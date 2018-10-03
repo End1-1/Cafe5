@@ -137,7 +137,6 @@ void DlgOrder::buildMenu(const QString &menu, QString part1, QString part2)
 void DlgOrder::addDishToOrder(const QJsonObject &obj)
 {
     QJsonObject o = obj;
-<<<<<<< HEAD
     if (obj["f_id"].toString().toInt() == 0) {
         o["f_id"] = "0";
         o["f_header"] = fOrder->headerValue("f_id");
@@ -149,7 +148,6 @@ void DlgOrder::addDishToOrder(const QJsonObject &obj)
         o["f_qty2"] = "0";
         o["f_comment"] = "";
     }
-=======
     o["f_id"] = "0";
     o["f_state"] = QString::number(DISH_STATE_OK);
     o["f_service"] = "0";
@@ -158,7 +156,6 @@ void DlgOrder::addDishToOrder(const QJsonObject &obj)
     o["f_qty1"] = "1";
     o["f_qty2"] = "0";
     o["f_comment"] = "";
->>>>>>> 838f31771d5f7dd82bf2f9d4a1b63c78fc2269eb
     int row = ui->tblOrder->rowCount();
     ui->tblOrder->setRowCount(row + 1);
     ui->tblOrder->setItem(row, 0, new QTableWidgetItem());
@@ -169,17 +166,13 @@ void DlgOrder::addDishToOrder(const QJsonObject &obj)
 
 void DlgOrder::loadOrder(const QJsonObject &obj)
 {
-<<<<<<< HEAD
-=======
     fOrder->fItems = obj["body"].toArray();
->>>>>>> 838f31771d5f7dd82bf2f9d4a1b63c78fc2269eb
     fOrder->fHeader = obj["header"].toArray().at(0).toObject();
     if (fOrder->headerValue("f_id").toInt() == 0) {
         fOrder->setHeaderValue("f_staff", fUser->fId);
         fOrder->setHeaderValue("f_staffname", fUser->fFull);
         fOrder->setHeaderValue("f_state", ORDER_STATE_OPEN);
         fOrder->setHeaderValue("f_prefix", "");
-<<<<<<< HEAD
         fOrder->setHeaderValue("f_comment", "");
         fOrder->setHeaderValue("f_hall", obj["table"].toArray().at(0)["f_hall"].toString());
     }
@@ -188,10 +181,6 @@ void DlgOrder::loadOrder(const QJsonObject &obj)
     for (int i = 0, count = obj["body"].toArray().count(); i < count; i++) {
         addDishToOrder(obj["body"].toArray().at(i).toObject());
     }
-=======
-        fOrder->setHeaderValue("f_hall", obj["table"].toArray().at(0)["f_hall"].toString());
-    }
->>>>>>> 838f31771d5f7dd82bf2f9d4a1b63c78fc2269eb
 }
 
 void DlgOrder::changeQty(double qty)

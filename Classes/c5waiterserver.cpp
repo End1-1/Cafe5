@@ -27,7 +27,6 @@ void C5WaiterServer::reply(QJsonObject &o)
         QJsonArray jHall;
         srh.getJsonFromQuery("select f_id, f_name from h_halls", jHall);
         QJsonArray jTables;
-<<<<<<< HEAD
         srh.getJsonFromQuery("select t.f_id, t.f_hall, t.f_name, t.f_lock, t.f_lockSrc, \
                             h.f_id as f_header, concat(u.f_last, ' ', u.f_first) as f_staffName, \
                             h.f_amountCash + h.f_amountCard + h.f_amountBank + h.f_amountOther as f_amount, \
@@ -36,9 +35,7 @@ void C5WaiterServer::reply(QJsonObject &o)
                             left join o_header h on h.f_table=t.f_id and h.f_state=1 \
                             left join s_user u on u.f_id=h.f_staff \
                             order by f_id", jTables);
-=======
         srh.getJsonFromQuery("select f_id, f_hall, f_name, f_lock, f_lockSrc from h_tables order by f_id", jTables);
->>>>>>> 838f31771d5f7dd82bf2f9d4a1b63c78fc2269eb
         o["reply"] = 1;
         o["halls"] = jHall;
         o["tables"] = jTables;
@@ -46,11 +43,7 @@ void C5WaiterServer::reply(QJsonObject &o)
     }
     case sm_menu: {
         QJsonArray jMenu;
-<<<<<<< HEAD
         QString query = "select d.f_id as f_dish, mn.f_name as menu_name, p1.f_name as part1, p2.f_name as part2, d.f_name, \
-=======
-        QString query = "select mn.f_name as menu_name, p1.f_name as part1, p2.f_name as part2, d.f_name, \
->>>>>>> 838f31771d5f7dd82bf2f9d4a1b63c78fc2269eb
                 m.f_price, m.f_store, m.f_print1, m.f_print2, d.f_remind \
                 from d_menu m \
                 left join d_menu_names mn on mn.f_id=m.f_menu \
@@ -91,16 +84,13 @@ void C5WaiterServer::reply(QJsonObject &o)
                 srh.fDb[":f_id"] = fIn["table"].toInt();
                 srh.fDb.exec("update h_tables set f_lock=:f_lock, f_lockSrc=:f_lockSrc where f_id=:f_id");
                 QJsonArray jo;
-<<<<<<< HEAD
                 QJsonArray jb;
                 bv[":f_table"] = fIn["table"].toInt();
                 bv[":f_state"] = ORDER_STATE_OPEN;
                 srh.getJsonFromQuery("select * from o_header o where f_table=:f_table and f_state=:f_state order by o.f_id limit 1 ", jo, bv);
-=======
                 bv[":f_table"] = fIn["table"].toInt();
                 bv[":f_state"] = ORDER_STATE_OPEN;
                 srh.getJsonFromQuery("select * from o_header where f_table=:f_table and f_state=:f_state", jo, bv);
->>>>>>> 838f31771d5f7dd82bf2f9d4a1b63c78fc2269eb
                 if (jo.count() == 0) {
                     QJsonObject jh;
                     jh["f_id"] = 0;
@@ -110,7 +100,6 @@ void C5WaiterServer::reply(QJsonObject &o)
                     jh["f_dateOpen"] = current_date;
                     jh["f_timeOpen"] = current_time;
                     jo.append(jh);
-<<<<<<< HEAD
                 } else {
                     bv[":f_header"] = jo.at(0).toObject()["f_id"].toString().toInt();
                     srh.getJsonFromQuery("select ob.f_id, ob.f_header, ob.f_state, dp1.f_name as part1, dp2.f_name as part2, d.f_name as f_name, \
@@ -124,10 +113,6 @@ void C5WaiterServer::reply(QJsonObject &o)
                 }
                 o["header"] = jo;
                 o["body"] = jb;
-=======
-                }
-                o["header"] = jo;
->>>>>>> 838f31771d5f7dd82bf2f9d4a1b63c78fc2269eb
                 o["table"] = jt;
             } else {
                 o["reply"] = 2;
@@ -147,7 +132,6 @@ void C5WaiterServer::reply(QJsonObject &o)
             if (jh["unlocktable"].toString().toInt() > 0) {
                 srh.fDb[":f_lock"] = 0;
                 srh.fDb[":f_lockSrc"] = "";
-<<<<<<< HEAD
                 srh.fDb[":f_id"] = jh["f_table"].toString();
                 srh.fDb.exec("update h_tables set f_lock=:f_lock, f_lockSrc=:f_lockSrc where f_id=:f_id");
             }
@@ -187,15 +171,10 @@ void C5WaiterServer::reply(QJsonObject &o)
             srh.fDb[":f_comment"] = jb["f_comment"].toString();
             srh.fDb[":f_remind"] = jb["f_remind"].toString().toInt();
             srh.fDb.update("o_body", where_id(jb["f_id"].toString()));
-=======
-                srh.fDb[":f_id"] = jh["f_table"].toString().toInt();
-                srh.fDb.exec("update h_tables set f_lock=:f_lock, f_lockSrc=:f_lockSrc where f_id=:f_id");
-            }
         }
         if (jh["id"].toInt() == 0) {
             srh.fDb[":f_id"] = 0;
             jh["id"] = srh.fDb.insert("o_header");
->>>>>>> 838f31771d5f7dd82bf2f9d4a1b63c78fc2269eb
         }
         o["ooo"] = fIn;
         break;

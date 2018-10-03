@@ -4,10 +4,7 @@
 #include "c5dialog.h"
 #include <QTcpServer>
 #include <QTableWidgetItem>
-<<<<<<< HEAD
 #include <QTimer>
-=======
->>>>>>> 838f31771d5f7dd82bf2f9d4a1b63c78fc2269eb
 
 namespace Ui {
 class DlgFace;
@@ -25,12 +22,9 @@ public:
     void setup();
 
 private slots:
-<<<<<<< HEAD
 
     void timeout();
 
-=======
->>>>>>> 838f31771d5f7dd82bf2f9d4a1b63c78fc2269eb
     void newConnection();
 
     void handleHall(const QJsonObject &obj);
@@ -56,11 +50,8 @@ private:
 
     QJsonArray fTables;
 
-<<<<<<< HEAD
     QTimer fTimer;
 
-=======
->>>>>>> 838f31771d5f7dd82bf2f9d4a1b63c78fc2269eb
     void filterHall();
 };
 
