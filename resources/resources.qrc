@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/">
+        <file>configure.png</file>
+        <file>exit.png</file>
+        <file>cancel.png</file>
+        <file>ok.png</file>
+        <file>down.png</file>
+        <file>up.png</file>
+        <file>menu.PNG</file>
+        <file>recycle.png</file>
+        <file>print_receipt.png</file>
+    </qresource>
+</RCC>
