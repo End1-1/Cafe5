@@ -81,6 +81,7 @@ public:
         tblHall->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         tblHall->setEditTriggers(QAbstractItemView::NoEditTriggers);
         tblHall->setSelectionMode(QAbstractItemView::NoSelection);
+        tblHall->setShowGrid(false);
         tblHall->horizontalHeader()->setVisible(false);
         tblHall->verticalHeader()->setVisible(false);
 

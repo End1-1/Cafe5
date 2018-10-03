@@ -11,7 +11,7 @@
 #include "c5halltabledelegate.h"
 #include <QTcpSocket>
 
-#define HALL_COL_WIDTH 200
+#define HALL_COL_WIDTH 175
 #define HALL_ROW_HEIGHT 60
 
 DlgFace::DlgFace(QWidget *parent) :
@@ -46,6 +46,15 @@ void DlgFace::setup()
     sh->send();
     sh = createSocketHandler(SLOT(handleConf(QJsonObject)));
     sh->bind("cmd", sm_waiterconf);
+    sh->send();
+    connect(&fTimer, SIGNAL(timeout()), this, SLOT(timeout()));
+    fTimer.start(5000);
+}
+
+void DlgFace::timeout()
+{
+    C5SocketHandler *sh = createSocketHandler(SLOT(handleHall(QJsonObject)));
+    sh->bind("cmd", sm_hall);
     sh->send();
 }
 

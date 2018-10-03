@@ -137,14 +137,17 @@ void DlgOrder::buildMenu(const QString &menu, QString part1, QString part2)
 void DlgOrder::addDishToOrder(const QJsonObject &obj)
 {
     QJsonObject o = obj;
-    o["f_id"] = "0";
-    o["f_state"] = QString::number(DISH_STATE_OK);
-    o["f_service"] = "0";
-    o["f_discount"] = "0";
-    o["f_total"] = o["f_price"];
-    o["f_qty1"] = "1";
-    o["f_qty2"] = "0";
-    o["f_comment"] = "";
+    if (obj["f_id"].toString().toInt() == 0) {
+        o["f_id"] = "0";
+        o["f_header"] = fOrder->headerValue("f_id");
+        o["f_state"] = QString::number(DISH_STATE_OK);
+        o["f_service"] = "0";
+        o["f_discount"] = "0";
+        o["f_total"] = o["f_price"];
+        o["f_qty1"] = "1";
+        o["f_qty2"] = "0";
+        o["f_comment"] = "";
+    }
     int row = ui->tblOrder->rowCount();
     ui->tblOrder->setRowCount(row + 1);
     ui->tblOrder->setItem(row, 0, new QTableWidgetItem());
@@ -155,14 +158,19 @@ void DlgOrder::addDishToOrder(const QJsonObject &obj)
 
 void DlgOrder::loadOrder(const QJsonObject &obj)
 {
-    fOrder->fItems = obj["body"].toArray();
     fOrder->fHeader = obj["header"].toArray().at(0).toObject();
     if (fOrder->headerValue("f_id").toInt() == 0) {
         fOrder->setHeaderValue("f_staff", fUser->fId);
         fOrder->setHeaderValue("f_staffname", fUser->fFull);
         fOrder->setHeaderValue("f_state", ORDER_STATE_OPEN);
         fOrder->setHeaderValue("f_prefix", "");
+        fOrder->setHeaderValue("f_comment", "");
         fOrder->setHeaderValue("f_hall", obj["table"].toArray().at(0)["f_hall"].toString());
+    }
+    ui->tblOrder->clear();
+    ui->tblOrder->setRowCount(0);
+    for (int i = 0, count = obj["body"].toArray().count(); i < count; i++) {
+        addDishToOrder(obj["body"].toArray().at(i).toObject());
     }
 }
 
