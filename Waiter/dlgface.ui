@@ -53,9 +53,12 @@
         <property name="selectionMode">
          <enum>QAbstractItemView::NoSelection</enum>
         </property>
+<<<<<<< HEAD
         <property name="showGrid">
          <bool>false</bool>
         </property>
+=======
+>>>>>>> 838f31771d5f7dd82bf2f9d4a1b63c78fc2269eb
         <attribute name="horizontalHeaderVisible">
          <bool>false</bool>
         </attribute>
