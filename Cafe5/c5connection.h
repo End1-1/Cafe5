@@ -1,0 +1,30 @@
+#ifndef C5CONNECTION_H
+#define C5CONNECTION_H
+
+#include "c5dialog.h"
+
+namespace Ui {
+class C5Connection;
+}
+
+class C5Connection : public C5Dialog
+{
+    Q_OBJECT
+
+public:
+    explicit C5Connection(QWidget *parent = 0);
+    ~C5Connection();
+    static void readParams(QList<QByteArray> &params);
+    virtual bool preambule();
+private slots:
+    void on_btnCancel_clicked();
+
+    void on_btnTest_clicked();
+
+    void on_btnSave_clicked();
+
+private:
+    Ui::C5Connection *ui;
+};
+
+#endif // C5CONNECTION_H

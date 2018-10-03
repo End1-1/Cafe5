@@ -1,0 +1,16 @@
+INPUT(
+./release\main.o
+./release\c5mainwindow.o
+./release\c5config.o
+./release\c5connection.o
+./release\c5database.o
+./release\c5dialog.o
+./release\c5message.o
+./release\c5sqlquery.o
+./release\c5staticdb.o
+./release\c5utils.o
+./release\moc_c5mainwindow.o
+./release\moc_c5connection.o
+./release\moc_c5dialog.o
+./release\moc_c5message.o
+);
