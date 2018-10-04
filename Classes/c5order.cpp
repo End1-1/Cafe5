@@ -1,6 +1,7 @@
 #include "c5order.h"
 #include "c5sockethandler.h"
 #include "c5socketmessage.h"
+#include "c5utils.h"
 #include <QDebug>
 
 C5Order::C5Order()
@@ -21,13 +22,13 @@ QString C5Order::itemValue(int index, const QString &name)
 
 void C5Order::setItemValue(int index, const QString &name, const QString &value)
 {
-    fItems[index].toObject()[name] = value;
+    fItems[index].toObject()[name.toLower()] = value;
     fSaved = false;
 }
 
 QString C5Order::headerValue(const QString &name)
 {
-    return fHeader[name].toString();
+    return fHeader[name.toLower()].toString();
 }
 
 void C5Order::setHeaderValue(const QString &name, const QString &value)
@@ -41,6 +42,11 @@ void C5Order::setHeaderValue(const QString &name, int value)
     setHeaderValue(name, QString::number(value));
 }
 
+void C5Order::setHeaderValue(const QString &name, double value)
+{
+    setHeaderValue(name, float_str(value, 2));
+}
+
 void C5Order::save(C5SocketHandler *sh)
 {
     if (fSaved) {
@@ -51,4 +57,30 @@ void C5Order::save(C5SocketHandler *sh)
     o["header"] = fHeader;
     o["body"] = fItems;
     sh->send(o);
+}
+
+void C5Order::countTotal()
+{
+    double total = 0;
+    double totalService = 0;
+    double totalDiscount = 0;
+    for (int i = 0, count = fItems.count(); i < count; i++) {
+        QJsonObject o = fItems[i].toObject();
+        double price = o["f_price"].toString().toDouble();
+        double service = o["f_service"].toString().toDouble();
+        double discount = o["f_discount"].toString().toDouble();
+        double itemTotal = price * o["f_qty2"].toString().toDouble();
+        double serviceAmount = (itemTotal * service);
+        itemTotal += serviceAmount;
+        double discountAmount = (itemTotal * discount);
+        itemTotal -= discountAmount;
+        total += itemTotal;
+        totalService += serviceAmount;
+        totalDiscount += discountAmount;
+        o["f_total"] = float_str(itemTotal, 2);
+        fItems[i] = o;
+    }
+    setHeaderValue("f_amounttotal", total);
+    setHeaderValue("f_amountservice", totalService);
+    setHeaderValue("f_amountdiscount", totalDiscount);
 }

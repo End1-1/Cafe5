@@ -7,4 +7,5 @@
 #define sm_opentable 4
 #define sm_waiterconf 5
 #define sm_saveorder 6
+#define sm_printservice 7
 #endif // C5SOCKETMESSAGE_H

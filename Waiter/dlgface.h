@@ -21,6 +21,10 @@ public:
 
     void setup();
 
+    void accept();
+
+    void reject();
+
 private slots:
 
     void timeout();
@@ -51,6 +55,8 @@ private:
     QJsonArray fTables;
 
     QTimer fTimer;
+
+    bool fCanClose;
 
     void filterHall();
 };

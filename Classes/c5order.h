@@ -16,7 +16,9 @@ public:
     QString headerValue(const QString &name);
     void setHeaderValue(const QString &name, const QString &value);
     void setHeaderValue(const QString &name, int value);
+    void setHeaderValue(const QString &name, double value);
     void save(C5SocketHandler *sh);
+    void countTotal();
     QJsonArray fItems;
     QJsonObject fHeader;
 private:

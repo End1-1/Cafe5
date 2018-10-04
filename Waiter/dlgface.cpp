@@ -10,6 +10,7 @@
 #include "c5waiterserver.h"
 #include "c5halltabledelegate.h"
 #include <QTcpSocket>
+#include <QCloseEvent>
 
 #define HALL_COL_WIDTH 175
 #define HALL_ROW_HEIGHT 60
@@ -19,7 +20,7 @@ DlgFace::DlgFace(QWidget *parent) :
     ui(new Ui::DlgFace)
 {
     ui->setupUi(this);
-
+    fCanClose = false;
 }
 
 DlgFace::~DlgFace()
@@ -49,6 +50,18 @@ void DlgFace::setup()
     sh->send();
     connect(&fTimer, SIGNAL(timeout()), this, SLOT(timeout()));
     fTimer.start(5000);
+}
+
+void DlgFace::accept()
+{
+    if (fCanClose) {
+        C5Dialog::accept();
+    }
+}
+
+void DlgFace::reject()
+{
+
 }
 
 void DlgFace::timeout()
@@ -109,6 +122,7 @@ void DlgFace::on_btnConnection_clicked()
 void DlgFace::on_btnExit_clicked()
 {
     if (C5Message::question(tr("Are you sure to close application")) == QDialog::Accepted) {
+        fCanClose = true;
         qApp->quit();
     }
 }
@@ -140,15 +154,15 @@ void DlgFace::on_tblHall_itemClicked(QTableWidgetItem *item)
     if (!item) {
         return;
     }
-    int tableId = item->data(Qt::UserRole).toJsonObject()["f_id"].toString().toInt();
-    if (tableId == 0) {
+    QJsonObject o = item->data(Qt::UserRole).toJsonObject();
+    if (o["f_id"].toString().toInt() == 0) {
         return;
     }
     C5User user;
-    if (!DlgPassword::getUser(item->data(Qt::UserRole).toJsonObject()["f_name"].toString(), &user)) {
+    if (!DlgPassword::getUser(o["f_name"].toString(), &user)) {
         return;
     }
-    DlgOrder::openTable(tableId, &user);
+    DlgOrder::openTable(o, &user);
     C5SocketHandler *sh = createSocketHandler(SLOT(handleHall(QJsonObject)));
     sh->bind("cmd", sm_hall);
     sh->send();

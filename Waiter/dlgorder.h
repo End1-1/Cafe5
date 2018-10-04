@@ -20,7 +20,7 @@ public:
 
     ~DlgOrder();
 
-    static void openTable(int table, C5User *user);
+    static void openTable(const QJsonObject &table, C5User *user);
 
 protected:
     virtual void accept();
@@ -48,8 +48,12 @@ private:
 
     void changeQty(double qty);
 
+    void itemsToTable();
+
 private slots:
     void handleOpenTable(const QJsonObject &obj);
+
+    void handlePrintService(const QJsonObject &obj);
 
     void saveAndQuit(const QJsonObject &obj);
 
@@ -70,6 +74,10 @@ private slots:
     void on_btnMin05_clicked();
 
     void on_btnCustom_clicked();
+
+    void on_btnPrintService_clicked();
+
+    void on_btnPayment_clicked();
 };
 
 #endif // DLGORDER_H

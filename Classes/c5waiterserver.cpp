@@ -28,8 +28,8 @@ void C5WaiterServer::reply(QJsonObject &o)
         srh.getJsonFromQuery("select f_id, f_name from h_halls", jHall);
         QJsonArray jTables;
         srh.getJsonFromQuery("select t.f_id, t.f_hall, t.f_name, t.f_lock, t.f_lockSrc, \
-                            h.f_id as f_header, concat(u.f_last, ' ', u.f_first) as f_staffName, \
-                            h.f_amountCash + h.f_amountCard + h.f_amountBank + h.f_amountOther as f_amount, \
+                            h.f_id as f_header, concat(u.f_last, ' ', left(u.f_first, 1), '.') as f_staffName, \
+                            h.f_amountTotal as f_amount, \
                             date_format(h.f_dateOpen, '%d.%m.%Y') as f_dateOpen, h.f_timeOpen \
                             from h_tables t \
                             left join o_header h on h.f_table=t.f_id and h.f_state=1 \
@@ -88,17 +88,14 @@ void C5WaiterServer::reply(QJsonObject &o)
                 bv[":f_table"] = fIn["table"].toInt();
                 bv[":f_state"] = ORDER_STATE_OPEN;
                 srh.getJsonFromQuery("select * from o_header o where f_table=:f_table and f_state=:f_state order by o.f_id limit 1 ", jo, bv);
-                bv[":f_table"] = fIn["table"].toInt();
-                bv[":f_state"] = ORDER_STATE_OPEN;
-                srh.getJsonFromQuery("select * from o_header where f_table=:f_table and f_state=:f_state", jo, bv);
                 if (jo.count() == 0) {
                     QJsonObject jh;
-                    jh["f_id"] = 0;
+                    jh["f_id"] = "0";
                     jh["f_hall"] = jt.at(0)["f_hall"];
                     jh["f_table"] = QString::number(fIn["table"].toInt());
                     jh["f_state"] = QString::number(ORDER_STATE_OPEN);
-                    jh["f_dateOpen"] = current_date;
-                    jh["f_timeOpen"] = current_time;
+                    jh["f_dateopen"] = current_date;
+                    jh["f_timeopen"] = current_time;
                     jo.append(jh);
                 } else {
                     bv[":f_header"] = jo.at(0).toObject()["f_id"].toString().toInt();
@@ -126,8 +123,8 @@ void C5WaiterServer::reply(QJsonObject &o)
         break;
     }
     case sm_saveorder: {
-        o["reply"] = 1;
         QJsonObject jh = fIn["header"].toObject();
+        QJsonArray ja = fIn["body"].toArray();
         if (jh.contains("unlocktable")) {
             if (jh["unlocktable"].toString().toInt() > 0) {
                 srh.fDb[":f_lock"] = 0;
@@ -136,20 +133,13 @@ void C5WaiterServer::reply(QJsonObject &o)
                 srh.fDb.exec("update h_tables set f_lock=:f_lock, f_lockSrc=:f_lockSrc where f_id=:f_id");
             }
         }
-        if (jh["f_id"].toString().toInt() == 0) {
+        if (jh["f_id"].toString().toInt() == 0 && ja.count() > 0) {
             srh.fDb[":f_id"] = 0;
-            srh.fDb[":f_dateOpen"] = QDate::fromString(jh["f_dateOpen"].toString(), FORMAT_DATE_TO_STR);
-            srh.fDb[":f_timeOpen"] = QTime::fromString(jh["f_timeOpen"].toString(), FORMAT_TIME_TO_STR);
+            srh.fDb[":f_dateOpen"] = QDate::fromString(jh["f_dateopen"].toString(), FORMAT_DATE_TO_STR);
+            srh.fDb[":f_timeOpen"] = QTime::fromString(jh["f_timeopen"].toString(), FORMAT_TIME_TO_STR);
             srh.fDb[":f_prefix"] = jh["f_prefix"].toString();
             jh["f_id"] = QString::number(srh.fDb.insert("o_header"));
         }
-        srh.fDb[":f_comment"] = jh["f_comment"].toString();
-        srh.fDb[":f_staff"] = jh["f_staff"].toString().toInt();
-        srh.fDb[":f_hall"] = jh["f_hall"].toString().toInt();
-        srh.fDb[":f_table"] = jh["f_table"].toString().toInt();
-        srh.fDb[":f_state"] = jh["f_state"].toString().toInt();
-        srh.fDb.update("o_header", where_id(jh["f_id"].toString()));
-        QJsonArray ja = fIn["body"].toArray();
         for (int i = 0; i < ja.count(); i++) {
             QJsonObject jb = ja.at(i).toObject();
             if (jb["f_id"].toString().toInt() == 0) {
@@ -171,12 +161,38 @@ void C5WaiterServer::reply(QJsonObject &o)
             srh.fDb[":f_comment"] = jb["f_comment"].toString();
             srh.fDb[":f_remind"] = jb["f_remind"].toString().toInt();
             srh.fDb.update("o_body", where_id(jb["f_id"].toString()));
+            ja[i] = jb;
         }
-        if (jh["id"].toInt() == 0) {
-            srh.fDb[":f_id"] = 0;
-            jh["id"] = srh.fDb.insert("o_header");
+        if (ja.count() > 0) {
+            srh.fDb[":f_comment"] = jh["f_comment"].toString();
+            srh.fDb[":f_staff"] = jh["f_staff"].toString().toInt();
+            srh.fDb[":f_hall"] = jh["f_hall"].toString().toInt();
+            srh.fDb[":f_table"] = jh["f_table"].toString().toInt();
+            srh.fDb[":f_state"] = jh["f_state"].toString().toInt();
+            srh.fDb[":f_amountTotal"] = jh["f_amounttotal"].toString().toDouble();
+            srh.fDb[":f_amountCash"] = jh["f_amountcache"].toString().toDouble();
+            srh.fDb[":f_amountCard"] = jh["f_amountcard"].toString().toDouble();
+            srh.fDb[":f_amountBank"] = jh["f_amountbank"].toString().toDouble();
+            srh.fDb[":f_amountOther"] = jh["f_amountother"].toString().toDouble();
+            srh.fDb[":f_amountService"] =jh["f_amountservice"].toString().toDouble();
+            srh.fDb[":f_amountDiscount"] = jh["f_amountdiscount"].toString().toDouble();
+            srh.fDb.update("o_header", where_id(jh["f_id"].toString()));
         }
-        o["ooo"] = fIn;
+        o = fIn;
+        o["header"] = jh;
+        o["body"] = ja;
+        o["reply"] = 1;
+        break;
+    }
+    case sm_printservice: {
+        o["reply"] = 1;
+        QJsonArray ji = fIn["body"].toArray();
+        for (int i = 0; i < ji.count(); i++ ) {
+            QJsonObject jo = ji[i].toObject();
+            jo["f_qty2"] = jo["f_qty1"];
+            ji[i] = jo;
+        }
+        o["body"] = ji;
         break;
     }
     default:

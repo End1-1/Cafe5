@@ -28,7 +28,7 @@ DlgOrder::~DlgOrder()
     delete fOrder;
 }
 
-void DlgOrder::openTable(int table, C5User *user)
+void DlgOrder::openTable(const QJsonObject &table, C5User *user)
 {
     DlgOrder *d = new DlgOrder(C5Config::fParentWidget);
     d->fMenuName = C5WaiterConf::fDefaultMenu;
@@ -48,7 +48,9 @@ void DlgOrder::openTable(int table, C5User *user)
     d->ui->tblOrder->verticalHeader()->setDefaultSectionSize(PART4_ROW_HEIGHT);
     d->buildMenu(d->fMenuName, "", "");
     d->fUser = user;
-    d->load(table);
+    d->ui->lbTable->setText(table["f_name"].toString());
+    d->ui->lbStaffName->setText(user->fFull);
+    d->load(table["f_id"].toString().toInt());
     d->exec();
     delete d;
 }
@@ -56,7 +58,7 @@ void DlgOrder::openTable(int table, C5User *user)
 void DlgOrder::accept()
 {
     C5SocketHandler *sh = createSocketHandler(SLOT(saveAndQuit(QJsonObject)));
-    fOrder->setHeaderValue("unlocktable", 1);
+    fOrder->setHeaderValue("unlocktable", "1");
     fOrder->save(sh);
 }
 
@@ -143,30 +145,22 @@ void DlgOrder::addDishToOrder(const QJsonObject &obj)
         o["f_state"] = QString::number(DISH_STATE_OK);
         o["f_service"] = "0";
         o["f_discount"] = "0";
-        o["f_total"] = o["f_price"];
+        o["f_total"] = "0";
         o["f_qty1"] = "1";
         o["f_qty2"] = "0";
         o["f_comment"] = "";
     }
-    o["f_id"] = "0";
-    o["f_state"] = QString::number(DISH_STATE_OK);
-    o["f_service"] = "0";
-    o["f_discount"] = "0";
-    o["f_total"] = o["f_price"];
-    o["f_qty1"] = "1";
-    o["f_qty2"] = "0";
-    o["f_comment"] = "";
     int row = ui->tblOrder->rowCount();
     ui->tblOrder->setRowCount(row + 1);
     ui->tblOrder->setItem(row, 0, new QTableWidgetItem());
     ui->tblOrder->item(row, 0)->setData(Qt::UserRole, o);
     ui->tblOrder->setCurrentCell(ui->tblOrder->rowCount() - 1, 0);
     fOrder->addItem(o);
+    fOrder->countTotal();
 }
 
 void DlgOrder::loadOrder(const QJsonObject &obj)
 {
-    fOrder->fItems = obj["body"].toArray();
     fOrder->fHeader = obj["header"].toArray().at(0).toObject();
     if (fOrder->headerValue("f_id").toInt() == 0) {
         fOrder->setHeaderValue("f_staff", fUser->fId);
@@ -175,12 +169,20 @@ void DlgOrder::loadOrder(const QJsonObject &obj)
         fOrder->setHeaderValue("f_prefix", "");
         fOrder->setHeaderValue("f_comment", "");
         fOrder->setHeaderValue("f_hall", obj["table"].toArray().at(0)["f_hall"].toString());
+        fOrder->setHeaderValue("f_amounttotal", 0);
+        fOrder->setHeaderValue("f_amountcash", 0);
+        fOrder->setHeaderValue("f_amountcard", 0);
+        fOrder->setHeaderValue("f_amountbank", 0);
+        fOrder->setHeaderValue("f_amountother", 0);
+        fOrder->setHeaderValue("f_amountservice", 0);
+        fOrder->setHeaderValue("f_amountdiscount", 0);
     }
     ui->tblOrder->clear();
     ui->tblOrder->setRowCount(0);
     for (int i = 0, count = obj["body"].toArray().count(); i < count; i++) {
         addDishToOrder(obj["body"].toArray().at(i).toObject());
     }
+    ui->leTotal->setText(fOrder->headerValue("f_amounttotal"));
 }
 
 void DlgOrder::changeQty(double qty)
@@ -190,7 +192,7 @@ void DlgOrder::changeQty(double qty)
         return;
     }
     int index = ml.at(0).row();
-    QJsonObject o = fOrder->fItems.at(index).toObject();
+    QJsonObject o = fOrder->fItems[index].toObject();
     if (qty > 0) {
         if (o["f_qty1"].toString().toDouble() + qty > 99) {
             return;
@@ -205,8 +207,21 @@ void DlgOrder::changeQty(double qty)
         }
     }
     fOrder->fItems[index] = o;
-    ui->tblOrder->item(index, 0)->setData(Qt::UserRole, o);
+    fOrder->countTotal();
+    ui->tblOrder->item(index, 0)->setData(Qt::UserRole, fOrder->fItems[index].toObject());
     ui->tblOrder->viewport()->update();
+}
+
+void DlgOrder::itemsToTable()
+{
+    fOrder->countTotal();
+    ui->tblOrder->clear();
+    ui->tblOrder->setRowCount(fOrder->fItems.count());
+    for (int i = 0; i < fOrder->fItems.count(); i++) {
+        ui->tblOrder->setItem(i, 0, new QTableWidgetItem());
+        ui->tblOrder->item(i, 0)->setData(Qt::UserRole, fOrder->fItems[i].toObject());
+    }
+    ui->leTotal->setText(fOrder->headerValue("f_amounttotal"));
 }
 
 void DlgOrder::handleOpenTable(const QJsonObject &obj)
@@ -226,10 +241,23 @@ void DlgOrder::handleOpenTable(const QJsonObject &obj)
     }
 }
 
+void DlgOrder::handlePrintService(const QJsonObject &obj)
+{
+    fOrder->fItems = obj["body"].toArray();
+    itemsToTable();
+    C5SocketHandler *sh = createSocketHandler(SLOT(saveAndQuit(QJsonObject)));
+    fOrder->save(sh);
+}
+
 void DlgOrder::saveAndQuit(const QJsonObject &obj)
 {
-    qDebug() << obj;
-    QDialog::accept();
+    if (obj["header"].toObject()["unlocktable"].toString().toInt() > 0) {
+        QDialog::accept();
+        return;
+    }
+    fOrder->fItems = obj["body"].toArray();
+    fOrder->fHeader = obj["header"].toObject();
+    itemsToTable();
 }
 
 void DlgOrder::handleError(int err, const QString &msg)
@@ -315,4 +343,19 @@ void DlgOrder::on_btnCustom_clicked()
     fOrder->fItems[index] = o;
     ui->tblOrder->item(index, 0)->setData(Qt::UserRole, o);
     ui->tblOrder->viewport()->update();
+}
+
+void DlgOrder::on_btnPrintService_clicked()
+{
+    C5SocketHandler *sh = createSocketHandler(SLOT(handlePrintService(QJsonObject)));
+    sh->bind("cmd", sm_printservice);
+    QJsonObject o;
+    o["header"] = fOrder->fHeader;
+    o["body"] = fOrder->fItems;
+    sh->send(o);
+}
+
+void DlgOrder::on_btnPayment_clicked()
+{
+
 }

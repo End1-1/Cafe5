@@ -9,5 +9,6 @@
         <file>menu.PNG</file>
         <file>recycle.png</file>
         <file>print_receipt.png</file>
+        <file>payment.png</file>
     </qresource>
 </RCC>
