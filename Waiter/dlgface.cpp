@@ -61,7 +61,7 @@ void DlgFace::accept()
 
 void DlgFace::reject()
 {
-
+    on_btnExit_clicked();
 }
 
 void DlgFace::timeout()

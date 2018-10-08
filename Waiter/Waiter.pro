@@ -51,7 +51,9 @@ SOURCES += \
     ../Classes/c5waiterserver.cpp \
     ../Classes/c5dishtabledelegate.cpp \
     ../Classes/c5ordertabledelegate.cpp \
-    ../Classes/c5halltabledelegate.cpp
+    ../Classes/c5halltabledelegate.cpp \
+    ../Classes/c5printing.cpp \
+    c5printservicethread.cpp
 
 HEADERS += \
         dlgface.h \
@@ -74,7 +76,9 @@ HEADERS += \
     ../Classes/c5waiterserver.h \
     ../Classes/c5dishtabledelegate.h \
     ../Classes/c5ordertabledelegate.h \
-    ../Classes/c5halltabledelegate.h
+    ../Classes/c5halltabledelegate.h \
+    ../Classes/c5printing.h \
+    c5printservicethread.h
 
 FORMS += \
         dlgface.ui \

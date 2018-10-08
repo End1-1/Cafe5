@@ -2,6 +2,7 @@
 #include "c5serverhandler.h"
 #include "c5config.h"
 #include "c5socketmessage.h"
+#include "c5printservicethread.h"
 #include "c5utils.h"
 #include <QDebug>
 #include <QJsonArray>
@@ -142,25 +143,7 @@ void C5WaiterServer::reply(QJsonObject &o)
         }
         for (int i = 0; i < ja.count(); i++) {
             QJsonObject jb = ja.at(i).toObject();
-            if (jb["f_id"].toString().toInt() == 0) {
-                srh.fDb[":f_id"] = 0;
-                jb["f_id"] = QString::number(srh.fDb.insert("o_body"));
-            }
-            srh.fDb[":f_header"] = jh["f_id"].toString().toInt();
-            srh.fDb[":f_state"] = jb["f_state"].toString().toInt();
-            srh.fDb[":f_dish"] = jb["f_dish"].toString().toInt();
-            srh.fDb[":f_qty1"] = jb["f_qty1"].toString().toDouble();
-            srh.fDb[":f_qty2"] = jb["f_qty2"].toString().toDouble();
-            srh.fDb[":f_price"] = jb["f_price"].toString().toDouble();
-            srh.fDb[":f_service"] = jb["f_service"].toString().toDouble();
-            srh.fDb[":f_discount"] = jb["f_discount"].toString().toDouble();
-            srh.fDb[":f_total"] = jb["f_total"].toString().toDouble();
-            srh.fDb[":f_store"] = jb["f_store"].toString().toInt();
-            srh.fDb[":f_print1"] = jb["f_print1"].toString();
-            srh.fDb[":f_print2"] = jb["f_print2"].toString();
-            srh.fDb[":f_comment"] = jb["f_comment"].toString();
-            srh.fDb[":f_remind"] = jb["f_remind"].toString().toInt();
-            srh.fDb.update("o_body", where_id(jb["f_id"].toString()));
+            saveDish(jh, jb, srh.fDb);
             ja[i] = jb;
         }
         if (ja.count() > 0) {
@@ -187,11 +170,19 @@ void C5WaiterServer::reply(QJsonObject &o)
     case sm_printservice: {
         o["reply"] = 1;
         QJsonArray ji = fIn["body"].toArray();
+        QJsonArray jp;
         for (int i = 0; i < ji.count(); i++ ) {
-            QJsonObject jo = ji[i].toObject();
+            QJsonObject jo = ji[i].toObject();            
+            if (jo["f_qty2"].toDouble() < jo["f_qty1"].toDouble()) {
+                jo["f_qtyPrint"] = jo["f_qty1"].toDouble() - jo["f_qty2"].toDouble();
+                jp.append(jo);
+            }
             jo["f_qty2"] = jo["f_qty1"];
+            saveDish(fIn["header"].toObject(), jo, srh.fDb);
             ji[i] = jo;
         }
+        C5PrintServiceThread *ps = new C5PrintServiceThread(fIn["header"].toObject(), jp);
+        ps->start();
         o["body"] = ji;
         break;
     }
@@ -200,4 +191,27 @@ void C5WaiterServer::reply(QJsonObject &o)
         o["msg"] = QString("%1: %2").arg(tr("Unknown command for socket handler from dlgface")).arg(cmd);
         break;
     }
+}
+
+void C5WaiterServer::saveDish(const QJsonObject &h, QJsonObject &o, C5Database &db)
+{
+    if (o["f_id"].toString().toInt() == 0) {
+        db[":f_id"] = 0;
+        o["f_id"] = QString::number(db.insert("o_body"));
+    }
+    db[":f_header"] = h["f_id"].toString().toInt();
+    db[":f_state"] = o["f_state"].toString().toInt();
+    db[":f_dish"] = o["f_dish"].toString().toInt();
+    db[":f_qty1"] = o["f_qty1"].toString().toDouble();
+    db[":f_qty2"] = o["f_qty2"].toString().toDouble();
+    db[":f_price"] = o["f_price"].toString().toDouble();
+    db[":f_service"] = o["f_service"].toString().toDouble();
+    db[":f_discount"] = o["f_discount"].toString().toDouble();
+    db[":f_total"] = o["f_total"].toString().toDouble();
+    db[":f_store"] = o["f_store"].toString().toInt();
+    db[":f_print1"] = o["f_print1"].toString();
+    db[":f_print2"] = o["f_print2"].toString();
+    db[":f_comment"] = o["f_comment"].toString();
+    db[":f_remind"] = o["f_remind"].toString().toInt();
+    db.update("o_body", where_id(o["f_id"].toString()));
 }
