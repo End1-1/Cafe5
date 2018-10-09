@@ -39,26 +39,32 @@ public:
 
     qreal fTop;
 
+    qreal fLineHeight;
+
+    qreal fNormalHeight;
+
+    qreal fNormalWidth;
+
 private:
+    qreal fTempTop;
+
     QPrinter fPrinter;
 
     QGraphicsScene *fCanvas;
 
     QList<QGraphicsScene*> fCanvasList;
 
-    qreal fNormalHeight;
-
-    qreal fNormalWidth;
-
     qreal fScaleFactor;
-
-    qreal fLineHeight;
 
     QPen fLinePen;
 
     QFont fFont;
 
     QMap<QGraphicsScene*, QPrinter::Orientation> fCanvasOrientation;
+
+    void setLineHeight();
+
+    void setTemptop(QGraphicsTextItem *item);
 };
 
 #endif // C5PRINTING_H

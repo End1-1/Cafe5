@@ -53,7 +53,8 @@ SOURCES += \
     ../Classes/c5ordertabledelegate.cpp \
     ../Classes/c5halltabledelegate.cpp \
     ../Classes/c5printing.cpp \
-    c5printservicethread.cpp
+    ../Classes/c5printservicethread.cpp \
+    dlgpayment.cpp
 
 HEADERS += \
         dlgface.h \
@@ -78,14 +79,16 @@ HEADERS += \
     ../Classes/c5ordertabledelegate.h \
     ../Classes/c5halltabledelegate.h \
     ../Classes/c5printing.h \
-    c5printservicethread.h
+    ../Classes/c5printservicethread.h \
+    dlgpayment.h
 
 FORMS += \
         dlgface.ui \
     ../Cafe5/c5connection.ui \
     ../Cafe5/c5message.ui \
     dlgpassword.ui \
-    dlgorder.ui
+    dlgorder.ui \
+    dlgpayment.ui
 
 INCLUDEPATH += ../Cafe5
 INCLUDEPATH += ../Classes

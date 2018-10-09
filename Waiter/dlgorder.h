@@ -57,6 +57,8 @@ private slots:
 
     void saveAndQuit(const QJsonObject &obj);
 
+    void handleGoPayment(const QJsonObject &obj);
+
     virtual void handleError(int err, const QString &msg);
 
     void on_tblPart1_itemClicked(QTableWidgetItem *item);

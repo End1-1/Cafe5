@@ -10,5 +10,8 @@
         <file>recycle.png</file>
         <file>print_receipt.png</file>
         <file>payment.png</file>
+        <file>calculator.png</file>
+        <file>service_check.png</file>
+        <file>wallet-with-money.png</file>
     </qresource>
 </RCC>

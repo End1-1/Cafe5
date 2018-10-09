@@ -19,6 +19,8 @@ private:
     QJsonObject fHeader;
 
     QJsonArray fBody;
+
+    void print(const QString &printer, const QString &side);
 };
 
 #endif // C5PRINTSERVICETHREAD_H

@@ -88,9 +88,21 @@ void C5WaiterServer::reply(QJsonObject &o)
                 QJsonArray jb;
                 bv[":f_table"] = fIn["table"].toInt();
                 bv[":f_state"] = ORDER_STATE_OPEN;
-                srh.getJsonFromQuery("select * from o_header o where f_table=:f_table and f_state=:f_state order by o.f_id limit 1 ", jo, bv);
+                srh.getJsonFromQuery("select t.f_name as f_tableName, concat(s.f_last, ' ', s.f_first) as f_staffname, \
+                    o.* \
+                    from o_header o \
+                    left join h_tables t on t.f_id=o.f_table \
+                    left join s_user s on s.f_id=o.f_staff \
+                    where o.f_table=:f_table and o.f_state=:f_state \
+                    order by o.f_id \
+                    limit 1 ", jo, bv);
                 if (jo.count() == 0) {
                     QJsonObject jh;
+                    srh.fDb[":f_id"] = fIn["table"].toInt();
+                    srh.fDb.exec("select f_name from h_table where f_id=:f_id");
+                    if (srh.fDb.nextRow()) {
+                        jh["f_tableName"] = srh.fDb.getString(0);
+                    }
                     jh["f_id"] = "0";
                     jh["f_hall"] = jt.at(0)["f_hall"];
                     jh["f_table"] = QString::number(fIn["table"].toInt());
@@ -173,8 +185,8 @@ void C5WaiterServer::reply(QJsonObject &o)
         QJsonArray jp;
         for (int i = 0; i < ji.count(); i++ ) {
             QJsonObject jo = ji[i].toObject();            
-            if (jo["f_qty2"].toDouble() < jo["f_qty1"].toDouble()) {
-                jo["f_qtyPrint"] = jo["f_qty1"].toDouble() - jo["f_qty2"].toDouble();
+            if (jo["f_qty2"].toString().toDouble() < jo["f_qty1"].toString().toDouble()) {
+                jo["f_qtyprint"] = jo["f_qty1"].toString().toDouble() - jo["f_qty2"].toString().toDouble();
                 jp.append(jo);
             }
             jo["f_qty2"] = jo["f_qty1"];
@@ -184,6 +196,20 @@ void C5WaiterServer::reply(QJsonObject &o)
         C5PrintServiceThread *ps = new C5PrintServiceThread(fIn["header"].toObject(), jp);
         ps->start();
         o["body"] = ji;
+        break;
+    }
+    case sm_printreceipt: {
+        QString err;
+        QJsonArray body = fIn["body"].toArray();
+        for (int i = 0; i < body.count(); i++) {
+            QJsonObject jo = body[i].toObject();
+            if (jo["f_qty1"].toString() != jo["f_qty2"].toString()) {
+                err += tr("All service must be printed");
+                break;
+            }
+        }
+        o["reply"] = err.isEmpty() ? 1 : 0;
+        o["msg"] = err;
         break;
     }
     default:

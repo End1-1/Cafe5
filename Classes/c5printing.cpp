@@ -2,6 +2,9 @@
 #include <QPainter>
 #include <QGraphicsItem>
 #include <QDebug>
+#include <QTextDocument>
+#include <QTextBlock>
+#include <QAbstractTextDocumentLayout>
 
 #define INCH_PER_MM 0.0393
 
@@ -34,23 +37,25 @@ void C5Printing::setSceneParams(qreal width, qreal height, QPrinter::Orientation
 void C5Printing::setFont(const QFont &font)
 {
     fFont = font;
-    QFontMetrics fm(fFont);
-    fLineHeight = fm.height() / fScaleFactor;
+    setLineHeight();
 }
 
 void C5Printing::setFontBold(bool bold)
 {
     fFont.setBold(bold);
+    setLineHeight();
 }
 
 void C5Printing::setFontItalic(bool italic)
 {
     fFont.setItalic(italic);
+    setLineHeight();
 }
 
 void C5Printing::setFontSize(int size)
 {
     fFont.setPointSize(size);
+    setLineHeight();
 }
 
 void C5Printing::line(qreal x1, qreal y1, qreal x2, qreal y2)
@@ -60,26 +65,29 @@ void C5Printing::line(qreal x1, qreal y1, qreal x2, qreal y2)
 
 void C5Printing::ltext(const QString &text, qreal x)
 {
-    QGraphicsItem *item = fCanvas->addText(text, fFont);
+    QGraphicsTextItem *item = fCanvas->addText(text, fFont);
     item->moveBy(x * fScaleFactor, fTop * fScaleFactor);
+    setTemptop(item);
 }
 
 void C5Printing::ctext(const QString &text)
 {
-    QGraphicsItem *item = fCanvas->addText(text, fFont);
-    QFontMetrics fm(fFont);
-    qreal textWidth = fm.width(text);
-    qreal left = ((fNormalWidth / 2) * fScaleFactor);
-    left -= textWidth / 2;
-    item->moveBy(left, fTop * fScaleFactor);
+    QGraphicsTextItem *item = fCanvas->addText(text, fFont);
+    QTextOption op;
+    op.setAlignment(Qt::AlignHCenter);
+    item->document()->setDefaultTextOption(op);
+    item->moveBy(0, fTop * fScaleFactor);
+    setTemptop(item);
 }
 
 void C5Printing::rtext(const QString text)
 {
-    QGraphicsItem *item = fCanvas->addText(text, fFont);
-    QFontMetrics fm(fFont);
-    qreal textWidth = fm.width(text);
-    item->moveBy((fNormalWidth * fScaleFactor) - textWidth, fTop * fScaleFactor);
+    QGraphicsTextItem *item = fCanvas->addText(text, fFont);
+    QTextOption op;
+    op.setAlignment(Qt::AlignRight);
+    item->document()->setDefaultTextOption(op);
+    item->moveBy(0, fTop * fScaleFactor);
+    setTemptop(item);
 }
 
 void C5Printing::br(int height)
@@ -88,7 +96,8 @@ void C5Printing::br(int height)
         height = fLineHeight;
     }
 
-    fTop += height;
+    fTop += height + (fTempTop > 0 ? fTempTop - fLineHeight : 0);
+    fTempTop = 0;
 
     if (fTop > fNormalHeight) {
         fTop = 0;
@@ -113,5 +122,22 @@ void C5Printing::print()
             fPrinter.newPage();
         }
         fCanvasList.at(i)->render(&painter);
+    }
+}
+
+void C5Printing::setLineHeight()
+{
+    QFontMetrics fm(fFont);
+    fLineHeight = fm.height() / fScaleFactor;
+}
+
+void C5Printing::setTemptop(QGraphicsTextItem *item)
+{
+    QFontMetrics fm(item->font());
+    item->setTextWidth(fNormalWidth * fScaleFactor);
+    int blocks = item->document()->documentLayout()->documentSize().height();
+    qreal h = (blocks) / fScaleFactor;
+    if (h > fLineHeight) {
+        fTempTop = h < fTempTop ? fTempTop : h;
     }
 }

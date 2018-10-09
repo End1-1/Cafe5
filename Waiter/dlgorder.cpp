@@ -6,6 +6,7 @@
 #include "c5order.h"
 #include "c5dishtabledelegate.h"
 #include "c5ordertabledelegate.h"
+#include "dlgpayment.h"
 #include "dlgpassword.h"
 #include <QCloseEvent>
 
@@ -33,6 +34,7 @@ void DlgOrder::openTable(const QJsonObject &table, C5User *user)
     DlgOrder *d = new DlgOrder(C5Config::fParentWidget);
     d->fMenuName = C5WaiterConf::fDefaultMenu;
     d->showFullScreen();
+    d->hide();
     qApp->processEvents();
     d->ui->tblPart2->horizontalHeader()->setDefaultSectionSize(PART2_COL_WIDTH);
     int colCount = d->ui->tblPart2->width() / PART2_COL_WIDTH;
@@ -177,12 +179,17 @@ void DlgOrder::loadOrder(const QJsonObject &obj)
         fOrder->setHeaderValue("f_amountservice", 0);
         fOrder->setHeaderValue("f_amountdiscount", 0);
     }
+    fOrder->setHeaderValue("f_currentstaff", fUser->fId);
+    fOrder->setHeaderValue("f_currentstaffname", fUser->fFull);
     ui->tblOrder->clear();
     ui->tblOrder->setRowCount(0);
     for (int i = 0, count = obj["body"].toArray().count(); i < count; i++) {
         addDishToOrder(obj["body"].toArray().at(i).toObject());
     }
     ui->leTotal->setText(fOrder->headerValue("f_amounttotal"));
+    if (fOrder->headerValue("f_staff").toInt() != fOrder->headerValue("f_currentstaff").toInt()) {
+        C5Message::info(QString("%1\r\n%2").arg(tr("Order owner")).arg(fOrder->headerValue("f_staffname")));
+    }
 }
 
 void DlgOrder::changeQty(double qty)
@@ -260,10 +267,21 @@ void DlgOrder::saveAndQuit(const QJsonObject &obj)
     itemsToTable();
 }
 
+void DlgOrder::handleGoPayment(const QJsonObject &obj)
+{
+    if (obj["reply"].toInt() == 0) {
+        C5Message::error(obj["msg"].toString());
+        return;
+    }
+    int paymentResult = DlgPayment::payment(fOrder);
+    qDebug() << paymentResult;
+}
+
 void DlgOrder::handleError(int err, const QString &msg)
 {
     switch (err) {
-
+    default:
+        break;
     }
     C5Message::error(msg);
 }
@@ -357,5 +375,10 @@ void DlgOrder::on_btnPrintService_clicked()
 
 void DlgOrder::on_btnPayment_clicked()
 {
-
+    C5SocketHandler *sh = createSocketHandler(SLOT(handleGoPayment(QJsonObject)));
+    sh->bind("cmd", sm_printreceipt);
+    QJsonObject o;
+    o["header"] = fOrder->fHeader;
+    o["body"] = fOrder->fItems;
+    sh->send(o);
 }
