@@ -37,6 +37,49 @@
        </widget>
       </item>
       <item>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QLabel" name="lbService">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QLabel:disabled {color:gray;}
+QLabel{color:maroon;}
+</string>
+        </property>
+        <property name="text">
+         <string>[Service]</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_3">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QLabel:disabled {color:gray;}
+QLabel {color:green;}
+</string>
+        </property>
+        <property name="text">
+         <string>[Discount]</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -837,6 +880,13 @@
                <property name="bottomMargin">
                 <number>0</number>
                </property>
+               <item row="0" column="1">
+                <widget class="QLineEdit" name="leTotal">
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
                <item row="0" column="0">
                 <widget class="QLabel" name="label">
                  <property name="text">
@@ -844,10 +894,14 @@
                  </property>
                 </widget>
                </item>
-               <item row="0" column="1">
-                <widget class="QLineEdit" name="leTotal">
-                 <property name="readOnly">
-                  <bool>true</bool>
+               <item row="0" column="2">
+                <widget class="QPushButton" name="btnExit">
+                 <property name="text">
+                  <string>Exit</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../resources/resources.qrc">
+                   <normaloff>:/cancel.png</normaloff>:/cancel.png</iconset>
                  </property>
                 </widget>
                </item>

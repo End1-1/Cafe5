@@ -45,12 +45,14 @@ void C5WaiterServer::reply(QJsonObject &o)
     case sm_menu: {
         QJsonArray jMenu;
         QString query = "select d.f_id as f_dish, mn.f_name as menu_name, p1.f_name as part1, p2.f_name as part2, d.f_name, \
-                m.f_price, m.f_store, m.f_print1, m.f_print2, d.f_remind \
+                m.f_price, m.f_store, m.f_print1, m.f_print2, d.f_remind, \
+                s.f_name as f_storename \
                 from d_menu m \
                 left join d_menu_names mn on mn.f_id=m.f_menu \
                 left join d_dish d on d.f_id=m.f_dish \
                 left join d_part2 p2 on p2.f_id=d.f_part \
-                left join d_part1 p1 on p1.f_id=p2.f_part ";
+                left join d_part1 p1 on p1.f_id=p2.f_part \
+                left join c_storages s on s.f_id=m.f_store ";
         srh.getJsonFromQuery(query, jMenu);
         o["reply"] = 1;
         o["menu"] = jMenu;
@@ -114,11 +116,13 @@ void C5WaiterServer::reply(QJsonObject &o)
                     bv[":f_header"] = jo.at(0).toObject()["f_id"].toString().toInt();
                     srh.getJsonFromQuery("select ob.f_id, ob.f_header, ob.f_state, dp1.f_name as part1, dp2.f_name as part2, d.f_name as f_name, \
                                          ob.f_qty1, ob.f_qty2, ob.f_price, ob.f_service, ob.f_discount, ob.f_total, \
-                                         ob.f_store, ob.f_print1, ob.f_print2, ob.f_comment, ob.f_remind, ob.f_dish \
+                                         ob.f_store, ob.f_print1, ob.f_print2, ob.f_comment, ob.f_remind, ob.f_dish, \
+                                         s.f_name as f_storename \
                                          from o_body ob \
                                          left join d_dish d on d.f_id=ob.f_dish \
                                          left join d_part2 dp2 on dp2.f_id=d.f_part \
                                          left join d_part1 dp1 on dp1.f_id=dp2.f_part \
+                                         left join c_storages s on s.f_id=ob.f_store \
                                          where ob.f_header=:f_header", jb, bv);
                 }
                 o["header"] = jo;

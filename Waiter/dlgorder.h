@@ -80,6 +80,8 @@ private slots:
     void on_btnPrintService_clicked();
 
     void on_btnPayment_clicked();
+
+    void on_btnExit_clicked();
 };
 
 #endif // DLGORDER_H

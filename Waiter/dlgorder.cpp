@@ -382,3 +382,8 @@ void DlgOrder::on_btnPayment_clicked()
     o["body"] = fOrder->fItems;
     sh->send(o);
 }
+
+void DlgOrder::on_btnExit_clicked()
+{
+    accept();
+}

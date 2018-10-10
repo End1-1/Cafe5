@@ -71,6 +71,7 @@ void C5PrintServiceThread::print(const QString &printer, const QString &side)
     p.line(0, p.fTop, p.fNormalWidth, p.fTop);
 
     p.setFontSize(12);
+    QSet<QString> storages;
     for (int i = 0; i < fBody.count(); i++) {
         QJsonObject o = fBody[i].toObject();
         if (o["f_qtyprint"].toDouble() < 0.01) {
@@ -79,6 +80,7 @@ void C5PrintServiceThread::print(const QString &printer, const QString &side)
         if (o[side].toString() != printer) {
             continue;
         }
+        storages << o["f_storename"].toString();
         p.ltext(o["f_name"].toString(), 0);
         p.br();
         p.ctext(float_str(o["f_qtyprint"].toDouble(), 2));
@@ -89,7 +91,9 @@ void C5PrintServiceThread::print(const QString &printer, const QString &side)
     p.line(0, p.fTop, p.fNormalWidth, p.fTop);
     p.br(1);
     p.setFontSize(8);
-    p.ltext(printer, 0);
+    p.ltext(tr("Printer: ") + printer, 0);
+    p.br();
+    p.ltext(tr("Storage: ") + storages.toList().join(","), 0);
 
     p.print();
 }
