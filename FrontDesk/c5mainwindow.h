@@ -2,6 +2,8 @@
 #define C5MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QLabel>
+#include <QTreeWidgetItem>
 
 namespace Ui {
 class C5MainWindow;
@@ -13,15 +15,52 @@ class C5MainWindow : public QMainWindow
 
 public:
     explicit C5MainWindow(QWidget *parent = 0);
+
     ~C5MainWindow();
+
     virtual void closeEvent(QCloseEvent *event);
+
 private slots:
-    void on_action_triggered();
+    void twCustomMenu(const QPoint &p);
+
+    void tabCloseRequested(int index);
+
+    void currentTabChange(int index);
 
     void on_actionConnection_triggered();
 
+    void on_actionLogin_triggered();
+
+    void on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column);
+
+    void on_actionConfigure_connection_triggered();
+
+    void on_actionClose_application_triggered();
+
 private:
+    template<typename T>
+    T *createTab(const QStringList &dbParams) {
+        T *t = new T();
+        t->setDatabase(dbParams.at(0), dbParams.at(1), dbParams.at(2), dbParams.at(3));
+        fTab->addTab(t, t->icon(), QString("[%1] %2").arg(dbParams.at(4)).arg(t->label()));
+        fTab->setCurrentIndex(fTab->count() - 1);
+        t->buildQuery();
+        return t;
+    }
+
     Ui::C5MainWindow *ui;
+
+    QLabel *fStatusLabel;
+
+    QTabWidget *fTab;
+
+    QToolBar *fReportToolbar;
+
+    bool fLogin;
+
+    void enableMenu(bool v);
+
+    void addTreeL3Item(QTreeWidgetItem *item, int permission, const QString &text, const QString &icon);
 };
 
 #endif // C5MAINWINDOW_H

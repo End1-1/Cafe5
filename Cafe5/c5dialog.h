@@ -7,6 +7,7 @@
 #include "c5config.h"
 #include "c5message.h"
 #include "c5sockethandler.h"
+#include "c5permissions.h"
 #include "c5utils.h"
 
 class C5Dialog : public QDialog

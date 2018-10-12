@@ -4,6 +4,7 @@
 #include <QString>
 #include <QHostInfo>
 #include <QDateTime>
+#include <QCryptographicHash>
 
 #define FORMAT_DATETIME_TO_STR "dd.MM.yyyy HH:mm:ss"
 #define FORMAT_DATE_TO_STR "dd.MM.yyyy"
@@ -29,7 +30,10 @@ class C5Utils
 public:
     C5Utils();
     void writeErrorLog(const QString &text);
+    QString pwd(const QString &value);
 };
+
+QString password(const QString &value);
 
 extern C5Utils __c5utils;
 

@@ -16,70 +16,43 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <widget class="QTabWidget" name="tabWidget">
-      <property name="currentIndex">
-       <number>0</number>
+     <widget class="QSplitter" name="splitter">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
       </property>
-      <widget class="QWidget" name="tab">
-       <attribute name="title">
-        <string>Tab 1</string>
-       </attribute>
+      <property name="childrenCollapsible">
+       <bool>false</bool>
+      </property>
+      <widget class="QTreeWidget" name="twDb">
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <column>
+        <property name="text">
+         <string/>
+        </property>
+       </column>
+      </widget>
+      <widget class="QTabWidget" name="tabWidget">
+       <property name="minimumSize">
+        <size>
+         <width>700</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="currentIndex">
+        <number>-1</number>
+       </property>
+       <property name="tabsClosable">
+        <bool>true</bool>
+       </property>
       </widget>
      </widget>
     </item>
    </layout>
-  </widget>
-  <widget class="QMenuBar" name="menuBar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>1018</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <widget class="QMenu" name="menuFile">
-    <property name="title">
-     <string>File</string>
-    </property>
-    <addaction name="actionLogin"/>
-    <addaction name="actionLogout"/>
-    <addaction name="separator"/>
-    <addaction name="actionConnection"/>
-    <addaction name="action"/>
-   </widget>
-   <widget class="QMenu" name="menuEdit">
-    <property name="title">
-     <string>Edit</string>
-    </property>
-   </widget>
-   <widget class="QMenu" name="menuAbout">
-    <property name="title">
-     <string>Help</string>
-    </property>
-    <addaction name="actionAbout"/>
-   </widget>
-   <widget class="QMenu" name="menuDirectory_of_menu">
-    <property name="title">
-     <string>Configuration of menu</string>
-    </property>
-   </widget>
-   <widget class="QMenu" name="menuDirectory_of_storage">
-    <property name="title">
-     <string>Configuration of storage</string>
-    </property>
-   </widget>
-   <widget class="QMenu" name="menuConfiguration_of_hal">
-    <property name="title">
-     <string>Configuration of hall</string>
-    </property>
-   </widget>
-   <addaction name="menuFile"/>
-   <addaction name="menuEdit"/>
-   <addaction name="menuDirectory_of_menu"/>
-   <addaction name="menuDirectory_of_storage"/>
-   <addaction name="menuConfiguration_of_hal"/>
-   <addaction name="menuAbout"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -88,35 +61,71 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionConnection"/>
+   <addaction name="actionAppend_database"/>
+   <addaction name="actionLogin"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <action name="actionLogin">
-   <property name="text">
-    <string>Login</string>
-   </property>
-  </action>
-  <action name="actionLogout">
-   <property name="text">
-    <string>Logout</string>
-   </property>
-  </action>
-  <action name="action">
-   <property name="text">
-    <string>Quit</string>
-   </property>
-  </action>
   <action name="actionConnection">
+   <property name="icon">
+    <iconset resource="../resources/res.qrc">
+     <normaloff>:/database.png</normaloff>:/database.png</iconset>
+   </property>
    <property name="text">
     <string>Connection</string>
    </property>
+   <property name="toolTip">
+    <string>Connection settings</string>
+   </property>
   </action>
-  <action name="actionAbout">
+  <action name="actionLogin">
+   <property name="icon">
+    <iconset resource="../resources/res.qrc">
+     <normaloff>:/lock.png</normaloff>:/lock.png</iconset>
+   </property>
    <property name="text">
-    <string>About</string>
+    <string>Login</string>
+   </property>
+   <property name="toolTip">
+    <string>Login</string>
+   </property>
+  </action>
+  <action name="actionAppend_database">
+   <property name="icon">
+    <iconset resource="../resources/res.qrc">
+     <normaloff>:/database_new.png</normaloff>:/database_new.png</iconset>
+   </property>
+   <property name="text">
+    <string>Append database</string>
+   </property>
+   <property name="toolTip">
+    <string>Append database</string>
+   </property>
+  </action>
+  <action name="actionConfigure_connection">
+   <property name="icon">
+    <iconset resource="../resources/res.qrc">
+     <normaloff>:/configure.png</normaloff>:/configure.png</iconset>
+   </property>
+   <property name="text">
+    <string>Configure connection</string>
+   </property>
+   <property name="toolTip">
+    <string>Configure connection</string>
+   </property>
+  </action>
+  <action name="actionClose_application">
+   <property name="text">
+    <string>Close application</string>
+   </property>
+   <property name="toolTip">
+    <string>Close application</string>
    </property>
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="../resources/res.qrc"/>
+ </resources>
  <connections/>
 </ui>

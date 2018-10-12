@@ -1,0 +1,30 @@
+#ifndef C5REPORTWIDGET_H
+#define C5REPORTWIDGET_H
+
+#include "c5grid.h"
+#include <QToolBar>
+
+class C5ReportWidget : public C5Grid
+{
+public:
+    C5ReportWidget(QWidget *parent = 0);
+
+    ~C5ReportWidget();
+
+    QIcon icon();
+
+    QString label();
+
+    virtual QToolBar *toolBar();
+
+protected:
+    QString fIcon;
+
+    QString fLabel;
+
+    QToolBar *fToolBar;
+
+    bool createToolBar();
+};
+
+#endif // C5REPORTWIDGET_H

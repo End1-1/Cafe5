@@ -3,7 +3,11 @@
 #include <QDebug>
 
 C5Dialog::C5Dialog(QWidget *parent) :
+#ifdef WAITER
     QDialog(parent, Qt::FramelessWindowHint)
+#else
+    QDialog(parent)
+#endif
 {
 }
 

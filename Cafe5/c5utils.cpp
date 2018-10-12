@@ -21,3 +21,9 @@ void C5Utils::writeErrorLog(const QString &text)
         f.close();
     }
 }
+
+QString password(const QString &value)
+{
+    QByteArray ba(value.toUtf8());
+    return QCryptographicHash::hash(ba, QCryptographicHash::Md5).toHex();
+}

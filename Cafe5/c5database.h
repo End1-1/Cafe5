@@ -1,6 +1,7 @@
 #ifndef C5Database_H
 #define C5Database_H
 
+#include "c5message.h"
 #include <QSqlDatabase>
 #include <QMap>
 #include <QVariant>

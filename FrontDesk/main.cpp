@@ -11,10 +11,11 @@ int main(int argc, char *argv[])
     C5Database::fUser = connectionParams.at(2);
     C5Database::fPass = connectionParams.at(3);
     C5Config::fSettingsName = connectionParams.at(4);
+    C5Config::fLastUsername = connectionParams.at(5);
 
     QApplication a(argc, argv);
     C5MainWindow w;
-    w.show();
+    w.showMaximized();
 
     return a.exec();
 }

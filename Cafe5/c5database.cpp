@@ -84,7 +84,7 @@ bool C5Database::open()
             //fDb.transaction();
         } else {
             isOpened = false;
-            fLastError += "#1: " + fDb.lastError().databaseText() + " database: " + fDb.databaseName() + " drivers: " + fDb.drivers().join(',');
+            fLastError += fDb.lastError().databaseText() + " database: " + fDb.databaseName() + " drivers: " + fDb.drivers().join(',');
             logEvent(fLastError);
         }
     }
@@ -120,6 +120,12 @@ void C5Database::close(bool commit)
 
 bool C5Database::exec(const QString &sqlQuery)
 {
+    if (!fDb.open()) {
+        if (!fDb.open()) {
+            C5Message::error(fLastError);
+            return false;
+        }
+    }
     return exec(sqlQuery, fDbRows, fNameColumnMap);
 }
 
@@ -409,6 +415,12 @@ QString C5Database::lastQuery(QSqlQuery *q)
 
 bool C5Database::exec(QSqlQuery *q, const QString &sqlQuery, bool &isSelect)
 {
+    if (!fDb.isOpen()) {
+        if (!fDb.open()) {
+            C5Message::error(fLastError);
+            return false;
+        }
+    }
     if (!q->prepare(sqlQuery)) {
         fLastError = q->lastError().databaseText();
         logEvent(fLastError);

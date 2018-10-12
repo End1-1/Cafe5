@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/">
+        <file>database.png</file>
+        <file>lock.png</file>
+        <file>database_new.png</file>
+        <file>database_main.png</file>
+        <file>configure.png</file>
+        <file>users_groups.png</file>
+        <file>edit.png</file>
+        <file>new.png</file>
+    </qresource>
+</RCC>

@@ -31,29 +31,53 @@ DEFINES += _MODULE_=\\\"FRONTDESK\\\"
 SOURCES += \
         main.cpp \
         c5mainwindow.cpp \
-    ../../Cafe5/c5config.cpp \
-    ../../Cafe5/c5connection.cpp \
-    ../../Cafe5/c5database.cpp \
-    ../../Cafe5/c5dialog.cpp \
-    ../../Cafe5/c5message.cpp \
-    ../../Cafe5/c5sqlquery.cpp \
-    ../../Cafe5/c5staticdb.cpp \
-    ../../Cafe5/c5utils.cpp
+    ../Cafe5/c5config.cpp \
+    ../Cafe5/c5connection.cpp \
+    ../Cafe5/c5database.cpp \
+    ../Cafe5/c5dialog.cpp \
+    ../Cafe5/c5message.cpp \
+    ../Cafe5/c5staticdb.cpp \
+    ../Cafe5/c5utils.cpp \
+    ../Cafe5/c5sockethandler.cpp \
+    c5login.cpp \
+    ../Classes/c5permissions.cpp \
+    c5reportwidget.cpp \
+    ../Classes/c5grid.cpp \
+    ../Reports/cr5usersgroups.cpp \
+    ../Reports/cr5users.cpp \
+    ../Classes/c5tablemodel.cpp
 
 HEADERS += \
         c5mainwindow.h \
-    ../../Cafe5/c5config.h \
-    ../../Cafe5/c5connection.h \
-    ../../Cafe5/c5database.h \
-    ../../Cafe5/c5dialog.h \
-    ../../Cafe5/c5message.h \
-    ../../Cafe5/c5sqlquery.h \
-    ../../Cafe5/c5staticdb.h \
-    ../../Cafe5/c5utils.h
+    ../Cafe5/c5config.h \
+    ../Cafe5/c5connection.h \
+    ../Cafe5/c5database.h \
+    ../Cafe5/c5dialog.h \
+    ../Cafe5/c5message.h \
+    ../Cafe5/c5staticdb.h \
+    ../Cafe5/c5utils.h \
+    ../Cafe5/c5sockethandler.h \
+    c5login.h \
+    ../Classes/c5permissions.h \
+    c5reportwidget.h \
+    ../Classes/c5grid.h \
+    ../Reports/cr5usersgroups.h \
+    ../Reports/cr5users.h \
+    ../Classes/c5tablemodel.h
 
 FORMS += \
         c5mainwindow.ui \
-    ../../Cafe5/c5connection.ui \
-    ../../Cafe5/c5message.ui
+    ../Cafe5/c5connection.ui \
+    ../Cafe5/c5message.ui \
+    c5login.ui \
+    ../Classes/c5grid.ui
 
-INCLUDEPATH += ../../Cafe5
+INCLUDEPATH += ../Cafe5
+INCLUDEPATH += ../Classes
+INCLUDEPATH += ../Reports
+INCLUDEPATH += ../RESOURCES
+
+RESOURCES += \
+    ../resources/res.qrc
+
+QMAKE_CXXFLAGS += -Werror
