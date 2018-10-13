@@ -275,8 +275,10 @@ int C5Database::insert(const QString &tableName, bool returnId)
         return 0;
     }
     if (returnId) {
-        exec("select last_insert_id()");
-        return getValue(0, 0).toInt();
+        QSqlQuery q(fDb);
+        q.exec("select last_insert_id()");
+        q.next();
+        return q.value(0).toInt();
     } else {
         return 1;
     }

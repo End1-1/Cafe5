@@ -45,7 +45,15 @@ SOURCES += \
     ../Classes/c5grid.cpp \
     ../Reports/cr5usersgroups.cpp \
     ../Reports/cr5users.cpp \
-    ../Classes/c5tablemodel.cpp
+    ../Classes/c5tablemodel.cpp \
+    ../Classes/c5textdelegate.cpp \
+    ../Classes/c5combodelegate.cpp \
+    ../Classes/c5tableview.cpp \
+    ../Cache/c5cache.cpp \
+    ../Cache/c5cacheusersgroups.cpp \
+    ../Controls/c5lineedit.cpp \
+    ../Controls/c5combobox.cpp \
+    ../Cache/c5cacheusersstate.cpp
 
 HEADERS += \
         c5mainwindow.h \
@@ -63,7 +71,15 @@ HEADERS += \
     ../Classes/c5grid.h \
     ../Reports/cr5usersgroups.h \
     ../Reports/cr5users.h \
-    ../Classes/c5tablemodel.h
+    ../Classes/c5tablemodel.h \
+    ../Classes/c5textdelegate.h \
+    ../Classes/c5combodelegate.h \
+    ../Classes/c5tableview.h \
+    ../Cache/c5cache.h \
+    ../Cache/c5cacheusersgroups.h \
+    ../Controls/c5lineedit.h \
+    ../Controls/c5combobox.h \
+    ../Cache/c5cacheusersstate.h
 
 FORMS += \
         c5mainwindow.ui \
@@ -75,9 +91,15 @@ FORMS += \
 INCLUDEPATH += ../Cafe5
 INCLUDEPATH += ../Classes
 INCLUDEPATH += ../Reports
+INCLUDEPATH += ../Controls
+INCLUDEPATH += ../Cache
 INCLUDEPATH += ../RESOURCES
 
 RESOURCES += \
     ../resources/res.qrc
 
 QMAKE_CXXFLAGS += -Werror
+
+DISTFILES += \
+    LastCache
+

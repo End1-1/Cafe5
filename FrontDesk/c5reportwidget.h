@@ -4,6 +4,8 @@
 #include "c5grid.h"
 #include <QToolBar>
 
+class C5Cache;
+
 class C5ReportWidget : public C5Grid
 {
 public:
@@ -17,6 +19,8 @@ public:
 
     virtual QToolBar *toolBar();
 
+    virtual bool hasDataUpdates();
+
 protected:
     QString fIcon;
 
@@ -25,6 +29,8 @@ protected:
     QToolBar *fToolBar;
 
     bool createToolBar();
+
+    C5Cache *createCache(int cacheId);
 };
 
 #endif // C5REPORTWIDGET_H

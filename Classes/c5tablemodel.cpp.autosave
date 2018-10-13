@@ -137,8 +137,7 @@ void C5TableModel::saveDataChanges()
         int row = fRowToUpdate.toList().at(i);
         if (fRawData.at(row).at(0).toString() == 0) {
             fDb[":f_id"] = 0;
-            int newid = fDb.insert(fTableForUpdate, true);
-            fRawData[row][0] = newid;
+            fRawData[row][0] = fDb.insert(fTableForUpdate, true);;
         }
         for (int j = 0; j < fColumnsForUpdate.count(); j++) {
             fDb[":" + fColumnIndexName[fColumnsForUpdate.at(j)]] = fRawData.at(row).at(fColumnsForUpdate.at(j));

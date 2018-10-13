@@ -55,6 +55,9 @@
    </layout>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextUnderIcon</enum>
+   </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
    </attribute>
@@ -96,10 +99,14 @@
      <normaloff>:/database_new.png</normaloff>:/database_new.png</iconset>
    </property>
    <property name="text">
-    <string>Append database</string>
+    <string>Append\ndatabase</string>
+   </property>
+   <property name="iconText">
+    <string>Append
+database</string>
    </property>
    <property name="toolTip">
-    <string>Append database</string>
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Append database&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </action>
   <action name="actionConfigure_connection">

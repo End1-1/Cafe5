@@ -10,6 +10,7 @@ C5Grid::C5Grid(QWidget *parent) :
     fModel = new C5TableModel(fDb, this);
     ui->tblView->setModel(fModel);
     fSimpleQuery = true;
+    fTableView = ui->tblView;
 }
 
 C5Grid::~C5Grid()
@@ -22,6 +23,12 @@ void C5Grid::setDatabase(const QString &host, const QString &db, const QString &
     fDb.setDatabase(host, db, username, password);
 }
 
+void C5Grid::setTableForUpdate(const QString &table, const QList<int> &columns)
+{
+    fModel->fTableForUpdate = table;
+    fModel->fColumnsForUpdate = columns;
+}
+
 void C5Grid::buildQuery()
 {
     if (!fSimpleQuery) {
@@ -29,6 +36,24 @@ void C5Grid::buildQuery()
     }
     fModel->translate(fTranslation);
     refreshData();
+}
+
+int C5Grid::newRow()
+{
+    int row = 0;
+    QModelIndexList ml = ui->tblView->selectionModel()->selectedRows();
+    if (ml.count() > 0) {
+        row = ml.at(0).row();
+    }
+    fModel->insertRow(row);
+    ui->tblView->setCurrentIndex(fModel->index(row + 1, 0));
+    return row;
+}
+
+void C5Grid::saveDataChanges()
+{
+    fModel->saveDataChanges();
+    fTableView->viewport()->update();
 }
 
 void C5Grid::refreshData()

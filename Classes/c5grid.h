@@ -1,8 +1,13 @@
 #ifndef C5GRID_H
 #define C5GRID_H
 
-#include <QWidget>
 #include "c5database.h"
+#include "c5textdelegate.h"
+#include "c5combodelegate.h"
+#include "c5tableview.h"
+#include <QWidget>
+#include <QDebug>
+#include <QTableView>
 
 class C5TableModel;
 
@@ -21,21 +26,30 @@ public:
 
     void setDatabase(const QString &host, const QString &db, const QString &username, const QString &password);
 
-    void buildQuery();
+    void setTableForUpdate(const QString &table, const QList<int> &columns);
+
+    virtual void buildQuery();
 
 protected:
+    C5Database fDb;
+
     bool fSimpleQuery;
 
     QString fSqlQuery;
 
+    C5TableView *fTableView;
+
     QMap<QString, QString> fTranslation;
+
+    int newRow();
 
 private:
     Ui::C5Grid *ui;
 
-    C5Database fDb;
-
     C5TableModel *fModel;
+
+protected slots:
+    virtual void saveDataChanges();
 
 private slots:
     virtual void refreshData();

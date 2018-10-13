@@ -13,7 +13,7 @@ CR5UsersGroups::CR5UsersGroups(QWidget *parent) :
 QToolBar *CR5UsersGroups::toolBar()
 {
     if (createToolBar()) {
-        fToolBar->addAction(QIcon(":/new.png"), tr("New group"), this, SLOT(newGroup()));
+        fToolBar->addAction(QIcon(":/new.png"), tr("New\ngroup"), this, SLOT(newGroup()));
     }
     return fToolBar;
 }
