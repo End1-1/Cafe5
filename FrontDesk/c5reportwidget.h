@@ -2,6 +2,7 @@
 #define C5REPORTWIDGET_H
 
 #include "c5grid.h"
+#include "c5lineedit.h"
 #include <QToolBar>
 
 class C5Cache;
@@ -21,6 +22,8 @@ public:
 
     virtual bool hasDataUpdates();
 
+    void hotkey(const QString &key);
+
 protected:
     QString fIcon;
 
@@ -31,6 +34,12 @@ protected:
     bool createToolBar();
 
     C5Cache *createCache(int cacheId);
+
+    QToolBar *createStandartToolbar(const QList<ToolBarButtons> &btn);
+
+    virtual void clearFilter();
+
+    C5LineEdit *fFilterLineEdit;
 };
 
 #endif // C5REPORTWIDGET_H

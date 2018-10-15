@@ -37,21 +37,12 @@ CR5Users::CR5Users(QWidget *parent) :
 
 QToolBar *CR5Users::toolBar()
 {
-    if (createToolBar()) {
-        fToolBar->addAction(QIcon(":/new.png"), tr("New\nuser"), this, SLOT(newUser()));
-        fToolBar->addAction(QIcon(":/edit.png"), tr("Edit\nuser"), this, SLOT(editUser()));
-        fToolBar->addAction(QIcon(":/save.png"), tr("Save\nchanges"), this, SLOT(saveDataChanges()));
-    }
-    return fToolBar;
-}
-
-void CR5Users::newUser()
-{
-    int row = newRow();
-    qDebug() << row;
-}
-
-void CR5Users::editUser()
-{
-    C5Message::info("Edit user");
+    QList<ToolBarButtons> btn;
+    btn << ToolBarButtons::tbNew
+        << ToolBarButtons::tbSave
+        << ToolBarButtons::tbClearFilter
+        << ToolBarButtons::tbRefresh
+        << ToolBarButtons::tbExcel
+        << ToolBarButtons::tbPrint;
+    return createStandartToolbar(btn);
 }

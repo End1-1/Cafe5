@@ -1,4 +1,6 @@
 #include "c5tablemodel.h"
+#include "c5utils.h"
+#include <QIcon>
 
 C5TableModel::C5TableModel(C5Database &db, QObject *parent) :
     QAbstractTableModel(parent),
@@ -40,14 +42,29 @@ int C5TableModel::columnCount(const QModelIndex &parent) const
 
 QVariant C5TableModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    if (role == Qt::DisplayRole) {
+    switch (role) {
+    case Qt::DisplayRole:
         if (orientation == Qt::Vertical) {
             return section + 1;
         } else {
             return fTranslateColumn.contains(fColumnIndexName[section]) ? fTranslateColumn[fColumnIndexName[section]] : fColumnIndexName[section];
         }
+    case Qt::DecorationRole:
+        if (orientation == Qt::Horizontal) {
+            if (fFilters.contains(section)) {
+                return QIcon(":/filter_set.png");
+            }
+        }
     }
-    return QVariant();
+return QVariant();
+}
+
+int C5TableModel::indexForColumnName(const QString &column)
+{
+    if (fColumnNameIndex.contains(column)) {
+        return fColumnNameIndex[column];
+    }
+    return -1;
 }
 
 QVariant C5TableModel::data(const QModelIndex &index, int role) const
@@ -57,7 +74,9 @@ QVariant C5TableModel::data(const QModelIndex &index, int role) const
     }
     switch (role) {
     case Qt::DisplayRole:
-        return dataDisplay(index.row(), index.column());
+        return dataDisplay(fProxyData.at(index.row()), index.column());
+    case Qt::EditRole:
+        return dataDisplay(fProxyData.at(index.row()), index.column());
     case Qt::BackgroundColorRole:
         if (fColorData.contains(fProxyData.at(index.row()))) {
             return fColorData[fProxyData.at(index.row())][index.column()];
@@ -137,8 +156,7 @@ void C5TableModel::saveDataChanges()
         int row = fRowToUpdate.toList().at(i);
         if (fRawData.at(row).at(0).toString() == 0) {
             fDb[":f_id"] = 0;
-            int newid = fDb.insert(fTableForUpdate, true);
-            fRawData[row][0] = newid;
+            fRawData[row][0] = fDb.insert(fTableForUpdate, true);;
         }
         for (int j = 0; j < fColumnsForUpdate.count(); j++) {
             fDb[":" + fColumnIndexName[fColumnsForUpdate.at(j)]] = fRawData.at(row).at(fColumnsForUpdate.at(j));
@@ -155,11 +173,118 @@ void C5TableModel::saveDataChanges()
     fColorData.clear();
 }
 
+void C5TableModel::setFilter(int column, const QString &filter)
+{
+    fFilters[column] = filter;
+    filterData();
+}
+
+void C5TableModel::removeFilter(int column)
+{
+    fFilters.remove(column);
+    fProxyData.clear();
+    for (int i = 0; i < fRawData.count(); i++) {
+        fProxyData << i;
+    }
+    filterData();
+}
+
+void C5TableModel::clearFilter()
+{
+    fFilters.clear();
+    fProxyData.clear();
+    for (int i = 0; i < fRawData.count(); i++) {
+        fProxyData << i;
+    }
+    filterData();
+}
+
+void C5TableModel::uniqueValuesForColumn(int column, QSet<QString> &values)
+{
+    for (int i = 0; i < fProxyData.count(); i++) {
+        values << dataDisplay(fProxyData.at(i), column).toString();
+    }
+}
+
+void C5TableModel::sumForColumns(const QStringList &columns, QMap<QString, double> &values)
+{
+    foreach (QString s, columns) {
+        if (fColumnNameIndex.contains(s)) {
+            double total = 0;
+            int idx = fColumnNameIndex[s];
+            for (int i = 0, count = fProxyData.count(); i < count; i++) {
+                total += fRawData.at(fProxyData.at(i)).at(idx).toDouble();
+            }
+            values[s] = total;
+        }
+    }
+}
+
+void C5TableModel::filterData()
+{
+    beginResetModel();
+    QList<int> ps = fProxyData;
+    fProxyData.clear();
+    QList<int> columns = fFilters.keys();
+    if (columns.contains(-1)) {
+        columns.removeFirst();
+    }
+    for (int r = 0, count = ps.count(); r < count; r++) {
+        int row = ps.at(r);
+        bool found = fFilters.count() == 0;
+        if (found) {
+            goto FOUND;
+        }
+        if (fFilters.contains(-1)) {
+            for (int c = 0; c < fColumnIndexName.count(); c++) {
+                if (dataDisplay(row, c).toString().contains(fFilters[-1], Qt::CaseInsensitive)) {
+                    found = true;
+                    goto FOUND;
+                }
+            }
+        }
+        found = columns.count() > 0;
+        foreach (int col, columns) {
+            found = found && dataDisplay(row, col).toString().contains(fFilters[col], Qt::CaseInsensitive);
+            if (!found) {
+                goto FOUND;
+            }
+        }
+        FOUND:
+        if (found) {
+            fProxyData << row;
+        }
+    }
+    endResetModel();
+}
+
 void C5TableModel::clearModel()
 {
+    fProxyData.clear();
     fRawData.clear();
     fColumnNameIndex.clear();
     fColumnIndexName.clear();
     fRowToUpdate.clear();
     fAddDataToUpdate.clear();
+    fColorData.clear();
+    fFilters.clear();
+}
+
+QVariant C5TableModel::dataDisplay(int row, int column) const
+{
+    QVariant v = fRawData.at(row).at(column);
+    switch (v.type()) {
+    case QVariant::Int:
+        return v.toString();
+    case QVariant::Date:
+        return v.toDate().toString(FORMAT_DATE_TO_STR);
+    case QVariant::DateTime:
+        return v.toDateTime().toString(FORMAT_DATETIME_TO_STR);
+    case QVariant::Time:
+        return v.toTime().toString(FORMAT_TIME_TO_STR);
+    case QVariant::Double:
+        return float_str(v.toDouble(), 2);
+    default:
+        return v.toString();
+    }
 }

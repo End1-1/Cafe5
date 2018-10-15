@@ -9,6 +9,8 @@
 #define cp_t1_usergroups 101
 #define cp_t1_users 102
 #define cp_t2_action 200
+#define cp_t3_reports 300
+#define cp_t3_sales_common 301
 
 class C5Permissions
 {
@@ -17,9 +19,9 @@ public:
     static QList<int> fTemplate;
     static void init(C5Database &db);
     static void clear();
-    static QList<int> fPermissions;
+    static QMap<QString, QList<int> > fPermissions;
 };
 
-bool pr(int permission);
+bool pr(const QString &db, int permission);
 
 #endif // C5PERMISSIONS_H

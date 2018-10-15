@@ -9,5 +9,13 @@
         <file>edit.png</file>
         <file>new.png</file>
         <file>save.png</file>
+        <file>filter_clear.png</file>
+        <file>filter_set.png</file>
+        <file>refresh.png</file>
+        <file>print.png</file>
+        <file>excel.png</file>
+        <file>reports.png</file>
+        <file>graph.png</file>
+        <file>password.png</file>
     </qresource>
 </RCC>

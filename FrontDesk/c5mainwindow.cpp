@@ -4,9 +4,11 @@
 #include "c5connection.h"
 #include "c5login.h"
 #include "c5permissions.h"
+#include "cr5commonsales.h"
 #include "cr5usersgroups.h"
 #include "cr5users.h"
 #include <QCloseEvent>
+#include <QShortcut>
 #include <QMenu>
 
 C5MainWindow::C5MainWindow(QWidget *parent) :
@@ -26,6 +28,16 @@ C5MainWindow::C5MainWindow(QWidget *parent) :
     connect(ui->tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(tabCloseRequested(int)));
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(currentTabChange(int)));
     fReportToolbar = 0;
+    QShortcut *f3 = new QShortcut(QKeySequence("Ctrl+F"), this);
+    connect(f3, &QShortcut::activated, [this]() {
+        C5ReportWidget *rw = static_cast<C5ReportWidget*>(fTab->currentWidget());
+        rw->hotkey("F3");
+    });
+    QShortcut *esc = new QShortcut(QKeySequence("ESC"), this);
+    connect(esc, &QShortcut::activated, [this]() {
+        C5ReportWidget *rw = static_cast<C5ReportWidget*>(fTab->currentWidget());
+        rw->hotkey("esc");
+    });
 }
 
 C5MainWindow::~C5MainWindow()
@@ -49,8 +61,7 @@ void C5MainWindow::twCustomMenu(const QPoint &p)
     if (!item->parent()) {
         menu.addAction(ui->actionConfigure_connection);
     }
-    QPoint pt(p);
-    menu.exec(ui->twDb->mapToGlobal(pt));
+    menu.exec(ui->twDb->mapToGlobal(p));
 }
 
 void C5MainWindow::tabCloseRequested(int index)
@@ -106,7 +117,7 @@ void C5MainWindow::on_actionLogin_triggered()
         ui->twDb->addTopLevelItem(item);
 
         QTreeWidgetItem *it = 0;
-        if (pr(cp_t2_action)) {
+        if (pr(db.getString(0), cp_t2_action)) {
             it = new QTreeWidgetItem();
             it->setText(0, tr("Actions"));
             it->setData(0, Qt::UserRole, cp_t2_action);
@@ -114,7 +125,16 @@ void C5MainWindow::on_actionLogin_triggered()
             item->addChild(it);
         }
 
-        if (pr(cp_t1_preference)) {
+        if (pr(db.getString(0), cp_t3_reports)) {
+            it = new QTreeWidgetItem();
+            it->setText(0, tr("Reports"));
+            it->setData(0, Qt::UserRole, cp_t2_action);
+            it->setIcon(0, QIcon(":/reports.png"));
+            item->addChild(it);
+            addTreeL3Item(it, cp_t3_sales_common, tr("Sales, common"), ":/graph.png");
+        }
+
+        if (pr(db.getString(0), cp_t1_preference)) {
             it = new QTreeWidgetItem();
             it->setText(0, tr("Preferences"));
             it->setData(0, Qt::UserRole, cp_t1_preference);
@@ -134,12 +154,17 @@ void C5MainWindow::enableMenu(bool v)
         ui->twDb->clear();
     }
     fLogin = v;
-    ui->actionAppend_database->setEnabled(v && pr(cp_append_database));
+    ui->actionAppend_database->setEnabled(v && __usergroup == 1);
 }
 
 void C5MainWindow::addTreeL3Item(QTreeWidgetItem *item, int permission, const QString &text, const QString &icon)
 {
-    if (!pr(permission)) {
+    QTreeWidgetItem *root = item;
+    while (root->parent() != 0) {
+        root = root->parent();
+    }
+    QString db = root->text(0);
+    if (!pr(db, permission)) {
         return;
     }
     QTreeWidgetItem *child = new QTreeWidgetItem();
@@ -171,6 +196,9 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
         break;
     case cp_t1_users:
         createTab<CR5Users>(dbParams);
+        break;
+    case cp_t3_sales_common:
+        createTab<CR5CommonSales>(dbParams);
         break;
     default:
         break;

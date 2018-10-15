@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>C5FilterValues</class>
+ <widget class="QDialog" name="C5FilterValues">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>545</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Filter</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLineEdit" name="leFilter"/>
+   </item>
+   <item>
+    <widget class="QListWidget" name="lst"/>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>leFilter</tabstop>
+  <tabstop>lst</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

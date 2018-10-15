@@ -11,11 +11,6 @@ public:
     CR5Users(QWidget *parent = 0);
 
     virtual QToolBar *toolBar();
-
-private slots:
-    void newUser();
-
-    void editUser();
 };
 
 #endif // CR5USERS_H

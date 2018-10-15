@@ -1,8 +1,8 @@
 #include "c5permissions.h"
 #include "c5config.h"
 
-QList<int> C5Permissions::fPermissions;
 QList<int> C5Permissions::fTemplate;
+QMap<QString, QList<int> > C5Permissions::fPermissions;
 
 C5Permissions::C5Permissions()
 {
@@ -17,15 +17,17 @@ void C5Permissions::init(C5Database &db)
               << cp_t1_usergroups
               << cp_t1_users
               << cp_t2_action
+              << cp_t3_reports
+              << cp_t3_sales_common
                  ;
     if (__usergroup == 1) {
-        fPermissions = fTemplate;
+        fPermissions[db.database()] = fTemplate;
         return;
     }
     db[":f_group"] = __usergroup;
     db.exec("select f_key from s_user_access where f_group=:f_group");
     while (db.nextRow()) {
-        fPermissions << db.getInt(0);
+        fPermissions[db.database()] << db.getInt(0);
     }
 }
 
@@ -35,7 +37,7 @@ void C5Permissions::clear()
     fTemplate.clear();
 }
 
-bool pr(int permission)
+bool pr(const QString &db, int permission)
 {
-    return C5Permissions::fPermissions.contains(permission);
+    return C5Permissions::fPermissions[db].contains(permission);
 }

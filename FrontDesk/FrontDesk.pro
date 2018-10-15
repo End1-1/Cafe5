@@ -53,7 +53,14 @@ SOURCES += \
     ../Cache/c5cacheusersgroups.cpp \
     ../Controls/c5lineedit.cpp \
     ../Controls/c5combobox.cpp \
-    ../Cache/c5cacheusersstate.cpp
+    ../Cache/c5cacheusersstate.cpp \
+    c5filtervalues.cpp \
+    ../Cafe5/excel.cpp \
+    ../Reports/cr5commonsales.cpp \
+    ../Classes/c5gridgilter.cpp \
+    c5filterwidget.cpp \
+    ../Reports/cr5commonsalesfilter.cpp \
+    ../Controls/c5dateedit.cpp
 
 HEADERS += \
         c5mainwindow.h \
@@ -79,14 +86,24 @@ HEADERS += \
     ../Cache/c5cacheusersgroups.h \
     ../Controls/c5lineedit.h \
     ../Controls/c5combobox.h \
-    ../Cache/c5cacheusersstate.h
+    ../Cache/c5cacheusersstate.h \
+    c5filtervalues.h \
+    ../Cafe5/excel.h \
+    ../Reports/cr5commonsales.h \
+    ../Classes/c5gridgilter.h \
+    c5filterwidget.h \
+    ../Reports/cr5commonsalesfilter.h \
+    ../Controls/c5dateedit.h
 
 FORMS += \
         c5mainwindow.ui \
     ../Cafe5/c5connection.ui \
     ../Cafe5/c5message.ui \
     c5login.ui \
-    ../Classes/c5grid.ui
+    ../Classes/c5grid.ui \
+    c5filtervalues.ui \
+    ../Classes/c5gridgilter.ui \
+    ../Reports/cr5commonsalesfilter.ui
 
 INCLUDEPATH += ../Cafe5
 INCLUDEPATH += ../Classes
