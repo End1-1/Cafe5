@@ -5,9 +5,12 @@
 #include "c5textdelegate.h"
 #include "c5combodelegate.h"
 #include "c5tableview.h"
-#include <QWidget>
+#include "c5config.h"
+#include "c5widget.h"
 #include <QDebug>
+#include <QHBoxLayout>
 #include <QTableView>
+#include <QSettings>
 
 class C5TableModel;
 
@@ -17,20 +20,18 @@ class C5Grid;
 
 class C5FilterWidget;
 
-class C5Grid : public QWidget
+class C5Grid : public C5Widget
 {
     Q_OBJECT
 
 public:
-    enum ToolBarButtons {tbNone = 0, tbNew, tbEdit, tbSave, tbRefresh, tbFilter, tbClearFilter, tbPrint, tbExcel };
-
-    explicit C5Grid(QWidget *parent = 0);
+    explicit C5Grid(const QStringList &dbParams, QWidget *parent = 0);
 
     ~C5Grid();
 
-    void setDatabase(const QString &host, const QString &db, const QString &username, const QString &password);
-
     void setTableForUpdate(const QString &table, const QList<int> &columns);
+
+    virtual void postProcess();
 
     virtual void buildQuery();
 
@@ -65,9 +66,21 @@ protected:
 
     QWidget *widget();
 
+    QHBoxLayout *hl();
+
+    int rowId(int column = 0);
+
+    int rowId(int &row, int column);
+
+    virtual void cellClicked(const QModelIndex &index);
+
     void callEditor(int id);
 
     void sumColumnsData();
+
+    void restoreColumnsVisibility();
+
+    QStringList dbParams();
 
 private:
     Ui::C5Grid *ui;
@@ -75,6 +88,8 @@ private:
     int fFilterColumn;
 
 protected slots:
+    virtual void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
+
     virtual void saveDataChanges();
 
     virtual int newRow();
@@ -95,10 +110,14 @@ protected slots:
     \
     virtual void tableViewHeaderClicked(const QModelIndex &index);
 
+    virtual void tableViewHeaderResized(int column, int oldSize, int newSize);
+
 private slots:    
     void filterByColumn();
 
     void removeFilterForColumn();
+
+    void on_tblView_clicked(const QModelIndex &index);
 };
 
 #endif // C5GRID_H

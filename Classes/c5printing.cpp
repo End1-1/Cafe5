@@ -63,6 +63,11 @@ void C5Printing::line(qreal x1, qreal y1, qreal x2, qreal y2)
     fCanvas->addLine(x1 * fScaleFactor, y1 * fScaleFactor, x2 * fScaleFactor, y2 * fScaleFactor, fLinePen);
 }
 
+void C5Printing::line()
+{
+    line(0, fTop, fNormalWidth, fTop);
+}
+
 void C5Printing::ltext(const QString &text, qreal x)
 {
     QGraphicsTextItem *item = fCanvas->addText(text, fFont);
@@ -88,6 +93,35 @@ void C5Printing::rtext(const QString text)
     item->document()->setDefaultTextOption(op);
     item->moveBy(0, fTop * fScaleFactor);
     setTemptop(item);
+}
+
+void C5Printing::image(const QString &fileName, Qt::Alignment align)
+{
+    QPixmap p(fileName);
+    image(p, align);
+}
+
+void C5Printing::image(const QPixmap &image, Qt::Alignment align)
+{
+    QPixmap p(image);
+    p = p.scaled(image.width() / fScaleFactor, p.height() / fScaleFactor);
+    fTempTop = fTempTop < (p.height() / fScaleFactor) ? (p.height() / fScaleFactor) : fTempTop;
+    QGraphicsPixmapItem *pi = fCanvas->addPixmap(p);
+    QPointF pos = pi->pos();
+    switch (align) {
+    case Qt::AlignLeft:
+        break;
+    case Qt::AlignRight:
+        pos.setX((fNormalWidth * fScaleFactor) - p.width() - 1);
+        break;
+    case Qt::AlignHCenter:
+        pos.setX(((fNormalWidth * fScaleFactor) / 2) - (p.width() / 2));
+        break;
+    default:
+        break;
+    }
+    pos.setY(fTop * fScaleFactor);
+    pi->setPos(pos);
 }
 
 void C5Printing::br(int height)

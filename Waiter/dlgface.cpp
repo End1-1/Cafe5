@@ -14,9 +14,10 @@
 
 #define HALL_COL_WIDTH 175
 #define HALL_ROW_HEIGHT 60
+#define TIMER_TIMEOUT_INTERVAL 5000
 
 DlgFace::DlgFace(QWidget *parent) :
-    C5Dialog(parent),
+    C5Dialog(C5Config::dbParams(), parent),
     ui(new Ui::DlgFace)
 {
     ui->setupUi(this);
@@ -47,9 +48,10 @@ void DlgFace::setup()
     sh->send();
     sh = createSocketHandler(SLOT(handleConf(QJsonObject)));
     sh->bind("cmd", sm_waiterconf);
+    sh->bind("station", hostinfo);
     sh->send();
     connect(&fTimer, SIGNAL(timeout()), this, SLOT(timeout()));
-    fTimer.start(5000);
+    fTimer.start(TIMER_TIMEOUT_INTERVAL);
 }
 
 void DlgFace::accept()
@@ -69,6 +71,7 @@ void DlgFace::timeout()
     C5SocketHandler *sh = createSocketHandler(SLOT(handleHall(QJsonObject)));
     sh->bind("cmd", sm_hall);
     sh->send();
+    ui->lbDate->setText(QString("%1").arg(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR2)));
 }
 
 void DlgFace::newConnection()
@@ -107,7 +110,7 @@ void DlgFace::handleConf(const QJsonObject &obj)
 void DlgFace::handleSocket(const QJsonObject &obj)
 {
     C5SocketHandler *sh = static_cast<C5SocketHandler*>(sender());
-    C5WaiterServer ws(obj);
+    C5WaiterServer ws(obj, sh->fSocket);
     QJsonObject o;
     ws.reply(o);
     sh->send(o);
@@ -116,7 +119,7 @@ void DlgFace::handleSocket(const QJsonObject &obj)
 
 void DlgFace::on_btnConnection_clicked()
 {
-    go<C5Connection>();
+    go<C5Connection>(C5Config::dbParams());
 }
 
 void DlgFace::on_btnExit_clicked()
@@ -162,8 +165,10 @@ void DlgFace::on_tblHall_itemClicked(QTableWidgetItem *item)
     if (!DlgPassword::getUser(o["f_name"].toString(), &user)) {
         return;
     }
+    fTimer.stop();
     DlgOrder::openTable(o, &user);
     C5SocketHandler *sh = createSocketHandler(SLOT(handleHall(QJsonObject)));
     sh->bind("cmd", sm_hall);
     sh->send();
+    fTimer.start(TIMER_TIMEOUT_INTERVAL);
 }

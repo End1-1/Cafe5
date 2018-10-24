@@ -22,6 +22,8 @@ public:
 
     static bool getQty(const QString &title, int &qty);
 
+    static bool getAmount(const QString &title, double &amount, bool defaultAmount = false);
+
 private slots:
     void handlePassword(const QJsonObject &obj);
 
@@ -51,12 +53,18 @@ private slots:
 
     void on_lePassword_returnPressed();
 
+    void on_lePassword_textChanged(const QString &arg1);
+
+    void on_btnClear_clicked();
+
 private:
     Ui::DlgPassword *ui;
 
     void click(const QString &text);
 
     C5User *fUser;
+
+    double fMax;
 };
 
 #endif // DLGPASSWORD_H

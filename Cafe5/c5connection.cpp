@@ -7,8 +7,8 @@
 #define db_ver 1
 #define params_count 6
 
-C5Connection::C5Connection(QWidget *parent) :
-    C5Dialog(parent),
+C5Connection::C5Connection(const QStringList &dbParams, QWidget *parent) :
+    C5Dialog(dbParams, parent),
     ui(new Ui::C5Connection)
 {
     ui->setupUi(this);
@@ -19,7 +19,10 @@ C5Connection::C5Connection(QWidget *parent) :
     ui->leDatabase->setText(params.at(1));
     ui->leUsername->setText(params.at(2));
     ui->lePassword->setText(params.at(3));
-    ui->cbSettings->setCurrentText(params.at(4));
+    if (!ui->leHost->text().isEmpty() && !ui->leDatabase->text().isEmpty()) {
+        on_btnRefreshSettings_clicked();
+        ui->cbSettings->setCurrentText(params.at(4));
+    }
 }
 
 C5Connection::~C5Connection()
@@ -47,13 +50,13 @@ void C5Connection::readParams(QList<QByteArray> &params)
 void C5Connection::writeParams()
 {
     QByteArray buf;
-    buf.append(C5Database::fHost.toUtf8());
+    buf.append(C5Config::fDBHost.toUtf8());
     buf.append('\r');
-    buf.append(C5Database::fFile.toUtf8());
+    buf.append(C5Config::fDBPath.toUtf8());
     buf.append('\r');
-    buf.append(C5Database::fUser.toUtf8());
+    buf.append(C5Config::fDBUser.toUtf8());
     buf.append('\r');
-    buf.append(C5Database::fPass.toUtf8());
+    buf.append(C5Config::fDBPassword.toUtf8());
     buf.append('\r');
     buf.append(C5Config::fSettingsName.toUtf8());
     buf.append('\r');
@@ -101,12 +104,13 @@ void C5Connection::on_btnTest_clicked()
 
 void C5Connection::on_btnSave_clicked()
 {
-    C5Database::fHost = ui->leHost->text();
-    C5Database::fFile = ui->leDatabase->text();
-    C5Database::fUser = ui->leUsername->text();
-    C5Database::fPass = ui->lePassword->text();
+    C5Config::fDBHost = ui->leHost->text();
+    C5Config::fDBPath = ui->leDatabase->text();
+    C5Config::fDBUser = ui->leUsername->text();
+    C5Config::fDBPassword = ui->lePassword->text();
     C5Config::fSettingsName = ui->cbSettings->currentText();
     writeParams();
+    C5Message::info(tr("Saved"));
 }
 
 void C5Connection::on_btnInit_clicked()
@@ -136,4 +140,15 @@ void C5Connection::on_btnInit_clicked()
         db.exec(s);
     }
     C5Message::info(tr("Ready to use"));
+}
+
+void C5Connection::on_btnRefreshSettings_clicked()
+{
+    C5Database db(ui->leHost->text(), ui->leDatabase->text(), ui->leUsername->text(), ui->lePassword->text());
+    if (db.open()) {
+        db.exec("select f_id, f_name, f_description from s_settings_names");
+        while (db.nextRow()) {
+            ui->cbSettings->addItem(db.getString(1), db.getInt(0));
+        }
+    }
 }

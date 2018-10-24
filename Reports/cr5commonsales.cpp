@@ -1,8 +1,8 @@
 #include "cr5commonsales.h"
 #include "cr5commonsalesfilter.h"
 
-CR5CommonSales::CR5CommonSales(QWidget *parent) :
-    C5ReportWidget(parent)
+CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
+    C5ReportWidget(dbParams, parent)
 {
     fIcon = ":/graph.png";
     fLabel = tr("Sales, common");
@@ -60,6 +60,8 @@ CR5CommonSales::CR5CommonSales(QWidget *parent) :
     fColumnsVisible["sum(oh.f_amountcard) as f_amountcard"] = true;
     fColumnsVisible["sum(oh.f_amountbank) as f_amountbank"] = true;
     fColumnsVisible["sum(oh.f_amountother) as f_amountother"] = true;
+
+    restoreColumnsVisibility();
 
     fFilterWidget = new CR5CommonSalesFilter();
 }

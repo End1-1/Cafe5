@@ -1,0 +1,14 @@
+#ifndef CR5DISHPART1_H
+#define CR5DISHPART1_H
+
+#include "c5reportwidget.h"
+
+class CR5DishPart1 : public C5ReportWidget
+{
+public:
+    CR5DishPart1(const QStringList &dbParams, QWidget *parent = 0);
+
+    virtual QToolBar *toolBar();
+};
+
+#endif // CR5DISHPART1_H

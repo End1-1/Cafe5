@@ -13,16 +13,12 @@
 int C5Database::fCounter = 0;
 
 QMutex fMutex;
-QString C5Database::fHost;
-QString C5Database::fFile;
-QString C5Database::fUser;
-QString C5Database::fPass;
 
-C5Database::C5Database() :
+C5Database::C5Database(const QStringList &dbParams) :
     QObject()
 {
     init();
-    configureDatabase(fDb, fHost, fFile, fUser, fPass);
+    configureDatabase(fDb, dbParams[0], dbParams[1], dbParams[2], dbParams[3]);
 }
 
 C5Database::C5Database(C5Database &db) :
@@ -34,15 +30,6 @@ C5Database::C5Database(C5Database &db) :
                       db.fDb.databaseName(),
                       db.fDb.userName(),
                       db.fDb.password());
-}
-
-C5Database::C5Database(bool openFirst) :
-    QObject()
-{
-    init();
-    Q_UNUSED(openFirst)
-    configureDatabase(fDb, fHost, fFile, fUser, fPass);
-    fDb.open();
 }
 
 C5Database::C5Database(const QString &host, const QString &db, const QString &user, const QString &password) :
@@ -58,6 +45,16 @@ C5Database::~C5Database()
     logEvent("Destructor" + fDb.connectionName());
     fDb = QSqlDatabase::addDatabase(_DBDRIVER_);
     QSqlDatabase::removeDatabase(fDbName);
+}
+
+QStringList C5Database::dbParams()
+{
+    QStringList params;
+    params << fDb.hostName()
+           << fDb.databaseName()
+           << fDb.userName()
+           << fDb.password();
+    return params;
 }
 
 QString C5Database::getDbNumber(const QString &prefix)

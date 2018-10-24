@@ -17,5 +17,8 @@
         <file>reports.png</file>
         <file>graph.png</file>
         <file>password.png</file>
+        <file>permissions.png</file>
+        <file>menu.png</file>
+        <file>delete.png</file>
     </qresource>
 </RCC>

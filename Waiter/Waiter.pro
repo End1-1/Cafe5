@@ -37,7 +37,6 @@ SOURCES += \
     ../Cafe5/c5config.cpp \
     ../Cafe5/c5dialog.cpp \
     ../Cafe5/c5utils.cpp \
-    ../Cafe5/c5staticdb.cpp \
     ../Cafe5/c5connection.cpp \
     ../Cafe5/c5message.cpp \
     ../Cafe5/c5sockethandler.cpp \
@@ -54,7 +53,12 @@ SOURCES += \
     ../Classes/c5halltabledelegate.cpp \
     ../Classes/c5printing.cpp \
     ../Classes/c5printservicethread.cpp \
-    dlgpayment.cpp
+    dlgpayment.cpp \
+    ../Classes/c5printreceiptthread.cpp \
+    ../Classes/QRCodeGenerator.cpp \
+    ../../NewTax/printtaxn.cpp \
+    ../Controls/c5lineedit.cpp \
+    ../Classes/c5printremovedservicethread.cpp
 
 HEADERS += \
         dlgface.h \
@@ -62,7 +66,6 @@ HEADERS += \
     ../Cafe5/c5config.h \
     ../Cafe5/c5dialog.h \
     ../Cafe5/c5utils.h \
-    ../Cafe5/c5staticdb.h \
     ../Cafe5/c5connection.h \
     ../Cafe5/c5message.h \
     ../Cafe5/c5sockethandler.h \
@@ -80,7 +83,12 @@ HEADERS += \
     ../Classes/c5halltabledelegate.h \
     ../Classes/c5printing.h \
     ../Classes/c5printservicethread.h \
-    dlgpayment.h
+    dlgpayment.h \
+    ../Classes/c5printreceiptthread.h \
+    ../Classes/QRCodeGenerator.h \
+    ../../NewTax/printtaxn.h \
+    ../Controls/c5lineedit.h \
+    ../Classes/c5printremovedservicethread.h
 
 FORMS += \
         dlgface.ui \
@@ -92,8 +100,18 @@ FORMS += \
 
 INCLUDEPATH += ../Cafe5
 INCLUDEPATH += ../Classes
+INCLUDEPATH += ../Controls
+INCLUDEPATH += ../../NewTax
+INCLUDEPATH += C:/OpenSSL-Win32.0/include
+INCLUDEPATH += C:/OpenSSL-Win32.0/include/openssl
 
 RESOURCES += \
     ../resources/resources.qrc
 
 DISTFILES +=
+
+LIBS += -lVersion
+LIBS += -lwsock32
+LIBS += -LC:/OpenSSL-Win32/lib
+LIBS += -lopenssl
+LIBS += -llibcrypto

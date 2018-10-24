@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>C5GroupPermissionsEditor</class>
+ <widget class="QWidget" name="C5GroupPermissionsEditor">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>937</width>
+    <height>704</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QCommandLinkButton" name="lbGroup">
+     <property name="text">
+      <string>CommandLinkButton</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTabWidget" name="tw">
+     <property name="tabPosition">
+      <enum>QTabWidget::West</enum>
+     </property>
+     <property name="currentIndex">
+      <number>1</number>
+     </property>
+     <widget class="QWidget" name="tab_2">
+      <attribute name="title">
+       <string>Actions</string>
+      </attribute>
+     </widget>
+     <widget class="QWidget" name="tab_5">
+      <attribute name="title">
+       <string>Waiter</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_3">
+       <item row="3" column="0">
+        <spacer name="verticalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>544</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="2" column="0">
+        <widget class="C5CheckBox" name="checkBox_9">
+         <property name="text">
+          <string>Mutliple receipt</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>501</number>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="C5CheckBox" name="chWaiter">
+         <property name="text">
+          <string>Entry</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>500</number>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="C5CheckBox" name="checkBox_10">
+         <property name="text">
+          <string>Remove printed service</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>502</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_3">
+      <attribute name="title">
+       <string>Reports</string>
+      </attribute>
+     </widget>
+     <widget class="QWidget" name="tab_4">
+      <attribute name="title">
+       <string>Menu</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="2" column="0">
+        <widget class="C5CheckBox" name="checkBox_4">
+         <property name="text">
+          <string>Dish departments</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>402</number>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="C5CheckBox" name="checkBox_5">
+         <property name="text">
+          <string>Types of dishes</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>403</number>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="C5CheckBox" name="chMenu">
+         <property name="text">
+          <string>All items</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>400</number>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="C5CheckBox" name="checkBox_6">
+         <property name="text">
+          <string>Dishes list</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>404</number>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="1" column="0">
+        <widget class="QCheckBox" name="checkBox_7">
+         <property name="text">
+          <string>Menu names</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>401</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab">
+      <attribute name="title">
+       <string>Preferences</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="1" column="0">
+        <widget class="C5CheckBox" name="checkBox">
+         <property name="text">
+          <string>Users groups</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>101</number>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>544</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="2" column="0">
+        <widget class="C5CheckBox" name="checkBox_2">
+         <property name="text">
+          <string>Users</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>102</number>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="C5CheckBox" name="checkBox_3">
+         <property name="text">
+          <string>Databases</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>103</number>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="C5CheckBox" name="chPreferences">
+         <property name="text">
+          <string>All items</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>100</number>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="C5CheckBox" name="checkBox_8">
+         <property name="text">
+          <string>Settings</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>104</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>C5CheckBox</class>
+   <extends>QCheckBox</extends>
+   <header location="global">c5checkbox.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

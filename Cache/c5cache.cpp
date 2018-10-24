@@ -1,30 +1,33 @@
 #include "c5cache.h"
-#include "c5cacheusersgroups.h"
-#include "c5cacheusersstate.h"
 
 QMap<QString, C5Cache*> C5Cache::fCacheList;
+QMap<int, QString> C5Cache::fCacheQuery;
 
-C5Cache::C5Cache(const QString &host, const QString &db, const QString &user, const QString &password)
+C5Cache::C5Cache(const QStringList &dbParams) :
+    fDb(dbParams)
 {
-    fDb.setDatabase(host, db, user, password);
+    if (fCacheQuery.count() == 0) {
+        fCacheQuery[cache_users_groups] = "select f_id, f_name from s_user_group order by f_name";
+        fCacheQuery[cache_users_states] = "select f_id, f_name from s_user_state";
+        fCacheQuery[cache_dish_part1] = "select f_id, f_name from d_part1";
+    }
 }
 
-C5Cache *C5Cache::cache(const QString &host, const QString &db, const QString &user, const QString &password, int cacheId)
+C5Cache *C5Cache::cache(const QStringList &dbParams, int cacheId)
 {
-    QString cacheName = host + db + user + password + "-" + QString::number(cacheId);
+    QString cacheName = dbParams[0] + dbParams[1] + dbParams[2] + dbParams[3] + "-" + QString::number(cacheId);
     C5Cache *cache = 0;
     if (!fCacheList.contains(cacheName)) {
-        switch (cacheId) {
-        case cache_users_groups:
-            cache = new C5CacheUsersGroups(host, db, user, password);
-            break;
-        case cache_users_states:
-            cache = new C5CacheUsersState(host, db, user, password);
-            break;
-        }
-        cache->loadFromDatabase();
+        cache = new C5Cache(dbParams);
+        QString query = fCacheQuery[cacheId];
+        cache->loadFromDatabase(query);
         fCacheList[cacheName] = cache;
     }
 
     return fCacheList[cacheName];
+}
+
+void C5Cache::loadFromDatabase(const QString &query)
+{
+    fDb.exec(query, fCacheData);
 }

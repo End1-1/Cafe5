@@ -50,14 +50,14 @@ private:
 
     void itemsToTable();
 
+    void saveOrder();
+
 private slots:
     void handleOpenTable(const QJsonObject &obj);
 
     void handlePrintService(const QJsonObject &obj);
 
     void saveAndQuit(const QJsonObject &obj);
-
-    void handleGoPayment(const QJsonObject &obj);
 
     virtual void handleError(int err, const QString &msg);
 
@@ -82,6 +82,8 @@ private slots:
     void on_btnPayment_clicked();
 
     void on_btnExit_clicked();
+
+    void on_btnVoid_clicked();
 };
 
 #endif // DLGORDER_H

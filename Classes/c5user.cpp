@@ -6,6 +6,14 @@ C5User::C5User()
     fId = 0;
 }
 
+bool C5User::check(int permission)
+{
+    if (fGroup.toInt() == 1) {
+        return true;
+    }
+    return fPermissions.contains(QString::number(permission));
+}
+
 void C5User::fromJson(const QJsonObject &obj)
 {
     QJsonArray ju = obj["user"].toArray();
@@ -16,5 +24,6 @@ void C5User::fromJson(const QJsonObject &obj)
         fFirst = u["f_first"].toString();
         fLast = u["f_last"].toString();
         fFull = fLast + " " + fFirst;
+        fPermissions = u["f_permissions"].toString().split(",", QString::SkipEmptyParts);
     }
 }

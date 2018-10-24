@@ -19,26 +19,38 @@ public:
     ~C5SocketHandler();
 
     QVariant &operator[] (const QString &key);
+
     void bind(const QString &key, const QVariant &value);
+
     void send();
+
     void send(int errorCode);
+
     void send(QJsonObject &obj);
+
     void close();
+
+    QTcpSocket *fSocket;
 
 private:
     bool fReadState;
+
     int fDataSize;
+
     QByteArray fData;
-    QTcpSocket *fSocket;
+
     int fErrorCode;
+
     QMap<QString, QVariant> fBindValues;
 
 private slots:
     void connected();
+
     void readyRead();
 
 signals:
     void handleCommand(const QJsonObject &data);
+
     void handleError(int cmd, const QString &message);
 };
 

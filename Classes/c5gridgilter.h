@@ -18,7 +18,7 @@ public:
 
     ~C5GridGilter();
 
-    static bool filter(C5FilterWidget *filterWidget, QString &condition, QMap<QString, bool> &showColumns);
+    static bool filter(C5FilterWidget *filterWidget, QString &condition, QMap<QString, bool> &showColumns, QMap<QString, QString> &colTranslation);
 
 private slots:
     void on_btnCancel_clicked();

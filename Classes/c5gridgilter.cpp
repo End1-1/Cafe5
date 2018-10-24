@@ -5,7 +5,7 @@
 #include <QCheckBox>
 
 C5GridGilter::C5GridGilter(QWidget *parent) :
-    C5Dialog(parent),
+    C5Dialog(QStringList(), parent),
     ui(new Ui::C5GridGilter)
 {
     ui->setupUi(this);
@@ -16,7 +16,7 @@ C5GridGilter::~C5GridGilter()
     delete ui;
 }
 
-bool C5GridGilter::filter(C5FilterWidget *filterWidget, QString &condition, QMap<QString, bool> &showColumns)
+bool C5GridGilter::filter(C5FilterWidget *filterWidget, QString &condition, QMap<QString, bool> &showColumns, QMap<QString, QString> &colTranslation)
 {
     C5GridGilter *gf = new C5GridGilter(C5Config::fParentWidget);
     gf->ui->vl->addWidget(filterWidget);
@@ -24,7 +24,17 @@ bool C5GridGilter::filter(C5FilterWidget *filterWidget, QString &condition, QMap
     for (QMap<QString, bool>::const_iterator it = showColumns.begin(); it != showColumns.end(); it++) {
         QListWidgetItem *item = new QListWidgetItem(lv);
         item->setData(Qt::UserRole, it.key());
-        QCheckBox *c = new QCheckBox(it.key());
+
+        QString s = it.key();
+        int pos = s.indexOf(" as");
+        if (pos > -1) {
+            s = s.mid(pos + 4, s.length() - pos + 4);
+        } else {
+            pos = s.indexOf(".");
+            s = s.mid(pos + 1, s.length() - pos);
+        }
+
+        QCheckBox *c = new QCheckBox(colTranslation[s]);
         c->setChecked(it.value());
         lv->setItemWidget(item, c);
     }

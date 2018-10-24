@@ -12,7 +12,7 @@ class C5Connection : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit C5Connection(QWidget *parent = 0);
+    explicit C5Connection(const QStringList &dbParams, QWidget *parent = 0);
 
     ~C5Connection();
 
@@ -30,6 +30,8 @@ private slots:
     void on_btnSave_clicked();
 
     void on_btnInit_clicked();
+
+    void on_btnRefreshSettings_clicked();
 
 private:
     Ui::C5Connection *ui;

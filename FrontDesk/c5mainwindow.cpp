@@ -4,8 +4,14 @@
 #include "c5connection.h"
 #include "c5login.h"
 #include "c5permissions.h"
+#include "c5widget.h"
 #include "cr5commonsales.h"
 #include "cr5usersgroups.h"
+#include "cr5dish.h"
+#include "cr5settings.h"
+#include "cr5dishpart1.h"
+#include "cr5dishpart2.h"
+#include "cr5databases.h"
 #include "cr5users.h"
 #include <QCloseEvent>
 #include <QShortcut>
@@ -29,15 +35,10 @@ C5MainWindow::C5MainWindow(QWidget *parent) :
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(currentTabChange(int)));
     fReportToolbar = 0;
     QShortcut *f3 = new QShortcut(QKeySequence("Ctrl+F"), this);
-    connect(f3, &QShortcut::activated, [this]() {
-        C5ReportWidget *rw = static_cast<C5ReportWidget*>(fTab->currentWidget());
-        rw->hotkey("F3");
-    });
+    connect(f3, SIGNAL(activated()), this, SLOT(hotKey()));
     QShortcut *esc = new QShortcut(QKeySequence("ESC"), this);
-    connect(esc, &QShortcut::activated, [this]() {
-        C5ReportWidget *rw = static_cast<C5ReportWidget*>(fTab->currentWidget());
-        rw->hotkey("esc");
-    });
+    connect(esc, SIGNAL(activated()), this, SLOT(hotKey()));
+    __mainWindow = this;
 }
 
 C5MainWindow::~C5MainWindow()
@@ -77,28 +78,35 @@ void C5MainWindow::currentTabChange(int index)
         removeToolBar(fReportToolbar);
     }
     fReportToolbar = 0;
-    C5ReportWidget *w = static_cast<C5ReportWidget*>(fTab->widget(index));
-    if (!w) {
+    C5ReportWidget *w = dynamic_cast<C5ReportWidget*>(fTab->widget(index));
+    C5Widget *w2 = dynamic_cast<C5Widget*>(fTab->widget(index));
+    if (!w && !w2) {
         return;
     }
-    fReportToolbar = w->toolBar();
-    addToolBar(fReportToolbar);
-    fReportToolbar->show();
+    if (w) {
+        fReportToolbar = w->toolBar();
+    } else if (w2) {
+        fReportToolbar = w2->toolBar();
+    }
+    if (fReportToolbar) {
+        addToolBar(fReportToolbar);
+        fReportToolbar->show();
+    }
 }
 
 void C5MainWindow::on_actionConnection_triggered()
 {
-    C5Connection::go<C5Connection>();
+    C5Connection::go<C5Connection>(C5Config::dbParams());
 }
 
 void C5MainWindow::on_actionLogin_triggered()
 {
-    if (!C5Connection::go<C5Login>()) {
+    if (!C5Connection::go<C5Login>(C5Config::dbParams())) {
         return;
     }
     fStatusLabel->setText(__username);
 
-    C5Database db;
+    C5Database db(C5Config::fDBHost, C5Config::fDBPath, C5Config::fDBUser, C5Config::fDBPassword);
     db[":f_user"] = __userid;
     db.exec("select f_db, f_description, f_host, f_db, f_user, f_password, f_main from s_db \
             where f_name in (select f_db from s_db_access where f_user=:f_user and f_permit=1)");
@@ -131,7 +139,18 @@ void C5MainWindow::on_actionLogin_triggered()
             it->setData(0, Qt::UserRole, cp_t2_action);
             it->setIcon(0, QIcon(":/reports.png"));
             item->addChild(it);
-            addTreeL3Item(it, cp_t3_sales_common, tr("Sales, common"), ":/graph.png");
+            addTreeL3Item(it, cp_t3_sales_common, tr("Sales, expert mode"), ":/graph.png");
+        }
+
+        if (pr(db.getString(0), cp_t4_menu)) {
+            it = new QTreeWidgetItem();
+            it->setText(0, tr("Menu"));
+            it->setData(0, Qt::UserRole, cp_t4_part1);
+            it->setIcon(0, QIcon(":/menu.png"));
+            item->addChild(it);
+            addTreeL3Item(it, cp_t4_part1, tr("Dish depts"), ":/menu.png");
+            addTreeL3Item(it, cp_t4_part2, tr("Types of dishes"), ":/menu.png");
+            addTreeL3Item(it, cp_t4_dishes, tr("Dishes list"), ":/menu.png");
         }
 
         if (pr(db.getString(0), cp_t1_preference)) {
@@ -142,10 +161,22 @@ void C5MainWindow::on_actionLogin_triggered()
             item->addChild(it);
             addTreeL3Item(it, cp_t1_usergroups, tr("Users groups"), ":/users_groups.png");
             addTreeL3Item(it, cp_t1_users, tr("Users"), ":/users_groups.png");
+            addTreeL3Item(it, cp_t1_databases, tr("Databases"), ":/database.png");
+            addTreeL3Item(it, cp_t1_settigns, tr("Settings"), ":/configure.png");
         }
     }
 
-    enableMenu(true);
+            enableMenu(true);
+}
+
+void C5MainWindow::hotKey()
+{
+    QShortcut *s = static_cast<QShortcut*>(sender());
+    C5Widget *w = static_cast<C5Widget*>(fTab->currentWidget());
+    if (!w) {
+        return;
+    }
+    w->hotKey(s->key().toString());
 }
 
 void C5MainWindow::enableMenu(bool v)
@@ -197,8 +228,23 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
     case cp_t1_users:
         createTab<CR5Users>(dbParams);
         break;
+    case cp_t1_databases:
+        createTab<CR5Databases>(dbParams);
+        break;
+    case cp_t1_settigns:
+        createTab<CR5Settings>(dbParams);
+        break;
     case cp_t3_sales_common:
         createTab<CR5CommonSales>(dbParams);
+        break;
+    case cp_t4_part1:
+        createTab<CR5DishPart1>(dbParams);
+        break;
+    case cp_t4_part2:
+        createTab<CR5DishPart2>(dbParams);
+        break;
+    case cp_t4_dishes:
+        createTab<CR5Dish>(dbParams);
         break;
     default:
         break;

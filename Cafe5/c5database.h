@@ -15,23 +15,15 @@ class C5Database : public QObject
 {
     Q_OBJECT
 public:
-    C5Database();
+    C5Database(const QStringList &dbParams);
 
     C5Database(C5Database &db);
-
-    C5Database(bool openFirst);
 
     C5Database(const QString &host, const QString &db, const QString &user, const QString &password);
 
     ~C5Database();
 
-    static QString fHost;
-
-    static QString fFile;
-
-    static QString fUser;
-
-    static QString fPass;
+    QStringList dbParams();
 
     void init();
 

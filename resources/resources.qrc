@@ -13,5 +13,6 @@
         <file>calculator.png</file>
         <file>service_check.png</file>
         <file>wallet-with-money.png</file>
+        <file>refresh.png</file>
     </qresource>
 </RCC>

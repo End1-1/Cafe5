@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <QJsonObject>
+#include <QStringList>
 
 class C5User
 {
@@ -13,7 +14,10 @@ public:
     QString fFull;
     QString fGroup;
     int fId;
+    bool check(int permission);
     void fromJson(const QJsonObject &obj);
+private:
+    QStringList fPermissions;
 };
 
 #endif // C5USER_H

@@ -2,7 +2,8 @@
 #include "c5connection.h"
 #include <QJsonArray>
 
-C5ServerHandler::C5ServerHandler()
+C5ServerHandler::C5ServerHandler() :
+    fDb(C5Config::dbParams())
 {
     fDb.open();
 }

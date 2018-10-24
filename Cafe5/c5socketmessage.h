@@ -9,5 +9,7 @@
 #define sm_saveorder 6
 #define sm_printservice 7
 #define sm_printreceipt 8
+#define sm_closeorder 9
+#define sm_stationconfig 10
 
 #endif // C5SOCKETMESSAGE_H

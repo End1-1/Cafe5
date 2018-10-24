@@ -22,6 +22,8 @@ public:
 
     int indexForColumnName(const QString &column);
 
+    QString nameForColumnIndex(int index);
+
     virtual QVariant data(const QModelIndex &index, int role) const;
 
     inline QVariant data(int row, int column, int role) const {return data(index(row, column), role); }
@@ -37,6 +39,8 @@ public:
     void setEditableFlag(int column, Qt::ItemFlags flag);
 
     void insertRow(int row);
+
+    void removeRow(int row, const QModelIndex &parent = QModelIndex());
 
     void saveDataChanges();
 

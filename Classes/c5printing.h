@@ -25,11 +25,17 @@ public:
 
     void line(qreal x1, qreal y1, qreal x2, qreal y2);
 
+    void line();
+
     void ltext(const QString &text, qreal x);
 
     void ctext(const QString &text);
 
     void rtext(const QString text);
+
+    void image(const QString &fileName, Qt::Alignment align);
+
+    void image(const QPixmap &image, Qt::Alignment align);
 
     void br(int height = 0);
 

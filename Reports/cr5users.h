@@ -8,9 +8,12 @@ class CR5Users : public C5ReportWidget
     Q_OBJECT
 
 public:
-    CR5Users(QWidget *parent = 0);
+    CR5Users(const QStringList &dbParams, QWidget *parent = 0);
 
     virtual QToolBar *toolBar();
+
+private slots:
+    void setPasswords();
 };
 
 #endif // CR5USERS_H

@@ -21,6 +21,7 @@ DEFINES += _DBDRIVER_=\\\"QMYSQL\\\"
 DEFINES += _ORGANIZATION_=\\\"Jazzve\\\"
 DEFINES += _APPLICATION_=\\\"Cafe5\\\"
 DEFINES += _MODULE_=\\\"FRONTDESK\\\"
+DEFINES += FRONTDESK
 
 # You can also make your code fail to compile if you use deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -36,7 +37,6 @@ SOURCES += \
     ../Cafe5/c5database.cpp \
     ../Cafe5/c5dialog.cpp \
     ../Cafe5/c5message.cpp \
-    ../Cafe5/c5staticdb.cpp \
     ../Cafe5/c5utils.cpp \
     ../Cafe5/c5sockethandler.cpp \
     c5login.cpp \
@@ -50,17 +50,26 @@ SOURCES += \
     ../Classes/c5combodelegate.cpp \
     ../Classes/c5tableview.cpp \
     ../Cache/c5cache.cpp \
-    ../Cache/c5cacheusersgroups.cpp \
     ../Controls/c5lineedit.cpp \
     ../Controls/c5combobox.cpp \
-    ../Cache/c5cacheusersstate.cpp \
     c5filtervalues.cpp \
     ../Cafe5/excel.cpp \
     ../Reports/cr5commonsales.cpp \
     ../Classes/c5gridgilter.cpp \
     c5filterwidget.cpp \
     ../Reports/cr5commonsalesfilter.cpp \
-    ../Controls/c5dateedit.cpp
+    ../Controls/c5dateedit.cpp \
+    c5passwords.cpp \
+    ../Classes/c5widget.cpp \
+    c5grouppermissionseditor.cpp \
+    ../Controls/c5checkbox.cpp \
+    ../Reports/cr5databases.cpp \
+    ../Reports/cr5dishpart1.cpp \
+    ../Reports/cr5dishpart2.cpp \
+    ../Reports/cr5dish.cpp \
+    c5dishwidget.cpp \
+    ../Reports/cr5settings.cpp \
+    ../Reports/c5settingswidget.cpp
 
 HEADERS += \
         c5mainwindow.h \
@@ -69,7 +78,6 @@ HEADERS += \
     ../Cafe5/c5database.h \
     ../Cafe5/c5dialog.h \
     ../Cafe5/c5message.h \
-    ../Cafe5/c5staticdb.h \
     ../Cafe5/c5utils.h \
     ../Cafe5/c5sockethandler.h \
     c5login.h \
@@ -83,17 +91,26 @@ HEADERS += \
     ../Classes/c5combodelegate.h \
     ../Classes/c5tableview.h \
     ../Cache/c5cache.h \
-    ../Cache/c5cacheusersgroups.h \
     ../Controls/c5lineedit.h \
     ../Controls/c5combobox.h \
-    ../Cache/c5cacheusersstate.h \
     c5filtervalues.h \
     ../Cafe5/excel.h \
     ../Reports/cr5commonsales.h \
     ../Classes/c5gridgilter.h \
     c5filterwidget.h \
     ../Reports/cr5commonsalesfilter.h \
-    ../Controls/c5dateedit.h
+    ../Controls/c5dateedit.h \
+    c5passwords.h \
+    ../Classes/c5widget.h \
+    c5grouppermissionseditor.h \
+    ../Controls/c5checkbox.h \
+    ../Reports/cr5databases.h \
+    ../Reports/cr5dishpart1.h \
+    ../Reports/cr5dishpart2.h \
+    ../Reports/cr5dish.h \
+    c5dishwidget.h \
+    ../Reports/cr5settings.h \
+    ../Reports/c5settingswidget.h
 
 FORMS += \
         c5mainwindow.ui \
@@ -103,7 +120,11 @@ FORMS += \
     ../Classes/c5grid.ui \
     c5filtervalues.ui \
     ../Classes/c5gridgilter.ui \
-    ../Reports/cr5commonsalesfilter.ui
+    ../Reports/cr5commonsalesfilter.ui \
+    c5passwords.ui \
+    c5grouppermissionseditor.ui \
+    c5dishwidget.ui \
+    ../Reports/c5settingswidget.ui
 
 INCLUDEPATH += ../Cafe5
 INCLUDEPATH += ../Classes

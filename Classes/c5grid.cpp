@@ -7,11 +7,13 @@
 #include "c5gridgilter.h"
 #include <QMenu>
 
-C5Grid::C5Grid(QWidget *parent) :
-    QWidget(parent),
+C5Grid::C5Grid(const QStringList &dbParams, QWidget *parent) :
+    C5Widget(dbParams, parent),
+    fDb(dbParams),
     ui(new Ui::C5Grid)
 {
     ui->setupUi(this);
+    fDBParams = dbParams;
     fModel = new C5TableModel(fDb, this);
     ui->tblView->setModel(fModel);
     fSimpleQuery = true;
@@ -19,6 +21,8 @@ C5Grid::C5Grid(QWidget *parent) :
     fTableView->horizontalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(fTableView->horizontalHeader(), SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(tableViewContextMenuRequested(QPoint)));
     connect(fTableView->horizontalHeader(), SIGNAL(clicked(QModelIndex)), this, SLOT(tableViewHeaderClicked(QModelIndex)));
+    connect(fTableView->horizontalHeader(), SIGNAL(sectionResized(int,int,int)), this, SLOT(tableViewHeaderResized(int,int,int)));
+    connect(fTableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(selectionChanged(QItemSelection,QItemSelection)));
     fFilterWidget = 0;
     ui->tblTotal->setVisible(false);
 }
@@ -28,15 +32,15 @@ C5Grid::~C5Grid()
     delete ui;
 }
 
-void C5Grid::setDatabase(const QString &host, const QString &db, const QString &username, const QString &password)
-{
-    fDb.setDatabase(host, db, username, password);
-}
-
 void C5Grid::setTableForUpdate(const QString &table, const QList<int> &columns)
 {
     fModel->fTableForUpdate = table;
     fModel->fColumnsForUpdate = columns;
+}
+
+void C5Grid::postProcess()
+{
+    buildQuery();
 }
 
 void C5Grid::buildQuery()
@@ -108,6 +112,37 @@ QWidget *C5Grid::widget()
     return ui->wd;
 }
 
+QHBoxLayout *C5Grid::hl()
+{
+    return ui->hl;
+}
+
+int C5Grid::rowId(int column)
+{
+    QModelIndexList ml = fTableView->selectionModel()->selectedIndexes();
+    if (ml.count() == 0) {
+        C5Message::info(tr("Nothing was selected"));
+        return 0;
+    }
+    return fModel->data(ml.at(0).row(), column, Qt::EditRole).toInt();
+}
+
+int C5Grid::rowId(int &row, int column)
+{
+    QModelIndexList ml = fTableView->selectionModel()->selectedIndexes();
+    if (ml.count() == 0) {
+        C5Message::info(tr("Nothing was selected"));
+        return 0;
+    }
+    row = ml.at(0).row();
+    return fModel->data(row, column, Qt::EditRole).toInt();
+}
+
+void C5Grid::cellClicked(const QModelIndex &index)
+{
+    Q_UNUSED(index);
+}
+
 void C5Grid::callEditor(int id)
 {
     Q_UNUSED(id)
@@ -128,6 +163,30 @@ void C5Grid::sumColumnsData()
     vheader << QString::number(fModel->rowCount());
     ui->tblTotal->setVerticalHeaderLabels(vheader);
     ui->tblTotal->setVisible(true);
+}
+
+void C5Grid::restoreColumnsVisibility()
+{
+    QSettings s(_ORGANIZATION_, QString("%1\\%2\\reports\\%3\\visiblecolumns")
+                .arg(_APPLICATION_)
+                .arg(_MODULE_)
+                .arg(fLabel));
+    for (QMap<QString, bool>::iterator it = fColumnsVisible.begin(); it != fColumnsVisible.end(); it++) {
+        if (s.contains(it.key())) {
+            it.value() = s.value(it.key()).toBool();
+        }
+    }
+}
+
+QStringList C5Grid::dbParams()
+{
+    return fDBParams;
+}
+
+void C5Grid::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
+{
+    qDebug() << selected.indexes();
+    qDebug() << deselected.indexes();
 }
 
 void C5Grid::filterByColumn()
@@ -216,7 +275,14 @@ void C5Grid::clearFilter()
 void C5Grid::setSearchParameters()
 {
     if (fFilterWidget) {
-        if (C5GridGilter::filter(fFilterWidget, fWhereCondition, fColumnsVisible)) {
+        if (C5GridGilter::filter(fFilterWidget, fWhereCondition, fColumnsVisible, fTranslation)) {
+            QSettings s(_ORGANIZATION_, QString("%1\\%2\\reports\\%3\\visiblecolumns")
+                        .arg(_APPLICATION_)
+                        .arg(_MODULE_)
+                        .arg(fLabel));
+            for (QMap<QString, bool>::const_iterator it = fColumnsVisible.begin(); it != fColumnsVisible.end(); it++) {
+                s.setValue(it.key(), it.value());
+            }
             buildQuery();
         }
     }
@@ -237,6 +303,18 @@ void C5Grid::tableViewHeaderClicked(const QModelIndex &index)
     fModel->sort(index.column());
 }
 
+void C5Grid::tableViewHeaderResized(int column, int oldSize, int newSize)
+{
+    Q_UNUSED(oldSize);
+    ui->tblTotal->setColumnWidth(column, newSize);
+    QString columnName = fModel->nameForColumnIndex(column);
+    QSettings s(_ORGANIZATION_, QString("%1\\%2\\reports\\%3\\columnswidth")
+                .arg(_APPLICATION_)
+                .arg(_MODULE_)
+                .arg(fLabel));
+    s.setValue(columnName, newSize);
+}
+
 void C5Grid::saveDataChanges()
 {
     fModel->saveDataChanges();
@@ -245,10 +323,23 @@ void C5Grid::saveDataChanges()
 
 void C5Grid::refreshData()
 {
+    QSettings s(_ORGANIZATION_, QString("%1\\%2\\reports\\%3\\columnswidth")
+                .arg(_APPLICATION_)
+                .arg(_MODULE_)
+                .arg(fLabel));
     fModel->execQuery(fSqlQuery);
     ui->tblTotal->setColumnCount(fModel->columnCount());
     for (int i = 0; i < ui->tblTotal->columnCount(); i++) {
         ui->tblTotal->setItem(0, i, new QTableWidgetItem());
+        QString colName = fModel->nameForColumnIndex(i);
+        if (s.contains(colName)) {
+            ui->tblView->setColumnWidth(i, s.value(colName).toInt());
+        }
     }
     sumColumnsData();
+}
+
+void C5Grid::on_tblView_clicked(const QModelIndex &index)
+{
+    cellClicked(index);
 }

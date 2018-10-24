@@ -3,7 +3,6 @@
 
 #include <QDialog>
 #include <QJsonArray>
-#include "c5staticdb.h"
 #include "c5config.h"
 #include "c5message.h"
 #include "c5sockethandler.h"
@@ -14,12 +13,13 @@ class C5Dialog : public QDialog
 {
     Q_OBJECT
 public:
-    C5Dialog(QWidget *parent = 0);
+    C5Dialog(const QStringList &dbParams, QWidget *parent = 0);
+
     virtual bool preambule();
 
     template<typename T>
-    static bool go() {
-        T *t = new T(__c5config.fParentWidget);        
+    static bool go(const QStringList &dbParams) {
+        T *t = new T(dbParams, __c5config.fParentWidget);
         bool result = false;
         if (t->preambule()) {
             result = t->exec() == QDialog::Accepted;
@@ -29,6 +29,9 @@ public:
     }
 
     C5SocketHandler *createSocketHandler(const char *slot);
+
+protected:
+    const QStringList &fDBParams;
 
 protected slots:
     void handleError(int err, const QString &msg);

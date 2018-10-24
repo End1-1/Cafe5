@@ -5,10 +5,11 @@
 #include <QCryptographicHash>
 
 DlgPassword::DlgPassword(QWidget *parent) :
-    C5Dialog(parent),
+    C5Dialog(QStringList(), parent),
     ui(new Ui::DlgPassword)
 {
     ui->setupUi(this);
+    fMax = 0;
 }
 
 DlgPassword::~DlgPassword()
@@ -33,7 +34,23 @@ bool DlgPassword::getQty(const QString &title, int &qty)
     d->ui->lePassword->setEchoMode(QLineEdit::Normal);
     d->ui->lePassword->setMaxLength(2);
     bool result = d->exec() == QDialog::Accepted;
-    qty = d->ui->lePassword->text().toInt();
+    qty = d->ui->lePassword->getInteger();
+    delete d;
+    return result;
+}
+
+bool DlgPassword::getAmount(const QString &title, double &amount, bool defaultAmount)
+{
+    DlgPassword *d = new DlgPassword(C5Config::fParentWidget);
+    d->ui->label->setText(title);
+    d->ui->lePassword->setEchoMode(QLineEdit::Normal);
+    d->ui->lePassword->setValidator(new QDoubleValidator(0, amount, 2));
+    if (defaultAmount) {
+        d->ui->lePassword->setDouble(amount);
+    }
+    d->fMax = amount;
+    bool result = d->exec() == QDialog::Accepted;
+    amount = d->ui->lePassword->getDouble();
     delete d;
     return result;
 }
@@ -125,4 +142,18 @@ void DlgPassword::on_pushButton_12_clicked()
 void DlgPassword::on_lePassword_returnPressed()
 {
     on_pushButton_12_clicked();
+}
+
+void DlgPassword::on_lePassword_textChanged(const QString &arg1)
+{
+    if (fMax > 0.01) {
+        if (arg1.toDouble() > fMax) {
+            ui->lePassword->setText(QString::number(fMax, 'f', 2).remove(QRegExp("\\.0+$")).remove(QRegExp("\\.$")));
+        }
+    }
+}
+
+void DlgPassword::on_btnClear_clicked()
+{
+    ui->lePassword->clear();
 }

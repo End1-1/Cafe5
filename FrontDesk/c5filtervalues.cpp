@@ -3,7 +3,7 @@
 #include <QCheckBox>
 
 C5FilterValues::C5FilterValues(QWidget *parent) :
-    C5Dialog(parent),
+    C5Dialog(QStringList(), parent),
     ui(new Ui::C5FilterValues)
 {
     ui->setupUi(this);

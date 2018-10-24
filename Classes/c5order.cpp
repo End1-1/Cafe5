@@ -44,7 +44,7 @@ void C5Order::setHeaderValue(const QString &name, int value)
 
 void C5Order::setHeaderValue(const QString &name, double value)
 {
-    setHeaderValue(name, float_str(value, 2));
+    setHeaderValue(name, QString::number(value, 'f', 2));
 }
 
 void C5Order::save(C5SocketHandler *sh)
@@ -66,6 +66,9 @@ void C5Order::countTotal()
     double totalDiscount = 0;
     for (int i = 0, count = fItems.count(); i < count; i++) {
         QJsonObject o = fItems[i].toObject();
+        if (o["f_state"].toString().toInt() != DISH_STATE_OK) {
+            continue;
+        }
         double price = o["f_price"].toString().toDouble();
         double service = o["f_service"].toString().toDouble();
         double discount = o["f_discount"].toString().toDouble();
@@ -77,7 +80,7 @@ void C5Order::countTotal()
         total += itemTotal;
         totalService += serviceAmount;
         totalDiscount += discountAmount;
-        o["f_total"] = float_str(itemTotal, 2);
+        o["f_total"] = QString::number(itemTotal, 'f', 2);
         fItems[i] = o;
     }
     setHeaderValue("f_amounttotal", total);

@@ -6,33 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>394</width>
-    <height>189</height>
+    <width>366</width>
+    <height>194</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Connection settings</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_4">
      <property name="text">
-      <string>Host</string>
+      <string>Password</string>
      </property>
     </widget>
-   </item>
-   <item row="0" column="1">
-    <widget class="QLineEdit" name="leHost"/>
-   </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Database</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <widget class="QLineEdit" name="leDatabase"/>
    </item>
    <item row="2" column="0">
     <widget class="QLabel" name="label_3">
@@ -41,18 +28,12 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="1">
-    <widget class="QLineEdit" name="leUsername"/>
-   </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="label_4">
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>Password</string>
+      <string>Database</string>
      </property>
     </widget>
-   </item>
-   <item row="3" column="1">
-    <widget class="QLineEdit" name="lePassword"/>
    </item>
    <item row="4" column="0">
     <widget class="QLabel" name="label_5">
@@ -61,7 +42,52 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="0" colspan="2">
+   <item row="4" column="1">
+    <widget class="QComboBox" name="cbSettings"/>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Host</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="2">
+    <widget class="QPushButton" name="btnRefreshSettings">
+     <property name="minimumSize">
+      <size>
+       <width>25</width>
+       <height>25</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>25</width>
+       <height>25</height>
+      </size>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources/resources.qrc">
+       <normaloff>:/refresh.png</normaloff>:/refresh.png</iconset>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1" colspan="2">
+    <widget class="QLineEdit" name="lePassword"/>
+   </item>
+   <item row="2" column="1" colspan="2">
+    <widget class="QLineEdit" name="leUsername"/>
+   </item>
+   <item row="1" column="1" colspan="2">
+    <widget class="QLineEdit" name="leDatabase"/>
+   </item>
+   <item row="0" column="1" colspan="2">
+    <widget class="QLineEdit" name="leHost"/>
+   </item>
+   <item row="5" column="0" colspan="3">
     <widget class="QWidget" name="widget" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
@@ -121,11 +147,10 @@
      </layout>
     </widget>
    </item>
-   <item row="4" column="1">
-    <widget class="QComboBox" name="cbSettings"/>
-   </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../resources/resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

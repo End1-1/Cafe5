@@ -1,7 +1,6 @@
 #include "c5printservicethread.h"
 #include "c5printing.h"
 #include "c5utils.h"
-#include <QDebug>
 #include <QApplication>
 
 C5PrintServiceThread::C5PrintServiceThread(const QJsonObject &header, const QJsonArray &body, QObject *parent) :
@@ -83,7 +82,7 @@ void C5PrintServiceThread::print(const QString &printer, const QString &side)
         storages << o["f_storename"].toString();
         p.ltext(o["f_name"].toString(), 0);
         p.br();
-        p.ctext(float_str(o["f_qtyprint"].toDouble(), 2));
+        p.ctext(o["f_qtyprint"].toString());
         p.br();
         p.line(0, p.fTop, p.fNormalWidth, p.fTop);
         p.br(1);

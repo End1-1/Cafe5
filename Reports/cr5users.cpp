@@ -1,9 +1,8 @@
 #include "cr5users.h"
-#include "c5cacheusersgroups.h"
-#include "c5cacheusersstate.h"
+#include "c5passwords.h"
 
-CR5Users::CR5Users(QWidget *parent) :
-    C5ReportWidget(parent)
+CR5Users::CR5Users(const QStringList &dbParams, QWidget *parent) :
+    C5ReportWidget(dbParams, parent)
 {
     fIcon = ":/users_groups.png";
     fLabel = tr("Users");
@@ -18,11 +17,11 @@ CR5Users::CR5Users(QWidget *parent) :
     fTranslation["f_first"] = tr("First name");
     fTranslation["f_last"] = tr("Last name");
 
-    C5CacheUsersGroups *cg = static_cast<C5CacheUsersGroups*>(createCache(cache_users_groups));
+    C5Cache *cg = createCache(cache_users_groups);
     C5ComboDelegate *cbGroups = new C5ComboDelegate("f_group", cg, fTableView);
     fTableView->setItemDelegateForColumn(1, cbGroups);
 
-    C5CacheUsersState *cs = static_cast<C5CacheUsersState*>(createCache(cache_users_states));
+    C5Cache *cs = createCache(cache_users_states);
     C5ComboDelegate *cbStates = new C5ComboDelegate("f_state", cs, fTableView);
     fTableView->setItemDelegateForColumn(2, cbStates);
 
@@ -37,12 +36,23 @@ CR5Users::CR5Users(QWidget *parent) :
 
 QToolBar *CR5Users::toolBar()
 {
-    QList<ToolBarButtons> btn;
-    btn << ToolBarButtons::tbNew
-        << ToolBarButtons::tbSave
-        << ToolBarButtons::tbClearFilter
-        << ToolBarButtons::tbRefresh
-        << ToolBarButtons::tbExcel
-        << ToolBarButtons::tbPrint;
-    return createStandartToolbar(btn);
+    if (!fToolBar) {
+        QList<ToolBarButtons> btn;
+        btn << ToolBarButtons::tbNew
+            << ToolBarButtons::tbSave
+            << ToolBarButtons::tbClearFilter
+            << ToolBarButtons::tbRefresh
+            << ToolBarButtons::tbExcel
+            << ToolBarButtons::tbPrint;
+            createStandartToolbar(btn);
+        fToolBar->addAction(QIcon(":/password.png"), tr("Set\npasswords"), this, SLOT(setPasswords()));
+    }
+    return fToolBar;
+}
+
+void CR5Users::setPasswords()
+{
+    if (int id = rowId()) {
+        C5Passwords::setPasswords(fDBParams, id);
+    };
 }

@@ -8,12 +8,12 @@ class CR5UsersGroups : public C5ReportWidget
     Q_OBJECT
 
 public:
-    CR5UsersGroups(QWidget *parent = 0);
+    CR5UsersGroups(const QStringList &dbParams, QWidget *parent = 0);
 
     virtual QToolBar *toolBar();
 
 private slots:
-    void newGroup();
+    void setPermissions();
 };
 
 #endif // CR5USERSGROUPS_H

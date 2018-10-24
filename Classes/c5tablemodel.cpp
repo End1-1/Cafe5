@@ -67,6 +67,11 @@ int C5TableModel::indexForColumnName(const QString &column)
     return -1;
 }
 
+QString C5TableModel::nameForColumnIndex(int index)
+{
+    return fColumnIndexName[index];
+}
+
 QVariant C5TableModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid()) {
@@ -150,6 +155,13 @@ void C5TableModel::insertRow(int row)
     endInsertRows();
 }
 
+void C5TableModel::removeRow(int row, const QModelIndex &parent)
+{
+    beginRemoveRows(parent, row, row);
+    fRawData.removeAt(fProxyData.at(row));
+    endRemoveRows();
+}
+
 void C5TableModel::saveDataChanges()
 {
     for (int i = 0, count = fRowToUpdate.count(); i < count; i++) {
@@ -176,6 +188,10 @@ void C5TableModel::saveDataChanges()
 void C5TableModel::setFilter(int column, const QString &filter)
 {
     fFilters[column] = filter;
+    fProxyData.clear();
+    for (int i = 0; i < fRawData.count(); i++) {
+        fProxyData << i;
+    }
     filterData();
 }
 
@@ -229,23 +245,39 @@ void C5TableModel::filterData()
     if (columns.contains(-1)) {
         columns.removeFirst();
     }
+    QMap<int, QStringList> filter;
+    for (QMap<int, QString>::const_iterator it = fFilters.begin(); it != fFilters.end(); it++) {
+        filter[it.key()] = it.value().split("|", QString::SkipEmptyParts);
+        if (filter[it.key()].count() == 0) {
+            filter.remove(it.key());
+        }
+    }
     for (int r = 0, count = ps.count(); r < count; r++) {
         int row = ps.at(r);
-        bool found = fFilters.count() == 0;
+        bool found = filter.count() == 0;
         if (found) {
             goto FOUND;
         }
         if (fFilters.contains(-1)) {
             for (int c = 0; c < fColumnIndexName.count(); c++) {
-                if (dataDisplay(row, c).toString().contains(fFilters[-1], Qt::CaseInsensitive)) {
-                    found = true;
-                    goto FOUND;
+                foreach (QString searchStr, filter[-1]) {
+                    if (dataDisplay(row, c).toString().contains(searchStr, Qt::CaseInsensitive)) {
+                        found = true;
+                        goto FOUND;
+                    }
                 }
             }
         }
         found = columns.count() > 0;
         foreach (int col, columns) {
-            found = found && dataDisplay(row, col).toString().contains(fFilters[col], Qt::CaseInsensitive);
+            bool found2 = false;
+            foreach (QString searchStr, filter[col]) {
+                found2 = found2 || dataDisplay(row, col).toString().contains(searchStr, Qt::CaseInsensitive);
+                if (found2) {
+                    break;
+                }
+            }
+            found = found && found2;
             if (!found) {
                 goto FOUND;
             }
