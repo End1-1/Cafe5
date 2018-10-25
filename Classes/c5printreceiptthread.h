@@ -7,6 +7,8 @@
 
 class C5PrintReceiptThread : public QThread
 {
+    Q_OBJECT
+
 public:
     C5PrintReceiptThread(const QJsonObject &header, const QJsonArray &body, const QString &printer, QObject *parent = 0);
 

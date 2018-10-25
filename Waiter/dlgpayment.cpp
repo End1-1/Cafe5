@@ -48,6 +48,7 @@ void DlgPayment::handleReceipt(const QJsonObject &obj)
     }
     fOrder->fHeader = obj["header"].toObject();
     fOrder->fItems = obj["body"].toArray();
+    ui->btnCash->setEnabled(fOrder->headerValue("f_print").toInt() > 0);
 }
 
 void DlgPayment::handleCloseOrder(const QJsonObject &obj)
@@ -145,15 +146,12 @@ void DlgPayment::on_btnSetCard_clicked()
 
 void DlgPayment::checkTotal()
 {
-    qDebug() << ui->leCash->getDouble()
-                + ui->leCard->getDouble()
-                + ui->leBank->getDouble()
-                + ui->leOther->getDouble() << ui->leAmountTotal->getDouble();
     if (ui->leCash->getDouble() + ui->leCard->getDouble() + ui->leBank->getDouble() + ui->leOther->getDouble() == ui->leAmountTotal->getDouble()) {
         ui->btnReceipt->setEnabled(true);
     } else {
         ui->btnReceipt->setEnabled(false);
     }
+    ui->btnCash->setEnabled(fOrder->headerValue("f_print").toInt() > 0);
 }
 
 void DlgPayment::on_btnSetBank_clicked()

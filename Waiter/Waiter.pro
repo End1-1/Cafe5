@@ -106,7 +106,8 @@ INCLUDEPATH += C:/OpenSSL-Win32.0/include
 INCLUDEPATH += C:/OpenSSL-Win32.0/include/openssl
 
 RESOURCES += \
-    ../resources/resources.qrc
+    ../resources/resources.qrc \
+    translator.qrc
 
 DISTFILES +=
 

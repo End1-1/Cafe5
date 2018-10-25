@@ -10,6 +10,7 @@ class C5Cache;
 
 class C5ReportWidget : public C5Grid
 {
+    Q_OBJECT
 public:
     C5ReportWidget(const QStringList &dbParams, QWidget *parent = 0);
 

@@ -5,6 +5,8 @@
 
 class CR5DishPart1 : public C5ReportWidget
 {
+    Q_OBJECT
+
 public:
     CR5DishPart1(const QStringList &dbParams, QWidget *parent = 0);
 

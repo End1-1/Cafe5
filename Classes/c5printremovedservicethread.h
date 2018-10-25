@@ -6,6 +6,8 @@
 
 class C5PrintRemovedServiceThread : public QThread
 {
+    Q_OBJECT
+
 public:
     C5PrintRemovedServiceThread(const QJsonObject &h, const QJsonObject &b, QObject *parent = 0);
 

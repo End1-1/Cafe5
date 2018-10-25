@@ -1,6 +1,7 @@
-#include <QApplication>
 #include "dlgface.h"
 #include "c5connection.h"
+#include <QApplication>
+#include <QTranslator>
 
 int main(int argc, char *argv[])
 {
@@ -13,7 +14,11 @@ int main(int argc, char *argv[])
     C5Config::fSettingsName = connectionParams.at(4);
     C5Config::initParamsFromDb();
 
+    QTranslator t;
+    t.load(":/Waiter.qm");
+
     QApplication a(argc, argv);
+    a.installTranslator(&t);
     QFont font(a.font());
     font.setFamily("Arial LatArm Unicode");
     font.setPointSize(12);

@@ -7,6 +7,8 @@
 
 class C5PrintServiceThread : public QThread
 {
+    Q_OBJECT
+
 public:
     C5PrintServiceThread(const QJsonObject &header, const QJsonArray &body, QObject *parent = 0);
 
