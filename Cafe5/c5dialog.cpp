@@ -4,7 +4,8 @@
 
 C5Dialog::C5Dialog(const QStringList &dbParams, QWidget *parent) :
 #ifdef WAITER
-    QDialog(parent, Qt::FramelessWindowHint)
+    QDialog(parent, Qt::FramelessWindowHint),
+    fDBParams(dbParams)
 #else
     QDialog(parent),
     fDBParams(dbParams)

@@ -11,7 +11,7 @@ class C5Widget : public QWidget
     Q_OBJECT
 
 public:
-    enum ToolBarButtons {tbNone = 0, tbNew, tbEdit, tbSave, tbRefresh, tbFilter, tbClearFilter, tbPrint, tbExcel };
+    enum ToolBarButtons {tbNone = 0, tbNew, tbEdit, tbSave, tbRefresh, tbFilter, tbClearFilter, tbPrint, tbExcel, tbDelete };
 
     explicit C5Widget(const QStringList &dbParams, QWidget *parent = 0);
 
@@ -26,6 +26,10 @@ public:
     virtual QWidget *widget();
 
     virtual void hotKey(const QString &key);
+
+    virtual void selectorCallback(int row, const QList<QVariant> &values);
+
+    virtual bool event(QEvent *event);
 
 protected:
     QToolBar *fToolBar;

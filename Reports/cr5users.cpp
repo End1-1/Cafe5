@@ -52,7 +52,7 @@ QToolBar *CR5Users::toolBar()
 
 void CR5Users::setPasswords()
 {
-    if (int id = rowId()) {
+    if (int id = rowId(0)) {
         C5Passwords::setPasswords(fDBParams, id);
     };
 }

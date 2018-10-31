@@ -84,6 +84,26 @@ QStringList C5Config::dbParams()
     return params;
 }
 
+QString C5Config::orderPrefix()
+{
+    return getValue(param_order_prefix);
+}
+
+int C5Config::defaultMenu()
+{
+    return getValue(param_default_menu).toInt();
+}
+
+int C5Config::defaultHall()
+{
+    return getValue(param_default_hall).toInt();
+}
+
+int C5Config::defaultTable()
+{
+    return getValue(param_default_table).toInt();
+}
+
 void C5Config::initParamsFromDb()
 {
     C5Database db(fDBHost, fDBPath, fDBUser, fDBPassword);

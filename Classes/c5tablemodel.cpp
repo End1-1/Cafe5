@@ -102,6 +102,11 @@ bool C5TableModel::setData(const QModelIndex &index, const QVariant &value, int 
     return true;
 }
 
+bool C5TableModel::setData(int row, int column, const QVariant &value, int role)
+{
+    return setData(createIndex(row, column), value, role);
+}
+
 void C5TableModel::setRowToUpdate(int row, const QString &field, const QVariant &value, const QColor &rowColor)
 {
     fRowToUpdate << fProxyData.at(row);
@@ -162,10 +167,17 @@ void C5TableModel::removeRow(int row, const QModelIndex &parent)
     endRemoveRows();
 }
 
+QList<QVariant> C5TableModel::getRowValues(int row)
+{
+    return fRawData.at(fProxyData.at(row));
+}
+
 void C5TableModel::saveDataChanges()
 {
-    for (int i = 0, count = fRowToUpdate.count(); i < count; i++) {
-        int row = fRowToUpdate.toList().at(i);
+    QList<int> rows = fRowToUpdate.toList();
+    std::sort(rows.begin(), rows.end());
+    for (int i = 0, count = rows.count(); i < count; i++) {
+        int row = rows.at(i);
         if (fRawData.at(row).at(0).toString() == 0) {
             fDb[":f_id"] = 0;
             fRawData[row][0] = fDb.insert(fTableForUpdate, true);;

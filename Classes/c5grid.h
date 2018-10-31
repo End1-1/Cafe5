@@ -35,6 +35,10 @@ public:
 
     virtual void buildQuery();
 
+    virtual void buildQuery(const QString &query);
+
+    void setFilter(int column, const QString &filter);
+
 protected:
     C5Database fDb;
 
@@ -62,19 +66,25 @@ protected:
 
     QString fWhereCondition;
 
+    QString fHavindCondition;
+
     C5FilterWidget *fFilterWidget;
 
     QWidget *widget();
 
     QHBoxLayout *hl();
 
-    int rowId(int column = 0);
+    int rowId();
+
+    int rowId(int column);
 
     int rowId(int &row, int column);
 
     virtual void cellClicked(const QModelIndex &index);
 
-    void callEditor(int id);
+    virtual void callEditor(int id);
+
+    virtual void removeWithId(int id);
 
     void sumColumnsData();
 
@@ -87,6 +97,8 @@ private:
 
     int fFilterColumn;
 
+    void insertJoinTable(QStringList &joins, QMap<QString, QString> &joinsMap, const QString &table, const QString &mainTable);
+
 protected slots:
     virtual void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 
@@ -95,6 +107,8 @@ protected slots:
     virtual int newRow();
 
     virtual void editRow(int columnWidthId = 0);
+
+    virtual void removeRow(int columnWithId = 0);
 
     virtual void print();
 
@@ -118,6 +132,12 @@ private slots:
     void removeFilterForColumn();
 
     void on_tblView_clicked(const QModelIndex &index);
+
+    void on_tblView_doubleClicked(const QModelIndex &index);
+
+signals:
+    void tblDoubleClicked(int row, int column, const QList<QVariant> &values);
+
 };
 
 #endif // C5GRID_H

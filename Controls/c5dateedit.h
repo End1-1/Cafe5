@@ -13,6 +13,7 @@ public:
     C5DateEdit(QWidget *parent = 0);
     void setText(const QString &text);
     QDate date();
+    QString toMySQLDate(bool ap = true);
     void setDate(const QDate &date);
     QString getField();
     void setField(const QString &field);

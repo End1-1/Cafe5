@@ -131,11 +131,17 @@ void C5Connection::on_btnInit_clicked()
     }
     QStringList queries;
     QString emptyPass = password("0000");
-    queries << QString("insert into s_db values (1, database(), 'Init', '%1', '%2', '%3', '%4', 1)").arg(ui->leHost->text()).arg(ui->leDatabase->text()).arg(ui->leUsername->text()).arg(ui->lePassword->text());
-    queries << "insert into s_db_access values (1, database(), 1, 1)";
-    queries << "insert into s_settings_names values (1, 'Main')";
-    queries << "insert into s_user_group values (1, 'Administrator')";
-    queries << QString("insert into s_user values (1, 1, 1, 'Admin', '', 'admin', '%1', '%2')").arg(emptyPass).arg(emptyPass);
+    queries << QString("insert into s_db values (1, database(), 'Init', '%1', '%2', '%3', '%4', 1)").arg(ui->leHost->text()).arg(ui->leDatabase->text()).arg(ui->leUsername->text()).arg(ui->lePassword->text())
+            << "insert into s_db_access values (1, database(), 1, 1)"
+            << "insert into s_settings_names values (1, 'Main')"
+            << "insert into s_user_group values (1, 'Administrator')"
+            << QString("insert into s_user values (1, 1, 1, 'Admin', '', 'admin', '%1', '%2')").arg(emptyPass).arg(emptyPass)
+            << "insert into a_state values (2, 'Սևագիր');"
+            << "insert into a_state values (1, 'Գրանցված');"
+            << "insert into a_type values (1, 'Պահեստի մուտք');"
+            << "insert into a_type values (2, 'Պահեստի ելք');"
+            << "insert into a_type values (3, 'Պահեստի տեղաշարժ');"
+               ;
     foreach (QString s, queries) {
         db.exec(s);
     }

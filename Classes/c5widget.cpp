@@ -1,4 +1,6 @@
 #include "c5widget.h"
+#include <QEvent>
+#include <QKeyEvent>
 
 C5Widget::C5Widget(const QStringList &dbParams, QWidget *parent) :
     QWidget(parent),
@@ -53,6 +55,9 @@ QToolBar *C5Widget::createStandartToolbar(const QList<ToolBarButtons> &btn)
         if (btn.contains(ToolBarButtons::tbEdit)) {
             fToolBar->addAction(QIcon(":/edit.png"), tr("Edit"), this, SLOT(editRow()));
         }
+        if (btn.contains(ToolBarButtons::tbDelete)) {
+            fToolBar->addAction(QIcon(":/delete.png"), tr("Remove"), this, SLOT(removeRow()));
+        }
         if (btn.contains(ToolBarButtons::tbSave)) {
             fToolBar->addAction(QIcon(":/save.png"), tr("Save\nchanges"), this, SLOT(saveDataChanges()));
         }
@@ -88,4 +93,24 @@ QWidget *C5Widget::widget()
 void C5Widget::hotKey(const QString &key)
 {
     Q_UNUSED(key);
+}
+
+void C5Widget::selectorCallback(int row, const QList<QVariant> &values)
+{
+    Q_UNUSED(values);
+    Q_UNUSED(row);
+}
+
+bool C5Widget::event(QEvent *event)
+{
+    if (event->type() == QEvent::KeyPress) {
+        QKeyEvent *ke = static_cast<QKeyEvent*>(event);
+        switch (ke->key()) {
+        case Qt::Key_Enter:
+        case Qt::Key_Return:
+            focusNextChild();
+            break;
+        }
+    }
+    return QWidget::event(event);
 }

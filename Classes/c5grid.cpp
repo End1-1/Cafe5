@@ -63,19 +63,7 @@ void C5Grid::buildQuery()
                 int pos = s.indexOf(QRegExp("\\b[a-z,A-Z]*\\."));
                 QString tableOfField = s.mid(pos, s.indexOf(".", pos) - pos);
                 if (tableOfField != mainTable) {
-                    for (int i = 0; i < fLeftJoinTables.count(); i++) {
-                        QString tmpJoinTable = fLeftJoinTables.at(i);
-                        pos = tmpJoinTable.indexOf(QRegExp("\\[.*\\]"));
-                        tmpJoinTable = tmpJoinTable.mid(pos, tmpJoinTable.length() - pos);
-                        tmpJoinTable.replace("[", "").replace("]", "");
-                        if (tmpJoinTable == tableOfField) {
-                            if (!leftJoinTablesMap.contains(tmpJoinTable)) {
-                                leftJoinTablesMap[tmpJoinTable] = fLeftJoinTables.at(i).mid(0, fLeftJoinTables.at(i).length() - (fLeftJoinTables.at(i).length() - fLeftJoinTables.at(i).indexOf(" [")));
-                                leftJoinTables << leftJoinTablesMap[tmpJoinTable];
-                            }
-                            break;
-                        }
-                    }
+                    insertJoinTable(leftJoinTables, leftJoinTablesMap, tableOfField, mainTable);
                 }
                 if (fColumnsGroup.contains(s)) {
                     pos = s.indexOf(" as");
@@ -86,9 +74,31 @@ void C5Grid::buildQuery()
                 }
             }
         }
+        if (fFilterWidget) {
+            fWhereCondition = fFilterWidget->condition();
+        }
+        int p = 0;
+        QRegExp re("\\b[a-z]*\\.");
+        re.setMinimal(true);
+        while ((p = re.indexIn(fWhereCondition, p)) != -1) {
+            qDebug() << re.capturedTexts() << re.captureCount();
+            QString table = re.cap(0);
+            p += re.matchedLength();
+            table = table.remove(table.length() - 1, 1);
+            if (table != mainTable) {
+                insertJoinTable(leftJoinTables, leftJoinTablesMap, table, mainTable);
+            }
+        }
         fSqlQuery += " from " + fMainTable + " ";
         foreach (QString s, leftJoinTables) {
             fSqlQuery += s + " ";
+        }
+        if (!fWhereCondition.isEmpty()) {
+            if (fWhereCondition.contains("where", Qt::CaseInsensitive)) {
+                fSqlQuery += " and " + fWhereCondition;
+            } else {
+                fSqlQuery += " where " + fWhereCondition;
+            }
         }
         if (groupFields.count() > 0) {
             first = true;
@@ -102,9 +112,23 @@ void C5Grid::buildQuery()
                 fSqlQuery += s;
             }
         }
+        if (!fHavindCondition.isEmpty()) {
+            fSqlQuery += fHavindCondition;
+        }
     }
     fModel->translate(fTranslation);
     refreshData();
+}
+
+void C5Grid::buildQuery(const QString &query)
+{
+    fSqlQuery = query;
+    buildQuery();
+}
+
+void C5Grid::setFilter(int column, const QString &filter)
+{
+    fModel->setFilter(column, filter);
 }
 
 QWidget *C5Grid::widget()
@@ -115,6 +139,15 @@ QWidget *C5Grid::widget()
 QHBoxLayout *C5Grid::hl()
 {
     return ui->hl;
+}
+
+int C5Grid::rowId()
+{
+    QModelIndexList ml = fTableView->selectionModel()->selectedIndexes();
+    if (ml.count() == 0) {
+        return 0;
+    }
+    return fModel->data(ml.at(0).row(), 0, Qt::EditRole).toInt();
 }
 
 int C5Grid::rowId(int column)
@@ -145,7 +178,12 @@ void C5Grid::cellClicked(const QModelIndex &index)
 
 void C5Grid::callEditor(int id)
 {
-    Q_UNUSED(id)
+    Q_UNUSED(id);
+}
+
+void C5Grid::removeWithId(int id)
+{
+    Q_UNUSED(id);
 }
 
 void C5Grid::sumColumnsData()
@@ -181,6 +219,35 @@ void C5Grid::restoreColumnsVisibility()
 QStringList C5Grid::dbParams()
 {
     return fDBParams;
+}
+
+void C5Grid::insertJoinTable(QStringList &joins, QMap<QString, QString> &joinsMap, const QString &table, const QString &mainTable)
+{
+    QString j;
+    for (int i = 0; i < fLeftJoinTables.count(); i++) {
+        QString tmpJoinTable = fLeftJoinTables.at(i);
+        int pos = tmpJoinTable.indexOf(QRegExp("\\[.*\\]"));
+        tmpJoinTable = tmpJoinTable.mid(pos, tmpJoinTable.length() - pos);
+        tmpJoinTable.replace("[", "").replace("]", "");
+        if (tmpJoinTable == table) {
+            if (!joinsMap.contains(tmpJoinTable)) {
+                j = fLeftJoinTables.at(i).mid(0, fLeftJoinTables.at(i).length() - (fLeftJoinTables.at(i).length() - fLeftJoinTables.at(i).indexOf(" [")));
+                QRegExp rx("=.*$");
+                rx.indexIn(j, 0);
+                QString otherTable = rx.cap(0).trimmed();
+                otherTable.remove(0, 1);
+                otherTable = otherTable.mid(0, otherTable.indexOf(".", 0));
+                if (otherTable != mainTable && !otherTable.isEmpty()) {
+                    if (!joinsMap.contains(otherTable)) {
+                        insertJoinTable(joins, joinsMap, otherTable, mainTable);
+                    }
+                }
+                joinsMap[tmpJoinTable] = j;
+                joins << joinsMap[tmpJoinTable];
+            }
+            break;
+        }
+    }
 }
 
 void C5Grid::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
@@ -228,6 +295,18 @@ void C5Grid::editRow(int columnWidthId)
     }
     row = ml.at(0).row();
     callEditor(fModel->data(row, columnWidthId, Qt::EditRole).toInt());
+}
+
+void C5Grid::removeRow(int columnWithId)
+{
+    int row = 0;
+    QModelIndexList ml = ui->tblView->selectionModel()->selectedIndexes();
+    if (ml.count() == 0) {
+        C5Message::info(tr("Nothing was selected"));
+        return;
+    }
+    row = ml.at(0).row();
+    removeWithId(fModel->data(row, columnWithId, Qt::EditRole).toInt());
 }
 
 void C5Grid::print()
@@ -317,6 +396,7 @@ void C5Grid::tableViewHeaderResized(int column, int oldSize, int newSize)
 
 void C5Grid::saveDataChanges()
 {
+    fTableView->selectionModel()->clear();
     fModel->saveDataChanges();
     fTableView->viewport()->update();
 }
@@ -342,4 +422,10 @@ void C5Grid::refreshData()
 void C5Grid::on_tblView_clicked(const QModelIndex &index)
 {
     cellClicked(index);
+}
+
+void C5Grid::on_tblView_doubleClicked(const QModelIndex &index)
+{
+    QList<QVariant> values = fModel->getRowValues(index.row());
+    emit tblDoubleClicked(index.row(), index.column(), values);
 }

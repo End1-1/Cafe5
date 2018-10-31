@@ -90,8 +90,12 @@ bool C5Database::open()
 
 bool C5Database::startTransaction()
 {
-    fDb.transaction();
-    return true;
+    if (!fDb.open()) {
+        if (!open()) {
+            return false;
+        }
+    }
+    return fDb.transaction();
 }
 
 bool C5Database::commit()

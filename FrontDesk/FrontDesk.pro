@@ -69,7 +69,20 @@ SOURCES += \
     ../Reports/cr5dish.cpp \
     c5dishwidget.cpp \
     ../Reports/cr5settings.cpp \
-    ../Reports/c5settingswidget.cpp
+    ../Reports/c5settingswidget.cpp \
+    ../Reports/cr5goodsunit.cpp \
+    ../Reports/cr5goodsgroup.cpp \
+    ../Reports/cr5goods.cpp \
+    ../Reports/cr5goodswaste.cpp \
+    c5selector.cpp \
+    ../Controls/c5lineeditwithselector.cpp \
+    c5storedoc.cpp \
+    ../Reports/cr5goodsstorages.cpp \
+    ../Reports/cr5goodspartners.cpp \
+    ../Controls/c5tablewidget.cpp \
+    ../Reports/cr5documents.cpp \
+    ../Reports/cr5materialsinstore.cpp \
+    ../Reports/cr5materialinstorefilter.cpp
 
 HEADERS += \
         c5mainwindow.h \
@@ -110,7 +123,20 @@ HEADERS += \
     ../Reports/cr5dish.h \
     c5dishwidget.h \
     ../Reports/cr5settings.h \
-    ../Reports/c5settingswidget.h
+    ../Reports/c5settingswidget.h \
+    ../Reports/cr5goodsunit.h \
+    ../Reports/cr5goodsgroup.h \
+    ../Reports/cr5goods.h \
+    ../Reports/cr5goodswaste.h \
+    c5selector.h \
+    ../Controls/c5lineeditwithselector.h \
+    c5storedoc.h \
+    ../Reports/cr5goodsstorages.h \
+    ../Reports/cr5goodspartners.h \
+    ../Controls/c5tablewidget.h \
+    ../Reports/cr5documents.h \
+    ../Reports/cr5materialsinstore.h \
+    ../Reports/cr5materialinstorefilter.h
 
 FORMS += \
         c5mainwindow.ui \
@@ -124,7 +150,10 @@ FORMS += \
     c5passwords.ui \
     c5grouppermissionseditor.ui \
     c5dishwidget.ui \
-    ../Reports/c5settingswidget.ui
+    ../Reports/c5settingswidget.ui \
+    c5selector.ui \
+    c5storedoc.ui \
+    ../Reports/cr5materialinstorefilter.ui
 
 INCLUDEPATH += ../Cafe5
 INCLUDEPATH += ../Classes

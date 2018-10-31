@@ -20,5 +20,10 @@
         <file>permissions.png</file>
         <file>menu.png</file>
         <file>delete.png</file>
+        <file>goods.png</file>
+        <file>add.png</file>
+        <file>remove.png</file>
+        <file>draft.png</file>
+        <file>documents.png</file>
     </qresource>
 </RCC>

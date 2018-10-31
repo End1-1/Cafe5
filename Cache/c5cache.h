@@ -7,9 +7,17 @@
 #define cache_users_groups 1
 #define cache_users_states 2
 #define cache_dish_part1 3
+#define cache_dish_part2 4
+#define cache_goods_unit 5
+#define cache_goods_group 6
+#define cache_goods 7
+#define cache_goods_store 8
+#define cache_goods_partners 9
 
-class C5Cache
+class C5Cache : public QObject
 {
+    Q_OBJECT
+
 public:
     C5Cache(const QStringList &dbParams);
 
@@ -19,12 +27,22 @@ public:
 
     inline int rowCount() {return fCacheData.count();}
 
+    inline int find(int id) {return fCacheIdRow.contains(id) ? fCacheIdRow[id] : -1;}
+
+    void refresh();
+
     static C5Cache *cache(const QStringList &dbParams, int cacheId);
 
     static QMap<QString, C5Cache*> fCacheList;
 
+    static QString cacheName(const QStringList &dbParams, int cacheId);
+
+    QString query(int cacheId);
+
 protected:
     QList<QList<QVariant> > fCacheData;
+
+    QMap<int, int> fCacheIdRow;
 
     virtual void loadFromDatabase(const QString &query);
 
@@ -32,6 +50,8 @@ protected:
 
 private:
     static QMap<int, QString> fCacheQuery;
+
+    int fId;
 };
 
 #endif // C5CACHE_H

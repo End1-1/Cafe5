@@ -30,6 +30,8 @@ public:
 
     virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
 
+    virtual bool setData(int row, int column, const QVariant &value, int role = Qt::EditRole);
+
     void setRowToUpdate(int row, const QString &field = "", const QVariant &value = QVariant(), const QColor &rowColor = QColor::fromRgb(210, 150, 60));
 
     void setRowColor(int row, const QColor &color);
@@ -41,6 +43,8 @@ public:
     void insertRow(int row);
 
     void removeRow(int row, const QModelIndex &parent = QModelIndex());
+
+    QList<QVariant> getRowValues(int row);
 
     void saveDataChanges();
 

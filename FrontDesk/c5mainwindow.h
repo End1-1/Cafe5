@@ -29,6 +29,8 @@ public:
         return t;
     }
 
+    void removeTab(QWidget *w);
+
 public slots:
     void on_actionLogin_triggered();
 

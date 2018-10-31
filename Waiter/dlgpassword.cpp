@@ -2,6 +2,7 @@
 #include "ui_dlgpassword.h"
 #include "c5config.h"
 #include "c5user.h"
+#include "c5database.h"
 #include <QCryptographicHash>
 
 DlgPassword::DlgPassword(QWidget *parent) :
@@ -10,6 +11,7 @@ DlgPassword::DlgPassword(QWidget *parent) :
 {
     ui->setupUi(this);
     fMax = 0;
+    fAutoFromDb = false;
 }
 
 DlgPassword::~DlgPassword()
@@ -21,6 +23,17 @@ bool DlgPassword::getUser(const QString &title, C5User *user)
 {
     DlgPassword *d = new DlgPassword(C5Config::fParentWidget);
     d->fUser = user;
+    d->ui->label->setText(title);
+    bool result = d->exec() == QDialog::Accepted;
+    delete d;
+    return result;
+}
+
+bool DlgPassword::getUserDB(const QString &title, C5User *user)
+{
+    DlgPassword *d = new DlgPassword(C5Config::fParentWidget);
+    d->fUser = user;
+    d->fAutoFromDb = true;
     d->ui->label->setText(title);
     bool result = d->exec() == QDialog::Accepted;
     delete d;
@@ -130,10 +143,25 @@ void DlgPassword::on_pushButton_11_clicked()
 void DlgPassword::on_pushButton_12_clicked()
 {
     if (ui->lePassword->echoMode() == QLineEdit::Password) {
-        C5SocketHandler *s = createSocketHandler(SLOT(handlePassword(QJsonObject)));
-        s->bind("cmd", sm_checkuser);
-        s->bind("pass", QCryptographicHash::hash(ui->lePassword->text().toLatin1(), QCryptographicHash::Md5).toHex());
-        s->send();
+        if (fAutoFromDb) {
+            C5Database db(C5Config::fDBHost, C5Config::fDBPath, C5Config::fDBUser, C5Config::fDBPassword);
+            db[":f_altpassword"] = password(ui->lePassword->text());
+            db.exec("select f_first, f_last, f_id from s_user where f_altpassword=:f_altpassword");
+            if (db.nextRow()) {
+                fUser->fFirst = db.getString(0);
+                fUser->fLast = db.getString(1);
+                fUser->fFull = fUser->fLast + " " + fUser->fFirst;
+                fUser->fId = db.getInt(2);
+                accept();
+            } else {
+                C5Message::error(tr("Access denied"));
+            }
+        } else {
+            C5SocketHandler *s = createSocketHandler(SLOT(handlePassword(QJsonObject)));
+            s->bind("cmd", sm_checkuser);
+            s->bind("pass", password(ui->lePassword->text()));
+            s->send();
+        }
     } else {
         accept();
     }

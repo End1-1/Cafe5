@@ -33,7 +33,7 @@ QToolBar *CR5UsersGroups::toolBar()
 
 void CR5UsersGroups::setPermissions()
 {
-    if (int id = rowId()) {
+    if (int id = rowId(0)) {
         C5GroupPermissionsEditor *p = __mainWindow->createTab<C5GroupPermissionsEditor>(fDBParams);
         p->setPermissionsGroupId(id);
     }

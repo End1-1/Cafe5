@@ -6,6 +6,7 @@ C5SettingsWidget::C5SettingsWidget(const QStringList &dbParams, QWidget *parent)
     ui(new Ui::C5SettingsWidget)
 {
     ui->setupUi(this);
+    ui->cbMenu->setDBValues(fDBParams, "select f_id, f_name from d_menu_names order by 2");
 }
 
 C5SettingsWidget::~C5SettingsWidget()
@@ -30,6 +31,9 @@ void C5SettingsWidget::setSettingsId(int id)
 
 void C5SettingsWidget::save()
 {
+    if (fSettingsId == 0) {
+        return;
+    }
     QMap<int, QString> fTags;
     fTags[ui->leLocalReceiptPrinter->getTag()] = ui->leLocalReceiptPrinter->text();
     fTags[ui->leServiceFactor->getTag()] = ui->leServiceFactor->text();
@@ -39,7 +43,13 @@ void C5SettingsWidget::save()
     fTags[ui->leTaxPort->getTag()] = ui->leTaxPort->text();
     fTags[ui->leTaxPassword->getTag()] = ui->leTaxPassword->text();
     fTags[ui->leTaxDept->getTag()] = ui->leTaxDept->text();
+    fTags[ui->cbMenu->getTag()] = ui->cbMenu->currentData().toString();
+    fTags[ui->leOrderPrefix->getTag()] = ui->leOrderPrefix->text();
+    fTags[ui->leHall->getTag()] = ui->leHall->text();
+    fTags[ui->leTable->getTag()] = ui->leTable->text();
     C5Database db(fDBParams);
+    db[":f_settings"] = fSettingsId;
+    db.exec("delete from s_settings_values where f_settings=:f_settings");
     for (QMap<int, QString>::const_iterator it = fTags.begin(); it != fTags.end(); it++) {
         db[":f_settings"] = fSettingsId;
         db[":f_key"] = it.key();
@@ -53,6 +63,8 @@ void C5SettingsWidget::clearWidgetValue(QWidget *w)
 {
     if (!strcmp(w->metaObject()->className(), "C5LineEdit")) {
         static_cast<C5LineEdit*>(w)->clear();
+    } else if (!strcmp(w->metaObject()->className(), "C5ComboBox")) {
+        static_cast<C5ComboBox*>(w)->setCurrentIndex(-1);
     }
 }
 
@@ -60,6 +72,8 @@ void C5SettingsWidget::setWidgetValue(QWidget *w, const QString &value)
 {
     if (!strcmp(w->metaObject()->className(), "C5LineEdit")) {
         static_cast<C5LineEdit*>(w)->setText(value);
+    } else if (!strcmp(w->metaObject()->className(), "C5ComboBox")) {
+        static_cast<C5ComboBox*>(w)->setIndexForValue(value);
     }
 }
 
@@ -68,6 +82,7 @@ void C5SettingsWidget::clear(QWidget *parent)
     if (!parent) {
         parent = this;
     }
+    fSettingsId = 0;
     QObjectList ol = parent->children();
     foreach (QObject *o, ol) {
         if (o->children().count() > 0) {
@@ -86,6 +101,11 @@ QWidget *C5SettingsWidget::widget(QWidget *parent, int tag)
     foreach (QObject *o, ol) {
         if (!strcmp(o->metaObject()->className(), "C5LineEdit")) {
             C5LineEdit *l = static_cast<C5LineEdit*>(o);
+            if (l->getTag() == tag) {
+                return l;
+            }
+        } else if (!strcmp(o->metaObject()->className(), "C5ComboBox")) {
+            C5ComboBox *l = static_cast<C5ComboBox*>(o);
             if (l->getTag() == tag) {
                 return l;
             }

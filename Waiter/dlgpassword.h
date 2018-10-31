@@ -20,6 +20,8 @@ public:
 
     static bool getUser(const QString &title, C5User *user);
 
+    static bool getUserDB(const QString &title, C5User *user);
+
     static bool getQty(const QString &title, int &qty);
 
     static bool getAmount(const QString &title, double &amount, bool defaultAmount = false);
@@ -65,6 +67,8 @@ private:
     C5User *fUser;
 
     double fMax;
+
+    bool fAutoFromDb;
 };
 
 #endif // DLGPASSWORD_H

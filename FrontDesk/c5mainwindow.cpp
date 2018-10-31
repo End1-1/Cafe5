@@ -7,12 +7,21 @@
 #include "c5widget.h"
 #include "cr5commonsales.h"
 #include "cr5usersgroups.h"
+#include "cr5documents.h"
 #include "cr5dish.h"
 #include "cr5settings.h"
 #include "cr5dishpart1.h"
 #include "cr5dishpart2.h"
+#include "cr5goodsgroup.h"
 #include "cr5databases.h"
+#include "cr5goodspartners.h"
+#include "cr5goodswaste.h"
+#include "cr5goodsunit.h"
+#include "cr5materialsinstore.h"
+#include "cr5goods.h"
 #include "cr5users.h"
+#include "cr5goodsstorages.h"
+#include "c5storedoc.h"
 #include <QCloseEvent>
 #include <QShortcut>
 #include <QMenu>
@@ -53,6 +62,16 @@ void C5MainWindow::closeEvent(QCloseEvent *event)
         return;
     }
     QMainWindow::closeEvent(event);
+}
+
+void C5MainWindow::removeTab(QWidget *w)
+{
+    for (int i = 0; i < fTab->count(); i++) {
+        if (w == fTab->widget(i)) {
+            tabCloseRequested(i);
+            return;
+        }
+    }
 }
 
 void C5MainWindow::twCustomMenu(const QPoint &p)
@@ -131,6 +150,8 @@ void C5MainWindow::on_actionLogin_triggered()
             it->setData(0, Qt::UserRole, cp_t2_action);
             it->setIcon(0, QIcon(":/edit.png"));
             item->addChild(it);
+            addTreeL3Item(it, cp_t2_store_input, tr("New store input"), ":/goods.png");
+            addTreeL3Item(it, cp_t2_store_output, tr("New store output"), ":/goods.png");
         }
 
         if (pr(db.getString(0), cp_t3_reports)) {
@@ -139,6 +160,8 @@ void C5MainWindow::on_actionLogin_triggered()
             it->setData(0, Qt::UserRole, cp_t2_action);
             it->setIcon(0, QIcon(":/reports.png"));
             item->addChild(it);
+            addTreeL3Item(it, cp_t3_documents, tr("Documents"), ":/documents.png");
+            addTreeL3Item(it, cp_t3_store, tr("Storage"), ":/goods.png");
             addTreeL3Item(it, cp_t3_sales_common, tr("Sales, expert mode"), ":/graph.png");
         }
 
@@ -153,6 +176,20 @@ void C5MainWindow::on_actionLogin_triggered()
             addTreeL3Item(it, cp_t4_dishes, tr("Dishes list"), ":/menu.png");
         }
 
+        if (pr(db.getString(0), cp_t6_goods_menu)) {
+            it = new QTreeWidgetItem();
+            it->setText(0, tr("Goods"));
+            it->setData(0, Qt::UserRole, cp_t6_goods_menu);
+            it->setIcon(0, QIcon(":/goods.png"));
+            item->addChild(it);
+            addTreeL3Item(it, cp_t6_storage, tr("Storages"), ":/goods.png");
+            addTreeL3Item(it, cp_t6_groups, tr("Groups of goods"), ":/goods.png");
+            addTreeL3Item(it, cp_t6_goods, tr("Goods"), ":/goods.png");
+            addTreeL3Item(it, cp_t6_waste, tr("Autowaste"), ":/goods.png");
+            addTreeL3Item(it, cp_t6_units, tr("Units"), ":/goods.png");
+            addTreeL3Item(it, cp_t6_partners, tr("Partners"), ":/goods.png");
+        }
+
         if (pr(db.getString(0), cp_t1_preference)) {
             it = new QTreeWidgetItem();
             it->setText(0, tr("Preferences"));
@@ -165,8 +202,7 @@ void C5MainWindow::on_actionLogin_triggered()
             addTreeL3Item(it, cp_t1_settigns, tr("Settings"), ":/configure.png");
         }
     }
-
-            enableMenu(true);
+    enableMenu(true);
 }
 
 void C5MainWindow::hotKey()
@@ -234,8 +270,24 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
     case cp_t1_settigns:
         createTab<CR5Settings>(dbParams);
         break;
+    case cp_t2_store_input: {
+        C5StoreDoc *sd = createTab<C5StoreDoc>(dbParams);
+        sd->setMode(C5StoreDoc::sdInput);
+        break;
+    }
+    case cp_t2_store_output: {
+        C5StoreDoc *sd = createTab<C5StoreDoc>(dbParams);
+        sd->setMode(C5StoreDoc::sdOutput);
+        break;
+    }
     case cp_t3_sales_common:
         createTab<CR5CommonSales>(dbParams);
+        break;
+    case cp_t3_documents:
+        createTab<CR5Documents>(dbParams);
+        break;
+    case cp_t3_store:
+        createTab<CR5MaterialsInStore>(dbParams);
         break;
     case cp_t4_part1:
         createTab<CR5DishPart1>(dbParams);
@@ -245,6 +297,24 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
         break;
     case cp_t4_dishes:
         createTab<CR5Dish>(dbParams);
+        break;
+    case cp_t6_units:
+        createTab<CR5GoodsUnit>(dbParams);
+        break;
+    case cp_t6_groups:
+        createTab<CR5GoodsGroup>(dbParams);
+        break;
+    case cp_t6_goods:
+        createTab<CR5Goods>(dbParams);
+        break;
+    case cp_t6_waste:
+        createTab<CR5GoodsWaste>(dbParams);
+        break;
+    case cp_t6_storage:
+        createTab<CR5GoodsStorages>(dbParams);
+        break;
+    case cp_t6_partners:
+        createTab<CR5GoodsPartners>(dbParams);
         break;
     default:
         break;

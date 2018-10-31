@@ -315,7 +315,7 @@
         <location filename="../Classes/c5waiterserver.cpp" line="253"/>
         <location filename="../Classes/c5waiterserver.cpp" line="308"/>
         <source>All service must be complited</source>
-        <translation>Պատվերը ամբողական չէ</translation>
+        <translation type="unfinished">Պատվերը անավարտ է</translation>
     </message>
     <message>
         <location filename="../Classes/c5waiterserver.cpp" line="264"/>

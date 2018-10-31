@@ -26,6 +26,8 @@ public:
 
     void setTag(int tag);
 
+    inline bool isEmpty() {return text().isEmpty();}
+
 private:
     int fTag;
 };

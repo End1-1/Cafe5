@@ -12,6 +12,17 @@
 #define param_tax_port 6
 #define param_tax_password 7
 #define param_tax_dept 8
+#define param_default_menu 9
+#define param_order_prefix 10
+#define param_default_hall 11
+#define param_default_table 12
+
+#define DOC_STATE_SAVED 1
+#define DOC_STATE_DRAFT 2
+
+#define DOC_TYPE_STORE_INPUT 1
+#define DOC_TYPE_STORE_OUTPUT 2
+#define DOC_TYPE_STORE_MOVE 3
 
 class C5Config
 {
@@ -35,6 +46,10 @@ public:
     static QString taxPassword();
     static QString taxDept();
     static QStringList dbParams();
+    static int defaultMenu();
+    static int defaultHall();
+    static int defaultTable();
+    static QString orderPrefix();
     static void initParamsFromDb();
 
 private:

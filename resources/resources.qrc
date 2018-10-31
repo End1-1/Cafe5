@@ -14,5 +14,6 @@
         <file>service_check.png</file>
         <file>wallet-with-money.png</file>
         <file>refresh.png</file>
+        <file>filter_clear.png</file>
     </qresource>
 </RCC>

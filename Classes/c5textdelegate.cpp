@@ -5,7 +5,7 @@
 C5TextDelegate::C5TextDelegate(QObject *parent) :
     QItemDelegate(parent)
 {
-
+    fValidator = 0;
 }
 
 QWidget *C5TextDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
@@ -13,6 +13,9 @@ QWidget *C5TextDelegate::createEditor(QWidget *parent, const QStyleOptionViewIte
     Q_UNUSED(option);
     Q_UNUSED(index);
     C5LineEdit *l = new C5LineEdit(parent);
+    if (fValidator) {
+        l->setValidator(fValidator);
+    }
     return l;
 }
 
@@ -38,4 +41,9 @@ void C5TextDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionVie
 {
     Q_UNUSED(index);
     editor->setGeometry(option.rect);
+}
+
+void C5TextDelegate::setValidator(QValidator *v)
+{
+    fValidator = v;
 }

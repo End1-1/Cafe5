@@ -63,20 +63,22 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
 
     restoreColumnsVisibility();
 
-    fFilterWidget = new CR5CommonSalesFilter();
+    fFilterWidget = new CR5CommonSalesFilter(fDBParams);
 }
 
 QToolBar *CR5CommonSales::toolBar()
 {
-    QList<ToolBarButtons> btn;
-    btn << ToolBarButtons::tbEdit
-        << ToolBarButtons::tbFilter
-        << ToolBarButtons::tbClearFilter
-        << ToolBarButtons::tbRefresh
-        << ToolBarButtons::tbExcel
-        << ToolBarButtons::tbPrint;
-    QToolBar *tb = createStandartToolbar(btn);
-    return tb;
+    if (!fToolBar) {
+        QList<ToolBarButtons> btn;
+        btn << ToolBarButtons::tbEdit
+            << ToolBarButtons::tbFilter
+            << ToolBarButtons::tbClearFilter
+            << ToolBarButtons::tbRefresh
+            << ToolBarButtons::tbExcel
+            << ToolBarButtons::tbPrint;
+        fToolBar = createStandartToolbar(btn);
+    }
+    return fToolBar;
 }
 
 void CR5CommonSales::editRow(int columnWidthId)

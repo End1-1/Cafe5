@@ -66,6 +66,9 @@
        <height>25</height>
       </size>
      </property>
+     <property name="focusPolicy">
+      <enum>Qt::ClickFocus</enum>
+     </property>
      <property name="text">
       <string/>
      </property>
@@ -149,6 +152,18 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>leHost</tabstop>
+  <tabstop>leDatabase</tabstop>
+  <tabstop>leUsername</tabstop>
+  <tabstop>lePassword</tabstop>
+  <tabstop>cbSettings</tabstop>
+  <tabstop>btnSave</tabstop>
+  <tabstop>btnTest</tabstop>
+  <tabstop>btnInit</tabstop>
+  <tabstop>btnCancel</tabstop>
+  <tabstop>btnRefreshSettings</tabstop>
+ </tabstops>
  <resources>
   <include location="../resources/resources.qrc"/>
  </resources>

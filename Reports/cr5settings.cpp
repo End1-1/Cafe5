@@ -48,6 +48,8 @@ void CR5Settings::selectionChanged(const QItemSelection &selected, const QItemSe
     Q_UNUSED(deselected);
     if (int id = rowId()) {
         fSettingsWidget->setSettingsId(id);
+    } else {
+        fSettingsWidget->clear(fSettingsWidget);
     }
 }
 

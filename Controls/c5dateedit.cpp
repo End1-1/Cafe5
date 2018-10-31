@@ -30,6 +30,15 @@ QDate C5DateEdit::date()
     return QDate::fromString(text(), FORMAT_DATE_TO_STR);
 }
 
+QString C5DateEdit::toMySQLDate(bool ap)
+{
+    QString d = date().toString("yyyy-MM-dd");
+    if (ap) {
+        d = "'" + d + "'";
+    }
+    return d;
+}
+
 void C5DateEdit::setDate(const QDate &date)
 {
     QDate d = date;
