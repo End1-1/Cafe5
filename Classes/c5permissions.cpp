@@ -23,6 +23,7 @@ void C5Permissions::init(C5Database &db)
               << cp_t2_action
               << cp_t2_store_input
               << cp_t2_store_output
+              << cp_t2_store_move
 
               << cp_t3_reports
               << cp_t3_sales_common

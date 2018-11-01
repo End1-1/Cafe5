@@ -84,7 +84,7 @@ protected:
 
     virtual void callEditor(int id);
 
-    virtual void removeWithId(int id);
+    virtual void removeWithId(int id, int row);
 
     void sumColumnsData();
 

@@ -181,9 +181,10 @@ void C5Grid::callEditor(int id)
     Q_UNUSED(id);
 }
 
-void C5Grid::removeWithId(int id)
+void C5Grid::removeWithId(int id, int row)
 {
     Q_UNUSED(id);
+    Q_UNUSED(row);
 }
 
 void C5Grid::sumColumnsData()
@@ -306,7 +307,7 @@ void C5Grid::removeRow(int columnWithId)
         return;
     }
     row = ml.at(0).row();
-    removeWithId(fModel->data(row, columnWithId, Qt::EditRole).toInt());
+    removeWithId(fModel->data(row, columnWithId, Qt::EditRole).toInt(), row);
 }
 
 void C5Grid::print()

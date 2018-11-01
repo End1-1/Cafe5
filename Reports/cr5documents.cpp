@@ -1,5 +1,6 @@
 #include "cr5documents.h"
 #include "c5storedoc.h"
+#include "c5tablemodel.h"
 
 CR5Documents::CR5Documents(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
@@ -86,13 +87,15 @@ void CR5Documents::callEditor(int id)
     openDoc(id);
 }
 
-void CR5Documents::removeWithId(int id)
+void CR5Documents::removeWithId(int id, int row)
 {
     switch (docType(id)) {
     case DOC_TYPE_STORE_INPUT:
     case DOC_TYPE_STORE_OUTPUT:
     case DOC_TYPE_STORE_MOVE:
-        C5StoreDoc::removeDoc(id);
+        if (C5StoreDoc::removeDoc(fDBParams, id)) {
+            fModel->removeRow(row);
+        }
         break;
     }
 }

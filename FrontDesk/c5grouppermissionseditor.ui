@@ -27,14 +27,34 @@
       <enum>QTabWidget::West</enum>
      </property>
      <property name="currentIndex">
-      <number>3</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
        <string>Actions</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_5">
-       <item row="2" column="1">
+       <item row="1" column="0">
+        <widget class="C5CheckBox" name="checkBox_21">
+         <property name="text">
+          <string>Store output</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>202</number>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="C5CheckBox" name="checkBox_16">
+         <property name="text">
+          <string>Store input</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>201</number>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
         <spacer name="verticalSpacer_5">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -47,23 +67,13 @@
          </property>
         </spacer>
        </item>
-       <item row="0" column="0">
-        <widget class="C5CheckBox" name="checkBox_16">
+       <item row="2" column="0">
+        <widget class="C5CheckBox" name="checkBox_23">
          <property name="text">
-          <string>Store input</string>
+          <string>Store movement</string>
          </property>
          <property name="Tag" stdset="0">
-          <number>201</number>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="C5CheckBox" name="checkBox_21">
-         <property name="text">
-          <string>Store output</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>202</number>
+          <number>203</number>
          </property>
         </widget>
        </item>

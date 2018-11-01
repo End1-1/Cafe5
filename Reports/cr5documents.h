@@ -17,7 +17,7 @@ protected slots:
 
     virtual void callEditor(int id);
 
-    virtual void removeWithId(int id);
+    virtual void removeWithId(int id, int row);
 
 private:
     void openDoc(int id);

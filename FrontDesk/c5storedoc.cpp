@@ -106,10 +106,31 @@ QToolBar *C5StoreDoc::toolBar()
     return fToolBar;
 }
 
-bool C5StoreDoc::removeDoc(int id)
+bool C5StoreDoc::removeDoc(const QStringList &dbParams, int id)
 {
-    qDebug() << id;
-    return true;
+    if (C5Message::question(tr("Confirm to remove document")) != QDialog::Accepted) {
+        return false;
+    }
+    QString err;
+    C5Database db(dbParams);
+    db[":f_basedoc"] = id;
+    db.exec("select d.f_date, s.f_document from a_store s "
+            "inner join a_header d on d.f_id=s.f_document "
+            "where f_basedoc=:f_basedoc and f_document<>:f_basedoc and s.f_type=-1");
+    while (db.nextRow()) {
+        err += QString("No: %1, %2<br>").arg(db.getInt(1)).arg(db.getDate(0).toString(FORMAT_DATE_TO_STR));
+    }
+    if (!err.isEmpty()) {
+        C5Message::error(err);
+        return false;
+    }
+    db[":f_document"] = id;
+    db.exec("delete from a_store where f_document=:f_document");
+    db[":f_document"] = id;
+    db.exec("delete from a_store_draft where f_document=:f_document");
+    db[":f_id"] = id;
+    db.exec("delete from a_header where f_id=:f_id");
+    return err.isEmpty();
 }
 
 void C5StoreDoc::countTotal()
@@ -121,16 +142,48 @@ void C5StoreDoc::countTotal()
     ui->leTotal->setDouble(total);
 }
 
-bool C5StoreDoc::docCheck()
+bool C5StoreDoc::docCheck(QString &err)
 {
-    return true;
+    switch (fDocType) {
+    case sdInput:
+        if (ui->leStoreInput->getInteger() == 0) {
+            err += tr("Input store is not defined") + "<br>";
+        }
+        break;
+    case sdOutput:
+        if (ui->leStoreOutput->getInteger() == 0) {
+            err = tr("Output store is not defined") + "<br>";
+        }
+        break;
+    case sdMovement:
+        if (ui->leStoreInput->getInteger() == 0) {
+            err += tr("Input store is not defined") + "<br>";
+        }
+        if (ui->leStoreOutput->getInteger() == 0) {
+            err = tr("Output store is not defined") + "<br>";
+        }
+        if (ui->leStoreInput->getInteger() == ui->leStoreOutput->getInteger() && ui->leStoreInput->getInteger() != 0) {
+            err += tr("Input store and output store cannot be same") + "<br>";
+        }
+        break;
+    }
+    if (ui->tblGoods->rowCount() == 0) {
+        err += tr("Cannot save an emtpy document") + "<br>";
+    }
+    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+        if (ui->tblGoods->lineEdit(i, 3)->getDouble() < 0.001) {
+            err += QString("%1 #%2, %3, missing quantity").arg(tr("Row")).arg(i + 1).arg(ui->tblGoods->getString(i, 2)) + "<br>";
+        }
+    }
+    return err.isEmpty();
 }
 
 void C5StoreDoc::save(int state)
 {
     C5Database db(fDBParams);
     QString err;
-    if (!docCheck()) {
+    if (!docCheck(err)) {
+        C5Message::error(err);
         return;
     }
     if (state == DOC_STATE_SAVED && !ui->wheader->isEnabled()) {
@@ -152,6 +205,7 @@ void C5StoreDoc::save(int state)
         switch (fDocType) {
         case DOC_TYPE_STORE_INPUT:
         case DOC_TYPE_STORE_OUTPUT:
+        case DOC_TYPE_STORE_MOVE:
             db[":f_document"] = ui->leDocNum->getInteger();
             db.exec("delete from a_store where f_document=:f_document");
             break;
@@ -192,6 +246,16 @@ void C5StoreDoc::save(int state)
             db[":f_amount"] = amount;
             db.update("a_header", where_id(ui->leDocNum->getInteger()));
             break;
+        }
+        case DOC_TYPE_STORE_MOVE: {
+            double amount = 0;
+            if (!writeOutput(ui->deDate->date(), ui->leDocNum->getInteger(), ui->leStoreOutput->getInteger(), amount, err)) {
+                C5Message::error(err);
+                return;
+            }
+            db[":f_amount"] = amount;
+            db.update("a_header", where_id(ui->leDocNum->getInteger()));
+            writeInput();
         }
         }
         setDocEnabled(false);

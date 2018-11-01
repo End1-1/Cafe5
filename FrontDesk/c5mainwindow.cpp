@@ -152,6 +152,7 @@ void C5MainWindow::on_actionLogin_triggered()
             item->addChild(it);
             addTreeL3Item(it, cp_t2_store_input, tr("New store input"), ":/goods.png");
             addTreeL3Item(it, cp_t2_store_output, tr("New store output"), ":/goods.png");
+            addTreeL3Item(it, cp_t2_store_move, tr("New store movement"), ":/goods.png");
         }
 
         if (pr(db.getString(0), cp_t3_reports)) {
@@ -278,6 +279,11 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
     case cp_t2_store_output: {
         C5StoreDoc *sd = createTab<C5StoreDoc>(dbParams);
         sd->setMode(C5StoreDoc::sdOutput);
+        break;
+    }
+    case cp_t2_store_move: {
+        C5StoreDoc *sd = createTab<C5StoreDoc>(dbParams);
+        sd->setMode(C5StoreDoc::sdMovement);
         break;
     }
     case cp_t3_sales_common:

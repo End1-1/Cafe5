@@ -24,7 +24,7 @@ public:
 
     virtual QToolBar *toolBar();
 
-    static bool removeDoc(int id);
+    static bool removeDoc(const QStringList &dbParams, int id);
 
 private:
     Ui::C5StoreDoc *ui;
@@ -35,7 +35,7 @@ private:
 
     void countTotal();
 
-    bool docCheck();
+    bool docCheck(QString &err);
 
     void save(int state);
 
