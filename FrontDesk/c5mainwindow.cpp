@@ -10,8 +10,11 @@
 #include "cr5documents.h"
 #include "cr5dish.h"
 #include "cr5settings.h"
+#include "cr5goodsmovement.h"
 #include "cr5dishpart1.h"
+#include "cr5tstoreextra.h"
 #include "cr5dishpart2.h"
+#include "c5storeinventory.h"
 #include "cr5goodsgroup.h"
 #include "cr5databases.h"
 #include "cr5goodspartners.h"
@@ -153,6 +156,7 @@ void C5MainWindow::on_actionLogin_triggered()
             addTreeL3Item(it, cp_t2_store_input, tr("New store input"), ":/goods.png");
             addTreeL3Item(it, cp_t2_store_output, tr("New store output"), ":/goods.png");
             addTreeL3Item(it, cp_t2_store_move, tr("New store movement"), ":/goods.png");
+            addTreeL3Item(it, cp_t2_store_inventory, tr("New store inventory"), ":/goods.png");
         }
 
         if (pr(db.getString(0), cp_t3_reports)) {
@@ -163,6 +167,8 @@ void C5MainWindow::on_actionLogin_triggered()
             item->addChild(it);
             addTreeL3Item(it, cp_t3_documents, tr("Documents"), ":/documents.png");
             addTreeL3Item(it, cp_t3_store, tr("Storage"), ":/goods.png");
+            addTreeL3Item(it, cp_t3_store_movement, tr("Storages movements"), ":/goods.png");
+            addTreeL3Item(it, cp_t3_tstore_extra, tr("T-account, extra"), ":/documents.png");
             addTreeL3Item(it, cp_t3_sales_common, tr("Sales, expert mode"), ":/graph.png");
         }
 
@@ -286,6 +292,9 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
         sd->setMode(C5StoreDoc::sdMovement);
         break;
     }
+    case cp_t2_store_inventory:
+        createTab<C5StoreInventory>(dbParams);
+        break;
     case cp_t3_sales_common:
         createTab<CR5CommonSales>(dbParams);
         break;
@@ -294,6 +303,12 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
         break;
     case cp_t3_store:
         createTab<CR5MaterialsInStore>(dbParams);
+        break;
+    case cp_t3_store_movement:
+        createTab<CR5GoodsMovement>(dbParams);
+        break;
+    case cp_t3_tstore_extra:
+        createTab<CR5TStoreExtra>(dbParams);
         break;
     case cp_t4_part1:
         createTab<CR5DishPart1>(dbParams);

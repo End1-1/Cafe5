@@ -14,6 +14,8 @@ public:
 
     void execQuery(const QString &query);
 
+    void setExternalData(const QMap<QString, int> &columnNameIndex, const QMap<QString, QString> &translation);
+
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
 
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
@@ -68,10 +70,10 @@ public:
 
     QList<int> fColumnsForUpdate;
 
+    QList<QList<QVariant> > fRawData;
+
 private:
     C5Database &fDb;
-
-    QList<QList<QVariant> > fRawData;
 
     QList<int> fProxyData;
 

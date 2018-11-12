@@ -29,6 +29,10 @@ public:
 
     ~C5Grid();
 
+    C5TableView *fTableView;
+
+    C5TableModel *fModel;
+
     void setTableForUpdate(const QString &table, const QList<int> &columns);
 
     virtual void postProcess();
@@ -39,16 +43,15 @@ public:
 
     void setFilter(int column, const QString &filter);
 
+public slots:
+    void on_tblView_doubleClicked(const QModelIndex &index);
+
 protected:
     C5Database fDb;
 
     bool fSimpleQuery;
 
     QString fSqlQuery;
-
-    C5TableView *fTableView;
-
-    C5TableModel *fModel;
 
     QMap<QString, QString> fTranslation;
 
@@ -90,7 +93,11 @@ protected:
 
     void restoreColumnsVisibility();
 
+    void restoreColumnsWidths();
+
     QStringList dbParams();
+
+    virtual QString reportAdditionalTitle();
 
 private:
     Ui::C5Grid *ui;
@@ -98,6 +105,8 @@ private:
     int fFilterColumn;
 
     void insertJoinTable(QStringList &joins, QMap<QString, QString> &joinsMap, const QString &table, const QString &mainTable);
+
+    int sumOfColumnsWidghtBefore(int column);
 
 protected slots:
     virtual void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
@@ -132,8 +141,6 @@ private slots:
     void removeFilterForColumn();
 
     void on_tblView_clicked(const QModelIndex &index);
-
-    void on_tblView_doubleClicked(const QModelIndex &index);
 
 signals:
     void tblDoubleClicked(int row, int column, const QList<QVariant> &values);

@@ -5,14 +5,15 @@ CR5DishPart2::CR5DishPart2(const QStringList &dbParams, QWidget *parent) :
 {
     fIcon = ":/menu.png";
     fLabel = tr("Types of dishes");
-    fSqlQuery = "select t.f_id, p.f_name as part_name, t.f_name, t.f_adgCode \
+    fSqlQuery = "select t.f_id, p.f_name as part_name, t.f_name, t.f_adgCode, \
                 t.f_queue \
                 from d_part2 t \
                 left join d_part1 p on p.f_id=t.f_part ";
     fTranslation["f_id"] = tr("Code");
     fTranslation["part_name"] = tr("Dept name");
     fTranslation["f_name"] = tr("Name");
-    fTranslation["f_adgCode"] = tr("ADG code");
+    fTranslation["f_adgcode"] = tr("ADG code");
+    fTranslation["f_queue"] = tr("Queue");
 
     C5Cache *cd = createCache(cache_dish_part1);
     C5ComboDelegate *cbPart = new C5ComboDelegate("f_part", cd, fTableView);

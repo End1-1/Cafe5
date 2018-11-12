@@ -32,6 +32,9 @@ C5Cache::C5Cache(const QStringList &dbParams) :
                                                     .arg(tr("Info"))
                                                     .arg(tr("Phone"))
                                                     .arg(tr("Email"));
+        fCacheQuery[cache_store_inout] = QString("select f_id as `%1`, f_name as `%2` from a_type_sign")
+                .arg(tr("Code"))
+                .arg(tr("Name"));
     }
 }
 

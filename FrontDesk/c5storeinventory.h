@@ -1,22 +1,50 @@
 #ifndef C5STOREINVENTORY_H
 #define C5STOREINVENTORY_H
 
-#include <QWidget>
+#include "c5widget.h"
 
 namespace Ui {
 class C5StoreInventory;
 }
 
-class C5StoreInventory : public QWidget
+class C5StoreInventory : public C5Widget
 {
     Q_OBJECT
 
 public:
-    explicit C5StoreInventory(QWidget *parent = 0);
+    explicit C5StoreInventory(const QStringList &dbParams, QWidget *parent = 0);
+
     ~C5StoreInventory();
+
+    virtual QToolBar *toolBar();
+
+    bool openDoc(int id);
+
+    static bool removeDoc(const QStringList &dbParams, int id);
+
+private slots:
+    void saveDoc();
+
+    void printDoc();
+
+    void on_btnAddGoods_clicked();
+
+    void on_btnRemoveGoods_clicked();
+
+    void tblQtyChanged(const QString &arg1);
+
+    void tblPriceChanged(const QString &arg1);
+
+    void tblTotalChanged(const QString &arg1);
 
 private:
     Ui::C5StoreInventory *ui;
+
+    int addGoodsRow();
+
+    void countTotal();
+
+    bool docCheck(QString &err);
 };
 
 #endif // C5STOREINVENTORY_H

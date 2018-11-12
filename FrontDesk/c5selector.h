@@ -21,6 +21,8 @@ public:
 
     static bool getValue(const QStringList &dbParams, int cache, QList<QVariant> &values);
 
+    void keyPressEvent(QKeyEvent *key) override;
+
 private slots:
     void tblDoubleClicked(int row, int column, const QList<QVariant> &values);
 

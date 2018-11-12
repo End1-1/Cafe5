@@ -23,6 +23,7 @@
 #define DOC_TYPE_STORE_INPUT 1
 #define DOC_TYPE_STORE_OUTPUT 2
 #define DOC_TYPE_STORE_MOVE 3
+#define DOC_TYPE_STORE_INVENTORY 4
 
 class C5Config
 {
@@ -51,6 +52,8 @@ public:
     static int defaultTable();
     static QString orderPrefix();
     static void initParamsFromDb();
+    static QVariant getRegValue(const QString &key);
+    static void setRegValue(const QString &key, const QVariant &value);
 
 private:
     static QString getValue(int key);

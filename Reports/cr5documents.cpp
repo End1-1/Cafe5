@@ -1,5 +1,6 @@
 #include "cr5documents.h"
 #include "c5storedoc.h"
+#include "c5storeinventory.h"
 #include "c5tablemodel.h"
 
 CR5Documents::CR5Documents(const QStringList &dbParams, QWidget *parent) :
@@ -97,6 +98,11 @@ void CR5Documents::removeWithId(int id, int row)
             fModel->removeRow(row);
         }
         break;
+    case DOC_TYPE_STORE_INVENTORY:
+        if (C5StoreInventory::removeDoc(fDBParams, id)) {
+            fModel->removeRow(row);
+        }
+        break;
     }
 }
 
@@ -109,6 +115,13 @@ void CR5Documents::openDoc(int id)
         C5StoreDoc *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);
         if (!sd->openDoc(id)) {
             __mainWindow->removeTab(sd);
+        }
+        break;
+    }
+    case DOC_TYPE_STORE_INVENTORY: {
+        C5StoreInventory *si = __mainWindow->createTab<C5StoreInventory>(fDBParams);
+        if (!si->openDoc(id)) {
+            __mainWindow->removeTab(si);
         }
         break;
     }

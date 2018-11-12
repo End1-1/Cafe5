@@ -2,6 +2,7 @@
 #include "c5database.h"
 #include <QDir>
 #include <QMutex>
+#include <QSettings>
 
 QString C5Config::fAppHomePath;
 QString C5Config::fAppLogFile;
@@ -117,6 +118,18 @@ void C5Config::initParamsFromDb()
             fSettings[db.getInt(0)] = db.getString(1);
         }
     }
+}
+
+QVariant C5Config::getRegValue(const QString &key)
+{
+    QSettings s(_ORGANIZATION_, _APPLICATION_+ QString("\\") + _MODULE_);
+    return s.value(key);
+}
+
+void C5Config::setRegValue(const QString &key, const QVariant &value)
+{
+    QSettings s(_ORGANIZATION_, _APPLICATION_+ QString("\\") + _MODULE_);
+    s.setValue(key, value);
 }
 
 QString C5Config::getValue(int key)

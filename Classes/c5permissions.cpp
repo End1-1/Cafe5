@@ -24,11 +24,14 @@ void C5Permissions::init(C5Database &db)
               << cp_t2_store_input
               << cp_t2_store_output
               << cp_t2_store_move
+              << cp_t2_store_inventory
 
               << cp_t3_reports
               << cp_t3_sales_common
               << cp_t3_documents
               << cp_t3_store
+              << cp_t3_store_movement
+              << cp_t3_tstore_extra
 
               << cp_t4_menu
               << cp_t4_menu_names

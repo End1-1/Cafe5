@@ -28,6 +28,27 @@ void C5TableModel::execQuery(const QString &query)
     endResetModel();
 }
 
+void C5TableModel::setExternalData(const QMap<QString, int> &columnNameIndex, const QMap<QString, QString> &translation)
+{
+    beginResetModel();
+    fProxyData.clear();
+    fColumnNameIndex.clear();
+    fColumnIndexName.clear();
+    fRowToUpdate.clear();
+    fAddDataToUpdate.clear();
+    fColorData.clear();
+    fFilters.clear();
+    fColumnNameIndex = columnNameIndex;
+    for (int i = 0, count = fRawData.count(); i < count; i++) {
+        fProxyData << i;
+    }
+    for (QMap<QString, int>::const_iterator it = fColumnNameIndex.begin(); it != fColumnNameIndex.end(); it++) {
+        fColumnIndexName[it.value()] = it.key();
+    }
+    endResetModel();
+    translate(translation);
+}
+
 int C5TableModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
@@ -178,10 +199,6 @@ void C5TableModel::saveDataChanges()
     std::sort(rows.begin(), rows.end());
     for (int i = 0, count = rows.count(); i < count; i++) {
         int row = rows.at(i);
-        if (fRawData.at(row).at(0).toString() == 0) {
-            fDb[":f_id"] = 0;
-            fRawData[row][0] = fDb.insert(fTableForUpdate, true);;
-        }
         for (int j = 0; j < fColumnsForUpdate.count(); j++) {
             fDb[":" + fColumnIndexName[fColumnsForUpdate.at(j)]] = fRawData.at(row).at(fColumnsForUpdate.at(j));
         }
@@ -190,7 +207,11 @@ void C5TableModel::saveDataChanges()
                 fDb[":" + it.key()] = it.value();
             }
         }
-        fDb.update(fTableForUpdate, where_id(fRawData.at(row).at(0).toInt()));
+        if (fRawData.at(row).at(0).toString() == 0) {
+            fRawData[row][0] = fDb.insert(fTableForUpdate, true);;
+        } else {
+            fDb.update(fTableForUpdate, where_id(fRawData.at(row).at(0).toInt()));
+        }
     }
     fRowToUpdate.clear();
     fAddDataToUpdate.clear();

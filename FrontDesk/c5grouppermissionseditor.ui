@@ -27,7 +27,7 @@
       <enum>QTabWidget::West</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
@@ -54,7 +54,7 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
+       <item row="4" column="1">
         <spacer name="verticalSpacer_5">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -74,6 +74,16 @@
          </property>
          <property name="Tag" stdset="0">
           <number>203</number>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="C5CheckBox" name="checkBox_24">
+         <property name="text">
+          <string>Store inventory</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>204</number>
          </property>
         </widget>
        </item>
@@ -214,7 +224,17 @@
        <string>Reports</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_6">
-       <item row="4" column="1">
+       <item row="1" column="0">
+        <widget class="C5CheckBox" name="checkBox_20">
+         <property name="text">
+          <string>Documents</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>302</number>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
         <spacer name="verticalSpacer_6">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -227,16 +247,6 @@
          </property>
         </spacer>
        </item>
-       <item row="0" column="0">
-        <widget class="C5CheckBox" name="checkBox_18">
-         <property name="text">
-          <string>All items</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>300</number>
-         </property>
-        </widget>
-       </item>
        <item row="2" column="0">
         <widget class="C5CheckBox" name="checkBox_19">
          <property name="text">
@@ -247,13 +257,13 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="C5CheckBox" name="checkBox_20">
+       <item row="0" column="0">
+        <widget class="C5CheckBox" name="checkBox_18">
          <property name="text">
-          <string>Documents</string>
+          <string>All items</string>
          </property>
          <property name="Tag" stdset="0">
-          <number>302</number>
+          <number>300</number>
          </property>
         </widget>
        </item>
@@ -264,6 +274,16 @@
          </property>
          <property name="Tag" stdset="0">
           <number>303</number>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="C5CheckBox" name="checkBox_25">
+         <property name="text">
+          <string>T-store extra</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>305</number>
          </property>
         </widget>
        </item>

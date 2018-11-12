@@ -8,15 +8,31 @@
 
 #define INCH_PER_MM 0.0393
 
+C5Printing::C5Printing()
+{
+    fCanvas = new QGraphicsScene();
+    fCanvasList.append(fCanvas);
+    fResolution = 200;
+    fScaleFactor = (180.0 / fResolution) * 3.68;
+    fLinePen.setWidth(1);
+    fLineHeight = 4;
+    fTop = 0;
+    fTempTop = 0;
+    fCurrentPageIndex = 0;
+}
+
 C5Printing::C5Printing(const QString &printer)
 {
     fPrinter.setPrinterName(printer);
     fCanvas = new QGraphicsScene();
     fCanvasList.append(fCanvas);
-    fScaleFactor = (180 / fPrinter.resolution()) * 3.68;
+    fResolution = fPrinter.resolution();
+    fScaleFactor = (180.0 / fResolution) * 3.68;
     fLinePen.setWidth(1);
     fLineHeight = 4;
     fTop = 0;
+    fTempTop = 0;
+    fCurrentPageIndex = 0;
 }
 
 C5Printing::~C5Printing()
@@ -30,7 +46,7 @@ void C5Printing::setSceneParams(qreal width, qreal height, QPrinter::Orientation
 {
     fNormalHeight = height;
     fNormalWidth = width;
-    fCanvas->setSceneRect(0, 0, width * fPrinter.resolution() * INCH_PER_MM, height * fPrinter.resolution() * INCH_PER_MM);
+    fCanvas->setSceneRect(0, 0, width * fResolution * INCH_PER_MM, height * fResolution * INCH_PER_MM);
     fCanvasOrientation[fCanvas] = o;
 }
 
@@ -124,7 +140,7 @@ void C5Printing::image(const QPixmap &image, Qt::Alignment align)
     pi->setPos(pos);
 }
 
-void C5Printing::br(int height)
+bool C5Printing::br(qreal height)
 {
     if (height == 0) {
         height = fLineHeight;
@@ -139,12 +155,40 @@ void C5Printing::br(int height)
         fCanvas = new QGraphicsScene();
         fCanvasList.append(fCanvas);
         setSceneParams(fNormalWidth, fNormalHeight, o);
+        fCurrentPageIndex++;
+        return true;
     }
+    return false;
 }
 
 bool C5Printing::checkBr(int height)
 {
     return fTop + height > fNormalHeight;
+}
+
+QPrinter::Orientation C5Printing::orientation(int index)
+{
+    return fCanvasOrientation[fCanvasList[index]];
+}
+
+int C5Printing::resolution()
+{
+    return fResolution;
+}
+
+int C5Printing::currentPageIndex()
+{
+    return fCurrentPageIndex;
+}
+
+QGraphicsScene *C5Printing::page(int index)
+{
+    return fCanvasList.at(index);
+}
+
+int C5Printing::pageCount()
+{
+    return fCanvasList.count();
 }
 
 void C5Printing::print()

@@ -2,6 +2,7 @@
 #include "ui_c5selector.h"
 #include "c5cache.h"
 #include "c5grid.h"
+#include "c5tablemodel.h"
 
 QMap<QString, QMap<int, C5Selector*> > C5Selector::fSelectorList;
 
@@ -11,6 +12,7 @@ C5Selector::C5Selector(const QStringList &dbParams, QWidget *parent) :
 {
     ui->setupUi(this);
     fGrid = new C5Grid(dbParams, 0);
+    fGrid->fTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->hl->addWidget(fGrid);
     connect(fGrid, SIGNAL(tblDoubleClicked(int,int,QList<QVariant>)), this, SLOT(tblDoubleClicked(int,int,QList<QVariant>)));
 }
@@ -38,6 +40,35 @@ bool C5Selector::getValue(const QStringList &dbParams, int cache, QList<QVariant
     bool result = c->exec() == QDialog::Accepted;
     values = c->fValues;
     return result;
+}
+
+void C5Selector::keyPressEvent(QKeyEvent *key)
+{
+    int row = fGrid->fTableView->currentIndex().row();
+    QModelIndex index = fGrid->fTableView->model()->index(row, 0);
+    switch (key->key()) {
+    case Qt::Key_Up:
+        if (row > 0) {
+            row--;
+        }
+        break;
+    case Qt::Key_Down:
+        if (row < fGrid->fModel->rowCount() - 1) {
+            row++;
+        }
+        break;
+    case Qt::Key_Enter:
+    case Qt::Key_Return:
+        if (key->modifiers() && Qt::ControlModifier) {
+            fGrid->on_tblView_doubleClicked(index);
+        }
+        break;
+    default:
+        break;
+    }
+    index = fGrid->fTableView->model()->index(row, 0);
+    fGrid->fTableView->setCurrentIndex(index);
+    C5Dialog::keyPressEvent(key);
 }
 
 void C5Selector::tblDoubleClicked(int row, int column, const QList<QVariant> &values)

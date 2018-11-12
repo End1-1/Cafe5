@@ -102,6 +102,7 @@ QToolBar *C5StoreDoc::toolBar()
         fToolBar = createStandartToolbar(QList<ToolBarButtons>());
         fToolBar->addAction(QIcon(":/save.png"), tr("Save"), this, SLOT(saveDoc()));
         fToolBar->addAction(QIcon(":/draft.png"), tr("Draft"), this, SLOT(draftDoc()));
+        fToolBar->addAction(QIcon(":/print.png"), tr("Print"), this, SLOT(printDoc()));
     }
     return fToolBar;
 }
@@ -300,6 +301,7 @@ void C5StoreDoc::writeInput()
 
 bool C5StoreDoc::writeOutput(const QDate &date, int docNum, int store, double &amount, QString &err)
 {
+    amount = 0;
     C5Database db(fDBParams);
     C5Database dbdoc(fDBParams);
     db.startTransaction();
@@ -320,6 +322,7 @@ bool C5StoreDoc::writeOutput(const QDate &date, int docNum, int store, double &a
             "for update ").arg(goodsID.join(",")), storeData);
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
         double qty = ui->tblGoods->lineEdit(i, 3)->getDouble();
+        ui->tblGoods->lineEdit(i, 6)->setDouble(0);
         for (int j = 0; j < storeData.count(); j++) {
             if (storeData.at(j).at(1).toInt() == ui->tblGoods->getInteger(i, 1)) {
                 if (storeData.at(j).at(2).toDouble() > 0) {
@@ -353,10 +356,10 @@ bool C5StoreDoc::writeOutput(const QDate &date, int docNum, int store, double &a
                                    .arg(ui->tblGoods->getInteger(i, 1))
                                    .arg(storeData.at(j).at(2).toDouble())
                                    .arg(storeData.at(j).at(3).toDouble())
-                                   .arg(storeData.at(j).at(3).toDouble() * qty)
+                                   .arg(storeData.at(j).at(3).toDouble() * storeData.at(j).at(2).toDouble())
                                    .arg(storeData.at(j).at(0).toInt())
                                    .arg(dbdoc.getInt(0));
-                        amount += storeData.at(j).at(3).toDouble() * qty;
+                        amount += storeData.at(j).at(3).toDouble() * storeData.at(j).at(2).toDouble();
                         qty -= storeData.at(j).at(2).toDouble();
                         storeData[j][2] = 0.0;
                         ui->tblGoods->lineEdit(i, 6)->setDouble(ui->tblGoods->lineEdit(i, 6)->getDouble() + storeData.at(j).at(3).toDouble() * qty);
@@ -427,6 +430,11 @@ void C5StoreDoc::saveDoc()
 void C5StoreDoc::draftDoc()
 {
     save(DOC_STATE_DRAFT);
+}
+
+void C5StoreDoc::printDoc()
+{
+
 }
 
 void C5StoreDoc::tblQtyChanged(const QString &arg1)

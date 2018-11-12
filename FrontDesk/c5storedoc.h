@@ -52,6 +52,8 @@ private slots:
 
     void draftDoc();
 
+    void printDoc();
+
     void tblQtyChanged(const QString &arg1);
 
     void tblPriceChanged(const QString &arg1);

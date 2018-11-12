@@ -9,6 +9,8 @@
 class C5Printing
 {
 public:
+    C5Printing();
+
     C5Printing(const QString &printer);
 
     ~C5Printing();
@@ -37,9 +39,19 @@ public:
 
     void image(const QPixmap &image, Qt::Alignment align);
 
-    void br(int height = 0);
+    bool br(qreal height = 0);
 
     bool checkBr(int height);
+
+    QPrinter::Orientation orientation(int index);
+
+    int resolution();
+
+    int currentPageIndex();
+
+    QGraphicsScene *page(int index);
+
+    int pageCount();
 
     void print();
 
@@ -62,9 +74,13 @@ private:
 
     qreal fScaleFactor;
 
+    int fResolution;
+
     QPen fLinePen;
 
     QFont fFont;
+
+    int fCurrentPageIndex;
 
     QMap<QGraphicsScene*, QPrinter::Orientation> fCanvasOrientation;
 

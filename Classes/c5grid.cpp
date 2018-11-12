@@ -4,6 +4,8 @@
 #include "c5filtervalues.h"
 #include "excel.h"
 #include "c5filterwidget.h"
+#include "c5printing.h"
+#include "c5printpreview.h"
 #include "c5gridgilter.h"
 #include <QMenu>
 
@@ -217,9 +219,30 @@ void C5Grid::restoreColumnsVisibility()
     }
 }
 
+void C5Grid::restoreColumnsWidths()
+{
+    QSettings s(_ORGANIZATION_, QString("%1\\%2\\reports\\%3\\columnswidth")
+                .arg(_APPLICATION_)
+                .arg(_MODULE_)
+                .arg(fLabel));
+    ui->tblTotal->setColumnCount(fModel->columnCount());
+    for (int i = 0; i < ui->tblTotal->columnCount(); i++) {
+        ui->tblTotal->setItem(0, i, new QTableWidgetItem());
+        QString colName = fModel->nameForColumnIndex(i);
+        if (s.contains(colName)) {
+            ui->tblView->setColumnWidth(i, s.value(colName).toInt());
+        }
+    }
+}
+
 QStringList C5Grid::dbParams()
 {
     return fDBParams;
+}
+
+QString C5Grid::reportAdditionalTitle()
+{
+    return "";
 }
 
 void C5Grid::insertJoinTable(QStringList &joins, QMap<QString, QString> &joinsMap, const QString &table, const QString &mainTable)
@@ -249,6 +272,15 @@ void C5Grid::insertJoinTable(QStringList &joins, QMap<QString, QString> &joinsMa
             break;
         }
     }
+}
+
+int C5Grid::sumOfColumnsWidghtBefore(int column)
+{
+    int sum = 0;
+    for (int i = 0; i < column; i++) {
+        sum += fTableView->columnWidth(i);
+    }
+    return sum;
 }
 
 void C5Grid::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
@@ -312,7 +344,87 @@ void C5Grid::removeRow(int columnWithId)
 
 void C5Grid::print()
 {
+    QFont font(qApp->font());
+    font.setPointSize(8);
+    C5Printing p;
+    QSize paperSize(200, 280);
+    QPrinter::Orientation paperPos = QPrinter::Portrait;
+    p.setSceneParams(paperSize.width(), paperSize.height(), paperPos);
+    p.setFont(font);
+    int page = p.currentPageIndex();
+    int startFrom = 0;
+    bool stopped = false;
+    int columnsWidth = 0;
+    qreal scaleFactor = 3.2;
+    qreal rowScaleFactor = 4;
+    for (int i = 0; i < fModel->columnCount(); i++) {
+        columnsWidth += fTableView->columnWidth(i);
+    }
+    columnsWidth /= scaleFactor;
+    do {
+        p.setFontBold(true);
+        p.ltext(QString("%1 %2")
+                .arg(fLabel)
+                .arg(reportAdditionalTitle()), 0);
+        // for width test p.line(0, p.fTop, 50, p.fTop);
+        p.br();
+        p.br();
+        p.setFontSize(7);
+        p.line(0, p.fTop, columnsWidth, p.fTop);
+        for (int c = 0; c < fModel->columnCount(); c++) {
+            if (c > 0) {
+                p.ltext(fModel->headerData(c, Qt::Horizontal, Qt::DisplayRole).toString(), (sumOfColumnsWidghtBefore(c) / scaleFactor) + 1);
+                p.line(sumOfColumnsWidghtBefore(c) / scaleFactor, p.fTop, sumOfColumnsWidghtBefore(c) / scaleFactor, p.fTop + (fTableView->verticalHeader()->defaultSectionSize() / rowScaleFactor));
+            } else {
+                p.ltext(fModel->headerData(c, Qt::Horizontal, Qt::DisplayRole).toString(), 1);
+                p.line(0, p.fTop, 0, p.fTop + (fTableView->verticalHeader()->defaultSectionSize() / rowScaleFactor));
+            }
+        }
+        p.line(columnsWidth, p.fTop, columnsWidth, p.fTop + (fTableView->verticalHeader()->defaultSectionSize() / rowScaleFactor));
+        p.setFontBold(false);
+        p.br();
+        p.line(0, p.fTop, columnsWidth, p.fTop);
+        for (int r = startFrom; r < fModel->rowCount(); r++) {
+            p.line(0, p.fTop, columnsWidth, p.fTop);
+            for (int c = 0; c < fModel->columnCount(); c++) {
+                if (c > 0) {
+                    p.ltext(fModel->data(r, c, Qt::DisplayRole).toString(), (sumOfColumnsWidghtBefore(c) / scaleFactor) + 1);
+                    p.line(sumOfColumnsWidghtBefore(c) / scaleFactor, p.fTop, sumOfColumnsWidghtBefore(c) / scaleFactor, p.fTop + (fTableView->rowHeight(r) / rowScaleFactor));
+                } else {
+                    p.ltext(fModel->data(r, c, Qt::DisplayRole).toString(), 1);
+                    p.line(0, p.fTop, 0, p.fTop + (fTableView->rowHeight(r) / rowScaleFactor));
+                }
+            }
+            //last vertical line
+            p.line(columnsWidth, p.fTop, columnsWidth, p.fTop + (fTableView->rowHeight(r) / rowScaleFactor));
+            if (p.checkBr(p.fLineHeight * 4) || r >= fModel->rowCount() - 1) {
+                p.line(0, p.fTop + (fTableView->rowHeight(r) / rowScaleFactor), columnsWidth, p.fTop + (fTableView->rowHeight(r) / rowScaleFactor));\
+                p.br();
+                startFrom = r + 1;
+                stopped = startFrom >= fModel->rowCount() - 1;
+                p.fTop = p.fNormalHeight - p.fLineHeight;
+                p.ltext(QString("%1 %2, %3 %4")
+                        .arg("Page")
+                        .arg(page + 1)
+                        .arg(tr("Printed"))
+                        .arg(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR2)), 0);
+                p.rtext(fDBParams.at(1));
+                if (r < fModel->rowCount() - 1) {
+                    p.br(p.fLineHeight * 4);
+                }
+                break;
+            } else {
+                //p.line(0, p.fTop + (fTableView->rowHeight(r) / scaleFactor), sumOfColumnsWidghtBefore(fModel->columnCount()) / scaleFactor, p.fTop + (fTableView->rowHeight(r) / scaleFactor));
+                p.br();
+            }
+        }
+        if (fModel->rowCount() == 0) {
+            stopped = true;
+        }
+    } while (!stopped);
 
+    C5PrintPreview pp(&p, fDBParams, this);
+    pp.exec();
 }
 
 void C5Grid::exportToExcel()
@@ -404,19 +516,8 @@ void C5Grid::saveDataChanges()
 
 void C5Grid::refreshData()
 {
-    QSettings s(_ORGANIZATION_, QString("%1\\%2\\reports\\%3\\columnswidth")
-                .arg(_APPLICATION_)
-                .arg(_MODULE_)
-                .arg(fLabel));
     fModel->execQuery(fSqlQuery);
-    ui->tblTotal->setColumnCount(fModel->columnCount());
-    for (int i = 0; i < ui->tblTotal->columnCount(); i++) {
-        ui->tblTotal->setItem(0, i, new QTableWidgetItem());
-        QString colName = fModel->nameForColumnIndex(i);
-        if (s.contains(colName)) {
-            ui->tblView->setColumnWidth(i, s.value(colName).toInt());
-        }
-    }
+    restoreColumnsWidths();
     sumColumnsData();
 }
 

@@ -16,11 +16,14 @@
 #define cp_t2_store_input 201
 #define cp_t2_store_output 202
 #define cp_t2_store_move 203
+#define cp_t2_store_inventory 204
 
 #define cp_t3_reports 300
 #define cp_t3_sales_common 301
 #define cp_t3_documents 302
 #define cp_t3_store 303
+#define cp_t3_store_movement 304
+#define cp_t3_tstore_extra 305
 
 #define cp_t4_menu 400
 #define cp_t4_menu_names 401

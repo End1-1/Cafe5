@@ -82,7 +82,15 @@ SOURCES += \
     ../Controls/c5tablewidget.cpp \
     ../Reports/cr5documents.cpp \
     ../Reports/cr5materialsinstore.cpp \
-    ../Reports/cr5materialinstorefilter.cpp
+    ../Reports/cr5materialinstorefilter.cpp \
+    ../Reports/cr5goodsmovement.cpp \
+    ../Reports/cr5goodsmovementfilter.cpp \
+    ../Classes/c5printpreview.cpp \
+    ../Classes/c5printing.cpp \
+    ../Controls/c5graphicsview.cpp \
+    c5storeinventory.cpp \
+    ../Reports/cr5tstoreextra.cpp \
+    ../Reports/cr5tstoreextrafilter.cpp
 
 HEADERS += \
         c5mainwindow.h \
@@ -136,7 +144,15 @@ HEADERS += \
     ../Controls/c5tablewidget.h \
     ../Reports/cr5documents.h \
     ../Reports/cr5materialsinstore.h \
-    ../Reports/cr5materialinstorefilter.h
+    ../Reports/cr5materialinstorefilter.h \
+    ../Reports/cr5goodsmovement.h \
+    ../Reports/cr5goodsmovementfilter.h \
+    ../Classes/c5printpreview.h \
+    ../Classes/c5printing.h \
+    ../Controls/c5graphicsview.h \
+    c5storeinventory.h \
+    ../Reports/cr5tstoreextra.h \
+    ../Reports/cr5tstoreextrafilter.h
 
 FORMS += \
         c5mainwindow.ui \
@@ -153,7 +169,11 @@ FORMS += \
     ../Reports/c5settingswidget.ui \
     c5selector.ui \
     c5storedoc.ui \
-    ../Reports/cr5materialinstorefilter.ui
+    ../Reports/cr5materialinstorefilter.ui \
+    ../Reports/cr5goodsmovementfilter.ui \
+    ../Classes/c5printpreview.ui \
+    c5storeinventory.ui \
+    ../Reports/cr5tstoreextrafilter.ui
 
 INCLUDEPATH += ../Cafe5
 INCLUDEPATH += ../Classes

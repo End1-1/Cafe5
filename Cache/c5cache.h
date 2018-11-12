@@ -13,6 +13,7 @@
 #define cache_goods 7
 #define cache_goods_store 8
 #define cache_goods_partners 9
+#define cache_store_inout 10
 
 class C5Cache : public QObject
 {
