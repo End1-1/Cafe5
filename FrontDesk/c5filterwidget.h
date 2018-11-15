@@ -2,9 +2,9 @@
 #define C5FILTERWIDGET_H
 
 #include "c5utils.h"
-#include <QWidget>
+#include "c5widget.h"
 
-class C5FilterWidget : public QWidget
+class C5FilterWidget : public C5Widget
 {
     Q_OBJECT
 
@@ -12,9 +12,6 @@ public:
     explicit C5FilterWidget(const QStringList &dbParams, QWidget *parent = 0);
 
     virtual QString condition() = 0;
-
-protected:
-    QStringList fDBParams;
 
 signals:
 

@@ -1,0 +1,9 @@
+15.11.2018
+	1. Correct. Print preview and printing
+	2. New. Sorting data in C5TableModel
+	3. Correct. Print table name on receipt and service. 
+	4. Correct. Print order id on service
+	5. Correct. Order prefix
+	6. New. Correct qty of inventory from T-account, extra.
+	7. New. C5TableWidget.createComboBox.
+	8. Correct. C5FilterValues correct search.

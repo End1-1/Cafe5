@@ -16,6 +16,9 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QTabWidget" name="tabWidget">
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
      <property name="currentIndex">
       <number>0</number>
      </property>
@@ -53,7 +56,11 @@
       </attribute>
       <layout class="QHBoxLayout" name="horizontalLayout_4">
        <item>
-        <widget class="QListWidget" name="lvColumns"/>
+        <widget class="QListWidget" name="lvColumns">
+         <property name="focusPolicy">
+          <enum>Qt::ClickFocus</enum>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -77,6 +84,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="btnOK">
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
+        </property>
         <property name="text">
          <string>Apply</string>
         </property>
@@ -84,6 +94,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="btnCancel">
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
+        </property>
         <property name="text">
          <string>Cancel</string>
         </property>

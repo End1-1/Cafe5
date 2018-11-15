@@ -281,12 +281,12 @@
     <message>
         <location filename="../Classes/c5printservicethread.cpp" line="93"/>
         <source>Printer: </source>
-        <translation>Տպիչ</translation>
+        <translation>Տպիչ` </translation>
     </message>
     <message>
         <location filename="../Classes/c5printservicethread.cpp" line="95"/>
         <source>Storage: </source>
-        <translation>Պահեստ</translation>
+        <translation>Պահեստ` </translation>
     </message>
 </context>
 <context>
@@ -315,7 +315,7 @@
         <location filename="../Classes/c5waiterserver.cpp" line="253"/>
         <location filename="../Classes/c5waiterserver.cpp" line="308"/>
         <source>All service must be complited</source>
-        <translation type="unfinished">Պատվերը անավարտ է</translation>
+        <translation>Պատվերը անավարտ է</translation>
     </message>
     <message>
         <location filename="../Classes/c5waiterserver.cpp" line="264"/>

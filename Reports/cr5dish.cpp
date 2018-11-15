@@ -1,11 +1,13 @@
 #include "cr5dish.h"
 #include "c5dishwidget.h"
+#include "c5tablemodel.h"
+#include <QAbstractScrollArea>
 
 CR5Dish::CR5Dish(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
 {
     fIcon = ":/users_groups.png";
-    fLabel = tr("Users");
+    fLabel = tr("Dishes");
 
     fSqlQuery = "select d.f_id, p1.f_name as f_part1, p2.f_name as f_part2, d.f_name, \
                 f_remind, f_service, f_discount, d.f_queue \
@@ -19,6 +21,7 @@ CR5Dish::CR5Dish(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_remind"] = tr("Remind");
     fTranslation["f_service"] = tr("Service");
     fTranslation["f_discount"] = tr("Discount");
+    fTranslation["f_queue"] = tr("Queue");
 
     C5Cache *cd = createCache(cache_dish_part2);
     C5ComboDelegate *cbPart = new C5ComboDelegate("f_part", cd, fTableView);
@@ -33,8 +36,8 @@ CR5Dish::CR5Dish(const QStringList &dbParams, QWidget *parent) :
     colsForUpdate << 3 << 4 << 5 << 6 << 7;
     setTableForUpdate("d_dish", colsForUpdate);
 
-    C5DishWidget *dw = new C5DishWidget(dbParams, this);
-    hl()->addWidget(dw);
+    fDishWidget = new C5DishWidget(dbParams, this);
+    hl()->addWidget(fDishWidget);
 }
 
 QToolBar *CR5Dish::toolBar()
@@ -50,4 +53,29 @@ QToolBar *CR5Dish::toolBar()
             createStandartToolbar(btn);
     }
     return fToolBar;
+}
+
+void CR5Dish::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
+{
+    Q_UNUSED(selected);
+    Q_UNUSED(deselected);
+    int newId = rowId();
+    if (deselected.indexes().count() > 0) {
+        fModel->saveDataChanges();
+        fTableView->viewport()->update();
+        int oldId = fModel->data(deselected.indexes().at(0).row(), 0, Qt::EditRole).toInt();
+        fDishWidget->save(oldId);
+    }
+    if (newId > 0) {
+        fDishWidget->setDish(newId);
+    } else {
+        fDishWidget->clearWidget();
+    }
+}
+
+void CR5Dish::saveDataChanges()
+{
+    fModel->saveDataChanges();
+    fTableView->viewport()->update();
+    fDishWidget->save(rowId());
 }

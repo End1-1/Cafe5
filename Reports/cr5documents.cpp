@@ -1,6 +1,7 @@
 #include "cr5documents.h"
 #include "c5storedoc.h"
 #include "c5storeinventory.h"
+#include "cr5documentsfilter.h"
 #include "c5tablemodel.h"
 
 CR5Documents::CR5Documents(const QStringList &dbParams, QWidget *parent) :
@@ -24,7 +25,7 @@ CR5Documents::CR5Documents(const QStringList &dbParams, QWidget *parent) :
                    << "p.f_taxname"
                    << "h.f_amount"
                    << "h.f_comment"
-                   << "u.f_login"
+                   << "u.f_login as f_operatorname"
                    << "h.f_createdate"
                    << "h.f_createtime"
                       ;
@@ -49,7 +50,7 @@ CR5Documents::CR5Documents(const QStringList &dbParams, QWidget *parent) :
     fColumnsVisible["p.f_taxname"] = true;
     fColumnsVisible["h.f_amount"] = true;
     fColumnsVisible["h.f_comment"] = true;
-    fColumnsVisible["h.f_login"] = true;
+    fColumnsVisible["u.f_login as f_operatorname"] = true;
     fColumnsVisible["h.f_createdate"] = true;
     fColumnsVisible["h.f_createtime"] = true;
 
@@ -57,7 +58,7 @@ CR5Documents::CR5Documents(const QStringList &dbParams, QWidget *parent) :
 
     restoreColumnsVisibility();
 
-    //fFilterWidget = new CR5CommonSalesFilter();
+    fFilterWidget = new CR5DocumentsFilter(dbParams);
 }
 
 QToolBar *CR5Documents::toolBar()
@@ -94,11 +95,17 @@ void CR5Documents::removeWithId(int id, int row)
     case DOC_TYPE_STORE_INPUT:
     case DOC_TYPE_STORE_OUTPUT:
     case DOC_TYPE_STORE_MOVE:
+        if (C5Message::question(tr("Confirm to remove document")) != QDialog::Accepted) {
+            return;
+        }
         if (C5StoreDoc::removeDoc(fDBParams, id)) {
             fModel->removeRow(row);
         }
         break;
     case DOC_TYPE_STORE_INVENTORY:
+        if (C5Message::question(tr("Confirm to remove document")) != QDialog::Accepted) {
+            return;
+        }
         if (C5StoreInventory::removeDoc(fDBParams, id)) {
             fModel->removeRow(row);
         }

@@ -4,6 +4,7 @@
 #include <QTableWidget>
 
 class C5LineEdit;
+class C5ComboBox;
 
 class C5TableWidget : public QTableWidget
 {
@@ -18,6 +19,10 @@ public:
 
     C5LineEdit *lineEdit(int row, int column);
 
+    C5ComboBox *createComboBox(int row, int column);
+
+    C5ComboBox *comboBox(int row, int column);
+
     bool findWidget(QWidget *w, int &row, int &column);
 
     int getInteger(int row, int column);
@@ -31,6 +36,8 @@ public:
     double getDouble(int row, int column);
 
     void setDouble(int row, int column, double value);
+
+    int addEmptyRow();
 };
 
 #endif // C5TABLEWIDGET_H

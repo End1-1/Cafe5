@@ -108,7 +108,12 @@ bool C5Widget::event(QEvent *event)
         switch (ke->key()) {
         case Qt::Key_Enter:
         case Qt::Key_Return:
-            focusNextChild();
+            if (ke->modifiers() & Qt::ControlModifier) {
+                break;
+            } else {
+                focusNextChild();
+                return true;
+            }
             break;
         }
     }

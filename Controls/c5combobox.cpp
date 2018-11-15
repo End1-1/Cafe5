@@ -1,5 +1,6 @@
 #include "c5combobox.h"
 #include "c5database.h"
+#include "c5cache.h"
 
 C5ComboBox::C5ComboBox(QWidget *parent) :
     QComboBox(parent)
@@ -31,5 +32,13 @@ void C5ComboBox::setDBValues(const QStringList dbParams, const QString &sql, con
     }
     if (defaultValue.isValid()) {
         setCurrentIndex(findData(defaultValue));
+    }
+}
+
+void C5ComboBox::setCache(const QStringList &dbParams, int cacheid, int colId, int colName)
+{
+    C5Cache *c = C5Cache::cache(dbParams, cacheid);
+    for (int i = 0; i < c->rowCount(); i++) {
+        addItem(c->getString(i, colName), c->getInt(i, colId));
     }
 }

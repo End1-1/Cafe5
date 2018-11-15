@@ -10,6 +10,7 @@
 #define FORMAT_DATETIME_TO_STR2 "dd/MM/yyyy HH:mm"
 #define FORMAT_DATE_TO_STR "dd/MM/yyyy"
 #define FORMAT_TIME_TO_STR "HH:mm:ss"
+#define FORMAT_DATE_TO_STR_MYSQL "yyyy-MM-dd"
 
 #define current_date QDate::currentDate().toString(FORMAT_DATE_TO_STR)
 #define current_time QTime::currentTime().toString(FORMAT_TIME_TO_STR)
@@ -35,6 +36,8 @@ public:
 
     QString pwd(const QString &value);
 };
+
+QString hostusername();
 
 QString password(const QString &value);
 

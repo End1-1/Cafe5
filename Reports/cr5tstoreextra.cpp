@@ -2,6 +2,7 @@
 #include "c5tablemodel.h"
 #include "cr5tstoreextrafilter.h"
 #include "c5gridgilter.h"
+#include <QInputDialog>
 
 CR5TStoreExtra::CR5TStoreExtra(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
@@ -41,6 +42,8 @@ CR5TStoreExtra::CR5TStoreExtra(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_sumdif"] = tr("Sum, dif");
 
     fFilterWidget = new CR5TStoreExtraFilter(dbParams);
+
+    connect(this, SIGNAL(tblDoubleClicked(int,int,QList<QVariant>)), this, SLOT(tblDoubleClicked(int,int,QList<QVariant>)));
 }
 
 QToolBar *CR5TStoreExtra::toolBar()
@@ -178,4 +181,72 @@ void CR5TStoreExtra::buildQuery()
 void CR5TStoreExtra::refreshData()
 {
     buildQuery();
+}
+
+int CR5TStoreExtra::documentForInventory()
+{
+    int result = 0;
+    CR5TStoreExtraFilter *f = static_cast<CR5TStoreExtraFilter*>(fFilterWidget);
+    C5Database db(fDBParams);
+    db[":f_date"] = f->dateEnd();
+    db[":f_type"] = DOC_TYPE_STORE_INVENTORY;
+    db.exec("select f_id from a_header where f_date=:f_date and f_type=:f_type");
+    bool found = false;
+    while (db.nextRow() && !found) {
+        C5Database db2(fDBParams);
+        db2[":f_document"] = db.getInt(0);
+        db2.exec("select * from a_store_inventory where f_document=:f_document");
+        if (db2.nextRow()) {
+            result = db.getInt(0);
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        db[":f_state"] = DOC_STATE_SAVED;
+        db[":f_type"] = DOC_TYPE_STORE_INVENTORY;
+        db[":f_operator"] = __userid;
+        db[":f_date"] = QDate::currentDate();
+        db[":f_createDate"] = QDate::currentDate();
+        db[":f_createTime"] = QTime::currentTime();
+        db[":f_partner"] = 0;
+        db[":f_amount"] = 0;
+        db[":f_comment"] = tr("Created automaticaly");
+        db[":f_raw"] = "";
+        result = db.insert("a_header");
+    }
+    return result;
+}
+
+void CR5TStoreExtra::tblDoubleClicked(int row, int column, const QList<QVariant> &values)
+{
+    bool ok;
+    double qty;
+    int docid;
+    CR5TStoreExtraFilter *f = static_cast<CR5TStoreExtraFilter*>(fFilterWidget);
+    C5Database db(fDBParams);
+    switch (column) {
+    case 10:
+        qty = QInputDialog::getDouble(this, tr("Inventory qty"), tr("Qty"), 0, 0, 100000, 4, &ok);
+        if (qty < 0.0001) {
+            C5Message::error(tr("Quantity must be greater than 0"));
+            return;
+        }
+        if (!ok) {
+            return;
+        }
+        docid = documentForInventory();
+        db[":f_document"] = docid;
+        db[":f_goods"] = values.at(0);
+        db.exec("delete from a_store_inventory where f_document=:f_document and f_goods=:f_goods");
+        db[":f_document"] = docid;
+        db[":f_store"] = f->store();
+        db[":f_goods"] = values.at(0);
+        db[":f_qty"] = qty;
+        db[":f_price"] = 0;
+        db[":f_total"] = 0;
+        db.insert("a_store_inventory", false);
+        fModel->setData(row, column, qty);
+        break;
+    }
 }

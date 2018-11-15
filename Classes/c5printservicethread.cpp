@@ -21,7 +21,7 @@ void C5PrintServiceThread::run()
     QSet<QString> fPrint1, fPrint2;
     for (int i = 0; i < fBody.count(); i++) {
         QJsonObject jb = fBody[i].toObject();
-        if (jb["f_qtyprint"].toDouble() > 0.01) {
+        if (jb["f_qtyprint"].toString().toDouble() > 0.01) {
             if (jb["f_print1"].toString().length() > 0) {
                 fPrint1 << jb["f_print1"].toString();
             }
@@ -45,9 +45,9 @@ void C5PrintServiceThread::run()
 void C5PrintServiceThread::print(const QString &printer, const QString &side)
 {
     QFont font(qApp->font());
-    font.setPointSize(10);
-    C5Printing p(printer);
-    p.setSceneParams(70, 280, QPrinter::Portrait);
+    font.setPointSize(30);
+    C5Printing p;
+    p.setSceneParams(650, 2800, QPrinter::Portrait);
     p.setFont(font);
 
     p.ctext(tr("New order"));
@@ -69,11 +69,10 @@ void C5PrintServiceThread::print(const QString &printer, const QString &side)
     p.br(p.fLineHeight + 2);
     p.line(0, p.fTop, p.fNormalWidth, p.fTop);
 
-    p.setFontSize(12);
     QSet<QString> storages;
     for (int i = 0; i < fBody.count(); i++) {
         QJsonObject o = fBody[i].toObject();
-        if (o["f_qtyprint"].toDouble() < 0.01) {
+        if (o["f_qtyprint"].toString().toDouble() < 0.01) {
             continue;
         }
         if (o[side].toString() != printer) {
@@ -89,10 +88,10 @@ void C5PrintServiceThread::print(const QString &printer, const QString &side)
     }
     p.line(0, p.fTop, p.fNormalWidth, p.fTop);
     p.br(1);
-    p.setFontSize(8);
+    p.setFontSize(20);
     p.ltext(tr("Printer: ") + printer, 0);
     p.br();
     p.ltext(tr("Storage: ") + storages.toList().join(","), 0);
 
-    p.print();
+    p.print(printer, QPrinter::Custom);
 }

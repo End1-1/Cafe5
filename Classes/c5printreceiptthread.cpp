@@ -15,9 +15,9 @@ C5PrintReceiptThread::C5PrintReceiptThread(const QJsonObject &header, const QJso
 void C5PrintReceiptThread::run()
 {
     QFont font(qApp->font());
-    font.setPointSize(9);
-    C5Printing p(fPrinter);
-    p.setSceneParams(70, 280, QPrinter::Portrait);
+    font.setPointSize(20);
+    C5Printing p;
+    p.setSceneParams(650, 2800, QPrinter::Portrait);
     p.setFont(font);
 
     p.image("./logo_receipt.png", Qt::AlignHCenter);
@@ -44,9 +44,16 @@ void C5PrintReceiptThread::run()
     p.ltext(tr("Receipt number"), 0);
     p.rtext(fHeader["f_receiptnumber"].toString());
     p.br();
+    p.ltext(tr("Date"), 0);
+    p.rtext(fHeader["f_taxtime"].toString());
+    p.br();
     p.ltext(tr("(F)"), 0);
     p.br();
     p.line();
+#ifdef QT_DEBUG
+    p.br();
+    p.line(0, p.fTop, 350, p.fTop);
+#endif
     p.br(1);
     p.ltext(tr("Order"), 0);
     p.rtext(QString("%1%2").arg(fHeader["f_prefix"].toString()).arg(fHeader["f_id"].toString()));
@@ -60,10 +67,14 @@ void C5PrintReceiptThread::run()
     p.ltext(tr("Staff"), 0);
     p.rtext(fHeader["f_currentstaffname"].toString());
     p.br();
+    p.br(1);
     p.line();
+    p.br(1);
     p.ctext(tr("Class | Name | Qty | Price | Total"));
     p.br();
+    p.br(2);
     p.line();
+    p.br(1);
     int nn = 1;
     for (int i = 0; i < fBody.count(); i++) {
         QJsonObject o = fBody.at(i).toObject();
@@ -79,7 +90,9 @@ void C5PrintReceiptThread::run()
                 .arg("").arg("")
                 .arg(float_str(o["f_total"].toString().toDouble(), 2)), 0);
         p.br();
+        p.br(2);
         p.line();
+        p.br(1);
     }
     p.br();
     p.ltext(tr("Total"), 0);
@@ -132,7 +145,7 @@ void C5PrintReceiptThread::run()
                         encodeImage.setPixel( i + QR_MARGIN, j + QR_MARGIN, 0 );
 
             QPixmap pix = QPixmap::fromImage( encodeImage );
-            pix = pix.scaled(600, 600);
+            pix = pix.scaled(300, 300);
             p.image(pix, Qt::AlignHCenter);
             p.br();
         }
@@ -142,5 +155,5 @@ void C5PrintReceiptThread::run()
     p.ltext(tr("Thank you for visit!"), 0);
     p.rtext(fHeader["f_print"].toString());
     p.br();
-    p.print();
+    p.print(fPrinter, QPrinter::Custom);
 }

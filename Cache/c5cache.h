@@ -14,6 +14,10 @@
 #define cache_goods_store 8
 #define cache_goods_partners 9
 #define cache_store_inout 10
+#define cache_doc_state 11
+#define cache_doc_type 12
+#define cache_users 14
+#define cache_waiter_printers 15
 
 class C5Cache : public QObject
 {

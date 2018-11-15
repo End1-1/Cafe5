@@ -1,9 +1,9 @@
 #ifndef C5PRINTING_H
 #define C5PRINTING_H
 
-#include <QPrinter>
 #include <QGraphicsScene>
 #include <QPen>
+#include <QPrinter>
 #include <QMap>
 
 class C5Printing
@@ -43,17 +43,15 @@ public:
 
     bool checkBr(int height);
 
-    QPrinter::Orientation orientation(int index);
-
-    int resolution();
-
     int currentPageIndex();
 
     QGraphicsScene *page(int index);
 
     int pageCount();
 
-    void print();
+    QPrinter::Orientation orientation(int index);
+
+    void print(const QString &printername, QPagedPaintDevice::PageSize pageSize);
 
     qreal fTop;
 
@@ -66,15 +64,9 @@ public:
 private:
     qreal fTempTop;
 
-    QPrinter fPrinter;
-
     QGraphicsScene *fCanvas;
 
     QList<QGraphicsScene*> fCanvasList;
-
-    qreal fScaleFactor;
-
-    int fResolution;
 
     QPen fLinePen;
 

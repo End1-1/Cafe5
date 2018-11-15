@@ -43,7 +43,8 @@ void C5FilterValues::on_leFilter_textChanged(const QString &arg1)
 {
     QListWidget *l = ui->lst;
     for (int i = 0, count = l->count(); i < count; i++) {
-        bool hidden = !l->item(i)->text().contains(arg1, Qt::CaseInsensitive);
+        QCheckBox *c = static_cast<QCheckBox*>(ui->lst->itemWidget(ui->lst->item(i)));
+        bool hidden = !c->text().contains(arg1, Qt::CaseInsensitive);
         l->setItemHidden(l->item(i), hidden);
     }
 }

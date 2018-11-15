@@ -19,6 +19,11 @@ protected:
 
 private:
     QMap<QString, int> fColumnNameIndex;
+
+    int documentForInventory();
+
+private slots:
+    void tblDoubleClicked(int row, int column, const QList<QVariant> &values);
 };
 
 #endif // CR5TSTOREEXTRA_H

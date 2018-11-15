@@ -65,7 +65,7 @@ bool C5StoreInventory::removeDoc(const QStringList &dbParams, int id)
 {
     C5Database db(dbParams);
     db[":f_document"] = id;
-    db.exec("delete from a_store_invenetory where f_document=:f_document");
+    db.exec("delete from a_store_inventory where f_document=:f_document");
     db[":f_id"] = id;
     db.exec("delete from a_header where f_id=:f_id");
     return true;

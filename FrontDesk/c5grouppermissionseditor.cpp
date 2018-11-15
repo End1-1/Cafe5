@@ -1,6 +1,8 @@
 #include "c5grouppermissionseditor.h"
 #include "ui_c5grouppermissionseditor.h"
 #include "c5permissions.h"
+#include "c5selector.h"
+#include "c5cache.h"
 #include <QProxyStyle>
 
 class CustomTabStyle : public QProxyStyle {
@@ -68,12 +70,19 @@ QToolBar *C5GroupPermissionsEditor::toolBar()
 
 void C5GroupPermissionsEditor::on_lbGroup_clicked()
 {
-
+    QList<QVariant> values;
+    if (C5Selector::getValue(fDBParams, cache_users_groups, values)) {
+        setPermissionsGroupId(values.at(0).toInt());
+    }
 }
 
 void C5GroupPermissionsEditor::savePemissions()
 {
     C5Database db(fDBParams);
+    if (fGroupId == 1) {
+        C5Message::info(tr("Nothig was saved"));
+        return;
+    }
     db[":f_group"] = fGroupId;
     db.exec("delete from s_user_access where f_group=:f_group");
     for (QMap<int, C5CheckBox*>::const_iterator it = fCheckBoxes.begin(); it != fCheckBoxes.end(); it++) {
@@ -89,6 +98,10 @@ void C5GroupPermissionsEditor::savePemissions()
 
 void C5GroupPermissionsEditor::getPermissions()
 {
+    QList<C5CheckBox*> l = fCheckBoxes.values();
+    foreach (C5CheckBox *c, l) {
+        c->setChecked(false);
+    }
     C5Database db(fDBParams);
     db[":f_group"] = fGroupId;
     db.exec("select f_key from s_user_access where f_group=:f_group");

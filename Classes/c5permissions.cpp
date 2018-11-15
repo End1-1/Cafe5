@@ -25,6 +25,7 @@ void C5Permissions::init(C5Database &db)
               << cp_t2_store_output
               << cp_t2_store_move
               << cp_t2_store_inventory
+              << cp_t2_count_output_of_sale
 
               << cp_t3_reports
               << cp_t3_sales_common

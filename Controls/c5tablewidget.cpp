@@ -1,5 +1,6 @@
 #include "c5tablewidget.h"
 #include "c5lineedit.h"
+#include "c5combobox.h"
 
 C5TableWidget::C5TableWidget(QWidget *parent) :
     QTableWidget(parent)
@@ -29,6 +30,19 @@ C5LineEdit *C5TableWidget::createLineEdit(int row, int column)
 C5LineEdit *C5TableWidget::lineEdit(int row, int column)
 {
     return static_cast<C5LineEdit*>(cellWidget(row, column));
+}
+
+C5ComboBox *C5TableWidget::createComboBox(int row, int column)
+{
+    C5ComboBox *c = new C5ComboBox(this);
+    c->setFrame(false);
+    setCellWidget(row, column, c);
+    return c;
+}
+
+C5ComboBox *C5TableWidget::comboBox(int row, int column)
+{
+    return static_cast<C5ComboBox*>(cellWidget(row, column));
 }
 
 bool C5TableWidget::findWidget(QWidget *w, int &row, int &column)
@@ -73,4 +87,14 @@ double C5TableWidget::getDouble(int row, int column)
 void C5TableWidget::setDouble(int row, int column, double value)
 {
     item(row, column)->setText(QString::number(value, 'f', 2));
+}
+
+int C5TableWidget::addEmptyRow()
+{
+    int row = rowCount();
+    setRowCount(row + 1);
+    for (int i = 0; i < columnCount(); i++) {
+        setItem(row, i, new QTableWidgetItem());
+    }
+    return row;
 }

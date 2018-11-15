@@ -69,6 +69,10 @@
    <header location="global">c5dateedit.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>deStart</tabstop>
+  <tabstop>deEnd</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

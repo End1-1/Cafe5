@@ -74,6 +74,7 @@ void DlgPassword::handlePassword(const QJsonObject &obj)
     if (obj["reply"].toInt() == 0) {
         ui->lePassword->clear();
         C5Message::error(tr("Access denied"));
+        ui->lePassword->setFocus();
         return;
     }
     fUser->fromJson(obj);

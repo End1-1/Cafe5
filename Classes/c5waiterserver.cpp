@@ -125,7 +125,7 @@ void C5WaiterServer::reply(QJsonObject &o)
                 QJsonArray jb;
                 bv[":f_table"] = fIn["table"].toInt();
                 bv[":f_state"] = ORDER_STATE_OPEN;
-                srh.getJsonFromQuery("select h.f_name as f_hallname, t.f_name as f_tableName, concat(s.f_last, ' ', s.f_first) as f_staffname, \
+                srh.getJsonFromQuery("select h.f_prefix, h.f_name as f_hallname, t.f_name as f_tableName, concat(s.f_last, ' ', s.f_first) as f_staffname, \
                     o.* \
                     from o_header o \
                     left join h_tables t on t.f_id=o.f_table \
@@ -137,7 +137,7 @@ void C5WaiterServer::reply(QJsonObject &o)
                 if (jo.count() == 0) {
                     QJsonObject jh;
                     srh.fDb[":f_id"] = fIn["table"].toInt();
-                    srh.fDb.exec("select f_name from h_table where f_id=:f_id");
+                    srh.fDb.exec("select f_name from h_tables where f_id=:f_id");
                     if (srh.fDb.nextRow()) {
                         jh["f_tablename"] = srh.fDb.getString(0);
                     }
@@ -147,6 +147,7 @@ void C5WaiterServer::reply(QJsonObject &o)
                         jh["f_hallname"] = srh.fDb.getString(0);
                     }
                     jh["f_id"] = "0";
+                    jh["f_prefix"] = C5Config::orderPrefix();
                     jh["f_hall"] = jt.at(0)["f_hall"];
                     jh["f_table"] = QString::number(fIn["table"].toInt());
                     jh["f_state"] = QString::number(ORDER_STATE_OPEN);
@@ -204,6 +205,7 @@ void C5WaiterServer::reply(QJsonObject &o)
         QJsonArray ji = fIn["body"].toArray();
         QJsonObject jh = fIn["header"].toObject();
         QJsonArray jp;
+        saveOrder(jh, ji, srh.fDb);
         for (int i = 0; i < ji.count(); i++ ) {
             QJsonObject jo = ji[i].toObject();
             if (jo["f_state"].toString().toInt() != DISH_STATE_OK) {
@@ -224,7 +226,7 @@ void C5WaiterServer::reply(QJsonObject &o)
                 srh.fDb.update("o_header", where_id(jh["f_id"].toString().toInt()));
             }
         }
-        C5PrintServiceThread *ps = new C5PrintServiceThread(fIn["header"].toObject(), jp);
+        C5PrintServiceThread *ps = new C5PrintServiceThread(jh, jp);
         ps->start();
         o["body"] = ji;
         o["header"] = jh;
@@ -282,6 +284,7 @@ void C5WaiterServer::reply(QJsonObject &o)
             jh["f_receiptnumber"] = jtax[0].toObject()["f_receiptnumber"].toString();
             jh["f_hvhh"] = jtax[0].toObject()["f_hvhh"].toString();
             jh["f_fiscalmode"] = jtax[0].toObject()["f_fiscalmode"].toString();
+            jh["f_taxtime"] = jtax[0].toObject()["f_time"].toString();
 
             jh["f_print"] = QString::number(abs(jh["f_print"].toString().toInt()) + 1);
             srh.fDb[":f_print"] = jh["f_print"].toString().toInt();
@@ -304,6 +307,9 @@ void C5WaiterServer::reply(QJsonObject &o)
         // CHECKING ALL ITEMS THAT WAS PRINTED
         for (int i = 0; i < jb.count(); i++) {
             QJsonObject jo = jb[i].toObject();
+            if (jo["f_state"].toString().toInt() != DISH_STATE_OK) {
+                continue;
+            }
             if (jo["f_qty1"].toString() != jo["f_qty2"].toString()) {
                 err += tr("All service must be complited");
                 break;
@@ -314,6 +320,10 @@ void C5WaiterServer::reply(QJsonObject &o)
         }
         if (err.isEmpty()) {
             srh.fDb[":f_state"] = ORDER_STATE_CLOSE;
+            srh.fDb[":f_dateClose"] = QDate::currentDate();
+            srh.fDb[":f_dateCash"] = QDate::currentDate();
+            srh.fDb[":f_timeClose"] = QTime::currentTime();
+            srh.fDb[":f_staff"] = jh["f_currentStaff"].toString().toInt();
             srh.fDb.update("o_header", where_id(jh["f_id"].toString()));
             srh.fDb[":f_lock"] = 0;
             srh.fDb[":f_lockSrc"] = "";
@@ -438,8 +448,8 @@ int C5WaiterServer::printTax(const QJsonObject &h, const QJsonArray &ja, C5Datab
     db[":f_result"] = result;
     db.insert("o_tax_log", false);
     if (result == pt_err_ok) {
-        QString sn, firm, address, fiscal, hvhh, rseq, devnum;
-        PrintTaxN::parseResponse(jsonOut, firm, hvhh, fiscal, rseq, sn, address, devnum);
+        QString sn, firm, address, fiscal, hvhh, rseq, devnum, time;
+        PrintTaxN::parseResponse(jsonOut, firm, hvhh, fiscal, rseq, sn, address, devnum, time);
         db[":f_id"] = h["f_id"].toString().toInt();
         db.exec("delete from o_tax where f_id=:f_id");
         db[":f_id"] = h["f_id"].toString().toInt();
@@ -452,6 +462,7 @@ int C5WaiterServer::printTax(const QJsonObject &h, const QJsonArray &ja, C5Datab
         db[":f_receiptnumber"] = rseq;
         db[":f_hvhh"] = hvhh;
         db[":f_fiscalmode"] = tr("(F)");
+        db[":f_time"] = time;
         db.insert("o_tax", false);
     }
     return result;

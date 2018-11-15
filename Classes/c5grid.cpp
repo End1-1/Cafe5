@@ -22,7 +22,7 @@ C5Grid::C5Grid(const QStringList &dbParams, QWidget *parent) :
     fTableView = ui->tblView;
     fTableView->horizontalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(fTableView->horizontalHeader(), SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(tableViewContextMenuRequested(QPoint)));
-    connect(fTableView->horizontalHeader(), SIGNAL(clicked(QModelIndex)), this, SLOT(tableViewHeaderClicked(QModelIndex)));
+    connect(fTableView->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(tableViewHeaderClicked(int)));
     connect(fTableView->horizontalHeader(), SIGNAL(sectionResized(int,int,int)), this, SLOT(tableViewHeaderResized(int,int,int)));
     connect(fTableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(selectionChanged(QItemSelection,QItemSelection)));
     fFilterWidget = 0;
@@ -31,6 +31,9 @@ C5Grid::C5Grid(const QStringList &dbParams, QWidget *parent) :
 
 C5Grid::~C5Grid()
 {
+    if (fFilterWidget) {
+        delete fFilterWidget;
+    }
     delete ui;
 }
 
@@ -83,7 +86,6 @@ void C5Grid::buildQuery()
         QRegExp re("\\b[a-z]*\\.");
         re.setMinimal(true);
         while ((p = re.indexIn(fWhereCondition, p)) != -1) {
-            qDebug() << re.capturedTexts() << re.captureCount();
             QString table = re.cap(0);
             p += re.matchedLength();
             table = table.remove(table.length() - 1, 1);
@@ -285,8 +287,8 @@ int C5Grid::sumOfColumnsWidghtBefore(int column)
 
 void C5Grid::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
 {
-    qDebug() << selected.indexes();
-    qDebug() << deselected.indexes();
+    Q_UNUSED(selected);
+    Q_UNUSED(deselected);
 }
 
 void C5Grid::filterByColumn()
@@ -345,31 +347,38 @@ void C5Grid::removeRow(int columnWithId)
 void C5Grid::print()
 {
     QFont font(qApp->font());
-    font.setPointSize(8);
+    font.setPointSize(20);
     C5Printing p;
-    QSize paperSize(200, 280);
-    QPrinter::Orientation paperPos = QPrinter::Portrait;
-    p.setSceneParams(paperSize.width(), paperSize.height(), paperPos);
+    QSize paperSize(2000, 2800);
     p.setFont(font);
     int page = p.currentPageIndex();
     int startFrom = 0;
     bool stopped = false;
     int columnsWidth = 0;
-    qreal scaleFactor = 3.2;
-    qreal rowScaleFactor = 4;
+    qreal scaleFactor = 0.45;
+    qreal rowScaleFactor = 0.79;
     for (int i = 0; i < fModel->columnCount(); i++) {
         columnsWidth += fTableView->columnWidth(i);
     }
     columnsWidth /= scaleFactor;
+    if (columnsWidth > 2000) {
+        p.setSceneParams(paperSize.height(), paperSize.width(), QPrinter::Landscape);
+    } else {
+        p.setSceneParams(paperSize.width(), paperSize.height(), QPrinter::Portrait);
+    }
     do {
         p.setFontBold(true);
         p.ltext(QString("%1 %2")
                 .arg(fLabel)
                 .arg(reportAdditionalTitle()), 0);
-        // for width test p.line(0, p.fTop, 50, p.fTop);
+//#ifdef QT_DEBUG
+//        p.line(0, p.fTop, 500, p.fTop);
+//        p.br();
+//        p.line(0, p.fTop, 1000, p.fTop);
+//        p.br();
+//#endif
         p.br();
-        p.br();
-        p.setFontSize(7);
+        p.setFontBold(false);
         p.line(0, p.fTop, columnsWidth, p.fTop);
         for (int c = 0; c < fModel->columnCount(); c++) {
             if (c > 0) {
@@ -381,7 +390,6 @@ void C5Grid::print()
             }
         }
         p.line(columnsWidth, p.fTop, columnsWidth, p.fTop + (fTableView->verticalHeader()->defaultSectionSize() / rowScaleFactor));
-        p.setFontBold(false);
         p.br();
         p.line(0, p.fTop, columnsWidth, p.fTop);
         for (int r = startFrom; r < fModel->rowCount(); r++) {
@@ -403,15 +411,18 @@ void C5Grid::print()
                 startFrom = r + 1;
                 stopped = startFrom >= fModel->rowCount() - 1;
                 p.fTop = p.fNormalHeight - p.fLineHeight;
-                p.ltext(QString("%1 %2, %3 %4")
+                p.ltext(QString("%1 %2, %3 %4, %5/%6")
                         .arg("Page")
                         .arg(page + 1)
                         .arg(tr("Printed"))
-                        .arg(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR2)), 0);
+                        .arg(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR2))
+                        .arg(hostinfo)
+                        .arg(hostusername()), 0);
                 p.rtext(fDBParams.at(1));
                 if (r < fModel->rowCount() - 1) {
                     p.br(p.fLineHeight * 4);
                 }
+                page++;
                 break;
             } else {
                 //p.line(0, p.fTop + (fTableView->rowHeight(r) / scaleFactor), sumOfColumnsWidghtBefore(fModel->columnCount()) / scaleFactor, p.fTop + (fTableView->rowHeight(r) / scaleFactor));
@@ -490,9 +501,9 @@ void C5Grid::tableViewContextMenuRequested(const QPoint &point)
     m.exec(fTableView->mapToGlobal(point));
 }
 
-void C5Grid::tableViewHeaderClicked(const QModelIndex &index)
+void C5Grid::tableViewHeaderClicked(int index)
 {
-    fModel->sort(index.column());
+    fModel->sort(index);
 }
 
 void C5Grid::tableViewHeaderResized(int column, int oldSize, int newSize)

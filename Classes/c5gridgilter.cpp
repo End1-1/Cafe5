@@ -20,6 +20,18 @@ bool C5GridGilter::filter(C5FilterWidget *filterWidget, QString &condition, QMap
 {
     C5GridGilter *gf = new C5GridGilter(C5Config::fParentWidget);
     gf->ui->vl->addWidget(filterWidget);
+    if (filterWidget->children().count() > 0) {
+        QObjectList ol = filterWidget->children();
+        foreach (QObject *o, ol) {
+            QWidget *w = dynamic_cast<QWidget*>(o);
+            if (w) {
+                if (w->focusPolicy() == Qt::StrongFocus && w->previousInFocusChain() == 0) {
+                    w->setFocus();
+                    break;
+                }
+            }
+        }
+    }
     QListWidget *lv = gf->ui->lvColumns;
     for (QMap<QString, bool>::const_iterator it = showColumns.begin(); it != showColumns.end(); it++) {
         QListWidgetItem *item = new QListWidgetItem(lv);

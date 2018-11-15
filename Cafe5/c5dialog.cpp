@@ -26,6 +26,22 @@ C5SocketHandler *C5Dialog::createSocketHandler(const char *slot)
     return s;
 }
 
+void C5Dialog::keyPressEvent(QKeyEvent *e)
+{
+    switch (e->key()) {
+    case Qt::Key_Enter:
+    case Qt::Key_Return:
+        if (e->modifiers() & Qt::ControlModifier) {
+            QDialog::keyPressEvent(e);
+        } else {
+            focusNextChild();
+        }
+        e->ignore();
+        return;
+    }
+    QDialog::keyPressEvent(e);
+}
+
 void C5Dialog::handleError(int err, const QString &msg)
 {
     Q_UNUSED(err);

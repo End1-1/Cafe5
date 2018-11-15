@@ -17,6 +17,7 @@
 #define cp_t2_store_output 202
 #define cp_t2_store_move 203
 #define cp_t2_store_inventory 204
+#define cp_t2_count_output_of_sale 205
 
 #define cp_t3_reports 300
 #define cp_t3_sales_common 301

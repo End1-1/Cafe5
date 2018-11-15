@@ -26,8 +26,8 @@ void C5PrintRemovedServiceThread::print(const QString &printName)
 {
     QFont font(qApp->font());
     font.setPointSize(10);
-    C5Printing p(printName);
-    p.setSceneParams(70, 280, QPrinter::Portrait);
+    C5Printing p;
+    p.setSceneParams(650, 2800, QPrinter::Portrait);
     p.setFont(font);
 
     p.image(":/cancel.png", Qt::AlignHCenter);
@@ -69,5 +69,5 @@ void C5PrintRemovedServiceThread::print(const QString &printName)
     p.br();
     p.ltext(tr("Storage: ") + storages.toList().join(","), 0);
 
-    p.print();
+    p.print(printName, QPrinter::Custom);
 }

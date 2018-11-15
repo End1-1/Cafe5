@@ -20,6 +20,7 @@
 #include "cr5goodspartners.h"
 #include "cr5goodswaste.h"
 #include "cr5goodsunit.h"
+#include "cr5menunames.h"
 #include "cr5materialsinstore.h"
 #include "cr5goods.h"
 #include "cr5users.h"
@@ -157,6 +158,7 @@ void C5MainWindow::on_actionLogin_triggered()
             addTreeL3Item(it, cp_t2_store_output, tr("New store output"), ":/goods.png");
             addTreeL3Item(it, cp_t2_store_move, tr("New store movement"), ":/goods.png");
             addTreeL3Item(it, cp_t2_store_inventory, tr("New store inventory"), ":/goods.png");
+            addTreeL3Item(it, cp_t2_count_output_of_sale, tr("Count output of sales from store"), ":/goods.png");
         }
 
         if (pr(db.getString(0), cp_t3_reports)) {
@@ -181,6 +183,7 @@ void C5MainWindow::on_actionLogin_triggered()
             addTreeL3Item(it, cp_t4_part1, tr("Dish depts"), ":/menu.png");
             addTreeL3Item(it, cp_t4_part2, tr("Types of dishes"), ":/menu.png");
             addTreeL3Item(it, cp_t4_dishes, tr("Dishes list"), ":/menu.png");
+            addTreeL3Item(it, cp_t4_menu_names, tr("Menu names"), ":/menu.png");
         }
 
         if (pr(db.getString(0), cp_t6_goods_menu)) {
@@ -208,6 +211,9 @@ void C5MainWindow::on_actionLogin_triggered()
             addTreeL3Item(it, cp_t1_databases, tr("Databases"), ":/database.png");
             addTreeL3Item(it, cp_t1_settigns, tr("Settings"), ":/configure.png");
         }
+    }
+    if (ui->twDb->topLevelItemCount() == 1) {
+        ui->twDb->expandAll();
     }
     enableMenu(true);
 }
@@ -318,6 +324,9 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
         break;
     case cp_t4_dishes:
         createTab<CR5Dish>(dbParams);
+        break;
+    case cp_t4_menu_names:
+        createTab<CR5MenuNames>(dbParams);
         break;
     case cp_t6_units:
         createTab<CR5GoodsUnit>(dbParams);

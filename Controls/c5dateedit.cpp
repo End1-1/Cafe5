@@ -5,7 +5,7 @@ QDate C5DateEditFirstDate = QDate::currentDate();
 QDate C5DateEditMinDate = QDate::fromString("01/01/1900", "dd/MM/yyyy");
 
 C5DateEdit::C5DateEdit(QWidget *parent) :
-    QLineEdit(parent)
+    C5LineEdit(parent)
 {
     setInputMask("00/00/0000");
     setDate(C5DateEditFirstDate);

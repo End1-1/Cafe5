@@ -1,10 +1,10 @@
 #ifndef EDATEEDIT_H
 #define EDATEEDIT_H
 
-#include <QLineEdit>
+#include "c5lineedit.h"
 #include <QDate>
 
-class C5DateEdit : public QLineEdit
+class C5DateEdit : public C5LineEdit
 {
     Q_OBJECT
     Q_PROPERTY(QString Field READ getField WRITE setField)

@@ -14,6 +14,8 @@ public:
 
     void execQuery(const QString &query);
 
+    void sort(int column);
+
     void setExternalData(const QMap<QString, int> &columnNameIndex, const QMap<QString, QString> &translation);
 
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
@@ -74,6 +76,10 @@ public:
 
 private:
     C5Database &fDb;
+
+    bool fSortAsc;
+
+    int fLastSortedColumn;
 
     QList<int> fProxyData;
 

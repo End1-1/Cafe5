@@ -3,6 +3,7 @@
 #include "c5printing.h"
 #include <QPrinterInfo>
 #include <QMatrix>
+#include <QGraphicsScene>
 
 C5PrintPreview::C5PrintPreview(C5Printing *printData, const QStringList &dbParams, QWidget *parent) :
     C5Dialog(dbParams, parent),
@@ -50,19 +51,18 @@ void C5PrintPreview::renderPage()
 
 void C5PrintPreview::zoom()
 {
-    qreal z = ui->cbZoom->currentText().remove(ui->cbZoom->currentText().length() - 1, 1).toInt();
-    z /= 30.0;
-    QSizeF s(fPrintData->orientation(fPageNumber - 1) == QPrinter::Portrait ? QSizeF(200.0, 280.0) : QSizeF(280.0, 200.0));
-    s.setWidth(s.width() * z);
-    s.setHeight(s.height() * z);
-    ui->gv->setMinimumSize(s.toSize());
-    ui->gv->setMaximumSize(s.toSize());
-    z /= 3.35;
     if (fScaleFactor > 0.0) {
         ui->gv->scale(1 / fScaleFactor, 1 / fScaleFactor);
     }
+    qreal z = ui->cbZoom->currentText().remove(ui->cbZoom->currentText().length() - 1, 1).toInt() / 100.0;
+    z /= 2.5;
     fScaleFactor = z;
-    ui->gv->scale(z, z);
+    QRectF r(fPrintData->page(fPageNumber - 1)->sceneRect());
+    r.setWidth(r.width() * z);
+    r.setHeight(r.height() * z);
+    ui->gv->setMinimumSize(r.size().toSize());
+    ui->gv->setMaximumSize(r.size().toSize());
+    ui->gv->scale(fScaleFactor, fScaleFactor);
 }
 
 void C5PrintPreview::on_cbPrintSelection_currentIndexChanged(int index)
@@ -78,28 +78,7 @@ void C5PrintPreview::on_cbZoom_currentIndexChanged(int index)
 
 void C5PrintPreview::on_btnPrint_clicked()
 {
-    QPrinter printer(QPrinter::HighResolution);
-    printer.setPrinterName(ui->cbPrinters->currentText());
-    QPrinter::Margins margins;
-    margins.left = 0;
-    margins.top = 0;
-    margins.bottom = 0;
-    margins.right = 0;
-    printer.setMargins(margins);
-    QPainter painter(&printer);
-    QMatrix matrix;
-    qreal scale = (static_cast<double>(printer.resolution()) / static_cast<double>(fPrintData->resolution())) * 0.8;
-    matrix.scale(scale, scale);
-    painter.setMatrix(matrix);
-    for (int i = 0; i < fPrintData->pageCount(); i++) {
-        printer.setOrientation(fPrintData->orientation(i));
-        if (i > 0) {
-            printer.newPage();
-        }
-        QGraphicsScene *s = fPrintData->page(i);
-        qDebug() << s->sceneRect().size();
-        s->render(&painter);
-    }
+    fPrintData->print(ui->cbPrinters->currentText(), QPrinter::A4);
 }
 
 void C5PrintPreview::on_cbPrinters_currentIndexChanged(const QString &arg1)

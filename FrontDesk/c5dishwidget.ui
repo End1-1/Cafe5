@@ -6,13 +6,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>571</width>
+    <width>675</width>
     <height>436</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>300</width>
+    <width>600</width>
     <height>0</height>
    </size>
   </property>
@@ -36,11 +36,86 @@
     <number>0</number>
    </property>
    <item>
+    <widget class="QLabel" name="lbName">
+     <property name="styleSheet">
+      <string notr="true">font-weight:bold;
+font-size:12px;</string>
+     </property>
+     <property name="text">
+      <string>Name</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QGroupBox" name="groupBox">
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>300</height>
+      </size>
+     </property>
      <property name="title">
       <string>Menu</string>
      </property>
-     <layout class="QHBoxLayout" name="hlMenu"/>
+     <layout class="QHBoxLayout" name="hlMenu">
+      <property name="leftMargin">
+       <number>1</number>
+      </property>
+      <property name="topMargin">
+       <number>1</number>
+      </property>
+      <property name="rightMargin">
+       <number>1</number>
+      </property>
+      <property name="bottomMargin">
+       <number>1</number>
+      </property>
+      <item>
+       <widget class="C5TableWidget" name="tblPricing">
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <column>
+         <property name="text">
+          <string>Menu record</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Menu code</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Menu name</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Price</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Store</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Print1</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Print2</string>
+         </property>
+        </column>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>
@@ -48,11 +123,175 @@
      <property name="title">
       <string>Recipes</string>
      </property>
-     <layout class="QHBoxLayout" name="hlRecipe"/>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QWidget" name="widget" native="true">
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QPushButton" name="btnAddRecipe">
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources/res.qrc">
+             <normaloff>:/add.png</normaloff>:/add.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnRemoveRecipe">
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources/res.qrc">
+             <normaloff>:/remove.png</normaloff>:/remove.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>584</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="C5TableWidget" name="tblRecipe">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>2</verstretch>
+         </sizepolicy>
+        </property>
+        <column>
+         <property name="text">
+          <string>Record</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Goods code</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Goods name</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Qty</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Unit</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Price</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Total</string>
+         </property>
+        </column>
+       </widget>
+      </item>
+      <item>
+       <widget class="QWidget" name="widget_2" native="true">
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>473</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Total self cost</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="C5LineEdit" name="leTotal">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>100</width>
+             <height>16777215</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
   </layout>
  </widget>
- <resources/>
+ <customwidgets>
+  <customwidget>
+   <class>C5LineEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5lineedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5TableWidget</class>
+   <extends>QTableWidget</extends>
+   <header location="global">c5tablewidget.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../resources/res.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -6,7 +6,8 @@ C5TableModel::C5TableModel(C5Database &db, QObject *parent) :
     QAbstractTableModel(parent),
     fDb(db)
 {
-
+    fSortAsc = true;
+    fLastSortedColumn = -1;
 }
 
 void C5TableModel::translate(const QMap<QString, QString> &t)
@@ -24,6 +25,26 @@ void C5TableModel::execQuery(const QString &query)
     }
     for (QMap<QString, int>::const_iterator it = fColumnNameIndex.begin(); it != fColumnNameIndex.end(); it++) {
         fColumnIndexName[it.value()] = it.key();
+    }
+    endResetModel();
+}
+
+void C5TableModel::sort(int column)
+{
+    if (fLastSortedColumn == column) {
+        fSortAsc = !fSortAsc;
+    } else {
+        fSortAsc = true;
+    }
+    fLastSortedColumn = column;
+    QMap<QVariant, int> data;
+    foreach (int i, fProxyData) {
+        data.insertMulti(fRawData[i][column], i);
+    }
+    beginResetModel();
+    fProxyData = data.values();
+    if (!fSortAsc) {
+        std::reverse(fProxyData.begin(), fProxyData.end());
     }
     endResetModel();
 }

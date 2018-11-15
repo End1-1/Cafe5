@@ -12,6 +12,7 @@
 class C5Dialog : public QDialog
 {
     Q_OBJECT
+
 public:
     C5Dialog(const QStringList &dbParams, QWidget *parent = 0);
 
@@ -32,6 +33,8 @@ public:
 
 protected:
     const QStringList &fDBParams;
+
+    virtual void keyPressEvent(QKeyEvent *e);
 
 protected slots:
     void handleError(int err, const QString &msg);

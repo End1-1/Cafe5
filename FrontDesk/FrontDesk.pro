@@ -90,7 +90,10 @@ SOURCES += \
     ../Controls/c5graphicsview.cpp \
     c5storeinventory.cpp \
     ../Reports/cr5tstoreextra.cpp \
-    ../Reports/cr5tstoreextrafilter.cpp
+    ../Reports/cr5tstoreextrafilter.cpp \
+    ../Reports/cr5menunames.cpp \
+    ../Classes/c5datedelegate.cpp \
+    ../Reports/cr5documentsfilter.cpp
 
 HEADERS += \
         c5mainwindow.h \
@@ -152,7 +155,10 @@ HEADERS += \
     ../Controls/c5graphicsview.h \
     c5storeinventory.h \
     ../Reports/cr5tstoreextra.h \
-    ../Reports/cr5tstoreextrafilter.h
+    ../Reports/cr5tstoreextrafilter.h \
+    ../Reports/cr5menunames.h \
+    ../Classes/c5datedelegate.h \
+    ../Reports/cr5documentsfilter.h
 
 FORMS += \
         c5mainwindow.ui \
@@ -173,7 +179,8 @@ FORMS += \
     ../Reports/cr5goodsmovementfilter.ui \
     ../Classes/c5printpreview.ui \
     c5storeinventory.ui \
-    ../Reports/cr5tstoreextrafilter.ui
+    ../Reports/cr5tstoreextrafilter.ui \
+    ../Reports/cr5documentsfilter.ui
 
 INCLUDEPATH += ../Cafe5
 INCLUDEPATH += ../Classes

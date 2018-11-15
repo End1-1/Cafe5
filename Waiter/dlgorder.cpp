@@ -168,7 +168,7 @@ void DlgOrder::loadOrder(const QJsonObject &obj)
         fOrder->setHeaderValue("f_staff", fUser->fId);
         fOrder->setHeaderValue("f_staffname", fUser->fFull);
         fOrder->setHeaderValue("f_state", ORDER_STATE_OPEN);
-        fOrder->setHeaderValue("f_prefix", "");
+        fOrder->setHeaderValue("f_prefix", C5Config::orderPrefix());
         fOrder->setHeaderValue("f_comment", "");
         fOrder->setHeaderValue("f_hall", obj["table"].toArray().at(0)["f_hall"].toString());
         fOrder->setHeaderValue("f_amounttotal", 0);
