@@ -58,7 +58,6 @@ QToolBar *CR5Dish::toolBar()
 void CR5Dish::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
 {
     Q_UNUSED(selected);
-    Q_UNUSED(deselected);
     int newId = rowId();
     if (deselected.indexes().count() > 0) {
         fModel->saveDataChanges();

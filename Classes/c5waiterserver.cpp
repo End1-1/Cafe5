@@ -125,7 +125,7 @@ void C5WaiterServer::reply(QJsonObject &o)
                 QJsonArray jb;
                 bv[":f_table"] = fIn["table"].toInt();
                 bv[":f_state"] = ORDER_STATE_OPEN;
-                srh.getJsonFromQuery("select h.f_prefix, h.f_name as f_hallname, t.f_name as f_tableName, concat(s.f_last, ' ', s.f_first) as f_staffname, \
+                srh.getJsonFromQuery("select o.f_prefix, h.f_name as f_hallname, t.f_name as f_tableName, concat(s.f_last, ' ', s.f_first) as f_staffname, \
                     o.* \
                     from o_header o \
                     left join h_tables t on t.f_id=o.f_table \
@@ -323,7 +323,7 @@ void C5WaiterServer::reply(QJsonObject &o)
             srh.fDb[":f_dateClose"] = QDate::currentDate();
             srh.fDb[":f_dateCash"] = QDate::currentDate();
             srh.fDb[":f_timeClose"] = QTime::currentTime();
-            srh.fDb[":f_staff"] = jh["f_currentStaff"].toString().toInt();
+            srh.fDb[":f_staff"] = jh["f_currentstaff"].toString().toInt();
             srh.fDb.update("o_header", where_id(jh["f_id"].toString()));
             srh.fDb[":f_lock"] = 0;
             srh.fDb[":f_lockSrc"] = "";

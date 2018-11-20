@@ -127,7 +127,6 @@ void C5DishWidget::save(int id)
         db[":f_goods"] = ui->tblRecipe->getInteger(i, 1);
         db[":f_qty"] = ui->tblRecipe->lineEdit(i, 3)->getDouble();
         db[":f_price"] = ui->tblRecipe->lineEdit(i, 5)->getDouble();
-        db[":f_total"] = ui->tblRecipe->lineEdit(i, 6)->getDouble();
         if (ui->tblRecipe->getInteger(i, 0) == 0) {
             ui->tblRecipe->setInteger(i, 0, db.insert("d_recipes"));
         } else {
@@ -150,6 +149,8 @@ void C5DishWidget::on_btnAddRecipe_clicked()
     ui->tblRecipe->setInteger(row, 1, values.at(0).toInt());
     ui->tblRecipe->setString(row, 2, values.at(2).toString());
     ui->tblRecipe->setString(row, 4, values.at(3).toString());
+    ui->tblRecipe->createLineEdit(row, 5)->setDouble(0);
+    ui->tblRecipe->createLineEdit(row, 6)->setDouble(0);
     l->setFocus();
 }
 

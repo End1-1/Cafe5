@@ -1,11 +1,13 @@
 #include "c5tablewidget.h"
 #include "c5lineedit.h"
 #include "c5combobox.h"
+#include "excel.h"
+#include <QHeaderView>
 
 C5TableWidget::C5TableWidget(QWidget *parent) :
     QTableWidget(parent)
 {
-
+    setEditTriggers(NoEditTriggers);
 }
 
 void C5TableWidget::setColumnWidths(int count, ...)
@@ -97,4 +99,31 @@ int C5TableWidget::addEmptyRow()
         setItem(row, i, new QTableWidgetItem());
     }
     return row;
+}
+
+void C5TableWidget::exportToExcel()
+{
+    int colCount = columnCount();
+    if (colCount == 0 || rowCount() == 0) {
+        return;
+    }
+    Excel e;
+    for (int i = 0; i < colCount; i++) {
+        e.setValue(horizontalHeaderItem(i)->text(), 1, i + 1);
+        e.setColumnWidth(i + 1, columnWidth(i) / 7);
+    }
+    QColor color = QColor::fromRgb(200, 200, 250);
+    e.setBackground(e.address(0, 0), e.address(0, colCount - 1),
+                     color.red(), color.green(), color.blue());
+    e.setFontBold(e.address(0, 0), e.address(0, colCount - 1));
+    e.setHorizontalAlignment(e.address(0, 0), e.address(0, colCount - 1), Excel::hCenter);
+
+    for (int j = 0; j < rowCount(); j++) {
+        for (int i = 0; i < colCount; i++) {
+            e.setValue(getString(j, i), j + 2, i + 1);
+        }
+    }
+
+    e.setFontSize(e.address(0, 0), e.address(rowCount() , colCount ), 10);
+    e.show();
 }

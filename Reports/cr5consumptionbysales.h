@@ -1,18 +1,17 @@
-#ifndef CR5TSTOREEXTRA_H
-#define CR5TSTOREEXTRA_H
+#ifndef CR5CONSUMPTIONBYSALES_H
+#define CR5CONSUMPTIONBYSALES_H
 
 #include "c5reportwidget.h"
 
-class CR5TStoreExtra : public C5ReportWidget
+class CR5ConsumptionBySales : public C5ReportWidget
 {
     Q_OBJECT
 
 public:
-    CR5TStoreExtra(const QStringList &dbParams, QWidget *parent = 0);
+    CR5ConsumptionBySales(const QStringList &dbParams, QWidget *parent = 0);
 
     virtual QToolBar *toolBar();
 
-protected:
     virtual void buildQuery();
 
     virtual void refreshData();
@@ -24,6 +23,8 @@ private:
 
 private slots:
     void tblDoubleClicked(int row, int column, const QList<QVariant> &values);
+
+    void makeOutput(bool v);
 };
 
-#endif // CR5TSTOREEXTRA_H
+#endif // CR5CONSUMPTIONBYSALES_H

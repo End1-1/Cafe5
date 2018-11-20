@@ -93,7 +93,9 @@ SOURCES += \
     ../Reports/cr5tstoreextrafilter.cpp \
     ../Reports/cr5menunames.cpp \
     ../Classes/c5datedelegate.cpp \
-    ../Reports/cr5documentsfilter.cpp
+    ../Reports/cr5documentsfilter.cpp \
+    ../Reports/cr5consumptionbysales.cpp \
+    ../Reports/cr5consumptionbysalesfilter.cpp
 
 HEADERS += \
         c5mainwindow.h \
@@ -158,7 +160,9 @@ HEADERS += \
     ../Reports/cr5tstoreextrafilter.h \
     ../Reports/cr5menunames.h \
     ../Classes/c5datedelegate.h \
-    ../Reports/cr5documentsfilter.h
+    ../Reports/cr5documentsfilter.h \
+    ../Reports/cr5consumptionbysales.h \
+    ../Reports/cr5consumptionbysalesfilter.h
 
 FORMS += \
         c5mainwindow.ui \
@@ -180,7 +184,8 @@ FORMS += \
     ../Classes/c5printpreview.ui \
     c5storeinventory.ui \
     ../Reports/cr5tstoreextrafilter.ui \
-    ../Reports/cr5documentsfilter.ui
+    ../Reports/cr5documentsfilter.ui \
+    ../Reports/cr5consumptionbysalesfilter.ui
 
 INCLUDEPATH += ../Cafe5
 INCLUDEPATH += ../Classes
@@ -190,7 +195,8 @@ INCLUDEPATH += ../Cache
 INCLUDEPATH += ../RESOURCES
 
 RESOURCES += \
-    ../resources/res.qrc
+    ../resources/res.qrc \
+    lang.qrc
 
 QMAKE_CXXFLAGS += -Werror
 

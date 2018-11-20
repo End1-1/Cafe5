@@ -7,6 +7,7 @@
 #include "c5widget.h"
 #include "cr5commonsales.h"
 #include "cr5usersgroups.h"
+#include "cr5consumptionbysales.h"
 #include "cr5documents.h"
 #include "cr5dish.h"
 #include "cr5settings.h"
@@ -51,6 +52,8 @@ C5MainWindow::C5MainWindow(QWidget *parent) :
     connect(f3, SIGNAL(activated()), this, SLOT(hotKey()));
     QShortcut *esc = new QShortcut(QKeySequence("ESC"), this);
     connect(esc, SIGNAL(activated()), this, SLOT(hotKey()));
+    QShortcut *ctrlPlush = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Plus), this);
+    connect(ctrlPlush, SIGNAL(activated()), this, SLOT(hotKey()));
     __mainWindow = this;
 }
 
@@ -158,7 +161,6 @@ void C5MainWindow::on_actionLogin_triggered()
             addTreeL3Item(it, cp_t2_store_output, tr("New store output"), ":/goods.png");
             addTreeL3Item(it, cp_t2_store_move, tr("New store movement"), ":/goods.png");
             addTreeL3Item(it, cp_t2_store_inventory, tr("New store inventory"), ":/goods.png");
-            addTreeL3Item(it, cp_t2_count_output_of_sale, tr("Count output of sales from store"), ":/goods.png");
         }
 
         if (pr(db.getString(0), cp_t3_reports)) {
@@ -171,6 +173,7 @@ void C5MainWindow::on_actionLogin_triggered()
             addTreeL3Item(it, cp_t3_store, tr("Storage"), ":/goods.png");
             addTreeL3Item(it, cp_t3_store_movement, tr("Storages movements"), ":/goods.png");
             addTreeL3Item(it, cp_t3_tstore_extra, tr("T-account, extra"), ":/documents.png");
+            addTreeL3Item(it, cp_t2_count_output_of_sale, tr("Consumption of goods based on sales"), ":/goods.png");
             addTreeL3Item(it, cp_t3_sales_common, tr("Sales, expert mode"), ":/graph.png");
         }
 
@@ -300,6 +303,9 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
     }
     case cp_t2_store_inventory:
         createTab<C5StoreInventory>(dbParams);
+        break;
+    case cp_t2_count_output_of_sale:
+        createTab<CR5ConsumptionBySales>(dbParams);
         break;
     case cp_t3_sales_common:
         createTab<CR5CommonSales>(dbParams);

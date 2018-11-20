@@ -25,7 +25,7 @@ bool C5GridGilter::filter(C5FilterWidget *filterWidget, QString &condition, QMap
         foreach (QObject *o, ol) {
             QWidget *w = dynamic_cast<QWidget*>(o);
             if (w) {
-                if (w->focusPolicy() == Qt::StrongFocus && w->previousInFocusChain() == 0) {
+                if (w->focusPolicy() == Qt::StrongFocus) {
                     w->setFocus();
                     break;
                 }

@@ -73,6 +73,12 @@ QToolBar *CR5Documents::toolBar()
             << ToolBarButtons::tbExcel
             << ToolBarButtons::tbPrint;
         fToolBar = createStandartToolbar(btn);
+        QAction *a = new QAction(QIcon(":/save.png"), tr("Save\ndocuments"));
+        connect(a, SIGNAL(triggered()), this, SLOT(saveDocs()));
+        fToolBar->insertAction(fToolBar->actions().at(0), a);
+        a = new QAction(QIcon(":/draft.png"), tr("Create\ndraft"));
+        connect(a, SIGNAL(triggered()), this, SLOT(draftDocs()));
+        fToolBar->insertAction(fToolBar->actions().at(1), a);
     }
     return fToolBar;
 }
@@ -144,4 +150,112 @@ int CR5Documents::docType(int id)
         return 0;
     }
     return db.getInt(0);
+}
+
+void CR5Documents::saveDocs()
+{
+    if (!fColumnsVisible["h.f_id"]) {
+        C5Message::error(tr("Please, set the 'Code' column to visible."));
+        return;
+    }
+    QModelIndexList ml = fTableView->selectionModel()->selectedIndexes();
+    if (ml.count() == 0) {
+        return;
+    }
+    if (C5Message::question(tr("Confirm to save selected documents")) != QDialog::Accepted) {
+        return;
+    }
+    QSet<int> rowsTemp;
+    foreach (QModelIndex mi, ml) {
+        rowsTemp << mi.row();
+    }
+    QList<int> rows = rowsTemp.toList();
+    std::sort(rows.begin(), rows.end());
+    C5Database db(fDBParams);
+    QString err;
+    foreach (int row, rows) {
+        int docid = fModel->data(row, fModel->indexForColumnName("f_id"), Qt::EditRole).toInt();
+        db[":f_id"] = docid;
+        db.exec("select * from a_header where f_id=:f_id");
+        if (!db.nextRow()) {
+            continue;
+        }
+        if (db.getInt("f_state") == DOC_STATE_SAVED) {
+            continue;
+        }
+        C5StoreDoc d(fDBParams);
+        QString e;
+        switch (db.getInt("f_type")) {
+        case DOC_TYPE_STORE_INPUT:
+        case DOC_TYPE_STORE_MOVE:
+        case DOC_TYPE_STORE_OUTPUT:
+            d.openDoc(docid);
+            if (d.save(DOC_STATE_SAVED, e, false)) {
+                fModel->setData(row, fModel->indexForColumnName("f_statename"), tr("Saved"));
+                fModel->setData(row, fModel->indexForColumnName("f_amount"), 0);
+            } else {
+                err += e;
+            }
+            e = "";
+            break;
+        default:
+            continue;
+            break;
+        }
+    }
+    if (!err.isEmpty()) {
+        C5Message::error(err);
+    }
+}
+
+void CR5Documents::draftDocs()
+{
+    if (!fColumnsVisible["h.f_id"]) {
+        C5Message::error(tr("Please, set the 'Code' column to visible."));
+        return;
+    }
+    QModelIndexList ml = fTableView->selectionModel()->selectedIndexes();
+    if (ml.count() == 0) {
+        return;
+    }
+    if (C5Message::question(tr("Confirm to create draft for selected documents")) != QDialog::Accepted) {
+        return;
+    }
+    QSet<int> rowsTemp;
+    foreach (QModelIndex mi, ml) {
+        rowsTemp << mi.row();
+    }
+    QList<int> rows = rowsTemp.toList();
+    std::sort(rows.begin(), rows.end());
+    C5Database db(fDBParams);
+    QString err;
+    foreach (int row, rows) {
+        int docid = fModel->data(row, fModel->indexForColumnName("f_id"), Qt::EditRole).toInt();
+        db[":f_id"] = docid;
+        db.exec("select * from a_header where f_id=:f_id");
+        if (!db.nextRow()) {
+            continue;
+        }
+        if (db.getInt("f_state") == DOC_STATE_DRAFT) {
+            continue;
+        }
+        C5StoreDoc d(fDBParams);
+        switch (db.getInt("f_type")) {
+        case DOC_TYPE_STORE_INPUT:
+        case DOC_TYPE_STORE_MOVE:
+        case DOC_TYPE_STORE_OUTPUT:
+            d.openDoc(docid);
+            if (d.save(DOC_STATE_DRAFT, err, false)) {
+                fModel->setData(row, fModel->indexForColumnName("f_statename"), tr("Draft"));
+                fModel->setData(row, fModel->indexForColumnName("f_amount"), 0);
+            }
+            break;
+        default:
+            continue;
+            break;
+        }
+    }
+    if (!err.isEmpty()) {
+        C5Message::error(err);
+    }
 }

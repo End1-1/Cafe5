@@ -44,6 +44,8 @@ public:
 
     void setFilter(int column, const QString &filter);
 
+    virtual void hotKey(const QString &key);
+
 public slots:
     void on_tblView_doubleClicked(const QModelIndex &index);
 
@@ -137,6 +139,8 @@ protected slots:
     virtual void tableViewHeaderResized(int column, int oldSize, int newSize);
 
 private slots:    
+    void autofitColumns();
+
     void filterByColumn();
 
     void removeFilterForColumn();

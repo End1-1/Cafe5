@@ -16,6 +16,8 @@ public:
 
     void setValue(const QString &id);
 
+    void setValue(int id);
+
 protected:
     virtual void mouseDoubleClickEvent(QMouseEvent *e);
 

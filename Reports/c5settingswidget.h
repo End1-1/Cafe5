@@ -18,7 +18,7 @@ public:
 
     void setSettingsId(int id);
 
-    void save();
+    void save(int oldId);
 
     void clear(QWidget *parent);
 

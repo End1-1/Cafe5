@@ -9,7 +9,7 @@ C5StoreInventory::C5StoreInventory(const QStringList &dbParams, QWidget *parent)
 {
     ui->setupUi(this);
     fIcon = ":/goods.png";
-    fLabel = tr("Store document");
+    fLabel = tr("Store inventory");
     ui->leStore->setSelector(fDBParams, ui->leStoreName, cache_goods_store);
     ui->tblGoods->setColumnWidths(7, 0, 0, 300, 80, 80, 80, 80);
 }

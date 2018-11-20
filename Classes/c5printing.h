@@ -11,8 +11,6 @@ class C5Printing
 public:
     C5Printing();
 
-    C5Printing(const QString &printer);
-
     ~C5Printing();
 
     void setSceneParams(qreal width, qreal height, QPrinter::Orientation o);

@@ -39,15 +39,21 @@ QToolBar *CR5Settings::toolBar()
 void CR5Settings::saveDataChanges()
 {
     C5Grid::saveDataChanges();
-    fSettingsWidget->save();
+    fSettingsWidget->save(rowId());
 }
 
 void CR5Settings::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
 {
     Q_UNUSED(selected);
-    Q_UNUSED(deselected);
-    if (int id = rowId()) {
-        fSettingsWidget->setSettingsId(id);
+    int newId = rowId();
+    if (deselected.indexes().count() > 0) {
+        fModel->saveDataChanges();
+        fTableView->viewport()->update();
+        int oldId = fModel->data(deselected.indexes().at(0).row(), 0, Qt::EditRole).toInt();
+        fSettingsWidget->save(oldId);
+    }
+    if (newId > 0) {
+        fSettingsWidget->setSettingsId(newId);
     } else {
         fSettingsWidget->clear(fSettingsWidget);
     }

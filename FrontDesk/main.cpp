@@ -1,6 +1,7 @@
 #include "c5mainwindow.h"
 #include "c5connection.h"
 #include <QApplication>
+#include <QTranslator>
 
 int main(int argc, char *argv[])
 {
@@ -14,6 +15,10 @@ int main(int argc, char *argv[])
     C5Config::fLastUsername = connectionParams.at(5);
 
     QApplication a(argc, argv);
+    QTranslator t;
+    t.load(":/lang/FrontDesk.qm");
+    a.installTranslator(&t);
+
     C5MainWindow w;
     w.showMaximized();
     a.processEvents();

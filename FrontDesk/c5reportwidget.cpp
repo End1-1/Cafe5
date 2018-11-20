@@ -42,6 +42,8 @@ void C5ReportWidget::hotKey(const QString &key)
         fFilterLineEdit->setSelection(0, fFilterLineEdit->text().length());
     } else if (key.toLower() == "esc") {
         widget()->setVisible(false);
+    } else {
+        C5Grid::hotKey(key);
     }
 }
 

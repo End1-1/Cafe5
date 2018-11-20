@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>CR5TStoreExtraFilter</class>
- <widget class="QWidget" name="CR5TStoreExtraFilter">
+ <class>CR5ConsumptionBySalesFilter</class>
+ <widget class="QWidget" name="CR5ConsumptionBySalesFilter">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>399</height>
+    <width>674</width>
+    <height>444</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,12 +17,18 @@
    <item row="0" column="0">
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>Start</string>
+      <string>Date start</string>
      </property>
     </widget>
    </item>
    <item row="0" column="1">
     <widget class="C5DateEdit" name="deStart">
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>0</height>
+      </size>
+     </property>
      <property name="maximumSize">
       <size>
        <width>100</width>
@@ -34,12 +40,18 @@
    <item row="1" column="0">
     <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>End</string>
+      <string>Date end</string>
      </property>
     </widget>
    </item>
    <item row="1" column="1">
     <widget class="C5DateEdit" name="deEnd">
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>0</height>
+      </size>
+     </property>
      <property name="maximumSize">
       <size>
        <width>100</width>
@@ -57,6 +69,12 @@
    </item>
    <item row="2" column="1">
     <widget class="C5LineEditWithSelector" name="leStore">
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>0</height>
+      </size>
+     </property>
      <property name="maximumSize">
       <size>
        <width>100</width>
@@ -70,10 +88,35 @@
      <property name="enabled">
       <bool>false</bool>
      </property>
+     <property name="minimumSize">
+      <size>
+       <width>300</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>300</width>
+       <height>16777215</height>
+      </size>
+     </property>
      <property name="focusPolicy">
       <enum>Qt::NoFocus</enum>
      </property>
     </widget>
+   </item>
+   <item row="2" column="3">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>186</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
    </item>
    <item row="3" column="1">
     <spacer name="verticalSpacer">
@@ -83,7 +126,7 @@
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
-       <height>300</height>
+       <height>342</height>
       </size>
      </property>
     </spacer>
@@ -107,11 +150,6 @@
    <header location="global">c5lineeditwithselector.h</header>
   </customwidget>
  </customwidgets>
- <tabstops>
-  <tabstop>deStart</tabstop>
-  <tabstop>deEnd</tabstop>
-  <tabstop>leStore</tabstop>
- </tabstops>
  <resources/>
  <connections/>
 </ui>

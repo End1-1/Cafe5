@@ -135,6 +135,15 @@ void C5Grid::setFilter(int column, const QString &filter)
     fModel->setFilter(column, filter);
 }
 
+void C5Grid::hotKey(const QString &key)
+{
+    if (key == "Ctrl++") {
+        fTableView->selectAll();
+        return;
+    }
+    C5Widget::hotKey(key);
+}
+
 QWidget *C5Grid::widget()
 {
     return ui->wd;
@@ -498,6 +507,7 @@ void C5Grid::tableViewContextMenuRequested(const QPoint &point)
     QMenu m;
     m.addAction(QIcon(":/filter_set.png"), QString("%1 '%2'").arg(tr("Set filter")).arg(colName), this, SLOT(filterByColumn()));
     m.addAction(QIcon(":/filter_clear.png"), QString("%1 '%2'").arg(tr("Remove filter")).arg(colName), this, SLOT(removeFilterForColumn()));
+    m.addAction(QIcon(":/expand.png"), tr("Autofit columns widths"), this, SLOT(autofitColumns()));
     m.exec(fTableView->mapToGlobal(point));
 }
 
@@ -516,6 +526,11 @@ void C5Grid::tableViewHeaderResized(int column, int oldSize, int newSize)
                 .arg(_MODULE_)
                 .arg(fLabel));
     s.setValue(columnName, newSize);
+}
+
+void C5Grid::autofitColumns()
+{
+    fTableView->resizeColumnsToContents();
 }
 
 void C5Grid::saveDataChanges()

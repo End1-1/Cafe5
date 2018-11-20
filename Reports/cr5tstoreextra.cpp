@@ -183,26 +183,26 @@ void CR5TStoreExtra::refreshData()
     buildQuery();
 }
 
-int CR5TStoreExtra::documentForInventory()
+QString CR5TStoreExtra::documentForInventory()
 {
-    int result = 0;
+    QString result;
     CR5TStoreExtraFilter *f = static_cast<CR5TStoreExtraFilter*>(fFilterWidget);
     C5Database db(fDBParams);
     db[":f_date"] = f->dateEnd();
     db[":f_type"] = DOC_TYPE_STORE_INVENTORY;
     db.exec("select f_id from a_header where f_date=:f_date and f_type=:f_type");
-    bool found = false;
-    while (db.nextRow() && !found) {
+    while (db.nextRow()) {
         C5Database db2(fDBParams);
         db2[":f_document"] = db.getInt(0);
         db2.exec("select * from a_store_inventory where f_document=:f_document");
         if (db2.nextRow()) {
-            result = db.getInt(0);
-            found = true;
-            break;
+            if (!result.isEmpty()) {
+                result += ",";
+            }
+            result += db.getString(0);
         }
     }
-    if (!found) {
+    if (result.isEmpty()) {
         db[":f_state"] = DOC_STATE_SAVED;
         db[":f_type"] = DOC_TYPE_STORE_INVENTORY;
         db[":f_operator"] = __userid;
@@ -213,7 +213,7 @@ int CR5TStoreExtra::documentForInventory()
         db[":f_amount"] = 0;
         db[":f_comment"] = tr("Created automaticaly");
         db[":f_raw"] = "";
-        result = db.insert("a_header");
+        result = QString::number(db.insert("a_header"));
     }
     return result;
 }
@@ -222,24 +222,23 @@ void CR5TStoreExtra::tblDoubleClicked(int row, int column, const QList<QVariant>
 {
     bool ok;
     double qty;
-    int docid;
+    QString docid;
     CR5TStoreExtraFilter *f = static_cast<CR5TStoreExtraFilter*>(fFilterWidget);
     C5Database db(fDBParams);
     switch (column) {
     case 10:
         qty = QInputDialog::getDouble(this, tr("Inventory qty"), tr("Qty"), 0, 0, 100000, 4, &ok);
+        if (!ok) {
+            return;
+        }
         if (qty < 0.0001) {
             C5Message::error(tr("Quantity must be greater than 0"));
             return;
         }
-        if (!ok) {
-            return;
-        }
         docid = documentForInventory();
-        db[":f_document"] = docid;
         db[":f_goods"] = values.at(0);
-        db.exec("delete from a_store_inventory where f_document=:f_document and f_goods=:f_goods");
-        db[":f_document"] = docid;
+        db.exec(QString("delete from a_store_inventory where f_document in (%1) and f_goods=:f_goods").arg(docid));
+        db[":f_document"] = docid.split(",", QString::SkipEmptyParts).at(0);
         db[":f_store"] = f->store();
         db[":f_goods"] = values.at(0);
         db[":f_qty"] = qty;

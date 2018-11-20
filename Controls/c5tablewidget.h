@@ -38,6 +38,8 @@ public:
     void setDouble(int row, int column, double value);
 
     int addEmptyRow();
+
+    void exportToExcel();
 };
 
 #endif // C5TABLEWIDGET_H

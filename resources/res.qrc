@@ -31,5 +31,7 @@
         <file>right-arrow.png</file>
         <file>zoom-in.png</file>
         <file>zoom-out.png</file>
+        <file>expand.png</file>
+        <file>show_list.png</file>
     </qresource>
 </RCC>

@@ -36,6 +36,11 @@ void C5LineEditWithSelector::setValue(const QString &id)
     }
 }
 
+void C5LineEditWithSelector::setValue(int id)
+{
+    setValue(QString::number(id));
+}
+
 void C5LineEditWithSelector::mouseDoubleClickEvent(QMouseEvent *e)
 {
     Q_UNUSED(e);

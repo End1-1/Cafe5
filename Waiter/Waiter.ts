@@ -35,22 +35,22 @@
         <translation>IP հասցե</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.ui" line="109"/>
+        <location filename="../Cafe5/c5connection.ui" line="112"/>
         <source>Save</source>
         <translation>Պահպանել</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.ui" line="116"/>
+        <location filename="../Cafe5/c5connection.ui" line="119"/>
         <source>Test</source>
         <translation>Ստուգել</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.ui" line="123"/>
+        <location filename="../Cafe5/c5connection.ui" line="126"/>
         <source>Init</source>
         <translation>Ստեղցել</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.ui" line="130"/>
+        <location filename="../Cafe5/c5connection.ui" line="133"/>
         <source>Cancel</source>
         <translation>Հրաժարվել</translation>
     </message>
@@ -86,7 +86,7 @@
         <translation>Արդեն ստեղծված է</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="142"/>
+        <location filename="../Cafe5/c5connection.cpp" line="148"/>
         <source>Ready to use</source>
         <translation>Պատրաստ է օգտագործման</translation>
     </message>
@@ -143,62 +143,67 @@
     </message>
     <message>
         <location filename="../Classes/c5printreceiptthread.cpp" line="47"/>
+        <source>Date</source>
+        <translation type="unfinished">Ամսաթիվ</translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5printreceiptthread.cpp" line="50"/>
         <source>(F)</source>
         <translation>(Ֆ)</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printreceiptthread.cpp" line="51"/>
+        <location filename="../Classes/c5printreceiptthread.cpp" line="58"/>
         <source>Order</source>
         <translation>Պատվեր</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printreceiptthread.cpp" line="54"/>
+        <location filename="../Classes/c5printreceiptthread.cpp" line="61"/>
         <source>Table</source>
         <translation>Սեղան</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printreceiptthread.cpp" line="57"/>
+        <location filename="../Classes/c5printreceiptthread.cpp" line="64"/>
         <source>Printed</source>
         <translation>Տպված</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printreceiptthread.cpp" line="60"/>
+        <location filename="../Classes/c5printreceiptthread.cpp" line="67"/>
         <source>Staff</source>
         <translation>Սպասարկող</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printreceiptthread.cpp" line="64"/>
+        <location filename="../Classes/c5printreceiptthread.cpp" line="73"/>
         <source>Class | Name | Qty | Price | Total</source>
         <translation>Դաս | Անվանում | Քանակ | Գին | Ընդամենը</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printreceiptthread.cpp" line="73"/>
+        <location filename="../Classes/c5printreceiptthread.cpp" line="84"/>
         <source>Class</source>
         <translation>Դաս</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printreceiptthread.cpp" line="85"/>
+        <location filename="../Classes/c5printreceiptthread.cpp" line="98"/>
         <source>Total</source>
         <translation>Ընդամենը</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printreceiptthread.cpp" line="89"/>
-        <location filename="../Classes/c5printreceiptthread.cpp" line="94"/>
+        <location filename="../Classes/c5printreceiptthread.cpp" line="102"/>
+        <location filename="../Classes/c5printreceiptthread.cpp" line="107"/>
         <source>Service included</source>
         <translation>Այդ թվում սպասարկում</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printreceiptthread.cpp" line="99"/>
+        <location filename="../Classes/c5printreceiptthread.cpp" line="112"/>
         <source>Need to pay</source>
         <translation>Ենթակա է վճարման</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printreceiptthread.cpp" line="108"/>
+        <location filename="../Classes/c5printreceiptthread.cpp" line="121"/>
         <source>Pay by IDRAM</source>
         <translation>Վճարում IDRAM-ով</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printreceiptthread.cpp" line="142"/>
+        <location filename="../Classes/c5printreceiptthread.cpp" line="155"/>
         <source>Thank you for visit!</source>
         <translation>Շնորհակալություն այցելության համար</translation>
     </message>
@@ -279,12 +284,12 @@
         <translation>Սպասարկող</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="93"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="92"/>
         <source>Printer: </source>
         <translation>Տպիչ` </translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="95"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="94"/>
         <source>Storage: </source>
         <translation>Պահեստ` </translation>
     </message>
@@ -292,48 +297,48 @@
 <context>
     <name>C5WaiterServer</name>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="176"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="177"/>
         <source>Table wasnt unlocked correctly, try again</source>
         <translation>Սեղանը արքելափակված է սխալ, փորձեկ կրկին</translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="182"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="183"/>
         <source>Table locked by </source>
         <translation>Սեղանը խմբավորվում է</translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="187"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="188"/>
         <source>Program error, unknown table id or connection error</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="242"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="244"/>
         <source>You cannot print more then 1 copies of receipt</source>
         <translation>Դուք չէկ կարող տպել հաշիվը մեկ օրինակից ավել</translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="253"/>
-        <location filename="../Classes/c5waiterserver.cpp" line="308"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="255"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="314"/>
         <source>All service must be complited</source>
         <translation>Պատվերը անավարտ է</translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="264"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="266"/>
         <source>Print tax error</source>
         <translation>ՀԴՄ-ի սխալ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="313"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="319"/>
         <source>Receipt was not printed</source>
         <translation>Հաշիվը տպված չէ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="328"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="338"/>
         <source>Unknown command for socket handler from dlgface</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="454"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="464"/>
         <source>(F)</source>
         <translation>(Ֆ)</translation>
     </message>
@@ -506,12 +511,13 @@ AMOUNT</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="dlgpassword.ui" line="370"/>
+        <location filename="dlgpassword.ui" line="379"/>
         <source>TABLE</source>
         <translation>ՍԵՂԱՆ</translation>
     </message>
     <message>
-        <location filename="dlgpassword.cpp" line="63"/>
+        <location filename="dlgpassword.cpp" line="76"/>
+        <location filename="dlgpassword.cpp" line="158"/>
         <source>Access denied</source>
         <translation>Մուտքը արգելված է</translation>
     </message>
@@ -612,12 +618,12 @@ AMOUNT</source>
 <context>
     <name>PrintTaxN</name>
     <message>
-        <location filename="../../NewTax/printtaxn.cpp" line="64"/>
+        <location filename="../../NewTax/printtaxn.cpp" line="65"/>
         <source>Socket read error</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../NewTax/printtaxn.cpp" line="72"/>
+        <location filename="../../NewTax/printtaxn.cpp" line="73"/>
         <source>Data read timeout</source>
         <translation></translation>
     </message>

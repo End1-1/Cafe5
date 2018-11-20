@@ -369,7 +369,7 @@ QVariant C5TableModel::dataDisplay(int row, int column) const
     case QVariant::Time:
         return v.toTime().toString(FORMAT_TIME_TO_STR);
     case QVariant::Double:
-        return float_str(v.toDouble(), 2);
+        return float_str(v.toDouble(), 4);
     default:
         return v.toString();
     }

@@ -17,14 +17,6 @@
 #define param_default_hall 11
 #define param_default_table 12
 
-#define DOC_STATE_SAVED 1
-#define DOC_STATE_DRAFT 2
-
-#define DOC_TYPE_STORE_INPUT 1
-#define DOC_TYPE_STORE_OUTPUT 2
-#define DOC_TYPE_STORE_MOVE 3
-#define DOC_TYPE_STORE_INVENTORY 4
-
 class C5Config
 {
 public:

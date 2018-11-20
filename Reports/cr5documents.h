@@ -23,6 +23,11 @@ private:
     void openDoc(int id);
 
     int docType(int id);
+
+private slots:
+    void saveDocs();
+
+    void draftDocs();
 };
 
 #endif // CR5DOCUMENTS_H

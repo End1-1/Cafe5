@@ -718,4 +718,5 @@ void C5StoreDoc::on_tblGoodsStore_itemDoubleClicked(QTableWidgetItem *item)
     if (r < 0) {
         return;
     }
+    
 }

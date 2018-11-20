@@ -18,6 +18,7 @@
 #define cache_doc_type 12
 #define cache_users 14
 #define cache_waiter_printers 15
+#define cache_store_reason 16
 
 class C5Cache : public QObject
 {

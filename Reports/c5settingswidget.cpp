@@ -29,9 +29,9 @@ void C5SettingsWidget::setSettingsId(int id)
     }
 }
 
-void C5SettingsWidget::save()
+void C5SettingsWidget::save(int oldId)
 {
-    if (fSettingsId == 0) {
+    if (oldId == 0) {
         return;
     }
     QMap<int, QString> fTags;
@@ -48,10 +48,10 @@ void C5SettingsWidget::save()
     fTags[ui->leHall->getTag()] = ui->leHall->text();
     fTags[ui->leTable->getTag()] = ui->leTable->text();
     C5Database db(fDBParams);
-    db[":f_settings"] = fSettingsId;
+    db[":f_settings"] = oldId;
     db.exec("delete from s_settings_values where f_settings=:f_settings");
     for (QMap<int, QString>::const_iterator it = fTags.begin(); it != fTags.end(); it++) {
-        db[":f_settings"] = fSettingsId;
+        db[":f_settings"] = oldId;
         db[":f_key"] = it.key();
         db[":f_value"] = it.value();
         db.insert("s_settings_values", false);

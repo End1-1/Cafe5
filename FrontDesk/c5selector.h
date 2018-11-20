@@ -21,6 +21,8 @@ public:
 
     static bool getValue(const QStringList &dbParams, int cache, QList<QVariant> &values);
 
+    static bool getValues(const QStringList &dbParams, const QString &sql, QList<QVariant> &values);
+
     void keyPressEvent(QKeyEvent *key) override;
 
 private slots:

@@ -35,10 +35,20 @@ bool C5Selector::getValue(const QStringList &dbParams, int cache, QList<QVariant
     } else {
         c = fSelectorList[cacheName][cache];
     }
-    values.clear();
     c->ui->leFilter->setFocus();
     bool result = c->exec() == QDialog::Accepted;
     values = c->fValues;
+    return result;
+}
+
+bool C5Selector::getValues(const QStringList &dbParams, const QString &sql, QList<QVariant> &values)
+{
+    C5Selector *c = new C5Selector(dbParams, __mainWindow);
+    c->fQuery = sql;
+    c->refresh();
+    bool result = c->exec() == QDialog::Accepted;
+    values = c->fValues;
+    delete c;
     return result;
 }
 

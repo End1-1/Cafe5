@@ -43,9 +43,11 @@ C5Cache::C5Cache(const QStringList &dbParams) :
                 .arg(tr("Name"));
         fCacheQuery[cache_users] = QString("select f_id as `%1`, concat(f_last, ' ', f_first) as `%2` from s_user")
                 .arg(tr("Code"))
-                .arg(tr("Tax name"))
-                .arg(tr("Contact"));
+                .arg(tr("Name"));
         fCacheQuery[cache_waiter_printers] = QString("select f_id as `%1`, f_name as `%2` from d_printers")
+                .arg(tr("Code"))
+                .arg(tr("Name"));
+        fCacheQuery[cache_store_reason] = QString("select f_id as `%1`, f_name as `%2` from a_reason")
                 .arg(tr("Code"))
                 .arg(tr("Name"));
     }
