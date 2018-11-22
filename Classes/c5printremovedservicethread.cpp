@@ -25,7 +25,7 @@ void C5PrintRemovedServiceThread::run()
 void C5PrintRemovedServiceThread::print(const QString &printName)
 {
     QFont font(qApp->font());
-    font.setPointSize(10);
+    font.setPointSize(24);
     C5Printing p;
     p.setSceneParams(650, 2800, QPrinter::Portrait);
     p.setFont(font);
@@ -51,7 +51,6 @@ void C5PrintRemovedServiceThread::print(const QString &printName)
     p.br(p.fLineHeight + 2);
     p.line(0, p.fTop, p.fNormalWidth, p.fTop);
 
-    p.setFontSize(12);
     QSet<QString> storages;
     QJsonObject o = fBody;
     storages << o["f_storename"].toString();

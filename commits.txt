@@ -18,3 +18,8 @@
 19.11.2018
 	1. New. C5Grid hot key for select all (Ctrl + Plus).
 	2. Upgrade. CR5Documents. Create draft for selected document and save selected draft documents.
+	3. New. Reason for documents in the store.
+20.11.2018
+	1. New. C5StoreDoc. Added panel with goods list with quantity in the store.
+	2. Upgrade. C5TableWidget. Fit columns to table widget width.
+	3. New. Storehouse rc.file

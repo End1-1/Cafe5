@@ -21,6 +21,29 @@ void C5TableWidget::setColumnWidths(int count, ...)
     va_end(vl);
 }
 
+void C5TableWidget::fitColumnsToWidth(int dec)
+{
+    int colWidths = 0;
+    int hiddenColumns = 0;
+    for (int i = 0; i < columnCount(); i++) {
+        if (columnWidth(i) == 0) {
+            hiddenColumns++;
+        }
+        colWidths += columnWidth(i);
+    }
+    int freeSpace = width() - colWidths - dec;
+    int delta = 0;
+    if (columnCount() - hiddenColumns > 0) {
+        delta = freeSpace / (columnCount() - hiddenColumns);
+    }
+    for (int i = 0; i < columnCount(); i++) {
+        if (columnWidth(i) == 0) {
+            continue;
+        }
+        setColumnWidth(i, columnWidth(i) + delta);
+    }
+}
+
 C5LineEdit *C5TableWidget::createLineEdit(int row, int column)
 {
     C5LineEdit *l = new C5LineEdit(this);

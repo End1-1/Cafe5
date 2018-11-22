@@ -42,6 +42,7 @@ bool C5StoreDoc::openDoc(int id)
     QJsonObject jo = jd.object();
     ui->leStoreInput->setValue(jo["f_storein"].toString());
     ui->leStoreOutput->setValue(jo["f_storeout"].toString());
+    setMode(static_cast<STORE_DOC>(fDocType));
     db[":f_document"] = id;
     db.exec("select d.f_id, d.f_goods, g.f_name, d.f_qty, u.f_name, d.f_price, d.f_total, d.f_reason \
             from a_store_draft d \
@@ -50,7 +51,7 @@ bool C5StoreDoc::openDoc(int id)
             where d.f_document=:f_document ");
     while (db.nextRow()) {
         int row = addGoodsRow();
-        ui->leReason->setValue(db.getString(7));
+        ui->leReason->setValue(db.getString("f_reason"));
         ui->tblGoods->setInteger(row, 0, db.getInt(0));
         ui->tblGoods->setInteger(row, 1, db.getInt(1));
         ui->tblGoods->setString(row, 2, db.getString(2));
@@ -59,7 +60,6 @@ bool C5StoreDoc::openDoc(int id)
         ui->tblGoods->lineEdit(row, 5)->setDouble(db.getDouble(5));
         ui->tblGoods->lineEdit(row, 6)->setDouble(db.getDouble(6));
     }
-    setMode(static_cast<STORE_DOC>(fDocType));
     setDocEnabled(fDocState == DOC_STATE_DRAFT);
     return true;
 }
@@ -109,16 +109,19 @@ QToolBar *C5StoreDoc::toolBar()
         fToolBar = createStandartToolbar(QList<ToolBarButtons>());
         fToolBar->addAction(QIcon(":/save.png"), tr("Save"), this, SLOT(saveDoc()));
         fToolBar->addAction(QIcon(":/draft.png"), tr("Draft"), this, SLOT(draftDoc()));
+        fToolBar->addAction(QIcon(":/recycle.png"), tr("Remove"), this, SLOT(removeDocument()));
         fToolBar->addAction(QIcon(":/print.png"), tr("Print"), this, SLOT(printDoc()));
         fToolBar->addAction(QIcon(":/show_list.png"), tr("Show/Hide\ngoods list"), this, SLOT(showHideGoodsList()));
     }
     return fToolBar;
 }
 
-bool C5StoreDoc::removeDoc(const QStringList &dbParams, int id)
+bool C5StoreDoc::removeDoc(const QStringList &dbParams, int id, bool showmessage)
 {
-    if (C5Message::question(tr("Confirm to remove document")) != QDialog::Accepted) {
-        return false;
+    if (showmessage) {
+        if (C5Message::question(tr("Confirm to remove document")) != QDialog::Accepted) {
+            return false;
+        }
     }
     QString err;
     C5Database db(dbParams);
@@ -473,7 +476,30 @@ void C5StoreDoc::loadGroupsInput()
 
 void C5StoreDoc::loadGoodsInput()
 {
-    loadGoods(ui->leStoreInput->getInteger());
+    ui->tblGoodsStore->setSortingEnabled(false);
+    ui->tblGoodsStore->clearContents();
+    ui->tblGoodsStore->setRowCount(0);
+    C5Database db(fDBParams);
+    db.exec(QString("select s.f_goods, g.f_group, g.f_name as f_goodsname, u.f_name as f_unitname, "
+              "sum(s.f_qty*s.f_type) as f_qty, sum(s.f_total*s.f_type) as f_amount "
+              "from c_goods g "
+              "left join a_store s on s.f_goods=g.f_id and s.f_store=%1 "
+              "left join a_header d on d.f_id=s.f_document and d.f_date<=%2 "
+              "inner join c_groups gg on gg.f_id=g.f_group "
+              "inner join c_units u on u.f_id=g.f_unit "
+              "group by 1, 2, 3, 4 ")
+            .arg(ui->leStoreInput->getInteger())
+            .arg(ui->deDate->toMySQLDate()));
+    while (db.nextRow()) {
+        int row = ui->tblGoodsStore->addEmptyRow();
+        ui->tblGoodsStore->setInteger(row, 0, db.getInt(0));
+        ui->tblGoodsStore->setInteger(row, 1, db.getInt(1));
+        ui->tblGoodsStore->setString(row, 2, db.getString(2));
+        ui->tblGoodsStore->setDouble(row, 3, db.getDouble(4));
+        ui->tblGoodsStore->setString(row, 4, db.getString(3));
+        ui->tblGoodsStore->setDouble(row, 5, db.getDouble(5));
+    }
+    ui->tblGoodsStore->setSortingEnabled(true);
 }
 
 void C5StoreDoc::loadGoodsOutput()
@@ -483,6 +509,7 @@ void C5StoreDoc::loadGoodsOutput()
 
 void C5StoreDoc::loadGoods(int store)
 {
+    ui->tblGoodsStore->setSortingEnabled(false);
     ui->tblGoodsStore->clearContents();
     ui->tblGoodsStore->setRowCount(0);
     C5Database db(fDBParams);
@@ -507,6 +534,7 @@ void C5StoreDoc::loadGoods(int store)
         ui->tblGoodsStore->setString(row, 4, db.getString(3));
         ui->tblGoodsStore->setDouble(row, 5, db.getDouble(5));
     }
+    ui->tblGoodsStore->setSortingEnabled(true);
 }
 
 void C5StoreDoc::setGoodsPanelHidden(bool v)
@@ -528,6 +556,8 @@ void C5StoreDoc::setGoodsPanelHidden(bool v)
             loadGoodsOutput();
             break;
         }
+        ui->tblGoodsGroup->fitColumnsToWidth(45);
+        ui->tblGoodsStore->fitColumnsToWidth(45);
     }
 }
 
@@ -567,7 +597,14 @@ void C5StoreDoc::getOutput()
             .arg(ui->leStoreOutput->getInteger())
             .arg(ui->deDate->toMySQLDate());
     QList<QVariant> vals;
-    if (!C5Selector::getValues(fDBParams, query, vals)) {
+    QMap<QString, QString> trans;
+    trans[":f_goods"] = tr("Code");
+    trans[":f_groupname"] = tr("Group");
+    trans[":f_goodsname"] = tr("Name");
+    trans[":f_unitname"] = tr("Unit");
+    trans[":f_qty"] = tr("Qty");
+    trans[":f_amount"] = tr("Amount");
+    if (!C5Selector::getValues(fDBParams, query, vals, trans)) {
         return;
     }
     int row = addGoodsRow();
@@ -594,6 +631,13 @@ void C5StoreDoc::draftDoc()
     bool v = C5Config::getRegValue("showhidegoods").toBool();
     if (v) {
         setGoodsPanelHidden(v);
+    }
+}
+
+void C5StoreDoc::removeDocument()
+{
+    if (removeDoc(fDBParams, ui->leDocNum->getInteger(), true)) {
+        __mainWindow->removeTab(this);
     }
 }
 
@@ -718,4 +762,9 @@ void C5StoreDoc::on_tblGoodsStore_itemDoubleClicked(QTableWidgetItem *item)
     if (r < 0) {
         return;
     }
+    int row = addGoodsRow();
+    ui->tblGoods->setInteger(row, 1, ui->tblGoodsStore->getInteger(r, 0));
+    ui->tblGoods->setString(row, 2, ui->tblGoodsStore->getString(r, 2));
+    ui->tblGoods->setString(row, 4, ui->tblGoodsStore->getString(r, 4));
+    ui->tblGoods->lineEdit(row, 3)->setFocus();
 }

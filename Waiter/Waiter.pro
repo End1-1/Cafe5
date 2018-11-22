@@ -11,6 +11,10 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = Waiter
 TEMPLATE = app
 
+RC_FILE = res.rc
+
+ICON = cup.ico
+
 DEFINES += _DBDRIVER_=\\\"QMYSQL\\\"
 DEFINES += _ORGANIZATION_=\\\"Jazzve\\\"
 DEFINES += _APPLICATION_=\\\"Cafe5\\\"
@@ -88,7 +92,9 @@ HEADERS += \
     ../Classes/QRCodeGenerator.h \
     ../../NewTax/printtaxn.h \
     ../Controls/c5lineedit.h \
-    ../Classes/c5printremovedservicethread.h
+    ../Classes/c5printremovedservicethread.h \
+    rc.h \
+    res.rc
 
 FORMS += \
         dlgface.ui \
@@ -109,7 +115,8 @@ RESOURCES += \
     ../resources/resources.qrc \
     translator.qrc
 
-DISTFILES +=
+DISTFILES += \
+    cup.ico
 
 LIBS += -lVersion
 LIBS += -lwsock32

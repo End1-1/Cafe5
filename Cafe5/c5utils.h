@@ -39,6 +39,8 @@
 #define DOC_REASON_MOVE 2
 #define DOC_REASON_OUT 3
 #define DOC_REASON_SALE 4
+#define DOC_REASON_LOST 5
+#define DOC_REASON_OVER 6
 
 class C5Utils
 {

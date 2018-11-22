@@ -34,6 +34,8 @@ public:
 
     C5TableModel *fModel;
 
+    QMap<QString, QString> fTranslation;
+
     void setTableForUpdate(const QString &table, const QList<int> &columns);
 
     virtual void postProcess();
@@ -55,8 +57,6 @@ protected:
     bool fSimpleQuery;
 
     QString fSqlQuery;
-
-    QMap<QString, QString> fTranslation;
 
     QString fMainTable;
 
@@ -144,6 +144,8 @@ private slots:
     void filterByColumn();
 
     void removeFilterForColumn();
+
+    void tblValueChanged(int pos);
 
     void on_tblView_clicked(const QModelIndex &index);
 

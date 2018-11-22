@@ -241,12 +241,12 @@
         <translation>Սպասարկող</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printremovedservicethread.cpp" line="68"/>
+        <location filename="../Classes/c5printremovedservicethread.cpp" line="67"/>
         <source>Printer: </source>
         <translation>Տպիչ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printremovedservicethread.cpp" line="70"/>
+        <location filename="../Classes/c5printremovedservicethread.cpp" line="69"/>
         <source>Storage: </source>
         <translation>Պահեստ</translation>
     </message>

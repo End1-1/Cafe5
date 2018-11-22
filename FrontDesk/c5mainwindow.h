@@ -51,6 +51,8 @@ private slots:
 
     void on_actionClose_application_triggered();
 
+    void on_btnHideMenu_clicked();
+
 private:
     Ui::C5MainWindow *ui;
 

@@ -8,6 +8,8 @@ QT       += core gui network printsupport sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
+RC_FILE = res.rc
+
 TARGET = FrontDesk
 TEMPLATE = app
 
@@ -162,7 +164,9 @@ HEADERS += \
     ../Classes/c5datedelegate.h \
     ../Reports/cr5documentsfilter.h \
     ../Reports/cr5consumptionbysales.h \
-    ../Reports/cr5consumptionbysalesfilter.h
+    ../Reports/cr5consumptionbysalesfilter.h \
+    rc.h \
+    res.rc
 
 FORMS += \
         c5mainwindow.ui \
@@ -201,5 +205,7 @@ RESOURCES += \
 QMAKE_CXXFLAGS += -Werror
 
 DISTFILES += \
-    LastCache
+    LastCache \
+    storehouse.ico
 
+ICON = storehouse.ico

@@ -41,10 +41,11 @@ bool C5Selector::getValue(const QStringList &dbParams, int cache, QList<QVariant
     return result;
 }
 
-bool C5Selector::getValues(const QStringList &dbParams, const QString &sql, QList<QVariant> &values)
+bool C5Selector::getValues(const QStringList &dbParams, const QString &sql, QList<QVariant> &values, const QMap<QString, QString> &translator)
 {
     C5Selector *c = new C5Selector(dbParams, __mainWindow);
     c->fQuery = sql;
+    c->fGrid->fTranslation = translator;
     c->refresh();
     bool result = c->exec() == QDialog::Accepted;
     values = c->fValues;

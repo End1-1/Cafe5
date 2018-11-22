@@ -25,13 +25,13 @@
     <widget class="C5DateEdit" name="deStart">
      <property name="minimumSize">
       <size>
-       <width>100</width>
+       <width>120</width>
        <height>0</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
-       <width>100</width>
+       <width>120</width>
        <height>16777215</height>
       </size>
      </property>
@@ -48,13 +48,13 @@
     <widget class="C5DateEdit" name="deEnd">
      <property name="minimumSize">
       <size>
-       <width>100</width>
+       <width>120</width>
        <height>0</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
-       <width>100</width>
+       <width>120</width>
        <height>16777215</height>
       </size>
      </property>
@@ -71,13 +71,13 @@
     <widget class="C5LineEditWithSelector" name="leStore">
      <property name="minimumSize">
       <size>
-       <width>100</width>
+       <width>120</width>
        <height>0</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
-       <width>100</width>
+       <width>120</width>
        <height>16777215</height>
       </size>
      </property>
@@ -135,14 +135,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5DateEdit</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5dateedit.h</header>
-  </customwidget>
-  <customwidget>
    <class>C5LineEdit</class>
    <extends>QLineEdit</extends>
    <header location="global">c5lineedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5DateEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5dateedit.h</header>
   </customwidget>
   <customwidget>
    <class>C5LineEditWithSelector</class>

@@ -26,7 +26,7 @@ public:
 
     virtual QToolBar *toolBar();
 
-    static bool removeDoc(const QStringList &dbParams, int id);
+    static bool removeDoc(const QStringList &dbParams, int id, bool showmessage = true);
 
     bool save(int state, QString &err, bool showMsg);
 
@@ -70,6 +70,8 @@ private slots:
 
     void draftDoc();
 
+    void removeDocument();
+
     void printDoc();
 
     void filterGoodsPanel(int group);
@@ -91,6 +93,7 @@ private slots:
     void on_leStoreOutput_textChanged(const QString &arg1);
 
     void on_tblGoodsGroup_itemClicked(QTableWidgetItem *item);
+
     void on_tblGoodsStore_itemDoubleClicked(QTableWidgetItem *item);
 };
 

@@ -368,3 +368,9 @@ void C5MainWindow::on_actionClose_application_triggered()
         qApp->quit();
     }
 }
+
+void C5MainWindow::on_btnHideMenu_clicked()
+{
+    ui->twDb->setVisible(!ui->twDb->isVisible());
+    ui->btnHideMenu->setText(ui->twDb->isVisible() ? "<" : ">");
+}

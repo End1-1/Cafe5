@@ -33,5 +33,6 @@
         <file>zoom-out.png</file>
         <file>expand.png</file>
         <file>show_list.png</file>
+        <file>recycle.png</file>
     </qresource>
 </RCC>

@@ -25,6 +25,8 @@ private slots:
     void tblDoubleClicked(int row, int column, const QList<QVariant> &values);
 
     void makeOutput(bool v);
+
+    void writeDocs(int doctype, int reason, const QMap<int, double> &data, const QString &comment);
 };
 
 #endif // CR5CONSUMPTIONBYSALES_H

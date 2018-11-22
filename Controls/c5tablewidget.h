@@ -15,6 +15,8 @@ public:
 
     void setColumnWidths(int count, ...);
 
+    void fitColumnsToWidth(int dec = 5);
+
     C5LineEdit *createLineEdit(int row, int column);
 
     C5LineEdit *lineEdit(int row, int column);

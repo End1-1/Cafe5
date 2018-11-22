@@ -8,6 +8,7 @@
 #include "c5printpreview.h"
 #include "c5gridgilter.h"
 #include <QMenu>
+#include <QScrollBar>
 
 C5Grid::C5Grid(const QStringList &dbParams, QWidget *parent) :
     C5Widget(dbParams, parent),
@@ -25,6 +26,7 @@ C5Grid::C5Grid(const QStringList &dbParams, QWidget *parent) :
     connect(fTableView->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(tableViewHeaderClicked(int)));
     connect(fTableView->horizontalHeader(), SIGNAL(sectionResized(int,int,int)), this, SLOT(tableViewHeaderResized(int,int,int)));
     connect(fTableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(selectionChanged(QItemSelection,QItemSelection)));
+    connect(ui->tblTotal->horizontalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(tblValueChanged(int)));
     fFilterWidget = 0;
     ui->tblTotal->setVisible(false);
 }
@@ -315,6 +317,11 @@ void C5Grid::filterByColumn()
 void C5Grid::removeFilterForColumn()
 {
     fModel->removeFilter(fFilterColumn);
+}
+
+void C5Grid::tblValueChanged(int pos)
+{
+    fTableView->horizontalScrollBar()->setValue(pos);
 }
 
 int C5Grid::newRow()

@@ -522,6 +522,9 @@
         <property name="selectionBehavior">
          <enum>QAbstractItemView::SelectRows</enum>
         </property>
+        <property name="sortingEnabled">
+         <bool>true</bool>
+        </property>
         <column>
          <property name="text">
           <string>Goods code</string>
