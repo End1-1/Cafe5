@@ -47,11 +47,13 @@ private slots:
 
     void on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column);
 
-    void on_actionConfigure_connection_triggered();
-
     void on_actionClose_application_triggered();
 
     void on_btnHideMenu_clicked();
+
+    void on_actionHome_triggered();
+
+    void on_actionGo_to_home_triggered();
 
 private:
     Ui::C5MainWindow *ui;
@@ -67,6 +69,8 @@ private:
     void enableMenu(bool v);
 
     void addTreeL3Item(QTreeWidgetItem *item, int permission, const QString &text, const QString &icon);
+
+    void showWelcomePage();
 };
 
 #endif // C5MAINWINDOW_H

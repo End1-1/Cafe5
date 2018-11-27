@@ -1,4 +1,5 @@
 #include "cr5goodsstorages.h"
+#include "ce5storage.h"
 
 CR5GoodsStorages::CR5GoodsStorages(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
@@ -10,11 +11,7 @@ CR5GoodsStorages::CR5GoodsStorages(const QStringList &dbParams, QWidget *parent)
     fTranslation["f_id"] = tr("Code");
     fTranslation["f_name"] = tr("Name");
 
-    fTableView->setItemDelegateForColumn(1, new C5TextDelegate(fTableView));
-
-    QList<int> colsForUpdate;
-    colsForUpdate << 1;
-    setTableForUpdate("c_storages", colsForUpdate);
+    fEditor = new CE5Storage(dbParams);
 }
 
 QToolBar *CR5GoodsStorages::toolBar()
@@ -22,7 +19,6 @@ QToolBar *CR5GoodsStorages::toolBar()
     if (!fToolBar) {
         QList<ToolBarButtons> btn;
         btn << ToolBarButtons::tbNew
-            << ToolBarButtons::tbSave
             << ToolBarButtons::tbClearFilter
             << ToolBarButtons::tbRefresh
             << ToolBarButtons::tbExcel

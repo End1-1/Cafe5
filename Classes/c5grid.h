@@ -20,6 +20,7 @@ class C5Grid;
 }
 
 class C5FilterWidget;
+class CE5Editor;
 
 class C5Grid : public C5Widget
 {
@@ -49,7 +50,7 @@ public:
     virtual void hotKey(const QString &key);
 
 public slots:
-    void on_tblView_doubleClicked(const QModelIndex &index);
+    virtual bool on_tblView_doubleClicked(const QModelIndex &index);
 
 protected:
     C5Database fDb;
@@ -75,6 +76,8 @@ protected:
     QString fHavindCondition;
 
     C5FilterWidget *fFilterWidget;
+
+    CE5Editor *fEditor;
 
     QWidget *widget();
 
@@ -105,6 +108,10 @@ protected:
 private:
     Ui::C5Grid *ui;
 
+    QModelIndex fFilterIndex;
+
+    QString fFilterString;
+
     int fFilterColumn;
 
     void insertJoinTable(QStringList &joins, QMap<QString, QString> &joinsMap, const QString &table, const QString &mainTable);
@@ -113,6 +120,10 @@ private:
 
 protected slots:
     virtual void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
+
+    virtual void copySelection();
+
+    virtual void copyAll();
 
     virtual void saveDataChanges();
 
@@ -133,6 +144,8 @@ protected slots:
     virtual void setSearchParameters();
 
     virtual void tableViewContextMenuRequested(const QPoint &point);
+
+    virtual void tableViewHeaderContextMenuRequested(const QPoint &point);
     \
     virtual void tableViewHeaderClicked(int index);
 
@@ -142,6 +155,8 @@ private slots:
     void autofitColumns();
 
     void filterByColumn();
+
+    void filterByStringAndIndex();
 
     void removeFilterForColumn();
 

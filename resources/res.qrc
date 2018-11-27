@@ -34,5 +34,7 @@
         <file>expand.png</file>
         <file>show_list.png</file>
         <file>recycle.png</file>
+        <file>copy.png</file>
+        <file>ahuni.ttf</file>
     </qresource>
 </RCC>

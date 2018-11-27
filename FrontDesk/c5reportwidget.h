@@ -7,6 +7,7 @@
 #include <QToolBar>
 
 class C5Cache;
+class CE5Editor;
 
 class C5ReportWidget : public C5Grid
 {

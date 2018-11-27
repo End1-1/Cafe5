@@ -1,4 +1,5 @@
 #include "cr5goods.h"
+#include "ce5goods.h"
 
 CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
@@ -15,13 +16,7 @@ CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_unitname"] = tr("Unit");
     fTranslation["f_name"] = tr("Name");;
 
-    fTableView->setItemDelegateForColumn(1, new C5ComboDelegate("f_group", createCache(cache_goods_group), fTableView));
-    fTableView->setItemDelegateForColumn(2, new C5ComboDelegate("f_unit", createCache(cache_goods_unit), fTableView));
-    fTableView->setItemDelegateForColumn(3, new C5TextDelegate(fTableView));
-
-    QList<int> colsForUpdate;
-    colsForUpdate << 3;
-    setTableForUpdate("c_goods", colsForUpdate);
+    fEditor = new CE5Goods(dbParams);
 }
 
 QToolBar *CR5Goods::toolBar()
@@ -29,7 +24,6 @@ QToolBar *CR5Goods::toolBar()
     if (!fToolBar) {
         QList<ToolBarButtons> btn;
         btn << ToolBarButtons::tbNew
-            << ToolBarButtons::tbSave
             << ToolBarButtons::tbClearFilter
             << ToolBarButtons::tbRefresh
             << ToolBarButtons::tbExcel

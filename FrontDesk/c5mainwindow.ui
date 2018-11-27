@@ -104,6 +104,9 @@
    </layout>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="toolButtonStyle">
     <enum>Qt::ToolButtonTextUnderIcon</enum>
    </property>
@@ -114,8 +117,8 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionConnection"/>
-   <addaction name="actionAppend_database"/>
    <addaction name="actionLogin"/>
+   <addaction name="actionHome"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionConnection">
@@ -124,7 +127,7 @@
      <normaloff>:/database.png</normaloff>:/database.png</iconset>
    </property>
    <property name="text">
-    <string>Connection</string>
+    <string>Main connection</string>
    </property>
    <property name="toolTip">
     <string>Connection settings</string>
@@ -142,34 +145,6 @@
     <string>Login</string>
    </property>
   </action>
-  <action name="actionAppend_database">
-   <property name="icon">
-    <iconset resource="../resources/res.qrc">
-     <normaloff>:/database_new.png</normaloff>:/database_new.png</iconset>
-   </property>
-   <property name="text">
-    <string>Append\ndatabase</string>
-   </property>
-   <property name="iconText">
-    <string>Append
-database</string>
-   </property>
-   <property name="toolTip">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Append database&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-   </property>
-  </action>
-  <action name="actionConfigure_connection">
-   <property name="icon">
-    <iconset resource="../resources/res.qrc">
-     <normaloff>:/configure.png</normaloff>:/configure.png</iconset>
-   </property>
-   <property name="text">
-    <string>Configure connection</string>
-   </property>
-   <property name="toolTip">
-    <string>Configure connection</string>
-   </property>
-  </action>
   <action name="actionClose_application">
    <property name="text">
     <string>Close application</string>
@@ -178,9 +153,27 @@ database</string>
     <string>Close application</string>
    </property>
   </action>
+  <action name="actionHome">
+   <property name="icon">
+    <iconset resource="lang.qrc">
+     <normaloff>:/storehouse.ico</normaloff>:/storehouse.ico</iconset>
+   </property>
+   <property name="text">
+    <string>Home</string>
+   </property>
+  </action>
+  <action name="actionGo_to_home">
+   <property name="text">
+    <string>Go to home</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Home</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
+  <include location="lang.qrc"/>
   <include location="../resources/res.qrc"/>
  </resources>
  <connections/>

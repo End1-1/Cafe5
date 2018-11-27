@@ -66,6 +66,9 @@
        </item>
        <item>
         <widget class="C5TableView" name="tblView">
+         <property name="contextMenuPolicy">
+          <enum>Qt::CustomContextMenu</enum>
+         </property>
          <property name="verticalScrollBarPolicy">
           <enum>Qt::ScrollBarAlwaysOn</enum>
          </property>
@@ -73,12 +76,12 @@
           <enum>Qt::ScrollBarAlwaysOff</enum>
          </property>
          <property name="editTriggers">
-          <set>QAbstractItemView::AllEditTriggers</set>
+          <set>QAbstractItemView::NoEditTriggers</set>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QTableWidget" name="tblTotal">
+        <widget class="C5TableWidget" name="tblTotal">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -146,6 +149,11 @@
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>C5TableWidget</class>
+   <extends>QTableWidget</extends>
+   <header location="global">c5tablewidget.h</header>
+  </customwidget>
   <customwidget>
    <class>C5TableView</class>
    <extends>QTableView</extends>

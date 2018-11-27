@@ -23,3 +23,9 @@
 	1. New. C5StoreDoc. Added panel with goods list with quantity in the store.
 	2. Upgrade. C5TableWidget. Fit columns to table widget width.
 	3. New. Storehouse rc.file
+22.11.2018
+	1. New. C5Editor. Required field: Field - field name, Type - data type: 0 - QString, 1 - int. Optional: Check, format empty=FieldName.
+23.11.2018
+27.11.2018
+	1. Upgrade. CE5User, CE5UserGroup.
+	2. New. Passed and accepted fields in store doc.

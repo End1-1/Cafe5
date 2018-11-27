@@ -1,5 +1,7 @@
 #include "cr5goodsmovement.h"
 #include "cr5goodsmovementfilter.h"
+#include "c5storedoc.h"
+#include "c5tablemodel.h"
 
 CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
@@ -67,8 +69,8 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
     fColumnsVisible["sum(s.f_total) as f_total"] = true;
 
     restoreColumnsVisibility();
-
     fFilterWidget = new CR5GoodsMovementFilter(fDBParams);
+    connect(this, SIGNAL(tblDoubleClicked(int,int,QList<QVariant>)), this, SLOT(tblDoubleClicked(int,int,QList<QVariant>)));
 }
 
 QToolBar *CR5GoodsMovement::toolBar()
@@ -83,4 +85,18 @@ QToolBar *CR5GoodsMovement::toolBar()
         fToolBar = createStandartToolbar(btn);
     }
     return fToolBar;
+}
+
+void CR5GoodsMovement::tblDoubleClicked(int row, int column, const QList<QVariant> &values)
+{
+    Q_UNUSED(row);
+    Q_UNUSED(column);
+    if (!fColumnsVisible["s.f_document"]) {
+        C5Message::info(tr("Document id column must be included in the report"));
+        return;
+    }
+    C5StoreDoc *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);
+    if (!sd->openDoc(values.at(fModel->indexForColumnName("f_document")).toInt())) {
+        __mainWindow->removeTab(sd);
+    }
 }

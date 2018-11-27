@@ -10,7 +10,7 @@ CR5Dish::CR5Dish(const QStringList &dbParams, QWidget *parent) :
     fLabel = tr("Dishes");
 
     fSqlQuery = "select d.f_id, p1.f_name as f_part1, p2.f_name as f_part2, d.f_name, \
-                f_remind, f_service, f_discount, d.f_queue \
+                f_remind, f_service, f_discount, d.f_queue, d.f_color \
                 from d_dish d \
                 left join d_part2 p2 on p2.f_id=d.f_part \
                 left join d_part1 p1 on p1.f_id=p2.f_part ";
@@ -22,22 +22,8 @@ CR5Dish::CR5Dish(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_service"] = tr("Service");
     fTranslation["f_discount"] = tr("Discount");
     fTranslation["f_queue"] = tr("Queue");
-
-    C5Cache *cd = createCache(cache_dish_part2);
-    C5ComboDelegate *cbPart = new C5ComboDelegate("f_part", cd, fTableView);
-    fTableView->setItemDelegateForColumn(2, cbPart);
-    fTableView->setItemDelegateForColumn(3, new C5TextDelegate(fTableView));
-    fTableView->setItemDelegateForColumn(4, new C5TextDelegate(fTableView));
-    fTableView->setItemDelegateForColumn(5, new C5TextDelegate(fTableView));
-    fTableView->setItemDelegateForColumn(6, new C5TextDelegate(fTableView));
-    fTableView->setItemDelegateForColumn(7, new C5TextDelegate(fTableView));
-
-    QList<int> colsForUpdate;
-    colsForUpdate << 3 << 4 << 5 << 6 << 7;
-    setTableForUpdate("d_dish", colsForUpdate);
-
-    fDishWidget = new C5DishWidget(dbParams, this);
-    hl()->addWidget(fDishWidget);
+    fTranslation["f_color"] = tr("Color");
+    fEditor = new C5DishWidget(dbParams);
 }
 
 QToolBar *CR5Dish::toolBar()
@@ -45,7 +31,6 @@ QToolBar *CR5Dish::toolBar()
     if (!fToolBar) {
         QList<ToolBarButtons> btn;
         btn << ToolBarButtons::tbNew
-            << ToolBarButtons::tbSave
             << ToolBarButtons::tbClearFilter
             << ToolBarButtons::tbRefresh
             << ToolBarButtons::tbExcel
@@ -55,26 +40,30 @@ QToolBar *CR5Dish::toolBar()
     return fToolBar;
 }
 
-void CR5Dish::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
+bool CR5Dish::on_tblView_doubleClicked(const QModelIndex &index)
 {
-    Q_UNUSED(selected);
-    int newId = rowId();
-    if (deselected.indexes().count() > 0) {
-        fModel->saveDataChanges();
-        fTableView->viewport()->update();
-        int oldId = fModel->data(deselected.indexes().at(0).row(), 0, Qt::EditRole).toInt();
-        fDishWidget->save(oldId);
+    if (C5Grid::on_tblView_doubleClicked(index)) {
+        fModel->setRowColor(index.row(), QColor::fromRgb(fModel->data(index.row(), fModel->indexForColumnName("f_color"), Qt::EditRole).toInt()));
     }
-    if (newId > 0) {
-        fDishWidget->setDish(newId);
-    } else {
-        fDishWidget->clearWidget();
-    }
+    return true;
 }
 
-void CR5Dish::saveDataChanges()
+void CR5Dish::buildQuery()
 {
-    fModel->saveDataChanges();
-    fTableView->viewport()->update();
-    fDishWidget->save(rowId());
+    C5Grid::buildQuery();
+    setColors();
+}
+
+void CR5Dish::refreshData()
+{
+    C5Grid::refreshData();
+    setColors();
+}
+
+void CR5Dish::setColors()
+{
+    fTableView->setColumnWidth(fModel->indexForColumnName("f_color"), 0);
+    for (int i = 0, count = fModel->rowCount(); i < count; i++) {
+        fModel->setRowColor(i, QColor::fromRgb(fModel->data(i, fModel->indexForColumnName("f_color"), Qt::EditRole).toInt()));
+    }
 }

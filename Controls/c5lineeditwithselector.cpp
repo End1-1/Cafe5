@@ -26,6 +26,9 @@ void C5LineEditWithSelector::setSelector(const QStringList &dbParams, QLineEdit 
 void C5LineEditWithSelector::setValue(const QString &id)
 {
     setText(id);
+    if (fCache == 0) {
+        return;
+    }
     C5Cache *c = C5Cache::cache(fDBParams, fCache);
     int row = c->find(id.toInt());
     if (row > -1) {
@@ -41,10 +44,16 @@ void C5LineEditWithSelector::setValue(int id)
     setValue(QString::number(id));
 }
 
+int C5LineEditWithSelector::cacheId()
+{
+    return fCache;
+}
+
 void C5LineEditWithSelector::mouseDoubleClickEvent(QMouseEvent *e)
 {
     Q_UNUSED(e);
     if (fCache == 0) {
+        emit doubleClicked();
         return;
     }
     QList<QVariant> values;

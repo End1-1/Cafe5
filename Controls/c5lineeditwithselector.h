@@ -18,6 +18,8 @@ public:
 
     void setValue(int id);
 
+    int cacheId();
+
 protected:
     virtual void mouseDoubleClickEvent(QMouseEvent *e);
 
@@ -36,6 +38,8 @@ private:
 
 signals:
     void done(const QList<QVariant> &values);
+
+    void doubleClicked();
 };
 
 #endif // C5LINEEDITWITHSELECTOR_H

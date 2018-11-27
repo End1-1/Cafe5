@@ -2,6 +2,11 @@
 #include "ui_c5storedoc.h"
 #include "c5cache.h"
 #include "c5selector.h"
+#include "c5printing.h"
+#include "c5printpreview.h"
+#include "c5editor.h"
+#include "ce5partner.h"
+#include "ce5goods.h"
 
 C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
     C5Widget(dbParams, parent),
@@ -16,6 +21,10 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
     ui->lePartner->setSelector(fDBParams, ui->lePartnerName, cache_goods_partners);
     ui->tblGoods->setColumnWidths(7, 0, 0, 300, 80, 80, 80, 80);
     ui->tblGoodsStore->setColumnWidths(6, 0, 0, 200, 70, 50, 70);
+    ui->btnNewPartner->setVisible(pr(dbParams.at(1), cp_t6_partners));
+    ui->btnNewGoods->setVisible(pr(dbParams.at(1), cp_t6_goods));
+    ui->leAccepted->setSelector(dbParams, ui->leAcceptedName, cache_users);
+    ui->lePassed->setSelector(dbParams, ui->lePassedName, cache_users);
 }
 
 C5StoreDoc::~C5StoreDoc()
@@ -42,6 +51,8 @@ bool C5StoreDoc::openDoc(int id)
     QJsonObject jo = jd.object();
     ui->leStoreInput->setValue(jo["f_storein"].toString());
     ui->leStoreOutput->setValue(jo["f_storeout"].toString());
+    ui->lePassed->setValue(jo["f_passed"].toString());
+    ui->leAccepted->setValue(jo["f_accepted"].toString());
     setMode(static_cast<STORE_DOC>(fDocType));
     db[":f_document"] = id;
     db.exec("select d.f_id, d.f_goods, g.f_name, d.f_qty, u.f_name, d.f_price, d.f_total, d.f_reason \
@@ -85,6 +96,7 @@ void C5StoreDoc::setMode(C5StoreDoc::STORE_DOC sd)
         ui->lbInvoiceDate->setVisible(false);
         ui->lbInvoiceNumber->setVisible(false);
         ui->lbPartner->setVisible(false);
+        ui->btnNewPartner->setVisible(false);
         ui->leReason->setValue(DOC_REASON_MOVE);
         break;
     case sdMovement:
@@ -95,6 +107,7 @@ void C5StoreDoc::setMode(C5StoreDoc::STORE_DOC sd)
         ui->lbInvoiceDate->setVisible(false);
         ui->lbInvoiceNumber->setVisible(false);
         ui->lbPartner->setVisible(false);
+        ui->btnNewPartner->setVisible(false);
         ui->leReason->setValue(DOC_REASON_OUT);
         break;
     default:
@@ -109,6 +122,7 @@ QToolBar *C5StoreDoc::toolBar()
         fToolBar = createStandartToolbar(QList<ToolBarButtons>());
         fToolBar->addAction(QIcon(":/save.png"), tr("Save"), this, SLOT(saveDoc()));
         fToolBar->addAction(QIcon(":/draft.png"), tr("Draft"), this, SLOT(draftDoc()));
+        fToolBar->addAction(QIcon(":/new.png"), tr("New\ndocument"), this, SLOT(newDoc()));
         fToolBar->addAction(QIcon(":/recycle.png"), tr("Remove"), this, SLOT(removeDocument()));
         fToolBar->addAction(QIcon(":/print.png"), tr("Print"), this, SLOT(printDoc()));
         fToolBar->addAction(QIcon(":/show_list.png"), tr("Show/Hide\ngoods list"), this, SLOT(showHideGoodsList()));
@@ -243,6 +257,8 @@ bool C5StoreDoc::save(int state, QString &err)
     QJsonObject jo;
     jo["f_storein"] = ui->leStoreInput->text();
     jo["f_storeout"] = ui->leStoreOutput->text();
+    jo["f_passed"] = ui->lePassed->text();
+    jo["f_accepted"] = ui->leAccepted->text();
     QJsonDocument jd(jo);
     if (ui->leDocNum->getInteger() == 0) {
         db[":f_id"] = 0;
@@ -480,7 +496,7 @@ void C5StoreDoc::loadGoodsInput()
     ui->tblGoodsStore->clearContents();
     ui->tblGoodsStore->setRowCount(0);
     C5Database db(fDBParams);
-    db.exec(QString("select s.f_goods, g.f_group, g.f_name as f_goodsname, u.f_name as f_unitname, "
+    db.exec(QString("select g.f_id, g.f_group, g.f_name as f_goodsname, u.f_name as f_unitname, "
               "sum(s.f_qty*s.f_type) as f_qty, sum(s.f_total*s.f_type) as f_amount "
               "from c_goods g "
               "left join a_store s on s.f_goods=g.f_id and s.f_store=%1 "
@@ -559,6 +575,18 @@ void C5StoreDoc::setGoodsPanelHidden(bool v)
         ui->tblGoodsGroup->fitColumnsToWidth(45);
         ui->tblGoodsStore->fitColumnsToWidth(45);
     }
+}
+
+void C5StoreDoc::newDoc()
+{
+    ui->leDocNum->clear();
+    ui->lePartner->setValue(0);
+    ui->leComment->clear();
+    ui->leStoreInput->setValue(0);
+    ui->leStoreOutput->setValue(0);
+    ui->tblGoods->clearContents();
+    ui->tblGoods->setRowCount(0);
+    countTotal();
 }
 
 void C5StoreDoc::getInput()
@@ -643,7 +671,104 @@ void C5StoreDoc::removeDocument()
 
 void C5StoreDoc::printDoc()
 {
-
+    if (ui->leDocNum->getInteger() == 0) {
+        C5Message::error(tr("Document is not saved"));
+        return;
+    }
+    C5Printing p;
+    p.setSceneParams(2000, 2800, QPrinter::Portrait);
+    bool end = false;
+    int rowStart = 0;
+    int pageNumber = 1;
+    do {
+        p.setFontSize(25);
+        p.setFontBold(true);
+        QString docTypeText;
+        switch (fDocType) {
+        case DOC_TYPE_STORE_INPUT:
+            docTypeText = tr("Store input");
+            break;
+        case DOC_TYPE_STORE_OUTPUT:
+            docTypeText = tr("Store output");
+            break;
+        case DOC_TYPE_STORE_MOVE:
+            docTypeText = tr("Store movement");
+            break;
+        }
+        p.ltext(QString("%1 #%2, %3").arg(docTypeText).arg(ui->leDocNum->text()).arg(ui->deDate->text()), 0);
+        p.rtext(ui->leReasonName->text());
+        p.br();
+        p.setFontSize(20);
+        p.setFontBold(false);
+        if (ui->leStoreInput->getInteger() > 0) {
+            p.ltext(QString("%1: %2").arg(tr("Store, input")).arg(ui->leStoreInputName->text()), 0);
+            p.br();
+        }
+        if (ui->leStoreOutput->getInteger() > 0) {
+            p.ltext(QString("%1: %2").arg(tr("Store, output")).arg(ui->leStoreOutputName->text()), 0);
+            p.br();
+        }
+        if (!ui->leInvoiceNumber->isEmpty()) {
+            p.ltext(QString("%1: #%2, %3").arg(tr("Invoice")).arg(ui->leInvoiceNumber->text()).arg(ui->deInvoiceDate->text()), 0);
+            p.br();
+        }
+        if (ui->lePartner->getInteger() > 0) {
+            p.ltext(QString("%1: %2").arg(tr("Partner")).arg(ui->lePartnerName->text()), 0);
+            p.br();
+        }
+        if (!ui->leComment->isEmpty()) {
+            p.ltext(ui->leComment->text(), 0);
+            p.br();
+        }
+        p.setFontBold(true);
+        p.ltext(QString("%1: %2").arg(tr("Total amount")).arg(ui->leTotal->text()), 0);
+        p.setFontBold(false);
+        p.br();
+        QList<qreal> points;
+        points << 0 << 500 << 250 << 250 << 250 << 270;
+        QStringList vals;
+        end = true;
+        p.br();
+        vals.clear();
+        vals << tr("Goods")
+             << tr("Qty")
+             << tr("Unit")
+             << tr("Price")
+             << tr("Total");
+        p.setFontBold(true);
+        p.tableText(points, vals, p.fLineHeight + 20);
+        p.br(p.fLineHeight + 20);
+        p.setFontBold(false);
+        for (int i = rowStart; i < ui->tblGoods->rowCount(); i++) {
+            vals.clear();
+            vals << ui->tblGoods->getString(i, 2);
+            vals << ui->tblGoods->lineEdit(i, 3)->text();
+            vals << ui->tblGoods->getString(i, 4);
+            vals << ui->tblGoods->lineEdit(i, 5)->text();
+            vals << ui->tblGoods->lineEdit(i, 6)->text();
+            p.tableText(points, vals, p.fLineHeight + 20);
+            end = i == ui->tblGoods->rowCount() - 1;
+            p.br(p.fLineHeight + 20);
+            if (p.checkBr((p.fLineHeight + 20) * 2) || end) {
+                p.fTop = p.fNormalHeight - ((p.fLineHeight + 20) * 2);
+                p.ltext(tr("Passed"), 0);
+                p.ltext(tr("Accepted"), 700);
+                p.br(p.fLineHeight + 20);
+                p.ltext(ui->lePassedName->text(), 0);
+                p.ltext(ui->leAcceptedName->text(), 700);
+                p.line(0, p.fTop, 650, p.fTop);
+                p.line(700, p.fTop, 1300, p.fTop);
+                p.rtext(QString("%1 #%2").arg(tr("Page")).arg(pageNumber++));
+                rowStart = i + 1;
+                if (!end) {
+                    p.br(p.fLineHeight + 20);
+                }
+                break;
+            }
+        }
+    } while (!end);
+    C5PrintPreview pp(&p, fDBParams, this);
+    pp.exec();
 }
 
 void C5StoreDoc::filterGoodsPanel(int group)
@@ -758,6 +883,9 @@ void C5StoreDoc::on_tblGoodsGroup_itemClicked(QTableWidgetItem *item)
 
 void C5StoreDoc::on_tblGoodsStore_itemDoubleClicked(QTableWidgetItem *item)
 {
+    if (!ui->wheader->isEnabled()) {
+        return;
+    }
     int r = item->row();
     if (r < 0) {
         return;
@@ -767,4 +895,30 @@ void C5StoreDoc::on_tblGoodsStore_itemDoubleClicked(QTableWidgetItem *item)
     ui->tblGoods->setString(row, 2, ui->tblGoodsStore->getString(r, 2));
     ui->tblGoods->setString(row, 4, ui->tblGoodsStore->getString(r, 4));
     ui->tblGoods->lineEdit(row, 3)->setFocus();
+}
+
+void C5StoreDoc::on_btnNewPartner_clicked()
+{
+    CE5Partner *ep = new CE5Partner(fDBParams);
+    C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
+    QList<QMap<QString, QVariant> > data;
+    if(e->getResult(data)) {
+        ui->lePartner->setValue(data.at(0)["f_id"].toString());
+    }
+    delete e;
+}
+
+void C5StoreDoc::on_btnNewGoods_clicked()
+{
+    CE5Goods *ep = new CE5Goods(fDBParams);
+    C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
+    QList<QMap<QString, QVariant> > data;
+    if(e->getResult(data)) {
+        int row = addGoodsRow();
+        ui->tblGoods->setData(row, 1, data.at(0)["f_id"]);
+        ui->tblGoods->setData(row, 2, data.at(0)["f_name"]);
+        ui->tblGoods->setData(row, 4, data.at(0)["f_unitname"]);
+        ui->tblGoods->lineEdit(row, 3)->setFocus();
+    }
+    delete e;
 }

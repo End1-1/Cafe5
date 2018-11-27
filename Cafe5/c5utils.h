@@ -41,6 +41,7 @@
 #define DOC_REASON_SALE 4
 #define DOC_REASON_LOST 5
 #define DOC_REASON_OVER 6
+#define DOC_REASON_TRASH 7
 
 class C5Utils
 {

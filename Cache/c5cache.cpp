@@ -1,10 +1,12 @@
 #include "c5cache.h"
+#include "c5database.h"
 
 QMap<QString, C5Cache*> C5Cache::fCacheList;
 QMap<int, QString> C5Cache::fCacheQuery;
+QMap<QString, int> C5Cache::fTableCache;
 
 C5Cache::C5Cache(const QStringList &dbParams) :
-    fDb(dbParams)
+    fDBParams(dbParams)
 {
     if (fCacheQuery.count() == 0) {
         fCacheQuery[cache_users_groups] = "select f_id, f_name from s_user_group order by f_name";
@@ -51,6 +53,42 @@ C5Cache::C5Cache(const QStringList &dbParams) :
                 .arg(tr("Code"))
                 .arg(tr("Name"));
     }
+    if (fTableCache.count() == 0) {
+        fTableCache["c_partners"] = cache_goods_partners;
+        fTableCache["c_units"] = cache_goods_unit;
+        fTableCache["c_groups"] = cache_goods_group;
+        fTableCache["c_goods"] = cache_goods;
+        fTableCache["d_part1"] = cache_dish_part1;
+        fTableCache["d_part2"] = cache_dish_part2;
+        fTableCache["d_dish"] = cache_dish;
+        fTableCache["c_storages"] = cache_goods_store;
+        fTableCache["c_goods_waster"] = cache_goods_waste;
+        fTableCache["s_user"] = cache_users;
+        fTableCache["s_user_group"] = cache_users_groups;
+    }
+    fVersion = 0;
+    C5Database db(dbParams);
+    db.startTransaction();
+    db.exec("select f_id from s_cache for update");
+    QList<int> missingCache;
+    for (QMap<QString, int>::const_iterator it = fTableCache.begin(); it != fTableCache.end(); it++) {
+        bool found = false;
+        for (int  i = 0; i < db.rowCount(); i++) {
+            if (db.getInt(i, "f_id") == it.value()) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            missingCache << it.value();
+        }
+    }
+    foreach (int k, missingCache) {
+        db[":f_id"] = k;
+        db[":f_version"] = 0;
+        db.insert("s_cache", false);
+    }
+    db.commit();
 }
 
 void C5Cache::refresh()
@@ -65,17 +103,38 @@ C5Cache *C5Cache::cache(const QStringList &dbParams, int cacheId)
     if (!fCacheList.contains(name)) {
         cache = new C5Cache(dbParams);
         cache->fId = cacheId;
+        fCacheList[name] = cache;
+    } else {
+        cache = fCacheList[name];
+    }
+    if (cache->fCacheData.count() == 0) {
         QString query = fCacheQuery[cacheId];
         cache->loadFromDatabase(query);
-        fCacheList[name] = cache;
+    } else {
+        C5Database db(cache->fDBParams);
+        db[":f_id"] = cache->fId;
+        db.exec("select f_version from s_cache where f_id=:f_id");
+        if (db.nextRow()) {
+            if (cache->fVersion != db.getInt(0)) {
+                QString query = fCacheQuery[cacheId];
+                cache->loadFromDatabase(query);
+            }
+        }
     }
-
-    return fCacheList[name];
+    return cache;
 }
 
 QString C5Cache::cacheName(const QStringList &dbParams, int cacheId)
 {
     return dbParams[0] + dbParams[1] + dbParams[2] + dbParams[3] + "-" + QString::number(cacheId);
+}
+
+void C5Cache::resetCache(const QStringList &dbParams, const QString &table)
+{
+    int cacheId = fTableCache[table];
+    C5Cache *c = C5Cache::cache(dbParams, cacheId);
+    c->fCacheData.clear();
+    c->fCacheIdRow.clear();
 }
 
 QString C5Cache::query(int cacheId)
@@ -86,8 +145,14 @@ QString C5Cache::query(int cacheId)
 void C5Cache::loadFromDatabase(const QString &query)
 {
     fCacheIdRow.clear();
-    fDb.exec(query, fCacheData);
+    C5Database db(fDBParams);
+    db.exec(query, fCacheData);
     for (int i = 0; i < fCacheData.count(); i++) {
         fCacheIdRow[fCacheData[i][0].toInt()] = i;
+    }
+    db[":f_id"] = fId;
+    db.exec("select f_version from s_cache where f_id=:f_id");
+    if (db.nextRow()) {
+        fVersion = db.getInt(0);
     }
 }

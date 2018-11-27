@@ -1,5 +1,6 @@
 #include "cr5users.h"
 #include "c5passwords.h"
+#include "ce5user.h"
 
 CR5Users::CR5Users(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
@@ -16,22 +17,7 @@ CR5Users::CR5Users(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_login"] = tr("Username");
     fTranslation["f_first"] = tr("First name");
     fTranslation["f_last"] = tr("Last name");
-
-    C5Cache *cg = createCache(cache_users_groups);
-    C5ComboDelegate *cbGroups = new C5ComboDelegate("f_group", cg, fTableView);
-    fTableView->setItemDelegateForColumn(1, cbGroups);
-
-    C5Cache *cs = createCache(cache_users_states);
-    C5ComboDelegate *cbStates = new C5ComboDelegate("f_state", cs, fTableView);
-    fTableView->setItemDelegateForColumn(2, cbStates);
-
-    fTableView->setItemDelegateForColumn(3, new C5TextDelegate(fTableView));
-    fTableView->setItemDelegateForColumn(4, new C5TextDelegate(fTableView));
-    fTableView->setItemDelegateForColumn(5, new C5TextDelegate(fTableView));
-
-    QList<int> colsForUpdate;
-    colsForUpdate << 3 << 4 << 5;
-    setTableForUpdate("s_user", colsForUpdate);
+    fEditor = new CE5User(dbParams);
 }
 
 QToolBar *CR5Users::toolBar()
@@ -39,7 +25,6 @@ QToolBar *CR5Users::toolBar()
     if (!fToolBar) {
         QList<ToolBarButtons> btn;
         btn << ToolBarButtons::tbNew
-            << ToolBarButtons::tbSave
             << ToolBarButtons::tbClearFilter
             << ToolBarButtons::tbRefresh
             << ToolBarButtons::tbExcel

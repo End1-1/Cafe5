@@ -1,6 +1,7 @@
 #include "cr5goodswaste.h"
 #include "c5selector.h"
 #include "c5tablemodel.h"
+#include "ce5goodswaste.h"
 
 CR5GoodsWaste::CR5GoodsWaste(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
@@ -8,24 +9,16 @@ CR5GoodsWaste::CR5GoodsWaste(const QStringList &dbParams, QWidget *parent) :
     fIcon = ":/goods.png";
     fLabel = tr("Goods auto waste");
 
-    fSqlQuery = "select w.f_id, g.f_name as f_groupname, gg.f_name, w.f_waste \
+    fSqlQuery = "select w.f_id, gg.f_name as f_goodsname, r.f_name as f_reasonname, w.f_waste \
                 from c_goods_waste w \
                 left join c_goods gg on gg.f_id=w.f_goods \
-                left join c_groups g on g.f_id=gg.f_group ";
+                left join a_reason r on r.f_id=w.f_reason ";
     fTranslation["f_id"] = tr("Code");
-    fTranslation["f_groupname"] = tr("Group");
+    fTranslation["f_reasonname"] = tr("Reason");
     fTranslation["f_waste"] = tr("Waste %");
-    fTranslation["f_name"] = tr("Name");;
+    fTranslation["f_goodsname"] = tr("Goods");;
 
-    C5TextDelegate *te = new C5TextDelegate(fTableView);
-    te->setValidator(new QDoubleValidator(0, 9, 3));
-    fTableView->setItemDelegateForColumn(3, te);
-
-    QList<int> colsForUpdate;
-    colsForUpdate << 3;
-    setTableForUpdate("c_goods_waste", colsForUpdate);
-
-    connect(this, SIGNAL(tblDoubleClicked(int,int,QList<QVariant>)), this, SLOT(dblClick(int,int,QList<QVariant>)));
+    fEditor = new CE5GoodsWaste(dbParams);
 }
 
 QToolBar *CR5GoodsWaste::toolBar()
@@ -33,7 +26,7 @@ QToolBar *CR5GoodsWaste::toolBar()
     if (!fToolBar) {
         QList<ToolBarButtons> btn;
         btn << ToolBarButtons::tbNew
-            << ToolBarButtons::tbSave
+            << ToolBarButtons::tbDelete
             << ToolBarButtons::tbClearFilter
             << ToolBarButtons::tbRefresh
             << ToolBarButtons::tbExcel
@@ -43,16 +36,27 @@ QToolBar *CR5GoodsWaste::toolBar()
     return fToolBar;
 }
 
-void CR5GoodsWaste::dblClick(int row, int column, const QList<QVariant> &values)
+void CR5GoodsWaste::removeRow()
 {
-    QList<QVariant> v;
-    if (column < 3) {
-        if (!C5Selector::getValue(fDBParams, cache_goods, v)) {
-            return;
-        }
-        fModel->setData(row, 1, v.at(1));
-        fModel->setData(row, 2, v.at(2));
-        fModel->setRowToUpdate(row, "f_goods", v.at(0));
+    QModelIndexList ml = fTableView->selectionModel()->selectedIndexes();
+    if (ml.count() == 0) {
+        return;
     }
-    qDebug() << row << column << values;
+    if (C5Message::question(tr("Confirm to remove selected records")) != QDialog::Accepted) {
+        return;
+    }
+    QSet<int> rowsTemp;
+    foreach (QModelIndex mi, ml) {
+        rowsTemp << mi.row();
+    }
+    QList<int> rows = rowsTemp.toList();
+    std::sort(rows.begin(), rows.end());
+    std::reverse(rows.begin(), rows.end());
+    C5Database db(fDBParams);
+    foreach (int r, rows) {
+        db[":f_id"] = fModel->data(r, 0, Qt::EditRole);
+        db.exec("delete from c_goods_waste where f_id=:f_id");
+        fModel->removeRow(r);
+    }
 }
+

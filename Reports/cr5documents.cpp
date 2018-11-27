@@ -66,7 +66,6 @@ QToolBar *CR5Documents::toolBar()
     if (!fToolBar) {
         QList<ToolBarButtons> btn;
         btn << ToolBarButtons::tbEdit
-            << ToolBarButtons::tbDelete
             << ToolBarButtons::tbFilter
             << ToolBarButtons::tbClearFilter
             << ToolBarButtons::tbRefresh
@@ -79,6 +78,9 @@ QToolBar *CR5Documents::toolBar()
         a = new QAction(QIcon(":/draft.png"), tr("Create\ndraft"));
         connect(a, SIGNAL(triggered()), this, SLOT(draftDocs()));
         fToolBar->insertAction(fToolBar->actions().at(1), a);
+        a = new QAction(QIcon(":/recycle.png"), tr("Remove"));
+        connect(a, SIGNAL(triggered()), this, SLOT(removeDocs()));
+        fToolBar->insertAction(fToolBar->actions().at(2), a);
     }
     return fToolBar;
 }
@@ -93,30 +95,6 @@ void CR5Documents::tblDoubleClicked(int row, int column, const QList<QVariant> &
 void CR5Documents::callEditor(int id)
 {
     openDoc(id);
-}
-
-void CR5Documents::removeWithId(int id, int row)
-{
-    switch (docType(id)) {
-    case DOC_TYPE_STORE_INPUT:
-    case DOC_TYPE_STORE_OUTPUT:
-    case DOC_TYPE_STORE_MOVE:
-        if (C5Message::question(tr("Confirm to remove document")) != QDialog::Accepted) {
-            return;
-        }
-        if (C5StoreDoc::removeDoc(fDBParams, id)) {
-            fModel->removeRow(row);
-        }
-        break;
-    case DOC_TYPE_STORE_INVENTORY:
-        if (C5Message::question(tr("Confirm to remove document")) != QDialog::Accepted) {
-            return;
-        }
-        if (C5StoreInventory::removeDoc(fDBParams, id)) {
-            fModel->removeRow(row);
-        }
-        break;
-    }
 }
 
 void CR5Documents::openDoc(int id)
@@ -257,5 +235,48 @@ void CR5Documents::draftDocs()
     }
     if (!err.isEmpty()) {
         C5Message::error(err);
+    }
+}
+
+void CR5Documents::removeDocs()
+{
+    if (!fColumnsVisible["h.f_id"]) {
+        C5Message::error(tr("Please, set the 'Code' column to visible."));
+        return;
+    }
+    QModelIndexList ml = fTableView->selectionModel()->selectedIndexes();
+    if (ml.count() == 0) {
+        return;
+    }
+    if (C5Message::question(tr("Confirm to remove selected documents")) != QDialog::Accepted) {
+        return;
+    }
+    QSet<int> rowsTemp;
+    foreach (QModelIndex mi, ml) {
+        rowsTemp << mi.row();
+    }
+    QList<int> rows = rowsTemp.toList();
+    std::sort(rows.begin(), rows.end());
+    std::reverse(rows.begin(), rows.end());
+    foreach (int r, rows) {
+        int id = fModel->data(r, fModel->indexForColumnName("f_id"), Qt::EditRole).toInt();
+        switch (docType(id)) {
+        case DOC_TYPE_STORE_INPUT:
+        case DOC_TYPE_STORE_OUTPUT:
+        case DOC_TYPE_STORE_MOVE:
+            if (C5StoreDoc::removeDoc(fDBParams, id, false)) {
+                fModel->removeRow(r);
+            } else {
+                return;
+            }
+            break;
+        case DOC_TYPE_STORE_INVENTORY:
+            if (C5StoreInventory::removeDoc(fDBParams, id)) {
+                fModel->removeRow(r);
+            } else {
+                return;
+            }
+            break;
+        }
     }
 }

@@ -69,7 +69,6 @@ SOURCES += \
     ../Reports/cr5dishpart1.cpp \
     ../Reports/cr5dishpart2.cpp \
     ../Reports/cr5dish.cpp \
-    c5dishwidget.cpp \
     ../Reports/cr5settings.cpp \
     ../Reports/c5settingswidget.cpp \
     ../Reports/cr5goodsunit.cpp \
@@ -97,7 +96,22 @@ SOURCES += \
     ../Classes/c5datedelegate.cpp \
     ../Reports/cr5documentsfilter.cpp \
     ../Reports/cr5consumptionbysales.cpp \
-    ../Reports/cr5consumptionbysalesfilter.cpp
+    ../Reports/cr5consumptionbysalesfilter.cpp \
+    ../Editors/ce5partner.cpp \
+    ../Editors/c5editor.cpp \
+    ../Editors/ce5editor.cpp \
+    ../Editors/ce5goodsunit.cpp \
+    ../Editors/ce5storage.cpp \
+    ../Editors/ce5goods.cpp \
+    ../Editors/ce5dishpart1.cpp \
+    ../Editors/ce5dishpart2.cpp \
+    ../Editors/c5dishwidget.cpp \
+    ../Editors/ce5menuname.cpp \
+    ../Editors/ce5goodsgroup.cpp \
+    ../Editors/ce5goodswaste.cpp \
+    c5welcomepage.cpp \
+    ../Editors/ce5usergroup.cpp \
+    ../Editors/ce5user.cpp
 
 HEADERS += \
         c5mainwindow.h \
@@ -136,7 +150,6 @@ HEADERS += \
     ../Reports/cr5dishpart1.h \
     ../Reports/cr5dishpart2.h \
     ../Reports/cr5dish.h \
-    c5dishwidget.h \
     ../Reports/cr5settings.h \
     ../Reports/c5settingswidget.h \
     ../Reports/cr5goodsunit.h \
@@ -166,7 +179,22 @@ HEADERS += \
     ../Reports/cr5consumptionbysales.h \
     ../Reports/cr5consumptionbysalesfilter.h \
     rc.h \
-    res.rc
+    res.rc \
+    ../Editors/ce5partner.h \
+    ../Editors/c5editor.h \
+    ../Editors/ce5editor.h \
+    ../Editors/ce5goodsunit.h \
+    ../Editors/ce5storage.h \
+    ../Editors/ce5goods.h \
+    ../Editors/ce5dishpart1.h \
+    ../Editors/ce5dishpart2.h \
+    ../Editors/c5dishwidget.h \
+    ../Editors/ce5menuname.h \
+    ../Editors/ce5goodsgroup.h \
+    ../Editors/ce5goodswaste.h \
+    c5welcomepage.h \
+    ../Editors/ce5usergroup.h \
+    ../Editors/ce5user.h
 
 FORMS += \
         c5mainwindow.ui \
@@ -179,7 +207,6 @@ FORMS += \
     ../Reports/cr5commonsalesfilter.ui \
     c5passwords.ui \
     c5grouppermissionseditor.ui \
-    c5dishwidget.ui \
     ../Reports/c5settingswidget.ui \
     c5selector.ui \
     c5storedoc.ui \
@@ -189,13 +216,28 @@ FORMS += \
     c5storeinventory.ui \
     ../Reports/cr5tstoreextrafilter.ui \
     ../Reports/cr5documentsfilter.ui \
-    ../Reports/cr5consumptionbysalesfilter.ui
+    ../Reports/cr5consumptionbysalesfilter.ui \
+    ../Editors/ce5partner.ui \
+    ../Editors/c5editor.ui \
+    ../Editors/ce5goodsunit.ui \
+    ../Editors/ce5storage.ui \
+    ../Editors/ce5goods.ui \
+    ../Editors/ce5dishpart1.ui \
+    ../Editors/ce5dishpart2.ui \
+    ../Editors/c5dishwidget.ui \
+    ../Editors/ce5menuname.ui \
+    ../Editors/ce5goodsgroup.ui \
+    ../Editors/ce5goodswaste.ui \
+    c5welcomepage.ui \
+    ../Editors/ce5usergroup.ui \
+    ../Editors/ce5user.ui
 
 INCLUDEPATH += ../Cafe5
 INCLUDEPATH += ../Classes
 INCLUDEPATH += ../Reports
 INCLUDEPATH += ../Controls
 INCLUDEPATH += ../Cache
+INCLUDEPATH += ../Editors
 INCLUDEPATH += ../RESOURCES
 
 RESOURCES += \

@@ -69,6 +69,27 @@ void C5Printing::line()
     line(0, fTop, fNormalWidth, fTop);
 }
 
+void C5Printing::tableText(const QList<qreal> &points, const QStringList &vals, int rowHeight)
+{
+    if (points.count() < 2) {
+        return;
+    }
+    qreal totalWidth = 0.0;
+    foreach (qreal w, points) {
+        totalWidth += w;
+    }
+    line(points.at(0), fTop, totalWidth, fTop);
+    line(points.at(0), fTop + rowHeight, totalWidth, fTop + rowHeight);
+    totalWidth = 0.0;
+    for (int i = 0; i < points.count(); i++) {
+        totalWidth += points.at(i);
+        line (totalWidth, fTop, totalWidth, fTop + rowHeight);
+        if (i < points.count() - 1) {
+            ltext(vals.at(i), totalWidth + 1);
+        }
+    }
+}
+
 void C5Printing::ltext(const QString &text, qreal x)
 {
     QGraphicsTextItem *item = fCanvas->addText(text, fFont);
@@ -148,7 +169,7 @@ bool C5Printing::br(qreal height)
 
 bool C5Printing::checkBr(int height)
 {
-    return fTop + height > fNormalHeight;
+    return fTop + height >= fNormalHeight;
 }
 
 int C5Printing::currentPageIndex()

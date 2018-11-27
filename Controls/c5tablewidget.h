@@ -27,6 +27,10 @@ public:
 
     bool findWidget(QWidget *w, int &row, int &column);
 
+    QVariant getData(int row, int column);
+
+    void setData(int row, int column, const QVariant &value);
+
     int getInteger(int row, int column);
 
     void setInteger(int row, int column, int value);

@@ -1,9 +1,26 @@
 #include "c5lineedit.h"
+#include <QValidator>
+
 
 C5LineEdit::C5LineEdit(QWidget *parent) :
     QLineEdit(parent)
 {
+    fColor = -1;
+}
 
+void C5LineEdit::setText(const QString &arg)
+{
+    QString t = arg;
+    const QValidator *v = validator();
+    if (v) {
+        if (!strcmp(v->metaObject()->className(), "QDoubleValidator")) {
+            QLocale l;
+            t.replace(".", l.decimalPoint());
+            t.replace(",", l.decimalPoint());
+            t.replace("․", l.decimalPoint());
+        }
+    }
+    QLineEdit::setText(t);
 }
 
 void C5LineEdit::setInteger(int i)
@@ -34,4 +51,19 @@ int C5LineEdit::getTag()
 void C5LineEdit::setTag(int tag)
 {
     fTag = tag;
+}
+
+void C5LineEdit::setColor(int c)
+{
+    fColor = c;
+    QPalette palette;
+    QColor color = QColor::fromRgb(c);
+    palette.setColor(QPalette::Base, color);
+    palette.setColor(QPalette::Text, color);
+    setPalette(palette);
+}
+
+int C5LineEdit::color()
+{
+    return fColor;
 }

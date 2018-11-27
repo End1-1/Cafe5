@@ -27,6 +27,8 @@ public:
 
     void line();
 
+    void tableText(const QList<qreal> &points, const QStringList &vals, int rowHeight);
+
     void ltext(const QString &text, qreal x);
 
     void ctext(const QString &text);

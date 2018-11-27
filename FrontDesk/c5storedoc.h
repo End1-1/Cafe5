@@ -62,6 +62,8 @@ private:
     void setGoodsPanelHidden(bool v);
 
 private slots:
+    void newDoc();
+
     void getInput();
 
     void getOutput();
@@ -95,6 +97,10 @@ private slots:
     void on_tblGoodsGroup_itemClicked(QTableWidgetItem *item);
 
     void on_tblGoodsStore_itemDoubleClicked(QTableWidgetItem *item);
+
+    void on_btnNewPartner_clicked();
+
+    void on_btnNewGoods_clicked();
 };
 
 #endif // C5STOREDOC_H

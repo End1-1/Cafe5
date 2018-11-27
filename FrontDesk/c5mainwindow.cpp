@@ -20,6 +20,7 @@
 #include "cr5databases.h"
 #include "cr5goodspartners.h"
 #include "cr5goodswaste.h"
+#include "c5welcomepage.h"
 #include "cr5goodsunit.h"
 #include "cr5menunames.h"
 #include "cr5materialsinstore.h"
@@ -48,13 +49,23 @@ C5MainWindow::C5MainWindow(QWidget *parent) :
     connect(ui->tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(tabCloseRequested(int)));
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(currentTabChange(int)));
     fReportToolbar = 0;
+    ui->actionHome->setEnabled(false);
+
     QShortcut *f3 = new QShortcut(QKeySequence("Ctrl+F"), this);
     connect(f3, SIGNAL(activated()), this, SLOT(hotKey()));
     QShortcut *esc = new QShortcut(QKeySequence("ESC"), this);
     connect(esc, SIGNAL(activated()), this, SLOT(hotKey()));
     QShortcut *ctrlPlush = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Plus), this);
     connect(ctrlPlush, SIGNAL(activated()), this, SLOT(hotKey()));
+    QShortcut *ctrlHome = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Home), this);
+    connect(ctrlHome, SIGNAL(activated()), this, SLOT(on_actionGo_to_home_triggered()));
     __mainWindow = this;
+
+    QVariant menuPanelIsVisible = C5Config::getRegValue("menupanel");
+    if (menuPanelIsVisible == QVariant::Invalid) {
+        menuPanelIsVisible = true;
+    }
+    ui->twDb->setVisible(menuPanelIsVisible.toBool());
 }
 
 C5MainWindow::~C5MainWindow()
@@ -86,7 +97,7 @@ void C5MainWindow::twCustomMenu(const QPoint &p)
     QTreeWidgetItem *item = ui->twDb->itemAt(p);
     QMenu menu(this);
     if (!item->parent()) {
-        menu.addAction(ui->actionConfigure_connection);
+
     }
     menu.exec(ui->twDb->mapToGlobal(p));
 }
@@ -149,6 +160,14 @@ void C5MainWindow::on_actionLogin_triggered()
         QString icon = db.getInt(6) == 0 ? ":/database.png" : ":/database_main.png";
         item->setIcon(0, QIcon(icon));
         ui->twDb->addTopLevelItem(item);
+
+        QVariant showwelcomePage = C5Config::getRegValue("showwelcomepage");
+        if (showwelcomePage == QVariant::Invalid) {
+            showwelcomePage = false;
+        }
+        if (showwelcomePage.toBool()) {
+            showWelcomePage();
+        }
 
         QTreeWidgetItem *it = 0;
         if (pr(db.getString(0), cp_t2_action)) {
@@ -219,6 +238,8 @@ void C5MainWindow::on_actionLogin_triggered()
         ui->twDb->expandAll();
     }
     enableMenu(true);
+    ui->actionHome->setEnabled(true);
+    ui->actionLogin->setVisible(false);
 }
 
 void C5MainWindow::hotKey()
@@ -237,7 +258,6 @@ void C5MainWindow::enableMenu(bool v)
         ui->twDb->clear();
     }
     fLogin = v;
-    ui->actionAppend_database->setEnabled(v && __usergroup == 1);
 }
 
 void C5MainWindow::addTreeL3Item(QTreeWidgetItem *item, int permission, const QString &text, const QString &icon)
@@ -255,6 +275,22 @@ void C5MainWindow::addTreeL3Item(QTreeWidgetItem *item, int permission, const QS
     child->setIcon(0, QIcon(icon));
     child->setData(0, Qt::UserRole, permission);
     item->addChild(child);
+}
+
+void C5MainWindow::showWelcomePage()
+{
+    QTreeWidgetItem *item = ui->twDb->topLevelItem(0);
+    QStringList dbparams;
+    dbparams << item->data(0, Qt::UserRole + 1).toString()
+             << item->data(0, Qt::UserRole + 2).toString()
+             << item->data(0, Qt::UserRole + 3).toString()
+             << item->data(0, Qt::UserRole + 4).toString()
+             << item->data(0, Qt::UserRole).toString();
+    C5WelcomePage *t = new C5WelcomePage(dbparams);
+    fTab->insertTab(0, t, t->icon(), QString("[%1] %2").arg(dbparams.at(4)).arg(t->label()));
+    fTab->setCurrentIndex(0);
+    fTab->tabBar()->tabButton(0, QTabBar::RightSide)->resize(0, 0);
+    t->postProcess();
 }
 
 void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
@@ -357,11 +393,6 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
     }
 }
 
-void C5MainWindow::on_actionConfigure_connection_triggered()
-{
-
-}
-
 void C5MainWindow::on_actionClose_application_triggered()
 {
     if (C5Message::question(tr("Are you sure to close application?")) == QDialog::Accepted) {
@@ -373,4 +404,36 @@ void C5MainWindow::on_btnHideMenu_clicked()
 {
     ui->twDb->setVisible(!ui->twDb->isVisible());
     ui->btnHideMenu->setText(ui->twDb->isVisible() ? "<" : ">");
+    C5Config::setRegValue("menupanel", ui->twDb->isVisible());
+}
+void C5MainWindow::on_actionHome_triggered()
+{
+    bool isVisible = fTab->count() > 0;
+    C5WelcomePage *wp = 0;
+    if (isVisible) {
+        wp = dynamic_cast<C5WelcomePage*>(fTab->widget(0));
+    }
+    isVisible = wp != 0;
+    if (isVisible) {
+        removeTab(wp);
+    } else {
+        if (ui->twDb->topLevelItemCount() > 0) {
+            showWelcomePage();
+        }
+    }
+    C5Config::setRegValue("showwelcomepage", !isVisible);
+}
+
+void C5MainWindow::on_actionGo_to_home_triggered()
+{
+    if (fTab->count() == 0) {
+        showWelcomePage();
+        return;
+    }
+    C5WelcomePage *wp = dynamic_cast<C5WelcomePage*>(fTab->widget(0));
+    if (wp) {
+        fTab->setCurrentIndex(0);
+    } else {
+        showWelcomePage();
+    }
 }

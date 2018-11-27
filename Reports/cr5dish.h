@@ -14,13 +14,19 @@ public:
 
     virtual QToolBar *toolBar();
 
-protected:
-    virtual void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
+public slots:
+    virtual bool on_tblView_doubleClicked(const QModelIndex &index);
 
-    virtual void saveDataChanges();
+protected:
+    virtual void buildQuery();
+
+    virtual void refreshData();
 
 private:
     C5DishWidget *fDishWidget;
+
+private:
+    void setColors();
 };
 
 #endif // CR5DISH_H

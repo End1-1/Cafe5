@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>CE5Partner</class>
+ <widget class="QWidget" name="CE5Partner">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>436</width>
+    <height>218</height>
+   </rect>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>450</width>
+    <height>16777215</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Taxname</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="C5LineEditWithSelector" name="lineEdit_2">
+     <property name="Field" stdset="0">
+      <string>f_taxname</string>
+     </property>
+     <property name="Check" stdset="0">
+      <string>empty=Taxname</string>
+     </property>
+     <property name="Type" stdset="0">
+      <number>0</number>
+     </property>
+     <property name="First" stdset="0">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="C5LineEditWithSelector" name="leCode">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="Field" stdset="0">
+      <string>f_id</string>
+     </property>
+     <property name="Primary" stdset="0">
+      <bool>true</bool>
+     </property>
+     <property name="Manual" stdset="0">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Contact</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="C5LineEditWithSelector" name="lineEdit_3">
+     <property name="Field" stdset="0">
+      <string>f_contact</string>
+     </property>
+     <property name="Type" stdset="0">
+      <string>0</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Info</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Code</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <widget class="C5LineEditWithSelector" name="lineEdit_4">
+     <property name="Field" stdset="0">
+      <string>f_info</string>
+     </property>
+     <property name="Type" stdset="0">
+      <string>0</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>Phone</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1">
+    <widget class="C5LineEditWithSelector" name="lineEdit_5">
+     <property name="Field" stdset="0">
+      <string>f_phone</string>
+     </property>
+     <property name="Type" stdset="0">
+      <string>0</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0">
+    <widget class="QLabel" name="label_6">
+     <property name="text">
+      <string>Email</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1">
+    <widget class="C5LineEditWithSelector" name="lineEdit_6">
+     <property name="Field" stdset="0">
+      <string>f_email</string>
+     </property>
+     <property name="Type" stdset="0">
+      <string>0</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_7">
+     <property name="text">
+      <string>Taxpayer id</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="C5LineEditWithSelector" name="lineEdit_7">
+     <property name="Field" stdset="0">
+      <string>f_taxcode</string>
+     </property>
+     <property name="Type" stdset="0">
+      <string>0</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>C5LineEditWithSelector</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5lineeditwithselector.h</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>leCode</tabstop>
+  <tabstop>lineEdit_2</tabstop>
+  <tabstop>lineEdit_7</tabstop>
+  <tabstop>lineEdit_3</tabstop>
+  <tabstop>lineEdit_4</tabstop>
+  <tabstop>lineEdit_5</tabstop>
+  <tabstop>lineEdit_6</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

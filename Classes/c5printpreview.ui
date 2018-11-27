@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1226</width>
+    <width>1271</width>
     <height>714</height>
    </rect>
   </property>
@@ -389,13 +389,16 @@
         <property name="widgetResizable">
          <bool>true</bool>
         </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
         <widget class="QWidget" name="scrollAreaWidgetContents">
          <property name="geometry">
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>1204</width>
-           <height>654</height>
+           <width>1245</width>
+           <height>649</height>
           </rect>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_3">

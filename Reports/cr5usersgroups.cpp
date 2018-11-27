@@ -1,5 +1,6 @@
 #include "cr5usersgroups.h"
 #include "c5grouppermissionseditor.h"
+#include "ce5usergroup.h"
 
 CR5UsersGroups::CR5UsersGroups(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
@@ -9,10 +10,7 @@ CR5UsersGroups::CR5UsersGroups(const QStringList &dbParams, QWidget *parent) :
     fSqlQuery = "select f_id, f_name from s_user_group";
     fTranslation["f_id"] = tr("Code");
     fTranslation["f_name"] = tr("Name");
-    fTableView->setItemDelegateForColumn(1, new C5TextDelegate(fTableView));
-    QList<int> colsForUpdate;
-    colsForUpdate << 1;
-    setTableForUpdate("s_user_group", colsForUpdate);
+    fEditor = new CE5UserGroup(dbParams);
 }
 
 QToolBar *CR5UsersGroups::toolBar()
@@ -20,7 +18,6 @@ QToolBar *CR5UsersGroups::toolBar()
     if (!fToolBar) {
         QList<ToolBarButtons> btn;
         btn << ToolBarButtons::tbNew
-            << ToolBarButtons::tbSave
             << ToolBarButtons::tbClearFilter
             << ToolBarButtons::tbRefresh
             << ToolBarButtons::tbExcel

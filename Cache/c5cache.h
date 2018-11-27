@@ -1,8 +1,9 @@
 #ifndef C5CACHE_H
 #define C5CACHE_H
 
-#include "c5database.h"
+#include <QObject>
 #include <QMap>
+#include <QVariant>
 
 #define cache_users_groups 1
 #define cache_users_states 2
@@ -19,6 +20,8 @@
 #define cache_users 14
 #define cache_waiter_printers 15
 #define cache_store_reason 16
+#define cache_dish 17
+#define cache_goods_waste 18
 
 class C5Cache : public QObject
 {
@@ -41,7 +44,11 @@ public:
 
     static QMap<QString, C5Cache*> fCacheList;
 
+    static int idForTable(const QString &table) {return fTableCache[table];}
+
     static QString cacheName(const QStringList &dbParams, int cacheId);
+
+    static void resetCache(const QStringList &dbParams, const QString &table);
 
     QString query(int cacheId);
 
@@ -52,12 +59,16 @@ protected:
 
     virtual void loadFromDatabase(const QString &query);
 
-    C5Database fDb;
-
 private:
     static QMap<int, QString> fCacheQuery;
 
+    static QMap<QString, int> fTableCache;
+
     int fId;
+
+    int fVersion;
+
+    QStringList fDBParams;
 };
 
 #endif // C5CACHE_H

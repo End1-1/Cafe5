@@ -4,12 +4,14 @@
 #include "c5cache.h"
 #include "c5selector.h"
 #include "c5combobox.h"
+#include <QColorDialog>
 
 C5DishWidget::C5DishWidget(const QStringList &dbParams, QWidget *parent) :
-    C5Widget(dbParams, parent),
+    CE5Editor(dbParams, parent),
     ui(new Ui::C5DishWidget)
 {
     ui->setupUi(this);
+    ui->lePart2->setSelector(dbParams, ui->lePart2Name, cache_dish_part2);
     ui->tblPricing->setColumnWidths(7, 0, 0, 100, 80, 100, 100, 100);
     ui->tblRecipe->setColumnWidths(7, 0, 0, 200, 80, 80, 80, 80);
     C5Database db(dbParams);
@@ -27,8 +29,8 @@ C5DishWidget::C5DishWidget(const QStringList &dbParams, QWidget *parent) :
         ui->tblPricing->createComboBox(row, 6)->setCache(dbParams, cache_waiter_printers);
         row++;
     }
-    fId = 0;
     this->setEnabled(false);
+    connect(ui->leColor, SIGNAL(doubleClicked()), this, SLOT(setColor()));
 }
 
 C5DishWidget::~C5DishWidget()
@@ -36,16 +38,36 @@ C5DishWidget::~C5DishWidget()
     delete ui;
 }
 
+QString C5DishWidget::title()
+{
+    return tr("Dish");
+}
+
+QString C5DishWidget::table()
+{
+    return "d_dish";
+}
+
+void C5DishWidget::setId(int id)
+{
+    CE5Editor::setId(id);
+    setDish(id);
+}
+
+void C5DishWidget::clear()
+{
+    CE5Editor::clear();
+    for (int i = 0; i < ui->tblPricing->rowCount(); i++) {
+        ui->tblPricing->setString(i, 3, "");
+    }
+    ui->tblRecipe->clearContents();
+    ui->tblRecipe->setRowCount(0);
+    this->setEnabled(false);
+}
+
 void C5DishWidget::setDish(int id)
 {
-    clearWidget();
-    fId = id;
     C5Database db(fDBParams);
-    db[":f_id"] = id;
-    db.exec("select concat(p2.f_name, ': ', d.f_name) as f_name from d_dish d left join d_part2 p2 on p2.f_id=d.f_part where d.f_id=:f_id");
-    if (db.nextRow()) {
-        ui->lbName->setText(db.getString("f_name"));
-    }
     db[":f_dish"] = id;
     db.exec("select m.f_id, m.f_menu, m.f_price, m.f_store, m.f_print1, m.f_print2 from d_menu m where f_dish=:f_dish");
     while (db.nextRow()) {
@@ -88,23 +110,15 @@ void C5DishWidget::setDish(int id)
     this->setEnabled(id > 0);
 }
 
-void C5DishWidget::clearWidget()
+bool C5DishWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
 {
-    fId = 0;
-    ui->lbName->clear();
-    for (int i = 0; i < ui->tblPricing->rowCount(); i++) {
-        ui->tblPricing->setString(i, 3, "");
+    bool result = CE5Editor::save(err, data);
+    if (!result) {
+        return false;
     }
-    ui->tblRecipe->clearContents();
-    ui->tblRecipe->setRowCount(0);
-    this->setEnabled(false);
-}
-
-void C5DishWidget::save(int id)
-{
     C5Database db(fDBParams);
     for (int i = 0; i < ui->tblPricing->rowCount(); i++) {
-        db[":f_dish"] = id;
+        db[":f_dish"] = ui->leCode->getInteger();
         db[":f_price"] = ui->tblPricing->getDouble(i, 3);
         db[":f_menu"] = ui->tblPricing->getInteger(i, 1);
         db[":f_store"] = ui->tblPricing->comboBox(i, 4)->currentIndex() > -1 ? ui->tblPricing->comboBox(i, 4)->currentData() : "null";
@@ -123,7 +137,7 @@ void C5DishWidget::save(int id)
                 db.exec("delete from d_recipes where f_id=:f_id");
             }
         }
-        db[":f_dish"] = id;
+        db[":f_dish"] = ui->leCode->getInteger();
         db[":f_goods"] = ui->tblRecipe->getInteger(i, 1);
         db[":f_qty"] = ui->tblRecipe->lineEdit(i, 3)->getDouble();
         db[":f_price"] = ui->tblRecipe->lineEdit(i, 5)->getDouble();
@@ -133,6 +147,7 @@ void C5DishWidget::save(int id)
             db.update("d_recipes", where_id(ui->tblRecipe->getInteger(i, 0)));
         }
     }
+    return true;
 }
 
 void C5DishWidget::on_btnAddRecipe_clicked()
@@ -161,6 +176,14 @@ void C5DishWidget::on_btnRemoveRecipe_clicked()
         return;
     }
     ui->tblRecipe->setRowHidden(row, true);
+}
+
+void C5DishWidget::setColor()
+{
+    QColor initColor = QColor::fromRgb(ui->leColor->color());
+    int color = QColorDialog::getColor(initColor, this, tr("Background color")).rgb();
+    ui->leColor->setColor(color);
+    ui->leColor->setInteger(color);
 }
 
 void C5DishWidget::countTotalSelfCost()

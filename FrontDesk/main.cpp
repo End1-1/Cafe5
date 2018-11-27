@@ -2,6 +2,8 @@
 #include "c5connection.h"
 #include <QApplication>
 #include <QTranslator>
+#include <QStyleFactory>
+#include <QFontDatabase>
 
 int main(int argc, char *argv[])
 {
@@ -14,10 +16,26 @@ int main(int argc, char *argv[])
     C5Config::fSettingsName = connectionParams.at(4);
     C5Config::fLastUsername = connectionParams.at(5);
 
+#ifndef QT_DEBUG
+    QStringList libPath;
+    libPath << "./";
+    libPath << "./platforms";
+    libPath << "./sqldrivers";
+    QCoreApplication::setLibraryPaths(libPath);
+#endif
+
     QApplication a(argc, argv);
     QTranslator t;
     t.load(":/lang/FrontDesk.qm");
     a.installTranslator(&t);
+    a.setStyle(QStyleFactory::create("fusion"));
+
+    int id = QFontDatabase::addApplicationFont(":/ahuni.ttf");
+    QString family = QFontDatabase::applicationFontFamilies(id).at(0);
+    QFont font(family);
+    font.setPointSize(8);
+    a.setFont(font);
+
 
     C5MainWindow w;
     w.showMaximized();

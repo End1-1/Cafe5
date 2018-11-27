@@ -12,8 +12,8 @@ public:
 
     virtual QToolBar *toolBar();
 
-private slots:
-    void dblClick(int row, int column, const QList<QVariant> &values);
+protected slots:
+    virtual void removeRow();
 };
 
 #endif // CR5GOODSWASTE_H

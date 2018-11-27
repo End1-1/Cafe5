@@ -11,6 +11,17 @@ public:
     CR5DishPart2(const QStringList &dbParams, QWidget *parent = 0);
 
     virtual QToolBar *toolBar();
+
+public slots:
+    virtual bool on_tblView_doubleClicked(const QModelIndex &index);
+
+protected:
+    virtual void buildQuery();
+
+    virtual void refreshData();
+
+private:
+    void setColors();
 };
 
 #endif // CR5DISHPART2_H

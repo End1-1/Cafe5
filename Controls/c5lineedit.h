@@ -14,6 +14,8 @@ public:
 
     QString fOldValue;
 
+    void setText(const QString &arg);
+
     void setInteger(int i);
 
     int getInteger();
@@ -28,8 +30,14 @@ public:
 
     inline bool isEmpty() {return text().isEmpty();}
 
+    void setColor(int c);
+
+    int color();
+
 private:
     int fTag;
+
+    int fColor;
 };
 
 #endif // C5LINEEDIT_H

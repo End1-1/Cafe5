@@ -84,6 +84,16 @@ bool C5TableWidget::findWidget(QWidget *w, int &row, int &column)
     return false;
 }
 
+QVariant C5TableWidget::getData(int row, int column)
+{
+    return item(row, column)->text();
+}
+
+void C5TableWidget::setData(int row, int column, const QVariant &value)
+{
+    item(row, column)->setData(Qt::DisplayRole, value);
+}
+
 int C5TableWidget::getInteger(int row, int column)
 {
     return item(row, column)->text().toInt();

@@ -7,8 +7,11 @@
 #include "c5printing.h"
 #include "c5printpreview.h"
 #include "c5gridgilter.h"
+#include "c5editor.h"
+#include "ce5editor.h"
 #include <QMenu>
 #include <QScrollBar>
+#include <QClipboard>
 
 C5Grid::C5Grid(const QStringList &dbParams, QWidget *parent) :
     C5Widget(dbParams, parent),
@@ -22,19 +25,25 @@ C5Grid::C5Grid(const QStringList &dbParams, QWidget *parent) :
     fSimpleQuery = true;
     fTableView = ui->tblView;
     fTableView->horizontalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(fTableView->horizontalHeader(), SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(tableViewContextMenuRequested(QPoint)));
+    connect(fTableView->horizontalHeader(), SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(tableViewHeaderContextMenuRequested(QPoint)));
     connect(fTableView->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(tableViewHeaderClicked(int)));
     connect(fTableView->horizontalHeader(), SIGNAL(sectionResized(int,int,int)), this, SLOT(tableViewHeaderResized(int,int,int)));
     connect(fTableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(selectionChanged(QItemSelection,QItemSelection)));
+    connect(fTableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(tableViewContextMenuRequested(QPoint)));
     connect(ui->tblTotal->horizontalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(tblValueChanged(int)));
     fFilterWidget = 0;
+    fEditor = 0;
     ui->tblTotal->setVisible(false);
+    ui->tblView->resizeRowsToContents();
 }
 
 C5Grid::~C5Grid()
 {
     if (fFilterWidget) {
         delete fFilterWidget;
+    }
+    if (fEditor) {
+        delete fEditor;
     }
     delete ui;
 }
@@ -302,6 +311,70 @@ void C5Grid::selectionChanged(const QItemSelection &selected, const QItemSelecti
     Q_UNUSED(deselected);
 }
 
+void C5Grid::copySelection()
+{
+    QModelIndexList sel = fTableView->selectionModel()->selectedIndexes();
+    if (sel.count() == 0) {
+        return;
+    }
+    QString data;
+    int currCol = -1;
+    bool first = true;
+    foreach (QModelIndex m, sel) {
+        if (currCol < 0) {
+            currCol = m.row();
+        }
+        if (currCol != m.row()) {
+            currCol = m.row();
+            first = true;
+            data += "\r\n";
+        }
+        if (first) {
+            first = false;
+        } else {
+            data += "\t";
+        }
+        data += m.data(Qt::DisplayRole).toString();
+    }
+    QClipboard *c = qApp->clipboard();
+    c->setText(data);
+}
+
+void C5Grid::copyAll()
+{
+    QString data;
+    for (int i = 0; i < fModel->columnCount(); i++) {
+        data += fModel->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString();
+        if (i < fModel->columnCount() - 1) {
+            data += "\t";
+        } else {
+            data += "\r\n";
+        }
+    }
+    for (int r = 0, rc = fModel->rowCount(); r < rc; r++) {
+        for (int c = 0, cc = fModel->columnCount(); c < cc; c++) {
+            data += fModel->data(r, c, Qt::DisplayRole).toString();
+            if (c == cc - 1) {
+                data += "\r\n";
+            } else {
+                data += "\t";
+            }
+        }
+    }
+    if (ui->tblTotal->isVisible()) {
+        for (int i = 0; i < ui->tblTotal->columnCount(); i++) {
+            data += ui->tblTotal->getString(0, i);
+            if (i < fModel->columnCount() - 1) {
+                data += "\t";
+            } else {
+                data += "\r\n";
+            }
+        }
+    }
+    QClipboard *c = qApp->clipboard();
+    c->setText(data);
+}
+
 void C5Grid::filterByColumn()
 {
     QSet<QString> filterValues;
@@ -312,6 +385,15 @@ void C5Grid::filterByColumn()
         fModel->setFilter(fFilterColumn, sortedValues.join("|"));
     }
     sumColumnsData();
+}
+
+void C5Grid::filterByStringAndIndex()
+{
+    if (fFilterString.isEmpty()) {
+        return;
+    }
+    fModel->setFilter(fFilterIndex.column(), fFilterString);
+    fFilterString.clear();
 }
 
 void C5Grid::removeFilterForColumn()
@@ -326,12 +408,34 @@ void C5Grid::tblValueChanged(int pos)
 
 int C5Grid::newRow()
 {
+    if (fEditor == 0) {
+        return -1;
+    }
+    C5Editor *e = C5Editor::createEditor(fDBParams, fEditor, 0);
+    QList<QMap<QString, QVariant> > data;
+    bool yes = e->getResult(data);
+    fEditor->setParent(0);
+    delete e;
+    if (!yes) {
+        return -1;
+    }
     int row = 0;
     QModelIndexList ml = ui->tblView->selectionModel()->selectedIndexes();
     if (ml.count() > 0) {
         row = ml.at(0).row();
     }
-    fModel->insertRow(row);
+    for (int i = 0; i < data.count(); i++) {
+        fModel->insertRow(row);
+        for (QMap<QString, QVariant>::const_iterator it = data.at(i).begin(); it != data.at(i).end(); it++) {
+            int col = fModel->indexForColumnName(it.key());
+            if (col > -1) {
+                if (fModel->rowCount() == 1) {
+                    row = -1;
+                }
+                fModel->setData(row + 1, col, it.value());
+            }
+        }
+    }
     ui->tblView->setCurrentIndex(fModel->index(row + 1, 0));
     return row;
 }
@@ -397,6 +501,9 @@ void C5Grid::print()
         p.setFontBold(false);
         p.line(0, p.fTop, columnsWidth, p.fTop);
         for (int c = 0; c < fModel->columnCount(); c++) {
+            if (fTableView->columnWidth(c) == 0) {
+                continue;
+            }
             if (c > 0) {
                 p.ltext(fModel->headerData(c, Qt::Horizontal, Qt::DisplayRole).toString(), (sumOfColumnsWidghtBefore(c) / scaleFactor) + 1);
                 p.line(sumOfColumnsWidghtBefore(c) / scaleFactor, p.fTop, sumOfColumnsWidghtBefore(c) / scaleFactor, p.fTop + (fTableView->verticalHeader()->defaultSectionSize() / rowScaleFactor));
@@ -411,6 +518,9 @@ void C5Grid::print()
         for (int r = startFrom; r < fModel->rowCount(); r++) {
             p.line(0, p.fTop, columnsWidth, p.fTop);
             for (int c = 0; c < fModel->columnCount(); c++) {
+                if (fTableView->columnWidth(c) == 0) {
+                    continue;
+                }
                 if (c > 0) {
                     p.ltext(fModel->data(r, c, Qt::DisplayRole).toString(), (sumOfColumnsWidghtBefore(c) / scaleFactor) + 1);
                     p.line(sumOfColumnsWidghtBefore(c) / scaleFactor, p.fTop, sumOfColumnsWidghtBefore(c) / scaleFactor, p.fTop + (fTableView->rowHeight(r) / rowScaleFactor));
@@ -509,6 +619,20 @@ void C5Grid::setSearchParameters()
 
 void C5Grid::tableViewContextMenuRequested(const QPoint &point)
 {
+    QModelIndex index = fTableView->indexAt(point);
+    QMenu m;
+    if (index.row() > -1 && index.column() > -1) {
+        fFilterString = fModel->data(index, Qt::DisplayRole).toString();
+        fFilterIndex = index;
+        m.addAction(QIcon(":/filter_set.png"), QString("%1 '%2'").arg(tr("Filter")).arg(fFilterString), this, SLOT(filterByStringAndIndex()));
+    }
+    m.addAction(QIcon(":/copy.png"), tr("Copy selection"), this, SLOT(copySelection()));
+    m.addAction(QIcon(":/copy.png"), tr("Copy all"), this, SLOT(copyAll()));
+    m.exec(fTableView->mapToGlobal(point));
+}
+
+void C5Grid::tableViewHeaderContextMenuRequested(const QPoint &point)
+{
     fFilterColumn = fTableView->columnAt(point.x());
     QString colName = fModel->headerData(fFilterColumn, Qt::Horizontal, Qt::DisplayRole).toString();
     QMenu m;
@@ -559,8 +683,34 @@ void C5Grid::on_tblView_clicked(const QModelIndex &index)
     cellClicked(index);
 }
 
-void C5Grid::on_tblView_doubleClicked(const QModelIndex &index)
+bool C5Grid::on_tblView_doubleClicked(const QModelIndex &index)
 {
     QList<QVariant> values = fModel->getRowValues(index.row());
+    if (fEditor) {
+        if (values.count() > 0) {
+            C5Editor *e = C5Editor::createEditor(fDBParams, fEditor, values.at(0).toInt());
+            QList<QMap<QString, QVariant> > data;
+            bool yes = e->getResult(data);
+            fEditor->setParent(0);
+            delete e;
+            if (!yes) {
+                return false;
+            }
+            int row = index.row();
+            for (int i = 0; i < data.count(); i++) {
+                if (i > 0) {
+                    fModel->insertRow(row);
+                    row++;
+                }
+                for (QMap<QString, QVariant>::const_iterator it = data.at(i).begin(); it != data.at(i).end(); it++) {
+                    int col = fModel->indexForColumnName(it.key());
+                    if (col > -1) {
+                        fModel->setData(row, col, it.value());
+                    }
+                }
+            }
+        }
+    }
     emit tblDoubleClicked(index.row(), index.column(), values);
+    return fEditor != 0;
 }
