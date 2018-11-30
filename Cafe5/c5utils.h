@@ -15,7 +15,7 @@
 #define current_date QDate::currentDate().toString(FORMAT_DATE_TO_STR)
 #define current_time QTime::currentTime().toString(FORMAT_TIME_TO_STR)
 #define hostinfo QHostInfo::localHostName().toLower()
-#define float_str(value, f) QLocale().toString(value, 'f', f).remove(QRegExp("(?!\\d\\.[1-9]+)0+$")).remove(QRegExp("\\.$"))
+#define float_str(value, f) QLocale().toString(value, 'f', f).remove(QRegExp("(?!\\d[\\.\\,][1-9]+)0+$")).remove(QRegExp("[\\.\\,]$"))
 
 #define ORDER_STATE_NONE 0
 #define ORDER_STATE_OPEN 1

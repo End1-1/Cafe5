@@ -90,6 +90,11 @@ QString C5Config::orderPrefix()
     return getValue(param_order_prefix);
 }
 
+int C5Config::docNumDigits()
+{
+    return getValue(param_doc_num_digits).toInt();
+}
+
 int C5Config::defaultMenu()
 {
     return getValue(param_default_menu).toInt();

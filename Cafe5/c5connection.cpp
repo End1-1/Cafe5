@@ -109,6 +109,7 @@ void C5Connection::on_btnSave_clicked()
     C5Config::fDBUser = ui->leUsername->text();
     C5Config::fDBPassword = ui->lePassword->text();
     C5Config::fSettingsName = ui->cbSettings->currentText();
+    C5Config::initParamsFromDb();
     writeParams();
     C5Message::info(tr("Saved"));
 }

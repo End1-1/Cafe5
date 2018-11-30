@@ -25,6 +25,8 @@ public:
 
     void keyPressEvent(QKeyEvent *key) override;
 
+    static void resetCache(const QStringList &dbParams, int cacheId);
+
 private slots:
     void tblDoubleClicked(int row, int column, const QList<QVariant> &values);
 
@@ -46,6 +48,8 @@ private:
     QList<QVariant> fValues;
 
     static QMap<QString, QMap<int, C5Selector*> > fSelectorList;
+
+    bool fReset;
 };
 
 #endif // C5SELECTOR_H

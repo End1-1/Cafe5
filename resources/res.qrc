@@ -36,5 +36,6 @@
         <file>recycle.png</file>
         <file>copy.png</file>
         <file>ahuni.ttf</file>
+        <file>storehouse.png</file>
     </qresource>
 </RCC>

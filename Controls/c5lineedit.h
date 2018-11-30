@@ -14,6 +14,8 @@ public:
 
     QString fOldValue;
 
+    int fDecimalPlaces;
+
     void setText(const QString &arg);
 
     void setInteger(int i);
@@ -34,10 +36,16 @@ public:
 
     int color();
 
+protected:
+    void keyPressEvent(QKeyEvent *e);
+
 private:
     int fTag;
 
     int fColor;
+
+private slots:
+    void editText(const QString &arg);
 };
 
 #endif // C5LINEEDIT_H

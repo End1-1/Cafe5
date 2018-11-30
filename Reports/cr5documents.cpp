@@ -19,6 +19,7 @@ CR5Documents::CR5Documents(const QStringList &dbParams, QWidget *parent) :
                        ;
 
     fColumnsFields << "h.f_id"
+                   << "h.f_userid as f_docnum"
                    << "ds.f_name as f_statename"
                    << "dt.f_name as f_typename"
                    << "h.f_date"
@@ -32,7 +33,8 @@ CR5Documents::CR5Documents(const QStringList &dbParams, QWidget *parent) :
 
     fColumnsSum << "f_amount";
 
-    fTranslation["f_id"] = tr("Code");
+    fTranslation["f_id"] = tr("Op.num.");
+    fTranslation["f_docnum"] = tr("Code");
     fTranslation["f_statename"] = tr("State");
     fTranslation["f_typename"] = tr("Type");
     fTranslation["f_date"] = tr("Date");
@@ -44,6 +46,7 @@ CR5Documents::CR5Documents(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_createtime"] = tr("Last change time");
 
     fColumnsVisible["h.f_id"] = true;
+    fColumnsVisible["h.f_userid as f_docnum"] = true;
     fColumnsVisible["ds.f_name as f_statename"] = true;
     fColumnsVisible["dt.f_name as f_typename"] = true;
     fColumnsVisible["h.f_date"] = true;
@@ -89,7 +92,11 @@ void CR5Documents::tblDoubleClicked(int row, int column, const QList<QVariant> &
 {
     Q_UNUSED(column);
     Q_UNUSED(row);
-    openDoc(values.at(0).toInt());
+    if (!fColumnsVisible["h.f_id"]) {
+        C5Message::error(tr("Op.num. column must be included in the report"));
+        return;
+    }
+    openDoc(values.at(fModel->indexForColumnName("f_id")).toInt());
 }
 
 void CR5Documents::callEditor(int id)

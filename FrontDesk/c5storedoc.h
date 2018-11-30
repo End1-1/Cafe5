@@ -37,6 +37,8 @@ private:
 
     int fDocState;
 
+    int fInternalId;
+
     void countTotal();
 
     bool docCheck(QString &err);

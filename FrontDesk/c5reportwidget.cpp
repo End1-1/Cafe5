@@ -19,6 +19,7 @@ C5ReportWidget::C5ReportWidget(const QStringList &dbParams, QWidget *parent) :
     widget()->setVisible(false);
     connect(fFilterLineEdit, &C5LineEdit::textChanged, [this](const QString &arg1) {
         fModel->setFilter(-1, arg1);
+        sumColumnsData();
     });
 }
 

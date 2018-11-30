@@ -47,6 +47,7 @@ void C5SettingsWidget::save(int oldId)
     fTags[ui->leOrderPrefix->getTag()] = ui->leOrderPrefix->text();
     fTags[ui->leHall->getTag()] = ui->leHall->text();
     fTags[ui->leTable->getTag()] = ui->leTable->text();
+    fTags[ui->leDocNumDigits->getTag()] = ui->leDocNumDigits->text();
     C5Database db(fDBParams);
     db[":f_settings"] = oldId;
     db.exec("delete from s_settings_values where f_settings=:f_settings");
@@ -56,7 +57,7 @@ void C5SettingsWidget::save(int oldId)
         db[":f_value"] = it.value();
         db.insert("s_settings_values", false);
     }
-
+    C5Config::initParamsFromDb();
 }
 
 void C5SettingsWidget::clearWidgetValue(QWidget *w)

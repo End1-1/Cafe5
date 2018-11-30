@@ -16,6 +16,7 @@
 #define param_order_prefix 10
 #define param_default_hall 11
 #define param_default_table 12
+#define param_doc_num_digits 13
 
 class C5Config
 {
@@ -43,6 +44,7 @@ public:
     static int defaultHall();
     static int defaultTable();
     static QString orderPrefix();
+    static int docNumDigits();
     static void initParamsFromDb();
     static QVariant getRegValue(const QString &key);
     static void setRegValue(const QString &key, const QVariant &value);

@@ -66,7 +66,7 @@
     </message>
     <message>
         <location filename="../Cafe5/c5connection.cpp" line="98"/>
-        <location filename="../Cafe5/c5connection.cpp" line="120"/>
+        <location filename="../Cafe5/c5connection.cpp" line="121"/>
         <source>Cannot connect to database</source>
         <translation>Հնարավոր չէ կապ հաստատել տվյալների պահոցի հետ</translation>
     </message>
@@ -76,17 +76,17 @@
         <translation>Կապը հաստատված է</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="113"/>
+        <location filename="../Cafe5/c5connection.cpp" line="114"/>
         <source>Saved</source>
         <translation>Պահպանված է</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="129"/>
+        <location filename="../Cafe5/c5connection.cpp" line="130"/>
         <source>Already initialized</source>
         <translation>Արդեն ստեղծված է</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="148"/>
+        <location filename="../Cafe5/c5connection.cpp" line="149"/>
         <source>Ready to use</source>
         <translation>Պատրաստ է օգտագործման</translation>
     </message>

@@ -2,7 +2,5 @@
     <qresource prefix="/lang">
         <file>FrontDesk.qm</file>
     </qresource>
-    <qresource prefix="/">
-        <file>storehouse.ico</file>
-    </qresource>
+    <qresource prefix="/"/>
 </RCC>

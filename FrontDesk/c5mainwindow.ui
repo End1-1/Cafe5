@@ -155,8 +155,8 @@
   </action>
   <action name="actionHome">
    <property name="icon">
-    <iconset resource="lang.qrc">
-     <normaloff>:/storehouse.ico</normaloff>:/storehouse.ico</iconset>
+    <iconset resource="../resources/res.qrc">
+     <normaloff>:/storehouse.png</normaloff>:/storehouse.png</iconset>
    </property>
    <property name="text">
     <string>Home</string>
@@ -173,7 +173,6 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="lang.qrc"/>
   <include location="../resources/res.qrc"/>
  </resources>
  <connections/>

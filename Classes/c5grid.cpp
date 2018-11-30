@@ -394,6 +394,7 @@ void C5Grid::filterByStringAndIndex()
     }
     fModel->setFilter(fFilterIndex.column(), fFilterString);
     fFilterString.clear();
+    sumColumnsData();
 }
 
 void C5Grid::removeFilterForColumn()
@@ -599,6 +600,7 @@ void C5Grid::exportToExcel()
 void C5Grid::clearFilter()
 {
     fModel->clearFilter();
+    sumColumnsData();
 }
 
 void C5Grid::setSearchParameters()

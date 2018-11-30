@@ -1,6 +1,7 @@
 #include "c5tablewidget.h"
 #include "c5lineedit.h"
 #include "c5combobox.h"
+#include "c5utils.h"
 #include "excel.h"
 #include <QHeaderView>
 
@@ -116,12 +117,12 @@ void C5TableWidget::setString(int row, int column, const QString &str)
 
 double C5TableWidget::getDouble(int row, int column)
 {
-    return item(row, column)->text().toDouble();
+    return QLocale().toDouble(item(row, column)->text());
 }
 
 void C5TableWidget::setDouble(int row, int column, double value)
 {
-    item(row, column)->setText(QString::number(value, 'f', 2));
+    item(row, column)->setText(float_str(value, 2));
 }
 
 int C5TableWidget::addEmptyRow()

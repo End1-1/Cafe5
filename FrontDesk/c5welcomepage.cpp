@@ -16,6 +16,7 @@ C5WelcomePage::C5WelcomePage(const QStringList &dbParams, QWidget *parent) :
     ui->setupUi(this);
     fDbName = dbParams.at(1);
     fLabel = tr("Home");
+    fIcon = ":/storehouse.png";
     ui->btnNewStoreInput->setVisible(pr(fDbName, cp_t2_store_input));
     ui->btnNewStoreOutput->setVisible(pr(fDbName, cp_t2_store_output));
     ui->btnNewStoreMovement->setVisible(pr(fDbName, cp_t2_store_move));

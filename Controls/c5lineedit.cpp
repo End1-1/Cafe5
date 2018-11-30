@@ -1,25 +1,19 @@
 #include "c5lineedit.h"
+#include "c5utils.h"
 #include <QValidator>
-
+#include <QKeyEvent>
 
 C5LineEdit::C5LineEdit(QWidget *parent) :
     QLineEdit(parent)
 {
     fColor = -1;
+    fDecimalPlaces = 2;
+    connect(this, SIGNAL(textEdited(QString)), this, SLOT(editText(QString)));
 }
 
 void C5LineEdit::setText(const QString &arg)
 {
     QString t = arg;
-    const QValidator *v = validator();
-    if (v) {
-        if (!strcmp(v->metaObject()->className(), "QDoubleValidator")) {
-            QLocale l;
-            t.replace(".", l.decimalPoint());
-            t.replace(",", l.decimalPoint());
-            t.replace("․", l.decimalPoint());
-        }
-    }
     QLineEdit::setText(t);
 }
 
@@ -35,12 +29,13 @@ int C5LineEdit::getInteger()
 
 void C5LineEdit::setDouble(double i)
 {
-    setText(QString::number(i, 'f', 2).remove(QRegExp("\\.0+$")).remove(QRegExp("\\.$")));
+    QString si = float_str(i, fDecimalPlaces);
+    setText(si);
 }
 
 double C5LineEdit::getDouble()
 {
-    return text().toDouble();
+    return QLocale().toDouble(text());
 }
 
 int C5LineEdit::getTag()
@@ -66,4 +61,29 @@ void C5LineEdit::setColor(int c)
 int C5LineEdit::color()
 {
     return fColor;
+}
+
+void C5LineEdit::keyPressEvent(QKeyEvent *e)
+{
+    const QValidator *v = validator();
+    if (v) {
+        if (!strcmp(v->metaObject()->className(), "QDoubleValidator")) {
+            qDebug() << e->key() << e->text();
+            switch (e->key()) {
+            case 46:
+            case 44:
+            case 8228:
+                e = new QKeyEvent (QEvent::KeyRelease,Qt::Key_A,Qt::NoModifier, QLocale().decimalPoint());
+                break;
+            }
+        }
+    }
+    QLineEdit::keyPressEvent(e);
+}
+
+void C5LineEdit::editText(const QString &arg)
+{
+    int cursPos = cursorPosition();
+    setText(arg);
+    setCursorPosition(cursPos);
 }

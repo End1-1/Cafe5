@@ -28,4 +28,9 @@
 23.11.2018
 27.11.2018
 	1. Upgrade. CE5User, CE5UserGroup.
-	2. New. Passed and accepted fields in store doc.
+	2. New. Passed and accepted fields in store doc. Stored in json string.
+	3. Upgrade. alter table a_type add f_counter integer.
+	4. Upgrade. alter table a_header add f_userId nvarchar(32) after f_id.
+28.11.2018
+	1. Upgrade. Save already saved document. Only some fields, not part of store.
+	

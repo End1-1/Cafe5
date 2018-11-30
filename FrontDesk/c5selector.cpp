@@ -15,6 +15,7 @@ C5Selector::C5Selector(const QStringList &dbParams, QWidget *parent) :
     fGrid->fTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->hl->addWidget(fGrid);
     connect(fGrid, SIGNAL(tblDoubleClicked(int,int,QList<QVariant>)), this, SLOT(tblDoubleClicked(int,int,QList<QVariant>)));
+    fReset = true;
 }
 
 C5Selector::~C5Selector()
@@ -30,10 +31,13 @@ bool C5Selector::getValue(const QStringList &dbParams, int cache, QList<QVariant
         c = new C5Selector(dbParams, C5Config::fParentWidget);
         c->fQuery = C5Cache(dbParams).query(cache);
         c->fCache = cache;
-        c->refresh();
         fSelectorList[cacheName][cache] = c;
     } else {
         c = fSelectorList[cacheName][cache];
+    }    
+    if (c->fReset) {
+        c->fReset = false;
+        c->refresh();
     }
     c->ui->leFilter->setFocus();
     bool result = c->exec() == QDialog::Accepted;
@@ -80,6 +84,17 @@ void C5Selector::keyPressEvent(QKeyEvent *key)
     index = fGrid->fTableView->model()->index(row, 0);
     fGrid->fTableView->setCurrentIndex(index);
     C5Dialog::keyPressEvent(key);
+}
+
+void C5Selector::resetCache(const QStringList &dbParams, int cacheId)
+{
+    QString cacheName = C5Cache::cacheName(dbParams, cacheId);
+    if (fSelectorList.contains(cacheName)) {
+        if (fSelectorList[cacheName].contains(cacheId)) {
+            fSelectorList[cacheName][cacheId]->fReset = true;
+        }
+
+    }
 }
 
 void C5Selector::tblDoubleClicked(int row, int column, const QList<QVariant> &values)

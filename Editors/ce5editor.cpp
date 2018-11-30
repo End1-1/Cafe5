@@ -3,6 +3,7 @@
 #include "c5checkbox.h"
 #include "c5dateedit.h"
 #include "c5cache.h"
+#include "c5selector.h"
 #include <QValidator>
 
 CE5Editor::CE5Editor(const QStringList &dbParams, QWidget *parent) :
@@ -153,13 +154,19 @@ bool CE5Editor::save(QString &err, QList<QMap<QString, QVariant> > &data)
     row[leId->property("Field").toString()] = leId->getInteger();
     data.append(row);
     db.startTransaction();
-    db[":f_id"] = C5Cache::idForTable(table());
+    int cacheid = C5Cache::idForTable(table());
+    if (cacheid == 0) {
+        C5Message::error(QString("No cache for %1").arg(table()));
+    }
+    db[":f_id"] = cacheid;
     db.exec("select f_version from s_cache where f_id=:f_id for update");
     if (db.nextRow()) {
         db[":f_version"] = db.getInt("f_version") + 1;
         db.update("s_cache", where_id(C5Cache::idForTable(table())));
     }
     db.commit();
+    C5Cache::resetCache(fDBParams, table());
+    C5Selector::resetCache(fDBParams, cacheid);
     return err.isEmpty();
 }
 
