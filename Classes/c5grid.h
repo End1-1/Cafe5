@@ -105,6 +105,8 @@ protected:
 
     virtual QString reportAdditionalTitle();
 
+    virtual QMenu *buildTableViewContextMenu(const QPoint &point);
+
 private:
     Ui::C5Grid *ui;
 

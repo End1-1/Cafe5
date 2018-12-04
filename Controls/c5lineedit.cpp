@@ -87,3 +87,9 @@ void C5LineEdit::editText(const QString &arg)
     setText(arg);
     setCursorPosition(cursPos);
 }
+
+C5LineEdit *isLineEdit(QObject *o)
+{
+    C5LineEdit *le = dynamic_cast<C5LineEdit*>(o);
+    return le;
+}

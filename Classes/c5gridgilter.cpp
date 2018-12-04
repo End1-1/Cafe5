@@ -19,6 +19,7 @@ C5GridGilter::~C5GridGilter()
 bool C5GridGilter::filter(C5FilterWidget *filterWidget, QString &condition, QMap<QString, bool> &showColumns, QMap<QString, QString> &colTranslation)
 {
     C5GridGilter *gf = new C5GridGilter(C5Config::fParentWidget);
+    filterWidget->restoreFilter(filterWidget);
     gf->ui->vl->addWidget(filterWidget);
     if (filterWidget->children().count() > 0) {
         QObjectList ol = filterWidget->children();
@@ -53,6 +54,7 @@ bool C5GridGilter::filter(C5FilterWidget *filterWidget, QString &condition, QMap
     bool result = gf->exec() == QDialog::Accepted;
     filterWidget->setParent(0);
     if (result) {
+        filterWidget->saveFilter(filterWidget);
         condition = filterWidget->condition();
         for (int i = 0; i < lv->count(); i++) {
             QCheckBox *c = static_cast<QCheckBox*>(lv->itemWidget(lv->item(i)));

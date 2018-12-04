@@ -47,7 +47,7 @@ private:
 
     void writeInput();
 
-    bool writeOutput(const QDate &date, int docNum, int store, double &amount, QString &err);
+    bool writeOutput(const QDate &date, int docNum, int store, double &amount, QList<int> &outId, QString &err);
 
     int addGoodsRow();
 

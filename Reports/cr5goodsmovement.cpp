@@ -19,8 +19,9 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
                     << "inner join a_header a on a.f_id=s.f_document [a]"
                        ;
 
-    fColumnsFields << "a.f_date"
-                   << "s.f_document"
+    fColumnsFields << "a.f_document"
+                   << "a.f_date"
+                   << "s.f_userid"
                    << "ss.f_name as f_store"
                    << "st.f_name as f_type"
                    << "gg.f_name as f_group"
@@ -31,8 +32,9 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
                    << "sum(s.f_total) as f_total"
                       ;
 
-    fColumnsGroup << "a.f_date"
-                  << "s.f_document"
+    fColumnsGroup << "s.f_document"
+                  << "a.f_date"
+                  << "s.f_userid"
                   << "st.f_name as f_type"
                   << "ss.f_name as f_store"
                   << "gg.f_name as f_group"
@@ -46,8 +48,9 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
                 << "f_total"
                       ;
 
+    fTranslation["f_userid"] = tr("Document");
     fTranslation["f_date"] = tr("Date");
-    fTranslation["f_document"]  = tr("Document");
+    fTranslation["f_document"]  = tr("Op.num.");
     fTranslation["f_type"] = tr("In/Out");
     fTranslation["f_store"] = tr("Storage");
     fTranslation["f_group"] = tr("Group");
@@ -58,6 +61,7 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
     fTranslation["f_total"] = tr("Amount");;
 
     fColumnsVisible["a.f_date"] = true;
+    fColumnsVisible["a.f_userid"] = true;
     fColumnsVisible["s.f_document"] = true;
     fColumnsVisible["st.f_name as f_type"] = true;
     fColumnsVisible["ss.f_name as f_store"] = true;

@@ -119,9 +119,15 @@ public:
 
     QString columnName(int index);
 
+    QMap<QString, QVariant> getBindValues();
+
     void getBindValues(QMap<QString, QVariant> &b);
 
     void getBindValues(int row, QMap<QString, QVariant> &b);
+
+    void setBindValues(const QMap<QString, QVariant> &b);
+
+    void removeBindValue(const QString &key);
 
     void setValue(int row, int column, const QVariant &value);
 

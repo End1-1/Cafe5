@@ -306,6 +306,7 @@ bool C5StoreDoc::save(int state, QString &err)
     db[":f_raw"] = jd.toJson();
     db.update("a_header", where_id(fInternalId));
 
+    QList<int> outId;
     if (fDocState == DOC_STATE_DRAFT) {
         if (state == DOC_STATE_SAVED) {
             switch (fDocType) {
@@ -314,7 +315,7 @@ bool C5StoreDoc::save(int state, QString &err)
                 break;
             case DOC_TYPE_STORE_OUTPUT: {
                 double amount = 0;
-                if (!writeOutput(ui->deDate->date(), fInternalId, ui->leStoreOutput->getInteger(), amount, err)) {
+                if (!writeOutput(ui->deDate->date(), fInternalId, ui->leStoreOutput->getInteger(), amount, outId, err)) {
                     return false;
                 }
                 db[":f_amount"] = amount;
@@ -323,12 +324,24 @@ bool C5StoreDoc::save(int state, QString &err)
             }
             case DOC_TYPE_STORE_MOVE: {
                 double amount = 0;
-                if (!writeOutput(ui->deDate->date(), fInternalId, ui->leStoreOutput->getInteger(), amount, err)) {
+                if (!writeOutput(ui->deDate->date(), fInternalId, ui->leStoreOutput->getInteger(), amount, outId, err)) {
                     return false;
                 }
                 db[":f_amount"] = amount;
                 db.update("a_header", where_id(fInternalId));
-                writeInput();
+                C5Database db1(fDBParams);
+                C5Database db2(fDBParams);
+                foreach (int recid, outId) {
+                    db1[":f_id"] = recid;
+                    db1.exec("select * from a_store where f_id=:f_id");
+                    db1.nextRow();
+                    db2.setBindValues(db1.getBindValues());
+                    db2.removeBindValue(":f_id");
+                    db2[":f_document"] = fInternalId;
+                    db2[":f_type"] = 1;
+                    db2[":f_store"] = ui->leStoreInput->getInteger();
+                    db2.insert("a_store", false);
+                }
             }
             }
         }
@@ -374,7 +387,7 @@ void C5StoreDoc::writeInput()
     }
 }
 
-bool C5StoreDoc::writeOutput(const QDate &date, int docNum, int store, double &amount, QString &err)
+bool C5StoreDoc::writeOutput(const QDate &date, int docNum, int store, double &amount, QList<int> &outId, QString &err)
 {
     amount = 0;
     C5Database db(fDBParams);
@@ -385,7 +398,6 @@ bool C5StoreDoc::writeOutput(const QDate &date, int docNum, int store, double &a
         goodsID << ui->tblGoods->getString(i, 1);
     }
     QList<QList<QVariant> > storeData;
-    QStringList queries;
     db[":f_store"] = store;
     db[":f_date"] = date;
     db.exec(QString("select s.f_base, s.f_goods, sum(s.f_qty*s.f_type), s.f_price, sum(s.f_total*s.f_type) "
@@ -395,6 +407,7 @@ bool C5StoreDoc::writeOutput(const QDate &date, int docNum, int store, double &a
             "group by 1, 2, 4 "
             "having sum(s.f_qty*s.f_type) > 0.001 "
             "for update ").arg(goodsID.join(",")), storeData);
+    QList<QMap<QString, QVariant> > queries;
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
         double qty = ui->tblGoods->lineEdit(i, 3)->getDouble();
         ui->tblGoods->lineEdit(i, 6)->setDouble(0);
@@ -407,41 +420,43 @@ bool C5StoreDoc::writeOutput(const QDate &date, int docNum, int store, double &a
                         dbdoc[":f_base"] = storeData.at(j).at(0).toInt();
                         dbdoc.exec("select f_document from a_store where f_base=:f_base and f_type=1");
                         dbdoc.nextRow();
-                        queries << QString("insert into a_store (f_document, f_store, f_type, f_goods, f_qty, f_price, f_total, f_base, f_basedoc, f_reason) "
-                                           "values (%1, %2, -1, %3, %4, %5, %6, %7, %8, %9)")
-                                   .arg(docNum)
-                                   .arg(store)
-                                   .arg(ui->tblGoods->getInteger(i, 1))
-                                   .arg(qty)
-                                   .arg(storeData.at(j).at(3).toDouble())
-                                   .arg(storeData.at(j).at(3).toDouble() * qty)
-                                   .arg(storeData.at(j).at(0).toInt())
-                                   .arg(dbdoc.getInt(0))
-                                   .arg(ui->leReason->getInteger());
+                        QMap<QString, QVariant> newrec;
+                        newrec[":f_document"] = docNum;
+                        newrec[":f_store"] = store;
+                        newrec[":f_type"] = -1;
+                        newrec[":f_goods"] = ui->tblGoods->getInteger(i, 1);
+                        newrec[":f_qty"] = qty;
+                        newrec[":f_price"] = storeData.at(j).at(3).toDouble();
+                        newrec[":f_total"] = storeData.at(j).at(3).toDouble() * qty;
+                        newrec[":f_base"] = storeData.at(j).at(0).toInt();
+                        newrec[":f_basedoc"] = dbdoc.getInt(0);
+                        newrec[":f_reason"] = ui->leReason->getInteger();
+                        queries << newrec;
                         amount += storeData.at(j).at(3).toDouble() * qty;
-                        ui->tblGoods->lineEdit(i, 6)->setDouble(ui->tblGoods->lineEdit(i, 6)->getDouble() + storeData.at(j).at(3).toDouble() * qty);
-                        ui->tblGoods->lineEdit(i, 5)->setDouble(storeData.at(j).at(3).toDouble());
+                        ui->tblGoods->lineEdit(i, 6)->setDouble(ui->tblGoods->lineEdit(i, 6)->getDouble() + (storeData.at(j).at(3).toDouble() * qty));
+                        ui->tblGoods->lineEdit(i, 5)->setDouble(ui->tblGoods->lineEdit(i, 6)->getDouble() / ui->tblGoods->lineEdit(i, 3)->getDouble());
                         qty = 0;
                     } else {
                         dbdoc[":f_base"] = storeData.at(j).at(0).toInt();
                         dbdoc.exec("select f_document from a_store where f_base=:f_base and f_type=1");
                         dbdoc.nextRow();
-                        queries << QString("insert into a_store (f_document, f_store, f_type, f_goods, f_qty, f_price, f_total, f_base, f_basedoc, f_reason) "
-                                           "values (%1, %2, -1, %3, %4, %5, %6, %7, %8, %9)")
-                                   .arg(docNum)
-                                   .arg(store)
-                                   .arg(ui->tblGoods->getInteger(i, 1))
-                                   .arg(storeData.at(j).at(2).toDouble())
-                                   .arg(storeData.at(j).at(3).toDouble())
-                                   .arg(storeData.at(j).at(3).toDouble() * storeData.at(j).at(2).toDouble())
-                                   .arg(storeData.at(j).at(0).toInt())
-                                   .arg(dbdoc.getInt(0))
-                                   .arg(ui->leReason->getInteger());
+                        QMap<QString, QVariant> newrec;
+                        newrec[":f_document"] = docNum;
+                        newrec[":f_store"] = store;
+                        newrec[":f_type"] = -1;
+                        newrec[":f_goods"] = ui->tblGoods->getInteger(i, 1);
+                        newrec[":f_qty"] = storeData.at(j).at(2).toDouble();
+                        newrec[":f_price"] = storeData.at(j).at(3).toDouble();
+                        newrec[":f_total"] = storeData.at(j).at(3).toDouble() * storeData.at(j).at(2).toDouble();
+                        newrec[":f_base"] = storeData.at(j).at(0).toInt();
+                        newrec[":f_basedoc"] = dbdoc.getInt(0);
+                        newrec[":f_reason"] = ui->leReason->getInteger();
+                        queries << newrec;
+                        ui->tblGoods->lineEdit(i, 6)->setDouble(ui->tblGoods->lineEdit(i, 6)->getDouble() + (storeData.at(j).at(3).toDouble() * storeData.at(j).at(2).toDouble()));
+                        ui->tblGoods->lineEdit(i, 5)->setDouble(ui->tblGoods->lineEdit(i, 6)->getDouble() / ui->tblGoods->lineEdit(i, 3)->getDouble());
                         amount += storeData.at(j).at(3).toDouble() * storeData.at(j).at(2).toDouble();
                         qty -= storeData.at(j).at(2).toDouble();
                         storeData[j][2] = 0.0;
-                        ui->tblGoods->lineEdit(i, 6)->setDouble(ui->tblGoods->lineEdit(i, 6)->getDouble() + storeData.at(j).at(3).toDouble() * qty);
-                        ui->tblGoods->lineEdit(i, 5)->setDouble(storeData.at(j).at(3).toDouble());
                     }
                 }
             }
@@ -457,8 +472,9 @@ bool C5StoreDoc::writeOutput(const QDate &date, int docNum, int store, double &a
         }
     }
     if (err.isEmpty()) {
-        foreach (QString s, queries) {
-            db.exec(s);
+        for (QList<QMap<QString, QVariant> >::const_iterator it = queries.begin(); it != queries.end(); it++) {
+            db.setBindValues(*it);
+            outId << db.insert("a_store");
         }
     }
     db.commit();
@@ -476,7 +492,8 @@ int C5StoreDoc::addGoodsRow()
     lqty->setValidator(new QDoubleValidator(0, 1000000, 3));
     ui->tblGoods->setItem(row, 4, new QTableWidgetItem());
     C5LineEdit *lprice = ui->tblGoods->createLineEdit(row, 5);
-    lprice->setValidator(new QDoubleValidator(0, 100000000, 2));
+    lprice->setValidator(new QDoubleValidator(0, 100000000, 3));
+    lprice->fDecimalPlaces = 3;
     C5LineEdit *ltotal = ui->tblGoods->createLineEdit(row, 6);
     ltotal->setValidator(new QDoubleValidator(0, 100000000, 2));
     connect(lqty, SIGNAL(textEdited(QString)), this, SLOT(tblQtyChanged(QString)));
@@ -837,7 +854,7 @@ void C5StoreDoc::printDoc()
         p.br(p.fLineHeight + 20);
     }
     points.clear();
-    points << 900
+    points << 1200
            << 500
            << 270;
     vals.clear();

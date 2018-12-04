@@ -312,6 +312,15 @@ QString C5Database::columnName(int index)
     return fNameColumnMap.key(index);
 }
 
+QMap<QString, QVariant> C5Database::getBindValues()
+{
+    QMap<QString, QVariant> b;
+    for (QMap<QString, int>::const_iterator it = fNameColumnMap.begin(); it != fNameColumnMap.end(); it++) {
+        b[":" + it.key()] = getValue(fCursorPos, it.key());
+    }
+    return b;
+}
+
 void C5Database::getBindValues(QMap<QString, QVariant> &b)
 {
     getBindValues(fCursorPos, b);
@@ -322,6 +331,16 @@ void C5Database::getBindValues(int row, QMap<QString, QVariant> &b)
     for (QMap<QString, int>::const_iterator it = fNameColumnMap.begin(); it != fNameColumnMap.end(); it++) {
         b[":" + it.key()] = getValue(row, it.key());
     }
+}
+
+void C5Database::setBindValues(const QMap<QString, QVariant> &b)
+{
+    fBindValues = b;
+}
+
+void C5Database::removeBindValue(const QString &key)
+{
+    fBindValues.remove(key);
 }
 
 void C5Database::setValue(int row, int column, const QVariant &value)

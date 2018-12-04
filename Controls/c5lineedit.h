@@ -48,4 +48,6 @@ private slots:
     void editText(const QString &arg);
 };
 
+C5LineEdit *isLineEdit(QObject *o);
+
 #endif // C5LINEEDIT_H

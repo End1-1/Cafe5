@@ -74,3 +74,9 @@ void C5LineEditWithSelector::focusOutEvent(QFocusEvent *e)
     }
     C5LineEdit::focusOutEvent(e);
 }
+
+C5LineEditWithSelector *isLineEditWithSelector(QObject *o)
+{
+    C5LineEditWithSelector *le = dynamic_cast<C5LineEditWithSelector*>(o);
+    return le;
+}

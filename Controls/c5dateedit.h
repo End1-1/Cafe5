@@ -54,4 +54,6 @@ signals:
     void dateChanged(const QDate &date);
 };
 
+C5DateEdit *isDateEdit(QObject *o);
+
 #endif // EDATEEDIT_H

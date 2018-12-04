@@ -3,6 +3,7 @@
 #include "c5storeinventory.h"
 #include "cr5documentsfilter.h"
 #include "c5tablemodel.h"
+#include <QMenu>
 
 CR5Documents::CR5Documents(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
@@ -86,6 +87,16 @@ QToolBar *CR5Documents::toolBar()
         fToolBar->insertAction(fToolBar->actions().at(2), a);
     }
     return fToolBar;
+}
+
+QMenu *CR5Documents::buildTableViewContextMenu(const QPoint &point)
+{
+    QMenu *m = C5Grid::buildTableViewContextMenu(point);
+    m->addSeparator();
+    QAction *a = new QAction(QIcon(":/copy.png"), tr("Copy selected documents"), this);
+    connect(a, SIGNAL(triggered()), this, SLOT(copySelectedDocs()));
+    m->addAction(a);
+    return m;
 }
 
 void CR5Documents::tblDoubleClicked(int row, int column, const QList<QVariant> &values)
@@ -285,5 +296,57 @@ void CR5Documents::removeDocs()
             }
             break;
         }
+    }
+}
+
+void CR5Documents::copySelectedDocs()
+{
+    if (!fColumnsVisible["h.f_id"]) {
+        C5Message::error(tr("Please, set the 'Code' column to visible."));
+        return;
+    }
+    QModelIndexList ml = fTableView->selectionModel()->selectedIndexes();
+    if (ml.count() == 0) {
+        return;
+    }
+    QSet<int> rowsTemp;
+    foreach (QModelIndex mi, ml) {
+        rowsTemp << mi.row();
+    }
+    QList<int> rows = rowsTemp.toList();
+    std::sort(rows.begin(), rows.end());
+    std::reverse(rows.begin(), rows.end());
+    C5Database db1(fDBParams);
+    C5Database db2(fDBParams);
+    foreach (int r, rows) {
+        int id = fModel->data(r, fModel->indexForColumnName("f_id"), Qt::EditRole).toInt();
+        db1[":f_id"] = id;
+        db1.exec("select * from a_header where f_id=:f_id");
+        if (!db1.nextRow()) {
+            continue;
+        }
+        db2.setBindValues(db1.getBindValues());
+        db2.removeBindValue(":f_id");
+        db2[":f_state"] = DOC_STATE_DRAFT;
+        int newDocId = db2.insert("a_header");
+        QString tableName;
+        switch (db1.getInt("f_type")) {
+        case DOC_TYPE_STORE_INPUT:
+        case DOC_TYPE_STORE_MOVE:
+        case DOC_TYPE_STORE_OUTPUT:
+            tableName = "a_store_draft";
+            break;
+        default:
+            tableName = "UNKNOWN";
+        }
+        db1[":f_document"] = id;
+        db1.exec(QString("select * from %1 where f_document=:f_document").arg(tableName));
+        while (db1.nextRow()) {
+            db2.setBindValues(db1.getBindValues());
+            db2.removeBindValue(":f_id");
+            db2[":f_document"] = newDocId;
+            db2.insert(tableName, false);
+        }
+        openDoc(newDocId);
     }
 }

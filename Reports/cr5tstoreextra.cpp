@@ -97,7 +97,7 @@ void CR5TStoreExtra::buildQuery()
     db.exec("select s.f_base, s.f_goods, sum(s.f_qty*s.f_type) as f_qty, sum(s.f_total*s.f_type) as f_amount "
               "from a_store s "
               "inner join a_header d on d.f_id=s.f_document "
-              "where s.f_store=:f_store and d.f_date<=:f_date "
+              "where s.f_store=:f_store and d.f_date<:f_date "
               "group by 1, 2 "
               "having sum(s.f_qty*s.f_type) > 0.001 ");
     while (db.nextRow()) {
@@ -206,7 +206,7 @@ QString CR5TStoreExtra::documentForInventory()
         db[":f_state"] = DOC_STATE_SAVED;
         db[":f_type"] = DOC_TYPE_STORE_INVENTORY;
         db[":f_operator"] = __userid;
-        db[":f_date"] = QDate::currentDate();
+        db[":f_date"] = f->dateEnd();
         db[":f_createDate"] = QDate::currentDate();
         db[":f_createTime"] = QTime::currentTime();
         db[":f_partner"] = 0;

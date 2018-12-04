@@ -33,4 +33,7 @@
 	4. Upgrade. alter table a_header add f_userId nvarchar(32) after f_id.
 28.11.2018
 	1. Upgrade. Save already saved document. Only some fields, not part of store.
-	
+02.12.2018
+	1. Save filters parameters.
+	2. Make the copy document from documents directory.
+	3. Correct store output function. ALTER TABLE `a_store_draft` CHANGE COLUMN `f_price` `f_price` DECIMAL(14,3) NULL DEFAULT NULL ;

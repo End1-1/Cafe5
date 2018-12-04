@@ -13,6 +13,10 @@ public:
 
     virtual QString condition() = 0;
 
+    virtual void saveFilter(QWidget *parent);
+
+    virtual void restoreFilter(QWidget *parent);
+
 signals:
 
 public slots:

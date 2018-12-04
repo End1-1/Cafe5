@@ -42,4 +42,6 @@ signals:
     void doubleClicked();
 };
 
+C5LineEditWithSelector *isLineEditWithSelector(QObject *o);
+
 #endif // C5LINEEDITWITHSELECTOR_H

@@ -20,3 +20,9 @@ void C5CheckBox::setTag(int tag)
 {
     fTag = tag;
 }
+
+C5CheckBox *isCheckBox(QObject *o)
+{
+    C5CheckBox *ce = dynamic_cast<C5CheckBox*>(o);
+    return ce;
+}

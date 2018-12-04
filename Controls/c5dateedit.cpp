@@ -105,3 +105,9 @@ void C5DateEdit::newText(const QString &arg1)
     setCursorPosition(cp);
     emit dateChanged(d);
 }
+
+C5DateEdit *isDateEdit(QObject *o)
+{
+    C5DateEdit *de = dynamic_cast<C5DateEdit*>(o);
+    return de;
+}

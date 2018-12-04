@@ -22,4 +22,6 @@ private:
     int fTag;
 };
 
+C5CheckBox *isCheckBox(QObject *o);
+
 #endif // C5CHECKBOX_H

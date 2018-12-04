@@ -12,6 +12,9 @@ public:
 
     virtual QToolBar *toolBar();
 
+protected:
+    virtual QMenu *buildTableViewContextMenu(const QPoint &point);
+
 protected slots:
     virtual void tblDoubleClicked(int row, int column, const QList<QVariant> &values);
 
@@ -28,6 +31,8 @@ private slots:
     void draftDocs();
 
     void removeDocs();
+
+    void copySelectedDocs();
 };
 
 #endif // CR5DOCUMENTS_H

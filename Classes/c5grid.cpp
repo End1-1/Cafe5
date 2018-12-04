@@ -56,6 +56,10 @@ void C5Grid::setTableForUpdate(const QString &table, const QList<int> &columns)
 
 void C5Grid::postProcess()
 {
+    if (fFilterWidget) {
+        fFilterWidget->restoreFilter(fFilterWidget);
+        fWhereCondition = fFilterWidget->condition();
+    }
     buildQuery();
 }
 
@@ -267,6 +271,20 @@ QString C5Grid::reportAdditionalTitle()
     return "";
 }
 
+QMenu *C5Grid::buildTableViewContextMenu(const QPoint &point)
+{
+    QModelIndex index = fTableView->indexAt(point);
+    QMenu *m = new QMenu(this);
+    if (index.row() > -1 && index.column() > -1) {
+        fFilterString = fModel->data(index, Qt::DisplayRole).toString();
+        fFilterIndex = index;
+        m->addAction(QIcon(":/filter_set.png"), QString("%1 '%2'").arg(tr("Filter")).arg(fFilterString), this, SLOT(filterByStringAndIndex()));
+    }
+    m->addAction(QIcon(":/copy.png"), tr("Copy selection"), this, SLOT(copySelection()));
+    m->addAction(QIcon(":/copy.png"), tr("Copy all"), this, SLOT(copyAll()));
+    return m;
+}
+
 void C5Grid::insertJoinTable(QStringList &joins, QMap<QString, QString> &joinsMap, const QString &table, const QString &mainTable)
 {
     QString j;
@@ -476,7 +494,7 @@ void C5Grid::print()
     int startFrom = 0;
     bool stopped = false;
     int columnsWidth = 0;
-    qreal scaleFactor = 0.45;
+    qreal scaleFactor = 0.40;
     qreal rowScaleFactor = 0.79;
     for (int i = 0; i < fModel->columnCount(); i++) {
         columnsWidth += fTableView->columnWidth(i);
@@ -621,16 +639,9 @@ void C5Grid::setSearchParameters()
 
 void C5Grid::tableViewContextMenuRequested(const QPoint &point)
 {
-    QModelIndex index = fTableView->indexAt(point);
-    QMenu m;
-    if (index.row() > -1 && index.column() > -1) {
-        fFilterString = fModel->data(index, Qt::DisplayRole).toString();
-        fFilterIndex = index;
-        m.addAction(QIcon(":/filter_set.png"), QString("%1 '%2'").arg(tr("Filter")).arg(fFilterString), this, SLOT(filterByStringAndIndex()));
-    }
-    m.addAction(QIcon(":/copy.png"), tr("Copy selection"), this, SLOT(copySelection()));
-    m.addAction(QIcon(":/copy.png"), tr("Copy all"), this, SLOT(copyAll()));
-    m.exec(fTableView->mapToGlobal(point));
+    QMenu *m = buildTableViewContextMenu(point);
+    m->exec(fTableView->mapToGlobal(point));
+    delete m;
 }
 
 void C5Grid::tableViewHeaderContextMenuRequested(const QPoint &point)

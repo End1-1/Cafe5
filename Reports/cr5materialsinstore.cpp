@@ -36,7 +36,7 @@ CR5MaterialsInStore::CR5MaterialsInStore(const QStringList &dbParams, QWidget *p
                 << "f_total"
                       ;
 
-    fHavindCondition = " having sum(s.f_qty*s.f_type) > 0.001 ";
+    fHavindCondition = " having sum(s.f_qty*s.f_type) <> 0 ";
 
     fTranslation["f_storage"] = tr("Storage");
     fTranslation["f_group"] = tr("Group");
