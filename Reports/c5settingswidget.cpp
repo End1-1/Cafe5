@@ -2,7 +2,7 @@
 #include "ui_c5settingswidget.h"
 
 C5SettingsWidget::C5SettingsWidget(const QStringList &dbParams, QWidget *parent) :
-    C5Widget(dbParams, parent),
+    CE5Editor(dbParams, parent),
     ui(new Ui::C5SettingsWidget)
 {
     ui->setupUi(this);
@@ -14,8 +14,9 @@ C5SettingsWidget::~C5SettingsWidget()
     delete ui;
 }
 
-void C5SettingsWidget::setSettingsId(int id)
+void C5SettingsWidget::setId(int id)
 {
+    CE5Editor::setId(id);
     clear(this);
     fSettingsId = id;
     C5Database db(fDBParams);
@@ -29,10 +30,10 @@ void C5SettingsWidget::setSettingsId(int id)
     }
 }
 
-void C5SettingsWidget::save(int oldId)
+bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
 {
-    if (oldId == 0) {
-        return;
+    if (!CE5Editor::save(err, data)) {
+        return false;
     }
     QMap<int, QString> fTags;
     fTags[ui->leLocalReceiptPrinter->getTag()] = ui->leLocalReceiptPrinter->text();
@@ -49,15 +50,16 @@ void C5SettingsWidget::save(int oldId)
     fTags[ui->leTable->getTag()] = ui->leTable->text();
     fTags[ui->leDocNumDigits->getTag()] = ui->leDocNumDigits->text();
     C5Database db(fDBParams);
-    db[":f_settings"] = oldId;
+    db[":f_settings"] = ui->leCode->getInteger();
     db.exec("delete from s_settings_values where f_settings=:f_settings");
     for (QMap<int, QString>::const_iterator it = fTags.begin(); it != fTags.end(); it++) {
-        db[":f_settings"] = oldId;
+        db[":f_settings"] = ui->leCode->getInteger();
         db[":f_key"] = it.key();
         db[":f_value"] = it.value();
         db.insert("s_settings_values", false);
     }
     C5Config::initParamsFromDb();
+    return true;
 }
 
 void C5SettingsWidget::clearWidgetValue(QWidget *w)

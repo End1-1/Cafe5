@@ -1,13 +1,13 @@
 #ifndef C5SETTINGSWIDGET_H
 #define C5SETTINGSWIDGET_H
 
-#include "c5widget.h"
+#include "ce5editor.h"
 
 namespace Ui {
 class C5SettingsWidget;
 }
 
-class C5SettingsWidget : public C5Widget
+class C5SettingsWidget : public CE5Editor
 {
     Q_OBJECT
 
@@ -16,9 +16,13 @@ public:
 
     ~C5SettingsWidget();
 
-    void setSettingsId(int id);
+    virtual QString title() {return tr("Settings");}
 
-    void save(int oldId);
+    virtual QString table() {return "s_settings_names";}
+
+    virtual void setId(int id);
+
+    virtual bool save(QString &err, QList<QMap<QString, QVariant> > &data);
 
     void clear(QWidget *parent);
 

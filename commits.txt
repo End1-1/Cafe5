@@ -36,4 +36,16 @@
 02.12.2018
 	1. Save filters parameters.
 	2. Make the copy document from documents directory.
-	3. Correct store output function. ALTER TABLE `a_store_draft` CHANGE COLUMN `f_price` `f_price` DECIMAL(14,3) NULL DEFAULT NULL ;
+	3. Correct store output function. 
+05.12.2018
+	1. Correct. Save the record of the table if "Manual" property is defined for id field.
+	2. Upgrade. Manual id code for goods editor.
+06.12.2018
+	1. Upgrade. New table o_credit_card.
+07.12.2018
+	1. Upgrade. Add dish remove reason. New table o_dish_remove_reason.
+12.12.2018
+	1. Upgrade. Add additional counter for o_header. Each hall have own order counter.
+	2. Upgrade. Add discount system.
+13.12.2018
+	1. Continue. Finished discount system.

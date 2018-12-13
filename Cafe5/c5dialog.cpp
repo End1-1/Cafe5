@@ -26,6 +26,11 @@ C5SocketHandler *C5Dialog::createSocketHandler(const char *slot)
     return s;
 }
 
+QStringList C5Dialog::getDbParams()
+{
+    return fDBParams;
+}
+
 void C5Dialog::keyPressEvent(QKeyEvent *e)
 {
     switch (e->key()) {

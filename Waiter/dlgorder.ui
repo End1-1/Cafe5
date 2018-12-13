@@ -65,7 +65,7 @@ QLabel{color:maroon;}
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label_3">
+       <widget class="QLabel" name="lbDiscount">
         <property name="enabled">
          <bool>false</bool>
         </property>

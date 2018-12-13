@@ -31,6 +31,8 @@ public:
 
     C5SocketHandler *createSocketHandler(const char *slot);
 
+    QStringList getDbParams();
+
 protected:
     const QStringList &fDBParams;
 

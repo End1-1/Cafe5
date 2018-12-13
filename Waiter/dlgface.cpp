@@ -8,7 +8,9 @@
 #include "c5menu.h"
 #include "c5witerconf.h"
 #include "c5waiterserver.h"
+#include "dlglistofhall.h"
 #include "c5halltabledelegate.h"
+#include "c5cafecommon.h"
 #include <QTcpSocket>
 #include <QCloseEvent>
 
@@ -42,6 +44,7 @@ void DlgFace::setup()
     fTcpServer.listen(QHostAddress::Any, 1000);
     C5SocketHandler *sh = createSocketHandler(SLOT(handleHall(QJsonObject)));
     sh->bind("cmd", sm_hall);
+    sh->bind("hall", C5Config::hallList());
     sh->send();
     sh = createSocketHandler(SLOT(handleMenu(QJsonObject)));
     sh->bind("cmd", sm_menu);
@@ -49,6 +52,12 @@ void DlgFace::setup()
     sh = createSocketHandler(SLOT(handleConf(QJsonObject)));
     sh->bind("cmd", sm_waiterconf);
     sh->bind("station", hostinfo);
+    sh->send();
+    sh = createSocketHandler(SLOT(handleCreditCards(QJsonObject)));
+    sh->bind("cmd", sm_creditcards);
+    sh->send();
+    sh = createSocketHandler(SLOT(handleDishRemoveReason(QJsonObject)));
+    sh->bind("cmd", sm_dishremovereason);
     sh->send();
     connect(&fTimer, SIGNAL(timeout()), this, SLOT(timeout()));
     fTimer.start(TIMER_TIMEOUT_INTERVAL);
@@ -69,6 +78,7 @@ void DlgFace::reject()
 void DlgFace::timeout()
 {
     C5SocketHandler *sh = createSocketHandler(SLOT(handleHall(QJsonObject)));
+    sh->bind("hall", C5Config::hallList());
     sh->bind("cmd", sm_hall);
     sh->send();
     ui->lbDate->setText(QString("%1").arg(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR2)));
@@ -84,13 +94,17 @@ void DlgFace::newConnection()
 void DlgFace::handleHall(const QJsonObject &obj)
 {
     sender()->deleteLater();
-    fHalls = obj["halls"].toArray();
-    fTables = obj["tables"].toArray();
-    filterHall();
+    C5CafeCommon::fHalls = obj["halls"].toArray();
+    C5CafeCommon::fTables = obj["tables"].toArray();
+    if (fCurrentHall.isEmpty()) {
+        fCurrentHall = C5Config::defaultHall();
+    }
+    filterHall(fCurrentHall);
 }
 
 void DlgFace::handleMenu(const QJsonObject &obj)
 {
+    sender()->deleteLater();
     QJsonArray jMenu = obj["menu"].toArray();
     for (int i = 0, count = jMenu.count(); i < count; i++) {
         QJsonObject o = jMenu.at(i).toObject();
@@ -103,8 +117,37 @@ void DlgFace::handleMenu(const QJsonObject &obj)
 
 void DlgFace::handleConf(const QJsonObject &obj)
 {
+    sender()->deleteLater();
     Q_UNUSED(obj)
     C5WaiterConf::fDefaultMenu = "M1";
+}
+
+void DlgFace::handleCreditCards(const QJsonObject &obj)
+{
+    sender()->deleteLater();
+    C5CafeCommon::fCreditCards.clear();
+    QJsonArray jCC = obj["cards"].toArray();
+    for (int i = 0; i < jCC.count(); i++) {
+        CreditCards cc;
+        QJsonObject o = jCC.at(i).toObject();
+        cc.id = o["f_id"].toString().toInt();
+        cc.name = o["f_name"].toString();
+        QString base64 = o["f_image"].toString();
+        if (!base64.isEmpty()) {
+            cc.image.loadFromData(QByteArray::fromBase64(base64.toLatin1()), "PNG");
+        }
+        C5CafeCommon::fCreditCards << cc;
+    }
+}
+
+void DlgFace::handleDishRemoveReason(const QJsonObject &obj)
+{
+    sender()->deleteLater();
+    C5CafeCommon::fDishRemoveReason.clear();
+    QJsonArray jr = obj["reasons"].toArray();
+    for (int i = 0; i < jr.count(); i++) {
+        C5CafeCommon::fDishRemoveReason << jr.at(i)["f_name"].toString();
+    }
 }
 
 void DlgFace::handleSocket(const QJsonObject &obj)
@@ -130,12 +173,17 @@ void DlgFace::on_btnExit_clicked()
     }
 }
 
-void DlgFace::filterHall()
+void DlgFace::filterHall(const QString &hall)
 {
     ui->tblHall->clearContents();
     ui->tblHall->setRowCount(0);
     int c = 0, r = 0;
-    for (int i = 0; i < fTables.count(); i++)  {
+    for (int i = 0; i < C5CafeCommon::fTables.count(); i++)  {
+        if (hall != "*" && !hall.isEmpty()) {
+            if (C5CafeCommon::fTables.at(i).toObject()["f_hall"].toString() != hall) {
+                continue;
+            }
+        }
         if (c == ui->tblHall->columnCount()) {
             c = 0;
             r++;
@@ -147,7 +195,7 @@ void DlgFace::filterHall()
             }
         }
         QTableWidgetItem *item = ui->tblHall->item(r, c++);
-        item->setData(Qt::UserRole, fTables.at(i).toObject());
+        item->setData(Qt::UserRole, C5CafeCommon::fTables.at(i).toObject());
     }
     ui->tblHall->setRowCount(r + 1);
 }
@@ -171,4 +219,14 @@ void DlgFace::on_tblHall_itemClicked(QTableWidgetItem *item)
     sh->bind("cmd", sm_hall);
     sh->send();
     fTimer.start(TIMER_TIMEOUT_INTERVAL);
+}
+
+void DlgFace::on_btnHallFilter_clicked()
+{
+    QString hall;
+    if (!DlgListOfHall::getHall(hall)) {
+        return;
+    }
+    fCurrentHall = hall;
+    filterHall(hall);
 }

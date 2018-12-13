@@ -1,0 +1,55 @@
+#include "cr5discountsystem.h"
+#include "ce5discountcard.h"
+
+CR5DiscountSystem::CR5DiscountSystem(const QStringList &dbParams, QWidget *parent) :
+    C5ReportWidget(dbParams, parent)
+{
+    fLabel = tr("Dicount system");
+    fIcon = ":/discount.png";
+    fSimpleQuery = false;
+    fMainTable = "b_cards_discount d";
+    fLeftJoinTables << "left join b_clients c on c.f_id=d.f_client [c]";
+    fColumnsFields << "d.f_id"
+                   << "c.f_firstname"
+                   << "c.f_lastname"
+                   << "d.f_value"
+                   << "c.f_info"
+                   << "d.f_code"
+                   << "d.f_datestart"
+                   << "d.f_dateend"
+                   << "d.f_active";
+    fTranslation["f_id"] = tr("Code");
+    fTranslation["f_firstname"] = tr("First name");
+    fTranslation["f_lastname"] = tr("Last name");
+    fTranslation["f_value"] = tr("Discount");
+    fTranslation["f_info"] = tr("Client info");
+    fTranslation["f_code"] = tr("Card code");
+    fTranslation["f_datestart"] = tr("Start date");
+    fTranslation["f_dateend"] = tr("End date");
+    fTranslation["f_active"] = tr("State");
+    fColumnsVisible["d.f_id"] = true;
+    fColumnsVisible["c.f_firstname"] = true;
+    fColumnsVisible["c.f_lastname"] = true;
+    fColumnsVisible["d.f_value"] = true;
+    fColumnsVisible["c.f_info"] = true;
+    fColumnsVisible["d.f_code"] = true;
+    fColumnsVisible["d.f_datestart"] = true;
+    fColumnsVisible["d.f_dateend"] = true;
+    fColumnsVisible["d.f_active"] = true;
+    restoreColumnsVisibility();
+    fEditor = new CE5DiscountCard(dbParams);
+}
+
+QToolBar *CR5DiscountSystem::toolBar()
+{
+    if (!fToolBar) {
+        QList<ToolBarButtons> btn;
+        btn << ToolBarButtons::tbNew
+            << ToolBarButtons::tbClearFilter
+            << ToolBarButtons::tbRefresh
+            << ToolBarButtons::tbExcel
+            << ToolBarButtons::tbPrint;
+        fToolBar = createStandartToolbar(btn);
+    }
+    return fToolBar;
+}

@@ -24,6 +24,7 @@ C5DishWidget::C5DishWidget(const QStringList &dbParams, QWidget *parent) :
         }
         ui->tblPricing->setInteger(row, 1, db.getInt("f_id"));
         ui->tblPricing->setString(row, 2, db.getString("f_name"));
+        ui->tblPricing->createLineEdit(row, 3)->setValidator(new QDoubleValidator(0, 999999999, 2));
         ui->tblPricing->createComboBox(row, 4)->setCache(dbParams, cache_goods_store);
         ui->tblPricing->createComboBox(row, 5)->setCache(dbParams, cache_waiter_printers);
         ui->tblPricing->createComboBox(row, 6)->setCache(dbParams, cache_waiter_printers);
@@ -58,7 +59,7 @@ void C5DishWidget::clear()
 {
     CE5Editor::clear();
     for (int i = 0; i < ui->tblPricing->rowCount(); i++) {
-        ui->tblPricing->setString(i, 3, "");
+        ui->tblPricing->lineEdit(i, 3)->clear();
     }
     ui->tblRecipe->clearContents();
     ui->tblRecipe->setRowCount(0);
@@ -74,7 +75,7 @@ void C5DishWidget::setDish(int id)
         for (int i = 0; i < ui->tblPricing->rowCount(); i++) {
             if (ui->tblPricing->getInteger(i, 1) == db.getInt("f_menu")) {
                 ui->tblPricing->setInteger(i, 0, db.getInt("f_id"));
-                ui->tblPricing->setDouble(i, 3, db.getDouble("f_price"));
+                ui->tblPricing->lineEdit(i, 3)->setDouble(db.getDouble("f_price"));
                 ui->tblPricing->comboBox(i, 4)->setCurrentIndex(ui->tblPricing->comboBox(i, 4)->findData(db.getInt("f_store")));
                 ui->tblPricing->comboBox(i, 5)->setCurrentIndex(ui->tblPricing->comboBox(i, 5)->findText(db.getString("f_print1")));
                 ui->tblPricing->comboBox(i, 6)->setCurrentIndex(ui->tblPricing->comboBox(i, 6)->findText(db.getString("f_print2")));
@@ -119,7 +120,7 @@ bool C5DishWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     C5Database db(fDBParams);
     for (int i = 0; i < ui->tblPricing->rowCount(); i++) {
         db[":f_dish"] = ui->leCode->getInteger();
-        db[":f_price"] = ui->tblPricing->getDouble(i, 3);
+        db[":f_price"] = ui->tblPricing->lineEdit(i, 3)->getDouble();
         db[":f_menu"] = ui->tblPricing->getInteger(i, 1);
         db[":f_store"] = ui->tblPricing->comboBox(i, 4)->currentIndex() > -1 ? ui->tblPricing->comboBox(i, 4)->currentData() : "null";
         db[":f_print1"] = ui->tblPricing->comboBox(i, 5)->currentText();

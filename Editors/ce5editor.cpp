@@ -135,7 +135,7 @@ bool CE5Editor::save(QString &err, QList<QMap<QString, QVariant> > &data)
             if (leId->isEnabled()) {
                 C5Database dbcheck(fDBParams);
                 dbcheck[":f_id"] = leId->getInteger();
-                dbcheck.exec("select * from c_partners where f_id=:f_id");
+                dbcheck.exec("select * from " + table() + " where f_id=:f_id");
                 if (dbcheck.nextRow()) {
                     err = tr("Duplicate id");
                     db.rollback();
@@ -144,6 +144,10 @@ bool CE5Editor::save(QString &err, QList<QMap<QString, QVariant> > &data)
                 leId->setEnabled(false);
                 db[":f_id"] = leId->getInteger();
                 db.insert(table(), false);
+            } else {
+                if (!db.update(table(), where_id(leId->getInteger()))) {
+                    err = db.fLastError;
+                }
             }
         } else {
             if (!db.update(table(), where_id(leId->getInteger()))) {
@@ -154,7 +158,8 @@ bool CE5Editor::save(QString &err, QList<QMap<QString, QVariant> > &data)
     row[leId->property("Field").toString()] = leId->getInteger();
     data.append(row);
     db.startTransaction();
-    int cacheid = C5Cache::idForTable(table());
+    C5Cache *cache = C5Cache::cache(fDBParams, 0);
+    int cacheid = cache->idForTable(table());
     if (cacheid == 0) {
         C5Message::error(QString("No cache for %1").arg(table()));
     }
@@ -181,6 +186,12 @@ bool CE5Editor::checkData(QString &err)
                         err += QString("%1 %2<br>")
                                 .arg(rule.mid(rule.indexOf("=") + 1, rule.length() - rule.indexOf("=")))
                                 .arg(tr("cannot be empty"));
+                    }
+                } else if (rule.mid(0, 7) == "nonzero") {
+                    if (le->getDouble() < 0.0001) {
+                        err += QString("%1 %2<br>")
+                                .arg(rule.mid(rule.indexOf("=") + 1, rule.length() - rule.indexOf("=")))
+                                .arg("cannot be zero");
                     }
                 }
             }

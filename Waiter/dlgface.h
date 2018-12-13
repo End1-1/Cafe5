@@ -37,6 +37,10 @@ private slots:
 
     void handleConf(const QJsonObject &obj);
 
+    void handleCreditCards(const QJsonObject &obj);
+
+    void handleDishRemoveReason(const QJsonObject &obj);
+
     void handleSocket(const QJsonObject &obj);
 
     void on_btnConnection_clicked();
@@ -45,20 +49,20 @@ private slots:
 
     void on_tblHall_itemClicked(QTableWidgetItem *item);
 
+    void on_btnHallFilter_clicked();
+
 private:
     Ui::DlgFace *ui;
 
+    QString fCurrentHall;
+
     QTcpServer fTcpServer;
-
-    QJsonArray fHalls;
-
-    QJsonArray fTables;
 
     QTimer fTimer;
 
     bool fCanClose;
 
-    void filterHall();
+    void filterHall(const QString &hall);
 };
 
 #endif // DLGFACE_H

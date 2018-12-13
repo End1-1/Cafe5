@@ -13,7 +13,6 @@
 #define param_tax_password 7
 #define param_tax_dept 8
 #define param_default_menu 9
-#define param_order_prefix 10
 #define param_default_hall 11
 #define param_default_table 12
 #define param_doc_num_digits 13
@@ -41,9 +40,9 @@ public:
     static QString taxDept();
     static QStringList dbParams();
     static int defaultMenu();
-    static int defaultHall();
+    static QString defaultHall();
+    static QString hallList();
     static int defaultTable();
-    static QString orderPrefix();
     static int docNumDigits();
     static void initParamsFromDb();
     static QVariant getRegValue(const QString &key);
@@ -63,6 +62,8 @@ extern QStringList __databases;
 #ifdef FRONTDESK
 #include "c5mainwindow.h"
 extern C5MainWindow *__mainWindow;
+#else
+extern QDialog *__mainWindow;
 #endif
 
 #endif // C5CONFIG_H

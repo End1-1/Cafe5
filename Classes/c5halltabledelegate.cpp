@@ -30,7 +30,7 @@ void C5HallTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &o
     painter->fillRect(fillRect, bgBrush);
     QRect tableRect = fillRect;
     tableRect.adjust(4, 2, -2, -2);
-    QString amount = o["f_amount"].toString() == "0" ? "" : " / " + o["f_amount"].toString();
+    QString amount = o["f_amount"].toString().toDouble() == 0.00 ? "" : " / " + o["f_amount"].toString();
     painter->drawText(tableRect, o["f_name"].toString() + amount);
     QRect staffRect = option.rect;
     font.setBold(true);

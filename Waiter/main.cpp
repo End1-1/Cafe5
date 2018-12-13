@@ -24,6 +24,7 @@ int main(int argc, char *argv[])
     font.setPointSize(12);
     a.setFont(font);
     DlgFace w;
+    __mainWindow = &w;
     C5Config::fParentWidget = &w;
     w.showFullScreen();
     a.processEvents();

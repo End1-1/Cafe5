@@ -27,36 +27,42 @@ private slots:
 
     void handleCloseOrder(const QJsonObject &obj);
 
+    void handleDiscount(const QJsonObject &obj);
+
     virtual void handleError(int err, const QString &msg);
+
+    void tableWidgetBtnClearClicked();
+
+    void tableWidgetBtnCalcClicked();
 
     void on_btnReceipt_clicked();
 
-    void on_btnCash_clicked();
-
     void on_btnCancel_clicked();
 
-    void on_btnClearCash_clicked();
+    void on_btnCloseOrder_clicked();
 
-    void on_btnClearCard_clicked();
+    void on_btnPaymentCash_clicked();
 
-    void on_btnClearBank_clicked();
+    void on_btnPaymentCard_clicked();
 
-    void on_btnClearOther_clicked();
+    void on_btnPaymentBank_clicked();
 
-    void on_btnSetCash_clicked();
+    void on_btnPaymentOther_clicked();
 
-    void on_btnSetCard_clicked();
-
-    void on_btnSetBank_clicked();
-
-    void on_btnSetOther_clicked();
+    void on_btnDiscount_clicked();
 
 private:
     Ui::DlgPayment *ui;
 
     C5Order *fOrder;
 
+    void setPaymentInfo();
+
+    void addPaymentMode(int mode, QString text, double amount);
+
     void checkTotal();
+
+    bool checkForPaymentMethod(int mode, double &total);
 };
 
 #endif // DLGPAYMENT_H

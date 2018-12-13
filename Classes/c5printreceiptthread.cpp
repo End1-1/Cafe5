@@ -56,7 +56,7 @@ void C5PrintReceiptThread::run()
 #endif
     p.br(1);
     p.ltext(tr("Order"), 0);
-    p.rtext(QString("%1%2").arg(fHeader["f_prefix"].toString()).arg(fHeader["f_id"].toString()));
+    p.rtext(QString("%1%2").arg(fHeader["f_prefix"].toString()).arg(fHeader["f_hallid"].toString()));
     p.br();
     p.ltext(tr("Table"), 0);
     p.rtext(QString("%1/%2").arg(fHeader["f_hallname"].toString()).arg(fHeader["f_tablename"].toString()));
@@ -99,12 +99,12 @@ void C5PrintReceiptThread::run()
     p.rtext(float_str(fHeader["f_amounttotal"].toString().toDouble(), 2));
     p.br();
     if (fHeader["f_servicefactor"].toString().toDouble() > 0.01) {
-        p.ltext(QString("%1 %2%").arg(tr("Service included")).arg(float_str(fHeader["f_servicefactor"].toString().toDouble(), 2)), 0);
+        p.ltext(QString("%1 %2%").arg(tr("Service included")).arg(float_str(fHeader["f_servicefactor"].toString().toDouble() * 100, 2)), 0);
         p.rtext(float_str(fHeader["f_amountservice"].toString().toDouble(), 2));
         p.br();
     }
     if (fHeader["f_discountfactor"].toString().toDouble() > 0.01) {
-        p.ltext(QString("%1 %2%").arg(tr("Service included")).arg(float_str(fHeader["f_discountfactor"].toString().toDouble(), 2)), 0);
+        p.ltext(QString("%1 %2%").arg(tr("Discount included")).arg(float_str(fHeader["f_discountfactor"].toString().toDouble() * 100, 2)), 0);
         p.rtext(float_str(fHeader["f_amountdiscount"].toString().toDouble(), 2));
         p.br();
     }

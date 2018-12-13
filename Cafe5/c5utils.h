@@ -43,6 +43,8 @@
 #define DOC_REASON_OVER 6
 #define DOC_REASON_TRASH 7
 
+#define CARD_TYPE_DISCOUNT 1
+
 class C5Utils
 {
 public:

@@ -31,6 +31,7 @@
 #define cp_t4_part1 402
 #define cp_t4_part2 403
 #define cp_t4_dishes 404
+#define cp_t4_dish_remove_reason 405
 
 #define cp_t5_waiter 500
 #define cp_t5_multiple_receipt 501
@@ -43,6 +44,10 @@
 #define cp_t6_waste 604
 #define cp_t6_storage 605
 #define cp_t6_partners 606
+
+#define cp_t7_other 700
+#define cp_t7_credit_card 701
+#define cp_t7_discount_system 702
 
 
 class C5Permissions

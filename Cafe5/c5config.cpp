@@ -23,6 +23,9 @@ QMutex settingsMutex;
 
 #ifdef FRONTDESK
 C5MainWindow *__mainWindow;
+#else
+#include <QDialog>
+QDialog *__mainWindow;
 #endif
 
 C5Config::C5Config()
@@ -85,11 +88,6 @@ QStringList C5Config::dbParams()
     return params;
 }
 
-QString C5Config::orderPrefix()
-{
-    return getValue(param_order_prefix);
-}
-
 int C5Config::docNumDigits()
 {
     return getValue(param_doc_num_digits).toInt();
@@ -100,9 +98,19 @@ int C5Config::defaultMenu()
     return getValue(param_default_menu).toInt();
 }
 
-int C5Config::defaultHall()
+QString C5Config::defaultHall()
 {
-    return getValue(param_default_hall).toInt();
+    QStringList halls = getValue(param_default_hall).split(",", QString::SkipEmptyParts);
+    if (halls.count() > 0) {
+        return halls.at(0);
+    } else {
+        return "";
+    }
+}
+
+QString C5Config::hallList()
+{
+    return getValue(param_default_hall);
 }
 
 int C5Config::defaultTable()

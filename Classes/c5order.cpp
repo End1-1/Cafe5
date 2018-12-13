@@ -22,7 +22,9 @@ QString C5Order::itemValue(int index, const QString &name)
 
 void C5Order::setItemValue(int index, const QString &name, const QString &value)
 {
-    fItems[index].toObject()[name.toLower()] = value;
+    QJsonObject o = fItems[index].toObject();
+    o[name.toLower()] = value;
+    fItems[index] = o;
     fSaved = false;
 }
 
@@ -65,6 +67,8 @@ void C5Order::countTotal()
     double totalService = 0;
     double totalDiscount = 0;
     for (int i = 0, count = fItems.count(); i < count; i++) {
+        setItemValue(i, "f_discount", headerValue("f_discountfactor"));
+        setItemValue(i, "f_service", headerValue("f_servicefactor"));
         QJsonObject o = fItems[i].toObject();
         if (o["f_state"].toString().toInt() != DISH_STATE_OK) {
             continue;
@@ -86,4 +90,15 @@ void C5Order::countTotal()
     setHeaderValue("f_amounttotal", total);
     setHeaderValue("f_amountservice", totalService);
     setHeaderValue("f_amountdiscount", totalDiscount);
+    double acash = headerValue("f_amountcash").toDouble(),
+            acard = headerValue("f_amountcard").toDouble(),
+            abank = headerValue("f_amountbank").toDouble(),
+            aother = headerValue("f_amountother").toDouble();
+    double adiff = total - (acash + acard + abank + aother);
+    if (adiff < 0.001) {
+        setHeaderValue("f_amountother", 0);
+        setHeaderValue("f_amountbank", 0);
+        setHeaderValue("f_amountcard", 0);
+        setHeaderValue("f_amountcash", headerValue("f_amounttotal"));
+    }
 }

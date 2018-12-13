@@ -4,6 +4,7 @@
 #include "c5witerconf.h"
 #include "c5menu.h"
 #include "c5order.h"
+#include "dlgdishremovereason.h"
 #include "c5dishtabledelegate.h"
 #include "c5ordertabledelegate.h"
 #include "dlgpayment.h"
@@ -80,8 +81,6 @@ void DlgOrder::load(int table)
 
 void DlgOrder::buildMenu(const QString &menu, QString part1, QString part2)
 {
-    Q_UNUSED(part1)
-    Q_UNUSED(part2)
     QStringList p1 = C5Menu::fMenu[menu].keys();
     int col = 0, row = 0;
     ui->tblPart1->clear();
@@ -94,6 +93,10 @@ void DlgOrder::buildMenu(const QString &menu, QString part1, QString part2)
     }
 
     if (part1.isEmpty()) {
+        if (!ui->tblPart1->item(0, 0)) {
+            C5Message::error(tr("Menu is not defined"));
+            return;
+        }
         part1 = ui->tblPart1->item(0, 0)->text();
     }
 
@@ -146,7 +149,7 @@ void DlgOrder::addDishToOrder(const QJsonObject &obj)
         o["f_header"] = fOrder->headerValue("f_id");
         o["f_state"] = QString::number(DISH_STATE_OK);
         o["f_service"] = C5Config::serviceFactor();
-        o["f_discount"] = "0";
+        o["f_discount"] = fOrder->headerValue("f_discountfactor");
         o["f_total"] = "0";
         o["f_qty1"] = "1";
         o["f_qty2"] = "0";
@@ -158,17 +161,20 @@ void DlgOrder::addDishToOrder(const QJsonObject &obj)
     ui->tblOrder->item(row, 0)->setData(Qt::UserRole, o);
     ui->tblOrder->setCurrentCell(ui->tblOrder->rowCount() - 1, 0);
     fOrder->addItem(o);
+    fOrder->setHeaderValue("f_amountcash", 0);
+    fOrder->setHeaderValue("f_amountcard", 0);
+    fOrder->setHeaderValue("f_amountbank", 0);
+    fOrder->setHeaderValue("f_amountother", 0);
     fOrder->countTotal();
 }
 
 void DlgOrder::loadOrder(const QJsonObject &obj)
 {
-    fOrder->fHeader = obj["header"].toArray().at(0).toObject();
+    fOrder->fHeader = obj["header"].toObject();
     if (fOrder->headerValue("f_id").toInt() == 0) {
         fOrder->setHeaderValue("f_staff", fUser->fId);
         fOrder->setHeaderValue("f_staffname", fUser->fFull);
         fOrder->setHeaderValue("f_state", ORDER_STATE_OPEN);
-        fOrder->setHeaderValue("f_prefix", C5Config::orderPrefix());
         fOrder->setHeaderValue("f_comment", "");
         fOrder->setHeaderValue("f_hall", obj["table"].toArray().at(0)["f_hall"].toString());
         fOrder->setHeaderValue("f_amounttotal", 0);
@@ -185,6 +191,20 @@ void DlgOrder::loadOrder(const QJsonObject &obj)
     fOrder->setHeaderValue("f_currentstaffname", fUser->fFull);
     fOrder->fItems = obj["body"].toArray();
     itemsToTable();
+    if (fOrder->headerValue("f_discountfactor").toDouble() > 0) {
+        ui->lbDiscount->setEnabled(true);
+        ui->lbDiscount->setText(QString("[%1: %2%]").arg(tr("Discount")).arg(fOrder->headerValue("f_discountfactor").toDouble() * 100));
+    } else {
+        ui->lbDiscount->setEnabled(false);
+        ui->lbDiscount->setText(tr("[Discount]"));
+    }
+    if (fOrder->headerValue("f_servicefactor").toDouble() > 0) {
+        ui->lbService->setEnabled(true);
+        ui->lbService->setText(QString("[%1: %2%]").arg(tr("Service")).arg(fOrder->headerValue("f_servicefactor").toDouble() * 100));
+    } else {
+        ui->lbService->setEnabled(false);
+        ui->lbService->setText(tr("[Service]"));
+    }
     if (fOrder->headerValue("f_staff").toInt() != fOrder->headerValue("f_currentstaff").toInt()) {
         C5Message::info(QString("%1\r\n%2").arg(tr("Order owner")).arg(fOrder->headerValue("f_staffname")));
     }
@@ -385,11 +405,28 @@ void DlgOrder::on_btnPrintService_clicked()
 
 void DlgOrder::on_btnPayment_clicked()
 {
+    bool empty = true;
+    for (int i = 0; i < fOrder->fItems.count(); i++) {
+        if (fOrder->itemValue(i, "f_state").toInt() != DISH_STATE_OK) {
+            continue;
+        }
+        if (fOrder->itemValue(i, "f_qty1").toDouble() > fOrder->itemValue(i, "f_qty2").toDouble()) {
+            C5Message::error(tr("Order is incomplete"));
+            return;
+        }
+        empty = false;
+    }
+    if (empty) {
+        C5Message::error(tr("Order is incomplete"));
+        return;
+    }
     int paymentResult = DlgPayment::payment(fOrder);
-    QJsonObject obj;
     switch (paymentResult) {
     case PAYDLG_ORDER_CLOSE:
         QDialog::accept();
+        break;
+    case PAYDLG_NONE:
+        saveOrder();
         break;
     }
 }
@@ -427,6 +464,11 @@ void DlgOrder::on_btnVoid_clicked()
         if (!DlgPassword::getAmount(o["f_name"].toString(), max, true)) {
             return;
         }
+        QString reasonname;
+        int reasonid;
+        if (!DlgDishRemoveReason::getReason(reasonname, reasonid)) {
+            return;
+        }
         if (max > o["f_qty2"].toString().toDouble()) {
             maxFree = max - (o["f_qty1"].toString().toDouble() - o["f_qty2"].toString().toDouble());
             o["f_qty1"] = QString::number(o["f_qty1"].toString().toDouble() - maxFree);
@@ -436,17 +478,19 @@ void DlgOrder::on_btnVoid_clicked()
             return;
         }
         //GET DISH STATE
-        int dishState = DISH_STATE_MISTAKE;
+        int dishState = reasonid;
         if (max < o["f_qty1"].toString().toDouble()) {
             o["f_qty1"] = QString::number(o["f_qty1"].toString().toDouble() - max);
             QJsonObject o2 = o;
             o2["f_id"] = "0";
-            o2["f_state"] = QString::number(dishState * -1);
+            o2["f_state"] = QString::number(dishState * -1); // Print removed dishes if state < 0
             o2["f_qty1"] = QString::number(max, 'f', 2);
             o2["f_qty2"] = o2["f_qty1"];
+            o2["f_removereason"] = reasonname;
             fOrder->fItems.append(o2);
         } else {
-            o["f_state"] = QString::number(dishState * -1);
+            o["f_state"] = QString::number(dishState * -1); // Print removed dishes if state < 0
+            o["f_removereason"] = reasonname;
         }
         fOrder->fItems[index] = o;
         if (fOrder->headerValue("f_print").toInt() > 0) {

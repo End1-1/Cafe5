@@ -364,6 +364,7 @@ bool C5StoreDoc::save(int state, QString &err)
     }
     fDocState = state;
     setDocEnabled(fDocState == DOC_STATE_DRAFT);
+    countTotal();
     return true;
 }
 
@@ -819,7 +820,7 @@ void C5StoreDoc::printDoc()
         points << 1000;
     }
     if (!ui->leInvoiceNumber->isEmpty()) {
-        vals << ui->leInvoiceNumber->text() + " / " + ui->deInvoiceDate->text();
+        vals << ui->leInvoiceNumber->text() + " /    " + ui->deInvoiceDate->text();
         points << 800;
     }
     p.tableText(points, vals, p.fLineHeight + 20);
@@ -867,12 +868,12 @@ void C5StoreDoc::printDoc()
 
     //p.fTop = p.fNormalHeight - ((p.fLineHeight + 20) * 2);
     p.ltext(tr("Accepted"), 50);
-    p.ltext(tr("Passed"), 800);
+    p.ltext(tr("Passed"), 1000);
     p.br(p.fLineHeight + 20);
     p.ltext(ui->leAcceptedName->text(), 50);
-    p.ltext(ui->lePassedName->text(), 800);
-    p.line(0, p.fTop, 750, p.fTop);
-    p.line(800, p.fTop, 1600, p.fTop);
+    p.ltext(ui->lePassedName->text(), 1000);
+    p.line(50, p.fTop, 700, p.fTop);
+    p.line(1000, p.fTop, 1650, p.fTop);
 
     C5PrintPreview pp(&p, fDBParams, this);
     pp.exec();

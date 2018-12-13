@@ -11,5 +11,8 @@
 #define sm_printreceipt 8
 #define sm_closeorder 9
 #define sm_stationconfig 10
+#define sm_creditcards 11
+#define sm_dishremovereason 12
+#define sm_discount 13
 
 #endif // C5SOCKETMESSAGE_H

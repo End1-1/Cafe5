@@ -102,7 +102,7 @@ int C5TableWidget::getInteger(int row, int column)
 
 void C5TableWidget::setInteger(int row, int column, int value)
 {
-    item(row, column)->setText(QString::number(value));
+    setString(row, column, QString::number(value));
 }
 
 QString C5TableWidget::getString(int row, int column)
@@ -112,7 +112,11 @@ QString C5TableWidget::getString(int row, int column)
 
 void C5TableWidget::setString(int row, int column, const QString &str)
 {
-    item(row, column)->setText(str);
+    if (!item(row, column)) {
+        setItem(row, column, new QTableWidgetItem(str));
+    } else {
+        item(row, column)->setText(str);
+    }
 }
 
 double C5TableWidget::getDouble(int row, int column)
@@ -122,7 +126,7 @@ double C5TableWidget::getDouble(int row, int column)
 
 void C5TableWidget::setDouble(int row, int column, double value)
 {
-    item(row, column)->setText(float_str(value, 2));
+    setString(row, column, float_str(value, 2));
 }
 
 int C5TableWidget::addEmptyRow()

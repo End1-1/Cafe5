@@ -10,6 +10,9 @@ C5ServerHandler::C5ServerHandler() :
 
 void C5ServerHandler::getJsonFromQuery(const QString &query, QJsonArray &arr, const QMap<QString, QVariant> &bind)
 {
+    while (arr.count() > 0) {
+        arr.removeAt(0);
+    }
     for (QMap<QString, QVariant>::const_iterator it = bind.begin(); it != bind.end(); it++) {
         fDb[it.key()] = it.value();
     }

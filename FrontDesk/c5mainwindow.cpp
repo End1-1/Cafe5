@@ -12,10 +12,12 @@
 #include "cr5dish.h"
 #include "cr5settings.h"
 #include "cr5goodsmovement.h"
+#include "cr5creditcards.h"
 #include "cr5dishpart1.h"
 #include "cr5tstoreextra.h"
 #include "cr5dishpart2.h"
 #include "c5storeinventory.h"
+#include "cr5discountsystem.h"
 #include "cr5goodsgroup.h"
 #include "cr5databases.h"
 #include "cr5goodspartners.h"
@@ -24,6 +26,7 @@
 #include "cr5goodsunit.h"
 #include "cr5menunames.h"
 #include "cr5materialsinstore.h"
+#include "cr5dishremovereason.h"
 #include "cr5goods.h"
 #include "cr5users.h"
 #include "cr5goodsstorages.h"
@@ -59,6 +62,10 @@ C5MainWindow::C5MainWindow(QWidget *parent) :
     connect(ctrlPlush, SIGNAL(activated()), this, SLOT(hotKey()));
     QShortcut *ctrlHome = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Home), this);
     connect(ctrlHome, SIGNAL(activated()), this, SLOT(on_actionGo_to_home_triggered()));
+    QShortcut *ctrlLog = new QShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_L), this);
+    connect(ctrlLog, &QShortcut::activated, [this]() {
+        ui->wLog->setVisible(!ui->wLog->isVisible());
+    });
     __mainWindow = this;
 
     QVariant menuPanelIsVisible = C5Config::getRegValue("menupanel");
@@ -66,6 +73,7 @@ C5MainWindow::C5MainWindow(QWidget *parent) :
         menuPanelIsVisible = true;
     }
     ui->twDb->setVisible(menuPanelIsVisible.toBool());
+    ui->wLog->setVisible(false);
 }
 
 C5MainWindow::~C5MainWindow()
@@ -90,6 +98,13 @@ void C5MainWindow::removeTab(QWidget *w)
             return;
         }
     }
+}
+
+void C5MainWindow::writeLog(const QString &message)
+{
+    ui->ptLog->appendPlainText(QString("%1: %2")
+                               .arg(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR))
+                                .arg(message));
 }
 
 void C5MainWindow::twCustomMenu(const QPoint &p)
@@ -206,6 +221,7 @@ void C5MainWindow::on_actionLogin_triggered()
             addTreeL3Item(it, cp_t4_part2, tr("Types of dishes"), ":/menu.png");
             addTreeL3Item(it, cp_t4_dishes, tr("Dishes list"), ":/menu.png");
             addTreeL3Item(it, cp_t4_menu_names, tr("Menu names"), ":/menu.png");
+            addTreeL3Item(it, cp_t4_dish_remove_reason, tr("Dish remove reasons"), ":/menu.png");
         }
 
         if (pr(db.getString(0), cp_t6_goods_menu)) {
@@ -220,6 +236,16 @@ void C5MainWindow::on_actionLogin_triggered()
             addTreeL3Item(it, cp_t6_waste, tr("Autowaste"), ":/goods.png");
             addTreeL3Item(it, cp_t6_units, tr("Units"), ":/goods.png");
             addTreeL3Item(it, cp_t6_partners, tr("Partners"), ":/goods.png");
+        }
+
+        if (pr(db.getString(0), cp_t7_other)) {
+            it = new QTreeWidgetItem();
+            it->setText(0, tr("Other"));
+            it->setData(0, Qt::UserRole, cp_t6_goods_menu);
+            it->setIcon(0, QIcon(":/other.png"));
+            item->addChild(it);
+            addTreeL3Item(it, cp_t7_credit_card, tr("Credit cards"), ":/credit-card.png");
+            addTreeL3Item(it, cp_t7_discount_system, tr("Discount system"), ":/discount.png");
         }
 
         if (pr(db.getString(0), cp_t1_preference)) {
@@ -370,6 +396,9 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
     case cp_t4_menu_names:
         createTab<CR5MenuNames>(dbParams);
         break;
+    case cp_t4_dish_remove_reason:
+        createTab<CR5DishRemoveReason>(dbParams);
+        break;
     case cp_t6_units:
         createTab<CR5GoodsUnit>(dbParams);
         break;
@@ -387,6 +416,12 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
         break;
     case cp_t6_partners:
         createTab<CR5GoodsPartners>(dbParams);
+        break;
+    case cp_t7_credit_card:
+        createTab<CR5CreditCards>(dbParams);
+        break;
+    case cp_t7_discount_system:
+        createTab<CR5DiscountSystem>(dbParams);
         break;
     default:
         break;

@@ -51,7 +51,7 @@ SOURCES += \
     ../Classes/c5textdelegate.cpp \
     ../Classes/c5combodelegate.cpp \
     ../Classes/c5tableview.cpp \
-    ../Cache/c5cache.cpp \
+    ../Classes/c5cache.cpp \
     ../Controls/c5lineedit.cpp \
     ../Controls/c5combobox.cpp \
     c5filtervalues.cpp \
@@ -111,7 +111,14 @@ SOURCES += \
     ../Editors/ce5goodswaste.cpp \
     c5welcomepage.cpp \
     ../Editors/ce5usergroup.cpp \
-    ../Editors/ce5user.cpp
+    ../Editors/ce5user.cpp \
+    ../Reports/cr5creditcards.cpp \
+    ../Editors/ce5creditcard.cpp \
+    ../Reports/cr5dishremovereason.cpp \
+    ../Editors/ce5dishremovereason.cpp \
+    ../Reports/cr5discountsystem.cpp \
+    ../Editors/ce5discountcard.cpp \
+    ../Editors/ce5client.cpp
 
 HEADERS += \
         c5mainwindow.h \
@@ -132,7 +139,7 @@ HEADERS += \
     ../Classes/c5textdelegate.h \
     ../Classes/c5combodelegate.h \
     ../Classes/c5tableview.h \
-    ../Cache/c5cache.h \
+    ../Classes/c5cache.h \
     ../Controls/c5lineedit.h \
     ../Controls/c5combobox.h \
     c5filtervalues.h \
@@ -194,7 +201,14 @@ HEADERS += \
     ../Editors/ce5goodswaste.h \
     c5welcomepage.h \
     ../Editors/ce5usergroup.h \
-    ../Editors/ce5user.h
+    ../Editors/ce5user.h \
+    ../Reports/cr5creditcards.h \
+    ../Editors/ce5creditcard.h \
+    ../Reports/cr5dishremovereason.h \
+    ../Editors/ce5dishremovereason.h \
+    ../Reports/cr5discountsystem.h \
+    ../Editors/ce5discountcard.h \
+    ../Editors/ce5client.h
 
 FORMS += \
         c5mainwindow.ui \
@@ -230,13 +244,16 @@ FORMS += \
     ../Editors/ce5goodswaste.ui \
     c5welcomepage.ui \
     ../Editors/ce5usergroup.ui \
-    ../Editors/ce5user.ui
+    ../Editors/ce5user.ui \
+    ../Editors/ce5creditcard.ui \
+    ../Editors/ce5dishremovereason.ui \
+    ../Editors/ce5discountcard.ui \
+    ../Editors/ce5client.ui
 
 INCLUDEPATH += ../Cafe5
 INCLUDEPATH += ../Classes
 INCLUDEPATH += ../Reports
 INCLUDEPATH += ../Controls
-INCLUDEPATH += ../Cache
 INCLUDEPATH += ../Editors
 INCLUDEPATH += ../RESOURCES
 

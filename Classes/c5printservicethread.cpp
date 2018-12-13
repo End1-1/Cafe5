@@ -56,7 +56,7 @@ void C5PrintServiceThread::print(const QString &printer, const QString &side)
     p.rtext(fHeader["f_tablename"].toString());
     p.br();
     p.ltext(tr("Order no"), 0);
-    p.rtext(QString("%1%2").arg(fHeader["f_prefix"].toString()).arg(fHeader["f_id"].toString()));
+    p.rtext(QString("%1%2").arg(fHeader["f_prefix"].toString()).arg(fHeader["f_hallid"].toString()));
     p.br();
     p.ltext(tr("Date"), 0);
     p.rtext(QDate::currentDate().toString(FORMAT_DATE_TO_STR));

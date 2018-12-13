@@ -32,9 +32,9 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="btnNewStoreOutput">
+       <widget class="QPushButton" name="btnNewStoreMovement">
         <property name="text">
-         <string>New store output</string>
+         <string>New store movement</string>
         </property>
         <property name="icon">
          <iconset resource="../resources/res.qrc">
@@ -43,9 +43,9 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="btnNewStoreMovement">
+       <widget class="QPushButton" name="btnNewStoreOutput">
         <property name="text">
-         <string>New store movement</string>
+         <string>New store output</string>
         </property>
         <property name="icon">
          <iconset resource="../resources/res.qrc">

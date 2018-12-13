@@ -31,6 +31,8 @@ public:
 
     void removeTab(QWidget *w);
 
+    void writeLog(const QString &message);
+
 public slots:
     void on_actionLogin_triggered();
 

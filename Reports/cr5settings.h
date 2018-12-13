@@ -17,11 +17,6 @@ public:
 private:
     C5SettingsWidget *fSettingsWidget;
 
-protected slots:
-    virtual void saveDataChanges();
-
-    virtual void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
-
 private slots:
     void removeSettings();
 };

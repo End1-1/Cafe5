@@ -24,6 +24,7 @@ void C5PrintRemovedServiceThread::run()
 
 void C5PrintRemovedServiceThread::print(const QString &printName)
 {
+    QJsonObject o = fBody;
     QFont font(qApp->font());
     font.setPointSize(24);
     C5Printing p;
@@ -34,11 +35,28 @@ void C5PrintRemovedServiceThread::print(const QString &printName)
     p.br();
     p.ctext(tr("REMOVED FROM ORDER"));
     p.br();
+    p.ltext(tr("Reason"), 0);
+    switch (abs(o["f_state"].toString().toInt())) {
+    case DISH_STATE_MISTAKE:
+        p.rtext(tr("Mistake"));
+        break;
+    case DISH_STATE_VOID:
+        p.rtext(tr("Void"));
+        break;
+    default:
+        p.rtext(tr("May be, programm error occured"));
+        break;
+    }
+    p.br();
+    p.ltext(tr("Comment"), 0);
+    p.br();
+    p.ltext(o["f_removereason"].toString(), 50);
+    p.br();
     p.ltext(tr("Table"), 0);
     p.rtext(fHeader["f_tablename"].toString());
     p.br();
     p.ltext(tr("Order no"), 0);
-    p.rtext(QString("%1%2").arg(fHeader["f_prefix"].toString()).arg(fHeader["f_id"].toString()));
+    p.rtext(QString("%1%2").arg(fHeader["f_prefix"].toString()).arg(fHeader["f_hallid"].toString()));
     p.br();
     p.ltext(tr("Date"), 0);
     p.rtext(QDate::currentDate().toString(FORMAT_DATE_TO_STR));
@@ -52,7 +70,6 @@ void C5PrintRemovedServiceThread::print(const QString &printName)
     p.line(0, p.fTop, p.fNormalWidth, p.fTop);
 
     QSet<QString> storages;
-    QJsonObject o = fBody;
     storages << o["f_storename"].toString();
     p.ltext(o["f_name"].toString(), 0);
     p.br();

@@ -22,6 +22,12 @@
 #define cache_store_reason 16
 #define cache_dish 17
 #define cache_goods_waste 18
+#define cache_credit_card 19
+#define cache_dish_remove_reason 20
+#define cache_settings_names 21
+#define cache_hall_list 22
+#define cache_discount_client 23
+#define cache_discount_cards 24
 
 class C5Cache : public QObject
 {
@@ -31,6 +37,8 @@ public:
     C5Cache(const QStringList &dbParams);
 
     inline QString getString(int row, int column) {return fCacheData.at(row).at(column).toString();}
+
+    QString getString(int id);
 
     inline int getInt(int row, int column) {return fCacheData.at(row).at(column).toInt();}
 
@@ -69,6 +77,8 @@ private:
     int fVersion;
 
     QStringList fDBParams;
+
+    void setCacheSimpleQuery(int cacheId, const QString &table);
 };
 
 #endif // C5CACHE_H

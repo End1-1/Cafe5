@@ -2,6 +2,7 @@
 #define CE5EDITOR_H
 
 #include "c5widget.h"
+#include "c5editor.h"
 #include <QSet>
 
 class C5LineEditWithSelector;
@@ -30,6 +31,19 @@ public:
     void getLineEdit(QObject *parent);
 
     void focusFirst();
+
+    template<typename T>
+    bool getId(QString &id) {
+        T *ep = new T(fDBParams);
+        C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
+        QList<QMap<QString, QVariant> > data;
+        bool result = e->getResult(data);
+        if (result) {
+            id = data.at(0)["f_id"].toString();
+        }
+        delete e;
+        return result;
+    }
 
 private:
     C5LineEditWithSelector *findLineEditWithId();

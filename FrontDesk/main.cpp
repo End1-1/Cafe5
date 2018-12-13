@@ -1,5 +1,6 @@
 #include "c5mainwindow.h"
 #include "c5connection.h"
+#include "c5cache.h"
 #include <QApplication>
 #include <QTranslator>
 #include <QStyleFactory>
@@ -36,7 +37,6 @@ int main(int argc, char *argv[])
     QFont font(family);
     font.setPointSize(8);
     a.setFont(font);
-
 
     C5MainWindow w;
     w.showMaximized();

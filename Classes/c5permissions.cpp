@@ -39,6 +39,7 @@ void C5Permissions::init(C5Database &db)
               << cp_t4_part1
               << cp_t4_part2
               << cp_t4_dishes
+              << cp_t4_dish_remove_reason
 
               << cp_t5_waiter
               << cp_t5_multiple_receipt
@@ -51,6 +52,10 @@ void C5Permissions::init(C5Database &db)
               << cp_t6_groups
               << cp_t6_waste
               << cp_t6_partners
+
+              << cp_t7_other
+              << cp_t7_credit_card
+              << cp_t7_discount_system
                  ;
     if (__usergroup == 1) {
         fPermissions[db.database()] = fTemplate;

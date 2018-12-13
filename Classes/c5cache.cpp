@@ -52,6 +52,19 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         fCacheQuery[cache_store_reason] = QString("select f_id as `%1`, f_name as `%2` from a_reason")
                 .arg(tr("Code"))
                 .arg(tr("Name"));
+        fCacheQuery[cache_credit_card] = QString("select f_id as `%1`, f_name as `%2` from o_credit_card")
+                .arg(tr("Code"))
+                .arg(tr("Name"));
+        fCacheQuery[cache_dish_remove_reason] = QString("select f_id as `%1`, f_name as `%2` from o_dish_remove_reason")
+                .arg(tr("Code"))
+                .arg(tr("Name"));
+        fCacheQuery[cache_discount_client] = QString("select f_id as `%1`, f_firstname as `%2`, f_lastname as `%3`, f_info as `%4` from b_clients")
+                .arg(tr("Code"))
+                .arg(tr("First name"))
+                .arg(tr("Last name"))
+                .arg(tr("Additional info"));
+        setCacheSimpleQuery(cache_settings_names, "s_settings_names");
+        setCacheSimpleQuery(cache_hall_list, "h_halls");
     }
     if (fTableCache.count() == 0) {
         fTableCache["c_partners"] = cache_goods_partners;
@@ -65,6 +78,12 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         fTableCache["c_goods_waster"] = cache_goods_waste;
         fTableCache["s_user"] = cache_users;
         fTableCache["s_user_group"] = cache_users_groups;
+        fTableCache["o_credit_card"] = cache_credit_card;
+        fTableCache["o_dish_remove_reason"] = cache_dish_remove_reason;
+        fTableCache["s_settings_names"] = cache_settings_names;
+        fTableCache["h_halls"] = cache_hall_list;
+        fTableCache["b_clients"] = cache_discount_client;
+        fTableCache["b_cards_discount"] = cache_discount_cards;
     }
     fVersion = 0;
     C5Database db(dbParams);
@@ -89,6 +108,16 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         db.insert("s_cache", false);
     }
     db.commit();
+}
+
+QString C5Cache::getString(int id)
+{
+    int row = find(id);
+    if (row > -1) {
+        return getString(row, 1);
+    } else {
+        return "FIND ERROR";
+    }
 }
 
 void C5Cache::refresh()
@@ -155,4 +184,12 @@ void C5Cache::loadFromDatabase(const QString &query)
     if (db.nextRow()) {
         fVersion = db.getInt(0);
     }
+}
+
+void C5Cache::setCacheSimpleQuery(int cacheId, const QString &table)
+{
+    fCacheQuery[cacheId] = QString("select f_id as `%1`, f_name as `%2` from %3 ")
+            .arg(tr("Code"))
+            .arg(tr("Name"))
+            .arg(table);
 }

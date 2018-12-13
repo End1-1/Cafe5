@@ -15,5 +15,11 @@
         <file>wallet-with-money.png</file>
         <file>refresh.png</file>
         <file>filter_clear.png</file>
+        <file>edit.png</file>
+        <file>credit-card.png</file>
+        <file>bank.png</file>
+        <file>giftbox.png</file>
+        <file>place.png</file>
+        <file>discount.png</file>
     </qresource>
 </RCC>
