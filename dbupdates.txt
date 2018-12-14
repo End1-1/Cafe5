@@ -18,3 +18,4 @@
 		create table b_cards_discount (f_id integer primary key auto_increment, f_value decimal(6,3), f_code tinytext, f_client integer, f_datestart date, f_dateend date, f_active smallint);
 		create table b_history (f_id integer primary key auto_increment, f_order integer, f_type smallint, f_card integer, f_value decimal(6,3), f_data decimal(14,2));
 		ALTER TABLE `a_store_draft` CHANGE COLUMN `f_price` `f_price` DECIMAL(14,3) NULL DEFAULT NULL ;
+		create table d_dish_comment (f_id integer primary key auto_increment, f_name tinytext);

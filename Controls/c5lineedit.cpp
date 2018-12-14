@@ -68,7 +68,6 @@ void C5LineEdit::keyPressEvent(QKeyEvent *e)
     const QValidator *v = validator();
     if (v) {
         if (!strcmp(v->metaObject()->className(), "QDoubleValidator")) {
-            qDebug() << e->key() << e->text();
             switch (e->key()) {
             case 46:
             case 44:

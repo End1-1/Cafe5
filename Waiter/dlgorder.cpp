@@ -9,10 +9,12 @@
 #include "c5ordertabledelegate.h"
 #include "dlgpayment.h"
 #include "dlgpassword.h"
+#include "dlglistofdishcomments.h"
 #include <QCloseEvent>
+#include <QScrollBar>
 
 #define PART2_COL_WIDTH 150
-#define PART2_ROW_HEIGHT 40
+#define PART2_ROW_HEIGHT 60
 #define PART3_ROW_HEIGHT 80
 #define PART4_ROW_HEIGHT 80
 
@@ -37,15 +39,17 @@ void DlgOrder::openTable(const QJsonObject &table, C5User *user)
     d->showFullScreen();
     d->hide();
     qApp->processEvents();
+    d->ui->tblPart1->fitRowToHeight();
+    d->ui->tblPart1->fitColumnsToWidth();
     d->ui->tblPart2->horizontalHeader()->setDefaultSectionSize(PART2_COL_WIDTH);
-    int colCount = d->ui->tblPart2->width() / PART2_COL_WIDTH;
-    d->ui->tblPart2->setColumnCount(colCount);
+    d->ui->tblPart2->fitColumnsToWidth();
     d->ui->tblPart2->verticalHeader()->setDefaultSectionSize(PART2_ROW_HEIGHT);
+    d->ui->tblPart2->fitRowToHeight();
     d->ui->tblDishes->setItemDelegate(new C5DishTableDelegate());
     d->ui->tblDishes->horizontalHeader()->setDefaultSectionSize(PART2_COL_WIDTH);
+    d->ui->tblDishes->fitColumnsToWidth();
     d->ui->tblDishes->verticalHeader()->setDefaultSectionSize(PART3_ROW_HEIGHT);
-    colCount = d->ui->tblDishes->width() / PART2_COL_WIDTH;
-    d->ui->tblDishes->setColumnCount(colCount);
+    d->ui->tblDishes->fitRowToHeight();
     d->ui->tblOrder->setItemDelegate(new C5OrderTableDelegate());
     d->ui->tblOrder->setColumnWidth(0, d->ui->tblOrder->width() - 2);
     d->ui->tblOrder->verticalHeader()->setDefaultSectionSize(PART4_ROW_HEIGHT);
@@ -452,7 +456,7 @@ void DlgOrder::on_btnVoid_clicked()
         saveOrder();
         return;
     } else {
-        double max = 0, maxFree = 0;
+        double max = 0;
         if (fUser->check(cp_t5_remove_printed_service)) {
             max = o["f_qty1"].toString().toDouble();
         } else {
@@ -464,38 +468,93 @@ void DlgOrder::on_btnVoid_clicked()
         if (!DlgPassword::getAmount(o["f_name"].toString(), max, true)) {
             return;
         }
-        QString reasonname;
-        int reasonid;
-        if (!DlgDishRemoveReason::getReason(reasonname, reasonid)) {
-            return;
-        }
-        if (max > o["f_qty2"].toString().toDouble()) {
-            maxFree = max - (o["f_qty1"].toString().toDouble() - o["f_qty2"].toString().toDouble());
-            o["f_qty1"] = QString::number(o["f_qty1"].toString().toDouble() - maxFree);
-            max -= maxFree;
-        }
-        if (max < 0.01) {
-            return;
-        }
-        //GET DISH STATE
-        int dishState = reasonid;
-        if (max < o["f_qty1"].toString().toDouble()) {
+        if (max <= o["f_qty1"].toString().toDouble() - o["f_qty2"].toString().toDouble()) {
             o["f_qty1"] = QString::number(o["f_qty1"].toString().toDouble() - max);
-            QJsonObject o2 = o;
-            o2["f_id"] = "0";
-            o2["f_state"] = QString::number(dishState * -1); // Print removed dishes if state < 0
-            o2["f_qty1"] = QString::number(max, 'f', 2);
-            o2["f_qty2"] = o2["f_qty1"];
-            o2["f_removereason"] = reasonname;
-            fOrder->fItems.append(o2);
         } else {
-            o["f_state"] = QString::number(dishState * -1); // Print removed dishes if state < 0
-            o["f_removereason"] = reasonname;
+            QString reasonname;
+            int reasonid;
+            if (!DlgDishRemoveReason::getReason(reasonname, reasonid)) {
+                return;
+            }
+            if (max > o["f_qty1"].toString().toDouble() - o["f_qty2"].toString().toDouble()) {
+                max -= o["f_qty1"].toString().toDouble() - o["f_qty2"].toString().toDouble();
+            }
+            //GET DISH STATE
+            int dishState = reasonid;
+            if (max < o["f_qty1"].toString().toDouble()) {
+                o["f_qty1"] = QString::number(o["f_qty1"].toString().toDouble() - max);
+                QJsonObject o2 = o;
+                o2["f_id"] = "0";
+                o2["f_state"] = QString::number(dishState * -1); // Print removed dishes if state < 0
+                o2["f_qty1"] = QString::number(max, 'f', 2);
+                o2["f_qty2"] = o2["f_qty1"];
+                o2["f_removereason"] = reasonname;
+                fOrder->fItems.append(o2);
+                if (o2["f_qty2"].toString().toDouble() > o2["f_qty1"].toString().toDouble()) {
+                    o2["f_qty2"] = o2["f_qty1"];
+                }
+            } else {
+                o["f_state"] = QString::number(dishState * -1); // Print removed dishes if state < 0
+                o["f_removereason"] = reasonname;
+            }
+        }
+        if (o["f_qty2"].toString().toDouble() > o["f_qty1"].toString().toDouble()) {
+            o["f_qty2"] = o["f_qty1"];
         }
         fOrder->fItems[index] = o;
         if (fOrder->headerValue("f_print").toInt() > 0) {
             fOrder->setHeaderValue("f_print", fOrder->headerValue("f_print").toInt() * -1);
         }
         saveOrder();
+    }
+}
+
+void DlgOrder::on_btnComment_clicked()
+{
+    int index = ui->tblOrder->currentRow();
+    if (index < 0) {
+        return;
+    }
+    QJsonObject o = fOrder->fItems.at(index).toObject();
+    QString comment = o["f_name"].toString();
+    if (!DlgListOfDishComments::getComment(comment)) {
+        return;
+    }
+    o["f_comment"] = comment;
+    fOrder->fItems[index] = o;
+    ui->tblOrder->item(index, 0)->setData(Qt::UserRole, fOrder->fItems[index].toObject());
+    ui->tblOrder->viewport()->update();
+}
+
+void DlgOrder::on_btnDishScrollDown_clicked()
+{
+    ui->tblDishes->verticalScrollBar()->setValue(ui->tblDishes->verticalScrollBar()->value() + 3);
+}
+
+void DlgOrder::on_btnTypeScrollDown_clicked()
+{
+    ui->tblPart2->verticalScrollBar()->setValue(ui->tblPart2->verticalScrollBar()->value() + 2);
+}
+
+void DlgOrder::on_btnTypeScrollUp_clicked()
+{
+    ui->tblPart2->verticalScrollBar()->setValue(ui->tblPart2->verticalScrollBar()->value() - 2);
+}
+
+void DlgOrder::on_btnDishScrollUp_clicked()
+{
+    ui->tblDishes->verticalScrollBar()->setValue(ui->tblDishes->verticalScrollBar()->value() - 3);
+}
+
+void DlgOrder::on_btnExpandDishTable_clicked()
+{
+    if (ui->wDishTypes->isVisible()) {
+        ui->wDishTypes->setVisible(false);
+        ui->wDishTypesControl->setVisible(false);
+        ui->btnExpandDishTable->setIcon(QIcon(":/minimize.png"));
+    } else {
+        ui->wDishTypes->setVisible(true);
+        ui->wDishTypesControl->setVisible(true);
+        ui->btnExpandDishTable->setIcon(QIcon(":/expand2.png"));
     }
 }

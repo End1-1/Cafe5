@@ -84,6 +84,18 @@ private slots:
     void on_btnExit_clicked();
 
     void on_btnVoid_clicked();
+
+    void on_btnComment_clicked();
+
+    void on_btnDishScrollDown_clicked();
+
+    void on_btnTypeScrollDown_clicked();
+
+    void on_btnTypeScrollUp_clicked();
+
+    void on_btnDishScrollUp_clicked();
+
+    void on_btnExpandDishTable_clicked();
 };
 
 #endif // DLGORDER_H

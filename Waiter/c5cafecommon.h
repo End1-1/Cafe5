@@ -24,6 +24,8 @@ public:
 
     static QStringList fDishRemoveReason;
 
+    static QStringList fDishComments;
+
     static QJsonArray fHalls;
 
     static QJsonArray fTables;

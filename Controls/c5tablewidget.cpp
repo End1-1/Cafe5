@@ -45,6 +45,14 @@ void C5TableWidget::fitColumnsToWidth(int dec)
     }
 }
 
+void C5TableWidget::fitRowToHeight(int dec)
+{
+    int rh = verticalHeader()->defaultSectionSize();
+    int visibleRows = (height() - dec) / rh;
+    int delta = (height() - dec) - (visibleRows * rh);
+    verticalHeader()->setDefaultSectionSize(rh + (delta / visibleRows));
+}
+
 C5LineEdit *C5TableWidget::createLineEdit(int row, int column)
 {
     C5LineEdit *l = new C5LineEdit(this);

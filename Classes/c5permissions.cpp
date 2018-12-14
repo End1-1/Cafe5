@@ -40,6 +40,7 @@ void C5Permissions::init(C5Database &db)
               << cp_t4_part2
               << cp_t4_dishes
               << cp_t4_dish_remove_reason
+              << cp_t4_dish_comments
 
               << cp_t5_waiter
               << cp_t5_multiple_receipt

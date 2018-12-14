@@ -12,6 +12,7 @@ void C5OrderTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &
     if (!index.isValid()) {
         return;
     }
+    painter->save();
     QBrush bgBrush(Qt::white, Qt::SolidPattern);
     QPen pen(Qt::black, Qt::SolidLine);
     if (option.state & QStyle::State_Selected) {
@@ -24,6 +25,17 @@ void C5OrderTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &
     QRect nameRect = option.rect;
     nameRect.adjust(1, 2, -75, -2);
     painter->drawText(nameRect, QString("%1. %2").arg(index.row() + 1).arg(o["f_name"].toString()));
+    if (o["f_comment"].toString().length() > 0) {
+        QRect commentRect = option.rect;
+        QFont f(painter->font());
+        f.setPointSize(f.pointSize() - 3);
+        painter->setFont(f);
+        QFontMetrics fm(f);
+        commentRect.adjust(2, commentRect.height() - fm.height() - 2, -75, -2);
+        painter->drawText(commentRect, o["f_comment"].toString());
+        f.setPointSize(f.pointSize() + 3);
+        painter->setFont(f);
+    }
     int y = option.rect.top() + (option.rect.height() / 2);
     int x = option.rect.right() - 70;
     painter->drawLine(x, y, option.rect.right(), y);
@@ -41,4 +53,5 @@ void C5OrderTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &
     r = option.rect;
     r.adjust(r.width() - 70, (r.height() / 2) + 5, 0, 0);
     painter->drawText(r, o["f_total"].toString(), op);
+    painter->restore();
 }

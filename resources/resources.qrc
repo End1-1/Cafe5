@@ -21,5 +21,9 @@
         <file>giftbox.png</file>
         <file>place.png</file>
         <file>discount.png</file>
+        <file>comment.png</file>
+        <file>expand.png</file>
+        <file>expand2.png</file>
+        <file>minimize.png</file>
     </qresource>
 </RCC>

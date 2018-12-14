@@ -415,7 +415,6 @@ bool C5StoreDoc::writeOutput(const QDate &date, int docNum, int store, double &a
         for (int j = 0; j < storeData.count(); j++) {
             if (storeData.at(j).at(1).toInt() == ui->tblGoods->getInteger(i, 1)) {
                 if (storeData.at(j).at(2).toDouble() > 0) {
-                    qDebug() << storeData.at(j).at(2).toDouble();
                     if (storeData.at(j).at(2).toDouble() >= qty) {
                         storeData[j][2] = storeData.at(j).at(2).toDouble() - qty;
                         dbdoc[":f_base"] = storeData.at(j).at(0).toInt();

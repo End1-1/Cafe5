@@ -59,6 +59,7 @@ void C5DishWidget::clear()
 {
     CE5Editor::clear();
     for (int i = 0; i < ui->tblPricing->rowCount(); i++) {
+        ui->tblPricing->setInteger(i, 0, 0);
         ui->tblPricing->lineEdit(i, 3)->clear();
     }
     ui->tblRecipe->clearContents();

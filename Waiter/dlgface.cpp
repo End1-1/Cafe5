@@ -59,6 +59,9 @@ void DlgFace::setup()
     sh = createSocketHandler(SLOT(handleDishRemoveReason(QJsonObject)));
     sh->bind("cmd", sm_dishremovereason);
     sh->send();
+    sh = createSocketHandler(SLOT(handleDishComment(QJsonObject)));
+    sh->bind("cmd", sm_dishcomment);
+    sh->send();
     connect(&fTimer, SIGNAL(timeout()), this, SLOT(timeout()));
     fTimer.start(TIMER_TIMEOUT_INTERVAL);
 }
@@ -147,6 +150,16 @@ void DlgFace::handleDishRemoveReason(const QJsonObject &obj)
     QJsonArray jr = obj["reasons"].toArray();
     for (int i = 0; i < jr.count(); i++) {
         C5CafeCommon::fDishRemoveReason << jr.at(i)["f_name"].toString();
+    }
+}
+
+void DlgFace::handleDishComment(const QJsonObject &obj)
+{
+    sender()->deleteLater();
+    C5CafeCommon::fDishComments.clear();
+    QJsonArray ja = obj["comments"].toArray();
+    for (int i = 0; i < ja.count(); i++) {
+        C5CafeCommon::fDishComments << ja.at(i).toObject()["f_name"].toString();
     }
 }
 

@@ -1,6 +1,7 @@
 #include "c5editor.h"
 #include "ui_c5editor.h"
 #include "ce5editor.h"
+#include <QShortcut>
 
 C5Editor::C5Editor(const QStringList &dbParams, QWidget *parent) :
     C5Dialog(dbParams, parent),
@@ -8,6 +9,8 @@ C5Editor::C5Editor(const QStringList &dbParams, QWidget *parent) :
 {
     ui->setupUi(this);
     fVerticalLayout = ui->vl;
+    QShortcut *s = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_S), this);
+    connect(s, SIGNAL(activated()), this, SLOT(on_btnSave_clicked()));
 }
 
 C5Editor::~C5Editor()

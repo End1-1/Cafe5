@@ -49,3 +49,9 @@
 	2. Upgrade. Add discount system.
 13.12.2018
 	1. Continue. Finished discount system.
+	2. Correct. Remove dish from order.
+14.12.2018
+	1. Upgrade. Add comment for the dish in the order.
+	2. Upgrade. Save and close shortcut binded to Ctrl+S key for C5Editor.
+	3. Upgrade. Double click on row in the C5Grid now can activated with Ctrl + Enter.
+	4. Correct. Retrive correct hall list from server.

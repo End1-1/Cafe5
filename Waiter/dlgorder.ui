@@ -121,7 +121,7 @@ QLabel {color:green;}
        <number>0</number>
       </property>
       <item>
-       <widget class="QWidget" name="widget_4" native="true">
+       <widget class="QWidget" name="wleft" native="true">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
           <horstretch>2</horstretch>
@@ -157,7 +157,7 @@ QLabel {color:green;}
              <number>0</number>
             </property>
             <item>
-             <widget class="QWidget" name="widget_5" native="true">
+             <widget class="QWidget" name="wDishTypes" native="true">
               <property name="maximumSize">
                <size>
                 <width>16777215</width>
@@ -181,90 +181,66 @@ QLabel {color:green;}
                 <number>0</number>
                </property>
                <item>
-                <widget class="QWidget" name="widget_7" native="true">
+                <widget class="C5TableWidget" name="tblPart1">
                  <property name="maximumSize">
                   <size>
                    <width>165</width>
                    <height>16777215</height>
                   </size>
                  </property>
-                 <layout class="QVBoxLayout" name="verticalLayout_4">
-                  <property name="leftMargin">
-                   <number>0</number>
+                 <property name="verticalScrollBarPolicy">
+                  <enum>Qt::ScrollBarAlwaysOff</enum>
+                 </property>
+                 <property name="horizontalScrollBarPolicy">
+                  <enum>Qt::ScrollBarAlwaysOff</enum>
+                 </property>
+                 <property name="editTriggers">
+                  <set>QAbstractItemView::NoEditTriggers</set>
+                 </property>
+                 <property name="selectionMode">
+                  <enum>QAbstractItemView::NoSelection</enum>
+                 </property>
+                 <attribute name="horizontalHeaderVisible">
+                  <bool>false</bool>
+                 </attribute>
+                 <attribute name="horizontalHeaderDefaultSectionSize">
+                  <number>80</number>
+                 </attribute>
+                 <attribute name="verticalHeaderVisible">
+                  <bool>false</bool>
+                 </attribute>
+                 <attribute name="verticalHeaderDefaultSectionSize">
+                  <number>60</number>
+                 </attribute>
+                 <row>
+                  <property name="text">
+                   <string>New Row</string>
                   </property>
-                  <property name="topMargin">
-                   <number>0</number>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>New Row</string>
                   </property>
-                  <property name="rightMargin">
-                   <number>0</number>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>New Row</string>
                   </property>
-                  <property name="bottomMargin">
-                   <number>0</number>
+                 </row>
+                 <column>
+                  <property name="text">
+                   <string>New Column</string>
                   </property>
-                  <item>
-                   <widget class="QTableWidget" name="tblPart1">
-                    <property name="maximumSize">
-                     <size>
-                      <width>165</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <property name="verticalScrollBarPolicy">
-                     <enum>Qt::ScrollBarAlwaysOff</enum>
-                    </property>
-                    <property name="horizontalScrollBarPolicy">
-                     <enum>Qt::ScrollBarAlwaysOff</enum>
-                    </property>
-                    <property name="editTriggers">
-                     <set>QAbstractItemView::NoEditTriggers</set>
-                    </property>
-                    <property name="selectionMode">
-                     <enum>QAbstractItemView::NoSelection</enum>
-                    </property>
-                    <attribute name="horizontalHeaderVisible">
-                     <bool>false</bool>
-                    </attribute>
-                    <attribute name="horizontalHeaderDefaultSectionSize">
-                     <number>80</number>
-                    </attribute>
-                    <attribute name="verticalHeaderVisible">
-                     <bool>false</bool>
-                    </attribute>
-                    <attribute name="verticalHeaderDefaultSectionSize">
-                     <number>60</number>
-                    </attribute>
-                    <row>
-                     <property name="text">
-                      <string>New Row</string>
-                     </property>
-                    </row>
-                    <row>
-                     <property name="text">
-                      <string>New Row</string>
-                     </property>
-                    </row>
-                    <row>
-                     <property name="text">
-                      <string>New Row</string>
-                     </property>
-                    </row>
-                    <column>
-                     <property name="text">
-                      <string>New Column</string>
-                     </property>
-                    </column>
-                    <column>
-                     <property name="text">
-                      <string>New Column</string>
-                     </property>
-                    </column>
-                   </widget>
-                  </item>
-                 </layout>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string>New Column</string>
+                  </property>
+                 </column>
                 </widget>
                </item>
                <item>
-                <widget class="QTableWidget" name="tblPart2">
+                <widget class="C5TableWidget" name="tblPart2">
                  <property name="verticalScrollBarPolicy">
                   <enum>Qt::ScrollBarAlwaysOff</enum>
                  </property>
@@ -323,11 +299,202 @@ QLabel {color:green;}
                    <string>New Column</string>
                   </property>
                  </column>
+                 <column>
+                  <property name="text">
+                   <string>New Column</string>
+                  </property>
+                 </column>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QWidget" name="wDishTypesControl" native="true">
+              <layout class="QHBoxLayout" name="horizontalLayout_3">
+               <property name="spacing">
+                <number>6</number>
+               </property>
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="QPushButton" name="btnChangeMenu">
+                 <property name="minimumSize">
+                  <size>
+                   <width>50</width>
+                   <height>50</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>50</width>
+                   <height>50</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../resources/resources.qrc">
+                   <normaloff>:/menu.PNG</normaloff>:/menu.PNG</iconset>
+                 </property>
+                 <property name="iconSize">
+                  <size>
+                   <width>32</width>
+                   <height>32</height>
+                  </size>
+                 </property>
                 </widget>
                </item>
                <item>
-                <widget class="QWidget" name="widget_8" native="true">
-                 <layout class="QVBoxLayout" name="verticalLayout_6">
+                <spacer name="horizontalSpacer_4">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QPushButton" name="btnTypeScrollDown">
+                 <property name="minimumSize">
+                  <size>
+                   <width>50</width>
+                   <height>50</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>50</width>
+                   <height>50</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../resources/resources.qrc">
+                   <normaloff>:/down.png</normaloff>:/down.png</iconset>
+                 </property>
+                 <property name="iconSize">
+                  <size>
+                   <width>32</width>
+                   <height>32</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="btnTypeScrollUp">
+                 <property name="minimumSize">
+                  <size>
+                   <width>50</width>
+                   <height>50</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>50</width>
+                   <height>50</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../resources/resources.qrc">
+                   <normaloff>:/up.png</normaloff>:/up.png</iconset>
+                 </property>
+                 <property name="iconSize">
+                  <size>
+                   <width>32</width>
+                   <height>32</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QWidget" name="wDishes" native="true">
+              <layout class="QVBoxLayout" name="verticalLayout_8">
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="C5TableWidget" name="tblDishes">
+                 <property name="verticalScrollBarPolicy">
+                  <enum>Qt::ScrollBarAlwaysOff</enum>
+                 </property>
+                 <property name="horizontalScrollBarPolicy">
+                  <enum>Qt::ScrollBarAlwaysOff</enum>
+                 </property>
+                 <property name="editTriggers">
+                  <set>QAbstractItemView::NoEditTriggers</set>
+                 </property>
+                 <property name="selectionMode">
+                  <enum>QAbstractItemView::NoSelection</enum>
+                 </property>
+                 <attribute name="horizontalHeaderVisible">
+                  <bool>false</bool>
+                 </attribute>
+                 <attribute name="verticalHeaderVisible">
+                  <bool>false</bool>
+                 </attribute>
+                 <column>
+                  <property name="text">
+                   <string>New Column</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string>New Column</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string>New Column</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string>New Column</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string>New Column</string>
+                  </property>
+                 </column>
+                </widget>
+               </item>
+               <item>
+                <widget class="QWidget" name="wDishUpDown" native="true">
+                 <layout class="QHBoxLayout" name="horizontalLayout_5">
                   <property name="spacing">
                    <number>6</number>
                   </property>
@@ -344,78 +511,37 @@ QLabel {color:green;}
                    <number>0</number>
                   </property>
                   <item>
-                   <widget class="QPushButton" name="btnChangeMenu">
-                    <property name="minimumSize">
-                     <size>
-                      <width>50</width>
-                      <height>50</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>50</width>
-                      <height>50</height>
-                     </size>
+                   <widget class="QPushButton" name="btnExit">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
                     </property>
                     <property name="text">
-                     <string/>
+                     <string>Exit</string>
                     </property>
                     <property name="icon">
                      <iconset resource="../resources/resources.qrc">
-                      <normaloff>:/menu.PNG</normaloff>:/menu.PNG</iconset>
-                    </property>
-                    <property name="iconSize">
-                     <size>
-                      <width>32</width>
-                      <height>32</height>
-                     </size>
+                      <normaloff>:/cancel.png</normaloff>:/cancel.png</iconset>
                     </property>
                    </widget>
                   </item>
                   <item>
-                   <spacer name="verticalSpacer">
+                   <spacer name="horizontalSpacer_3">
                     <property name="orientation">
-                     <enum>Qt::Vertical</enum>
+                     <enum>Qt::Horizontal</enum>
                     </property>
                     <property name="sizeHint" stdset="0">
                      <size>
-                      <width>20</width>
-                      <height>49</height>
+                      <width>40</width>
+                      <height>20</height>
                      </size>
                     </property>
                    </spacer>
                   </item>
                   <item>
-                   <widget class="QPushButton" name="btnTypeScrollUp">
-                    <property name="minimumSize">
-                     <size>
-                      <width>50</width>
-                      <height>50</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>50</width>
-                      <height>50</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string/>
-                    </property>
-                    <property name="icon">
-                     <iconset resource="../resources/resources.qrc">
-                      <normaloff>:/up.png</normaloff>:/up.png</iconset>
-                    </property>
-                    <property name="iconSize">
-                     <size>
-                      <width>32</width>
-                      <height>32</height>
-                     </size>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="btnTypeScrollDown">
+                   <widget class="QPushButton" name="btnDishScrollDown">
                     <property name="minimumSize">
                      <size>
                       <width>50</width>
@@ -442,80 +568,6 @@ QLabel {color:green;}
                      </size>
                     </property>
                    </widget>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item>
-             <widget class="QWidget" name="widget_9" native="true">
-              <layout class="QHBoxLayout" name="horizontalLayout_3">
-               <property name="leftMargin">
-                <number>0</number>
-               </property>
-               <property name="topMargin">
-                <number>0</number>
-               </property>
-               <property name="rightMargin">
-                <number>0</number>
-               </property>
-               <property name="bottomMargin">
-                <number>0</number>
-               </property>
-               <item>
-                <widget class="QTableWidget" name="tblDishes">
-                 <property name="verticalScrollBarPolicy">
-                  <enum>Qt::ScrollBarAlwaysOff</enum>
-                 </property>
-                 <property name="horizontalScrollBarPolicy">
-                  <enum>Qt::ScrollBarAlwaysOff</enum>
-                 </property>
-                 <property name="editTriggers">
-                  <set>QAbstractItemView::NoEditTriggers</set>
-                 </property>
-                 <property name="selectionMode">
-                  <enum>QAbstractItemView::NoSelection</enum>
-                 </property>
-                 <attribute name="horizontalHeaderVisible">
-                  <bool>false</bool>
-                 </attribute>
-                 <attribute name="verticalHeaderVisible">
-                  <bool>false</bool>
-                 </attribute>
-                </widget>
-               </item>
-               <item>
-                <widget class="QWidget" name="widget_10" native="true">
-                 <layout class="QVBoxLayout" name="verticalLayout_8">
-                  <property name="spacing">
-                   <number>6</number>
-                  </property>
-                  <property name="leftMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="topMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="rightMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="bottomMargin">
-                   <number>0</number>
-                  </property>
-                  <item>
-                   <spacer name="verticalSpacer_3">
-                    <property name="orientation">
-                     <enum>Qt::Vertical</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>20</width>
-                      <height>105</height>
-                     </size>
-                    </property>
-                   </spacer>
                   </item>
                   <item>
                    <widget class="QPushButton" name="btnDishScrollUp">
@@ -547,7 +599,7 @@ QLabel {color:green;}
                    </widget>
                   </item>
                   <item>
-                   <widget class="QPushButton" name="btnDishScrollDown">
+                   <widget class="QPushButton" name="btnExpandDishTable">
                     <property name="minimumSize">
                      <size>
                       <width>50</width>
@@ -565,7 +617,7 @@ QLabel {color:green;}
                     </property>
                     <property name="icon">
                      <iconset resource="../resources/resources.qrc">
-                      <normaloff>:/down.png</normaloff>:/down.png</iconset>
+                      <normaloff>:/expand2.png</normaloff>:/expand2.png</iconset>
                     </property>
                     <property name="iconSize">
                      <size>
@@ -591,13 +643,13 @@ QLabel {color:green;}
        <widget class="QWidget" name="widget_2" native="true">
         <property name="minimumSize">
          <size>
-          <width>250</width>
+          <width>280</width>
           <height>0</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>250</width>
+          <width>280</width>
           <height>16777215</height>
          </size>
         </property>
@@ -648,25 +700,6 @@ QLabel {color:green;}
               </property>
              </widget>
             </item>
-            <item row="0" column="1">
-             <widget class="QPushButton" name="btnPlus05">
-              <property name="minimumSize">
-               <size>
-                <width>50</width>
-                <height>50</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>50</width>
-                <height>50</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>+0.5</string>
-              </property>
-             </widget>
-            </item>
             <item row="0" column="2">
              <widget class="QPushButton" name="btnMin1">
               <property name="minimumSize">
@@ -705,8 +738,8 @@ QLabel {color:green;}
               </property>
              </widget>
             </item>
-            <item row="1" column="0">
-             <widget class="QPushButton" name="btnCustom">
+            <item row="0" column="1">
+             <widget class="QPushButton" name="btnPlus05">
               <property name="minimumSize">
                <size>
                 <width>50</width>
@@ -720,7 +753,7 @@ QLabel {color:green;}
                </size>
               </property>
               <property name="text">
-               <string>+/-</string>
+               <string>+0.5</string>
               </property>
              </widget>
             </item>
@@ -802,6 +835,54 @@ QLabel {color:green;}
               <property name="icon">
                <iconset resource="../resources/resources.qrc">
                 <normaloff>:/payment.png</normaloff>:/payment.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>32</width>
+                <height>32</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="4">
+             <widget class="QPushButton" name="btnCustom">
+              <property name="minimumSize">
+               <size>
+                <width>50</width>
+                <height>50</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>50</width>
+                <height>50</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>+/-</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QPushButton" name="btnComment">
+              <property name="minimumSize">
+               <size>
+                <width>50</width>
+                <height>50</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>50</width>
+                <height>50</height>
+               </size>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="../resources/resources.qrc">
+                <normaloff>:/comment.png</normaloff>:/comment.png</iconset>
               </property>
               <property name="iconSize">
                <size>
@@ -894,17 +975,6 @@ QLabel {color:green;}
                  </property>
                 </widget>
                </item>
-               <item row="0" column="2">
-                <widget class="QPushButton" name="btnExit">
-                 <property name="text">
-                  <string>Exit</string>
-                 </property>
-                 <property name="icon">
-                  <iconset resource="../resources/resources.qrc">
-                   <normaloff>:/cancel.png</normaloff>:/cancel.png</iconset>
-                 </property>
-                </widget>
-               </item>
               </layout>
              </widget>
             </item>
@@ -919,6 +989,13 @@ QLabel {color:green;}
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>C5TableWidget</class>
+   <extends>QTableWidget</extends>
+   <header location="global">c5tablewidget.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../resources/resources.qrc"/>
  </resources>

@@ -88,13 +88,12 @@ void C5SocketHandler::close()
 
 void C5SocketHandler::connected()
 {
-    qDebug() << "Connected";
+
 }
 
 void C5SocketHandler::readyRead()
 {
     if (!fReadState) {
-        qDebug() << "New ready read";
         fSocket->read(reinterpret_cast<char*>(&fDataSize), sizeof(quint32));
         fReadState = true;
     }

@@ -85,7 +85,8 @@ SOURCES += \
     c5cafecommon.cpp \
     dlgcreditcardlist.cpp \
     dlgdishremovereason.cpp \
-    dlglistofhall.cpp
+    dlglistofhall.cpp \
+    dlglistofdishcomments.cpp
 
 HEADERS += \
         dlgface.h \
@@ -140,7 +141,8 @@ HEADERS += \
     c5cafecommon.h \
     dlgcreditcardlist.h \
     dlgdishremovereason.h \
-    dlglistofhall.h
+    dlglistofhall.h \
+    dlglistofdishcomments.h
 
 FORMS += \
         dlgface.ui \
@@ -158,7 +160,8 @@ FORMS += \
     wpaymentoptions.ui \
     dlgcreditcardlist.ui \
     dlgdishremovereason.ui \
-    dlglistofhall.ui
+    dlglistofhall.ui \
+    dlglistofdishcomments.ui
 
 INCLUDEPATH += ../Cafe5
 INCLUDEPATH += ../Classes

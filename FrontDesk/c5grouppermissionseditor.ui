@@ -27,7 +27,7 @@
       <enum>QTabWidget::West</enum>
      </property>
      <property name="currentIndex">
-      <number>5</number>
+      <number>4</number>
      </property>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
@@ -304,6 +304,16 @@
        <string>Menu</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
+       <item row="5" column="0">
+        <widget class="C5CheckBox" name="checkBox_29">
+         <property name="text">
+          <string>Dish remove reasons</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>405</number>
+         </property>
+        </widget>
+       </item>
        <item row="2" column="0">
         <widget class="C5CheckBox" name="checkBox_4">
          <property name="text">
@@ -324,6 +334,16 @@
          </property>
         </widget>
        </item>
+       <item row="1" column="0">
+        <widget class="C5CheckBox" name="checkBox_7">
+         <property name="text">
+          <string>Menu names</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>401</number>
+         </property>
+        </widget>
+       </item>
        <item row="4" column="0">
         <widget class="C5CheckBox" name="checkBox_6">
          <property name="text">
@@ -334,7 +354,17 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="0">
+       <item row="0" column="0">
+        <widget class="C5CheckBox" name="chMenu">
+         <property name="text">
+          <string>All items</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>400</number>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0">
         <spacer name="verticalSpacer_2">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -347,33 +377,13 @@
          </property>
         </spacer>
        </item>
-       <item row="0" column="0">
-        <widget class="C5CheckBox" name="chMenu">
+       <item row="6" column="0">
+        <widget class="C5CheckBox" name="checkBox_30">
          <property name="text">
-          <string>All items</string>
+          <string>Dish comments</string>
          </property>
          <property name="Tag" stdset="0">
-          <number>400</number>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="C5CheckBox" name="checkBox_7">
-         <property name="text">
-          <string>Menu names</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>401</number>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <widget class="C5CheckBox" name="checkBox_29">
-         <property name="text">
-          <string>Dish remove reasons</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>405</number>
+          <number>406</number>
          </property>
         </widget>
        </item>

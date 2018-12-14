@@ -17,6 +17,8 @@ void C5DishTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &o
     rectName.adjust(2, 2, -2, -2);
     painter->drawText(rectName, o["f_name"].toString());
     QRect rectPrice = option.rect;
-    rectPrice.adjust(rectPrice.width() - 50, rectPrice.height() - 20, -2, -2);
-    painter->drawText(rectPrice, o["f_price"].toString());
+    QFontMetrics fm(painter->font());
+    QString price = o["f_price"].toString();
+    rectPrice.adjust(rectPrice.width() - (fm.width(price) + 5), rectPrice.height() - (fm.height() + 5), -2, -2);
+    painter->drawText(rectPrice, price);
 }

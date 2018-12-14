@@ -28,6 +28,7 @@
 #define cache_hall_list 22
 #define cache_discount_client 23
 #define cache_discount_cards 24
+#define cache_dish_comments 25
 
 class C5Cache : public QObject
 {

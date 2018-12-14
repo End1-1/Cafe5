@@ -12,6 +12,7 @@
 #include <QMenu>
 #include <QScrollBar>
 #include <QClipboard>
+#include <QShortcut>
 
 C5Grid::C5Grid(const QStringList &dbParams, QWidget *parent) :
     C5Widget(dbParams, parent),
@@ -35,6 +36,10 @@ C5Grid::C5Grid(const QStringList &dbParams, QWidget *parent) :
     fEditor = 0;
     ui->tblTotal->setVisible(false);
     ui->tblView->resizeRowsToContents();
+    QShortcut *s = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Enter), this);
+    connect(s, SIGNAL(activated()), this, SLOT(ctrlEnter()));
+    s = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Return), this);
+    connect(s, SIGNAL(activated()), this, SLOT(ctrlEnter()));
 }
 
 C5Grid::~C5Grid()
@@ -670,6 +675,12 @@ void C5Grid::tableViewHeaderResized(int column, int oldSize, int newSize)
                 .arg(_MODULE_)
                 .arg(fLabel));
     s.setValue(columnName, newSize);
+}
+
+void C5Grid::ctrlEnter()
+{
+    QModelIndex m = ui->tblView->currentIndex();
+    on_tblView_doubleClicked(m);
 }
 
 void C5Grid::autofitColumns()

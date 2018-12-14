@@ -391,6 +391,13 @@ void C5WaiterServer::reply(QJsonObject &o)
         o["msg"] = tr("Cannot find card");
         break;
     }
+    case sm_dishcomment: {
+        QJsonArray ja;
+        srh.getJsonFromQuery("select f_name from d_dish_comment", ja);
+        o["reply"] = 1;
+        o["comments"] = ja;
+        break;
+    }
     default:
         o["reply"] = 0;
         o["msg"] = QString("%1: %2").arg(tr("Unknown command for socket handler from dlgface")).arg(cmd);

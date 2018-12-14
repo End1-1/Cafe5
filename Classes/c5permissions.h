@@ -32,6 +32,7 @@
 #define cp_t4_part2 403
 #define cp_t4_dishes 404
 #define cp_t4_dish_remove_reason 405
+#define cp_t4_dish_comments 406
 
 #define cp_t5_waiter 500
 #define cp_t5_multiple_receipt 501

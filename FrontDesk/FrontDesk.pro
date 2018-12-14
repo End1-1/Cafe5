@@ -118,7 +118,9 @@ SOURCES += \
     ../Editors/ce5dishremovereason.cpp \
     ../Reports/cr5discountsystem.cpp \
     ../Editors/ce5discountcard.cpp \
-    ../Editors/ce5client.cpp
+    ../Editors/ce5client.cpp \
+    ../Editors/ce5dishcomment.cpp \
+    ../Reports/cr5dishcomment.cpp
 
 HEADERS += \
         c5mainwindow.h \
@@ -208,7 +210,9 @@ HEADERS += \
     ../Editors/ce5dishremovereason.h \
     ../Reports/cr5discountsystem.h \
     ../Editors/ce5discountcard.h \
-    ../Editors/ce5client.h
+    ../Editors/ce5client.h \
+    ../Editors/ce5dishcomment.h \
+    ../Reports/cr5dishcomment.h
 
 FORMS += \
         c5mainwindow.ui \
@@ -248,7 +252,8 @@ FORMS += \
     ../Editors/ce5creditcard.ui \
     ../Editors/ce5dishremovereason.ui \
     ../Editors/ce5discountcard.ui \
-    ../Editors/ce5client.ui
+    ../Editors/ce5client.ui \
+    ../Editors/ce5dishcomment.ui
 
 INCLUDEPATH += ../Cafe5
 INCLUDEPATH += ../Classes

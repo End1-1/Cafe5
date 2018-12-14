@@ -41,6 +41,8 @@ private slots:
 
     void handleDishRemoveReason(const QJsonObject &obj);
 
+    void handleDishComment(const QJsonObject &obj);
+
     void handleSocket(const QJsonObject &obj);
 
     void on_btnConnection_clicked();

@@ -2,6 +2,7 @@
 
 QList<CreditCards> C5CafeCommon::fCreditCards;
 QStringList C5CafeCommon::fDishRemoveReason;
+QStringList C5CafeCommon::fDishComments;
 QJsonArray C5CafeCommon::fHalls;
 QJsonArray C5CafeCommon::fTables;
 

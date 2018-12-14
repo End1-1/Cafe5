@@ -14,5 +14,6 @@
 #define sm_creditcards 11
 #define sm_dishremovereason 12
 #define sm_discount 13
+#define sm_dishcomment 14
 
 #endif // C5SOCKETMESSAGE_H

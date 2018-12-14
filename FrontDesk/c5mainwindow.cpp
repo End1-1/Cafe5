@@ -14,6 +14,7 @@
 #include "cr5goodsmovement.h"
 #include "cr5creditcards.h"
 #include "cr5dishpart1.h"
+#include "cr5dishcomment.h"
 #include "cr5tstoreextra.h"
 #include "cr5dishpart2.h"
 #include "c5storeinventory.h"
@@ -222,6 +223,7 @@ void C5MainWindow::on_actionLogin_triggered()
             addTreeL3Item(it, cp_t4_dishes, tr("Dishes list"), ":/menu.png");
             addTreeL3Item(it, cp_t4_menu_names, tr("Menu names"), ":/menu.png");
             addTreeL3Item(it, cp_t4_dish_remove_reason, tr("Dish remove reasons"), ":/menu.png");
+            addTreeL3Item(it, cp_t4_dish_comments, tr("Dish comments"), ":/menu.png");
         }
 
         if (pr(db.getString(0), cp_t6_goods_menu)) {
@@ -398,6 +400,9 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
         break;
     case cp_t4_dish_remove_reason:
         createTab<CR5DishRemoveReason>(dbParams);
+        break;
+    case cp_t4_dish_comments:
+        createTab<CR5DishComment>(dbParams);
         break;
     case cp_t6_units:
         createTab<CR5GoodsUnit>(dbParams);

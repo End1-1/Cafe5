@@ -17,6 +17,8 @@ public:
 
     void fitColumnsToWidth(int dec = 5);
 
+    void fitRowToHeight(int dec = 5);
+
     C5LineEdit *createLineEdit(int row, int column);
 
     C5LineEdit *lineEdit(int row, int column);

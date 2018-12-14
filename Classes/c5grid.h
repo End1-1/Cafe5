@@ -154,6 +154,8 @@ protected slots:
     virtual void tableViewHeaderResized(int column, int oldSize, int newSize);
 
 private slots:    
+    void ctrlEnter();
+
     void autofitColumns();
 
     void filterByColumn();

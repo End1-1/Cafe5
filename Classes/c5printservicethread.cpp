@@ -81,6 +81,10 @@ void C5PrintServiceThread::print(const QString &printer, const QString &side)
         storages << o["f_storename"].toString();
         p.ltext(o["f_name"].toString(), 0);
         p.br();
+        if (o["f_comment"].toString().length() > 0) {
+            p.ltext(o["f_comment"].toString(), 0);
+            p.br();
+        }
         p.ctext(o["f_qtyprint"].toString());
         p.br();
         p.line(0, p.fTop, p.fNormalWidth, p.fTop);
