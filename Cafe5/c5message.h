@@ -13,10 +13,15 @@ class C5Message : public QDialog
 
 public:
     explicit C5Message(QWidget *parent = 0);
+
     ~C5Message();
+
     static int error(const QString &errorStr);
+
     static int info(const QString &infoStr);
+
     static int question(const QString &questionStr);
+
 private slots:
     void on_btnYes_clicked();
 
@@ -24,6 +29,7 @@ private slots:
 
 private:
     Ui::C5Message *ui;
+
     static int showMessage(const QString &text, const QString &color);
 };
 

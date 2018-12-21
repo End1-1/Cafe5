@@ -15,5 +15,8 @@
 #define sm_dishremovereason 12
 #define sm_discount 13
 #define sm_dishcomment 14
+#define sm_dailycommon 15
+#define sm_reports 16
+#define sm_waiter_report 17
 
 #endif // C5SOCKETMESSAGE_H

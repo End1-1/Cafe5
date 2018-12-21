@@ -4,6 +4,7 @@
 #include <QGraphicsScene>
 #include <QPen>
 #include <QPrinter>
+#include <QJsonArray>
 #include <QMap>
 
 class C5Printing
@@ -13,7 +14,7 @@ public:
 
     ~C5Printing();
 
-    void setSceneParams(qreal width, qreal height, QPrinter::Orientation o);
+    void setSceneParams(qreal width, qreal height, QPrinter::Orientation orientation);
 
     void setFont(const QFont &font);
 
@@ -61,6 +62,8 @@ public:
 
     qreal fNormalWidth;
 
+    QJsonArray jsonData();
+
 private:
     qreal fTempTop;
 
@@ -79,6 +82,8 @@ private:
     void setLineHeight();
 
     void setTemptop(QGraphicsTextItem *item);
+
+    QJsonArray fJsonData;
 };
 
 #endif // C5PRINTING_H

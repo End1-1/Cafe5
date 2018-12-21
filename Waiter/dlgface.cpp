@@ -9,6 +9,7 @@
 #include "c5witerconf.h"
 #include "c5waiterserver.h"
 #include "dlglistofhall.h"
+#include "dlgreports.h"
 #include "c5halltabledelegate.h"
 #include "c5cafecommon.h"
 #include <QTcpSocket>
@@ -83,6 +84,7 @@ void DlgFace::timeout()
     C5SocketHandler *sh = createSocketHandler(SLOT(handleHall(QJsonObject)));
     sh->bind("hall", C5Config::hallList());
     sh->bind("cmd", sm_hall);
+    sh->bind("hall", C5Config::hallList());
     sh->send();
     ui->lbDate->setText(QString("%1").arg(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR2)));
 }
@@ -230,6 +232,7 @@ void DlgFace::on_tblHall_itemClicked(QTableWidgetItem *item)
     DlgOrder::openTable(o, &user);
     C5SocketHandler *sh = createSocketHandler(SLOT(handleHall(QJsonObject)));
     sh->bind("cmd", sm_hall);
+    sh->bind("hall", C5Config::hallList());
     sh->send();
     fTimer.start(TIMER_TIMEOUT_INTERVAL);
 }
@@ -242,4 +245,13 @@ void DlgFace::on_btnHallFilter_clicked()
     }
     fCurrentHall = hall;
     filterHall(hall);
+}
+
+void DlgFace::on_btnReports_clicked()
+{
+    C5User user;
+    if (!DlgPassword::getUser(tr("Reports"), &user)) {
+        return;
+    }
+    DlgReports::openReports(&user);
 }

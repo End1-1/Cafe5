@@ -178,6 +178,35 @@ AMOUNT</string>
        </spacer>
       </item>
       <item>
+       <widget class="QToolButton" name="btnReports">
+        <property name="minimumSize">
+         <size>
+          <width>48</width>
+          <height>48</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>48</width>
+          <height>48</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/resources.qrc">
+          <normaloff>:/report.png</normaloff>:/report.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QToolButton" name="btnHallFilter">
         <property name="minimumSize">
          <size>

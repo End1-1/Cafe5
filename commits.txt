@@ -55,3 +55,5 @@
 	2. Upgrade. Save and close shortcut binded to Ctrl+S key for C5Editor.
 	3. Upgrade. Double click on row in the C5Grid now can activated with Ctrl + Enter.
 	4. Correct. Retrive correct hall list from server.
+18.12.2018
+	1. New. Waiter report dialog.

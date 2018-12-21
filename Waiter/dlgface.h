@@ -53,6 +53,8 @@ private slots:
 
     void on_btnHallFilter_clicked();
 
+    void on_btnReports_clicked();
+
 private:
     Ui::DlgFace *ui;
 

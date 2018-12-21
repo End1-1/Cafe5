@@ -11,9 +11,14 @@
 #include <QDebug>
 #include <QJsonArray>
 #include <QMutex>
+#include <QDir>
 #include <QTcpSocket>
+#include <QPrinter>
+#include <QLibrary>
 
 QMutex mutex;
+typedef QString (*caption)();
+typedef QJsonArray (*json)(C5Database &db, const QJsonObject &params);
 
 C5WaiterServer::C5WaiterServer(const QJsonObject &o, QTcpSocket *socket) :
     fIn(o)
@@ -396,6 +401,76 @@ void C5WaiterServer::reply(QJsonObject &o)
         srh.getJsonFromQuery("select f_name from d_dish_comment", ja);
         o["reply"] = 1;
         o["comments"] = ja;
+        break;
+    }
+    case sm_dailycommon: {
+        QJsonArray ja;
+        bv[":f_datecash1"] = QDate::fromString(fIn["date1"].toString(), FORMAT_DATE_TO_STR_MYSQL);
+        bv[":f_datecash2"] = QDate::fromString(fIn["date2"].toString(), FORMAT_DATE_TO_STR_MYSQL);
+        bv[":f_state"] = ORDER_STATE_CLOSE;
+        srh.getJsonFromQuery("select oh.f_id, concat(oh.f_prefix, oh.f_hallid) as f_order, date_format(oh.f_datecash, '%d.%m.%Y') as f_datecash, oh.f_timeclose, "
+                             "h.f_name as f_hall, t.f_name as f_table, concat(u.f_last, ' ', u.f_first) as f_staff,"
+                             "oh.f_amounttotal "
+                             "from o_header oh "
+                             "left join h_halls h on h.f_id=oh.f_hall "
+                             "left join h_tables t on t.f_id=oh.f_table "
+                             "left join s_user u on u.f_id=oh.f_staff "
+                             "where oh.f_state=:f_state and oh.f_datecash between :f_datecash1 and :f_datecash2 "
+                             "order by oh.f_timeclose", ja, bv);
+        o["reply"] = 0;
+        o["report"] = ja;
+        break;
+    }
+    case sm_reports: {
+        QJsonArray ja;
+        QDir dir("./waiterreports");
+        QStringList dll = dir.entryList(QStringList() << "*.dll", QDir::Files);
+        foreach (QString s, dll) {
+            QLibrary l("./waiterreports/" + s);
+            if (!l.load()) {
+                continue;
+            }
+            caption c = (caption) l.resolve("caption");
+            if (!c) {
+                l.unload();
+                continue;
+            }
+            QJsonObject jo;
+            jo["caption"] = c();
+            jo["file"] = s;
+            ja.append(jo);
+        }
+        o["reply"] = 0;
+        o["reports"] = ja;
+        break;
+    }
+    case sm_waiter_report: {
+        QString filename = fIn["file"].toString();
+        QLibrary l("./waiterreports/" + filename);
+        if (!l.load()) {
+            o["reply"] = 1;
+            o["msg"] = QString("%1 %2").arg(tr("Could not load")).arg(filename);
+            break;
+        }
+        json j = (json) l.resolve("json");
+        if (!j) {
+            o["reply"] = 1;
+            o["msg"] = QString("json %1 %2").arg(tr("entry point is missing in")).arg(filename);
+            break;
+        }
+        QJsonObject jo;
+        jo["date1"] = fIn["date1"];
+        jo["date2"] = fIn["date2"];
+        o["reply"] = 0;
+        QJsonArray report = j(srh.fDb, jo);
+        QJsonObject jp;
+        jp["pagesize"] = (int) QPrinter::Custom;
+        jp["printer"] = "local";
+        jp["cmd"] = "print";
+        report.append(jp);
+        l.unload();
+        o["reply"] = 0;
+        o["report"] = report;
         break;
     }
     default:
