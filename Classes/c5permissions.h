@@ -25,6 +25,7 @@
 #define cp_t3_store 303
 #define cp_t3_store_movement 304
 #define cp_t3_tstore_extra 305
+#define cp_t3_store_sale 306
 
 #define cp_t4_menu 400
 #define cp_t4_menu_names 401
@@ -49,6 +50,7 @@
 #define cp_t7_other 700
 #define cp_t7_credit_card 701
 #define cp_t7_discount_system 702
+#define cp_t7_upload_data_to_other_server 703
 
 
 class C5Permissions

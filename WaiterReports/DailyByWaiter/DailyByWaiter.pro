@@ -44,3 +44,6 @@ HEADERS += \
 
 FORMS += \
     ../../Cafe5/c5message.ui
+
+RESOURCES += \
+    res.qrc

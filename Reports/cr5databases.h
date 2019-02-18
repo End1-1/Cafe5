@@ -9,6 +9,8 @@ class CR5Databases : public C5ReportWidget
 
 public:
     CR5Databases(const QStringList &dbParams, QWidget *parent = 0);
+
+    virtual QToolBar *toolBar();
 };
 
 #endif // CR5DATABASES_H

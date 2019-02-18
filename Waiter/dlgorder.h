@@ -96,6 +96,8 @@ private slots:
     void on_btnDishScrollUp_clicked();
 
     void on_btnExpandDishTable_clicked();
+
+    void on_btnChangeMenu_clicked();
 };
 
 #endif // DLGORDER_H

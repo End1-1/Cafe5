@@ -23,6 +23,9 @@ public:
 
     bool getResult(QList<QMap<QString, QVariant> > &data);
 
+protected:
+    virtual void closeEvent(QCloseEvent *e);
+
 private slots:
     void on_btnSave_clicked();
 

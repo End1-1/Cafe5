@@ -427,6 +427,13 @@
            </property>
           </spacer>
          </item>
+         <item>
+          <widget class="C5LineEdit" name="leScancode">
+           <property name="placeholderText">
+            <string>Search by scancode</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
       </item>
@@ -655,9 +662,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5LineEditWithSelector</class>
+   <class>C5DateEdit</class>
    <extends>QLineEdit</extends>
-   <header location="global">c5lineeditwithselector.h</header>
+   <header location="global">c5dateedit.h</header>
   </customwidget>
   <customwidget>
    <class>C5LineEdit</class>
@@ -665,14 +672,14 @@
    <header location="global">c5lineedit.h</header>
   </customwidget>
   <customwidget>
+   <class>C5LineEditWithSelector</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5lineeditwithselector.h</header>
+  </customwidget>
+  <customwidget>
    <class>C5TableWidget</class>
    <extends>QTableWidget</extends>
    <header location="global">c5tablewidget.h</header>
-  </customwidget>
-  <customwidget>
-   <class>C5DateEdit</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5dateedit.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

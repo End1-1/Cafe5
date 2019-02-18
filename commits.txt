@@ -57,3 +57,5 @@
 	4. Correct. Retrive correct hall list from server.
 18.12.2018
 	1. New. Waiter report dialog.
+21.12.2018
+	1. New. First report from dinamic library.

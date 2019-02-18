@@ -33,6 +33,7 @@ void C5Permissions::init(C5Database &db)
               << cp_t3_store
               << cp_t3_store_movement
               << cp_t3_tstore_extra
+              << cp_t3_store_sale
 
               << cp_t4_menu
               << cp_t4_menu_names
@@ -57,6 +58,7 @@ void C5Permissions::init(C5Database &db)
               << cp_t7_other
               << cp_t7_credit_card
               << cp_t7_discount_system
+              << cp_t7_upload_data_to_other_server
                  ;
     if (__usergroup == 1) {
         fPermissions[db.database()] = fTemplate;

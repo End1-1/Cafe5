@@ -63,9 +63,14 @@ C5Cache::C5Cache(const QStringList &dbParams) :
                 .arg(tr("First name"))
                 .arg(tr("Last name"))
                 .arg(tr("Additional info"));
+        fCacheQuery[cache_s_db] = QString("select f_id as `%1`,  f_name as `%2`, f_description as `%3` from s_db")
+                .arg(tr("Code"))
+                .arg(tr("Name"))
+                .arg(tr("Description"));
         setCacheSimpleQuery(cache_settings_names, "s_settings_names");
         setCacheSimpleQuery(cache_hall_list, "h_halls");
         setCacheSimpleQuery(cache_dish_comments, "d_dish_comment");
+        setCacheSimpleQuery(cache_menu_names, "d_menu_names");
     }
     if (fTableCache.count() == 0) {
         fTableCache["c_partners"] = cache_goods_partners;
@@ -86,6 +91,8 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         fTableCache["b_clients"] = cache_discount_client;
         fTableCache["b_cards_discount"] = cache_discount_cards;
         fTableCache["d_dish_comment"] = cache_dish_comments;
+        fTableCache["s_db"] = cache_s_db;
+        fTableCache["d_menu_names"] = cache_menu_names;
     }
     fVersion = 0;
     C5Database db(dbParams);

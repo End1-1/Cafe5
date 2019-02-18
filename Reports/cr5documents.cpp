@@ -107,15 +107,15 @@ void CR5Documents::tblDoubleClicked(int row, int column, const QList<QVariant> &
         C5Message::error(tr("Op.num. column must be included in the report"));
         return;
     }
-    openDoc(values.at(fModel->indexForColumnName("f_id")).toInt());
+    openDoc(values.at(fModel->indexForColumnName("f_id")).toString());
 }
 
-void CR5Documents::callEditor(int id)
+void CR5Documents::callEditor(QString id)
 {
     openDoc(id);
 }
 
-void CR5Documents::openDoc(int id)
+void CR5Documents::openDoc(QString id)
 {
     switch (docType(id)) {
     case DOC_TYPE_STORE_INPUT:
@@ -137,7 +137,7 @@ void CR5Documents::openDoc(int id)
     }
 }
 
-int CR5Documents::docType(int id)
+int CR5Documents::docType(QString id)
 {
     C5Database db(fDBParams);
     db[":f_id"] = id;
@@ -170,7 +170,7 @@ void CR5Documents::saveDocs()
     C5Database db(fDBParams);
     QString err;
     foreach (int row, rows) {
-        int docid = fModel->data(row, fModel->indexForColumnName("f_id"), Qt::EditRole).toInt();
+        QString docid = fModel->data(row, fModel->indexForColumnName("f_id"), Qt::EditRole).toString();
         db[":f_id"] = docid;
         db.exec("select * from a_header where f_id=:f_id");
         if (!db.nextRow()) {
@@ -226,7 +226,7 @@ void CR5Documents::draftDocs()
     C5Database db(fDBParams);
     QString err;
     foreach (int row, rows) {
-        int docid = fModel->data(row, fModel->indexForColumnName("f_id"), Qt::EditRole).toInt();
+        QString docid = fModel->data(row, fModel->indexForColumnName("f_id"), Qt::EditRole).toString();
         db[":f_id"] = docid;
         db.exec("select * from a_header where f_id=:f_id");
         if (!db.nextRow()) {
@@ -277,7 +277,7 @@ void CR5Documents::removeDocs()
     std::sort(rows.begin(), rows.end());
     std::reverse(rows.begin(), rows.end());
     foreach (int r, rows) {
-        int id = fModel->data(r, fModel->indexForColumnName("f_id"), Qt::EditRole).toInt();
+        QString id = fModel->data(r, fModel->indexForColumnName("f_id"), Qt::EditRole).toString();
         switch (docType(id)) {
         case DOC_TYPE_STORE_INPUT:
         case DOC_TYPE_STORE_OUTPUT:
@@ -325,10 +325,12 @@ void CR5Documents::copySelectedDocs()
         if (!db1.nextRow()) {
             continue;
         }
+        QString newDocId = C5Database::uuid();
         db2.setBindValues(db1.getBindValues());
         db2.removeBindValue(":f_id");
         db2[":f_state"] = DOC_STATE_DRAFT;
-        int newDocId = db2.insert("a_header");
+        db2[":f_id"] = newDocId;
+        db2.insert("a_header", false);
         QString tableName;
         switch (db1.getInt("f_type")) {
         case DOC_TYPE_STORE_INPUT:

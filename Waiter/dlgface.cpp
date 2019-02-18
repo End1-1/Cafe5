@@ -124,7 +124,7 @@ void DlgFace::handleConf(const QJsonObject &obj)
 {
     sender()->deleteLater();
     Q_UNUSED(obj)
-    C5WaiterConf::fDefaultMenu = "M1";
+    C5WaiterConf::fDefaultMenu = QString::fromUtf8("Ռեստորան");
 }
 
 void DlgFace::handleCreditCards(const QJsonObject &obj)

@@ -20,13 +20,13 @@ public:
 
     ~C5StoreDoc();
 
-    bool openDoc(int id);
+    bool openDoc(QString id);
 
     void setMode(STORE_DOC sd);
 
     virtual QToolBar *toolBar();
 
-    static bool removeDoc(const QStringList &dbParams, int id, bool showmessage = true);
+    static bool removeDoc(const QStringList &dbParams, QString id, bool showmessage = true);
 
     bool save(int state, QString &err, bool showMsg);
 
@@ -37,7 +37,7 @@ private:
 
     int fDocState;
 
-    int fInternalId;
+    QString fInternalId;
 
     void countTotal();
 
@@ -47,7 +47,7 @@ private:
 
     void writeInput();
 
-    bool writeOutput(const QDate &date, int docNum, int store, double &amount, QList<int> &outId, QString &err);
+    bool writeOutput(const QDate &date, QString docNum, int store, double &amount, QStringList &outId, QString &err);
 
     int addGoodsRow();
 
@@ -103,6 +103,8 @@ private slots:
     void on_btnNewPartner_clicked();
 
     void on_btnNewGoods_clicked();
+
+    void on_leScancode_returnPressed();
 };
 
 #endif // C5STOREDOC_H

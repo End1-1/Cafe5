@@ -42,6 +42,9 @@ void CE5Editor::setId(int id)
                         le->setValue(db.getString(i));
                     }
                     if (le->property("SetColor") != QVariant::Invalid) {
+                        if (le->isEmpty()) {
+                            le->setInteger(-1);
+                        }
                         if (le->property("SetColor").toBool()) {
                             le->setColor(le->getInteger());
                         }
@@ -93,6 +96,14 @@ bool CE5Editor::save(QString &err, QList<QMap<QString, QVariant> > &data)
         }
         if (leField->property("Primary") != QVariant::Invalid) {
             continue;
+        }
+        if (leField->property("SetColor") != QVariant::Invalid) {
+            if (leField->isEmpty()) {
+                leField->setInteger(-1);
+            }
+            if (leField->property("SetColor").toBool()) {
+                leField->setColor(leField->getInteger());
+            }
         }
         QString fieldName = leField->property("Field").toString();
         QVariant value;

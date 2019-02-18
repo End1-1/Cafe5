@@ -7,6 +7,9 @@ C5SettingsWidget::C5SettingsWidget(const QStringList &dbParams, QWidget *parent)
 {
     ui->setupUi(this);
     ui->cbMenu->setDBValues(fDBParams, "select f_id, f_name from d_menu_names order by 2");
+    ui->cbDefaultStore->setDBValues(fDBParams, "select f_id, f_name from c_storages order by 2");
+    ui->cbTaxUseExtPos->addItem(tr("Yes"), "true");
+    ui->cbTaxUseExtPos->addItem(tr("No"), "false");
 }
 
 C5SettingsWidget::~C5SettingsWidget()
@@ -49,6 +52,8 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     fTags[ui->leHall->getTag()] = ui->leHall->text();
     fTags[ui->leTable->getTag()] = ui->leTable->text();
     fTags[ui->leDocNumDigits->getTag()] = ui->leDocNumDigits->text();
+    fTags[ui->cbDefaultStore->getTag()] = ui->cbDefaultStore->currentData().toString();
+    fTags[ui->cbTaxUseExtPos->getTag()] = ui->cbTaxUseExtPos->currentData().toString();
     C5Database db(fDBParams);
     db[":f_settings"] = ui->leCode->getInteger();
     db.exec("delete from s_settings_values where f_settings=:f_settings");

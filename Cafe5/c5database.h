@@ -7,7 +7,7 @@
 #include <QVariant>
 #include <QDate>
 
-#define where_id(id) QString("where f_id=%1").arg(id)
+#define where_id(id) QString("where f_id='%1'").arg(id)
 
 class QSqlQuery;
 
@@ -54,6 +54,8 @@ public:
     bool exec(const QString &sqlQuery, QList<QList<QVariant> > &dbrows, QMap<QString, int> &columns);
 
     bool exec(const QString &sqlQuery, QMap<QString, QList<QVariant> > &dbrows, QMap<QString, int> &columns);
+
+    static QString uuid(const QStringList &dbParams = QStringList());
 
     QMap<QString, QVariant> fBindValues;
 
@@ -161,6 +163,8 @@ private:
     bool exec(QSqlQuery *q, const QString &sqlQuery, bool &isSelect);
 
     QMap<QString, int> fNameColumnMap;
+
+    static QStringList fDbParamsForUuid;
 
 };
 

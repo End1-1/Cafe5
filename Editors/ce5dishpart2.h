@@ -25,6 +25,8 @@ private:
 
 private slots:
     void selectColor();
+
+    void on_btnNewPart_clicked();
 };
 
 #endif // CE5DISHPART2_H

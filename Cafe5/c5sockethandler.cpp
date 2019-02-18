@@ -1,6 +1,6 @@
 #include "c5sockethandler.h"
 
-QString __socketServerHost = "10.1.0.2";
+QString __socketServerHost = "192.168.2.200";
 quint16 __socketServerPort = 1000;
 
 C5SocketHandler::C5SocketHandler(QTcpSocket *socket, QObject *parent) :

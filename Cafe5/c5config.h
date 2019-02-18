@@ -16,6 +16,8 @@
 #define param_default_hall 11
 #define param_default_table 12
 #define param_doc_num_digits 13
+#define param_default_store 14
+#define param_tax_use_ext_pos 15
 
 class C5Config
 {
@@ -38,12 +40,14 @@ public:
     static int taxPort();
     static QString taxPassword();
     static QString taxDept();
+    static QString taxUseExtPos();
     static QStringList dbParams();
     static int defaultMenu();
     static QString defaultHall();
     static QString hallList();
     static int defaultTable();
     static int docNumDigits();
+    static int defaultStore();
     static void initParamsFromDb();
     static QVariant getRegValue(const QString &key);
     static void setRegValue(const QString &key, const QVariant &value);

@@ -3,6 +3,7 @@
 #include "c5combobox.h"
 #include "c5utils.h"
 #include "excel.h"
+#include "c5checkbox.h"
 #include <QHeaderView>
 
 C5TableWidget::C5TableWidget(QWidget *parent) :
@@ -77,6 +78,18 @@ C5ComboBox *C5TableWidget::createComboBox(int row, int column)
 C5ComboBox *C5TableWidget::comboBox(int row, int column)
 {
     return static_cast<C5ComboBox*>(cellWidget(row, column));
+}
+
+C5CheckBox *C5TableWidget::createCheckbox(int row, int column)
+{
+    C5CheckBox *c = new C5CheckBox(this);
+    setCellWidget(row, column, c);
+    return c;
+}
+
+C5CheckBox *C5TableWidget::checkBox(int row, int column)
+{
+    return static_cast<C5CheckBox*>(cellWidget(row, column));
 }
 
 bool C5TableWidget::findWidget(QWidget *w, int &row, int &column)

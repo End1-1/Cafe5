@@ -36,6 +36,8 @@ private slots:
 
     void setColor();
 
+    void on_btnNewType_clicked();
+
 private:
     Ui::C5DishWidget *ui;
 

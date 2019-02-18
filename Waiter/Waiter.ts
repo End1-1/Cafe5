@@ -269,27 +269,27 @@
     <message>
         <location filename="../Classes/c5gridgilter.ui" line="14"/>
         <source>Report parameters</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Classes/c5gridgilter.ui" line="27"/>
         <source>Parameters</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Classes/c5gridgilter.ui" line="55"/>
         <source>Show columns</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Classes/c5gridgilter.ui" line="91"/>
         <source>Apply</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Classes/c5gridgilter.ui" line="101"/>
         <source>Cancel</source>
-        <translation type="unfinished">Հրաժարվել</translation>
+        <translation>Հրաժարվել</translation>
     </message>
 </context>
 <context>
@@ -315,82 +315,82 @@
     <message>
         <location filename="../Classes/c5printpreview.ui" line="14"/>
         <source>Print preview</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Classes/c5printpreview.ui" line="102"/>
         <source>Page 1 of 1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Classes/c5printpreview.ui" line="229"/>
         <source>200%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Classes/c5printpreview.ui" line="234"/>
         <source>175%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Classes/c5printpreview.ui" line="239"/>
         <source>150%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Classes/c5printpreview.ui" line="244"/>
         <source>125%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Classes/c5printpreview.ui" line="249"/>
         <source>100%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Classes/c5printpreview.ui" line="254"/>
         <source>75%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Classes/c5printpreview.ui" line="259"/>
         <source>50%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Classes/c5printpreview.ui" line="264"/>
         <source>25%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Classes/c5printpreview.ui" line="285"/>
         <source>Print</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Classes/c5printpreview.ui" line="293"/>
         <source>All pages</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Classes/c5printpreview.ui" line="298"/>
         <source>Current page</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Classes/c5printpreview.ui" line="303"/>
         <source>Custom</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Classes/c5printpreview.cpp" line="40"/>
         <source>Page</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Classes/c5printpreview.cpp" line="42"/>
         <source>of</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -618,58 +618,70 @@
 <context>
     <name>C5WaiterServer</name>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="195"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="203"/>
         <source>Table wasnt unlocked correctly, try again</source>
         <translation>Սեղանը արքելափակված է սխալ, փորձեկ կրկին</translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="201"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="209"/>
         <source>Table locked by </source>
         <translation>Սեղանը խմբավորվում է</translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="206"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="214"/>
         <source>Program error, unknown table id or connection error</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="262"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="270"/>
         <source>You cannot print more then 1 copies of receipt</source>
         <translation>Դուք չէկ կարող տպել հաշիվը մեկ օրինակից ավել</translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="273"/>
-        <location filename="../Classes/c5waiterserver.cpp" line="332"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="281"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="340"/>
         <source>All service must be complited</source>
         <translation>Պատվերը անավարտ է</translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="284"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="292"/>
         <source>Print tax error</source>
         <translation>ՀԴՄ-ի սխալ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="337"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="345"/>
         <source>Receipt was not printed</source>
         <translation>Հաշիվը տպված չէ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="367"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="375"/>
         <source>Bonus system alreay exists for this order</source>
         <translation>Զեղչը արդեն կիրարված է</translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="391"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="399"/>
         <source>Cannot find card</source>
         <translation>Այդպիսի քարտ գոյություն չունի</translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="403"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="466"/>
+        <source>Could not load</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5waiterserver.cpp" line="445"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="473"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="483"/>
+        <source>entry point is missing in</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5waiterserver.cpp" line="503"/>
         <source>Unknown command for socket handler from dlgface</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="549"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="649"/>
         <source>(F)</source>
         <translation>(Ֆ)</translation>
     </message>
@@ -679,75 +691,75 @@
     <message>
         <location filename="../Classes/c5widget.cpp" line="53"/>
         <source>New</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Classes/c5widget.cpp" line="56"/>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Classes/c5widget.cpp" line="59"/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Classes/c5widget.cpp" line="62"/>
         <source>Save
 changes</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Classes/c5widget.cpp" line="65"/>
         <source>Search by
 parameters</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Classes/c5widget.cpp" line="68"/>
         <source>Clear
 filter</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Classes/c5widget.cpp" line="71"/>
         <source>Refresh</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Classes/c5widget.cpp" line="74"/>
         <source>Print</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Classes/c5widget.cpp" line="77"/>
         <source>Export to
 MS Excel</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>CE5Editor</name>
     <message>
         <location filename="../Editors/ce5editor.cpp" line="19"/>
-        <location filename="../Editors/ce5editor.cpp" line="82"/>
+        <location filename="../Editors/ce5editor.cpp" line="85"/>
         <source>Program error. Cannot find field with id property</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5editor.cpp" line="73"/>
+        <location filename="../Editors/ce5editor.cpp" line="76"/>
         <source>Invalid code</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5editor.cpp" line="140"/>
+        <location filename="../Editors/ce5editor.cpp" line="151"/>
         <source>Duplicate id</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5editor.cpp" line="188"/>
+        <location filename="../Editors/ce5editor.cpp" line="199"/>
         <source>cannot be empty</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -807,9 +819,14 @@ AMOUNT</source>
 ԳՈՒՄԱՐ</translation>
     </message>
     <message>
-        <location filename="dlgface.cpp" line="184"/>
+        <location filename="dlgface.cpp" line="185"/>
         <source>Are you sure to close application</source>
         <translation>Փակել՞ ծրագիրը</translation>
+    </message>
+    <message>
+        <location filename="dlgface.cpp" line="253"/>
+        <source>Reports</source>
+        <translation>Հաշվետվություններ</translation>
     </message>
 </context>
 <context>
@@ -1222,6 +1239,82 @@ ORDER</source>
     <message>
         <source>OTHER</source>
         <translation type="vanished">Այլ եղանակ</translation>
+    </message>
+</context>
+<context>
+    <name>DlgReports</name>
+    <message>
+        <location filename="dlgreports.ui" line="14"/>
+        <source>Dialog</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="dlgreports.ui" line="27"/>
+        <source>Unique id</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="dlgreports.ui" line="32"/>
+        <source>Order</source>
+        <translation>Պատվեր</translation>
+    </message>
+    <message>
+        <location filename="dlgreports.ui" line="37"/>
+        <source>Date</source>
+        <translation>Ամսաթիվ</translation>
+    </message>
+    <message>
+        <location filename="dlgreports.ui" line="42"/>
+        <source>Time</source>
+        <translation>Ժամ</translation>
+    </message>
+    <message>
+        <location filename="dlgreports.ui" line="47"/>
+        <source>Hall</source>
+        <translation>Սրահ</translation>
+    </message>
+    <message>
+        <location filename="dlgreports.ui" line="52"/>
+        <source>Table</source>
+        <translation>Սեղան</translation>
+    </message>
+    <message>
+        <location filename="dlgreports.ui" line="57"/>
+        <source>Waiter</source>
+        <translation>Սպասարկող</translation>
+    </message>
+    <message>
+        <location filename="dlgreports.ui" line="62"/>
+        <source>Amount</source>
+        <translation>Գումար</translation>
+    </message>
+    <message>
+        <location filename="dlgreports.ui" line="97"/>
+        <source>Print reports</source>
+        <translation>Տպել հաշվետվություն</translation>
+    </message>
+    <message>
+        <location filename="dlgreports.ui" line="187"/>
+        <source>Date start</source>
+        <translation>Ամսաթիվ, սկիզբ</translation>
+    </message>
+    <message>
+        <location filename="dlgreports.ui" line="264"/>
+        <source>Date end</source>
+        <translation>Ամսաթիվ, վերջ</translation>
+    </message>
+</context>
+<context>
+    <name>DlgReportsList</name>
+    <message>
+        <location filename="dlgreportslist.ui" line="14"/>
+        <source>Reports</source>
+        <translation>Հասանելի հաշվետվություններ</translation>
+    </message>
+    <message>
+        <location filename="dlgreportslist.cpp" line="30"/>
+        <source>Cancel</source>
+        <translation>Հրաժարվել</translation>
     </message>
 </context>
 <context>

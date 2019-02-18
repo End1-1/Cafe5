@@ -11,12 +11,16 @@
 #include <QSqlField>
 
 int C5Database::fCounter = 0;
+QStringList C5Database::fDbParamsForUuid;
 
 QMutex fMutex;
 
 C5Database::C5Database(const QStringList &dbParams) :
     QObject()
 {
+    if (fDbParamsForUuid.count() == 0) {
+        fDbParamsForUuid = dbParams;
+    }
     init();
     configureDatabase(fDb, dbParams[0], dbParams[1], dbParams[2], dbParams[3]);
 }
@@ -37,7 +41,6 @@ C5Database::C5Database(const QString &host, const QString &db, const QString &us
 {
     init();
     configureDatabase(fDb, host, db, user, password);
-
 }
 
 C5Database::~C5Database()
@@ -122,7 +125,7 @@ void C5Database::close(bool commit)
 bool C5Database::exec(const QString &sqlQuery)
 {
     if (!fDb.open()) {
-        if (!fDb.open()) {
+        if (!open()) {
             C5Message::error(fLastError);
             return false;
         }
@@ -148,6 +151,9 @@ bool C5Database::exec(const QString &sqlQuery, QList<QList<QVariant> > &dbrows, 
     }
 
 #ifdef QT_DEBUG
+    logEvent("#1 " + lastQuery(q1));
+#endif
+#ifdef LOGGING
     logEvent("#1 " + lastQuery(q1));
 #endif
 
@@ -187,6 +193,9 @@ bool C5Database::exec(const QString &sqlQuery, QMap<QString, QList<QVariant> > &
 #ifdef QT_DEBUG
     logEvent("#1 " + lastQuery(q1));
 #endif
+#ifdef LOGGING
+    logEvent("#1 " + lastQuery(q1));
+#endif
 
     fBindValues.clear();
     if (isSelect) {
@@ -207,6 +216,17 @@ bool C5Database::exec(const QString &sqlQuery, QMap<QString, QList<QVariant> > &
         }
     }
     return result;
+}
+
+QString C5Database::uuid(const QStringList &dbParams)
+{
+    if (dbParams.count() > 0) {
+        fDbParamsForUuid = dbParams;
+    }
+    C5Database db(fDbParamsForUuid);
+    db.exec("select uuid()");
+    db.nextRow();
+    return db.getString(0);
 }
 
 int C5Database::rowCount()

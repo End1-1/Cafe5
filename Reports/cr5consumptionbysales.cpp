@@ -309,8 +309,7 @@ void CR5ConsumptionBySales::writeDocs(int doctype, int reason, const QMap<int, d
         break;
     }
     QJsonDocument jd(jo);
-    db[":f_id"] = 0;
-    int docid = db.insert("a_header");
+    QString docid = C5Database::uuid();
     db[":f_state"] = DOC_STATE_DRAFT;
     db[":f_type"] = doctype;
     db[":f_operator"] = __userid;
@@ -321,7 +320,8 @@ void CR5ConsumptionBySales::writeDocs(int doctype, int reason, const QMap<int, d
     db[":f_amount"] = 0;
     db[":f_comment"] = comment;
     db[":f_raw"] = jd.toJson();
-    db.update("a_header", where_id(docid));
+    db[":f_id"]= docid;
+    db.insert("a_header", false);
     for (QMap<int, double>::const_iterator it = data.begin(); it != data.end(); it++) {
         db[":f_id"] = 0;
         int rec = db.insert("a_store_draft");

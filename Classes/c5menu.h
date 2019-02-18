@@ -5,11 +5,6 @@
 #include <QMap>
 #include <QJsonObject>
 
-typedef struct  {
-    int fId;
-    QString fName;
-} DPART1;
-
 class C5Menu
 {
 public:

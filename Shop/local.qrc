@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/lang">
+        <file>Shop.qm</file>
+    </qresource>
+</RCC>

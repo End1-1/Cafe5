@@ -32,12 +32,16 @@ void C5PrintJson::run()
             p.br(jo["height"].toDouble());
         } else if (jo["cmd"].toString() == "scene") {
             p.setSceneParams(jo["width"].toDouble(), jo["height"].toDouble(), (jo["orientation"].toInt() == 0 ? QPrinter::Portrait : QPrinter::Landscape));
-        } else if (jo["cmd"].toString() == "fond") {
+        } else if (jo["cmd"].toString() == "font") {
             QFont font(jo["family"].toString(), jo["size"].toInt());
             font.setBold(jo["bold"].toBool());
             p.setFont(font);
         } else if (jo["cmd"].toString() == "print") {
             p.print(jo["printer"].toString(), static_cast<QPrinter::PageSize>(jo["pagesize"].toInt()));
+        } else if (jo["cmd"].toString() == "line1") {
+            p.line(jo["x1"].toDouble(), jo["y1"].toDouble(), jo["x2"].toDouble(), jo["y2"].toDouble());
+        } else if (jo["cmd"].toString() == "line2") {
+            p.line();
         }
     }
 }

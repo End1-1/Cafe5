@@ -10,6 +10,7 @@
 #include "dlgpayment.h"
 #include "dlgpassword.h"
 #include "dlglistofdishcomments.h"
+#include "dlglistofmenu.h"
 #include <QCloseEvent>
 #include <QScrollBar>
 
@@ -557,4 +558,14 @@ void DlgOrder::on_btnExpandDishTable_clicked()
         ui->wDishTypesControl->setVisible(true);
         ui->btnExpandDishTable->setIcon(QIcon(":/expand2.png"));
     }
+}
+
+void DlgOrder::on_btnChangeMenu_clicked()
+{
+    QString menu;
+    if (!DlgListOfMenu::getMenuId(menu, fDBParams)) {
+        return;
+    }
+    fMenuName = menu;
+    buildMenu(menu, "", "");
 }

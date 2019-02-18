@@ -7,9 +7,11 @@ CR5GoodsGroup::CR5GoodsGroup(const QStringList &dbParams, QWidget *parent) :
     fIcon = ":/goods.png";
     fLabel = tr("Group of goods");
 
-    fSqlQuery = "select f_id, f_name from c_groups ";
+    fSqlQuery = "select f_id, f_name, f_taxdept, f_adgcode from c_groups ";
     fTranslation["f_id"] = tr("Code");
     fTranslation["f_name"] = tr("Name");
+    fTranslation["f_taxdep"] = tr("Tax dept");
+    fTranslation["f_adgcode"] = tr("ADG code");
 
     fEditor = new CE5GoodsGroup(dbParams);
 }

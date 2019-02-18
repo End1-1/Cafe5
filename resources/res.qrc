@@ -40,5 +40,6 @@
         <file>other.png</file>
         <file>credit-card.png</file>
         <file>discount.png</file>
+        <file>data-transfer.png</file>
     </qresource>
 </RCC>

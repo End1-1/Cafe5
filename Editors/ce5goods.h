@@ -20,6 +20,17 @@ public:
 
     virtual QString table();
 
+    virtual void setId(int id);
+
+    virtual bool save(QString &err, QList<QMap<QString, QVariant> > &data);
+
+    virtual void clear();
+
+private slots:
+    void on_leAddScanCode_returnPressed();
+
+    void on_btnRemoveScaneCode_clicked();
+
 private:
     Ui::CE5Goods *ui;
 };

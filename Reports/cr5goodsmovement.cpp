@@ -100,7 +100,7 @@ void CR5GoodsMovement::tblDoubleClicked(int row, int column, const QList<QVarian
         return;
     }
     C5StoreDoc *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);
-    if (!sd->openDoc(values.at(fModel->indexForColumnName("f_document")).toInt())) {
+    if (!sd->openDoc(values.at(fModel->indexForColumnName("f_document")).toString())) {
         __mainWindow->removeTab(sd);
     }
 }

@@ -120,7 +120,13 @@ SOURCES += \
     ../Editors/ce5discountcard.cpp \
     ../Editors/ce5client.cpp \
     ../Editors/ce5dishcomment.cpp \
-    ../Reports/cr5dishcomment.cpp
+    ../Reports/cr5dishcomment.cpp \
+    ../Reports/cr5salefromstore.cpp \
+    ../Reports/cr5salefromstorefilter.cpp \
+    c5salefromstoreorder.cpp \
+    c5datasynchronize.cpp \
+    ../Editors/ce5databases.cpp \
+    c5datasyncthread.cpp
 
 HEADERS += \
         c5mainwindow.h \
@@ -212,7 +218,13 @@ HEADERS += \
     ../Editors/ce5discountcard.h \
     ../Editors/ce5client.h \
     ../Editors/ce5dishcomment.h \
-    ../Reports/cr5dishcomment.h
+    ../Reports/cr5dishcomment.h \
+    ../Reports/cr5salefromstore.h \
+    ../Reports/cr5salefromstorefilter.h \
+    c5salefromstoreorder.h \
+    c5datasynchronize.h \
+    ../Editors/ce5databases.h \
+    c5datasyncthread.h
 
 FORMS += \
         c5mainwindow.ui \
@@ -253,7 +265,11 @@ FORMS += \
     ../Editors/ce5dishremovereason.ui \
     ../Editors/ce5discountcard.ui \
     ../Editors/ce5client.ui \
-    ../Editors/ce5dishcomment.ui
+    ../Editors/ce5dishcomment.ui \
+    ../Reports/cr5salefromstorefilter.ui \
+    c5salefromstoreorder.ui \
+    c5datasynchronize.ui \
+    ../Editors/ce5databases.ui
 
 INCLUDEPATH += ../Cafe5
 INCLUDEPATH += ../Classes

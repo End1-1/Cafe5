@@ -172,6 +172,7 @@ void C5Printing::rtext(const QString text)
     QJsonObject o;
     o["cmd"] = "rtext";
     o["text"] = text;
+    fJsonData.append(o);
 }
 
 void C5Printing::image(const QString &fileName, Qt::Alignment align)

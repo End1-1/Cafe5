@@ -18,9 +18,9 @@ public:
 
     virtual QToolBar *toolBar();
 
-    bool openDoc(int id);
+    bool openDoc(QString id);
 
-    static bool removeDoc(const QStringList &dbParams, int id);
+    static bool removeDoc(const QStringList &dbParams, QString id);
 
 private slots:
     void saveDoc();

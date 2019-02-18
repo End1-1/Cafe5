@@ -1,4 +1,5 @@
 #include "cr5databases.h"
+#include "ce5databases.h"
 
 CR5Databases::CR5Databases(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
@@ -21,7 +22,19 @@ CR5Databases::CR5Databases(const QStringList &dbParams, QWidget *parent) :
     fTableView->setItemDelegateForColumn(5, new C5TextDelegate(fTableView));
     fTableView->setItemDelegateForColumn(6, new C5TextDelegate(fTableView));
 
-    QList<int> colsForUpdate;
-    colsForUpdate << 1 << 2 << 3 << 4 << 5 << 6;
-    setTableForUpdate("s_user", colsForUpdate);
+    fEditor = new CE5Databases(dbParams);
+}
+
+QToolBar *CR5Databases::toolBar()
+{
+    if (!fToolBar) {
+        QList<ToolBarButtons> btn;
+        btn << ToolBarButtons::tbNew
+            << ToolBarButtons::tbClearFilter
+            << ToolBarButtons::tbRefresh
+            << ToolBarButtons::tbExcel
+            << ToolBarButtons::tbPrint;
+            createStandartToolbar(btn);
+    }
+    return fToolBar;
 }

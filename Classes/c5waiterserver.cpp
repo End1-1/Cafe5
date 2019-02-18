@@ -15,10 +15,13 @@
 #include <QTcpSocket>
 #include <QPrinter>
 #include <QLibrary>
+#include <QApplication>
+#include <QTranslator>
 
 QMutex mutex;
 typedef QString (*caption)();
 typedef QJsonArray (*json)(C5Database &db, const QJsonObject &params);
+typedef void (*translator)(QTranslator &trans);
 
 C5WaiterServer::C5WaiterServer(const QJsonObject &o, QTcpSocket *socket) :
     fIn(o)
@@ -65,7 +68,8 @@ void C5WaiterServer::reply(QJsonObject &o)
                 left join d_dish d on d.f_id=m.f_dish \
                 left join d_part2 p2 on p2.f_id=d.f_part \
                 left join d_part1 p1 on p1.f_id=p2.f_part \
-                left join c_storages s on s.f_id=m.f_store ";
+                left join c_storages s on s.f_id=m.f_store \
+                where m.f_state=1 ";
         srh.getJsonFromQuery(query, jMenu);
         o["reply"] = 1;
         o["menu"] = jMenu;
@@ -160,14 +164,14 @@ void C5WaiterServer::reply(QJsonObject &o)
                     if (srh.fDb.nextRow()) {
                         jh["f_hallname"] = srh.fDb.getString(0);
                     }
-                    jh["f_id"] = "0";
+                    jh["f_id"] = "";
                     jh["f_hall"] = jt.at(0)["f_hall"];
                     jh["f_table"] = QString::number(fIn["table"].toInt());
                     jh["f_state"] = QString::number(ORDER_STATE_OPEN);
                     jh["f_dateopen"] = current_date;
                     jh["f_timeopen"] = current_time;
                 } else {
-                    bv[":f_header"] = jo.at(0).toObject()["f_id"].toString().toInt();
+                    bv[":f_header"] = jo.at(0).toObject()["f_id"].toString();
                     jh = jo.at(0).toObject();
                     srh.getJsonFromQuery("select ob.f_id, ob.f_header, ob.f_state, dp1.f_name as part1, dp2.f_name as part2, ob.f_adgcode, d.f_name as f_name, \
                                          ob.f_qty1, ob.f_qty2, ob.f_price, ob.f_service, ob.f_discount, ob.f_total, \
@@ -181,7 +185,7 @@ void C5WaiterServer::reply(QJsonObject &o)
                                          where ob.f_header=:f_header", jb, bv);
                     // Discount
                     QJsonArray jda;
-                    bv[":f_order"] = jo.at(0).toObject()["f_id"].toString().toInt();
+                    bv[":f_order"] = jo.at(0).toObject()["f_id"].toString();
                     srh.getJsonFromQuery("select f_id, f_type, f_value from b_history where f_order=:f_order", jda, bv);
                     if (jda.count() > 0) {
                         jh["f_bonusid"] = jda.at(0).toObject()["f_id"].toString();
@@ -281,14 +285,14 @@ void C5WaiterServer::reply(QJsonObject &o)
         }
         // CHECKING TAX AND PRINT IF NEEDED
         QJsonArray jtax;
-        bv[":f_id"] = jh["f_id"].toString().toInt();
+        bv[":f_id"] = jh["f_id"].toString();
         srh.getJsonFromQuery("select * from o_tax where f_id=:f_id", jtax, bv);
         if (jtax.count() == 0) {
             int result = printTax(jh, jb, srh.fDb);
             if (result != pt_err_ok) {
                 err += tr("Print tax error");
             } else {
-                bv[":f_id"] = jh["f_id"].toString().toInt();
+                bv[":f_id"] = jh["f_id"].toString();
                 srh.getJsonFromQuery("select * from o_tax where f_id=:f_id", jtax, bv);
             }
         } else {
@@ -365,7 +369,7 @@ void C5WaiterServer::reply(QJsonObject &o)
     }
     case sm_discount: {
         QJsonArray ja;
-        bv[":f_order"] = fIn["order"].toString().toInt();
+        bv[":f_order"] = fIn["order"].toString();
         srh.getJsonFromQuery("select * from b_history where f_order=:f_order", ja, bv);
         if (ja.count() > 0) {
             o["reply"] = 0;
@@ -435,10 +439,21 @@ void C5WaiterServer::reply(QJsonObject &o)
                 l.unload();
                 continue;
             }
+            translator t = (translator) (l.resolve("translator"));
+            if (!t) {
+                l.unload();
+                o["reply"] = 1;
+                o["msg"] = QString("translator %1 %2").arg(tr("entry point is missing in")).arg(s);
+                break;
+            }
+            QTranslator trans;
+            t(trans);
+            qApp->installTranslator(&trans);
             QJsonObject jo;
             jo["caption"] = c();
             jo["file"] = s;
             ja.append(jo);
+            l.unload();
         }
         o["reply"] = 0;
         o["reports"] = ja;
@@ -452,8 +467,19 @@ void C5WaiterServer::reply(QJsonObject &o)
             o["msg"] = QString("%1 %2").arg(tr("Could not load")).arg(filename);
             break;
         }
+        translator t = (translator) (l.resolve("translator"));
+        if (!t) {
+            l.unload();
+            o["reply"] = 1;
+            o["msg"] = QString("translator %1 %2").arg(tr("entry point is missing in")).arg(filename);
+            break;
+        }
+        QTranslator trans;
+        t(trans);
+        qApp->installTranslator(&trans);
         json j = (json) l.resolve("json");
         if (!j) {
+            l.unload();
             o["reply"] = 1;
             o["msg"] = QString("json %1 %2").arg(tr("entry point is missing in")).arg(filename);
             break;
@@ -507,7 +533,7 @@ void C5WaiterServer::saveOrder(QJsonObject &jh, QJsonArray &ja, C5Database &db)
             db.exec("update h_tables set f_lock=:f_lock, f_lockSrc=:f_lockSrc where f_id=:f_id");
         }
     }
-    if (jh["f_id"].toString().toInt() == 0 && ja.count() > 0) {
+    if (jh["f_id"].toString().isEmpty() && ja.count() > 0) {
         db[":f_id"] = jh["f_hall"].toString().toInt();
         db.exec("select f_counter + 1, f_prefix as f_counter from h_halls where f_id=:f_id for update");
         if (db.nextRow()) {
@@ -518,12 +544,13 @@ void C5WaiterServer::saveOrder(QJsonObject &jh, QJsonArray &ja, C5Database &db)
         } else {
             jh["f_hallid"] = "0";
         }
-        db[":f_id"] = 0;
+        jh["f_id"] = C5Database::uuid();
+        db[":f_id"] = jh["f_id"].toString();
         db[":f_hallid"] = jh["f_hallid"].toString().toInt();
         db[":f_dateOpen"] = QDate::fromString(jh["f_dateopen"].toString(), FORMAT_DATE_TO_STR);
         db[":f_timeOpen"] = QTime::fromString(jh["f_timeopen"].toString(), FORMAT_TIME_TO_STR);
         db[":f_prefix"] = jh["f_prefix"].toString();
-        jh["f_id"] = QString::number(db.insert("o_header"));
+        db.insert("o_header", false);
     }
     if (jh.contains("f_bonusid")) {
         db[":f_data"] = jh["f_discountamount"].toString().toDouble();
@@ -558,16 +585,17 @@ void C5WaiterServer::saveOrder(QJsonObject &jh, QJsonArray &ja, C5Database &db)
 
 void C5WaiterServer::saveDish(const QJsonObject &h, QJsonObject &o, C5Database &db)
 {
-    if (o["f_id"].toString().toInt() == 0) {
-        db[":f_id"] = 0;
-        o["f_id"] = QString::number(db.insert("o_body"));
+    if (o["f_id"].toString().isEmpty()) {
+        o["f_id"] = C5Database::uuid();
+        db[":f_id"] = o["f_id"].toString();
+        db.insert("o_body", false);
     }
     if (o["f_state"].toString().toInt() < 0) {
         o["f_state"] = QString::number(o["f_state"].toString().toInt() * -1);
         C5PrintRemovedServiceThread *pr = new C5PrintRemovedServiceThread(h, o);
         pr->start();
     }
-    db[":f_header"] = h["f_id"].toString().toInt();
+    db[":f_header"] = h["f_id"].toString();
     db[":f_state"] = o["f_state"].toString().toInt();
     db[":f_dish"] = o["f_dish"].toString().toInt();
     db[":f_qty1"] = o["f_qty1"].toString().toDouble();

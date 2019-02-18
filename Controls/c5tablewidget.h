@@ -5,6 +5,7 @@
 
 class C5LineEdit;
 class C5ComboBox;
+class C5CheckBox;
 
 class C5TableWidget : public QTableWidget
 {
@@ -26,6 +27,10 @@ public:
     C5ComboBox *createComboBox(int row, int column);
 
     C5ComboBox *comboBox(int row, int column);
+
+    C5CheckBox *createCheckbox(int row, int column);
+
+    C5CheckBox *checkBox(int row, int column);
 
     bool findWidget(QWidget *w, int &row, int &column);
 

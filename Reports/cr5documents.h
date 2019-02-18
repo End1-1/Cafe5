@@ -18,12 +18,12 @@ protected:
 protected slots:
     virtual void tblDoubleClicked(int row, int column, const QList<QVariant> &values);
 
-    virtual void callEditor(int id);
+    virtual void callEditor(QString id);
 
 private:
-    void openDoc(int id);
+    void openDoc(QString id);
 
-    int docType(int id);
+    int docType(QString id);
 
 private slots:
     void saveDocs();

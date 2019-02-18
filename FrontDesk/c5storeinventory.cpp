@@ -29,7 +29,7 @@ QToolBar *C5StoreInventory::toolBar()
     return fToolBar;
 }
 
-bool C5StoreInventory::openDoc(int id)
+bool C5StoreInventory::openDoc(QString id)
 {
     C5Database db(fDBParams);
     db[":f_id"] = id;
@@ -61,7 +61,7 @@ bool C5StoreInventory::openDoc(int id)
     return true;
 }
 
-bool C5StoreInventory::removeDoc(const QStringList &dbParams, int id)
+bool C5StoreInventory::removeDoc(const QStringList &dbParams, QString id)
 {
     C5Database db(dbParams);
     db[":f_document"] = id;

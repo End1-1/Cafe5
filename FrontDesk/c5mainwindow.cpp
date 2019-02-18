@@ -24,7 +24,9 @@
 #include "cr5goodspartners.h"
 #include "cr5goodswaste.h"
 #include "c5welcomepage.h"
+#include "cr5salefromstore.h"
 #include "cr5goodsunit.h"
+#include "c5datasynchronize.h"
 #include "cr5menunames.h"
 #include "cr5materialsinstore.h"
 #include "cr5dishremovereason.h"
@@ -210,6 +212,7 @@ void C5MainWindow::on_actionLogin_triggered()
             addTreeL3Item(it, cp_t3_tstore_extra, tr("T-account, extra"), ":/documents.png");
             addTreeL3Item(it, cp_t2_count_output_of_sale, tr("Consumption of goods based on sales"), ":/goods.png");
             addTreeL3Item(it, cp_t3_sales_common, tr("Sales, expert mode"), ":/graph.png");
+            addTreeL3Item(it, cp_t3_store_sale, tr("Sales from store"), ":/graph.png");
         }
 
         if (pr(db.getString(0), cp_t4_menu)) {
@@ -248,6 +251,7 @@ void C5MainWindow::on_actionLogin_triggered()
             item->addChild(it);
             addTreeL3Item(it, cp_t7_credit_card, tr("Credit cards"), ":/credit-card.png");
             addTreeL3Item(it, cp_t7_discount_system, tr("Discount system"), ":/discount.png");
+            addTreeL3Item(it, cp_t7_upload_data_to_other_server, tr("Data synchronization"), ":/data-transfer.png");
         }
 
         if (pr(db.getString(0), cp_t1_preference)) {
@@ -386,6 +390,9 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
     case cp_t3_tstore_extra:
         createTab<CR5TStoreExtra>(dbParams);
         break;
+    case cp_t3_store_sale:
+        createTab<CR5SaleFromStore>(dbParams);
+        break;
     case cp_t4_part1:
         createTab<CR5DishPart1>(dbParams);
         break;
@@ -428,6 +435,12 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
     case cp_t7_discount_system:
         createTab<CR5DiscountSystem>(dbParams);
         break;
+    case cp_t7_upload_data_to_other_server: {
+        C5DataSynchronize *ds = new C5DataSynchronize(dbParams, this);
+        ds->exec();
+        delete ds;
+        break;
+    }
     default:
         break;
     }

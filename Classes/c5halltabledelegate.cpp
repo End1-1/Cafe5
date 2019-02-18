@@ -15,7 +15,7 @@ void C5HallTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &o
     painter->save();
     QJsonObject o = index.data(Qt::UserRole).toJsonObject();
     QBrush bgBrush(QColor::fromRgb(217, 217, 217), Qt::SolidPattern);
-    if (o["f_header"].toString().toInt()) {
+    if (!o["f_header"].toString().isEmpty()) {
         bgBrush.setColor(QColor::fromRgb(130, 255, 100));
     }
     if (o["f_lock"].toString().toInt() > 0) {

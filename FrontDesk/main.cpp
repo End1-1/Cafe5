@@ -8,6 +8,22 @@
 
 int main(int argc, char *argv[])
 {
+
+#ifndef QT_DEBUG
+    QStringList libPath;
+    libPath << "./";
+    libPath << "./platforms";
+    libPath << "./sqldrivers";
+    libPath << "./printsupport";
+    QCoreApplication::setLibraryPaths(libPath);
+#endif
+
+    if (QDate::currentDate() > QDate::fromString("01.04.2019", "dd.MM.yyyy")) {
+        return 0;
+    }
+
+    QApplication a(argc, argv);
+
     QList<QByteArray> connectionParams;
     C5Connection::readParams(connectionParams);
     C5Config::fDBHost = connectionParams.at(0);
@@ -16,17 +32,8 @@ int main(int argc, char *argv[])
     C5Config::fDBPassword = connectionParams.at(3);
     C5Config::fSettingsName = connectionParams.at(4);
     C5Config::fLastUsername = connectionParams.at(5);
-    //C5Config::initParamsFromDb();
+    C5Config::initParamsFromDb();
 
-#ifndef QT_DEBUG
-    QStringList libPath;
-    libPath << "./";
-    libPath << "./platforms";
-    libPath << "./sqldrivers";
-    QCoreApplication::setLibraryPaths(libPath);
-#endif
-
-    QApplication a(argc, argv);
     QTranslator t;
     t.load(":/lang/FrontDesk.qm");
     a.installTranslator(&t);

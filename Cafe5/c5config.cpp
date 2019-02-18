@@ -73,6 +73,11 @@ QString C5Config::taxDept()
     return getValue(param_tax_dept);
 }
 
+QString C5Config::taxUseExtPos()
+{
+    return getValue(param_tax_use_ext_pos);
+}
+
 QString C5Config::serviceFactor()
 {
     return getValue(param_service_factor);
@@ -91,6 +96,11 @@ QStringList C5Config::dbParams()
 int C5Config::docNumDigits()
 {
     return getValue(param_doc_num_digits).toInt();
+}
+
+int C5Config::defaultStore()
+{
+    return getValue(param_default_store).toInt();
 }
 
 int C5Config::defaultMenu()
