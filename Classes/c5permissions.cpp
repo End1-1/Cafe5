@@ -11,7 +11,7 @@ C5Permissions::C5Permissions()
 
 void C5Permissions::init(C5Database &db)
 {
-    clear();
+    fPermissions[db.database()].clear();
     fTemplate << cp_append_database
 
               << cp_t1_preference
@@ -19,6 +19,8 @@ void C5Permissions::init(C5Database &db)
               << cp_t1_users
               << cp_t1_databases
               << cp_t1_settigns
+              << cp_t1_login_to_manager
+              << cp_t1_login_to_waiter
 
               << cp_t2_action
               << cp_t2_store_input
@@ -26,6 +28,7 @@ void C5Permissions::init(C5Database &db)
               << cp_t2_store_move
               << cp_t2_store_inventory
               << cp_t2_count_output_of_sale
+              << cp_t2_calculate_self_cost
 
               << cp_t3_reports
               << cp_t3_sales_common
@@ -42,6 +45,7 @@ void C5Permissions::init(C5Database &db)
               << cp_t4_dishes
               << cp_t4_dish_remove_reason
               << cp_t4_dish_comments
+              << cp_t4_dish_price_self_cost
 
               << cp_t5_waiter
               << cp_t5_multiple_receipt
@@ -59,6 +63,9 @@ void C5Permissions::init(C5Database &db)
               << cp_t7_credit_card
               << cp_t7_discount_system
               << cp_t7_upload_data_to_other_server
+              << cp_t7_halls
+              << cp_t7_tables
+              << cp_t7_upload_date_settings
                  ;
     if (__usergroup == 1) {
         fPermissions[db.database()] = fTemplate;

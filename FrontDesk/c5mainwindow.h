@@ -41,7 +41,11 @@ private slots:
 
     void twCustomMenu(const QPoint &p);
 
+    void tabCustomMenu(const QPoint &p);
+
     void tabCloseRequested(int index);
+
+    void actionChangeDatabase();
 
     void currentTabChange(int index);
 
@@ -56,6 +60,12 @@ private slots:
     void on_actionHome_triggered();
 
     void on_actionGo_to_home_triggered();
+
+    void on_twDb_itemExpanded(QTreeWidgetItem *item);
+
+    void on_actionLogout_triggered();
+
+    void on_actionChange_password_triggered();
 
 private:
     Ui::C5MainWindow *ui;
@@ -73,6 +83,8 @@ private:
     void addTreeL3Item(QTreeWidgetItem *item, int permission, const QString &text, const QString &icon);
 
     void showWelcomePage();
+
+    QStringList getDbParams(QTreeWidgetItem *item);
 };
 
 #endif // C5MAINWINDOW_H

@@ -29,6 +29,7 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
                    << "gg.f_name as f_goodsname"
                    << "gr.f_name as f_goodsgroup"
                    << "gu.f_name as f_goodsunit"
+                   << "og.f_tax"
                    << "sum(og.f_qty) as f_qty"
                    << "sum(og.f_total) as f_total"
                       ;
@@ -39,6 +40,7 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
                    << "gg.f_name as f_goodsname"
                    << "gr.f_name as f_groodsgroup"
                    << "gu.f_name as f_goodsunit"
+                   << "og.f_tax"
                       ;
 
     fColumnsSum << "f_qty"
@@ -51,6 +53,7 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
     fTranslation["f_goodsname"] = tr("Goods");
     fTranslation["f_goodsgroup"] = tr("Group");
     fTranslation["f_goodsunit"] = tr("Unit");
+    fTranslation["f_tax"] = tr("TAX");
     fTranslation["f_qty"] = tr("Qty");
     fTranslation["f_total"] = tr("Total");
 
@@ -60,6 +63,7 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
     fColumnsVisible["gg.f_name as f_goodsname"] = true;
     fColumnsVisible["gr.f_name as f_goodsgroup"] = true;
     fColumnsVisible["gu.f_name as f_goodsunit"] = true;
+    fColumnsVisible["og.f_tax"] = true;
     fColumnsVisible["sum(og.f_qty) as f_qty"] = true;
     fColumnsVisible["sum(og.f_total) as f_total"] = true;
 
@@ -85,6 +89,14 @@ QToolBar *CR5SaleFromStore::toolBar()
         fToolBar->addAction(aout);
     }
     return fToolBar;
+}
+
+void CR5SaleFromStore::restoreColumnsWidths()
+{
+    C5Grid::restoreColumnsWidths();
+    if (fColumnsVisible["oh.f_id as f_header"]) {
+        fTableView->setColumnWidth(fModel->fColumnNameIndex["f_header"], 0);
+    }
 }
 
 void CR5SaleFromStore::makeOutput(bool v)

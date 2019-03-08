@@ -10,6 +10,7 @@
 #define where_id(id) QString("where f_id='%1'").arg(id)
 
 class QSqlQuery;
+class C5TableWidget;
 
 class C5Database : public QObject
 {
@@ -55,6 +56,8 @@ public:
 
     bool exec(const QString &sqlQuery, QMap<QString, QList<QVariant> > &dbrows, QMap<QString, int> &columns);
 
+    bool execDirect(const QString &sqlQuery);
+
     static QString uuid(const QStringList &dbParams = QStringList());
 
     QMap<QString, QVariant> fBindValues;
@@ -67,13 +70,19 @@ public:
 
     int columnCount();
 
+    bool first();
+
     bool nextRow(QList<QVariant> &row);
 
     bool nextRow();
 
+    void fetchRowsToTableWidget(C5TableWidget *table);
+
     bool update(const QString &tableName, const QString &whereClause);
 
     int insert(const QString &tableName, bool returnId = true);
+
+    bool replaceInto(const QString &tableName);
 
     bool insertId(const QString &tableName, const QVariant &id);
 
@@ -116,6 +125,12 @@ public:
     inline QTime getTime(int column) { return fDbRows.at(fCursorPos).at(column).toTime(); }
 
     inline QTime getTime(const QString &columnName) { return fDbRows.at(fCursorPos).at(fNameColumnMap[columnName.toLower()]).toTime(); }
+
+    inline QDateTime getDateTime(int row, const QString &columnName) { return fDbRows.at(row).at(fNameColumnMap[columnName.toLower()]).toDateTime(); }
+
+    inline QDateTime getDateTime(const QString &columnName) { return fDbRows.at(fCursorPos).at(fNameColumnMap[columnName.toLower()]).toDateTime(); }
+
+    inline QDateTime getDateTime(int column) { return fDbRows.at(fCursorPos).at(column).toDateTime(); }
 
     inline QList<QVariant> &row() {return fDbRows[fCursorPos]; }
 

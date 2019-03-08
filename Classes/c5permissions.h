@@ -11,6 +11,8 @@
 #define cp_t1_users 102
 #define cp_t1_databases 103
 #define cp_t1_settigns 104
+#define cp_t1_login_to_manager 105
+#define cp_t1_login_to_waiter 106
 
 #define cp_t2_action 200
 #define cp_t2_store_input 201
@@ -18,6 +20,7 @@
 #define cp_t2_store_move 203
 #define cp_t2_store_inventory 204
 #define cp_t2_count_output_of_sale 205
+#define cp_t2_calculate_self_cost 206
 
 #define cp_t3_reports 300
 #define cp_t3_sales_common 301
@@ -34,6 +37,7 @@
 #define cp_t4_dishes 404
 #define cp_t4_dish_remove_reason 405
 #define cp_t4_dish_comments 406
+#define cp_t4_dish_price_self_cost 407
 
 #define cp_t5_waiter 500
 #define cp_t5_multiple_receipt 501
@@ -51,6 +55,9 @@
 #define cp_t7_credit_card 701
 #define cp_t7_discount_system 702
 #define cp_t7_upload_data_to_other_server 703
+#define cp_t7_halls 704
+#define cp_t7_tables 705
+#define cp_t7_upload_date_settings 706
 
 
 class C5Permissions

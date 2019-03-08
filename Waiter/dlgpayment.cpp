@@ -4,6 +4,9 @@
 #include "c5utils.h"
 #include "c5cafecommon.h"
 #include "wpaymentoptions.h"
+#include "dlgguest.h"
+#include "dlgcl.h"
+#include "dlgreceiptlanguage.h"
 #include "dlgcreditcardlist.h"
 #include <QInputDialog>
 
@@ -28,6 +31,9 @@ DlgPayment::DlgPayment(QWidget *parent) :
     ui->tblInfo->setString(3, 0, tr("Payment"));
     ui->tblInfo->item(3, 0)->setData(Qt::TextAlignmentRole, Qt::AlignCenter);
     ui->tblInfo->setSpan(3, 0, 1, ui->tblInfo->columnCount());
+    ui->wPayOther->setVisible(false);
+    setLangIcon();
+    setTaxState();
 }
 
 DlgPayment::~DlgPayment()
@@ -39,6 +45,7 @@ int DlgPayment::payment(C5Order *order)
 {
     DlgPayment *d = new DlgPayment(C5Config::fParentWidget);
     d->fOrder = order;
+    d->setRoomComment();
     d->ui->tblInfo->setString(1, 0, order->headerValue("f_tablename"));
     d->ui->tblInfo->setString(1, 1, order->headerValue("f_currentstaffname"));
     d->ui->tblInfo->setString(1, 2, order->headerValue("f_amounttotal"));
@@ -249,6 +256,8 @@ void DlgPayment::on_btnReceipt_clicked()
     sh->bind("station", hostinfo);
     sh->bind("printer", C5Config::localReceiptPrinter());
     QJsonObject o;
+    fOrder->setHeaderValue("f_receiptlanguage", C5Config::getRegValue("receipt_language").toString());
+    fOrder->setHeaderValue("f_printtax", ui->btnTax->isChecked() ? "1" : "0");
     o["header"] = fOrder->fHeader;
     o["body"] = fOrder->fItems;
     sh->send(o);
@@ -275,6 +284,51 @@ bool DlgPayment::checkForPaymentMethod(int mode, double &total)
         total += ui->tblInfo->getDouble(i, 1);
     }
     return result;
+}
+
+void DlgPayment::setLangIcon()
+{
+    switch (C5Config::getRegValue("receipt_language").toInt()) {
+    case 0:
+    case 1:
+        ui->btnReceiptLanguage->setIcon(QIcon(":/armenia.png"));
+        C5Config::setRegValue("receipt_language", RECEIPT_LANGUAGE_AM);
+        break;
+    case 2:
+        ui->btnReceiptLanguage->setIcon(QIcon(":/usa.png"));
+        break;
+    }
+}
+
+void DlgPayment::setRoomComment()
+{
+    bool v = !fOrder->headerValue("f_other_room").isEmpty();
+    ui->leRoomComment->setVisible(v);
+    if (v) {
+        ui->leRoomComment->setText(fOrder->headerValue("f_other_room") + ", " + fOrder->headerValue("f_other_guest"));
+    }
+}
+
+void DlgPayment::setCLComment()
+{
+    bool v = !fOrder->headerValue("f_other_clcode").isEmpty();
+    ui->leRoomComment->setVisible(v);
+    if (v) {
+        ui->leRoomComment->setText(fOrder->headerValue("f_other_clcode") + ", " + fOrder->headerValue("f_other_clname"));
+    }
+}
+
+void DlgPayment::setTaxState()
+{
+    switch (C5Config::getRegValue("btn_tax_state").toInt()) {
+    case 0:
+    case 1:
+        ui->btnTax->setChecked(true);
+        break;
+    case 2:
+        ui->btnTax->setChecked(false);
+        break;
+    }
 }
 
 void DlgPayment::setPaymentInfo()
@@ -364,6 +418,7 @@ void DlgPayment::on_btnPaymentCash_clicked()
     fOrder->setHeaderValue("f_amountother", 0);
     total = fOrder->headerValue("f_amounttotal").toDouble() - total;
     addPaymentMode(p_cash, tr("Cash"), total);
+    ui->btnTax->setChecked(true);
 }
 
 void DlgPayment::on_btnPaymentCard_clicked()
@@ -389,6 +444,7 @@ void DlgPayment::on_btnPaymentCard_clicked()
     fOrder->setHeaderValue("f_amountother", 0);
     total = fOrder->headerValue("f_amounttotal").toDouble() - total;
     addPaymentMode(p_card, tr("Credit card"), total);
+    ui->btnTax->setChecked(true);
 }
 
 void DlgPayment::on_btnPaymentBank_clicked()
@@ -407,6 +463,7 @@ void DlgPayment::on_btnPaymentBank_clicked()
     fOrder->setHeaderValue("f_amountcard", 0);
     fOrder->setHeaderValue("f_amountother", 0);
     fOrder->setHeaderValue("f_amountbank", total);
+    ui->btnTax->setChecked(false);
 }
 
 void DlgPayment::on_btnPaymentOther_clicked()
@@ -425,6 +482,8 @@ void DlgPayment::on_btnPaymentOther_clicked()
     fOrder->setHeaderValue("f_amountcard", 0);
     fOrder->setHeaderValue("f_amountbank", 0);
     fOrder->setHeaderValue("f_amountother", total);
+    ui->wPayOther->setVisible(true);
+    ui->btnTax->setChecked(false);
 }
 
 void DlgPayment::on_btnDiscount_clicked()
@@ -443,4 +502,46 @@ void DlgPayment::on_btnDiscount_clicked()
     sh->bind("order", fOrder->headerValue("f_id"));
     sh->bind("code", code);
     sh->send();
+}
+
+void DlgPayment::on_btnPayComplimentary_clicked()
+{
+    fOrder->setHeaderValue("f_otherid", QString::number(PAYOTHER_COMPLIMENTARY));
+}
+
+void DlgPayment::on_btnPayTransferToRoom_clicked()
+{
+    QString res, inv, room, guest;
+    if (DlgGuest::getGuest(res, inv, room, guest)) {
+        fOrder->setHeaderValue("f_otherid", QString::number(PAYOTHER_TRANSFER_TO_ROOM));
+        fOrder->setHeaderValue("f_other_res", res);
+        fOrder->setHeaderValue("f_other_inv", inv);
+        fOrder->setHeaderValue("f_other_room", room);
+        fOrder->setHeaderValue("f_other_guest", guest);
+        setRoomComment();
+    }
+}
+
+void DlgPayment::on_btnReceiptLanguage_clicked()
+{
+    if (int r = DlgReceiptLanguage::receipLanguage()) {
+        C5Config::setRegValue("receipt_language", r);
+        setLangIcon();
+    }
+}
+
+void DlgPayment::on_btnTax_clicked()
+{
+    C5Config::setRegValue("btn_tax_state", ui->btnTax->isChecked() ? 2 : 1);
+}
+
+void DlgPayment::on_btnPayCityLedger_clicked()
+{
+    QString clCode, clName;
+    if (DlgCL::getCL(clCode, clName)) {
+        fOrder->setHeaderValue("f_otherid", QString::number(PAYOTHER_CL));
+        fOrder->setHeaderValue("f_other_clcode", clCode);
+        fOrder->setHeaderValue("f_other_clname", clName);
+        setCLComment();
+    }
 }

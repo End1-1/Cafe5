@@ -22,6 +22,8 @@ public:
 
     static bool removeDoc(const QStringList &dbParams, QString id);
 
+    virtual bool allowChangeDatabase();
+
 private slots:
     void saveDoc();
 

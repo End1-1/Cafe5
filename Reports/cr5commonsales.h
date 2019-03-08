@@ -14,6 +14,8 @@ public:
 
 protected:
     virtual void editRow(int columnWidthId);
+
+    virtual void restoreColumnsWidths();
 };
 
 #endif // CR5COMMONSALES_H

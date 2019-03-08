@@ -53,6 +53,8 @@ public:
     int addEmptyRow();
 
     void exportToExcel();
+
+    void search(const QString &txt);
 };
 
 #endif // C5TABLEWIDGET_H

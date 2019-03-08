@@ -57,6 +57,8 @@ void C5TableWidget::fitRowToHeight(int dec)
 C5LineEdit *C5TableWidget::createLineEdit(int row, int column)
 {
     C5LineEdit *l = new C5LineEdit(this);
+    l->setProperty("row", row);
+    l->setProperty("column", column);
     l->setFrame(false);
     setCellWidget(row, column, l);
     return l;
@@ -128,7 +130,11 @@ void C5TableWidget::setInteger(int row, int column, int value)
 
 QString C5TableWidget::getString(int row, int column)
 {
-    return item(row, column)->text();
+    QTableWidgetItem *i = item(row, column);
+    if (!i) {
+        return "NO ITEM!";
+    }
+    return i->text();
 }
 
 void C5TableWidget::setString(int row, int column, const QString &str)
@@ -142,7 +148,11 @@ void C5TableWidget::setString(int row, int column, const QString &str)
 
 double C5TableWidget::getDouble(int row, int column)
 {
-    return QLocale().toDouble(item(row, column)->text());
+    QTableWidgetItem *i = item(row, column);
+    if (!i) {
+        return 0.0;
+    }
+    return QLocale().toDouble(i->text());
 }
 
 void C5TableWidget::setDouble(int row, int column, double value)
@@ -185,4 +195,17 @@ void C5TableWidget::exportToExcel()
 
     e.setFontSize(e.address(0, 0), e.address(rowCount() , colCount ), 10);
     e.show();
+}
+
+void C5TableWidget::search(const QString &txt)
+{
+    for (int i = 0; i < rowCount(); i++) {
+        bool hidden = true;
+        for (int j = 0; j < columnCount(); j++) {
+            if (getString(i, j).contains(txt, Qt::CaseInsensitive)) {
+                hidden = false;
+            }
+        }
+        setRowHidden(i, hidden);
+    }
 }

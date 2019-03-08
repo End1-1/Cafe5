@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>414</width>
-    <height>437</height>
+    <height>427</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -23,7 +23,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -143,20 +143,6 @@
        <string>Waiter</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="6" column="1">
-        <widget class="C5LineEdit" name="leIDRAMID">
-         <property name="Tag" stdset="0">
-          <number>3</number>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="0">
-        <widget class="QLabel" name="label_3">
-         <property name="text">
-          <string>IDRAM Id</string>
-         </property>
-        </widget>
-       </item>
        <item row="7" column="1">
         <widget class="C5LineEdit" name="leIDRAMPhone">
          <property name="Tag" stdset="0">
@@ -171,14 +157,21 @@
          </property>
         </widget>
        </item>
-       <item row="11" column="0">
-        <widget class="QLabel" name="label_8">
+       <item row="6" column="0">
+        <widget class="QLabel" name="label_3">
          <property name="text">
-          <string>Tax department</string>
+          <string>IDRAM Id</string>
          </property>
         </widget>
        </item>
-       <item row="13" column="1">
+       <item row="6" column="1">
+        <widget class="C5LineEdit" name="leIDRAMID">
+         <property name="Tag" stdset="0">
+          <number>3</number>
+         </property>
+        </widget>
+       </item>
+       <item row="14" column="1">
         <spacer name="verticalSpacer_2">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -198,6 +191,13 @@
          </property>
         </widget>
        </item>
+       <item row="11" column="0">
+        <widget class="QLabel" name="label_8">
+         <property name="text">
+          <string>Tax department</string>
+         </property>
+        </widget>
+       </item>
        <item row="5" column="1">
         <widget class="C5LineEdit" name="leTable">
          <property name="Tag" stdset="0">
@@ -212,17 +212,17 @@
          </property>
         </widget>
        </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Service value</string>
+         </property>
+        </widget>
+       </item>
        <item row="1" column="1">
         <widget class="C5ComboBox" name="cbMenu">
          <property name="Tag" stdset="0">
           <number>9</number>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>Receipt printer</string>
          </property>
         </widget>
        </item>
@@ -233,17 +233,10 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="label_2">
+       <item row="2" column="0">
+        <widget class="QLabel" name="label">
          <property name="text">
-          <string>Service value</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_10">
-         <property name="text">
-          <string>Order number prefix</string>
+          <string>Receipt printer</string>
          </property>
         </widget>
        </item>
@@ -254,10 +247,10 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="label_11">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_10">
          <property name="text">
-          <string>Default hall</string>
+          <string>Order number prefix</string>
          </property>
         </widget>
        </item>
@@ -268,17 +261,10 @@
          </property>
         </widget>
        </item>
-       <item row="9" column="0">
-        <widget class="QLabel" name="label_6">
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_11">
          <property name="text">
-          <string>Tax port</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_9">
-         <property name="text">
-          <string>Main menu</string>
+          <string>Default hall</string>
          </property>
         </widget>
        </item>
@@ -289,6 +275,13 @@
          </property>
         </widget>
        </item>
+       <item row="9" column="0">
+        <widget class="QLabel" name="label_6">
+         <property name="text">
+          <string>Tax port</string>
+         </property>
+        </widget>
+       </item>
        <item row="10" column="1">
         <widget class="C5LineEdit" name="leTaxPassword">
          <property name="Tag" stdset="0">
@@ -296,24 +289,10 @@
          </property>
         </widget>
        </item>
-       <item row="8" column="0">
-        <widget class="QLabel" name="label_5">
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_9">
          <property name="text">
-          <string>Tax IP</string>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="0">
-        <widget class="QLabel" name="label_4">
-         <property name="text">
-          <string>IDRAM phone</string>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="1">
-        <widget class="C5LineEdit" name="leTaxIP">
-         <property name="Tag" stdset="0">
-          <number>5</number>
+          <string>Main menu</string>
          </property>
         </widget>
        </item>
@@ -324,6 +303,13 @@
          </property>
         </widget>
        </item>
+       <item row="8" column="1">
+        <widget class="C5LineEdit" name="leTaxIP">
+         <property name="Tag" stdset="0">
+          <number>5</number>
+         </property>
+        </widget>
+       </item>
        <item row="12" column="0">
         <widget class="QLabel" name="label_18">
          <property name="text">
@@ -331,10 +317,38 @@
          </property>
         </widget>
        </item>
+       <item row="7" column="0">
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>IDRAM phone</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="0">
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>Tax IP</string>
+         </property>
+        </widget>
+       </item>
        <item row="12" column="1">
         <widget class="C5ComboBox" name="cbTaxUseExtPos">
          <property name="Tag" stdset="0">
           <number>15</number>
+         </property>
+        </widget>
+       </item>
+       <item row="13" column="0">
+        <widget class="QLabel" name="label_19">
+         <property name="text">
+          <string>Hotel database</string>
+         </property>
+        </widget>
+       </item>
+       <item row="13" column="1">
+        <widget class="C5LineEdit" name="leHotelDatabase">
+         <property name="Tag" stdset="0">
+          <number>17</number>
          </property>
         </widget>
        </item>
@@ -361,6 +375,28 @@
    <header location="global">c5combobox.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>leCode</tabstop>
+  <tabstop>lineEdit_2</tabstop>
+  <tabstop>lineEdit_3</tabstop>
+  <tabstop>leDocNumDigits</tabstop>
+  <tabstop>cbDefaultStore</tabstop>
+  <tabstop>leOrderPrefix</tabstop>
+  <tabstop>cbMenu</tabstop>
+  <tabstop>leLocalReceiptPrinter</tabstop>
+  <tabstop>leServiceFactor</tabstop>
+  <tabstop>leHall</tabstop>
+  <tabstop>leTable</tabstop>
+  <tabstop>leIDRAMID</tabstop>
+  <tabstop>leIDRAMPhone</tabstop>
+  <tabstop>leTaxIP</tabstop>
+  <tabstop>leTaxPort</tabstop>
+  <tabstop>leTaxPassword</tabstop>
+  <tabstop>leTaxDept</tabstop>
+  <tabstop>cbTaxUseExtPos</tabstop>
+  <tabstop>leHotelDatabase</tabstop>
+  <tabstop>tabWidget</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

@@ -7,7 +7,6 @@ class C5WaiterConf
 {
 public:
     C5WaiterConf();
-    static QString fDefaultMenu;
 };
 
 #endif // C5WITERCONF_H

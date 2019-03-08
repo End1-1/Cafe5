@@ -20,6 +20,8 @@ public:
 
     virtual QString table();
 
+    virtual bool checkData(QString &err);
+
 private:
     Ui::CE5MenuName *ui;
 };

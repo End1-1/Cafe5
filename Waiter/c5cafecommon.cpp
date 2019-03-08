@@ -5,6 +5,7 @@ QStringList C5CafeCommon::fDishRemoveReason;
 QStringList C5CafeCommon::fDishComments;
 QJsonArray C5CafeCommon::fHalls;
 QJsonArray C5CafeCommon::fTables;
+QMap<int, QMap<int, QString> > C5CafeCommon::fHallConfigs;
 
 C5CafeCommon::C5CafeCommon()
 {
@@ -19,4 +20,31 @@ QString C5CafeCommon::creditCardName(int id)
         }
     }
     return "UNKNOWN";
+}
+
+QJsonObject C5CafeCommon::table(const QString &id)
+{
+    for (int i = 0; i < fTables.count(); i++) {
+        QJsonObject t = fTables.at(i).toObject();
+        if (t["f_id"].toString() == id) {
+            return t;
+        }
+    }
+    return QJsonObject();
+}
+
+QJsonObject C5CafeCommon::table(int id)
+{
+    return table(QString::number(id));
+}
+
+QJsonObject C5CafeCommon::hall(const QString &id)
+{
+    for (int i = 0; i < fHalls.count(); i++) {
+        QJsonObject h = fHalls.at(i).toObject();
+        if (h["f_id"].toString() == id) {
+            return h;
+        }
+    }
+    return QJsonObject();
 }

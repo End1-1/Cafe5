@@ -1,4 +1,5 @@
 #include "C5Database.h"
+#include "c5tablewidget.h"
 #include <QMutexLocker>
 #include <QSqlQuery>
 #include <QSqlError>
@@ -151,10 +152,9 @@ bool C5Database::exec(const QString &sqlQuery, QList<QList<QVariant> > &dbrows, 
     }
 
 #ifdef QT_DEBUG
-    logEvent("#1 " + lastQuery(q1));
-#endif
-#ifdef LOGGING
-    logEvent("#1 " + lastQuery(q1));
+    logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + lastQuery(q1));
+#elif  LOGGING
+    logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + lastQuery(q1));
 #endif
 
     fBindValues.clear();
@@ -191,10 +191,9 @@ bool C5Database::exec(const QString &sqlQuery, QMap<QString, QList<QVariant> > &
     }
 
 #ifdef QT_DEBUG
-    logEvent("#1 " + lastQuery(q1));
-#endif
-#ifdef LOGGING
-    logEvent("#1 " + lastQuery(q1));
+    logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + lastQuery(q1));
+#elif LOGGING
+    logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + lastQuery(q1));
 #endif
 
     fBindValues.clear();
@@ -218,6 +217,24 @@ bool C5Database::exec(const QString &sqlQuery, QMap<QString, QList<QVariant> > &
     return result;
 }
 
+bool C5Database::execDirect(const QString &sqlQuery)
+{
+    QSqlQuery *q = new QSqlQuery(fDb);
+    if (!q->exec(sqlQuery)) {
+        fLastError = q->lastError().databaseText();
+        logEvent(fLastError);
+        logEvent(sqlQuery);
+        return false;
+    }
+#ifdef QT_DEBUG
+    logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + lastQuery(q));
+#elif LOGGING
+    logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + lastQuery(q));
+#endif
+    delete q;
+    return true;
+}
+
 QString C5Database::uuid(const QStringList &dbParams)
 {
     if (dbParams.count() > 0) {
@@ -225,8 +242,10 @@ QString C5Database::uuid(const QStringList &dbParams)
     }
     C5Database db(fDbParamsForUuid);
     db.exec("select uuid()");
-    db.nextRow();
-    return db.getString(0);
+    if (db.nextRow()) {
+        return db.getString(0);
+    }
+    return "";
 }
 
 int C5Database::rowCount()
@@ -237,6 +256,12 @@ int C5Database::rowCount()
 int C5Database::columnCount()
 {
     return fNameColumnMap.count();
+}
+
+bool C5Database::first()
+{
+    fCursorPos = -1;
+    return rowCount() > 0;
 }
 
 bool C5Database::nextRow(QList<QVariant> &row)
@@ -255,6 +280,25 @@ bool C5Database::nextRow()
         return true;
     }
     return false;
+}
+
+void C5Database::fetchRowsToTableWidget(C5TableWidget *table)
+{
+    int cols = columnCount();
+    while (nextRow()) {
+        int row = table->addEmptyRow();
+        for (int i = 0; i < cols; i++) {
+            QVariant v = getValue(i);
+            switch (v.type()) {
+            case QVariant::Double:
+                table->setString(row, i, QString::number(v.toDouble(), 'f', 3).remove(QRegExp("(?!\\d[\\.\\,][1-9]+)0+$")).remove(QRegExp("[\\.\\,]$")));
+                break;
+            default:
+                table->setString(row, i, v.toString());
+                break;
+            }
+        }
+    }
 }
 
 bool C5Database::update(const QString &tableName, const QString &whereClause)
@@ -303,6 +347,22 @@ int C5Database::insert(const QString &tableName, bool returnId)
     } else {
         return 1;
     }
+}
+
+bool C5Database::replaceInto(const QString &tableName)
+{
+    QString sql = "replace into " + tableName + " values ( ";
+    bool first = true;
+    for (QMap<QString, QVariant>::const_iterator it = fBindValues.begin(); it != fBindValues.end(); it++) {
+        if (first) {
+            first = false;
+        } else {
+            sql += ",";
+        }
+        sql += it.key();
+    }
+    sql += ")";
+    return exec(sql);
 }
 
 bool C5Database::insertId(const QString &tableName, const QVariant &id)

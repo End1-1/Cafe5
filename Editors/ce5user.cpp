@@ -15,3 +15,17 @@ CE5User::~CE5User()
 {
     delete ui;
 }
+
+bool CE5User::checkData(QString &err)
+{
+    bool result = CE5Editor::checkData(err);
+    C5Database db(fDBParams);
+    db[":f_id"] = ui->leCode->text();
+    db[":f_login"] = ui->leLogin->text();
+    db.exec("select * from s_user where f_login=:f_login and length(f_login)>0 and f_id<>:f_id");
+    if (db.nextRow()) {
+        err += tr("Duplicate login name") + "<br>";
+        result = false;
+    }
+    return result;
+}

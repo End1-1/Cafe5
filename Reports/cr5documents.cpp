@@ -58,6 +58,8 @@ CR5Documents::CR5Documents(const QStringList &dbParams, QWidget *parent) :
     fColumnsVisible["h.f_createdate"] = true;
     fColumnsVisible["h.f_createtime"] = true;
 
+    fOrderCondition = " order by h.f_date, f_docnum ";
+
     connect(this, SIGNAL(tblDoubleClicked(int,int,QList<QVariant>)), this, SLOT(tblDoubleClicked(int,int,QList<QVariant>)));
 
     restoreColumnsVisibility();
@@ -97,6 +99,14 @@ QMenu *CR5Documents::buildTableViewContextMenu(const QPoint &point)
     connect(a, SIGNAL(triggered()), this, SLOT(copySelectedDocs()));
     m->addAction(a);
     return m;
+}
+
+void CR5Documents::restoreColumnsWidths()
+{
+    C5Grid::restoreColumnsWidths();
+    if (fColumnsVisible["h.f_id"]) {
+        fTableView->setColumnWidth(fModel->fColumnNameIndex["f_id"], 0);
+    }
 }
 
 void CR5Documents::tblDoubleClicked(int row, int column, const QList<QVariant> &values)

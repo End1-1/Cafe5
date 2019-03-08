@@ -14,6 +14,8 @@ public:
 
     QToolBar *toolBar();
 
+    virtual void restoreColumnsWidths();
+
 private:
     CR5SaleFromStoreFilter *fFilter;
 

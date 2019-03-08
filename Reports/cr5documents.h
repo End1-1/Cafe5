@@ -15,6 +15,8 @@ public:
 protected:
     virtual QMenu *buildTableViewContextMenu(const QPoint &point);
 
+    virtual void restoreColumnsWidths();
+
 protected slots:
     virtual void tblDoubleClicked(int row, int column, const QList<QVariant> &values);
 

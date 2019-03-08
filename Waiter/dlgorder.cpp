@@ -1,5 +1,6 @@
 #include "dlgorder.h"
 #include "ui_dlgorder.h"
+#include "c5cafecommon.h"
 #include "c5user.h"
 #include "c5witerconf.h"
 #include "c5menu.h"
@@ -7,9 +8,12 @@
 #include "dlgdishremovereason.h"
 #include "c5dishtabledelegate.h"
 #include "c5ordertabledelegate.h"
+#include "c5part2tabledelegate.h"
 #include "dlgpayment.h"
 #include "dlgpassword.h"
+#include "dlgguest.h"
 #include "dlglistofdishcomments.h"
+#include "dlgface.h"
 #include "dlglistofmenu.h"
 #include <QCloseEvent>
 #include <QScrollBar>
@@ -25,6 +29,7 @@ DlgOrder::DlgOrder(QWidget *parent) :
 {
     ui->setupUi(this);
     fOrder = new C5Order();
+    ui->btnGuest->setVisible(C5Config::useHotel());
 }
 
 DlgOrder::~DlgOrder()
@@ -35,13 +40,20 @@ DlgOrder::~DlgOrder()
 
 void DlgOrder::openTable(const QJsonObject &table, C5User *user)
 {
+    QJsonObject hall = C5CafeCommon::hall(table["f_hall"].toString());
+    if (hall.count() > 0) {
+        C5Config::setServiceFactor(C5CafeCommon::fHallConfigs[hall["f_settings"].toString().toInt()][param_service_factor]);
+        QString menuName = C5Menu::fMenuNames[C5CafeCommon::fHallConfigs[hall["f_settings"].toString().toInt()][param_default_menu]];
+        C5Config::setValue(param_default_menu_name, menuName);
+    }
     DlgOrder *d = new DlgOrder(C5Config::fParentWidget);
-    d->fMenuName = C5WaiterConf::fDefaultMenu;
+    d->fMenuName = C5Config::defaultMenuName();
     d->showFullScreen();
     d->hide();
     qApp->processEvents();
     d->ui->tblPart1->fitRowToHeight();
     d->ui->tblPart1->fitColumnsToWidth();
+    d->ui->tblPart2->setItemDelegate(new C5Part2TableDelegate());
     d->ui->tblPart2->horizontalHeader()->setDefaultSectionSize(PART2_COL_WIDTH);
     d->ui->tblPart2->fitColumnsToWidth();
     d->ui->tblPart2->verticalHeader()->setDefaultSectionSize(PART2_ROW_HEIGHT);
@@ -86,6 +98,10 @@ void DlgOrder::load(int table)
 
 void DlgOrder::buildMenu(const QString &menu, QString part1, QString part2)
 {
+    if (menu.isEmpty()) {
+        C5Message::error(tr("Menu is not defined"));
+        return;
+    }
     QStringList p1 = C5Menu::fMenu[menu].keys();
     int col = 0, row = 0;
     ui->tblPart1->clear();
@@ -115,10 +131,22 @@ void DlgOrder::buildMenu(const QString &menu, QString part1, QString part2)
         if (row > ui->tblPart2->rowCount() - 1) {
             ui->tblPart2->setRowCount(row + 1);
         }
-        ui->tblPart2->setItem(row, col++, new QTableWidgetItem(s));
+        QTableWidgetItem *item = new QTableWidgetItem(s);
+        item->setData(Qt::UserRole, C5Menu::fPart2Color[s]);
+        ui->tblPart2->setItem(row, col++, item);
         if (col == colCount) {
             col = 0;
             row ++;
+        }
+    }
+    if (ui->tblPart2->rowCount() > 0) {
+        for (int i = 0; i < ui->tblPart2->columnCount(); i++) {
+            QTableWidgetItem *item = ui->tblPart2->item(ui->tblPart2->rowCount() - 1, i);
+            if (!item) {
+                item = new QTableWidgetItem("");
+                item->setData(Qt::UserRole, -1);
+                ui->tblPart2->setItem(ui->tblPart2->rowCount() - 1, i, item);
+            }
         }
     }
 
@@ -150,7 +178,7 @@ void DlgOrder::addDishToOrder(const QJsonObject &obj)
 {
     QJsonObject o = obj;
     if (obj["f_id"].toString().toInt() == 0) {
-        o["f_id"] = "0";
+        o["f_id"] = "";
         o["f_header"] = fOrder->headerValue("f_id");
         o["f_state"] = QString::number(DISH_STATE_OK);
         o["f_service"] = C5Config::serviceFactor();
@@ -568,4 +596,31 @@ void DlgOrder::on_btnChangeMenu_clicked()
     }
     fMenuName = menu;
     buildMenu(menu, "", "");
+}
+
+void DlgOrder::on_btnChangeTable_clicked()
+{
+    int tableId;
+    if (!DlgFace::getTable(tableId)) {
+        return;
+    }
+    QJsonObject table = C5CafeCommon::table(tableId);
+    if (table.count() > 0) {
+        QJsonObject hall = C5CafeCommon::hall(table["f_hall"].toString());
+        if (hall.count() > 0) {
+            C5Config::setServiceFactor(C5CafeCommon::fHallConfigs[hall["f_settings"].toString().toInt()][param_service_factor]);
+            QString menuName = C5Menu::fMenuNames[C5CafeCommon::fHallConfigs[hall["f_settings"].toString().toInt()][param_default_menu]];
+            if (fMenuName != menuName) {
+                fMenuName = menuName;
+                buildMenu(fMenuName, "", "");
+            }
+        }
+    }
+    load(tableId);
+}
+
+void DlgOrder::on_btnGuest_clicked()
+{
+    QString res, inv, room, guest;
+    DlgGuest::getGuest(res, inv, room, guest);
 }

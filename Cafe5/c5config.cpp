@@ -83,6 +83,11 @@ QString C5Config::serviceFactor()
     return getValue(param_service_factor);
 }
 
+void C5Config::setServiceFactor(const QString &value)
+{
+    setValue(param_service_factor, value);
+}
+
 QStringList C5Config::dbParams()
 {
     QStringList params;
@@ -103,9 +108,34 @@ int C5Config::defaultStore()
     return getValue(param_default_store).toInt();
 }
 
+bool C5Config::useHotel()
+{
+    return !getValue(param_hotel_database).isEmpty();
+}
+
+QString C5Config::hotelDatabase()
+{
+    return getValue(param_hotel_database);
+}
+
+QString C5Config::serverIP()
+{
+    return getRegValue("server_ip").toString();
+}
+
+void C5Config::setServerIP(const QString &ip)
+{
+    setRegValue("server_ip", ip);
+}
+
 int C5Config::defaultMenu()
 {
     return getValue(param_default_menu).toInt();
+}
+
+QString C5Config::defaultMenuName()
+{
+    return getValue(param_default_menu_name);
 }
 
 QString C5Config::defaultHall()
@@ -153,6 +183,12 @@ void C5Config::setRegValue(const QString &key, const QVariant &value)
 {
     QSettings s(_ORGANIZATION_, _APPLICATION_+ QString("\\") + _MODULE_);
     s.setValue(key, value);
+}
+
+void C5Config::setValue(int key, const QString &value)
+{
+    QMutexLocker ml(&settingsMutex);
+    fSettings[key] = value;
 }
 
 QString C5Config::getValue(int key)

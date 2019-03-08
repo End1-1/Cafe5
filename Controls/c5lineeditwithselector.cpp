@@ -1,12 +1,14 @@
 #include "c5lineeditwithselector.h"
 #include "c5selector.h"
 #include "c5cache.h"
+#include "c5widget.h"
 
 C5LineEditWithSelector::C5LineEditWithSelector(QWidget *parent) :
     C5LineEdit(parent)
 {
     fCache = 0;
     fNameLineEdit = 0;
+    fWidget = 0;
 }
 
 C5LineEditWithSelector::~C5LineEditWithSelector()
@@ -23,6 +25,11 @@ void C5LineEditWithSelector::setSelector(const QStringList &dbParams, QLineEdit 
     fColumnName = colName;
 }
 
+void C5LineEditWithSelector::setCallbackWidget(C5Widget *w)
+{
+    fWidget = w;
+}
+
 void C5LineEditWithSelector::setValue(const QString &id)
 {
     setText(id);
@@ -36,6 +43,9 @@ void C5LineEditWithSelector::setValue(const QString &id)
     } else {
         clear();
         fNameLineEdit->clear();
+    }
+    if (fWidget && row > -1) {
+        fWidget->selectorCallback(0, c->getRow(row));
     }
 }
 
@@ -63,6 +73,9 @@ void C5LineEditWithSelector::mouseDoubleClickEvent(QMouseEvent *e)
     setText(values.at(fColumnId).toString());
     if (fNameLineEdit) {
         fNameLineEdit->setText(values.at(fColumnName).toString());
+    }
+    if (fWidget && values.count() > 0) {
+        fWidget->selectorCallback(0, values);
     }
     emit done(values);
 }

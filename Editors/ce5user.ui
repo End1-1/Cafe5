@@ -55,7 +55,7 @@
     </widget>
    </item>
    <item row="0" column="1">
-    <widget class="C5LineEditWithSelector" name="lineEdit">
+    <widget class="C5LineEditWithSelector" name="leCode">
      <property name="Field" stdset="0">
       <string>f_id</string>
      </property>
@@ -89,7 +89,7 @@
     </widget>
    </item>
    <item row="5" column="1" colspan="2">
-    <widget class="C5LineEditWithSelector" name="lineEdit_6">
+    <widget class="C5LineEditWithSelector" name="leLogin">
      <property name="Field" stdset="0">
       <string>f_login</string>
      </property>
@@ -158,12 +158,12 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>lineEdit</tabstop>
+  <tabstop>leCode</tabstop>
   <tabstop>leState</tabstop>
   <tabstop>leGroup</tabstop>
   <tabstop>lineEdit_4</tabstop>
   <tabstop>lineEdit_5</tabstop>
-  <tabstop>lineEdit_6</tabstop>
+  <tabstop>leLogin</tabstop>
   <tabstop>leGroupName</tabstop>
   <tabstop>leStateName</tabstop>
  </tabstops>

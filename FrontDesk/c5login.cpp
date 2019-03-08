@@ -42,7 +42,6 @@ void C5Login::on_btnOk_clicked()
     __usergroup = db.getInt(1);
     __username = db.getString(3);
 
-    C5Permissions::init(db);
     C5Config::fLastUsername = ui->leUsername->text();
     C5Connection::writeParams();
 

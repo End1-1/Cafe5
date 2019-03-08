@@ -1,5 +1,6 @@
 #include "dlgface.h"
 #include "c5connection.h"
+#include "c5sockethandler.h"
 #include <QApplication>
 #include <QTranslator>
 #include <QMessageBox>
@@ -25,6 +26,7 @@ int main(int argc, char *argv[])
         C5Config::fDBPassword = connectionParams.at(3);
         C5Config::fSettingsName = connectionParams.at(4);
         C5Config::initParamsFromDb();
+        C5SocketHandler::setServerAddress(C5Config::serverIP());
     } else {
         C5Dialog::go<C5Connection>(C5Config::dbParams());
     }

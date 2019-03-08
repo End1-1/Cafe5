@@ -22,38 +22,35 @@ void C5PrintReceiptThread::run()
 
     p.image("./logo_receipt.png", Qt::AlignHCenter);
     p.br();
-    p.ltext(fHeader["f_firmname"].toString(), 0);
-    p.br();
-    p.ltext(fHeader["f_address"].toString(), 0);
-    p.br();
-    p.ltext(tr("Department"), 0);
-    p.rtext(fHeader["f_dept"].toString());
-    p.br();
-    p.ltext(tr("Tax number"), 0);
-    p.rtext(fHeader["f_hvhh"].toString());
-    p.br();
-    p.ltext(tr("Device number"), 0);
-    p.rtext(fHeader["f_devnum"].toString());
-    p.br();
-    p.ltext(tr("Serial"), 0);
-    p.rtext(fHeader["f_serial"].toString());
-    p.br();
-    p.ltext(tr("Fiscal"), 0);
-    p.rtext(fHeader["f_fiscal"].toString());
-    p.br();
-    p.ltext(tr("Receipt number"), 0);
-    p.rtext(fHeader["f_receiptnumber"].toString());
-    p.br();
-    p.ltext(tr("Date"), 0);
-    p.rtext(fHeader["f_taxtime"].toString());
-    p.br();
-    p.ltext(tr("(F)"), 0);
-    p.br();
-    p.line();
-#ifdef QT_DEBUG
-    p.br();
-    p.line(0, p.fTop, 350, p.fTop);
-#endif
+    if (fHeader["f_printtax"].toString().toInt()) {
+        p.ltext(fHeader["f_firmname"].toString(), 0);
+        p.br();
+        p.ltext(fHeader["f_address"].toString(), 0);
+        p.br();
+        p.ltext(tr("Department"), 0);
+        p.rtext(fHeader["f_dept"].toString());
+        p.br();
+        p.ltext(tr("Tax number"), 0);
+        p.rtext(fHeader["f_hvhh"].toString());
+        p.br();
+        p.ltext(tr("Device number"), 0);
+        p.rtext(fHeader["f_devnum"].toString());
+        p.br();
+        p.ltext(tr("Serial"), 0);
+        p.rtext(fHeader["f_serial"].toString());
+        p.br();
+        p.ltext(tr("Fiscal"), 0);
+        p.rtext(fHeader["f_fiscal"].toString());
+        p.br();
+        p.ltext(tr("Receipt number"), 0);
+        p.rtext(fHeader["f_receiptnumber"].toString());
+        p.br();
+        p.ltext(tr("Date"), 0);
+        p.rtext(fHeader["f_taxtime"].toString());
+        p.br();
+        p.ltext(tr("(F)"), 0);
+        p.br();
+    }
     p.br(1);
     p.ltext(tr("Order"), 0);
     p.rtext(QString("%1%2").arg(fHeader["f_prefix"].toString()).arg(fHeader["f_hallid"].toString()));
@@ -151,7 +148,51 @@ void C5PrintReceiptThread::run()
         }
     }
 
+    p.br();
+    if (fHeader["f_amountcash"].toString().toDouble() > 0.001) {
+        p.ltext(tr("Payment, cash"), 0);
+        p.rtext(float_str(fHeader["f_amountcash"].toString().toDouble(), 2));
+    }
+    if (fHeader["f_amountcard"].toString().toDouble() > 0.001) {
+        p.ltext(tr("Payment, card"), 0);
+        p.rtext(float_str(fHeader["f_amountcard"].toString().toDouble(), 2));
+    }
+    if (fHeader["f_amountbank"].toString().toDouble() > 0.001) {
+        p.ltext(tr("Bank transfer"), 0);
+        p.rtext(float_str(fHeader["f_amountbank"].toString().toDouble(), 2));
+    }
+    p.br();
+
+    if (!fHeader["f_other_room"].toString().isEmpty()) {
+        p.br();
+        p.ctext(tr("Transfer to room"));
+        p.br();
+        p.ctext(fHeader["f_other_room"].toString() + ", " + fHeader["f_other_guest"].toString());
+        p.br(p.fLineHeight * 5);
+        p.line(3);
+        p.ctext(tr("Signature"));
+        p.br(p.fLineHeight * 2);
+    }
+
+    if (!fHeader["f_other_clcode"].toString().isEmpty()) {
+        p.br();
+        p.ctext(tr("City ledger"));
+        p.br();
+        p.ctext(fHeader["f_other_clcode"].toString() + ", " + fHeader["f_other_clname"].toString());
+        p.br(p.fLineHeight * 3);
+    }
+
+    if (fHeader["f_otherid"].toString().toInt() == PAYOTHER_COMPLIMENTARY) {
+        p.br();
+        p.ctext(tr("Complimentary"));
+        p.br(p.fLineHeight * 5);
+        p.line(3);
+        p.ctext(tr("Signature"));
+        p.br(p.fLineHeight * 2);
+    }
+
     p.setFontBold(true);
+    p.br(p.fLineHeight * 3);
     p.ltext(tr("Thank you for visit!"), 0);
     p.rtext(fHeader["f_print"].toString());
     p.br();

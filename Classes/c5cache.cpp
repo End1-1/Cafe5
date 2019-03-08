@@ -12,7 +12,12 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         setCacheSimpleQuery(cache_users_groups, "s_user_group");
         setCacheSimpleQuery(cache_users_states, "s_user_state");
         setCacheSimpleQuery(cache_dish_part1, "d_part1");
-        setCacheSimpleQuery(cache_dish_part2, "d_part2");
+        fCacheQuery[cache_dish_part2] = QString("select p2.f_id `%1`, p2.f_name as `%2`, p1.f_name `%3` "
+                                        "from d_part2 p2 "
+                                        "left join d_part1 p1 on p1.f_id=p2.f_part ")
+                .arg(tr("Code"))
+                .arg(tr("Name"))
+                .arg(tr("Part"));
         fCacheQuery[cache_goods_unit] = "select f_id, f_name from c_units";
         fCacheQuery[cache_goods_group] = "select f_id, f_name from c_groups";
         fCacheQuery[cache_goods] = QString("select g.f_id as `%1`, gg.f_name as `%2`, g.f_name as `%3`, u.f_name as `%4` \
@@ -71,6 +76,8 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         setCacheSimpleQuery(cache_hall_list, "h_halls");
         setCacheSimpleQuery(cache_dish_comments, "d_dish_comment");
         setCacheSimpleQuery(cache_menu_names, "d_menu_names");
+        setCacheSimpleQuery(cache_halls, "h_halls");
+        setCacheSimpleQuery(cache_tables, "h_tables");
     }
     if (fTableCache.count() == 0) {
         fTableCache["c_partners"] = cache_goods_partners;
@@ -93,6 +100,8 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         fTableCache["d_dish_comment"] = cache_dish_comments;
         fTableCache["s_db"] = cache_s_db;
         fTableCache["d_menu_names"] = cache_menu_names;
+        fTableCache["h_halls"] = cache_halls;
+        fTableCache["h_tables"] = cache_tables;
     }
     fVersion = 0;
     C5Database db(dbParams);

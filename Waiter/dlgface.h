@@ -25,6 +25,8 @@ public:
 
     void reject();
 
+    static bool getTable(int &tableId);
+
 private slots:
 
     void timeout();
@@ -55,6 +57,8 @@ private slots:
 
     void on_btnReports_clicked();
 
+    void on_btnCancel_clicked();
+
 private:
     Ui::DlgFace *ui;
 
@@ -65,6 +69,10 @@ private:
     QTimer fTimer;
 
     bool fCanClose;
+
+    bool fModeJustSelectTable;
+
+    QJsonObject fSelectedTable;
 
     void filterHall(const QString &hall);
 };

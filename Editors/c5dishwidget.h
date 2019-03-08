@@ -26,6 +26,7 @@ public:
 
     void setDish(int id);
 
+    virtual void selectorCallback(int row, const QList<QVariant> &values);
 
     virtual bool save(QString &err, QList<QMap<QString, QVariant> > &data);
 
@@ -37,6 +38,8 @@ private slots:
     void setColor();
 
     void on_btnNewType_clicked();
+
+    void recipeQtyPriceChanged(const QString &arg);
 
 private:
     Ui::C5DishWidget *ui;

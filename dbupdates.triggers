@@ -1,0 +1,71 @@
+alter table h_halls add column a timestamp;
+alter table h_tables add column a timestamp;
+alter table c_goods add column a timestamp;
+alter table c_groups add column a timestamp;
+delimiter //
+drop trigger if exists h_halls_before_insert //
+drop trigger if exists h_halls_before_update //
+drop trigger if exists h_tables_before_insert //
+drop trigger if exists h_tables_before_update //
+drop trigger if exists c_groups_before_insert //
+drop trigger if exists c_groups_before_update //
+drop trigger if exists c_goods_before_insert //
+drop trigger if exists c_goods_before_update //
+
+CREATE  TRIGGER `h_halls_before_insert`
+BEFORE INSERT ON `h_halls` 
+FOR EACH ROW 
+BEGIN
+set NEW.a = current_timestamp();
+END; //
+
+CREATE  TRIGGER `h_halls_before_update`
+BEFORE update ON `h_halls` 
+FOR EACH ROW 
+BEGIN
+set NEW.a = current_timestamp();
+END; //
+
+CREATE  TRIGGER `h_tables_before_insert`
+BEFORE INSERT ON `h_tables` 
+FOR EACH ROW 
+BEGIN
+set NEW.a = current_timestamp();
+END; //
+
+CREATE  TRIGGER `h_tables_before_update`
+BEFORE update ON `h_tables` 
+FOR EACH ROW 
+BEGIN
+set NEW.a = current_timestamp();
+END; //
+
+CREATE  TRIGGER `c_goods_before_insert`
+BEFORE INSERT ON `c_goods` 
+FOR EACH ROW 
+BEGIN
+set NEW.a = current_timestamp();
+END; //
+
+CREATE  TRIGGER `c_goods_before_update`
+BEFORE update ON `c_goods` 
+FOR EACH ROW 
+BEGIN
+set NEW.a = current_timestamp();
+END; //
+
+CREATE  TRIGGER `c_groups_before_insert`
+BEFORE INSERT ON `c_groups` 
+FOR EACH ROW 
+BEGIN
+set NEW.a = current_timestamp();
+END; //
+
+CREATE  TRIGGER `c_groups_before_update`
+BEFORE update ON `c_groups` 
+FOR EACH ROW 
+BEGIN
+set NEW.a = current_timestamp();
+END; //
+
+delimiter ;

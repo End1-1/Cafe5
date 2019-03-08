@@ -1,6 +1,7 @@
 #include "cr5dish.h"
 #include "c5dishwidget.h"
 #include "c5tablemodel.h"
+#include "cr5menutranslator.h"
 #include <QAbstractScrollArea>
 
 CR5Dish::CR5Dish(const QStringList &dbParams, QWidget *parent) :
@@ -36,6 +37,7 @@ QToolBar *CR5Dish::toolBar()
             << ToolBarButtons::tbExcel
             << ToolBarButtons::tbPrint;
             createStandartToolbar(btn);
+        fToolBar->addAction(QIcon(":/translate.png"), tr("Translator"), this, SLOT(translator()));
     }
     return fToolBar;
 }
@@ -66,4 +68,9 @@ void CR5Dish::setColors()
     for (int i = 0, count = fModel->rowCount(); i < count; i++) {
         fModel->setRowColor(i, QColor::fromRgb(fModel->data(i, fModel->indexForColumnName("f_color"), Qt::EditRole).toInt()));
     }
+}
+
+void CR5Dish::translator()
+{
+    __mainWindow->createTab<CR5MenuTranslator>(fDBParams);
 }

@@ -89,8 +89,11 @@ void C5Printing::setFontSize(int size)
     fJsonData.append(o);
 }
 
-void C5Printing::line(qreal x1, qreal y1, qreal x2, qreal y2)
+void C5Printing::line(qreal x1, qreal y1, qreal x2, qreal y2, int lineWidth)
 {
+    if (lineWidth > 0) {
+        fLinePen.setWidth(lineWidth);
+    }
     fCanvas->addLine(x1, y1, x2, y2, fLinePen);
 
     QJsonObject o;
@@ -99,15 +102,17 @@ void C5Printing::line(qreal x1, qreal y1, qreal x2, qreal y2)
     o["y1"] = y1;
     o["x2"] = x2;
     o["y2"] = y2;
+    o["width"] = lineWidth;
     fJsonData.append(o);
 }
 
-void C5Printing::line()
+void C5Printing::line(int lineWidth)
 {
-    line(0, fTop, fNormalWidth, fTop);
+    line(0, fTop, fNormalWidth, fTop, lineWidth);
 
     QJsonObject o;
     o["cmd"] = "line2";
+    o["width"] = lineWidth;
     fJsonData.append(o);
 }
 

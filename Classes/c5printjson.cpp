@@ -39,9 +39,9 @@ void C5PrintJson::run()
         } else if (jo["cmd"].toString() == "print") {
             p.print(jo["printer"].toString(), static_cast<QPrinter::PageSize>(jo["pagesize"].toInt()));
         } else if (jo["cmd"].toString() == "line1") {
-            p.line(jo["x1"].toDouble(), jo["y1"].toDouble(), jo["x2"].toDouble(), jo["y2"].toDouble());
+            p.line(jo["x1"].toDouble(), jo["y1"].toDouble(), jo["x2"].toDouble(), jo["y2"].toDouble(), jo["width"].toInt());
         } else if (jo["cmd"].toString() == "line2") {
-            p.line();
+            p.line(jo["width"].toInt());
         }
     }
 }

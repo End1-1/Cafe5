@@ -6,6 +6,7 @@
 #include "c5config.h"
 #include "c5connection.h"
 #include <QShortcut>
+#include <QInputDialog>
 
 QMap<QString, Goods> fGoods;
 
@@ -115,6 +116,13 @@ void Working::on_btnNewOrder_clicked()
 
 void Working::on_btnConnection_clicked()
 {
+    if (C5Config::fDBPassword.length() > 0) {
+        QString password = QInputDialog::getText(this, tr("Password"), tr("Password"), QLineEdit::Password);
+        if (C5Config::fDBPassword != password) {
+            C5Message::error(tr("Access denied"));
+            return;
+        }
+    }
     const QStringList dbParams;
     C5Connection *cnf = new C5Connection(dbParams, this);
     cnf->exec();

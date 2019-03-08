@@ -24,9 +24,9 @@ public:
 
     void setFontSize(int size);
 
-    void line(qreal x1, qreal y1, qreal x2, qreal y2);
+    void line(qreal x1, qreal y1, qreal x2, qreal y2, int lineWidth = -1);
 
-    void line();
+    void line(int lineWidth = -1);
 
     void tableText(const QList<qreal> &points, const QStringList &vals, int rowHeight);
 

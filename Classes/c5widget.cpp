@@ -119,3 +119,13 @@ bool C5Widget::event(QEvent *event)
     }
     return QWidget::event(event);
 }
+
+void C5Widget::changeDatabase(const QStringList &dbParams)
+{
+    fDBParams = dbParams;
+}
+
+bool C5Widget::allowChangeDatabase()
+{
+    return true;
+}

@@ -41,5 +41,11 @@
         <file>credit-card.png</file>
         <file>discount.png</file>
         <file>data-transfer.png</file>
+        <file>hall.png</file>
+        <file>table.png</file>
+        <file>access.png</file>
+        <file>constructor.png</file>
+        <file>translate.png</file>
+        <file>logout.png</file>
     </qresource>
 </RCC>

@@ -156,3 +156,28 @@ void C5GroupPermissionsEditor::on_chMenu_clicked(bool checked)
 {
     setChecked(400, 499, checked);
 }
+
+void C5GroupPermissionsEditor::on_chGoods_clicked(bool checked)
+{
+    setChecked(600, 699, checked);
+}
+
+void C5GroupPermissionsEditor::on_chActions_clicked(bool checked)
+{
+    setChecked(200, 299, checked);
+}
+
+void C5GroupPermissionsEditor::on_chWaiterAllItems_clicked(bool checked)
+{
+    setChecked(500, 599, checked);
+}
+
+void C5GroupPermissionsEditor::on_chREportsAllItems_clicked(bool checked)
+{
+    setChecked(300, 399, checked);
+}
+
+void C5GroupPermissionsEditor::on_chOtherAllItems_clicked(bool checked)
+{
+    setChecked(700, 799, checked);
+}

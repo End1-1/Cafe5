@@ -95,9 +95,7 @@ bool WOrder::writeOrder(bool tax)
             db[":f_time"] = time;
             db.insert("o_tax", false);
         } else {
-            C5Message::error(err);
-            C5Message::error(jsonOut);
-            C5Message::error(jsonIn);
+            C5Message::error(err + "<br>" + jsonOut + "<br>" + jsonIn);
             return false;
         }
     }
@@ -137,6 +135,7 @@ bool WOrder::writeOrder(bool tax)
         db[":f_qty"] = ui->tblGoods->getDouble(i, 2);
         db[":f_price"] = ui->tblGoods->getDouble(i, 4);
         db[":f_total"] = ui->tblGoods->getDouble(i, 5);
+        db[":f_tax"] = (int) tax;
         db.insert("o_goods", false);
     }
     db.commit();

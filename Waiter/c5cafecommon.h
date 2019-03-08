@@ -4,6 +4,8 @@
 #include <QString>
 #include <QPixmap>
 #include <QJsonArray>
+#include <QJsonObject>
+#include <QMap>
 
 typedef struct {
     int id;
@@ -22,6 +24,12 @@ public:
 
     static QString creditCardName(int id);
 
+    static QJsonObject table(const QString &id);
+
+    static QJsonObject table(int id);
+
+    static QJsonObject hall(const QString &id);
+
     static QStringList fDishRemoveReason;
 
     static QStringList fDishComments;
@@ -29,6 +37,8 @@ public:
     static QJsonArray fHalls;
 
     static QJsonArray fTables;
+
+    static QMap<int, QMap<int, QString> > fHallConfigs;
 };
 
 #endif // C5CAFECOMMON_H

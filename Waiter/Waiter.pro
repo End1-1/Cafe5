@@ -19,6 +19,7 @@ DEFINES += _DBDRIVER_=\\\"QMYSQL\\\"
 DEFINES += _ORGANIZATION_=\\\"Jazzve\\\"
 DEFINES += _APPLICATION_=\\\"Cafe5\\\"
 DEFINES += _MODULE_=\\\"WAITER\\\"
+DEFINES += WAITER
 # DEFINES += LOGGING
 
 QMAKE_CXXFLAGS += -Werror
@@ -91,7 +92,12 @@ SOURCES += \
     ../Classes/c5printjson.cpp \
     dlgreports.cpp \
     dlgreportslist.cpp \
-    dlglistofmenu.cpp
+    dlglistofmenu.cpp \
+    ../Classes/c5part2tabledelegate.cpp \
+    dlgguest.cpp \
+    ../Classes/rkeyboard.cpp \
+    dlgreceiptlanguage.cpp \
+    dlgcl.cpp
 
 HEADERS += \
         dlgface.h \
@@ -151,7 +157,12 @@ HEADERS += \
     ../Classes/c5printjson.h \
     dlgreports.h \
     dlgreportslist.h \
-    dlglistofmenu.h
+    dlglistofmenu.h \
+    ../Classes/c5part2tabledelegate.h \
+    dlgguest.h \
+    ../Classes/rkeyboard.h \
+    dlgreceiptlanguage.h \
+    dlgcl.h
 
 FORMS += \
         dlgface.ui \
@@ -173,7 +184,11 @@ FORMS += \
     dlglistofdishcomments.ui \
     dlgreports.ui \
     dlgreportslist.ui \
-    dlglistofmenu.ui
+    dlglistofmenu.ui \
+    dlgguest.ui \
+    ../Classes/rkeyboard.ui \
+    dlgreceiptlanguage.ui \
+    dlgcl.ui
 
 INCLUDEPATH += ../Cafe5
 INCLUDEPATH += ../Classes

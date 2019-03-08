@@ -27,6 +27,9 @@ private:
 
 private:
     void setColors();
+
+private slots:
+    void translator();
 };
 
 #endif // CR5DISH_H

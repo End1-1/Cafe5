@@ -31,6 +31,10 @@ private slots:
 
     void on_btnRemoveScaneCode_clicked();
 
+    void on_btnNewGroup_clicked();
+
+    void on_btnNewUnit_clicked();
+
 private:
     Ui::CE5Goods *ui;
 };

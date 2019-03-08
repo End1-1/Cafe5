@@ -33,6 +33,16 @@ private slots:
 
     void on_chMenu_clicked(bool checked);
 
+    void on_chGoods_clicked(bool checked);
+
+    void on_chActions_clicked(bool checked);
+
+    void on_chWaiterAllItems_clicked(bool checked);
+
+    void on_chREportsAllItems_clicked(bool checked);
+
+    void on_chOtherAllItems_clicked(bool checked);
+
 private:
     Ui::C5GroupPermissionsEditor *ui;
 

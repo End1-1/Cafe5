@@ -23,6 +23,7 @@ C5Connection::C5Connection(const QStringList &dbParams, QWidget *parent) :
         on_btnRefreshSettings_clicked();
         ui->cbSettings->setCurrentText(params.at(4));
     }
+    ui->leServer->setText(C5Config::serverIP());
 }
 
 C5Connection::~C5Connection()
@@ -112,6 +113,7 @@ void C5Connection::on_btnSave_clicked()
     C5Config::initParamsFromDb();
     writeParams();
     C5Message::info(tr("Saved"));
+    C5Config::setServerIP(ui->leServer->text());
 }
 
 void C5Connection::on_btnInit_clicked()

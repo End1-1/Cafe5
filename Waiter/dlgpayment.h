@@ -51,6 +51,16 @@ private slots:
 
     void on_btnDiscount_clicked();
 
+    void on_btnPayComplimentary_clicked();
+
+    void on_btnPayTransferToRoom_clicked();
+
+    void on_btnReceiptLanguage_clicked();
+
+    void on_btnTax_clicked();
+
+    void on_btnPayCityLedger_clicked();
+
 private:
     Ui::DlgPayment *ui;
 
@@ -63,6 +73,14 @@ private:
     void checkTotal();
 
     bool checkForPaymentMethod(int mode, double &total);
+
+    void setLangIcon();
+
+    void setRoomComment();
+
+    void setCLComment();
+
+    void setTaxState();
 };
 
 #endif // DLGPAYMENT_H

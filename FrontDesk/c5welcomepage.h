@@ -16,6 +16,8 @@ public:
 
     ~C5WelcomePage();
 
+    void setDatabaseName(const QString &database);
+
 private slots:
     void on_btnNewStoreInput_clicked();
 
@@ -36,6 +38,8 @@ private slots:
     void on_btnGoodsOutputBySales_clicked();
 
     void on_btnSalesCommon_clicked();
+
+    void on_btnDatabase_clicked();
 
 private:
     Ui::C5WelcomePage *ui;

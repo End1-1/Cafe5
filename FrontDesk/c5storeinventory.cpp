@@ -71,6 +71,11 @@ bool C5StoreInventory::removeDoc(const QStringList &dbParams, QString id)
     return true;
 }
 
+bool C5StoreInventory::allowChangeDatabase()
+{
+    return false;
+}
+
 void C5StoreInventory::saveDoc()
 {
     C5Database db(fDBParams);

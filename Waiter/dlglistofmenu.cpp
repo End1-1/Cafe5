@@ -42,6 +42,7 @@ void DlgListOfMenu::on_lst_clicked(const QModelIndex &index)
     }
     if (index.row() == ui->lst->count() - 1) {
         reject();
+        return;
     }
     fMenuId = index.data(Qt::DisplayRole).toString();
     accept();

@@ -95,3 +95,13 @@ void CE5Goods::on_btnRemoveScaneCode_clicked()
     }
     delete ui->lstCodes->currentItem();
 }
+
+void CE5Goods::on_btnNewGroup_clicked()
+{
+
+}
+
+void CE5Goods::on_btnNewUnit_clicked()
+{
+
+}

@@ -25,6 +25,8 @@ DlgFace::DlgFace(QWidget *parent) :
 {
     ui->setupUi(this);
     fCanClose = false;
+    ui->btnCancel->setVisible(false);
+    fModeJustSelectTable = false;
 }
 
 DlgFace::~DlgFace()
@@ -79,6 +81,27 @@ void DlgFace::reject()
     on_btnExit_clicked();
 }
 
+bool DlgFace::getTable(int &tableId)
+{
+    bool result = false;
+    DlgFace *df = new DlgFace(__mainWindow);
+    df->ui->lbDate->setVisible(false);
+    df->ui->btnConnection->setVisible(false);
+    df->ui->btnReports->setVisible(false);
+    df->ui->btnExit->setVisible(false);
+    df->ui->btnCancel->setVisible(true);
+    df->fModeJustSelectTable = true;
+    df->showFullScreen();
+    df->hide();
+    df->setup();
+    result = df->exec() == QDialog::Accepted;
+    if (result) {
+        tableId = df->fSelectedTable["f_id"].toString().toInt();
+    }
+    delete df;
+    return result;
+}
+
 void DlgFace::timeout()
 {
     C5SocketHandler *sh = createSocketHandler(SLOT(handleHall(QJsonObject)));
@@ -109,6 +132,9 @@ void DlgFace::handleHall(const QJsonObject &obj)
 
 void DlgFace::handleMenu(const QJsonObject &obj)
 {
+    C5Menu::fMenu.clear();;
+    C5Menu::fMenuNames.clear();
+    C5Menu::fPart2Color.clear();
     sender()->deleteLater();
     QJsonArray jMenu = obj["menu"].toArray();
     for (int i = 0, count = jMenu.count(); i < count; i++) {
@@ -117,14 +143,29 @@ void DlgFace::handleMenu(const QJsonObject &obj)
                 [o["part1"].toString()]
                 [o["part2"].toString()]
                 .append(o);
+        C5Menu::fPart2Color[o["part2"].toString()] = o["type_color"].toString().toInt();
+    }
+    C5Menu::fPart2Color[""] = -1;
+    for (int i = 0; i < obj["menunames"].toArray().count(); i++) {
+        C5Menu::fMenuNames[obj["menunames"].toArray().at(i).toObject()["f_id"].toString()] = obj["menunames"].toArray().at(i).toObject()["f_name"].toString();
     }
 }
 
 void DlgFace::handleConf(const QJsonObject &obj)
 {
     sender()->deleteLater();
-    Q_UNUSED(obj)
-    C5WaiterConf::fDefaultMenu = QString::fromUtf8("Ռեստորան");
+    if (obj["reply"].toInt() == 0) {
+        return;
+    }
+    QStringList keys = obj["conf"].toObject().keys();
+    foreach (QString k, keys) {
+        C5Config::setValue(k.toInt(), obj["conf"].toObject()[k].toString());
+    }
+    QJsonArray ja = obj["otherconf"].toArray();
+    C5CafeCommon::fHallConfigs.clear();
+    for (int i = 0; i < ja.count(); i++) {
+        C5CafeCommon::fHallConfigs[ja.at(i).toObject()["f_settings"].toString().toInt()][ja.at(i).toObject()["f_key"].toString().toInt()] = ja.at(i).toObject()["f_value"].toString();
+    }
 }
 
 void DlgFace::handleCreditCards(const QJsonObject &obj)
@@ -182,6 +223,10 @@ void DlgFace::on_btnConnection_clicked()
 
 void DlgFace::on_btnExit_clicked()
 {
+    if (fModeJustSelectTable) {
+        reject();
+        return;
+    }
     if (C5Message::question(tr("Are you sure to close application")) == QDialog::Accepted) {
         fCanClose = true;
         qApp->quit();
@@ -224,6 +269,12 @@ void DlgFace::on_tblHall_itemClicked(QTableWidgetItem *item)
     if (o["f_id"].toString().toInt() == 0) {
         return;
     }
+    if (fModeJustSelectTable) {
+        fSelectedTable = o;
+        fCanClose = true;
+        accept();
+        return;
+    }
     C5User user;
     if (!DlgPassword::getUser(o["f_name"].toString(), &user)) {
         return;
@@ -254,4 +305,9 @@ void DlgFace::on_btnReports_clicked()
         return;
     }
     DlgReports::openReports(&user);
+}
+
+void DlgFace::on_btnCancel_clicked()
+{
+    on_btnExit_clicked();
 }

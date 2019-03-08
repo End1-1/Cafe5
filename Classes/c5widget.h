@@ -33,6 +33,10 @@ public:
 
     virtual bool event(QEvent *event);
 
+    virtual void changeDatabase(const QStringList &dbParams);
+
+    virtual bool allowChangeDatabase();
+
 protected:
     QToolBar *fToolBar;
 
@@ -48,6 +52,7 @@ protected:
 
 protected slots:
     virtual void print();
+
 };
 
 #endif // C5WIDGET_H

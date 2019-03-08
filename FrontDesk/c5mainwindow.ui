@@ -110,6 +110,9 @@
             <height>0</height>
            </size>
           </property>
+          <property name="contextMenuPolicy">
+           <enum>Qt::CustomContextMenu</enum>
+          </property>
           <property name="currentIndex">
            <number>-1</number>
           </property>
@@ -168,7 +171,9 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionConnection"/>
+   <addaction name="actionChange_password"/>
    <addaction name="actionLogin"/>
+   <addaction name="actionLogout"/>
    <addaction name="actionHome"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -219,6 +224,24 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Home</string>
+   </property>
+  </action>
+  <action name="actionLogout">
+   <property name="icon">
+    <iconset resource="../resources/res.qrc">
+     <normaloff>:/logout.png</normaloff>:/logout.png</iconset>
+   </property>
+   <property name="text">
+    <string>Logout</string>
+   </property>
+  </action>
+  <action name="actionChange_password">
+   <property name="icon">
+    <iconset resource="../resources/res.qrc">
+     <normaloff>:/password.png</normaloff>:/password.png</iconset>
+   </property>
+   <property name="text">
+    <string>Change password</string>
    </property>
   </action>
  </widget>

@@ -202,6 +202,22 @@ void C5TableModel::insertRow(int row)
     endInsertRows();
 }
 
+void C5TableModel::insertColumn(int column)
+{
+    beginInsertColumns(QModelIndex(), column + 1, column + 1);
+    for (int i = 0; i < fRawData.count(); i++) {
+        fRawData[i] << QVariant();
+    }
+    endInsertColumns();
+}
+
+void C5TableModel::insertColumn(int column, const QString &header)
+{
+    insertColumn(column);
+    fColumnIndexName[columnCount()] = header;
+    fColumnNameIndex[header] = columnCount();
+}
+
 void C5TableModel::removeRow(int row, const QModelIndex &parent)
 {
     beginRemoveRows(parent, row, row);

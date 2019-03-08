@@ -20,6 +20,8 @@ public:
 
     virtual QString table() {return "s_user";}
 
+    virtual bool checkData(QString &err);
+
 private:
     Ui::CE5User *ui;
 };

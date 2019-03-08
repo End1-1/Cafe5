@@ -28,5 +28,17 @@
         <file>report.png</file>
         <file>left-arrow.png</file>
         <file>right-arrow.png</file>
+        <file>tables.png</file>
+        <file>chair.png</file>
+        <file>armenia.png</file>
+        <file>enter.png</file>
+        <file>russia.png</file>
+        <file>shift.png</file>
+        <file>usa.png</file>
+        <file>backspace.png</file>
+        <file>guest.png</file>
+        <file>logout.png</file>
+        <file>ledger.png</file>
+        <file>tax.png</file>
     </qresource>
 </RCC>

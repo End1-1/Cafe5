@@ -27,7 +27,9 @@ private slots:
 
 private:
     Ui::DlgDishRemoveReason *ui;
+
     int fState;
+
     QString fName;
 };
 

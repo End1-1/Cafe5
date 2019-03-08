@@ -26,6 +26,8 @@ private:
 
     int printTax(const QJsonObject &h, const QJsonArray &ja, C5Database &db);
 
+    void closeOrderHotel(const QJsonObject &h);
+
     QTcpSocket *fSocket;
 };
 

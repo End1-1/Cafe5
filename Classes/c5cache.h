@@ -31,6 +31,8 @@
 #define cache_dish_comments 25
 #define cache_menu_names 26
 #define cache_s_db 27
+#define cache_halls 28
+#define cache_tables 29
 
 class C5Cache : public QObject
 {
@@ -40,6 +42,8 @@ public:
     C5Cache(const QStringList &dbParams);
 
     inline QString getString(int row, int column) {return fCacheData.at(row).at(column).toString();}
+
+    inline QList<QVariant> getRow(int row) {return fCacheData.at(row);}
 
     QString getString(int id);
 

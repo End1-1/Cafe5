@@ -42,6 +42,36 @@
           <string>Main</string>
          </property>
          <layout class="QGridLayout" name="gridLayout">
+          <item row="3" column="1" colspan="4">
+           <widget class="C5LineEditWithSelector" name="lineEdit_3">
+            <property name="Field" stdset="0">
+             <string>f_comment</string>
+            </property>
+            <property name="Type" stdset="0">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1" colspan="4">
+           <widget class="C5LineEditWithSelector" name="lineEdit">
+            <property name="Field" stdset="0">
+             <string>f_name</string>
+            </property>
+            <property name="Type" stdset="0">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3">
+           <widget class="C5LineEditWithSelector" name="lePart2Name">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="FieldRef" stdset="0">
+             <string>f_part2</string>
+            </property>
+           </widget>
+          </item>
           <item row="1" column="0">
            <widget class="QLabel" name="label_2">
             <property name="text">
@@ -53,56 +83,6 @@
            <widget class="QLabel" name="label_4">
             <property name="text">
              <string>Name</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2">
-           <widget class="C5LineEditWithSelector" name="lePart2Name">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="FieldRef" stdset="0">
-             <string>f_part2</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="C5LineEditWithSelector" name="leCode">
-            <property name="maximumSize">
-             <size>
-              <width>100</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="Field" stdset="0">
-             <string>f_id</string>
-            </property>
-            <property name="Primary" stdset="0">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_6">
-            <property name="text">
-             <string>Description</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1" colspan="2">
-           <widget class="C5LineEditWithSelector" name="lineEdit">
-            <property name="Field" stdset="0">
-             <string>f_name</string>
-            </property>
-            <property name="Type" stdset="0">
-             <string>0</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>Code</string>
             </property>
            </widget>
           </item>
@@ -125,17 +105,37 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="1" colspan="2">
-           <widget class="C5LineEditWithSelector" name="lineEdit_3">
-            <property name="Field" stdset="0">
-             <string>f_comment</string>
+          <item row="0" column="1">
+           <widget class="C5LineEditWithSelector" name="leCode">
+            <property name="maximumSize">
+             <size>
+              <width>100</width>
+              <height>16777215</height>
+             </size>
             </property>
-            <property name="Type" stdset="0">
-             <string>0</string>
+            <property name="Field" stdset="0">
+             <string>f_id</string>
+            </property>
+            <property name="Primary" stdset="0">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
-          <item row="1" column="3">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>Code</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_6">
+            <property name="text">
+             <string>Description</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="5">
            <widget class="QPushButton" name="btnNewType">
             <property name="text">
              <string/>
@@ -143,6 +143,22 @@
             <property name="icon">
              <iconset resource="../resources/res.qrc">
               <normaloff>:/new.png</normaloff>:/new.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="C5LineEditWithSelector" name="lePart1Name">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>200</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="FieldRef" stdset="0">
+             <string>f_part1</string>
             </property>
            </widget>
           </item>

@@ -14,9 +14,11 @@
 #include "cr5goodsmovement.h"
 #include "cr5creditcards.h"
 #include "cr5dishpart1.h"
+#include "c5dishselfcostgenprice.h"
 #include "cr5dishcomment.h"
 #include "cr5tstoreextra.h"
 #include "cr5dishpart2.h"
+#include "cr5dishpriceselfcost.h"
 #include "c5storeinventory.h"
 #include "cr5discountsystem.h"
 #include "cr5goodsgroup.h"
@@ -28,7 +30,10 @@
 #include "cr5goodsunit.h"
 #include "c5datasynchronize.h"
 #include "cr5menunames.h"
+#include "cr5tables.h"
+#include "cr5hall.h"
 #include "cr5materialsinstore.h"
+#include "c5changepassword.h"
 #include "cr5dishremovereason.h"
 #include "cr5goods.h"
 #include "cr5users.h"
@@ -54,6 +59,7 @@ C5MainWindow::C5MainWindow(QWidget *parent) :
     connect(ui->twDb, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(twCustomMenu(QPoint)));
     connect(ui->tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(tabCloseRequested(int)));
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(currentTabChange(int)));
+    connect(ui->tabWidget, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(tabCustomMenu(QPoint)));
     fReportToolbar = 0;
     ui->actionHome->setEnabled(false);
 
@@ -77,6 +83,8 @@ C5MainWindow::C5MainWindow(QWidget *parent) :
     }
     ui->twDb->setVisible(menuPanelIsVisible.toBool());
     ui->wLog->setVisible(false);
+    ui->actionLogout->setVisible(false);
+    ui->actionChange_password->setVisible(false);
 }
 
 C5MainWindow::~C5MainWindow()
@@ -120,11 +128,49 @@ void C5MainWindow::twCustomMenu(const QPoint &p)
     menu.exec(ui->twDb->mapToGlobal(p));
 }
 
+void C5MainWindow::tabCustomMenu(const QPoint &p)
+{
+    C5Widget *w = static_cast<C5Widget*>(ui->tabWidget->currentWidget());
+    if (w) {
+        if (!w->allowChangeDatabase()) {
+            return;
+        }
+    }
+    QMenu menu(this);
+    for (int i = 0; i < ui->twDb->topLevelItemCount(); i++) {
+        QAction *a = menu.addAction(ui->twDb->topLevelItem(i)->text(0), this, SLOT(actionChangeDatabase()));
+        a->setData(i);
+    }
+    menu.exec(ui->tabWidget->mapToGlobal(p));
+}
+
 void C5MainWindow::tabCloseRequested(int index)
 {
     C5ReportWidget *w = static_cast<C5ReportWidget*>(fTab->widget(index));
     fTab->removeTab(index);
     delete w;
+}
+
+void C5MainWindow::actionChangeDatabase()
+{
+    QAction * a = static_cast<QAction*>(sender());
+    int index = a->data().toInt();
+    QTreeWidgetItem *item = ui->twDb->topLevelItem(index);
+    if (!item) {
+        return;
+    }
+    QStringList dbParams;
+    dbParams << item->data(0, Qt::UserRole + 1).toString()
+             << item->data(0, Qt::UserRole + 2).toString()
+             << item->data(0, Qt::UserRole + 3).toString()
+             << item->data(0, Qt::UserRole + 4).toString()
+             << item->data(0, Qt::UserRole).toString();
+    C5Widget *w = static_cast<C5Widget*>(ui->tabWidget->currentWidget());
+    if (!w) {
+        return;
+    }
+    ui->tabWidget->setTabText(ui->tabWidget->currentIndex(), QString("[%1] %2").arg(dbParams.at(4)).arg(w->label()));
+    w->changeDatabase(dbParams);
 }
 
 void C5MainWindow::currentTabChange(int index)
@@ -163,8 +209,8 @@ void C5MainWindow::on_actionLogin_triggered()
 
     C5Database db(C5Config::fDBHost, C5Config::fDBPath, C5Config::fDBUser, C5Config::fDBPassword);
     db[":f_user"] = __userid;
-    db.exec("select f_db, f_description, f_host, f_db, f_user, f_password, f_main from s_db \
-            where f_name in (select f_db from s_db_access where f_user=:f_user and f_permit=1)");
+    db.exec("select f_name, f_description, f_host, f_db, f_user, f_password, f_main from s_db \
+            where f_id in (select f_db from s_db_access where f_user=:f_user and f_permit=1)");
     while (db.nextRow()) {
         QTreeWidgetItem *item = new QTreeWidgetItem();
         item->setText(0, db.getString(0));
@@ -179,16 +225,26 @@ void C5MainWindow::on_actionLogin_triggered()
         item->setIcon(0, QIcon(icon));
         ui->twDb->addTopLevelItem(item);
 
+        C5Database dbpr(db.getString(2),  db.getString(3),  db.getString(4),  db.getString(5));
+        C5Permissions::init(dbpr);
+
         QVariant showwelcomePage = C5Config::getRegValue("showwelcomepage");
         if (showwelcomePage == QVariant::Invalid) {
             showwelcomePage = false;
         }
         if (showwelcomePage.toBool()) {
-            showWelcomePage();
+            bool isVisible = fTab->count() > 0;
+            C5WelcomePage *wp = 0;
+            if (isVisible) {
+                wp = dynamic_cast<C5WelcomePage*>(fTab->widget(0));
+            }
+            if (wp == 0) {
+                showWelcomePage();
+            }
         }
 
         QTreeWidgetItem *it = 0;
-        if (pr(db.getString(0), cp_t2_action)) {
+        if (pr(db.getString(3), cp_t2_action)) {
             it = new QTreeWidgetItem();
             it->setText(0, tr("Actions"));
             it->setData(0, Qt::UserRole, cp_t2_action);
@@ -198,9 +254,10 @@ void C5MainWindow::on_actionLogin_triggered()
             addTreeL3Item(it, cp_t2_store_output, tr("New store output"), ":/goods.png");
             addTreeL3Item(it, cp_t2_store_move, tr("New store movement"), ":/goods.png");
             addTreeL3Item(it, cp_t2_store_inventory, tr("New store inventory"), ":/goods.png");
+            addTreeL3Item(it, cp_t2_calculate_self_cost, tr("Calculate dishes self cost"), ":/menu.png");
         }
 
-        if (pr(db.getString(0), cp_t3_reports)) {
+        if (pr(db.getString(3), cp_t3_reports)) {
             it = new QTreeWidgetItem();
             it->setText(0, tr("Reports"));
             it->setData(0, Qt::UserRole, cp_t2_action);
@@ -215,7 +272,7 @@ void C5MainWindow::on_actionLogin_triggered()
             addTreeL3Item(it, cp_t3_store_sale, tr("Sales from store"), ":/graph.png");
         }
 
-        if (pr(db.getString(0), cp_t4_menu)) {
+        if (pr(db.getString(3), cp_t4_menu)) {
             it = new QTreeWidgetItem();
             it->setText(0, tr("Menu"));
             it->setData(0, Qt::UserRole, cp_t4_part1);
@@ -227,9 +284,10 @@ void C5MainWindow::on_actionLogin_triggered()
             addTreeL3Item(it, cp_t4_menu_names, tr("Menu names"), ":/menu.png");
             addTreeL3Item(it, cp_t4_dish_remove_reason, tr("Dish remove reasons"), ":/menu.png");
             addTreeL3Item(it, cp_t4_dish_comments, tr("Dish comments"), ":/menu.png");
+            addTreeL3Item(it, cp_t4_dish_price_self_cost, tr("Dish self cost report"), ":/menu.png");
         }
 
-        if (pr(db.getString(0), cp_t6_goods_menu)) {
+        if (pr(db.getString(3), cp_t6_goods_menu)) {
             it = new QTreeWidgetItem();
             it->setText(0, tr("Goods"));
             it->setData(0, Qt::UserRole, cp_t6_goods_menu);
@@ -243,18 +301,22 @@ void C5MainWindow::on_actionLogin_triggered()
             addTreeL3Item(it, cp_t6_partners, tr("Partners"), ":/goods.png");
         }
 
-        if (pr(db.getString(0), cp_t7_other)) {
+        if (pr(db.getString(3), cp_t7_other)) {
             it = new QTreeWidgetItem();
             it->setText(0, tr("Other"));
             it->setData(0, Qt::UserRole, cp_t6_goods_menu);
             it->setIcon(0, QIcon(":/other.png"));
             item->addChild(it);
+            addTreeL3Item(it, cp_t7_halls, tr("Halls"), ":/hall.png");
+            addTreeL3Item(it, cp_t7_tables, tr("Tables"), ":/table.png");
             addTreeL3Item(it, cp_t7_credit_card, tr("Credit cards"), ":/credit-card.png");
             addTreeL3Item(it, cp_t7_discount_system, tr("Discount system"), ":/discount.png");
-            addTreeL3Item(it, cp_t7_upload_data_to_other_server, tr("Data synchronization"), ":/data-transfer.png");
+            if (db.getInt(6) > 0) {
+                addTreeL3Item(it, cp_t7_upload_data_to_other_server, tr("Data synchronization"), ":/data-transfer.png");
+            }
         }
 
-        if (pr(db.getString(0), cp_t1_preference)) {
+        if (pr(db.getString(3), cp_t1_preference)) {
             it = new QTreeWidgetItem();
             it->setText(0, tr("Preferences"));
             it->setData(0, Qt::UserRole, cp_t1_preference);
@@ -272,6 +334,8 @@ void C5MainWindow::on_actionLogin_triggered()
     enableMenu(true);
     ui->actionHome->setEnabled(true);
     ui->actionLogin->setVisible(false);
+    ui->actionLogout->setVisible(true);
+    ui->actionChange_password->setVisible(true);
 }
 
 void C5MainWindow::hotKey()
@@ -298,7 +362,7 @@ void C5MainWindow::addTreeL3Item(QTreeWidgetItem *item, int permission, const QS
     while (root->parent() != 0) {
         root = root->parent();
     }
-    QString db = root->text(0);
+    QString db = root->data(0, Qt::UserRole + 2).toString();
     if (!pr(db, permission)) {
         return;
     }
@@ -325,6 +389,17 @@ void C5MainWindow::showWelcomePage()
     t->postProcess();
 }
 
+QStringList C5MainWindow::getDbParams(QTreeWidgetItem *item)
+{
+    QStringList dbParams;
+    dbParams << item->data(0, Qt::UserRole + 1).toString()
+             << item->data(0, Qt::UserRole + 2).toString()
+             << item->data(0, Qt::UserRole + 3).toString()
+             << item->data(0, Qt::UserRole + 4).toString()
+             << item->data(0, Qt::UserRole).toString();
+    return dbParams;
+}
+
 void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
     Q_UNUSED(column);
@@ -335,12 +410,7 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
         return;
     }
     QTreeWidgetItem *root = item->parent()->parent();
-    QStringList dbParams;
-    dbParams << root->data(0, Qt::UserRole + 1).toString()
-             << root->data(0, Qt::UserRole + 2).toString()
-             << root->data(0, Qt::UserRole + 3).toString()
-             << root->data(0, Qt::UserRole + 4).toString()
-             << root->data(0, Qt::UserRole).toString();
+    QStringList dbParams = getDbParams(root);
     switch (item->data(0, Qt::UserRole).toInt()) {
     case cp_t1_usergroups:
         createTab<CR5UsersGroups>(dbParams);
@@ -367,6 +437,10 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
     case cp_t2_store_move: {
         C5StoreDoc *sd = createTab<C5StoreDoc>(dbParams);
         sd->setMode(C5StoreDoc::sdMovement);
+        break;
+    }
+    case cp_t2_calculate_self_cost: {
+        createTab<C5DishSelfCostGenPrice>(dbParams);
         break;
     }
     case cp_t2_store_inventory:
@@ -411,6 +485,9 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
     case cp_t4_dish_comments:
         createTab<CR5DishComment>(dbParams);
         break;
+    case cp_t4_dish_price_self_cost:
+        createTab<CR5DishPriceSelfCost>(dbParams);
+        break;
     case cp_t6_units:
         createTab<CR5GoodsUnit>(dbParams);
         break;
@@ -441,6 +518,12 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
         delete ds;
         break;
     }
+    case cp_t7_halls:
+        createTab<CR5Hall>(dbParams);
+        break;
+    case cp_t7_tables:
+        createTab<CR5Tables>(dbParams);
+        break;
     default:
         break;
     }
@@ -489,4 +572,47 @@ void C5MainWindow::on_actionGo_to_home_triggered()
     } else {
         showWelcomePage();
     }
+}
+
+void C5MainWindow::on_twDb_itemExpanded(QTreeWidgetItem *item)
+{
+    if (item->parent()) {
+        return;
+    }
+    for (int i = 0; i < ui->twDb->topLevelItemCount(); i++) {
+        if (ui->twDb->topLevelItem(i) != item) {
+            ui->twDb->collapseItem(ui->twDb->topLevelItem(i));
+        }
+    }
+}
+
+void C5MainWindow::on_actionLogout_triggered()
+{
+    for (int i = ui->tabWidget->count() - 1; i > -1 ; i--) {
+        QWidget *w = ui->tabWidget->widget(i);
+        w->deleteLater();
+        ui->tabWidget->removeTab(i);
+    }
+    ui->twDb->clear();
+    ui->actionLogin->setVisible(true);
+    ui->actionLogout->setVisible(false);
+    ui->actionChange_password->setVisible(false);
+}
+
+void C5MainWindow::on_actionChange_password_triggered()
+{
+    if (ui->twDb->topLevelItemCount() == 0) {
+        return;
+    }
+    QString password;
+    if (!C5ChangePassword::changePassword(getDbParams(ui->twDb->topLevelItem(0)), password)) {
+        return;
+    }
+    for (int i = 0; i < ui->twDb->topLevelItemCount(); i++) {
+        C5Database db(getDbParams(ui->twDb->topLevelItem(i)));
+        db[":f_id"] = __userid;
+        db[":f_password"] = password;
+        db.exec("update s_user set f_password=md5(:f_password) where f_id=:f_id");
+    }
+    C5Message::info(tr("Password changed"));
 }

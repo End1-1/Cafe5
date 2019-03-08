@@ -54,6 +54,7 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     fTags[ui->leDocNumDigits->getTag()] = ui->leDocNumDigits->text();
     fTags[ui->cbDefaultStore->getTag()] = ui->cbDefaultStore->currentData().toString();
     fTags[ui->cbTaxUseExtPos->getTag()] = ui->cbTaxUseExtPos->currentData().toString();
+    fTags[ui->leHotelDatabase->getTag()] = ui->leHotelDatabase->text();
     C5Database db(fDBParams);
     db[":f_settings"] = ui->leCode->getInteger();
     db.exec("delete from s_settings_values where f_settings=:f_settings");

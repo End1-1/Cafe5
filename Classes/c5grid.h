@@ -49,6 +49,8 @@ public:
 
     virtual void hotKey(const QString &key);
 
+    virtual void changeDatabase(const QStringList &dbParams);
+
 public slots:
     virtual bool on_tblView_doubleClicked(const QModelIndex &index);
 
@@ -75,6 +77,8 @@ protected:
 
     QString fHavindCondition;
 
+    QString fOrderCondition;
+
     C5FilterWidget *fFilterWidget;
 
     CE5Editor *fEditor;
@@ -97,9 +101,9 @@ protected:
 
     void sumColumnsData();
 
-    void restoreColumnsVisibility();
+    virtual void restoreColumnsVisibility();
 
-    void restoreColumnsWidths();
+    virtual void restoreColumnsWidths();
 
     QStringList dbParams();
 

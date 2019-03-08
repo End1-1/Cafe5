@@ -18,3 +18,7 @@ ALTER TABLE `o_tax_log` CHANGE COLUMN `f_order` `f_order` CHAR(36) NULL DEFAULT 
 ALTER TABLE `o_tax` CHANGE COLUMN `f_id` `f_id` CHAR(36) NOT NULL ;
 alter table d_menu add column f_state smallint default 1;
 ALTER TABLE `o_goods` CHANGE COLUMN `f_header` `f_header` CHAR(36) NOT NULL ;
+alter table o_goods add column f_tax smallint default 0;
+ALTER TABLE `s_receipt_print` RENAME TO  `s_station_conf` ;
+ALTER TABLE `s_station_conf` CHANGE COLUMN `f_printer` `f_conf` INT NULL DEFAULT NULL ;
+

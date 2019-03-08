@@ -136,6 +136,7 @@ void C5Grid::buildQuery()
                 fSqlQuery += s;
             }
         }
+        fSqlQuery += fOrderCondition;
         if (!fHavindCondition.isEmpty()) {
             fSqlQuery += fHavindCondition;
         }
@@ -162,6 +163,14 @@ void C5Grid::hotKey(const QString &key)
         return;
     }
     C5Widget::hotKey(key);
+}
+
+void C5Grid::changeDatabase(const QStringList &dbParams)
+{
+    C5Widget::changeDatabase(dbParams);
+    fDb.close();
+    fDb.setDatabase(dbParams.at(0), dbParams.at(1), dbParams.at(2), dbParams.at(3));
+    refreshData();
 }
 
 QWidget *C5Grid::widget()
@@ -515,12 +524,6 @@ void C5Grid::print()
         p.ltext(QString("%1 %2")
                 .arg(fLabel)
                 .arg(reportAdditionalTitle()), 0);
-//#ifdef QT_DEBUG
-//        p.line(0, p.fTop, 500, p.fTop);
-//        p.br();
-//        p.line(0, p.fTop, 1000, p.fTop);
-//        p.br();
-//#endif
         p.br();
         p.setFontBold(false);
         p.line(0, p.fTop, columnsWidth, p.fTop);
@@ -575,7 +578,6 @@ void C5Grid::print()
                 page++;
                 break;
             } else {
-                //p.line(0, p.fTop + (fTableView->rowHeight(r) / scaleFactor), sumOfColumnsWidghtBefore(fModel->columnCount()) / scaleFactor, p.fTop + (fTableView->rowHeight(r) / scaleFactor));
                 p.br();
             }
         }

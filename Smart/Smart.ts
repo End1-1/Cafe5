@@ -10,7 +10,7 @@
     </message>
     <message>
         <location filename="../Cafe5/c5connection.ui" line="20"/>
-        <location filename="../Cafe5/c5connection.cpp" line="77"/>
+        <location filename="../Cafe5/c5connection.cpp" line="78"/>
         <source>Password</source>
         <translation type="unfinished"></translation>
     </message>
@@ -20,18 +20,23 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.ui" line="34"/>
+        <location filename="../Cafe5/c5connection.ui" line="41"/>
         <source>Database</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.ui" line="41"/>
-        <source>Settings</source>
+        <location filename="../Cafe5/c5connection.ui" line="51"/>
+        <source>Database Host</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.ui" line="51"/>
-        <source>Host</source>
+        <location filename="../Cafe5/c5connection.ui" line="156"/>
+        <source>Server address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Cafe5/c5connection.ui" line="34"/>
+        <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -55,38 +60,38 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="77"/>
+        <location filename="../Cafe5/c5connection.cpp" line="78"/>
         <source>Configuration settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="80"/>
+        <location filename="../Cafe5/c5connection.cpp" line="81"/>
         <source>Access denied</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="98"/>
-        <location filename="../Cafe5/c5connection.cpp" line="121"/>
+        <location filename="../Cafe5/c5connection.cpp" line="99"/>
+        <location filename="../Cafe5/c5connection.cpp" line="123"/>
         <source>Cannot connect to database</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="102"/>
+        <location filename="../Cafe5/c5connection.cpp" line="103"/>
         <source>Connection successfull</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="114"/>
+        <location filename="../Cafe5/c5connection.cpp" line="115"/>
         <source>Saved</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="130"/>
+        <location filename="../Cafe5/c5connection.cpp" line="132"/>
         <source>Already initialized</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="149"/>
+        <location filename="../Cafe5/c5connection.cpp" line="151"/>
         <source>Ready to use</source>
         <translation type="unfinished"></translation>
     </message>

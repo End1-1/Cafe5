@@ -1,5 +1,6 @@
 #include "cr5commonsales.h"
 #include "cr5commonsalesfilter.h"
+#include "c5tablemodel.h"
 
 CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
@@ -85,4 +86,12 @@ void CR5CommonSales::editRow(int columnWidthId)
 {
     Q_UNUSED(columnWidthId);
     C5Grid::editRow(1);
+}
+
+void CR5CommonSales::restoreColumnsWidths()
+{
+    C5Grid::restoreColumnsWidths();
+    if (fColumnsVisible["oh.f_id"]) {
+        fTableView->setColumnWidth(fModel->fColumnNameIndex["f_id"], 0);
+    }
 }

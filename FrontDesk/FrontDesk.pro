@@ -126,7 +126,18 @@ SOURCES += \
     c5salefromstoreorder.cpp \
     c5datasynchronize.cpp \
     ../Editors/ce5databases.cpp \
-    c5datasyncthread.cpp
+    c5datasyncthread.cpp \
+    ../Reports/cr5hall.cpp \
+    ../Editors/ce5halls.cpp \
+    ../Reports/cr5tables.cpp \
+    ../Editors/ce5table.cpp \
+    ../Editors/ce5createtablesforhall.cpp \
+    c5dbuseraccess.cpp \
+    ../Reports/cr5menutranslator.cpp \
+    c5changepassword.cpp \
+    ../Reports/cr5dishpriceselfcost.cpp \
+    c5dishselfcostgenprice.cpp \
+    ../Reports/cr5dishpriceselfcostfilter.cpp
 
 HEADERS += \
         c5mainwindow.h \
@@ -224,7 +235,18 @@ HEADERS += \
     c5salefromstoreorder.h \
     c5datasynchronize.h \
     ../Editors/ce5databases.h \
-    c5datasyncthread.h
+    c5datasyncthread.h \
+    ../Reports/cr5hall.h \
+    ../Editors/ce5halls.h \
+    ../Reports/cr5tables.h \
+    ../Editors/ce5table.h \
+    ../Editors/ce5createtablesforhall.h \
+    c5dbuseraccess.h \
+    ../Reports/cr5menutranslator.h \
+    c5changepassword.h \
+    ../Reports/cr5dishpriceselfcost.h \
+    c5dishselfcostgenprice.h \
+    ../Reports/cr5dishpriceselfcostfilter.h
 
 FORMS += \
         c5mainwindow.ui \
@@ -269,7 +291,15 @@ FORMS += \
     ../Reports/cr5salefromstorefilter.ui \
     c5salefromstoreorder.ui \
     c5datasynchronize.ui \
-    ../Editors/ce5databases.ui
+    ../Editors/ce5databases.ui \
+    ../Editors/ce5halls.ui \
+    ../Editors/ce5table.ui \
+    ../Editors/ce5createtablesforhall.ui \
+    c5dbuseraccess.ui \
+    ../Reports/cr5menutranslator.ui \
+    c5changepassword.ui \
+    c5dishselfcostgenprice.ui \
+    ../Reports/cr5dishpriceselfcostfilter.ui
 
 INCLUDEPATH += ../Cafe5
 INCLUDEPATH += ../Classes

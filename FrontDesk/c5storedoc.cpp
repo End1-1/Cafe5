@@ -20,7 +20,7 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
     ui->leReason->setSelector(fDBParams, ui->leReasonName, cache_store_reason);
     ui->lePartner->setSelector(fDBParams, ui->lePartnerName, cache_goods_partners);
     ui->tblGoods->setColumnWidths(7, 0, 0, 300, 80, 80, 80, 80);
-    ui->tblGoodsStore->setColumnWidths(6, 0, 0, 200, 70, 50, 70);
+    ui->tblGoodsStore->setColumnWidths(7, 0, 0, 200, 70, 50, 50, 70);
     ui->btnNewPartner->setVisible(pr(dbParams.at(1), cp_t6_partners));
     ui->btnNewGoods->setVisible(pr(dbParams.at(1), cp_t6_goods));
     ui->leAccepted->setSelector(dbParams, ui->leAcceptedName, cache_users);
@@ -185,6 +185,11 @@ bool C5StoreDoc::save(int state, QString &err, bool showMsg)
     return err.isEmpty();
 }
 
+bool C5StoreDoc::allowChangeDatabase()
+{
+    return false;
+}
+
 void C5StoreDoc::countTotal()
 {
     double total = 0;
@@ -241,8 +246,15 @@ bool C5StoreDoc::save(int state, QString &err)
         db.nextRow();
         ui->leDocNum->setText(QString("%1").arg(db.getInt(0) + 1, C5Config::docNumDigits(), 10, QChar('0')));
         db[":f_counter"] = db.getInt(0) + 1;
-        db.update("a_type", where_id(fDocType));
+        if (!db.update("a_type", where_id(fDocType))) {
+            C5Message::error(db.fLastError);
+        }
         db.commit();
+    } else {
+        int docnum = ui->leDocNum->getInteger();
+        db[":f_id"] = fDocType;
+        db[":f_counter"] = docnum;
+        db.exec("update a_type set f_counter=:f_counter where f_id=:f_id and f_counter<:f_counter");
     }
     if (DOC_STATE_SAVED == state) {
         if (ui->leReason->getInteger() == 0) {
@@ -573,7 +585,10 @@ void C5StoreDoc::loadGoodsInput()
         ui->tblGoodsStore->setString(row, 2, db.getString(2));
         ui->tblGoodsStore->setDouble(row, 3, db.getDouble(4));
         ui->tblGoodsStore->setString(row, 4, db.getString(3));
-        ui->tblGoodsStore->setDouble(row, 5, db.getDouble(5));
+        ui->tblGoodsStore->setDouble(row, 6, db.getDouble(5));
+        if (ui->tblGoodsStore->getDouble(row, 3) > 0.0001) {
+            ui->tblGoodsStore->setDouble(row, 5, ui->tblGoodsStore->getDouble(row, 6) / ui->tblGoodsStore->getDouble(row, 3));
+        }
     }
     ui->tblGoodsStore->setSortingEnabled(true);
 }
@@ -608,7 +623,10 @@ void C5StoreDoc::loadGoods(int store)
         ui->tblGoodsStore->setString(row, 2, db.getString(2));
         ui->tblGoodsStore->setDouble(row, 3, db.getDouble(4));
         ui->tblGoodsStore->setString(row, 4, db.getString(3));
-        ui->tblGoodsStore->setDouble(row, 5, db.getDouble(5));
+        ui->tblGoodsStore->setDouble(row, 6, db.getDouble(5));
+        if (ui->tblGoodsStore->getDouble(row, 3) > 0.0001) {
+            ui->tblGoodsStore->setDouble(row, 5, ui->tblGoodsStore->getDouble(row, 6) / ui->tblGoodsStore->getDouble(row, 3));
+        }
     }
     ui->tblGoodsStore->setSortingEnabled(true);
 }
@@ -640,6 +658,7 @@ void C5StoreDoc::setGoodsPanelHidden(bool v)
 void C5StoreDoc::newDoc()
 {
     fInternalId = "";
+    fDocState = DOC_STATE_DRAFT;
     ui->leDocNum->clear();
     ui->lePartner->setValue(0);
     ui->leComment->clear();
@@ -647,6 +666,14 @@ void C5StoreDoc::newDoc()
     ui->leStoreOutput->setValue(0);
     ui->tblGoods->clearContents();
     ui->tblGoods->setRowCount(0);
+    ui->leInvoiceNumber->clear();
+    setDocEnabled(true);
+    C5Database db(fDBParams);
+    db.startTransaction();
+    db[":f_id"] = (fDocType);
+    db.exec("select f_counter from a_type where f_id=:f_id for update");
+    db.nextRow();
+    ui->leDocNum->setPlaceholderText(QString("%1").arg(db.getInt(0) + 1, C5Config::docNumDigits(), 10, QChar('0')));
     countTotal();
 }
 
@@ -873,11 +900,11 @@ void C5StoreDoc::printDoc()
     p.br(p.fLineHeight + 20);
 
     //p.fTop = p.fNormalHeight - ((p.fLineHeight + 20) * 2);
-    p.ltext(tr("Accepted"), 50);
-    p.ltext(tr("Passed"), 1000);
+    p.ltext(tr("Passed"), 50);
+    p.ltext(tr("Accepted"), 1000);
     p.br(p.fLineHeight + 20);
-    p.ltext(ui->leAcceptedName->text(), 50);
-    p.ltext(ui->lePassedName->text(), 1000);
+    p.ltext(ui->leAcceptedName->text(), 1000);
+    p.ltext(ui->lePassedName->text(), 50);
     p.line(50, p.fTop, 700, p.fTop);
     p.line(1000, p.fTop, 1650, p.fTop);
 

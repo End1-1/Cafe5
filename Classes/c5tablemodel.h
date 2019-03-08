@@ -46,6 +46,10 @@ public:
 
     void insertRow(int row);
 
+    void insertColumn(int column);
+
+    void insertColumn(int column, const QString &header);
+
     void removeRow(int row, const QModelIndex &parent = QModelIndex());
 
     QList<QVariant> getRowValues(int row);

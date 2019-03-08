@@ -16,7 +16,8 @@
         <location filename="../Classes/c5cache.cpp" line="56"/>
         <location filename="../Classes/c5cache.cpp" line="59"/>
         <location filename="../Classes/c5cache.cpp" line="62"/>
-        <location filename="../Classes/c5cache.cpp" line="194"/>
+        <location filename="../Classes/c5cache.cpp" line="67"/>
+        <location filename="../Classes/c5cache.cpp" line="205"/>
         <source>Code</source>
         <translation></translation>
     </message>
@@ -37,7 +38,8 @@
         <location filename="../Classes/c5cache.cpp" line="54"/>
         <location filename="../Classes/c5cache.cpp" line="57"/>
         <location filename="../Classes/c5cache.cpp" line="60"/>
-        <location filename="../Classes/c5cache.cpp" line="195"/>
+        <location filename="../Classes/c5cache.cpp" line="68"/>
+        <location filename="../Classes/c5cache.cpp" line="206"/>
         <source>Name</source>
         <translation></translation>
     </message>
@@ -81,6 +83,11 @@
         <source>Additional info</source>
         <translation></translation>
     </message>
+    <message>
+        <location filename="../Classes/c5cache.cpp" line="69"/>
+        <source>Description</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>C5Connection</name>
@@ -91,7 +98,7 @@
     </message>
     <message>
         <location filename="../Cafe5/c5connection.ui" line="20"/>
-        <location filename="../Cafe5/c5connection.cpp" line="77"/>
+        <location filename="../Cafe5/c5connection.cpp" line="78"/>
         <source>Password</source>
         <translation>Գախտնաբառ</translation>
     </message>
@@ -101,19 +108,28 @@
         <translation>Օգտագործողի անուն</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.ui" line="34"/>
+        <location filename="../Cafe5/c5connection.ui" line="41"/>
         <source>Database</source>
         <translation>Տվյալների պահոց</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.ui" line="41"/>
+        <location filename="../Cafe5/c5connection.ui" line="51"/>
+        <source>Database Host</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Cafe5/c5connection.ui" line="156"/>
+        <source>Server address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Cafe5/c5connection.ui" line="34"/>
         <source>Settings</source>
         <translation>Կարգավորումներ</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.ui" line="51"/>
         <source>Host</source>
-        <translation>Հոստ</translation>
+        <translation type="vanished">Հոստ</translation>
     </message>
     <message>
         <location filename="../Cafe5/c5connection.ui" line="112"/>
@@ -136,38 +152,38 @@
         <translation>Հրաժարվել</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="77"/>
+        <location filename="../Cafe5/c5connection.cpp" line="78"/>
         <source>Configuration settings</source>
         <translation>Կարգավորումներ</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="80"/>
+        <location filename="../Cafe5/c5connection.cpp" line="81"/>
         <source>Access denied</source>
         <translation>Մուտքը արգելված է</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="98"/>
-        <location filename="../Cafe5/c5connection.cpp" line="121"/>
+        <location filename="../Cafe5/c5connection.cpp" line="99"/>
+        <location filename="../Cafe5/c5connection.cpp" line="123"/>
         <source>Cannot connect to database</source>
         <translation>Հնարավոր չէ կապ հաստատել տվյալների պահոցի հետ</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="102"/>
+        <location filename="../Cafe5/c5connection.cpp" line="103"/>
         <source>Connection successfull</source>
         <translation>Կապը հաստատված է</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="114"/>
+        <location filename="../Cafe5/c5connection.cpp" line="115"/>
         <source>Saved</source>
         <translation>Պահպանված է</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="130"/>
+        <location filename="../Cafe5/c5connection.cpp" line="132"/>
         <source>Already initialized</source>
         <translation>Արդեն ստեղծված է</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="149"/>
+        <location filename="../Cafe5/c5connection.cpp" line="151"/>
         <source>Ready to use</source>
         <translation>Պատրաստե</translation>
     </message>
@@ -193,12 +209,12 @@
 <context>
     <name>PrintTaxN</name>
     <message>
-        <location filename="../../NewTax/printtaxn.cpp" line="65"/>
+        <location filename="../../NewTax/printtaxn.cpp" line="64"/>
         <source>Socket read error</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../NewTax/printtaxn.cpp" line="73"/>
+        <location filename="../../NewTax/printtaxn.cpp" line="72"/>
         <source>Data read timeout</source>
         <translation></translation>
     </message>
@@ -267,12 +283,12 @@
         <translation>Մանրի վերադարձ</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="50"/>
+        <location filename="worder.cpp" line="53"/>
         <source>Write order?</source>
         <translation>Գրանցել՞</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="90"/>
+        <location filename="worder.cpp" line="94"/>
         <source>(F)</source>
         <translation>(Ֆ)</translation>
     </message>
@@ -291,42 +307,65 @@
     </message>
     <message>
         <location filename="working.ui" line="76"/>
+        <source>Save order
+F9</source>
+        <translation type="unfinished">Գրանցել
+(F9)</translation>
+    </message>
+    <message>
+        <location filename="working.ui" line="90"/>
+        <source>F9</source>
+        <translation type="unfinished"> Նոր պատվեր
+(F9)</translation>
+    </message>
+    <message>
+        <location filename="working.ui" line="100"/>
         <source>Configuration
 F10</source>
         <translation>Կարգավորումներ
 (F10)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="90"/>
+        <location filename="working.ui" line="114"/>
         <source>F10</source>
         <translation> Նոր պատվեր
 (F10)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="114"/>
+        <location filename="working.ui" line="138"/>
         <source>F11</source>
         <translation> Նոր պատվեր
 (F11)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="138"/>
+        <location filename="working.ui" line="162"/>
         <source>F12</source>
         <translation> Նոր պատվեր
 (F12)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="100"/>
+        <location filename="working.ui" line="124"/>
         <source>New order
 F11</source>
         <translation> Նոր պատվեր
 (F11)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="124"/>
+        <location filename="working.ui" line="148"/>
         <source>Save order
 F12</source>
         <translation>Գրանցել
 (F12)</translation>
+    </message>
+    <message>
+        <location filename="working.cpp" line="120"/>
+        <source>Password</source>
+        <translation type="unfinished">Գախտնաբառ</translation>
+    </message>
+    <message>
+        <location filename="working.cpp" line="122"/>
+        <source>Access denied</source>
+        <translation type="unfinished">Մուտքը արգելված է</translation>
     </message>
 </context>
 </TS>

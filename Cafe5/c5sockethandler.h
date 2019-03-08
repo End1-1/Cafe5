@@ -18,6 +18,8 @@ public:
 
     ~C5SocketHandler();
 
+    static void setServerAddress(const QString &serverIP);
+
     QVariant &operator[] (const QString &key);
 
     void bind(const QString &key, const QVariant &value);

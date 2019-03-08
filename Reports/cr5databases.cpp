@@ -1,4 +1,5 @@
 #include "cr5databases.h"
+#include "c5dbuseraccess.h"
 #include "ce5databases.h"
 
 CR5Databases::CR5Databases(const QStringList &dbParams, QWidget *parent) :
@@ -35,6 +36,12 @@ QToolBar *CR5Databases::toolBar()
             << ToolBarButtons::tbExcel
             << ToolBarButtons::tbPrint;
             createStandartToolbar(btn);
+        fToolBar->addAction(QIcon(":/access.png"), tr("Access"), this, SLOT(actionAccess()));
     }
     return fToolBar;
+}
+
+void CR5Databases::actionAccess()
+{
+    __mainWindow->createTab<C5DbUserAccess>(fDBParams);
 }

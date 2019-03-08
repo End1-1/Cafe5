@@ -1,13 +1,16 @@
 #include "c5sockethandler.h"
 
-QString __socketServerHost = "192.168.2.200";
+QString __socketServerHost = "";
 quint16 __socketServerPort = 1000;
 
 C5SocketHandler::C5SocketHandler(QTcpSocket *socket, QObject *parent) :
     QObject(parent)
 {
-    fReadState = false;
     fSocket = socket;
+    if (__socketServerHost.length() == 0) {
+        return;
+    }
+    fReadState = false;
     fErrorCode = 0;
     if (fSocket == 0) {
         fSocket = new QTcpSocket(parent);
@@ -23,6 +26,11 @@ C5SocketHandler::~C5SocketHandler()
 
 }
 
+void C5SocketHandler::setServerAddress(const QString &serverIP)
+{
+    __socketServerHost = serverIP;
+}
+
 QVariant &C5SocketHandler::operator[](const QString &key)
 {
     return fBindValues[key];
@@ -35,6 +43,9 @@ void C5SocketHandler::bind(const QString &key, const QVariant &value)
 
 void C5SocketHandler::send()
 {
+    if (!fSocket) {
+        return;
+    }
     QJsonObject jObj;
     for (QMap<QString, QVariant>::const_iterator it = fBindValues.begin(); it != fBindValues.end(); it++) {
         switch (it.value().type()) {

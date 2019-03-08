@@ -11,6 +11,9 @@ public:
     CR5Databases(const QStringList &dbParams, QWidget *parent = 0);
 
     virtual QToolBar *toolBar();
+
+private slots:
+    void actionAccess();
 };
 
 #endif // CR5DATABASES_H

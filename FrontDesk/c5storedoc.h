@@ -30,6 +30,8 @@ public:
 
     bool save(int state, QString &err, bool showMsg);
 
+    virtual bool allowChangeDatabase();
+
 private:
     Ui::C5StoreDoc *ui;
 
