@@ -206,15 +206,19 @@ void C5TableModel::insertColumn(int column)
 {
     beginInsertColumns(QModelIndex(), column + 1, column + 1);
     for (int i = 0; i < fRawData.count(); i++) {
-        fRawData[i] << QVariant();
+        fRawData[i].insert(column, QVariant());
     }
     endInsertColumns();
 }
 
 void C5TableModel::insertColumn(int column, const QString &header)
 {
+    for (int i = columnCount(); i > column; i--) {
+        fColumnIndexName[i] = fColumnIndexName[i - 1];
+        fColumnNameIndex[fColumnIndexName[i]] = i;
+    }
     insertColumn(column);
-    fColumnIndexName[columnCount()] = header;
+    fColumnIndexName[column] = header;
     fColumnNameIndex[header] = columnCount();
 }
 

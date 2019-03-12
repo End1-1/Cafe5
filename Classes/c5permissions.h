@@ -29,6 +29,7 @@
 #define cp_t3_store_movement 304
 #define cp_t3_tstore_extra 305
 #define cp_t3_store_sale 306
+#define cp_t3_documents_store 307
 
 #define cp_t4_menu 400
 #define cp_t4_menu_names 401
@@ -42,6 +43,7 @@
 #define cp_t5_waiter 500
 #define cp_t5_multiple_receipt 501
 #define cp_t5_remove_printed_service 502
+#define cp_t5_change_service_value 503
 
 #define cp_t6_goods_menu 600
 #define cp_t6_units 601

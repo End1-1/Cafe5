@@ -15,11 +15,17 @@
 #define param_default_menu 9
 #define param_default_hall 11
 #define param_default_table 12
-#define param_doc_num_digits 13
+#define param_doc_num_digits_input 13
 #define param_default_store 14
 #define param_tax_use_ext_pos 15
 #define param_default_menu_name 16
 #define param_hotel_database 17
+#define param_cafe_service_mode 18
+#define param_date_cash_auto 19
+#define param_date_cash 20
+#define param_item_code_for_hotel 21
+#define param_doc_num_digits_move 22
+#define param_doc_num_digits_out 23
 
 class C5Config
 {
@@ -76,13 +82,23 @@ public:
 
     static int defaultTable();
 
-    static int docNumDigits();
+    static int docNumDigitsInput();
+
+    static int docNumDigitsMove();
+
+    static int docNumDigitsOut();
 
     static int defaultStore();
+
+    static bool autoDateCash();
+
+    static QString dateCash();
 
     static bool useHotel();
 
     static QString hotelDatabase();
+
+    static QString logDatabase();
 
     static QString serverIP();
 

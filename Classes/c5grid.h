@@ -152,7 +152,7 @@ protected slots:
     virtual void tableViewContextMenuRequested(const QPoint &point);
 
     virtual void tableViewHeaderContextMenuRequested(const QPoint &point);
-    \
+
     virtual void tableViewHeaderClicked(int index);
 
     virtual void tableViewHeaderResized(int column, int oldSize, int newSize);

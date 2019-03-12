@@ -4,7 +4,9 @@
 #include "c5cache.h"
 #include "c5selector.h"
 #include "c5combobox.h"
+#include "c5printing.h"
 #include "ce5dishpart2.h"
+#include "c5printpreview.h"
 #include <QColorDialog>
 
 C5DishWidget::C5DishWidget(const QStringList &dbParams, QWidget *parent) :
@@ -246,4 +248,51 @@ void C5DishWidget::recipeQtyPriceChanged(const QString &arg)
         break;
     }
     countTotalSelfCost();
+}
+
+void C5DishWidget::on_btnPrintRecipe_clicked()
+{
+    QFont font(qApp->font());
+    font.setPointSize(20);
+    C5Printing p;
+    QSize paperSize(2000, 2800);
+    p.setSceneParams(paperSize.width(), paperSize.height(), QPrinter::Portrait);
+    p.setFont(font);
+    //int page = p.currentPageIndex();
+    p.setFontBold(true);
+    p.ctext(tr("Recipe") + " " + ui->leName->text());
+    p.br();
+    QList<qreal> points;
+    QStringList vals;
+    points << 0 << 600 << 300 << 300 << 300 << 300 ;
+    vals.clear();
+    vals << tr("Goods");
+    vals << tr("Qty");
+    vals << tr("Unit");
+    vals << tr("Price");
+    vals << tr("Cost");
+    p.tableText(points, vals, 60);
+    p.br(60);
+    p.setFontBold(false);
+    for (int i = 0; i < ui->tblRecipe->rowCount(); i++) {
+        vals.clear();
+        vals << ui->tblRecipe->getString(i, 2);
+        vals << ui->tblRecipe->lineEdit(i, 3)->text();
+        vals << ui->tblRecipe->getString(i, 4);
+        vals << ui->tblRecipe->lineEdit(i, 5)->text();
+        vals << ui->tblRecipe->lineEdit(i, 6)->text();
+        p.tableText(points, vals, 60);
+        p.br(60);
+    }
+    if (ui->tblRecipe->rowCount() > 0) {
+        vals.clear();
+        points.clear();
+        points << 0 << 1500 << 300;
+        vals << tr("Total") << ui->leTotal->text();
+        p.tableText(points, vals, 60);
+        p.br(60);
+    }
+
+    C5PrintPreview pp(&p, fDBParams, this);
+    pp.exec();
 }

@@ -28,6 +28,7 @@ C5WaiterServer::C5WaiterServer(const QJsonObject &o, QTcpSocket *socket) :
     fIn(o)
 {
     fSocket = socket;
+    fPeerAddress = QHostAddress(fSocket->peerAddress().toIPv4Address()).toString();
 }
 
 void C5WaiterServer::reply(QJsonObject &o)
@@ -117,9 +118,11 @@ void C5WaiterServer::reply(QJsonObject &o)
     }
     case sm_waiterconf: {
         QJsonObject jConf;
-        srh.fDb[":f_ip"] = QHostAddress(fSocket->peerAddress().toIPv4Address()).toString();
+        srh.fDb[":f_ip"] = fPeerAddress;;
         srh.fDb.exec("select * from s_station_conf where f_ip=:f_ip");
         if (srh.fDb.nextRow()) {
+           o["date_cash"] = srh.fDb.getString("f_datecash");
+           o["date_auto"] = srh.fDb.getString("f_datecashauto");
            srh.fDb[":f_settings"] = srh.fDb.getInt("f_conf");
            srh.fDb.exec("select f_key, f_value from s_settings_values where f_settings=:f_settings");
            while (srh.fDb.nextRow()) {
@@ -151,7 +154,7 @@ void C5WaiterServer::reply(QJsonObject &o)
         bv[":f_id"] = fIn["table"].toInt();
         srh.getJsonFromQuery("select * from h_tables where f_id=:f_id", jt, bv);
         if (jt.count() > 0) {
-            if (jt.at(0)["f_lock"].toString().toInt() == 0) {
+            if (jt.at(0).toObject()["f_lock"].toString().toInt() == 0) {
                 o["reply"] = 1;
                 srh.fDb[":f_lock"] = 1;
                 srh.fDb[":f_lockSrc"] = fIn["host"].toString();
@@ -177,13 +180,13 @@ void C5WaiterServer::reply(QJsonObject &o)
                     if (srh.fDb.nextRow()) {
                         jh["f_tablename"] = srh.fDb.getString(0);
                     }
-                    srh.fDb[":f_id"] = jt.at(0)["f_hall"].toString();
+                    srh.fDb[":f_id"] = jt.at(0).toObject()["f_hall"].toString();
                     srh.fDb.exec("select f_name from h_halls where f_id=:f_id");
                     if (srh.fDb.nextRow()) {
                         jh["f_hallname"] = srh.fDb.getString(0);
                     }
                     jh["f_id"] = "";
-                    jh["f_hall"] = jt.at(0)["f_hall"];
+                    jh["f_hall"] = jt.at(0).toObject()["f_hall"];
                     jh["f_table"] = QString::number(fIn["table"].toInt());
                     jh["f_state"] = QString::number(ORDER_STATE_OPEN);
                     jh["f_dateopen"] = current_date;
@@ -230,7 +233,7 @@ void C5WaiterServer::reply(QJsonObject &o)
                 o["body"] = jb;
                 o["table"] = jt;
             } else {
-                if (jt.at(0)["f_locksrc"].toString() == fIn["host"].toString()) {
+                if (jt.at(0).toObject()["f_locksrc"].toString() == fIn["host"].toString()) {
                     o["table"] = fIn["table"];
                     o["reply"] = 3;
                     o["msg"] = tr("Table wasnt unlocked correctly, try again");
@@ -239,7 +242,7 @@ void C5WaiterServer::reply(QJsonObject &o)
                     srh.fDb.update("h_tables", where_id(fIn["table"].toInt()));
                 } else {
                     o["reply"] = 2;
-                    o["msg"] = tr("Table locked by ") + jt.at(0)["f_locksrc"].toString();
+                    o["msg"] = tr("Table locked by ") + jt.at(0).toObject()["f_locksrc"].toString();
                 }
             }
         } else {
@@ -378,10 +381,20 @@ void C5WaiterServer::reply(QJsonObject &o)
         if (jh["f_print"].toString().toInt() < 1) {
             err += tr("Receipt was not printed");
         }
+        QDate dateCash = QDate::currentDate();
+        bool isAuto;
+        srh.fDb[":f_ip"] = fPeerAddress;
+        srh.fDb.exec("select f_dateCash, f_dateCashAuto from s_station_conf where f_ip=:f_ip");
+        if (srh.fDb.nextRow()) {
+            isAuto = srh.fDb.getInt(1) == 1;
+            if (!isAuto) {
+                dateCash = srh.fDb.getDate(0);
+            }
+        }
         if (err.isEmpty()) {
             srh.fDb[":f_state"] = ORDER_STATE_CLOSE;
             srh.fDb[":f_dateClose"] = QDate::currentDate();
-            srh.fDb[":f_dateCash"] = QDate::currentDate();
+            srh.fDb[":f_dateCash"] = dateCash;
             srh.fDb[":f_timeClose"] = QTime::currentTime();
             srh.fDb[":f_staff"] = jh["f_currentstaff"].toString().toInt();
             srh.fDb.update("o_header", where_id(jh["f_id"].toString()));
@@ -389,7 +402,7 @@ void C5WaiterServer::reply(QJsonObject &o)
             srh.fDb[":f_lockSrc"] = "";
             srh.fDb.update("h_tables", where_id(jh["f_table"].toString().toInt()));
 
-            closeOrderHotel(jh);
+            closeOrderHotel(srh.fDb, jh);
         }
         o["reply"] = err.isEmpty() ? 1 : 0;
         o["msg"] = err;
@@ -419,13 +432,13 @@ void C5WaiterServer::reply(QJsonObject &o)
             o["reply"] = 1;
             o["type"] = CARD_TYPE_DISCOUNT;
             srh.fDb[":f_type"] = CARD_TYPE_DISCOUNT;
-            srh.fDb[":f_value"] = ja.at(0)["f_value"].toString().toDouble();
-            srh.fDb[":f_card"] = ja.at(0)["f_id"].toString().toInt();
+            srh.fDb[":f_value"] = ja.at(0).toObject()["f_value"].toString().toDouble();
+            srh.fDb[":f_card"] = ja.at(0).toObject()["f_id"].toString().toInt();
             srh.fDb[":f_data"] = 0;
             srh.fDb[":f_order"] = fIn["order"];
             jo["f_id"] = QString::number(srh.fDb.insert("b_history"));
             jo["f_type"] = QString::number(CARD_TYPE_DISCOUNT);
-            jo["f_value"] = ja.at(0)["f_value"].toString();
+            jo["f_value"] = ja.at(0).toObject()["f_value"].toString();
             o["card"] = jo;
             break;
         } else {
@@ -534,6 +547,9 @@ void C5WaiterServer::reply(QJsonObject &o)
         o["report"] = report;
         break;
     }
+    case sm_log:
+        remember(fIn);
+        break;
     default:
         o["reply"] = 0;
         o["msg"] = QString("%1: %2").arg(tr("Unknown command for socket handler from dlgface")).arg(cmd);
@@ -588,7 +604,7 @@ void C5WaiterServer::saveOrder(QJsonObject &jh, QJsonArray &ja, C5Database &db)
         db.insert("o_header", false);
     }
     if (jh["f_otherid"].toString().toInt() == PAYOTHER_TRANSFER_TO_ROOM) {
-        db[":f_id"] = jh[":f_id"].toString();
+        db[":f_id"] = jh["f_id"].toString();
         db.exec("select * from o_pay_room where f_id=:f_id");
         if (db.nextRow()) {
             db[":f_res"] = jh["f_other_res"].toString();
@@ -604,9 +620,12 @@ void C5WaiterServer::saveOrder(QJsonObject &jh, QJsonArray &ja, C5Database &db)
             db[":f_guest"] = jh["f_other_guest"].toString();
             db.insert("o_pay_room", false);
         }
+    } else {
+        db[":f_id"] = jh["f_id"].toString();
+        db.exec("delete from o_pay_room where f_id=:f_id");
     }
     if (jh["f_otherid"].toString().toInt() == PAYOTHER_CL) {
-        db[":f_id"] = jh[":f_id"].toString();
+        db[":f_id"] = jh["f_id"].toString();
         db.exec("select * from o_pay_cl where f_id=:f_id");
         if (db.nextRow()) {
             db[":f_code"] = jh["f_other_clcode"].toString();
@@ -618,6 +637,9 @@ void C5WaiterServer::saveOrder(QJsonObject &jh, QJsonArray &ja, C5Database &db)
             db[":f_name"] = jh["f_other_clname"].toString();
             db.insert("o_pay_cl", false);
         }
+    } else {
+        db[":f_id"] = jh["f_id"].toString();
+        db.exec("delete from o_pay_cl where f_id=:f_id");
     }
     if (jh.contains("f_bonusid")) {
         db[":f_data"] = jh["f_discountamount"].toString().toDouble();
@@ -639,6 +661,7 @@ void C5WaiterServer::saveOrder(QJsonObject &jh, QJsonArray &ja, C5Database &db)
         db[":f_amountCard"] = jh["f_amountcard"].toString().toDouble();
         db[":f_amountBank"] = jh["f_amountbank"].toString().toDouble();
         db[":f_amountOther"] = jh["f_amountother"].toString().toDouble();
+        db[":f_servicemode"] = jh["f_servicemode"].toString().toInt();
         db[":f_amountService"] =jh["f_amountservice"].toString().toDouble();
         db[":f_amountDiscount"] = jh["f_amountdiscount"].toString().toDouble();
         db[":f_servicefactor"] = jh["f_servicefactor"].toString().toDouble();
@@ -723,8 +746,28 @@ int C5WaiterServer::printTax(const QJsonObject &h, const QJsonArray &ja, C5Datab
     return result;
 }
 
-void C5WaiterServer::closeOrderHotel(const QJsonObject &h)
+void C5WaiterServer::closeOrderHotel(C5Database &db, const QJsonObject &h)
 {
+    int settings = 0;
+    int item = 0;
+    QString itemName;
+    db[":f_id"] = h["f_hall"].toString().toInt();
+    db.exec("select f_settings from h_halls where f_id=:f_id");
+    if (db.nextRow()) {
+        settings = db.getInt(0);
+    }
+    if (settings == 0) {
+        return;
+    }
+    db[":f_settings"] = settings;
+    db[":f_key"] = param_item_code_for_hotel;
+    db.exec("select f_value from s_settings_values where f_settings=:f_settings and f_key=:f_key");
+    if (db.nextRow()) {
+        item = db.getString(0).toInt();
+    }
+    if (item == 0) {
+        return;
+    }
     if (h["f_otherid"].toString().toInt() == PAYOTHER_TRANSFER_TO_ROOM
             || h["f_otherid"].toString().toInt() == PAYOTHER_CL) {
         C5Database db(C5Config::dbParams().at(0), "airwick", C5Config::dbParams().at(2), C5Config::dbParams().at(3));
@@ -787,6 +830,13 @@ void C5WaiterServer::closeOrderHotel(const QJsonObject &h)
 
         C5Database fDD(C5Config::dbParams().at(0), C5Config::hotelDatabase(), C5Config::dbParams().at(2), C5Config::dbParams().at(3));
         fDD.open();
+        fDD[":f_id"] = item;
+        fDD.exec("select f_en from f_invoice_item where f_id=:f_id");
+        if (fDD.nextRow()) {
+            itemName = fDD.getString(0);
+        } else {
+            return;
+        }
         fDD[":f_id"] = result;
         fDD[":f_source"] = "PS";
         fDD[":f_res"] = res;
@@ -796,8 +846,8 @@ void C5WaiterServer::closeOrderHotel(const QJsonObject &h)
         fDD[":f_user"] = 1;
         fDD[":f_room"] = h["f_otherid"].toString().toInt() == PAYOTHER_TRANSFER_TO_ROOM ? room : clcode;
         fDD[":f_guest"] = h["f_otherid"].toString().toInt() == PAYOTHER_TRANSFER_TO_ROOM ? guest : clname + ", " + h["f_prefix"].toString() + h["f_hallid"].toString();
-        fDD[":f_itemCode"] = 502;
-        fDD[":f_finalName"] = tr("RESTAURANT ") + h["f_prefix"].toString() + h["f_hallid"].toString();
+        fDD[":f_itemCode"] = item;
+        fDD[":f_finalName"] = itemName + h["f_prefix"].toString() + h["f_hallid"].toString();
         fDD[":f_amountAmd"] = h["f_amounttotal"];
         fDD[":f_usedPrepaid"] = 0;
         fDD[":f_amountVat"] = h["f_amounttotal"].toDouble() / 1.1;
@@ -821,4 +871,21 @@ void C5WaiterServer::closeOrderHotel(const QJsonObject &h)
         fDD[":f_side"] = 0;
         fDD.insert("m_register", false);
     }
+}
+
+void C5WaiterServer::remember(const QJsonObject &h)
+{
+    C5Database db(C5Config::dbParams().at(0), C5Config::logDatabase(), C5Config::dbParams().at(2), C5Config::dbParams().at(3));
+    db[":f_comp"] = h["comp"].toString();
+    db[":f_date"] = QDate::fromString(h["date"].toString(), FORMAT_DATE_TO_STR_MYSQL);
+    db[":f_time"] = QTime::fromString(h["time"].toString(), FORMAT_TIME_TO_STR);
+    db[":f_user"] = h["user"].toInt();
+    db[":f_type"] = h["type"].toInt();
+    db[":f_rec"] = h["rec"].toString();
+    db[":f_invoice"] = h["invoice"].toString();
+    db[":f_reservation"] = h["reservation"].toString();
+    db[":f_action"] = h["action"].toString();
+    db[":f_value1"] = h["value1"].toString();
+    db[":f_value2"] = h["value2"].toString();
+    db.insert("log", false);
 }

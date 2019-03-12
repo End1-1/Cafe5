@@ -41,6 +41,8 @@ private slots:
 
     void on_btnDatabase_clicked();
 
+    void on_btnStoreDocs_clicked();
+
 private:
     Ui::C5WelcomePage *ui;
 

@@ -25,11 +25,13 @@ public:
 
     void reject();
 
-    static bool getTable(int &tableId);
+    static bool getTable(int &tableId, const QString &hall);
 
 private slots:
 
     void timeout();
+
+    void confTimeout();
 
     void newConnection();
 
@@ -67,6 +69,8 @@ private:
     QTcpServer fTcpServer;
 
     QTimer fTimer;
+
+    QTimer fConfTimer;
 
     bool fCanClose;
 

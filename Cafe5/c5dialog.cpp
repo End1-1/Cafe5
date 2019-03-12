@@ -1,6 +1,6 @@
 #include "c5dialog.h"
 #include "c5database.h"
-#include <QDebug>
+#include <QKeyEvent>
 
 C5Dialog::C5Dialog(const QStringList &dbParams, QWidget *parent) :
 #ifdef WAITER

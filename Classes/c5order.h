@@ -19,6 +19,8 @@ public:
     void setHeaderValue(const QString &name, double value);
     void save(C5SocketHandler *sh);
     void countTotal();
+    void countTotalV1();
+    void countTotalV2();
     QJsonArray fItems;
     QJsonObject fHeader;
 private:

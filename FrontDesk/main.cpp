@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setLibraryPaths(libPath);
 #endif
 
-    if (QDate::currentDate() > QDate::fromString("01.04.2019", "dd.MM.yyyy")) {
+    if (QDate::currentDate() > QDate::fromString("01.07.2019", "dd.MM.yyyy")) {
         return 0;
     }
 

@@ -10,8 +10,10 @@
 #include "c5waiterserver.h"
 #include "dlglistofhall.h"
 #include "dlgreports.h"
+#include "dlgexitwithmessage.h"
 #include "c5halltabledelegate.h"
 #include "c5cafecommon.h"
+#include "c5logtoserverthread.h"
 #include <QTcpSocket>
 #include <QCloseEvent>
 
@@ -67,6 +69,11 @@ void DlgFace::setup()
     sh->send();
     connect(&fTimer, SIGNAL(timeout()), this, SLOT(timeout()));
     fTimer.start(TIMER_TIMEOUT_INTERVAL);
+    connect(&fTimer, SIGNAL(timeout()), this, SLOT(confTimeout()));
+    fConfTimer.start(TIMER_TIMEOUT_INTERVAL * 12);
+    if (!fModeJustSelectTable) {
+        C5LogToServerThread::remember(LOG_WAITER, 0, "", "", "", "Program started", "", "");
+    }
 }
 
 void DlgFace::accept()
@@ -81,7 +88,7 @@ void DlgFace::reject()
     on_btnExit_clicked();
 }
 
-bool DlgFace::getTable(int &tableId)
+bool DlgFace::getTable(int &tableId, const QString &hall)
 {
     bool result = false;
     DlgFace *df = new DlgFace(__mainWindow);
@@ -94,6 +101,8 @@ bool DlgFace::getTable(int &tableId)
     df->showFullScreen();
     df->hide();
     df->setup();
+    df->fCurrentHall = hall;
+    df->filterHall(hall);
     result = df->exec() == QDialog::Accepted;
     if (result) {
         tableId = df->fSelectedTable["f_id"].toString().toInt();
@@ -109,7 +118,15 @@ void DlgFace::timeout()
     sh->bind("cmd", sm_hall);
     sh->bind("hall", C5Config::hallList());
     sh->send();
-    ui->lbDate->setText(QString("%1").arg(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR2)));
+    ui->lbDate->setText(QString("%1 %2").arg(QDate::fromString(__c5config.dateCash(), FORMAT_DATE_TO_STR_MYSQL).toString(FORMAT_DATE_TO_STR)).arg(QTime::currentTime().toString("HH:mm")));
+}
+
+void DlgFace::confTimeout()
+{
+    C5SocketHandler *sh = createSocketHandler(SLOT(handleConf(QJsonObject)));
+    sh->bind("cmd", sm_waiterconf);
+    sh->bind("station", hostinfo);
+    sh->send();
 }
 
 void DlgFace::newConnection()
@@ -132,6 +149,7 @@ void DlgFace::handleHall(const QJsonObject &obj)
 
 void DlgFace::handleMenu(const QJsonObject &obj)
 {
+    sender()->deleteLater();
     C5Menu::fMenu.clear();;
     C5Menu::fMenuNames.clear();
     C5Menu::fPart2Color.clear();
@@ -157,9 +175,17 @@ void DlgFace::handleConf(const QJsonObject &obj)
     if (obj["reply"].toInt() == 0) {
         return;
     }
+    if (!__c5config.autoDateCash() && !__c5config.dateCash().isEmpty()) {
+        if (__c5config.dateCash() != obj["date_cash"].toString()) {
+            DlgExitWithMessage::openDialog(tr("Working date was changed, application now will quit"));
+            return;
+        }
+    }
+    __c5config.setValue(param_date_cash_auto, obj["date_auto"].toString());
+    __c5config.setValue(param_date_cash, obj["date_cash"].toString());
     QStringList keys = obj["conf"].toObject().keys();
     foreach (QString k, keys) {
-        C5Config::setValue(k.toInt(), obj["conf"].toObject()[k].toString());
+        __c5config.setValue(k.toInt(), obj["conf"].toObject()[k].toString());
     }
     QJsonArray ja = obj["otherconf"].toArray();
     C5CafeCommon::fHallConfigs.clear();
@@ -192,7 +218,7 @@ void DlgFace::handleDishRemoveReason(const QJsonObject &obj)
     C5CafeCommon::fDishRemoveReason.clear();
     QJsonArray jr = obj["reasons"].toArray();
     for (int i = 0; i < jr.count(); i++) {
-        C5CafeCommon::fDishRemoveReason << jr.at(i)["f_name"].toString();
+        C5CafeCommon::fDishRemoveReason << jr.at(i).toObject()["f_name"].toString();
     }
 }
 
@@ -224,7 +250,7 @@ void DlgFace::on_btnConnection_clicked()
 void DlgFace::on_btnExit_clicked()
 {
     if (fModeJustSelectTable) {
-        reject();
+        C5Dialog::reject();
         return;
     }
     if (C5Message::question(tr("Are you sure to close application")) == QDialog::Accepted) {

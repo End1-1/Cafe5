@@ -18,6 +18,14 @@ public:
 
     virtual QString condition();
 
+    virtual void saveFilter(QWidget *parent);
+
+    virtual void restoreFilter(QWidget *parent);
+
+    bool isSimpleView();
+
+    QString menuId();
+
 private:
     Ui::CR5DishPriceSelfCostFilter *ui;
 };

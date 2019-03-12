@@ -53,7 +53,7 @@
            </widget>
           </item>
           <item row="2" column="1" colspan="4">
-           <widget class="C5LineEditWithSelector" name="lineEdit">
+           <widget class="C5LineEditWithSelector" name="leName">
             <property name="Field" stdset="0">
              <string>f_name</string>
             </property>
@@ -384,6 +384,17 @@
               </widget>
              </item>
              <item>
+              <widget class="QPushButton" name="btnPrintRecipe">
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="../resources/res.qrc">
+                 <normaloff>:/print.png</normaloff>:/print.png</iconset>
+               </property>
+              </widget>
+             </item>
+             <item>
               <spacer name="horizontalSpacer">
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
@@ -506,9 +517,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5CheckBox</class>
-   <extends>QCheckBox</extends>
-   <header location="global">c5checkbox.h</header>
+   <class>C5TableWidget</class>
+   <extends>QTableWidget</extends>
+   <header location="global">c5tablewidget.h</header>
   </customwidget>
   <customwidget>
    <class>C5LineEdit</class>
@@ -521,9 +532,9 @@
    <header location="global">c5lineeditwithselector.h</header>
   </customwidget>
   <customwidget>
-   <class>C5TableWidget</class>
-   <extends>QTableWidget</extends>
-   <header location="global">c5tablewidget.h</header>
+   <class>C5CheckBox</class>
+   <extends>QCheckBox</extends>
+   <header location="global">c5checkbox.h</header>
   </customwidget>
  </customwidgets>
  <resources>

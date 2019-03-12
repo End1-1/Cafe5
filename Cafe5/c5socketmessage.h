@@ -18,5 +18,6 @@
 #define sm_dailycommon 15
 #define sm_reports 16
 #define sm_waiter_report 17
+#define sm_log 18
 
 #endif // C5SOCKETMESSAGE_H

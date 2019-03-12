@@ -26,7 +26,7 @@
          <string>New store input</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/res.qrc">
+         <iconset>
           <normaloff>:/goods.png</normaloff>:/goods.png</iconset>
         </property>
        </widget>
@@ -37,7 +37,7 @@
          <string>New store movement</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/res.qrc">
+         <iconset>
           <normaloff>:/goods.png</normaloff>:/goods.png</iconset>
         </property>
        </widget>
@@ -48,7 +48,7 @@
          <string>New store output</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/res.qrc">
+         <iconset>
           <normaloff>:/goods.png</normaloff>:/goods.png</iconset>
         </property>
        </widget>
@@ -59,7 +59,7 @@
          <string>New store inventory</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/res.qrc">
+         <iconset>
           <normaloff>:/goods.png</normaloff>:/goods.png</iconset>
         </property>
        </widget>
@@ -92,7 +92,18 @@
          <string>Documents</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/res.qrc">
+         <iconset>
+          <normaloff>:/documents.png</normaloff>:/documents.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnStoreDocs">
+        <property name="text">
+         <string>Store documents</string>
+        </property>
+        <property name="icon">
+         <iconset>
           <normaloff>:/documents.png</normaloff>:/documents.png</iconset>
         </property>
        </widget>
@@ -103,7 +114,7 @@
          <string>Materials in the store</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/res.qrc">
+         <iconset>
           <normaloff>:/goods.png</normaloff>:/goods.png</iconset>
         </property>
        </widget>
@@ -114,7 +125,7 @@
          <string>Movement in the store</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/res.qrc">
+         <iconset>
           <normaloff>:/goods.png</normaloff>:/goods.png</iconset>
         </property>
        </widget>
@@ -125,7 +136,7 @@
          <string>T-account, extra</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/res.qrc">
+         <iconset>
           <normaloff>:/documents.png</normaloff>:/documents.png</iconset>
         </property>
        </widget>
@@ -136,7 +147,7 @@
          <string>Consumption of goods based on sales</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/res.qrc">
+         <iconset>
           <normaloff>:/goods.png</normaloff>:/goods.png</iconset>
         </property>
        </widget>
@@ -147,7 +158,7 @@
          <string>Sales, expert mode</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/res.qrc">
+         <iconset>
           <normaloff>:/graph.png</normaloff>:/graph.png</iconset>
         </property>
        </widget>
@@ -177,8 +188,6 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../resources/res.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

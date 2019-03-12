@@ -52,12 +52,22 @@ private:
 
     void saveOrder();
 
+    void setServiceLabel();
+
+    void logRecord(const QString &rec, const QString &action, const QString &value1, const QString &value2);
+
+    void processDelayedLogs();
+
+    void setButtonsState();
+
 private slots:
     void handleOpenTable(const QJsonObject &obj);
 
     void handlePrintService(const QJsonObject &obj);
 
     void saveAndQuit(const QJsonObject &obj);
+
+    void changeTable(const QJsonObject &obj);
 
     virtual void handleError(int err, const QString &msg);
 
@@ -98,8 +108,12 @@ private slots:
     void on_btnExpandDishTable_clicked();
 
     void on_btnChangeMenu_clicked();
+
     void on_btnChangeTable_clicked();
+
     void on_btnGuest_clicked();
+
+    void on_btnRoomService_clicked();
 };
 
 #endif // DLGORDER_H

@@ -6,6 +6,7 @@
 #include "wpaymentoptions.h"
 #include "dlgguest.h"
 #include "dlgcl.h"
+#include "c5logtoserverthread.h"
 #include "dlgreceiptlanguage.h"
 #include "dlgcreditcardlist.h"
 #include <QInputDialog>
@@ -46,6 +47,7 @@ int DlgPayment::payment(C5Order *order)
     DlgPayment *d = new DlgPayment(C5Config::fParentWidget);
     d->fOrder = order;
     d->setRoomComment();
+    d->setComplimentary();
     d->ui->tblInfo->setString(1, 0, order->headerValue("f_tablename"));
     d->ui->tblInfo->setString(1, 1, order->headerValue("f_currentstaffname"));
     d->ui->tblInfo->setString(1, 2, order->headerValue("f_amounttotal"));
@@ -261,6 +263,42 @@ void DlgPayment::on_btnReceipt_clicked()
     o["header"] = fOrder->fHeader;
     o["body"] = fOrder->fItems;
     sh->send(o);
+
+    //LOG
+    QString payMethods;
+    QString amounts;
+    if (fOrder->headerValue("f_amountcash").toDouble() > 0.001) {
+        payMethods += payMethods.isEmpty() ? "Cash" : payMethods + " / Cash";
+        amounts += amounts.isEmpty() ? fOrder->headerValue("f_amountcash") : amounts + " / " + fOrder->headerValue("f_amountcash");
+    }
+    if (fOrder->headerValue("f_amountcard").toDouble() > 0.001) {
+        payMethods += payMethods.isEmpty() ? "Cash" : payMethods + " / Card";
+        amounts += amounts.isEmpty() ? fOrder->headerValue("f_amountcard") : amounts + " / " + fOrder->headerValue("f_amountcard");
+    }
+    if (fOrder->headerValue("f_amountbank").toDouble() > 0.001) {
+        payMethods = "Bank";
+        amounts = fOrder->headerValue("f_amountbank");
+    }
+    if (fOrder->headerValue("f_amountother").toDouble() > 0.001) {
+        switch (fOrder->headerValue("f_otherid").toInt()) {
+        case PAYOTHER_TRANSFER_TO_ROOM:
+            payMethods = fOrder->headerValue("f_other_room") + "," + fOrder->headerValue("f_other_inv") + "," + fOrder->headerValue("f_other_guest");
+            break;
+        case PAYOTHER_CL:
+            payMethods = fOrder->headerValue("f_other_clcode") + "," + fOrder->headerValue("f_other_clname");
+            break;
+        case PAYOTHER_COMPLIMENTARY:
+            payMethods = "Complimentary";
+            break;
+        default:
+            payMethods = "Unknown";
+            break;
+        }
+        amounts = fOrder->headerValue("f_amountother");
+    }
+    amounts += fOrder->headerValue("f_printtax") == "1" ? " Tax: yes" : " Tax: no";
+    C5LogToServerThread::remember(LOG_WAITER, __userid, "", fOrder->headerValue("f_id"), "", "Receipt", payMethods, amounts);
+    //END LOG
 }
 
 void DlgPayment::on_btnCancel_clicked()
@@ -318,6 +356,14 @@ void DlgPayment::setCLComment()
     }
 }
 
+void DlgPayment::setComplimentary()
+{
+    if (fOrder->headerValue("f_otherid").toInt() == PAYOTHER_COMPLIMENTARY) {
+        ui->leRoomComment->setVisible(true);
+        ui->leRoomComment->setText(tr("Complimentary"));
+    }
+}
+
 void DlgPayment::setTaxState()
 {
     switch (C5Config::getRegValue("btn_tax_state").toInt()) {
@@ -329,6 +375,19 @@ void DlgPayment::setTaxState()
         ui->btnTax->setChecked(false);
         break;
     }
+}
+
+void DlgPayment::clearOther()
+{
+    fOrder->setHeaderValue("f_otherid", "0");
+    fOrder->setHeaderValue("f_other_res", "");
+    fOrder->setHeaderValue("f_other_inv", "");
+    fOrder->setHeaderValue("f_other_room", "");
+    fOrder->setHeaderValue("f_other_guest", "");
+    fOrder->setHeaderValue("f_other_clcode", "");
+    fOrder->setHeaderValue("f_other_clname", "");
+    ui->leRoomComment->clear();
+    ui->leRoomComment->setVisible(false);
 }
 
 void DlgPayment::setPaymentInfo()
@@ -399,10 +458,12 @@ void DlgPayment::on_btnCloseOrder_clicked()
     o["header"] = fOrder->fHeader;
     o["body"] = fOrder->fItems;
     sh->send(o);
+    C5LogToServerThread::remember(LOG_WAITER, __userid, "", fOrder->headerValue("f_id"), "", "Close order", "", "");
 }
 
 void DlgPayment::on_btnPaymentCash_clicked()
 {
+    clearOther();
     double total = 0.0;
     for (int i = ui->tblInfo->rowCount() - 1; i >= paystart; i--) {
         if (ui->tblInfo->item(i, 0)->data(Qt::UserRole).toInt() == p_bank
@@ -423,6 +484,7 @@ void DlgPayment::on_btnPaymentCash_clicked()
 
 void DlgPayment::on_btnPaymentCard_clicked()
 {
+    clearOther();
     int cardid;
     QString cardname;
     if (!DlgCreditCardList::getCardInfo(cardid, cardname)) {
@@ -449,6 +511,7 @@ void DlgPayment::on_btnPaymentCard_clicked()
 
 void DlgPayment::on_btnPaymentBank_clicked()
 {
+    clearOther();
     double total = 0.0;
     if (checkForPaymentMethod(p_bank, total)) {
         C5Message::error(tr("Bankh method already exists"));
@@ -468,6 +531,7 @@ void DlgPayment::on_btnPaymentBank_clicked()
 
 void DlgPayment::on_btnPaymentOther_clicked()
 {
+    clearOther();
     double total = 0.0;
     if (checkForPaymentMethod(p_other, total)) {
         C5Message::error(tr("Other method already exists"));
@@ -506,7 +570,9 @@ void DlgPayment::on_btnDiscount_clicked()
 
 void DlgPayment::on_btnPayComplimentary_clicked()
 {
+    clearOther();
     fOrder->setHeaderValue("f_otherid", QString::number(PAYOTHER_COMPLIMENTARY));
+    setComplimentary();
 }
 
 void DlgPayment::on_btnPayTransferToRoom_clicked()

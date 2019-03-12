@@ -91,7 +91,17 @@ void C5StoreDoc::setMode(C5StoreDoc::STORE_DOC sd)
     db[":f_id"] = (fDocType);
     db.exec("select f_counter from a_type where f_id=:f_id for update");
     db.nextRow();
-    ui->leDocNum->setPlaceholderText(QString("%1").arg(db.getInt(0) + 1, C5Config::docNumDigits(), 10, QChar('0')));
+    switch (fDocType) {
+    case DOC_TYPE_STORE_INPUT:
+        ui->leDocNum->setPlaceholderText(QString("%1").arg(db.getInt(0) + 1, C5Config::docNumDigitsInput(), 10, QChar('0')));
+        break;
+    case DOC_TYPE_STORE_MOVE:
+        ui->leDocNum->setPlaceholderText(QString("%1").arg(db.getInt(0) + 1, C5Config::docNumDigitsMove(), 10, QChar('0')));
+        break;
+    case DOC_TYPE_STORE_OUTPUT:
+        ui->leDocNum->setPlaceholderText(QString("%1").arg(db.getInt(0) + 1, C5Config::docNumDigitsOut(), 10, QChar('0')));
+        break;
+    }
 
     switch (sd) {
     case sdInput:
@@ -244,7 +254,17 @@ bool C5StoreDoc::save(int state, QString &err)
         db[":f_id"] = (fDocType);
         db.exec("select f_counter from a_type where f_id=:f_id for update");
         db.nextRow();
-        ui->leDocNum->setText(QString("%1").arg(db.getInt(0) + 1, C5Config::docNumDigits(), 10, QChar('0')));
+        switch (fDocType) {
+        case DOC_TYPE_STORE_INPUT:
+            ui->leDocNum->setPlaceholderText(QString("%1").arg(db.getInt(0) + 1, C5Config::docNumDigitsInput(), 10, QChar('0')));
+            break;
+        case DOC_TYPE_STORE_MOVE:
+            ui->leDocNum->setPlaceholderText(QString("%1").arg(db.getInt(0) + 1, C5Config::docNumDigitsMove(), 10, QChar('0')));
+            break;
+        case DOC_TYPE_STORE_OUTPUT:
+            ui->leDocNum->setPlaceholderText(QString("%1").arg(db.getInt(0) + 1, C5Config::docNumDigitsOut(), 10, QChar('0')));
+            break;
+        }
         db[":f_counter"] = db.getInt(0) + 1;
         if (!db.update("a_type", where_id(fDocType))) {
             C5Message::error(db.fLastError);
@@ -673,7 +693,17 @@ void C5StoreDoc::newDoc()
     db[":f_id"] = (fDocType);
     db.exec("select f_counter from a_type where f_id=:f_id for update");
     db.nextRow();
-    ui->leDocNum->setPlaceholderText(QString("%1").arg(db.getInt(0) + 1, C5Config::docNumDigits(), 10, QChar('0')));
+    switch (fDocType) {
+    case DOC_TYPE_STORE_INPUT:
+        ui->leDocNum->setPlaceholderText(QString("%1").arg(db.getInt(0) + 1, C5Config::docNumDigitsInput(), 10, QChar('0')));
+        break;
+    case DOC_TYPE_STORE_MOVE:
+        ui->leDocNum->setPlaceholderText(QString("%1").arg(db.getInt(0) + 1, C5Config::docNumDigitsMove(), 10, QChar('0')));
+        break;
+    case DOC_TYPE_STORE_OUTPUT:
+        ui->leDocNum->setPlaceholderText(QString("%1").arg(db.getInt(0) + 1, C5Config::docNumDigitsOut(), 10, QChar('0')));
+        break;
+    }
     countTotal();
 }
 
@@ -898,13 +928,22 @@ void C5StoreDoc::printDoc()
     p.br(p.fLineHeight + 20);
     p.br(p.fLineHeight + 20);
     p.br(p.fLineHeight + 20);
-
-    //p.fTop = p.fNormalHeight - ((p.fLineHeight + 20) * 2);
-    p.ltext(tr("Passed"), 50);
-    p.ltext(tr("Accepted"), 1000);
-    p.br(p.fLineHeight + 20);
-    p.ltext(ui->leAcceptedName->text(), 1000);
-    p.ltext(ui->lePassedName->text(), 50);
+    switch (fDocType) {
+    case DOC_TYPE_STORE_MOVE:
+        p.ltext(tr("Passed"), 50);
+        p.ltext(tr("Accepted"), 1000);
+        p.br(p.fLineHeight + 20);
+        p.ltext(ui->lePassedName->text(), 50);
+        p.ltext(ui->leAcceptedName->text(), 1000);
+        break;
+    default:
+        p.ltext(tr("Accepted"), 50);
+        p.ltext(tr("Passed"), 1000);
+        p.br(p.fLineHeight + 20);
+        p.ltext(ui->leAcceptedName->text(), 1000);
+        p.ltext(ui->lePassedName->text(), 50);
+        break;
+    }
     p.line(50, p.fTop, 700, p.fTop);
     p.line(1000, p.fTop, 1650, p.fTop);
 

@@ -10,6 +10,8 @@ C5SettingsWidget::C5SettingsWidget(const QStringList &dbParams, QWidget *parent)
     ui->cbDefaultStore->setDBValues(fDBParams, "select f_id, f_name from c_storages order by 2");
     ui->cbTaxUseExtPos->addItem(tr("Yes"), "true");
     ui->cbTaxUseExtPos->addItem(tr("No"), "false");
+    ui->cbServiceMode->addItem(tr("Increase price of dish"), SERVICE_AMOUNT_MODE_INCREASE_PRICE);
+    ui->cbServiceMode->addItem(tr("Print on receipt like a dish"), SERVICE_AMOUNT_MODE_SEPARATE);
 }
 
 C5SettingsWidget::~C5SettingsWidget()
@@ -29,6 +31,22 @@ void C5SettingsWidget::setId(int id)
         QWidget *w = widget(this, db.getInt(0));
         if (w) {
             setWidgetValue(w, db.getString(1));
+        }
+    }
+    db.exec("select f_id, f_counter from a_type");
+    while (db.nextRow()) {
+        switch (db.getInt(0)) {
+        case DOC_TYPE_STORE_INPUT:
+            ui->leInputDocCounter->setInteger(db.getInt(1));
+            break;
+        case DOC_TYPE_STORE_OUTPUT:
+            ui->leOutDocCounter->setInteger(db.getInt(1));
+            break;
+        case DOC_TYPE_STORE_MOVE:
+            ui->leMoveDocCounter->setInteger(db.getInt(1));
+            break;
+        default:
+            break;
         }
     }
 }
@@ -51,10 +69,14 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     fTags[ui->leOrderPrefix->getTag()] = ui->leOrderPrefix->text();
     fTags[ui->leHall->getTag()] = ui->leHall->text();
     fTags[ui->leTable->getTag()] = ui->leTable->text();
-    fTags[ui->leDocNumDigits->getTag()] = ui->leDocNumDigits->text();
+    fTags[ui->leInputDocNumDigits->getTag()] = ui->leInputDocNumDigits->text();
+    fTags[ui->leMoveDocNumDigits->getTag()] = ui->leMoveDocNumDigits->text();
+    fTags[ui->leOutDocNumDigits->getTag()] = ui->leOutDocNumDigits->text();
     fTags[ui->cbDefaultStore->getTag()] = ui->cbDefaultStore->currentData().toString();
     fTags[ui->cbTaxUseExtPos->getTag()] = ui->cbTaxUseExtPos->currentData().toString();
     fTags[ui->leHotelDatabase->getTag()] = ui->leHotelDatabase->text();
+    fTags[ui->cbServiceMode->getTag()] = ui->cbServiceMode->currentData().toString();
+    fTags[ui->leItemCodeForHotel->getTag()] = ui->leItemCodeForHotel->text();
     C5Database db(fDBParams);
     db[":f_settings"] = ui->leCode->getInteger();
     db.exec("delete from s_settings_values where f_settings=:f_settings");
@@ -64,7 +86,13 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
         db[":f_value"] = it.value();
         db.insert("s_settings_values", false);
     }
-    C5Config::initParamsFromDb();
+    db[":f_counter"] = ui->leInputDocCounter->getInteger();
+    db.update("a_type", where_id(DOC_TYPE_STORE_INPUT));
+    db[":f_counter"] = ui->leOutDocCounter->getInteger();
+    db.update("a_type", where_id(DOC_TYPE_STORE_OUTPUT));
+    db[":f_counter"] = ui->leMoveDocCounter->getInteger();
+    db.update("a_type", where_id(DOC_TYPE_STORE_MOVE));
+    __c5config.initParamsFromDb();
     return true;
 }
 
@@ -102,6 +130,9 @@ void C5SettingsWidget::clear(QWidget *parent)
             clearWidgetValue(static_cast<QWidget*>(o));
         }
     }
+    ui->leInputDocCounter->clear();
+    ui->leOutDocCounter->clear();
+    ui->leMoveDocCounter->clear();
 }
 
 QWidget *C5SettingsWidget::widget(QWidget *parent, int tag)

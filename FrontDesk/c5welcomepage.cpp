@@ -5,6 +5,7 @@
 #include "cr5documents.h"
 #include "cr5materialsinstore.h"
 #include "cr5consumptionbysales.h"
+#include "cr5storedocuments.h"
 #include "cr5goodsmovement.h"
 #include "cr5tstoreextra.h"
 #include "cr5commonsales.h"
@@ -46,6 +47,7 @@ void C5WelcomePage::setDatabaseName(const QString &database)
     ui->btnTStoreExtra->setVisible(pr(fDbName, cp_t3_tstore_extra));
     ui->btnGoodsOutputBySales->setVisible(pr(fDbName, cp_t2_count_output_of_sale));
     ui->btnSalesCommon->setVisible(pr(fDbName, cp_t3_sales_common));
+    ui->btnStoreDocs->setVisible(pr(fDbName, cp_t3_documents_store));
     ui->btnDatabase->setText(database);
 }
 
@@ -109,4 +111,9 @@ void C5WelcomePage::on_btnDatabase_clicked()
         return;
     }
     setDatabaseName(values.at(1).toString());
+}
+
+void C5WelcomePage::on_btnStoreDocs_clicked()
+{
+    __mainWindow->createTab<CR5StoreDocuments>(fDBParams);
 }

@@ -40,5 +40,6 @@
         <file>logout.png</file>
         <file>ledger.png</file>
         <file>tax.png</file>
+        <file>room-service.png</file>
     </qresource>
 </RCC>

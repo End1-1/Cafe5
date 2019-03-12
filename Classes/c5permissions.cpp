@@ -37,6 +37,7 @@ void C5Permissions::init(C5Database &db)
               << cp_t3_store_movement
               << cp_t3_tstore_extra
               << cp_t3_store_sale
+              << cp_t3_documents_store
 
               << cp_t4_menu
               << cp_t4_menu_names
@@ -50,6 +51,7 @@ void C5Permissions::init(C5Database &db)
               << cp_t5_waiter
               << cp_t5_multiple_receipt
               << cp_t5_remove_printed_service
+              << cp_t5_change_service_value
 
               << cp_t6_storage
               << cp_t6_goods_menu

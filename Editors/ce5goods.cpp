@@ -1,6 +1,8 @@
 #include "ce5goods.h"
 #include "ui_ce5goods.h"
 #include "c5cache.h"
+#include "ce5goodsgroup.h"
+#include "ce5goodsunit.h"
 #include "c5message.h"
 
 CE5Goods::CE5Goods(const QStringList &dbParams, QWidget *parent) :
@@ -98,10 +100,22 @@ void CE5Goods::on_btnRemoveScaneCode_clicked()
 
 void CE5Goods::on_btnNewGroup_clicked()
 {
-
+    CE5GoodsGroup *ep = new CE5GoodsGroup(fDBParams);
+    C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
+    QList<QMap<QString, QVariant> > data;
+    if(e->getResult(data)) {
+        ui->leGroup->setValue(data.at(0)["f_id"].toString());
+    }
+    delete e;
 }
 
 void CE5Goods::on_btnNewUnit_clicked()
 {
-
+    CE5GoodsUnit *ep = new CE5GoodsUnit(fDBParams);
+    C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
+    QList<QMap<QString, QVariant> > data;
+    if(e->getResult(data)) {
+        ui->leGroup->setValue(data.at(0)["f_id"].toString());
+    }
+    delete e;
 }

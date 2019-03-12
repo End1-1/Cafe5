@@ -27,7 +27,9 @@ void C5DateEdit::setText(const QString &text)
 
 QDate C5DateEdit::date()
 {
-    return QDate::fromString(text(), FORMAT_DATE_TO_STR);
+    QString t = text();
+    QDate d = QDate::fromString(t, FORMAT_DATE_TO_STR);
+    return d;
 }
 
 QString C5DateEdit::toMySQLDate(bool ap)

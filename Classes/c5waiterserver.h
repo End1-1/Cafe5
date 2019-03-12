@@ -18,6 +18,8 @@ public:
 private:
     const QJsonObject &fIn;
 
+    QString fPeerAddress;
+
     bool checkPermission(int user, int permission, C5Database &db);
 
     void saveOrder(QJsonObject &jh, QJsonArray &ja, C5Database &db);
@@ -26,7 +28,9 @@ private:
 
     int printTax(const QJsonObject &h, const QJsonArray &ja, C5Database &db);
 
-    void closeOrderHotel(const QJsonObject &h);
+    void closeOrderHotel(C5Database &db, const QJsonObject &h);
+
+    void remember(const QJsonObject &h);
 
     QTcpSocket *fSocket;
 };

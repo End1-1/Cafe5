@@ -84,7 +84,7 @@ void C5PrintReceiptThread::run()
         p.ltext(o["f_name"].toString(), 0);
         p.br();
         QString servPlus;
-        QString servValue = float_str(fHeader["f_servicefactor"].toString().toDouble() * 100, 2) + "%";
+        QString servValue = float_str(fHeader["f_servicefactor"].toString().toDouble() * 100, 2) + "% ";
         if (fHeader["f_servicefactor"].toString().toDouble() > 0.001) {
             servPlus = "+";
         } else {

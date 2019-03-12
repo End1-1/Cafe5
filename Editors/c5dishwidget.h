@@ -41,6 +41,8 @@ private slots:
 
     void recipeQtyPriceChanged(const QString &arg);
 
+    void on_btnPrintRecipe_clicked();
+
 private:
     Ui::C5DishWidget *ui;
 

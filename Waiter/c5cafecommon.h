@@ -39,6 +39,8 @@ public:
     static QJsonArray fTables;
 
     static QMap<int, QMap<int, QString> > fHallConfigs;
+
+    static QString serviceMode(const QString &hall);
 };
 
 #endif // C5CAFECOMMON_H

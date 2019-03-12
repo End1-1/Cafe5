@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>414</width>
-    <height>427</height>
+    <width>517</width>
+    <height>552</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -23,7 +23,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -95,28 +95,44 @@
        <string>Store</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_22">
+         <property name="text">
+          <string>Output document counter*</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="2">
+        <widget class="C5LineEdit" name="leInputDocCounter"/>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_21">
+         <property name="text">
+          <string>Movement document counter*</string>
+         </property>
+        </widget>
+       </item>
        <item row="0" column="0" colspan="2">
         <widget class="QLabel" name="label_13">
          <property name="text">
-          <string>Document number digits</string>
+          <string>Input document number digits</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="2">
-        <widget class="C5LineEdit" name="leDocNumDigits">
-         <property name="Tag" stdset="0">
-          <number>13</number>
-         </property>
-        </widget>
+       <item row="5" column="2">
+        <widget class="C5LineEdit" name="leOutDocCounter"/>
        </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_17">
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_20">
          <property name="text">
-          <string>Default store</string>
+          <string>Input documents counter*</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="2">
+       <item row="4" column="2">
+        <widget class="C5LineEdit" name="leMoveDocCounter"/>
+       </item>
+       <item row="7" column="2">
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -129,10 +145,59 @@
          </property>
         </spacer>
        </item>
-       <item row="1" column="2">
+       <item row="6" column="0">
+        <widget class="QLabel" name="label_17">
+         <property name="text">
+          <string>Default store</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <widget class="C5LineEdit" name="leInputDocNumDigits">
+         <property name="Tag" stdset="0">
+          <number>13</number>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="2">
         <widget class="C5ComboBox" name="cbDefaultStore">
          <property name="Tag" stdset="0">
           <number>14</number>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="0" colspan="3">
+        <widget class="QLabel" name="label_23">
+         <property name="text">
+          <string>*This settings common for all cases</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_26">
+         <property name="text">
+          <string>Movement document number digits</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_27">
+         <property name="text">
+          <string>Output document number digits</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2">
+        <widget class="C5LineEdit" name="leMoveDocNumDigits">
+         <property name="Tag" stdset="0">
+          <number>22</number>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="2">
+        <widget class="C5LineEdit" name="leOutDocNumDigits">
+         <property name="Tag" stdset="0">
+          <number>23</number>
          </property>
         </widget>
        </item>
@@ -143,35 +208,140 @@
        <string>Waiter</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="7" column="1">
+       <item row="15" column="0">
+        <widget class="QLabel" name="label_25">
+         <property name="text">
+          <string>Item code for hotel voucher</string>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="0">
+        <widget class="QLabel" name="label_6">
+         <property name="text">
+          <string>Tax port</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_11">
+         <property name="text">
+          <string>Default hall</string>
+         </property>
+        </widget>
+       </item>
+       <item row="11" column="0">
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>Tax password</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="C5LineEdit" name="leHall">
+         <property name="Tag" stdset="0">
+          <number>11</number>
+         </property>
+        </widget>
+       </item>
+       <item row="11" column="1">
+        <widget class="C5LineEdit" name="leTaxPassword">
+         <property name="Tag" stdset="0">
+          <number>7</number>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="1">
+        <widget class="C5LineEdit" name="leTaxIP">
+         <property name="Tag" stdset="0">
+          <number>5</number>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_9">
+         <property name="text">
+          <string>Main menu</string>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="1">
+        <widget class="C5LineEdit" name="leTaxPort">
+         <property name="Tag" stdset="0">
+          <number>6</number>
+         </property>
+        </widget>
+       </item>
+       <item row="13" column="0">
+        <widget class="QLabel" name="label_18">
+         <property name="text">
+          <string>Tax use external POS</string>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="0">
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>Tax IP</string>
+         </property>
+        </widget>
+       </item>
+       <item row="13" column="1">
+        <widget class="C5ComboBox" name="cbTaxUseExtPos">
+         <property name="Tag" stdset="0">
+          <number>15</number>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="0">
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>IDRAM phone</string>
+         </property>
+        </widget>
+       </item>
+       <item row="14" column="0">
+        <widget class="QLabel" name="label_19">
+         <property name="text">
+          <string>Hotel database</string>
+         </property>
+        </widget>
+       </item>
+       <item row="14" column="1">
+        <widget class="C5LineEdit" name="leHotelDatabase">
+         <property name="Tag" stdset="0">
+          <number>17</number>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="1">
         <widget class="C5LineEdit" name="leIDRAMPhone">
          <property name="Tag" stdset="0">
           <number>4</number>
          </property>
         </widget>
        </item>
-       <item row="11" column="1">
+       <item row="12" column="1">
         <widget class="C5LineEdit" name="leTaxDept">
          <property name="Tag" stdset="0">
           <number>8</number>
          </property>
         </widget>
        </item>
-       <item row="6" column="0">
+       <item row="0" column="1">
+        <widget class="C5LineEdit" name="leOrderPrefix">
+         <property name="Tag" stdset="0">
+          <number>10</number>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0">
         <widget class="QLabel" name="label_3">
          <property name="text">
           <string>IDRAM Id</string>
          </property>
         </widget>
        </item>
-       <item row="6" column="1">
-        <widget class="C5LineEdit" name="leIDRAMID">
-         <property name="Tag" stdset="0">
-          <number>3</number>
-         </property>
-        </widget>
-       </item>
-       <item row="14" column="1">
+       <item row="18" column="1">
         <spacer name="verticalSpacer_2">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -184,28 +354,35 @@
          </property>
         </spacer>
        </item>
-       <item row="0" column="1">
-        <widget class="C5LineEdit" name="leOrderPrefix">
+       <item row="7" column="1">
+        <widget class="C5LineEdit" name="leIDRAMID">
          <property name="Tag" stdset="0">
-          <number>10</number>
+          <number>3</number>
          </property>
         </widget>
        </item>
-       <item row="11" column="0">
+       <item row="1" column="1">
+        <widget class="C5ComboBox" name="cbMenu">
+         <property name="Tag" stdset="0">
+          <number>9</number>
+         </property>
+        </widget>
+       </item>
+       <item row="12" column="0">
         <widget class="QLabel" name="label_8">
          <property name="text">
           <string>Tax department</string>
          </property>
         </widget>
        </item>
-       <item row="5" column="1">
+       <item row="6" column="1">
         <widget class="C5LineEdit" name="leTable">
          <property name="Tag" stdset="0">
           <number>12</number>
          </property>
         </widget>
        </item>
-       <item row="5" column="0">
+       <item row="6" column="0">
         <widget class="QLabel" name="label_12">
          <property name="text">
           <string>Default table</string>
@@ -216,13 +393,6 @@
         <widget class="QLabel" name="label_2">
          <property name="text">
           <string>Service value</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="C5ComboBox" name="cbMenu">
-         <property name="Tag" stdset="0">
-          <number>9</number>
          </property>
         </widget>
        </item>
@@ -254,101 +424,24 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="1">
-        <widget class="C5LineEdit" name="leHall">
-         <property name="Tag" stdset="0">
-          <number>11</number>
-         </property>
-        </widget>
-       </item>
        <item row="4" column="0">
-        <widget class="QLabel" name="label_11">
+        <widget class="QLabel" name="label_24">
          <property name="text">
-          <string>Default hall</string>
+          <string>Service amount mode</string>
          </property>
         </widget>
        </item>
-       <item row="10" column="0">
-        <widget class="QLabel" name="label_7">
-         <property name="text">
-          <string>Tax password</string>
-         </property>
-        </widget>
-       </item>
-       <item row="9" column="0">
-        <widget class="QLabel" name="label_6">
-         <property name="text">
-          <string>Tax port</string>
-         </property>
-        </widget>
-       </item>
-       <item row="10" column="1">
-        <widget class="C5LineEdit" name="leTaxPassword">
+       <item row="4" column="1">
+        <widget class="C5ComboBox" name="cbServiceMode">
          <property name="Tag" stdset="0">
-          <number>7</number>
+          <number>18</number>
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_9">
-         <property name="text">
-          <string>Main menu</string>
-         </property>
-        </widget>
-       </item>
-       <item row="9" column="1">
-        <widget class="C5LineEdit" name="leTaxPort">
+       <item row="15" column="1">
+        <widget class="C5LineEdit" name="leItemCodeForHotel">
          <property name="Tag" stdset="0">
-          <number>6</number>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="1">
-        <widget class="C5LineEdit" name="leTaxIP">
-         <property name="Tag" stdset="0">
-          <number>5</number>
-         </property>
-        </widget>
-       </item>
-       <item row="12" column="0">
-        <widget class="QLabel" name="label_18">
-         <property name="text">
-          <string>Tax use external POS</string>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="0">
-        <widget class="QLabel" name="label_4">
-         <property name="text">
-          <string>IDRAM phone</string>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="0">
-        <widget class="QLabel" name="label_5">
-         <property name="text">
-          <string>Tax IP</string>
-         </property>
-        </widget>
-       </item>
-       <item row="12" column="1">
-        <widget class="C5ComboBox" name="cbTaxUseExtPos">
-         <property name="Tag" stdset="0">
-          <number>15</number>
-         </property>
-        </widget>
-       </item>
-       <item row="13" column="0">
-        <widget class="QLabel" name="label_19">
-         <property name="text">
-          <string>Hotel database</string>
-         </property>
-        </widget>
-       </item>
-       <item row="13" column="1">
-        <widget class="C5LineEdit" name="leHotelDatabase">
-         <property name="Tag" stdset="0">
-          <number>17</number>
+          <number>21</number>
          </property>
         </widget>
        </item>
@@ -379,7 +472,7 @@
   <tabstop>leCode</tabstop>
   <tabstop>lineEdit_2</tabstop>
   <tabstop>lineEdit_3</tabstop>
-  <tabstop>leDocNumDigits</tabstop>
+  <tabstop>leInputDocNumDigits</tabstop>
   <tabstop>cbDefaultStore</tabstop>
   <tabstop>leOrderPrefix</tabstop>
   <tabstop>cbMenu</tabstop>

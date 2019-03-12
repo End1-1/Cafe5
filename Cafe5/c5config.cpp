@@ -98,14 +98,34 @@ QStringList C5Config::dbParams()
     return params;
 }
 
-int C5Config::docNumDigits()
+int C5Config::docNumDigitsInput()
 {
-    return getValue(param_doc_num_digits).toInt();
+    return getValue(param_doc_num_digits_input).toInt();
+}
+
+int C5Config::docNumDigitsMove()
+{
+    return getValue(param_doc_num_digits_move).toInt();
+}
+
+int C5Config::docNumDigitsOut()
+{
+    return getValue(param_doc_num_digits_out).toInt();
 }
 
 int C5Config::defaultStore()
 {
     return getValue(param_default_store).toInt();
+}
+
+bool C5Config::autoDateCash()
+{
+    return getValue(param_date_cash_auto).toInt() == 1;
+}
+
+QString C5Config::dateCash()
+{
+    return getValue(param_date_cash);
 }
 
 bool C5Config::useHotel()
@@ -116,6 +136,11 @@ bool C5Config::useHotel()
 QString C5Config::hotelDatabase()
 {
     return getValue(param_hotel_database);
+}
+
+QString C5Config::logDatabase()
+{
+    return "airlog";
 }
 
 QString C5Config::serverIP()

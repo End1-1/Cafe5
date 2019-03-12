@@ -97,7 +97,10 @@ SOURCES += \
     dlgguest.cpp \
     ../Classes/rkeyboard.cpp \
     dlgreceiptlanguage.cpp \
-    dlgcl.cpp
+    dlgcl.cpp \
+    ../Classes/c5logtoserverthread.cpp \
+    ../Classes/c5permissions.cpp \
+    dlgexitwithmessage.cpp
 
 HEADERS += \
         dlgface.h \
@@ -162,7 +165,10 @@ HEADERS += \
     dlgguest.h \
     ../Classes/rkeyboard.h \
     dlgreceiptlanguage.h \
-    dlgcl.h
+    dlgcl.h \
+    ../Classes/c5logtoserverthread.h \
+    ../Classes/c5permissions.h \
+    dlgexitwithmessage.h
 
 FORMS += \
         dlgface.ui \
@@ -188,7 +194,8 @@ FORMS += \
     dlgguest.ui \
     ../Classes/rkeyboard.ui \
     dlgreceiptlanguage.ui \
-    dlgcl.ui
+    dlgcl.ui \
+    dlgexitwithmessage.ui
 
 INCLUDEPATH += ../Cafe5
 INCLUDEPATH += ../Classes

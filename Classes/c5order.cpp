@@ -17,7 +17,7 @@ void C5Order::addItem(const QJsonObject &obj)
 
 QString C5Order::itemValue(int index, const QString &name)
 {
-    return fItems.at(index)[name].toString();
+    return fItems.at(index).toObject()[name].toString();
 }
 
 void C5Order::setItemValue(int index, const QString &name, const QString &value)
@@ -63,6 +63,21 @@ void C5Order::save(C5SocketHandler *sh)
 
 void C5Order::countTotal()
 {
+    switch (headerValue("f_servicemode").toInt()) {
+    case SERVICE_AMOUNT_MODE_INCREASE_PRICE:
+        countTotalV1();
+        break;
+    case SERVICE_AMOUNT_MODE_SEPARATE:
+        countTotalV2();
+        break;
+    default:
+        countTotalV1();
+        break;
+    }
+}
+
+void C5Order::countTotalV1()
+{
     double total = 0;
     double totalService = 0;
     double totalDiscount = 0;
@@ -87,6 +102,44 @@ void C5Order::countTotal()
         o["f_total"] = QString::number(itemTotal, 'f', 2);
         fItems[i] = o;
     }
+    setHeaderValue("f_amounttotal", total);
+    setHeaderValue("f_amountservice", totalService);
+    setHeaderValue("f_amountdiscount", totalDiscount);
+    double acash = headerValue("f_amountcash").toDouble(),
+            acard = headerValue("f_amountcard").toDouble(),
+            abank = headerValue("f_amountbank").toDouble(),
+            aother = headerValue("f_amountother").toDouble();
+    double adiff = total - (acash + acard + abank + aother);
+    if (adiff < 0.001) {
+        setHeaderValue("f_amountother", 0);
+        setHeaderValue("f_amountbank", 0);
+        setHeaderValue("f_amountcard", 0);
+        setHeaderValue("f_amountcash", headerValue("f_amounttotal"));
+    }
+}
+
+void C5Order::countTotalV2()
+{
+    double total = 0;
+    double totalService = 0;
+    double totalDiscount = 0;
+    for (int i = 0, count = fItems.count(); i < count; i++) {
+        setItemValue(i, "f_discount", headerValue("f_discountfactor"));
+        setItemValue(i, "f_service", headerValue("f_servicefactor"));
+        QJsonObject o = fItems[i].toObject();
+        if (o["f_state"].toString().toInt() != DISH_STATE_OK) {
+            continue;
+        }
+        double price = o["f_price"].toString().toDouble();
+        double itemTotal = price * o["f_qty2"].toString().toDouble();
+        o["f_total"] = QString::number(itemTotal, 'f', 2);
+        fItems[i] = o;
+        total += itemTotal;
+    }
+    totalService = total * headerValue("f_servicefactor").toDouble();
+    total += totalService;
+    totalDiscount = total * headerValue("f_discountfactor").toDouble();
+    total -= totalDiscount;
     setHeaderValue("f_amounttotal", total);
     setHeaderValue("f_amountservice", totalService);
     setHeaderValue("f_amountdiscount", totalDiscount);

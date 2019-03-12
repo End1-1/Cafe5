@@ -80,7 +80,11 @@ private:
 
     void setCLComment();
 
+    void setComplimentary();
+
     void setTaxState();
+
+    void clearOther();
 };
 
 #endif // DLGPAYMENT_H

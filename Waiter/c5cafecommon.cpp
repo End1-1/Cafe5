@@ -1,4 +1,6 @@
 #include "c5cafecommon.h"
+#include "c5config.h"
+#include "c5utils.h"
 
 QList<CreditCards> C5CafeCommon::fCreditCards;
 QStringList C5CafeCommon::fDishRemoveReason;
@@ -47,4 +49,12 @@ QJsonObject C5CafeCommon::hall(const QString &id)
         }
     }
     return QJsonObject();
+}
+
+QString C5CafeCommon::serviceMode(const QString &hall)
+{
+    if (fHallConfigs[hall.toInt()][param_cafe_service_mode].toInt() == 0) {
+        return QString::number(SERVICE_AMOUNT_MODE_INCREASE_PRICE);
+    }
+    return fHallConfigs[hall.toInt()][param_cafe_service_mode];
 }

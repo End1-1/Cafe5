@@ -1,0 +1,63 @@
+#ifndef C5LOGTOSERVERTHREAD_H
+#define C5LOGTOSERVERTHREAD_H
+
+#include <QThread>
+#include <QDate>
+#include <QTime>
+
+#define LOG_WAITER 48
+
+typedef struct {
+
+    int fType;
+
+    int fUser;
+
+    QDate fDate;
+
+    QTime fTime;
+
+    QString fRec;
+
+    QString fInvoice;
+
+    QString fReservation;
+
+    QString fAction;
+
+    QString fValue1;
+
+    QString fValue2;
+
+} C5LogRecord;
+
+class C5LogToServerThread : public QThread
+{
+public:
+    C5LogToServerThread(QObject *parent = 0);
+
+    static void configureServer(const QString &ip, int port);
+
+    static void remember(int type, int user, const QString &rec, const QString &invoice, const QString &reservation, const QString &action, const QString &value1, const QString &value2);
+
+protected:
+    void run();
+
+    int fType;
+
+    int fUser;
+
+    QString fRec;
+
+    QString fInvoice;
+
+    QString fReservation;
+
+    QString fAction;
+
+    QString fValue1;
+
+    QString fValue2;
+};
+
+#endif // C5LOGTOSERVERTHREAD_H

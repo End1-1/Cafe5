@@ -17,6 +17,7 @@
 #include "c5dishselfcostgenprice.h"
 #include "cr5dishcomment.h"
 #include "cr5tstoreextra.h"
+#include "cr5storedocuments.h"
 #include "cr5dishpart2.h"
 #include "cr5dishpriceselfcost.h"
 #include "c5storeinventory.h"
@@ -264,6 +265,7 @@ void C5MainWindow::on_actionLogin_triggered()
             it->setIcon(0, QIcon(":/reports.png"));
             item->addChild(it);
             addTreeL3Item(it, cp_t3_documents, tr("Documents"), ":/documents.png");
+            addTreeL3Item(it, cp_t3_documents_store, tr("Documents in the store"), ":/documents.png");
             addTreeL3Item(it, cp_t3_store, tr("Storage"), ":/goods.png");
             addTreeL3Item(it, cp_t3_store_movement, tr("Storages movements"), ":/goods.png");
             addTreeL3Item(it, cp_t3_tstore_extra, tr("T-account, extra"), ":/documents.png");
@@ -454,6 +456,9 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
         break;
     case cp_t3_documents:
         createTab<CR5Documents>(dbParams);
+        break;
+    case cp_t3_documents_store:
+        createTab<CR5StoreDocuments>(dbParams);
         break;
     case cp_t3_store:
         createTab<CR5MaterialsInStore>(dbParams);
