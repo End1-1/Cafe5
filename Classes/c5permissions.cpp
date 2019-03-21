@@ -68,6 +68,7 @@ void C5Permissions::init(C5Database &db)
               << cp_t7_halls
               << cp_t7_tables
               << cp_t7_upload_date_settings
+              << cp_t7_translator
                  ;
     if (__usergroup == 1) {
         fPermissions[db.database()] = fTemplate;

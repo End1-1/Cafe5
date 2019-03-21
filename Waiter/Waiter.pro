@@ -100,7 +100,8 @@ SOURCES += \
     dlgcl.cpp \
     ../Classes/c5logtoserverthread.cpp \
     ../Classes/c5permissions.cpp \
-    dlgexitwithmessage.cpp
+    dlgexitwithmessage.cpp \
+    ../Classes/c5translator.cpp
 
 HEADERS += \
         dlgface.h \
@@ -168,7 +169,8 @@ HEADERS += \
     dlgcl.h \
     ../Classes/c5logtoserverthread.h \
     ../Classes/c5permissions.h \
-    dlgexitwithmessage.h
+    dlgexitwithmessage.h \
+    ../Classes/c5translator.h
 
 FORMS += \
         dlgface.ui \

@@ -60,6 +60,7 @@
 #define cp_t7_halls 704
 #define cp_t7_tables 705
 #define cp_t7_upload_date_settings 706
+#define cp_t7_translator 707
 
 
 class C5Permissions

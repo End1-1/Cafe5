@@ -9,6 +9,7 @@
 #include "c5logtoserverthread.h"
 #include "dlgreceiptlanguage.h"
 #include "dlgcreditcardlist.h"
+#include "c5translator.h"
 #include <QInputDialog>
 
 #define paystart 4
@@ -258,7 +259,7 @@ void DlgPayment::on_btnReceipt_clicked()
     sh->bind("station", hostinfo);
     sh->bind("printer", C5Config::localReceiptPrinter());
     QJsonObject o;
-    fOrder->setHeaderValue("f_receiptlanguage", C5Config::getRegValue("receipt_language").toString());
+    fOrder->setHeaderValue("f_receiptlanguage", C5Config::getRegValue("receipt_language").toInt());
     fOrder->setHeaderValue("f_printtax", ui->btnTax->isChecked() ? "1" : "0");
     o["header"] = fOrder->fHeader;
     o["body"] = fOrder->fItems;
@@ -328,12 +329,16 @@ void DlgPayment::setLangIcon()
 {
     switch (C5Config::getRegValue("receipt_language").toInt()) {
     case 0:
-    case 1:
         ui->btnReceiptLanguage->setIcon(QIcon(":/armenia.png"));
-        C5Config::setRegValue("receipt_language", RECEIPT_LANGUAGE_AM);
+        C5Config::setRegValue("receipt_language", LANG_AM);
+        break;
+    case 1:
+        ui->btnReceiptLanguage->setIcon(QIcon(":/usa.png"));
+        C5Config::setRegValue("receipt_language", LANG_EN);
         break;
     case 2:
-        ui->btnReceiptLanguage->setIcon(QIcon(":/usa.png"));
+        ui->btnReceiptLanguage->setIcon(QIcon(":/russia.png"));
+        C5Config::setRegValue("receipt_language", LANG_RU);
         break;
     }
 }
@@ -590,7 +595,8 @@ void DlgPayment::on_btnPayTransferToRoom_clicked()
 
 void DlgPayment::on_btnReceiptLanguage_clicked()
 {
-    if (int r = DlgReceiptLanguage::receipLanguage()) {
+    int r = DlgReceiptLanguage::receipLanguage();
+    if (r > -1) {
         C5Config::setRegValue("receipt_language", r);
         setLangIcon();
     }

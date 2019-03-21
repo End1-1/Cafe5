@@ -9,6 +9,7 @@
 #include "cr5usersgroups.h"
 #include "cr5consumptionbysales.h"
 #include "cr5documents.h"
+#include "c5translatorform.h"
 #include "cr5dish.h"
 #include "cr5settings.h"
 #include "cr5goodsmovement.h"
@@ -328,6 +329,7 @@ void C5MainWindow::on_actionLogin_triggered()
             addTreeL3Item(it, cp_t1_users, tr("Users"), ":/users_groups.png");
             addTreeL3Item(it, cp_t1_databases, tr("Databases"), ":/database.png");
             addTreeL3Item(it, cp_t1_settigns, tr("Settings"), ":/configure.png");
+            addTreeL3Item(it, cp_t7_translator, tr("Translator"), ":/translate.png");
         }
     }
     if (ui->twDb->topLevelItemCount() == 1) {
@@ -528,6 +530,9 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
         break;
     case cp_t7_tables:
         createTab<CR5Tables>(dbParams);
+        break;
+    case cp_t7_translator:
+        createTab<C5TranslatorForm>(dbParams);
         break;
     default:
         break;

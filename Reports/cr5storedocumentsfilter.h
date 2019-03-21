@@ -18,6 +18,8 @@ public:
 
     virtual QString condition();
 
+    QString storages();
+
 private:
     Ui::CR5StoreDocumentsFilter *ui;
 };

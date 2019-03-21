@@ -60,6 +60,7 @@ C5LineEdit *C5TableWidget::createLineEdit(int row, int column)
     l->setProperty("row", row);
     l->setProperty("column", column);
     l->setFrame(false);
+    connect(l, SIGNAL(textChanged(QString)), this, SLOT(lineEditTextChanged(QString)));
     setCellWidget(row, column, l);
     return l;
 }
@@ -72,8 +73,11 @@ C5LineEdit *C5TableWidget::lineEdit(int row, int column)
 C5ComboBox *C5TableWidget::createComboBox(int row, int column)
 {
     C5ComboBox *c = new C5ComboBox(this);
+    c->setProperty("row", row);
+    c->setProperty("column", column);
     c->setFrame(false);
     setCellWidget(row, column, c);
+    connect(c, SIGNAL(currentTextChanged(QString)), this, SLOT(comboTextChanged(QString)));
     return c;
 }
 
@@ -85,7 +89,10 @@ C5ComboBox *C5TableWidget::comboBox(int row, int column)
 C5CheckBox *C5TableWidget::createCheckbox(int row, int column)
 {
     C5CheckBox *c = new C5CheckBox(this);
+    c->setProperty("row", row);
+    c->setProperty("column", column);
     setCellWidget(row, column, c);
+    connect(c, SIGNAL(clicked(bool)), this, SLOT(checkBoxChecked(bool)));
     return c;
 }
 
@@ -208,4 +215,22 @@ void C5TableWidget::search(const QString &txt)
         }
         setRowHidden(i, hidden);
     }
+}
+
+void C5TableWidget::lineEditTextChanged(const QString arg1)
+{
+    C5LineEdit *l = static_cast<C5LineEdit*>(sender());
+    setString(l->property("row").toInt(), l->property("column").toInt(), arg1);
+}
+
+void C5TableWidget::comboTextChanged(const QString &text)
+{
+    C5ComboBox *c = static_cast<C5ComboBox*>(sender());
+    setString(c->property("row").toInt(), c->property("column").toInt(), text);
+}
+
+void C5TableWidget::checkBoxChecked(bool v)
+{
+    C5CheckBox *c = static_cast<C5CheckBox*>(sender());
+    setString(c->property("row").toInt(), c->property("column").toInt(), (v ? "1" : 0));
 }

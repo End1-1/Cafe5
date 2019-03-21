@@ -548,13 +548,15 @@ void C5Grid::print()
                 if (fTableView->columnWidth(c) == 0) {
                     continue;
                 }
+                int s = fTableView->columnSpan(r, c) - 1;
                 if (c > 0) {
                     p.ltext(fModel->data(r, c, Qt::DisplayRole).toString(), (sumOfColumnsWidghtBefore(c) / scaleFactor) + 1);
-                    p.line(sumOfColumnsWidghtBefore(c) / scaleFactor, p.fTop, sumOfColumnsWidghtBefore(c) / scaleFactor, p.fTop + (fTableView->rowHeight(r) / rowScaleFactor));
+                    p.line(sumOfColumnsWidghtBefore(c + s) / scaleFactor, p.fTop, sumOfColumnsWidghtBefore(c + s) / scaleFactor, p.fTop + (fTableView->rowHeight(r) / rowScaleFactor));
                 } else {
                     p.ltext(fModel->data(r, c, Qt::DisplayRole).toString(), 1);
                     p.line(0, p.fTop, 0, p.fTop + (fTableView->rowHeight(r) / rowScaleFactor));
                 }
+                c += s;
             }
             //last vertical line
             p.line(columnsWidth, p.fTop, columnsWidth, p.fTop + (fTableView->rowHeight(r) / rowScaleFactor));

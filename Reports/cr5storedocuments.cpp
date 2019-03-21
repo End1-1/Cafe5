@@ -10,6 +10,7 @@ CR5StoreDocuments::CR5StoreDocuments(const QStringList &dbParams, QWidget *paren
     fIcon = ":/documents.png";
     fSimpleQuery = true;
     fFilterWidget = new CR5StoreDocumentsFilter(dbParams);
+    fFilter = static_cast<CR5StoreDocumentsFilter*>(fFilterWidget);
     fTranslation["f_document"] = tr("Document");
     fTranslation["f_docstatename"] = tr("State");
     fTranslation["f_date"] = tr("Date");
@@ -18,21 +19,31 @@ CR5StoreDocuments::CR5StoreDocuments(const QStringList &dbParams, QWidget *paren
     fTranslation["f_storename"] = tr("Storage");
     fTranslation["f_amount"] = tr("Amount");
     fTranslation["f_partnername"] = tr("Partner");
-    fColumnsSum << "7";
+    fColumnsSum << "f_amount";
     connect(this, SIGNAL(tblDoubleClicked(int,int,QList<QVariant>)), this, SLOT(tblDoubleClickEvent(int,int,QList<QVariant>)));
 }
 
 void CR5StoreDocuments::buildQuery()
 {
-    fSqlQuery = "select distinct(b.f_document) as f_document, ds.f_name as f_docstatename, h.f_date, h.f_userid, \
-            p.f_taxname as f_partnername, t.f_name as f_typename, s.f_name as f_storename, sum(b.f_total*b.f_type) as f_amount \
+    fSqlQuery = "select distinct(b.f_document) as f_document, h.f_date, h.f_userid, ds.f_name as f_docstatename, \
+            p.f_taxname as f_partnername, t.f_name as f_typename, coalesce(concat(b2.f_storename2, '->', s.f_name), s.f_name) as f_storename, \
+            sum(b.f_total*b.f_type) as f_amount \
             from a_store b \
+            left join (select b.f_document,  b.f_store, s2.f_name as f_storename2, sum(b.f_total) as f_total \
+                from a_store b \
+                left join a_header h on h.f_id=b.f_document  \
+                left join c_storages s2 on s2.f_id=b.f_store "
+            + fFilterWidget->condition() + " and b.f_type=-1 \
+                group by 1, 2, 3) b2 on  b2.f_document=b.f_document \
             left join a_header h on h.f_id=b.f_document \
             left join c_storages s on s.f_id=b.f_store \
             left join a_type t on t.f_id=h.f_type \
             left join a_state ds on ds.f_id=h.f_state \
             left join c_partners p on p.f_id=h.f_partner ";
-    fSqlQuery += fFilterWidget->condition();
+    fSqlQuery += fFilterWidget->condition() + " and b.f_type=1 ";
+    if (!fFilter->storages().isEmpty()) {
+        fSqlQuery += " and (b.f_store in (" + fFilter->storages() + ") or b2.f_store in (" + fFilter->storages() +")) ";
+    }
     fSqlQuery += " group by 1,2,3,4,5,6,7 order by h.f_date,h.f_userid ";
     C5Grid::buildQuery();
     fTableView->setColumnWidth(0, 0);

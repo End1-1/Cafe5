@@ -56,13 +56,17 @@ void CR5MenuTranslator::on_btnClearSearch_clicked()
 void CR5MenuTranslator::saveDataChanges()
 {
     C5Database db(fDBParams);
-    db.exec("delete from d_translator");
     for (int i = 0; i < ui->tbl->rowCount(); i++) {
+        db[":f_id"] = ui->tbl->getInteger(i, 0);
+        db.exec("delete from d_translator where f_id=:f_id");
         db[":f_id"] = ui->tbl->getInteger(i, 0);
         db[":f_mode"] = TRANSLATOR_MENU_DISHES;
         db[":f_en"] = ui->tbl->lineEdit(i, 3)->text();
         db[":f_ru"] = ui->tbl->lineEdit(i, 4)->text();
-        db.insert("d_translator", false);
+        if (!db.insert("d_translator", false)) {
+            C5Message::error(db.fLastError);
+            return;
+        }
     }
     C5Message::info(tr("Saved"));
 }

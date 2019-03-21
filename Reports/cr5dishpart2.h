@@ -22,6 +22,9 @@ protected:
 
 private:
     void setColors();
+
+private slots:
+    void deletePart2();
 };
 
 #endif // CR5DISHPART2_H

@@ -3,6 +3,7 @@
 #include "c5cache.h"
 #include "c5grid.h"
 #include "c5tablemodel.h"
+#include <QKeyEvent>
 
 QMap<QString, QMap<int, C5Selector*> > C5Selector::fSelectorList;
 

@@ -180,10 +180,10 @@ void C5DataSyncThread::uploadData()
             bool localErr = false;
             if (dbDst.nextRow()) {
                 dbDst.setBindValues(values);
-                localErr = dbDst.update(t, where_id(values[":f_id"].toString()));
+                localErr = !dbDst.update(t, where_id(values[":f_id"].toString()));
             } else {
                 dbDst.setBindValues(values);
-                localErr = dbDst.insert(t, false);
+                localErr = !dbDst.insert(t, false);
             }
             if (localErr) {
                 err = true;

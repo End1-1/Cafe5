@@ -106,6 +106,7 @@ void DlgOrder::buildMenu(const QString &menu, QString part1, QString part2)
         C5Message::error(tr("Menu is not defined"));
         return;
     }
+    ui->btnChangeMenu->setText(menu);
     QStringList p1 = C5Menu::fMenu[menu].keys();
     int col = 0, row = 0;
     ui->tblPart1->clear();

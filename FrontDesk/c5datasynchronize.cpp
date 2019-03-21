@@ -209,6 +209,12 @@ void C5DataSynchronize::on_btnSaveSyncTables_clicked()
                 BEGIN \
                 set NEW.a = current_timestamp(); \
                 END ").arg(ui->tblSyncTables->getString(i, 1)));
+            dbmain.execDirect(QString("CREATE  TRIGGER `%1_before_delete` \
+                BEFORE delete ON `%1` \
+                FOR EACH ROW  \
+                BEGIN \
+                insert into s_deleted (f_table, f_rec, a) values (%1, old.f_id, current_timestemp()); \
+                END ").arg(ui->tblSyncTables->getString(i, 1)));
         }
     }
     for (int i = 0; i < ui->lstDatabases->count(); i++) {
@@ -223,6 +229,8 @@ void C5DataSynchronize::on_btnSaveSyncTables_clicked()
         foreach (QString s, fRemovedSyncTables) {
             db.exec(QString("drop trigger if exists %1_before_insert").arg(s));
             db.exec(QString("drop trigger if exists %1_before_update").arg(s));
+            db.exec(QString("drop trigger if exists %1_before_delete").arg(s));
+            db.exec(QString("alter table %1 drop column a").arg(s));
         }
     }
     fRemovedSyncTables.clear();

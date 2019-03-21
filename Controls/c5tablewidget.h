@@ -55,6 +55,13 @@ public:
     void exportToExcel();
 
     void search(const QString &txt);
+
+private slots:
+    void lineEditTextChanged(const QString arg1);
+
+    void comboTextChanged(const QString &text);
+
+    void checkBoxChecked(bool v);
 };
 
 #endif // C5TABLEWIDGET_H

@@ -917,108 +917,108 @@
         <translation>Հեռացնել պատրաստած ուտեստը</translation>
     </message>
     <message>
-        <location filename="c5grouppermissionseditor.ui" line="174"/>
-        <location filename="c5grouppermissionseditor.ui" line="243"/>
+        <location filename="c5grouppermissionseditor.ui" line="184"/>
+        <location filename="c5grouppermissionseditor.ui" line="253"/>
         <source>Goods</source>
         <translation>Ապրանքներ</translation>
     </message>
     <message>
-        <location filename="c5grouppermissionseditor.ui" line="180"/>
+        <location filename="c5grouppermissionseditor.ui" line="190"/>
         <source>Units</source>
         <translation>Չափման միավոր</translation>
     </message>
     <message>
-        <location filename="c5grouppermissionseditor.ui" line="210"/>
+        <location filename="c5grouppermissionseditor.ui" line="220"/>
         <source>Groups</source>
         <translation>Խմբեր</translation>
     </message>
     <message>
-        <location filename="c5grouppermissionseditor.ui" line="200"/>
+        <location filename="c5grouppermissionseditor.ui" line="210"/>
         <source>Auto waste</source>
         <translation>Ավտոմատ դուրսգրում</translation>
     </message>
     <message>
-        <location filename="c5grouppermissionseditor.ui" line="233"/>
+        <location filename="c5grouppermissionseditor.ui" line="243"/>
         <source>Storages</source>
         <translation>Պահեստներ</translation>
     </message>
     <message>
-        <location filename="c5grouppermissionseditor.ui" line="264"/>
+        <location filename="c5grouppermissionseditor.ui" line="274"/>
         <source>Reports</source>
         <translation>Հաշվետվություններ</translation>
     </message>
     <message>
-        <location filename="c5grouppermissionseditor.ui" line="323"/>
+        <location filename="c5grouppermissionseditor.ui" line="333"/>
         <source>Documents</source>
         <translation>Փաստաթղթերի մատյան</translation>
     </message>
     <message>
-        <location filename="c5grouppermissionseditor.ui" line="270"/>
+        <location filename="c5grouppermissionseditor.ui" line="280"/>
         <source>Sales, expert mode</source>
         <translation>Վաճառք, ընդհանուր</translation>
     </message>
     <message>
-        <location filename="c5grouppermissionseditor.ui" line="313"/>
+        <location filename="c5grouppermissionseditor.ui" line="323"/>
         <source>Storage</source>
         <translation>Պահեստ</translation>
     </message>
     <message>
-        <location filename="c5grouppermissionseditor.ui" line="290"/>
+        <location filename="c5grouppermissionseditor.ui" line="300"/>
         <source>T-store extra</source>
         <translation>T-հաշիվ, էքստրա</translation>
     </message>
     <message>
-        <location filename="c5grouppermissionseditor.ui" line="354"/>
+        <location filename="c5grouppermissionseditor.ui" line="364"/>
         <source>Menu</source>
         <translation>Ճաշացանկ</translation>
     </message>
     <message>
-        <location filename="c5grouppermissionseditor.ui" line="370"/>
+        <location filename="c5grouppermissionseditor.ui" line="380"/>
         <source>Dish remove reasons</source>
         <translation>Ուտեստի հեռացման պատճառ</translation>
     </message>
     <message>
-        <location filename="c5grouppermissionseditor.ui" line="360"/>
+        <location filename="c5grouppermissionseditor.ui" line="370"/>
         <source>Dish departments</source>
         <translation>Ոտեստի բաժիններ</translation>
     </message>
     <message>
-        <location filename="c5grouppermissionseditor.ui" line="390"/>
+        <location filename="c5grouppermissionseditor.ui" line="400"/>
         <source>Types of dishes</source>
         <translation>Ուտեստի տեսակներ</translation>
     </message>
     <message>
         <location filename="c5grouppermissionseditor.ui" line="153"/>
-        <location filename="c5grouppermissionseditor.ui" line="190"/>
-        <location filename="c5grouppermissionseditor.ui" line="280"/>
-        <location filename="c5grouppermissionseditor.ui" line="433"/>
-        <location filename="c5grouppermissionseditor.ui" line="460"/>
-        <location filename="c5grouppermissionseditor.ui" line="550"/>
+        <location filename="c5grouppermissionseditor.ui" line="200"/>
+        <location filename="c5grouppermissionseditor.ui" line="290"/>
+        <location filename="c5grouppermissionseditor.ui" line="443"/>
+        <location filename="c5grouppermissionseditor.ui" line="470"/>
+        <location filename="c5grouppermissionseditor.ui" line="560"/>
         <source>All items</source>
         <translation>Բոլորը</translation>
     </message>
     <message>
-        <location filename="c5grouppermissionseditor.ui" line="410"/>
+        <location filename="c5grouppermissionseditor.ui" line="420"/>
         <source>Dishes list</source>
         <translation>Ուտեստների ցանկ</translation>
     </message>
     <message>
-        <location filename="c5grouppermissionseditor.ui" line="380"/>
+        <location filename="c5grouppermissionseditor.ui" line="390"/>
         <source>Menu names</source>
         <translation>Ճաշացանկների ցանկ</translation>
     </message>
     <message>
-        <location filename="c5grouppermissionseditor.ui" line="560"/>
+        <location filename="c5grouppermissionseditor.ui" line="570"/>
         <source>Login to manager</source>
         <translation>Մուտք կարավարող ծրագիր</translation>
     </message>
     <message>
-        <location filename="c5grouppermissionseditor.ui" line="570"/>
+        <location filename="c5grouppermissionseditor.ui" line="580"/>
         <source>Login to waiter</source>
         <translation>Մուտք ռեստորանի ծրագիր</translation>
     </message>
     <message>
-        <location filename="c5grouppermissionseditor.ui" line="253"/>
+        <location filename="c5grouppermissionseditor.ui" line="263"/>
         <source>Partners</source>
         <translation>Գործընկերներ</translation>
     </message>
@@ -1033,82 +1033,87 @@
         <translation>Հաշվարկել ուտեստների ինքնարժեք</translation>
     </message>
     <message>
-        <location filename="c5grouppermissionseditor.ui" line="333"/>
+        <location filename="c5grouppermissionseditor.ui" line="173"/>
+        <source>Change value of service fee</source>
+        <translation>Ավելացնել կամ հանել սպասարկամն գումար</translation>
+    </message>
+    <message>
+        <location filename="c5grouppermissionseditor.ui" line="343"/>
         <source>Sales from store</source>
         <translation>Վաճառք պահեստից</translation>
     </message>
     <message>
-        <location filename="c5grouppermissionseditor.ui" line="343"/>
+        <location filename="c5grouppermissionseditor.ui" line="353"/>
         <source>Documents in the store</source>
         <translation>Պահեստի փաստաթղթեր</translation>
     </message>
     <message>
-        <location filename="c5grouppermissionseditor.ui" line="400"/>
+        <location filename="c5grouppermissionseditor.ui" line="410"/>
         <source>Dish comments</source>
         <translation>Մեկնաբանություն ուտեստի համար</translation>
     </message>
     <message>
-        <location filename="c5grouppermissionseditor.ui" line="443"/>
+        <location filename="c5grouppermissionseditor.ui" line="453"/>
         <source>Dish price and self cost report</source>
         <translation>Ուտեստների ինքնարժեքների հաշվետվություն</translation>
     </message>
     <message>
-        <location filename="c5grouppermissionseditor.ui" line="454"/>
+        <location filename="c5grouppermissionseditor.ui" line="464"/>
         <source>Other</source>
         <translation>Այլ</translation>
     </message>
     <message>
-        <location filename="c5grouppermissionseditor.ui" line="470"/>
+        <location filename="c5grouppermissionseditor.ui" line="480"/>
         <source>Credit cards</source>
         <translation>Բանկի քարտ</translation>
     </message>
     <message>
-        <location filename="c5grouppermissionseditor.ui" line="480"/>
+        <location filename="c5grouppermissionseditor.ui" line="490"/>
         <source>Halls</source>
         <translation>Սրահներ /մասնաճյուղեր/</translation>
     </message>
     <message>
-        <location filename="c5grouppermissionseditor.ui" line="490"/>
+        <location filename="c5grouppermissionseditor.ui" line="500"/>
         <source>Tables</source>
         <translation>Սեղաններ /դրամարկղներ/</translation>
     </message>
     <message>
-        <location filename="c5grouppermissionseditor.ui" line="500"/>
+        <location filename="c5grouppermissionseditor.ui" line="510"/>
         <source>Discount system</source>
         <translation>Զեղչի համակարգ</translation>
     </message>
     <message>
-        <location filename="c5grouppermissionseditor.ui" line="510"/>
+        <location filename="c5grouppermissionseditor.ui" line="520"/>
         <source>Upload data to other server</source>
         <translation>Տվյալների սինխրոնիզացիա</translation>
     </message>
     <message>
-        <location filename="c5grouppermissionseditor.ui" line="520"/>
+        <location filename="c5grouppermissionseditor.ui" line="530"/>
         <source>Settings for data synchronization</source>
         <translation>Սինխրոնիզացիաի կարգավորումներ</translation>
     </message>
     <message>
-        <location filename="c5grouppermissionseditor.ui" line="544"/>
+        <location filename="c5grouppermissionseditor.ui" line="554"/>
         <source>Preferences</source>
         <translation>Կարգավորումներ</translation>
     </message>
     <message>
-        <location filename="c5grouppermissionseditor.ui" line="580"/>
+        <location filename="c5grouppermissionseditor.ui" line="590"/>
         <source>Users groups</source>
         <translation>Օգտագործողի խմբեր</translation>
     </message>
     <message>
-        <location filename="c5grouppermissionseditor.ui" line="590"/>
+        <location filename="c5grouppermissionseditor.ui" line="600"/>
         <source>Users</source>
         <translation>Օգտագործողներ</translation>
     </message>
     <message>
-        <location filename="c5grouppermissionseditor.ui" line="600"/>
+        <location filename="c5grouppermissionseditor.ui" line="610"/>
         <source>Databases</source>
         <translation>Տվյալների պահոցներ</translation>
     </message>
     <message>
-        <location filename="c5grouppermissionseditor.ui" line="610"/>
+        <location filename="c5grouppermissionseditor.ui" line="620"/>
         <source>Settings</source>
         <translation>Կարգավորումներ</translation>
     </message>
@@ -4325,6 +4330,26 @@ input/output</source>
         <source>Translator</source>
         <translation>Թարկմանիչ</translation>
     </message>
+    <message>
+        <location filename="../Reports/cr5dish.cpp" line="41"/>
+        <source>Remove</source>
+        <translation>Հեռացնել</translation>
+    </message>
+    <message>
+        <location filename="../Reports/cr5dish.cpp" line="90"/>
+        <source>This name in use and cannot be removed</source>
+        <translation>Այս անվանումը օգտագործվում է</translation>
+    </message>
+    <message>
+        <location filename="../Reports/cr5dish.cpp" line="93"/>
+        <source>Confirm to remove the selected dish</source>
+        <translation>Հաստատեք հեռացումը</translation>
+    </message>
+    <message>
+        <location filename="../Reports/cr5dish.cpp" line="105"/>
+        <source>Deleted</source>
+        <translation>Հեռացված է</translation>
+    </message>
 </context>
 <context>
     <name>CR5DishComment</name>
@@ -5214,7 +5239,7 @@ draft</source>
         <translation>Թարկմանիչ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5menutranslator.cpp" line="67"/>
+        <location filename="../Reports/cr5menutranslator.cpp" line="71"/>
         <source>Saved</source>
         <translation>Պահպանված է</translation>
     </message>
@@ -5354,42 +5379,42 @@ settings</source>
         <translation>Պահեստի փաստաթղթեր</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5storedocuments.cpp" line="13"/>
+        <location filename="../Reports/cr5storedocuments.cpp" line="14"/>
         <source>Document</source>
         <translation>Փաստաթուղթ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5storedocuments.cpp" line="14"/>
+        <location filename="../Reports/cr5storedocuments.cpp" line="15"/>
         <source>State</source>
         <translation>Վիճակ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5storedocuments.cpp" line="15"/>
+        <location filename="../Reports/cr5storedocuments.cpp" line="16"/>
         <source>Date</source>
         <translation>Ամսաթիվ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5storedocuments.cpp" line="16"/>
+        <location filename="../Reports/cr5storedocuments.cpp" line="17"/>
         <source>Doc num</source>
         <translation>Համար</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5storedocuments.cpp" line="17"/>
+        <location filename="../Reports/cr5storedocuments.cpp" line="18"/>
         <source>Operation</source>
         <translation>Տեսակ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5storedocuments.cpp" line="18"/>
+        <location filename="../Reports/cr5storedocuments.cpp" line="19"/>
         <source>Storage</source>
         <translation>Պահեստ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5storedocuments.cpp" line="19"/>
+        <location filename="../Reports/cr5storedocuments.cpp" line="20"/>
         <source>Amount</source>
         <translation>Գումար</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5storedocuments.cpp" line="20"/>
+        <location filename="../Reports/cr5storedocuments.cpp" line="21"/>
         <source>Partner</source>
         <translation>Գործընկեր</translation>
     </message>
@@ -5412,12 +5437,26 @@ settings</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5storedocumentsfilter.ui" line="40"/>
+        <location filename="../Reports/cr5storedocumentsfilter.ui" line="53"/>
         <source>Date end</source>
         <translation>Ավարտ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5storedocumentsfilter.ui" line="53"/>
+        <location filename="../Reports/cr5storedocumentsfilter.ui" line="120"/>
+        <source>Document type</source>
+        <translation>Փաստաթղթի տեսակ</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation type="vanished">ՏԵսակ</translation>
+    </message>
+    <message>
+        <location filename="../Reports/cr5storedocumentsfilter.ui" line="106"/>
+        <source>type</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../Reports/cr5storedocumentsfilter.ui" line="46"/>
         <source>d2</source>
         <translation></translation>
     </message>
@@ -5427,7 +5466,7 @@ settings</source>
         <translation>Պահեստ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5storedocumentsfilter.ui" line="73"/>
+        <location filename="../Reports/cr5storedocumentsfilter.ui" line="93"/>
         <source>store</source>
         <translation></translation>
     </message>

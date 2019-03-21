@@ -160,6 +160,8 @@ public:
 
     inline QString password() {return fDb.password(); }
 
+    QSqlDatabase fDb;
+
 private:
     bool fIsReady;
 
@@ -168,8 +170,6 @@ private:
     static int fCounter;
 
     QString fDbName;
-
-    QSqlDatabase fDb;
 
     void configureDatabase(QSqlDatabase &cn, const QString &host, const QString &db, const QString &user, const QString &password);
 

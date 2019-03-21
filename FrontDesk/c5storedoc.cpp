@@ -256,13 +256,13 @@ bool C5StoreDoc::save(int state, QString &err)
         db.nextRow();
         switch (fDocType) {
         case DOC_TYPE_STORE_INPUT:
-            ui->leDocNum->setPlaceholderText(QString("%1").arg(db.getInt(0) + 1, C5Config::docNumDigitsInput(), 10, QChar('0')));
+            ui->leDocNum->setText(QString("%1").arg(db.getInt(0) + 1, C5Config::docNumDigitsInput(), 10, QChar('0')));
             break;
         case DOC_TYPE_STORE_MOVE:
-            ui->leDocNum->setPlaceholderText(QString("%1").arg(db.getInt(0) + 1, C5Config::docNumDigitsMove(), 10, QChar('0')));
+            ui->leDocNum->setText(QString("%1").arg(db.getInt(0) + 1, C5Config::docNumDigitsMove(), 10, QChar('0')));
             break;
         case DOC_TYPE_STORE_OUTPUT:
-            ui->leDocNum->setPlaceholderText(QString("%1").arg(db.getInt(0) + 1, C5Config::docNumDigitsOut(), 10, QChar('0')));
+            ui->leDocNum->setText(QString("%1").arg(db.getInt(0) + 1, C5Config::docNumDigitsOut(), 10, QChar('0')));
             break;
         }
         db[":f_counter"] = db.getInt(0) + 1;

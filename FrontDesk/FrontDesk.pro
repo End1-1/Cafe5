@@ -139,7 +139,8 @@ SOURCES += \
     c5dishselfcostgenprice.cpp \
     ../Reports/cr5dishpriceselfcostfilter.cpp \
     ../Reports/cr5storedocuments.cpp \
-    ../Reports/cr5storedocumentsfilter.cpp
+    ../Reports/cr5storedocumentsfilter.cpp \
+    c5translatorform.cpp
 
 HEADERS += \
         c5mainwindow.h \
@@ -250,7 +251,8 @@ HEADERS += \
     c5dishselfcostgenprice.h \
     ../Reports/cr5dishpriceselfcostfilter.h \
     ../Reports/cr5storedocuments.h \
-    ../Reports/cr5storedocumentsfilter.h
+    ../Reports/cr5storedocumentsfilter.h \
+    c5translatorform.h
 
 FORMS += \
         c5mainwindow.ui \
@@ -304,7 +306,8 @@ FORMS += \
     c5changepassword.ui \
     c5dishselfcostgenprice.ui \
     ../Reports/cr5dishpriceselfcostfilter.ui \
-    ../Reports/cr5storedocumentsfilter.ui
+    ../Reports/cr5storedocumentsfilter.ui \
+    c5translatorform.ui
 
 INCLUDEPATH += ../Cafe5
 INCLUDEPATH += ../Classes

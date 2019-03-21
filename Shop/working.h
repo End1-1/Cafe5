@@ -43,6 +43,7 @@ private slots:
     void on_btnSaveOrder_clicked();
 
     void on_leCode_textChanged(const QString &arg1);
+
     void on_btnSaveOrderNoTax_clicked();
 };
 

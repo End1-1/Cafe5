@@ -31,6 +31,7 @@ QToolBar *CR5DishPart2::toolBar()
             << ToolBarButtons::tbExcel
             << ToolBarButtons::tbPrint;
             createStandartToolbar(btn);
+            fToolBar->addAction(QIcon(":/delete.png"), tr("Remove"), this, SLOT(deletePart2()));
     }
     return fToolBar;
 }
@@ -61,4 +62,45 @@ void CR5DishPart2::setColors()
     for (int i = 0, count = fModel->rowCount(); i < count; i++) {
         fModel->setRowColor(i, QColor::fromRgb(fModel->data(i, fModel->indexForColumnName("f_color"), Qt::EditRole).toInt()));
     }
+}
+
+void CR5DishPart2::deletePart2()
+{
+    int row = 0;
+    int id = rowId(row, 0);
+    if (id == 0) {
+        return;
+    }
+    C5Database db(fDBParams);
+    db[":f_part"] = id;
+    db.exec("select f_id from d_dish where f_part=:f_part");
+    QList<int> ids;
+    while (db.nextRow()) {
+        ids << db.getInt(0);
+    }
+    foreach (int dishid, ids) {
+        db[":f_dish"] = dishid;
+        db.exec("select * from o_body where f_dish=:f_dish");
+        if (db.nextRow()) {
+            C5Message::error(tr("This name in use and cannot be removed"));
+            return;
+        }
+    }
+    if (C5Message::question(tr("Confirm to remove the selected dish part and all dishes that includes this part")) != QDialog::Accepted) {
+        return;
+    }
+    foreach (int dishid, ids) {
+        db[":f_dish"] = dishid;
+        db.exec("delete from d_recipes where f_dish=:f_dish");
+        db[":f_id"] = dishid;
+        db.exec("delete from d_translator where f_id=:f_id");
+        db[":f_dish"] = dishid;
+        db.exec("delete from d_menu where f_dish=:f_dish");
+    }
+    db[":f_part"] = id;
+    db.exec("delete from d_dish where f_part=:f_part");
+    db[":f_id"] = id;
+    db.exec("delete from d_part2 where f_id=:f_id");
+    fModel->removeRow(row);
+    C5Message::info(tr("Deleted"));
 }

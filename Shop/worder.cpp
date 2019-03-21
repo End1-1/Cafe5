@@ -55,6 +55,7 @@ bool WOrder::writeOrder(bool tax)
     }
     C5Database db(C5Config::dbParams());
     db.startTransaction();
+    QString id = C5Database::uuid();
 
     if (tax) {
         PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), this);
@@ -69,7 +70,8 @@ bool WOrder::writeOrder(bool tax)
         QString jsonIn, jsonOut, err;
         int result = 0;
         result = pt.makeJsonAndPrint(ui->leCard->getDouble(), 0, jsonIn, jsonOut, err);
-        db[":f_order"] = 0;
+
+        db[":f_order"] = id;
         db[":f_date"] = QDate::currentDate();
         db[":f_time"] = QTime::currentTime();
         db[":f_in"] = jsonIn;
@@ -77,12 +79,13 @@ bool WOrder::writeOrder(bool tax)
         db[":f_err"] = err;
         db[":f_result"] = result;
         db.insert("o_tax_log", false);
+        QSqlQuery q(db.fDb);
         if (result == pt_err_ok) {
             QString sn, firm, address, fiscal, hvhh, rseq, devnum, time;
             PrintTaxN::parseResponse(jsonOut, firm, hvhh, fiscal, rseq, sn, address, devnum, time);
-            db[":f_id"] = 0;
+            db[":f_id"] = id;
             db.exec("delete from o_tax where f_id=:f_id");
-            db[":f_id"] = 0;
+            db[":f_id"] = id;
             db[":f_dept"] = C5Config::taxDept();
             db[":f_firmname"] = firm;
             db[":f_address"] = address;
@@ -94,13 +97,14 @@ bool WOrder::writeOrder(bool tax)
             db[":f_fiscalmode"] = tr("(F)");
             db[":f_time"] = time;
             db.insert("o_tax", false);
+            pt.saveTimeResult(id, q);
         } else {
             C5Message::error(err + "<br>" + jsonOut + "<br>" + jsonIn);
+            pt.saveTimeResult("Not saved - " + id, q);
             return false;
         }
     }
 
-    QString id = C5Database::uuid();
     db[":f_id"] = id;
     db[":f_hallid"] = 0;
     db[":f_prefix"] = "";

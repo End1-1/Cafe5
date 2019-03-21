@@ -30,6 +30,8 @@ private:
 
 private slots:
     void translator();
+
+    void deleteDish();
 };
 
 #endif // CR5DISH_H

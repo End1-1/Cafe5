@@ -1,4 +1,5 @@
 #include "dlgface.h"
+#include "c5translator.h"
 #include "c5connection.h"
 #include "c5sockethandler.h"
 #include <QApplication>

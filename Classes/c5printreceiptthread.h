@@ -10,7 +10,7 @@ class C5PrintReceiptThread : public QThread
     Q_OBJECT
 
 public:
-    C5PrintReceiptThread(const QJsonObject &header, const QJsonArray &body, const QString &printer, QObject *parent = 0);
+    C5PrintReceiptThread(const QStringList &dbParams, const QJsonObject &header, const QJsonArray &body, const QString &printer, QObject *parent = 0);
 
 protected:
     virtual void run();
@@ -21,6 +21,8 @@ private:
     QJsonArray fBody;
 
     QString fPrinter;
+
+    QStringList fDbParams;
 };
 
 #endif // C5PRINTRECEIPTTHREAD_H

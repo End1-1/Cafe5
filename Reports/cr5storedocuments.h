@@ -3,6 +3,8 @@
 
 #include "c5reportwidget.h"
 
+class CR5StoreDocumentsFilter;
+
 class CR5StoreDocuments : public C5ReportWidget
 {
     Q_OBJECT
@@ -13,6 +15,9 @@ public:
     virtual void buildQuery();
 
     QToolBar *toolBar();
+
+private:
+    CR5StoreDocumentsFilter *fFilter;
 
 private slots:
     void tblDoubleClickEvent(int row, int column, const QList<QVariant> &values);
