@@ -1,5 +1,6 @@
 #include "cr5goodsmovement.h"
 #include "cr5goodsmovementfilter.h"
+#include "c5mainwindow.h"
 #include "c5storedoc.h"
 #include "c5tablemodel.h"
 

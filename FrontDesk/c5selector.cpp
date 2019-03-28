@@ -7,12 +7,12 @@
 
 QMap<QString, QMap<int, C5Selector*> > C5Selector::fSelectorList;
 
-C5Selector::C5Selector(const QStringList &dbParams, QWidget *parent) :
-    C5Dialog(dbParams, parent),
+C5Selector::C5Selector(const QStringList &dbParams) :
+    C5Dialog(dbParams),
     ui(new Ui::C5Selector)
 {
     ui->setupUi(this);
-    fGrid = new C5Grid(dbParams, 0);
+    fGrid = new C5Grid(dbParams, nullptr);
     fGrid->fTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->hl->addWidget(fGrid);
     connect(fGrid, SIGNAL(tblDoubleClicked(int,int,QList<QVariant>)), this, SLOT(tblDoubleClicked(int,int,QList<QVariant>)));
@@ -27,9 +27,9 @@ C5Selector::~C5Selector()
 bool C5Selector::getValue(const QStringList &dbParams, int cache, QList<QVariant> &values)
 {
     QString cacheName = C5Cache::cacheName(dbParams, cache);
-    C5Selector *c = 0;
+    C5Selector *c = nullptr;
     if (!fSelectorList[cacheName].contains(cache)) {
-        c = new C5Selector(dbParams, C5Config::fParentWidget);
+        c = new C5Selector(dbParams);
         c->fQuery = C5Cache(dbParams).query(cache);
         c->fCache = cache;
         fSelectorList[cacheName][cache] = c;
@@ -48,7 +48,7 @@ bool C5Selector::getValue(const QStringList &dbParams, int cache, QList<QVariant
 
 bool C5Selector::getValues(const QStringList &dbParams, const QString &sql, QList<QVariant> &values, const QMap<QString, QString> &translator)
 {
-    C5Selector *c = new C5Selector(dbParams, __mainWindow);
+    C5Selector *c = new C5Selector(dbParams);
     c->fQuery = sql;
     c->fGrid->fTranslation = translator;
     c->refresh();
@@ -75,7 +75,7 @@ void C5Selector::keyPressEvent(QKeyEvent *key)
         break;
     case Qt::Key_Enter:
     case Qt::Key_Return:
-        if (key->modifiers() && Qt::ControlModifier) {
+        if (key->modifiers() & Qt::ControlModifier) {
             fGrid->on_tblView_doubleClicked(index);
         }
         break;

@@ -24,10 +24,10 @@
 #define PART3_ROW_HEIGHT 80
 #define PART4_ROW_HEIGHT 80
 
-QList<C5LogRecord> fLogDelay;
+static QList<C5LogRecord> fLogDelay;
 
-DlgOrder::DlgOrder(QWidget *parent) :
-    C5Dialog(C5Config::dbParams(), parent),
+DlgOrder::DlgOrder() :
+    C5Dialog(C5Config::dbParams()),
     ui(new Ui::DlgOrder)
 {
     ui->setupUi(this);
@@ -49,7 +49,7 @@ void DlgOrder::openTable(const QJsonObject &table, C5User *user)
         QString menuName = C5Menu::fMenuNames[C5CafeCommon::fHallConfigs[hall["f_settings"].toString().toInt()][param_default_menu]];
         C5Config::setValue(param_default_menu_name, menuName);
     }
-    DlgOrder *d = new DlgOrder(C5Config::fParentWidget);
+    DlgOrder *d = new DlgOrder();
     d->fMenuName = C5Config::defaultMenuName();
     d->showFullScreen();
     d->hide();
@@ -449,11 +449,8 @@ void DlgOrder::changeTable(const QJsonObject &obj)
 
 void DlgOrder::handleError(int err, const QString &msg)
 {
+    Q_UNUSED(err);
     sender()->deleteLater();
-    switch (err) {
-    default:
-        break;
-    }
     C5Message::error(msg);
 }
 

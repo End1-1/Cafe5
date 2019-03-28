@@ -14,7 +14,7 @@ class DlgReports : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgReports(const QStringList &dbParams, QWidget *parent = 0);
+    explicit DlgReports(const QStringList &dbParams);
 
     ~DlgReports();
 

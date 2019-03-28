@@ -12,11 +12,11 @@ class DlgDishRemoveReason : public QDialog
     Q_OBJECT
 
 public:
-    explicit DlgDishRemoveReason(QWidget *parent = 0);
+    explicit DlgDishRemoveReason(QWidget *parent = nullptr);
 
     ~DlgDishRemoveReason();
 
-    static getReason(QString &reason, int &state);
+    static bool getReason(QString &reason, int &state);
 
 private slots:
     void on_lst_clicked(const QModelIndex &index);

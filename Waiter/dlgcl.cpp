@@ -1,8 +1,8 @@
 #include "dlgcl.h"
 #include "ui_dlgcl.h"
 
-DlgCL::DlgCL(const QStringList &dbParams, QWidget *parent) :
-    C5Dialog(dbParams, parent),
+DlgCL::DlgCL(const QStringList &dbParams) :
+    C5Dialog(dbParams),
     ui(new Ui::DlgCL)
 {
     ui->setupUi(this);
@@ -29,7 +29,7 @@ DlgCL::~DlgCL()
 
 bool DlgCL::getCL(QString &id, QString &name)
 {
-    DlgCL *d = new DlgCL(C5Config::dbParams(), __mainWindow);
+    DlgCL *d = new DlgCL(C5Config::dbParams());
     bool result = d->exec() == QDialog::Accepted;
     if (result) {
         id = d->ui->tblGuest->getString(d->fRow, 0);

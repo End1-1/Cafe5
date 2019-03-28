@@ -12,7 +12,7 @@ class DlgCL : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgCL(const QStringList &dbParams, QWidget *parent = 0);
+    explicit DlgCL(const QStringList &dbParams);
 
     ~DlgCL();
 

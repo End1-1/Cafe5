@@ -320,7 +320,7 @@ RESOURCES += \
     ../resources/res.qrc \
     lang.qrc
 
-QMAKE_CXXFLAGS += -Werror
+#QMAKE_CXXFLAGS += -Werror
 
 DISTFILES += \
     LastCache \

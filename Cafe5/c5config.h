@@ -128,11 +128,5 @@ extern QString __username;
 
 extern QStringList __databases;
 
-#ifdef FRONTDESK
-#include "c5mainwindow.h"
-extern C5MainWindow *__mainWindow;
-#else
-extern QDialog *__mainWindow;
-#endif
 
 #endif // C5CONFIG_H

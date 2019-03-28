@@ -84,7 +84,7 @@ void C5DishWidget::setDish(int id)
                 ui->tblPricing->comboBox(i, 4)->setCurrentIndex(ui->tblPricing->comboBox(i, 4)->findData(db.getInt("f_store")));
                 ui->tblPricing->comboBox(i, 5)->setCurrentIndex(ui->tblPricing->comboBox(i, 5)->findText(db.getString("f_print1")));
                 ui->tblPricing->comboBox(i, 6)->setCurrentIndex(ui->tblPricing->comboBox(i, 6)->findText(db.getString("f_print2")));
-                ui->tblPricing->checkBox(i, 7)->setChecked(db.getInt(6) == 1 ? Qt::Checked : Qt::Unchecked);
+                ui->tblPricing->checkBox(i, 7)->setChecked(db.getInt(6) == 1);
                 break;
             }
         }
@@ -139,7 +139,7 @@ bool C5DishWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
         db[":f_store"] = ui->tblPricing->comboBox(i, 4)->currentIndex() > -1 ? ui->tblPricing->comboBox(i, 4)->currentData() : "null";
         db[":f_print1"] = ui->tblPricing->comboBox(i, 5)->currentText();
         db[":f_print2"] = ui->tblPricing->comboBox(i, 6)->currentText();
-        db[":f_state"] = (int) ui->tblPricing->checkBox(i, 7)->isChecked();
+        db[":f_state"] = ui->tblPricing->checkBox(i, 7)->isChecked() ? 1 : 0;
         if (ui->tblPricing->getInteger(i, 0) == 0) {
             ui->tblPricing->setInteger(i, 0, db.insert("d_menu"));
         } else {
@@ -293,6 +293,6 @@ void C5DishWidget::on_btnPrintRecipe_clicked()
         p.br(60);
     }
 
-    C5PrintPreview pp(&p, fDBParams, this);
+    C5PrintPreview pp(&p, fDBParams);
     pp.exec();
 }

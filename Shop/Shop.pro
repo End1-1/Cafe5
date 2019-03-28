@@ -89,8 +89,8 @@ INCLUDEPATH += ../Controls
 INCLUDEPATH += ../Editors
 INCLUDEPATH += ../RESOURCES
 INCLUDEPATH += ../../NewTax
-INCLUDEPATH += C:/OpenSSL-Win32.0/include
-INCLUDEPATH += C:/OpenSSL-Win32.0/include/openssl
+INCLUDEPATH += C:/OpenSSL-Win32/include
+INCLUDEPATH += C:/OpenSSL-Win32/include/openssl
 
 ICON = bag.ico
 
@@ -103,5 +103,3 @@ LIBS += -lwsock32
 LIBS += -LC:/OpenSSL-Win32/lib
 LIBS += -lopenssl
 LIBS += -llibcrypto
-
-QMAKE_CXXFLAGS += -Werror

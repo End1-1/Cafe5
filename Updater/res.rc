@@ -1,0 +1,32 @@
+IDI_ICON1 ICON DISCARDABLE "time.ico"
+
+#include "rc.h"
+#include <windows.h>
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION _PRODUCT_VERSION
+PRODUCTVERSION _PRODUCT_VERSION
+
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904E4"
+        BEGIN
+            VALUE "Comments", "\0"
+            VALUE "CompanyName", "Kudryashov Vasili\0"
+            VALUE "FileDescription", "Updater\0"
+            VALUE "FileVersion", _FILE_VERSION_STR
+            VALUE "InternalName", "Storehouse\0"
+            VALUE "LegalCopyright", "(C)2017-2019, Kudryashov Vasili\0"
+            VALUE "OriginalFilename", "Updater.exe\0"
+            VALUE "Email", "end1_1@yahoo.com\0"
+            VALUE "ProductName", "Updater\0"
+            VALUE "ProductVersion", _PRODUCT_VERSION_STR
+        END
+    END
+
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END

@@ -589,6 +589,21 @@
           <height>200</height>
          </size>
         </property>
+        <property name="editTriggers">
+         <set>QAbstractItemView::NoEditTriggers</set>
+        </property>
+        <property name="dragEnabled">
+         <bool>true</bool>
+        </property>
+        <property name="dragDropMode">
+         <enum>QAbstractItemView::DragDrop</enum>
+        </property>
+        <property name="defaultDropAction">
+         <enum>Qt::TargetMoveAction</enum>
+        </property>
+        <property name="selectionMode">
+         <enum>QAbstractItemView::SingleSelection</enum>
+        </property>
         <attribute name="horizontalHeaderVisible">
          <bool>false</bool>
         </attribute>
@@ -614,6 +629,9 @@
       </item>
       <item>
        <widget class="C5TableWidget" name="tblGoodsStore">
+        <property name="styleSheet">
+         <string notr="true">QTableWidget::item{ selection-background-color: red}</string>
+        </property>
         <property name="selectionMode">
          <enum>QAbstractItemView::SingleSelection</enum>
         </property>

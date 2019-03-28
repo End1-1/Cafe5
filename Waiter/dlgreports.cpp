@@ -3,8 +3,8 @@
 #include "dlgreportslist.h"
 #include "c5printjson.h"
 
-DlgReports::DlgReports(const QStringList &dbParams, QWidget *parent) :
-    C5Dialog(dbParams, parent),
+DlgReports::DlgReports(const QStringList &dbParams) :
+    C5Dialog(dbParams),
     ui(new Ui::DlgReports)
 {
     ui->setupUi(this);
@@ -20,7 +20,7 @@ DlgReports::~DlgReports()
 
 void DlgReports::openReports(C5User *user)
 {
-    DlgReports *d = new DlgReports(QStringList(), __mainWindow);
+    DlgReports *d = new DlgReports(QStringList());
     d->fUser = user;
     d->showFullScreen();
     d->hide();

@@ -30,7 +30,7 @@ DlgCreditCardList::~DlgCreditCardList()
 bool DlgCreditCardList::getCardInfo(int &id, QString &name)
 {
     bool result = false;
-    DlgCreditCardList *d = new DlgCreditCardList(__mainWindow);
+    DlgCreditCardList *d = new DlgCreditCardList();
     if (d->exec() == QDialog::Accepted) {
         id = d->fId;
         name = d->fName;

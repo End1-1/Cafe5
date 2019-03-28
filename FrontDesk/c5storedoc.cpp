@@ -5,6 +5,7 @@
 #include "c5printing.h"
 #include "c5printpreview.h"
 #include "c5editor.h"
+#include "c5mainwindow.h"
 #include "ce5partner.h"
 #include "ce5goods.h"
 
@@ -28,6 +29,8 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
     fInternalId = "";
     fDocState = DOC_STATE_DRAFT;
     ui->leScancode->setVisible(false);
+    ui->tblGoodsGroup->viewport()->installEventFilter(this);
+    fGroupTableCell = nullptr;
 }
 
 C5StoreDoc::~C5StoreDoc()
@@ -198,6 +201,60 @@ bool C5StoreDoc::save(int state, QString &err, bool showMsg)
 bool C5StoreDoc::allowChangeDatabase()
 {
     return false;
+}
+
+bool C5StoreDoc::eventFilter(QObject *o, QEvent *e)
+{
+    if (o == ui->tblGoodsGroup->viewport()) {
+        if (e->type() == QEvent::MouseButtonPress) {
+            QCursor c;
+            QTableWidgetItem *item = ui->tblGoodsGroup->itemAt(ui->tblGoodsGroup->mapFromGlobal(c.pos()));
+            if (!item) {
+                return false;
+            }
+            fGroupTableCell = new TableCell(this, item);
+            fGroupTableCell->setMinimumSize(ui->tblGoodsGroup->columnWidth(0), ui->tblGoodsGroup->rowHeight(0));
+            fGroupTableCell->setMaximumSize(ui->tblGoodsGroup->columnWidth(0), ui->tblGoodsGroup->rowHeight(0));
+            fGroupTableCell->move(ui->tblGoodsGroup->mapToGlobal(c.pos()));
+            fGroupTableCell->show();
+        } else if(e->type() == QEvent::MouseButtonRelease) {
+            if (fGroupTableCell) {
+                QTableWidgetItem *oldItem = fGroupTableCell->fOldItem;
+                delete fGroupTableCell;
+                fGroupTableCell = nullptr;
+                QTableWidgetItem *item = ui->tblGoodsGroup->itemAt(ui->tblGoodsGroup->mapFromGlobal(QCursor().pos()));
+                if (item) {
+                    QTableWidgetItem tempItem;
+                    tempItem.setText(oldItem->text());
+                    tempItem.setData(Qt::UserRole, oldItem->data(Qt::UserRole));
+                    tempItem.setData(Qt::UserRole + 1, oldItem->data(Qt::UserRole + 1));
+                    oldItem->setText(item->text());
+                    oldItem->setData(Qt::UserRole, item->data(Qt::UserRole));
+                    oldItem->setData(Qt::UserRole + 1, item->data(Qt::UserRole + 1));
+                    item->setText(tempItem.text());
+                    item->setData(Qt::UserRole, tempItem.data(Qt::UserRole));
+                    item->setData(Qt::UserRole + 1, tempItem.data(Qt::UserRole + 1));
+                    C5Database db(fDBParams);
+                    for (int r = 0; r < ui->tblGoodsGroup->rowCount(); r++) {
+                        for (int c = 0; c < ui->tblGoodsGroup->columnCount(); c++) {
+                            QTableWidgetItem *i = ui->tblGoodsGroup->item(r, c);
+                            if (i == nullptr) {
+                                continue;
+                            }
+                            db[":f_order"] = (c + (r * ui->tblGoodsGroup->columnCount()));
+                            db.update("c_groups", where_id(i->data(Qt::UserRole).toInt()));
+                        }
+                    }
+                }
+            }
+        } else if (e->type() == QEvent::MouseMove) {
+            if (fGroupTableCell) {
+                fGroupTableCell->move(mapFromGlobal(QCursor().pos()));
+                return true;
+            }
+        }
+    }
+    return C5Widget::eventFilter(o, e);
 }
 
 void C5StoreDoc::countTotal()
@@ -563,7 +620,7 @@ void C5StoreDoc::setDocEnabled(bool v)
 void C5StoreDoc::loadGroupsInput()
 {
     C5Database db(fDBParams);
-    db.exec("select f_id, f_name from c_groups order by 2");
+    db.exec("select f_id, f_name from c_groups order by f_order, f_name");
     int col = -1, row = 0;
     ui->tblGoodsGroup->clearContents();
     ui->tblGoodsGroup->setRowCount(0);
@@ -672,6 +729,25 @@ void C5StoreDoc::setGoodsPanelHidden(bool v)
         }
         ui->tblGoodsGroup->fitColumnsToWidth(45);
         ui->tblGoodsStore->fitColumnsToWidth(45);
+    }
+}
+
+void C5StoreDoc::markGoodsComplited()
+{
+    QColor sel = QColor::fromRgb(245, 135, 157);
+    QColor blank = QColor::fromRgb(255, 255, 255);
+    QSet<int> goods;
+    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+        goods << ui->tblGoods->item(i, 1)->data(Qt::EditRole).toInt();
+    }
+    for (int r = 0; r < ui->tblGoodsStore->rowCount(); r++) {
+        QColor color = goods.contains(ui->tblGoodsStore->item(r, 0)->data(Qt::EditRole).toInt()) ? sel : blank;
+        for (int c = 0; c < ui->tblGoodsStore->columnCount(); c++) {
+            QTableWidgetItem *i = ui->tblGoodsStore->item(r, c);
+            if (i) {
+                i->setData(Qt::BackgroundRole, color);
+            }
+        }
     }
 }
 
@@ -789,7 +865,7 @@ void C5StoreDoc::removeDocument()
 
 void C5StoreDoc::printDoc()
 {
-    if (fInternalId == 0) {
+    if (fInternalId == nullptr) {
         C5Message::error(tr("Document is not saved"));
         return;
     }
@@ -947,7 +1023,7 @@ void C5StoreDoc::printDoc()
     p.line(50, p.fTop, 700, p.fTop);
     p.line(1000, p.fTop, 1650, p.fTop);
 
-    C5PrintPreview pp(&p, fDBParams, this);
+    C5PrintPreview pp(&p, fDBParams);
     pp.exec();
 }
 
@@ -1020,6 +1096,7 @@ void C5StoreDoc::on_btnAddGoods_clicked()
         getOutput();
         break;
     }
+    markGoodsComplited();
 }
 
 void C5StoreDoc::on_btnRemoveGoods_clicked()
@@ -1076,6 +1153,7 @@ void C5StoreDoc::on_tblGoodsStore_itemDoubleClicked(QTableWidgetItem *item)
     ui->tblGoods->setString(row, 2, ui->tblGoodsStore->getString(r, 2));
     ui->tblGoods->setString(row, 4, ui->tblGoodsStore->getString(r, 4));
     ui->tblGoods->lineEdit(row, 3)->setFocus();
+    markGoodsComplited();
 }
 
 void C5StoreDoc::on_btnNewPartner_clicked()
@@ -1107,4 +1185,11 @@ void C5StoreDoc::on_btnNewGoods_clicked()
 void C5StoreDoc::on_leScancode_returnPressed()
 {
 
+}
+
+TableCell::TableCell(QWidget *parent, QTableWidgetItem *item) :
+    QLabel(parent, Qt::FramelessWindowHint)
+{
+    setText(item->text());
+    fOldItem = item;
 }

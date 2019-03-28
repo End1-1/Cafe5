@@ -6,7 +6,7 @@ C5Widget::C5Widget(const QStringList &dbParams, QWidget *parent) :
     QWidget(parent),
     fDBParams(dbParams)
 {
-    fToolBar = 0;
+    fToolBar = nullptr;
 }
 
 QIcon C5Widget::icon()
@@ -27,12 +27,6 @@ void C5Widget::postProcess()
 QToolBar *C5Widget::toolBar()
 {
     createToolBar();
-    return fToolBar;
-
-    if (!fToolBar) {
-        fToolBar = new QToolBar();
-        fToolBar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-    }
     return fToolBar;
 }
 
@@ -87,7 +81,7 @@ void C5Widget::print()
 
 QWidget *C5Widget::widget()
 {
-    return 0;
+    return nullptr;
 }
 
 void C5Widget::hotKey(const QString &key)
@@ -114,7 +108,6 @@ bool C5Widget::event(QEvent *event)
                 focusNextChild();
                 return true;
             }
-            break;
         }
     }
     return QWidget::event(event);

@@ -12,7 +12,7 @@ class C5ChangePassword : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit C5ChangePassword(const QStringList &dbParams, QWidget *parent = 0);
+    explicit C5ChangePassword(const QStringList &dbParams);
 
     ~C5ChangePassword();
 

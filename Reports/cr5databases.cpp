@@ -1,6 +1,7 @@
 #include "cr5databases.h"
 #include "c5dbuseraccess.h"
 #include "ce5databases.h"
+#include "c5mainwindow.h"
 
 CR5Databases::CR5Databases(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)

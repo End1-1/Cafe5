@@ -7,6 +7,7 @@
 #include "cr5consumptionbysales.h"
 #include "cr5storedocuments.h"
 #include "cr5goodsmovement.h"
+#include "c5mainwindow.h"
 #include "cr5tstoreextra.h"
 #include "cr5commonsales.h"
 #include "c5cache.h"

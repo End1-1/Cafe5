@@ -1,5 +1,6 @@
 #include "cr5dish.h"
 #include "c5dishwidget.h"
+#include "c5mainwindow.h"
 #include "c5tablemodel.h"
 #include "cr5menutranslator.h"
 #include <QAbstractScrollArea>

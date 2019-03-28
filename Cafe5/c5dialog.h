@@ -14,13 +14,17 @@ class C5Dialog : public QDialog
     Q_OBJECT
 
 public:
-    C5Dialog(const QStringList &dbParams, QWidget *parent = 0);
+    C5Dialog(const QStringList &dbParams);
+
+    ~C5Dialog();
+
+    static void setMainWindow(QWidget *widget);
 
     virtual bool preambule();
 
     template<typename T>
     static bool go(const QStringList &dbParams) {
-        T *t = new T(dbParams, __c5config.fParentWidget);
+        T *t = new T(dbParams);
         bool result = false;
         if (t->preambule()) {
             result = t->exec() == QDialog::Accepted;

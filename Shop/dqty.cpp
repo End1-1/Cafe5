@@ -1,5 +1,6 @@
 #include "dqty.h"
 #include "ui_dqty.h"
+#include <QDoubleValidator>
 
 DQty::DQty(QWidget *parent) :
     QDialog(parent),

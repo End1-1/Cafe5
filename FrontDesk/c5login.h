@@ -11,7 +11,7 @@ class C5Login : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit C5Login(const QStringList &dbParams, QWidget *parent = 0);
+    explicit C5Login(const QStringList &dbParams);
 
     ~C5Login();
 

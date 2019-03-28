@@ -12,7 +12,7 @@ class C5FilterValues : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit C5FilterValues(QWidget *parent = 0);
+    explicit C5FilterValues();
 
     ~C5FilterValues();
 

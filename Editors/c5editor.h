@@ -15,7 +15,7 @@ class C5Editor : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit C5Editor(const QStringList &dbParams, QWidget *parent = 0);
+    explicit C5Editor(const QStringList &dbParams);
 
     ~C5Editor();
 

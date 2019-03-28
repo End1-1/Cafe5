@@ -2,8 +2,8 @@
 #include "ui_dlgreceiptlanguage.h"
 #include "c5translator.h"
 
-DlgReceiptLanguage::DlgReceiptLanguage(const QStringList &dbParams, QWidget *parent) :
-    C5Dialog(dbParams, parent),
+DlgReceiptLanguage::DlgReceiptLanguage(const QStringList &dbParams) :
+    C5Dialog(dbParams),
     ui(new Ui::DlgReceiptLanguage)
 {
     ui->setupUi(this);
@@ -35,7 +35,7 @@ DlgReceiptLanguage::~DlgReceiptLanguage()
 
 int DlgReceiptLanguage::receipLanguage()
 {
-    DlgReceiptLanguage *d = new DlgReceiptLanguage(C5Config::dbParams(), __mainWindow);
+    DlgReceiptLanguage *d = new DlgReceiptLanguage(C5Config::dbParams());
     int result = -1;
     if (d->exec() == QDialog::Accepted) {
         result = d->fResult;

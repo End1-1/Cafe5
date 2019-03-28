@@ -3,8 +3,8 @@
 #include "ce5editor.h"
 #include <QShortcut>
 
-C5Editor::C5Editor(const QStringList &dbParams, QWidget *parent) :
-    C5Dialog(dbParams, parent),
+C5Editor::C5Editor(const QStringList &dbParams) :
+    C5Dialog(dbParams),
     ui(new Ui::C5Editor)
 {
     ui->setupUi(this);
@@ -20,7 +20,7 @@ C5Editor::~C5Editor()
 
 C5Editor *C5Editor::createEditor(const QStringList &dbParams, CE5Editor *e, int id)
 {
-    C5Editor *de = new C5Editor(dbParams, C5Config::fParentWidget);
+    C5Editor *de = new C5Editor(dbParams);
     de->fEditor = e;
     de->fVerticalLayout->addWidget(e);
     de->adjustSize();

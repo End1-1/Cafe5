@@ -2,8 +2,8 @@
 #include "ui_c5login.h"
 #include "c5connection.h"
 
-C5Login::C5Login(const QStringList &dbParams, QWidget *parent) :
-    C5Dialog(dbParams, parent),
+C5Login::C5Login(const QStringList &dbParams) :
+    C5Dialog(dbParams),
     ui(new Ui::C5Login)
 {
     ui->setupUi(this);
@@ -31,7 +31,6 @@ void C5Login::on_btnOk_clicked()
     db.exec("select f_id, f_group, f_state, concat(f_last, ' ', f_first) from s_user where f_login=:f_login and f_password=:f_password");
     if (!db.nextRow()) {
         C5Message::error(tr("Login failed"));
-        __mainWindow->writeLog("Login failed for: " + ui->leUsername->text());
         return;
     }
     if (db.getInt(2) == 0) {

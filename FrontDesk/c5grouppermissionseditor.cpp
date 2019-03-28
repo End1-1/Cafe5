@@ -4,6 +4,7 @@
 #include "c5selector.h"
 #include "c5cache.h"
 #include <QProxyStyle>
+#include <QStyleOptionTab>
 
 class CustomTabStyle : public QProxyStyle {
 public:

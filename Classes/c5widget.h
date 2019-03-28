@@ -15,7 +15,7 @@ class C5Widget : public QWidget
 public:
     enum ToolBarButtons {tbNone = 0, tbNew, tbEdit, tbSave, tbRefresh, tbFilter, tbClearFilter, tbPrint, tbExcel, tbDelete };
 
-    explicit C5Widget(const QStringList &dbParams, QWidget *parent = 0);
+    explicit C5Widget(const QStringList &dbParams, QWidget *parent = nullptr);
 
     QIcon icon();
 

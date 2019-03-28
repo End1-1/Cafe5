@@ -2,8 +2,8 @@
 #include "ui_dlgexitwithmessage.h"
 #include "c5config.h"
 
-DlgExitWithMessage::DlgExitWithMessage(QWidget *parent) :
-    C5Dialog(C5Config::dbParams(), parent),
+DlgExitWithMessage::DlgExitWithMessage() :
+    C5Dialog(C5Config::dbParams()),
     ui(new Ui::DlgExitWithMessage)
 {
     ui->setupUi(this);
@@ -16,7 +16,7 @@ DlgExitWithMessage::~DlgExitWithMessage()
 
 void DlgExitWithMessage::openDialog(const QString &msg, int closeTimeout)
 {
-    DlgExitWithMessage *d = new DlgExitWithMessage(__mainWindow);
+    DlgExitWithMessage *d = new DlgExitWithMessage();
     d->ui->lbMessage->setText(msg);
     d->setCloseTimeout(closeTimeout);
     d->exec();

@@ -1,9 +1,10 @@
 #include "c5salefromstoreorder.h"
 #include "ui_c5salefromstoreorder.h"
+#include "c5mainwindow.h"
 #include <QMenu>
 
-C5SaleFromStoreOrder::C5SaleFromStoreOrder(const QStringList &dbParams, QWidget *parent) :
-    C5Dialog(dbParams, parent),
+C5SaleFromStoreOrder::C5SaleFromStoreOrder(const QStringList &dbParams) :
+    C5Dialog(dbParams),
     ui(new Ui::C5SaleFromStoreOrder)
 {
     ui->setupUi(this);
@@ -18,7 +19,7 @@ C5SaleFromStoreOrder::~C5SaleFromStoreOrder()
 
 void C5SaleFromStoreOrder::openOrder(const QStringList &dbParams, const QString &id)
 {
-    C5SaleFromStoreOrder *d = new C5SaleFromStoreOrder(dbParams, __mainWindow);
+    C5SaleFromStoreOrder *d = new C5SaleFromStoreOrder(dbParams);
     d->loadOrder(id);
     d->exec();
     delete d;

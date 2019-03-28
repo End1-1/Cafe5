@@ -7,8 +7,8 @@
 
 QMutex mutex;
 
-C5DataSynchronize::C5DataSynchronize(const QStringList &dbParams, QWidget *parent) :
-    C5Dialog(dbParams, parent),
+C5DataSynchronize::C5DataSynchronize(const QStringList &dbParams) :
+    C5Dialog(dbParams),
     ui(new Ui::C5DataSynchronize)
 {
     ui->setupUi(this);

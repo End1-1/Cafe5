@@ -7,8 +7,8 @@
 #define db_ver 1
 #define params_count 6
 
-C5Connection::C5Connection(const QStringList &dbParams, QWidget *parent) :
-    C5Dialog(dbParams, parent),
+C5Connection::C5Connection(const QStringList &dbParams) :
+    C5Dialog(dbParams),
     ui(new Ui::C5Connection)
 {
     ui->setupUi(this);

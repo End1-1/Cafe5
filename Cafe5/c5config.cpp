@@ -2,13 +2,14 @@
 #include "c5database.h"
 #include <QDir>
 #include <QMutex>
+#include <QDialog>
 #include <QSettings>
 
 QString C5Config::fAppHomePath;
 QString C5Config::fAppLogFile;
 QString C5Config::fSettingsName;
 QString C5Config::fLastUsername;
-QWidget *C5Config::fParentWidget = 0;
+QWidget *C5Config::fParentWidget = nullptr;
 QString C5Config::fDBHost;
 QString C5Config::fDBPath;
 QString C5Config::fDBUser;
@@ -19,14 +20,7 @@ int __usergroup;
 QString __username;
 QStringList __databases;
 QMap<int, QString> C5Config::fSettings;
-QMutex settingsMutex;
-
-#ifdef FRONTDESK
-C5MainWindow *__mainWindow;
-#else
-#include <QDialog>
-QDialog *__mainWindow;
-#endif
+static QMutex settingsMutex;
 
 C5Config::C5Config()
 {

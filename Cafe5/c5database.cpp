@@ -14,7 +14,7 @@
 int C5Database::fCounter = 0;
 QStringList C5Database::fDbParamsForUuid;
 
-QMutex fMutex;
+static QMutex fMutex;
 
 C5Database::C5Database(const QStringList &dbParams) :
     QObject()

@@ -1,8 +1,8 @@
 #include "c5passwords.h"
 #include "ui_c5passwords.h"
 
-C5Passwords::C5Passwords(const QStringList &dbParams, QWidget *parent) :
-    C5Dialog(dbParams, parent),
+C5Passwords::C5Passwords(const QStringList &dbParams) :
+    C5Dialog(dbParams),
     ui(new Ui::C5Passwords)
 {
     ui->setupUi(this);
@@ -17,7 +17,7 @@ C5Passwords::~C5Passwords()
 
 void C5Passwords::setPasswords(const QStringList &dbParams, int userId)
 {
-    C5Passwords *p = new C5Passwords(dbParams, C5Config::fParentWidget);
+    C5Passwords *p = new C5Passwords(dbParams);
     p->setUser(userId);
     p->exec();
     delete p;

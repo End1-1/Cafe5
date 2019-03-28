@@ -14,7 +14,7 @@ class C5MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit C5MainWindow(QWidget *parent = 0);
+    explicit C5MainWindow(QWidget *parent = nullptr);
 
     ~C5MainWindow();
 
@@ -86,5 +86,7 @@ private:
 
     QStringList getDbParams(QTreeWidgetItem *item);
 };
+
+extern C5MainWindow *__mainWindow;
 
 #endif // C5MAINWINDOW_H

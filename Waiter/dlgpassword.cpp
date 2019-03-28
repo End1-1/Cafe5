@@ -4,9 +4,10 @@
 #include "c5user.h"
 #include "c5database.h"
 #include <QCryptographicHash>
+#include <QDoubleValidator>
 
-DlgPassword::DlgPassword(QWidget *parent) :
-    C5Dialog(QStringList(), parent),
+DlgPassword::DlgPassword() :
+    C5Dialog(QStringList()),
     ui(new Ui::DlgPassword)
 {
     ui->setupUi(this);
@@ -21,7 +22,7 @@ DlgPassword::~DlgPassword()
 
 bool DlgPassword::getUser(const QString &title, C5User *user)
 {
-    DlgPassword *d = new DlgPassword(C5Config::fParentWidget);
+    DlgPassword *d = new DlgPassword();
     d->fUser = user;
     d->ui->label->setText(title);
     bool result = d->exec() == QDialog::Accepted;
@@ -31,7 +32,7 @@ bool DlgPassword::getUser(const QString &title, C5User *user)
 
 bool DlgPassword::getUserDB(const QString &title, C5User *user)
 {
-    DlgPassword *d = new DlgPassword(C5Config::fParentWidget);
+    DlgPassword *d = new DlgPassword();
     d->fUser = user;
     d->fAutoFromDb = true;
     d->ui->label->setText(title);
@@ -42,7 +43,7 @@ bool DlgPassword::getUserDB(const QString &title, C5User *user)
 
 bool DlgPassword::getQty(const QString &title, int &qty)
 {
-    DlgPassword *d = new DlgPassword(C5Config::fParentWidget);
+    DlgPassword *d = new DlgPassword();
     d->ui->label->setText(title);
     d->ui->lePassword->setEchoMode(QLineEdit::Normal);
     d->ui->lePassword->setMaxLength(2);
@@ -54,7 +55,7 @@ bool DlgPassword::getQty(const QString &title, int &qty)
 
 bool DlgPassword::getAmount(const QString &title, double &amount, bool defaultAmount)
 {
-    DlgPassword *d = new DlgPassword(C5Config::fParentWidget);
+    DlgPassword *d = new DlgPassword();
     d->ui->label->setText(title);
     d->ui->lePassword->setEchoMode(QLineEdit::Normal);
     d->ui->lePassword->setValidator(new QDoubleValidator(0, amount, 2));

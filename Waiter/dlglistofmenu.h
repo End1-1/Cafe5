@@ -12,7 +12,7 @@ class DlgListOfMenu : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgListOfMenu(const QStringList &dbParams, QWidget *parent = 0);
+    explicit DlgListOfMenu(const QStringList &dbParams);
 
     ~DlgListOfMenu();
 

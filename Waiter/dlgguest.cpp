@@ -1,8 +1,8 @@
 #include "dlgguest.h"
 #include "ui_dlgguest.h"
 
-DlgGuest::DlgGuest(QWidget *parent) :
-    C5Dialog(C5Config::dbParams(), parent),
+DlgGuest::DlgGuest() :
+    C5Dialog(C5Config::dbParams()),
     ui(new Ui::DlgGuest)
 {
     ui->setupUi(this);
@@ -34,7 +34,7 @@ DlgGuest::~DlgGuest()
 
 bool DlgGuest::getGuest(QString &res, QString &inv, QString &room, QString &guest)
 {
-    DlgGuest *d = new DlgGuest(__mainWindow);
+    DlgGuest *d = new DlgGuest();
     d->showFullScreen();
     d->hide();
     d->ui->kbd->adjustSize();

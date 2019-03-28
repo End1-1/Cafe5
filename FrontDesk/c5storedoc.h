@@ -2,12 +2,20 @@
 #define C5STOREDOC_H
 
 #include "c5widget.h"
+#include <QLabel>
 
 namespace Ui {
 class C5StoreDoc;
 }
 
 class QTableWidgetItem;
+
+class TableCell : public QLabel {
+public:
+    QTableWidgetItem *fOldItem;
+
+    TableCell(QWidget *parent, QTableWidgetItem *item);
+};
 
 class C5StoreDoc : public C5Widget
 {
@@ -16,7 +24,7 @@ class C5StoreDoc : public C5Widget
 public:
     enum STORE_DOC {sdInput = 1, sdOutput, sdMovement};
 
-    explicit C5StoreDoc(const QStringList &dbParams, QWidget *parent = 0);
+    explicit C5StoreDoc(const QStringList &dbParams, QWidget *parent = nullptr);
 
     ~C5StoreDoc();
 
@@ -31,6 +39,9 @@ public:
     bool save(int state, QString &err, bool showMsg);
 
     virtual bool allowChangeDatabase();
+    
+protected:
+    virtual bool eventFilter(QObject *o, QEvent *e);    
 
 private:
     Ui::C5StoreDoc *ui;
@@ -40,6 +51,8 @@ private:
     int fDocState;
 
     QString fInternalId;
+
+    TableCell *fGroupTableCell;
 
     void countTotal();
 
@@ -64,6 +77,8 @@ private:
     void loadGoods(int store);
 
     void setGoodsPanelHidden(bool v);
+
+    void markGoodsComplited();
 
 private slots:
     void newDoc();

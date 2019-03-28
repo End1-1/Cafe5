@@ -12,7 +12,7 @@ class DlgReceiptLanguage : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgReceiptLanguage(const QStringList &dbParams, QWidget *parent = 0);
+    explicit DlgReceiptLanguage(const QStringList &dbParams);
 
     ~DlgReceiptLanguage();
 

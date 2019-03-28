@@ -1,6 +1,7 @@
 #include "cr5storedocuments.h"
 #include "cr5storedocumentsfilter.h"
 #include "c5tablemodel.h"
+#include "c5mainwindow.h"
 #include "c5storedoc.h"
 
 CR5StoreDocuments::CR5StoreDocuments(const QStringList &dbParams, QWidget *parent) :

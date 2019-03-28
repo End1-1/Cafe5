@@ -4,8 +4,8 @@
 #include <QListWidgetItem>
 #include <QCheckBox>
 
-C5GridGilter::C5GridGilter(QWidget *parent) :
-    C5Dialog(QStringList(), parent),
+C5GridGilter::C5GridGilter() :
+    C5Dialog(QStringList()),
     ui(new Ui::C5GridGilter)
 {
     ui->setupUi(this);
@@ -18,7 +18,7 @@ C5GridGilter::~C5GridGilter()
 
 bool C5GridGilter::filter(C5FilterWidget *filterWidget, QString &condition, QMap<QString, bool> &showColumns, QMap<QString, QString> &colTranslation)
 {
-    C5GridGilter *gf = new C5GridGilter(C5Config::fParentWidget);
+    C5GridGilter *gf = new C5GridGilter();
     filterWidget->restoreFilter(filterWidget);
     gf->ui->vl->addWidget(filterWidget);
     if (filterWidget->children().count() > 0) {

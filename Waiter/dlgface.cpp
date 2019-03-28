@@ -21,8 +21,8 @@
 #define HALL_ROW_HEIGHT 60
 #define TIMER_TIMEOUT_INTERVAL 5000
 
-DlgFace::DlgFace(QWidget *parent) :
-    C5Dialog(C5Config::dbParams(), parent),
+DlgFace::DlgFace() :
+    C5Dialog(C5Config::dbParams()),
     ui(new Ui::DlgFace)
 {
     ui->setupUi(this);
@@ -91,7 +91,7 @@ void DlgFace::reject()
 bool DlgFace::getTable(int &tableId, const QString &hall)
 {
     bool result = false;
-    DlgFace *df = new DlgFace(__mainWindow);
+    DlgFace *df = new DlgFace();
     df->ui->lbDate->setVisible(false);
     df->ui->btnConnection->setVisible(false);
     df->ui->btnReports->setVisible(false);

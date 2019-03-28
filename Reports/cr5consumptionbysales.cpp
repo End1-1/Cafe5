@@ -2,6 +2,7 @@
 #include "cr5consumptionbysalesfilter.h"
 #include "c5gridgilter.h"
 #include "c5tablemodel.h"
+#include "c5mainwindow.h"
 #include "c5storedoc.h"
 #include <QInputDialog>
 

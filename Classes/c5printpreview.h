@@ -14,7 +14,7 @@ class C5PrintPreview : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit C5PrintPreview(C5Printing *printData, const QStringList &dbParams, QWidget *parent = 0);
+    explicit C5PrintPreview(C5Printing *printData, const QStringList &dbParams);
 
     ~C5PrintPreview();
 

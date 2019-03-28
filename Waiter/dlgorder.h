@@ -16,7 +16,7 @@ class DlgOrder : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgOrder(QWidget *parent = 0);
+    explicit DlgOrder();
 
     ~DlgOrder();
 

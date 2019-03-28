@@ -2,9 +2,10 @@
 #include "ui_ce5createtablesforhall.h"
 #include "c5cache.h"
 #include "ce5halls.h"
+#include "c5mainwindow.h"
 
-CE5CreateTablesForHall::CE5CreateTablesForHall(const QStringList &dbParams, QWidget *parent) :
-    C5Dialog(dbParams, parent),
+CE5CreateTablesForHall::CE5CreateTablesForHall(const QStringList &dbParams) :
+    C5Dialog(dbParams),
     ui(new Ui::CE5CreateTablesForHall)
 {
     ui->setupUi(this);
@@ -18,7 +19,7 @@ CE5CreateTablesForHall::~CE5CreateTablesForHall()
 
 void CE5CreateTablesForHall::createTableForHall(const QStringList &dbParams)
 {
-    CE5CreateTablesForHall *d = new CE5CreateTablesForHall(dbParams, __mainWindow);
+    CE5CreateTablesForHall *d = new CE5CreateTablesForHall(dbParams);
     d->exec();
     delete d;
 }

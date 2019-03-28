@@ -3,6 +3,7 @@
 #include "c5storeinventory.h"
 #include "cr5documentsfilter.h"
 #include "c5tablemodel.h"
+#include "c5mainwindow.h"
 #include <QMenu>
 
 CR5Documents::CR5Documents(const QStringList &dbParams, QWidget *parent) :

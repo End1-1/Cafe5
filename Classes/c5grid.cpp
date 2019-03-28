@@ -588,7 +588,7 @@ void C5Grid::print()
         }
     } while (!stopped);
 
-    C5PrintPreview pp(&p, fDBParams, this);
+    C5PrintPreview pp(&p, fDBParams);
     pp.exec();
 }
 

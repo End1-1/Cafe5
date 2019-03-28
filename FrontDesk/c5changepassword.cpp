@@ -1,8 +1,8 @@
 #include "c5changepassword.h"
 #include "ui_c5changepassword.h"
 
-C5ChangePassword::C5ChangePassword(const QStringList &dbParams, QWidget *parent) :
-    C5Dialog(dbParams, parent),
+C5ChangePassword::C5ChangePassword(const QStringList &dbParams) :
+    C5Dialog(dbParams),
     ui(new Ui::C5ChangePassword)
 {
     ui->setupUi(this);
@@ -15,7 +15,7 @@ C5ChangePassword::~C5ChangePassword()
 
 bool C5ChangePassword::changePassword(const QStringList &dbParams, QString &password)
 {
-    C5ChangePassword *d = new C5ChangePassword(dbParams, __mainWindow);
+    C5ChangePassword *d = new C5ChangePassword(dbParams);
     bool result = d->exec() == QDialog::Accepted;
     password = d->ui->leNewPassword->text();
     delete d;

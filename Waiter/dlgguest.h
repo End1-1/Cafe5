@@ -12,7 +12,7 @@ class DlgGuest : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgGuest(QWidget *parent = 0);
+    explicit DlgGuest();
 
     ~DlgGuest();
 

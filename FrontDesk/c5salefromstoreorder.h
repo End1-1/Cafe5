@@ -12,7 +12,7 @@ class C5SaleFromStoreOrder : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit C5SaleFromStoreOrder(const QStringList &dbParams, QWidget *parent = 0);
+    explicit C5SaleFromStoreOrder(const QStringList &dbParams);
 
     ~C5SaleFromStoreOrder();
 

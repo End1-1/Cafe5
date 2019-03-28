@@ -2,8 +2,8 @@
 #include "ui_dlglistofmenu.h"
 #include "c5menu.h"
 
-DlgListOfMenu::DlgListOfMenu(const QStringList &dbParams, QWidget *parent) :
-    C5Dialog(dbParams, parent),
+DlgListOfMenu::DlgListOfMenu(const QStringList &dbParams) :
+    C5Dialog(dbParams),
     ui(new Ui::DlgListOfMenu)
 {
     ui->setupUi(this);
@@ -27,7 +27,7 @@ DlgListOfMenu::~DlgListOfMenu()
 bool DlgListOfMenu::getMenuId(QString &id, const QStringList &dbParams)
 {
     bool result = false;
-    DlgListOfMenu *d = new DlgListOfMenu(dbParams, __mainWindow);
+    DlgListOfMenu *d = new DlgListOfMenu(dbParams);
     if (d->exec() == QDialog::Accepted) {
         result = true;
         id = d->fMenuId;

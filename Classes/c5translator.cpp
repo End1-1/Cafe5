@@ -1,10 +1,10 @@
 #include "c5translator.h"
 
-C5Translator __tr;
-QMap<QString, QString> fEn;
-QMap<QString, QString> fRu;
-QMap<QString, QString> fEnDish;
-QMap<QString, QString> fRuDish;
+static C5Translator __tr;
+static QMap<QString, QString> fEn;
+static QMap<QString, QString> fRu;
+static QMap<QString, QString> fEnDish;
+static QMap<QString, QString> fRuDish;
 
 C5Translator::C5Translator()
 {

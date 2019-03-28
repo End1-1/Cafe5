@@ -14,7 +14,7 @@ class RKeyboard : public QWidget
     Q_OBJECT
 
 public:
-    explicit RKeyboard(QWidget *parent = 0);
+    explicit RKeyboard(QWidget *parent = nullptr);
 
     ~RKeyboard();
 

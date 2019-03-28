@@ -17,7 +17,7 @@ DlgReportsList::~DlgReportsList()
 
 bool DlgReportsList::getReport(const QJsonArray &ja, QString &fileName)
 {
-    DlgReportsList *d = new DlgReportsList(__mainWindow);
+    DlgReportsList *d = new DlgReportsList();
     for (int i = 0; i < ja.count(); i++) {
         QListWidgetItem *item = new QListWidgetItem(d->ui->lst);
         item->setSizeHint(QSize(100, 50));

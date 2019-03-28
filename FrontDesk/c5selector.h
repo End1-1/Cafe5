@@ -15,7 +15,7 @@ class C5Selector : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit C5Selector(const QStringList &dbParams, QWidget *parent = 0);
+    explicit C5Selector(const QStringList &dbParams);
 
     ~C5Selector();
 

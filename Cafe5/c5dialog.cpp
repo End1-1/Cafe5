@@ -2,15 +2,32 @@
 #include "c5database.h"
 #include <QKeyEvent>
 
-C5Dialog::C5Dialog(const QStringList &dbParams, QWidget *parent) :
+static QWidget *__mainWindow = nullptr;
+
+C5Dialog::C5Dialog(const QStringList &dbParams) :
 #ifdef WAITER
-    QDialog(parent, Qt::FramelessWindowHint),
+    QDialog(__mainWindow, Qt::FramelessWindowHint),
     fDBParams(dbParams)
 #else
-    QDialog(parent),
+    QDialog(__mainWindow),
     fDBParams(dbParams)
 #endif
 {
+    if (__mainWindow == nullptr) {
+        __mainWindow = this;
+    }
+}
+
+C5Dialog::~C5Dialog()
+{
+    if (__mainWindow == this) {
+        __mainWindow = nullptr;
+    }
+}
+
+void C5Dialog::setMainWindow(QWidget *widget)
+{
+    __mainWindow = widget;
 }
 
 bool C5Dialog::preambule()
@@ -20,7 +37,7 @@ bool C5Dialog::preambule()
 
 C5SocketHandler *C5Dialog::createSocketHandler(const char *slot)
 {
-    C5SocketHandler *s = new C5SocketHandler(0, this);
+    C5SocketHandler *s = new C5SocketHandler(nullptr, this);
     connect(s, SIGNAL(handleCommand(QJsonObject)), this, slot);
     connect(s, SIGNAL(handleError(int,QString)), this, SLOT(handleError(int,QString)));
     return s;

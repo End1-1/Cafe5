@@ -31,7 +31,7 @@ DlgListOfHall::~DlgListOfHall()
 
 bool DlgListOfHall::getHall(QString &hall)
 {
-    DlgListOfHall *d = new DlgListOfHall(__mainWindow);
+    DlgListOfHall *d = new DlgListOfHall();
     bool result = d->exec() == QDialog::Accepted;
     if (result) {
         hall = d->fHall;

@@ -8,7 +8,7 @@
 #include <QShortcut>
 #include <QInputDialog>
 
-QMap<QString, Goods> fGoods;
+static QMap<QString, Goods> fGoods;
 
 Working::Working(QWidget *parent) :
     QDialog(parent),
@@ -124,7 +124,7 @@ void Working::on_btnConnection_clicked()
         }
     }
     const QStringList dbParams;
-    C5Connection *cnf = new C5Connection(dbParams, this);
+    C5Connection *cnf = new C5Connection(dbParams);
     cnf->exec();
     delete cnf;
 }

@@ -16,7 +16,7 @@ class DlgPayment : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgPayment(QWidget *parent = 0);
+    explicit DlgPayment();
 
     ~DlgPayment();
 
@@ -61,6 +61,8 @@ private slots:
 
     void on_btnPayCityLedger_clicked();
 
+    void on_btnSelfCost_clicked();
+
 private:
     Ui::DlgPayment *ui;
 
@@ -85,6 +87,8 @@ private:
     void setTaxState();
 
     void clearOther();
+
+    void setSelfCost();
 };
 
 #endif // DLGPAYMENT_H

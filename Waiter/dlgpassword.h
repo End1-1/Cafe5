@@ -14,7 +14,7 @@ class DlgPassword : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgPassword(QWidget *parent = 0);
+    explicit DlgPassword();
 
     ~DlgPassword();
 

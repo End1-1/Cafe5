@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
 {
 
 #ifndef QT_DEBUG
-    QStringList libPath;
+    QStringList libPath = QCoreApplication::libraryPaths();
     libPath << "./";
     libPath << "./platforms";
     libPath << "./sqldrivers";

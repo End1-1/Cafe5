@@ -32,9 +32,9 @@ DlgDishRemoveReason::~DlgDishRemoveReason()
     delete ui;
 }
 
-DlgDishRemoveReason::getReason(QString &reason, int &state)
+bool DlgDishRemoveReason::getReason(QString &reason, int &state)
 {
-    DlgDishRemoveReason *d = new DlgDishRemoveReason(__mainWindow);
+    DlgDishRemoveReason *d = new DlgDishRemoveReason();
     bool result = d->exec() == QDialog::Accepted;
     if (result) {
         state = d->fState;

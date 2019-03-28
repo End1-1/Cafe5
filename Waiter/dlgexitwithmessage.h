@@ -13,7 +13,7 @@ class DlgExitWithMessage : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgExitWithMessage(QWidget *parent = 0);
+    explicit DlgExitWithMessage();
 
     ~DlgExitWithMessage();
 

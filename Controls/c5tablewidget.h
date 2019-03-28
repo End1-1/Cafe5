@@ -12,7 +12,7 @@ class C5TableWidget : public QTableWidget
     Q_OBJECT
 
 public:
-    C5TableWidget(QWidget *parent = 0);
+    C5TableWidget(QWidget *parent = nullptr);
 
     void setColumnWidths(int count, ...);
 

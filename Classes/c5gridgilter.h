@@ -14,7 +14,7 @@ class C5GridGilter : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit C5GridGilter(QWidget *parent = 0);
+    explicit C5GridGilter();
 
     ~C5GridGilter();
 

@@ -45,6 +45,8 @@
 #include <QShortcut>
 #include <QMenu>
 
+C5MainWindow *__mainWindow;
+
 C5MainWindow::C5MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::C5MainWindow)
@@ -77,6 +79,7 @@ C5MainWindow::C5MainWindow(QWidget *parent) :
     connect(ctrlLog, &QShortcut::activated, [this]() {
         ui->wLog->setVisible(!ui->wLog->isVisible());
     });
+    C5Dialog::setMainWindow(this);
     __mainWindow = this;
 
     QVariant menuPanelIsVisible = C5Config::getRegValue("menupanel");
@@ -245,7 +248,7 @@ void C5MainWindow::on_actionLogin_triggered()
             }
         }
 
-        QTreeWidgetItem *it = 0;
+        QTreeWidgetItem *it = nullptr;
         if (pr(db.getString(3), cp_t2_action)) {
             it = new QTreeWidgetItem();
             it->setText(0, tr("Actions"));
@@ -520,7 +523,7 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
         createTab<CR5DiscountSystem>(dbParams);
         break;
     case cp_t7_upload_data_to_other_server: {
-        C5DataSynchronize *ds = new C5DataSynchronize(dbParams, this);
+        C5DataSynchronize *ds = new C5DataSynchronize(dbParams);
         ds->exec();
         delete ds;
         break;

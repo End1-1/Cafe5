@@ -12,7 +12,7 @@ class C5DataSynchronize : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit C5DataSynchronize(const QStringList &dbParams, QWidget *parent = 0);
+    explicit C5DataSynchronize(const QStringList &dbParams);
 
     ~C5DataSynchronize();
 

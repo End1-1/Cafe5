@@ -29,7 +29,7 @@ DlgListOfDishComments::~DlgListOfDishComments()
 
 bool DlgListOfDishComments::getComment(QString &comment)
 {
-    DlgListOfDishComments *d = new DlgListOfDishComments(__mainWindow);
+    DlgListOfDishComments *d = new DlgListOfDishComments();
     d->ui->lbComment->setText(comment);
     d->showFullScreen();
     d->hide();

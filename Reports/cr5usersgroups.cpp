@@ -1,6 +1,7 @@
 #include "cr5usersgroups.h"
 #include "c5grouppermissionseditor.h"
 #include "ce5usergroup.h"
+#include "c5mainwindow.h"
 
 CR5UsersGroups::CR5UsersGroups(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)

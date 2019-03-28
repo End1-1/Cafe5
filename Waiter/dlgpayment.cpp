@@ -18,8 +18,8 @@
 #define p_bank 3
 #define p_other 4
 
-DlgPayment::DlgPayment(QWidget *parent) :
-    C5Dialog(C5Config::dbParams(), parent),
+DlgPayment::DlgPayment() :
+    C5Dialog(C5Config::dbParams()),
     ui(new Ui::DlgPayment)
 {
     ui->setupUi(this);
@@ -45,10 +45,11 @@ DlgPayment::~DlgPayment()
 
 int DlgPayment::payment(C5Order *order)
 {
-    DlgPayment *d = new DlgPayment(C5Config::fParentWidget);
+    DlgPayment *d = new DlgPayment();
     d->fOrder = order;
     d->setRoomComment();
     d->setComplimentary();
+    d->setSelfCost();
     d->ui->tblInfo->setString(1, 0, order->headerValue("f_tablename"));
     d->ui->tblInfo->setString(1, 1, order->headerValue("f_currentstaffname"));
     d->ui->tblInfo->setString(1, 2, order->headerValue("f_amounttotal"));
@@ -395,6 +396,14 @@ void DlgPayment::clearOther()
     ui->leRoomComment->setVisible(false);
 }
 
+void DlgPayment::setSelfCost()
+{
+    if (fOrder->headerValue("f_otherid").toInt() == PAYOTHER_SELFCOST) {
+        ui->leRoomComment->setVisible(true);
+        ui->leRoomComment->setText(tr("Selfcost"));
+    }
+}
+
 void DlgPayment::setPaymentInfo()
 {
     for (int i = ui->tblInfo->rowCount() - 1; i > paystart - 1; i--) {
@@ -616,4 +625,11 @@ void DlgPayment::on_btnPayCityLedger_clicked()
         fOrder->setHeaderValue("f_other_clname", clName);
         setCLComment();
     }
+}
+
+void DlgPayment::on_btnSelfCost_clicked()
+{
+    clearOther();
+    fOrder->setHeaderValue("f_otherid", QString::number(PAYOTHER_SELFCOST));
+    setSelfCost();
 }

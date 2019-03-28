@@ -88,7 +88,7 @@ void C5DataSyncThread::downloadData()
         dbDst[":f_id"] = dbSrc.getString("f_id");
         dbDst.exec("delete from o_header where f_id=:f_id");
         dbDst.setBindValues(dbSrc.getBindValues());
-        noError &= dbDst.insert("o_header", false);
+        noError &= dbDst.insert("o_header", false) > 0;
         progress++;
         if (progress % 50 == 0) {
             emit progressBarValue(progress);
@@ -106,7 +106,7 @@ void C5DataSyncThread::downloadData()
         dbDst[":f_id"] = dbSrc.getString("f_id");
         dbDst.exec("delete from o_goods where f_id=:f_id");
         dbDst.setBindValues(dbSrc.getBindValues());
-        noError &= dbDst.insert("o_goods", false);
+        noError &= dbDst.insert("o_goods", false) > 0;
         progress++;
         progressValue++;
         if (progress % 50 == 0) {

@@ -22,8 +22,6 @@ DEFINES += _MODULE_=\\\"WAITER\\\"
 DEFINES += WAITER
 # DEFINES += LOGGING
 
-QMAKE_CXXFLAGS += -Werror
-
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
@@ -70,19 +68,12 @@ SOURCES += \
     ../Controls/c5combobox.cpp \
     ../Controls/c5dateedit.cpp \
     ../Controls/c5graphicsview.cpp \
-    ../Controls/c5lineeditwithselector.cpp \
     ../Cafe5/excel.cpp \
     ../Classes/c5cache.cpp \
-    ../FrontDesk/c5selector.cpp \
-    ../Classes/c5grid.cpp \
-    ../Editors/c5editor.cpp \
-    ../Editors/ce5editor.cpp \
     ../Classes/c5tablemodel.cpp \
     ../Classes/c5tableview.cpp \
     ../Classes/c5printpreview.cpp \
     ../Classes/c5widget.cpp \
-    ../Classes/c5gridgilter.cpp \
-    ../FrontDesk/c5filtervalues.cpp \
     wpaymentoptions.cpp \
     c5cafecommon.cpp \
     dlgcreditcardlist.cpp \
@@ -139,18 +130,11 @@ HEADERS += \
     ../Controls/c5combobox.h \
     ../Controls/c5dateedit.h \
     ../Controls/c5graphicsview.h \
-    ../Controls/c5lineeditwithselector.h \
     ../Cafe5/excel.h \
-    ../FrontDesk/c5selector.h \
-    ../Classes/c5grid.h \
-    ../Editors/c5editor.h \
-    ../Editors/ce5editor.h \
     ../Classes/c5tablemodel.h \
     ../Classes/c5tableview.h \
     ../Classes/c5printpreview.h \
     ../Classes/c5widget.h \
-    ../Classes/c5gridgilter.h \
-    ../FrontDesk/c5filtervalues.h \
     ../Classes/c5cache.h \
     wpaymentoptions.h \
     c5cafecommon.h \
@@ -179,12 +163,7 @@ FORMS += \
     dlgpassword.ui \
     dlgorder.ui \
     dlgpayment.ui \
-    ../FrontDesk/c5selector.ui \
-    ../Classes/c5grid.ui \
-    ../Editors/c5editor.ui \
     ../Classes/c5printpreview.ui \
-    ../Classes/c5gridgilter.ui \
-    ../FrontDesk/c5filtervalues.ui \
     wpaymentoptions.ui \
     dlgcreditcardlist.ui \
     dlgdishremovereason.ui \
@@ -202,11 +181,10 @@ FORMS += \
 INCLUDEPATH += ../Cafe5
 INCLUDEPATH += ../Classes
 INCLUDEPATH += ../Controls
-INCLUDEPATH += ../FrontDesk
 INCLUDEPATH += ../../NewTax
 INCLUDEPATH += ../Editors
-INCLUDEPATH += C:/OpenSSL-Win32.0/include
-INCLUDEPATH += C:/OpenSSL-Win32.0/include/openssl
+INCLUDEPATH += C:/OpenSSL-Win32/include
+INCLUDEPATH += C:/OpenSSL-Win32/include/openssl
 
 RESOURCES += \
     ../resources/resources.qrc \

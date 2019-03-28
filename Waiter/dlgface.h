@@ -15,7 +15,7 @@ class DlgFace : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgFace(QWidget *parent = 0);
+    explicit DlgFace();
 
     ~DlgFace();
 

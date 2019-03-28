@@ -12,7 +12,7 @@ class CE5CreateTablesForHall : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit CE5CreateTablesForHall(const QStringList &dbParams, QWidget *parent = 0);
+    explicit CE5CreateTablesForHall(const QStringList &dbParams);
 
     ~CE5CreateTablesForHall();
 
