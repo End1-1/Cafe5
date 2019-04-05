@@ -8,6 +8,7 @@
 #include "c5mainwindow.h"
 #include "ce5partner.h"
 #include "ce5goods.h"
+#include <QMenu>
 
 C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
     C5Widget(dbParams, parent),
@@ -31,6 +32,7 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
     ui->leScancode->setVisible(false);
     ui->tblGoodsGroup->viewport()->installEventFilter(this);
     fGroupTableCell = nullptr;
+    fGroupTableCellMove = false;
 }
 
 C5StoreDoc::~C5StoreDoc()
@@ -205,7 +207,7 @@ bool C5StoreDoc::allowChangeDatabase()
 
 bool C5StoreDoc::eventFilter(QObject *o, QEvent *e)
 {
-    if (o == ui->tblGoodsGroup->viewport()) {
+    if (o == ui->tblGoodsGroup->viewport() && fGroupTableCellMove) {
         if (e->type() == QEvent::MouseButtonPress) {
             QCursor c;
             QTableWidgetItem *item = ui->tblGoodsGroup->itemAt(ui->tblGoodsGroup->mapFromGlobal(c.pos()));
@@ -234,21 +236,11 @@ bool C5StoreDoc::eventFilter(QObject *o, QEvent *e)
                     item->setText(tempItem.text());
                     item->setData(Qt::UserRole, tempItem.data(Qt::UserRole));
                     item->setData(Qt::UserRole + 1, tempItem.data(Qt::UserRole + 1));
-                    C5Database db(fDBParams);
-                    for (int r = 0; r < ui->tblGoodsGroup->rowCount(); r++) {
-                        for (int c = 0; c < ui->tblGoodsGroup->columnCount(); c++) {
-                            QTableWidgetItem *i = ui->tblGoodsGroup->item(r, c);
-                            if (i == nullptr) {
-                                continue;
-                            }
-                            db[":f_order"] = (c + (r * ui->tblGoodsGroup->columnCount()));
-                            db.update("c_groups", where_id(i->data(Qt::UserRole).toInt()));
-                        }
-                    }
                 }
             }
         } else if (e->type() == QEvent::MouseMove) {
             if (fGroupTableCell) {
+                fGroupTableCellMove = true;
                 fGroupTableCell->move(mapFromGlobal(QCursor().pos()));
                 return true;
             }
@@ -710,6 +702,7 @@ void C5StoreDoc::loadGoods(int store)
 
 void C5StoreDoc::setGoodsPanelHidden(bool v)
 {
+    QModelIndexList lst = ui->tblGoodsGroup->selectionModel()->selectedIndexes();
     if (!isVisible()) {
         return;
     }
@@ -729,6 +722,10 @@ void C5StoreDoc::setGoodsPanelHidden(bool v)
         }
         ui->tblGoodsGroup->fitColumnsToWidth(45);
         ui->tblGoodsStore->fitColumnsToWidth(45);
+    }
+    if (lst.count() > 0) {
+        ui->tblGoodsGroup->selectionModel()->setCurrentIndex(lst.at(0), QItemSelectionModel::Select);
+        on_tblGoodsGroup_itemClicked(ui->tblGoodsGroup->item(lst.at(0).row(), lst.at(0).column()));
     }
 }
 
@@ -1041,6 +1038,41 @@ void C5StoreDoc::showHideGoodsList()
     setGoodsPanelHidden(v);
 }
 
+void C5StoreDoc::changeGoodsGroupOrder()
+{
+    fGroupTableCellMove = true;
+}
+
+void C5StoreDoc::saveGoodsGroupOrder()
+{
+    C5Database db(fDBParams);
+    for (int r = 0; r < ui->tblGoodsGroup->rowCount(); r++) {
+        for (int c = 0; c < ui->tblGoodsGroup->columnCount(); c++) {
+            QTableWidgetItem *i = ui->tblGoodsGroup->item(r, c);
+            if (i == nullptr) {
+                continue;
+            }
+            db[":f_order"] = (c + (r * ui->tblGoodsGroup->columnCount()));
+            db.update("c_groups", where_id(i->data(Qt::UserRole).toInt()));
+        }
+    }
+    if (fGroupTableCell) {
+        delete fGroupTableCell;
+        fGroupTableCell = nullptr;
+    }
+    fGroupTableCellMove = false;
+}
+
+void C5StoreDoc::cancelGoodsGroupOrder()
+{
+    fGroupTableCellMove = false;
+    if (fGroupTableCell) {
+        delete fGroupTableCell;
+        fGroupTableCell = nullptr;
+    }
+    loadGroupsInput();
+}
+
 void C5StoreDoc::tblQtyChanged(const QString &arg1)
 {
     Q_UNUSED(arg1);
@@ -1192,4 +1224,16 @@ TableCell::TableCell(QWidget *parent, QTableWidgetItem *item) :
 {
     setText(item->text());
     fOldItem = item;
+}
+
+void C5StoreDoc::on_tblGoodsGroup_customContextMenuRequested(const QPoint &pos)
+{
+    QMenu *menu = new QMenu(this);
+    if (fGroupTableCellMove) {
+        menu->addAction(tr("Save order"), this, SLOT(saveGoodsGroupOrder()));
+        menu->addAction(tr("Cancel changes"), this, SLOT(cancelGoodsGroupOrder()));
+    } else {
+        menu->addAction(tr("Change order"), this, SLOT(changeGoodsGroupOrder()));
+    }
+    menu->popup(ui->tblGoodsGroup->mapToGlobal(pos));
 }

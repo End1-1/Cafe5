@@ -33,7 +33,7 @@ void C5Translator::setLanguage(int language)
     fLanguage = language;
 }
 
-QString C5Translator::tr(const QString &value)
+QString C5Translator::tt(const QString &value)
 {
     switch (fLanguage) {
     case LANG_AM:
@@ -53,7 +53,7 @@ QString C5Translator::EN(const QString &value)
         insertUnknown(value);
         return "UNKNOWN_EN " + value;
     }
-    if (fRu[value].isEmpty()) {
+    if (fEn[value].isEmpty()) {
         return "empty_en " + value;
     }
     return fEn[value];

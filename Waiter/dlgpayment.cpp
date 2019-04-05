@@ -72,6 +72,9 @@ void DlgPayment::handleReceipt(const QJsonObject &obj)
     }
     fOrder->fHeader = obj["header"].toObject();
     fOrder->fItems = obj["body"].toArray();
+    if (fOrder->headerValue("f_otherid").toInt() == PAYOTHER_SELFCOST) {
+        ui->tblInfo->setDouble(ui->tblInfo->rowCount() - 1, 1, fOrder->headerValue("f_amountother").toDouble());
+    }
     ui->btnCloseOrder->setEnabled(fOrder->headerValue("f_print").toInt() > 0);
 }
 
@@ -299,7 +302,7 @@ void DlgPayment::on_btnReceipt_clicked()
         amounts = fOrder->headerValue("f_amountother");
     }
     amounts += fOrder->headerValue("f_printtax") == "1" ? " Tax: yes" : " Tax: no";
-    C5LogToServerThread::remember(LOG_WAITER, __userid, "", fOrder->headerValue("f_id"), "", "Receipt", payMethods, amounts);
+    C5LogToServerThread::remember(LOG_WAITER, __username, "", fOrder->headerValue("f_id"), "", "Receipt", payMethods, amounts);
     //END LOG
 }
 
@@ -472,7 +475,7 @@ void DlgPayment::on_btnCloseOrder_clicked()
     o["header"] = fOrder->fHeader;
     o["body"] = fOrder->fItems;
     sh->send(o);
-    C5LogToServerThread::remember(LOG_WAITER, __userid, "", fOrder->headerValue("f_id"), "", "Close order", "", "");
+    C5LogToServerThread::remember(LOG_WAITER, __username, "", fOrder->headerValue("f_id"), "", "Close order", "", "");
 }
 
 void DlgPayment::on_btnPaymentCash_clicked()

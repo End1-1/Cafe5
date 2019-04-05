@@ -19,5 +19,6 @@
 #define sm_reports 16
 #define sm_waiter_report 17
 #define sm_log 18
+#define sm_version 19
 
 #endif // C5SOCKETMESSAGE_H

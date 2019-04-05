@@ -29,6 +29,8 @@ protected:
 private:
     bool fUpdateMySelf;
 
+    QString fInstallPath;
+
     QString fFileToExtract;
 
     QString fPathToExtract;

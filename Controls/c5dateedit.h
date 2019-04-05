@@ -13,7 +13,7 @@ class C5DateEdit : public C5LineEdit
     Q_PROPERTY(bool DoNotCheckMinDate READ getCheckMinDate WRITE setCheckMinDate)
 
 public:
-    C5DateEdit(QWidget *parent = 0);
+    C5DateEdit(QWidget *parent = nullptr);
 
     void setText(const QString &text);
 
@@ -22,6 +22,10 @@ public:
     QString toMySQLDate(bool ap = true);
 
     void setDate(const QDate &date);
+
+    void setDateTime(const QDateTime &datetime);
+
+    void setTime(const QTime &time);
 
     QString getField();
 
@@ -52,6 +56,8 @@ private slots:
 
 signals:
     void dateChanged(const QDate &date);
+
+    void timeChanged(const QTime &time);
 };
 
 C5DateEdit *isDateEdit(QObject *o);

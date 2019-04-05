@@ -58,7 +58,6 @@ SOURCES += \
     ../Classes/c5printing.cpp \
     ../Classes/c5printservicethread.cpp \
     dlgpayment.cpp \
-    ../Classes/c5printreceiptthread.cpp \
     ../Classes/QRCodeGenerator.cpp \
     ../../NewTax/printtaxn.cpp \
     ../Controls/c5lineedit.cpp \
@@ -92,7 +91,11 @@ SOURCES += \
     ../Classes/c5logtoserverthread.cpp \
     ../Classes/c5permissions.cpp \
     dlgexitwithmessage.cpp \
-    ../Classes/c5translator.cpp
+    ../Classes/c5translator.cpp \
+    c5printreceiptthread.cpp \
+    ../Cafe5/dlgexitbyversion.cpp \
+    ../Classes/fileversion.cpp \
+    dlgsearchinmenu.cpp
 
 HEADERS += \
         dlgface.h \
@@ -118,7 +121,6 @@ HEADERS += \
     ../Classes/c5printing.h \
     ../Classes/c5printservicethread.h \
     dlgpayment.h \
-    ../Classes/c5printreceiptthread.h \
     ../Classes/QRCodeGenerator.h \
     ../../NewTax/printtaxn.h \
     ../Controls/c5lineedit.h \
@@ -154,7 +156,11 @@ HEADERS += \
     ../Classes/c5logtoserverthread.h \
     ../Classes/c5permissions.h \
     dlgexitwithmessage.h \
-    ../Classes/c5translator.h
+    ../Classes/c5translator.h \
+    c5printreceiptthread.h \
+    ../Cafe5/dlgexitbyversion.h \
+    ../Classes/fileversion.h \
+    dlgsearchinmenu.h
 
 FORMS += \
         dlgface.ui \
@@ -176,7 +182,9 @@ FORMS += \
     ../Classes/rkeyboard.ui \
     dlgreceiptlanguage.ui \
     dlgcl.ui \
-    dlgexitwithmessage.ui
+    dlgexitwithmessage.ui \
+    ../Cafe5/dlgexitbyversion.ui \
+    dlgsearchinmenu.ui
 
 INCLUDEPATH += ../Cafe5
 INCLUDEPATH += ../Classes

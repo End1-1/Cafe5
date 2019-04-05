@@ -18,17 +18,31 @@ C5DateEdit::C5DateEdit(QWidget *parent) :
 
 void C5DateEdit::setText(const QString &text)
 {
-    QDate d = QDate::fromString(text, FORMAT_DATE_TO_STR);
-    if (d.isValid() && d < C5DateEditMinDate && !fDoNoCheckMinDate) {
-        d = C5DateEditMinDate;
+    if (inputMask() == "00/00/0000") {
+        QDate d = QDate::fromString(text, FORMAT_DATE_TO_STR);
+        if (d.isValid() && d < C5DateEditMinDate && !fDoNoCheckMinDate) {
+            d = C5DateEditMinDate;
+        }
+        QLineEdit::setText(d.toString(FORMAT_DATE_TO_STR));
+    } else if (inputMask() == "00:00:00") {
+        QTime t = QTime::fromString(text, FORMAT_TIME_TO_STR);
+        if (t.isValid()) {
+            QLineEdit::setText(t.toString(FORMAT_TIME_TO_STR));
+        }
+    } else {
+        QLineEdit::setText(text);
     }
-    QLineEdit::setText(d.toString(FORMAT_DATE_TO_STR));
 }
 
 QDate C5DateEdit::date()
 {
     QString t = text();
-    QDate d = QDate::fromString(t, FORMAT_DATE_TO_STR);
+    QDate d;
+    if (inputMask() == "00/00/0000") {
+        d = QDate::fromString(t, FORMAT_DATE_TO_STR);
+    } else {
+        d = QDate::fromString(t, FORMAT_DATETIME_TO_STR);
+    }
     return d;
 }
 
@@ -48,6 +62,18 @@ void C5DateEdit::setDate(const QDate &date)
         d = C5DateEditMinDate;
     }
     setText(d.toString(FORMAT_DATE_TO_STR));
+}
+
+void C5DateEdit::setDateTime(const QDateTime &datetime)
+{
+    setInputMask("00/00/0000 00:00:00");
+    setText(datetime.toString(FORMAT_DATETIME_TO_STR));
+}
+
+void C5DateEdit::setTime(const QTime &time)
+{
+    setInputMask("00:00:00");
+    setText(time.toString(FORMAT_TIME_TO_STR));
 }
 
 QString C5DateEdit::getField()
@@ -88,24 +114,40 @@ void C5DateEdit::setBgColor(const QColor &color)
 
 void C5DateEdit::newText(const QString &arg1)
 {
-    QDate d = QDate::fromString(arg1, FORMAT_DATE_TO_STR);
-    if (d.isValid() && d < C5DateEditMinDate) {
-        if (!fDoNoCheckMinDate) {
-            d = C5DateEditMinDate;
+    if (inputMask() == "00/00/0000") {
+        QDate d = QDate::fromString(arg1, FORMAT_DATE_TO_STR);
+        if (d.isValid() && d < C5DateEditMinDate) {
+            if (!fDoNoCheckMinDate) {
+                d = C5DateEditMinDate;
+            }
         }
+        fIsValid = d.isValid();
+        if (d.isValid()) {
+            setBgColor(Qt::white);
+        } else {
+            setBgColor(Qt::red);
+        }
+        int cp = cursorPosition();
+        if (d.isValid()) {
+            QLineEdit::setText(d.toString(FORMAT_DATE_TO_STR));
+        }
+        setCursorPosition(cp);
+        emit dateChanged(d);
+    } else if (inputMask() == "00:00:00") {
+        QTime t = QTime::fromString(arg1, FORMAT_TIME_TO_STR);
+        fIsValid = t.isValid();
+        if (t.isValid()) {
+            setBgColor(Qt::white);
+        } else {
+            setBgColor(Qt::red);
+        }
+        int cp = cursorPosition();
+        if (t.isValid()) {
+            QLineEdit::setText(t.toString(FORMAT_TIME_TO_STR));
+        }
+        setCursorPosition(cp);
+        emit timeChanged(t);
     }
-    fIsValid = d.isValid();
-    if (d.isValid()) {
-        setBgColor(Qt::white);
-    } else {
-        setBgColor(Qt::red);
-    }
-    int cp = cursorPosition();
-    if (d.isValid()) {
-        QLineEdit::setText(d.toString(FORMAT_DATE_TO_STR));
-    }
-    setCursorPosition(cp);
-    emit dateChanged(d);
 }
 
 C5DateEdit *isDateEdit(QObject *o)

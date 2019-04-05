@@ -135,10 +135,6 @@
         <translation>Կարգավորումներ</translation>
     </message>
     <message>
-        <source>Host</source>
-        <translation type="vanished">Հոստ</translation>
-    </message>
-    <message>
         <location filename="../Cafe5/c5connection.ui" line="112"/>
         <source>Save</source>
         <translation>Պահպանել</translation>
@@ -216,12 +212,12 @@
 <context>
     <name>PrintTaxN</name>
     <message>
-        <location filename="../../NewTax/printtaxn.cpp" line="64"/>
+        <location filename="../../NewTax/printtaxn.cpp" line="65"/>
         <source>Socket read error</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../NewTax/printtaxn.cpp" line="72"/>
+        <location filename="../../NewTax/printtaxn.cpp" line="73"/>
         <source>Data read timeout</source>
         <translation></translation>
     </message>
@@ -295,7 +291,7 @@
         <translation>Գրանցել՞</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="94"/>
+        <location filename="worder.cpp" line="97"/>
         <source>(F)</source>
         <translation>(Ֆ)</translation>
     </message>

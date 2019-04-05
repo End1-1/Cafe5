@@ -30,7 +30,8 @@ void C5Order::setItemValue(int index, const QString &name, const QString &value)
 
 QString C5Order::headerValue(const QString &name)
 {
-    return fHeader[name.toLower()].toString();
+    QString value = fHeader[name.toLower()].toString();
+    return value;
 }
 
 void C5Order::setHeaderValue(const QString &name, const QString &value)

@@ -1,0 +1,769 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Form Files">
+      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
+      <Extensions>ui</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Form Files">
+      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
+      <Extensions>ui</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Generated Files">
+      <UniqueIdentifier>{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;moc;h;def;odl;idl;res;</Extensions>
+    </Filter>
+    <Filter Include="Generated Files">
+      <UniqueIdentifier>{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;moc;h;def;odl;idl;res;</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
+      <Extensions>qrc;*</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
+      <Extensions>qrc;*</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Distribution Files">
+      <UniqueIdentifier>{B83CAF91-C7BF-462F-B76C-EA11631F866C}</UniqueIdentifier>
+      <Extensions>*</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Distribution Files">
+      <UniqueIdentifier>{B83CAF91-C7BF-462F-B76C-EA11631F866C}</UniqueIdentifier>
+      <Extensions>*</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Classes\QRCodeGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\c5cache.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="c5cafecommon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Controls\c5checkbox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Controls\c5combobox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Cafe5\c5config.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Cafe5\c5connection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Cafe5\c5database.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Controls\c5dateedit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Cafe5\c5dialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\c5dishtabledelegate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Controls\c5graphicsview.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\c5halltabledelegate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Controls\c5lineedit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\c5logtoserverthread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\c5menu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Cafe5\c5message.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\c5order.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\c5ordertabledelegate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\c5part2tabledelegate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\c5permissions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\c5printing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\c5printjson.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\c5printpreview.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="c5printreceiptthread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\c5printremovedservicethread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\c5printservicethread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Cafe5\c5serverhandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Cafe5\c5sockethandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\c5tablemodel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\c5tableview.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Controls\c5tablewidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\c5translator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\c5user.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Cafe5\c5utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\c5waiterserver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\c5widget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\c5witerconf.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dlgcl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dlgcreditcardlist.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dlgdishremovereason.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dlgexitwithmessage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dlgface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dlgguest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dlglistofdishcomments.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dlglistofhall.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dlglistofmenu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dlgorder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dlgpassword.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dlgpayment.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dlgreceiptlanguage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dlgreports.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dlgreportslist.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Cafe5\excel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\NewTax\printtaxn.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\rkeyboard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="wpaymentoptions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Classes\QRCodeGenerator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <QtMoc Include="..\Classes\c5cache.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="c5cafecommon.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="..\Controls\c5checkbox.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="..\Controls\c5combobox.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <ClInclude Include="..\Cafe5\c5config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <QtMoc Include="..\Cafe5\c5connection.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="..\Cafe5\c5database.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="..\Controls\c5dateedit.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="..\Cafe5\c5dialog.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <ClInclude Include="..\Classes\c5dishtabledelegate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Controls\c5graphicsview.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\c5halltabledelegate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <QtMoc Include="..\Controls\c5lineedit.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <ClInclude Include="..\Classes\c5logtoserverthread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\c5menu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <QtMoc Include="..\Cafe5\c5message.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <ClInclude Include="..\Classes\c5order.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\c5ordertabledelegate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\c5part2tabledelegate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\c5permissions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\c5printing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <QtMoc Include="..\Classes\c5printjson.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="..\Classes\c5printpreview.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="c5printreceiptthread.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="..\Classes\c5printremovedservicethread.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="..\Classes\c5printservicethread.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <ClInclude Include="..\Cafe5\c5serverhandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <QtMoc Include="..\Cafe5\c5sockethandler.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <ClInclude Include="..\Cafe5\c5socketmessage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\c5tablemodel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <QtMoc Include="..\Classes\c5tableview.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="..\Controls\c5tablewidget.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <ClInclude Include="..\Classes\c5translator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\c5user.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Cafe5\c5utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <QtMoc Include="..\Classes\c5waiterserver.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="..\Classes\c5widget.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <ClInclude Include="..\Classes\c5witerconf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <QtMoc Include="dlgcl.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="dlgcreditcardlist.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="dlgdishremovereason.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="dlgexitwithmessage.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="dlgface.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="dlgguest.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="dlglistofdishcomments.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="dlglistofhall.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="dlglistofmenu.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="dlgorder.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="dlgpassword.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="dlgpayment.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="dlgreceiptlanguage.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="dlgreports.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="dlgreportslist.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <ClInclude Include="..\Cafe5\excel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <QtMoc Include="..\..\NewTax\printtaxn.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <ClInclude Include="rc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="res.rc">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <QtMoc Include="..\Classes\rkeyboard.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="wpaymentoptions.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+  </ItemGroup>
+  <ItemGroup>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <CustomBuild Include="debug\moc_predefs.h.cbt">
+      <Filter>Generated Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="release\moc_predefs.h.cbt">
+      <Filter>Generated Files</Filter>
+    </CustomBuild>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <ClInclude Include="ui_c5connection.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_c5message.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_c5printpreview.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_dlgcl.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_dlgcreditcardlist.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_dlgdishremovereason.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_dlgexitwithmessage.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_dlgface.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_dlgguest.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_dlglistofdishcomments.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_dlglistofhall.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_dlglistofmenu.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_dlgorder.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_dlgpassword.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_dlgpayment.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_dlgreceiptlanguage.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_dlgreports.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_dlgreportslist.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_rkeyboard.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_wpaymentoptions.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <QtUic Include="..\Cafe5\c5connection.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="..\Cafe5\c5message.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="..\Classes\c5printpreview.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="dlgcl.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="dlgcreditcardlist.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="dlgdishremovereason.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="dlgexitwithmessage.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="dlgface.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="dlgguest.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="dlglistofdishcomments.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="dlglistofhall.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="dlglistofmenu.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="dlgorder.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="dlgpassword.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="dlgpayment.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="dlgreceiptlanguage.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="dlgreports.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="dlgreportslist.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="..\Classes\rkeyboard.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="wpaymentoptions.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Waiter.qm">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\armenia.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\backspace.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\bank.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\calculator.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\cancel.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\chair.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\comment.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\configure.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\credit-card.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\discount.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\down.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\edit.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\enter.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\exit.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\expand.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\expand2.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\filter_clear.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\giftbox.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\guest.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\ledger.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\left-arrow.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\logout.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\menu.PNG">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\minimize.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\ok.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\payment.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\place.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\print_receipt.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\recycle.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\refresh.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\report.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <QtRcc Include="..\resources\resources.qrc">
+      <Filter>Resource Files</Filter>
+    </QtRcc>
+    <None Include="..\resources\right-arrow.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\room-service.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\russia.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\service_check.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\shift.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\tables.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\tax.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <QtRcc Include="translator.qrc">
+      <Filter>Resource Files</Filter>
+    </QtRcc>
+    <None Include="..\resources\up.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\usa.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\wallet-with-money.png">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cup.ico">
+      <Filter>Distribution Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="res.rc" />
+  </ItemGroup>
+</Project>

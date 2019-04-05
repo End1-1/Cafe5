@@ -172,8 +172,8 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Waiter/dlgpassword.cpp" line="76"/>
-        <location filename="../Waiter/dlgpassword.cpp" line="158"/>
+        <location filename="../Waiter/dlgpassword.cpp" line="77"/>
+        <location filename="../Waiter/dlgpassword.cpp" line="159"/>
         <source>Access denied</source>
         <translation type="unfinished"></translation>
     </message>

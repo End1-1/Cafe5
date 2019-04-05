@@ -16,7 +16,7 @@ public:
 
     void setLanguage(int language);
 
-    QString tr(const QString &value);
+    QString tt(const QString &value);
 
 private:
 

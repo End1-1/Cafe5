@@ -12,7 +12,7 @@ C5SocketHandler::C5SocketHandler(QTcpSocket *socket, QObject *parent) :
     }
     fReadState = false;
     fErrorCode = 0;
-    if (fSocket == 0) {
+    if (fSocket == nullptr) {
         fSocket = new QTcpSocket(parent);
         connect(fSocket, SIGNAL(connected()), this, SLOT(connected()));
         fSocket->connectToHost(__socketServerHost, __socketServerPort);

@@ -6,6 +6,7 @@
 #include "c5permissions.h"
 #include "c5widget.h"
 #include "cr5commonsales.h"
+#include "checkforupdatethread.h"
 #include "cr5usersgroups.h"
 #include "cr5consumptionbysales.h"
 #include "cr5documents.h"
@@ -15,6 +16,7 @@
 #include "cr5goodsmovement.h"
 #include "cr5creditcards.h"
 #include "cr5dishpart1.h"
+#include "c5toolbarwidget.h"
 #include "c5dishselfcostgenprice.h"
 #include "cr5dishcomment.h"
 #include "cr5tstoreextra.h"
@@ -43,6 +45,7 @@
 #include "c5storedoc.h"
 #include <QCloseEvent>
 #include <QShortcut>
+#include <QProcess>
 #include <QMenu>
 
 C5MainWindow *__mainWindow;
@@ -64,7 +67,12 @@ C5MainWindow::C5MainWindow(QWidget *parent) :
     connect(ui->tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(tabCloseRequested(int)));
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(currentTabChange(int)));
     connect(ui->tabWidget, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(tabCustomMenu(QPoint)));
-    fReportToolbar = 0;
+    fReportToolbar = nullptr;
+    fRightToolbar = new QToolBar();
+    addToolBar(fRightToolbar);
+    fToolbarWidget = new C5ToolBarWidget(this);
+    fToolbarWidget->setUpdateButtonVisible(false);
+    fRightToolbar->addWidget(fToolbarWidget);
     ui->actionHome->setEnabled(false);
 
     QShortcut *f3 = new QShortcut(QKeySequence("Ctrl+F"), this);
@@ -90,10 +98,13 @@ C5MainWindow::C5MainWindow(QWidget *parent) :
     ui->wLog->setVisible(false);
     ui->actionLogout->setVisible(false);
     ui->actionChange_password->setVisible(false);
+    connect(&fUpdateTimer, SIGNAL(timeout()), this, SLOT(updateTimeout()));
+    fUpdateTimer.start(10000);
 }
 
 C5MainWindow::~C5MainWindow()
 {
+    fUpdateTimer.stop();
     delete ui;
 }
 
@@ -183,7 +194,7 @@ void C5MainWindow::currentTabChange(int index)
     if (fReportToolbar) {
         removeToolBar(fReportToolbar);
     }
-    fReportToolbar = 0;
+    fReportToolbar = nullptr;
     C5ReportWidget *w = dynamic_cast<C5ReportWidget*>(fTab->widget(index));
     C5Widget *w2 = dynamic_cast<C5Widget*>(fTab->widget(index));
     if (!w && !w2) {
@@ -195,7 +206,7 @@ void C5MainWindow::currentTabChange(int index)
         fReportToolbar = w2->toolBar();
     }
     if (fReportToolbar) {
-        addToolBar(fReportToolbar);
+        insertToolBar(fRightToolbar, fReportToolbar);
         fReportToolbar->show();
     }
 }
@@ -239,11 +250,11 @@ void C5MainWindow::on_actionLogin_triggered()
         }
         if (showwelcomePage.toBool()) {
             bool isVisible = fTab->count() > 0;
-            C5WelcomePage *wp = 0;
+            C5WelcomePage *wp = nullptr;
             if (isVisible) {
                 wp = dynamic_cast<C5WelcomePage*>(fTab->widget(0));
             }
-            if (wp == 0) {
+            if (wp == nullptr) {
                 showWelcomePage();
             }
         }
@@ -345,6 +356,44 @@ void C5MainWindow::on_actionLogin_triggered()
     ui->actionChange_password->setVisible(true);
 }
 
+void C5MainWindow::updateTimeout()
+{
+    fUpdateTimer.stop();
+    CheckForUpdateThread *ut = new CheckForUpdateThread(this);
+    ut->fApplication = _MODULE_;
+    ut->fDbParams = C5Config::dbParams();
+    connect(ut, SIGNAL(checked(bool, int, QString)), this, SLOT(updateChecked(bool, int, QString)));
+    ut->start();
+}
+
+void C5MainWindow::updateChecked(bool needUpdate, int source, const QString &path)
+{
+    if (!needUpdate) {
+        fUpdateTimer.start(60000);
+        return;
+    }
+    if (path.isEmpty()) {
+        fToolbarWidget->setUpdateButtonVisible(true);
+        C5Message::info(tr("Update exists, but you will update manually"));
+        fUpdateTimer.start(60000);
+        return;
+    }
+    fToolbarWidget->setUpdateButtonVisible(true);
+    switch (source) {
+    case usNone:
+        fUpdateTimer.start(60000);
+        break;
+    case usLocalnet: {
+        QStringList args;
+        args << "-lhttp://" + C5Config::fDBHost;
+        args << "-s0";
+        QProcess p;
+        p.start(qApp->applicationDirPath() + "/updater.exe", args);
+        break;
+    }
+    }
+}
+
 void C5MainWindow::hotKey()
 {
     QShortcut *s = static_cast<QShortcut*>(sender());
@@ -366,7 +415,7 @@ void C5MainWindow::enableMenu(bool v)
 void C5MainWindow::addTreeL3Item(QTreeWidgetItem *item, int permission, const QString &text, const QString &icon)
 {
     QTreeWidgetItem *root = item;
-    while (root->parent() != 0) {
+    while (root->parent() != nullptr) {
         root = root->parent();
     }
     QString db = root->data(0, Qt::UserRole + 2).toString();
@@ -558,11 +607,11 @@ void C5MainWindow::on_btnHideMenu_clicked()
 void C5MainWindow::on_actionHome_triggered()
 {
     bool isVisible = fTab->count() > 0;
-    C5WelcomePage *wp = 0;
+    C5WelcomePage *wp = nullptr;
     if (isVisible) {
         wp = dynamic_cast<C5WelcomePage*>(fTab->widget(0));
     }
-    isVisible = wp != 0;
+    isVisible = wp != nullptr;
     if (isVisible) {
         removeTab(wp);
     } else {

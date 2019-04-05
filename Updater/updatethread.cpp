@@ -88,11 +88,11 @@ void UpdateThread::startUpdate()
     emit message(tr("Copying new files"));
     for (int i = 0; i < fFilesForCopy.count(); i++) {
         QString tmpFileName = fFilesForCopy.at(i).toString();
-        QFile file(fFileToExtract + "/" + tmpFileName);
-        if (QFile::exists("./" + tmpFileName)) {
-            QFile::remove("./" + tmpFileName);
+        QFile file(fFileToExtract + "\\" + tmpFileName);
+        if (QFile::exists(fInstallPath + tmpFileName)) {
+            QFile::remove(fInstallPath + tmpFileName);
         }
-        if (!file.copy("./" + tmpFileName)) {
+        if (!file.copy(fInstallPath + tmpFileName)) {
             if (tmpFileName == "updater.exe") {
                 fUpdateMySelf = true;
                 continue;

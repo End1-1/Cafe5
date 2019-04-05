@@ -20,6 +20,7 @@ DEFINES += DLL
 
 INCLUDEPATH += ../../Cafe5
 INCLUDEPATH += ../../Classes
+INCLUDEPATH += ../../Controls
 
 # You can also make your code fail to compile if you use deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -32,7 +33,14 @@ SOURCES += \
     ../../Cafe5/c5message.cpp \
     ../../Cafe5/c5config.cpp \
     ../../Cafe5/c5utils.cpp \
-    ../../Classes/c5printing.cpp
+    ../../Classes/c5printing.cpp \
+    ../../Controls/c5tablewidget.cpp \
+    ../../Controls/c5checkbox.cpp \
+    ../../Controls/c5combobox.cpp \
+    ../../Controls/c5dateedit.cpp \
+    ../../Controls/c5lineedit.cpp \
+    ../../Cafe5/excel.cpp \
+    ../../Classes/c5cache.cpp
 
 HEADERS += \
     dll.h \
@@ -40,7 +48,14 @@ HEADERS += \
     ../../Cafe5/c5message.h \
     ../../Cafe5/c5config.h \
     ../../Cafe5/c5utils.h \
-    ../../Classes/c5printing.h
+    ../../Classes/c5printing.h \
+    ../../Controls/c5tablewidget.h \
+    ../../Controls/c5checkbox.h \
+    ../../Controls/c5combobox.h \
+    ../../Controls/c5dateedit.h \
+    ../../Controls/c5lineedit.h \
+    ../../Cafe5/excel.h \
+    ../../Classes/c5cache.h
 
 FORMS += \
     ../../Cafe5/c5message.ui

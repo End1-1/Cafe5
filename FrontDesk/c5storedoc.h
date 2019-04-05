@@ -54,6 +54,8 @@ private:
 
     TableCell *fGroupTableCell;
 
+    bool fGroupTableCellMove;
+
     void countTotal();
 
     bool docCheck(QString &err);
@@ -99,6 +101,12 @@ private slots:
 
     void showHideGoodsList();
 
+    void changeGoodsGroupOrder();
+
+    void saveGoodsGroupOrder();
+
+    void cancelGoodsGroupOrder();
+
     void tblQtyChanged(const QString &arg1);
 
     void tblPriceChanged(const QString &arg1);
@@ -122,6 +130,8 @@ private slots:
     void on_btnNewGoods_clicked();
 
     void on_leScancode_returnPressed();
+
+    void on_tblGoodsGroup_customContextMenuRequested(const QPoint &pos);
 };
 
 #endif // C5STOREDOC_H

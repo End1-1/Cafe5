@@ -47,5 +47,7 @@
         <file>constructor.png</file>
         <file>translate.png</file>
         <file>logout.png</file>
+        <file>update.png</file>
+        <file>order.png</file>
     </qresource>
 </RCC>

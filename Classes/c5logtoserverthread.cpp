@@ -4,7 +4,7 @@
 #include "c5config.h"
 #include <QMutex>
 
-QMutex fLogThreadMutex;
+static QMutex fLogThreadMutex;
 
 C5LogToServerThread::C5LogToServerThread(QObject *parent) :
     QThread(parent)
@@ -12,7 +12,7 @@ C5LogToServerThread::C5LogToServerThread(QObject *parent) :
     connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
 }
 
-void C5LogToServerThread::remember(int type, int user, const QString &rec, const QString &invoice, const QString &reservation, const QString &action, const QString &value1, const QString &value2)
+void C5LogToServerThread::remember(int type, const QString &user, const QString &rec, const QString &invoice, const QString &reservation, const QString &action, const QString &value1, const QString &value2)
 {
     C5LogToServerThread *l = new C5LogToServerThread(__c5config.fParentWidget);
     l->fType = type;
@@ -30,7 +30,7 @@ void C5LogToServerThread::run()
 {
     QMutexLocker ml(&fLogThreadMutex);
     msleep(200);
-    C5SocketHandler *s = new C5SocketHandler(0, __c5config.fParentWidget);
+    C5SocketHandler *s = new C5SocketHandler(nullptr, __c5config.fParentWidget);
     s->bind("cmd", sm_log);
     s->bind("comp", hostinfo);
     s->bind("date", QDate::currentDate().toString(FORMAT_DATE_TO_STR_MYSQL));

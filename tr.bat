@@ -1,7 +1,7 @@
-set path=%PATH%;C:\Qt\Qt5.10.0\5.10.0\mingw53_32\bin;C:\Qt\Qt5.10.0\Tools\mingw530_32\bin
-lupdate FrontDesk\FrontDesk.pro -ts FrontDesk\FrontDesk.ts
-lupdate Waiter\Waiter.pro -ts Waiter\Waiter.ts
-lupdate Smart\Smart.pro -ts Smart\Smart.ts
-lupdate WaiterReports\DailyByWaiter\DailyByWaiter.pro -ts WaiterReports\DailyByWaiter\DailyByWaiter.ts
-lupdate Shop\Shop.pro -ts Shop\Shop.ts
+set path=%PATH%;C:\Qt\MVSC\5.12.2\msvc2017\bin
+lupdate -noobsolete FrontDesk\FrontDesk.pro -ts FrontDesk\FrontDesk.ts
+lupdate -noobsolete Waiter\Waiter.pro -ts Waiter\Waiter.ts
+lupdate -noobsolete Smart\Smart.pro -ts Smart\Smart.ts
+lupdate -noobsolete WaiterReports\DailyByWaiter\DailyByWaiter.pro -ts WaiterReports\DailyByWaiter\DailyByWaiter.ts
+lupdate -noobsolete Shop\Shop.pro -ts Shop\Shop.ts
 pause

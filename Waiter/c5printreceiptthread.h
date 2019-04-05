@@ -4,13 +4,14 @@
 #include <QThread>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QObject>
 
 class C5PrintReceiptThread : public QThread
 {
     Q_OBJECT
 
 public:
-    C5PrintReceiptThread(const QStringList &dbParams, const QJsonObject &header, const QJsonArray &body, const QString &printer, QObject *parent = 0);
+    C5PrintReceiptThread(const QStringList &dbParams, const QJsonObject &header, const QJsonArray &body, const QString &printer, QObject *parent = nullptr);
 
 protected:
     virtual void run();
@@ -23,6 +24,12 @@ private:
     QString fPrinter;
 
     QStringList fDbParams;
+
+private slots:
+    void print();
+
+signals:
+    void startPrint();
 };
 
 #endif // C5PRINTRECEIPTTHREAD_H

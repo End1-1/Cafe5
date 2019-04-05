@@ -1,0 +1,545 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{56422419-0D2E-3672-B5D9-2C77310F2955}</ProjectGuid>
+    <RootNamespace>Waiter</RootNamespace>
+    <Keyword>Qt4VSv1.0</Keyword>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformMinVersion>10.0.17763.0</WindowsTargetPlatformMinVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <PlatformToolset>v141</PlatformToolset>
+    <OutputDirectory>release\</OutputDirectory>
+    <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
+    <CharacterSet>NotSet</CharacterSet>
+    <ConfigurationType>Application</ConfigurationType>
+    <IntermediateDirectory>release\</IntermediateDirectory>
+    <PrimaryOutput>Waiter</PrimaryOutput>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <PlatformToolset>v141</PlatformToolset>
+    <OutputDirectory>debug\</OutputDirectory>
+    <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
+    <CharacterSet>NotSet</CharacterSet>
+    <ConfigurationType>Application</ConfigurationType>
+    <IntermediateDirectory>debug\</IntermediateDirectory>
+    <PrimaryOutput>Waiter</PrimaryOutput>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <PropertyGroup Condition="'$(QtMsBuild)'=='' or !Exists('$(QtMsBuild)\qt.targets')">
+    <QtMsBuild>$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
+  </PropertyGroup>
+  <Target Name="QtMsBuildNotFound" BeforeTargets="CustomBuild;ClCompile" Condition="!Exists('$(QtMsBuild)\qt.targets') or !Exists('$(QtMsBuild)\qt.props')">
+    <Message Importance="High" Text="QtMsBuild: could not locate qt.targets, qt.props; project may not build correctly." />
+  </Target>
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt.props')">
+    <Import Project="$(QtMsBuild)\qt.props" />
+  </ImportGroup>
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Waiter</TargetName>
+    <IgnoreImportLibrary Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</IgnoreImportLibrary>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Waiter</TargetName>
+    <IgnoreImportLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</IgnoreImportLibrary>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;..\Cafe5;..\Classes;..\Controls;..\..\NewTax;..\Editors;..\..\..\OpenSSL-Win32\include;..\..\..\OpenSSL-Win32\include\openssl;..\..\..\QT\MVSC\5.12.2\MSVC2017\include;..\..\..\QT\MVSC\5.12.2\MSVC2017\include\QtPrintSupport;..\..\..\QT\MVSC\5.12.2\MSVC2017\include\QtWidgets;..\..\..\QT\MVSC\5.12.2\MSVC2017\include\QtGui;..\..\..\QT\MVSC\5.12.2\MSVC2017\include\QtANGLE;..\..\..\QT\MVSC\5.12.2\MSVC2017\include\QtNetwork;..\..\..\QT\MVSC\5.12.2\MSVC2017\include\QtSql;..\..\..\QT\MVSC\5.12.2\MSVC2017\include\QtCore;release;C:\VulkanSDK\1.0.51.0\include;..\..\..\QT\MVSC\5.12.2\MSVC2017\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -Zc:__cplusplus -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
+      <AssemblerListingLocation>release\</AssemblerListingLocation>
+      <BrowseInformation>false</BrowseInformation>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <DisableSpecificWarnings>4577;4467;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <Optimization>MaxSpeed</Optimization>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;_DBDRIVER_="QMYSQL";_ORGANIZATION_="Jazzve";_APPLICATION_="Cafe5";_MODULE_="WAITER";WAITER;QT_DEPRECATED_WARNINGS;QT_NO_DEBUG;QT_PRINTSUPPORT_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_NETWORK_LIB;QT_SQL_LIB;QT_CORE_LIB;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessToFile>false</PreprocessToFile>
+      <ProgramDataBaseFileName>$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <WarningLevel>Level3</WarningLevel>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>"C:\Program Files (x86)\Windows Kits\10\lib\10.0.17763.0\um\x86\Version.lib";"C:\Program Files (x86)\Windows Kits\10\lib\10.0.17763.0\um\x86\wsock32.lib";C:\OpenSSL-Win32\lib\openssl.lib;C:\OpenSSL-Win32\lib\libcrypto.lib;$(QTDIR)\lib\Qt5PrintSupport.lib;$(QTDIR)\lib\Qt5Widgets.lib;$(QTDIR)\lib\Qt5Gui.lib;$(QTDIR)\lib\Qt5Network.lib;$(QTDIR)\lib\Qt5Sql.lib;$(QTDIR)\lib\Qt5Core.lib;$(QTDIR)\lib\qtmain.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(QTDIR)\lib;C:\OpenSSL-Win32\lib;C:\QT\MVSC\5.12.2\MSVC2017\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>"/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' publicKeyToken='6595b64144ccf1df' language='*' processorArchitecture='*'" %(AdditionalOptions)</AdditionalOptions>
+      <DataExecutionPrevention>true</DataExecutionPrevention>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreImportLibrary>true</IgnoreImportLibrary>
+      <LinkIncremental>false</LinkIncremental>
+      <OutputFile>$(OutDir)\Waiter.exe</OutputFile>
+      <RandomizedBaseAddress>true</RandomizedBaseAddress>
+      <SubSystem>Windows</SubSystem>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Link>
+    <Midl>
+      <DefaultCharType>Unsigned</DefaultCharType>
+      <EnableErrorChecks>None</EnableErrorChecks>
+      <WarningLevel>0</WarningLevel>
+    </Midl>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;_DBDRIVER_=\"QMYSQL\";_ORGANIZATION_=\"Jazzve\";_APPLICATION_=\"Cafe5\";_MODULE_=\"WAITER\";WAITER;QT_DEPRECATED_WARNINGS;QT_NO_DEBUG;QT_PRINTSUPPORT_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_NETWORK_LIB;QT_SQL_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <QtMoc>
+      <QTDIR>C:\QT\MVSC\5.12.2\MSVC2017</QTDIR>
+      <OutputFile>$(Configuration)\moc_%(Filename).cpp</OutputFile>
+      <Define>UNICODE;_UNICODE;$(Platform);_ENABLE_EXTENDED_ALIGNED_STORAGE;_DBDRIVER_="QMYSQL";_ORGANIZATION_="Jazzve";_APPLICATION_="Cafe5";_MODULE_="WAITER";WAITER;QT_DEPRECATED_WARNINGS;QT_NO_DEBUG;QT_PRINTSUPPORT_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_NETWORK_LIB;QT_SQL_LIB;QT_CORE_LIB</Define>
+      <CompilerFlavor>msvc</CompilerFlavor>
+      <Include>./$(Configuration)/moc_predefs.h</Include>
+      <ExecutionDescription>Moc'ing %(Identity)...</ExecutionDescription>
+      <InputFile>%(FullPath)</InputFile>
+      <DynamicSource>output</DynamicSource>
+      <IncludePath>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;C:/QT/MVSC/5.12.2/MSVC2017/mkspecs/$(Platform)-msvc;.;C:/Projects/Cafe5/Cafe5;C:/Projects/Cafe5/Classes;C:/Projects/Cafe5/Controls;C:/Projects/NewTax;C:/Projects/Cafe5/Editors;C:/OpenSSL-$(Platform)/include;C:/OpenSSL-$(Platform)/include/openssl;C:/QT/MVSC/5.12.2/MSVC2017/include;C:/QT/MVSC/5.12.2/MSVC2017/include/QtPrintSupport;C:/QT/MVSC/5.12.2/MSVC2017/include/QtWidgets;C:/QT/MVSC/5.12.2/MSVC2017/include/QtGui;C:/QT/MVSC/5.12.2/MSVC2017/include/QtANGLE;C:/QT/MVSC/5.12.2/MSVC2017/include/QtNetwork;C:/QT/MVSC/5.12.2/MSVC2017/include/QtSql;C:/QT/MVSC/5.12.2/MSVC2017/include/QtCore;C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\ATLMFC\include;C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\include;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um;C:\Program Files (x86)\Windows Kits\10\include\10.0.17763.0\ucrt;C:\Program Files (x86)\Windows Kits\10\include\10.0.17763.0\shared;C:\Program Files (x86)\Windows Kits\10\include\10.0.17763.0\um;C:\Program Files (x86)\Windows Kits\10\include\10.0.17763.0\winrt;C:\Program Files (x86)\Windows Kits\10\include\10.0.17763.0\cppwinrt</IncludePath>
+    </QtMoc>
+    <QtRcc>
+      <OutputFile>$(Configuration)\qrc_%(Filename).cpp</OutputFile>
+      <Compression>default</Compression>
+      <QTDIR>C:\QT\MVSC\5.12.2\MSVC2017</QTDIR>
+      <InputFile>%(FullPath)</InputFile>
+      <ExecutionDescription>Rcc'ing %(Identity)...</ExecutionDescription>
+    </QtRcc>
+    <QtUic>
+      <QTDIR>C:\QT\MVSC\5.12.2\MSVC2017</QTDIR>
+      <ExecutionDescription>Uic'ing %(Identity)...</ExecutionDescription>
+      <InputFile>%(FullPath)</InputFile>
+    </QtUic>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;..\Cafe5;..\Classes;..\Controls;..\..\NewTax;..\Editors;..\..\..\OpenSSL-Win32\include;..\..\..\OpenSSL-Win32\include\openssl;..\..\..\QT\MVSC\5.12.2\MSVC2017\include;..\..\..\QT\MVSC\5.12.2\MSVC2017\include\QtPrintSupport;..\..\..\QT\MVSC\5.12.2\MSVC2017\include\QtWidgets;..\..\..\QT\MVSC\5.12.2\MSVC2017\include\QtGui;..\..\..\QT\MVSC\5.12.2\MSVC2017\include\QtANGLE;..\..\..\QT\MVSC\5.12.2\MSVC2017\include\QtNetwork;..\..\..\QT\MVSC\5.12.2\MSVC2017\include\QtSql;..\..\..\QT\MVSC\5.12.2\MSVC2017\include\QtCore;debug;C:\VulkanSDK\1.0.51.0\include;..\..\..\QT\MVSC\5.12.2\MSVC2017\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -Zc:__cplusplus -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
+      <AssemblerListingLocation>debug\</AssemblerListingLocation>
+      <BrowseInformation>false</BrowseInformation>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4577;4467;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;_DBDRIVER_="QMYSQL";_ORGANIZATION_="Jazzve";_APPLICATION_="Cafe5";_MODULE_="WAITER";WAITER;QT_DEPRECATED_WARNINGS;QT_PRINTSUPPORT_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_NETWORK_LIB;QT_SQL_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessToFile>false</PreprocessToFile>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <WarningLevel>Level3</WarningLevel>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <ProgramDataBaseFileName>$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>"C:\Program Files (x86)\Windows Kits\10\lib\10.0.17763.0\um\x86\Version.lib";"C:\Program Files (x86)\Windows Kits\10\lib\10.0.17763.0\um\x86\wsock32.lib";C:\OpenSSL-Win32\lib\openssl.lib;C:\OpenSSL-Win32\lib\libcrypto.lib;$(QTDIR)\lib\Qt5PrintSupportd.lib;$(QTDIR)\lib\Qt5Widgetsd.lib;$(QTDIR)\lib\Qt5Guid.lib;$(QTDIR)\lib\Qt5Networkd.lib;$(QTDIR)\lib\Qt5Sqld.lib;$(QTDIR)\lib\Qt5Cored.lib;$(QTDIR)\lib\qtmaind.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(QTDIR)\lib;C:\OpenSSL-Win32\lib;C:\QT\MVSC\5.12.2\MSVC2017\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>"/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' publicKeyToken='6595b64144ccf1df' language='*' processorArchitecture='*'" %(AdditionalOptions)</AdditionalOptions>
+      <DataExecutionPrevention>true</DataExecutionPrevention>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreImportLibrary>true</IgnoreImportLibrary>
+      <OutputFile>$(OutDir)\Waiter.exe</OutputFile>
+      <RandomizedBaseAddress>true</RandomizedBaseAddress>
+      <SubSystem>Windows</SubSystem>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Link>
+    <Midl>
+      <DefaultCharType>Unsigned</DefaultCharType>
+      <EnableErrorChecks>None</EnableErrorChecks>
+      <WarningLevel>0</WarningLevel>
+    </Midl>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;_DBDRIVER_=\"QMYSQL\";_ORGANIZATION_=\"Jazzve\";_APPLICATION_=\"Cafe5\";_MODULE_=\"WAITER\";WAITER;QT_DEPRECATED_WARNINGS;QT_PRINTSUPPORT_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_NETWORK_LIB;QT_SQL_LIB;QT_CORE_LIB;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <QtRcc>
+      <QTDIR>C:\QT\MVSC\5.12.2\MSVC2017</QTDIR>
+      <Compression>default</Compression>
+      <OutputFile>$(Configuration)\qrc_%(Filename).cpp</OutputFile>
+      <InputFile>%(FullPath)</InputFile>
+      <ExecutionDescription>Rcc'ing %(Identity)...</ExecutionDescription>
+    </QtRcc>
+    <QtMoc>
+      <QTDIR>C:\QT\MVSC\5.12.2\MSVC2017</QTDIR>
+      <OutputFile>$(Configuration)\moc_%(Filename).cpp</OutputFile>
+      <Define>UNICODE;_UNICODE;$(Platform);_ENABLE_EXTENDED_ALIGNED_STORAGE;_DBDRIVER_="QMYSQL";_ORGANIZATION_="Jazzve";_APPLICATION_="Cafe5";_MODULE_="WAITER";WAITER;QT_DEPRECATED_WARNINGS;QT_PRINTSUPPORT_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_NETWORK_LIB;QT_SQL_LIB;QT_CORE_LIB</Define>
+      <CompilerFlavor>msvc</CompilerFlavor>
+      <Include>./$(Configuration)/moc_predefs.h</Include>
+      <ExecutionDescription>Moc'ing %(Identity)...</ExecutionDescription>
+      <InputFile>%(FullPath)</InputFile>
+      <DynamicSource>output</DynamicSource>
+      <IncludePath>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;C:/QT/MVSC/5.12.2/MSVC2017/mkspecs/$(Platform)-msvc;.;C:/Projects/Cafe5/Cafe5;C:/Projects/Cafe5/Classes;C:/Projects/Cafe5/Controls;C:/Projects/NewTax;C:/Projects/Cafe5/Editors;C:/OpenSSL-$(Platform)/include;C:/OpenSSL-$(Platform)/include/openssl;C:/QT/MVSC/5.12.2/MSVC2017/include;C:/QT/MVSC/5.12.2/MSVC2017/include/QtPrintSupport;C:/QT/MVSC/5.12.2/MSVC2017/include/QtWidgets;C:/QT/MVSC/5.12.2/MSVC2017/include/QtGui;C:/QT/MVSC/5.12.2/MSVC2017/include/QtANGLE;C:/QT/MVSC/5.12.2/MSVC2017/include/QtNetwork;C:/QT/MVSC/5.12.2/MSVC2017/include/QtSql;C:/QT/MVSC/5.12.2/MSVC2017/include/QtCore;C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\ATLMFC\include;C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\include;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um;C:\Program Files (x86)\Windows Kits\10\include\10.0.17763.0\ucrt;C:\Program Files (x86)\Windows Kits\10\include\10.0.17763.0\shared;C:\Program Files (x86)\Windows Kits\10\include\10.0.17763.0\um;C:\Program Files (x86)\Windows Kits\10\include\10.0.17763.0\winrt;C:\Program Files (x86)\Windows Kits\10\include\10.0.17763.0\cppwinrt</IncludePath>
+    </QtMoc>
+    <QtUic>
+      <QTDIR>C:\QT\MVSC\5.12.2\MSVC2017</QTDIR>
+      <ExecutionDescription>Uic'ing %(Identity)...</ExecutionDescription>
+      <InputFile>%(FullPath)</InputFile>
+    </QtUic>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Classes\QRCodeGenerator.cpp" />
+    <ClCompile Include="..\Classes\c5cache.cpp" />
+    <ClCompile Include="c5cafecommon.cpp" />
+    <ClCompile Include="..\Controls\c5checkbox.cpp" />
+    <ClCompile Include="..\Controls\c5combobox.cpp" />
+    <ClCompile Include="..\Cafe5\c5config.cpp" />
+    <ClCompile Include="..\Cafe5\c5connection.cpp" />
+    <ClCompile Include="..\Cafe5\c5database.cpp" />
+    <ClCompile Include="..\Controls\c5dateedit.cpp" />
+    <ClCompile Include="..\Cafe5\c5dialog.cpp" />
+    <ClCompile Include="..\Classes\c5dishtabledelegate.cpp" />
+    <ClCompile Include="..\Controls\c5graphicsview.cpp" />
+    <ClCompile Include="..\Classes\c5halltabledelegate.cpp" />
+    <ClCompile Include="..\Controls\c5lineedit.cpp" />
+    <ClCompile Include="..\Classes\c5logtoserverthread.cpp" />
+    <ClCompile Include="..\Classes\c5menu.cpp" />
+    <ClCompile Include="..\Cafe5\c5message.cpp" />
+    <ClCompile Include="..\Classes\c5order.cpp" />
+    <ClCompile Include="..\Classes\c5ordertabledelegate.cpp" />
+    <ClCompile Include="..\Classes\c5part2tabledelegate.cpp" />
+    <ClCompile Include="..\Classes\c5permissions.cpp" />
+    <ClCompile Include="..\Classes\c5printing.cpp" />
+    <ClCompile Include="..\Classes\c5printjson.cpp" />
+    <ClCompile Include="..\Classes\c5printpreview.cpp" />
+    <ClCompile Include="c5printreceiptthread.cpp" />
+    <ClCompile Include="..\Classes\c5printremovedservicethread.cpp" />
+    <ClCompile Include="..\Classes\c5printservicethread.cpp" />
+    <ClCompile Include="..\Cafe5\c5serverhandler.cpp" />
+    <ClCompile Include="..\Cafe5\c5sockethandler.cpp" />
+    <ClCompile Include="..\Classes\c5tablemodel.cpp" />
+    <ClCompile Include="..\Classes\c5tableview.cpp" />
+    <ClCompile Include="..\Controls\c5tablewidget.cpp" />
+    <ClCompile Include="..\Classes\c5translator.cpp" />
+    <ClCompile Include="..\Classes\c5user.cpp" />
+    <ClCompile Include="..\Cafe5\c5utils.cpp" />
+    <ClCompile Include="..\Classes\c5waiterserver.cpp" />
+    <ClCompile Include="..\Classes\c5widget.cpp" />
+    <ClCompile Include="..\Classes\c5witerconf.cpp" />
+    <ClCompile Include="dlgcl.cpp" />
+    <ClCompile Include="dlgcreditcardlist.cpp" />
+    <ClCompile Include="dlgdishremovereason.cpp" />
+    <ClCompile Include="dlgexitwithmessage.cpp" />
+    <ClCompile Include="dlgface.cpp" />
+    <ClCompile Include="dlgguest.cpp" />
+    <ClCompile Include="dlglistofdishcomments.cpp" />
+    <ClCompile Include="dlglistofhall.cpp" />
+    <ClCompile Include="dlglistofmenu.cpp" />
+    <ClCompile Include="dlgorder.cpp" />
+    <ClCompile Include="dlgpassword.cpp" />
+    <ClCompile Include="dlgpayment.cpp" />
+    <ClCompile Include="dlgreceiptlanguage.cpp" />
+    <ClCompile Include="dlgreports.cpp" />
+    <ClCompile Include="dlgreportslist.cpp" />
+    <ClCompile Include="..\Cafe5\excel.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="..\..\NewTax\printtaxn.cpp" />
+    <ClCompile Include="..\Classes\rkeyboard.cpp" />
+    <ClCompile Include="wpaymentoptions.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Classes\QRCodeGenerator.h" />
+    <QtMoc Include="..\Classes\c5cache.h">
+    </QtMoc>
+    <QtMoc Include="c5cafecommon.h">
+    </QtMoc>
+    <QtMoc Include="..\Controls\c5checkbox.h">
+    </QtMoc>
+    <QtMoc Include="..\Controls\c5combobox.h">
+    </QtMoc>
+    <ClInclude Include="..\Cafe5\c5config.h" />
+    <QtMoc Include="..\Cafe5\c5connection.h">
+    </QtMoc>
+    <QtMoc Include="..\Cafe5\c5database.h">
+    </QtMoc>
+    <QtMoc Include="..\Controls\c5dateedit.h">
+    </QtMoc>
+    <QtMoc Include="..\Cafe5\c5dialog.h">
+    </QtMoc>
+    <ClInclude Include="..\Classes\c5dishtabledelegate.h" />
+    <ClInclude Include="..\Controls\c5graphicsview.h" />
+    <ClInclude Include="..\Classes\c5halltabledelegate.h" />
+    <QtMoc Include="..\Controls\c5lineedit.h">
+    </QtMoc>
+    <ClInclude Include="..\Classes\c5logtoserverthread.h" />
+    <ClInclude Include="..\Classes\c5menu.h" />
+    <QtMoc Include="..\Cafe5\c5message.h">
+    </QtMoc>
+    <ClInclude Include="..\Classes\c5order.h" />
+    <ClInclude Include="..\Classes\c5ordertabledelegate.h" />
+    <ClInclude Include="..\Classes\c5part2tabledelegate.h" />
+    <ClInclude Include="..\Classes\c5permissions.h" />
+    <ClInclude Include="..\Classes\c5printing.h" />
+    <QtMoc Include="..\Classes\c5printjson.h">
+    </QtMoc>
+    <QtMoc Include="..\Classes\c5printpreview.h">
+    </QtMoc>
+    <QtMoc Include="c5printreceiptthread.h">
+    </QtMoc>
+    <QtMoc Include="..\Classes\c5printremovedservicethread.h">
+    </QtMoc>
+    <QtMoc Include="..\Classes\c5printservicethread.h">
+    </QtMoc>
+    <ClInclude Include="..\Cafe5\c5serverhandler.h" />
+    <QtMoc Include="..\Cafe5\c5sockethandler.h">
+    </QtMoc>
+    <ClInclude Include="..\Cafe5\c5socketmessage.h" />
+    <ClInclude Include="..\Classes\c5tablemodel.h" />
+    <QtMoc Include="..\Classes\c5tableview.h">
+    </QtMoc>
+    <QtMoc Include="..\Controls\c5tablewidget.h">
+    </QtMoc>
+    <ClInclude Include="..\Classes\c5translator.h" />
+    <ClInclude Include="..\Classes\c5user.h" />
+    <ClInclude Include="..\Cafe5\c5utils.h" />
+    <QtMoc Include="..\Classes\c5waiterserver.h">
+    </QtMoc>
+    <QtMoc Include="..\Classes\c5widget.h">
+    </QtMoc>
+    <ClInclude Include="..\Classes\c5witerconf.h" />
+    <QtMoc Include="dlgcl.h">
+    </QtMoc>
+    <QtMoc Include="dlgcreditcardlist.h">
+    </QtMoc>
+    <QtMoc Include="dlgdishremovereason.h">
+    </QtMoc>
+    <QtMoc Include="dlgexitwithmessage.h">
+    </QtMoc>
+    <QtMoc Include="dlgface.h">
+    </QtMoc>
+    <QtMoc Include="dlgguest.h">
+    </QtMoc>
+    <QtMoc Include="dlglistofdishcomments.h">
+    </QtMoc>
+    <QtMoc Include="dlglistofhall.h">
+    </QtMoc>
+    <QtMoc Include="dlglistofmenu.h">
+    </QtMoc>
+    <QtMoc Include="dlgorder.h">
+    </QtMoc>
+    <QtMoc Include="dlgpassword.h">
+    </QtMoc>
+    <QtMoc Include="dlgpayment.h">
+    </QtMoc>
+    <QtMoc Include="dlgreceiptlanguage.h">
+    </QtMoc>
+    <QtMoc Include="dlgreports.h">
+    </QtMoc>
+    <QtMoc Include="dlgreportslist.h">
+    </QtMoc>
+    <ClInclude Include="..\Cafe5\excel.h" />
+    <QtMoc Include="..\..\NewTax\printtaxn.h">
+    </QtMoc>
+    <ClInclude Include="rc.h" />
+    <ClInclude Include="res.rc" />
+    <QtMoc Include="..\Classes\rkeyboard.h">
+    </QtMoc>
+    <QtMoc Include="wpaymentoptions.h">
+    </QtMoc>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="debug\moc_predefs.h.cbt">
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\..\QT\MVSC\5.12.2\MSVC2017\mkspecs\features\data\dummy.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cl -Bx"$(QTDIR)\bin\qmake.exe" -nologo -Zc:wchar_t -FS -Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -Zc:__cplusplus -Zi -MDd -W3 -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 -wd4577 -wd4467 -E ..\..\..\QT\MVSC\5.12.2\MSVC2017\mkspecs\features\data\dummy.cpp 2&gt;NUL &gt;debug\moc_predefs.h</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generate moc_predefs.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">debug\moc_predefs.h;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="release\moc_predefs.h.cbt">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\..\QT\MVSC\5.12.2\MSVC2017\mkspecs\features\data\dummy.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cl -Bx"$(QTDIR)\bin\qmake.exe" -nologo -Zc:wchar_t -FS -Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -Zc:__cplusplus -O2 -MD -W3 -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 -wd4577 -wd4467 -E ..\..\..\QT\MVSC\5.12.2\MSVC2017\mkspecs\features\data\dummy.cpp 2&gt;NUL &gt;release\moc_predefs.h</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generate moc_predefs.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">release\moc_predefs.h;%(Outputs)</Outputs>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </CustomBuild>
+    <ClInclude Include="ui_c5connection.h" />
+    <ClInclude Include="ui_c5message.h" />
+    <ClInclude Include="ui_c5printpreview.h" />
+    <ClInclude Include="ui_dlgcl.h" />
+    <ClInclude Include="ui_dlgcreditcardlist.h" />
+    <ClInclude Include="ui_dlgdishremovereason.h" />
+    <ClInclude Include="ui_dlgexitwithmessage.h" />
+    <ClInclude Include="ui_dlgface.h" />
+    <ClInclude Include="ui_dlgguest.h" />
+    <ClInclude Include="ui_dlglistofdishcomments.h" />
+    <ClInclude Include="ui_dlglistofhall.h" />
+    <ClInclude Include="ui_dlglistofmenu.h" />
+    <ClInclude Include="ui_dlgorder.h" />
+    <ClInclude Include="ui_dlgpassword.h" />
+    <ClInclude Include="ui_dlgpayment.h" />
+    <ClInclude Include="ui_dlgreceiptlanguage.h" />
+    <ClInclude Include="ui_dlgreports.h" />
+    <ClInclude Include="ui_dlgreportslist.h" />
+    <ClInclude Include="ui_rkeyboard.h" />
+    <ClInclude Include="ui_wpaymentoptions.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtUic Include="..\Cafe5\c5connection.ui">
+      <OutputFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ui_c5connection.h</OutputFile>
+      <OutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ui_c5connection.h</OutputFile>
+    </QtUic>
+    <QtUic Include="..\Cafe5\c5message.ui">
+      <OutputFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ui_c5message.h</OutputFile>
+      <OutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ui_c5message.h</OutputFile>
+    </QtUic>
+    <QtUic Include="..\Classes\c5printpreview.ui">
+      <OutputFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ui_c5printpreview.h</OutputFile>
+      <OutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ui_c5printpreview.h</OutputFile>
+    </QtUic>
+    <QtUic Include="dlgcl.ui">
+      <OutputFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ui_dlgcl.h</OutputFile>
+      <OutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ui_dlgcl.h</OutputFile>
+    </QtUic>
+    <QtUic Include="dlgcreditcardlist.ui">
+      <OutputFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ui_dlgcreditcardlist.h</OutputFile>
+      <OutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ui_dlgcreditcardlist.h</OutputFile>
+    </QtUic>
+    <QtUic Include="dlgdishremovereason.ui">
+      <OutputFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ui_dlgdishremovereason.h</OutputFile>
+      <OutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ui_dlgdishremovereason.h</OutputFile>
+    </QtUic>
+    <QtUic Include="dlgexitwithmessage.ui">
+      <OutputFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ui_dlgexitwithmessage.h</OutputFile>
+      <OutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ui_dlgexitwithmessage.h</OutputFile>
+    </QtUic>
+    <QtUic Include="dlgface.ui">
+      <OutputFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ui_dlgface.h</OutputFile>
+      <OutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ui_dlgface.h</OutputFile>
+    </QtUic>
+    <QtUic Include="dlgguest.ui">
+      <OutputFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ui_dlgguest.h</OutputFile>
+      <OutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ui_dlgguest.h</OutputFile>
+    </QtUic>
+    <QtUic Include="dlglistofdishcomments.ui">
+      <OutputFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ui_dlglistofdishcomments.h</OutputFile>
+      <OutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ui_dlglistofdishcomments.h</OutputFile>
+    </QtUic>
+    <QtUic Include="dlglistofhall.ui">
+      <OutputFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ui_dlglistofhall.h</OutputFile>
+      <OutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ui_dlglistofhall.h</OutputFile>
+    </QtUic>
+    <QtUic Include="dlglistofmenu.ui">
+      <OutputFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ui_dlglistofmenu.h</OutputFile>
+      <OutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ui_dlglistofmenu.h</OutputFile>
+    </QtUic>
+    <QtUic Include="dlgorder.ui">
+      <OutputFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ui_dlgorder.h</OutputFile>
+      <OutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ui_dlgorder.h</OutputFile>
+    </QtUic>
+    <QtUic Include="dlgpassword.ui">
+      <OutputFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ui_dlgpassword.h</OutputFile>
+      <OutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ui_dlgpassword.h</OutputFile>
+    </QtUic>
+    <QtUic Include="dlgpayment.ui">
+      <OutputFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ui_dlgpayment.h</OutputFile>
+      <OutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ui_dlgpayment.h</OutputFile>
+    </QtUic>
+    <QtUic Include="dlgreceiptlanguage.ui">
+      <OutputFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ui_dlgreceiptlanguage.h</OutputFile>
+      <OutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ui_dlgreceiptlanguage.h</OutputFile>
+    </QtUic>
+    <QtUic Include="dlgreports.ui">
+      <OutputFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ui_dlgreports.h</OutputFile>
+      <OutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ui_dlgreports.h</OutputFile>
+    </QtUic>
+    <QtUic Include="dlgreportslist.ui">
+      <OutputFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ui_dlgreportslist.h</OutputFile>
+      <OutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ui_dlgreportslist.h</OutputFile>
+    </QtUic>
+    <QtUic Include="..\Classes\rkeyboard.ui">
+      <OutputFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ui_rkeyboard.h</OutputFile>
+      <OutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ui_rkeyboard.h</OutputFile>
+    </QtUic>
+    <QtUic Include="wpaymentoptions.ui">
+      <OutputFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ui_wpaymentoptions.h</OutputFile>
+      <OutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ui_wpaymentoptions.h</OutputFile>
+    </QtUic>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Waiter.qm" />
+    <None Include="..\resources\armenia.png" />
+    <None Include="..\resources\backspace.png" />
+    <None Include="..\resources\bank.png" />
+    <None Include="..\resources\calculator.png" />
+    <None Include="..\resources\cancel.png" />
+    <None Include="..\resources\chair.png" />
+    <None Include="..\resources\comment.png" />
+    <None Include="..\resources\configure.png" />
+    <None Include="..\resources\credit-card.png" />
+    <None Include="..\resources\discount.png" />
+    <None Include="..\resources\down.png" />
+    <None Include="..\resources\edit.png" />
+    <None Include="..\resources\enter.png" />
+    <None Include="..\resources\exit.png" />
+    <None Include="..\resources\expand.png" />
+    <None Include="..\resources\expand2.png" />
+    <None Include="..\resources\filter_clear.png" />
+    <None Include="..\resources\giftbox.png" />
+    <None Include="..\resources\guest.png" />
+    <None Include="..\resources\ledger.png" />
+    <None Include="..\resources\left-arrow.png" />
+    <None Include="..\resources\logout.png" />
+    <None Include="..\resources\menu.PNG" />
+    <None Include="..\resources\minimize.png" />
+    <None Include="..\resources\ok.png" />
+    <None Include="..\resources\payment.png" />
+    <None Include="..\resources\place.png" />
+    <None Include="..\resources\print_receipt.png" />
+    <None Include="..\resources\recycle.png" />
+    <None Include="..\resources\refresh.png" />
+    <None Include="..\resources\report.png" />
+    <QtRcc Include="..\resources\resources.qrc">
+      <InitFuncName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">resources</InitFuncName>
+      <InitFuncName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">resources</InitFuncName>
+    </QtRcc>
+    <None Include="..\resources\right-arrow.png" />
+    <None Include="..\resources\room-service.png" />
+    <None Include="..\resources\russia.png" />
+    <None Include="..\resources\service_check.png" />
+    <None Include="..\resources\shift.png" />
+    <None Include="..\resources\tables.png" />
+    <None Include="..\resources\tax.png" />
+    <QtRcc Include="translator.qrc">
+      <InitFuncName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">translator</InitFuncName>
+      <InitFuncName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">translator</InitFuncName>
+    </QtRcc>
+    <None Include="..\resources\up.png" />
+    <None Include="..\resources\usa.png" />
+    <None Include="..\resources\wallet-with-money.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cup.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="res.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
+    <Import Project="$(QtMsBuild)\qt.targets" />
+  </ImportGroup>
+  <ImportGroup Label="ExtensionTargets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties Qt5Version_x0020_Win32="MSVC2017" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

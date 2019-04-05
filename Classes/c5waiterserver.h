@@ -35,7 +35,11 @@ private:
 
     void closeOrderHotel(C5Database &db, const QJsonObject &h, const QJsonArray &b);
 
+    void calculateSelfCost(QJsonObject &jh, QJsonArray &jb, C5Database &db);
+
     void remember(const QJsonObject &h);
+
+    void getVersions(C5Database &db, QJsonArray &arr);
 
     QTcpSocket *fSocket;
 };

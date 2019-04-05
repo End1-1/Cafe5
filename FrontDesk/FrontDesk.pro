@@ -140,7 +140,11 @@ SOURCES += \
     ../Reports/cr5dishpriceselfcostfilter.cpp \
     ../Reports/cr5storedocuments.cpp \
     ../Reports/cr5storedocumentsfilter.cpp \
-    c5translatorform.cpp
+    c5translatorform.cpp \
+    c5toolbarwidget.cpp \
+    ../Classes/checkforupdatethread.cpp \
+    ../Classes/fileversion.cpp \
+    c5waiterorder.cpp
 
 HEADERS += \
         c5mainwindow.h \
@@ -252,7 +256,11 @@ HEADERS += \
     ../Reports/cr5dishpriceselfcostfilter.h \
     ../Reports/cr5storedocuments.h \
     ../Reports/cr5storedocumentsfilter.h \
-    c5translatorform.h
+    c5translatorform.h \
+    c5toolbarwidget.h \
+    ../Classes/checkforupdatethread.h \
+    ../Classes/fileversion.h \
+    c5waiterorder.h
 
 FORMS += \
         c5mainwindow.ui \
@@ -307,7 +315,9 @@ FORMS += \
     c5dishselfcostgenprice.ui \
     ../Reports/cr5dishpriceselfcostfilter.ui \
     ../Reports/cr5storedocumentsfilter.ui \
-    c5translatorform.ui
+    c5translatorform.ui \
+    c5toolbarwidget.ui \
+    c5waiterorder.ui
 
 INCLUDEPATH += ../Cafe5
 INCLUDEPATH += ../Classes
@@ -327,3 +337,5 @@ DISTFILES += \
     storehouse.ico
 
 ICON = storehouse.ico
+
+LIBS += -lVersion

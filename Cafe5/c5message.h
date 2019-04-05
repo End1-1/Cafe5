@@ -12,7 +12,7 @@ class C5Message : public QDialog
     Q_OBJECT
 
 public:
-    explicit C5Message(QWidget *parent = 0);
+    explicit C5Message(QWidget *parent = nullptr);
 
     ~C5Message();
 

@@ -42,8 +42,6 @@ private:
 
     void buildMenu(const QString &menu, QString part1, QString part2);
 
-    void addDishToOrder(const QJsonObject &obj);
-
     void loadOrder(const QJsonObject &obj);
 
     void changeQty(double qty);
@@ -61,6 +59,8 @@ private:
     void setButtonsState();
 
 private slots:
+    void addDishToOrder(const QJsonObject &obj);
+
     void handleOpenTable(const QJsonObject &obj);
 
     void handlePrintService(const QJsonObject &obj);
@@ -114,6 +114,8 @@ private slots:
     void on_btnGuest_clicked();
 
     void on_btnRoomService_clicked();
+
+    void on_btnSearchInMenu_clicked();
 };
 
 #endif // DLGORDER_H

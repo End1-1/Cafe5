@@ -10,7 +10,7 @@ class C5LineEditWithSelector : public C5LineEdit
     Q_OBJECT
 
 public:
-    C5LineEditWithSelector(QWidget *parent = 0);
+    C5LineEditWithSelector(QWidget *parent = nullptr);
 
     ~C5LineEditWithSelector();
 

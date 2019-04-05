@@ -3,24 +3,25 @@
 #include "c5printing.h"
 #include <QJsonArray>
 
-QString caption()
+void caption(QString &str)
 {
-    return QObject::tr("Daily by waiters");
+    str = QObject::tr("Daily by waiters");
 }
 
-QJsonArray json(C5Database &db, const QJsonObject &params)
+void json(C5Database &db, const QJsonObject &params, QJsonArray &jarr)
 {
     db[":f_state"] = ORDER_STATE_CLOSE;
     db[":f_datecash1"] = QDate::fromString(params["date1"].toString(), FORMAT_DATE_TO_STR_MYSQL);
     db[":f_datecash2"] = QDate::fromString(params["date2"].toString(), FORMAT_DATE_TO_STR_MYSQL);
     db.exec("select concat(u.f_last, ' ', u.f_first) as f_staffname, count(oh.f_id), sum(oh.f_amounttotal), "
             "sum(oh.f_amountcash) as f_amountcash, sum(oh.f_amountcard) as f_amountcard, "
-            "sum(oh.f_amountbank) as f_amountbank, sum(oh.f_amountother) as f_amountother "
-            "from o_Header oh "
+            "sum(oh.f_amountbank) as f_amountbank, sum(oh.f_amountother) as f_amountother, "
+            "oh.f_staff "
+            "from o_header oh "
             "left join s_user u on u.f_id=oh.f_staff "
             "where oh.f_state=:f_state "
             "and oh.f_datecash between :f_datecash1 and :f_datecash2 "
-            "group by 1 "
+            "group by 1, 8 "
             "order by 1 ");
     C5Printing p;
     p.setSceneParams(700, 2700, QPrinter::Portrait);
@@ -67,6 +68,29 @@ QJsonArray json(C5Database &db, const QJsonObject &params)
             p.rtext(float_str(db.getDouble(6), 2));
             p.br();
             other += db.getDouble(6);
+            C5Database dbo(db);
+            dbo[":f_state"] = ORDER_STATE_CLOSE;
+            dbo[":f_staff"] = db.getInt(7);
+            dbo[":f_datecash1"] = QDate::fromString(params["date1"].toString(), FORMAT_DATE_TO_STR_MYSQL);
+            dbo[":f_datecash2"] = QDate::fromString(params["date2"].toString(), FORMAT_DATE_TO_STR_MYSQL);
+            dbo.exec("select p.f_name, count(oh.f_id), sum(oh.f_amountother) as f_amountother "
+                    "from o_header oh "
+                    "left join o_pay_other p on p.f_id=oh.f_otherid "
+                    "where oh.f_state=:f_state and oh.f_staff=:f_staff and oh.f_otherid>0 "
+                    "and oh.f_datecash between :f_datecash1 and :f_datecash2 "
+                    "group by 1 "
+                    "order by 1 ");
+            if (dbo.nextRow()) {
+                p.br();
+                p.br();
+                p.ltext(QObject::tr("Other:"), 25);
+                p.br();
+                do {
+                    p.ltext(dbo.getString(0), 5);
+                    p.rtext(QString("%1 (%2)").arg(float_str(dbo.getDouble(2), 2)).arg(dbo.getInt(1)));
+                    p.br();
+                } while (dbo.nextRow());
+            }
         }
         p.setFontBold(true);
         p.ltext(QObject::tr("Total amount"), 5);
@@ -113,7 +137,7 @@ QJsonArray json(C5Database &db, const QJsonObject &params)
     p.br();
     p.line();
 
-    return p.jsonData();
+    jarr = p.jsonData();
 }
 
 void translator(QTranslator &trans)

@@ -31,6 +31,8 @@ private slots:
 
     void timeout();
 
+    void checkVersionTimeout();
+
     void confTimeout();
 
     void newConnection();
@@ -46,6 +48,8 @@ private slots:
     void handleDishRemoveReason(const QJsonObject &obj);
 
     void handleDishComment(const QJsonObject &obj);
+
+    void handleVersion(const QJsonObject &obj);
 
     void handleSocket(const QJsonObject &obj);
 
@@ -69,6 +73,8 @@ private:
     QTcpServer fTcpServer;
 
     QTimer fTimer;
+
+    QTimer fTimerCheckVersion;
 
     QTimer fConfTimer;
 

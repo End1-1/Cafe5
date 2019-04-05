@@ -7,11 +7,14 @@
 #include "dlgorder.h"
 #include "c5menu.h"
 #include "c5witerconf.h"
+#include "dlgexitbyversion.h"
 #include "c5waiterserver.h"
 #include "dlglistofhall.h"
+#include "c5utils.h"
 #include "dlgreports.h"
 #include "dlgexitwithmessage.h"
 #include "c5halltabledelegate.h"
+#include "fileversion.h"
 #include "c5cafecommon.h"
 #include "c5logtoserverthread.h"
 #include <QTcpSocket>
@@ -29,6 +32,8 @@ DlgFace::DlgFace() :
     fCanClose = false;
     ui->btnCancel->setVisible(false);
     fModeJustSelectTable = false;
+    connect(&fTimerCheckVersion, SIGNAL(timeout()), this, SLOT(checkVersionTimeout()));
+    fTimerCheckVersion.start(60000);
 }
 
 DlgFace::~DlgFace()
@@ -119,6 +124,13 @@ void DlgFace::timeout()
     sh->bind("hall", C5Config::hallList());
     sh->send();
     ui->lbDate->setText(QString("%1 %2").arg(QDate::fromString(__c5config.dateCash(), FORMAT_DATE_TO_STR_MYSQL).toString(FORMAT_DATE_TO_STR)).arg(QTime::currentTime().toString("HH:mm")));
+}
+
+void DlgFace::checkVersionTimeout()
+{
+    C5SocketHandler *sh = createSocketHandler(SLOT(handleVersion(QJsonObject)));
+    sh->bind("cmd", sm_version);
+    sh->send();
 }
 
 void DlgFace::confTimeout()
@@ -229,6 +241,24 @@ void DlgFace::handleDishComment(const QJsonObject &obj)
     QJsonArray ja = obj["comments"].toArray();
     for (int i = 0; i < ja.count(); i++) {
         C5CafeCommon::fDishComments << ja.at(i).toObject()["f_name"].toString();
+    }
+}
+
+void DlgFace::handleVersion(const QJsonObject &obj)
+{
+    if (obj["reply"].toInt() != 0) {
+        C5Message::error(obj["msg"].toString());
+        return;
+    }
+    QJsonArray arr = obj["versions"].toArray();
+    for (int i = 0; i < arr.count(); i++) {
+        QJsonObject o = arr.at(i).toObject();
+        if (o["app"].toString() == _MODULE_) {
+            QString version = FileVersion::getVersionString(qApp->applicationFilePath());
+            if (o["version"].toString() != version) {
+                DlgExitByVersion::exit(version, o["version"].toString());
+            }
+        }
     }
 }
 

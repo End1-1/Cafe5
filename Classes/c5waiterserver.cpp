@@ -18,9 +18,9 @@
 #include <QApplication>
 #include <QTranslator>
 
-QMutex mutex;
-typedef QString (*caption)();
-typedef QJsonArray (*json)(C5Database &db, const QJsonObject &params);
+static QMutex mutex;
+typedef void (*caption)(QString &str);
+typedef void (*json)(C5Database &db, const QJsonObject &params, QJsonArray &jarr);
 typedef void (*translator)(QTranslator &trans);
 
 C5WaiterServer::C5WaiterServer(const QJsonObject &o, QTcpSocket *socket) :
@@ -262,6 +262,9 @@ void C5WaiterServer::reply(QJsonObject &o)
         } else {
 
         }
+        if (jh["f_otherid"].toString().toInt() == PAYOTHER_SELFCOST) {
+            calculateSelfCost(jh, jb, srh.fDb);
+        }
         // CHECKING FOR TAX CASH/CARD
         // PRINT RECEIPT
         // TODO: CHECK FOR DESTINATION PRINTER AND REDIRECT QUERY
@@ -321,10 +324,13 @@ void C5WaiterServer::reply(QJsonObject &o)
             }
         }
         if (err.isEmpty()) {
+            jh["f_timeclose"] = QTime::currentTime().toString(FORMAT_TIME_TO_STR);
+            jh["f_dateclose"] = QDate::currentDate().toString(FORMAT_DATE_TO_STR);
+            jh["f_datecash"] = dateCash.toString(FORMAT_DATE_TO_STR);
             srh.fDb[":f_state"] = ORDER_STATE_CLOSE;
             srh.fDb[":f_dateClose"] = QDate::currentDate();
-            srh.fDb[":f_dateCash"] = dateCash;
-            srh.fDb[":f_timeClose"] = QTime::currentTime();
+            srh.fDb[":f_dateCash"] = QDate::fromString(jh["f_datecash"].toString(), FORMAT_DATE_TO_STR);
+            srh.fDb[":f_timeClose"] = QTime::fromString(jh["f_timeclose"].toString(), FORMAT_TIME_TO_STR);
             srh.fDb[":f_staff"] = jh["f_currentstaff"].toString().toInt();
             srh.fDb.update("o_header", where_id(jh["f_id"].toString()));
             srh.fDb[":f_lock"] = 0;
@@ -404,7 +410,7 @@ void C5WaiterServer::reply(QJsonObject &o)
     }
     case sm_reports: {
         QJsonArray ja;
-        QDir dir("./waiterreports");
+        QDir dir(qApp->applicationDirPath() + "/waiterreports");
         QStringList dll = dir.entryList(QStringList() << "*.dll", QDir::Files);
         foreach (QString s, dll) {
             QLibrary l("./waiterreports/" + s);
@@ -427,7 +433,9 @@ void C5WaiterServer::reply(QJsonObject &o)
             t(trans);
             qApp->installTranslator(&trans);
             QJsonObject jo;
-            jo["caption"] = c();
+            QString caption;
+            c(caption);
+            jo["caption"] = caption;
             jo["file"] = s;
             ja.append(jo);
             l.unload();
@@ -438,7 +446,7 @@ void C5WaiterServer::reply(QJsonObject &o)
     }
     case sm_waiter_report: {
         QString filename = fIn["file"].toString();
-        QLibrary l("./waiterreports/" + filename);
+        QLibrary l(qApp->applicationDirPath() + "/waiterreports/" + filename);
         if (!l.load()) {
             o["reply"] = 1;
             o["msg"] = QString("%1 %2").arg(tr("Could not load")).arg(filename);
@@ -465,7 +473,8 @@ void C5WaiterServer::reply(QJsonObject &o)
         jo["date1"] = fIn["date1"];
         jo["date2"] = fIn["date2"];
         o["reply"] = 0;
-        QJsonArray report = j(srh.fDb, jo);
+        QJsonArray report;
+        j(srh.fDb, jo, report);
         QJsonObject jp;
         jp["pagesize"] = (int) QPrinter::Custom;
         jp["printer"] = "local";
@@ -479,6 +488,13 @@ void C5WaiterServer::reply(QJsonObject &o)
     case sm_log:
         remember(fIn);
         break;
+    case sm_version: {
+        QJsonArray versions;
+        getVersions(srh.fDb, versions);
+        o["reply"] = 0;
+        o["versions"] = versions;
+        break;
+    }
     default:
         o["reply"] = 0;
         o["msg"] = QString("%1: %2").arg(tr("Unknown command for socket handler from dlgface")).arg(cmd);
@@ -723,12 +739,24 @@ void C5WaiterServer::saveDish(const QJsonObject &h, QJsonObject &o, C5Database &
 int C5WaiterServer::printTax(const QJsonObject &h, const QJsonArray &ja, C5Database &db)
 {
     PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), this);
+    double serviceTotal = 0;
     for (int i = 0; i < ja.count(); i++) {
         QJsonObject d = ja[i].toObject();
         if (d["f_state"].toString().toInt() != DISH_STATE_OK) {
             continue;
         }
-        pt.addGoods(C5Config::taxDept(), d["f_adgcode"].toString(), d["f_dish"].toString(), d["f_name"].toString(), d["f_price"].toString().toDouble(), d["f_qty2"].toString().toDouble());
+        double price = d["f_price"].toString().toDouble();
+        if (h["f_servicefactor"].toString().toDouble() > 0.001) {
+            if (h["f_servicemode"].toString().toInt() == SERVICE_AMOUNT_MODE_INCREASE_PRICE) {
+                price += price * h["f_servicefactor"].toString().toDouble();
+            } else {
+                serviceTotal += price * h["f_servicefactor"].toString().toDouble();
+            }
+        }
+        pt.addGoods(C5Config::taxDept(), d["f_adgcode"].toString(), d["f_dish"].toString(), d["f_name"].toString(), price, d["f_qty2"].toString().toDouble());
+    }
+    if (serviceTotal > 0.001) {
+        pt.addGoods(C5Config::taxDept(), "5901", "001", QString("%1 %2%").arg(tr("Service")).arg(float_str(h["f_servicefactor"].toString().toDouble()*100, 2)), serviceTotal, 1.0);
     }
     QString jsonIn, jsonOut, err;
     int result = 0;
@@ -762,6 +790,29 @@ int C5WaiterServer::printTax(const QJsonObject &h, const QJsonArray &ja, C5Datab
     return result;
 }
 
+void correctHotelID(QString &id) {
+    C5Database dba(C5Config::dbParams().at(0), "airwick", C5Config::dbParams().at(2), C5Config::dbParams().at(3));
+    dba.open();
+    int totaltrynum = 0;
+    bool success = false;
+    QString tempId = id;
+    do {
+         success = dba.exec(QString("insert into airwick.f_id (f_value, f_try, f_comp, f_user, f_date, f_time, f_db) values ('%1-%2', %3, '%4', '%5', '%6', '%7', database())")
+                                         .arg("PS")
+                                         .arg(id).arg(totaltrynum)
+                                         .arg(QHostInfo::localHostName().toUpper())
+                                         .arg(1) //user id
+                                         .arg(QDate::currentDate().toString("yyyy-MM-dd"))
+                                         .arg(QTime::currentTime().toString("HH:mm:ss")));
+        if (dba.fLastError.toLower().contains("duplicate entry")) {
+            totaltrynum++;
+            id = QString("%1-%2").arg(tempId).arg(totaltrynum);
+        } else {
+            success = true;
+        }
+    } while (!success);
+}
+
 QString getHotelID(const QString &source) {
     C5Database dba(C5Config::dbParams().at(0), "airwick", C5Config::dbParams().at(2), C5Config::dbParams().at(3));
     dba.open();
@@ -769,27 +820,27 @@ QString getHotelID(const QString &source) {
     bool done = false;
     QString result;
     do {
-        QString query = QString ("select f_max, f_zero from serv_id_counter where f_id='%1' for update").arg("PS");
+        QString query = QString ("select f_max, f_zero from serv_id_counter where f_id='%1' for update").arg(source);
         if (!dba.exec(query)) {
-            QMessageBox::critical(0, "ID ERROR", "<H1><font color=\"red\">COUNTER ID GENERATOR FAIL</font></h1><br>" + dba.fLastError);
+            QMessageBox::critical(nullptr, "ID ERROR", "<H1><font color=\"red\">COUNTER ID GENERATOR FAIL</font></h1><br>" + dba.fLastError);
             exit(0);
         }
         if (dba.nextRow()) {
             int max = dba.getInt(0) + 1;
             int zero = dba.getInt(1);
             dba[":f_max"] = max;
-            dba[":f_id"] = "PS";
+            dba[":f_id"] = source;
             query = "update serv_id_counter set f_max=:f_max where f_id=:f_id";
             dba.exec(query);
             result = QString("%1").arg(max, zero, 10, QChar('0'));
         } else {
-            query = "insert into serv_id_counter (f_id, f_max, f_zero) values ('PS', 0, 6)";
+            query = "insert into serv_id_counter (f_id, f_max, f_zero) values ('" + source + "', 0, 6)";
             dba.exec(query);
             totaltrynum++;
             continue;
         }
         dba.exec(QString("insert into airwick.f_id (f_value, f_try, f_comp, f_user, f_date, f_time, f_db) values ('%1-%2', %3, '%4', '%5', '%6', '%7', database())")
-             .arg("PS")
+             .arg(source)
              .arg(result).arg(totaltrynum)
              .arg(QHostInfo::localHostName().toUpper())
              .arg(1) //user id
@@ -801,7 +852,7 @@ QString getHotelID(const QString &source) {
             done = true;
         }
         if (totaltrynum > 20) {
-            QMessageBox::critical(0, "ID ERROR", "<H1><font color=\"red\">COUNTER ID GENERATOR FAIL, GIVE UP</font></h1>");
+            QMessageBox::critical(nullptr, "ID ERROR", "<H1><font color=\"red\">COUNTER ID GENERATOR FAIL, GIVE UP</font></h1>");
             exit(0);
         }
     } while (!done);
@@ -832,7 +883,8 @@ void C5WaiterServer::closeOrderHotel(C5Database &db, const QJsonObject &h, const
         return;
     }
 
-    QString result = getHotelID("PS");
+    QString result = h["f_prefix"].toString() + h["f_hallid"].toString();
+    correctHotelID(result);
     int paymentMode = 1;
 
     QString room, res, inv, clcode, clname, guest;
@@ -870,14 +922,14 @@ void C5WaiterServer::closeOrderHotel(C5Database &db, const QJsonObject &h, const
     fDD[":f_id"] = result;
     fDD[":f_source"] = "PS";
     fDD[":f_res"] = res;
-    fDD[":f_wdate"] = QDate::currentDate();
+    fDD[":f_wdate"] = QDate::fromString(h["f_datecash"].toString(), ("dd/MM/yyyy"));
     fDD[":f_rdate"] = QDate::currentDate();
     fDD[":f_time"] = QTime::currentTime();
     fDD[":f_user"] = 1;
     fDD[":f_room"] = h["f_otherid"].toString().toInt() == PAYOTHER_TRANSFER_TO_ROOM ? room : clcode;
     fDD[":f_guest"] = h["f_otherid"].toString().toInt() == PAYOTHER_TRANSFER_TO_ROOM ? guest : clname + ", " + h["f_prefix"].toString() + h["f_hallid"].toString();
     fDD[":f_itemCode"] = item;
-    fDD[":f_finalName"] = itemName + h["f_prefix"].toString() + h["f_hallid"].toString();
+    fDD[":f_finalName"] = itemName + " " + h["f_prefix"].toString() + h["f_hallid"].toString();
     fDD[":f_amountAmd"] = h["f_amounttotal"];
     fDD[":f_usedPrepaid"] = 0;
     fDD[":f_amountVat"] = h["f_amounttotal"].toDouble() / 1.1;
@@ -887,8 +939,8 @@ void C5WaiterServer::closeOrderHotel(C5Database &db, const QJsonObject &h, const
     fDD[":f_creditCard"] = 0;
     fDD[":f_cityLedger"] = clcode.toInt();
     fDD[":f_paymentComment"] = "";
-    fDD[":f_dc"] = "CREDIT";
-    fDD[":f_sign"] = 0;
+    fDD[":f_dc"] = "DEBIT";
+    fDD[":f_sign"] = 1;
     fDD[":f_doc"] = "";
     fDD[":f_rec"] = "";
     fDD[":f_inv"] = inv;
@@ -906,9 +958,9 @@ void C5WaiterServer::closeOrderHotel(C5Database &db, const QJsonObject &h, const
     fDD[":f_hall"] = h["f_hall"].toString().toInt();
     fDD[":f_table"] = h["f_table"].toString().toInt();
     fDD[":f_staff"] = 1;
-    fDD[":f_dateopen"] = QDateTime::fromString(h["f_dateopen"].toString() + " " + h["f_timeopen"].toString(), "yyyy-MM-dd HH:mm:ss");
-    fDD[":f_dateclose"] = QDateTime::fromString(h["f_dateclose"].toString() + " " + h["f_timeclose"].toString(), "yyyy-MM-dd HH:mm:ss");
-    fDD[":f_datecash"] = QDate::fromString(h["f_datecash"].toString("yyyy-MM-dd"));
+    fDD[":f_dateopen"] = QDateTime::fromString(h["f_dateopen"].toString() + " " + h["f_timeopen"].toString(), "dd/MM/yyyy HH:mm:ss");
+    fDD[":f_dateclose"] = QDateTime::fromString(h["f_dateclose"].toString() + " " + h["f_timeclose"].toString(), "dd/MM/yyyy HH:mm:ss");
+    fDD[":f_datecash"] = QDate::fromString(h["f_datecash"].toString(), ("dd/MM/yyyy"));
     fDD[":f_comment"] = "";
     fDD[":f_paymentModeComment"] = "";
     fDD[":f_paymentMode"] = paymentMode;
@@ -952,13 +1004,68 @@ void C5WaiterServer::closeOrderHotel(C5Database &db, const QJsonObject &h, const
     }
 }
 
+void C5WaiterServer::calculateSelfCost(QJsonObject &jh, QJsonArray &jb, C5Database &db)
+{
+    QMap<int, QMap<int, double> > goodsQty;
+    QMap<int, double> price;
+    db[":f_id"] = jh["f_id"].toString();
+    db.exec("select b.f_dish, r.f_goods, r.f_qty "
+            "from d_recipes r "
+            "left join o_body b on b.f_dish=r.f_dish "
+            "left join o_header h on h.f_id=b.f_header "
+            "where b.f_state=1 and h.f_id=:f_id ");
+    while (db.nextRow()) {
+        goodsQty[db.getInt(0)][db.getInt(1)] = db.getDouble(2);
+    }
+    db.exec("select s.f_goods, sum(s.f_total)/sum(f_qty) "
+            "from a_store s "
+            "left join a_header h on h.f_id=s.f_document "
+            "where h.f_state=1 and h.f_type=1 and s.f_type=1 "
+            "group by 1");
+    while (db.nextRow()) {
+        price[db.getInt(0)] = db.getDouble(1);
+    }
+    double total = 0;
+    for (int i = 0; i < jb.count(); i++) {
+        QJsonObject o = jb.at(i).toObject();
+        if (o["f_state"].toString().toInt() != DISH_STATE_OK) {
+            continue;
+        }
+        if (!goodsQty.contains(o["f_dish"].toString().toInt())) {
+            continue;
+        }
+        double selfcost = 0;
+        QMap<int, double> recipe = goodsQty[o["f_dish"].toString().toInt()];
+        for (QMap<int, double>::const_iterator it = recipe.begin(); it != recipe.end(); it++) {
+            selfcost += price[it.key()] * it.value();
+        }
+        o["f_price"] = QString::number(selfcost, 'f', 2);
+        o["f_service"] = "0";
+        o["f_total"] = QString::number(selfcost * o["f_qty1"].toString().toDouble(), 'f', 2);
+        db[":f_id"] = o["f_id"].toString();
+        db[":f_price"] = selfcost;
+        db.exec("update o_body set f_price=:f_price where f_id=:f_id");
+        total += selfcost * o["f_qty1"].toString().toDouble();
+        jb[i] = o;
+    }
+    jh["f_amountother"] = QString::number(total, 'f', 2);
+    jh["f_amounttotal"] = QString::number(total, 'f', 2);
+    jh["f_servicefactor"] = "0";
+    jh["f_amountservice"] = 0;
+    db[":f_amountother"] = total;
+    db[":f_amounttotal"] = total;
+    db[":f_servicefactor"] = 0;
+    db[":f_amountservice"] = 0;
+    db.update("o_header", where_id(jh["f_id"].toString()));
+}
+
 void C5WaiterServer::remember(const QJsonObject &h)
 {
     C5Database db(C5Config::dbParams().at(0), C5Config::logDatabase(), C5Config::dbParams().at(2), C5Config::dbParams().at(3));
     db[":f_comp"] = h["comp"].toString();
     db[":f_date"] = QDate::fromString(h["date"].toString(), FORMAT_DATE_TO_STR_MYSQL);
     db[":f_time"] = QTime::fromString(h["time"].toString(), FORMAT_TIME_TO_STR);
-    db[":f_user"] = h["user"].toInt();
+    db[":f_user"] = h["user"].toString();
     db[":f_type"] = h["type"].toInt();
     db[":f_rec"] = h["rec"].toString();
     db[":f_invoice"] = h["invoice"].toString();
@@ -967,4 +1074,15 @@ void C5WaiterServer::remember(const QJsonObject &h)
     db[":f_value1"] = h["value1"].toString();
     db[":f_value2"] = h["value2"].toString();
     db.insert("log", false);
+}
+
+void C5WaiterServer::getVersions(C5Database &db, QJsonArray &arr)
+{
+    db.exec("select * from s_app");
+    while (db.nextRow()) {
+        QJsonObject o;
+        o["app"] = db.getString(0);
+        o["version"] = db.getString(1);
+        arr.append(o);
+    }
 }

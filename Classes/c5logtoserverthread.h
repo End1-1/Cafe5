@@ -11,7 +11,7 @@ typedef struct {
 
     int fType;
 
-    int fUser;
+    QString fUser;
 
     QDate fDate;
 
@@ -34,18 +34,18 @@ typedef struct {
 class C5LogToServerThread : public QThread
 {
 public:
-    C5LogToServerThread(QObject *parent = 0);
+    C5LogToServerThread(QObject *parent = nullptr);
 
     static void configureServer(const QString &ip, int port);
 
-    static void remember(int type, int user, const QString &rec, const QString &invoice, const QString &reservation, const QString &action, const QString &value1, const QString &value2);
+    static void remember(int type, const QString &user, const QString &rec, const QString &invoice, const QString &reservation, const QString &action, const QString &value1, const QString &value2);
 
 protected:
     void run();
 
     int fType;
 
-    int fUser;
+    QString fUser;
 
     QString fRec;
 

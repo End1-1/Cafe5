@@ -72,7 +72,7 @@ void MainDialog::on_btnUpdate_clicked()
 {
     ui->txtLog->clear();
     fUpdateThread = new UpdateThread(this);
-    fUpdateThread->fServerAddress = "http://10.1.0.70";
+    fUpdateThread->fServerAddress = "https://www.hotelicca.com";
     fUpdateThread->fUpdateVersion = 1;
     connect(fUpdateThread, SIGNAL(message(QString)), this, SLOT(message(QString)));
     connect(fUpdateThread, SIGNAL(allDone(QString)), this, SLOT(allDone(QString)));

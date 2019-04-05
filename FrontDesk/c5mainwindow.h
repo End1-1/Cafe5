@@ -4,10 +4,13 @@
 #include <QMainWindow>
 #include <QLabel>
 #include <QTreeWidgetItem>
+#include <QTimer>
 
 namespace Ui {
 class C5MainWindow;
 }
+
+class C5ToolBarWidget;
 
 class C5MainWindow : public QMainWindow
 {
@@ -37,6 +40,10 @@ public slots:
     void on_actionLogin_triggered();
 
 private slots:
+    void updateTimeout();
+
+    void updateChecked(bool needUpdate, int source, const QString &path);
+
     void hotKey();
 
     void twCustomMenu(const QPoint &p);
@@ -75,6 +82,12 @@ private:
     QTabWidget *fTab;
 
     QToolBar *fReportToolbar;
+
+    QToolBar *fRightToolbar;
+
+    C5ToolBarWidget *fToolbarWidget;
+
+    QTimer fUpdateTimer;
 
     bool fLogin;
 

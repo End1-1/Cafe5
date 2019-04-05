@@ -10,6 +10,7 @@
 #include "c5ordertabledelegate.h"
 #include "c5part2tabledelegate.h"
 #include "dlgpayment.h"
+#include "dlgsearchinmenu.h"
 #include "dlgpassword.h"
 #include "dlgguest.h"
 #include "c5logtoserverthread.h"
@@ -43,6 +44,8 @@ DlgOrder::~DlgOrder()
 
 void DlgOrder::openTable(const QJsonObject &table, C5User *user)
 {
+    __userid = user->fId;
+    __username = user->fFull;
     QJsonObject hall = C5CafeCommon::hall(table["f_hall"].toString());
     if (hall.count() > 0) {
         C5Config::setServiceFactor(C5CafeCommon::fHallConfigs[hall["f_settings"].toString().toInt()][param_service_factor]);
@@ -334,7 +337,7 @@ void DlgOrder::logRecord(const QString &rec, const QString &action, const QStrin
         fLogDelay.append(l);
     } else {
         processDelayedLogs();
-        C5LogToServerThread::remember(LOG_WAITER, __userid, rec, fOrder->headerValue("f_id"), "", action, value1, value2);
+        C5LogToServerThread::remember(LOG_WAITER, __username, rec, fOrder->headerValue("f_id"), "", action, value1, value2);
     }
 }
 
@@ -740,4 +743,13 @@ void DlgOrder::on_btnRoomService_clicked()
     itemsToTable();
     fOrder->countTotal();
     setServiceLabel();
+}
+
+void DlgOrder::on_btnSearchInMenu_clicked()
+{
+    DlgSearchInMenu *d = new DlgSearchInMenu();
+    connect(d, SIGNAL(dish(QJsonObject)), this, SLOT(addDishToOrder(QJsonObject)));
+    d->buildMenu(fMenuName);
+    d->exec();
+    delete d;
 }
