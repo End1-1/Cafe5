@@ -42,5 +42,7 @@
         <file>tax.png</file>
         <file>room-service.png</file>
         <file>search.png</file>
+        <file>compressor.png</file>
+        <file>bill.png</file>
     </qresource>
 </RCC>

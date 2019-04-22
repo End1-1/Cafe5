@@ -12,7 +12,7 @@ class C5DishWidget : public CE5Editor
     Q_OBJECT
 
 public:
-    explicit C5DishWidget(const QStringList &dbParams, QWidget *parent = 0);
+    explicit C5DishWidget(const QStringList &dbParams, QWidget *parent = nullptr);
 
     ~C5DishWidget();
 

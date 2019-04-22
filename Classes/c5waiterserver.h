@@ -25,17 +25,15 @@ private:
 
     void openActiveOrder(QJsonObject &jh, QJsonArray &jb, QJsonArray &jt, C5ServerHandler &srh);
 
-    void openOrder(QJsonObject &jh, QJsonArray &jb, C5ServerHandler &srh);
-
     void saveOrder(QJsonObject &jh, QJsonArray &ja, C5Database &db);
 
     void saveDish(const QJsonObject &h, QJsonObject &o, C5Database &db);
 
     int printTax(const QJsonObject &h, const QJsonArray &ja, C5Database &db);
 
-    void closeOrderHotel(C5Database &db, const QJsonObject &h, const QJsonArray &b);
+    bool printBill(QJsonObject &jh, QJsonArray &jb, QString &err, C5ServerHandler &srh);
 
-    void calculateSelfCost(QJsonObject &jh, QJsonArray &jb, C5Database &db);
+    bool printReceipt(QJsonObject &jh, QJsonArray &jb, QString &err, C5ServerHandler &srh);
 
     void remember(const QJsonObject &h);
 

@@ -12,7 +12,7 @@ class CE5UserGroup : public CE5Editor
     Q_OBJECT
 
 public:
-    explicit CE5UserGroup(const QStringList &dbParams, QWidget *parent = 0);
+    explicit CE5UserGroup(const QStringList &dbParams, QWidget *parent = nullptr);
 
     ~CE5UserGroup();
 

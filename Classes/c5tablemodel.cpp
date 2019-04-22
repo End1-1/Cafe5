@@ -204,7 +204,7 @@ void C5TableModel::insertRow(int row)
 
 void C5TableModel::insertColumn(int column)
 {
-    beginInsertColumns(QModelIndex(), column + 1, column + 1);
+    beginInsertColumns(QModelIndex(), column, column);
     for (int i = 0; i < fRawData.count(); i++) {
         fRawData[i].insert(column, QVariant());
     }

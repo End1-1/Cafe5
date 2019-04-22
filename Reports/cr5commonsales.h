@@ -19,6 +19,8 @@ protected:
 
 private slots:
     void openOrder(int row, int column, const QList<QVariant> &values);
+
+    void transferToRoom();
 };
 
 #endif // CR5COMMONSALES_H

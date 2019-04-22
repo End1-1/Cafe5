@@ -8,7 +8,7 @@ class CR5CreditCards : public C5ReportWidget
     Q_OBJECT
 
 public:
-    CR5CreditCards(const QStringList &dbParams, QWidget *parent = 0);
+    CR5CreditCards(const QStringList &dbParams, QWidget *parent = nullptr);
 
 
     virtual QToolBar *toolBar();

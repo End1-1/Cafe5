@@ -12,7 +12,7 @@ class CE5DishComment : public CE5Editor
     Q_OBJECT
 
 public:
-    explicit CE5DishComment(const QStringList &dbParams, QWidget *parent = 0);
+    explicit CE5DishComment(const QStringList &dbParams, QWidget *parent = nullptr);
 
     ~CE5DishComment();
 

@@ -8,7 +8,7 @@ class CR5MenuNames : public C5ReportWidget
     Q_OBJECT
 
 public:
-    CR5MenuNames(const QStringList &dbParams, QWidget *parent = 0);
+    CR5MenuNames(const QStringList &dbParams, QWidget *parent = nullptr);
 
     virtual QToolBar *toolBar();
 };

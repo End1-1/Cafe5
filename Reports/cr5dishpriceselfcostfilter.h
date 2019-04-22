@@ -12,7 +12,7 @@ class CR5DishPriceSelfCostFilter : public C5FilterWidget
     Q_OBJECT
 
 public:
-    explicit CR5DishPriceSelfCostFilter(const QStringList &dbParams, QWidget *parent = 0);
+    explicit CR5DishPriceSelfCostFilter(const QStringList &dbParams, QWidget *parent = nullptr);
 
     ~CR5DishPriceSelfCostFilter();
 

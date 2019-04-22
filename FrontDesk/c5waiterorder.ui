@@ -24,6 +24,69 @@
        <string>Main</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
+       <item row="8" column="1">
+        <widget class="C5LineEdit" name="leBank">
+         <property name="maximumSize">
+          <size>
+           <width>200</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0">
+        <widget class="QLabel" name="label_11">
+         <property name="text">
+          <string>Card</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="C5DateEdit" name="deDateClose">
+         <property name="maximumSize">
+          <size>
+           <width>200</width>
+           <height>16777215</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="0">
+        <widget class="QLabel" name="label_12">
+         <property name="text">
+          <string>Bank</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1">
+        <widget class="C5LineEdit" name="leCash">
+         <property name="maximumSize">
+          <size>
+           <width>200</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="C5DateEdit" name="deDateCash">
+         <property name="maximumSize">
+          <size>
+           <width>200</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
        <item row="0" column="0">
         <widget class="QLabel" name="label">
          <property name="text">
@@ -31,58 +94,10 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="1">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="4" column="1">
-        <widget class="C5DateEdit" name="deDateClose"/>
-       </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="label_3">
+       <item row="9" column="0">
+        <widget class="QLabel" name="label_13">
          <property name="text">
-          <string>Date close</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="C5DateEdit" name="deDateOpen"/>
-       </item>
-       <item row="5" column="3">
-        <widget class="QLabel" name="label_7">
-         <property name="text">
-          <string>Table</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="4">
-        <widget class="QLineEdit" name="leNumber"/>
-       </item>
-       <item row="5" column="1">
-        <widget class="C5DateEdit" name="deDateCash"/>
-       </item>
-       <item row="2" column="2">
-        <widget class="C5DateEdit" name="teOpen">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>60</width>
-           <height>16777215</height>
-          </size>
+          <string>Other</string>
          </property>
         </widget>
        </item>
@@ -93,6 +108,33 @@
          </property>
         </widget>
        </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>Date cash</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="1">
+        <widget class="C5LineEdit" name="leCard">
+         <property name="maximumSize">
+          <size>
+           <width>200</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="3">
+        <widget class="QLabel" name="label_8">
+         <property name="text">
+          <string>State</string>
+         </property>
+        </widget>
+       </item>
        <item row="0" column="3">
         <widget class="QLabel" name="label_5">
          <property name="text">
@@ -100,10 +142,33 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="1" colspan="2">
-        <widget class="QLineEdit" name="leUuid">
+       <item row="9" column="2" colspan="3">
+        <widget class="QLineEdit" name="leOtherName">
          <property name="readOnly">
           <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="4">
+        <widget class="QLineEdit" name="leState"/>
+       </item>
+       <item row="2" column="1">
+        <widget class="C5DateEdit" name="deDateOpen">
+         <property name="maximumSize">
+          <size>
+           <width>200</width>
+           <height>16777215</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="4">
+        <widget class="QLineEdit" name="leTable"/>
+       </item>
+       <item row="6" column="0">
+        <widget class="QLabel" name="label_10">
+         <property name="text">
+          <string>Cash</string>
          </property>
         </widget>
        </item>
@@ -123,10 +188,30 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="label_4">
+       <item row="5" column="3">
+        <widget class="QLabel" name="label_7">
          <property name="text">
-          <string>Date cash</string>
+          <string>Table</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1" colspan="2">
+        <widget class="QLineEdit" name="leUuid">
+         <property name="minimumSize">
+          <size>
+           <width>250</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>Date close</string>
          </property>
         </widget>
        </item>
@@ -137,21 +222,37 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="4">
-        <widget class="QLineEdit" name="leState"/>
+       <item row="9" column="1">
+        <widget class="C5LineEdit" name="leOther">
+         <property name="maximumSize">
+          <size>
+           <width>200</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="11" column="1">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
        </item>
        <item row="4" column="4">
         <widget class="QLineEdit" name="leHall"/>
        </item>
-       <item row="2" column="3">
-        <widget class="QLabel" name="label_8">
-         <property name="text">
-          <string>State</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="4">
-        <widget class="QLineEdit" name="leTable"/>
+       <item row="0" column="4">
+        <widget class="QLineEdit" name="leNumber"/>
        </item>
        <item row="0" column="5">
         <spacer name="horizontalSpacer_2">
@@ -166,6 +267,22 @@
          </property>
         </spacer>
        </item>
+       <item row="2" column="2">
+        <widget class="C5DateEdit" name="teOpen">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>60</width>
+           <height>16777215</height>
+          </size>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="tabDishes">
@@ -175,6 +292,18 @@
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
         <widget class="C5TableWidget" name="tblDishes">
+         <property name="contextMenuPolicy">
+          <enum>Qt::CustomContextMenu</enum>
+         </property>
+         <property name="editTriggers">
+          <set>QAbstractItemView::NoEditTriggers</set>
+         </property>
+         <property name="selectionMode">
+          <enum>QAbstractItemView::SingleSelection</enum>
+         </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectRows</enum>
+         </property>
          <column>
           <property name="text">
            <string>ID</string>
@@ -265,20 +394,21 @@
       </size>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="0">
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+      <item row="2" column="2">
+       <widget class="C5LineEdit" name="leTotal">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
         </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>260</width>
-          <height>20</height>
-         </size>
+        <property name="readOnly">
+         <bool>true</bool>
         </property>
-       </spacer>
+       </widget>
       </item>
-      <item row="0" column="1">
+      <item row="2" column="1">
        <widget class="QLabel" name="label_9">
         <property name="font">
          <font>
@@ -292,15 +422,28 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="2">
-       <widget class="QLineEdit" name="leTotal">
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
+      <item row="2" column="0">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>260</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLabel" name="lbService">
+        <property name="text">
+         <string>Service</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="C5LineEdit" name="leService">
         <property name="readOnly">
          <bool>true</bool>
         </property>
@@ -321,6 +464,11 @@
    <class>C5TableWidget</class>
    <extends>QTableWidget</extends>
    <header location="global">c5tablewidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5LineEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5lineedit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

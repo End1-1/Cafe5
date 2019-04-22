@@ -14,7 +14,7 @@ class CE5Editor : public C5Widget
     Q_OBJECT
 
 public:
-    CE5Editor(const QStringList &dbParams, QWidget *parent = 0);
+    CE5Editor(const QStringList &dbParams, QWidget *parent = nullptr);
 
     virtual void setId(int id);
 

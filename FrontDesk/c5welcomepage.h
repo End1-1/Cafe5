@@ -12,7 +12,7 @@ class C5WelcomePage : public C5Widget
     Q_OBJECT
 
 public:
-    explicit C5WelcomePage(const QStringList &dbParams, QWidget *parent = 0);
+    explicit C5WelcomePage(const QStringList &dbParams, QWidget *parent = nullptr);
 
     ~C5WelcomePage();
 

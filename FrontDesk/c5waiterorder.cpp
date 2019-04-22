@@ -1,6 +1,10 @@
 #include "c5waiterorder.h"
 #include "ui_c5waiterorder.h"
 #include "c5utils.h"
+#include "c5waiterorder.h"
+#include "c5waiterorderdoc.h"
+#include "c5dishwidget.h"
+#include <QMenu>
 
 C5WaiterOrder::C5WaiterOrder(const QStringList &dbParams, QWidget *parent) :
     C5Widget(dbParams, parent),
@@ -22,12 +26,13 @@ void C5WaiterOrder::setOrder(const QString &id)
     C5Database db(fDBParams);
     db[":f_id"] = id;
     db.exec("select o.f_prefix, os.f_name as f_statename, h.f_name as f_hallname, t.f_name as f_tableName, concat(s.f_last, ' ', s.f_first) as f_staffname, "
-            "o.* "
+            "o.*, oth.f_name as f_othername "
             "from o_header o "
             "left join h_tables t on t.f_id=o.f_table "
             "left join h_halls h on h.f_id=t.f_hall "
             "left join s_user s on s.f_id=o.f_staff "
             "left join o_state os on os.f_id=o.f_state "
+            "left join o_pay_other oth on oth.f_id=o.f_otherid "
             "where o.f_id=:f_id ");
     if (db.nextRow()) {
         ui->leUuid->setText(id);
@@ -41,6 +46,15 @@ void C5WaiterOrder::setOrder(const QString &id)
         ui->leHall->setText(db.getString("f_hallname"));
         ui->leTable->setText(db.getString("f_tablename"));
         ui->leTotal->setText(float_str(db.getDouble("f_amounttotal"), 2));
+        ui->leCash->setDouble(db.getDouble("f_amountcash"));
+        ui->leCard->setDouble(db.getDouble("f_amountcard"));
+        ui->leBank->setDouble(db.getDouble("f_amountbank"));
+        ui->leOther->setDouble(db.getDouble("f_amountother"));
+        ui->leOtherName->setText(db.getString("f_othername"));
+        if (db.getDouble("f_servicefactor") > 0.001) {
+            ui->lbService->setText(QString("%1 %2%").arg(tr("Service")).arg(db.getDouble("f_servicefactor") * 100));
+            ui->leService->setDouble(db.getDouble("f_serviceamount"));
+        }
     } else {
         C5Message::error(tr("Invalid order uuid"));
         return;
@@ -84,4 +98,64 @@ void C5WaiterOrder::setOrder(const QString &id)
 bool C5WaiterOrder::allowChangeDatabase()
 {
     return false;
+}
+
+QToolBar *C5WaiterOrder::toolBar()
+{
+    if (!fToolBar) {
+        QList<ToolBarButtons> btn;
+        fToolBar = createStandartToolbar(btn);
+        fToolBar->addAction(QIcon(":/app.png"), tr("Transfer to hotel"), this, SLOT(transferToHotel()));
+        fToolBar->addAction(QIcon(":/constructor.png"), tr("Recount selfcost"), this, SLOT(recountSelfCost()));
+    }
+    return fToolBar;
+}
+
+void C5WaiterOrder::jsonToDoc(C5WaiterOrderDoc &doc)
+{
+    ui->leTotal->setDouble(doc.hDouble("f_amounttotal"));
+}
+
+void C5WaiterOrder::transferToHotel()
+{
+    C5Database db(fDBParams);
+    C5WaiterOrderDoc d(ui->leUuid->text(), db);
+    QString err;
+    C5Database fDD(fDBParams.at(0), C5Config::hotelDatabase(), fDBParams.at(2), fDBParams.at(3));
+    d.transferToHotel(fDD, err);
+    if (err.isEmpty()) {
+        C5Message::info(tr("Done"));
+    } else {
+        C5Message::error(err);
+    }
+}
+
+void C5WaiterOrder::recountSelfCost()
+{
+    C5Database db(fDBParams);
+    C5WaiterOrderDoc d(ui->leUuid->text(), db);
+    d.calculateSelfCost();
+    jsonToDoc(d);
+    C5Message::info(tr("Done"));
+}
+
+void C5WaiterOrder::openMenuItem()
+{
+    QModelIndexList ml = ui->tblDishes->selectionModel()->selectedRows();
+    if (ml.count() == 0) {
+        return;
+    }
+    C5DishWidget *ep = new C5DishWidget(fDBParams);
+    C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
+    QList<QMap<QString, QVariant> > d;
+    ep->setId(ui->tblDishes->getInteger(ml.at(0).row(), 3));
+    e->getResult(d);
+    delete e;
+}
+
+void C5WaiterOrder::on_tblDishes_customContextMenuRequested(const QPoint &pos)
+{
+    QMenu *m = new QMenu(this);
+    m->addAction(tr("Open menu item"), this, SLOT(openMenuItem()));
+    m->popup(ui->tblDishes->mapToGlobal(pos));
 }

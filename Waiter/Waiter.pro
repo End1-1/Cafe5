@@ -50,7 +50,6 @@ SOURCES += \
     ../Classes/c5user.cpp \
     ../Classes/c5menu.cpp \
     ../Classes/c5witerconf.cpp \
-    ../Classes/c5order.cpp \
     ../Classes/c5waiterserver.cpp \
     ../Classes/c5dishtabledelegate.cpp \
     ../Classes/c5ordertabledelegate.cpp \
@@ -95,7 +94,8 @@ SOURCES += \
     c5printreceiptthread.cpp \
     ../Cafe5/dlgexitbyversion.cpp \
     ../Classes/fileversion.cpp \
-    dlgsearchinmenu.cpp
+    dlgsearchinmenu.cpp \
+    ../Classes/c5waiterorderdoc.cpp
 
 HEADERS += \
         dlgface.h \
@@ -113,7 +113,6 @@ HEADERS += \
     ../Classes/c5user.h \
     ../Classes/c5menu.h \
     ../Classes/c5witerconf.h \
-    ../Classes/c5order.h \
     ../Classes/c5waiterserver.h \
     ../Classes/c5dishtabledelegate.h \
     ../Classes/c5ordertabledelegate.h \
@@ -160,7 +159,8 @@ HEADERS += \
     c5printreceiptthread.h \
     ../Cafe5/dlgexitbyversion.h \
     ../Classes/fileversion.h \
-    dlgsearchinmenu.h
+    dlgsearchinmenu.h \
+    ../Classes/c5waiterorderdoc.h
 
 FORMS += \
         dlgface.ui \

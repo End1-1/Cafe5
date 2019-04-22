@@ -12,7 +12,7 @@ class C5SettingsWidget : public CE5Editor
     Q_OBJECT
 
 public:
-    explicit C5SettingsWidget(const QStringList &dbParams, QWidget *parent = 0);
+    explicit C5SettingsWidget(const QStringList &dbParams, QWidget *parent = nullptr);
 
     ~C5SettingsWidget();
 

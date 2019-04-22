@@ -12,7 +12,7 @@ class C5StoreInventory : public C5Widget
     Q_OBJECT
 
 public:
-    explicit C5StoreInventory(const QStringList &dbParams, QWidget *parent = 0);
+    explicit C5StoreInventory(const QStringList &dbParams, QWidget *parent = nullptr);
 
     ~C5StoreInventory();
 

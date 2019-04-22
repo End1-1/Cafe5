@@ -9,7 +9,7 @@ class C5FilterWidget : public C5Widget
     Q_OBJECT
 
 public:
-    explicit C5FilterWidget(const QStringList &dbParams, QWidget *parent = 0);
+    explicit C5FilterWidget(const QStringList &dbParams, QWidget *parent = nullptr);
 
     virtual QString condition() = 0;
 

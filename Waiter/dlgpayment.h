@@ -2,7 +2,7 @@
 #define DLGPAYMENT_H
 
 #include "c5dialog.h"
-#include "c5order.h"
+#include "c5waiterorderdoc.h"
 
 #define PAYDLG_NONE 0
 #define PAYDLG_ORDER_CLOSE 1
@@ -20,7 +20,7 @@ public:
 
     ~DlgPayment();
 
-    static int payment(C5Order *order);
+    static int payment(C5WaiterOrderDoc *order);
 
 private slots:
     void handleReceipt(const QJsonObject &obj);
@@ -63,10 +63,12 @@ private slots:
 
     void on_btnSelfCost_clicked();
 
+    void on_btnBill_clicked();
+
 private:
     Ui::DlgPayment *ui;
 
-    C5Order *fOrder;
+    C5WaiterOrderDoc *fOrder;
 
     void setPaymentInfo();
 

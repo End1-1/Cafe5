@@ -8,7 +8,7 @@ class CR5Users : public C5ReportWidget
     Q_OBJECT
 
 public:
-    CR5Users(const QStringList &dbParams, QWidget *parent = 0);
+    CR5Users(const QStringList &dbParams, QWidget *parent = nullptr);
 
     virtual QToolBar *toolBar();
 

@@ -2,6 +2,7 @@
 #define C5CONFIG_H
 
 #include <QString>
+#include <QVariant>
 #include <QWidget>
 
 #define param_local_receipt_printer 1
@@ -106,7 +107,7 @@ public:
 
     static void initParamsFromDb();
 
-    static QVariant getRegValue(const QString &key);
+    static QVariant getRegValue(const QString &key, const QVariant &defaultValue = QVariant());
 
     static void setRegValue(const QString &key, const QVariant &value);
 

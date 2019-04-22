@@ -16,6 +16,8 @@ class C5Database : public QObject
 {
     Q_OBJECT
 public:
+    C5Database();
+
     C5Database(const QStringList &dbParams);
 
     C5Database(C5Database &db);

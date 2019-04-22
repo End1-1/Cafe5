@@ -14,7 +14,7 @@ class C5GroupPermissionsEditor : public C5Widget
     Q_OBJECT
 
 public:
-    explicit C5GroupPermissionsEditor(const QStringList &dbParams, QWidget *parent = 0);
+    explicit C5GroupPermissionsEditor(const QStringList &dbParams, QWidget *parent = nullptr);
 
     ~C5GroupPermissionsEditor();
 

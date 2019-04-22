@@ -16,6 +16,11 @@ QStringList C5Database::fDbParamsForUuid;
 
 static QMutex fMutex;
 
+C5Database::C5Database()
+{
+
+}
+
 C5Database::C5Database(const QStringList &dbParams) :
     QObject()
 {

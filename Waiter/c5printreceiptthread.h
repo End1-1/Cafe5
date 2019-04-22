@@ -13,6 +13,8 @@ class C5PrintReceiptThread : public QThread
 public:
     C5PrintReceiptThread(const QStringList &dbParams, const QJsonObject &header, const QJsonArray &body, const QString &printer, QObject *parent = nullptr);
 
+    bool fBill;
+
 protected:
     virtual void run();
 

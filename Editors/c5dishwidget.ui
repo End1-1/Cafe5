@@ -67,6 +67,9 @@
             <property name="enabled">
              <bool>false</bool>
             </property>
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
             <property name="FieldRef" stdset="0">
              <string>f_part2</string>
             </property>
@@ -156,6 +159,9 @@
               <width>200</width>
               <height>16777215</height>
              </size>
+            </property>
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
             </property>
             <property name="FieldRef" stdset="0">
              <string>f_part1</string>
@@ -537,6 +543,27 @@
    <header location="global">c5checkbox.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>leCode</tabstop>
+  <tabstop>lePart2</tabstop>
+  <tabstop>leName</tabstop>
+  <tabstop>lineEdit_3</tabstop>
+  <tabstop>lineEdit_2</tabstop>
+  <tabstop>leColor</tabstop>
+  <tabstop>checkBox_2</tabstop>
+  <tabstop>checkBox</tabstop>
+  <tabstop>checkBox_3</tabstop>
+  <tabstop>btnNewType</tabstop>
+  <tabstop>lePart1Name</tabstop>
+  <tabstop>tblPricing</tabstop>
+  <tabstop>lePart2Name</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>btnAddRecipe</tabstop>
+  <tabstop>btnRemoveRecipe</tabstop>
+  <tabstop>btnPrintRecipe</tabstop>
+  <tabstop>tblRecipe</tabstop>
+  <tabstop>leTotal</tabstop>
+ </tabstops>
  <resources>
   <include location="../resources/res.qrc"/>
  </resources>

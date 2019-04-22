@@ -192,10 +192,10 @@ void C5Config::initParamsFromDb()
     }
 }
 
-QVariant C5Config::getRegValue(const QString &key)
+QVariant C5Config::getRegValue(const QString &key, const QVariant &defaultValue)
 {
     QSettings s(_ORGANIZATION_, _APPLICATION_+ QString("\\") + _MODULE_);
-    return s.value(key);
+    return s.value(key, defaultValue);
 }
 
 void C5Config::setRegValue(const QString &key, const QVariant &value)

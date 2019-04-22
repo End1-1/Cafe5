@@ -52,7 +52,7 @@ bool C5GridGilter::filter(C5FilterWidget *filterWidget, QString &condition, QMap
         lv->setItemWidget(item, c);
     }
     bool result = gf->exec() == QDialog::Accepted;
-    filterWidget->setParent(0);
+    filterWidget->setParent(nullptr);
     if (result) {
         filterWidget->saveFilter(filterWidget);
         condition = filterWidget->condition();

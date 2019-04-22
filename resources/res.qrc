@@ -49,5 +49,6 @@
         <file>logout.png</file>
         <file>update.png</file>
         <file>order.png</file>
+        <file>app.png</file>
     </qresource>
 </RCC>

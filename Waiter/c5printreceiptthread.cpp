@@ -12,6 +12,8 @@ C5PrintReceiptThread::C5PrintReceiptThread(const QStringList &dbParams, const QJ
     fBody = body;
     fPrinter = printer;
     fDbParams = dbParams;
+    fBill = false;
+    connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
     connect(this, SIGNAL(startPrint()), this, SLOT(print()));
 }
 
@@ -46,7 +48,7 @@ void C5PrintReceiptThread::print()
         p.setFontBold(false);
     }
     p.setFontBold(false);
-    if (fHeader["f_printtax"].toString().toInt()) {
+    if (fHeader["f_printtax"].toString().toInt() && !fBill) {
         p.ltext(fHeader["f_firmname"].toString(), 0);
         p.br();
         p.ltext(fHeader["f_address"].toString(), 0);
@@ -94,11 +96,13 @@ void C5PrintReceiptThread::print()
     p.line();
     p.br(1);
     int nn = 1;
+    double total = 0;
     for (int i = 0; i < fBody.count(); i++) {
         QJsonObject o = fBody.at(i).toObject();
         if (o["f_state"].toString().toInt() != DISH_STATE_OK) {
             continue;
         }
+        total += o["f_qty2"].toString().toDouble() * o["f_price"].toString().toDouble();
         p.ltext(QString("%1. %2: %3, %4").arg(nn++).arg(__translator.tt(tr("Class"))).arg(o["f_adgcode"].toString()).arg(o["f_name"].toString()), 0);
 //        p.br();
 //        p.ltext(o["f_name"].toString(), 0);
@@ -133,6 +137,11 @@ void C5PrintReceiptThread::print()
         break;
     case SERVICE_AMOUNT_MODE_SEPARATE:
         if (fHeader["f_servicefactor"].toString().toDouble() > 0.0001) {
+            p.br(2);
+            p.line();
+            p.ltext(QString("%1").arg(__translator.tt(tr("Total"))), 0);
+            p.rtext(float_str(total, 2));
+            p.br();
             p.ltext(QString("%1 %2%").arg(__translator.tt(tr("Service"))).arg(float_str(fHeader["f_servicefactor"].toString().toDouble() * 100, 2)), 0);
             p.rtext(float_str(fHeader["f_amountservice"].toString().toDouble(), 2));
             p.br();
@@ -142,7 +151,7 @@ void C5PrintReceiptThread::print()
         }
         break;
     }
-    p.ltext(__translator.tt(tr("Total")), 0);
+    p.ltext(__translator.tt(tr("Grand total")), 0);
     p.rtext(float_str(fHeader["f_amounttotal"].toString().toDouble(), 2));
     p.br();
     if (fHeader["f_servicemode"].toString().toInt() == SERVICE_AMOUNT_MODE_INCREASE_PRICE && fHeader["f_servicefactor"].toString().toDouble() > 0.001) {
@@ -198,20 +207,22 @@ void C5PrintReceiptThread::print()
         }
     }
 
-    p.br();
-    if (fHeader["f_amountcash"].toString().toDouble() > 0.001) {
-        p.ltext(__translator.tt(tr("Payment, cash")), 0);
-        p.rtext(float_str(fHeader["f_amountcash"].toString().toDouble(), 2));
+    if (!fBill) {
+        p.br();
+        if (fHeader["f_amountcash"].toString().toDouble() > 0.001) {
+            p.ltext(__translator.tt(tr("Payment, cash")), 0);
+            p.rtext(float_str(fHeader["f_amountcash"].toString().toDouble(), 2));
+        }
+        if (fHeader["f_amountcard"].toString().toDouble() > 0.001) {
+            p.ltext(__translator.tt(tr("Payment, card")), 0);
+            p.rtext(float_str(fHeader["f_amountcard"].toString().toDouble(), 2));
+        }
+        if (fHeader["f_amountbank"].toString().toDouble() > 0.001) {
+            p.ltext(__translator.tt(tr("Bank transfer")), 0);
+            p.rtext(float_str(fHeader["f_amountbank"].toString().toDouble(), 2));
+        }
+        p.br();
     }
-    if (fHeader["f_amountcard"].toString().toDouble() > 0.001) {
-        p.ltext(__translator.tt(tr("Payment, card")), 0);
-        p.rtext(float_str(fHeader["f_amountcard"].toString().toDouble(), 2));
-    }
-    if (fHeader["f_amountbank"].toString().toDouble() > 0.001) {
-        p.ltext(__translator.tt(tr("Bank transfer")), 0);
-        p.rtext(float_str(fHeader["f_amountbank"].toString().toDouble(), 2));
-    }
-    p.br();
 
     p.setFontSize(24);
     if (!fHeader["f_other_room"].toString().isEmpty()) {
@@ -246,7 +257,8 @@ void C5PrintReceiptThread::print()
     p.setFontBold(true);
     p.br(p.fLineHeight * 3);
     p.ltext(__translator.tt(tr("Thank you for visit!")), 0);
-    p.rtext(fHeader["f_print"].toString());
+    p.br();
+    p.ltext(QString("%1: %2").arg(tr("Sample")).arg(fHeader["f_print"].toString()), 0);
     p.br();
     p.print(fPrinter, QPrinter::Custom);
 }

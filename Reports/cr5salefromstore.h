@@ -10,7 +10,7 @@ class CR5SaleFromStore : public C5ReportWidget
     Q_OBJECT
 
 public:
-    CR5SaleFromStore(const QStringList &dbParams, QWidget *parent = 0);
+    CR5SaleFromStore(const QStringList &dbParams, QWidget *parent = nullptr);
 
     QToolBar *toolBar();
 

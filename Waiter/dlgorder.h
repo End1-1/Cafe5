@@ -9,7 +9,7 @@ class DlgOrder;
 }
 
 class C5User;
-class C5Order;
+class C5WaiterOrderDoc;
 
 class DlgOrder : public C5Dialog
 {
@@ -32,7 +32,7 @@ private:
 
     C5User *fUser;
 
-    C5Order *fOrder;
+    C5WaiterOrderDoc *fOrder;
 
     QString fMenuName;
 
@@ -116,6 +116,8 @@ private slots:
     void on_btnRoomService_clicked();
 
     void on_btnSearchInMenu_clicked();
+
+    void on_btnCompactDishAddMode_clicked();
 };
 
 #endif // DLGORDER_H

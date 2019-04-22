@@ -8,7 +8,7 @@ class CR5Hall : public C5ReportWidget
     Q_OBJECT
 
 public:
-    CR5Hall(const QStringList &dbParams, QWidget *parent = 0);
+    CR5Hall(const QStringList &dbParams, QWidget *parent = nullptr);
 
     virtual QToolBar *toolBar();
 };

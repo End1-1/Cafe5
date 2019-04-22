@@ -4,7 +4,6 @@
 #include "c5user.h"
 #include "c5witerconf.h"
 #include "c5menu.h"
-#include "c5order.h"
 #include "dlgdishremovereason.h"
 #include "c5dishtabledelegate.h"
 #include "c5ordertabledelegate.h"
@@ -13,6 +12,7 @@
 #include "dlgsearchinmenu.h"
 #include "dlgpassword.h"
 #include "dlgguest.h"
+#include "c5waiterorderdoc.h"
 #include "c5logtoserverthread.h"
 #include "dlglistofdishcomments.h"
 #include "dlgface.h"
@@ -32,8 +32,9 @@ DlgOrder::DlgOrder() :
     ui(new Ui::DlgOrder)
 {
     ui->setupUi(this);
-    fOrder = new C5Order();
+    fOrder = new C5WaiterOrderDoc();
     ui->btnGuest->setVisible(C5Config::useHotel());
+    ui->btnCompactDishAddMode->setChecked(C5Config::getRegValue("compact dish add mode", true).toBool());
 }
 
 DlgOrder::~DlgOrder()
@@ -85,8 +86,8 @@ void DlgOrder::openTable(const QJsonObject &table, C5User *user)
 void DlgOrder::accept()
 {
     C5SocketHandler *sh = createSocketHandler(SLOT(saveAndQuit(QJsonObject)));
-    fOrder->setHeaderValue("unlocktable", "1");
-    fOrder->save(sh);
+    fOrder->hSetString("unlocktable", "1");
+    fOrder->sendToServer(sh);
 }
 
 void DlgOrder::reject()
@@ -184,13 +185,37 @@ void DlgOrder::buildMenu(const QString &menu, QString part1, QString part2)
 
 void DlgOrder::addDishToOrder(const QJsonObject &obj)
 {
+    if (ui->btnCompactDishAddMode->isChecked()) {
+        for (int i = 0; i < fOrder->itemsCount(); i++) {
+            if (obj["f_dish"].toString() == fOrder->iString("f_dish", i)) {
+                if (obj["f_store"].toString() != fOrder->iString("f_store", i)) {
+                    break;
+                }
+                if (obj["f_print1"].toString() != fOrder->iString("f_print1", i)) {
+                    break;
+                }
+                if (obj["f_print2"].toString() != fOrder->iString("f_print2", i)) {
+                    break;
+                }
+                if (obj["f_comment"].toString() != fOrder->iString("f_comment", i)) {
+                    break;
+                }
+                fOrder->iSetString("f_qty1", float_str(fOrder->iDouble("f_qty1", i) + 1, 1), i);
+                ui->tblOrder->item(i, 0)->setData(Qt::UserRole, fOrder->item(i));
+                ui->tblOrder->viewport()->update();
+                ui->tblOrder->scrollToItem(ui->tblOrder->item(i, 0));
+                ui->tblOrder->setCurrentItem(ui->tblOrder->item(i, 0));
+                return;
+            }
+        }
+    }
     QJsonObject o = obj;
     if (obj["f_id"].toString().isEmpty()) {
         o["f_id"] = "";
-        o["f_header"] = fOrder->headerValue("f_id");
+        o["f_header"] = fOrder->hString("f_id");
         o["f_state"] = QString::number(DISH_STATE_OK);
         o["f_service"] = C5Config::serviceFactor();
-        o["f_discount"] = fOrder->headerValue("f_discountfactor");
+        o["f_discount"] = fOrder->hString("f_discountfactor");
         o["f_total"] = "0";
         o["f_qty1"] = "1";
         o["f_qty2"] = "0";
@@ -203,52 +228,53 @@ void DlgOrder::addDishToOrder(const QJsonObject &obj)
     ui->tblOrder->item(row, 0)->setData(Qt::UserRole, o);
     ui->tblOrder->setCurrentCell(ui->tblOrder->rowCount() - 1, 0);
     fOrder->addItem(o);
-    fOrder->setHeaderValue("f_amountcash", 0);
-    fOrder->setHeaderValue("f_amountcard", 0);
-    fOrder->setHeaderValue("f_amountbank", 0);
-    fOrder->setHeaderValue("f_amountother", 0);
+    fOrder->hSetDouble("f_amountcash", 0);
+    fOrder->hSetDouble("f_amountcard", 0);
+    fOrder->hSetDouble("f_amountbank", 0);
+    fOrder->hSetDouble("f_amountother", 0);
     fOrder->countTotal();
     setButtonsState();
+    ui->lePrepaiment->setText(fOrder->prepayment());
 }
 
 void DlgOrder::loadOrder(const QJsonObject &obj)
 {
     fOrder->fHeader = obj["header"].toObject();
-    if (fOrder->headerValue("f_id").isEmpty()) {
-        logRecord("", "New order", fOrder->headerValue("f_tablename"), "");
-        fOrder->setHeaderValue("f_staff", fUser->fId);
-        fOrder->setHeaderValue("f_staffname", fUser->fFull);
-        fOrder->setHeaderValue("f_state", ORDER_STATE_OPEN);
-        fOrder->setHeaderValue("f_comment", "");
-        fOrder->setHeaderValue("f_hall", obj["table"].toArray().at(0).toObject()["f_hall"].toString());
-        fOrder->setHeaderValue("f_amounttotal", 0);
-        fOrder->setHeaderValue("f_amountcash", 0);
-        fOrder->setHeaderValue("f_amountcard", 0);
-        fOrder->setHeaderValue("f_amountbank", 0);
-        fOrder->setHeaderValue("f_amountother", 0);
-        fOrder->setHeaderValue("f_amountservice", 0);
-        fOrder->setHeaderValue("f_amountdiscount", 0);
-        fOrder->setHeaderValue("f_servicemode", C5CafeCommon::serviceMode(C5CafeCommon::hall(obj["table"].toArray().at(0).toObject()["f_hall"].toString())["f_settings"].toString()));
-        fOrder->setHeaderValue("f_servicefactor", C5Config::serviceFactor());
-        fOrder->setHeaderValue("f_discountfactor", 0);
+    if (fOrder->hString("f_id").isEmpty()) {
+        logRecord("", "New order", fOrder->hString("f_tablename"), "");
+        fOrder->hSetInt("f_staff", fUser->fId);
+        fOrder->hSetString("f_staffname", fUser->fFull);
+        fOrder->hSetInt("f_state", ORDER_STATE_OPEN);
+        fOrder->hSetString("f_comment", "");
+        fOrder->hSetString("f_hall", obj["table"].toArray().at(0).toObject()["f_hall"].toString());
+        fOrder->hSetDouble("f_amounttotal", 0);
+        fOrder->hSetDouble("f_amountcash", 0);
+        fOrder->hSetDouble("f_amountcard", 0);
+        fOrder->hSetDouble("f_amountbank", 0);
+        fOrder->hSetDouble("f_amountother", 0);
+        fOrder->hSetDouble("f_amountservice", 0);
+        fOrder->hSetDouble("f_amountdiscount", 0);
+        fOrder->hSetString("f_servicemode", C5CafeCommon::serviceMode(C5CafeCommon::hall(obj["table"].toArray().at(0).toObject()["f_hall"].toString())["f_settings"].toString()));
+        fOrder->hSetString("f_servicefactor", C5Config::serviceFactor());
+        fOrder->hSetDouble("f_discountfactor", 0);
     } else {
-        logRecord("", "Open order", fOrder->headerValue("f_tablename"), "");
+        logRecord("", "Open order", fOrder->hString("f_tablename"), "");
     }
-    ui->lbTable->setText(fOrder->headerValue("f_tablename"));
-    fOrder->setHeaderValue("f_currentstaff", fUser->fId);
-    fOrder->setHeaderValue("f_currentstaffname", fUser->fFull);
+    ui->lbTable->setText(fOrder->hString("f_tablename"));
+    fOrder->hSetInt("f_currentstaff", fUser->fId);
+    fOrder->hSetString("f_currentstaffname", fUser->fFull);
     fOrder->fItems = obj["body"].toArray();
     itemsToTable();
-    if (fOrder->headerValue("f_discountfactor").toDouble() > 0) {
+    if (fOrder->hDouble("f_discountfactor") > 0) {
         ui->lbDiscount->setEnabled(true);
-        ui->lbDiscount->setText(QString("[%1: %2%]").arg(tr("Discount")).arg(fOrder->headerValue("f_discountfactor").toDouble() * 100));
+        ui->lbDiscount->setText(QString("[%1: %2%]").arg(tr("Discount")).arg(fOrder->hDouble("f_discountfactor") * 100));
     } else {
         ui->lbDiscount->setEnabled(false);
         ui->lbDiscount->setText(tr("[Discount]"));
     }
     setServiceLabel();
-    if (fOrder->headerValue("f_staff").toInt() != fOrder->headerValue("f_currentstaff").toInt()) {
-        C5Message::info(QString("%1\r\n%2").arg(tr("Order owner")).arg(fOrder->headerValue("f_staffname")));
+    if (fOrder->hInt("f_staff") != fOrder->hInt("f_currentstaff")) {
+        C5Message::info(QString("%1\r\n%2").arg(tr("Order owner")).arg(fOrder->hString("f_staffname")));
     }
 }
 
@@ -259,7 +285,7 @@ void DlgOrder::changeQty(double qty)
         return;
     }
     int index = ml.at(0).row();
-    QJsonObject o = fOrder->fItems[index].toObject();
+    QJsonObject o = fOrder->item(index);
     QString oldQty = o["f_qty1"].toString();
     if (qty > 0) {
         if (o["f_qty1"].toString().toDouble() + qty > 99) {
@@ -281,6 +307,7 @@ void DlgOrder::changeQty(double qty)
     setButtonsState();
     ui->tblOrder->item(index, 0)->setData(Qt::UserRole, fOrder->fItems[index].toObject());
     ui->tblOrder->viewport()->update();
+    ui->lePrepaiment->setText(fOrder->prepayment());
 }
 
 void DlgOrder::itemsToTable()
@@ -291,11 +318,12 @@ void DlgOrder::itemsToTable()
     for (int i = 0; i < fOrder->fItems.count(); i++) {
         ui->tblOrder->setItem(i, 0, new QTableWidgetItem());
         ui->tblOrder->item(i, 0)->setData(Qt::UserRole, fOrder->fItems[i].toObject());
-        if (fOrder->itemValue(i, "f_state").toInt() != DISH_STATE_OK) {
+        if (fOrder->iInt("f_state", i) != DISH_STATE_OK) {
             ui->tblOrder->setRowHidden(i, true);
         }
     }
-    ui->leTotal->setText(fOrder->headerValue("f_amounttotal"));
+    ui->leTotal->setText(fOrder->hString("f_amounttotal"));
+    ui->lePrepaiment->setText(fOrder->prepayment());
     setButtonsState();
 }
 
@@ -311,9 +339,9 @@ void DlgOrder::saveOrder()
 
 void DlgOrder::setServiceLabel()
 {
-    if (fOrder->headerValue("f_servicefactor").toDouble() > 0) {
+    if (fOrder->hDouble("f_servicefactor") > 0) {
         ui->lbService->setEnabled(true);
-        ui->lbService->setText(QString("[%1: %2%]").arg(tr("Service")).arg(fOrder->headerValue("f_servicefactor").toDouble() * 100));
+        ui->lbService->setText(QString("[%1: %2%]").arg(tr("Service")).arg(fOrder->hDouble("f_servicefactor") * 100));
     } else {
         ui->lbService->setEnabled(false);
         ui->lbService->setText(tr("[Service]"));
@@ -322,10 +350,10 @@ void DlgOrder::setServiceLabel()
 
 void DlgOrder::logRecord(const QString &rec, const QString &action, const QString &value1, const QString &value2)
 {
-    if (fOrder->headerValue("f_id").isEmpty()) {
+    if (fOrder->hString("f_id").isEmpty()) {
         C5LogRecord l;
         l.fType = LOG_WAITER;
-        l.fUser = __userid;
+        l.fUser = __username;
         l.fDate = QDate::currentDate();
         l.fTime = QTime::currentTime();
         l.fRec = rec;
@@ -337,15 +365,15 @@ void DlgOrder::logRecord(const QString &rec, const QString &action, const QStrin
         fLogDelay.append(l);
     } else {
         processDelayedLogs();
-        C5LogToServerThread::remember(LOG_WAITER, __username, rec, fOrder->headerValue("f_id"), "", action, value1, value2);
+        C5LogToServerThread::remember(LOG_WAITER, __username, rec, fOrder->hString("f_id"), "", action, value1, value2);
     }
 }
 
 void DlgOrder::processDelayedLogs()
 {
-    if (!fOrder->headerValue("f_id").isEmpty()) {
+    if (!fOrder->hString("f_id").isEmpty()) {
         foreach (C5LogRecord r, fLogDelay) {
-            C5LogToServerThread::remember(LOG_WAITER, r.fUser, r.fRec, fOrder->headerValue("f_id"), "", r.fAction, r.fValue1, r.fValue2);
+            C5LogToServerThread::remember(LOG_WAITER, r.fUser, r.fRec, fOrder->hString("f_id"), "", r.fAction, r.fValue1, r.fValue2);
         }
         fLogDelay.clear();
     }
@@ -357,10 +385,10 @@ void DlgOrder::setButtonsState()
     bool btnPayment = true;
 
     for (int i = 0; i < fOrder->fItems.count(); i++) {
-        if (fOrder->itemValue(i, "f_state").toInt() != DISH_STATE_OK) {
+        if (fOrder->iInt("f_state", i) != DISH_STATE_OK) {
             continue;
         }
-        if (fOrder->itemValue(i, "f_qty1").toDouble() > fOrder->itemValue(i, "f_qty2").toDouble()) {
+        if (fOrder->iDouble("f_qty1", i) > fOrder->iDouble("f_qty2", i)) {
             btnSendToCooking = true;
         }
     }
@@ -405,7 +433,7 @@ void DlgOrder::handlePrintService(const QJsonObject &obj)
     fOrder->fHeader = obj["header"].toObject();
     itemsToTable();
     C5SocketHandler *sh = createSocketHandler(SLOT(saveAndQuit(QJsonObject)));
-    fOrder->save(sh);
+    fOrder->sendToServer(sh);
 }
 
 void DlgOrder::saveAndQuit(const QJsonObject &obj)
@@ -431,7 +459,7 @@ void DlgOrder::changeTable(const QJsonObject &obj)
     fOrder->fHeader = obj["header"].toObject();
     processDelayedLogs();
     int tableId;
-    if (!DlgFace::getTable(tableId, fOrder->headerValue("f_hall"))) {
+    if (!DlgFace::getTable(tableId, fOrder->hString("f_hall"))) {
         return;
     }
     QJsonObject table = C5CafeCommon::table(tableId);
@@ -551,11 +579,11 @@ void DlgOrder::on_btnPrintService_clicked()
 void DlgOrder::on_btnPayment_clicked()
 {
     bool empty = true;
-    for (int i = 0; i < fOrder->fItems.count(); i++) {
-        if (fOrder->itemValue(i, "f_state").toInt() != DISH_STATE_OK) {
+    for (int i = 0; i < fOrder->itemsCount(); i++) {
+        if (fOrder->iInt("f_state", i) != DISH_STATE_OK) {
             continue;
         }
-        if (fOrder->itemValue(i, "f_qty1").toDouble() > fOrder->itemValue(i, "f_qty2").toDouble()) {
+        if (fOrder->iDouble("f_qty1", i) > fOrder->iDouble("f_qty2", i)) {
             C5Message::error(tr("Order is incomplete"));
             return;
         }
@@ -568,7 +596,10 @@ void DlgOrder::on_btnPayment_clicked()
     int paymentResult = DlgPayment::payment(fOrder);
     switch (paymentResult) {
     case PAYDLG_ORDER_CLOSE:
-        QDialog::accept();
+        fOrder->fHeader = QJsonObject();
+        fOrder->fItems = QJsonArray();
+        itemsToTable();
+        on_btnChangeTable_clicked();
         break;
     case PAYDLG_NONE:
         saveOrder();
@@ -650,8 +681,8 @@ void DlgOrder::on_btnVoid_clicked()
             o["f_qty2"] = o["f_qty1"];
         }
         fOrder->fItems[index] = o;
-        if (fOrder->headerValue("f_print").toInt() > 0) {
-            fOrder->setHeaderValue("f_print", fOrder->headerValue("f_print").toInt() * -1);
+        if (fOrder->hInt("f_print") > 0) {
+            fOrder->hSetInt("f_print", fOrder->hInt("f_print") * -1);
         }
         saveOrder();
     }
@@ -721,8 +752,8 @@ void DlgOrder::on_btnChangeMenu_clicked()
 void DlgOrder::on_btnChangeTable_clicked()
 {
     C5SocketHandler *sh = createSocketHandler(SLOT(changeTable(QJsonObject)));
-    fOrder->setHeaderValue("unlocktable", "1");
-    fOrder->save(sh);
+    fOrder->hSetString("unlocktable", "1");
+    fOrder->sendToServer(sh);
 }
 
 void DlgOrder::on_btnGuest_clicked()
@@ -733,13 +764,13 @@ void DlgOrder::on_btnGuest_clicked()
 
 void DlgOrder::on_btnRoomService_clicked()
 {
-    QString oldFactor = fOrder->headerValue("f_servicefactor");
-    if (fOrder->headerValue("f_servicefactor").toDouble() > 0.0001) {
-        fOrder->setHeaderValue("f_servicefactor", 0);
+    QString oldFactor = fOrder->hString("f_servicefactor");
+    if (fOrder->hDouble("f_servicefactor") > 0.0001) {
+        fOrder->hSetDouble("f_servicefactor", 0);
     } else {
-        fOrder->setHeaderValue("f_servicefactor", C5Config::serviceFactor());
+        fOrder->hSetString("f_servicefactor", C5Config::serviceFactor());
     }
-    logRecord("", "Change service factor", oldFactor, fOrder->headerValue("f_servicefactor"));
+    logRecord("", "Change service factor", oldFactor, fOrder->hString("f_servicefactor"));
     itemsToTable();
     fOrder->countTotal();
     setServiceLabel();
@@ -752,4 +783,9 @@ void DlgOrder::on_btnSearchInMenu_clicked()
     d->buildMenu(fMenuName);
     d->exec();
     delete d;
+}
+
+void DlgOrder::on_btnCompactDishAddMode_clicked()
+{
+    C5Config::setRegValue("compact dish add mode", ui->btnCompactDishAddMode->isChecked());
 }

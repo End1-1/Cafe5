@@ -713,13 +713,16 @@ void C5Grid::on_tblView_clicked(const QModelIndex &index)
 
 bool C5Grid::on_tblView_doubleClicked(const QModelIndex &index)
 {
+    if (index.row() < 0 || index.column() < 0) {
+        return false;
+    }
     QList<QVariant> values = fModel->getRowValues(index.row());
     if (fEditor) {
         if (values.count() > 0) {
             C5Editor *e = C5Editor::createEditor(fDBParams, fEditor, values.at(0).toInt());
             QList<QMap<QString, QVariant> > data;
             bool yes = e->getResult(data);
-            fEditor->setParent(0);
+            fEditor->setParent(nullptr);
             delete e;
             if (!yes) {
                 return false;

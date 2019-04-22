@@ -406,6 +406,47 @@ QLabel {color:green;}
                 </spacer>
                </item>
                <item>
+                <widget class="QPushButton" name="btnCompactDishAddMode">
+                 <property name="minimumSize">
+                  <size>
+                   <width>50</width>
+                   <height>50</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>50</width>
+                   <height>50</height>
+                  </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::NoFocus</enum>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">QPushButton:checked{background-color: rgb(0, 150, 0);font-weight:bold; }</string>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../resources/resources.qrc">
+                   <normaloff>:/compressor.png</normaloff>:/compressor.png</iconset>
+                 </property>
+                 <property name="iconSize">
+                  <size>
+                   <width>32</width>
+                   <height>32</height>
+                  </size>
+                 </property>
+                 <property name="checkable">
+                  <bool>true</bool>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
                 <widget class="QPushButton" name="btnTypeScrollDown">
                  <property name="minimumSize">
                   <size>
@@ -1084,7 +1125,14 @@ QLabel {color:green;}
                <property name="bottomMargin">
                 <number>0</number>
                </property>
-               <item row="0" column="1">
+               <item row="1" column="0">
+                <widget class="QLabel" name="label">
+                 <property name="text">
+                  <string>Need to pay</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
                 <widget class="QLineEdit" name="leTotal">
                  <property name="readOnly">
                   <bool>true</bool>
@@ -1092,9 +1140,16 @@ QLabel {color:green;}
                 </widget>
                </item>
                <item row="0" column="0">
-                <widget class="QLabel" name="label">
+                <widget class="QLabel" name="label_2">
                  <property name="text">
-                  <string>Total</string>
+                  <string>Prepayment</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QLineEdit" name="lePrepaiment">
+                 <property name="readOnly">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>

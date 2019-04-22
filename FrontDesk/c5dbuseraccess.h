@@ -12,7 +12,7 @@ class C5DbUserAccess : public C5Widget
     Q_OBJECT
 
 public:
-    explicit C5DbUserAccess(const QStringList &dbParams, QWidget *parent = 0);
+    explicit C5DbUserAccess(const QStringList &dbParams, QWidget *parent = nullptr);
 
     ~C5DbUserAccess();
 

@@ -13,7 +13,7 @@ class C5ReportWidget : public C5Grid
 {
     Q_OBJECT
 public:
-    C5ReportWidget(const QStringList &dbParams, QWidget *parent = 0);
+    C5ReportWidget(const QStringList &dbParams, QWidget *parent = nullptr);
 
     ~C5ReportWidget();
 

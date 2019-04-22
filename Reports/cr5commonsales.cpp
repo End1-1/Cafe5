@@ -3,6 +3,7 @@
 #include "c5tablemodel.h"
 #include "c5waiterorder.h"
 #include "c5mainwindow.h"
+#include "c5waiterorderdoc.h"
 
 CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
@@ -108,6 +109,7 @@ QToolBar *CR5CommonSales::toolBar()
             << ToolBarButtons::tbExcel
             << ToolBarButtons::tbPrint;
         fToolBar = createStandartToolbar(btn);
+        fToolBar->addAction(QIcon(":/app.pnգ"), tr("Transfer to room"), this, SLOT(transferToRoom()));
     }
     return fToolBar;
 }
@@ -139,4 +141,29 @@ void CR5CommonSales::openOrder(int row, int column, const QList<QVariant> &value
     }
     C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>(fDBParams);
     wo->setOrder(values.at(fModel->fColumnNameIndex["f_id"]).toString());
+}
+
+void CR5CommonSales::transferToRoom()
+{
+    if (!fColumnsVisible["oh.f_id"]) {
+        C5Message::info(tr("Column 'Header' must be checked in filter"));
+        return;
+    }
+    QModelIndexList ml = this->fTableView->selectionModel()->selectedIndexes();
+    QSet<int> rows;
+    foreach (QModelIndex m, ml) {
+        rows << m.row();
+    }
+    C5Database db1(fDBParams);
+    C5Database db2(fDBParams.at(0), C5Config::hotelDatabase(), fDBParams.at(2), fDBParams.at(3));
+    foreach (int r, rows) {
+        QString err;
+        C5WaiterOrderDoc w(fModel->data(r, fModel->fColumnNameIndex["f_id"], Qt::EditRole).toString(), db1);
+        w.transferToHotel(db2, err);
+        if (!err.isEmpty()) {
+            C5Message::error(err + "<br>" + fModel->data(r, 0, Qt::EditRole).toString());
+            return;
+        }
+    }
+    C5Message::info(tr("Done"));
 }

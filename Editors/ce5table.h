@@ -12,7 +12,7 @@ class CE5Table : public CE5Editor
     Q_OBJECT
 
 public:
-    explicit CE5Table(const QStringList &dbParams, QWidget *parent = 0);
+    explicit CE5Table(const QStringList &dbParams, QWidget *parent = nullptr);
 
     ~CE5Table();
 

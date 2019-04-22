@@ -12,7 +12,7 @@ class CE5MenuName : public CE5Editor
     Q_OBJECT
 
 public:
-    explicit CE5MenuName(const QStringList &dbParams, QWidget *parent = 0);
+    explicit CE5MenuName(const QStringList &dbParams, QWidget *parent = nullptr);
 
     ~CE5MenuName();
 

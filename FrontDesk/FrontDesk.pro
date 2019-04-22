@@ -144,7 +144,8 @@ SOURCES += \
     c5toolbarwidget.cpp \
     ../Classes/checkforupdatethread.cpp \
     ../Classes/fileversion.cpp \
-    c5waiterorder.cpp
+    c5waiterorder.cpp \
+    ../Classes/c5waiterorderdoc.cpp
 
 HEADERS += \
         c5mainwindow.h \
@@ -260,7 +261,8 @@ HEADERS += \
     c5toolbarwidget.h \
     ../Classes/checkforupdatethread.h \
     ../Classes/fileversion.h \
-    c5waiterorder.h
+    c5waiterorder.h \
+    ../Classes/c5waiterorderdoc.h
 
 FORMS += \
         c5mainwindow.ui \
