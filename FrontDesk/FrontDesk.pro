@@ -55,7 +55,6 @@ SOURCES += \
     ../Controls/c5lineedit.cpp \
     ../Controls/c5combobox.cpp \
     c5filtervalues.cpp \
-    ../Cafe5/excel.cpp \
     ../Reports/cr5commonsales.cpp \
     ../Classes/c5gridgilter.cpp \
     c5filterwidget.cpp \
@@ -145,7 +144,20 @@ SOURCES += \
     ../Classes/checkforupdatethread.cpp \
     ../Classes/fileversion.cpp \
     c5waiterorder.cpp \
-    ../Classes/c5waiterorderdoc.cpp
+    ../Classes/c5waiterorderdoc.cpp \
+    ../../XLSX/src/xlsx.cpp \
+    ../../XLSX/src/xlsxcell.cpp \
+    ../../XLSX/src/xlsxcontenttype.cpp \
+    ../../XLSX/src/xlsxdocpropsapp.cpp \
+    ../../XLSX/src/xlsxdocpropscore.cpp \
+    ../../XLSX/src/xlsxdocument.cpp \
+    ../../XLSX/src/xlsxrels.cpp \
+    ../../XLSX/src/xlsxsharedstring.cpp \
+    ../../XLSX/src/xlsxsheet.cpp \
+    ../../XLSX/src/xlsxstyles.cpp \
+    ../../XLSX/src/xlsxtheme.cpp \
+    ../../XLSX/src/xlsxworkbook.cpp \
+    ../../XLSX/src/xlsxwriter.cpp
 
 HEADERS += \
         c5mainwindow.h \
@@ -170,7 +182,6 @@ HEADERS += \
     ../Controls/c5lineedit.h \
     ../Controls/c5combobox.h \
     c5filtervalues.h \
-    ../Cafe5/excel.h \
     ../Reports/cr5commonsales.h \
     ../Classes/c5gridgilter.h \
     c5filterwidget.h \
@@ -262,7 +273,23 @@ HEADERS += \
     ../Classes/checkforupdatethread.h \
     ../Classes/fileversion.h \
     c5waiterorder.h \
-    ../Classes/c5waiterorderdoc.h
+    ../Classes/c5waiterorderdoc.h \
+    ../../XLSX/src/crs32.h \
+    ../../XLSX/src/xlsx.h \
+    ../../XLSX/src/xlsxall.h \
+    ../../XLSX/src/xlsxcell.h \
+    ../../XLSX/src/xlsxcontenttype.h \
+    ../../XLSX/src/xlsxdocpropsapp.h \
+    ../../XLSX/src/xlsxdocpropscore.h \
+    ../../XLSX/src/xlsxdocument.h \
+    ../../XLSX/src/xlsxrels.h \
+    ../../XLSX/src/xlsxsharedstring.h \
+    ../../XLSX/src/xlsxsheet.h \
+    ../../XLSX/src/xlsxstyles.h \
+    ../../XLSX/src/xlsxtheme.h \
+    ../../XLSX/src/xlsxworkbook.h \
+    ../../XLSX/src/xlsxwriter.h \
+    ../../XLSX/src/zip.h
 
 FORMS += \
         c5mainwindow.ui \
@@ -327,6 +354,7 @@ INCLUDEPATH += ../Reports
 INCLUDEPATH += ../Controls
 INCLUDEPATH += ../Editors
 INCLUDEPATH += ../RESOURCES
+INCLUDEPATH += c:/projects/xlsx/src
 
 RESOURCES += \
     ../resources/res.qrc \

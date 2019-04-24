@@ -188,6 +188,9 @@ void DlgOrder::addDishToOrder(const QJsonObject &obj)
     if (ui->btnCompactDishAddMode->isChecked()) {
         for (int i = 0; i < fOrder->itemsCount(); i++) {
             if (obj["f_dish"].toString() == fOrder->iString("f_dish", i)) {
+                if (fOrder->iInt("f_state", i) != DISH_STATE_OK) {
+                    continue;
+                }
                 if (obj["f_store"].toString() != fOrder->iString("f_store", i)) {
                     break;
                 }
@@ -205,6 +208,7 @@ void DlgOrder::addDishToOrder(const QJsonObject &obj)
                 ui->tblOrder->viewport()->update();
                 ui->tblOrder->scrollToItem(ui->tblOrder->item(i, 0));
                 ui->tblOrder->setCurrentItem(ui->tblOrder->item(i, 0));
+                ui->lePrepaiment->setText(fOrder->prepayment());
                 return;
             }
         }

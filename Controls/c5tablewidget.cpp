@@ -1,15 +1,22 @@
 #include "c5tablewidget.h"
 #include "c5lineedit.h"
 #include "c5combobox.h"
+#include "c5message.h"
 #include "c5utils.h"
-#include "excel.h"
 #include "c5checkbox.h"
+#include "xlsxall.h"
 #include <QHeaderView>
+#include <QApplication>
 
 C5TableWidget::C5TableWidget(QWidget *parent) :
     QTableWidget(parent)
 {
     setEditTriggers(NoEditTriggers);
+}
+
+C5TableWidgetItem *C5TableWidget::item(int row, int column) const
+{
+    return static_cast<C5TableWidgetItem*>(QTableWidget::item(row, column));
 }
 
 void C5TableWidget::setColumnWidths(int count, ...)
@@ -117,27 +124,31 @@ bool C5TableWidget::findWidget(QWidget *w, int &row, int &column)
 
 QVariant C5TableWidget::getData(int row, int column)
 {
-    return item(row, column)->text();
+    return item(row, column)->data(Qt::EditRole);
 }
 
 void C5TableWidget::setData(int row, int column, const QVariant &value)
 {
-    item(row, column)->setData(Qt::DisplayRole, value);
+    C5TableWidgetItem *i = item(row, column);
+    if (!i) {
+        i = new C5TableWidgetItem();
+    }
+    i->setData(Qt::EditRole, value);
 }
 
 int C5TableWidget::getInteger(int row, int column)
 {
-    return item(row, column)->text().toInt();
+    return getData(row, column).toInt();
 }
 
 void C5TableWidget::setInteger(int row, int column, int value)
 {
-    setString(row, column, QString::number(value));
+    setData(row, column, value);
 }
 
 QString C5TableWidget::getString(int row, int column)
 {
-    QTableWidgetItem *i = item(row, column);
+    C5TableWidgetItem *i = item(row, column);
     if (!i) {
         return "NO ITEM!";
     }
@@ -146,25 +157,17 @@ QString C5TableWidget::getString(int row, int column)
 
 void C5TableWidget::setString(int row, int column, const QString &str)
 {
-    if (!item(row, column)) {
-        setItem(row, column, new QTableWidgetItem(str));
-    } else {
-        item(row, column)->setText(str);
-    }
+    setData(row, column, str);
 }
 
 double C5TableWidget::getDouble(int row, int column)
 {
-    QTableWidgetItem *i = item(row, column);
-    if (!i) {
-        return 0.0;
-    }
-    return QLocale().toDouble(i->text());
+    return getData(row, column).toDouble();
 }
 
 void C5TableWidget::setDouble(int row, int column, double value)
 {
-    setString(row, column, float_str(value, 2));
+    setData(row, column, value);
 }
 
 int C5TableWidget::addEmptyRow()
@@ -172,36 +175,44 @@ int C5TableWidget::addEmptyRow()
     int row = rowCount();
     setRowCount(row + 1);
     for (int i = 0; i < columnCount(); i++) {
-        setItem(row, i, new QTableWidgetItem());
+        setItem(row, i, new C5TableWidgetItem());
     }
     return row;
 }
 
 void C5TableWidget::exportToExcel()
 {
-    int colCount = columnCount();
-    if (colCount == 0 || rowCount() == 0) {
+    if (columnCount() == 0 || rowCount() == 0) {
+        C5Message::info(tr("Empty report"));
         return;
     }
-    Excel e;
-    for (int i = 0; i < colCount; i++) {
-        e.setValue(horizontalHeaderItem(i)->text(), 1, i + 1);
-        e.setColumnWidth(i + 1, columnWidth(i) / 7);
-    }
+    XlsxDocument d;
+    XlsxSheet *s = d.workbook()->addSheet("Sheet1");
+    /* HEADER */
     QColor color = QColor::fromRgb(200, 200, 250);
-    e.setBackground(e.address(0, 0), e.address(0, colCount - 1),
-                     color.red(), color.green(), color.blue());
-    e.setFontBold(e.address(0, 0), e.address(0, colCount - 1));
-    e.setHorizontalAlignment(e.address(0, 0), e.address(0, colCount - 1), Excel::hCenter);
-
+    QFont headerFont(qApp->font());
+    headerFont.setBold(true);
+    d.style()->addFont("header", headerFont);
+    d.style()->addBackgrounFill("header", color);
+    for (int i = 0; i < columnCount(); i++) {
+        s->addCell(1, i + 1, horizontalHeaderItem(i)->data(Qt::DisplayRole).toString(), d.style()->styleNum("header"));
+        s->setColumnWidth(i + 1, columnWidth(i) / 7);
+    }
+    //e.setHorizontalAlignment(e.address(0, 0), e.address(0, colCount - 1), Excel::hCenter);
+    /* BODY */
+    QFont bodyFont(qApp->font());
+    d.style()->addFont("body", bodyFont);
     for (int j = 0; j < rowCount(); j++) {
-        for (int i = 0; i < colCount; i++) {
-            e.setValue(getString(j, i), j + 2, i + 1);
+        for (int i = 0; i < columnCount(); i++) {
+            s->addCell(j + 2, i + 1,  item(j, i)->data(Qt::EditRole), d.style()->styleNum("body"));
         }
     }
-
-    e.setFontSize(e.address(0, 0), e.address(rowCount() , colCount ), 10);
-    e.show();
+    QString err;
+    if (!d.save(err, true)) {
+        if (!err.isEmpty()) {
+            C5Message::error(err);
+        }
+    }
 }
 
 void C5TableWidget::search(const QString &txt)
@@ -232,5 +243,39 @@ void C5TableWidget::comboTextChanged(const QString &text)
 void C5TableWidget::checkBoxChecked(bool v)
 {
     C5CheckBox *c = static_cast<C5CheckBox*>(sender());
-    setString(c->property("row").toInt(), c->property("column").toInt(), (v ? "1" : 0));
+    setString(c->property("row").toInt(), c->property("column").toInt(), (v ? "1" : "0"));
+}
+
+C5TableWidgetItem::C5TableWidgetItem(int type) :
+    QTableWidgetItem (type)
+{
+
+}
+
+C5TableWidgetItem::C5TableWidgetItem(const QString &text, int type) :
+    QTableWidgetItem (text, type)
+{
+
+}
+
+QVariant C5TableWidgetItem::data(int role) const
+{
+    QVariant v = QTableWidgetItem::data(role);
+    if (role == Qt::DisplayRole) {
+       switch (v.type()) {
+       case QVariant::Int:
+           return v.toString();
+       case QVariant::Date:
+           return v.toDate().toString(FORMAT_DATE_TO_STR);
+       case QVariant::DateTime:
+           return v.toDateTime().toString(FORMAT_DATETIME_TO_STR);
+       case QVariant::Time:
+           return v.toTime().toString(FORMAT_TIME_TO_STR);
+       case QVariant::Double:
+           return float_str(v.toDouble(), 2);
+       default:
+           return v.toString();
+       }
+    }
+    return v;
 }

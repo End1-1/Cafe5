@@ -2,13 +2,13 @@
 #include "ui_c5grid.h"
 #include "c5tablemodel.h"
 #include "c5filtervalues.h"
-#include "excel.h"
 #include "c5filterwidget.h"
 #include "c5printing.h"
 #include "c5printpreview.h"
 #include "c5gridgilter.h"
 #include "c5editor.h"
 #include "ce5editor.h"
+#include "xlsxall.h"
 #include <QMenu>
 #include <QScrollBar>
 #include <QClipboard>
@@ -32,8 +32,8 @@ C5Grid::C5Grid(const QStringList &dbParams, QWidget *parent) :
     connect(fTableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(selectionChanged(QItemSelection,QItemSelection)));
     connect(fTableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(tableViewContextMenuRequested(QPoint)));
     connect(ui->tblTotal->horizontalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(tblValueChanged(int)));
-    fFilterWidget = 0;
-    fEditor = 0;
+    fFilterWidget = nullptr;
+    fEditor = nullptr;
     ui->tblTotal->setVisible(false);
     ui->tblView->resizeRowsToContents();
     QShortcut *s = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Enter), this);
@@ -238,7 +238,7 @@ void C5Grid::sumColumnsData()
     fModel->sumForColumns(fColumnsSum, values);
     for (QMap<QString, double>::const_iterator it = values.begin(); it != values.end(); it++) {
         int idx = fModel->indexForColumnName(it.key());
-        ui->tblTotal->item(0, idx)->setData(Qt::DisplayRole, float_str(it.value(), 2));
+        ui->tblTotal->setData(0, idx, it.value());
     }
     QStringList vheader;
     vheader << QString::number(fModel->rowCount());
@@ -267,7 +267,7 @@ void C5Grid::restoreColumnsWidths()
                 .arg(fLabel));
     ui->tblTotal->setColumnCount(fModel->columnCount());
     for (int i = 0; i < ui->tblTotal->columnCount(); i++) {
-        ui->tblTotal->setItem(0, i, new QTableWidgetItem());
+        ui->tblTotal->setItem(0, i, new C5TableWidgetItem());
         QString colName = fModel->nameForColumnIndex(i);
         if (s.contains(colName)) {
             ui->tblView->setColumnWidth(i, s.value(colName).toInt());
@@ -441,13 +441,13 @@ void C5Grid::tblValueChanged(int pos)
 
 int C5Grid::newRow()
 {
-    if (fEditor == 0) {
+    if (fEditor == nullptr) {
         return -1;
     }
     C5Editor *e = C5Editor::createEditor(fDBParams, fEditor, 0);
     QList<QMap<QString, QVariant> > data;
     bool yes = e->getResult(data);
-    fEditor->setParent(0);
+    fEditor->setParent(nullptr);
     delete e;
     if (!yes) {
         return -1;
@@ -597,31 +597,47 @@ void C5Grid::exportToExcel()
     int colCount = fModel->columnCount();
     int rowCount = fModel->rowCount();
     if (colCount == 0 || rowCount == 0) {
-        C5Message::error(tr("Empty report!"));
+        C5Message::info(tr("Empty report!"));
         return;
     }
-    Excel e;
-    for (int i = 0; i < colCount; i++) {
-        e.setValue(fModel->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString(), 1, i + 1);
-        e.setColumnWidth(i + 1, fTableView->columnWidth(i) / 7);
-    }
+    XlsxDocument d;
+    XlsxSheet *s = d.workbook()->addSheet("Sheet1");
+    /* HEADER */
     QColor color = QColor::fromRgb(200, 200, 250);
-    e.setBackground(e.address(0, 0), e.address(0, colCount - 1),
-                     color.red(), color.green(), color.blue());
-    e.setFontBold(e.address(0, 0), e.address(0, colCount - 1));
-    e.setHorizontalAlignment(e.address(0, 0), e.address(0, colCount - 1), Excel::hCenter);
-
+    QFont headerFont(qApp->font());
+    headerFont.setBold(true);
+    d.style()->addFont("header", headerFont);
+    d.style()->addBackgrounFill("header", color);
+    for (int i = 0; i < colCount; i++) {
+        s->addCell(1, i + 1, fModel->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString(), d.style()->styleNum("header"));
+        s->setColumnWidth(i + 1, fTableView->columnWidth(i) / 7);
+    }
+    //e.setHorizontalAlignment(e.address(0, 0), e.address(0, colCount - 1), Excel::hCenter);
+    /* BODY */
+    QFont bodyFont(qApp->font());
+    d.style()->addFont("body", bodyFont);
     for (int j = 0; j < rowCount; j++) {
         for (int i = 0; i < colCount; i++) {
-            e.setValue(fModel->data(j, i, Qt::EditRole).toString(), j + 2, i + 1);
+            s->addCell(j + 2, i + 1, fModel->data(j, i, Qt::EditRole), d.style()->styleNum("body"));
         }
-        color = fModel->data(j, 0, Qt::BackgroundColorRole).value<QColor>();
-        e.setBackground(e.address(j + 1, 0), e.address(j + 1, colCount - 1),
-                         color.red(), color.green(), color.blue());
     }
-
-    e.setFontSize(e.address(0, 0), e.address(rowCount , colCount ), 10);
-    e.show();
+    /* TOTALS ROWS */
+    if (ui->tblTotal->isVisible()) {
+        QFont totalFont(qApp->font());
+        totalFont.setBold(true);
+        d.style()->addFont("footer", headerFont);
+        color = QColor::fromRgb(193, 206, 221);
+        d.style()->addBackgrounFill("footer", color);
+        for (int i = 0; i < colCount; i++) {
+            s->addCell(1 + fModel->rowCount() + 1, i + 1, ui->tblTotal->getData(0, i), d.style()->styleNum("footer"));
+        }
+    }
+    QString err;
+    if (!d.save(err, true)) {
+        if (!err.isEmpty()) {
+            C5Message::error(err);
+        }
+    }
 }
 
 void C5Grid::clearFilter()
@@ -743,5 +759,5 @@ bool C5Grid::on_tblView_doubleClicked(const QModelIndex &index)
         }
     }
     emit tblDoubleClicked(index.row(), index.column(), values);
-    return fEditor != 0;
+    return fEditor != nullptr;
 }

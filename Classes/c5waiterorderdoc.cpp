@@ -86,6 +86,8 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &fDD, QString &err)
         return false;
     }
     int paymentMode = 1;
+    QString dc = "DEBET";
+    int sign = -1;
 
     QString room, res, inv, clcode, clname, guest;
     if (fHeader["f_otherid"].toString().toInt() == PAYOTHER_TRANSFER_TO_ROOM) {
@@ -94,6 +96,8 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &fDD, QString &err)
         res = fHeader["f_other_res"].toString();
         guest = fHeader["f_other_guest"].toString();
         paymentMode = 5;
+        dc = "CREDIT";
+        sign = 1;
     } else if (hInt("f_otherid") == PAYOTHER_COMPLIMENTARY) {
         paymentMode = 6;
     } else if (hInt("f_otherid") == PAYOTHER_SELFCOST) {
@@ -145,8 +149,8 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &fDD, QString &err)
     fDD[":f_creditCard"] = 0;
     fDD[":f_cityLedger"] = clcode.toInt();
     fDD[":f_paymentComment"] = "";
-    fDD[":f_dc"] = "DEBIT";
-    fDD[":f_sign"] = 1;
+    fDD[":f_dc"] = dc;
+    fDD[":f_sign"] = sign;
     fDD[":f_doc"] = "";
     fDD[":f_rec"] = "";
     fDD[":f_inv"] = inv;

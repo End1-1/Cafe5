@@ -7,12 +7,26 @@ class C5LineEdit;
 class C5ComboBox;
 class C5CheckBox;
 
+
+class C5TableWidgetItem : public QTableWidgetItem {
+public:
+    explicit C5TableWidgetItem(int type = Type);
+
+    explicit C5TableWidgetItem(const QString &text, int type = Type);
+
+    virtual QVariant data(int role) const override;
+
+    inline QString text() {return data(Qt::DisplayRole).toString(); }
+};
+
 class C5TableWidget : public QTableWidget
 {
     Q_OBJECT
 
 public:
     C5TableWidget(QWidget *parent = nullptr);
+
+    C5TableWidgetItem *item(int row, int column) const;
 
     void setColumnWidths(int count, ...);
 

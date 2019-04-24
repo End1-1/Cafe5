@@ -123,7 +123,7 @@ QVariant C5TableModel::data(const QModelIndex &index, int role) const
     case Qt::DisplayRole:
         return dataDisplay(fProxyData.at(index.row()), index.column());
     case Qt::EditRole:
-        return dataDisplay(fProxyData.at(index.row()), index.column());
+        return fRawData.at(fProxyData.at(index.row())).at(index.column());
     case Qt::BackgroundColorRole:
         if (fColorData.contains(fProxyData.at(index.row()))) {
             return fColorData[fProxyData.at(index.row())][index.column()];
