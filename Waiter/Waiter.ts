@@ -375,7 +375,7 @@
         <translation>Սպասարկում</translation>
     </message>
     <message>
-        <location filename="c5printreceiptthread.cpp" line="261"/>
+        <location filename="c5printreceiptthread.cpp" line="257"/>
         <source>Sample</source>
         <translation>Օրնկ․</translation>
     </message>
@@ -405,48 +405,48 @@
         <translation>Ենթակա է վճարման</translation>
     </message>
     <message>
-        <location filename="c5printreceiptthread.cpp" line="177"/>
+        <location filename="c5printreceiptthread.cpp" line="175"/>
         <source>Pay by IDRAM</source>
         <translation>Վճարում IDRAM-ով</translation>
     </message>
     <message>
-        <location filename="c5printreceiptthread.cpp" line="213"/>
+        <location filename="c5printreceiptthread.cpp" line="210"/>
         <source>Payment, cash</source>
         <translation>Վճարումը առնձերն</translation>
     </message>
     <message>
-        <location filename="c5printreceiptthread.cpp" line="217"/>
+        <location filename="c5printreceiptthread.cpp" line="214"/>
         <source>Payment, card</source>
         <translation>Վճարումը անկանխիկ</translation>
     </message>
     <message>
-        <location filename="c5printreceiptthread.cpp" line="221"/>
+        <location filename="c5printreceiptthread.cpp" line="218"/>
         <source>Bank transfer</source>
         <translation>Փոխանցում բանկով</translation>
     </message>
     <message>
-        <location filename="c5printreceiptthread.cpp" line="230"/>
+        <location filename="c5printreceiptthread.cpp" line="227"/>
         <source>Transfer to room</source>
         <translation>Կցել սենյակի հաշվին</translation>
     </message>
     <message>
-        <location filename="c5printreceiptthread.cpp" line="235"/>
-        <location filename="c5printreceiptthread.cpp" line="252"/>
+        <location filename="c5printreceiptthread.cpp" line="232"/>
+        <location filename="c5printreceiptthread.cpp" line="249"/>
         <source>Signature</source>
         <translation>Ստորագրություն</translation>
     </message>
     <message>
-        <location filename="c5printreceiptthread.cpp" line="241"/>
+        <location filename="c5printreceiptthread.cpp" line="238"/>
         <source>City ledger</source>
         <translation>Դեբիտորական պարտք</translation>
     </message>
     <message>
-        <location filename="c5printreceiptthread.cpp" line="249"/>
+        <location filename="c5printreceiptthread.cpp" line="246"/>
         <source>Complimentary</source>
         <translation>Հյուրասիրություն</translation>
     </message>
     <message>
-        <location filename="c5printreceiptthread.cpp" line="259"/>
+        <location filename="c5printreceiptthread.cpp" line="255"/>
         <source>Thank you for visit!</source>
         <translation>Շնորհակալություն այցելության համար</translation>
     </message>
@@ -560,6 +560,14 @@
         <location filename="../Classes/c5printservicethread.cpp" line="98"/>
         <source>Storage: </source>
         <translation>Պահեստ` </translation>
+    </message>
+</context>
+<context>
+    <name>C5TableWidget</name>
+    <message>
+        <location filename="../Controls/c5tablewidget.cpp" line="187"/>
+        <source>Empty report</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -926,13 +934,13 @@ AMOUNT</source>
     </message>
     <message>
         <location filename="dlgorder.ui" line="70"/>
-        <location filename="dlgorder.cpp" line="347"/>
+        <location filename="dlgorder.cpp" line="351"/>
         <source>[Service]</source>
         <translation>[Սպասարկում]</translation>
     </message>
     <message>
         <location filename="dlgorder.ui" line="85"/>
-        <location filename="dlgorder.cpp" line="273"/>
+        <location filename="dlgorder.cpp" line="277"/>
         <source>[Discount]</source>
         <translation>[Զեղչ]</translation>
     </message>
@@ -1022,28 +1030,28 @@ AMOUNT</source>
         <translation>Ճաշացանկը բացակայում է</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="270"/>
+        <location filename="dlgorder.cpp" line="274"/>
         <source>Discount</source>
         <translation>Զեղչ</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="344"/>
+        <location filename="dlgorder.cpp" line="348"/>
         <source>Service</source>
         <translation>Սպասարկում</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="277"/>
+        <location filename="dlgorder.cpp" line="281"/>
         <source>Order owner</source>
         <translation>Պատվերը բացել է </translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="587"/>
-        <location filename="dlgorder.cpp" line="593"/>
+        <location filename="dlgorder.cpp" line="591"/>
+        <location filename="dlgorder.cpp" line="597"/>
         <source>Order is incomplete</source>
         <translation>Պատվերը անավարտ է</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="624"/>
+        <location filename="dlgorder.cpp" line="628"/>
         <source>Confirm to remove</source>
         <translation>Հաստատեք հեռացումը</translation>
     </message>
@@ -1194,9 +1202,9 @@ ORDER</source>
         <translation>Փակել պատվերը</translation>
     </message>
     <message>
-        <location filename="dlgpayment.cpp" line="167"/>
-        <location filename="dlgpayment.cpp" line="420"/>
-        <location filename="dlgpayment.cpp" line="501"/>
+        <location filename="dlgpayment.cpp" line="168"/>
+        <location filename="dlgpayment.cpp" line="421"/>
+        <location filename="dlgpayment.cpp" line="502"/>
         <source>Cash</source>
         <translation>Կանխիկ</translation>
     </message>
@@ -1221,81 +1229,81 @@ ORDER</source>
         <translation>Վճարում</translation>
     </message>
     <message>
-        <location filename="dlgpayment.cpp" line="173"/>
-        <location filename="dlgpayment.cpp" line="428"/>
+        <location filename="dlgpayment.cpp" line="174"/>
+        <location filename="dlgpayment.cpp" line="429"/>
         <source>Bank</source>
         <translation>Փոխանցում բանկով</translation>
     </message>
     <message>
-        <location filename="dlgpayment.cpp" line="258"/>
+        <location filename="dlgpayment.cpp" line="259"/>
         <source>Payment mode is not selected</source>
         <translation>Վճարման եղանակը նշված չէ</translation>
     </message>
     <message>
-        <location filename="dlgpayment.cpp" line="375"/>
+        <location filename="dlgpayment.cpp" line="376"/>
         <source>Complimentary</source>
         <translation>Հյուրասիրություն</translation>
     </message>
     <message>
-        <location filename="dlgpayment.cpp" line="409"/>
+        <location filename="dlgpayment.cpp" line="410"/>
         <source>Selfcost</source>
         <translation>Ինքնարժեք</translation>
     </message>
     <message>
-        <location filename="dlgpayment.cpp" line="495"/>
+        <location filename="dlgpayment.cpp" line="496"/>
         <source>Cash method already exists</source>
         <translation>Կանխիկ եղանակը արդեն նշված է</translation>
     </message>
     <message>
-        <location filename="dlgpayment.cpp" line="521"/>
+        <location filename="dlgpayment.cpp" line="522"/>
         <source>Card method already exists</source>
         <translation>Բանկի քարտով եղանակը արդեն նշված է</translation>
     </message>
     <message>
-        <location filename="dlgpayment.cpp" line="528"/>
+        <location filename="dlgpayment.cpp" line="529"/>
         <source>Credit card</source>
         <translation>Բանկի քարտ</translation>
     </message>
     <message>
-        <location filename="dlgpayment.cpp" line="537"/>
+        <location filename="dlgpayment.cpp" line="538"/>
         <source>Bankh method already exists</source>
         <translation>Փոխանցումով եղանակը արդեն նշված է</translation>
     </message>
     <message>
-        <location filename="dlgpayment.cpp" line="544"/>
+        <location filename="dlgpayment.cpp" line="545"/>
         <source>Bank transfer</source>
         <translation>Փոխանցում բանկով</translation>
     </message>
     <message>
-        <location filename="dlgpayment.cpp" line="557"/>
+        <location filename="dlgpayment.cpp" line="558"/>
         <source>Other method already exists</source>
         <translation>Այլ եղանակով տարբերակը արդեն նշված է</translation>
     </message>
     <message>
-        <location filename="dlgpayment.cpp" line="564"/>
+        <location filename="dlgpayment.cpp" line="565"/>
         <source>Other transfer</source>
         <translation>Այլ վճարման եղանակ</translation>
     </message>
     <message>
-        <location filename="dlgpayment.cpp" line="576"/>
+        <location filename="dlgpayment.cpp" line="577"/>
         <source>Card code</source>
         <translation>Մուտքագրեք քարտը</translation>
     </message>
     <message>
-        <location filename="dlgpayment.cpp" line="581"/>
+        <location filename="dlgpayment.cpp" line="582"/>
         <source>Card code is empty</source>
         <translation>Քարտի կոդը դատարկ է</translation>
     </message>
     <message>
-        <location filename="dlgpayment.cpp" line="176"/>
-        <location filename="dlgpayment.cpp" line="432"/>
+        <location filename="dlgpayment.cpp" line="177"/>
+        <location filename="dlgpayment.cpp" line="433"/>
         <source>Other</source>
         <translation>Այլ եղանակ</translation>
     </message>
     <message>
-        <location filename="dlgpayment.cpp" line="170"/>
-        <location filename="dlgpayment.cpp" line="424"/>
-        <location filename="dlgpayment.cpp" line="576"/>
+        <location filename="dlgpayment.cpp" line="171"/>
+        <location filename="dlgpayment.cpp" line="425"/>
+        <location filename="dlgpayment.cpp" line="577"/>
         <source>Card</source>
         <translation>Քարտ</translation>
     </message>
@@ -1310,7 +1318,7 @@ ORDER</source>
         <translation>Տպել հաշիվը</translation>
     </message>
     <message>
-        <location filename="dlgpayment.cpp" line="472"/>
+        <location filename="dlgpayment.cpp" line="473"/>
         <source>Confirm to close order</source>
         <translation>Հաստատեք պատվերի փակումը</translation>
     </message>

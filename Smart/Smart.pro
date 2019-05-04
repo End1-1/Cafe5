@@ -16,6 +16,7 @@ TEMPLATE = app
 # depend on your compiler). Please consult the documentation of the
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
+DEFINES += WAITER
 
 # You can also make your code fail to compile if you use deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -24,7 +25,10 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
+    ../../NewTax/printtaxn.cpp \
+    dishitemdelegate.cpp \
         main.cpp \
+    payment.cpp \
         workspace.cpp \
     ../Cafe5/c5config.cpp \
     ../Cafe5/c5connection.cpp \
@@ -38,6 +42,10 @@ SOURCES += \
     ../Classes/c5user.cpp
 
 HEADERS += \
+    ../../NewTax/printtaxn.h \
+    dish.h \
+    dishitemdelegate.h \
+    payment.h \
         workspace.h \
     ../Cafe5/c5config.h \
     ../Cafe5/c5connection.h \
@@ -52,6 +60,8 @@ HEADERS += \
     ../Classes/c5user.h
 
 FORMS += \
+    ../FrontDesk/c5selector.ui \
+    payment.ui \
         workspace.ui \
     ../Cafe5/c5connection.ui \
     ../Cafe5/c5message.ui \
@@ -63,13 +73,13 @@ DEFINES += _APPLICATION_=\\\"Cafe5\\\"
 DEFINES += _MODULE_=\\\"SMART\\\"
 DEFINES += WAITER
 
-INCLUDEPATH += ../Cafe5
-INCLUDEPATH += ../Classes
-INCLUDEPATH += ../Controls
-INCLUDEPATH += ../Waiter
-INCLUDEPATH += ../../NewTax
-INCLUDEPATH += C:/OpenSSL-Win32.0/include
-INCLUDEPATH += C:/OpenSSL-Win32.0/include/openssl
+INCLUDEPATH += c:/projects/cafe5/Cafe5
+INCLUDEPATH += c:/projects/cafe5/Classes
+INCLUDEPATH += c:/projects/cafe5/Controls
+INCLUDEPATH += c:/projects/cafe5/Waiter
+INCLUDEPATH += c:/Projects/NewTax
+INCLUDEPATH += C:/OpenSSL-Win32/include
+INCLUDEPATH += C:/OpenSSL-Win32/include/openssl
 
 LIBS += -lVersion
 LIBS += -lwsock32

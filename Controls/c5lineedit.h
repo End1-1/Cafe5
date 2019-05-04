@@ -39,6 +39,8 @@ public:
 protected:
     void keyPressEvent(QKeyEvent *e);
 
+    void focusOutEvent(QFocusEvent *event);
+
 private:
     int fTag;
 
@@ -46,6 +48,10 @@ private:
 
 private slots:
     void editText(const QString &arg);
+
+signals:
+    void focusOut();
+
 };
 
 C5LineEdit *isLineEdit(QObject *o);

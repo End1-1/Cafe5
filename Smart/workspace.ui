@@ -118,7 +118,7 @@ QLabel {color:green;}
     </widget>
    </item>
    <item>
-    <widget class="QWidget" name="widget" native="true">
+    <widget class="QWidget" name="dDown" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_4">
       <property name="spacing">
        <number>1</number>
@@ -136,7 +136,7 @@ QLabel {color:green;}
        <number>0</number>
       </property>
       <item>
-       <widget class="QWidget" name="widget_4" native="true">
+       <widget class="QWidget" name="wLeft" native="true">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
           <horstretch>2</horstretch>
@@ -157,7 +157,7 @@ QLabel {color:green;}
           <number>0</number>
          </property>
          <item>
-          <widget class="QWidget" name="widget_6" native="true">
+          <widget class="QWidget" name="wDish" native="true">
            <layout class="QVBoxLayout" name="verticalLayout_5">
             <property name="spacing">
              <number>1</number>
@@ -175,7 +175,7 @@ QLabel {color:green;}
              <number>0</number>
             </property>
             <item>
-             <widget class="QWidget" name="widget_5" native="true">
+             <widget class="QWidget" name="wDishPart" native="true">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                 <horstretch>0</horstretch>
@@ -375,7 +375,7 @@ QLabel {color:green;}
              </widget>
             </item>
             <item>
-             <widget class="QWidget" name="widget_9" native="true">
+             <widget class="QWidget" name="wDish_2" native="true">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                 <horstretch>0</horstretch>
@@ -454,7 +454,7 @@ QLabel {color:green;}
                 </widget>
                </item>
                <item>
-                <widget class="QWidget" name="widget_7" native="true">
+                <widget class="QWidget" name="wDishScroll" native="true">
                  <property name="minimumSize">
                   <size>
                    <width>0</width>
@@ -549,7 +549,7 @@ QLabel {color:green;}
        </widget>
       </item>
       <item>
-       <widget class="QWidget" name="widget_2" native="true">
+       <widget class="QWidget" name="wRight" native="true">
         <property name="minimumSize">
          <size>
           <width>250</width>
@@ -579,7 +579,7 @@ QLabel {color:green;}
           <number>0</number>
          </property>
          <item>
-          <widget class="QWidget" name="widget_3" native="true">
+          <widget class="QWidget" name="wQty" native="true">
            <layout class="QGridLayout" name="gridLayout">
             <property name="leftMargin">
              <number>0</number>
@@ -596,8 +596,8 @@ QLabel {color:green;}
             <property name="spacing">
              <number>1</number>
             </property>
-            <item row="0" column="0">
-             <widget class="QPushButton" name="btnPlus1">
+            <item row="1" column="0">
+             <widget class="QPushButton" name="btnP10">
               <property name="minimumSize">
                <size>
                 <width>50</width>
@@ -611,12 +611,12 @@ QLabel {color:green;}
                </size>
               </property>
               <property name="text">
-               <string>1</string>
+               <string>+10</string>
               </property>
              </widget>
             </item>
-            <item row="0" column="1">
-             <widget class="QPushButton" name="btnPlus05">
+            <item row="1" column="1">
+             <widget class="QPushButton" name="btnP1">
               <property name="minimumSize">
                <size>
                 <width>50</width>
@@ -630,12 +630,50 @@ QLabel {color:green;}
                </size>
               </property>
               <property name="text">
-               <string>2</string>
+               <string>+1</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="2">
+             <widget class="QPushButton" name="btnM1">
+              <property name="minimumSize">
+               <size>
+                <width>50</width>
+                <height>50</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>50</width>
+                <height>50</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>-1</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="4">
+             <widget class="QPushButton" name="btn5">
+              <property name="minimumSize">
+               <size>
+                <width>50</width>
+                <height>50</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>50</width>
+                <height>50</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>5</string>
               </property>
              </widget>
             </item>
             <item row="0" column="3">
-             <widget class="QPushButton" name="btnMin05">
+             <widget class="QPushButton" name="btn4">
               <property name="minimumSize">
                <size>
                 <width>50</width>
@@ -654,7 +692,7 @@ QLabel {color:green;}
              </widget>
             </item>
             <item row="0" column="2">
-             <widget class="QPushButton" name="btnMin1">
+             <widget class="QPushButton" name="btn3">
               <property name="minimumSize">
                <size>
                 <width>50</width>
@@ -672,8 +710,8 @@ QLabel {color:green;}
               </property>
              </widget>
             </item>
-            <item row="1" column="0">
-             <widget class="QPushButton" name="btnCustom">
+            <item row="0" column="1">
+             <widget class="QPushButton" name="btn2">
               <property name="minimumSize">
                <size>
                 <width>50</width>
@@ -687,12 +725,12 @@ QLabel {color:green;}
                </size>
               </property>
               <property name="text">
-               <string>+10</string>
+               <string>2</string>
               </property>
              </widget>
             </item>
-            <item row="0" column="4">
-             <widget class="QPushButton" name="btnMin05_2">
+            <item row="0" column="0">
+             <widget class="QPushButton" name="btn1">
               <property name="minimumSize">
                <size>
                 <width>50</width>
@@ -706,59 +744,11 @@ QLabel {color:green;}
                </size>
               </property>
               <property name="text">
-               <string>5</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QPushButton" name="btnPlus1_2">
-              <property name="minimumSize">
-               <size>
-                <width>50</width>
-                <height>50</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>50</width>
-                <height>50</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>+1</string>
+               <string>1</string>
               </property>
              </widget>
             </item>
             <item row="1" column="4">
-             <widget class="QPushButton" name="btnPrintService">
-              <property name="minimumSize">
-               <size>
-                <width>50</width>
-                <height>50</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>50</width>
-                <height>50</height>
-               </size>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset resource="../resources/resources.qrc">
-                <normaloff>:/print_receipt.png</normaloff>:/print_receipt.png</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>32</width>
-                <height>32</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="3">
              <widget class="QPushButton" name="btnVoid">
               <property name="minimumSize">
                <size>
@@ -787,8 +777,8 @@ QLabel {color:green;}
               </property>
              </widget>
             </item>
-            <item row="1" column="2">
-             <widget class="QPushButton" name="btnPlus1_3">
+            <item row="1" column="3">
+             <widget class="QPushButton" name="btnP05">
               <property name="minimumSize">
                <size>
                 <width>50</width>
@@ -802,7 +792,7 @@ QLabel {color:green;}
                </size>
               </property>
               <property name="text">
-               <string>-1</string>
+               <string>0.5</string>
               </property>
              </widget>
             </item>
@@ -940,5 +930,171 @@ QLabel {color:green;}
  <resources>
   <include location="../resources/resources.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>btn1</sender>
+   <signal>clicked()</signal>
+   <receiver>Workspace</receiver>
+   <slot>setQty()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>764</x>
+     <y>46</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>498</x>
+     <y>359</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btn2</sender>
+   <signal>clicked()</signal>
+   <receiver>Workspace</receiver>
+   <slot>setQty()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>815</x>
+     <y>46</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>498</x>
+     <y>359</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btn3</sender>
+   <signal>clicked()</signal>
+   <receiver>Workspace</receiver>
+   <slot>setQty()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>866</x>
+     <y>46</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>498</x>
+     <y>359</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btn4</sender>
+   <signal>clicked()</signal>
+   <receiver>Workspace</receiver>
+   <slot>setQty()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>917</x>
+     <y>46</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>498</x>
+     <y>359</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btn5</sender>
+   <signal>clicked()</signal>
+   <receiver>Workspace</receiver>
+   <slot>setQty()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>968</x>
+     <y>46</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>498</x>
+     <y>359</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnP10</sender>
+   <signal>clicked()</signal>
+   <receiver>Workspace</receiver>
+   <slot>changeQty()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>764</x>
+     <y>97</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>498</x>
+     <y>359</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnP1</sender>
+   <signal>clicked()</signal>
+   <receiver>Workspace</receiver>
+   <slot>changeQty()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>815</x>
+     <y>97</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>498</x>
+     <y>359</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnM1</sender>
+   <signal>clicked()</signal>
+   <receiver>Workspace</receiver>
+   <slot>changeQty()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>866</x>
+     <y>97</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>498</x>
+     <y>359</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnVoid</sender>
+   <signal>clicked()</signal>
+   <receiver>Workspace</receiver>
+   <slot>removeDish()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>917</x>
+     <y>97</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>498</x>
+     <y>359</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnP05</sender>
+   <signal>clicked()</signal>
+   <receiver>Workspace</receiver>
+   <slot>setQty()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>917</x>
+     <y>97</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>498</x>
+     <y>359</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>setQty()</slot>
+  <slot>changeQty()</slot>
+  <slot>removeDish()</slot>
+ </slots>
 </ui>

@@ -1,0 +1,29 @@
+#ifndef DISH_H
+#define DISH_H
+
+#include <QString>
+#include <QMetaType>
+
+struct Dish {
+    int id;
+    int typeId;
+    QString name;
+    QString printer;
+    QString adgCode;
+    int store;
+    double price;
+    double qty;
+    int color;
+    Dish() {
+        id = 0;
+        typeId = 0;
+        store = 0;
+        price = 0;
+        qty = 1;
+        color = -1;
+    }
+};
+Q_DECLARE_METATYPE(Dish*)
+Q_DECLARE_METATYPE(Dish)
+
+#endif // DISH_H

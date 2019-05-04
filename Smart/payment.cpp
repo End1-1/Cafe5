@@ -1,32 +1,99 @@
-#include "c5printreceiptthread.h"
+#include "payment.h"
+#include "ui_payment.h"
+#include "printtaxn.h"
 #include "c5printing.h"
-#include "c5utils.h"
-#include "c5translator.h"
-#include "QRCodeGenerator.h"
-#include <QApplication>
+#include "c5database.h"
+#include "dish.h"
 
-C5PrintReceiptThread::C5PrintReceiptThread(const QStringList &dbParams, const QJsonObject &header, const QJsonArray &body, const QString &printer, QObject *parent) :
-    QThread(parent)
+payment::payment(const QStringList &dbParams) :
+    C5Dialog(dbParams),
+    ui(new Ui::payment)
 {
-    fHeader = header;
-    fBody = body;
-    fPrinter = printer;
-    fDbParams = dbParams;
-    fBill = false;
-    connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
-    connect(this, SIGNAL(startPrint()), this, SLOT(print()));
+    ui->setupUi(this);
+    ui->btnTax->setChecked(__c5config.getRegValue("taxprint").toBool());
+    QFont f(qApp->font());
+    f.setPointSize(f.pointSize() + 3);
+    setFont(f);
 }
 
-void C5PrintReceiptThread::run()
+payment::~payment()
 {
-    emit startPrint();
+    delete ui;
 }
 
-void C5PrintReceiptThread::print()
+void payment::setAmount(double amount)
 {
-    C5Translator __translator;
-    __translator.initTranslator(fDbParams);
-    __translator.setLanguage(fHeader["f_receiptlanguage"].toString().toInt());
+    QStringList cash;
+    cash << "500"
+         << "1000"
+         << "2000"
+         << "5000"
+         << "10000"
+         << "20000";
+    ui->leAmount->setDouble(amount);
+    ui->leCash->setDouble(amount);
+    ui->leChange->setDouble(0);
+}
+
+double payment::cardAmount()
+{
+    return fCardAmount;
+}
+
+double payment::cashAmount()
+{
+    return ui->leAmount->getDouble() - fCardAmount;
+}
+
+void payment::setOrderTable(QTableWidget *t)
+{
+    fOrderTable = t;
+}
+
+void payment::on_btnTax_clicked(bool checked)
+{
+    __c5config.setRegValue("taxprint", checked);
+}
+
+void payment::on_btnCancel_clicked()
+{
+    reject();
+}
+
+void payment::on_leCash_textChanged(const QString &arg1)
+{
+    ui->leChange->setDouble(ui->leAmount->getDouble() - arg1.toDouble());
+}
+
+void payment::on_btnCheckoutCash_clicked()
+{
+    checkout(true);
+}
+
+void payment::on_btnCheckoutCard_clicked()
+{
+    checkout(false);
+}
+
+void payment::checkout(bool cash)
+{
+    fOrderUUID = C5Database::uuid();
+    if (ui->btnTax->isChecked()) {
+        if (!printTax(cash ? 0 : ui->leAmount->getDouble())) {
+            return;
+        }
+    }
+    if (cash) {
+        fCardAmount = ui->leAmount->getDouble();
+    }
+    if (printReceipt()) {
+
+    }
+}
+
+bool payment::printReceipt()
+{
+    C5Database db;
     QFont font(qApp->font());
     font.setPointSize(20);
     C5Printing p;
@@ -36,7 +103,7 @@ void C5PrintReceiptThread::print()
     p.image("./logo_receipt.png", Qt::AlignHCenter);
     p.br();
     p.setFontBold(true);
-    p.ctext(__translator.tt(tr("Receipt #")) + QString("%1%2").arg(fHeader["f_prefix"].toString()).arg(fHeader["f_hallid"].toString()));
+    p.ctext(tr("Receipt #") + QString("%1%2").arg(fHeader["f_prefix"].toString()).arg(fHeader["f_hallid"].toString()));
     p.br();
     if (fHeader["f_otherid"].toString().toInt() == PAYOTHER_SELFCOST) {
         p.setFontSize(24);
@@ -47,25 +114,26 @@ void C5PrintReceiptThread::print()
         p.setFontSize(20);
         p.setFontBold(false);
     }
-    p.setFontBold(false);
-    if (fHeader["f_printtax"].toString().toInt() && !fBill) {
-        p.ltext(fHeader["f_firmname"].toString(), 0);
+    p.setFontBold(false);db[":f_id"] = fOrderUUID;
+    db.exec("select * from o_tax where f_id=:f_id");
+    if (db.nextRow()) {
+        p.ltext(db.getString("f_firmname"), 0);
         p.br();
-        p.ltext(fHeader["f_address"].toString(), 0);
+        p.ltext(db.getString("f_address"), 0);
         p.br();
-        p.ltext(__translator.tt(tr("Department")), 0);
-        p.rtext(fHeader["f_dept"].toString());
+        p.ltext(tr("Department"), 0);
+        p.rtext(db.getString("f_dept"));
         p.br();
-        p.ltext(__translator.tt(tr("Tax number")), 0);
-        p.rtext(fHeader["f_hvhh"].toString());
+        p.ltext(tr("Tax number"), 0);
+        p.rtext(db.getString("f_hvhh"));
         p.br();
-        p.ltext(__translator.tt(tr("Device number")), 0);
-        p.rtext(fHeader["f_devnum"].toString());
+        p.ltext(tr("Device number"), 0);
+        p.rtext(db.getString("f_devnum"));
         p.br();
-        p.ltext(__translator.tt(tr("Serial")), 0);
-        p.rtext(fHeader["f_serial"].toString());
+        p.ltext(tr("Serial"), 0);
+        p.rtext(db.getString("f_serial"));
         p.br();
-        p.ltext(__translator.tt(tr("Fiscal")), 0);
+        p.ltext(tr("Fiscal"), 0);
         p.rtext(fHeader["f_fiscal"].toString());
         p.br();
         p.ltext(__translator.tt(tr("Receipt number")), 0);
@@ -106,7 +174,7 @@ void C5PrintReceiptThread::print()
         p.ltext(QString("%1. %2: %3, %4").arg(nn++).arg(__translator.tt(tr("Class"))).arg(o["f_adgcode"].toString()).arg(o["f_name"].toString()), 0);
 //        p.br();
 //        p.ltext(o["f_name"].toString(), 0);
-//        p.br(); <--- this row fuck
+        p.br();
         QString servPlus;
         QString servValue = float_str(fHeader["f_servicefactor"].toString().toDouble() * 100, 2) + "% ";
         if (fHeader["f_servicemode"].toString().toInt() == SERVICE_AMOUNT_MODE_INCREASE_PRICE) {
@@ -121,10 +189,10 @@ void C5PrintReceiptThread::print()
                     .arg(servPlus).arg(servValue)
                     .arg(float_str(o["f_total"].toString().toDouble(), 2)), 0);
         } else {
-            p.rtext(QString("%1 x %2 = %5")
+            p.ltext(QString("%1 x %2 = %5")
                     .arg(float_str(o["f_qty2"].toString().toDouble(), 2))
                     .arg(float_str(o["f_price"].toString().toDouble(), 2))
-                    .arg(float_str(o["f_total"].toString().toDouble(), 2)));
+                    .arg(float_str(o["f_total"].toString().toDouble(), 2)), 0);
         }
         p.br();
         p.br(2);
@@ -167,6 +235,8 @@ void C5PrintReceiptThread::print()
     p.setFontBold(true);
     p.ltext(__translator.tt(tr("Need to pay")), 0);
     p.rtext(float_str(fHeader["f_amounttotal"].toString().toDouble(), 2));
+    p.br();
+    p.br();
 
     p.line();
     p.br();
@@ -206,6 +276,7 @@ void C5PrintReceiptThread::print()
     }
 
     if (!fBill) {
+        p.br();
         if (fHeader["f_amountcash"].toString().toDouble() > 0.001) {
             p.ltext(__translator.tt(tr("Payment, cash")), 0);
             p.rtext(float_str(fHeader["f_amountcash"].toString().toDouble(), 2));
@@ -227,7 +298,7 @@ void C5PrintReceiptThread::print()
         p.ctext(__translator.tt(tr("Transfer to room")));
         p.br();
         p.ctext(fHeader["f_other_room"].toString() + ", " + fHeader["f_other_guest"].toString());
-        p.br(p.fLineHeight * 3);
+        p.br(p.fLineHeight * 5);
         p.line(3);
         p.ctext(__translator.tt(tr("Signature")));
         p.br(p.fLineHeight * 2);
@@ -244,7 +315,7 @@ void C5PrintReceiptThread::print()
     if (fHeader["f_otherid"].toString().toInt() == PAYOTHER_COMPLIMENTARY) {
         p.br();
         p.ctext(__translator.tt(tr("Complimentary")) + " " + fHeader["f_comment"].toString());
-        p.br(p.fLineHeight * 3);
+        p.br(p.fLineHeight * 5);
         p.line(3);
         p.ctext(__translator.tt(tr("Signature")));
         p.br(p.fLineHeight * 2);
@@ -252,9 +323,52 @@ void C5PrintReceiptThread::print()
 
     p.setFontSize(20);
     p.setFontBold(true);
+    p.br(p.fLineHeight * 3);
     p.ltext(__translator.tt(tr("Thank you for visit!")), 0);
     p.br();
     p.ltext(QString("%1: %2").arg(tr("Sample")).arg(fHeader["f_print"].toString()), 0);
     p.br();
     p.print(fPrinter, QPrinter::Custom);
+}
+
+bool payment::printTax(double cardAmount)
+{
+    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), this);
+    for (int i = 0; i < fOrderTable->rowCount(); i++) {
+        Dish d = fOrderTable->item(i, 0)->data(Qt::UserRole).value<Dish>();
+        pt.addGoods(C5Config::taxDept(), d.adgCode, QString::number(d.id), d.name, d.price, d.qty);
+    }
+    QString jsonIn, jsonOut, err;
+    int result = 0;
+    result = pt.makeJsonAndPrint(cardAmount, 0, jsonIn, jsonOut, err);
+    C5Database db;
+    db[":f_order"] = fOrderUUID;
+    db[":f_date"] = QDate::currentDate();
+    db[":f_time"] = QTime::currentTime();
+    db[":f_in"] = jsonIn;
+    db[":f_out"] = jsonOut;
+    db[":f_err"] = err;
+    db[":f_result"] = result;
+    db.insert("o_tax_log", false);
+    if (result == pt_err_ok) {
+        QString sn, firm, address, fiscal, hvhh, rseq, devnum, time;
+        PrintTaxN::parseResponse(jsonOut, firm, hvhh, fiscal, rseq, sn, address, devnum, time);
+        db[":f_id"] = fOrderUUID;
+        db.exec("delete from o_tax where f_id=:f_id");
+        db[":f_id"] = fOrderUUID;
+        db[":f_dept"] = C5Config::taxDept();
+        db[":f_firmname"] = firm;
+        db[":f_address"] = address;
+        db[":f_devnum"] = devnum;
+        db[":f_serial"] = sn;
+        db[":f_fiscal"] = fiscal;
+        db[":f_receiptnumber"] = rseq;
+        db[":f_hvhh"] = hvhh;
+        db[":f_fiscalmode"] = tr("(F)");
+        db[":f_time"] = time;
+        db.insert("o_tax", false);
+    } else {
+        C5Message::error(err);
+    }
+    return result;
 }

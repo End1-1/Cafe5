@@ -1,5 +1,4 @@
 #include "C5Database.h"
-#include "c5tablewidget.h"
 #include <QMutexLocker>
 #include <QSqlQuery>
 #include <QSqlError>
@@ -285,25 +284,6 @@ bool C5Database::nextRow()
         return true;
     }
     return false;
-}
-
-void C5Database::fetchRowsToTableWidget(C5TableWidget *table)
-{
-    int cols = columnCount();
-    while (nextRow()) {
-        int row = table->addEmptyRow();
-        for (int i = 0; i < cols; i++) {
-            QVariant v = getValue(i);
-            switch (v.type()) {
-            case QVariant::Double:
-                table->setString(row, i, QString::number(v.toDouble(), 'f', 3).remove(QRegExp("(?!\\d[\\.\\,][1-9]+)0+$")).remove(QRegExp("[\\.\\,]$")));
-                break;
-            default:
-                table->setString(row, i, v.toString());
-                break;
-            }
-        }
-    }
 }
 
 bool C5Database::update(const QString &tableName, const QString &whereClause)

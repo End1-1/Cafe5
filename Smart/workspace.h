@@ -3,6 +3,7 @@
 
 #include "c5dialog.h"
 #include "c5user.h"
+#include "dish.h"
 
 namespace Ui {
 class Workspace;
@@ -11,40 +12,23 @@ class Workspace;
 class QTableWidgetItem;
 class QTableWidget;
 
-struct Dish {
-    int id;
-    int typeId;
-    QString name;
-    QString printer;
-    QString adgCode;
-    int store;
-    double price;
-    double qty;
-    int color;
-    Dish() {
-        id = 0;
-        typeId = 0;
-        store = 0;
-        price = 0;
-        qty = 1;
-        color = -1;
-    }
-};
-Q_DECLARE_METATYPE(Dish*)
-Q_DECLARE_METATYPE(Dish)
-
 class Workspace : public C5Dialog
 {
     Q_OBJECT
 
 public:
-    explicit Workspace(const QStringList &dbParams, QWidget *parent = 0);
+    explicit Workspace(const QStringList &dbParams);
 
     ~Workspace();
 
     void login();
 
 private slots:
+    void setQty();
+
+    void changeQty();
+
+    void removeDish();
 
     void on_tblPart2_itemClicked(QTableWidgetItem *item);
 
@@ -54,8 +38,6 @@ private slots:
 
     void on_btnClearFilter_clicked();
 
-    void on_btnVoid_clicked();
-
 private:
     Ui::Workspace *ui;
 
@@ -64,6 +46,10 @@ private:
     QList<Dish*> fDishes;
 
     int fTypeFilter;
+
+    bool currentDish(Dish &d);
+
+    void setCurrentDish(Dish &d);
 
     void filter();
 

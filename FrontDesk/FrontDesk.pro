@@ -32,6 +32,7 @@ DEFINES += FRONTDESK
 
 
 SOURCES += \
+    ../Classes/proxytablewidgetdatabase.cpp \
         main.cpp \
         c5mainwindow.cpp \
     ../Cafe5/c5config.cpp \
@@ -160,6 +161,7 @@ SOURCES += \
     ../../XLSX/src/xlsxwriter.cpp
 
 HEADERS += \
+    ../Classes/proxytablewidgetdatabase.h \
         c5mainwindow.h \
     ../Cafe5/c5config.h \
     ../Cafe5/c5connection.h \

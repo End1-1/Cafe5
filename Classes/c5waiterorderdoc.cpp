@@ -108,6 +108,8 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &fDD, QString &err)
         clcode = fHeader["f_other_clcode"].toString();
         clname = fHeader["f_other_clname"].toString();
         paymentMode = 4;
+        dc = "DEBIT";
+        sign = -1;
     }
 
     if (fHeader["f_amountcard"].toString().toDouble() > 0.001) {

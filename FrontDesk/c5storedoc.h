@@ -97,6 +97,8 @@ private slots:
 
     void printDoc();
 
+    void checkInvoiceDuplicate();
+
     void filterGoodsPanel(int group);
 
     void showHideGoodsList();

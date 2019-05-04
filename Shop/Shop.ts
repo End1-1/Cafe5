@@ -210,6 +210,14 @@
     </message>
 </context>
 <context>
+    <name>C5TableWidget</name>
+    <message>
+        <location filename="../Controls/c5tablewidget.cpp" line="187"/>
+        <source>Empty report</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>PrintTaxN</name>
     <message>
         <location filename="../../NewTax/printtaxn.cpp" line="65"/>

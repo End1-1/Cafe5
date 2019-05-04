@@ -80,6 +80,12 @@ void C5LineEdit::keyPressEvent(QKeyEvent *e)
     QLineEdit::keyPressEvent(e);
 }
 
+void C5LineEdit::focusOutEvent(QFocusEvent *event)
+{
+    QLineEdit::focusOutEvent(event);
+    emit focusOut();
+}
+
 void C5LineEdit::editText(const QString &arg)
 {
     int cursPos = cursorPosition();

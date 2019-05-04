@@ -132,6 +132,7 @@ void C5TableWidget::setData(int row, int column, const QVariant &value)
     C5TableWidgetItem *i = item(row, column);
     if (!i) {
         i = new C5TableWidgetItem();
+        QTableWidget::setItem(row, column, i);
     }
     i->setData(Qt::EditRole, value);
 }

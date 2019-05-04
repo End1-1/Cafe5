@@ -10,7 +10,6 @@
 #define where_id(id) QString("where f_id='%1'").arg(id)
 
 class QSqlQuery;
-class C5TableWidget;
 
 class C5Database : public QObject
 {
@@ -77,8 +76,6 @@ public:
     bool nextRow(QList<QVariant> &row);
 
     bool nextRow();
-
-    void fetchRowsToTableWidget(C5TableWidget *table);
 
     bool update(const QString &tableName, const QString &whereClause);
 

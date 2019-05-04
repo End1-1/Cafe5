@@ -5,6 +5,18 @@
 
 int main(int argc, char *argv[])
 {
+    QApplication a(argc, argv);
+    QStringList args;
+    for (int i = 0; i < argc; i++) {
+        args << argv[i];
+    }
+    if (args.contains("--config")) {
+        C5Connection *c = new C5Connection(QStringList());
+        c->exec();
+        delete c;
+    }
+    QFont f("Arial", 10);
+    qApp->setFont(f);
     QList<QByteArray> connectionParams;
     C5Connection::readParams(connectionParams);
     C5Config::fDBHost = connectionParams.at(0);
@@ -14,7 +26,6 @@ int main(int argc, char *argv[])
     C5Config::fSettingsName = connectionParams.at(4);
     C5Config::initParamsFromDb();
 
-    QApplication a(argc, argv);
     QStringList dbParams;
     dbParams << C5Config::fDBHost
              << C5Config::fDBPath

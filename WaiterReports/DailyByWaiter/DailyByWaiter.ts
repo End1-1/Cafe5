@@ -115,6 +115,14 @@
     </message>
 </context>
 <context>
+    <name>C5TableWidget</name>
+    <message>
+        <location filename="../../Controls/c5tablewidget.cpp" line="187"/>
+        <source>Empty report</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <location filename="dll.cpp" line="8"/>

@@ -31,6 +31,7 @@ DlgPayment::DlgPayment() :
     ui->tblInfo->setString(0, 2, tr("Amount to paid"));
     ui->tblInfo->setSpan(2, 0, 1, ui->tblInfo->columnCount());
     ui->tblInfo->setString(3, 0, tr("Payment"));
+    ui->tblInfo->setString(3, 0, "");
     ui->tblInfo->item(3, 0)->setData(Qt::TextAlignmentRole, Qt::AlignCenter);
     ui->tblInfo->setSpan(3, 0, 1, ui->tblInfo->columnCount());
     ui->wPayOther->setVisible(false);

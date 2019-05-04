@@ -35,6 +35,19 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
+    ../../XLSX/src/xlsx.cpp \
+    ../../XLSX/src/xlsxcell.cpp \
+    ../../XLSX/src/xlsxcontenttype.cpp \
+    ../../XLSX/src/xlsxdocpropsapp.cpp \
+    ../../XLSX/src/xlsxdocpropscore.cpp \
+    ../../XLSX/src/xlsxdocument.cpp \
+    ../../XLSX/src/xlsxrels.cpp \
+    ../../XLSX/src/xlsxsharedstring.cpp \
+    ../../XLSX/src/xlsxsheet.cpp \
+    ../../XLSX/src/xlsxstyles.cpp \
+    ../../XLSX/src/xlsxtheme.cpp \
+    ../../XLSX/src/xlsxworkbook.cpp \
+    ../../XLSX/src/xlsxwriter.cpp \
         main.cpp \
         dlgface.cpp \
     ../Cafe5/c5database.cpp \
@@ -66,7 +79,6 @@ SOURCES += \
     ../Controls/c5combobox.cpp \
     ../Controls/c5dateedit.cpp \
     ../Controls/c5graphicsview.cpp \
-    ../Cafe5/excel.cpp \
     ../Classes/c5cache.cpp \
     ../Classes/c5tablemodel.cpp \
     ../Classes/c5tableview.cpp \
@@ -98,6 +110,22 @@ SOURCES += \
     ../Classes/c5waiterorderdoc.cpp
 
 HEADERS += \
+    ../../XLSX/src/crs32.h \
+    ../../XLSX/src/xlsx.h \
+    ../../XLSX/src/xlsxall.h \
+    ../../XLSX/src/xlsxcell.h \
+    ../../XLSX/src/xlsxcontenttype.h \
+    ../../XLSX/src/xlsxdocpropsapp.h \
+    ../../XLSX/src/xlsxdocpropscore.h \
+    ../../XLSX/src/xlsxdocument.h \
+    ../../XLSX/src/xlsxrels.h \
+    ../../XLSX/src/xlsxsharedstring.h \
+    ../../XLSX/src/xlsxsheet.h \
+    ../../XLSX/src/xlsxstyles.h \
+    ../../XLSX/src/xlsxtheme.h \
+    ../../XLSX/src/xlsxworkbook.h \
+    ../../XLSX/src/xlsxwriter.h \
+    ../../XLSX/src/zip.h \
         dlgface.h \
     ../Cafe5/c5database.h \
     ../Cafe5/c5config.h \
@@ -131,7 +159,6 @@ HEADERS += \
     ../Controls/c5combobox.h \
     ../Controls/c5dateedit.h \
     ../Controls/c5graphicsview.h \
-    ../Cafe5/excel.h \
     ../Classes/c5tablemodel.h \
     ../Classes/c5tableview.h \
     ../Classes/c5printpreview.h \
@@ -193,6 +220,7 @@ INCLUDEPATH += ../../NewTax
 INCLUDEPATH += ../Editors
 INCLUDEPATH += C:/OpenSSL-Win32/include
 INCLUDEPATH += C:/OpenSSL-Win32/include/openssl
+INCLUDEPATH += C:/Projects/XLSX/src
 
 RESOURCES += \
     ../resources/resources.qrc \

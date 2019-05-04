@@ -7,8 +7,8 @@ C5LineEditWithSelector::C5LineEditWithSelector(QWidget *parent) :
     C5LineEdit(parent)
 {
     fCache = 0;
-    fNameLineEdit = 0;
-    fWidget = 0;
+    fNameLineEdit = nullptr;
+    fWidget = nullptr;
 }
 
 C5LineEditWithSelector::~C5LineEditWithSelector()

@@ -2,13 +2,16 @@
 #include "ui_workspace.h"
 #include "c5connection.h"
 #include "dlgpassword.h"
+#include "dishitemdelegate.h"
+#include "payment.h"
 
-Workspace::Workspace(const QStringList &dbParams, QWidget *parent) :
-    C5Dialog(dbParams, parent),
+Workspace::Workspace(const QStringList &dbParams) :
+    C5Dialog(dbParams),
     ui(new Ui::Workspace)
 {
     ui->setupUi(this);
     fTypeFilter = 0;
+    ui->tblOrder->setItemDelegate(new DishItemDelegate());
 }
 
 Workspace::~Workspace()
@@ -75,6 +78,42 @@ void Workspace::login()
     stretchTableColumns(ui->tblDishes);
     stretchTableColumns(ui->tblOrder);
     stretchTableColumns(ui->tblPart2);
+}
+
+void Workspace::setQty()
+{
+    Dish d;
+    if (!currentDish(d)) {
+        return;
+    }
+    QPushButton *b = static_cast<QPushButton*>(sender());
+    d.qty = b->text().toInt();
+    setCurrentDish(d);
+}
+
+void Workspace::changeQty()
+{
+    Dish d;
+    if (!currentDish(d)) {
+        return;
+    }
+    QPushButton *b = static_cast<QPushButton*>(sender());
+    d.qty += b->text().toDouble();
+    setCurrentDish(d);
+}
+
+void Workspace::removeDish()
+{
+    int row = ui->tblOrder->currentRow();
+    if (row < 0) {
+        return;
+    }
+    ui->tblOrder->removeRow(row);
+    row--;
+    if (row > 0) {
+        ui->tblOrder->setCurrentCell(row, 0);
+    }
+    countTotal();
 }
 
 void Workspace::filter()
@@ -155,51 +194,59 @@ void Workspace::on_tblDishes_itemClicked(QTableWidgetItem *item)
 
 void Workspace::on_btnCheckout_clicked()
 {
-    C5Database db(fDBParams);
-    db[":f_prefix"] = C5Config::orderPrefix();
-    db[":f_state"] = ORDER_STATE_CLOSE;
-    db[":f_hall"] = C5Config::defaultHall();
-    db[":f_table"] = C5Config::defaultTable();
-    db[":f_dateOpen"] = QDate::currentDate();
-    db[":f_dateClose"] = QDate::currentDate();
-    db[":f_timeOpen"] = QTime::currentTime();
-    db[":f_timeClose"] = QTime::currentTime();
-    db[":f_dateCash"] = QDate::currentDate();
-    db[":f_staff"] = fUser.fId;
-    db[":f_comment"] = "";
-    db[":f_print"] = 1;
-    db[":f_amounttotal"] = ui->leTotal->getDouble();
-    db[":f_amountcash"] = ui->leTotal->getDouble();
-    db[":f_amountcard"] = 0;
-    db[":f_amountbank"] = 0;
-    db[":f_amountother"] = 0;
-    db[":f_amountservice"] = 0;
-    db[":f_amountdiscount"] = 0;
-    db[":f_servicefactor"] = 0;
-    db[":f_discountfactor"] = 0;
-    int id = db.insert("o_header");
-    for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
-        Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
-        db[":f_header"] = id;
-        db[":f_state"] = DISH_STATE_OK;
-        db[":f_dish"] = d.id;
-        db[":f_qty1"] = d.qty;
-        db[":f_qty2"] = d.qty;
-        db[":f_price"] = d.price;
-        db[":f_service"] = C5Config::serviceFactor().toDouble();
-        db[":f_discount"] = 0;
-        db[":f_total"] = d.qty * d.price;
-        db[":f_store"] = d.store;
-        db[":f_print1"] = d.printer;
-        db[":f_print2"] = "";
-        db[":f_comment"] = "";
-        db[":f_remind"] = 0;
-        db[":f_adgcode"] = d.adgCode;
-        db.insert("o_body", false);
+    if (ui->tblOrder->rowCount() == 0) {
+        return;
     }
-    ui->tblOrder->clear();
-    ui->tblOrder->setRowCount(0);
-    ui->leTotal->setDouble(0);
+    payment *p = new payment(C5Config::dbParams());
+    p->setAmount(ui->leTotal->getDouble());
+    if (p->exec() == QDialog::Accepted) {
+        C5Database db(fDBParams);
+        db[":f_prefix"] = "";
+        db[":f_state"] = ORDER_STATE_CLOSE;
+        db[":f_hall"] = C5Config::defaultHall();
+        db[":f_table"] = C5Config::defaultTable();
+        db[":f_dateOpen"] = QDate::currentDate();
+        db[":f_dateClose"] = QDate::currentDate();
+        db[":f_timeOpen"] = QTime::currentTime();
+        db[":f_timeClose"] = QTime::currentTime();
+        db[":f_dateCash"] = QDate::currentDate();
+        db[":f_staff"] = fUser.fId;
+        db[":f_comment"] = "";
+        db[":f_print"] = 1;
+        db[":f_amounttotal"] = ui->leTotal->getDouble();
+        db[":f_amountcash"] = p->cashAmount();
+        db[":f_amountcard"] = p->cardAmount();
+        db[":f_amountbank"] = 0;
+        db[":f_amountother"] = 0;
+        db[":f_amountservice"] = 0;
+        db[":f_amountdiscount"] = 0;
+        db[":f_servicefactor"] = 0;
+        db[":f_discountfactor"] = 0;
+        int id = db.insert("o_header");
+        for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
+            Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
+            db[":f_header"] = id;
+            db[":f_state"] = DISH_STATE_OK;
+            db[":f_dish"] = d.id;
+            db[":f_qty1"] = d.qty;
+            db[":f_qty2"] = d.qty;
+            db[":f_price"] = d.price;
+            db[":f_service"] = C5Config::serviceFactor().toDouble();
+            db[":f_discount"] = 0;
+            db[":f_total"] = d.qty * d.price;
+            db[":f_store"] = d.store;
+            db[":f_print1"] = d.printer;
+            db[":f_print2"] = "";
+            db[":f_comment"] = "";
+            db[":f_remind"] = 0;
+            db[":f_adgcode"] = d.adgCode;
+            db.insert("o_body", false);
+        }
+        ui->tblOrder->clear();
+        ui->tblOrder->setRowCount(0);
+        ui->leTotal->setDouble(0);
+    }
+    delete p;
 }
 
 void Workspace::on_btnClearFilter_clicked()
@@ -208,16 +255,23 @@ void Workspace::on_btnClearFilter_clicked()
     filter();
 }
 
-void Workspace::on_btnVoid_clicked()
+bool Workspace::currentDish(Dish &d)
 {
-    QModelIndexList ml = ui->tblOrder->selectionModel()->selectedIndexes();
-    if (ml.count() == 0) {
+    int row = ui->tblOrder->currentRow();
+    if (row < 0) {
+        return false;
+    }
+    d = ui->tblOrder->item(row, 0)->data(Qt::UserRole).value<Dish>();
+    return true;
+}
+
+void Workspace::setCurrentDish(Dish &d)
+{
+    int row = ui->tblOrder->currentRow();
+    if (row < 0) {
         return;
     }
-    Dish d = ui->tblOrder->item(ml.at(0).row(), 0)->data(Qt::UserRole).value<Dish>();
-    if (C5Message::question(tr("Confirm to remove") + "<br>" + d.name) != QDialog::Accepted) {
-        return;
-    }
-    ui->tblOrder->removeRow(ml.at(0).row());
+    ui->tblOrder->item(row, 0)->setData(Qt::UserRole, qVariantFromValue<Dish>(d));
+    ui->tblOrder->viewport()->update();
     countTotal();
 }

@@ -33,6 +33,7 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
     ui->tblGoodsGroup->viewport()->installEventFilter(this);
     fGroupTableCell = nullptr;
     fGroupTableCellMove = false;
+    connect(ui->leInvoiceNumber, SIGNAL(focusOut()), this, SLOT(checkInvoiceDuplicate()));
 }
 
 C5StoreDoc::~C5StoreDoc()
@@ -386,6 +387,7 @@ bool C5StoreDoc::save(int state, QString &err)
     db[":f_partner"] = ui->lePartner->getInteger();
     db[":f_amount"] = ui->leTotal->getDouble();
     db[":f_comment"] = ui->leComment->text();
+    db[":f_invoice"] = ui->leInvoiceNumber->text();
     db[":f_raw"] = jd.toJson();
     db.update("a_header", where_id(fInternalId));
 
@@ -869,7 +871,7 @@ void C5StoreDoc::printDoc()
     C5Printing p;
     QList<qreal> points;
     QStringList vals;
-    p.setSceneParams(2000, 2800, QPrinter::Portrait);
+    p.setSceneParams(2000, 2700, QPrinter::Portrait);
 
     p.setFontSize(25);
     p.setFontBold(true);
@@ -979,6 +981,10 @@ void C5StoreDoc::printDoc()
     p.br(p.fLineHeight + 20);
     p.setFontBold(false);
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+        if (p.checkBr(p.fLineHeight + 20)) {
+            p.br(p.fLineHeight + 20);
+            p.br();
+        }
         vals.clear();
         vals << QString::number(i + 1);
         vals << ui->tblGoods->getString(i, 1);
@@ -988,6 +994,9 @@ void C5StoreDoc::printDoc()
         vals << ui->tblGoods->lineEdit(i, 5)->text();
         vals << ui->tblGoods->lineEdit(i, 6)->text();
         p.tableText(points, vals, p.fLineHeight + 20);
+        if (p.checkBr(p.fLineHeight + 20)) {
+            p.br(p.fLineHeight + 20);
+        }
         p.br(p.fLineHeight + 20);
     }
     points.clear();
@@ -1022,6 +1031,20 @@ void C5StoreDoc::printDoc()
 
     C5PrintPreview pp(&p, fDBParams);
     pp.exec();
+}
+
+void C5StoreDoc::checkInvoiceDuplicate()
+{
+    ui->leInvoiceNumber->setStyleSheet("");
+    C5Database db(fDBParams);
+    db[":f_invoice"] = ui->leInvoiceNumber->text();
+    db[":f_id"] = fInternalId;
+    db.exec("select count(f_id) from a_header where f_invoice=:f_invoice and f_id<>:f_id");
+    if (db.nextRow()) {
+        if (db.getInt(0) > 0) {
+            ui->leInvoiceNumber->setStyleSheet("background:red;");
+        }
+    }
 }
 
 void C5StoreDoc::filterGoodsPanel(int group)

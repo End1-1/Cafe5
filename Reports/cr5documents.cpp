@@ -28,6 +28,7 @@ CR5Documents::CR5Documents(const QStringList &dbParams, QWidget *parent) :
                    << "p.f_taxname"
                    << "h.f_amount"
                    << "h.f_comment"
+                   << "h.f_invoice"
                    << "u.f_login as f_operatorname"
                    << "h.f_createdate"
                    << "h.f_createtime"
@@ -43,6 +44,7 @@ CR5Documents::CR5Documents(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_taxname"] = tr("Partner");
     fTranslation["f_amount"] = tr("Amount");
     fTranslation["f_comment"] = tr("Comment");
+    fTranslation["f_invoice"] = tr("Invoice");
     fTranslation["f_operatorname"] = tr("Operator");
     fTranslation["f_createdate"] = tr("Last change date");
     fTranslation["f_createtime"] = tr("Last change time");
@@ -55,6 +57,7 @@ CR5Documents::CR5Documents(const QStringList &dbParams, QWidget *parent) :
     fColumnsVisible["p.f_taxname"] = true;
     fColumnsVisible["h.f_amount"] = true;
     fColumnsVisible["h.f_comment"] = true;
+    fColumnsVisible["h.f_invoice"] = true;
     fColumnsVisible["u.f_login as f_operatorname"] = true;
     fColumnsVisible["h.f_createdate"] = true;
     fColumnsVisible["h.f_createtime"] = true;
