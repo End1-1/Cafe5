@@ -187,19 +187,6 @@
     </message>
 </context>
 <context>
-    <name>PrintTaxN</name>
-    <message>
-        <location filename="../../NewTax/printtaxn.cpp" line="65"/>
-        <source>Socket read error</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../NewTax/printtaxn.cpp" line="73"/>
-        <source>Data read timeout</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>Workspace</name>
     <message>
         <location filename="workspace.ui" line="14"/>

@@ -23,6 +23,7 @@ C5WaiterOrderDoc::C5WaiterOrderDoc(QJsonObject &jh, QJsonArray &jb, C5Database &
     fHeader = jh;
     fItems = jb;
     fSaved = true;
+    getTaxInfo();
 }
 
 C5WaiterOrderDoc::~C5WaiterOrderDoc()
@@ -134,19 +135,19 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &fDD, QString &err)
     fDD[":f_id"] = result;
     fDD[":f_source"] = "PS";
     fDD[":f_res"] = res;
-    fDD[":f_wdate"] = QDate::fromString(fHeader["f_datecash"].toString(), ("dd/MM/yyyy"));
+    fDD[":f_wdate"] = QDate::fromString(hString("f_datecash"), ("dd/MM/yyyy"));
     fDD[":f_rdate"] = QDate::currentDate();
     fDD[":f_time"] = QTime::currentTime();
     fDD[":f_user"] = 1;
-    fDD[":f_room"] = fHeader["f_otherid"].toString().toInt() == PAYOTHER_TRANSFER_TO_ROOM ? room : clcode;
-    fDD[":f_guest"] = fHeader["f_otherid"].toString().toInt() == PAYOTHER_TRANSFER_TO_ROOM ? guest : clname + ", " + fHeader["f_prefix"].toString() + fHeader["f_hallid"].toString();
+    fDD[":f_room"] = hInt("f_otherid") == PAYOTHER_TRANSFER_TO_ROOM ? room : clcode;
+    fDD[":f_guest"] = hInt("f_otherid") == PAYOTHER_TRANSFER_TO_ROOM ? guest : clname + ", " + hString("f_prefix") + hString("f_hallid");
     fDD[":f_itemCode"] = item;
-    fDD[":f_finalName"] = itemName + " " + fHeader["f_prefix"].toString() + fHeader["f_hallid"].toString();
-    fDD[":f_amountAmd"] = fHeader["f_amounttotal"].toString();
+    fDD[":f_finalName"] = itemName + " " + hString("f_prefix") + hString("f_hallid");
+    fDD[":f_amountAmd"] = hDouble("f_amounttotal");
     fDD[":f_usedPrepaid"] = 0;
-    fDD[":f_amountVat"] = fHeader["f_amounttotal"].toDouble() / 1.1;
+    fDD[":f_amountVat"] = hDouble("f_amounttotal") - (hDouble("f_amounttotal") / 1.2);
     fDD[":f_amountUsd"] = 0;
-    fDD[":f_fiscal"] = 0;
+    fDD[":f_fiscal"] = fTax["f_receiptnumber"].toString().toInt();
     fDD[":f_paymentMode"] = paymentMode;
     fDD[":f_creditCard"] = 0;
     fDD[":f_cityLedger"] = clcode.toInt();
@@ -156,6 +157,7 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &fDD, QString &err)
     fDD[":f_doc"] = "";
     fDD[":f_rec"] = "";
     fDD[":f_inv"] = inv;
+    fDD[":f_vatmode"] = 1;
     fDD[":f_finance"] = 1;
     fDD[":f_remarks"] = "";
     fDD[":f_canceled"] = 0;
@@ -171,22 +173,22 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &fDD, QString &err)
 
     fDD[":f_id"] = result;
     fDD[":f_state"] = 2;
-    fDD[":f_hall"] = fHeader["f_hall"].toString().toInt();
-    fDD[":f_table"] = fHeader["f_table"].toString().toInt();
+    fDD[":f_hall"] = hInt("f_hall");
+    fDD[":f_table"] = hInt("f_table");
     fDD[":f_staff"] = 1;
-    fDD[":f_dateopen"] = QDateTime::fromString(fHeader["f_dateopen"].toString() + " " + fHeader["f_timeopen"].toString(), "dd/MM/yyyy HH:mm:ss");
-    fDD[":f_dateclose"] = QDateTime::fromString(fHeader["f_dateclose"].toString() + " " + fHeader["f_timeclose"].toString(), "dd/MM/yyyy HH:mm:ss");
-    fDD[":f_datecash"] = QDate::fromString(fHeader["f_datecash"].toString(), ("dd/MM/yyyy"));
+    fDD[":f_dateopen"] = QDateTime::fromString(hString("f_dateopen") + " " + hString("f_timeopen"), "dd/MM/yyyy HH:mm:ss");
+    fDD[":f_dateclose"] = QDateTime::fromString(hString("f_dateclose") + " " + hString("f_timeclose"), "dd/MM/yyyy HH:mm:ss");
+    fDD[":f_datecash"] = QDate::fromString(hString("f_datecash"), ("dd/MM/yyyy"));
     fDD[":f_comment"] = "";
     fDD[":f_paymentModeComment"] = hInt("f_otherid") == PAYOTHER_TRANSFER_TO_ROOM ? QString("%1, %2").arg(room).arg(guest) : "";
     fDD[":f_paymentMode"] = paymentMode;
     fDD[":f_cityLedger"] = clcode.toInt();
     fDD[":f_reservation"] = res;
     fDD[":f_complex"] = 0;
-    fDD[":f_print"] = fHeader["f_print"].toString().toInt();
-    fDD[":f_tax"] = 0;
+    fDD[":f_print"] = hInt("f_print");
+    fDD[":f_tax"] = fTax["f_receiptnumber"].toString().toInt();
     fDD[":f_roomComment"] = "";
-    fDD[":f_total"] = fHeader["f_total"].toString().toDouble();
+    fDD[":f_total"] = hDouble("f_total");
     if (!fDD.insert("o_header", false)) {
         err = "Cannot insert into o_header<br>" + fDD.fLastError;
         fDD.rollback();
@@ -236,6 +238,18 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &fDD, QString &err)
             fDD.exec("update o_dish set f_total=f_qty * f_price where f_header=:f_header");
         }
     }
+    fDD[":f_comp"] = QHostInfo::localHostName().toUpper();
+    fDD[":f_date"] = QDate::currentDate();
+    fDD[":f_time"] = QTime::currentTime();
+    fDD[":f_user"] = 1;
+    fDD[":f_type"] = 23;
+    fDD[":f_rec"] = hString("f_prefix") + hString("f_hallid");
+    fDD[":f_invoice"] = inv;
+    fDD[":f_reservation"] = res;
+    fDD[":f_action"] = "IMPORT FROM WAITER";
+    fDD[":f_value1"] = hString("f_prefix") + hString("f_hallid");
+    fDD[":f_value2"] = hString("f_amounttotal");
+    fDD.insert("airlog.log", false);
     fDD.commit();
     return true;
 }
@@ -456,7 +470,7 @@ double C5WaiterOrderDoc::countPreTotalV2()
 
 void C5WaiterOrderDoc::open()
 {
-    fDb[":f_id"] = fHeader["f_id"].toString();
+    fDb[":f_id"] = hString("f_id");
     fDb.exec("select h.f_name as f_hallname, t.f_name as f_tableName, concat(s.f_last, ' ', s.f_first) as f_staffname, \
         o.* \
         from o_header o \
@@ -481,6 +495,7 @@ void C5WaiterOrderDoc::open()
             }
         }
     }
+    getTaxInfo();
     fDb[":f_header"] = fHeader["f_id"].toString();
     fDb.exec("select ob.f_id, ob.f_header, ob.f_state, dp1.f_name as part1, dp2.f_name as part2, ob.f_adgcode, d.f_name as f_name, \
                          ob.f_qty1, ob.f_qty2, ob.f_price, ob.f_service, ob.f_discount, ob.f_total, \
@@ -521,6 +536,17 @@ void C5WaiterOrderDoc::open()
     if (fDb.nextRow()) {
         fHeader["f_other_clcode"] = fDb.getString("f_code");
         fHeader["f_other_clname"] = fDb.getString("f_name");
+    }
+}
+
+void C5WaiterOrderDoc::getTaxInfo()
+{
+    fDb[":f_id"] = hString("f_id");
+    fDb.exec("select * from o_tax where f_id=:f_id");
+    if (fDb.nextRow()) {
+        for (int i = 0; i < fDb.columnCount(); i++) {
+            fTax[fDb.columnName(i)] = fDb.getString(i);
+        }
     }
 }
 

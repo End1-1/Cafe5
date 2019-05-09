@@ -14,6 +14,9 @@ public:
 
 protected slots:
     virtual void tblDoubleClicked(int row, int column, const QList<QVariant> &values);
+
+protected:
+    void restoreColumnsWidths();
 };
 
 #endif // CR5GOODSMOVEMENT_H

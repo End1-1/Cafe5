@@ -12,7 +12,7 @@ DlgGuest::DlgGuest() :
     db.exec("select r.f_id, r.f_invoice, r.f_room, g.guest "
             "from f_reservation r "
             "left join guests g on g.f_id=r.f_guest "
-            "where r.f_state=1");
+            "where r.f_state=1 order by r.f_room ");
     while (db.nextRow()) {
         int row = ui->tblGuest->addEmptyRow();
         ui->tblGuest->setString(row, 0, db.getString(1));

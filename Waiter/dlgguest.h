@@ -27,6 +27,7 @@ private slots:
     void searchGuest(const QString &txt);
 
     void kbdAccept();
+
     void on_tblGuest_doubleClicked(const QModelIndex &index);
 };
 

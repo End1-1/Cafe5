@@ -274,37 +274,17 @@
        <string>Reports</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_6">
-       <item row="3" column="0">
-        <widget class="C5CheckBox" name="checkBox_19">
-         <property name="text">
-          <string>Sales, expert mode</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>301</number>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="C5CheckBox" name="chREportsAllItems">
-         <property name="text">
-          <string>All items</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>300</number>
-         </property>
-        </widget>
-       </item>
        <item row="5" column="0">
-        <widget class="C5CheckBox" name="checkBox_25">
+        <widget class="C5CheckBox" name="checkBox_22">
          <property name="text">
-          <string>T-store extra</string>
+          <string>Storage</string>
          </property>
          <property name="Tag" stdset="0">
-          <number>305</number>
+          <number>303</number>
          </property>
         </widget>
        </item>
-       <item row="7" column="1">
+       <item row="8" column="1">
         <spacer name="verticalSpacer_6">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -317,13 +297,53 @@
          </property>
         </spacer>
        </item>
-       <item row="4" column="0">
-        <widget class="C5CheckBox" name="checkBox_22">
+       <item row="0" column="0">
+        <widget class="C5CheckBox" name="chREportsAllItems">
          <property name="text">
-          <string>Storage</string>
+          <string>All items</string>
          </property>
          <property name="Tag" stdset="0">
-          <number>303</number>
+          <number>300</number>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0">
+        <widget class="C5CheckBox" name="checkBox_31">
+         <property name="text">
+          <string>Sales from store</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>306</number>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="C5CheckBox" name="checkBox_19">
+         <property name="text">
+          <string>Sales, expert mode</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>301</number>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0">
+        <widget class="C5CheckBox" name="checkBox_25">
+         <property name="text">
+          <string>T-store extra</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>305</number>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="C5CheckBox" name="checkBox_27">
+         <property name="text">
+          <string>Documents in the store</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>307</number>
          </property>
         </widget>
        </item>
@@ -337,23 +357,13 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="0">
-        <widget class="C5CheckBox" name="checkBox_31">
+       <item row="3" column="0">
+        <widget class="C5CheckBox" name="checkBox_40">
          <property name="text">
-          <string>Sales from store</string>
+          <string>Goods movement</string>
          </property>
          <property name="Tag" stdset="0">
-          <number>306</number>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="C5CheckBox" name="checkBox_27">
-         <property name="text">
-          <string>Documents in the store</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>307</number>
+          <number>304</number>
          </property>
         </widget>
        </item>

@@ -71,7 +71,7 @@ SOURCES += \
     ../Classes/c5printservicethread.cpp \
     dlgpayment.cpp \
     ../Classes/QRCodeGenerator.cpp \
-    ../../NewTax/printtaxn.cpp \
+    ../../NewTax/Src/printtaxn.cpp \
     ../Controls/c5lineedit.cpp \
     ../Classes/c5printremovedservicethread.cpp \
     ../Controls/c5tablewidget.cpp \
@@ -149,7 +149,7 @@ HEADERS += \
     ../Classes/c5printservicethread.h \
     dlgpayment.h \
     ../Classes/QRCodeGenerator.h \
-    ../../NewTax/printtaxn.h \
+    ../../NewTax/Src/printtaxn.h \
     ../Controls/c5lineedit.h \
     ../Classes/c5printremovedservicethread.h \
     rc.h \
@@ -216,7 +216,7 @@ FORMS += \
 INCLUDEPATH += ../Cafe5
 INCLUDEPATH += ../Classes
 INCLUDEPATH += ../Controls
-INCLUDEPATH += ../../NewTax
+INCLUDEPATH += C:/Projects/NewTax/Src
 INCLUDEPATH += ../Editors
 INCLUDEPATH += C:/OpenSSL-Win32/include
 INCLUDEPATH += C:/OpenSSL-Win32/include/openssl

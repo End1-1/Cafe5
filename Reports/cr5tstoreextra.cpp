@@ -26,6 +26,19 @@ CR5TStoreExtra::CR5TStoreExtra(const QStringList &dbParams, QWidget *parent) :
     fColumnNameIndex["f_qtydif"] = 12;
     fColumnNameIndex["f_sumdif"] = 13;
 
+    fColumnsSum << "f_qtybegin"
+                << "f_sumbegin"
+                << "f_qtyin"
+                << "f_sumin"
+                << "f_qtyout"
+                << "f_sumout"
+                << "f_qtymust"
+                << "f_summust"
+                << "f_qtyinv"
+                << "f_suminv"
+                << "f_qtydif"
+                << "f_sumdif";
+
     fTranslation["f_goodsid"] = tr("Goods code");
     fTranslation["f_goodsname"] = tr("Goods name");
     fTranslation["f_qtybegin"] = tr("Qty, begin");
@@ -176,6 +189,7 @@ void CR5TStoreExtra::buildQuery()
 
     fModel->setExternalData(fColumnNameIndex, fTranslation);
     restoreColumnsWidths();
+    sumColumnsData();
 }
 
 void CR5TStoreExtra::refreshData()

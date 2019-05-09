@@ -20,7 +20,8 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
                     << "inner join a_header a on a.f_id=s.f_document [a]"
                        ;
 
-    fColumnsFields << "a.f_document"
+    fColumnsFields << "s.f_document"
+                   << "a.f_userid"
                    << "a.f_date"
                    << "s.f_userid"
                    << "ss.f_name as f_store"
@@ -34,6 +35,7 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
                       ;
 
     fColumnsGroup << "s.f_document"
+                  << "a.f_userid"
                   << "a.f_date"
                   << "s.f_userid"
                   << "st.f_name as f_type"
@@ -63,7 +65,7 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
 
     fColumnsVisible["a.f_date"] = true;
     fColumnsVisible["a.f_userid"] = true;
-    fColumnsVisible["s.f_document"] = true;
+    fColumnsVisible["s.f_document"] = false;
     fColumnsVisible["st.f_name as f_type"] = true;
     fColumnsVisible["ss.f_name as f_store"] = true;
     fColumnsVisible["gg.f_name as f_group"] = true;
@@ -103,5 +105,14 @@ void CR5GoodsMovement::tblDoubleClicked(int row, int column, const QList<QVarian
     C5StoreDoc *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);
     if (!sd->openDoc(values.at(fModel->indexForColumnName("f_document")).toString())) {
         __mainWindow->removeTab(sd);
+    }
+}
+
+void CR5GoodsMovement::restoreColumnsWidths()
+{
+    C5ReportWidget::restoreColumnsWidths();
+    int idx = fModel->indexForColumnName("f_document");
+    if (idx != -1) {
+        fTableView->setColumnWidth(idx, 0);
     }
 }

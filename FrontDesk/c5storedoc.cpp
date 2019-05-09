@@ -86,6 +86,7 @@ bool C5StoreDoc::openDoc(QString id)
         ui->tblGoods->lineEdit(row, 6)->setDouble(db.getDouble(6));
     }
     setDocEnabled(fDocState == DOC_STATE_DRAFT);
+    countTotal();
     return true;
 }
 
@@ -524,7 +525,7 @@ bool C5StoreDoc::writeOutput(const QDate &date, QString docNum, int store, doubl
                         ui->tblGoods->lineEdit(i, 5)->setDouble(ui->tblGoods->lineEdit(i, 6)->getDouble() / ui->tblGoods->lineEdit(i, 3)->getDouble());
                         qty = 0;
                     } else {
-                        dbdoc[":f_base"] = storeData.at(j).at(0).toInt();
+                        dbdoc[":f_base"] = storeData.at(j).at(0).toString();
                         dbdoc.exec("select f_document from a_store where f_base=:f_base and f_type=1");
                         dbdoc.nextRow();
                         QMap<QString, QVariant> newrec;
@@ -724,6 +725,7 @@ void C5StoreDoc::setGoodsPanelHidden(bool v)
         }
         ui->tblGoodsGroup->fitColumnsToWidth(45);
         ui->tblGoodsStore->fitColumnsToWidth(45);
+        markGoodsComplited();
     }
     if (lst.count() > 0) {
         ui->tblGoodsGroup->selectionModel()->setCurrentIndex(lst.at(0), QItemSelectionModel::Select);

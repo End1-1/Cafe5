@@ -124,7 +124,7 @@ void CR5Documents::tblDoubleClicked(int row, int column, const QList<QVariant> &
     openDoc(values.at(fModel->indexForColumnName("f_id")).toString());
 }
 
-void CR5Documents::callEditor(QString id)
+void CR5Documents::callEditor(const QString &id)
 {
     openDoc(id);
 }
@@ -333,7 +333,7 @@ void CR5Documents::copySelectedDocs()
     C5Database db1(fDBParams);
     C5Database db2(fDBParams);
     foreach (int r, rows) {
-        int id = fModel->data(r, fModel->indexForColumnName("f_id"), Qt::EditRole).toInt();
+        QString id = fModel->data(r, fModel->indexForColumnName("f_id"), Qt::EditRole).toString();
         db1[":f_id"] = id;
         db1.exec("select * from a_header where f_id=:f_id");
         if (!db1.nextRow()) {
@@ -359,9 +359,11 @@ void CR5Documents::copySelectedDocs()
         db1.exec(QString("select * from %1 where f_document=:f_document").arg(tableName));
         while (db1.nextRow()) {
             db2.setBindValues(db1.getBindValues());
-            db2.removeBindValue(":f_id");
+            db2[":f_id"] = C5Database::uuid();
             db2[":f_document"] = newDocId;
-            db2.insert(tableName, false);
+            if (!db2.insert(tableName, false)) {
+                C5Message::error(db2.fLastError);
+            }
         }
         openDoc(newDocId);
     }

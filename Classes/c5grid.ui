@@ -78,6 +78,9 @@
          <property name="editTriggers">
           <set>QAbstractItemView::NoEditTriggers</set>
          </property>
+         <property name="wordWrap">
+          <bool>false</bool>
+         </property>
         </widget>
        </item>
        <item>

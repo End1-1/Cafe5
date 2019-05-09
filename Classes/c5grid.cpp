@@ -218,7 +218,7 @@ void C5Grid::cellClicked(const QModelIndex &index)
     Q_UNUSED(index);
 }
 
-void C5Grid::callEditor(int id)
+void C5Grid::callEditor(const QString &id)
 {
     Q_UNUSED(id);
 }
@@ -238,7 +238,8 @@ void C5Grid::sumColumnsData()
     fModel->sumForColumns(fColumnsSum, values);
     for (QMap<QString, double>::const_iterator it = values.begin(); it != values.end(); it++) {
         int idx = fModel->indexForColumnName(it.key());
-        ui->tblTotal->setData(0, idx, it.value());
+        double value = it.value();
+        ui->tblTotal->setData(0, idx, value);
     }
     QStringList vheader;
     vheader << QString::number(fModel->rowCount());
@@ -482,7 +483,7 @@ void C5Grid::editRow(int columnWidthId)
         return;
     }
     row = ml.at(0).row();
-    callEditor(fModel->data(row, columnWidthId, Qt::EditRole).toInt());
+    callEditor(fModel->data(row, columnWidthId, Qt::EditRole).toString());
 }
 
 void C5Grid::removeRow(int columnWithId)
@@ -560,6 +561,41 @@ void C5Grid::print()
             }
             //last vertical line
             p.line(columnsWidth, p.fTop, columnsWidth, p.fTop + (fTableView->rowHeight(r) / rowScaleFactor));
+            if (ui->tblTotal->isVisible() && r == fModel->rowCount() - 1) {
+                p.setFontBold(true);
+                if (p.checkBr(ui->tblTotal->rowHeight(0))) {
+                    p.line(0, p.fTop + (ui->tblTotal->rowHeight(0) / rowScaleFactor), columnsWidth, p.fTop + (ui->tblTotal->rowHeight(0) / rowScaleFactor));\
+                    p.br();
+                    stopped = startFrom >= fModel->rowCount() - 1;
+                    p.fTop = p.fNormalHeight - p.fLineHeight;
+                    p.ltext(QString("%1 %2, %3 %4, %5/%6")
+                            .arg("Page")
+                            .arg(page + 1)
+                            .arg(tr("Printed"))
+                            .arg(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR2))
+                            .arg(hostinfo)
+                            .arg(hostusername()), 0);
+                    p.rtext(fDBParams.at(1));
+                    page++;
+                } else {
+                    p.br();
+                }
+                p.line(0, p.fTop, columnsWidth, p.fTop);
+                p.line(0, p.fTop + (ui->tblTotal->rowHeight(0) / rowScaleFactor), columnsWidth, p.fTop + (ui->tblTotal->rowHeight(0) / rowScaleFactor));\
+                for (int c = 0; c < fModel->columnCount(); c++) {
+                    if (fTableView->columnWidth(c) == 0) {
+                        continue;
+                    }
+                    if (c > 0) {
+                        p.ltext(ui->tblTotal->getString(0, c), (sumOfColumnsWidghtBefore(c) / scaleFactor) + 1);
+                        p.line(sumOfColumnsWidghtBefore(c) / scaleFactor, p.fTop, sumOfColumnsWidghtBefore(c) / scaleFactor, p.fTop + (fTableView->verticalHeader()->defaultSectionSize() / rowScaleFactor));
+                    } else {
+                        p.ltext(ui->tblTotal->getString(0, c), 1);
+                        p.line(0, p.fTop, 0, p.fTop + (fTableView->verticalHeader()->defaultSectionSize() / rowScaleFactor));
+                    }
+                }
+                p.line(columnsWidth, p.fTop, columnsWidth, p.fTop + (ui->tblTotal->rowHeight(0) / rowScaleFactor));
+            }
             if (p.checkBr(p.fLineHeight * 4) || r >= fModel->rowCount() - 1) {
                 p.line(0, p.fTop + (fTableView->rowHeight(r) / rowScaleFactor), columnsWidth, p.fTop + (fTableView->rowHeight(r) / rowScaleFactor));\
                 p.br();
@@ -577,7 +613,9 @@ void C5Grid::print()
                 if (r < fModel->rowCount() - 1) {
                     p.br(p.fLineHeight * 4);
                 }
-                page++;
+                if (r < fModel->rowCount() - 1) {
+                    page++;
+                }
                 break;
             } else {
                 p.br();

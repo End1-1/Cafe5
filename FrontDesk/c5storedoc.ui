@@ -592,6 +592,9 @@
         <property name="contextMenuPolicy">
          <enum>Qt::CustomContextMenu</enum>
         </property>
+        <property name="styleSheet">
+         <string notr="true">QTableWidget::item{ selection-background-color:rgb(50,150,200);}</string>
+        </property>
         <property name="editTriggers">
          <set>QAbstractItemView::NoEditTriggers</set>
         </property>

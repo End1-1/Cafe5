@@ -30,6 +30,8 @@ public:
 
     QJsonObject fHeader;
 
+    QJsonObject fTax;
+
     QJsonArray fItems;
 
     int hInt(const QString &name);
@@ -68,6 +70,8 @@ private:
     bool fSaved;
 
     void open();
+
+    void getTaxInfo();
 
     void countTotalV1();
 

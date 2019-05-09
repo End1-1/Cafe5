@@ -95,7 +95,7 @@ protected:
 
     virtual void cellClicked(const QModelIndex &index);
 
-    virtual void callEditor(int id);
+    virtual void callEditor(const QString &id);
 
     virtual void removeWithId(int id, int row);
 

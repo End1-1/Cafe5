@@ -218,19 +218,6 @@
     </message>
 </context>
 <context>
-    <name>PrintTaxN</name>
-    <message>
-        <location filename="../../NewTax/printtaxn.cpp" line="65"/>
-        <source>Socket read error</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../NewTax/printtaxn.cpp" line="73"/>
-        <source>Data read timeout</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>WOrder</name>
     <message>
         <location filename="worder.ui" line="14"/>

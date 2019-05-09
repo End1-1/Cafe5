@@ -20,7 +20,7 @@ protected:
 protected slots:
     virtual void tblDoubleClicked(int row, int column, const QList<QVariant> &values);
 
-    virtual void callEditor(QString id);
+    virtual void callEditor(const QString &id);
 
 private:
     void openDoc(QString id);
