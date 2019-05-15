@@ -107,11 +107,11 @@ void CR5TStoreExtra::buildQuery()
     //begin
     db[":f_store"] = f->store();
     db[":f_date"] = f->dateStart();
-    db.exec("select s.f_base, s.f_goods, sum(s.f_qty*s.f_type) as f_qty, sum(s.f_total*s.f_type) as f_amount "
+    db.exec("select s.f_goods, sum(s.f_qty*s.f_type) as f_qty, sum(s.f_total*s.f_type) as f_amount "
               "from a_store s "
               "inner join a_header d on d.f_id=s.f_document "
               "where s.f_store=:f_store and d.f_date<:f_date "
-              "group by 1, 2 "
+              "group by 1  "
               "having sum(s.f_qty*s.f_type) > 0.001 ");
     while (db.nextRow()) {
         int row = goodsRowMap[db.getInt("f_goods")];

@@ -792,7 +792,19 @@ bool C5WaiterServer::printReceipt(QJsonObject &jh, QJsonArray &jb, QString &err,
         srh.fDb.update("o_header", where_id(jh["f_id"].toString()));
         jh["f_idramid"] = C5Config::idramID();
         jh["f_idramphone"] = C5Config::idramPhone();
-        C5PrintReceiptThread *pr = new C5PrintReceiptThread(C5Config::dbParams(), jh, jb, C5Config::localReceiptPrinter());
+        C5Database db(C5Config::dbParams());
+        QString printerName = "local";
+        db[":f_name"] = jh["receipt_printer"].toString();
+        db.exec("select f_id from s_settings_names where lower(f_name)=lower(:f_name)");
+        if (db.nextRow()) {
+            db[":f_settings"] = db.getInt(0);
+            db[":f_key"] = param_local_receipt_printer;
+            db.exec("select f_value from s_settings_values where f_settings=:f_settings and f_key=:f_key");
+            if (db.nextRow()) {
+                printerName = db.getString(0);
+            }
+        }
+        C5PrintReceiptThread *pr = new C5PrintReceiptThread(C5Config::dbParams(), jh, jb, printerName);
         pr->start();
     }
     return err.isEmpty();

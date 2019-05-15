@@ -266,6 +266,7 @@ void DlgPayment::on_btnReceipt_clicked()
     QJsonObject o;
     fOrder->hSetInt("f_receiptlanguage", C5Config::getRegValue("receipt_language").toInt());
     fOrder->hSetString("f_printtax", ui->btnTax->isChecked() ? "1" : "0");
+    fOrder->hSetString("receipt_printer",  C5Config::fSettingsName);
     o["header"] = fOrder->fHeader;
     o["body"] = fOrder->fItems;
     sh->send(o);
