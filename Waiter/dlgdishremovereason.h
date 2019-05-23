@@ -19,6 +19,10 @@ public:
     static bool getReason(QString &reason, int &state);
 
 private slots:
+    void kbdAccept();
+
+    void textChanged(const QString &text);
+
     void on_lst_clicked(const QModelIndex &index);
 
     void on_btnMistake_clicked();

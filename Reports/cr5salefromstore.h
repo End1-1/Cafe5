@@ -12,7 +12,7 @@ class CR5SaleFromStore : public C5ReportWidget
 public:
     CR5SaleFromStore(const QStringList &dbParams, QWidget *parent = nullptr);
 
-    QToolBar *toolBar();
+    virtual QToolBar *toolBar();
 
     virtual void restoreColumnsWidths();
 

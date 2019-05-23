@@ -30,7 +30,7 @@ void C5PrintReceiptThread::print()
     QFont font(qApp->font());
     font.setPointSize(20);
     C5Printing p;
-    p.setSceneParams(600, 2800, QPrinter::Portrait);
+    p.setSceneParams(650, 2800, QPrinter::Portrait);
     p.setFont(font);
 
     p.image("./logo_receipt.png", Qt::AlignHCenter);

@@ -73,6 +73,11 @@ void RKeyboard::setText(const QString &text)
     fText = text;
 }
 
+QString RKeyboard::text() const
+{
+    return ui->leResult->text();
+}
+
 void RKeyboard::btnTextClicked()
 {
     QPushButton *b = static_cast<QPushButton*>(sender());

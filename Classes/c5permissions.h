@@ -30,6 +30,7 @@
 #define cp_t3_tstore_extra 305
 #define cp_t3_store_sale 306
 #define cp_t3_documents_store 307
+#define cp_t3_sale_removed_dishes 308
 
 #define cp_t4_menu 400
 #define cp_t4_menu_names 401
@@ -39,11 +40,16 @@
 #define cp_t4_dish_remove_reason 405
 #define cp_t4_dish_comments 406
 #define cp_t4_dish_price_self_cost 407
+#define cp_t4_menu_review 408
 
 #define cp_t5_waiter 500
 #define cp_t5_multiple_receipt 501
 #define cp_t5_remove_printed_service 502
 #define cp_t5_change_service_value 503
+#define cp_t5_pay_transfer_to_room 504
+#define cp_t5_pay_complimentary 505
+#define cp_t5_pay_breakfast 506
+#define cp_t5_pay_cityledger 507
 
 #define cp_t6_goods_menu 600
 #define cp_t6_units 601

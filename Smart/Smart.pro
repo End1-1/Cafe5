@@ -25,8 +25,10 @@ DEFINES += WAITER
 
 
 SOURCES += \
-    ../../NewTax/printtaxn.cpp \
+    ../../NewTax/Src/printtaxn.cpp \
+    ../Classes/c5printing.cpp \
     dishitemdelegate.cpp \
+    dishtableitemdelegate.cpp \
         main.cpp \
     payment.cpp \
         workspace.cpp \
@@ -42,9 +44,11 @@ SOURCES += \
     ../Classes/c5user.cpp
 
 HEADERS += \
-    ../../NewTax/printtaxn.h \
+    ../../NewTax/Src/printtaxn.h \
+    ../Classes/c5printing.h \
     dish.h \
     dishitemdelegate.h \
+    dishtableitemdelegate.h \
     payment.h \
         workspace.h \
     ../Cafe5/c5config.h \
@@ -77,7 +81,7 @@ INCLUDEPATH += c:/projects/cafe5/Cafe5
 INCLUDEPATH += c:/projects/cafe5/Classes
 INCLUDEPATH += c:/projects/cafe5/Controls
 INCLUDEPATH += c:/projects/cafe5/Waiter
-INCLUDEPATH += c:/Projects/NewTax
+INCLUDEPATH += c:/Projects/NewTax/Src
 INCLUDEPATH += C:/OpenSSL-Win32/include
 INCLUDEPATH += C:/OpenSSL-Win32/include/openssl
 

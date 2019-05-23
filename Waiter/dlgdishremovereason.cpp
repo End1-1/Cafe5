@@ -25,6 +25,9 @@ DlgDishRemoveReason::DlgDishRemoveReason(QWidget *parent) :
     item->setText("Cancel");
     item->setIcon(QIcon(":/cancel.png"));
     ui->lst->addItem(item);
+    connect(ui->kbd, SIGNAL(accept()), this, SLOT(kbdAccept()));
+    connect(ui->kbd, SIGNAL(textChanged(QString)), this, SLOT(textChanged(QString)));
+    connect(ui->kbd, SIGNAL(reject()), this, SLOT(reject()));
 }
 
 DlgDishRemoveReason::~DlgDishRemoveReason()
@@ -44,6 +47,20 @@ bool DlgDishRemoveReason::getReason(QString &reason, int &state)
     return result;
 }
 
+void DlgDishRemoveReason::kbdAccept()
+{
+    if (ui->kbd->text().isEmpty()) {
+        return;
+    }
+    fName = ui->kbd->text();
+}
+
+void DlgDishRemoveReason::textChanged(const QString &text)
+{
+    Q_UNUSED(text);
+    ui->lst->setCurrentRow(-1);
+}
+
 void DlgDishRemoveReason::on_lst_clicked(const QModelIndex &index)
 {
     if (!index.isValid()) {
@@ -58,9 +75,12 @@ void DlgDishRemoveReason::on_lst_clicked(const QModelIndex &index)
 
 void DlgDishRemoveReason::on_btnMistake_clicked()
 {
-    if (ui->lst->currentRow() < 0) {
+    if (ui->lst->currentRow() < 0 && ui->kbd->text().isEmpty()) {
         C5Message::error(tr("Reason is not selected"));
         return;
+    }
+    if (ui->lst->currentRow() < 0) {
+        fName = ui->kbd->text();
     }
     fState = DISH_STATE_MISTAKE;
     accept();
@@ -68,9 +88,12 @@ void DlgDishRemoveReason::on_btnMistake_clicked()
 
 void DlgDishRemoveReason::on_btnVoid_clicked()
 {
-    if (ui->lst->currentRow() < 0) {
+    if (ui->lst->currentRow() < 0 && ui->kbd->text().isEmpty()) {
         C5Message::error(tr("Reason is not selected"));
         return;
+    }
+    if (ui->lst->currentRow() < 0) {
+        fName = ui->kbd->text();
     }
     fState = DISH_STATE_VOID;
     accept();

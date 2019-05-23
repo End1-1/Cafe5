@@ -50,5 +50,7 @@
         <file>update.png</file>
         <file>order.png</file>
         <file>app.png</file>
+        <file>eye.png</file>
+        <file>eye-no.png</file>
     </qresource>
 </RCC>

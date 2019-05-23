@@ -11,6 +11,8 @@ namespace Ui {
 class DlgPayment;
 }
 
+class C5User;
+
 class DlgPayment : public C5Dialog
 {
     Q_OBJECT
@@ -20,7 +22,7 @@ public:
 
     ~DlgPayment();
 
-    static int payment(C5WaiterOrderDoc *order);
+    static int payment(C5User *user, C5WaiterOrderDoc *order);
 
 private slots:
     void handleReceipt(const QJsonObject &obj);
@@ -69,6 +71,8 @@ private:
     Ui::DlgPayment *ui;
 
     C5WaiterOrderDoc *fOrder;
+
+    C5User *fUser;
 
     void setPaymentInfo();
 

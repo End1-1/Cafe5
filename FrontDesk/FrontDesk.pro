@@ -33,6 +33,9 @@ DEFINES += FRONTDESK
 
 SOURCES += \
     ../Classes/proxytablewidgetdatabase.cpp \
+    ../Reports/cr5menureview.cpp \
+    ../Reports/cr5saleremoveddishes.cpp \
+    ../Reports/cr5saleremoveddishesfilter.cpp \
         main.cpp \
         c5mainwindow.cpp \
     ../Cafe5/c5config.cpp \
@@ -162,6 +165,9 @@ SOURCES += \
 
 HEADERS += \
     ../Classes/proxytablewidgetdatabase.h \
+    ../Reports/cr5menureview.h \
+    ../Reports/cr5saleremoveddishes.h \
+    ../Reports/cr5saleremoveddishesfilter.h \
         c5mainwindow.h \
     ../Cafe5/c5config.h \
     ../Cafe5/c5connection.h \
@@ -294,6 +300,7 @@ HEADERS += \
     ../../XLSX/src/zip.h
 
 FORMS += \
+    ../Reports/cr5saleremoveddishesfilter.ui \
         c5mainwindow.ui \
     ../Cafe5/c5connection.ui \
     ../Cafe5/c5message.ui \

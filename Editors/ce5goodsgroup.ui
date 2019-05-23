@@ -22,6 +22,9 @@
      <property name="First" stdset="0">
       <bool>false</bool>
      </property>
+     <property name="Type" stdset="0">
+      <number>1</number>
+     </property>
     </widget>
    </item>
    <item row="2" column="0">

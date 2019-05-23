@@ -14,13 +14,15 @@ class DlgListOfDishComments : public QDialog
     Q_OBJECT
 
 public:
-    explicit DlgListOfDishComments(QWidget *parent = 0);
+    explicit DlgListOfDishComments(QWidget *parent = nullptr);
 
     ~DlgListOfDishComments();
 
     static bool getComment(QString &comment);
 
 private slots:
+    void kbdAccept();
+
     void on_btnCancel_clicked();
 
     void on_tbl_itemClicked(QTableWidgetItem *item);

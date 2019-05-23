@@ -38,6 +38,7 @@ void C5Permissions::init(C5Database &db)
               << cp_t3_tstore_extra
               << cp_t3_store_sale
               << cp_t3_documents_store
+              << cp_t3_sale_removed_dishes
 
               << cp_t4_menu
               << cp_t4_menu_names
@@ -47,11 +48,16 @@ void C5Permissions::init(C5Database &db)
               << cp_t4_dish_remove_reason
               << cp_t4_dish_comments
               << cp_t4_dish_price_self_cost
+              << cp_t4_menu_review
 
               << cp_t5_waiter
               << cp_t5_multiple_receipt
               << cp_t5_remove_printed_service
               << cp_t5_change_service_value
+              << cp_t5_pay_transfer_to_room
+              << cp_t5_pay_cityledger
+              << cp_t5_pay_breakfast
+              << cp_t5_pay_complimentary
 
               << cp_t6_storage
               << cp_t6_goods_menu

@@ -28,7 +28,13 @@ private:
 
     void jsonToDoc(C5WaiterOrderDoc &doc);
 
+    void showLog();
+
 private slots:
+    void showAll();
+
+    void hideRemoved();
+
     void transferToHotel();
 
     void recountSelfCost();
@@ -36,6 +42,8 @@ private slots:
     void openMenuItem();
 
     void on_tblDishes_customContextMenuRequested(const QPoint &pos);
+
+    void on_tabWidget_currentChanged(int index);
 };
 
 #endif // C5WAITERORDER_H

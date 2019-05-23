@@ -6,6 +6,7 @@
 #include "wpaymentoptions.h"
 #include "dlgguest.h"
 #include "dlgcl.h"
+#include "c5user.h"
 #include "c5logtoserverthread.h"
 #include "dlgreceiptlanguage.h"
 #include "dlgcreditcardlist.h"
@@ -44,9 +45,14 @@ DlgPayment::~DlgPayment()
     delete ui;
 }
 
-int DlgPayment::payment(C5WaiterOrderDoc *order)
+int DlgPayment::payment(C5User *user, C5WaiterOrderDoc *order)
 {
     DlgPayment *d = new DlgPayment();
+    d->fUser = user;
+    d->ui->btnPayTransferToRoom->setVisible(d->fUser->check(cp_t5_pay_transfer_to_room));
+    d->ui->btnPayComplimentary->setVisible(d->fUser->check(cp_t5_pay_complimentary));
+    d->ui->btnPayCityLedger->setVisible(d->fUser->check(cp_t5_pay_cityledger));
+    d->ui->btnSelfCost->setVisible(d->fUser->check(cp_t5_pay_breakfast));
     d->fOrder = order;
     d->setRoomComment();
     d->setComplimentary();
@@ -258,6 +264,12 @@ void DlgPayment::on_btnReceipt_clicked()
     if (ui->tblInfo->rowCount() == paystart) {
         C5Message::error(tr("Payment mode is not selected"));
         return;
+    }
+    if (fOrder->hDouble("f_amountother") > 0.001) {
+        if (fOrder->hInt("f_otherid") == 0) {
+            C5Message::error(tr("Other method is not selected"));
+            return;
+        }
     }
     C5SocketHandler *sh = createSocketHandler(SLOT(handleReceipt(QJsonObject)));
     sh->bind("cmd", sm_printreceipt);

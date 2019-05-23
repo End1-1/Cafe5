@@ -63,7 +63,7 @@ QToolBar *CR5TStoreExtra::toolBar()
 {
     if (!fToolBar) {
         QList<ToolBarButtons> btn;
-            btn << ToolBarButtons::tbFilter
+        btn << ToolBarButtons::tbFilter
             << ToolBarButtons::tbClearFilter
             << ToolBarButtons::tbRefresh
             << ToolBarButtons::tbExcel

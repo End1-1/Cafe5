@@ -20,6 +20,8 @@ public:
 
     void setText(const QString &text);
 
+    QString text() const;
+
 private slots:
     void btnTextClicked();
 

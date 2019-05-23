@@ -655,10 +655,10 @@ int C5WaiterServer::printTax(const QJsonObject &h, const QJsonArray &ja, C5Datab
                 serviceTotal += d["f_qty1"].toString().toDouble() * price * h["f_servicefactor"].toString().toDouble();
             }
         }
-        pt.addGoods(C5Config::taxDept(), d["f_adgcode"].toString(), d["f_dish"].toString(), d["f_name"].toString(), price, d["f_qty2"].toString().toDouble());
+        pt.addGoods(C5Config::taxDept(), d["f_adgcode"].toString(), d["f_dish"].toString(), d["f_name"].toString(), price, d["f_qty2"].toString().toDouble(), 0);
     }
     if (serviceTotal > 0.001) {
-        pt.addGoods(C5Config::taxDept(), "5901", "001", QString("%1 %2%").arg(tr("Service")).arg(float_str(h["f_servicefactor"].toString().toDouble()*100, 2)), serviceTotal, 1.0);
+        pt.addGoods(C5Config::taxDept(), "5901", "001", QString("%1 %2%").arg(tr("Service")).arg(float_str(h["f_servicefactor"].toString().toDouble()*100, 2)), serviceTotal, 1.0, 0);
     }
     QString jsonIn, jsonOut, err;
     int result = 0;

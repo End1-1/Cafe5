@@ -17,7 +17,7 @@ CR5TStoreExtraFilter::~CR5TStoreExtraFilter()
 
 QString CR5TStoreExtraFilter::condition()
 {
-    return 0;
+    return "";
 }
 
 QDate CR5TStoreExtraFilter::dateStart()

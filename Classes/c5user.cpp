@@ -24,6 +24,6 @@ void C5User::fromJson(const QJsonObject &obj)
         fFirst = u["f_first"].toString();
         fLast = u["f_last"].toString();
         fFull = fLast + " " + fFirst;
-        fPermissions = u["f_permissions"].toString().split(",", QString::SkipEmptyParts);
+        fPermissions = obj["f_permissions"].toString().split(",", QString::SkipEmptyParts);
     }
 }

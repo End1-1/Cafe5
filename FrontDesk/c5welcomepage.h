@@ -43,6 +43,24 @@ private slots:
 
     void on_btnStoreDocs_clicked();
 
+    void on_btnStorages_clicked();
+
+    void on_btnGoodsGroups_clicked();
+
+    void on_btnGoods_clicked();
+
+    void on_btnUnits_clicked();
+
+    void on_btnPartners_clicked();
+
+    void on_btnMenuName_clicked();
+
+    void on_btnDishDepts_clicked();
+
+    void on_btnTypesOfDishes_clicked();
+
+    void on_btnDishes_clicked();
+
 private:
     Ui::C5WelcomePage *ui;
 

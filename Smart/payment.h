@@ -14,19 +14,9 @@ class payment : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit payment(const QStringList &dbParams);
+    explicit payment(const QString order, const QStringList &dbParams);
 
     ~payment();
-
-    void setAmount(double amount);
-
-    double cardAmount();
-
-    double cashAmount();
-
-    void setOrderTable(QTableWidget *t);
-
-    QString fOrderUUID;
 
 private slots:
     void on_btnTax_clicked(bool checked);
@@ -42,9 +32,7 @@ private slots:
 private:
     Ui::payment *ui;
 
-    QTableWidget *fOrderTable;
-
-    double fCardAmount;
+    QString fOrderUUID;
 
     void checkout(bool cash);
 

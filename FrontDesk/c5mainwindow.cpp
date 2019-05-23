@@ -11,6 +11,7 @@
 #include "cr5consumptionbysales.h"
 #include "cr5documents.h"
 #include "c5translatorform.h"
+#include "cr5saleremoveddishes.h"
 #include "cr5dish.h"
 #include "cr5settings.h"
 #include "cr5goodsmovement.h"
@@ -26,6 +27,7 @@
 #include "c5storeinventory.h"
 #include "cr5discountsystem.h"
 #include "cr5goodsgroup.h"
+#include "cr5menureview.h"
 #include "cr5databases.h"
 #include "cr5goodspartners.h"
 #include "cr5goodswaste.h"
@@ -225,8 +227,8 @@ void C5MainWindow::on_actionLogin_triggered()
 
     C5Database db(C5Config::fDBHost, C5Config::fDBPath, C5Config::fDBUser, C5Config::fDBPassword);
     db[":f_user"] = __userid;
-    db.exec("select f_name, f_description, f_host, f_db, f_user, f_password, f_main from s_db \
-            where f_id in (select f_db from s_db_access where f_user=:f_user and f_permit=1)");
+    db.exec("select f_name, f_description, f_host, f_db, f_user, f_password, f_main from s_db "
+            "where f_id in (select f_db from s_db_access where f_user=:f_user and f_permit=1)");
     while (db.nextRow()) {
         QTreeWidgetItem *item = new QTreeWidgetItem();
         item->setText(0, db.getString(0));
@@ -287,6 +289,7 @@ void C5MainWindow::on_actionLogin_triggered()
             addTreeL3Item(it, cp_t2_count_output_of_sale, tr("Consumption of goods based on sales"), ":/goods.png");
             addTreeL3Item(it, cp_t3_sales_common, tr("Sales, expert mode"), ":/graph.png");
             addTreeL3Item(it, cp_t3_store_sale, tr("Sales from store"), ":/graph.png");
+            addTreeL3Item(it, cp_t3_sale_removed_dishes, tr("Sales, removed dishes"), ":/delete.png");
         }
 
         if (pr(db.getString(3), cp_t4_menu)) {
@@ -302,6 +305,7 @@ void C5MainWindow::on_actionLogin_triggered()
             addTreeL3Item(it, cp_t4_dish_remove_reason, tr("Dish remove reasons"), ":/menu.png");
             addTreeL3Item(it, cp_t4_dish_comments, tr("Dish comments"), ":/menu.png");
             addTreeL3Item(it, cp_t4_dish_price_self_cost, tr("Dish self cost report"), ":/menu.png");
+            addTreeL3Item(it, cp_t4_menu_review, tr("Review menu"), ":/menu.png");
         }
 
         if (pr(db.getString(3), cp_t6_goods_menu)) {
@@ -526,6 +530,9 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
     case cp_t3_store_sale:
         createTab<CR5SaleFromStore>(dbParams);
         break;
+    case cp_t3_sale_removed_dishes:
+        createTab<CR5SaleRemovedDishes>(dbParams);
+        break;
     case cp_t4_part1:
         createTab<CR5DishPart1>(dbParams);
         break;
@@ -546,6 +553,9 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
         break;
     case cp_t4_dish_price_self_cost:
         createTab<CR5DishPriceSelfCost>(dbParams);
+        break;
+    case cp_t4_menu_review:
+        createTab<CR5MenuReview>(dbParams);
         break;
     case cp_t6_units:
         createTab<CR5GoodsUnit>(dbParams);

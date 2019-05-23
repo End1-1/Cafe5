@@ -26,7 +26,7 @@
          <string>New store input</string>
         </property>
         <property name="icon">
-         <iconset>
+         <iconset resource="../resources/res.qrc">
           <normaloff>:/goods.png</normaloff>:/goods.png</iconset>
         </property>
        </widget>
@@ -37,7 +37,7 @@
          <string>New store movement</string>
         </property>
         <property name="icon">
-         <iconset>
+         <iconset resource="../resources/res.qrc">
           <normaloff>:/goods.png</normaloff>:/goods.png</iconset>
         </property>
        </widget>
@@ -48,7 +48,7 @@
          <string>New store output</string>
         </property>
         <property name="icon">
-         <iconset>
+         <iconset resource="../resources/res.qrc">
           <normaloff>:/goods.png</normaloff>:/goods.png</iconset>
         </property>
        </widget>
@@ -59,13 +59,130 @@
          <string>New store inventory</string>
         </property>
         <property name="icon">
-         <iconset>
+         <iconset resource="../resources/res.qrc">
           <normaloff>:/goods.png</normaloff>:/goods.png</iconset>
         </property>
        </widget>
       </item>
       <item>
-       <spacer name="verticalSpacer">
+       <widget class="QGroupBox" name="groupBox_3">
+        <property name="title">
+         <string>Goods</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <item>
+          <widget class="QPushButton" name="btnStorages">
+           <property name="text">
+            <string>Storages</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources/res.qrc">
+             <normaloff>:/goods.png</normaloff>:/goods.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnGoodsGroups">
+           <property name="text">
+            <string>Groups of goods</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources/res.qrc">
+             <normaloff>:/goods.png</normaloff>:/goods.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnGoods">
+           <property name="text">
+            <string>Goods</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources/res.qrc">
+             <normaloff>:/goods.png</normaloff>:/goods.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnUnits">
+           <property name="text">
+            <string>Units</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources/res.qrc">
+             <normaloff>:/goods.png</normaloff>:/goods.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnPartners">
+           <property name="text">
+            <string>Partners</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources/res.qrc">
+             <normaloff>:/goods.png</normaloff>:/goods.png</iconset>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="groupBox_4">
+        <property name="title">
+         <string>Menu</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <item>
+          <widget class="QPushButton" name="btnMenuName">
+           <property name="text">
+            <string>Menu names</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources/res.qrc">
+             <normaloff>:/menu.png</normaloff>:/menu.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnDishDepts">
+           <property name="text">
+            <string>Dish departments</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources/res.qrc">
+             <normaloff>:/menu.png</normaloff>:/menu.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnTypesOfDishes">
+           <property name="text">
+            <string>Types of dishes</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources/res.qrc">
+             <normaloff>:/menu.png</normaloff>:/menu.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnDishes">
+           <property name="text">
+            <string>Dishes</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources/res.qrc">
+             <normaloff>:/menu.png</normaloff>:/menu.png</iconset>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <spacer name="verticalSpacer_3">
         <property name="orientation">
          <enum>Qt::Vertical</enum>
         </property>
@@ -80,6 +197,13 @@
      </layout>
     </widget>
    </item>
+   <item row="0" column="0" colspan="2">
+    <widget class="QCommandLinkButton" name="btnDatabase">
+     <property name="text">
+      <string>Database name</string>
+     </property>
+    </widget>
+   </item>
    <item row="1" column="1">
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
@@ -92,7 +216,7 @@
          <string>Documents</string>
         </property>
         <property name="icon">
-         <iconset>
+         <iconset resource="../resources/res.qrc">
           <normaloff>:/documents.png</normaloff>:/documents.png</iconset>
         </property>
        </widget>
@@ -103,7 +227,7 @@
          <string>Store documents</string>
         </property>
         <property name="icon">
-         <iconset>
+         <iconset resource="../resources/res.qrc">
           <normaloff>:/documents.png</normaloff>:/documents.png</iconset>
         </property>
        </widget>
@@ -114,7 +238,7 @@
          <string>Materials in the store</string>
         </property>
         <property name="icon">
-         <iconset>
+         <iconset resource="../resources/res.qrc">
           <normaloff>:/goods.png</normaloff>:/goods.png</iconset>
         </property>
        </widget>
@@ -125,7 +249,7 @@
          <string>Movement in the store</string>
         </property>
         <property name="icon">
-         <iconset>
+         <iconset resource="../resources/res.qrc">
           <normaloff>:/goods.png</normaloff>:/goods.png</iconset>
         </property>
        </widget>
@@ -136,7 +260,7 @@
          <string>T-account, extra</string>
         </property>
         <property name="icon">
-         <iconset>
+         <iconset resource="../resources/res.qrc">
           <normaloff>:/documents.png</normaloff>:/documents.png</iconset>
         </property>
        </widget>
@@ -147,7 +271,7 @@
          <string>Consumption of goods based on sales</string>
         </property>
         <property name="icon">
-         <iconset>
+         <iconset resource="../resources/res.qrc">
           <normaloff>:/goods.png</normaloff>:/goods.png</iconset>
         </property>
        </widget>
@@ -158,7 +282,7 @@
          <string>Sales, expert mode</string>
         </property>
         <property name="icon">
-         <iconset>
+         <iconset resource="../resources/res.qrc">
           <normaloff>:/graph.png</normaloff>:/graph.png</iconset>
         </property>
        </widget>
@@ -179,15 +303,10 @@
      </layout>
     </widget>
    </item>
-   <item row="0" column="0" colspan="2">
-    <widget class="QCommandLinkButton" name="btnDatabase">
-     <property name="text">
-      <string>Database name</string>
-     </property>
-    </widget>
-   </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../resources/res.qrc"/>
+ </resources>
  <connections/>
 </ui>

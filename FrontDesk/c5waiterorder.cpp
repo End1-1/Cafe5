@@ -13,6 +13,7 @@ C5WaiterOrder::C5WaiterOrder(const QStringList &dbParams, QWidget *parent) :
     ui->setupUi(this);
     fLabel = tr("Order");
     fIcon = ":/order.png";
+    ui->tblLog->setColumnWidths(ui->tblLog->columnCount(), 100, 80, 200, 200, 200, 200);
 }
 
 C5WaiterOrder::~C5WaiterOrder()
@@ -25,7 +26,8 @@ void C5WaiterOrder::setOrder(const QString &id)
 
     C5Database db(fDBParams);
     db[":f_id"] = id;
-    db.exec("select o.f_prefix, os.f_name as f_statename, h.f_name as f_hallname, t.f_name as f_tableName, concat(s.f_last, ' ', s.f_first) as f_staffname, "
+    db.exec("select o.f_prefix, os.f_name as f_statename, h.f_name as f_hallname, t.f_name as f_tableName, "
+            "concat(s.f_last, ' ', s.f_first) as f_staffname, "
             "o.*, oth.f_name as f_othername "
             "from o_header o "
             "left join h_tables t on t.f_id=o.f_table "
@@ -53,7 +55,7 @@ void C5WaiterOrder::setOrder(const QString &id)
         ui->leOtherName->setText(db.getString("f_othername"));
         if (db.getDouble("f_servicefactor") > 0.001) {
             ui->lbService->setText(QString("%1 %2%").arg(tr("Service")).arg(db.getDouble("f_servicefactor") * 100));
-            ui->leService->setDouble(db.getDouble("f_serviceamount"));
+            ui->leService->setDouble(db.getDouble("f_amountservice"));
         }
     } else {
         C5Message::error(tr("Invalid order uuid"));
@@ -107,6 +109,8 @@ QToolBar *C5WaiterOrder::toolBar()
         fToolBar = createStandartToolbar(btn);
         fToolBar->addAction(QIcon(":/app.png"), tr("Transfer to hotel"), this, SLOT(transferToHotel()));
         fToolBar->addAction(QIcon(":/constructor.png"), tr("Recount selfcost"), this, SLOT(recountSelfCost()));
+        fToolBar->addAction(QIcon(":/eye.png"), tr("Show all"), this, SLOT(showAll()));
+        fToolBar->addAction(QIcon(":/eye-no.png"), tr("Hide removed"), this, SLOT(hideRemoved()));
     }
     return fToolBar;
 }
@@ -114,6 +118,44 @@ QToolBar *C5WaiterOrder::toolBar()
 void C5WaiterOrder::jsonToDoc(C5WaiterOrderDoc &doc)
 {
     ui->leTotal->setDouble(doc.hDouble("f_amounttotal"));
+}
+
+void C5WaiterOrder::showLog()
+{
+    ui->tblLog->clearContents();
+    C5Database db(fDBParams);
+    db[":f_invoice"] = ui->leUuid->text();
+    db.exec("select f_date, f_time, f_user, f_action, f_value1, f_value2 "
+            "from airlog.log "
+            "where f_invoice=:f_invoice "
+            "order by f_date desc, f_time desc ");
+    ui->tblLog->setRowCount(db.rowCount());
+    int row = 0;
+    while (db.nextRow()) {
+        ui->tblLog->setData(row, 0, db.getDate("f_date"));
+        ui->tblLog->setData(row, 1, db.getTime("f_time"));
+        ui->tblLog->setData(row, 2, db.getString("f_user"));
+        ui->tblLog->setData(row, 3, db.getString("f_action"));
+        ui->tblLog->setData(row, 4, db.getString("f_value1"));
+        ui->tblLog->setData(row, 5, db.getString("f_value2"));
+        row++;
+    }
+}
+
+void C5WaiterOrder::showAll()
+{
+    for (int i = 0; i < ui->tblDishes->rowCount(); i++) {
+        ui->tblDishes->setRowHidden(i, false);
+    }
+}
+
+void C5WaiterOrder::hideRemoved()
+{
+    for (int i = 0; i < ui->tblDishes->rowCount(); i++) {
+        if (ui->tblDishes->getInteger(i, 1) != DISH_STATE_OK) {
+            ui->tblDishes->setRowHidden(i, true);
+        }
+    }
 }
 
 void C5WaiterOrder::transferToHotel()
@@ -158,4 +200,13 @@ void C5WaiterOrder::on_tblDishes_customContextMenuRequested(const QPoint &pos)
     QMenu *m = new QMenu(this);
     m->addAction(tr("Open menu item"), this, SLOT(openMenuItem()));
     m->popup(ui->tblDishes->mapToGlobal(pos));
+}
+
+void C5WaiterOrder::on_tabWidget_currentChanged(int index)
+{
+    switch (index) {
+    case 2:
+        showLog();
+        break;
+    }
 }

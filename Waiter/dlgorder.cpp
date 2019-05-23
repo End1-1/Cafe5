@@ -185,6 +185,7 @@ void DlgOrder::buildMenu(const QString &menu, QString part1, QString part2)
 
 void DlgOrder::addDishToOrder(const QJsonObject &obj)
 {
+    bool found = false;
     if (ui->btnCompactDishAddMode->isChecked()) {
         for (int i = 0; i < fOrder->itemsCount(); i++) {
             if (obj["f_dish"].toString() == fOrder->iString("f_dish", i)) {
@@ -209,29 +210,31 @@ void DlgOrder::addDishToOrder(const QJsonObject &obj)
                 ui->tblOrder->scrollToItem(ui->tblOrder->item(i, 0));
                 ui->tblOrder->setCurrentItem(ui->tblOrder->item(i, 0));
                 ui->lePrepaiment->setText(fOrder->prepayment());
-                return;
+                found = true;
             }
         }
     }
-    QJsonObject o = obj;
-    if (obj["f_id"].toString().isEmpty()) {
-        o["f_id"] = "";
-        o["f_header"] = fOrder->hString("f_id");
-        o["f_state"] = QString::number(DISH_STATE_OK);
-        o["f_service"] = C5Config::serviceFactor();
-        o["f_discount"] = fOrder->hString("f_discountfactor");
-        o["f_total"] = "0";
-        o["f_qty1"] = "1";
-        o["f_qty2"] = "0";
-        o["f_comment"] = "";
-        logRecord("", "New dish", o["f_name"].toString(), "");
+    if (!found) {
+        QJsonObject o = obj;
+        if (obj["f_id"].toString().isEmpty()) {
+            o["f_id"] = "";
+            o["f_header"] = fOrder->hString("f_id");
+            o["f_state"] = QString::number(DISH_STATE_OK);
+            o["f_service"] = C5Config::serviceFactor();
+            o["f_discount"] = fOrder->hString("f_discountfactor");
+            o["f_total"] = "0";
+            o["f_qty1"] = "1";
+            o["f_qty2"] = "0";
+            o["f_comment"] = "";
+            logRecord("", "New dish", o["f_name"].toString(), "");
+        }
+        int row = ui->tblOrder->rowCount();
+        ui->tblOrder->setRowCount(row + 1);
+        ui->tblOrder->setItem(row, 0, new QTableWidgetItem());
+        ui->tblOrder->item(row, 0)->setData(Qt::UserRole, o);
+        ui->tblOrder->setCurrentCell(ui->tblOrder->rowCount() - 1, 0);
+        fOrder->addItem(o);
     }
-    int row = ui->tblOrder->rowCount();
-    ui->tblOrder->setRowCount(row + 1);
-    ui->tblOrder->setItem(row, 0, new QTableWidgetItem());
-    ui->tblOrder->item(row, 0)->setData(Qt::UserRole, o);
-    ui->tblOrder->setCurrentCell(ui->tblOrder->rowCount() - 1, 0);
-    fOrder->addItem(o);
     fOrder->hSetDouble("f_amountcash", 0);
     fOrder->hSetDouble("f_amountcard", 0);
     fOrder->hSetDouble("f_amountbank", 0);
@@ -597,7 +600,7 @@ void DlgOrder::on_btnPayment_clicked()
         C5Message::error(tr("Order is incomplete"));
         return;
     }
-    int paymentResult = DlgPayment::payment(fOrder);
+    int paymentResult = DlgPayment::payment(fUser, fOrder);
     switch (paymentResult) {
     case PAYDLG_ORDER_CLOSE:
         fOrder->fHeader = QJsonObject();

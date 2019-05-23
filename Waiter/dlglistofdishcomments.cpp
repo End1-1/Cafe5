@@ -20,6 +20,7 @@ DlgListOfDishComments::DlgListOfDishComments(QWidget *parent) :
             col = 0;
         }
     }
+    connect(ui->kbd, SIGNAL(accept()), this, SLOT(kbdAccept()));
 }
 
 DlgListOfDishComments::~DlgListOfDishComments()
@@ -41,6 +42,15 @@ bool DlgListOfDishComments::getComment(QString &comment)
     }
     delete d;
     return result;
+}
+
+void DlgListOfDishComments::kbdAccept()
+{
+    if (ui->kbd->text().isEmpty()) {
+        return;
+    }
+    fResult = ui->kbd->text();
+    accept();
 }
 
 void DlgListOfDishComments::on_btnCancel_clicked()

@@ -146,7 +146,7 @@ void C5Cache::refresh()
 C5Cache *C5Cache::cache(const QStringList &dbParams, int cacheId)
 {
     QString name = cacheName(dbParams, cacheId);
-    C5Cache *cache = 0;
+    C5Cache *cache = nullptr;
     if (!fCacheList.contains(name)) {
         cache = new C5Cache(dbParams);
         cache->fId = cacheId;
