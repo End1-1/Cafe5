@@ -67,18 +67,27 @@ void C5FilterWidget::restoreFilter(QWidget *parent)
         }
         if ((le = isLineEditWithSelector(o))) {
             filterName = le->property("FilterName").toString();
+            if (filterName.isEmpty()) {
+                continue;
+            }
             value = s.value(filterName, "");
             le->setValue(value.toString());
             continue;
         }
         if ((de = isDateEdit(o))) {
             filterName = de->property("FilterName").toString();
+            if (filterName.isEmpty()) {
+                continue;
+            }
             value = s.value(filterName, QDate::currentDate());
             de->setDate(value.toDate());
             continue;
         }
         if ((ce = isCheckBox(o))) {
             filterName = ce->property("FilterName").toString();
+            if (filterName.isEmpty()) {
+                continue;
+            }
             value = s.value(filterName, 0);
             ce->setChecked(value.toBool());
             continue;

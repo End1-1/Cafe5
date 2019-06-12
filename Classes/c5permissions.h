@@ -31,6 +31,8 @@
 #define cp_t3_store_sale 306
 #define cp_t3_documents_store 307
 #define cp_t3_sale_removed_dishes 308
+#define cp_t3_sale_dishes 309
+#define cp_t3_sale_from_store_total 310
 
 #define cp_t4_menu 400
 #define cp_t4_menu_names 401
@@ -67,6 +69,13 @@
 #define cp_t7_tables 705
 #define cp_t7_upload_date_settings 706
 #define cp_t7_translator 707
+#define cp_t7_store_reason 708
+
+#define cp_t8_cash 800
+#define cp_t8_cash_doc 801
+#define cp_t8_cash_common_report 802
+#define cp_t8_cash_detailed_report 803
+#define cp_t8_cash_names 804
 
 
 class C5Permissions

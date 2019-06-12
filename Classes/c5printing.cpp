@@ -262,17 +262,21 @@ QPrinter::Orientation C5Printing::orientation(int index)
 
 void C5Printing::print(const QString &printername, QPrinter::PageSize pageSize)
 {
-    QPrinter printer(QPrinter::PrinterResolution);
-    printer.setPrinterName(printername);
-    printer.setPageSize(pageSize);
-    QPainter painter(&printer);
-    for (int i = 0; i < fCanvasList.count(); i++) {
-        if (i > 0) {
-            printer.newPage();
-        }
-        QPrinter::Orientation o = fCanvasOrientation[fCanvasList.at(i)];
+    if (fCanvasList.count() > 0) {
+        QPrinter printer(QPrinter::PrinterResolution);
+        printer.setPrinterName(printername);
+        QPrinter::Orientation o = fCanvasOrientation[fCanvasList.at(0)];
         printer.setOrientation(o);
-        fCanvasList.at(i)->render(&painter);
+        printer.setPageSize(pageSize);
+        QPainter painter(&printer);
+        for (int i = 0; i < fCanvasList.count(); i++) {
+            if (i > 0) {
+                o = fCanvasOrientation[fCanvasList.at(i)];
+                printer.setOrientation(o);
+                printer.newPage();
+            }
+            fCanvasList.at(i)->render(&painter);
+        }
     }
 }
 

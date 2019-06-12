@@ -2,26 +2,39 @@
 #define WORKING_H
 
 #include <QDialog>
+#include <QTimer>
 
 namespace Ui {
 class Working;
 }
+
+class QTableWidgetItem;
 
 class Working : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit Working(QWidget *parent = 0);
+    explicit Working(QWidget *parent = nullptr);
 
     ~Working();
+
+    bool eventFilter(QObject *watched, QEvent *event);
 
 private:
     Ui::Working *ui;
 
+    QTimer fTimer;
+
+    int fTimerTimeout;
+
     void getGoodsList();
 
+    void makeWGoods();
+
 private slots:
+    void timeout();
+
     void shortcutF1();
 
     void shortcutF2();
@@ -42,9 +55,13 @@ private slots:
 
     void on_btnSaveOrder_clicked();
 
-    void on_leCode_textChanged(const QString &arg1);
-
     void on_btnSaveOrderNoTax_clicked();
+
+    void on_btnExit_clicked();
+
+    void on_btnShowGoodsList_clicked();
+
+    void on_tblGoods_itemClicked(QTableWidgetItem *item);
 };
 
 #endif // WORKING_H

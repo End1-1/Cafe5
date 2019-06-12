@@ -9,6 +9,7 @@ C5SaleFromStoreOrder::C5SaleFromStoreOrder(const QStringList &dbParams) :
 {
     ui->setupUi(this);
     ui->tblData->setColumnWidths(ui->tblData->columnCount(), 0, 300, 80, 80, 80, 80);
+    ui->leID->setVisible(false);
     connect(ui->tblData, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(tblContextMenu(QPoint)));
 }
 
@@ -40,9 +41,11 @@ void C5SaleFromStoreOrder::loadOrder(const QString &id)
     ui->leID->setText(id);
     C5Database db(fDBParams);
     db[":f_id"] = id;
-    db.exec("select f_datecash from o_header where f_id=:f_id");
+    db.exec("select f_datecash, f_timeclose, concat(f_prefix, f_hallid) as f_userid from o_header where f_id=:f_id");
     if (db.nextRow()) {
         ui->deDate->setDate(db.getDate(0));
+        ui->teTime->setText(db.getString(1));
+        ui->leUserId->setText(db.getString("f_userid"));
     } else {
         C5Message::error(tr("No such order"));
         return;

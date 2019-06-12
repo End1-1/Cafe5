@@ -7,6 +7,7 @@ C5Widget::C5Widget(const QStringList &dbParams, QWidget *parent) :
     fDBParams(dbParams)
 {
     fToolBar = nullptr;
+    fFocusNextChild = true;
 }
 
 QIcon C5Widget::icon()
@@ -74,6 +75,11 @@ QToolBar *C5Widget::createStandartToolbar(const QList<ToolBarButtons> &btn)
     return fToolBar;
 }
 
+void C5Widget::nextChild()
+{
+
+}
+
 void C5Widget::print()
 {
 
@@ -97,7 +103,7 @@ void C5Widget::selectorCallback(int row, const QList<QVariant> &values)
 
 bool C5Widget::event(QEvent *event)
 {
-    if (event->type() == QEvent::KeyPress) {
+    if (event->type() == QEvent::KeyRelease) {
         QKeyEvent *ke = static_cast<QKeyEvent*>(event);
         switch (ke->key()) {
         case Qt::Key_Enter:
@@ -105,7 +111,11 @@ bool C5Widget::event(QEvent *event)
             if (ke->modifiers() & Qt::ControlModifier) {
                 break;
             } else {
-                focusNextChild();
+                if (fFocusNextChild) {
+                    focusNextChild();
+                } else {
+                    nextChild();
+                }
                 return true;
             }
         }

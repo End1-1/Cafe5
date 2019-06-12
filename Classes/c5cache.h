@@ -21,7 +21,6 @@
 #define cache_waiter_printers 15
 #define cache_store_reason 16
 #define cache_dish 17
-#define cache_goods_waste 18
 #define cache_credit_card 19
 #define cache_dish_remove_reason 20
 #define cache_settings_names 21

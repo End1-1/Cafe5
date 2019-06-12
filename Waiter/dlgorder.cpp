@@ -606,7 +606,8 @@ void DlgOrder::on_btnPayment_clicked()
         fOrder->fHeader = QJsonObject();
         fOrder->fItems = QJsonArray();
         itemsToTable();
-        on_btnChangeTable_clicked();
+        accept();
+        //on_btnChangeTable_clicked();
         break;
     case PAYDLG_NONE:
         saveOrder();

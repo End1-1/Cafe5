@@ -26,6 +26,25 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
+    ../../XLSX/src/xlsx.cpp \
+    ../../XLSX/src/xlsxcell.cpp \
+    ../../XLSX/src/xlsxcontenttype.cpp \
+    ../../XLSX/src/xlsxdocpropsapp.cpp \
+    ../../XLSX/src/xlsxdocpropscore.cpp \
+    ../../XLSX/src/xlsxdocument.cpp \
+    ../../XLSX/src/xlsxrels.cpp \
+    ../../XLSX/src/xlsxsharedstring.cpp \
+    ../../XLSX/src/xlsxsheet.cpp \
+    ../../XLSX/src/xlsxstyles.cpp \
+    ../../XLSX/src/xlsxtheme.cpp \
+    ../../XLSX/src/xlsxworkbook.cpp \
+    ../../XLSX/src/xlsxwriter.cpp \
+    ../Cache/cachecashnames.cpp \
+    ../Cache/cachedishstate.cpp \
+    ../Cache/cachegoodswaste.cpp \
+    ../Cache/cacheorderstate.cpp \
+    ../Cache/cachestorereason.cpp \
+    ../Classes/c5printing.cpp \
         main.cpp \
         working.cpp \
     worder.cpp \
@@ -39,15 +58,37 @@ SOURCES += \
     ../Cafe5/c5sockethandler.cpp \
     ../Controls/c5lineedit.cpp \
     ../Controls/c5tablewidget.cpp \
-    ../Cafe5/excel.cpp \
     ../Controls/c5combobox.cpp \
     ../Controls/c5dateedit.cpp \
     ../Classes/c5cache.cpp \
-    ../../NewTax/printtaxn.cpp \
+    ../../NewTax/Src/printtaxn.cpp \
     dqty.cpp \
     ../Controls/c5checkbox.cpp
 
 HEADERS += \
+    ../../XLSX/src/crs32.h \
+    ../../XLSX/src/xlsx.h \
+    ../../XLSX/src/xlsxall.h \
+    ../../XLSX/src/xlsxcell.h \
+    ../../XLSX/src/xlsxcontenttype.h \
+    ../../XLSX/src/xlsxdocpropsapp.h \
+    ../../XLSX/src/xlsxdocpropscore.h \
+    ../../XLSX/src/xlsxdocument.h \
+    ../../XLSX/src/xlsxrels.h \
+    ../../XLSX/src/xlsxsharedstring.h \
+    ../../XLSX/src/xlsxsheet.h \
+    ../../XLSX/src/xlsxstyles.h \
+    ../../XLSX/src/xlsxtheme.h \
+    ../../XLSX/src/xlsxworkbook.h \
+    ../../XLSX/src/xlsxwriter.h \
+    ../../XLSX/src/zip.h \
+    ../Cache/cachecashnames.h \
+    ../Cache/cachedishstate.h \
+    ../Cache/cachegoodswaste.h \
+    ../Cache/cacheheaders.h \
+    ../Cache/cacheorderstate.h \
+    ../Cache/cachestorereason.h \
+    ../Classes/c5printing.h \
         working.h \
     worder.h \
     goods.h \
@@ -61,11 +102,10 @@ HEADERS += \
     ../Cafe5/c5socketmessage.h \
     ../Controls/c5lineedit.h \
     ../Controls/c5tablewidget.h \
-    ../Cafe5/excel.h \
     ../Controls/c5combobox.h \
     ../Controls/c5dateedit.h \
     ../Classes/c5cache.h \
-    ../../NewTax/printtaxn.h \
+    ../../NewTax/Src/printtaxn.h \
     dqty.h \
     ../Controls/c5checkbox.h
 
@@ -77,18 +117,20 @@ FORMS += \
     dqty.ui
 
 DEFINES += _DBDRIVER_=\\\"QMYSQL\\\"
-DEFINES += _ORGANIZATION_=\\\"Jazzve\\\"
-DEFINES += _APPLICATION_=\\\"Cafe5\\\"
-DEFINES += _MODULE_=\\\"SHOP\\\"
+DEFINES += _ORGANIZATION_=\\\"Hotelicca\\\"
+DEFINES += _APPLICATION_=\\\"SmartHotel\\\"
+DEFINES += _MODULE_=\\\"Shop\\\"
 DEFINES += SHOP
 
 INCLUDEPATH += ../Cafe5
 INCLUDEPATH += ../Classes
+INCLUDEPATH += ../Cache
 INCLUDEPATH += ../Reports
 INCLUDEPATH += ../Controls
 INCLUDEPATH += ../Editors
 INCLUDEPATH += ../RESOURCES
-INCLUDEPATH += ../../NewTax
+INCLUDEPATH += ../../NewTax/Src
+INCLUDEPATH += ../../XLSX/Src
 INCLUDEPATH += C:/OpenSSL-Win32/include
 INCLUDEPATH += C:/OpenSSL-Win32/include/openssl
 

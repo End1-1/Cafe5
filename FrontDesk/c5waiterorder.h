@@ -31,6 +31,8 @@ private:
     void showLog();
 
 private slots:
+    void removeOrder();
+
     void showAll();
 
     void hideRemoved();

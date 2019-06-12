@@ -39,6 +39,8 @@ void C5Permissions::init(C5Database &db)
               << cp_t3_store_sale
               << cp_t3_documents_store
               << cp_t3_sale_removed_dishes
+              << cp_t3_sale_dishes
+              << cp_t3_sale_from_store_total
 
               << cp_t4_menu
               << cp_t4_menu_names
@@ -75,6 +77,13 @@ void C5Permissions::init(C5Database &db)
               << cp_t7_tables
               << cp_t7_upload_date_settings
               << cp_t7_translator
+              << cp_t7_store_reason
+
+              << cp_t8_cash
+              << cp_t8_cash_doc
+              << cp_t8_cash_common_report
+              << cp_t8_cash_detailed_report
+              << cp_t8_cash_names
                  ;
     if (__usergroup == 1) {
         fPermissions[db.database()] = fTemplate;

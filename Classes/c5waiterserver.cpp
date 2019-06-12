@@ -46,7 +46,7 @@ void C5WaiterServer::reply(QJsonObject &o)
         QJsonArray jTables;
         srh.getJsonFromQuery(QString("select t.f_id, t.f_hall, t.f_name, t.f_lock, t.f_lockSrc, \
                             h.f_id as f_header, concat(u.f_last, ' ', left(u.f_first, 1), '.') as f_staffName, \
-                            h.f_amountTotal as f_amount, \
+                            h.f_amountTotal as f_amount, h.f_print, \
                             date_format(h.f_dateOpen, '%d.%m.%Y') as f_dateOpen, h.f_timeOpen \
                             from h_tables t \
                             left join o_header h on h.f_table=t.f_id and h.f_state=1 \
@@ -290,7 +290,7 @@ void C5WaiterServer::reply(QJsonObject &o)
 
             C5Database fDD(C5Config::dbParams().at(0), C5Config::hotelDatabase(), C5Config::dbParams().at(2), C5Config::dbParams().at(3));
             C5WaiterOrderDoc w(jh, jb, srh.fDb);
-            w.transferToHotel(fDD, err);
+            //w.transferToHotel(fDD, err);
         }
         o["reply"] = err.isEmpty() ? 1 : 0;
         o["msg"] = err;

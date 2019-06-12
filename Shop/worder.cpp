@@ -4,6 +4,8 @@
 #include "c5config.h"
 #include "printtaxn.h"
 #include "dqty.h"
+#include "c5utils.h"
+#include "c5printing.h"
 
 WOrder::WOrder(QWidget *parent) :
     QWidget(parent),
@@ -56,6 +58,7 @@ bool WOrder::writeOrder(bool tax)
     C5Database db(C5Config::dbParams());
     db.startTransaction();
     QString id = C5Database::uuid();
+    QString sn, firm, address, fiscal, hvhh, rseq, devnum, time;
 
     if (tax) {
         PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), this);
@@ -65,7 +68,7 @@ bool WOrder::writeOrder(bool tax)
                         ui->tblGoods->getString(i, 0), //goods id
                         ui->tblGoods->getString(i, 1), //name
                         ui->tblGoods->getDouble(i, 4), //price
-                        ui->tblGoods->getDouble(i, 2)); //qty
+                        ui->tblGoods->getDouble(i, 2), 0); //qty
         }
         QString jsonIn, jsonOut, err;
         int result = 0;
@@ -81,7 +84,6 @@ bool WOrder::writeOrder(bool tax)
         db.insert("o_tax_log", false);
         QSqlQuery q(db.fDb);
         if (result == pt_err_ok) {
-            QString sn, firm, address, fiscal, hvhh, rseq, devnum, time;
             PrintTaxN::parseResponse(jsonOut, firm, hvhh, fiscal, rseq, sn, address, devnum, time);
             db[":f_id"] = id;
             db.exec("delete from o_tax where f_id=:f_id");
@@ -139,10 +141,99 @@ bool WOrder::writeOrder(bool tax)
         db[":f_qty"] = ui->tblGoods->getDouble(i, 2);
         db[":f_price"] = ui->tblGoods->getDouble(i, 4);
         db[":f_total"] = ui->tblGoods->getDouble(i, 5);
-        db[":f_tax"] = (int) tax;
+        db[":f_tax"] = tax ? 1 : 0;
         db.insert("o_goods", false);
     }
     db.commit();
+    if (!C5Config::localReceiptPrinter().isEmpty()) {
+        QFont font(qApp->font());
+        font.setPointSize(20);
+        C5Printing p;
+        p.setSceneParams(650, 2800, QPrinter::Portrait);
+        p.setFont(font);
+        if (tax) {
+            p.ltext(firm, 0);
+            p.br();
+            p.ltext(address, 0);
+            p.br();
+            p.ltext(tr("Department"), 0);
+            p.rtext(ui->tblGoods->getString(0, 6));
+            p.br();
+            p.ltext(tr("Tax number"), 0);
+            p.rtext(hvhh);
+            p.br();
+            p.ltext(tr("Device number"), 0);
+            p.rtext(devnum);
+            p.br();
+            p.ltext(tr("Serial"), 0);
+            p.rtext(sn);
+            p.br();
+            p.ltext(tr("Fiscal"), 0);
+            p.rtext(fiscal);
+            p.br();
+            p.ltext(tr("Receipt number"), 0);
+            p.rtext(rseq);
+            p.br();
+            p.ltext(tr("Date"), 0);
+            p.rtext(time);
+            p.br();
+            p.ltext(tr("(F)"), 0);
+            p.br();
+        }
+        p.br(2);
+        p.setFontBold(true);
+        p.ctext(tr("Class | Name | Qty | Price | Total"));
+        p.setFontBold(false);
+        p.br();
+        p.line(3);
+        p.br(3);
+        for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+            if (tax) {
+                p.ltext(QString("%1 %2, %3").arg(tr("Class:"))
+                        .arg(ui->tblGoods->getString(i, 7))
+                        .arg(ui->tblGoods->getString(i, 1)), 0);
+            } else {
+                p.ltext(QString("%1").arg(ui->tblGoods->getString(i, 1)), 0);
+            }
+            p.br();
+            p.ltext(QString("%1 X %2 = %3")
+                    .arg(float_str(ui->tblGoods->getDouble(i, 2), 2))
+                    .arg(ui->tblGoods->getDouble(i, 4), 2)
+                    .arg(float_str(ui->tblGoods->getDouble(i, 2) * ui->tblGoods->getDouble(i, 4), 2)), 0);
+            p.br();
+            p.line();
+            p.br(2);
+        }
+        p.line(4);
+        p.br(3);
+        p.setFontBold(true);
+        p.ltext(tr("Need to pay"), 0);
+        p.rtext(float_str(ui->leTotal->getDouble(), 2));
+        p.br();
+        p.br();
+
+        p.line();
+        p.br();
+
+        if (ui->leCash->getDouble() > 0.001) {
+            p.ltext(tr("Payment, cash"), 0);
+            p.rtext(float_str(ui->leCash->getDouble(), 2));
+        }
+        if (ui->leCard->getDouble() > 0.001) {
+            p.ltext(tr("Payment, card"), 0);
+            p.rtext(float_str(ui->leCard->getDouble(), 2));
+        }
+
+        p.setFontSize(20);
+        p.setFontBold(true);
+        p.br(p.fLineHeight * 3);
+        p.ltext(tr("Thank you for visit!"), 0);
+        p.br();
+        p.ltext(tr("Printed"), 0);
+        p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
+        p.br();
+        p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
+    }
     return true;
 }
 

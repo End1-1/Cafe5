@@ -189,7 +189,7 @@ void C5TableModel::setEditableFlag(int column, Qt::ItemFlags flag)
 
 void C5TableModel::insertRow(int row)
 {
-    beginInsertRows(QModelIndex(), row + 1, row + 1);
+    beginInsertRows(QModelIndex(), row, row);
     QList<QVariant> emptyRow;
     for (int i = 0; i < fColumnIndexName.count(); i++) {
         emptyRow << QVariant();

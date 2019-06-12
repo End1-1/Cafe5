@@ -52,5 +52,7 @@
         <file>app.png</file>
         <file>eye.png</file>
         <file>eye-no.png</file>
+        <file>cash.png</file>
+        <file>folder.png</file>
     </qresource>
 </RCC>

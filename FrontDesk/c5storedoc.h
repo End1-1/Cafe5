@@ -32,16 +32,18 @@ public:
 
     void setMode(STORE_DOC sd);
 
-    virtual QToolBar *toolBar();
+    virtual QToolBar *toolBar() override;
 
     static bool removeDoc(const QStringList &dbParams, QString id, bool showmessage = true);
 
     bool save(int state, QString &err, bool showMsg);
 
-    virtual bool allowChangeDatabase();
+    virtual bool allowChangeDatabase() override;
     
 protected:
-    virtual bool eventFilter(QObject *o, QEvent *e);    
+    virtual bool eventFilter(QObject *o, QEvent *e) override;
+
+    virtual void nextChild() override;
 
 private:
     Ui::C5StoreDoc *ui;
@@ -49,6 +51,8 @@ private:
     int fDocType;
 
     int fDocState;
+
+    bool fCanChangeFocus;
 
     QString fInternalId;
 

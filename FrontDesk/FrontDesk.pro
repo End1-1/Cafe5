@@ -32,10 +32,25 @@ DEFINES += FRONTDESK
 
 
 SOURCES += \
+    ../Cache/cachecashnames.cpp \
+    ../Cache/cachedishstate.cpp \
+    ../Cache/cachestorereason.cpp \
+    ../Cafe5/c5double.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
+    ../Editors/c5cashname.cpp \
+    ../Editors/ce5storereason.cpp \
+    ../Reports/cr5cashdetailed.cpp \
+    ../Reports/cr5cashdetailedfilter.cpp \
+    ../Reports/cr5cashnames.cpp \
     ../Reports/cr5menureview.cpp \
+    ../Reports/cr5salefromstoretotal.cpp \
+    ../Reports/cr5salefromstoretotalfilter.cpp \
     ../Reports/cr5saleremoveddishes.cpp \
     ../Reports/cr5saleremoveddishesfilter.cpp \
+    ../Reports/cr5salesbydishes.cpp \
+    ../Reports/cr5salesbydishesfilter.cpp \
+    ../Reports/cr5storereason.cpp \
+    c5cashdoc.cpp \
         main.cpp \
         c5mainwindow.cpp \
     ../Cafe5/c5config.cpp \
@@ -161,13 +176,31 @@ SOURCES += \
     ../../XLSX/src/xlsxstyles.cpp \
     ../../XLSX/src/xlsxtheme.cpp \
     ../../XLSX/src/xlsxworkbook.cpp \
-    ../../XLSX/src/xlsxwriter.cpp
+    ../../XLSX/src/xlsxwriter.cpp \
+    ../Cache/cacheorderstate.cpp \
+    ../Cache/cachegoodswaste.cpp
 
 HEADERS += \
+    ../Cache/cachecashnames.h \
+    ../Cache/cachedishstate.h \
+    ../Cache/cacheheaders.h \
+    ../Cache/cachestorereason.h \
+    ../Cafe5/c5double.h \
     ../Classes/proxytablewidgetdatabase.h \
+    ../Editors/c5cashname.h \
+    ../Editors/ce5storereason.h \
+    ../Reports/cr5cashdetailed.h \
+    ../Reports/cr5cashdetailedfilter.h \
+    ../Reports/cr5cashnames.h \
     ../Reports/cr5menureview.h \
+    ../Reports/cr5salefromstoretotal.h \
+    ../Reports/cr5salefromstoretotalfilter.h \
     ../Reports/cr5saleremoveddishes.h \
     ../Reports/cr5saleremoveddishesfilter.h \
+    ../Reports/cr5salesbydishes.h \
+    ../Reports/cr5salesbydishesfilter.h \
+    ../Reports/cr5storereason.h \
+    c5cashdoc.h \
         c5mainwindow.h \
     ../Cafe5/c5config.h \
     ../Cafe5/c5connection.h \
@@ -297,10 +330,18 @@ HEADERS += \
     ../../XLSX/src/xlsxtheme.h \
     ../../XLSX/src/xlsxworkbook.h \
     ../../XLSX/src/xlsxwriter.h \
-    ../../XLSX/src/zip.h
+    ../../XLSX/src/zip.h \
+    ../Cache/cacheorderstate.h \
+    ../Cache/cachegoodswaste.h
 
 FORMS += \
+    ../Editors/c5cashname.ui \
+    ../Editors/ce5storereason.ui \
+    ../Reports/cr5cashdetailedfilter.ui \
+    ../Reports/cr5salefromstoretotalfilter.ui \
     ../Reports/cr5saleremoveddishesfilter.ui \
+    ../Reports/cr5salesbydishesfilter.ui \
+    c5cashdoc.ui \
         c5mainwindow.ui \
     ../Cafe5/c5connection.ui \
     ../Cafe5/c5message.ui \
@@ -358,6 +399,7 @@ FORMS += \
     c5waiterorder.ui
 
 INCLUDEPATH += ../Cafe5
+INCLUDEPATH += ../Cache
 INCLUDEPATH += ../Classes
 INCLUDEPATH += ../Reports
 INCLUDEPATH += ../Controls

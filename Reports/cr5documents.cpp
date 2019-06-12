@@ -4,6 +4,7 @@
 #include "cr5documentsfilter.h"
 #include "c5tablemodel.h"
 #include "c5mainwindow.h"
+#include "c5cashdoc.h"
 #include <QMenu>
 
 CR5Documents::CR5Documents(const QStringList &dbParams, QWidget *parent) :
@@ -62,7 +63,7 @@ CR5Documents::CR5Documents(const QStringList &dbParams, QWidget *parent) :
     fColumnsVisible["h.f_createdate"] = true;
     fColumnsVisible["h.f_createtime"] = true;
 
-    fOrderCondition = " order by h.f_date, f_docnum ";
+    fOrderCondition = " order by h.f_date, h.f_userid ";
 
     connect(this, SIGNAL(tblDoubleClicked(int,int,QList<QVariant>)), this, SLOT(tblDoubleClicked(int,int,QList<QVariant>)));
 
@@ -135,16 +136,23 @@ void CR5Documents::openDoc(QString id)
     case DOC_TYPE_STORE_INPUT:
     case DOC_TYPE_STORE_OUTPUT:
     case DOC_TYPE_STORE_MOVE: {
-        C5StoreDoc *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);
+        auto *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);
         if (!sd->openDoc(id)) {
             __mainWindow->removeTab(sd);
         }
         break;
     }
     case DOC_TYPE_STORE_INVENTORY: {
-        C5StoreInventory *si = __mainWindow->createTab<C5StoreInventory>(fDBParams);
+        auto *si = __mainWindow->createTab<C5StoreInventory>(fDBParams);
         if (!si->openDoc(id)) {
             __mainWindow->removeTab(si);
+        }
+        break;
+    }
+    case DOC_TYPE_CASH: {
+        auto *cd = __mainWindow->createTab<C5CashDoc>(fDBParams);
+        if (!cd->openDoc(id)) {
+            __mainWindow->removeTab(cd);
         }
         break;
     }
@@ -309,6 +317,12 @@ void CR5Documents::removeDocs()
                 return;
             }
             break;
+        case DOC_TYPE_CASH:
+            if (C5CashDoc::removeDoc(fDBParams, id)) {
+                fModel->removeRow(r);
+            } else {
+                return;
+            }
         }
     }
 }

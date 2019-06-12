@@ -7,8 +7,10 @@
 #include "c5connection.h"
 #include <QShortcut>
 #include <QInputDialog>
+#include <QSettings>
 
 static QMap<QString, Goods> fGoods;
+static QSettings __s(QString("%1\\%2\\%3").arg(_ORGANIZATION_).arg(_APPLICATION_).arg(_MODULE_));
 
 Working::Working(QWidget *parent) :
     QDialog(parent),
@@ -31,11 +33,57 @@ Working::Working(QWidget *parent) :
     connect(sF12, SIGNAL(activated()), this, SLOT(on_btnSaveOrder_clicked()));
     getGoodsList();
     on_btnNewOrder_clicked();
+    ui->leCode->installEventFilter(this);
+    ui->tab->installEventFilter(this);
+    fTimerTimeout = 0;
+    connect(&fTimer, SIGNAL(timeout()), this, SLOT(timeout()));
+    fTimer.start(1000);
 }
 
 Working::~Working()
 {
     delete ui;
+}
+
+bool Working::eventFilter(QObject *watched, QEvent *event)
+{
+    WOrder *w = nullptr;
+    if (event->type() == QEvent::KeyRelease) {
+        auto *ke = static_cast<QKeyEvent*>(event);
+        switch (ke->key()) {
+        case Qt::Key_Plus:
+            ui->leCode->clear();
+            w = static_cast<WOrder*>(ui->tab->currentWidget());
+            if (w) {
+                w->changeQty();
+            }
+            event->accept();
+            return true;
+        case Qt::Key_Minus:
+            ui->leCode->clear();
+            w = static_cast<WOrder*>(ui->tab->currentWidget());
+            if (w) {
+                w->removeRow();
+            }
+            event->accept();
+            return true;
+        case Qt::Key_Asterisk:
+            ui->leCode->clear();
+            w = static_cast<WOrder*>(ui->tab->currentWidget());
+            if (w) {
+                w->changePrice();
+            }
+            event->accept();
+            return true;
+        case Qt::Key_F5:
+            on_btnShowGoodsList_clicked();
+            break;
+        case Qt::Key_F9:
+            on_btnSaveOrderNoTax_clicked();
+            break;
+        }
+    }
+    return QDialog::eventFilter(watched, event);
 }
 
 void Working::getGoodsList()
@@ -58,6 +106,50 @@ void Working::getGoodsList()
         g.fTaxDept = db.getInt(5);
         g.fAdgCode = db.getString(6);
         fGoods[g.fScanCode] = g;
+    }
+    ui->wGoods->setVisible(__s.value("goodslist", false).toBool());
+    if (__s.value("goodslist", false).toBool()) {
+        makeWGoods();
+    }
+}
+
+void Working::makeWGoods()
+{
+    ui->tblGoods->clearContents();
+    ui->tblGoods->setRowCount(0);
+    int col = 0;
+    int row = 0;
+    C5Database db(C5Config::dbParams());
+    db.exec("select gs.f_code, gg.f_id, gg.f_name as f_goodsname, gu.f_name, gg.f_saleprice, "
+            "gr.f_taxdept, gr.f_adgcode "
+            "from c_goods_scancode gs "
+            "left join c_goods gg on gg.f_id=gs.f_goods "
+            "left join c_groups gr on gr.f_id=gg.f_group "
+            "left join c_units gu on gu.f_id=gg.f_unit "
+            "order by gr.f_name, gg.f_name ");
+    while (db.nextRow()) {
+        if (ui->tblGoods->rowCount() - 1 < row) {
+            ui->tblGoods->setRowCount(ui->tblGoods->rowCount() + 1);
+        }
+        QTableWidgetItem *item = new QTableWidgetItem();
+        item->setText(db.getString("f_goodsname"));
+        item->setData(Qt::UserRole, db.getString("f_code"));
+        ui->tblGoods->setItem(row, col++, item);
+        if (col == 3) {
+            col = 0;
+            row++;
+        }
+    }
+}
+
+void Working::timeout()
+{
+    //ui->leCode->setFocus();
+    fTimerTimeout++;
+    if (fTimerTimeout == 5) {
+        if (ui->wGoods->isVisible()) {
+            ui->tblGoods->horizontalHeader()->setDefaultSectionSize(ui->tblGoods->width() / 3);
+        }
     }
 }
 
@@ -110,6 +202,13 @@ void Working::shortcutUp()
 void Working::on_btnNewOrder_clicked()
 {
     WOrder *w = new WOrder(this);
+    QObjectList ol = w->children();
+    for (QObject *o: ol) {
+        auto wd = dynamic_cast<QWidget*>(o);
+        if (wd) {
+            wd->installEventFilter(this);
+        }
+    }
     ui->tab->addTab(w, "");
     ui->tab->setCurrentIndex(ui->tab->count() - 1);
 }
@@ -160,35 +259,6 @@ void Working::on_btnSaveOrder_clicked()
     w->deleteLater();
 }
 
-void Working::on_leCode_textChanged(const QString &arg1)
-{
-    if (arg1 == "+") {
-        ui->leCode->clear();
-        WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
-        if (!w) {
-            return;
-        }
-        w->changeQty();
-        return;
-    }
-    if (arg1 == "*") {
-        ui->leCode->clear();
-        WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
-        if (!w) {
-            return;
-        }
-        w->changePrice();
-    }
-    if (arg1 == "-") {
-        ui->leCode->clear();
-        WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
-        if (!w) {
-            return;
-        }
-        w->removeRow();
-    }
-}
-
 void Working::on_btnSaveOrderNoTax_clicked()
 {
     WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
@@ -203,4 +273,31 @@ void Working::on_btnSaveOrderNoTax_clicked()
         on_btnNewOrder_clicked();
     }
     w->deleteLater();
+}
+
+void Working::on_btnExit_clicked()
+{
+    accept();
+}
+
+void Working::on_btnShowGoodsList_clicked()
+{
+    ui->wGoods->setVisible(!ui->wGoods->isVisible());
+    __s.setValue("goodslist", ui->wGoods->isVisible());
+    if (ui->wGoods->isVisible()) {
+        makeWGoods();
+    }
+}
+
+void Working::on_tblGoods_itemClicked(QTableWidgetItem *item)
+{
+    if (!item) {
+        return;
+    }
+    QString code = item->data(Qt::UserRole).toString();
+    if (code.isEmpty()) {
+        return;
+    }
+    ui->leCode->setText(code);
+    on_leCode_returnPressed();
 }

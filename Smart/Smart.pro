@@ -41,7 +41,8 @@ SOURCES += \
     ../Cafe5/c5sockethandler.cpp \
     ../Waiter/dlgpassword.cpp \
     ../Controls/c5lineedit.cpp \
-    ../Classes/c5user.cpp
+    ../Classes/c5user.cpp \
+    dlgpassword.cpp
 
 HEADERS += \
     ../../NewTax/Src/printtaxn.h \
@@ -61,7 +62,8 @@ HEADERS += \
     ../Cafe5/c5socketmessage.h \
     ../Waiter/dlgpassword.h \
     ../Controls/c5lineedit.h \
-    ../Classes/c5user.h
+    ../Classes/c5user.h \
+    dlgpassword.h
 
 FORMS += \
     ../FrontDesk/c5selector.ui \
@@ -69,7 +71,8 @@ FORMS += \
         workspace.ui \
     ../Cafe5/c5connection.ui \
     ../Cafe5/c5message.ui \
-    ../Waiter/dlgpassword.ui
+    ../Waiter/dlgpassword.ui \
+    dlgpassword.ui
 
 DEFINES += _DBDRIVER_=\\\"QMYSQL\\\"
 DEFINES += _ORGANIZATION_=\\\"Jazzve\\\"
@@ -80,7 +83,6 @@ DEFINES += WAITER
 INCLUDEPATH += c:/projects/cafe5/Cafe5
 INCLUDEPATH += c:/projects/cafe5/Classes
 INCLUDEPATH += c:/projects/cafe5/Controls
-INCLUDEPATH += c:/projects/cafe5/Waiter
 INCLUDEPATH += c:/Projects/NewTax/Src
 INCLUDEPATH += C:/OpenSSL-Win32/include
 INCLUDEPATH += C:/OpenSSL-Win32/include/openssl
@@ -92,4 +94,5 @@ LIBS += -lopenssl
 LIBS += -llibcrypto
 
 RESOURCES += \
-    ../resources/resources.qrc
+    ../resources/resources.qrc \
+    transres.qrc

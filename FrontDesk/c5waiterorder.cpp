@@ -111,6 +111,7 @@ QToolBar *C5WaiterOrder::toolBar()
         fToolBar->addAction(QIcon(":/constructor.png"), tr("Recount selfcost"), this, SLOT(recountSelfCost()));
         fToolBar->addAction(QIcon(":/eye.png"), tr("Show all"), this, SLOT(showAll()));
         fToolBar->addAction(QIcon(":/eye-no.png"), tr("Hide removed"), this, SLOT(hideRemoved()));
+        fToolBar->addAction(QIcon(":/delete.png"), tr("Remove"), this, SLOT(removeOrder()));
     }
     return fToolBar;
 }
@@ -140,6 +141,21 @@ void C5WaiterOrder::showLog()
         ui->tblLog->setData(row, 5, db.getString("f_value2"));
         row++;
     }
+}
+
+void C5WaiterOrder::removeOrder()
+{
+    if (C5Message::info(tr("Confirm to remove")) != QDialog::Accepted) {
+        return;
+    }
+    C5Database db(fDBParams);
+    db[":f_state"] = ORDER_STATE_VOID;
+    db[":f_id"] = ui->leUuid->text();
+    db.exec("update o_header set f_state=:f_state where f_id=:f_id");
+    db[":f_state"] = DISH_STATE_MISTAKE;
+    db[":f_header"] = ui->leUuid->text();
+    db.exec("update o_body set f_state=:f_state where f_header=:f_header");
+    C5Message::info(tr("Removed"));
 }
 
 void C5WaiterOrder::showAll()

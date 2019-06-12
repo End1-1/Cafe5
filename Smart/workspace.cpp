@@ -246,7 +246,8 @@ void Workspace::on_btnCheckout_clicked()
     }
     for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
         Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
-        db[":f_id"] = C5Database::uuid();
+        QString bid = C5Database::uuid();
+        db[":f_id"] = bid;
         db[":f_header"] = id;
         db[":f_state"] = DISH_STATE_OK;
         db[":f_dish"] = d.id;
@@ -266,6 +267,24 @@ void Workspace::on_btnCheckout_clicked()
             C5Message::error(db.fLastError);
             db.rollback();
             return;
+        }
+        db[":f_dish"] = d.id;
+        db.exec("select r.f_goods, r.f_qty from "
+                "d_recipes r "
+                "where r.f_dish=:f_dish");
+        QList<Dish> recipe;
+        while (db.nextRow()) {
+            Dish d;
+            d.id = db.getInt(0);
+            d.qty = db.getDouble(1);
+            recipe.append(d);
+        }
+        for (const Dish &d: recipe) {
+            db[":f_header"] = id;
+            db[":f_body"] = bid;
+            db[":f_goods"] = d.id;
+            db[":f_qty"] = d.qty;
+            db.insert("o_store_output", false);
         }
     }
     db.commit();
@@ -341,4 +360,9 @@ void Workspace::setCurrentDish(Dish &d)
     ui->tblOrder->item(row, 0)->setData(Qt::UserRole, qVariantFromValue<Dish>(d));
     ui->tblOrder->viewport()->update();
     countTotal();
+}
+
+void Workspace::on_btnExit_clicked()
+{
+    accept();
 }

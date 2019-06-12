@@ -15,7 +15,7 @@ class WOrder : public QWidget
     Q_OBJECT
 
 public:
-    explicit WOrder(QWidget *parent = 0);
+    explicit WOrder(QWidget *parent = nullptr);
 
     ~WOrder();
 

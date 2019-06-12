@@ -38,6 +38,8 @@ private slots:
 
     void on_btnClearFilter_clicked();
 
+    void on_btnExit_clicked();
+
 private:
     Ui::Workspace *ui;
 

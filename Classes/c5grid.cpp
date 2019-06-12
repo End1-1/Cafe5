@@ -25,6 +25,7 @@ C5Grid::C5Grid(const QStringList &dbParams, QWidget *parent) :
     ui->tblView->setModel(fModel);
     fSimpleQuery = true;
     fTableView = ui->tblView;
+    fTableTotal = ui->tblTotal;
     fTableView->horizontalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(fTableView->horizontalHeader(), SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(tableViewHeaderContextMenuRequested(QPoint)));
     connect(fTableView->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(tableViewHeaderClicked(int)));
@@ -272,6 +273,8 @@ void C5Grid::restoreColumnsWidths()
         QString colName = fModel->nameForColumnIndex(i);
         if (s.contains(colName)) {
             ui->tblView->setColumnWidth(i, s.value(colName).toInt());
+        } else {
+            ui->tblView->setColumnWidth(i, ui->tblView->horizontalHeader()->defaultSectionSize());
         }
     }
 }

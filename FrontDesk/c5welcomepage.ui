@@ -15,7 +15,7 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="1" column="0">
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="grAction">
      <property name="title">
       <string>Actions</string>
      </property>
@@ -65,7 +65,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QGroupBox" name="groupBox_3">
+       <widget class="QGroupBox" name="grGoods">
         <property name="title">
          <string>Goods</string>
         </property>
@@ -129,7 +129,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QGroupBox" name="groupBox_4">
+       <widget class="QGroupBox" name="grMenu">
         <property name="title">
          <string>Menu</string>
         </property>
@@ -205,7 +205,7 @@
     </widget>
    </item>
    <item row="1" column="1">
-    <widget class="QGroupBox" name="groupBox_2">
+    <widget class="QGroupBox" name="grReports">
      <property name="title">
       <string>Report</string>
      </property>

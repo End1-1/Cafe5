@@ -1,5 +1,10 @@
 #include "c5cache.h"
 #include "c5database.h"
+#include "cachedishstate.h"
+#include "cacheorderstate.h"
+#include "cachegoodswaste.h"
+#include "cachecashnames.h" //32
+#include "cachestorereason.h" //33
 
 QMap<QString, C5Cache*> C5Cache::fCacheList;
 QMap<int, QString> C5Cache::fCacheQuery;
@@ -78,6 +83,11 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         setCacheSimpleQuery(cache_menu_names, "d_menu_names");
         setCacheSimpleQuery(cache_halls, "h_halls");
         setCacheSimpleQuery(cache_tables, "h_tables");
+        fCacheQuery[cache_dish_state] = query_cache_dish_state;
+        fCacheQuery[cache_order_state] = query_cache_order_state;
+        fCacheQuery[cache_goods_waste] = query_cache_goods_waste;
+        fCacheQuery[cache_cash_names] = query_cache_cash_names;
+        fCacheQuery[cache_store_reason] = query_cache_store_reason;
     }
     if (fTableCache.count() == 0) {
         fTableCache["c_partners"] = cache_goods_partners;
@@ -88,7 +98,7 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         fTableCache["d_part2"] = cache_dish_part2;
         fTableCache["d_dish"] = cache_dish;
         fTableCache["c_storages"] = cache_goods_store;
-        fTableCache["c_goods_waster"] = cache_goods_waste;
+        fTableCache["c_goods_waste"] = cache_goods_waste;
         fTableCache["s_user"] = cache_users;
         fTableCache["s_user_group"] = cache_users_groups;
         fTableCache["o_credit_card"] = cache_credit_card;
@@ -102,6 +112,10 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         fTableCache["d_menu_names"] = cache_menu_names;
         fTableCache["h_halls"] = cache_halls;
         fTableCache["h_tables"] = cache_tables;
+        fTableCache["o_body_state"] = cache_dish_state;
+        fTableCache["o_state"] = cache_order_state;
+        fTableCache["e_cash_names"] = cache_cash_names;
+        fTableCache["a_reason"] = cache_store_reason;
     }
     fVersion = 0;
     C5Database db(dbParams);

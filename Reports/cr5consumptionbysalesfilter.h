@@ -20,6 +20,8 @@ public:
 
     int store();
 
+    bool salesCounted();
+
     QDate date1();
 
     QDate date2();

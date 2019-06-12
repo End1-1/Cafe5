@@ -3,15 +3,19 @@
 #include "c5message.h"
 #include "c5connection.h"
 #include "c5login.h"
+#include "c5cashdoc.h"
+#include "cr5cashdetailed.h"
 #include "c5permissions.h"
 #include "c5widget.h"
 #include "cr5commonsales.h"
 #include "checkforupdatethread.h"
 #include "cr5usersgroups.h"
 #include "cr5consumptionbysales.h"
+#include "cr5storereason.h"
 #include "cr5documents.h"
 #include "c5translatorform.h"
 #include "cr5saleremoveddishes.h"
+#include "cr5cashnames.h"
 #include "cr5dish.h"
 #include "cr5settings.h"
 #include "cr5goodsmovement.h"
@@ -19,7 +23,9 @@
 #include "cr5dishpart1.h"
 #include "c5toolbarwidget.h"
 #include "c5dishselfcostgenprice.h"
+#include "cr5salefromstoretotal.h"
 #include "cr5dishcomment.h"
+#include "cr5salesbydishes.h"
 #include "cr5tstoreextra.h"
 #include "cr5storedocuments.h"
 #include "cr5dishpart2.h"
@@ -29,6 +35,7 @@
 #include "cr5goodsgroup.h"
 #include "cr5menureview.h"
 #include "cr5databases.h"
+#include "cr5storereason.h"
 #include "cr5goodspartners.h"
 #include "cr5goodswaste.h"
 #include "c5welcomepage.h"
@@ -223,6 +230,7 @@ void C5MainWindow::on_actionLogin_triggered()
     if (!C5Connection::go<C5Login>(C5Config::dbParams())) {
         return;
     }
+    showMaximized();
     fStatusLabel->setText(__username);
 
     C5Database db(C5Config::fDBHost, C5Config::fDBPath, C5Config::fDBUser, C5Config::fDBPassword);
@@ -289,7 +297,20 @@ void C5MainWindow::on_actionLogin_triggered()
             addTreeL3Item(it, cp_t2_count_output_of_sale, tr("Consumption of goods based on sales"), ":/goods.png");
             addTreeL3Item(it, cp_t3_sales_common, tr("Sales, expert mode"), ":/graph.png");
             addTreeL3Item(it, cp_t3_store_sale, tr("Sales from store"), ":/graph.png");
+            addTreeL3Item(it, cp_t3_sale_from_store_total, tr("Sales from store total"), ":/graph.png");
             addTreeL3Item(it, cp_t3_sale_removed_dishes, tr("Sales, removed dishes"), ":/delete.png");
+            addTreeL3Item(it, cp_t3_sale_dishes, tr("Sales, dishes"), ":/graph.png");
+        }
+
+        if (pr(db.getString(3), cp_t8_cash)) {
+            it = new QTreeWidgetItem();
+            it->setText(0, tr("Cash"));
+            it->setData(0, Qt::UserRole, cp_t2_action);
+            it->setIcon(0, QIcon(":/reports.png"));
+            item->addChild(it);
+            addTreeL3Item(it, cp_t8_cash_doc, tr("New document"), ":/cash.png");
+            addTreeL3Item(it, cp_t8_cash_detailed_report, tr("Cash detailed report"), ":/cash.png");
+            addTreeL3Item(it, cp_t8_cash_names, tr("Cash names"), ":/cash.png");
         }
 
         if (pr(db.getString(3), cp_t4_menu)) {
@@ -332,6 +353,7 @@ void C5MainWindow::on_actionLogin_triggered()
             addTreeL3Item(it, cp_t7_tables, tr("Tables"), ":/table.png");
             addTreeL3Item(it, cp_t7_credit_card, tr("Credit cards"), ":/credit-card.png");
             addTreeL3Item(it, cp_t7_discount_system, tr("Discount system"), ":/discount.png");
+            addTreeL3Item(it, cp_t7_store_reason, tr("Store reason"), ":/documents.png");
             if (db.getInt(6) > 0) {
                 addTreeL3Item(it, cp_t7_upload_data_to_other_server, tr("Data synchronization"), ":/data-transfer.png");
             }
@@ -533,6 +555,12 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
     case cp_t3_sale_removed_dishes:
         createTab<CR5SaleRemovedDishes>(dbParams);
         break;
+    case cp_t3_sale_dishes:
+        createTab<CR5SalesByDishes>(dbParams);
+        break;
+    case cp_t3_sale_from_store_total:
+        createTab<CR5SaleFromStoreTotal>(dbParams);
+        break;
     case cp_t4_part1:
         createTab<CR5DishPart1>(dbParams);
         break;
@@ -595,6 +623,18 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
         break;
     case cp_t7_translator:
         createTab<C5TranslatorForm>(dbParams);
+        break;
+    case cp_t7_store_reason:
+        createTab<CR5StoreReason>(dbParams);
+        break;
+    case cp_t8_cash_names:
+        createTab<CR5CashNames>(dbParams);
+        break;
+    case cp_t8_cash_doc:
+        createTab<C5CashDoc>(dbParams);
+        break;
+    case cp_t8_cash_detailed_report:
+        createTab<CR5CashDetailed>(dbParams);
         break;
     default:
         break;

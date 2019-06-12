@@ -1,11 +1,13 @@
 #include "cr5saleremoveddishesfilter.h"
 #include "ui_cr5saleremoveddishesfilter.h"
+#include "cachedishstate.h"
 
 CR5SaleRemovedDishesFilter::CR5SaleRemovedDishesFilter(const QStringList &dbParams, QWidget *parent) :
     C5FilterWidget(dbParams, parent),
     ui(new Ui::CR5SaleRemovedDishesFilter)
 {
     ui->setupUi(this);
+    ui->leDishState->setSelector(dbParams, ui->leStateName, cache_dish_state);
 }
 
 CR5SaleRemovedDishesFilter::~CR5SaleRemovedDishesFilter()

@@ -9,6 +9,7 @@
 #include "ce5partner.h"
 #include "ce5goods.h"
 #include <QMenu>
+#include <QShortcut>
 
 C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
     C5Widget(dbParams, parent),
@@ -29,11 +30,16 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
     ui->lePassed->setSelector(dbParams, ui->lePassedName, cache_users);
     fInternalId = "";
     fDocState = DOC_STATE_DRAFT;
-    ui->leScancode->setVisible(false);
     ui->tblGoodsGroup->viewport()->installEventFilter(this);
     fGroupTableCell = nullptr;
     fGroupTableCellMove = false;
     connect(ui->leInvoiceNumber, SIGNAL(focusOut()), this, SLOT(checkInvoiceDuplicate()));
+    QShortcut *f2 = new QShortcut(QKeySequence(Qt::Key_F2), this);
+    connect(f2, &QShortcut::activated, [this](){
+        ui->leScancode->setFocus();
+    });
+    fFocusNextChild = false;
+    fCanChangeFocus = true;
 }
 
 C5StoreDoc::~C5StoreDoc()
@@ -199,6 +205,61 @@ bool C5StoreDoc::save(int state, QString &err, bool showMsg)
         C5Message::error(err);
         return false;
     }
+    if (err.isEmpty()) {
+        if (fDocType == DOC_TYPE_STORE_INPUT) {
+            C5Database db(fDBParams);
+            db.exec("select * from c_goods_waste");
+            QMap<int, double> gw;
+            int reason = 0;
+            while (db.nextRow()) {
+                if (reason == 0) {
+                    reason = db.getInt("f_reason");
+                }
+                gw[db.getInt("f_goods")] = db.getDouble("f_waste");
+            }
+            QMap<int, double> gq;
+            for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+                if (gw.contains(ui->tblGoods->getInteger(i, 1))) {
+                    gq[ui->tblGoods->getInteger(i, 1)] = ui->tblGoods->getDouble(i, 3) * (gw[ui->tblGoods->getInteger(i, 1)] / 100);
+                }
+            }
+            if (gq.count() > 0) {
+                C5Database db(fDBParams);
+                QJsonObject jo;
+                    jo["f_storein"] = "";
+                    jo["f_storeout"] = ui->leStoreOutput->text();
+
+                QJsonDocument jd(jo);
+                QString docid = C5Database::uuid();
+                db[":f_state"] = DOC_STATE_DRAFT;
+                db[":f_type"] = DOC_TYPE_STORE_OUTPUT;
+                db[":f_operator"] = __userid;
+                db[":f_date"] = ui->deDate->date();
+                db[":f_createDate"] = QDate::currentDate();
+                db[":f_createTime"] = QTime::currentTime();
+                db[":f_partner"] = 0;
+                db[":f_amount"] = 0;
+                db[":f_comment"] = "AUTO WASTE";
+                db[":f_raw"] = jd.toJson();
+                db[":f_id"]= docid;
+                db.insert("a_header", false);
+                for (QMap<int, double>::const_iterator it = gq.begin(); it != gq.end(); it++) {
+                    db[":f_id"] = C5Database::uuid();
+                    db[":f_document"] = docid;
+                    db[":f_goods"] = it.key();
+                    db[":f_qty"] = it.value();
+                    db[":f_price"] = 0;
+                    db[":f_total"] = 0;
+                    db[":f_reason"] = reason;
+                    db.insert("a_store_draft", false);
+                }
+                C5StoreDoc *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);
+                if (!sd->openDoc(docid)) {
+                    __mainWindow->removeTab(sd);
+                }
+            }
+        }
+    }
     return err.isEmpty();
 }
 
@@ -249,6 +310,15 @@ bool C5StoreDoc::eventFilter(QObject *o, QEvent *e)
         }
     }
     return C5Widget::eventFilter(o, e);
+}
+
+void C5StoreDoc::nextChild()
+{
+    if (fCanChangeFocus) {
+        focusNextChild();
+    } else {
+        fCanChangeFocus = true;
+    }
 }
 
 void C5StoreDoc::countTotal()
@@ -556,7 +626,7 @@ bool C5StoreDoc::writeOutput(const QDate &date, QString docNum, int store, doubl
             if (err.isEmpty()) {
                 err += tr("No enaugh materials in the store") + "<br>";
             }
-            err += QString("%1 - %2").arg(ui->tblGoods->getString(i, 2)).arg(qty);
+            err += QString("%1 - %2").arg(ui->tblGoods->getString(i, 2)).arg(qty) + "<br>";
         }
     }
     if (err.isEmpty()) {
@@ -1241,7 +1311,30 @@ void C5StoreDoc::on_btnNewGoods_clicked()
 
 void C5StoreDoc::on_leScancode_returnPressed()
 {
-
+    C5Database db(C5Config::dbParams());
+    db[":f_code"] = ui->leScancode->text();
+    db.exec("select gs.f_code, gg.f_id, gg.f_name, gu.f_name as f_unitname, gg.f_saleprice, "
+            "gr.f_taxdept, gr.f_adgcode "
+            "from c_goods_scancode gs "
+            "left join c_goods gg on gg.f_id=gs.f_goods "
+            "left join c_groups gr on gr.f_id=gg.f_group "
+            "left join c_units gu on gu.f_id=gg.f_unit "
+            "where gs.f_code=:f_code");
+    ui->leScancode->clear();
+    if (db.nextRow()) {
+        int row = addGoodsRow();
+        ui->tblGoods->setInteger(row, 1, db.getInt("f_id"));
+        ui->tblGoods->setString(row, 2, db.getString("f_name"));
+        ui->tblGoods->setString(row, 4, db.getString("f_unitname"));
+        ui->tblGoods->item(row, 2)->setSelected(true);
+        fCanChangeFocus = false;
+        ui->tblGoods->lineEdit(row, 3)->setFocus();
+        markGoodsComplited();
+    } else {
+        C5Message::error(tr("Goods not found"));
+        fCanChangeFocus = false;
+        ui->leScancode->setFocus();
+    }
 }
 
 TableCell::TableCell(QWidget *parent, QTableWidgetItem *item) :

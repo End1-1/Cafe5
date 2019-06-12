@@ -21,6 +21,7 @@ class C5Grid;
 
 class C5FilterWidget;
 class CE5Editor;
+class C5TableWidget;
 
 class C5Grid : public C5Widget
 {
@@ -32,6 +33,8 @@ public:
     ~C5Grid();
 
     C5TableView *fTableView;
+
+    C5TableWidget *fTableTotal;
 
     C5TableModel *fModel;
 

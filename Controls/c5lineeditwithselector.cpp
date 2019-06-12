@@ -39,7 +39,8 @@ void C5LineEditWithSelector::setValue(const QString &id)
     C5Cache *c = C5Cache::cache(fDBParams, fCache);
     int row = c->find(id.toInt());
     if (row > -1) {
-        fNameLineEdit->setText(c->getString(row, fColumnName));
+        QString text = c->getString(row, fColumnName);
+        fNameLineEdit->setText(text);
     } else {
         clear();
         fNameLineEdit->clear();

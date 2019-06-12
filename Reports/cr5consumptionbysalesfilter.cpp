@@ -25,6 +25,11 @@ int CR5ConsumptionBySalesFilter::store()
     return ui->leStore->getInteger();
 }
 
+bool CR5ConsumptionBySalesFilter::salesCounted()
+{
+    return ui->chSalesCounted->isChecked();
+}
+
 QDate CR5ConsumptionBySalesFilter::date1()
 {
     return ui->deStart->date();

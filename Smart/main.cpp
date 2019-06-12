@@ -2,10 +2,14 @@
 #include "c5config.h"
 #include "c5connection.h"
 #include <QApplication>
+#include <QTranslator>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    QTranslator t;
+    t.load(":/Smart.qm");
+    a.installTranslator(&t);
     QStringList args;
     for (int i = 0; i < argc; i++) {
         args << argv[i];

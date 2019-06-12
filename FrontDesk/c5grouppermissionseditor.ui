@@ -15,19 +15,12 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QCommandLinkButton" name="lbGroup">
-     <property name="text">
-      <string>CommandLinkButton</string>
-     </property>
-    </widget>
-   </item>
-   <item>
     <widget class="QTabWidget" name="tw">
      <property name="tabPosition">
       <enum>QTabWidget::West</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>6</number>
      </property>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
@@ -314,33 +307,13 @@
        <string>Reports</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_6">
-       <item row="3" column="0">
-        <widget class="C5CheckBox" name="checkBox_40">
+       <item row="10" column="0">
+        <widget class="C5CheckBox" name="checkBox_47">
          <property name="text">
-          <string>Goods movement</string>
+          <string>Sales, dishes</string>
          </property>
          <property name="Tag" stdset="0">
-          <number>304</number>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="C5CheckBox" name="checkBox_19">
-         <property name="text">
-          <string>Sales, expert mode</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>301</number>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <widget class="C5CheckBox" name="checkBox_22">
-         <property name="text">
-          <string>Storage</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>303</number>
+          <number>309</number>
          </property>
         </widget>
        </item>
@@ -364,7 +337,7 @@
          </property>
         </widget>
        </item>
-       <item row="9" column="1">
+       <item row="11" column="1">
         <spacer name="verticalSpacer_6">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -377,6 +350,26 @@
          </property>
         </spacer>
        </item>
+       <item row="9" column="0">
+        <widget class="C5CheckBox" name="checkBox_45">
+         <property name="text">
+          <string>Sales, removed dishes</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>308</number>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="C5CheckBox" name="checkBox_40">
+         <property name="text">
+          <string>Goods movement</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>304</number>
+         </property>
+        </widget>
+       </item>
        <item row="6" column="0">
         <widget class="C5CheckBox" name="checkBox_25">
          <property name="text">
@@ -384,6 +377,16 @@
          </property>
          <property name="Tag" stdset="0">
           <number>305</number>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="C5CheckBox" name="checkBox_22">
+         <property name="text">
+          <string>Storage</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>303</number>
          </property>
         </widget>
        </item>
@@ -407,15 +410,95 @@
          </property>
         </widget>
        </item>
-       <item row="8" column="0">
-        <widget class="C5CheckBox" name="checkBox_45">
+       <item row="4" column="0">
+        <widget class="C5CheckBox" name="checkBox_19">
          <property name="text">
-          <string>Sales, removed dishes</string>
+          <string>Sales, expert mode</string>
          </property>
          <property name="Tag" stdset="0">
-          <number>307</number>
+          <number>301</number>
          </property>
         </widget>
+       </item>
+       <item row="8" column="0">
+        <widget class="C5CheckBox" name="checkBox_48">
+         <property name="text">
+          <string>Sales from store total</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>310</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_8">
+      <attribute name="title">
+       <string>Cash</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="0">
+        <widget class="C5CheckBox" name="chCash">
+         <property name="text">
+          <string>All actions</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>800</number>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="C5CheckBox" name="checkBox_49">
+         <property name="text">
+          <string>Cash names</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>804</number>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="C5CheckBox" name="checkBox_50">
+         <property name="text">
+          <string>Cash documents</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>801</number>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="C5CheckBox" name="checkBox_51">
+         <property name="text">
+          <string>Cash common report</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>802</number>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="C5CheckBox" name="checkBox_52">
+         <property name="text">
+          <string>Cash detailed report</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>803</number>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <spacer name="verticalSpacer_8">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>498</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>
@@ -605,6 +688,16 @@
         </widget>
        </item>
        <item>
+        <widget class="C5CheckBox" name="checkBox_53">
+         <property name="text">
+          <string>Store reasons</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>708</number>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="verticalSpacer_7">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -709,6 +802,13 @@
        </item>
       </layout>
      </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCommandLinkButton" name="lbGroup">
+     <property name="text">
+      <string>CommandLinkButton</string>
+     </property>
     </widget>
    </item>
   </layout>

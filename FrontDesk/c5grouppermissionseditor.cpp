@@ -29,7 +29,6 @@ public:
     QProxyStyle::drawControl(element, option, painter, widget);
   }
 
-
 };
 
 C5GroupPermissionsEditor::C5GroupPermissionsEditor(const QStringList &dbParams, QWidget *parent) :
@@ -181,4 +180,8 @@ void C5GroupPermissionsEditor::on_chREportsAllItems_clicked(bool checked)
 void C5GroupPermissionsEditor::on_chOtherAllItems_clicked(bool checked)
 {
     setChecked(700, 799, checked);
+}
+void C5GroupPermissionsEditor::on_chCash_clicked(bool checked)
+{
+    setChecked(800, 899, checked);
 }

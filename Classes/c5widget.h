@@ -46,9 +46,13 @@ protected:
 
     QString fLabel;
 
+    bool fFocusNextChild;
+
     bool createToolBar();
 
     QToolBar *createStandartToolbar(const QList<ToolBarButtons> &btn);
+
+    virtual void nextChild();
 
 protected slots:
     virtual void print();

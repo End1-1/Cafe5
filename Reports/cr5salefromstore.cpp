@@ -117,6 +117,7 @@ void CR5SaleFromStore::makeOutput(bool v)
             "order by 1");
     int store = 0;
     QString docid;
+    bool nostorewarning = false;
     while (db.nextRow()) {
         if (store == 0 || store != db.getInt(0)) {
             if (!docid.isEmpty()) {
@@ -126,6 +127,10 @@ void CR5SaleFromStore::makeOutput(bool v)
                 }
             }
             store = db.getInt(0);
+            if (store == 0) {
+                nostorewarning = true;
+                continue;
+            }
             QJsonObject jo;
             jo["f_storein"] = "";
             jo["f_storeout"] = db.getString(0);
@@ -156,6 +161,9 @@ void CR5SaleFromStore::makeOutput(bool v)
     C5StoreDoc *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);
     if (!sd->openDoc(docid)) {
         __mainWindow->removeTab(sd);
+    }
+    if (nostorewarning) {
+        C5Message::error(tr("Not for all items store defined"));
     }
 }
 

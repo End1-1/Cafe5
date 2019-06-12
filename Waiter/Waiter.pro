@@ -48,6 +48,7 @@ SOURCES += \
     ../../XLSX/src/xlsxtheme.cpp \
     ../../XLSX/src/xlsxworkbook.cpp \
     ../../XLSX/src/xlsxwriter.cpp \
+    ../Cache/cachegoodswaste.cpp \
         main.cpp \
         dlgface.cpp \
     ../Cafe5/c5database.cpp \
@@ -107,7 +108,9 @@ SOURCES += \
     ../Cafe5/dlgexitbyversion.cpp \
     ../Classes/fileversion.cpp \
     dlgsearchinmenu.cpp \
-    ../Classes/c5waiterorderdoc.cpp
+    ../Classes/c5waiterorderdoc.cpp \
+    ../Cache/cachedishstate.cpp \
+    ../Cache/cacheorderstate.cpp
 
 HEADERS += \
     ../../XLSX/src/crs32.h \
@@ -126,6 +129,7 @@ HEADERS += \
     ../../XLSX/src/xlsxworkbook.h \
     ../../XLSX/src/xlsxwriter.h \
     ../../XLSX/src/zip.h \
+    ../Cache/cachegoodswaste.h \
         dlgface.h \
     ../Cafe5/c5database.h \
     ../Cafe5/c5config.h \
@@ -187,7 +191,10 @@ HEADERS += \
     ../Cafe5/dlgexitbyversion.h \
     ../Classes/fileversion.h \
     dlgsearchinmenu.h \
-    ../Classes/c5waiterorderdoc.h
+    ../Classes/c5waiterorderdoc.h \
+    ../Cache/cachedishstate.h \
+    ../Cache/cacheheaders.h \
+    ../Cache/cacheorderstate.h
 
 FORMS += \
         dlgface.ui \
@@ -215,6 +222,7 @@ FORMS += \
 
 INCLUDEPATH += ../Cafe5
 INCLUDEPATH += ../Classes
+INCLUDEPATH += ../Cache
 INCLUDEPATH += ../Controls
 INCLUDEPATH += C:/Projects/NewTax/Src
 INCLUDEPATH += ../Editors

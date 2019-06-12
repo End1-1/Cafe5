@@ -430,7 +430,7 @@
          <item>
           <widget class="C5LineEdit" name="leScancode">
            <property name="placeholderText">
-            <string>Search by scancode</string>
+            <string>Search by scancode (F2)</string>
            </property>
           </widget>
          </item>
@@ -463,6 +463,9 @@
          </property>
          <item>
           <widget class="C5TableWidget" name="tblGoods">
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
            <property name="editTriggers">
             <set>QAbstractItemView::NoEditTriggers</set>
            </property>
@@ -589,6 +592,9 @@
           <height>200</height>
          </size>
         </property>
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
+        </property>
         <property name="contextMenuPolicy">
          <enum>Qt::CustomContextMenu</enum>
         </property>
@@ -635,6 +641,9 @@
       </item>
       <item>
        <widget class="C5TableWidget" name="tblGoodsStore">
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
+        </property>
         <property name="styleSheet">
          <string notr="true">QTableWidget::item{ selection-background-color: red}</string>
         </property>
@@ -713,6 +722,7 @@
  </customwidgets>
  <tabstops>
   <tabstop>deDate</tabstop>
+  <tabstop>leDocNum</tabstop>
   <tabstop>deInvoiceDate</tabstop>
   <tabstop>leInvoiceNumber</tabstop>
   <tabstop>leStoreInput</tabstop>
@@ -722,16 +732,10 @@
   <tabstop>leAccepted</tabstop>
   <tabstop>leReason</tabstop>
   <tabstop>leComment</tabstop>
-  <tabstop>btnRemoveGoods</tabstop>
-  <tabstop>btnNewPartner</tabstop>
-  <tabstop>btnAddGoods</tabstop>
-  <tabstop>leAcceptedName</tabstop>
+  <tabstop>leScancode</tabstop>
   <tabstop>tblGoods</tabstop>
-  <tabstop>lePassedName</tabstop>
   <tabstop>tblGoodsGroup</tabstop>
   <tabstop>tblGoodsStore</tabstop>
-  <tabstop>btnNewGoods</tabstop>
-  <tabstop>leTotal</tabstop>
  </tabstops>
  <resources>
   <include location="../resources/res.qrc"/>

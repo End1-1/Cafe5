@@ -21,32 +21,6 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="1">
-    <widget class="C5DateEdit" name="deStart">
-     <property name="minimumSize">
-      <size>
-       <width>120</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>120</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="FilterName" stdset="0">
-      <string>date1</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Date end</string>
-     </property>
-    </widget>
-   </item>
    <item row="1" column="1">
     <widget class="C5DateEdit" name="deEnd">
      <property name="minimumSize">
@@ -66,10 +40,22 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>Store</string>
+   <item row="0" column="1">
+    <widget class="C5DateEdit" name="deStart">
+     <property name="minimumSize">
+      <size>
+       <width>120</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>120</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>date1</string>
      </property>
     </widget>
    </item>
@@ -91,6 +77,19 @@
       <string>store</string>
      </property>
     </widget>
+   </item>
+   <item row="4" column="1">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>342</height>
+      </size>
+     </property>
+    </spacer>
    </item>
    <item row="2" column="2">
     <widget class="C5LineEdit" name="leStoreName">
@@ -127,26 +126,44 @@
      </property>
     </spacer>
    </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Store</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Date end</string>
+     </property>
+    </widget>
+   </item>
    <item row="3" column="1">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
+    <widget class="QCheckBox" name="chSalesCounted">
+     <property name="text">
+      <string/>
      </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>342</height>
-      </size>
+     <property name="FilterName" stdset="0">
+      <string>SalesCounted</string>
      </property>
-    </spacer>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Sale counted</string>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5LineEditWithSelector</class>
+   <class>C5DateEdit</class>
    <extends>QLineEdit</extends>
-   <header location="global">c5lineeditwithselector.h</header>
+   <header location="global">c5dateedit.h</header>
   </customwidget>
   <customwidget>
    <class>C5LineEdit</class>
@@ -154,9 +171,9 @@
    <header location="global">c5lineedit.h</header>
   </customwidget>
   <customwidget>
-   <class>C5DateEdit</class>
+   <class>C5LineEditWithSelector</class>
    <extends>QLineEdit</extends>
-   <header location="global">c5dateedit.h</header>
+   <header location="global">c5lineeditwithselector.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

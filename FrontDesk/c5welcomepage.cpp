@@ -30,7 +30,7 @@ C5WelcomePage::C5WelcomePage(const QStringList &dbParams, QWidget *parent) :
     setDatabaseName(dbParams.at(1));
     fLabel = tr("Home");
     fIcon = ":/storehouse.png";
-
+    ui->grMenu->setVisible(false);
 }
 
 C5WelcomePage::~C5WelcomePage()
