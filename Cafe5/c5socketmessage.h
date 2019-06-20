@@ -1,9 +1,11 @@
 #ifndef C5SOCKETMESSAGE_H
 #define C5SOCKETMESSAGE_H
 
+#include <QtGlobal>
+
 static const int sm_hall = 1;
 static const int sm_menu = 2;
-static const int sm_checkuser = 3;
+static const qint32 sm_checkuser = 3;
 static const int sm_opentable = 4;
 static const int sm_waiterconf = 5;
 static const int sm_saveorder = 6;

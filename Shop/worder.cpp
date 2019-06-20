@@ -6,12 +6,14 @@
 #include "dqty.h"
 #include "c5utils.h"
 #include "c5printing.h"
+#include "working.h"
 
 WOrder::WOrder(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::WOrder)
 {
     ui->setupUi(this);
+    fWorking = static_cast<Working*>(parent);
     fDateOpen = QDate::currentDate();
     fTimeOpen = QTime::currentTime();
     ui->tblGoods->setColumnWidths(ui->tblGoods->columnCount(), 0, 300, 80, 80, 80, 80, 80, 80);
@@ -193,7 +195,7 @@ bool WOrder::writeOrder(bool tax)
                         .arg(ui->tblGoods->getString(i, 7))
                         .arg(ui->tblGoods->getString(i, 1)), 0);
             } else {
-                p.ltext(QString("%1").arg(ui->tblGoods->getString(i, 1)), 0);
+                p.ltext(QString("%1%2").arg(fWorking->goodsCode(ui->tblGoods->getInteger(i, 0))).arg(ui->tblGoods->getString(i, 1)), 0);
             }
             p.br();
             p.ltext(QString("%1 X %2 = %3")

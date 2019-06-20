@@ -59,9 +59,6 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         fCacheQuery[cache_waiter_printers] = QString("select f_id as `%1`, f_name as `%2` from d_printers")
                 .arg(tr("Code"))
                 .arg(tr("Name"));
-        fCacheQuery[cache_store_reason] = QString("select f_id as `%1`, f_name as `%2` from a_reason")
-                .arg(tr("Code"))
-                .arg(tr("Name"));
         fCacheQuery[cache_credit_card] = QString("select f_id as `%1`, f_name as `%2` from o_credit_card")
                 .arg(tr("Code"))
                 .arg(tr("Name"));

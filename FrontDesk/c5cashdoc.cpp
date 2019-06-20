@@ -1,9 +1,11 @@
 #include "c5cashdoc.h"
 #include "ui_c5cashdoc.h"
+#include "c5storedoc.h"
 #include "c5utils.h"
 #include "c5double.h"
 #include "cachecashnames.h"
 #include "c5mainwindow.h"
+#include "c5inputdate.h"
 #include <QJsonDocument>
 #include <QJsonObject>
 
@@ -16,12 +18,24 @@ C5CashDoc::C5CashDoc(const QStringList &dbParams, QWidget *parent) :
     fLabel = "Cash document";
     ui->tbl->setColumnWidths(2, 400, 100);
     C5Database db(fDBParams);
-    db[":f_id"] = (DOC_TYPE_CASH);
+    db[":f_id"] = DOC_TYPE_CASH;
     db.exec("select f_counter from a_type where f_id=:f_id for update");
-    db.nextRow();
+    if (!db.nextRow()) {
+        db[":f_id"] = DOC_TYPE_CASH;
+        db[":f_counter"] = 1;
+        db[":f_name"] = tr("Cash doc");
+        db.insert("f_counter", false);
+        db.commit();
+        db[":f_id"] = DOC_TYPE_CASH;
+        db.exec("select f_counter from a_type where f_id=:f_id for update");
+        db.nextRow();
+    }
     ui->leDocNum->setPlaceholderText(QString("%1").arg(db.getInt(0) + 1, C5Config::docNumDigitsInput(), 10, QChar('0')));
     ui->leInput->setSelector(dbParams, ui->leInputName, cache_cash_names);
     ui->leOutput->setSelector(dbParams, ui->leOutputName, cache_cash_names);
+    ui->lbStoreDoc->setEnabled(false);
+    ui->leStoreDoc->setEnabled(false);
+    ui->btnOpenStoreDoc->setEnabled(false);
 }
 
 C5CashDoc::~C5CashDoc()
@@ -35,6 +49,7 @@ QToolBar *C5CashDoc::toolBar()
         C5Widget::toolBar();
         fToolBar->addAction(QIcon(":/save.png"), tr("Save"), this, SLOT(save()));
         fToolBar->addAction(QIcon(":/delete.png"), tr("Remove"), this, SLOT(removeDoc()));
+        fToolBar->addAction(QIcon(":/cash.png"), tr("Input from sale"), this, SLOT(inputFromSale()));
     }
     return fToolBar;
 }
@@ -54,6 +69,7 @@ bool C5CashDoc::openDoc(const QString &uuid)
         ui->leInput->setValue(jo["cashin"].toString());
         ui->leOutput->setValue(jo["cashout"].toString());
         ui->leRemarks->setText(db.getString("f_comment"));
+        fStoreUuid = jo["storedoc"].toString();
         if (ui->leOutput->getInteger() > 0 && ui->leInput->getInteger() == 0) {
             sign = -1;
         }
@@ -65,11 +81,39 @@ bool C5CashDoc::openDoc(const QString &uuid)
             ui->tbl->createLineEdit(row, 0)->setText(db.getString("f_remarks"));
             ui->tbl->createLineEdit(row, 1)->setDouble(db.getDouble("f_amount"));
         }
+        if (!fStoreUuid.isEmpty()) {
+            db[":f_id"] = fStoreUuid;
+            db.exec("select f_userid from a_header where f_id=:f_id");
+            if (db.nextRow()) {
+                ui->lbStoreDoc->setEnabled(true);
+                ui->leStoreDoc->setEnabled(true);
+                ui->btnOpenStoreDoc->setEnabled(true);
+                ui->leStoreDoc->setText(db.getString("f_userid"));
+            }
+        }
     } else {
         C5Message::error(tr("Invalid document id"));
         return false;
     }
     return true;
+}
+
+void C5CashDoc::setStoreDoc(const QString &uuid)
+{
+    fStoreUuid = uuid;
+    C5Database db(fDBParams);
+    db[":f_id"] = uuid;
+    db.exec("select * from a_header where f_id=:f_id");
+    if (db.nextRow()) {
+        ui->leStoreDoc->setText(db.getString("f_userid"));
+        int row = ui->tbl->addEmptyRow();
+        ui->tbl->createLineEdit(row, 0)->setText(QString("%1 #%2").arg(tr("Store input")).arg(db.getString("f_userid")));
+        ui->tbl->createLineEdit(row, 1)->setDouble(db.getDouble("f_amount"));
+        amountChanged("");
+        ui->lbStoreDoc->setEnabled(true);
+        ui->leStoreDoc->setEnabled(true);
+        ui->btnOpenStoreDoc->setEnabled(true);
+    }
 }
 
 bool C5CashDoc::removeDoc(const QStringList &dbParams, const QString &uuid)
@@ -105,15 +149,35 @@ void C5CashDoc::save()
         C5Message::error(err);
         return;
     }
+    C5Database db(fDBParams);
     if (ui->leDocNum->text().isEmpty()) {
-        ui->leDocNum->setText(ui->leDocNum->placeholderText());
+        db.startTransaction();
+        db[":f_id"] = (DOC_TYPE_CASH);
+        db.exec("select f_counter from a_type where f_id=:f_id for update");
+        int count = 1;
+        if (db.nextRow()) {
+            count = db.getInt(0) + 1;
+            ui->leDocNum->setText(QString("%1").arg(count, C5Config::docNumDigitsInput(), 10, QChar('0')));
+        } else {
+            ui->leDocNum->setText(QString("%1").arg(count, C5Config::docNumDigitsInput(), 10, QChar('0')));
+        }
+        db[":f_counter"] = count;
+        if (!db.update("a_type", where_id(DOC_TYPE_CASH))) {
+            C5Message::error(db.fLastError);
+        }
+        db.commit();
+    } else {
+        int docnum = ui->leDocNum->getInteger();
+        db[":f_id"] = DOC_TYPE_CASH;
+        db[":f_counter"] = docnum;
+        db.exec("update a_type set f_counter=:f_counter where f_id=:f_id and f_counter<:f_counter");
     }
     QJsonObject jo;
     jo["cashin"] = ui->leInput->text();
     jo["cashout"] = ui->leOutput->text();
+    jo["storedoc"] = fStoreUuid;
     QJsonDocument jd;
     jd.setObject(jo);
-    C5Database db(fDBParams);
     if (fUuid.isEmpty()) {
         fUuid = C5Database::uuid();
         db[":f_id"] = fUuid;
@@ -151,6 +215,19 @@ void C5CashDoc::save()
             db.insert("e_cash", false);
         }
     }
+    if (!fStoreUuid.isEmpty()) {
+        db[":f_id"] = fStoreUuid;
+        db.exec("select * from a_header where f_id=:f_id");
+        if (db.nextRow()) {
+            QJsonDocument jd = QJsonDocument::fromJson(db.getString("f_raw").toUtf8());
+            QJsonObject jo = jd.object();
+            jo["cashdoc"] = fUuid;
+            jd.setObject(jo);
+            db[":f_raw"] = jd.toJson();
+            db[":f_id"] = fStoreUuid;
+            db.exec("update a_header set f_raw=:f_raw where f_id=:f_id");
+        }
+    }
     C5Message::info(tr("Saved"));
 }
 
@@ -167,6 +244,22 @@ void C5CashDoc::removeDoc()
     __mainWindow->removeTab(this);
 }
 
+void C5CashDoc::inputFromSale()
+{
+    QDate d = QDate::currentDate();
+    if (C5InputDate::date(d)) {
+        C5Database db(fDBParams);
+        db[":f_date"] = d;
+        db.exec("select sum(f_amounttotal) from o_header where f_datecash=:f_date");
+        if (db.nextRow()) {
+            int row = ui->tbl->addEmptyRow();
+            ui->tbl->createLineEdit(row, 0)->setText(QString("%1 %2").arg(tr("Input from sale")).arg(d.toString(FORMAT_DATE_TO_STR)));
+            ui->tbl->createLineEdit(row, 1)->setDouble(db.getDouble("f_amount"));
+            amountChanged("");
+        }
+    }
+}
+
 void C5CashDoc::on_btnNewRow_clicked()
 {
     int row = ui->tbl->addEmptyRow();
@@ -174,4 +267,15 @@ void C5CashDoc::on_btnNewRow_clicked()
     C5LineEdit *l = ui->tbl->createLineEdit(row, 1);
     l->setValidator(new QDoubleValidator(0, 999999999, 2));
     connect(l, SIGNAL(textChanged(QString)), this, SLOT(amountChanged(QString)));
+}
+
+void C5CashDoc::on_btnOpenStoreDoc_clicked()
+{
+    if (fStoreUuid.isEmpty()) {
+        return;
+    }
+    auto *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);
+    if (!sd->openDoc(fStoreUuid)) {
+        __mainWindow->removeTab(sd);
+    }
 }

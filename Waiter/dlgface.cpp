@@ -77,7 +77,7 @@ void DlgFace::setup()
     connect(&fTimer, SIGNAL(timeout()), this, SLOT(confTimeout()));
     fConfTimer.start(TIMER_TIMEOUT_INTERVAL * 12);
     if (!fModeJustSelectTable) {
-        C5LogToServerThread::remember(LOG_WAITER, 0, "", "", "", "Program started", "", "");
+        C5LogToServerThread::remember(LOG_WAITER, "", "", "", "", "Program started", "", "");
     }
 }
 

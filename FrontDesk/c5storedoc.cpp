@@ -1,8 +1,10 @@
 #include "c5storedoc.h"
 #include "ui_c5storedoc.h"
-#include "c5cache.h"
+#include "cachestorereason.h"
 #include "c5selector.h"
+#include "c5cache.h"
 #include "c5printing.h"
+#include "c5cashdoc.h"
 #include "c5printpreview.h"
 #include "c5editor.h"
 #include "c5mainwindow.h"
@@ -73,6 +75,7 @@ bool C5StoreDoc::openDoc(QString id)
     ui->leAccepted->setValue(jo["f_accepted"].toString());
     ui->deInvoiceDate->setDate(QDate::fromString(jo["f_invoicedate"].toString(), "dd.MM.yyyy"));
     ui->leInvoiceNumber->setText(jo["f_invoice"].toString());
+    fCashUuid = jo["cashdoc"].toString();
     setMode(static_cast<STORE_DOC>(fDocType));
     db[":f_document"] = id;
     db.exec("select d.f_id, d.f_goods, g.f_name, d.f_qty, u.f_name, d.f_price, d.f_total, d.f_reason \
@@ -93,6 +96,15 @@ bool C5StoreDoc::openDoc(QString id)
     }
     setDocEnabled(fDocState == DOC_STATE_DRAFT);
     countTotal();
+    if (!fCashUuid.isEmpty()) {
+        db[":f_id"] = fCashUuid;
+        db.exec("select * from a_header where f_id=:f_id");
+        if (db.nextRow()) {
+            ui->leCashDoc->setEnabled(true);
+            ui->lbCashDoc->setEnabled(true);
+            ui->leCashDoc->setText(db.getString("f_userid"));
+        }
+    }
     return true;
 }
 
@@ -109,9 +121,15 @@ void C5StoreDoc::setMode(C5StoreDoc::STORE_DOC sd)
         ui->leDocNum->setPlaceholderText(QString("%1").arg(db.getInt(0) + 1, C5Config::docNumDigitsInput(), 10, QChar('0')));
         break;
     case DOC_TYPE_STORE_MOVE:
+        ui->lbCashDoc->setVisible(false);
+        ui->leCashDoc->setVisible(false);
+        ui->btnCreateDoc->setVisible(false);
         ui->leDocNum->setPlaceholderText(QString("%1").arg(db.getInt(0) + 1, C5Config::docNumDigitsMove(), 10, QChar('0')));
         break;
     case DOC_TYPE_STORE_OUTPUT:
+        ui->lbCashDoc->setVisible(false);
+        ui->leCashDoc->setVisible(false);
+        ui->btnCreateDoc->setVisible(false);
         ui->leDocNum->setPlaceholderText(QString("%1").arg(db.getInt(0) + 1, C5Config::docNumDigitsOut(), 10, QChar('0')));
         break;
     }
@@ -1354,4 +1372,21 @@ void C5StoreDoc::on_tblGoodsGroup_customContextMenuRequested(const QPoint &pos)
         menu->addAction(tr("Change order"), this, SLOT(changeGoodsGroupOrder()));
     }
     menu->popup(ui->tblGoodsGroup->mapToGlobal(pos));
+}
+
+void C5StoreDoc::on_btnCreateDoc_clicked()
+{
+    if (fDocState != DOC_STATE_SAVED) {
+        C5Message::info(tr("Save first"));
+        return;
+    }
+    if (ui->leCashDoc->isEmpty()) {
+        auto cd = __mainWindow->createTab<C5CashDoc>(fDBParams);
+        cd->setStoreDoc(fInternalId);
+    } else {
+        auto *cd = __mainWindow->createTab<C5CashDoc>(fDBParams);
+        if (!cd->openDoc(fCashUuid)) {
+            __mainWindow->removeTab(cd);
+        }
+    }
 }

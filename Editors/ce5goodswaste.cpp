@@ -1,5 +1,6 @@
 #include "ce5goodswaste.h"
 #include "ui_ce5goodswaste.h"
+#include "cachestorereason.h"
 #include "c5cache.h"
 #include "c5utils.h"
 

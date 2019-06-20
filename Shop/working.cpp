@@ -10,6 +10,7 @@
 #include <QSettings>
 
 static QMap<QString, Goods> fGoods;
+static QMap<int, QString> fGoodsCodeForPrint;
 static QSettings __s(QString("%1\\%2\\%3").arg(_ORGANIZATION_).arg(_APPLICATION_).arg(_MODULE_));
 
 Working::Working(QWidget *parent) :
@@ -86,6 +87,15 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
     return QDialog::eventFilter(watched, event);
 }
 
+QString Working::goodsCode(int code) const
+{
+    if (fGoodsCodeForPrint.contains(code)) {
+        return fGoodsCodeForPrint[code] + " ";
+    } else {
+        return "";
+    }
+}
+
 void Working::getGoodsList()
 {
     fGoods.clear();
@@ -106,6 +116,10 @@ void Working::getGoodsList()
         g.fTaxDept = db.getInt(5);
         g.fAdgCode = db.getString(6);
         fGoods[g.fScanCode] = g;
+    }
+    db.exec("select f_code, f_goods from c_goods_scancode where f_receipt=1");
+    while (db.nextRow()) {
+        fGoodsCodeForPrint[db.getInt("f_goods")] = db.getString("f_code");
     }
     ui->wGoods->setVisible(__s.value("goodslist", false).toBool());
     if (__s.value("goodslist", false).toBool()) {

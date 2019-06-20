@@ -1,5 +1,6 @@
 #include "c5waiterorderdoc.h"
 #include "c5utils.h"
+#include "c5cafecommon.h"
 #include "c5config.h"
 #include "c5sockethandler.h"
 #include "c5sockethandler.h"
@@ -132,6 +133,13 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &fDD, QString &err)
         fDD.rollback();
         return false;
     }
+    QString payComment = "CASH";
+    if (hDouble("f_amountcard") > 0.001) {
+        payComment = C5CafeCommon::creditCardName(hInt("f_creditcardid"));
+    }
+    if (!clcode.isEmpty()) {
+        payComment = clname;
+    }
     fDD[":f_id"] = result;
     fDD[":f_source"] = "PS";
     fDD[":f_res"] = res;
@@ -149,9 +157,9 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &fDD, QString &err)
     fDD[":f_amountUsd"] = 0;
     fDD[":f_fiscal"] = fTax["f_receiptnumber"].toString().toInt();
     fDD[":f_paymentMode"] = paymentMode;
-    fDD[":f_creditCard"] = 0;
+    fDD[":f_creditCard"] = hInt("f_creditcardid");
     fDD[":f_cityLedger"] = clcode.toInt();
-    fDD[":f_paymentComment"] = "";
+    fDD[":f_paymentComment"] = payComment;
     fDD[":f_dc"] = dc;
     fDD[":f_sign"] = sign;
     fDD[":f_doc"] = "";

@@ -50,7 +50,9 @@ SOURCES += \
     ../Reports/cr5salesbydishes.cpp \
     ../Reports/cr5salesbydishesfilter.cpp \
     ../Reports/cr5storereason.cpp \
+    ../Waiter/c5cafecommon.cpp \
     c5cashdoc.cpp \
+    c5inputdate.cpp \
         main.cpp \
         c5mainwindow.cpp \
     ../Cafe5/c5config.cpp \
@@ -200,7 +202,9 @@ HEADERS += \
     ../Reports/cr5salesbydishes.h \
     ../Reports/cr5salesbydishesfilter.h \
     ../Reports/cr5storereason.h \
+    ../Waiter/c5cafecommon.h \
     c5cashdoc.h \
+    c5inputdate.h \
         c5mainwindow.h \
     ../Cafe5/c5config.h \
     ../Cafe5/c5connection.h \
@@ -342,6 +346,7 @@ FORMS += \
     ../Reports/cr5saleremoveddishesfilter.ui \
     ../Reports/cr5salesbydishesfilter.ui \
     c5cashdoc.ui \
+    c5inputdate.ui \
         c5mainwindow.ui \
     ../Cafe5/c5connection.ui \
     ../Cafe5/c5message.ui \
@@ -404,6 +409,7 @@ INCLUDEPATH += ../Classes
 INCLUDEPATH += ../Reports
 INCLUDEPATH += ../Controls
 INCLUDEPATH += ../Editors
+INCLUDEPATH += ../Waiter
 INCLUDEPATH += ../RESOURCES
 INCLUDEPATH += c:/projects/xlsx/src
 

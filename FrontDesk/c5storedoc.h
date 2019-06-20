@@ -26,7 +26,7 @@ public:
 
     explicit C5StoreDoc(const QStringList &dbParams, QWidget *parent = nullptr);
 
-    ~C5StoreDoc();
+    ~C5StoreDoc() override;
 
     bool openDoc(QString id);
 
@@ -55,6 +55,8 @@ private:
     bool fCanChangeFocus;
 
     QString fInternalId;
+
+    QString fCashUuid;
 
     TableCell *fGroupTableCell;
 
@@ -138,6 +140,8 @@ private slots:
     void on_leScancode_returnPressed();
 
     void on_tblGoodsGroup_customContextMenuRequested(const QPoint &pos);
+
+    void on_btnCreateDoc_clicked();
 };
 
 #endif // C5STOREDOC_H

@@ -535,7 +535,7 @@ void DlgPayment::on_btnPaymentCard_clicked()
         C5Message::error(tr("Card method already exists"));
         return;
     }
-    fOrder->hSetDouble("f_creditcardid", cardid);
+    fOrder->hSetInt("f_creditcardid", cardid);
     fOrder->hSetDouble("f_amountbank", 0);
     fOrder->hSetDouble("f_amountother", 0);
     total = fOrder->hDouble("f_amounttotal") - total;

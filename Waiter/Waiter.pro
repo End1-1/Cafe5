@@ -48,7 +48,9 @@ SOURCES += \
     ../../XLSX/src/xlsxtheme.cpp \
     ../../XLSX/src/xlsxworkbook.cpp \
     ../../XLSX/src/xlsxwriter.cpp \
+    ../Cache/cachecashnames.cpp \
     ../Cache/cachegoodswaste.cpp \
+    ../Cache/cachestorereason.cpp \
         main.cpp \
         dlgface.cpp \
     ../Cafe5/c5database.cpp \
@@ -129,7 +131,9 @@ HEADERS += \
     ../../XLSX/src/xlsxworkbook.h \
     ../../XLSX/src/xlsxwriter.h \
     ../../XLSX/src/zip.h \
+    ../Cache/cachecashnames.h \
     ../Cache/cachegoodswaste.h \
+    ../Cache/cachestorereason.h \
         dlgface.h \
     ../Cafe5/c5database.h \
     ../Cafe5/c5config.h \

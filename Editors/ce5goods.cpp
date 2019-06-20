@@ -57,6 +57,13 @@ bool CE5Goods::save(QString &err, QList<QMap<QString, QVariant> > &data)
         db[":f_goods"] = ui->leCode->getInteger();
         db.insert("c_goods_scancode", false);
     }
+    if (ui->lstCodes->count() > 0) {
+        db[":f_goods"] = ui->leCode->getInteger();
+        db.exec("update c_goods_scancode set f_receipt=0 where f_goods=:f_goods");
+        db[":f_goods"] = ui->leCode->getInteger();
+        db[":f_code"] = ui->lstCodes->item(0)->text();
+        db.exec("update c_goods_scancode set f_receipt=1 where f_code=:f_code and f_goods=:f_goods");
+    }
     return true;
 }
 

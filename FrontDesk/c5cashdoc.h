@@ -20,6 +20,8 @@ public:
 
     bool openDoc(const QString &uuid);
 
+    void setStoreDoc(const QString &uuid);
+
     static bool removeDoc(const QStringList &dbParams, const QString &uuid);
 
 private slots:
@@ -29,12 +31,18 @@ private slots:
 
     void removeDoc();
 
+    void inputFromSale();
+
     void on_btnNewRow_clicked();
+
+    void on_btnOpenStoreDoc_clicked();
 
 private:
     Ui::C5CashDoc *ui;
 
     QString fUuid;
+    
+    QString fStoreUuid;
 };
 
 #endif // C5CASHDOC_H

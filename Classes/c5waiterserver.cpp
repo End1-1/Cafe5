@@ -290,7 +290,7 @@ void C5WaiterServer::reply(QJsonObject &o)
 
             C5Database fDD(C5Config::dbParams().at(0), C5Config::hotelDatabase(), C5Config::dbParams().at(2), C5Config::dbParams().at(3));
             C5WaiterOrderDoc w(jh, jb, srh.fDb);
-            //w.transferToHotel(fDD, err);
+            w.transferToHotel(fDD, err);
         }
         o["reply"] = err.isEmpty() ? 1 : 0;
         o["msg"] = err;

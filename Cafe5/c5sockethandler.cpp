@@ -12,6 +12,7 @@ C5SocketHandler::C5SocketHandler(QTcpSocket *socket, QObject *parent) :
     }
     fReadState = false;
     fErrorCode = 0;
+    fDataSize = 0;
     if (fSocket == nullptr) {
         fSocket = new QTcpSocket(parent);
         connect(fSocket, SIGNAL(connected()), this, SLOT(connected()));
@@ -105,7 +106,11 @@ void C5SocketHandler::connected()
 void C5SocketHandler::readyRead()
 {
     if (!fReadState) {
-        fSocket->read(reinterpret_cast<char*>(&fDataSize), sizeof(quint32));
+        char *c = new char[sizeof(quint32)];
+        qDebug() << sizeof(quint32);
+        qDebug() << fSocket->read(c, sizeof(quint32));
+        memcpy(&fDataSize, c, sizeof(quint32));
+        qDebug() << fDataSize;
         fReadState = true;
     }
     fData.append(fSocket->readAll());
@@ -123,5 +128,6 @@ void C5SocketHandler::readyRead()
     }
     if (fDataSize < fData.size()) {
         qDebug() << "PIZDA";
+        close();
     }
 }

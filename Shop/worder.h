@@ -10,6 +10,8 @@ namespace Ui {
 class WOrder;
 }
 
+class Working;
+
 class WOrder : public QWidget
 {
     Q_OBJECT
@@ -50,6 +52,8 @@ private:
     QDate fDateOpen;
 
     QTime fTimeOpen;
+
+    Working *fWorking;
 };
 
 #endif // WORDER_H

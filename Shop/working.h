@@ -21,6 +21,8 @@ public:
 
     bool eventFilter(QObject *watched, QEvent *event);
 
+    QString goodsCode(int code) const;
+
 private:
     Ui::Working *ui;
 
