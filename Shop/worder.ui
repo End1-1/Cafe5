@@ -82,6 +82,20 @@
       </font>
      </property>
      <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="5">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Cash (F3)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Total</string>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="6">
        <widget class="C5LineEdit" name="leCash">
         <property name="minimumSize">
@@ -98,12 +112,18 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="5">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Cash (F3)</string>
+      <item row="0" column="8">
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
-       </widget>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>108</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
       <item row="0" column="2">
        <widget class="C5LineEdit" name="leTotal">
@@ -123,19 +143,6 @@
          <bool>true</bool>
         </property>
        </widget>
-      </item>
-      <item row="0" column="8">
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>108</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
       </item>
       <item row="0" column="3">
        <widget class="QLabel" name="label_5">
@@ -157,13 +164,6 @@
           <width>130</width>
           <height>16777215</height>
          </size>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Total</string>
         </property>
        </widget>
       </item>
@@ -190,6 +190,30 @@
         </property>
         <property name="readOnly">
          <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="9" rowspan="2">
+       <widget class="QLabel" name="lbRefund">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+          <weight>75</weight>
+          <italic>false</italic>
+          <bold>true</bold>
+          <underline>false</underline>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background:rgb(255, 0, 0);
+color:rgb(255,255,255);
+padding:4px;</string>
+        </property>
+        <property name="text">
+         <string>Refund mode</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
         </property>
        </widget>
       </item>

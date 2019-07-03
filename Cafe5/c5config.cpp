@@ -142,6 +142,16 @@ QString C5Config::serverIP()
     return getRegValue("server_ip").toString();
 }
 
+bool C5Config::noCashDocStore()
+{
+    return getValue(param_no_cash_doc_store) == "1";
+}
+
+bool C5Config::noScanCodeStore()
+{
+    return getValue(param_no_scancode_store) == "1";
+}
+
 void C5Config::setServerIP(const QString &ip)
 {
     setRegValue("server_ip", ip);

@@ -25,17 +25,19 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
                        ;
 
     fColumnsFields << "oh.f_id as f_header"
+                   << "concat(oh.f_prefix, oh.f_hallid) as f_number"
                    << "oh.f_datecash"
                    << "s.f_name as f_storename"
                    << "gg.f_name as f_goodsname"
                    << "gr.f_name as f_goodsgroup"
                    << "gu.f_name as f_goodsunit"
                    << "og.f_tax"
-                   << "sum(og.f_qty) as f_qty"
-                   << "sum(og.f_total) as f_total"
+                   << "sum(og.f_qty*og.f_sign) as f_qty"
+                   << "sum(og.f_total*og.f_sign) as f_total"
                       ;
 
     fColumnsGroup << "oh.f_id as f_header"
+                  << "concat(oh.f_prefix, oh.f_hallid) as f_number"
                    << "oh.f_datecash"
                    << "s.f_name as f_storename"
                    << "gg.f_name as f_goodsname"
@@ -48,7 +50,8 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
                 << "f_total"
                       ;
 
-    fTranslation["f_header"] = tr("Order");
+    fTranslation["f_header"] = tr("UUID");
+    fTranslation["f_number"] = tr("Number");
     fTranslation["f_datecash"] = tr("Date, cash");
     fTranslation["f_storename"] = tr("Store");
     fTranslation["f_goodsname"] = tr("Goods");
@@ -59,14 +62,15 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
     fTranslation["f_total"] = tr("Total");
 
     fColumnsVisible["oh.f_id as f_header"] = true;
+    fColumnsVisible["concat(oh.f_prefix, oh.f_hallid) as f_number"] = true;
     fColumnsVisible["oh.f_datecash"] = true;
     fColumnsVisible["s.f_name as f_storename"] = true;
     fColumnsVisible["gg.f_name as f_goodsname"] = true;
     fColumnsVisible["gr.f_name as f_goodsgroup"] = true;
     fColumnsVisible["gu.f_name as f_goodsunit"] = true;
     fColumnsVisible["og.f_tax"] = true;
-    fColumnsVisible["sum(og.f_qty) as f_qty"] = true;
-    fColumnsVisible["sum(og.f_total) as f_total"] = true;
+    fColumnsVisible["sum(og.f_qty*og.f_sign) as f_qty"] = true;
+    fColumnsVisible["sum(og.f_total*og.f_sign) as f_total"] = true;
 
     restoreColumnsVisibility();
     fFilterWidget = new CR5SaleFromStoreFilter(fDBParams);
@@ -108,7 +112,7 @@ void CR5SaleFromStore::makeOutput(bool v)
     db[":f_datecash1"] = fFilter->d1();
     db[":f_datecash2"] = fFilter->d2();
     db[":f_state"] = 0;
-    db.exec("select og.f_store, og.f_goods, sum(og.f_qty) as f_qty "
+    db.exec("select og.f_store, og.f_goods, sum(og.f_qty * og.f_sign) as f_qty "
             "from o_goods og "
             "left join o_header oh on oh.f_id=og.f_header "
             "where oh.f_datecash between :f_datecash1 and :f_datecash2 "
@@ -119,6 +123,9 @@ void CR5SaleFromStore::makeOutput(bool v)
     QString docid;
     bool nostorewarning = false;
     while (db.nextRow()) {
+        if (db.getDouble(2) < 0.0001) {
+            continue;
+        }
         if (store == 0 || store != db.getInt(0)) {
             if (!docid.isEmpty()) {
                 C5StoreDoc *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);

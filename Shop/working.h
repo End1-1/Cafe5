@@ -64,6 +64,8 @@ private slots:
     void on_btnShowGoodsList_clicked();
 
     void on_tblGoods_itemClicked(QTableWidgetItem *item);
+
+    void on_btnRefund_clicked();
 };
 
 #endif // WORKING_H

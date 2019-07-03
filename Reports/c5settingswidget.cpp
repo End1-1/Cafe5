@@ -77,6 +77,8 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     fTags[ui->leHotelDatabase->getTag()] = ui->leHotelDatabase->text();
     fTags[ui->cbServiceMode->getTag()] = ui->cbServiceMode->currentData().toString();
     fTags[ui->leItemCodeForHotel->getTag()] = ui->leItemCodeForHotel->text();
+    fTags[ui->chNoCashDoc->getTag()] = ui->chNoCashDoc->isChecked() ? "1" : "0";
+    fTags[ui->chNoScanCode->getTag()] = ui->chNoScanCode->isChecked() ? "1" : "0";
     C5Database db(fDBParams);
     db[":f_settings"] = ui->leCode->getInteger();
     db.exec("delete from s_settings_values where f_settings=:f_settings");
@@ -111,6 +113,8 @@ void C5SettingsWidget::setWidgetValue(QWidget *w, const QString &value)
         static_cast<C5LineEdit*>(w)->setText(value);
     } else if (!strcmp(w->metaObject()->className(), "C5ComboBox")) {
         static_cast<C5ComboBox*>(w)->setIndexForValue(value);
+    } else if (!strcmp(w->metaObject()->className(), "C5CheckBox")) {
+        static_cast<C5CheckBox*>(w)->setChecked(value == "1");
     }
 }
 
@@ -157,5 +161,5 @@ QWidget *C5SettingsWidget::widget(QWidget *parent, int tag)
             }
         }
     }
-    return 0;
+    return nullptr;
 }

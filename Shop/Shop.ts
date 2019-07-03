@@ -281,7 +281,8 @@
     </message>
     <message>
         <location filename="worder.ui" line="60"/>
-        <location filename="worder.ui" line="166"/>
+        <location filename="worder.ui" line="95"/>
+        <location filename="worder.cpp" line="230"/>
         <source>Total</source>
         <translation>Ընդամենը</translation>
     </message>
@@ -296,12 +297,18 @@
         <translation>ԱԴԳ կոդ</translation>
     </message>
     <message>
-        <location filename="worder.ui" line="143"/>
+        <location filename="worder.ui" line="150"/>
         <source>Card (F4)</source>
         <translation>ՔԱՐՏ (F4)</translation>
     </message>
     <message>
-        <location filename="worder.ui" line="104"/>
+        <location filename="worder.ui" line="213"/>
+        <source>Refund mode</source>
+        <translation>ՀԵՏ 
+ՎԵՐԱԴԱՐՁ</translation>
+    </message>
+    <message>
+        <location filename="worder.ui" line="88"/>
         <source>Cash (F3)</source>
         <translation>Կանխիկ (F3)</translation>
     </message>
@@ -311,85 +318,106 @@
         <translation>Մանրի վերադարձ</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="55"/>
+        <location filename="worder.cpp" line="65"/>
         <source>Write order?</source>
         <translation>Գրանցել՞</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="99"/>
-        <location filename="worder.cpp" line="180"/>
+        <location filename="worder.cpp" line="109"/>
+        <location filename="worder.cpp" line="193"/>
         <source>(F)</source>
         <translation>(Ֆ)</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="159"/>
+        <location filename="worder.cpp" line="172"/>
         <source>Department</source>
         <translation>Բաժին</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="162"/>
+        <location filename="worder.cpp" line="175"/>
         <source>Tax number</source>
         <translation>ՀՎՀՀ</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="165"/>
+        <location filename="worder.cpp" line="178"/>
         <source>Device number</source>
         <translation>ԳՀ</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="168"/>
+        <location filename="worder.cpp" line="181"/>
         <source>Serial</source>
         <translation>ԱՀ</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="171"/>
+        <location filename="worder.cpp" line="184"/>
         <source>Fiscal</source>
         <translation>Ֆիսկալ</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="174"/>
+        <location filename="worder.cpp" line="187"/>
         <source>Receipt number</source>
         <translation>ԿՀ</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="177"/>
+        <location filename="worder.cpp" line="190"/>
         <source>Date</source>
         <translation>Ամսաթիվ</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="185"/>
+        <location filename="worder.cpp" line="200"/>
+        <source>Refund</source>
+        <translation>Հետ վերադարձ</translation>
+    </message>
+    <message>
+        <location filename="worder.cpp" line="204"/>
         <source>Class | Name | Qty | Price | Total</source>
         <translation>Դաս՝ | Անվանում | Քնկ | Գին | Ընդամենը</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="192"/>
+        <location filename="worder.cpp" line="211"/>
         <source>Class:</source>
         <translation>Դաս՝</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="210"/>
+        <location filename="worder.cpp" line="234"/>
         <source>Need to pay</source>
         <translation>Ենթակա է վճարման</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="219"/>
+        <location filename="worder.cpp" line="243"/>
         <source>Payment, cash</source>
         <translation>Կանխիկ</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="223"/>
+        <location filename="worder.cpp" line="247"/>
         <source>Payment, card</source>
         <translation>Անկանխիկ</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="230"/>
+        <location filename="worder.cpp" line="254"/>
         <source>Thank you for visit!</source>
         <translation>Շնորհակալություն այցելության համար</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="232"/>
+        <location filename="worder.cpp" line="257"/>
         <source>Printed</source>
         <translation>Տպված</translation>
+    </message>
+    <message>
+        <location filename="worder.cpp" line="325"/>
+        <source>Administrator password</source>
+        <translation>Ադմինիստրատորի գախտնաբառ</translation>
+    </message>
+    <message>
+        <location filename="worder.cpp" line="325"/>
+        <source>Password</source>
+        <translation>Գախտնաբառ</translation>
+    </message>
+    <message>
+        <location filename="worder.cpp" line="341"/>
+        <location filename="worder.cpp" line="346"/>
+        <source>Access denied</source>
+        <translation>Մուտքը արգելված է</translation>
     </message>
 </context>
 <context>
@@ -413,41 +441,48 @@
     </message>
     <message>
         <location filename="working.ui" line="178"/>
+        <source>Refund
+F6</source>
+        <translation>Հետ վերադարձ
+(F6)</translation>
+    </message>
+    <message>
+        <location filename="working.ui" line="205"/>
         <source>Save order
 F9</source>
         <translation>Գրանցել
 (F9)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="192"/>
+        <location filename="working.ui" line="219"/>
         <source>F9</source>
         <translation> Նոր պատվեր
 (F9)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="232"/>
+        <location filename="working.ui" line="259"/>
         <source>Configuration
 F10</source>
         <translation>Կարգավորումներ
 (F10)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="246"/>
         <location filename="working.ui" line="273"/>
-        <location filename="working.ui" line="306"/>
+        <location filename="working.ui" line="300"/>
+        <location filename="working.ui" line="333"/>
         <source>F10</source>
         <translation> Նոր պատվեր
 (F10)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="259"/>
+        <location filename="working.ui" line="286"/>
         <source>Goods List
 F5</source>
         <translation>Ապրանքներ
 (F5)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="292"/>
+        <location filename="working.ui" line="319"/>
         <source>Exit
 Esc</source>
         <translation>Ելք
@@ -455,12 +490,13 @@ Esc</source>
     </message>
     <message>
         <location filename="working.ui" line="165"/>
+        <location filename="working.ui" line="192"/>
         <source>F11</source>
         <translation> Նոր պատվեր
 (F11)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="219"/>
+        <location filename="working.ui" line="246"/>
         <source>F12</source>
         <translation> Նոր պատվեր
 (F12)</translation>
@@ -473,19 +509,19 @@ F11</source>
 (F11)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="205"/>
+        <location filename="working.ui" line="232"/>
         <source>Save order
 F12</source>
         <translation>Գրանցել
 (F12)</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="219"/>
+        <location filename="working.cpp" line="235"/>
         <source>Password</source>
         <translation>Գախտնաբառ</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="221"/>
+        <location filename="working.cpp" line="237"/>
         <source>Access denied</source>
         <translation>Մուտքը արգելված է</translation>
     </message>

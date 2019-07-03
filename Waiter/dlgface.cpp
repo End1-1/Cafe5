@@ -268,6 +268,7 @@ void DlgFace::handleSocket(const QJsonObject &obj)
     C5WaiterServer ws(obj, sh->fSocket);
     QJsonObject o;
     ws.reply(o);
+    o["cmd"] = ws.cmd();
     sh->send(o);
     sh->close();
 }

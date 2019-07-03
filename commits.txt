@@ -59,3 +59,7 @@
 	1. New. Waiter report dialog.
 21.12.2018
 	1. New. First report from dinamic library.
+03.07.2019
+	1. Shop: refund option.
+	2. Cash doc.
+	3. First Working configuration

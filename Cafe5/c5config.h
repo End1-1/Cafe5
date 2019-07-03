@@ -27,6 +27,8 @@
 #define param_item_code_for_hotel 21
 #define param_doc_num_digits_move 22
 #define param_doc_num_digits_out 23
+#define param_no_cash_doc_store 24
+#define param_no_scancode_store 25
 
 class C5Config
 {
@@ -102,6 +104,10 @@ public:
     static QString logDatabase();
 
     static QString serverIP();
+
+    static bool noCashDocStore();
+
+    static bool noScanCodeStore();
 
     static void setServerIP(const QString &ip);
 

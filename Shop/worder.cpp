@@ -5,8 +5,10 @@
 #include "printtaxn.h"
 #include "dqty.h"
 #include "c5utils.h"
+#include "c5permissions.h"
 #include "c5printing.h"
 #include "working.h"
+#include <QInputDialog>
 
 WOrder::WOrder(QWidget *parent) :
     QWidget(parent),
@@ -17,6 +19,8 @@ WOrder::WOrder(QWidget *parent) :
     fDateOpen = QDate::currentDate();
     fTimeOpen = QTime::currentTime();
     ui->tblGoods->setColumnWidths(ui->tblGoods->columnCount(), 0, 300, 80, 80, 80, 80, 80, 80);
+    ui->lbRefund->setVisible(false);
+    fModeRefund = false;
 }
 
 WOrder::~WOrder()
@@ -51,6 +55,10 @@ void WOrder::addGoods(const Goods &g)
 
 bool WOrder::writeOrder(bool tax)
 {
+    if (fModeRefund) {
+        tax = false;
+    }
+
     if (ui->tblGoods->rowCount() == 0) {
         return false;
     }
@@ -108,10 +116,22 @@ bool WOrder::writeOrder(bool tax)
             return false;
         }
     }
+    
+    int sign = fModeRefund ? -1 : 1;
+
+    db[":f_id"] = C5Config::defaultHall();
+    db.exec("select f_counter + 1, f_prefix as f_counter from h_halls where f_id=:f_id for update");
+    QString pref, hallid;
+    if (db.nextRow()) {
+        hallid = db.getString(0);
+        pref = db.getString(1);
+        db[":f_counter"] = db.getInt(0);
+        db.update("h_halls", where_id(C5Config::defaultHall()));
+    }
 
     db[":f_id"] = id;
-    db[":f_hallid"] = 0;
-    db[":f_prefix"] = "";
+    db[":f_hallid"] = hallid.toInt();
+    db[":f_prefix"] = pref;
     db[":f_state"] = 0;
     db[":f_hall"] = C5Config::defaultHall();
     db[":f_table"] = C5Config::defaultTable();
@@ -123,9 +143,9 @@ bool WOrder::writeOrder(bool tax)
     db[":f_staff"] = 1;
     db[":f_comment"] = "";
     db[":f_print"] = 1;
-    db[":f_amountTotal"] = ui->leTotal->getDouble();
-    db[":f_amountCash"] = ui->leTotal->getDouble() - ui->leCard->getDouble();
-    db[":f_amountCard"] = ui->leCard->getDouble();
+    db[":f_amountTotal"] = ui->leTotal->getDouble() * sign;
+    db[":f_amountCash"] = (ui->leTotal->getDouble() - ui->leCard->getDouble()) * sign;
+    db[":f_amountCard"] = ui->leCard->getDouble() * sign;
     db[":f_amountBank"] = 0;
     db[":f_amountOther"] = 0;
     db[":f_amountService"] = 0;
@@ -144,6 +164,7 @@ bool WOrder::writeOrder(bool tax)
         db[":f_price"] = ui->tblGoods->getDouble(i, 4);
         db[":f_total"] = ui->tblGoods->getDouble(i, 5);
         db[":f_tax"] = tax ? 1 : 0;
+        db[":f_sign"] = sign;
         db.insert("o_goods", false);
     }
     db.commit();
@@ -184,6 +205,14 @@ bool WOrder::writeOrder(bool tax)
         }
         p.br(2);
         p.setFontBold(true);
+        if (fModeRefund) {
+            p.setFontSize(30);
+            p.ctext(tr("Refund"));
+            p.br();
+        }
+        p.ctext(QString("#%1%2").arg(pref).arg(hallid));
+        p.br();
+        p.setFontSize(20);
         p.ctext(tr("Class | Name | Qty | Price | Total"));
         p.setFontBold(false);
         p.br();
@@ -209,28 +238,34 @@ bool WOrder::writeOrder(bool tax)
         p.line(4);
         p.br(3);
         p.setFontBold(true);
-        p.ltext(tr("Need to pay"), 0);
-        p.rtext(float_str(ui->leTotal->getDouble(), 2));
-        p.br();
-        p.br();
+        if (fModeRefund) {
+            p.ltext(tr("Total"), 0);
+            p.rtext(ui->leTotal->text());
+            p.br();
+        } else {
+            p.ltext(tr("Need to pay"), 0);
+            p.rtext(float_str(ui->leTotal->getDouble(), 2));
+            p.br();
+            p.br();
 
-        p.line();
-        p.br();
+            p.line();
+            p.br();
 
-        if (ui->leCash->getDouble() > 0.001) {
-            p.ltext(tr("Payment, cash"), 0);
-            p.rtext(float_str(ui->leCash->getDouble(), 2));
+            if (ui->leCash->getDouble() > 0.001) {
+                p.ltext(tr("Payment, cash"), 0);
+                p.rtext(float_str(ui->leCash->getDouble(), 2));
+            }
+            if (ui->leCard->getDouble() > 0.001) {
+                p.ltext(tr("Payment, card"), 0);
+                p.rtext(float_str(ui->leCard->getDouble(), 2));
+            }
+
+            p.setFontSize(20);
+            p.setFontBold(true);
+            p.br(p.fLineHeight * 3);
+            p.ltext(tr("Thank you for visit!"), 0);
+            p.br();
         }
-        if (ui->leCard->getDouble() > 0.001) {
-            p.ltext(tr("Payment, card"), 0);
-            p.rtext(float_str(ui->leCard->getDouble(), 2));
-        }
-
-        p.setFontSize(20);
-        p.setFontBold(true);
-        p.br(p.fLineHeight * 3);
-        p.ltext(tr("Thank you for visit!"), 0);
-        p.br();
         p.ltext(tr("Printed"), 0);
         p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
         p.br();
@@ -293,6 +328,39 @@ void WOrder::prevRow()
     if (row - 1 > -1) {
         ui->tblGoods->setCurrentItem(ui->tblGoods->item(row - 1, 0));
     }
+}
+
+void WOrder::refund()
+{
+    if (!fModeRefund) {
+        bool ok;
+        QString pwd = QInputDialog::getText(this, tr("Administrator password"), tr("Password"), QLineEdit::Password, "", &ok);
+        if (!ok) {
+            return;
+        }
+        C5Database db(C5Config::dbParams());
+        db[":f_altPassword"] = password(pwd);
+        db[":f_state"] = 1;
+        db.exec("select f_id, f_group, f_first, f_last from s_user where f_altPassword=:f_altPassword and f_state=:f_state");
+        if (db.nextRow()) {
+            if (db.getInt(1) != 1) {
+                db[":f_group"] = db.getValue(1);
+                db[":f_key"] = cp_t5_refund_goods;
+                db.exec("select f_key from s_user_access where f_group=:f_group and f_key=:f_key and f_value=1");
+                if (db.nextRow()) {
+
+                } else {
+                    C5Message::error(tr("Access denied"));
+                    return;
+                }
+            }
+        } else {
+            C5Message::error(tr("Access denied"));
+            return;
+        }
+    }
+    fModeRefund = !fModeRefund;
+    ui->lbRefund->setVisible(fModeRefund);
 }
 
 void WOrder::countTotal()

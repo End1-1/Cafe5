@@ -30,6 +30,10 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
     ui->btnNewGoods->setVisible(pr(dbParams.at(1), cp_t6_goods));
     ui->leAccepted->setSelector(dbParams, ui->leAcceptedName, cache_users);
     ui->lePassed->setSelector(dbParams, ui->lePassedName, cache_users);
+    ui->lbCashDoc->setVisible(!C5Config::noCashDocStore());
+    ui->leCashDoc->setVisible(!C5Config::noCashDocStore());
+    ui->btnCreateDoc->setVisible(!C5Config::noCashDocStore());
+    ui->leScancode->setVisible(!C5Config::noScanCodeStore());
     fInternalId = "";
     fDocState = DOC_STATE_DRAFT;
     ui->tblGoodsGroup->viewport()->installEventFilter(this);

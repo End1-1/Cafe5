@@ -22,6 +22,8 @@ Working::Working(QWidget *parent) :
     QShortcut *sF2 = new QShortcut(QKeySequence(Qt::Key_F2), this);
     QShortcut *sF3 = new QShortcut(QKeySequence(Qt::Key_F3), this);
     QShortcut *sF4 = new QShortcut(QKeySequence(Qt::Key_F4), this);
+    QShortcut *sF6 = new QShortcut(QKeySequence(Qt::Key_F6), this);
+    QShortcut *sF11 = new QShortcut(QKeySequence(Qt::Key_F11), this);
     QShortcut *sF12 = new QShortcut(QKeySequence(Qt::Key_F12), this);
     QShortcut *sDown = new QShortcut(QKeySequence(Qt::Key_Down), this);
     QShortcut *sUp = new QShortcut(QKeySequence(Qt::Key_Up), this);
@@ -29,9 +31,11 @@ Working::Working(QWidget *parent) :
     connect(sF2, SIGNAL(activated()), this, SLOT(shortcutF2()));
     connect(sF3, SIGNAL(activated()), this, SLOT(shortcutF3()));
     connect(sF4, SIGNAL(activated()), this, SLOT(shortcutF4()));
+    connect(sF6, SIGNAL(activated()), this, SLOT(on_btnRefund_clicked()));
+    connect(sF11, SIGNAL(activated()), this, SLOT(on_btnNewOrder_clicked()));
+    connect(sF12, SIGNAL(activated()), this, SLOT(on_btnSaveOrder_clicked()));
     connect(sDown, SIGNAL(activated()), this, SLOT(shortcutDown()));
     connect(sUp, SIGNAL(activated()), this, SLOT(shortcutUp()));
-    connect(sF12, SIGNAL(activated()), this, SLOT(on_btnSaveOrder_clicked()));
     getGoodsList();
     on_btnNewOrder_clicked();
     ui->leCode->installEventFilter(this);
@@ -314,4 +318,13 @@ void Working::on_tblGoods_itemClicked(QTableWidgetItem *item)
     }
     ui->leCode->setText(code);
     on_leCode_returnPressed();
+}
+
+void Working::on_btnRefund_clicked()
+{
+    WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
+    if (!w) {
+        return;
+    }
+    w->refund();
 }

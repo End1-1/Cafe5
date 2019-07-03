@@ -10,7 +10,7 @@ class C5CheckBox : public QCheckBox
     Q_PROPERTY(int Tag READ getTag WRITE setTag)
 
 public:
-    C5CheckBox(QWidget *parent = 0);
+    C5CheckBox(QWidget *parent = nullptr);
 
     ~C5CheckBox();
 

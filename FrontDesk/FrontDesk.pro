@@ -35,6 +35,7 @@ SOURCES += \
     ../Cache/cachecashnames.cpp \
     ../Cache/cachedishstate.cpp \
     ../Cache/cachestorereason.cpp \
+    ../Cafe5/c5cafecommon.cpp \
     ../Cafe5/c5double.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
     ../Editors/c5cashname.cpp \
@@ -50,7 +51,6 @@ SOURCES += \
     ../Reports/cr5salesbydishes.cpp \
     ../Reports/cr5salesbydishesfilter.cpp \
     ../Reports/cr5storereason.cpp \
-    ../Waiter/c5cafecommon.cpp \
     c5cashdoc.cpp \
     c5inputdate.cpp \
         main.cpp \
@@ -187,6 +187,7 @@ HEADERS += \
     ../Cache/cachedishstate.h \
     ../Cache/cacheheaders.h \
     ../Cache/cachestorereason.h \
+    ../Cafe5/c5cafecommon.h \
     ../Cafe5/c5double.h \
     ../Classes/proxytablewidgetdatabase.h \
     ../Editors/c5cashname.h \
@@ -202,7 +203,6 @@ HEADERS += \
     ../Reports/cr5salesbydishes.h \
     ../Reports/cr5salesbydishesfilter.h \
     ../Reports/cr5storereason.h \
-    ../Waiter/c5cafecommon.h \
     c5cashdoc.h \
     c5inputdate.h \
         c5mainwindow.h \

@@ -571,77 +571,77 @@
 <context>
     <name>C5WaiterServer</name>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="169"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="173"/>
         <source>Table wasnt unlocked correctly, try again</source>
         <translation>Սեղանը արքելափակված է սխալ, փորձեկ կրկին</translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="175"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="179"/>
         <source>Table locked by </source>
         <translation>Սեղանը խմբավորվում է</translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="180"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="184"/>
         <source>Program error, unknown table id or connection error</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="701"/>
-        <location filename="../Classes/c5waiterserver.cpp" line="737"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="710"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="746"/>
         <source>You cannot print more then 1 copies of receipt</source>
         <translation>Դուք չէկ կարող տպել հաշիվը մեկ օրինակից ավել</translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="260"/>
-        <location filename="../Classes/c5waiterserver.cpp" line="712"/>
-        <location filename="../Classes/c5waiterserver.cpp" line="748"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="264"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="721"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="757"/>
         <source>All service must be complited</source>
         <translation>Պատվերը անավարտ է</translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="760"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="769"/>
         <source>Print tax error</source>
         <translation>ՀԴՄ-ի սխալ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="265"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="269"/>
         <source>Receipt was not printed</source>
         <translation>Հաշիվը տպված չէ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="312"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="316"/>
         <source>Bonus system alreay exists for this order</source>
         <translation>Զեղչը արդեն կիրարված է</translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="336"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="340"/>
         <source>Cannot find card</source>
         <translation>Այդպիսի քարտ գոյություն չունի</translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="405"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="409"/>
         <source>Could not load</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="382"/>
-        <location filename="../Classes/c5waiterserver.cpp" line="412"/>
-        <location filename="../Classes/c5waiterserver.cpp" line="422"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="386"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="416"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="426"/>
         <source>entry point is missing in</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="453"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="457"/>
         <source>Unknown command for socket handler from dlgface</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="661"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="670"/>
         <source>Service</source>
         <translation>Սպասարկում</translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="688"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="697"/>
         <source>(F)</source>
         <translation>(Ֆ)</translation>
     </message>
@@ -824,12 +824,12 @@ AMOUNT</source>
         <translation>Աշխատանքային օրը փոխվել է, ծրագիրը պետք է անջատվի</translation>
     </message>
     <message>
-        <location filename="dlgface.cpp" line="286"/>
+        <location filename="dlgface.cpp" line="287"/>
         <source>Are you sure to close application</source>
         <translation>Փակել՞ ծրագիրը</translation>
     </message>
     <message>
-        <location filename="dlgface.cpp" line="360"/>
+        <location filename="dlgface.cpp" line="361"/>
         <source>Reports</source>
         <translation>Հաշվետվություններ</translation>
     </message>
@@ -1494,14 +1494,18 @@ ORDER</source>
 <context>
     <name>QObject</name>
     <message>
+        <location filename="../Cache/cachecashnames.cpp" line="4"/>
         <location filename="../Cache/cachedishstate.cpp" line="4"/>
         <location filename="../Cache/cacheorderstate.cpp" line="4"/>
+        <location filename="../Cache/cachestorereason.cpp" line="4"/>
         <source>Code</source>
         <translation type="unfinished">Կոդ</translation>
     </message>
     <message>
+        <location filename="../Cache/cachecashnames.cpp" line="5"/>
         <location filename="../Cache/cachedishstate.cpp" line="5"/>
         <location filename="../Cache/cacheorderstate.cpp" line="5"/>
+        <location filename="../Cache/cachestorereason.cpp" line="5"/>
         <source>Name</source>
         <translation type="unfinished">Անվանում</translation>
     </message>

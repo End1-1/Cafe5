@@ -51,6 +51,7 @@ SOURCES += \
     ../Cache/cachecashnames.cpp \
     ../Cache/cachegoodswaste.cpp \
     ../Cache/cachestorereason.cpp \
+    ../Cafe5/c5cafecommon.cpp \
         main.cpp \
         dlgface.cpp \
     ../Cafe5/c5database.cpp \
@@ -88,7 +89,6 @@ SOURCES += \
     ../Classes/c5printpreview.cpp \
     ../Classes/c5widget.cpp \
     wpaymentoptions.cpp \
-    c5cafecommon.cpp \
     dlgcreditcardlist.cpp \
     dlgdishremovereason.cpp \
     dlglistofhall.cpp \
@@ -134,6 +134,7 @@ HEADERS += \
     ../Cache/cachecashnames.h \
     ../Cache/cachegoodswaste.h \
     ../Cache/cachestorereason.h \
+    ../Cafe5/c5cafecommon.h \
         dlgface.h \
     ../Cafe5/c5database.h \
     ../Cafe5/c5config.h \
@@ -173,7 +174,6 @@ HEADERS += \
     ../Classes/c5widget.h \
     ../Classes/c5cache.h \
     wpaymentoptions.h \
-    c5cafecommon.h \
     dlgcreditcardlist.h \
     dlgdishremovereason.h \
     dlglistofhall.h \

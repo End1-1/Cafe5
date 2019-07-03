@@ -170,6 +170,33 @@ F11</string>
        </widget>
       </item>
       <item>
+       <widget class="QToolButton" name="btnRefund">
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
+        </property>
+        <property name="text">
+         <string>Refund
+F6</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/other.png</normaloff>:/other.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="shortcut">
+         <string>F11</string>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonTextUnderIcon</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QToolButton" name="btnSaveOrderNoTax">
         <property name="focusPolicy">
          <enum>Qt::ClickFocus</enum>

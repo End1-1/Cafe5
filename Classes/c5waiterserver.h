@@ -16,6 +16,8 @@ public:
 
     void reply(QJsonObject &o);
 
+    int cmd();
+
 private:
     const QJsonObject &fIn;
 

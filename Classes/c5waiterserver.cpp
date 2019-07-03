@@ -62,7 +62,7 @@ void C5WaiterServer::reply(QJsonObject &o)
     case sm_menu: {
         QJsonArray jMenu;
         QString query = "select d.f_id as f_dish, mn.f_name as menu_name, p1.f_name as part1, p2.f_name as part2, p2.f_adgCode, d.f_name, \
-                m.f_price, m.f_store, m.f_print1, m.f_print2, d.f_remind, \
+                m.f_price, m.f_store, m.f_print1, m.f_print2, d.f_remind, d.f_comment as f_description, \
                 s.f_name as f_storename, d.f_color as dish_color, p2.f_color as type_color \
                 from d_menu m \
                 left join d_menu_names mn on mn.f_id=m.f_menu \
@@ -81,7 +81,11 @@ void C5WaiterServer::reply(QJsonObject &o)
     }
     case sm_checkuser: {
         QJsonArray jUser;
-        bv[":f_altPassword"] = fIn["pass"].toString();
+        QString pass = fIn["pass"].toString();
+        if (fIn.contains("md5")) {
+            pass = password(pass);
+        }
+        bv[":f_altPassword"] = pass;
         bv[":f_state"] = 1;
         srh.getJsonFromQuery("select f_id, f_group, f_first, f_last from s_user where f_altPassword=:f_altPassword and f_state=:f_state", jUser, bv);
         if (jUser.count() > 0) {
@@ -453,6 +457,11 @@ void C5WaiterServer::reply(QJsonObject &o)
         o["msg"] = QString("%1: %2").arg(tr("Unknown command for socket handler from dlgface")).arg(cmd);
         break;
     }
+}
+
+int C5WaiterServer::cmd()
+{
+    return fIn["cmd"].toInt();
 }
 
 bool C5WaiterServer::checkPermission(int user, int permission, C5Database &db)

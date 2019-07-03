@@ -23,7 +23,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -102,8 +102,12 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="2">
-        <widget class="C5LineEdit" name="leInputDocCounter"/>
+       <item row="10" column="0" colspan="3">
+        <widget class="QLabel" name="label_23">
+         <property name="text">
+          <string>*This settings common for all cases</string>
+         </property>
+        </widget>
        </item>
        <item row="4" column="0">
         <widget class="QLabel" name="label_21">
@@ -112,10 +116,64 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="0" colspan="2">
-        <widget class="QLabel" name="label_13">
+       <item row="9" column="2">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="6" column="2">
+        <widget class="C5ComboBox" name="cbDefaultStore">
+         <property name="Tag" stdset="0">
+          <number>14</number>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <widget class="C5LineEdit" name="leInputDocNumDigits">
+         <property name="Tag" stdset="0">
+          <number>13</number>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_26">
          <property name="text">
-          <string>Input document number digits</string>
+          <string>Movement document number digits</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2">
+        <widget class="C5LineEdit" name="leMoveDocNumDigits">
+         <property name="Tag" stdset="0">
+          <number>22</number>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="2">
+        <widget class="C5LineEdit" name="leInputDocCounter"/>
+       </item>
+       <item row="4" column="2">
+        <widget class="C5LineEdit" name="leMoveDocCounter"/>
+       </item>
+       <item row="6" column="0">
+        <widget class="QLabel" name="label_17">
+         <property name="text">
+          <string>Default store</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="2">
+        <widget class="C5LineEdit" name="leOutDocNumDigits">
+         <property name="Tag" stdset="0">
+          <number>23</number>
          </property>
         </widget>
        </item>
@@ -129,54 +187,20 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="2">
-        <widget class="C5LineEdit" name="leMoveDocCounter"/>
+       <item row="0" column="0" colspan="2">
+        <widget class="QLabel" name="label_13">
+         <property name="text">
+          <string>Input document number digits</string>
+         </property>
+        </widget>
        </item>
        <item row="7" column="2">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="6" column="0">
-        <widget class="QLabel" name="label_17">
+        <widget class="C5CheckBox" name="chNoCashDoc">
          <property name="text">
-          <string>Default store</string>
+          <string/>
          </property>
-        </widget>
-       </item>
-       <item row="0" column="2">
-        <widget class="C5LineEdit" name="leInputDocNumDigits">
          <property name="Tag" stdset="0">
-          <number>13</number>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="2">
-        <widget class="C5ComboBox" name="cbDefaultStore">
-         <property name="Tag" stdset="0">
-          <number>14</number>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="0" colspan="3">
-        <widget class="QLabel" name="label_23">
-         <property name="text">
-          <string>*This settings common for all cases</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_26">
-         <property name="text">
-          <string>Movement document number digits</string>
+          <number>24</number>
          </property>
         </widget>
        </item>
@@ -187,17 +211,27 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="2">
-        <widget class="C5LineEdit" name="leMoveDocNumDigits">
+       <item row="8" column="2">
+        <widget class="C5CheckBox" name="chNoScanCode">
+         <property name="text">
+          <string/>
+         </property>
          <property name="Tag" stdset="0">
-          <number>22</number>
+          <number>25</number>
          </property>
         </widget>
        </item>
-       <item row="2" column="2">
-        <widget class="C5LineEdit" name="leOutDocNumDigits">
-         <property name="Tag" stdset="0">
-          <number>23</number>
+       <item row="7" column="0">
+        <widget class="QLabel" name="label_28">
+         <property name="text">
+          <string>No cash doc option in store doc</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="0">
+        <widget class="QLabel" name="label_29">
+         <property name="text">
+          <string>No scancode in store doc</string>
          </property>
         </widget>
        </item>
@@ -466,6 +500,11 @@
    <class>C5ComboBox</class>
    <extends>QComboBox</extends>
    <header location="global">c5combobox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5CheckBox</class>
+   <extends>QCheckBox</extends>
+   <header location="global">c5checkbox.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

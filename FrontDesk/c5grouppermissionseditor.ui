@@ -20,7 +20,7 @@
       <enum>QTabWidget::West</enum>
      </property>
      <property name="currentIndex">
-      <number>6</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
@@ -117,13 +117,46 @@
        <string>Waiter</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_3">
-       <item row="2" column="0">
-        <widget class="C5CheckBox" name="checkBox_9">
+       <item row="4" column="0">
+        <widget class="C5CheckBox" name="checkBox_41">
          <property name="text">
-          <string>Mutliple receipt</string>
+          <string>Payment, transfer to room</string>
          </property>
          <property name="Tag" stdset="0">
-          <number>501</number>
+          <number>504</number>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="C5CheckBox" name="checkBox_10">
+         <property name="text">
+          <string>Remove printed service</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>502</number>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="0">
+        <spacer name="verticalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>544</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="6" column="0">
+        <widget class="C5CheckBox" name="checkBox_43">
+         <property name="text">
+          <string>Payment, breakfast</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>506</number>
          </property>
         </widget>
        </item>
@@ -147,29 +180,6 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="C5CheckBox" name="checkBox_10">
-         <property name="text">
-          <string>Remove printed service</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>502</number>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="0">
-        <spacer name="verticalSpacer_3">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>544</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
        <item row="0" column="0">
         <widget class="C5CheckBox" name="chWaiterAllItems">
          <property name="text">
@@ -180,23 +190,13 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="0">
-        <widget class="C5CheckBox" name="checkBox_43">
+       <item row="2" column="0">
+        <widget class="C5CheckBox" name="checkBox_9">
          <property name="text">
-          <string>Payment, breakfast</string>
+          <string>Mutliple receipt</string>
          </property>
          <property name="Tag" stdset="0">
-          <number>506</number>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="C5CheckBox" name="checkBox_41">
-         <property name="text">
-          <string>Payment, transfer to room</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>504</number>
+          <number>501</number>
          </property>
         </widget>
        </item>
@@ -207,6 +207,16 @@
          </property>
          <property name="Tag" stdset="0">
           <number>507</number>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="0">
+        <widget class="C5CheckBox" name="checkBox_54">
+         <property name="text">
+          <string>Refund goods (Shop)</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>508</number>
          </property>
         </widget>
        </item>

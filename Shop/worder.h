@@ -39,6 +39,8 @@ public:
 
     void prevRow();
 
+    void refund();
+
 private slots:
     void on_leCash_textChanged(const QString &arg1);
 
@@ -54,6 +56,8 @@ private:
     QTime fTimeOpen;
 
     Working *fWorking;
+
+    bool fModeRefund;
 };
 
 #endif // WORDER_H
