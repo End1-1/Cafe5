@@ -49,6 +49,7 @@ SOURCES += \
     ../../XLSX/src/xlsxworkbook.cpp \
     ../../XLSX/src/xlsxwriter.cpp \
     ../Cache/cachecashnames.cpp \
+    ../Cache/cachedish.cpp \
     ../Cache/cachegoodswaste.cpp \
     ../Cache/cachestorereason.cpp \
     ../Cafe5/c5cafecommon.cpp \
@@ -132,6 +133,7 @@ HEADERS += \
     ../../XLSX/src/xlsxwriter.h \
     ../../XLSX/src/zip.h \
     ../Cache/cachecashnames.h \
+    ../Cache/cachedish.h \
     ../Cache/cachegoodswaste.h \
     ../Cache/cachestorereason.h \
     ../Cafe5/c5cafecommon.h \

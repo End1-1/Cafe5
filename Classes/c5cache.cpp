@@ -3,6 +3,7 @@
 #include "cachedishstate.h"
 #include "cacheorderstate.h"
 #include "cachegoodswaste.h"
+#include "cachedish.h"
 #include "cachecashnames.h" //32
 #include "cachestorereason.h" //33
 
@@ -85,6 +86,7 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         fCacheQuery[cache_goods_waste] = query_cache_goods_waste;
         fCacheQuery[cache_cash_names] = query_cache_cash_names;
         fCacheQuery[cache_store_reason] = query_cache_store_reason;
+        fCacheQuery[cache_dish] = query_cache_dish;
     }
     if (fTableCache.count() == 0) {
         fTableCache["c_partners"] = cache_goods_partners;

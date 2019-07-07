@@ -11,13 +11,12 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 #ifndef QT_DEBUG
     QStringList libPath;
-    libPath << "./";
-    libPath << "./platforms";
-    libPath << "./sqldrivers";
-    libPath << "./printsupport";
+    libPath << qApp->applicationDirPath();
+    libPath << qApp->applicationDirPath() + "/platforms";
+    libPath << qApp->applicationDirPath() + "/sqldrivers";
+    libPath << qApp->applicationDirPath() + "/printsupport";
     QCoreApplication::setLibraryPaths(libPath);
 #endif
-
     QList<QByteArray> connectionParams;
     C5Connection::readParams(connectionParams);
     if (connectionParams.count() > 0) {

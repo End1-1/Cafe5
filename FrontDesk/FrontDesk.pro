@@ -33,6 +33,7 @@ DEFINES += FRONTDESK
 
 SOURCES += \
     ../Cache/cachecashnames.cpp \
+    ../Cache/cachedish.cpp \
     ../Cache/cachedishstate.cpp \
     ../Cache/cachestorereason.cpp \
     ../Cafe5/c5cafecommon.cpp \
@@ -184,6 +185,7 @@ SOURCES += \
 
 HEADERS += \
     ../Cache/cachecashnames.h \
+    ../Cache/cachedish.h \
     ../Cache/cachedishstate.h \
     ../Cache/cacheheaders.h \
     ../Cache/cachestorereason.h \

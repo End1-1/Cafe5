@@ -21,4 +21,7 @@ ALTER TABLE `o_goods` CHANGE COLUMN `f_header` `f_header` CHAR(36) NOT NULL ;
 alter table o_goods add column f_tax smallint default 0;
 ALTER TABLE `s_receipt_print` RENAME TO  `s_station_conf` ;
 ALTER TABLE `s_station_conf` CHANGE COLUMN `f_printer` `f_conf` INT NULL DEFAULT NULL ;
-
+/* */
+alter table d_recipes add column f_complex integer;
+alter table d_recipes add column f_complexQty decimal(14,4);
+alter table d_recipes add column f_complexBase decimal(14,4);

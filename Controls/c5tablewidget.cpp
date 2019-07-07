@@ -124,7 +124,8 @@ bool C5TableWidget::findWidget(QWidget *w, int &row, int &column)
 
 QVariant C5TableWidget::getData(int row, int column)
 {
-    return item(row, column)->data(Qt::EditRole);
+    C5TableWidgetItem *i = item(row, column);
+    return i->data(Qt::EditRole);
 }
 
 void C5TableWidget::setData(int row, int column, const QVariant &value)

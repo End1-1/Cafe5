@@ -5,6 +5,7 @@
 #include "c5selector.h"
 #include "c5combobox.h"
 #include "c5printing.h"
+#include "cachedish.h"
 #include "ce5dishpart2.h"
 #include "c5printpreview.h"
 #include <QColorDialog>
@@ -17,7 +18,8 @@ C5DishWidget::C5DishWidget(const QStringList &dbParams, QWidget *parent) :
     ui->lePart2->setSelector(dbParams, ui->lePart2Name, cache_dish_part2);
     ui->lePart2->setCallbackWidget(this);
     ui->tblPricing->setColumnWidths(8, 0, 0, 100, 80, 100, 100, 100, 30);
-    ui->tblRecipe->setColumnWidths(7, 0, 0, 200, 80, 80, 80, 80);
+    ui->tblRecipe->setColumnWidths(10, 0, 0, 200, 80, 80, 80, 80, 0, 0, 0);
+    ui->tblComplex->setColumnWidths(3, 0, 250, 45);
     C5Database db(dbParams);
     db.exec("select f_id, f_name from d_menu_names");
     int row = 0;
@@ -69,6 +71,8 @@ void C5DishWidget::clear()
     }
     ui->tblRecipe->clearContents();
     ui->tblRecipe->setRowCount(0);
+    ui->tblComplex->clearContents();
+    ui->tblComplex->setRowCount(0);
 }
 
 void C5DishWidget::setDish(int id)
@@ -93,7 +97,7 @@ void C5DishWidget::setDish(int id)
     ui->tblRecipe->setRowCount(0);
     int row = 0;
     db[":f_dish"] = id;
-    db.exec("select r.f_id, r.f_goods, g.f_name, r.f_qty, u.f_name as f_unit, r.f_price, r.f_qty*r.f_price as f_total "
+    db.exec("select r.f_id, r.f_goods, g.f_name, r.f_qty, u.f_name as f_unit, r.f_price, r.f_qty*r.f_price as f_total, r.f_complex, f_complexQty, f_complexBaseQty "
             "from d_recipes r "
             "left join c_goods g on g.f_id=r.f_goods "
             "left join c_units u on u.f_id=g.f_unit "
@@ -106,7 +110,14 @@ void C5DishWidget::setDish(int id)
         C5LineEdit *l = ui->tblRecipe->createLineEdit(row, 3);
         l->setValidator(new QDoubleValidator(0, 100000, 4));
         l->setDouble(db.getDouble("f_qty"));
-        connect(l, SIGNAL(textEdited(QString)), this, SLOT(recipeQtyPriceChanged(QString)));
+        if (db.getInt("f_complex") > 0) {
+            l->setReadOnly(true);
+        }
+        if (db.getInt("f_complex") > 0) {
+            connect(l, SIGNAL(textChanged(QString)), this, SLOT(recipeQtyPriceChanged(QString)));
+        } else {
+            connect(l, SIGNAL(textEdited(QString)), this, SLOT(recipeQtyPriceChanged(QString)));
+        }
         ui->tblRecipe->setString(row, 4, db.getString("f_unit"));
         C5LineEdit *le = ui->tblRecipe->createLineEdit(row, 5);
         connect(le, SIGNAL(textEdited(QString)), this, SLOT(recipeQtyPriceChanged(QString)));
@@ -114,7 +125,34 @@ void C5DishWidget::setDish(int id)
         le = ui->tblRecipe->createLineEdit(row, 6);
         le->setDouble(db.getDouble("f_total"));
         connect(le, SIGNAL(textEdited(QString)), this, SLOT(recipeQtyPriceChanged(QString)));
+        ui->tblRecipe->setString(row, 7, db.getString("f_complex"));
+        ui->tblRecipe->setDouble(row, 8, db.getDouble("f_complexqty"));
+        ui->tblRecipe->setDouble(row, 9, db.getDouble("f_complexbaseqty"));
+        if (db.getInt("f_complex") > 0) {
+            for (int i = 0; i < ui->tblRecipe->columnCount(); i++) {
+                if (ui->tblRecipe->item(row, i)) {
+                    ui->tblRecipe->item(row, i)->setBackgroundColor(Qt::magenta);
+                }
+            }
+        }
         row++;
+    }
+    C5Cache *c = C5Cache::cache(fDBParams, cache_dish);
+    db[":f_dish"] = id;
+    db.exec("select distinct(r.f_complex), f_complexQty  "
+            "from d_recipes r "
+            "where r.f_dish=:f_dish and r.f_complex>0 ");
+    while (db.nextRow()) {
+        if (db.getInt(0) == 0) {
+            continue;
+        }
+        QString s = c->getString(db.getInt(0));
+        int row = ui->tblComplex->addEmptyRow();
+        ui->tblComplex->setString(row, 0, db.getString(0));
+        ui->tblComplex->setString(row, 1, s);
+        C5LineEdit *l = ui->tblComplex->createLineEdit(row, 2);
+        l->setDouble(db.getDouble(1));
+        connect(l, SIGNAL(textChanged(QString)), this, SLOT(complextQtyChanged(QString)));
     }
     countTotalSelfCost();
 }
@@ -157,6 +195,9 @@ bool C5DishWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
         db[":f_goods"] = ui->tblRecipe->getInteger(i, 1);
         db[":f_qty"] = ui->tblRecipe->lineEdit(i, 3)->getDouble();
         db[":f_price"] = ui->tblRecipe->lineEdit(i, 5)->getDouble();
+        db[":f_complex"] = ui->tblRecipe->getDouble(i, 7);
+        db[":f_complexqty"] = ui->tblRecipe->getDouble(i, 8);
+        db[":f_complexbaseqty"] = ui->tblRecipe->getDouble(i, 9);
         if (ui->tblRecipe->getInteger(i, 0) == 0) {
             ui->tblRecipe->setInteger(i, 0, db.insert("d_recipes"));
         } else {
@@ -164,6 +205,21 @@ bool C5DishWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
         }
     }
     return true;
+}
+
+void C5DishWidget::complextQtyChanged(const QString &arg)
+{
+    C5LineEdit *l = static_cast<C5LineEdit*>(sender());
+    int row, col;
+    if (ui->tblComplex->findWidget(l, row, col)) {
+        QString code = ui->tblComplex->getString(row, 0);
+        for (int i = 0; i < ui->tblRecipe->rowCount(); i++) {
+            if (ui->tblRecipe->getString(i, 7) == code) {
+                ui->tblRecipe->setData(i, 8, arg.toDouble());
+                ui->tblRecipe->lineEdit(i, 3)->setDouble(ui->tblRecipe->getDouble(i, 9) * arg.toDouble());
+            }
+        }
+    }
 }
 
 void C5DishWidget::on_btnAddRecipe_clicked()
@@ -196,7 +252,30 @@ void C5DishWidget::on_btnRemoveRecipe_clicked()
     if (row < 0) {
         return;
     }
+    int complex = ui->tblRecipe->getInteger(row, 7);
+    if (complex > 0) {
+        if (C5Message::question(tr("This is part of complex and will remove immediatelly with other components. Continue?")) != QDialog::Accepted) {
+            return;
+        }
+    }
     ui->tblRecipe->setRowHidden(row, true);
+    if (complex > 0) {
+        C5Database db(fDBParams);
+        int code = ui->tblRecipe->getInteger(row, 7);
+        for (int i = ui->tblRecipe->rowCount() - 1; i > -1; i--) {
+            if (ui->tblRecipe->getInteger(i, 7) == code) {
+                db[":f_id"] = ui->tblRecipe->getInteger(i, 0);
+                db.exec("delete from d_recipes where f_id=:f_id");
+                ui->tblRecipe->removeRow(i);
+            }
+        }
+        for (int i = 0; i < ui->tblComplex->rowCount(); i++) {
+            if (ui->tblComplex->getInteger(i, 0) == complex) {
+                ui->tblComplex->removeRow(i);
+                break;
+            }
+        }
+    }
 }
 
 void C5DishWidget::setColor()
@@ -295,4 +374,109 @@ void C5DishWidget::on_btnPrintRecipe_clicked()
 
     C5PrintPreview pp(&p, fDBParams);
     pp.exec();
+}
+
+void C5DishWidget::on_btnAddDish_clicked()
+{
+    QList<QVariant> values;
+    if (!C5Selector::getValue(fDBParams, cache_dish, values)) {
+        return;
+    }
+    if (ui->leCode->text() == values.at(0).toString()) {
+        C5Message::info(tr("The recipe cannot contains itself"));
+        return;
+    }
+    for (int i = 0; i < ui->tblComplex->rowCount(); i++) {
+        if (ui->tblComplex->getString(i, 0) == values.at(0).toString()) {
+            C5Message::info(tr("This dish already in the list"));
+            return;
+        }
+    }
+    int row = ui->tblComplex->addEmptyRow();
+    C5LineEdit *l = ui->tblComplex->createLineEdit(row, 2);
+    l->setValidator(new QDoubleValidator(0, 100000, 4));
+    l->setDouble(1.0);
+    connect(l, SIGNAL(textChanged(QString)), this, SLOT(complextQtyChanged(QString)));
+    l->setFocus();
+    ui->tblComplex->setString(row, 0, values.at(0).toString());
+    ui->tblComplex->setString(row, 1, values.at(1).toString());
+
+    C5Database db(fDBParams);
+    db[":f_dish"] = values.at(0).toInt();
+    db.exec("select r.f_id, r.f_goods, g.f_name, r.f_qty, u.f_name as f_unit, r.f_price, r.f_qty*r.f_price as f_total, f_complex, f_complexqty, f_complexbaseqty "
+            "from d_recipes r "
+            "left join c_goods g on g.f_id=r.f_goods "
+            "left join c_units u on u.f_id=g.f_unit "
+            "where r.f_dish=:f_dish");
+    while (db.nextRow()) {
+        row = ui->tblRecipe->addEmptyRow();
+        ui->tblRecipe->setInteger(row, 0, 0);
+        ui->tblRecipe->setInteger(row, 1, db.getInt("f_goods"));
+        ui->tblRecipe->setString(row, 2, db.getString("f_name"));
+        C5LineEdit *l = ui->tblRecipe->createLineEdit(row, 3);
+        l->setValidator(new QDoubleValidator(0, 100000, 4));
+        l->setDouble(db.getDouble("f_qty"));
+        l->setReadOnly(true);
+        connect(l, SIGNAL(textChanged(QString)), this, SLOT(recipeQtyPriceChanged(QString)));
+        ui->tblRecipe->setString(row, 4, db.getString("f_unit"));
+        C5LineEdit *le = ui->tblRecipe->createLineEdit(row, 5);
+        connect(le, SIGNAL(textEdited(QString)), this, SLOT(recipeQtyPriceChanged(QString)));
+        le->setDouble(db.getDouble("f_price"));
+        le = ui->tblRecipe->createLineEdit(row, 6);
+        le->setDouble(db.getDouble("f_total"));
+        connect(le, SIGNAL(textEdited(QString)), this, SLOT(recipeQtyPriceChanged(QString)));
+        ui->tblRecipe->setString(row, 7, values.at(0).toString());
+        for (int i = 0; i < ui->tblRecipe->columnCount(); i++) {
+            if (ui->tblRecipe->item(row, i)) {
+                ui->tblRecipe->item(row, i)->setBackgroundColor(Qt::magenta);
+            }
+        }
+        ui->tblRecipe->setDouble(row, 8, 1);
+        ui->tblRecipe->setDouble(row, 9, db.getDouble("f_qty"));
+        row++;
+    }
+}
+
+void C5DishWidget::on_tblComplex_cellClicked(int row, int column)
+{
+    Q_UNUSED(column);
+    QString code = ui->tblComplex->getString(row, 0);
+    for (int i = 0; i < ui->tblRecipe->rowCount(); i++) {
+        if (code == ui->tblRecipe->getString(i, 7)) {
+            for (int j = 0; j < ui->tblRecipe->columnCount(); j++) {
+                if (ui->tblRecipe->item(i, j)) {
+                    ui->tblRecipe->item(i, j)->setBackgroundColor(Qt::green);
+                }
+            }
+        } else if (ui->tblRecipe->getInteger(i, 7) > 0) {
+            for (int j = 0; j < ui->tblRecipe->columnCount(); j++) {
+                if (ui->tblRecipe->item(i, j)) {
+                    ui->tblRecipe->item(i, j)->setBackgroundColor(Qt::magenta);
+                }
+            }
+        }
+    }
+}
+
+void C5DishWidget::on_btnDeleteDish_clicked()
+{
+    QModelIndexList ml = ui->tblComplex->selectionModel()->selectedIndexes();
+    if (ml.count() == 0) {
+        return;
+    }
+    if (C5Message::question(tr("This is part of complex and will remove immediatelly with other components. Continue?")) != QDialog::Accepted) {
+        return;
+    }
+    C5Database db(fDBParams);
+    int row = ml.at(0).row();
+    QString code = ui->tblComplex->getString(row, 0);
+    for (int i = ui->tblRecipe->rowCount() - 1; i > -1; i--) {
+        QString rcode = ui->tblRecipe->getString(i, 7);
+        if (rcode == code) {
+            db[":f_id"] = ui->tblRecipe->getInteger(i, 0);
+            db.exec("delete from d_recipes where f_id=:f_id");
+            ui->tblRecipe->removeRow(i);
+        }
+    }
+    ui->tblComplex->removeRow(0);
 }
