@@ -121,6 +121,7 @@ void C5SocketHandler::readyRead()
             emit handleCommand(jDoc.object());
         } else {
             emit handleError(fErrorCode, je.errorString());
+            fSocket->close();
         }
         fData.clear();
         fDataSize = 0;

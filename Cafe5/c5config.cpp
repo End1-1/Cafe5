@@ -14,6 +14,7 @@ QString C5Config::fDBHost;
 QString C5Config::fDBPath;
 QString C5Config::fDBUser;
 QString C5Config::fDBPassword;
+QString C5Config::fFullScreen;
 C5Config __c5config;
 int __userid;
 int __usergroup;
@@ -218,6 +219,11 @@ void C5Config::setValue(int key, const QString &value)
 {
     QMutexLocker ml(&settingsMutex);
     fSettings[key] = value;
+}
+
+bool C5Config::isAppFullScreen()
+{
+    return fFullScreen == "1";
 }
 
 QString C5Config::getValue(int key)

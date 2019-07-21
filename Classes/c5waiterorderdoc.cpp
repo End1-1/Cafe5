@@ -59,6 +59,7 @@ void C5WaiterOrderDoc::sendToServer(C5SocketHandler *sh)
 
 bool C5WaiterOrderDoc::transferToHotel(C5Database &fDD, QString &err)
 {
+    return true;
     int settings = 0;
     int item = 0;
     QString itemName;

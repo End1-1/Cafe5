@@ -25,3 +25,4 @@ ALTER TABLE `s_station_conf` CHANGE COLUMN `f_printer` `f_conf` INT NULL DEFAULT
 alter table d_recipes add column f_complex integer;
 alter table d_recipes add column f_complexQty decimal(14,4);
 alter table d_recipes add column f_complexBase decimal(14,4);
+create table droid_message(f_id integer primary key auto_increment, msg integer);

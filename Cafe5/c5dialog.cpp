@@ -6,7 +6,7 @@ static QWidget *__mainWindow = nullptr;
 
 C5Dialog::C5Dialog(const QStringList &dbParams) :
 #ifdef WAITER
-    QDialog(__mainWindow, Qt::FramelessWindowHint),
+    QDialog(__mainWindow, C5Config::isAppFullScreen() ? Qt::FramelessWindowHint : Qt::WindowFlags()),
     fDBParams(dbParams)
 #else
     QDialog(__mainWindow),
@@ -46,6 +46,19 @@ C5SocketHandler *C5Dialog::createSocketHandler(const char *slot)
 QStringList C5Dialog::getDbParams()
 {
     return fDBParams;
+}
+
+void C5Dialog::showFullScreen()
+{
+#ifdef WAITER
+    if (C5Config::isAppFullScreen()) {
+        QDialog::showFullScreen();
+    } else {
+        QDialog::showMaximized();
+    }
+#else
+    QDialog::showFullScreen();
+#endif
 }
 
 void C5Dialog::keyPressEvent(QKeyEvent *e)

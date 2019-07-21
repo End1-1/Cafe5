@@ -53,6 +53,8 @@ SOURCES += \
     ../Cache/cachegoodswaste.cpp \
     ../Cache/cachestorereason.cpp \
     ../Cafe5/c5cafecommon.cpp \
+    ../Classes/c5jsondb.cpp \
+    ../Classes/notificationwidget.cpp \
         main.cpp \
         dlgface.cpp \
     ../Cafe5/c5database.cpp \
@@ -137,6 +139,8 @@ HEADERS += \
     ../Cache/cachegoodswaste.h \
     ../Cache/cachestorereason.h \
     ../Cafe5/c5cafecommon.h \
+    ../Classes/c5jsondb.h \
+    ../Classes/notificationwidget.h \
         dlgface.h \
     ../Cafe5/c5database.h \
     ../Cafe5/c5config.h \
@@ -203,6 +207,7 @@ HEADERS += \
     ../Cache/cacheorderstate.h
 
 FORMS += \
+    ../Classes/notificationwidget.ui \
         dlgface.ui \
     ../Cafe5/c5connection.ui \
     ../Cafe5/c5message.ui \
@@ -237,6 +242,7 @@ INCLUDEPATH += C:/OpenSSL-Win32/include/openssl
 INCLUDEPATH += C:/Projects/XLSX/src
 
 RESOURCES += \
+    ../resources/res.qrc \
     ../resources/resources.qrc \
     translator.qrc
 

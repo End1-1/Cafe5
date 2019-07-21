@@ -9,89 +9,94 @@
         <translation>Կապի պարամետրեր</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.ui" line="20"/>
-        <location filename="../Cafe5/c5connection.cpp" line="78"/>
+        <location filename="../Cafe5/c5connection.ui" line="54"/>
+        <location filename="../Cafe5/c5connection.cpp" line="80"/>
         <source>Password</source>
         <translation>Գախտնաբար</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.ui" line="27"/>
+        <location filename="../Cafe5/c5connection.ui" line="33"/>
         <source>Username</source>
         <translation>Օգտագործող</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.ui" line="41"/>
+        <location filename="../Cafe5/c5connection.ui" line="90"/>
         <source>Database</source>
         <translation>Տվյալների պահոց</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.ui" line="51"/>
+        <location filename="../Cafe5/c5connection.ui" line="23"/>
         <source>Database Host</source>
         <translation>Պահոցի սերվերի IP</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.ui" line="156"/>
+        <location filename="../Cafe5/c5connection.ui" line="47"/>
         <source>Server address</source>
         <translation>Սերվերի IP</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.ui" line="34"/>
+        <location filename="../Cafe5/c5connection.ui" line="40"/>
         <source>Settings</source>
         <translation>Կարգավորումներ</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.ui" line="112"/>
+        <location filename="../Cafe5/c5connection.ui" line="116"/>
         <source>Save</source>
         <translation>Պահպանել</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.ui" line="119"/>
+        <location filename="../Cafe5/c5connection.ui" line="123"/>
         <source>Test</source>
         <translation>Սուգել</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.ui" line="126"/>
+        <location filename="../Cafe5/c5connection.ui" line="130"/>
         <source>Init</source>
         <translation>Ստեղծել</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.ui" line="133"/>
+        <location filename="../Cafe5/c5connection.ui" line="137"/>
         <source>Cancel</source>
         <translation>Փակել</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="78"/>
+        <location filename="../Cafe5/c5connection.ui" line="173"/>
+        <source>Full screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Cafe5/c5connection.cpp" line="80"/>
         <source>Configuration settings</source>
         <translation>Կոնֆիգուրացիա</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="81"/>
+        <location filename="../Cafe5/c5connection.cpp" line="83"/>
         <source>Access denied</source>
         <translation>Մուտքը արգելված է</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="99"/>
-        <location filename="../Cafe5/c5connection.cpp" line="123"/>
+        <location filename="../Cafe5/c5connection.cpp" line="101"/>
+        <location filename="../Cafe5/c5connection.cpp" line="126"/>
         <source>Cannot connect to database</source>
         <translation>Կապը ձախողվեց</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="103"/>
+        <location filename="../Cafe5/c5connection.cpp" line="105"/>
         <source>Connection successfull</source>
         <translation>Կապը հաստատվեց</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="115"/>
+        <location filename="../Cafe5/c5connection.cpp" line="118"/>
         <source>Saved</source>
         <translation>Պահպանված է</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="132"/>
+        <location filename="../Cafe5/c5connection.cpp" line="135"/>
         <source>Already initialized</source>
         <translation>Ստեղծված է</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="151"/>
+        <location filename="../Cafe5/c5connection.cpp" line="154"/>
         <source>Ready to use</source>
         <translation>Պատրաս է օգտագործման</translation>
     </message>
@@ -202,14 +207,22 @@
 <context>
     <name>PrintTaxN</name>
     <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="65"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="67"/>
         <source>Socket read error</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="73"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="75"/>
         <source>Data read timeout</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>QObject</name>
+    <message>
+        <location filename="../Classes/c5printing.cpp" line="296"/>
+        <source>Failed send order to remote printer</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -7,7 +7,10 @@
 #include "c5permissions.h"
 #include "printtaxn.h"
 #include "c5waiterorderdoc.h"
+#include "c5printing.h"
 #include "c5utils.h"
+#include "notificationwidget.h"
+#include "c5jsondb.h"
 #include <QDebug>
 #include <QJsonArray>
 #include <QMutex>
@@ -37,6 +40,7 @@ void C5WaiterServer::reply(QJsonObject &o)
     QMap<QString, QVariant> bv;
 
     int cmd = fIn["cmd"].toInt();
+    o["cmd"] = cmd;
     switch (cmd) {
     case sm_hall: {
         QJsonArray jHall;
@@ -374,12 +378,12 @@ void C5WaiterServer::reply(QJsonObject &o)
             if (!l.load()) {
                 continue;
             }
-            caption c = (caption) l.resolve("caption");
+            caption c = reinterpret_cast<caption>(l.resolve("caption"));
             if (!c) {
                 l.unload();
                 continue;
             }
-            translator t = (translator) (l.resolve("translator"));
+            translator t = reinterpret_cast<translator>(l.resolve("translator"));
             if (!t) {
                 l.unload();
                 o["reply"] = 1;
@@ -409,7 +413,7 @@ void C5WaiterServer::reply(QJsonObject &o)
             o["msg"] = QString("%1 %2").arg(tr("Could not load")).arg(filename);
             break;
         }
-        translator t = (translator) (l.resolve("translator"));
+        translator t = reinterpret_cast<translator>(l.resolve("translator"));
         if (!t) {
             l.unload();
             o["reply"] = 1;
@@ -419,7 +423,7 @@ void C5WaiterServer::reply(QJsonObject &o)
         QTranslator trans;
         t(trans);
         qApp->installTranslator(&trans);
-        json j = (json) l.resolve("json");
+        json j = reinterpret_cast<json>(l.resolve("json"));
         if (!j) {
             l.unload();
             o["reply"] = 1;
@@ -433,7 +437,7 @@ void C5WaiterServer::reply(QJsonObject &o)
         QJsonArray report;
         j(srh.fDb, jo, report);
         QJsonObject jp;
-        jp["pagesize"] = (int) QPrinter::Custom;
+        jp["pagesize"] = static_cast<int> (QPrinter::Custom);
         jp["printer"] = "local";
         jp["cmd"] = "print";
         report.append(jp);
@@ -452,6 +456,16 @@ void C5WaiterServer::reply(QJsonObject &o)
         o["versions"] = versions;
         break;
     }
+    case sm_apporder: {
+        processAppOrder(o);
+        break;
+    }
+    case sm_callstaff:
+        processCallStaff(o);
+        break;
+    case sm_messagelist:
+        processMessageList(o);
+        break;
     default:
         o["reply"] = 0;
         o["msg"] = QString("%1: %2").arg(tr("Unknown command for socket handler from dlgface")).arg(cmd);
@@ -845,4 +859,150 @@ void C5WaiterServer::getVersions(C5Database &db, QJsonArray &arr)
         o["version"] = db.getString(1);
         arr.append(o);
     }
+}
+
+void C5WaiterServer::processAppOrder(QJsonObject &o)
+{
+    QString orderinfo;
+    C5Database db(C5Config::dbParams());
+    QString id = fIn["header"].toString();
+    if (id.isEmpty()) {
+        id = db.uuid();
+        db[":f_id"] = fIn["hallid"].toString().toInt();
+        db.exec("select f_counter + 1, f_prefix as f_counter from h_halls where f_id=:f_id for update");
+        if (db.nextRow()) {
+            o["f_hallid"] = db.getString(0);
+            o["f_prefix"] = db.getString(1);
+            db[":f_counter"] = db.getInt(0);
+            db.update("h_halls", where_id(fIn["hallid"].toString()));
+        } else {
+            o["f_hallid"] = "0";
+            o["f_prefix"] = "";
+        }
+        db[":f_id"] = id;
+        db[":f_hallid"] = o["f_hallid"].toString();
+        db[":f_prefix"] = o["f_prefix"].toString();
+        db[":f_state"] = ORDER_STATE_OPEN;
+        db[":f_hall"] = fIn["hallid"].toString();
+        db[":f_table"] = fIn["tableid"].toString();
+        db[":f_dateopen"] = QDate::currentDate();
+        db[":f_timeopen"] = QTime::currentTime();
+        db[":f_staff"] = fIn["staffid"].toString();
+        db[":f_comment"] = "";
+        db[":f_print"] = 0;
+        db[":f_amounttotal"] = 0;
+        db[":f_amountcash"] = 0;
+        db[":f_amountcard"] = 0;
+        db[":f_amountbank"] = 0;
+        db[":f_amountother"] = 0;
+        db[":f_amountservice"] = 0;
+        db[":f_amountservice"] = 0;
+        db[":f_amountdiscount"] = 0;
+        db[":f_servicefactor"] = 0;
+        db[":f_discountfactor"] = 0;
+        db[":f_creditcardid"] = 0;
+        db[":f_otherid"] = 0;
+        db.insert("o_header", false);
+    }
+    orderinfo += QString("%1 %2, %3<br>").arg(tr("Order")).arg(fIn["tablename"].toString()).arg(o["f_hallprefix"].toString() + o["f_hallid"].toString());
+    QJsonArray jd = fIn["dishes"].toArray();
+    QJsonArray jout;
+    QJsonArray jprint;
+    for (int i = 0; i < jd.count(); i++) {
+        QJsonObject d = jd.at(i).toObject();
+        if (d["remoteid"].toString().isEmpty()) {
+            d["remoteid"] = C5Database::uuid();
+            db[":f_id"] = d["remoteid"].toString();
+            db.insert("o_body", false);
+        }
+        if (d["qty2"].toString().toDouble() < d["qty1"].toString().toDouble()) {
+            QJsonObject jdp;
+            jdp["f_qtyprint"] = QString::number(d["qty1"].toString().toDouble() - d["qty2"].toString().toDouble(), 'f', 1);
+            jdp["f_name"] = d["dishname"].toString();
+            jdp["f_storename"] = d["store"].toString();
+            jdp["f_print1"] = d["print1"].toString();
+            jdp["f_print2"] = d["print2"].toString();
+            jprint.append(jdp);
+            d["qty2"] = d["qty1"].toString();
+            orderinfo += QString("%1: %2<br>").arg(jdp["f_name"].toString()).arg(jdp["f_qtyprint"].toString());
+        }
+//        if (o["f_state"].toString().toInt() < 0) {
+//            o["f_state"] = QString::number(o["f_state"].toString().toInt() * -1);
+//            C5PrintRemovedServiceThread *pr = new C5PrintRemovedServiceThread(h, o);
+//            pr->start();
+//        }
+        db[":f_header"] = id;
+        db[":f_state"] = d["state"].toString();
+        db[":f_dish"] = d["dishcode"].toString().toInt();
+        db[":f_qty1"] = d["qty1"].toString().toDouble();
+        db[":f_qty2"] = d["qty2"].toString().toDouble();
+        db[":f_price"] = d["price"].toString().toDouble();
+        db[":f_service"] = 0;
+        db[":f_discount"] = 0;
+        db[":f_total"] = d["qty2"].toString().toDouble() * d["price"].toString().toDouble();
+        db[":f_store"] = d["store"].toString().toInt();
+        db[":f_print1"] = d["print1"].toString();
+        db[":f_print2"] = d["print2"].toString();
+        db[":f_comment"] = "";
+        db[":f_remind"] = d["remind"].toString().toInt();
+        db[":f_adgcode"] = d["adgcode"].toString();
+        db[":f_removereason"] = "";
+        db.update("o_body", where_id(d["remoteid"].toString()));
+        jout.append(d);
+    }
+    db[":f_id"] = id;
+    db.exec("select * from o_header where f_id=:f_id");
+    o["header"] = C5JsonDb::convertRowToJsonObject(db);
+    o["body"] = jout;
+    o["reply"] = 1;
+    if (jprint.count() > 0) {
+        o["msg"] = tr("Your order was accepted");
+        QJsonObject jhprint;
+        jhprint["f_tablename"] = fIn["tablename"].toString();
+        jhprint["f_prefix"] = o["header"].toObject()["f_prefix"].toString();
+        jhprint["f_hallid"] = o["header"].toObject()["f_hallid"].toString();
+        jhprint["f_currentstaffname"] = fIn["staffname"].toString();
+        C5PrintServiceThread *ps = new C5PrintServiceThread(jhprint, jprint);
+        ps->start();
+        NotificationWidget::showMessage(orderinfo);
+    } else {
+        o["msg"] = tr("Your order is empty or already was accepted");
+        NotificationWidget::showMessage(tr("The customer was make an empty order, can you help him?"));
+    }
+}
+
+void C5WaiterServer::processCallStaff(QJsonObject &o)
+{
+    QFont font(qApp->font());
+    font.setPointSize(30);
+    C5Printing p;
+    p.setSceneParams(650, 2800, QPrinter::Portrait);
+    p.setFont(font);
+
+    p.ltext(tr("Table"), 0);
+    p.rtext(fIn["table"].toString());
+    p.br();
+    p.ltext(tr("Call staff"), 0);
+    p.br();
+    p.ltext(tr("Date"), 0);
+    p.rtext(QDate::currentDate().toString(FORMAT_DATE_TO_STR));
+    p.br();
+    p.ltext(tr("Time"), 0);
+    p.rtext(QTime::currentTime().toString(FORMAT_TIME_TO_STR));
+    p.br();
+    p.br(p.fLineHeight + 2);
+    p.line(0, p.fTop, p.fNormalWidth, p.fTop);
+    p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
+    o["reply"] = 1;
+
+    NotificationWidget::showMessage(QString("%1 %2: %3").arg(tr("Table")).arg(fIn["table"].toString()).arg(tr("Call staff")));
+}
+
+void C5WaiterServer::processMessageList(QJsonObject &o)
+{
+    C5Database db(C5Config::dbParams());
+    db[":f_id"] = fIn["lastmessage"].toInt();
+    db.exec("select f_id, msg from droid_message where f_id>:f_id");
+    o["list"] = C5JsonDb::convertRowsToJsonArray(db);
+    o["reply"] = 1;
 }

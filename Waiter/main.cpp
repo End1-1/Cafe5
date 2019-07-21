@@ -42,7 +42,11 @@ int main(int argc, char *argv[])
 
     DlgFace w;
     C5Config::fParentWidget = &w;
-    w.showFullScreen();
+    if (C5Config::isAppFullScreen()) {
+        w.showFullScreen();
+    } else {
+        w.showMaximized();
+    }
     a.processEvents();
     w.setup();
 

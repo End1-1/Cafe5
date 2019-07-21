@@ -41,6 +41,12 @@ private:
 
     void getVersions(C5Database &db, QJsonArray &arr);
 
+    void processAppOrder(QJsonObject &o);
+
+    void processCallStaff(QJsonObject &o);
+
+    void processMessageList(QJsonObject &o);
+
     QTcpSocket *fSocket;
 };
 

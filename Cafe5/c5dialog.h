@@ -37,6 +37,8 @@ public:
 
     QStringList getDbParams();
 
+    void showFullScreen();
+
 protected:
     const QStringList &fDBParams;
 

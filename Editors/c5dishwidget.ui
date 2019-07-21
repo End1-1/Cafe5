@@ -23,7 +23,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -105,6 +105,9 @@
             </property>
             <property name="First" stdset="0">
              <bool>true</bool>
+            </property>
+            <property name="Check" stdset="0">
+             <string>empty=&quot;Type&quot;</string>
             </property>
            </widget>
           </item>

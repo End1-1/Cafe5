@@ -23,6 +23,7 @@ C5Connection::C5Connection(const QStringList &dbParams) :
         on_btnRefreshSettings_clicked();
         ui->cbSettings->setCurrentText(params.at(4));
     }
+    ui->chFullScreen->setChecked(params.at(5).toInt() != 0);
     ui->leServer->setText(C5Config::serverIP());
 }
 
@@ -63,6 +64,7 @@ void C5Connection::writeParams()
     buf.append('\r');
     buf.append(C5Config::fLastUsername.toUtf8());
     buf.append('\r');
+    buf.append(C5Config::fFullScreen.toUtf8());
 
     for (int i = 0; i < buf.length(); i++) {
         buf[i] = buf[i] ^ ((i % 2) + (i % 3) + (i % 4) + (i % 5) + (i % 6) + (i % 7) + (i % 8) + (i % 9));
@@ -110,6 +112,7 @@ void C5Connection::on_btnSave_clicked()
     C5Config::fDBUser = ui->leUsername->text();
     C5Config::fDBPassword = ui->lePassword->text();
     C5Config::fSettingsName = ui->cbSettings->currentText();
+    C5Config::fFullScreen = ui->chFullScreen->isChecked() ? "1" : "0";
     writeParams();
     C5Config::initParamsFromDb();
     C5Message::info(tr("Saved"));

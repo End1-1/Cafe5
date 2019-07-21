@@ -46,6 +46,9 @@ void DlgFace::setup()
     ui->tblHall->setItemDelegate(new C5HallTableDelegate());
     ui->tblHall->horizontalHeader()->setDefaultSectionSize(HALL_COL_WIDTH);
     ui->tblHall->setColumnCount(ui->tblHall->width() / HALL_COL_WIDTH);
+    if (ui->tblHall->columnCount() == 0) {
+        ui->tblHall->setColumnCount(1);
+    }
     int delta = ui->tblHall->width() - (ui->tblHall->columnCount() * HALL_COL_WIDTH) - 5;
     delta /= ui->tblHall->columnCount();
     ui->tblHall->horizontalHeader()->setDefaultSectionSize(HALL_COL_WIDTH + delta);
@@ -367,4 +370,14 @@ void DlgFace::on_btnReports_clicked()
 void DlgFace::on_btnCancel_clicked()
 {
     on_btnExit_clicked();
+}
+
+void DlgFace::on_btnClearDroid_clicked()
+{
+    if (C5Message::question(tr("Are you sure to clear droids?")) != QDialog::Accepted) {
+        return;
+    }
+    C5Database db(C5Config::dbParams());
+    db[":msg"] = 1;
+    db.insert("droid_message", false);
 }

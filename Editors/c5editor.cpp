@@ -21,6 +21,7 @@ C5Editor::~C5Editor()
 C5Editor *C5Editor::createEditor(const QStringList &dbParams, CE5Editor *e, int id)
 {
     C5Editor *de = new C5Editor(dbParams);
+    e->fFocusNextChild = false;
     de->fEditor = e;
     de->fVerticalLayout->addWidget(e);
     de->adjustSize();

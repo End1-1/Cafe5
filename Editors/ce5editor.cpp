@@ -224,6 +224,7 @@ void CE5Editor::clear()
             }
         }
     }
+    focusFirst();
 }
 
 C5LineEditWithSelector *CE5Editor::findLineEditWithId()
@@ -233,14 +234,14 @@ C5LineEditWithSelector *CE5Editor::findLineEditWithId()
             return le;
         }
     }
-    return 0;
+    return nullptr;
 }
 
 void CE5Editor::getLineEdit(QObject *parent)
 {
-    C5LineEditWithSelector *le = 0;
-    C5CheckBox *ch = 0;
-    C5DateEdit *de = 0;
+    C5LineEditWithSelector *le = nullptr;
+    C5CheckBox *ch = nullptr;
+    C5DateEdit *de = nullptr;
     QObjectList ol = parent->children();
     foreach (QObject *o, ol) {
         if (o->children().count() > 0) {

@@ -1,12 +1,16 @@
 #include "c5printing.h"
+#include "notificationwidget.h"
 #include <QPainter>
 #include <QGraphicsItem>
 #include <QDebug>
 #include <QTextDocument>
 #include <QTextBlock>
+#include <QPrinterInfo>
 #include <QPrinter>
 #include <QJsonObject>
+#include <QJsonDocument>
 #include <QAbstractTextDocumentLayout>
+#include <QTcpSocket>
 
 #define INCH_PER_MM 0.0393
 
@@ -262,6 +266,42 @@ QPrinter::Orientation C5Printing::orientation(int index)
 
 void C5Printing::print(const QString &printername, QPrinter::PageSize pageSize)
 {
+    if (printername.contains("print://", Qt::CaseInsensitive)) {
+        QRegExp re("(print:\\/\\/)(.*):(\\d*)\\/(.*)", Qt::CaseInsensitive);
+        re.indexIn(printername);
+        if (re.captureCount() > 0) {
+            QStringList l = re.capturedTexts();
+            QString addr = l.at(2);
+            QString prt = l.at(3);
+            QString prn = l.at(4);
+            QJsonObject jobj;
+            jobj["data"] = fJsonData;
+            jobj["cmd"] = 1;
+            jobj["printer"] = prn;
+            jobj["pagesize"] = pageSize;
+            QJsonDocument jdoc(jobj);
+            QTcpSocket ts;
+            ts.connectToHost(addr, prt.toInt());
+            if (ts.waitForConnected()) {
+                QByteArray out = jdoc.toJson();
+                int datasize = out.length();
+                ts.write(reinterpret_cast<const char *>(&datasize), sizeof(datasize));
+                int cmd = 1;
+                ts.write(reinterpret_cast<const char *>(&cmd), sizeof(cmd));
+                ts.write(out, out.length());
+                ts.waitForBytesWritten();
+                ts.waitForReadyRead(60000);
+                ts.disconnectFromHost();
+            } else {
+                NotificationWidget::showMessage(QObject::tr("Failed send order to remote printer"), 1);
+            }
+        }
+        return;
+    }
+    QPrinterInfo pi;
+    if (!pi.availablePrinterNames().contains(printername, Qt::CaseInsensitive)) {
+        return;
+    }
     if (fCanvasList.count() > 0) {
         QPrinter printer(QPrinter::PrinterResolution);
         printer.setPrinterName(printername);

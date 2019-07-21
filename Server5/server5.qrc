@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Server5.qm</file>
+    </qresource>
+</RCC>

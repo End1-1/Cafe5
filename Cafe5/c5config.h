@@ -45,6 +45,8 @@ public:
 
     static QString fLastUsername;
 
+    static QString fFullScreen;
+
     static QString fDBHost;
 
     static QString fDBPath;
@@ -118,6 +120,8 @@ public:
     static void setRegValue(const QString &key, const QVariant &value);
 
     static void setValue(int key, const QString &value);
+
+    static bool isAppFullScreen();
 
 private:
     static QString getValue(int key);

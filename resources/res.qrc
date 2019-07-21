@@ -54,5 +54,9 @@
         <file>eye-no.png</file>
         <file>cash.png</file>
         <file>folder.png</file>
+        <file>info.png</file>
+        <file>server.png</file>
+        <file>cancel.png</file>
+        <file>warning.png</file>
     </qresource>
 </RCC>

@@ -13,6 +13,8 @@ class C5Widget : public QWidget
     Q_OBJECT
 
 public:
+    friend class C5Editor;
+
     enum ToolBarButtons {tbNone = 0, tbNew, tbEdit, tbSave, tbRefresh, tbFilter, tbClearFilter, tbPrint, tbExcel, tbDelete };
 
     explicit C5Widget(const QStringList &dbParams, QWidget *parent = nullptr);
