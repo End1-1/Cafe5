@@ -36,6 +36,8 @@ private slots:
 
     void countOutputBasedOnRecipes();
 
+    void changeOutputStore();
+
     void writeDocs(int doctype, int reason, const QMap<int, double> &data, const QString &comment);
 };
 

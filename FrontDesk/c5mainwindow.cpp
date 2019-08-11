@@ -37,6 +37,7 @@
 #include "cr5databases.h"
 #include "cr5storereason.h"
 #include "cr5goodspartners.h"
+#include "cr5discountstatisics.h"
 #include "cr5goodswaste.h"
 #include "c5welcomepage.h"
 #include "cr5salefromstore.h"
@@ -109,6 +110,7 @@ C5MainWindow::C5MainWindow(QWidget *parent) :
     ui->actionChange_password->setVisible(false);
     connect(&fUpdateTimer, SIGNAL(timeout()), this, SLOT(updateTimeout()));
     fUpdateTimer.start(10000);
+    ui->twDb->resize(C5Config::getRegValue("twdbsize", 300).toInt(), 0);
 }
 
 C5MainWindow::~C5MainWindow()
@@ -300,6 +302,7 @@ void C5MainWindow::on_actionLogin_triggered()
             addTreeL3Item(it, cp_t3_sale_from_store_total, tr("Sales from store total"), ":/graph.png");
             addTreeL3Item(it, cp_t3_sale_removed_dishes, tr("Sales, removed dishes"), ":/delete.png");
             addTreeL3Item(it, cp_t3_sale_dishes, tr("Sales, dishes"), ":/graph.png");
+            addTreeL3Item(it, cp_t3_discount_statistics, tr("Discount statistics"), ":/discount.png");
         }
 
         if (pr(db.getString(3), cp_t8_cash)) {
@@ -561,6 +564,9 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
     case cp_t3_sale_from_store_total:
         createTab<CR5SaleFromStoreTotal>(dbParams);
         break;
+    case cp_t3_discount_statistics:
+        createTab<CR5DiscountStatisics>(dbParams);
+        break;
     case cp_t4_part1:
         createTab<CR5DishPart1>(dbParams);
         break;
@@ -727,4 +733,11 @@ void C5MainWindow::on_actionChange_password_triggered()
         db.exec("update s_user set f_password=md5(:f_password) where f_id=:f_id");
     }
     C5Message::info(tr("Password changed"));
+}
+
+void C5MainWindow::on_splitter_splitterMoved(int pos, int index)
+{
+    Q_UNUSED(pos);
+    Q_UNUSED(index);
+    C5Config::setRegValue("twdbsize", ui->twDb->width());
 }

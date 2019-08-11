@@ -4,92 +4,96 @@
 <context>
     <name>C5Cache</name>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="24"/>
-        <location filename="../../Classes/c5cache.cpp" line="33"/>
+        <location filename="../../Classes/c5cache.cpp" line="25"/>
+        <location filename="../../Classes/c5cache.cpp" line="29"/>
+        <location filename="../../Classes/c5cache.cpp" line="32"/>
         <location filename="../../Classes/c5cache.cpp" line="38"/>
-        <location filename="../../Classes/c5cache.cpp" line="42"/>
-        <location filename="../../Classes/c5cache.cpp" line="49"/>
-        <location filename="../../Classes/c5cache.cpp" line="52"/>
+        <location filename="../../Classes/c5cache.cpp" line="43"/>
+        <location filename="../../Classes/c5cache.cpp" line="47"/>
+        <location filename="../../Classes/c5cache.cpp" line="54"/>
+        <location filename="../../Classes/c5cache.cpp" line="57"/>
+        <location filename="../../Classes/c5cache.cpp" line="60"/>
+        <location filename="../../Classes/c5cache.cpp" line="63"/>
+        <location filename="../../Classes/c5cache.cpp" line="66"/>
+        <location filename="../../Classes/c5cache.cpp" line="69"/>
+        <location filename="../../Classes/c5cache.cpp" line="72"/>
+        <location filename="../../Classes/c5cache.cpp" line="75"/>
+        <location filename="../../Classes/c5cache.cpp" line="80"/>
+        <location filename="../../Classes/c5cache.cpp" line="230"/>
+        <source>Code</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../Classes/c5cache.cpp" line="26"/>
+        <location filename="../../Classes/c5cache.cpp" line="30"/>
+        <location filename="../../Classes/c5cache.cpp" line="33"/>
+        <location filename="../../Classes/c5cache.cpp" line="40"/>
+        <location filename="../../Classes/c5cache.cpp" line="44"/>
+        <location filename="../../Classes/c5cache.cpp" line="48"/>
         <location filename="../../Classes/c5cache.cpp" line="55"/>
         <location filename="../../Classes/c5cache.cpp" line="58"/>
         <location filename="../../Classes/c5cache.cpp" line="61"/>
         <location filename="../../Classes/c5cache.cpp" line="64"/>
         <location filename="../../Classes/c5cache.cpp" line="67"/>
         <location filename="../../Classes/c5cache.cpp" line="70"/>
-        <location filename="../../Classes/c5cache.cpp" line="75"/>
-        <location filename="../../Classes/c5cache.cpp" line="223"/>
-        <source>Code</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../Classes/c5cache.cpp" line="25"/>
-        <location filename="../../Classes/c5cache.cpp" line="35"/>
-        <location filename="../../Classes/c5cache.cpp" line="39"/>
-        <location filename="../../Classes/c5cache.cpp" line="43"/>
-        <location filename="../../Classes/c5cache.cpp" line="50"/>
-        <location filename="../../Classes/c5cache.cpp" line="53"/>
-        <location filename="../../Classes/c5cache.cpp" line="56"/>
-        <location filename="../../Classes/c5cache.cpp" line="59"/>
-        <location filename="../../Classes/c5cache.cpp" line="62"/>
-        <location filename="../../Classes/c5cache.cpp" line="65"/>
-        <location filename="../../Classes/c5cache.cpp" line="68"/>
-        <location filename="../../Classes/c5cache.cpp" line="76"/>
-        <location filename="../../Classes/c5cache.cpp" line="224"/>
+        <location filename="../../Classes/c5cache.cpp" line="73"/>
+        <location filename="../../Classes/c5cache.cpp" line="81"/>
+        <location filename="../../Classes/c5cache.cpp" line="231"/>
         <source>Name</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="26"/>
+        <location filename="../../Classes/c5cache.cpp" line="27"/>
         <source>Part</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="34"/>
+        <location filename="../../Classes/c5cache.cpp" line="39"/>
         <source>Group</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="36"/>
+        <location filename="../../Classes/c5cache.cpp" line="41"/>
         <source>Unit</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="44"/>
+        <location filename="../../Classes/c5cache.cpp" line="49"/>
         <source>Contact</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="45"/>
+        <location filename="../../Classes/c5cache.cpp" line="50"/>
         <source>Info</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="46"/>
+        <location filename="../../Classes/c5cache.cpp" line="51"/>
         <source>Phone</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="47"/>
+        <location filename="../../Classes/c5cache.cpp" line="52"/>
         <source>Email</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="71"/>
+        <location filename="../../Classes/c5cache.cpp" line="76"/>
         <source>First name</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="72"/>
+        <location filename="../../Classes/c5cache.cpp" line="77"/>
         <source>Last name</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="73"/>
+        <location filename="../../Classes/c5cache.cpp" line="78"/>
         <source>Additional info</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="77"/>
+        <location filename="../../Classes/c5cache.cpp" line="82"/>
         <source>Description</source>
         <translation></translation>
     </message>
@@ -115,7 +119,7 @@
 <context>
     <name>C5TableWidget</name>
     <message>
-        <location filename="../../Controls/c5tablewidget.cpp" line="188"/>
+        <location filename="../../Controls/c5tablewidget.cpp" line="191"/>
         <source>Empty report</source>
         <translation type="unfinished"></translation>
     </message>

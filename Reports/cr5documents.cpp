@@ -19,9 +19,10 @@ CR5Documents::CR5Documents(const QStringList &dbParams, QWidget *parent) :
                     << "left join c_partners p on p.f_id=h.f_partner [p]"
                     << "left join a_state ds on ds.f_id=h.f_state [ds]"
                     << "left join a_type dt on dt.f_id=h.f_type [dt]"
+                    << "left join a_store sa on sa.f_document=h.f_id [sa]"
                        ;
 
-    fColumnsFields << "h.f_id"
+    fColumnsFields << "distinct(h.f_id) as f_id"
                    << "h.f_userid as f_docnum"
                    << "ds.f_name as f_statename"
                    << "dt.f_name as f_typename"
@@ -50,7 +51,7 @@ CR5Documents::CR5Documents(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_createdate"] = tr("Last change date");
     fTranslation["f_createtime"] = tr("Last change time");
 
-    fColumnsVisible["h.f_id"] = true;
+    fColumnsVisible["distinct(h.f_id) as f_id"] = true;
     fColumnsVisible["h.f_userid as f_docnum"] = true;
     fColumnsVisible["ds.f_name as f_statename"] = true;
     fColumnsVisible["dt.f_name as f_typename"] = true;
@@ -109,7 +110,7 @@ QMenu *CR5Documents::buildTableViewContextMenu(const QPoint &point)
 void CR5Documents::restoreColumnsWidths()
 {
     C5Grid::restoreColumnsWidths();
-    if (fColumnsVisible["h.f_id"]) {
+    if (fColumnsVisible["distinct(h.f_id) as f_id"]) {
         fTableView->setColumnWidth(fModel->fColumnNameIndex["f_id"], 0);
     }
 }
@@ -118,7 +119,7 @@ void CR5Documents::tblDoubleClicked(int row, int column, const QList<QVariant> &
 {
     Q_UNUSED(column);
     Q_UNUSED(row);
-    if (!fColumnsVisible["h.f_id"]) {
+    if (!fColumnsVisible["distinct(h.f_id) as f_id"]) {
         C5Message::error(tr("Op.num. column must be included in the report"));
         return;
     }
@@ -172,7 +173,7 @@ int CR5Documents::docType(QString id)
 
 void CR5Documents::saveDocs()
 {
-    if (!fColumnsVisible["h.f_id"]) {
+    if (!fColumnsVisible["distinct(h.f_id) as f_id"]) {
         C5Message::error(tr("Please, set the 'Code' column to visible."));
         return;
     }
@@ -228,7 +229,7 @@ void CR5Documents::saveDocs()
 
 void CR5Documents::draftDocs()
 {
-    if (!fColumnsVisible["h.f_id"]) {
+    if (!fColumnsVisible["distinct(h.f_id) as f_id"]) {
         C5Message::error(tr("Please, set the 'Code' column to visible."));
         return;
     }
@@ -280,7 +281,7 @@ void CR5Documents::draftDocs()
 
 void CR5Documents::removeDocs()
 {
-    if (!fColumnsVisible["h.f_id"]) {
+    if (!fColumnsVisible["distinct(h.f_id) as f_id"]) {
         C5Message::error(tr("Please, set the 'Code' column to visible."));
         return;
     }
@@ -329,7 +330,7 @@ void CR5Documents::removeDocs()
 
 void CR5Documents::copySelectedDocs()
 {
-    if (!fColumnsVisible["h.f_id"]) {
+    if (!fColumnsVisible["distinct(h.f_id) as f_id"]) {
         C5Message::error(tr("Please, set the 'Code' column to visible."));
         return;
     }

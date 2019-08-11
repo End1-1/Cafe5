@@ -6,6 +6,7 @@
 #include "cachedish.h"
 #include "cachecashnames.h" //32
 #include "cachestorereason.h" //33
+#include "cachediscounttype.h" // 34
 
 QMap<QString, C5Cache*> C5Cache::fCacheList;
 QMap<int, QString> C5Cache::fCacheQuery;
@@ -24,8 +25,12 @@ C5Cache::C5Cache(const QStringList &dbParams) :
                 .arg(tr("Code"))
                 .arg(tr("Name"))
                 .arg(tr("Part"));
-        fCacheQuery[cache_goods_unit] = "select f_id, f_name from c_units";
-        fCacheQuery[cache_goods_group] = "select f_id, f_name from c_groups";
+        fCacheQuery[cache_goods_unit] = QString("select f_id as `%1`, f_name as `%2` from c_units")
+                .arg(tr("Code"))
+                .arg(tr("Name"));
+        fCacheQuery[cache_goods_group] = QString("select f_id as `%1`, f_name as `%2` from c_groups")
+                .arg(tr("Code"))
+                .arg(tr("Name"));
         fCacheQuery[cache_goods] = QString("select g.f_id as `%1`, gg.f_name as `%2`, g.f_name as `%3`, u.f_name as `%4` \
                                            from c_goods g \
                                            left join c_groups gg on gg.f_id=g.f_group \
@@ -87,6 +92,7 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         fCacheQuery[cache_cash_names] = query_cache_cash_names;
         fCacheQuery[cache_store_reason] = query_cache_store_reason;
         fCacheQuery[cache_dish] = query_cache_dish;
+        fCacheQuery[cache_discount_type] = query_discount_type;
     }
     if (fTableCache.count() == 0) {
         fTableCache["c_partners"] = cache_goods_partners;
@@ -115,6 +121,7 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         fTableCache["o_state"] = cache_order_state;
         fTableCache["e_cash_names"] = cache_cash_names;
         fTableCache["a_reason"] = cache_store_reason;
+        fTableCache["b_card_types"] = cache_discount_type;
     }
     fVersion = 0;
     C5Database db(dbParams);

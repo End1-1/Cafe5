@@ -51,6 +51,8 @@ private slots:
 
     void on_btnDeleteDish_clicked();
 
+    void on_btnNewGoods_clicked();
+
 private:
     Ui::C5DishWidget *ui;
 

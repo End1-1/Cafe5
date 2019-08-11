@@ -2,12 +2,15 @@
 <ui version="4.0">
  <class>NotificationWidget</class>
  <widget class="QWidget" name="NotificationWidget">
+  <property name="windowModality">
+   <enum>Qt::WindowModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>414</width>
-    <height>132</height>
+    <height>155</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -113,6 +116,9 @@ color:white;</string>
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
         </property>
         <property name="styleSheet">
          <string notr="true">background-color: rgba(255, 255, 255, 0);</string>

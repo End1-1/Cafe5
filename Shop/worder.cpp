@@ -4,10 +4,11 @@
 #include "c5config.h"
 #include "printtaxn.h"
 #include "dqty.h"
-#include "c5utils.h"
 #include "c5permissions.h"
 #include "c5printing.h"
+#include "printreceipt.h"
 #include "working.h"
+#include "c5utils.h"
 #include <QInputDialog>
 
 WOrder::WOrder(QWidget *parent) :
@@ -21,6 +22,9 @@ WOrder::WOrder(QWidget *parent) :
     ui->tblGoods->setColumnWidths(ui->tblGoods->columnCount(), 0, 300, 80, 80, 80, 80, 80, 80);
     ui->lbRefund->setVisible(false);
     fModeRefund = false;
+    fCostumerId = 0;
+    ui->lbDisc->setVisible(false);
+    ui->leDisc->setVisible(false);
 }
 
 WOrder::~WOrder()
@@ -68,7 +72,17 @@ bool WOrder::writeOrder(bool tax)
     C5Database db(C5Config::dbParams());
     db.startTransaction();
     QString id = C5Database::uuid();
+    int discId = 0;
     QString sn, firm, address, fiscal, hvhh, rseq, devnum, time;
+
+    if (fCostumerId > 0) {
+        db[":f_type"] = fCardMode;
+        db[":f_value"] = fCardValue;
+        db[":f_card"] = fCardId;
+        db[":f_data"] = 0;
+        db[":f_order"] = id;
+        discId = db.insert("b_history");
+    }
 
     if (tax) {
         PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), this);
@@ -116,7 +130,7 @@ bool WOrder::writeOrder(bool tax)
             return false;
         }
     }
-    
+
     int sign = fModeRefund ? -1 : 1;
 
     db[":f_id"] = C5Config::defaultHall();
@@ -132,7 +146,7 @@ bool WOrder::writeOrder(bool tax)
     db[":f_id"] = id;
     db[":f_hallid"] = hallid.toInt();
     db[":f_prefix"] = pref;
-    db[":f_state"] = 0;
+    db[":f_state"] = ORDER_STATE_CLOSE;
     db[":f_hall"] = C5Config::defaultHall();
     db[":f_table"] = C5Config::defaultTable();
     db[":f_dateopen"] = fDateOpen;
@@ -163,115 +177,42 @@ bool WOrder::writeOrder(bool tax)
         db[":f_qty"] = ui->tblGoods->getDouble(i, 2);
         db[":f_price"] = ui->tblGoods->getDouble(i, 4);
         db[":f_total"] = ui->tblGoods->getDouble(i, 5);
-        db[":f_tax"] = tax ? 1 : 0;
+        db[":f_tax"] = tax ? rseq.toInt() : 0;
         db[":f_sign"] = sign;
+        db[":f_taxdept"] = C5Config::taxDept();
         db.insert("o_goods", false);
     }
+    fCostumerId = 0;
     db.commit();
     if (!C5Config::localReceiptPrinter().isEmpty()) {
-        QFont font(qApp->font());
-        font.setPointSize(20);
-        C5Printing p;
-        p.setSceneParams(650, 2800, QPrinter::Portrait);
-        p.setFont(font);
-        if (tax) {
-            p.ltext(firm, 0);
-            p.br();
-            p.ltext(address, 0);
-            p.br();
-            p.ltext(tr("Department"), 0);
-            p.rtext(ui->tblGoods->getString(0, 6));
-            p.br();
-            p.ltext(tr("Tax number"), 0);
-            p.rtext(hvhh);
-            p.br();
-            p.ltext(tr("Device number"), 0);
-            p.rtext(devnum);
-            p.br();
-            p.ltext(tr("Serial"), 0);
-            p.rtext(sn);
-            p.br();
-            p.ltext(tr("Fiscal"), 0);
-            p.rtext(fiscal);
-            p.br();
-            p.ltext(tr("Receipt number"), 0);
-            p.rtext(rseq);
-            p.br();
-            p.ltext(tr("Date"), 0);
-            p.rtext(time);
-            p.br();
-            p.ltext(tr("(F)"), 0);
-            p.br();
-        }
-        p.br(2);
-        p.setFontBold(true);
-        if (fModeRefund) {
-            p.setFontSize(30);
-            p.ctext(tr("Refund"));
-            p.br();
-        }
-        p.ctext(QString("#%1%2").arg(pref).arg(hallid));
-        p.br();
-        p.setFontSize(20);
-        p.ctext(tr("Class | Name | Qty | Price | Total"));
-        p.setFontBold(false);
-        p.br();
-        p.line(3);
-        p.br(3);
-        for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
-            if (tax) {
-                p.ltext(QString("%1 %2, %3").arg(tr("Class:"))
-                        .arg(ui->tblGoods->getString(i, 7))
-                        .arg(ui->tblGoods->getString(i, 1)), 0);
-            } else {
-                p.ltext(QString("%1%2").arg(fWorking->goodsCode(ui->tblGoods->getInteger(i, 0))).arg(ui->tblGoods->getString(i, 1)), 0);
-            }
-            p.br();
-            p.ltext(QString("%1 X %2 = %3")
-                    .arg(float_str(ui->tblGoods->getDouble(i, 2), 2))
-                    .arg(ui->tblGoods->getDouble(i, 4), 2)
-                    .arg(float_str(ui->tblGoods->getDouble(i, 2) * ui->tblGoods->getDouble(i, 4), 2)), 0);
-            p.br();
-            p.line();
-            p.br(2);
-        }
-        p.line(4);
-        p.br(3);
-        p.setFontBold(true);
-        if (fModeRefund) {
-            p.ltext(tr("Total"), 0);
-            p.rtext(ui->leTotal->text());
-            p.br();
-        } else {
-            p.ltext(tr("Need to pay"), 0);
-            p.rtext(float_str(ui->leTotal->getDouble(), 2));
-            p.br();
-            p.br();
-
-            p.line();
-            p.br();
-
-            if (ui->leCash->getDouble() > 0.001) {
-                p.ltext(tr("Payment, cash"), 0);
-                p.rtext(float_str(ui->leCash->getDouble(), 2));
-            }
-            if (ui->leCard->getDouble() > 0.001) {
-                p.ltext(tr("Payment, card"), 0);
-                p.rtext(float_str(ui->leCard->getDouble(), 2));
-            }
-
-            p.setFontSize(20);
-            p.setFontBold(true);
-            p.br(p.fLineHeight * 3);
-            p.ltext(tr("Thank you for visit!"), 0);
-            p.br();
-        }
-        p.ltext(tr("Printed"), 0);
-        p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
-        p.br();
-        p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
+        PrintReceipt p;
+        p.print(id);
     }
     return true;
+}
+
+void WOrder::fixCostumer(const QString &code)
+{
+    C5Database db(C5Config::dbParams());
+    db[":f_code"] = code;
+    db.exec("select * from b_cards_discount where f_code=:f_code");
+    if (!db.nextRow()) {
+        return;
+    }
+    if (QDate::currentDate() > db.getDate("f_dateend")) {
+        C5Message::error(tr("Cards was expired"));
+        return;
+    }
+    fCostumerId = db.getInt("f_client");
+    fCardId = db.getInt("f_id");
+    fCardMode = db.getInt("f_mode");
+    fCardValue = db.getDouble("f_value");
+    db[":f_id"] = fCostumerId;
+    db.exec("select * from b_clients where f_id=:f_id");
+    if (!db.nextRow()) {
+        return;
+    }
+    fWorking->markDiscount(db.getString("f_firstname") + " " + db.getString("f_lastname"));
 }
 
 void WOrder::changeQty()
@@ -333,29 +274,7 @@ void WOrder::prevRow()
 void WOrder::refund()
 {
     if (!fModeRefund) {
-        bool ok;
-        QString pwd = QInputDialog::getText(this, tr("Administrator password"), tr("Password"), QLineEdit::Password, "", &ok);
-        if (!ok) {
-            return;
-        }
-        C5Database db(C5Config::dbParams());
-        db[":f_altPassword"] = password(pwd);
-        db[":f_state"] = 1;
-        db.exec("select f_id, f_group, f_first, f_last from s_user where f_altPassword=:f_altPassword and f_state=:f_state");
-        if (db.nextRow()) {
-            if (db.getInt(1) != 1) {
-                db[":f_group"] = db.getValue(1);
-                db[":f_key"] = cp_t5_refund_goods;
-                db.exec("select f_key from s_user_access where f_group=:f_group and f_key=:f_key and f_value=1");
-                if (db.nextRow()) {
-
-                } else {
-                    C5Message::error(tr("Access denied"));
-                    return;
-                }
-            }
-        } else {
-            C5Message::error(tr("Access denied"));
+        if (!fWorking->getAdministratorRights()) {
             return;
         }
     }
@@ -363,11 +282,69 @@ void WOrder::refund()
     ui->lbRefund->setVisible(fModeRefund);
 }
 
+void WOrder::setDiscount(const QString &label, const QString &value)
+{
+    if (label.isEmpty()) {
+        ui->leDisc->setVisible(false);
+        ui->lbDisc->setVisible(false);
+    } else {
+        ui->leDisc->setVisible(true);
+        ui->lbDisc->setVisible(true);
+        ui->lbDisc->setText(label);
+        ui->leDisc->setText(value);
+    }
+    countTotal();
+}
+
 void WOrder::countTotal()
 {
     double total = 0;
+    double discount = 0;
+    double disc = 0;
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
-        total += ui->tblGoods->getDouble(i, 5);
+        double amount = ui->tblGoods->getDouble(i, 5);
+        switch (fCardMode) {
+        case CARD_TYPE_DISCOUNT:
+            disc = amount * fCardValue;
+            discount += disc;
+            total += amount - disc;
+            break;
+        case CARD_TYPE_ACCUMULATIVE:
+            disc = amount * fCardValue;
+            discount += disc;
+            total += amount;
+            break;
+        case CARD_TYPE_COUNT_ORDER:
+            total += amount;
+            break;
+        case CARD_TYPE_MANUAL:
+            total += amount;
+            break;
+        default:
+            total += ui->tblGoods->getDouble(i, 5);
+            break;
+        }
+    }
+    switch (fCardMode) {
+    case CARD_TYPE_DISCOUNT: {
+        ui->leDisc->setText(float_str(discount, 2));
+        ui->lbDisc->setText(QString("%1 %%2").arg(tr("Discount")).arg(float_str(fCardValue, 2)));
+        break;
+    }
+    case CARD_TYPE_ACCUMULATIVE: {
+        ui->leDisc->setText(float_str(discount, 2));
+        ui->lbDisc->setText(QString("%1 %%2").arg(tr("Discount")).arg(float_str(fCardValue, 2)));
+        break;
+    }
+    case CARD_TYPE_COUNT_ORDER: {
+        ui->lbDisc->setText(QString("%1").arg(tr("Visit counter")));
+        break;
+    }
+    case CARD_TYPE_MANUAL:
+        ui->lbDisc->setText(QString("%1").arg(tr("Discount")).arg(float_str(fCardValue, 2)));
+        break;
+    default:
+        break;
     }
     ui->leTotal->setDouble(total);
 }

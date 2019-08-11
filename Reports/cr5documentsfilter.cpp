@@ -1,6 +1,7 @@
 #include "cr5documentsfilter.h"
 #include "ui_cr5documentsfilter.h"
 #include "c5cache.h"
+#include "cachestorereason.h"
 
 CR5DocumentsFilter::CR5DocumentsFilter(const QStringList &dbParams, QWidget *parent) :
     C5FilterWidget(dbParams, parent),
@@ -11,6 +12,7 @@ CR5DocumentsFilter::CR5DocumentsFilter(const QStringList &dbParams, QWidget *par
     ui->leDocType->setSelector(dbParams, ui->leDocTypeName, cache_doc_type);
     ui->lePartner->setSelector(dbParams, ui->lePartnerName, cache_goods_partners);
     ui->leOperator->setSelector(dbParams, ui->leOperatorName, cache_users);
+    ui->leReason->setSelector(dbParams, ui->leReasonName, cache_store_reason);
 }
 
 CR5DocumentsFilter::~CR5DocumentsFilter()
@@ -32,6 +34,9 @@ QString CR5DocumentsFilter::condition()
     }
     if (!ui->leOperator->isEmpty()) {
         result += " and h.f_operator in (" + ui->leOperator->text() + ") ";
+    }
+    if (!ui->leReason->isEmpty()) {
+        result += " and sa.f_reason in (" + ui->leReason->text() + ") ";
     }
     return result;
 }

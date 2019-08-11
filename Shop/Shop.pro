@@ -40,13 +40,17 @@ SOURCES += \
     ../../XLSX/src/xlsxworkbook.cpp \
     ../../XLSX/src/xlsxwriter.cpp \
     ../Cache/cachecashnames.cpp \
+    ../Cache/cachediscounttype.cpp \
     ../Cache/cachedish.cpp \
     ../Cache/cachedishstate.cpp \
     ../Cache/cachegoodswaste.cpp \
     ../Cache/cacheorderstate.cpp \
     ../Cache/cachestorereason.cpp \
     ../Classes/c5printing.cpp \
+    ../Classes/notificationwidget.cpp \
         main.cpp \
+    printreceipt.cpp \
+    sales.cpp \
         working.cpp \
     worder.cpp \
     goods.cpp \
@@ -84,6 +88,7 @@ HEADERS += \
     ../../XLSX/src/xlsxwriter.h \
     ../../XLSX/src/zip.h \
     ../Cache/cachecashnames.h \
+    ../Cache/cachediscounttype.h \
     ../Cache/cachedish.h \
     ../Cache/cachedishstate.h \
     ../Cache/cachegoodswaste.h \
@@ -91,6 +96,9 @@ HEADERS += \
     ../Cache/cacheorderstate.h \
     ../Cache/cachestorereason.h \
     ../Classes/c5printing.h \
+    ../Classes/notificationwidget.h \
+    printreceipt.h \
+    sales.h \
         working.h \
     worder.h \
     goods.h \
@@ -112,6 +120,8 @@ HEADERS += \
     ../Controls/c5checkbox.h
 
 FORMS += \
+    ../Classes/notificationwidget.ui \
+    sales.ui \
         working.ui \
     worder.ui \
     ../Cafe5/c5connection.ui \

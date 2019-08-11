@@ -20,6 +20,8 @@ public:
 
     virtual QString table() {return "b_cards_discount";}
 
+    bool save(QString &err, QList<QMap<QString, QVariant> > &data);
+
 private slots:
     void on_btnNewClient_clicked();
 

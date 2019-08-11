@@ -3,6 +3,7 @@
 #include "worder.h"
 #include "c5database.h"
 #include "goods.h"
+#include "sales.h"
 #include "c5config.h"
 #include "c5connection.h"
 #include <QShortcut>
@@ -14,7 +15,7 @@ static QMap<int, QString> fGoodsCodeForPrint;
 static QSettings __s(QString("%1\\%2\\%3").arg(_ORGANIZATION_).arg(_APPLICATION_).arg(_MODULE_));
 
 Working::Working(QWidget *parent) :
-    QDialog(parent),
+    QWidget(parent),
     ui(new Ui::Working)
 {
     ui->setupUi(this);
@@ -88,7 +89,7 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
             break;
         }
     }
-    return QDialog::eventFilter(watched, event);
+    return QWidget::eventFilter(watched, event);
 }
 
 QString Working::goodsCode(int code) const
@@ -98,6 +99,41 @@ QString Working::goodsCode(int code) const
     } else {
         return "";
     }
+}
+
+void Working::markDiscount(const QString &customer)
+{
+    ui->leDiscount->setText(customer);
+}
+
+bool Working::getAdministratorRights()
+{
+    bool ok;
+    QString pwd = QInputDialog::getText(this, tr("Administrator password"), tr("Password"), QLineEdit::Password, "", &ok);
+    if (!ok) {
+        return false;
+    }
+    C5Database db(C5Config::dbParams());
+    db[":f_altPassword"] = password(pwd);
+    db[":f_state"] = 1;
+    db.exec("select f_id, f_group, f_first, f_last from s_user where f_altPassword=:f_altPassword and f_state=:f_state");
+    if (db.nextRow()) {
+        if (db.getInt(1) != 1) {
+            db[":f_group"] = db.getValue(1);
+            db[":f_key"] = cp_t5_refund_goods;
+            db.exec("select f_key from s_user_access where f_group=:f_group and f_key=:f_key and f_value=1");
+            if (db.nextRow()) {
+                return true;
+            } else {
+                C5Message::error(tr("Access denied"));
+                return false;
+            }
+        }
+    } else {
+        C5Message::error(tr("Access denied"));
+        return false;
+    }
+    return true;
 }
 
 void Working::getGoodsList()
@@ -249,10 +285,18 @@ void Working::on_btnConnection_clicked()
 void Working::on_leCode_returnPressed()
 {
     QString code = ui->leCode->text();
+    if (code.isEmpty()) {
+        return;
+    }
     ui->leCode->clear();
     ui->leCode->setFocus();
     WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
     if (!w) {
+        return;
+    }
+    if (code.at(0).toLower() == "c") {
+        code.remove(0, 1);
+        w->fixCostumer(code);
         return;
     }
     if (!fGoods.contains(code)) {
@@ -291,11 +335,12 @@ void Working::on_btnSaveOrderNoTax_clicked()
         on_btnNewOrder_clicked();
     }
     w->deleteLater();
+    ui->leDiscount->clear();
 }
 
 void Working::on_btnExit_clicked()
 {
-    accept();
+    qApp->quit();
 }
 
 void Working::on_btnShowGoodsList_clicked()
@@ -327,4 +372,12 @@ void Working::on_btnRefund_clicked()
         return;
     }
     w->refund();
+}
+
+void Working::on_btnDuplicateReceipt_clicked()
+{
+    if (!getAdministratorRights()) {
+        return;
+    }
+    Sales::showSales(this);
 }

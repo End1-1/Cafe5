@@ -107,10 +107,8 @@ void C5SocketHandler::readyRead()
 {
     if (!fReadState) {
         char *c = new char[sizeof(quint32)];
-        qDebug() << sizeof(quint32);
-        qDebug() << fSocket->read(c, sizeof(quint32));
+        fSocket->read(c, sizeof(quint32));
         memcpy(&fDataSize, c, sizeof(quint32));
-        qDebug() << fDataSize;
         fReadState = true;
     }
     fData.append(fSocket->readAll());

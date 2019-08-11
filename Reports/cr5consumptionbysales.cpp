@@ -4,6 +4,7 @@
 #include "c5tablemodel.h"
 #include "c5mainwindow.h"
 #include "c5double.h"
+#include "dlgchangeoutputstore.h"
 #include "c5storedoc.h"
 #include <QInputDialog>
 
@@ -76,9 +77,12 @@ QToolBar *CR5ConsumptionBySales::toolBar()
         QAction *a = new QAction(QIcon(":/goods.png"), tr("Make\ninput/output"), this);
         connect(a, SIGNAL(triggered(bool)), this, SLOT(makeOutput(bool)));
         fToolBar->insertAction(fToolBar->actions().at(0), a);
-//        auto *b = new QAction(QIcon(":/calculator.png"), tr("Count output\nbase on recipes"), this);
-//        connect(b, SIGNAL(triggered(bool)), this, SLOT(countOutputBasedOnRecipes()));
-//        fToolBar->insertAction(a, b);
+        auto *b = new QAction(QIcon(":/calculator.png"), tr("Count output\nbase on recipes"), this);
+        connect(b, SIGNAL(triggered(bool)), this, SLOT(countOutputBasedOnRecipes()));
+        fToolBar->insertAction(a, b);
+        auto *d = new QAction(QIcon(":/decision.png"), tr("Change the store of output"), this);
+        connect(d, SIGNAL(triggered(bool)), this, SLOT(changeOutputStore()));
+        fToolBar->insertAction(b, d);
         auto *c = new QAction(QIcon(":/goods.png"), tr("Sales\noutput"), this);
         connect(c, SIGNAL(triggered(bool)), this, SLOT(salesOutput(bool)));
         fToolBar->insertAction(a, c);
@@ -337,15 +341,16 @@ void CR5ConsumptionBySales::makeOutput(bool v)
     QList<QList<QVariant> > &rows = fModel->fRawData;
     for (int i = 0; i < rows.count(); i++) {
         double qty = rows[i][col_qtydiff].toDouble();
-
-        if (rows[i][col_qtydiff].toDouble() > rows[i][col_qtysale].toDouble()) {
-            qty = 0;
+        if (rows[i][col_qtydiff].toDouble() > 0.0001) {
+            qty = rows[i][col_qtydiff].toDouble();
+        } else if (rows[i][col_qtydiff].toDouble() < -0.0001) {
+            qty = rows[i][col_qtydiff].toDouble();
         }
         if (qty > 0.0001) {
             goodsOver[rows[i][col_goodsid].toInt()] = qty;
         }
-        if (qty  < 0.0001) {
-            goodsLost[rows[i][col_goodsid].toInt()] = qty;
+        if (qty  < -0.0001) {
+            goodsLost[rows[i][col_goodsid].toInt()] = qty * -1;
         }
     }
     if (goodsSale.count() > 0) {
@@ -381,6 +386,45 @@ void CR5ConsumptionBySales::countOutputBasedOnRecipes()
         C5Message::error(tr("Store must be selected"));
         return;
     }
+    C5Database db(fDBParams);
+    db[":f_store"] = fFilter->store();
+    db[":f_datecash1"] = fFilter->date1();
+    db[":f_datecash2"] = fFilter->date2();
+    db.exec("delete from o_store_output where f_body in "
+            "(select f_id from o_body where f_store=:f_store and f_header in "
+            "(select f_id from o_header where f_datecash between :f_datecash1 and :f_datecash2)) ");
+
+    db[":f_store"] = fFilter->store();
+    db[":f_datecash1"] = fFilter->date1();
+    db[":f_datecash2"] = fFilter->date2();
+    db[":f_headerstate"] = ORDER_STATE_CLOSE;
+    db[":f_bodystate1"] = DISH_STATE_OK;
+    db[":f_bodystate2"] = DISH_STATE_VOID;
+    db.exec("select h.f_id as f_header, b.f_id as f_body, b.f_dish, r.f_goods, sum(b.f_qty1*r.f_qty) as f_qty "
+            "from d_recipes r "
+            "inner join o_body b on b.f_dish=r.f_dish "
+            "inner join o_header h on h.f_id=b.f_header "
+            "where h.f_datecash between :f_datecash1 and :f_datecash2 and h.f_state=:f_headerstate "
+            "and (b.f_state=:f_bodystate1 or b.f_state=:f_bodystate2) and b.f_store=:f_store "
+            "group by 1,2,3,4");
+    C5Database db2(fDBParams);
+    while (db.nextRow()) {
+        db2[":f_header"] = db.getString("f_header");
+        db2[":f_body"] = db.getString("f_body");
+        db2[":f_goods"] = db.getString("f_goods");
+        db2[":f_qty"] = db.getDouble("f_qty");
+        db2[":f_price"] = 0;
+        db2.insert("o_store_output", false);
+    }
+    C5Message::info(tr("Done"));
+}
+
+void CR5ConsumptionBySales::changeOutputStore()
+{
+    DlgChangeOutputStore *d = new DlgChangeOutputStore(fDBParams, this);
+    d->refresh(fFilter->date1(), fFilter->date2());
+    d->exec();
+    delete d;
 }
 
 void CR5ConsumptionBySales::writeDocs(int doctype, int reason, const QMap<int, double> &data, const QString &comment)

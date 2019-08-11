@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>Working</class>
- <widget class="QDialog" name="Working">
+ <widget class="QWidget" name="Working">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -30,7 +30,11 @@
     <number>2</number>
    </property>
    <item row="1" column="0">
-    <widget class="QTabWidget" name="tab"/>
+    <widget class="QTabWidget" name="tab">
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+    </widget>
    </item>
    <item row="1" column="1">
     <widget class="QWidget" name="wGoods" native="true">
@@ -65,6 +69,9 @@
          <font>
           <pointsize>12</pointsize>
          </font>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
         </property>
         <property name="editTriggers">
          <set>QAbstractItemView::NoEditTriggers</set>
@@ -103,10 +110,7 @@
    </item>
    <item row="0" column="0" colspan="2">
     <widget class="QWidget" name="widget" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <property name="spacing">
-       <number>1</number>
-      </property>
+     <layout class="QGridLayout" name="gridLayout_2">
       <property name="leftMargin">
        <number>1</number>
       </property>
@@ -119,57 +123,7 @@
       <property name="bottomMargin">
        <number>1</number>
       </property>
-      <item>
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>Goods code (F2)</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="leCode"/>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>304</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QToolButton" name="btnNewOrder">
-        <property name="focusPolicy">
-         <enum>Qt::ClickFocus</enum>
-        </property>
-        <property name="text">
-         <string>New order
-F11</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../resources/res.qrc">
-          <normaloff>:/new.png</normaloff>:/new.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>32</width>
-          <height>32</height>
-         </size>
-        </property>
-        <property name="shortcut">
-         <string>F11</string>
-        </property>
-        <property name="toolButtonStyle">
-         <enum>Qt::ToolButtonTextUnderIcon</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
+      <item row="0" column="5" rowspan="2">
        <widget class="QToolButton" name="btnRefund">
         <property name="focusPolicy">
          <enum>Qt::ClickFocus</enum>
@@ -196,34 +150,17 @@ F6</string>
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="QToolButton" name="btnSaveOrderNoTax">
-        <property name="focusPolicy">
-         <enum>Qt::ClickFocus</enum>
-        </property>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
         <property name="text">
-         <string>Save order
-F9</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../resources/res.qrc">
-          <normaloff>:/save.png</normaloff>:/save.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>32</width>
-          <height>32</height>
-         </size>
-        </property>
-        <property name="shortcut">
-         <string>F9</string>
-        </property>
-        <property name="toolButtonStyle">
-         <enum>Qt::ToolButtonTextUnderIcon</enum>
+         <string>Goods code (F2)</string>
         </property>
        </widget>
       </item>
-      <item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="leCode"/>
+      </item>
+      <item row="0" column="8" rowspan="2">
        <widget class="QToolButton" name="btnSaveOrder">
         <property name="focusPolicy">
          <enum>Qt::ClickFocus</enum>
@@ -250,7 +187,30 @@ F12</string>
         </property>
        </widget>
       </item>
-      <item>
+      <item row="1" column="1" colspan="2">
+       <widget class="QLineEdit" name="leDiscount">
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>304</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="0" column="9" rowspan="2">
        <widget class="QToolButton" name="btnConnection">
         <property name="focusPolicy">
          <enum>Qt::ClickFocus</enum>
@@ -277,7 +237,34 @@ F10</string>
         </property>
        </widget>
       </item>
-      <item>
+      <item row="0" column="7" rowspan="2">
+       <widget class="QToolButton" name="btnSaveOrderNoTax">
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
+        </property>
+        <property name="text">
+         <string>Save order
+F9</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/save.png</normaloff>:/save.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="shortcut">
+         <string>F9</string>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonTextUnderIcon</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="10" rowspan="2">
        <widget class="QToolButton" name="btnShowGoodsList">
         <property name="focusPolicy">
          <enum>Qt::ClickFocus</enum>
@@ -304,7 +291,7 @@ F5</string>
         </property>
        </widget>
       </item>
-      <item>
+      <item row="0" column="11" rowspan="2">
        <widget class="QToolButton" name="btnExit">
         <property name="minimumSize">
          <size>
@@ -337,6 +324,67 @@ Esc</string>
         </property>
        </widget>
       </item>
+      <item row="0" column="3" rowspan="2">
+       <widget class="QToolButton" name="btnNewOrder">
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
+        </property>
+        <property name="text">
+         <string>New order
+F11</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/new.png</normaloff>:/new.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="shortcut">
+         <string>F11</string>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonTextUnderIcon</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Discount (F3)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="6" rowspan="2">
+       <widget class="QToolButton" name="btnDuplicateReceipt">
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
+        </property>
+        <property name="text">
+         <string>Duplicate
+receipt (F4)</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/print.png</normaloff>:/print.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="shortcut">
+         <string>F9</string>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonTextUnderIcon</enum>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -345,14 +393,9 @@ Esc</string>
  <layoutdefault spacing="6" margin="11"/>
  <tabstops>
   <tabstop>leCode</tabstop>
-  <tabstop>tab</tabstop>
   <tabstop>tblGoods</tabstop>
-  <tabstop>btnNewOrder</tabstop>
-  <tabstop>btnSaveOrderNoTax</tabstop>
-  <tabstop>btnSaveOrder</tabstop>
-  <tabstop>btnConnection</tabstop>
-  <tabstop>btnShowGoodsList</tabstop>
-  <tabstop>btnExit</tabstop>
+  <tabstop>tab</tabstop>
+  <tabstop>leDiscount</tabstop>
  </tabstops>
  <resources>
   <include location="../resources/res.qrc"/>

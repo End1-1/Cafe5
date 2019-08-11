@@ -122,7 +122,7 @@ void CE5Goods::on_btnNewUnit_clicked()
     C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
     QList<QMap<QString, QVariant> > data;
     if(e->getResult(data)) {
-        ui->leGroup->setValue(data.at(0)["f_id"].toString());
+        ui->leUnit->setValue(data.at(0)["f_id"].toString());
     }
     delete e;
 }

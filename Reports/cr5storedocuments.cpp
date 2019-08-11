@@ -45,6 +45,9 @@ void CR5StoreDocuments::buildQuery()
     if (!fFilter->storages().isEmpty()) {
         fSqlQuery += " and (b.f_store in (" + fFilter->storages() + ") or b2.f_store in (" + fFilter->storages() +")) ";
     }
+    if (!fFilter->reason().isEmpty()) {
+        fSqlQuery += " and (b.f_reason in (" + fFilter->reason() + ")) ";
+    }
     fSqlQuery += " group by 1,2,3,4,5,6,7 order by h.f_date,h.f_userid ";
     C5Grid::buildQuery();
     fTableView->setColumnWidth(0, 0);

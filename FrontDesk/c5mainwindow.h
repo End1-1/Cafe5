@@ -74,6 +74,8 @@ private slots:
 
     void on_actionChange_password_triggered();
 
+    void on_splitter_splitterMoved(int pos, int index);
+
 private:
     Ui::C5MainWindow *ui;
 

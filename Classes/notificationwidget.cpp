@@ -12,6 +12,7 @@ NotificationThread::NotificationThread(const QString &message, int info) :
     fMessage = message;
     fInfo = info;
     moveToThread(qApp->instance()->thread());
+    qApp->processEvents();
     connect(this, SIGNAL(go()), this, SLOT(run()));
     emit go();
 }
@@ -21,7 +22,6 @@ void NotificationThread::run()
     NotificationWidget *nw = new NotificationWidget(fMessage, fInfo);
     nw->adjustSize();
     nw->setWindowOpacity(0.5);
-    nw->show();
     QRect rect = nw->rect();
     int r = 10;
     QRegion region;
@@ -49,6 +49,7 @@ void NotificationThread::run()
     nw->move(rect.width() - 10 - nw->width(), y + 5);
     NotificationWidget::fWidgetList.append(nw);
     nw->fTimer.start(50);
+    nw->show();
 }
 
 NotificationWidget::NotificationWidget(const QString &message, int info, QWidget *parent) :

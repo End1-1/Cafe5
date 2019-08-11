@@ -18,7 +18,9 @@ public:
 
     virtual QString condition();
 
-    QString storages();
+    QString storages() const;
+
+    QString reason() const;
 
 private:
     Ui::CR5StoreDocumentsFilter *ui;

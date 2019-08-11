@@ -134,6 +134,9 @@ void C5TableWidget::setData(int row, int column, const QVariant &value)
     if (!i) {
         i = new C5TableWidgetItem();
         QTableWidget::setItem(row, column, i);
+        if (fColumnsDecimals.contains(column)) {
+            i->fDecimals = fColumnsDecimals[column];
+        }
     }
     i->setData(Qt::EditRole, value);
 }
@@ -230,6 +233,20 @@ void C5TableWidget::search(const QString &txt)
     }
 }
 
+double C5TableWidget::sumOfColumn(int column)
+{
+    double total = 0;
+    for (int i = 0; i < rowCount(); i++) {
+        total += getDouble(i, column);
+    }
+    return total;
+}
+
+void C5TableWidget::setColumnDecimals(int column, int decimals)
+{
+    fColumnsDecimals[column] = decimals;
+}
+
 void C5TableWidget::lineEditTextChanged(const QString arg1)
 {
     C5LineEdit *l = static_cast<C5LineEdit*>(sender());
@@ -251,7 +268,7 @@ void C5TableWidget::checkBoxChecked(bool v)
 C5TableWidgetItem::C5TableWidgetItem(int type) :
     QTableWidgetItem (type)
 {
-
+    fDecimals = 2;
 }
 
 C5TableWidgetItem::C5TableWidgetItem(const QString &text, int type) :
@@ -274,7 +291,7 @@ QVariant C5TableWidgetItem::data(int role) const
        case QVariant::Time:
            return v.toTime().toString(FORMAT_TIME_TO_STR);
        case QVariant::Double:
-           return float_str(v.toDouble(), 2);
+           return float_str(v.toDouble(), fDecimals);
        default:
            return v.toString();
        }

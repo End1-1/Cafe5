@@ -10,7 +10,7 @@
     </message>
     <message>
         <location filename="../Cafe5/c5connection.ui" line="54"/>
-        <location filename="../Cafe5/c5connection.cpp" line="80"/>
+        <location filename="../Cafe5/c5connection.cpp" line="81"/>
         <source>Password</source>
         <translation>Գախտնաբար</translation>
     </message>
@@ -65,33 +65,33 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="80"/>
+        <location filename="../Cafe5/c5connection.cpp" line="81"/>
         <source>Configuration settings</source>
         <translation>Կոնֆիգուրացիա</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="83"/>
+        <location filename="../Cafe5/c5connection.cpp" line="84"/>
         <source>Access denied</source>
         <translation>Մուտքը արգելված է</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="101"/>
-        <location filename="../Cafe5/c5connection.cpp" line="126"/>
+        <location filename="../Cafe5/c5connection.cpp" line="102"/>
+        <location filename="../Cafe5/c5connection.cpp" line="127"/>
         <source>Cannot connect to database</source>
         <translation>Կապը ձախողվեց</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="105"/>
+        <location filename="../Cafe5/c5connection.cpp" line="106"/>
         <source>Connection successfull</source>
         <translation>Կապը հաստատվեց</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="118"/>
+        <location filename="../Cafe5/c5connection.cpp" line="119"/>
         <source>Saved</source>
         <translation>Պահպանված է</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="135"/>
+        <location filename="../Cafe5/c5connection.cpp" line="136"/>
         <source>Already initialized</source>
         <translation>Ստեղծված է</translation>
     </message>

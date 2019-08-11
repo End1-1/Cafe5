@@ -33,17 +33,21 @@ DEFINES += FRONTDESK
 
 SOURCES += \
     ../Cache/cachecashnames.cpp \
+    ../Cache/cachediscounttype.cpp \
     ../Cache/cachedish.cpp \
     ../Cache/cachedishstate.cpp \
     ../Cache/cachestorereason.cpp \
     ../Cafe5/c5cafecommon.cpp \
     ../Cafe5/c5double.cpp \
+    ../Classes/notificationwidget.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
     ../Editors/c5cashname.cpp \
     ../Editors/ce5storereason.cpp \
     ../Reports/cr5cashdetailed.cpp \
     ../Reports/cr5cashdetailedfilter.cpp \
     ../Reports/cr5cashnames.cpp \
+    ../Reports/cr5discountstatisics.cpp \
+    ../Reports/cr5discountstatisticsfilter.cpp \
     ../Reports/cr5menureview.cpp \
     ../Reports/cr5salefromstoretotal.cpp \
     ../Reports/cr5salefromstoretotalfilter.cpp \
@@ -54,6 +58,7 @@ SOURCES += \
     ../Reports/cr5storereason.cpp \
     c5cashdoc.cpp \
     c5inputdate.cpp \
+    dlgchangeoutputstore.cpp \
         main.cpp \
         c5mainwindow.cpp \
     ../Cafe5/c5config.cpp \
@@ -185,18 +190,22 @@ SOURCES += \
 
 HEADERS += \
     ../Cache/cachecashnames.h \
+    ../Cache/cachediscounttype.h \
     ../Cache/cachedish.h \
     ../Cache/cachedishstate.h \
     ../Cache/cacheheaders.h \
     ../Cache/cachestorereason.h \
     ../Cafe5/c5cafecommon.h \
     ../Cafe5/c5double.h \
+    ../Classes/notificationwidget.h \
     ../Classes/proxytablewidgetdatabase.h \
     ../Editors/c5cashname.h \
     ../Editors/ce5storereason.h \
     ../Reports/cr5cashdetailed.h \
     ../Reports/cr5cashdetailedfilter.h \
     ../Reports/cr5cashnames.h \
+    ../Reports/cr5discountstatisics.h \
+    ../Reports/cr5discountstatisticsfilter.h \
     ../Reports/cr5menureview.h \
     ../Reports/cr5salefromstoretotal.h \
     ../Reports/cr5salefromstoretotalfilter.h \
@@ -270,6 +279,7 @@ HEADERS += \
     ../Reports/cr5documentsfilter.h \
     ../Reports/cr5consumptionbysales.h \
     ../Reports/cr5consumptionbysalesfilter.h \
+    dlgchangeoutputstore.h \
     rc.h \
     res.rc \
     ../Editors/ce5partner.h \
@@ -341,9 +351,11 @@ HEADERS += \
     ../Cache/cachegoodswaste.h
 
 FORMS += \
+    ../Classes/notificationwidget.ui \
     ../Editors/c5cashname.ui \
     ../Editors/ce5storereason.ui \
     ../Reports/cr5cashdetailedfilter.ui \
+    ../Reports/cr5discountstatisticsfilter.ui \
     ../Reports/cr5salefromstoretotalfilter.ui \
     ../Reports/cr5saleremoveddishesfilter.ui \
     ../Reports/cr5salesbydishesfilter.ui \
@@ -403,7 +415,8 @@ FORMS += \
     ../Reports/cr5storedocumentsfilter.ui \
     c5translatorform.ui \
     c5toolbarwidget.ui \
-    c5waiterorder.ui
+    c5waiterorder.ui \
+    dlgchangeoutputstore.ui
 
 INCLUDEPATH += ../Cafe5
 INCLUDEPATH += ../Cache

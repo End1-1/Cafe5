@@ -13,7 +13,7 @@ C5PrintServiceThread::C5PrintServiceThread(const QJsonObject &header, const QJso
 
 C5PrintServiceThread::~C5PrintServiceThread()
 {
-    qDebug();
+
 }
 
 void C5PrintServiceThread::run()

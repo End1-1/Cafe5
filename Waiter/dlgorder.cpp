@@ -61,6 +61,9 @@ void DlgOrder::openTable(const QJsonObject &table, C5User *user)
     d->ui->btnRoomService->setEnabled(user->check(cp_t5_change_service_value));
     d->ui->tblPart1->fitRowToHeight();
     d->ui->tblPart1->fitColumnsToWidth();
+    QFont f(qApp->font());
+    f.setBold(true);
+    d->ui->tblPart1->setFont(f);
     d->ui->tblPart2->setItemDelegate(new C5Part2TableDelegate());
     d->ui->tblPart2->horizontalHeader()->setDefaultSectionSize(PART2_COL_WIDTH);
     d->ui->tblPart2->fitColumnsToWidth();
@@ -329,7 +332,7 @@ void DlgOrder::itemsToTable()
             ui->tblOrder->setRowHidden(i, true);
         }
     }
-    ui->leTotal->setText(fOrder->hString("f_amounttotal"));
+    ui->leTotal->setText(float_str(fOrder->hString("f_amounttotal").toDouble(), 2));
     ui->lePrepaiment->setText(fOrder->prepayment());
     setButtonsState();
 }
@@ -606,7 +609,6 @@ void DlgOrder::on_btnPayment_clicked()
         fOrder->fHeader = QJsonObject();
         fOrder->fItems = QJsonArray();
         itemsToTable();
-        accept();
         on_btnChangeTable_clicked();
         break;
     case PAYDLG_NONE:

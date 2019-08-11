@@ -281,19 +281,25 @@ void CE5Editor::focusFirst()
 {
     foreach (C5LineEditWithSelector *l, fLines) {
         if (l->property("First") != QVariant::Invalid) {
-            l->setFocus();
+            if (l->property("First").toBool()) {
+                l->setFocus();
+            }
             return;
         }
     }
     foreach (C5CheckBox *c, fChecks) {
         if (c->property("First") != QVariant::Invalid) {
-            c->setFocus();
+            if (c->property("First").toBool()) {
+                c->setFocus();
+            }
             return;
         }
     }
     foreach (C5DateEdit *d, fDates) {
         if (d->property("First") != QVariant::Invalid) {
-            d->setFocus();
+            if (d->property("First").toBool()) {
+                d->setFocus();
+            }
             return;
         }
     }

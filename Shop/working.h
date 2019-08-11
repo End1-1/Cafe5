@@ -1,7 +1,7 @@
 #ifndef WORKING_H
 #define WORKING_H
 
-#include <QDialog>
+#include <QWidget>
 #include <QTimer>
 
 namespace Ui {
@@ -10,7 +10,7 @@ class Working;
 
 class QTableWidgetItem;
 
-class Working : public QDialog
+class Working : public QWidget
 {
     Q_OBJECT
 
@@ -22,6 +22,10 @@ public:
     bool eventFilter(QObject *watched, QEvent *event);
 
     QString goodsCode(int code) const;
+
+    void markDiscount(const QString &customer);
+
+    bool getAdministratorRights();
 
 private:
     Ui::Working *ui;
@@ -66,6 +70,8 @@ private slots:
     void on_tblGoods_itemClicked(QTableWidgetItem *item);
 
     void on_btnRefund_clicked();
+
+    void on_btnDuplicateReceipt_clicked();
 };
 
 #endif // WORKING_H

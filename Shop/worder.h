@@ -29,6 +29,8 @@ public:
 
     bool writeOrder(bool tax = true);
 
+    void fixCostumer(const QString &code);
+
     void changeQty();
 
     void changePrice();
@@ -40,6 +42,8 @@ public:
     void prevRow();
 
     void refund();
+
+    void setDiscount(const QString &label, const QString &value);
 
 private slots:
     void on_leCash_textChanged(const QString &arg1);
@@ -58,6 +62,16 @@ private:
     Working *fWorking;
 
     bool fModeRefund;
+
+    int fCostumerId;
+
+    int fCardId;
+
+    int fCardMode;
+
+    double fCardValue;
+
+    double fCardData;
 };
 
 #endif // WORDER_H

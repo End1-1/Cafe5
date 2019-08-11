@@ -80,10 +80,10 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
     fColumnsVisible["oh.f_datecash"] = true;
     fColumnsVisible["hl.f_name as f_hallname"] = true;
     fColumnsVisible["ht.f_name as f_tablename"] = true;
-    fColumnsVisible["f_dateopen"] = false;
-    fColumnsVisible["f_dateclose"] = false;
-    fColumnsVisible["f_timeopen"] = false;
-    fColumnsVisible["f_timeclose"] = false;
+    fColumnsVisible["oh.f_dateopen"] = false;
+    fColumnsVisible["oh.f_dateclose"] = false;
+    fColumnsVisible["oh.f_timeopen"] = false;
+    fColumnsVisible["oh.f_timeclose"] = false;
     fColumnsVisible["concat(w.f_last, ' ', w.f_first) as f_staff"] = false;
     fColumnsVisible["sum(oh.f_amounttotal) as f_amounttotal"] = true;
     fColumnsVisible["sum(oh.f_amountcash) as f_amountcash"] = true;
@@ -109,7 +109,6 @@ QToolBar *CR5CommonSales::toolBar()
             << ToolBarButtons::tbExcel
             << ToolBarButtons::tbPrint;
         fToolBar = createStandartToolbar(btn);
-        fToolBar->addAction(QIcon(":/app.pnգ"), tr("Transfer to room"), this, SLOT(transferToRoom()));
     }
     return fToolBar;
 }

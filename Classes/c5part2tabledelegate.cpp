@@ -1,5 +1,6 @@
 #include "c5part2tabledelegate.h"
 #include <QPainter>
+#include <QApplication>
 
 C5Part2TableDelegate::C5Part2TableDelegate()
 {
@@ -16,6 +17,9 @@ void C5Part2TableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &
     painter->fillRect(option.rect, bgcolor);
     QRect textRect = option.rect;
     textRect.adjust(2, 2, -2, -2);
+    QFont f(qApp->font());
+    f.setBold(true);
+    painter->setFont(f);
     painter->drawText(textRect, index.data(Qt::DisplayRole).toString());
     painter->restore();
 }

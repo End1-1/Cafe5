@@ -25,6 +25,7 @@ int main(int argc, char *argv[])
         C5Config::fDBUser = connectionParams.at(2);
         C5Config::fDBPassword = connectionParams.at(3);
         C5Config::fSettingsName = connectionParams.at(4);
+        C5Config::fFullScreen = connectionParams.at(6);
         C5Config::initParamsFromDb();
         C5SocketHandler::setServerAddress(C5Config::serverIP());
     } else {

@@ -26,5 +26,6 @@ static const int sm_bill = 20;
 static const int sm_apporder = 21;
 static const int sm_callstaff = 22;
 static const int sm_messagelist = 23;
+static const int sm_callreceipt = 24;
 
 #endif // C5SOCKETMESSAGE_H

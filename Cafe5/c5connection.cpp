@@ -23,7 +23,7 @@ C5Connection::C5Connection(const QStringList &dbParams) :
         on_btnRefreshSettings_clicked();
         ui->cbSettings->setCurrentText(params.at(4));
     }
-    ui->chFullScreen->setChecked(params.at(5).toInt() != 0);
+    ui->chFullScreen->setChecked(params.at(6).toInt() != 0);
     ui->leServer->setText(C5Config::serverIP());
 }
 
@@ -65,6 +65,7 @@ void C5Connection::writeParams()
     buf.append(C5Config::fLastUsername.toUtf8());
     buf.append('\r');
     buf.append(C5Config::fFullScreen.toUtf8());
+    buf.append('\r');
 
     for (int i = 0; i < buf.length(); i++) {
         buf[i] = buf[i] ^ ((i % 2) + (i % 3) + (i % 4) + (i % 5) + (i % 6) + (i % 7) + (i % 8) + (i % 9));
@@ -127,7 +128,7 @@ void C5Connection::on_btnInit_clicked()
         return;
     }
     bool init = true;
-    db.exec("select * from s_user_group");
+    db.exec("select * from s_db where f_id=1");
     if (db.nextRow()) {
         init = false;
     }
@@ -136,17 +137,16 @@ void C5Connection::on_btnInit_clicked()
         return;
     }
     QStringList queries;
-    QString emptyPass = password("0000");
-    queries << QString("insert into s_db values (1, database(), 'Init', '%1', '%2', '%3', '%4', 1)").arg(ui->leHost->text()).arg(ui->leDatabase->text()).arg(ui->leUsername->text()).arg(ui->lePassword->text())
-            << "insert into s_db_access values (1, database(), 1, 1)"
-            << "insert into s_settings_names values (1, 'Main')"
-            << "insert into s_user_group values (1, 'Administrator')"
-            << QString("insert into s_user values (1, 1, 1, 'Admin', '', 'admin', '%1', '%2')").arg(emptyPass).arg(emptyPass)
-            << "insert into a_state values (2, 'Սևագիր');"
-            << "insert into a_state values (1, 'Գրանցված');"
-            << "insert into a_type values (1, 'Պահեստի մուտք');"
-            << "insert into a_type values (2, 'Պահեստի ելք');"
-            << "insert into a_type values (3, 'Պահեստի տեղաշարժ');"
+    queries << QString("update s_user set f_password='4a7d1ed414474e4033ac29ccb8653d9b' where f_id=1")
+            << QString("insert into s_db (f_id, f_name, f_description, f_host, f_db, f_user, f_password, f_main) values (1, '%1', '%2', '%3', '%4', '%5', '%6', %7)")
+                .arg("New db")
+                .arg("Description")
+                .arg(ui->leHost->text())
+                .arg(ui->leDatabase->text())
+                .arg(ui->leUsername->text())
+                .arg(ui->lePassword->text())
+                .arg(1)
+            << QString("insert into s_db_access (f_id, f_db, f_user, f_permit) values (1, 1, 1, 1)");
                ;
     foreach (QString s, queries) {
         db.exec(s);

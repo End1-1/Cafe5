@@ -41,6 +41,7 @@ void C5Permissions::init(C5Database &db)
               << cp_t3_sale_removed_dishes
               << cp_t3_sale_dishes
               << cp_t3_sale_from_store_total
+              << cp_t3_discount_statistics
 
               << cp_t4_menu
               << cp_t4_menu_names

@@ -27,12 +27,16 @@ private:
 
     void getDailyCommon(const QDate &date1 = QDate::currentDate(), const QDate &date2 = QDate::currentDate());
 
+    void setLangIcon();
+
 private slots:
     void handleDailyCommon(const QJsonObject &obj);
 
     void handleReportsList(const QJsonObject &obj);
 
     void handlePrintReport(const QJsonObject &obj);
+
+    void handleReceipt(const QJsonObject &obj);
 
     void on_btnRefresh_clicked();
 
@@ -47,6 +51,10 @@ private slots:
     void on_btnExit_clicked();
 
     void on_btnReports_clicked();
+
+    void on_btnPrintOrderReceipt_clicked();
+
+    void on_btnReceiptLanguage_clicked();
 };
 
 #endif // DLGREPORTS_H

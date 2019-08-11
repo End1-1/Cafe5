@@ -327,16 +327,6 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="C5CheckBox" name="checkBox_20">
-         <property name="text">
-          <string>Documents</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>302</number>
-         </property>
-        </widget>
-       </item>
        <item row="2" column="0">
         <widget class="C5CheckBox" name="checkBox_27">
          <property name="text">
@@ -347,46 +337,13 @@
          </property>
         </widget>
        </item>
-       <item row="11" column="1">
-        <spacer name="verticalSpacer_6">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>521</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="9" column="0">
-        <widget class="C5CheckBox" name="checkBox_45">
+       <item row="8" column="0">
+        <widget class="C5CheckBox" name="checkBox_48">
          <property name="text">
-          <string>Sales, removed dishes</string>
+          <string>Sales from store total</string>
          </property>
          <property name="Tag" stdset="0">
-          <number>308</number>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="C5CheckBox" name="checkBox_40">
-         <property name="text">
-          <string>Goods movement</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>304</number>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="0">
-        <widget class="C5CheckBox" name="checkBox_25">
-         <property name="text">
-          <string>T-store extra</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>305</number>
+          <number>310</number>
          </property>
         </widget>
        </item>
@@ -410,6 +367,16 @@
          </property>
         </widget>
        </item>
+       <item row="9" column="0">
+        <widget class="C5CheckBox" name="checkBox_45">
+         <property name="text">
+          <string>Sales, removed dishes</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>308</number>
+         </property>
+        </widget>
+       </item>
        <item row="7" column="0">
         <widget class="C5CheckBox" name="checkBox_31">
          <property name="text">
@@ -417,6 +384,39 @@
          </property>
          <property name="Tag" stdset="0">
           <number>306</number>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="C5CheckBox" name="checkBox_20">
+         <property name="text">
+          <string>Documents</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>302</number>
+         </property>
+        </widget>
+       </item>
+       <item row="12" column="1">
+        <spacer name="verticalSpacer_6">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>521</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="6" column="0">
+        <widget class="C5CheckBox" name="checkBox_25">
+         <property name="text">
+          <string>T-store extra</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>305</number>
          </property>
         </widget>
        </item>
@@ -430,13 +430,23 @@
          </property>
         </widget>
        </item>
-       <item row="8" column="0">
-        <widget class="C5CheckBox" name="checkBox_48">
+       <item row="3" column="0">
+        <widget class="C5CheckBox" name="checkBox_40">
          <property name="text">
-          <string>Sales from store total</string>
+          <string>Goods movement</string>
          </property>
          <property name="Tag" stdset="0">
-          <number>310</number>
+          <number>304</number>
+         </property>
+        </widget>
+       </item>
+       <item row="11" column="0">
+        <widget class="C5CheckBox" name="checkBox_55">
+         <property name="text">
+          <string>Discount statistics</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>311</number>
          </property>
         </widget>
        </item>

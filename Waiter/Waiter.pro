@@ -49,12 +49,14 @@ SOURCES += \
     ../../XLSX/src/xlsxworkbook.cpp \
     ../../XLSX/src/xlsxwriter.cpp \
     ../Cache/cachecashnames.cpp \
+    ../Cache/cachediscounttype.cpp \
     ../Cache/cachedish.cpp \
     ../Cache/cachegoodswaste.cpp \
     ../Cache/cachestorereason.cpp \
     ../Cafe5/c5cafecommon.cpp \
     ../Classes/c5jsondb.cpp \
     ../Classes/notificationwidget.cpp \
+    c5printreceiptthread50mm.cpp \
         main.cpp \
         dlgface.cpp \
     ../Cafe5/c5database.cpp \
@@ -135,12 +137,14 @@ HEADERS += \
     ../../XLSX/src/xlsxwriter.h \
     ../../XLSX/src/zip.h \
     ../Cache/cachecashnames.h \
+    ../Cache/cachediscounttype.h \
     ../Cache/cachedish.h \
     ../Cache/cachegoodswaste.h \
     ../Cache/cachestorereason.h \
     ../Cafe5/c5cafecommon.h \
     ../Classes/c5jsondb.h \
     ../Classes/notificationwidget.h \
+    c5printreceiptthread50mm.h \
         dlgface.h \
     ../Cafe5/c5database.h \
     ../Cafe5/c5config.h \

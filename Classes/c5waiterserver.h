@@ -47,6 +47,8 @@ private:
 
     void processMessageList(QJsonObject &o);
 
+    void processCallReceipt(QJsonObject &o);
+
     QTcpSocket *fSocket;
 };
 

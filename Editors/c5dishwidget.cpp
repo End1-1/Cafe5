@@ -4,6 +4,7 @@
 #include "c5cache.h"
 #include "c5selector.h"
 #include "c5combobox.h"
+#include "ce5goods.h"
 #include "c5printing.h"
 #include "cachedish.h"
 #include "ce5dishpart2.h"
@@ -37,6 +38,7 @@ C5DishWidget::C5DishWidget(const QStringList &dbParams, QWidget *parent) :
         ui->tblPricing->createCheckbox(row, 7);
         row++;
     }
+    ui->tblRecipe->setColumnDecimals(3, 4);
     connect(ui->leColor, SIGNAL(doubleClicked()), this, SLOT(setColor()));
 }
 
@@ -109,6 +111,7 @@ void C5DishWidget::setDish(int id)
         ui->tblRecipe->setString(row, 2, db.getString("f_name"));
         C5LineEdit *l = ui->tblRecipe->createLineEdit(row, 3);
         l->setValidator(new QDoubleValidator(0, 100000, 4));
+        l->fDecimalPlaces = 4;
         l->setDouble(db.getDouble("f_qty"));
         if (db.getInt("f_complex") > 0) {
             l->setReadOnly(true);
@@ -415,6 +418,7 @@ void C5DishWidget::on_btnAddDish_clicked()
         ui->tblRecipe->setString(row, 2, db.getString("f_name"));
         C5LineEdit *l = ui->tblRecipe->createLineEdit(row, 3);
         l->setValidator(new QDoubleValidator(0, 100000, 4));
+        l->fDecimalPlaces = 4;
         l->setDouble(db.getDouble("f_qty"));
         l->setReadOnly(true);
         connect(l, SIGNAL(textChanged(QString)), this, SLOT(recipeQtyPriceChanged(QString)));
@@ -479,4 +483,30 @@ void C5DishWidget::on_btnDeleteDish_clicked()
         }
     }
     ui->tblComplex->removeRow(0);
+}
+
+void C5DishWidget::on_btnNewGoods_clicked()
+{
+    CE5Goods *ep = new CE5Goods(fDBParams);
+    C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
+    QList<QMap<QString, QVariant> > data;
+    if(e->getResult(data)) {
+        int row = ui->tblRecipe->addEmptyRow();
+        C5LineEdit *l = ui->tblRecipe->createLineEdit(row, 3);
+        l->setValidator(new QDoubleValidator(0, 100000, 4));
+        l->clear();
+        l->setFocus();
+        connect(l, SIGNAL(textEdited(QString)), this, SLOT(recipeQtyPriceChanged(QString)));
+        ui->tblRecipe->setInteger(row, 0, 0);
+        ui->tblRecipe->setInteger(row, 1, data.at(0)["f_id"].toInt());
+        ui->tblRecipe->setString(row, 2, data.at(0)["f_name"].toString());
+        ui->tblRecipe->setString(row, 4, data.at(0)["f_unitname"].toString());
+        l = ui->tblRecipe->createLineEdit(row, 5);
+        l->setDouble(0);
+        connect(l, SIGNAL(textEdited(QString)), this, SLOT(recipeQtyPriceChanged(QString)));
+        l = ui->tblRecipe->createLineEdit(row, 6);
+        l->setDouble(0);
+        connect(l, SIGNAL(textEdited(QString)), this, SLOT(recipeQtyPriceChanged(QString)));
+    }
+    delete e;
 }

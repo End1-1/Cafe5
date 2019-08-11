@@ -282,7 +282,7 @@ void C5Printing::print(const QString &printername, QPrinter::PageSize pageSize)
             QJsonDocument jdoc(jobj);
             QTcpSocket ts;
             ts.connectToHost(addr, prt.toInt());
-            if (ts.waitForConnected()) {
+            if (ts.waitForConnected(5000)) {
                 QByteArray out = jdoc.toJson();
                 int datasize = out.length();
                 ts.write(reinterpret_cast<const char *>(&datasize), sizeof(datasize));

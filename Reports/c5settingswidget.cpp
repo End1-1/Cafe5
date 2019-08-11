@@ -79,6 +79,9 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     fTags[ui->leItemCodeForHotel->getTag()] = ui->leItemCodeForHotel->text();
     fTags[ui->chNoCashDoc->getTag()] = ui->chNoCashDoc->isChecked() ? "1" : "0";
     fTags[ui->chNoScanCode->getTag()] = ui->chNoScanCode->isChecked() ? "1" : "0";
+    fTags[ui->leChangeWorkingDateTime->getTag()] = ui->leChangeWorkingDateTime->text();
+    fTags[ui->chAlwaysOfferTax->getTag()] = ui->chAlwaysOfferTax->isChecked() ? "1" : "0";
+    fTags[ui->leFDFontSize->getTag()] = ui->leFDFontSize->text();
     C5Database db(fDBParams);
     db[":f_settings"] = ui->leCode->getInteger();
     db.exec("delete from s_settings_values where f_settings=:f_settings");
@@ -109,7 +112,8 @@ void C5SettingsWidget::clearWidgetValue(QWidget *w)
 
 void C5SettingsWidget::setWidgetValue(QWidget *w, const QString &value)
 {
-    if (!strcmp(w->metaObject()->className(), "C5LineEdit")) {
+    if (!strcmp(w->metaObject()->className(), "C5LineEdit") ||
+            !strcmp(w->metaObject()->className(), "C5LineEditWithSelector")) {
         static_cast<C5LineEdit*>(w)->setText(value);
     } else if (!strcmp(w->metaObject()->className(), "C5ComboBox")) {
         static_cast<C5ComboBox*>(w)->setIndexForValue(value);
@@ -152,6 +156,11 @@ QWidget *C5SettingsWidget::widget(QWidget *parent, int tag)
             C5ComboBox *l = static_cast<C5ComboBox*>(o);
             if (l->getTag() == tag) {
                 return l;
+            }
+        } else if (!strcmp(o->metaObject()->className(), "C5CheckBox")) {
+            C5CheckBox *c = static_cast<C5CheckBox*>(o);
+            if (c->getTag() == tag) {
+                return c;
             }
         }
         if (o->children().count() > 0) {

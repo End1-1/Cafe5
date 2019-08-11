@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
     int id = QFontDatabase::addApplicationFont(":/ahuni.ttf");
     QString family = QFontDatabase::applicationFontFamilies(id).at(0);
     QFont font(family);
-    font.setPointSize(8);
+    font.setPointSize(C5Config::fronDeskFontSize());
     a.setFont(font);
 
     C5MainWindow w;

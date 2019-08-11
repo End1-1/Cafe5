@@ -33,6 +33,7 @@
 #define cp_t3_sale_removed_dishes 308
 #define cp_t3_sale_dishes 309
 #define cp_t3_sale_from_store_total 310
+#define cp_t3_discount_statistics 311
 
 #define cp_t4_menu 400
 #define cp_t4_menu_names 401

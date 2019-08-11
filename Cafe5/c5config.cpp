@@ -226,6 +226,20 @@ bool C5Config::isAppFullScreen()
     return fFullScreen == "1";
 }
 
+int C5Config::fronDeskFontSize()
+{
+    int s = getValue(param_fd_font_size).toInt();
+    if (s == 0) {
+        s = 8;
+    }
+    return s;
+}
+
+bool C5Config::alwaysOfferTaxPrint()
+{
+    return getValue(param_tax_print_always_offer).toInt() == 1;
+}
+
 QString C5Config::getValue(int key)
 {
     QMutexLocker ml(&settingsMutex);

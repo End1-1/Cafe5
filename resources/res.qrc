@@ -58,5 +58,7 @@
         <file>server.png</file>
         <file>cancel.png</file>
         <file>warning.png</file>
+        <file>calculator.png</file>
+        <file>decision.png</file>
     </qresource>
 </RCC>

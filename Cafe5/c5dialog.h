@@ -40,7 +40,7 @@ public:
     void showFullScreen();
 
 protected:
-    const QStringList &fDBParams;
+    QStringList fDBParams;
 
     virtual void keyPressEvent(QKeyEvent *e);
 

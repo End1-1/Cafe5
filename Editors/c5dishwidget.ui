@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1050</width>
+    <width>1079</width>
     <height>602</height>
    </rect>
   </property>
@@ -143,6 +143,9 @@
           </item>
           <item row="1" column="5">
            <widget class="QPushButton" name="btnNewType">
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
             <property name="text">
              <string/>
             </property>
@@ -372,6 +375,9 @@
              </property>
              <item>
               <widget class="QPushButton" name="btnAddRecipe">
+               <property name="focusPolicy">
+                <enum>Qt::NoFocus</enum>
+               </property>
                <property name="text">
                 <string/>
                </property>
@@ -382,7 +388,24 @@
               </widget>
              </item>
              <item>
+              <widget class="QPushButton" name="btnNewGoods">
+               <property name="focusPolicy">
+                <enum>Qt::NoFocus</enum>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="../resources/res.qrc">
+                 <normaloff>:/new.png</normaloff>:/new.png</iconset>
+               </property>
+              </widget>
+             </item>
+             <item>
               <widget class="QPushButton" name="btnRemoveRecipe">
+               <property name="focusPolicy">
+                <enum>Qt::NoFocus</enum>
+               </property>
                <property name="text">
                 <string/>
                </property>
@@ -394,6 +417,9 @@
              </item>
              <item>
               <widget class="QPushButton" name="btnPrintRecipe">
+               <property name="focusPolicy">
+                <enum>Qt::NoFocus</enum>
+               </property>
                <property name="text">
                 <string/>
                </property>
@@ -464,6 +490,9 @@
                  <width>100</width>
                  <height>16777215</height>
                 </size>
+               </property>
+               <property name="focusPolicy">
+                <enum>Qt::NoFocus</enum>
                </property>
               </widget>
              </item>
@@ -540,7 +569,7 @@
             </property>
             <property name="maximumSize">
              <size>
-              <width>300</width>
+              <width>330</width>
               <height>16777215</height>
              </size>
             </property>
@@ -564,6 +593,9 @@
                  <horstretch>0</horstretch>
                  <verstretch>2</verstretch>
                 </sizepolicy>
+               </property>
+               <property name="horizontalScrollBarPolicy">
+                <enum>Qt::ScrollBarAlwaysOff</enum>
                </property>
                <column>
                 <property name="text">
@@ -608,6 +640,9 @@
              </property>
              <item>
               <widget class="QPushButton" name="btnAddDish">
+               <property name="focusPolicy">
+                <enum>Qt::NoFocus</enum>
+               </property>
                <property name="text">
                 <string/>
                </property>
@@ -619,6 +654,9 @@
              </item>
              <item>
               <widget class="QPushButton" name="btnDeleteDish">
+               <property name="focusPolicy">
+                <enum>Qt::NoFocus</enum>
+               </property>
                <property name="text">
                 <string/>
                </property>
@@ -655,14 +693,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5TableWidget</class>
-   <extends>QTableWidget</extends>
-   <header location="global">c5tablewidget.h</header>
-  </customwidget>
-  <customwidget>
    <class>C5LineEdit</class>
    <extends>QLineEdit</extends>
    <header location="global">c5lineedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5TableWidget</class>
+   <extends>QTableWidget</extends>
+   <header location="global">c5tablewidget.h</header>
   </customwidget>
   <customwidget>
    <class>C5LineEditWithSelector</class>
@@ -686,14 +724,16 @@
   <tabstop>checkBox</tabstop>
   <tabstop>checkBox_3</tabstop>
   <tabstop>btnNewType</tabstop>
-  <tabstop>lePart1Name</tabstop>
   <tabstop>tblPricing</tabstop>
-  <tabstop>lePart2Name</tabstop>
   <tabstop>tabWidget</tabstop>
   <tabstop>btnAddRecipe</tabstop>
+  <tabstop>btnNewGoods</tabstop>
   <tabstop>btnRemoveRecipe</tabstop>
   <tabstop>btnPrintRecipe</tabstop>
   <tabstop>tblRecipe</tabstop>
+  <tabstop>btnAddDish</tabstop>
+  <tabstop>tblComplex</tabstop>
+  <tabstop>btnDeleteDish</tabstop>
   <tabstop>leTotal</tabstop>
  </tabstops>
  <resources>

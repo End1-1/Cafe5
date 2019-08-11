@@ -94,7 +94,6 @@ void C5Selector::resetCache(const QStringList &dbParams, int cacheId)
         if (fSelectorList[cacheName].contains(cacheId)) {
             fSelectorList[cacheName][cacheId]->fReset = true;
         }
-
     }
 }
 

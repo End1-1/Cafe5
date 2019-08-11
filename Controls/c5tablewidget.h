@@ -17,6 +17,8 @@ public:
     virtual QVariant data(int role) const override;
 
     inline QString text() {return data(Qt::DisplayRole).toString(); }
+
+    int fDecimals;
 };
 
 class C5TableWidget : public QTableWidget
@@ -69,6 +71,13 @@ public:
     void exportToExcel();
 
     void search(const QString &txt);
+
+    double sumOfColumn(int column);
+
+    void setColumnDecimals(int column, int decimals);
+
+private:
+    QMap<int, int> fColumnsDecimals;
 
 private slots:
     void lineEditTextChanged(const QString arg1);

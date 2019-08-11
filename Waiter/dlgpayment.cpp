@@ -513,7 +513,7 @@ void DlgPayment::on_btnPaymentCash_clicked()
     fOrder->hSetDouble("f_amountother", 0);
     total = fOrder->hDouble("f_amounttotal") - total;
     addPaymentMode(p_cash, tr("Cash"), total);
-    ui->btnTax->setChecked(true);
+    ui->btnTax->setChecked(C5Config::alwaysOfferTaxPrint());
 }
 
 void DlgPayment::on_btnPaymentCard_clicked()
@@ -540,7 +540,7 @@ void DlgPayment::on_btnPaymentCard_clicked()
     fOrder->hSetDouble("f_amountother", 0);
     total = fOrder->hDouble("f_amounttotal") - total;
     addPaymentMode(p_card, tr("Credit card"), total);
-    ui->btnTax->setChecked(true);
+    ui->btnTax->setChecked(C5Config::alwaysOfferTaxPrint());
 }
 
 void DlgPayment::on_btnPaymentBank_clicked()

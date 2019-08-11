@@ -29,6 +29,9 @@
 #define param_doc_num_digits_out 23
 #define param_no_cash_doc_store 24
 #define param_no_scancode_store 25
+#define param_working_date_change_time 26
+#define param_tax_print_always_offer 27
+#define param_fd_font_size 28
 
 class C5Config
 {
@@ -122,6 +125,10 @@ public:
     static void setValue(int key, const QString &value);
 
     static bool isAppFullScreen();
+
+    static int fronDeskFontSize();
+
+    static bool alwaysOfferTaxPrint();
 
 private:
     static QString getValue(int key);

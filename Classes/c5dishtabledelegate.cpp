@@ -1,6 +1,7 @@
 #include "c5dishtabledelegate.h"
 #include <QJsonObject>
 #include <QPainter>
+#include <QApplication>
 
 C5DishTableDelegate::C5DishTableDelegate()
 {
@@ -19,6 +20,9 @@ void C5DishTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &o
         return;
     }
     painter->save();
+    QFont f(qApp->font());
+    f.setBold(true);
+    painter->setFont(f);
     painter->fillRect(option.rect, QColor::fromRgb(o["dish_color"].toString().toInt()));
     QRect rectName = option.rect;
     rectName.adjust(2, 2, -2, -2);

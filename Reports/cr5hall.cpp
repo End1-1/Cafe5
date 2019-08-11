@@ -14,7 +14,8 @@ CR5Hall::CR5Hall(const QStringList &dbParams, QWidget *parent) :
                    << "h.f_name"
                    << "h.f_counter"
                    << "h.f_prefix"
-                   << "s.f_name as f_settingsname";
+                   << "s.f_name as f_settingsname"
+                   << "h.f_counterhall";
 
     fLeftJoinTables << "left join s_settings_names s on s.f_id=h.f_settings [s]";
 
@@ -23,12 +24,14 @@ CR5Hall::CR5Hall(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_counter"] = tr("Counter");
     fTranslation["f_prefix"] = tr("Order prefix");
     fTranslation["f_settingsname"] = tr("Default settings");
+    fTranslation["f_counterhall"] = tr("Hall counter");
 
     fColumnsVisible["h.f_id"] = true;
     fColumnsVisible["h.f_name"] = true;
     fColumnsVisible["h.f_counter"] = true;
     fColumnsVisible["h.f_prefix"] = true;
     fColumnsVisible["s.f_name as f_settingsname"] = true;
+    fColumnsVisible["h.f_counterhall"] = true;
 
     restoreColumnsVisibility();
 

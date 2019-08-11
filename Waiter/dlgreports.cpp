@@ -2,6 +2,9 @@
 #include "ui_dlgreports.h"
 #include "dlgreportslist.h"
 #include "c5printjson.h"
+#include "c5translator.h"
+#include "c5user.h"
+#include "dlgreceiptlanguage.h"
 
 DlgReports::DlgReports(const QStringList &dbParams) :
     C5Dialog(dbParams),
@@ -10,7 +13,7 @@ DlgReports::DlgReports(const QStringList &dbParams) :
     ui->setupUi(this);
     ui->date1->setDate(QDate::currentDate());
     ui->date2->setDate(QDate::currentDate());
-
+    setLangIcon();
 }
 
 DlgReports::~DlgReports()
@@ -36,6 +39,24 @@ void DlgReports::getDailyCommon(const QDate &date1, const QDate &date2)
     sh->bind("date1", date1.toString(FORMAT_DATE_TO_STR_MYSQL));
     sh->bind("date2", date2.toString(FORMAT_DATE_TO_STR_MYSQL));
     sh->send();
+}
+
+void DlgReports::setLangIcon()
+{
+    switch (C5Config::getRegValue("receipt_language").toInt()) {
+    case 0:
+        ui->btnReceiptLanguage->setIcon(QIcon(":/armenia.png"));
+        C5Config::setRegValue("receipt_language", LANG_AM);
+        break;
+    case 1:
+        ui->btnReceiptLanguage->setIcon(QIcon(":/usa.png"));
+        C5Config::setRegValue("receipt_language", LANG_EN);
+        break;
+    case 2:
+        ui->btnReceiptLanguage->setIcon(QIcon(":/russia.png"));
+        C5Config::setRegValue("receipt_language", LANG_RU);
+        break;
+    }
 }
 
 void DlgReports::handleDailyCommon(const QJsonObject &obj)
@@ -94,6 +115,13 @@ void DlgReports::handlePrintReport(const QJsonObject &obj)
     pj->start();
 }
 
+void DlgReports::handleReceipt(const QJsonObject &obj)
+{
+    if (obj["reply"].toInt() == 0) {
+        C5Message::error(obj["msg"].toString());
+    }
+}
+
 void DlgReports::on_btnRefresh_clicked()
 {
     getDailyCommon(ui->date1->date(), ui->date2->date());
@@ -129,4 +157,28 @@ void DlgReports::on_btnReports_clicked()
     C5SocketHandler *sh = createSocketHandler(SLOT(handleReportsList(QJsonObject)));
     sh->bind("cmd", sm_reports);
     sh->send();
+}
+
+void DlgReports::on_btnPrintOrderReceipt_clicked()
+{
+    QModelIndexList l = ui->tbl->selectionModel()->selectedRows();
+    if (l.count() == 0) {
+        return;
+    }
+    C5SocketHandler *sh = createSocketHandler(SLOT(handleReceipt(QJsonObject)));
+    sh->bind("cmd", sm_printreceipt);
+    sh->bind("staffid", QString::number(fUser->fId));
+    sh->bind("staffname", fUser->fFull);
+    sh->bind("f_receiptlanguage", QString::number(C5Config::getRegValue("receipt_language").toInt()));
+    sh->bind("id", ui->tbl->getString(l.at(0).row(), 0));
+    sh->send();
+}
+
+void DlgReports::on_btnReceiptLanguage_clicked()
+{
+    int r = DlgReceiptLanguage::receipLanguage();
+    if (r > -1) {
+        C5Config::setRegValue("receipt_language", r);
+        setLangIcon();
+    }
 }
