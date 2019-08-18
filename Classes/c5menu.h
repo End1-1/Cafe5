@@ -16,6 +16,8 @@ public:
     static QMap<QString, int> fPart2Color;
 
     static QMap<QString, QString> fMenuNames;
+
+    static QMap<QString, QStringList> fDishSpecial;
 };
 
 #endif // C5MENU_H

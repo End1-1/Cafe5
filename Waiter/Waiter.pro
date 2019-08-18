@@ -57,6 +57,7 @@ SOURCES += \
     ../Classes/c5jsondb.cpp \
     ../Classes/notificationwidget.cpp \
     c5printreceiptthread50mm.cpp \
+    dlglistdishspecial.cpp \
         main.cpp \
         dlgface.cpp \
     ../Cafe5/c5database.cpp \
@@ -155,6 +156,7 @@ HEADERS += \
     ../Cafe5/c5sockethandler.h \
     ../Cafe5/c5socketmessage.h \
     ../Cafe5/c5serverhandler.h \
+    dlglistdishspecial.h \
     dlgpassword.h \
     dlgorder.h \
     ../Classes/c5user.h \
@@ -215,6 +217,7 @@ FORMS += \
         dlgface.ui \
     ../Cafe5/c5connection.ui \
     ../Cafe5/c5message.ui \
+    dlglistdishspecial.ui \
     dlgpassword.ui \
     dlgorder.ui \
     dlgpayment.ui \

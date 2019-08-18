@@ -67,17 +67,17 @@
 <context>
     <name>NotificationWidget</name>
     <message>
-        <location filename="../Classes/notificationwidget.ui" line="20"/>
+        <location filename="../Classes/notificationwidget.ui" line="23"/>
         <source>Message</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/notificationwidget.ui" line="92"/>
+        <location filename="../Classes/notificationwidget.ui" line="95"/>
         <source>27.07.2019 22:16</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/notificationwidget.ui" line="173"/>
+        <location filename="../Classes/notificationwidget.ui" line="179"/>
         <source>The message!</source>
         <translation></translation>
     </message>

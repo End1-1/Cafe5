@@ -15,6 +15,7 @@
 #include "c5waiterorderdoc.h"
 #include "c5logtoserverthread.h"
 #include "dlglistofdishcomments.h"
+#include "dlglistdishspecial.h"
 #include "dlgface.h"
 #include "dlglistofmenu.h"
 #include <QCloseEvent>
@@ -188,23 +189,26 @@ void DlgOrder::buildMenu(const QString &menu, QString part1, QString part2)
 
 void DlgOrder::addDishToOrder(const QJsonObject &obj)
 {
+    QJsonObject o = obj;
     bool found = false;
+    QString special = DlgListDishSpecial::getSpecial(obj["f_dish"].toString(), fDBParams);
+    o["f_comment"] = special;
     if (ui->btnCompactDishAddMode->isChecked()) {
         for (int i = 0; i < fOrder->itemsCount(); i++) {
-            if (obj["f_dish"].toString() == fOrder->iString("f_dish", i)) {
+            if (o["f_dish"].toString() == fOrder->iString("f_dish", i)) {
                 if (fOrder->iInt("f_state", i) != DISH_STATE_OK) {
                     continue;
                 }
-                if (obj["f_store"].toString() != fOrder->iString("f_store", i)) {
+                if (o["f_store"].toString() != fOrder->iString("f_store", i)) {
                     break;
                 }
-                if (obj["f_print1"].toString() != fOrder->iString("f_print1", i)) {
+                if (o["f_print1"].toString() != fOrder->iString("f_print1", i)) {
                     break;
                 }
-                if (obj["f_print2"].toString() != fOrder->iString("f_print2", i)) {
+                if (o["f_print2"].toString() != fOrder->iString("f_print2", i)) {
                     break;
                 }
-                if (obj["f_comment"].toString() != fOrder->iString("f_comment", i)) {
+                if (o["f_comment"].toString() != fOrder->iString("f_comment", i)) {
                     break;
                 }
                 fOrder->iSetString("f_qty1", float_str(fOrder->iDouble("f_qty1", i) + 1, 1), i);
@@ -218,7 +222,6 @@ void DlgOrder::addDishToOrder(const QJsonObject &obj)
         }
     }
     if (!found) {
-        QJsonObject o = obj;
         if (obj["f_id"].toString().isEmpty()) {
             o["f_id"] = "";
             o["f_header"] = fOrder->hString("f_id");
@@ -228,8 +231,7 @@ void DlgOrder::addDishToOrder(const QJsonObject &obj)
             o["f_total"] = "0";
             o["f_qty1"] = "1";
             o["f_qty2"] = "0";
-            o["f_comment"] = "";
-            logRecord("", "New dish", o["f_name"].toString(), "");
+            logRecord("", "New dish", o["f_name"].toString() + " " + o["f_comment"].toString(), "");
         }
         int row = ui->tblOrder->rowCount();
         ui->tblOrder->setRowCount(row + 1);
@@ -409,6 +411,20 @@ void DlgOrder::setButtonsState()
 
     ui->btnPrintService->setEnabled(btnSendToCooking);
     ui->btnPayment->setEnabled(btnPayment);
+}
+
+void DlgOrder::changeTimeOrder()
+{
+    QModelIndexList ml = ui->tblOrder->selectionModel()->selectedIndexes();
+    if (ml.count() == 0) {
+        return;
+    }
+    int index = ml.at(0).row();
+    QJsonObject o = fOrder->item(index);
+    o["f_timeorder"] = static_cast<QPushButton*>(sender())->text();
+    fOrder->fItems[index] = o;
+    ui->tblOrder->item(index, 0)->setData(Qt::UserRole, fOrder->fItems[index].toObject());
+    ui->tblOrder->viewport()->update();
 }
 
 void DlgOrder::handleOpenTable(const QJsonObject &obj)
@@ -798,4 +814,19 @@ void DlgOrder::on_btnSearchInMenu_clicked()
 void DlgOrder::on_btnCompactDishAddMode_clicked()
 {
     C5Config::setRegValue("compact dish add mode", ui->btnCompactDishAddMode->isChecked());
+}
+
+void DlgOrder::on_btnTime1_clicked()
+{
+    changeTimeOrder();
+}
+
+void DlgOrder::on_btnTime2_clicked()
+{
+    changeTimeOrder();
+}
+
+void DlgOrder::on_btnTime3_clicked()
+{
+    changeTimeOrder();
 }

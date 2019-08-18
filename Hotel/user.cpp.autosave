@@ -1,0 +1,13 @@
+#include "user.h"
+
+User *__user = nullptr;
+
+User::User()
+{
+    
+}
+
+bool User::pr(int permission)
+{
+    return fPermissions.contains(permission);    
+}

@@ -58,6 +58,8 @@ private:
 
     void setButtonsState();
 
+    void changeTimeOrder();
+
 private slots:
     void addDishToOrder(const QJsonObject &obj);
 
@@ -118,6 +120,10 @@ private slots:
     void on_btnSearchInMenu_clicked();
 
     void on_btnCompactDishAddMode_clicked();
+
+    void on_btnTime1_clicked();
+    void on_btnTime2_clicked();
+    void on_btnTime3_clicked();
 };
 
 #endif // DLGORDER_H

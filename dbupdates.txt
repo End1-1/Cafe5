@@ -40,3 +40,8 @@ INSERT INTO `b_card_types` (`f_id`, `f_name`) VALUES ('4', 'Կուտակային
 update o_header set f_state=2 where f_state=0;
 ALTER TABLE `h_halls` CHANGE COLUMN `f_prefix` `f_prefix` CHAR(8) NOT NULL , ADD UNIQUE INDEX `f_prefix_UNIQUE` (`f_prefix` ASC);
 ALTER TABLE `h_halls`  ADD COLUMN `f_counterhall` INT(11) NULL AFTER `f_settings`;
+alter table d_menu change column f_print1 f_print1 tinytext, change column f_print2 f_print2 tinytext;
+alter table o_body change column f_print1 f_print1 tinytext, change column  f_print2 f_print2 tinytext;
+create table d_special (f_id integer primary key auto_increment, f_dish integer, f_comment tinytext);
+alter table o_tax_debug add column f_mark tinytext;
+alter table o_tax_debug add column f_elapsed integer;

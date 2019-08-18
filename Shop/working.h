@@ -49,6 +49,8 @@ private slots:
 
     void shortcutF4();
 
+    void shortcutF7();
+
     void shortcutDown();
 
     void shortcutUp();

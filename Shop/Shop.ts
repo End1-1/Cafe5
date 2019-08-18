@@ -227,17 +227,17 @@
 <context>
     <name>NotificationWidget</name>
     <message>
-        <location filename="../Classes/notificationwidget.ui" line="20"/>
+        <location filename="../Classes/notificationwidget.ui" line="23"/>
         <source>Message</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/notificationwidget.ui" line="92"/>
+        <location filename="../Classes/notificationwidget.ui" line="95"/>
         <source>27.07.2019 22:16</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/notificationwidget.ui" line="173"/>
+        <location filename="../Classes/notificationwidget.ui" line="179"/>
         <source>The message!</source>
         <translation></translation>
     </message>
@@ -564,8 +564,9 @@ F9</source>
     </message>
     <message>
         <location filename="working.ui" line="357"/>
-        <source>Discount (F3)</source>
-        <translation>Զեղչ (F3)</translation>
+        <source>Discount (F7)</source>
+        <oldsource>Discount (F3)</oldsource>
+        <translation type="unfinished">Զեղչ (F3)</translation>
     </message>
     <message>
         <location filename="working.ui" line="367"/>
@@ -631,20 +632,20 @@ F12</source>
 (F12)</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="112"/>
-        <location filename="working.cpp" line="273"/>
+        <location filename="working.cpp" line="114"/>
+        <location filename="working.cpp" line="280"/>
         <source>Password</source>
         <translation>Գախտնաբառ</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="112"/>
+        <location filename="working.cpp" line="114"/>
         <source>Administrator password</source>
         <translation>Ադմինիստրատորի գախտնաբառ</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="128"/>
-        <location filename="working.cpp" line="133"/>
-        <location filename="working.cpp" line="275"/>
+        <location filename="working.cpp" line="130"/>
+        <location filename="working.cpp" line="135"/>
+        <location filename="working.cpp" line="282"/>
         <source>Access denied</source>
         <translation>Մուտքը արգելված է</translation>
     </message>

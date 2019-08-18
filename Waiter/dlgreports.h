@@ -25,6 +25,8 @@ private:
 
     C5User *fUser;
 
+    QString fCurrentHall;
+
     void getDailyCommon(const QDate &date1 = QDate::currentDate(), const QDate &date2 = QDate::currentDate());
 
     void setLangIcon();
@@ -55,6 +57,8 @@ private slots:
     void on_btnPrintOrderReceipt_clicked();
 
     void on_btnReceiptLanguage_clicked();
+
+    void on_btnHall_clicked();
 };
 
 #endif // DLGREPORTS_H

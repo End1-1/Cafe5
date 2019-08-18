@@ -68,7 +68,7 @@ void C5WaiterServer::reply(QJsonObject &o)
         QJsonArray jMenu;
         QString query = "select d.f_id as f_dish, mn.f_name as menu_name, p1.f_name as part1, p2.f_name as part2, p2.f_adgCode, d.f_name, \
                 m.f_price, m.f_store, m.f_print1, m.f_print2, d.f_remind, d.f_comment as f_description, \
-                s.f_name as f_storename, d.f_color as dish_color, p2.f_color as type_color \
+                s.f_name as f_storename, d.f_color as dish_color, p2.f_color as type_color, 1 as f_timeorder \
                 from d_menu m \
                 left join d_menu_names mn on mn.f_id=m.f_menu \
                 left join d_dish d on d.f_id=m.f_dish \
@@ -79,9 +79,12 @@ void C5WaiterServer::reply(QJsonObject &o)
         srh.getJsonFromQuery(query, jMenu);
         QJsonArray jMenuNames;
         srh.getJsonFromQuery("select f_id, f_name from d_menu_names", jMenuNames);
+        QJsonArray jDishSpecial;
+        srh.getJsonFromQuery("select f_dish, f_comment from d_special", jDishSpecial);
         o["reply"] = 1;
         o["menu"] = jMenu;
         o["menunames"] = jMenuNames;
+        o["dishspecial"] = jDishSpecial;
         break;
     }
     case sm_checkuser: {
@@ -384,15 +387,19 @@ void C5WaiterServer::reply(QJsonObject &o)
         bv[":f_datecash1"] = QDate::fromString(fIn["date1"].toString(), FORMAT_DATE_TO_STR_MYSQL);
         bv[":f_datecash2"] = QDate::fromString(fIn["date2"].toString(), FORMAT_DATE_TO_STR_MYSQL);
         bv[":f_state"] = ORDER_STATE_CLOSE;
-        srh.getJsonFromQuery("select oh.f_id, concat(oh.f_prefix, oh.f_hallid) as f_order, date_format(oh.f_datecash, '%d.%m.%Y') as f_datecash, oh.f_timeclose, "
-                             "h.f_name as f_hall, t.f_name as f_table, concat(u.f_last, ' ', u.f_first) as f_staff,"
-                             "oh.f_amounttotal "
-                             "from o_header oh "
-                             "left join h_halls h on h.f_id=oh.f_hall "
-                             "left join h_tables t on t.f_id=oh.f_table "
-                             "left join s_user u on u.f_id=oh.f_staff "
-                             "where oh.f_state=:f_state and oh.f_datecash between :f_datecash1 and :f_datecash2 "
-                             "order by oh.f_timeclose", ja, bv);
+        QString sqlQuery = "select oh.f_id, concat(oh.f_prefix, oh.f_hallid) as f_order, date_format(oh.f_datecash, '%d.%m.%Y') as f_datecash, oh.f_timeclose, "
+                           "h.f_name as f_hall, t.f_name as f_table, concat(u.f_last, ' ', u.f_first) as f_staff,"
+                           "oh.f_amounttotal "
+                           "from o_header oh "
+                           "left join h_halls h on h.f_id=oh.f_hall "
+                           "left join h_tables t on t.f_id=oh.f_table "
+                           "left join s_user u on u.f_id=oh.f_staff "
+                           "where oh.f_state=:f_state and oh.f_datecash between :f_datecash1 and :f_datecash2 ";
+        if (!fIn["hall"].toString().isEmpty()) {
+            sqlQuery += QString(" and oh.f_hall=%1 ").arg(fIn["hall"].toString());
+        }
+        sqlQuery += "order by oh.f_timeclose";
+        srh.getJsonFromQuery(sqlQuery, ja, bv);
         o["reply"] = 0;
         o["report"] = ja;
         break;
@@ -575,13 +582,14 @@ void C5WaiterServer::saveOrder(QJsonObject &jh, QJsonArray &ja, C5Database &db)
         db[":f_id"] = jh["f_hall"].toString().toInt();
         db.exec("select f_counterhall from h_halls where f_id=:f_id");
         if (db.nextRow()) {
-            db[":f_id"] = db.getInt(0);
+            int hallid = db.getInt(0);
+            db[":f_id"] = hallid;
             db.exec("select f_counter + 1, f_prefix as f_counter from h_halls where f_id=:f_id for update");
             if (db.nextRow()) {
                 jh["f_hallid"] = db.getString(0);
                 jh["f_prefix"] = db.getString(1);
                 db[":f_counter"] = db.getInt(0);
-                db.update("h_halls", where_id(jh["f_hall"].toString()));
+                db.update("h_halls", where_id(hallid));
             }
         } else {
             jh["f_hallid"] = "0";
@@ -692,6 +700,7 @@ void C5WaiterServer::saveDish(const QJsonObject &h, QJsonObject &o, C5Database &
     db[":f_remind"] = o["f_remind"].toString().toInt();
     db[":f_adgcode"] = o["f_adgcode"].toString();
     db[":f_removereason"] = o["f_removereason"].toString();
+    db[":f_timeorder"] = o["f_timeorder"].toString().toInt();
     db.update("o_body", where_id(o["f_id"].toString()));
 }
 

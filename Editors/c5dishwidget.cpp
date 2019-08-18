@@ -75,6 +75,8 @@ void C5DishWidget::clear()
     ui->tblRecipe->setRowCount(0);
     ui->tblComplex->clearContents();
     ui->tblComplex->setRowCount(0);
+    ui->lwComment->clear();
+    ui->leDishComment->clear();
 }
 
 void C5DishWidget::setDish(int id)
@@ -158,6 +160,12 @@ void C5DishWidget::setDish(int id)
         connect(l, SIGNAL(textChanged(QString)), this, SLOT(complextQtyChanged(QString)));
     }
     countTotalSelfCost();
+    db[":f_dish"] = id;
+    db.exec("select f_comment from d_special where f_dish=:f_dish");
+    while (db.nextRow()) {
+        QListWidgetItem *item = new QListWidgetItem(ui->lwComment);
+        item->setText(db.getString(0));
+    }
 }
 
 void C5DishWidget::selectorCallback(int row, const QList<QVariant> &values)
@@ -207,6 +215,13 @@ bool C5DishWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
             db.update("d_recipes", where_id(ui->tblRecipe->getInteger(i, 0)));
         }
     }
+    db[":f_dish"] = ui->leCode->text();
+    db.exec("delete from d_special where f_dish=:f_dish");
+    for (int i = 0; i < ui->lwComment->count(); i++) {
+        db[":f_dish"] = ui->leCode->text();
+        db[":f_comment"] = ui->lwComment->item(i)->text();
+        db.insert("d_special", false);
+    }
     return true;
 }
 
@@ -219,7 +234,7 @@ void C5DishWidget::complextQtyChanged(const QString &arg)
         for (int i = 0; i < ui->tblRecipe->rowCount(); i++) {
             if (ui->tblRecipe->getString(i, 7) == code) {
                 ui->tblRecipe->setData(i, 8, arg.toDouble());
-                ui->tblRecipe->lineEdit(i, 3)->setDouble(ui->tblRecipe->getDouble(i, 9) * arg.toDouble());
+                ui->tblRecipe->lineEdit(i, 3)->setDouble(ui->tblRecipe->getDouble(i, 9) * QLocale().toDouble(arg));
             }
         }
     }
@@ -291,10 +306,12 @@ void C5DishWidget::setColor()
 
 void C5DishWidget::countTotalSelfCost()
 {
-    double total = 0;
+    double total = 0, totalWeight = 0;
     for (int i = 0; i < ui->tblRecipe->rowCount(); i++) {
+        totalWeight += ui->tblRecipe->lineEdit(i, 3)->getDouble();
         total += ui->tblRecipe->lineEdit(i, 6)->getDouble();
     }
+    ui->leWeight->setDouble(totalWeight);
     ui->leTotal->setDouble(total);
 }
 
@@ -509,4 +526,31 @@ void C5DishWidget::on_btnNewGoods_clicked()
         connect(l, SIGNAL(textEdited(QString)), this, SLOT(recipeQtyPriceChanged(QString)));
     }
     delete e;
+}
+
+void C5DishWidget::on_btnRemoveComment_clicked()
+{
+    QModelIndexList ml = ui->lwComment->selectionModel()->selectedIndexes();
+    if (ml.count() == 0) {
+        return;
+    }
+    if (C5Message::question(tr("Confirm to remove dish comment")) == QDialog::Accepted) {
+        ui->lwComment->removeItemWidget(ui->lwComment->item(ml.at(0).row()));
+    }
+}
+
+void C5DishWidget::on_btnAddComment_clicked()
+{
+    if (ui->leDishComment->text().isEmpty()) {
+        return;
+    }
+    QListWidgetItem *item = new QListWidgetItem(ui->lwComment);
+    item->setText(ui->leDishComment->text());
+    ui->leDishComment->clear();
+    ui->leDishComment->setFocus();
+}
+
+void C5DishWidget::on_leDishComment_returnPressed()
+{
+    on_btnAddComment_clicked();
 }

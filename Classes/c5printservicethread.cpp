@@ -68,6 +68,7 @@ void C5PrintServiceThread::print(const QString &printer, const QString &side)
     p.rtext(fHeader["f_currentstaffname"].toString());
     p.br(p.fLineHeight + 2);
     p.line(0, p.fTop, p.fNormalWidth, p.fTop);
+    p.br(2);
 
     QSet<QString> storages;
     for (int i = 0; i < fBody.count(); i++) {
@@ -79,13 +80,13 @@ void C5PrintServiceThread::print(const QString &printer, const QString &side)
             continue;
         }
         storages << o["f_storename"].toString();
-        p.ltext(o["f_name"].toString(), 0);
+        p.ltext(QString("[%1] %2").arg(o["f_timeorder"].toString()).arg(o["f_name"].toString()), 0);
         p.br();
         if (o["f_comment"].toString().length() > 0) {
             p.ltext(o["f_comment"].toString(), 0);
             p.br();
         }
-        p.ctext(o["f_qtyprint"].toString());
+        p.ctext(QString("%1: %2").arg(tr("Qty")).arg(o["f_qtyprint"].toString()));
         p.br();
         p.line(0, p.fTop, p.fNormalWidth, p.fTop);
         p.br(1);

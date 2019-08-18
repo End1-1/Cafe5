@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/menu.png</file>
+        <file>images/settings.png</file>
+        <file>images/chart.png</file>
+    </qresource>
+</RCC>

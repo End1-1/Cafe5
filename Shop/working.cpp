@@ -24,6 +24,7 @@ Working::Working(QWidget *parent) :
     QShortcut *sF3 = new QShortcut(QKeySequence(Qt::Key_F3), this);
     QShortcut *sF4 = new QShortcut(QKeySequence(Qt::Key_F4), this);
     QShortcut *sF6 = new QShortcut(QKeySequence(Qt::Key_F6), this);
+    QShortcut *sF7 = new QShortcut(QKeySequence(Qt::Key_F7), this);
     QShortcut *sF11 = new QShortcut(QKeySequence(Qt::Key_F11), this);
     QShortcut *sF12 = new QShortcut(QKeySequence(Qt::Key_F12), this);
     QShortcut *sDown = new QShortcut(QKeySequence(Qt::Key_Down), this);
@@ -33,6 +34,7 @@ Working::Working(QWidget *parent) :
     connect(sF3, SIGNAL(activated()), this, SLOT(shortcutF3()));
     connect(sF4, SIGNAL(activated()), this, SLOT(shortcutF4()));
     connect(sF6, SIGNAL(activated()), this, SLOT(on_btnRefund_clicked()));
+    connect(sF7, SIGNAL(activated()), this, SLOT(shortcutF7()));
     connect(sF11, SIGNAL(activated()), this, SLOT(on_btnNewOrder_clicked()));
     connect(sF12, SIGNAL(activated()), this, SLOT(on_btnSaveOrder_clicked()));
     connect(sDown, SIGNAL(activated()), this, SLOT(shortcutDown()));
@@ -233,6 +235,11 @@ void Working::shortcutF4()
         return;
     }
     w->focusCard();
+}
+
+void Working::shortcutF7()
+{
+
 }
 
 void Working::shortcutDown()

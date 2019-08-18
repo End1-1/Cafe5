@@ -107,7 +107,7 @@ void C5DishSelfCostGenPrice::saveDataChanges()
         db[":f_price"] = ui->tbl->lineEdit(i, 4)->getDouble();
         db.exec("update d_recipes set f_price=:f_price where f_goods=:f_goods");
     }
-    C5Message::info("The prices was updated");
+    C5Message::info(tr("The prices was updated"));
 }
 
 void C5DishSelfCostGenPrice::on_leSearch_textChanged(const QString &arg1)

@@ -59,7 +59,6 @@ void C5WaiterOrderDoc::sendToServer(C5SocketHandler *sh)
 
 bool C5WaiterOrderDoc::transferToHotel(C5Database &fDD, QString &err)
 {
-    return true;
     int settings = 0;
     int item = 0;
     QString itemName;
@@ -507,15 +506,15 @@ void C5WaiterOrderDoc::open()
     getTaxInfo();
     fDb[":f_header"] = fHeader["f_id"].toString();
     fDb.exec("select ob.f_id, ob.f_header, ob.f_state, dp1.f_name as part1, dp2.f_name as part2, ob.f_adgcode, d.f_name as f_name, \
-                         ob.f_qty1, ob.f_qty2, ob.f_price, ob.f_service, ob.f_discount, ob.f_total, \
-                         ob.f_store, ob.f_print1, ob.f_print2, ob.f_comment, ob.f_remind, ob.f_dish, \
-                         s.f_name as f_storename, ob.f_removereason \
-                         from o_body ob \
-                         left join d_dish d on d.f_id=ob.f_dish \
-                         left join d_part2 dp2 on dp2.f_id=d.f_part \
-                         left join d_part1 dp1 on dp1.f_id=dp2.f_part \
-                         left join c_storages s on s.f_id=ob.f_store \
-                         where ob.f_header=:f_header");
+             ob.f_qty1, ob.f_qty2, ob.f_price, ob.f_service, ob.f_discount, ob.f_total, \
+             ob.f_store, ob.f_print1, ob.f_print2, ob.f_comment, ob.f_remind, ob.f_dish, \
+             s.f_name as f_storename, ob.f_removereason, ob.f_timeorder \
+             from o_body ob \
+             left join d_dish d on d.f_id=ob.f_dish \
+             left join d_part2 dp2 on dp2.f_id=d.f_part \
+             left join d_part1 dp1 on dp1.f_id=dp2.f_part \
+             left join c_storages s on s.f_id=ob.f_store \
+             where ob.f_header=:f_header");
     while (fDb.nextRow()) {
         QJsonObject o;
         for (int i = 0; i < fDb.columnCount(); i++) {

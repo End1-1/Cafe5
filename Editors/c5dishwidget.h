@@ -53,6 +53,12 @@ private slots:
 
     void on_btnNewGoods_clicked();
 
+    void on_btnRemoveComment_clicked();
+
+    void on_btnAddComment_clicked();
+
+    void on_leDishComment_returnPressed();
+
 private:
     Ui::C5DishWidget *ui;
 

@@ -3,8 +3,10 @@
 #include "dlgreportslist.h"
 #include "c5printjson.h"
 #include "c5translator.h"
+#include "c5cafecommon.h"
 #include "c5user.h"
 #include "dlgreceiptlanguage.h"
+#include "dlglistofhall.h"
 
 DlgReports::DlgReports(const QStringList &dbParams) :
     C5Dialog(dbParams),
@@ -38,6 +40,7 @@ void DlgReports::getDailyCommon(const QDate &date1, const QDate &date2)
     sh->bind("cmd", sm_dailycommon);
     sh->bind("date1", date1.toString(FORMAT_DATE_TO_STR_MYSQL));
     sh->bind("date2", date2.toString(FORMAT_DATE_TO_STR_MYSQL));
+    sh->bind("hall", fCurrentHall);
     sh->send();
 }
 
@@ -69,6 +72,7 @@ void DlgReports::handleDailyCommon(const QJsonObject &obj)
     QJsonArray ja = obj["report"].toArray();
     ui->tbl->clearContents();
     ui->tbl->setRowCount(0);
+    double total = 0;
     for (int i = 0; i < ja.count(); i++) {
         QJsonObject o = ja.at(i).toObject();
         int r = ui->tbl->addEmptyRow();
@@ -80,9 +84,18 @@ void DlgReports::handleDailyCommon(const QJsonObject &obj)
         ui->tbl->setString(r, 5, o["f_table"].toString());
         ui->tbl->setString(r, 6, o["f_staff"].toString());
         ui->tbl->setString(r, 7, float_str(o["f_amounttotal"].toString().toDouble(), 2));
+        total += o["f_amounttotal"].toString().toDouble();
     }
+    ui->tblTotal->setColumnCount(ui->tbl->columnCount());
     ui->tbl->resizeColumnsToContents();
     ui->tbl->setColumnWidth(0, 0);
+    for (int i = 0; i < ui->tbl->columnCount(); i++) {
+        ui->tblTotal->setColumnWidth(i, ui->tbl->columnWidth(i));
+    }
+    ui->tblTotal->setString(0, 7, float_str(total, 2));
+    QStringList l;
+    l.append(QString::number(ui->tbl->rowCount()));
+    ui->tblTotal->setVerticalHeaderLabels(l);
 }
 
 void DlgReports::handleReportsList(const QJsonObject &obj)
@@ -181,4 +194,14 @@ void DlgReports::on_btnReceiptLanguage_clicked()
         C5Config::setRegValue("receipt_language", r);
         setLangIcon();
     }
+}
+
+void DlgReports::on_btnHall_clicked()
+{
+    QString hall;
+    if (!DlgListOfHall::getHall(hall)) {
+        return;
+    }
+    fCurrentHall = hall;
+    ui->btnHall->setText(C5CafeCommon::hall(hall)["f_name"].toString());
 }

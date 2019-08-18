@@ -32,6 +32,7 @@
 #define param_working_date_change_time 26
 #define param_tax_print_always_offer 27
 #define param_fd_font_size 28
+#define param_recipe_widht 29
 
 class C5Config
 {

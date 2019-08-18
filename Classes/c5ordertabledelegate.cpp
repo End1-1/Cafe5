@@ -24,7 +24,7 @@ void C5OrderTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &
     QJsonObject o = index.data(Qt::UserRole).toJsonObject();
     QRect nameRect = option.rect;
     nameRect.adjust(1, 2, -75, -2);
-    painter->drawText(nameRect, QString("%1. %2").arg(index.row() + 1).arg(o["f_name"].toString()));
+    painter->drawText(nameRect, QString("%1. [%2] %3").arg(index.row() + 1).arg(o["f_timeorder"].toString()).arg(o["f_name"].toString()));
     if (o["f_comment"].toString().length() > 0) {
         QRect commentRect = option.rect;
         QFont f(painter->font());
