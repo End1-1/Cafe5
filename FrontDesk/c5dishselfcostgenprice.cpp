@@ -1,5 +1,6 @@
 #include "c5dishselfcostgenprice.h"
 #include "ui_c5dishselfcostgenprice.h"
+#include "c5message.h"
 #include "proxytablewidgetdatabase.h"
 
 C5DishSelfCostGenPrice::C5DishSelfCostGenPrice(const QStringList &dbParams, QWidget *parent) :

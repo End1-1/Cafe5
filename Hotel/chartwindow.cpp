@@ -12,3 +12,8 @@ ChartWindow::~ChartWindow()
 {
     delete ui;
 }
+
+void ChartWindow::createDateChart()
+{
+
+}

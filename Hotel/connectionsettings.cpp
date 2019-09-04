@@ -2,10 +2,8 @@
 #include "ui_connectionsettings.h"
 #include "message.h"
 #include "widgetcontainer.h"
-#include <QSettings>
+#include "settings.h"
 #include <QInputDialog>
-
-static QSettings __s(_ORGANIZATION_, _APPLICATION_);
 
 ConnectionSettings::ConnectionSettings() :
     Dialog(),
@@ -23,22 +21,13 @@ void ConnectionSettings::configure()
 {
     ConnectionSettings *cs = new ConnectionSettings();
     cs->setWidgetContainer();
-    QByteArray buf = __s.value("con").toByteArray();
-    for (int i = 0; i < buf.length(); i++) {
-        buf[i] = buf[i] ^ ((i % 2) + (i % 3) + (i % 4) + (i % 5) + (i % 6) + (i % 7) + (i % 8) + (i % 9));
-    }
-    QList<QByteArray> s = buf.split(';');
-    for (const QString l: s) {
-        QStringList kv = l.split('=');
-        if (kv.count() != 2) {
-            continue;
-        }
-        cs->setStrw(kv.at(0), kv.at(1));
-    }
-    if (!cs->strw("password").isEmpty()) {
+    cs->setStrw("host", __s.s("host"));
+    cs->setStrw("port", __s.s("port"));
+    cs->setStrw("hostpassword", __s.s("hostpassword"));
+    if (!cs->strw("hostpassword").isEmpty()) {
         bool ok = false;
-        QString pwd = QInputDialog::getText(cs, tr("Database password"), tr("Database password"), QLineEdit::Password, "", &ok);
-        if (ok && pwd == cs->strw("password")) {
+        QString pwd = QInputDialog::getText(cs, tr("Database password"), tr("Database password"), QLineEdit::Password, "", &ok, Qt::FramelessWindowHint);
+        if (ok && pwd == cs->strw("hostpassword")) {
 
         } else {
             if (ok) {
@@ -67,11 +56,14 @@ void ConnectionSettings::on_btnSave_clicked()
 {
     QByteArray settings;
     settings += "host=" + strw("host") + ";";
-    settings += "database=" + strw("database") + ";";
-    settings += "username=" + strw("username") + ";";
-    settings += "password=" + strw("password") + ";";
+    settings += "port=" + strw("port") + ";";
+    settings += "hostpassword=" + strw("hostpassword") + ";";
     for (int i = 0; i < settings.length(); i++) {
         settings[i] = settings[i] ^ ((i % 2) + (i % 3) + (i % 4) + (i % 5) + (i % 6) + (i % 7) + (i % 8) + (i % 9));
     }
-    __s.setValue("con", settings);
+    __s.set("con", settings);
+    __s.set("host", strw("host"));
+    __s.set("port", strw("port"));
+    __s.set("hostpassword", strw("hostpassword"));
+    Message::showMessage(tr("Saved"));
 }

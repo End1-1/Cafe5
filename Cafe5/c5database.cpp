@@ -1,6 +1,7 @@
 #include "C5Database.h"
 #include <QMutexLocker>
 #include <QSqlQuery>
+#include <QMessageBox>
 #include <QSqlError>
 #include <QSqlRecord>
 #include <QDir>
@@ -131,7 +132,7 @@ bool C5Database::exec(const QString &sqlQuery)
 {
     if (!fDb.open()) {
         if (!open()) {
-            C5Message::error(fLastError);
+            QMessageBox::critical(0, "DB error", fLastError);
             return false;
         }
     }
@@ -504,7 +505,7 @@ bool C5Database::exec(QSqlQuery *q, const QString &sqlQuery, bool &isSelect)
 {
     if (!fDb.isOpen()) {
         if (!fDb.open()) {
-            C5Message::error(fLastError);
+            QMessageBox::critical(0, "DB error", fLastError);
             return false;
         }
     }

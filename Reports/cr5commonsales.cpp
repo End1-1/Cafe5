@@ -35,6 +35,8 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
                    << "sum(oh.f_amountcard) as f_amountcard"
                    << "sum(oh.f_amountbank) as f_amountbank"
                    << "sum(oh.f_amountother) as f_amountother"
+                   << "oh.f_amountservice"
+                   << "oh.f_amountdiscount"
                       ;
 
     fColumnsGroup << "concat(oh.f_prefix, oh.f_hallid) as f_prefix"
@@ -47,6 +49,8 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
                    << "oh.f_timeopen"
                    << "oh.f_dateclose"
                    << "oh.f_timeclose"
+                   << "oh.f_amountservice"
+                   << "oh.f_amountdiscount"
                    << "concat(w.f_last, ' ', w.f_first) as f_staff"
                       ;
 
@@ -55,6 +59,8 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
                 << "f_amountcard"
                 << "f_amountbank"
                 << "f_amountother"
+                << "f_amountservice"
+                << "f_amountdiscount"
                       ;
 
     fTranslation["f_prefix"] = tr("Head");
@@ -73,6 +79,8 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_amountcard"] = tr("Card");
     fTranslation["f_amountbank"] = tr("Bank");
     fTranslation["f_amountother"] = tr("Other");
+    fTranslation["f_amountservice"] = tr("Service");
+    fTranslation["f_amountdiscount"] = tr("Discount");
 
     fColumnsVisible["concat(oh.f_prefix, oh.f_hallid) as f_prefix"] = true;
     fColumnsVisible["oh.f_id"] = true;
@@ -90,6 +98,8 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
     fColumnsVisible["sum(oh.f_amountcard) as f_amountcard"] = true;
     fColumnsVisible["sum(oh.f_amountbank) as f_amountbank"] = true;
     fColumnsVisible["sum(oh.f_amountother) as f_amountother"] = true;
+    fColumnsVisible["oh.f_amountservice"] = false;
+    fColumnsVisible["oh.f_amountdiscount"] = false;
 
     connect(this, SIGNAL(tblDoubleClicked(int, int, QList<QVariant>)), this, SLOT(openOrder(int, int, QList<QVariant>)));
 

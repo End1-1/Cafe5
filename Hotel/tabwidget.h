@@ -12,6 +12,8 @@ public:
     virtual const QString title() = 0;
     virtual const QString icon() = 0;
     virtual void setWidgetContainer();
+    virtual bool allowClose();
+    virtual void showMenuPanel();
 };
 
 #endif // TABWIDGET_H

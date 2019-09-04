@@ -27,7 +27,9 @@ private slots:
     void search(const QString &arg1);
 
     void on_btnCheckVisible_clicked();
+
     void on_btnRefresh_clicked();
+
     void on_btnGo_clicked();
 };
 

@@ -35,8 +35,18 @@ private slots:
 
     void on_btnNewUnit_clicked();
 
+    void on_btnAddGoods_clicked();
+
+    void on_btnRemoveGoods_clicked();
+
+    void on_btnNewGoods_clicked();
+
 private:
     Ui::CE5Goods *ui;
+
+    int addGoodsRow();
+
+    void countTotal();
 };
 
 #endif // CE5GOODS_H

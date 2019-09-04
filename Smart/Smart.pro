@@ -27,6 +27,7 @@ DEFINES += WAITER
 SOURCES += \
     ../../NewTax/Src/printtaxn.cpp \
     ../Classes/c5printing.cpp \
+    ../Classes/notificationwidget.cpp \
     dishitemdelegate.cpp \
     dishtableitemdelegate.cpp \
         main.cpp \
@@ -47,6 +48,7 @@ SOURCES += \
 HEADERS += \
     ../../NewTax/Src/printtaxn.h \
     ../Classes/c5printing.h \
+    ../Classes/notificationwidget.h \
     dish.h \
     dishitemdelegate.h \
     dishtableitemdelegate.h \
@@ -66,6 +68,7 @@ HEADERS += \
     dlgpassword.h
 
 FORMS += \
+    ../Classes/notificationwidget.ui \
     ../FrontDesk/c5selector.ui \
     payment.ui \
         workspace.ui \

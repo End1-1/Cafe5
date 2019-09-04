@@ -41,7 +41,7 @@ delete from droid_message;
 delete from d_img;
 delete from o_dish_remove_reason;
 delete from d_dish_comment;
-delete from a_reason where f_id>7;
+delete from a_reason where f_id>8;
 delete from h_tables;
 delete from h_halls;
 delete from c_partners;

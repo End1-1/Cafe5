@@ -13,3 +13,13 @@ void TabWidget::setWidgetContainer()
     fCtrl = this;
     fCtrl->getWatchList(fCtrl);
 }
+
+bool TabWidget::allowClose()
+{
+    return true;
+}
+
+void TabWidget::showMenuPanel()
+{
+
+}

@@ -19,6 +19,7 @@ public:
 
 private:
     Ui::ChartWindow *ui;
+    void createDateChart();
 };
 
 #endif // CHARTWINDOW_H

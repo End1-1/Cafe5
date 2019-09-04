@@ -78,8 +78,8 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &fDD, QString &err)
         item = fDb.getString(0).toInt();
     }
     if (item == 0) {
-        err = "Cannot retrieve invoice item for hotel";
-        return false;
+        //err = "Cannot retrieve invoice item for hotel";
+        return true;
     }
 
     QString result = fHeader["f_prefix"].toString() + fHeader["f_hallid"].toString();

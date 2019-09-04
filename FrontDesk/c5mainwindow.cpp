@@ -281,6 +281,7 @@ void C5MainWindow::on_actionLogin_triggered()
             addTreeL3Item(it, cp_t2_store_input, tr("New store input"), ":/goods.png");
             addTreeL3Item(it, cp_t2_store_output, tr("New store output"), ":/goods.png");
             addTreeL3Item(it, cp_t2_store_move, tr("New store movement"), ":/goods.png");
+            addTreeL3Item(it, cp_t2_store_complectation, tr("New store complecation"), ":/goods.png");
             addTreeL3Item(it, cp_t2_store_inventory, tr("New store inventory"), ":/goods.png");
             addTreeL3Item(it, cp_t2_calculate_self_cost, tr("Calculate dishes self cost"), ":/menu.png");
         }
@@ -534,6 +535,11 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
     case cp_t2_count_output_of_sale:
         createTab<CR5ConsumptionBySales>(dbParams);
         break;
+    case cp_t2_store_complectation: {
+        C5StoreDoc *sd = createTab<C5StoreDoc>(dbParams);
+        sd->setMode(C5StoreDoc::sdComplectation);
+        break;
+    }
     case cp_t3_sales_common:
         createTab<CR5CommonSales>(dbParams);
         break;

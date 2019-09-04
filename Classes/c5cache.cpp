@@ -4,9 +4,11 @@
 #include "cacheorderstate.h"
 #include "cachegoodswaste.h"
 #include "cachedish.h"
-#include "cachecashnames.h" //32
-#include "cachestorereason.h" //33
-#include "cachediscounttype.h" // 34
+#include "cachecashnames.h"     //32
+#include "cachestorereason.h"   //33
+#include "cachediscounttype.h"  //34
+#include "cacheheaderpayment.h" //35
+#include "cacheheadepaid.h"     //36
 
 QMap<QString, C5Cache*> C5Cache::fCacheList;
 QMap<int, QString> C5Cache::fCacheQuery;
@@ -93,6 +95,8 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         fCacheQuery[cache_store_reason] = query_cache_store_reason;
         fCacheQuery[cache_dish] = query_cache_dish;
         fCacheQuery[cache_discount_type] = query_discount_type;
+        fCacheQuery[cache_header_payment] = query_cache_header_payment;
+        fCacheQuery[cache_header_paid] = query_cache_header_paid;
     }
     if (fTableCache.count() == 0) {
         fTableCache["c_partners"] = cache_goods_partners;
@@ -122,6 +126,8 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         fTableCache["e_cash_names"] = cache_cash_names;
         fTableCache["a_reason"] = cache_store_reason;
         fTableCache["b_card_types"] = cache_discount_type;
+        fTableCache["a_header_payment"] = cache_header_payment;
+        fTableCache["a_header_paid"] = cache_header_paid;
     }
     fVersion = 0;
     C5Database db(dbParams);

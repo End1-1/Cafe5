@@ -36,6 +36,8 @@ SOURCES += \
     ../Cache/cachediscounttype.cpp \
     ../Cache/cachedish.cpp \
     ../Cache/cachedishstate.cpp \
+    ../Cache/cacheheadepaid.cpp \
+    ../Cache/cacheheaderpayment.cpp \
     ../Cache/cachestorereason.cpp \
     ../Cafe5/c5cafecommon.cpp \
     ../Cafe5/c5double.cpp \
@@ -193,6 +195,8 @@ HEADERS += \
     ../Cache/cachediscounttype.h \
     ../Cache/cachedish.h \
     ../Cache/cachedishstate.h \
+    ../Cache/cacheheadepaid.h \
+    ../Cache/cacheheaderpayment.h \
     ../Cache/cacheheaders.h \
     ../Cache/cachestorereason.h \
     ../Cafe5/c5cafecommon.h \
@@ -435,7 +439,6 @@ RESOURCES += \
 #QMAKE_CXXFLAGS += -Werror
 
 DISTFILES += \
-    LastCache \
     storehouse.ico
 
 ICON = storehouse.ico

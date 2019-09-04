@@ -4,6 +4,7 @@
 #include "c5database.h"
 #include <QAbstractTableModel>
 #include <QSet>
+#include <QColor>
 
 class C5TableModel : public QAbstractTableModel
 {

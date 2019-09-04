@@ -180,6 +180,7 @@ bool WOrder::writeOrder(bool tax)
         db[":f_tax"] = tax ? rseq.toInt() : 0;
         db[":f_sign"] = sign;
         db[":f_taxdept"] = C5Config::taxDept();
+        db[":f_row"] = i + 1;
         db.insert("o_goods", false);
     }
     fCostumerId = 0;

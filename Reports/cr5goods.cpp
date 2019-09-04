@@ -8,7 +8,7 @@ CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
     fLabel = tr("Goods");
 
     fSqlQuery = "select gg.f_id, g.f_name as f_groupname, u.f_name as f_unitname, gg.f_name, \
-                gg.f_saleprice \
+                gg.f_saleprice, gg.f_lowlevel \
                 from c_goods gg \
                 left join c_groups g on g.f_id=gg.f_group \
                 left join c_units u on u.f_id=gg.f_unit ";
@@ -17,6 +17,7 @@ CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_unitname"] = tr("Unit");
     fTranslation["f_name"] = tr("Name");
     fTranslation["f_saleprice"] = tr("Sale price");
+    fTranslation["f_lowlevel"] = tr("Low level");
 
     fEditor = new CE5Goods(dbParams);
 }

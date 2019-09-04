@@ -29,6 +29,7 @@ private slots:
     void saveDataChanges();
 
     void refreshData();
+
     void on_leUsername_textChanged(const QString &arg1);
 };
 

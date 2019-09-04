@@ -3,6 +3,7 @@
 #include "c5waiterorder.h"
 #include "c5tablemodel.h"
 #include "c5mainwindow.h"
+#include "c5message.h"
 
 CR5SalesByDishes::CR5SalesByDishes(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)

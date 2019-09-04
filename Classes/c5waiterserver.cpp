@@ -75,7 +75,8 @@ void C5WaiterServer::reply(QJsonObject &o)
                 left join d_part2 p2 on p2.f_id=d.f_part \
                 left join d_part1 p1 on p1.f_id=p2.f_part \
                 left join c_storages s on s.f_id=m.f_store \
-                where m.f_state=1 ";
+                where m.f_state=1 \
+                order by d.f_queue, d.f_name ";
         srh.getJsonFromQuery(query, jMenu);
         QJsonArray jMenuNames;
         srh.getJsonFromQuery("select f_id, f_name from d_menu_names", jMenuNames);

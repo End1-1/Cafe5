@@ -2,6 +2,7 @@
 #include "ui_cr5menutranslator.h"
 #include "c5lineedit.h"
 #include "c5utils.h"
+#include "c5message.h"
 
 CR5MenuTranslator::CR5MenuTranslator(const QStringList &dbParams, QWidget *parent) :
     C5Widget(dbParams, parent),

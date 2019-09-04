@@ -19,12 +19,15 @@ void C5TableModel::execQuery(const QString &query)
 {
     beginResetModel();
     clearModel();
-    fDb.exec(query, fRawData, fColumnNameIndex);
-    for (int i = 0, count = fRawData.count(); i < count; i++) {
-        fProxyData << i;
-    }
-    for (QMap<QString, int>::const_iterator it = fColumnNameIndex.begin(); it != fColumnNameIndex.end(); it++) {
-        fColumnIndexName[it.value()] = it.key();
+    if (fDb.exec(query, fRawData, fColumnNameIndex)) {
+        for (int i = 0, count = fRawData.count(); i < count; i++) {
+            fProxyData << i;
+        }
+        for (QMap<QString, int>::const_iterator it = fColumnNameIndex.begin(); it != fColumnNameIndex.end(); it++) {
+            fColumnIndexName[it.value()] = it.key();
+        }
+    } else {
+
     }
     endResetModel();
 }

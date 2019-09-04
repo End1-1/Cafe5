@@ -77,6 +77,7 @@ void C5DishWidget::clear()
     ui->tblComplex->setRowCount(0);
     ui->lwComment->clear();
     ui->leDishComment->clear();
+    ui->leQueue->setText("999");
 }
 
 void C5DishWidget::setDish(int id)

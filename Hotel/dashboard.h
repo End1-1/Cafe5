@@ -25,9 +25,11 @@ private:
     QList<QAction*> fActionsOfCashier;
     void hideMenu();
     void showMenu();
+    void showWidgetMenu();
     void disableMenu();
     void prepareMenu();
     void buildMenu(QToolButton *btn, const QList<QAction*> &l);
+    bool closeAllTab();
 
 public slots:
     void on_btnLogin_clicked();
@@ -43,6 +45,7 @@ private slots:
     void on_tw_tabCloseRequested(int index);
     void on_btnBills_clicked();
 
+    void on_actionRoom_chart_triggered();
 };
 
 extern Dashboard *__dashboard;

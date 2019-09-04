@@ -27,36 +27,13 @@
        <string>Actions</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_5">
-       <item row="7" column="1">
-        <spacer name="verticalSpacer_5">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>567</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="2" column="0">
-        <widget class="C5CheckBox" name="checkBox_21">
+       <item row="6" column="0">
+        <widget class="C5CheckBox" name="checkBox_26">
          <property name="text">
-          <string>Store output</string>
+          <string>Count store output of sales</string>
          </property>
          <property name="Tag" stdset="0">
-          <number>202</number>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="C5CheckBox" name="checkBox_16">
-         <property name="text">
-          <string>Store input</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>201</number>
+          <number>205</number>
          </property>
         </widget>
        </item>
@@ -70,6 +47,16 @@
          </property>
         </widget>
        </item>
+       <item row="2" column="0">
+        <widget class="C5CheckBox" name="checkBox_21">
+         <property name="text">
+          <string>Store output</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>202</number>
+         </property>
+        </widget>
+       </item>
        <item row="4" column="0">
         <widget class="C5CheckBox" name="checkBox_24">
          <property name="text">
@@ -80,15 +67,38 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="0">
-        <widget class="C5CheckBox" name="checkBox_26">
+       <item row="1" column="0">
+        <widget class="C5CheckBox" name="checkBox_16">
          <property name="text">
-          <string>Count store output of sales</string>
+          <string>Store input</string>
          </property>
          <property name="Tag" stdset="0">
-          <number>205</number>
+          <number>201</number>
          </property>
         </widget>
+       </item>
+       <item row="7" column="0">
+        <widget class="C5CheckBox" name="checkBox_11">
+         <property name="text">
+          <string>Calculate dishes self cost</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>206</number>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="1">
+        <spacer name="verticalSpacer_5">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>567</height>
+          </size>
+         </property>
+        </spacer>
        </item>
        <item row="0" column="0">
         <widget class="C5CheckBox" name="chActions">
@@ -100,13 +110,13 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="0">
-        <widget class="C5CheckBox" name="checkBox_11">
+       <item row="5" column="0">
+        <widget class="C5CheckBox" name="checkBox_56">
          <property name="text">
-          <string>Calculate dishes self cost</string>
+          <string>Store complectation</string>
          </property>
          <property name="Tag" stdset="0">
-          <number>206</number>
+          <number>207</number>
          </property>
         </widget>
        </item>

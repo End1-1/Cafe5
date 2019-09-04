@@ -2,6 +2,7 @@
 #include "ui_c5dbuseraccess.h"
 #include "c5permissions.h"
 #include "c5checkbox.h"
+#include "c5message.h"
 
 C5DbUserAccess::C5DbUserAccess(const QStringList &dbParams, QWidget *parent) :
     C5Widget(dbParams, parent),

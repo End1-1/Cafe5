@@ -32,7 +32,22 @@ payment::payment(const QString order, const QStringList &dbParams) :
          << "2000"
          << "5000"
          << "10000"
+         << "15000"
          << "20000";
+    int r = 0, c = 0;
+    for (int i = 0; i < cash.count(); i++) {
+        ui->tblChange->setItem(r, c, new QTableWidgetItem(cash.at(i)));
+        c++;
+        if (c == ui->tblChange->columnCount()) {
+            c = 0;
+            r++;
+        }
+        if (r > 1) {
+            return;
+        }
+    }
+    ui->tblChange->setVisible(false);
+    adjustSize();
 }
 
 payment::~payment()

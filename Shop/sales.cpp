@@ -50,7 +50,8 @@ void Sales::refresh()
             "left join b_history h on h.f_order=oh.f_id "
             "left join b_cards_discount d on d.f_id=h.f_card "
             "left join b_clients c on c.f_id=d.f_client "
-            "where oh.f_datecash between :f_start and :f_end and f_state=:f_state");
+            "where oh.f_datecash between :f_start and :f_end and f_state=:f_state "
+            "order by oh.f_datecash, oh.f_timeclose ");
     ui->tbl->setRowCount(db.rowCount());
     int row = 0;
     while (db.nextRow()) {

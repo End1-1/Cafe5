@@ -4,13 +4,37 @@
 <context>
     <name>C5Cache</name>
     <message>
-        <location filename="../Classes/c5cache.cpp" line="25"/>
-        <location filename="../Classes/c5cache.cpp" line="29"/>
+        <location filename="../Classes/c5cache.cpp" line="27"/>
+        <location filename="../Classes/c5cache.cpp" line="31"/>
+        <location filename="../Classes/c5cache.cpp" line="34"/>
+        <location filename="../Classes/c5cache.cpp" line="40"/>
+        <location filename="../Classes/c5cache.cpp" line="45"/>
+        <location filename="../Classes/c5cache.cpp" line="49"/>
+        <location filename="../Classes/c5cache.cpp" line="56"/>
+        <location filename="../Classes/c5cache.cpp" line="59"/>
+        <location filename="../Classes/c5cache.cpp" line="62"/>
+        <location filename="../Classes/c5cache.cpp" line="65"/>
+        <location filename="../Classes/c5cache.cpp" line="68"/>
+        <location filename="../Classes/c5cache.cpp" line="71"/>
+        <location filename="../Classes/c5cache.cpp" line="74"/>
+        <location filename="../Classes/c5cache.cpp" line="77"/>
+        <location filename="../Classes/c5cache.cpp" line="82"/>
+        <location filename="../Classes/c5cache.cpp" line="236"/>
+        <source>Code</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5cache.cpp" line="41"/>
+        <source>Group</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5cache.cpp" line="28"/>
         <location filename="../Classes/c5cache.cpp" line="32"/>
-        <location filename="../Classes/c5cache.cpp" line="38"/>
-        <location filename="../Classes/c5cache.cpp" line="43"/>
-        <location filename="../Classes/c5cache.cpp" line="47"/>
-        <location filename="../Classes/c5cache.cpp" line="54"/>
+        <location filename="../Classes/c5cache.cpp" line="35"/>
+        <location filename="../Classes/c5cache.cpp" line="42"/>
+        <location filename="../Classes/c5cache.cpp" line="46"/>
+        <location filename="../Classes/c5cache.cpp" line="50"/>
         <location filename="../Classes/c5cache.cpp" line="57"/>
         <location filename="../Classes/c5cache.cpp" line="60"/>
         <location filename="../Classes/c5cache.cpp" line="63"/>
@@ -18,82 +42,58 @@
         <location filename="../Classes/c5cache.cpp" line="69"/>
         <location filename="../Classes/c5cache.cpp" line="72"/>
         <location filename="../Classes/c5cache.cpp" line="75"/>
-        <location filename="../Classes/c5cache.cpp" line="80"/>
-        <location filename="../Classes/c5cache.cpp" line="230"/>
-        <source>Code</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../Classes/c5cache.cpp" line="39"/>
-        <source>Group</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../Classes/c5cache.cpp" line="26"/>
-        <location filename="../Classes/c5cache.cpp" line="30"/>
-        <location filename="../Classes/c5cache.cpp" line="33"/>
-        <location filename="../Classes/c5cache.cpp" line="40"/>
-        <location filename="../Classes/c5cache.cpp" line="44"/>
-        <location filename="../Classes/c5cache.cpp" line="48"/>
-        <location filename="../Classes/c5cache.cpp" line="55"/>
-        <location filename="../Classes/c5cache.cpp" line="58"/>
-        <location filename="../Classes/c5cache.cpp" line="61"/>
-        <location filename="../Classes/c5cache.cpp" line="64"/>
-        <location filename="../Classes/c5cache.cpp" line="67"/>
-        <location filename="../Classes/c5cache.cpp" line="70"/>
-        <location filename="../Classes/c5cache.cpp" line="73"/>
-        <location filename="../Classes/c5cache.cpp" line="81"/>
-        <location filename="../Classes/c5cache.cpp" line="231"/>
+        <location filename="../Classes/c5cache.cpp" line="83"/>
+        <location filename="../Classes/c5cache.cpp" line="237"/>
         <source>Name</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5cache.cpp" line="27"/>
+        <location filename="../Classes/c5cache.cpp" line="29"/>
         <source>Part</source>
         <translation>Բաժին</translation>
     </message>
     <message>
-        <location filename="../Classes/c5cache.cpp" line="41"/>
+        <location filename="../Classes/c5cache.cpp" line="43"/>
         <source>Unit</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5cache.cpp" line="49"/>
+        <location filename="../Classes/c5cache.cpp" line="51"/>
         <source>Contact</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5cache.cpp" line="50"/>
+        <location filename="../Classes/c5cache.cpp" line="52"/>
         <source>Info</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5cache.cpp" line="51"/>
+        <location filename="../Classes/c5cache.cpp" line="53"/>
         <source>Phone</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5cache.cpp" line="52"/>
+        <location filename="../Classes/c5cache.cpp" line="54"/>
         <source>Email</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5cache.cpp" line="76"/>
+        <location filename="../Classes/c5cache.cpp" line="78"/>
         <source>First name</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5cache.cpp" line="77"/>
+        <location filename="../Classes/c5cache.cpp" line="79"/>
         <source>Last name</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5cache.cpp" line="78"/>
+        <location filename="../Classes/c5cache.cpp" line="80"/>
         <source>Additional info</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5cache.cpp" line="82"/>
+        <location filename="../Classes/c5cache.cpp" line="84"/>
         <source>Description</source>
         <translation>Նկարագրություն</translation>
     </message>
@@ -245,87 +245,87 @@
 <context>
     <name>PrintReceipt</name>
     <message>
-        <location filename="printreceipt.cpp" line="70"/>
+        <location filename="printreceipt.cpp" line="71"/>
         <source>Department</source>
         <translation>Բաժին</translation>
     </message>
     <message>
-        <location filename="printreceipt.cpp" line="73"/>
+        <location filename="printreceipt.cpp" line="74"/>
         <source>Tax number</source>
         <translation>ՀՎՀՀ</translation>
     </message>
     <message>
-        <location filename="printreceipt.cpp" line="76"/>
+        <location filename="printreceipt.cpp" line="77"/>
         <source>Device number</source>
         <translation>ԳՀ</translation>
     </message>
     <message>
-        <location filename="printreceipt.cpp" line="79"/>
+        <location filename="printreceipt.cpp" line="80"/>
         <source>Serial</source>
         <translation>ԱՀ</translation>
     </message>
     <message>
-        <location filename="printreceipt.cpp" line="82"/>
+        <location filename="printreceipt.cpp" line="83"/>
         <source>Fiscal</source>
         <translation>Ֆիսկալ</translation>
     </message>
     <message>
-        <location filename="printreceipt.cpp" line="85"/>
+        <location filename="printreceipt.cpp" line="86"/>
         <source>Receipt number</source>
         <translation>ԿՀ</translation>
     </message>
     <message>
-        <location filename="printreceipt.cpp" line="88"/>
+        <location filename="printreceipt.cpp" line="89"/>
         <source>Date</source>
         <translation>Ամսաթիվ</translation>
     </message>
     <message>
-        <location filename="printreceipt.cpp" line="91"/>
+        <location filename="printreceipt.cpp" line="92"/>
         <source>(F)</source>
         <translation>(Ֆ)</translation>
     </message>
     <message>
-        <location filename="printreceipt.cpp" line="98"/>
+        <location filename="printreceipt.cpp" line="99"/>
         <source>Refund</source>
         <translation>Հետ վերադարձ</translation>
     </message>
     <message>
-        <location filename="printreceipt.cpp" line="104"/>
+        <location filename="printreceipt.cpp" line="105"/>
         <source>Class | Name | Qty | Price | Total</source>
         <translation>Դաս՝ | Անվանում | Քնկ | Գին | Ընդամենը</translation>
     </message>
     <message>
-        <location filename="printreceipt.cpp" line="111"/>
+        <location filename="printreceipt.cpp" line="112"/>
         <source>Class:</source>
         <translation>Դաս՝</translation>
     </message>
     <message>
-        <location filename="printreceipt.cpp" line="130"/>
+        <location filename="printreceipt.cpp" line="131"/>
         <source>Total</source>
         <translation>Ընդամենը</translation>
     </message>
     <message>
-        <location filename="printreceipt.cpp" line="134"/>
+        <location filename="printreceipt.cpp" line="135"/>
         <source>Need to pay</source>
         <translation>Ենթակա է վճարման</translation>
     </message>
     <message>
-        <location filename="printreceipt.cpp" line="143"/>
+        <location filename="printreceipt.cpp" line="144"/>
         <source>Payment, cash</source>
         <translation>Կանխիկ</translation>
     </message>
     <message>
-        <location filename="printreceipt.cpp" line="148"/>
+        <location filename="printreceipt.cpp" line="149"/>
         <source>Payment, card</source>
         <translation>Անկանխիկ</translation>
     </message>
     <message>
-        <location filename="printreceipt.cpp" line="156"/>
+        <location filename="printreceipt.cpp" line="157"/>
         <source>Thank you for visit!</source>
         <translation>Շնորհակալություն այցելության համար</translation>
     </message>
     <message>
-        <location filename="printreceipt.cpp" line="159"/>
+        <location filename="printreceipt.cpp" line="160"/>
         <source>Printed</source>
         <translation>Տպված</translation>
     </message>
@@ -485,9 +485,9 @@
     </message>
     <message>
         <location filename="worder.ui" line="223"/>
-        <location filename="worder.cpp" line="331"/>
-        <location filename="worder.cpp" line="336"/>
-        <location filename="worder.cpp" line="344"/>
+        <location filename="worder.cpp" line="332"/>
+        <location filename="worder.cpp" line="337"/>
+        <location filename="worder.cpp" line="345"/>
         <source>Discount</source>
         <translation>Զեղչ</translation>
     </message>
@@ -512,12 +512,12 @@
         <translation>(Ֆ)</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="203"/>
+        <location filename="worder.cpp" line="204"/>
         <source>Cards was expired</source>
         <translation>Քարտի ժամկետը անցել է</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="340"/>
+        <location filename="worder.cpp" line="341"/>
         <source>Visit counter</source>
         <translation>Այցելություն</translation>
     </message>

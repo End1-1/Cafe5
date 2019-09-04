@@ -2,7 +2,9 @@
 #include "ui_dashboard.h"
 #include "login.h"
 #include "message.h"
+#include "clientsocket.h"
 #include "chartwindow.h"
+#include "user.h"
 #include <QToolButton>
 #include <QCloseEvent>
 #include <QTimer>
@@ -15,6 +17,7 @@ QWidget *createTabWidget() {
     T *t = new T();
     t->setWidgetContainer();
     __dashboard->fTabWidget->addTab(t, QIcon(t->icon()), t->title());
+    __dashboard->fTabWidget->setCurrentWidget(t);
     return t;
 }
 
@@ -29,6 +32,13 @@ Dashboard::Dashboard(QWidget *parent) :
     btn->setIcon(QIcon(":/images/menu.png"));
     connect(btn, &QToolButton::clicked, this, &Dashboard::showMenu);
     ui->tw->setCornerWidget(btn, Qt::TopLeftCorner);
+    btn->show();
+    btn = new QToolButton(ui->tw);
+    btn->setEnabled(false);
+    btn->setMinimumSize(20, 20);
+    btn->setIcon(QIcon(":/images/menu.png"));
+    connect(btn, &QToolButton::clicked, this, &Dashboard::showWidgetMenu);
+    ui->tw->setCornerWidget(btn, Qt::TopRightCorner);
     btn->show();
     disableMenu();
 }
@@ -53,6 +63,14 @@ void Dashboard::showMenu()
         t->start(1);
     } else {
         hideMenu();
+    }
+}
+
+void Dashboard::showWidgetMenu()
+{
+    TabWidget *t = static_cast<TabWidget*>(fTabWidget->currentWidget());
+    if (t) {
+        t->showMenuPanel();
     }
 }
 
@@ -103,6 +121,21 @@ void Dashboard::buildMenu(QToolButton *btn, const QList<QAction *> &l)
     ui->verticalLayout->insertWidget(btn->property("index").toInt(), ui->lwMenu);
 }
 
+bool Dashboard::closeAllTab()
+{
+    for (int i = fTabWidget->count() - 1; i > -1; i--) {
+        TabWidget *t = static_cast<TabWidget*>(ui->tw->widget(i));
+        if (!t->allowClose()) {
+            return false;
+        }
+    }
+    while (fTabWidget->count() > 0) {
+        fTabWidget->widget(0)->deleteLater();
+        fTabWidget->removeTab(0);
+    }
+    return true;
+}
+
 void Dashboard::timeoutHideMenu()
 {
     if (ui->wMenu->width() > 10) {
@@ -132,13 +165,16 @@ void Dashboard::on_btnReservations_clicked()
 
 void Dashboard::on_actionNew_reservation_triggered()
 {
-    createTabWidget<ChartWindow>();
+
 }
 
 void Dashboard::on_tw_tabCloseRequested(int index)
 {
-    ui->tw->widget(index)->deleteLater();
-    ui->tw->removeTab(index);
+    TabWidget *t = static_cast<TabWidget*>(ui->tw->widget(index));
+    if (t->allowClose()) {
+        ui->tw->widget(index)->deleteLater();
+        ui->tw->removeTab(index);
+    }
 }
 
 void Dashboard::on_btnBills_clicked()
@@ -151,10 +187,15 @@ void Dashboard::on_btnLogin_clicked()
     if (ui->btnLogin->property("login").toBool()) {
         if (Login::login()) {
             prepareMenu();
+            fTabWidget->cornerWidget(Qt::TopRightCorner)->setEnabled(true);
         }
     } else {
         if (Message::yesNo(tr("Confirm to logout")) == Message::rYes) {
-            disableMenu();
+            if (closeAllTab()) {
+                disableMenu();
+                fTabWidget->cornerWidget(Qt::TopRightCorner)->setEnabled(false);
+                __socket.disconnectFromHost();
+            }
         }
     }
 }
@@ -165,5 +206,16 @@ void Dashboard::closeEvent(QCloseEvent *event)
         event->ignore();
         return;
     }
+    if (!closeAllTab()) {
+        event->ignore();
+        return;
+    }
+    __socket.disconnectFromHost();
+    __user->unreg();
     QWidget::closeEvent(event);
+}
+
+void Dashboard::on_actionRoom_chart_triggered()
+{
+    createTabWidget<ChartWindow>();
 }

@@ -7,6 +7,7 @@
 #include "c5combodelegate.h"
 #include "c5tableview.h"
 #include "c5config.h"
+#include "c5message.h"
 #include "c5widget.h"
 #include <QDebug>
 #include <QHBoxLayout>

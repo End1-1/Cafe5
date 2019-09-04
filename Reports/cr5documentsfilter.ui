@@ -14,6 +14,30 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="12" column="0" colspan="4">
+    <widget class="QLabel" name="label_8">
+     <property name="text">
+      <string>*Only for documents in the store</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Document state</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="3">
+    <widget class="C5LineEdit" name="lePaidName">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+    </widget>
+   </item>
    <item row="0" column="2">
     <widget class="C5DateEdit" name="deStart">
      <property name="minimumSize">
@@ -30,61 +54,6 @@
      </property>
      <property name="FilterName" stdset="0">
       <string>date1</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Date start</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="2">
-    <widget class="C5LineEditWithSelector" name="lePartner">
-     <property name="minimumSize">
-      <size>
-       <width>100</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="FilterName" stdset="0">
-      <string>supplier</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="3">
-    <widget class="C5LineEdit" name="leDocTypeName">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="2">
-    <widget class="C5LineEditWithSelector" name="leDocType">
-     <property name="minimumSize">
-      <size>
-       <width>100</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="FilterName" stdset="0">
-      <string>doctype</string>
      </property>
     </widget>
    </item>
@@ -107,17 +76,22 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>Document type</string>
+   <item row="1" column="2">
+    <widget class="C5DateEdit" name="deEnd">
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>0</height>
+      </size>
      </property>
-    </widget>
-   </item>
-   <item row="6" column="0">
-    <widget class="QLabel" name="label_7">
-     <property name="text">
-      <string>Reason*</string>
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>date2</string>
      </property>
     </widget>
    </item>
@@ -128,17 +102,141 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>Document state</string>
+   <item row="4" column="3">
+    <widget class="C5LineEdit" name="lePartnerName">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
      </property>
     </widget>
    </item>
-   <item row="4" column="0">
-    <widget class="QLabel" name="label_5">
+   <item row="5" column="3">
+    <widget class="C5LineEdit" name="leOperatorName">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="0">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>223</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_3">
      <property name="text">
-      <string>Supplier</string>
+      <string>Document type</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_6">
+     <property name="text">
+      <string>Operator</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="3">
+    <widget class="C5LineEdit" name="leDocTypeName">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="3">
+    <widget class="C5LineEdit" name="leReasonName">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="2">
+    <widget class="C5LineEditWithSelector" name="lePaid">
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>reason</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="0">
+    <widget class="QLabel" name="label_7">
+     <property name="text">
+      <string>Reason*</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="2">
+    <widget class="C5LineEditWithSelector" name="leReason">
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>reason</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Date start</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="2">
+    <widget class="C5LineEditWithSelector" name="leDocType">
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>doctype</string>
      </property>
     </widget>
    </item>
@@ -152,18 +250,31 @@
      </property>
     </widget>
    </item>
-   <item row="7" column="0">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>Supplier</string>
      </property>
-     <property name="sizeHint" stdset="0">
+    </widget>
+   </item>
+   <item row="4" column="2">
+    <widget class="C5LineEditWithSelector" name="lePartner">
+     <property name="minimumSize">
       <size>
-       <width>20</width>
-       <height>223</height>
+       <width>100</width>
+       <height>0</height>
       </size>
      </property>
-    </spacer>
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>supplier</string>
+     </property>
+    </widget>
    </item>
    <item row="5" column="2">
     <widget class="C5LineEditWithSelector" name="leOperator">
@@ -184,64 +295,8 @@
      </property>
     </widget>
    </item>
-   <item row="6" column="3">
-    <widget class="C5LineEdit" name="leReasonName">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="2">
-    <widget class="C5DateEdit" name="deEnd">
-     <property name="minimumSize">
-      <size>
-       <width>100</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="FilterName" stdset="0">
-      <string>date2</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="3">
-    <widget class="C5LineEdit" name="lePartnerName">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="0">
-    <widget class="QLabel" name="label_6">
-     <property name="text">
-      <string>Operator</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="3">
-    <widget class="C5LineEdit" name="leOperatorName">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-    </widget>
-   </item>
    <item row="6" column="2">
-    <widget class="C5LineEditWithSelector" name="leReason">
+    <widget class="C5LineEditWithSelector" name="lePayment">
      <property name="minimumSize">
       <size>
        <width>100</width>
@@ -259,10 +314,27 @@
      </property>
     </widget>
    </item>
-   <item row="8" column="0" colspan="4">
-    <widget class="QLabel" name="label_8">
+   <item row="6" column="3">
+    <widget class="C5LineEdit" name="lePaymentName">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0">
+    <widget class="QLabel" name="label_9">
      <property name="text">
-      <string>*Only for documents in the store</string>
+      <string>Payment</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="0">
+    <widget class="QLabel" name="label_10">
+     <property name="text">
+      <string>Paid</string>
      </property>
     </widget>
    </item>
@@ -270,9 +342,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5DateEdit</class>
+   <class>C5LineEditWithSelector</class>
    <extends>QLineEdit</extends>
-   <header location="global">c5dateedit.h</header>
+   <header location="global">c5lineeditwithselector.h</header>
   </customwidget>
   <customwidget>
    <class>C5LineEdit</class>
@@ -280,9 +352,9 @@
    <header location="global">c5lineedit.h</header>
   </customwidget>
   <customwidget>
-   <class>C5LineEditWithSelector</class>
+   <class>C5DateEdit</class>
    <extends>QLineEdit</extends>
-   <header location="global">c5lineeditwithselector.h</header>
+   <header location="global">c5dateedit.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

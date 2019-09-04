@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -25,29 +25,35 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
+        ../HotelFiles/cmd.cpp \
+        ../HotelFiles/widgetcontainer.cpp \
+        ../HotelFiles/widgetcontrols.cpp \
         chartwindow.cpp \
+        clientsocket.cpp \
         connectionsettings.cpp \
         dialog.cpp \
         login.cpp \
         main.cpp \
         dashboard.cpp \
         message.cpp \
+        settings.cpp \
         tabwidget.cpp \
-        user.cpp \
-        widgetcontainer.cpp \
-        widgetcontrols.cpp
+        user.cpp
 
 HEADERS += \
+        ../HotelFiles/cmd.h \
+        ../HotelFiles/widgetcontainer.h \
+        ../HotelFiles/widgetcontrols.h \
         chartwindow.h \
+        clientsocket.h \
         connectionsettings.h \
         dashboard.h \
         dialog.h \
         login.h \
         message.h \
+        settings.h \
         tabwidget.h \
-        user.h \
-        widgetcontainer.h \
-        widgetcontrols.h
+        user.h
 
 FORMS += \
         chartwindow.ui \
@@ -63,6 +69,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     res.qrc
+
+INCLUDEPATH += ..\HotelFiles
 
 DEFINES += _ORGANIZATION_=\\\"SmartHotel\\\"
 DEFINES += _APPLICATION_=\\\"Hotel\\\"

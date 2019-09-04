@@ -2,6 +2,8 @@
 #include "ui_cr5storedocumentsfilter.h"
 #include "c5cache.h"
 #include "cachestorereason.h"
+#include "cacheheaderpayment.h"
+#include "cacheheadepaid.h"
 
 CR5StoreDocumentsFilter::CR5StoreDocumentsFilter(const QStringList &dbParams, QWidget *parent) :
     C5FilterWidget(dbParams, parent),
@@ -11,6 +13,8 @@ CR5StoreDocumentsFilter::CR5StoreDocumentsFilter(const QStringList &dbParams, QW
     ui->leStore->setSelector(dbParams, ui->leStoreName, cache_goods_store);
     ui->leType->setSelector(dbParams, ui->leTypeName, cache_doc_type);
     ui->leReason->setSelector(dbParams, ui->leReasonName, cache_store_reason);
+    ui->lePayment->setSelector(dbParams, ui->lePaymentName, cache_header_payment);
+    ui->lePaid->setSelector(dbParams, ui->lePaidName, cache_header_paid);
 }
 
 CR5StoreDocumentsFilter::~CR5StoreDocumentsFilter()
@@ -23,6 +27,12 @@ QString CR5StoreDocumentsFilter::condition()
     QString result = "where h.f_date between " + ui->deStart->toMySQLDate() + " and " + ui->deEnd->toMySQLDate();
     if (!ui->leType->isEmpty()) {
         result += " and h.f_type in (" + ui->leType->text() + ") ";
+    }
+    if (!ui->lePayment->isEmpty()) {
+        result += " and h.f_payment in (" + ui->lePaymentName->text() + ") ";
+    }
+    if (!ui->lePaid->isEmpty()) {
+        result += " and h.f_paid in (" + QString::number(ui->lePaid->getInteger() - 1) + ") ";
     }
     return result;
 }

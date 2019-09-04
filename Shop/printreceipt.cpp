@@ -39,9 +39,10 @@ void PrintReceipt::print(const QString &id)
     db.exec("select g.f_name, t.f_adgcode, s.f_code, o.f_qty, o.f_price, o.f_total, o.f_sign, o.f_taxdept "
             "from o_goods o "
             "left join c_goods g on g.f_id=o.f_goods "
-            "left join c_groups t on g.f_id=g.f_group "
+            "left join c_groups t on t.f_id=g.f_group "
             "left join c_goods_scancode s on s.f_goods=g.f_id and s.f_receipt=1 "
-            "where o.f_header=:f_header");
+            "where o.f_header=:f_header "
+            "order by o.f_row ");
     QList<QList<QVariant> > data;
     bool fModeRefund = false;
     QString taxDept;

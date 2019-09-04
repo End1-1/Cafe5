@@ -45,3 +45,16 @@ alter table o_body change column f_print1 f_print1 tinytext, change column  f_pr
 create table d_special (f_id integer primary key auto_increment, f_dish integer, f_comment tinytext);
 alter table o_tax_debug add column f_mark tinytext;
 alter table o_tax_debug add column f_elapsed integer;
+alter table o_body add f_timeorder smallint
+alter table o_goods add f_row smallint;
+
+/* 040919 */
+alter table c_goods add f_lowlevel decimal(12,4);
+INSERT INTO `a_reason` (`f_id`, `f_name`) VALUES ('8', 'Կոմպլեկտավորում');
+alter table a_header add column f_payment smallint, add column f_paid smallint;
+create table a_header_paid (f_id integer primary key, f_name tinytext);
+insert into a_header_paid (f_id, f_name) values (1, 'Չվճարված'), (2, 'Վճարված'), (3, 'Բոլորը');
+create table a_header_payment (f_id integer primary key, f_name tinytext);
+insert into a_header_payment (f_id, f_name) values (1, 'Կանխիկ'), (2, 'Բանկային քարտ'), (3, 'Փոխանցում');
+insert into a_type  values (6, 'Կոմպլեկտավորում', 0);
+create table c_goods_complectation (f_id integer primary key auto_increment, f_base integer, f_goods integer, f_qty decimal(14,2), f_price decimal(14,3));

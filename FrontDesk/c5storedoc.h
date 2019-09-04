@@ -22,7 +22,7 @@ class C5StoreDoc : public C5Widget
     Q_OBJECT
 
 public:
-    enum STORE_DOC {sdInput = 1, sdOutput, sdMovement};
+    enum STORE_DOC {sdInput = 1, sdOutput, sdMovement, sdInventory, sdCash, sdComplectation};
 
     explicit C5StoreDoc(const QStringList &dbParams, QWidget *parent = nullptr);
 
@@ -60,11 +60,17 @@ private:
 
     TableCell *fGroupTableCell;
 
+    QMap<int, double> fBaseQtyOfComplectation;
+
     bool fGroupTableCellMove;
 
     void countTotal();
 
+    void countQtyOfComplectation();
+
     bool docCheck(QString &err);
+
+    void rowsCheck(QString &err);
 
     bool save(int state, QString &err);
 
@@ -142,6 +148,10 @@ private slots:
     void on_tblGoodsGroup_customContextMenuRequested(const QPoint &pos);
 
     void on_btnCreateDoc_clicked();
+
+    void on_leComplectationName_textChanged(const QString &arg1);
+
+    void on_leComplectationQty_textChanged(const QString &arg1);
 };
 
 #endif // C5STOREDOC_H

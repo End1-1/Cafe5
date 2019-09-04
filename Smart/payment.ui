@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>622</width>
+    <width>643</width>
     <height>292</height>
    </rect>
   </property>
@@ -237,9 +237,18 @@
        </widget>
       </item>
       <item row="2" column="0" colspan="4">
-       <widget class="QTableWidget" name="tableWidget">
+       <widget class="QTableWidget" name="tblChange">
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>102</height>
+         </size>
+        </property>
         <property name="focusPolicy">
          <enum>Qt::ClickFocus</enum>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">border:0xp;</string>
         </property>
         <property name="verticalScrollBarPolicy">
          <enum>Qt::ScrollBarAlwaysOff</enum>
@@ -263,7 +272,7 @@
          <bool>false</bool>
         </attribute>
         <attribute name="verticalHeaderDefaultSectionSize">
-         <number>28</number>
+         <number>50</number>
         </attribute>
         <attribute name="verticalHeaderMinimumSectionSize">
          <number>50</number>
@@ -273,6 +282,16 @@
           <string>New Row</string>
          </property>
         </row>
+        <row>
+         <property name="text">
+          <string>New Row</string>
+         </property>
+        </row>
+        <column>
+         <property name="text">
+          <string>New Column</string>
+         </property>
+        </column>
         <column>
          <property name="text">
           <string>New Column</string>

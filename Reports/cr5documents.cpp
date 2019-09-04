@@ -136,7 +136,8 @@ void CR5Documents::openDoc(QString id)
     switch (docType(id)) {
     case DOC_TYPE_STORE_INPUT:
     case DOC_TYPE_STORE_OUTPUT:
-    case DOC_TYPE_STORE_MOVE: {
+    case DOC_TYPE_STORE_MOVE:
+    case DOC_TYPE_COMPLECTATION: {
         auto *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);
         if (!sd->openDoc(id)) {
             __mainWindow->removeTab(sd);

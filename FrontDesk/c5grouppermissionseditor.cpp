@@ -28,7 +28,6 @@ public:
     }
     QProxyStyle::drawControl(element, option, painter, widget);
   }
-
 };
 
 C5GroupPermissionsEditor::C5GroupPermissionsEditor(const QStringList &dbParams, QWidget *parent) :

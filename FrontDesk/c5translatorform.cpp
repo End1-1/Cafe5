@@ -1,6 +1,7 @@
 #include "c5translatorform.h"
 #include "ui_c5translatorform.h"
 #include "c5lineedit.h"
+#include "c5message.h"
 
 C5TranslatorForm::C5TranslatorForm(const QStringList &dbParams, QWidget *parent) :
     C5Widget(dbParams, parent),

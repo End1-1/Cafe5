@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>263</width>
-    <height>163</height>
+    <height>137</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,13 +29,6 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>Host</string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="1">
        <widget class="QLineEdit" name="lineEdit">
         <property name="settings" stdset="0">
@@ -49,55 +42,21 @@
       <item row="1" column="0">
        <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>Database</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QLineEdit" name="lineEdit_2">
-        <property name="settings" stdset="0">
-         <string>database</string>
-        </property>
-        <property name="noset" stdset="0">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Username</string>
+         <string>Port</string>
         </property>
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QLineEdit" name="lineEdit_3">
-        <property name="settings" stdset="0">
-         <string>username</string>
-        </property>
-        <property name="noset" stdset="0">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="label_4">
-        <property name="text">
-         <string>Password</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
        <widget class="QLineEdit" name="lineEdit_4">
         <property name="settings" stdset="0">
-         <string>password</string>
+         <string>hostpassword</string>
         </property>
         <property name="noset" stdset="0">
          <bool>true</bool>
         </property>
        </widget>
       </item>
-      <item row="4" column="0" colspan="2">
+      <item row="3" column="0" colspan="2">
        <widget class="QWidget" name="widget_2" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
@@ -141,6 +100,30 @@
           </spacer>
          </item>
         </layout>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Host</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="lineEdit_2">
+        <property name="settings" stdset="0">
+         <string>port</string>
+        </property>
+        <property name="noset" stdset="0">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Password</string>
+        </property>
        </widget>
       </item>
      </layout>
