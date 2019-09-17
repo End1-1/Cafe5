@@ -52,6 +52,8 @@ SOURCES += \
     ../Cache/cachediscounttype.cpp \
     ../Cache/cachedish.cpp \
     ../Cache/cachegoodswaste.cpp \
+    ../Cache/cacheheadepaid.cpp \
+    ../Cache/cacheheaderpayment.cpp \
     ../Cache/cachestorereason.cpp \
     ../Cafe5/c5cafecommon.cpp \
     ../Classes/c5jsondb.cpp \
@@ -141,6 +143,8 @@ HEADERS += \
     ../Cache/cachediscounttype.h \
     ../Cache/cachedish.h \
     ../Cache/cachegoodswaste.h \
+    ../Cache/cacheheadepaid.h \
+    ../Cache/cacheheaderpayment.h \
     ../Cache/cachestorereason.h \
     ../Cafe5/c5cafecommon.h \
     ../Classes/c5jsondb.h \

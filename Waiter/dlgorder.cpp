@@ -332,6 +332,8 @@ void DlgOrder::itemsToTable()
         ui->tblOrder->item(i, 0)->setData(Qt::UserRole, fOrder->fItems[i].toObject());
         if (fOrder->iInt("f_state", i) != DISH_STATE_OK) {
             ui->tblOrder->setRowHidden(i, true);
+        } else {
+            ui->tblOrder->setRowHidden(i, false);
         }
     }
     ui->leTotal->setText(float_str(fOrder->hString("f_amounttotal").toDouble(), 2));

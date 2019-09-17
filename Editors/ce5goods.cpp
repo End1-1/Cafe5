@@ -102,6 +102,7 @@ void CE5Goods::clear()
     ui->lstCodes->clear();
     ui->tblGoods->clearContents();
     ui->tblGoods->setRowCount(0);
+    ui->leLowLevel->setText("0");
 }
 
 void CE5Goods::on_leAddScanCode_returnPressed()

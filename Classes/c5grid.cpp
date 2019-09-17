@@ -460,6 +460,8 @@ int C5Grid::newRow()
     QModelIndexList ml = ui->tblView->selectionModel()->selectedIndexes();
     if (ml.count() > 0) {
         row = ml.at(0).row();
+    } else {
+        return -1;
     }
     for (int i = 0; i < data.count(); i++) {
         fModel->insertRow(row);

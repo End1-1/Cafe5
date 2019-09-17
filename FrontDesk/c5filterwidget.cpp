@@ -7,7 +7,7 @@
 C5FilterWidget::C5FilterWidget(const QStringList &dbParams, QWidget *parent) :
     C5Widget(dbParams, parent)
 {
-
+    fFocusNextChild = false;
 }
 
 void C5FilterWidget::saveFilter(QWidget *parent)

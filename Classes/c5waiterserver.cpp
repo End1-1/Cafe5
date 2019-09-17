@@ -788,7 +788,8 @@ bool C5WaiterServer::printBill(QJsonObject &jh, QJsonArray &jb, QString &err, C5
     }
     // TODO: CHECK FOR DESTINATION PRINTER AND REDIRECT QUERY
     if (err.isEmpty()) {
-        C5PrintReceiptThread *pr = new C5PrintReceiptThread(C5Config::dbParams(), jh, jb, C5Config::localReceiptPrinter());
+        //C5PrintReceiptThread *pr = new C5PrintReceiptThread(C5Config::dbParams(), jh, jb, C5Config::localReceiptPrinter());
+        C5PrintReceiptThread50mm *pr = new C5PrintReceiptThread50mm(C5Config::dbParams(), jh, jb, C5Config::localReceiptPrinter());
         pr->fBill = true;
         pr->start();
     }
@@ -871,7 +872,8 @@ bool C5WaiterServer::printReceipt(QJsonObject &jh, QJsonArray &jb, QString &err,
                 printerName = db.getString(0);
             }
         }
-        C5PrintReceiptThread *pr = new C5PrintReceiptThread(C5Config::dbParams(), jh, jb, printerName);
+        //C5PrintReceiptThread *pr = new C5PrintReceiptThread(C5Config::dbParams(), jh, jb, printerName);
+        C5PrintReceiptThread50mm *pr = new C5PrintReceiptThread50mm(C5Config::dbParams(), jh, jb, printerName);
         pr->start();
     }
     return err.isEmpty();
