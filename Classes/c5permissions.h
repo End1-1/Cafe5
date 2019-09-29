@@ -35,6 +35,7 @@
 #define cp_t3_sale_dishes 309
 #define cp_t3_sale_from_store_total 310
 #define cp_t3_discount_statistics 311
+#define cp_t3_debts_to_partners 312
 
 #define cp_t4_menu 400
 #define cp_t4_menu_names 401
@@ -73,6 +74,7 @@
 #define cp_t7_upload_date_settings 706
 #define cp_t7_translator 707
 #define cp_t7_store_reason 708
+#define cp_t7_customers 709
 
 #define cp_t8_cash 800
 #define cp_t8_cash_doc 801

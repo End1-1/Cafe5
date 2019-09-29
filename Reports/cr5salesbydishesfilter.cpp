@@ -1,7 +1,6 @@
 #include "cr5salesbydishesfilter.h"
 #include "ui_cr5salesbydishesfilter.h"
 #include "c5cache.h"
-#include "cachedishstate.h"
 
 CR5SalesByDishesFilter::CR5SalesByDishesFilter(const QStringList &dbParams, QWidget *parent) :
     C5FilterWidget(dbParams, parent),

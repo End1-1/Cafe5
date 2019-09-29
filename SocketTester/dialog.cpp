@@ -9,9 +9,11 @@ Dialog::Dialog(QWidget *parent) :
     ui(new Ui::Dialog)
 {
     ui->setupUi(this);
+    fRawRead = false;
     ui->lePort->setText(s.value("port").toString());
     ui->leAddress->setText(s.value("address").toString());
     connect(&fSocket, SIGNAL(readyRead()), this, SLOT(readyRead()));
+    connect(&fSocket, SIGNAL(disconnected()), this, SLOT(disconnected()));
 }
 
 Dialog::~Dialog()
@@ -56,10 +58,25 @@ void Dialog::on_btnSend_clicked()
 
 void Dialog::readyRead()
 {
-    if (datasize == 0) {
-        fSocket.read(reinterpret_cast<char *>(&datasize), sizeof(datasize));
-        ui->teLog->append(QString::number(datasize));
+    if (!fRawRead) {
+        if (datasize == 0) {
+            fSocket.read(reinterpret_cast<char *>(&datasize), sizeof(datasize));
+            ui->teLog->append(QString::number(datasize));
+        }
     }
     ui->teLog->append(fSocket.readAll());
     datasize = 0;
+}
+
+void Dialog::disconnected()
+{
+    ui->teLog->append("Disconnected");
+}
+
+void Dialog::on_btnRowSend_clicked()
+{
+    fRawRead = true;
+    int datasize = ui->teData->toPlainText().toUtf8().length();
+    ui->teLog->append(QString::number(fSocket.write(ui->teData->toPlainText().toUtf8(), datasize)));
+    fSocket.flush();
 }

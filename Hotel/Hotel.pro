@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network
+QT       += core gui network sql printsupport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -25,9 +25,18 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
+        ../Cafe5/c5config.cpp \
+        ../Cafe5/c5database.cpp \
+        ../Cafe5/c5utils.cpp \
+        ../Controls/c5dateedit.cpp \
+        ../Controls/c5lineedit.cpp \
         ../HotelFiles/cmd.cpp \
         ../HotelFiles/widgetcontainer.cpp \
         ../HotelFiles/widgetcontrols.cpp \
+        chartdatescene.cpp \
+        chartitemmonthrect.cpp \
+        chartitemrect.cpp \
+        chartparams.cpp \
         chartwindow.cpp \
         clientsocket.cpp \
         connectionsettings.cpp \
@@ -41,9 +50,18 @@ SOURCES += \
         user.cpp
 
 HEADERS += \
+        ../Cafe5/c5config.h \
+        ../Cafe5/c5database.h \
+        ../Cafe5/c5utils.h \
+        ../Controls/c5dateedit.h \
+        ../Controls/c5lineedit.h \
         ../HotelFiles/cmd.h \
         ../HotelFiles/widgetcontainer.h \
         ../HotelFiles/widgetcontrols.h \
+        chartdatescene.h \
+        chartitemmonthrect.h \
+        chartitemrect.h \
+        chartparams.h \
         chartwindow.h \
         clientsocket.h \
         connectionsettings.h \
@@ -71,7 +89,10 @@ RESOURCES += \
     res.qrc
 
 INCLUDEPATH += ..\HotelFiles
+INCLUDEPATH += ..\Controls
+INCLUDEPATH += ..\Cafe5
 
 DEFINES += _ORGANIZATION_=\\\"SmartHotel\\\"
 DEFINES += _APPLICATION_=\\\"Hotel\\\"
 DEFINES += _DBDRIVER_=\\\"QMYSQL\\\"
+DEFINES += _MODULE_=\\\"HOTEL\\\"

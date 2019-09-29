@@ -1,9 +1,6 @@
 #include "cr5documentsfilter.h"
 #include "ui_cr5documentsfilter.h"
 #include "c5cache.h"
-#include "cachestorereason.h"
-#include "cacheheadepaid.h"
-#include "cacheheaderpayment.h"
 
 CR5DocumentsFilter::CR5DocumentsFilter(const QStringList &dbParams, QWidget *parent) :
     C5FilterWidget(dbParams, parent),

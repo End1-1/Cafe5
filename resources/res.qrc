@@ -60,5 +60,7 @@
         <file>warning.png</file>
         <file>calculator.png</file>
         <file>decision.png</file>
+        <file>customers.png</file>
+        <file>contract.png</file>
     </qresource>
 </RCC>

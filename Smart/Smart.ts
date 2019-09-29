@@ -120,6 +120,14 @@
     </message>
 </context>
 <context>
+    <name>C5Printing</name>
+    <message>
+        <location filename="../Classes/c5printing.cpp" line="297"/>
+        <source>Failed send order to remote printer</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>C5Selector</name>
     <message>
         <location filename="../FrontDesk/c5selector.ui" line="14"/>
@@ -233,14 +241,6 @@
         <location filename="../../NewTax/Src/printtaxn.cpp" line="75"/>
         <source>Data read timeout</source>
         <translation></translation>
-    </message>
-</context>
-<context>
-    <name>QObject</name>
-    <message>
-        <location filename="../Classes/c5printing.cpp" line="296"/>
-        <source>Failed send order to remote printer</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -421,99 +421,99 @@
         <translation>Անկանխիկ</translation>
     </message>
     <message>
-        <location filename="payment.cpp" line="119"/>
+        <location filename="payment.cpp" line="121"/>
         <source>Receipt #</source>
         <translation>Պատվեր №</translation>
     </message>
     <message>
-        <location filename="payment.cpp" line="127"/>
+        <location filename="payment.cpp" line="129"/>
         <source>Department</source>
         <translation>Բաժին</translation>
     </message>
     <message>
         <location filename="payment.ui" line="235"/>
-        <location filename="payment.cpp" line="130"/>
+        <location filename="payment.cpp" line="132"/>
         <source>Tax number</source>
         <translation>ՀԴՄ կտրոնի համար</translation>
     </message>
     <message>
-        <location filename="payment.cpp" line="133"/>
+        <location filename="payment.cpp" line="135"/>
         <source>Device number</source>
         <translation>ԳՀ</translation>
     </message>
     <message>
-        <location filename="payment.cpp" line="136"/>
+        <location filename="payment.cpp" line="138"/>
         <source>Serial</source>
         <translation>ԱՀ</translation>
     </message>
     <message>
-        <location filename="payment.cpp" line="139"/>
+        <location filename="payment.cpp" line="141"/>
         <source>Fiscal</source>
         <translation>Ֆիսկալ</translation>
     </message>
     <message>
-        <location filename="payment.cpp" line="142"/>
+        <location filename="payment.cpp" line="144"/>
         <source>Receipt number</source>
         <translation>ԿՀ</translation>
     </message>
     <message>
-        <location filename="payment.cpp" line="145"/>
+        <location filename="payment.cpp" line="147"/>
         <source>Date</source>
         <translation>Ամսաթիվ</translation>
     </message>
     <message>
-        <location filename="payment.cpp" line="148"/>
-        <location filename="payment.cpp" line="250"/>
+        <location filename="payment.cpp" line="150"/>
+        <location filename="payment.cpp" line="252"/>
         <source>(F)</source>
         <translation>(Ֆ)</translation>
     </message>
     <message>
-        <location filename="payment.cpp" line="171"/>
+        <location filename="payment.cpp" line="173"/>
         <source>Class:</source>
         <translation>Դաս՝</translation>
     </message>
     <message>
-        <location filename="payment.cpp" line="203"/>
+        <location filename="payment.cpp" line="205"/>
         <source>Printed</source>
         <translation>Տպված</translation>
     </message>
     <message>
-        <location filename="payment.cpp" line="151"/>
+        <location filename="payment.cpp" line="153"/>
         <source>Staff</source>
         <translation>Սպասարկող</translation>
     </message>
     <message>
-        <location filename="payment.cpp" line="115"/>
+        <location filename="payment.cpp" line="117"/>
         <source>Invalid order number</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="payment.cpp" line="157"/>
+        <location filename="payment.cpp" line="159"/>
         <source>Class | Name | Qty | Price | Total</source>
         <translation>Դաս՝ | Անվանում | Քնկ | Գին | Ընդամենը</translation>
     </message>
     <message>
-        <location filename="payment.cpp" line="181"/>
+        <location filename="payment.cpp" line="183"/>
         <source>Need to pay</source>
         <translation>Ենթակա է վճարման</translation>
     </message>
     <message>
-        <location filename="payment.cpp" line="190"/>
+        <location filename="payment.cpp" line="192"/>
         <source>Payment, cash</source>
         <translation>Կանխիկ</translation>
     </message>
     <message>
-        <location filename="payment.cpp" line="194"/>
+        <location filename="payment.cpp" line="196"/>
         <source>Payment, card</source>
         <translation>Անկանխիկ</translation>
     </message>
     <message>
-        <location filename="payment.cpp" line="201"/>
+        <location filename="payment.cpp" line="203"/>
         <source>Thank you for visit!</source>
         <translation>Շնորհակալություն այցելության համար</translation>
     </message>
     <message>
-        <location filename="payment.cpp" line="206"/>
+        <location filename="payment.cpp" line="208"/>
         <source>Sample</source>
         <translation>Օրնկ․</translation>
     </message>

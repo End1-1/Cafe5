@@ -14,31 +14,14 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="3" column="0">
-    <widget class="QLabel" name="label_5">
+   <item row="0" column="2">
+    <widget class="QLabel" name="label_6">
      <property name="text">
-      <string>Cash input</string>
+      <string>Document number</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="2">
-    <widget class="QLabel" name="lbStoreDoc">
-     <property name="text">
-      <string>Store document</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1">
-    <widget class="C5DateEdit" name="deDate">
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="0" colspan="6">
+   <item row="7" column="0" colspan="6">
     <widget class="QWidget" name="widget" native="true">
      <layout class="QGridLayout" name="gridLayout_2">
       <property name="leftMargin">
@@ -103,6 +86,52 @@
      </layout>
     </widget>
    </item>
+   <item row="6" column="0">
+    <widget class="QToolButton" name="btnNewRow">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources/res.qrc">
+       <normaloff>:/add.png</normaloff>:/add.png</iconset>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="C5LineEditWithSelector" name="leOutput">
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>Cash input</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Cash, output</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="4">
+    <widget class="QToolButton" name="btnOpenStoreDoc">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources/res.qrc">
+       <normaloff>:/folder.png</normaloff>:/folder.png</iconset>
+     </property>
+    </widget>
+   </item>
    <item row="2" column="5">
     <spacer name="horizontalSpacer">
      <property name="orientation">
@@ -116,29 +145,8 @@
      </property>
     </spacer>
    </item>
-   <item row="4" column="1" colspan="5">
-    <widget class="QLineEdit" name="leRemarks"/>
-   </item>
-   <item row="5" column="0">
-    <widget class="QToolButton" name="btnNewRow">
-     <property name="text">
-      <string/>
-     </property>
-     <property name="icon">
-      <iconset resource="../resources/res.qrc">
-       <normaloff>:/add.png</normaloff>:/add.png</iconset>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>Cash, output</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="3">
-    <widget class="QLineEdit" name="leStoreDoc">
+   <item row="0" column="1">
+    <widget class="C5DateEdit" name="deDate">
      <property name="maximumSize">
       <size>
        <width>100</width>
@@ -171,20 +179,10 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="2">
-    <widget class="QLabel" name="label_6">
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_4">
      <property name="text">
-      <string>Document number</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1">
-    <widget class="C5LineEditWithSelector" name="leOutput">
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
+      <string>Remarks</string>
      </property>
     </widget>
    </item>
@@ -192,13 +190,6 @@
     <widget class="QLabel" name="label">
      <property name="text">
       <string>Date</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>Remarks</string>
      </property>
     </widget>
    </item>
@@ -212,14 +203,47 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="4">
-    <widget class="QToolButton" name="btnOpenStoreDoc">
+   <item row="5" column="1" colspan="5">
+    <widget class="QLineEdit" name="leRemarks"/>
+   </item>
+   <item row="1" column="2">
+    <widget class="QLabel" name="lbStoreDoc">
      <property name="text">
-      <string/>
+      <string>Store document</string>
      </property>
-     <property name="icon">
-      <iconset resource="../resources/res.qrc">
-       <normaloff>:/folder.png</normaloff>:/folder.png</iconset>
+    </widget>
+   </item>
+   <item row="1" column="3">
+    <widget class="QLineEdit" name="leStoreDoc">
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_7">
+     <property name="text">
+      <string>Partner</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="C5LineEditWithSelector" name="lePartner">
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="2" colspan="2">
+    <widget class="C5LineEditWithSelector" name="lePartnerName">
+     <property name="enabled">
+      <bool>false</bool>
      </property>
     </widget>
    </item>
@@ -227,14 +251,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5LineEdit</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5lineedit.h</header>
-  </customwidget>
-  <customwidget>
    <class>C5LineEditWithSelector</class>
    <extends>QLineEdit</extends>
    <header location="global">c5lineeditwithselector.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5LineEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5lineedit.h</header>
   </customwidget>
   <customwidget>
    <class>C5TableWidget</class>

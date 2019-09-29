@@ -4,6 +4,7 @@
 #include "c5waiterorder.h"
 #include "c5waiterorderdoc.h"
 #include "c5dishwidget.h"
+#include "proxytablewidgetdatabase.h"
 #include <QMenu>
 
 C5WaiterOrder::C5WaiterOrder(const QStringList &dbParams, QWidget *parent) :
@@ -14,6 +15,7 @@ C5WaiterOrder::C5WaiterOrder(const QStringList &dbParams, QWidget *parent) :
     fLabel = tr("Order");
     fIcon = ":/order.png";
     ui->tblLog->setColumnWidths(ui->tblLog->columnCount(), 100, 80, 200, 200, 200, 200);
+    ui->tblStore->setColumnWidths(ui->tblStore->columnCount(), 80, 300, 200, 300, 80, 80, 80, 80);
 }
 
 C5WaiterOrder::~C5WaiterOrder()
@@ -129,7 +131,7 @@ void C5WaiterOrder::showLog()
     db.exec("select f_date, f_time, f_user, f_action, f_value1, f_value2 "
             "from airlog.log "
             "where f_invoice=:f_invoice "
-            "order by f_date desc, f_time desc ");
+            "order by f_id desc ");
     ui->tblLog->setRowCount(db.rowCount());
     int row = 0;
     while (db.nextRow()) {
@@ -141,6 +143,28 @@ void C5WaiterOrder::showLog()
         ui->tblLog->setData(row, 5, db.getString("f_value2"));
         row++;
     }
+}
+
+void C5WaiterOrder::showStore()
+{
+    ui->tblStore->clearContents();
+    ui->tblStore->setRowCount(0);
+    C5Database db(fDBParams);
+    db[":f_header"] = ui->leUuid->text();
+    db[":f_state1"] = DISH_STATE_OK;
+    db[":f_state2"] = DISH_STATE_VOID;
+    db.exec("select sn.f_name as f_dishstatename, d.f_name as f_dishname, st.f_name as f_storename, "
+            "g.f_name as f_goodsname, b.f_qty1, r.f_qty, o.f_qty as f_outputqty, o.f_price, "
+            "o.f_qty*o.f_price as f_total "
+            "from o_store_output o "
+            "inner join o_body b on b.f_id=o.f_body "
+            "inner join o_body_state sn on sn.f_id=b.f_state "
+            "inner join d_dish d on d.f_id=b.f_dish "
+            "inner join c_storages st on st.f_id=b.f_store "
+            "inner join d_recipes r on r.f_dish=b.f_dish "
+            "inner join c_goods g on g.f_id=r.f_goods and r.f_goods=o.f_goods "
+            "where b.f_header=:f_header and (b.f_state=:f_state1 or b.f_state=:f_state2)");
+    ProxyTableWidgetDatabase::fillTableWidgetRowFromDatabase(&db, ui->tblStore);
 }
 
 void C5WaiterOrder::removeOrder()
@@ -222,6 +246,9 @@ void C5WaiterOrder::on_tabWidget_currentChanged(int index)
 {
     switch (index) {
     case 2:
+        showStore();
+        break;
+    case 3:
         showLog();
         break;
     }

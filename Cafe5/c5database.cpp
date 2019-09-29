@@ -51,7 +51,6 @@ C5Database::C5Database(const QString &host, const QString &db, const QString &us
 
 C5Database::~C5Database()
 {
-    logEvent("Destructor" + fDb.connectionName());
     fDb = QSqlDatabase::addDatabase(_DBDRIVER_);
     QSqlDatabase::removeDatabase(fDbName);
 }

@@ -32,13 +32,6 @@ DEFINES += FRONTDESK
 
 
 SOURCES += \
-    ../Cache/cachecashnames.cpp \
-    ../Cache/cachediscounttype.cpp \
-    ../Cache/cachedish.cpp \
-    ../Cache/cachedishstate.cpp \
-    ../Cache/cacheheadepaid.cpp \
-    ../Cache/cacheheaderpayment.cpp \
-    ../Cache/cachestorereason.cpp \
     ../Cafe5/c5cafecommon.cpp \
     ../Cafe5/c5double.cpp \
     ../Classes/notificationwidget.cpp \
@@ -48,6 +41,8 @@ SOURCES += \
     ../Reports/cr5cashdetailed.cpp \
     ../Reports/cr5cashdetailedfilter.cpp \
     ../Reports/cr5cashnames.cpp \
+    ../Reports/cr5customers.cpp \
+    ../Reports/cr5debtstopartner.cpp \
     ../Reports/cr5discountstatisics.cpp \
     ../Reports/cr5discountstatisticsfilter.cpp \
     ../Reports/cr5menureview.cpp \
@@ -186,19 +181,9 @@ SOURCES += \
     ../../XLSX/src/xlsxstyles.cpp \
     ../../XLSX/src/xlsxtheme.cpp \
     ../../XLSX/src/xlsxworkbook.cpp \
-    ../../XLSX/src/xlsxwriter.cpp \
-    ../Cache/cacheorderstate.cpp \
-    ../Cache/cachegoodswaste.cpp
+    ../../XLSX/src/xlsxwriter.cpp
 
 HEADERS += \
-    ../Cache/cachecashnames.h \
-    ../Cache/cachediscounttype.h \
-    ../Cache/cachedish.h \
-    ../Cache/cachedishstate.h \
-    ../Cache/cacheheadepaid.h \
-    ../Cache/cacheheaderpayment.h \
-    ../Cache/cacheheaders.h \
-    ../Cache/cachestorereason.h \
     ../Cafe5/c5cafecommon.h \
     ../Cafe5/c5double.h \
     ../Classes/notificationwidget.h \
@@ -208,6 +193,8 @@ HEADERS += \
     ../Reports/cr5cashdetailed.h \
     ../Reports/cr5cashdetailedfilter.h \
     ../Reports/cr5cashnames.h \
+    ../Reports/cr5customers.h \
+    ../Reports/cr5debtstopartner.h \
     ../Reports/cr5discountstatisics.h \
     ../Reports/cr5discountstatisticsfilter.h \
     ../Reports/cr5menureview.h \
@@ -350,9 +337,7 @@ HEADERS += \
     ../../XLSX/src/xlsxtheme.h \
     ../../XLSX/src/xlsxworkbook.h \
     ../../XLSX/src/xlsxwriter.h \
-    ../../XLSX/src/zip.h \
-    ../Cache/cacheorderstate.h \
-    ../Cache/cachegoodswaste.h
+    ../../XLSX/src/zip.h
 
 FORMS += \
     ../Classes/notificationwidget.ui \

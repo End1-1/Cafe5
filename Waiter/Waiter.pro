@@ -48,13 +48,6 @@ SOURCES += \
     ../../XLSX/src/xlsxtheme.cpp \
     ../../XLSX/src/xlsxworkbook.cpp \
     ../../XLSX/src/xlsxwriter.cpp \
-    ../Cache/cachecashnames.cpp \
-    ../Cache/cachediscounttype.cpp \
-    ../Cache/cachedish.cpp \
-    ../Cache/cachegoodswaste.cpp \
-    ../Cache/cacheheadepaid.cpp \
-    ../Cache/cacheheaderpayment.cpp \
-    ../Cache/cachestorereason.cpp \
     ../Cafe5/c5cafecommon.cpp \
     ../Classes/c5jsondb.cpp \
     ../Classes/notificationwidget.cpp \
@@ -118,9 +111,7 @@ SOURCES += \
     ../Cafe5/dlgexitbyversion.cpp \
     ../Classes/fileversion.cpp \
     dlgsearchinmenu.cpp \
-    ../Classes/c5waiterorderdoc.cpp \
-    ../Cache/cachedishstate.cpp \
-    ../Cache/cacheorderstate.cpp
+    ../Classes/c5waiterorderdoc.cpp
 
 HEADERS += \
     ../../XLSX/src/crs32.h \
@@ -139,13 +130,6 @@ HEADERS += \
     ../../XLSX/src/xlsxworkbook.h \
     ../../XLSX/src/xlsxwriter.h \
     ../../XLSX/src/zip.h \
-    ../Cache/cachecashnames.h \
-    ../Cache/cachediscounttype.h \
-    ../Cache/cachedish.h \
-    ../Cache/cachegoodswaste.h \
-    ../Cache/cacheheadepaid.h \
-    ../Cache/cacheheaderpayment.h \
-    ../Cache/cachestorereason.h \
     ../Cafe5/c5cafecommon.h \
     ../Classes/c5jsondb.h \
     ../Classes/notificationwidget.h \
@@ -211,10 +195,7 @@ HEADERS += \
     ../Cafe5/dlgexitbyversion.h \
     ../Classes/fileversion.h \
     dlgsearchinmenu.h \
-    ../Classes/c5waiterorderdoc.h \
-    ../Cache/cachedishstate.h \
-    ../Cache/cacheheaders.h \
-    ../Cache/cacheorderstate.h
+    ../Classes/c5waiterorderdoc.h
 
 FORMS += \
     ../Classes/notificationwidget.ui \

@@ -58,3 +58,13 @@ create table a_header_payment (f_id integer primary key, f_name tinytext);
 insert into a_header_payment (f_id, f_name) values (1, 'Կանխիկ'), (2, 'Բանկային քարտ'), (3, 'Փոխանցում');
 insert into a_type  values (6, 'Կոմպլեկտավորում', 0);
 create table c_goods_complectation (f_id integer primary key auto_increment, f_base integer, f_goods integer, f_qty decimal(14,2), f_price decimal(14,3));
+
+/*190919 */
+insert into s_app values ('DB', '1');
+alter table o_store_output add column f_baseqty decimal(14,4) after f_qty;
+alter table c_goods add column f_lastinputprice decimal(14,3) after f_saleprice;
+alter table o_store_output add column f_store integer after f_body ;
+
+/* DB - 2 */
+update s_app set f_version='2' where f_app='DB';
+alter table a_store_draft add column f_storein integer after f_document, add column f_storeout integer after f_storein;

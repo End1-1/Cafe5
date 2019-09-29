@@ -7,8 +7,9 @@
 #include <QJsonArray>
 #include <QMap>
 
-class C5Printing
+class C5Printing : public QObject
 {
+    Q_OBJECT
 public:
     C5Printing();
 

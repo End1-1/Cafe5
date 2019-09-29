@@ -1,5 +1,8 @@
 #include "c5dateedit.h"
-#include "c5utils.h"
+
+#define FORMAT_DATE_TO_STR "dd/MM/yyyy"
+#define FORMAT_TIME_TO_STR "HH:mm:ss"
+#define FORMAT_DATETIME_TO_STR  "dd/MM/yyyy HH:mm:ss"
 
 QDate C5DateEditFirstDate = QDate::currentDate();
 QDate C5DateEditMinDate = QDate::fromString("01/01/1900", "dd/MM/yyyy");

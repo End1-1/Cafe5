@@ -1,6 +1,6 @@
 #include "cr5cashdetailedfilter.h"
 #include "ui_cr5cashdetailedfilter.h"
-#include "cachecashnames.h"
+#include "c5cache.h"
 
 CR5CashDetailedFilter::CR5CashDetailedFilter(const QStringList &dbParams, QWidget *parent) :
     C5FilterWidget(dbParams, parent),

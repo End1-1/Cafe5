@@ -1,6 +1,6 @@
 #include "cr5commonsalesfilter.h"
 #include "ui_cr5commonsalesfilter.h"
-#include "cacheorderstate.h"
+#include "c5cache.h"
 
 CR5CommonSalesFilter::CR5CommonSalesFilter(const QStringList &dbParams, QWidget *parent) :
     C5FilterWidget(dbParams, parent),

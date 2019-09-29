@@ -20,6 +20,7 @@
 #include "cr5settings.h"
 #include "cr5goodsmovement.h"
 #include "cr5creditcards.h"
+#include "cr5debtstopartner.h"
 #include "cr5dishpart1.h"
 #include "c5toolbarwidget.h"
 #include "c5dishselfcostgenprice.h"
@@ -43,6 +44,7 @@
 #include "cr5salefromstore.h"
 #include "cr5goodsunit.h"
 #include "c5datasynchronize.h"
+#include "cr5customers.h"
 #include "cr5menunames.h"
 #include "cr5tables.h"
 #include "cr5hall.h"
@@ -296,13 +298,14 @@ void C5MainWindow::on_actionLogin_triggered()
             addTreeL3Item(it, cp_t3_documents_store, tr("Documents in the store"), ":/documents.png");
             addTreeL3Item(it, cp_t3_store, tr("Storage"), ":/goods.png");
             addTreeL3Item(it, cp_t3_store_movement, tr("Storages movements"), ":/goods.png");
+            addTreeL3Item(it, cp_t3_sale_from_store_total, tr("Detailed movement in the storage"), ":/graph.png");
             addTreeL3Item(it, cp_t3_tstore_extra, tr("T-account, extra"), ":/documents.png");
             addTreeL3Item(it, cp_t2_count_output_of_sale, tr("Consumption of goods based on sales"), ":/goods.png");
             addTreeL3Item(it, cp_t3_sales_common, tr("Sales, expert mode"), ":/graph.png");
-            addTreeL3Item(it, cp_t3_store_sale, tr("Sales from store"), ":/graph.png");
-            addTreeL3Item(it, cp_t3_sale_from_store_total, tr("Sales from store total"), ":/graph.png");
-            addTreeL3Item(it, cp_t3_sale_removed_dishes, tr("Sales, removed dishes"), ":/delete.png");
             addTreeL3Item(it, cp_t3_sale_dishes, tr("Sales, dishes"), ":/graph.png");
+            addTreeL3Item(it, cp_t3_sale_removed_dishes, tr("Sales, removed dishes"), ":/delete.png");
+            addTreeL3Item(it, cp_t3_store_sale, tr("Sales from store"), ":/graph.png");
+            addTreeL3Item(it, cp_t3_debts_to_partners, tr("Debts to partners"), ":/contract.png");
             addTreeL3Item(it, cp_t3_discount_statistics, tr("Discount statistics"), ":/discount.png");
         }
 
@@ -356,6 +359,7 @@ void C5MainWindow::on_actionLogin_triggered()
             addTreeL3Item(it, cp_t7_halls, tr("Halls"), ":/hall.png");
             addTreeL3Item(it, cp_t7_tables, tr("Tables"), ":/table.png");
             addTreeL3Item(it, cp_t7_credit_card, tr("Credit cards"), ":/credit-card.png");
+            addTreeL3Item(it, cp_t7_customers, tr("Customers"), ":/customers.png");
             addTreeL3Item(it, cp_t7_discount_system, tr("Discount system"), ":/discount.png");
             addTreeL3Item(it, cp_t7_store_reason, tr("Store reason"), ":/documents.png");
             if (db.getInt(6) > 0) {
@@ -573,6 +577,9 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
     case cp_t3_discount_statistics:
         createTab<CR5DiscountStatisics>(dbParams);
         break;
+    case cp_t3_debts_to_partners:
+        createTab<CR5DebtsToPartner>(dbParams);
+        break;
     case cp_t4_part1:
         createTab<CR5DishPart1>(dbParams);
         break;
@@ -617,6 +624,9 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
         break;
     case cp_t7_credit_card:
         createTab<CR5CreditCards>(dbParams);
+        break;
+    case cp_t7_customers:
+        createTab<CR5Customers>(dbParams);
         break;
     case cp_t7_discount_system:
         createTab<CR5DiscountSystem>(dbParams);

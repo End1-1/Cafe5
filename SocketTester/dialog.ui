@@ -91,6 +91,13 @@
          </property>
         </widget>
        </item>
+       <item>
+        <widget class="QPushButton" name="btnRowSend">
+         <property name="text">
+          <string>Raw send</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </item>

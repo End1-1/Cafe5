@@ -14,89 +14,10 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="10" column="3">
-    <widget class="QLineEdit" name="leReasonName">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
    <item row="13" column="3">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>201</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="10" column="2">
-    <widget class="C5LineEditWithSelector" name="leReason">
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="FilterName" stdset="0">
-      <string>reason</string>
-     </property>
-    </widget>
-   </item>
-   <item row="9" column="2">
-    <widget class="C5LineEditWithSelector" name="leStore">
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="FilterName" stdset="0">
-      <string>store</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="2">
-    <widget class="C5DateEdit" name="deEnd">
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="FilterName" stdset="0">
-      <string>d2</string>
-     </property>
-    </widget>
-   </item>
-   <item row="9" column="3">
-    <widget class="QLineEdit" name="leStoreName">
+    <widget class="QLineEdit" name="lePaidName">
      <property name="enabled">
       <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="2">
-    <widget class="C5DateEdit" name="deStart">
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="FilterName" stdset="0">
-      <string>d1</string>
-     </property>
-    </widget>
-   </item>
-   <item row="9" column="0">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>Store</string>
      </property>
     </widget>
    </item>
@@ -107,45 +28,16 @@
      </property>
     </widget>
    </item>
-   <item row="10" column="0">
-    <widget class="QLabel" name="label_5">
-     <property name="text">
-      <string>Reason</string>
+   <item row="13" column="2">
+    <widget class="C5LineEditWithSelector" name="lePaid">
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
      </property>
-    </widget>
-   </item>
-   <item row="11" column="0">
-    <widget class="QLabel" name="label_6">
-     <property name="text">
-      <string>Payment</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="0">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>Document type</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Date end</string>
-     </property>
-    </widget>
-   </item>
-   <item row="12" column="0">
-    <widget class="QLabel" name="label_7">
-     <property name="text">
-      <string>Paid</string>
-     </property>
-    </widget>
-   </item>
-   <item row="11" column="3">
-    <widget class="QLineEdit" name="lePaymentName">
-     <property name="enabled">
-      <bool>false</bool>
+     <property name="FilterName" stdset="0">
+      <string>payment</string>
      </property>
     </widget>
    </item>
@@ -162,6 +54,53 @@
      </property>
     </widget>
    </item>
+   <item row="9" column="2">
+    <widget class="C5LineEditWithSelector" name="leStore">
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>store</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Date end</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Store</string>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="0">
+    <widget class="QLabel" name="label_6">
+     <property name="text">
+      <string>Payment</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="2">
+    <widget class="C5LineEditWithSelector" name="leReason">
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>reason</string>
+     </property>
+    </widget>
+   </item>
    <item row="2" column="0">
     <widget class="QLabel" name="label">
      <property name="text">
@@ -169,7 +108,81 @@
      </property>
     </widget>
    </item>
-   <item row="11" column="2">
+   <item row="9" column="3">
+    <widget class="QLineEdit" name="leStoreName">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="14" column="3">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>201</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="10" column="0">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>Reason</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="2">
+    <widget class="C5DateEdit" name="deStart">
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>d1</string>
+     </property>
+    </widget>
+   </item>
+   <item row="13" column="0">
+    <widget class="QLabel" name="label_7">
+     <property name="text">
+      <string>Paid</string>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="3">
+    <widget class="QLineEdit" name="lePaymentName">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="2">
+    <widget class="C5DateEdit" name="deEnd">
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>d2</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="3">
+    <widget class="QLineEdit" name="leReasonName">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="2">
     <widget class="C5LineEditWithSelector" name="lePayment">
      <property name="maximumSize">
       <size>
@@ -182,15 +195,22 @@
      </property>
     </widget>
    </item>
-   <item row="12" column="3">
-    <widget class="QLineEdit" name="lePaidName">
-     <property name="enabled">
-      <bool>false</bool>
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Document type</string>
      </property>
     </widget>
    </item>
-   <item row="12" column="2">
-    <widget class="C5LineEditWithSelector" name="lePaid">
+   <item row="11" column="0">
+    <widget class="QLabel" name="label_8">
+     <property name="text">
+      <string>Partner</string>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="2">
+    <widget class="C5LineEditWithSelector" name="lePartner">
      <property name="maximumSize">
       <size>
        <width>100</width>
@@ -198,7 +218,14 @@
       </size>
      </property>
      <property name="FilterName" stdset="0">
-      <string>payment</string>
+      <string>partner</string>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="3">
+    <widget class="QLineEdit" name="lePartnerName">
+     <property name="enabled">
+      <bool>false</bool>
      </property>
     </widget>
    </item>

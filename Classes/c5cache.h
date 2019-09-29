@@ -19,6 +19,8 @@
 #define cache_doc_type 12
 #define cache_users 14
 #define cache_waiter_printers 15
+#define cache_dish 17
+#define cache_goods_waste 18
 #define cache_credit_card 19
 #define cache_dish_remove_reason 20
 #define cache_settings_names 21
@@ -30,6 +32,13 @@
 #define cache_s_db 27
 #define cache_halls 28
 #define cache_tables 29
+#define cache_dish_state 30
+#define cache_order_state 31
+#define cache_cash_names 32
+#define cache_store_reason 33
+#define cache_discount_type 34
+#define cache_header_payment 35
+#define cache_header_paid 36
 
 class C5Cache : public QObject
 {

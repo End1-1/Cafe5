@@ -267,14 +267,19 @@ void C5Grid::restoreColumnsWidths()
                 .arg(_APPLICATION_)
                 .arg(_MODULE_)
                 .arg(fLabel));
+
     ui->tblTotal->setColumnCount(fModel->columnCount());
     for (int i = 0; i < ui->tblTotal->columnCount(); i++) {
         ui->tblTotal->setItem(0, i, new C5TableWidgetItem());
         QString colName = fModel->nameForColumnIndex(i);
+        if (!fColumnsVisible[colName] || ui->tblView->columnWidth(i) == 0) {
+            continue;
+        }
         if (s.contains(colName)) {
+            ui->tblView->horizontalHeader()->setSectionResizeMode(i, QHeaderView::Interactive);
             ui->tblView->setColumnWidth(i, s.value(colName).toInt());
         } else {
-            ui->tblView->setColumnWidth(i, ui->tblView->horizontalHeader()->defaultSectionSize());
+            ui->tblView->horizontalHeader()->setSectionResizeMode(i, QHeaderView::ResizeToContents);
         }
     }
 }
@@ -461,17 +466,14 @@ int C5Grid::newRow()
     if (ml.count() > 0) {
         row = ml.at(0).row();
     } else {
-        return -1;
+        row = fModel->rowCount();
     }
     for (int i = 0; i < data.count(); i++) {
         fModel->insertRow(row);
         for (QMap<QString, QVariant>::const_iterator it = data.at(i).begin(); it != data.at(i).end(); it++) {
             int col = fModel->indexForColumnName(it.key());
             if (col > -1) {
-                if (fModel->rowCount() == 1) {
-                    row = -1;
-                }
-                fModel->setData(row + 1, col, it.value());
+                fModel->setData(row, col, it.value());
             }
         }
     }
@@ -761,6 +763,11 @@ void C5Grid::saveDataChanges()
 void C5Grid::refreshData()
 {
     fModel->execQuery(fSqlQuery);
+    if (fSimpleQuery) {
+        for (int i = 0; i < fModel->columnCount(); i++) {
+            fColumnsVisible[fModel->fColumnIndexName[i]] = true;
+        }
+    }
     restoreColumnsWidths();
     sumColumnsData();
 }

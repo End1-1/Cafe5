@@ -2,10 +2,13 @@
 #define CHARTWINDOW_H
 
 #include "tabwidget.h"
+#include <QDate>
 
 namespace Ui {
 class ChartWindow;
 }
+
+class ChartDateScene;
 
 class ChartWindow : public TabWidget
 {
@@ -14,12 +17,15 @@ class ChartWindow : public TabWidget
 public:
     explicit ChartWindow();
     ~ChartWindow();
-    virtual const QString title() {return tr("Chart"); }
-    virtual const QString icon() {return ":/images/chart.png"; }
+
+private slots:
+    void on_btnForward_clicked();
 
 private:
     Ui::ChartWindow *ui;
     void createDateChart();
+    ChartDateScene *fDateScene;
+    void loadScene();
 };
 
 #endif // CHARTWINDOW_H

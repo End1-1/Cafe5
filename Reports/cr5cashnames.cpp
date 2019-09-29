@@ -10,7 +10,6 @@ CR5CashNames::CR5CashNames(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_id"] = tr("Code");
     fTranslation["f_name"] = tr("Name");
     fEditor = new C5CashName(dbParams);
-
 }
 
 QToolBar *CR5CashNames::toolBar()

@@ -1,11 +1,9 @@
 #include "c5storedoc.h"
 #include "ui_c5storedoc.h"
-#include "cachestorereason.h"
 #include "c5selector.h"
 #include "c5cache.h"
 #include "c5printing.h"
 #include "c5cashdoc.h"
-#include "cacheheaderpayment.h"
 #include "c5printpreview.h"
 #include "c5editor.h"
 #include "c5mainwindow.h"
@@ -37,6 +35,11 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
     ui->lePassed->setSelector(dbParams, ui->lePassedName, cache_users);
     ui->lbCashDoc->setVisible(!C5Config::noCashDocStore());
     ui->leCashDoc->setVisible(!C5Config::noCashDocStore());
+    ui->deCashDate->setVisible(!C5Config::noCashDocStore());
+    ui->lePayment->setVisible(!C5Config::noCashDocStore());
+    ui->lePaymentName->setVisible(!C5Config::noCashDocStore());
+    ui->lbPayment->setVisible(!C5Config::noCashDocStore());
+    ui->chPaid->setVisible(!C5Config::noCashDocStore());
     ui->btnCreateDoc->setVisible(!C5Config::noCashDocStore());
     ui->leScancode->setVisible(!C5Config::noScanCodeStore());
     fInternalId = "";
@@ -117,6 +120,7 @@ bool C5StoreDoc::openDoc(QString id)
         if (db.nextRow()) {
             ui->leCashDoc->setEnabled(true);
             ui->lbCashDoc->setEnabled(true);
+            ui->deCashDate->setEnabled(true);
             ui->leCashDoc->setText(db.getString("f_userid"));
         }
     }
@@ -147,12 +151,14 @@ void C5StoreDoc::setMode(C5StoreDoc::STORE_DOC sd)
     case DOC_TYPE_STORE_MOVE:
         ui->lbCashDoc->setVisible(false);
         ui->leCashDoc->setVisible(false);
+        ui->deCashDate->setVisible(false);
         ui->btnCreateDoc->setVisible(false);
         ui->leDocNum->setPlaceholderText(QString("%1").arg(db.getInt(0) + 1, C5Config::docNumDigitsMove(), 10, QChar('0')));
         break;
     case DOC_TYPE_STORE_OUTPUT:
         ui->lbCashDoc->setVisible(false);
         ui->leCashDoc->setVisible(false);
+        ui->deCashDate->setVisible(false);
         ui->btnCreateDoc->setVisible(false);
         ui->leDocNum->setPlaceholderText(QString("%1").arg(db.getInt(0) + 1, C5Config::docNumDigitsOut(), 10, QChar('0')));
         break;
@@ -233,11 +239,14 @@ bool C5StoreDoc::removeDoc(const QStringList &dbParams, QString id, bool showmes
     QString err;
     C5Database db(dbParams);
     db[":f_basedoc"] = id;
-    db.exec("select d.f_date, s.f_document from a_store s "
+    if (!db.exec("select d.f_date, d.f_userid from a_store s "
             "inner join a_header d on d.f_id=s.f_document "
-            "where f_basedoc=:f_basedoc and f_document<>:f_basedoc and s.f_type=-1");
+             "where f_basedoc=:f_basedoc and f_document<>:f_basedoc and s.f_type=-1")) {
+        C5Message::error(db.fLastError);
+        return false;
+    }
     while (db.nextRow()) {
-        err += QString("No: %1, %2<br>").arg(db.getInt(1)).arg(db.getDate(0).toString(FORMAT_DATE_TO_STR));
+        err += QString("No: %1, %2<br>").arg(db.getString(1)).arg(db.getDate(0).toString(FORMAT_DATE_TO_STR));
     }
     if (!err.isEmpty()) {
         C5Message::error(err);
@@ -303,6 +312,8 @@ bool C5StoreDoc::save(int state, QString &err, bool showMsg)
                 for (QMap<int, double>::const_iterator it = gq.begin(); it != gq.end(); it++) {
                     db[":f_id"] = C5Database::uuid();
                     db[":f_document"] = docid;
+                    db[":f_storein"] = ui->leStoreInput->getInteger();
+                    db[":f_storeout"] = ui->leStoreOutput->getInteger();
                     db[":f_goods"] = it.key();
                     db[":f_qty"] = it.value();
                     db[":f_price"] = 0;
@@ -634,12 +645,19 @@ bool C5StoreDoc::save(int state, QString &err)
             ui->tblGoods->setString(i, 0, draftId);
             db[":f_id"] = draftId;
             db[":f_document"] = fInternalId;
+            db[":f_storein"] = ui->leStoreInput->getInteger();
+            db[":f_storeout"] = ui->leStoreOutput->getInteger();
             db[":f_goods"] = ui->tblGoods->getInteger(i, 1);
             db[":f_qty"] = ui->tblGoods->lineEdit(i, 3)->getDouble();
             db[":f_price"] = ui->tblGoods->lineEdit(i, 5)->getDouble();
             db[":f_total"] = ui->tblGoods->lineEdit(i, 6)->getDouble();
             db[":f_reason"] = ui->leReason->getInteger();
             db.insert("a_store_draft", false);
+            if (fDocType = DOC_TYPE_STORE_INPUT) {
+                db[":f_id"] = ui->tblGoods->getInteger(i, 1);
+                db[":f_lastinputprice"] = ui->tblGoods->lineEdit(i, 5)->getDouble();
+                db.exec("update c_goods set f_lastinputprice=:f_lastinputprice where f_id=:f_id");
+            }
         }
     }
     fDocState = state;

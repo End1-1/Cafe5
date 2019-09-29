@@ -1,6 +1,6 @@
 #include "cr5discountstatisticsfilter.h"
 #include "ui_cr5discountstatisticsfilter.h"
-#include "cachediscounttype.h"
+#include "c5cache.h"
 
 CR5DiscountStatisticsFilter::CR5DiscountStatisticsFilter(const QStringList &dbParams, QWidget *parent) :
     C5FilterWidget(dbParams, parent),

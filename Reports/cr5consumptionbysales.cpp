@@ -400,7 +400,8 @@ void CR5ConsumptionBySales::countOutputBasedOnRecipes()
     db[":f_headerstate"] = ORDER_STATE_CLOSE;
     db[":f_bodystate1"] = DISH_STATE_OK;
     db[":f_bodystate2"] = DISH_STATE_VOID;
-    db.exec("select h.f_id as f_header, b.f_id as f_body, b.f_dish, r.f_goods, sum(b.f_qty1*r.f_qty) as f_qty "
+    db.exec("select h.f_id as f_header, b.f_id as f_body, b.f_dish, r.f_goods, sum(b.f_qty1*r.f_qty) as f_qty, "
+            "r.f_qty as f_baseqty, b.f_store "
             "from d_recipes r "
             "inner join o_body b on b.f_dish=r.f_dish "
             "inner join o_header h on h.f_id=b.f_header "
@@ -413,6 +414,8 @@ void CR5ConsumptionBySales::countOutputBasedOnRecipes()
         db2[":f_body"] = db.getString("f_body");
         db2[":f_goods"] = db.getString("f_goods");
         db2[":f_qty"] = db.getDouble("f_qty");
+        db2[":f_baseqty"] = db.getDouble("f_baseqty");
+        db2[":f_store"] = db.getInt("f_store");
         db2[":f_price"] = 0;
         db2.insert("o_store_output", false);
     }

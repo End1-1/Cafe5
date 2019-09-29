@@ -3,7 +3,7 @@
 #include "c5storedoc.h"
 #include "c5utils.h"
 #include "c5double.h"
-#include "cachecashnames.h"
+#include "c5cache.h"
 #include "c5mainwindow.h"
 #include "c5inputdate.h"
 #include <QJsonDocument>
@@ -33,6 +33,7 @@ C5CashDoc::C5CashDoc(const QStringList &dbParams, QWidget *parent) :
     ui->leDocNum->setPlaceholderText(QString("%1").arg(db.getInt(0) + 1, C5Config::docNumDigitsInput(), 10, QChar('0')));
     ui->leInput->setSelector(dbParams, ui->leInputName, cache_cash_names);
     ui->leOutput->setSelector(dbParams, ui->leOutputName, cache_cash_names);
+    ui->lePartner->setSelector(dbParams, ui->lePartnerName, cache_goods_partners);
     ui->lbStoreDoc->setEnabled(false);
     ui->leStoreDoc->setEnabled(false);
     ui->btnOpenStoreDoc->setEnabled(false);
@@ -63,6 +64,7 @@ bool C5CashDoc::openDoc(const QString &uuid)
     if (db.nextRow()) {
         ui->deDate->setDate(db.getDate("f_date"));
         ui->leDocNum->setText(db.getString("f_userid"));
+        ui->lePartner->setValue(db.getString("f_partner"));
         QJsonDocument jd = QJsonDocument::fromJson(db.getString("f_raw").toUtf8());
         QJsonObject jo = jd.object();
         int sign = 1;
@@ -79,8 +81,12 @@ bool C5CashDoc::openDoc(const QString &uuid)
         while (db.nextRow()) {
             int row = ui->tbl->addEmptyRow();
             ui->tbl->createLineEdit(row, 0)->setText(db.getString("f_remarks"));
-            ui->tbl->createLineEdit(row, 1)->setDouble(db.getDouble("f_amount"));
+            C5LineEdit *l = ui->tbl->createLineEdit(row, 1);
+            l->setDouble(db.getDouble("f_amount"));
+            l->setValidator(new QDoubleValidator(0, 999999999, 2));
+            connect(l, SIGNAL(textChanged(QString)), this, SLOT(amountChanged(QString)));
         }
+        amountChanged("0");
         if (!fStoreUuid.isEmpty()) {
             db[":f_id"] = fStoreUuid;
             db.exec("select f_userid from a_header where f_id=:f_id");
@@ -142,6 +148,9 @@ void C5CashDoc::save()
     if (ui->leInput->getInteger() == 0 && ui->leOutput->getInteger() == 0) {
         err += tr("No cash name selected") + "<br>";
     }
+    if (ui->leInput->getInteger() == ui->leOutput->getInteger() && ui->leInput->getInteger() > 0) {
+        err += tr("Input and output cash desks are identical");
+    }
     if (zerodouble(ui->leTotal->getDouble())) {
         err += tr("Empty document") + "<br>";
     }
@@ -191,6 +200,7 @@ void C5CashDoc::save()
         db[":f_header"] = fUuid;
         db.exec("delete from e_cash where f_header=:f_header");
     }
+    db[":f_partner"] = ui->lePartner->getInteger();
     db[":f_userid"] = ui->leDocNum->text();
     db[":f_date"] = ui->deDate->date();
     db[":f_amount"] = ui->leTotal->getDouble();

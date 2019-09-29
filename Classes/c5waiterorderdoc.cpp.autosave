@@ -288,6 +288,15 @@ void C5WaiterOrderDoc::makeOutputOfStore()
     }
 }
 
+void C5WaiterOrderDoc::makeStoreDocument(C5Database &db, const QString &id, int store)
+{
+    db[":f_id"] = id;
+    db.exec("select f_datecash from o_header where f_id=:f_id");
+    QDate date = db.getDate(0);
+    db[":f_store"] = store;
+    db.exec("select f_document from a_store_draft where ")    
+}
+
 int C5WaiterOrderDoc::hInt(const QString &name)
 {
     return fHeader[name].toString().toInt();

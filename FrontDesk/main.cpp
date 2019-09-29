@@ -1,6 +1,5 @@
 #include "c5mainwindow.h"
 #include "c5connection.h"
-#include "c5cache.h"
 #include <QApplication>
 #include <QTranslator>
 #include <QStyleFactory>

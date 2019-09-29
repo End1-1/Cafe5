@@ -43,6 +43,7 @@ void C5Permissions::init(C5Database &db)
               << cp_t3_sale_dishes
               << cp_t3_sale_from_store_total
               << cp_t3_discount_statistics
+              << cp_t3_debts_to_partners
 
               << cp_t4_menu
               << cp_t4_menu_names
@@ -81,6 +82,7 @@ void C5Permissions::init(C5Database &db)
               << cp_t7_upload_date_settings
               << cp_t7_translator
               << cp_t7_store_reason
+              << cp_t7_customers
 
               << cp_t8_cash
               << cp_t8_cash_doc

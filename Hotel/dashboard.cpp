@@ -13,10 +13,10 @@
 Dashboard *__dashboard = nullptr;
 
 template<typename T>
-QWidget *createTabWidget() {
+T *createTabWidget(const QIcon &icon, const QString &title) {
     T *t = new T();
     t->setWidgetContainer();
-    __dashboard->fTabWidget->addTab(t, QIcon(t->icon()), t->title());
+    __dashboard->fTabWidget->addTab(t, icon, title);
     __dashboard->fTabWidget->setCurrentWidget(t);
     return t;
 }
@@ -110,7 +110,7 @@ void Dashboard::buildMenu(QToolButton *btn, const QList<QAction *> &l)
         b->setText(a->text());
         b->setIcon(a->icon());
         b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-        b->setStyleSheet("background-color: rgb(240, 240, 170); margin: 1px;");
+        b->setStyleSheet("border: 1px solid gray; background-color: rgb(240, 240, 170); margin: 1px;");
         connect(b, SIGNAL(clicked()), a, SLOT(trigger()));
         QListWidgetItem *item = new QListWidgetItem(ui->lwMenu);
         item->setSizeHint(QSize(100, 30));
@@ -217,5 +217,6 @@ void Dashboard::closeEvent(QCloseEvent *event)
 
 void Dashboard::on_actionRoom_chart_triggered()
 {
-    createTabWidget<ChartWindow>();
+    QAction *a = static_cast<QAction*>(sender());
+    createTabWidget<ChartWindow>(a->icon(), a->text());
 }

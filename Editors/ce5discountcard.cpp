@@ -2,7 +2,6 @@
 #include "ui_ce5discountcard.h"
 #include "ce5client.h"
 #include "c5cache.h"
-#include "cachediscounttype.h"
 #include <QDoubleValidator>
 
 CE5DiscountCard::CE5DiscountCard(const QStringList &dbParams, QWidget *parent) :

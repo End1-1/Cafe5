@@ -4,98 +4,119 @@
 <context>
     <name>C5Cache</name>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="27"/>
+        <location filename="../../Classes/c5cache.cpp" line="18"/>
+        <location filename="../../Classes/c5cache.cpp" line="22"/>
+        <location filename="../../Classes/c5cache.cpp" line="25"/>
         <location filename="../../Classes/c5cache.cpp" line="31"/>
-        <location filename="../../Classes/c5cache.cpp" line="34"/>
+        <location filename="../../Classes/c5cache.cpp" line="36"/>
         <location filename="../../Classes/c5cache.cpp" line="40"/>
-        <location filename="../../Classes/c5cache.cpp" line="45"/>
-        <location filename="../../Classes/c5cache.cpp" line="49"/>
+        <location filename="../../Classes/c5cache.cpp" line="47"/>
+        <location filename="../../Classes/c5cache.cpp" line="50"/>
+        <location filename="../../Classes/c5cache.cpp" line="53"/>
         <location filename="../../Classes/c5cache.cpp" line="56"/>
         <location filename="../../Classes/c5cache.cpp" line="59"/>
         <location filename="../../Classes/c5cache.cpp" line="62"/>
         <location filename="../../Classes/c5cache.cpp" line="65"/>
         <location filename="../../Classes/c5cache.cpp" line="68"/>
-        <location filename="../../Classes/c5cache.cpp" line="71"/>
-        <location filename="../../Classes/c5cache.cpp" line="74"/>
-        <location filename="../../Classes/c5cache.cpp" line="77"/>
-        <location filename="../../Classes/c5cache.cpp" line="82"/>
-        <location filename="../../Classes/c5cache.cpp" line="236"/>
+        <location filename="../../Classes/c5cache.cpp" line="73"/>
+        <location filename="../../Classes/c5cache.cpp" line="83"/>
+        <location filename="../../Classes/c5cache.cpp" line="86"/>
+        <location filename="../../Classes/c5cache.cpp" line="90"/>
+        <location filename="../../Classes/c5cache.cpp" line="93"/>
+        <location filename="../../Classes/c5cache.cpp" line="99"/>
+        <location filename="../../Classes/c5cache.cpp" line="103"/>
+        <location filename="../../Classes/c5cache.cpp" line="106"/>
+        <location filename="../../Classes/c5cache.cpp" line="109"/>
+        <location filename="../../Classes/c5cache.cpp" line="247"/>
         <source>Code</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="28"/>
-        <location filename="../../Classes/c5cache.cpp" line="32"/>
-        <location filename="../../Classes/c5cache.cpp" line="35"/>
-        <location filename="../../Classes/c5cache.cpp" line="42"/>
-        <location filename="../../Classes/c5cache.cpp" line="46"/>
-        <location filename="../../Classes/c5cache.cpp" line="50"/>
+        <location filename="../../Classes/c5cache.cpp" line="19"/>
+        <location filename="../../Classes/c5cache.cpp" line="23"/>
+        <location filename="../../Classes/c5cache.cpp" line="26"/>
+        <location filename="../../Classes/c5cache.cpp" line="33"/>
+        <location filename="../../Classes/c5cache.cpp" line="37"/>
+        <location filename="../../Classes/c5cache.cpp" line="41"/>
+        <location filename="../../Classes/c5cache.cpp" line="48"/>
+        <location filename="../../Classes/c5cache.cpp" line="51"/>
+        <location filename="../../Classes/c5cache.cpp" line="54"/>
         <location filename="../../Classes/c5cache.cpp" line="57"/>
         <location filename="../../Classes/c5cache.cpp" line="60"/>
         <location filename="../../Classes/c5cache.cpp" line="63"/>
         <location filename="../../Classes/c5cache.cpp" line="66"/>
-        <location filename="../../Classes/c5cache.cpp" line="69"/>
-        <location filename="../../Classes/c5cache.cpp" line="72"/>
-        <location filename="../../Classes/c5cache.cpp" line="75"/>
-        <location filename="../../Classes/c5cache.cpp" line="83"/>
-        <location filename="../../Classes/c5cache.cpp" line="237"/>
+        <location filename="../../Classes/c5cache.cpp" line="74"/>
+        <location filename="../../Classes/c5cache.cpp" line="84"/>
+        <location filename="../../Classes/c5cache.cpp" line="87"/>
+        <location filename="../../Classes/c5cache.cpp" line="91"/>
+        <location filename="../../Classes/c5cache.cpp" line="94"/>
+        <location filename="../../Classes/c5cache.cpp" line="100"/>
+        <location filename="../../Classes/c5cache.cpp" line="104"/>
+        <location filename="../../Classes/c5cache.cpp" line="107"/>
+        <location filename="../../Classes/c5cache.cpp" line="110"/>
+        <location filename="../../Classes/c5cache.cpp" line="248"/>
         <source>Name</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="29"/>
+        <location filename="../../Classes/c5cache.cpp" line="20"/>
         <source>Part</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="41"/>
+        <location filename="../../Classes/c5cache.cpp" line="32"/>
         <source>Group</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="43"/>
+        <location filename="../../Classes/c5cache.cpp" line="34"/>
         <source>Unit</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="51"/>
+        <location filename="../../Classes/c5cache.cpp" line="42"/>
         <source>Contact</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="52"/>
+        <location filename="../../Classes/c5cache.cpp" line="43"/>
         <source>Info</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="53"/>
+        <location filename="../../Classes/c5cache.cpp" line="44"/>
         <source>Phone</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="54"/>
+        <location filename="../../Classes/c5cache.cpp" line="45"/>
         <source>Email</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="78"/>
+        <location filename="../../Classes/c5cache.cpp" line="69"/>
         <source>First name</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="79"/>
+        <location filename="../../Classes/c5cache.cpp" line="70"/>
         <source>Last name</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="80"/>
+        <location filename="../../Classes/c5cache.cpp" line="71"/>
         <source>Additional info</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="84"/>
+        <location filename="../../Classes/c5cache.cpp" line="75"/>
         <source>Description</source>
         <translation></translation>
+    </message>
+    <message>
+        <location filename="../../Classes/c5cache.cpp" line="101"/>
+        <source>Type</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -114,6 +135,14 @@
         <location filename="../../Cafe5/c5message.ui" line="68"/>
         <source>Cancel</source>
         <translation>Հրաժարվել</translation>
+    </message>
+</context>
+<context>
+    <name>C5Printing</name>
+    <message>
+        <location filename="../../Classes/c5printing.cpp" line="297"/>
+        <source>Failed send order to remote printer</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -196,11 +225,6 @@
         <location filename="dll.cpp" line="135"/>
         <source>Printed</source>
         <translation>Տպված</translation>
-    </message>
-    <message>
-        <location filename="../../Classes/c5printing.cpp" line="296"/>
-        <source>Failed send order to remote printer</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

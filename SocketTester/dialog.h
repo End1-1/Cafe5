@@ -23,11 +23,14 @@ private slots:
     void on_lePort_textChanged(const QString &arg1);
     void on_btnSend_clicked();
     void readyRead();
+    void disconnected();
+    void on_btnRowSend_clicked();
 
 private:
     Ui::Dialog *ui;
     QTcpSocket fSocket;
     int datasize;
+    bool fRawRead;
 };
 
 #endif // DIALOG_H

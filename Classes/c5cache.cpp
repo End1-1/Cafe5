@@ -1,14 +1,5 @@
 #include "c5cache.h"
 #include "c5database.h"
-#include "cachedishstate.h"
-#include "cacheorderstate.h"
-#include "cachegoodswaste.h"
-#include "cachedish.h"
-#include "cachecashnames.h"     //32
-#include "cachestorereason.h"   //33
-#include "cachediscounttype.h"  //34
-#include "cacheheaderpayment.h" //35
-#include "cacheheadepaid.h"     //36
 
 QMap<QString, C5Cache*> C5Cache::fCacheList;
 QMap<int, QString> C5Cache::fCacheQuery;
@@ -88,15 +79,35 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         setCacheSimpleQuery(cache_menu_names, "d_menu_names");
         setCacheSimpleQuery(cache_halls, "h_halls");
         setCacheSimpleQuery(cache_tables, "h_tables");
-        fCacheQuery[cache_dish_state] = query_cache_dish_state;
-        fCacheQuery[cache_order_state] = query_cache_order_state;
-        fCacheQuery[cache_goods_waste] = query_cache_goods_waste;
-        fCacheQuery[cache_cash_names] = query_cache_cash_names;
-        fCacheQuery[cache_store_reason] = query_cache_store_reason;
-        fCacheQuery[cache_dish] = query_cache_dish;
-        fCacheQuery[cache_discount_type] = query_discount_type;
-        fCacheQuery[cache_header_payment] = query_cache_header_payment;
-        fCacheQuery[cache_header_paid] = query_cache_header_paid;
+        fCacheQuery[cache_dish_state] = QString("select f_id as `%1`, f_name as `%2` from o_body_state")
+                .arg(tr("Code"))
+                .arg(tr("Name"));
+        fCacheQuery[cache_order_state] = QString("select f_id as `%1`, f_name as `%2` from o_state")
+                .arg(tr("Code"))
+                .arg(tr("Name"));
+        fCacheQuery[cache_goods_waste] = "";
+        fCacheQuery[cache_cash_names] = QString("select f_id as `%1`, f_name as `%2` from e_cash_names")
+                .arg(tr("Code"))
+                .arg(tr("Name"));
+        fCacheQuery[cache_store_reason] = QString("select f_id as `%1`, f_name as `%2` from a_reason")
+                .arg(tr("Code"))
+                .arg(tr("Name"));
+        fCacheQuery[cache_dish] = QString("select d.f_id as `%1`, d.f_name as `%2`, p2.f_name as `%3` "
+                                          "from d_dish d "
+                                          "inner join d_part2 p2 on p2.f_id=d.f_part "
+                                          "order by 3, 2 ")
+               .arg(tr("Code"))
+               .arg(tr("Name"))
+               .arg(tr("Type"));
+        fCacheQuery[cache_discount_type] = QString("select f_id as `%1`, f_name as `%2` from b_card_types")
+                .arg(tr("Code"))
+                .arg(tr("Name"));
+        fCacheQuery[cache_header_payment] = QString("select f_id as `%1`, f_name as `%2` from a_header_payment")
+                .arg(tr("Code"))
+                .arg(tr("Name"));;
+        fCacheQuery[cache_header_paid] = QString("select f_id as `%1`, f_name as `%2` from a_header_paid")
+                .arg(tr("Code"))
+                .arg(tr("Name"));
     }
     if (fTableCache.count() == 0) {
         fTableCache["c_partners"] = cache_goods_partners;

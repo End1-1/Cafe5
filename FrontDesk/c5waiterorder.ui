@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>617</width>
+    <width>665</width>
     <height>606</height>
    </rect>
   </property>
@@ -383,6 +383,74 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="tab_3">
+      <attribute name="title">
+       <string>Store</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="C5TableWidget" name="tblStore">
+         <property name="contextMenuPolicy">
+          <enum>Qt::CustomContextMenu</enum>
+         </property>
+         <property name="editTriggers">
+          <set>QAbstractItemView::NoEditTriggers</set>
+         </property>
+         <property name="selectionMode">
+          <enum>QAbstractItemView::SingleSelection</enum>
+         </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectRows</enum>
+         </property>
+         <column>
+          <property name="text">
+           <string>State</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Dish</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Store</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Goods</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Qty</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Base qty</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Output</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Price</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Total</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
        <string>History</string>
@@ -497,9 +565,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5DateEdit</class>
+   <class>C5LineEdit</class>
    <extends>QLineEdit</extends>
-   <header location="global">c5dateedit.h</header>
+   <header location="global">c5lineedit.h</header>
   </customwidget>
   <customwidget>
    <class>C5TableWidget</class>
@@ -507,9 +575,9 @@
    <header location="global">c5tablewidget.h</header>
   </customwidget>
   <customwidget>
-   <class>C5LineEdit</class>
+   <class>C5DateEdit</class>
    <extends>QLineEdit</extends>
-   <header location="global">c5lineedit.h</header>
+   <header location="global">c5dateedit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

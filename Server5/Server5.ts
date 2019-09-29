@@ -2,6 +2,14 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="hy_AM">
 <context>
+    <name>C5Printing</name>
+    <message>
+        <location filename="../Classes/c5printing.cpp" line="297"/>
+        <source>Failed send order to remote printer</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>C5Server5</name>
     <message>
         <location filename="c5server5.ui" line="26"/>
@@ -80,14 +88,6 @@
         <location filename="../Classes/notificationwidget.ui" line="179"/>
         <source>The message!</source>
         <translation></translation>
-    </message>
-</context>
-<context>
-    <name>QObject</name>
-    <message>
-        <location filename="../Classes/c5printing.cpp" line="296"/>
-        <source>Failed send order to remote printer</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

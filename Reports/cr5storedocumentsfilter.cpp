@@ -1,9 +1,6 @@
 #include "cr5storedocumentsfilter.h"
 #include "ui_cr5storedocumentsfilter.h"
 #include "c5cache.h"
-#include "cachestorereason.h"
-#include "cacheheaderpayment.h"
-#include "cacheheadepaid.h"
 
 CR5StoreDocumentsFilter::CR5StoreDocumentsFilter(const QStringList &dbParams, QWidget *parent) :
     C5FilterWidget(dbParams, parent),
@@ -15,6 +12,7 @@ CR5StoreDocumentsFilter::CR5StoreDocumentsFilter(const QStringList &dbParams, QW
     ui->leReason->setSelector(dbParams, ui->leReasonName, cache_store_reason);
     ui->lePayment->setSelector(dbParams, ui->lePaymentName, cache_header_payment);
     ui->lePaid->setSelector(dbParams, ui->lePaidName, cache_header_paid);
+    ui->lePartner->setSelector(dbParams, ui->lePartnerName, cache_goods_partners);
 }
 
 CR5StoreDocumentsFilter::~CR5StoreDocumentsFilter()
@@ -33,6 +31,9 @@ QString CR5StoreDocumentsFilter::condition()
     }
     if (!ui->lePaid->isEmpty()) {
         result += " and h.f_paid in (" + QString::number(ui->lePaid->getInteger() - 1) + ") ";
+    }
+    if (!ui->lePartner->isEmpty()) {
+        result += " and h.f_partner in (" + ui->lePartner->text() + ") ";
     }
     return result;
 }

@@ -14,7 +14,8 @@
 
 #define INCH_PER_MM 0.0393
 
-C5Printing::C5Printing()
+C5Printing::C5Printing() :
+    QObject()
 {
     fCanvas = new QGraphicsScene();
     fCanvasList.append(fCanvas);
@@ -293,7 +294,7 @@ void C5Printing::print(const QString &printername, QPrinter::PageSize pageSize)
                 ts.waitForReadyRead(60000);
                 ts.disconnectFromHost();
             } else {
-                NotificationWidget::showMessage(QObject::tr("Failed send order to remote printer"), 1);
+                NotificationWidget::showMessage(tr("Failed send order to remote printer"), 1);
             }
         }
         return;

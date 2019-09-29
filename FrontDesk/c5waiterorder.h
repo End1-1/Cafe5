@@ -30,6 +30,8 @@ private:
 
     void showLog();
 
+    void showStore();
+
 private slots:
     void removeOrder();
 

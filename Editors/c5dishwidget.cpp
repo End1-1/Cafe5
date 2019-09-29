@@ -6,7 +6,6 @@
 #include "c5combobox.h"
 #include "ce5goods.h"
 #include "c5printing.h"
-#include "cachedish.h"
 #include "ce5dishpart2.h"
 #include "c5printpreview.h"
 #include <QColorDialog>
