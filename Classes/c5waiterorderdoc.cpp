@@ -3,14 +3,17 @@
 #include "c5cafecommon.h"
 #include "c5config.h"
 #include "c5sockethandler.h"
-#include "c5sockethandler.h"
+#include "c5storedochandler.h"
 #include <QHostInfo>
 
-C5WaiterOrderDoc::C5WaiterOrderDoc() {
+C5WaiterOrderDoc::C5WaiterOrderDoc() :
+    QObject()
+{
     fSaved = true;
 }
 
 C5WaiterOrderDoc::C5WaiterOrderDoc(const QString &id, C5Database &db) :
+    QObject(),
     fDb(db)
 {
     fHeader["f_id"] = id;
@@ -19,6 +22,7 @@ C5WaiterOrderDoc::C5WaiterOrderDoc(const QString &id, C5Database &db) :
 }
 
 C5WaiterOrderDoc::C5WaiterOrderDoc(QJsonObject &jh, QJsonArray &jb, C5Database &db) :
+    QObject(),
     fDb(db)
 {
     fHeader = jh;
@@ -286,6 +290,61 @@ void C5WaiterOrderDoc::makeOutputOfStore()
         db2[":f_price"] = fDb.getDouble("f_lastinputprice");
         db2.insert("o_store_output", false);
     }
+}
+
+void C5WaiterOrderDoc::makeStoreDocument(C5Database &db, const QString &id, int storeId)
+{
+    db[":f_id"] = id;
+    db.exec("select f_datecash from o_header where f_id=:f_id");
+    db.nextRow();
+    QDate date = db.getDate(0);
+    db[":f_header"] = id;
+    db.exec("select distinct(f_store) from o_store_output where f_header=:f_header");
+    QList<int> storeList;
+    while (db.nextRow()) {
+        storeList.append(db.getInt(0));
+    }
+    for (int store: storeList) {
+        if (storeId > 0) {
+            if (store != storeId) {
+                continue;
+            }
+        }
+        db.startTransaction();
+        C5StoreDocHandler dh(db);
+        db[":f_store"] = store;
+        db[":f_type"] = DOC_TYPE_STORE_OUTPUT;
+        db[":f_reason"] = DOC_REASON_SALE;
+        db[":f_state"] = DOC_STATE_DRAFT;
+        db[":f_date"] = date;
+        db.exec("select f_document from a_store_draft d "
+                "inner join a_header h on h.f_id=d.f_document "
+                "where h.f_date=:f_date and h.f_type=:f_type and d.f_storeout=:f_store "
+                "and d.f_reason=:f_reason and h.f_state=:f_state ");
+        if (db.nextRow()) {
+            dh.openDoc(db.getString(0));
+        } else {
+            dh.writeDraft(date, DOC_TYPE_STORE_OUTPUT, 0, store, DOC_REASON_SALE, QMap<int, double>(), tr("Auto output"));
+        }
+        db[":f_store"] = store;
+        db[":f_header"] = id;
+        db.exec("select f_id, f_goods, f_qty from o_store_output where f_header=:f_header and f_store=:f_store");
+        QList<StoreGoods> goodsList;
+        while (db.nextRow()) {
+            StoreGoods sg(db);
+            sg.fStorein = 0;
+            sg.fStoreout = store;
+            sg.fReason = DOC_REASON_SALE;
+            goodsList.append(sg);
+        }
+        for (StoreGoods &sg: goodsList) {
+            sg.fRelUuid = dh.appendToDraft(sg);
+            db[":f_id"] = sg.fUuid;
+            db[":f_storerec"] = sg.fRelUuid;
+            db.exec("update o_store_output set f_storerec=:f_storerec where f_id=:f_id");
+        }
+    }
+    db.commit();
 }
 
 int C5WaiterOrderDoc::hInt(const QString &name)

@@ -19,10 +19,11 @@ int main(int argc, char *argv[])
 
     QApplication a(argc, argv);
 
-    QDate dtrial = QDate::fromString("09.10.2019", "dd.MM.yyyy");
-    if (QDate::currentDate() > dtrial) {
-        return 0;
-    }
+
+//    QDate dtrial = QDate::fromString("09.10.2019", "dd.MM.yyyy");
+//    if (QDate::currentDate() > dtrial) {
+//        return 0;
+//    }
 
     QList<QByteArray> connectionParams;
     C5Connection::readParams(connectionParams);

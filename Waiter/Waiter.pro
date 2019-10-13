@@ -50,6 +50,7 @@ SOURCES += \
     ../../XLSX/src/xlsxwriter.cpp \
     ../Cafe5/c5cafecommon.cpp \
     ../Classes/c5jsondb.cpp \
+    ../Classes/c5storedochandler.cpp \
     ../Classes/notificationwidget.cpp \
     c5printreceiptthread50mm.cpp \
     dlglistdishspecial.cpp \
@@ -132,6 +133,7 @@ HEADERS += \
     ../../XLSX/src/zip.h \
     ../Cafe5/c5cafecommon.h \
     ../Classes/c5jsondb.h \
+    ../Classes/c5storedochandler.h \
     ../Classes/notificationwidget.h \
     c5printreceiptthread50mm.h \
         dlgface.h \

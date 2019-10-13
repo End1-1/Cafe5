@@ -68,3 +68,5 @@ alter table o_store_output add column f_store integer after f_body ;
 /* DB - 2 */
 update s_app set f_version='2' where f_app='DB';
 alter table a_store_draft add column f_storein integer after f_document, add column f_storeout integer after f_storein;
+alter table o_store_output add column f_storerec char(36);
+alter table a_store add f_draft char(36);

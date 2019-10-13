@@ -7,8 +7,10 @@
 
 class C5SocketHandler;
 
-class C5WaiterOrderDoc
+class C5WaiterOrderDoc : public QObject
 {
+    Q_OBJECT
+
 public:
     C5WaiterOrderDoc();
 
@@ -29,6 +31,8 @@ public:
     bool transferToHotel(C5Database &fDD, QString &err);
 
     void makeOutputOfStore();
+
+    static void makeStoreDocument(C5Database &db, const QString &id, int storeId);
 
     QJsonObject fHeader;
 

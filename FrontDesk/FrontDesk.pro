@@ -34,6 +34,7 @@ DEFINES += FRONTDESK
 SOURCES += \
     ../Cafe5/c5cafecommon.cpp \
     ../Cafe5/c5double.cpp \
+    ../Classes/c5storedochandler.cpp \
     ../Classes/notificationwidget.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
     ../Editors/c5cashname.cpp \
@@ -186,6 +187,7 @@ SOURCES += \
 HEADERS += \
     ../Cafe5/c5cafecommon.h \
     ../Cafe5/c5double.h \
+    ../Classes/c5storedochandler.h \
     ../Classes/notificationwidget.h \
     ../Classes/proxytablewidgetdatabase.h \
     ../Editors/c5cashname.h \

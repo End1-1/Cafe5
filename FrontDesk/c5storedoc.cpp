@@ -572,6 +572,30 @@ bool C5StoreDoc::save(int state, QString &err)
         return false;
     }
 
+    if (state != fDocState) {
+        db[":f_document"] = fInternalId;
+        db.exec("delete from a_store_draft where f_document=:f_document");
+        for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+            QString draftId = C5Database::uuid();
+            ui->tblGoods->setString(i, 0, draftId);
+            db[":f_id"] = draftId;
+            db[":f_document"] = fInternalId;
+            db[":f_storein"] = ui->leStoreInput->getInteger();
+            db[":f_storeout"] = ui->leStoreOutput->getInteger();
+            db[":f_goods"] = ui->tblGoods->getInteger(i, 1);
+            db[":f_qty"] = ui->tblGoods->lineEdit(i, 3)->getDouble();
+            db[":f_price"] = ui->tblGoods->lineEdit(i, 5)->getDouble();
+            db[":f_total"] = ui->tblGoods->lineEdit(i, 6)->getDouble();
+            db[":f_reason"] = ui->leReason->getInteger();
+            db.insert("a_store_draft", false);
+            if (fDocType == DOC_TYPE_STORE_INPUT) {
+                db[":f_id"] = ui->tblGoods->getInteger(i, 1);
+                db[":f_lastinputprice"] = ui->tblGoods->lineEdit(i, 5)->getDouble();
+                db.exec("update c_goods set f_lastinputprice=:f_lastinputprice where f_id=:f_id");
+            }
+        }
+    }
+
     QStringList outId;
     if (fDocState == DOC_STATE_DRAFT) {
         if (state == DOC_STATE_SAVED) {
@@ -638,12 +662,8 @@ bool C5StoreDoc::save(int state, QString &err)
     }
 
     if (state != fDocState) {
-        db[":f_document"] = fInternalId;
-        db.exec("delete from a_store_draft where f_document=:f_document");
         for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
-            QString draftId = C5Database::uuid();
-            ui->tblGoods->setString(i, 0, draftId);
-            db[":f_id"] = draftId;
+            db[":f_id"] = ui->tblGoods->getString(i, 0);
             db[":f_document"] = fInternalId;
             db[":f_storein"] = ui->leStoreInput->getInteger();
             db[":f_storeout"] = ui->leStoreOutput->getInteger();
@@ -652,14 +672,10 @@ bool C5StoreDoc::save(int state, QString &err)
             db[":f_price"] = ui->tblGoods->lineEdit(i, 5)->getDouble();
             db[":f_total"] = ui->tblGoods->lineEdit(i, 6)->getDouble();
             db[":f_reason"] = ui->leReason->getInteger();
-            db.insert("a_store_draft", false);
-            if (fDocType = DOC_TYPE_STORE_INPUT) {
-                db[":f_id"] = ui->tblGoods->getInteger(i, 1);
-                db[":f_lastinputprice"] = ui->tblGoods->lineEdit(i, 5)->getDouble();
-                db.exec("update c_goods set f_lastinputprice=:f_lastinputprice where f_id=:f_id");
-            }
+            db.exec("update a_store_draft set f_price=:f_price, f_total=:f_total where f_id=:f_id");
         }
     }
+
     fDocState = state;
     setDocEnabled(fDocState == DOC_STATE_DRAFT);
     countTotal();
@@ -729,6 +745,7 @@ bool C5StoreDoc::writeOutput(const QDate &date, QString docNum, int store, doubl
                         newrec[":f_base"] = storeData.at(j).at(0).toString();
                         newrec[":f_basedoc"] = dbdoc.getString(0);
                         newrec[":f_reason"] = ui->leReason->getInteger();
+                        newrec[":f_draft"] = ui->tblGoods->getString(i, 0);
                         queries << newrec;
                         amount += storeData.at(j).at(3).toDouble() * qty;
                         ui->tblGoods->lineEdit(i, 6)->setDouble(ui->tblGoods->lineEdit(i, 6)->getDouble() + (storeData.at(j).at(3).toDouble() * qty));
@@ -749,6 +766,7 @@ bool C5StoreDoc::writeOutput(const QDate &date, QString docNum, int store, doubl
                         newrec[":f_base"] = storeData.at(j).at(0).toString();
                         newrec[":f_basedoc"] = dbdoc.getString(0);
                         newrec[":f_reason"] = ui->leReason->getInteger();
+                        newrec[":f_draft"] = ui->tblGoods->getString(i, 0);
                         queries << newrec;
                         ui->tblGoods->lineEdit(i, 6)->setDouble(ui->tblGoods->lineEdit(i, 6)->getDouble() + (storeData.at(j).at(3).toDouble() * storeData.at(j).at(2).toDouble()));
                         ui->tblGoods->lineEdit(i, 5)->setDouble(ui->tblGoods->lineEdit(i, 6)->getDouble() / ui->tblGoods->lineEdit(i, 3)->getDouble());

@@ -332,6 +332,7 @@ void C5WaiterServer::reply(QJsonObject &o)
             C5WaiterOrderDoc w(jh, jb, srh.fDb);
             w.transferToHotel(fDD, err);
             w.makeOutputOfStore();
+            w.makeStoreDocument(srh.fDb, jh["f_id"].toString(), 0);
         }
         o["reply"] = err.isEmpty() ? 1 : 0;
         o["msg"] = err;
