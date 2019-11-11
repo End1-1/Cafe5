@@ -75,5 +75,6 @@ void Sales::on_btnPrint_clicked()
         return;
     }
     PrintReceipt pr(this);
-    pr.print(ui->tbl->getString(ml.at(0).row(), 0));
+    C5Database db(C5Config::dbParams());
+    pr.print(ui->tbl->getString(ml.at(0).row(), 0), db);
 }

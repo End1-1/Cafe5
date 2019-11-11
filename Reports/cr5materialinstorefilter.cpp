@@ -22,8 +22,16 @@ QString CR5MaterialInStoreFilter::condition()
     if (!ui->leStore->isEmpty()) {
         cond += " and s.f_store in (" + ui->leStore->text() + ") ";
     }
+    if (!ui->leGroup->isEmpty()) {
+        cond += " and gg.f_id in (" + ui->leGroup->text() + ") ";
+    }
     if (!ui->leMaterial->isEmpty()) {
         cond += " and s.f_goods in (" + ui->leMaterial->text() + ") ";
     }
     return cond;
+}
+
+bool CR5MaterialInStoreFilter::showDrafts()
+{
+    return ui->chShowDrafts->isChecked();
 }

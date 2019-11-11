@@ -13,6 +13,7 @@
 static QMap<QString, Goods> fGoods;
 static QMap<int, QString> fGoodsCodeForPrint;
 static QSettings __s(QString("%1\\%2\\%3").arg(_ORGANIZATION_).arg(_APPLICATION_).arg(_MODULE_));
+static int fOrderCount = 0;
 
 Working::Working(QWidget *parent) :
     QWidget(parent),
@@ -40,12 +41,16 @@ Working::Working(QWidget *parent) :
     connect(sDown, SIGNAL(activated()), this, SLOT(shortcutDown()));
     connect(sUp, SIGNAL(activated()), this, SLOT(shortcutUp()));
     getGoodsList();
-    on_btnNewOrder_clicked();
     ui->leCode->installEventFilter(this);
     ui->tab->installEventFilter(this);
-    fTimerTimeout = 0;
-    connect(&fTimer, SIGNAL(timeout()), this, SLOT(timeout()));
-    fTimer.start(1000);
+    C5Database db(C5Config::dbParams());
+    db[":f_state"] = ORDER_STATE_CLOSE;
+    db[":f_datecash"] = QDate::currentDate();
+    db[":f_hall"] = C5Config::defaultHall();
+    db.exec("select count(f_id) from o_header where f_datecash=:f_datecash and f_state=:f_state and f_hall=:f_hall");
+    db.nextRow();
+    fOrderCount = db.getInt(0);
+    on_btnNewOrder_clicked();
 }
 
 Working::~Working()
@@ -171,6 +176,8 @@ void Working::getGoodsList()
 
 void Working::makeWGoods()
 {
+    ui->tblGoods->horizontalHeader()->setDefaultSectionSize(width() / 5);
+    ui->tblGoods->verticalHeader()->setDefaultSectionSize(30);
     ui->tblGoods->clearContents();
     ui->tblGoods->setRowCount(0);
     int col = 0;
@@ -182,29 +189,19 @@ void Working::makeWGoods()
             "left join c_goods gg on gg.f_id=gs.f_goods "
             "left join c_groups gr on gr.f_id=gg.f_group "
             "left join c_units gu on gu.f_id=gg.f_unit "
-            "order by gr.f_name, gg.f_name ");
+            "where gs.f_receipt=1 "
+            "order by gg.f_name ");
     while (db.nextRow()) {
         if (ui->tblGoods->rowCount() - 1 < row) {
             ui->tblGoods->setRowCount(ui->tblGoods->rowCount() + 1);
         }
         QTableWidgetItem *item = new QTableWidgetItem();
-        item->setText(db.getString("f_goodsname"));
+        item->setText(db.getString("f_code") + ". " + db.getString("f_goodsname"));
         item->setData(Qt::UserRole, db.getString("f_code"));
         ui->tblGoods->setItem(row, col++, item);
         if (col == 3) {
             col = 0;
             row++;
-        }
-    }
-}
-
-void Working::timeout()
-{
-    //ui->leCode->setFocus();
-    fTimerTimeout++;
-    if (fTimerTimeout == 5) {
-        if (ui->wGoods->isVisible()) {
-            ui->tblGoods->horizontalHeader()->setDefaultSectionSize(ui->tblGoods->width() / 3);
         }
     }
 }
@@ -270,7 +267,7 @@ void Working::on_btnNewOrder_clicked()
             wd->installEventFilter(this);
         }
     }
-    ui->tab->addTab(w, "");
+    ui->tab->addTab(w, QString::number(++fOrderCount));
     ui->tab->setCurrentIndex(ui->tab->count() - 1);
 }
 
@@ -353,7 +350,8 @@ void Working::on_btnExit_clicked()
 void Working::on_btnShowGoodsList_clicked()
 {
     ui->wGoods->setVisible(!ui->wGoods->isVisible());
-    __s.setValue("goodslist", ui->wGoods->isVisible());
+    ui->tab->setVisible(!ui->wGoods->isVisible());
+    __s.setValue("goodslist", false);
     if (ui->wGoods->isVisible()) {
         makeWGoods();
     }

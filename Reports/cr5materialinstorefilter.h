@@ -18,6 +18,8 @@ public:
 
     virtual QString condition();
 
+    bool showDrafts();
+
 private:
     Ui::CR5MaterialInStoreFilter *ui;
 };

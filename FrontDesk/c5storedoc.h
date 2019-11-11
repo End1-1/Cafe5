@@ -36,7 +36,7 @@ public:
 
     static bool removeDoc(const QStringList &dbParams, QString id, bool showmessage = true);
 
-    bool save(int state, QString &err, bool showMsg);
+    bool saveDraft(C5Database &db, int state, QString &err, bool showMsg);
 
     virtual bool allowChangeDatabase() override;
     
@@ -64,6 +64,10 @@ private:
 
     bool fGroupTableCellMove;
 
+    QString fComplectationId;
+
+    int fBasedOnSale;
+
     void countTotal();
 
     void countQtyOfComplectation();
@@ -72,11 +76,15 @@ private:
 
     void rowsCheck(QString &err);
 
-    bool save(int state, QString &err);
+    bool saveDraft(C5Database &db, int state, QString &err);
 
-    void writeInput();
+    bool insertDraftRow(C5Database &db, int row);
 
-    bool writeOutput(const QDate &date, QString docNum, int store, double &amount, QStringList &outId, QString &err);
+    bool updateDraftRow(C5Database &db, int row);
+
+    void writeInput(C5Database &db);
+
+    bool writeOutput(C5Database &db, const QDate &date, QString docNum, int store, double &amount, QStringList &outId, QString &err);
 
     int addGoodsRow();
 

@@ -210,10 +210,13 @@ void CR5Documents::saveDocs()
         case DOC_TYPE_STORE_MOVE:
         case DOC_TYPE_STORE_OUTPUT:
             d.openDoc(docid);
-            if (d.save(DOC_STATE_SAVED, e, false)) {
+            db.startTransaction();
+            if (d.saveDraft(db, DOC_STATE_SAVED, e, false)) {
                 fModel->setData(row, fModel->indexForColumnName("f_statename"), tr("Saved"));
                 fModel->setData(row, fModel->indexForColumnName("f_amount"), 0);
+                db.commit();
             } else {
+                db.rollback();
                 err += e;
             }
             e = "";
@@ -265,9 +268,13 @@ void CR5Documents::draftDocs()
         case DOC_TYPE_STORE_MOVE:
         case DOC_TYPE_STORE_OUTPUT:
             d.openDoc(docid);
-            if (d.save(DOC_STATE_DRAFT, err, false)) {
+            db.startTransaction();
+            if (d.saveDraft(db, DOC_STATE_DRAFT, err, false)) {
                 fModel->setData(row, fModel->indexForColumnName("f_statename"), tr("Draft"));
                 fModel->setData(row, fModel->indexForColumnName("f_amount"), 0);
+                db.commit();
+            } else {
+                db.rollback();
             }
             break;
         default:
@@ -306,6 +313,7 @@ void CR5Documents::removeDocs()
         case DOC_TYPE_STORE_INPUT:
         case DOC_TYPE_STORE_OUTPUT:
         case DOC_TYPE_STORE_MOVE:
+        case DOC_TYPE_COMPLECTATION:
             if (C5StoreDoc::removeDoc(fDBParams, id, false)) {
                 fModel->removeRow(r);
             } else {

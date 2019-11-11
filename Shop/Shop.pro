@@ -39,14 +39,8 @@ SOURCES += \
     ../../XLSX/src/xlsxtheme.cpp \
     ../../XLSX/src/xlsxworkbook.cpp \
     ../../XLSX/src/xlsxwriter.cpp \
-    ../Cache/cachecashnames.cpp \
-    ../Cache/cachediscounttype.cpp \
-    ../Cache/cachedish.cpp \
-    ../Cache/cachedishstate.cpp \
-    ../Cache/cachegoodswaste.cpp \
-    ../Cache/cacheorderstate.cpp \
-    ../Cache/cachestorereason.cpp \
     ../Classes/c5printing.cpp \
+    ../Classes/c5storedraftwriter.cpp \
     ../Classes/notificationwidget.cpp \
         main.cpp \
     printreceipt.cpp \
@@ -87,15 +81,8 @@ HEADERS += \
     ../../XLSX/src/xlsxworkbook.h \
     ../../XLSX/src/xlsxwriter.h \
     ../../XLSX/src/zip.h \
-    ../Cache/cachecashnames.h \
-    ../Cache/cachediscounttype.h \
-    ../Cache/cachedish.h \
-    ../Cache/cachedishstate.h \
-    ../Cache/cachegoodswaste.h \
-    ../Cache/cacheheaders.h \
-    ../Cache/cacheorderstate.h \
-    ../Cache/cachestorereason.h \
     ../Classes/c5printing.h \
+    ../Classes/c5storedraftwriter.h \
     ../Classes/notificationwidget.h \
     printreceipt.h \
     sales.h \

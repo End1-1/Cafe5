@@ -2,7 +2,6 @@
 #define WORKING_H
 
 #include <QWidget>
-#include <QTimer>
 
 namespace Ui {
 class Working;
@@ -30,16 +29,11 @@ public:
 private:
     Ui::Working *ui;
 
-    QTimer fTimer;
-
-    int fTimerTimeout;
-
     void getGoodsList();
 
     void makeWGoods();
 
 private slots:
-    void timeout();
 
     void shortcutF1();
 

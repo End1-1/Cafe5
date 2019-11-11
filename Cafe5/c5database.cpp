@@ -16,13 +16,14 @@ QStringList C5Database::fDbParamsForUuid;
 
 static QMutex fMutex;
 
-C5Database::C5Database()
+C5Database::C5Database() :
+    QObject()
 {
-
+    fQuery = nullptr;
 }
 
 C5Database::C5Database(const QStringList &dbParams) :
-    QObject()
+    C5Database()
 {
     if (fDbParamsForUuid.count() == 0) {
         fDbParamsForUuid = dbParams;
@@ -32,7 +33,7 @@ C5Database::C5Database(const QStringList &dbParams) :
 }
 
 C5Database::C5Database(C5Database &db) :
-    QObject()
+    C5Database()
 {
     init();
     configureDatabase(fDb,
@@ -43,7 +44,7 @@ C5Database::C5Database(C5Database &db) :
 }
 
 C5Database::C5Database(const QString &host, const QString &db, const QString &user, const QString &password) :
-    QObject()
+    C5Database()
 {
     init();
     configureDatabase(fDb, host, db, user, password);
@@ -51,6 +52,9 @@ C5Database::C5Database(const QString &host, const QString &db, const QString &us
 
 C5Database::~C5Database()
 {
+    if (fQuery) {
+        delete fQuery;
+    }
     fDb = QSqlDatabase::addDatabase(_DBDRIVER_);
     QSqlDatabase::removeDatabase(fDbName);
 }
@@ -86,7 +90,10 @@ bool C5Database::open()
     bool isOpened = true;
     if (!fDb.isOpen()) {
         if (fDb.open()) {
-            //fDb.transaction();
+            if (fQuery) {
+                delete fQuery;
+            }
+            fQuery = new QSqlQuery(fDb);
         } else {
             isOpened = false;
             fLastError += fDb.lastError().databaseText() + " database: " + fDb.databaseName() + " drivers: " + fDb.drivers().join(',');
@@ -98,23 +105,20 @@ bool C5Database::open()
 
 bool C5Database::startTransaction()
 {
-    if (!fDb.open()) {
-        if (!open()) {
-            return false;
-        }
+    if (!open()) {
+        return false;
     }
-    return fDb.transaction();
+    return fQuery->exec("start transaction");
 }
 
 bool C5Database::commit()
 {
-    fDb.commit();
-    return true;
+    return fQuery->exec("commit");
 }
 
 void C5Database::rollback()
 {
-    fDb.rollback();
+    fQuery->exec("rollback");
 }
 
 void C5Database::close(bool commit)
@@ -129,11 +133,9 @@ void C5Database::close(bool commit)
 
 bool C5Database::exec(const QString &sqlQuery)
 {
-    if (!fDb.open()) {
-        if (!open()) {
-            QMessageBox::critical(0, "DB error", fLastError);
-            return false;
-        }
+    if (!open()) {
+        QMessageBox::critical(0, "DB error", fLastError);
+        return false;
     }
     return exec(sqlQuery, fDbRows, fNameColumnMap);
 }
@@ -146,35 +148,33 @@ bool C5Database::exec(const QString &sqlQuery, QList<QList<QVariant> > &dbrows)
 
 bool C5Database::exec(const QString &sqlQuery, QList<QList<QVariant> > &dbrows, QMap<QString, int> &columns)
 {
-    QSqlQuery *q1 = new QSqlQuery(fDb);
     bool isSelect = true;
     bool result = true;
-    if (!exec(q1, sqlQuery, isSelect)) {
-        delete q1;
+    if (!exec(sqlQuery, isSelect)) {
         fBindValues.clear();
         return false;
     }
 
 #ifdef QT_DEBUG
-    logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + lastQuery(q1));
+    logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + lastQuery(fQuery));
 #elif  LOGGING
-    logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + lastQuery(q1));
+    logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + lastQuery(fQuery));
 #endif
 
     fBindValues.clear();
     if (isSelect) {
         fCursorPos = -1;
         columns.clear();
-        QSqlRecord r = q1->record();
+        QSqlRecord r = fQuery->record();
         for (int i = 0; i < r.count(); i++) {
             columns[r.field(i).name().toLower()] = i;
         }
         int colCount = r.count();
         dbrows.clear();
-        while (q1->next()) {
+        while (fQuery->next()) {
             QList<QVariant> row;
             for (int i = 0; i < colCount; i++) {
-                row << q1->value(i);
+                row << fQuery->value(i);
             }
             dbrows << row;
         }
@@ -184,38 +184,36 @@ bool C5Database::exec(const QString &sqlQuery, QList<QList<QVariant> > &dbrows, 
 
 bool C5Database::exec(const QString &sqlQuery, QMap<QString, QList<QVariant> > &dbrows, QMap<QString, int> &columns)
 {
-    QSqlQuery *q1 = new QSqlQuery(fDb);
     bool isSelect = true;
     bool result = true;
 
-    if (!exec(q1, sqlQuery, isSelect)) {
-        delete q1;
+    if (!exec(sqlQuery, isSelect)) {
         fBindValues.clear();
         return false;
     }
 
 #ifdef QT_DEBUG
-    logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + lastQuery(q1));
+    logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + lastQuery(fQuery));
 #elif LOGGING
-    logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + lastQuery(q1));
+    logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + lastQuery(fQuery));
 #endif
 
     fBindValues.clear();
     if (isSelect) {
         fCursorPos = -1;
         columns.clear();
-        QSqlRecord r = q1->record();
+        QSqlRecord r = fQuery->record();
         for (int i = 0; i < r.count(); i++) {
             columns[r.field(i).name().toLower()] = i;
         }
         int colCount = r.count();
         dbrows.clear();
-        while (q1->next()) {
+        while (fQuery->next()) {
             QList<QVariant> row;
             for (int i = 0; i < colCount; i++) {
-                row << q1->value(i);
+                row << fQuery->value(i);
             }
-            dbrows[q1->value(0).toString()] << row;
+            dbrows[fQuery->value(0).toString()] << row;
         }
     }
     return result;
@@ -223,19 +221,17 @@ bool C5Database::exec(const QString &sqlQuery, QMap<QString, QList<QVariant> > &
 
 bool C5Database::execDirect(const QString &sqlQuery)
 {
-    QSqlQuery *q = new QSqlQuery(fDb);
-    if (!q->exec(sqlQuery)) {
-        fLastError = q->lastError().databaseText();
+    if (!fQuery->exec(sqlQuery)) {
+        fLastError = fQuery->lastError().databaseText();
         logEvent(fLastError);
         logEvent(sqlQuery);
         return false;
     }
 #ifdef QT_DEBUG
-    logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + lastQuery(q));
+    logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + lastQuery(fQuery));
 #elif LOGGING
-    logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + lastQuery(q));
+    logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + lastQuery(fQuery));
 #endif
-    delete q;
     return true;
 }
 
@@ -325,10 +321,9 @@ int C5Database::insert(const QString &tableName, bool returnId)
         return 0;
     }
     if (returnId) {
-        QSqlQuery q(fDb);
-        q.exec("select last_insert_id()");
-        q.next();
-        return q.value(0).toInt();
+        fQuery->exec("select last_insert_id()");
+        fQuery->next();
+        return fQuery->value(0).toInt();
     } else {
         return 1;
     }
@@ -500,30 +495,27 @@ QString C5Database::lastQuery(QSqlQuery *q)
     return sql;
 }
 
-bool C5Database::exec(QSqlQuery *q, const QString &sqlQuery, bool &isSelect)
+bool C5Database::exec(const QString &sqlQuery, bool &isSelect)
 {
-    if (!fDb.isOpen()) {
-        if (!fDb.open()) {
-            QMessageBox::critical(0, "DB error", fLastError);
-            return false;
-        }
+    if (!open()) {
+        return false;
     }
-    if (!q->prepare(sqlQuery)) {
-        fLastError = q->lastError().databaseText();
+    if (!fQuery->prepare(sqlQuery)) {
+        fLastError = fQuery->lastError().databaseText();
         logEvent(fLastError);
         logEvent(sqlQuery);
         return false;
     }
     for (QMap<QString, QVariant>::const_iterator it = fBindValues.begin(); it != fBindValues.end(); it++) {
-        q->bindValue(it.key(), it.value());
+        fQuery->bindValue(it.key(), it.value());
     }
-    if (!q->exec()) {
-        fLastError = q->lastError().databaseText();
+    if (!fQuery->exec()) {
+        fLastError = fQuery->lastError().databaseText();
         logEvent(fLastError);
-        logEvent(lastQuery(q));
+        logEvent(lastQuery(fQuery));
         return false;
     }
-    isSelect = q->isSelect();
+    isSelect = fQuery->isSelect();
     if (!isSelect) {
         isSelect = sqlQuery.mid(0, 4).compare("call", Qt::CaseInsensitive) == 0;
     }

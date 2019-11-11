@@ -173,11 +173,13 @@ private:
 
     QString lastQuery(QSqlQuery *q);
 
-    bool exec(QSqlQuery *q, const QString &sqlQuery, bool &isSelect);
+    bool exec(const QString &sqlQuery, bool &isSelect);
 
     QMap<QString, int> fNameColumnMap;
 
     static QStringList fDbParamsForUuid;
+
+    QSqlQuery *fQuery;
 
 };
 

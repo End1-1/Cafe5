@@ -272,7 +272,28 @@ void C5Grid::restoreColumnsWidths()
     for (int i = 0; i < ui->tblTotal->columnCount(); i++) {
         ui->tblTotal->setItem(0, i, new C5TableWidgetItem());
         QString colName = fModel->nameForColumnIndex(i);
-        if (!fColumnsVisible[colName] || ui->tblView->columnWidth(i) == 0) {
+        QString fullColName = colName;
+        for (QMap<QString, bool>::const_iterator it = fColumnsVisible.begin(); it != fColumnsVisible.end(); it++) {
+            QString c = it.key().toLower();
+            if (c.contains(" as ")) {
+                int pos = c.indexOf(" as ");
+                if (fullColName == c.mid(pos + 4, c.length() - pos)) {
+                    fullColName = c;
+                    break;
+                }
+            } else if (c.contains(".")) {
+                int pos = c.indexOf(".");
+                if (fullColName == c.mid(pos + 1, c.length() - pos)) {
+                    fullColName = c;
+                    break;
+                }
+            } else if (c == fullColName) {
+                fullColName = c;
+                break;
+            }
+        }
+        if (!fColumnsVisible[fullColName] || ui->tblView->columnWidth(i) == 0) {
+            ui->tblView->horizontalHeader()->setSectionResizeMode(i, QHeaderView::Interactive);
             continue;
         }
         if (s.contains(colName)) {
@@ -280,6 +301,8 @@ void C5Grid::restoreColumnsWidths()
             ui->tblView->setColumnWidth(i, s.value(colName).toInt());
         } else {
             ui->tblView->horizontalHeader()->setSectionResizeMode(i, QHeaderView::ResizeToContents);
+            //qApp->processEvents();
+            ui->tblView->horizontalHeader()->setSectionResizeMode(i, QHeaderView::Interactive);
         }
     }
 }

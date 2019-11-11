@@ -4,11 +4,13 @@
 #include "c5config.h"
 #include "printtaxn.h"
 #include "dqty.h"
+#include "c5message.h"
 #include "c5permissions.h"
 #include "c5printing.h"
 #include "printreceipt.h"
 #include "working.h"
 #include "c5utils.h"
+#include "c5storedraftwriter.h"
 #include <QInputDialog>
 
 WOrder::WOrder(QWidget *parent) :
@@ -106,7 +108,7 @@ bool WOrder::writeOrder(bool tax)
         db[":f_err"] = err;
         db[":f_result"] = result;
         db.insert("o_tax_log", false);
-        QSqlQuery q(db.fDb);
+        QSqlQuery *q = new QSqlQuery(db.fDb);
         if (result == pt_err_ok) {
             PrintTaxN::parseResponse(jsonOut, firm, hvhh, fiscal, rseq, sn, address, devnum, time);
             db[":f_id"] = id;
@@ -123,10 +125,12 @@ bool WOrder::writeOrder(bool tax)
             db[":f_fiscalmode"] = tr("(F)");
             db[":f_time"] = time;
             db.insert("o_tax", false);
-            pt.saveTimeResult(id, q);
+            pt.saveTimeResult(id, *q);
+            delete q;
         } else {
             C5Message::error(err + "<br>" + jsonOut + "<br>" + jsonIn);
-            pt.saveTimeResult("Not saved - " + id, q);
+            pt.saveTimeResult("Not saved - " + id, *q);
+            delete q;
             return false;
         }
     }
@@ -164,11 +168,17 @@ bool WOrder::writeOrder(bool tax)
     db[":f_amountOther"] = 0;
     db[":f_amountService"] = 0;
     db[":f_amountDiscount"] = 0;
+    db[":f_serviceMode"] = 0;
     db[":f_serviceFactor"] = 0;
     db[":f_discountFactor"] = 0;
     db[":f_creditCardId"] = 0;
     db[":f_otherId"] = 0;
-    db.insert("o_header", false);
+    if (db.insert("o_header", false) == 0) {
+        C5Message::error(db.fLastError);
+        db.rollback();
+        db.close();
+        return false;
+    }
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
         db[":f_id"] = C5Database::uuid();
         db[":f_header"] = id;
@@ -181,14 +191,35 @@ bool WOrder::writeOrder(bool tax)
         db[":f_sign"] = sign;
         db[":f_taxdept"] = C5Config::taxDept();
         db[":f_row"] = i + 1;
-        db.insert("o_goods", false);
+        if (db.insert("o_goods", false) == 0) {
+            db.rollback();
+            db.close();
+            return false;
+        }
     }
-    fCostumerId = 0;
-    db.commit();
+
+    C5StoreDraftWriter dw(db);
+    if (fModeRefund) {
+        if (!dw.writeFromShopInput(QDate::currentDate(), id)) {
+            C5Message::error(dw.fErrorMsg);
+            db.rollback();
+            return false;
+        }
+    } else {
+        if (!dw.writeFromShopOutput(QDate::currentDate(), id)) {
+            C5Message::error(dw.fErrorMsg);
+            db.rollback();
+            return false;
+        }
+    }
+
     if (!C5Config::localReceiptPrinter().isEmpty()) {
         PrintReceipt p;
-        p.print(id);
+        p.print(id, db);
     }
+
+    fCostumerId = 0;
+    db.commit();
     return true;
 }
 

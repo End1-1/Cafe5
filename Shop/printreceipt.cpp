@@ -10,9 +10,8 @@ PrintReceipt::PrintReceipt(QObject *parent) : QObject(parent)
 
 }
 
-void PrintReceipt::print(const QString &id)
+void PrintReceipt::print(const QString &id, C5Database &db)
 {
-    C5Database db(C5Config::dbParams());
     db[":f_id"] = id;
     db.exec("select * from o_header where f_id=:f_id");
     db.nextRow();

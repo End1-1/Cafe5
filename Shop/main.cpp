@@ -32,6 +32,7 @@ int main(int argc, char *argv[])
     C5Config::initParamsFromDb();
     C5Database::uuid(C5Config::dbParams());
 
+    __userid = 1;
     Working w;
     w.showMaximized();
 

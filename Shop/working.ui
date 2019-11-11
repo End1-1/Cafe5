@@ -40,13 +40,13 @@
     <widget class="QWidget" name="wGoods" native="true">
      <property name="minimumSize">
       <size>
-       <width>600</width>
+       <width>0</width>
        <height>0</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
-       <width>600</width>
+       <width>16777215</width>
        <height>16777215</height>
       </size>
      </property>
@@ -67,11 +67,19 @@
        <widget class="QTableWidget" name="tblGoods">
         <property name="font">
          <font>
-          <pointsize>12</pointsize>
+          <pointsize>14</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
          </font>
         </property>
         <property name="focusPolicy">
          <enum>Qt::NoFocus</enum>
+        </property>
+        <property name="verticalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOff</enum>
+        </property>
+        <property name="horizontalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOff</enum>
         </property>
         <property name="editTriggers">
          <set>QAbstractItemView::NoEditTriggers</set>
