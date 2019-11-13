@@ -10,7 +10,8 @@ CR5DebtsToPartner::CR5DebtsToPartner(const QStringList &dbParams, QWidget *paren
     fSimpleQuery = true;
     fSqlQuery = "select p.f_Id, p.f_taxname, sum(h.f_amount) as f_sum from c_partners p "
                 "inner join a_header h on h.f_partner=p.f_id "
-                "where h.f_state=1 and h.f_type=1 and h.f_paid=0 ";
+                "where h.f_state=1 and h.f_type=1 and h.f_paid=0 "
+                "group by 1, 2 ";
     fTranslation["f_id"] = tr("Code");
     fTranslation["f_taxname"] = tr("Partner");
     fTranslation["f_sum"] = tr("Debt");
@@ -37,5 +38,7 @@ void CR5DebtsToPartner::doubleClick(int row, int column, const QList<QVariant> &
     if (vals.count() == 0) {
         return;
     }
-    __mainWindow->createTab<CR5StoreDocuments>(fDBParams);
+    CR5StoreDocuments *d = __mainWindow->createTab<CR5StoreDocuments>(fDBParams);
+    d->setPartnersFilter(vals.at(0).toInt());
+    d->buildQuery();
 }

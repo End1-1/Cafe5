@@ -82,3 +82,4 @@ alter table a_store_draft drop column f_storein, drop column f_storeout;
 alter table a_store_draft add column f_base char(36);
 ALTER TABLE `a_store_draft` ADD INDEX `fk_store_draft_base_idx` (`f_base` ASC);
 INSERT INTO `a_reason` (`f_id`, `f_name`) VALUES ('9', 'Հետ վերադարձ');
+UPDATE `a_reason` SET `f_name` = 'Տեղաշարժ' WHERE (`f_id` = '2');

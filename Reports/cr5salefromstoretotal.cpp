@@ -1,6 +1,7 @@
 #include "cr5salefromstoretotal.h"
 #include "c5tablemodel.h"
 #include "cr5salefromstoretotalfilter.h"
+#include "c5tablewidget.h"
 
 CR5SaleFromStoreTotal::CR5SaleFromStoreTotal(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
@@ -9,48 +10,8 @@ CR5SaleFromStoreTotal::CR5SaleFromStoreTotal(const QStringList &dbParams, QWidge
     fLabel = tr("Sales from store total");
     fSimpleQuery = false;
 
-    fColumnNameIndex["f_goodsid"] = 0;
-    fColumnNameIndex["f_goodsname"] = 1;
-    fColumnNameIndex["f_qtybegin"] = 2;
-    fColumnNameIndex["f_sumbegin"] = 3;
-//    fColumnNameIndex["f_qtyin"] = 4;
-//    fColumnNameIndex["f_sumin"] = 5;
-//    fColumnNameIndex["f_qtyout"] = 6;
-//    fColumnNameIndex["f_sumout"] = 7;
-//    fColumnNameIndex["f_qtymust"] = 8;
-//    fColumnNameIndex["f_summust"] = 9;
-//    fColumnNameIndex["f_qtyinv"] = 10;
-//    fColumnNameIndex["f_suminv"] = 11;
-//    fColumnNameIndex["f_qtydif"] = 12;
-//    fColumnNameIndex["f_sumdif"] = 13;
-
-//    fColumnsSum << "f_qtybegin"
-//                << "f_sumbegin"
-//                << "f_qtyin"
-//                << "f_sumin"
-//                << "f_qtyout"
-//                << "f_sumout"
-//                << "f_qtymust"
-//                << "f_summust"
-//                << "f_qtyinv"
-//                << "f_suminv"
-//                << "f_qtydif"
-//                << "f_sumdif";
-
-    fTranslation["f_goodsid"] = tr("Goods code");
-    fTranslation["f_goodsname"] = tr("Goods name");
-    fTranslation["f_qtybegin"] = tr("Qty, begin");
-    fTranslation["f_sumbegin"] = tr("Sum, begin");
-//    fTranslation["f_qtyin"] = tr("Qty, in");
-//    fTranslation["f_sumin"] = tr("Sum, in");
-//    fTranslation["f_qtyout"] = tr("Qty, out");
-//    fTranslation["f_sumout"] = tr("Sum, out");
-//    fTranslation["f_qtymust"] = tr("Qty, must");
-//    fTranslation["f_summust"] = tr("Sum, must");
-//    fTranslation["f_qtyinv"] = tr("Qty, inv");
-//    fTranslation["f_suminv"] = tr("Sum, inv");
-//    fTranslation["f_qtydif"] = tr("Qty, dif");
-//    fTranslation["f_sumdif"] = tr("Sum, dif");
+    fFilterWidget = new CR5SaleFromStoreTotalFilter(dbParams);
+    fFilter = static_cast<CR5SaleFromStoreTotalFilter*>(fFilterWidget);
 }
 
 QToolBar *CR5SaleFromStoreTotal::toolBar()
@@ -69,12 +30,72 @@ QToolBar *CR5SaleFromStoreTotal::toolBar()
 
 void CR5SaleFromStoreTotal::buildQuery()
 {
+    fColumnNameIndex.clear();
+    fTranslation.clear();
+    fColumnsVisible.clear();
+
+    fColumnNameIndex["f_group"] = 0;
+    fColumnNameIndex["f_goodsid"] = 1;
+    fColumnNameIndex["f_goodsname"] = 2;
+    fColumnNameIndex["f_qtybegin"] = 3;
+    fColumnNameIndex["f_sumbegin"] = 4;
+
+    fTranslation["f_group"] = tr("Group");
+    fTranslation["f_goodsid"] = tr("Goods") + "\r\n" +  tr("code");
+    fTranslation["f_goodsname"] = tr("Goods name");
+    fTranslation["f_qtybegin"] = tr("Initial") + "\r\n" + tr("Qty");
+    fTranslation["f_sumbegin"] = tr("Initial") + "\r\n" + tr("Amount");
+
+    C5Database db(fDBParams);
+    QMap<int, int> typeMap1, typeMap2;
+    db[":f_date1"] = fFilter->start();
+    db[":f_date2"] = fFilter->end();
+    db[":f_state"] = DOC_STATE_SAVED;
+    db[":f_store"] = fFilter->store();
+    db[":f_type"] = 1;
+    db.exec("select distinct(r.f_name) as r_name, s.f_reason from a_store s "
+            "inner join a_header h on h.f_id=s.f_document "
+            "inner join a_reason r on r.f_id=s.f_reason "
+            "where h.f_date between :f_date1 and :f_date2 "
+            "and h.f_state=:f_state and s.f_store=:f_store "
+            "and s.f_type=:f_type ");
+    int nextCol = fColumnNameIndex.count();
+    while (db.nextRow()) {
+        typeMap1[db.getInt(1)] = nextCol;
+        fColumnNameIndex[db.getString(0)] = nextCol++;
+        fColumnNameIndex[db.getString(0) + "," + tr("Amount")] = nextCol++;
+        fTranslation[db.getString(0)] = db.getString(0) + "\r\n" + tr("Qty");
+        fTranslation[db.getString(0) + "," + tr("Amount")] = db.getString(0) + "\r\n" + tr("Amount");
+    }
+    db[":f_date1"] = fFilter->start();
+    db[":f_date2"] = fFilter->end();
+    db[":f_state"] = DOC_STATE_SAVED;
+    db[":f_store"] = fFilter->store();
+    db[":f_type"] = -1;
+    db.exec("select distinct(r.f_name) as r_name, s.f_reason from a_store s "
+            "inner join a_header h on h.f_id=s.f_document "
+            "inner join a_reason r on r.f_id=s.f_reason "
+            "where h.f_date between :f_date1 and :f_date2 "
+            "and h.f_state=:f_state and s.f_store=:f_store "
+            "and s.f_type=:f_type ");
+
+    while (db.nextRow()) {
+        typeMap2[db.getInt(1)] = nextCol;
+        fColumnNameIndex[db.getString(0)] = nextCol++;
+        fColumnNameIndex[db.getString(0) + "," + tr("Amount")] = nextCol++;
+        fTranslation[db.getString(0)] = db.getString(0) + "\r\n" + tr("Qty");
+        fTranslation[db.getString(0) + "," + tr("Amount")] = db.getString(0) +"\r\n" + tr("Amount");
+    }
+    fColumnNameIndex["f_final"] = nextCol++;
+    fColumnNameIndex["f_finalamount"] = nextCol++;
+    fTranslation["f_final"] = tr("Final, qty");
+    fTranslation["f_finalamount"] = tr("Final amount");
+
     QList<QList<QVariant> > &rows = fModel->fRawData;
     rows.clear();
-    C5Database db(fDBParams);
 
     //names
-    db.exec("select f_id, f_name from c_goods order by f_name");
+    db.exec("select g.f_id, g.f_name, gr.f_name as f_groupname from c_goods g inner join c_groups gr on gr.f_id=g.f_group order by f_name");
     int row = 0;
     QMap<int, int> goodsRowMap;
     while (db.nextRow()) {
@@ -82,27 +103,108 @@ void CR5SaleFromStoreTotal::buildQuery()
         for (int i = 0; i < 14; i++) {
             emptyRow << QVariant();
         }
-        emptyRow[0] = db.getInt("f_id");
-        emptyRow[1] = db.getString("f_name");
+        emptyRow[0] = db.getString("f_groupname");
+        emptyRow[1] = db.getInt("f_id");
+        emptyRow[2] = db.getString("f_name");
         rows << emptyRow;
         goodsRowMap[db.getInt(0)] = row++;
     }
 
-//    db[":f_store"] = fFilter->store();
-//    db[":f_date"] = fFilter->dateStart();
-    db.exec("select s.f_goods, sum(s.f_qty*s.f_type) as f_qty, sum(s.f_total*s.f_type) as f_amount "
-              "from a_store s "
-              "inner join a_header d on d.f_id=s.f_document "
-              "where s.f_store=:f_store and d.f_date<:f_date "
-              "group by 1  "
-              "having sum(s.f_qty*s.f_type) > 0.001 ");
+    QString query = QString("select s.f_goods, gg.f_name as f_groupname, g.f_name as f_goodsname, u.f_name as f_unitname, "
+                          "sum(s.f_qty*s.f_type) as f_qty, sum(s.f_total*s.f_type) as f_amount "
+                          "from a_store s "
+                          "inner join a_header d on d.f_id=s.f_document "
+                          "inner join c_goods g on g.f_id=s.f_goods "
+                          "inner join c_groups gg on gg.f_id=g.f_group "
+                          "inner join c_units u on u.f_id=g.f_unit "
+                          "where s.f_store=%1 and d.f_date<'%2'"
+                          "group by 1, 2, 3, 4 "
+                          "having sum(s.f_qty*s.f_type) > 0.001 ")
+            .arg(fFilter->store())
+            .arg(fFilter->start().toString(FORMAT_DATE_TO_STR_MYSQL));
+    db.exec(query);
     while (db.nextRow()) {
         int row = goodsRowMap[db.getInt("f_goods")];
-        rows[row][2] = db.getDouble("f_qty");
-        rows[row][3] = db.getDouble("f_amount");
+        rows[row][3] = db.getDouble("f_qty");
+        rows[row][4] = db.getDouble("f_amount");
+    }
+
+    db[":f_date1"] = fFilter->start();
+    db[":f_date2"] = fFilter->end();
+    db[":f_state"] = DOC_STATE_SAVED;
+    db[":f_store"] = fFilter->store();
+    db.exec("select s.f_goods, s.f_type, s.f_reason, "
+                              "sum(s.f_qty*s.f_type) as f_qty, sum(s.f_total*s.f_type) as f_amount "
+                              "from a_store s "
+                              "inner join a_header d on d.f_id=s.f_document "
+                              "inner join c_goods g on g.f_id=s.f_goods "
+                              "inner join c_groups gg on gg.f_id=g.f_group "
+                              "inner join c_units u on u.f_id=g.f_unit "
+                              "where s.f_store=:f_store and d.f_date between :f_date1 and :f_date2 "
+                              "group by 1, 2, 3 ");
+    while (db.nextRow()) {
+        int row = goodsRowMap[db.getInt("f_goods")];
+        int col = 0;
+        if (db.getInt(1) == 1) {
+            col = typeMap1[db.getInt(2)];
+        } else {
+            col = typeMap2[db.getInt(2)];
+        }
+        rows[row][col] = db.getDouble("f_qty");
+        rows[row][col + 1] = db.getDouble("f_amount");
+    }
+
+    for (int i = 0; i < rows.count(); i++) {
+
+    }
+
+    for (int i = rows.count() - 1; i > -1; i--) {
+        bool remove = true;
+        for (int j = 3; j < nextCol - 3; j += 2) {
+            rows[i][nextCol - 2] = rows[i][nextCol - 2].toDouble() + rows[i][j].toDouble();
+            rows[i][nextCol - 1] = rows[i][nextCol - 1].toDouble() + rows[i][j + 1].toDouble();
+            if (rows[i][j].toDouble() > -0.0001 && rows[i][j] < 0.0001) {
+                remove = false;
+            }
+        }
+        if (remove) {
+            rows.removeAt(i);
+        }
     }
 
     fModel->setExternalData(fColumnNameIndex, fTranslation);
+    for (QMap<QString, int>::const_iterator it = fColumnNameIndex.begin(); it != fColumnNameIndex.end(); it++) {
+        fColumnsVisible[it.key()] = true;
+    }
+    restoreColumnsWidths();
+    QStringList totalList;
+    totalList.append(QString::number(rows.count()));
+    fTableTotal->setVerticalHeaderLabels(totalList);
+    fTableTotal->setVisible(true);
+    for (int i = 3; i < nextCol; i++) {
+        double total = 0;
+        for (int j = 0; j < rows.count(); j++) {
+            total += rows[j][i].toDouble();
+        }
+        fTableTotal->setData(0, i, total);
+    }
+    for (int j = 3; j < nextCol; j++) {
+        if (j % 2 != 0) {
+            fTableView->setColumnHidden(j, !fFilter->showQty());
+            fTableTotal->setColumnHidden(j, !fFilter->showQty());
+            if (fFilter->showQty() && fTableTotal->columnWidth(j) == 0) {
+                fTableView->setColumnWidth(j, 80);
+                fTableTotal->setColumnWidth(j, 80);
+            }
+        } else {
+            fTableView->setColumnHidden(j, !fFilter->showAmount());
+            fTableTotal->setColumnHidden(j, !fFilter->showAmount());
+            if (fFilter->showAmount() && fTableTotal->columnWidth(j) == 0) {
+                fTableView->setColumnWidth(j, 80);
+                fTableTotal->setColumnWidth(j, 80);
+            }
+        }
+    }
 }
 
 void CR5SaleFromStoreTotal::refreshData()

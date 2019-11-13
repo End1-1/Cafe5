@@ -15,7 +15,7 @@ C5CashDoc::C5CashDoc(const QStringList &dbParams, QWidget *parent) :
 {
     ui->setupUi(this);
     fIcon = ":/cash.png";
-    fLabel = "Cash document";
+    fLabel = tr("Cash document");
     ui->tbl->setColumnWidths(2, 400, 100);
     C5Database db(fDBParams);
     db[":f_id"] = DOC_TYPE_CASH;
@@ -288,4 +288,17 @@ void C5CashDoc::on_btnOpenStoreDoc_clicked()
     if (!sd->openDoc(fStoreUuid)) {
         __mainWindow->removeTab(sd);
     }
+}
+
+void C5CashDoc::on_btnRemoveRow_clicked()
+{
+    int row = ui->tbl->currentRow();
+    if (row < 0) {
+        return;
+    }
+    if (C5Message::question(tr("Confirm to remove") + "<br>" + ui->tbl->item(row, 0)->text()) != QDialog::Accepted) {
+        return;
+    }
+    ui->tbl->removeRow(row);
+    amountChanged("");
 }

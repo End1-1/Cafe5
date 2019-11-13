@@ -47,3 +47,8 @@ QString CR5StoreDocumentsFilter::reason() const
 {
     return ui->leReason->text();
 }
+
+void CR5StoreDocumentsFilter::setPartnerFilter(int partner)
+{
+    ui->lePartner->setValue(partner);
+}

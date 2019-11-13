@@ -14,10 +14,20 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="2">
-    <widget class="QLabel" name="label_6">
+   <item row="2" column="1">
+    <widget class="C5LineEditWithSelector" name="leOutput">
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
      <property name="text">
-      <string>Document number</string>
+      <string>Date</string>
      </property>
     </widget>
    </item>
@@ -86,52 +96,6 @@
      </layout>
     </widget>
    </item>
-   <item row="6" column="0">
-    <widget class="QToolButton" name="btnNewRow">
-     <property name="text">
-      <string/>
-     </property>
-     <property name="icon">
-      <iconset resource="../resources/res.qrc">
-       <normaloff>:/add.png</normaloff>:/add.png</iconset>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1">
-    <widget class="C5LineEditWithSelector" name="leOutput">
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="label_5">
-     <property name="text">
-      <string>Cash input</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>Cash, output</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="4">
-    <widget class="QToolButton" name="btnOpenStoreDoc">
-     <property name="text">
-      <string/>
-     </property>
-     <property name="icon">
-      <iconset resource="../resources/res.qrc">
-       <normaloff>:/folder.png</normaloff>:/folder.png</iconset>
-     </property>
-    </widget>
-   </item>
    <item row="2" column="5">
     <spacer name="horizontalSpacer">
      <property name="orientation">
@@ -145,8 +109,8 @@
      </property>
     </spacer>
    </item>
-   <item row="0" column="1">
-    <widget class="C5DateEdit" name="deDate">
+   <item row="1" column="3">
+    <widget class="QLineEdit" name="leStoreDoc">
      <property name="maximumSize">
       <size>
        <width>100</width>
@@ -165,36 +129,26 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="2" colspan="2">
-    <widget class="QLineEdit" name="leOutputName">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="2" colspan="2">
-    <widget class="C5LineEditWithSelector" name="leInputName">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="0">
-    <widget class="QLabel" name="label_4">
+   <item row="1" column="4">
+    <widget class="QToolButton" name="btnOpenStoreDoc">
      <property name="text">
-      <string>Remarks</string>
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>:/folder.png</normaloff>:/folder.png</iconset>
      </property>
     </widget>
    </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_5">
      <property name="text">
-      <string>Date</string>
+      <string>Cash input</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="3">
-    <widget class="C5LineEdit" name="leDocNum">
+   <item row="0" column="1">
+    <widget class="C5DateEdit" name="deDate">
      <property name="maximumSize">
       <size>
        <width>100</width>
@@ -203,30 +157,10 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="1" colspan="5">
-    <widget class="QLineEdit" name="leRemarks"/>
-   </item>
-   <item row="1" column="2">
-    <widget class="QLabel" name="lbStoreDoc">
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_3">
      <property name="text">
-      <string>Store document</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="3">
-    <widget class="QLineEdit" name="leStoreDoc">
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0">
-    <widget class="QLabel" name="label_7">
-     <property name="text">
-      <string>Partner</string>
+      <string>Cash, output</string>
      </property>
     </widget>
    </item>
@@ -240,11 +174,122 @@
      </property>
     </widget>
    </item>
+   <item row="2" column="2" colspan="2">
+    <widget class="QLineEdit" name="leOutputName">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="3">
+    <widget class="C5LineEdit" name="leDocNum">
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+    </widget>
+   </item>
    <item row="4" column="2" colspan="2">
     <widget class="C5LineEditWithSelector" name="lePartnerName">
      <property name="enabled">
       <bool>false</bool>
      </property>
+    </widget>
+   </item>
+   <item row="5" column="1" colspan="5">
+    <widget class="QLineEdit" name="leRemarks"/>
+   </item>
+   <item row="0" column="2">
+    <widget class="QLabel" name="label_6">
+     <property name="text">
+      <string>Document number</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_7">
+     <property name="text">
+      <string>Partner</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <widget class="QLabel" name="lbStoreDoc">
+     <property name="text">
+      <string>Store document</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Remarks</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="2" colspan="2">
+    <widget class="C5LineEditWithSelector" name="leInputName">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0" colspan="6">
+    <widget class="QWidget" name="widget_2" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="spacing">
+       <number>2</number>
+      </property>
+      <property name="leftMargin">
+       <number>1</number>
+      </property>
+      <property name="topMargin">
+       <number>1</number>
+      </property>
+      <property name="rightMargin">
+       <number>1</number>
+      </property>
+      <property name="bottomMargin">
+       <number>1</number>
+      </property>
+      <item>
+       <widget class="QToolButton" name="btnNewRow">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>:/add.png</normaloff>:/add.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="btnRemoveRow">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>:/cancel.png</normaloff>:/cancel.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
     </widget>
    </item>
   </layout>
@@ -271,8 +316,6 @@
    <header location="global">c5dateedit.h</header>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="../resources/res.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

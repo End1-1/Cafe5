@@ -18,6 +18,16 @@ public:
 
     virtual QString condition() override;
 
+    int store();
+
+    QDate start() const;
+
+    QDate end() const;
+
+    bool showQty();
+
+    bool showAmount();
+
 private:
     Ui::CR5SaleFromStoreTotalFilter *ui;
 };

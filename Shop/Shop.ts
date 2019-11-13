@@ -253,7 +253,7 @@
         <translation>Ավտոմատ մուտք</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="181"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="184"/>
         <source>Sale autooutput</source>
         <translation>Ավտոմատ ելք</translation>
     </message>
@@ -539,122 +539,122 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="working.ui" line="93"/>
-        <location filename="working.ui" line="98"/>
-        <location filename="working.ui" line="103"/>
+        <location filename="working.ui" line="101"/>
+        <location filename="working.ui" line="106"/>
+        <location filename="working.ui" line="111"/>
         <source>New Column</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="working.ui" line="156"/>
+        <location filename="working.ui" line="164"/>
         <source>Goods code (F2)</source>
         <translation>Ապրանքի կոդ (F2)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="132"/>
+        <location filename="working.ui" line="140"/>
         <source>Refund
 F6</source>
         <translation>Հետ վերադարձ
 (F6)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="246"/>
+        <location filename="working.ui" line="254"/>
         <source>Save order
 F9</source>
         <translation>Գրանցել
 (F9)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="260"/>
-        <location filename="working.ui" line="381"/>
+        <location filename="working.ui" line="268"/>
+        <location filename="working.ui" line="389"/>
         <source>F9</source>
         <translation> Նոր պատվեր
 (F9)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="357"/>
+        <location filename="working.ui" line="365"/>
         <source>Discount (F7)</source>
         <oldsource>Discount (F3)</oldsource>
         <translation>Զեղչ (F7)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="367"/>
+        <location filename="working.ui" line="375"/>
         <source>Duplicate
 receipt (F4)</source>
         <translation>Հաշվի 
 կրկօրինակ (F4)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="219"/>
+        <location filename="working.ui" line="227"/>
         <source>Configuration
 F10</source>
         <translation>Կարգավորումներ
 (F10)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="233"/>
-        <location filename="working.ui" line="287"/>
-        <location filename="working.ui" line="320"/>
+        <location filename="working.ui" line="241"/>
+        <location filename="working.ui" line="295"/>
+        <location filename="working.ui" line="328"/>
         <source>F10</source>
         <translation> Նոր պատվեր
 (F10)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="273"/>
+        <location filename="working.ui" line="281"/>
         <source>Goods List
 F5</source>
         <translation>Ապրանքներ
 (F5)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="306"/>
+        <location filename="working.ui" line="314"/>
         <source>Exit
 Esc</source>
         <translation>Ելք
 (Esc)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="146"/>
-        <location filename="working.ui" line="347"/>
+        <location filename="working.ui" line="154"/>
+        <location filename="working.ui" line="355"/>
         <source>F11</source>
         <translation> Նոր պատվեր
 (F11)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="183"/>
+        <location filename="working.ui" line="191"/>
         <source>F12</source>
         <translation> Նոր պատվեր
 (F12)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="333"/>
+        <location filename="working.ui" line="341"/>
         <source>New order
 F11</source>
         <translation> Նոր պատվեր
 (F11)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="169"/>
+        <location filename="working.ui" line="177"/>
         <source>Save order
 F12</source>
         <translation>Գրանցել
 (F12)</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="114"/>
-        <location filename="working.cpp" line="280"/>
+        <location filename="working.cpp" line="119"/>
+        <location filename="working.cpp" line="277"/>
         <source>Password</source>
         <translation>Գախտնաբառ</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="114"/>
+        <location filename="working.cpp" line="119"/>
         <source>Administrator password</source>
         <translation>Ադմինիստրատորի գախտնաբառ</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="130"/>
         <location filename="working.cpp" line="135"/>
-        <location filename="working.cpp" line="282"/>
+        <location filename="working.cpp" line="140"/>
+        <location filename="working.cpp" line="279"/>
         <source>Access denied</source>
         <translation>Մուտքը արգելված է</translation>
     </message>

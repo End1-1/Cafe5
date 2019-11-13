@@ -22,6 +22,8 @@ public:
 
     QString reason() const;
 
+    void setPartnerFilter(int partner);
+
 private:
     Ui::CR5StoreDocumentsFilter *ui;
 };

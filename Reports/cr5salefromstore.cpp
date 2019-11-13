@@ -89,9 +89,6 @@ QToolBar *CR5SaleFromStore::toolBar()
             << ToolBarButtons::tbExcel
             << ToolBarButtons::tbPrint;
         fToolBar = createStandartToolbar(btn);
-        QAction *aout = new QAction(QIcon(":/storehouse.png"), tr("Make output"), this);
-        connect(aout, SIGNAL(triggered(bool)), this, SLOT(makeOutput(bool)));
-        fToolBar->addAction(aout);
     }
     return fToolBar;
 }
@@ -101,76 +98,6 @@ void CR5SaleFromStore::restoreColumnsWidths()
     C5Grid::restoreColumnsWidths();
     if (fColumnsVisible["oh.f_id as f_header"]) {
         fTableView->setColumnWidth(fModel->fColumnNameIndex["f_header"], 0);
-    }
-}
-
-void CR5SaleFromStore::makeOutput(bool v)
-{
-    Q_UNUSED(v);
-    C5Database db(fDBParams);
-    C5Database db1(fDBParams);
-    db[":f_datecash1"] = fFilter->d1();
-    db[":f_datecash2"] = fFilter->d2();
-    db[":f_state"] = 0;
-    db.exec("select og.f_store, og.f_goods, sum(og.f_qty * og.f_sign) as f_qty "
-            "from o_goods og "
-            "left join o_header oh on oh.f_id=og.f_header "
-            "where oh.f_datecash between :f_datecash1 and :f_datecash2 "
-            "and oh.f_state=:f_state "
-            "group by 1, 2 "
-            "order by 1");
-    int store = 0;
-    QString docid;
-    bool nostorewarning = false;
-    while (db.nextRow()) {
-        if (db.getDouble(2) < 0.0001) {
-            continue;
-        }
-        if (store == 0 || store != db.getInt(0)) {
-            if (!docid.isEmpty()) {
-                C5StoreDoc *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);
-                if (!sd->openDoc(docid)) {
-                    __mainWindow->removeTab(sd);
-                }
-            }
-            store = db.getInt(0);
-            if (store == 0) {
-                nostorewarning = true;
-                continue;
-            }
-            QJsonObject jo;
-            jo["f_storein"] = "";
-            jo["f_storeout"] = db.getString(0);
-            QJsonDocument jd(jo);
-            docid = C5Database::uuid();
-            db1[":f_state"] = DOC_STATE_DRAFT;
-            db1[":f_type"] = DOC_TYPE_STORE_OUTPUT;
-            db1[":f_operator"] = __userid;
-            db1[":f_date"] = fFilter->d2();
-            db1[":f_createDate"] = QDate::currentDate();
-            db1[":f_createTime"] = QTime::currentTime();
-            db1[":f_partner"] = 0;
-            db1[":f_amount"] = 0;
-            db1[":f_comment"] = "";
-            db1[":f_raw"] = jd.toJson();
-            db1[":f_id"] = docid;
-            db1.insert("a_header", false);
-        }
-        db1[":f_id"] = C5Database::uuid();
-        db1[":f_document"] = docid;
-        db1[":f_goods"] = db.getInt(1);
-        db1[":f_qty"] = db.getDouble(2);
-        db1[":f_price"] = 0;
-        db1[":f_total"] = 0;
-        db1[":f_reason"] = DOC_REASON_SALE;
-        db1.insert("a_store_draft");
-    }
-    C5StoreDoc *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);
-    if (!sd->openDoc(docid)) {
-        __mainWindow->removeTab(sd);
-    }
-    if (nostorewarning) {
-        C5Message::error(tr("Not for all items store defined"));
     }
 }
 

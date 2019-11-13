@@ -16,6 +16,8 @@ public:
 
     QToolBar *toolBar();
 
+    void setPartnersFilter(int partner);
+
 private:
     CR5StoreDocumentsFilter *fFilter;
 

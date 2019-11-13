@@ -1167,7 +1167,7 @@ void C5StoreDoc::getOutput()
     }
     int row = addGoodsRow();
     ui->tblGoods->setString(row, 1, vals.at(0).toString());
-    ui->tblGoods->setString(row, 2, vals.at(1).toString());
+    ui->tblGoods->setString(row, 2, vals.at(2).toString());
     ui->tblGoods->setString(row, 4, vals.at(3).toString());
     ui->tblGoods->lineEdit(row, 3)->setFocus();
 }

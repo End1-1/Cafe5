@@ -5,6 +5,7 @@
 
 class CR5Customers : public C5ReportWidget
 {
+    Q_OBJECT
 public:
     CR5Customers(const QStringList &dbParams, QWidget *parent = nullptr);
     virtual QToolBar *toolBar() override;

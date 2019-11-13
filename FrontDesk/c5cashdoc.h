@@ -37,6 +37,8 @@ private slots:
 
     void on_btnOpenStoreDoc_clicked();
 
+    void on_btnRemoveRow_clicked();
+
 private:
     Ui::C5CashDoc *ui;
 
