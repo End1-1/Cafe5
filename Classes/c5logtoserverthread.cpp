@@ -7,14 +7,14 @@
 static QMutex fLogThreadMutex;
 
 C5LogToServerThread::C5LogToServerThread(QObject *parent) :
-    QThread(parent)
+    QObject(parent)
 {
-    connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
+
 }
 
 void C5LogToServerThread::remember(int type, const QString &user, const QString &rec, const QString &invoice, const QString &reservation, const QString &action, const QString &value1, const QString &value2)
 {
-    C5LogToServerThread *l = new C5LogToServerThread(__c5config.fParentWidget);
+    C5LogToServerThread *l = new C5LogToServerThread();
     l->fType = type;
     l->fUser = user;
     l->fRec = rec;
@@ -23,14 +23,20 @@ void C5LogToServerThread::remember(int type, const QString &user, const QString 
     l->fAction = action;
     l->fValue1 = value1;
     l->fValue2 = value2;
-    l->start();
+
+    QThread *t = new QThread();
+    connect(t, SIGNAL(finished()), t, SLOT(deleteLater()));
+    connect(t, SIGNAL(started()), l, SLOT(run()));
+    connect(l, SIGNAL(finished()), t, SLOT(quit()));
+    connect(l, SIGNAL(finished()), l, SLOT(deleteLater()));
+    l->moveToThread(t);
+    t->start();
 }
 
 void C5LogToServerThread::run()
 {
     QMutexLocker ml(&fLogThreadMutex);
-    msleep(200);
-    C5SocketHandler *s = new C5SocketHandler(nullptr, __c5config.fParentWidget);
+    C5SocketHandler *s = new C5SocketHandler(nullptr, this);
     s->bind("cmd", sm_log);
     s->bind("comp", hostinfo);
     s->bind("date", QDate::currentDate().toString(FORMAT_DATE_TO_STR_MYSQL));
@@ -44,4 +50,5 @@ void C5LogToServerThread::run()
     s->bind("value1", fValue1);
     s->bind("value2", fValue2);
     s->send();
+    emit finished();
 }

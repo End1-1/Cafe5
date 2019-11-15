@@ -62,5 +62,6 @@
         <file>decision.png</file>
         <file>customers.png</file>
         <file>contract.png</file>
+        <file>upload.png</file>
     </qresource>
 </RCC>

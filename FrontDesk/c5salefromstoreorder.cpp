@@ -1,6 +1,7 @@
 #include "c5salefromstoreorder.h"
 #include "ui_c5salefromstoreorder.h"
 #include "c5mainwindow.h"
+#include "c5storedraftwriter.h"
 #include <QMenu>
 
 C5SaleFromStoreOrder::C5SaleFromStoreOrder(const QStringList &dbParams) :
@@ -81,36 +82,13 @@ void C5SaleFromStoreOrder::saveChanges()
 {
     C5Database db(fDBParams);
     db.startTransaction();
+    C5StoreDraftWriter dw(db);
     foreach (QString i, fDeleteRows) {
-        db[":f_id"] = i;
-        db.exec("select f_storerec, f_qty from o_goods where f_id=:f_id");
-        if (db.nextRow()) {
-            QString recid = db.getString("f_storerec");
-            double qty = db.getDouble("f_qty");
-            db[":f_id"] = recid;
-            db.exec("select f_document, f_qty from a_store_draft where f_id=:f_id for update");
-            if (db.nextRow()) {
-                double draftQty = db.getDouble("f_qty");
-                db[":f_qty"] = qty;
-                db[":f_id"] = recid;
-                db.exec("update a_store_draft set f_qty=f_qty-:f_qty where f_id=:f_id");
-                if (draftQty - qty < 0.0001) {
-                    db[":f_id"] = recid;
-                    db.exec("delete from a_store_draft where f_id=:f_id");
-                }
-                db[":f_id"] = db.getString("f_document");
-                db.exec("select * from a_header where f_id=:f_id");
-                if (db.nextRow()) {
-                    if (db.getInt("f_state") == DOC_STATE_SAVED) {
-                        C5Message::error(tr("Store document has been registered for this sale"));
-                        db.rollback();
-                        return;
-                    }
-                }
-            }
+        if (!dw.rollbackOutput(db, i)) {
+            db.rollback();
+            C5Message::error(dw.fErrorMsg);
+            return;
         }
-        db[":f_id"] = i;
-        db.exec("delete from o_goods where f_id=:f_id");
     }
     if (ui->tblData->rowCount() == 0) {
         db[":f_id"] = ui->leID->text();

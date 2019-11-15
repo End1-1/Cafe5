@@ -4,9 +4,9 @@
 #include "c5tablemodel.h"
 #include "c5mainwindow.h"
 #include "c5waiterorderdoc.h"
-#include "c5storedochandler.h"
 #include "c5double.h"
 #include "dlgchangeoutputstore.h"
+#include "c5storedraftwriter.h"
 #include "c5storedoc.h"
 #include <QInputDialog>
 
@@ -163,10 +163,13 @@ void CR5ConsumptionBySales::buildQuery()
     db[":f_store"] = f->store();
     db[":f_date1"] = f->date1();
     db[":f_date2"] = f->date2();
+    db[":f_type"] = DOC_TYPE_STORE_OUTPUT;
+    db[":f_reason"] = DOC_REASON_SALE;
     db.exec("select s.f_goods, sum(s.f_qty) as f_qty "
             "from a_store_draft s "
             "inner join a_header h on h.f_id=s.f_document "
-            "where h.f_date between :f_date1 and :f_date2 and s.f_storeout=:f_store "
+            "where h.f_date between :f_date1 and :f_date2 and s.f_store=:f_store "
+            "and s.f_reason=:f_reason and h.f_type=:f_type "
             "group by 1 ");
     while (db.nextRow()) {
         int r = goodsMap[db.getInt(0)];
@@ -178,11 +181,13 @@ void CR5ConsumptionBySales::buildQuery()
     db[":f_date2"] = f->date2();
     db[":f_type"] = -1;
     db[":f_state"] = DOC_STATE_SAVED;
+    db[":f_reason"] = DOC_REASON_SALE;
     db.exec("select s.f_goods, sum(s.f_qty) as f_qty "
             "from a_store s "
             "left join a_header h on h.f_id=s.f_document "
             "where h.f_date between :f_date1 and :f_date2 and s.f_store=:f_store "
             "and s.f_type=:f_type and h.f_state=:f_state  "
+            "and s.f_reason<>:f_reason "
             "group by 1 ");
     while (db.nextRow()) {
         int r = goodsMap[db.getInt(0)];
@@ -203,7 +208,10 @@ void CR5ConsumptionBySales::buildQuery()
     }
     /* get counted qty */
     for (int i = 0; i < rows.count(); i++) {
-        rows[i][col_qtyafter] = rows[i][col_qtybefore].toDouble() - rows[i][col_qtysale].toDouble();
+        rows[i][col_qtyafter] = rows[i][col_qtybefore].toDouble()
+                + rows[i][col_qtyinput].toDouble()
+                - rows[i][col_qtysale].toDouble()
+                - rows[i][col_qtyout].toDouble();
     }
     /* get inventory quantities */
     db[":f_date"] = f->date2();
@@ -235,6 +243,17 @@ void CR5ConsumptionBySales::buildQuery()
     for (int i  = rows.count() - 1; i > -1; i--) {
         countRowQty(i);
     }
+    fColumnsVisible["f_goodsid"] = true;
+    fColumnsVisible["f_goodsgroup"] = true;
+    fColumnsVisible["f_goodsname"] = true;
+    fColumnsVisible["f_qtybefore"] = true;
+    fColumnsVisible["f_qtyinput"] = true;
+    fColumnsVisible["f_qtysale"] = true;
+    fColumnsVisible["f_qtyout"] = true;
+    fColumnsVisible["f_qtystore"] = true;
+    fColumnsVisible["f_qtyafter"] = true;
+    fColumnsVisible["f_qtyinv"] = true;
+    fColumnsVisible["f_qtydiff"] = true;
     restoreColumnsWidths();
 }
 
@@ -379,83 +398,21 @@ void CR5ConsumptionBySales::salesOutput(bool v)
 
 void CR5ConsumptionBySales::countOutputBasedOnRecipes()
 {
-    if (fFilter->store() == 0) {
-        C5Message::error(tr("Store must be selected"));
-        return;
-    }
     C5Database db(fDBParams);
-    db[":f_store"] = fFilter->store();
-    db[":f_datecash1"] = fFilter->date1();
-    db[":f_datecash2"] = fFilter->date2();
-    db.exec("delete from o_store_output where f_body in "
-            "(select f_id from o_body where f_store=:f_store and f_header in "
-            "(select f_id from o_header where f_datecash between :f_datecash1 and :f_datecash2)) ");
-    db[":f_datecash1"] = fFilter->date1();
-    db[":f_datecash2"] = fFilter->date2();
     db.exec("select f_id from o_header where f_datecash between :f_datecash1 and :f_datecash2");
     QStringList idList;
     while (db.nextRow()) {
         idList.append(db.getString(0));
     }
-
-    db[":f_store"] = fFilter->store();
-    db[":f_datecash1"] = fFilter->date1();
-    db[":f_datecash2"] = fFilter->date2();
-    db[":f_headerstate"] = ORDER_STATE_CLOSE;
-    db[":f_bodystate1"] = DISH_STATE_OK;
-    db[":f_bodystate2"] = DISH_STATE_VOID;
-    db.exec("select h.f_id as f_header, b.f_id as f_body, b.f_dish, r.f_goods, sum(b.f_qty1*r.f_qty) as f_qty, "
-            "r.f_qty as f_baseqty, b.f_store "
-            "from d_recipes r "
-            "inner join o_body b on b.f_dish=r.f_dish "
-            "inner join o_header h on h.f_id=b.f_header "
-            "where h.f_datecash between :f_datecash1 and :f_datecash2 and h.f_state=:f_headerstate "
-            "and (b.f_state=:f_bodystate1 or b.f_state=:f_bodystate2) and b.f_store=:f_store "
-            "group by 1,2,3,4");
-    C5Database db2(fDBParams);
-    while (db.nextRow()) {
-        db2[":f_header"] = db.getString("f_header");
-        db2[":f_body"] = db.getString("f_body");
-        db2[":f_goods"] = db.getString("f_goods");
-        db2[":f_qty"] = db.getDouble("f_qty");
-        db2[":f_baseqty"] = db.getDouble("f_baseqty");
-        db2[":f_store"] = db.getInt("f_store");
-        db2[":f_price"] = 0;
-        db2.insert("o_store_output", false);
-    }
-    db[":f_date1"] = fFilter->date1();
-    db[":f_date2"] = fFilter->date2();
-    db[":f_type"] = DOC_TYPE_STORE_OUTPUT;
-    db[":f_store"] = fFilter->store();
-    db[":f_reason"] = DOC_REASON_SALE;
-    db.exec("select distinct(f_document) from a_store_draft where f_storeout=:f_store and f_reason=:f_reason and f_document in "
-            "(select f_id from a_header where f_type=:f_type and f_date between :f_date1 and :f_date2)");
-    QStringList docDelete;
-    while (db.nextRow()) {
-        docDelete.append(db.getString(0));
-    }
-    db[":f_date1"] = fFilter->date1();
-    db[":f_date2"] = fFilter->date2();
-    db[":f_type"] = DOC_TYPE_STORE_OUTPUT;
-    db[":f_store"] = fFilter->store();
-    db[":f_reason"] = DOC_REASON_SALE;
-    db.exec("delete from a_store where f_store=:f_store and f_reason=:f_reason and f_document in "
-            "(select f_id from a_header where f_type=:f_type and f_date between :f_date1 and :f_date2)");
-    db[":f_date1"] = fFilter->date1();
-    db[":f_date2"] = fFilter->date2();
-    db[":f_type"] = DOC_TYPE_STORE_OUTPUT;
-    db[":f_store"] = fFilter->store();
-    db[":f_reason"] = DOC_REASON_SALE;
-    db.exec("delete from a_store_draft where f_storeout=:f_store and f_reason=:f_reason and f_document in "
-            "(select f_id from a_header where f_type=:f_type and f_date between :f_date1 and :f_date2)");
-    for (const QString &s: docDelete) {
-        db[":f_id"] = s;
-        db.exec("delete from a_header where f_id=:f_id");
-    }
+    QString err;
     for (QString id: idList) {
-        C5WaiterOrderDoc::makeStoreDocument(db, id, fFilter->store());
+        C5WaiterOrderDoc(id, db).makeOutputOfStore(db, err);
     }
-    C5Message::info(tr("Done"));
+    if (err.isEmpty()) {
+        C5Message::info(tr("Done"));
+    } else {
+        C5Message::error(tr("Complete with errors"));
+    }
 }
 
 void CR5ConsumptionBySales::changeOutputStore()
@@ -469,20 +426,20 @@ void CR5ConsumptionBySales::changeOutputStore()
 void CR5ConsumptionBySales::writeDocs(int doctype, int reason, const QMap<int, double> &data, const QString &comment)
 {
     C5Database db(fDBParams);
-    C5StoreDocHandler dh(db);
+    C5StoreDraftWriter dw(db);
     QDate docDate = static_cast<CR5ConsumptionBySalesFilter*>(fFilterWidget)->date2();
-    int storein = 0, storeout = 0;
+    int store = 0;
     switch (doctype) {
     case DOC_TYPE_STORE_OUTPUT:
-        storeout = static_cast<CR5ConsumptionBySalesFilter*>(fFilterWidget)->store();
+        store = static_cast<CR5ConsumptionBySalesFilter*>(fFilterWidget)->store();
         break;
     case DOC_TYPE_STORE_INPUT:
-        storein = static_cast<CR5ConsumptionBySalesFilter*>(fFilterWidget)->store();
+        store = static_cast<CR5ConsumptionBySalesFilter*>(fFilterWidget)->store();
         break;
     }
-    dh.writeDraft(docDate, doctype, storein, storeout, reason, data, comment);
+    QString documentId = dw.writeDraft(docDate, doctype, store, reason, data, comment);
     C5StoreDoc *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);
-    if (!sd->openDoc(dh.fDocumentId)) {
+    if (!sd->openDoc(documentId)) {
         __mainWindow->removeTab(sd);
     }
 }

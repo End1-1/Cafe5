@@ -122,7 +122,9 @@ private slots:
     void on_btnCompactDishAddMode_clicked();
 
     void on_btnTime1_clicked();
+
     void on_btnTime2_clicked();
+
     void on_btnTime3_clicked();
 };
 

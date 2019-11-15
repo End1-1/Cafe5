@@ -20,6 +20,8 @@ public:
 
     QString table() override;
 
+    virtual bool checkData(QString &err) override;
+
 private:
     Ui::CE5StoreReason *ui;
 };

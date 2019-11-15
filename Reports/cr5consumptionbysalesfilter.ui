@@ -176,6 +176,12 @@
    <header location="global">c5lineeditwithselector.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>deStart</tabstop>
+  <tabstop>deEnd</tabstop>
+  <tabstop>leStore</tabstop>
+  <tabstop>chSalesCounted</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

@@ -25,13 +25,14 @@ protected:
 private:
     C5DishWidget *fDishWidget;
 
-private:
     void setColors();
 
 private slots:
     void translator();
 
     void deleteDish();
+
+    void raiseMenuVersion();
 };
 
 #endif // CR5DISH_H

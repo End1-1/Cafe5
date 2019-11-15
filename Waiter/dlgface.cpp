@@ -171,6 +171,7 @@ void DlgFace::handleMenu(const QJsonObject &obj)
     C5Menu::fDishSpecial.clear();
     sender()->deleteLater();
     QJsonArray jMenu = obj["menu"].toArray();
+    C5Menu::fMenuVersion = obj["version"].toString();
     for (int i = 0, count = jMenu.count(); i < count; i++) {
         QJsonObject o = jMenu.at(i).toObject();
         C5Menu::fMenu[o["menu_name"].toString()]
@@ -268,6 +269,11 @@ void DlgFace::handleVersion(const QJsonObject &obj)
                 DlgExitByVersion::exit(version, o["version"].toString());
             }
         }
+        if (o["app"].toString() == "menu") {
+            if (o["version"].toString() != C5Menu::fMenuVersion) {
+                DlgExitByVersion::exit(tr("Menu was updated"));
+            }
+        }
     }
 }
 
@@ -280,6 +286,7 @@ void DlgFace::handleSocket(const QJsonObject &obj)
     o["cmd"] = ws.cmd();
     sh->send(o);
     sh->close();
+    sh->deleteLater();
 }
 
 void DlgFace::on_btnConnection_clicked()

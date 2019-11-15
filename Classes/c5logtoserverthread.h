@@ -31,8 +31,10 @@ typedef struct {
 
 } C5LogRecord;
 
-class C5LogToServerThread : public QThread
+class C5LogToServerThread : public QObject
 {
+    Q_OBJECT
+
 public:
     C5LogToServerThread(QObject *parent = nullptr);
 
@@ -40,8 +42,10 @@ public:
 
     static void remember(int type, const QString &user, const QString &rec, const QString &invoice, const QString &reservation, const QString &action, const QString &value1, const QString &value2);
 
-protected:
+public slots:
     void run();
+
+protected:
 
     int fType;
 
@@ -58,6 +62,9 @@ protected:
     QString fValue1;
 
     QString fValue2;
+
+signals:
+    void finished();
 };
 
 #endif // C5LOGTOSERVERTHREAD_H

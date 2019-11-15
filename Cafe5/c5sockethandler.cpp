@@ -7,6 +7,9 @@ C5SocketHandler::C5SocketHandler(QTcpSocket *socket, QObject *parent) :
     QObject(parent)
 {
     fSocket = socket;
+    if (fSocket) {
+        fSocket->setParent(this);
+    }
     if (__socketServerHost.length() == 0) {
         return;
     }
@@ -24,7 +27,7 @@ C5SocketHandler::C5SocketHandler(QTcpSocket *socket, QObject *parent) :
 
 C5SocketHandler::~C5SocketHandler()
 {
-
+    fSocket->deleteLater();
 }
 
 void C5SocketHandler::setServerAddress(const QString &serverIP)

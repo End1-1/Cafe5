@@ -3,7 +3,6 @@
 
 #include <QWidget>
 #include <QTimer>
-#include <QThread>
 
 namespace Ui {
 class NotificationWidget;

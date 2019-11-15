@@ -16,7 +16,7 @@ public:
 
     C5WaiterOrderDoc(const QString &id, C5Database &db);
 
-    C5WaiterOrderDoc(QJsonObject &jh, QJsonArray &jb, C5Database &db);
+    C5WaiterOrderDoc(C5Database &db, QJsonObject &jh, QJsonArray &jb);
 
     ~C5WaiterOrderDoc();
 
@@ -28,11 +28,9 @@ public:
 
     void sendToServer(C5SocketHandler *sh);
 
-    bool transferToHotel(C5Database &fDD, QString &err);
+    bool transferToHotel(C5Database &db, C5Database &fDD, QString &err);
 
-    void makeOutputOfStore();
-
-    static void makeStoreDocument(C5Database &db, const QString &id, int storeId);
+    bool makeOutputOfStore(C5Database &db, QString &err);
 
     QJsonObject fHeader;
 
@@ -68,16 +66,15 @@ public:
 
     void countTotal();
 
-    void calculateSelfCost();
+    void calculateSelfCost(C5Database &db);
 
 private:
-    C5Database fDb;
 
     bool fSaved;
 
-    void open();
+    void open(C5Database &db);
 
-    void getTaxInfo();
+    void getTaxInfo(C5Database &db);
 
     void countTotalV1();
 

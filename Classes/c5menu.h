@@ -18,6 +18,8 @@ public:
     static QMap<QString, QString> fMenuNames;
 
     static QMap<QString, QStringList> fDishSpecial;
+
+    static QString fMenuVersion;
 };
 
 #endif // C5MENU_H

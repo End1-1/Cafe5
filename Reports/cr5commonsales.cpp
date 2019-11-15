@@ -168,7 +168,7 @@ void CR5CommonSales::transferToRoom()
     foreach (int r, rows) {
         QString err;
         C5WaiterOrderDoc w(fModel->data(r, fModel->fColumnNameIndex["f_id"], Qt::EditRole).toString(), db1);
-        w.transferToHotel(db2, err);
+        w.transferToHotel(db1, db2, err);
         if (!err.isEmpty()) {
             C5Message::error(err + "<br>" + fModel->data(r, 0, Qt::EditRole).toString());
             return;

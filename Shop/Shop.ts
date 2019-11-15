@@ -257,6 +257,11 @@
         <source>Sale autooutput</source>
         <translation>Ավտոմատ ելք</translation>
     </message>
+    <message>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="271"/>
+        <source>Store document has been registered for this sale</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>C5TableWidget</name>

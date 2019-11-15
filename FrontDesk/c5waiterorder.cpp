@@ -3,7 +3,9 @@
 #include "c5utils.h"
 #include "c5waiterorder.h"
 #include "c5waiterorderdoc.h"
+#include "c5storedraftwriter.h"
 #include "c5dishwidget.h"
+#include "c5mainwindow.h"
 #include "proxytablewidgetdatabase.h"
 #include <QMenu>
 
@@ -156,11 +158,11 @@ void C5WaiterOrder::showStore()
     db.exec("select sn.f_name as f_dishstatename, d.f_name as f_dishname, st.f_name as f_storename, "
             "g.f_name as f_goodsname, b.f_qty1, r.f_qty, o.f_qty as f_outputqty, o.f_price, "
             "o.f_qty*o.f_price as f_total "
-            "from o_store_output o "
+            "from o_goods o "
             "inner join o_body b on b.f_id=o.f_body "
             "inner join o_body_state sn on sn.f_id=b.f_state "
             "inner join d_dish d on d.f_id=b.f_dish "
-            "inner join c_storages st on st.f_id=b.f_store "
+            "inner join c_storages st on st.f_id=o.f_store "
             "inner join d_recipes r on r.f_dish=b.f_dish "
             "inner join c_goods g on g.f_id=r.f_goods and r.f_goods=o.f_goods "
             "where b.f_header=:f_header and (b.f_state=:f_state1 or b.f_state=:f_state2)");
@@ -173,12 +175,29 @@ void C5WaiterOrder::removeOrder()
         return;
     }
     C5Database db(fDBParams);
+    C5StoreDraftWriter dw(db);
+    db.startTransaction();
+    db[":f_header"] = ui->leUuid->text();
+    db.exec("select f_id from o_goods where f_header=:f_header");
+    QStringList idList;
+    while (db.nextRow()) {
+        idList.append(db.getString("f_id"));
+    }
+    for (const QString &id: idList) {
+        if (!dw.rollbackOutput(db, id)) {
+            db.rollback();
+            C5Message::error(dw.fErrorMsg);
+            return;
+        }
+    }
     db[":f_state"] = ORDER_STATE_VOID;
     db[":f_id"] = ui->leUuid->text();
     db.exec("update o_header set f_state=:f_state where f_id=:f_id");
     db[":f_state"] = DISH_STATE_MISTAKE;
     db[":f_header"] = ui->leUuid->text();
     db.exec("update o_body set f_state=:f_state where f_header=:f_header");
+    db.commit();
+    __mainWindow->removeTab(this);
     C5Message::info(tr("Removed"));
 }
 
@@ -204,7 +223,7 @@ void C5WaiterOrder::transferToHotel()
     C5WaiterOrderDoc d(ui->leUuid->text(), db);
     QString err;
     C5Database fDD(fDBParams.at(0), C5Config::hotelDatabase(), fDBParams.at(2), fDBParams.at(3));
-    d.transferToHotel(fDD, err);
+    d.transferToHotel(db, fDD, err);
     if (err.isEmpty()) {
         C5Message::info(tr("Done"));
     } else {
@@ -216,7 +235,7 @@ void C5WaiterOrder::recountSelfCost()
 {
     C5Database db(fDBParams);
     C5WaiterOrderDoc d(ui->leUuid->text(), db);
-    d.calculateSelfCost();
+    d.calculateSelfCost(db);
     jsonToDoc(d);
     C5Message::info(tr("Done"));
 }

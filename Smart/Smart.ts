@@ -62,7 +62,7 @@
     <message>
         <location filename="../Cafe5/c5connection.ui" line="173"/>
         <source>Full screen</source>
-        <translation type="unfinished"></translation>
+        <translation>Ամբողջ էկրանին</translation>
     </message>
     <message>
         <location filename="../Cafe5/c5connection.cpp" line="81"/>
@@ -124,7 +124,7 @@
     <message>
         <location filename="../Classes/c5printing.cpp" line="297"/>
         <source>Failed send order to remote printer</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -217,17 +217,17 @@
     <message>
         <location filename="../Classes/notificationwidget.ui" line="23"/>
         <source>Message</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Classes/notificationwidget.ui" line="95"/>
         <source>27.07.2019 22:16</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Classes/notificationwidget.ui" line="179"/>
         <source>The message!</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>

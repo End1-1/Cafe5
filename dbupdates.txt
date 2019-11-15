@@ -73,7 +73,7 @@ alter table a_store add f_draft char(36);
 
 
 /* DB - 3 */
-update s_app set f_version ='3' where f_app='DB";
+update s_app set f_version ='3' where f_app='DB';
 ALTER TABLE `a_store_draft` ADD INDEX `fk_store_draft_document_idx` (`f_document` ASC);
 alter table o_goods add f_storerec char(36);
 alter table a_store_draft add column f_store integer after f_document, add column f_type smallint after f_store;
@@ -83,3 +83,6 @@ alter table a_store_draft add column f_base char(36);
 ALTER TABLE `a_store_draft` ADD INDEX `fk_store_draft_base_idx` (`f_base` ASC);
 INSERT INTO `a_reason` (`f_id`, `f_name`) VALUES ('9', 'Հետ վերադարձ');
 UPDATE `a_reason` SET `f_name` = 'Տեղաշարժ' WHERE (`f_id` = '2');
+insert into s_app (f_app, f_version) values ('menu', '1');
+alter table o_goods add f_body char(36) after f_header;
+drop table o_store_output;

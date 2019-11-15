@@ -86,6 +86,12 @@ void C5WaiterServer::reply(QJsonObject &o)
         o["menu"] = jMenu;
         o["menunames"] = jMenuNames;
         o["dishspecial"] = jDishSpecial;
+        srh.fDb.exec("select f_version from s_app where lower(f_app)='menu'");
+        if (srh.fDb.nextRow()) {
+            o["version"] = srh.fDb.getString(0);
+        } else {
+            o["version"] = "1";
+        }
         break;
     }
     case sm_checkuser: {
@@ -329,10 +335,9 @@ void C5WaiterServer::reply(QJsonObject &o)
             srh.fDb.update("h_tables", where_id(jh["f_table"].toString().toInt()));
 
             C5Database fDD(C5Config::dbParams().at(0), C5Config::hotelDatabase(), C5Config::dbParams().at(2), C5Config::dbParams().at(3));
-            C5WaiterOrderDoc w(jh, jb, srh.fDb);
-            w.transferToHotel(fDD, err);
-            w.makeOutputOfStore();
-            w.makeStoreDocument(srh.fDb, jh["f_id"].toString(), 0);
+            C5WaiterOrderDoc w(srh.fDb, jh, jb);
+            w.transferToHotel(srh.fDb, fDD, err);
+            w.makeOutputOfStore(srh.fDb, err);
         }
         o["reply"] = err.isEmpty() ? 1 : 0;
         o["msg"] = err;
@@ -783,8 +788,8 @@ bool C5WaiterServer::printBill(QJsonObject &jh, QJsonArray &jb, QString &err, C5
         }
     }
     if (jh["f_otherid"].toString().toInt() == PAYOTHER_SELFCOST) {
-        C5WaiterOrderDoc w(jh, jb, srh.fDb);
-        w.calculateSelfCost();
+        C5WaiterOrderDoc w(srh.fDb, jh, jb);
+        w.calculateSelfCost(srh.fDb);
         jh = w.fHeader;
         jb = w.fItems;
     }
@@ -836,8 +841,8 @@ bool C5WaiterServer::printReceipt(QJsonObject &jh, QJsonArray &jb, QString &err,
 
     }
     if (jh["f_otherid"].toString().toInt() == PAYOTHER_SELFCOST) {
-        C5WaiterOrderDoc w(jh, jb, srh.fDb);
-        w.calculateSelfCost();
+        C5WaiterOrderDoc w(srh.fDb, jh, jb);
+        w.calculateSelfCost(srh.fDb);
         jh = w.fHeader;
         jb = w.fItems;
     }

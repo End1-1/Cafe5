@@ -2114,27 +2114,22 @@
         <translation>Գումար</translation>
     </message>
     <message>
-        <location filename="c5salefromstoreorder.cpp" line="32"/>
+        <location filename="c5salefromstoreorder.cpp" line="33"/>
         <source>Save changes?</source>
         <translation>Պահպանել՞ փոփոխությունները</translation>
     </message>
     <message>
-        <location filename="c5salefromstoreorder.cpp" line="50"/>
+        <location filename="c5salefromstoreorder.cpp" line="51"/>
         <source>No such order</source>
         <translation>Այդպիսի կտրոն գոյություն չունի</translation>
     </message>
     <message>
-        <location filename="c5salefromstoreorder.cpp" line="105"/>
-        <source>Store document has been registered for this sale</source>
-        <translation>Պահեստի փասթաթուղթը գրանցված է այս վաճառքի համար</translation>
-    </message>
-    <message>
-        <location filename="c5salefromstoreorder.cpp" line="129"/>
+        <location filename="c5salefromstoreorder.cpp" line="107"/>
         <source>Delete</source>
         <translation>Հեռացնել</translation>
     </message>
     <message>
-        <location filename="c5salefromstoreorder.cpp" line="141"/>
+        <location filename="c5salefromstoreorder.cpp" line="119"/>
         <source>Are you sure to delete selected row?</source>
         <translation>Հաստատեք հեռացումը</translation>
     </message>
@@ -2804,6 +2799,11 @@ goods list</source>
         <source>Sale autooutput</source>
         <translation>Ավտոմատ ելք, վաճառք</translation>
     </message>
+    <message>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="271"/>
+        <source>Store document has been registered for this sale</source>
+        <translation>Պահեստի փասթաթուղթը գրանցված է այս վաճառքի համար</translation>
+    </message>
 </context>
 <context>
     <name>C5StoreInventory</name>
@@ -3099,7 +3099,7 @@ goods list</source>
     <message>
         <location filename="c5waiterorder.ui" line="354"/>
         <location filename="c5waiterorder.ui" line="550"/>
-        <location filename="c5waiterorder.cpp" line="59"/>
+        <location filename="c5waiterorder.cpp" line="61"/>
         <source>Service</source>
         <translation>Սպասարկման տոկոս</translation>
     </message>
@@ -3186,62 +3186,62 @@ goods list</source>
         <translation>Արժեք 2</translation>
     </message>
     <message>
-        <location filename="c5waiterorder.cpp" line="15"/>
+        <location filename="c5waiterorder.cpp" line="17"/>
         <source>Order</source>
         <translation>Պատվեր</translation>
     </message>
     <message>
-        <location filename="c5waiterorder.cpp" line="63"/>
+        <location filename="c5waiterorder.cpp" line="65"/>
         <source>Invalid order uuid</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="c5waiterorder.cpp" line="112"/>
+        <location filename="c5waiterorder.cpp" line="114"/>
         <source>Transfer to hotel</source>
         <translation>Թարմացնել
 Հյուր․ համակարգում</translation>
     </message>
     <message>
-        <location filename="c5waiterorder.cpp" line="113"/>
+        <location filename="c5waiterorder.cpp" line="115"/>
         <source>Recount selfcost</source>
         <translation>Հաշվարկել
 ինքնարժեքը</translation>
     </message>
     <message>
-        <location filename="c5waiterorder.cpp" line="114"/>
+        <location filename="c5waiterorder.cpp" line="116"/>
         <source>Show all</source>
         <translation>Ցուցադրել
 բոլորը</translation>
     </message>
     <message>
-        <location filename="c5waiterorder.cpp" line="115"/>
+        <location filename="c5waiterorder.cpp" line="117"/>
         <source>Hide removed</source>
         <translation>Թաքցնել
 հեռացվածները</translation>
     </message>
     <message>
-        <location filename="c5waiterorder.cpp" line="116"/>
+        <location filename="c5waiterorder.cpp" line="118"/>
         <source>Remove</source>
         <translation>Հեռացնել</translation>
     </message>
     <message>
-        <location filename="c5waiterorder.cpp" line="172"/>
+        <location filename="c5waiterorder.cpp" line="174"/>
         <source>Confirm to remove</source>
         <translation>Հաստատեք հեռացումը</translation>
     </message>
     <message>
-        <location filename="c5waiterorder.cpp" line="182"/>
+        <location filename="c5waiterorder.cpp" line="201"/>
         <source>Removed</source>
         <translation>Հեռացված է</translation>
     </message>
     <message>
-        <location filename="c5waiterorder.cpp" line="209"/>
-        <location filename="c5waiterorder.cpp" line="221"/>
+        <location filename="c5waiterorder.cpp" line="228"/>
+        <location filename="c5waiterorder.cpp" line="240"/>
         <source>Done</source>
         <translation>Պատրաստ է</translation>
     </message>
     <message>
-        <location filename="c5waiterorder.cpp" line="241"/>
+        <location filename="c5waiterorder.cpp" line="260"/>
         <source>Open menu item</source>
         <translation>Դիտել ճաշացանկի գրանցումը</translation>
     </message>
@@ -3249,9 +3249,9 @@ goods list</source>
 <context>
     <name>C5WaiterOrderDoc</name>
     <message>
-        <location filename="../Classes/c5waiterorderdoc.cpp" line="327"/>
-        <source>Auto output</source>
-        <translation>Ավտոմատ ելք</translation>
+        <location filename="../Classes/c5waiterorderdoc.cpp" line="294"/>
+        <source>Document saved</source>
+        <translation>Պահեստի փասթաթուղթը պահպանված է</translation>
     </message>
 </context>
 <context>
@@ -4773,6 +4773,11 @@ MS Excel</translation>
         <source>Movement reason</source>
         <translation>Պահեստի շարժի նշանակություն</translation>
     </message>
+    <message>
+        <location filename="../Editors/ce5storereason.cpp" line="31"/>
+        <source>This item is not editable</source>
+        <translation>Այս գրանցումը խմբագրման ենթակա չէ</translation>
+    </message>
 </context>
 <context>
     <name>CE5Table</name>
@@ -5296,22 +5301,22 @@ base on recipes</source>
         <translation>Փոխել ելքի պահեստը</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5consumptionbysales.cpp" line="357"/>
+        <location filename="../Reports/cr5consumptionbysales.cpp" line="376"/>
         <source>Lost</source>
         <translation>Կորուստ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5consumptionbysales.cpp" line="360"/>
+        <location filename="../Reports/cr5consumptionbysales.cpp" line="379"/>
         <source>Over</source>
         <translation>Ավելցուկ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5consumptionbysales.cpp" line="383"/>
-        <source>Store must be selected</source>
-        <translation>Պահեստը նշված չէ</translation>
+        <location filename="../Reports/cr5consumptionbysales.cpp" line="414"/>
+        <source>Complete with errors</source>
+        <translation>Ավարտված է սխալներով</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5consumptionbysales.cpp" line="458"/>
+        <location filename="../Reports/cr5consumptionbysales.cpp" line="412"/>
         <source>Done</source>
         <translation>Պատրաստ է</translation>
     </message>
@@ -5346,28 +5351,28 @@ output</source>
         <translation>Պահեստը նշված չէ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5consumptionbysales.cpp" line="276"/>
+        <location filename="../Reports/cr5consumptionbysales.cpp" line="295"/>
         <source>Created automaticaly</source>
         <translation>Ստեղծված է ավտոմատ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5consumptionbysales.cpp" line="308"/>
+        <location filename="../Reports/cr5consumptionbysales.cpp" line="327"/>
         <source>Inventory qty</source>
         <translation>Գույքագրման քանակ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5consumptionbysales.cpp" line="308"/>
+        <location filename="../Reports/cr5consumptionbysales.cpp" line="327"/>
         <source>Qty</source>
         <translation>Քանակ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5consumptionbysales.cpp" line="313"/>
+        <location filename="../Reports/cr5consumptionbysales.cpp" line="332"/>
         <source>Quantity must be greater than 0</source>
         <translation>Քանակը պետք է լինի զրոից ավել</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5consumptionbysales.cpp" line="354"/>
-        <location filename="../Reports/cr5consumptionbysales.cpp" line="376"/>
+        <location filename="../Reports/cr5consumptionbysales.cpp" line="373"/>
+        <location filename="../Reports/cr5consumptionbysales.cpp" line="395"/>
         <source>Sale</source>
         <translation>Վաճառք</translation>
     </message>
@@ -5756,19 +5761,30 @@ output</source>
         <translation>Հեռացնել</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dish.cpp" line="91"/>
+        <location filename="../Reports/cr5dish.cpp" line="43"/>
+        <source>Raise menu version</source>
+        <translation>Փոխել ճաշացանկի
+տարբերակը</translation>
+    </message>
+    <message>
+        <location filename="../Reports/cr5dish.cpp" line="92"/>
         <source>This name in use and cannot be removed</source>
         <translation>Այս անվանումը օգտագործվում է</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dish.cpp" line="94"/>
+        <location filename="../Reports/cr5dish.cpp" line="95"/>
         <source>Confirm to remove the selected dish</source>
         <translation>Հաստատեք հեռացումը</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dish.cpp" line="106"/>
+        <location filename="../Reports/cr5dish.cpp" line="107"/>
         <source>Deleted</source>
         <translation>Հեռացված է</translation>
+    </message>
+    <message>
+        <location filename="../Reports/cr5dish.cpp" line="124"/>
+        <source>Current menu version</source>
+        <translation>Ընդացիկ տարբերակը</translation>
     </message>
 </context>
 <context>
