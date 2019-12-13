@@ -32,6 +32,8 @@ private:
 
     C5User *fUser;
 
+    int fCarNumber;
+
     C5WaiterOrderDoc *fOrder;
 
     QString fMenuName;
@@ -59,6 +61,8 @@ private:
     void setButtonsState();
 
     void changeTimeOrder();
+
+    void setCar(int num);
 
 private slots:
     void addDishToOrder(const QJsonObject &obj);
@@ -126,6 +130,10 @@ private slots:
     void on_btnTime2_clicked();
 
     void on_btnTime3_clicked();
+
+    void on_btnCar_clicked();
+
+    void on_btnPackage_clicked();
 };
 
 #endif // DLGORDER_H

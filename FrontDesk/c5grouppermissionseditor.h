@@ -45,6 +45,8 @@ private slots:
 
     void on_chCash_clicked(bool checked);
 
+    void on_chSalaryAll_clicked(bool checked);
+
 private:
     Ui::C5GroupPermissionsEditor *ui;
 

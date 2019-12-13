@@ -20,6 +20,10 @@ public:
     static QMap<QString, QStringList> fDishSpecial;
 
     static QString fMenuVersion;
+
+    static QMap<QString, QJsonObject> fPackages;
+
+    static QMap<int, QList<QJsonObject> > fPackagesList;
 };
 
 #endif // C5MENU_H

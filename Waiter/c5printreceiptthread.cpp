@@ -109,22 +109,31 @@ void C5PrintReceiptThread::print()
 //        p.br(); <--- this row fuck
         QString servPlus;
         QString servValue = float_str(fHeader["f_servicefactor"].toString().toDouble() * 100, 2) + "% ";
+        QString total = o["f_total"].toString().toDouble() > 0.001 ? float_str(o["f_total"].toString().toDouble(), 2) : tr("Present");
         if (fHeader["f_servicemode"].toString().toInt() == SERVICE_AMOUNT_MODE_INCREASE_PRICE) {
             if (fHeader["f_servicefactor"].toString().toDouble() > 0.001) {
                 servPlus = "+";
             } else {
                 servValue = "";
             }
-            p.ltext(QString("%1 x %2 %3 %4 = %5")
-                    .arg(float_str(o["f_qty2"].toString().toDouble(), 2))
-                    .arg(float_str(o["f_price"].toString().toDouble(), 2))
-                    .arg(servPlus).arg(servValue)
-                    .arg(float_str(o["f_total"].toString().toDouble(), 2)), 0);
+            if (total.toDouble() < 0.001) {
+                p.rtext(total);
+            } else {
+                p.ltext(QString("%1 x %2 %3 %4 = %5")
+                        .arg(float_str(o["f_qty2"].toString().toDouble(), 2))
+                        .arg(float_str(o["f_price"].toString().toDouble(), 2))
+                        .arg(servPlus).arg(servValue)
+                        .arg(total), 0);
+            }
         } else {
-            p.rtext(QString("%1 x %2 = %5")
-                    .arg(float_str(o["f_qty2"].toString().toDouble(), 2))
-                    .arg(float_str(o["f_price"].toString().toDouble(), 2))
-                    .arg(float_str(o["f_total"].toString().toDouble(), 2)));
+            if (total.toDouble() < 0.001) {
+                p.rtext(total);
+            } else {
+                p.rtext(QString("%1 x %2 = %5")
+                        .arg(float_str(o["f_qty2"].toString().toDouble(), 2))
+                        .arg(float_str(o["f_price"].toString().toDouble(), 2))
+                        .arg(total));
+            }
         }
         p.br();
         p.br(2);
@@ -233,12 +242,21 @@ void C5PrintReceiptThread::print()
         p.br(p.fLineHeight * 2);
     }
 
-    if (!fHeader["f_other_clcode"].toString().isEmpty()) {
+    if (!fHeader["f_other_clcode"].toString().isEmpty() && fHeader["f_otherid"].toString().toInt() == PAYOTHER_CL) {
         p.br();
         p.ctext(__translator.tt(tr("City ledger")));
         p.br();
         p.ctext(fHeader["f_other_clcode"].toString() + ", " + fHeader["f_other_clname"].toString());
         p.br(p.fLineHeight * 3);
+    }
+
+    if (fHeader["f_otherid"].toString().toInt() == PAYOTHER_DEBT) {
+        p.br();
+        p.ctext(__translator.tt(tr("Debt")) + " " + fHeader["f_other_clname"].toString());
+        p.br(p.fLineHeight * 3);
+        p.line(3);
+        p.ctext(__translator.tt(tr("Signature")));
+        p.br(p.fLineHeight * 2);
     }
 
     if (fHeader["f_otherid"].toString().toInt() == PAYOTHER_COMPLIMENTARY) {
@@ -247,6 +265,18 @@ void C5PrintReceiptThread::print()
         p.br(p.fLineHeight * 3);
         p.line(3);
         p.ctext(__translator.tt(tr("Signature")));
+        p.br(p.fLineHeight * 2);
+    }
+
+    if (fHeader["car"].toString().toInt() > 0) {
+        p.br();
+        p.ltext(tr("Costumer"), 0);
+        p.br();
+        p.ltext(fHeader["car_costumer"].toString(), 0);
+        p.br();
+        p.ltext(fHeader["car_model"].toString(), 0);
+        p.br();
+        p.ltext(fHeader["car_govnumber"].toString(), 0);
         p.br(p.fLineHeight * 2);
     }
 

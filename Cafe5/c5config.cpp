@@ -240,6 +240,12 @@ bool C5Config::alwaysOfferTaxPrint()
     return getValue(param_tax_print_always_offer).toInt() == 1;
 }
 
+bool C5Config::carMode()
+{
+    bool val = getValue(param_car_mode).toInt() == 1;
+    return val;
+}
+
 QString C5Config::getValue(int key)
 {
     QMutexLocker ml(&settingsMutex);

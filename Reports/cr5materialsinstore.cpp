@@ -57,7 +57,8 @@ void CR5MaterialsInStore::prepareDrafts()
                     << "inner join c_goods g on g.f_id=s.f_goods [g]"
                        ;
 
-    fColumnsFields << "ss.f_name as f_storage"
+    fColumnsFields << "g.f_id as f_code"
+                   << "ss.f_name as f_storage"
                    << "gg.f_name as f_group"
                    << "g.f_name as f_goods"
                    << "sum(s.f_qty*s.f_type) as f_qty"
@@ -69,7 +70,8 @@ void CR5MaterialsInStore::prepareDrafts()
                    << "sum(s.f_qty*s.f_type)*g.f_saleprice as f_totalsale"
                       ;
 
-    fColumnsGroup << "ss.f_name as f_storage"
+    fColumnsGroup << "g.f_id as f_code"
+                  << "ss.f_name as f_storage"
                    << "gg.f_name as f_group"
                    << "g.f_lastinputprice"
                    << "u.f_name as f_unit"
@@ -85,6 +87,7 @@ void CR5MaterialsInStore::prepareDrafts()
 
     fHavindCondition = " having sum(s.f_qty*s.f_type) <> 0 ";
 
+    fTranslation["f_code"] = tr("Code");
     fTranslation["f_storage"] = tr("Storage");
     fTranslation["f_group"] = tr("Group");
     fTranslation["f_goods"] = tr("Goods");
@@ -96,6 +99,7 @@ void CR5MaterialsInStore::prepareDrafts()
     fTranslation["f_saleprice"] = tr("Sale price");
     fTranslation["f_totalsale"] = tr("Sale amount");
 
+    fColumnsVisible["g.f_id as f_code"] = true;
     fColumnsVisible["ss.f_name as f_storage"] = true;
     fColumnsVisible["gg.f_name as f_group"] = true;
     fColumnsVisible["g.f_name as f_goods"] = true;
@@ -127,7 +131,8 @@ void CR5MaterialsInStore::prepareNoDrafts()
                     << "inner join c_goods g on g.f_id=s.f_goods [g]"
                        ;
 
-    fColumnsFields << "ss.f_name as f_storage"
+    fColumnsFields << "g.f_id as f_code"
+                   << "ss.f_name as f_storage"
                    << "gg.f_name as f_group"
                    << "g.f_name as f_goods"
                    << "sum(s.f_qty*s.f_type) as f_qty"
@@ -139,7 +144,8 @@ void CR5MaterialsInStore::prepareNoDrafts()
                    << "sum(s.f_qty*s.f_type)*g.f_saleprice as f_totalsale"
                       ;
 
-    fColumnsGroup << "ss.f_name as f_storage"
+    fColumnsGroup << "g.f_id as f_code"
+                  << "ss.f_name as f_storage"
                    << "gg.f_name as f_group"
                    << "s.f_price"
                    << "u.f_name as f_unit"
@@ -155,6 +161,7 @@ void CR5MaterialsInStore::prepareNoDrafts()
 
     fHavindCondition = " having sum(s.f_qty*s.f_type) <> 0 ";
 
+    fTranslation["f_code"] = tr("Code");
     fTranslation["f_storage"] = tr("Storage");
     fTranslation["f_group"] = tr("Group");
     fTranslation["f_goods"] = tr("Goods");
@@ -166,6 +173,7 @@ void CR5MaterialsInStore::prepareNoDrafts()
     fTranslation["f_saleprice"] = tr("Sale price");
     fTranslation["f_totalsale"] = tr("Sale amount");
 
+    fColumnsVisible["g.f_id as f_code"] = true;
     fColumnsVisible["ss.f_name as f_storage"] = true;
     fColumnsVisible["gg.f_name as f_group"] = true;
     fColumnsVisible["g.f_name as f_goods"] = true;

@@ -38,14 +38,19 @@ SOURCES += \
     ../Classes/notificationwidget.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
     ../Editors/c5cashname.cpp \
+    ../Editors/ce5dishpackage.cpp \
+    ../Editors/ce5packagelist.cpp \
     ../Editors/ce5storereason.cpp \
     ../Reports/cr5cashdetailed.cpp \
     ../Reports/cr5cashdetailedfilter.cpp \
     ../Reports/cr5cashnames.cpp \
+    ../Reports/cr5costumerdebts.cpp \
+    ../Reports/cr5costumerdebtsfilter.cpp \
     ../Reports/cr5customers.cpp \
     ../Reports/cr5debtstopartner.cpp \
     ../Reports/cr5discountstatisics.cpp \
     ../Reports/cr5discountstatisticsfilter.cpp \
+    ../Reports/cr5dishpackage.cpp \
     ../Reports/cr5menureview.cpp \
     ../Reports/cr5salefromstoretotal.cpp \
     ../Reports/cr5salefromstoretotalfilter.cpp \
@@ -55,7 +60,10 @@ SOURCES += \
     ../Reports/cr5salesbydishesfilter.cpp \
     ../Reports/cr5storereason.cpp \
     c5cashdoc.cpp \
+    c5costumerdebtpayment.cpp \
     c5inputdate.cpp \
+    c5progressdialog.cpp \
+    c5salarydoc.cpp \
     dlgchangeoutputstore.cpp \
         main.cpp \
         c5mainwindow.cpp \
@@ -191,14 +199,19 @@ HEADERS += \
     ../Classes/notificationwidget.h \
     ../Classes/proxytablewidgetdatabase.h \
     ../Editors/c5cashname.h \
+    ../Editors/ce5dishpackage.h \
+    ../Editors/ce5packagelist.h \
     ../Editors/ce5storereason.h \
     ../Reports/cr5cashdetailed.h \
     ../Reports/cr5cashdetailedfilter.h \
     ../Reports/cr5cashnames.h \
+    ../Reports/cr5costumerdebts.h \
+    ../Reports/cr5costumerdebtsfilter.h \
     ../Reports/cr5customers.h \
     ../Reports/cr5debtstopartner.h \
     ../Reports/cr5discountstatisics.h \
     ../Reports/cr5discountstatisticsfilter.h \
+    ../Reports/cr5dishpackage.h \
     ../Reports/cr5menureview.h \
     ../Reports/cr5salefromstoretotal.h \
     ../Reports/cr5salefromstoretotalfilter.h \
@@ -208,6 +221,7 @@ HEADERS += \
     ../Reports/cr5salesbydishesfilter.h \
     ../Reports/cr5storereason.h \
     c5cashdoc.h \
+    c5costumerdebtpayment.h \
     c5inputdate.h \
         c5mainwindow.h \
     ../Cafe5/c5config.h \
@@ -219,6 +233,7 @@ HEADERS += \
     ../Cafe5/c5sockethandler.h \
     c5login.h \
     ../Classes/c5permissions.h \
+    c5progressdialog.h \
     c5reportwidget.h \
     ../Classes/c5grid.h \
     ../Reports/cr5usersgroups.h \
@@ -250,6 +265,7 @@ HEADERS += \
     ../Reports/cr5goodsgroup.h \
     ../Reports/cr5goods.h \
     ../Reports/cr5goodswaste.h \
+    c5salarydoc.h \
     c5selector.h \
     ../Controls/c5lineeditwithselector.h \
     c5storedoc.h \
@@ -344,13 +360,17 @@ HEADERS += \
 FORMS += \
     ../Classes/notificationwidget.ui \
     ../Editors/c5cashname.ui \
+    ../Editors/ce5dishpackage.ui \
+    ../Editors/ce5packagelist.ui \
     ../Editors/ce5storereason.ui \
     ../Reports/cr5cashdetailedfilter.ui \
+    ../Reports/cr5costumerdebtsfilter.ui \
     ../Reports/cr5discountstatisticsfilter.ui \
     ../Reports/cr5salefromstoretotalfilter.ui \
     ../Reports/cr5saleremoveddishesfilter.ui \
     ../Reports/cr5salesbydishesfilter.ui \
     c5cashdoc.ui \
+    c5costumerdebtpayment.ui \
     c5inputdate.ui \
         c5mainwindow.ui \
     ../Cafe5/c5connection.ui \
@@ -363,6 +383,8 @@ FORMS += \
     c5passwords.ui \
     c5grouppermissionseditor.ui \
     ../Reports/c5settingswidget.ui \
+    c5progressdialog.ui \
+    c5salarydoc.ui \
     c5selector.ui \
     c5storedoc.ui \
     ../Reports/cr5materialinstorefilter.ui \

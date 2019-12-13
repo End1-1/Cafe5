@@ -71,6 +71,7 @@ RKeyboard::~RKeyboard()
 void RKeyboard::setText(const QString &text)
 {
     fText = text;
+    ui->leResult->setText(fText);
 }
 
 QString RKeyboard::text() const

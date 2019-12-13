@@ -95,6 +95,9 @@ private:
     void clearOther();
 
     void setSelfCost();
+
+private slots:
+    void handlePaymentDebtCar(const QJsonObject &obj);
 };
 
 #endif // DLGPAYMENT_H

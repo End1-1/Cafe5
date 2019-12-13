@@ -184,3 +184,8 @@ void C5GroupPermissionsEditor::on_chCash_clicked(bool checked)
 {
     setChecked(800, 899, checked);
 }
+
+void C5GroupPermissionsEditor::on_chSalaryAll_clicked(bool checked)
+{
+    setChecked(900, 999, checked);
+}

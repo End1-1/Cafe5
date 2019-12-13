@@ -46,6 +46,7 @@
 #define cp_t4_dish_comments 406
 #define cp_t4_dish_price_self_cost 407
 #define cp_t4_menu_review 408
+#define cp_t4_dishes_packages 409
 
 #define cp_t5_waiter 500
 #define cp_t5_multiple_receipt 501
@@ -81,6 +82,11 @@
 #define cp_t8_cash_common_report 802
 #define cp_t8_cash_detailed_report 803
 #define cp_t8_cash_names 804
+#define cp_t8_costumer_debts 805
+
+#define cp_t9_salary 900
+#define cp_t9_salary_doc 901
+#define cp_t9_report 902
 
 
 class C5Permissions

@@ -17,6 +17,8 @@
 #include "dlglistofdishcomments.h"
 #include "dlglistdishspecial.h"
 #include "dlgface.h"
+#include "dlglistofpackages.h"
+#include "dlgcarnumber.h"
 #include "dlglistofmenu.h"
 #include <QCloseEvent>
 #include <QScrollBar>
@@ -33,6 +35,9 @@ DlgOrder::DlgOrder() :
     ui(new Ui::DlgOrder)
 {
     ui->setupUi(this);
+    fCarNumber = 0;
+    ui->lbCar->setVisible(C5Config::carMode());
+    ui->btnCar->setVisible(C5Config::carMode());
     fOrder = new C5WaiterOrderDoc();
     ui->btnGuest->setVisible(C5Config::useHotel());
     ui->btnCompactDishAddMode->setChecked(C5Config::getRegValue("compact dish add mode", true).toBool());
@@ -284,6 +289,11 @@ void DlgOrder::loadOrder(const QJsonObject &obj)
         ui->lbDiscount->setEnabled(false);
         ui->lbDiscount->setText(tr("[Discount]"));
     }
+    if (fOrder->hString("car").toInt() > 0) {
+        setCar(fOrder->hInt("car"));
+    } else {
+        ui->lbCar->clear();
+    }
     setServiceLabel();
     if (fOrder->hInt("f_staff") != fOrder->hInt("f_currentstaff")) {
         C5Message::info(QString("%1\r\n%2").arg(tr("Order owner")).arg(fOrder->hString("f_staffname")));
@@ -298,6 +308,10 @@ void DlgOrder::changeQty(double qty)
     }
     int index = ml.at(0).row();
     QJsonObject o = fOrder->item(index);
+    if (o["d_package"].toString().toInt() > 0) {
+        C5Message::error(tr("You cannot change the quantity of items of package"));
+        return;
+    }
     QString oldQty = o["f_qty1"].toString();
     if (qty > 0) {
         if (o["f_qty1"].toString().toDouble() + qty > 99) {
@@ -427,6 +441,25 @@ void DlgOrder::changeTimeOrder()
     fOrder->fItems[index] = o;
     ui->tblOrder->item(index, 0)->setData(Qt::UserRole, fOrder->fItems[index].toObject());
     ui->tblOrder->viewport()->update();
+}
+
+void DlgOrder::setCar(int num)
+{
+    ui->lbCar->setVisible(false);
+    C5Database db(fDBParams);
+    db[":f_id"] = num;
+    db.exec("select concat(c.f_name, ', ', bc.f_govnumber, ', ', trim(concat(cl.f_lastname, ' ', cl.f_firstname))) "
+            "from b_car bc "
+            "left join b_clients cl on cl.f_id=bc.f_costumer "
+            "left join s_car c on c.f_id=bc.f_car "
+            "where bc.f_id=:f_id");
+    if (db.nextRow()) {
+        fCarNumber = num;
+        ui->lbCar->setVisible(true);
+        ui->lbCar->setEnabled(true);
+        ui->lbCar->setText(QString("[%1]").arg(db.getString(0)));
+    }
+    fOrder->fHeader["car"] = QString::number(num);
 }
 
 void DlgOrder::handleOpenTable(const QJsonObject &obj)
@@ -606,6 +639,12 @@ void DlgOrder::on_btnPrintService_clicked()
 
 void DlgOrder::on_btnPayment_clicked()
 {
+    if (C5Config::carMode()) {
+        if (fOrder->hInt("car") == 0) {
+            C5Message::error(tr("Car model and costumer not specified"));
+            return;
+        }
+    }
     bool empty = true;
     for (int i = 0; i < fOrder->itemsCount(); i++) {
         if (fOrder->iInt("f_state", i) != DISH_STATE_OK) {
@@ -831,4 +870,26 @@ void DlgOrder::on_btnTime2_clicked()
 void DlgOrder::on_btnTime3_clicked()
 {
     changeTimeOrder();
+}
+
+void DlgOrder::on_btnCar_clicked()
+{
+    int num;
+    if (!DlgCarNumber::getNumber(num)) {
+        return;
+    }
+    setCar(num);
+}
+
+void DlgOrder::on_btnPackage_clicked()
+{
+    int id;
+    QString name;
+    if (DlgListOfPackages::package(id, name)) {
+        QList<QJsonObject> items = C5Menu::fPackagesList[id];
+        for (const QJsonObject &o: items) {
+            addDishToOrder(o);
+        }
+        logRecord("", "New package", name, "");
+    }
 }

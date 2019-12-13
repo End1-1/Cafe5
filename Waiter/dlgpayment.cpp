@@ -4,6 +4,7 @@
 #include "c5utils.h"
 #include "c5cafecommon.h"
 #include "wpaymentoptions.h"
+#include "c5sockethandler.h"
 #include "dlgguest.h"
 #include "dlgcl.h"
 #include "c5user.h"
@@ -424,6 +425,14 @@ void DlgPayment::setSelfCost()
     }
 }
 
+void DlgPayment::handlePaymentDebtCar(const QJsonObject &obj)
+{
+    fOrder->hSetString("f_otherid", QString::number(PAYOTHER_DEBT));
+    fOrder->hSetString("f_other_clcode", obj["f_id"].toString());
+    fOrder->hSetString("f_other_clname", obj["f_name"].toString());
+    setCLComment();
+}
+
 void DlgPayment::setPaymentInfo()
 {
     for (int i = ui->tblInfo->rowCount() - 1; i > paystart - 1; i--) {
@@ -638,12 +647,19 @@ void DlgPayment::on_btnTax_clicked()
 
 void DlgPayment::on_btnPayCityLedger_clicked()
 {
-    QString clCode, clName;
-    if (DlgCL::getCL(clCode, clName)) {
-        fOrder->hSetString("f_otherid", QString::number(PAYOTHER_CL));
-        fOrder->hSetString("f_other_clcode", clCode);
-        fOrder->hSetString("f_other_clname", clName);
-        setCLComment();
+    if (C5Config::carMode()) {
+        C5SocketHandler *h = createSocketHandler(SLOT(handlePaymentDebtCar(QJsonObject)));
+        h->bind("cmd", sm_getcostumer_by_car);
+        h->bind("car", fOrder->hString("car"));
+        h->send();
+    } else {
+        QString clCode, clName;
+        if (DlgCL::getCL(clCode, clName)) {
+            fOrder->hSetString("f_otherid", QString::number(PAYOTHER_CL));
+            fOrder->hSetString("f_other_clcode", clCode);
+            fOrder->hSetString("f_other_clname", clName);
+            setCLComment();
+        }
     }
 }
 

@@ -245,9 +245,9 @@
        </widget>
       </item>
       <item row="2" column="3">
-       <widget class="C5LineEditWithSelector" name="leCashDoc">
+       <widget class="C5LineEditWithSelector" name="leCashName">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="readOnly">
          <bool>true</bool>
@@ -400,7 +400,7 @@
       <item row="2" column="0">
        <widget class="QLabel" name="lbCashDoc">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="text">
          <string>Output cash desk</string>
@@ -410,11 +410,21 @@
       <item row="2" column="1">
        <widget class="C5DateEdit" name="deCashDate">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="maximumSize">
          <size>
           <width>100</width>
+          <height>16777215</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="C5LineEditWithSelector" name="leCash">
+        <property name="maximumSize">
+         <size>
+          <width>80</width>
           <height>16777215</height>
          </size>
         </property>
@@ -862,14 +872,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5LineEditWithSelector</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5lineeditwithselector.h</header>
-  </customwidget>
-  <customwidget>
    <class>C5LineEdit</class>
    <extends>QLineEdit</extends>
    <header location="global">c5lineedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5LineEditWithSelector</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5lineeditwithselector.h</header>
   </customwidget>
   <customwidget>
    <class>C5TableWidget</class>

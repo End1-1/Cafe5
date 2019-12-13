@@ -19,6 +19,7 @@
 #include "cr5dish.h"
 #include "cr5settings.h"
 #include "cr5goodsmovement.h"
+#include "c5salarydoc.h"
 #include "cr5creditcards.h"
 #include "cr5debtstopartner.h"
 #include "cr5dishpart1.h"
@@ -28,11 +29,13 @@
 #include "cr5dishcomment.h"
 #include "cr5salesbydishes.h"
 #include "cr5tstoreextra.h"
+#include "cr5costumerdebts.h"
 #include "cr5storedocuments.h"
 #include "cr5dishpart2.h"
 #include "cr5dishpriceselfcost.h"
 #include "c5storeinventory.h"
 #include "cr5discountsystem.h"
+#include "cr5dishpackage.h"
 #include "cr5goodsgroup.h"
 #include "cr5menureview.h"
 #include "cr5databases.h"
@@ -318,6 +321,17 @@ void C5MainWindow::on_actionLogin_triggered()
             addTreeL3Item(it, cp_t8_cash_doc, tr("New document"), ":/cash.png");
             addTreeL3Item(it, cp_t8_cash_detailed_report, tr("Cash detailed report"), ":/cash.png");
             addTreeL3Item(it, cp_t8_cash_names, tr("Cash names"), ":/cash.png");
+            addTreeL3Item(it, cp_t8_costumer_debts, tr("Costumers debts"), ":/cash.png");
+        }
+
+        if (pr(db.getString(3), cp_t9_salary)) {
+            it = new QTreeWidgetItem();
+            it->setText(0, tr("Salary"));
+            it->setData(0, Qt::UserRole, cp_t9_salary);
+            it->setIcon(0, QIcon(":/employee.png"));
+            item->addChild(it);
+            addTreeL3Item(it, cp_t9_salary_doc, tr("New salary document"), ":/employee.png");
+            addTreeL3Item(it, cp_t9_report, tr("Report"), ":/employee.png");
         }
 
         if (pr(db.getString(3), cp_t4_menu)) {
@@ -329,6 +343,7 @@ void C5MainWindow::on_actionLogin_triggered()
             addTreeL3Item(it, cp_t4_part1, tr("Dish depts"), ":/menu.png");
             addTreeL3Item(it, cp_t4_part2, tr("Types of dishes"), ":/menu.png");
             addTreeL3Item(it, cp_t4_dishes, tr("Dishes list"), ":/menu.png");
+            addTreeL3Item(it, cp_t4_dishes_packages, tr("Dishes packages"), ":/menu.png");
             addTreeL3Item(it, cp_t4_menu_names, tr("Menu names"), ":/menu.png");
             addTreeL3Item(it, cp_t4_dish_remove_reason, tr("Dish remove reasons"), ":/menu.png");
             addTreeL3Item(it, cp_t4_dish_comments, tr("Dish comments"), ":/menu.png");
@@ -589,6 +604,9 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
     case cp_t4_dishes:
         createTab<CR5Dish>(dbParams);
         break;
+    case cp_t4_dishes_packages:
+        createTab<CR5DishPackage>(dbParams);
+        break;
     case cp_t4_menu_names:
         createTab<CR5MenuNames>(dbParams);
         break;
@@ -657,6 +675,12 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
         break;
     case cp_t8_cash_detailed_report:
         createTab<CR5CashDetailed>(dbParams);
+        break;
+    case cp_t8_costumer_debts:
+        createTab<CR5CostumerDebts>(dbParams);
+        break;
+    case cp_t9_salary_doc:
+        createTab<C5SalaryDoc>(dbParams);
         break;
     default:
         break;

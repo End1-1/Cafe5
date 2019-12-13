@@ -68,6 +68,8 @@ private:
 
     int fBasedOnSale;
 
+    void setUserID(bool withUpdate, int value);
+
     void countTotal();
 
     void countQtyOfComplectation();
@@ -101,6 +103,8 @@ private:
     void setGoodsPanelHidden(bool v);
 
     void markGoodsComplited();
+
+    void updateCashDoc();
 
 private slots:
     void newDoc();
@@ -160,6 +164,8 @@ private slots:
     void on_leComplectationName_textChanged(const QString &arg1);
 
     void on_leComplectationQty_textChanged(const QString &arg1);
+
+    void on_chPaid_clicked(bool checked);
 };
 
 #endif // C5STOREDOC_H

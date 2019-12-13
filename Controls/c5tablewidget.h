@@ -4,6 +4,7 @@
 #include <QTableWidget>
 
 class C5LineEdit;
+class C5LineEditWithSelector;
 class C5ComboBox;
 class C5CheckBox;
 
@@ -39,6 +40,10 @@ public:
     C5LineEdit *createLineEdit(int row, int column);
 
     C5LineEdit *lineEdit(int row, int column);
+
+    C5LineEditWithSelector *createLineEditWiSelector(int row, int column);
+
+    C5LineEditWithSelector *lineEditWithSelector(int row, int column);
 
     C5ComboBox *createComboBox(int row, int column);
 

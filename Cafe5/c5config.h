@@ -33,6 +33,7 @@
 #define param_tax_print_always_offer 27
 #define param_fd_font_size 28
 #define param_recipe_widht 29
+#define param_car_mode 30
 
 class C5Config
 {
@@ -130,6 +131,8 @@ public:
     static int fronDeskFontSize();
 
     static bool alwaysOfferTaxPrint();
+
+    static bool carMode();
 
 private:
     static QString getValue(int key);

@@ -39,6 +39,7 @@
 #define cache_discount_type 34
 #define cache_header_payment 35
 #define cache_header_paid 36
+#define cache_dish_package 37
 
 class C5Cache : public QObject
 {

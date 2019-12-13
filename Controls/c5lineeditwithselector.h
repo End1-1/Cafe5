@@ -46,6 +46,7 @@ signals:
     void done(const QList<QVariant> &values);
 
     void doubleClicked();
+
 };
 
 C5LineEditWithSelector *isLineEditWithSelector(QObject *o);

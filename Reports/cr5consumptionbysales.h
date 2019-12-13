@@ -39,6 +39,9 @@ private slots:
     void changeOutputStore();
 
     void writeDocs(int doctype, int reason, const QMap<int, double> &data, const QString &comment);
+
+signals:
+    void updateProgressValue(int);
 };
 
 #endif // CR5CONSUMPTIONBYSALES_H

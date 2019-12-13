@@ -37,11 +37,13 @@ C5CashDoc::C5CashDoc(const QStringList &dbParams, QWidget *parent) :
     ui->lbStoreDoc->setEnabled(false);
     ui->leStoreDoc->setEnabled(false);
     ui->btnOpenStoreDoc->setEnabled(false);
+    fRelation = false;
 }
 
 C5CashDoc::~C5CashDoc()
 {
     delete ui;
+    //delete fActionFromSale;
 }
 
 QToolBar *C5CashDoc::toolBar()
@@ -50,13 +52,58 @@ QToolBar *C5CashDoc::toolBar()
         C5Widget::toolBar();
         fToolBar->addAction(QIcon(":/save.png"), tr("Save"), this, SLOT(save()));
         fToolBar->addAction(QIcon(":/delete.png"), tr("Remove"), this, SLOT(removeDoc()));
-        fToolBar->addAction(QIcon(":/cash.png"), tr("Input from sale"), this, SLOT(inputFromSale()));
+        fActionFromSale = fToolBar->addAction(QIcon(":/cash.png"), tr("Input from sale"), this, SLOT(inputFromSale()));
     }
     return fToolBar;
 }
 
+void C5CashDoc::setRelation(bool r)
+{
+    fRelation = r;
+}
+
+void C5CashDoc::setCashInput(int id)
+{
+    ui->leInput->setValue(id);
+}
+
+void C5CashDoc::setCashOutput(int id)
+{
+    ui->leOutput->setValue(id);
+}
+
+void C5CashDoc::setDate(const QDate &d)
+{
+    ui->deDate->setDate(d);
+}
+
+void C5CashDoc::setComment(const QString &t)
+{
+    ui->leRemarks->setText(t);
+}
+
+void C5CashDoc::addRow(const QString &t, double a)
+{
+    int row = ui->tbl->addEmptyRow();
+    C5LineEdit *l = ui->tbl->createLineEdit(row, 0);
+    l->setText(t);
+    l = ui->tbl->createLineEdit(row, 1);
+    l->setValidator(new QDoubleValidator(0, 999999999, 2));
+    l->setDouble(a);
+    connect(l, SIGNAL(textChanged(QString)), this, SLOT(amountChanged(QString)));
+    amountChanged("");
+}
+
+void C5CashDoc::updateRow(int row, const QString &t, double a)
+{
+    ui->tbl->lineEdit(row, 0)->setText(t);
+    ui->tbl->lineEdit(row, 1)->setDouble(a);
+    amountChanged("");
+}
+
 bool C5CashDoc::openDoc(const QString &uuid)
 {
+    fActionFromSale->setVisible(false);
     fUuid = uuid;
     C5Database db(fDBParams);
     db[":f_id"] = uuid;
@@ -68,6 +115,7 @@ bool C5CashDoc::openDoc(const QString &uuid)
         QJsonDocument jd = QJsonDocument::fromJson(db.getString("f_raw").toUtf8());
         QJsonObject jo = jd.object();
         int sign = 1;
+        fRelation = jo["relation"].toString().toInt() == 1;
         ui->leInput->setValue(jo["cashin"].toString());
         ui->leOutput->setValue(jo["cashout"].toString());
         ui->leRemarks->setText(db.getString("f_comment"));
@@ -101,6 +149,14 @@ bool C5CashDoc::openDoc(const QString &uuid)
         C5Message::error(tr("Invalid document id"));
         return false;
     }
+    if (fRelation) {
+        ui->witems->setEnabled(false);
+        ui->leInput->setEnabled(false);
+        ui->leOutput->setEnabled(false);
+        ui->tbl->setEnabled(false);
+        ui->leRemarks->setEnabled(false);
+        ui->lePartner->setEnabled(false);
+    }
     return true;
 }
 
@@ -120,6 +176,16 @@ void C5CashDoc::setStoreDoc(const QString &uuid)
         ui->leStoreDoc->setEnabled(true);
         ui->btnOpenStoreDoc->setEnabled(true);
     }
+}
+
+QString C5CashDoc::uuid() const
+{
+    return fUuid;
+}
+
+int C5CashDoc::inputCash()
+{
+    return ui->leInput->getInteger();
 }
 
 bool C5CashDoc::removeDoc(const QStringList &dbParams, const QString &uuid)
@@ -185,6 +251,7 @@ void C5CashDoc::save()
     jo["cashin"] = ui->leInput->text();
     jo["cashout"] = ui->leOutput->text();
     jo["storedoc"] = fStoreUuid;
+    jo["relation"] = fRelation ? "1" : "0";
     QJsonDocument jd;
     jd.setObject(jo);
     if (fUuid.isEmpty()) {
@@ -243,6 +310,10 @@ void C5CashDoc::save()
 
 void C5CashDoc::removeDoc()
 {
+    if (fRelation) {
+        C5Message::error(tr("Cannot remove this document, becouse an relation exist"));
+        return;
+    }
     if (C5Message::question(tr("Confirm to remove selected documents")) != QDialog::Accepted) {
         return;
     }
@@ -260,8 +331,9 @@ void C5CashDoc::inputFromSale()
     if (C5InputDate::date(d)) {
         C5Database db(fDBParams);
         db[":f_date"] = d;
-        db.exec("select sum(f_amounttotal) from o_header where f_datecash=:f_date");
+        db.exec("select sum(f_amountcash) from o_header where f_datecash=:f_date");
         if (db.nextRow()) {
+            ui->leRemarks->setText(QString("%1 %2").arg(tr("Input from sale")).arg(d.toString(FORMAT_DATE_TO_STR)));
             int row = ui->tbl->addEmptyRow();
             ui->tbl->createLineEdit(row, 0)->setText(QString("%1 %2").arg(tr("Input from sale")).arg(d.toString(FORMAT_DATE_TO_STR)));
             ui->tbl->createLineEdit(row, 1)->setDouble(db.getDouble("f_amount"));

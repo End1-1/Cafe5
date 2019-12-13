@@ -49,6 +49,8 @@ private:
 
     void processCallReceipt(QJsonObject &o);
 
+    void processGetCostumerByCar(QJsonObject &o);
+
     QTcpSocket *fSocket;
 };
 

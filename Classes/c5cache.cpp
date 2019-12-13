@@ -64,8 +64,9 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         fCacheQuery[cache_dish_remove_reason] = QString("select f_id as `%1`, f_name as `%2` from o_dish_remove_reason")
                 .arg(tr("Code"))
                 .arg(tr("Name"));
-        fCacheQuery[cache_discount_client] = QString("select f_id as `%1`, f_firstname as `%2`, f_lastname as `%3`, f_info as `%4` from b_clients")
+        fCacheQuery[cache_discount_client] = QString("select f_id as `%1`, concat(f_lastname, ' ', f_firstname) as f_fullname, f_firstname as `%2`, f_lastname as `%3`, f_info as `%4` from b_clients")
                 .arg(tr("Code"))
+                .arg(tr("Full name"))
                 .arg(tr("First name"))
                 .arg(tr("Last name"))
                 .arg(tr("Additional info"));
@@ -79,6 +80,11 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         setCacheSimpleQuery(cache_menu_names, "d_menu_names");
         setCacheSimpleQuery(cache_halls, "h_halls");
         setCacheSimpleQuery(cache_tables, "h_tables");
+        setCacheSimpleQuery(cache_dish_package, "d_package");
+        fCacheQuery[cache_dish_package] = QString("select f_id as `%1`, f_name as `%2`, f_price as `%3` from d_package ")
+                .arg(tr("Code"))
+                .arg(tr("Name"))
+                .arg(tr("Price"));
         fCacheQuery[cache_dish_state] = QString("select f_id as `%1`, f_name as `%2` from o_body_state")
                 .arg(tr("Code"))
                 .arg(tr("Name"));
@@ -139,6 +145,7 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         fTableCache["b_card_types"] = cache_discount_type;
         fTableCache["a_header_payment"] = cache_header_payment;
         fTableCache["a_header_paid"] = cache_header_paid;
+        fTableCache["d_package"] = cache_dish_package;
     }
     fVersion = 0;
     C5Database db(dbParams);

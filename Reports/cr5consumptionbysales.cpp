@@ -4,6 +4,7 @@
 #include "c5tablemodel.h"
 #include "c5mainwindow.h"
 #include "c5waiterorderdoc.h"
+#include "c5progressdialog.h"
 #include "c5double.h"
 #include "dlgchangeoutputstore.h"
 #include "c5storedraftwriter.h"
@@ -222,6 +223,7 @@ void CR5ConsumptionBySales::buildQuery()
             "inner join a_header h on h.f_id=i.f_document "
             "inner join c_goods g on g.f_id=i.f_goods "
             "where h.f_date=:f_date and h.f_type=:f_type "
+            "and i.f_store=:f_store "
             "group by 1, 2 ");
     while (db.nextRow()) {
         int r = goodsMap[db.getInt(0)];
@@ -398,16 +400,28 @@ void CR5ConsumptionBySales::salesOutput(bool v)
 
 void CR5ConsumptionBySales::countOutputBasedOnRecipes()
 {
+    C5ProgressDialog *pd = new C5ProgressDialog();
+    connect(this, SIGNAL(updateProgressValue(int)), pd, SLOT(updateProgressValue(int)));
     C5Database db(fDBParams);
+    db[":f_datecash1"] = fFilter->date1();
+    db[":f_datecash2"] = fFilter->date2();
     db.exec("select f_id from o_header where f_datecash between :f_datecash1 and :f_datecash2");
     QStringList idList;
     while (db.nextRow()) {
         idList.append(db.getString(0));
     }
+    pd->setMax(idList.count());
+    pd->show();
     QString err;
+    int count = 0;
     for (QString id: idList) {
         C5WaiterOrderDoc(id, db).makeOutputOfStore(db, err);
+        count++;
+        if (count % 20 == 0) {
+            emit updateProgressValue(count);
+        }
     }
+    delete pd;
     if (err.isEmpty()) {
         C5Message::info(tr("Done"));
     } else {

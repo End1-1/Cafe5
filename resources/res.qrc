@@ -63,5 +63,8 @@
         <file>customers.png</file>
         <file>contract.png</file>
         <file>upload.png</file>
+        <file>car.png</file>
+        <file>package.png</file>
+        <file>employee.png</file>
     </qresource>
 </RCC>

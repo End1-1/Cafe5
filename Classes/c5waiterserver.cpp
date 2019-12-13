@@ -82,10 +82,23 @@ void C5WaiterServer::reply(QJsonObject &o)
         srh.getJsonFromQuery("select f_id, f_name from d_menu_names", jMenuNames);
         QJsonArray jDishSpecial;
         srh.getJsonFromQuery("select f_dish, f_comment from d_special", jDishSpecial);
+        QJsonArray jPackages;
+        srh.getJsonFromQuery("select f_id, f_name, f_price from d_package where f_enabled=1", jPackages);
+        QJsonArray jPackagesList;
+        srh.getJsonFromQuery("select p.f_package, p.f_dish, d.f_name, p.f_price, '' as part1, '' as part2, p2.f_adgCode, 1 as f_store, '' as f_print1, '' as f_print2, "
+                             "'' as f_remind, '' as f_description, '' as f_storename, -1 as dish_color, -1 as type_color, 1 as f_timeorder "
+                             "from d_package_list p "
+                             "left join d_package dp on dp.f_id=p.f_package "
+                             "left join d_dish d on d.f_id=p.f_dish "
+                             "left join d_part2 p2 on p2.f_id=d.f_part "
+                             "left join d_part1 p1 on p1.f_id=p2.f_part "
+                             "where dp.f_enabled=1 ", jPackagesList);
         o["reply"] = 1;
         o["menu"] = jMenu;
         o["menunames"] = jMenuNames;
         o["dishspecial"] = jDishSpecial;
+        o["packages"] = jPackages;
+        o["packageslist"] = jPackagesList;
         srh.fDb.exec("select f_version from s_app where lower(f_app)='menu'");
         if (srh.fDb.nextRow()) {
             o["version"] = srh.fDb.getString(0);
@@ -334,6 +347,20 @@ void C5WaiterServer::reply(QJsonObject &o)
             srh.fDb[":f_lockSrc"] = "";
             srh.fDb.update("h_tables", where_id(jh["f_table"].toString().toInt()));
 
+            if (jh["f_otherid"].toString().toInt() == PAYOTHER_DEBT) {
+                srh.fDb[":f_order"] = jh["f_id"].toString();
+                srh.fDb.exec("select f_costumer from b_car_orders co "
+                             "inner join b_car c on c.f_id=co.f_car "
+                             "where f_order=:f_order");
+                if (srh.fDb.nextRow()) {
+                    srh.fDb[":f_costumer"] = srh.fDb.getInt(0);
+                    srh.fDb[":f_order"] = jh["f_id"].toString();
+                    srh.fDb[":f_amount"] = jh["f_amountother"].toString().toDouble() * -1;
+                    srh.fDb[":f_date"] = dateCash;
+                    srh.fDb.insert("b_clients_debts", false);
+                }
+            }
+
             C5Database fDD(C5Config::dbParams().at(0), C5Config::hotelDatabase(), C5Config::dbParams().at(2), C5Config::dbParams().at(3));
             C5WaiterOrderDoc w(srh.fDb, jh, jb);
             w.transferToHotel(srh.fDb, fDD, err);
@@ -511,6 +538,9 @@ void C5WaiterServer::reply(QJsonObject &o)
     case sm_callreceipt:
         processCallReceipt(o);
         break;
+    case sm_getcostumer_by_car:
+        processGetCostumerByCar(o);
+        break;
     default:
         o["reply"] = 0;
         o["msg"] = QString("%1: %2").arg(tr("Unknown command for socket handler from dlgface")).arg(cmd);
@@ -609,6 +639,15 @@ void C5WaiterServer::saveOrder(QJsonObject &jh, QJsonArray &ja, C5Database &db)
         db[":f_timeOpen"] = QTime::fromString(jh["f_timeopen"].toString(), FORMAT_TIME_TO_STR);
         db[":f_prefix"] = jh["f_prefix"].toString();
         db.insert("o_header", false);
+    }
+    if (jh["car"].toString().toInt() > 0) {
+        db[":f_id"] = jh["f_id"].toString();
+        db.exec("select * from b_car_order where f_order=:f_id");
+        if (!db.nextRow()) {
+            db[":f_order"] = jh["f_id"].toString();
+            db[":f_car"] = jh["car"].toString();
+            db.insert("b_car_orders", false);
+        }
     }
     if (jh["f_otherid"].toString().toInt() == PAYOTHER_TRANSFER_TO_ROOM) {
         db[":f_id"] = jh["f_id"].toString();
@@ -709,6 +748,7 @@ void C5WaiterServer::saveDish(const QJsonObject &h, QJsonObject &o, C5Database &
     db[":f_adgcode"] = o["f_adgcode"].toString();
     db[":f_removereason"] = o["f_removereason"].toString();
     db[":f_timeorder"] = o["f_timeorder"].toString().toInt();
+    db[":f_package"] = o["f_package"].toString().toInt();
     db.update("o_body", where_id(o["f_id"].toString()));
 }
 
@@ -793,10 +833,25 @@ bool C5WaiterServer::printBill(QJsonObject &jh, QJsonArray &jb, QString &err, C5
         jh = w.fHeader;
         jb = w.fItems;
     }
+    if (jh["car"].toString().toInt() > 0) {
+        srh.fDb[":f_id"] = jh["car"].toString().toInt();
+        srh.fDb.exec("select c.f_name as f_carname, bc.f_govnumber, trim(concat(cl.f_lastname, ' ', cl.f_firstname))) as f_name "
+                "from b_car bc "
+                "left join b_clients cl on cl.f_id=bc.f_costumer "
+                "left join s_car c on c.f_id=bc.f_car "
+                "where bc.f_id=:f_id");
+        if (srh.fDb.nextRow()) {
+            jh["car_model"] = srh.fDb.getString("f_carname");
+            jh["car_govnumber"] = srh.fDb.getString("f_govnumber");
+            jh["car_costumer"] = srh.fDb.getString("f_name");
+        } else {
+            jh["car"] = "0";
+        }
+    }
     // TODO: CHECK FOR DESTINATION PRINTER AND REDIRECT QUERY
     if (err.isEmpty()) {
-        //C5PrintReceiptThread *pr = new C5PrintReceiptThread(C5Config::dbParams(), jh, jb, C5Config::localReceiptPrinter());
-        C5PrintReceiptThread50mm *pr = new C5PrintReceiptThread50mm(C5Config::dbParams(), jh, jb, C5Config::localReceiptPrinter());
+        C5PrintReceiptThread *pr = new C5PrintReceiptThread(C5Config::dbParams(), jh, jb, C5Config::localReceiptPrinter());
+        //C5PrintReceiptThread50mm *pr = new C5PrintReceiptThread50mm(C5Config::dbParams(), jh, jb, C5Config::localReceiptPrinter());
         pr->fBill = true;
         pr->start();
     }
@@ -879,8 +934,25 @@ bool C5WaiterServer::printReceipt(QJsonObject &jh, QJsonArray &jb, QString &err,
                 printerName = db.getString(0);
             }
         }
-        //C5PrintReceiptThread *pr = new C5PrintReceiptThread(C5Config::dbParams(), jh, jb, printerName);
-        C5PrintReceiptThread50mm *pr = new C5PrintReceiptThread50mm(C5Config::dbParams(), jh, jb, printerName);
+
+        if (jh["car"].toString().toInt() > 0) {
+            db[":f_id"] = jh["car"].toString().toInt();
+            db.exec("select c.f_name as f_carname, bc.f_govnumber, trim(concat(cl.f_lastname, ' ', cl.f_firstname)) as f_name "
+                    "from b_car bc "
+                    "left join b_clients cl on cl.f_id=bc.f_costumer "
+                    "left join s_car c on c.f_id=bc.f_car "
+                    "where bc.f_id=:f_id");
+            if (db.nextRow()) {
+                jh["car_model"] = db.getString("f_carname");
+                jh["car_govnumber"] = db.getString("f_govnumber");
+                jh["car_costumer"] = db.getString("f_name");
+            } else {
+                jh["car"] = "0";
+            }
+        }
+
+        C5PrintReceiptThread *pr = new C5PrintReceiptThread(C5Config::dbParams(), jh, jb, printerName);
+        //C5PrintReceiptThread50mm *pr = new C5PrintReceiptThread50mm(C5Config::dbParams(), jh, jb, printerName);
         pr->start();
     }
     return err.isEmpty();
@@ -1085,4 +1157,22 @@ void C5WaiterServer::processCallReceipt(QJsonObject &o)
     o["reply"] = 1;
 
     NotificationWidget::showMessage(QString("%1 %2: %3").arg(tr("Table")).arg(fIn["tablename"].toString()).arg(tr("Call receipt")));
+}
+
+void C5WaiterServer::processGetCostumerByCar(QJsonObject &o)
+{
+    C5Database db(C5Config::dbParams());
+    db[":f_id"] = fIn["car"].toString().toInt();
+    db.exec("select bc.f_id, concat(c.f_name, ', ', bc.f_govnumber, ', ', trim(concat(cl.f_lastname, ' ', cl.f_firstname))) as f_name "
+            "from b_car bc "
+            "left join b_clients cl on cl.f_id=bc.f_costumer "
+            "left join s_car c on c.f_id=bc.f_car "
+            "where bc.f_id=:f_id");
+    if (db.nextRow()) {
+        o["name"] = db.getString(1);
+        o["id"] = db.getString(0);
+        o["reply"] = 1;
+    } else {
+        o["reply"] = 0;
+    }
 }

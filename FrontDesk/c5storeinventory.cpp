@@ -2,6 +2,8 @@
 #include "ui_c5storeinventory.h"
 #include "c5selector.h"
 #include "c5cache.h"
+#include "c5printing.h"
+#include "c5printpreview.h"
 
 C5StoreInventory::C5StoreInventory(const QStringList &dbParams, QWidget *parent) :
     C5Widget(dbParams, parent),
@@ -85,10 +87,6 @@ void C5StoreInventory::saveDoc()
         return;
     }
 
-    if (ui->leDocNum->getInteger() == 0) {
-        db[":f_id"] = 0;
-        ui->leDocNum->setInteger(db.insert("a_header"));
-    }
     db[":f_state"] = DOC_STATE_SAVED;
     db[":f_type"] = DOC_TYPE_STORE_INVENTORY;
     db[":f_operator"] = __userid;
@@ -99,20 +97,26 @@ void C5StoreInventory::saveDoc()
     db[":f_amount"] = ui->leTotal->getDouble();
     db[":f_comment"] = ui->leComment->text();
     db[":f_raw"] = "";
-    db.update("a_header", where_id(ui->leDocNum->getInteger()));
+    if (ui->leDocNum->isEmpty()) {
+        ui->leDocNum->setText(C5Database::uuid());
+        db[":f_id"] = ui->leDocNum->text();
+        db.insert("a_header", false);
+    } else {
+        db.update("a_header", where_id(ui->leDocNum->text()));
+    }
 
-    db[":f_document"] = ui->leDocNum->getInteger();
+    db[":f_document"] = ui->leDocNum->text();
     db.exec("delete from a_store_inventory where f_document=:f_document");
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
-        db[":f_id"] = 0;
-        ui->tblGoods->setInteger(i, 0, db.insert("a_store_inventory"));
-        db[":f_document"] = ui->leDocNum->getInteger();
+        ui->tblGoods->setString(i, 0, C5Database::uuid());
+        db[":f_id"] = ui->tblGoods->getString(i, 0);
+        db[":f_document"] = ui->leDocNum->text();
         db[":f_store"] = ui->leStore->getInteger();
         db[":f_goods"] = ui->tblGoods->getInteger(i, 1);
         db[":f_qty"] = ui->tblGoods->lineEdit(i, 3)->getDouble();
         db[":f_price"] = ui->tblGoods->lineEdit(i, 5)->getDouble();
         db[":f_total"] = ui->tblGoods->lineEdit(i, 6)->getDouble();
-        db.update("a_store_inventory", where_id(ui->tblGoods->getInteger(i, 0)));
+        db.insert("a_store_inventory", false);
     }
 
     C5Message::info(tr("Saved"));
@@ -120,7 +124,118 @@ void C5StoreInventory::saveDoc()
 
 void C5StoreInventory::printDoc()
 {
+    if (ui->leDocNum->text().isEmpty()) {
+        C5Message::error(tr("Document is not saved"));
+        return;
+    }
+    C5Printing p;
+    QList<qreal> points;
+    QStringList vals;
+    p.setSceneParams(2000, 2700, QPrinter::Portrait);
 
+    p.setFontSize(25);
+    p.setFontBold(true);
+    QString docTypeText = tr("Store inventorization");
+
+    p.ctext(QString("%1 N%2").arg(docTypeText).arg(ui->leDocNum->text()));
+    p.br();
+    p.br();
+    p.setFontSize(20);
+    p.setFontBold(false);
+    QString storeInName = ui->leStoreName->text();
+    p.br();
+    p.setFontBold(true);
+    points.clear();
+    points << 50 << 200;
+    vals << tr("Date");
+    if (!storeInName.isEmpty()) {
+        vals << tr("Store, input");
+        points << 400;
+    }
+    if (!ui->leComment->isEmpty()) {
+        vals << tr("Comment");
+        points << 600;
+    }
+
+    p.tableText(points, vals, p.fLineHeight + 20);
+    p.br(p.fLineHeight + 20);
+    p.setFontBold(false);
+    vals.clear();
+    vals << ui->deDate->text();
+    if (!storeInName.isEmpty()) {
+        vals << ui->leStoreName->text();
+    }
+    if (!ui->leComment->isEmpty()) {
+        vals << ui->leComment->text();
+    }
+
+    p.tableText(points, vals, p.fLineHeight + 20);
+    p.br(p.fLineHeight + 20);
+    p.br(p.fLineHeight + 20);
+
+    points.clear();
+    vals.clear();
+    p.setFontBold(true);
+    points << 50;
+    p.tableText(points, vals, p.fLineHeight + 20);
+    p.br(p.fLineHeight + 20);
+
+    p.setFontBold(false);
+    points.clear();
+    vals.clear();
+    points << 50;
+    p.tableText(points, vals, p.fLineHeight + 20);
+    p.br();
+    p.br();
+    p.br();
+
+    points.clear();
+    points << 50 << 100 << 200 << 600 << 250 << 250 << 250 << 270;
+    vals.clear();
+    vals << tr("NN")
+         << tr("Material code")
+         << tr("Goods")
+         << tr("Qty")
+         << tr("Unit")
+         << tr("Price")
+         << tr("Total");
+    p.setFontBold(true);
+    p.tableText(points, vals, p.fLineHeight + 20);
+    p.br(p.fLineHeight + 20);
+    p.setFontBold(false);
+    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+        if (p.checkBr(p.fLineHeight + 20)) {
+            p.br(p.fLineHeight + 20);
+            p.br();
+        }
+        vals.clear();
+        vals << QString::number(i + 1);
+        vals << ui->tblGoods->getString(i, 1);
+        vals << ui->tblGoods->getString(i, 2);
+        vals << ui->tblGoods->lineEdit(i, 3)->text();
+        vals << ui->tblGoods->getString(i, 4);
+        vals << ui->tblGoods->lineEdit(i, 5)->text();
+        vals << ui->tblGoods->lineEdit(i, 6)->text();
+        p.tableText(points, vals, p.fLineHeight + 20);
+        if (p.checkBr(p.fLineHeight + 20)) {
+            p.br(p.fLineHeight + 20);
+        }
+        p.br(p.fLineHeight + 20);
+    }
+    points.clear();
+    points << 1200
+           << 500
+           << 270;
+    vals.clear();
+    vals << tr("Total amount");
+    vals << ui->leTotal->text();
+    p.tableText(points, vals, p.fLineHeight + 20);
+    p.br(p.fLineHeight + 20);
+    p.line(50, p.fTop, 700, p.fTop);
+    p.line(1000, p.fTop, 1650, p.fTop);
+
+    C5PrintPreview pp(&p, fDBParams);
+    pp.exec();
 }
 
 void C5StoreInventory::on_btnAddGoods_clicked()

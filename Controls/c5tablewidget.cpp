@@ -3,6 +3,7 @@
 #include "c5combobox.h"
 #include "c5message.h"
 #include "c5utils.h"
+#include "c5lineeditwithselector.h"
 #include "c5checkbox.h"
 #include "xlsxall.h"
 #include <QHeaderView>
@@ -75,6 +76,22 @@ C5LineEdit *C5TableWidget::createLineEdit(int row, int column)
 C5LineEdit *C5TableWidget::lineEdit(int row, int column)
 {
     return static_cast<C5LineEdit*>(cellWidget(row, column));
+}
+
+C5LineEditWithSelector *C5TableWidget::createLineEditWiSelector(int row, int column)
+{
+    C5LineEditWithSelector *l = new C5LineEditWithSelector(this);
+    l->setProperty("row", row);
+    l->setProperty("column", column);
+    l->setFrame(false);
+    connect(l, SIGNAL(textChanged(QString)), this, SLOT(lineEditTextChanged(QString)));
+    setCellWidget(row, column, l);
+    return l;
+}
+
+C5LineEditWithSelector *C5TableWidget::lineEditWithSelector(int row, int column)
+{
+    return static_cast<C5LineEditWithSelector*>(cellWidget(row, column));
 }
 
 C5ComboBox *C5TableWidget::createComboBox(int row, int column)

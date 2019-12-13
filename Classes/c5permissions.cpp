@@ -54,6 +54,7 @@ void C5Permissions::init(C5Database &db)
               << cp_t4_dish_comments
               << cp_t4_dish_price_self_cost
               << cp_t4_menu_review
+              << cp_t4_dishes_packages
 
               << cp_t5_waiter
               << cp_t5_multiple_receipt
@@ -89,6 +90,11 @@ void C5Permissions::init(C5Database &db)
               << cp_t8_cash_common_report
               << cp_t8_cash_detailed_report
               << cp_t8_cash_names
+              << cp_t8_costumer_debts
+
+              << cp_t9_salary
+              << cp_t9_salary_doc
+              << cp_t9_report
                  ;
     if (__usergroup == 1) {
         fPermissions[db.database()] = fTemplate;

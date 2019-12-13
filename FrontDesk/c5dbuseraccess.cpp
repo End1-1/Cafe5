@@ -92,6 +92,7 @@ void C5DbUserAccess::saveDataChanges()
             }
         }
     }
+    db.commit();
     C5Message::info(tr("Saved"));
 }
 

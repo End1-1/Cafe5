@@ -53,7 +53,9 @@ SOURCES += \
     ../Classes/c5storedraftwriter.cpp \
     ../Classes/notificationwidget.cpp \
     c5printreceiptthread50mm.cpp \
+    dlgcarnumber.cpp \
     dlglistdishspecial.cpp \
+    dlglistofpackages.cpp \
         main.cpp \
         dlgface.cpp \
     ../Cafe5/c5database.cpp \
@@ -136,6 +138,7 @@ HEADERS += \
     ../Classes/c5storedraftwriter.h \
     ../Classes/notificationwidget.h \
     c5printreceiptthread50mm.h \
+    dlgcarnumber.h \
         dlgface.h \
     ../Cafe5/c5database.h \
     ../Cafe5/c5config.h \
@@ -147,6 +150,7 @@ HEADERS += \
     ../Cafe5/c5socketmessage.h \
     ../Cafe5/c5serverhandler.h \
     dlglistdishspecial.h \
+    dlglistofpackages.h \
     dlgpassword.h \
     dlgorder.h \
     ../Classes/c5user.h \
@@ -201,10 +205,12 @@ HEADERS += \
 
 FORMS += \
     ../Classes/notificationwidget.ui \
+    dlgcarnumber.ui \
         dlgface.ui \
     ../Cafe5/c5connection.ui \
     ../Cafe5/c5message.ui \
     dlglistdishspecial.ui \
+    dlglistofpackages.ui \
     dlgpassword.ui \
     dlgorder.ui \
     dlgpayment.ui \

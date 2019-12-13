@@ -184,7 +184,7 @@
       </size>
      </property>
      <property name="FilterName" stdset="0">
-      <string>reason</string>
+      <string>paid</string>
      </property>
     </widget>
    </item>
@@ -310,7 +310,7 @@
       </size>
      </property>
      <property name="FilterName" stdset="0">
-      <string>reason</string>
+      <string>payment</string>
      </property>
     </widget>
    </item>
@@ -342,14 +342,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5LineEditWithSelector</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5lineeditwithselector.h</header>
-  </customwidget>
-  <customwidget>
    <class>C5LineEdit</class>
    <extends>QLineEdit</extends>
    <header location="global">c5lineedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5LineEditWithSelector</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5lineeditwithselector.h</header>
   </customwidget>
   <customwidget>
    <class>C5DateEdit</class>
@@ -362,8 +362,11 @@
   <tabstop>deEnd</tabstop>
   <tabstop>leDocType</tabstop>
   <tabstop>leDocState</tabstop>
-  <tabstop>leDocTypeName</tabstop>
-  <tabstop>leDocStateName</tabstop>
+  <tabstop>lePartner</tabstop>
+  <tabstop>leOperator</tabstop>
+  <tabstop>lePayment</tabstop>
+  <tabstop>lePaid</tabstop>
+  <tabstop>leReason</tabstop>
  </tabstops>
  <resources/>
  <connections/>

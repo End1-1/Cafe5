@@ -294,11 +294,12 @@ void C5Grid::restoreColumnsWidths()
         }
         if (!fColumnsVisible[fullColName] || ui->tblView->columnWidth(i) == 0) {
             ui->tblView->horizontalHeader()->setSectionResizeMode(i, QHeaderView::Interactive);
-            continue;
+            //continue; why this row was commented, i dont know
         }
         if (s.contains(colName)) {
             ui->tblView->horizontalHeader()->setSectionResizeMode(i, QHeaderView::Interactive);
-            ui->tblView->setColumnWidth(i, s.value(colName).toInt());
+            int w = s.value(colName).toInt();
+            ui->tblView->setColumnWidth(i, w);
         } else {
             ui->tblView->horizontalHeader()->setSectionResizeMode(i, QHeaderView::ResizeToContents);
             //qApp->processEvents();
@@ -493,6 +494,9 @@ int C5Grid::newRow()
     }
     for (int i = 0; i < data.count(); i++) {
         fModel->insertRow(row);
+        if (ml.count() > 0) {
+            row++;
+        }
         for (QMap<QString, QVariant>::const_iterator it = data.at(i).begin(); it != data.at(i).end(); it++) {
             int col = fModel->indexForColumnName(it.key());
             if (col > -1) {
@@ -504,27 +508,33 @@ int C5Grid::newRow()
     return row;
 }
 
-void C5Grid::editRow(int columnWidthId)
+bool C5Grid::currentRow(int &row)
 {
-    int row = 0;
+    row = -1;
     QModelIndexList ml = ui->tblView->selectionModel()->selectedIndexes();
     if (ml.count() == 0) {
         C5Message::info(tr("Nothing was selected"));
-        return;
+        return false;
     }
     row = ml.at(0).row();
+    return true;
+}
+
+void C5Grid::editRow(int columnWidthId)
+{
+    int row = 0;
+    if (!currentRow(row)) {
+        return;
+    }
     callEditor(fModel->data(row, columnWidthId, Qt::EditRole).toString());
 }
 
 void C5Grid::removeRow(int columnWithId)
 {
     int row = 0;
-    QModelIndexList ml = ui->tblView->selectionModel()->selectedIndexes();
-    if (ml.count() == 0) {
-        C5Message::info(tr("Nothing was selected"));
+    if (!currentRow(row)) {
         return;
     }
-    row = ml.at(0).row();
     removeWithId(fModel->data(row, columnWithId, Qt::EditRole).toInt(), row);
 }
 

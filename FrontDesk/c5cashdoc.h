@@ -18,16 +18,35 @@ public:
 
     virtual QToolBar *toolBar() override;
 
+    void setRelation(bool r);
+
+    void setCashInput(int id);
+
+    void setCashOutput(int id);
+
+    void setDate(const QDate &d);
+
+    void setComment(const QString &t);
+
+    void addRow(const QString &t, double a);
+
+    void updateRow(int row, const QString &t, double a);
+
     bool openDoc(const QString &uuid);
 
     void setStoreDoc(const QString &uuid);
 
+    QString uuid() const;
+
+    int inputCash();
+
     static bool removeDoc(const QStringList &dbParams, const QString &uuid);
+
+public slots:
+    void save();
 
 private slots:
     void amountChanged(const QString &arg1);
-
-    void save();
 
     void removeDoc();
 
@@ -45,6 +64,10 @@ private:
     QString fUuid;
     
     QString fStoreUuid;
+
+    bool fRelation;
+
+    QAction *fActionFromSale;
 };
 
 #endif // C5CASHDOC_H

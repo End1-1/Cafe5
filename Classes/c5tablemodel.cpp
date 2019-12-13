@@ -101,7 +101,7 @@ QVariant C5TableModel::headerData(int section, Qt::Orientation orientation, int 
             }
         }
     }
-return QVariant();
+    return QVariant();
 }
 
 int C5TableModel::indexForColumnName(const QString &column)

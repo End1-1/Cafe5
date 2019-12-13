@@ -139,6 +139,8 @@ protected slots:
 
     virtual int newRow();
 
+    bool currentRow(int &row);
+
     virtual void editRow(int columnWidthId = 0);
 
     virtual void removeRow(int columnWithId = 0);

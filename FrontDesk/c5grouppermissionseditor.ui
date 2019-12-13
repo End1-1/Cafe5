@@ -20,7 +20,7 @@
       <enum>QTabWidget::West</enum>
      </property>
      <property name="currentIndex">
-      <number>3</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
@@ -466,7 +466,57 @@
           <string>Debts to partners</string>
          </property>
          <property name="Tag" stdset="0">
-          <number>311</number>
+          <number>312</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_9">
+      <attribute name="title">
+       <string>Salary</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_7">
+       <item row="1" column="0">
+        <widget class="C5CheckBox" name="chSalaryAll_2">
+         <property name="text">
+          <string>Edit document</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>901</number>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <spacer name="verticalSpacer_9">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>544</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="0" column="0">
+        <widget class="C5CheckBox" name="chSalaryAll">
+         <property name="text">
+          <string>All items</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>900</number>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="C5CheckBox" name="chSalaryAll_3">
+         <property name="text">
+          <string>Report</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>902</number>
          </property>
         </widget>
        </item>
@@ -477,15 +527,18 @@
        <string>Cash</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="0" column="0">
-        <widget class="C5CheckBox" name="chCash">
-         <property name="text">
-          <string>All actions</string>
+       <item row="6" column="0">
+        <spacer name="verticalSpacer_8">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
          </property>
-         <property name="Tag" stdset="0">
-          <number>800</number>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>498</height>
+          </size>
          </property>
-        </widget>
+        </spacer>
        </item>
        <item row="1" column="0">
         <widget class="C5CheckBox" name="checkBox_49">
@@ -494,16 +547,6 @@
          </property>
          <property name="Tag" stdset="0">
           <number>804</number>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="C5CheckBox" name="checkBox_50">
-         <property name="text">
-          <string>Cash documents</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>801</number>
          </property>
         </widget>
        </item>
@@ -527,18 +570,35 @@
          </property>
         </widget>
        </item>
+       <item row="2" column="0">
+        <widget class="C5CheckBox" name="checkBox_50">
+         <property name="text">
+          <string>Cash documents</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>801</number>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="C5CheckBox" name="chCash">
+         <property name="text">
+          <string>All actions</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>800</number>
+         </property>
+        </widget>
+       </item>
        <item row="5" column="0">
-        <spacer name="verticalSpacer_8">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
+        <widget class="C5CheckBox" name="checkBox_59">
+         <property name="text">
+          <string>Costumer debts</string>
          </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>498</height>
-          </size>
+         <property name="Tag" stdset="0">
+          <number>805</number>
          </property>
-        </spacer>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -547,7 +607,37 @@
        <string>Menu</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="9" column="0">
+       <item row="8" column="0">
+        <widget class="C5CheckBox" name="checkBox_18">
+         <property name="text">
+          <string>Dish price and self cost report</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>407</number>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0">
+        <widget class="C5CheckBox" name="checkBox_29">
+         <property name="text">
+          <string>Dish remove reasons</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>405</number>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="C5CheckBox" name="checkBox_6">
+         <property name="text">
+          <string>Dishes list</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>404</number>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="0">
         <spacer name="verticalSpacer_2">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -567,6 +657,26 @@
          </property>
          <property name="Tag" stdset="0">
           <number>401</number>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="C5CheckBox" name="checkBox_5">
+         <property name="text">
+          <string>Types of dishes</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>403</number>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0">
+        <widget class="C5CheckBox" name="checkBox_30">
+         <property name="text">
+          <string>Dish comments</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>406</number>
          </property>
         </widget>
        </item>
@@ -590,63 +700,23 @@
          </property>
         </widget>
        </item>
-       <item row="7" column="0">
-        <widget class="C5CheckBox" name="checkBox_18">
-         <property name="text">
-          <string>Dish price and self cost report</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>407</number>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="C5CheckBox" name="checkBox_5">
-         <property name="text">
-          <string>Types of dishes</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>403</number>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <widget class="C5CheckBox" name="checkBox_29">
-         <property name="text">
-          <string>Dish remove reasons</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>405</number>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="0">
-        <widget class="C5CheckBox" name="checkBox_30">
-         <property name="text">
-          <string>Dish comments</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>406</number>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="C5CheckBox" name="checkBox_6">
-         <property name="text">
-          <string>Dishes list</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>404</number>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="0">
+       <item row="9" column="0">
         <widget class="C5CheckBox" name="checkBox_46">
          <property name="text">
           <string>Review menu</string>
          </property>
          <property name="Tag" stdset="0">
           <number>408</number>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="C5CheckBox" name="checkBox_58">
+         <property name="text">
+          <string>Dishes packages</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>409</number>
          </property>
         </widget>
        </item>

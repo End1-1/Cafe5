@@ -135,7 +135,7 @@
       <string/>
      </property>
      <property name="icon">
-      <iconset>
+      <iconset resource="../resources/res.qrc">
        <normaloff>:/folder.png</normaloff>:/folder.png</iconset>
      </property>
     </widget>
@@ -237,7 +237,7 @@
     </widget>
    </item>
    <item row="6" column="0" colspan="6">
-    <widget class="QWidget" name="widget_2" native="true">
+    <widget class="QWidget" name="witems" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout">
       <property name="spacing">
        <number>2</number>
@@ -260,7 +260,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset>
+         <iconset resource="../resources/res.qrc">
           <normaloff>:/add.png</normaloff>:/add.png</iconset>
         </property>
        </widget>
@@ -271,7 +271,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset>
+         <iconset resource="../resources/res.qrc">
           <normaloff>:/cancel.png</normaloff>:/cancel.png</iconset>
         </property>
        </widget>
@@ -296,14 +296,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5LineEditWithSelector</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5lineeditwithselector.h</header>
-  </customwidget>
-  <customwidget>
    <class>C5LineEdit</class>
    <extends>QLineEdit</extends>
    <header location="global">c5lineedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5LineEditWithSelector</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5lineeditwithselector.h</header>
   </customwidget>
   <customwidget>
    <class>C5TableWidget</class>
@@ -316,6 +316,8 @@
    <header location="global">c5dateedit.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../resources/res.qrc"/>
+ </resources>
  <connections/>
 </ui>

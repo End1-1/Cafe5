@@ -169,6 +169,8 @@ void DlgFace::handleMenu(const QJsonObject &obj)
     C5Menu::fMenuNames.clear();
     C5Menu::fPart2Color.clear();
     C5Menu::fDishSpecial.clear();
+    C5Menu::fPackages.clear();
+    C5Menu::fPackagesList.clear();
     sender()->deleteLater();
     QJsonArray jMenu = obj["menu"].toArray();
     C5Menu::fMenuVersion = obj["version"].toString();
@@ -188,6 +190,16 @@ void DlgFace::handleMenu(const QJsonObject &obj)
     for (int i = 0; i < ja.count(); i++) {
         QJsonObject o = ja.at(i).toObject();
         C5Menu::fDishSpecial[o["f_dish"].toString()].append(o["f_comment"].toString());
+    }
+    ja = obj["packages"].toArray();
+    for (int i = 0; i < ja.count(); i++) {
+        QJsonObject o = ja.at(i).toObject();
+        C5Menu::fPackages[o["f_name"].toString()] = o;
+    }
+    ja = obj["packageslist"].toArray();
+    for (int i = 0; i < ja.count(); i++) {
+        QJsonObject o = ja.at(i).toObject();
+        C5Menu::fPackagesList[o["f_package"].toString().toInt()].append(o);
     }
 }
 

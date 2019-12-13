@@ -588,12 +588,17 @@ void C5WaiterOrderDoc::open(C5Database &db)
             }
         }
     }
+    db[":f_order"] = fHeader["f_id"].toString();
+    db.exec("select f_car from b_car_orders where f_order=:f_order");
+    if (db.nextRow()) {
+        fHeader["car"] = db.getString(0);
+    }
     getTaxInfo(db);
     db[":f_header"] = fHeader["f_id"].toString();
     db.exec("select ob.f_id, ob.f_header, ob.f_state, dp1.f_name as part1, dp2.f_name as part2, ob.f_adgcode, d.f_name as f_name, \
              ob.f_qty1, ob.f_qty2, ob.f_price, ob.f_service, ob.f_discount, ob.f_total, \
              ob.f_store, ob.f_print1, ob.f_print2, ob.f_comment, ob.f_remind, ob.f_dish, \
-             s.f_name as f_storename, ob.f_removereason, ob.f_timeorder \
+             s.f_name as f_storename, ob.f_removereason, ob.f_timeorder, ob.f_package \
              from o_body ob \
              left join d_dish d on d.f_id=ob.f_dish \
              left join d_part2 dp2 on dp2.f_id=d.f_part \
