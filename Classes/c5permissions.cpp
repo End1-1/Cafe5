@@ -65,6 +65,7 @@ void C5Permissions::init(C5Database &db)
               << cp_t5_pay_breakfast
               << cp_t5_pay_complimentary
               << cp_t5_refund_goods
+              << cp_t5_shift_rotation
 
               << cp_t6_storage
               << cp_t6_goods_menu

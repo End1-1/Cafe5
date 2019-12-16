@@ -8,8 +8,8 @@ class C5Selector;
 }
 
 class C5Grid;
-
 class C5TableModel;
+
 class C5Selector : public C5Dialog
 {
     Q_OBJECT

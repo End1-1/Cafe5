@@ -19,16 +19,16 @@
         <location filename="../../Classes/c5cache.cpp" line="65"/>
         <location filename="../../Classes/c5cache.cpp" line="68"/>
         <location filename="../../Classes/c5cache.cpp" line="74"/>
-        <location filename="../../Classes/c5cache.cpp" line="85"/>
-        <location filename="../../Classes/c5cache.cpp" line="89"/>
-        <location filename="../../Classes/c5cache.cpp" line="92"/>
-        <location filename="../../Classes/c5cache.cpp" line="96"/>
-        <location filename="../../Classes/c5cache.cpp" line="99"/>
-        <location filename="../../Classes/c5cache.cpp" line="105"/>
-        <location filename="../../Classes/c5cache.cpp" line="109"/>
-        <location filename="../../Classes/c5cache.cpp" line="112"/>
-        <location filename="../../Classes/c5cache.cpp" line="115"/>
-        <location filename="../../Classes/c5cache.cpp" line="254"/>
+        <location filename="../../Classes/c5cache.cpp" line="86"/>
+        <location filename="../../Classes/c5cache.cpp" line="90"/>
+        <location filename="../../Classes/c5cache.cpp" line="93"/>
+        <location filename="../../Classes/c5cache.cpp" line="97"/>
+        <location filename="../../Classes/c5cache.cpp" line="100"/>
+        <location filename="../../Classes/c5cache.cpp" line="106"/>
+        <location filename="../../Classes/c5cache.cpp" line="110"/>
+        <location filename="../../Classes/c5cache.cpp" line="113"/>
+        <location filename="../../Classes/c5cache.cpp" line="116"/>
+        <location filename="../../Classes/c5cache.cpp" line="256"/>
         <source>Code</source>
         <translation>Կոդ</translation>
     </message>
@@ -47,16 +47,16 @@
         <location filename="../../Classes/c5cache.cpp" line="63"/>
         <location filename="../../Classes/c5cache.cpp" line="66"/>
         <location filename="../../Classes/c5cache.cpp" line="75"/>
-        <location filename="../../Classes/c5cache.cpp" line="86"/>
-        <location filename="../../Classes/c5cache.cpp" line="90"/>
-        <location filename="../../Classes/c5cache.cpp" line="93"/>
-        <location filename="../../Classes/c5cache.cpp" line="97"/>
-        <location filename="../../Classes/c5cache.cpp" line="100"/>
-        <location filename="../../Classes/c5cache.cpp" line="106"/>
-        <location filename="../../Classes/c5cache.cpp" line="110"/>
-        <location filename="../../Classes/c5cache.cpp" line="113"/>
-        <location filename="../../Classes/c5cache.cpp" line="116"/>
-        <location filename="../../Classes/c5cache.cpp" line="255"/>
+        <location filename="../../Classes/c5cache.cpp" line="87"/>
+        <location filename="../../Classes/c5cache.cpp" line="91"/>
+        <location filename="../../Classes/c5cache.cpp" line="94"/>
+        <location filename="../../Classes/c5cache.cpp" line="98"/>
+        <location filename="../../Classes/c5cache.cpp" line="101"/>
+        <location filename="../../Classes/c5cache.cpp" line="107"/>
+        <location filename="../../Classes/c5cache.cpp" line="111"/>
+        <location filename="../../Classes/c5cache.cpp" line="114"/>
+        <location filename="../../Classes/c5cache.cpp" line="117"/>
+        <location filename="../../Classes/c5cache.cpp" line="257"/>
         <source>Name</source>
         <translation>Անվանում</translation>
     </message>
@@ -121,12 +121,12 @@
         <translation>Նկարագրություն</translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="87"/>
+        <location filename="../../Classes/c5cache.cpp" line="88"/>
         <source>Price</source>
         <translation>Գին</translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="107"/>
+        <location filename="../../Classes/c5cache.cpp" line="108"/>
         <source>Type</source>
         <translation>Տեսակ</translation>
     </message>
@@ -158,14 +158,6 @@
     </message>
 </context>
 <context>
-    <name>C5TableWidget</name>
-    <message>
-        <location filename="../../Controls/c5tablewidget.cpp" line="191"/>
-        <source>Empty report</source>
-        <translation>Դատարկ հաշվետվություն</translation>
-    </message>
-</context>
-<context>
     <name>NotificationWidget</name>
     <message>
         <location filename="../../Classes/notificationwidget.ui" line="23"/>
@@ -187,76 +179,90 @@
     <name>QObject</name>
     <message>
         <location filename="dll.cpp" line="8"/>
-        <source>Daily report</source>
-        <translation>Օրվա հաշվետվություն</translation>
+        <location filename="dll.cpp" line="34"/>
+        <source>Daily total report</source>
+        <oldsource>Daily report</oldsource>
+        <translation>Ընդհանուր հաշվետվություն</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="30"/>
-        <source>Daily by waiters</source>
-        <translation>Օրվա հաշվետվություն</translation>
+        <location filename="dll.cpp" line="43"/>
+        <source>Orders</source>
+        <translation>Պատվերներ</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="45"/>
+        <location filename="dll.cpp" line="51"/>
+        <location filename="dll.cpp" line="98"/>
         <source>Number of orders</source>
         <translation>Պատվերներ</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="49"/>
+        <location filename="dll.cpp" line="55"/>
+        <location filename="dll.cpp" line="102"/>
         <source>Cash</source>
         <translation>Կանխիկ</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="55"/>
+        <location filename="dll.cpp" line="60"/>
+        <location filename="dll.cpp" line="107"/>
         <source>Card</source>
         <translation>Անկանխիկ</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="61"/>
+        <location filename="dll.cpp" line="65"/>
+        <location filename="dll.cpp" line="112"/>
         <source>Bank</source>
         <translation>Բանկ</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="67"/>
+        <location filename="dll.cpp" line="70"/>
+        <location filename="dll.cpp" line="117"/>
         <source>Other</source>
-        <translation>Պարտք</translation>
+        <translation>Այլ</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="86"/>
-        <source>Other:</source>
-        <translation>Պարտք</translation>
-    </message>
-    <message>
-        <location filename="dll.cpp" line="96"/>
+        <location filename="dll.cpp" line="75"/>
+        <location filename="dll.cpp" line="122"/>
         <source>Total amount</source>
         <translation>Ընդամենը</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="109"/>
-        <source>Total cash</source>
-        <translation>Կանխիկ</translation>
+        <location filename="dll.cpp" line="95"/>
+        <source>Total</source>
+        <translation>Ընդամենը</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="114"/>
-        <source>Total card</source>
-        <translation>Քարտ</translation>
+        <location filename="dll.cpp" line="154"/>
+        <source>Other payments</source>
+        <translation>Այլ վճարումներ</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="119"/>
-        <source>Total bank</source>
-        <translation>Փոխանցում</translation>
+        <location filename="dll.cpp" line="175"/>
+        <source>Sales</source>
+        <translation>Վաճառք</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="124"/>
-        <source>Total other</source>
-        <translation>Այլ</translation>
+        <location filename="dll.cpp" line="217"/>
+        <source>Cashdesk</source>
+        <translation>Դրամարկղ</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="129"/>
-        <source>Grand total</source>
-        <translation>Վերջնահաշվարկ</translation>
+        <location filename="dll.cpp" line="234"/>
+        <location filename="dll.cpp" line="270"/>
+        <source>Balance</source>
+        <translation>Բալանս</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="135"/>
+        <location filename="dll.cpp" line="254"/>
+        <source>Input</source>
+        <translation>Մուտք</translation>
+    </message>
+    <message>
+        <location filename="dll.cpp" line="256"/>
+        <source>Output</source>
+        <translation>Ելք</translation>
+    </message>
+    <message>
+        <location filename="dll.cpp" line="281"/>
         <source>Printed</source>
         <translation>Տպված</translation>
     </message>

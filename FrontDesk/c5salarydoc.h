@@ -1,13 +1,13 @@
 #ifndef C5SALARYDOC_H
 #define C5SALARYDOC_H
 
-#include "c5widget.h"
+#include "c5document.h"
 
 namespace Ui {
 class C5SalaryDoc;
 }
 
-class C5SalaryDoc : public C5Widget
+class C5SalaryDoc : public C5Document
 {
     Q_OBJECT
 
@@ -16,13 +16,21 @@ public:
 
     ~C5SalaryDoc();
 
+    bool openDoc(const QString &id);
+
     virtual QToolBar *toolBar() override;
 
 public slots:
     void save();
 
 private slots:
+    void countSalary();
+
     void countAmounts(const QString &arg1);
+
+    void createCashDocument();
+
+    void removeDoc(bool showmessage = true);
 
     void on_btnAddEmployee_clicked();
 
@@ -34,6 +42,10 @@ private:
     QString fUUID;
 
     QString fCashUUID;
+
+    int newRow();
+
+    void setPaid();
 };
 
 #endif // C5SALARYDOC_H

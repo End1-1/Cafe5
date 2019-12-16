@@ -127,27 +127,7 @@
        <string>Waiter</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_3">
-       <item row="4" column="0">
-        <widget class="C5CheckBox" name="checkBox_41">
-         <property name="text">
-          <string>Payment, transfer to room</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>504</number>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="C5CheckBox" name="checkBox_10">
-         <property name="text">
-          <string>Remove printed service</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>502</number>
-         </property>
-        </widget>
-       </item>
-       <item row="9" column="0">
+       <item row="10" column="0">
         <spacer name="verticalSpacer_3">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -160,26 +140,6 @@
          </property>
         </spacer>
        </item>
-       <item row="6" column="0">
-        <widget class="C5CheckBox" name="checkBox_43">
-         <property name="text">
-          <string>Payment, breakfast</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>506</number>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="C5CheckBox" name="checkBox_39">
-         <property name="text">
-          <string>Change value of service fee</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>503</number>
-         </property>
-        </widget>
-       </item>
        <item row="5" column="0">
         <widget class="C5CheckBox" name="checkBox_42">
          <property name="text">
@@ -187,26 +147,6 @@
          </property>
          <property name="Tag" stdset="0">
           <number>505</number>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="C5CheckBox" name="chWaiterAllItems">
-         <property name="text">
-          <string>All items</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>500</number>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="C5CheckBox" name="checkBox_9">
-         <property name="text">
-          <string>Mutliple receipt</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>501</number>
          </property>
         </widget>
        </item>
@@ -220,6 +160,66 @@
          </property>
         </widget>
        </item>
+       <item row="4" column="0">
+        <widget class="C5CheckBox" name="checkBox_41">
+         <property name="text">
+          <string>Payment, transfer to room</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>504</number>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="C5CheckBox" name="chWaiterAllItems">
+         <property name="text">
+          <string>All items</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>500</number>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0">
+        <widget class="C5CheckBox" name="checkBox_43">
+         <property name="text">
+          <string>Payment, breakfast</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>506</number>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="C5CheckBox" name="checkBox_10">
+         <property name="text">
+          <string>Remove printed service</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>502</number>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="C5CheckBox" name="checkBox_39">
+         <property name="text">
+          <string>Change value of service fee</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>503</number>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="C5CheckBox" name="checkBox_9">
+         <property name="text">
+          <string>Mutliple receipt</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>501</number>
+         </property>
+        </widget>
+       </item>
        <item row="8" column="0">
         <widget class="C5CheckBox" name="checkBox_54">
          <property name="text">
@@ -227,6 +227,16 @@
          </property>
          <property name="Tag" stdset="0">
           <number>508</number>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="0">
+        <widget class="C5CheckBox" name="checkBox_60">
+         <property name="text">
+          <string>Shift rotation</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>509</number>
          </property>
         </widget>
        </item>
@@ -403,7 +413,7 @@
        <item row="8" column="0">
         <widget class="C5CheckBox" name="checkBox_48">
          <property name="text">
-          <string>Sales from store total</string>
+          <string>Detailed movement in the storage</string>
          </property>
          <property name="Tag" stdset="0">
           <number>310</number>

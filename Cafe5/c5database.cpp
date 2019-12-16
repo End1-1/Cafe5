@@ -155,6 +155,8 @@ bool C5Database::exec(const QString &sqlQuery, QList<QList<QVariant> > &dbrows, 
         return false;
     }
 
+//#define LOGGING 1
+
 #ifdef QT_DEBUG
     logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + lastQuery(fQuery));
 #elif  LOGGING

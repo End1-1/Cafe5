@@ -81,6 +81,7 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         setCacheSimpleQuery(cache_halls, "h_halls");
         setCacheSimpleQuery(cache_tables, "h_tables");
         setCacheSimpleQuery(cache_dish_package, "d_package");
+        setCacheSimpleQuery(cache_salary_shift, "s_salary_shift");
         fCacheQuery[cache_dish_package] = QString("select f_id as `%1`, f_name as `%2`, f_price as `%3` from d_package ")
                 .arg(tr("Code"))
                 .arg(tr("Name"))
@@ -146,6 +147,7 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         fTableCache["a_header_payment"] = cache_header_payment;
         fTableCache["a_header_paid"] = cache_header_paid;
         fTableCache["d_package"] = cache_dish_package;
+        fTableCache["s_salary_shift"] = cache_salary_shift;
     }
     fVersion = 0;
     C5Database db(dbParams);

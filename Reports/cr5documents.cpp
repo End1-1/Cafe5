@@ -4,6 +4,7 @@
 #include "cr5documentsfilter.h"
 #include "c5tablemodel.h"
 #include "c5mainwindow.h"
+#include "c5salarydoc.h"
 #include "c5cashdoc.h"
 #include <QMenu>
 
@@ -158,6 +159,12 @@ void CR5Documents::openDoc(QString id)
         }
         break;
     }
+    case DOC_TYPE_SALARY:
+        auto *sd = __mainWindow->createTab<C5SalaryDoc>(fDBParams);
+        if (!sd->openDoc(id)) {
+            __mainWindow->removeTab(sd);
+        }
+        break;
     }
 }
 

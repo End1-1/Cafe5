@@ -52,10 +52,13 @@ SOURCES += \
     ../Classes/c5jsondb.cpp \
     ../Classes/c5storedraftwriter.cpp \
     ../Classes/notificationwidget.cpp \
+    c5lineeditwithselector.cpp \
     c5printreceiptthread50mm.cpp \
     dlgcarnumber.cpp \
     dlglistdishspecial.cpp \
     dlglistofpackages.cpp \
+    dlglistofshifts.cpp \
+    dlgshiftrotation.cpp \
         main.cpp \
         dlgface.cpp \
     ../Cafe5/c5database.cpp \
@@ -137,6 +140,7 @@ HEADERS += \
     ../Classes/c5jsondb.h \
     ../Classes/c5storedraftwriter.h \
     ../Classes/notificationwidget.h \
+    c5lineeditwithselector.h \
     c5printreceiptthread50mm.h \
     dlgcarnumber.h \
         dlgface.h \
@@ -151,6 +155,7 @@ HEADERS += \
     ../Cafe5/c5serverhandler.h \
     dlglistdishspecial.h \
     dlglistofpackages.h \
+    dlglistofshifts.h \
     dlgpassword.h \
     dlgorder.h \
     ../Classes/c5user.h \
@@ -167,6 +172,7 @@ HEADERS += \
     ../../NewTax/Src/printtaxn.h \
     ../Controls/c5lineedit.h \
     ../Classes/c5printremovedservicethread.h \
+    dlgshiftrotation.h \
     rc.h \
     res.rc \
     ../Controls/c5tablewidget.h \
@@ -211,10 +217,12 @@ FORMS += \
     ../Cafe5/c5message.ui \
     dlglistdishspecial.ui \
     dlglistofpackages.ui \
+    dlglistofshifts.ui \
     dlgpassword.ui \
     dlgorder.ui \
     dlgpayment.ui \
     ../Classes/c5printpreview.ui \
+    dlgshiftrotation.ui \
     wpaymentoptions.ui \
     dlgcreditcardlist.ui \
     dlgdishremovereason.ui \

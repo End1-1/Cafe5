@@ -10,27 +10,14 @@
 #include <QJsonObject>
 
 C5CashDoc::C5CashDoc(const QStringList &dbParams, QWidget *parent) :
-    C5Widget(dbParams, parent),
+    C5Document(dbParams, parent),
     ui(new Ui::C5CashDoc)
 {
     ui->setupUi(this);
     fIcon = ":/cash.png";
     fLabel = tr("Cash document");
-    ui->tbl->setColumnWidths(2, 400, 100);
-    C5Database db(fDBParams);
-    db[":f_id"] = DOC_TYPE_CASH;
-    db.exec("select f_counter from a_type where f_id=:f_id for update");
-    if (!db.nextRow()) {
-        db[":f_id"] = DOC_TYPE_CASH;
-        db[":f_counter"] = 1;
-        db[":f_name"] = tr("Cash doc");
-        db.insert("f_counter", false);
-        db.commit();
-        db[":f_id"] = DOC_TYPE_CASH;
-        db.exec("select f_counter from a_type where f_id=:f_id for update");
-        db.nextRow();
-    }
-    ui->leDocNum->setPlaceholderText(QString("%1").arg(db.getInt(0) + 1, C5Config::docNumDigitsInput(), 10, QChar('0')));
+    ui->tbl->setColumnWidths(2, 400, 100);    
+    ui->leDocNum->setPlaceholderText(QString("%1").arg(genNumber(DOC_TYPE_CASH), C5Config::docNumDigitsInput(), 10, QChar('0')));
     ui->leInput->setSelector(dbParams, ui->leInputName, cache_cash_names);
     ui->leOutput->setSelector(dbParams, ui->leOutputName, cache_cash_names);
     ui->lePartner->setSelector(dbParams, ui->lePartnerName, cache_goods_partners);
@@ -38,12 +25,15 @@ C5CashDoc::C5CashDoc(const QStringList &dbParams, QWidget *parent) :
     ui->leStoreDoc->setEnabled(false);
     ui->btnOpenStoreDoc->setEnabled(false);
     fRelation = false;
+    fActionFromSale = nullptr;
 }
 
 C5CashDoc::~C5CashDoc()
 {
     delete ui;
-    //delete fActionFromSale;
+    if (fActionFromSale) {
+        delete fActionFromSale;
+    }
 }
 
 QToolBar *C5CashDoc::toolBar()
@@ -103,7 +93,9 @@ void C5CashDoc::updateRow(int row, const QString &t, double a)
 
 bool C5CashDoc::openDoc(const QString &uuid)
 {
-    fActionFromSale->setVisible(false);
+    if (fActionFromSale) {
+        fActionFromSale->setVisible(false);
+    }
     fUuid = uuid;
     C5Database db(fDBParams);
     db[":f_id"] = uuid;
@@ -183,9 +175,19 @@ QString C5CashDoc::uuid() const
     return fUuid;
 }
 
+QDate C5CashDoc::date() const
+{
+    return ui->deDate->date();
+}
+
 int C5CashDoc::inputCash()
 {
     return ui->leInput->getInteger();
+}
+
+int C5CashDoc::outputCash()
+{
+    return ui->leOutput->getInteger();
 }
 
 bool C5CashDoc::removeDoc(const QStringList &dbParams, const QString &uuid)
@@ -226,26 +228,8 @@ void C5CashDoc::save()
     }
     C5Database db(fDBParams);
     if (ui->leDocNum->text().isEmpty()) {
-        db.startTransaction();
-        db[":f_id"] = (DOC_TYPE_CASH);
-        db.exec("select f_counter from a_type where f_id=:f_id for update");
-        int count = 1;
-        if (db.nextRow()) {
-            count = db.getInt(0) + 1;
-            ui->leDocNum->setText(QString("%1").arg(count, C5Config::docNumDigitsInput(), 10, QChar('0')));
-        } else {
-            ui->leDocNum->setText(QString("%1").arg(count, C5Config::docNumDigitsInput(), 10, QChar('0')));
-        }
-        db[":f_counter"] = count;
-        if (!db.update("a_type", where_id(DOC_TYPE_CASH))) {
-            C5Message::error(db.fLastError);
-        }
-        db.commit();
-    } else {
-        int docnum = ui->leDocNum->getInteger();
-        db[":f_id"] = DOC_TYPE_CASH;
-        db[":f_counter"] = docnum;
-        db.exec("update a_type set f_counter=:f_counter where f_id=:f_id and f_counter<:f_counter");
+        ui->leDocNum->setInteger(genNumber(DOC_TYPE_CASH));
+        updateGenNumber(ui->leDocNum->getInteger(), DOC_TYPE_CASH);
     }
     QJsonObject jo;
     jo["cashin"] = ui->leInput->text();
@@ -328,14 +312,18 @@ void C5CashDoc::removeDoc()
 void C5CashDoc::inputFromSale()
 {
     QDate d = QDate::currentDate();
-    if (C5InputDate::date(d)) {
+    int shift;
+    QString shiftname;
+    if (C5InputDate::date(fDBParams, d, shift, shiftname)) {
         C5Database db(fDBParams);
         db[":f_date"] = d;
-        db.exec("select sum(f_amountcash) from o_header where f_datecash=:f_date");
+        db[":f_state"] = ORDER_STATE_CLOSE;
+        db[":f_shift"] = shift;
+        db.exec("select sum(f_amountcash) from o_header where f_datecash=:f_date and f_state=:f_state and f_shift=:f_shift");
         if (db.nextRow()) {
-            ui->leRemarks->setText(QString("%1 %2").arg(tr("Input from sale")).arg(d.toString(FORMAT_DATE_TO_STR)));
+            ui->leRemarks->setText(QString("%1 %2, %3").arg(tr("Input from sale")).arg(d.toString(FORMAT_DATE_TO_STR)).arg(shiftname));
             int row = ui->tbl->addEmptyRow();
-            ui->tbl->createLineEdit(row, 0)->setText(QString("%1 %2").arg(tr("Input from sale")).arg(d.toString(FORMAT_DATE_TO_STR)));
+            ui->tbl->createLineEdit(row, 0)->setText(QString("%1 %2, %3").arg(tr("Input from sale")).arg(d.toString(FORMAT_DATE_TO_STR)).arg(shiftname));
             ui->tbl->createLineEdit(row, 1)->setDouble(db.getDouble("f_amount"));
             amountChanged("");
         }

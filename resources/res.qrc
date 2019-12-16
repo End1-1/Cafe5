@@ -66,5 +66,6 @@
         <file>car.png</file>
         <file>package.png</file>
         <file>employee.png</file>
+        <file>rotation.png</file>
     </qresource>
 </RCC>

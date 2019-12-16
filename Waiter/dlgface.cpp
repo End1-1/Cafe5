@@ -9,6 +9,7 @@
 #include "c5witerconf.h"
 #include "dlgexitbyversion.h"
 #include "c5waiterserver.h"
+#include "dlgshiftrotation.h"
 #include "dlglistofhall.h"
 #include "c5utils.h"
 #include "dlgreports.h"
@@ -156,6 +157,7 @@ void DlgFace::handleHall(const QJsonObject &obj)
     sender()->deleteLater();
     C5CafeCommon::fHalls = obj["halls"].toArray();
     C5CafeCommon::fTables = obj["tables"].toArray();
+    C5CafeCommon::fShifts = obj["shifts"].toArray();
     if (fCurrentHall.isEmpty()) {
         fCurrentHall = C5Config::defaultHall();
     }
@@ -210,13 +212,14 @@ void DlgFace::handleConf(const QJsonObject &obj)
         return;
     }
     if (!__c5config.autoDateCash() && !__c5config.dateCash().isEmpty()) {
-        if (__c5config.dateCash() != obj["date_cash"].toString()) {
+        if (__c5config.dateCash() != obj["date_cash"].toString() || __c5config.dateShift() != obj["date_shift"].toString().toInt()) {
             DlgExitWithMessage::openDialog(tr("Working date was changed, application now will quit"));
             return;
         }
     }
     __c5config.setValue(param_date_cash_auto, obj["date_auto"].toString());
     __c5config.setValue(param_date_cash, obj["date_cash"].toString());
+    __c5config.setValue(param_date_cash_shift, obj["date_shift"].toString());
     QStringList keys = obj["conf"].toObject().keys();
     foreach (QString k, keys) {
         __c5config.setValue(k.toInt(), obj["conf"].toObject()[k].toString());
@@ -405,4 +408,17 @@ void DlgFace::on_btnClearDroid_clicked()
     C5Database db(C5Config::dbParams());
     db[":msg"] = 1;
     db.insert("droid_message", false);
+}
+
+void DlgFace::on_btnSetSession_clicked()
+{
+    C5User user;
+    if (!DlgPassword::getUser(tr("Shift rotation"), &user)) {
+        return;
+    }
+    if (user.check(cp_t5_shift_rotation)) {
+        DlgShiftRotation *d = new DlgShiftRotation(fDBParams);
+        d->exec();
+        delete d;
+    }
 }

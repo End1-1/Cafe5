@@ -128,6 +128,7 @@ void DlgCarNumber::on_lst_itemClicked(QListWidgetItem *item)
     }
     if (fCostumer) {
         ui->leCostumer->setText(item->text());
+        ui->leCostumer->setProperty("id", item->data(Qt::UserRole).toInt());
         ui->leAdditional->setText(fCostumerPhones[item->data(Qt::UserRole).toInt()]);
     }
     if (fAdditional) {

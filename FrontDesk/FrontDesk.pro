@@ -61,6 +61,7 @@ SOURCES += \
     ../Reports/cr5storereason.cpp \
     c5cashdoc.cpp \
     c5costumerdebtpayment.cpp \
+    c5document.cpp \
     c5inputdate.cpp \
     c5progressdialog.cpp \
     c5salarydoc.cpp \
@@ -222,6 +223,7 @@ HEADERS += \
     ../Reports/cr5storereason.h \
     c5cashdoc.h \
     c5costumerdebtpayment.h \
+    c5document.h \
     c5inputdate.h \
         c5mainwindow.h \
     ../Cafe5/c5config.h \

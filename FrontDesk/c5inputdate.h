@@ -16,7 +16,7 @@ public:
 
     ~C5InputDate();
 
-    static bool date(QDate &d);
+    static bool date(const QStringList &dbParams, QDate &d, int &shift, QString &shiftName);
 
 private slots:
     void on_btnCancel_clicked();

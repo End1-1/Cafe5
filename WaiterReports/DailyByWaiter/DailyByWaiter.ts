@@ -19,16 +19,16 @@
         <location filename="../../Classes/c5cache.cpp" line="65"/>
         <location filename="../../Classes/c5cache.cpp" line="68"/>
         <location filename="../../Classes/c5cache.cpp" line="74"/>
-        <location filename="../../Classes/c5cache.cpp" line="85"/>
-        <location filename="../../Classes/c5cache.cpp" line="89"/>
-        <location filename="../../Classes/c5cache.cpp" line="92"/>
-        <location filename="../../Classes/c5cache.cpp" line="96"/>
-        <location filename="../../Classes/c5cache.cpp" line="99"/>
-        <location filename="../../Classes/c5cache.cpp" line="105"/>
-        <location filename="../../Classes/c5cache.cpp" line="109"/>
-        <location filename="../../Classes/c5cache.cpp" line="112"/>
-        <location filename="../../Classes/c5cache.cpp" line="115"/>
-        <location filename="../../Classes/c5cache.cpp" line="254"/>
+        <location filename="../../Classes/c5cache.cpp" line="86"/>
+        <location filename="../../Classes/c5cache.cpp" line="90"/>
+        <location filename="../../Classes/c5cache.cpp" line="93"/>
+        <location filename="../../Classes/c5cache.cpp" line="97"/>
+        <location filename="../../Classes/c5cache.cpp" line="100"/>
+        <location filename="../../Classes/c5cache.cpp" line="106"/>
+        <location filename="../../Classes/c5cache.cpp" line="110"/>
+        <location filename="../../Classes/c5cache.cpp" line="113"/>
+        <location filename="../../Classes/c5cache.cpp" line="116"/>
+        <location filename="../../Classes/c5cache.cpp" line="256"/>
         <source>Code</source>
         <translation></translation>
     </message>
@@ -47,16 +47,16 @@
         <location filename="../../Classes/c5cache.cpp" line="63"/>
         <location filename="../../Classes/c5cache.cpp" line="66"/>
         <location filename="../../Classes/c5cache.cpp" line="75"/>
-        <location filename="../../Classes/c5cache.cpp" line="86"/>
-        <location filename="../../Classes/c5cache.cpp" line="90"/>
-        <location filename="../../Classes/c5cache.cpp" line="93"/>
-        <location filename="../../Classes/c5cache.cpp" line="97"/>
-        <location filename="../../Classes/c5cache.cpp" line="100"/>
-        <location filename="../../Classes/c5cache.cpp" line="106"/>
-        <location filename="../../Classes/c5cache.cpp" line="110"/>
-        <location filename="../../Classes/c5cache.cpp" line="113"/>
-        <location filename="../../Classes/c5cache.cpp" line="116"/>
-        <location filename="../../Classes/c5cache.cpp" line="255"/>
+        <location filename="../../Classes/c5cache.cpp" line="87"/>
+        <location filename="../../Classes/c5cache.cpp" line="91"/>
+        <location filename="../../Classes/c5cache.cpp" line="94"/>
+        <location filename="../../Classes/c5cache.cpp" line="98"/>
+        <location filename="../../Classes/c5cache.cpp" line="101"/>
+        <location filename="../../Classes/c5cache.cpp" line="107"/>
+        <location filename="../../Classes/c5cache.cpp" line="111"/>
+        <location filename="../../Classes/c5cache.cpp" line="114"/>
+        <location filename="../../Classes/c5cache.cpp" line="117"/>
+        <location filename="../../Classes/c5cache.cpp" line="257"/>
         <source>Name</source>
         <translation></translation>
     </message>
@@ -121,12 +121,12 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="87"/>
+        <location filename="../../Classes/c5cache.cpp" line="88"/>
         <source>Price</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="107"/>
+        <location filename="../../Classes/c5cache.cpp" line="108"/>
         <source>Type</source>
         <translation type="unfinished"></translation>
     </message>
@@ -160,7 +160,7 @@
 <context>
     <name>C5TableWidget</name>
     <message>
-        <location filename="../../Controls/c5tablewidget.cpp" line="191"/>
+        <location filename="../../Controls/c5tablewidget.cpp" line="208"/>
         <source>Empty report</source>
         <translation type="unfinished"></translation>
     </message>

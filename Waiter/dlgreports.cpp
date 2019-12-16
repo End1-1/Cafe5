@@ -5,6 +5,7 @@
 #include "c5translator.h"
 #include "c5cafecommon.h"
 #include "c5user.h"
+#include "dlglistofshifts.h"
 #include "dlgreceiptlanguage.h"
 #include "dlglistofhall.h"
 
@@ -15,6 +16,7 @@ DlgReports::DlgReports(const QStringList &dbParams) :
     ui->setupUi(this);
     ui->date1->setDate(QDate::currentDate());
     ui->date2->setDate(QDate::currentDate());
+    fShiftId = 0;
     setLangIcon();
 }
 
@@ -41,6 +43,7 @@ void DlgReports::getDailyCommon(const QDate &date1, const QDate &date2)
     sh->bind("date1", date1.toString(FORMAT_DATE_TO_STR_MYSQL));
     sh->bind("date2", date2.toString(FORMAT_DATE_TO_STR_MYSQL));
     sh->bind("hall", fCurrentHall);
+    sh->bind("shift", QString::number(fShiftId));
     sh->send();
 }
 
@@ -114,6 +117,7 @@ void DlgReports::handleReportsList(const QJsonObject &obj)
     sh->bind("file", file);
     sh->bind("date1", ui->date1->date().toString(FORMAT_DATE_TO_STR_MYSQL));
     sh->bind("date2", ui->date2->date().toString(FORMAT_DATE_TO_STR_MYSQL));
+    sh->bind("shift", QString::number(fShiftId));
     sh->send();
 }
 
@@ -157,7 +161,7 @@ void DlgReports::on_btnDateRight1_clicked()
 
 void DlgReports::on_btnDateRight2_clicked()
 {
-    ui->date2->setDate(ui->date2->date().addDays(-1));
+    ui->date2->setDate(ui->date2->date().addDays(1));
 }
 
 void DlgReports::on_btnExit_clicked()
@@ -204,4 +208,11 @@ void DlgReports::on_btnHall_clicked()
     }
     fCurrentHall = hall;
     ui->btnHall->setText(C5CafeCommon::hall(hall)["f_name"].toString());
+}
+
+void DlgReports::on_btnShift_clicked()
+{
+    if (DlgListOfShifts::getShift(fShiftId, fShiftName)) {
+        ui->btnShift->setText(fShiftName);
+    }
 }

@@ -19,6 +19,7 @@ DEFINES += _MODULE_=\\\"WAITER\\\"
 DEFINES += DLL
 
 INCLUDEPATH += ../../Cafe5
+INCLUDEPATH += ../../FrontDesk
 INCLUDEPATH += ../../Classes
 INCLUDEPATH += ../../Controls
 INCLUDEPATH += c:/projects/xlsx/src
@@ -49,7 +50,6 @@ SOURCES += \
     ../../Cafe5/c5config.cpp \
     ../../Cafe5/c5utils.cpp \
     ../../Classes/c5printing.cpp \
-    ../../Controls/c5tablewidget.cpp \
     ../../Controls/c5checkbox.cpp \
     ../../Controls/c5combobox.cpp \
     ../../Controls/c5dateedit.cpp \
@@ -80,7 +80,6 @@ HEADERS += \
     ../../Cafe5/c5config.h \
     ../../Cafe5/c5utils.h \
     ../../Classes/c5printing.h \
-    ../../Controls/c5tablewidget.h \
     ../../Controls/c5checkbox.h \
     ../../Controls/c5combobox.h \
     ../../Controls/c5dateedit.h \

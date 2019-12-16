@@ -1,13 +1,13 @@
 #ifndef C5CASHDOC_H
 #define C5CASHDOC_H
 
-#include "c5widget.h"
+#include "c5document.h"
 
 namespace Ui {
 class C5CashDoc;
 }
 
-class C5CashDoc : public C5Widget
+class C5CashDoc : public C5Document
 {
     Q_OBJECT
 
@@ -38,7 +38,11 @@ public:
 
     QString uuid() const;
 
+    QDate date() const;
+
     int inputCash();
+
+    int outputCash();
 
     static bool removeDoc(const QStringList &dbParams, const QString &uuid);
 

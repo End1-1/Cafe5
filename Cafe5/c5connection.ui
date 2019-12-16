@@ -76,7 +76,7 @@
       <string/>
      </property>
      <property name="icon">
-      <iconset resource="../resources/resources.qrc">
+      <iconset resource="../resources/res.qrc">
        <normaloff>:/refresh.png</normaloff>:/refresh.png</iconset>
      </property>
     </widget>
@@ -189,7 +189,7 @@
   <tabstop>btnRefreshSettings</tabstop>
  </tabstops>
  <resources>
-  <include location="../resources/resources.qrc"/>
+  <include location="../resources/res.qrc"/>
  </resources>
  <connections/>
 </ui>

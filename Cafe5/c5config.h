@@ -34,6 +34,7 @@
 #define param_fd_font_size 28
 #define param_recipe_widht 29
 #define param_car_mode 30
+#define param_date_cash_shift 31
 
 class C5Config
 {
@@ -103,6 +104,8 @@ public:
     static bool autoDateCash();
 
     static QString dateCash();
+
+    static int dateShift();
 
     static bool useHotel();
 

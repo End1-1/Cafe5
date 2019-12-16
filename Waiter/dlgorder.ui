@@ -684,7 +684,7 @@ QLabel {color:green;}
                      <string>Exit</string>
                     </property>
                     <property name="icon">
-                     <iconset resource="../resources/resources.qrc">
+                     <iconset resource="../resources/res.qrc">
                       <normaloff>:/cancel.png</normaloff>:/cancel.png</iconset>
                     </property>
                    </widget>
@@ -1126,7 +1126,7 @@ QLabel {color:green;}
                <string/>
               </property>
               <property name="icon">
-               <iconset resource="../resources/resources.qrc">
+               <iconset resource="../resources/res.qrc">
                 <normaloff>:/recycle.png</normaloff>:/recycle.png</iconset>
               </property>
               <property name="iconSize">
@@ -1458,8 +1458,8 @@ QLabel {color:green;}
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../resources/resources.qrc"/>
   <include location="../resources/res.qrc"/>
+  <include location="../resources/resources.qrc"/>
  </resources>
  <connections/>
 </ui>

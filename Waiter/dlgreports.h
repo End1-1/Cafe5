@@ -27,6 +27,10 @@ private:
 
     QString fCurrentHall;
 
+    int fShiftId;
+
+    QString fShiftName;
+
     void getDailyCommon(const QDate &date1 = QDate::currentDate(), const QDate &date2 = QDate::currentDate());
 
     void setLangIcon();
@@ -59,6 +63,8 @@ private slots:
     void on_btnReceiptLanguage_clicked();
 
     void on_btnHall_clicked();
+
+    void on_btnShift_clicked();
 };
 
 #endif // DLGREPORTS_H

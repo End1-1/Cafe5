@@ -7,6 +7,7 @@ QStringList C5CafeCommon::fDishRemoveReason;
 QStringList C5CafeCommon::fDishComments;
 QJsonArray C5CafeCommon::fHalls;
 QJsonArray C5CafeCommon::fTables;
+QJsonArray C5CafeCommon::fShifts;
 QMap<int, QMap<int, QString> > C5CafeCommon::fHallConfigs;
 
 C5CafeCommon::C5CafeCommon()

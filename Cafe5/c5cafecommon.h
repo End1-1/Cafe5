@@ -38,6 +38,8 @@ public:
 
     static QJsonArray fTables;
 
+    static QJsonArray fShifts;
+
     static QMap<int, QMap<int, QString> > fHallConfigs;
 
     static QString serviceMode(const QString &hall);

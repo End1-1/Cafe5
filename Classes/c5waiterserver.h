@@ -51,6 +51,8 @@ private:
 
     void processGetCostumerByCar(QJsonObject &o);
 
+    void processRotateShift(QJsonObject &o);
+
     QTcpSocket *fSocket;
 };
 

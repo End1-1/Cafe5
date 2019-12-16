@@ -123,6 +123,11 @@ QString C5Config::dateCash()
     return getValue(param_date_cash);
 }
 
+int C5Config::dateShift()
+{
+    return getValue(param_date_cash_shift).toInt();
+}
+
 bool C5Config::useHotel()
 {
     return !getValue(param_hotel_database).isEmpty();

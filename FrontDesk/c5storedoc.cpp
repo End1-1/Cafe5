@@ -99,7 +99,7 @@ bool C5StoreDoc::openDoc(QString id)
     ui->leInvoiceNumber->setText(jo["f_invoice"].toString());
     ui->lePayment->setValue(db.getInt("f_payment"));
     ui->chPaid->setChecked(db.getInt("f_paid") == 1);
-    fCashUuid = jo["cashdoc"].toString();
+    fCashUuid = jo["f_cashuuid"].toString();
     setMode(static_cast<STORE_DOC>(fDocType));
     db[":f_document"] = id;
     switch (fDocType) {
@@ -761,6 +761,11 @@ bool C5StoreDoc::saveDraft(C5Database &db, int state, QString &err)
     fDocState = state;
     setDocEnabled(fDocState == DOC_STATE_DRAFT);
     countTotal();
+    if (fDocState == DOC_STATE_SAVED) {
+        if (!fCashUuid.isEmpty()) {
+            updateCashDoc();
+        }
+    }
     return true;
 }
 

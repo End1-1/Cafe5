@@ -196,4 +196,23 @@ INSERT INTO S_CAR (F_NAME) VALUES ('УАЗ');
 update s_app set f_version ='5' where f_app='DB';
 alter table o_body add f_package integer default 0;
 create table b_car_orders (f_order char(36) primary key, f_car integer);
-create table b_clients_debts (f_id integer primary key auto_increment, f_date date, f_costumer integer, f_order char(36),  f_cash char(36), f_amount decimal(14,2));
+create table b_clients_debts (f_id integer primary key auto_increment, f_header char(36), f_date date, f_costumer integer, f_order char(36),  f_cash char(36), f_amount decimal(14,2));
+
+/* DB - 6 */
+update s_app set f_version ='6' where f_app='DB';
+create table s_salary_body (f_id char(36) primary key, f_user integer, f_position integer, f_amount decimal(14,2), f_row integer);
+create table s_salary_options (f_id char(36) primary key, f_cashdoc char(36), f_shift integer);
+create table s_salary_shift (f_id integer primary key auto_increment, f_name tinytext, f_number smallint);
+insert into s_salary_shift  values (1, 'I հերթ', 1), (2, 'II հերթ', 2);
+create table s_salary_shift_time (f_id integer primary key auto_increment, f_shift integer, f_start time, f_end time);
+INSERT INTO `s_salary_shift_time` (`f_shift`, `f_start`, `f_end`) VALUES ('1', '10:00:00', '21:59:59');
+INSERT INTO `s_salary_shift_time` (`f_shift`, `f_start`, `f_end`) VALUES ('2', '22:00:00', '23:59:59');
+INSERT INTO `s_salary_shift_time` (`f_shift`, `f_start`, `f_end`) VALUES ('2', '00:00:00', '09:59:50');
+create table s_salary_account (f_id integer primary key auto_increment, f_position integer, f_shift integer, f_individual integer, f_percent decimal(3,3), f_round integer);
+INSERT INTO `a_type` (`f_id`, `f_name`, `f_counter`) VALUES ('7', 'Աշխատավարձ', '0');
+INSERT INTO `o_pay_other` (`f_id`, `f_name`) VALUES ('5', 'Պարտք ');
+UPDATE `o_pay_other` SET `f_name` = 'Գործընկերոչ պարտք' WHERE (`f_id` = '3');
+alter table o_header add column f_shift integer;
+update o_header set f_shift=1 where f_timeclose between '10:00' and '21:59:59';
+update o_header set f_shift=2 where f_timeclose between '22:00' and '23:59:59';
+update o_header set f_shift=2 where f_timeclose between '00:00' and '09:59:59';

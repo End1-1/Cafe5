@@ -28,5 +28,6 @@ static const int sm_callstaff = 22;
 static const int sm_messagelist = 23;
 static const int sm_callreceipt = 24;
 static const int sm_getcostumer_by_car = 25;
+static const int sm_rotate_shift = 26;
 
 #endif // C5SOCKETMESSAGE_H

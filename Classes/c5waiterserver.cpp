@@ -51,17 +51,22 @@ void C5WaiterServer::reply(QJsonObject &o)
         QJsonArray jTables;
         srh.getJsonFromQuery(QString("select t.f_id, t.f_hall, t.f_name, t.f_lock, t.f_lockSrc, \
                             h.f_id as f_header, concat(u.f_last, ' ', left(u.f_first, 1), '.') as f_staffName, \
-                            h.f_amountTotal as f_amount, h.f_print, \
+                            h.f_amountTotal as f_amount, h.f_print, bc.f_govnumber, \
                             date_format(h.f_dateOpen, '%d.%m.%Y') as f_dateOpen, h.f_timeOpen \
                             from h_tables t \
                             left join o_header h on h.f_table=t.f_id and h.f_state=1 \
+                            left join b_car_orders bco on bco.f_order = h.f_id  \
+                            left join b_car bc on bc.f_id=bco.f_car \
                             left join s_user u on u.f_id=h.f_staff  %1 \
                             order by f_id")
                 .arg(hallFilter.isEmpty() ? "" : " where t.f_hall in (" + hallFilter + ") "), jTables);
         //srh.getJsonFromQuery("select f_id, f_hall, f_name, f_lock, f_lockSrc from h_tables order by f_id", jTables);
+        QJsonArray jShift;
+        srh.getJsonFromQuery("select f_id, f_name from s_salary_shift", jShift);
         o["reply"] = 1;
         o["halls"] = jHall;
         o["tables"] = jTables;
+        o["shifts"] = jShift;
         break;
     }
     case sm_menu: {
@@ -155,6 +160,7 @@ void C5WaiterServer::reply(QJsonObject &o)
         if (srh.fDb.nextRow()) {
            o["date_cash"] = srh.fDb.getString("f_datecash");
            o["date_auto"] = srh.fDb.getString("f_datecashauto");
+           o["date_shift"] = srh.fDb.getString("f_shift");
            srh.fDb[":f_settings"] = srh.fDb.getInt("f_conf");
            srh.fDb.exec("select f_key, f_value from s_settings_values where f_settings=:f_settings");
            while (srh.fDb.nextRow()) {
@@ -308,9 +314,10 @@ void C5WaiterServer::reply(QJsonObject &o)
             err += tr("Receipt was not printed");
         }
         QDate dateCash = QDate::currentDate();
+        int dateShift = 0;
         bool isAuto;
         srh.fDb[":f_ip"] = fPeerAddress;
-        srh.fDb.exec("select f_dateCash, f_dateCashAuto from s_station_conf where f_ip=:f_ip");
+        srh.fDb.exec("select f_dateCash, f_dateCashAuto, f_shift from s_station_conf where f_ip=:f_ip");
         if (srh.fDb.nextRow()) {
             isAuto = srh.fDb.getInt(1) == 1;
             if (isAuto) {
@@ -330,7 +337,8 @@ void C5WaiterServer::reply(QJsonObject &o)
                    }
                 }
             } else {
-                dateCash = srh.fDb.getDate(0);
+                dateCash = srh.fDb.getDate("f_datecash");
+                dateShift = srh.fDb.getInt("f_shift");
             }
         }
         if (err.isEmpty()) {
@@ -346,6 +354,20 @@ void C5WaiterServer::reply(QJsonObject &o)
             srh.fDb[":f_lock"] = 0;
             srh.fDb[":f_lockSrc"] = "";
             srh.fDb.update("h_tables", where_id(jh["f_table"].toString().toInt()));
+
+            if (dateShift == 0) {
+                srh.fDb[":f_time"] = QTime::fromString(jh["f_timeclose"].toString(), FORMAT_TIME_TO_STR);
+                srh.fDb.exec("select f_shift from s_salary_shift_time where :f_time between f_start and f_end");
+                if (srh.fDb.nextRow()) {
+                    dateShift = srh.fDb.getInt("f_shift");
+                } else {
+                    dateShift = 1;
+                }
+            }
+
+            srh.fDb[":f_id"] = jh["f_id"].toString();
+            srh.fDb[":f_shift"] = dateShift;
+            srh.fDb.exec("update o_header set f_shift=:f_shift where f_id=:f_id");
 
             if (jh["f_otherid"].toString().toInt() == PAYOTHER_DEBT) {
                 srh.fDb[":f_order"] = jh["f_id"].toString();
@@ -433,6 +455,9 @@ void C5WaiterServer::reply(QJsonObject &o)
         if (!fIn["hall"].toString().isEmpty()) {
             sqlQuery += QString(" and oh.f_hall=%1 ").arg(fIn["hall"].toString());
         }
+        if (fIn["shift"].toString().toInt() > 0) {
+            sqlQuery += QString(" and oh.f_shift=%1 ").arg(fIn["shift"].toString());
+        }
         sqlQuery += "order by oh.f_timeclose";
         srh.getJsonFromQuery(sqlQuery, ja, bv);
         o["reply"] = 0;
@@ -503,6 +528,7 @@ void C5WaiterServer::reply(QJsonObject &o)
         QJsonObject jo;
         jo["date1"] = fIn["date1"];
         jo["date2"] = fIn["date2"];
+        jo["f_shift"] = fIn["shift"];
         o["reply"] = 0;
         QJsonArray report;
         j(srh.fDb, jo, report);
@@ -540,6 +566,9 @@ void C5WaiterServer::reply(QJsonObject &o)
         break;
     case sm_getcostumer_by_car:
         processGetCostumerByCar(o);
+        break;
+    case sm_rotate_shift:
+        processRotateShift(o);
         break;
     default:
         o["reply"] = 0;
@@ -642,8 +671,12 @@ void C5WaiterServer::saveOrder(QJsonObject &jh, QJsonArray &ja, C5Database &db)
     }
     if (jh["car"].toString().toInt() > 0) {
         db[":f_id"] = jh["f_id"].toString();
-        db.exec("select * from b_car_order where f_order=:f_id");
-        if (!db.nextRow()) {
+        db.exec("select * from b_car_orders where f_order=:f_id");
+        if (db.nextRow()) {
+            db[":f_order"] = jh["f_id"].toString();
+            db[":f_car"] = jh["car"].toString();
+            db.exec("update b_car_orders set f_car=:f_car where f_order=:f_order");
+        } else {
             db[":f_order"] = jh["f_id"].toString();
             db[":f_car"] = jh["car"].toString();
             db.insert("b_car_orders", false);
@@ -1175,4 +1208,13 @@ void C5WaiterServer::processGetCostumerByCar(QJsonObject &o)
     } else {
         o["reply"] = 0;
     }
+}
+
+void C5WaiterServer::processRotateShift(QJsonObject &o)
+{
+    C5Database db(C5Config::dbParams());
+    db[":f_datecash"] = QDate::fromString(fIn["date"].toString(), FORMAT_DATE_TO_STR_MYSQL);
+    db[":f_shift"] = fIn["shift"].toString().toInt();
+    db.exec("update s_station_conf set f_datecash=:f_datecash, f_shift=:f_shift");
+    o["reply"] = 1;
 }

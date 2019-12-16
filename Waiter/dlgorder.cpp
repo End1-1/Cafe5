@@ -86,7 +86,7 @@ void DlgOrder::openTable(const QJsonObject &table, C5User *user)
     d->buildMenu(d->fMenuName, "", "");
     d->fUser = user;
     d->ui->lbTable->setText(table["f_name"].toString());
-    d->ui->lbStaffName->setText(user->fFull);
+    d->ui->lbStaffName->setText(QString("%1%2").arg(user->fFull).arg(__c5config.autoDateCash() ? "" : " [" + __c5config.dateCash() + " / " + QString::number(__c5config.dateShift()) + "]"));
     d->load(table["f_id"].toString().toInt());
     d->exec();
     delete d;

@@ -331,7 +331,7 @@ void C5MainWindow::on_actionLogin_triggered()
             it->setIcon(0, QIcon(":/employee.png"));
             item->addChild(it);
             addTreeL3Item(it, cp_t9_salary_doc, tr("New salary document"), ":/employee.png");
-            addTreeL3Item(it, cp_t9_report, tr("Report"), ":/employee.png");
+            //addTreeL3Item(it, cp_t9_report, tr("Report"), ":/employee.png");
         }
 
         if (pr(db.getString(3), cp_t4_menu)) {

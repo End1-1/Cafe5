@@ -67,6 +67,8 @@ private slots:
 
     void on_btnClearDroid_clicked();
 
+    void on_btnSetSession_clicked();
+
 private:
     Ui::DlgFace *ui;
 
