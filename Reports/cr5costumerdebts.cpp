@@ -15,6 +15,8 @@ CR5CostumerDebts::CR5CostumerDebts(const QStringList &dbParams, QWidget *parent)
     fMainTable = "b_clients_debts cd";
     fLeftJoinTables << "left join b_clients c on c.f_id=cd.f_costumer [c]"
                     << "left join o_header oh on oh.f_id=cd.f_order [oh]"
+                    << "left join b_car bc on bc.f_id=bco.f_car [bc]"
+                    << "left join b_car_orders bco on bco.f_order=oh.f_id [bco]"
                        ;
 
     fColumnsFields << "cd.f_order"
@@ -22,6 +24,7 @@ CR5CostumerDebts::CR5CostumerDebts(const QStringList &dbParams, QWidget *parent)
                    << "concat(c.f_lastname, ' ', c.f_firstname) as f_costumername"
                    << "cd.f_date"
                    << "concat(oh.f_prefix, f_hallid) as f_ordernum"
+                   << "bc.f_govnumber"
                    << "sum(cd.f_amount) as f_amount"
                       ;
 
@@ -30,6 +33,7 @@ CR5CostumerDebts::CR5CostumerDebts(const QStringList &dbParams, QWidget *parent)
                   << "concat(c.f_lastname, ' ', c.f_firstname) as f_costumername"
                   << "cd.f_date"
                   << "concat(oh.f_prefix, f_hallid) as f_ordernum"
+                  << "bc.f_govnumber"
                       ;
 
     fColumnsSum << "f_amount"
@@ -41,6 +45,7 @@ CR5CostumerDebts::CR5CostumerDebts(const QStringList &dbParams, QWidget *parent)
     fTranslation["f_date"] = tr("Date");
     fTranslation["f_ordernum"] = tr("Order");
     fTranslation["f_amount"] = tr("Amount");
+    fTranslation["f_govnumber"] = tr("Gov. number");
 
     fColumnsVisible["cd.f_order"] = true;
     fColumnsVisible["cd.f_id"] = true;
@@ -48,6 +53,7 @@ CR5CostumerDebts::CR5CostumerDebts(const QStringList &dbParams, QWidget *parent)
     fColumnsVisible["cd.f_date"] = true;
     fColumnsVisible["concat(oh.f_prefix, f_hallid) as f_ordernum"] = true;
     fColumnsVisible["sum(cd.f_amount) as f_amount"] = true;
+    fColumnsVisible["bc.f_govnumber"] = true;
 
     connect(this, SIGNAL(tblDoubleClicked(int, int, QList<QVariant>)), this, SLOT(openOrder(int, int, QList<QVariant>)));
 

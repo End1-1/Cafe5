@@ -378,7 +378,10 @@ void CR5ConsumptionBySales::makeOutput(bool v)
         writeDocs(DOC_TYPE_STORE_OUTPUT, DOC_REASON_LOST, goodsLost, tr("Lost"));
     }
     if (goodsOver.count() > 0) {
-        writeDocs(DOC_TYPE_STORE_INPUT, DOC_REASON_OVER, goodsOver, tr("Over"));
+        C5StoreDoc *sd = writeDocs(DOC_TYPE_STORE_INPUT, DOC_REASON_OVER, goodsOver, tr("Over"));
+        if (sd) {
+            sd->setLastInputPrices();
+        }
     }
 }
 
@@ -437,7 +440,7 @@ void CR5ConsumptionBySales::changeOutputStore()
     delete d;
 }
 
-void CR5ConsumptionBySales::writeDocs(int doctype, int reason, const QMap<int, double> &data, const QString &comment)
+C5StoreDoc *CR5ConsumptionBySales::writeDocs(int doctype, int reason, const QMap<int, double> &data, const QString &comment)
 {
     C5Database db(fDBParams);
     C5StoreDraftWriter dw(db);
@@ -455,5 +458,7 @@ void CR5ConsumptionBySales::writeDocs(int doctype, int reason, const QMap<int, d
     C5StoreDoc *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);
     if (!sd->openDoc(documentId)) {
         __mainWindow->removeTab(sd);
+        sd = nullptr;
     }
+    return sd;
 }

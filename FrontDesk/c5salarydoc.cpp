@@ -183,18 +183,17 @@ void C5SalaryDoc::countSalary()
         timeEnd.append(db.getTime(1));
     }
     double amount = 0;
-    for (int i = 0; i < timeStart.count(); i++) {
-        db[":f_timeclose1"] = timeStart.at(i);
-        db[":f_timeclose2"] = timeEnd.at(i);
+
+        db[":f_shift"] = ui->leShift->getInteger();
         db[":f_datecash1"] = ui->deDate->date();
         db[":f_datecash2"] = ui->deDate->date();
         db.exec("select sum(f_amounttotal) from o_header "
                 "where f_datecash between :f_datecash1 and :f_datecash2 "
-                "and f_timeclose between :f_timeclose1 and :f_timeclose2 "
+                "and f_shift=:f_shift "
                 "and f_state=2 ");
         db.nextRow();
         amount += db.getDouble(0);
-    }
+
     for (int i = 0; i < ui->tbl->rowCount(); i++) {
         db[":f_shift"] = ui->leShift->getInteger();
         db[":f_position"] = ui->tbl->lineEditWithSelector(i, 1)->getInteger();
@@ -204,11 +203,11 @@ void C5SalaryDoc::countSalary()
                 ui->tbl->lineEditWithSelector(i, 5)->setDouble(db.getInt(0));
             } else {
                 double counted = (amount * db.getDouble(1)) / posCount[ui->tbl->lineEditWithSelector(i, 1)->getInteger()];
-                if (db.getInt(2) > 0) {
-                    counted = trunc(ceil(counted / (pow(10, db.getInt(2)))) * pow(10, db.getInt(2)));
-                } else if (db.getInt(2) < 0) {
-                    counted = trunc(floor(counted / (pow(10, db.getInt(2)))) * pow(10, db.getInt(2)));
-                }
+//                if (db.getInt(2) > 0) {
+//                    counted = trunc(ceil(counted / (pow(10, db.getInt(2)))) * pow(10, db.getInt(2)));
+//                } else if (db.getInt(2) < 0) {
+//                    counted = trunc(floor(counted / (pow(10, db.getInt(2)))) * pow(10, db.getInt(2)));
+//                }
                 ui->tbl->lineEditWithSelector(i, 5)->setDouble(counted);
             }
         }

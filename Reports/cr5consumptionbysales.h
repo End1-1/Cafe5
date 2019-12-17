@@ -4,6 +4,7 @@
 #include "c5reportwidget.h"
 
 class CR5ConsumptionBySalesFilter;
+class C5StoreDoc;
 
 class CR5ConsumptionBySales : public C5ReportWidget
 {
@@ -38,7 +39,7 @@ private slots:
 
     void changeOutputStore();
 
-    void writeDocs(int doctype, int reason, const QMap<int, double> &data, const QString &comment);
+    C5StoreDoc *writeDocs(int doctype, int reason, const QMap<int, double> &data, const QString &comment);
 
 signals:
     void updateProgressValue(int);

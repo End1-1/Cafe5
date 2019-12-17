@@ -444,14 +444,28 @@ void C5WaiterServer::reply(QJsonObject &o)
         bv[":f_datecash1"] = QDate::fromString(fIn["date1"].toString(), FORMAT_DATE_TO_STR_MYSQL);
         bv[":f_datecash2"] = QDate::fromString(fIn["date2"].toString(), FORMAT_DATE_TO_STR_MYSQL);
         bv[":f_state"] = ORDER_STATE_CLOSE;
-        QString sqlQuery = "select oh.f_id, concat(oh.f_prefix, oh.f_hallid) as f_order, date_format(oh.f_datecash, '%d.%m.%Y') as f_datecash, oh.f_timeclose, "
+        QString sqlQuery;
+        if (__c5config.carMode()) {
+            sqlQuery = "select oh.f_id, concat(oh.f_prefix, oh.f_hallid) as f_order, date_format(oh.f_datecash, '%d.%m.%Y') as f_datecash, oh.f_timeclose, "
                            "h.f_name as f_hall, t.f_name as f_table, concat(u.f_last, ' ', u.f_first) as f_staff,"
-                           "oh.f_amounttotal "
+                           "oh.f_amounttotal, bc.f_govnumber "
                            "from o_header oh "
                            "left join h_halls h on h.f_id=oh.f_hall "
                            "left join h_tables t on t.f_id=oh.f_table "
                            "left join s_user u on u.f_id=oh.f_staff "
+                            "left join b_car_orders bco on bco.f_order=oh.f_id "
+                            "left join b_car bc on bc.f_id=bco.f_car "
                            "where oh.f_state=:f_state and oh.f_datecash between :f_datecash1 and :f_datecash2 ";
+        } else {
+            sqlQuery = "select oh.f_id, concat(oh.f_prefix, oh.f_hallid) as f_order, date_format(oh.f_datecash, '%d.%m.%Y') as f_datecash, oh.f_timeclose, "
+                       "h.f_name as f_hall, t.f_name as f_table, concat(u.f_last, ' ', u.f_first) as f_staff,"
+                       "oh.f_amounttotal "
+                       "from o_header oh "
+                       "left join h_halls h on h.f_id=oh.f_hall "
+                       "left join h_tables t on t.f_id=oh.f_table "
+                       "left join s_user u on u.f_id=oh.f_staff "
+                       "where oh.f_state=:f_state and oh.f_datecash between :f_datecash1 and :f_datecash2 ";
+        }
         if (!fIn["hall"].toString().isEmpty()) {
             sqlQuery += QString(" and oh.f_hall=%1 ").arg(fIn["hall"].toString());
         }

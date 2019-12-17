@@ -216,3 +216,8 @@ alter table o_header add column f_shift integer;
 update o_header set f_shift=1 where f_timeclose between '10:00' and '21:59:59';
 update o_header set f_shift=2 where f_timeclose between '22:00' and '23:59:59';
 update o_header set f_shift=2 where f_timeclose between '00:00' and '09:59:59';
+
+
+/* DB - 7 */
+update s_app set f_version ='7' where f_app='DB';
+alter table s_station_conf add column f_shift smallint default 1;

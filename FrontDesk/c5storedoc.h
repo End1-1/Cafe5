@@ -32,6 +32,8 @@ public:
 
     void setMode(STORE_DOC sd);
 
+    void setLastInputPrices();
+
     virtual QToolBar *toolBar() override;
 
     static bool removeDoc(const QStringList &dbParams, QString id, bool showmessage = true);

@@ -55,7 +55,7 @@ void C5HallTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &o
     painter->drawText(timeRect, o["f_timeopen"].toString(), op);
     if (!o["f_govnumber"].toString().isEmpty()) {
         QRect govRect = option.rect;
-        govRect.adjust(0, govRect.height() - fm.height() - 7, -2, -2);
+        govRect.adjust(0, govRect.height() - fm.height() - 10, -2, -2);
         op.setAlignment(Qt::AlignRight);
         font.setBold(true);
         font.setPointSize(12);

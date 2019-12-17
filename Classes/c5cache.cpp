@@ -64,9 +64,13 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         fCacheQuery[cache_dish_remove_reason] = QString("select f_id as `%1`, f_name as `%2` from o_dish_remove_reason")
                 .arg(tr("Code"))
                 .arg(tr("Name"));
-        fCacheQuery[cache_discount_client] = QString("select f_id as `%1`, concat(f_lastname, ' ', f_firstname) as f_fullname, f_firstname as `%2`, f_lastname as `%3`, f_info as `%4` from b_clients")
+        fCacheQuery[cache_discount_client] = QString("select c.f_id as `%1`, concat(f_lastname, ' ', f_firstname) as `%2`, "
+                                                     "bc.f_govnumber as `%3`, f_firstname as `%4`, f_lastname as `%5`, f_info as `%6` "
+                                                     "from b_clients c "
+                                                     "left join b_car bc on bc.f_costumer=c.f_id ")
                 .arg(tr("Code"))
                 .arg(tr("Full name"))
+                .arg(tr("Gov. number"))
                 .arg(tr("First name"))
                 .arg(tr("Last name"))
                 .arg(tr("Additional info"));

@@ -110,6 +110,8 @@ public:
 
     inline int getInt(const QString &columnName) {return fDbRows.at(fCursorPos).at(fNameColumnMap[columnName.toLower()]).toInt(); }
 
+    inline double getDouble(int row, const QString &columnName) {return fDbRows.at(row).at(fNameColumnMap[columnName.toLower()]).toDouble();}
+
     inline double getDouble(int column) {return fDbRows.at(fCursorPos).at(column).toDouble(); }
 
     inline double getDouble(const QString &columnName) {return fDbRows.at(fCursorPos).at(fNameColumnMap[columnName.toLower()]).toDouble(); }

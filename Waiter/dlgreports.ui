@@ -215,6 +215,11 @@
        <string>Amount</string>
       </property>
      </column>
+     <column>
+      <property name="text">
+       <string/>
+      </property>
+     </column>
     </widget>
    </item>
    <item row="0" column="0">
@@ -334,7 +339,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="../resources/res.qrc">
+         <iconset resource="../resources/resources.qrc">
           <normaloff>:/left-arrow.png</normaloff>:/left-arrow.png</iconset>
         </property>
         <property name="iconSize">
@@ -375,7 +380,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="../resources/res.qrc">
+         <iconset resource="../resources/resources.qrc">
           <normaloff>:/right-arrow.png</normaloff>:/right-arrow.png</iconset>
         </property>
         <property name="iconSize">
@@ -411,7 +416,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="../resources/res.qrc">
+         <iconset resource="../resources/resources.qrc">
           <normaloff>:/left-arrow.png</normaloff>:/left-arrow.png</iconset>
         </property>
         <property name="iconSize">
@@ -452,7 +457,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="../resources/res.qrc">
+         <iconset resource="../resources/resources.qrc">
           <normaloff>:/right-arrow.png</normaloff>:/right-arrow.png</iconset>
         </property>
         <property name="iconSize">
@@ -481,7 +486,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="../resources/res.qrc">
+         <iconset resource="../resources/resources.qrc">
           <normaloff>:/refresh.png</normaloff>:/refresh.png</iconset>
         </property>
         <property name="iconSize">
@@ -545,7 +550,6 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../resources/res.qrc"/>
   <include location="../resources/resources.qrc"/>
  </resources>
  <connections/>

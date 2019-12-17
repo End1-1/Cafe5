@@ -21,7 +21,7 @@ CR5DiscountStatisics::CR5DiscountStatisics(const QStringList &dbParams, QWidget 
     fColumnsFields << "oh.f_id"
                    << "concat(oh.f_prefix, oh.f_hallid) as f_prefix"
                    << "oh.f_datecash"
-                   << "bd.f_name as dtname"
+                   << "dt.f_name as dtname"
                    << "bc.f_firstname"
                    << "bc.f_lastname"
                    << "bd.f_value"
@@ -32,7 +32,7 @@ CR5DiscountStatisics::CR5DiscountStatisics(const QStringList &dbParams, QWidget 
     fColumnsGroup << "concat(oh.f_prefix, oh.f_hallid) as f_prefix"
                    << "oh.f_id"
                    << "oh.f_datecash"
-                   << "bd.f_name as dtname"
+                   << "dt.f_name as dtname"
                    << "bd.f_name"
                    << "bc.f_firstname"
                    << "bc.f_lastname"
@@ -56,7 +56,7 @@ CR5DiscountStatisics::CR5DiscountStatisics(const QStringList &dbParams, QWidget 
     fColumnsVisible["concat(oh.f_prefix, oh.f_hallid) as f_prefix"] = true;
     fColumnsVisible["oh.f_id"] = true;
     fColumnsVisible["oh.f_datecash"] = true;
-    fColumnsVisible["bd.f_name as dtname"] = true;
+    fColumnsVisible["dt.f_name as dtname"] = true;
     fColumnsVisible["bc.f_firstname"] = true;
     fColumnsVisible["bc.f_lastname"] = true;
     fColumnsVisible["bd.f_value"] = true;

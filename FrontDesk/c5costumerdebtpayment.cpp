@@ -65,8 +65,8 @@ void C5CostumerDebtPayment::on_btnOK_clicked()
         doc->setRelation(true);
         doc->setCashInput(ui->leCash->getInteger());
         doc->setDate(ui->deDate->date());
-        doc->setComment(tr("Dept payment") + ", " + ui->leCostumerName->text());
-        doc->addRow(tr("Dept payment") + ", " + ui->leCostumerName->text(), ui->leAmount->getDouble());
+        doc->setComment(tr("Dept payment") + ", " + ui->leCostumerName->text() + " " + ui->leGovnumber->text());
+        doc->addRow(tr("Dept payment") + ", " + ui->leCostumerName->text()  + " " + ui->leGovnumber->text(), ui->leAmount->getDouble());
         doc->save();
         db[":f_cash"] = doc->uuid();
         db[":f_id"] = ui->leCode->getInteger();

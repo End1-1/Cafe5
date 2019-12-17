@@ -251,6 +251,26 @@ void C5StoreDoc::setMode(C5StoreDoc::STORE_DOC sd)
     setGoodsPanelHidden(C5Config::getRegValue("showhidegoods").toBool());
 }
 
+void C5StoreDoc::setLastInputPrices()
+{
+    C5Database db(fDBParams);
+    db[":f_id"] = fInternalId;
+    db.exec("select b.f_goods, g.f_lastinputprice "
+            "from a_store_draft b "
+            "left join c_goods g on g.f_id=b.f_goods "
+            "where b.f_document=:f_id");
+    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+        for (int j = 0; j < db.rowCount(); j++) {
+            if (ui->tblGoods->getInteger(i, 1) == db.getInt(j, "f_goods")) {
+                ui->tblGoods->lineEdit(i, 5)->setDouble(db.getDouble(j, "f_lastinputprice"));
+                ui->tblGoods->lineEdit(i, 6)->setDouble(ui->tblGoods->lineEdit(i, 3)->getDouble() * db.getDouble(j, "f_lastinputprice"));
+                break;
+            }
+        }
+    }
+    countTotal();
+}
+
 QToolBar *C5StoreDoc::toolBar()
 {
     if (!fToolBar) {
