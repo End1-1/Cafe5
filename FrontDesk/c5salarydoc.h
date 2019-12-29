@@ -20,6 +20,8 @@ public:
 
     virtual QToolBar *toolBar() override;
 
+    static bool removeDocument(const QStringList &dbParams, const QString &uuid);
+
 public slots:
     void save();
 

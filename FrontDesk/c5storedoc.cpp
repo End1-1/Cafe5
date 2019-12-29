@@ -307,12 +307,14 @@ bool C5StoreDoc::removeDoc(const QStringList &dbParams, QString id, bool showmes
     }
     db[":f_id"] = id;
     db.exec("select f_raw from a_header where f_id=:f_id");
+    QString cashDoc;
     if (db.nextRow()) {
         QJsonDocument jd = QJsonDocument::fromJson(db.getString(0).toUtf8());
         QJsonObject jo = jd.object();
         if (jo["based_on_sale"].toInt() > 0) {
             err += tr("Document based on sale cannot be edited manually");
         }
+        cashDoc = jo["f_cashuuid"].toString();
     }
     if (!err.isEmpty()) {
         C5Message::error(err);
@@ -324,6 +326,12 @@ bool C5StoreDoc::removeDoc(const QStringList &dbParams, QString id, bool showmes
     db.exec("delete from a_store_draft where f_document=:f_document");
     db[":f_id"] = id;
     db.exec("delete from a_header where f_id=:f_id");
+    if (!cashDoc.isEmpty()) {
+        db[":f_header"] = cashDoc;
+        db.exec("delete from e_cash where f_header=:f_header");
+        db[":f_id"] = cashDoc;
+        db.exec("delete from a_header where f_id=:f_id");
+    }
     return err.isEmpty();
 }
 

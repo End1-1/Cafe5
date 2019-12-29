@@ -1,6 +1,7 @@
 #include "cr5consumptionbysales.h"
 #include "cr5consumptionbysalesfilter.h"
 #include "c5gridgilter.h"
+#include "cr5consuptionreason.h"
 #include "c5tablemodel.h"
 #include "c5mainwindow.h"
 #include "c5waiterorderdoc.h"
@@ -320,11 +321,21 @@ void CR5ConsumptionBySales::countRowQty(int row)
 
 void CR5ConsumptionBySales::tblDoubleClicked(int row, int column, const QList<QVariant> &values)
 {
+    if (values.count() == 0) {
+        return;
+    }
     bool ok;
     double qty;
     QString docid;
     C5Database db(fDBParams);
     switch (column) {
+    case col_qtysale: {
+        //if (pr(fDBParams, cp_t3_consuption_reason)) {
+            CR5ConsuptionReason *s = __mainWindow->createTab<CR5ConsuptionReason>(fDBParams);
+            s->setFilterParams(fFilter->date1(), fFilter->date2(), fFilter->store(), values.at(0).toInt());
+        //}
+        break;
+    }
     case col_qtyinv:
         qty = QInputDialog::getDouble(this, tr("Inventory qty"), tr("Qty"), 0, 0, 100000, 4, &ok);
         if (!ok) {

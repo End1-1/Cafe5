@@ -18,6 +18,8 @@ public:
 
     void setId(int id);
 
+    virtual void selectorCallback(int row, const QList<QVariant> &values) override;
+
 private slots:
     void on_btnCancel_clicked();
 

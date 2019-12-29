@@ -23,5 +23,11 @@ QString CR5CostumerDebtsFilter::condition()
     if (!ui->leCostumer->isEmpty()) {
         cond += " and cd.f_costumer in (" + ui->leCostumer->text() + ") ";
     }
+    if (ui->rbDebts->isChecked()) {
+        cond += " and cd.f_amount<0 ";
+    }
+    if (ui->rbPaid->isChecked()) {
+        cond += " and cd.f_amount>0 ";
+    }
     return cond;
 }

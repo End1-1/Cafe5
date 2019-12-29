@@ -36,6 +36,7 @@
 #define cp_t3_sale_from_store_total 310
 #define cp_t3_discount_statistics 311
 #define cp_t3_debts_to_partners 312
+#define cp_t3_consuption_reason 313
 
 #define cp_t4_menu 400
 #define cp_t4_menu_names 401
@@ -84,6 +85,7 @@
 #define cp_t8_cash_detailed_report 803
 #define cp_t8_cash_names 804
 #define cp_t8_costumer_debts 805
+#define cp_t8_costumer_debts_pay 806
 
 #define cp_t9_salary 900
 #define cp_t9_salary_doc 901

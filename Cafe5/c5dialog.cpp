@@ -61,6 +61,12 @@ void C5Dialog::showFullScreen()
 #endif
 }
 
+void C5Dialog::selectorCallback(int row, const QList<QVariant> &values)
+{
+    Q_UNUSED(row);
+    Q_UNUSED(values);
+}
+
 void C5Dialog::keyPressEvent(QKeyEvent *e)
 {
     switch (e->key()) {

@@ -39,6 +39,8 @@ public:
 
     void showFullScreen();
 
+    virtual void selectorCallback(int row, const QList<QVariant> &values);
+
 protected:
     QStringList fDBParams;
 

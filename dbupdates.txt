@@ -200,7 +200,7 @@ create table b_clients_debts (f_id integer primary key auto_increment, f_header 
 
 /* DB - 6 */
 update s_app set f_version ='6' where f_app='DB';
-create table s_salary_body (f_id char(36) primary key, f_user integer, f_position integer, f_amount decimal(14,2), f_row integer);
+create table s_salary_body (f_id char(36) primary key, f_header char(36), f_user integer, f_position integer, f_amount decimal(14,2), f_row integer);
 create table s_salary_options (f_id char(36) primary key, f_cashdoc char(36), f_shift integer);
 create table s_salary_shift (f_id integer primary key auto_increment, f_name tinytext, f_number smallint);
 insert into s_salary_shift  values (1, 'I հերթ', 1), (2, 'II հերթ', 2);

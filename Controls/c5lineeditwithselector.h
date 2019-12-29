@@ -4,6 +4,7 @@
 #include "c5lineedit.h"
 
 class C5Widget;
+class C5Dialog;
 
 class C5LineEditWithSelector : public C5LineEdit
 {
@@ -17,6 +18,8 @@ public:
     void setSelector(const QStringList &dbParams, QLineEdit *selName, int cacheId, int colId = 0, int colName = 1);
 
     void setCallbackWidget(C5Widget *w);
+
+    void setCallbackDialog(C5Dialog *d);
 
     void setValue(const QString &id);
 
@@ -41,6 +44,8 @@ private:
     QLineEdit *fNameLineEdit;
 
     C5Widget *fWidget;
+
+    C5Dialog *fDialog;
 
 signals:
     void done(const QList<QVariant> &values);

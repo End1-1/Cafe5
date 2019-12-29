@@ -87,6 +87,15 @@ QToolBar *C5SalaryDoc::toolBar()
     return fToolBar;
 }
 
+bool C5SalaryDoc::removeDocument(const QStringList &dbParams, const QString &uuid)
+{
+    C5SalaryDoc *d = new C5SalaryDoc(dbParams);
+    d->openDoc(uuid);
+    d->removeDoc(false);
+    delete d;
+    return true;
+}
+
 void C5SalaryDoc::save()
 {
     QString error;
@@ -258,13 +267,22 @@ void C5SalaryDoc::removeDoc(bool showmessage)
     }
     C5Database db(fDBParams);
     db.startTransaction();
-    db[":_id"] = fUUID;
-    db.exec("delete from a_header where f_id=:f_id");
     db[":f_id"] = fUUID;
-    db.exec("delete from s_salary_options where f_id=:f_id");
+    db.exec("delete from a_header where f_id=:f_id");
     db[":f_header"] = fUUID;
     db.exec("delete from s_salary_body where f_header=:f_header");
     db.commit();
+    db[":f_id"] = fUUID;
+    db.exec("select * from s_salary_options where f_id=:f_id");
+    if (db.nextRow()) {
+        QString cashdoc = db.getString("f_cashdoc");
+        db[":f_header"] = cashdoc;
+        db.exec("delete from e_cash where f_header=:f_header");
+        db[":f_id"] = cashdoc;
+        db.exec("delete from a_header where f_id=:f_id");
+    }
+    db[":f_id"] = fUUID;
+    db.exec("delete from s_salary_options where f_id=:f_id");
     __mainWindow->removeTab(this);
 }
 

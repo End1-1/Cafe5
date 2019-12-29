@@ -340,6 +340,14 @@ void CR5Documents::removeDocs()
             } else {
                 return;
             }
+            break;
+        case DOC_TYPE_SALARY:
+            if (C5SalaryDoc::removeDocument(fDBParams, id)) {
+                fModel->removeRow(r);
+            } else {
+                return;
+            }
+            break;
         }
     }
 }

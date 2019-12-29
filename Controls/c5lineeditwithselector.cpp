@@ -9,6 +9,7 @@ C5LineEditWithSelector::C5LineEditWithSelector(QWidget *parent) :
     fCache = 0;
     fNameLineEdit = nullptr;
     fWidget = nullptr;
+    fDialog = nullptr;
 }
 
 C5LineEditWithSelector::~C5LineEditWithSelector()
@@ -30,6 +31,11 @@ void C5LineEditWithSelector::setCallbackWidget(C5Widget *w)
     fWidget = w;
 }
 
+void C5LineEditWithSelector::setCallbackDialog(C5Dialog *d)
+{
+    fDialog = d;
+}
+
 void C5LineEditWithSelector::setValue(const QString &id)
 {
     setText(id);
@@ -47,7 +53,9 @@ void C5LineEditWithSelector::setValue(const QString &id)
     }
     if (fWidget && row > -1) {
         fWidget->selectorCallback(0, c->getRow(row));
-
+    }
+    if (fDialog && row > -1) {
+        fDialog->selectorCallback(0, c->getRow(row));
     }
 }
 
@@ -78,6 +86,9 @@ void C5LineEditWithSelector::mouseDoubleClickEvent(QMouseEvent *e)
     }
     if (fWidget && values.count() > 0) {
         fWidget->selectorCallback(0, values);
+    }
+    if (fDialog && values.count() > 0) {
+        fDialog->selectorCallback(0, values);
     }
     emit done(values);
 }

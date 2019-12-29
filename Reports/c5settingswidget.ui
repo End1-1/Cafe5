@@ -547,17 +547,14 @@
        <item row="17" column="0">
         <widget class="QLabel" name="label_34">
          <property name="text">
-          <string>Manual changing date of cash</string>
+          <string>Cash id</string>
          </property>
         </widget>
        </item>
        <item row="17" column="2">
-        <widget class="C5CheckBox" name="chManualDateCash">
-         <property name="text">
-          <string/>
-         </property>
+        <widget class="C5LineEdit" name="leCashId">
          <property name="Tag" stdset="0">
-          <number>31</number>
+          <number>32</number>
          </property>
         </widget>
        </item>

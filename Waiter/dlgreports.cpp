@@ -44,6 +44,7 @@ void DlgReports::getDailyCommon(const QDate &date1, const QDate &date2)
     sh->bind("date2", date2.toString(FORMAT_DATE_TO_STR_MYSQL));
     sh->bind("hall", fCurrentHall);
     sh->bind("shift", QString::number(fShiftId));
+    sh->bind("cash", QString::number(__c5config.cashId()));
     sh->send();
 }
 

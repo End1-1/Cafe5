@@ -5,8 +5,16 @@
 #include <QStyleFactory>
 #include <QFontDatabase>
 
+#define N_DEMO_ 1
+
 int main(int argc, char *argv[])
 {
+#ifdef _DEMO_
+    QDate dtrial = QDate::fromString("01.02.2020", "dd.MM.yyyy");
+    if (QDate::currentDate() > dtrial) {
+        return 0;
+    }
+#endif
 
 #ifndef QT_DEBUG
     QStringList libPath = QCoreApplication::libraryPaths();
@@ -18,12 +26,6 @@ int main(int argc, char *argv[])
 #endif
 
     QApplication a(argc, argv);
-
-
-//    QDate dtrial = QDate::fromString("09.10.2019", "dd.MM.yyyy");
-//    if (QDate::currentDate() > dtrial) {
-//        return 0;
-//    }
 
     QList<QByteArray> connectionParams;
     C5Connection::readParams(connectionParams);

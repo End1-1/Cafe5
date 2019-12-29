@@ -15,6 +15,7 @@
 #include "cr5documents.h"
 #include "c5translatorform.h"
 #include "cr5saleremoveddishes.h"
+#include "c5costumerdebtpayment.h"
 #include "cr5cashnames.h"
 #include "cr5dish.h"
 #include "cr5settings.h"
@@ -39,6 +40,7 @@
 #include "cr5goodsgroup.h"
 #include "cr5menureview.h"
 #include "cr5databases.h"
+#include "cr5consuptionreason.h"
 #include "cr5storereason.h"
 #include "cr5goodspartners.h"
 #include "cr5discountstatisics.h"
@@ -304,6 +306,7 @@ void C5MainWindow::on_actionLogin_triggered()
             addTreeL3Item(it, cp_t3_sale_from_store_total, tr("Detailed movement in the storage"), ":/graph.png");
             addTreeL3Item(it, cp_t3_tstore_extra, tr("T-account, extra"), ":/documents.png");
             addTreeL3Item(it, cp_t2_count_output_of_sale, tr("Consumption of goods based on sales"), ":/goods.png");
+            addTreeL3Item(it, cp_t3_consuption_reason, tr("Reason for consuption"), ":/goods.png");
             addTreeL3Item(it, cp_t3_sales_common, tr("Sales, expert mode"), ":/graph.png");
             addTreeL3Item(it, cp_t3_sale_dishes, tr("Sales, dishes"), ":/graph.png");
             addTreeL3Item(it, cp_t3_sale_removed_dishes, tr("Sales, removed dishes"), ":/delete.png");
@@ -318,10 +321,11 @@ void C5MainWindow::on_actionLogin_triggered()
             it->setData(0, Qt::UserRole, cp_t2_action);
             it->setIcon(0, QIcon(":/reports.png"));
             item->addChild(it);
-            addTreeL3Item(it, cp_t8_cash_doc, tr("New document"), ":/cash.png");
+            addTreeL3Item(it, cp_t8_cash_doc, tr("New cash document"), ":/cash.png");
+            addTreeL3Item(it, cp_t8_costumer_debts_pay, tr("New payment for costumer debt"), ":/cash.png");
             addTreeL3Item(it, cp_t8_cash_detailed_report, tr("Cash detailed report"), ":/cash.png");
+            addTreeL3Item(it, cp_t8_costumer_debts, tr("Costumers debts report"), ":/cash.png");
             addTreeL3Item(it, cp_t8_cash_names, tr("Cash names"), ":/cash.png");
-            addTreeL3Item(it, cp_t8_costumer_debts, tr("Costumers debts"), ":/cash.png");
         }
 
         if (pr(db.getString(3), cp_t9_salary)) {
@@ -595,6 +599,9 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
     case cp_t3_debts_to_partners:
         createTab<CR5DebtsToPartner>(dbParams);
         break;
+    case cp_t3_consuption_reason:
+        createTab<CR5ConsuptionReason>(dbParams);
+        break;
     case cp_t4_part1:
         createTab<CR5DishPart1>(dbParams);
         break;
@@ -673,6 +680,12 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
     case cp_t8_cash_doc:
         createTab<C5CashDoc>(dbParams);
         break;
+    case cp_t8_costumer_debts_pay: {
+        auto *cp = new C5CostumerDebtPayment(dbParams);
+        cp->exec();
+        delete cp;
+        break;
+    }
     case cp_t8_cash_detailed_report:
         createTab<CR5CashDetailed>(dbParams);
         break;

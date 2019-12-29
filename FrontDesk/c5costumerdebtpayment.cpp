@@ -11,6 +11,7 @@ C5CostumerDebtPayment::C5CostumerDebtPayment(const QStringList &dbParams) :
     ui->setupUi(this);
     ui->leAmount->setValidator(new QDoubleValidator(0, 999999999, 0));
     ui->leCostumer->setSelector(dbParams, ui->leCostumerName, cache_discount_client);
+    ui->leCostumer->setCallbackDialog(this);
     ui->leCash->setSelector(dbParams, ui->leCashName, cache_cash_names);
 }
 
@@ -23,12 +24,13 @@ void C5CostumerDebtPayment::setId(int id)
 {
     C5Database db(fDBParams);
     db[":f_id"] = id;
-    db.exec("select f_id, f_date, f_costumer, f_cash from b_clients_debts where f_id=:f_id");
+    db.exec("select f_id, f_date, f_costumer, f_cash, f_amount, f_govnumber from b_clients_debts where f_id=:f_id");
     if (db.nextRow()) {
         ui->leCode->setInteger(id);
         ui->deDate->setDate(db.getDate("f_date"));
         ui->leCostumer->setValue(db.getInt("f_costumer"));
         ui->leAmount->setDouble(db.getDouble("f_amount"));
+        ui->leGovnumber->setText(db.getString("f_govnumber"));
         ui->btnRemove->setEnabled(true);
         C5CashDoc *doc = new C5CashDoc(fDBParams);
         if (doc->openDoc(db.getString("f_cash"))) {
@@ -37,6 +39,14 @@ void C5CostumerDebtPayment::setId(int id)
         delete doc;
     } else {
         C5Message::error(tr("Document not exists"));
+    }
+}
+
+void C5CostumerDebtPayment::selectorCallback(int row, const QList<QVariant> &values)
+{
+    Q_UNUSED(row);
+    if (values.count() > 0) {
+        ui->leGovnumber->setText(values.at(2).toString());
     }
 }
 
@@ -59,6 +69,7 @@ void C5CostumerDebtPayment::on_btnOK_clicked()
     db[":f_date"] = ui->deDate->date();
     db[":f_costumer"] = ui->leCostumer->getInteger();
     db[":f_amount"] = ui->leAmount->getDouble();
+    db[":f_govnumber"] = ui->leGovnumber->text();
     if (ui->leCode->getInteger() == 0) {
         ui->leCode->setInteger(db.insert("b_clients_debts"));
         C5CashDoc *doc = new C5CashDoc(fDBParams);

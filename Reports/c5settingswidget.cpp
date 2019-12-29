@@ -83,6 +83,7 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     fTags[ui->chAlwaysOfferTax->getTag()] = ui->chAlwaysOfferTax->isChecked() ? "1" : "0";
     fTags[ui->leFDFontSize->getTag()] = ui->leFDFontSize->text();
     fTags[ui->chCarMode->getTag()] = ui->chCarMode->isChecked() ? "1" : "0";
+    fTags[ui->leCashId->getTag()] = ui->leCashId->text();
     C5Database db(fDBParams);
     db[":f_settings"] = ui->leCode->getInteger();
     db.exec("delete from s_settings_values where f_settings=:f_settings");

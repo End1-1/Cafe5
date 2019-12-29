@@ -24,7 +24,7 @@ CR5CostumerDebts::CR5CostumerDebts(const QStringList &dbParams, QWidget *parent)
                    << "concat(c.f_lastname, ' ', c.f_firstname) as f_costumername"
                    << "cd.f_date"
                    << "concat(oh.f_prefix, f_hallid) as f_ordernum"
-                   << "bc.f_govnumber"
+                   << "cd.f_govnumber"
                    << "sum(cd.f_amount) as f_amount"
                       ;
 
@@ -33,7 +33,7 @@ CR5CostumerDebts::CR5CostumerDebts(const QStringList &dbParams, QWidget *parent)
                   << "concat(c.f_lastname, ' ', c.f_firstname) as f_costumername"
                   << "cd.f_date"
                   << "concat(oh.f_prefix, f_hallid) as f_ordernum"
-                  << "bc.f_govnumber"
+                  << "cd.f_govnumber"
                       ;
 
     fColumnsSum << "f_amount"
@@ -53,7 +53,9 @@ CR5CostumerDebts::CR5CostumerDebts(const QStringList &dbParams, QWidget *parent)
     fColumnsVisible["cd.f_date"] = true;
     fColumnsVisible["concat(oh.f_prefix, f_hallid) as f_ordernum"] = true;
     fColumnsVisible["sum(cd.f_amount) as f_amount"] = true;
-    fColumnsVisible["bc.f_govnumber"] = true;
+    fColumnsVisible["cd.f_govnumber"] = true;
+
+    fHavindCondition = " having sum(cd.f_amount) <> 0 ";
 
     connect(this, SIGNAL(tblDoubleClicked(int, int, QList<QVariant>)), this, SLOT(openOrder(int, int, QList<QVariant>)));
 

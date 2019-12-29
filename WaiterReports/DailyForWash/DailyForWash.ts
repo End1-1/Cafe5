@@ -184,90 +184,90 @@
     <name>QObject</name>
     <message>
         <location filename="dll.cpp" line="8"/>
-        <location filename="dll.cpp" line="34"/>
+        <location filename="dll.cpp" line="38"/>
         <source>Daily total report</source>
         <oldsource>Daily report</oldsource>
         <translation>Ընդհանուր հաշվետվություն</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="43"/>
+        <location filename="dll.cpp" line="47"/>
         <source>Orders</source>
-        <translation>Պատվերներ</translation>
-    </message>
-    <message>
-        <location filename="dll.cpp" line="51"/>
-        <location filename="dll.cpp" line="98"/>
-        <source>Number of orders</source>
         <translation>Պատվերներ</translation>
     </message>
     <message>
         <location filename="dll.cpp" line="55"/>
         <location filename="dll.cpp" line="102"/>
+        <source>Number of orders</source>
+        <translation>Պատվերներ</translation>
+    </message>
+    <message>
+        <location filename="dll.cpp" line="59"/>
+        <location filename="dll.cpp" line="106"/>
         <source>Cash</source>
         <translation>Կանխիկ</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="60"/>
-        <location filename="dll.cpp" line="107"/>
+        <location filename="dll.cpp" line="64"/>
+        <location filename="dll.cpp" line="111"/>
         <source>Card</source>
         <translation>Անկանխիկ</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="65"/>
-        <location filename="dll.cpp" line="112"/>
+        <location filename="dll.cpp" line="69"/>
+        <location filename="dll.cpp" line="116"/>
         <source>Bank</source>
         <translation>Բանկ</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="70"/>
-        <location filename="dll.cpp" line="117"/>
+        <location filename="dll.cpp" line="74"/>
+        <location filename="dll.cpp" line="121"/>
         <source>Other</source>
         <translation>Այլ</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="75"/>
-        <location filename="dll.cpp" line="122"/>
+        <location filename="dll.cpp" line="79"/>
+        <location filename="dll.cpp" line="126"/>
         <source>Total amount</source>
         <translation>Ընդամենը</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="95"/>
+        <location filename="dll.cpp" line="99"/>
         <source>Total</source>
         <translation>Ընդամենը</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="154"/>
+        <location filename="dll.cpp" line="158"/>
         <source>Other payments</source>
         <translation>Այլ վճարումներ</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="175"/>
+        <location filename="dll.cpp" line="179"/>
         <source>Sales</source>
         <translation>Վաճառք</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="217"/>
+        <location filename="dll.cpp" line="221"/>
         <source>Cashdesk</source>
         <translation>Դրամարկղ</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="234"/>
-        <location filename="dll.cpp" line="270"/>
+        <location filename="dll.cpp" line="238"/>
+        <location filename="dll.cpp" line="274"/>
         <source>Balance</source>
         <translation>Բալանս</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="254"/>
+        <location filename="dll.cpp" line="258"/>
         <source>Input</source>
         <translation>Մուտք</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="256"/>
+        <location filename="dll.cpp" line="260"/>
         <source>Output</source>
         <translation>Ելք</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="281"/>
+        <location filename="dll.cpp" line="285"/>
         <source>Printed</source>
         <translation>Տպված</translation>
     </message>

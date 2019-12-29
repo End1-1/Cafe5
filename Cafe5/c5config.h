@@ -35,6 +35,7 @@
 #define param_recipe_widht 29
 #define param_car_mode 30
 #define param_date_cash_shift 31
+#define param_cash_id 32
 
 class C5Config
 {
@@ -136,6 +137,8 @@ public:
     static bool alwaysOfferTaxPrint();
 
     static bool carMode();
+
+    static int cashId();
 
 private:
     static QString getValue(int key);

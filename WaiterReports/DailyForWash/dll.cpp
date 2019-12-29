@@ -11,8 +11,12 @@ void caption(QString &str)
 void json(C5Database &db, const QJsonObject &params, QJsonArray &jarr)
 {
     QString shift;
+    QString cash;
     if (params["f_shift"].toString().toInt() > 0) {
-        shift = " and oh.f_shift in (" + params["f_shift"].toString() + ") ";
+        shift += " and oh.f_shift in (" + params["f_shift"].toString() + ") ";
+    }
+    if (params["cash"].toString().toInt() > 0) {
+        cash += " and c.f_cash in (" + params["cash"].toString() + ") ";
     }
     db[":f_state"] = ORDER_STATE_CLOSE;
     db[":f_datecash1"] = QDate::fromString(params["date1"].toString(), FORMAT_DATE_TO_STR_MYSQL);
@@ -223,7 +227,7 @@ void json(C5Database &db, const QJsonObject &params, QJsonArray &jarr)
             "from e_cash c "
             "inner join e_cash_names cn on cn.f_id=c.f_cash "
             "inner join a_header h on h.f_id=c.f_header and h.f_type=5 "
-            "where h.f_date between :f_date1 and :f_date2 "
+            "where h.f_date between :f_date1 and :f_date2 " + cash +
             "order by cn.f_name, f_sign desc, f_date");
     QString inout, cashname;
     double cashbalance = 0;

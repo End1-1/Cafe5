@@ -371,7 +371,7 @@ void C5WaiterServer::reply(QJsonObject &o)
 
             if (jh["f_otherid"].toString().toInt() == PAYOTHER_DEBT) {
                 srh.fDb[":f_order"] = jh["f_id"].toString();
-                srh.fDb.exec("select f_costumer from b_car_orders co "
+                srh.fDb.exec("select f_costumer, f_govnumber from b_car_orders co "
                              "inner join b_car c on c.f_id=co.f_car "
                              "where f_order=:f_order");
                 if (srh.fDb.nextRow()) {
@@ -379,6 +379,7 @@ void C5WaiterServer::reply(QJsonObject &o)
                     srh.fDb[":f_order"] = jh["f_id"].toString();
                     srh.fDb[":f_amount"] = jh["f_amountother"].toString().toDouble() * -1;
                     srh.fDb[":f_date"] = dateCash;
+                    srh.fDb[":f_govnumber"] = srh.fDb.getString(1);
                     srh.fDb.insert("b_clients_debts", false);
                 }
             }

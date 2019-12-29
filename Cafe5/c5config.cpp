@@ -251,6 +251,11 @@ bool C5Config::carMode()
     return val;
 }
 
+int C5Config::cashId()
+{
+    return getValue(param_cash_id).toInt();
+}
+
 QString C5Config::getValue(int key)
 {
     QMutexLocker ml(&settingsMutex);
