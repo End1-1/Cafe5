@@ -5,7 +5,7 @@
 #include <QStyleFactory>
 #include <QFontDatabase>
 
-#define N_DEMO_ 1
+#define _DEMO_ 1
 
 int main(int argc, char *argv[])
 {

@@ -13,6 +13,7 @@ C5CostumerDebtPayment::C5CostumerDebtPayment(const QStringList &dbParams) :
     ui->leCostumer->setSelector(dbParams, ui->leCostumerName, cache_discount_client);
     ui->leCostumer->setCallbackDialog(this);
     ui->leCash->setSelector(dbParams, ui->leCashName, cache_cash_names);
+    connect(ui->leCostumer, SIGNAL(done(QList<QVariant>)), this, SLOT(selectorDone(QList<QVariant>)));
 }
 
 C5CostumerDebtPayment::~C5CostumerDebtPayment()
@@ -46,7 +47,16 @@ void C5CostumerDebtPayment::selectorCallback(int row, const QList<QVariant> &val
 {
     Q_UNUSED(row);
     if (values.count() > 0) {
+        //ui->leGovnumber->setText(values.at(2).toString());
+        //fSelectedGovNumber = values.at(2).toString();
+    }
+}
+
+void C5CostumerDebtPayment::selectorDone(const QList<QVariant> &values)
+{
+    if (values.count() > 0) {
         ui->leGovnumber->setText(values.at(2).toString());
+        fSelectedGovNumber = values.at(2).toString();
     }
 }
 

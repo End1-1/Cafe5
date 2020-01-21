@@ -90,7 +90,7 @@ void C5LineEditWithSelector::mouseDoubleClickEvent(QMouseEvent *e)
     if (fDialog && values.count() > 0) {
         fDialog->selectorCallback(0, values);
     }
-    emit done(values);
+        emit done(values);
 }
 
 void C5LineEditWithSelector::focusOutEvent(QFocusEvent *e)

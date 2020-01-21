@@ -54,6 +54,8 @@ SOURCES += \
     ../Reports/cr5discountstatisticsfilter.cpp \
     ../Reports/cr5dishpackage.cpp \
     ../Reports/cr5menureview.cpp \
+    ../Reports/cr5salarybyworkers.cpp \
+    ../Reports/cr5salarybyworkersfilter.cpp \
     ../Reports/cr5salefromstoretotal.cpp \
     ../Reports/cr5salefromstoretotalfilter.cpp \
     ../Reports/cr5saleremoveddishes.cpp \
@@ -218,6 +220,8 @@ HEADERS += \
     ../Reports/cr5discountstatisticsfilter.h \
     ../Reports/cr5dishpackage.h \
     ../Reports/cr5menureview.h \
+    ../Reports/cr5salarybyworkers.h \
+    ../Reports/cr5salarybyworkersfilter.h \
     ../Reports/cr5salefromstoretotal.h \
     ../Reports/cr5salefromstoretotalfilter.h \
     ../Reports/cr5saleremoveddishes.h \
@@ -373,6 +377,7 @@ FORMS += \
     ../Reports/cr5consuptionreasonfilter.ui \
     ../Reports/cr5costumerdebtsfilter.ui \
     ../Reports/cr5discountstatisticsfilter.ui \
+    ../Reports/cr5salarybyworkersfilter.ui \
     ../Reports/cr5salefromstoretotalfilter.ui \
     ../Reports/cr5saleremoveddishesfilter.ui \
     ../Reports/cr5salesbydishesfilter.ui \

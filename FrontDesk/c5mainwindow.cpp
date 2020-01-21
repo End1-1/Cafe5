@@ -42,6 +42,7 @@
 #include "cr5databases.h"
 #include "cr5consuptionreason.h"
 #include "cr5storereason.h"
+#include "cr5salarybyworkers.h"
 #include "cr5goodspartners.h"
 #include "cr5discountstatisics.h"
 #include "cr5goodswaste.h"
@@ -335,7 +336,7 @@ void C5MainWindow::on_actionLogin_triggered()
             it->setIcon(0, QIcon(":/employee.png"));
             item->addChild(it);
             addTreeL3Item(it, cp_t9_salary_doc, tr("New salary document"), ":/employee.png");
-            //addTreeL3Item(it, cp_t9_report, tr("Report"), ":/employee.png");
+            addTreeL3Item(it, cp_t9_report, tr("Salary by workers"), ":/employee.png");
         }
 
         if (pr(db.getString(3), cp_t4_menu)) {
@@ -694,6 +695,9 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
         break;
     case cp_t9_salary_doc:
         createTab<C5SalaryDoc>(dbParams);
+        break;
+    case cp_t9_report:
+        createTab<CR5SalaryByWorkers>(dbParams);
         break;
     default:
         break;

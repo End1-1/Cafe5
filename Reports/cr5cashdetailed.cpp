@@ -100,7 +100,8 @@ void CR5CashDetailed::buildQuery()
     query = "select c.f_header, h.f_date, c.f_remarks, c.f_sign, c.f_amount "
                                 "from e_cash c "
                                 "inner join a_header h on h.f_id=c.f_header and h.f_type=:f_type "
-                                "where f_cash=:f_cash and h.f_date between :f_date1 and :f_date2";
+                                "where f_cash=:f_cash and h.f_date between :f_date1 and :f_date2 "
+                                "order by h.f_date, h.f_userid ";
     db[":f_cash"] = fFilter->cash();
     db[":f_date1"] = fFilter->date1();
     db[":f_date2"] = fFilter->date2();

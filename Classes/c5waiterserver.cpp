@@ -1071,7 +1071,7 @@ void C5WaiterServer::processAppOrder(QJsonObject &o)
         db[":f_amountservice"] = 0;
         db[":f_amountservice"] = 0;
         db[":f_amountdiscount"] = 0;
-        db[":f_servicefactor"] = 0;
+        db[":f_servicefactor"] = fIn["servicevalue"].toString().toDouble();
         db[":f_discountfactor"] = 0;
         db[":f_creditcardid"] = 0;
         db[":f_otherid"] = 0;
@@ -1110,9 +1110,9 @@ void C5WaiterServer::processAppOrder(QJsonObject &o)
         db[":f_qty1"] = d["qty1"].toString().toDouble();
         db[":f_qty2"] = d["qty2"].toString().toDouble();
         db[":f_price"] = d["price"].toString().toDouble();
-        db[":f_service"] = 0;
+        db[":f_service"] = fIn["servicevalue"].toString().toDouble();
         db[":f_discount"] = 0;
-        db[":f_total"] = d["qty2"].toString().toDouble() * d["price"].toString().toDouble();
+        db[":f_total"] = (d["qty2"].toString().toDouble() * d["price"].toString().toDouble()) + (d["qty2"].toString().toDouble() * d["price"].toString().toDouble() * fIn["servicevalue"].toString().toDouble());
         db[":f_store"] = d["store"].toString().toInt();
         db[":f_print1"] = d["print1"].toString();
         db[":f_print2"] = d["print2"].toString();

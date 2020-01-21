@@ -221,3 +221,7 @@ update o_header set f_shift=2 where f_timeclose between '00:00' and '09:59:59';
 /* DB - 7 */
 update s_app set f_version ='7' where f_app='DB';
 alter table s_station_conf add column f_shift smallint default 1;
+
+/* DB - 8 */
+update s_app set f_version ='7' where f_app='DB';
+alter table b_clients_debts add f_govnumber tinytext;

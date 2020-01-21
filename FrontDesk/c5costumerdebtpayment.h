@@ -21,6 +21,8 @@ public:
     virtual void selectorCallback(int row, const QList<QVariant> &values) override;
 
 private slots:
+    void selectorDone(const QList<QVariant> &values);
+
     void on_btnCancel_clicked();
 
     void on_btnOK_clicked();
@@ -29,6 +31,8 @@ private slots:
 
 private:
     Ui::C5CostumerDebtPayment *ui;
+
+    QString fSelectedGovNumber;
 };
 
 #endif // C5COSTUMERDEBTPAYMENT_H
