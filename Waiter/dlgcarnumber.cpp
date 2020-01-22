@@ -170,6 +170,7 @@ void DlgCarNumber::on_btnClose_clicked()
 
 void DlgCarNumber::on_btnAccept_clicked()
 {
+    C5Database db(fDBParams);
     if (fRecordId == 0) {
         if (ui->leCarModel->property("id").toInt() == 0) {
             C5Message::error(tr("Car model is not selected"));
@@ -183,7 +184,6 @@ void DlgCarNumber::on_btnAccept_clicked()
             C5Message::error(tr("Costumer name is empty"));
             return;
         }
-        C5Database db(fDBParams);
         db[":f_govnumber"] = ui->leCarNumber->text();
         db.exec("select * from b_car where f_govnumber=:f_govnumber");
         if (db.nextRow()) {
@@ -214,10 +214,24 @@ void DlgCarNumber::on_btnAccept_clicked()
             db[":f_costumer"] = ui->leCostumer->property("id").toInt();
             fRecordId = db.insert("b_car");
         }
-        fCostumerCars.clear();
-        fCostumerNames.clear();
-        fCostumerPhones.clear();
+    } else {
+        QStringList l = ui->leCostumer->text().split(" ");
+        if (l.count() > 0) {
+            if (l.count() == 1) {
+                db[":f_firstname"] = l.at(0);
+                db[":f_lastname"] = "";
+            } else {
+                db[":f_firstname"] = l.at(0);
+                db[":f_lastname"] = l.at(1);
+            }
+            db[":f_info"] = ui->leAdditional->text();
+        }
+        db[":f_id"] = ui->leCostumer->property("id").toInt();
+        db.exec("update b_clients set f_firstname=:f_firstname, f_lastname=:f_lastname, f_info=:f_info where f_id=:f_id");
     }
+    fCostumerCars.clear();
+    fCostumerNames.clear();
+    fCostumerPhones.clear();
     if (fRecordId > 0) {
         accept();
     }
