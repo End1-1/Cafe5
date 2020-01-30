@@ -180,45 +180,67 @@ void C5SalaryDoc::countSalary()
         return;
     }
     QMap<int, int> posCount;
+    QMap<int, QString> posCondition;
+    QMap<int, double> posTotal;
+    QMap<int, double> posIndividual;
+    QMap<int, double> posPercent;
     for (int i = 0; i < ui->tbl->rowCount(); i++) {
         posCount[ui->tbl->lineEditWithSelector(i, 1)->getInteger()] = posCount[ui->tbl->lineEditWithSelector(i, 1)->getInteger()] + 1;
     }
-    C5Database db(fDBParams);
-    db[":f_shift"] = ui->leShift->getInteger();
-    db.exec("select f_start, f_end from s_salary_shift_time where f_shift=:f_shift");
-    QList<QTime> timeStart, timeEnd;
-    while (db.nextRow()) {
-        timeStart.append(db.getTime(0));
-        timeEnd.append(db.getTime(1));
-    }
-    double amount = 0;
 
+    C5Database db(fDBParams);
+    for (QMap<int, int>::const_iterator it = posCount.begin(); it != posCount.end(); it++) {
+        db[":f_position"] = it.key();
+        db[":f_shift"] = ui->leShift->getInteger();
+        db.exec("select f_raw, f_individual, f_percent from s_salary_account where f_position=:f_position and f_shift=:f_shift");
+        while (db.nextRow()) {
+            posCondition[it.key()] = db.getString(0);
+            posPercent[it.key()] = db.getDouble(2);
+            if (db.getDouble(1) > 0.001) {
+                posIndividual[it.key()] = db.getDouble(1);
+            }
+        }
+    }
+
+    for (QMap<int, int>::const_iterator it = posCount.begin(); it != posCount.end(); it++) {
+        if (posIndividual.contains(it.key())) {
+            continue;
+        }
         db[":f_shift"] = ui->leShift->getInteger();
         db[":f_datecash1"] = ui->deDate->date();
         db[":f_datecash2"] = ui->deDate->date();
-        db.exec("select sum(f_amounttotal) from o_header "
-                "where f_datecash between :f_datecash1 and :f_datecash2 "
-                "and f_shift=:f_shift "
-                "and f_state=2 ");
-        db.nextRow();
-        amount += db.getDouble(0);
+        QString cond;
+        QJsonParseError jerr;
+        QJsonDocument joc = QJsonDocument::fromJson(posCondition[it.key()].toUtf8(), &jerr);
+        if (jerr.error == QJsonParseError::NoError) {
+            QJsonArray ja = joc.array();
+            for (int i = 0; i < ja.count(); i++) {
+                QJsonObject jo = ja.at(i).toObject();
+                if (jo.contains("i_dishpart2")) {
+                    cond += " and ob.f_dish in (select f_id from d_dish where f_part in (" + jo["i_dishpart2"].toString() + ")) ";
+                }
+            }
+        }
+        db.exec("select sum(ob.f_total) "
+                "from o_body ob "
+                "inner join o_header oh on oh.f_id=ob.f_header "
+                "where oh.f_datecash between :f_datecash1 and :f_datecash2 "
+                "and oh.f_shift=:f_shift "
+                "and oh.f_state=2 and ob.f_state=1 " + cond);
+        if (db.nextRow()) {
+            posTotal[it.key()] = db.getDouble(0);
+        } else {
+            posTotal[it.key()] = 0;
+        }
+    }
 
     for (int i = 0; i < ui->tbl->rowCount(); i++) {
-        db[":f_shift"] = ui->leShift->getInteger();
-        db[":f_position"] = ui->tbl->lineEditWithSelector(i, 1)->getInteger();
-        db.exec("select f_individual, f_percent, f_round from s_salary_account where f_shift=:f_shift and f_position=:f_position");
-        if (db.nextRow()) {
-            if (db.getInt(0) > 0) {
-                ui->tbl->lineEditWithSelector(i, 5)->setDouble(db.getInt(0));
-            } else {
-                double counted = (amount * db.getDouble(1)) / posCount[ui->tbl->lineEditWithSelector(i, 1)->getInteger()];
-//                if (db.getInt(2) > 0) {
-//                    counted = trunc(ceil(counted / (pow(10, db.getInt(2)))) * pow(10, db.getInt(2)));
-//                } else if (db.getInt(2) < 0) {
-//                    counted = trunc(floor(counted / (pow(10, db.getInt(2)))) * pow(10, db.getInt(2)));
-//                }
-                ui->tbl->lineEditWithSelector(i, 5)->setDouble(counted);
-            }
+        if (posIndividual[ui->tbl->lineEditWithSelector(i, 1)->getInteger()] > 0.001) {
+            ui->tbl->lineEditWithSelector(i, 5)->setDouble(posIndividual[ui->tbl->lineEditWithSelector(i, 1)->getInteger()]);
+        } else {
+            ui->tbl->lineEditWithSelector(i, 5)->setDouble((posTotal[ui->tbl->lineEditWithSelector(i, 1)->getInteger()]
+                                                           * posPercent[ui->tbl->lineEditWithSelector(i, 1)->getInteger()])
+                    / posCount[ui->tbl->lineEditWithSelector(i, 1)->getInteger()]);
         }
     }
 }

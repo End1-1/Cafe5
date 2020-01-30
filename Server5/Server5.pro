@@ -28,29 +28,41 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
+        ../Cafe5/c5database.cpp \
         ../Classes/c5printing.cpp \
         ../Classes/c5printjson.cpp \
         ../Classes/notificationwidget.cpp \
+        c5reportsupload.cpp \
+        c5scheduler.cpp \
+        dbconnection.cpp \
         main.cpp \
         c5server5.cpp \
+        server5settings.cpp \
         serversocket.cpp \
         socketthread.cpp \
         widgetcontainer.cpp
 
 HEADERS += \
+        ../Cafe5/c5database.h \
         ../Classes/c5printing.h \
         ../Classes/c5printjson.h \
         ../Classes/notificationwidget.h \
+        c5reportsupload.h \
+        c5scheduler.h \
         c5server5.h \
+        dbconnection.h \
         rc.h \
         res.rc \
+        server5settings.h \
         serversocket.h \
         socketthread.h \
         widgetcontainer.h
 
 FORMS += \
         ../Classes/notificationwidget.ui \
-        c5server5.ui
+        c5reportsupload.ui \
+        c5server5.ui \
+        dbconnection.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -66,5 +78,6 @@ DEFINES += _APPLICATION_=\\\"Server5\\\"
 DEFINES += _DBDRIVER_=\\\"QMYSQL\\\"
 
 INCLUDEPATH += ../Classes
+INCLUDEPATH += ../Cafe5
 
 DISTFILES +=

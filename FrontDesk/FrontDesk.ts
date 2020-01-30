@@ -7742,7 +7742,7 @@ draft</source>
         <translation>Ընդամենը</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salarybyworkers.cpp" line="71"/>
+        <location filename="../Reports/cr5salarybyworkers.cpp" line="85"/>
         <source>Column &apos;Header&apos; must be checked in filter</source>
         <translation>&quot;UUID&quot; դաշտը պետք է ընդգրկված լինի հաշվետվության մեջ</translation>
     </message>

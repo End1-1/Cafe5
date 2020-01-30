@@ -18,6 +18,7 @@ private:
     QList<QWidget*> fWatchList;
     QMap<QString, QWidget*> fWidgetsList;
     QMap<QString, int> fWidgetsTypes;
+    QVariant checkWidget(QWidget *w, int wtype);
 };
 
 #endif // WIDGETCONTAINER_H

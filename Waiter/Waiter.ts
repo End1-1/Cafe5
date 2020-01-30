@@ -1075,17 +1075,17 @@ MS Excel</source>
         <translation>Մոդել</translation>
     </message>
     <message>
-        <location filename="dlgcarnumber.cpp" line="175"/>
+        <location filename="dlgcarnumber.cpp" line="176"/>
         <source>Car model is not selected</source>
         <translation>Մեքենայի մոդել ընտրված չէ</translation>
     </message>
     <message>
-        <location filename="dlgcarnumber.cpp" line="179"/>
+        <location filename="dlgcarnumber.cpp" line="180"/>
         <source>Car goverment number is empty</source>
         <translation>Պետհամարանիշը նշված չէ</translation>
     </message>
     <message>
-        <location filename="dlgcarnumber.cpp" line="183"/>
+        <location filename="dlgcarnumber.cpp" line="184"/>
         <source>Costumer name is empty</source>
         <translation>Հաճախորդի անունը նշված չէ</translation>
     </message>

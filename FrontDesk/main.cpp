@@ -10,7 +10,7 @@
 int main(int argc, char *argv[])
 {
 #ifdef _DEMO_
-    QDate dtrial = QDate::fromString("01.02.2020", "dd.MM.yyyy");
+    QDate dtrial = QDate::fromString("03.02.2020", "dd.MM.yyyy");
     if (QDate::currentDate() > dtrial) {
         return 0;
     }

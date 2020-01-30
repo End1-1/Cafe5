@@ -624,6 +624,7 @@ void DlgOrder::on_btnCustom_clicked()
     ui->tblOrder->viewport()->update();
     logRecord(o["f_id"].toString(), "Qty of " + o["f_name"].toString(), oldQty, o["f_qty1"].toString());
     setButtonsState();
+    ui->lePrepaiment->setText(fOrder->prepayment());
 }
 
 void DlgOrder::on_btnPrintService_clicked()

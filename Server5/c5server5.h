@@ -10,6 +10,7 @@ class C5Server5;
 }
 
 class WidgetContainer;
+class c5scheduler;
 
 class C5Server5 : public QWidget
 {
@@ -28,6 +29,7 @@ private:
     QMenu fTrayMenu;
     QSystemTrayIcon fTrayIcon;
     WidgetContainer *wc;
+    c5scheduler *scheduler;
     void processJson(QByteArray &d);
 
 private slots:
@@ -35,6 +37,9 @@ private slots:
     void iconClicked(QSystemTrayIcon::ActivationReason reason);
     void on_btnApply_clicked();
     void clientSocketDataRead(const QString &uuid, QByteArray &d);
+    void on_btnReportsToUpload_clicked();
+
+    void on_btnDatabase_clicked();
 
 signals:
     void sendData(const QString &);

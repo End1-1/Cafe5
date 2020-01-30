@@ -2,11 +2,16 @@
 #include "ui_c5server5.h"
 #include "serversocket.h"
 #include "c5printjson.h"
+#include "c5reportsupload.h"
+#include "server5settings.h"
 #include "notificationwidget.h"
+#include "c5scheduler.h"
+#include "dbconnection.h"
 #include <QCloseEvent>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QMessageBox>
+#include <QInputDialog>
 #include <QDebug>
 
 C5Server5::C5Server5(QWidget *parent) :
@@ -26,10 +31,12 @@ C5Server5::C5Server5(QWidget *parent) :
     if (!ss->listen(static_cast<quint16>(wc->getInt("serverport")))) {
         QMessageBox::critical(this, tr("Socket error"), tr("Cannot listen port"));
     }
+    scheduler = new c5scheduler(this);
 }
 
 C5Server5::~C5Server5()
 {
+    delete scheduler;
     delete ui;
 }
 
@@ -100,4 +107,29 @@ void C5Server5::clientSocketDataRead(const QString &uuid, QByteArray &d)
         break;
     }
     emit sendData(uuid);
+}
+
+void C5Server5::on_btnReportsToUpload_clicked()
+{
+    C5ReportsUpload *r = new C5ReportsUpload(this);
+    r->exec();
+    delete r;
+}
+
+void C5Server5::on_btnDatabase_clicked()
+{
+    if (!__s.value("dbpassword").toString().isEmpty()) {
+        bool ok = false;
+        QString pwd = QInputDialog::getText(this, tr("Database password"), tr("Password"), QLineEdit::Password, "", &ok);
+        if (!ok) {
+            return;
+        }
+        if (pwd != __s.value("dbpassword").toString()) {
+            QMessageBox::critical(this, tr("Error"), tr("Invalid database password"));
+            return;
+        }
+    }
+    DbConnection *d = new DbConnection(this);
+    d->exec();
+    delete d;
 }
