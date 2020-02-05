@@ -193,11 +193,7 @@ void C5WaiterOrder::removeOrder()
     db[":f_state"] = ORDER_STATE_VOID;
     db[":f_id"] = ui->leUuid->text();
     db.exec("update o_header set f_state=:f_state where f_id=:f_id");
-    db[":f_state"] = DISH_STATE_MISTAKE;
-    db[":f_header"] = ui->leUuid->text();
-    db.exec("update o_body set f_state=:f_state where f_header=:f_header");
-    db[":f_order"] = ui->leUuid->text();
-    db.exec("delete from b_clients_debts where f_order=:f_order");
+    C5WaiterOrderDoc::removeDocument(db, ui->leUuid->text());
     db.commit();
     __mainWindow->removeTab(this);
     C5Message::info(tr("Removed"));

@@ -294,8 +294,9 @@ void DlgFace::handleVersion(const QJsonObject &obj)
 
 void DlgFace::handleSocket(const QJsonObject &obj)
 {
+    QJsonObject no(obj);
     C5SocketHandler *sh = static_cast<C5SocketHandler*>(sender());
-    C5WaiterServer ws(obj, sh->fSocket);
+    C5WaiterServer ws(no, sh->fSocket);
     QJsonObject o;
     ws.reply(o);
     o["cmd"] = ws.cmd();

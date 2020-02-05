@@ -237,6 +237,126 @@
     </message>
 </context>
 <context>
+    <name>C5Editor</name>
+    <message>
+        <location filename="../Editors/c5editor.ui" line="14"/>
+        <source>Dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Editors/c5editor.ui" line="81"/>
+        <source>Save</source>
+        <translation type="unfinished">Պահպանել</translation>
+    </message>
+    <message>
+        <location filename="../Editors/c5editor.ui" line="88"/>
+        <source>Save and new</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Editors/c5editor.ui" line="95"/>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>C5FilterValues</name>
+    <message>
+        <location filename="../FrontDesk/c5filtervalues.ui" line="14"/>
+        <source>Filter</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>C5Grid</name>
+    <message>
+        <location filename="../Classes/c5grid.ui" line="14"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5grid.ui" line="117"/>
+        <source>New Row</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5grid.cpp" line="200"/>
+        <location filename="../Classes/c5grid.cpp" line="210"/>
+        <location filename="../Classes/c5grid.cpp" line="516"/>
+        <source>Nothing was selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5grid.cpp" line="328"/>
+        <source>Filter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5grid.cpp" line="330"/>
+        <source>Copy selection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5grid.cpp" line="331"/>
+        <source>Copy all</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5grid.cpp" line="614"/>
+        <location filename="../Classes/c5grid.cpp" line="648"/>
+        <source>Printed</source>
+        <translation type="unfinished">Տպված</translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5grid.cpp" line="678"/>
+        <source>Empty report!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5grid.cpp" line="755"/>
+        <source>Set filter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5grid.cpp" line="756"/>
+        <source>Remove filter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5grid.cpp" line="757"/>
+        <source>Autofit columns widths</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>C5GridGilter</name>
+    <message>
+        <location filename="../Classes/c5gridgilter.ui" line="14"/>
+        <source>Report parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5gridgilter.ui" line="27"/>
+        <source>Parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5gridgilter.ui" line="55"/>
+        <source>Show columns</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5gridgilter.ui" line="91"/>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5gridgilter.ui" line="101"/>
+        <source>Cancel</source>
+        <translation type="unfinished">Հրաժարվել</translation>
+    </message>
+</context>
+<context>
     <name>C5Message</name>
     <message>
         <location filename="../Cafe5/c5message.ui" line="26"/>
@@ -255,11 +375,102 @@
     </message>
 </context>
 <context>
+    <name>C5PrintPreview</name>
+    <message>
+        <location filename="../Classes/c5printpreview.ui" line="14"/>
+        <source>Print preview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5printpreview.ui" line="102"/>
+        <source>Page 1 of 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5printpreview.ui" line="229"/>
+        <source>200%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5printpreview.ui" line="234"/>
+        <source>175%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5printpreview.ui" line="239"/>
+        <source>150%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5printpreview.ui" line="244"/>
+        <source>125%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5printpreview.ui" line="249"/>
+        <source>100%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5printpreview.ui" line="254"/>
+        <source>75%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5printpreview.ui" line="259"/>
+        <source>50%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5printpreview.ui" line="264"/>
+        <source>25%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5printpreview.ui" line="285"/>
+        <source>Print</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5printpreview.ui" line="293"/>
+        <source>All pages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5printpreview.ui" line="298"/>
+        <source>Current page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5printpreview.ui" line="303"/>
+        <source>Custom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5printpreview.cpp" line="40"/>
+        <source>Page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5printpreview.cpp" line="42"/>
+        <source>of</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>C5Printing</name>
     <message>
         <location filename="../Classes/c5printing.cpp" line="297"/>
         <source>Failed send order to remote printer</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>C5Selector</name>
+    <message>
+        <location filename="../FrontDesk/c5selector.ui" line="14"/>
+        <source>Search</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -286,6 +497,82 @@
         <location filename="../Controls/c5tablewidget.cpp" line="208"/>
         <source>Empty report</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>C5Widget</name>
+    <message>
+        <location filename="../Classes/c5widget.cpp" line="48"/>
+        <source>New</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5widget.cpp" line="51"/>
+        <source>Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5widget.cpp" line="54"/>
+        <source>Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5widget.cpp" line="57"/>
+        <source>Save
+changes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5widget.cpp" line="60"/>
+        <source>Search by
+parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5widget.cpp" line="63"/>
+        <source>Clear
+filter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5widget.cpp" line="66"/>
+        <source>Refresh</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5widget.cpp" line="69"/>
+        <source>Print</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5widget.cpp" line="72"/>
+        <source>Export to
+MS Excel</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>CE5Editor</name>
+    <message>
+        <location filename="../Editors/ce5editor.cpp" line="19"/>
+        <location filename="../Editors/ce5editor.cpp" line="85"/>
+        <source>Program error. Cannot find field with id property</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Editors/ce5editor.cpp" line="76"/>
+        <source>Invalid code</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Editors/ce5editor.cpp" line="151"/>
+        <source>Duplicate id</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Editors/ce5editor.cpp" line="199"/>
+        <source>cannot be empty</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -405,6 +692,19 @@
         <location filename="../../NewTax/Src/printtaxn.cpp" line="75"/>
         <source>Data read timeout</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>QObject</name>
+    <message>
+        <location filename="main.cpp" line="21"/>
+        <source>Application error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="main.cpp" line="21"/>
+        <source>Please, register application.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

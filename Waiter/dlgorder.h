@@ -65,6 +65,10 @@ private:
     void setCar(int num);
 
 private slots:
+    void handleDiscount(const QJsonObject &obj);
+
+    void handleVisit(const QJsonObject &obj);
+
     void addDishToOrder(const QJsonObject &obj);
 
     void handleOpenTable(const QJsonObject &obj);
@@ -72,6 +76,8 @@ private slots:
     void handlePrintService(const QJsonObject &obj);
 
     void saveAndQuit(const QJsonObject &obj);
+
+    void saveAndDiscount(const QJsonObject &obj);
 
     void changeTable(const QJsonObject &obj);
 

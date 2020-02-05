@@ -1,12 +1,12 @@
 #include "working.h"
 #include "c5config.h"
 #include "c5connection.h"
+#include "c5license.h"
 #include <QApplication>
 #include <QTranslator>
 
 int main(int argc, char *argv[])
 {
-
 #ifndef QT_DEBUG
     QStringList libPath;
     libPath << "./";
@@ -17,6 +17,10 @@ int main(int argc, char *argv[])
 #endif
 
     QApplication a(argc, argv);
+    if (!C5License::isOK()) {
+        QMessageBox::critical(0, QObject::tr("Application error"), QObject::tr("Please, register application."));
+        return 0;
+    }
 
     QTranslator t;
     t.load(":/lang/Shop.qm");

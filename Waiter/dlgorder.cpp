@@ -38,6 +38,7 @@ DlgOrder::DlgOrder() :
     fCarNumber = 0;
     ui->lbCar->setVisible(C5Config::carMode());
     ui->btnCar->setVisible(C5Config::carMode());
+    ui->lbVisit->setVisible(false);
     fOrder = new C5WaiterOrderDoc();
     ui->btnGuest->setVisible(C5Config::useHotel());
     ui->btnCompactDishAddMode->setChecked(C5Config::getRegValue("compact dish add mode", true).toBool());
@@ -94,6 +95,13 @@ void DlgOrder::openTable(const QJsonObject &table, C5User *user)
 
 void DlgOrder::accept()
 {
+    if (!fOrder->hString("f_id").isEmpty()) {
+        if (fOrder->isEmpty()) {
+            if (C5Message::question(tr("Order is empty. Remove?")) == QDialog::Accepted) {
+                fOrder->hSetString("closeempty", "1");
+            }
+        }
+    }
     C5SocketHandler *sh = createSocketHandler(SLOT(saveAndQuit(QJsonObject)));
     fOrder->hSetString("unlocktable", "1");
     fOrder->sendToServer(sh);
@@ -256,6 +264,9 @@ void DlgOrder::addDishToOrder(const QJsonObject &obj)
 
 void DlgOrder::loadOrder(const QJsonObject &obj)
 {
+    ui->lbCar->clear();
+    ui->lbVisit->clear();
+    ui->lbVisit->setVisible(false);
     fOrder->fHeader = obj["header"].toObject();
     if (fOrder->hString("f_id").isEmpty()) {
         logRecord("", "New order", fOrder->hString("f_tablename"), "");
@@ -291,8 +302,6 @@ void DlgOrder::loadOrder(const QJsonObject &obj)
     }
     if (fOrder->hString("car").toInt() > 0) {
         setCar(fOrder->hInt("car"));
-    } else {
-        ui->lbCar->clear();
     }
     setServiceLabel();
     if (fOrder->hInt("f_staff") != fOrder->hInt("f_currentstaff")) {
@@ -445,21 +454,101 @@ void DlgOrder::changeTimeOrder()
 
 void DlgOrder::setCar(int num)
 {
+    QString govnumber;
+    int client;
     ui->lbCar->setVisible(false);
     C5Database db(fDBParams);
     db[":f_id"] = num;
-    db.exec("select concat(c.f_name, ', ', bc.f_govnumber, ', ', trim(concat(cl.f_lastname, ' ', cl.f_firstname))) "
+    db.exec("select concat(c.f_name, ', ', bc.f_govnumber, ', ', trim(concat(cl.f_lastname, ' ', cl.f_firstname))), "
+            "bc.f_govnumber, cl.f_id as f_client "
             "from b_car bc "
             "left join b_clients cl on cl.f_id=bc.f_costumer "
             "left join s_car c on c.f_id=bc.f_car "
             "where bc.f_id=:f_id");
     if (db.nextRow()) {
         fCarNumber = num;
+        govnumber = db.getString(1);
+        client = db.getInt("f_client");
         ui->lbCar->setVisible(true);
         ui->lbCar->setEnabled(true);
         ui->lbCar->setText(QString("[%1]").arg(db.getString(0)));
     }
     fOrder->fHeader["car"] = QString::number(num);
+
+    if (fOrder->hString("f_id").isEmpty()) {
+        C5SocketHandler *sh = createSocketHandler(SLOT(saveAndDiscount(QJsonObject)));
+        sh->bind("cmd", sm_saveorder);
+        QJsonObject o;
+        o["header"] = fOrder->fHeader;
+        o["body"] = fOrder->fItems;
+        o["govnumber"] = govnumber;
+        sh->send(o);
+    } else {
+        QJsonObject obj;
+        obj["saved"] = 1;
+        obj["govnumber"] = govnumber;
+        saveAndDiscount(obj);
+    }
+}
+
+void DlgOrder::handleDiscount(const QJsonObject &obj)
+{
+    sender()->deleteLater();
+    if (obj["reply"].toInt() == 0) {
+        if (obj["handlevisit"].toInt() == 1) {
+            /* CHECK FOR AUTOMATICALLY EVERY 11 DISCOUNT BY GOVNUMBER */
+            QString govnumber = obj["code"].toString();
+            if (!govnumber.isEmpty() && fOrder->hDouble("f_discountfactor") < 0.001) {
+                C5SocketHandler *sh = createSocketHandler(SLOT(handleVisit(QJsonObject)));
+                sh->bind("cmd", sm_checkdiscount_by_visit);
+                sh->bind("order", fOrder->hString("f_id"));
+                sh->bind("code", govnumber);
+                sh->send();
+                return;
+            }
+        } else {
+            C5Message::error(obj["msg"].toString());
+            return;
+        }
+    }
+    switch (obj["type"].toInt()) {
+    case CARD_TYPE_DISCOUNT:
+        fOrder->hSetString("f_bonustype", obj["card"].toObject()["f_type"].toString());
+        fOrder->hSetString("f_bonusid", obj["card"].toObject()["f_id"].toString());
+        switch (obj["card"].toObject()["f_type"].toString().toInt()) {
+        case CARD_TYPE_DISCOUNT:
+            fOrder->hSetDouble("f_discountfactor", obj["card"].toObject()["f_value"].toString().toDouble() / 100.0);
+            for (int i = 0; i < fOrder->fItems.count(); i++) {
+                fOrder->iSetString("f_discount", fOrder->hString("f_discountfactor"), i);
+            }
+            break;
+        }
+        fOrder->countTotal();
+        break;
+    }
+    itemsToTable();
+}
+
+void DlgOrder::handleVisit(const QJsonObject &obj)
+{
+    sender()->deleteLater();
+    if (obj["reply"].toInt() == 0) {
+        C5Message::error(obj["msg"].toString());
+        return;
+    }
+    if (obj["noconfig"].toInt() > 0) {
+        return;
+    }
+    ui->lbVisit->setVisible(true);
+    ui->lbVisit->setEnabled(true);
+    ui->lbVisit->setText(QString("[%1 / %2]").arg(obj["current"].toInt()).arg(obj["visit"].toInt()));
+    if (obj["current"].toInt() == 0 && fOrder->hDouble("f_discountfactor") < 0.001) {
+        C5SocketHandler *sh = createSocketHandler(SLOT(handleDiscount(QJsonObject)));
+        sh->bind("cmd", sm_discount);
+        sh->bind("order", fOrder->hString("f_id"));
+        sh->bind("code", obj["card_code"].toString());
+        sh->send();
+    }
 }
 
 void DlgOrder::handleOpenTable(const QJsonObject &obj)
@@ -508,6 +597,25 @@ void DlgOrder::saveAndQuit(const QJsonObject &obj)
         return;
     }
     itemsToTable();
+}
+
+void DlgOrder::saveAndDiscount(const QJsonObject &obj)
+{
+    if (!obj.contains("saved")) {
+        sender()->deleteLater();
+        fOrder->fHeader = obj["header"].toObject();
+        fOrder->fItems = obj["body"].toArray();
+    }
+    /* CHECK FOR AUTOMATICALLY DISCOUNT BY GOV NUMBER*/
+    QString govnumber = obj["govnumber"].toString();
+    if (!govnumber.isEmpty() && fOrder->hDouble("f_discountfactor") < 0.001) {
+        C5SocketHandler *sh = createSocketHandler(SLOT(handleDiscount(QJsonObject)));
+        sh->bind("cmd", sm_discount);
+        sh->bind("order", fOrder->hString("f_id"));
+        sh->bind("code", govnumber);
+        sh->bind("handlevisit", 1);
+        sh->send();
+    }
 }
 
 void DlgOrder::changeTable(const QJsonObject &obj)
@@ -875,6 +983,10 @@ void DlgOrder::on_btnTime3_clicked()
 
 void DlgOrder::on_btnCar_clicked()
 {
+    if (fOrder->hDouble("f_discountfactor") > 0.001) {
+        C5Message::info(tr("You should not change the car, becouse discount was applied"));
+        return;
+    }
     int num;
     if (!DlgCarNumber::getNumber(num)) {
         return;

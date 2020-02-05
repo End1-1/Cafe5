@@ -47,6 +47,16 @@ C5WaiterOrderDoc::~C5WaiterOrderDoc()
 
 }
 
+bool C5WaiterOrderDoc::isEmpty()
+{
+    for (int i = 0, c = itemsCount(); i < c; i++) {
+        if (iInt("f_state", i) == DISH_STATE_OK) {
+            return false;
+        }
+    }
+    return true;
+}
+
 int C5WaiterOrderDoc::itemsCount()
 {
     return fItems.count();
@@ -345,6 +355,20 @@ bool C5WaiterOrderDoc::makeOutputOfStore(C5Database &db, QString &err)
     }
     db.commit();
     return true;
+}
+
+void C5WaiterOrderDoc::removeDocument(C5Database &db, const QString &id)
+{
+    db[":f_state"] = DISH_STATE_MISTAKE;
+    db[":f_state_normal"] = DISH_STATE_OK;
+    db[":f_header"] = id;
+    db.exec("update o_body set f_state=:f_state where f_header=:f_header and f_state=:f_state_normal");
+    db[":f_order"] = id;
+    db.exec("delete from b_clients_debts where f_order=:f_order");
+    db[":f_order"] = id;
+    db.exec("delete from b_car_orders where f_order=:f_order");
+    db[":f_order"] = id;
+    db.exec("delete from b_history where f_order=:f_order");
 }
 
 int C5WaiterOrderDoc::hInt(const QString &name)

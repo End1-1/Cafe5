@@ -20,6 +20,8 @@ public:
 
     ~C5WaiterOrderDoc();
 
+    bool isEmpty();
+
     int itemsCount();
 
     QJsonObject item(int index);
@@ -31,6 +33,8 @@ public:
     bool transferToHotel(C5Database &db, C5Database &fDD, QString &err);
 
     bool makeOutputOfStore(C5Database &db, QString &err);
+
+    static void removeDocument(C5Database &db, const QString &id);
 
     QJsonObject fHeader;
 

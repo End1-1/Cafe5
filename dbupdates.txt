@@ -23,6 +23,7 @@ ALTER TABLE `s_receipt_print` RENAME TO  `s_station_conf` ;
 ALTER TABLE `s_station_conf` CHANGE COLUMN `f_printer` `f_conf` INT NULL DEFAULT NULL ;
 alter table c_goods_scancode add column  f_receipt smallint;
 CREATE TABLE `d_img` (  `f_id` INT NOT NULL,  `f_data` MEDIUMBLOB NULL,  PRIMARY KEY (`f_id`));
+/* ELINA STARTED FRON HERE */
 alter table d_recipes add column f_complex integer;
 alter table d_recipes add column f_complexQty decimal(14,4);
 alter table d_recipes add column f_complexBase decimal(14,4);
@@ -45,7 +46,7 @@ alter table o_body change column f_print1 f_print1 tinytext, change column  f_pr
 create table d_special (f_id integer primary key auto_increment, f_dish integer, f_comment tinytext);
 alter table o_tax_debug add column f_mark tinytext;
 alter table o_tax_debug add column f_elapsed integer;
-alter table o_body add f_timeorder smallint
+alter table o_body add f_timeorder smallint;
 alter table o_goods add f_row smallint;
 
 /* 040919 */
@@ -104,7 +105,7 @@ INSERT INTO S_CAR (F_NAME) VALUES ('AUDI');
 INSERT INTO S_CAR (F_NAME) VALUES ('BENTLEY');
 INSERT INTO S_CAR (F_NAME) VALUES ('BMW');
 INSERT INTO S_CAR (F_NAME) VALUES ('BRILLIANCE');
-INSERT INTO S_CAR (F_NAME) VALUES ('BUD');mi
+INSERT INTO S_CAR (F_NAME) VALUES ('BUD');
 INSERT INTO S_CAR (F_NAME) VALUES ('BUGATTI');
 INSERT INTO S_CAR (F_NAME) VALUES ('BUICK');
 INSERT INTO S_CAR (F_NAME) VALUES ('BYD');
@@ -229,3 +230,8 @@ alter table b_clients_debts add f_govnumber tinytext;
 /* DB - 9 */
 update s_app set f_version ='9' where f_app='DB';
 alter table s_salary_account add f_raw text;
+
+/* DB - 10 */
+update s_app set f_version ='10' where f_app='DB';
+INSERT INTO `b_card_types` (`f_id`, `f_name`) VALUES ('5', 'Ավտոմատ զեղչ տոկոսով');
+INSERT INTO `o_state` (`f_id`, `f_name`) VALUES ('4', 'Դատարկ');

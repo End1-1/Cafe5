@@ -102,6 +102,21 @@ QLabel {color:green;}
        </widget>
       </item>
       <item>
+       <widget class="QLabel" name="lbVisit">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QLabel:disabled {color:gray;}
+QLabel {color:yellow;background:green;}
+</string>
+        </property>
+        <property name="text">
+         <string>[Visit]</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -684,7 +699,7 @@ QLabel {color:green;}
                      <string>Exit</string>
                     </property>
                     <property name="icon">
-                     <iconset resource="../resources/res.qrc">
+                     <iconset resource="../resources/resources.qrc">
                       <normaloff>:/cancel.png</normaloff>:/cancel.png</iconset>
                     </property>
                    </widget>
@@ -1126,7 +1141,7 @@ QLabel {color:green;}
                <string/>
               </property>
               <property name="icon">
-               <iconset resource="../resources/res.qrc">
+               <iconset resource="../resources/resources.qrc">
                 <normaloff>:/recycle.png</normaloff>:/recycle.png</iconset>
               </property>
               <property name="iconSize">
@@ -1458,8 +1473,8 @@ QLabel {color:green;}
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../resources/res.qrc"/>
   <include location="../resources/resources.qrc"/>
+  <include location="../resources/res.qrc"/>
  </resources>
  <connections/>
 </ui>

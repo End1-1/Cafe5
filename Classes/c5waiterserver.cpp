@@ -28,7 +28,7 @@ typedef void (*caption)(QString &str);
 typedef void (*json)(C5Database &db, const QJsonObject &params, QJsonArray &jarr);
 typedef void (*translator)(QTranslator &trans);
 
-C5WaiterServer::C5WaiterServer(const QJsonObject &o, QTcpSocket *socket) :
+C5WaiterServer::C5WaiterServer(QJsonObject &o, QTcpSocket *socket) :
     fIn(o)
 {
     fSocket = socket;
@@ -174,7 +174,7 @@ void C5WaiterServer::reply(QJsonObject &o)
                jConf[QString::number(param_default_menu_name)] = "NO MENU DEFINED";
            }
         } else {
-            srh.fDb[":f_station"] = fIn["station"];
+            srh.fDb[":f_station"] = fIn["station"].toString();
             srh.fDb[":f_conf"] = 1;
             srh.fDb[":f_ip"] = QHostAddress(fSocket->peerAddress().toIPv4Address()).toString();
             srh.fDb.insert("s_station_conf", false);
@@ -221,10 +221,10 @@ void C5WaiterServer::reply(QJsonObject &o)
         break;
     }
     case sm_saveorder: {
+        o = fIn;
         QJsonObject jh = fIn["header"].toObject();
         QJsonArray ja = fIn["body"].toArray();
-        saveOrder(jh, ja, srh.fDb);
-        o = fIn;
+        saveOrder(o, jh, ja, srh.fDb);
         o["header"] = jh;
         o["body"] = ja;
         o["reply"] = 1;
@@ -235,7 +235,7 @@ void C5WaiterServer::reply(QJsonObject &o)
         QJsonArray ji = fIn["body"].toArray();
         QJsonObject jh = fIn["header"].toObject();
         QJsonArray jp;
-        saveOrder(jh, ji, srh.fDb);
+        saveOrder(o, jh, ji, srh.fDb);
         for (int i = 0; i < ji.count(); i++ ) {
             QJsonObject jo = ji[i].toObject();
             if (jo["f_state"].toString().toInt() != DISH_STATE_OK) {
@@ -296,101 +296,7 @@ void C5WaiterServer::reply(QJsonObject &o)
         break;
     }
     case sm_closeorder: {
-        QString err;
-        QJsonArray jb = fIn["body"].toArray();
-        QJsonObject jh = fIn["header"].toObject();
-        // CHECKING ALL ITEMS THAT WAS PRINTED
-        for (int i = 0; i < jb.count(); i++) {
-            QJsonObject jo = jb[i].toObject();
-            if (jo["f_state"].toString().toInt() != DISH_STATE_OK) {
-                continue;
-            }
-            if (jo["f_qty1"].toString() != jo["f_qty2"].toString()) {
-                err += tr("All service must be complited");
-                break;
-            }
-        }
-        if (jh["f_print"].toString().toInt() < 1) {
-            err += tr("Receipt was not printed");
-        }
-        QDate dateCash = QDate::currentDate();
-        int dateShift = 0;
-        bool isAuto;
-        srh.fDb[":f_ip"] = fPeerAddress;
-        srh.fDb.exec("select f_dateCash, f_dateCashAuto, f_shift from s_station_conf where f_ip=:f_ip");
-        if (srh.fDb.nextRow()) {
-            isAuto = srh.fDb.getInt(1) == 1;
-            if (isAuto) {
-                srh.fDb[":f_ip"] = fPeerAddress;;
-                srh.fDb.exec("select * from s_station_conf where f_ip=:f_ip");
-                if (srh.fDb.nextRow()) {
-                   srh.fDb[":f_settings"] = srh.fDb.getInt("f_conf");
-                   srh.fDb[":f_key"] = param_working_date_change_time;
-                   srh.fDb.exec("select f_value from s_settings_values where f_settings=:f_settings and f_key=:f_key");
-                   if (srh.fDb.nextRow()) {
-                       QTime t = QTime::fromString(srh.fDb.getString(0), "HH:mm:ss");
-                       if (t.isValid()) {
-                           if (QTime::currentTime() < t) {
-                               dateCash = dateCash.addDays(-1);
-                           }
-                       }
-                   }
-                }
-            } else {
-                dateCash = srh.fDb.getDate("f_datecash");
-                dateShift = srh.fDb.getInt("f_shift");
-            }
-        }
-        if (err.isEmpty()) {
-            jh["f_timeclose"] = QTime::currentTime().toString(FORMAT_TIME_TO_STR);
-            jh["f_dateclose"] = QDate::currentDate().toString(FORMAT_DATE_TO_STR);
-            jh["f_datecash"] = dateCash.toString(FORMAT_DATE_TO_STR);
-            srh.fDb[":f_state"] = ORDER_STATE_CLOSE;
-            srh.fDb[":f_dateClose"] = QDate::currentDate();
-            srh.fDb[":f_dateCash"] = QDate::fromString(jh["f_datecash"].toString(), FORMAT_DATE_TO_STR);
-            srh.fDb[":f_timeClose"] = QTime::fromString(jh["f_timeclose"].toString(), FORMAT_TIME_TO_STR);
-            srh.fDb[":f_staff"] = jh["f_currentstaff"].toString().toInt();
-            srh.fDb.update("o_header", where_id(jh["f_id"].toString()));
-            srh.fDb[":f_lock"] = 0;
-            srh.fDb[":f_lockSrc"] = "";
-            srh.fDb.update("h_tables", where_id(jh["f_table"].toString().toInt()));
-
-            if (dateShift == 0) {
-                srh.fDb[":f_time"] = QTime::fromString(jh["f_timeclose"].toString(), FORMAT_TIME_TO_STR);
-                srh.fDb.exec("select f_shift from s_salary_shift_time where :f_time between f_start and f_end");
-                if (srh.fDb.nextRow()) {
-                    dateShift = srh.fDb.getInt("f_shift");
-                } else {
-                    dateShift = 1;
-                }
-            }
-
-            srh.fDb[":f_id"] = jh["f_id"].toString();
-            srh.fDb[":f_shift"] = dateShift;
-            srh.fDb.exec("update o_header set f_shift=:f_shift where f_id=:f_id");
-
-            if (jh["f_otherid"].toString().toInt() == PAYOTHER_DEBT) {
-                srh.fDb[":f_order"] = jh["f_id"].toString();
-                srh.fDb.exec("select f_costumer, f_govnumber from b_car_orders co "
-                             "inner join b_car c on c.f_id=co.f_car "
-                             "where f_order=:f_order");
-                if (srh.fDb.nextRow()) {
-                    srh.fDb[":f_costumer"] = srh.fDb.getInt(0);
-                    srh.fDb[":f_order"] = jh["f_id"].toString();
-                    srh.fDb[":f_amount"] = jh["f_amountother"].toString().toDouble() * -1;
-                    srh.fDb[":f_date"] = dateCash;
-                    srh.fDb[":f_govnumber"] = srh.fDb.getString(1);
-                    srh.fDb.insert("b_clients_debts", false);
-                }
-            }
-
-            C5Database fDD(C5Config::dbParams().at(0), C5Config::hotelDatabase(), C5Config::dbParams().at(2), C5Config::dbParams().at(3));
-            C5WaiterOrderDoc w(srh.fDb, jh, jb);
-            w.transferToHotel(srh.fDb, fDD, err);
-            w.makeOutputOfStore(srh.fDb, err);
-        }
-        o["reply"] = err.isEmpty() ? 1 : 0;
-        o["msg"] = err;
+        processCloseOrder(o, srh.fDb);
         break;
     }
     case sm_creditcards: {
@@ -420,7 +326,7 @@ void C5WaiterServer::reply(QJsonObject &o)
             srh.fDb[":f_value"] = ja.at(0).toObject()["f_value"].toString().toDouble();
             srh.fDb[":f_card"] = ja.at(0).toObject()["f_id"].toString().toInt();
             srh.fDb[":f_data"] = 0;
-            srh.fDb[":f_order"] = fIn["order"];
+            srh.fDb[":f_order"] = fIn["order"].toString();
             jo["f_id"] = QString::number(srh.fDb.insert("b_history"));
             jo["f_type"] = QString::number(CARD_TYPE_DISCOUNT);
             jo["f_value"] = ja.at(0).toObject()["f_value"].toString();
@@ -428,6 +334,10 @@ void C5WaiterServer::reply(QJsonObject &o)
             break;
         } else {
 
+        }
+        if (fIn["handlevisit"].toInt() == 1) {
+            o["handlevisit"] = 1;
+            o["code"] = fIn["code"].toString();
         }
         o["reply"] = 0;
         o["msg"] = tr("Cannot find card");
@@ -585,6 +495,9 @@ void C5WaiterServer::reply(QJsonObject &o)
     case sm_rotate_shift:
         processRotateShift(o);
         break;
+    case sm_checkdiscount_by_visit:
+        processCheckDiscountByVisit(o);
+        break;
     default:
         o["reply"] = 0;
         o["msg"] = QString("%1: %2").arg(tr("Unknown command for socket handler from dlgface")).arg(cmd);
@@ -649,7 +562,7 @@ void C5WaiterServer::openActiveOrder(QJsonObject &jh, QJsonArray &jb, QJsonArray
     }
 }
 
-void C5WaiterServer::saveOrder(QJsonObject &jh, QJsonArray &ja, C5Database &db)
+void C5WaiterServer::saveOrder(QJsonObject &o, QJsonObject &jh, QJsonArray &ja, C5Database &db)
 {
     db.startTransaction();
     if (jh.contains("unlocktable")) {
@@ -659,8 +572,23 @@ void C5WaiterServer::saveOrder(QJsonObject &jh, QJsonArray &ja, C5Database &db)
             db[":f_id"] = jh["f_table"].toString();
             db.exec("update h_tables set f_lock=:f_lock, f_lockSrc=:f_lockSrc where f_id=:f_id");
         }
+        if (jh["closeempty"].toString().toInt() == 1) {
+            bool e = true;
+            for (int i = 0; i < ja.count(); i++) {
+                QJsonObject jb = ja.at(i).toObject();
+                if (jb["f_state"].toString().toInt() == DISH_STATE_OK) {
+                    e = false;
+                    break;
+                }
+            }
+            if (e) {
+                jh["f_state"] = QString::number(ORDER_STATE_EMPTY);
+                fIn["header"] = jh;
+                processCloseOrder(o, db);
+            }
+        }
     }
-    if (jh["f_id"].toString().isEmpty() && ja.count() > 0) {
+    if (jh["f_id"].toString().isEmpty() && jh["f_table"].toString().toInt() > 0) {
         db[":f_id"] = jh["f_hall"].toString().toInt();
         db.exec("select f_counterhall from h_halls where f_id=:f_id");
         if (db.nextRow()) {
@@ -744,7 +672,7 @@ void C5WaiterServer::saveOrder(QJsonObject &jh, QJsonArray &ja, C5Database &db)
         saveDish(jh, jb, db);
         ja[i] = jb;
     }
-    if (ja.count() > 0) {
+    if (jh["f_table"].toString().toInt() > 0) {
         db[":f_comment"] = jh["f_comment"].toString();
         db[":f_staff"] = jh["f_staff"].toString().toInt();
         db[":f_hall"] = jh["f_hall"].toString().toInt();
@@ -798,6 +726,113 @@ void C5WaiterServer::saveDish(const QJsonObject &h, QJsonObject &o, C5Database &
     db[":f_timeorder"] = o["f_timeorder"].toString().toInt();
     db[":f_package"] = o["f_package"].toString().toInt();
     db.update("o_body", where_id(o["f_id"].toString()));
+}
+
+void C5WaiterServer::processCloseOrder(QJsonObject &o, C5Database &db)
+{
+    QString err;
+    QJsonArray jb = fIn["body"].toArray();
+    QJsonObject jh = fIn["header"].toObject();
+    int orderstate = jh["f_state"].toString().toInt();
+    if (orderstate == ORDER_STATE_OPEN) {
+        orderstate = ORDER_STATE_CLOSE;
+    }
+    // CHECKING ALL ITEMS THAT WAS PRINTED
+    for (int i = 0; i < jb.count(); i++) {
+        QJsonObject jo = jb[i].toObject();
+        if (jo["f_state"].toString().toInt() != DISH_STATE_OK) {
+            continue;
+        }
+        if (jo["f_qty1"].toString() != jo["f_qty2"].toString()) {
+            err += tr("All service must be complited");
+            break;
+        }
+    }
+    if (jh["f_print"].toString().toInt() < 1) {
+        err += tr("Receipt was not printed");
+    }
+    QDate dateCash = QDate::currentDate();
+    int dateShift = 0;
+    bool isAuto;
+    db[":f_ip"] = fPeerAddress;
+    db.exec("select f_dateCash, f_dateCashAuto, f_shift from s_station_conf where f_ip=:f_ip");
+    if (db.nextRow()) {
+        isAuto = db.getInt(1) == 1;
+        if (isAuto) {
+            db[":f_ip"] = fPeerAddress;;
+            db.exec("select * from s_station_conf where f_ip=:f_ip");
+            if (db.nextRow()) {
+               db[":f_settings"] = db.getInt("f_conf");
+               db[":f_key"] = param_working_date_change_time;
+               db.exec("select f_value from s_settings_values where f_settings=:f_settings and f_key=:f_key");
+               if (db.nextRow()) {
+                   QTime t = QTime::fromString(db.getString(0), "HH:mm:ss");
+                   if (t.isValid()) {
+                       if (QTime::currentTime() < t) {
+                           dateCash = dateCash.addDays(-1);
+                       }
+                   }
+               }
+            }
+        } else {
+            dateCash = db.getDate("f_datecash");
+            dateShift = db.getInt("f_shift");
+        }
+    }
+    if (err.isEmpty()) {
+        jh["f_timeclose"] = QTime::currentTime().toString(FORMAT_TIME_TO_STR);
+        jh["f_dateclose"] = QDate::currentDate().toString(FORMAT_DATE_TO_STR);
+        jh["f_datecash"] = dateCash.toString(FORMAT_DATE_TO_STR);
+        db[":f_state"] = orderstate;
+        db[":f_dateClose"] = QDate::currentDate();
+        db[":f_dateCash"] = QDate::fromString(jh["f_datecash"].toString(), FORMAT_DATE_TO_STR);
+        db[":f_timeClose"] = QTime::fromString(jh["f_timeclose"].toString(), FORMAT_TIME_TO_STR);
+        db[":f_staff"] = jh["f_currentstaff"].toString().toInt();
+        db.update("o_header", where_id(jh["f_id"].toString()));
+        db[":f_lock"] = 0;
+        db[":f_lockSrc"] = "";
+        db.update("h_tables", where_id(jh["f_table"].toString().toInt()));
+
+        if (dateShift == 0) {
+            db[":f_time"] = QTime::fromString(jh["f_timeclose"].toString(), FORMAT_TIME_TO_STR);
+            db.exec("select f_shift from s_salary_shift_time where :f_time between f_start and f_end");
+            if (db.nextRow()) {
+                dateShift = db.getInt("f_shift");
+            } else {
+                dateShift = 1;
+            }
+        }
+
+        db[":f_id"] = jh["f_id"].toString();
+        db[":f_shift"] = dateShift;
+        db.exec("update o_header set f_shift=:f_shift where f_id=:f_id");
+
+        if (jh["f_otherid"].toString().toInt() == PAYOTHER_DEBT) {
+            db[":f_order"] = jh["f_id"].toString();
+            db.exec("select f_costumer, f_govnumber from b_car_orders co "
+                         "inner join b_car c on c.f_id=co.f_car "
+                         "where f_order=:f_order");
+            if (db.nextRow()) {
+                db[":f_costumer"] = db.getInt(0);
+                db[":f_order"] = jh["f_id"].toString();
+                db[":f_amount"] = jh["f_amountother"].toString().toDouble() * -1;
+                db[":f_date"] = dateCash;
+                db[":f_govnumber"] = db.getString(1);
+                db.insert("b_clients_debts", false);
+            }
+        }
+
+        if (orderstate == ORDER_STATE_CLOSE) {
+            C5Database fDD(C5Config::dbParams().at(0), C5Config::hotelDatabase(), C5Config::dbParams().at(2), C5Config::dbParams().at(3));
+            C5WaiterOrderDoc w(db, jh, jb);
+            w.transferToHotel(db, fDD, err);
+            w.makeOutputOfStore(db, err);
+        } else {
+            C5WaiterOrderDoc::removeDocument(db, jh["f_id"].toString());
+        }
+    }
+    o["reply"] = err.isEmpty() ? 1 : 0;
+    o["msg"] = err;
 }
 
 int C5WaiterServer::printTax(const QJsonObject &h, const QJsonArray &ja, C5Database &db)
@@ -856,7 +891,8 @@ int C5WaiterServer::printTax(const QJsonObject &h, const QJsonArray &ja, C5Datab
 
 bool C5WaiterServer::printBill(QJsonObject &jh, QJsonArray &jb, QString &err, C5ServerHandler &srh)
 {
-    saveOrder(jh, jb, srh.fDb);
+    QJsonObject o;
+    saveOrder(o, jh, jb, srh.fDb);
     // CHECKING FOR RECEIPT PRINT COUNT
     if (jh["f_print"].toString().toInt() > 0) {
         if (!checkPermission(jh["f_currentstaff"].toString().toInt(), cp_t5_multiple_receipt, srh.fDb)) {
@@ -908,7 +944,8 @@ bool C5WaiterServer::printBill(QJsonObject &jh, QJsonArray &jb, QString &err, C5
 
 bool C5WaiterServer::printReceipt(QJsonObject &jh, QJsonArray &jb, QString &err, C5ServerHandler &srh)
 {
-    saveOrder(jh, jb, srh.fDb);
+    QJsonObject o;
+    saveOrder(o, jh, jb, srh.fDb);
     // CHECKING FOR RECEIPT PRINT COUNT
     if (jh["f_print"].toString().toInt() > 0) {
         if (!checkPermission(jh["f_currentstaff"].toString().toInt(), cp_t5_multiple_receipt, srh.fDb)) {
@@ -1231,5 +1268,46 @@ void C5WaiterServer::processRotateShift(QJsonObject &o)
     db[":f_datecash"] = QDate::fromString(fIn["date"].toString(), FORMAT_DATE_TO_STR_MYSQL);
     db[":f_shift"] = fIn["shift"].toString().toInt();
     db.exec("update s_station_conf set f_datecash=:f_datecash, f_shift=:f_shift");
+    o["reply"] = 1;
+}
+
+void C5WaiterServer::processCheckDiscountByVisit(QJsonObject &o)
+{
+    C5Database db(C5Config::dbParams());
+    db[":f_govnumber"] = fIn["code"].toString();
+    db.exec("select count(f_order), f_costumer from b_car_orders bco "
+            "inner join b_car bc on bc.f_id=bco.f_car "
+            "where bc.f_govnumber=:f_govnumber");
+    if (db.nextRow()) {
+        o["visit"] = db.getInt(0);
+        o["client"] = db.getInt(1);
+    } else {
+        o["reply"] = 0;
+        o["msg"] = tr("Invalide card code");
+        return;
+    }
+    db[":f_code"] = "auto_" + fIn["code"].toString();
+    db[":f_mode"] = CARD_TYPE_AUTO_DISCOUNT;
+    db.exec("select * from b_cards_discount where f_code=:f_code");
+    if (db.nextRow()) {
+        o["card_code"] = db.getString("f_code");
+    } else {
+        o["card_code"] = "auto_" + fIn["code"].toString();
+        db[":f_mode"] = CARD_TYPE_AUTO_DISCOUNT;
+        db[":f_code"] = "auto_" + fIn["code"].toString();
+        db[":f_client"] = o["client"].toInt();
+        db[":f_value"] = 100;
+        db[":f_datestart"] = QDate::currentDate();
+        db[":f_dateend"] = QDate::currentDate().addDays(360 * 10);
+        db[":f_active"] = 1;
+        db.insert("b_cards_discount", false);
+    }
+    db[":f_code"] = "VISIT";
+    db.exec("select * from b_cards_discount where f_code=:f_code");
+    if (!db.nextRow()) {
+        o["noconfig"] = 1;
+    } else {
+        o["current"] = o["visit"].toInt() % db.getInt("f_value");
+    }
     o["reply"] = 1;
 }

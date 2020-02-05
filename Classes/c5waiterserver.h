@@ -12,14 +12,14 @@ class C5WaiterServer : public QObject
 {
     Q_OBJECT
 public:
-    C5WaiterServer(const QJsonObject &o, QTcpSocket *socket);
+    C5WaiterServer(QJsonObject &o, QTcpSocket *socket);
 
     void reply(QJsonObject &o);
 
     int cmd();
 
 private:
-    const QJsonObject &fIn;
+    QJsonObject &fIn;
 
     QString fPeerAddress;
 
@@ -27,9 +27,11 @@ private:
 
     void openActiveOrder(QJsonObject &jh, QJsonArray &jb, QJsonArray &jt, C5ServerHandler &srh);
 
-    void saveOrder(QJsonObject &jh, QJsonArray &ja, C5Database &db);
+    void saveOrder(QJsonObject &o, QJsonObject &jh, QJsonArray &ja, C5Database &db);
 
     void saveDish(const QJsonObject &h, QJsonObject &o, C5Database &db);
+
+    void processCloseOrder(QJsonObject &o, C5Database &db);
 
     int printTax(const QJsonObject &h, const QJsonArray &ja, C5Database &db);
 
@@ -52,6 +54,8 @@ private:
     void processGetCostumerByCar(QJsonObject &o);
 
     void processRotateShift(QJsonObject &o);
+
+    void processCheckDiscountByVisit(QJsonObject &o);
 
     QTcpSocket *fSocket;
 };

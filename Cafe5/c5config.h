@@ -36,6 +36,10 @@
 #define param_car_mode 30
 #define param_date_cash_shift 31
 #define param_cash_id 32
+#define param_frondesk_mode 33
+
+#define FRONTDESK_WAITER 0
+#define FRONTDESK_SHOP 1
 
 class C5Config
 {
@@ -139,6 +143,8 @@ public:
     static bool carMode();
 
     static int cashId();
+
+    static int frontDeskMode();
 
 private:
     static QString getValue(int key);

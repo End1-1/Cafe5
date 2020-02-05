@@ -49,6 +49,7 @@ SOURCES += \
     ../../XLSX/src/xlsxworkbook.cpp \
     ../../XLSX/src/xlsxwriter.cpp \
     ../Cafe5/c5cafecommon.cpp \
+    ../Cafe5/c5license.cpp \
     ../Classes/c5jsondb.cpp \
     ../Classes/c5storedraftwriter.cpp \
     ../Classes/notificationwidget.cpp \
@@ -137,6 +138,7 @@ HEADERS += \
     ../../XLSX/src/xlsxwriter.h \
     ../../XLSX/src/zip.h \
     ../Cafe5/c5cafecommon.h \
+    ../Cafe5/c5license.h \
     ../Classes/c5jsondb.h \
     ../Classes/c5storedraftwriter.h \
     ../Classes/notificationwidget.h \

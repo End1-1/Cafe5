@@ -39,9 +39,22 @@ SOURCES += \
     ../../XLSX/src/xlsxtheme.cpp \
     ../../XLSX/src/xlsxworkbook.cpp \
     ../../XLSX/src/xlsxwriter.cpp \
+    ../Cafe5/c5license.cpp \
+    ../Classes/c5grid.cpp \
+    ../Classes/c5gridgilter.cpp \
     ../Classes/c5printing.cpp \
+    ../Classes/c5printpreview.cpp \
     ../Classes/c5storedraftwriter.cpp \
+    ../Classes/c5tablemodel.cpp \
+    ../Classes/c5tableview.cpp \
+    ../Classes/c5widget.cpp \
     ../Classes/notificationwidget.cpp \
+    ../Controls/c5graphicsview.cpp \
+    ../Controls/c5lineeditwithselector.cpp \
+    ../Editors/c5editor.cpp \
+    ../Editors/ce5editor.cpp \
+    ../FrontDesk/c5filtervalues.cpp \
+    ../FrontDesk/c5selector.cpp \
         main.cpp \
     printreceipt.cpp \
     sales.cpp \
@@ -81,9 +94,22 @@ HEADERS += \
     ../../XLSX/src/xlsxworkbook.h \
     ../../XLSX/src/xlsxwriter.h \
     ../../XLSX/src/zip.h \
+    ../Cafe5/c5license.h \
+    ../Classes/c5grid.h \
+    ../Classes/c5gridgilter.h \
     ../Classes/c5printing.h \
+    ../Classes/c5printpreview.h \
     ../Classes/c5storedraftwriter.h \
+    ../Classes/c5tablemodel.h \
+    ../Classes/c5tableview.h \
+    ../Classes/c5widget.h \
     ../Classes/notificationwidget.h \
+    ../Controls/c5graphicsview.h \
+    ../Controls/c5lineeditwithselector.h \
+    ../Editors/c5editor.h \
+    ../Editors/ce5editor.h \
+    ../FrontDesk/c5filtervalues.h \
+    ../FrontDesk/c5selector.h \
     printreceipt.h \
     sales.h \
         working.h \
@@ -107,7 +133,13 @@ HEADERS += \
     ../Controls/c5checkbox.h
 
 FORMS += \
+    ../Classes/c5grid.ui \
+    ../Classes/c5gridgilter.ui \
+    ../Classes/c5printpreview.ui \
     ../Classes/notificationwidget.ui \
+    ../Editors/c5editor.ui \
+    ../FrontDesk/c5filtervalues.ui \
+    ../FrontDesk/c5selector.ui \
     sales.ui \
         working.ui \
     worder.ui \
@@ -123,6 +155,7 @@ DEFINES += SHOP
 
 INCLUDEPATH += ../Cafe5
 INCLUDEPATH += ../Classes
+INCLUDEPATH += ../FrontDesk
 INCLUDEPATH += ../Cache
 INCLUDEPATH += ../Reports
 INCLUDEPATH += ../Controls

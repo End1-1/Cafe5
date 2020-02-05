@@ -83,7 +83,9 @@ QToolBar *CR5ConsumptionBySales::toolBar()
         fToolBar->insertAction(fToolBar->actions().at(0), a);
         auto *b = new QAction(QIcon(":/calculator.png"), tr("Count output\nbase on recipes"), this);
         connect(b, SIGNAL(triggered(bool)), this, SLOT(countOutputBasedOnRecipes()));
-        fToolBar->insertAction(a, b);
+        if (__c5config.frontDeskMode() == FRONTDESK_WAITER) {
+            fToolBar->insertAction(a, b);
+        }
         auto *d = new QAction(QIcon(":/decision.png"), tr("Change the store of output"), this);
         connect(d, SIGNAL(triggered(bool)), this, SLOT(changeOutputStore()));
         fToolBar->insertAction(b, d);

@@ -339,21 +339,23 @@ void C5MainWindow::on_actionLogin_triggered()
             addTreeL3Item(it, cp_t9_report, tr("Salary by workers"), ":/employee.png");
         }
 
-        if (pr(db.getString(3), cp_t4_menu)) {
-            it = new QTreeWidgetItem();
-            it->setText(0, tr("Menu"));
-            it->setData(0, Qt::UserRole, cp_t4_part1);
-            it->setIcon(0, QIcon(":/menu.png"));
-            item->addChild(it);
-            addTreeL3Item(it, cp_t4_part1, tr("Dish depts"), ":/menu.png");
-            addTreeL3Item(it, cp_t4_part2, tr("Types of dishes"), ":/menu.png");
-            addTreeL3Item(it, cp_t4_dishes, tr("Dishes list"), ":/menu.png");
-            addTreeL3Item(it, cp_t4_dishes_packages, tr("Dishes packages"), ":/menu.png");
-            addTreeL3Item(it, cp_t4_menu_names, tr("Menu names"), ":/menu.png");
-            addTreeL3Item(it, cp_t4_dish_remove_reason, tr("Dish remove reasons"), ":/menu.png");
-            addTreeL3Item(it, cp_t4_dish_comments, tr("Dish comments"), ":/menu.png");
-            addTreeL3Item(it, cp_t4_dish_price_self_cost, tr("Dish self cost report"), ":/menu.png");
-            addTreeL3Item(it, cp_t4_menu_review, tr("Review menu"), ":/menu.png");
+        if (__c5config.frontDeskMode() == FRONTDESK_WAITER) {
+            if (pr(db.getString(3), cp_t4_menu)) {
+                it = new QTreeWidgetItem();
+                it->setText(0, tr("Menu"));
+                it->setData(0, Qt::UserRole, cp_t4_part1);
+                it->setIcon(0, QIcon(":/menu.png"));
+                item->addChild(it);
+                addTreeL3Item(it, cp_t4_part1, tr("Dish depts"), ":/menu.png");
+                addTreeL3Item(it, cp_t4_part2, tr("Types of dishes"), ":/menu.png");
+                addTreeL3Item(it, cp_t4_dishes, tr("Dishes list"), ":/menu.png");
+                addTreeL3Item(it, cp_t4_dishes_packages, tr("Dishes packages"), ":/menu.png");
+                addTreeL3Item(it, cp_t4_menu_names, tr("Menu names"), ":/menu.png");
+                addTreeL3Item(it, cp_t4_dish_remove_reason, tr("Dish remove reasons"), ":/menu.png");
+                addTreeL3Item(it, cp_t4_dish_comments, tr("Dish comments"), ":/menu.png");
+                addTreeL3Item(it, cp_t4_dish_price_self_cost, tr("Dish self cost report"), ":/menu.png");
+                addTreeL3Item(it, cp_t4_menu_review, tr("Review menu"), ":/menu.png");
+            }
         }
 
         if (pr(db.getString(3), cp_t6_goods_menu)) {

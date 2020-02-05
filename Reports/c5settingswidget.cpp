@@ -12,6 +12,8 @@ C5SettingsWidget::C5SettingsWidget(const QStringList &dbParams, QWidget *parent)
     ui->cbTaxUseExtPos->addItem(tr("No"), "false");
     ui->cbServiceMode->addItem(tr("Increase price of dish"), SERVICE_AMOUNT_MODE_INCREASE_PRICE);
     ui->cbServiceMode->addItem(tr("Print on receipt like a dish"), SERVICE_AMOUNT_MODE_SEPARATE);
+    ui->cbFronDeskMode->addItem(tr("Waiter"), 0);
+    ui->cbFronDeskMode->addItem(tr("Shop"), 1);
 }
 
 C5SettingsWidget::~C5SettingsWidget()
@@ -84,6 +86,7 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     fTags[ui->leFDFontSize->getTag()] = ui->leFDFontSize->text();
     fTags[ui->chCarMode->getTag()] = ui->chCarMode->isChecked() ? "1" : "0";
     fTags[ui->leCashId->getTag()] = ui->leCashId->text();
+    fTags[ui->cbFronDeskMode->getTag()] = ui->cbFronDeskMode->currentData().toString();
     C5Database db(fDBParams);
     db[":f_settings"] = ui->leCode->getInteger();
     db.exec("delete from s_settings_values where f_settings=:f_settings");

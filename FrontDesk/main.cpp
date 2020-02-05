@@ -1,20 +1,14 @@
 #include "c5mainwindow.h"
 #include "c5connection.h"
+#include "c5license.h"
+#include <QMessageBox>
 #include <QApplication>
 #include <QTranslator>
 #include <QStyleFactory>
 #include <QFontDatabase>
 
-#define _DEMO_ 1
-
 int main(int argc, char *argv[])
 {
-#ifdef _DEMO_
-    QDate dtrial = QDate::fromString("03.02.2020", "dd.MM.yyyy");
-    if (QDate::currentDate() > dtrial) {
-        return 0;
-    }
-#endif
 
 #ifndef QT_DEBUG
     QStringList libPath = QCoreApplication::libraryPaths();
@@ -26,6 +20,10 @@ int main(int argc, char *argv[])
 #endif
 
     QApplication a(argc, argv);
+    if (!C5License::isOK()) {
+        QMessageBox::critical(0, QObject::tr("Applicatin error"), QObject::tr("Please, register application."));
+        return 0;
+    }
 
     QList<QByteArray> connectionParams;
     C5Connection::readParams(connectionParams);

@@ -1,23 +1,19 @@
 #include "dlgface.h"
 #include "c5translator.h"
 #include "c5connection.h"
+#include "c5license.h"
 #include "c5sockethandler.h"
 #include <QApplication>
 #include <QTranslator>
 #include <QMessageBox>
 
-#define N_DEMO_ 1
-
 int main(int argc, char *argv[])
 {
-#ifdef _DEMO_
-    QDate dtrial = QDate::fromString("01.02.2020", "dd.MM.yyyy");
-    if (QDate::currentDate() > dtrial) {
+    QApplication a(argc, argv);
+    if (!C5License::isOK()) {
+        QMessageBox::critical(0, QObject::tr("Applicatin error"), QObject::tr("Please, register application."));
         return 0;
     }
-#endif
-
-    QApplication a(argc, argv);
 #ifndef QT_DEBUG
     QStringList libPath;
     libPath << qApp->applicationDirPath();
