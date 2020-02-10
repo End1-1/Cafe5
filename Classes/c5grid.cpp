@@ -803,6 +803,9 @@ void C5Grid::refreshData()
     }
     restoreColumnsWidths();
     sumColumnsData();
+    if (!ui->tblTotal->isVisible()) {
+        ui->tblView->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    }
 }
 
 void C5Grid::on_tblView_clicked(const QModelIndex &index)

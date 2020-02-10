@@ -35,11 +35,13 @@ SOURCES += \
     ../Cafe5/c5cafecommon.cpp \
     ../Cafe5/c5double.cpp \
     ../Cafe5/c5license.cpp \
+    ../Classes/c5crypt.cpp \
     ../Classes/c5storedraftwriter.cpp \
     ../Classes/notificationwidget.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
     ../Editors/c5cashname.cpp \
     ../Editors/ce5dishpackage.cpp \
+    ../Editors/ce5goodsclass.cpp \
     ../Editors/ce5packagelist.cpp \
     ../Editors/ce5storereason.cpp \
     ../Reports/cr5cashdetailed.cpp \
@@ -54,6 +56,8 @@ SOURCES += \
     ../Reports/cr5discountstatisics.cpp \
     ../Reports/cr5discountstatisticsfilter.cpp \
     ../Reports/cr5dishpackage.cpp \
+    ../Reports/cr5goodsclasses.cpp \
+    ../Reports/cr5goodsfilter.cpp \
     ../Reports/cr5menureview.cpp \
     ../Reports/cr5salarybyworkers.cpp \
     ../Reports/cr5salarybyworkersfilter.cpp \
@@ -202,11 +206,13 @@ HEADERS += \
     ../Cafe5/c5cafecommon.h \
     ../Cafe5/c5double.h \
     ../Cafe5/c5license.h \
+    ../Classes/c5crypt.h \
     ../Classes/c5storedraftwriter.h \
     ../Classes/notificationwidget.h \
     ../Classes/proxytablewidgetdatabase.h \
     ../Editors/c5cashname.h \
     ../Editors/ce5dishpackage.h \
+    ../Editors/ce5goodsclass.h \
     ../Editors/ce5packagelist.h \
     ../Editors/ce5storereason.h \
     ../Reports/cr5cashdetailed.h \
@@ -221,6 +227,8 @@ HEADERS += \
     ../Reports/cr5discountstatisics.h \
     ../Reports/cr5discountstatisticsfilter.h \
     ../Reports/cr5dishpackage.h \
+    ../Reports/cr5goodsclasses.h \
+    ../Reports/cr5goodsfilter.h \
     ../Reports/cr5menureview.h \
     ../Reports/cr5salarybyworkers.h \
     ../Reports/cr5salarybyworkersfilter.h \
@@ -373,12 +381,14 @@ FORMS += \
     ../Classes/notificationwidget.ui \
     ../Editors/c5cashname.ui \
     ../Editors/ce5dishpackage.ui \
+    ../Editors/ce5goodsclass.ui \
     ../Editors/ce5packagelist.ui \
     ../Editors/ce5storereason.ui \
     ../Reports/cr5cashdetailedfilter.ui \
     ../Reports/cr5consuptionreasonfilter.ui \
     ../Reports/cr5costumerdebtsfilter.ui \
     ../Reports/cr5discountstatisticsfilter.ui \
+    ../Reports/cr5goodsfilter.ui \
     ../Reports/cr5salarybyworkersfilter.ui \
     ../Reports/cr5salefromstoretotalfilter.ui \
     ../Reports/cr5saleremoveddishesfilter.ui \
@@ -454,6 +464,8 @@ INCLUDEPATH += ../Editors
 INCLUDEPATH += ../Waiter
 INCLUDEPATH += ../RESOURCES
 INCLUDEPATH += c:/projects/xlsx/src
+INCLUDEPATH += C:/OpenSSL-Win32/include
+INCLUDEPATH += C:/OpenSSL-Win32/include/openssl
 
 RESOURCES += \
     ../resources/res.qrc \
@@ -467,3 +479,6 @@ DISTFILES += \
 ICON = storehouse.ico
 
 LIBS += -lVersion
+LIBS += -LC:/OpenSSL-Win32/lib
+LIBS += -lopenssl
+LIBS += -llibcrypto

@@ -40,6 +40,7 @@ INSERT INTO `b_card_types` (`f_id`, `f_name`) VALUES ('3', 'Հաճախորդի �
 INSERT INTO `b_card_types` (`f_id`, `f_name`) VALUES ('4', 'Կուտակային');
 update o_header set f_state=2 where f_state=0;
 ALTER TABLE `h_halls` CHANGE COLUMN `f_prefix` `f_prefix` CHAR(8) NOT NULL , ADD UNIQUE INDEX `f_prefix_UNIQUE` (`f_prefix` ASC);
+ALTER TABLE `h_halls` ADD COLUMN `f_settings` INTeger;
 ALTER TABLE `h_halls`  ADD COLUMN `f_counterhall` INT(11) NULL AFTER `f_settings`;
 alter table d_menu change column f_print1 f_print1 tinytext, change column f_print2 f_print2 tinytext;
 alter table o_body change column f_print1 f_print1 tinytext, change column  f_print2 f_print2 tinytext;
@@ -202,6 +203,8 @@ create table b_clients_debts (f_id integer primary key auto_increment, f_header 
 /* DB - 6 */
 update s_app set f_version ='6' where f_app='DB';
 create table s_salary_body (f_id char(36) primary key, f_header char(36), f_user integer, f_position integer, f_amount decimal(14,2), f_row integer);
+ALTER TABLE `o_header` ADD COLUMN `f_servicemode` INTeger;
+ALTER TABLE `a_header` ADD COLUMN `f_invoice` VARCHAR(64) NULL AFTER `f_paid`;
 create table s_salary_options (f_id char(36) primary key, f_cashdoc char(36), f_shift integer);
 create table s_salary_shift (f_id integer primary key auto_increment, f_name tinytext, f_number smallint);
 insert into s_salary_shift  values (1, 'I հերթ', 1), (2, 'II հերթ', 2);
@@ -235,3 +238,14 @@ alter table s_salary_account add f_raw text;
 update s_app set f_version ='10' where f_app='DB';
 INSERT INTO `b_card_types` (`f_id`, `f_name`) VALUES ('5', 'Ավտոմատ զեղչ տոկոսով');
 INSERT INTO `o_state` (`f_id`, `f_name`) VALUES ('4', 'Դատարկ');
+
+/* DB - 11*/
+update s_app set f_version ='11' where f_app='DB';
+alter table c_goods add column f_group1 integer, add column f_group2 integer, add column f_group3 integer, add column f_group4 integer, add column f_saleprice2 decimal(14,2);
+alter table c_goods add column f_supplier integer after f_id;
+create table c_goods_classes (f_id integer primary key auto_increment, f_name tinytext);
+alter table c_goods add column f_enabled smallint ;
+update c_goods set f_enabled=1;
+
+/* DB - 12*/
+update s_app set f_version ='12' where f_app='DB';

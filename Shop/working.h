@@ -33,7 +33,10 @@ private:
 
     void makeWGoods();
 
+    void addGoods(QString &code);
+
 private slots:
+    void escape();
 
     void shortcutF1();
 
@@ -68,6 +71,8 @@ private slots:
     void on_btnRefund_clicked();
 
     void on_btnDuplicateReceipt_clicked();
+
+    void on_leCode_textChanged(const QString &arg1);
 };
 
 #endif // WORKING_H

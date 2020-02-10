@@ -28,7 +28,8 @@
         <location filename="../../Classes/c5cache.cpp" line="114"/>
         <location filename="../../Classes/c5cache.cpp" line="117"/>
         <location filename="../../Classes/c5cache.cpp" line="120"/>
-        <location filename="../../Classes/c5cache.cpp" line="260"/>
+        <location filename="../../Classes/c5cache.cpp" line="123"/>
+        <location filename="../../Classes/c5cache.cpp" line="264"/>
         <source>Code</source>
         <translation>Կոդ</translation>
     </message>
@@ -56,7 +57,8 @@
         <location filename="../../Classes/c5cache.cpp" line="115"/>
         <location filename="../../Classes/c5cache.cpp" line="118"/>
         <location filename="../../Classes/c5cache.cpp" line="121"/>
-        <location filename="../../Classes/c5cache.cpp" line="261"/>
+        <location filename="../../Classes/c5cache.cpp" line="124"/>
+        <location filename="../../Classes/c5cache.cpp" line="265"/>
         <source>Name</source>
         <translation>Անվանում</translation>
     </message>

@@ -67,7 +67,7 @@
        <widget class="QTableWidget" name="tblGoods">
         <property name="font">
          <font>
-          <pointsize>14</pointsize>
+          <pointsize>12</pointsize>
           <weight>75</weight>
           <bold>true</bold>
          </font>
@@ -85,30 +85,83 @@
          <set>QAbstractItemView::NoEditTriggers</set>
         </property>
         <property name="selectionMode">
-         <enum>QAbstractItemView::NoSelection</enum>
+         <enum>QAbstractItemView::SingleSelection</enum>
+        </property>
+        <property name="selectionBehavior">
+         <enum>QAbstractItemView::SelectRows</enum>
         </property>
         <property name="wordWrap">
          <bool>false</bool>
         </property>
         <attribute name="horizontalHeaderVisible">
-         <bool>false</bool>
+         <bool>true</bool>
         </attribute>
         <attribute name="verticalHeaderVisible">
          <bool>false</bool>
         </attribute>
         <column>
          <property name="text">
-          <string>New Column</string>
+          <string>Code</string>
          </property>
         </column>
         <column>
          <property name="text">
-          <string>New Column</string>
+          <string>Scancode</string>
          </property>
         </column>
         <column>
          <property name="text">
-          <string>New Column</string>
+          <string>Partner</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Group</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Name</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Retail</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Wholesale</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Unit</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Class 1</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Class 2</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Class 3</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>TaxDept</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Adg</string>
          </property>
         </column>
        </widget>

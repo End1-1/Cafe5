@@ -75,6 +75,7 @@ void C5Permissions::init(C5Database &db)
               << cp_t6_groups
               << cp_t6_waste
               << cp_t6_partners
+              << cp_t6_classes
 
               << cp_t7_other
               << cp_t7_credit_card

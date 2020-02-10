@@ -67,6 +67,7 @@
 #define cp_t6_waste 604
 #define cp_t6_storage 605
 #define cp_t6_partners 606
+#define cp_t6_classes 607
 
 #define cp_t7_other 700
 #define cp_t7_credit_card 701

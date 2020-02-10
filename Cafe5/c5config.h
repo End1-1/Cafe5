@@ -37,6 +37,13 @@
 #define param_date_cash_shift 31
 #define param_cash_id 32
 #define param_frondesk_mode 33
+#define param_shop_enterpin 34
+#define param_nocash_id 35
+#define param_autocash_prefix 36
+#define param_autonocash_prefix 37
+#define param_autoinput_salecash 38
+#define param_tax_cashier_login 39
+#define param_tax_cashier_pin 40
 
 #define FRONTDESK_WAITER 0
 #define FRONTDESK_SHOP 1
@@ -144,7 +151,15 @@ public:
 
     static int cashId();
 
+    static int nocashId();
+
     static int frontDeskMode();
+
+    static bool shopEnterPin();
+
+    static QString taxCashier();
+
+    static QString taxPin();
 
 private:
     static QString getValue(int key);

@@ -233,12 +233,12 @@
 <context>
     <name>PrintTaxN</name>
     <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="67"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="69"/>
         <source>Socket read error</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="75"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="77"/>
         <source>Data read timeout</source>
         <translation></translation>
     </message>

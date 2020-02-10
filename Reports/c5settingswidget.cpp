@@ -87,6 +87,13 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     fTags[ui->chCarMode->getTag()] = ui->chCarMode->isChecked() ? "1" : "0";
     fTags[ui->leCashId->getTag()] = ui->leCashId->text();
     fTags[ui->cbFronDeskMode->getTag()] = ui->cbFronDeskMode->currentData().toString();
+    fTags[ui->chEnterShopPin->getTag()] = ui->chEnterShopPin->isChecked() ? "1" : "0";
+    fTags[ui->chAutoCash->getTag()] = ui->chAutoCash->isChecked() ? "1" : "0";
+    fTags[ui->leCardId->getTag()] = ui->leCardId->text();
+    fTags[ui->leCashIdPrefix->getTag()] = ui->leCashIdPrefix->text();
+    fTags[ui->leCardIdPrefix->getTag()] = ui->leCardIdPrefix->text();
+    fTags[ui->leCashierLogin->getTag()] = ui->leCashierLogin->text();
+    fTags[ui->leCashierPin->getTag()] = ui->leCashierPin->text();
     C5Database db(fDBParams);
     db[":f_settings"] = ui->leCode->getInteger();
     db.exec("delete from s_settings_values where f_settings=:f_settings");

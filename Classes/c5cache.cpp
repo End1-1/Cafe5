@@ -52,7 +52,7 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         fCacheQuery[cache_doc_type] = QString("select f_id as `%1`, f_name as `%2` from a_type")
                 .arg(tr("Code"))
                 .arg(tr("Name"));
-        fCacheQuery[cache_users] = QString("select f_id as `%1`, concat(f_last, ' ', f_first) as `%2` from s_user")
+        fCacheQuery[cache_users] = QString("select f_id as `%1`, concat(f_last, ' ', f_first) as `%2` from s_user where f_state=1")
                 .arg(tr("Code"))
                 .arg(tr("Name"));
         fCacheQuery[cache_waiter_printers] = QString("select f_id as `%1`, f_name as `%2` from d_printers")
@@ -119,6 +119,9 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         fCacheQuery[cache_header_paid] = QString("select f_id as `%1`, f_name as `%2` from a_header_paid")
                 .arg(tr("Code"))
                 .arg(tr("Name"));
+        fCacheQuery[cache_goods_classes] = QString("select f_id as `%1`, f_name as `%2` from c_goods_classes")
+                .arg(tr("Code"))
+                .arg(tr("Name"));
     }
     if (fTableCache.count() == 0) {
         fTableCache["c_partners"] = cache_goods_partners;
@@ -152,6 +155,7 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         fTableCache["a_header_paid"] = cache_header_paid;
         fTableCache["d_package"] = cache_dish_package;
         fTableCache["s_salary_shift"] = cache_salary_shift;
+        fTableCache["c_goods_classes"] = cache_goods_classes;
     }
     fVersion = 0;
     C5Database db(dbParams);

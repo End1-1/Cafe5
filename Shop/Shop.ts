@@ -28,7 +28,8 @@
         <location filename="../Classes/c5cache.cpp" line="114"/>
         <location filename="../Classes/c5cache.cpp" line="117"/>
         <location filename="../Classes/c5cache.cpp" line="120"/>
-        <location filename="../Classes/c5cache.cpp" line="260"/>
+        <location filename="../Classes/c5cache.cpp" line="123"/>
+        <location filename="../Classes/c5cache.cpp" line="264"/>
         <source>Code</source>
         <translation></translation>
     </message>
@@ -61,7 +62,8 @@
         <location filename="../Classes/c5cache.cpp" line="115"/>
         <location filename="../Classes/c5cache.cpp" line="118"/>
         <location filename="../Classes/c5cache.cpp" line="121"/>
-        <location filename="../Classes/c5cache.cpp" line="261"/>
+        <location filename="../Classes/c5cache.cpp" line="124"/>
+        <location filename="../Classes/c5cache.cpp" line="265"/>
         <source>Name</source>
         <translation></translation>
     </message>
@@ -98,12 +100,12 @@
     <message>
         <location filename="../Classes/c5cache.cpp" line="72"/>
         <source>Full name</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Classes/c5cache.cpp" line="73"/>
         <source>Gov. number</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Classes/c5cache.cpp" line="74"/>
@@ -128,7 +130,7 @@
     <message>
         <location filename="../Classes/c5cache.cpp" line="92"/>
         <source>Price</source>
-        <translation type="unfinished">Գին</translation>
+        <translation>Գին</translation>
     </message>
     <message>
         <location filename="../Classes/c5cache.cpp" line="112"/>
@@ -241,22 +243,22 @@
     <message>
         <location filename="../Editors/c5editor.ui" line="14"/>
         <source>Dialog</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Editors/c5editor.ui" line="81"/>
         <source>Save</source>
-        <translation type="unfinished">Պահպանել</translation>
+        <translation>Պահպանել</translation>
     </message>
     <message>
         <location filename="../Editors/c5editor.ui" line="88"/>
         <source>Save and new</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Editors/c5editor.ui" line="95"/>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -264,7 +266,7 @@
     <message>
         <location filename="../FrontDesk/c5filtervalues.ui" line="14"/>
         <source>Filter</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -576,6 +578,84 @@ MS Excel</source>
     </message>
 </context>
 <context>
+    <name>DlgPin</name>
+    <message>
+        <location filename="dlgpin.ui" line="14"/>
+        <source>Shop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="dlgpin.ui" line="76"/>
+        <source>CLEAR</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="dlgpin.ui" line="105"/>
+        <source>5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="dlgpin.ui" line="134"/>
+        <source>6</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="dlgpin.ui" line="163"/>
+        <source>ENTER</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="dlgpin.ui" line="192"/>
+        <source>2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="dlgpin.ui" line="221"/>
+        <source>8</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="dlgpin.ui" line="250"/>
+        <source>1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="dlgpin.ui" line="279"/>
+        <source>3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="dlgpin.ui" line="353"/>
+        <source>7</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="dlgpin.ui" line="367"/>
+        <source>Enter your username and pin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="dlgpin.ui" line="412"/>
+        <source>9</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="dlgpin.ui" line="441"/>
+        <source>X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="dlgpin.ui" line="483"/>
+        <source>4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="dlgpin.ui" line="512"/>
+        <source>0</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>NotificationWidget</name>
     <message>
         <location filename="../Classes/notificationwidget.ui" line="23"/>
@@ -684,12 +764,12 @@ MS Excel</source>
 <context>
     <name>PrintTaxN</name>
     <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="67"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="69"/>
         <source>Socket read error</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="75"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="77"/>
         <source>Data read timeout</source>
         <translation></translation>
     </message>
@@ -697,14 +777,24 @@ MS Excel</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="main.cpp" line="21"/>
+        <location filename="main.cpp" line="22"/>
         <source>Application error</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="main.cpp" line="21"/>
+        <location filename="main.cpp" line="22"/>
         <source>Please, register application.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="main.cpp" line="52"/>
+        <source>Login failed</source>
+        <translation>Մուտքը արգելված է</translation>
+    </message>
+    <message>
+        <location filename="main.cpp" line="54"/>
+        <source>User is inactive</source>
+        <translation>Օգտագործողը ապակտիվ է</translation>
     </message>
 </context>
 <context>
@@ -861,102 +951,155 @@ MS Excel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="working.ui" line="101"/>
-        <location filename="working.ui" line="106"/>
-        <location filename="working.ui" line="111"/>
-        <source>New Column</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="working.ui" line="164"/>
+        <location filename="working.ui" line="209"/>
         <source>Goods code (F2)</source>
         <translation>Ապրանքի կոդ (F2)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="140"/>
+        <location filename="working.ui" line="185"/>
         <source>Refund
 F6</source>
         <translation>Հետ վերադարձ
 (F6)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="254"/>
+        <location filename="working.ui" line="101"/>
+        <source>Code</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="working.ui" line="106"/>
+        <source>Partner</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="working.ui" line="111"/>
+        <source>Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="working.ui" line="116"/>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="working.ui" line="121"/>
+        <source>Retail</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="working.ui" line="126"/>
+        <source>Wholesale</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="working.ui" line="131"/>
+        <source>Unit</source>
+        <translation type="unfinished">Չափ․մ․</translation>
+    </message>
+    <message>
+        <location filename="working.ui" line="136"/>
+        <source>Class 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="working.ui" line="141"/>
+        <source>Class 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="working.ui" line="146"/>
+        <source>Class 3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="working.ui" line="151"/>
+        <source>TaxDept</source>
+        <translation type="unfinished">Հդմ բաժին</translation>
+    </message>
+    <message>
+        <location filename="working.ui" line="156"/>
+        <source>Adg</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="working.ui" line="299"/>
         <source>Save order
 F9</source>
         <translation>Գրանցել
 (F9)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="268"/>
-        <location filename="working.ui" line="389"/>
+        <location filename="working.ui" line="313"/>
+        <location filename="working.ui" line="434"/>
         <source>F9</source>
         <translation> Նոր պատվեր
 (F9)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="365"/>
+        <location filename="working.ui" line="410"/>
         <source>Discount (F7)</source>
         <oldsource>Discount (F3)</oldsource>
         <translation>Զեղչ (F7)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="375"/>
+        <location filename="working.ui" line="420"/>
         <source>Duplicate
 receipt (F4)</source>
         <translation>Հաշվի 
 կրկօրինակ (F4)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="227"/>
+        <location filename="working.ui" line="272"/>
         <source>Configuration
 F10</source>
         <translation>Կարգավորումներ
 (F10)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="241"/>
-        <location filename="working.ui" line="295"/>
-        <location filename="working.ui" line="328"/>
+        <location filename="working.ui" line="286"/>
+        <location filename="working.ui" line="340"/>
+        <location filename="working.ui" line="373"/>
         <source>F10</source>
         <translation> Նոր պատվեր
 (F10)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="281"/>
+        <location filename="working.ui" line="326"/>
         <source>Goods List
 F5</source>
         <translation>Ապրանքներ
 (F5)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="314"/>
+        <location filename="working.ui" line="359"/>
         <source>Exit
 Esc</source>
         <translation>Ելք
 (Esc)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="154"/>
-        <location filename="working.ui" line="355"/>
+        <location filename="working.ui" line="199"/>
+        <location filename="working.ui" line="400"/>
         <source>F11</source>
         <translation> Նոր պատվեր
 (F11)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="191"/>
+        <location filename="working.ui" line="236"/>
         <source>F12</source>
         <translation> Նոր պատվեր
 (F12)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="341"/>
+        <location filename="working.ui" line="386"/>
         <source>New order
 F11</source>
         <translation> Նոր պատվեր
 (F11)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="177"/>
+        <location filename="working.ui" line="222"/>
         <source>Save order
 F12</source>
         <translation>Գրանցել
@@ -964,7 +1107,7 @@ F12</source>
     </message>
     <message>
         <location filename="working.cpp" line="119"/>
-        <location filename="working.cpp" line="277"/>
+        <location filename="working.cpp" line="282"/>
         <source>Password</source>
         <translation>Գախտնաբառ</translation>
     </message>
@@ -976,7 +1119,7 @@ F12</source>
     <message>
         <location filename="working.cpp" line="135"/>
         <location filename="working.cpp" line="140"/>
-        <location filename="working.cpp" line="279"/>
+        <location filename="working.cpp" line="284"/>
         <source>Access denied</source>
         <translation>Մուտքը արգելված է</translation>
     </message>

@@ -40,6 +40,7 @@ SOURCES += \
     ../../XLSX/src/xlsxworkbook.cpp \
     ../../XLSX/src/xlsxwriter.cpp \
     ../Cafe5/c5license.cpp \
+    ../Classes/c5crypt.cpp \
     ../Classes/c5grid.cpp \
     ../Classes/c5gridgilter.cpp \
     ../Classes/c5printing.cpp \
@@ -55,6 +56,7 @@ SOURCES += \
     ../Editors/ce5editor.cpp \
     ../FrontDesk/c5filtervalues.cpp \
     ../FrontDesk/c5selector.cpp \
+    dlgpin.cpp \
         main.cpp \
     printreceipt.cpp \
     sales.cpp \
@@ -95,6 +97,7 @@ HEADERS += \
     ../../XLSX/src/xlsxwriter.h \
     ../../XLSX/src/zip.h \
     ../Cafe5/c5license.h \
+    ../Classes/c5crypt.h \
     ../Classes/c5grid.h \
     ../Classes/c5gridgilter.h \
     ../Classes/c5printing.h \
@@ -110,6 +113,7 @@ HEADERS += \
     ../Editors/ce5editor.h \
     ../FrontDesk/c5filtervalues.h \
     ../FrontDesk/c5selector.h \
+    dlgpin.h \
     printreceipt.h \
     sales.h \
         working.h \
@@ -140,6 +144,7 @@ FORMS += \
     ../Editors/c5editor.ui \
     ../FrontDesk/c5filtervalues.ui \
     ../FrontDesk/c5selector.ui \
+    dlgpin.ui \
     sales.ui \
         working.ui \
     worder.ui \

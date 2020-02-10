@@ -41,6 +41,16 @@ private slots:
 
     void on_btnNewGoods_clicked();
 
+    void on_btnNewPartner_clicked();
+
+    void on_btnNewGroup1_clicked();
+
+    void on_btnNewGroup2_clicked();
+
+    void on_btnNewGroup3_clicked();
+
+    void on_btnNewGroup4_clicked();
+
 private:
     Ui::CE5Goods *ui;
 

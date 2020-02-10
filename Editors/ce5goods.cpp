@@ -3,7 +3,9 @@
 #include "c5cache.h"
 #include "ce5goodsgroup.h"
 #include "ce5goodsunit.h"
+#include "ce5partner.h"
 #include "c5message.h"
+#include "ce5goodsclass.h"
 #include "c5selector.h"
 
 CE5Goods::CE5Goods(const QStringList &dbParams, QWidget *parent) :
@@ -11,10 +13,15 @@ CE5Goods::CE5Goods(const QStringList &dbParams, QWidget *parent) :
     ui(new Ui::CE5Goods)
 {
     ui->setupUi(this);
+    ui->leSupplier->setSelector(dbParams, ui->leSupplierName, cache_goods_partners);
     ui->leGroup->setSelector(dbParams, ui->leGroupName, cache_goods_group);
     ui->leUnit->setSelector(dbParams, ui->leUnitName, cache_goods_unit);
     ui->leLowLevel->setValidator(new QDoubleValidator(0, 100000, 4));
     ui->tblGoods->setColumnWidths(7, 0, 0, 300, 80, 80, 80, 80);
+    ui->leClass1->setSelector(dbParams, ui->leClassName1, cache_goods_classes);
+    ui->leClass2->setSelector(dbParams, ui->leClassName2, cache_goods_classes);
+    ui->leClass3->setSelector(dbParams, ui->leClassName3, cache_goods_classes);
+    ui->leClass4->setSelector(dbParams, ui->leClassName4, cache_goods_classes);
 }
 
 CE5Goods::~CE5Goods()
@@ -226,6 +233,61 @@ void CE5Goods::on_btnNewGoods_clicked()
         ui->tblGoods->setData(row, 2, data.at(0)["f_name"]);
         ui->tblGoods->setData(row, 4, data.at(0)["f_unitname"]);
         ui->tblGoods->lineEdit(row, 3)->setFocus();
+    }
+    delete e;
+}
+
+void CE5Goods::on_btnNewPartner_clicked()
+{
+    CE5Partner *ep = new CE5Partner(fDBParams);
+    C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
+    QList<QMap<QString, QVariant> > data;
+    if(e->getResult(data)) {
+        ui->leSupplier->setValue(data.at(0)["f_id"].toString());
+    }
+    delete e;
+}
+
+void CE5Goods::on_btnNewGroup1_clicked()
+{
+    CE5GoodsClass *ep = new CE5GoodsClass(fDBParams);
+    C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
+    QList<QMap<QString, QVariant> > data;
+    if(e->getResult(data)) {
+        ui->leClass1->setValue(data.at(0)["f_id"].toString());
+    }
+    delete e;
+}
+
+void CE5Goods::on_btnNewGroup2_clicked()
+{
+    CE5GoodsClass *ep = new CE5GoodsClass(fDBParams);
+    C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
+    QList<QMap<QString, QVariant> > data;
+    if(e->getResult(data)) {
+        ui->leClass2->setValue(data.at(0)["f_id"].toString());
+    }
+    delete e;
+}
+
+void CE5Goods::on_btnNewGroup3_clicked()
+{
+    CE5GoodsClass *ep = new CE5GoodsClass(fDBParams);
+    C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
+    QList<QMap<QString, QVariant> > data;
+    if(e->getResult(data)) {
+        ui->leClass3->setValue(data.at(0)["f_id"].toString());
+    }
+    delete e;
+}
+
+void CE5Goods::on_btnNewGroup4_clicked()
+{
+    CE5GoodsClass *ep = new CE5GoodsClass(fDBParams);
+    C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
+    QList<QMap<QString, QVariant> > data;
+    if(e->getResult(data)) {
+        ui->leClass4->setValue(data.at(0)["f_id"].toString());
     }
     delete e;
 }

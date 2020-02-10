@@ -261,6 +261,21 @@ int C5Config::frontDeskMode()
     return getValue(param_frondesk_mode).toInt();
 }
 
+bool C5Config::shopEnterPin()
+{
+    return getValue(param_shop_enterpin).toInt() == 1;
+}
+
+QString C5Config::taxCashier()
+{
+    return getValue(param_tax_cashier_login);
+}
+
+QString C5Config::taxPin()
+{
+    return getValue(param_tax_cashier_pin);
+}
+
 QString C5Config::getValue(int key)
 {
     QMutexLocker ml(&settingsMutex);

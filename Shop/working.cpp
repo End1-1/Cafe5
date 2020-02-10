@@ -3,6 +3,7 @@
 #include "worder.h"
 #include "c5database.h"
 #include "goods.h"
+#include "printtaxn.h"
 #include "sales.h"
 #include "c5config.h"
 #include "c5connection.h"
@@ -30,6 +31,7 @@ Working::Working(QWidget *parent) :
     QShortcut *sF12 = new QShortcut(QKeySequence(Qt::Key_F12), this);
     QShortcut *sDown = new QShortcut(QKeySequence(Qt::Key_Down), this);
     QShortcut *sUp = new QShortcut(QKeySequence(Qt::Key_Up), this);
+    QShortcut *sEsc = new QShortcut(QKeySequence(Qt::Key_Escape), this);
     connect(sF1, SIGNAL(activated()), this, SLOT(shortcutF1()));
     connect(sF2, SIGNAL(activated()), this, SLOT(shortcutF2()));
     connect(sF3, SIGNAL(activated()), this, SLOT(shortcutF3()));
@@ -40,6 +42,7 @@ Working::Working(QWidget *parent) :
     connect(sF12, SIGNAL(activated()), this, SLOT(on_btnSaveOrder_clicked()));
     connect(sDown, SIGNAL(activated()), this, SLOT(shortcutDown()));
     connect(sUp, SIGNAL(activated()), this, SLOT(shortcutUp()));
+    connect(sEsc, SIGNAL(activated()), this, SLOT(escape()));
     getGoodsList();
     ui->leCode->installEventFilter(this);
     ui->tab->installEventFilter(this);
@@ -48,9 +51,12 @@ Working::Working(QWidget *parent) :
     db[":f_datecash"] = QDate::currentDate();
     db[":f_hall"] = C5Config::defaultHall();
     db.exec("select count(f_id) from o_header where f_datecash=:f_datecash and f_state=:f_state and f_hall=:f_hall");
-    db.nextRow();
-    fOrderCount = db.getInt(0);
+    if (db.nextRow()) {
+        fOrderCount = db.getInt(0);
+    }
     on_btnNewOrder_clicked();
+    PrintTaxN::fTaxCashier = __c5config.taxCashier();
+    PrintTaxN::fTaxPin = __c5config.taxPin();
 }
 
 Working::~Working()
@@ -176,34 +182,71 @@ void Working::getGoodsList()
 
 void Working::makeWGoods()
 {
-    ui->tblGoods->horizontalHeader()->setDefaultSectionSize(width() / 5);
+    QList<int> cw;
+    cw << 0 << 100 << 200 << 200 << 300 << 50 << 80 << 80 << 100 << 100 << 100 << 100 << 0 << 0;
+    for (int i = 0; i < cw.count(); i++) {
+        ui->tblGoods->setColumnWidth(i, cw.at(i));
+    }
     ui->tblGoods->verticalHeader()->setDefaultSectionSize(30);
     ui->tblGoods->clearContents();
     ui->tblGoods->setRowCount(0);
-    int col = 0;
     int row = 0;
     C5Database db(C5Config::dbParams());
-    db.exec("select gs.f_code, gg.f_id, gg.f_name as f_goodsname, gu.f_name, gg.f_saleprice, "
+    db.exec("select gs.f_id, s.f_code, cp.f_taxname, gr.f_name as f_groupname, gs.f_name as f_goodsname, gu.f_name as f_unitname, "
+            "gs.f_saleprice, gs.f_saleprice2, "
+            "gca.f_name as group1, gcb.f_name group2, gcc.f_name as group3, gcd.f_name as group4, "
             "gr.f_taxdept, gr.f_adgcode "
-            "from c_goods_scancode gs "
-            "left join c_goods gg on gg.f_id=gs.f_goods "
-            "left join c_groups gr on gr.f_id=gg.f_group "
-            "left join c_units gu on gu.f_id=gg.f_unit "
-            "where gs.f_receipt=1 "
-            "order by gg.f_name ");
+            "from c_goods gs "
+            "left join c_goods_scancode s on s.f_goods=gs.f_id and s.f_receipt=1 "
+            "left join c_groups gr on gr.f_id=gs.f_group "
+            "left join c_units gu on gu.f_id=gs.f_unit "
+            "left join c_partners cp on cp.f_id=gs.f_supplier "
+            "left join c_goods_classes gca on gca.f_id=gs.f_group1 "
+            "left join c_goods_classes gcb on gcb.f_id=gs.f_group2 "
+            "left join c_goods_classes gcc on gcc.f_id=gs.f_group3 "
+            "left join c_goods_classes gcd on gcd.f_id=gs.f_group4 "
+            "where gs.f_enabled=1 "
+            "order by gr.f_name, gs.f_name ");
+    ui->tblGoods->setRowCount(db.rowCount());
     while (db.nextRow()) {
-        if (ui->tblGoods->rowCount() - 1 < row) {
-            ui->tblGoods->setRowCount(ui->tblGoods->rowCount() + 1);
+        for (int i = 0; i < db.columnCount(); i++) {
+            QTableWidgetItem *item = new QTableWidgetItem();
+            item->setData(Qt::EditRole, db.getValue(i));
+            ui->tblGoods->setItem(row, i, item);
         }
-        QTableWidgetItem *item = new QTableWidgetItem();
-        item->setText(db.getString("f_code") + ". " + db.getString("f_goodsname"));
-        item->setData(Qt::UserRole, db.getString("f_code"));
-        ui->tblGoods->setItem(row, col++, item);
-        if (col == 3) {
-            col = 0;
-            row++;
-        }
+        row++;
     }
+}
+
+void Working::addGoods(QString &code)
+{
+    if (code.isEmpty()) {
+        return;
+    }
+    ui->leCode->clear();
+    ui->leCode->setFocus();
+    WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
+    if (!w) {
+        return;
+    }
+    if (code.at(0).toLower() == "c") {
+        code.remove(0, 1);
+        w->fixCostumer(code);
+        return;
+    }
+    if (!fGoods.contains(code)) {
+        return;
+    }
+    w->addGoods(fGoods[code]);
+}
+
+void Working::escape()
+{
+    if (ui->tblGoods->isVisible()) {
+        ui->wGoods->setVisible(!ui->wGoods->isVisible());
+        ui->tab->setVisible(!ui->wGoods->isVisible());
+    }
+    ui->leCode->clear();
 }
 
 void Working::shortcutF1()
@@ -241,20 +284,46 @@ void Working::shortcutF7()
 
 void Working::shortcutDown()
 {
-    WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
-    if (!w) {
-        return;
+    if (ui->tblGoods->isVisible()) {
+        bool stop = false;
+        do {
+            if (ui->tblGoods->currentRow() == ui->tblGoods->rowCount() - 1) {
+                break;
+            }
+            ui->tblGoods->setCurrentCell(ui->tblGoods->currentRow() + 1, 0);
+            if (!ui->tblGoods->isRowHidden(ui->tblGoods->currentRow())) {
+                stop = true;
+            }
+        } while (!stop);
+    } else {
+        WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
+        if (!w) {
+            return;
+        }
+        w->nextRow();
     }
-    w->nextRow();
 }
 
 void Working::shortcutUp()
 {
-    WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
-    if (!w) {
-        return;
+    if (ui->tblGoods->isVisible()) {
+        bool stop = false;
+        do {
+            if (ui->tblGoods->currentRow() == 0) {
+                break;
+            }
+            ui->tblGoods->setCurrentCell(ui->tblGoods->currentRow() - 1, 0);
+            if (!ui->tblGoods->isRowHidden(ui->tblGoods->currentRow())) {
+                stop = true;
+            }
+        } while (!stop);
+    } else {
+        WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
+        if (!w) {
+            return;
+        }
+        w->prevRow();
     }
-    w->prevRow();
 }
 
 void Working::on_btnNewOrder_clicked()
@@ -288,25 +357,18 @@ void Working::on_btnConnection_clicked()
 
 void Working::on_leCode_returnPressed()
 {
-    QString code = ui->leCode->text();
-    if (code.isEmpty()) {
-        return;
+    if (ui->tblGoods->isVisible()) {
+        int row = ui->tblGoods->currentRow();
+        if (row > -1) {
+            QString code = ui->tblGoods->item(row, 1)->data(Qt::EditRole).toString();
+            if (!code.isEmpty()) {
+                addGoods(code);
+            }
+        }
+    } else {
+        QString code = ui->leCode->text();
+        addGoods(code);
     }
-    ui->leCode->clear();
-    ui->leCode->setFocus();
-    WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
-    if (!w) {
-        return;
-    }
-    if (code.at(0).toLower() == "c") {
-        code.remove(0, 1);
-        w->fixCostumer(code);
-        return;
-    }
-    if (!fGoods.contains(code)) {
-        return;
-    }
-    w->addGoods(fGoods[code]);
 }
 
 void Working::on_btnSaveOrder_clicked()
@@ -385,4 +447,37 @@ void Working::on_btnDuplicateReceipt_clicked()
         return;
     }
     Sales::showSales(this);
+}
+
+void Working::on_leCode_textChanged(const QString &arg1)
+{
+    if (!ui->tblGoods->isVisible()) {
+        return;
+    }
+    if (arg1 == "+") {
+        return;
+    }
+    if (arg1 == "-") {
+        return;
+    }
+    if (arg1 == "*") {
+        return;
+    }
+    bool selectRow = false;
+    for (int r = 0; r < ui->tblGoods->rowCount(); r++) {
+        for (int c = 1; c < ui->tblGoods->columnCount(); c++) {
+            QTableWidgetItem *item = ui->tblGoods->item(r, c);
+            if (item->data(Qt::EditRole).toString().contains(arg1, Qt::CaseInsensitive)) {
+                ui->tblGoods->setRowHidden(r, false);
+                if (!selectRow) {
+                    selectRow = true;
+                    ui->tblGoods->setCurrentCell(r, 0);
+                }
+                goto C;
+            }
+        }
+        ui->tblGoods->setRowHidden(r, true);
+        C:
+        continue;
+    }
 }

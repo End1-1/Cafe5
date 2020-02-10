@@ -41,6 +41,7 @@
 #define cache_header_paid 36
 #define cache_dish_package 37
 #define cache_salary_shift 38
+#define cache_goods_classes 39
 
 class C5Cache : public QObject
 {
