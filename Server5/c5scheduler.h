@@ -21,6 +21,7 @@ public slots:
 private:
     QTimer fTimer;
     bool fRun;
+    void uploadStatistic();
 };
 
 #endif // C5SCHEDULER_H

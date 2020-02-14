@@ -1,3 +1,4 @@
+
 ALTER TABLE `o_header` CHANGE COLUMN `f_id` `f_id` CHAR(36) NOT NULL ;
 ALTER TABLE `o_body` CHANGE COLUMN `f_id` `f_id` CHAR(36) NOT NULL ;
 ALTER TABLE `o_goods` CHANGE COLUMN `f_id` `f_id` CHAR(36) NOT NULL ;
@@ -249,3 +250,10 @@ update c_goods set f_enabled=1;
 
 /* DB - 12*/
 update s_app set f_version ='12' where f_app='DB';
+create table s_syncronize (f_id integer primary key auto_increment, f_db integer, f_table tinytext, f_recid char(36), f_op smallint, f_date timestamp);
+insert into s_app (f_app, f_version) values ('LOCATION', '1');
+ALTER TABLE `c_goods_scancode` DROP PRIMARY KEY;
+alter table c_goods_scancode add column f_id integer primary key auto_increment first;
+alter table s_sync_tables add column f_inout smallint;
+ALTER TABLE `o_tax_debug` CHANGE COLUMN `f_id` `f_id` CHAR(36) NOT NULL ;
+ALTER TABLE `o_tax_log` CHANGE COLUMN `f_id` `f_id` CHAR(36) NOT NULL ;

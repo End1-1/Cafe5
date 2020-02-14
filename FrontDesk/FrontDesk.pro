@@ -35,8 +35,11 @@ SOURCES += \
     ../Cafe5/c5cafecommon.cpp \
     ../Cafe5/c5double.cpp \
     ../Cafe5/c5license.cpp \
+    ../Cafe5/c5licensedlg.cpp \
     ../Classes/c5crypt.cpp \
+    ../Classes/c5filelogwriter.cpp \
     ../Classes/c5storedraftwriter.cpp \
+    ../Classes/c5threadobject.cpp \
     ../Classes/notificationwidget.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
     ../Editors/c5cashname.cpp \
@@ -168,7 +171,6 @@ SOURCES += \
     c5salefromstoreorder.cpp \
     c5datasynchronize.cpp \
     ../Editors/ce5databases.cpp \
-    c5datasyncthread.cpp \
     ../Reports/cr5hall.cpp \
     ../Editors/ce5halls.cpp \
     ../Reports/cr5tables.cpp \
@@ -206,8 +208,11 @@ HEADERS += \
     ../Cafe5/c5cafecommon.h \
     ../Cafe5/c5double.h \
     ../Cafe5/c5license.h \
+    ../Cafe5/c5licensedlg.h \
     ../Classes/c5crypt.h \
+    ../Classes/c5filelogwriter.h \
     ../Classes/c5storedraftwriter.h \
+    ../Classes/c5threadobject.h \
     ../Classes/notificationwidget.h \
     ../Classes/proxytablewidgetdatabase.h \
     ../Editors/c5cashname.h \
@@ -340,7 +345,6 @@ HEADERS += \
     c5salefromstoreorder.h \
     c5datasynchronize.h \
     ../Editors/ce5databases.h \
-    c5datasyncthread.h \
     ../Reports/cr5hall.h \
     ../Editors/ce5halls.h \
     ../Reports/cr5tables.h \
@@ -378,6 +382,7 @@ HEADERS += \
     ../../XLSX/src/zip.h
 
 FORMS += \
+    ../Cafe5/c5licensedlg.ui \
     ../Classes/notificationwidget.ui \
     ../Editors/c5cashname.ui \
     ../Editors/ce5dishpackage.ui \

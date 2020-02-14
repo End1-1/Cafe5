@@ -388,9 +388,6 @@ void C5MainWindow::on_actionLogin_triggered()
             addTreeL3Item(it, cp_t7_customers, tr("Customers"), ":/customers.png");
             addTreeL3Item(it, cp_t7_discount_system, tr("Discount system"), ":/discount.png");
             addTreeL3Item(it, cp_t7_store_reason, tr("Store reason"), ":/documents.png");
-            if (db.getInt(6) > 0) {
-                addTreeL3Item(it, cp_t7_upload_data_to_other_server, tr("Data synchronization"), ":/data-transfer.png");
-            }
         }
 
         if (pr(db.getString(3), cp_t1_preference)) {
@@ -666,12 +663,6 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
     case cp_t7_discount_system:
         createTab<CR5DiscountSystem>(dbParams);
         break;
-    case cp_t7_upload_data_to_other_server: {
-        C5DataSynchronize *ds = new C5DataSynchronize(dbParams);
-        ds->exec();
-        delete ds;
-        break;
-    }
     case cp_t7_halls:
         createTab<CR5Hall>(dbParams);
         break;

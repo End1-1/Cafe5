@@ -31,6 +31,7 @@ private:
     WidgetContainer *wc;
     c5scheduler *scheduler;
     void processJson(QByteArray &d);
+    bool checkDbPassword();
 
 private slots:
     void appTerminate();
@@ -38,8 +39,8 @@ private slots:
     void on_btnApply_clicked();
     void clientSocketDataRead(const QString &uuid, QByteArray &d);
     void on_btnReportsToUpload_clicked();
-
     void on_btnDatabase_clicked();
+    void on_btnDatabaseSync_clicked();
 
 signals:
     void sendData(const QString &);

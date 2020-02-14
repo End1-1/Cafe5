@@ -310,6 +310,16 @@
    <header location="global">c5dateedit.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>deStart</tabstop>
+  <tabstop>deEnd</tabstop>
+  <tabstop>leSupplier</tabstop>
+  <tabstop>leGroup</tabstop>
+  <tabstop>leClass1</tabstop>
+  <tabstop>leClass2</tabstop>
+  <tabstop>leClass3</tabstop>
+  <tabstop>leClass4</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

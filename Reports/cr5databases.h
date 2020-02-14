@@ -14,6 +14,8 @@ public:
 
 private slots:
     void actionAccess();
+
+    void actionSync();
 };
 
 #endif // CR5DATABASES_H

@@ -1266,7 +1266,8 @@ void C5StoreDoc::saveDoc()
     QString err;
     C5Database db(fDBParams);
     db.startTransaction();
-    if (saveDraft(db, DOC_STATE_SAVED, err, true)) {
+    bool saved = saveDraft(db, DOC_STATE_SAVED, err, true);
+    if (saved) {
         db.commit();
     } else {
         db.rollback();
@@ -1274,6 +1275,9 @@ void C5StoreDoc::saveDoc()
     bool v = C5Config::getRegValue("showhidegoods").toBool();
     if (v) {
         setGoodsPanelHidden(v);
+    }
+    if (saved) {
+        C5Message::info(tr("Saved"));
     }
 }
 
@@ -1759,7 +1763,6 @@ void C5StoreDoc::on_btnCreateDoc_clicked()
         delete doc;
     }
     saveDoc();
-    C5Message::info(tr("Saved"));
 }
 
 void C5StoreDoc::on_leComplectationName_textChanged(const QString &arg1)

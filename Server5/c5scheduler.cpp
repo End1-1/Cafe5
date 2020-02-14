@@ -1,6 +1,7 @@
 #include "c5scheduler.h"
 #include "server5settings.h"
 #include "c5database.h"
+#include "c5databasesync.h"
 #include <QDebug>
 #include <QJsonDocument>
 #include <QJsonArray>
@@ -20,6 +21,8 @@ c5scheduler::c5scheduler(QObject *parent) : QObject(parent)
 #endif
     fTimer.start();
     fRun = false;
+    C5DatabaseSync *db = new C5DatabaseSync(this);
+    db->start();
 }
 
 void c5scheduler::timeout()
@@ -28,6 +31,24 @@ void c5scheduler::timeout()
         return;
     }
     fRun = true;
+    if (__s.value("url").toString().isEmpty()) {
+        uploadStatistic();
+    }
+}
+
+void c5scheduler::replyFinished(QNetworkReply *r)
+{
+    if (r->error() == QNetworkReply::NoError) {
+        qDebug() << r->readAll();
+    } else {
+        qDebug() << r->errorString();
+    }
+    r->deleteLater();
+    fRun = false;
+}
+
+void c5scheduler::uploadStatistic()
+{
     QJsonParseError err;
     QJsonDocument jdoc = QJsonDocument::fromJson(__s.value("queries").toString().toUtf8(), &err);
     if (err.error != err.NoError) {
@@ -70,15 +91,4 @@ void c5scheduler::timeout()
     params.addQueryItem("reqpass", __s.value("urlsecret").toString());
     connect(manager, SIGNAL(finished(QNetworkReply *)), this, SLOT(replyFinished(QNetworkReply*)));
     manager->post(request, params.query().toUtf8());
-}
-
-void c5scheduler::replyFinished(QNetworkReply *r)
-{
-    if (r->error() == QNetworkReply::NoError) {
-        qDebug() << r->readAll();
-    } else {
-        qDebug() << r->errorString();
-    }
-    r->deleteLater();
-    fRun = false;
 }

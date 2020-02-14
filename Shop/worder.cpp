@@ -100,6 +100,7 @@ bool WOrder::writeOrder(bool tax)
         int result = 0;
         result = pt.makeJsonAndPrint(ui->leCard->getDouble(), 0, jsonIn, jsonOut, err);
 
+        db[":f_id"] = db.uuid();
         db[":f_order"] = id;
         db[":f_date"] = QDate::currentDate();
         db[":f_time"] = QTime::currentTime();

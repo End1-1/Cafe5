@@ -97,6 +97,13 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="btnDatabaseSync">
+        <property name="text">
+         <string>Synchronize</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="btnApply">
         <property name="text">
          <string>Apply</string>

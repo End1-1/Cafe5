@@ -13,17 +13,17 @@ C5License::C5License()
 
 bool C5License::isOK()
 {
-    qDebug() << QSysInfo::machineUniqueId();
-    C5Crypt c;
-    QString key = "theKey";
-    QByteArray in = "sceleton";
-    QByteArray out;
-    c.cryptData(key.toUtf8(), in, out);
-    qDebug() << key << in << out;
-    c.decryptData(key.toUtf8(), out, in);
-    qDebug() << key << in << out;
-    if (QDate::currentDate() > QDate::fromString("11.02.2020", "dd.MM.yyyy")) {
-        return false;
-    }
+//    qDebug() << QSysInfo::machineUniqueId();
+//    C5Crypt c;
+//    QString key = "theKey";
+//    QByteArray in = "sceleton";
+//    QByteArray out;
+//    c.cryptData(key.toUtf8(), in, out);
+//    qDebug() << key << in << out;
+//    c.decryptData(key.toUtf8(), out, in);
+//    qDebug() << key << in << out;
+//    if (QDate::currentDate() > QDate::fromString("11.03.2020", "dd.MM.yyyy")) {
+//        return false;
+//    }
     return true;    
 }

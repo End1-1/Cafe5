@@ -70,6 +70,22 @@ void C5Server5::processJson(QByteArray &d)
     }
 }
 
+bool C5Server5::checkDbPassword()
+{
+    if (!__s.value("dbpassword").toString().isEmpty()) {
+        bool ok = false;
+        QString pwd = QInputDialog::getText(this, tr("Database password"), tr("Password"), QLineEdit::Password, "", &ok);
+        if (!ok) {
+            return false;
+        }
+        if (pwd != __s.value("dbpassword").toString()) {
+            QMessageBox::critical(this, tr("Error"), tr("Invalid database password"));
+            return false;
+        }
+    }
+    return true;
+}
+
 void C5Server5::appTerminate()
 {
     if (QMessageBox::warning(this, tr("Confirmation"), tr("Are you sure to close application?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
@@ -118,18 +134,15 @@ void C5Server5::on_btnReportsToUpload_clicked()
 
 void C5Server5::on_btnDatabase_clicked()
 {
-    if (!__s.value("dbpassword").toString().isEmpty()) {
-        bool ok = false;
-        QString pwd = QInputDialog::getText(this, tr("Database password"), tr("Password"), QLineEdit::Password, "", &ok);
-        if (!ok) {
-            return;
-        }
-        if (pwd != __s.value("dbpassword").toString()) {
-            QMessageBox::critical(this, tr("Error"), tr("Invalid database password"));
-            return;
-        }
+    if (!checkDbPassword()) {
+        return;
     }
     DbConnection *d = new DbConnection(this);
     d->exec();
     delete d;
+}
+
+void C5Server5::on_btnDatabaseSync_clicked()
+{
+
 }

@@ -860,6 +860,7 @@ int C5WaiterServer::printTax(const QJsonObject &h, const QJsonArray &ja, C5Datab
     QString jsonIn, jsonOut, err;
     int result = 0;
     result = pt.makeJsonAndPrint(h["f_amountcard"].toString().toDouble(), 0, jsonIn, jsonOut, err);
+    db[":f_id"] = db.uuid();
     db[":f_order"] = h["f_id"].toString().toInt();
     db[":f_date"] = QDate::currentDate();
     db[":f_time"] = QTime::currentTime();
