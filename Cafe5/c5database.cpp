@@ -1,7 +1,6 @@
 #include "C5Database.h"
 #include <QMutexLocker>
 #include <QSqlQuery>
-#include <QMessageBox>
 #include <QSqlError>
 #include <QSqlRecord>
 #include <QDir>
@@ -10,6 +9,10 @@
 #include <QDate>
 #include <QDebug>
 #include <QSqlField>
+
+#ifndef _NOAPP_
+#include <QMessageBox>
+#endif
 
 int C5Database::fCounter = 0;
 QStringList C5Database::fDbParamsForUuid;
@@ -134,7 +137,10 @@ void C5Database::close(bool commit)
 bool C5Database::exec(const QString &sqlQuery)
 {
     if (!open()) {
+#ifdef _NOAPP_
+#else
         QMessageBox::critical(0, "DB error", fLastError);
+#endif
         return false;
     }
     return exec(sqlQuery, fDbRows, fNameColumnMap);

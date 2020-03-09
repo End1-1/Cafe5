@@ -57,6 +57,7 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
     });
     fFocusNextChild = false;
     fCanChangeFocus = true;
+    ui->tblAdd->setColumnWidths(ui->tblAdd->columnCount(), 0, 300, 80);
 }
 
 C5StoreDoc::~C5StoreDoc()
@@ -144,6 +145,18 @@ bool C5StoreDoc::openDoc(QString id)
             C5Message::error(tr("Error in complectation document"));
             return false;
         }
+    }    
+    db[":f_header"] = id;
+    db.exec("select f_name, f_amount from a_complectation_additions where f_header=:f_header order by f_row");
+    while (db.nextRow()) {
+        int row = ui->tblAdd->rowCount();
+        ui->tblAdd->setRowCount(row + 1);
+        C5LineEdit *l = ui->tblAdd->createLineEdit(row, 1);
+        l->setText(db.getString(0));
+        l = ui->tblAdd->createLineEdit(row, 2);
+        connect(l, SIGNAL(textEdited(QString)), this, SLOT(tblAddChanged(QString)));
+        l->setValidator(new QDoubleValidator());
+        l->setDouble(db.getDouble(1));
     }
     setDocEnabled(fDocState == DOC_STATE_DRAFT);
     countTotal();
@@ -247,6 +260,9 @@ void C5StoreDoc::setMode(C5StoreDoc::STORE_DOC sd)
         ui->leReason->setValue(DOC_REASON_COMPLECTATION);
     default:
         break;
+    }
+    if (sd != DOC_TYPE_COMPLECTATION) {
+        ui->tw->removeTab(1);
     }
     setGoodsPanelHidden(C5Config::getRegValue("showhidegoods").toBool());
 }
@@ -525,6 +541,9 @@ void C5StoreDoc::countTotal()
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
         total += ui->tblGoods->lineEdit(i, 6)->getDouble();
     }
+    for (int i = 0; i < ui->tblAdd->rowCount(); i++) {
+        total += ui->tblAdd->lineEdit(i, 2)->getDouble();
+    }
     ui->leTotal->setDouble(total);
 }
 
@@ -786,6 +805,17 @@ bool C5StoreDoc::saveDraft(C5Database &db, int state, QString &err)
         }
     }
 
+    db[":f_header"] = fInternalId;
+    db.exec("delete from a_complectation_additions");
+    for (int i = 0; i < ui->tblAdd->rowCount(); i++) {
+        db[":f_id"] = db.uuid();
+        db[":f_header"] = fInternalId;
+        db[":f_name"] = ui->tblAdd->lineEdit(i, 1)->text();
+        db[":f_amount"] = ui->tblAdd->lineEdit(i, 2)->getDouble();
+        db[":f_row"] = i + 1;
+        db.insert("a_complectation_additions", false);
+    }
+
     fDocState = state;
     setDocEnabled(fDocState == DOC_STATE_DRAFT);
     countTotal();
@@ -1011,6 +1041,14 @@ void C5StoreDoc::setDocEnabled(bool v)
     for (int r = 0; r < ui->tblGoods->rowCount(); r++) {
         for (int c = 0; c < ui->tblGoods->columnCount(); c++) {
             C5LineEdit *l = dynamic_cast<C5LineEdit*>(ui->tblGoods->cellWidget(r, c));
+            if (l) {
+                l->setEnabled(v);
+            }
+        }
+    }
+    for (int r = 0; r < ui->tblAdd->rowCount(); r++) {
+        for (int c = 1; c < ui->tblAdd->columnCount(); c++) {
+            C5LineEdit *l = dynamic_cast<C5LineEdit*>(ui->tblAdd->cellWidget(r, c));
             if (l) {
                 l->setEnabled(v);
             }
@@ -1598,6 +1636,12 @@ void C5StoreDoc::tblTotalChanged(const QString &arg1)
     countTotal();
 }
 
+void C5StoreDoc::tblAddChanged(const QString &arg1)
+{
+    Q_UNUSED(arg1);
+    //countTotal();
+}
+
 void C5StoreDoc::on_btnAddGoods_clicked()
 {
     switch (fDocType) {
@@ -1701,14 +1745,13 @@ void C5StoreDoc::on_btnNewGoods_clicked()
 void C5StoreDoc::on_leScancode_returnPressed()
 {
     C5Database db(C5Config::dbParams());
-    db[":f_code"] = ui->leScancode->text();
-    db.exec("select gs.f_code, gg.f_id, gg.f_name, gu.f_name as f_unitname, gg.f_saleprice, "
+    db[":f_scancode"] = ui->leScancode->text();
+    db.exec("select gg.f_scancode, gg.f_id, gg.f_name, gu.f_name as f_unitname, gg.f_saleprice, "
             "gr.f_taxdept, gr.f_adgcode "
-            "from c_goods_scancode gs "
-            "left join c_goods gg on gg.f_id=gs.f_goods "
+            "from c_goods gg  "
             "left join c_groups gr on gr.f_id=gg.f_group "
             "left join c_units gu on gu.f_id=gg.f_unit "
-            "where gs.f_code=:f_code");
+            "where gg.f_scancode=:f_scancode");
     ui->leScancode->clear();
     if (db.nextRow()) {
         int row = addGoodsRow();
@@ -1810,4 +1853,28 @@ void C5StoreDoc::on_chPaid_clicked(bool checked)
     ui->leCash->setEnabled(checked);
     ui->leCashName->setEnabled(checked);
     ui->deCashDate->setEnabled(checked);
+}
+
+void C5StoreDoc::on_btnAddAdd_clicked()
+{
+    int row = ui->tblAdd->rowCount();
+    ui->tblAdd->setRowCount(row + 1);
+    C5LineEdit *l = ui->tblAdd->createLineEdit(row, 1);
+    l->setFocus();
+    l = ui->tblAdd->createLineEdit(row, 2);
+    l->setValidator(new QDoubleValidator());
+    connect(l, SIGNAL(textEdited(QString)), this, SLOT(tblAddChanged(QString)));
+}
+
+void C5StoreDoc::on_btnRemoveAdd_clicked()
+{
+    int row = ui->tblAdd->currentRow();
+    if (row < 0) {
+        return;
+    }
+    if (C5Message::question(tr("Confirm to remove") + "<br>" + ui->tblAdd->lineEdit(row, 2)->text()) != QDialog::Accepted) {
+        return;
+    }
+    ui->tblAdd->removeRow(row);
+    countTotal();
 }

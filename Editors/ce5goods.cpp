@@ -7,6 +7,7 @@
 #include "c5message.h"
 #include "ce5goodsclass.h"
 #include "c5selector.h"
+#include <QClipboard>
 
 CE5Goods::CE5Goods(const QStringList &dbParams, QWidget *parent) :
     CE5Editor(dbParams, parent),
@@ -43,13 +44,7 @@ void CE5Goods::setId(int id)
 {
     CE5Editor::setId(id);
     C5Database db(fDBParams);
-    db[":f_goods"] = id;
-    db.exec("select f_code from c_goods_scancode where f_goods=:f_goods");
-    while (db.nextRow()) {
-        QListWidgetItem *item = new QListWidgetItem(ui->lstCodes);
-        item->setText(db.getString(0));
-        ui->lstCodes->addItem(item);
-    }
+    /* Complectation */
     db[":f_base"] = id;
     db.exec("select c.f_id, c.f_goods, g.f_name as f_goodsname, c.f_qty, u.f_name as f_unitname, "
             "c.f_price, c.f_qty*c.f_price as f_total "
@@ -75,22 +70,7 @@ bool CE5Goods::save(QString &err, QList<QMap<QString, QVariant> > &data)
         return false;
     }
     C5Database db(fDBParams);
-    db[":f_goods"] = ui->leCode->text();
-    db.exec("delete from c_goods_scancode where f_goods=:f_goods");
-    for (int i = 0; i < ui->lstCodes->count(); i++) {
-        db[":f_code"] = ui->lstCodes->item(i)->text();
-        db.exec("delete from c_goods_scancode where f_code=:f_code");
-        db[":f_code"] = ui->lstCodes->item(i)->text();
-        db[":f_goods"] = ui->leCode->getInteger();
-        db.insert("c_goods_scancode", false);
-    }
-    if (ui->lstCodes->count() > 0) {
-        db[":f_goods"] = ui->leCode->getInteger();
-        db.exec("update c_goods_scancode set f_receipt=0 where f_goods=:f_goods");
-        db[":f_goods"] = ui->leCode->getInteger();
-        db[":f_code"] = ui->lstCodes->item(0)->text();
-        db.exec("update c_goods_scancode set f_receipt=1 where f_code=:f_code and f_goods=:f_goods");
-    }
+    /* Complectation */
     db[":f_base"] = ui->leCode->text();
     db.exec("delete from c_goods_complectation where f_base=:f_base");
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
@@ -105,43 +85,10 @@ bool CE5Goods::save(QString &err, QList<QMap<QString, QVariant> > &data)
 
 void CE5Goods::clear()
 {
-    CE5Editor::clear();
-    ui->lstCodes->clear();
+    CE5Editor::clear();;
     ui->tblGoods->clearContents();
     ui->tblGoods->setRowCount(0);
     ui->leLowLevel->setText("0");
-}
-
-void CE5Goods::on_leAddScanCode_returnPressed()
-{
-    if (ui->leAddScanCode->isEmpty()) {
-        return;
-    }
-    C5Database db(fDBParams);
-    db[":f_code"] = ui->leAddScanCode->text();
-    db.exec("select gg.f_name, gg.f_id from c_goods_scancode gs left join c_goods gg on gs.f_goods=gg.f_id where gs.f_code=:f_code");
-    if (db.nextRow()) {
-        if (ui->leCode->getInteger() != db.getInt(1)) {
-            if (C5Message::question(tr("Scancode already registered with other goods. Append to current goods?") + "<br>" + db.getString(0)) != QDialog::Accepted) {
-                ui->leAddScanCode->clear();
-                ui->leAddScanCode->setFocus();
-                return;
-            }
-        }
-    }
-    QListWidgetItem *item = new QListWidgetItem(ui->lstCodes);
-    item->setText(ui->leAddScanCode->text());
-    ui->lstCodes->addItem(item);
-    ui->leAddScanCode->clear();
-    ui->leAddScanCode->setFocus();
-}
-
-void CE5Goods::on_btnRemoveScaneCode_clicked()
-{
-    if (ui->lstCodes->currentRow() < 0) {
-        return;
-    }
-    delete ui->lstCodes->currentItem();
 }
 
 void CE5Goods::on_btnNewGroup_clicked()
@@ -290,4 +237,39 @@ void CE5Goods::on_btnNewGroup4_clicked()
         ui->leClass4->setValue(data.at(0)["f_id"].toString());
     }
     delete e;
+}
+
+void CE5Goods::on_btnCopy_clicked()
+{
+    QString clipbrd;
+    for (int r = 0; r < ui->tblGoods->rowCount(); r++) {
+        clipbrd += ui->tblGoods->getString(r, 1) + "\t";
+        clipbrd += ui->tblGoods->getString(r, 2) + "\t";
+        clipbrd += ui->tblGoods->lineEdit(r, 3)->text() + "\t";
+        clipbrd += ui->tblGoods->getString(r, 4) + "\t";
+        clipbrd += ui->tblGoods->lineEdit(r, 5)->text() + "\t";
+        clipbrd += ui->tblGoods->lineEdit(r, 6)->text() + "\t";
+        clipbrd += "\r\n";
+    }
+    if (!clipbrd.isEmpty()) {
+        qApp->clipboard()->setText(clipbrd);
+    }
+}
+
+void CE5Goods::on_btnPaste_clicked()
+{
+    QStringList rows = qApp->clipboard()->text().split("\r\n");
+    foreach (const QString &s, rows) {
+        QStringList cols = s.split("\t");
+        if (cols.count() < 6) {
+            continue;
+        }
+        int row = addGoodsRow();
+        ui->tblGoods->setData(row, 1, cols.at(0));
+        ui->tblGoods->setData(row, 2, cols.at(1));
+        ui->tblGoods->lineEdit(row, 3)->setText(cols.at(2));
+        ui->tblGoods->setData(row, 4, cols.at(3));
+        ui->tblGoods->lineEdit(row, 5)->setText(cols.at(4));
+        ui->tblGoods->lineEdit(row, 6)->setText(cols.at(5));
+    }
 }

@@ -16,6 +16,8 @@ private slots:
     void actionAccess();
 
     void actionSync();
+
+    void actionService();
 };
 
 #endif // CR5DATABASES_H

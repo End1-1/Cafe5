@@ -101,6 +101,11 @@
     </message>
     <message>
         <location filename="c5server5.ui" line="102"/>
+        <source>Synchronize</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c5server5.ui" line="109"/>
         <source>Apply</source>
         <translation>Լավ</translation>
     </message>
@@ -125,32 +130,32 @@
         <translation>Նոր պատրվեր</translation>
     </message>
     <message>
-        <location filename="c5server5.cpp" line="75"/>
+        <location filename="c5server5.cpp" line="91"/>
         <source>Confirmation</source>
         <translation>Հարց</translation>
     </message>
     <message>
-        <location filename="c5server5.cpp" line="75"/>
+        <location filename="c5server5.cpp" line="91"/>
         <source>Are you sure to close application?</source>
         <translation>Դուրս գալ՞ ծրագրից</translation>
     </message>
     <message>
-        <location filename="c5server5.cpp" line="123"/>
+        <location filename="c5server5.cpp" line="77"/>
         <source>Database password</source>
         <translation>Տվյալների պահոցի գախտնավար</translation>
     </message>
     <message>
-        <location filename="c5server5.cpp" line="123"/>
+        <location filename="c5server5.cpp" line="77"/>
         <source>Password</source>
         <translation>Գախտնաբար</translation>
     </message>
     <message>
-        <location filename="c5server5.cpp" line="128"/>
+        <location filename="c5server5.cpp" line="82"/>
         <source>Error</source>
         <translation>Սխալ</translation>
     </message>
     <message>
-        <location filename="c5server5.cpp" line="128"/>
+        <location filename="c5server5.cpp" line="82"/>
         <source>Invalid database password</source>
         <translation>Տվյալների պահոցի գախտնավարը սխալ է</translation>
     </message>

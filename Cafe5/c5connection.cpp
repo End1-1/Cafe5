@@ -156,6 +156,7 @@ void C5Connection::on_btnInit_clicked()
 
 void C5Connection::on_btnRefreshSettings_clicked()
 {
+    ui->cbSettings->clear();
     C5Database db(ui->leHost->text(), ui->leDatabase->text(), ui->leUsername->text(), ui->lePassword->text());
     if (db.open()) {
         db.exec("select f_id, f_name, f_description from s_settings_names");

@@ -85,10 +85,10 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     fTags[ui->chAlwaysOfferTax->getTag()] = ui->chAlwaysOfferTax->isChecked() ? "1" : "0";
     fTags[ui->leFDFontSize->getTag()] = ui->leFDFontSize->text();
     fTags[ui->chCarMode->getTag()] = ui->chCarMode->isChecked() ? "1" : "0";
-    fTags[ui->leCashId->getTag()] = ui->leCashId->text();
     fTags[ui->cbFronDeskMode->getTag()] = ui->cbFronDeskMode->currentData().toString();
     fTags[ui->chEnterShopPin->getTag()] = ui->chEnterShopPin->isChecked() ? "1" : "0";
     fTags[ui->chAutoCash->getTag()] = ui->chAutoCash->isChecked() ? "1" : "0";
+    fTags[ui->leCashId->getTag()] = ui->leCashId->text();
     fTags[ui->leCardId->getTag()] = ui->leCardId->text();
     fTags[ui->leCashIdPrefix->getTag()] = ui->leCashIdPrefix->text();
     fTags[ui->leCardIdPrefix->getTag()] = ui->leCardIdPrefix->text();
@@ -124,8 +124,7 @@ void C5SettingsWidget::clearWidgetValue(QWidget *w)
 
 void C5SettingsWidget::setWidgetValue(QWidget *w, const QString &value)
 {
-    if (!strcmp(w->metaObject()->className(), "C5LineEdit") ||
-            !strcmp(w->metaObject()->className(), "C5LineEditWithSelector")) {
+    if (!strcmp(w->metaObject()->className(), "C5LineEdit") || !strcmp(w->metaObject()->className(), "C5LineEditWithSelector")) {
         static_cast<C5LineEdit*>(w)->setText(value);
     } else if (!strcmp(w->metaObject()->className(), "C5ComboBox")) {
         static_cast<C5ComboBox*>(w)->setIndexForValue(value);

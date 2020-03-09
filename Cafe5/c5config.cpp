@@ -251,9 +251,29 @@ bool C5Config::carMode()
     return val;
 }
 
+bool C5Config::autoCashInput()
+{
+    return getValue(param_autoinput_salecash).toInt() == 1;
+}
+
 int C5Config::cashId()
 {
     return getValue(param_cash_id).toInt();
+}
+
+int C5Config::nocashId()
+{
+    return getValue(param_nocash_id).toInt();
+}
+
+QString C5Config::cashPrefix()
+{
+    return getValue(param_autocash_prefix);
+}
+
+QString C5Config::nocashPrefix()
+{
+    return getValue(param_autonocash_prefix);
 }
 
 int C5Config::frontDeskMode()

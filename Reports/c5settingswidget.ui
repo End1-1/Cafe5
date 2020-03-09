@@ -366,7 +366,7 @@
        <item row="10" column="2">
         <widget class="C5LineEdit" name="leCardIdPrefix">
          <property name="Tag" stdset="0">
-          <number>38</number>
+          <number>37</number>
          </property>
         </widget>
        </item>
@@ -408,7 +408,7 @@
        <item row="7" column="2">
         <widget class="C5LineEdit" name="leCashIdPrefix">
          <property name="Tag" stdset="0">
-          <number>37</number>
+          <number>36</number>
          </property>
         </widget>
        </item>

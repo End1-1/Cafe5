@@ -33,6 +33,7 @@ CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
                    << "gcb.f_name as gname2"
                    << "gcc.f_name as gname3"
                    << "gcd.f_name as gname4"
+                   << "gg.f_scancode"
                       ;
 
     fColumnsVisible["gg.f_id"] = true;
@@ -48,6 +49,7 @@ CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
     fColumnsVisible["gcb.f_name as gname2"] = true;
     fColumnsVisible["gcc.f_name as gname3"] = true;
     fColumnsVisible["gcd.f_name as gname4"] = true;
+    fColumnsVisible["gg.f_scancode"] = true;
 
     fTranslation["f_id"] = tr("Code");
     fTranslation["f_taxname"] = tr("Supplier");
@@ -62,7 +64,9 @@ CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
     fTranslation["gname2"] = tr("Class 2");
     fTranslation["gname3"] = tr("Class 3");
     fTranslation["gname4"] = tr("Class 4");
+    fTranslation["f_scancode"] = tr("Scancode");
 
+    restoreColumnsVisibility();
     fEditor = new CE5Goods(dbParams);
     fFilterWidget = new CR5GoodsFilter(dbParams);
 }

@@ -257,3 +257,27 @@ alter table c_goods_scancode add column f_id integer primary key auto_increment 
 alter table s_sync_tables add column f_inout smallint;
 ALTER TABLE `o_tax_debug` CHANGE COLUMN `f_id` `f_id` CHAR(36) NOT NULL ;
 ALTER TABLE `o_tax_log` CHANGE COLUMN `f_id` `f_id` CHAR(36) NOT NULL ;
+alter table s_db add column f_syncin integer default 0, add column f_syncout integer default 0;
+drop table s_sync_tables;
+create table s_syncronize_in (f_id integer primary key auto_increment, f_table tinytext);
+insert into s_syncronize_in (f_table) values ('o_tax_log');
+insert into s_syncronize_in (f_table) values ('o_tax');
+insert into s_syncronize_in (f_table) values ('o_tax_debug');
+insert into s_syncronize_in (f_table) values ('o_header');
+insert into s_syncronize_in (f_table) values ('o_goods');
+insert into s_syncronize_in (f_table) values ('a_store_draft');
+insert into s_syncronize_in (f_table) values ('a_store');
+insert into s_syncronize_in (f_table) values ('a_header');
+CREATE TABLE `o_body_state` (  `f_id` int(11) NOT NULL,  `f_name` varchar(128) DEFAULT NULL,  PRIMARY KEY (`f_id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+INSERT INTO `o_body_state` (`f_id`, `f_name`) VALUES ('1', 'Նորմալ');
+INSERT INTO `o_body_state` (`f_id`, `f_name`) VALUES ('2', 'Սխալ');
+INSERT INTO `o_body_state` (`f_id`, `f_name`) VALUES ('3', 'Չեղակված');
+
+
+/* DB - 13*/
+update s_app set f_version ='13' where f_app='DB';
+drop table s_deleted;
+create table a_complectation_additions (f_id char(36) primary key, f_header char(36), f_name tinytext, f_amount decimal(14,2), f_row integer);
+alter table s_db add f_synctime timestamp;
+alter table e_cash add column f_autoinput smallint default 0;
+alter table e_cash add column f_oheader char(36);

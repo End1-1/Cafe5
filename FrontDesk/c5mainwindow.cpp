@@ -312,8 +312,10 @@ void C5MainWindow::on_actionLogin_triggered()
             addTreeL3Item(it, cp_t2_count_output_of_sale, tr("Consumption of goods based on sales"), ":/goods.png");
             addTreeL3Item(it, cp_t3_consuption_reason, tr("Reason for consuption"), ":/goods.png");
             addTreeL3Item(it, cp_t3_sales_common, tr("Sales, expert mode"), ":/graph.png");
-            addTreeL3Item(it, cp_t3_sale_dishes, tr("Sales, dishes"), ":/graph.png");
-            addTreeL3Item(it, cp_t3_sale_removed_dishes, tr("Sales, removed dishes"), ":/delete.png");
+            if (__c5config.frontDeskMode() == FRONTDESK_WAITER) {
+                addTreeL3Item(it, cp_t3_sale_dishes, tr("Sales, dishes"), ":/graph.png");
+                addTreeL3Item(it, cp_t3_sale_removed_dishes, tr("Sales, removed dishes"), ":/delete.png");
+            }
             addTreeL3Item(it, cp_t3_store_sale, tr("Sales from store"), ":/graph.png");
             addTreeL3Item(it, cp_t3_debts_to_partners, tr("Debts to partners"), ":/contract.png");
             addTreeL3Item(it, cp_t3_discount_statistics, tr("Discount statistics"), ":/discount.png");

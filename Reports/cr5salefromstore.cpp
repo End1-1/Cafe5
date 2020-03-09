@@ -37,6 +37,7 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
                    << "cp.f_taxname"
                    << "g.f_name as f_groupname"
                    << "gg.f_name as f_goodsname"
+                   << "gg.f_scancode"
                    << "gr.f_name as f_goodsgroup"
                    << "gu.f_name as f_goodsunit"
                    << "og.f_tax"
@@ -54,6 +55,7 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
                    << "s.f_name as f_storename"
                    << "g.f_name as f_groupname"
                    << "gg.f_name as f_goodsname"
+                   << "gg.f_scancode"
                    << "gr.f_name as f_groodsgroup"
                    << "gu.f_name as f_goodsunit"
                    << "og.f_tax"
@@ -73,6 +75,7 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
     fTranslation["f_datecash"] = tr("Date, cash");
     fTranslation["f_storename"] = tr("Store");
     fTranslation["f_goodsname"] = tr("Goods");
+    fTranslation["f_scancode"] = tr("Scancode");
     fTranslation["f_goodsgroup"] = tr("Group");
     fTranslation["f_goodsunit"] = tr("Unit");
     fTranslation["f_tax"] = tr("TAX");
@@ -90,9 +93,9 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
     fColumnsVisible["oh.f_datecash"] = true;
     fColumnsVisible["cp.f_taxname"] = true;
     fColumnsVisible["g.f_name as f_groupname"] = true;
-    fColumnsVisible["g.f_name as f_groupname"] = true;
     fColumnsVisible["s.f_name as f_storename"] = true;
     fColumnsVisible["gg.f_name as f_goodsname"] = true;
+    fColumnsVisible["gg.f_scancode"] = false;
     fColumnsVisible["gr.f_name as f_goodsgroup"] = true;
     fColumnsVisible["gu.f_name as f_goodsunit"] = true;
     fColumnsVisible["og.f_tax"] = true;

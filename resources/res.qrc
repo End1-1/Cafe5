@@ -67,5 +67,7 @@
         <file>package.png</file>
         <file>employee.png</file>
         <file>rotation.png</file>
+        <file>paste.png</file>
+        <file>service.png</file>
     </qresource>
 </RCC>

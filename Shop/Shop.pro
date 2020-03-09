@@ -54,6 +54,7 @@ SOURCES += \
     ../Controls/c5lineeditwithselector.cpp \
     ../Editors/c5editor.cpp \
     ../Editors/ce5editor.cpp \
+    ../FrontDesk/c5document.cpp \
     ../FrontDesk/c5filtervalues.cpp \
     ../FrontDesk/c5selector.cpp \
     dlgpin.cpp \
@@ -111,6 +112,7 @@ HEADERS += \
     ../Controls/c5lineeditwithselector.h \
     ../Editors/c5editor.h \
     ../Editors/ce5editor.h \
+    ../FrontDesk/c5document.h \
     ../FrontDesk/c5filtervalues.h \
     ../FrontDesk/c5selector.h \
     dlgpin.h \
@@ -142,6 +144,10 @@ FORMS += \
     ../Classes/c5printpreview.ui \
     ../Classes/notificationwidget.ui \
     ../Editors/c5editor.ui \
+    ../Editors/ce5goods.ui \
+    ../Editors/ce5goodsgroup.ui \
+    ../Editors/ce5goodsunit.ui \
+    ../Editors/ce5partner.ui \
     ../FrontDesk/c5filtervalues.ui \
     ../FrontDesk/c5selector.ui \
     dlgpin.ui \

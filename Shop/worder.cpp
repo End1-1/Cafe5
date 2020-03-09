@@ -12,6 +12,7 @@
 #include "c5utils.h"
 #include "c5storedraftwriter.h"
 #include <QInputDialog>
+#include <QJsonObject>
 
 WOrder::WOrder(QWidget *parent) :
     QWidget(parent),
@@ -27,6 +28,9 @@ WOrder::WOrder(QWidget *parent) :
     fCostumerId = 0;
     ui->lbDisc->setVisible(false);
     ui->leDisc->setVisible(false);
+    ui->leCard->setValidator(new QDoubleValidator(0, 1000000000,2 ));
+    ui->leCash->setValidator(new QDoubleValidator(0, 1000000000,2 ));
+    ui->leChange->setValidator(new QDoubleValidator(0, 1000000000,2 ));
 }
 
 WOrder::~WOrder()
@@ -64,7 +68,12 @@ bool WOrder::writeOrder(bool tax)
     if (fModeRefund) {
         tax = false;
     }
-
+    if (!tax) {
+        if (ui->leCard->text().toDouble() > 0.001) {
+            C5Message::error(tr("You cannot use this option with card payment mode."));
+            return false;
+        }
+    }
     if (ui->tblGoods->rowCount() == 0) {
         return false;
     }
@@ -159,7 +168,7 @@ bool WOrder::writeOrder(bool tax)
     db[":f_datecash"] = QDate::currentDate();
     db[":f_timeopen"] = fTimeOpen;
     db[":f_timeclose"] = QTime::currentTime();
-    db[":f_staff"] = 1;
+    db[":f_staff"] = __userid;
     db[":f_comment"] = "";
     db[":f_print"] = 1;
     db[":f_amountTotal"] = ui->leTotal->getDouble() * sign;
@@ -174,10 +183,11 @@ bool WOrder::writeOrder(bool tax)
     db[":f_discountFactor"] = 0;
     db[":f_creditCardId"] = 0;
     db[":f_otherId"] = 0;
+    db[":f_source"] = 2;
     if (db.insert("o_header", false) == 0) {
-        C5Message::error(db.fLastError);
         db.rollback();
         db.close();
+        C5Message::error(db.fLastError);
         return false;
     }
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
@@ -196,6 +206,29 @@ bool WOrder::writeOrder(bool tax)
             db.rollback();
             db.close();
             return false;
+        }
+    }
+
+    if (__c5config.autoCashInput()) {
+        QString err;
+        if (__c5config.cashId() == 0) {
+            err += tr("Cashdesk for cash not defined");
+        }
+        if (__c5config.nocashId() == 0) {
+            err += tr("Cashdesk for card not defined");
+        }
+        if (!err.isEmpty()) {
+            db.rollback();
+            db.close();
+            C5Message::error(err);
+            return false;
+        }
+        double cash = ui->leTotal->getDouble() - ui->leCard->getDouble();
+        if (cash > 0.001) {
+            createCashDoc(db, __c5config.cashId(), __c5config.cashPrefix(), cash, id, pref + hallid);
+        }
+        if (ui->leCard->getDouble() > 0.001) {
+            createCashDoc(db, __c5config.nocashId(), __c5config.nocashPrefix(), ui->leCard->getDouble(), id, pref + hallid);
         }
     }
 
@@ -221,6 +254,93 @@ bool WOrder::writeOrder(bool tax)
 
     fCostumerId = 0;
     db.commit();
+    return true;
+}
+
+bool WOrder::createCashDoc(C5Database &db, int cashid, const QString &prefix, double newAmount, const QString &cashdocid, const QString &ordernum)
+{
+    if (fModeRefund) {
+        newAmount *= -1;
+    }
+
+    db[":f_id"] = DOC_TYPE_CASH;
+    if (!db.exec("select f_counter + 1 from a_type where f_id=:f_id for update")) {
+        C5Message::error(db.fLastError);
+        return false;
+    }
+    if (!db.nextRow()) {
+        db[":f_id"] = DOC_TYPE_CASH;
+        db[":f_counter"] = 1;
+        db[":f_name"] = tr("Cash doc");
+        if (!db.insert("f_counter", false)) {
+            C5Message::error(db.fLastError);
+            return false;
+        }
+        db.commit();
+        db[":f_id"] = DOC_TYPE_CASH;
+        if (!db.exec("select f_counter from a_type where f_id=:f_id for update")) {
+            C5Message::error(db.fLastError);
+            return false;
+        }
+        db.nextRow();
+    }
+    int counter = db.getInt(0);
+    db[":f_id"] = DOC_TYPE_CASH;
+    db[":f_counter"] = counter;
+    if (!db.exec("update a_type set f_counter=:f_counter where f_id=:f_id and f_counter<:f_counter")) {
+        C5Message::error(db.fLastError);
+        return false;
+    }
+
+    QJsonObject jo;
+    jo["cashin"] = cashid;
+    jo["cashout"] = 0;
+    jo["storedoc"] = "";
+    jo["relation"] = "1";
+    QJsonDocument jd;
+    jd.setObject(jo);
+    QString fUuid = C5Database::uuid();
+    db[":f_id"] = fUuid;
+    db[":f_operator"] = __userid;
+    db[":f_state"] = DOC_STATE_SAVED;
+    db[":f_type"] = DOC_TYPE_CASH;
+    db[":f_createdate"] = QDate::currentDate();
+    db[":f_createtime"] = QTime::currentTime();
+    if (!db.insert("a_header", false)) {
+        C5Message::error(db.fLastError);
+        return false;
+    }
+
+    db[":f_partner"] = 0;
+    db[":f_userid"] = counter;
+    db[":f_date"] = QDate::currentDate();
+    db[":f_amount"] = newAmount;
+    db[":f_comment"] = prefix + " " + QDate::currentDate().toString("dd.MM.yyyy") + "/" + ordernum;
+    db[":f_raw"] = jd.toJson();
+    if (!db.update("a_header", where_id(fUuid))) {
+        C5Message::error(db.fLastError);
+        return false;
+    }
+
+    db[":f_header"] = fUuid;
+    db[":f_sign"] = 1;
+    db[":f_cash"] = cashid;
+    db[":f_remarks"] = prefix + " " + QDate::currentDate().toString("dd.MM.yyyy") + "/" + ordernum;
+    db[":f_amount"] = newAmount;
+    db[":f_autoinput"] = 1;
+    db[":f_oheader"] = cashdocid;
+    if (!db.insert("e_cash", false)) {
+        C5Message::error(db.fLastError);
+        return false;
+    }
+
+    db[":f_cashdoc"] = fUuid;
+    db[":f_id"] = cashdocid;
+    if (!db.exec("update o_header set f_cashdoc=:f_cashdoc where f_id=:f_id")) {
+        C5Message::error(db.fLastError);
+        return false;
+    }
+
     return true;
 }
 
@@ -254,7 +374,7 @@ void WOrder::changeQty()
     if (row < 0) {
         return;
     }
-    double qty = DQty::getQty(this);
+    double qty = DQty::getQty(tr("Quantity"), this);
     if (qty < 0.001) {
         return;
     }
@@ -269,7 +389,7 @@ void WOrder::changePrice()
     if (row < 0) {
         return;
     }
-    double qty = DQty::getQty(this);
+    double qty = DQty::getQty(tr("Price"), this);
     if (qty < 0.001) {
         return;
     }
@@ -285,6 +405,9 @@ void WOrder::removeRow()
         return;
     }
     ui->tblGoods->removeRow(row);
+    ui->leCard->clear();
+    ui->leCash->clear();
+    ui->leChange->clear();
     countTotal();
 }
 

@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Delivery</string>
+    <string name="Login">Login</string>
+    <string name="Password">Password</string>
+    <string name="LoginStatus">Login...</string>
+    <string name="PreOrder">Preorder</string>
+    <string name="Order">Order</string>
+    <string name="ServerAddress">Server address</string>
+    <string name="ServerPort">Server port</string>
+    <string name="LoginStatusFailed">Login failed</string>
+</resources>

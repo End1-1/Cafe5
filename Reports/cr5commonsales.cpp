@@ -3,6 +3,7 @@
 #include "c5tablemodel.h"
 #include "c5waiterorder.h"
 #include "c5mainwindow.h"
+#include "c5salefromstoreorder.h"
 #include "c5waiterorderdoc.h"
 
 CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
@@ -148,8 +149,22 @@ void CR5CommonSales::openOrder(int row, int column, const QList<QVariant> &value
     if (values.count() == 0) {
         return;
     }
-    C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>(fDBParams);
-    wo->setOrder(values.at(fModel->fColumnNameIndex["f_id"]).toString());
+    C5Database db(fDBParams);
+    db[":f_id"] = values.at(fModel->fColumnNameIndex["f_id"]).toString();
+    db.exec("select f_source from o_header where f_id=:f_id");
+    if (db.nextRow()) {
+        switch (abs(db.getInt(0))) {
+        case 1: {
+            C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>(fDBParams);
+            wo->setOrder(values.at(fModel->fColumnNameIndex["f_id"]).toString());
+            break;
+        }
+        case 2: {
+            C5SaleFromStoreOrder::openOrder(fDBParams, values.at(fModel->fColumnNameIndex["f_id"]).toString());
+            break;
+        }
+        }
+    }
 }
 
 void CR5CommonSales::transferToRoom()

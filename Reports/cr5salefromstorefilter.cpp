@@ -41,6 +41,12 @@ QString CR5SaleFromStoreFilter::condition()
     if (!ui->leClass4->isEmpty()) {
         w += " and gg.f_group4 in (" + ui->leClass4->text() + ") ";
     }
+    if (ui->rbFiscal->isChecked()) {
+        w += " and og.f_tax>0 ";
+    }
+    if (ui->rbFiscalNone->isChecked()) {
+        w += " and og.f_tax=0 ";
+    }
     return w;
 }
 

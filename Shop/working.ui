@@ -75,6 +75,12 @@
         <property name="focusPolicy">
          <enum>Qt::NoFocus</enum>
         </property>
+        <property name="styleSheet">
+         <string notr="true">QTableWidget::item:selected{
+background-color: #005e37;
+color:white;font-size:13pt;
+};</string>
+        </property>
         <property name="verticalScrollBarPolicy">
          <enum>Qt::ScrollBarAlwaysOff</enum>
         </property>

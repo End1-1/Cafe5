@@ -39,6 +39,9 @@
        <height>16777215</height>
       </size>
      </property>
+     <property name="FilterName" stdset="0">
+      <string>class1</string>
+     </property>
     </widget>
    </item>
    <item row="0" column="2">
@@ -75,6 +78,9 @@
        <width>100</width>
        <height>16777215</height>
       </size>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>class2</string>
      </property>
     </widget>
    </item>
@@ -113,6 +119,9 @@
        <height>16777215</height>
       </size>
      </property>
+     <property name="FiilterName" stdset="0">
+      <string>supplier</string>
+     </property>
     </widget>
    </item>
    <item row="1" column="1">
@@ -123,6 +132,9 @@
        <height>16777215</height>
       </size>
      </property>
+     <property name="FilterName" stdset="0">
+      <string>group</string>
+     </property>
     </widget>
    </item>
    <item row="4" column="1">
@@ -132,6 +144,9 @@
        <width>100</width>
        <height>16777215</height>
       </size>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>class3</string>
      </property>
     </widget>
    </item>
@@ -186,6 +201,9 @@
        <width>100</width>
        <height>16777215</height>
       </size>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>class4</string>
      </property>
     </widget>
    </item>

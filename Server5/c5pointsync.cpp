@@ -173,8 +173,10 @@ void C5PointSync::doSync()
         maxId = maxId > id ? maxId : id;
     }
     dm[":f_syncin"] = maxId;
+    dm[":f_synctime"] = QDateTime::currentDateTime();
     dm[":f_id"] = fDbParams.at(0);
     dm.exec("update s_db set f_syncin=:f_syncin where f_id=:f_id");
+    c5logd(QString("Synchronization finished. Last ID: %1").arg(maxId), logfile);
 }
 
 void C5PointSync::timeout()

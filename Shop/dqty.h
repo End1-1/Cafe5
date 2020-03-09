@@ -14,7 +14,7 @@ class DQty : public QDialog
 public:
     explicit DQty(QWidget *parent = 0);
     ~DQty();
-    static double getQty(QWidget *parent = 0);
+    static double getQty(const QString &title, QWidget *parent = 0);
 
 private slots:
     void on_leQty_returnPressed();

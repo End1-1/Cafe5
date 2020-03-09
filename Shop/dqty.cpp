@@ -15,9 +15,10 @@ DQty::~DQty()
     delete ui;
 }
 
-double DQty::getQty(QWidget *parent)
+double DQty::getQty(const QString &title, QWidget *parent)
 {
     DQty *d = new DQty(parent);
+    d->ui->lbTitle->setText(title);
     double result = 0;
     if (d->exec() == QDialog::Accepted)
         result = d->ui->leQty->text().toDouble();

@@ -23,7 +23,9 @@ private slots:
 
 private:
     Ui::DlgCreditCardList *ui;
+
     int fId;
+
     QString fName;
 };
 

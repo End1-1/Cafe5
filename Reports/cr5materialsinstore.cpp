@@ -61,6 +61,7 @@ void CR5MaterialsInStore::prepareDrafts()
                    << "ss.f_name as f_storage"
                    << "gg.f_name as f_group"
                    << "g.f_name as f_goods"
+                   << "g.f_scancode"
                    << "sum(s.f_qty*s.f_type) as f_qty"
                    << "u.f_name as f_unit"
                    << "g.f_lastinputprice"
@@ -91,6 +92,7 @@ void CR5MaterialsInStore::prepareDrafts()
     fTranslation["f_storage"] = tr("Storage");
     fTranslation["f_group"] = tr("Group");
     fTranslation["f_goods"] = tr("Goods");
+    fTranslation["f_scancode"] = tr("Scancode");
     fTranslation["f_qty"] = tr("Qty");
     fTranslation["f_unit"] = tr("Unit");
     fTranslation["f_lastinputprice"] = tr("Price");
@@ -103,6 +105,7 @@ void CR5MaterialsInStore::prepareDrafts()
     fColumnsVisible["ss.f_name as f_storage"] = true;
     fColumnsVisible["gg.f_name as f_group"] = true;
     fColumnsVisible["g.f_name as f_goods"] = true;
+    fColumnsVisible["g.f_scancode"] = true;
     fColumnsVisible["sum(s.f_qty*s.f_type) as f_qty"] = true;
     fColumnsVisible["u.f_name as f_unit"] = true;
     fColumnsVisible["g.f_lastinputprice"] = true;
@@ -135,6 +138,7 @@ void CR5MaterialsInStore::prepareNoDrafts()
                    << "ss.f_name as f_storage"
                    << "gg.f_name as f_group"
                    << "g.f_name as f_goods"
+                   << "g.f_scancode"
                    << "sum(s.f_qty*s.f_type) as f_qty"
                    << "u.f_name as f_unit"
                    << "s.f_price"
@@ -165,6 +169,7 @@ void CR5MaterialsInStore::prepareNoDrafts()
     fTranslation["f_storage"] = tr("Storage");
     fTranslation["f_group"] = tr("Group");
     fTranslation["f_goods"] = tr("Goods");
+    fTranslation["f_scancode"] = tr("Scancode");
     fTranslation["f_qty"] = tr("Qty");
     fTranslation["f_unit"] = tr("Unit");
     fTranslation["f_price"] = tr("Price");
@@ -177,6 +182,7 @@ void CR5MaterialsInStore::prepareNoDrafts()
     fColumnsVisible["ss.f_name as f_storage"] = true;
     fColumnsVisible["gg.f_name as f_group"] = true;
     fColumnsVisible["g.f_name as f_goods"] = true;
+    fColumnsVisible["g.f_scancode"] = true;
     fColumnsVisible["sum(s.f_qty*s.f_type) as f_qty"] = true;
     fColumnsVisible["u.f_name as f_unit"] = true;
     fColumnsVisible["s.f_price"] = true;

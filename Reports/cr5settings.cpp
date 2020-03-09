@@ -14,6 +14,7 @@ CR5Settings::CR5Settings(const QStringList &dbParams, QWidget *parent) :
     fTableView->setItemDelegateForColumn(1, new C5TextDelegate(fTableView));
     fTableView->setItemDelegateForColumn(2, new C5TextDelegate(fTableView));
     fEditor = new C5SettingsWidget(dbParams);
+    fSettingsWidget = nullptr;
 }
 
 QToolBar *CR5Settings::toolBar()
@@ -39,11 +40,13 @@ void CR5Settings::removeSettings()
             return;
         }
         C5Database db(fDBParams);
-        db[":f_settigns"] = id;
+        db[":f_settings"] = id;
         db.exec("delete from s_settings_values where f_settings=:f_settings");
         db[":f_id"] = id;
         db.exec("delete from s_settings_names where f_id=:f_id");
         fModel->removeRow(row);
-        fSettingsWidget->clear(0);
+        if (fSettingsWidget) {
+            fSettingsWidget->clear(0);
+        }
     }
 }

@@ -141,6 +141,8 @@ private slots:
 
     void tblTotalChanged(const QString &arg1);
 
+    void tblAddChanged(const QString &arg1);
+
     void on_btnAddGoods_clicked();
 
     void on_btnRemoveGoods_clicked();
@@ -168,6 +170,10 @@ private slots:
     void on_leComplectationQty_textChanged(const QString &arg1);
 
     void on_chPaid_clicked(bool checked);
+
+    void on_btnAddAdd_clicked();
+
+    void on_btnRemoveAdd_clicked();
 };
 
 #endif // C5STOREDOC_H

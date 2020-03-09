@@ -21,6 +21,13 @@
        <pointsize>14</pointsize>
       </font>
      </property>
+     <property name="styleSheet">
+      <string notr="true">QTableWidget::item:selected{
+ background-color: #005e37;
+color:white;
+font-size:13pt;
+};</string>
+     </property>
      <property name="editTriggers">
       <set>QAbstractItemView::NoEditTriggers</set>
      </property>

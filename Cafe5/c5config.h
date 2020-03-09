@@ -149,9 +149,15 @@ public:
 
     static bool carMode();
 
+    static bool autoCashInput();
+
     static int cashId();
 
     static int nocashId();
+
+    static QString cashPrefix();
+
+    static QString nocashPrefix();
 
     static int frontDeskMode();
 

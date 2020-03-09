@@ -2,6 +2,7 @@
 #define WORDER_H
 
 #include "goods.h"
+#include "c5database.h"
 #include <QWidget>
 #include <QDate>
 #include <QTime>
@@ -28,6 +29,8 @@ public:
     void addGoods(const Goods &g);
 
     bool writeOrder(bool tax = true);
+
+    bool createCashDoc(C5Database &db, int cashid, const QString &prefix, double newAmount, const QString &cashdocid, const QString &ordernum);
 
     void fixCostumer(const QString &code);
 

@@ -153,12 +153,12 @@ void Working::getGoodsList()
 {
     fGoods.clear();
     C5Database db(C5Config::dbParams());
-    db.exec("select gs.f_code, gg.f_id, gg.f_name, gu.f_name, gg.f_saleprice, "
+    db.exec("select gg.f_scancode, gg.f_id, gg.f_name, gu.f_name, gg.f_saleprice, "
             "gr.f_taxdept, gr.f_adgcode "
-            "from c_goods_scancode gs "
-            "left join c_goods gg on gg.f_id=gs.f_goods "
+            "from c_goods gg "
             "left join c_groups gr on gr.f_id=gg.f_group "
-            "left join c_units gu on gu.f_id=gg.f_unit ");
+            "left join c_units gu on gu.f_id=gg.f_unit "
+            "where f_enabled=1");
     while (db.nextRow()) {
         Goods g;
         g.fScanCode = db.getString(0);
@@ -169,21 +169,17 @@ void Working::getGoodsList()
         g.fTaxDept = db.getInt(5);
         g.fAdgCode = db.getString(6);
         fGoods[g.fScanCode] = g;
-    }
-    db.exec("select f_code, f_goods from c_goods_scancode where f_receipt=1");
-    while (db.nextRow()) {
-        fGoodsCodeForPrint[db.getInt("f_goods")] = db.getString("f_code");
+        fGoodsCodeForPrint[g.fCode.toInt()] = g.fScanCode;
     }
     ui->wGoods->setVisible(__s.value("goodslist", false).toBool());
-    if (__s.value("goodslist", false).toBool()) {
-        makeWGoods();
-    }
+    makeWGoods();
 }
 
 void Working::makeWGoods()
 {
     QList<int> cw;
-    cw << 0 << 100 << 200 << 200 << 300 << 50 << 80 << 80 << 100 << 100 << 100 << 100 << 0 << 0;
+    //cw << 0 << 100 << 200 << 200 << 300 << 80 << 80 << 80 << 100 << 100 << 100 << 100 << 0 << 0;
+    cw << 0 << 150 << 0 << 200 << 400 << 80 << 0 << 0 << 200 << 0 << 0 << 0 << 0 << 0;
     for (int i = 0; i < cw.count(); i++) {
         ui->tblGoods->setColumnWidth(i, cw.at(i));
     }
@@ -192,12 +188,11 @@ void Working::makeWGoods()
     ui->tblGoods->setRowCount(0);
     int row = 0;
     C5Database db(C5Config::dbParams());
-    db.exec("select gs.f_id, s.f_code, cp.f_taxname, gr.f_name as f_groupname, gs.f_name as f_goodsname, gu.f_name as f_unitname, "
-            "gs.f_saleprice, gs.f_saleprice2, "
+    db.exec("select gs.f_id, gs.f_scancode, cp.f_taxname, gr.f_name as f_groupname, gs.f_name as f_goodsname,  "
+            "gs.f_saleprice, gs.f_saleprice2, gu.f_name as f_unitname, "
             "gca.f_name as group1, gcb.f_name group2, gcc.f_name as group3, gcd.f_name as group4, "
             "gr.f_taxdept, gr.f_adgcode "
             "from c_goods gs "
-            "left join c_goods_scancode s on s.f_goods=gs.f_id and s.f_receipt=1 "
             "left join c_groups gr on gr.f_id=gs.f_group "
             "left join c_units gu on gu.f_id=gs.f_unit "
             "left join c_partners cp on cp.f_id=gs.f_supplier "
@@ -206,7 +201,7 @@ void Working::makeWGoods()
             "left join c_goods_classes gcc on gcc.f_id=gs.f_group3 "
             "left join c_goods_classes gcd on gcd.f_id=gs.f_group4 "
             "where gs.f_enabled=1 "
-            "order by gr.f_name, gs.f_name ");
+            "order by gr.f_name, gca.f_name ");
     ui->tblGoods->setRowCount(db.rowCount());
     while (db.nextRow()) {
         for (int i = 0; i < db.columnCount(); i++) {
@@ -229,10 +224,12 @@ void Working::addGoods(QString &code)
     if (!w) {
         return;
     }
-    if (code.at(0).toLower() == "c") {
-        code.remove(0, 1);
-        w->fixCostumer(code);
-        return;
+    if (code.at(0).toLower() == "?" ) {
+        if (code.at(1).toLower() == "c") {
+            code.remove(0, 2);
+            w->fixCostumer(code);
+            return;
+        }
     }
     if (!fGoods.contains(code)) {
         return;
@@ -414,9 +411,6 @@ void Working::on_btnShowGoodsList_clicked()
     ui->wGoods->setVisible(!ui->wGoods->isVisible());
     ui->tab->setVisible(!ui->wGoods->isVisible());
     __s.setValue("goodslist", false);
-    if (ui->wGoods->isVisible()) {
-        makeWGoods();
-    }
 }
 
 void Working::on_tblGoods_itemClicked(QTableWidgetItem *item)

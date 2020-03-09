@@ -8,6 +8,7 @@ CR5CommonSalesFilter::CR5CommonSalesFilter(const QStringList &dbParams, QWidget 
 {
     ui->setupUi(this);
     ui->leState->setSelector(dbParams, ui->leStateName, cache_order_state);
+    ui->leHall->setSelector(dbParams, ui->leHallName, cache_halls);
 }
 
 CR5CommonSalesFilter::~CR5CommonSalesFilter()
@@ -20,6 +21,9 @@ QString CR5CommonSalesFilter::condition()
     QString result = " oh.f_datecash between " + ui->deStart->toMySQLDate() + " and " + ui->deEnd->toMySQLDate() + " ";
     if (!ui->leState->isEmpty()) {
         result += " and oh.f_state in (" + ui->leState->text() + ") ";
+    }
+    if (!ui->leHall->isEmpty()) {
+        result += " and oh.f_hall in (" + ui->leHall->text() + ") ";
     }
     return result;
 }

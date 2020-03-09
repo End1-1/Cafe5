@@ -27,10 +27,6 @@ public:
     virtual void clear();
 
 private slots:
-    void on_leAddScanCode_returnPressed();
-
-    void on_btnRemoveScaneCode_clicked();
-
     void on_btnNewGroup_clicked();
 
     void on_btnNewUnit_clicked();
@@ -50,6 +46,10 @@ private slots:
     void on_btnNewGroup3_clicked();
 
     void on_btnNewGroup4_clicked();
+
+    void on_btnCopy_clicked();
+
+    void on_btnPaste_clicked();
 
 private:
     Ui::CE5Goods *ui;

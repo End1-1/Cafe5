@@ -18,23 +18,13 @@ public:
 
     static void openOrder(const QStringList &dbParams, const QString &id);
 
-    virtual void closeEvent(QCloseEvent *e);
+private slots:
+    void on_btnRemove_clicked();
 
 private:
     Ui::C5SaleFromStoreOrder *ui;
 
-    QStringList fDeleteRows;
-
     void loadOrder(const QString &id);
-
-    void countTotal();
-
-    void saveChanges();
-
-private slots:
-    void tblContextMenu(const QPoint &point);
-
-    void actionDelete(bool v);
 };
 
 #endif // C5SALEFROMSTOREORDER_H
