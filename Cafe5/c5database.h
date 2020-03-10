@@ -60,6 +60,8 @@ public:
 
     static QString uuid(const QStringList &dbParams = QStringList());
 
+    QByteArray uuid_bin(const QStringList &dp = QStringList());
+
     QMap<QString, QVariant> fBindValues;
 
     QList<QList<QVariant> > fDbRows;

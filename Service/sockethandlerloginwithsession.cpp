@@ -1,24 +1,39 @@
-#include "sockethandlerlogin.h"
+#include "sockethandlerloginwithsession.h"
 #include "c5database.h"
 #include "config.h"
 #include "servicecommands.h"
 #include <QJsonDocument>
 #include <QJsonObject>
 
-SocketHandlerLogin::SocketHandlerLogin(QByteArray &data) :
+SocketHandlerLoginWithSession::SocketHandlerLoginWithSession(QByteArray &data) :
     SocketHandler(data)
 {
 
 }
 
-void SocketHandlerLogin::processData()
+void SocketHandlerLoginWithSession::processData()
 {
     QJsonDocument jdoc = QJsonDocument::fromJson(fData);
     QJsonObject jo = jdoc.object();
+    QByteArray session =  QByteArray::fromBase64(jo["session"].toString().toUtf8());
     C5Database db(DBHOST, DBFILE, DBUSER, DBPASSWORD);
-    db[":f_login"] = jo["username"].toString();
-    db[":f_password"] = jo["password"].toString();
-    db.exec("select f_id, f_group, f_first, f_last from s_user where f_login=:f_login and f_password=md5(:f_password)");
+    db[":f_session"] = session;
+    db.exec("select f_id, f_user from s_login_session where f_session=:f_session");
+    int userid = 0;
+    if (db.nextRow()) {
+        int recid = db.getInt("f_id");
+        userid = db.getInt("f_user");
+        db[":f_iplogout"] = fPeerAddress;
+        db[":f_dateend"] = QDate::currentDate();
+        db[":f_timeend"] = QTime::currentTime();
+        db.update("s_login_session", where_id(recid));
+    } else {
+        fResponseCode = dr_login_failed;
+        return;
+    }
+
+    db[":f_id"] = userid;
+    db.exec("select f_id, f_group, f_first, f_last from s_user where f_id=:f_id");
     if (db.nextRow()) {
         fData.clear();
         jo = QJsonObject();

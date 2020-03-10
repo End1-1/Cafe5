@@ -12,6 +12,7 @@ SOURCES += \
         main.cpp \
         sockethandler.cpp \
         sockethandlerlogin.cpp \
+        sockethandlerloginwithsession.cpp \
         sockethandlerserviceconfig.cpp \
         sockethandlerservicelogin.cpp \
         sockethandlerunknown.cpp \
@@ -29,6 +30,7 @@ HEADERS += \
     servicecommands.h \
     sockethandler.h \
     sockethandlerlogin.h \
+    sockethandlerloginwithsession.h \
     sockethandlerserviceconfig.h \
     sockethandlerservicelogin.h \
     sockethandlerunknown.h \

@@ -5,6 +5,7 @@
 #include "sockethandlerunknown.h"
 #include "sockethandlerservicelogin.h"
 #include "sockethandlerserviceconfig.h"
+#include "sockethandlerloginwithsession.h"
 #include "servicecommands.h"
 
 SocketRW::SocketRW(SslSocket *socket)
@@ -48,10 +49,14 @@ void SocketRW::go()
                 case dt_service_config:
                     sh = SocketHandler::create<SocketHandlerServiceConfig>(data);
                     break;
+                case dt_login_with_session:
+                    sh = SocketHandler::create<SocketHandlerLoginWithSession>(data);
+                    break;
                 default:
                     sh = SocketHandler::create<SocketHandlerUnknown>(data);
                     break;
                 }
+                sh->setSocket(fSocket);
                 sh->processData();
                 LogWriter::write(10, 1, fSocket->fUuid, QObject::tr("Response: ") + data);
                 datasize = data.size();

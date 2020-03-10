@@ -1,6 +1,7 @@
 package com.e.delivery.Utils;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.e.delivery.Activities.DeliveryApp;
 import com.e.delivery.R;
@@ -118,6 +119,7 @@ public class DataSender extends AsyncTask<Integer, Integer, Integer> {
             mReply = new JSONObject(mBuffer);
         } catch (JSONException e) {
             e.printStackTrace();
+            Log.d("BUFFER", mBuffer);
         }
         return mResponse;
     }

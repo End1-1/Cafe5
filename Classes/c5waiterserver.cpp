@@ -335,7 +335,7 @@ void C5WaiterServer::reply(QJsonObject &o)
         } else {
 
         }
-        if (fIn["handlevisit"].toInt() == 1) {
+        if (fIn["handlevisit"].toInt() == 1) {            
             o["handlevisit"] = 1;
             o["code"] = fIn["code"].toString();
         }

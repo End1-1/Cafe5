@@ -484,10 +484,17 @@ void DlgOrder::setCar(int num)
         o["govnumber"] = govnumber;
         sh->send(o);
     } else {
-        QJsonObject obj;
-        obj["saved"] = 1;
-        obj["govnumber"] = govnumber;
-        saveAndDiscount(obj);
+//        QJsonObject obj;
+//        obj["saved"] = 1;
+//        obj["govnumber"] = govnumber;
+//        saveAndDiscount(obj);
+        C5SocketHandler *sh = createSocketHandler(SLOT(saveAndDiscount(QJsonObject)));
+        sh->bind("cmd", sm_saveorder);
+        QJsonObject o;
+        o["header"] = fOrder->fHeader;
+        o["body"] = fOrder->fItems;
+        o["govnumber"] = govnumber;
+        sh->send(o);
     }
 }
 
@@ -542,7 +549,7 @@ void DlgOrder::handleVisit(const QJsonObject &obj)
     ui->lbVisit->setVisible(true);
     ui->lbVisit->setEnabled(true);
     ui->lbVisit->setText(QString("[%1 / %2]").arg(obj["current"].toInt()).arg(obj["visit"].toInt()));
-    if (obj["current"].toInt() == 0 && fOrder->hDouble("f_discountfactor") < 0.001) {
+    if (obj["visit"].toInt() > 0 && obj["current"].toInt() == 0 && fOrder->hDouble("f_discountfactor") < 0.001) {
         C5SocketHandler *sh = createSocketHandler(SLOT(handleDiscount(QJsonObject)));
         sh->bind("cmd", sm_discount);
         sh->bind("order", fOrder->hString("f_id"));
@@ -601,8 +608,8 @@ void DlgOrder::saveAndQuit(const QJsonObject &obj)
 
 void DlgOrder::saveAndDiscount(const QJsonObject &obj)
 {
+    sender()->deleteLater();
     if (!obj.contains("saved")) {
-        sender()->deleteLater();
         fOrder->fHeader = obj["header"].toObject();
         fOrder->fItems = obj["body"].toArray();
     }

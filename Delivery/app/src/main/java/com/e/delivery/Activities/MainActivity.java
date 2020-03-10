@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.e.delivery.R;
+import com.e.delivery.Utils.Config;
 import com.e.delivery.Utils.DataSender;
 import com.e.delivery.Utils.DataSenderCommands;
 import com.e.delivery.Utils.Json;
@@ -18,6 +19,24 @@ public class MainActivity extends ParentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setButtonsClickListener((ViewGroup) findViewById(R.id.idParent));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (findViewById(R.id.clConfig).getVisibility() == View.VISIBLE) {
+            String session = Config.getString(this, "session_id");
+            if (!session.isEmpty()) {
+                findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
+                findViewById(R.id.tvLoginStatus).setVisibility(View.VISIBLE);
+                findViewById(R.id.btnEnter).setEnabled(false);
+                setTextViewText(R.id.tvLoginStatus, getString(R.string.LoginStatus));
+                Json j = new Json();
+                j.putString("session", session);
+                DataSender ds = new DataSender(j.toString(), DataSenderCommands.qLoginWithSession, dsLogin);
+                ds.execute();
+            }
+        }
     }
 
     @Override
@@ -54,7 +73,9 @@ public class MainActivity extends ParentActivity {
         public void finish(int result, Json data) {
             if (result == DataSenderCommands.rOk) {
                 ViewAnimator.animateHeight(findViewById(R.id.clConfig), -1, 0, hideLogin);
+                Config.setString(MainActivity.this,"session_id", data.getString("session"));
             } else {
+                Config.setString(MainActivity.this,"session_id", "");
                 findViewById(R.id.progressBar).setVisibility(View.GONE);
                 findViewById(R.id.btnEnter).setEnabled(true);
                 String msg = String.format("%s\n%s", getString(R.string.LoginStatusFailed), data.getString("msg"));

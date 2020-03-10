@@ -2,11 +2,15 @@
 #define SOCKETHANDLER_H
 
 #include <QByteArray>
+#include <QString>
+
+class SslSocket;
 
 class SocketHandler
 {
 public:
     explicit SocketHandler(QByteArray &data);
+    void setSocket(SslSocket *socket);
     virtual void processData() = 0;
     virtual bool closeConnection();
     qint32 fResponseCode;
@@ -19,6 +23,8 @@ public:
 
 protected:
     QByteArray &fData;
+    QString fPeerAddress;
+    SslSocket *fSslSocket;
 };
 
 #endif // SOCKETHANDLER_H

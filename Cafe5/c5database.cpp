@@ -256,6 +256,15 @@ QString C5Database::uuid(const QStringList &dbParams)
     return "";
 }
 
+QByteArray C5Database::uuid_bin(const QStringList &dp)
+{
+    exec("select unhex(replace(uuid(),'-',''))") ;
+    if (nextRow()) {
+        return getValue(0).toByteArray();
+    }
+    return QByteArray();
+}
+
 int C5Database::rowCount()
 {
     return fDbRows.count();

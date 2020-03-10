@@ -103,7 +103,8 @@ bool WOrder::writeOrder(bool tax)
                         ui->tblGoods->getString(i, 0), //goods id
                         ui->tblGoods->getString(i, 1), //name
                         ui->tblGoods->getDouble(i, 4), //price
-                        ui->tblGoods->getDouble(i, 2), 0); //qty
+                        ui->tblGoods->getDouble(i, 2), //qty
+                        fCardValue * 100); //discount
         }
         QString jsonIn, jsonOut, err;
         int result = 0;
@@ -177,10 +178,10 @@ bool WOrder::writeOrder(bool tax)
     db[":f_amountBank"] = 0;
     db[":f_amountOther"] = 0;
     db[":f_amountService"] = 0;
-    db[":f_amountDiscount"] = 0;
+    db[":f_amountDiscount"] = ui->leDisc->getDouble();
     db[":f_serviceMode"] = 0;
     db[":f_serviceFactor"] = 0;
-    db[":f_discountFactor"] = 0;
+    db[":f_discountFactor"] = fCardValue;
     db[":f_creditCardId"] = 0;
     db[":f_otherId"] = 0;
     db[":f_source"] = 2;
@@ -366,6 +367,7 @@ void WOrder::fixCostumer(const QString &code)
         return;
     }
     fWorking->markDiscount(db.getString("f_firstname") + " " + db.getString("f_lastname"));
+    countTotal();
 }
 
 void WOrder::changeQty()
@@ -481,15 +483,17 @@ void WOrder::countTotal()
             break;
         }
     }
+    ui->leDisc->setVisible(disc > 0.001);
+    ui->lbDisc->setVisible(disc > 0.001);
     switch (fCardMode) {
     case CARD_TYPE_DISCOUNT: {
         ui->leDisc->setText(float_str(discount, 2));
-        ui->lbDisc->setText(QString("%1 %%2").arg(tr("Discount")).arg(float_str(fCardValue, 2)));
+        ui->lbDisc->setText(QString("%1 %2%").arg(tr("Discount")).arg(float_str(fCardValue * 100, 2)));
         break;
     }
     case CARD_TYPE_ACCUMULATIVE: {
         ui->leDisc->setText(float_str(discount, 2));
-        ui->lbDisc->setText(QString("%1 %%2").arg(tr("Discount")).arg(float_str(fCardValue, 2)));
+        ui->lbDisc->setText(QString("%1 %%2").arg(tr("Discount")).arg(float_str(fCardValue * 100, 2)));
         break;
     }
     case CARD_TYPE_COUNT_ORDER: {
@@ -497,7 +501,7 @@ void WOrder::countTotal()
         break;
     }
     case CARD_TYPE_MANUAL:
-        ui->lbDisc->setText(QString("%1").arg(tr("Discount")).arg(float_str(fCardValue, 2)));
+        ui->lbDisc->setText(QString("%1").arg(tr("Discount")).arg(float_str(fCardValue * 100, 2)));
         break;
     default:
         break;

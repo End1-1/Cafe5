@@ -281,3 +281,10 @@ create table a_complectation_additions (f_id char(36) primary key, f_header char
 alter table s_db add f_synctime timestamp;
 alter table e_cash add column f_autoinput smallint default 0;
 alter table e_cash add column f_oheader char(36);
+
+/* DB - 14 */
+update s_app set f_version ='14' where f_app='DB';
+create table s_login_session (f_id integer primary key auto_increment, f_session binary(16), f_user integer, f_iplogin char(15), f_iplogout char(15), f_datestart date, f_timestart time, f_dateend date, f_timeend time);
+ALTER TABLE `s_login_session` ADD INDEX `idx_login_session` (`f_session` ASC);
+UPDATE c_goods g INNER JOIN c_goods_scancode s ON s.f_goods = g.f_id SET g.f_scancode = (select f_code from c_goods_scancode ss where ss.f_goods=g.f_id order by s.f_receipt );
+drop table c_goods_scancode;
