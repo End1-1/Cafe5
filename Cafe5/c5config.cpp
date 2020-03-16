@@ -296,6 +296,11 @@ QString C5Config::taxPin()
     return getValue(param_tax_cashier_pin);
 }
 
+bool C5Config::controlShopQty()
+{
+    return getValue(param_control_shop_qty).toInt() == 1;
+}
+
 QString C5Config::getValue(int key)
 {
     QMutexLocker ml(&settingsMutex);

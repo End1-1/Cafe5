@@ -26,6 +26,7 @@ WOrder::WOrder(QWidget *parent) :
     ui->lbRefund->setVisible(false);
     fModeRefund = false;
     fCostumerId = 0;
+    fCardValue = 0;
     ui->lbDisc->setVisible(false);
     ui->leDisc->setVisible(false);
     ui->leCard->setValidator(new QDoubleValidator(0, 1000000000,2 ));
@@ -378,6 +379,11 @@ void WOrder::changeQty()
     }
     double qty = DQty::getQty(tr("Quantity"), this);
     if (qty < 0.001) {
+        return;
+    }
+    Goods g = fWorking->fGoods[ui->tblGoods->getString(row, 0)];
+    if (g.fQty < qty) {
+        C5Message::error(tr("Insufficient quantity") + "<br>" + float_str(qty - g.fQty, 3));
         return;
     }
     ui->tblGoods->setDouble(row, 2, qty);

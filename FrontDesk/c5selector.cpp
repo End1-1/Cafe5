@@ -16,6 +16,7 @@ C5Selector::C5Selector(const QStringList &dbParams) :
     fGrid->fTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->hl->addWidget(fGrid);
     connect(fGrid, SIGNAL(tblDoubleClicked(int,int,QList<QVariant>)), this, SLOT(tblDoubleClicked(int,int,QList<QVariant>)));
+    connect(fGrid, SIGNAL(tblSingleClick(QModelIndex)), this, SLOT(tblSingleClick(QModelIndex)));
     fReset = true;
 }
 
@@ -35,7 +36,8 @@ bool C5Selector::getValue(const QStringList &dbParams, int cache, QList<QVariant
         fSelectorList[cacheName][cache] = c;
     } else {
         c = fSelectorList[cacheName][cache];
-    }    
+    }
+    c->fMultipleSelection = false;
     if (c->fReset) {
         c->fReset = false;
         c->refresh();
@@ -43,6 +45,35 @@ bool C5Selector::getValue(const QStringList &dbParams, int cache, QList<QVariant
     c->ui->leFilter->setFocus();
     bool result = c->exec() == QDialog::Accepted;
     values = c->fValues;
+    return result;
+}
+
+bool C5Selector::getMultipleValues(const QStringList &dbParams, int cache, QList<QList<QVariant> > &values)
+{
+    QString cacheName = C5Cache::cacheName(dbParams, cache);
+    C5Selector *c = nullptr;
+    if (!fSelectorList[cacheName].contains(cache)) {
+        c = new C5Selector(dbParams);
+        c->fQuery = C5Cache(dbParams).query(cache);
+        c->fCache = cache;
+        fSelectorList[cacheName][cache] = c;
+    } else {
+        c = fSelectorList[cacheName][cache];
+    }
+    c->fMultipleSelection = true;
+    if (c->fReset) {
+        c->fReset = false;
+        c->refresh();
+    }
+    c->ui->leFilter->setFocus();
+    bool result = c->exec() == QDialog::Accepted;
+    if (result) {
+        for (int i = 0; i < c->fGrid->fModel->rowCount(); i++) {
+            if (c->fGrid->fModel->data(i, 0, Qt::CheckStateRole) == Qt::Checked) {
+                values.append(c->fGrid->fModel->getRowValues(i));
+            }
+        }
+    }
     return result;
 }
 
@@ -97,6 +128,15 @@ void C5Selector::resetCache(const QStringList &dbParams, int cacheId)
     }
 }
 
+void C5Selector::tblSingleClick(const QModelIndex &index)
+{
+    if (index.column() == 0) {
+        return;
+    }
+    int v = fGrid->fModel->data(index.row(), 0, Qt::EditRole).toInt() == 0 ? 1 : 0;
+    fGrid->fModel->setData(index.row(), 0, v, Qt::CheckStateRole);
+}
+
 void C5Selector::tblDoubleClicked(int row, int column, const QList<QVariant> &values)
 {
     Q_UNUSED(column);
@@ -115,10 +155,22 @@ void C5Selector::on_btnRefreshCache_clicked()
 void C5Selector::refresh()
 {
     C5Cache::cache(fDBParams, fCache)->refresh();
+    fGrid->setCheckboxes(true);
+    fGrid->fModel->setSingleCheckBoxSelection(!fMultipleSelection);
     fGrid->buildQuery(fQuery);
 }
 
 void C5Selector::on_leFilter_textChanged(const QString &arg1)
 {
     fGrid->setFilter(-1, arg1);
+}
+
+void C5Selector::on_btnCheck_clicked()
+{
+    for (int i = 0; i < fGrid->fModel->rowCount(); i++) {
+        if (fGrid->fModel->data(i, 0, Qt::CheckStateRole) == Qt::Checked) {
+            accept();
+            return;
+        }
+    }
 }

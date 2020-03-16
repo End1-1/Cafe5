@@ -5,6 +5,7 @@
 #include <QMap>
 #include <QVariant>
 #include <QDate>
+#include <QElapsedTimer>
 
 #define where_id(id) QString("where f_id='%1'").arg(id)
 
@@ -172,6 +173,10 @@ private:
     static int fCounter;
 
     QString fDbName;
+
+    QElapsedTimer fTimer;
+
+    qint64 fTimerCount;
 
     void configureDatabase(QSqlDatabase &cn, const QString &host, const QString &db, const QString &user, const QString &password);
 

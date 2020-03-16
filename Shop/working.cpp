@@ -11,7 +11,7 @@
 #include <QInputDialog>
 #include <QSettings>
 
-static QMap<QString, Goods> fGoods;
+QMap<QString, Goods> Working::fGoods;
 static QMap<int, QString> fGoodsCodeForPrint;
 static QSettings __s(QString("%1\\%2\\%3").arg(_ORGANIZATION_).arg(_APPLICATION_).arg(_MODULE_));
 static int fOrderCount = 0;
@@ -57,6 +57,7 @@ Working::Working(QWidget *parent) :
     on_btnNewOrder_clicked();
     PrintTaxN::fTaxCashier = __c5config.taxCashier();
     PrintTaxN::fTaxPin = __c5config.taxPin();
+    ui->wGoods->setVisible(false);
 }
 
 Working::~Working()
@@ -151,35 +152,14 @@ bool Working::getAdministratorRights()
 
 void Working::getGoodsList()
 {
-    fGoods.clear();
-    C5Database db(C5Config::dbParams());
-    db.exec("select gg.f_scancode, gg.f_id, gg.f_name, gu.f_name, gg.f_saleprice, "
-            "gr.f_taxdept, gr.f_adgcode "
-            "from c_goods gg "
-            "left join c_groups gr on gr.f_id=gg.f_group "
-            "left join c_units gu on gu.f_id=gg.f_unit "
-            "where f_enabled=1");
-    while (db.nextRow()) {
-        Goods g;
-        g.fScanCode = db.getString(0);
-        g.fCode = db.getString(1);
-        g.fName = db.getString(2);
-        g.fUnit = db.getString(3);
-        g.fPrice = db.getDouble(4);
-        g.fTaxDept = db.getInt(5);
-        g.fAdgCode = db.getString(6);
-        fGoods[g.fScanCode] = g;
-        fGoodsCodeForPrint[g.fCode.toInt()] = g.fScanCode;
-    }
-    ui->wGoods->setVisible(__s.value("goodslist", false).toBool());
     makeWGoods();
 }
 
 void Working::makeWGoods()
 {
     QList<int> cw;
-    //cw << 0 << 100 << 200 << 200 << 300 << 80 << 80 << 80 << 100 << 100 << 100 << 100 << 0 << 0;
-    cw << 0 << 150 << 0 << 200 << 400 << 80 << 0 << 0 << 200 << 0 << 0 << 0 << 0 << 0;
+    //cw << 0 << 100 << 200 << 200 << 300 << 80 << 80 << 80 << 100 << 100 << 100 << 100 << 0 << 0 << 80;
+    cw << 0 << 150 << 0 << 200 << 400 << 80 << 0 << 0 << 200 << 0 << 0 << 0 << 0 << 0 << 80;
     for (int i = 0; i < cw.count(); i++) {
         ui->tblGoods->setColumnWidth(i, cw.at(i));
     }
@@ -187,23 +167,54 @@ void Working::makeWGoods()
     ui->tblGoods->clearContents();
     ui->tblGoods->setRowCount(0);
     int row = 0;
+    fGoods.clear();
     C5Database db(C5Config::dbParams());
-    db.exec("select gs.f_id, gs.f_scancode, cp.f_taxname, gr.f_name as f_groupname, gs.f_name as f_goodsname,  "
-            "gs.f_saleprice, gs.f_saleprice2, gu.f_name as f_unitname, "
+    db[":f_store"] = 1;
+    db[":f_date"] = QDate::currentDate();
+    db.exec("select g.f_id, g.f_scancode, cp.f_taxname, gg.f_name as f_groupname, g.f_name as f_goodsname, "
+            "g.f_saleprice, g.f_saleprice2, u.f_name as f_unitname, "
             "gca.f_name as group1, gcb.f_name group2, gcc.f_name as group3, gcd.f_name as group4, "
-            "gr.f_taxdept, gr.f_adgcode "
-            "from c_goods gs "
-            "left join c_groups gr on gr.f_id=gs.f_group "
-            "left join c_units gu on gu.f_id=gs.f_unit "
-            "left join c_partners cp on cp.f_id=gs.f_supplier "
-            "left join c_goods_classes gca on gca.f_id=gs.f_group1 "
-            "left join c_goods_classes gcb on gcb.f_id=gs.f_group2 "
-            "left join c_goods_classes gcc on gcc.f_id=gs.f_group3 "
-            "left join c_goods_classes gcd on gcd.f_id=gs.f_group4 "
-            "where gs.f_enabled=1 "
-            "order by gr.f_name, gca.f_name ");
+            "gg.f_taxdept, gg.f_adgcode, sum(s.f_qty*s.f_type) as f_qty "
+            "from a_store_draft s "
+            "inner join c_goods g on g.f_id=s.f_goods "
+            "inner join c_groups gg on gg.f_id=g.f_group "
+            "inner join c_units u on u.f_id=g.f_unit "
+            "left join c_goods_classes gca on gca.f_id=g.f_group1 "
+            "left join c_goods_classes gcb on gcb.f_id=g.f_group2 "
+            "left join c_goods_classes gcc on gcc.f_id=g.f_group3 "
+            "left join c_goods_classes gcd on gcd.f_id=g.f_group4 "
+            "left join c_partners cp on cp.f_id=g.f_supplier "
+            "inner join a_header h on h.f_id=s.f_document "
+            "where h.f_date<=:f_date and s.f_store=:f_store  "
+            "group by g.f_id,gg.f_name,g.f_name,g.f_lastinputprice,g.f_saleprice "
+            "having sum(s.f_qty*s.f_type) > 0 ");
+//    db.exec("select gs.f_id, gs.f_scancode, cp.f_taxname, gr.f_name as f_groupname, gs.f_name as f_goodsname,  "
+//            "gs.f_saleprice, gs.f_saleprice2, gu.f_name as f_unitname, "
+//            "gca.f_name as group1, gcb.f_name group2, gcc.f_name as group3, gcd.f_name as group4, "
+//            "gr.f_taxdept, gr.f_adgcode, 0 as f_qty "
+//            "from c_goods gs "
+//            "left join c_groups gr on gr.f_id=gs.f_group "
+//            "left join c_units gu on gu.f_id=gs.f_unit "
+//            "left join c_partners cp on cp.f_id=gs.f_supplier "
+//            "left join c_goods_classes gca on gca.f_id=gs.f_group1 "
+//            "left join c_goods_classes gcb on gcb.f_id=gs.f_group2 "
+//            "left join c_goods_classes gcc on gcc.f_id=gs.f_group3 "
+//            "left join c_goods_classes gcd on gcd.f_id=gs.f_group4 "
+//            "where gs.f_enabled=1 "
+//            "order by gr.f_name, gca.f_name ");
     ui->tblGoods->setRowCount(db.rowCount());
     while (db.nextRow()) {
+        Goods g;
+        g.fScanCode = db.getString("f_scancode");
+        g.fCode = db.getString("f_id");
+        g.fName = db.getString("f_goodsname");
+        g.fUnit = db.getString("f_unitname");
+        g.fPrice = db.getDouble("f_saleprice");
+        g.fTaxDept = db.getInt("f_taxdept");
+        g.fAdgCode = db.getString("f_adgcode");
+        g.fQty = db.getDouble("f_qty");
+        fGoods[g.fScanCode] = g;
+        fGoodsCodeForPrint[g.fCode.toInt()] = g.fScanCode;
         for (int i = 0; i < db.columnCount(); i++) {
             QTableWidgetItem *item = new QTableWidgetItem();
             item->setData(Qt::EditRole, db.getValue(i));
@@ -377,11 +388,13 @@ void Working::on_btnSaveOrder_clicked()
     if (!w->writeOrder()) {
         return;
     }
+    getGoodsList();
     ui->tab->removeTab(ui->tab->currentIndex());
     if (ui->tab->count() == 0) {
         on_btnNewOrder_clicked();
     }
     w->deleteLater();
+    ui->leDiscount->clear();
 }
 
 void Working::on_btnSaveOrderNoTax_clicked()
@@ -393,6 +406,7 @@ void Working::on_btnSaveOrderNoTax_clicked()
     if (!w->writeOrder(false)) {
         return;
     }
+    getGoodsList();
     ui->tab->removeTab(ui->tab->currentIndex());
     if (ui->tab->count() == 0) {
         on_btnNewOrder_clicked();

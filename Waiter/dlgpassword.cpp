@@ -154,6 +154,8 @@ void DlgPassword::on_pushButton_12_clicked()
                 fUser->fLast = db.getString(1);
                 fUser->fFull = fUser->fLast + " " + fUser->fFirst;
                 fUser->fId = db.getInt(2);
+                __userid = fUser->fId;
+                __username = fUser->fFull;
                 accept();
             } else {
                 C5Message::error(tr("Access denied"));

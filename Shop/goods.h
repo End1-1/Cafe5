@@ -15,6 +15,7 @@ public:
     double fPrice;
     int fTaxDept;
     QString fAdgCode;
+    double fQty;
 };
 
 #endif // GOODS_H

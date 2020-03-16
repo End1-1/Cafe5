@@ -162,12 +162,22 @@ color:white;font-size:13pt;
         </column>
         <column>
          <property name="text">
+          <string>Class 4</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
           <string>TaxDept</string>
          </property>
         </column>
         <column>
          <property name="text">
           <string>Adg</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Qty</string>
          </property>
         </column>
        </widget>

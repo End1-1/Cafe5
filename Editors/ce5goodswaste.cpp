@@ -8,7 +8,7 @@ CE5GoodsWaste::CE5GoodsWaste(const QStringList &dbParams, QWidget *parent) :
     ui(new Ui::CE5GoodsWaste)
 {
     ui->setupUi(this);
-    ui->leGoods->setSelector(dbParams, ui->leGoodsName, cache_goods, 0, 2);
+    ui->leGoods->setSelector(dbParams, ui->leGoodsName, cache_goods, 1, 3);
     ui->leReason->setSelector(dbParams, ui->leReasonName, cache_store_reason);
     ui->leReason->setValue(DOC_REASON_TRASH);
 }

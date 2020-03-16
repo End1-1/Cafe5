@@ -45,6 +45,7 @@ void C5Permissions::init(C5Database &db)
               << cp_t3_discount_statistics
               << cp_t3_debts_to_partners
               << cp_t3_consuption_reason
+              << cp_t3_car_visits
 
               << cp_t4_menu
               << cp_t4_menu_names

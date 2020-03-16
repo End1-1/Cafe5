@@ -31,4 +31,5 @@ bool CE5StoreReason::checkData(QString &err)
         err += tr("This item is not editable") + "<br>";
         return false;
     }
+    return true;
 }

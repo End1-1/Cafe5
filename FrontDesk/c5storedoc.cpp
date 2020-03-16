@@ -25,7 +25,7 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
     ui->lePayment->setSelector(fDBParams, ui->lePaymentName, cache_header_payment);
     ui->leReason->setSelector(fDBParams, ui->leReasonName, cache_store_reason);
     ui->lePartner->setSelector(fDBParams, ui->lePartnerName, cache_goods_partners);
-    ui->leComplectationCode->setSelector(fDBParams, ui->leComplectationName, cache_goods, 0, 2);
+    ui->leComplectationCode->setSelector(fDBParams, ui->leComplectationName, cache_goods, 1, 3);
     disconnect(ui->leComplectationName, SIGNAL(textChanged(QString)), this, SLOT(on_leComplectationName_textChanged(QString)));
     connect(ui->leComplectationName, SIGNAL(textChanged(QString)), this, SLOT(on_leComplectationName_textChanged(QString)));
     ui->tblGoods->setColumnWidths(7, 0, 0, 300, 80, 80, 80, 80);
@@ -1270,7 +1270,7 @@ void C5StoreDoc::getOutput()
         return;
     }
     QString query = QString("select s.f_goods, gg.f_name as f_groupname, g.f_name as f_goodsname, u.f_name as f_unitname, "
-                          "sum(s.f_qty*s.f_type) as f_qty, sum(s.f_total*s.f_type) as f_amount "
+                          "sum(s.f_qty*s.f_type) as f_qty, sum(s.f_total*s.f_type) as f_amount, g.f_scancode "
                           "from a_store s "
                           "inner join a_header d on d.f_id=s.f_document "
                           "inner join c_goods g on g.f_id=s.f_goods "
@@ -1289,6 +1289,7 @@ void C5StoreDoc::getOutput()
     trans["f_unitname"] = tr("Unit");
     trans["f_qty"] = tr("Qty");
     trans["f_amount"] = tr("Amount");
+    trans["f_scancode"] = tr("Scancode");
     if (!C5Selector::getValues(fDBParams, query, vals, trans)) {
         return;
     }

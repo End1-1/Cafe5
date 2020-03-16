@@ -37,6 +37,7 @@
 #define cp_t3_discount_statistics 311
 #define cp_t3_debts_to_partners 312
 #define cp_t3_consuption_reason 313
+#define cp_t3_car_visits 314
 
 #define cp_t4_menu 400
 #define cp_t4_menu_names 401

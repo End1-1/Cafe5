@@ -17,6 +17,8 @@ public:
 
     virtual void restoreFilter(QWidget *parent);
 
+    virtual void clearFilter(QWidget *parent);
+
 signals:
 
 public slots:

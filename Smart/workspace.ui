@@ -121,7 +121,7 @@ QLabel {color:green;}
     <widget class="QWidget" name="dDown" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_4">
       <property name="spacing">
-       <number>1</number>
+       <number>3</number>
       </property>
       <property name="leftMargin">
        <number>0</number>
@@ -158,9 +158,9 @@ QLabel {color:green;}
          </property>
          <item>
           <widget class="QWidget" name="wDish" native="true">
-           <layout class="QVBoxLayout" name="verticalLayout_5">
+           <layout class="QHBoxLayout" name="horizontalLayout_5">
             <property name="spacing">
-             <number>1</number>
+             <number>3</number>
             </property>
             <property name="leftMargin">
              <number>0</number>
@@ -184,20 +184,17 @@ QLabel {color:green;}
               </property>
               <property name="minimumSize">
                <size>
-                <width>0</width>
-                <height>150</height>
+                <width>200</width>
+                <height>0</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>16777215</width>
-                <height>150</height>
+                <width>200</width>
+                <height>16777215</height>
                </size>
               </property>
-              <layout class="QHBoxLayout" name="horizontalLayout_2">
-               <property name="spacing">
-                <number>1</number>
-               </property>
+              <layout class="QVBoxLayout" name="verticalLayout_5">
                <property name="leftMargin">
                 <number>0</number>
                </property>
@@ -230,6 +227,9 @@ QLabel {color:green;}
                  <property name="selectionMode">
                   <enum>QAbstractItemView::NoSelection</enum>
                  </property>
+                 <property name="showGrid">
+                  <bool>false</bool>
+                 </property>
                  <attribute name="horizontalHeaderVisible">
                   <bool>false</bool>
                  </attribute>
@@ -244,45 +244,17 @@ QLabel {color:green;}
                    <string>New Column</string>
                   </property>
                  </column>
-                 <column>
-                  <property name="text">
-                   <string>New Column</string>
-                  </property>
-                 </column>
-                 <column>
-                  <property name="text">
-                   <string>New Column</string>
-                  </property>
-                 </column>
-                 <column>
-                  <property name="text">
-                   <string>New Column</string>
-                  </property>
-                 </column>
-                 <column>
-                  <property name="text">
-                   <string>New Column</string>
-                  </property>
-                 </column>
-                 <column>
-                  <property name="text">
-                   <string>New Column</string>
-                  </property>
-                 </column>
                 </widget>
                </item>
                <item>
-                <widget class="QWidget" name="wpart2" native="true">
+                <widget class="QWidget" name="wPart2Buttons" native="true">
                  <property name="minimumSize">
                   <size>
                    <width>0</width>
                    <height>0</height>
                   </size>
                  </property>
-                 <layout class="QVBoxLayout" name="verticalLayout_6">
-                  <property name="spacing">
-                   <number>1</number>
-                  </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_2">
                   <property name="leftMargin">
                    <number>0</number>
                   </property>
@@ -319,6 +291,29 @@ QLabel {color:green;}
                    </widget>
                   </item>
                   <item>
+                   <widget class="QPushButton" name="btnPartDown">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string/>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="../resources/resources.qrc">
+                      <normaloff>:/down.png</normaloff>:/down.png</iconset>
+                    </property>
+                    <property name="iconSize">
+                     <size>
+                      <width>32</width>
+                      <height>32</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
                    <widget class="QPushButton" name="btnClearFilter">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
@@ -342,27 +337,17 @@ QLabel {color:green;}
                    </widget>
                   </item>
                   <item>
-                   <widget class="QPushButton" name="btnPartDown">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
+                   <spacer name="horizontalSpacer_3">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
                     </property>
-                    <property name="text">
-                     <string/>
-                    </property>
-                    <property name="icon">
-                     <iconset resource="../resources/resources.qrc">
-                      <normaloff>:/down.png</normaloff>:/down.png</iconset>
-                    </property>
-                    <property name="iconSize">
+                    <property name="sizeHint" stdset="0">
                      <size>
-                      <width>32</width>
-                      <height>32</height>
+                      <width>40</width>
+                      <height>20</height>
                      </size>
                     </property>
-                   </widget>
+                   </spacer>
                   </item>
                  </layout>
                 </widget>
@@ -378,10 +363,7 @@ QLabel {color:green;}
                 <verstretch>5</verstretch>
                </sizepolicy>
               </property>
-              <layout class="QHBoxLayout" name="horizontalLayout_3">
-               <property name="spacing">
-                <number>1</number>
-               </property>
+              <layout class="QVBoxLayout" name="verticalLayout_4">
                <property name="leftMargin">
                 <number>0</number>
                </property>
@@ -408,17 +390,23 @@ QLabel {color:green;}
                  <property name="selectionMode">
                   <enum>QAbstractItemView::NoSelection</enum>
                  </property>
+                 <property name="showGrid">
+                  <bool>false</bool>
+                 </property>
                  <property name="gridStyle">
                   <enum>Qt::NoPen</enum>
                  </property>
                  <attribute name="horizontalHeaderVisible">
                   <bool>false</bool>
                  </attribute>
+                 <attribute name="horizontalHeaderDefaultSectionSize">
+                  <number>70</number>
+                 </attribute>
                  <attribute name="verticalHeaderVisible">
                   <bool>false</bool>
                  </attribute>
                  <attribute name="verticalHeaderDefaultSectionSize">
-                  <number>50</number>
+                  <number>63</number>
                  </attribute>
                  <column>
                   <property name="text">
@@ -453,17 +441,8 @@ QLabel {color:green;}
                 </widget>
                </item>
                <item>
-                <widget class="QWidget" name="wDishScroll" native="true">
-                 <property name="minimumSize">
-                  <size>
-                   <width>0</width>
-                   <height>0</height>
-                  </size>
-                 </property>
-                 <layout class="QVBoxLayout" name="verticalLayout_4">
-                  <property name="spacing">
-                   <number>1</number>
-                  </property>
+                <widget class="QWidget" name="wDishButtons" native="true">
+                 <layout class="QHBoxLayout" name="horizontalLayout_3">
                   <property name="leftMargin">
                    <number>0</number>
                   </property>
@@ -546,14 +525,14 @@ QLabel {color:green;}
                    </widget>
                   </item>
                   <item>
-                   <spacer name="verticalSpacer">
+                   <spacer name="horizontalSpacer_4">
                     <property name="orientation">
-                     <enum>Qt::Vertical</enum>
+                     <enum>Qt::Horizontal</enum>
                     </property>
                     <property name="sizeHint" stdset="0">
                      <size>
-                      <width>20</width>
-                      <height>488</height>
+                      <width>380</width>
+                      <height>20</height>
                      </size>
                     </property>
                    </spacer>

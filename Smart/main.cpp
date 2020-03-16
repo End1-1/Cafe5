@@ -28,6 +28,8 @@ int main(int argc, char *argv[])
     C5Config::fDBUser = connectionParams.at(2);
     C5Config::fDBPassword = connectionParams.at(3);
     C5Config::fSettingsName = connectionParams.at(4);
+    C5Config::fLastUsername = connectionParams.at(5);
+    C5Config::fFullScreen = connectionParams.at(6);
     C5Config::initParamsFromDb();
 
     QStringList dbParams;
@@ -39,7 +41,9 @@ int main(int argc, char *argv[])
     C5Config::fParentWidget = &w;
     w.showFullScreen();
     a.processEvents();
-    w.login();
+    if (!w.login()) {
+        return 0;
+    }
 
     return a.exec();
 }

@@ -47,6 +47,8 @@ SOURCES += \
     ../Editors/ce5goodsclass.cpp \
     ../Editors/ce5packagelist.cpp \
     ../Editors/ce5storereason.cpp \
+    ../Reports/cr5carvisits.cpp \
+    ../Reports/cr5carvisitsfilter.cpp \
     ../Reports/cr5cashdetailed.cpp \
     ../Reports/cr5cashdetailedfilter.cpp \
     ../Reports/cr5cashnames.cpp \
@@ -62,6 +64,7 @@ SOURCES += \
     ../Reports/cr5goodsclasses.cpp \
     ../Reports/cr5goodsfilter.cpp \
     ../Reports/cr5menureview.cpp \
+    ../Reports/cr5menureviewfilter.cpp \
     ../Reports/cr5salarybyworkers.cpp \
     ../Reports/cr5salarybyworkersfilter.cpp \
     ../Reports/cr5salefromstoretotal.cpp \
@@ -73,6 +76,7 @@ SOURCES += \
     ../Reports/cr5storereason.cpp \
     c5cashdoc.cpp \
     c5costumerdebtpayment.cpp \
+    c5dishgroupaction.cpp \
     c5document.cpp \
     c5inputdate.cpp \
     c5progressdialog.cpp \
@@ -222,6 +226,8 @@ HEADERS += \
     ../Editors/ce5goodsclass.h \
     ../Editors/ce5packagelist.h \
     ../Editors/ce5storereason.h \
+    ../Reports/cr5carvisits.h \
+    ../Reports/cr5carvisitsfilter.h \
     ../Reports/cr5cashdetailed.h \
     ../Reports/cr5cashdetailedfilter.h \
     ../Reports/cr5cashnames.h \
@@ -237,6 +243,7 @@ HEADERS += \
     ../Reports/cr5goodsclasses.h \
     ../Reports/cr5goodsfilter.h \
     ../Reports/cr5menureview.h \
+    ../Reports/cr5menureviewfilter.h \
     ../Reports/cr5salarybyworkers.h \
     ../Reports/cr5salarybyworkersfilter.h \
     ../Reports/cr5salefromstoretotal.h \
@@ -248,6 +255,7 @@ HEADERS += \
     ../Reports/cr5storereason.h \
     c5cashdoc.h \
     c5costumerdebtpayment.h \
+    c5dishgroupaction.h \
     c5document.h \
     c5inputdate.h \
         c5mainwindow.h \
@@ -392,17 +400,20 @@ FORMS += \
     ../Editors/ce5goodsclass.ui \
     ../Editors/ce5packagelist.ui \
     ../Editors/ce5storereason.ui \
+    ../Reports/cr5carvisitsfilter.ui \
     ../Reports/cr5cashdetailedfilter.ui \
     ../Reports/cr5consuptionreasonfilter.ui \
     ../Reports/cr5costumerdebtsfilter.ui \
     ../Reports/cr5discountstatisticsfilter.ui \
     ../Reports/cr5goodsfilter.ui \
+    ../Reports/cr5menureviewfilter.ui \
     ../Reports/cr5salarybyworkersfilter.ui \
     ../Reports/cr5salefromstoretotalfilter.ui \
     ../Reports/cr5saleremoveddishesfilter.ui \
     ../Reports/cr5salesbydishesfilter.ui \
     c5cashdoc.ui \
     c5costumerdebtpayment.ui \
+    c5dishgroupaction.ui \
     c5inputdate.ui \
         c5mainwindow.ui \
     ../Cafe5/c5connection.ui \

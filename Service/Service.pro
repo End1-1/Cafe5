@@ -11,6 +11,7 @@ SOURCES += \
         logwriter.cpp \
         main.cpp \
         sockethandler.cpp \
+        sockethandlergoods.cpp \
         sockethandlerlogin.cpp \
         sockethandlerloginwithsession.cpp \
         sockethandlerserviceconfig.cpp \
@@ -29,6 +30,7 @@ HEADERS += \
     logwriter.h \
     servicecommands.h \
     sockethandler.h \
+    sockethandlergoods.h \
     sockethandlerlogin.h \
     sockethandlerloginwithsession.h \
     sockethandlerserviceconfig.h \

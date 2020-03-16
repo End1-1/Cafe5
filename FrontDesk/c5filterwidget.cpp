@@ -94,3 +94,28 @@ void C5FilterWidget::restoreFilter(QWidget *parent)
         }
     }
 }
+
+void C5FilterWidget::clearFilter(QWidget *parent)
+{
+    QObjectList ol = parent->children();
+    C5LineEditWithSelector *le;
+    C5DateEdit *de;
+    C5CheckBox *ce;
+    foreach (QObject *o, ol) {
+        if (o->children().count() > 0) {
+            clearFilter(static_cast<QWidget*>(o));
+        }
+        if ((le = isLineEditWithSelector(o))) {
+            le->setValue("");
+            continue;
+        }
+        if ((de = isDateEdit(o))) {
+            de->setDate(QDate::currentDate());
+            continue;
+        }
+        if ((ce = isCheckBox(o))) {
+            ce->setChecked(false);
+            continue;
+        }
+    }
+}

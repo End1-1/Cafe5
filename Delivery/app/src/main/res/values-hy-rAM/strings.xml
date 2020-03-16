@@ -9,4 +9,19 @@
     <string name="ServerAddress">Սերվերի հասցե</string>
     <string name="ServerPort">Սերվերի պորտ</string>
     <string name="LoginStatusFailed">Mwjjdj</string>
+    <string name="DeliveryAgent">Մատակարար</string>
+    <string name="TaxNumber">ՀՎՀՀ</string>
+    <string name="TaxName">Հարկային անուն</string>
+    <string name="MarketName">Անվանում</string>
+    <string name="Contact">Կոնտակտ</string>
+    <string name="Phone">Հեռախոս</string>
+    <string name="Code">Կոդ</string>
+    <string name="Address">Հասցե</string>
+    <string name="Customer">Հաճախորդ</string>
+    <string name="Goods">Ապրանքներ</string>
+    <string name="Bill">Հաշիվ</string>
+    <string name="LoginStatusGoodsGroups">Բերնվում է ապրանքների խմբերը</string>
+    <string name="LoginStatusGoods">Բերնվում է ապրանքները</string>
+    <string name="Append">Ավելացնել</string>
+    <string name="Ready">Պատրաստ է</string>
 </resources>

@@ -227,6 +227,7 @@ bool payment::printTax(double cardAmount)
     QString jsonIn, jsonOut, err;
     int result = 0;
     result = pt.makeJsonAndPrint(cardAmount, 0, jsonIn, jsonOut, err);
+    db[":f_id"] = db.uuid();
     db[":f_order"] = fOrderUUID;
     db[":f_date"] = QDate::currentDate();
     db[":f_time"] = QTime::currentTime();

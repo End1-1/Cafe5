@@ -55,6 +55,8 @@ public:
 
     virtual void changeDatabase(const QStringList &dbParams);
 
+    virtual void setCheckboxes(bool v);
+
 public slots:
     virtual bool on_tblView_doubleClicked(const QModelIndex &index);
 
@@ -122,6 +124,8 @@ private:
 
     QString fFilterString;
 
+    bool fCheckboxes;
+
     int fFilterColumn;
 
     void insertJoinTable(QStringList &joins, QMap<QString, QString> &joinsMap, const QString &table, const QString &mainTable);
@@ -179,6 +183,8 @@ private slots:
     void on_tblView_clicked(const QModelIndex &index);
 
 signals:
+    void tblSingleClick(const QModelIndex &);
+
     void tblDoubleClicked(int row, int column, const QList<QVariant> &values);
 
 };

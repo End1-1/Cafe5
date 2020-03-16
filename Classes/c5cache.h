@@ -42,6 +42,7 @@
 #define cache_dish_package 37
 #define cache_salary_shift 38
 #define cache_goods_classes 39
+#define cache_dish_menu_state 40
 
 class C5Cache : public QObject
 {

@@ -12,6 +12,7 @@
 #include "cr5usersgroups.h"
 #include "cr5consumptionbysales.h"
 #include "cr5storereason.h"
+#include "cr5carvisits.h"
 #include "cr5documents.h"
 #include "cr5goodsclasses.h"
 #include "c5translatorform.h"
@@ -316,6 +317,9 @@ void C5MainWindow::on_actionLogin_triggered()
                 addTreeL3Item(it, cp_t3_sale_dishes, tr("Sales, dishes"), ":/graph.png");
                 addTreeL3Item(it, cp_t3_sale_removed_dishes, tr("Sales, removed dishes"), ":/delete.png");
             }
+            if (__c5config.carMode()) {
+                addTreeL3Item(it, cp_t3_car_visits, tr("Car visits"), ":/car.png");
+            }
             addTreeL3Item(it, cp_t3_store_sale, tr("Sales from store"), ":/graph.png");
             addTreeL3Item(it, cp_t3_debts_to_partners, tr("Debts to partners"), ":/contract.png");
             addTreeL3Item(it, cp_t3_discount_statistics, tr("Discount statistics"), ":/discount.png");
@@ -589,6 +593,9 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
         break;
     case cp_t3_store_sale:
         createTab<CR5SaleFromStore>(dbParams);
+        break;
+    case cp_t3_car_visits:
+        createTab<CR5CarVisits>(dbParams);
         break;
     case cp_t3_sale_removed_dishes:
         createTab<CR5SaleRemovedDishes>(dbParams);

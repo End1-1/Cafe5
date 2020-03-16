@@ -6,6 +6,8 @@
 #include <QSet>
 #include <QColor>
 
+class QTableView;
+
 class C5TableModel : public QAbstractTableModel
 {
 public:
@@ -14,6 +16,10 @@ public:
     void translate(const QMap<QString, QString> &t);
 
     void execQuery(const QString &query);
+
+    void setCheckboxes(bool v);
+
+    void setSingleCheckBoxSelection(bool v);
 
     void sort(int column);
 
@@ -82,9 +88,15 @@ public:
 private:
     C5Database &fDb;
 
+    QTableView *fTableView;
+
     bool fSortAsc;
 
     int fLastSortedColumn;
+
+    bool fCheckboxes;
+
+    bool fSingleCheckBoxSelection;
 
     QList<int> fProxyData;
 

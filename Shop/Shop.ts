@@ -7,34 +7,35 @@
         <location filename="../Classes/c5cache.cpp" line="18"/>
         <location filename="../Classes/c5cache.cpp" line="22"/>
         <location filename="../Classes/c5cache.cpp" line="25"/>
-        <location filename="../Classes/c5cache.cpp" line="31"/>
-        <location filename="../Classes/c5cache.cpp" line="36"/>
-        <location filename="../Classes/c5cache.cpp" line="40"/>
-        <location filename="../Classes/c5cache.cpp" line="47"/>
-        <location filename="../Classes/c5cache.cpp" line="50"/>
-        <location filename="../Classes/c5cache.cpp" line="53"/>
-        <location filename="../Classes/c5cache.cpp" line="56"/>
-        <location filename="../Classes/c5cache.cpp" line="59"/>
-        <location filename="../Classes/c5cache.cpp" line="62"/>
-        <location filename="../Classes/c5cache.cpp" line="65"/>
-        <location filename="../Classes/c5cache.cpp" line="71"/>
-        <location filename="../Classes/c5cache.cpp" line="78"/>
-        <location filename="../Classes/c5cache.cpp" line="90"/>
-        <location filename="../Classes/c5cache.cpp" line="94"/>
-        <location filename="../Classes/c5cache.cpp" line="97"/>
-        <location filename="../Classes/c5cache.cpp" line="101"/>
-        <location filename="../Classes/c5cache.cpp" line="104"/>
-        <location filename="../Classes/c5cache.cpp" line="110"/>
-        <location filename="../Classes/c5cache.cpp" line="114"/>
-        <location filename="../Classes/c5cache.cpp" line="117"/>
-        <location filename="../Classes/c5cache.cpp" line="120"/>
-        <location filename="../Classes/c5cache.cpp" line="123"/>
-        <location filename="../Classes/c5cache.cpp" line="264"/>
+        <location filename="../Classes/c5cache.cpp" line="32"/>
+        <location filename="../Classes/c5cache.cpp" line="38"/>
+        <location filename="../Classes/c5cache.cpp" line="42"/>
+        <location filename="../Classes/c5cache.cpp" line="49"/>
+        <location filename="../Classes/c5cache.cpp" line="52"/>
+        <location filename="../Classes/c5cache.cpp" line="55"/>
+        <location filename="../Classes/c5cache.cpp" line="58"/>
+        <location filename="../Classes/c5cache.cpp" line="61"/>
+        <location filename="../Classes/c5cache.cpp" line="64"/>
+        <location filename="../Classes/c5cache.cpp" line="67"/>
+        <location filename="../Classes/c5cache.cpp" line="73"/>
+        <location filename="../Classes/c5cache.cpp" line="80"/>
+        <location filename="../Classes/c5cache.cpp" line="92"/>
+        <location filename="../Classes/c5cache.cpp" line="96"/>
+        <location filename="../Classes/c5cache.cpp" line="99"/>
+        <location filename="../Classes/c5cache.cpp" line="103"/>
+        <location filename="../Classes/c5cache.cpp" line="106"/>
+        <location filename="../Classes/c5cache.cpp" line="112"/>
+        <location filename="../Classes/c5cache.cpp" line="116"/>
+        <location filename="../Classes/c5cache.cpp" line="119"/>
+        <location filename="../Classes/c5cache.cpp" line="122"/>
+        <location filename="../Classes/c5cache.cpp" line="125"/>
+        <location filename="../Classes/c5cache.cpp" line="128"/>
+        <location filename="../Classes/c5cache.cpp" line="269"/>
         <source>Code</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5cache.cpp" line="32"/>
+        <location filename="../Classes/c5cache.cpp" line="33"/>
         <source>Group</source>
         <translation></translation>
     </message>
@@ -42,28 +43,29 @@
         <location filename="../Classes/c5cache.cpp" line="19"/>
         <location filename="../Classes/c5cache.cpp" line="23"/>
         <location filename="../Classes/c5cache.cpp" line="26"/>
-        <location filename="../Classes/c5cache.cpp" line="33"/>
-        <location filename="../Classes/c5cache.cpp" line="37"/>
-        <location filename="../Classes/c5cache.cpp" line="41"/>
-        <location filename="../Classes/c5cache.cpp" line="48"/>
-        <location filename="../Classes/c5cache.cpp" line="51"/>
-        <location filename="../Classes/c5cache.cpp" line="54"/>
-        <location filename="../Classes/c5cache.cpp" line="57"/>
-        <location filename="../Classes/c5cache.cpp" line="60"/>
-        <location filename="../Classes/c5cache.cpp" line="63"/>
-        <location filename="../Classes/c5cache.cpp" line="66"/>
-        <location filename="../Classes/c5cache.cpp" line="79"/>
-        <location filename="../Classes/c5cache.cpp" line="91"/>
-        <location filename="../Classes/c5cache.cpp" line="95"/>
-        <location filename="../Classes/c5cache.cpp" line="98"/>
-        <location filename="../Classes/c5cache.cpp" line="102"/>
-        <location filename="../Classes/c5cache.cpp" line="105"/>
-        <location filename="../Classes/c5cache.cpp" line="111"/>
-        <location filename="../Classes/c5cache.cpp" line="115"/>
-        <location filename="../Classes/c5cache.cpp" line="118"/>
-        <location filename="../Classes/c5cache.cpp" line="121"/>
-        <location filename="../Classes/c5cache.cpp" line="124"/>
-        <location filename="../Classes/c5cache.cpp" line="265"/>
+        <location filename="../Classes/c5cache.cpp" line="34"/>
+        <location filename="../Classes/c5cache.cpp" line="39"/>
+        <location filename="../Classes/c5cache.cpp" line="43"/>
+        <location filename="../Classes/c5cache.cpp" line="50"/>
+        <location filename="../Classes/c5cache.cpp" line="53"/>
+        <location filename="../Classes/c5cache.cpp" line="56"/>
+        <location filename="../Classes/c5cache.cpp" line="59"/>
+        <location filename="../Classes/c5cache.cpp" line="62"/>
+        <location filename="../Classes/c5cache.cpp" line="65"/>
+        <location filename="../Classes/c5cache.cpp" line="68"/>
+        <location filename="../Classes/c5cache.cpp" line="81"/>
+        <location filename="../Classes/c5cache.cpp" line="93"/>
+        <location filename="../Classes/c5cache.cpp" line="97"/>
+        <location filename="../Classes/c5cache.cpp" line="100"/>
+        <location filename="../Classes/c5cache.cpp" line="104"/>
+        <location filename="../Classes/c5cache.cpp" line="107"/>
+        <location filename="../Classes/c5cache.cpp" line="113"/>
+        <location filename="../Classes/c5cache.cpp" line="117"/>
+        <location filename="../Classes/c5cache.cpp" line="120"/>
+        <location filename="../Classes/c5cache.cpp" line="123"/>
+        <location filename="../Classes/c5cache.cpp" line="126"/>
+        <location filename="../Classes/c5cache.cpp" line="129"/>
+        <location filename="../Classes/c5cache.cpp" line="270"/>
         <source>Name</source>
         <translation></translation>
     </message>
@@ -73,67 +75,72 @@
         <translation>Բաժին</translation>
     </message>
     <message>
-        <location filename="../Classes/c5cache.cpp" line="34"/>
+        <location filename="../Classes/c5cache.cpp" line="35"/>
         <source>Unit</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5cache.cpp" line="42"/>
+        <location filename="../Classes/c5cache.cpp" line="36"/>
+        <source>Scancode</source>
+        <translation>Սկանկոդ</translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5cache.cpp" line="44"/>
         <source>Contact</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5cache.cpp" line="43"/>
+        <location filename="../Classes/c5cache.cpp" line="45"/>
         <source>Info</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5cache.cpp" line="44"/>
+        <location filename="../Classes/c5cache.cpp" line="46"/>
         <source>Phone</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5cache.cpp" line="45"/>
+        <location filename="../Classes/c5cache.cpp" line="47"/>
         <source>Email</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5cache.cpp" line="72"/>
+        <location filename="../Classes/c5cache.cpp" line="74"/>
         <source>Full name</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5cache.cpp" line="73"/>
+        <location filename="../Classes/c5cache.cpp" line="75"/>
         <source>Gov. number</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5cache.cpp" line="74"/>
+        <location filename="../Classes/c5cache.cpp" line="76"/>
         <source>First name</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5cache.cpp" line="75"/>
+        <location filename="../Classes/c5cache.cpp" line="77"/>
         <source>Last name</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5cache.cpp" line="76"/>
+        <location filename="../Classes/c5cache.cpp" line="78"/>
         <source>Additional info</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5cache.cpp" line="80"/>
+        <location filename="../Classes/c5cache.cpp" line="82"/>
         <source>Description</source>
         <translation>Նկարագրություն</translation>
     </message>
     <message>
-        <location filename="../Classes/c5cache.cpp" line="92"/>
+        <location filename="../Classes/c5cache.cpp" line="94"/>
         <source>Price</source>
         <translation>Գին</translation>
     </message>
     <message>
-        <location filename="../Classes/c5cache.cpp" line="112"/>
+        <location filename="../Classes/c5cache.cpp" line="114"/>
         <source>Type</source>
         <translation>Տեսակ</translation>
     </message>
@@ -290,50 +297,50 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5grid.cpp" line="200"/>
-        <location filename="../Classes/c5grid.cpp" line="210"/>
-        <location filename="../Classes/c5grid.cpp" line="516"/>
+        <location filename="../Classes/c5grid.cpp" line="201"/>
+        <location filename="../Classes/c5grid.cpp" line="211"/>
+        <location filename="../Classes/c5grid.cpp" line="517"/>
         <source>Nothing was selected</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5grid.cpp" line="328"/>
+        <location filename="../Classes/c5grid.cpp" line="329"/>
         <source>Filter</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5grid.cpp" line="330"/>
+        <location filename="../Classes/c5grid.cpp" line="331"/>
         <source>Copy selection</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5grid.cpp" line="331"/>
+        <location filename="../Classes/c5grid.cpp" line="332"/>
         <source>Copy all</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5grid.cpp" line="614"/>
-        <location filename="../Classes/c5grid.cpp" line="648"/>
+        <location filename="../Classes/c5grid.cpp" line="615"/>
+        <location filename="../Classes/c5grid.cpp" line="649"/>
         <source>Printed</source>
         <translation>Տպված</translation>
     </message>
     <message>
-        <location filename="../Classes/c5grid.cpp" line="678"/>
+        <location filename="../Classes/c5grid.cpp" line="679"/>
         <source>Empty report!</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5grid.cpp" line="755"/>
+        <location filename="../Classes/c5grid.cpp" line="756"/>
         <source>Set filter</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5grid.cpp" line="756"/>
+        <location filename="../Classes/c5grid.cpp" line="757"/>
         <source>Remove filter</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5grid.cpp" line="757"/>
+        <location filename="../Classes/c5grid.cpp" line="758"/>
         <source>Autofit columns widths</source>
         <translation></translation>
     </message>
@@ -1026,7 +1033,7 @@ MS Excel</source>
     <message>
         <location filename="dqty.ui" line="25"/>
         <source>TITLE</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1326,7 +1333,7 @@ MS Excel</source>
     </message>
     <message>
         <location filename="worder.ui" line="62"/>
-        <location filename="worder.cpp" line="392"/>
+        <location filename="worder.cpp" line="400"/>
         <source>Price</source>
         <translation>Գին</translation>
     </message>
@@ -1359,9 +1366,9 @@ MS Excel</source>
     </message>
     <message>
         <location filename="worder.ui" line="230"/>
-        <location filename="worder.cpp" line="487"/>
-        <location filename="worder.cpp" line="492"/>
-        <location filename="worder.cpp" line="500"/>
+        <location filename="worder.cpp" line="497"/>
+        <location filename="worder.cpp" line="502"/>
+        <location filename="worder.cpp" line="510"/>
         <source>Discount</source>
         <translation>Զեղչ</translation>
     </message>
@@ -1376,47 +1383,52 @@ MS Excel</source>
         <translation>Մանրի վերադարձ</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="73"/>
+        <location filename="worder.cpp" line="74"/>
         <source>You cannot use this option with card payment mode.</source>
         <translation>Անկանխիկ գործարքի դեպքում չի թուլատրվում</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="80"/>
+        <location filename="worder.cpp" line="81"/>
         <source>Write order?</source>
         <translation>Գրանցել՞</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="135"/>
+        <location filename="worder.cpp" line="137"/>
         <source>(F)</source>
         <translation>(Ֆ)</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="215"/>
+        <location filename="worder.cpp" line="217"/>
         <source>Cashdesk for cash not defined</source>
         <translation>Կանխիկի դրամարկղը նշանակված չէ</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="218"/>
+        <location filename="worder.cpp" line="220"/>
         <source>Cashdesk for card not defined</source>
         <translation>Անկանխիկի դրամարկղը նշանակված չէ</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="274"/>
+        <location filename="worder.cpp" line="276"/>
         <source>Cash doc</source>
         <translation>Դրամարկղի փասթաթուղք</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="356"/>
+        <location filename="worder.cpp" line="358"/>
         <source>Cards was expired</source>
         <translation>Քարտի ժամկետը անցել է</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="377"/>
+        <location filename="worder.cpp" line="380"/>
         <source>Quantity</source>
         <translation>Քանակ</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="496"/>
+        <location filename="worder.cpp" line="386"/>
+        <source>Insufficient quantity</source>
+        <translation>Անբավարար քանակ</translation>
+    </message>
+    <message>
+        <location filename="worder.cpp" line="506"/>
         <source>Visit counter</source>
         <translation>Այցելություն</translation>
     </message>
@@ -1429,12 +1441,12 @@ MS Excel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="working.ui" line="223"/>
+        <location filename="working.ui" line="233"/>
         <source>Goods code (F2)</source>
         <translation>Ապրանքի կոդ (F2)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="199"/>
+        <location filename="working.ui" line="209"/>
         <source>Refund
 F6</source>
         <translation>Հետ վերադարձ
@@ -1497,112 +1509,122 @@ F6</source>
     </message>
     <message>
         <location filename="working.ui" line="165"/>
+        <source>Class 4</source>
+        <translation>Դաս 4</translation>
+    </message>
+    <message>
+        <location filename="working.ui" line="170"/>
         <source>TaxDept</source>
         <translation>Հդմ բաժին</translation>
     </message>
     <message>
-        <location filename="working.ui" line="170"/>
+        <location filename="working.ui" line="175"/>
         <source>Adg</source>
         <translation>ԱԴԳ կոդ</translation>
     </message>
     <message>
-        <location filename="working.ui" line="313"/>
+        <location filename="working.ui" line="180"/>
+        <source>Qty</source>
+        <translation>Քանակ</translation>
+    </message>
+    <message>
+        <location filename="working.ui" line="323"/>
         <source>Save order
 F9</source>
         <translation>Գրանցել
 (F9)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="327"/>
-        <location filename="working.ui" line="448"/>
+        <location filename="working.ui" line="337"/>
+        <location filename="working.ui" line="458"/>
         <source>F9</source>
         <translation> Նոր պատվեր
 (F9)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="424"/>
+        <location filename="working.ui" line="434"/>
         <source>Discount (F7)</source>
         <oldsource>Discount (F3)</oldsource>
         <translation>Զեղչ (F7)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="434"/>
+        <location filename="working.ui" line="444"/>
         <source>Duplicate
 receipt (F4)</source>
         <translation>Հաշվի 
 կրկօրինակ (F4)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="286"/>
+        <location filename="working.ui" line="296"/>
         <source>Configuration
 F10</source>
         <translation>Կարգավորումներ
 (F10)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="300"/>
-        <location filename="working.ui" line="354"/>
-        <location filename="working.ui" line="387"/>
+        <location filename="working.ui" line="310"/>
+        <location filename="working.ui" line="364"/>
+        <location filename="working.ui" line="397"/>
         <source>F10</source>
         <translation> Նոր պատվեր
 (F10)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="340"/>
+        <location filename="working.ui" line="350"/>
         <source>Goods List
 F5</source>
         <translation>Ապրանքներ
 (F5)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="373"/>
+        <location filename="working.ui" line="383"/>
         <source>Exit
 Esc</source>
         <translation>Ելք
 (Esc)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="213"/>
-        <location filename="working.ui" line="414"/>
+        <location filename="working.ui" line="223"/>
+        <location filename="working.ui" line="424"/>
         <source>F11</source>
         <translation> Նոր պատվեր
 (F11)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="250"/>
+        <location filename="working.ui" line="260"/>
         <source>F12</source>
         <translation> Նոր պատվեր
 (F12)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="400"/>
+        <location filename="working.ui" line="410"/>
         <source>New order
 F11</source>
         <translation> Նոր պատվեր
 (F11)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="236"/>
+        <location filename="working.ui" line="246"/>
         <source>Save order
 F12</source>
         <translation>Գրանցել
 (F12)</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="125"/>
-        <location filename="working.cpp" line="341"/>
+        <location filename="working.cpp" line="126"/>
+        <location filename="working.cpp" line="354"/>
         <source>Password</source>
         <translation>Գախտնաբառ</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="125"/>
+        <location filename="working.cpp" line="126"/>
         <source>Administrator password</source>
         <translation>Ադմինիստրատորի գախտնաբառ</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="141"/>
-        <location filename="working.cpp" line="146"/>
-        <location filename="working.cpp" line="343"/>
+        <location filename="working.cpp" line="142"/>
+        <location filename="working.cpp" line="147"/>
+        <location filename="working.cpp" line="356"/>
         <source>Access denied</source>
         <translation>Մուտքը արգելված է</translation>
     </message>

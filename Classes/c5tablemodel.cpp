@@ -1,13 +1,17 @@
 #include "c5tablemodel.h"
 #include "c5utils.h"
 #include <QIcon>
+#include <QTableView>
 
 C5TableModel::C5TableModel(C5Database &db, QObject *parent) :
     QAbstractTableModel(parent),
     fDb(db)
 {
+    fTableView = dynamic_cast<QTableView*>(parent);
     fSortAsc = true;
     fLastSortedColumn = -1;
+    fCheckboxes = false;
+    fSingleCheckBoxSelection = true;
 }
 
 void C5TableModel::translate(const QMap<QString, QString> &t)
@@ -21,15 +25,38 @@ void C5TableModel::execQuery(const QString &query)
     clearModel();
     if (fDb.exec(query, fRawData, fColumnNameIndex)) {
         for (int i = 0, count = fRawData.count(); i < count; i++) {
+            if (fCheckboxes) {
+                fRawData[i].insert(0, QVariant());
+            }
             fProxyData << i;
         }
         for (QMap<QString, int>::const_iterator it = fColumnNameIndex.begin(); it != fColumnNameIndex.end(); it++) {
             fColumnIndexName[it.value()] = it.key();
         }
+        if (fCheckboxes) {
+            for (QMap<QString, int>::iterator it = fColumnNameIndex.begin(); it != fColumnNameIndex.end(); it++) {
+                QString k = it.key();
+                int v = it.value() + 1;
+                fColumnNameIndex[k] = v;
+                fColumnIndexName[v] = k;
+            }
+            fColumnNameIndex["X"] = 0;
+            fColumnIndexName[0] = "X";
+        }
     } else {
 
     }
     endResetModel();
+}
+
+void C5TableModel::setCheckboxes(bool v)
+{
+    fCheckboxes = v;
+}
+
+void C5TableModel::setSingleCheckBoxSelection(bool v)
+{
+    fSingleCheckBoxSelection = v;
 }
 
 void C5TableModel::sort(int column)
@@ -123,7 +150,20 @@ QVariant C5TableModel::data(const QModelIndex &index, int role) const
         return QVariant();
     }
     switch (role) {
+    case Qt::CheckStateRole: {
+        if (fCheckboxes) {
+            if (index.column() == 0) {
+                return fRawData.at(fProxyData.at(index.row())).at(index.column()).toInt() == 0 ? Qt::Unchecked : Qt::Checked;
+            }
+        }
+        return QVariant();
+    }
     case Qt::DisplayRole:
+        if (fCheckboxes) {
+            if (index.column() == 0) {
+                return "";
+            }
+        }
         return dataDisplay(fProxyData.at(index.row()), index.column());
     case Qt::EditRole:
         return fRawData.at(fProxyData.at(index.row())).at(index.column());
@@ -142,6 +182,17 @@ bool C5TableModel::setData(const QModelIndex &index, const QVariant &value, int 
     switch (role) {
     case Qt::EditRole:
         fRawData[fProxyData.at(index.row())][index.column()] = value;
+        break;
+    case Qt::CheckStateRole:
+        if (fCheckboxes && fSingleCheckBoxSelection && value > 0) {
+            for (int i = 0; i < fRawData.count(); i++) {
+                fRawData[i][0] = 0;
+            }
+        }
+        fRawData[fProxyData.at(index.row())][index.column()] = value;
+        if (fTableView != nullptr) {
+            fTableView->viewport()->update();
+        }
         break;
     }
     return true;
@@ -178,11 +229,16 @@ void C5TableModel::setRowColor(int row, const QColor &color)
 
 Qt::ItemFlags C5TableModel::flags(const QModelIndex &index) const
 {
+    Qt::ItemFlags f = QAbstractTableModel::flags(index);
     if (fEditableFlags.contains(index.column())) {
-        return QAbstractTableModel::flags(index) ^ fEditableFlags[index.column()];
+        f = f ^ fEditableFlags[index.column()];
     } else {
-        return QAbstractTableModel::flags(index);
+
     }
+    if (fCheckboxes) {
+        f = f | Qt::ItemIsUserCheckable;
+    }
+    return f;
 }
 
 void C5TableModel::setEditableFlag(int column, Qt::ItemFlags flag)

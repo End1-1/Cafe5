@@ -12,11 +12,15 @@ public:
 
     virtual QToolBar *toolBar() override;
 
+    virtual void restoreColumnsWidths();
+
 protected:
     virtual void refreshData() override;
 
 private slots:
     void dblClick(int row, int column, const QList<QVariant> &v);
+
+    void groupAction();
 };
 
 #endif // CR5MENUREVIEW_H

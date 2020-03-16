@@ -1,4 +1,5 @@
 #include "sockethandlerlogin.h"
+#include "sockethandlergoods.h"
 #include "c5database.h"
 #include "config.h"
 #include "servicecommands.h"
@@ -16,6 +17,7 @@ void SocketHandlerLogin::processData()
     QJsonDocument jdoc = QJsonDocument::fromJson(fData);
     QJsonObject jo = jdoc.object();
     C5Database db(DBHOST, DBFILE, DBUSER, DBPASSWORD);
+    bool listOfGoods = jo["listofgoods"].toInt() == 1;
     db[":f_login"] = jo["username"].toString();
     db[":f_password"] = jo["password"].toString();
     db.exec("select f_id, f_group, f_first, f_last from s_user where f_login=:f_login and f_password=md5(:f_password)");
@@ -34,6 +36,12 @@ void SocketHandlerLogin::processData()
         db[":f_datestart"] = QDate::currentDate();
         db[":f_timestart"] = QTime::currentTime();
         db.insert("s_login_session", false);
+        if (listOfGoods) {
+            QByteArray goodsData;
+            SocketHandlerGoods shg(goodsData);
+            shg.processData();
+            jo["listofgoodsgroups"] = QJsonDocument::fromJson(goodsData).object();
+        }
         jdoc = QJsonDocument(jo);
         fData = jdoc.toJson(QJsonDocument::Compact);
     } else {

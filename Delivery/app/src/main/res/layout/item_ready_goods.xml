@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/llBackground"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/tvName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin"
+        android:layout_weight="1"
+        android:text="SNIKERS BARBEQUE"
+        android:textColor="@color/colorBlack"
+        android:textSize="@dimen/listFontSize" />
+
+    <TextView
+        android:id="@+id/tvPrice"
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin"
+        android:text="12400"
+        android:textColor="@color/colorBlack"
+        android:textSize="@dimen/listFontSize" />
+
+    <TextView
+        android:id="@+id/tvQtyStore"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin"
+        android:text="13"
+        android:textColor="@color/colorBlack"
+        android:textSize="@dimen/listFontSize" />
+
+    <EditText
+        android:id="@+id/edQty"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin"
+        android:inputType="numberDecimal"
+        android:gravity="right"
+        android:text=""
+        android:textColor="@color/colorBlack"
+        android:textSize="@dimen/listFontSize" />
+</LinearLayout>

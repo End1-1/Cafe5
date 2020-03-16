@@ -44,6 +44,7 @@
 #define param_autoinput_salecash 38
 #define param_tax_cashier_login 39
 #define param_tax_cashier_pin 40
+#define param_control_shop_qty 41
 
 #define FRONTDESK_WAITER 0
 #define FRONTDESK_SHOP 1
@@ -166,6 +167,8 @@ public:
     static QString taxCashier();
 
     static QString taxPin();
+
+    static bool controlShopQty();
 
 private:
     static QString getValue(int key);

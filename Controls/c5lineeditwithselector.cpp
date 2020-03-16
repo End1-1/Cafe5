@@ -10,6 +10,7 @@ C5LineEditWithSelector::C5LineEditWithSelector(QWidget *parent) :
     fNameLineEdit = nullptr;
     fWidget = nullptr;
     fDialog = nullptr;
+    fMultiselection = false;
 }
 
 C5LineEditWithSelector::~C5LineEditWithSelector()
@@ -17,13 +18,19 @@ C5LineEditWithSelector::~C5LineEditWithSelector()
 
 }
 
-void C5LineEditWithSelector::setSelector(const QStringList &dbParams, QLineEdit *selName, int cacheId, int colId, int colName)
+C5LineEditWithSelector &C5LineEditWithSelector::setSelector(const QStringList &dbParams, QLineEdit *selName, int cacheId, int colId, int colName)
 {
     fDBParams = dbParams;
     fNameLineEdit = selName;
     fCache = cacheId;
     fColumnId = colId;
     fColumnName = colName;
+    return *this;
+}
+
+void C5LineEditWithSelector::setMultiselection(bool v)
+{
+    fMultiselection = v;
 }
 
 void C5LineEditWithSelector::setCallbackWidget(C5Widget *w)
@@ -43,19 +50,31 @@ void C5LineEditWithSelector::setValue(const QString &id)
         return;
     }
     C5Cache *c = C5Cache::cache(fDBParams, fCache);
-    int row = c->find(id.toInt());
-    if (row > -1) {
-        QString text = c->getString(row, fColumnName);
+    QString text;
+    int row = -1;
+    QStringList ids = id.split(",", QString::SkipEmptyParts);
+    foreach (const QString &s, ids) {
+        row = c->find(s.toInt());
+        if (row > -1) {
+            if (!text.isEmpty()) {
+                text += ",";
+            }
+            text = c->getString(row, fColumnName - 1);
+        }
+    }
+    if (!text.isEmpty()) {
         fNameLineEdit->setText(text);
     } else {
         clear();
         fNameLineEdit->clear();
     }
-    if (fWidget && row > -1) {
-        fWidget->selectorCallback(0, c->getRow(row));
-    }
-    if (fDialog && row > -1) {
-        fDialog->selectorCallback(0, c->getRow(row));
+    if (!fMultiselection) {
+        if (fWidget && row > -1) {
+            fWidget->selectorCallback(0, c->getRow(row));
+        }
+        if (fDialog && row > -1) {
+            fDialog->selectorCallback(0, c->getRow(row));
+        }
     }
 }
 
@@ -76,21 +95,52 @@ void C5LineEditWithSelector::mouseDoubleClickEvent(QMouseEvent *e)
         emit doubleClicked();
         return;
     }
-    QList<QVariant> values;
-    if (!C5Selector::getValue(fDBParams, fCache, values)) {
-        return;
-    }
-    setText(values.at(fColumnId).toString());
-    if (fNameLineEdit) {
-        fNameLineEdit->setText(values.at(fColumnName).toString());
-    }
-    if (fWidget && values.count() > 0) {
-        fWidget->selectorCallback(0, values);
-    }
-    if (fDialog && values.count() > 0) {
-        fDialog->selectorCallback(0, values);
-    }
+
+    if (fMultiselection) {
+        QList<QList<QVariant> > values;
+        if (!C5Selector::getMultipleValues(fDBParams, fCache, values)) {
+            return;
+        }
+        QString textId, textName;
+        foreach (const QList<QVariant> &c, values) {
+            if (!textId.isEmpty()) {
+                textId += ",";
+                textName += ",";
+            }
+            textId += c.at(fColumnId).toString();
+            textName += c.at(fColumnName).toString();
+        }
+        setText(textId);
+        if (fNameLineEdit) {
+            fNameLineEdit->setText(textName);
+        }
+//        if (fWidget && values.count() > 0) {
+//            fWidget->selectorCallback(0, values);
+//        }
+//        if (fDialog && values.count() > 0) {
+//            fDialog->selectorCallback(0, values);
+//        }
+        emit multiDone(values);
+    } else {
+        QList<QVariant> values;
+        if (!C5Selector::getValue(fDBParams, fCache, values)) {
+            return;
+        }
+        if (values.count() == 0) {
+            return;
+        }
+        setText(values.at(fColumnId).toString());
+        if (fNameLineEdit) {
+            fNameLineEdit->setText(values.at(fColumnName).toString());
+        }
+        if (fWidget && values.count() > 0) {
+            fWidget->selectorCallback(0, values);
+        }
+        if (fDialog && values.count() > 0) {
+            fDialog->selectorCallback(0, values);
+        }
         emit done(values);
+    }
 }
 
 void C5LineEditWithSelector::focusOutEvent(QFocusEvent *e)

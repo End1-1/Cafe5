@@ -33,6 +33,7 @@ int main(int argc, char *argv[])
     C5Config::fDBPassword = connectionParams.at(3);
     C5Config::fSettingsName = connectionParams.at(4);
     C5Config::fLastUsername = connectionParams.at(5);
+    C5Config::fFullScreen = connectionParams.at(6);
     C5Config::initParamsFromDb();
 
     QTranslator t;

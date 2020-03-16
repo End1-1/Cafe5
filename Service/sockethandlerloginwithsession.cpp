@@ -1,9 +1,11 @@
 #include "sockethandlerloginwithsession.h"
 #include "c5database.h"
 #include "config.h"
+#include "sockethandlergoods.h"
 #include "servicecommands.h"
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QJsonArray>
 
 SocketHandlerLoginWithSession::SocketHandlerLoginWithSession(QByteArray &data) :
     SocketHandler(data)
@@ -17,6 +19,7 @@ void SocketHandlerLoginWithSession::processData()
     QJsonObject jo = jdoc.object();
     QByteArray session =  QByteArray::fromBase64(jo["session"].toString().toUtf8());
     C5Database db(DBHOST, DBFILE, DBUSER, DBPASSWORD);
+    bool listOfGoods = jo["listofgoods"].toInt() == 1;
     db[":f_session"] = session;
     db.exec("select f_id, f_user from s_login_session where f_session=:f_session");
     int userid = 0;
@@ -48,7 +51,13 @@ void SocketHandlerLoginWithSession::processData()
         db[":f_iplogin"] = fPeerAddress;
         db[":f_datestart"] = QDate::currentDate();
         db[":f_timestart"] = QTime::currentTime();
-        db.insert("s_login_session", false);
+        db.insert("s_login_session", false);        
+        if (listOfGoods) {
+            QByteArray goodsData;
+            SocketHandlerGoods shg(goodsData);
+            shg.processData();
+            jo["listofgoodsgroups"] = QJsonDocument::fromJson(goodsData).object();
+        }
         jdoc = QJsonDocument(jo);
         fData = jdoc.toJson(QJsonDocument::Compact);
     } else {

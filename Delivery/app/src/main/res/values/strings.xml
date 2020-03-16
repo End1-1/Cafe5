@@ -8,4 +8,20 @@
     <string name="ServerAddress">Server address</string>
     <string name="ServerPort">Server port</string>
     <string name="LoginStatusFailed">Login failed</string>
+    <string name="DeliveryAgent">DeliveryAgent</string>
+    <string name="TaxNumber">Tax number</string>
+    <string name="TaxName">Tax name</string>
+    <string name="MarketName">Market name</string>
+    <string name="Contact">Contact name</string>
+    <string name="Phone">Phone number</string>
+    <string name="Code">Code</string>
+    <string name="Address">Address</string>
+    <string name="Customer">Customer</string>
+    <string name="Goods">Goods</string>
+    <string name="Bill">Bill</string>
+    <string name="LoginStatusGoodsGroups">Loading groups of goods</string>
+    <string name="LoginStatusGoods">Loading goods</string>
+    <string name="Append">Append</string>
+    <string name="Ready">Ready</string>
+
 </resources>

@@ -9,7 +9,7 @@ CR5MaterialInStoreFilter::CR5MaterialInStoreFilter(const QStringList &dbParams, 
     ui->setupUi(this);
     ui->leStore->setSelector(fDBParams, ui->leStoreName, cache_goods_store);
     ui->leGroup->setSelector(fDBParams, ui->leGroupname, cache_goods_group);
-    ui->leMaterial->setSelector(fDBParams, ui->leMaterialName, cache_goods, 0, 2);
+    ui->leMaterial->setSelector(fDBParams, ui->leMaterialName, cache_goods, 1, 3);
     ui->leClass1->setSelector(fDBParams, ui->leClass1Name, cache_goods_classes);
     ui->leClass2->setSelector(fDBParams, ui->leClass2Name, cache_goods_classes);
     ui->leClass3->setSelector(fDBParams, ui->leClass3Name, cache_goods_classes);

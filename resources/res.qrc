@@ -69,5 +69,7 @@
         <file>rotation.png</file>
         <file>paste.png</file>
         <file>service.png</file>
+        <file>hammer.png</file>
+        <file>checked.png</file>
     </qresource>
 </RCC>

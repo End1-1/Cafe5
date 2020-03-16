@@ -22,6 +22,9 @@
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
     <widget class="QTabWidget" name="tabWidget">
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
      <property name="currentIndex">
       <number>0</number>
      </property>
@@ -591,6 +594,16 @@
          </property>
         </spacer>
        </item>
+       <item row="0" column="1">
+        <widget class="C5CheckBox" name="chEnterShopPin">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>34</number>
+         </property>
+        </widget>
+       </item>
        <item row="2" column="0">
         <spacer name="verticalSpacer_6">
          <property name="orientation">
@@ -604,13 +617,20 @@
          </property>
         </spacer>
        </item>
-       <item row="0" column="1">
-        <widget class="C5CheckBox" name="chEnterShopPin">
+       <item row="1" column="1">
+        <widget class="C5CheckBox" name="chControlShopQuantity">
          <property name="text">
           <string/>
          </property>
          <property name="Tag" stdset="0">
-          <number>34</number>
+          <number>41</number>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_43">
+         <property name="text">
+          <string>Control quantity</string>
          </property>
         </widget>
        </item>
@@ -757,14 +777,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5LineEdit</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5lineedit.h</header>
-  </customwidget>
-  <customwidget>
    <class>C5LineEditWithSelector</class>
    <extends>QLineEdit</extends>
    <header location="global">c5lineeditwithselector.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5LineEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5lineedit.h</header>
   </customwidget>
   <customwidget>
    <class>C5CheckBox</class>
@@ -778,7 +798,6 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>tabWidget</tabstop>
   <tabstop>leCode</tabstop>
   <tabstop>lineEdit_2</tabstop>
   <tabstop>lineEdit_3</tabstop>
@@ -797,6 +816,11 @@
   <tabstop>leLocalReceiptPrinter</tabstop>
   <tabstop>leIDRAMID</tabstop>
   <tabstop>leIDRAMPhone</tabstop>
+  <tabstop>chAutoCash</tabstop>
+  <tabstop>leCashId</tabstop>
+  <tabstop>leCashIdPrefix</tabstop>
+  <tabstop>leCardId</tabstop>
+  <tabstop>leCardIdPrefix</tabstop>
   <tabstop>cbMenu</tabstop>
   <tabstop>leServiceFactor</tabstop>
   <tabstop>cbServiceMode</tabstop>
@@ -806,10 +830,14 @@
   <tabstop>leItemCodeForHotel</tabstop>
   <tabstop>leChangeWorkingDateTime</tabstop>
   <tabstop>chCarMode</tabstop>
+  <tabstop>chEnterShopPin</tabstop>
+  <tabstop>chControlShopQuantity</tabstop>
   <tabstop>leTaxIP</tabstop>
   <tabstop>leTaxPort</tabstop>
   <tabstop>leTaxPassword</tabstop>
   <tabstop>leTaxDept</tabstop>
+  <tabstop>leCashierLogin</tabstop>
+  <tabstop>leCashierPin</tabstop>
   <tabstop>cbTaxUseExtPos</tabstop>
   <tabstop>chAlwaysOfferTax</tabstop>
  </tabstops>

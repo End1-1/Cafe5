@@ -136,6 +136,32 @@
     </message>
 </context>
 <context>
+    <name>C5StoreDraftWriter</name>
+    <message>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="71"/>
+        <source>Sale autoinput</source>
+        <translation>Ավտոմատ մուտք</translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="184"/>
+        <source>Sale autooutput</source>
+        <translation>Ավտոմատ ելք</translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="271"/>
+        <source>Store document has been registered for this sale</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>C5WaiterOrderDoc</name>
+    <message>
+        <location filename="../Classes/c5waiterorderdoc.cpp" line="304"/>
+        <source>Document saved</source>
+        <translation>Պահպանված է</translation>
+    </message>
+</context>
+<context>
     <name>DlgPassword</name>
     <message>
         <location filename="dlgpassword.ui" line="35"/>
@@ -205,9 +231,9 @@
     </message>
     <message>
         <location filename="dlgpassword.cpp" line="77"/>
-        <location filename="dlgpassword.cpp" line="159"/>
+        <location filename="dlgpassword.cpp" line="163"/>
         <location filename="../Waiter/dlgpassword.cpp" line="77"/>
-        <location filename="../Waiter/dlgpassword.cpp" line="159"/>
+        <location filename="../Waiter/dlgpassword.cpp" line="161"/>
         <source>Access denied</source>
         <translation>Մուտքը արգելված է</translation>
     </message>
@@ -272,90 +298,90 @@
     </message>
     <message>
         <location filename="workspace.ui" line="244"/>
-        <location filename="workspace.ui" line="249"/>
-        <location filename="workspace.ui" line="254"/>
-        <location filename="workspace.ui" line="259"/>
-        <location filename="workspace.ui" line="264"/>
-        <location filename="workspace.ui" line="269"/>
-        <location filename="workspace.ui" line="425"/>
-        <location filename="workspace.ui" line="430"/>
-        <location filename="workspace.ui" line="435"/>
-        <location filename="workspace.ui" line="440"/>
-        <location filename="workspace.ui" line="445"/>
-        <location filename="workspace.ui" line="450"/>
-        <location filename="workspace.ui" line="867"/>
+        <location filename="workspace.ui" line="413"/>
+        <location filename="workspace.ui" line="418"/>
+        <location filename="workspace.ui" line="423"/>
+        <location filename="workspace.ui" line="428"/>
+        <location filename="workspace.ui" line="433"/>
+        <location filename="workspace.ui" line="438"/>
+        <location filename="workspace.ui" line="846"/>
         <source>New Column</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="769"/>
+        <location filename="workspace.ui" line="748"/>
         <source>1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="750"/>
+        <location filename="workspace.ui" line="729"/>
         <source>2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="712"/>
+        <location filename="workspace.ui" line="691"/>
         <source>4</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="731"/>
+        <location filename="workspace.ui" line="710"/>
         <source>3</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="636"/>
+        <location filename="workspace.ui" line="615"/>
         <source>+10</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="693"/>
+        <location filename="workspace.ui" line="672"/>
         <source>5</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="655"/>
+        <location filename="workspace.ui" line="634"/>
         <source>+1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="674"/>
+        <location filename="workspace.ui" line="653"/>
         <source>-1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="817"/>
+        <location filename="workspace.ui" line="796"/>
         <source>0.5</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="903"/>
+        <location filename="workspace.ui" line="882"/>
         <source>Total</source>
         <translation>Ընդամենը</translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="916"/>
+        <location filename="workspace.ui" line="895"/>
         <source>Checkout</source>
         <translation>ՀԱՇԻՎ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="32"/>
+        <location filename="workspace.cpp" line="35"/>
         <source>ENTER</source>
         <translation>ՄՈՒՏՔ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="306"/>
+        <location filename="workspace.cpp" line="330"/>
         <source>Receipt #</source>
         <translation>Պատվեր №</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="323"/>
+        <location filename="workspace.cpp" line="347"/>
         <source>Printed:</source>
         <translation>Տպված</translation>
+    </message>
+    <message>
+        <location filename="workspace.cpp" line="391"/>
+        <source>Confirm to close application</source>
+        <translation>Փակել՞ ծրագիրը</translation>
     </message>
 </context>
 <context>
@@ -463,7 +489,7 @@
     </message>
     <message>
         <location filename="payment.cpp" line="150"/>
-        <location filename="payment.cpp" line="252"/>
+        <location filename="payment.cpp" line="253"/>
         <source>(F)</source>
         <translation>(Ֆ)</translation>
     </message>

@@ -24,14 +24,16 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         fCacheQuery[cache_goods_group] = QString("select f_id as `%1`, f_name as `%2` from c_groups")
                 .arg(tr("Code"))
                 .arg(tr("Name"));
-        fCacheQuery[cache_goods] = QString("select g.f_id as `%1`, gg.f_name as `%2`, g.f_name as `%3`, u.f_name as `%4` \
+        fCacheQuery[cache_goods] = QString("select g.f_id as `%1`, gg.f_name as `%2`, g.f_name as `%3`, u.f_name as `%4`, \
+                                           g.f_scancode as `%5` \
                                            from c_goods g \
                                            left join c_groups gg on gg.f_id=g.f_group \
                                            left join c_units as u on u.f_id=g.f_unit")
                 .arg(tr("Code"))
                 .arg(tr("Group"))
                 .arg(tr("Name"))
-                .arg(tr("Unit"));
+                .arg(tr("Unit"))
+                .arg(tr("Scancode"));
         fCacheQuery[cache_goods_store] = QString("select f_id as `%1`, f_name as `%2` from c_storages")
                 .arg(tr("Code"))
                 .arg(tr("Name"));
@@ -120,6 +122,9 @@ C5Cache::C5Cache(const QStringList &dbParams) :
                 .arg(tr("Code"))
                 .arg(tr("Name"));
         fCacheQuery[cache_goods_classes] = QString("select f_id as `%1`, f_name as `%2` from c_goods_classes")
+                .arg(tr("Code"))
+                .arg(tr("Name"));
+        fCacheQuery[cache_dish_menu_state] = QString("select f_id as `%1`, f_name as `%2` from d_dish_state")
                 .arg(tr("Code"))
                 .arg(tr("Name"));
     }

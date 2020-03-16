@@ -73,8 +73,6 @@ private:
     int fCardMode;
 
     double fCardValue;
-
-    double fCardData;
 };
 
 #endif // WORDER_H

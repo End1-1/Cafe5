@@ -1,6 +1,7 @@
 #ifndef WORKING_H
 #define WORKING_H
 
+#include "goods.h"
 #include <QWidget>
 
 namespace Ui {
@@ -25,6 +26,8 @@ public:
     void markDiscount(const QString &customer);
 
     bool getAdministratorRights();
+
+    static QMap<QString, Goods> fGoods;
 
 private:
     Ui::Working *ui;

@@ -11,6 +11,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = Smart
 TEMPLATE = app
 
+RC_FILE = res.rc
+
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
@@ -26,9 +28,13 @@ DEFINES += WAITER
 
 SOURCES += \
     ../../NewTax/Src/printtaxn.cpp \
+    ../Cafe5/c5cafecommon.cpp \
     ../Classes/c5printing.cpp \
+    ../Classes/c5storedraftwriter.cpp \
+    ../Classes/c5waiterorderdoc.cpp \
     ../Classes/notificationwidget.cpp \
     dishitemdelegate.cpp \
+    dishpartitemdelegate.cpp \
     dishtableitemdelegate.cpp \
         main.cpp \
     payment.cpp \
@@ -47,12 +53,18 @@ SOURCES += \
 
 HEADERS += \
     ../../NewTax/Src/printtaxn.h \
+    ../Cafe5/c5cafecommon.h \
     ../Classes/c5printing.h \
+    ../Classes/c5storedraftwriter.h \
+    ../Classes/c5waiterorderdoc.h \
     ../Classes/notificationwidget.h \
     dish.h \
     dishitemdelegate.h \
+    dishpartitemdelegate.h \
     dishtableitemdelegate.h \
     payment.h \
+    rc.h \
+    res.rc \
         workspace.h \
     ../Cafe5/c5config.h \
     ../Cafe5/c5connection.h \

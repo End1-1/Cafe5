@@ -21,6 +21,8 @@ public:
 
     static bool getValue(const QStringList &dbParams, int cache, QList<QVariant> &values);
 
+    static bool getMultipleValues(const QStringList &dbParams, int cache, QList<QList<QVariant> > &values);
+
     static bool getValues(const QStringList &dbParams, const QString &sql, QList<QVariant> &values, const QMap<QString, QString> &translator);
 
     void keyPressEvent(QKeyEvent *key) override;
@@ -28,11 +30,15 @@ public:
     static void resetCache(const QStringList &dbParams, int cacheId);
 
 private slots:
+    void tblSingleClick(const QModelIndex &index);
+
     void tblDoubleClicked(int row, int column, const QList<QVariant> &values);
 
     void on_btnRefreshCache_clicked();
 
     void on_leFilter_textChanged(const QString &arg1);
+
+    void on_btnCheck_clicked();
 
 private:
     Ui::C5Selector *ui;
@@ -50,6 +56,8 @@ private:
     static QMap<QString, QMap<int, C5Selector*> > fSelectorList;
 
     bool fReset;
+
+    bool fMultipleSelection;
 };
 
 #endif // C5SELECTOR_H

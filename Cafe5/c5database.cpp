@@ -164,9 +164,9 @@ bool C5Database::exec(const QString &sqlQuery, QList<QList<QVariant> > &dbrows, 
 //#define LOGGING 1
 
 #ifdef QT_DEBUG
-    logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + lastQuery(fQuery));
+    logEvent(fDb.hostName() + " (" + QString::number(fTimerCount) + " ms):" + fDb.databaseName() + " " + lastQuery(fQuery));
 #elif  LOGGING
-    logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + lastQuery(fQuery));
+    logEvent(fDb.hostName() + " (" + QString::number(fTimerCount) + " ms):" + fDb.databaseName() + " " + lastQuery(fQuery));
 #endif
 
     fBindValues.clear();
@@ -514,6 +514,7 @@ QString C5Database::lastQuery(QSqlQuery *q)
 
 bool C5Database::exec(const QString &sqlQuery, bool &isSelect)
 {
+    fTimer.restart();
     if (!open()) {
         return false;
     }
@@ -536,5 +537,6 @@ bool C5Database::exec(const QString &sqlQuery, bool &isSelect)
     if (!isSelect) {
         isSelect = sqlQuery.mid(0, 4).compare("call", Qt::CaseInsensitive) == 0;
     }
+    fTimerCount = fTimer.elapsed();
     return true;
 }

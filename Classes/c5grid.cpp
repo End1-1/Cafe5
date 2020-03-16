@@ -20,8 +20,9 @@ C5Grid::C5Grid(const QStringList &dbParams, QWidget *parent) :
     ui(new Ui::C5Grid)
 {
     ui->setupUi(this);
+    fCheckboxes = false;
     fDBParams = dbParams;
-    fModel = new C5TableModel(fDb, this);
+    fModel = new C5TableModel(fDb, ui->tblView);
     ui->tblView->setModel(fModel);
     fSimpleQuery = true;
     fTableView = ui->tblView;
@@ -75,7 +76,8 @@ void C5Grid::buildQuery()
     QStringList leftJoinTables;
     QMap<QString, QString> leftJoinTablesMap;
     QStringList groupFields;
-    if (!fSimpleQuery) {
+    if (fSimpleQuery) {
+    } else {
         fSqlQuery = "select ";
         bool first = true;
         foreach (QString s, fColumnsFields) {
@@ -174,6 +176,11 @@ void C5Grid::changeDatabase(const QStringList &dbParams)
     refreshData();
 }
 
+void C5Grid::setCheckboxes(bool v)
+{
+    fCheckboxes = v;
+}
+
 QWidget *C5Grid::widget()
 {
     return ui->wd;
@@ -216,7 +223,7 @@ int C5Grid::rowId(int &row, int column)
 
 void C5Grid::cellClicked(const QModelIndex &index)
 {
-    Q_UNUSED(index);
+    emit tblSingleClick(index);
 }
 
 void C5Grid::callEditor(const QString &id)
@@ -720,6 +727,10 @@ void C5Grid::exportToExcel()
 
 void C5Grid::clearFilter()
 {
+    if (fFilterWidget) {
+        fFilterWidget->clearFilter(fFilterWidget);
+        fFilterWidget->saveFilter(fFilterWidget);
+    }
     fModel->clearFilter();
     sumColumnsData();
 }
@@ -795,7 +806,24 @@ void C5Grid::saveDataChanges()
 
 void C5Grid::refreshData()
 {
-    fModel->execQuery(fSqlQuery);
+    QString sqlQuery = fSqlQuery;
+    if (fSimpleQuery) {
+        if (fFilterWidget) {
+            fWhereCondition = fFilterWidget->condition();
+        }
+        if (!fWhereCondition.isEmpty()) {
+            if (fSqlQuery.contains("where")) {
+                sqlQuery += " and " + fWhereCondition;
+            } else {
+                sqlQuery += fWhereCondition;
+            }
+        }
+        if (!fOrderCondition.isEmpty()) {
+            sqlQuery += fOrderCondition;
+        }
+    }
+    fModel->setCheckboxes(fCheckboxes);
+    fModel->execQuery(sqlQuery);
     if (fSimpleQuery) {
         for (int i = 0; i < fModel->columnCount(); i++) {
             fColumnsVisible[fModel->fColumnIndexName[i]] = true;

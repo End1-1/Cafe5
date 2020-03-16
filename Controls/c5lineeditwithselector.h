@@ -15,7 +15,9 @@ public:
 
     ~C5LineEditWithSelector();
 
-    void setSelector(const QStringList &dbParams, QLineEdit *selName, int cacheId, int colId = 0, int colName = 1);
+    C5LineEditWithSelector &setSelector(const QStringList &dbParams, QLineEdit *selName, int cacheId, int colId = 1, int colName = 2);
+
+    void setMultiselection(bool v);
 
     void setCallbackWidget(C5Widget *w);
 
@@ -47,8 +49,12 @@ private:
 
     C5Dialog *fDialog;
 
+    bool fMultiselection;
+
 signals:
     void done(const QList<QVariant> &values);
+
+    void multiDone(const QList<QList<QVariant> > &values);
 
     void doubleClicked();
 

@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <dimen name="btnIconSize">24dp</dimen>
     <dimen name="textFontSize">18sp</dimen>
+    <dimen name="listFontSize">14sp</dimen>
     <dimen name="bigButtonSize">148dp</dimen>
+    <dimen name="margin">2dp</dimen>
 </resources>

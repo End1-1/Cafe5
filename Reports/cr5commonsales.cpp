@@ -147,6 +147,7 @@ void CR5CommonSales::openOrder(int row, int column, const QList<QVariant> &value
         return;
     }
     if (values.count() == 0) {
+        C5Message::info(tr("Nothing selected"));
         return;
     }
     C5Database db(fDBParams);
@@ -163,7 +164,15 @@ void CR5CommonSales::openOrder(int row, int column, const QList<QVariant> &value
             C5SaleFromStoreOrder::openOrder(fDBParams, values.at(fModel->fColumnNameIndex["f_id"]).toString());
             break;
         }
+        default: {
+            C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>(fDBParams);
+            wo->setOrder(values.at(fModel->fColumnNameIndex["f_id"]).toString());
+            break;
         }
+        }
+    } else {
+        C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>(fDBParams);
+        wo->setOrder(values.at(fModel->fColumnNameIndex["f_id"]).toString());
     }
 }
 

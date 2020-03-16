@@ -2,16 +2,14 @@ package com.e.delivery.Activities;
 
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.e.delivery.Utils.LocaleHelper;
 
@@ -22,19 +20,6 @@ public class ParentActivity extends AppCompatActivity implements View.OnClickLis
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getSupportActionBar().hide();
         LocaleHelper.setLocale(this, "hy");
-    }
-
-    protected void setButtonsClickListener (ViewGroup vg){
-        for(int i = 0; i < vg.getChildCount(); i++){
-            View v = vg.getChildAt(i);
-            if(v instanceof Button){
-                v.setOnClickListener(this);
-            } else if (v instanceof ImageButton) {
-                v.setOnClickListener(this);
-            } else if (v instanceof ConstraintLayout) {
-                setButtonsClickListener((ViewGroup) v);
-            }
-        }
     }
 
     @Override
@@ -55,5 +40,11 @@ public class ParentActivity extends AppCompatActivity implements View.OnClickLis
     public void setTextViewText(int id, String text) {
         TextView tv = findViewById(id);
         tv.setText(text);
+    }
+
+    public void replaceFragment(Fragment fr, int containerId, String tag) {
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(containerId, fr, tag);
+        fragmentTransaction.commit();
     }
 }

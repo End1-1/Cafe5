@@ -21,7 +21,7 @@ public:
 
     ~Workspace();
 
-    void login();
+    bool login();
 
 private slots:
     void setQty();
@@ -39,6 +39,14 @@ private slots:
     void on_btnClearFilter_clicked();
 
     void on_btnExit_clicked();
+
+    void on_btnPartUp_clicked();
+
+    void on_btnPartDown_clicked();
+
+    void on_btnDishUp_clicked();
+
+    void on_btnDishDown_clicked();
 
 private:
     Ui::Workspace *ui;
@@ -58,6 +66,8 @@ private:
     void countTotal();
 
     void stretchTableColumns(QTableWidget *t);
+
+    void scrollTable(QTableWidget *t, int direction, int rows);
 };
 
 #endif // WORKSPACE_H

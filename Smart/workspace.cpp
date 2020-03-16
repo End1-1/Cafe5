@@ -3,9 +3,12 @@
 #include "c5connection.h"
 #include "dlgpassword.h"
 #include "dishitemdelegate.h"
+#include "c5waiterorderdoc.h"
+#include "dishpartitemdelegate.h"
 #include "dishtableitemdelegate.h"
 #include "payment.h"
 #include "c5printing.h"
+#include <QScrollBar>
 
 Workspace::Workspace(const QStringList &dbParams) :
     C5Dialog(dbParams),
@@ -13,6 +16,7 @@ Workspace::Workspace(const QStringList &dbParams) :
 {
     ui->setupUi(this);
     fTypeFilter = 0;
+    ui->tblPart2->setItemDelegate(new DishPartItemDelegate());
     ui->tblOrder->setItemDelegate(new DishItemDelegate());
     ui->tblDishes->setItemDelegate(new DishTableItemDelegate());
 }
@@ -22,23 +26,22 @@ Workspace::~Workspace()
     delete ui;
 }
 
-void Workspace::login()
+bool Workspace::login()
 {
-    qDebug() << fDBParams;
     if (fDBParams.count() == 0) {
         go<C5Connection>(fDBParams);
-        return;
+        return false;
     }
     if (!DlgPassword::getUserDB(tr("ENTER"), &fUser)) {
         accept();
-        return;
+        return false;
     }
     ui->lbStaffName->setText(fUser.fFull);
     C5Database db(fDBParams);
     db[":f_menu"] = C5Config::defaultMenu();
     db.exec("select f_id, f_name, f_color \
             from d_part2 \
-            where f_id in (select f_part from d_dish where f_id in (Select f_dish from d_menu where f_menu=:f_menu)) \
+            where f_id in (select f_part from d_dish where f_id in (Select f_dish from d_menu where f_menu=:f_menu and f_state=1)) \
             order by f_queue");
     int row = 0, col = 0;
     while (db.nextRow()) {
@@ -50,7 +53,7 @@ void Workspace::login()
         item->setData(Qt::BackgroundRole, QColor::fromRgb(db.getInt("f_color")));
         ui->tblPart2->setItem(row, col, item);
         col++;
-        if (col == 6) {
+        if (col == ui->tblPart2->columnCount()) {
             row++;
             col = 0;
         }        
@@ -60,7 +63,7 @@ void Workspace::login()
             FROM d_menu m \
             left join d_dish d on d.f_id=m.f_dish \
             left join d_part2 p2 on p2.f_id=d.f_part \
-            where m.f_menu=:f_menu \
+            where m.f_menu=:f_menu and m.f_state=1 \
             order by d.f_queue ");
     while (db.nextRow()) {
         Dish *d = new Dish();
@@ -83,6 +86,7 @@ void Workspace::login()
     stretchTableColumns(ui->tblDishes);
     stretchTableColumns(ui->tblOrder);
     stretchTableColumns(ui->tblPart2);
+    return true;
 }
 
 void Workspace::setQty()
@@ -92,7 +96,7 @@ void Workspace::setQty()
         return;
     }
     QPushButton *b = static_cast<QPushButton*>(sender());
-    d.qty = b->text().toInt();
+    d.qty = b->text().toDouble();
     setCurrentDish(d);
 }
 
@@ -166,6 +170,11 @@ void Workspace::stretchTableColumns(QTableWidget *t)
     t->horizontalHeader()->setDefaultSectionSize(delta + t->horizontalHeader()->defaultSectionSize());
 }
 
+void Workspace::scrollTable(QTableWidget *t, int direction, int rows)
+{
+    t->verticalScrollBar()->setValue((t->verticalScrollBar()->value() + (t->verticalHeader()->defaultSectionSize() * rows)) * direction);
+}
+
 
 void Workspace::on_tblPart2_itemClicked(QTableWidgetItem *item)
 {
@@ -207,12 +216,19 @@ void Workspace::on_btnCheckout_clicked()
     QString prefix;
     QString hallid;
     db[":f_id"] = C5Config::defaultHall();
-    db.exec("select f_counter + 1, f_prefix as f_counter from h_halls where f_id=:f_id for update");
+    db.exec("select f_counterhall from h_halls where f_id=:f_id");
     if (db.nextRow()) {
-        hallid = db.getString(0);
-        prefix = db.getString(1);
-        db[":f_counter"] = db.getInt(0);
-        db.update("h_halls", where_id(C5Config::defaultHall()));
+        int hid = db.getInt(0);
+        db[":f_id"] = hid;
+        db.exec("select f_counter + 1, f_prefix as f_counter from h_halls where f_id=:f_id for update");
+        if (db.nextRow()) {
+            hallid = db.getString(0);
+            prefix = db.getString(1);
+            db[":f_counter"] = db.getInt(0);
+            db.update("h_halls", where_id(hallid));
+        }
+    } else {
+        hallid ="[-]";
     }
 
     db.startTransaction();
@@ -286,6 +302,14 @@ void Workspace::on_btnCheckout_clicked()
             db[":f_qty"] = d.qty;
             db.insert("o_store_output", false);
         }
+    }
+
+    QString err;
+    C5WaiterOrderDoc w(id, db);
+    if (!w.makeOutputOfStore(db, err)) {
+        db.rollback();
+        C5Message::error(err);
+        return;
     }
     db.commit();
 
@@ -364,5 +388,27 @@ void Workspace::setCurrentDish(Dish &d)
 
 void Workspace::on_btnExit_clicked()
 {
-    accept();
+    if (C5Message::question(tr("Confirm to close application"))) {
+        accept();
+    }
+}
+
+void Workspace::on_btnPartUp_clicked()
+{
+    scrollTable(ui->tblPart2, -1, 2);
+}
+
+void Workspace::on_btnPartDown_clicked()
+{
+    scrollTable(ui->tblPart2, 1, 2);
+}
+
+void Workspace::on_btnDishUp_clicked()
+{
+    scrollTable(ui->tblDishes, -1, 5);
+}
+
+void Workspace::on_btnDishDown_clicked()
+{
+    scrollTable(ui->tblDishes, 1, 5);
 }

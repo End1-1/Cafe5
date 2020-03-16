@@ -7,7 +7,7 @@ CR5GoodsMovementFilter::CR5GoodsMovementFilter(const QStringList &dbParams, QWid
     ui(new Ui::CR5GoodsMovementFilter)
 {
     ui->setupUi(this);
-    ui->leGoods->setSelector(fDBParams, ui->leGoodsName, cache_goods, 0, 2);
+    ui->leGoods->setSelector(fDBParams, ui->leGoodsName, cache_goods, 1, 3);
     ui->leStore->setSelector(fDBParams, ui->leStoreName, cache_goods_store);
     ui->leInOut->setSelector(fDBParams, ui->leInOutName, cache_store_inout);
 }
