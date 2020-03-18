@@ -77,7 +77,6 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
 
     restoreColumnsVisibility();
     fFilterWidget = new CR5GoodsMovementFilter(fDBParams);
-    connect(this, SIGNAL(tblDoubleClicked(int,int,QList<QVariant>)), this, SLOT(tblDoubleClicked(int,int,QList<QVariant>)));
 }
 
 QToolBar *CR5GoodsMovement::toolBar()
@@ -94,18 +93,19 @@ QToolBar *CR5GoodsMovement::toolBar()
     return fToolBar;
 }
 
-void CR5GoodsMovement::tblDoubleClicked(int row, int column, const QList<QVariant> &values)
+bool CR5GoodsMovement::tblDoubleClicked(int row, int column, const QList<QVariant> &values)
 {
     Q_UNUSED(row);
     Q_UNUSED(column);
     if (!fColumnsVisible["s.f_document"]) {
         C5Message::info(tr("Document id column must be included in the report"));
-        return;
+        return true;
     }
     C5StoreDoc *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);
     if (!sd->openDoc(values.at(fModel->indexForColumnName("f_document")).toString())) {
         __mainWindow->removeTab(sd);
     }
+    return true;
 }
 
 void CR5GoodsMovement::restoreColumnsWidths()

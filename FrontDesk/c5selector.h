@@ -32,7 +32,7 @@ public:
 private slots:
     void tblSingleClick(const QModelIndex &index);
 
-    void tblDoubleClicked(int row, int column, const QList<QVariant> &values);
+    virtual bool tblDoubleClicked(int row, int column, const QList<QVariant> &values);
 
     void on_btnRefreshCache_clicked();
 

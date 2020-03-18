@@ -22,7 +22,6 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
                     << "left join c_goods gg on gg.f_id=og.f_goods [gg]"
                     << "left join c_groups gr on gr.f_id=gg.f_group [gr]"
                     << "left join c_units gu on gu.f_id=gg.f_unit [gu]"
-                    << "left join c_groups g on g.f_id=gg.f_group [g]"
                     << "left join c_partners cp on cp.f_id=gg.f_supplier [cp]"
                     << "left join c_goods_classes gca on gca.f_id=gg.f_group1 [gca]"
                     << "left join c_goods_classes gcb on gcb.f_id=gg.f_group2 [gcb]"
@@ -35,10 +34,9 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
                    << "oh.f_datecash"
                    << "s.f_name as f_storename"
                    << "cp.f_taxname"
-                   << "g.f_name as f_groupname"
+                   << "gr.f_name as f_goodsgroup"
                    << "gg.f_name as f_goodsname"
                    << "gg.f_scancode"
-                   << "gr.f_name as f_goodsgroup"
                    << "gu.f_name as f_goodsunit"
                    << "og.f_tax"
                    << "gca.f_name as gname1"
@@ -53,7 +51,6 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
                   << "concat(oh.f_prefix, oh.f_hallid) as f_number"
                    << "oh.f_datecash"
                    << "s.f_name as f_storename"
-                   << "g.f_name as f_groupname"
                    << "gg.f_name as f_goodsname"
                    << "gg.f_scancode"
                    << "gr.f_name as f_groodsgroup"
@@ -92,7 +89,6 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
     fColumnsVisible["concat(oh.f_prefix, oh.f_hallid) as f_number"] = true;
     fColumnsVisible["oh.f_datecash"] = true;
     fColumnsVisible["cp.f_taxname"] = true;
-    fColumnsVisible["g.f_name as f_groupname"] = true;
     fColumnsVisible["s.f_name as f_storename"] = true;
     fColumnsVisible["gg.f_name as f_goodsname"] = true;
     fColumnsVisible["gg.f_scancode"] = false;
@@ -109,8 +105,6 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
     restoreColumnsVisibility();
     fFilterWidget = new CR5SaleFromStoreFilter(fDBParams);
     fFilter = static_cast<CR5SaleFromStoreFilter*>(fFilterWidget);
-
-    connect(this, SIGNAL(tblDoubleClicked(int,int,QList<QVariant>)), this, SLOT(tblClick(int,int,QList<QVariant>)));
 }
 
 QToolBar *CR5SaleFromStore::toolBar()
@@ -135,16 +129,17 @@ void CR5SaleFromStore::restoreColumnsWidths()
     }
 }
 
-void CR5SaleFromStore::tblClick(int row, int column, const QList<QVariant> &values)
+bool CR5SaleFromStore::tblDoubleClicked(int row, int column, const QList<QVariant> &values)
 {
     Q_UNUSED(row);
     Q_UNUSED(column);
     if (!fColumnsVisible["oh.f_id as f_header"]) {
         C5Message::info(tr("Column 'Header' must be checked in filter"));
-        return;
+        return true;
     }
     if (values.count() == 0) {
-        return;
+        return true;
     }
     C5SaleFromStoreOrder::openOrder(fDBParams, values.at(fModel->indexForColumnName("f_header")).toString());
+    return true;
 }

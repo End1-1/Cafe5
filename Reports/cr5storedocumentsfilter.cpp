@@ -7,12 +7,12 @@ CR5StoreDocumentsFilter::CR5StoreDocumentsFilter(const QStringList &dbParams, QW
     ui(new Ui::CR5StoreDocumentsFilter)
 {
     ui->setupUi(this);
-    ui->leStore->setSelector(dbParams, ui->leStoreName, cache_goods_store);
-    ui->leType->setSelector(dbParams, ui->leTypeName, cache_doc_type);
-    ui->leReason->setSelector(dbParams, ui->leReasonName, cache_store_reason);
-    ui->lePayment->setSelector(dbParams, ui->lePaymentName, cache_header_payment);
-    ui->lePaid->setSelector(dbParams, ui->lePaidName, cache_header_paid);
-    ui->lePartner->setSelector(dbParams, ui->lePartnerName, cache_goods_partners);
+    ui->leStore->setSelector(dbParams, ui->leStoreName, cache_goods_store).setMultiselection(true);
+    ui->leType->setSelector(dbParams, ui->leTypeName, cache_doc_type).setMultiselection(true);
+    ui->leReason->setSelector(dbParams, ui->leReasonName, cache_store_reason).setMultiselection(true);
+    ui->lePayment->setSelector(dbParams, ui->lePaymentName, cache_header_payment).setMultiselection(true);
+    ui->lePaid->setSelector(dbParams, ui->lePaidName, cache_header_paid).setMultiselection(true);
+    ui->lePartner->setSelector(dbParams, ui->lePartnerName, cache_goods_partners).setMultiselection(true);
 }
 
 CR5StoreDocumentsFilter::~CR5StoreDocumentsFilter()

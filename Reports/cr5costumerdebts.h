@@ -19,11 +19,11 @@ public:
 protected:
     virtual void restoreColumnsWidths() override;
 
+    virtual bool tblDoubleClicked(int row, int column, const QList<QVariant> &vals);
+
 private:
     CR5CostumerDebtsFilter *fFilter;
 
-private slots:
-    void openOrder(int row, int column, const QList<QVariant> &vals);
 };
 
 #endif // CR5COSTUMERDEBTS_H

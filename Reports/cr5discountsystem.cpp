@@ -8,12 +8,11 @@ CR5DiscountSystem::CR5DiscountSystem(const QStringList &dbParams, QWidget *paren
     fIcon = ":/discount.png";
     fSimpleQuery = false;
     fMainTable = "b_cards_discount d";
-    fLeftJoinTables << "left join b_clients c on c.f_id=d.f_client [c]";
+    fLeftJoinTables << "left join c_partners c on c.f_id=d.f_client [c]";
     fLeftJoinTables << "left join b_card_types dt on dt.f_id=d.f_mode [dt]";
     fColumnsFields << "d.f_id"
                    << "dt.f_name as dtname"
-                   << "c.f_firstname"
-                   << "c.f_lastname"
+                   << "c.f_contact"
                    << "d.f_value"
                    << "c.f_info"
                    << "d.f_code"
@@ -22,8 +21,7 @@ CR5DiscountSystem::CR5DiscountSystem(const QStringList &dbParams, QWidget *paren
                    << "d.f_active";
     fTranslation["f_id"] = tr("Code");
     fTranslation["dtname"] = tr("Mode");
-    fTranslation["f_firstname"] = tr("First name");
-    fTranslation["f_lastname"] = tr("Last name");
+    fTranslation["f_contact"] = tr("Contact name");
     fTranslation["f_value"] = tr("Discount");
     fTranslation["f_info"] = tr("Client info");
     fTranslation["f_code"] = tr("Card code");
@@ -32,8 +30,7 @@ CR5DiscountSystem::CR5DiscountSystem(const QStringList &dbParams, QWidget *paren
     fTranslation["f_active"] = tr("State");
     fColumnsVisible["d.f_id"] = true;
     fColumnsVisible["dt.f_name as dtname"] = true;
-    fColumnsVisible["c.f_firstname"] = true;
-    fColumnsVisible["c.f_lastname"] = true;
+    fColumnsVisible["c.f_contact"] = true;
     fColumnsVisible["d.f_value"] = true;
     fColumnsVisible["c.f_info"] = true;
     fColumnsVisible["d.f_code"] = true;

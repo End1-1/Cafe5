@@ -23,5 +23,18 @@
     <string name="LoginStatusGoods">Loading goods</string>
     <string name="Append">Append</string>
     <string name="Ready">Ready</string>
+    <string name="TotalAmount">Total amount</string>
+    <string name="_999_999_00">999.999,00</string>
+    <string name="Cash">Cash</string>
+    <string name="BankTransfer">Bank transfer</string>
+    <string name="Credit">Credit</string>
+    <string name="WriteOrder">Write order</string>
+    <string name="PartnerIsUndefined">Partners Is Undefined</string>
+    <string name="GoodsListIsEmpty">Goods list empty</string>
+    <string name="Close">Close</string>
+    <string name="InvalidTotalAmount">Invalid Total Amount</string>
+    <string name="OrderSaved">Order saved</string>
+    <string name="NewSale">New\nsale</string>
+    <string name="SalesToday">Sales\ntoday</string>
 
 </resources>

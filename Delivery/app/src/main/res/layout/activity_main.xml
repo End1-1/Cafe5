@@ -22,7 +22,7 @@
             android:layout_marginStart="16dp"
             android:text="@string/Login"
             android:textSize="@dimen/textFontSize"
-            app:layout_constraintBottom_toBottomOf="@id/edUsername"
+            app:layout_constraintBottom_toBottomOf="@+id/edUsername"
             app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
@@ -32,14 +32,14 @@
             android:layout_marginStart="16dp"
             android:text="@string/Password"
             android:textSize="@dimen/textFontSize"
-            app:layout_constraintBottom_toBottomOf="@id/edPassword"
+            app:layout_constraintBottom_toBottomOf="@+id/edPassword"
             app:layout_constraintStart_toStartOf="parent" />
 
         <EditText
             android:id="@+id/edUsername"
-            android:layout_width="212dp"
-            android:layout_height="44dp"
-            android:layout_marginTop="32dp"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:layout_marginEnd="24dp"
             android:ems="10"
             android:inputType="textPersonName"
@@ -52,9 +52,9 @@
 
         <EditText
             android:id="@+id/edPassword"
-            android:layout_width="wrap_content"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="8dp"
             android:layout_marginEnd="24dp"
             android:ems="10"
             android:inputType="textPassword"
@@ -130,20 +130,21 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/btnPreOrder"
-                android:layout_width="@dimen/bigButtonSize"
-                android:layout_height="@dimen/bigButtonSize"
-                android:drawableTop="@drawable/preorder"
-                android:text="@string/PreOrder"
-                android:textSize="@dimen/textFontSize" />
-
-            <Button
                 android:id="@+id/btnOrder"
                 android:layout_width="@dimen/bigButtonSize"
                 android:layout_height="@dimen/bigButtonSize"
                 android:drawableTop="@drawable/checkout"
-                android:text="@string/Order"
+                android:text="@string/NewSale"
                 android:textSize="@dimen/textFontSize" />
+
+            <Button
+                android:id="@+id/btnSales"
+                android:layout_width="@dimen/bigButtonSize"
+                android:layout_height="@dimen/bigButtonSize"
+                android:drawableTop="@drawable/preorder"
+                android:text="@string/SalesToday"
+                android:textSize="@dimen/textFontSize" />
+
         </LinearLayout>
     </LinearLayout>
 

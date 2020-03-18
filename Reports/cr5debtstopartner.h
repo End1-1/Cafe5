@@ -11,8 +11,8 @@ public:
 
     virtual QToolBar *toolBar();
 
-private slots:
-    void doubleClick(int row, int column, const QList<QVariant> &vals);
+protected:
+    virtual bool tblDoubleClicked(int row, int column, const QList<QVariant> &vals) override;
 };
 
 #endif // CR5DEBTSTOPARTNER_H

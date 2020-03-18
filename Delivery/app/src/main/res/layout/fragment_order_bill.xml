@@ -1,14 +1,167 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Fragments.FROrderBill">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="order bil" />
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/btnReady"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/dlldone"
+            android:text="@string/WriteOrder"
+            android:textColor="@color/colorBlack"
+            android:textSize="@dimen/textFontSize"
+            android:textStyle="bold" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/textView8"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="@string/TotalAmount"
+                android:textColor="@color/colorBlack"
+                android:textSize="@dimen/textFontSize"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@+id/edTotalAmount"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <EditText
+                android:id="@+id/edTotalAmount"
+                android:layout_width="110dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:text="@string/_999_999_00"
+                android:textColor="@color/colorBlack"
+                android:textSize="@dimen/textFontSize"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/rbCash"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="@string/Cash"
+                android:textColor="@color/colorBlack"
+                android:textSize="@dimen/textFontSize"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@+id/edCash"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/rbBank"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="@string/BankTransfer"
+                android:textColor="@color/colorBlack"
+                android:textSize="@dimen/textFontSize"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@+id/edBankTransfer"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/rbCredit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="@string/Credit"
+                android:textColor="@color/colorBlack"
+                android:textSize="@dimen/textFontSize"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@+id/edDept"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <EditText
+                android:id="@+id/edCash"
+                android:layout_width="110dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:ems="10"
+                android:inputType="numberDecimal"
+                android:textColor="@color/colorBlack"
+                android:textSize="@dimen/textFontSize"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/edTotalAmount" />
+
+            <EditText
+                android:id="@+id/edBankTransfer"
+                android:layout_width="110dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:ems="10"
+                android:inputType="numberDecimal"
+                android:textColor="@color/colorBlack"
+                android:textSize="@dimen/textFontSize"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/edCash" />
+
+            <EditText
+                android:id="@+id/edDept"
+                android:layout_width="110dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:ems="10"
+                android:inputType="numberDecimal"
+                android:textColor="@color/colorBlack"
+                android:textSize="@dimen/textFontSize"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/edBankTransfer" />
+
+            <ImageButton
+                android:id="@+id/btnCorrectBank"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="8dp"
+                android:background="@null"
+                android:scaleType="fitXY"
+                android:src="@drawable/calculator"
+                app:layout_constraintBottom_toBottomOf="@+id/edBankTransfer"
+                app:layout_constraintEnd_toStartOf="@+id/edBankTransfer" />
+
+            <ImageButton
+                android:id="@+id/btnCorrectDept"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="8dp"
+                android:background="@null"
+                android:scaleType="fitXY"
+                android:src="@drawable/calculator"
+                app:layout_constraintBottom_toBottomOf="@+id/edDept"
+                app:layout_constraintEnd_toStartOf="@+id/edDept" />
+
+            <ImageButton
+                android:id="@+id/btnCorrectCash"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/calculator"
+                android:background="@null"
+                android:scaleType="fitXY"
+                app:layout_constraintBottom_toBottomOf="@+id/edCash"
+                app:layout_constraintEnd_toStartOf="@+id/edCash" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
 </FrameLayout>

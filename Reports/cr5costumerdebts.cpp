@@ -9,11 +9,11 @@ CR5CostumerDebts::CR5CostumerDebts(const QStringList &dbParams, QWidget *parent)
     C5ReportWidget(dbParams, parent)
 {
     fIcon = ":/cash.png";
-    fLabel = tr("Costumers debts");
+    fLabel = tr("Customers debts");
     fSimpleQuery = false;
 
     fMainTable = "b_clients_debts cd";
-    fLeftJoinTables << "left join b_clients c on c.f_id=cd.f_costumer [c]"
+    fLeftJoinTables << "left join c_partners c on c.f_id=cd.f_costumer [c]"
                     << "left join o_header oh on oh.f_id=cd.f_order [oh]"
                     << "left join b_car bc on bc.f_id=bco.f_car [bc]"
                     << "left join b_car_orders bco on bco.f_order=oh.f_id [bco]"
@@ -21,7 +21,7 @@ CR5CostumerDebts::CR5CostumerDebts(const QStringList &dbParams, QWidget *parent)
 
     fColumnsFields << "cd.f_order"
                    << "cd.f_id"
-                   << "concat(c.f_lastname, ' ', c.f_firstname) as f_costumername"
+                   << "c.f_contact"
                    << "cd.f_date"
                    << "concat(oh.f_prefix, f_hallid) as f_ordernum"
                    << "cd.f_govnumber"
@@ -30,7 +30,7 @@ CR5CostumerDebts::CR5CostumerDebts(const QStringList &dbParams, QWidget *parent)
 
     fColumnsGroup << "cd.f_order"
                   << "cd.f_id"
-                  << "concat(c.f_lastname, ' ', c.f_firstname) as f_costumername"
+                  << "c.f_contact"
                   << "cd.f_date"
                   << "concat(oh.f_prefix, f_hallid) as f_ordernum"
                   << "cd.f_govnumber"
@@ -41,7 +41,7 @@ CR5CostumerDebts::CR5CostumerDebts(const QStringList &dbParams, QWidget *parent)
 
     fTranslation["f_order"] = tr("UUID");
     fTranslation["f_id"] = tr("Row");
-    fTranslation["f_costumername"] = tr("Costumer");
+    fTranslation["f_contact"] = tr("Contact");
     fTranslation["f_date"] = tr("Date");
     fTranslation["f_ordernum"] = tr("Order");
     fTranslation["f_amount"] = tr("Amount");
@@ -49,15 +49,13 @@ CR5CostumerDebts::CR5CostumerDebts(const QStringList &dbParams, QWidget *parent)
 
     fColumnsVisible["cd.f_order"] = true;
     fColumnsVisible["cd.f_id"] = true;
-    fColumnsVisible["concat(c.f_lastname, ' ', c.f_firstname) as f_costumername"] = true;
+    fColumnsVisible["c.f_contact"] = true;
     fColumnsVisible["cd.f_date"] = true;
     fColumnsVisible["concat(oh.f_prefix, f_hallid) as f_ordernum"] = true;
     fColumnsVisible["sum(cd.f_amount) as f_amount"] = true;
     fColumnsVisible["cd.f_govnumber"] = true;
 
     fHavindCondition = " having sum(cd.f_amount) <> 0 ";
-
-    connect(this, SIGNAL(tblDoubleClicked(int, int, QList<QVariant>)), this, SLOT(openOrder(int, int, QList<QVariant>)));
 
     restoreColumnsVisibility();
 
@@ -99,21 +97,21 @@ void CR5CostumerDebts::restoreColumnsWidths()
     }
 }
 
-void CR5CostumerDebts::openOrder(int row, int column, const QList<QVariant> &vals)
+bool CR5CostumerDebts::tblDoubleClicked(int row, int column, const QList<QVariant> &vals)
 {
     Q_UNUSED(row);
     Q_UNUSED(column);
     if (vals.empty()) {
-        return;
+        return true;
     }
     if (!fColumnsVisible["cd.f_order"] || !fColumnsVisible["cd.f_id"]) {
         C5Message::error(tr("Column UUID and Row must be included in the report"));
-        return;
+        return true;
     }
     if (!vals.at(0).toString().isEmpty()) {
         C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>(fDBParams);
         wo->setOrder(vals.at(0).toString());
-        return;
+        return true;
     }
     if (!vals.at(1).toString().isEmpty()) {
         C5CostumerDebtPayment *d = new C5CostumerDebtPayment(fDBParams);
@@ -121,4 +119,5 @@ void CR5CostumerDebts::openOrder(int row, int column, const QList<QVariant> &val
         d->exec();
         delete d;
     }
+    return true;
 }

@@ -17,11 +17,11 @@ public:
 protected:
     virtual void restoreColumnsWidths() override;
 
+    virtual bool tblDoubleClicked(int row, int column, const QList<QVariant> &v);
+
 private:
     CR5SaleRemovedDishesFilter *fFilter;
 
-private slots:
-    void openOrder(int row, int column, const QList<QVariant> &v);
 };
 
 #endif // CR5SALEREMOVEDDISHES_H

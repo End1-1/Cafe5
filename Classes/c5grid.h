@@ -83,6 +83,8 @@ protected:
 
     QString fHavindCondition;
 
+    QString fGroupCondition;
+
     QString fOrderCondition;
 
     C5FilterWidget *fFilterWidget;
@@ -116,6 +118,8 @@ protected:
     virtual QString reportAdditionalTitle();
 
     virtual QMenu *buildTableViewContextMenu(const QPoint &point);
+
+    virtual bool tblDoubleClicked(int row, int column, const QList<QVariant> &values);
 
 private:
     Ui::C5Grid *ui;
@@ -185,7 +189,8 @@ private slots:
 signals:
     void tblSingleClick(const QModelIndex &);
 
-    void tblDoubleClicked(int row, int column, const QList<QVariant> &values);
+    void tblDoubleClick(int row, int column, const QList<QVariant> &values);
+
 
 };
 

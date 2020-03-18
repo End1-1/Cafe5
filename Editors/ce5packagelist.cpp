@@ -3,7 +3,7 @@
 #include "c5cache.h"
 #include "c5selector.h"
 
-CE5PackageList::CE5PackageList(const QStringList &dbParams, int package, QWidget *parent) :
+CE5PackageList::CE5PackageList(const QStringList &dbParams, int package) :
     C5Dialog(dbParams),
     ui(new Ui::CE5PackageList)
 {

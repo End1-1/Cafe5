@@ -67,7 +67,6 @@
 #define cp_t6_goods 603
 #define cp_t6_waste 604
 #define cp_t6_storage 605
-#define cp_t6_partners 606
 #define cp_t6_classes 607
 
 #define cp_t7_other 700
@@ -79,7 +78,7 @@
 #define cp_t7_upload_date_settings 706
 #define cp_t7_translator 707
 #define cp_t7_store_reason 708
-#define cp_t7_customers 709
+#define cp_t7_partners 709
 
 #define cp_t8_cash 800
 #define cp_t8_cash_doc 801

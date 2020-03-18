@@ -18,11 +18,12 @@ public:
 
     void setPartnersFilter(int partner);
 
+protected:
+    virtual bool tblDoubleClicked(int row, int column, const QList<QVariant> &values);
+
 private:
     CR5StoreDocumentsFilter *fFilter;
 
-private slots:
-    void tblDoubleClickEvent(int row, int column, const QList<QVariant> &values);
 };
 
 #endif // CR5STOREDOCUMENTS_H

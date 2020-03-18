@@ -59,7 +59,7 @@ void C5LineEditWithSelector::setValue(const QString &id)
             if (!text.isEmpty()) {
                 text += ",";
             }
-            text = c->getString(row, fColumnName - 1);
+            text += c->getString(row, fColumnName - 1);
         }
     }
     if (!text.isEmpty()) {

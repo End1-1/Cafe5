@@ -74,7 +74,11 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_timeclose"] = tr("Close time");
     fTranslation["f_datecash"] = tr("Date, cash");
     fTranslation["f_hallname"] = tr("Hall");
-    fTranslation["f_tablename"] = tr("Table");
+    if (__c5config.frontDeskMode() == FRONTDESK_SHOP) {
+        fTranslation["f_tablename"] = tr("Cash");
+    } else {
+        fTranslation["f_tablename"] = tr("Table");
+    }
     fTranslation["f_amounttotal"] = tr("Total");
     fTranslation["f_amountcash"] = tr("Cash");
     fTranslation["f_amountcard"] = tr("Card");
@@ -101,8 +105,6 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
     fColumnsVisible["sum(oh.f_amountother) as f_amountother"] = true;
     fColumnsVisible["oh.f_amountservice"] = false;
     fColumnsVisible["oh.f_amountdiscount"] = false;
-
-    connect(this, SIGNAL(tblDoubleClicked(int, int, QList<QVariant>)), this, SLOT(openOrder(int, int, QList<QVariant>)));
 
     restoreColumnsVisibility();
 
@@ -138,17 +140,17 @@ void CR5CommonSales::restoreColumnsWidths()
     }
 }
 
-void CR5CommonSales::openOrder(int row, int column, const QList<QVariant> &values)
+bool CR5CommonSales::tblDoubleClicked(int row, int column, const QList<QVariant> &values)
 {
     Q_UNUSED(row);
     Q_UNUSED(column);
     if (!fColumnsVisible["oh.f_id"]) {
         C5Message::info(tr("Column 'Header' must be checked in filter"));
-        return;
+        return true;
     }
     if (values.count() == 0) {
         C5Message::info(tr("Nothing selected"));
-        return;
+        return true;
     }
     C5Database db(fDBParams);
     db[":f_id"] = values.at(fModel->fColumnNameIndex["f_id"]).toString();
@@ -174,6 +176,7 @@ void CR5CommonSales::openOrder(int row, int column, const QList<QVariant> &value
         C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>(fDBParams);
         wo->setOrder(values.at(fModel->fColumnNameIndex["f_id"]).toString());
     }
+    return true;
 }
 
 void CR5CommonSales::transferToRoom()

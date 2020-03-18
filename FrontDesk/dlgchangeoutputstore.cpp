@@ -4,7 +4,7 @@
 #include "c5checkbox.h"
 #include "c5cache.h"
 
-DlgChangeOutputStore::DlgChangeOutputStore(const QStringList &dbParams, QWidget *parent) :
+DlgChangeOutputStore::DlgChangeOutputStore(const QStringList &dbParams) :
     C5Dialog(dbParams),
     ui(new Ui::DlgChangeOutputStore)
 {

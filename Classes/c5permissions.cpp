@@ -75,7 +75,6 @@ void C5Permissions::init(C5Database &db)
               << cp_t6_units
               << cp_t6_groups
               << cp_t6_waste
-              << cp_t6_partners
               << cp_t6_classes
 
               << cp_t7_other
@@ -87,7 +86,7 @@ void C5Permissions::init(C5Database &db)
               << cp_t7_upload_date_settings
               << cp_t7_translator
               << cp_t7_store_reason
-              << cp_t7_customers
+              << cp_t7_partners
 
               << cp_t8_cash
               << cp_t8_cash_doc

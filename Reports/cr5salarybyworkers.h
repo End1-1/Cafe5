@@ -14,8 +14,8 @@ public:
 
     virtual QToolBar *toolBar();
 
-private slots:
-    void tblClick(int row, int column, const QList<QVariant> &vals);
+protected:
+    virtual bool tblDoubleClicked(int row, int column, const QList<QVariant> &vals);
 
 };
 

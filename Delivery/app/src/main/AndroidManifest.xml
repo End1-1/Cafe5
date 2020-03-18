@@ -15,8 +15,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Activities.OrderActivity"
-            android:windowSoftInputMode="adjustPan"></activity>
+        <activity android:name=".Activities.SalesTodayActivity"></activity>
+        <activity
+            android:name=".Activities.OrderActivity"
+            android:windowSoftInputMode="adjustPan" />
         <activity android:name=".Activities.ConfigActivity" />
         <activity android:name=".Activities.MainActivity">
             <intent-filter>
@@ -25,7 +27,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".Services.TempService"
+
+        <service
+            android:name=".Services.TempService"
             android:exported="true" />
     </application>
 

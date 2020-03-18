@@ -55,8 +55,6 @@ CR5TStoreExtra::CR5TStoreExtra(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_sumdif"] = tr("Sum, dif");
 
     fFilterWidget = new CR5TStoreExtraFilter(dbParams);
-
-    connect(this, SIGNAL(tblDoubleClicked(int,int,QList<QVariant>)), this, SLOT(tblDoubleClicked(int,int,QList<QVariant>)));
 }
 
 QToolBar *CR5TStoreExtra::toolBar()
@@ -232,7 +230,7 @@ QString CR5TStoreExtra::documentForInventory()
     return result;
 }
 
-void CR5TStoreExtra::tblDoubleClicked(int row, int column, const QList<QVariant> &values)
+bool CR5TStoreExtra::tblDoubleClicked(int row, int column, const QList<QVariant> &values)
 {
     bool ok;
     double qty;
@@ -243,11 +241,11 @@ void CR5TStoreExtra::tblDoubleClicked(int row, int column, const QList<QVariant>
     case 10:
         qty = QInputDialog::getDouble(this, tr("Inventory qty"), tr("Qty"), 0, 0, 100000, 4, &ok);
         if (!ok) {
-            return;
+            return true;
         }
         if (qty < 0.0001) {
             C5Message::error(tr("Quantity must be greater than 0"));
-            return;
+            return true;
         }
         docid = documentForInventory();
         db[":f_goods"] = values.at(0);
@@ -262,4 +260,5 @@ void CR5TStoreExtra::tblDoubleClicked(int row, int column, const QList<QVariant>
         fModel->setData(row, column, qty);
         break;
     }
+    return true;
 }

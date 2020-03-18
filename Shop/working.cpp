@@ -169,7 +169,8 @@ void Working::makeWGoods()
     int row = 0;
     fGoods.clear();
     C5Database db(C5Config::dbParams());
-    db[":f_store"] = 1;
+    if (C5Config::controlShopQty()) {
+    db[":f_store"] = C5Config::defaultStore();
     db[":f_date"] = QDate::currentDate();
     db.exec("select g.f_id, g.f_scancode, cp.f_taxname, gg.f_name as f_groupname, g.f_name as f_goodsname, "
             "g.f_saleprice, g.f_saleprice2, u.f_name as f_unitname, "
@@ -188,20 +189,22 @@ void Working::makeWGoods()
             "where h.f_date<=:f_date and s.f_store=:f_store  "
             "group by g.f_id,gg.f_name,g.f_name,g.f_lastinputprice,g.f_saleprice "
             "having sum(s.f_qty*s.f_type) > 0 ");
-//    db.exec("select gs.f_id, gs.f_scancode, cp.f_taxname, gr.f_name as f_groupname, gs.f_name as f_goodsname,  "
-//            "gs.f_saleprice, gs.f_saleprice2, gu.f_name as f_unitname, "
-//            "gca.f_name as group1, gcb.f_name group2, gcc.f_name as group3, gcd.f_name as group4, "
-//            "gr.f_taxdept, gr.f_adgcode, 0 as f_qty "
-//            "from c_goods gs "
-//            "left join c_groups gr on gr.f_id=gs.f_group "
-//            "left join c_units gu on gu.f_id=gs.f_unit "
-//            "left join c_partners cp on cp.f_id=gs.f_supplier "
-//            "left join c_goods_classes gca on gca.f_id=gs.f_group1 "
-//            "left join c_goods_classes gcb on gcb.f_id=gs.f_group2 "
-//            "left join c_goods_classes gcc on gcc.f_id=gs.f_group3 "
-//            "left join c_goods_classes gcd on gcd.f_id=gs.f_group4 "
-//            "where gs.f_enabled=1 "
-//            "order by gr.f_name, gca.f_name ");
+    } else {
+        db.exec("select gs.f_id, gs.f_scancode, cp.f_taxname, gr.f_name as f_groupname, gs.f_name as f_goodsname,  "
+                "gs.f_saleprice, gs.f_saleprice2, gu.f_name as f_unitname, "
+                "gca.f_name as group1, gcb.f_name group2, gcc.f_name as group3, gcd.f_name as group4, "
+                "gr.f_taxdept, gr.f_adgcode, 0 as f_qty "
+                "from c_goods gs "
+                "left join c_groups gr on gr.f_id=gs.f_group "
+                "left join c_units gu on gu.f_id=gs.f_unit "
+                "left join c_partners cp on cp.f_id=gs.f_supplier "
+                "left join c_goods_classes gca on gca.f_id=gs.f_group1 "
+                "left join c_goods_classes gcb on gcb.f_id=gs.f_group2 "
+                "left join c_goods_classes gcc on gcc.f_id=gs.f_group3 "
+                "left join c_goods_classes gcd on gcd.f_id=gs.f_group4 "
+                "where gs.f_enabled=1 "
+                "order by gr.f_name, gca.f_name ");
+    }
     ui->tblGoods->setRowCount(db.rowCount());
     while (db.nextRow()) {
         Goods g;

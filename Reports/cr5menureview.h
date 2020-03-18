@@ -17,9 +17,9 @@ public:
 protected:
     virtual void refreshData() override;
 
-private slots:
-    void dblClick(int row, int column, const QList<QVariant> &v);
+    virtual bool tblDoubleClicked(int row, int column, const QList<QVariant> &v) override;
 
+private slots:
     void groupAction();
 };
 

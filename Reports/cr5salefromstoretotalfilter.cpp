@@ -7,7 +7,7 @@ CR5SaleFromStoreTotalFilter::CR5SaleFromStoreTotalFilter(const QStringList &dbPa
     ui(new Ui::CR5SaleFromStoreTotalFilter)
 {
     ui->setupUi(this);
-    ui->leStore->setSelector(dbParams, ui->leStoreName, cache_goods_store);
+    ui->leStore->setSelector(dbParams, ui->leStoreName, cache_goods_store).setMultiselection(true);
 }
 
 CR5SaleFromStoreTotalFilter::~CR5SaleFromStoreTotalFilter()

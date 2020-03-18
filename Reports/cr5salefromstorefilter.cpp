@@ -7,12 +7,12 @@ CR5SaleFromStoreFilter::CR5SaleFromStoreFilter(const QStringList &dbParams, QWid
     ui(new Ui::CR5SaleFromStoreFilter)
 {
     ui->setupUi(this);
-    ui->leSupplier->setSelector(dbParams, ui->leSupplierName, cache_goods_partners);
-    ui->leGroup->setSelector(dbParams, ui->leGroupName, cache_goods_group);
-    ui->leClass1->setSelector(dbParams, ui->leClass1Name, cache_goods_classes);
-    ui->leClass2->setSelector(dbParams, ui->leClass2Name, cache_goods_classes);
-    ui->leClass3->setSelector(dbParams, ui->leClass3Name, cache_goods_classes);
-    ui->leClass4->setSelector(dbParams, ui->leClass4Name, cache_goods_classes);
+    ui->leSupplier->setSelector(dbParams, ui->leSupplierName, cache_goods_partners).setMultiselection(true);
+    ui->leGroup->setSelector(dbParams, ui->leGroupName, cache_goods_group).setMultiselection(true);
+    ui->leClass1->setSelector(dbParams, ui->leClass1Name, cache_goods_classes).setMultiselection(true);
+    ui->leClass2->setSelector(dbParams, ui->leClass2Name, cache_goods_classes).setMultiselection(true);
+    ui->leClass3->setSelector(dbParams, ui->leClass3Name, cache_goods_classes).setMultiselection(true);
+    ui->leClass4->setSelector(dbParams, ui->leClass4Name, cache_goods_classes).setMultiselection(true);
 }
 
 CR5SaleFromStoreFilter::~CR5SaleFromStoreFilter()

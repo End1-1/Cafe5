@@ -90,8 +90,6 @@ CR5SalesByDishes::CR5SalesByDishes(const QStringList &dbParams, QWidget *parent)
 
     restoreColumnsVisibility();
 
-    connect(this, SIGNAL(tblDoubleClicked(int,int,QList<QVariant>)), this, SLOT(openOrder(int,int,QList<QVariant>)));
-
     fFilterWidget = new CR5SalesByDishesFilter(dbParams);
 }
 
@@ -117,17 +115,18 @@ void CR5SalesByDishes::restoreColumnsWidths()
     }
 }
 
-void CR5SalesByDishes::openOrder(int row, int column, const QList<QVariant> &v)
+bool CR5SalesByDishes::tblDoubleClicked(int row, int column, const QList<QVariant> &v)
 {
     Q_UNUSED(row);
     Q_UNUSED(column);
     if (!fColumnsVisible["oh.f_id as f_header"]) {
         C5Message::info(tr("Column 'Header' must be checked in filter"));
-        return;
+        return true;
     }
     if (v.count() == 0) {
-        return;
+        return true;
     }
     C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>(fDBParams);
     wo->setOrder(v.at(fModel->fColumnNameIndex["f_id"]).toString());
+    return true;
 }

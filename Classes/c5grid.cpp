@@ -339,6 +339,12 @@ QMenu *C5Grid::buildTableViewContextMenu(const QPoint &point)
     return m;
 }
 
+bool C5Grid::tblDoubleClicked(int row, int column, const QList<QVariant> &values)
+{
+    emit tblDoubleClick(row, column, values);
+    return false;
+}
+
 void C5Grid::insertJoinTable(QStringList &joins, QMap<QString, QString> &joinsMap, const QString &table, const QString &mainTable)
 {
     QString j;
@@ -813,10 +819,16 @@ void C5Grid::refreshData()
         }
         if (!fWhereCondition.isEmpty()) {
             if (fSqlQuery.contains("where")) {
+                if (fWhereCondition.contains("where")) {
+                    fWhereCondition.replace("where", " ");
+                }
                 sqlQuery += " and " + fWhereCondition;
             } else {
                 sqlQuery += fWhereCondition;
             }
+        }
+        if (!fGroupCondition.isEmpty()) {
+            sqlQuery += fGroupCondition;
         }
         if (!fOrderCondition.isEmpty()) {
             sqlQuery += fOrderCondition;
@@ -847,6 +859,9 @@ bool C5Grid::on_tblView_doubleClicked(const QModelIndex &index)
         return false;
     }
     QList<QVariant> values = fModel->getRowValues(index.row());
+    if (tblDoubleClicked(index.row(), index.column(), values)) {
+        return false;
+    }
     if (fEditor) {
         if (values.count() > 0) {
             C5Editor *e = C5Editor::createEditor(fDBParams, fEditor, values.at(0).toInt());
@@ -872,6 +887,5 @@ bool C5Grid::on_tblView_doubleClicked(const QModelIndex &index)
             }
         }
     }
-    emit tblDoubleClicked(index.row(), index.column(), values);
     return fEditor != nullptr;
 }

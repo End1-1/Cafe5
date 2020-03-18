@@ -2,7 +2,7 @@
 #include "ui_c5dishgroupaction.h"
 #include "c5cache.h"
 
-C5DishGroupAction::C5DishGroupAction(const QStringList &dbParams, QWidget *parent) :
+C5DishGroupAction::C5DishGroupAction(const QStringList &dbParams) :
     C5Dialog(dbParams),
     ui(new Ui::C5DishGroupAction)
 {

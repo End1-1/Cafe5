@@ -15,7 +15,7 @@ class C5DishGroupAction : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit C5DishGroupAction(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit C5DishGroupAction(const QStringList &dbParams);
 
     ~C5DishGroupAction();
 

@@ -52,7 +52,6 @@
 #include "cr5salefromstore.h"
 #include "cr5goodsunit.h"
 #include "c5datasynchronize.h"
-#include "cr5customers.h"
 #include "cr5menunames.h"
 #include "cr5tables.h"
 #include "cr5hall.h"
@@ -378,7 +377,6 @@ void C5MainWindow::on_actionLogin_triggered()
             addTreeL3Item(it, cp_t6_goods, tr("Goods"), ":/goods.png");
             addTreeL3Item(it, cp_t6_waste, tr("Autowaste"), ":/goods.png");
             addTreeL3Item(it, cp_t6_units, tr("Units"), ":/goods.png");
-            addTreeL3Item(it, cp_t6_partners, tr("Partners"), ":/goods.png");
             addTreeL3Item(it, cp_t6_classes, tr("Classes"), ":/goods.png");
         }
 
@@ -388,10 +386,10 @@ void C5MainWindow::on_actionLogin_triggered()
             it->setData(0, Qt::UserRole, cp_t6_goods_menu);
             it->setIcon(0, QIcon(":/other.png"));
             item->addChild(it);
+            addTreeL3Item(it, cp_t7_partners, tr("Partners"), ":/partners.png");
             addTreeL3Item(it, cp_t7_halls, tr("Halls"), ":/hall.png");
             addTreeL3Item(it, cp_t7_tables, tr("Tables"), ":/table.png");
             addTreeL3Item(it, cp_t7_credit_card, tr("Credit cards"), ":/credit-card.png");
-            addTreeL3Item(it, cp_t7_customers, tr("Customers"), ":/customers.png");
             addTreeL3Item(it, cp_t7_discount_system, tr("Discount system"), ":/discount.png");
             addTreeL3Item(it, cp_t7_store_reason, tr("Store reason"), ":/documents.png");
         }
@@ -657,7 +655,7 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
     case cp_t6_storage:
         createTab<CR5GoodsStorages>(dbParams);
         break;
-    case cp_t6_partners:
+    case cp_t7_partners:
         createTab<CR5GoodsPartners>(dbParams);
         break;
     case cp_t6_classes:
@@ -665,9 +663,6 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
         break;
     case cp_t7_credit_card:
         createTab<CR5CreditCards>(dbParams);
-        break;
-    case cp_t7_customers:
-        createTab<CR5Customers>(dbParams);
         break;
     case cp_t7_discount_system:
         createTab<CR5DiscountSystem>(dbParams);

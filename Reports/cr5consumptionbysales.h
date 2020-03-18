@@ -19,6 +19,9 @@ public:
 
     virtual void refreshData();
 
+protected:
+    virtual bool tblDoubleClicked(int row, int column, const QList<QVariant> &values);
+
 private:
     CR5ConsumptionBySalesFilter *fFilter;
 
@@ -29,8 +32,6 @@ private:
     void countRowQty(int row);
 
 private slots:
-    void tblDoubleClicked(int row, int column, const QList<QVariant> &values);
-
     void makeOutput(bool v);
 
     void salesOutput(bool v);

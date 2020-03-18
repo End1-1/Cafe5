@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>436</width>
-    <height>218</height>
+    <height>220</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -20,29 +20,6 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Taxname</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <widget class="C5LineEditWithSelector" name="lineEdit_2">
-     <property name="Field" stdset="0">
-      <string>f_taxname</string>
-     </property>
-     <property name="Check" stdset="0">
-      <string>empty=Taxname</string>
-     </property>
-     <property name="Type" stdset="0">
-      <number>0</number>
-     </property>
-     <property name="First" stdset="0">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
    <item row="0" column="1">
     <widget class="C5LineEditWithSelector" name="leCode">
      <property name="enabled">
@@ -59,10 +36,61 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="0">
-    <widget class="QLabel" name="label_3">
+   <item row="6" column="1">
+    <widget class="C5LineEditWithSelector" name="lineEdit_5">
+     <property name="Field" stdset="0">
+      <string>f_phone</string>
+     </property>
+     <property name="Type" stdset="0">
+      <string>0</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_7">
      <property name="text">
-      <string>Contact</string>
+      <string>Taxpayer id</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0">
+    <widget class="QLabel" name="label_6">
+     <property name="text">
+      <string>Email</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1">
+    <widget class="C5LineEditWithSelector" name="lineEdit_6">
+     <property name="Field" stdset="0">
+      <string>f_email</string>
+     </property>
+     <property name="Type" stdset="0">
+      <string>0</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>Phone</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="C5LineEditWithSelector" name="lineEdit_7">
+     <property name="Field" stdset="0">
+      <string>f_taxcode</string>
+     </property>
+     <property name="Type" stdset="0">
+      <string>0</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Taxname</string>
      </property>
     </widget>
    </item>
@@ -73,6 +101,13 @@
      </property>
      <property name="Type" stdset="0">
       <string>0</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Contact</string>
      </property>
     </widget>
    </item>
@@ -100,51 +135,33 @@
      </property>
     </widget>
    </item>
-   <item row="6" column="0">
-    <widget class="QLabel" name="label_5">
-     <property name="text">
-      <string>Phone</string>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="1">
-    <widget class="C5LineEditWithSelector" name="lineEdit_5">
+   <item row="1" column="1">
+    <widget class="C5LineEditWithSelector" name="lineEdit_2">
      <property name="Field" stdset="0">
-      <string>f_phone</string>
+      <string>f_taxname</string>
+     </property>
+     <property name="Check" stdset="0">
+      <string>empty=Taxname</string>
      </property>
      <property name="Type" stdset="0">
-      <string>0</string>
+      <number>0</number>
+     </property>
+     <property name="First" stdset="0">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
-   <item row="7" column="0">
-    <widget class="QLabel" name="label_6">
+   <item row="8" column="0">
+    <widget class="QLabel" name="label_8">
      <property name="text">
-      <string>Email</string>
+      <string>Address</string>
      </property>
     </widget>
    </item>
-   <item row="7" column="1">
-    <widget class="C5LineEditWithSelector" name="lineEdit_6">
+   <item row="8" column="1">
+    <widget class="C5LineEditWithSelector" name="lineEdit_8">
      <property name="Field" stdset="0">
-      <string>f_email</string>
-     </property>
-     <property name="Type" stdset="0">
-      <string>0</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="label_7">
-     <property name="text">
-      <string>Taxpayer id</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1">
-    <widget class="C5LineEditWithSelector" name="lineEdit_7">
-     <property name="Field" stdset="0">
-      <string>f_taxcode</string>
+      <string>f_address</string>
      </property>
      <property name="Type" stdset="0">
       <string>0</string>

@@ -8,7 +8,7 @@
     <string name="Order">Պատվեր\n</string>
     <string name="ServerAddress">Սերվերի հասցե</string>
     <string name="ServerPort">Սերվերի պորտ</string>
-    <string name="LoginStatusFailed">Mwjjdj</string>
+    <string name="LoginStatusFailed">Մուտքը ձախողվեց</string>
     <string name="DeliveryAgent">Մատակարար</string>
     <string name="TaxNumber">ՀՎՀՀ</string>
     <string name="TaxName">Հարկային անուն</string>
@@ -24,4 +24,17 @@
     <string name="LoginStatusGoods">Բերնվում է ապրանքները</string>
     <string name="Append">Ավելացնել</string>
     <string name="Ready">Պատրաստ է</string>
+    <string name="TotalAmount">Ենթակա է վճարման</string>
+    <string name="_999_999_00">999.999,00</string>
+    <string name="Cash">Կանխիկ</string>
+    <string name="BankTransfer">Փոխանցում</string>
+    <string name="Credit">Պարտք</string>
+    <string name="WriteOrder">Գրանցել վաճառքը</string>
+    <string name="PartnerIsUndefined">Գործընկերը նշված չէ</string>
+    <string name="GoodsListIsEmpty">Ապրանքների ցանկը դատարկ է</string>
+    <string name="Close">Փակել</string>
+    <string name="InvalidTotalAmount">Վճարման գումարը սխալ է</string>
+    <string name="OrderSaved">Պահպանված է</string>
+    <string name="NewSale">Նոր\nվաճառք</string>
+    <string name="SalesToday">Վաճառքը\nայսօր</string>
 </resources>

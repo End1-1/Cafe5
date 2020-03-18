@@ -10,7 +10,7 @@ CR5MenuReview::CR5MenuReview(const QStringList &dbParams, QWidget *parent) :
 {
     fIcon = ":/menu.png";
     fLabel = tr("Review menu");
-    fSqlQuery = "select m.f_id as f_mid, md.f_name as f_statename, d.f_id, mn.f_name as f_menuname, dp1.f_name as f_part1, dp2.f_name as f_part2, "
+    fSqlQuery = "select  d.f_id, m.f_id as f_mid, md.f_name as f_statename, mn.f_name as f_menuname, dp1.f_name as f_part1, dp2.f_name as f_part2, "
             "d.f_name as f_dishname, m.f_price, s.f_name as f_storename, m.f_print1, m.f_print2, d.f_color "
             "from d_menu m "
             "left join d_dish_state md on md.f_id=m.f_state "
@@ -32,7 +32,6 @@ CR5MenuReview::CR5MenuReview(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_print1"] = tr("Print 1");
     fTranslation["f_print2"] = tr("Print 2");
     fTranslation["f_color"] = tr("Color");
-    connect(this, SIGNAL(tblDoubleClicked(int,int,QList<QVariant>)), this, SLOT(dblClick(int,int,QList<QVariant>)));
     fEditor = new C5DishWidget(dbParams);
     restoreColumnsVisibility();
     fFilterWidget = new CR5MenuReviewFilter(dbParams);
@@ -70,21 +69,23 @@ void CR5MenuReview::refreshData()
     }
 }
 
-void CR5MenuReview::dblClick(int row, int column, const QList<QVariant> &v)
+bool CR5MenuReview::tblDoubleClicked(int row, int column, const QList<QVariant> &v)
 {
     Q_UNUSED(row);
     Q_UNUSED(column);
     if (v.count() == 0) {
-        return;
+        return true;
     }
     C5DishWidget *ep = new C5DishWidget(fDBParams);
     C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
-    ep->setId(v.at(fModel->indexForColumnName("f_id")).toInt());
+    int col = fModel->indexForColumnName("f_id");
+    ep->setId(v.at(col).toInt());
     QList<QMap<QString, QVariant> > data;
     if(e->getResult(data)) {
 
     }
     delete e;
+    return true;
 }
 
 void CR5MenuReview::groupAction()
@@ -98,6 +99,7 @@ void CR5MenuReview::groupAction()
     for (int i = 0; i < ml.count(); i++) {
         rows.insert(ml.at(i).row());
     }
+    int col = fModel->indexForColumnName("f_mid");
     C5DishGroupAction *da = new C5DishGroupAction(fDBParams);
     if (da->exec() == QDialog::Accepted) {
         C5Database db(fDBParams);
@@ -106,14 +108,14 @@ void CR5MenuReview::groupAction()
         if (da->setStore(id)) {
             foreach (int row, rows) {
                 db[":f_store"] = id;
-                db.update("d_menu", where_id(fModel->data(row, 0, Qt::EditRole).toString()));
+                db.update("d_menu", where_id(fModel->data(row, col, Qt::EditRole).toString()));
             }
             work = true;
         }
         if (da->setState(id)) {
             foreach (int row, rows) {
                 db[":f_state"] = id;
-                db.update("d_menu", where_id(fModel->data(row, 0, Qt::EditRole).toString()));
+                db.update("d_menu", where_id(fModel->data(row, col, Qt::EditRole).toString()));
             }
             work = true;
         }

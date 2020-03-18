@@ -382,9 +382,11 @@ void WOrder::changeQty()
         return;
     }
     Goods g = fWorking->fGoods[ui->tblGoods->getString(row, 0)];
-    if (g.fQty < qty) {
-        C5Message::error(tr("Insufficient quantity") + "<br>" + float_str(qty - g.fQty, 3));
-        return;
+    if (__c5config.controlShopQty()) {
+        if (g.fQty < qty) {
+            C5Message::error(tr("Insufficient quantity") + "<br>" + float_str(qty - g.fQty, 3));
+            return;
+        }
     }
     ui->tblGoods->setDouble(row, 2, qty);
     ui->tblGoods->setDouble(row, 5, ui->tblGoods->getDouble(row, 4) * qty);

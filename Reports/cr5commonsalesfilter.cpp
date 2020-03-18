@@ -7,11 +7,11 @@ CR5CommonSalesFilter::CR5CommonSalesFilter(const QStringList &dbParams, QWidget 
     ui(new Ui::CR5CommonSalesFilter)
 {
     ui->setupUi(this);
-    ui->leState->setSelector(dbParams, ui->leStateName, cache_order_state);
-    ui->leHall->setSelector(dbParams, ui->leHallName, cache_halls);
-    ui->leTable->setSelector(dbParams, ui->leTableName, cache_tables);
-    ui->leStaff->setSelector(dbParams, ui->leStaffName, cache_users);
-    ui->leShift->setSelector(dbParams, ui->leShiftName, cache_salary_shift);
+    ui->leState->setSelector(dbParams, ui->leStateName, cache_order_state).setMultiselection(true);
+    ui->leHall->setSelector(dbParams, ui->leHallName, cache_halls).setMultiselection(true);
+    ui->leTable->setSelector(dbParams, ui->leTableName, cache_tables).setMultiselection(true);
+    ui->leStaff->setSelector(dbParams, ui->leStaffName, cache_users).setMultiselection(true);
+    ui->leShift->setSelector(dbParams, ui->leShiftName, cache_salary_shift).setMultiselection(true);
 }
 
 CR5CommonSalesFilter::~CR5CommonSalesFilter()

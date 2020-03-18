@@ -56,7 +56,6 @@ SOURCES += \
     ../Reports/cr5consuptionreasonfilter.cpp \
     ../Reports/cr5costumerdebts.cpp \
     ../Reports/cr5costumerdebtsfilter.cpp \
-    ../Reports/cr5customers.cpp \
     ../Reports/cr5debtstopartner.cpp \
     ../Reports/cr5discountstatisics.cpp \
     ../Reports/cr5discountstatisticsfilter.cpp \
@@ -168,7 +167,6 @@ SOURCES += \
     ../Editors/ce5dishremovereason.cpp \
     ../Reports/cr5discountsystem.cpp \
     ../Editors/ce5discountcard.cpp \
-    ../Editors/ce5client.cpp \
     ../Editors/ce5dishcomment.cpp \
     ../Reports/cr5dishcomment.cpp \
     ../Reports/cr5salefromstore.cpp \
@@ -235,7 +233,6 @@ HEADERS += \
     ../Reports/cr5consuptionreasonfilter.h \
     ../Reports/cr5costumerdebts.h \
     ../Reports/cr5costumerdebtsfilter.h \
-    ../Reports/cr5customers.h \
     ../Reports/cr5debtstopartner.h \
     ../Reports/cr5discountstatisics.h \
     ../Reports/cr5discountstatisticsfilter.h \
@@ -348,7 +345,6 @@ HEADERS += \
     ../Editors/ce5dishremovereason.h \
     ../Reports/cr5discountsystem.h \
     ../Editors/ce5discountcard.h \
-    ../Editors/ce5client.h \
     ../Editors/ce5dishcomment.h \
     ../Reports/cr5dishcomment.h \
     ../Reports/cr5salefromstore.h \
@@ -455,7 +451,6 @@ FORMS += \
     ../Editors/ce5creditcard.ui \
     ../Editors/ce5dishremovereason.ui \
     ../Editors/ce5discountcard.ui \
-    ../Editors/ce5client.ui \
     ../Editors/ce5dishcomment.ui \
     ../Reports/cr5salefromstorefilter.ui \
     c5salefromstoreorder.ui \

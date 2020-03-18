@@ -15,13 +15,13 @@ CR5CarVisits::CR5CarVisits(const QStringList &dbParams, QWidget *parent) :
     fMainTable = "o_header oh";
     fLeftJoinTables << "left join b_car_orders bco on bco.f_order=oh.f_id [bco]"
                     << "left join b_car car on car.f_id=bco.f_car [car]"
-                    << "left join b_clients bc on bc.f_id=car.f_costumer [bc]"
+                    << "left join c_partners bc on bc.f_id=car.f_costumer [bc]"
                     << "left join s_car cm on cm.f_id=car.f_car [cm]";
 
     fColumnsFields << "oh.f_id"
                    << "oh.f_datecash"
                    << "concat(oh.f_prefix, oh.f_hallid) as orderid"
-                   << "concat(bc.f_lastname, ' ', bc.f_firstname) as customer"
+                   << "bc.f_contact"
                    << "cm.f_name"
                    << "car.f_govnumber"
                    << "sum(oh.f_amounttotal) as f_total"
@@ -34,7 +34,7 @@ CR5CarVisits::CR5CarVisits(const QStringList &dbParams, QWidget *parent) :
     fColumnsGroup << "oh.f_id"
                   << "oh.f_datecash"
                   << "concat(oh.f_prefix, oh.f_hallid) as orderid"
-                  << "concat(bc.f_lastname, ' ', bc.f_firstname) as customer"
+                  << "bc.f_contact"
                   << "cm.f_name"
                   << "car.f_govnumber";
 
@@ -48,7 +48,7 @@ CR5CarVisits::CR5CarVisits(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_id"] = tr("UUID");
     fTranslation["f_datecash"] = tr("Date");
     fTranslation["orderid"] = tr("Order id");
-    fTranslation["customer"] = tr("Customer");
+    fTranslation["f_contact"] = tr("Contact");
     fTranslation["f_name"] = tr("Model");
     fTranslation["f_govnumber"] = tr("Gov number");
     fTranslation["f_total"] = tr("Total");
@@ -61,7 +61,7 @@ CR5CarVisits::CR5CarVisits(const QStringList &dbParams, QWidget *parent) :
     fColumnsVisible["oh.f_id"] = true;
     fColumnsVisible["oh.f_datecash"] = true;
     fColumnsVisible["concat(oh.f_prefix, oh.f_hallid) as orderid"] = true;
-    fColumnsVisible["concat(bc.f_lastname, ' ', bc.f_firstname) as customer"] = true;
+    fColumnsVisible["bc.f_contact"] = true;
     fColumnsVisible["cm.f_name"] = true;
     fColumnsVisible["car.f_govnumber"] = true;
     fColumnsVisible["sum(oh.f_amounttotal) as f_total"] = true;
@@ -72,7 +72,6 @@ CR5CarVisits::CR5CarVisits(const QStringList &dbParams, QWidget *parent) :
     fColumnsVisible["sum(oh.f_amountDiscount) as f_discount"] = true;
 
     restoreColumnsVisibility();
-    connect(this, SIGNAL(tblDoubleClicked(int, int, QList<QVariant>)), this, SLOT(openOrder(int, int, QList<QVariant>)));
     fFilterWidget = new CR5CarVisitsFilter(dbParams);
 }
 
@@ -99,17 +98,17 @@ void CR5CarVisits::restoreColumnsWidths()
     }
 }
 
-void CR5CarVisits::openOrder(int row, int column, const QList<QVariant> &values)
+bool CR5CarVisits::tblDoubleClicked(int row, int column, const QList<QVariant> &values)
 {
     Q_UNUSED(row);
     Q_UNUSED(column);
     if (!fColumnsVisible["oh.f_id"]) {
         C5Message::info(tr("Column 'Header' must be checked in filter"));
-        return;
+        return true;
     }
     if (values.count() == 0) {
         C5Message::info(tr("Nothing selected"));
-        return;
+        return true;
     }
     C5Database db(fDBParams);
     db[":f_id"] = values.at(fModel->fColumnNameIndex["f_id"]).toString();
@@ -135,4 +134,5 @@ void CR5CarVisits::openOrder(int row, int column, const QList<QVariant> &values)
         C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>(fDBParams);
         wo->setOrder(values.at(fModel->fColumnNameIndex["f_id"]).toString());
     }
+    return true;
 }

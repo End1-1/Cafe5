@@ -30,7 +30,7 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
     connect(ui->leComplectationName, SIGNAL(textChanged(QString)), this, SLOT(on_leComplectationName_textChanged(QString)));
     ui->tblGoods->setColumnWidths(7, 0, 0, 300, 80, 80, 80, 80);
     ui->tblGoodsStore->setColumnWidths(7, 0, 0, 200, 70, 50, 50, 70);
-    ui->btnNewPartner->setVisible(pr(dbParams.at(1), cp_t6_partners));
+    ui->btnNewPartner->setVisible(pr(dbParams.at(1), cp_t7_partners));
     ui->btnNewGoods->setVisible(pr(dbParams.at(1), cp_t6_goods));
     ui->leAccepted->setSelector(dbParams, ui->leAcceptedName, cache_users);
     ui->lePassed->setSelector(dbParams, ui->lePassedName, cache_users);
@@ -1253,9 +1253,9 @@ void C5StoreDoc::getInput()
         return;
     }
     int row = addGoodsRow();
-    ui->tblGoods->setString(row, 1, vals.at(0).toString());
-    ui->tblGoods->setString(row, 2, vals.at(2).toString());
-    ui->tblGoods->setString(row, 4, vals.at(3).toString());
+    ui->tblGoods->setString(row, 1, vals.at(1).toString());
+    ui->tblGoods->setString(row, 2, vals.at(3).toString());
+    ui->tblGoods->setString(row, 4, vals.at(4).toString());
     ui->tblGoods->lineEdit(row, 3)->setFocus();
 }
 
@@ -1294,9 +1294,9 @@ void C5StoreDoc::getOutput()
         return;
     }
     int row = addGoodsRow();
-    ui->tblGoods->setString(row, 1, vals.at(0).toString());
-    ui->tblGoods->setString(row, 2, vals.at(2).toString());
-    ui->tblGoods->setString(row, 4, vals.at(3).toString());
+    ui->tblGoods->setString(row, 1, vals.at(1).toString());
+    ui->tblGoods->setString(row, 2, vals.at(3).toString());
+    ui->tblGoods->setString(row, 4, vals.at(4).toString());
     ui->tblGoods->lineEdit(row, 3)->setFocus();
 }
 

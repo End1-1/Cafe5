@@ -16,11 +16,11 @@ public:
 
     virtual void restoreColumnsWidths();
 
+protected:
+    virtual bool tblDoubleClicked(int row, int column, const QList<QVariant> &values);
+
 private:
     CR5SaleFromStoreFilter *fFilter;
-
-private slots:
-    void tblClick(int row, int column, const QList<QVariant> &values);
 };
 
 #endif // CR5SALEFROMSTORE_H

@@ -71,5 +71,6 @@
         <file>service.png</file>
         <file>hammer.png</file>
         <file>checked.png</file>
+        <file>partners.png</file>
     </qresource>
 </RCC>

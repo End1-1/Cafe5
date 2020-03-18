@@ -81,8 +81,6 @@ CR5SaleRemovedDishes::CR5SaleRemovedDishes(const QStringList &dbParams, QWidget 
 
     fFilterWidget = new CR5SaleRemovedDishesFilter(fDBParams);
     fFilter = static_cast<CR5SaleRemovedDishesFilter*>(fFilterWidget);
-
-    connect(this, SIGNAL(tblDoubleClicked(int,int,QList<QVariant>)), this, SLOT(openOrder(int,int,QList<QVariant>)));
 }
 
 QToolBar *CR5SaleRemovedDishes::toolBar()
@@ -107,17 +105,18 @@ void CR5SaleRemovedDishes::restoreColumnsWidths()
     }
 }
 
-void CR5SaleRemovedDishes::openOrder(int row, int column, const QList<QVariant> &v)
+bool CR5SaleRemovedDishes::tblDoubleClicked(int row, int column, const QList<QVariant> &v)
 {
     Q_UNUSED(row);
     Q_UNUSED(column);
     if (!fColumnsVisible["oh.f_id as f_header"]) {
         C5Message::info(tr("Column 'Header' must be checked in filter"));
-        return;
+        return true;
     }
     if (v.count() == 0) {
-        return;
+        return true;
     }
     C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>(fDBParams);
     wo->setOrder(v.at(fModel->fColumnNameIndex["f_id"]).toString());
+    return true;
 }

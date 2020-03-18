@@ -11,7 +11,6 @@ CR5DishPriceSelfCost::CR5DishPriceSelfCost(const QStringList &dbParams, QWidget 
     fFilterWidget = new CR5DishPriceSelfCostFilter(dbParams);
     fFilter = static_cast<CR5DishPriceSelfCostFilter*>(fFilterWidget);
     fSimpleQuery = true;
-    connect(this, SIGNAL(tblDoubleClicked(int,int,QList<QVariant>)), this, SLOT(tblDoubleClickEvent(int,int,QList<QVariant>)));
 }
 
 QToolBar *CR5DishPriceSelfCost::toolBar()
@@ -139,15 +138,15 @@ void CR5DishPriceSelfCost::buildQueryV2()
     }
 }
 
-void CR5DishPriceSelfCost::tblDoubleClickEvent(int row, int column, const QList<QVariant> &values)
+bool CR5DishPriceSelfCost::tblDoubleClicked(int row, int column, const QList<QVariant> &values)
 {
     Q_UNUSED(row);
     Q_UNUSED(column);
     if (values.count() == 0) {
-        return;
+        return true;
     }
     if (values.at(0).toInt() == 0) {
-        return;
+        return true;
     }
     C5DishWidget *ep = new C5DishWidget(fDBParams);
     C5Editor *e = C5Editor::createEditor(fDBParams, ep, values.at(0).toInt());
@@ -156,4 +155,5 @@ void CR5DishPriceSelfCost::tblDoubleClickEvent(int row, int column, const QList<
 
     }
     delete e;
+    return true;
 }

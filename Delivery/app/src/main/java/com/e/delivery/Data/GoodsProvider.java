@@ -13,6 +13,10 @@ public class GoodsProvider {
     public static List<Goods> mGoods = new LinkedList<>();
     public static List<Goods> mProxyGoods = new LinkedList<>();
     public static List<Goods> mReadyGoods = new LinkedList<>();
+    public static Double mTotalAmount = 0.0;
+    public static Double mCashAmount = 0.0;
+    public static Double mBankAmount = 0.0;
+    public static Double mDebtAmount = 0.0;
 
     public static void initGoodsGroups(JSONArray ja) {
         GoodsProvider.mGoodsGroups.clear();
@@ -58,8 +62,12 @@ public class GoodsProvider {
         for (Goods g: mProxyGoods) {
             if (g.mSelectedQty > 0.001) {
                 mReadyGoods.add(g);
+                mTotalAmount += g.mSelectedQty * g.mRetailPrice;
             }
         }
+        mCashAmount = 0.0;
+        mBankAmount = 0.0;
+        mDebtAmount = 0.0;
     }
 
     public static int proxyGoodsCount() {

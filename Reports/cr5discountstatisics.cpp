@@ -15,15 +15,14 @@ CR5DiscountStatisics::CR5DiscountStatisics(const QStringList &dbParams, QWidget 
     fLeftJoinTables << "left join b_cards_discount bd on bd.f_id=bh.f_card [bd]"
                     << "left join b_card_types dt on dt.f_id=bd.f_mode [dt]"
                     << "left join o_header oh on oh.f_id=bh.f_order [oh]"
-                    << "left join b_clients bc on bc.f_id=bd.f_client [bc]"
+                    << "left join c_partners bc on bc.f_id=bd.f_client [bc]"
                        ;
 
     fColumnsFields << "oh.f_id"
                    << "concat(oh.f_prefix, oh.f_hallid) as f_prefix"
                    << "oh.f_datecash"
                    << "dt.f_name as dtname"
-                   << "bc.f_firstname"
-                   << "bc.f_lastname"
+                   << "bc.f_contact"
                    << "bd.f_value"
                    << "sum(bh.f_data) as f_data"
                    << "sum(oh.f_amounttotal) as f_amounttotal"
@@ -34,8 +33,7 @@ CR5DiscountStatisics::CR5DiscountStatisics(const QStringList &dbParams, QWidget 
                    << "oh.f_datecash"
                    << "dt.f_name as dtname"
                    << "bd.f_name"
-                   << "bc.f_firstname"
-                   << "bc.f_lastname"
+                   << "bc.f_contact"
                    << "bd.f_value"
                       ;
 
@@ -45,8 +43,7 @@ CR5DiscountStatisics::CR5DiscountStatisics(const QStringList &dbParams, QWidget 
 
     fTranslation["f_prefix"] = tr("Head");
     fTranslation["f_id"] = tr("Code");
-    fTranslation["f_firstname"] = tr("First name");
-    fTranslation["f_lastname"] = tr("Last name");
+    fTranslation["f_contact"] = tr("Contact name");
     fTranslation["f_datecash"] = tr("Date, cash");
     fTranslation["f_value"] = tr("Value");
     fTranslation["dtname"] = tr("Mode");
@@ -57,13 +54,10 @@ CR5DiscountStatisics::CR5DiscountStatisics(const QStringList &dbParams, QWidget 
     fColumnsVisible["oh.f_id"] = true;
     fColumnsVisible["oh.f_datecash"] = true;
     fColumnsVisible["dt.f_name as dtname"] = true;
-    fColumnsVisible["bc.f_firstname"] = true;
-    fColumnsVisible["bc.f_lastname"] = true;
+    fColumnsVisible["bc.f_contact"] = true;
     fColumnsVisible["bd.f_value"] = true;
     fColumnsVisible["sum(bh.f_data) as f_data"] = true;
     fColumnsVisible["sum(oh.f_amounttotal) as f_amounttotal"] = true;
-
-    connect(this, SIGNAL(tblDoubleClicked(int, int, QList<QVariant>)), this, SLOT(openOrder(int, int, QList<QVariant>)));
 
     restoreColumnsVisibility();
 
@@ -92,17 +86,18 @@ void CR5DiscountStatisics::restoreColumnsWidths()
     }
 }
 
-void CR5DiscountStatisics::openOrder(int row, int column, const QList<QVariant> &values)
+bool CR5DiscountStatisics::tblDoubleClicked(int row, int column, const QList<QVariant> &values)
 {
     Q_UNUSED(row);
     Q_UNUSED(column);
     if (!fColumnsVisible["oh.f_id"]) {
         C5Message::info(tr("Column 'Header' must be checked in filter"));
-        return;
+        return true;
     }
     if (values.count() == 0) {
-        return;
+        return true;
     }
     C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>(fDBParams);
     wo->setOrder(values.at(fModel->fColumnNameIndex["f_id"]).toString());
+    return true;
 }

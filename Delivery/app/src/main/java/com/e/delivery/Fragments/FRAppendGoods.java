@@ -23,13 +23,6 @@ import com.e.delivery.Utils.EnumView;
 
 public class FRAppendGoods extends ParentFragment {
 
-    public static String mTag = "FRAppendGoods";
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_append_goods, container, false);

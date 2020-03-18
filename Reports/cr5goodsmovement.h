@@ -12,11 +12,10 @@ public:
 
     virtual QToolBar *toolBar();
 
-protected slots:
-    virtual void tblDoubleClicked(int row, int column, const QList<QVariant> &values);
-
 protected:
     void restoreColumnsWidths();
+
+    virtual bool tblDoubleClicked(int row, int column, const QList<QVariant> &values) override;
 };
 
 #endif // CR5GOODSMOVEMENT_H

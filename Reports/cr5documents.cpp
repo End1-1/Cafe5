@@ -66,9 +66,6 @@ CR5Documents::CR5Documents(const QStringList &dbParams, QWidget *parent) :
     fColumnsVisible["h.f_createtime"] = true;
 
     fOrderCondition = " order by h.f_date, h.f_userid ";
-
-    connect(this, SIGNAL(tblDoubleClicked(int,int,QList<QVariant>)), this, SLOT(tblDoubleClicked(int,int,QList<QVariant>)));
-
     restoreColumnsVisibility();
 
     fFilterWidget = new CR5DocumentsFilter(dbParams);
@@ -116,15 +113,16 @@ void CR5Documents::restoreColumnsWidths()
     }
 }
 
-void CR5Documents::tblDoubleClicked(int row, int column, const QList<QVariant> &values)
+bool CR5Documents::tblDoubleClicked(int row, int column, const QList<QVariant> &values)
 {
     Q_UNUSED(column);
     Q_UNUSED(row);
     if (!fColumnsVisible["distinct(h.f_id) as f_id"]) {
         C5Message::error(tr("Op.num. column must be included in the report"));
-        return;
+        return true;
     }
     openDoc(values.at(fModel->indexForColumnName("f_id")).toString());
+    return true;
 }
 
 void CR5Documents::callEditor(const QString &id)

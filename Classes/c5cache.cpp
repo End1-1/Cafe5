@@ -66,15 +66,13 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         fCacheQuery[cache_dish_remove_reason] = QString("select f_id as `%1`, f_name as `%2` from o_dish_remove_reason")
                 .arg(tr("Code"))
                 .arg(tr("Name"));
-        fCacheQuery[cache_discount_client] = QString("select c.f_id as `%1`, concat(f_lastname, ' ', f_firstname) as `%2`, "
-                                                     "bc.f_govnumber as `%3`, f_firstname as `%4`, f_lastname as `%5`, f_info as `%6` "
-                                                     "from b_clients c "
+        fCacheQuery[cache_discount_client] = QString("select c.f_id as `%1`, c.f_contact as `%2`, "
+                                                     "bc.f_govnumber as `%3`, c.f_info as `%4` "
+                                                     "from c_partners c "
                                                      "left join b_car bc on bc.f_costumer=c.f_id ")
                 .arg(tr("Code"))
                 .arg(tr("Full name"))
                 .arg(tr("Gov. number"))
-                .arg(tr("First name"))
-                .arg(tr("Last name"))
                 .arg(tr("Additional info"));
         fCacheQuery[cache_s_db] = QString("select f_id as `%1`,  f_name as `%2`, f_description as `%3` from s_db")
                 .arg(tr("Code"))
@@ -144,7 +142,6 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         fTableCache["o_dish_remove_reason"] = cache_dish_remove_reason;
         fTableCache["s_settings_names"] = cache_settings_names;
         fTableCache["h_halls"] = cache_hall_list;
-        fTableCache["b_clients"] = cache_discount_client;
         fTableCache["b_cards_discount"] = cache_discount_cards;
         fTableCache["d_dish_comment"] = cache_dish_comments;
         fTableCache["s_db"] = cache_s_db;

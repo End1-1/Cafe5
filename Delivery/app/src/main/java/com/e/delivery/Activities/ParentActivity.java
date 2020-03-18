@@ -8,9 +8,9 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.e.delivery.Fragments.ParentFragment;
 import com.e.delivery.Utils.LocaleHelper;
 
 public class ParentActivity extends AppCompatActivity implements View.OnClickListener {
@@ -42,9 +42,9 @@ public class ParentActivity extends AppCompatActivity implements View.OnClickLis
         tv.setText(text);
     }
 
-    public void replaceFragment(Fragment fr, int containerId, String tag) {
+    public void replaceFragment(ParentFragment fr, int containerId) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(containerId, fr, tag);
+        fragmentTransaction.replace(containerId, fr, fr.tag());
         fragmentTransaction.commit();
     }
 }

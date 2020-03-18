@@ -24,6 +24,9 @@ protected:
 
     void restoreColumnsWidths() override;
 
+protected slots:
+    virtual int newRow() override;
+
 private:
     CR5CashDetailedFilter *fFilter;
 

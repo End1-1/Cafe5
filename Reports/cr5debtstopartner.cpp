@@ -15,7 +15,6 @@ CR5DebtsToPartner::CR5DebtsToPartner(const QStringList &dbParams, QWidget *paren
     fTranslation["f_id"] = tr("Code");
     fTranslation["f_taxname"] = tr("Partner");
     fTranslation["f_sum"] = tr("Debt");
-    connect(this, SIGNAL(tblDoubleClicked(int,int,QList<QVariant>)), this, SLOT(doubleClick(int,int,QList<QVariant>)));
 }
 
 QToolBar *CR5DebtsToPartner::toolBar()
@@ -31,14 +30,15 @@ QToolBar *CR5DebtsToPartner::toolBar()
     return fToolBar;
 }
 
-void CR5DebtsToPartner::doubleClick(int row, int column, const QList<QVariant> &vals)
+bool CR5DebtsToPartner::tblDoubleClicked(int row, int column, const QList<QVariant> &vals)
 {
     Q_UNUSED(row);
     Q_UNUSED(column);
     if (vals.count() == 0) {
-        return;
+        return true;
     }
     CR5StoreDocuments *d = __mainWindow->createTab<CR5StoreDocuments>(fDBParams);
     d->setPartnersFilter(vals.at(0).toInt());
     d->buildQuery();
+    return true;
 }

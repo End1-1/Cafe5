@@ -65,7 +65,6 @@ CR5ConsumptionBySales::CR5ConsumptionBySales(const QStringList &dbParams, QWidge
 
     fFilterWidget = new CR5ConsumptionBySalesFilter(dbParams);
     fFilter = static_cast<CR5ConsumptionBySalesFilter*>(fFilterWidget);
-    connect(this, SIGNAL(tblDoubleClicked(int,int,QList<QVariant>)), this, SLOT(tblDoubleClicked(int,int,QList<QVariant>)));
 }
 
 QToolBar *CR5ConsumptionBySales::toolBar()
@@ -321,10 +320,10 @@ void CR5ConsumptionBySales::countRowQty(int row)
                     - fModel->data(row, col_qtyafter, Qt::EditRole).toDouble());
 }
 
-void CR5ConsumptionBySales::tblDoubleClicked(int row, int column, const QList<QVariant> &values)
+bool CR5ConsumptionBySales::tblDoubleClicked(int row, int column, const QList<QVariant> &values)
 {
     if (values.count() == 0) {
-        return;
+        return true;
     }
     bool ok;
     double qty;
@@ -341,11 +340,11 @@ void CR5ConsumptionBySales::tblDoubleClicked(int row, int column, const QList<QV
     case col_qtyinv:
         qty = QInputDialog::getDouble(this, tr("Inventory qty"), tr("Qty"), 0, 0, 100000, 4, &ok);
         if (!ok) {
-            return;
+            return true;
         }
         if (qty < 0.0001) {
             C5Message::error(tr("Quantity must be greater than 0"));
-            return;
+            return true;
         }
         docid = documentForInventory();
         db[":f_goods"] = values.at(0);
@@ -363,6 +362,7 @@ void CR5ConsumptionBySales::tblDoubleClicked(int row, int column, const QList<QV
         countRowQty(row);
         break;
     }
+    return true;
 }
 
 void CR5ConsumptionBySales::makeOutput(bool v)
@@ -447,7 +447,7 @@ void CR5ConsumptionBySales::countOutputBasedOnRecipes()
 
 void CR5ConsumptionBySales::changeOutputStore()
 {
-    DlgChangeOutputStore *d = new DlgChangeOutputStore(fDBParams, this);
+    DlgChangeOutputStore *d = new DlgChangeOutputStore(fDBParams);
     d->refresh(fFilter->date1(), fFilter->date2());
     d->exec();
     delete d;

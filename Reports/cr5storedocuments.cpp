@@ -21,7 +21,6 @@ CR5StoreDocuments::CR5StoreDocuments(const QStringList &dbParams, QWidget *paren
     fTranslation["f_amount"] = tr("Amount");
     fTranslation["f_partnername"] = tr("Partner");
     fColumnsSum << "f_amount";
-    connect(this, SIGNAL(tblDoubleClicked(int,int,QList<QVariant>)), this, SLOT(tblDoubleClickEvent(int,int,QList<QVariant>)));
 }
 
 void CR5StoreDocuments::buildQuery()
@@ -34,21 +33,22 @@ void CR5StoreDocuments::buildQuery()
                 from a_store b \
                 left join a_header h on h.f_id=b.f_document  \
                 left join c_storages s2 on s2.f_id=b.f_store "
-            + fFilterWidget->condition() + " and b.f_type=-1 \
+            + fFilterWidget->condition() + " and b.f_type=-1 and h.f_type=3 \
                 group by 1, 2, 3) b2 on  b2.f_document=b.f_document \
             left join a_header h on h.f_id=b.f_document \
             left join c_storages s on s.f_id=b.f_store \
             left join a_type t on t.f_id=h.f_type \
             left join a_state ds on ds.f_id=h.f_state \
             left join c_partners p on p.f_id=h.f_partner ";
-    fSqlQuery += fFilterWidget->condition() + " and b.f_type=1 ";
+    fSqlQuery += fFilterWidget->condition() + "and ((h.f_type=3 and b.f_type=1) or (h.f_type <>3)) ";
     if (!fFilter->storages().isEmpty()) {
         fSqlQuery += " and (b.f_store in (" + fFilter->storages() + ") or b2.f_store in (" + fFilter->storages() +")) ";
     }
     if (!fFilter->reason().isEmpty()) {
         fSqlQuery += " and (b.f_reason in (" + fFilter->reason() + ")) ";
     }
-    fSqlQuery += " group by 1,2,3,4,5,6,7 order by h.f_date,h.f_userid ";
+    fGroupCondition = " group by 1,2,3,4,5,6,7 ";
+    fOrderCondition = "order by h.f_date,h.f_userid ";
     C5Grid::buildQuery();
     fTableView->setColumnWidth(0, 0);
     sumColumnsData();
@@ -73,15 +73,16 @@ void CR5StoreDocuments::setPartnersFilter(int partner)
     fFilter->setPartnerFilter(partner);
 }
 
-void CR5StoreDocuments::tblDoubleClickEvent(int row, int column, const QList<QVariant> &values)
+bool CR5StoreDocuments::tblDoubleClicked(int row, int column, const QList<QVariant> &values)
 {
     Q_UNUSED(row);
     Q_UNUSED(column);
     if (values.count() == 0) {
-        return;
+        return true;
     }
     C5StoreDoc *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);
     if (!sd->openDoc(values.at(0).toString())) {
         __mainWindow->removeTab(sd);
     }
+    return true;
 }

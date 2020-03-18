@@ -15,7 +15,7 @@ C5Selector::C5Selector(const QStringList &dbParams) :
     fGrid = new C5Grid(dbParams, nullptr);
     fGrid->fTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->hl->addWidget(fGrid);
-    connect(fGrid, SIGNAL(tblDoubleClicked(int,int,QList<QVariant>)), this, SLOT(tblDoubleClicked(int,int,QList<QVariant>)));
+    connect(fGrid, SIGNAL(tblDoubleClick(int,int,QList<QVariant>)), this, SLOT(tblDoubleClicked(int,int,QList<QVariant>)));
     connect(fGrid, SIGNAL(tblSingleClick(QModelIndex)), this, SLOT(tblSingleClick(QModelIndex)));
     fReset = true;
 }
@@ -137,7 +137,7 @@ void C5Selector::tblSingleClick(const QModelIndex &index)
     fGrid->fModel->setData(index.row(), 0, v, Qt::CheckStateRole);
 }
 
-void C5Selector::tblDoubleClicked(int row, int column, const QList<QVariant> &values)
+bool C5Selector::tblDoubleClicked(int row, int column, const QList<QVariant> &values)
 {
     Q_UNUSED(column);
     Q_UNUSED(row);
@@ -145,6 +145,7 @@ void C5Selector::tblDoubleClicked(int row, int column, const QList<QVariant> &va
     if (fValues.count() > 0) {
         accept();
     }
+    return true;
 }
 
 void C5Selector::on_btnRefreshCache_clicked()
@@ -169,6 +170,7 @@ void C5Selector::on_btnCheck_clicked()
 {
     for (int i = 0; i < fGrid->fModel->rowCount(); i++) {
         if (fGrid->fModel->data(i, 0, Qt::CheckStateRole) == Qt::Checked) {
+            fValues = fGrid->fModel->getRowValues(i);
             accept();
             return;
         }

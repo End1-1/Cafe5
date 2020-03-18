@@ -12,7 +12,7 @@ class CE5PackageList : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit CE5PackageList(const QStringList &dbParams, int package, QWidget *parent = nullptr);
+    explicit CE5PackageList(const QStringList &dbParams, int package);
 
     ~CE5PackageList();
 

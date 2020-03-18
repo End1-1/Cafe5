@@ -31,7 +31,8 @@ QToolBar *CR5CashDetailed::toolBar()
 {
     if (!fToolBar) {
         QList<ToolBarButtons> btn;
-        btn << ToolBarButtons::tbFilter
+        btn << ToolBarButtons::tbNew
+            << ToolBarButtons::tbFilter
             << ToolBarButtons::tbClearFilter
             << ToolBarButtons::tbRefresh
             << ToolBarButtons::tbExcel
@@ -136,6 +137,12 @@ void CR5CashDetailed::restoreColumnsWidths()
 {
     C5ReportWidget::restoreColumnsWidths();
     fTableView->setColumnWidth(0, 0);
+}
+
+int CR5CashDetailed::newRow()
+{
+    __mainWindow->createTab<C5CashDoc>(fDBParams);
+    return 0;
 }
 
 void CR5CashDetailed::sum()

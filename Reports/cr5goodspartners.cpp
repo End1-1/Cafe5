@@ -17,6 +17,7 @@ CR5GoodsPartners::CR5GoodsPartners(const QStringList &dbParams, QWidget *parent)
     fTranslation["f_info"] = tr("Info");
     fTranslation["f_phone"] = tr("Phone");
     fTranslation["f_email"] = tr("Email");
+    fTranslation["f_address"] = tr("Address");
 
     fEditor = new CE5Partner(fDBParams);
 }

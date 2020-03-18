@@ -294,3 +294,8 @@ alter table o_header add f_source smallint;
 alter table o_header add column f_cashdoc char(36);
 UPDATE c_goods g INNER JOIN c_goods_scancode s ON s.f_goods = g.f_id SET g.f_scancode = (select f_code from c_goods_scancode ss where ss.f_goods=g.f_id order by s.f_receipt );
 drop table c_goods_scancode;
+
+/* DB - 16 */
+update s_app set f_version ='16' where f_app='DB';
+create table d_dish_state (f_id integer primary key, f_name tinytext);
+insert into d_dish_state (f_id, f_name) values (0, 'Ոչ ակտիվ'),(1, 'Ակտիվ');

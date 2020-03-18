@@ -19,16 +19,8 @@ import com.e.delivery.Utils.EnumView;
 
 public class FROrderGoods extends ParentFragment {
 
-    public static String mTag = "FROrderGoods";
-
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_order_goods, container, false);
         EnumView.setButtonsClickListener(v, this);
         RecyclerView rv = v.findViewById(R.id.rv);
@@ -47,7 +39,7 @@ public class FROrderGoods extends ParentFragment {
     }
 
     void appendGoods() {
-        mActivity.replaceFragment(new FRAppendGoods(), R.id.fragment, FRAppendGoods.mTag);
+        mActivity.replaceFragment(new FRAppendGoods(), R.id.fragment);
     }
 
     public class ReadyGoodsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {

@@ -7,4 +7,7 @@
     <color name="colorLightGray">#eaeaea</color>
     <color name="colorWhite">#ffffff</color>
     <color name="colorRVSelected">#aeeaae</color>
+    <color name="colorRed">#ff0000</color>
+    <color name="colorGreen">#009900</color>
+    <color name="colorSeparatorView">#0070aa</color>
 </resources>

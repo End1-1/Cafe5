@@ -34,9 +34,19 @@ void SocketHandlerGoods::processData()
         j["f_saleprice2"] = db.getDouble("f_saleprice2");
         jagoods.append(j);
     }
+    QJsonArray jpartners;
+    db.exec("select f_taxcode, f_taxname, f_contact, f_info, f_phone, f_address from c_partners");
+    while (db.nextRow()) {
+        QJsonObject j;
+        for (int i = 0; i < db.columnCount(); i++) {
+            j[db.columnName(i)] = db.getString(i);
+        }
+        jpartners.append(j);
+    }
     QJsonObject jo;
     jo["groups"] = jagroups;
     jo["goods"] = jagoods;
+    jo["partners"] = jpartners;
     QJsonDocument jdoc(jo);
     fData = jdoc.toJson(QJsonDocument::Compact);
 }

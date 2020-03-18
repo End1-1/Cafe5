@@ -7,130 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>498</width>
-    <height>293</height>
+    <height>300</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="0">
-    <widget class="QLabel" name="label_10">
-     <property name="text">
-      <string>Discount type</string>
-     </property>
-    </widget>
-   </item>
    <item row="7" column="2">
-    <widget class="C5LineEditWithSelector" name="leValue">
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="Field" stdset="0">
-      <string>f_value</string>
-     </property>
-     <property name="Type" stdset="0">
-      <string>2</string>
-     </property>
-     <property name="Check" stdset="0">
-      <string>nonzero=&quot;Discount value&quot;</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="2">
-    <widget class="C5LineEditWithSelector" name="leDiscount">
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="Field" stdset="0">
-      <string>f_mode</string>
-     </property>
-     <property name="Type" stdset="0">
-      <string>1</string>
-     </property>
-     <property name="Check" stdset="0">
-      <string>empty=&quot;Discount type&quot;</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0">
-    <widget class="QLabel" name="label_7">
-     <property name="text">
-      <string>First name</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="2">
-    <widget class="C5LineEditWithSelector" name="leClient">
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="Field" stdset="0">
-      <string>f_client</string>
-     </property>
-     <property name="Type" stdset="0">
-      <string>1</string>
-     </property>
-     <property name="Check" stdset="0">
-      <string>empty=&quot;Client&quot;</string>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="0">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>Date start</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Code</string>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="0">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>Value</string>
-     </property>
-    </widget>
-   </item>
-   <item row="11" column="2">
-    <widget class="C5CheckBox" name="checkBox">
-     <property name="text">
-      <string>Active</string>
-     </property>
-     <property name="Field" stdset="0">
-      <string>f_active</string>
-     </property>
-    </widget>
-   </item>
-   <item row="9" column="0">
-    <widget class="QLabel" name="label_5">
-     <property name="text">
-      <string>Date end</string>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="0">
-    <widget class="QLabel" name="label_6">
-     <property name="text">
-      <string>Info</string>
-     </property>
-    </widget>
-   </item>
-   <item row="9" column="2">
     <widget class="C5DateEdit" name="deDateEnd">
      <property name="maximumSize">
       <size>
@@ -140,78 +24,6 @@
      </property>
      <property name="Field" stdset="0">
       <string>f_dateend</string>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="2">
-    <widget class="C5DateEdit" name="lineEdit_5">
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="Field" stdset="0">
-      <string>f_datestart</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="0">
-    <widget class="QLabel" name="label_8">
-     <property name="text">
-      <string>Last name</string>
-     </property>
-     <property name="FieldRef" stdset="0">
-      <string>f_lastname</string>
-     </property>
-    </widget>
-   </item>
-   <item row="10" column="0">
-    <widget class="QLabel" name="label_9">
-     <property name="text">
-      <string>Card code</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Client</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="2">
-    <widget class="C5LineEditWithSelector" name="leCode">
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="Field" stdset="0">
-      <string>f_id</string>
-     </property>
-     <property name="Primary" stdset="0">
-      <bool>true</bool>
-     </property>
-     <property name="Manual" stdset="0">
-      <bool>true</bool>
-     </property>
-     <property name="First" stdset="0">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="3">
-    <widget class="C5LineEditWithSelector" name="leDiscountName">
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="FieldRef" stdset="0">
-      <string>dtname</string>
      </property>
     </widget>
    </item>
@@ -238,7 +50,27 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="2" colspan="2">
+   <item row="1" column="3">
+    <widget class="C5LineEditWithSelector" name="leDiscountName">
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="FieldRef" stdset="0">
+      <string>dtname</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_6">
+     <property name="text">
+      <string>Info</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="3">
     <widget class="C5LineEditWithSelector" name="leFirstName">
      <property name="enabled">
       <bool>true</bool>
@@ -250,27 +82,40 @@
       <bool>true</bool>
      </property>
      <property name="FieldRef" stdset="0">
-      <string>f_firstname</string>
+      <string>f_contact</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="2" colspan="2">
-    <widget class="C5LineEditWithSelector" name="leLastName">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-     <property name="FieldRef" stdset="0">
-      <string>f_lastname</string>
+   <item row="8" column="2" colspan="2">
+    <widget class="C5LineEditWithSelector" name="leCard">
+     <property name="Field" stdset="0">
+      <string>f_code</string>
      </property>
     </widget>
    </item>
-   <item row="6" column="2" colspan="2">
+   <item row="0" column="2">
+    <widget class="C5LineEditWithSelector" name="leCode">
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="Field" stdset="0">
+      <string>f_id</string>
+     </property>
+     <property name="Primary" stdset="0">
+      <bool>true</bool>
+     </property>
+     <property name="Manual" stdset="0">
+      <bool>true</bool>
+     </property>
+     <property name="First" stdset="0">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="2" colspan="2">
     <widget class="C5LineEditWithSelector" name="leClientInfo">
      <property name="enabled">
       <bool>true</bool>
@@ -286,10 +131,132 @@
      </property>
     </widget>
    </item>
-   <item row="10" column="2" colspan="2">
-    <widget class="C5LineEditWithSelector" name="leCard">
+   <item row="8" column="0">
+    <widget class="QLabel" name="label_9">
+     <property name="text">
+      <string>Card code</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Value</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="2">
+    <widget class="C5CheckBox" name="checkBox">
+     <property name="text">
+      <string>Active</string>
+     </property>
      <property name="Field" stdset="0">
-      <string>f_code</string>
+      <string>f_active</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="2">
+    <widget class="C5LineEditWithSelector" name="leValue">
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="Field" stdset="0">
+      <string>f_value</string>
+     </property>
+     <property name="Type" stdset="0">
+      <string>2</string>
+     </property>
+     <property name="Check" stdset="0">
+      <string>nonzero=&quot;Discount value&quot;</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Date start</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_10">
+     <property name="text">
+      <string>Discount type</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>Date end</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="2">
+    <widget class="C5LineEditWithSelector" name="leClient">
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="Field" stdset="0">
+      <string>f_client</string>
+     </property>
+     <property name="Type" stdset="0">
+      <string>1</string>
+     </property>
+     <property name="Check" stdset="0">
+      <string>empty=&quot;Client&quot;</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Code</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <widget class="C5LineEditWithSelector" name="leDiscount">
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="Field" stdset="0">
+      <string>f_mode</string>
+     </property>
+     <property name="Type" stdset="0">
+      <string>1</string>
+     </property>
+     <property name="Check" stdset="0">
+      <string>empty=&quot;Discount type&quot;</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="2">
+    <widget class="C5DateEdit" name="lineEdit_5">
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="Field" stdset="0">
+      <string>f_datestart</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Client</string>
      </property>
     </widget>
    </item>
@@ -315,8 +282,6 @@
  <tabstops>
   <tabstop>leCode</tabstop>
   <tabstop>leClient</tabstop>
-  <tabstop>leFirstName</tabstop>
-  <tabstop>leLastName</tabstop>
   <tabstop>leClientInfo</tabstop>
   <tabstop>leValue</tabstop>
   <tabstop>lineEdit_5</tabstop>

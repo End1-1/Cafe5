@@ -17,6 +17,10 @@ public class ParentFragment extends Fragment implements View.OnClickListener {
 
     }
 
+    public String tag() {
+        return getClass().getName();
+    }
+
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);

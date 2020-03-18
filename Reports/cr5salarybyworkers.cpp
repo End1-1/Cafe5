@@ -49,9 +49,6 @@ CR5SalaryByWorkers::CR5SalaryByWorkers(const QStringList &dbParams, QWidget *par
 
     restoreColumnsVisibility();
     fFilterWidget = new CR5SalaryByWorkersFilter(fDBParams);
-//    fFilter = static_cast<CR5SaleFromStoreFilter*>(fFilterWidget);
-
-    connect(this, SIGNAL(tblDoubleClicked(int,int,QList<QVariant>)), this, SLOT(tblClick(int,int,QList<QVariant>)));
 
 }
 
@@ -77,19 +74,20 @@ QToolBar *CR5SalaryByWorkers::toolBar()
     return fToolBar;
 }
 
-void CR5SalaryByWorkers::tblClick(int row, int column, const QList<QVariant> &vals)
+bool CR5SalaryByWorkers::tblDoubleClicked(int row, int column, const QList<QVariant> &vals)
 {
     Q_UNUSED(row);
     Q_UNUSED(column);
     if (!fColumnsVisible["h.f_id as f_header"]) {
         C5Message::info(tr("Column 'Header' must be checked in filter"));
-        return;
+        return true;
     }
     if (vals.isEmpty()) {
-        return;
+        return true;
     }
     auto *sd = __mainWindow->createTab<C5SalaryDoc>(fDBParams);
     if (!sd->openDoc(vals.at(0).toString())) {
         __mainWindow->removeTab(sd);
     }
+    return true;
 }

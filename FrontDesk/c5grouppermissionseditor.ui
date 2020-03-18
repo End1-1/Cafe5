@@ -20,7 +20,7 @@
       <enum>QTabWidget::West</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>7</number>
      </property>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
@@ -247,13 +247,26 @@
        <string>Goods</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_4">
-       <item row="2" column="0">
-        <widget class="C5CheckBox" name="checkBox_13">
+       <item row="7" column="1">
+        <spacer name="verticalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>498</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="1" column="0">
+        <widget class="C5CheckBox" name="checkBox_12">
          <property name="text">
-          <string>Groups</string>
+          <string>Units</string>
          </property>
          <property name="Tag" stdset="0">
-          <number>602</number>
+          <number>601</number>
          </property>
         </widget>
        </item>
@@ -267,26 +280,6 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="0">
-        <widget class="C5CheckBox" name="checkBox_38">
-         <property name="text">
-          <string>Partners</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>606</number>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="C5CheckBox" name="checkBox_12">
-         <property name="text">
-          <string>Units</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>601</number>
-         </property>
-        </widget>
-       </item>
        <item row="3" column="0">
         <widget class="C5CheckBox" name="checkBox_14">
          <property name="text">
@@ -297,13 +290,13 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="0">
-        <widget class="C5CheckBox" name="checkBox_15">
+       <item row="2" column="0">
+        <widget class="C5CheckBox" name="checkBox_13">
          <property name="text">
-          <string>Auto waste</string>
+          <string>Groups</string>
          </property>
          <property name="Tag" stdset="0">
-          <number>604</number>
+          <number>602</number>
          </property>
         </widget>
        </item>
@@ -317,26 +310,23 @@
          </property>
         </widget>
        </item>
-       <item row="8" column="1">
-        <spacer name="verticalSpacer_4">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>498</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="7" column="0">
+       <item row="6" column="0">
         <widget class="C5CheckBox" name="checkBox_63">
          <property name="text">
           <string>Classes</string>
          </property>
          <property name="Tag" stdset="0">
           <number>607</number>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="C5CheckBox" name="checkBox_15">
+         <property name="text">
+          <string>Auto waste</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>604</number>
          </property>
         </widget>
        </item>
@@ -788,6 +778,16 @@
         </widget>
        </item>
        <item>
+        <widget class="C5CheckBox" name="checkBox_38">
+         <property name="text">
+          <string>Partners</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>706</number>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="C5CheckBox" name="checkBox_28">
          <property name="text">
           <string>Credit cards</string>
@@ -814,16 +814,6 @@
          </property>
          <property name="Tag" stdset="0">
           <number>705</number>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="C5CheckBox" name="chCostumers">
-         <property name="text">
-          <string>Customers</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>709</number>
          </property>
         </widget>
        </item>

@@ -17,9 +17,9 @@ protected:
 
     virtual void restoreColumnsWidths();
 
-protected slots:
-    virtual void tblDoubleClicked(int row, int column, const QList<QVariant> &values);
+    virtual bool tblDoubleClicked(int row, int column, const QList<QVariant> &values) override;
 
+protected slots:
     virtual void callEditor(const QString &id);
 
 private:

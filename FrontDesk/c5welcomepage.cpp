@@ -62,7 +62,7 @@ void C5WelcomePage::setDatabaseName(const QString &database)
     ui->btnGoods->setVisible(pr(fDbName, cp_t6_goods));
     ui->btnStorages->setVisible(pr(fDbName, cp_t6_storage));
     ui->btnUnits->setVisible(pr(fDbName, cp_t6_units));
-    ui->btnPartners->setVisible(pr(fDbName, cp_t6_partners));
+    ui->btnPartners->setVisible(pr(fDbName, cp_t7_partners));
     ui->btnMenuName->setVisible(pr(fDbName, cp_t4_menu));
     ui->btnDishDepts->setVisible(pr(fDbName, cp_t4_part1));
     ui->btnTypesOfDishes->setVisible(pr(fDbName, cp_t4_part2));

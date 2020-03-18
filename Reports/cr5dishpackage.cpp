@@ -41,7 +41,7 @@ void CR5DishPackage::editDishList()
         return;
     }
     int id = fModel->data(row, 0, Qt::EditRole).toInt();
-    CE5PackageList *pl = new CE5PackageList(fDBParams, id, this);
+    CE5PackageList *pl = new CE5PackageList(fDBParams, id);
     pl->exec();
     delete pl;
 }

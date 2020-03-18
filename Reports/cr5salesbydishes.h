@@ -14,8 +14,8 @@ public:
 
     virtual void restoreColumnsWidths();
 
-private slots:
-    void openOrder(int row, int column, const QList<QVariant> &v);
+protected:
+    virtual bool tblDoubleClicked(int row, int column, const QList<QVariant> &v);
 };
 
 #endif // CR5SALESBYDISHES_H

@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.e.delivery.Data.GoodsProvider;
+import com.e.delivery.Data.PartnerProvider;
 import com.e.delivery.R;
 import com.e.delivery.Services.TempService;
 import com.e.delivery.Utils.Config;
@@ -77,6 +78,10 @@ public class MainActivity extends ParentActivity {
                 i = new Intent(this, OrderActivity.class);
                 startActivity(i);
                 break;
+            case R.id.btnSales:
+                i = new Intent(this, SalesTodayActivity.class);
+                startActivity(i);
+                break;
         }
     }
 
@@ -99,6 +104,8 @@ public class MainActivity extends ParentActivity {
                 setTextViewText(R.id.tvLoginStatus, getString(R.string.LoginStatusGoods));
                 Json goods = gg.getJsonArray("goods");
                 GoodsProvider.initGoods(goods.getArray("goods"));
+                Json partners = gg.getJsonArray("partners");
+                PartnerProvider.initPartners(partners.getArray("partners"));
                 ViewAnimator.animateHeight(findViewById(R.id.clConfig), -1, 0, hideLogin);
             } else {
                 Config.setString(MainActivity.this,"session_id", "");
