@@ -17,5 +17,5 @@ void SocketHandler::setSocket(SslSocket *socket)
 
 bool SocketHandler::closeConnection()
 {
-    return true;
+    return false;
 }

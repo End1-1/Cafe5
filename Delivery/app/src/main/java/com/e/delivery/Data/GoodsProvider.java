@@ -57,6 +57,15 @@ public class GoodsProvider {
         }
     }
 
+    public static Goods getGoods(int code) {
+        for (Goods g: mGoods) {
+            if (g.mCode == code) {
+                return g;
+            }
+        }
+        return null;
+    }
+
     public static void setReadyGoods() {
         mReadyGoods.clear();
         for (Goods g: mProxyGoods) {
@@ -76,5 +85,16 @@ public class GoodsProvider {
 
     public static int readyGoodsCount() {
         return mReadyGoods.size();
+    }
+
+    public static void clearOrder() {
+        for (Goods g: mGoods) {
+            g.mSelectedQty = 0.0;
+        }
+        mReadyGoods.clear();
+        mTotalAmount = 0.0;
+        mCashAmount = 0.0;
+        mBankAmount = 0.0;
+        mDebtAmount = 0.0;
     }
 }

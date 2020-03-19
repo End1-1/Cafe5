@@ -32,14 +32,12 @@ public class DataSender extends AsyncTask<Integer, Integer, Integer> {
     int mCommand;
     int mResponse;
     JSONObject mReply;
-    DataSenderCallback mDataSenderCallback;
 
-    public DataSender(String buffer, int command, DataSenderCallback dataSenderCallback) {
+    public DataSender(String buffer, int command) {
         mBuffer = buffer;
         mCommand = command;
         mResponse  = 0;
         mReply = new JSONObject();
-        mDataSenderCallback = dataSenderCallback;
     }
 
     @Override
@@ -127,10 +125,5 @@ public class DataSender extends AsyncTask<Integer, Integer, Integer> {
     @Override
     protected void onPostExecute(Integer integer) {
         super.onPostExecute(integer);
-        mDataSenderCallback.finish(integer, new Json(mReply));
-    }
-
-    public interface DataSenderCallback {
-        void finish(int result, Json data);
     }
 }

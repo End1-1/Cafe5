@@ -1,8 +1,10 @@
 package com.e.delivery.Activities;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -68,21 +70,31 @@ public class SalesTodayActivity extends ParentActivity {
             notifyDataSetChanged();
         }
 
-        class VH extends RecyclerView.ViewHolder {
+        class VH extends RecyclerView.ViewHolder implements View.OnLongClickListener {
 
+            OH mVhOh;
             TextView tvName;
             TextView tvAmount;
 
             public VH(@NonNull View itemView) {
                 super(itemView);
+                itemView.setOnLongClickListener(this);
                 tvName = itemView.findViewById(R.id.tvName);
                 tvAmount = itemView.findViewById(R.id.tvAmount);
             }
 
             public void onBind(int position) {
-                OH oh = mOh.get(position);
-                tvName.setText(oh.mName);
-                tvAmount.setText(String.format("%.0f", oh.mAmount));
+                mVhOh = mOh.get(position);
+                tvName.setText(mVhOh.mName);
+                tvAmount.setText(String.format("%.0f", mVhOh.mAmount));
+            }
+
+            @Override
+            public boolean onLongClick(View v) {
+                Intent i = new Intent(SalesTodayActivity.this, OrderActivity.class);
+                i.putExtra("order", mVhOh.mId);
+                startActivity(i);
+                return false;
             }
         }
 

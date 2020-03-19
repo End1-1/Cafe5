@@ -3,6 +3,7 @@ package com.e.delivery.Activities;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
 
@@ -11,6 +12,7 @@ import androidx.appcompat.app.AlertDialog;
 import com.e.delivery.Data.Goods;
 import com.e.delivery.Data.GoodsProvider;
 import com.e.delivery.Data.Partner;
+import com.e.delivery.Data.PartnerProvider;
 import com.e.delivery.Fragments.FRCustomer;
 import com.e.delivery.Fragments.FROrderBill;
 import com.e.delivery.Fragments.FROrderGoods;
@@ -26,13 +28,24 @@ public class OrderActivity extends ParentActivity {
     FROrderBill frBill = new FROrderBill();
     FROrderGoods frGoods = new FROrderGoods();
     Partner mPartner;
+    int mOrderId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order);
         EnumView.setButtonsClickListener(findViewById(R.id.idParent), this);
+        mOrderId = getIntent().getIntExtra("order", 0);
+        if (mOrderId > 0) {
+            loadOrder();
+        }
         replaceFragment(frCustomer, R.id.fragment);
+    }
+
+    @Override
+    public void onDestroy() {
+        GoodsProvider.clearOrder();
+        super.onDestroy();
     }
 
     @Override
@@ -123,10 +136,34 @@ public class OrderActivity extends ParentActivity {
         ab.setNegativeButton(R.string.Close, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                OrderActivity.this.onBackPressed();
+                finish();
             }
         });
         AlertDialog dlg = ab.create();
         dlg.show();
+    }
+
+    void loadOrder() {
+        Database db = new Database(this);
+        String sql = String.format("select * from ob where oh=%d", mOrderId);
+        Cursor c = db.select(sql);
+        if (c.moveToFirst()) {
+            do {
+                Goods g = GoodsProvider.getGoods(c.getInt(c.getColumnIndex("goods")));
+                g.mSelectedQty = c.getDouble(c.getColumnIndex("qty"));
+                GoodsProvider.mReadyGoods.add(g);
+            } while (c.moveToNext());
+        }
+        sql = String.format("select taxcode, atotal, acash, abank, adept from oh where id=%d", mOrderId);
+        c = db.select(sql);
+        if (c.moveToFirst()) {
+            mPartner = PartnerProvider.getPartner(c.getString(c.getColumnIndex("taxcode")));
+            GoodsProvider.mTotalAmount = c.getDouble(c.getColumnIndex("atotal"));
+            GoodsProvider.mCashAmount = c.getDouble(c.getColumnIndex("acash"));
+            GoodsProvider.mBankAmount = c.getDouble(c.getColumnIndex("abank"));
+            GoodsProvider.mDebtAmount = c.getDouble(c.getColumnIndex("adept"));
+        } else {
+            finish();
+        }
     }
 }

@@ -1,11 +1,15 @@
 package com.e.delivery.Activities;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 
+import com.e.delivery.Data.DataMessage;
 import com.e.delivery.Data.GoodsProvider;
 import com.e.delivery.Data.PartnerProvider;
 import com.e.delivery.R;
@@ -35,21 +39,48 @@ public class MainActivity extends ParentActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        if (findViewById(R.id.clConfig).getVisibility() == View.VISIBLE) {
-            String session = Config.getString(this, "session_id");
-            if (!session.isEmpty()) {
-                findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
-                findViewById(R.id.tvLoginStatus).setVisibility(View.VISIBLE);
-                findViewById(R.id.btnEnter).setEnabled(false);
-                setTextViewText(R.id.tvLoginStatus, getString(R.string.LoginStatus));
-                Json j = new Json();
-                j.putString("session", session);
-                j.putInt("listofgoods", 1);
-                DataSender ds = new DataSender(j.toString(), DataSenderCommands.qLoginWithSession, dsLogin);
-                ds.execute();
-            }
+    protected void messageHandler(DataMessage m) {
+        super.messageHandler(m);
+        switch (m.mCommand) {
+            case DataSenderCommands.lServiceStarted:
+                if (findViewById(R.id.clConfig).getVisibility() == View.VISIBLE) {
+                    String session = Config.getString(this, "session_id");
+                    if (!session.isEmpty()) {
+                        findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
+                        findViewById(R.id.tvLoginStatus).setVisibility(View.VISIBLE);
+                        findViewById(R.id.btnEnter).setEnabled(false);
+                        setTextViewText(R.id.tvLoginStatus, getString(R.string.LoginStatus));
+                        Json j = new Json();
+                        j.putString("session", session);
+                        j.putInt("listofgoods", 1);
+                        m = new DataMessage(DataSenderCommands.qLoginWithSession, j.toString());
+                        sendMessage(m);
+                    }
+                }
+                break;
+            case DataSenderCommands.qLogin:
+            case DataSenderCommands.qLoginWithSession:
+                Json data = new Json(m.mBuffer);
+                if (m.mResponse == DataSenderCommands.rOk) {
+                    Config.setString(MainActivity.this,"session_id", data.getString("session"));
+                    setTextViewText(R.id.tvLoginStatus, getString(R.string.LoginStatusGoodsGroups));
+                    Json gg = data.getJsonObject("listofgoodsgroups");
+                    Json goodsGroups = gg.getJsonArray("groups");
+                    GoodsProvider.initGoodsGroups(goodsGroups.getArray("groups"));
+                    setTextViewText(R.id.tvLoginStatus, getString(R.string.LoginStatusGoods));
+                    Json goods = gg.getJsonArray("goods");
+                    GoodsProvider.initGoods(goods.getArray("goods"));
+                    Json partners = gg.getJsonArray("partners");
+                    PartnerProvider.initPartners(partners.getArray("partners"));
+                    ViewAnimator.animateHeight(findViewById(R.id.clConfig), -1, 0, hideLogin);
+                } else {
+                    Config.setString(MainActivity.this,"session_id", "");
+                    findViewById(R.id.progressBar).setVisibility(View.GONE);
+                    findViewById(R.id.btnEnter).setEnabled(true);
+                    String msg = String.format("%s\n%s", getString(R.string.LoginStatusFailed), data.getString("msg"));
+                    setTextViewText(R.id.tvLoginStatus, msg);
+                }
+                break;
         }
     }
 
@@ -67,8 +98,8 @@ public class MainActivity extends ParentActivity {
                 j.putString("username", editText(R.id.edUsername));
                 j.putString("password", editText(R.id.edPassword));
                 j.putInt("listofgoods", 1);
-                DataSender ds = new DataSender(j.toString(), DataSenderCommands.qLogin, dsLogin);
-                ds.execute();
+                DataMessage m = new DataMessage(DataSenderCommands.qLogin, j.toString());
+                sendMessage(m);
                 break;
             case R.id.btnSettings:
                 i = new Intent(this, ConfigActivity.class);
@@ -88,32 +119,9 @@ public class MainActivity extends ParentActivity {
     ViewAnimator.ViewAnimatorEnd hideLogin = new ViewAnimator.ViewAnimatorEnd() {
         @Override
         public void end() {
+            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
             ViewAnimator.animateHeight(findViewById(R.id.llWorking), 0, findViewById(R.id.idParent).getMeasuredHeight(), null);
-        }
-    };
-
-    DataSender.DataSenderCallback dsLogin = new DataSender.DataSenderCallback() {
-        @Override
-        public void finish(int result, Json data) {
-            if (result == DataSenderCommands.rOk) {
-                Config.setString(MainActivity.this,"session_id", data.getString("session"));
-                setTextViewText(R.id.tvLoginStatus, getString(R.string.LoginStatusGoodsGroups));
-                Json gg = data.getJsonObject("listofgoodsgroups");
-                Json goodsGroups = gg.getJsonArray("groups");
-                GoodsProvider.initGoodsGroups(goodsGroups.getArray("groups"));
-                setTextViewText(R.id.tvLoginStatus, getString(R.string.LoginStatusGoods));
-                Json goods = gg.getJsonArray("goods");
-                GoodsProvider.initGoods(goods.getArray("goods"));
-                Json partners = gg.getJsonArray("partners");
-                PartnerProvider.initPartners(partners.getArray("partners"));
-                ViewAnimator.animateHeight(findViewById(R.id.clConfig), -1, 0, hideLogin);
-            } else {
-                Config.setString(MainActivity.this,"session_id", "");
-                findViewById(R.id.progressBar).setVisibility(View.GONE);
-                findViewById(R.id.btnEnter).setEnabled(true);
-                String msg = String.format("%s\n%s", getString(R.string.LoginStatusFailed), data.getString("msg"));
-                setTextViewText(R.id.tvLoginStatus, msg);
-            }
         }
     };
 }

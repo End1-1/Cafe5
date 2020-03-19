@@ -33,7 +33,7 @@ void SocketRW::go()
                 fSocket->read(reinterpret_cast<char *>(&datatype), sizeof(datatype));
                 LogWriter::write(10, 1, fSocket->fUuid, QString("Ready data, type: %2, size: %3 bytes").arg(datatype).arg(datasize));
             }
-            int r = fSocket->read(buffer, buffersize);
+            int r = fSocket->read(buffer, datasize - dataread > buffersize ? buffersize : datasize - dataread);
             dataread += r;
             data.append(buffer, r);
             if (dataread == datasize) {
@@ -70,6 +70,9 @@ void SocketRW::go()
                     break;
                 }
                 data.clear();
+                datasize = 0;
+                dataread = 0;
+                datatype = 0;
             }
         }
     }

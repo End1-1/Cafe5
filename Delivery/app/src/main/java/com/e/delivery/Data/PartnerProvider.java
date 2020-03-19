@@ -61,4 +61,13 @@ public class PartnerProvider {
         }
         return l;
     }
+
+    public static Partner getPartner(String taxcode) {
+        for (Partner p: mPartners) {
+            if (p.mTaxCode.equals(taxcode)) {
+                return p;
+            }
+        }
+        return null;
+    }
 }

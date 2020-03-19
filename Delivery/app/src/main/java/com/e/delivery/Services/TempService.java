@@ -5,20 +5,59 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.os.Build;
 import android.os.IBinder;
+import android.provider.ContactsContract;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.e.delivery.Activities.DeliveryApp;
 import com.e.delivery.Activities.MainActivity;
+import com.e.delivery.Data.DataMessage;
 import com.e.delivery.R;
+import com.e.delivery.Utils.Config;
+import com.e.delivery.Utils.DataSenderCommands;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.InetSocketAddress;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
+import java.util.LinkedList;
+import java.util.NoSuchElementException;
+import java.util.Queue;
+
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
 
 import static android.app.Notification.DEFAULT_VIBRATE;
 
@@ -26,6 +65,8 @@ public class TempService extends Service {
 
     static final String CHANNEL_ID = "1250012";
     static final String TAG = TempService.class.getSimpleName();
+    MessageHandler mMessageHandler;
+    Queue<DataMessage> mDataMessage = new LinkedList<>();
 
     @Override
     public void onCreate() {
@@ -74,5 +115,186 @@ public class TempService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return null;
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        super.onStartCommand(intent, flags, startId);
+        //ExecutorService es = Executors.newFixedThreadPool(10);
+        mMessageHandler = new MessageHandler();
+        new Thread(mMessageHandler).start();
+        //mServerThreadFuture = es.submit(mSocketThread);
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter("S"));
+        return START_STICKY;
+    }
+
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            DataMessage m = intent.getParcelableExtra("datamessage");
+            mDataMessage.add(m);
+        }
+    };
+
+    protected void sendMessage(DataMessage m) {
+        Intent i = new Intent("A");
+        i.putExtra("datamessage", m);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(i);
+    }
+
+    class MessageHandler implements Runnable {
+
+        SSLSocket mSocket = null;
+        boolean mConnected = false;
+
+        void connect() {
+            mConnected = false;
+            String err = "";
+            do {
+                try {
+                    if (mSocket != null) {
+                        mSocket.close();
+                    }
+                    String keyStore = KeyStore.getDefaultType();
+                    KeyStore trusted = KeyStore.getInstance(keyStore);
+                    InputStream in = DeliveryApp.getAppContext().getResources().openRawResource(R.raw.keystore);
+                    trusted.load(in, "qwerty".toCharArray());
+                    in.close();
+                    String keyManagerFactory = KeyManagerFactory.getDefaultAlgorithm();
+                    KeyManagerFactory kmf = KeyManagerFactory.getInstance(keyManagerFactory);
+                    kmf.init(trusted, "qwerty".toCharArray());
+
+                    TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+                    tmf.init(trusted);
+                    TrustManager[] tm = tmf.getTrustManagers();
+                    SSLContext sslContext = SSLContext.getInstance("TLS");
+                    sslContext.init(kmf.getKeyManagers(), tm, null);
+                    SSLSocketFactory factory = sslContext.getSocketFactory();
+
+                    mSocket = (SSLSocket) factory.createSocket();
+                    mSocket.connect(new InetSocketAddress(Config.mServerIP, Config.mServerPort), 5000);
+                    mSocket.setSoTimeout(3000);
+                    mSocket.startHandshake();
+                    mConnected = true;
+                } catch (IOException e) {
+                    err = String.format("{\"msg\":\"%s\"}", e.getMessage());
+                    e.printStackTrace();
+                } catch (KeyManagementException e) {
+                    err = String.format("{\"msg\":\"%s\"}", e.getMessage());
+                    e.printStackTrace();
+                } catch (NoSuchAlgorithmException e) {
+                    err = String.format("{\"msg\":\"%s\"}", e.getMessage());
+                    e.printStackTrace();
+                } catch (CertificateException e) {
+                    err = String.format("{\"msg\":\"%s\"}", e.getMessage());
+                    e.printStackTrace();
+                } catch (KeyStoreException e) {
+                    err = String.format("{\"msg\":\"%s\"}", e.getMessage());
+                    e.printStackTrace();
+                } catch (UnrecoverableKeyException e) {
+                    err = String.format("{\"msg\":\"%s\"}", e.getMessage());
+                    e.printStackTrace();
+                }
+                try {
+                    if (!mConnected) {
+                        while (mDataMessage.size() > 0) {
+                            DataMessage m = mDataMessage.remove();
+                            m.mResponse = DataSenderCommands.rErr;
+                            m.mBuffer = err;
+                            sendMessage(m);
+                        }
+                        Thread.sleep(1000);
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            } while (!mConnected);
+            sendMessage(new DataMessage(DataSenderCommands.lServiceStarted, ""));
+        }
+
+        @Override
+        public void run() {
+            do {
+                if (!mConnected) {
+                    connect();
+                }
+                DataMessage m = null;
+                try {
+                    m = mDataMessage.remove();
+                } catch (NoSuchElementException e) {
+                    m = null;
+                    e.printStackTrace();
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ee) {
+                        ee.printStackTrace();
+                    }
+                }
+                try {
+                    ByteBuffer bb = ByteBuffer.allocate(8);
+                    if (m != null) {
+                        OutputStream os = mSocket.getOutputStream();
+                        DataOutputStream dos = new DataOutputStream(os);
+                        bb.order(ByteOrder.LITTLE_ENDIAN);
+                        bb.putInt(m.mBuffer.getBytes("UTF-8").length);
+                        bb.putInt(m.mCommand);
+                        byte[] bytes = bb.array();
+                        dos.write(bytes, 0, 8);
+                        dos.flush();
+                        bytes = m.mBuffer.getBytes("UTF-8");
+                        dos.write(bytes, 0, bytes.length);
+                        dos.flush();
+                    }
+                    InputStream is = mSocket.getInputStream();
+                    DataInputStream dis = new DataInputStream(is);
+                    byte[] b = new byte[4];
+                    int read = dis.read(b, 0, 4);
+                    bb.clear();
+                    bb.put(b);
+                    dis.read(b, 0, 4);
+                    bb.put(b);
+                    bb.position(0);
+                    Integer datasize = bb.getInt();
+                    if (m == null) {
+                        m = new DataMessage(0, "");
+                    }
+                    if (read  == -1) {
+                        m.mCommand = DataSenderCommands.rReconnect;
+                    }
+                    m.mResponse = bb.getInt();
+                    m.mBuffer = "";
+                    while (dis.available() > 0 || datasize > 0) {
+                        int pt;
+                        byte[] bbb = new byte[8192];
+                        pt = dis.read(bbb, 0, 8192);
+                        datasize -= pt;
+                        m.mBuffer += new String(bbb, 0, pt);
+                    }
+                } catch (SocketTimeoutException e) {
+                    if (m == null) {
+                        m = new DataMessage(0, "");
+                    }
+                    if (m.mCommand == 0) {
+                        m.mCommand = DataSenderCommands.rIgnore;
+                    } else {
+                        m.mResponse = DataSenderCommands.rErr;
+                        m.mBuffer = String.format("{\"msg\":\"%s\"}", e.getMessage());
+                    }
+                } catch (IOException e) {
+                    if (m == null) {
+                        m = new DataMessage(0, "");
+                    }
+                    m.mResponse = DataSenderCommands.rErr;
+                    m.mBuffer = String.format("{\"msg\":\"%s\"}", e.getMessage());
+                    e.printStackTrace();
+                }
+                if (m.mCommand != DataSenderCommands.rIgnore) {
+                    sendMessage(m);
+                }
+                if (m.mCommand == DataSenderCommands.rReconnect) {
+                    connect();
+                }
+            } while (true);
+        }
     }
 }

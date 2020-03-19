@@ -20,6 +20,7 @@ public class Json {
         try {
             mObject = new JSONObject(s);
         } catch (JSONException e) {
+            mObject = new JSONObject();
             e.printStackTrace();
         }
     }
