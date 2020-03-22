@@ -6,7 +6,8 @@
 class SocketHandlerLoginWithSession : public SocketHandler
 {
 public:
-    SocketHandlerLoginWithSession(QByteArray &data);
+    SocketHandlerLoginWithSession(SocketData *sd, QByteArray &data);
+    bool login();
     virtual void processData() override;
 };
 

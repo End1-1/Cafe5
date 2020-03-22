@@ -1,7 +1,6 @@
 package com.e.delivery.Activities;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -18,9 +17,12 @@ import com.e.delivery.Fragments.FROrderBill;
 import com.e.delivery.Fragments.FROrderGoods;
 import com.e.delivery.Fragments.FRSearchPartner;
 import com.e.delivery.R;
+import com.e.delivery.Services.LocationService;
 import com.e.delivery.Utils.CompareDouble;
 import com.e.delivery.Utils.Database;
 import com.e.delivery.Utils.EnumView;
+
+import java.util.UUID;
 
 public class OrderActivity extends ParentActivity {
 
@@ -116,6 +118,7 @@ public class OrderActivity extends ParentActivity {
             cv.put("acash", GoodsProvider.mCashAmount);
             cv.put("abank", GoodsProvider.mBankAmount);
             cv.put("adept", GoodsProvider.mDebtAmount);
+            cv.put("coordinates", LocationService.mark());
             int id = db.insertWithId("oh");
             for (int i = 0; i < GoodsProvider.mReadyGoods.size(); i++) {
                 Goods g = GoodsProvider.mReadyGoods.get(i);

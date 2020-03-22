@@ -132,6 +132,12 @@
    <header location="global">c5lineedit.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>deStart</tabstop>
+  <tabstop>deEnd</tabstop>
+  <tabstop>leCostumer</tabstop>
+  <tabstop>leGovNumber</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

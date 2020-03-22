@@ -5,8 +5,8 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
-SocketHandlerGoods::SocketHandlerGoods(QByteArray &data) :
-    SocketHandler(data)
+SocketHandlerGoods::SocketHandlerGoods(SocketData *sd, QByteArray &data) :
+    SocketHandler(sd, data)
 {
 
 }

@@ -16,7 +16,7 @@ public class DeliveryApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Config.init(getApplicationContext());
         mAppContext = getApplicationContext();
+        Config.init();
     }
 }

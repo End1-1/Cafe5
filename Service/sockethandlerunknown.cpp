@@ -1,8 +1,8 @@
 #include "sockethandlerunknown.h"
 #include "servicecommands.h"
 
-SocketHandlerUnknown::SocketHandlerUnknown(QByteArray &data) :
-    SocketHandler(data)
+SocketHandlerUnknown::SocketHandlerUnknown(SocketData *sd, QByteArray &data) :
+    SocketHandler(sd, data)
 {
 
 }

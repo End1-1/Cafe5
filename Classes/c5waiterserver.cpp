@@ -161,7 +161,13 @@ void C5WaiterServer::reply(QJsonObject &o)
            o["date_cash"] = srh.fDb.getString("f_datecash");
            o["date_auto"] = srh.fDb.getString("f_datecashauto");
            o["date_shift"] = srh.fDb.getString("f_shift");
-           srh.fDb[":f_settings"] = srh.fDb.getInt("f_conf");
+           int settingsId = srh.fDb.getInt("f_conf");
+           srh.fDb[":f_name"] = fIn["config"].toString();
+           srh.fDb.exec("select f_id from s_settings_names where f_name=:f_name");
+           if (srh.fDb.nextRow()) {
+                settingsId = srh.fDb.getInt(0);
+           }
+           srh.fDb[":f_settings"] = settingsId;
            srh.fDb.exec("select f_key, f_value from s_settings_values where f_settings=:f_settings");
            while (srh.fDb.nextRow()) {
                jConf[srh.fDb.getString(0)] = srh.fDb.getString(1);
@@ -920,9 +926,9 @@ bool C5WaiterServer::printBill(QJsonObject &jh, QJsonArray &jb, QString &err, C5
     }
     if (jh["car"].toString().toInt() > 0) {
         srh.fDb[":f_id"] = jh["car"].toString().toInt();
-        srh.fDb.exec("select c.f_name as f_carname, bc.f_govnumber, trim(concat(cl.f_lastname, ' ', cl.f_firstname))) as f_name "
+        srh.fDb.exec("select c.f_name as f_carname, bc.f_govnumber, trim(cl.f_contact) as f_name "
                 "from b_car bc "
-                "left join b_clients cl on cl.f_id=bc.f_costumer "
+                "left join c_partners cl on cl.f_id=bc.f_costumer "
                 "left join s_car c on c.f_id=bc.f_car "
                 "where bc.f_id=:f_id");
         if (srh.fDb.nextRow()) {
@@ -1023,9 +1029,9 @@ bool C5WaiterServer::printReceipt(QJsonObject &jh, QJsonArray &jb, QString &err,
 
         if (jh["car"].toString().toInt() > 0) {
             db[":f_id"] = jh["car"].toString().toInt();
-            db.exec("select c.f_name as f_carname, bc.f_govnumber, trim(concat(cl.f_lastname, ' ', cl.f_firstname)) as f_name "
+            db.exec("select c.f_name as f_carname, bc.f_govnumber, trim(cl.f_contact) as f_name "
                     "from b_car bc "
-                    "left join b_clients cl on cl.f_id=bc.f_costumer "
+                    "left join c_partners cl on cl.f_id=bc.f_costumer "
                     "left join s_car c on c.f_id=bc.f_car "
                     "where bc.f_id=:f_id");
             if (db.nextRow()) {
@@ -1249,9 +1255,9 @@ void C5WaiterServer::processGetCostumerByCar(QJsonObject &o)
 {
     C5Database db(C5Config::dbParams());
     db[":f_id"] = fIn["car"].toString().toInt();
-    db.exec("select bc.f_id, concat(c.f_name, ', ', bc.f_govnumber, ', ', trim(concat(cl.f_lastname, ' ', cl.f_firstname))) as f_name "
+    db.exec("select bc.f_id, concat(c.f_name, ', ', bc.f_govnumber, ', ', trim(cl.f_contact)) as f_name "
             "from b_car bc "
-            "left join b_clients cl on cl.f_id=bc.f_costumer "
+            "left join c_partners cl on cl.f_id=bc.f_costumer "
             "left join s_car c on c.f_id=bc.f_car "
             "where bc.f_id=:f_id");
     if (db.nextRow()) {

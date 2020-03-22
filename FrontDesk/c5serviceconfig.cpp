@@ -14,12 +14,15 @@ C5ServiceConfig::C5ServiceConfig(const QString &ip, QWidget *parent) :
 {
     ui->setupUi(this);
     ui->leIP->setText(ip);
+    fSslSocket = nullptr;
 }
 
 C5ServiceConfig::~C5ServiceConfig()
 {
     delete ui;
-    delete fSslSocket;
+    if (fSslSocket) {
+        delete fSslSocket;
+    }
 }
 
 void C5ServiceConfig::connectToService(QByteArray &data, qint32 &datatype)

@@ -133,7 +133,7 @@ bool C5StoreDraftWriter::writeFromShopInput(const QDate &date, const QString &do
     return true;
 }
 
-bool C5StoreDraftWriter::writeFromShopOutput(const QDate &date, const QString &doc)
+bool C5StoreDraftWriter::writeFromShopOutput(int op, const QDate &date, const QString &doc)
 {
     QSet<int> stores;
     QList<Item> items;
@@ -159,10 +159,11 @@ bool C5StoreDraftWriter::writeFromShopOutput(const QDate &date, const QString &d
         fDb[":f_reason"] = DOC_REASON_SALE;
         fDb[":f_date"] = date;
         fDb[":f_store"] = store;
+        fDb[":f_operator"] = op;
         fDb.exec("select h.f_id from a_header h "
                  "inner join a_store_draft d on d.f_document=h.f_id "
                  "where h.f_date=:f_date and h.f_type=:f_type and h.f_state=:f_state "
-                 "and d.f_store=:f_store and d.f_reason=:f_reason");
+                 "and d.f_store=:f_store and d.f_reason=:f_reason and h.f_operator=:f_operator");
         if (fDb.nextRow()) {
             docid = fDb.getString(0);
         } else {
@@ -175,7 +176,7 @@ bool C5StoreDraftWriter::writeFromShopOutput(const QDate &date, const QString &d
             fDb[":f_userid"] = "";
             fDb[":f_state"] = DOC_STATE_DRAFT;
             fDb[":f_type"] = DOC_TYPE_STORE_OUTPUT;
-            fDb[":f_operator"] = __userid;
+            fDb[":f_operator"] = op;
             fDb[":f_date"] = date;
             fDb[":f_createDate"] = QDate::currentDate();
             fDb[":f_createTime"] = QTime::currentTime();

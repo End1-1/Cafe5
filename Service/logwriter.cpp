@@ -2,6 +2,7 @@
 #include <QMutex>
 #include <QFile>
 #include <QDateTime>
+#include <QDebug>
 
 static QMutex fMutex;
 QMap<int, QString> LogWriter::fFilesMap;
@@ -20,6 +21,9 @@ void LogWriter::setFile(int num, const QString &fileName)
 
 void LogWriter::write(int level, int file, const QString &session, const QString &message)
 {
+#ifdef QT_DEBUG
+    qDebug() << message;
+#endif;
     if (fCurrentLevel < level) {
         return;
     }

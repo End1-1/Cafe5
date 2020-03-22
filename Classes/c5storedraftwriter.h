@@ -14,7 +14,7 @@ public:
 
     bool writeFromShopInput(const QDate &date, const QString &doc);
 
-    bool writeFromShopOutput(const QDate &date, const QString &doc);
+    bool writeFromShopOutput(int op, const QDate &date, const QString &doc);
 
     bool rollbackOutput(C5Database &db, const QString &id);
 

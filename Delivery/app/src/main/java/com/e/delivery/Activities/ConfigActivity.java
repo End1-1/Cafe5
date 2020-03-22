@@ -20,7 +20,7 @@ public class ConfigActivity extends ParentActivity {
         super.onBackPressed();
         Config.mServerIP = editText(R.id.edServerAddress);
         Config.mServerPort = Integer.valueOf(editText(R.id.edServerPort));
-        Config.setString(this,"server_ip", Config.mServerIP);
-        Config.setInt(this, "server_port", Config.mServerPort);
+        Config.setString("server_ip", Config.mServerIP);
+        Config.setInt("server_port", Config.mServerPort);
     }
 }

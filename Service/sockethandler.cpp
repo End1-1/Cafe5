@@ -3,19 +3,17 @@
 #include "sslsocket.h"
 #include <QHostAddress>
 
-SocketHandler::SocketHandler(QByteArray &data) :
+SocketHandler::SocketHandler(SocketData *sd, QByteArray &data) :
     fData(data)
 {
     fResponseCode = dr_ok;
-}
-
-void SocketHandler::setSocket(SslSocket *socket)
-{
-    fSslSocket = socket;
-    fPeerAddress = QHostAddress(fSslSocket->peerAddress().toIPv4Address()).toString();
+    fSocketData = sd;
+    if (fSocketData) {
+        fPeerAddress = QHostAddress(fSocketData->fSocket->peerAddress().toIPv4Address()).toString();
+    }
 }
 
 bool SocketHandler::closeConnection()
 {
-    return false;
+    return fResponseCode != dr_ok;
 }

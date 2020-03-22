@@ -33,7 +33,7 @@ DlgCarNumber::DlgCarNumber() :
         }
     }
     if (fCostumerNames.count() == 0) {
-        db.exec("select f_id, trim(concat(f_lastname, ' ', f_firstname)), f_info from b_clients order by 1");
+        db.exec("select f_id, trim(f_contact), f_info from c_partners order by 1");
         while (db.nextRow()) {
             fCostumerNames.insert(db.getInt(0), db.getString(1));
             fCostumerPhones.insert(db.getInt(0), db.getString(2));
@@ -195,18 +195,9 @@ void DlgCarNumber::on_btnAccept_clicked()
             ui->leCarModel->setProperty("id", db.getInt("f_car"));
         }
         if (ui->leCostumer->property("id").toInt() == 0) {
-            QStringList l = ui->leCostumer->text().split(" ");
-            if (l.count() > 0) {
-                if (l.count() == 1) {
-                    db[":f_firstname"] = l.at(0);
-                    db[":f_lastname"] = "";
-                } else {
-                    db[":f_firstname"] = l.at(0);
-                    db[":f_lastname"] = l.at(1);
-                }
-                db[":f_info"] = ui->leAdditional->text();
-                ui->leCostumer->setProperty("id", db.insert("b_clients"));
-            }
+            db[":f_contact"] = ui->leCostumer->text();
+            db[":f_info"] = ui->leAdditional->text();
+            ui->leCostumer->setProperty("id", db.insert("c_partners"));
         }
         if (fRecordId == 0){
             db[":f_govnumber"] = ui->leCarNumber->text();
@@ -215,19 +206,10 @@ void DlgCarNumber::on_btnAccept_clicked()
             fRecordId = db.insert("b_car");
         }
     } else {
-        QStringList l = ui->leCostumer->text().split(" ");
-        if (l.count() > 0) {
-            if (l.count() == 1) {
-                db[":f_firstname"] = l.at(0);
-                db[":f_lastname"] = "";
-            } else {
-                db[":f_firstname"] = l.at(0);
-                db[":f_lastname"] = l.at(1);
-            }
-            db[":f_info"] = ui->leAdditional->text();
-        }
+        db[":f_contact"] = ui->leCostumer->text();
+        db[":f_info"] = ui->leAdditional->text();
         db[":f_id"] = ui->leCostumer->property("id").toInt();
-        db.exec("update b_clients set f_firstname=:f_firstname, f_lastname=:f_lastname, f_info=:f_info where f_id=:f_id");
+        db.exec("update c_partners set f_contact=:f_contact, f_info=:f_info where f_id=:f_id");
     }
     fCostumerCars.clear();
     fCostumerNames.clear();

@@ -17,7 +17,6 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.e.delivery.Data.DataMessage;
 import com.e.delivery.Fragments.ParentFragment;
-import com.e.delivery.Services.TempService;
 import com.e.delivery.Utils.LocaleHelper;
 
 public class ParentActivity extends AppCompatActivity implements View.OnClickListener {
@@ -69,12 +68,6 @@ public class ParentActivity extends AppCompatActivity implements View.OnClickLis
 
     protected void messageHandler(DataMessage m) {
 
-    }
-
-    protected void sendMessage(DataMessage m) {
-        Intent i = new Intent("S");
-        i.putExtra("datamessage", m);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(i);
     }
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {

@@ -63,6 +63,8 @@ public:
 
     QByteArray uuid_bin(const QStringList &dp = QStringList());
 
+    QByteArray uuid_getbin(QString u);
+
     QMap<QString, QVariant> fBindValues;
 
     QList<QList<QVariant> > fDbRows;

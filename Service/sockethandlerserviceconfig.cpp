@@ -6,8 +6,8 @@
 #include <QCryptographicHash>
 #include <QJsonObject>
 
-SocketHandlerServiceConfig::SocketHandlerServiceConfig(QByteArray &data) :
-    SocketHandler(data)
+SocketHandlerServiceConfig::SocketHandlerServiceConfig(SocketData *sd, QByteArray &data) :
+    SocketHandler(sd, data)
 {
 
 }

@@ -122,6 +122,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
+        <TextView
+            android:id="@+id/tvFullname"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/FullName"
+            android:textColor="@color/colorBlack"
+            android:textSize="@dimen/textBigFontSize"
+            android:textStyle="bold" />
+
         <LinearLayout
             android:id="@+id/llWorkingLine1"
             android:layout_width="match_parent"
@@ -143,6 +153,14 @@
                 android:layout_height="@dimen/bigButtonSize"
                 android:drawableTop="@drawable/preorder"
                 android:text="@string/SalesToday"
+                android:textSize="@dimen/textFontSize" />
+
+            <Button
+                android:id="@+id/btnLogout"
+                android:layout_width="@dimen/bigButtonSize"
+                android:layout_height="@dimen/bigButtonSize"
+                android:drawableTop="@drawable/exit"
+                android:text="@string/Logout"
                 android:textSize="@dimen/textFontSize" />
 
         </LinearLayout>

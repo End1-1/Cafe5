@@ -459,10 +459,10 @@ void DlgOrder::setCar(int num)
     ui->lbCar->setVisible(false);
     C5Database db(fDBParams);
     db[":f_id"] = num;
-    db.exec("select concat(c.f_name, ', ', bc.f_govnumber, ', ', trim(concat(cl.f_lastname, ' ', cl.f_firstname))), "
+    db.exec("select concat(c.f_name, ', ', bc.f_govnumber, ', ', trim(cl.f_contact)), "
             "bc.f_govnumber, cl.f_id as f_client "
             "from b_car bc "
-            "left join b_clients cl on cl.f_id=bc.f_costumer "
+            "left join c_partners cl on cl.f_id=bc.f_costumer "
             "left join s_car c on c.f_id=bc.f_car "
             "where bc.f_id=:f_id");
     if (db.nextRow()) {

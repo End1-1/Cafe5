@@ -2,7 +2,7 @@
 #include "c5database.h"
 #include <QDir>
 #include <QMutex>
-#include <QDialog>
+#include <QDebug>
 #include <QSettings>
 
 QString C5Config::fAppHomePath;

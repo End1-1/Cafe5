@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -30,12 +29,18 @@ public class SalesTodayActivity extends ParentActivity {
         SalesAdapter salesAdapter = new SalesAdapter(this);
         rv.setAdapter(salesAdapter);
         ((TextView) findViewById(R.id.tvTotalAmount)).setText(String.format("%.0f", salesAdapter.mTotal));
+        ((TextView) findViewById(R.id.tvTotalCash)).setText(String.format("%.0f", salesAdapter.mCash));
+        ((TextView) findViewById(R.id.tvTotalBank)).setText(String.format("%.0f", salesAdapter.mBank));
+        ((TextView) findViewById(R.id.tvTotalDept)).setText(String.format("%.0f", salesAdapter.mDept));
     }
 
     public class SalesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         List<OH> mOh;
         Double mTotal = 0.0;
+        Double mCash = 0.0;
+        Double mBank = 0.0;
+        Double mDept = 0.0;
 
         class OH {
             int mId;
@@ -54,6 +59,10 @@ public class SalesTodayActivity extends ParentActivity {
 
         public void refresh() {
             mOh.clear();
+            mTotal = 0.0;
+            mCash = 0.0;
+            mBank = 0.0;
+            mDept = 0.0;
             Cursor c = db.select("select * from oh");
             if (c.moveToFirst()) {
                 do {
@@ -63,6 +72,9 @@ public class SalesTodayActivity extends ParentActivity {
                     oh.mTaxcode = c.getString(c.getColumnIndex("taxcode"));
                     oh.mAmount = c.getDouble(c.getColumnIndex("atotal"));
                     mTotal += oh.mAmount;
+                    mCash += c.getDouble(c.getColumnIndex("acash"));
+                    mBank += c.getDouble(c.getColumnIndex("abank"));
+                    mDept += c.getDouble(c.getColumnIndex("adept"));
                     mOh.add(oh);
                 } while (c.moveToNext());
             }

@@ -1,5 +1,6 @@
 package com.e.delivery.Services;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -12,11 +13,10 @@ import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.location.LocationManager;
 import android.media.RingtoneManager;
 import android.os.Build;
 import android.os.IBinder;
-import android.provider.ContactsContract;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
@@ -27,10 +27,9 @@ import com.e.delivery.Activities.MainActivity;
 import com.e.delivery.Data.DataMessage;
 import com.e.delivery.R;
 import com.e.delivery.Utils.Config;
+import com.e.delivery.Utils.DataSender;
 import com.e.delivery.Utils.DataSenderCommands;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.e.delivery.Utils.Json;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -38,7 +37,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
-import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -65,8 +63,10 @@ public class TempService extends Service {
 
     static final String CHANNEL_ID = "1250012";
     static final String TAG = TempService.class.getSimpleName();
+    OrderUpload mOrderUpload = new OrderUpload();
     MessageHandler mMessageHandler;
     Queue<DataMessage> mDataMessage = new LinkedList<>();
+    LocationService mLocationService = new LocationService();
 
     @Override
     public void onCreate() {
@@ -117,6 +117,7 @@ public class TempService extends Service {
         return null;
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
@@ -125,6 +126,10 @@ public class TempService extends Service {
         new Thread(mMessageHandler).start();
         //mServerThreadFuture = es.submit(mSocketThread);
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter("S"));
+        mLocationService = new LocationService();
+        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        //locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, mLocationService, this.getMainLooper());
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, mLocationService);
         return START_STICKY;
     }
 
@@ -132,22 +137,26 @@ public class TempService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             DataMessage m = intent.getParcelableExtra("datamessage");
-            mDataMessage.add(m);
+            if (m.mSender.equals(m.mReceiver) && m.mSender.equals("S")) {
+                if (m.mResponse == 0) {
+                    mDataMessage.add(m);
+                }
+            } else {
+                mDataMessage.add(m);
+            }
         }
     };
-
-    protected void sendMessage(DataMessage m) {
-        Intent i = new Intent("A");
-        i.putExtra("datamessage", m);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(i);
-    }
 
     class MessageHandler implements Runnable {
 
         SSLSocket mSocket = null;
         boolean mConnected = false;
+        boolean mAuthorized = false;
 
         void connect() {
+            if (mConnected) {
+                return;
+            }
             mConnected = false;
             String err = "";
             do {
@@ -172,8 +181,8 @@ public class TempService extends Service {
                     SSLSocketFactory factory = sslContext.getSocketFactory();
 
                     mSocket = (SSLSocket) factory.createSocket();
-                    mSocket.connect(new InetSocketAddress(Config.mServerIP, Config.mServerPort), 5000);
-                    mSocket.setSoTimeout(3000);
+                    mSocket.connect(new InetSocketAddress(Config.mServerIP, Config.mServerPort), 15000);
+                    mSocket.setSoTimeout(10000);
                     mSocket.startHandshake();
                     mConnected = true;
                 } catch (IOException e) {
@@ -201,7 +210,8 @@ public class TempService extends Service {
                             DataMessage m = mDataMessage.remove();
                             m.mResponse = DataSenderCommands.rErr;
                             m.mBuffer = err;
-                            sendMessage(m);
+                            m.rotate();
+                            LocalMessanger.sendMessage(m);
                         }
                         Thread.sleep(1000);
                     }
@@ -209,7 +219,8 @@ public class TempService extends Service {
                     e.printStackTrace();
                 }
             } while (!mConnected);
-            sendMessage(new DataMessage(DataSenderCommands.lServiceStarted, ""));
+            mOrderUpload.start();
+            LocalMessanger.sendMessage(new DataMessage(DataSenderCommands.lServiceStarted, "", "S", "A"));
         }
 
         @Override
@@ -221,6 +232,22 @@ public class TempService extends Service {
                 DataMessage m = null;
                 try {
                     m = mDataMessage.remove();
+                    if (m.mCommand != DataSenderCommands.qLogin && m.mCommand != DataSenderCommands.qLoginWithSession) {
+                        if (!mAuthorized) {
+                            m.rotate();
+                            m.mResponse = DataSenderCommands.rLoginRequired;
+                            m.mBuffer = "Login required";
+                            LocalMessanger.sendMessage(m);
+                            if (Config.getString("username").length() > 0) {
+                                Json j = new Json();
+                                j.putString("username", Config.getString("username"));
+                                j.putString("password", Config.getString("password"));
+                                DataMessage ml = new DataMessage(DataSenderCommands.qLogin, j.toString(), "S", "S");
+                                LocalMessanger.sendMessage(ml);
+                            }
+                            continue;
+                        }
+                    }
                 } catch (NoSuchElementException e) {
                     m = null;
                     e.printStackTrace();
@@ -233,6 +260,7 @@ public class TempService extends Service {
                 try {
                     ByteBuffer bb = ByteBuffer.allocate(8);
                     if (m != null) {
+                        m.rotate();
                         OutputStream os = mSocket.getOutputStream();
                         DataOutputStream dos = new DataOutputStream(os);
                         bb.order(ByteOrder.LITTLE_ENDIAN);
@@ -256,10 +284,12 @@ public class TempService extends Service {
                     bb.position(0);
                     Integer datasize = bb.getInt();
                     if (m == null) {
-                        m = new DataMessage(0, "");
+                        m = new DataMessage(0, "", "S", "S");
+                        m.mResponse = DataSenderCommands.rOk;
                     }
                     if (read  == -1) {
                         m.mCommand = DataSenderCommands.rReconnect;
+                        m.mResponse = DataSenderCommands.rErr;
                     }
                     m.mResponse = bb.getInt();
                     m.mBuffer = "";
@@ -270,9 +300,24 @@ public class TempService extends Service {
                         datasize -= pt;
                         m.mBuffer += new String(bbb, 0, pt);
                     }
+                    if (m.mResponse == DataSenderCommands.rLoginRequired) {
+                        mAuthorized = false;
+                        if (Config.getString("username").length() > 0) {
+                            Json j = new Json();
+                            j.putString("username", Config.getString("username"));
+                            j.putString("password", Config.getString("password"));
+                            DataMessage ml = new DataMessage(DataSenderCommands.qLogin, j.toString(), "S", "S");
+                            LocalMessanger.sendMessage(ml);
+                        }
+                    }
+                    if (m.mCommand == DataSenderCommands.qLogin || m.mCommand == DataSenderCommands.qLoginWithSession) {
+                        if (m.mResponse == DataSenderCommands.rOk) {
+                            mAuthorized = true;
+                        }
+                    }
                 } catch (SocketTimeoutException e) {
                     if (m == null) {
-                        m = new DataMessage(0, "");
+                        m = new DataMessage(0, "", "", "");
                     }
                     if (m.mCommand == 0) {
                         m.mCommand = DataSenderCommands.rIgnore;
@@ -282,16 +327,19 @@ public class TempService extends Service {
                     }
                 } catch (IOException e) {
                     if (m == null) {
-                        m = new DataMessage(0, "");
+                        m = new DataMessage(0, "", "", "");
                     }
                     m.mResponse = DataSenderCommands.rErr;
                     m.mBuffer = String.format("{\"msg\":\"%s\"}", e.getMessage());
                     e.printStackTrace();
                 }
                 if (m.mCommand != DataSenderCommands.rIgnore) {
-                    sendMessage(m);
+                    LocalMessanger.sendMessage(m);
                 }
                 if (m.mCommand == DataSenderCommands.rReconnect) {
+                    mConnected = false;
+                    mAuthorized = false;
+                    mOrderUpload.stop();
                     connect();
                 }
             } while (true);

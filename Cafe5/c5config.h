@@ -3,7 +3,6 @@
 
 #include <QString>
 #include <QVariant>
-#include <QWidget>
 
 #define param_local_receipt_printer 1
 #define param_service_factor 2

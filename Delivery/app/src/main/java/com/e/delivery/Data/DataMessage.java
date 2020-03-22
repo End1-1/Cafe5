@@ -7,10 +7,21 @@ public class DataMessage implements Parcelable {
     public int mCommand;
     public String mBuffer;
     public int mResponse;
+    public String mSender;
+    public String mReceiver;
 
-    public DataMessage(int command, String buffer) {
+    public DataMessage(int command, String buffer, String sender, String receiver) {
+        mResponse = 0;
         mCommand = command;
         mBuffer = buffer;
+        mSender = sender;
+        mReceiver = receiver;
+    }
+
+    public void rotate() {
+        String s = mSender;
+        mSender = mReceiver;
+        mReceiver = s;
     }
 
     protected DataMessage(Parcel in) {

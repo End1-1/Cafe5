@@ -6,16 +6,19 @@
 #include "sockethandlerservicelogin.h"
 #include "sockethandlerserviceconfig.h"
 #include "sockethandlerloginwithsession.h"
+#include "sockethandlerlocationchanged.h"
+#include "sockethandleruploadsale.h"
+#include "sockethandleruuid.h"
 #include "servicecommands.h"
 
 SocketRW::SocketRW(SslSocket *socket)
 {
-    fSocket = socket;
+    fSocketData.fSocket = socket;
 }
 
 SocketRW::~SocketRW()
 {
-    delete fSocket;
+    delete fSocketData.fSocket;
 }
 
 void SocketRW::go()
@@ -26,44 +29,69 @@ void SocketRW::go()
     QByteArray data;
     int buffersize = 8192;
     char *buffer = new char[buffersize];
-    while (fSocket->waitForReadyRead(-1)) {
-        if (fSocket->bytesAvailable()) {
+    int waitForReadyReadTimeout = 30000;
+    while (fSocketData.fSocket->waitForReadyRead(waitForReadyReadTimeout)) {
+        if (fSocketData.fSocket->bytesAvailable()) {
             if (datasize == 0) {
-                fSocket->read(reinterpret_cast<char *>(&datasize), sizeof(datasize));
-                fSocket->read(reinterpret_cast<char *>(&datatype), sizeof(datatype));
-                LogWriter::write(10, 1, fSocket->fUuid, QString("Ready data, type: %2, size: %3 bytes").arg(datatype).arg(datasize));
+                fSocketData.fSocket->read(reinterpret_cast<char *>(&datasize), sizeof(datasize));
+                fSocketData.fSocket->read(reinterpret_cast<char *>(&datatype), sizeof(datatype));
+                LogWriter::write(10, 1, fSocketData.fSocket->fUuid, QString("Ready data, type: %2, size: %3 bytes").arg(datatype).arg(datasize));
             }
-            int r = fSocket->read(buffer, datasize - dataread > buffersize ? buffersize : datasize - dataread);
+            int r = fSocketData.fSocket->read(buffer, datasize - dataread > buffersize ? buffersize : datasize - dataread);
             dataread += r;
             data.append(buffer, r);
             if (dataread == datasize) {
-                LogWriter::write(10, 1, fSocket->fUuid, data);
-                SocketHandler *sh;
+                LogWriter::write(10, 1, fSocketData.fSocket->fUuid, data);
+                SocketHandler *sh = nullptr;
+                SocketHandlerLogin *hl = nullptr;
+                SocketHandlerLoginWithSession *hls = nullptr;
                 switch (datatype) {
                 case dt_login:
-                    sh = SocketHandler::create<SocketHandlerLogin>(data);
+                    hl = SocketHandler::create<SocketHandlerLogin>(&fSocketData, data);
+                    sh = hl;
+                    if (hl->login()) {
+                        waitForReadyReadTimeout = -1;
+                    }
                     break;
                 case dt_service_login:
-                    sh = SocketHandler::create<SocketHandlerServiceLogin>(data);
+                    sh = SocketHandler::create<SocketHandlerServiceLogin>(&fSocketData, data);
                     break;
                 case dt_service_config:
-                    sh = SocketHandler::create<SocketHandlerServiceConfig>(data);
+                    sh = SocketHandler::create<SocketHandlerServiceConfig>(&fSocketData, data);
                     break;
                 case dt_login_with_session:
-                    sh = SocketHandler::create<SocketHandlerLoginWithSession>(data);
+                    hls = SocketHandler::create<SocketHandlerLoginWithSession>(&fSocketData, data);
+                    sh = hls;
+                    if (hls->login()) {
+                        waitForReadyReadTimeout = -1;
+                    }
+                    break;
+                case dt_location_changed:
+                    sh = SocketHandler::create<SocketHandlerLocationChanged>(&fSocketData, data);
+                    break;
+                case dt_upload_sale:
+                    sh = SocketHandler::create<SocketHandlerUploadSale>(&fSocketData, data);
+                    break;
+                case dt_wonna_uuid:
+                    sh = SocketHandler::create<SocketHandlerUUID>(&fSocketData, data);
                     break;
                 default:
-                    sh = SocketHandler::create<SocketHandlerUnknown>(data);
+                    sh = SocketHandler::create<SocketHandlerUnknown>(&fSocketData, data);
                     break;
                 }
-                sh->setSocket(fSocket);
-                sh->processData();
-                LogWriter::write(10, 1, fSocket->fUuid, QObject::tr("Response: ") + data);
+                if (fSocketData.fSessionId.length() > 0) {
+                    sh->processData();
+                } else {
+                    sh->fResponseCode = dr_login_required;
+                    data.clear();
+                }
+
+                LogWriter::write(10, 1, fSocketData.fSocket->fUuid, QObject::tr("Response: ") + data);
                 datasize = data.size();
-                fSocket->write(reinterpret_cast<const char*>(&datasize), sizeof(datasize));
-                fSocket->write(reinterpret_cast<const char*>(&sh->fResponseCode), sizeof(sh->fResponseCode));
-                fSocket->write(data);
-                fSocket->flush();
+                fSocketData.fSocket->write(reinterpret_cast<const char*>(&datasize), sizeof(datasize));
+                fSocketData.fSocket->write(reinterpret_cast<const char*>(&sh->fResponseCode), sizeof(sh->fResponseCode));
+                fSocketData.fSocket->write(data);
+                fSocketData.fSocket->flush();
                 bool closeConnection = sh->closeConnection();
                 delete sh;
                 if (closeConnection) {
@@ -77,6 +105,6 @@ void SocketRW::go()
         }
     }
     delete [] buffer;
-    LogWriter::write(10, 1, fSocket->fUuid, "Close socket");
-    fSocket->close();
+    LogWriter::write(10, 1, fSocketData.fSocket->fUuid, "Close socket");
+    fSocketData.fSocket->close();
 }

@@ -49,6 +49,12 @@ C5Database::C5Database(C5Database &db) :
 C5Database::C5Database(const QString &host, const QString &db, const QString &user, const QString &password) :
     C5Database()
 {
+    if (fDbParamsForUuid.count() == 0) {
+        fDbParamsForUuid.append(host);
+        fDbParamsForUuid.append(db);
+        fDbParamsForUuid.append(user);
+        fDbParamsForUuid.append(password);
+    }
     init();
     configureDatabase(fDb, host, db, user, password);
 }
@@ -263,6 +269,18 @@ QByteArray C5Database::uuid_bin(const QStringList &dp)
         return getValue(0).toByteArray();
     }
     return QByteArray();
+}
+
+QByteArray C5Database::uuid_getbin(QString u)
+{
+    QByteArray b;
+    u.replace("-", "");
+    bool ok = true;
+    for (int i = 0; i < u.length(); i+= 2) {
+        QString t = u.mid(i, 2);
+        b.append(t.toUInt(&ok, 16));
+    }
+    return b;
 }
 
 int C5Database::rowCount()

@@ -242,7 +242,7 @@ bool WOrder::writeOrder(bool tax)
             return false;
         }
     } else {
-        if (!dw.writeFromShopOutput(QDate::currentDate(), id)) {
+        if (!dw.writeFromShopOutput(__userid, QDate::currentDate(), id)) {
             C5Message::error(dw.fErrorMsg);
             db.rollback();
             return false;

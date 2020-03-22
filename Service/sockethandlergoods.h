@@ -6,7 +6,7 @@
 class SocketHandlerGoods : public SocketHandler
 {
 public:
-    SocketHandlerGoods(QByteArray &data);
+    SocketHandlerGoods(SocketData *sd, QByteArray &data);
     virtual void processData() override;
 };
 

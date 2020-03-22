@@ -5,8 +5,8 @@
 #include <QJsonObject>
 #include <QCryptographicHash>
 
-SocketHandlerServiceLogin::SocketHandlerServiceLogin(QByteArray &data) :
-    SocketHandler(data)
+SocketHandlerServiceLogin::SocketHandlerServiceLogin(SocketData *sd, QByteArray &data) :
+    SocketHandler(sd, data)
 {
 
 }
@@ -26,5 +26,6 @@ void SocketHandlerServiceLogin::processData()
         fData.append(jdoc.toJson(QJsonDocument::Compact));
     } else {
         fResponseCode = dr_service_login_failed;
+        fData = "Login failed";
     }
 }

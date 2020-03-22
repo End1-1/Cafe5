@@ -6,7 +6,7 @@
 class SocketHandlerUnknown : public SocketHandler
 {
 public:
-    SocketHandlerUnknown(QByteArray &data);
+    SocketHandlerUnknown(SocketData *sd, QByteArray &data);
     virtual void processData() override;
     virtual bool closeConnection() override;
 };

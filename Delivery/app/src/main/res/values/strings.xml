@@ -36,5 +36,8 @@
     <string name="OrderSaved">Order saved</string>
     <string name="NewSale">New\nsale</string>
     <string name="SalesToday">Sales\ntoday</string>
+    <string name="YouMustAllowToAccessLocationService">To continue using application You should have to permit location service</string>
+    <string name="FullName">Full name</string>
+    <string name="Logout">Logout</string>
 
 </resources>

@@ -65,6 +65,7 @@ void DlgFace::setup()
     sh->send();
     sh = createSocketHandler(SLOT(handleConf(QJsonObject)));
     sh->bind("cmd", sm_waiterconf);
+    sh->bind("config", __c5config.fSettingsName);
     sh->bind("station", hostinfo);
     sh->send();
     sh = createSocketHandler(SLOT(handleCreditCards(QJsonObject)));
@@ -422,4 +423,5 @@ void DlgFace::on_btnSetSession_clicked()
         d->exec();
         delete d;
     }
+    confTimeout();
 }
