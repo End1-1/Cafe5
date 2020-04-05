@@ -18,19 +18,19 @@
         <location filename="../../Classes/c5cache.cpp" line="64"/>
         <location filename="../../Classes/c5cache.cpp" line="67"/>
         <location filename="../../Classes/c5cache.cpp" line="73"/>
-        <location filename="../../Classes/c5cache.cpp" line="80"/>
-        <location filename="../../Classes/c5cache.cpp" line="92"/>
-        <location filename="../../Classes/c5cache.cpp" line="96"/>
-        <location filename="../../Classes/c5cache.cpp" line="99"/>
-        <location filename="../../Classes/c5cache.cpp" line="103"/>
-        <location filename="../../Classes/c5cache.cpp" line="106"/>
-        <location filename="../../Classes/c5cache.cpp" line="112"/>
-        <location filename="../../Classes/c5cache.cpp" line="116"/>
-        <location filename="../../Classes/c5cache.cpp" line="119"/>
-        <location filename="../../Classes/c5cache.cpp" line="122"/>
-        <location filename="../../Classes/c5cache.cpp" line="125"/>
-        <location filename="../../Classes/c5cache.cpp" line="128"/>
-        <location filename="../../Classes/c5cache.cpp" line="269"/>
+        <location filename="../../Classes/c5cache.cpp" line="78"/>
+        <location filename="../../Classes/c5cache.cpp" line="90"/>
+        <location filename="../../Classes/c5cache.cpp" line="94"/>
+        <location filename="../../Classes/c5cache.cpp" line="97"/>
+        <location filename="../../Classes/c5cache.cpp" line="101"/>
+        <location filename="../../Classes/c5cache.cpp" line="104"/>
+        <location filename="../../Classes/c5cache.cpp" line="110"/>
+        <location filename="../../Classes/c5cache.cpp" line="114"/>
+        <location filename="../../Classes/c5cache.cpp" line="117"/>
+        <location filename="../../Classes/c5cache.cpp" line="120"/>
+        <location filename="../../Classes/c5cache.cpp" line="123"/>
+        <location filename="../../Classes/c5cache.cpp" line="126"/>
+        <location filename="../../Classes/c5cache.cpp" line="266"/>
         <source>Code</source>
         <translation>Կոդ</translation>
     </message>
@@ -48,19 +48,19 @@
         <location filename="../../Classes/c5cache.cpp" line="62"/>
         <location filename="../../Classes/c5cache.cpp" line="65"/>
         <location filename="../../Classes/c5cache.cpp" line="68"/>
-        <location filename="../../Classes/c5cache.cpp" line="81"/>
-        <location filename="../../Classes/c5cache.cpp" line="93"/>
-        <location filename="../../Classes/c5cache.cpp" line="97"/>
-        <location filename="../../Classes/c5cache.cpp" line="100"/>
-        <location filename="../../Classes/c5cache.cpp" line="104"/>
-        <location filename="../../Classes/c5cache.cpp" line="107"/>
-        <location filename="../../Classes/c5cache.cpp" line="113"/>
-        <location filename="../../Classes/c5cache.cpp" line="117"/>
-        <location filename="../../Classes/c5cache.cpp" line="120"/>
-        <location filename="../../Classes/c5cache.cpp" line="123"/>
-        <location filename="../../Classes/c5cache.cpp" line="126"/>
-        <location filename="../../Classes/c5cache.cpp" line="129"/>
-        <location filename="../../Classes/c5cache.cpp" line="270"/>
+        <location filename="../../Classes/c5cache.cpp" line="79"/>
+        <location filename="../../Classes/c5cache.cpp" line="91"/>
+        <location filename="../../Classes/c5cache.cpp" line="95"/>
+        <location filename="../../Classes/c5cache.cpp" line="98"/>
+        <location filename="../../Classes/c5cache.cpp" line="102"/>
+        <location filename="../../Classes/c5cache.cpp" line="105"/>
+        <location filename="../../Classes/c5cache.cpp" line="111"/>
+        <location filename="../../Classes/c5cache.cpp" line="115"/>
+        <location filename="../../Classes/c5cache.cpp" line="118"/>
+        <location filename="../../Classes/c5cache.cpp" line="121"/>
+        <location filename="../../Classes/c5cache.cpp" line="124"/>
+        <location filename="../../Classes/c5cache.cpp" line="127"/>
+        <location filename="../../Classes/c5cache.cpp" line="267"/>
         <source>Name</source>
         <translation>Անվանում</translation>
     </message>
@@ -116,31 +116,21 @@
     </message>
     <message>
         <location filename="../../Classes/c5cache.cpp" line="76"/>
-        <source>First name</source>
-        <translation>Անուն</translation>
-    </message>
-    <message>
-        <location filename="../../Classes/c5cache.cpp" line="77"/>
-        <source>Last name</source>
-        <translation>Ազգանուն</translation>
-    </message>
-    <message>
-        <location filename="../../Classes/c5cache.cpp" line="78"/>
         <source>Additional info</source>
         <translation>Լրացուցիչ</translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="82"/>
+        <location filename="../../Classes/c5cache.cpp" line="80"/>
         <source>Description</source>
         <translation>Նկարագրություն</translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="94"/>
+        <location filename="../../Classes/c5cache.cpp" line="92"/>
         <source>Price</source>
         <translation>Գին</translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="114"/>
+        <location filename="../../Classes/c5cache.cpp" line="112"/>
         <source>Type</source>
         <translation>Տեսակ</translation>
     </message>

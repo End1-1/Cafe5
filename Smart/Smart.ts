@@ -143,12 +143,12 @@
         <translation>Ավտոմատ մուտք</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="184"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="185"/>
         <source>Sale autooutput</source>
         <translation>Ավտոմատ ելք</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="271"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="272"/>
         <source>Store document has been registered for this sale</source>
         <translation></translation>
     </message>
