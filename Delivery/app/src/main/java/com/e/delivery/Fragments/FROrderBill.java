@@ -14,7 +14,7 @@ import com.e.delivery.R;
 import com.e.delivery.Utils.CompareDouble;
 import com.e.delivery.Utils.EnumView;
 
-public class FROrderBill extends ParentFragment {
+public class FROrderBill extends FRParentOrder {
 
     EditText edTotalAmount;
     EditText edCash;
@@ -42,6 +42,13 @@ public class FROrderBill extends ParentFragment {
         edCash.addTextChangedListener(watchCash);
         edBank.addTextChangedListener(watchBank);
         edDept.addTextChangedListener(watchDept);
+    }
+
+    @Override
+    public void disableEdit(boolean v) {
+        super.disableEdit(v);
+        int visible = v ? View.GONE : View.VISIBLE;
+        getView().findViewById(R.id.btnReady).setVisibility(visible);
     }
 
     @Override

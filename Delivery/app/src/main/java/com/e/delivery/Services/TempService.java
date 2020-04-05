@@ -27,7 +27,6 @@ import com.e.delivery.Activities.MainActivity;
 import com.e.delivery.Data.DataMessage;
 import com.e.delivery.R;
 import com.e.delivery.Utils.Config;
-import com.e.delivery.Utils.DataSender;
 import com.e.delivery.Utils.DataSenderCommands;
 import com.e.delivery.Utils.Json;
 

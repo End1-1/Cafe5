@@ -321,6 +321,11 @@ void C5Printing::print(const QString &printername, QPrinter::PageSize pageSize)
     }
 }
 
+void C5Printing::print(QPainter *p)
+{
+    fCanvasList.at(0)->render(p);
+}
+
 QJsonArray C5Printing::jsonData()
 {
     return fJsonData;

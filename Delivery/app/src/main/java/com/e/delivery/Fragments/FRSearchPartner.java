@@ -21,7 +21,7 @@ import com.e.delivery.Data.PartnerProvider;
 import com.e.delivery.R;
 import com.e.delivery.Utils.EnumView;
 
-public class FRSearchPartner extends ParentFragment {
+public class FRSearchPartner extends FRParentOrder {
 
     EditText edSearch;
     PartnersAdapter mPartnersAdapter;
@@ -53,6 +53,12 @@ public class FRSearchPartner extends ParentFragment {
                 ((OrderActivity) mActivity).setPartner(partner);
                 break;
         }
+    }
+
+    @Override
+    public void disableEdit(boolean v) {
+        super.disableEdit(v);
+        ((OrderActivity) mActivity).setPartner(null);
     }
 
     TextWatcher watcher = new TextWatcher() {

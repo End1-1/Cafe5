@@ -177,6 +177,7 @@ public class MainActivity extends ParentActivity {
             setEditText(R.id.edPassword, Config.getString("password"));
             findViewById(R.id.progressBar).setVisibility(View.GONE);
             findViewById(R.id.tvLoginStatus).setVisibility(View.GONE);
+            findViewById(R.id.btnEnter).setEnabled(true);
             findViewById(R.id.edUsername).requestFocus();
             ViewAnimator.animateHeight(findViewById(R.id.clConfig), 0, findViewById(R.id.idParent).getMeasuredHeight(), null);
         }

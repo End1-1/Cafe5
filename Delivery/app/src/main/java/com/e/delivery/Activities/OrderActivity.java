@@ -7,7 +7,9 @@ import android.os.Bundle;
 import android.view.View;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
 
+import com.e.delivery.Data.DataMessage;
 import com.e.delivery.Data.Goods;
 import com.e.delivery.Data.GoodsProvider;
 import com.e.delivery.Data.Partner;
@@ -15,14 +17,16 @@ import com.e.delivery.Data.PartnerProvider;
 import com.e.delivery.Fragments.FRCustomer;
 import com.e.delivery.Fragments.FROrderBill;
 import com.e.delivery.Fragments.FROrderGoods;
+import com.e.delivery.Fragments.FRParentOrder;
 import com.e.delivery.Fragments.FRSearchPartner;
 import com.e.delivery.R;
 import com.e.delivery.Services.LocationService;
 import com.e.delivery.Utils.CompareDouble;
+import com.e.delivery.Utils.DataSenderCommands;
 import com.e.delivery.Utils.Database;
 import com.e.delivery.Utils.EnumView;
 
-import java.util.UUID;
+import java.util.List;
 
 public class OrderActivity extends ParentActivity {
 
@@ -31,6 +35,7 @@ public class OrderActivity extends ParentActivity {
     FROrderGoods frGoods = new FROrderGoods();
     Partner mPartner;
     int mOrderId;
+    String mOrderUUID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,12 +75,18 @@ public class OrderActivity extends ParentActivity {
         replaceFragment(frGoods, R.id.fragment);
     }
 
+    public void cancelReadyGoods() {
+        replaceFragment(frGoods, R.id.fragment);
+    }
+
     public void searchPartner() {
         replaceFragment(new FRSearchPartner(), R.id.fragment);
     }
 
     public void setPartner(Partner p) {
-        mPartner = p;
+        if (p != null) {
+            mPartner = p;
+        }
         replaceFragment(frCustomer, R.id.fragment);
     }
 
@@ -157,7 +168,7 @@ public class OrderActivity extends ParentActivity {
                 GoodsProvider.mReadyGoods.add(g);
             } while (c.moveToNext());
         }
-        sql = String.format("select taxcode, atotal, acash, abank, adept from oh where id=%d", mOrderId);
+        sql = String.format("select taxcode, atotal, acash, abank, adept, unid from oh where id=%d", mOrderId);
         c = db.select(sql);
         if (c.moveToFirst()) {
             mPartner = PartnerProvider.getPartner(c.getString(c.getColumnIndex("taxcode")));
@@ -165,8 +176,26 @@ public class OrderActivity extends ParentActivity {
             GoodsProvider.mCashAmount = c.getDouble(c.getColumnIndex("acash"));
             GoodsProvider.mBankAmount = c.getDouble(c.getColumnIndex("abank"));
             GoodsProvider.mDebtAmount = c.getDouble(c.getColumnIndex("adept"));
+            mOrderUUID = c.getString(c.getColumnIndex("unid"));
         } else {
             finish();
+        }
+    }
+
+    @Override
+    protected void messageHandler(DataMessage m) {
+        super.messageHandler(m);
+        switch (m.mCommand) {
+            case DataSenderCommands.lDisableOrder:
+                disableEdit();
+                break;
+        }
+    }
+
+    void disableEdit() {
+        List<Fragment> fr = getSupportFragmentManager().getFragments();
+        for (Fragment f: fr) {
+            ((FRParentOrder) f).disableEdit(true);
         }
     }
 }

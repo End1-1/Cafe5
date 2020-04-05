@@ -301,6 +301,8 @@ create table d_dish_state (f_id integer primary key, f_name tinytext);
 insert into d_dish_state (f_id, f_name) values (0, 'Ոչ ակտիվ'),(1, 'Ակտիվ');
 drop table b_clients;
 alter table c_Partners add column f_address tinytext;
-create table o_additional (f_id binary(16), f_coordinates tinytext);
+create table o_additional (f_id char(36), f_coordinates tinytext, f_customer integer);
 alter table s_user add column f_config integer;
-alter table o_additional add column f_customer integer;
+
+/* DB - 17 */
+update s_app set f_version ='17' where f_app='DB';

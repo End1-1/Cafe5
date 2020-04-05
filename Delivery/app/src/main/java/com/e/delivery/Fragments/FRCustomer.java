@@ -11,7 +11,7 @@ import com.e.delivery.Data.Partner;
 import com.e.delivery.R;
 import com.e.delivery.Utils.EnumView;
 
-public class FRCustomer extends ParentFragment {
+public class FRCustomer extends FRParentOrder {
 
     Partner mPartner;
 
@@ -50,5 +50,12 @@ public class FRCustomer extends ParentFragment {
                 ((OrderActivity) mActivity).searchPartner();
                 break;
         }
+    }
+
+    @Override
+    public void disableEdit(boolean v) {
+        super.disableEdit(v);
+        int visible = v ? View.GONE : View.VISIBLE;
+        getView().findViewById(R.id.btnSearch).setVisibility(visible);
     }
 }

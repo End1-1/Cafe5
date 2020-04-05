@@ -41,6 +41,7 @@ int main(int argc, char *argv[])
     a.installTranslator(&t);
     a.setStyle(QStyleFactory::create("fusion"));
 
+    QFontDatabase::addApplicationFont(":/barcode.ttf");
     int id = QFontDatabase::addApplicationFont(":/ahuni.ttf");
     QString family = QFontDatabase::applicationFontFamilies(id).at(0);
     QFont font(family);

@@ -17,7 +17,7 @@ import com.e.delivery.Data.GoodsProvider;
 import com.e.delivery.R;
 import com.e.delivery.Utils.EnumView;
 
-public class FROrderGoods extends ParentFragment {
+public class FROrderGoods extends FRParentOrder {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -36,6 +36,13 @@ public class FROrderGoods extends ParentFragment {
                 appendGoods();
                 break;
         }
+    }
+
+    @Override
+    public void disableEdit(boolean v) {
+        super.disableEdit(v);
+        int visible = v ? View.GONE : View.VISIBLE;
+        getView().findViewById(R.id.btnAppendGoods).setVisibility(visible);
     }
 
     void appendGoods() {
@@ -63,8 +70,8 @@ public class FROrderGoods extends ParentFragment {
                 Goods g = GoodsProvider.mReadyGoods.get(position);
                 tvGoodsName.setText(g.mName);
                 tvPrice.setText(String.format("%.0f", g.mRetailPrice));
-                tvStoreQty.setText(String.format("%.0f", 0.0));
-                String s = String.format("%.0f", g.mSelectedQty);
+                tvStoreQty.setText(String.format("%.2f", 0.0));
+                String s = String.format("%.2f", g.mSelectedQty);
                 edQty.setText(s);
                 edQty.setSelection(s.length() - 1, 1);
                 int color = position % 2 == 0 ? R.color.colorLightGray : R.color.colorWhite;

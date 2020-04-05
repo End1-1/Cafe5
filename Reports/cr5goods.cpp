@@ -25,6 +25,7 @@ CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
                    << "g.f_name as f_groupname"
                    << "u.f_name as f_unitname"
                    << "gg.f_name"
+                   << "gg.f_scancode"
                    << "gg.f_saleprice"
                    << "gg.f_saleprice2"
                    << "gg.f_lowlevel"
@@ -33,7 +34,6 @@ CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
                    << "gcb.f_name as gname2"
                    << "gcc.f_name as gname3"
                    << "gcd.f_name as gname4"
-                   << "gg.f_scancode"
                       ;
 
     fColumnsVisible["gg.f_id"] = true;

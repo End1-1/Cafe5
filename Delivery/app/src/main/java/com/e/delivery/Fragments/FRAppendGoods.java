@@ -11,7 +11,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,7 +20,7 @@ import com.e.delivery.Data.GoodsProvider;
 import com.e.delivery.R;
 import com.e.delivery.Utils.EnumView;
 
-public class FRAppendGoods extends ParentFragment {
+public class FRAppendGoods extends FRParentOrder {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -39,6 +38,14 @@ public class FRAppendGoods extends ParentFragment {
             case R.id.btnReady:
                 ((OrderActivity) mActivity).readyGoods();
                 break;
+        }
+    }
+
+    @Override
+    public void disableEdit(boolean v) {
+        super.disableEdit(v);
+        if (v) {
+            ((OrderActivity) mActivity).cancelReadyGoods();
         }
     }
 

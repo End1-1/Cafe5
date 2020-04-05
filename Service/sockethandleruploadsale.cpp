@@ -90,7 +90,7 @@ void SocketHandlerUploadSale::processData()
         return;
     }
 
-    db[":f_id"] = db.uuid_getbin(id);
+    db[":f_id"] = id;
     db[":f_coordinates"] = latlon;
     db[":f_customer"] = customer;
     db.insert("o_additional", false);

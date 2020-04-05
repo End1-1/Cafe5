@@ -7,7 +7,12 @@
 #include "c5message.h"
 #include "ce5goodsclass.h"
 #include "c5selector.h"
+#include "c5printing.h"
+#include "barcode.h"
+#include <QPrinter>
 #include <QClipboard>
+#include <QFontDatabase>
+#include <QPaintEngine>
 
 CE5Goods::CE5Goods(const QStringList &dbParams, QWidget *parent) :
     CE5Editor(dbParams, parent),
@@ -23,6 +28,9 @@ CE5Goods::CE5Goods(const QStringList &dbParams, QWidget *parent) :
     ui->leClass2->setSelector(dbParams, ui->leClassName2, cache_goods_classes);
     ui->leClass3->setSelector(dbParams, ui->leClassName3, cache_goods_classes);
     ui->leClass4->setSelector(dbParams, ui->leClassName4, cache_goods_classes);
+    fPrinting = new C5Printing();
+    fPbw = new PrintBarcodeWidget(fPrinting, this);
+    ui->vl->addWidget(fPbw);
 }
 
 CE5Goods::~CE5Goods()
@@ -62,6 +70,17 @@ void CE5Goods::setId(int id)
         ui->tblGoods->lineEdit(row, 5)->setDouble(db.getDouble("f_price"));
         ui->tblGoods->lineEdit(row, 6)->setDouble(db.getDouble("f_total"));
     }
+    fPrinting->setSceneParams(fPbw->width() / 2, fPbw->height() / 2, QPrinter::Portrait);
+    fPrinting->line(0, 0, 40, 0);
+    fPrinting->line(0, 0, 0, 60);
+    fPrinting->line(40, 0, 40, 60);
+    fPrinting->line(0, 60, 40, 60);
+    fPrinting->line(0, 30, 40, 30);
+    QFont barcodeFont("Barcode", 6, QFont::Normal);
+    fPrinting->setFont(barcodeFont);
+    Barcode barcode;
+    QString barcodeString = barcode.Code_128(ui->leScanCode->text());
+    fPrinting->ltext(barcodeString, 0);
 }
 
 bool CE5Goods::save(QString &err, QList<QMap<QString, QVariant> > &data)
@@ -272,4 +291,33 @@ void CE5Goods::on_btnPaste_clicked()
         ui->tblGoods->lineEdit(row, 5)->setText(cols.at(4));
         ui->tblGoods->lineEdit(row, 6)->setText(cols.at(5));
     }
+}
+
+PrintBarcodeWidget::PrintBarcodeWidget(C5Printing *prn, QWidget *parent) :
+    QWidget(parent)
+{
+    print = prn;
+}
+
+void PrintBarcodeWidget::paintEvent(QPaintEvent *event)
+{
+    QPainter p(this);
+    print->print(&p);
+}
+
+void CE5Goods::on_btnPrintScancode_clicked()
+{
+    C5Printing *p = new C5Printing();
+    p->setSceneParams(210, 270, QPrinter::Portrait);
+//    p->line(0, 0, 40, 0);
+//    p->line(0, 0, 0, 60);
+//    p->line(40, 0, 40, 60);
+//    p->line(0, 60, 40, 60);
+//    p->line(0, 30, 40, 30);
+    QFont barcodeFont("Barcode", 12, QFont::Normal);
+    p->setFont(barcodeFont);
+    Barcode barcode;
+    QString barcodeString = barcode.Code_128(ui->leScanCode->text());
+    p->ltext(barcodeString, 0);
+    p->print("local", QPrinter::Custom);
 }

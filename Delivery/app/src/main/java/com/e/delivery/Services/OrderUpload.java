@@ -43,6 +43,11 @@ public class OrderUpload {
         LocalBroadcastManager.getInstance(DeliveryApp.getAppContext()).unregisterReceiver(mMessageHandler);
     }
 
+    public void disableOrder(String id) {
+        DataMessage m = new DataMessage(DataSenderCommands.lDisableOrder, id, "OU", "A");
+        LocalMessanger.sendMessage(m);
+    }
+
     BroadcastReceiver mMessageHandler = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -57,6 +62,7 @@ public class OrderUpload {
                         break;
                     case DataSenderCommands.qWonnaUUID:
                         sql = String.format("update oh set upid='%s' where id=%s and upid is null", j.getString("uuid"), j.getString("id"));
+                        disableOrder(j.getString("id"));
                         break;
                 }
                 db.exec(sql);
@@ -73,7 +79,6 @@ public class OrderUpload {
             if (!mCanUpload) {
                 return;
             }
-            mCanUpload = false;
             Database db = new Database(DeliveryApp.getAppContext());
             Cursor c = db.select("select id from oh where upid is null");
             if (c.moveToFirst()) {
@@ -81,6 +86,7 @@ public class OrderUpload {
                     try {
                         JSONObject j = new JSONObject();
                         j.put("id", c.getInt(c.getColumnIndex("id")));
+                        mCanUpload = false;
                         DataMessage m = new DataMessage(DataSenderCommands.qWonnaUUID, j.toString(), "OU", "S");
                         LocalMessanger.sendMessage(m);
                     } catch (JSONException e) {
@@ -124,6 +130,7 @@ public class OrderUpload {
                         } while (c.moveToNext());
                     }
                     jo.put("b", jab);
+                    mCanUpload = false;
                     DataMessage m = new DataMessage(DataSenderCommands.qUploadSale, jo.toString(), "OU", "S");
                     LocalMessanger.sendMessage(m);
                 } catch (JSONException e) {

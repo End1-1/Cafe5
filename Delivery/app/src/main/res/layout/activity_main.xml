@@ -5,6 +5,7 @@
     android:id="@+id/idParent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="@dimen/margin"
     tools:context=".Activities.MainActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -143,7 +144,7 @@
                 android:id="@+id/btnOrder"
                 android:layout_width="@dimen/bigButtonSize"
                 android:layout_height="@dimen/bigButtonSize"
-                android:drawableTop="@drawable/checkout"
+                android:drawableTop="@drawable/dllcheckout"
                 android:text="@string/NewSale"
                 android:textSize="@dimen/textFontSize" />
 
@@ -151,7 +152,7 @@
                 android:id="@+id/btnSales"
                 android:layout_width="@dimen/bigButtonSize"
                 android:layout_height="@dimen/bigButtonSize"
-                android:drawableTop="@drawable/preorder"
+                android:drawableTop="@drawable/dllpreorder"
                 android:text="@string/SalesToday"
                 android:textSize="@dimen/textFontSize" />
 
@@ -159,7 +160,7 @@
                 android:id="@+id/btnLogout"
                 android:layout_width="@dimen/bigButtonSize"
                 android:layout_height="@dimen/bigButtonSize"
-                android:drawableTop="@drawable/exit"
+                android:drawableTop="@drawable/dllexit"
                 android:text="@string/Logout"
                 android:textSize="@dimen/textFontSize" />
 

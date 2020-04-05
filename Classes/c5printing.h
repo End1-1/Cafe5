@@ -55,6 +55,8 @@ public:
 
     void print(const QString &printername, QPagedPaintDevice::PageSize pageSize);
 
+    void print(QPainter *p);
+
     qreal fTop;
 
     qreal fLineHeight;

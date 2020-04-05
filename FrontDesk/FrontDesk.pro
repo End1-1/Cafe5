@@ -44,6 +44,7 @@ SOURCES += \
     ../Classes/proxytablewidgetdatabase.cpp \
     ../Editors/c5cashname.cpp \
     ../Editors/ce5dishpackage.cpp \
+    ../Editors/ce5goodsbarcodelabelview.cpp \
     ../Editors/ce5goodsclass.cpp \
     ../Editors/ce5packagelist.cpp \
     ../Editors/ce5storereason.cpp \
@@ -73,6 +74,7 @@ SOURCES += \
     ../Reports/cr5salesbydishes.cpp \
     ../Reports/cr5salesbydishesfilter.cpp \
     ../Reports/cr5storereason.cpp \
+    barcode.cpp \
     c5cashdoc.cpp \
     c5costumerdebtpayment.cpp \
     c5dishgroupaction.cpp \
@@ -221,6 +223,7 @@ HEADERS += \
     ../Classes/proxytablewidgetdatabase.h \
     ../Editors/c5cashname.h \
     ../Editors/ce5dishpackage.h \
+    ../Editors/ce5goodsbarcodelabelview.h \
     ../Editors/ce5goodsclass.h \
     ../Editors/ce5packagelist.h \
     ../Editors/ce5storereason.h \
@@ -250,6 +253,7 @@ HEADERS += \
     ../Reports/cr5salesbydishes.h \
     ../Reports/cr5salesbydishesfilter.h \
     ../Reports/cr5storereason.h \
+    barcode.h \
     c5cashdoc.h \
     c5costumerdebtpayment.h \
     c5dishgroupaction.h \

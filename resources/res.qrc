@@ -72,5 +72,6 @@
         <file>hammer.png</file>
         <file>checked.png</file>
         <file>partners.png</file>
+        <file>Barcode.ttf</file>
     </qresource>
 </RCC>

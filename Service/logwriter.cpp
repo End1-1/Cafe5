@@ -22,7 +22,7 @@ void LogWriter::setFile(int num, const QString &fileName)
 void LogWriter::write(int level, int file, const QString &session, const QString &message)
 {
 #ifdef QT_DEBUG
-    qDebug() << message;
+    qDebug() << QDateTime::currentDateTime().toString("dd/MM/yyyy HH:mm:ss ") << message;
 #endif;
     if (fCurrentLevel < level) {
         return;

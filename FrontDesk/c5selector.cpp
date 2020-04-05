@@ -159,6 +159,7 @@ void C5Selector::refresh()
     fGrid->setCheckboxes(true);
     fGrid->fModel->setSingleCheckBoxSelection(!fMultipleSelection);
     fGrid->buildQuery(fQuery);
+    fGrid->fTableView->setColumnWidth(0, 25);
 }
 
 void C5Selector::on_leFilter_textChanged(const QString &arg1)

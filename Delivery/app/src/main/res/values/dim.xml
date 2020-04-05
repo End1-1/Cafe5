@@ -4,7 +4,7 @@
     <dimen name="textFontSize">18sp</dimen>
     <dimen name="textBigFontSize">28sp</dimen>
     <dimen name="listFontSize">14sp</dimen>
-    <dimen name="bigButtonSize">148dp</dimen>
+    <dimen name="bigButtonSize">120dp</dimen>
     <dimen name="margin">2dp</dimen>
     <dimen name="separatorViewHeight">2dp</dimen>
 </resources>
