@@ -113,7 +113,8 @@ bool C5StoreDoc::openDoc(QString id)
         db[":f_type"]= -1;
         break;
     }
-    db.exec("select d.f_id, d.f_goods, g.f_name, d.f_qty, u.f_name, d.f_price, d.f_total, d.f_reason \
+    db.exec("select d.f_id, d.f_goods, concat(g.f_name, ' ', g.f_scancode) as f_goodsname, \
+            d.f_qty, u.f_name, d.f_price, d.f_total, d.f_reason \
             from a_store_draft d \
             left join c_goods g on g.f_id=d.f_goods \
             left join c_units u on u.f_id=g.f_unit \
@@ -132,7 +133,8 @@ bool C5StoreDoc::openDoc(QString id)
     if (fDocType == DOC_TYPE_COMPLECTATION) {
         db[":f_document"] = id;
         db[":f_type"] = 1;
-        db.exec("select d.f_id, d.f_goods, g.f_name, d.f_qty, u.f_name, d.f_price, d.f_total, d.f_reason \
+        db.exec("select d.f_id, d.f_goods, concat(g.f_name, ' ', g.f_scancode) as f_goodsname, \
+                d.f_qty, u.f_name, d.f_price, d.f_total, d.f_reason \
                 from a_store_draft d \
                 left join c_goods g on g.f_id=d.f_goods \
                 left join c_units u on u.f_id=g.f_unit \
@@ -1088,14 +1090,15 @@ void C5StoreDoc::loadGoodsInput()
     ui->tblGoodsStore->clearContents();
     ui->tblGoodsStore->setRowCount(0);
     C5Database db(fDBParams);
-    db.exec(QString("select g.f_id, g.f_group, g.f_name as f_goodsname, u.f_name as f_unitname, "
-              "sum(s.f_qty*s.f_type) as f_qty, sum(s.f_total*s.f_type) as f_amount "
-              "from c_goods g "
-              "left join a_store s on s.f_goods=g.f_id and s.f_store=%1 "
-              "left join a_header d on d.f_id=s.f_document and d.f_date<=%2 "
-              "inner join c_groups gg on gg.f_id=g.f_group "
-              "inner join c_units u on u.f_id=g.f_unit "
-              "group by 1, 2, 3, 4 ")
+    db.exec(QString("select g.f_id, g.f_group, concat(g.f_name, ' ', g.f_scancode) as f_goodsname, "
+                    "u.f_name as f_unitname, "
+                    "sum(s.f_qty*s.f_type) as f_qty, sum(s.f_total*s.f_type) as f_amount "
+                    "from c_goods g "
+                    "left join a_store s on s.f_goods=g.f_id and s.f_store=%1 "
+                    "left join a_header d on d.f_id=s.f_document and d.f_date<=%2 "
+                    "inner join c_groups gg on gg.f_id=g.f_group "
+                    "inner join c_units u on u.f_id=g.f_unit "
+                    "group by 1, 2, 3, 4 ")
             .arg(ui->leStoreInput->getInteger())
             .arg(ui->deDate->toMySQLDate()));
     while (db.nextRow()) {

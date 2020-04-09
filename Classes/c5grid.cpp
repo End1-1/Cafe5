@@ -703,15 +703,26 @@ void C5Grid::exportToExcel()
         s->addCell(1, i + 1, fModel->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString(), d.style()->styleNum("header"));
         s->setColumnWidth(i + 1, fTableView->columnWidth(i) / 7);
     }
-    //e.setHorizontalAlignment(e.address(0, 0), e.address(0, colCount - 1), Excel::hCenter);
+
     /* BODY */
+    QMap<int, QString> bgFill;
     QFont bodyFont(qApp->font());
     d.style()->addFont("body", bodyFont);
+    d.style()->addBackgrounFill("body", QColor(Qt::white));
+    bgFill[QColor(Qt::white).rgb()] = "body";
     for (int j = 0; j < rowCount; j++) {
         for (int i = 0; i < colCount; i++) {
-            s->addCell(j + 2, i + 1, fModel->data(j, i, Qt::EditRole), d.style()->styleNum("body"));
+            int bgColor = fModel->data(j, i, Qt::BackgroundColorRole).value<QColor>().rgb();
+            if (!bgFill.contains(bgColor)) {
+                d.style()->addFont(QString::number(bgColor), bodyFont);
+                d.style()->addBackgrounFill(QString::number(bgColor), QColor::fromRgb(bgColor));
+                bgFill[bgColor] = QString::number(bgColor);
+            }
+            QString bgStyle = bgFill[bgColor];
+            s->addCell(j + 2, i + 1, fModel->data(j, i, Qt::EditRole), d.style()->styleNum(bgStyle));
         }
     }
+
     /* TOTALS ROWS */
     if (ui->tblTotal->isVisible()) {
         QFont totalFont(qApp->font());

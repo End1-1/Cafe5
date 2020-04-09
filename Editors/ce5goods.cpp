@@ -54,7 +54,7 @@ void CE5Goods::setId(int id)
     C5Database db(fDBParams);
     /* Complectation */
     db[":f_base"] = id;
-    db.exec("select c.f_id, c.f_goods, g.f_name as f_goodsname, c.f_qty, u.f_name as f_unitname, "
+    db.exec("select c.f_id, c.f_goods, concat(g.f_name, ' ', g.f_scancode) as f_goodsname, c.f_qty, u.f_name as f_unitname, "
             "c.f_price, c.f_qty*c.f_price as f_total "
             "from c_goods_complectation c "
             "left join c_goods g on g.f_id=c.f_goods "
@@ -139,9 +139,9 @@ void CE5Goods::on_btnAddGoods_clicked()
         return;
     }
     int row = addGoodsRow();
-    ui->tblGoods->setString(row, 1, vals.at(0).toString());
-    ui->tblGoods->setString(row, 2, vals.at(2).toString());
-    ui->tblGoods->setString(row, 4, vals.at(3).toString());
+    ui->tblGoods->setString(row, 1, vals.at(1).toString());
+    ui->tblGoods->setString(row, 2, vals.at(3).toString());
+    ui->tblGoods->setString(row, 4, vals.at(4).toString());
     ui->tblGoods->lineEdit(row, 3)->setFocus();
 }
 

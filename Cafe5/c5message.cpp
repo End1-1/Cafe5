@@ -37,6 +37,7 @@ int C5Message::showMessage(const QString &text, const QString &color)
     c5->ui->btnYes->setMinimumHeight(50);
     c5->ui->btnCancel->setMinimumHeight(50);
 #endif
+    c5->adjustSize();
     int result = c5->exec();
     delete c5;
     return result;
