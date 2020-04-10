@@ -32,10 +32,12 @@ int C5Message::question(const QString &questionStr)
 int C5Message::showMessage(const QString &text, const QString &color)
 {
     C5Message *c5 = new C5Message(__c5config.fParentWidget);
-    c5->ui->lbMessage->setText(QString("<html><body><h1><font color=\"%1\">%2</font></h1></body></html>").arg(color).arg(text));
-#ifdef _MODULE_
+#ifdef FRONTDESK
+    c5->ui->lbMessage->setText(QString("<html><body><h4><font color=\"%1\">%2</font></h4></body></html>").arg(color).arg(text));
+#else
     c5->ui->btnYes->setMinimumHeight(50);
     c5->ui->btnCancel->setMinimumHeight(50);
+    c5->ui->lbMessage->setText(QString("<html><body><h1><font color=\"%1\">%2</font></h1></body></html>").arg(color).arg(text));
 #endif
     c5->adjustSize();
     int result = c5->exec();

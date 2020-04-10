@@ -320,17 +320,17 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5grid.cpp" line="772"/>
+        <location filename="../Classes/c5grid.cpp" line="783"/>
         <source>Set filter</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5grid.cpp" line="773"/>
+        <location filename="../Classes/c5grid.cpp" line="784"/>
         <source>Remove filter</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5grid.cpp" line="774"/>
+        <location filename="../Classes/c5grid.cpp" line="785"/>
         <source>Autofit columns widths</source>
         <translation></translation>
     </message>
@@ -366,17 +366,17 @@
 <context>
     <name>C5Message</name>
     <message>
-        <location filename="../Cafe5/c5message.ui" line="26"/>
+        <location filename="../Cafe5/c5message.ui" line="37"/>
         <source>MESSAGE</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5message.ui" line="61"/>
+        <location filename="../Cafe5/c5message.ui" line="90"/>
         <source>OK</source>
         <translation>Ընդունել</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5message.ui" line="68"/>
+        <location filename="../Cafe5/c5message.ui" line="97"/>
         <source>Cancel</source>
         <translation>Հրաժարվել</translation>
     </message>
@@ -467,7 +467,7 @@
 <context>
     <name>C5Printing</name>
     <message>
-        <location filename="../Classes/c5printing.cpp" line="297"/>
+        <location filename="../Classes/c5printing.cpp" line="323"/>
         <source>Failed send order to remote printer</source>
         <translation></translation>
     </message>
@@ -1229,19 +1229,6 @@ MS Excel</source>
         <location filename="printreceipt.cpp" line="158"/>
         <source>Printed</source>
         <translation>Տպված</translation>
-    </message>
-</context>
-<context>
-    <name>PrintTaxN</name>
-    <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="75"/>
-        <source>Socket read error</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="83"/>
-        <source>Data read timeout</source>
-        <translation></translation>
     </message>
 </context>
 <context>

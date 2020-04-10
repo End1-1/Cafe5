@@ -73,5 +73,6 @@
         <file>checked.png</file>
         <file>partners.png</file>
         <file>Barcode.ttf</file>
+        <file>barcode.png</file>
     </qresource>
 </RCC>

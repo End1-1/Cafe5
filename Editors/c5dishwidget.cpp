@@ -136,7 +136,7 @@ void C5DishWidget::setDish(int id)
         if (db.getInt("f_complex") > 0) {
             for (int i = 0; i < ui->tblRecipe->columnCount(); i++) {
                 if (ui->tblRecipe->item(row, i)) {
-                    ui->tblRecipe->item(row, i)->setBackgroundColor(Qt::magenta);
+                    ui->tblRecipe->item(row, i)->setBackground(QBrush(Qt::magenta));
                 }
             }
         }
@@ -449,7 +449,7 @@ void C5DishWidget::on_btnAddDish_clicked()
         ui->tblRecipe->setString(row, 7, values.at(0).toString());
         for (int i = 0; i < ui->tblRecipe->columnCount(); i++) {
             if (ui->tblRecipe->item(row, i)) {
-                ui->tblRecipe->item(row, i)->setBackgroundColor(Qt::magenta);
+                ui->tblRecipe->item(row, i)->setBackground(QBrush(Qt::magenta));
             }
         }
         ui->tblRecipe->setDouble(row, 8, 1);
@@ -466,13 +466,13 @@ void C5DishWidget::on_tblComplex_cellClicked(int row, int column)
         if (code == ui->tblRecipe->getString(i, 7)) {
             for (int j = 0; j < ui->tblRecipe->columnCount(); j++) {
                 if (ui->tblRecipe->item(i, j)) {
-                    ui->tblRecipe->item(i, j)->setBackgroundColor(Qt::green);
+                    ui->tblRecipe->item(i, j)->setBackground(QBrush(Qt::green));
                 }
             }
         } else if (ui->tblRecipe->getInteger(i, 7) > 0) {
             for (int j = 0; j < ui->tblRecipe->columnCount(); j++) {
                 if (ui->tblRecipe->item(i, j)) {
-                    ui->tblRecipe->item(i, j)->setBackgroundColor(Qt::magenta);
+                    ui->tblRecipe->item(i, j)->setBackground(QBrush(Qt::magenta));
                 }
             }
         }

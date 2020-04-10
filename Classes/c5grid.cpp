@@ -457,7 +457,7 @@ void C5Grid::filterByColumn()
 {
     QSet<QString> filterValues;
     fModel->uniqueValuesForColumn(fFilterColumn, filterValues);
-    QStringList sortedValues = filterValues.toList();
+    QStringList sortedValues = filterValues.values();
     std::sort(sortedValues.begin(), sortedValues.end());
     if (C5FilterValues::filterValues(sortedValues)) {
         fModel->setFilter(fFilterColumn, sortedValues.join("|"));

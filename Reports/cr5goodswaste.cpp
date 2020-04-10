@@ -49,7 +49,7 @@ void CR5GoodsWaste::removeRow()
     foreach (QModelIndex mi, ml) {
         rowsTemp << mi.row();
     }
-    QList<int> rows = rowsTemp.toList();
+    QList<int> rows = rowsTemp.values();
     std::sort(rows.begin(), rows.end());
     std::reverse(rows.begin(), rows.end());
     C5Database db(fDBParams);

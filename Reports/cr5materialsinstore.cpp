@@ -1,6 +1,8 @@
 #include "cr5materialsinstore.h"
 #include "cr5materialinstorefilter.h"
 #include "c5tablemodel.h"
+#include "c5mainwindow.h"
+#include "c5storebarcode.h"
 
 CR5MaterialsInStore::CR5MaterialsInStore(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
@@ -28,6 +30,7 @@ QToolBar *CR5MaterialsInStore::toolBar()
             << ToolBarButtons::tbExcel
             << ToolBarButtons::tbPrint;
         fToolBar = createStandartToolbar(btn);
+        fToolBar->addAction(QIcon(":/barcode.png"), tr("Print\nbarcode"), this, SLOT(printBarcode()));
     }
     return fToolBar;
 }
@@ -206,6 +209,16 @@ void CR5MaterialsInStore::setColors()
                 fModel->setRowColor(i, QColor::fromRgb(255, 165, 165));
             }
         }
+    }
+}
+
+void CR5MaterialsInStore::printBarcode()
+{
+    C5StoreBarcode *b = __mainWindow->createTab<C5StoreBarcode>(fDBParams);
+    for (int i = 0; i < fModel->rowCount(); i++) {
+        b->addRow(fModel->data(i, fModel->indexForColumnName("f_goods"), Qt::EditRole).toString(),
+                  fModel->data(i, fModel->indexForColumnName("f_scancode"), Qt::EditRole).toString(),
+                  fModel->data(i, fModel->indexForColumnName("f_qty"), Qt::EditRole).toInt());
     }
 }
 

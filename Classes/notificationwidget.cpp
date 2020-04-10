@@ -3,6 +3,7 @@
 #include <QDateTime>
 #include <QGraphicsDropShadowEffect>
 #include <QDesktopWidget>
+#include <QScreen>
 
 QList<NotificationWidget*> NotificationWidget::fWidgetList;
 
@@ -41,7 +42,7 @@ void NotificationThread::run()
     corner.moveBottomRight(rect.bottomRight());
     region += QRegion(corner, QRegion::Ellipse);
     nw->setMask(region);
-    rect = QApplication::desktop()->screenGeometry();
+    rect = qApp->screens().at(0)->geometry();
     int y = 0;
     for (NotificationWidget *w: NotificationWidget::fWidgetList) {
         y += w->height() + 5;
@@ -88,7 +89,8 @@ void NotificationWidget::showMessage(const QString &message, int info)
 
 void NotificationWidget::compact()
 {
-    QRect rect = QApplication::desktop()->screenGeometry();
+
+    QRect rect = qApp->screens().at(0)->geometry();
     int pos = 0;
     for (NotificationWidget *w: fWidgetList) {
         int y = 0;

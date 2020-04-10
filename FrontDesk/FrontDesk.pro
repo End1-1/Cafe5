@@ -83,6 +83,7 @@ SOURCES += \
     c5progressdialog.cpp \
     c5salarydoc.cpp \
     c5serviceconfig.cpp \
+    c5storebarcode.cpp \
     dlgchangeoutputstore.cpp \
         main.cpp \
         c5mainwindow.cpp \
@@ -214,7 +215,7 @@ HEADERS += \
     ../Cafe5/c5double.h \
     ../Cafe5/c5license.h \
     ../Cafe5/c5licensedlg.h \
-    ../Cafe5/servicecommands.h \
+    ../Classes/barcode5.h \
     ../Classes/c5crypt.h \
     ../Classes/c5filelogwriter.h \
     ../Classes/c5storedraftwriter.h \
@@ -253,6 +254,7 @@ HEADERS += \
     ../Reports/cr5salesbydishes.h \
     ../Reports/cr5salesbydishesfilter.h \
     ../Reports/cr5storereason.h \
+    ../Service/servicecommands.h \
     barcode.h \
     c5cashdoc.h \
     c5costumerdebtpayment.h \
@@ -305,6 +307,7 @@ HEADERS += \
     c5selector.h \
     ../Controls/c5lineeditwithselector.h \
     c5serviceconfig.h \
+    c5storebarcode.h \
     c5storedoc.h \
     ../Reports/cr5goodsstorages.h \
     ../Reports/cr5goodspartners.h \
@@ -430,6 +433,7 @@ FORMS += \
     c5salarydoc.ui \
     c5selector.ui \
     c5serviceconfig.ui \
+    c5storebarcode.ui \
     c5storedoc.ui \
     ../Reports/cr5materialinstorefilter.ui \
     ../Reports/cr5goodsmovementfilter.ui \
@@ -482,6 +486,7 @@ INCLUDEPATH += ../Controls
 INCLUDEPATH += ../Editors
 INCLUDEPATH += ../Waiter
 INCLUDEPATH += ../RESOURCES
+INCLUDEPATH += ../Service
 INCLUDEPATH += c:/projects/xlsx/src
 INCLUDEPATH += C:/OpenSSL-Win32/include
 INCLUDEPATH += C:/OpenSSL-Win32/include/openssl

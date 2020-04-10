@@ -61,7 +61,7 @@ public:
 
     static QString uuid(const QStringList &dbParams = QStringList());
 
-    QByteArray uuid_bin(const QStringList &dp = QStringList());
+    QByteArray uuid_bin();
 
     QByteArray uuid_getbin(QString u);
 

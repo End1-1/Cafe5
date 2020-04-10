@@ -9,6 +9,7 @@
 #include "c5mainwindow.h"
 #include "ce5partner.h"
 #include "ce5goods.h"
+#include "c5storebarcode.h"
 #include <QMenu>
 #include <QShortcut>
 
@@ -299,6 +300,7 @@ QToolBar *C5StoreDoc::toolBar()
         fToolBar->addAction(QIcon(":/recycle.png"), tr("Remove"), this, SLOT(removeDocument()));
         fToolBar->addAction(QIcon(":/print.png"), tr("Print"), this, SLOT(printDoc()));
         fToolBar->addAction(QIcon(":/show_list.png"), tr("Show/Hide\ngoods list"), this, SLOT(showHideGoodsList()));
+        fToolBar->addAction(QIcon(":/barcode.png"), tr("Print\nbarcode"), this, SLOT(printBarcode()));
     }
     return fToolBar;
 }
@@ -1531,6 +1533,19 @@ void C5StoreDoc::printDoc()
 
     C5PrintPreview pp(&p, fDBParams);
     pp.exec();
+}
+
+void C5StoreDoc::printBarcode()
+{
+    C5StoreBarcode *b = __mainWindow->createTab<C5StoreBarcode>(fDBParams);
+    C5Database db(fDBParams);
+    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+        db[":f_id"] = ui->tblGoods->getInteger(i, 1);
+        db.exec("select f_name, f_scancode from c_goods where f_id=:f_id");
+        if (db.nextRow()) {
+            b->addRow(db.getString("f_name"), db.getString("f_scancode"), ui->tblGoods->getInteger(i, 3));
+        }
+    }
 }
 
 void C5StoreDoc::checkInvoiceDuplicate()

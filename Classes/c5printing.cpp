@@ -24,6 +24,7 @@ C5Printing::C5Printing() :
     fTop = 0;
     fTempTop = 0;
     fCurrentPageIndex = 0;
+    fNoNewPage = false;
 }
 
 C5Printing::~C5Printing()
@@ -94,6 +95,11 @@ void C5Printing::setFontSize(int size)
     fJsonData.append(o);
 }
 
+void C5Printing::setPen(const QPen &p)
+{
+    fLinePen = p;
+}
+
 void C5Printing::line(qreal x1, qreal y1, qreal x2, qreal y2, int lineWidth)
 {
     if (lineWidth > 0) {
@@ -150,6 +156,20 @@ void C5Printing::ltext(const QString &text, qreal x)
 
     QJsonObject o;
     o["cmd"] = "ltext";
+    o["text"] = text;
+    o["x"] = x;
+    fJsonData.append(o);
+}
+
+void C5Printing::ltext90(const QString &text, qreal x)
+{
+    QGraphicsTextItem *item = fCanvas->addText(text, fFont);
+    item->moveBy(x, fTop);
+    item->setRotation(90);
+    setTemptop(item);
+
+    QJsonObject o;
+    o["cmd"] = "ltext90";
     o["text"] = text;
     o["x"] = x;
     fJsonData.append(o);
@@ -229,13 +249,19 @@ bool C5Printing::br(qreal height)
     fTempTop = 0;
 
     if (fTop > fNormalHeight) {
-        fTop = 0;
-        QPrinter::Orientation o = fCanvasOrientation[fCanvas];
-        fCanvas = new QGraphicsScene();
-        fCanvasList.append(fCanvas);
-        setSceneParams(fNormalWidth, fNormalHeight, o);
-        fCurrentPageIndex++;
-        return true;
+        if (fNoNewPage) {
+            QRectF rf = fCanvas->sceneRect();
+            rf.setHeight(fTop);
+            fCanvas->setSceneRect(rf);
+        } else {
+            fTop = 0;
+            QPrinter::Orientation o = fCanvasOrientation[fCanvas];
+            fCanvas = new QGraphicsScene();
+            fCanvasList.append(fCanvas);
+            setSceneParams(fNormalWidth, fNormalHeight, o);
+            fCurrentPageIndex++;
+            return true;
+        }
     }
     return false;
 }
@@ -265,7 +291,7 @@ QPrinter::Orientation C5Printing::orientation(int index)
     return fCanvasOrientation[fCanvasList.at(index)];
 }
 
-void C5Printing::print(const QString &printername, QPrinter::PageSize pageSize)
+void C5Printing::print(const QString &printername, QPrinter::PageSize pageSize, bool rotate90)
 {
     if (printername.contains("print://", Qt::CaseInsensitive)) {
         QRegExp re("(print:\\/\\/)(.*):(\\d*)\\/(.*)", Qt::CaseInsensitive);
@@ -310,6 +336,10 @@ void C5Printing::print(const QString &printername, QPrinter::PageSize pageSize)
         printer.setOrientation(o);
         printer.setPageSize(pageSize);
         QPainter painter(&printer);
+        if (rotate90 > 0) {
+            painter.rotate(90);
+            painter.translate(0, -painter.viewport().width());
+        }
         for (int i = 0; i < fCanvasList.count(); i++) {
             if (i > 0) {
                 o = fCanvasOrientation[fCanvasList.at(i)];

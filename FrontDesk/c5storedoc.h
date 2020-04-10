@@ -123,6 +123,8 @@ private slots:
 
     void printDoc();
 
+    void printBarcode();
+
     void checkInvoiceDuplicate();
 
     void filterGoodsPanel(int group);

@@ -29,6 +29,9 @@ private:
 
     void setColors();
 
+private slots:
+    void printBarcode();
+
 };
 
 #endif // CR5MATERIALSINSTORE_H

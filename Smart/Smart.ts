@@ -104,17 +104,17 @@
 <context>
     <name>C5Message</name>
     <message>
-        <location filename="../Cafe5/c5message.ui" line="26"/>
+        <location filename="../Cafe5/c5message.ui" line="37"/>
         <source>MESSAGE</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5message.ui" line="61"/>
+        <location filename="../Cafe5/c5message.ui" line="90"/>
         <source>OK</source>
         <translation>Այո</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5message.ui" line="68"/>
+        <location filename="../Cafe5/c5message.ui" line="97"/>
         <source>Cancel</source>
         <translation>Հրաժարվել</translation>
     </message>
@@ -122,7 +122,7 @@
 <context>
     <name>C5Printing</name>
     <message>
-        <location filename="../Classes/c5printing.cpp" line="297"/>
+        <location filename="../Classes/c5printing.cpp" line="323"/>
         <source>Failed send order to remote printer</source>
         <translation></translation>
     </message>
@@ -253,19 +253,6 @@
     <message>
         <location filename="../Classes/notificationwidget.ui" line="179"/>
         <source>The message!</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>PrintTaxN</name>
-    <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="75"/>
-        <source>Socket read error</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="83"/>
-        <source>Data read timeout</source>
         <translation></translation>
     </message>
 </context>

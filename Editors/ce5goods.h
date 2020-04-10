@@ -62,8 +62,6 @@ private slots:
 
     void on_btnPaste_clicked();
 
-    void on_btnPrintScancode_clicked();
-
 private:
     Ui::CE5Goods *ui;
 

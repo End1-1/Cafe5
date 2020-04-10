@@ -194,7 +194,7 @@ void CR5Documents::saveDocs()
     foreach (QModelIndex mi, ml) {
         rowsTemp << mi.row();
     }
-    QList<int> rows = rowsTemp.toList();
+    QList<int> rows = rowsTemp.values();
     std::sort(rows.begin(), rows.end());
     C5Database db(fDBParams);
     QString err;
@@ -253,7 +253,7 @@ void CR5Documents::draftDocs()
     foreach (QModelIndex mi, ml) {
         rowsTemp << mi.row();
     }
-    QList<int> rows = rowsTemp.toList();
+    QList<int> rows = rowsTemp.values();
     std::sort(rows.begin(), rows.end());
     C5Database db(fDBParams);
     QString err;
@@ -309,7 +309,7 @@ void CR5Documents::removeDocs()
     foreach (QModelIndex mi, ml) {
         rowsTemp << mi.row();
     }
-    QList<int> rows = rowsTemp.toList();
+    QList<int> rows = rowsTemp.values();
     std::sort(rows.begin(), rows.end());
     std::reverse(rows.begin(), rows.end());
     foreach (int r, rows) {
@@ -364,7 +364,7 @@ void CR5Documents::copySelectedDocs()
     foreach (QModelIndex mi, ml) {
         rowsTemp << mi.row();
     }
-    QList<int> rows = rowsTemp.toList();
+    QList<int> rows = rowsTemp.values();
     std::sort(rows.begin(), rows.end());
     std::reverse(rows.begin(), rows.end());
     C5Database db1(fDBParams);

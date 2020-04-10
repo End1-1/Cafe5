@@ -25,6 +25,8 @@ public:
 
     void setFontSize(int size);
 
+    void setPen(const QPen &p);
+
     void line(qreal x1, qreal y1, qreal x2, qreal y2, int lineWidth = -1);
 
     void line(int lineWidth = -1);
@@ -32,6 +34,8 @@ public:
     void tableText(const QList<qreal> &points, const QStringList &vals, int rowHeight);
 
     void ltext(const QString &text, qreal x);
+
+    void ltext90(const QString &text, qreal x);
 
     void ctext(const QString &text);
 
@@ -53,7 +57,7 @@ public:
 
     QPrinter::Orientation orientation(int index);
 
-    void print(const QString &printername, QPagedPaintDevice::PageSize pageSize);
+    void print(const QString &printername, QPagedPaintDevice::PageSize pageSize, bool rotate90 = false);
 
     void print(QPainter *p);
 
@@ -66,6 +70,8 @@ public:
     qreal fNormalWidth;
 
     QJsonArray jsonData();
+
+    bool fNoNewPage;
 
 private:
     qreal fTempTop;

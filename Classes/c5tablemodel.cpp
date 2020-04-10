@@ -295,7 +295,7 @@ QList<QVariant> C5TableModel::getRowValues(int row)
 
 void C5TableModel::saveDataChanges()
 {
-    QList<int> rows = fRowToUpdate.toList();
+    QList<int> rows = fRowToUpdate.values();
     std::sort(rows.begin(), rows.end());
     for (int i = 0, count = rows.count(); i < count; i++) {
         int row = rows.at(i);

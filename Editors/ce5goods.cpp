@@ -8,7 +8,7 @@
 #include "ce5goodsclass.h"
 #include "c5selector.h"
 #include "c5printing.h"
-#include "barcode.h"
+#include "barcode5.h"
 #include <QPrinter>
 #include <QClipboard>
 #include <QFontDatabase>
@@ -71,16 +71,41 @@ void CE5Goods::setId(int id)
         ui->tblGoods->lineEdit(row, 6)->setDouble(db.getDouble("f_total"));
     }
     fPrinting->setSceneParams(fPbw->width() / 2, fPbw->height() / 2, QPrinter::Portrait);
-    fPrinting->line(0, 0, 40, 0);
-    fPrinting->line(0, 0, 0, 60);
-    fPrinting->line(40, 0, 40, 60);
-    fPrinting->line(0, 60, 40, 60);
-    fPrinting->line(0, 30, 40, 30);
-    QFont barcodeFont("Barcode", 6, QFont::Normal);
-    fPrinting->setFont(barcodeFont);
-    Barcode barcode;
-    QString barcodeString = barcode.Code_128(ui->leScanCode->text());
-    fPrinting->ltext(barcodeString, 0);
+
+    fPrinting->fNoNewPage = true;
+    fPrinting->setSceneParams(600, 500, QPrinter::Portrait);
+    fPrinting->setFont(QFont("Arial", 100, QFont::Normal));
+    fPrinting->setFontSize(100);
+    fPrinting->ltext(tr("elina"), 100);
+    fPrinting->br();
+    fPrinting->setFontSize(50);
+    fPrinting->ltext("MODEL: ", 50);
+    fPrinting->setFontBold(true);
+    fPrinting->ltext("               " + ui->leScanCode->text().right(ui->leScanCode->text().length() - 7), 50);
+    fPrinting->br();
+    fPrinting->setFontBold(false);
+    fPrinting->ltext("SIZE: ", 50);
+    fPrinting->setFontBold(true);
+    fPrinting->ltext("             " + ui->leScanCode->text().left(2), 50);
+    fPrinting->br();
+    BarcodeI2of5 b;
+    b.EncodeI2of5(ui->leScanCode->text().toLatin1().data());
+    fPrinting->fTop += 20;
+    b.DrawBarcode(*fPrinting, 50, fPrinting->fTop, fPrinting->fTop + 140, fPrinting->fTop + 150);
+    fPrinting->setFontSize(30);
+    QString code2 = QString("%1x%2x%3x%4")
+            .arg(ui->leScanCode->text().left(2))
+            .arg(ui->leScanCode->text().mid(2,3))
+            .arg(ui->leScanCode->text().mid(5,2))
+            .arg(ui->leScanCode->text().right(ui->leScanCode->text().length() - 7));
+    fPrinting->fTop += 100;
+    fPrinting->setFontBold(true);
+    fPrinting->ltext(code2, 50);
+    fPrinting->br();
+    fPrinting->ltext("MADE IN ARMENIA", 50);
+    BarcodeI2of5 barcode;
+    barcode.EncodeI2of5(ui->leScanCode->text().toLatin1().data());
+    barcode.DrawBarcode(*fPrinting, 10, 10, 50, 50);
 }
 
 bool CE5Goods::save(QString &err, QList<QMap<QString, QVariant> > &data)
@@ -302,22 +327,6 @@ PrintBarcodeWidget::PrintBarcodeWidget(C5Printing *prn, QWidget *parent) :
 void PrintBarcodeWidget::paintEvent(QPaintEvent *event)
 {
     QPainter p(this);
+    p.scale(0.5, 0.5);
     print->print(&p);
-}
-
-void CE5Goods::on_btnPrintScancode_clicked()
-{
-    C5Printing *p = new C5Printing();
-    p->setSceneParams(210, 270, QPrinter::Portrait);
-//    p->line(0, 0, 40, 0);
-//    p->line(0, 0, 0, 60);
-//    p->line(40, 0, 40, 60);
-//    p->line(0, 60, 40, 60);
-//    p->line(0, 30, 40, 30);
-    QFont barcodeFont("Barcode", 12, QFont::Normal);
-    p->setFont(barcodeFont);
-    Barcode barcode;
-    QString barcodeString = barcode.Code_128(ui->leScanCode->text());
-    p->ltext(barcodeString, 0);
-    p->print("local", QPrinter::Custom);
 }

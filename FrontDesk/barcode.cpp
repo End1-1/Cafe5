@@ -82,6 +82,46 @@ QString Barcode::Code_128(const QString &A) const {
     return S;
 }
 
+QString Barcode::Code_Interlived_2_5(const QString &A, bool Check) const
+{
+        int I;
+        int Ch;
+        int K;
+        QString D;
+        for (I = 0; I < A.length(); I++) {
+            Ch = A.at(I).toLatin1();
+            if ((48 <= Ch) && (Ch <= 57)) {
+                D += QChar(Ch);
+            }
+        }
+
+        if (((D.length() % 2 > 0) && (!Check)) || ((D.length() % 2 == 0) && Check)) {
+            D = "0" + D;
+        }
+
+        if (Check) {
+            K = 0;
+            for (I = 0; I < D.length(); I++) {
+                if (I % 2 > 0) {
+                    K = K + D.mid(I, 1).at(0).toLatin1() * 3;
+                } else {
+                    K = K + D.mid(I, 1).at(0).toLatin1();
+                }
+            }
+            K = 10 - (K % 10);
+            D += QString::number(K);
+        }
+
+        QString S;
+        for (I = 0; I < D.length() / 2; I++) {
+            QString mid = D.mid(I * 2, 2);
+            QString i2of5 = Interleaved_2of5_Pair(mid);
+            S += Code_Char(i2of5);
+        }
+
+        return Code_Char("1111") + S + Code_Char("3111");
+}
+
 
 QString Barcode::Code_Char(const QString &A) const {
     QString S;
@@ -228,4 +268,41 @@ QString Barcode::Code_128_ID(int ID) const {
         case 106:return "2331112";
     }
     return "";
+}
+
+QString Barcode::Interleaved_2of5_Pair(const QString &Pair) const
+{
+    QString S1 = Code_2of5_Ch(Pair.mid(0, 1));
+    QString S2 = Code_2of5_Ch(Pair.mid(1, 1));
+    QString S;
+    for (int i = 0; i < S1.length(); i++) {
+        S +=  S1.mid(i, 1) + S2.mid(i, 1);
+    }
+    return S;
+}
+
+QString Barcode::Code_2of5_Ch(const QString &Ch) const
+{
+    if (Ch == "0") {
+        return "11331";
+    } else if (Ch == "1") {
+        return "31113";
+    } else if (Ch == "2") {
+        return "13113";
+    } else if (Ch == "3") {
+        return "33111";
+    } else if (Ch == "4") {
+        return "11313";
+    } else if (Ch == "5") {
+        return "31311";
+    } else if (Ch == "6") {
+        return "13311";
+    } else if (Ch == "7") {
+        return "11133";
+    } else if (Ch == "8") {
+        return "31131";
+    } else if (Ch == "9") {
+        return "13131";
+    }
+    return "???";
 }
