@@ -2,6 +2,7 @@
 #include "ui_c5storebarcode.h"
 #include "barcode5.h"
 #include "c5storebarcodelist.h"
+#include "c5lineedit.h"
 #include "c5checkbox.h"
 #include <QPainter>
 #include <QPrintDialog>
@@ -30,7 +31,7 @@ void C5StoreBarcode::addRow(const QString &name, const QString &barcode, int qty
     ui->tbl->setRowCount(row + 1);
     ui->tbl->setString(row, 0, name);
     ui->tbl->setString(row, 1, barcode);
-    ui->tbl->setInteger(row, 2, qty);
+    ui->tbl->createLineEdit(row, 2)->setInteger(qty);
     ui->tbl->createCheckbox(row, 3)->setChecked(true);
 }
 
@@ -54,15 +55,17 @@ bool C5StoreBarcode::printOneBarcode(const QString &code, const QString &printer
     QPainter p(&printer);
     p.rotate(90);
     p.translate(0, -420);
-    QFont f("Arial", 32, QFont::Normal);
+    QFont f("ArTarumianHandes", 40, QFont::Normal);
     p.setFont(f);
-    p.drawText(QPoint(70, 50), "elina");
+    p.drawText(QPoint(40, 50), "elina");
+    f.setFamily("Arial");
     f.setPointSize(14);
     p.setFont(f);
     p.drawText(QPoint(20, 110), "MODEL: ");
     f.setBold(true);
+    f.setPointSize(16);
     p.setFont(f);
-    p.drawText(QPoint(20, 110), "               " + code.right(code.length() - 7));
+    p.drawText(QPoint(20, 110), "             " + code.right(code.length() - 7));
     f.setBold(false);
     p.setFont(f);
     if (code.left(2).toInt() < 20) {
@@ -88,14 +91,21 @@ bool C5StoreBarcode::printOneBarcode(const QString &code, const QString &printer
         }
         p.drawText(QPoint(190, 190), QString("pieces: %1").arg(sizes.count()));
     } else {
+        f.setBold(false);
+        f.setPointSize(14);
+        p.setFont(f);
         p.drawText(QPoint(20, 170), "SIZE: ");
         f.setBold(true);
+        f.setPointSize(16);
         p.setFont(f);
         p.drawText(QPoint(20, 170), "             " + code.left(2));
     }
-    BarcodeI2of5 b;
-    b.EncodeI2of5(code.toLatin1().data());
-    b.DrawBarcode(p, 50, 210, 290, 290);
+//    Barcode93 b;
+//    b.Encode93(code.toLatin1().data());
+    Barcode128 b;
+    b.Encode128A(code.toLatin1().data());
+    b.DrawBarcode(p, 50, 210, 290, 290, 2.5);
+
     f.setBold(true);
     f.setPointSize(10);
     p.setFont(f);
@@ -104,8 +114,8 @@ bool C5StoreBarcode::printOneBarcode(const QString &code, const QString &printer
             .arg(code.mid(2,3))
             .arg(code.mid(5,2))
             .arg(code.right(code.length() - 7));
-    p.drawText(QPoint(20, 350), code2);
-    p.drawText(QPoint(20, 400), "MADE IN ARMENIA");
+    p.drawText(QPoint(60, 350), code2);
+    p.drawText(QPoint(45, 400), "MADE IN ARMENIA");
     return printer.printerState() != QPrinter::Error;
 }
 
@@ -121,7 +131,7 @@ void C5StoreBarcode::print()
         if (!ui->tbl->checkBox(i, 3)->isChecked()) {
             continue;
         }
-        for (int j = 0; j < ui->tbl->getInteger(i, 2); j++) {
+        for (int j = 0; j < ui->tbl->lineEdit(i, 2)->getInteger(); j++) {
             printOneBarcode(ui->tbl->getString(i, 1), pd.printer()->printerName());
             ui->tbl->checkBox(i, 3)->setChecked(false);
         }

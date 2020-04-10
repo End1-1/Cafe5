@@ -99,8 +99,7 @@ public:
 		if(i_Ratio<=0)	i_Ratio=1;
 	}
 
-    void DrawBarcode(QPainter &pr, qreal iX, qreal iY0, qreal iY10, qreal iY11) {
-        qreal iPenW = 2;
+    void DrawBarcode(QPainter &pr, qreal iX, qreal iY0, qreal iY10, qreal iY11, qreal iPenW) {
         QPen pBar(Qt::black);
         pBar.setWidthF(iPenW);
         QPen pSpace(Qt::white);
