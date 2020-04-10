@@ -22,10 +22,13 @@ public:
 
 private:
     Ui::C5StoreBarcode *ui;
+
     bool printOneBarcode(const QString &code, const QString &printerName);
 
 private slots:
     void print();
+
+    void setList();
 
 };
 

@@ -2881,9 +2881,43 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="c5storebarcode.cpp" line="14"/>
+        <location filename="c5storebarcode.cpp" line="15"/>
         <source>Barcode print</source>
         <translation>Տպել շտրիխերը</translation>
+    </message>
+    <message>
+        <location filename="c5storebarcode.cpp" line="43"/>
+        <source>Set list</source>
+        <translation>Նշել
+ցանկը</translation>
+    </message>
+</context>
+<context>
+    <name>C5StoreBarcodeList</name>
+    <message>
+        <location filename="c5storebarcodelist.ui" line="14"/>
+        <source>Range</source>
+        <translation>Ցանկ</translation>
+    </message>
+    <message>
+        <location filename="c5storebarcodelist.ui" line="20"/>
+        <source>Start</source>
+        <translation>Սկիզբ</translation>
+    </message>
+    <message>
+        <location filename="c5storebarcodelist.ui" line="30"/>
+        <source>End</source>
+        <translation>Ավարտ</translation>
+    </message>
+    <message>
+        <location filename="c5storebarcodelist.ui" line="68"/>
+        <source>OK</source>
+        <translation>Ընդունել</translation>
+    </message>
+    <message>
+        <location filename="c5storebarcodelist.ui" line="75"/>
+        <source>Cancel</source>
+        <translation>Հրաժարվել</translation>
     </message>
 </context>
 <context>

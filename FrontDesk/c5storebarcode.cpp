@@ -1,6 +1,7 @@
 #include "c5storebarcode.h"
 #include "ui_c5storebarcode.h"
 #include "barcode5.h"
+#include "c5storebarcodelist.h"
 #include "c5checkbox.h"
 #include <QPainter>
 #include <QPrintDialog>
@@ -39,6 +40,7 @@ QToolBar *C5StoreBarcode::toolBar()
         QList<ToolBarButtons> btn;
         btn << ToolBarButtons::tbPrint;
         createStandartToolbar(btn);
+        fToolBar->addAction(QIcon(":/show_list.png"), tr("Set list"), this, SLOT(setList()));
     }
     return fToolBar;
 }
@@ -122,6 +124,19 @@ void C5StoreBarcode::print()
         for (int j = 0; j < ui->tbl->getInteger(i, 2); j++) {
             printOneBarcode(ui->tbl->getString(i, 1), pd.printer()->printerName());
             ui->tbl->checkBox(i, 3)->setChecked(false);
+        }
+    }
+}
+
+void C5StoreBarcode::setList()
+{
+    int r1, r2 = ui->tbl->rowCount();
+    if (C5StoreBarcodeList::getList(r1, r2)) {
+        for (int i = 0; i < ui->tbl->rowCount(); i++) {
+            ui->tbl->checkBox(i, 3)->setChecked(false);
+        }
+        for (int i = r1; i < r2 + 1; i++) {
+            ui->tbl->checkBox(i, 3)->setChecked(true);
         }
     }
 }

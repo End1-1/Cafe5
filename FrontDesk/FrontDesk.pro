@@ -10,6 +10,11 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 RC_FILE = res.rc
 
+win32: QMAKE_CXXFLAGS_RELEASE -= -Zc:strictStrings
+win32: QMAKE_CFLAGS_RELEASE -= -Zc:strictStrings
+win32: QMAKE_CFLAGS -= -Zc:strictStrings
+win32: QMAKE_CXXFLAGS -= -Zc:strictStrings
+
 TARGET = FrontDesk
 TEMPLATE = app
 
@@ -84,6 +89,7 @@ SOURCES += \
     c5salarydoc.cpp \
     c5serviceconfig.cpp \
     c5storebarcode.cpp \
+    c5storebarcodelist.cpp \
     dlgchangeoutputstore.cpp \
         main.cpp \
         c5mainwindow.cpp \
@@ -308,6 +314,7 @@ HEADERS += \
     ../Controls/c5lineeditwithselector.h \
     c5serviceconfig.h \
     c5storebarcode.h \
+    c5storebarcodelist.h \
     c5storedoc.h \
     ../Reports/cr5goodsstorages.h \
     ../Reports/cr5goodspartners.h \
@@ -434,6 +441,7 @@ FORMS += \
     c5selector.ui \
     c5serviceconfig.ui \
     c5storebarcode.ui \
+    c5storebarcodelist.ui \
     c5storedoc.ui \
     ../Reports/cr5materialinstorefilter.ui \
     ../Reports/cr5goodsmovementfilter.ui \

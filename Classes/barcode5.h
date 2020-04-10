@@ -1404,7 +1404,7 @@ private:
 		const int iLen=strlen(pszCode);
 		int i,iSum=0,iItem;
 
-		for(i=iLen;i >=1;i--)
+        for(i=iLen;i >=1; i--)
 		{
 			iItem=i%2?(pszCode[i-1]-'0')*1:(pszCode[i-1]-'0')*3;
 			iSum+=iItem;

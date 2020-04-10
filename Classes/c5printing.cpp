@@ -336,7 +336,7 @@ void C5Printing::print(const QString &printername, QPrinter::PageSize pageSize, 
         printer.setOrientation(o);
         printer.setPageSize(pageSize);
         QPainter painter(&printer);
-        if (rotate90 > 0) {
+        if (rotate90) {
             painter.rotate(90);
             painter.translate(0, -painter.viewport().width());
         }

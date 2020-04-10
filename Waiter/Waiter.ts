@@ -2055,6 +2055,19 @@ ORDER</source>
     </message>
 </context>
 <context>
+    <name>PrintTaxN</name>
+    <message>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="75"/>
+        <source>Socket read error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="83"/>
+        <source>Data read timeout</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <location filename="main.cpp" line="14"/>

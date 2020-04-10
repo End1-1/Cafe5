@@ -326,6 +326,7 @@ PrintBarcodeWidget::PrintBarcodeWidget(C5Printing *prn, QWidget *parent) :
 
 void PrintBarcodeWidget::paintEvent(QPaintEvent *event)
 {
+    Q_UNUSED(event);
     QPainter p(this);
     p.scale(0.5, 0.5);
     print->print(&p);
