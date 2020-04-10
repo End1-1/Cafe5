@@ -111,6 +111,7 @@ public:
         BYTE bBar;
         int i1,iNum1;
         int iY;
+
         for(i0 = 0; i0 < iNum0; i0++)
         {
             bBar	= *pb & 0x01;
@@ -124,8 +125,6 @@ public:
                     pr.setPen(pSpace);
                 }
                 pr.drawLine(iX, iY0, iX, iY);
-//				::MoveToEx(hDC,iX,iY0,0);
-//				::LineTo(hDC,iX,iY);
                 iX += (iPenW * 1);
             }
             pb++;

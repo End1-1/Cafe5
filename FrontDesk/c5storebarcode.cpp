@@ -48,7 +48,7 @@ QToolBar *C5StoreBarcode::toolBar()
 
 bool C5StoreBarcode::printOneBarcode(const QString &code, const QString &printerName)
 {
-    QPrinter printer(QPrinter::PrinterResolution);
+    QPrinter printer(QPrinter::HighResolution);
     printer.setPrinterName(printerName);
     printer.setOrientation(QPrinter::Portrait);
     printer.setPageSize(QPrinter::Custom);
@@ -100,11 +100,38 @@ bool C5StoreBarcode::printOneBarcode(const QString &code, const QString &printer
         p.setFont(f);
         p.drawText(QPoint(20, 170), "             " + code.left(2));
     }
-//    Barcode93 b;
-//    b.Encode93(code.toLatin1().data());
-    Barcode128 b;
-    b.Encode128A(code.toLatin1().data());
-    b.DrawBarcode(p, 50, 210, 290, 290, 2.5);
+//    Barcode39 b;
+//    b.Encode39(code.toLatin1().data());
+    Barcode93 b;
+    b.Encode93(code.toLatin1().data());
+//    Barcode128 b;
+//    b.Encode128A(code.toLatin1().data());
+    int of = 0;
+    switch (code.length()) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+        of = 80;
+        break;
+    case 7:
+    case 8:
+    case 9:
+        of = 50;
+        break;
+    case 10:
+        of = 40;
+        break;
+    default:
+        of = 30;
+        break;
+    }
+
+    qreal plen = 2;
+    b.DrawBarcode(p, of, 210, 270, 270, plen);
 
     f.setBold(true);
     f.setPointSize(10);
@@ -145,7 +172,7 @@ void C5StoreBarcode::setList()
         for (int i = 0; i < ui->tbl->rowCount(); i++) {
             ui->tbl->checkBox(i, 3)->setChecked(false);
         }
-        for (int i = r1; i < r2 + 1; i++) {
+        for (int i = r1 - 1; i < r2; i++) {
             ui->tbl->checkBox(i, 3)->setChecked(true);
         }
     }
