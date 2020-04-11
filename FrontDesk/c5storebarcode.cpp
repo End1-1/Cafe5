@@ -126,7 +126,7 @@ bool C5StoreBarcode::printOneBarcode(const QString &code, const QString &printer
         of = 40;
         break;
     default:
-        of = 30;
+        of = 20;
         break;
     }
 
