@@ -50,7 +50,12 @@ bool C5StoreBarcode::printOneBarcode(const QString &code, QPrintDialog &pd)
     QPrinter printer(QPrinter::HighResolution);
     printer.setPrinterName(pd.printer()->printerName());
     printer.setOrientation(pd.printer()->orientation());
-    printer.setPageSize(pd.printer()->pageSize());
+    QSizeF szf = printer.pageSizeMM();
+    szf = pd.printer()->pageSizeMM();
+    printer.setPageSizeMM(szf);
+    QPrinter::PageSize ps = printer.pageSize();
+    ps = pd.printer()->pageSize();
+    printer.setPageSize(ps);
     QPainter p(&printer);
     Barcode93 b;
     b.Encode93(code.toLatin1().data());
@@ -62,8 +67,8 @@ bool C5StoreBarcode::printOneBarcode(const QString &code, QPrintDialog &pd)
         f.setPointSize(14);
         f.setBold(true);
         p.setFont(f);
-        b.DrawBarcode(p, 60, 110, 220, 220, plen);
-        p.drawText(150, 270, code);
+        b.DrawBarcode(p, 50, 40, 180, 180, plen);
+        p.drawText(160, 220, code);
         return printer.printerState() != QPrinter::Error;
     }
     p.rotate(90);
