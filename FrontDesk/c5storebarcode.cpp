@@ -5,7 +5,6 @@
 #include "c5lineedit.h"
 #include "c5checkbox.h"
 #include <QPainter>
-#include <QPrintDialog>
 
 C5StoreBarcode::C5StoreBarcode(const QStringList &dbParams, QWidget *parent) :
     C5Widget(dbParams, parent),
@@ -46,17 +45,29 @@ QToolBar *C5StoreBarcode::toolBar()
     return fToolBar;
 }
 
-bool C5StoreBarcode::printOneBarcode(const QString &code, const QString &printerName)
+bool C5StoreBarcode::printOneBarcode(const QString &code, QPrintDialog &pd)
 {
     QPrinter printer(QPrinter::HighResolution);
-    printer.setPrinterName(printerName);
-    printer.setOrientation(QPrinter::Portrait);
-    printer.setPageSize(QPrinter::Custom);
+    printer.setPrinterName(pd.printer()->printerName());
+    printer.setOrientation(pd.printer()->orientation());
+    printer.setPageSize(pd.printer()->pageSize());
     QPainter p(&printer);
-    p.rotate(90);
-    p.translate(0, -420);
+    Barcode93 b;
+    b.Encode93(code.toLatin1().data());
     QFont f("ArTarumianHandes", 40, QFont::Normal);
     p.setFont(f);
+    qreal plen = 2;
+    if (code.length() == 4) {
+        plen = 5;
+        f.setPointSize(14);
+        f.setBold(true);
+        p.setFont(f);
+        b.DrawBarcode(p, 60, 110, 220, 220, plen);
+        p.drawText(150, 270, code);
+        return printer.printerState() != QPrinter::Error;
+    }
+    p.rotate(90);
+    p.translate(0, -420);
     p.drawText(QPoint(40, 50), "elina");
     f.setFamily("Arial");
     f.setPointSize(14);
@@ -102,8 +113,6 @@ bool C5StoreBarcode::printOneBarcode(const QString &code, const QString &printer
     }
 //    Barcode39 b;
 //    b.Encode39(code.toLatin1().data());
-    Barcode93 b;
-    b.Encode93(code.toLatin1().data());
 //    Barcode128 b;
 //    b.Encode128A(code.toLatin1().data());
     int of = 0;
@@ -129,8 +138,6 @@ bool C5StoreBarcode::printOneBarcode(const QString &code, const QString &printer
         of = 20;
         break;
     }
-
-    qreal plen = 2;
     b.DrawBarcode(p, of, 210, 270, 270, plen);
 
     f.setBold(true);
@@ -159,7 +166,7 @@ void C5StoreBarcode::print()
             continue;
         }
         for (int j = 0; j < ui->tbl->lineEdit(i, 2)->getInteger(); j++) {
-            printOneBarcode(ui->tbl->getString(i, 1), pd.printer()->printerName());
+            printOneBarcode(ui->tbl->getString(i, 1), pd);
             ui->tbl->checkBox(i, 3)->setChecked(false);
         }
     }

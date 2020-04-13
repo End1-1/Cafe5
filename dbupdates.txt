@@ -299,6 +299,7 @@ drop table c_goods_scancode;
 update s_app set f_version ='16' where f_app='DB';
 create table d_dish_state (f_id integer primary key, f_name tinytext);
 insert into d_dish_state (f_id, f_name) values (0, 'Ոչ ակտիվ'),(1, 'Ակտիվ');
+insert into c_partners (f_id, f_contact) select f_id, concat(f_firstname, ' ', f_lastname)  from b_clients;
 drop table b_clients;
 alter table c_Partners add column f_address tinytext;
 create table o_additional (f_id char(36), f_coordinates tinytext, f_customer integer);
@@ -306,3 +307,4 @@ alter table s_user add column f_config integer;
 
 /* DB - 17 */
 update s_app set f_version ='17' where f_app='DB';
+ALTER TABLE `s_user` ADD COLUMN `f_config` INT NULL AFTER `f_altPassword`;

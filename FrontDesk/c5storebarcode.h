@@ -2,6 +2,7 @@
 #define C5STOREBARCODE_H
 
 #include "c5widget.h"
+#include <QPrintDialog>
 
 namespace Ui {
 class C5StoreBarcode;
@@ -23,7 +24,7 @@ public:
 private:
     Ui::C5StoreBarcode *ui;
 
-    bool printOneBarcode(const QString &code, const QString &printerName);
+    bool printOneBarcode(const QString &code, QPrintDialog &pd);
 
 private slots:
     void print();
