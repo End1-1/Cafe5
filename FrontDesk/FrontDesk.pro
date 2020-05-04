@@ -37,6 +37,7 @@ DEFINES += FRONTDESK
 
 
 SOURCES += \
+    ../../NewTax/Src/printtaxn.cpp \
     ../Cafe5/c5cafecommon.cpp \
     ../Cafe5/c5double.cpp \
     ../Cafe5/c5license.cpp \
@@ -68,6 +69,7 @@ SOURCES += \
     ../Reports/cr5dishpackage.cpp \
     ../Reports/cr5goodsclasses.cpp \
     ../Reports/cr5goodsfilter.cpp \
+    ../Reports/cr5goodsimages.cpp \
     ../Reports/cr5menureview.cpp \
     ../Reports/cr5menureviewfilter.cpp \
     ../Reports/cr5salarybyworkers.cpp \
@@ -81,9 +83,11 @@ SOURCES += \
     ../Reports/cr5storereason.cpp \
     barcode.cpp \
     c5cashdoc.cpp \
+    c5checkdatabase.cpp \
     c5costumerdebtpayment.cpp \
     c5dishgroupaction.cpp \
     c5document.cpp \
+    c5goodsimage.cpp \
     c5inputdate.cpp \
     c5progressdialog.cpp \
     c5salarydoc.cpp \
@@ -217,6 +221,7 @@ SOURCES += \
     ../../XLSX/src/xlsxwriter.cpp
 
 HEADERS += \
+    ../../NewTax/Src/printtaxn.h \
     ../Cafe5/c5cafecommon.h \
     ../Cafe5/c5double.h \
     ../Cafe5/c5license.h \
@@ -249,6 +254,7 @@ HEADERS += \
     ../Reports/cr5dishpackage.h \
     ../Reports/cr5goodsclasses.h \
     ../Reports/cr5goodsfilter.h \
+    ../Reports/cr5goodsimages.h \
     ../Reports/cr5menureview.h \
     ../Reports/cr5menureviewfilter.h \
     ../Reports/cr5salarybyworkers.h \
@@ -263,9 +269,11 @@ HEADERS += \
     ../Service/servicecommands.h \
     barcode.h \
     c5cashdoc.h \
+    c5checkdatabase.h \
     c5costumerdebtpayment.h \
     c5dishgroupaction.h \
     c5document.h \
+    c5goodsimage.h \
     c5inputdate.h \
         c5mainwindow.h \
     ../Cafe5/c5config.h \
@@ -416,14 +424,17 @@ FORMS += \
     ../Reports/cr5costumerdebtsfilter.ui \
     ../Reports/cr5discountstatisticsfilter.ui \
     ../Reports/cr5goodsfilter.ui \
+    ../Reports/cr5goodsimages.ui \
     ../Reports/cr5menureviewfilter.ui \
     ../Reports/cr5salarybyworkersfilter.ui \
     ../Reports/cr5salefromstoretotalfilter.ui \
     ../Reports/cr5saleremoveddishesfilter.ui \
     ../Reports/cr5salesbydishesfilter.ui \
     c5cashdoc.ui \
+    c5checkdatabase.ui \
     c5costumerdebtpayment.ui \
     c5dishgroupaction.ui \
+    c5goodsimage.ui \
     c5inputdate.ui \
         c5mainwindow.ui \
     ../Cafe5/c5connection.ui \
@@ -496,6 +507,7 @@ INCLUDEPATH += ../Waiter
 INCLUDEPATH += ../RESOURCES
 INCLUDEPATH += ../Service
 INCLUDEPATH += c:/projects/xlsx/src
+INCLUDEPATH += C:/Projects/NewTax/Src
 INCLUDEPATH += C:/OpenSSL-Win32/include
 INCLUDEPATH += C:/OpenSSL-Win32/include/openssl
 
@@ -511,6 +523,7 @@ DISTFILES += \
 ICON = storehouse.ico
 
 LIBS += -lVersion
+LIBS += -lwsock32
 LIBS += -LC:/OpenSSL-Win32/lib
 LIBS += -lopenssl
 LIBS += -llibcrypto

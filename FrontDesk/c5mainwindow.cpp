@@ -33,6 +33,7 @@
 #include "cr5salesbydishes.h"
 #include "cr5tstoreextra.h"
 #include "cr5costumerdebts.h"
+#include "cr5goodsimages.h"
 #include "cr5storedocuments.h"
 #include "cr5dishpart2.h"
 #include "cr5dishpriceselfcost.h"
@@ -291,6 +292,7 @@ void C5MainWindow::on_actionLogin_triggered()
             addTreeL3Item(it, cp_t2_store_output, tr("New store output"), ":/goods.png");
             addTreeL3Item(it, cp_t2_store_move, tr("New store movement"), ":/goods.png");
             addTreeL3Item(it, cp_t2_store_complectation, tr("New store complecation"), ":/goods.png");
+            addTreeL3Item(it, cp_t2_store_decomplectation, tr("New store decomplecation"), ":/goods.png");
             addTreeL3Item(it, cp_t2_store_inventory, tr("New store inventory"), ":/goods.png");
             if (__c5config.frontDeskMode() == FRONTDESK_WAITER) {
                 addTreeL3Item(it, cp_t2_calculate_self_cost, tr("Calculate dishes self cost"), ":/menu.png");
@@ -378,6 +380,7 @@ void C5MainWindow::on_actionLogin_triggered()
             addTreeL3Item(it, cp_t6_waste, tr("Autowaste"), ":/goods.png");
             addTreeL3Item(it, cp_t6_units, tr("Units"), ":/goods.png");
             addTreeL3Item(it, cp_t6_classes, tr("Classes"), ":/goods.png");
+            addTreeL3Item(it, cp_t6_goods_images, tr("Images"), ":/images.png");
         }
 
         if (pr(db.getString(3), cp_t7_other)) {
@@ -571,6 +574,11 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
         sd->setMode(C5StoreDoc::sdComplectation);
         break;
     }
+    case cp_t2_store_decomplectation: {
+        C5StoreDoc *sd = createTab<C5StoreDoc>(dbParams);
+        sd->setMode(C5StoreDoc::sdDeComplectation);
+        break;
+    }
     case cp_t3_sales_common:
         createTab<CR5CommonSales>(dbParams);
         break;
@@ -654,6 +662,9 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
         break;
     case cp_t6_storage:
         createTab<CR5GoodsStorages>(dbParams);
+        break;
+    case cp_t6_goods_images:
+        createTab<CR5GoodsImages>(dbParams);
         break;
     case cp_t7_partners:
         createTab<CR5GoodsPartners>(dbParams);

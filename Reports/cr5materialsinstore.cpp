@@ -3,6 +3,8 @@
 #include "c5tablemodel.h"
 #include "c5mainwindow.h"
 #include "c5storebarcode.h"
+#include "ce5goods.h"
+#include "ce5editor.h"
 
 CR5MaterialsInStore::CR5MaterialsInStore(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
@@ -72,6 +74,8 @@ void CR5MaterialsInStore::prepareDrafts()
                    << "g.f_lowlevel"
                    << "g.f_saleprice"
                    << "sum(s.f_qty*s.f_type)*g.f_saleprice as f_totalsale"
+                   << "g.f_saleprice2"
+                   << "sum(s.f_qty*s.f_type)*g.f_saleprice2 as f_totalsale2"
                       ;
 
     fColumnsGroup << "g.f_id as f_code"
@@ -82,11 +86,13 @@ void CR5MaterialsInStore::prepareDrafts()
                    << "g.f_name as f_goods"
                    << "g.f_lowlevel"
                    << "g.f_saleprice"
+                   << "g.f_saleprice2"
                       ;
 
     fColumnsSum << "f_qty"
                 << "f_total"
                 << "f_totalsale"
+                << "f_totalsale2"
                       ;
 
     fHavindCondition = " having sum(s.f_qty*s.f_type) <> 0 ";
@@ -101,8 +107,10 @@ void CR5MaterialsInStore::prepareDrafts()
     fTranslation["f_lastinputprice"] = tr("Price");
     fTranslation["f_total"] = tr("Amount");
     fTranslation["f_lowlevel"] = tr("Warning");
-    fTranslation["f_saleprice"] = tr("Sale price");
-    fTranslation["f_totalsale"] = tr("Sale amount");
+    fTranslation["f_saleprice"] = tr("Retail price");
+    fTranslation["f_totalsale"] = tr("Retail amount");
+    fTranslation["f_saleprice2"] = tr("Whosale price");
+    fTranslation["f_totalsale2"] = tr("Whosale amount");
 
     fColumnsVisible["g.f_id as f_code"] = true;
     fColumnsVisible["ss.f_name as f_storage"] = true;
@@ -116,6 +124,8 @@ void CR5MaterialsInStore::prepareDrafts()
     fColumnsVisible["g.f_lowlevel"] = true;
     fColumnsVisible["g.f_saleprice"] = false;
     fColumnsVisible["sum(s.f_qty*s.f_type)*g.f_saleprice as f_totalsale"] = false;
+    fColumnsVisible["g.f_saleprice2"] = false;
+    fColumnsVisible["sum(s.f_qty*s.f_type)*g.f_saleprice2 as f_totalsale2"] = false;
     restoreColumnsVisibility();
 }
 
@@ -149,6 +159,8 @@ void CR5MaterialsInStore::prepareNoDrafts()
                    << "g.f_lowlevel"
                    << "g.f_saleprice"
                    << "sum(s.f_qty*s.f_type)*g.f_saleprice as f_totalsale"
+                   << "g.f_saleprice2"
+                   << "sum(s.f_qty*s.f_type)*g.f_saleprice2 as f_totalsale2"
                       ;
 
     fColumnsGroup << "g.f_id as f_code"
@@ -159,11 +171,13 @@ void CR5MaterialsInStore::prepareNoDrafts()
                    << "g.f_name as f_goods"
                    << "g.f_lowlevel"
                    << "g.f_saleprice"
+                   << "g.f_saleprice2"
                       ;
 
     fColumnsSum << "f_qty"
                 << "f_total"
                 << "f_totalsale"
+                << "f_totalsale2"
                       ;
 
     fHavindCondition = " having sum(s.f_qty*s.f_type) <> 0 ";
@@ -178,8 +192,10 @@ void CR5MaterialsInStore::prepareNoDrafts()
     fTranslation["f_price"] = tr("Price");
     fTranslation["f_total"] = tr("Amount");
     fTranslation["f_lowlevel"] = tr("Warning");
-    fTranslation["f_saleprice"] = tr("Sale price");
-    fTranslation["f_totalsale"] = tr("Sale amount");
+    fTranslation["f_saleprice"] = tr("Retail price");
+    fTranslation["f_totalsale"] = tr("Retail amount");
+    fTranslation["f_saleprice2"] = tr("Whosale price");
+    fTranslation["f_totalsale2"] = tr("Whosale amount");
 
     fColumnsVisible["g.f_id as f_code"] = true;
     fColumnsVisible["ss.f_name as f_storage"] = true;
@@ -193,6 +209,8 @@ void CR5MaterialsInStore::prepareNoDrafts()
     fColumnsVisible["g.f_lowlevel"] = true;
     fColumnsVisible["g.f_saleprice"] = false;
     fColumnsVisible["sum(s.f_qty*s.f_type)*g.f_saleprice as f_totalsale"] = false;
+    fColumnsVisible["g.f_saleprice2"] = false;
+    fColumnsVisible["sum(s.f_qty*s.f_type)*g.f_saleprice2 as f_totalsale2"] = false;
     restoreColumnsVisibility();
 }
 
@@ -231,4 +249,19 @@ void CR5MaterialsInStore::buildQuery()
         prepareNoDrafts();
     }
     C5Grid::buildQuery();
+}
+
+bool CR5MaterialsInStore::on_tblView_doubleClicked(const QModelIndex &index)
+{
+    if (!fColumnsVisible["g.f_id as f_code"]) {
+        C5Message::info(tr("Code column must be included in report"));
+        return false;
+    }
+    CE5Goods *ep = new CE5Goods(fDBParams);
+    C5Editor *e = C5Editor::createEditor(fDBParams, ep, fModel->data(index.row(), fModel->indexForColumnName("f_code"), Qt::EditRole).toInt());
+    QList<QMap<QString, QVariant> > data;
+    if(e->getResult(data)) {
+
+    }
+    return C5ReportWidget::on_tblView_doubleClicked(index);
 }

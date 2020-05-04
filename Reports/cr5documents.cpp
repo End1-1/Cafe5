@@ -5,6 +5,7 @@
 #include "c5tablemodel.h"
 #include "c5mainwindow.h"
 #include "c5salarydoc.h"
+#include "c5storedraftwriter.h"
 #include "c5cashdoc.h"
 #include <QMenu>
 
@@ -21,6 +22,7 @@ CR5Documents::CR5Documents(const QStringList &dbParams, QWidget *parent) :
                     << "left join a_state ds on ds.f_id=h.f_state [ds]"
                     << "left join a_type dt on dt.f_id=h.f_type [dt]"
                     << "left join a_store sa on sa.f_document=h.f_id [sa]"
+                    << "left join a_header_store hs on hs.f_id=h.f_id [hs]"
                        ;
 
     fColumnsFields << "distinct(h.f_id) as f_id"
@@ -31,7 +33,7 @@ CR5Documents::CR5Documents(const QStringList &dbParams, QWidget *parent) :
                    << "p.f_taxname"
                    << "h.f_amount"
                    << "h.f_comment"
-                   << "h.f_invoice"
+                   << "hs.f_invoice"
                    << "u.f_login as f_operatorname"
                    << "h.f_createdate"
                    << "h.f_createtime"
@@ -60,7 +62,7 @@ CR5Documents::CR5Documents(const QStringList &dbParams, QWidget *parent) :
     fColumnsVisible["p.f_taxname"] = true;
     fColumnsVisible["h.f_amount"] = true;
     fColumnsVisible["h.f_comment"] = true;
-    fColumnsVisible["h.f_invoice"] = true;
+    fColumnsVisible["hs.f_invoice"] = true;
     fColumnsVisible["u.f_login as f_operatorname"] = true;
     fColumnsVisible["h.f_createdate"] = true;
     fColumnsVisible["h.f_createtime"] = true;
@@ -214,14 +216,12 @@ void CR5Documents::saveDocs()
         case DOC_TYPE_STORE_INPUT:
         case DOC_TYPE_STORE_MOVE:
         case DOC_TYPE_STORE_OUTPUT:
+        case DOC_TYPE_COMPLECTATION:
             d.openDoc(docid);
-            db.startTransaction();
-            if (d.saveDraft(db, DOC_STATE_SAVED, e, false)) {
+            if (d.writeDocument(DOC_STATE_SAVED, err)) {
                 fModel->setData(row, fModel->indexForColumnName("f_statename"), tr("Saved"));
                 fModel->setData(row, fModel->indexForColumnName("f_amount"), 0);
-                db.commit();
             } else {
-                db.rollback();
                 err += e;
             }
             e = "";
@@ -272,14 +272,12 @@ void CR5Documents::draftDocs()
         case DOC_TYPE_STORE_INPUT:
         case DOC_TYPE_STORE_MOVE:
         case DOC_TYPE_STORE_OUTPUT:
+        case DOC_TYPE_COMPLECTATION:
             d.openDoc(docid);
-            db.startTransaction();
-            if (d.saveDraft(db, DOC_STATE_DRAFT, err, false)) {
+            if (d.writeDocument(DOC_STATE_DRAFT, err)) {
                 fModel->setData(row, fModel->indexForColumnName("f_statename"), tr("Draft"));
                 fModel->setData(row, fModel->indexForColumnName("f_amount"), 0);
-                db.commit();
             } else {
-                db.rollback();
             }
             break;
         default:

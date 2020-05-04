@@ -22,7 +22,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also make your code fail to compile if you use deprecated APIs.
 # In order to do so, uncomment the following line.
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
-#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
+#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
+# disables all the APIs deprecated before Qt 6.0.0
 
 
 SOURCES += \
@@ -45,6 +46,7 @@ SOURCES += \
     ../Classes/c5gridgilter.cpp \
     ../Classes/c5printing.cpp \
     ../Classes/c5printpreview.cpp \
+    ../Classes/c5shoporder.cpp \
     ../Classes/c5storedraftwriter.cpp \
     ../Classes/c5tablemodel.cpp \
     ../Classes/c5tableview.cpp \
@@ -57,10 +59,16 @@ SOURCES += \
     ../FrontDesk/c5document.cpp \
     ../FrontDesk/c5filtervalues.cpp \
     ../FrontDesk/c5selector.cpp \
+    c5replication.cpp \
     dlgpin.cpp \
         main.cpp \
     printreceipt.cpp \
+    replicadialog.cpp \
     sales.cpp \
+    settingsselection.cpp \
+    storeinput.cpp \
+    viewinputitem.cpp \
+    vieworder.cpp \
         working.cpp \
     worder.cpp \
     goods.cpp \
@@ -103,6 +111,7 @@ HEADERS += \
     ../Classes/c5gridgilter.h \
     ../Classes/c5printing.h \
     ../Classes/c5printpreview.h \
+    ../Classes/c5shoporder.h \
     ../Classes/c5storedraftwriter.h \
     ../Classes/c5tablemodel.h \
     ../Classes/c5tableview.h \
@@ -115,9 +124,15 @@ HEADERS += \
     ../FrontDesk/c5document.h \
     ../FrontDesk/c5filtervalues.h \
     ../FrontDesk/c5selector.h \
+    c5replication.h \
     dlgpin.h \
     printreceipt.h \
+    replicadialog.h \
     sales.h \
+    settingsselection.h \
+    storeinput.h \
+    viewinputitem.h \
+    vieworder.h \
         working.h \
     worder.h \
     goods.h \
@@ -151,7 +166,12 @@ FORMS += \
     ../FrontDesk/c5filtervalues.ui \
     ../FrontDesk/c5selector.ui \
     dlgpin.ui \
+    replicadialog.ui \
     sales.ui \
+    settingsselection.ui \
+    storeinput.ui \
+    viewinputitem.ui \
+    vieworder.ui \
         working.ui \
     worder.ui \
     ../Cafe5/c5connection.ui \
@@ -172,10 +192,9 @@ INCLUDEPATH += ../Reports
 INCLUDEPATH += ../Controls
 INCLUDEPATH += ../Editors
 INCLUDEPATH += ../RESOURCES
-INCLUDEPATH += ../../NewTax/Src
 INCLUDEPATH += ../../XLSX/Src
-INCLUDEPATH += C:/OpenSSL-Win32/include
-INCLUDEPATH += C:/OpenSSL-Win32/include/openssl
+INCLUDEPATH += C:/Projects/NewTax/Src
+
 
 ICON = bag.ico
 

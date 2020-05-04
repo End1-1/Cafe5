@@ -44,9 +44,17 @@
 #define param_tax_cashier_login 39
 #define param_tax_cashier_pin 40
 #define param_control_shop_qty 41
+#define param_rootdb_replica 42
+#define param_rootdb_host 43
+#define param_rootdb_schema 44
+#define param_rootdb_user 45
+#define param_rootdb_pass 46
 
 #define FRONTDESK_WAITER 0
 #define FRONTDESK_SHOP 1
+
+#define SALE_RETAIL 1
+#define SALE_WHOSALE 2
 
 class C5Config
 {
@@ -94,6 +102,8 @@ public:
     static QString taxUseExtPos();
 
     static QStringList dbParams();
+
+    static QStringList replicaDbParams();
 
     static int defaultMenu();
 
@@ -168,6 +178,16 @@ public:
     static QString taxPin();
 
     static bool controlShopQty();
+
+    static bool rdbReplica();
+
+    static QString rdbHost();
+
+    static QString rdbSchema();
+
+    static QString rdbUser();
+
+    static QString rdbPassword();
 
 private:
     static QString getValue(int key);

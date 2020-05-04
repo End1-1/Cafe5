@@ -14,7 +14,7 @@ C5TableModel::C5TableModel(C5Database &db, QObject *parent) :
     fSingleCheckBoxSelection = true;
 }
 
-void C5TableModel::translate(const QMap<QString, QString> &t)
+void C5TableModel::translate(const QHash<QString, QString> &t)
 {
     fTranslateColumn = t;
 }
@@ -30,11 +30,11 @@ void C5TableModel::execQuery(const QString &query)
             }
             fProxyData << i;
         }
-        for (QMap<QString, int>::const_iterator it = fColumnNameIndex.begin(); it != fColumnNameIndex.end(); it++) {
+        for (QHash<QString, int>::const_iterator it = fColumnNameIndex.begin(); it != fColumnNameIndex.end(); it++) {
             fColumnIndexName[it.value()] = it.key();
         }
         if (fCheckboxes) {
-            for (QMap<QString, int>::iterator it = fColumnNameIndex.begin(); it != fColumnNameIndex.end(); it++) {
+            for (QHash<QString, int>::iterator it = fColumnNameIndex.begin(); it != fColumnNameIndex.end(); it++) {
                 QString k = it.key();
                 int v = it.value() + 1;
                 fColumnNameIndex[k] = v;
@@ -79,7 +79,7 @@ void C5TableModel::sort(int column)
     endResetModel();
 }
 
-void C5TableModel::setExternalData(const QMap<QString, int> &columnNameIndex, const QMap<QString, QString> &translation)
+void C5TableModel::setExternalData(const QHash<QString, int> &columnNameIndex, const QHash<QString, QString> &translation)
 {
     beginResetModel();
     fProxyData.clear();
@@ -93,7 +93,7 @@ void C5TableModel::setExternalData(const QMap<QString, int> &columnNameIndex, co
     for (int i = 0, count = fRawData.count(); i < count; i++) {
         fProxyData << i;
     }
-    for (QMap<QString, int>::const_iterator it = fColumnNameIndex.begin(); it != fColumnNameIndex.end(); it++) {
+    for (QHash<QString, int>::const_iterator it = fColumnNameIndex.begin(); it != fColumnNameIndex.end(); it++) {
         fColumnIndexName[it.value()] = it.key();
     }
     endResetModel();

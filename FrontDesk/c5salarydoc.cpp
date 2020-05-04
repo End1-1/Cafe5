@@ -315,7 +315,7 @@ void C5SalaryDoc::on_btnAddEmployee_clicked()
         return;
     }
     C5Database db(fDBParams);
-    db[":f_id"] = vals.at(0).toInt();
+    db[":f_id"] = vals.at(1).toInt();
     db.exec("select g.f_id, concat(u.f_last, ' ', u.f_first) as f_employee "
             "from s_user u "
             "inner join s_user_group g on g.f_id=u.f_group "

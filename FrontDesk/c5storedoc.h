@@ -1,7 +1,7 @@
 #ifndef C5STOREDOC_H
 #define C5STOREDOC_H
 
-#include "c5widget.h"
+#include "c5document.h"
 #include <QLabel>
 
 namespace Ui {
@@ -17,12 +17,12 @@ public:
     TableCell(QWidget *parent, QTableWidgetItem *item);
 };
 
-class C5StoreDoc : public C5Widget
+class C5StoreDoc : public C5Document
 {
     Q_OBJECT
 
 public:
-    enum STORE_DOC {sdInput = 1, sdOutput, sdMovement, sdInventory, sdCash, sdComplectation};
+    enum STORE_DOC {sdInput = 1, sdOutput, sdMovement, sdInventory, sdCash, sdComplectation, sdDeComplectation};
 
     explicit C5StoreDoc(const QStringList &dbParams, QWidget *parent = nullptr);
 
@@ -36,9 +36,9 @@ public:
 
     virtual QToolBar *toolBar() override;
 
-    static bool removeDoc(const QStringList &dbParams, QString id, bool showmessage = true);
+    bool writeDocument(int state, QString &err);
 
-    bool saveDraft(C5Database &db, int state, QString &err, bool showMsg);
+    static bool removeDoc(const QStringList &dbParams, QString id, bool showmessage = true);
 
     virtual bool allowChangeDatabase() override;
     
@@ -60,6 +60,10 @@ private:
 
     QString fCashUuid;
 
+    QString fCashRowId;
+
+    QString fCashUserId;
+
     TableCell *fGroupTableCell;
 
     QMap<int, double> fBaseQtyOfComplectation;
@@ -70,7 +74,7 @@ private:
 
     int fBasedOnSale;
 
-    void setUserID(bool withUpdate, int value);
+    void setUserId(bool withUpdate, int value);
 
     void countTotal();
 
@@ -80,15 +84,7 @@ private:
 
     void rowsCheck(QString &err);
 
-    bool saveDraft(C5Database &db, int state, QString &err);
-
-    bool insertDraftRow(C5Database &db, int row);
-
-    bool updateDraftRow(C5Database &db, int row);
-
-    void writeInput(C5Database &db);
-
-    bool writeOutput(C5Database &db, const QDate &date, QString docNum, int store, double &amount, QStringList &outId, QString &err);
+    void writeDocumentWithState(int state);
 
     int addGoodsRow();
 
@@ -164,8 +160,6 @@ private slots:
     void on_leScancode_returnPressed();
 
     void on_tblGoodsGroup_customContextMenuRequested(const QPoint &pos);
-
-    void on_btnCreateDoc_clicked();
 
     void on_leComplectationName_textChanged(const QString &arg1);
 

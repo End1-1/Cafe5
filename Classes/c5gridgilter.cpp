@@ -16,7 +16,7 @@ C5GridGilter::~C5GridGilter()
     delete ui;
 }
 
-bool C5GridGilter::filter(C5FilterWidget *filterWidget, QString &condition, QMap<QString, bool> &showColumns, QMap<QString, QString> &colTranslation)
+bool C5GridGilter::filter(C5FilterWidget *filterWidget, QString &condition, QHash<QString, bool> &showColumns, QHash<QString, QString> &colTranslation)
 {
     C5GridGilter *gf = new C5GridGilter();
     filterWidget->restoreFilter(filterWidget);
@@ -34,7 +34,7 @@ bool C5GridGilter::filter(C5FilterWidget *filterWidget, QString &condition, QMap
         }
     }
     QListWidget *lv = gf->ui->lvColumns;
-    for (QMap<QString, bool>::const_iterator it = showColumns.begin(); it != showColumns.end(); it++) {
+    for (QHash<QString, bool>::const_iterator it = showColumns.begin(); it != showColumns.end(); it++) {
         QListWidgetItem *item = new QListWidgetItem(lv);
         item->setData(Qt::UserRole, it.key());
 

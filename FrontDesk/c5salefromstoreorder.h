@@ -21,6 +21,8 @@ public:
 private slots:
     void on_btnRemove_clicked();
 
+    void on_btnPrintTax_clicked();
+
 private:
     Ui::C5SaleFromStoreOrder *ui;
 

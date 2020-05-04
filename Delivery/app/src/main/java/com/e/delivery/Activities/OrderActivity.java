@@ -163,7 +163,8 @@ public class OrderActivity extends ParentActivity {
         Cursor c = db.select(sql);
         if (c.moveToFirst()) {
             do {
-                Goods g = GoodsProvider.getGoods(c.getInt(c.getColumnIndex("goods")));
+                int goodsId = c.getInt(c.getColumnIndex("goods"));
+                Goods g = GoodsProvider.getGoods(goodsId);
                 g.mSelectedQty = c.getDouble(c.getColumnIndex("qty"));
                 GoodsProvider.mReadyGoods.add(g);
             } while (c.moveToNext());
@@ -192,10 +193,11 @@ public class OrderActivity extends ParentActivity {
         }
     }
 
-    void disableEdit() {
+    public void disableEdit() {
+        boolean orderEditable = mOrderUUID.isEmpty();
         List<Fragment> fr = getSupportFragmentManager().getFragments();
         for (Fragment f: fr) {
-            ((FRParentOrder) f).disableEdit(true);
+            ((FRParentOrder) f).disableEdit(!orderEditable);
         }
     }
 }

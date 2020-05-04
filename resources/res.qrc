@@ -74,5 +74,7 @@
         <file>partners.png</file>
         <file>Barcode.ttf</file>
         <file>barcode.png</file>
+        <file>maintenance.png</file>
+        <file>images.png</file>
     </qresource>
 </RCC>

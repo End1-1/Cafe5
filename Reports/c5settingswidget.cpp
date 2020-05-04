@@ -95,6 +95,11 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     fTags[ui->leCashierLogin->getTag()] = ui->leCashierLogin->text();
     fTags[ui->leCashierPin->getTag()] = ui->leCashierPin->text();
     fTags[ui->chControlShopQuantity->getTag()] = ui->chControlShopQuantity->isChecked() ? "1" : "0";
+    fTags[ui->chRDB->getTag()] = ui->chRDB->isChecked() ? "1" : "0";
+    fTags[ui->leRDBHost->getTag()] = ui->leRDBHost->text();
+    fTags[ui->leRDBSchema->getTag()] = ui->leRDBSchema->text();
+    fTags[ui->leRDBUser->getTag()] = ui->leRDBUser->text();
+    fTags[ui->leRDBPassword->getTag()] = ui->leRDBPassword->text();
     C5Database db(fDBParams);
     db[":f_settings"] = ui->leCode->getInteger();
     db.exec("delete from s_settings_values where f_settings=:f_settings");

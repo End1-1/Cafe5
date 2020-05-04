@@ -307,4 +307,86 @@ alter table s_user add column f_config integer;
 
 /* DB - 17 */
 update s_app set f_version ='17' where f_app='DB';
-ALTER TABLE `s_user` ADD COLUMN `f_config` INT NULL AFTER `f_altPassword`;
+ALTER TABLE `s_user` ADD COLUMN `f_config` INT AFTER `f_altPassword`;
+create table c_goods_images (f_id integer primary key , f_data mediumblob);
+create table a_header_store (f_id char(36) primary key ,  f_useraccept integer, f_userpass integer, f_invoice tinytext, f_invoicedate date, f_storein integer, f_storeout integer, f_baseonsale smallint default 0, f_cashuuid char(36),  f_complectation integer, f_complectationqty decimal(14,3));
+/* VERY LONG QUERY */
+insert into a_header_store (f_id, f_baseonsale, f_useraccept, f_userpass, f_invoice, f_invoicedate, f_storein, f_storeout, f_cashuuid, f_complectation, f_complectationqty)
+select h.f_id, 
+if (locate('based_on_sale', f_raw)>0, mid(f_raw, locate('based_on_sale', f_raw) + length('based_on_sal":') + 1, 1), 0) as based_on_sale,
+if (locate('f_accepted', f_raw)>0, 
+	coalesce(nullif(mid(f_raw, locate('f_accepted', f_raw) + length('f_accepted":"') , 
+    locate('"', f_raw, locate('f_accepted', f_raw) + length('f_accepted":"')) - (locate('f_accepted', f_raw) + length('f_accepted":"'))) , ''), 0), 0) as accepted,
+if (locate('f_passed', f_raw)>0, 
+	coalesce(nullif(mid(f_raw, locate('f_passed', f_raw) + length('f_passed":"') , 
+    locate('"', f_raw, locate('f_passed', f_raw) + length('f_passed":"')) - (locate('f_passed', f_raw) + length('f_passed":"'))), ''), 0), 0) as passed,
+if (locate('f_invoice', f_raw)>0, 
+	mid(f_raw, locate('f_invoice', f_raw) + length('f_invoice":"') , 
+    locate('"', f_raw, locate('f_invoice', f_raw) + length('f_invoice":"')) - (locate('f_invoice', f_raw) + length('f_invoice":"'))) , '') as invoice,
+if (locate('f_invoicedate', f_raw)>0, 
+	str_to_date(mid(f_raw, locate('f_invoicedate', f_raw) + length('f_invoicedate":"') , 
+    locate('"', f_raw, locate('f_invoicedate', f_raw) + length('f_invoicedate":"')) - (locate('f_invoicedate', f_raw) + length('f_invoicedate":"'))), '%d.%m.%Y'), null) as invoice_date,
+if (locate('f_storein', f_raw)>0, 
+	coalesce(nullif(mid(f_raw, locate('f_storein', f_raw) + length('f_storein":"') , 
+    locate('"', f_raw, locate('f_storein', f_raw) + length('f_storein":"')) - (locate('f_storein', f_raw) + length('f_storein":"'))), ''), 0), 0) as storein,
+if (locate('f_storeout', f_raw)>0, 
+	coalesce(nullif(mid(f_raw, locate('f_storeout', f_raw) + length('f_storeout":"') , 
+    locate('"', f_raw, locate('f_storeout', f_raw) + length('f_storeout":"')) - (locate('f_storeout', f_raw) + length('f_storeout":"'))) , ''), 0), 0) as storeout,
+if (locate('f_cashuuid', f_raw)>0, 
+	mid(f_raw, locate('f_cashuuid', f_raw) + length('f_cashuuid":"') , 
+    locate('"', f_raw, locate('f_cashuuid', f_raw) + length('f_cashuuid":"')) - (locate('f_cashuuid', f_raw) + length('f_cashuuid":"'))) , '') as cashuuid,
+if (locate('f_complectation', f_raw)>0, 
+	coalesce(nullif(mid(f_raw, locate('f_complectation', f_raw) + length('f_complectation":"') , 
+    locate('"', f_raw, locate('f_complectation', f_raw) + length('f_complectation":"')) - (locate('f_complectation', f_raw) + length('f_complectation":"'))) , ''), 0), 0) as complectation,
+if (locate('f_complectationqty', f_raw)>0, 
+	coalesce(nullif(mid(f_raw, locate('f_complectationqty', f_raw) + length('f_complectationqty":"') , 
+    locate('"', f_raw, locate('f_complectationqty', f_raw) + length('f_complectationqty":"')) - (locate('f_complectationqty', f_raw) + length('f_complectationqty":"'))), ''), 0), 0) as complectationqty
+from a_header h ;
+/* END OF VERY LONG QUERY */
+alter table a_header drop column f_invoice, drop column f_raw;
+create table a_header_cash (f_id char(36) primary key, f_cashin integer, f_cashout integer, f_related smallint, f_storedoc char(36));
+alter table e_cash drop column f_autoinput;
+ALTER TABLE e_cash  CHANGE COLUMN `f_id` `f_id` CHAR(36) NOT NULL ;
+alter table e_cash add column f_base char(36);
+ALTER TABLE `e_cash` ADD INDEX `idx_ecash_base` (`f_base` ASC);
+alter table e_cash add column f_row smallint;
+ALTER TABLE `e_cash` ADD INDEX `fk_ecash_header_idx` (`f_header` ASC);
+alter table a_store_draft add f_row integer;
+ALTER TABLE  `e_cash` ADD CONSTRAINT `fk_ecash_header`   FOREIGN KEY (`f_header`)   REFERENCES `a_header` (`f_id`)   ON DELETE NO ACTION  ON UPDATE NO ACTION;
+/* 
+
+
+
+
+THE CORRECTION CASH DOCUMENTS FOR STORE INPUT DOCUMENTS MUST BE COMPLETED MANUALLY
+
+
+
+
+*/
+
+
+/* DB - 18 */
+/*
+
+!!!   COPY CASHDOC INFO FROM O_HEADER TO A_HEADER_CASH ! ! 
+
+
+*/
+update s_app set f_version ='18' where f_app='DB';
+alter table b_history drop column f_id;
+ALTER TABLE `b_history` CHANGE COLUMN `f_order` `f_id` CHAR(36) NOT NULL ,ADD PRIMARY KEY (`f_id`);
+alter table a_header_cash add column f_oheader char(36);
+alter table e_cash drop column f_oheader;
+alter table o_header drop column f_cashdoc;
+alter table o_header add column f_saletype smallint;
+create table o_sale_type (f_id integer primary key, f_name tinytext);
+INSERT INTO `o_sale_type` (`f_id`, `f_name`) VALUES ('1', 'Մանրածախ');
+INSERT INTO `o_sale_type` (`f_id`, `f_name`) VALUES ('2', 'Մեծածախ');
+alter table o_header add column f_partner integer;
+alter table c_partners add f_store integer;
+alter table c_partners add f_cash integer;
+
+
+/* DB - 19*/
+update s_app set f_version ='19' where f_app='DB';

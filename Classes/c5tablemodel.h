@@ -13,7 +13,7 @@ class C5TableModel : public QAbstractTableModel
 public:
     C5TableModel(C5Database &db, QObject *parent = 0);
 
-    void translate(const QMap<QString, QString> &t);
+    void translate(const QHash<QString, QString> &t);
 
     void execQuery(const QString &query);
 
@@ -23,7 +23,7 @@ public:
 
     void sort(int column);
 
-    void setExternalData(const QMap<QString, int> &columnNameIndex, const QMap<QString, QString> &translation);
+    void setExternalData(const QHash<QString, int> &columnNameIndex, const QHash<QString, QString> &translation);
 
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
 
@@ -75,9 +75,9 @@ public:
 
     void sumForColumns(const QStringList &columns, QMap<QString, double> &values);
 
-    QMap<QString, int> fColumnNameIndex;
+    QHash<QString, int> fColumnNameIndex;
 
-    QMap<int, QString> fColumnIndexName;
+    QHash<int, QString> fColumnIndexName;
 
     QString fTableForUpdate;
 
@@ -102,7 +102,7 @@ private:
 
     QMap<int, QList<QColor> > fColorData;
 
-    QMap<QString, QString> fTranslateColumn;
+    QHash<QString, QString> fTranslateColumn;
 
     QMap<int, Qt::ItemFlags> fEditableFlags;
 

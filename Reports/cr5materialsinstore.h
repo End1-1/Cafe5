@@ -17,6 +17,8 @@ public:
 
     virtual void buildQuery() override;
 
+    virtual bool on_tblView_doubleClicked(const QModelIndex &index);
+
 protected slots:
     virtual void refreshData() override;
 

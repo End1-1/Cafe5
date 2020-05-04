@@ -44,6 +44,11 @@ void C5DataSynchronize::on_btnSaveSyncTables_clicked()
         ds.execDirect(QString("drop trigger if exists %1_bd").arg(ds.getString(0)));
         ds.execDirect(QString("alter table %1 drop column a").arg(ds.getString(0)));
     }
+    if (ui->leAddSyncTable->text().toLower() == "clear") {
+        c5logf(QString("Clear synchronization on  %1").arg(fDBParams.at(4)), logFileName);
+        C5Message::info(tr("Done"));
+        return;
+    }
     c5logf(QString("Start creating triggers for tables on %1").arg(fDBParams.at(4)), logFileName);
     foreach (const QString &t, tables) {
         //SKIP MAIN TABLES, OTHERWISE NOTHING WILL TO WORK
@@ -76,5 +81,34 @@ void C5DataSynchronize::on_btnSaveSyncTables_clicked()
         }
     }
     C5Message::info(tr("Done"));
+}
+
+void C5DataSynchronize::dropTriggers(C5Database &ds)
+{
+    ds.exec("show tables");
+    QStringList tables;
+    while (ds.nextRow()) {
+        tables.append(ds.getString(0));
+    }
+    if (tables.isEmpty()) {
+        c5log("No tables to be syncronized.");
+        return;
+    } else {
+        c5log("Tables to be syncronized: \r\n" + tables.join("\r\n"));
+    }
+    QString logFileName = "syncdb_" + fDBParams.at(4) + ".log";
+    //C5Database dm(fMainDbParams.at(2), fMainDbParams.at(3), fMainDbParams.at(4), fMainDbParams.at(5));
+    if (!ds.open()) {
+        c5logf(QString("Database %1 (%2:%3) inaccesible").arg(fDBParams.at(4)).arg(fDBParams.at(0)).arg(fDBParams.at(1)), logFileName);
+        return;
+    }
+    ds.exec("show tables");
+    c5logf(QString("Start dropping triggers for tables on %1").arg(fDBParams.at(4)), logFileName);
+    while (ds.nextRow()) {
+        ds.execDirect(QString("drop trigger if exists %1_ai").arg(ds.getString(0)));
+        ds.execDirect(QString("drop trigger if exists %1_bu").arg(ds.getString(0)));
+        ds.execDirect(QString("drop trigger if exists %1_bd").arg(ds.getString(0)));
+        ds.execDirect(QString("alter table %1 drop column a").arg(ds.getString(0)));
+    }
 }
 

@@ -18,7 +18,7 @@ class WOrder : public QWidget
     Q_OBJECT
 
 public:
-    explicit WOrder(QWidget *parent = nullptr);
+    explicit WOrder(int saleType, QWidget *parent = nullptr);
 
     ~WOrder();
 
@@ -29,8 +29,6 @@ public:
     void addGoods(const Goods &g);
 
     bool writeOrder(bool tax = true);
-
-    bool createCashDoc(C5Database &db, int cashid, const QString &prefix, double newAmount, const QString &cashdocid, const QString &ordernum);
 
     void fixCostumer(const QString &code);
 
@@ -44,9 +42,9 @@ public:
 
     void prevRow();
 
-    void refund();
-
     void setDiscount(const QString &label, const QString &value);
+
+    void setPartner(const QString &taxcode, int id, const QString &taxname);
 
 private slots:
     void on_leCash_textChanged(const QString &arg1);
@@ -64,8 +62,6 @@ private:
 
     Working *fWorking;
 
-    bool fModeRefund;
-
     int fCostumerId;
 
     int fCardId;
@@ -73,6 +69,12 @@ private:
     int fCardMode;
 
     double fCardValue;
+
+    int fSaleType;
+
+    int fPartner;
+
+    bool returnFalse(const QString &msg, C5Database &db);
 };
 
 #endif // WORDER_H

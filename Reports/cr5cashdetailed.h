@@ -30,7 +30,7 @@ protected slots:
 private:
     CR5CashDetailedFilter *fFilter;
 
-    QMap<QString, int> fColumnNameIndex;
+    QHash<QString, int> fColumnNameIndex;
 
     void sum();
 };

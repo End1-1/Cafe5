@@ -173,7 +173,7 @@ void CR5SaleFromStoreTotal::buildQuery()
     }
 
     fModel->setExternalData(fColumnNameIndex, fTranslation);
-    for (QMap<QString, int>::const_iterator it = fColumnNameIndex.begin(); it != fColumnNameIndex.end(); it++) {
+    for (QHash<QString, int>::const_iterator it = fColumnNameIndex.begin(); it != fColumnNameIndex.end(); it++) {
         fColumnsVisible[it.key()] = true;
     }
     restoreColumnsWidths();

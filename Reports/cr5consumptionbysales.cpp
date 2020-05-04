@@ -8,7 +8,6 @@
 #include "c5progressdialog.h"
 #include "c5double.h"
 #include "dlgchangeoutputstore.h"
-#include "c5storedraftwriter.h"
 #include "c5storedoc.h"
 #include <QInputDialog>
 
@@ -385,13 +384,34 @@ void CR5ConsumptionBySales::makeOutput(bool v)
         }
     }
     if (goodsSale.count() > 0) {
-        writeDocs(DOC_TYPE_STORE_OUTPUT, DOC_REASON_SALE, goodsSale, tr("Sale"));
+        QList<IGoods> gl;
+        for (QMap<int, double>::const_iterator it = goodsSale.begin(); it != goodsSale.end(); it++) {
+            IGoods g;
+            g.goodsId = it.key();
+            g.goodsQty = it.value();
+            gl.append(g);
+        }
+        writeDocs(DOC_TYPE_STORE_OUTPUT, DOC_REASON_SALE, gl, tr("Sale"));
     }
     if (goodsLost.count() > 0) {
-        writeDocs(DOC_TYPE_STORE_OUTPUT, DOC_REASON_LOST, goodsLost, tr("Lost"));
+        QList<IGoods> gl;
+        for (QMap<int, double>::const_iterator it = goodsLost.begin(); it != goodsLost.end(); it++) {
+            IGoods g;
+            g.goodsId = it.key();
+            g.goodsQty = it.value();
+            gl.append(g);
+        }
+        writeDocs(DOC_TYPE_STORE_OUTPUT, DOC_REASON_LOST, gl, tr("Lost"));
     }
     if (goodsOver.count() > 0) {
-        C5StoreDoc *sd = writeDocs(DOC_TYPE_STORE_INPUT, DOC_REASON_OVER, goodsOver, tr("Over"));
+        QList<IGoods> gl;
+        for (QMap<int, double>::const_iterator it = goodsOver.begin(); it != goodsOver.end(); it++) {
+            IGoods g;
+            g.goodsId = it.key();
+            g.goodsQty = it.value();
+            gl.append(g);
+        }
+        C5StoreDoc *sd = writeDocs(DOC_TYPE_STORE_INPUT, DOC_REASON_OVER, gl, tr("Over"));
         if (sd) {
             sd->setLastInputPrices();
         }
@@ -410,7 +430,14 @@ void CR5ConsumptionBySales::salesOutput(bool v)
         }
     }
     if (goodsSale.count() > 0) {
-        writeDocs(DOC_TYPE_STORE_OUTPUT, DOC_REASON_SALE, goodsSale, tr("Sale"));
+        QList<IGoods> gl;
+        for (QMap<int, double>::const_iterator it = goodsSale.begin(); it != goodsSale.end(); it++) {
+            IGoods g;
+            g.goodsId = it.key();
+            g.goodsQty = it.value();
+            gl.append(g);
+        }
+        writeDocs(DOC_TYPE_STORE_OUTPUT, DOC_REASON_SALE, gl, tr("Sale"));
     }
 }
 
@@ -453,21 +480,41 @@ void CR5ConsumptionBySales::changeOutputStore()
     delete d;
 }
 
-C5StoreDoc *CR5ConsumptionBySales::writeDocs(int doctype, int reason, const QMap<int, double> &data, const QString &comment)
+C5StoreDoc *CR5ConsumptionBySales::writeDocs(int doctype, int reason, const QList<IGoods> &data, const QString &comment)
 {
     C5Database db(fDBParams);
     C5StoreDraftWriter dw(db);
     QDate docDate = static_cast<CR5ConsumptionBySalesFilter*>(fFilterWidget)->date2();
     int store = 0;
+    int storein = 0;
+    int storeout = 0;
+    int sdtype = 0;
     switch (doctype) {
     case DOC_TYPE_STORE_OUTPUT:
         store = static_cast<CR5ConsumptionBySalesFilter*>(fFilterWidget)->store();
+        storeout = store;
+        sdtype = -1;
         break;
     case DOC_TYPE_STORE_INPUT:
         store = static_cast<CR5ConsumptionBySalesFilter*>(fFilterWidget)->store();
+        storein = store;
+        sdtype = 1;
         break;
     }
-    QString documentId = dw.writeDraft(docDate, doctype, store, reason, data, comment);
+    QString documentId;
+    QString cashid;
+    dw.writeAHeader(documentId, dw.storeDocNum(doctype, store, true, 0), DOC_STATE_DRAFT, doctype, __userid, docDate,
+                    QDate::currentDate(), QTime::currentTime(), 0, 0, comment, 0, 0);
+    dw.writeAHeaderStore(documentId, __userid, __userid, "", QDate(), storein, storeout, 0, cashid, 0, 0);
+    if (storein > 0) {
+        dw.writeAHeaderCash(cashid, 0, 0, 1, documentId, "");
+    }
+    int rownum = 1;
+    foreach (const IGoods &g, data) {
+        QString sdid;
+        dw.writeAStoreDraft(sdid, documentId, store, sdtype, g.goodsId, g.goodsQty, g.goodsPrice, g.goodsPrice * g.goodsQty, reason, "", rownum++);
+    }
+    //= dw.writeDraft(docDate, doctype, store, reason, data, comment);
     C5StoreDoc *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);
     if (!sd->openDoc(documentId)) {
         __mainWindow->removeTab(sd);

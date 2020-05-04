@@ -30,6 +30,7 @@ void C5Permissions::init(C5Database &db)
               << cp_t2_count_output_of_sale
               << cp_t2_calculate_self_cost
               << cp_t2_store_complectation
+              << cp_t2_store_decomplectation
 
               << cp_t3_reports
               << cp_t3_sales_common
@@ -76,6 +77,7 @@ void C5Permissions::init(C5Database &db)
               << cp_t6_groups
               << cp_t6_waste
               << cp_t6_classes
+              << cp_t6_goods_images
 
               << cp_t7_other
               << cp_t7_credit_card

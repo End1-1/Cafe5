@@ -76,12 +76,13 @@ void CR5CashDetailed::buildQuery()
     QString query = QString("select '' as f_header, '%1' as f_date, '%2' as f_remarks, c.f_sign, sum(c.f_amount*c.f_sign) as f_amount "
                             "from e_cash c "
                             "inner join a_header h on h.f_id=c.f_header and h.f_type=:f_type "
-                            "where f_cash=:f_cash and h.f_date<'%1'")
+                            "where f_cash=:f_cash and h.f_date<'%1' and h.f_state=:f_state ")
             .arg(fFilter->date1().toString(FORMAT_DATE_TO_STR_MYSQL))
             .arg(tr("Brought forward"));
     C5Database db(fDBParams);
     db[":f_cash"] = fFilter->cash();
     db[":f_type"] = DOC_TYPE_CASH;
+    db[":f_state"] = DOC_STATE_SAVED;
     db.exec(query);
     if (db.nextRow()) {
         int r;
@@ -102,11 +103,13 @@ void CR5CashDetailed::buildQuery()
                                 "from e_cash c "
                                 "inner join a_header h on h.f_id=c.f_header and h.f_type=:f_type "
                                 "where f_cash=:f_cash and h.f_date between :f_date1 and :f_date2 "
+                                "and h.f_state=:f_state "
                                 "order by h.f_date, h.f_userid ";
     db[":f_cash"] = fFilter->cash();
     db[":f_date1"] = fFilter->date1();
     db[":f_date2"] = fFilter->date2();
     db[":f_type"] = DOC_TYPE_CASH;
+    db[":f_state"] = DOC_STATE_SAVED;
     db.exec(query);
     while (db.nextRow()) {
         int r;

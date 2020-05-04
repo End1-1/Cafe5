@@ -11,6 +11,9 @@ public:
     CR5Goods(const QStringList &dbParams, QWidget *parent = nullptr);
 
     virtual QToolBar *toolBar();
+
+public slots:
+    virtual bool on_tblView_doubleClicked(const QModelIndex &index);
 };
 
 #endif // CR5GOODS_H

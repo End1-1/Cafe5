@@ -20,7 +20,7 @@ protected:
     virtual void refreshData() override;
 
 private:
-    QMap<QString, int> fColumnNameIndex;
+    QHash<QString, int> fColumnNameIndex;
 
     CR5SaleFromStoreTotalFilter *fFilter;
 };

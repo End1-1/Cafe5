@@ -5,6 +5,7 @@
 #include "c5datasynchronize.h"
 #include "c5tablemodel.h"
 #include "c5serviceconfig.h"
+#include "c5checkdatabase.h"
 
 CR5Databases::CR5Databases(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
@@ -43,6 +44,7 @@ QToolBar *CR5Databases::toolBar()
         fToolBar->addAction(QIcon(":/access.png"), tr("Access"), this, SLOT(actionAccess()));
         fToolBar->addAction(QIcon(":data-transfer.png"), tr("Synchronization"), this, SLOT(actionSync()));
         fToolBar->addAction(QIcon(":/service.png"), tr("Service"), this, SLOT(actionService()));
+        fToolBar->addAction(QIcon(":/maintenance.png"), tr("Check database"), this, SLOT(checkDatabase()));
     }
     return fToolBar;
 }
@@ -78,4 +80,21 @@ void CR5Databases::actionService()
     C5ServiceConfig *sc = new C5ServiceConfig(values.at(1).toString(), this);
     sc->exec();
     delete sc;
+}
+
+void CR5Databases::checkDatabase()
+{
+    QList<QVariant> values = fModel->getRowValues(fTableView->currentIndex().row());
+    if (values.at(0).toString().isEmpty()) {
+        return;
+    }
+    QStringList p;
+    p.append(values.at(1).toString());
+    p.append(values.at(2).toString());
+    p.append(values.at(5).toString());
+    p.append(values.at(6).toString());
+    p.append(values.at(3).toString());
+    C5CheckDatabase *ds = new C5CheckDatabase(p);
+    ds->exec();
+    delete ds;
 }

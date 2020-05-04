@@ -93,6 +93,19 @@ QStringList C5Config::dbParams()
     return params;
 }
 
+QStringList C5Config::replicaDbParams()
+{
+    if (!rdbReplica()) {
+        return dbParams();
+    }
+    QStringList params;
+    params.append(getValue(param_rootdb_host));
+    params.append(getValue(param_rootdb_schema));
+    params.append(getValue(param_rootdb_user));
+    params.append(getValue(param_rootdb_pass));
+    return params;
+}
+
 int C5Config::docNumDigitsInput()
 {
     return getValue(param_doc_num_digits_input).toInt();
@@ -299,6 +312,31 @@ QString C5Config::taxPin()
 bool C5Config::controlShopQty()
 {
     return getValue(param_control_shop_qty).toInt() == 1;
+}
+
+bool C5Config::rdbReplica()
+{
+    return getValue(param_rootdb_replica).toInt() == 1;
+}
+
+QString C5Config::rdbHost()
+{
+    return getValue(param_rootdb_host);
+}
+
+QString C5Config::rdbSchema()
+{
+    return getValue(param_rootdb_schema);
+}
+
+QString C5Config::rdbUser()
+{
+    return getValue(param_rootdb_user);
+}
+
+QString C5Config::rdbPassword()
+{
+    return getValue(param_rootdb_pass);
 }
 
 QString C5Config::getValue(int key)

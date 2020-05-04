@@ -22,6 +22,7 @@
 #define cp_t2_count_output_of_sale 205
 #define cp_t2_calculate_self_cost 206
 #define cp_t2_store_complectation 207
+#define cp_t2_store_decomplectation 208
 
 #define cp_t3_reports 300
 #define cp_t3_sales_common 301
@@ -68,6 +69,7 @@
 #define cp_t6_waste 604
 #define cp_t6_storage 605
 #define cp_t6_classes 607
+#define cp_t6_goods_images 608
 
 #define cp_t7_other 700
 #define cp_t7_credit_card 701

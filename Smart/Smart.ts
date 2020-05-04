@@ -138,19 +138,59 @@
 <context>
     <name>C5StoreDraftWriter</name>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="71"/>
-        <source>Sale autoinput</source>
-        <translation>Ավտոմատ մուտք</translation>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="23"/>
+        <source>Output of sale</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="185"/>
-        <source>Sale autooutput</source>
-        <translation>Ավտոմատ ելք</translation>
-    </message>
-    <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="272"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="90"/>
         <source>Store document has been registered for this sale</source>
         <translation></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="157"/>
+        <source>No hall with id</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="190"/>
+        <source>Error in store document, partial data was lost</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="205"/>
+        <source>Empty store document</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="225"/>
+        <source>Error in cash document, partial data was lost</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="235"/>
+        <source>Empty cash document</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="325"/>
+        <source>Document not exists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="647"/>
+        <source>Invalid document id</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="753"/>
+        <source>Not enough materials in the store</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="845"/>
+        <source>This order used in next documents</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

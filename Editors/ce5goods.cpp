@@ -7,11 +7,10 @@
 #include "c5message.h"
 #include "ce5goodsclass.h"
 #include "c5selector.h"
-#include "c5printing.h"
-#include "barcode5.h"
-#include <QPrinter>
 #include <QClipboard>
 #include <QFontDatabase>
+#include <QMenu>
+#include <QFileDialog>
 #include <QPaintEngine>
 
 CE5Goods::CE5Goods(const QStringList &dbParams, QWidget *parent) :
@@ -28,9 +27,6 @@ CE5Goods::CE5Goods(const QStringList &dbParams, QWidget *parent) :
     ui->leClass2->setSelector(dbParams, ui->leClassName2, cache_goods_classes);
     ui->leClass3->setSelector(dbParams, ui->leClassName3, cache_goods_classes);
     ui->leClass4->setSelector(dbParams, ui->leClassName4, cache_goods_classes);
-    fPrinting = new C5Printing();
-    fPbw = new PrintBarcodeWidget(fPrinting, this);
-    ui->vl->addWidget(fPbw);
 }
 
 CE5Goods::~CE5Goods()
@@ -70,42 +66,7 @@ void CE5Goods::setId(int id)
         ui->tblGoods->lineEdit(row, 5)->setDouble(db.getDouble("f_price"));
         ui->tblGoods->lineEdit(row, 6)->setDouble(db.getDouble("f_total"));
     }
-    fPrinting->setSceneParams(fPbw->width() / 2, fPbw->height() / 2, QPrinter::Portrait);
-
-    fPrinting->fNoNewPage = true;
-    fPrinting->setSceneParams(600, 500, QPrinter::Portrait);
-    fPrinting->setFont(QFont("Arial", 100, QFont::Normal));
-    fPrinting->setFontSize(100);
-    fPrinting->ltext(tr("elina"), 100);
-    fPrinting->br();
-    fPrinting->setFontSize(50);
-    fPrinting->ltext("MODEL: ", 50);
-    fPrinting->setFontBold(true);
-    fPrinting->ltext("               " + ui->leScanCode->text().right(ui->leScanCode->text().length() - 7), 50);
-    fPrinting->br();
-    fPrinting->setFontBold(false);
-    fPrinting->ltext("SIZE: ", 50);
-    fPrinting->setFontBold(true);
-    fPrinting->ltext("             " + ui->leScanCode->text().left(2), 50);
-    fPrinting->br();
-    BarcodeI2of5 b;
-    b.EncodeI2of5(ui->leScanCode->text().toLatin1().data());
-    fPrinting->fTop += 20;
-    b.DrawBarcode(*fPrinting, 50, fPrinting->fTop, fPrinting->fTop + 140, fPrinting->fTop + 150);
-    fPrinting->setFontSize(30);
-    QString code2 = QString("%1x%2x%3x%4")
-            .arg(ui->leScanCode->text().left(2))
-            .arg(ui->leScanCode->text().mid(2,3))
-            .arg(ui->leScanCode->text().mid(5,2))
-            .arg(ui->leScanCode->text().right(ui->leScanCode->text().length() - 7));
-    fPrinting->fTop += 100;
-    fPrinting->setFontBold(true);
-    fPrinting->ltext(code2, 50);
-    fPrinting->br();
-    fPrinting->ltext("MADE IN ARMENIA", 50);
-    BarcodeI2of5 barcode;
-    barcode.EncodeI2of5(ui->leScanCode->text().toLatin1().data());
-    barcode.DrawBarcode(*fPrinting, 10, 10, 50, 50);
+    countTotal();
 }
 
 bool CE5Goods::save(QString &err, QList<QMap<QString, QVariant> > &data)
@@ -133,6 +94,96 @@ void CE5Goods::clear()
     ui->tblGoods->clearContents();
     ui->tblGoods->setRowCount(0);
     ui->leLowLevel->setText("0");
+    if (ui->tabWidget->currentIndex() > 1) {
+        ui->tabWidget->setCurrentIndex(0);
+    }
+    ui->lbImage->setText(tr("Image"));
+    ui->leTotal->clear();
+}
+
+void CE5Goods::tblQtyChanged(const QString &arg1)
+{
+    Q_UNUSED(arg1);
+    C5LineEdit *l = static_cast<C5LineEdit*>(sender());
+    C5LineEdit *lqty = ui->tblGoods->lineEdit(l->property("row").toInt(), 3);
+    C5LineEdit *lprice = ui->tblGoods->lineEdit(l->property("row").toInt(), 5);
+    C5LineEdit *ltotal = ui->tblGoods->lineEdit(l->property("row").toInt(), 6);
+    ltotal->setDouble(lqty->getDouble() * lprice->getDouble());
+    countTotal();
+}
+
+void CE5Goods::tblPriceChanged(const QString &arg1)
+{
+    Q_UNUSED(arg1);
+    C5LineEdit *l = static_cast<C5LineEdit*>(sender());
+    C5LineEdit *lqty = ui->tblGoods->lineEdit(l->property("row").toInt(), 3);
+    C5LineEdit *lprice = ui->tblGoods->lineEdit(l->property("row").toInt(), 5);
+    C5LineEdit *ltotal = ui->tblGoods->lineEdit(l->property("row").toInt(), 6);
+    ltotal->setDouble(lqty->getDouble() * lprice->getDouble());
+    countTotal();
+}
+
+void CE5Goods::tblTotalChanged(const QString &arg1)
+{
+    Q_UNUSED(arg1);
+    C5LineEdit *l = static_cast<C5LineEdit*>(sender());
+    C5LineEdit *lqty = ui->tblGoods->lineEdit(l->property("row").toInt(), 3);
+    C5LineEdit *lprice = ui->tblGoods->lineEdit(l->property("row").toInt(), 5);
+    C5LineEdit *ltotal = ui->tblGoods->lineEdit(l->property("row").toInt(), 6);
+    if (lqty->getDouble() > 0.0001) {
+        lprice->setDouble(ltotal->getDouble() / lqty->getDouble());
+    } else {
+        lprice->setDouble(0);
+    }
+    countTotal();
+}
+
+void CE5Goods::uploadImage()
+{
+    if (ui->leCode->getInteger() == 0) {
+        if (C5Message::question(tr("You should to item before upload an image")) ==  QDialog::Accepted) {
+            QString err;
+            QList<QMap<QString, QVariant> > data;
+            if (!save(err, data)) {
+                C5Message::error(err);
+                return;
+            }
+        } else {
+            return;
+        }
+    }
+    QString fn = QFileDialog::getOpenFileName(this, tr("Image"), "", "*.jpg;*.png;*.bmp");
+    if (fn.isEmpty()) {
+        return;
+    }
+    QPixmap pm;
+    if (!pm.load(fn)) {
+        C5Message::error(tr("Could not load image"));
+        return;
+    }
+    ui->lbImage->setPixmap(pm.scaled(ui->lbImage->size(), Qt::KeepAspectRatio));
+    qApp->processEvents();
+    QFile f(fn);
+    if (f.open(QIODevice::ReadOnly)) {
+        C5Database db(fDBParams);
+        db[":f_id"] = ui->leCode->getInteger();
+        db.exec("delete from c_goods_images where f_id=:f_id");
+        db[":f_id"] = ui->leCode->getInteger();
+        db[":f_data"] = f.readAll();
+        db.exec("insert into c_goods_images (f_id, f_data) values (:f_id, :f_data)");
+        f.close();
+    }
+}
+
+void CE5Goods::removeImage()
+{
+    if (C5Message::question(tr("Remove image")) !=  QDialog::Accepted) {
+        return;
+    }
+    C5Database db(fDBParams);
+    db[":f_id"] = ui->leCode->getInteger();
+    db.exec("delete from c_goods_images where f_id=:f_id");
+    ui->lbImage->setText(tr("Image"));
 }
 
 void CE5Goods::on_btnNewGroup_clicked()
@@ -318,16 +369,27 @@ void CE5Goods::on_btnPaste_clicked()
     }
 }
 
-PrintBarcodeWidget::PrintBarcodeWidget(C5Printing *prn, QWidget *parent) :
-    QWidget(parent)
+void CE5Goods::on_lbImage_customContextMenuRequested(const QPoint &pos)
 {
-    print = prn;
+    QMenu *m = new QMenu(this);
+    m->addAction(QIcon(":/new.png"), tr("Upload image"), this, SLOT(uploadImage()));
+    m->addAction(QIcon(":/delete.png"), tr("Remove image"), this, SLOT(removeImage()));
+    m->popup(ui->lbImage->mapToGlobal(pos));
 }
 
-void PrintBarcodeWidget::paintEvent(QPaintEvent *event)
+void CE5Goods::on_tabWidget_currentChanged(int index)
 {
-    Q_UNUSED(event);
-    QPainter p(this);
-    p.scale(0.5, 0.5);
-    print->print(&p);
+    switch (index) {
+    case 2: {
+        C5Database db(fDBParams);
+        db[":f_id"] = ui->leCode->getInteger();
+        db.exec("select * from c_goods_images where f_id=:f_id");
+        if (db.nextRow()) {
+            QPixmap p;
+            if (p.loadFromData(db.getValue("f_data").toByteArray())) {
+                ui->lbImage->setPixmap(p.scaled(ui->lbImage->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+            }
+        }
+    }
+    }
 }

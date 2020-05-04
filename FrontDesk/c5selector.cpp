@@ -77,7 +77,7 @@ bool C5Selector::getMultipleValues(const QStringList &dbParams, int cache, QList
     return result;
 }
 
-bool C5Selector::getValues(const QStringList &dbParams, const QString &sql, QList<QVariant> &values, const QMap<QString, QString> &translator)
+bool C5Selector::getValues(const QStringList &dbParams, const QString &sql, QList<QVariant> &values, const QHash<QString, QString> &translator)
 {
     C5Selector *c = new C5Selector(dbParams);
     c->fQuery = sql;

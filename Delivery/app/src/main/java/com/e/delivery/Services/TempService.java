@@ -148,6 +148,7 @@ public class TempService extends Service {
 
     class MessageHandler implements Runnable {
 
+        SSLSocketFactory mSSLSocketFactory = null;
         SSLSocket mSocket = null;
         boolean mConnected = false;
         boolean mAuthorized = false;
@@ -162,24 +163,27 @@ public class TempService extends Service {
                 try {
                     if (mSocket != null) {
                         mSocket.close();
+                        mSocket = null;
                     }
-                    String keyStore = KeyStore.getDefaultType();
-                    KeyStore trusted = KeyStore.getInstance(keyStore);
-                    InputStream in = DeliveryApp.getAppContext().getResources().openRawResource(R.raw.keystore);
-                    trusted.load(in, "qwerty".toCharArray());
-                    in.close();
-                    String keyManagerFactory = KeyManagerFactory.getDefaultAlgorithm();
-                    KeyManagerFactory kmf = KeyManagerFactory.getInstance(keyManagerFactory);
-                    kmf.init(trusted, "qwerty".toCharArray());
+                    if (mSSLSocketFactory == null) {
+                        String keyStore = KeyStore.getDefaultType();
+                        KeyStore trusted = KeyStore.getInstance(keyStore);
+                        InputStream in = DeliveryApp.getAppContext().getResources().openRawResource(R.raw.keystore);
+                        trusted.load(in, "qwerty".toCharArray());
+                        in.close();
+                        String keyManagerFactory = KeyManagerFactory.getDefaultAlgorithm();
+                        KeyManagerFactory kmf = KeyManagerFactory.getInstance(keyManagerFactory);
+                        kmf.init(trusted, "qwerty".toCharArray());
 
-                    TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-                    tmf.init(trusted);
-                    TrustManager[] tm = tmf.getTrustManagers();
-                    SSLContext sslContext = SSLContext.getInstance("TLS");
-                    sslContext.init(kmf.getKeyManagers(), tm, null);
-                    SSLSocketFactory factory = sslContext.getSocketFactory();
+                        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+                        tmf.init(trusted);
+                        TrustManager[] tm = tmf.getTrustManagers();
+                        SSLContext sslContext = SSLContext.getInstance("TLS");
+                        sslContext.init(kmf.getKeyManagers(), tm, null);
+                        mSSLSocketFactory = sslContext.getSocketFactory();
+                    }
 
-                    mSocket = (SSLSocket) factory.createSocket();
+                    mSocket = (SSLSocket) mSSLSocketFactory.createSocket();
                     mSocket.connect(new InetSocketAddress(Config.mServerIP, Config.mServerPort), 15000);
                     mSocket.setSoTimeout(10000);
                     mSocket.startHandshake();
@@ -231,20 +235,19 @@ public class TempService extends Service {
                 DataMessage m = null;
                 try {
                     m = mDataMessage.remove();
-                    if (m.mCommand != DataSenderCommands.qLogin && m.mCommand != DataSenderCommands.qLoginWithSession) {
+                    if (m.mCommand != DataSenderCommands.qLogin) {
                         if (!mAuthorized) {
                             m.rotate();
                             m.mResponse = DataSenderCommands.rLoginRequired;
                             m.mBuffer = "Login required";
                             LocalMessanger.sendMessage(m);
-                            if (Config.getString("username").length() > 0) {
+                            if (!Config.getString("username").isEmpty()) {
                                 Json j = new Json();
                                 j.putString("username", Config.getString("username"));
                                 j.putString("password", Config.getString("password"));
-                                DataMessage ml = new DataMessage(DataSenderCommands.qLogin, j.toString(), "S", "S");
-                                LocalMessanger.sendMessage(ml);
+                                j.putString("session", Config.getString("session_id"));
+                                m = new DataMessage(DataSenderCommands.qLogin, j.toString(), "A", "S");
                             }
-                            continue;
                         }
                     }
                 } catch (NoSuchElementException e) {
@@ -309,7 +312,7 @@ public class TempService extends Service {
                             LocalMessanger.sendMessage(ml);
                         }
                     }
-                    if (m.mCommand == DataSenderCommands.qLogin || m.mCommand == DataSenderCommands.qLoginWithSession) {
+                    if (m.mCommand == DataSenderCommands.qLogin) {
                         if (m.mResponse == DataSenderCommands.rOk) {
                             mAuthorized = true;
                         }

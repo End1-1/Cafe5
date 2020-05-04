@@ -25,6 +25,8 @@ private slots:
 
     void on_btnPrint_clicked();
 
+    void on_btnItemBack_clicked();
+
 private:
     Ui::Sales *ui;
 

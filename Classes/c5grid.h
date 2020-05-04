@@ -39,7 +39,7 @@ public:
 
     C5TableModel *fModel;
 
-    QMap<QString, QString> fTranslation;
+    QHash<QString, QString> fTranslation;
 
     void setTableForUpdate(const QString &table, const QList<int> &columns);
 
@@ -73,7 +73,7 @@ protected:
 
     QStringList fColumnsFields;
 
-    QMap<QString, bool> fColumnsVisible;
+    QHash<QString, bool> fColumnsVisible;
 
     QStringList fColumnsGroup;
 

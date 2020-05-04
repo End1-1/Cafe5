@@ -13,7 +13,7 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
 {
 
     fIcon = ":/graph.png";
-    fLabel = tr("Sales, common");
+    fLabel = tr("Sales, items");
     fSimpleQuery = false;
 
     fMainTable = "o_goods og";
@@ -27,6 +27,7 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
                     << "left join c_goods_classes gcb on gcb.f_id=gg.f_group2 [gcb]"
                     << "left join c_goods_classes gcc on gcc.f_id=gg.f_group3 [gcc]"
                     << "left join c_goods_classes gcd on gcd.f_id=gg.f_group4 [gcd]"
+                    << "left join a_store_draft ad on ad.f_id=og.f_storerec [ad]"
                        ;
 
     fColumnsFields << "oh.f_id as f_header"
@@ -45,6 +46,7 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
                    << "gcd.f_name as gname4"
                    << "sum(og.f_qty*og.f_sign) as f_qty"
                    << "sum(og.f_total*og.f_sign) as f_total"
+                   << "sum(ad.f_total) as f_selfcost"
                       ;
 
     fColumnsGroup << "oh.f_id as f_header"
@@ -65,6 +67,7 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
 
     fColumnsSum << "f_qty"
                 << "f_total"
+                << "f_selfcost"
                       ;
 
     fTranslation["f_header"] = tr("UUID");
@@ -84,6 +87,7 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
     fTranslation["gname4"] = tr("Class 4");
     fTranslation["f_taxname"] = tr("Supplier");
     fTranslation["f_groupname"] = tr("Group");
+    fTranslation["f_selfcost"] = tr("Selfcost");
 
     fColumnsVisible["oh.f_id as f_header"] = true;
     fColumnsVisible["concat(oh.f_prefix, oh.f_hallid) as f_number"] = true;
@@ -101,7 +105,7 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
     fColumnsVisible["gcb.f_name as gname2"] = true;
     fColumnsVisible["gcc.f_name as gname3"] = true;
     fColumnsVisible["gcd.f_name as gname4"] = true;
-
+    fColumnsVisible["sum(ad.f_total) as f_selfcost"] = true;
     restoreColumnsVisibility();
     fFilterWidget = new CR5SaleFromStoreFilter(fDBParams);
     fFilter = static_cast<CR5SaleFromStoreFilter*>(fFilterWidget);

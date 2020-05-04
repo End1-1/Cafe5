@@ -61,6 +61,12 @@ private slots:
 
     void on_btnDishes_clicked();
 
+    void on_btnNewComplectation_clicked();
+
+    void on_btnNewStoreDecomplectation_clicked();
+
+    void on_btnSaleOfItems_clicked();
+
 private:
     Ui::C5WelcomePage *ui;
 

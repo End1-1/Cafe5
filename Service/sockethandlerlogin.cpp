@@ -17,6 +17,18 @@ bool SocketHandlerLogin::login()
     QJsonDocument jdoc = QJsonDocument::fromJson(fData);
     QJsonObject jo = jdoc.object();
     C5Database db(DBHOST, DBFILE, DBUSER, DBPASSWORD);
+    if (!jo["session"].toString().isEmpty()) {
+        QByteArray session =  QByteArray::fromBase64(jo["session"].toString().toUtf8());
+        db[":f_iplogout"] = fPeerAddress;
+        db[":f_dateend"] = QDate::currentDate();
+        db[":f_timeend"] = QTime::currentTime();
+        db[":f_session"] = session;
+        db.exec("update s_login_session set f_iplogout=:f_iplogout, f_dateend=:f_dateend, f_timeend=:f_timeend where f_session=:f_session");
+        if (jo.contains("logout")) {
+            fResponseCode = dr_logout;
+            return true;
+        }
+    }
     bool listOfGoods = jo["listofgoods"].toInt() == 1;
     db[":f_login"] = jo["username"].toString();
     db[":f_password"] = jo["password"].toString();

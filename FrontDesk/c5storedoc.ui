@@ -330,26 +330,6 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="4">
-       <widget class="QPushButton" name="btnCreateDoc">
-        <property name="maximumSize">
-         <size>
-          <width>25</width>
-          <height>25</height>
-         </size>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::NoFocus</enum>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset resource="../resources/res.qrc">
-          <normaloff>:/new.png</normaloff>:/new.png</iconset>
-        </property>
-       </widget>
-      </item>
       <item row="4" column="2" colspan="2">
        <widget class="C5LineEdit" name="leStoreInputName">
         <property name="enabled">
@@ -683,7 +663,17 @@
          </property>
          <column>
           <property name="text">
-           <string>Row id</string>
+           <string>Rec in</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Rec out</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Rec base</string>
           </property>
          </column>
          <column>
@@ -1016,6 +1006,11 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>C5DateEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5dateedit.h</header>
+  </customwidget>
+  <customwidget>
    <class>C5LineEdit</class>
    <extends>QLineEdit</extends>
    <header location="global">c5lineedit.h</header>
@@ -1029,11 +1024,6 @@
    <class>C5TableWidget</class>
    <extends>QTableWidget</extends>
    <header location="global">c5tablewidget.h</header>
-  </customwidget>
-  <customwidget>
-   <class>C5DateEdit</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5dateedit.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

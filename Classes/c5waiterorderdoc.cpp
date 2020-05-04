@@ -348,7 +348,7 @@ bool C5WaiterOrderDoc::makeOutputOfStore(C5Database &db, QString &err)
         db.insert("o_goods", false);
     }
     C5StoreDraftWriter dw(db);
-    if (!dw.writeFromShopOutput(__userid, QDate::fromString(fHeader["f_datecash"].toString(), FORMAT_DATE_TO_STR), hString("f_id"))) {
+    if (!dw.writeFromShopOutput(fHeader["f_id"].toString(), DOC_STATE_DRAFT, err)) {
         db.rollback();
         err += dw.fErrorMsg + "<br>";
         return false;

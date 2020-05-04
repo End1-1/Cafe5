@@ -154,11 +154,11 @@ bool C5Database::exec(const QString &sqlQuery)
 
 bool C5Database::exec(const QString &sqlQuery, QList<QList<QVariant> > &dbrows)
 {
-    QMap<QString, int> cols;
+    QHash<QString, int> cols;
     return exec(sqlQuery, dbrows, cols);
 }
 
-bool C5Database::exec(const QString &sqlQuery, QList<QList<QVariant> > &dbrows, QMap<QString, int> &columns)
+bool C5Database::exec(const QString &sqlQuery, QList<QList<QVariant> > &dbrows, QHash<QString, int> &columns)
 {
     bool isSelect = true;
     bool result = true;
@@ -293,6 +293,11 @@ int C5Database::columnCount()
     return fNameColumnMap.count();
 }
 
+int C5Database::pos()
+{
+    return fCursorPos;
+}
+
 bool C5Database::first()
 {
     fCursorPos = -1;
@@ -410,7 +415,7 @@ QString C5Database::columnName(int index)
 QMap<QString, QVariant> C5Database::getBindValues()
 {
     QMap<QString, QVariant> b;
-    for (QMap<QString, int>::const_iterator it = fNameColumnMap.begin(); it != fNameColumnMap.end(); it++) {
+    for (QHash<QString, int>::const_iterator it = fNameColumnMap.begin(); it != fNameColumnMap.end(); it++) {
         b[":" + it.key()] = getValue(fCursorPos, it.key());
     }
     return b;
@@ -423,7 +428,7 @@ void C5Database::getBindValues(QMap<QString, QVariant> &b)
 
 void C5Database::getBindValues(int row, QMap<QString, QVariant> &b)
 {
-    for (QMap<QString, int>::const_iterator it = fNameColumnMap.begin(); it != fNameColumnMap.end(); it++) {
+    for (QHash<QString, int>::const_iterator it = fNameColumnMap.begin(); it != fNameColumnMap.end(); it++) {
         b[":" + it.key()] = getValue(row, it.key());
     }
 }
@@ -460,6 +465,7 @@ void C5Database::init()
     ++fCounter;
     fDbName = getDbNumber("DB1");
     fDb = QSqlDatabase::addDatabase(_DBDRIVER_, fDbName);
+    fDb.setConnectOptions("MYSQL_OPT_CONNECT_TIMEOUT=2");
 }
 
 bool C5Database::isOpened()
@@ -542,7 +548,13 @@ bool C5Database::exec(const QString &sqlQuery, bool &isSelect)
         logEvent(sqlQuery);
         return false;
     }
-    for (QMap<QString, QVariant>::const_iterator it = fBindValues.begin(); it != fBindValues.end(); it++) {
+    for (QMap<QString, QVariant>::iterator it = fBindValues.begin(); it != fBindValues.end(); it++) {
+//        QVariant v = it.value();
+//        if (v.type() == QVariant::Date) {
+//            if (!v.toDate().isValid()) {
+//                v = QDate::fromString("01/01/1990", "dd/MM/yyyy");
+//            }
+//        }
         fQuery->bindValue(it.key(), it.value());
     }
     if (!fQuery->exec()) {

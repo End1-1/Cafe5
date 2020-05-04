@@ -20,7 +20,7 @@ protected:
     virtual bool tblDoubleClicked(int row, int column, const QList<QVariant> &values);
 
 private:
-    QMap<QString, int> fColumnNameIndex;
+    QHash<QString, int> fColumnNameIndex;
 
     QString documentForInventory();
 };

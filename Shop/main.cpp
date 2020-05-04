@@ -3,6 +3,8 @@
 #include "c5connection.h"
 #include "c5license.h"
 #include "dlgpin.h"
+#include "replicadialog.h"
+#include "settingsselection.h"
 #include <QApplication>
 #include <QMessageBox>
 #include <QTranslator>
@@ -38,14 +40,14 @@ int main(int argc, char *argv[])
     C5Config::initParamsFromDb();
     C5Database::uuid(C5Config::dbParams());
 
-    if (C5Config::shopEnterPin()) {
+    if (__c5config.shopEnterPin()) {
         bool login = false;
+        C5Database db(C5Config::dbParams());
         do {
             QString user, pin;
             if (!DlgPin::getPin(user, pin)) {
                 return 0;
             }
-            C5Database db(C5Config::dbParams());
             db[":f_login"] = user;
             db[":f_password"] = password(pin);
             db.exec("select f_id, f_group, f_state, concat(f_last, ' ', f_first) from s_user where f_login=:f_login and f_altpassword=:f_password");
@@ -60,8 +62,27 @@ int main(int argc, char *argv[])
                 login = true;
             }
         } while (!login);
+        db[":f_user"] = __userid;
+        db.exec("select sn.f_id, sn.f_name from s_settings_names sn where sn.f_id in (select f_settings from s_user_config where f_user=:f_user)");
+        SettingsSelection *s = new SettingsSelection();
+        while (db.nextRow()) {
+            s->addSettingsId(db.getInt("f_id"), db.getString("f_name"));
+        }
+        s->addSettingsId(-1, QObject::tr("Cancel"));
+        if (db.rowCount() > 1) {
+            if (s->exec() == QDialog::Accepted) {
+
+            }
+        }
+        s->deleteLater();
+
     } else {
         __userid = 1;
+    }
+    if (__c5config.rdbReplica()) {
+        ReplicaDialog *rp = new ReplicaDialog();
+        rp->exec();
+        delete rp;
     }
     Working w;
     w.showMaximized();

@@ -89,20 +89,6 @@ font-size:13pt;
       </font>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="5">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Cash (F3)</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Total</string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="6">
        <widget class="C5LineEdit" name="leCash">
         <property name="minimumSize">
@@ -119,6 +105,34 @@ font-size:13pt;
         </property>
        </widget>
       </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="lbPartner">
+        <property name="text">
+         <string>Partner</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="5">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Cash (F3)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Change</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Total</string>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="8">
        <spacer name="horizontalSpacer_2">
         <property name="orientation">
@@ -132,8 +146,8 @@ font-size:13pt;
         </property>
        </spacer>
       </item>
-      <item row="0" column="2">
-       <widget class="C5LineEdit" name="leTotal">
+      <item row="3" column="2" colspan="5">
+       <widget class="C5LineEdit" name="lePartner">
         <property name="minimumSize">
          <size>
           <width>130</width>
@@ -142,19 +156,12 @@ font-size:13pt;
         </property>
         <property name="maximumSize">
          <size>
-          <width>130</width>
+          <width>16777215</width>
           <height>16777215</height>
          </size>
         </property>
         <property name="readOnly">
          <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="3">
-       <widget class="QLabel" name="label_5">
-        <property name="text">
-         <string>Card (F4)</string>
         </property>
        </widget>
       </item>
@@ -174,10 +181,29 @@ font-size:13pt;
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_4">
+      <item row="0" column="3">
+       <widget class="QLabel" name="label_5">
         <property name="text">
-         <string>Change</string>
+         <string>Card (F4)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="C5LineEdit" name="leTotal">
+        <property name="minimumSize">
+         <size>
+          <width>130</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>130</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -200,38 +226,40 @@ font-size:13pt;
         </property>
        </widget>
       </item>
-      <item row="0" column="9" rowspan="2">
-       <widget class="QLabel" name="lbRefund">
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-          <weight>75</weight>
-          <italic>false</italic>
-          <bold>true</bold>
-          <underline>false</underline>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background:rgb(255, 0, 0);
-color:rgb(255,255,255);
-padding:4px;</string>
-        </property>
+      <item row="2" column="0">
+       <widget class="QLabel" name="lbCustomer">
         <property name="text">
-         <string>Refund mode</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <string>Customer</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="5">
+      <item row="2" column="2" colspan="3">
+       <widget class="C5LineEdit" name="leCustomer">
+        <property name="minimumSize">
+         <size>
+          <width>130</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="5">
        <widget class="QLabel" name="lbDisc">
         <property name="text">
          <string>Discount</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="6">
+      <item row="2" column="6">
        <widget class="C5LineEdit" name="leDisc">
         <property name="minimumSize">
          <size>

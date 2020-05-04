@@ -23,11 +23,11 @@ public:
 
     QString goodsCode(int code) const;
 
-    void markDiscount(const QString &customer);
-
     bool getAdministratorRights();
 
     static QMap<QString, Goods> fGoods;
+
+    static QHash<int, QString> fGoodsCodeForPrint;
 
 private:
     Ui::Working *ui;
@@ -38,7 +38,13 @@ private:
 
     void addGoods(QString &code);
 
+    void newSale(int type);
+
+    int ordersCount();
+
 private slots:
+    void timeout();
+
     void escape();
 
     void shortcutF1();
@@ -49,7 +55,21 @@ private slots:
 
     void shortcutF4();
 
+    void shortcutF5();
+
+    void shortcurF6();
+
     void shortcutF7();
+
+    void shortcutF8();
+
+    void shortcutF9();
+
+    void shortcutF10();
+
+    void shortcutF11();
+
+    void shortcutF12();
 
     void shortcutDown();
 
@@ -71,11 +91,19 @@ private slots:
 
     void on_tblGoods_itemClicked(QTableWidgetItem *item);
 
-    void on_btnRefund_clicked();
-
     void on_btnDuplicateReceipt_clicked();
 
     void on_leCode_textChanged(const QString &arg1);
+
+    void on_btnNewWhosale_clicked();
+
+    void on_lePartner_returnPressed();
+
+    void on_tab_tabCloseRequested(int index);
+
+    void on_btnItemBack_clicked();
+
+    void on_btnStoreInput_clicked();
 };
 
 #endif // WORKING_H

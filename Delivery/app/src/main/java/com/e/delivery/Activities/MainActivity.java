@@ -34,10 +34,6 @@ public class MainActivity extends ParentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        if (Config.getString("username").length() > 0) {
-            setEditText(R.id.edUsername, Config.getString("username"));
-            setEditText(R.id.edPassword, Config.getString("password"));
-        }
         EnumView.setButtonsClickListener(findViewById(R.id.idParent), this);
         Intent intent = new Intent(this, TempService.class);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -48,6 +44,11 @@ public class MainActivity extends ParentActivity {
         ActivityCompat.requestPermissions(this, new String[] {
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION }, REQUEST_ACCESS_FINE_LOCATION);
+        if (!Config.getString("session_id").isEmpty()) {
+            PartnerProvider.initPartners();
+            GoodsProvider.init();
+            ViewAnimator.animateHeight(findViewById(R.id.clConfig), -1, 0, hideLogin);
+        }
     }
 
     @Override
@@ -79,22 +80,24 @@ public class MainActivity extends ParentActivity {
         switch (m.mCommand) {
             case DataSenderCommands.lServiceStarted:
                 if (findViewById(R.id.clConfig).getVisibility() == View.VISIBLE) {
-                    String session = Config.getString("session_id");
-                    if (!session.isEmpty()) {
+                    if (Config.getString("username").length() > 0) {
+                        setEditText(R.id.edUsername, Config.getString("username"));
+                        setEditText(R.id.edPassword, Config.getString("password"));
                         findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
                         findViewById(R.id.tvLoginStatus).setVisibility(View.VISIBLE);
                         findViewById(R.id.btnEnter).setEnabled(false);
                         setTextViewText(R.id.tvLoginStatus, getString(R.string.LoginStatus));
                         Json j = new Json();
-                        j.putString("session", session);
+                        j.putString("username", editText(R.id.edUsername));
+                        j.putString("password", editText(R.id.edPassword));
+                        j.putString("session", Config.getString("session_id"));
                         j.putInt("listofgoods", 1);
-                        m = new DataMessage(DataSenderCommands.qLoginWithSession, j.toString(), "A", "S");
+                        m = new DataMessage(DataSenderCommands.qLogin, j.toString(), "A", "S");
                         LocalMessanger.sendMessage(m);
                     }
                 }
                 break;
             case DataSenderCommands.qLogin:
-            case DataSenderCommands.qLoginWithSession:
                 Json data = new Json(m.mBuffer);
                 if (m.mResponse == DataSenderCommands.rOk) {
                     Config.setString("username", editText(R.id.edUsername));
@@ -126,6 +129,8 @@ public class MainActivity extends ParentActivity {
     @Override
     public void onClick(View view) {
         Intent i;
+        Json j;
+        DataMessage m;
         super.onClick(view);
         switch (view.getId()) {
             case R.id.btnEnter:
@@ -133,11 +138,12 @@ public class MainActivity extends ParentActivity {
                 findViewById(R.id.tvLoginStatus).setVisibility(View.VISIBLE);
                 findViewById(R.id.btnEnter).setEnabled(false);
                 setTextViewText(R.id.tvLoginStatus, getString(R.string.LoginStatus));
-                Json j = new Json();
+                j = new Json();
                 j.putString("username", editText(R.id.edUsername));
                 j.putString("password", editText(R.id.edPassword));
+                j.putString("session", Config.getString("session_id"));
                 j.putInt("listofgoods", 1);
-                DataMessage m = new DataMessage(DataSenderCommands.qLogin, j.toString(), "A", "S");
+                m = new DataMessage(DataSenderCommands.qLogin, j.toString(), "A", "S");
                 LocalMessanger.sendMessage(m);
                 break;
             case R.id.btnSettings:
@@ -154,6 +160,11 @@ public class MainActivity extends ParentActivity {
                 break;
             case R.id.btnLogout:
                 ViewAnimator.animateHeight(findViewById(R.id.llWorking), -1, 0, showLogin);
+                j = new Json();
+                j.putInt("logout", 1);
+                j.putString("session", Config.getString("session_id"));
+                m = new DataMessage(DataSenderCommands.qLogin, j.toString(), "A", "S");
+                LocalMessanger.sendMessage(m);
                 break;
         }
     }

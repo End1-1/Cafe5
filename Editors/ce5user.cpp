@@ -1,6 +1,7 @@
 #include "ce5user.h"
 #include "ui_ce5user.h"
 #include "c5cache.h"
+#include "ce5usergroup.h"
 
 CE5User::CE5User(const QStringList &dbParams, QWidget *parent) :
     CE5Editor(dbParams, parent),
@@ -29,4 +30,15 @@ bool CE5User::checkData(QString &err)
         result = false;
     }
     return result;
+}
+
+void CE5User::on_btnNewGroup_clicked()
+{
+    CE5UserGroup *ep = new CE5UserGroup(fDBParams);
+    C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
+    QList<QMap<QString, QVariant> > data;
+    if(e->getResult(data)) {
+        ui->leGroup->setValue(data.at(0)["f_id"].toString());
+    }
+    delete e;
 }

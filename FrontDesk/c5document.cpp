@@ -15,7 +15,7 @@ int C5Document::genNumber(int docType) const
         db[":f_id"] = docType;
         db[":f_counter"] = 1;
         db[":f_name"] = tr("Cash doc");
-        db.insert("f_counter", false);
+        db.insert("a_type", false);
         db.commit();
         db[":f_id"] = docType;
         db.exec("select f_counter from a_type where f_id=:f_id for update");

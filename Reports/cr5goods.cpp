@@ -85,3 +85,12 @@ QToolBar *CR5Goods::toolBar()
     }
     return fToolBar;
 }
+
+bool CR5Goods::on_tblView_doubleClicked(const QModelIndex &index)
+{
+    if (!fColumnsVisible["gg.f_id"]) {
+        C5Message::info(tr("ID Column must be included in report"));
+        return false;
+    }
+    return C5ReportWidget::on_tblView_doubleClicked(index);
+}

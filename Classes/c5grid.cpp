@@ -261,7 +261,7 @@ void C5Grid::restoreColumnsVisibility()
                 .arg(_APPLICATION_)
                 .arg(_MODULE_)
                 .arg(fLabel));
-    for (QMap<QString, bool>::iterator it = fColumnsVisible.begin(); it != fColumnsVisible.end(); it++) {
+    for (QHash<QString, bool>::iterator it = fColumnsVisible.begin(); it != fColumnsVisible.end(); it++) {
         if (s.contains(it.key())) {
             it.value() = s.value(it.key()).toBool();
         }
@@ -280,7 +280,7 @@ void C5Grid::restoreColumnsWidths()
         ui->tblTotal->setItem(0, i, new C5TableWidgetItem());
         QString colName = fModel->nameForColumnIndex(i);
         QString fullColName = colName;
-        for (QMap<QString, bool>::const_iterator it = fColumnsVisible.begin(); it != fColumnsVisible.end(); it++) {
+        for (QHash<QString, bool>::const_iterator it = fColumnsVisible.begin(); it != fColumnsVisible.end(); it++) {
             QString c = it.key().toLower();
             if (c.contains(" as ")) {
                 int pos = c.indexOf(" as ");
@@ -760,7 +760,7 @@ void C5Grid::setSearchParameters()
                         .arg(_APPLICATION_)
                         .arg(_MODULE_)
                         .arg(fLabel));
-            for (QMap<QString, bool>::const_iterator it = fColumnsVisible.begin(); it != fColumnsVisible.end(); it++) {
+            for (QHash<QString, bool>::const_iterator it = fColumnsVisible.begin(); it != fColumnsVisible.end(); it++) {
                 s.setValue(it.key(), it.value());
             }
             buildQuery();

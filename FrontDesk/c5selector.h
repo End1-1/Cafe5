@@ -23,7 +23,7 @@ public:
 
     static bool getMultipleValues(const QStringList &dbParams, int cache, QList<QList<QVariant> > &values);
 
-    static bool getValues(const QStringList &dbParams, const QString &sql, QList<QVariant> &values, const QMap<QString, QString> &translator);
+    static bool getValues(const QStringList &dbParams, const QString &sql, QList<QVariant> &values, const QHash<QString, QString> &translator);
 
     void keyPressEvent(QKeyEvent *key) override;
 

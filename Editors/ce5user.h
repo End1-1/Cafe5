@@ -22,6 +22,9 @@ public:
 
     virtual bool checkData(QString &err);
 
+private slots:
+    void on_btnNewGroup_clicked();
+
 private:
     Ui::CE5User *ui;
 };

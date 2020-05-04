@@ -72,6 +72,8 @@ private:
     bool fRelation;
 
     QAction *fActionFromSale;
+
+    QStringList fRemovedRows;
 };
 
 #endif // C5CASHDOC_H

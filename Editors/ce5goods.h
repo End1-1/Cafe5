@@ -7,17 +7,6 @@ namespace Ui {
 class CE5Goods;
 }
 
-class C5Printing;
-
-class PrintBarcodeWidget : public QWidget {
-    // QWidget interface
-public:
-    PrintBarcodeWidget(C5Printing *prn, QWidget *parent = nullptr);
-protected:
-    C5Printing *print;
-    virtual void paintEvent(QPaintEvent *event) override;
-};
-
 class CE5Goods : public CE5Editor
 {
     Q_OBJECT
@@ -38,6 +27,16 @@ public:
     virtual void clear();
 
 private slots:
+    void tblQtyChanged(const QString &arg1);
+
+    void tblPriceChanged(const QString &arg1);
+
+    void tblTotalChanged(const QString &arg1);
+
+    void uploadImage();
+
+    void removeImage();
+
     void on_btnNewGroup_clicked();
 
     void on_btnNewUnit_clicked();
@@ -62,12 +61,12 @@ private slots:
 
     void on_btnPaste_clicked();
 
+    void on_lbImage_customContextMenuRequested(const QPoint &pos);
+
+    void on_tabWidget_currentChanged(int index);
+
 private:
     Ui::CE5Goods *ui;
-
-    PrintBarcodeWidget *fPbw;
-
-    C5Printing *fPrinting;
 
     int addGoodsRow();
 

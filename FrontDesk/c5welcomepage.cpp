@@ -14,6 +14,7 @@
 #include "cr5goodsstorages.h"
 #include "cr5goodspartners.h"
 #include "cr5menunames.h"
+#include "cr5salefromstore.h"
 #include "cr5dishpart1.h"
 #include "cr5dishpart2.h"
 #include "cr5dish.h"
@@ -47,10 +48,15 @@ void C5WelcomePage::setDatabaseName(const QString &database)
         return;
     }
     fDbName = db.getString(0);
+    ui->grAction->setVisible(pr(fDbName, cp_t2_action));
+    ui->grGoods->setVisible(pr(fDbName, cp_t6_goods_menu));
+    ui->grReports->setVisible(pr(fDbName, cp_t3_reports));
     ui->btnNewStoreInput->setVisible(pr(fDbName, cp_t2_store_input));
     ui->btnNewStoreOutput->setVisible(pr(fDbName, cp_t2_store_output));
     ui->btnNewStoreMovement->setVisible(pr(fDbName, cp_t2_store_move));
     ui->btnNewStoreOutput->setVisible(pr(fDbName, cp_t2_store_inventory));
+    ui->btnNewComplectation->setVisible(pr(fDbName, cp_t2_store_complectation));
+    ui->btnNewStoreDecomplectation->setVisible(pr(fDbName, cp_t2_store_decomplectation));
     ui->btnDocs->setVisible(pr(fDbName, cp_t3_documents));
     ui->btnMaterialsInStore->setVisible(pr(fDbName, cp_t3_store));
     ui->btnMovementInStore->setVisible(pr(fDbName, cp_t3_store_movement));
@@ -67,6 +73,7 @@ void C5WelcomePage::setDatabaseName(const QString &database)
     ui->btnDishDepts->setVisible(pr(fDbName, cp_t4_part1));
     ui->btnTypesOfDishes->setVisible(pr(fDbName, cp_t4_part2));
     ui->btnDishes->setVisible(pr(fDbName, cp_t4_dishes));
+    ui->btnSaleOfItems->setVisible(pr(fDbName, cp_t3_store_sale));
     ui->btnDatabase->setText(database);
 }
 
@@ -180,4 +187,21 @@ void C5WelcomePage::on_btnTypesOfDishes_clicked()
 void C5WelcomePage::on_btnDishes_clicked()
 {
     __mainWindow->createTab<CR5Dish>(fDBParams);
+}
+
+void C5WelcomePage::on_btnNewComplectation_clicked()
+{
+    C5StoreDoc *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);
+    sd->setMode(C5StoreDoc::sdComplectation);
+}
+
+void C5WelcomePage::on_btnNewStoreDecomplectation_clicked()
+{
+    C5StoreDoc *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);
+    sd->setMode(C5StoreDoc::sdDeComplectation);
+}
+
+void C5WelcomePage::on_btnSaleOfItems_clicked()
+{
+    __mainWindow->createTab<CR5SaleFromStore>(fDBParams);
 }

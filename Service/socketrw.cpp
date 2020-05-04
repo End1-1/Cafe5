@@ -5,7 +5,6 @@
 #include "sockethandlerunknown.h"
 #include "sockethandlerservicelogin.h"
 #include "sockethandlerserviceconfig.h"
-#include "sockethandlerloginwithsession.h"
 #include "sockethandlerlocationchanged.h"
 #include "sockethandleruploadsale.h"
 #include "sockethandleruuid.h"
@@ -44,7 +43,6 @@ void SocketRW::go()
                 LogWriter::write(10, 1, fSocketData.fSocket->fUuid, data);
                 SocketHandler *sh = nullptr;
                 SocketHandlerLogin *hl = nullptr;
-                SocketHandlerLoginWithSession *hls = nullptr;
                 switch (datatype) {
                 case dt_login:
                     hl = SocketHandler::create<SocketHandlerLogin>(&fSocketData, data);
@@ -58,13 +56,6 @@ void SocketRW::go()
                     break;
                 case dt_service_config:
                     sh = SocketHandler::create<SocketHandlerServiceConfig>(&fSocketData, data);
-                    break;
-                case dt_login_with_session:
-                    hls = SocketHandler::create<SocketHandlerLoginWithSession>(&fSocketData, data);
-                    sh = hls;
-                    if (hls->login()) {
-                        waitForReadyReadTimeout = -1;
-                    }
                     break;
                 case dt_location_changed:
                     sh = SocketHandler::create<SocketHandlerLocationChanged>(&fSocketData, data);

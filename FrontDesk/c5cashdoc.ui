@@ -83,12 +83,27 @@
        <widget class="C5TableWidget" name="tbl">
         <column>
          <property name="text">
+          <string>In</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Out</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
           <string>Name</string>
          </property>
         </column>
         <column>
          <property name="text">
           <string>Amount</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Base</string>
          </property>
         </column>
        </widget>
@@ -296,6 +311,11 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>C5DateEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5dateedit.h</header>
+  </customwidget>
+  <customwidget>
    <class>C5LineEdit</class>
    <extends>QLineEdit</extends>
    <header location="global">c5lineedit.h</header>
@@ -309,11 +329,6 @@
    <class>C5TableWidget</class>
    <extends>QTableWidget</extends>
    <header location="global">c5tablewidget.h</header>
-  </customwidget>
-  <customwidget>
-   <class>C5DateEdit</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5dateedit.h</header>
   </customwidget>
  </customwidgets>
  <resources>

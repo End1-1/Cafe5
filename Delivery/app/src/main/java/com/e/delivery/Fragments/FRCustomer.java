@@ -41,6 +41,7 @@ public class FRCustomer extends FRParentOrder {
             ((EditText) getView().findViewById(R.id.edAddress)).setText(mPartner.mAddress);
             ((EditText) getView().findViewById(R.id.edPhone)).setText(mPartner.mPhone);
         }
+        ((OrderActivity) mActivity).disableEdit();
     }
 
     @Override

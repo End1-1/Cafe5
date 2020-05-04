@@ -53,7 +53,7 @@ public:
 
     bool exec(const QString &sqlQuery, QList<QList<QVariant> > &dbrows);
 
-    bool exec(const QString &sqlQuery, QList<QList<QVariant> > &dbrows, QMap<QString, int> &columns);
+    bool exec(const QString &sqlQuery, QList<QList<QVariant> > &dbrows, QHash<QString, int> &columns);
 
     bool exec(const QString &sqlQuery, QMap<QString, QList<QVariant> > &dbrows, QMap<QString, int> &columns);
 
@@ -74,6 +74,8 @@ public:
     int rowCount();
 
     int columnCount();
+
+    int pos();
 
     bool first();
 
@@ -186,7 +188,7 @@ private:
 
     bool exec(const QString &sqlQuery, bool &isSelect);
 
-    QMap<QString, int> fNameColumnMap;
+    QHash<QString, int> fNameColumnMap;
 
     static QStringList fDbParamsForUuid;
 

@@ -20,7 +20,7 @@
       <enum>QTabWidget::West</enum>
      </property>
      <property name="currentIndex">
-      <number>7</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
@@ -247,7 +247,47 @@
        <string>Goods</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_4">
-       <item row="7" column="1">
+       <item row="0" column="0">
+        <widget class="C5CheckBox" name="chGoods">
+         <property name="text">
+          <string>All items</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>600</number>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="C5CheckBox" name="checkBox_14">
+         <property name="text">
+          <string>Goods</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>603</number>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="C5CheckBox" name="checkBox_17">
+         <property name="text">
+          <string>Storages</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>605</number>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="C5CheckBox" name="checkBox_15">
+         <property name="text">
+          <string>Auto waste</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>604</number>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="1">
         <spacer name="verticalSpacer_4">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -270,23 +310,13 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="0">
-        <widget class="C5CheckBox" name="chGoods">
+       <item row="6" column="0">
+        <widget class="C5CheckBox" name="checkBox_63">
          <property name="text">
-          <string>All items</string>
+          <string>Classes</string>
          </property>
          <property name="Tag" stdset="0">
-          <number>600</number>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="C5CheckBox" name="checkBox_14">
-         <property name="text">
-          <string>Goods</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>603</number>
+          <number>607</number>
          </property>
         </widget>
        </item>
@@ -300,33 +330,13 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="0">
-        <widget class="C5CheckBox" name="checkBox_17">
+       <item row="7" column="0">
+        <widget class="C5CheckBox" name="checkBox_65">
          <property name="text">
-          <string>Storages</string>
+          <string>Images</string>
          </property>
          <property name="Tag" stdset="0">
-          <number>605</number>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="0">
-        <widget class="C5CheckBox" name="checkBox_63">
-         <property name="text">
-          <string>Classes</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>607</number>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="C5CheckBox" name="checkBox_15">
-         <property name="text">
-          <string>Auto waste</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>604</number>
+          <number>608</number>
          </property>
         </widget>
        </item>

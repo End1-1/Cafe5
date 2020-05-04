@@ -1,6 +1,7 @@
 #ifndef CR5CONSUMPTIONBYSALES_H
 #define CR5CONSUMPTIONBYSALES_H
 
+#include "c5storedraftwriter.h"
 #include "c5reportwidget.h"
 
 class CR5ConsumptionBySalesFilter;
@@ -25,7 +26,7 @@ protected:
 private:
     CR5ConsumptionBySalesFilter *fFilter;
 
-    QMap<QString, int> fColumnNameIndex;
+    QHash<QString, int> fColumnNameIndex;
 
     QString documentForInventory();
 
@@ -40,7 +41,7 @@ private slots:
 
     void changeOutputStore();
 
-    C5StoreDoc *writeDocs(int doctype, int reason, const QMap<int, double> &data, const QString &comment);
+    C5StoreDoc *writeDocs(int doctype, int reason, const QList<IGoods> &data, const QString &comment);
 
 signals:
     void updateProgressValue(int);

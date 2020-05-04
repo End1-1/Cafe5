@@ -22,6 +22,8 @@ private slots:
 private:
     Ui::C5DataSynchronize *ui;
 
+    void dropTriggers(C5Database &ds);
+
 };
 
 #endif // C5DATASYNCHRONIZE_H

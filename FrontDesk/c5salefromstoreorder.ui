@@ -184,6 +184,16 @@
        <string>Store</string>
       </property>
      </column>
+     <column>
+      <property name="text">
+       <string>TaxDept</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Adgt</string>
+      </property>
+     </column>
     </widget>
    </item>
    <item>
@@ -192,7 +202,7 @@
       <item row="0" column="5">
        <widget class="QPushButton" name="btnRemove">
         <property name="text">
-         <string>Callback</string>
+         <string>Remove</string>
         </property>
        </widget>
       </item>
@@ -261,12 +271,30 @@
         </property>
        </widget>
       </item>
+      <item row="1" column="4">
+       <widget class="QPushButton" name="btnPrintTax">
+        <property name="maximumSize">
+         <size>
+          <width>100</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Print tax</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>C5DateEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5dateedit.h</header>
+  </customwidget>
   <customwidget>
    <class>C5LineEdit</class>
    <extends>QLineEdit</extends>
@@ -276,11 +304,6 @@
    <class>C5TableWidget</class>
    <extends>QTableWidget</extends>
    <header location="global">c5tablewidget.h</header>
-  </customwidget>
-  <customwidget>
-   <class>C5DateEdit</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5dateedit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

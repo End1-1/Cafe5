@@ -4,6 +4,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class DataMessage implements Parcelable {
+    public static int mCounter = 0;
+    public int mLocalCounter;
     public int mCommand;
     public String mBuffer;
     public int mResponse;
@@ -11,6 +13,8 @@ public class DataMessage implements Parcelable {
     public String mReceiver;
 
     public DataMessage(int command, String buffer, String sender, String receiver) {
+        mCounter++;
+        mLocalCounter = mCounter;
         mResponse = 0;
         mCommand = command;
         mBuffer = buffer;

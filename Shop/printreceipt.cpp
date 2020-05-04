@@ -15,11 +15,25 @@ void PrintReceipt::print(const QString &id, C5Database &db)
     db[":f_id"] = id;
     db.exec("select * from o_header where f_id=:f_id");
     db.nextRow();
+    QString saletype;
+    if (db.getDouble("f_amounttotal") < 0) {
+        saletype = tr("Return");
+    }
     QString hallid = db.getString("f_hallid");
     QString pref = db.getString("f_prefix");
+    int partner = db.getInt("f_partner");
     double amountTotal = db.getDouble("f_amounttotal");
     double amountCash = db.getDouble("f_amountcash");
     double amountCard = db.getDouble("f_amountcard");
+    QString partnerName, partnerTaxcode;
+    if (partner > 0) {
+        db[":f_id"] = partner;
+        db.exec("select * from c_partners where f_id=:f_id");
+        if (db.nextRow()) {
+            partnerTaxcode = db.getString("f_taxcode");
+            partnerName = db.getString("f_taxname");
+        }
+    }
     db[":f_id"] = id;
     db.exec("select * from o_tax where f_id=:f_id");
     bool tax = db.nextRow();
@@ -35,7 +49,8 @@ void PrintReceipt::print(const QString &id, C5Database &db)
         time = db.getString("f_time");
     }
     db[":f_header"] = id;
-    db.exec("select g.f_name, t.f_adgcode, g.f_scancode, o.f_qty, o.f_price, o.f_total, o.f_sign, o.f_taxdept "
+    db.exec("select g.f_name, t.f_adgcode, g.f_scancode, o.f_qty, o.f_price, "
+            "o.f_total, o.f_sign, o.f_taxdept, o.f_id "
             "from o_goods o "
             "left join c_goods g on g.f_id=o.f_goods "
             "left join c_groups t on t.f_id=g.f_group "
@@ -55,6 +70,23 @@ void PrintReceipt::print(const QString &id, C5Database &db)
         }
         data.append(v);
     }
+
+    db[":f_header"] = id;
+    db.exec("select og.f_id, g.f_name, g.f_scancode, gc.f_qty "
+            "from c_goods_complectation gc "
+            "inner join c_goods g on gc.f_goods=g.f_id "
+            "inner join o_goods og on og.f_goods=gc.f_base "
+            "left join c_groups t on t.f_id=g.f_group "
+            "where og.f_header=:f_header");
+    QMap<QString, QList<QList<QVariant> > > complectation;
+    while (db.nextRow()) {
+        QList<QVariant> v;
+        for (int i = 0; i < db.columnCount(); i++) {
+            v.append(db.getValue(i));
+        }
+        complectation[db.getString("f_id")].append(v);
+    }
+
     if (!C5Config::localReceiptPrinter().isEmpty()) {
         QFont font(qApp->font());
         font.setPointSize(20);
@@ -91,6 +123,19 @@ void PrintReceipt::print(const QString &id, C5Database &db)
             p.br();
         }
         p.br(2);
+        if (!saletype.isEmpty()) {
+            p.setFontSize(22);
+            p.ctext(saletype);
+            p.br();
+            p.setFontSize(20);
+        }
+        if (!partnerName.isEmpty()) {
+            p.ltext(tr("Buyer taxcode"), 0);
+            p.rtext(partnerTaxcode);
+            p.br();
+            p.ltext(partnerName, 0);
+            p.br();
+        }
         p.setFontBold(true);
         if (fModeRefund) {
             p.setFontSize(30);
@@ -114,6 +159,14 @@ void PrintReceipt::print(const QString &id, C5Database &db)
                 p.ltext(QString("%1 %2").arg(data.at(i).at(2).toString()).arg(data.at(i).at(0).toString()), 0);
             }
             p.br();
+            if (complectation.contains(data.at(i).at(8).toString())) {
+                QList<QList<QVariant> > rows = complectation[data.at(i).at(8).toString()];
+                for (int ri = 0; ri < rows.count(); ri++) {
+                    QList<QVariant> rv = rows.at(ri);
+                    p.ltext(QString("|---%1 %2 X %3").arg(rv.at(1).toString()).arg(rv.at(2).toString()).arg(float_str(rv.at(3).toDouble(), 2)), 0);
+                    p.br();
+                }
+            }
             p.ltext(QString("%1 X %2 = %3")
                     .arg(float_str(data.at(i).at(3).toDouble(), 2))
                     .arg(data.at(i).at(4).toDouble(), 2)

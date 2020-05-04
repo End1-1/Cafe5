@@ -5,7 +5,6 @@ public class DataSenderCommands {
     public static final int lDisableOrder = -2;
 
     public static final int qLogin = 1;
-    public static final int qLoginWithSession = 4;
     public static final int qLocationChanged = 5;
     public static final int qUploadSale = 6;
     public static final int qWonnaUUID = 7;
