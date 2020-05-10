@@ -4,22 +4,127 @@
 #include "c5shoporder.h"
 #include <QThread>
 
-C5Replication::C5Replication(QObject *parent) :
-    QObject(parent)
+C5Replication::C5Replication() :
+    QObject()
 {
 
 }
 
-void C5Replication::start()
+void C5Replication::start(const char *slot)
 {
     QThread *t = new QThread();
     connect(t, SIGNAL(finished()), t, SLOT(deleteLater()));
     connect(t, SIGNAL(finished()), this, SLOT(deleteLater()));
-    connect(t, SIGNAL(started()), this, SLOT(process()));
+    connect(t, SIGNAL(started()), this, slot);
     connect(this, SIGNAL(finished()), t, SLOT(quit()));
-    setParent(0);
     moveToThread(t);
     t->start();
+}
+
+void C5Replication::downloadFromServer()
+{
+    int steps = 0;
+    int step = 1;
+    C5Database dr(__c5config.replicaDbParams());
+    C5Database dr2(__c5config.replicaDbParams());
+    emit progress("Connecting to replication database");
+    if (!dr.open()) {
+        emit progress("Connection to " + __c5config.replicaDbParams().at(0) + ":" + __c5config.replicaDbParams().at(1) + " failed.<br>" + dr.fLastError);
+        emit finished();
+        return;
+    }
+    C5Database db(__c5config.dbParams());
+    db[":f_host"] = db.fDb.hostName();
+    db[":f_db"] = db.fDb.databaseName();
+    db.exec("select f_syncin from s_db where f_host=:f_host and f_db=:f_db");
+    if (!db.nextRow()) {
+        emit progress("Cannot get syncronization number");
+        emit finished();
+        return;
+    }
+    int lastid = db.getInt(0);
+    QStringList tl;
+    dr.exec("select * from s_syncronize_in order by f_id");
+    while (dr.nextRow()) {
+        tl.append(dr.getString("f_table"));
+    }
+    steps = 2;
+    if (lastid == 0) {
+        steps = tl.count() + 2;
+        dr.exec("select max(f_id) from s_syncronize");
+        dr.nextRow();
+        lastid = dr.getInt(0);
+        db.startTransaction();
+        foreach (const QString &tn, tl) {
+            db.exec("delete from " + tn);
+        }
+        for (int i = tl.count() - 1; i > -1; i--) {
+            updateTable(dr, db, step, steps, tl.at(i));
+        }
+        db.commit();
+    }
+    dr[":f_id"] = lastid;
+    dr.exec("select s.f_id, s.f_table, s.f_recid, s.f_op "
+            "from s_syncronize s "
+            "inner join s_syncronize_in si on si.f_table=s.f_table "
+            "where s.f_id>:f_id");
+    while (dr.nextRow()) {
+        switch (dr.getInt("f_op")) {
+        case 1:
+            dr2[":f_id"] = dr.getInt("f_recid");
+            dr2.exec("select * from " + dr.getString("f_table") + " where f_id=:f_id");
+            if (dr2.nextRow()) {
+                db.setBindValues(dr2.getBindValues());
+                db.insert(dr.getString("f_table"), false);
+            }
+            break;
+        case 2:
+            dr2[":f_id"] = dr.getString("f_recid");
+            dr2.exec("select * from " + dr.getString("f_table") + " where f_id=:f_id");
+            if (dr2.nextRow()) {
+                db.setBindValues(dr2.getBindValues());
+                db.update(dr.getString("f_table"), where_id(dr.getString("f_id")));
+            }
+            break;
+        case 3:
+            db[":f_id"] = dr.getString("f_recid");
+            db.exec("delete from " + dr.getString("f_table") + " where f_id=:f_id");
+            break;
+        }
+        lastid = dr.getInt("f_id");
+        emit progress(QString("Step %1 of %2. Items %3 of %4").arg(step).arg(steps).arg(dr.pos()).arg(dr.rowCount()));
+    }
+    db[":f_host"] = db.fDb.hostName();
+    db[":f_db"] = db.fDb.databaseName();
+    db[":f_syncin"] = lastid;
+    db.exec("update s_db set f_syncin=:f_syncin, f_synctime=current_timestamp where f_host=:f_host and f_db=:f_db");
+
+    db.exec("delete from a_store_temp");
+    dr[":date"] = QDate::currentDate();
+    dr[":store"] = __c5config.defaultStore();
+    dr.exec("select g.f_id as f_code,ss.f_name as f_storage,gg.f_name as f_group,g.f_name as f_goods,g.f_scancode,sum(s.f_qty*s.f_type) as f_qty, "
+            "u.f_name as f_unit,g.f_lastinputprice,sum(g.f_lastinputprice*s.f_type*s.f_qty) as f_total,g.f_saleprice,sum(s.f_qty*s.f_type)*g.f_saleprice as f_totalsale,"
+            "g.f_saleprice2,sum(s.f_qty*s.f_type)*g.f_saleprice2 as f_totalsale2 "
+            "from a_store_draft s "
+            "inner join c_goods g on g.f_id=s.f_goods "
+            "inner join c_storages ss on ss.f_id=s.f_store "
+            "inner join c_groups gg on gg.f_id=g.f_group "
+            "inner join c_units u on u.f_id=g.f_unit "
+            "inner join a_header h on h.f_id=s.f_document  "
+            "where  h.f_date<=:date  and s.f_store=:store "
+            "group by g.f_id,ss.f_name,gg.f_name,g.f_name,u.f_name,g.f_lastinputprice,g.f_saleprice,g.f_saleprice2 "
+            "having sum(s.f_qty*s.f_type) > 0");
+    while (dr.nextRow()) {
+        db[":f_store"] = __c5config.defaultStore();
+        db[":f_goods"] = dr.getInt("f_code");
+        db[":f_qty"] = dr.getDouble("f_qty");
+        db.insert("a_store_temp", false);
+        if (dr.pos() % 20 == 0) {
+            emit progress(QString("Step %1 of %2. %3 %4/%5").arg(step).arg(steps).arg("Store").arg(dr.pos()).arg(dr.rowCount()));
+        }
+    }
+    step++;
+    emit finished();
 }
 
 bool C5Replication::ret(C5Database &db1, C5Database &db2)
@@ -30,7 +135,7 @@ bool C5Replication::ret(C5Database &db1, C5Database &db2)
     return true;
 }
 
-bool C5Replication::process()
+bool C5Replication::uploadToServer()
 {
     C5Database dr(__c5config.replicaDbParams());
     C5Database db(__c5config.dbParams());
@@ -62,6 +167,20 @@ bool C5Replication::process()
             if (!dr.insert("o_goods", false)) {
                 return ret(dr, db);
             }
+        }
+
+        db[":f_order"] = s;
+        db.exec("select * from o_tax_log where f_order=:f_order");
+        while (db.nextRow()) {
+            dr.setBindValues(db.getBindValues());
+            dr.insert("o_tax_log", false);
+        }
+
+        db[":f_id"] = s;
+        db.exec("select * from o_tax where f_id=:f_id");
+        if (db.nextRow()) {
+            dr.setBindValues(db.getBindValues());
+            dr.insert("o_tax", false);
         }
 
         QSet<QString> storeHeader;
@@ -144,6 +263,10 @@ bool C5Replication::process()
         db.exec("delete from o_goods where f_header=:f_header");
         db[":f_id"] = s;
         db.exec("delete from o_header where f_id=:f_id");
+        db[":f_order"] = s;
+        db.exec("delete from o_tax_log where f_order=:f_order");
+        db[":f_id"] = s;
+        db.exec("delete from o_tax where f_id=:f_id");
         foreach (const QString &s1, storeHeader) {
             db[":f_document"] = s1;
             db.exec("delete from a_store where f_document=:f_document");
@@ -167,4 +290,19 @@ bool C5Replication::process()
     }
     emit finished();
     return true;
+}
+
+void C5Replication::updateTable(C5Database &dr, C5Database &db, int &step, int steps, const QString &tableName)
+{
+    dr.exec("select * from " + tableName);
+    while (dr.nextRow()) {
+        if (dr.pos() % 10 == 0) {
+            emit progress(QString("Step %1 of %2. %3 %4/%5").arg(step).arg(steps).arg(tableName).arg(dr.pos()).arg(dr.rowCount()));
+        }
+        db.setBindValues(dr.getBindValues());
+        if (!db.insert(tableName, false)) {
+            emit progress(db.fLastError);
+        }
+    }
+    step++;
 }

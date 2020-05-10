@@ -67,6 +67,7 @@ void StoreInput::getList()
             "inner join a_header ah on ah.f_id=ad.f_document "
             "inner join a_header_shop2partner sp on sp.f_id=ah.f_id "
             "where sp.f_store=:f_store and sp.f_accept=0 ");
+    ui->leTotal->setDouble(0);
     while (db.nextRow()) {
         if (!db.getString("f_acc").isEmpty()) {
             continue;
@@ -80,5 +81,6 @@ void StoreInput::getList()
         ui->tbl->setString(r, 5, db.getString("f_scancode"));
         ui->tbl->setString(r, 6, db.getString("f_qty"));
         ui->tbl->setString(r, 7, db.getString("f_saleprice"));
+        ui->leTotal->setDouble(ui->leTotal->getDouble() + (db.getDouble("f_qty") * db.getDouble("f_saleprice")));
     }
 }

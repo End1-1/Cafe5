@@ -210,8 +210,26 @@ bool C5ShopOrder::write(double total, double card, double discount, bool tax, QL
                     return returnFalse(dw.fErrorMsg, db);
                 }
 
-                for (int i = 0; i < goods.count(); i++) {
-                    IGoods &g = goods[i];
+                QList<IGoods> ingoods;
+                db[":f_document"] = storeDocId;
+                db.exec("select if (gc.f_base is null, ad.f_goods, gc.f_goods) as f_goods, "
+                        "if(gc.f_base is null, ad.f_qty, gc.f_qty*ad.f_qty) as f_qty, "
+                        "if(gc.f_base is null, ad.f_price, g.f_saleprice2) as f_price, "
+                        "if(gc.f_base is null, ad.f_price*ad.f_qty, g.f_saleprice2*(gc.f_qty*ad.f_qty)) as f_total "
+                        "from a_store_draft ad "
+                        "left join c_goods_complectation gc on gc.f_base=ad.f_goods "
+                        "left join c_goods g on g.f_id=gc.f_goods "
+                        "where f_document=:f_document");
+                while (db.nextRow()) {
+                    IGoods g;
+                    g.goodsId = db.getInt("f_goods");
+                    g.goodsQty = db.getDouble("f_qty");
+                    g.goodsPrice = db.getDouble("f_price");
+                    g.goodsTotal = db.getDouble("f_total");
+                    ingoods.append(g);
+                }
+                for (int i = 0; i < ingoods.count(); i++) {
+                    IGoods &g = ingoods[i];
                     QString adraftid;
                     if (!dw.writeAStoreDraft(adraftid, pstoredoc, partnerStore, 1, g.goodsId, g.goodsQty, g.goodsPrice, g.goodsTotal, DOC_REASON_INPUT, adraftid, i + 1)) {
                         return returnFalse(dw.fErrorMsg, db);

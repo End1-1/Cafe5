@@ -104,17 +104,12 @@
 <context>
     <name>C5Message</name>
     <message>
-        <location filename="../Cafe5/c5message.ui" line="37"/>
-        <source>MESSAGE</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../Cafe5/c5message.ui" line="90"/>
+        <location filename="../Cafe5/c5message.ui" line="60"/>
         <source>OK</source>
         <translation>Այո</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5message.ui" line="97"/>
+        <location filename="../Cafe5/c5message.ui" line="67"/>
         <source>Cancel</source>
         <translation>Հրաժարվել</translation>
     </message>

@@ -7,8 +7,12 @@
 #include "sales.h"
 #include "c5replication.h"
 #include "c5config.h"
+#include "c5userauth.h"
+#include "dlgpin.h"
+#include "searchitems.h"
 #include "c5connection.h"
 #include "storeinput.h"
+#include "selectstaff.h"
 #include <QShortcut>
 #include <QInputDialog>
 #include <QTimer>
@@ -58,9 +62,15 @@ Working::Working(QWidget *parent) :
     PrintTaxN::fTaxCashier = __c5config.taxCashier();
     PrintTaxN::fTaxPin = __c5config.taxPin();
     ui->wGoods->setVisible(false);
+    ui->btnNewOrder->setVisible(!__c5config.shopDenyF1());
+    ui->btnNewWhosale->setVisible(!__c5config.shopDenyF2());
+    fTimerCounter = 0;
     QTimer *timer = new QTimer();
     connect(timer, SIGNAL(timeout()), this, SLOT(timeout()));
-    timer->start(20000);
+    timer->start(1000);
+    if (__c5config.shopDifferentStaff()) {
+        loadStaff();
+    }
 }
 
 Working::~Working()
@@ -91,6 +101,9 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
             event->accept();
             return true;
         case Qt::Key_Asterisk:
+            if (__c5config.shopDenyPriceChange()) {
+                return QWidget::eventFilter(watched, event);
+            }
             ui->leCode->clear();
             w = static_cast<WOrder*>(ui->tab->currentWidget());
             if (w) {
@@ -103,6 +116,69 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
             break;
         case Qt::Key_F9:
             on_btnSaveOrderNoTax_clicked();
+            break;
+        case Qt::Key_S:
+            if (ke->modifiers() & Qt::ControlModifier) {
+                SearchItems *si = new SearchItems(this);
+                si->exec();
+                si->deleteLater();
+                event->accept();
+                return true;
+            }
+            break;
+        case Qt::Key_I:
+            if (ke->modifiers() & Qt::ControlModifier) {
+                QString pin, pass;
+                if (DlgPin::getPin(pin, pass)) {
+                    C5Database db(__c5config.dbParams());
+                    C5UserAuth ua(db);
+                    int user, group;
+                    QString name;
+                    if (ua.authByPinPass(pin, pass, user, group, name)) {
+                        db[":f_user"] = user;
+                        db.exec("select * from s_salary_inout where f_user=:f_user and f_dateout is null");
+                        if (db.nextRow()) {
+                            C5Message::error(tr("Cannot input without output"));
+                        } else {
+                            db[":f_user"] = user;
+                            db[":f_datein"] = QDate::currentDate();
+                            db[":f_timein"] = QTime::currentTime();
+                            db.insert("s_salary_inout", false);
+                            loadStaff();
+                            C5Message::info(QString("%1,<br>%2").arg(tr("Welcome")).arg(name));
+                        }
+                    } else {
+                        C5Message::error(ua.error());
+                    }
+                }
+            }
+            break;
+        case Qt::Key_O:
+            if (ke->modifiers() & Qt::ControlModifier) {
+                QString pin, pass;
+                if (DlgPin::getPin(pin, pass)) {
+                    C5Database db(__c5config.dbParams());
+                    C5UserAuth ua(db);
+                    int user, group;
+                    QString name;
+                    if (ua.authByPinPass(pin, pass, user, group, name)) {
+                        db[":f_user"] = user;
+                        db.exec("select * from s_salary_inout where f_user=:f_user and f_dateout is null");
+                        if (db.nextRow()) {
+                            db[":f_user"] = user;
+                            db[":f_dateout"] = QDate::currentDate();
+                            db[":f_timeout"] = QTime::currentTime();
+                            db.update("s_salary_inout", where_id(db.getInt("f_id")));
+                            loadStaff();
+                            C5Message::info(QString("%1,<br>%2").arg(tr("Good bye")).arg(name));
+                        } else {
+                            C5Message::error(tr("Cannot output without input"));
+                        }
+                    } else {
+                        C5Message::error(ua.error());
+                    }
+                }
+            }
             break;
         }
     }
@@ -161,6 +237,12 @@ void Working::makeWGoods()
     for (int i = 0; i < cw.count(); i++) {
         ui->tblGoods->setColumnWidth(i, cw.at(i));
     }
+    ui->tblGoods->setColumnHidden(5, __c5config.shopDenyF1());
+    ui->tblGoods->setColumnHidden(6, __c5config.shopDenyF2());
+    ui->lbTotalRetail->setVisible(!__c5config.shopDenyF1());
+    ui->leTotalRetail->setVisible(!__c5config.shopDenyF1());
+    ui->lbTotalWhosale->setVisible(!__c5config.shopDenyF2());
+    ui->leTotalWhosale->setVisible(!__c5config.shopDenyF2());
     ui->tblGoods->verticalHeader()->setDefaultSectionSize(30);
     ui->tblGoods->clearContents();
     ui->tblGoods->setRowCount(0);
@@ -222,6 +304,8 @@ void Working::makeWGoods()
                 "order by gr.f_name, gca.f_name ");
     }
     ui->tblGoods->setRowCount(db.rowCount());
+    ui->leTotalRetail->setDouble(0);
+    ui->leTotalRetail->setDouble(0);
     while (db.nextRow()) {
         Goods g;
         g.fScanCode = db.getString("f_scancode");
@@ -240,7 +324,32 @@ void Working::makeWGoods()
             item->setData(Qt::EditRole, db.getValue(i));
             ui->tblGoods->setItem(row, i, item);
         }
+        ui->leTotalRetail->setDouble(ui->leTotalRetail->getDouble() + (g.fRetailPrice * g.fQty));
+        ui->leTotalWhosale->setDouble(ui->leTotalWhosale->getDouble() + (g.fWhosalePrice * g.fQty));
         row++;
+    }
+    ui->lbLastUpdate->setText(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
+}
+
+void Working::loadStaff()
+{
+    fCurrentUsers.clear();
+    C5Database db(__c5config.dbParams());
+    db.exec("select u.f_id, concat(u.f_last, ' ' , u.f_first) as f_name, p.f_data "
+            "from s_salary_inout s "
+            "inner join s_user u on u.f_id=s.f_user "
+            "left join s_user_photo p on p.f_id=u.f_id "
+            "where s.f_dateout is null");
+    while (db.nextRow()) {
+        IUser u;
+        u.id = db.getInt("f_id");
+        u.name = db.getString("f_name");
+        QPixmap p;
+        if (!p.loadFromData(db.getValue("f_data").toByteArray())) {
+            p = QPixmap(":/staff.png");
+        }
+        u.photo = p;
+        fCurrentUsers.append(u);
     }
 }
 
@@ -299,9 +408,19 @@ int Working::ordersCount()
 
 void Working::timeout()
 {
+    fTimerCounter++;
     if (__c5config.rdbReplica()) {
-        C5Replication *r = new C5Replication(this);
-        r->start();
+        if (fTimerCounter % 20 == 0) {
+            auto *r = new C5Replication();
+            r->start(SLOT(uploadToServer()));
+        }
+        if (fTimerCounter % 120 == 0) {
+            auto *r = new C5Replication();
+            r->start(SLOT(downloadFromServer()));
+        }
+    }
+    if (fTimerCounter % 180 == 0) {
+        getGoodsList();
     }
 }
 
@@ -316,11 +435,17 @@ void Working::escape()
 
 void Working::shortcutF1()
 {
+    if (__c5config.shopDenyF1()) {
+        return;
+    }
     newSale(SALE_RETAIL);
 }
 
 void Working::shortcutF2()
 {
+    if (__c5config.shopDenyF2()) {
+        return;
+    }
     newSale(SALE_WHOSALE);
 }
 

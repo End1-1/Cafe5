@@ -78,6 +78,20 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="btnRefresh">
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/refresh.png</normaloff>:/refresh.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -89,6 +103,52 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnModeTotal">
+        <property name="styleSheet">
+         <string notr="true">                QPushButton:checked{
+                    background-color: rgb(0, 150, 0);
+					font-weight:bold;
+                }</string>
+        </property>
+        <property name="text">
+         <string>Total mode</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/print.png</normaloff>:/print.png</iconset>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnModeItems">
+        <property name="styleSheet">
+         <string notr="true">                QPushButton:checked{
+                    background-color: rgb(0, 150, 0);
+					font-weight:bold;
+                }</string>
+        </property>
+        <property name="text">
+         <string>Item mode</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/print.png</normaloff>:/print.png</iconset>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QPushButton" name="btnPrint">
@@ -199,7 +259,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="QLabel" name="label_2">
+       <widget class="QLabel" name="lbRetail">
         <property name="text">
          <string>Retail</string>
         </property>
@@ -222,7 +282,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label_3">
+       <widget class="QLabel" name="lbWhosale">
         <property name="text">
          <string>Whosale</string>
         </property>
@@ -281,7 +341,7 @@
   <customwidget>
    <class>C5LineEdit</class>
    <extends>QLineEdit</extends>
-   <header location="global">c5lineedit.h</header>
+   <header>c5lineedit.h</header>
   </customwidget>
   <customwidget>
    <class>C5DateEdit</class>

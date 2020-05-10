@@ -637,7 +637,7 @@ void C5StoreDoc::countTotal()
 void C5StoreDoc::countQtyOfComplectation()
 {
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
-        ui->tblGoods->lineEdit(i, 5)->setDouble(fBaseQtyOfComplectation[ui->tblGoods->getInteger(i, 3)] * ui->leComplectationQty->getDouble());
+        ui->tblGoods->lineEdit(i, 5)->setDouble(fBaseQtyOfComplectation[i] * ui->leComplectationQty->getDouble());
     }
 }
 
@@ -726,7 +726,8 @@ int C5StoreDoc::addGoodsRow()
     ui->tblGoods->setItem(row, 3, new QTableWidgetItem());
     ui->tblGoods->setItem(row, 4, new QTableWidgetItem());
     C5LineEdit *lqty = ui->tblGoods->createLineEdit(row, 5);
-    lqty->setValidator(new QDoubleValidator(0, 1000000, 3));
+    lqty->setValidator(new QDoubleValidator(0, 1000000, 4));
+    lqty->fDecimalPlaces = 4;
     ui->tblGoods->setItem(row, 6, new QTableWidgetItem());
     C5LineEdit *lprice = ui->tblGoods->createLineEdit(row, 7);
     lprice->setValidator(new QDoubleValidator(0, 100000000, 3));
@@ -1050,6 +1051,9 @@ void C5StoreDoc::printDoc()
     case DOC_TYPE_STORE_MOVE:
         docTypeText = tr("Store movement");
         break;
+    case DOC_TYPE_COMPLECTATION:
+        docTypeText = tr("Store complectation");
+        break;
     }
 
     p.ctext(QString("%1 N%2").arg(docTypeText).arg(ui->leDocNum->text()));
@@ -1067,7 +1071,7 @@ void C5StoreDoc::printDoc()
         storeOutName = ui->leStoreOutputName->text();
     }
     if (!ui->leComment->isEmpty()) {
-        p.ltext(ui->leComment->text(), 0);
+        p.ltext(ui->leComment->text(), 50);
         p.br();
     }
     p.br();
@@ -1077,11 +1081,11 @@ void C5StoreDoc::printDoc()
     vals << tr("Date");
     if (!storeInName.isEmpty()) {
         vals << tr("Store, input");
-        points << 400;
+        points << 500;
     }
     if (!storeOutName.isEmpty()) {
         vals << tr("Store, output");
-        points << 400;
+        points << 500;
     }
     p.tableText(points, vals, p.fLineHeight + 20);
     p.br(p.fLineHeight + 20);
@@ -1130,12 +1134,42 @@ void C5StoreDoc::printDoc()
     p.br();
     p.br();
 
+    if (fDocType == DOC_TYPE_COMPLECTATION) {
+        points.clear();
+        points << 50 << 100 << 200 << 600 << 250 << 250 << 250;
+        vals.clear();
+        vals.append(tr("NN"));
+        vals.append(tr("Code"));
+        vals.append(tr("Input material"));
+        vals.append(tr("Qty"));
+        vals.append(tr("Price"));
+        vals.append(tr("Amount"));
+        p.setFontBold(true);
+        p.tableText(points, vals, p.fLineHeight + 20);
+        p.br(p.fLineHeight + 20);
+        vals.clear();
+        vals.append("1");
+        vals.append(ui->leComplectationCode->text());
+        vals.append(ui->leComplectationName->text());
+        vals.append(ui->leComplectationQty->text());
+        vals.append(float_str(ui->leTotal->getDouble() / ui->leComplectationQty->getDouble(), 2));
+        vals.append(ui->leTotal->text());
+        p.setFontBold(false);
+        p.tableText(points, vals, p.fLineHeight + 20);
+        p.br(p.fLineHeight + 20);
+    }
+    p.br();
+
+    QString goodsColName = tr("Goods");
+    if (fDocType == DOC_TYPE_COMPLECTATION) {
+        goodsColName = tr("Output material");
+    }
     points.clear();
     points << 50 << 100 << 200 << 600 << 250 << 250 << 250 << 270;
     vals.clear();
     vals << tr("NN")
          << tr("Material code")
-         << tr("Goods")
+         << goodsColName
          << tr("Qty")
          << tr("Unit")
          << tr("Price")
@@ -1505,7 +1539,7 @@ void C5StoreDoc::on_leComplectationName_textChanged(const QString &arg1)
             "where c.f_base=:f_base");
     while (db.nextRow()) {
         int row = addGoodsRow();
-        fBaseQtyOfComplectation[db.getInt("f_goods")] = db.getDouble("f_qty");
+        fBaseQtyOfComplectation.insert(row, db.getDouble("f_qty"));
         ui->tblGoods->setInteger(row, 3, db.getInt("f_goods"));
         ui->tblGoods->setString(row, 4, db.getString("f_goodsname"));
         ui->tblGoods->lineEdit(row, 5)->setDouble(db.getDouble("f_qty"));

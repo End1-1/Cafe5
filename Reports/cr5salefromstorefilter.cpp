@@ -7,6 +7,7 @@ CR5SaleFromStoreFilter::CR5SaleFromStoreFilter(const QStringList &dbParams, QWid
     ui(new Ui::CR5SaleFromStoreFilter)
 {
     ui->setupUi(this);
+    ui->leHall->setSelector(dbParams, ui->leHallname, cache_hall_list).setMultiselection(true);
     ui->leSupplier->setSelector(dbParams, ui->leSupplierName, cache_goods_partners).setMultiselection(true);
     ui->leGroup->setSelector(dbParams, ui->leGroupName, cache_goods_group).setMultiselection(true);
     ui->leClass1->setSelector(dbParams, ui->leClass1Name, cache_goods_classes).setMultiselection(true);
@@ -25,6 +26,9 @@ QString CR5SaleFromStoreFilter::condition()
     QString w = " oh.f_datecash between " + ui->deStart->toMySQLDate() + " and " + ui->deEnd->toMySQLDate() + " ";
     if (!ui->leSupplier->isEmpty()) {
         w += " and gg.f_supplier in (" + ui->leSupplier->text() + ") " ;
+    }
+    if (!ui->leHall->isEmpty()) {
+        w += " and oh.f_hall in (" + ui->leHall->text() + ") ";
     }
     if (!ui->leGroup->isEmpty()) {
         w += " and gg.f_group in (" + ui->leGroup->text() + ") ";

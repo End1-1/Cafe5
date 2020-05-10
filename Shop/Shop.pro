@@ -50,6 +50,7 @@ SOURCES += \
     ../Classes/c5storedraftwriter.cpp \
     ../Classes/c5tablemodel.cpp \
     ../Classes/c5tableview.cpp \
+    ../Classes/c5userauth.cpp \
     ../Classes/c5widget.cpp \
     ../Classes/notificationwidget.cpp \
     ../Controls/c5graphicsview.cpp \
@@ -61,12 +62,16 @@ SOURCES += \
     ../FrontDesk/c5selector.cpp \
     c5replication.cpp \
     dlgpin.cpp \
+    imageloader.cpp \
         main.cpp \
     printreceipt.cpp \
     replicadialog.cpp \
     sales.cpp \
+    searchitems.cpp \
+    selectstaff.cpp \
     settingsselection.cpp \
     storeinput.cpp \
+    userphoto.cpp \
     viewinputitem.cpp \
     vieworder.cpp \
         working.cpp \
@@ -115,6 +120,7 @@ HEADERS += \
     ../Classes/c5storedraftwriter.h \
     ../Classes/c5tablemodel.h \
     ../Classes/c5tableview.h \
+    ../Classes/c5userauth.h \
     ../Classes/c5widget.h \
     ../Classes/notificationwidget.h \
     ../Controls/c5graphicsview.h \
@@ -126,11 +132,15 @@ HEADERS += \
     ../FrontDesk/c5selector.h \
     c5replication.h \
     dlgpin.h \
+    imageloader.h \
     printreceipt.h \
     replicadialog.h \
     sales.h \
+    searchitems.h \
+    selectstaff.h \
     settingsselection.h \
     storeinput.h \
+    userphoto.h \
     viewinputitem.h \
     vieworder.h \
         working.h \
@@ -168,8 +178,11 @@ FORMS += \
     dlgpin.ui \
     replicadialog.ui \
     sales.ui \
+    searchitems.ui \
+    selectstaff.ui \
     settingsselection.ui \
     storeinput.ui \
+    userphoto.ui \
     viewinputitem.ui \
     vieworder.ui \
         working.ui \
@@ -194,7 +207,8 @@ INCLUDEPATH += ../Editors
 INCLUDEPATH += ../RESOURCES
 INCLUDEPATH += ../../XLSX/Src
 INCLUDEPATH += C:/Projects/NewTax/Src
-
+INCLUDEPATH += C:/OpenSSL-Win32/include
+INCLUDEPATH += C:/OpenSSL-Win32/include/openssl
 
 ICON = bag.ico
 
@@ -207,3 +221,4 @@ LIBS += -lwsock32
 LIBS += -LC:/OpenSSL-Win32/lib
 LIBS += -lopenssl
 LIBS += -llibcrypto
+

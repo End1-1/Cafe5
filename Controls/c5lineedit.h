@@ -30,7 +30,7 @@ public:
 
     void setTag(int tag);
 
-    inline bool isEmpty() {return text().isEmpty();}
+    inline bool isEmpty() {setText(text().trimmed()); return text().isEmpty();}
 
     void setColor(int c);
 

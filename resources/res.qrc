@@ -76,5 +76,7 @@
         <file>barcode.png</file>
         <file>maintenance.png</file>
         <file>images.png</file>
+        <file>search.png</file>
+        <file>staff.png</file>
     </qresource>
 </RCC>

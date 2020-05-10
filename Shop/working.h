@@ -10,6 +10,12 @@ class Working;
 
 class QTableWidgetItem;
 
+struct IUser {
+    int id;
+    QString name;
+    QPixmap photo;
+};
+
 class Working : public QWidget
 {
     Q_OBJECT
@@ -29,6 +35,8 @@ public:
 
     static QHash<int, QString> fGoodsCodeForPrint;
 
+    QList<IUser> fCurrentUsers;
+
 private:
     Ui::Working *ui;
 
@@ -36,11 +44,15 @@ private:
 
     void makeWGoods();
 
+    void loadStaff();
+
     void addGoods(QString &code);
 
     void newSale(int type);
 
     int ordersCount();
+
+    int fTimerCounter;
 
 private slots:
     void timeout();

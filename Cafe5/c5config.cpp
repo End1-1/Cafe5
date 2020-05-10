@@ -339,6 +339,26 @@ QString C5Config::rdbPassword()
     return getValue(param_rootdb_pass);
 }
 
+bool C5Config::shopDenyF1()
+{
+    return getValue(param_shop_noF1).toInt() == 1;
+}
+
+bool C5Config::shopDenyF2()
+{
+    return getValue(param_shop_noF2).toInt() == 1;
+}
+
+bool C5Config::shopDenyPriceChange()
+{
+    return getValue(param_shop_noPriceChange).toInt() == 1;
+}
+
+bool C5Config::shopDifferentStaff()
+{
+    return getValue(param_shop_defferentStaff).toInt() == 1;
+}
+
 QString C5Config::getValue(int key)
 {
     QMutexLocker ml(&settingsMutex);

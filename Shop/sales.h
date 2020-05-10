@@ -27,12 +27,24 @@ private slots:
 
     void on_btnItemBack_clicked();
 
+    void on_btnRefresh_clicked();
+
+    void on_btnModeTotal_clicked();
+
+    void on_btnModeItems_clicked();
+
 private:
     Ui::Sales *ui;
 
     void changeDate(int d);
 
     void refresh();
+
+    void refreshTotal();
+
+    void refreshItems();
+
+    int fViewMode;
 };
 
 #endif // SALES_H

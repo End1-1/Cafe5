@@ -1,12 +1,13 @@
 #ifndef REPLICADIALOG_H
 #define REPLICADIALOG_H
 
-#include "c5database.h"
 #include <QDialog>
 
 namespace Ui {
 class ReplicaDialog;
 }
+
+class C5Replication;
 
 class ReplicaDialog : public QDialog
 {
@@ -14,17 +15,16 @@ class ReplicaDialog : public QDialog
 
 public:
     explicit ReplicaDialog(QWidget *parent = nullptr);
+
     ~ReplicaDialog();
 
 private:
     Ui::ReplicaDialog *ui;
 
-    void progress(const QString &msg);
+    C5Replication *fReplica;
 
 private slots:
-    void timeout();
-
-    void updateTable(C5Database &dr, C5Database &db, int &step, int steps, const QString &tableName);
+    void progress(const QString &msg);
 };
 
 #endif // REPLICADIALOG_H

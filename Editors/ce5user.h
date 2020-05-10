@@ -16,6 +16,8 @@ public:
 
     ~CE5User();
 
+    virtual void setId(int id) override;
+
     virtual QString title() {return tr("User");}
 
     virtual QString table() {return "s_user";}
@@ -25,8 +27,11 @@ public:
 private slots:
     void on_btnNewGroup_clicked();
 
+    void on_btnLoadImage_clicked();
+
 private:
     Ui::CE5User *ui;
+
 };
 
 #endif // CE5USER_H

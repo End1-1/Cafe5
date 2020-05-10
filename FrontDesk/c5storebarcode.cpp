@@ -63,11 +63,11 @@ bool C5StoreBarcode::printOneBarcode(const QString &code, QPrintDialog &pd)
     p.setFont(f);
     qreal plen = 2;
     if (code.length() == 4) {
-        plen = 5;
+        plen = 2.5;
         f.setPointSize(14);
         f.setBold(true);
         p.setFont(f);
-        b.DrawBarcode(p, 50, 40, 180, 180, plen);
+        b.DrawBarcode(p, 150, 60, 180, 180, plen);
         p.drawText(160, 220, code);
         return printer.printerState() != QPrinter::Error;
     }

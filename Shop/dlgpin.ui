@@ -284,7 +284,7 @@
        <widget class="QWidget" name="widget" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
-          <widget class="QLineEdit" name="leUser">
+          <widget class="C5LineEdit" name="leUser">
            <property name="font">
             <font>
              <pointsize>16</pointsize>
@@ -302,7 +302,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="lePin">
+          <widget class="C5LineEdit" name="lePin">
            <property name="font">
             <font>
              <pointsize>16</pointsize>
@@ -531,6 +531,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>C5LineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>c5lineedit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

@@ -1,22 +1,106 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>StoreInput</class>
- <widget class="QDialog" name="StoreInput">
+ <class>SearchItems</class>
+ <widget class="QDialog" name="SearchItems">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>868</width>
-    <height>539</height>
+    <width>701</width>
+    <height>682</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Store input</string>
+   <string>Search</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QWidget" name="widget" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="C5LineEdit" name="leCode"/>
+      </item>
+      <item>
+       <widget class="QToolButton" name="btnSearch">
+        <property name="minimumSize">
+         <size>
+          <width>36</width>
+          <height>36</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>36</width>
+          <height>36</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/search.png</normaloff>:/search.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>35</width>
+          <height>32</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="C5TableWidget" name="tbl">
+     <column>
+      <property name="text">
+       <string>Store</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Goods</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Code</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Retail price</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Whosale price</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Qty</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="widget_2" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -36,98 +120,7 @@
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>685</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btnAccept">
-        <property name="text">
-         <string>Accept</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../resources/res.qrc">
-          <normaloff>:/decision.png</normaloff>:/decision.png</iconset>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btnView">
-        <property name="text">
-         <string>View</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../resources/res.qrc">
-          <normaloff>:/package.png</normaloff>:/package.png</iconset>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="C5TableWidget" name="tbl">
-     <property name="editTriggers">
-      <set>QAbstractItemView::NoEditTriggers</set>
-     </property>
-     <property name="selectionBehavior">
-      <enum>QAbstractItemView::SelectRows</enum>
-     </property>
-     <column>
-      <property name="text">
-       <string>UUID</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>X</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Date</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Store</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Goods</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Scancode</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Qty</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Retail</string>
-      </property>
-     </column>
-    </widget>
-   </item>
-   <item>
-    <widget class="QWidget" name="widget_2" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <item>
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>693</width>
+          <width>501</width>
           <height>20</height>
          </size>
         </property>
@@ -136,18 +129,12 @@
       <item>
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>Total</string>
+         <string>Total quantity</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="C5LineEdit" name="leTotal">
-        <property name="minimumSize">
-         <size>
-          <width>100</width>
-          <height>0</height>
-         </size>
-        </property>
+       <widget class="C5LineEdit" name="leTotalQty">
         <property name="maximumSize">
          <size>
           <width>100</width>

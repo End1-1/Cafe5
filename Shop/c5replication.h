@@ -8,17 +8,25 @@ class C5Replication : public QObject
 {
     Q_OBJECT
 public:
-    explicit C5Replication(QObject *parent = nullptr);
+    explicit C5Replication();
 
-    void start();
+    void start(const char *slot);
 
     bool ret(C5Database &db1, C5Database &db2);
 
 signals:
     void finished();
 
+    void progress(const QString&);
+
 public slots:
-    bool process();
+    bool uploadToServer();
+
+    void downloadFromServer();
+
+private:
+    void updateTable(C5Database &dr, C5Database &db, int &step, int steps, const QString &tableName);
+
 };
 
 #endif // C5REPLICATION_H

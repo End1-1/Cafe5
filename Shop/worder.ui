@@ -13,73 +13,8 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
-    <widget class="C5TableWidget" name="tblGoods">
-     <property name="font">
-      <font>
-       <pointsize>14</pointsize>
-      </font>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QTableWidget::item:selected{
- background-color: #005e37;
-color:white;
-font-size:13pt;
-};</string>
-     </property>
-     <property name="editTriggers">
-      <set>QAbstractItemView::NoEditTriggers</set>
-     </property>
-     <property name="selectionMode">
-      <enum>QAbstractItemView::SingleSelection</enum>
-     </property>
-     <property name="selectionBehavior">
-      <enum>QAbstractItemView::SelectRows</enum>
-     </property>
-     <column>
-      <property name="text">
-       <string>Goods code</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Goods name</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Qty</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Unit</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Price</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Total</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>TaxDept</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>AdgCode</string>
-      </property>
-     </column>
-    </widget>
-   </item>
-   <item>
+  <layout class="QGridLayout" name="gridLayout_2">
+   <item row="1" column="0">
     <widget class="QWidget" name="widget_2" native="true">
      <property name="font">
       <font>
@@ -281,6 +216,93 @@ font-size:13pt;
      </layout>
     </widget>
    </item>
+   <item row="0" column="0">
+    <widget class="C5TableWidget" name="tblGoods">
+     <property name="font">
+      <font>
+       <pointsize>14</pointsize>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QTableWidget::item:selected{
+ background-color: #005e37;
+color:white;
+font-size:13pt;
+};</string>
+     </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::SingleSelection</enum>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+     <column>
+      <property name="text">
+       <string>Goods code</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Goods name</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Qty</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Unit</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Price</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Total</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>TaxDept</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>AdgCode</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+   <item row="0" column="1" rowspan="2">
+    <widget class="QWidget" name="wimage" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>200</width>
+       <height>0</height>
+      </size>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QLabel" name="lbGoodsImage">
+        <property name="text">
+         <string>Image</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -292,7 +314,7 @@ font-size:13pt;
   <customwidget>
    <class>C5LineEdit</class>
    <extends>QLineEdit</extends>
-   <header location="global">c5lineedit.h</header>
+   <header>c5lineedit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

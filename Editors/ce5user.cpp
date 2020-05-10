@@ -2,6 +2,7 @@
 #include "ui_ce5user.h"
 #include "c5cache.h"
 #include "ce5usergroup.h"
+#include <QFileDialog>
 
 CE5User::CE5User(const QStringList &dbParams, QWidget *parent) :
     CE5Editor(dbParams, parent),
@@ -41,4 +42,53 @@ void CE5User::on_btnNewGroup_clicked()
         ui->leGroup->setValue(data.at(0)["f_id"].toString());
     }
     delete e;
+}
+
+void CE5User::on_btnLoadImage_clicked()
+{
+    if (ui->leCode->getInteger() == 0) {
+        C5Message::error(tr("Save first"));
+        return;
+    }
+    QString fn = QFileDialog::getOpenFileName(this, tr("Image"), "", "*.jpg;*.png;*.bmp");
+    if (fn.isEmpty()) {
+        return;
+    }
+    QPixmap pm;
+    if (!pm.load(fn)) {
+        C5Message::error(tr("Could not load image"));
+        return;
+    }
+    qApp->processEvents();
+    QFile f(fn);
+    if (f.open(QIODevice::ReadOnly)) {
+        C5Database db(fDBParams);
+        db[":f_id"] = ui->leCode->getInteger();
+        db.exec("delete from s_user_photo where f_id=:f_id");
+        db[":f_id"] = ui->leCode->getInteger();
+        db[":f_data"] = f.readAll();
+        db.exec("insert into s_user_photo (f_id, f_data) values (:f_id, :f_data)");
+        f.close();
+        ui->lbPhoto->setPixmap(pm.scaled(ui->lbPhoto->size(), Qt::KeepAspectRatio));
+    }
+}
+
+
+void CE5User::setId(int id)
+{
+    CE5Editor::setId(id);
+    C5Database db(fDBParams);
+    db[":f_id"] = ui->leCode->getInteger();
+    db.exec("select * from s_user_photo where f_id=:f_id");
+    QPixmap p;
+    if (db.nextRow()) {
+        if (p.loadFromData(db.getValue("f_data").toByteArray())) {
+
+        } else {
+            p = QPixmap(":/staff.png");
+        }
+    } else {
+        p = QPixmap(":/staff.png");
+    }
+    ui->lbPhoto->setPixmap(p.scaled(ui->lbPhoto->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
 }

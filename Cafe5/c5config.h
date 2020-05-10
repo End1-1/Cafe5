@@ -49,6 +49,10 @@
 #define param_rootdb_schema 44
 #define param_rootdb_user 45
 #define param_rootdb_pass 46
+#define param_shop_noF1 47
+#define param_shop_noF2 48
+#define param_shop_noPriceChange 49
+#define param_shop_defferentStaff 50
 
 #define FRONTDESK_WAITER 0
 #define FRONTDESK_SHOP 1
@@ -188,6 +192,14 @@ public:
     static QString rdbUser();
 
     static QString rdbPassword();
+
+    static bool shopDenyF1();
+
+    static bool shopDenyF2();
+
+    static bool shopDenyPriceChange();
+
+    static bool shopDifferentStaff();
 
 private:
     static QString getValue(int key);

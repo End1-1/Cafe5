@@ -3,6 +3,7 @@
 #include "c5connection.h"
 #include "c5license.h"
 #include "dlgpin.h"
+#include "c5userauth.h"
 #include "replicadialog.h"
 #include "settingsselection.h"
 #include <QApplication>
@@ -48,18 +49,11 @@ int main(int argc, char *argv[])
             if (!DlgPin::getPin(user, pin)) {
                 return 0;
             }
-            db[":f_login"] = user;
-            db[":f_password"] = password(pin);
-            db.exec("select f_id, f_group, f_state, concat(f_last, ' ', f_first) from s_user where f_login=:f_login and f_altpassword=:f_password");
-            if (!db.nextRow()) {
-                C5Message::error(QObject::tr("Login failed"));
-            } else if (db.getInt(2) == 0) {
-                C5Message::error(QObject::tr("User is inactive"));
-            } else {
-                __userid = db.getInt(0);
-                __usergroup = db.getInt(1);
-                __username = db.getString(3);
+            C5UserAuth ua(db);
+            if (ua.authByPinPass(user, pin, __userid, __usergroup, __username)) {
                 login = true;
+            } else {
+                C5Message::error(ua.error());
             }
         } while (!login);
         db[":f_user"] = __userid;
@@ -83,6 +77,7 @@ int main(int argc, char *argv[])
         ReplicaDialog *rp = new ReplicaDialog();
         rp->exec();
         delete rp;
+        __c5config.initParamsFromDb();
     }
     Working w;
     w.showMaximized();

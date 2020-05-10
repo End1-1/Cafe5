@@ -18,12 +18,11 @@ public:
 
     static bool getPin(QString &pin, QString &pass);
 
+protected:
+    virtual void keyReleaseEvent(QKeyEvent *event) override;
+
 private slots:
     void btnNumPressed();
-
-    void on_leUser_textChanged(const QString &arg1);
-
-    void on_lePin_textChanged(const QString &arg1);
 
     void on_btnEnter_clicked();
 
@@ -53,6 +52,9 @@ private slots:
 
 private:
     Ui::DlgPin *ui;
+
+    bool fPinEmpty;
+
 };
 
 #endif // DLGPIN_H

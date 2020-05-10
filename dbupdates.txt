@@ -386,7 +386,19 @@ INSERT INTO `o_sale_type` (`f_id`, `f_name`) VALUES ('2', 'Մեծածախ');
 alter table o_header add column f_partner integer;
 alter table c_partners add f_store integer;
 alter table c_partners add f_cash integer;
+INSERT INTO `a_type` (`f_id`, `f_name`, `f_counter`) VALUES ('8', 'Ապակոմպլեկտավորում', '0');
+create table a_header_shop2partner (f_id char(36) primary key,  f_store integer, f_accept integer);
+create table a_header_shop2partneraccept(f_id char(36));
+ALTER TABLE `o_header` CHANGE COLUMN `f_discountFactor` `f_discountFactor` DECIMAL(14,2) NULL DEFAULT NULL ;
+create table a_store_temp (f_id integer primary key auto_increment, f_store integer, f_goods integer, f_qty decimal(14,3));
+create table s_user_config (f_id integer primary key auto_increment, f_user integer, f_settings integer);
+alter table c_groups add f_order integer;
+insert into a_type  values (5, 'Դրամարկղ', 0);
+ALTER TABLE `c_goods_complectation` CHANGE COLUMN `f_qty` `f_qty` DECIMAL(14,4) NULL DEFAULT NULL ;
+ALTER TABLE `b_cards_discount` CHANGE COLUMN `f_value` `f_value` DECIMAL(14,3) NULL DEFAULT NULL ;
 
+ALTER TABLE `h_halls` CHANGE COLUMN `f_prefix` `f_prefix` CHAR(8) NULL DEFAULT NULL , ADD UNIQUE INDEX `f_prefix_UNIQUE` (`f_prefix` ASC);
+create table s_user_photo (f_id integer primary key, f_data mediumblob);
 
 /* DB - 19*/
 update s_app set f_version ='19' where f_app='DB';

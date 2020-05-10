@@ -14,7 +14,7 @@ ViewOrder::ViewOrder(const QString &order, QWidget *parent) :
 {
     ui->setupUi(this);
     ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 30, 300, 100, 100, 100);
-    C5Database db(__c5config.dbParams());
+    C5Database db(__c5config.replicaDbParams());
     db[":f_id"] = order;
     db.exec("select * from o_header where f_id=:f_id");
     if (db.nextRow()) {
@@ -71,7 +71,7 @@ void ViewOrder::on_btnReturn_clicked()
         C5Message::error(tr("Nothing to return"));
         return;
     }
-    C5Database db(__c5config.dbParams());
+    C5Database db(__c5config.replicaDbParams());
     C5StoreDraftWriter dw(db);
     db.startTransaction();
     QString headerPrefix;
@@ -147,6 +147,7 @@ void ViewOrder::on_btnReturn_clicked()
     }
 
     db.commit();
+    C5Message::info(tr("Return completed"));
 }
 
 void ViewOrder::on_pushButton_2_clicked()

@@ -22,7 +22,7 @@ CE5Goods::CE5Goods(const QStringList &dbParams, QWidget *parent) :
     ui->leGroup->setSelector(dbParams, ui->leGroupName, cache_goods_group);
     ui->leUnit->setSelector(dbParams, ui->leUnitName, cache_goods_unit);
     ui->leLowLevel->setValidator(new QDoubleValidator(0, 100000, 4));
-    ui->tblGoods->setColumnWidths(7, 0, 0, 300, 80, 80, 80, 80);
+    ui->tblGoods->setColumnWidths(7, 0, 0, 400, 80, 80, 80, 80);
     ui->leClass1->setSelector(dbParams, ui->leClassName1, cache_goods_classes);
     ui->leClass2->setSelector(dbParams, ui->leClassName2, cache_goods_classes);
     ui->leClass3->setSelector(dbParams, ui->leClassName3, cache_goods_classes);
@@ -242,7 +242,8 @@ int CE5Goods::addGoodsRow()
     ui->tblGoods->setItem(row, 1, new QTableWidgetItem());
     ui->tblGoods->setItem(row, 2, new QTableWidgetItem());
     C5LineEdit *lqty = ui->tblGoods->createLineEdit(row, 3);
-    lqty->setValidator(new QDoubleValidator(0, 1000000, 3));
+    lqty->setValidator(new QDoubleValidator(0, 1000000, 4));
+    lqty->fDecimalPlaces = 4;
     ui->tblGoods->setItem(row, 4, new QTableWidgetItem());
     C5LineEdit *lprice = ui->tblGoods->createLineEdit(row, 5);
     lprice->setValidator(new QDoubleValidator(0, 100000000, 3));

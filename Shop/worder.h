@@ -51,6 +51,10 @@ private slots:
 
     void on_leCard_textChanged(const QString &arg1);
 
+    void imageLoaded(const QPixmap &img);
+
+    void noImage();
+
 private:
     Ui::WOrder *ui;
 
