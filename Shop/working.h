@@ -12,6 +12,7 @@ class QTableWidgetItem;
 
 struct IUser {
     int id;
+    int group;
     QString name;
     QPixmap photo;
 };

@@ -32,6 +32,7 @@ C5WelcomePage::C5WelcomePage(const QStringList &dbParams, QWidget *parent) :
     fLabel = tr("Home");
     fIcon = ":/storehouse.png";
     ui->grMenu->setVisible(false);
+    setDatabaseName(dbParams.at(4));
 }
 
 C5WelcomePage::~C5WelcomePage()
@@ -61,14 +62,12 @@ void C5WelcomePage::setDatabaseName(const QString &database)
     ui->btnMaterialsInStore->setVisible(pr(fDbName, cp_t3_store));
     ui->btnMovementInStore->setVisible(pr(fDbName, cp_t3_store_movement));
     ui->btnTStoreExtra->setVisible(pr(fDbName, cp_t3_tstore_extra));
-    ui->btnGoodsOutputBySales->setVisible(pr(fDbName, cp_t2_count_output_of_sale));
     ui->btnSalesCommon->setVisible(pr(fDbName, cp_t3_sales_common));
     ui->btnStoreDocs->setVisible(pr(fDbName, cp_t3_documents_store));
     ui->btnGoodsGroups->setVisible(pr(fDbName, cp_t6_groups));
     ui->btnGoods->setVisible(pr(fDbName, cp_t6_goods));
     ui->btnStorages->setVisible(pr(fDbName, cp_t6_storage));
     ui->btnUnits->setVisible(pr(fDbName, cp_t6_units));
-    ui->btnPartners->setVisible(pr(fDbName, cp_t7_partners));
     ui->btnMenuName->setVisible(pr(fDbName, cp_t4_menu));
     ui->btnDishDepts->setVisible(pr(fDbName, cp_t4_part1));
     ui->btnTypesOfDishes->setVisible(pr(fDbName, cp_t4_part2));
@@ -120,11 +119,6 @@ void C5WelcomePage::on_btnTStoreExtra_clicked()
     __mainWindow->createTab<CR5TStoreExtra>(fDBParams);
 }
 
-void C5WelcomePage::on_btnGoodsOutputBySales_clicked()
-{
-    __mainWindow->createTab<CR5ConsumptionBySales>(fDBParams);
-}
-
 void C5WelcomePage::on_btnSalesCommon_clicked()
 {
     __mainWindow->createTab<CR5CommonSales>(fDBParams);
@@ -136,7 +130,7 @@ void C5WelcomePage::on_btnDatabase_clicked()
     if (!C5Selector::getValue(fDBParams, cache_s_db, values)) {
         return;
     }
-    setDatabaseName(values.at(1).toString());
+    setDatabaseName(values.at(2).toString());
 }
 
 void C5WelcomePage::on_btnStoreDocs_clicked()
@@ -162,11 +156,6 @@ void C5WelcomePage::on_btnGoods_clicked()
 void C5WelcomePage::on_btnUnits_clicked()
 {
     __mainWindow->createTab<CR5GoodsUnit>(fDBParams);
-}
-
-void C5WelcomePage::on_btnPartners_clicked()
-{
-    __mainWindow->createTab<CR5GoodsPartners>(fDBParams);
 }
 
 void C5WelcomePage::on_btnMenuName_clicked()

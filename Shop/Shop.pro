@@ -65,6 +65,7 @@ SOURCES += \
     imageloader.cpp \
         main.cpp \
     printreceipt.cpp \
+    printreceiptgroup.cpp \
     replicadialog.cpp \
     sales.cpp \
     searchitems.cpp \
@@ -134,6 +135,7 @@ HEADERS += \
     dlgpin.h \
     imageloader.h \
     printreceipt.h \
+    printreceiptgroup.h \
     replicadialog.h \
     sales.h \
     searchitems.h \

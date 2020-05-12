@@ -93,7 +93,7 @@ void WOrder::addGoods(const Goods &g)
 
 bool WOrder::writeOrder(bool tax)
 {
-    if (__c5config.shopDifferentStaff()) {
+    if (__c5config.shopDifferentStaff() && fWorking->fCurrentUsers.count() > 0) {
         SelectStaff ss(fWorking);
         ss.exec();
     }
@@ -134,7 +134,7 @@ bool WOrder::writeOrder(bool tax)
 
 void WOrder::fixCostumer(const QString &code)
 {
-    C5Database db(C5Config::dbParams());
+    C5Database db(C5Config::replicaDbParams());
     db[":f_code"] = code;
     db.exec("select * from b_cards_discount where f_code=:f_code");
     if (!db.nextRow()) {
@@ -152,6 +152,18 @@ void WOrder::fixCostumer(const QString &code)
     db.exec("select * from c_partners where f_id=:f_id");
     if (!db.nextRow()) {
         return;
+    }
+    if (fCardValue < 0) {
+        bool ok = false;
+        double v = QInputDialog::getDouble(this, tr("Discount value"), tr("Enter discount value"), 0, 0, 100, 0, &ok);
+        if (!ok) {
+            fCardId = 0;
+            fCostumerId = 0;
+            fCardMode = 0;
+            fCardValue = 0;
+            return;
+        }
+        fCardValue = v / 100;
     }
     ui->leDisc->setVisible(true);
     ui->leCustomer->setVisible(true);

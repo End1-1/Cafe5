@@ -35,8 +35,6 @@ private slots:
 
     void on_btnTStoreExtra_clicked();
 
-    void on_btnGoodsOutputBySales_clicked();
-
     void on_btnSalesCommon_clicked();
 
     void on_btnDatabase_clicked();
@@ -50,8 +48,6 @@ private slots:
     void on_btnGoods_clicked();
 
     void on_btnUnits_clicked();
-
-    void on_btnPartners_clicked();
 
     void on_btnMenuName_clicked();
 

@@ -60,6 +60,9 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
     fCanChangeFocus = true;
     ui->tblAdd->setColumnWidths(ui->tblAdd->columnCount(), 0, 300, 80);
     ui->leComplectationQty->setValidator(new QDoubleValidator(0, 999999999, 3));
+    if (pr(dbParams.at(1), cp_t1_deny_change_store_doc_date)) {
+        ui->deDate->setEnabled(false);
+    }
 }
 
 C5StoreDoc::~C5StoreDoc()
@@ -474,6 +477,18 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
             }
         }
     }
+
+    db[":f_header"] = fInternalId;
+    db.exec("delete from a_complectation_additions");
+    for (int i = 0; i < ui->tblAdd->rowCount(); i++) {
+        db[":f_id"] = db.uuid();
+        db[":f_header"] = fInternalId;
+        db[":f_name"] = ui->tblAdd->lineEdit(i, 1)->text();
+        db[":f_amount"] = ui->tblAdd->lineEdit(i, 2)->getDouble();
+        db[":f_row"] = i + 1;
+        db.insert("a_complectation_additions", false);
+    }
+
     dw.clearAStoreDraft(fInternalId);
     if (!dw.writeAHeader(fInternalId, ui->leDocNum->text(), fDocState, fDocType, __userid, ui->deDate->date(), QDate::currentDate(), QTime::currentTime(),
                          ui->lePartner->getInteger(), ui->leTotal->getDouble(), ui->leComment->text(), ui->lePayment->getInteger(), ui->chPaid->isChecked())) {
@@ -563,17 +578,6 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
                 continue;
             }
         }
-    }
-
-    db[":f_header"] = fInternalId;
-    db.exec("delete from a_complectation_additions");
-    for (int i = 0; i < ui->tblAdd->rowCount(); i++) {
-        db[":f_id"] = db.uuid();
-        db[":f_header"] = fInternalId;
-        db[":f_name"] = ui->tblAdd->lineEdit(i, 1)->text();
-        db[":f_amount"] = ui->tblAdd->lineEdit(i, 2)->getDouble();
-        db[":f_row"] = i + 1;
-        db.insert("a_complectation_additions", false);
     }
 
     countTotal();
@@ -743,6 +747,9 @@ int C5StoreDoc::addGoodsRow()
 void C5StoreDoc::setDocEnabled(bool v)
 {
     ui->deDate->setEnabled(v);
+    if (pr(fDBParams.at(1), cp_t1_deny_change_store_doc_date)) {
+        ui->deDate->setEnabled(false);
+    }
     ui->leStoreInput->setEnabled(v);
     ui->leStoreOutput->setEnabled(v);
     ui->wtoolbar->setEnabled(v);

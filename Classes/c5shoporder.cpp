@@ -1,6 +1,7 @@
 #include "c5shoporder.h"
 #include "c5database.h"
 #include "printreceipt.h"
+#include "printreceiptgroup.h"
 #include "c5utils.h"
 #include "c5config.h"
 #include "c5message.h"
@@ -261,7 +262,7 @@ bool C5ShopOrder::write(double total, double card, double discount, bool tax, QL
     }
 
     if (!C5Config::localReceiptPrinter().isEmpty()) {
-        PrintReceipt p;
+        PrintReceiptGroup p;
         p.print(oheaderid, db);
     }
 

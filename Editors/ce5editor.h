@@ -45,6 +45,9 @@ public:
         return result;
     }
 
+protected:
+    bool fRememberFields;
+
 private:
     C5LineEditWithSelector *findLineEditWithId();
 

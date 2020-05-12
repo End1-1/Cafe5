@@ -13,7 +13,7 @@ ViewOrder::ViewOrder(const QString &order, QWidget *parent) :
     ui(new Ui::ViewOrder)
 {
     ui->setupUi(this);
-    ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 30, 300, 100, 100, 100);
+    ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 30, 300, 100, 100, 100, 0, 200);
     C5Database db(__c5config.replicaDbParams());
     db[":f_id"] = order;
     db.exec("select * from o_header where f_id=:f_id");
@@ -27,7 +27,7 @@ ViewOrder::ViewOrder(const QString &order, QWidget *parent) :
         return;
     }
     db[":f_header"] = order;
-    db.exec("select b.f_id, g.f_name, g.f_id as f_goodsid, b.f_qty, b.f_price, b.f_total "
+    db.exec("select b.f_id, g.f_name, g.f_id as f_goodsid, b.f_qty, b.f_price, b.f_total, f_scancode "
             "from o_goods b "
             "inner join c_goods g on g.f_id=b.f_goods "
             "where b.f_header=:f_header");
@@ -40,6 +40,7 @@ ViewOrder::ViewOrder(const QString &order, QWidget *parent) :
         ui->tbl->setString(r, 4, db.getString("f_price"));
         ui->tbl->setString(r, 5, db.getString("f_total"));
         ui->tbl->setString(r, 6, db.getString("f_goodsid"));
+        ui->tbl->setString(r, 7, db.getString("f_scancode"));
     }
     if (ui->leAmount->getDouble() < 0) {
         ui->btnReturn->setVisible(false);

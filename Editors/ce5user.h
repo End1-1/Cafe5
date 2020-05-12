@@ -29,6 +29,8 @@ private slots:
 
     void on_btnLoadImage_clicked();
 
+    void on_btnPin_clicked(bool checked);
+
 private:
     Ui::CE5User *ui;
 

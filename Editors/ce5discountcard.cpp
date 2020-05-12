@@ -10,7 +10,7 @@ CE5DiscountCard::CE5DiscountCard(const QStringList &dbParams, QWidget *parent) :
 {
     ui->setupUi(this);
     ui->deDateEnd->setDate(QDate::currentDate().addDays(365 * 10));
-    ui->leValue->setValidator(new QDoubleValidator(0, 100, 3));
+   // ui->leValue->setValidator(new QDoubleValidator(-10, 100, 3));
     ui->leClient->setSelector(dbParams, ui->leFirstName, cache_discount_client);
     ui->leDiscount->setSelector(dbParams, ui->leDiscountName, cache_discount_type);
 }

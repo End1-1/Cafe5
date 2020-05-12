@@ -842,7 +842,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="845"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="849"/>
         <source>This order used in next documents</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1668,75 +1668,75 @@ AMOUNT</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="dlgpayment.ui" line="460"/>
+        <location filename="dlgpayment.ui" line="463"/>
         <source>DISCOUNT</source>
         <translation>Զեղչ</translation>
     </message>
     <message>
-        <location filename="dlgpayment.ui" line="67"/>
+        <location filename="dlgpayment.ui" line="70"/>
         <source>PAYMENT
 CASH</source>
         <translation>Կանխիկ</translation>
     </message>
     <message>
-        <location filename="dlgpayment.ui" line="97"/>
+        <location filename="dlgpayment.ui" line="100"/>
         <source>PAYMENT
 CARD</source>
         <translation>Բանկի քարտ</translation>
     </message>
     <message>
-        <location filename="dlgpayment.ui" line="127"/>
+        <location filename="dlgpayment.ui" line="130"/>
         <source>PAYMENT
 BANK</source>
         <translation>Փոխանցում</translation>
     </message>
     <message>
-        <location filename="dlgpayment.ui" line="157"/>
+        <location filename="dlgpayment.ui" line="160"/>
         <source>PAYMENT
 OTHER</source>
         <translation>Այլ վճարման
 եղանակ</translation>
     </message>
     <message>
-        <location filename="dlgpayment.ui" line="244"/>
+        <location filename="dlgpayment.ui" line="247"/>
         <source>TRANSFER TO ROOM</source>
         <translation>Կցել սենյակի
 հաշվին</translation>
     </message>
     <message>
-        <location filename="dlgpayment.ui" line="273"/>
+        <location filename="dlgpayment.ui" line="276"/>
         <source>CITY LEDGER</source>
         <translation>Պարտք</translation>
     </message>
     <message>
-        <location filename="dlgpayment.ui" line="302"/>
+        <location filename="dlgpayment.ui" line="305"/>
         <source>COMPLIMENTARY</source>
         <translation>Հյուրասիրություն</translation>
     </message>
     <message>
-        <location filename="dlgpayment.ui" line="331"/>
+        <location filename="dlgpayment.ui" line="334"/>
         <source>BREAKFAST</source>
         <translation>Նախաճաշ</translation>
     </message>
     <message>
-        <location filename="dlgpayment.ui" line="392"/>
+        <location filename="dlgpayment.ui" line="395"/>
         <source>TAX</source>
         <translation>ՀԴՄ</translation>
     </message>
     <message>
-        <location filename="dlgpayment.ui" line="430"/>
+        <location filename="dlgpayment.ui" line="433"/>
         <source>RECEIPT
 LANGUAGE</source>
         <translation>Հաշիվը
 տպելու լեզու</translation>
     </message>
     <message>
-        <location filename="dlgpayment.ui" line="489"/>
+        <location filename="dlgpayment.ui" line="492"/>
         <source>BILL</source>
         <translation>Նախահաշիվ</translation>
     </message>
     <message>
-        <location filename="dlgpayment.ui" line="547"/>
+        <location filename="dlgpayment.ui" line="550"/>
         <source>CLOSE
 ORDER</source>
         <translation>Փակել պատվերը</translation>
@@ -1853,12 +1853,12 @@ ORDER</source>
         <translation>Քարտ</translation>
     </message>
     <message>
-        <location filename="dlgpayment.ui" line="590"/>
+        <location filename="dlgpayment.ui" line="593"/>
         <source>CLOSE</source>
         <translation>Հետ</translation>
     </message>
     <message>
-        <location filename="dlgpayment.ui" line="518"/>
+        <location filename="dlgpayment.ui" line="521"/>
         <source>RECEIPT</source>
         <translation>Տպել հաշիվը</translation>
     </message>

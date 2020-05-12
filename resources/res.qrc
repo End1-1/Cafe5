@@ -78,5 +78,7 @@
         <file>images.png</file>
         <file>search.png</file>
         <file>staff.png</file>
+        <file>newdocument.png</file>
+        <file>pushpin.png</file>
     </qresource>
 </RCC>

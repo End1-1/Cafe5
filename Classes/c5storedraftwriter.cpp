@@ -782,6 +782,10 @@ bool C5StoreDraftWriter::writeOutput(const QString &docId, QString &err)
                 }
                 break;
             case DOC_TYPE_COMPLECTATION:
+                fDb[":f_header"] = docId;
+                fDb.exec("select sum(f_amount) from a_complectation_additions where f_header=:f_header");
+                fDb.nextRow();
+                amount += fDb.getDouble(0);
                 QString id = C5Database::uuid();
                 fDb[":f_id"] = id;
                 fDb[":f_document"] = docId;

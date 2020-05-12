@@ -92,3 +92,8 @@ void CE5User::setId(int id)
     }
     ui->lbPhoto->setPixmap(p.scaled(ui->lbPhoto->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
 }
+
+void CE5User::on_btnPin_clicked(bool checked)
+{
+
+}

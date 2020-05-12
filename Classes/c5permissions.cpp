@@ -121,5 +121,6 @@ void C5Permissions::clear()
 
 bool pr(const QString &db, int permission)
 {
-    return C5Permissions::fPermissions[db].contains(permission);
+    QList<int> &p = C5Permissions::fPermissions[db];
+    return p.contains(permission);
 }

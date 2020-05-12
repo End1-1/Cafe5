@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>498</width>
-    <height>300</height>
+    <height>248</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -167,10 +167,10 @@
       <string>f_value</string>
      </property>
      <property name="Type" stdset="0">
-      <string>2</string>
+      <string>3</string>
      </property>
      <property name="Check" stdset="0">
-      <string>nonzero=&quot;Discount value&quot;</string>
+      <string/>
      </property>
     </widget>
    </item>

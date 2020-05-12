@@ -9,7 +9,7 @@
 CE5Editor::CE5Editor(const QStringList &dbParams, QWidget *parent) :
     C5Widget(dbParams, parent)
 {
-
+    fRememberFields = false;
 }
 
 void CE5Editor::setId(int id)
@@ -115,6 +115,7 @@ bool CE5Editor::save(QString &err, QList<QMap<QString, QVariant> > &data)
             value = leField->getInteger();
             break;
         case 2:
+        case 3:
             value = leField->getDouble();
             break;
         }
@@ -259,6 +260,9 @@ void CE5Editor::getLineEdit(QObject *parent)
                     break;
                 case 2:
                     le->setValidator(new QDoubleValidator(0, 99999999999, 3));
+                    break;
+                case 3:
+                    le->setValidator(new QDoubleValidator(-99999999, 999999999, 3));
                     break;
                 }
             }

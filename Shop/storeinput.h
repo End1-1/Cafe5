@@ -20,10 +20,28 @@ private slots:
 
     void on_btnAccept_clicked();
 
+    void on_btnDateLeft_clicked();
+
+    void on_btnDateRight_clicked();
+
+    void on_btnRefresh_clicked();
+
+    void on_btnAcceptMode_clicked();
+
+    void on_btnHistoryMode_clicked();
+
 private:
     Ui::StoreInput *ui;
 
+    int fViewMode;
+
     void getList();
+
+    void history();
+
+    void changeDate(int d);
+
+    void refresh();
 };
 
 #endif // STOREINPUT_H

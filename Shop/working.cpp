@@ -335,7 +335,7 @@ void Working::loadStaff()
 {
     fCurrentUsers.clear();
     C5Database db(__c5config.dbParams());
-    db.exec("select u.f_id, concat(u.f_last, ' ' , u.f_first) as f_name, p.f_data "
+    db.exec("select u.f_id, u.f_group, concat(u.f_last, ' ' , u.f_first) as f_name, p.f_data "
             "from s_salary_inout s "
             "inner join s_user u on u.f_id=s.f_user "
             "left join s_user_photo p on p.f_id=u.f_id "
@@ -343,6 +343,7 @@ void Working::loadStaff()
     while (db.nextRow()) {
         IUser u;
         u.id = db.getInt("f_id");
+        u.group = db.getInt("f_group");
         u.name = db.getString("f_name");
         QPixmap p;
         if (!p.loadFromData(db.getValue("f_data").toByteArray())) {
