@@ -55,6 +55,9 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
            <property name="text">
             <string>Menu names</string>
            </property>
@@ -80,6 +83,9 @@
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
            </property>
            <property name="text">
             <string>Dish departments</string>
@@ -107,6 +113,9 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
            <property name="text">
             <string>Types of dishes</string>
            </property>
@@ -132,6 +141,9 @@
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
            </property>
            <property name="text">
             <string>Dishes</string>
@@ -168,6 +180,9 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
            <property name="text">
             <string>Storages</string>
            </property>
@@ -193,6 +208,9 @@
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
            </property>
            <property name="text">
             <string>Groups of goods</string>
@@ -220,6 +238,9 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
            <property name="text">
             <string>Goods</string>
            </property>
@@ -245,6 +266,9 @@
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
            </property>
            <property name="text">
             <string>Units</string>
@@ -312,6 +336,9 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
            <property name="text">
             <string>New store input</string>
            </property>
@@ -337,6 +364,9 @@
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
            </property>
            <property name="text">
             <string>New store movement</string>
@@ -364,6 +394,9 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
            <property name="text">
             <string>New store output</string>
            </property>
@@ -389,6 +422,9 @@
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
            </property>
            <property name="text">
             <string>New store complectation</string>
@@ -416,6 +452,9 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
            <property name="text">
             <string>New store decomplectation</string>
            </property>
@@ -435,12 +474,44 @@
           </widget>
          </item>
          <item>
+          <widget class="QToolButton" name="btnNewCashDocument">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
+           <property name="text">
+            <string>New cash document</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources/res.qrc">
+             <normaloff>:/cash.png</normaloff>:/cash.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>16</width>
+             <height>16</height>
+            </size>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonTextUnderIcon</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QToolButton" name="btnNewStoreInventory">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
            </property>
            <property name="text">
             <string>New store inventory</string>
@@ -481,6 +552,9 @@
    </item>
    <item row="0" column="0" colspan="3">
     <widget class="QCommandLinkButton" name="btnDatabase">
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
      <property name="text">
       <string>Database name</string>
      </property>
@@ -515,6 +589,9 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
            <property name="text">
             <string>Documents</string>
            </property>
@@ -534,6 +611,9 @@
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
            </property>
            <property name="text">
             <string>Store documents</string>
@@ -555,6 +635,9 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
            <property name="text">
             <string>Materials in the store</string>
            </property>
@@ -575,25 +658,8 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <property name="text">
-            <string>Movement in the store</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../resources/res.qrc">
-             <normaloff>:/documents.png</normaloff>:/documents.png</iconset>
-           </property>
-           <property name="toolButtonStyle">
-            <enum>Qt::ToolButtonTextUnderIcon</enum>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QToolButton" name="btnMovementInStore_2">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
            </property>
            <property name="text">
             <string>Movement in the store</string>
@@ -615,6 +681,9 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
            <property name="text">
             <string>Review of movement</string>
            </property>
@@ -635,8 +704,34 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
            <property name="text">
             <string>Sales by receipts</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources/res.qrc">
+             <normaloff>:/graph.png</normaloff>:/graph.png</iconset>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonTextUnderIcon</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnSaleDishes">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
+           <property name="text">
+            <string>Sales by dishes</string>
            </property>
            <property name="icon">
             <iconset resource="../resources/res.qrc">
@@ -655,12 +750,38 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
            <property name="text">
             <string>Sales by goods</string>
            </property>
            <property name="icon">
             <iconset resource="../resources/res.qrc">
              <normaloff>:/graph.png</normaloff>:/graph.png</iconset>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonTextUnderIcon</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnCashMovement">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
+           <property name="text">
+            <string>Movement in the cash</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources/res.qrc">
+             <normaloff>:/cash.png</normaloff>:/cash.png</iconset>
            </property>
            <property name="toolButtonStyle">
             <enum>Qt::ToolButtonTextUnderIcon</enum>
@@ -678,7 +799,7 @@
         <property name="sizeHint" stdset="0">
          <size>
           <width>20</width>
-          <height>283</height>
+          <height>238</height>
          </size>
         </property>
        </spacer>
@@ -688,6 +809,33 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>btnNewStoreInput</tabstop>
+  <tabstop>btnNewStoreMovement</tabstop>
+  <tabstop>btnNewStoreOutput</tabstop>
+  <tabstop>btnNewComplectation</tabstop>
+  <tabstop>btnNewStoreDecomplectation</tabstop>
+  <tabstop>btnNewCashDocument</tabstop>
+  <tabstop>btnNewStoreInventory</tabstop>
+  <tabstop>btnDocs</tabstop>
+  <tabstop>btnStoreDocs</tabstop>
+  <tabstop>btnMaterialsInStore</tabstop>
+  <tabstop>btnMovementInStore</tabstop>
+  <tabstop>btnTStoreExtra</tabstop>
+  <tabstop>btnSalesCommon</tabstop>
+  <tabstop>btnSaleDishes</tabstop>
+  <tabstop>btnSaleOfItems</tabstop>
+  <tabstop>btnCashMovement</tabstop>
+  <tabstop>btnMenuName</tabstop>
+  <tabstop>btnDishDepts</tabstop>
+  <tabstop>btnTypesOfDishes</tabstop>
+  <tabstop>btnDishes</tabstop>
+  <tabstop>btnStorages</tabstop>
+  <tabstop>btnGoodsGroups</tabstop>
+  <tabstop>btnGoods</tabstop>
+  <tabstop>btnDatabase</tabstop>
+  <tabstop>btnUnits</tabstop>
+ </tabstops>
  <resources>
   <include location="../resources/res.qrc"/>
  </resources>

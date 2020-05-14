@@ -17,6 +17,7 @@
 #include "cr5goodsclasses.h"
 #include "c5translatorform.h"
 #include "cr5saleremoveddishes.h"
+#include "cr5cashmovement.h"
 #include "c5costumerdebtpayment.h"
 #include "cr5cashnames.h"
 #include "cr5dish.h"
@@ -337,6 +338,7 @@ void C5MainWindow::on_actionLogin_triggered()
             addTreeL3Item(it, cp_t8_cash_detailed_report, tr("Cash detailed report"), ":/cash.png");
             addTreeL3Item(it, cp_t8_costumer_debts, tr("Costumers debts report"), ":/cash.png");
             addTreeL3Item(it, cp_t8_cash_names, tr("Cash names"), ":/cash.png");
+            addTreeL3Item(it, cp_t8_cash_movement, tr("Movement in the cash"), ":/cash.png");
         }
 
         if (pr(db.getString(3), cp_t9_salary)) {
@@ -707,6 +709,9 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
         break;
     case cp_t8_costumer_debts:
         createTab<CR5CostumerDebts>(dbParams);
+        break;
+    case cp_t8_cash_movement:
+        createTab<CR5CashMovement>(dbParams);
         break;
     case cp_t9_salary_doc:
         createTab<C5SalaryDoc>(dbParams);

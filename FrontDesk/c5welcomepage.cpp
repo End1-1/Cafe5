@@ -10,8 +10,10 @@
 #include "c5mainwindow.h"
 #include "cr5goods.h"
 #include "cr5goodsgroup.h"
+#include "cr5cashmovement.h"
 #include "cr5goodsunit.h"
 #include "cr5goodsstorages.h"
+#include "c5cashdoc.h"
 #include "cr5goodspartners.h"
 #include "cr5menunames.h"
 #include "cr5salefromstore.h"
@@ -20,6 +22,7 @@
 #include "cr5dish.h"
 #include "cr5tstoreextra.h"
 #include "cr5commonsales.h"
+#include "cr5salesbydishes.h"
 #include "c5cache.h"
 #include "c5selector.h"
 
@@ -31,7 +34,6 @@ C5WelcomePage::C5WelcomePage(const QStringList &dbParams, QWidget *parent) :
     setDatabaseName(dbParams.at(1));
     fLabel = tr("Home");
     fIcon = ":/storehouse.png";
-    ui->grMenu->setVisible(false);
     setDatabaseName(dbParams.at(4));
 }
 
@@ -52,6 +54,7 @@ void C5WelcomePage::setDatabaseName(const QString &database)
     ui->grAction->setVisible(pr(fDbName, cp_t2_action));
     ui->grGoods->setVisible(pr(fDbName, cp_t6_goods_menu));
     ui->grReports->setVisible(pr(fDbName, cp_t3_reports));
+    ui->grMenu->setVisible(pr(fDbName, cp_t4_menu));
     ui->btnNewStoreInput->setVisible(pr(fDbName, cp_t2_store_input));
     ui->btnNewStoreOutput->setVisible(pr(fDbName, cp_t2_store_output));
     ui->btnNewStoreMovement->setVisible(pr(fDbName, cp_t2_store_move));
@@ -73,7 +76,10 @@ void C5WelcomePage::setDatabaseName(const QString &database)
     ui->btnTypesOfDishes->setVisible(pr(fDbName, cp_t4_part2));
     ui->btnDishes->setVisible(pr(fDbName, cp_t4_dishes));
     ui->btnSaleOfItems->setVisible(pr(fDbName, cp_t3_store_sale));
+    ui->btnNewCashDocument->setVisible(pr(fDbName, cp_t8_cash_doc));
     ui->btnDatabase->setText(database);
+    ui->btnNewStoreInventory->setVisible(pr(fDbName, cp_t2_store_inventory));
+    ui->btnCashMovement->setVisible(pr(fDbName, cp_t8_cash_movement));
 }
 
 void C5WelcomePage::on_btnNewStoreInput_clicked()
@@ -193,4 +199,19 @@ void C5WelcomePage::on_btnNewStoreDecomplectation_clicked()
 void C5WelcomePage::on_btnSaleOfItems_clicked()
 {
     __mainWindow->createTab<CR5SaleFromStore>(fDBParams);
+}
+
+void C5WelcomePage::on_btnNewCashDocument_clicked()
+{
+    __mainWindow->createTab<C5CashDoc>(fDBParams);
+}
+
+void C5WelcomePage::on_btnCashMovement_clicked()
+{
+    __mainWindow->createTab<CR5CashMovement>(fDBParams);
+}
+
+void C5WelcomePage::on_btnSaleDishes_clicked()
+{
+    __mainWindow->createTab<CR5SalesByDishes>(fDBParams);
 }

@@ -1,6 +1,7 @@
 #include "payment.h"
 #include "ui_payment.h"
 #include "printtaxn.h"
+#include "c5storedraftwriter.h"
 #include "c5printing.h"
 #include "c5database.h"
 #include "dish.h"
@@ -86,6 +87,42 @@ void payment::checkout(bool cash)
         if (!printTax(cash ? 0 : ui->leAmount->getDouble())) {
             return;
         }
+    }
+    C5Database db(fDBParams);
+    db[":f_id"] = fOrderUUID;
+    db.exec("select * from o_header where f_id=:f_id");
+    if (!db.nextRow()) {
+        C5Message::error(db.fLastError);
+        return;
+    }
+    QString headerNum = db.getString("f_prefix") + db.getString("f_hallid");
+    int cashid = cash ? __c5config.cashId() : __c5config.nocashId();
+    QString cashprefix = cash ? __c5config.cashPrefix() : __c5config.nocashPrefix();
+    if (cash) {
+
+    } else {
+        db[":f_id"] = fOrderUUID;
+        db.exec("update o_header set f_amountcash=0, f_amountcard=f_amounttotal where f_id=:f_id");
+    }
+    C5StoreDraftWriter dw(db);
+    int counter = dw.counterAType(DOC_TYPE_CASH);
+    if (counter == 0) {
+        C5Message::error(dw.fErrorMsg);
+        return;
+    }
+    QString cashdoc;
+    if (!dw.writeAHeader(cashdoc, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH, __userid, QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, ui->leAmount->getDouble(), cashprefix + " " + headerNum, 0, 0)) {
+        C5Message::error(dw.fErrorMsg);
+        return;
+    }
+    if (!dw.writeAHeaderCash(cashdoc, cashid, 0, 1, "", fOrderUUID)) {
+        C5Message::error(dw.fErrorMsg);
+        return;
+    }
+    QString cashUUID;
+    if (!dw.writeECash(cashUUID, cashdoc, cashid, 1, cashprefix + " " + headerNum, ui->leAmount->getDouble(), cashUUID, 1)) {
+        C5Message::error(dw.fErrorMsg);
+        return;
     }
     if (printReceipt()) {
         accept();

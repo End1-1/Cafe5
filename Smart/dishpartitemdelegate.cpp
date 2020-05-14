@@ -12,6 +12,7 @@ void DishPartItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &
         return;
     }
     painter->save();
+    painter->setBrush(QColor::fromRgb(index.data(Qt::BackgroundColorRole).toInt()));
     QFont font = painter->font();
     font.setBold(true);
     font.setPointSize(11);
@@ -19,8 +20,19 @@ void DishPartItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &
     QString text = index.data(Qt::EditRole).toString();
     QRect rt = option.rect;
     painter->drawRect(rt);
-    rt.adjust(3, 3, -3, -3);
     QTextOption to;
-    painter->drawText(rt, text, to);
+    if (option.state & QStyle::State_Selected) {
+        painter->setPen(Qt::red);
+        rt = option.rect;
+        rt.adjust(5, 5, -3, -3);
+        painter->drawText(rt, text, to);
+        painter->setPen(Qt::black);
+        rt = option.rect;
+        rt.adjust(3, 3, -3, -3);
+        painter->drawText(rt, text, to);
+    } else {
+        rt.adjust(3, 3, -3, -3);
+        painter->drawText(rt, text, to);
+    }
     painter->restore();
 }

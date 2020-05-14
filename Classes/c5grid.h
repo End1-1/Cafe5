@@ -79,6 +79,8 @@ protected:
 
     QStringList fColumnsSum;
 
+    QStringList fColumnsOrder;
+
     QString fWhereCondition;
 
     QString fHavindCondition;
@@ -135,6 +137,8 @@ private:
     void insertJoinTable(QStringList &joins, QMap<QString, QString> &joinsMap, const QString &table, const QString &mainTable);
 
     int sumOfColumnsWidghtBefore(int column);
+
+    QString columnName(const QString &s) const;
 
 protected slots:
     virtual void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);

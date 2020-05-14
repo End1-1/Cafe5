@@ -138,12 +138,12 @@
 <context>
     <name>C5Message</name>
     <message>
-        <location filename="../../Cafe5/c5message.ui" line="60"/>
+        <location filename="../../Cafe5/c5message.ui" line="66"/>
         <source>OK</source>
         <translation>Ընդունել</translation>
     </message>
     <message>
-        <location filename="../../Cafe5/c5message.ui" line="67"/>
+        <location filename="../../Cafe5/c5message.ui" line="73"/>
         <source>Cancel</source>
         <translation>Հրաժարվել</translation>
     </message>

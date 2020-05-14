@@ -4,6 +4,7 @@
 #include "c5cache.h"
 #include "c5printing.h"
 #include "c5printpreview.h"
+#include "c5storedraftwriter.h"
 
 C5StoreInventory::C5StoreInventory(const QStringList &dbParams, QWidget *parent) :
     C5Widget(dbParams, parent),
@@ -87,36 +88,16 @@ void C5StoreInventory::saveDoc()
         return;
     }
 
-    db[":f_state"] = DOC_STATE_SAVED;
-    db[":f_type"] = DOC_TYPE_STORE_INVENTORY;
-    db[":f_operator"] = __userid;
-    db[":f_date"] = ui->deDate->date();
-    db[":f_createDate"] = QDate::currentDate();
-    db[":f_createTime"] = QTime::currentTime();
-    db[":f_partner"] = 0;
-    db[":f_amount"] = ui->leTotal->getDouble();
-    db[":f_comment"] = ui->leComment->text();
-    db[":f_raw"] = "";
-    if (ui->leDocNum->isEmpty()) {
-        ui->leDocNum->setText(C5Database::uuid());
-        db[":f_id"] = ui->leDocNum->text();
-        db.insert("a_header", false);
-    } else {
-        db.update("a_header", where_id(ui->leDocNum->text()));
-    }
+    C5StoreDraftWriter dw(db);
+    ui->leDocNum->setInteger(dw.counterAType(DOC_TYPE_STORE_INVENTORY));
+    dw.writeAHeader(fInternalID, ui->leDocNum->text(), DOC_STATE_SAVED, DOC_TYPE_STORE_INVENTORY, __userid, ui->deDate->date(), QDate::currentDate(), QTime::currentTime(), 0, ui->leTotal->getDouble(), ui->leComment->text(), 0, 0);
 
     db[":f_document"] = ui->leDocNum->text();
     db.exec("delete from a_store_inventory where f_document=:f_document");
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
-        ui->tblGoods->setString(i, 0, C5Database::uuid());
-        db[":f_id"] = ui->tblGoods->getString(i, 0);
-        db[":f_document"] = ui->leDocNum->text();
-        db[":f_store"] = ui->leStore->getInteger();
-        db[":f_goods"] = ui->tblGoods->getInteger(i, 1);
-        db[":f_qty"] = ui->tblGoods->lineEdit(i, 3)->getDouble();
-        db[":f_price"] = ui->tblGoods->lineEdit(i, 5)->getDouble();
-        db[":f_total"] = ui->tblGoods->lineEdit(i, 6)->getDouble();
-        db.insert("a_store_inventory", false);
+        QString id = ui->tblGoods->getString(i, 0);
+        dw.writeAStoreInventory(id, fInternalID, ui->leStore->getInteger(), ui->tblGoods->getInteger(i, 1), ui->tblGoods->lineEdit(i, 3)->getDouble(),  ui->tblGoods->lineEdit(i, 5)->getDouble(), ui->tblGoods->lineEdit(i, 6)->getDouble());
+        ui->tblGoods->setString(i, 0,id);
     }
 
     C5Message::info(tr("Saved"));

@@ -2,6 +2,7 @@
 #include "c5tablemodel.h"
 #include "cr5tstoreextrafilter.h"
 #include "c5gridgilter.h"
+#include "c5storedraftwriter.h"
 #include <QInputDialog>
 
 CR5TStoreExtra::CR5TStoreExtra(const QStringList &dbParams, QWidget *parent) :
@@ -215,17 +216,8 @@ QString CR5TStoreExtra::documentForInventory()
         }
     }
     if (result.isEmpty()) {
-        db[":f_state"] = DOC_STATE_SAVED;
-        db[":f_type"] = DOC_TYPE_STORE_INVENTORY;
-        db[":f_operator"] = __userid;
-        db[":f_date"] = f->dateEnd();
-        db[":f_createDate"] = QDate::currentDate();
-        db[":f_createTime"] = QTime::currentTime();
-        db[":f_partner"] = 0;
-        db[":f_amount"] = 0;
-        db[":f_comment"] = tr("Created automaticaly");
-        db[":f_raw"] = "";
-        result = QString::number(db.insert("a_header"));
+        C5StoreDraftWriter dw(db);
+        dw.writeAHeader(result, QString::number(dw.counterAType(DOC_TYPE_STORE_INVENTORY)), DOC_STATE_SAVED, DOC_TYPE_STORE_INVENTORY, __userid, f->dateEnd(), QDate::currentDate(), QTime::currentTime(), 0, 0, tr("Created automaticaly"), 0, 0);
     }
     return result;
 }
@@ -237,26 +229,20 @@ bool CR5TStoreExtra::tblDoubleClicked(int row, int column, const QList<QVariant>
     QString docid;
     CR5TStoreExtraFilter *f = static_cast<CR5TStoreExtraFilter*>(fFilterWidget);
     C5Database db(fDBParams);
+    C5StoreDraftWriter dw(db);
     switch (column) {
     case 10:
         qty = QInputDialog::getDouble(this, tr("Inventory qty"), tr("Qty"), 0, 0, 100000, 4, &ok);
         if (!ok) {
             return true;
         }
-        if (qty < 0.0001) {
-            C5Message::error(tr("Quantity must be greater than 0"));
-            return true;
-        }
         docid = documentForInventory();
         db[":f_goods"] = values.at(0);
         db.exec(QString("delete from a_store_inventory where f_document in (%1) and f_goods=:f_goods").arg(docid));
-        db[":f_document"] = docid.split(",", QString::SkipEmptyParts).at(0);
-        db[":f_store"] = f->store();
-        db[":f_goods"] = values.at(0);
-        db[":f_qty"] = qty;
-        db[":f_price"] = 0;
-        db[":f_total"] = 0;
-        db.insert("a_store_inventory", false);
+        QString id;
+        if (qty > 0.0001) {
+            dw.writeAStoreInventory(id, docid.split(",", QString::SkipEmptyParts).at(0), f->store(), values.at(0).toInt(), qty, 0, 0);
+        }
         fModel->setData(row, column, qty);
         break;
     }

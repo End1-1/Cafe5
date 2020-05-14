@@ -55,6 +55,8 @@ private slots:
 
     void noImage();
 
+    void on_btnInfo_clicked();
+
 private:
     Ui::WOrder *ui;
 

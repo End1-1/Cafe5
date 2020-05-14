@@ -30,6 +30,7 @@ CR5SalesByDishes::CR5SalesByDishes(const QStringList &dbParams, QWidget *parent)
                    << "h.f_name as f_hallname"
                    << "t.f_name as f_tablename"
                    << "oh.f_datecash"
+                   << "oh.f_timeclose"
                    << "bs.f_name as f_dishstate"
                    << "dpd.f_name as f_dishdept"
                    << "dp.f_name as f_dishpart"
@@ -46,6 +47,7 @@ CR5SalesByDishes::CR5SalesByDishes(const QStringList &dbParams, QWidget *parent)
                   << "t.f_name as f_tablename"
                   << "os.f_name as f_statename"
                   << "oh.f_datecash"
+                  << "oh.f_timeclose"
                   << "dpd.f_name as f_dishdept"
                   << "dp.f_name as f_dishpart"
                   << "d.f_name as f_dishname"
@@ -58,12 +60,16 @@ CR5SalesByDishes::CR5SalesByDishes(const QStringList &dbParams, QWidget *parent)
                 << "f_total"
                       ;
 
+    fColumnsOrder << "oh.f_datecash"
+                  << "oh.f_timeclose";
+
     fTranslation["f_header"] = tr("Header");
     fTranslation["f_order"] = tr("Order");
     fTranslation["f_hallname"] = tr("Hall");
     fTranslation["f_tablename"] = tr("Table");
     fTranslation["f_statename"] = tr("Order state");
     fTranslation["f_datecash"] = tr("Date, cash");
+    fTranslation["f_timeclose"] = tr("Time, close");
     fTranslation["f_dishdept"] = tr("Dept");
     fTranslation["f_dishpart"] = tr("Type of dish");
     fTranslation["f_dishname"] = tr("Dish");
@@ -75,6 +81,7 @@ CR5SalesByDishes::CR5SalesByDishes(const QStringList &dbParams, QWidget *parent)
 
     fColumnsVisible["oh.f_id as f_header"] = true;
     fColumnsVisible["oh.f_datecash"] = true;
+    fColumnsVisible["oh.f_timeclose"] = true;
     fColumnsVisible["os.f_name as f_statename"] = true;
     fColumnsVisible["concat(oh.f_prefix, oh.f_hallid) as f_order"] = true;
     fColumnsVisible["h.f_name as f_hallname"] = true;

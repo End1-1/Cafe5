@@ -253,9 +253,9 @@ void C5DishWidget::on_btnAddRecipe_clicked()
     l->setFocus();
     connect(l, SIGNAL(textEdited(QString)), this, SLOT(recipeQtyPriceChanged(QString)));
     ui->tblRecipe->setInteger(row, 0, 0);
-    ui->tblRecipe->setInteger(row, 1, values.at(0).toInt());
-    ui->tblRecipe->setString(row, 2, values.at(2).toString());
-    ui->tblRecipe->setString(row, 4, values.at(3).toString());
+    ui->tblRecipe->setInteger(row, 1, values.at(1).toInt());
+    ui->tblRecipe->setString(row, 2, values.at(3).toString());
+    ui->tblRecipe->setString(row, 4, values.at(4).toString());
     l = ui->tblRecipe->createLineEdit(row, 5);
     l->setDouble(0);
     connect(l, SIGNAL(textEdited(QString)), this, SLOT(recipeQtyPriceChanged(QString)));

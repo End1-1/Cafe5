@@ -140,6 +140,16 @@ void C5Grid::buildQuery()
             }
         }
         fSqlQuery += fOrderCondition;
+        foreach (const QString &o, fColumnsOrder) {
+            if (fColumnsVisible[o]) {
+                if (fSqlQuery.contains("order by ", Qt::CaseInsensitive)) {
+                    fSqlQuery += ",";
+                } else {
+                    fSqlQuery += " order by ";
+                }
+                fSqlQuery += columnName(o);
+            }
+        }
         if (!fHavindCondition.isEmpty()) {
             fSqlQuery += fHavindCondition;
         }
@@ -381,6 +391,16 @@ int C5Grid::sumOfColumnsWidghtBefore(int column)
         sum += fTableView->columnWidth(i);
     }
     return sum;
+}
+
+QString C5Grid::columnName(const QString &s) const
+{
+    int pos = s.indexOf(" as");
+    if (pos > -1) {
+        return s.mid(0, pos);
+    } else {
+        return s;
+    }
 }
 
 void C5Grid::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)

@@ -51,6 +51,12 @@ QString CR5SaleFromStoreFilter::condition()
     if (ui->rbFiscalNone->isChecked()) {
         w += " and og.f_tax=0 ";
     }
+    if (ui->rbRIYes->isChecked()) {
+        w += " and oh.f_amounttotal<0 ";
+    }
+    if (ui->rbRINo->isChecked()) {
+        w += " and oh.f_amounttotal>=0 ";
+    }
     return w;
 }
 

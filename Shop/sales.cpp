@@ -123,20 +123,21 @@ void Sales::refreshItems()
     h.append(tr("Tax"));
     h.append(tr("Date"));
     h.append(tr("Time"));
+    h.append(tr("Scancode"));
     h.append(tr("Goods"));
     h.append(tr("Qty"));
     h.append(tr("Price"));
     h.append(tr("Total"));
     ui->tbl->setColumnCount(h.count());
     ui->tbl->setHorizontalHeaderLabels(h);
-    ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 0, 120, 120, 100, 120, 120, 150, 300, 80, 80, 80);
+    ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 0, 120, 120, 100, 120, 100, 150, 250, 80, 80, 80);
     C5Database db(__c5config.replicaDbParams());
     db[":f_hall"] = __c5config.defaultHall();
     db[":f_start"] = ui->deStart->date();
     db[":f_end"] = ui->deEnd->date();
     db[":f_state"] = ORDER_STATE_CLOSE;
     db.exec("select oh.f_id, oh.f_saletype, os.f_name, concat(oh.f_prefix, oh.f_hallid) as f_number, ot.f_receiptnumber, "
-            "oh.f_datecash, oh.f_timeclose, g.f_name as f_goodsname, og.f_qty, og.f_price, og.f_total "
+            "oh.f_datecash, oh.f_timeclose, g.f_scancode, g.f_name as f_goodsname, og.f_qty, og.f_price, og.f_total "
             "from o_goods og "
             "inner join o_header oh on oh.f_id=og.f_header "
             "inner join c_goods g on g.f_id=og.f_goods "

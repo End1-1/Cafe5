@@ -39,7 +39,7 @@ bool C5ShopOrder::write(double total, double card, double discount, bool tax, QL
     C5Database dblog(__c5config.dbParams());
     db.startTransaction();
     C5StoreDraftWriter dw(db);
-    if (total < 0.0001) {
+    if (total < 0) {
         return returnFalse(tr("Negative amount"), db);
     }
     if (!tax) {

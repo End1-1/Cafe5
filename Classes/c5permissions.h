@@ -91,6 +91,7 @@
 #define cp_t8_cash_names 804
 #define cp_t8_costumer_debts 805
 #define cp_t8_costumer_debts_pay 806
+#define cp_t8_cash_movement 807
 
 #define cp_t9_salary 900
 #define cp_t9_salary_doc 901

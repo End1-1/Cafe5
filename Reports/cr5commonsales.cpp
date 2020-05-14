@@ -64,6 +64,9 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
                 << "f_amountdiscount"
                       ;
 
+    fColumnsOrder << "oh.f_datecash"
+                  << "oh.f_timeclose";
+
     fTranslation["f_prefix"] = tr("Head");
     fTranslation["f_id"] = tr("Code");
     fTranslation["f_staff"] = tr("Staff");

@@ -6,9 +6,11 @@
 #include "c5waiterorderdoc.h"
 #include "dishpartitemdelegate.h"
 #include "dishtableitemdelegate.h"
+#include "c5storedraftwriter.h"
 #include "payment.h"
 #include "c5printing.h"
 #include <QScrollBar>
+#include <QInputDialog>
 
 Workspace::Workspace(const QStringList &dbParams) :
     C5Dialog(dbParams),
@@ -44,13 +46,23 @@ bool Workspace::login()
             where f_id in (select f_part from d_dish where f_id in (Select f_dish from d_menu where f_menu=:f_menu and f_state=1)) \
             order by f_queue");
     int row = 0, col = 0;
+    ui->tblPart2->setRowCount(1);
+    QTableWidgetItem *itemAll = new QTableWidgetItem(tr("All"));
+    itemAll->setData(Qt::UserRole, -1);
+    itemAll->setData(Qt::BackgroundColorRole, -1);
+    ui->tblPart2->setItem(row, col, itemAll);
+    col++;
+    if (col == ui->tblPart2->columnCount()) {
+        row++;
+        col = 0;
+    }
     while (db.nextRow()) {
         if (row > ui->tblPart2->rowCount() - 1) {
             ui->tblPart2->setRowCount(row + 1);
         }
         QTableWidgetItem *item = new QTableWidgetItem(db.getString(1));
         item->setData(Qt::UserRole, db.getInt(0));
-        item->setData(Qt::BackgroundRole, QColor::fromRgb(db.getInt("f_color")));
+        item->setData(Qt::BackgroundColorRole, db.getInt("f_color"));
         ui->tblPart2->setItem(row, col, item);
         col++;
         if (col == ui->tblPart2->columnCount()) {
@@ -181,9 +193,6 @@ void Workspace::on_tblPart2_itemClicked(QTableWidgetItem *item)
     if (!item) {
         return;
     }
-    if (item->data(Qt::UserRole).toInt() == 0) {
-        return;
-    }
     fTypeFilter = item->data(Qt::UserRole).toInt();
     filter();
 }
@@ -212,7 +221,6 @@ void Workspace::on_btnCheckout_clicked()
         return;
     }
     C5Database db(fDBParams);
-    QString id = C5Database::uuid();
     QString prefix;
     QString hallid;
     db[":f_id"] = C5Config::defaultHall();
@@ -232,83 +240,35 @@ void Workspace::on_btnCheckout_clicked()
     }
 
     db.startTransaction();
-    db[":f_id"] = id;
-    db[":f_prefix"] = prefix;
-    db[":f_hallid"] = hallid;
-    db[":f_state"] = ORDER_STATE_CLOSE;
-    db[":f_hall"] = C5Config::defaultHall();
-    db[":f_table"] = C5Config::defaultTable();
-    db[":f_dateOpen"] = QDate::currentDate();
-    db[":f_dateClose"] = QDate::currentDate();
-    db[":f_timeOpen"] = QTime::currentTime();
-    db[":f_timeClose"] = QTime::currentTime();
-    db[":f_dateCash"] = QDate::currentDate();
-    db[":f_staff"] = fUser.fId;
-    db[":f_comment"] = "";
-    db[":f_print"] = 1;
-    db[":f_amounttotal"] = ui->leTotal->getDouble();
-    db[":f_amountcash"] = ui->leTotal->getDouble();
-    db[":f_amountcard"] = 0;
-    db[":f_amountbank"] = 0;
-    db[":f_amountother"] = 0;
-    db[":f_amountservice"] = 0;
-    db[":f_amountdiscount"] = 0;
-    db[":f_servicefactor"] = 0;
-    db[":f_discountfactor"] = 0;
-    if (!db.insert("o_header", false)) {
-        C5Message::error(db.fLastError);
+    C5StoreDraftWriter dw(db);
+    QString id;
+    if (!dw.writeOHeader(id, hallid.toInt(), prefix, ORDER_STATE_CLOSE, __c5config.defaultHall().toInt(), __c5config.defaultTable(), QDate::currentDate(), QDate::currentDate(),
+                    QDate::currentDate(), QTime::currentTime(), QTime::currentTime(), fUser.fId, "", 1, ui->leTotal->getDouble(), ui->leTotal->getDouble(),
+                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0)) {
+        C5Message::error(dw.fErrorMsg);
         db.rollback();
         return;
     }
+
     for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
         Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
-        QString bid = C5Database::uuid();
-        db[":f_id"] = bid;
-        db[":f_header"] = id;
-        db[":f_state"] = DISH_STATE_OK;
-        db[":f_dish"] = d.id;
-        db[":f_qty1"] = d.qty;
-        db[":f_qty2"] = d.qty;
-        db[":f_price"] = d.price;
-        db[":f_service"] = C5Config::serviceFactor().toDouble();
-        db[":f_discount"] = 0;
-        db[":f_total"] = d.qty * d.price;
-        db[":f_store"] = d.store;
-        db[":f_print1"] = d.printer;
-        db[":f_print2"] = "";
-        db[":f_comment"] = "";
-        db[":f_remind"] = 0;
-        db[":f_adgcode"] = d.adgCode;
-        if (!db.insert("o_body", false)) {
-            C5Message::error(db.fLastError);
+        QString bid;
+        if (!dw.writeOBody(bid, id, DISH_STATE_OK, d.id, d.qty, d.qty, d.price, d.qty*d.price, __c5config.serviceFactor().toDouble(), 0, d.store, d.printer, "", "", 0, d.adgCode, 0, 0, 0)) {
+            C5Message::error(dw.fErrorMsg);
             db.rollback();
             return;
         }
-        db[":f_dish"] = d.id;
-        db.exec("select r.f_goods, r.f_qty from "
-                "d_recipes r "
-                "where r.f_dish=:f_dish");
-        QList<Dish> recipe;
-        while (db.nextRow()) {
-            Dish d;
-            d.id = db.getInt(0);
-            d.qty = db.getDouble(1);
-            recipe.append(d);
-        }
-        for (const Dish &d: recipe) {
-            db[":f_header"] = id;
-            db[":f_body"] = bid;
-            db[":f_goods"] = d.id;
-            db[":f_qty"] = d.qty;
-            db.insert("o_store_output", false);
+        if (!dw.writeOBodyToOGoods(bid, id)) {
+            C5Message::error(dw.fErrorMsg);
+            db.rollback();
+            return;
         }
     }
 
     QString err;
-    C5WaiterOrderDoc w(id, db);
-    if (!w.makeOutputOfStore(db, err)) {
-        db.rollback();
+    if (!dw.writeFromShopOutput(id, DOC_STATE_SAVED, err)) {
         C5Message::error(err);
+        db.rollback();
         return;
     }
     db.commit();
@@ -411,4 +371,18 @@ void Workspace::on_btnDishUp_clicked()
 void Workspace::on_btnDishDown_clicked()
 {
     scrollTable(ui->tblDishes, 1, 5);
+}
+
+void Workspace::on_btnAny_clicked()
+{
+    bool ok = false;
+    double newQty = QInputDialog::getDouble(this, tr("Enter qty"), tr("Qty"), 0, 0.01, 99, 2, &ok);
+    if (ok && newQty > 0.001) {
+        Dish d;
+        if (!currentDish(d)) {
+            return;
+        }
+        d.qty = newQty;
+        setCurrentDish(d);
+    }
 }

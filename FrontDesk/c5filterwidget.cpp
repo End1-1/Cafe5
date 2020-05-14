@@ -2,7 +2,9 @@
 #include "c5lineeditwithselector.h"
 #include "c5dateedit.h"
 #include "c5checkbox.h"
+#include "c5guicontrols.h"
 #include <QSettings>
+#include <QToolButton>
 
 C5FilterWidget::C5FilterWidget(const QStringList &dbParams, QWidget *parent) :
     C5Widget(dbParams, parent)
@@ -58,9 +60,10 @@ void C5FilterWidget::restoreFilter(QWidget *parent)
     QObjectList ol = parent->children();
     QString filterName;
     QVariant value;
-    C5LineEditWithSelector *le;
-    C5DateEdit *de;
-    C5CheckBox *ce;
+    C5LineEditWithSelector *le = nullptr;
+    C5DateEdit *de = nullptr;
+    C5CheckBox *ce = nullptr;
+    QToolButton *tb = nullptr;
     foreach (QObject *o, ol) {
         if (o->children().count() > 0) {
             saveFilter(static_cast<QWidget*>(o));
@@ -80,7 +83,9 @@ void C5FilterWidget::restoreFilter(QWidget *parent)
                 continue;
             }
             value = s.value(filterName, QDate::currentDate());
-            de->setDate(value.toDate());
+            if (fixDates()) {
+                de->setDate(value.toDate());
+            }
             continue;
         }
         if ((ce = isCheckBox(o))) {
@@ -91,6 +96,13 @@ void C5FilterWidget::restoreFilter(QWidget *parent)
             value = s.value(filterName, 0);
             ce->setChecked(value.toBool());
             continue;
+        }
+        if (__guic.isToolButton(tb, o)) {
+            if (tb->property("FixDate").toBool()) {
+                tb->setCheckable(true);
+                connect(tb, SIGNAL(clicked(bool)), this, SLOT(setFixDate(bool)));
+                tb->setChecked(fixDates());
+            }
         }
     }
 }
@@ -118,4 +130,22 @@ void C5FilterWidget::clearFilter(QWidget *parent)
             continue;
         }
     }
+}
+
+bool C5FilterWidget::fixDates()
+{
+    QSettings s(_ORGANIZATION_, QString("%1\\%2\\reportfilter\\%3")
+                .arg(_APPLICATION_)
+                .arg(_MODULE_)
+                .arg(metaObject()->className()));
+    return s.value("fixdate").toBool();
+}
+
+void C5FilterWidget::setFixDate(bool v)
+{
+    QSettings s(_ORGANIZATION_, QString("%1\\%2\\reportfilter\\%3")
+                .arg(_APPLICATION_)
+                .arg(_MODULE_)
+                .arg(metaObject()->className()));
+    s.setValue("fixdate", v);
 }

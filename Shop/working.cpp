@@ -180,6 +180,25 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
                 }
             }
             break;
+        case Qt::Key_T:
+            if (ke->modifiers() & Qt::ControlModifier) {
+                C5Database db(__c5config.replicaDbParams());
+                db[":f_hall"] = __c5config.defaultHall();
+                db[":f_datecash"] = QDate::currentDate();
+                db[":f_state"] = ORDER_STATE_CLOSE;
+                db.exec("select concat(w.f_last, ' ', w.f_first) as f_staff,"
+                        "sum(oh.f_amounttotal) as f_amounttotal "
+                        "from o_header oh "
+                        "left join s_user w on w.f_id=oh.f_staff  "
+                        "where oh.f_hall=:f_hall and oh.f_datecash=:f_datecash  and oh.f_state=:f_state  group by concat(w.f_last, ' ', w.f_first)");
+                QString info = tr("Total today") + "<br>";
+                while (db.nextRow()) {
+                    info += QString("%1: %2<br>").arg(db.getString("f_staff")).arg(float_str(db.getDouble("f_amounttotal"), 2));
+                }
+                C5Message::info(info);
+                event->accept();
+            }
+            break;
         }
     }
     return QWidget::eventFilter(watched, event);
@@ -270,6 +289,7 @@ void Working::makeWGoods()
         } else {
             db[":f_store"] = C5Config::defaultStore();
             db[":f_date"] = QDate::currentDate();
+            db[":f_state"] = DOC_STATE_SAVED;
             db.exec("select g.f_id, g.f_scancode, cp.f_taxname, gg.f_name as f_groupname, g.f_name as f_goodsname, "
                     "g.f_saleprice, g.f_saleprice2, u.f_name as f_unitname, "
                     "gca.f_name as group1, gcb.f_name group2, gcc.f_name as group3, gcd.f_name as group4, "
@@ -284,7 +304,7 @@ void Working::makeWGoods()
                     "left join c_goods_classes gcd on gcd.f_id=g.f_group4 "
                     "left join c_partners cp on cp.f_id=g.f_supplier "
                     "inner join a_header h on h.f_id=s.f_document "
-                    "where h.f_date<=:f_date and s.f_store=:f_store  "
+                    "where h.f_date<=:f_date and s.f_store=:f_store and h.f_state=:f_state "
                     "group by g.f_id,gg.f_name,g.f_name,g.f_lastinputprice,g.f_saleprice ");
         }
     } else {

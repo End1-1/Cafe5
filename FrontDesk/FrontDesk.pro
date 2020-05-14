@@ -48,6 +48,7 @@ SOURCES += \
     ../Classes/c5threadobject.cpp \
     ../Classes/notificationwidget.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
+    ../Controls/c5guicontrols.cpp \
     ../Editors/c5cashname.cpp \
     ../Editors/ce5dishpackage.cpp \
     ../Editors/ce5goodsbarcodelabelview.cpp \
@@ -58,6 +59,8 @@ SOURCES += \
     ../Reports/cr5carvisitsfilter.cpp \
     ../Reports/cr5cashdetailed.cpp \
     ../Reports/cr5cashdetailedfilter.cpp \
+    ../Reports/cr5cashmovement.cpp \
+    ../Reports/cr5cashmovementfilter.cpp \
     ../Reports/cr5cashnames.cpp \
     ../Reports/cr5consuptionreason.cpp \
     ../Reports/cr5consuptionreasonfilter.cpp \
@@ -233,6 +236,7 @@ HEADERS += \
     ../Classes/c5threadobject.h \
     ../Classes/notificationwidget.h \
     ../Classes/proxytablewidgetdatabase.h \
+    ../Controls/c5guicontrols.h \
     ../Editors/c5cashname.h \
     ../Editors/ce5dishpackage.h \
     ../Editors/ce5goodsbarcodelabelview.h \
@@ -243,6 +247,8 @@ HEADERS += \
     ../Reports/cr5carvisitsfilter.h \
     ../Reports/cr5cashdetailed.h \
     ../Reports/cr5cashdetailedfilter.h \
+    ../Reports/cr5cashmovement.h \
+    ../Reports/cr5cashmovementfilter.h \
     ../Reports/cr5cashnames.h \
     ../Reports/cr5consuptionreason.h \
     ../Reports/cr5consuptionreasonfilter.h \
@@ -420,6 +426,7 @@ FORMS += \
     ../Editors/ce5storereason.ui \
     ../Reports/cr5carvisitsfilter.ui \
     ../Reports/cr5cashdetailedfilter.ui \
+    ../Reports/cr5cashmovementfilter.ui \
     ../Reports/cr5consuptionreasonfilter.ui \
     ../Reports/cr5costumerdebtsfilter.ui \
     ../Reports/cr5discountstatisticsfilter.ui \

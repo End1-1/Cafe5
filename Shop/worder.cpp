@@ -155,7 +155,7 @@ void WOrder::fixCostumer(const QString &code)
     }
     if (fCardValue < 0) {
         bool ok = false;
-        double v = QInputDialog::getDouble(this, tr("Discount value"), tr("Enter discount value"), 0, 0, 100, 0, &ok);
+        double v = QInputDialog::getDouble(this, tr("Discount value"), tr("Enter discount value"), 0, 0, 100000, 0, &ok);
         if (!ok) {
             fCardId = 0;
             fCostumerId = 0;
@@ -163,7 +163,11 @@ void WOrder::fixCostumer(const QString &code)
             fCardValue = 0;
             return;
         }
-        fCardValue = v / 100;
+        if (fCardMode == CARD_TYPE_DISCOUNT) {
+            fCardValue = v / 100;
+        } else {
+            fCardValue = v;
+        }
     }
     ui->leDisc->setVisible(true);
     ui->leCustomer->setVisible(true);
@@ -361,4 +365,14 @@ void WOrder::imageLoaded(const QPixmap &img)
 void WOrder::noImage()
 {
     ui->wimage->setVisible(false);
+}
+
+void WOrder::on_btnInfo_clicked()
+{
+    QString info = QString("Ctrl+S: %1<br>Ctrl+I: %2<br>Ctrl+O: %3<br>Ctrl+T: %4")
+            .arg(tr("Search goods in the storages"))
+            .arg(tr("Input staff at the work"))
+            .arg(tr("Output staff from the work"))
+            .arg(tr("Total today"));
+    C5Message::info(info);
 }

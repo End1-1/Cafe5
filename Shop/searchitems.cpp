@@ -23,14 +23,14 @@ void SearchItems::on_btnSearch_clicked()
     if (ui->leCode->isEmpty()) {
         return;
     }
-    ui->tbl->setColumnWidths(ui->tbl->columnCount(), 200, 200, 200, 100, 100, 100);
-    ui->tbl->setColumnHidden(3, __c5config.shopDenyF1());
-    ui->tbl->setColumnHidden(4, __c5config.shopDenyF2());
+    ui->tbl->setColumnWidths(ui->tbl->columnCount(), 200, 200, 200, 80, 100, 100, 100);
+    ui->tbl->setColumnHidden(4, __c5config.shopDenyF1());
+    ui->tbl->setColumnHidden(5, __c5config.shopDenyF2());
     C5Database db(__c5config.replicaDbParams());
     db[":f_date"] = QDate::currentDate();
     db[":f_scancode"] = ui->leCode->text();
-    db.exec("select ss.f_name as f_storage,g.f_name as f_goods,g.f_scancode,sum(s.f_qty*s.f_type) as f_qty, "
-            "u.f_name as f_unit,g.f_saleprice,g.f_saleprice2 "
+    db.exec("select ss.f_name as f_storage,g.f_name as f_goods,g.f_scancode, "
+            "u.f_name as f_unit,g.f_saleprice,g.f_saleprice2, sum(s.f_qty*s.f_type) as f_qty "
             "from a_store s "
             "inner join c_storages ss on ss.f_id=s.f_store "
             "inner join c_goods g on g.f_id=s.f_goods "

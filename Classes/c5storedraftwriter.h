@@ -42,9 +42,15 @@ public:
 
     bool writeAStoreDraft(QString &id, const QString &docId, int store, int type, int goods, double qty, double price, double total, int reason, const QString &baseid, int rownum);
 
+    bool writeAStoreInventory(QString &id, const QString &docId, int store, int goods, double qty, double price, double total);
+
     bool writeBHistory(const QString &id, int type, int card, double value, double data);
 
     bool writeECash(QString &id, const QString &header, int cash, int sign, const QString &purpose, double amount, QString &base, int rownum);
+
+    bool writeOBody(QString &id, const QString &header, int state, int dish, double qty1, double qty2, double price, double total, double service, double discount, int store, const QString &print1, const QString &print2, const QString &comment, int remind, const QString &adgcode, int removereason, int timeorder, int package);
+
+    bool writeOBodyToOGoods(const QString &id, const QString &headerid);
 
     bool writeOHeader(QString &id, int hallid, const QString &prefix, int state, int hall, int table, const QDate &dateopen, const QDate &dateclose, const QDate &datecash, const QTime &timeopen, const QTime &timeclose, int staff, const QString &comment, int print, double amountTotal, double amountCash, double amountCard, double amountBank, double amountOther, int serviceMode, double amountService, double amountDiscount, double serviceFactor, double discountFactor, int creditCardId, int otherId, int shift, int source, int saletype, int partner);
 

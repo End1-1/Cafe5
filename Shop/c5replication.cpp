@@ -102,6 +102,7 @@ void C5Replication::downloadFromServer()
     db.exec("delete from a_store_temp");
     dr[":date"] = QDate::currentDate();
     dr[":store"] = __c5config.defaultStore();
+    dr[":state"] = DOC_STATE_SAVED;
     dr.exec("select g.f_id as f_code,ss.f_name as f_storage,gg.f_name as f_group,g.f_name as f_goods,g.f_scancode,sum(s.f_qty*s.f_type) as f_qty, "
             "u.f_name as f_unit,g.f_lastinputprice,sum(g.f_lastinputprice*s.f_type*s.f_qty) as f_total,g.f_saleprice,sum(s.f_qty*s.f_type)*g.f_saleprice as f_totalsale,"
             "g.f_saleprice2,sum(s.f_qty*s.f_type)*g.f_saleprice2 as f_totalsale2 "
@@ -111,7 +112,7 @@ void C5Replication::downloadFromServer()
             "inner join c_groups gg on gg.f_id=g.f_group "
             "inner join c_units u on u.f_id=g.f_unit "
             "inner join a_header h on h.f_id=s.f_document  "
-            "where  h.f_date<=:date  and s.f_store=:store "
+            "where  h.f_date<=:date  and s.f_store=:store and h.f_state=:state "
             "group by g.f_id,ss.f_name,gg.f_name,g.f_name,u.f_name,g.f_lastinputprice,g.f_saleprice,g.f_saleprice2 "
             "having sum(s.f_qty*s.f_type) > 0");
     while (dr.nextRow()) {

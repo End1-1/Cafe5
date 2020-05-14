@@ -38,6 +38,9 @@
        <height>16777215</height>
       </size>
      </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
      <property name="Field" stdset="0">
       <string>f_id</string>
      </property>
@@ -79,6 +82,9 @@
     <widget class="C5LineEditWithSelector" name="leSettingsName">
      <property name="enabled">
       <bool>false</bool>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
      </property>
      <property name="FieldRef" stdset="0">
       <string>f_settingsname</string>
@@ -162,6 +168,15 @@
    <header location="global">c5lineeditwithselector.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>lineEdit</tabstop>
+  <tabstop>lineEdit_2</tabstop>
+  <tabstop>leSettingsddd</tabstop>
+  <tabstop>lineEdit_3</tabstop>
+  <tabstop>lineEdit_4</tabstop>
+  <tabstop>leSettings</tabstop>
+  <tabstop>leSettingsName</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

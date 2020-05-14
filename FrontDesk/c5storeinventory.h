@@ -42,6 +42,8 @@ private slots:
 private:
     Ui::C5StoreInventory *ui;
 
+    QString fInternalID;
+
     int addGoodsRow();
 
     void countTotal();

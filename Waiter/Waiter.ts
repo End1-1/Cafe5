@@ -238,12 +238,12 @@
 <context>
     <name>C5Message</name>
     <message>
-        <location filename="../Cafe5/c5message.ui" line="60"/>
+        <location filename="../Cafe5/c5message.ui" line="66"/>
         <source>OK</source>
         <translation>Այո</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5message.ui" line="67"/>
+        <location filename="../Cafe5/c5message.ui" line="73"/>
         <source>Cancel</source>
         <translation>Հրաժարվել</translation>
     </message>
@@ -832,17 +832,17 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="647"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="726"/>
         <source>Invalid document id</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="753"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="832"/>
         <source>Not enough materials in the store</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="849"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="928"/>
         <source>This order used in next documents</source>
         <translation type="unfinished"></translation>
     </message>
@@ -858,7 +858,7 @@
 <context>
     <name>C5WaiterOrderDoc</name>
     <message>
-        <location filename="../Classes/c5waiterorderdoc.cpp" line="304"/>
+        <location filename="../Classes/c5waiterorderdoc.cpp" line="303"/>
         <source>Document saved</source>
         <translation>Պահեստի փասթաթուղթը պահպանված է</translation>
     </message>

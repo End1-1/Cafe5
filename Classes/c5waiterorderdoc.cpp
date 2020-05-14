@@ -290,7 +290,6 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &db, C5Database &fDD, QString 
 bool C5WaiterOrderDoc::makeOutputOfStore(C5Database &db, QString &err)
 {
     //Check for store doc
-    db.startTransaction();
     db[":f_header"] = fHeader["f_id"].toString();
     db.exec("select h.f_state, d.f_id, d.f_qty as f_dqty, g.f_qty as f_gqty from o_goods g "
              "inner join a_store_draft d on d.f_id=g.f_storerec "
@@ -349,11 +348,9 @@ bool C5WaiterOrderDoc::makeOutputOfStore(C5Database &db, QString &err)
     }
     C5StoreDraftWriter dw(db);
     if (!dw.writeFromShopOutput(fHeader["f_id"].toString(), DOC_STATE_DRAFT, err)) {
-        db.rollback();
         err += dw.fErrorMsg + "<br>";
         return false;
     }
-    db.commit();
     return true;
 }
 

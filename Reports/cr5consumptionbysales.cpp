@@ -8,6 +8,7 @@
 #include "c5progressdialog.h"
 #include "c5double.h"
 #include "dlgchangeoutputstore.h"
+#include "c5storedraftwriter.h"
 #include "c5storedoc.h"
 #include <QInputDialog>
 
@@ -285,20 +286,8 @@ QString CR5ConsumptionBySales::documentForInventory()
         }
     }
     if (result.isEmpty()) {
-        result = C5Database::uuid(fDBParams);
-        db[":f_id"] = result;
-        db[":f_state"] = DOC_STATE_SAVED;
-        db[":f_type"] = DOC_TYPE_STORE_INVENTORY;
-        db[":f_operator"] = __userid;
-        db[":f_date"] = f->date2();
-        db[":f_createDate"] = QDate::currentDate();
-        db[":f_createTime"] = QTime::currentTime();
-        db[":f_partner"] = 0;
-        db[":f_amount"] = 0;
-        db[":f_comment"] = tr("Created automaticaly");
-        db[":f_raw"] = "";
-        db.insert("a_header", false);
-        result = QString("'%1'").arg(result);
+        C5StoreDraftWriter dw(db);
+        dw.writeAHeader(result, QString::number(dw.counterAType(DOC_TYPE_STORE_INVENTORY)), DOC_STATE_SAVED, DOC_TYPE_STORE_INVENTORY, __userid, f->date2(), QDate::currentDate(), QTime::currentTime(), 0, 0, tr("Created automaticaly"), 0, 0);
     }
     return result;
 }
@@ -328,6 +317,7 @@ bool CR5ConsumptionBySales::tblDoubleClicked(int row, int column, const QList<QV
     double qty;
     QString docid;
     C5Database db(fDBParams);
+    C5StoreDraftWriter dw(db);
     switch (column) {
     case col_qtysale: {
         //if (pr(fDBParams, cp_t3_consuption_reason)) {
@@ -341,22 +331,13 @@ bool CR5ConsumptionBySales::tblDoubleClicked(int row, int column, const QList<QV
         if (!ok) {
             return true;
         }
-        if (qty < 0.0001) {
-            C5Message::error(tr("Quantity must be greater than 0"));
-            return true;
-        }
         docid = documentForInventory();
         db[":f_goods"] = values.at(0);
         db.exec(QString("delete from a_store_inventory where f_document in (%1) and f_goods=:f_goods").arg(docid));
-        db[":f_id"] = C5Database::uuid(fDBParams);
-        QString doc = docid.split(",", QString::SkipEmptyParts).at(0);
-        db[":f_document"] = doc.replace("'", "");
-        db[":f_store"] = fFilter->store();
-        db[":f_goods"] = values.at(0);
-        db[":f_qty"] = qty;
-        db[":f_price"] = 0;
-        db[":f_total"] = 0;
-        db.insert("a_store_inventory", false);
+        QString id;
+        if (qty > 0.0001) {
+            dw.writeAStoreInventory(id, docid.split(",", QString::SkipEmptyParts).at(0), fFilter->store(), values.at(0).toInt(), qty, 0, 0);
+        }
         fModel->setData(row, column, qty);
         countRowQty(row);
         break;

@@ -37,5 +37,11 @@ QString CR5CommonSalesFilter::condition()
     if (!ui->leShift->isEmpty()) {
         result += " and oh.f_shift in (" + ui->leShift->text() + ") ";
     }
+    if (ui->rbRIYes->isChecked()) {
+        result += " and oh.f_amounttotal<0 ";
+    }
+    if (ui->rbRINo->isChecked()) {
+        result += " and oh.f_amounttotal>=0 ";
+    }
     return result;
 }

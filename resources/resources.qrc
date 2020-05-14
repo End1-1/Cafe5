@@ -45,5 +45,6 @@
         <file>compressor.png</file>
         <file>bill.png</file>
         <file>alarm-clock.png</file>
+        <file>weight.png</file>
     </qresource>
 </RCC>

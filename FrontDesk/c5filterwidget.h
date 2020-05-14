@@ -19,9 +19,10 @@ public:
 
     virtual void clearFilter(QWidget *parent);
 
-signals:
+    virtual bool fixDates();
 
 public slots:
+    void setFixDate(bool v);
 };
 
 #endif // C5FILTERWIDGET_H

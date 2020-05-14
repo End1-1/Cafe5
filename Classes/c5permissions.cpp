@@ -97,6 +97,7 @@ void C5Permissions::init(C5Database &db)
               << cp_t8_cash_names
               << cp_t8_costumer_debts
               << cp_t8_costumer_debts_pay
+              << cp_t8_cash_movement
 
               << cp_t9_salary
               << cp_t9_salary_doc

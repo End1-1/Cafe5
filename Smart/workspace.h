@@ -48,6 +48,8 @@ private slots:
 
     void on_btnDishDown_clicked();
 
+    void on_btnAny_clicked();
+
 private:
     Ui::Workspace *ui;
 

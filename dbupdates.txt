@@ -27,7 +27,7 @@ CREATE TABLE `d_img` (  `f_id` INT NOT NULL,  `f_data` MEDIUMBLOB NULL,  PRIMARY
 /* ELINA STARTED FRON HERE */
 alter table d_recipes add column f_complex integer;
 alter table d_recipes add column f_complexQty decimal(14,4);
-alter table d_recipes add column f_complexBase decimal(14,4);
+alter table d_recipes add column f_complexBaseQty decimal(14,4);
 create table droid_message(f_id integer primary key auto_increment, msg integer);
 alter table o_goods add f_taxdept varchar(2);
 ALTER TABLE `o_goods` CHANGE COLUMN `f_tax` `f_tax` INT NULL DEFAULT NULL ;
@@ -402,3 +402,4 @@ create table s_user_photo (f_id integer primary key, f_data mediumblob);
 
 /* DB - 19*/
 update s_app set f_version ='19' where f_app='DB';
+ALTER TABLE `h_halls` CHANGE COLUMN `f_prefix` `f_prefix` CHAR(8) NULL DEFAULT NULL ,ADD UNIQUE INDEX `f_prefix_UNIQUE` (`f_prefix` ASC);
