@@ -33,7 +33,7 @@ void C5ShopOrder::setParams(const QDate &dateOpen, const QTime &timeOpen, int sa
     fSaleType = saletype;
 }
 
-bool C5ShopOrder::write(double total, double card, double discount, bool tax, QList<IGoods> goods)
+bool C5ShopOrder::write(double total, double card, double prepaid, double discount, bool tax, QList<IGoods> goods)
 {
     C5Database db(__c5config.dbParams());
     C5Database dblog(__c5config.dbParams());
@@ -42,12 +42,13 @@ bool C5ShopOrder::write(double total, double card, double discount, bool tax, QL
     if (total < 0) {
         return returnFalse(tr("Negative amount"), db);
     }
+    /*
     if (!tax) {
         if (card > 0.001) {
             return returnFalse(tr("You cannot use this option with card payment mode."), db);
         }
     }
-
+*/
     if (goods.count() == 0) {
         return returnFalse(tr("Empty order"), db);
     }
@@ -92,7 +93,7 @@ bool C5ShopOrder::write(double total, double card, double discount, bool tax, QL
         }
         QString jsonIn, jsonOut, err;
         int result = 0;
-        result = pt.makeJsonAndPrint(card, 0, jsonIn, jsonOut, err);
+        result = pt.makeJsonAndPrint(card, prepaid, jsonIn, jsonOut, err);
 
         dblog[":f_id"] = db.uuid();
         dblog[":f_order"] = oheaderid;
@@ -106,19 +107,19 @@ bool C5ShopOrder::write(double total, double card, double discount, bool tax, QL
         QSqlQuery *q = new QSqlQuery(dblog.fDb);
         if (result == pt_err_ok) {
             PrintTaxN::parseResponse(jsonOut, firm, hvhh, fiscal, rseq, sn, address, devnum, time);
-            db[":f_id"] = oheaderid;
+            dblog[":f_id"] = oheaderid;
             db.exec("delete from o_tax where f_id=:f_id");
-            db[":f_id"] = oheaderid;
-            db[":f_dept"] = C5Config::taxDept();
-            db[":f_firmname"] = firm;
-            db[":f_address"] = address;
-            db[":f_devnum"] = devnum;
-            db[":f_serial"] = sn;
-            db[":f_fiscal"] = fiscal;
-            db[":f_receiptnumber"] = rseq;
-            db[":f_hvhh"] = hvhh;
-            db[":f_fiscalmode"] = tr("(F)");
-            db[":f_time"] = time;
+            dblog[":f_id"] = oheaderid;
+            dblog[":f_dept"] = C5Config::taxDept();
+            dblog[":f_firmname"] = firm;
+            dblog[":f_address"] = address;
+            dblog[":f_devnum"] = devnum;
+            dblog[":f_serial"] = sn;
+            dblog[":f_fiscal"] = fiscal;
+            dblog[":f_receiptnumber"] = rseq;
+            dblog[":f_hvhh"] = hvhh;
+            dblog[":f_fiscalmode"] = tr("(F)");
+            dblog[":f_time"] = time;
             dblog.insert("o_tax", false);
             pt.saveTimeResult(oheaderid, *q);
             delete q;
@@ -129,24 +130,38 @@ bool C5ShopOrder::write(double total, double card, double discount, bool tax, QL
         }
     }
 
+    bool needStoreDoc = false;
+    for (int i = 0; i < goods.count(); i++) {
+        IGoods &g = goods[i];
+        if (!g.isService) {
+            needStoreDoc = true;
+            break;
+        }
+    }
+
     QString storeDocComment = QString("%1 %2%3").arg(tr("Output of sale")).arg(headerPrefix).arg(headerId);
     QString storeDocId;
-    QString storedocUserNum = dw.storeDocNum(DOC_TYPE_STORE_OUTPUT, __c5config.defaultStore(), true, 0);
-    if (!dw.writeAHeader(storeDocId, storedocUserNum, DOC_STATE_DRAFT, DOC_TYPE_STORE_OUTPUT, __userid, QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, 0, storeDocComment, 0, 0)) {
-        return returnFalse(dw.fErrorMsg, db);
-    }
-    if (!dw.writeAHeaderStore(storeDocId, __userid, __userid, "", QDate(), 0, __c5config.defaultStore(), 1, "", 0, 0)) {
-        return returnFalse(dw.fErrorMsg, db);
+    QString storedocUserNum;
+    if (needStoreDoc) {
+        storedocUserNum = dw.storeDocNum(DOC_TYPE_STORE_OUTPUT, __c5config.defaultStore(), true, 0);
+        if (!dw.writeAHeader(storeDocId, storedocUserNum, DOC_STATE_DRAFT, DOC_TYPE_STORE_OUTPUT, __userid, QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, 0, storeDocComment, 0, 0)) {
+            return returnFalse(dw.fErrorMsg, db);
+        }
+        if (!dw.writeAHeaderStore(storeDocId, __userid, __userid, "", QDate(), 0, __c5config.defaultStore(), 1, "", 0, 0)) {
+            return returnFalse(dw.fErrorMsg, db);
+        }
     }
 
     for (int i = 0; i < goods.count(); i++) {
         IGoods &g = goods[i];
         QString ogoodsid;
         QString adraftid;
-        if (!dw.writeAStoreDraft(adraftid, storeDocId, __c5config.defaultStore(), -1, g.goodsId, g.goodsQty, 0, 0, DOC_REASON_SALE, adraftid, i + 1)) {
-            return returnFalse(dw.fErrorMsg, db);
+        if (!g.isService) {
+            if (!dw.writeAStoreDraft(adraftid, storeDocId, __c5config.defaultStore(), -1, g.goodsId, g.goodsQty, 0, 0, DOC_REASON_SALE, adraftid, i + 1)) {
+                return returnFalse(dw.fErrorMsg, db);
+            }
         }
-        if (!dw.writeOGoods(ogoodsid, oheaderid, "", __c5config.defaultStore(), g.goodsId, g.goodsQty, g.goodsPrice,  g.goodsTotal, tax ? rseq.toInt() : 0, 1, i + 1, adraftid)) {
+        if (!dw.writeOGoods(ogoodsid, oheaderid, "", __c5config.defaultStore(), g.goodsId, g.goodsQty, g.goodsPrice,  g.goodsTotal, tax ? rseq.toInt() : 0, 1, i + 1, adraftid, g.discountFactor, g.discountMode)) {
             return returnFalse(dw.fErrorMsg, db);
         }
     }
@@ -187,14 +202,16 @@ bool C5ShopOrder::write(double total, double card, double discount, bool tax, QL
     }
 
     QString err;
-    if (dw.writeOutput(storeDocId, err)) {
-        if (!dw.writeAHeader(storeDocId, storedocUserNum, DOC_STATE_SAVED, DOC_TYPE_STORE_OUTPUT, __userid, QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, 0, storeDocComment, 0, 0)) {
-            return returnFalse(dw.fErrorMsg, db);
+    if (needStoreDoc) {
+        if (dw.writeOutput(storeDocId, err)) {
+            if (!dw.writeAHeader(storeDocId, storedocUserNum, DOC_STATE_SAVED, DOC_TYPE_STORE_OUTPUT, __userid, QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, 0, storeDocComment, 0, 0)) {
+                return returnFalse(dw.fErrorMsg, db);
+            }
+            dw.writeTotalStoreAmount(storeDocId);
         }
-        dw.writeTotalStoreAmount(storeDocId);
     }
 
-    if (fPartnerCode > 0) {
+    if (fPartnerCode > 0 && needStoreDoc) {
         db[":f_id"] = fPartnerCode;
         db.exec("select f_store, f_cash from c_partners where f_id=:f_id");
         if (db.nextRow()) {
@@ -210,17 +227,45 @@ bool C5ShopOrder::write(double total, double card, double discount, bool tax, QL
                 if (!dw.writeAHeaderStore(pstoredoc, __userid, __userid, "", QDate(), partnerStore, 0, 1, "", 0, 0)) {
                     return returnFalse(dw.fErrorMsg, db);
                 }
+                // DO NOT UNCOMPLECT THE GOODS WITH UNIT ID THAT EQUAL TO 10
+                QString goodsComplect;
+                foreach (const IGoods &g, goods) {
+                    if (g.unitId == 10) {
+                        if (!goodsComplect.isEmpty()) {
+                            goodsComplect += ",";
+                        }
+                        goodsComplect += QString::number(g.goodsId);
+                    }
+                }
 
                 QList<IGoods> ingoods;
+                if (!goodsComplect.isEmpty()) {
+                    db[":f_document"] = storeDocId;
+                    db.exec("select if (gc.f_base is null, ad.f_goods, gc.f_goods) as f_goods, "
+                            "if(gc.f_base is null, ad.f_qty, gc.f_qty*ad.f_qty) as f_qty, "
+                            "if(gc.f_base is null, ad.f_price, g.f_saleprice2) as f_price, "
+                            "if(gc.f_base is null, ad.f_price*ad.f_qty, g.f_saleprice2*(gc.f_qty*ad.f_qty)) as f_total "
+                            "from a_store_draft ad "
+                            "left join c_goods_complectation gc on gc.f_base=ad.f_goods "
+                            "left join c_goods g on g.f_id=gc.f_goods "
+                            "where f_document=:f_document and ad.f_goods in (" + goodsComplect + ") ");
+                    while (db.nextRow()) {
+                        IGoods g;
+                        g.goodsId = db.getInt("f_goods");
+                        g.goodsQty = db.getDouble("f_qty");
+                        g.goodsPrice = db.getDouble("f_price");
+                        g.goodsTotal = db.getDouble("f_total");
+                        ingoods.append(g);
+                    }
+                }
+
+                if (goodsComplect.isEmpty()) {
+                    goodsComplect = "0";
+                }
                 db[":f_document"] = storeDocId;
-                db.exec("select if (gc.f_base is null, ad.f_goods, gc.f_goods) as f_goods, "
-                        "if(gc.f_base is null, ad.f_qty, gc.f_qty*ad.f_qty) as f_qty, "
-                        "if(gc.f_base is null, ad.f_price, g.f_saleprice2) as f_price, "
-                        "if(gc.f_base is null, ad.f_price*ad.f_qty, g.f_saleprice2*(gc.f_qty*ad.f_qty)) as f_total "
-                        "from a_store_draft ad "
-                        "left join c_goods_complectation gc on gc.f_base=ad.f_goods "
-                        "left join c_goods g on g.f_id=gc.f_goods "
-                        "where f_document=:f_document");
+                db.exec("select ad.f_goods, ad.f_qty, ad.f_price, ad.f_price*ad.f_qty as f_total "
+                          "from a_store_draft ad "
+                          "where f_document=:f_document and ad.f_goods not in (" + goodsComplect + ") ");
                 while (db.nextRow()) {
                     IGoods g;
                     g.goodsId = db.getInt("f_goods");
@@ -229,6 +274,7 @@ bool C5ShopOrder::write(double total, double card, double discount, bool tax, QL
                     g.goodsTotal = db.getDouble("f_total");
                     ingoods.append(g);
                 }
+
                 for (int i = 0; i < ingoods.count(); i++) {
                     IGoods &g = ingoods[i];
                     QString adraftid;
@@ -263,7 +309,9 @@ bool C5ShopOrder::write(double total, double card, double discount, bool tax, QL
 
     if (!C5Config::localReceiptPrinter().isEmpty()) {
         PrintReceiptGroup p;
-        p.print(oheaderid, db);
+        p.print(oheaderid, db, 1);
+        p.print(oheaderid, db, 2);
+        //p.print2(oheaderid, db);
     }
 
     db.commit();

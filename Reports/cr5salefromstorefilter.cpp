@@ -14,6 +14,7 @@ CR5SaleFromStoreFilter::CR5SaleFromStoreFilter(const QStringList &dbParams, QWid
     ui->leClass2->setSelector(dbParams, ui->leClass2Name, cache_goods_classes).setMultiselection(true);
     ui->leClass3->setSelector(dbParams, ui->leClass3Name, cache_goods_classes).setMultiselection(true);
     ui->leClass4->setSelector(dbParams, ui->leClass4Name, cache_goods_classes).setMultiselection(true);
+    ui->leBuyer->setSelector(dbParams, ui->leBuyerName, cache_goods_partners).setMultiselection(true);
 }
 
 CR5SaleFromStoreFilter::~CR5SaleFromStoreFilter()
@@ -56,6 +57,15 @@ QString CR5SaleFromStoreFilter::condition()
     }
     if (ui->rbRINo->isChecked()) {
         w += " and oh.f_amounttotal>=0 ";
+    }
+    if (!ui->leBuyer->isEmpty()) {
+        w += " and oh.f_partner in (" + ui->leBuyer->text() + ") ";
+    }
+    if (ui->rbSrvYes->isChecked()) {
+        w += " and gg.f_service=1 ";
+    }
+    if (ui->rbSrvNo->isChecked()) {
+        w += " and gg.f_service=0 ";
     }
     return w;
 }

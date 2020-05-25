@@ -80,5 +80,10 @@
         <file>staff.png</file>
         <file>newdocument.png</file>
         <file>pushpin.png</file>
+        <file>pricing.png</file>
+        <file>save-file.png</file>
+        <file>reset.png</file>
+        <file>restore.png</file>
+        <file>cleardb.sql</file>
     </qresource>
 </RCC>

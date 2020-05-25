@@ -1,5 +1,7 @@
 #include "cr5goods.h"
 #include "ce5goods.h"
+#include "c5goodspricing.h"
+#include "c5mainwindow.h"
 #include "cr5goodsfilter.h"
 
 CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
@@ -83,6 +85,9 @@ QToolBar *CR5Goods::toolBar()
             << ToolBarButtons::tbPrint;
             createStandartToolbar(btn);
     }
+    if (pr(fDBParams.at(4), cp_t1_goods_pricing)) {
+        fToolBar->addAction(QIcon(":/pricing.png"), tr("Pricing"), this, SLOT(princing()));
+    }
     return fToolBar;
 }
 
@@ -93,4 +98,9 @@ bool CR5Goods::on_tblView_doubleClicked(const QModelIndex &index)
         return false;
     }
     return C5ReportWidget::on_tblView_doubleClicked(index);
+}
+
+void CR5Goods::pricing()
+{
+    __mainWindow->createTab<C5GoodsPricing>(fDBParams);
 }

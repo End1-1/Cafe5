@@ -41,6 +41,7 @@ SOURCES += \
     ../../XLSX/src/xlsxworkbook.cpp \
     ../../XLSX/src/xlsxwriter.cpp \
     ../Cafe5/c5license.cpp \
+    ../Cafe5/c5replication.cpp \
     ../Classes/c5crypt.cpp \
     ../Classes/c5grid.cpp \
     ../Classes/c5gridgilter.cpp \
@@ -49,21 +50,24 @@ SOURCES += \
     ../Classes/c5shoporder.cpp \
     ../Classes/c5storedraftwriter.cpp \
     ../Classes/c5tablemodel.cpp \
+    ../Classes/c5tablerec.cpp \
     ../Classes/c5tableview.cpp \
     ../Classes/c5userauth.cpp \
     ../Classes/c5widget.cpp \
     ../Classes/notificationwidget.cpp \
     ../Controls/c5graphicsview.cpp \
+    ../Controls/c5guicontrols.cpp \
     ../Controls/c5lineeditwithselector.cpp \
     ../Editors/c5editor.cpp \
     ../Editors/ce5editor.cpp \
     ../FrontDesk/c5document.cpp \
     ../FrontDesk/c5filtervalues.cpp \
+    ../FrontDesk/c5filterwidget.cpp \
     ../FrontDesk/c5selector.cpp \
-    c5replication.cpp \
     dlgpin.cpp \
     imageloader.cpp \
         main.cpp \
+    preorders.cpp \
     printreceipt.cpp \
     printreceiptgroup.cpp \
     replicadialog.cpp \
@@ -112,6 +116,7 @@ HEADERS += \
     ../../XLSX/src/xlsxwriter.h \
     ../../XLSX/src/zip.h \
     ../Cafe5/c5license.h \
+    ../Cafe5/c5replication.h \
     ../Classes/c5crypt.h \
     ../Classes/c5grid.h \
     ../Classes/c5gridgilter.h \
@@ -120,20 +125,23 @@ HEADERS += \
     ../Classes/c5shoporder.h \
     ../Classes/c5storedraftwriter.h \
     ../Classes/c5tablemodel.h \
+    ../Classes/c5tablerec.h \
     ../Classes/c5tableview.h \
     ../Classes/c5userauth.h \
     ../Classes/c5widget.h \
     ../Classes/notificationwidget.h \
     ../Controls/c5graphicsview.h \
+    ../Controls/c5guicontrols.h \
     ../Controls/c5lineeditwithselector.h \
     ../Editors/c5editor.h \
     ../Editors/ce5editor.h \
     ../FrontDesk/c5document.h \
     ../FrontDesk/c5filtervalues.h \
+    ../FrontDesk/c5filterwidget.h \
     ../FrontDesk/c5selector.h \
-    c5replication.h \
     dlgpin.h \
     imageloader.h \
+    preorders.h \
     printreceipt.h \
     printreceiptgroup.h \
     replicadialog.h \
@@ -178,6 +186,7 @@ FORMS += \
     ../FrontDesk/c5filtervalues.ui \
     ../FrontDesk/c5selector.ui \
     dlgpin.ui \
+    preorders.ui \
     replicadialog.ui \
     sales.ui \
     searchitems.ui \
@@ -195,7 +204,7 @@ FORMS += \
 
 DEFINES += _DBDRIVER_=\\\"QMYSQL\\\"
 DEFINES += _ORGANIZATION_=\\\"Hotelicca\\\"
-DEFINES += _APPLICATION_=\\\"SmartHotel\\\"
+DEFINES += _APPLICATION_=\\\"Shop\\\"
 DEFINES += _MODULE_=\\\"Shop\\\"
 DEFINES += SHOP
 

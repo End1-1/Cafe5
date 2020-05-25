@@ -21,6 +21,7 @@ void C5Permissions::init(C5Database &db)
               << cp_t1_settigns
               << cp_t1_login_to_manager
               << cp_t1_login_to_waiter
+              << cp_t1_goods_pricing
 
               << cp_t2_action
               << cp_t2_store_input
@@ -47,6 +48,7 @@ void C5Permissions::init(C5Database &db)
               << cp_t3_debts_to_partners
               << cp_t3_consuption_reason
               << cp_t3_car_visits
+              << cp_t3_preorders
 
               << cp_t4_menu
               << cp_t4_menu_names

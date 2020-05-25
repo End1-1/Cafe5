@@ -71,6 +71,8 @@ private:
     int addGoodsRow();
 
     void countTotal();
+
+    QSet<QString> fStrings;
 };
 
 #endif // CE5GOODS_H

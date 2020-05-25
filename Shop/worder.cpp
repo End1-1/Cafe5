@@ -8,6 +8,7 @@
 #include "c5message.h"
 #include "c5permissions.h"
 #include "c5printing.h"
+#include "preorders.h"
 #include "printreceipt.h"
 #include "selectstaff.h"
 #include "c5shoporder.h"
@@ -16,17 +17,24 @@
 #include "c5storedraftwriter.h"
 #include <QInputDialog>
 
+#define col_qty 2
+#define col_price 4
+#define col_total 5
+#define col_discount_value 11
+#define col_discount_mode 12
+
 WOrder::WOrder(int saleType, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::WOrder)
 {
     ui->setupUi(this);
+    ui->wPreorder->setVisible(false);
     fSaleType = saleType;
     fPartner = 0;
     fWorking = static_cast<Working*>(parent);
     fDateOpen = QDate::currentDate();
     fTimeOpen = QTime::currentTime();
-    ui->tblGoods->setColumnWidths(ui->tblGoods->columnCount(), 0, 300, 80, 80, 80, 80, 80, 80);
+    ui->tblGoods->setColumnWidths(ui->tblGoods->columnCount(), 0, 300, 80, 80, 80, 80, 80, 80, 0, 0, 0, 80, 30);
     fCostumerId = 0;
     fCardValue = 0;
     ui->lbDisc->setVisible(false);
@@ -39,11 +47,21 @@ WOrder::WOrder(int saleType, QWidget *parent) :
     ui->lbPartner->setVisible(false);
     ui->lePartner->setVisible(false);
     noImage();
+    if (fSaleType == SALE_PREORDER) {
+        setStyleSheet("background: #d0ffc1;");
+        ui->wPreorder->setVisible(true);
+    }
+    ui->leAdvance->setValidator(new QDoubleValidator(0, 99999999, 2));
 }
 
 WOrder::~WOrder()
 {
     delete ui;
+}
+
+void WOrder::changeIshmarColor(const QString &c)
+{
+    ui->wIshmar->setStyleSheet(c);
 }
 
 void WOrder::focusCash()
@@ -66,13 +84,26 @@ void WOrder::addGoods(const Goods &g)
     }
     Goods gg = fWorking->fGoods[g.fScanCode];
     if (__c5config.controlShopQty()) {
-        if (gg.fQty < totalQty) {
+        if (!gg.fIsService && gg.fQty < totalQty) {
             C5Message::error(tr("Insufficient quantity") + "<br>" + float_str(totalQty - gg.fQty, 3));
             return;
         }
     }
+    addGoodsToTable(g);
+}
 
-    double price = fSaleType == SALE_RETAIL ? g.fRetailPrice : g.fWhosalePrice;
+void WOrder::addGoodsToTable(const Goods &g)
+{
+    double price = 0;
+    switch (fSaleType) {
+    case SALE_RETAIL:
+    case SALE_PREORDER:
+        price = g.fRetailPrice;
+        break;
+    case SALE_WHOSALE:
+        price = g.fWhosalePrice;
+        break;
+    }
     int row = ui->tblGoods->addEmptyRow();
     ui->tblGoods->setString(row, 0, g.fCode);
     ui->tblGoods->setString(row, 1, g.fName + " " + g.fScanCode);
@@ -82,6 +113,11 @@ void WOrder::addGoods(const Goods &g)
     ui->tblGoods->setDouble(row, 5, price);
     ui->tblGoods->setInteger(row, 6, g.fTaxDept);
     ui->tblGoods->setString(row, 7, g.fAdgCode);
+    ui->tblGoods->setString(row, 8, "");
+    ui->tblGoods->setInteger(row, 9, g.fUnitCode);
+    ui->tblGoods->setInteger(row, 10, g.fIsService ? 1 : 0);
+    ui->tblGoods->setDouble(row, col_discount_value, 0);
+    ui->tblGoods->setString(row, col_discount_mode, "");
     ui->tblGoods->setCurrentItem(ui->tblGoods->item(row, 0));
     countTotal();
 
@@ -97,6 +133,12 @@ bool WOrder::writeOrder(bool tax)
         SelectStaff ss(fWorking);
         ss.exec();
     }
+    if (fSaleType == SALE_PREORDER) {
+        if (fPreorderUUID.isEmpty()) {
+            C5Message::error(tr("Save first or make your sale as usual"));
+            return false;
+        }
+    }
     QList<IGoods> goods;
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
         IGoods g;
@@ -107,16 +149,23 @@ bool WOrder::writeOrder(bool tax)
         g.goodsPrice = ui->tblGoods->getDouble(i, 4);
         g.goodsQty = ui->tblGoods->getDouble(i, 2);
         g.goodsTotal = ui->tblGoods->getDouble(i, 5);
+        g.unitId = ui->tblGoods->getInteger(i, 9);
+        g.isService = ui->tblGoods->getInteger(i, 10) == 1;
+        g.discountFactor = ui->tblGoods->item(i, col_discount_value)->data(Qt::UserRole).toDouble();
+        g.discountMode = ui->tblGoods->item(i, col_discount_mode)->data(Qt::UserRole).toInt();
         goods.append(g);
     }
     C5ShopOrder so;
     so.setPartner(fPartner, ui->lePartner->text());
     so.setDiscount(fCostumerId, fCardId, fCardMode, fCardValue);
     so.setParams(fDateOpen, fTimeOpen, fSaleType);
-    bool w = so.write(ui->leTotal->getDouble(), ui->leCard->getDouble(), ui->leDisc->getDouble(), tax, goods);
+    bool w = so.write(ui->leTotal->getDouble(), ui->leCard->getDouble(), ui->leAdvance->getDouble(), ui->leDisc->getDouble(), tax, goods);
     if (w) {
         C5Database db(__c5config.dbParams());
         foreach (const IGoods &g, goods) {
+            if (g.isService) {
+                continue;
+            }
             db[":f_goods"] = g.goodsId;
             db[":f_store"] = __c5config.defaultStore();
             db[":f_qty"] = g.goodsQty;
@@ -128,8 +177,88 @@ bool WOrder::writeOrder(bool tax)
                 }
             }
         }
+        if (!fPreorderUUID.isEmpty()) {
+            db[":f_state"] = 2;
+            db.update("op_header", "f_id", fPreorderUUID);
+        }
     }
     return w;
+}
+
+bool WOrder::writePreorder()
+{
+    if (ui->tblGoods->rowCount() == 0) {
+        C5Message::error(tr("Empty order"));
+        return false;
+    }
+    if (ui->leContactName->text().isEmpty()) {
+        C5Message::error(tr("Customer name cannot be empty"));
+        return false;
+    }
+    bool r = true;
+    bool u = true;
+    C5Database db(__c5config.dbParams());
+    db.startTransaction();
+    db[":f_contact"] = ui->leContactName->text();
+    db.exec("select * from c_partners where f_contact=:f_contact and f_phone=:f_phone");
+    if (db.nextRow()) {
+        fPartner = db.getInt("f_id");
+    } else {
+        db[":f_contact"] = ui->leContactName->text();
+        db[":f_phone"] = ui->leContactPhone->text();
+        fPartner = db.insert("c_partners");
+    }
+    if (fPreorderUUID.isEmpty()) {
+        u = false;
+        fPreorderUUID = db.uuid_bin();
+    }
+    db[":f_id"] = fPreorderUUID;
+    db[":f_state"] = 1;
+    db[":f_datecreate"] = QDate::currentDate();
+    db[":f_timecreate"] = QTime::currentTime();
+    db[":f_staff"] = __userid;
+    db[":f_datefor"] = ui->dePreorerDate->date();
+    db[":f_timefor"] = ui->tmTime->time();
+    db[":f_total"] = ui->leTotal->getDouble();
+    db[":f_advance"] = ui->leAdvance->getDouble();
+    db[":f_customer"] = fPartner;
+    db[":f_info"] = ui->tePreorderInfo->toPlainText();
+    if (u) {
+        r = db.update("op_header", "f_id", fPreorderUUID);
+    } else {
+        r = db.insert("op_header", false);
+    }
+    if (!r) {
+        db.rollback();
+        C5Message::error(db.fLastError);
+        return false;
+    }
+    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+        u = true;
+        QByteArray bid = ui->tblGoods->getData(i, 8).toByteArray();
+        if (bid.isEmpty()) {
+            u = false;
+            bid = db.uuid_bin();
+        }
+        db[":f_id"] = bid;
+        db[":f_header"] = fPreorderUUID;
+        db[":f_goods"] = ui->tblGoods->getInteger(i, 0);
+        db[":f_qty"] = ui->tblGoods->getDouble(i, 2);
+        db[":f_price"] = ui->tblGoods->getDouble(i, 4);
+        if (u) {
+            r = db.update("op_body", "f_id", bid);
+        } else {
+            r = db.insert("op_body", false);
+        }
+        if (!r) {
+            db.rollback();
+            C5Message::error(db.fLastError);
+            return false;
+        }
+    }
+    db.commit();
+    C5Message::info(tr("Saved"));
+    return r;
 }
 
 void WOrder::fixCostumer(const QString &code)
@@ -154,9 +283,8 @@ void WOrder::fixCostumer(const QString &code)
         return;
     }
     if (fCardValue < 0) {
-        bool ok = false;
-        double v = QInputDialog::getDouble(this, tr("Discount value"), tr("Enter discount value"), 0, 0, 100000, 0, &ok);
-        if (!ok) {
+        double v;
+        if (!getDiscountValue(fCardMode, v)) {
             fCardId = 0;
             fCostumerId = 0;
             fCardMode = 0;
@@ -183,6 +311,10 @@ void WOrder::changeQty()
     if (row < 0) {
         return;
     }
+    if (ui->tblGoods->item(row, col_discount_mode)->data(Qt::UserRole).toInt() == CARD_TYPE_MANUAL) {
+        C5Message::error(tr("Cannot change the quantity on selected row with manual discount mode"));
+        return;
+    }
     double qty = DQty::getQty(tr("Quantity"), this);
     if (qty < 0.001) {
         return;
@@ -200,13 +332,70 @@ void WOrder::changeQty()
 
     Goods g = fWorking->fGoods[goodsCode];
     if (__c5config.controlShopQty()) {
-        if (g.fQty < totalQty) {
+        if (!g.fIsService && g.fQty < totalQty) {
             C5Message::error(tr("Insufficient quantity") + "<br>" + float_str(totalQty - g.fQty, 3));
             return;
         }
     }
     ui->tblGoods->setDouble(row, 2, qty);
     ui->tblGoods->setDouble(row, 5, ui->tblGoods->getDouble(row, 4) * qty);
+    countTotal();
+}
+
+void WOrder::discountRow(const QString &code)
+{
+    int row = ui->tblGoods->currentRow();
+    if (row < 0) {
+        return;
+    }
+    if (ui->tblGoods->getDouble(row, 11) > 0.001) {
+        C5Message::error(tr("Discount already applied"));
+        return;
+    }
+    C5Database db(C5Config::replicaDbParams());
+    db[":f_code"] = code;
+    db.exec("select * from b_cards_discount where f_code=:f_code");
+    if (!db.nextRow()) {
+        return;
+    }
+    if (QDate::currentDate() > db.getDate("f_dateend")) {
+        C5Message::error(tr("Cards was expired"));
+        return;
+    }
+    double v = db.getDouble("f_value");
+    int discType = db.getInt("f_mode");
+    if (db.getDouble("f_value") < 0) {
+        if (!getDiscountValue(discType, v)) {
+            return;
+        }
+        if (discType == CARD_TYPE_DISCOUNT) {
+            v /= 100;
+        }
+    }
+
+    switch (discType) {
+    case CARD_TYPE_DISCOUNT:
+        ui->tblGoods->setDouble(row, col_discount_value, v * 100);
+        ui->tblGoods->setString(row, col_discount_mode, "%");
+        ui->tblGoods->setDouble(row, col_price, ui->tblGoods->getDouble(row, col_price) - (ui->tblGoods->getDouble(row, col_price) * v));
+        ui->tblGoods->setDouble(row, col_total, ui->tblGoods->getDouble(row, col_qty) * ui->tblGoods->getDouble(row, col_price));
+        break;
+    case CARD_TYPE_MANUAL:
+        if (v > ui->tblGoods->getDouble(row, col_total)) {
+            C5Message::error(tr("Discount amount greater than total amount"));
+            return;
+        }
+        ui->tblGoods->setDouble(row, col_total, ui->tblGoods->getDouble(row, col_total) - v);
+        ui->tblGoods->setDouble(row, col_price, ui->tblGoods->getDouble(row, col_total) / ui->tblGoods->getDouble(row, col_qty));
+        ui->tblGoods->setDouble(row, col_discount_value, v);
+        ui->tblGoods->setString(row, col_discount_mode, "$");
+        break;
+    default:
+        C5Message::error(tr("This discount mode is not supported"));
+        return;
+    }
+    ui->tblGoods->item(row, col_discount_value)->setData(Qt::UserRole, v);
+    ui->tblGoods->item(row, col_discount_mode)->setData(Qt::UserRole, discType);
     countTotal();
 }
 
@@ -344,6 +533,26 @@ bool WOrder::returnFalse(const QString &msg, C5Database &db)
     return false;
 }
 
+bool WOrder::getDiscountValue(int discountType, double &v)
+{
+    bool ok = true;
+    QString disctitle;
+    double maxvalue = 100;
+    switch (discountType) {
+    case CARD_TYPE_DISCOUNT:
+        disctitle = tr("Enter discount value");
+        break;
+    case CARD_TYPE_MANUAL:
+        disctitle = tr("Enter discount amount");
+        maxvalue = 999999999;
+        break;
+    default:
+        return false;
+    }
+    v = QInputDialog::getDouble(this, tr("Discount"), disctitle, 0, 0.001, maxvalue, 3, &ok);
+    return ok;
+}
+
 void WOrder::on_leCash_textChanged(const QString &arg1)
 {
     ui->leChange->setDouble(arg1.toDouble() - ui->leTotal->getDouble());
@@ -351,8 +560,8 @@ void WOrder::on_leCash_textChanged(const QString &arg1)
 
 void WOrder::on_leCard_textChanged(const QString &arg1)
 {
-    if (arg1.toDouble() > ui->leTotal->getDouble()) {
-        ui->leCard->setDouble(ui->leTotal->getDouble());
+    if (arg1.toDouble() + ui->leAdvance->getDouble() > ui->leTotal->getDouble()) {
+        ui->leCard->setDouble(ui->leTotal->getDouble() - ui->leAdvance->getDouble());
     }
 }
 
@@ -369,10 +578,135 @@ void WOrder::noImage()
 
 void WOrder::on_btnInfo_clicked()
 {
-    QString info = QString("Ctrl+S: %1<br>Ctrl+I: %2<br>Ctrl+O: %3<br>Ctrl+T: %4")
+    QString info = QString("Ctrl+S: %1<br>Ctrl+I: %2<br>Ctrl+O: %3<br>Ctrl+T: %4<br>Ctrl+A: %5")
             .arg(tr("Search goods in the storages"))
             .arg(tr("Input staff at the work"))
             .arg(tr("Output staff from the work"))
-            .arg(tr("Total today"));
+            .arg(tr("Total today"))
+            .arg(tr("Preorder"));
     C5Message::info(info);
+}
+
+void WOrder::on_btnOpenOrder_clicked()
+{
+    Preorders *p = new Preorders(this);
+    if (p->exec() == QDialog::Accepted) {
+        ui->tblGoods->clearContents();
+        ui->tblGoods->setRowCount(0);
+        countTotal();
+        C5Database db(__c5config.replicaDbParams());
+        db[":f_id"] = p->fUUID;
+        db.exec("select o.f_id, o.f_datecreate, o.f_timecreate, o.f_datefor, o.f_timefor, "
+                "c.f_contact, c.f_phone, o.f_total, o.f_advance, o.f_info, o.f_customer, o.f_advancetax "
+                "from op_header o "
+                "left join c_partners c on c.f_id=o.f_customer "
+                "where o.f_id=:f_id ");
+        if (!db.nextRow()) {
+            C5Message::error(tr("Invalid preorder id"));
+            return;
+        }
+        double adv = db.getDouble("f_advance");
+        ui->dePreorerDate->setDate(db.getDate("f_datefor"));
+        ui->tmTime->setTime(db.getTime("f_timefor"));
+        ui->leAdvance->setDouble(adv);
+        ui->tePreorderInfo->setText(db.getString("f_info"));
+        ui->leContactName->setProperty("id", db.getInt("f_customer"));
+        ui->leContactName->setText(db.getString("f_contact"));
+        ui->leContactPhone->setText(db.getString("f_phone"));
+        ui->btnPrintTaxPrepaid->setEnabled(db.getInt("f_advancetax") == 0);
+        ui->leAdvance->setEnabled(db.getInt("f_advancetax") == 0);
+        db[":f_header"] = p->fUUID;
+        db.exec("select og.f_id, og.f_goods, concat(g.f_name, ' ' , g.f_scancode) as f_name, og.f_qty, "
+                "u.f_name as f_unitname, og.f_price, og.f_price*og.f_qty as f_total, gt.f_taxdept, "
+                "gt.f_adgcode, '', g.f_unit "
+                "from op_body og "
+                "inner join c_goods g on g.f_id=og.f_goods "
+                "inner join c_units u on u.f_id=g.f_unit "
+                "inner join c_groups gt on gt.f_id=g.f_group "
+                "where og.f_header=:f_header");
+        while (db.nextRow()) {
+            int row = ui->tblGoods->addEmptyRow();
+            ui->tblGoods->setInteger(row, 0, db.getInt("f_goods"));
+            ui->tblGoods->setString(row, 1, db.getString("f_name"));
+            ui->tblGoods->setDouble(row, 2, db.getDouble("f_qty"));
+            ui->tblGoods->setString(row, 3, db.getString("f_unitname"));
+            ui->tblGoods->setDouble(row, 4, db.getDouble("f_price"));
+            ui->tblGoods->setDouble(row, 5, db.getDouble("f_total"));
+            ui->tblGoods->setString(row, 6, db.getString("f_taxdept"));
+            ui->tblGoods->setString(row, 7, db.getString("f_adgcode"));
+            ui->tblGoods->setString(row, 8, db.getString("f_id"));
+            ui->tblGoods->setInteger(row, 9, db.getInt("f_unit"));
+            ui->tblGoods->setCurrentItem(ui->tblGoods->item(row, 0));
+        }
+        fPreorderUUID = p->fUUID;
+        countTotal();
+        ui->leAdvance->setDouble(adv);
+    }
+    p->deleteLater();
+}
+
+void WOrder::on_btnSave_clicked()
+{
+    if (fSaleType == SALE_PREORDER) {
+        writePreorder();
+    }
+}
+
+void WOrder::on_btnPrintTaxPrepaid_clicked()
+{
+    if (fPreorderTax > 0) {
+        C5Message::error(tr("Tax already printed"));
+        return;
+    }
+    if (fPreorderUUID.isEmpty()) {
+        C5Message::error(tr("Save first"));
+        return;
+    }
+    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), this);
+    QString inJson;
+    QString outJson;
+    QString err;
+    int result = pt.printAdvanceJson(ui->rbCash->isChecked() ? ui->leAdvance->getDouble() : 0, ui->rbCard->isChecked() ? ui->leAdvance->getDouble() : 0, inJson, outJson, err);
+    C5Database db(__c5config.replicaDbParams());
+    db[":f_id"] = db.uuid();
+    db[":f_date"] = QDate::currentDate();
+    db[":f_time"] = QTime::currentTime();
+    db[":f_mark"] = "ADVANCE";
+    db[":f_message"] = outJson;
+    db.insert("o_tax_debug");
+    if (result == pt_err_ok) {
+        QString ofirm, ohvhh, ofiscal, onumber, osn, oaddress, odevnum, otime;
+        PrintTaxN::parseResponse(outJson, ofirm, ohvhh, ofiscal, onumber, osn, oaddress, odevnum, otime);
+        fPreorderTax = onumber.toInt();
+        db[":f_advancetax"] = onumber;
+        db.update("op_header", "f_id", fPreorderUUID);
+        C5Message::info(tr("Printed"));
+        ui->btnPrintTaxPrepaid->setEnabled(false);
+        ui->leAdvance->setEnabled(false);
+    } else {
+        C5Message::error(outJson);
+    }
+}
+
+void WOrder::on_btnRemove_clicked()
+{
+    if (fPreorderUUID.isEmpty()) {
+        C5Message::error(tr("Cannot remove preorder that wasnt saved"));
+        return;
+    }
+    if (C5Message::question(tr("Confirm to remove")) != QDialog::Accepted) {
+        return;
+    }
+    C5Database db(__c5config.replicaDbParams());
+    db[":f_state"] = 3;
+    db.update("op_header", "f_id", fPreorderUUID);
+    fWorking->fTab->currentWidget()->deleteLater();
+    fWorking->fTab->removeTab(fWorking->fTab->currentIndex());
+}
+
+void WOrder::on_leAdvance_textChanged(const QString &arg1)
+{
+    if (arg1.toDouble() > ui->leTotal->getDouble()) {
+        ui->leAdvance->setDouble(ui->leTotal->getDouble());
+    }
 }

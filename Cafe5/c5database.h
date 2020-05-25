@@ -85,6 +85,12 @@ public:
 
     bool update(const QString &tableName, const QString &whereClause);
 
+    bool update(const QString &tableName, const QString &field, const QVariant &value);
+
+    bool deleteFromTable(const QString &tableName, const QVariant &id);
+
+    bool deleteFromTable(const QString &tableName, const QString &field, const QVariant &value);
+
     int insert(const QString &tableName, bool returnId = true);
 
     bool replaceInto(const QString &tableName);

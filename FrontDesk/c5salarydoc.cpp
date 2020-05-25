@@ -166,7 +166,7 @@ void C5SalaryDoc::save()
             doc->setDate(ui->deCashDate->date());
             doc->setComment(tr("Salary") + " #" + ui->leDocnumber->text() + "/" + ui->deDate->text());
             doc->updateRow(0, tr("Salary") + " #" + ui->leDocnumber->text() + "/" + ui->deDate->text(), ui->leTotal->getDouble());
-            doc->save();
+            doc->save(true);
         }
         delete doc;
     }
@@ -271,7 +271,7 @@ void C5SalaryDoc::createCashDocument()
     doc->setDate(ui->deCashDate->date());
     doc->setComment(tr("Salary") + " #" + ui->leDocnumber->text() + "/" + ui->deDate->text());
     doc->addRow(tr("Salary") + " #" + ui->leDocnumber->text() + "/" + ui->deDate->text(), ui->leTotal->getDouble());
-    doc->save();
+    doc->save(true);
     fCashUUID = doc->uuid();
     delete doc;
     C5Database db(fDBParams);

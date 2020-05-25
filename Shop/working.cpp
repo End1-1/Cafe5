@@ -71,6 +71,8 @@ Working::Working(QWidget *parent) :
     if (__c5config.shopDifferentStaff()) {
         loadStaff();
     }
+    fHaveChanges = false;
+    fTab = ui->tab;
 }
 
 Working::~Working()
@@ -199,6 +201,12 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
                 event->accept();
             }
             break;
+        case Qt::Key_A:
+            if (ke->modifiers() & Qt::ControlModifier) {
+                newSale(SALE_PREORDER);
+                event->accept();
+            }
+            break;
         }
     }
     return QWidget::eventFilter(watched, event);
@@ -252,7 +260,7 @@ void Working::makeWGoods()
 {
     QList<int> cw;
     //cw << 0 << 100 << 200 << 200 << 300 << 80 << 80 << 80 << 100 << 100 << 100 << 100 << 0 << 0 << 80;
-    cw << 0 << 150 << 0 << 200 << 400 << 80 << 80 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 80;
+    cw << 0 << 150 << 0 << 200 << 400 << 80 << 80 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 80 << 0;
     for (int i = 0; i < cw.count(); i++) {
         ui->tblGoods->setColumnWidth(i, cw.at(i));
     }
@@ -275,7 +283,7 @@ void Working::makeWGoods()
             db.exec("select g.f_id, g.f_scancode, cp.f_taxname, gg.f_name as f_groupname, g.f_name as f_goodsname, "
                     "g.f_saleprice, g.f_saleprice2, u.f_name as f_unitname, "
                     "gca.f_name as group1, gcb.f_name group2, gcc.f_name as group3, gcd.f_name as group4, "
-                    "gg.f_taxdept, gg.f_adgcode, s.f_qty  "
+                    "gg.f_taxdept, gg.f_adgcode, s.f_qty, g.f_unit  "
                     "from a_store_temp s "
                     "inner join c_goods g on g.f_id=s.f_goods "
                     "inner join c_groups gg on gg.f_id=g.f_group "
@@ -293,7 +301,7 @@ void Working::makeWGoods()
             db.exec("select g.f_id, g.f_scancode, cp.f_taxname, gg.f_name as f_groupname, g.f_name as f_goodsname, "
                     "g.f_saleprice, g.f_saleprice2, u.f_name as f_unitname, "
                     "gca.f_name as group1, gcb.f_name group2, gcc.f_name as group3, gcd.f_name as group4, "
-                    "gg.f_taxdept, gg.f_adgcode, sum(s.f_qty*s.f_type) as f_qty "
+                    "gg.f_taxdept, gg.f_adgcode, sum(s.f_qty*s.f_type) as f_qty, g.f_unit "
                     "from a_store_draft s "
                     "inner join c_goods g on g.f_id=s.f_goods "
                     "inner join c_groups gg on gg.f_id=g.f_group "
@@ -304,14 +312,15 @@ void Working::makeWGoods()
                     "left join c_goods_classes gcd on gcd.f_id=g.f_group4 "
                     "left join c_partners cp on cp.f_id=g.f_supplier "
                     "inner join a_header h on h.f_id=s.f_document "
-                    "where h.f_date<=:f_date and s.f_store=:f_store and h.f_state=:f_state "
-                    "group by g.f_id,gg.f_name,g.f_name,g.f_lastinputprice,g.f_saleprice ");
+                    "where h.f_date<=:f_date and s.f_store=:f_store and h.f_state=:f_state and g.f_enabled=1 and h.f_state=:f_state "
+                    "group by g.f_id,gg.f_name,g.f_name,g.f_lastinputprice,g.f_saleprice "
+                    "having sum(s.f_qty*s.f_type) > 0 ");
         }
     } else {
         db.exec("select gs.f_id, gs.f_scancode, cp.f_taxname, gr.f_name as f_groupname, gs.f_name as f_goodsname,  "
                 "gs.f_saleprice, gs.f_saleprice2, gu.f_name as f_unitname, "
                 "gca.f_name as group1, gcb.f_name group2, gcc.f_name as group3, gcd.f_name as group4, "
-                "gr.f_taxdept, gr.f_adgcode, 0 as f_qty "
+                "gr.f_taxdept, gr.f_adgcode, 0 as f_qty, gs.f_unit "
                 "from c_goods gs "
                 "left join c_groups gr on gr.f_id=gs.f_group "
                 "left join c_units gu on gu.f_id=gs.f_unit "
@@ -320,7 +329,7 @@ void Working::makeWGoods()
                 "left join c_goods_classes gcb on gcb.f_id=gs.f_group2 "
                 "left join c_goods_classes gcc on gcc.f_id=gs.f_group3 "
                 "left join c_goods_classes gcd on gcd.f_id=gs.f_group4 "
-                "where gs.f_enabled=1 "
+                "where gs.f_enabled=1 and gs.f_service=0 "
                 "order by gr.f_name, gca.f_name ");
     }
     ui->tblGoods->setRowCount(db.rowCount());
@@ -332,11 +341,13 @@ void Working::makeWGoods()
         g.fCode = db.getString("f_id");
         g.fName = db.getString("f_goodsname");
         g.fUnit = db.getString("f_unitname");
+        g.fUnitCode = db.getInt("f_unit");
         g.fRetailPrice = db.getDouble("f_saleprice");
         g.fWhosalePrice = db.getDouble("f_saleprice2");
         g.fTaxDept = db.getInt("f_taxdept");
         g.fAdgCode = db.getString("f_adgcode");
         g.fQty = db.getDouble("f_qty");
+        g.fIsService = false;
         fGoods[g.fScanCode] = g;
         fGoodsCodeForPrint[g.fCode.toInt()] = g.fScanCode;
         for (int i = 0; i < db.columnCount(); i++) {
@@ -348,6 +359,47 @@ void Working::makeWGoods()
         ui->leTotalWhosale->setDouble(ui->leTotalWhosale->getDouble() + (g.fWhosalePrice * g.fQty));
         row++;
     }
+    //services
+    db.exec("select gs.f_id, gs.f_scancode, cp.f_taxname, gr.f_name as f_groupname, gs.f_name as f_goodsname,  "
+            "gs.f_saleprice, gs.f_saleprice2, gu.f_name as f_unitname, "
+            "gca.f_name as group1, gcb.f_name group2, gcc.f_name as group3, gcd.f_name as group4, "
+            "gr.f_taxdept, gr.f_adgcode, 0 as f_qty, gs.f_unit "
+            "from c_goods gs "
+            "left join c_groups gr on gr.f_id=gs.f_group "
+            "left join c_units gu on gu.f_id=gs.f_unit "
+            "left join c_partners cp on cp.f_id=gs.f_supplier "
+            "left join c_goods_classes gca on gca.f_id=gs.f_group1 "
+            "left join c_goods_classes gcb on gcb.f_id=gs.f_group2 "
+            "left join c_goods_classes gcc on gcc.f_id=gs.f_group3 "
+            "left join c_goods_classes gcd on gcd.f_id=gs.f_group4 "
+            "where gs.f_enabled=1 and gs.f_service=1 "
+            "order by gr.f_name, gca.f_name ");
+    ui->tblGoods->setRowCount(ui->tblGoods->rowCount() + db.rowCount());
+    while (db.nextRow()) {
+        Goods g;
+        g.fScanCode = db.getString("f_scancode");
+        g.fCode = db.getString("f_id");
+        g.fName = db.getString("f_goodsname");
+        g.fUnit = db.getString("f_unitname");
+        g.fUnitCode = db.getInt("f_unit");
+        g.fRetailPrice = db.getDouble("f_saleprice");
+        g.fWhosalePrice = db.getDouble("f_saleprice2");
+        g.fTaxDept = db.getInt("f_taxdept");
+        g.fAdgCode = db.getString("f_adgcode");
+        g.fQty = db.getDouble("f_qty");
+        g.fIsService = true;
+        fGoods[g.fScanCode] = g;
+        fGoodsCodeForPrint[g.fCode.toInt()] = g.fScanCode;
+        for (int i = 0; i < db.columnCount(); i++) {
+            QTableWidgetItem *item = new QTableWidgetItem();
+            item->setData(Qt::EditRole, db.getValue(i));
+            ui->tblGoods->setItem(row, i, item);
+        }
+        ui->leTotalRetail->setDouble(ui->leTotalRetail->getDouble() + (g.fRetailPrice * g.fQty));
+        ui->leTotalWhosale->setDouble(ui->leTotalWhosale->getDouble() + (g.fWhosalePrice * g.fQty));
+        row++;
+    }
+
     ui->lbLastUpdate->setText(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
 }
 
@@ -392,10 +444,60 @@ void Working::addGoods(QString &code)
             return;
         }
     }
-    if (!fGoods.contains(code)) {
+    if (code.at(0).toLower() == "/") {
+        code.remove(0, 1);
+        w->discountRow(code);
         return;
     }
-    w->addGoods(fGoods[code]);
+    Goods g;
+    g.fCode = "0";
+    if (fGoods.contains(code)) {
+        g = fGoods[code];
+    } else {
+        if (w->fSaleType == SALE_PREORDER) {
+            C5Database db(__c5config.dbParams());
+            db[":f_scancode"] = code;
+            db.exec("select gs.f_id, gs.f_scancode, cp.f_taxname, gr.f_name as f_groupname, gs.f_name as f_goodsname,  "
+                      "gs.f_saleprice, gs.f_saleprice2, gu.f_name as f_unitname, "
+                      "gca.f_name as group1, gcb.f_name group2, gcc.f_name as group3, gcd.f_name as group4, "
+                      "gr.f_taxdept, gr.f_adgcode, 0 as f_qty, gs.f_unit, gs.f_service "
+                      "from c_goods gs "
+                      "left join c_groups gr on gr.f_id=gs.f_group "
+                      "left join c_units gu on gu.f_id=gs.f_unit "
+                      "left join c_partners cp on cp.f_id=gs.f_supplier "
+                      "left join c_goods_classes gca on gca.f_id=gs.f_group1 "
+                      "left join c_goods_classes gcb on gcb.f_id=gs.f_group2 "
+                      "left join c_goods_classes gcc on gcc.f_id=gs.f_group3 "
+                      "left join c_goods_classes gcd on gcd.f_id=gs.f_group4 "
+                      "where gs.f_enabled=1 and gs.f_scancode=:f_scancode "
+                      "order by gr.f_name, gca.f_name ");
+            if (db.nextRow()) {
+                g.fScanCode = db.getString("f_scancode");
+                g.fCode = db.getString("f_id");
+                g.fName = db.getString("f_goodsname");
+                g.fUnit = db.getString("f_unitname");
+                g.fUnitCode = db.getInt("f_unit");
+                g.fRetailPrice = db.getDouble("f_saleprice");
+                g.fWhosalePrice = db.getDouble("f_saleprice2");
+                g.fTaxDept = db.getInt("f_taxdept");
+                g.fAdgCode = db.getString("f_adgcode");
+                g.fQty = db.getDouble("f_qty");
+                g.fIsService = db.getInt("f_service") == 1;
+            }
+        }
+    }
+    if (g.fCode.toInt() == 0) {
+        return;
+    }
+    switch (w->fSaleType) {
+    case SALE_RETAIL:
+    case SALE_WHOSALE:
+        w->addGoods(g);
+        break;
+    case SALE_PREORDER:
+        w->addGoodsToTable(g);
+        break;
+    }
 }
 
 void Working::newSale(int type)
@@ -408,7 +510,18 @@ void Working::newSale(int type)
             wd->installEventFilter(this);
         }
     }
-    QString title = type == SALE_RETAIL ? tr("Retail") : tr("Whosale");
+    QString title;
+    switch (type) {
+    case SALE_RETAIL:
+        title = tr("Retail");
+        break;
+    case SALE_WHOSALE:
+        title = tr("Whosale");
+        break;
+    case SALE_PREORDER:
+        title = tr("Preorder");
+        break;
+    }
     ui->tab->addTab(w, QString("%1 #%2").arg(title).arg(ordersCount()));
     ui->tab->setCurrentIndex(ui->tab->count() - 1);
 }
@@ -437,11 +550,32 @@ void Working::timeout()
         }
         if (fTimerCounter % 120 == 0) {
             auto *r = new C5Replication();
+            connect(r, SIGNAL(haveChanges(bool)), this, SLOT(haveChanges(bool)));
             r->start(SLOT(downloadFromServer()));
         }
+
     }
     if (fTimerCounter % 180 == 0) {
         getGoodsList();
+    }
+    if (fHaveChanges) {
+        QString style = "background: green;";
+        switch (fTimerCounter % 4) {
+        case 1:
+            style = "background: red;";
+            break;
+        case 2:
+            style = "background: blue";
+            break;
+        case 3:
+            style = "background: white;";
+            break;
+        }
+        WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
+        if (!w) {
+            return;
+        }
+        w->changeIshmarColor(style);
     }
 }
 
@@ -569,6 +703,13 @@ void Working::shortcutUp()
             return;
         }
         w->prevRow();
+    }
+}
+
+void Working::haveChanges(bool v)
+{
+    if (!fHaveChanges) {
+        fHaveChanges = v;
     }
 }
 

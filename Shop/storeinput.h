@@ -30,6 +30,8 @@ private slots:
 
     void on_btnHistoryMode_clicked();
 
+    void on_leFilter_textChanged(const QString &arg1);
+
 private:
     Ui::StoreInput *ui;
 

@@ -50,6 +50,8 @@ private slots:
 
     void on_btnAny_clicked();
 
+    void on_btnPrintReport_clicked();
+
 private:
     Ui::Workspace *ui;
 

@@ -14,6 +14,9 @@ public:
 
 public slots:
     virtual bool on_tblView_doubleClicked(const QModelIndex &index);
+
+private slots:
+    void pricing();
 };
 
 #endif // CR5GOODS_H

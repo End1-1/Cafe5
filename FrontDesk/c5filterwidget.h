@@ -21,6 +21,8 @@ public:
 
     virtual bool fixDates();
 
+    void setDatabase(const QStringList &dbParams);
+
 public slots:
     void setFixDate(bool v);
 };

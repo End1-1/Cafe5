@@ -28,6 +28,7 @@
 #include "cr5debtstopartner.h"
 #include "cr5dishpart1.h"
 #include "c5toolbarwidget.h"
+#include "cr5preorders.h"
 #include "c5dishselfcostgenprice.h"
 #include "cr5salefromstoretotal.h"
 #include "cr5dishcomment.h"
@@ -325,6 +326,7 @@ void C5MainWindow::on_actionLogin_triggered()
             addTreeL3Item(it, cp_t3_store_sale, tr("Sales from store"), ":/graph.png");
             addTreeL3Item(it, cp_t3_debts_to_partners, tr("Debts to partners"), ":/contract.png");
             addTreeL3Item(it, cp_t3_discount_statistics, tr("Discount statistics"), ":/discount.png");
+            addTreeL3Item(it, cp_t3_preorders, tr("Preorders"), ":/customers.png");
         }
 
         if (pr(db.getString(3), cp_t8_cash)) {
@@ -622,6 +624,9 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
         break;
     case cp_t3_consuption_reason:
         createTab<CR5ConsuptionReason>(dbParams);
+        break;
+    case cp_t3_preorders:
+        createTab<CR5Preorders>(dbParams);
         break;
     case cp_t4_part1:
         createTab<CR5DishPart1>(dbParams);

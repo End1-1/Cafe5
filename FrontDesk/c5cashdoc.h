@@ -47,7 +47,7 @@ public:
     static bool removeDoc(const QStringList &dbParams, const QString &uuid);
 
 public slots:
-    void save();
+    void save(bool fromrelation = false);
 
 private slots:
     void amountChanged(const QString &arg1);

@@ -3,6 +3,7 @@
 #include "c5checkbox.h"
 #include "c5dateedit.h"
 #include "c5cache.h"
+#include "c5combobox.h"
 #include "c5selector.h"
 #include <QValidator>
 
@@ -37,7 +38,21 @@ void CE5Editor::setId(int id)
             foreach (C5LineEditWithSelector *le, fLines) {
                 if (le->property("Field").toString() == colName) {
                     if (le->cacheId() == 0){
-                        le->setValue(db.getString(i));
+                        switch (le->property("Type").toInt()) {
+                        case 0:
+                            le->setText(db.getString(i));
+                            break;
+                        case 1:
+                            le->setInteger(db.getInt(i));
+                            break;
+                        case 2:
+                        case 3:
+                            le->setDouble(db.getDouble(i));
+                            break;
+                        default:
+                            le->setText(db.getString(i));
+                            break;
+                        }
                     } else {
                         le->setValue(db.getString(i));
                     }
@@ -66,6 +81,15 @@ void CE5Editor::setId(int id)
                 foreach (C5DateEdit *de, fDates) {
                     if (de->property("Field").toString() == colName) {
                         de->setDate(db.getDate(i));
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            if (!found) {
+                foreach (C5ComboBox *cb, fCombos) {
+                    if (cb->property("Field").toString() == colName) {
+                        cb->setCurrentText(db.getString(i));
                         found = true;
                         break;
                     }
@@ -135,6 +159,15 @@ bool CE5Editor::save(QString &err, QList<QMap<QString, QVariant> > &data)
         }
         db[":" + deField->property("Field").toString()] = deField->date();
         row[deField->property("Field").toString()] = deField->date();
+    }
+    foreach (C5ComboBox *cb, fCombos) {
+        if (cb->property("Field") == QVariant::Invalid) {
+            continue;
+        }
+        if (cb->currentData().toInt() == 0) {
+            db[":" + cb->property("Field").toString()] = cb->currentText();
+            row[cb->property("Field").toString()] = cb->currentText();
+        }
     }
     if (leId->getInteger() == 0) {
         db[":f_id"] = 0;
@@ -225,6 +258,9 @@ void CE5Editor::clear()
             }
         }
     }
+    foreach (C5ComboBox *cb, fCombos) {
+        cb->setCurrentIndex(-1);
+    }
     focusFirst();
 }
 
@@ -243,6 +279,7 @@ void CE5Editor::getLineEdit(QObject *parent)
     C5LineEditWithSelector *le = nullptr;
     C5CheckBox *ch = nullptr;
     C5DateEdit *de = nullptr;
+    C5ComboBox *cb = nullptr;
     QObjectList ol = parent->children();
     foreach (QObject *o, ol) {
         if (o->children().count() > 0) {
@@ -267,16 +304,12 @@ void CE5Editor::getLineEdit(QObject *parent)
                 }
             }
             fLines << le;
-        } else {
-            ch = dynamic_cast<C5CheckBox*>(o);
-            if (ch) {
-                fChecks << ch;
-            } else {
-                de = dynamic_cast<C5DateEdit*>(o);
-                if (de) {
-                    fDates << de;
-                }
-            }
+        } else if (ch = dynamic_cast<C5CheckBox*>(o)) {
+            fChecks << ch;
+        } else if (de = dynamic_cast<C5DateEdit*>(o)) {
+            fDates << de;
+        } else if (cb = dynamic_cast<C5ComboBox*>(o)) {
+            fCombos << cb;
         }
     }
 }
@@ -307,4 +340,17 @@ void CE5Editor::focusFirst()
             return;
         }
     }
+    foreach (C5ComboBox *c, fCombos) {
+        if (c->property("First") != QVariant::Invalid) {
+            if (c->property("First").toBool()) {
+                c->setFocus();
+            }
+            return;
+        }
+    }
+}
+
+void CE5Editor::setDatabase(const QStringList &dbParams)
+{
+    fDBParams = dbParams;
 }

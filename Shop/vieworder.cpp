@@ -96,10 +96,10 @@ void ViewOrder::on_btnReturn_clicked()
         int i = rows.at(j);
         QString ogoodsid;
         QString adraftid;
-        if (!dw.writeAStoreDraft(adraftid, storeDocId, __c5config.defaultStore(), 1, ui->tbl->getInteger(i, 6), ui->tbl->getDouble(i, 3), ui->tbl->getDouble(i, 4), ui->tbl->getDouble(i, 5), DOC_REASON_SALE, adraftid, i + 1)) {
+        if (!dw.writeAStoreDraft(adraftid, storeDocId, __c5config.defaultStore(), 1, ui->tbl->getInteger(i, 6), ui->tbl->getDouble(i, 3), ui->tbl->getDouble(i, 4), ui->tbl->getDouble(i, 5), DOC_REASON_SALE_RETURN, adraftid, i + 1)) {
             return returnFalse(dw.fErrorMsg, &db);
         }
-        if (!dw.writeOGoods(ogoodsid, oheaderid, "", __c5config.defaultStore(), ui->tbl->getInteger(i, 6), ui->tbl->getDouble(i, 3), ui->tbl->getDouble(i, 4) * -1,  ui->tbl->getDouble(i, 5) * -1, 0, 1, i + 1, adraftid)) {
+        if (!dw.writeOGoods(ogoodsid, oheaderid, "", __c5config.defaultStore(), ui->tbl->getInteger(i, 6), ui->tbl->getDouble(i, 3), ui->tbl->getDouble(i, 4) * -1,  ui->tbl->getDouble(i, 5) * -1, 0, 1, i + 1, adraftid, 0, 0)) {
             return returnFalse(dw.fErrorMsg, &db);
         }
         ui->tbl->setDouble(i, 4, ui->tbl->getDouble(i, 4) * -1);

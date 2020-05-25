@@ -74,9 +74,9 @@ void C5CashDoc::setComment(const QString &t)
 void C5CashDoc::addRow(const QString &t, double a)
 {
     int row = ui->tbl->addEmptyRow();
-    C5LineEdit *l = ui->tbl->createLineEdit(row, 0);
+    C5LineEdit *l = ui->tbl->createLineEdit(row, 2);
     l->setText(t);
-    l = ui->tbl->createLineEdit(row, 1);
+    l = ui->tbl->createLineEdit(row, 3);
     l->setValidator(new QDoubleValidator(0, 999999999, 2));
     l->setDouble(a);
     connect(l, SIGNAL(textChanged(QString)), this, SLOT(amountChanged(QString)));
@@ -85,8 +85,8 @@ void C5CashDoc::addRow(const QString &t, double a)
 
 void C5CashDoc::updateRow(int row, const QString &t, double a)
 {
-    ui->tbl->lineEdit(row, 0)->setText(t);
-    ui->tbl->lineEdit(row, 1)->setDouble(a);
+    ui->tbl->lineEdit(row, 2)->setText(t);
+    ui->tbl->lineEdit(row, 3)->setDouble(a);
     amountChanged("");
 }
 
@@ -122,7 +122,7 @@ bool C5CashDoc::openDoc(const QString &uuid)
         if (row == -1) {
             row = ui->tbl->addEmptyRow();
         }
-        if (dw.value(container_ecash, i, "f_sign").toInt() == -1) {
+        if (dw.value(container_ecash, i, "f_sign").toInt() == 1) {
             ui->tbl->setString(row, 0, dw.value(container_ecash, i, "f_id").toString());
         } else {
             ui->tbl->setString(row, 1, dw.value(container_ecash, i, "f_id").toString());
@@ -217,9 +217,9 @@ void C5CashDoc::amountChanged(const QString &arg1)
     ui->leTotal->setDouble(total);
 }
 
-void C5CashDoc::save()
+void C5CashDoc::save(bool fromrelation)
 {
-    if (fRelation) {
+    if (fRelation && !fromrelation) {
         C5Message::info(tr("The document cannot be edited directly"));
         return;
     }

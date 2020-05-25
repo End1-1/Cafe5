@@ -7,7 +7,7 @@
 C5Replication::C5Replication() :
     QObject()
 {
-
+    fIgnoreErrors = false;
 }
 
 void C5Replication::start(const char *slot)
@@ -23,17 +23,31 @@ void C5Replication::start(const char *slot)
 
 void C5Replication::downloadFromServer()
 {
+    downloadDataFromServer(__c5config.replicaDbParams(), __c5config.dbParams());
+}
+
+bool C5Replication::ret(C5Database &db1, C5Database &db2)
+{
+    db1.rollback();
+    db2.rollback();
+    emit finished();
+    return true;
+}
+
+void C5Replication::downloadDataFromServer(const QStringList &src, const QStringList &dst)
+{
     int steps = 0;
     int step = 1;
-    C5Database dr(__c5config.replicaDbParams());
-    C5Database dr2(__c5config.replicaDbParams());
+    bool hc = false;
+    C5Database dr(src);
+    C5Database dr2(src);
     emit progress("Connecting to replication database");
     if (!dr.open()) {
-        emit progress("Connection to " + __c5config.replicaDbParams().at(0) + ":" + __c5config.replicaDbParams().at(1) + " failed.<br>" + dr.fLastError);
+        emit progress("Connection to " + src.at(0) + ":" + src.at(1) + " failed.<br>" + dr.fLastError);
         emit finished();
         return;
     }
-    C5Database db(__c5config.dbParams());
+    C5Database db(dst);
     db[":f_host"] = db.fDb.hostName();
     db[":f_db"] = db.fDb.databaseName();
     db.exec("select f_syncin from s_db where f_host=:f_host and f_db=:f_db");
@@ -69,6 +83,7 @@ void C5Replication::downloadFromServer()
             "inner join s_syncronize_in si on si.f_table=s.f_table "
             "where s.f_id>:f_id");
     while (dr.nextRow()) {
+        hc = true;
         switch (dr.getInt("f_op")) {
         case 1:
             dr2[":f_id"] = dr.getInt("f_recid");
@@ -83,7 +98,7 @@ void C5Replication::downloadFromServer()
             dr2.exec("select * from " + dr.getString("f_table") + " where f_id=:f_id");
             if (dr2.nextRow()) {
                 db.setBindValues(dr2.getBindValues());
-                db.update(dr.getString("f_table"), where_id(dr.getString("f_id")));
+                db.update(dr.getString("f_table"), where_id(dr.getString("f_recid")));
             }
             break;
         case 3:
@@ -125,21 +140,14 @@ void C5Replication::downloadFromServer()
         }
     }
     step++;
+    emit haveChanges(hc);
     emit finished();
 }
 
-bool C5Replication::ret(C5Database &db1, C5Database &db2)
+bool C5Replication::uploadDataToServer(const QStringList &src, const QStringList &dst)
 {
-    db1.rollback();
-    db2.rollback();
-    emit finished();
-    return true;
-}
-
-bool C5Replication::uploadToServer()
-{
-    C5Database dr(__c5config.replicaDbParams());
-    C5Database db(__c5config.dbParams());
+    C5Database dr(dst);
+    C5Database db(src);
     QStringList idlist;
     db.exec("select f_id from o_header");
     while (db.nextRow()) {
@@ -156,7 +164,9 @@ bool C5Replication::uploadToServer()
         }
         dr.setBindValues(db.getBindValues());
         if (!dr.insert("o_header", false)) {
-            return ret(dr, db);
+            if (!fIgnoreErrors) {
+                return ret(dr, db);
+            }
         }
 
         QSet<QString> storeRec;
@@ -166,7 +176,20 @@ bool C5Replication::uploadToServer()
             dr.setBindValues(db.getBindValues());
             storeRec.insert(db.getString("f_storerec"));
             if (!dr.insert("o_goods", false)) {
-                return ret(dr, db);
+                if (!fIgnoreErrors) {
+                    return ret(dr, db);
+                }
+            }
+        }
+
+        db[":f_header"] = s;
+        db.exec("select * from o_body where f_header=:f_header");
+        while (db.nextRow()) {
+            dr.setBindValues(db.getBindValues());
+            if (!dr.insert("o_body", false)) {
+                if (!fIgnoreErrors) {
+                    return ret(dr, db);
+                }
             }
         }
 
@@ -198,7 +221,9 @@ bool C5Replication::uploadToServer()
             if (db.nextRow()) {
                 dr.setBindValues(db.getBindValues());
                 if (!dr.insert("a_header", false)) {
-                    return ret(dr, db);
+                    if (!fIgnoreErrors) {
+                        return ret(dr, db);
+                    }
                 }
             }
             db[":f_id"] = s1;
@@ -206,7 +231,9 @@ bool C5Replication::uploadToServer()
             if (db.nextRow()) {
                 dr.setBindValues(db.getBindValues());
                 if (!dr.insert("a_header_store", false)) {
-                    return ret(dr, db);
+                    if (!fIgnoreErrors) {
+                        return ret(dr, db);
+                    }
                 }
             }
             db[":f_document"] = s1;
@@ -214,7 +241,9 @@ bool C5Replication::uploadToServer()
             while (db.nextRow()) {
                 dr.setBindValues(db.getBindValues());
                 if (!dr.insert("a_store_draft", false)) {
-                    return ret(dr, db);
+                    if (!fIgnoreErrors) {
+                        return ret(dr, db);
+                    }
                 }
             }
         }
@@ -226,7 +255,9 @@ bool C5Replication::uploadToServer()
             cashHeader.insert(db.getString("f_id"));
             dr.setBindValues(db.getBindValues());
             if (!dr.insert("a_header_cash", false)) {
-                return ret(dr, db);
+                if (!fIgnoreErrors) {
+                    return ret(dr, db);
+                }
             }
         }
         foreach (const QString &s1, cashHeader) {
@@ -235,7 +266,9 @@ bool C5Replication::uploadToServer()
             if (db.nextRow()) {
                 dr.setBindValues(db.getBindValues());
                 if (!dr.insert("a_header", false)) {
-                    return ret(dr, db);
+                    if (!fIgnoreErrors) {
+                        return ret(dr, db);
+                    }
                 }
             }
             db[":f_header"] = s1;
@@ -243,7 +276,9 @@ bool C5Replication::uploadToServer()
             while (db.nextRow()) {
                 dr.setBindValues(db.getBindValues());
                 if (!dr.insert("e_cash", false)) {
-                    return ret(dr, db);
+                    if (!fIgnoreErrors) {
+                        return ret(dr, db);
+                    }
                 }
             }
         }
@@ -262,6 +297,8 @@ bool C5Replication::uploadToServer()
 
         db[":f_header"] = s;
         db.exec("delete from o_goods where f_header=:f_header");
+        db[":f_header"] = s;
+        db.exec("delete from o_body where f_header=:f_header");
         db[":f_id"] = s;
         db.exec("delete from o_header where f_id=:f_id");
         db[":f_order"] = s;
@@ -291,6 +328,11 @@ bool C5Replication::uploadToServer()
     }
     emit finished();
     return true;
+}
+
+bool C5Replication::uploadToServer()
+{
+    return uploadDataToServer(__c5config.dbParams(), __c5config.replicaDbParams());
 }
 
 void C5Replication::updateTable(C5Database &dr, C5Database &db, int &step, int steps, const QString &tableName)

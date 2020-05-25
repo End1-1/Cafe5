@@ -23,6 +23,8 @@ public:
 
     bool getResult(QList<QMap<QString, QVariant> > &data);
 
+    virtual void reject() override;
+
 protected:
     virtual void closeEvent(QCloseEvent *e);
 

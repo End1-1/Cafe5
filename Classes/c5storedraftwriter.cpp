@@ -25,13 +25,19 @@ bool C5StoreDraftWriter::writeFromShopOutput(const QString &doc, int state, QStr
     QSet<int> stores;
     QList<IGoods> items;
     fDb[":f_header"] = doc;
-    fDb.exec("select f_id, f_store, f_goods, f_qty from o_goods where f_header=:f_header");
+    fDb.exec("select f_id, f_store, f_goods, f_qty, f_body, f_tax, f_row, f_discountfactor from o_goods where f_header=:f_header and f_sign=1");
     while (fDb.nextRow()) {
         IGoods i;
         i.recId = fDb.getString(0);
+        i.bodyId = fDb.getString("f_body");
         i.store = fDb.getInt(1);
         i.goodsId = fDb.getInt(2);
         i.goodsQty = fDb.getDouble(3);
+        i.goodsPrice = 0;
+        i.goodsTotal = 0;
+        i.tax = fDb.getInt("f_tax");
+        i.row = fDb.getInt("f_row");
+        i.discountFactor = fDb.getDouble("f_discountfactor");
         items.append(i);
         stores.insert(i.store);
     }
@@ -54,6 +60,7 @@ bool C5StoreDraftWriter::writeFromShopOutput(const QString &doc, int state, QStr
                 err += fDb.fLastError;
                 return returnResult(false, err);
             }
+            writeOGoods(i.recId, doc, i.bodyId, i.store, i.goodsId, i.goodsQty, i.goodsPrice, i.goodsTotal, i.tax, 1, i.row, drid, i.discountFactor, i.discountMode);
         }
         if (state == DOC_STATE_SAVED) {
             if (!writeOutput(id, err)) {
@@ -595,7 +602,7 @@ bool C5StoreDraftWriter::writeOBodyToOGoods(const QString &id, const QString &he
     while (fDb.nextRow()) {
         QString gid;
         if (!writeOGoods(gid, headerid, id, fDb.getInt("f_store"), fDb.getInt("f_goods"), fDb.getDouble("f_qty"), fDb.getDouble("f_lastinputprice"),
-                         fDb.getDouble("f_qty") * fDb.getDouble("f_lastinputprice"), 0, 1, ++row, "")) {
+                         fDb.getDouble("f_qty") * fDb.getDouble("f_lastinputprice"), 0, 1, ++row, "", 0, 0)) {
             return false;
         }
     }
@@ -651,7 +658,7 @@ bool C5StoreDraftWriter::writeOHeader(QString &id, int hallid, const QString &pr
     }
 }
 
-bool C5StoreDraftWriter::writeOGoods(QString &id, const QString &header, const QString &body, int store, int goods, double qty, double price, double total, int tax, int sign, int row, const QString &storerec)
+bool C5StoreDraftWriter::writeOGoods(QString &id, const QString &header, const QString &body, int store, int goods, double qty, double price, double total, int tax, int sign, int row, const QString &storerec, double discount, int discountMode)
 {
     bool u = true;
     if (id.isEmpty()) {
@@ -670,6 +677,8 @@ bool C5StoreDraftWriter::writeOGoods(QString &id, const QString &header, const Q
     fDb[":f_sign"] = sign;
     fDb[":f_row"] = row;
     fDb[":f_storerec"] = storerec;
+    fDb[":f_discountfactor"] = discount;
+    fDb[":f_discountmode"] = discountMode;
     if (u) {
         return returnResult(fDb.update("o_goods", where_id(id)));
     } else {
@@ -742,7 +751,7 @@ bool C5StoreDraftWriter::writeOutput(const QString &docId, QString &err)
     QList<double> priceList;
     QList<double> totalList;
     fDb[":f_document"] = docId;
-    fDb.exec("select s.f_id, s.f_goods, s.f_store, s.f_qty, s.f_price, s.f_total, concat(g.f_name, ' ', g.f_scancode) as f_name, s.f_base "
+    fDb.exec("select s.f_id, s.f_goods, s.f_store, s.f_qty, s.f_price, s.f_total, concat(g.f_name, ' ', g.f_scancode) as f_name, s.f_base, s.f_reason "
                "from a_store_draft s inner join c_goods g on g.f_id=s.f_goods "
                "where f_document=:f_document and f_type=-1");
     while (fDb.nextRow()) {

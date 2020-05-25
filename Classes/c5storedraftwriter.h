@@ -11,15 +11,22 @@
 
 struct IGoods {
     QString recId;
+    QString bodyId;
     int goodsId;
+    int tax;
+    int row;
     QString goodsName;
     double goodsQty;
     double goodsPrice;
     double goodsTotal;
+    double discountFactor;
+    int discountMode;
     int store;
+    int unitId;
     bool changed;
     QString taxDept;
     QString taxAdg;
+    bool isService;
     IGoods() {changed = false; }
 };
 
@@ -54,7 +61,7 @@ public:
 
     bool writeOHeader(QString &id, int hallid, const QString &prefix, int state, int hall, int table, const QDate &dateopen, const QDate &dateclose, const QDate &datecash, const QTime &timeopen, const QTime &timeclose, int staff, const QString &comment, int print, double amountTotal, double amountCash, double amountCard, double amountBank, double amountOther, int serviceMode, double amountService, double amountDiscount, double serviceFactor, double discountFactor, int creditCardId, int otherId, int shift, int source, int saletype, int partner);
 
-    bool writeOGoods(QString &id, const QString &header, const QString &body, int store, int goods, double qty, double price, double total, int tax, int sign, int row, const QString &storerec);
+    bool writeOGoods(QString &id, const QString &header, const QString &body, int store, int goods, double qty, double price, double total, int tax, int sign, int row, const QString &storerec, double discount, int discountMode);
 
     bool readAHeader(const QString &id);
 

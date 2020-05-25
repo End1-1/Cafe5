@@ -18,6 +18,7 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
                     << "left join h_tables ht on ht.f_id=oh.f_table [ht]"
                     << "left join s_user w on w.f_id=oh.f_staff [w]"
                     << "left join o_state os on os.f_id=oh.f_state [os]"
+                    << "left join c_partners cpb on cpb.f_id=oh.f_partner [cpb]"
                        ;
 
     fColumnsFields << "concat(oh.f_prefix, oh.f_hallid) as f_prefix"
@@ -31,6 +32,8 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
                    << "oh.f_timeopen"
                    << "oh.f_dateclose"
                    << "oh.f_timeclose"
+                   << "cpb.f_taxname as f_buyer"
+                   << "cpb.f_taxcode as f_buyertaxcode"
                    << "sum(oh.f_amounttotal) as f_amounttotal"
                    << "sum(oh.f_amountcash) as f_amountcash"
                    << "sum(oh.f_amountcard) as f_amountcard"
@@ -52,6 +55,8 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
                    << "oh.f_timeclose"
                    << "oh.f_amountservice"
                    << "oh.f_amountdiscount"
+                   << "cpb.f_taxname as f_buyer"
+                   << "cpb.f_taxcode as f_buyertaxcode"
                    << "concat(w.f_last, ' ', w.f_first) as f_staff"
                       ;
 
@@ -77,6 +82,8 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_timeclose"] = tr("Close time");
     fTranslation["f_datecash"] = tr("Date, cash");
     fTranslation["f_hallname"] = tr("Hall");
+    fTranslation["f_buyer"] = tr("Buyer");
+    fTranslation["f_buyertaxcode"] = tr("Buyer taxcode");
     if (__c5config.frontDeskMode() == FRONTDESK_SHOP) {
         fTranslation["f_tablename"] = tr("Cash");
     } else {
@@ -100,6 +107,8 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
     fColumnsVisible["oh.f_dateclose"] = false;
     fColumnsVisible["oh.f_timeopen"] = false;
     fColumnsVisible["oh.f_timeclose"] = false;
+    fColumnsVisible["cpb.f_taxname as f_buyer"] = false;
+    fColumnsVisible["cpb.f_taxcode as f_buyertaxcode"] = false;
     fColumnsVisible["concat(w.f_last, ' ', w.f_first) as f_staff"] = false;
     fColumnsVisible["sum(oh.f_amounttotal) as f_amounttotal"] = true;
     fColumnsVisible["sum(oh.f_amountcash) as f_amountcash"] = true;

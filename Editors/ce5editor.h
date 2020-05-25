@@ -8,6 +8,7 @@
 class C5LineEditWithSelector;
 class C5CheckBox;
 class C5DateEdit;
+class C5ComboBox;
 
 class CE5Editor : public C5Widget
 {
@@ -32,6 +33,8 @@ public:
 
     void focusFirst();
 
+    void setDatabase(const QStringList &dbParams);
+
     template<typename T>
     bool getId(QString &id) {
         T *ep = new T(fDBParams);
@@ -52,6 +55,8 @@ private:
     C5LineEditWithSelector *findLineEditWithId();
 
     QSet<C5LineEditWithSelector*> fLines;
+
+    QSet<C5ComboBox*> fCombos;
 
     QSet<C5CheckBox*> fChecks;
 

@@ -22,17 +22,27 @@ public:
 
     ~WOrder();
 
+    int fSaleType;
+
+    void changeIshmarColor(const QString &c);
+
     void focusCash();
 
     void focusCard();
 
     void addGoods(const Goods &g);
 
+    void addGoodsToTable(const Goods &g);
+
     bool writeOrder(bool tax = true);
+
+    bool writePreorder();
 
     void fixCostumer(const QString &code);
 
     void changeQty();
+
+    void discountRow(const QString &code);
 
     void changePrice();
 
@@ -57,6 +67,16 @@ private slots:
 
     void on_btnInfo_clicked();
 
+    void on_btnOpenOrder_clicked();
+
+    void on_btnSave_clicked();
+
+    void on_btnPrintTaxPrepaid_clicked();
+
+    void on_btnRemove_clicked();
+
+    void on_leAdvance_textChanged(const QString &arg1);
+
 private:
     Ui::WOrder *ui;
 
@@ -76,11 +96,15 @@ private:
 
     double fCardValue;
 
-    int fSaleType;
-
     int fPartner;
 
+    int fPreorderTax;
+
+    QByteArray fPreorderUUID;
+
     bool returnFalse(const QString &msg, C5Database &db);
+
+    bool getDiscountValue(int discountType, double &v);
 };
 
 #endif // WORDER_H

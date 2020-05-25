@@ -20,6 +20,12 @@ private slots:
     void actionService();
 
     void checkDatabase();
+
+    void backupDatabase();
+
+    void resetDatabase();
+
+    void uploadData();
 };
 
 #endif // CR5DATABASES_H

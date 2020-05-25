@@ -15,6 +15,7 @@
 #define cp_t1_login_to_waiter 106
 #define cp_t1_deny_change_cash_doc_date 107
 #define cp_t1_deny_change_store_doc_date 108
+#define cp_t1_goods_pricing 109
 
 #define cp_t2_action 200
 #define cp_t2_store_input 201
@@ -41,6 +42,7 @@
 #define cp_t3_debts_to_partners 312
 #define cp_t3_consuption_reason 313
 #define cp_t3_car_visits 314
+#define cp_t3_preorders 315
 
 #define cp_t4_menu 400
 #define cp_t4_menu_names 401

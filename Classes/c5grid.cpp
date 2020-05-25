@@ -184,6 +184,12 @@ void C5Grid::changeDatabase(const QStringList &dbParams)
     fDb.close();
     fDb.setDatabase(dbParams.at(0), dbParams.at(1), dbParams.at(2), dbParams.at(3));
     refreshData();
+    if (fEditor) {
+        fEditor->setDatabase(dbParams);
+    }
+    if (fFilterWidget) {
+        fFilterWidget->setDatabase(dbParams);
+    }
 }
 
 void C5Grid::setCheckboxes(bool v)

@@ -33,6 +33,10 @@ private slots:
 
     void on_btnModeItems_clicked();
 
+    void on_btnTotalByItems_clicked();
+
+    void on_btnPrintTax_clicked();
+
 private:
     Ui::Sales *ui;
 
@@ -44,7 +48,11 @@ private:
 
     void refreshItems();
 
+    void refreshTotalItems();
+
     int fViewMode;
+
+    QString userCond() const;
 };
 
 #endif // SALES_H

@@ -7,10 +7,13 @@
 #include "dishpartitemdelegate.h"
 #include "dishtableitemdelegate.h"
 #include "c5storedraftwriter.h"
+#include "calendar.h"
 #include "payment.h"
 #include "c5printing.h"
 #include <QScrollBar>
 #include <QInputDialog>
+#include <QScreen>
+
 
 Workspace::Workspace(const QStringList &dbParams) :
     C5Dialog(dbParams),
@@ -21,6 +24,15 @@ Workspace::Workspace(const QStringList &dbParams) :
     ui->tblPart2->setItemDelegate(new DishPartItemDelegate());
     ui->tblOrder->setItemDelegate(new DishItemDelegate());
     ui->tblDishes->setItemDelegate(new DishTableItemDelegate());
+    QRect r = qApp->screens().at(0)->geometry();
+    switch (r.width()) {
+    case 1280:
+        ui->tblDishes->setColumnCount(5);
+        break;
+    case 1024:
+        ui->tblDishes->setColumnCount(4);
+        break;
+    }
 }
 
 Workspace::~Workspace()
@@ -233,7 +245,7 @@ void Workspace::on_btnCheckout_clicked()
             hallid = db.getString(0);
             prefix = db.getString(1);
             db[":f_counter"] = db.getInt(0);
-            db.update("h_halls", where_id(hallid));
+            db.update("h_halls", where_id(hid));
         }
     } else {
         hallid ="[-]";
@@ -385,4 +397,70 @@ void Workspace::on_btnAny_clicked()
         d.qty = newQty;
         setCurrentDish(d);
     }
+}
+
+void Workspace::on_btnPrintReport_clicked()
+{
+    QDate date;
+    if (!Calendar::getDate(date)) {
+        return;
+    }
+    QFont font(qApp->font());
+    font.setPointSize(28);
+    C5Printing p;
+    p.setSceneParams(650, 2800, QPrinter::Portrait);
+    p.setFont(font);
+
+    if (QFile::exists("./logo_receipt.png")) {
+        p.image("./logo_receipt.png", Qt::AlignHCenter);
+        p.br();
+    }
+    p.setFontBold(true);
+    p.ctext(tr("End of day"));
+    p.br();
+    p.ctext(date.toString(FORMAT_DATE_TO_STR));
+    p.br();
+    double total = 0;
+
+    C5Database dd(fDBParams);
+    dd[":f_datecash"] = date;
+    dd[":f_stateh"] = ORDER_STATE_CLOSE;
+    dd[":f_stated"] = DISH_STATE_OK;
+    dd.exec("select d.f_name, sum(b.f_qty1) as f_qty, b.f_price, sum(b.f_qty1*b.f_price) as f_total "
+            "from o_body b "
+            "inner join o_header h on h.f_id=b.f_header "
+            "left join d_dish d on d.f_id=b.f_dish "
+            "where h.f_state=:f_stateh and b.f_state=:f_stated and h.f_datecash=:f_datecash "
+            "group by 1, 3 ");
+    p.setFontBold(false);
+    p.setFontSize(22);
+    while (dd.nextRow()) {
+        if (p.checkBr(p.fLineHeight + 2)) {
+            p.br();
+        }
+        total += dd.getDouble("f_total");
+        p.ltext(dd.getString("f_name"), 0);
+        p.br();
+        p.ltext(QString("%1 X %2 = %3").arg(float_str(dd.getDouble("f_qty"), 2)).arg(dd.getDouble("f_price"), 2).arg(float_str(dd.getDouble("f_total"), 2)), 0);
+        p.br();
+        p.line();
+        p.br(2);
+    }
+    p.line(4);
+    p.br(3);
+    p.setFontBold(true);
+    p.setFontSize(28);
+    p.ltext(tr("Total today"), 0);
+    p.rtext(float_str(total, 2));
+    p.br();
+    p.br();
+
+    p.line();
+    p.br();
+
+    p.setFontSize(18);
+    p.ltext(tr("Printed"), 0);
+    p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
+    p.br();
+    p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
 }

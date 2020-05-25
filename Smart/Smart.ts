@@ -138,52 +138,52 @@
         <translation>Ելք ըստ վաճառքի</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="90"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="97"/>
         <source>Store document has been registered for this sale</source>
         <translation>Պահեստի փասթաթուղթը գրանցված է այս վաճառքի համար</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="157"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="164"/>
         <source>No hall with id</source>
         <translation>Նշված կոդով սրահը բացակայում է</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="190"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="197"/>
         <source>Error in store document, partial data was lost</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="205"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="212"/>
         <source>Empty store document</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="225"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="232"/>
         <source>Error in cash document, partial data was lost</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="235"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="242"/>
         <source>Empty cash document</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="325"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="332"/>
         <source>Document not exists</source>
         <translation>Փաստաթուղթը գոյություն չունի</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="726"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="735"/>
         <source>Invalid document id</source>
         <translation>Սխալ փաստաթղթի համար</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="832"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="841"/>
         <source>Not enough materials in the store</source>
         <translation>Բացասական քանակ պահեստում</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="928"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="937"/>
         <source>This order used in next documents</source>
         <translation>Այս փաստաթուղթը օգտագործվում է հետևյալ պահեստի ելքերի մեջ</translation>
     </message>
@@ -194,6 +194,24 @@
         <location filename="../Classes/c5waiterorderdoc.cpp" line="303"/>
         <source>Document saved</source>
         <translation>Պահպանված է</translation>
+    </message>
+</context>
+<context>
+    <name>Calendar</name>
+    <message>
+        <location filename="../Cafe5/calendar.ui" line="14"/>
+        <source>Calendar</source>
+        <translation>Օրացույց</translation>
+    </message>
+    <message>
+        <location filename="../Cafe5/calendar.ui" line="38"/>
+        <source>OK</source>
+        <translation>Այո</translation>
+    </message>
+    <message>
+        <location filename="../Cafe5/calendar.ui" line="45"/>
+        <source>Cancel</source>
+        <translation>Հրաժարվել</translation>
     </message>
 </context>
 <context>
@@ -339,94 +357,109 @@
         <location filename="workspace.ui" line="428"/>
         <location filename="workspace.ui" line="433"/>
         <location filename="workspace.ui" line="438"/>
-        <location filename="workspace.ui" line="856"/>
+        <location filename="workspace.ui" line="879"/>
         <source>New Column</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="758"/>
+        <location filename="workspace.ui" line="781"/>
         <source>1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="739"/>
+        <location filename="workspace.ui" line="762"/>
         <source>2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="701"/>
+        <location filename="workspace.ui" line="724"/>
         <source>4</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="720"/>
+        <location filename="workspace.ui" line="743"/>
         <source>3</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="615"/>
+        <location filename="workspace.ui" line="638"/>
         <source>+10</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="634"/>
+        <location filename="workspace.ui" line="657"/>
         <source>+1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="653"/>
+        <location filename="workspace.ui" line="676"/>
         <source>-1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="806"/>
+        <location filename="workspace.ui" line="829"/>
         <source>0.5</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="892"/>
+        <location filename="workspace.ui" line="915"/>
         <source>Total</source>
         <translation>Ընդամենը</translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="905"/>
+        <location filename="workspace.ui" line="928"/>
         <source>Checkout</source>
         <translation>ՀԱՇԻՎ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="37"/>
+        <location filename="workspace.cpp" line="49"/>
         <source>ENTER</source>
         <translation>ՄՈՒՏՔ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="50"/>
+        <location filename="workspace.cpp" line="62"/>
         <source>All</source>
         <translation>Բոլորը</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="290"/>
+        <location filename="workspace.cpp" line="302"/>
         <source>Receipt #</source>
         <translation>Պատվեր №</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="307"/>
+        <location filename="workspace.cpp" line="319"/>
         <source>Printed:</source>
         <translation>Տպված</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="351"/>
+        <location filename="workspace.cpp" line="363"/>
         <source>Confirm to close application</source>
         <translation>Փակել՞ ծրագիրը</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="379"/>
+        <location filename="workspace.cpp" line="391"/>
         <source>Enter qty</source>
         <translation>Մուտքագրեք քանակը</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="379"/>
+        <location filename="workspace.cpp" line="391"/>
         <source>Qty</source>
         <translation>Քանակ</translation>
+    </message>
+    <message>
+        <location filename="workspace.cpp" line="419"/>
+        <source>End of day</source>
+        <translation>Օրվա հասույթ</translation>
+    </message>
+    <message>
+        <location filename="workspace.cpp" line="450"/>
+        <source>Total today</source>
+        <translation>Ընդամենը</translation>
+    </message>
+    <message>
+        <location filename="workspace.cpp" line="459"/>
+        <source>Printed</source>
+        <translation>Տպված</translation>
     </message>
 </context>
 <context>

@@ -141,6 +141,12 @@ bool C5FilterWidget::fixDates()
     return s.value("fixdate").toBool();
 }
 
+void C5FilterWidget::setDatabase(const QStringList &dbParams)
+{
+    fDBParams = dbParams;
+    restoreFilter(this);
+}
+
 void C5FilterWidget::setFixDate(bool v)
 {
     QSettings s(_ORGANIZATION_, QString("%1\\%2\\reportfilter\\%3")

@@ -49,6 +49,7 @@ int main(int argc, char *argv[])
     font.setPointSize(C5Config::fronDeskFontSize());
     a.setFont(font);
 
+    srand(time(NULL));
     C5MainWindow w;
     w.showMaximized();
     a.processEvents();

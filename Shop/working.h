@@ -9,6 +9,7 @@ class Working;
 }
 
 class QTableWidgetItem;
+class QTabWidget;
 
 struct IUser {
     int id;
@@ -38,6 +39,8 @@ public:
 
     QList<IUser> fCurrentUsers;
 
+    QTabWidget *fTab;
+
 private:
     Ui::Working *ui;
 
@@ -54,6 +57,8 @@ private:
     int ordersCount();
 
     int fTimerCounter;
+
+    bool fHaveChanges;
 
 private slots:
     void timeout();
@@ -87,6 +92,8 @@ private slots:
     void shortcutDown();
 
     void shortcutUp();
+
+    void haveChanges(bool v);
 
     void on_btnNewOrder_clicked();
 

@@ -12,6 +12,7 @@ CR5CommonSalesFilter::CR5CommonSalesFilter(const QStringList &dbParams, QWidget 
     ui->leTable->setSelector(dbParams, ui->leTableName, cache_tables).setMultiselection(true);
     ui->leStaff->setSelector(dbParams, ui->leStaffName, cache_users).setMultiselection(true);
     ui->leShift->setSelector(dbParams, ui->leShiftName, cache_salary_shift).setMultiselection(true);
+    ui->leBuyer->setSelector(dbParams, ui->leBuyerName, cache_goods_partners).setMultiselection(true);
 }
 
 CR5CommonSalesFilter::~CR5CommonSalesFilter()
@@ -42,6 +43,9 @@ QString CR5CommonSalesFilter::condition()
     }
     if (ui->rbRINo->isChecked()) {
         result += " and oh.f_amounttotal>=0 ";
+    }
+    if (!ui->leBuyer->isEmpty()) {
+        result += " and oh.f_partner in (" + ui->leBuyer->text() + ") ";
     }
     return result;
 }

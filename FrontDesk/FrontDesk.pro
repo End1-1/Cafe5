@@ -42,8 +42,10 @@ SOURCES += \
     ../Cafe5/c5double.cpp \
     ../Cafe5/c5license.cpp \
     ../Cafe5/c5licensedlg.cpp \
+    ../Cafe5/c5replication.cpp \
     ../Classes/c5crypt.cpp \
     ../Classes/c5filelogwriter.cpp \
+    ../Classes/c5random.cpp \
     ../Classes/c5storedraftwriter.cpp \
     ../Classes/c5threadobject.cpp \
     ../Classes/notificationwidget.cpp \
@@ -75,6 +77,7 @@ SOURCES += \
     ../Reports/cr5goodsimages.cpp \
     ../Reports/cr5menureview.cpp \
     ../Reports/cr5menureviewfilter.cpp \
+    ../Reports/cr5preorders.cpp \
     ../Reports/cr5salarybyworkers.cpp \
     ../Reports/cr5salarybyworkersfilter.cpp \
     ../Reports/cr5salefromstoretotal.cpp \
@@ -88,9 +91,11 @@ SOURCES += \
     c5cashdoc.cpp \
     c5checkdatabase.cpp \
     c5costumerdebtpayment.cpp \
+    c5dbresetoption.cpp \
     c5dishgroupaction.cpp \
     c5document.cpp \
     c5goodsimage.cpp \
+    c5goodspricing.cpp \
     c5inputdate.cpp \
     c5progressdialog.cpp \
     c5salarydoc.cpp \
@@ -229,9 +234,11 @@ HEADERS += \
     ../Cafe5/c5double.h \
     ../Cafe5/c5license.h \
     ../Cafe5/c5licensedlg.h \
+    ../Cafe5/c5replication.h \
     ../Classes/barcode5.h \
     ../Classes/c5crypt.h \
     ../Classes/c5filelogwriter.h \
+    ../Classes/c5random.h \
     ../Classes/c5storedraftwriter.h \
     ../Classes/c5threadobject.h \
     ../Classes/notificationwidget.h \
@@ -263,6 +270,7 @@ HEADERS += \
     ../Reports/cr5goodsimages.h \
     ../Reports/cr5menureview.h \
     ../Reports/cr5menureviewfilter.h \
+    ../Reports/cr5preorders.h \
     ../Reports/cr5salarybyworkers.h \
     ../Reports/cr5salarybyworkersfilter.h \
     ../Reports/cr5salefromstoretotal.h \
@@ -277,9 +285,11 @@ HEADERS += \
     c5cashdoc.h \
     c5checkdatabase.h \
     c5costumerdebtpayment.h \
+    c5dbresetoption.h \
     c5dishgroupaction.h \
     c5document.h \
     c5goodsimage.h \
+    c5goodspricing.h \
     c5inputdate.h \
         c5mainwindow.h \
     ../Cafe5/c5config.h \
@@ -440,8 +450,10 @@ FORMS += \
     c5cashdoc.ui \
     c5checkdatabase.ui \
     c5costumerdebtpayment.ui \
+    c5dbresetoption.ui \
     c5dishgroupaction.ui \
     c5goodsimage.ui \
+    c5goodspricing.ui \
     c5inputdate.ui \
         c5mainwindow.ui \
     ../Cafe5/c5connection.ui \

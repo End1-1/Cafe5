@@ -341,6 +341,36 @@ bool C5Database::update(const QString &tableName, const QString &whereClause)
     return exec(sql);
 }
 
+bool C5Database::update(const QString &tableName, const QString &field, const QVariant &value)
+{
+    QString sql = "update " + tableName + " set ";
+    bool first = true;
+    for (QMap<QString, QVariant>::const_iterator it = fBindValues.begin(); it != fBindValues.end(); it++) {
+        if (first) {
+            first = false;
+        } else {
+            sql += ",";
+        }
+        QString f = it.key();
+        sql += f.remove(0, 1) + "=" + it.key();
+    }
+    sql += QString(" where %1=:%1").arg(field);
+    fBindValues[":" + field] = value;
+    return exec(sql);
+}
+
+bool C5Database::deleteFromTable(const QString &tableName, const QString &field, const QVariant &value)
+{
+    fBindValues[":" + field] = value;
+    QString sql = QString("delete from %1 where %2=:%2").arg(tableName).arg(field);
+    return exec(sql);
+}
+
+bool C5Database::deleteFromTable(const QString &tableName, const QVariant &id)
+{
+    return deleteFromTable(tableName, "f_id", id);
+}
+
 int C5Database::insert(const QString &tableName, bool returnId)
 {
     QString sql = "insert into " + tableName;
@@ -528,6 +558,9 @@ QString C5Database::lastQuery(QSqlQuery *q)
         case QVariant::Time:
             value = QString("'%1'").arg(value.toTime().toString("HH:mm:ss"));
             break;
+        case QVariant::ByteArray:
+            value = QString("'%1'").arg(QString(value.toByteArray().toHex()));
+            break;
         default:
             break;
         }
@@ -544,8 +577,8 @@ bool C5Database::exec(const QString &sqlQuery, bool &isSelect)
     }
     if (!fQuery->prepare(sqlQuery)) {
         fLastError = fQuery->lastError().databaseText();
-        logEvent(fLastError);
-        logEvent(sqlQuery);
+        logEvent(fDb.hostName() + " (" + QString::number(fTimerCount) + " ms):" + fDb.databaseName() + " " + fLastError);
+        logEvent(fDb.hostName() + " (" + QString::number(fTimerCount) + " ms):" + fDb.databaseName() + " " + sqlQuery);
         return false;
     }
     for (QMap<QString, QVariant>::iterator it = fBindValues.begin(); it != fBindValues.end(); it++) {
@@ -559,8 +592,8 @@ bool C5Database::exec(const QString &sqlQuery, bool &isSelect)
     }
     if (!fQuery->exec()) {
         fLastError = fQuery->lastError().databaseText();
-        logEvent(fLastError);
-        logEvent(lastQuery(fQuery));
+        logEvent(fDb.hostName() + " (" + QString::number(fTimerCount) + " ms):" + fDb.databaseName() + " " + fLastError);
+        logEvent(fDb.hostName() + " (" + QString::number(fTimerCount) + " ms):" + fDb.databaseName() + " " + lastQuery(fQuery));
         return false;
     }
     isSelect = fQuery->isSelect();

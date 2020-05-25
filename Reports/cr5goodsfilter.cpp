@@ -41,6 +41,12 @@ QString CR5GoodsFilter::condition()
     if (!ui->leClass4->isEmpty()) {
         addCond(w, "gg.f_group4 in (" + ui->leClass4->text() + ") ");
     }
+    if (ui->rbService->isChecked()) {
+        addCond(w, "gg.f_service=1 ");
+    }
+    if (ui->rbNoService->isChecked()) {
+        addCond(w, "gg.f_service=0 ");
+    }
     if (!w.isEmpty()) {
         " where " + w;
     }

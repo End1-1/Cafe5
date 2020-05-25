@@ -41,6 +41,12 @@ bool C5Editor::getResult(QList<QMap<QString, QVariant> > &data)
     return false;
 }
 
+void C5Editor::reject()
+{
+    fEditor->clear();
+    C5Dialog::reject();
+}
+
 void C5Editor::closeEvent(QCloseEvent *e)
 {
     fEditor->clear();

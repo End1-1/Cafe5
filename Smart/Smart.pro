@@ -29,6 +29,7 @@ DEFINES += WAITER
 SOURCES += \
     ../../NewTax/Src/printtaxn.cpp \
     ../Cafe5/c5cafecommon.cpp \
+    ../Cafe5/calendar.cpp \
     ../Classes/c5printing.cpp \
     ../Classes/c5storedraftwriter.cpp \
     ../Classes/c5waiterorderdoc.cpp \
@@ -54,6 +55,7 @@ SOURCES += \
 HEADERS += \
     ../../NewTax/Src/printtaxn.h \
     ../Cafe5/c5cafecommon.h \
+    ../Cafe5/calendar.h \
     ../Classes/c5printing.h \
     ../Classes/c5storedraftwriter.h \
     ../Classes/c5waiterorderdoc.h \
@@ -80,6 +82,7 @@ HEADERS += \
     dlgpassword.h
 
 FORMS += \
+    ../Cafe5/calendar.ui \
     ../Classes/notificationwidget.ui \
     ../FrontDesk/c5selector.ui \
     payment.ui \

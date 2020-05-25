@@ -478,17 +478,6 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
         }
     }
 
-    db[":f_header"] = fInternalId;
-    db.exec("delete from a_complectation_additions");
-    for (int i = 0; i < ui->tblAdd->rowCount(); i++) {
-        db[":f_id"] = db.uuid();
-        db[":f_header"] = fInternalId;
-        db[":f_name"] = ui->tblAdd->lineEdit(i, 1)->text();
-        db[":f_amount"] = ui->tblAdd->lineEdit(i, 2)->getDouble();
-        db[":f_row"] = i + 1;
-        db.insert("a_complectation_additions", false);
-    }
-
     dw.clearAStoreDraft(fInternalId);
     if (!dw.writeAHeader(fInternalId, ui->leDocNum->text(), fDocState, fDocType, __userid, ui->deDate->date(), QDate::currentDate(), QTime::currentTime(),
                          ui->lePartner->getInteger(), ui->leTotal->getDouble(), ui->leComment->text(), ui->lePayment->getInteger(), ui->chPaid->isChecked())) {
@@ -505,6 +494,16 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
                                  ui->leReason->getInteger(), "", 1)) {
             err += db.fLastError + "<br>";
         }
+    }
+    db[":f_header"] = fInternalId;
+    db.exec("delete from a_complectation_additions where f_header=:f_header");
+    for (int i = 0; i < ui->tblAdd->rowCount(); i++) {
+        db[":f_id"] = db.uuid();
+        db[":f_header"] = fInternalId;
+        db[":f_name"] = ui->tblAdd->lineEdit(i, 1)->text();
+        db[":f_amount"] = ui->tblAdd->lineEdit(i, 2)->getDouble();
+        db[":f_row"] = i + 1;
+        db.insert("a_complectation_additions", false);
     }
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
         QString inid = ui->tblGoods->getString(i, 0);
@@ -585,9 +584,27 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
                          ui->lePartner->getInteger(), ui->leTotal->getDouble(), ui->leComment->text(), ui->lePayment->getInteger(), ui->chPaid->isChecked())) {
         err += db.fLastError + "<br>";
     }
+    if (fDocType == DOC_TYPE_COMPLECTATION) {
+        db[":f_id"] = ui->leComplectationCode->getInteger();
+        db[":f_lastinputprice"] = ui->leTotal->getDouble();
+        db.exec("update c_goods set f_lastinputprice=:f_lastinputprice where f_id=:f_id");
+    }
 
     fDocState = state;
     db.commit();
+    if (ui->tblAdd->rowCount() > 0){
+        db[":f_name"] = "last_store_additions";
+        db.exec("select * from s_draft where f_name=:f_name");
+        if (db.nextRow()) {
+            db[":f_name"] = "last_store_additions";
+            db[":f_value"] = fInternalId;
+            db.exec("update s_draft set f_value=:f_value where f_name=:f_name");
+        } else {
+            db[":f_name"] = "last_store_additions";
+            db[":f_value"] = fInternalId;
+            db.insert("s_draft", false);
+        }
+    }
     setDocEnabled(state == DOC_STATE_DRAFT);
     bool v = C5Config::getRegValue("showhidegoods").toBool();
     if (v) {
@@ -682,6 +699,9 @@ bool C5StoreDoc::docCheck(QString &err)
         }
         if (ui->leComplectationQty->getDouble() < 0.0001) {
             err += tr("The quantity of complectation cannot be zero") + "<br>";
+        }
+        if (ui->leComplectationCode->getInteger() == 0) {
+            err += tr("The goods of input cannot be unknown") + "<br>";
         }
         break;
     }
@@ -932,7 +952,12 @@ void C5StoreDoc::updateCashDoc()
 
 void C5StoreDoc::newDoc()
 {
-    fInternalId = "";
+    fInternalId.clear();
+    fCashRowId.clear();
+    fCashUuid.clear();
+    fCashUserId.clear();
+    fBasedOnSale = 0;
+    fComplectationId.clear();
     fDocState = DOC_STATE_DRAFT;
     ui->leDocNum->clear();
     ui->lePartner->setValue(0);
@@ -942,6 +967,10 @@ void C5StoreDoc::newDoc()
     ui->tblGoods->clearContents();
     ui->tblGoods->setRowCount(0);
     ui->leInvoiceNumber->clear();
+    ui->leComplectationCode->setValue("");
+    ui->leComplectationQty->clear();
+    ui->tblAdd->clearContents();
+    ui->tblAdd->setRowCount(0);
     setDocEnabled(true);
     C5Database db(fDBParams);
     db.startTransaction();
@@ -1011,7 +1040,7 @@ void C5StoreDoc::getOutput()
     }
     int row = addGoodsRow();
     ui->tblGoods->setString(row, 3, vals.at(1).toString());
-    ui->tblGoods->setString(row, 4, vals.at(3).toString());
+    ui->tblGoods->setString(row, 4, vals.at(3).toString() + " " + vals.at(7).toString());
     ui->tblGoods->setString(row, 6, vals.at(4).toString());
     ui->tblGoods->lineEdit(row, 5)->setFocus();
 }
@@ -1274,10 +1303,12 @@ void C5StoreDoc::checkInvoiceDuplicate()
     C5Database db(fDBParams);
     db[":f_invoice"] = ui->leInvoiceNumber->text();
     db[":f_id"] = fInternalId;
-    db.exec("select count(f_id) from a_header where f_invoice=:f_invoice and f_id<>:f_id");
+    db.exec("select count(f_id) from a_header_store where f_invoice=:f_invoice and f_id<>:f_id");
     if (db.nextRow()) {
         if (db.getInt(0) > 0) {
             ui->leInvoiceNumber->setStyleSheet("background:red;");
+        } else {
+            ui->leInvoiceNumber->setStyleSheet("");
         }
     }
 }
@@ -1485,7 +1516,7 @@ void C5StoreDoc::on_leScancode_returnPressed()
 {
     C5Database db(C5Config::dbParams());
     db[":f_scancode"] = ui->leScancode->text();
-    db.exec("select gg.f_scancode, gg.f_id, gg.f_name, gu.f_name as f_unitname, gg.f_saleprice, "
+    db.exec("select gg.f_scancode, gg.f_id, concat(gg.f_name, ' ', gg.f_scancode) as f_name, gu.f_name as f_unitname, gg.f_saleprice, "
             "gr.f_taxdept, gr.f_adgcode "
             "from c_goods gg  "
             "left join c_groups gr on gr.f_id=gg.f_group "
@@ -1595,4 +1626,25 @@ void C5StoreDoc::on_btnRemoveAdd_clicked()
     }
     ui->tblAdd->removeRow(row);
     countTotal();
+}
+
+void C5StoreDoc::on_btnInsertLast_clicked()
+{
+    C5Database db(fDBParams);
+    db[":f_name"] = "last_store_additions";
+    db.exec("select f_value from s_draft where f_name=:f_name");
+    if (db.nextRow()) {
+        db[":f_header"] = db.getString("f_id");
+        db.exec("select * from a_complectation_additions where f_header=:f_header order by f_row");
+        while (db.nextRow()) {
+            int row = ui->tblAdd->rowCount();
+            ui->tblAdd->setRowCount(row + 1);
+            C5LineEdit *l = ui->tblAdd->createLineEdit(row, 1);
+            l->setText(db.getString("f_name"));
+            l = ui->tblAdd->createLineEdit(row, 2);
+            l->setDouble(db.getDouble("f_amount"));
+            l->setValidator(new QDoubleValidator());
+            connect(l, SIGNAL(textEdited(QString)), this, SLOT(tblAddChanged(QString)));
+        }
+    }
 }

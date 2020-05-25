@@ -18,6 +18,7 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
                     << "inner join c_groups gg on gg.f_id=g.f_group [gg]"
                     << "inner join c_units u on u.f_id=g.f_unit [u]"
                     << "inner join a_header a on a.f_id=s.f_document [a]"
+                    << "inner join "
                        ;
 
     fColumnsFields << "s.f_document"
@@ -28,6 +29,9 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
                    << "st.f_name as f_type"
                    << "gg.f_name as f_group"
                    << "g.f_name as f_goods"
+                   << "g.f_scancode"
+                   << "g.f_saleprice"
+                   << "g.f_saleprice2"
                    << "sum(s.f_qty) as f_qty"
                    << "u.f_name as f_unit"
                    << "s.f_price"
@@ -42,6 +46,9 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
                   << "ss.f_name as f_store"
                   << "gg.f_name as f_group"
                   << "g.f_name as f_goods"
+                  << "g.f_scancode"
+                  << "g.f_saleprice"
+                  << "g.f_saleprice2"
                   << "s.f_price"
                   << "u.f_name as f_unit"
                   << "g.f_name as f_goods"
@@ -58,6 +65,9 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
     fTranslation["f_store"] = tr("Storage");
     fTranslation["f_group"] = tr("Group");
     fTranslation["f_goods"] = tr("Goods");
+    fTranslation["f_scancode"] = tr("Scancode");
+    fTranslation["f_saleprice"] = tr("Retail price");
+    fTranslation["f_saleprice2"] = tr("Whosale price");
     fTranslation["f_qty"] = tr("Qty");
     fTranslation["f_unit"] = tr("Unit");
     fTranslation["f_price"] = tr("Price");
@@ -70,6 +80,9 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
     fColumnsVisible["ss.f_name as f_store"] = true;
     fColumnsVisible["gg.f_name as f_group"] = true;
     fColumnsVisible["g.f_name as f_goods"] = true;
+    fColumnsVisible["g.f_scancode"] = true;
+    fColumnsVisible["g.f_saleprice"] = true;
+    fColumnsVisible["g.f_saleprice2"] = false;
     fColumnsVisible["sum(s.f_qty) as f_qty"] = true;
     fColumnsVisible["u.f_name as f_unit"] = true;
     fColumnsVisible["s.f_price"] = true;

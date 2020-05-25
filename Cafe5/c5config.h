@@ -59,6 +59,7 @@
 
 #define SALE_RETAIL 1
 #define SALE_WHOSALE 2
+#define SALE_PREORDER 3
 
 class C5Config
 {

@@ -9,8 +9,10 @@
 #include "c5selector.h"
 #include <QClipboard>
 #include <QFontDatabase>
+#include <QCompleter>
 #include <QMenu>
 #include <QFileDialog>
+#include <QStringListModel>
 #include <QPaintEngine>
 
 CE5Goods::CE5Goods(const QStringList &dbParams, QWidget *parent) :
@@ -27,6 +29,16 @@ CE5Goods::CE5Goods(const QStringList &dbParams, QWidget *parent) :
     ui->leClass2->setSelector(dbParams, ui->leClassName2, cache_goods_classes);
     ui->leClass3->setSelector(dbParams, ui->leClassName3, cache_goods_classes);
     ui->leClass4->setSelector(dbParams, ui->leClassName4, cache_goods_classes);
+
+    C5Database db(dbParams);
+    db.exec("select f_name from c_goods");
+    while (db.nextRow()) {
+        fStrings.insert(db.getString(0));
+    }
+    QStringListModel *m = new QStringListModel(fStrings.toList());
+    QCompleter *c = new QCompleter(m);
+    c->setCaseSensitivity(Qt::CaseInsensitive);
+    ui->leName->setCompleter(c);
 }
 
 CE5Goods::~CE5Goods()
@@ -51,7 +63,7 @@ void CE5Goods::setId(int id)
     /* Complectation */
     db[":f_base"] = id;
     db.exec("select c.f_id, c.f_goods, concat(g.f_name, ' ', g.f_scancode) as f_goodsname, c.f_qty, u.f_name as f_unitname, "
-            "c.f_price, c.f_qty*c.f_price as f_total "
+            "g.f_lastinputprice, c.f_qty*g.f_lastinputprice as f_total "
             "from c_goods_complectation c "
             "left join c_goods g on g.f_id=c.f_goods "
             "left join c_units u on u.f_id=g.f_unit "
@@ -63,7 +75,7 @@ void CE5Goods::setId(int id)
         ui->tblGoods->setString(row, 2, db.getString("f_goodsname"));
         ui->tblGoods->lineEdit(row, 3)->setDouble(db.getDouble("f_qty"));
         ui->tblGoods->setString(row, 4, db.getString("f_unitname"));
-        ui->tblGoods->lineEdit(row, 5)->setDouble(db.getDouble("f_price"));
+        ui->tblGoods->lineEdit(row, 5)->setDouble(db.getDouble("f_lastinputprice"));
         ui->tblGoods->lineEdit(row, 6)->setDouble(db.getDouble("f_total"));
     }
     countTotal();
@@ -85,6 +97,9 @@ bool CE5Goods::save(QString &err, QList<QMap<QString, QVariant> > &data)
         db[":f_price"] = ui->tblGoods->lineEdit(i, 5)->getDouble();
         db.insert("c_goods_complectation", false);
     }
+    ui->chEnabled->setChecked(true);
+    fStrings.insert(ui->leName->text());
+    static_cast<QStringListModel*>(ui->leName->completer()->model())->setStringList(fStrings.toList());
     return true;
 }
 

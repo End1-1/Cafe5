@@ -57,6 +57,7 @@ void StoreInput::on_btnAccept_clicked()
     C5StoreDraftWriter dw(db);
     foreach (int r, rows) {
         db[":f_id"] = ui->tbl->getString(r, 0);
+        db[":f_datetime"] = QDateTime::currentDateTime();
         db.insert("a_header_shop2partneraccept", false);
     }
     getList();
@@ -101,12 +102,13 @@ void StoreInput::history()
     db[":f_store"] = __c5config.defaultStore();
     db[":f_date1"] = ui->deStart->date();
     db[":f_date2"] = ui->deEnd->date();
+    db[":f_reason"] = DOC_REASON_INPUT;
     db.exec("select ad.f_id, '', ah.f_date, g.f_name, g.f_scancode, ad.f_qty, g.f_saleprice "
             "from a_store_draft ad "
             "inner join c_goods g on g.f_id=ad.f_goods "
             "inner join a_header ah on ah.f_id=ad.f_document "
-            "inner join a_header_shop2partner sp on sp.f_id=ah.f_id "
-            "where ad.f_store=:f_store and ah.f_date between :f_date1 and :f_date2 ");
+            "where ad.f_store=:f_store and ah.f_date between :f_date1 and :f_date2 and ad.f_type=1 "
+            "and ad.f_reason=:f_reason ");
     ui->leTotal->setDouble(0);
     while (db.nextRow()) {
         int r = ui->tbl->addEmptyRow();
@@ -170,4 +172,18 @@ void StoreInput::on_btnHistoryMode_clicked()
     ui->btnHistoryMode->setChecked(true);
     fViewMode = VM_STORE;
     refresh();
+}
+
+void StoreInput::on_leFilter_textChanged(const QString &arg1)
+{
+    for (int r = 0; r < ui->tbl->rowCount(); r++) {
+        bool h = true;
+        for (int c = 0; c < ui->tbl->columnCount(); c++) {
+            if (ui->tbl->getString(r, c).contains(arg1, Qt::CaseInsensitive)) {
+                h = false;
+                break;
+            }
+        }
+        ui->tbl->setRowHidden(r, h);
+    }
 }

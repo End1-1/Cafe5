@@ -170,6 +170,8 @@ private slots:
     void on_btnAddAdd_clicked();
 
     void on_btnRemoveAdd_clicked();
+
+    void on_btnInsertLast_clicked();
 };
 
 #endif // C5STOREDOC_H

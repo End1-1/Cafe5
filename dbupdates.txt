@@ -403,3 +403,38 @@ create table s_user_photo (f_id integer primary key, f_data mediumblob);
 /* DB - 19*/
 update s_app set f_version ='19' where f_app='DB';
 ALTER TABLE `h_halls` CHANGE COLUMN `f_prefix` `f_prefix` CHAR(8) NULL DEFAULT NULL ,ADD UNIQUE INDEX `f_prefix_UNIQUE` (`f_prefix` ASC);
+CREATE TABLE `s_salary_inout` (
+  `f_id` int(11) NOT NULL AUTO_INCREMENT,
+  `f_user` int(11) DEFAULT NULL,
+  `f_datein` date DEFAULT NULL,
+  `f_timein` time DEFAULT NULL,
+  `f_dateout` date DEFAULT NULL,
+  `f_timeout` time DEFAULT NULL,
+  PRIMARY KEY (`f_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/* DB - 20*/
+update s_app set f_version ='20' where f_app='DB';
+create table op_header (f_id binary(16) primary key, f_state smallint, f_datecreate date, f_timecreate time, f_staff integer, f_datefor date, f_timefor time, f_advance decimal(14, 2), f_total decimal(14,2), f_customer integer, f_info tinytext);
+create table op_body (f_id binary(16) primary key, f_header binary(16), f_goods integer, f_qty decimal(14,4), f_price decimal(14,2));
+ALTER TABLE  `op_body` ADD INDEX `fx_op_body_header_idx` (`f_header` ASC);
+ALTER TABLE `op_body` ADD CONSTRAINT `fx_op_body_header`  FOREIGN KEY (`f_header`)  REFERENCES `op_header` (`f_id`)  ON DELETE NO ACTION  ON UPDATE NO ACTION;
+create table s_draft (f_name tinytext, f_value tinytext);
+create table op_header_state (f_id integer primary key, f_name tinytext);
+insert into op_header_state (f_id, f_name) values (1, 'Սպասում է'), (2, 'Կատարված է');
+
+/* DB - 21*/
+update s_app set f_version ='21' where f_app='DB';
+alter table op_header add column f_advancetax integer;
+insert into op_header_state values (3, 'Հեռացված');
+alter table c_goods add column f_service smallint default 0;
+
+/* DB - 22*/
+update s_app set f_version ='22' where f_app='DB';
+alter table o_goods add column f_discountfactor decimal(14,2) default 0;
+alter table o_goods add column f_discountmode smallint default 0;
+
+/* DB - 23*/
+update s_app set f_version ='22' where f_app='DB';
+ALTER TABLE `a_store` ADD INDEX `idx_astore_base` (`f_base` ASC);
+;

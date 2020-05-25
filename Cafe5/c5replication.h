@@ -14,8 +14,16 @@ public:
 
     bool ret(C5Database &db1, C5Database &db2);
 
+    void downloadDataFromServer(const QStringList &src, const QStringList &dst);
+
+    bool uploadDataToServer(const QStringList &src, const QStringList &dst);
+
+    bool fIgnoreErrors;
+
 signals:
     void finished();
+
+    void haveChanges(bool);
 
     void progress(const QString&);
 

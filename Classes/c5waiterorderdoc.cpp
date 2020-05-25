@@ -360,12 +360,43 @@ void C5WaiterOrderDoc::removeDocument(C5Database &db, const QString &id)
     db[":f_state_normal"] = DISH_STATE_OK;
     db[":f_header"] = id;
     db.exec("update o_body set f_state=:f_state where f_header=:f_header and f_state=:f_state_normal");
-    db[":f_order"] = id;
-    db.exec("delete from b_clients_debts where f_order=:f_order");
-    db[":f_order"] = id;
-    db.exec("delete from b_car_orders where f_order=:f_order");
-    db[":f_order"] = id;
-    db.exec("delete from b_history where f_order=:f_order");
+    db[":f_id"] = id;
+    db[":f_state"] = ORDER_STATE_VOID;
+    db.exec("update o_header set f_state=:f_state where f_id=:f_id");
+    db.deleteFromTable("b_clients_debts", "f_order", id);
+    db.deleteFromTable("b_car_orders", "f_order", id);
+    db.deleteFromTable("b_history", "f_id", id);
+    db[":f_oheader"] = id;
+    db.exec("select * from a_header_cash where f_oheader=:f_oheader");
+    QString cashid;
+    if (db.nextRow()) {
+        cashid = db.getString("f_id");
+        db.deleteFromTable("e_cash", "f_header", cashid);
+        db.deleteFromTable("a_header_cash", cashid);
+        db.deleteFromTable("a_header", cashid);
+    }
+    db[":f_header"] = id;
+    db.exec("select ah.f_id as f_header, og.f_id as f_goods "
+            "from a_header ah "
+            "inner join a_store_draft ad on ad.f_document=ah.f_id "
+            "inner join o_goods og on og.f_storerec=ad.f_id "
+            "inner join o_body ob on ob.f_id=og.f_body "
+            "where ob.f_header=:f_header");
+    QSet<QString> aheader;
+    QSet<QString> ogoods;
+    while (db.nextRow()) {
+        aheader.insert(db.getString("f_header"));
+        ogoods.insert(db.getString("f_goods"));
+    }
+    foreach (const QString &s, ogoods) {
+        db.deleteFromTable("o_goods", s);
+    }
+    foreach (const QString &s, aheader) {
+        db.deleteFromTable("a_store", "f_document", s);
+        db.deleteFromTable("a_store_draft", "f_document", s);
+        db.deleteFromTable("a_header_store", s);
+        db.deleteFromTable("a_header", s);
+    }
 }
 
 int C5WaiterOrderDoc::hInt(const QString &name)
