@@ -46,6 +46,7 @@ WOrder::WOrder(int saleType, QWidget *parent) :
     ui->leChange->setValidator(new QDoubleValidator(0, 1000000000,2 ));
     ui->lbPartner->setVisible(false);
     ui->lePartner->setVisible(false);
+    ui->chDebt->setVisible(false);
     noImage();
     if (fSaleType == SALE_PREORDER) {
         setStyleSheet("background: #d0ffc1;");
@@ -160,8 +161,8 @@ bool WOrder::writeOrder(bool tax)
     so.setDiscount(fCostumerId, fCardId, fCardMode, fCardValue);
     so.setParams(fDateOpen, fTimeOpen, fSaleType);
     bool w = so.write(ui->leTotal->getDouble(), ui->leCard->getDouble(), ui->leAdvance->getDouble(), ui->leDisc->getDouble(), tax, goods);
+    C5Database db(__c5config.dbParams());
     if (w) {
-        C5Database db(__c5config.dbParams());
         foreach (const IGoods &g, goods) {
             if (g.isService) {
                 continue;
@@ -180,6 +181,18 @@ bool WOrder::writeOrder(bool tax)
         if (!fPreorderUUID.isEmpty()) {
             db[":f_state"] = 2;
             db.update("op_header", "f_id", fPreorderUUID);
+        }
+    }
+    if (w) {
+        if (ui->chDebt->isChecked()) {
+            if (fPartner > 0) {
+                db[":f_costumer"] = fPartner;
+                db[":f_order"] = so.fHeader;
+                db[":f_amount"] = ui->leTotal->getDouble() * -1;
+                db[":f_date"] = QDate::currentDate();
+                db[":f_govnumber"] = "";
+                db.insert("b_clients_debts", false);
+            }
         }
     }
     return w;
@@ -301,6 +314,7 @@ void WOrder::fixCostumer(const QString &code)
     ui->leCustomer->setVisible(true);
     ui->lbCustomer->setVisible(true);
     ui->lbDisc->setVisible(true);
+    ui->chDebt->setVisible(true);
     ui->leCustomer->setText(db.getString("f_firstname") + " " + db.getString("f_lastname"));
     countTotal();
 }
@@ -467,6 +481,7 @@ void WOrder::setPartner(const QString &taxcode, int id, const QString &taxname)
     fPartner = id;
     ui->lbPartner->setVisible(true);
     ui->lePartner->setVisible(true);
+    ui->chDebt->setVisible(true);
 }
 
 void WOrder::countTotal()

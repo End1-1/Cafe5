@@ -3,6 +3,7 @@
 #include "c5mainwindow.h"
 #include "c5storedraftwriter.h"
 #include "printtaxn.h"
+#include "c5cache.h"
 #include <QMenu>
 
 C5SaleFromStoreOrder::C5SaleFromStoreOrder(const QStringList &dbParams) :
@@ -12,6 +13,7 @@ C5SaleFromStoreOrder::C5SaleFromStoreOrder(const QStringList &dbParams) :
     ui->setupUi(this);
     ui->tblData->setColumnWidths(ui->tblData->columnCount(), 0, 0, 300, 80, 80, 80, 80, 0);
     ui->leID->setVisible(false);
+    ui->lePartner->setSelector(dbParams, ui->lePartnerName, cache_goods_partners);
     //ui->btnRemove->setVisible(pr(fDBParams, cp_t5_refund_goods));
 }
 
@@ -33,18 +35,22 @@ void C5SaleFromStoreOrder::loadOrder(const QString &id)
     ui->leID->setText(id);
     C5Database db(fDBParams);
     db[":f_id"] = id;
-    db.exec("select f_datecash, f_timeclose, concat(f_prefix, f_hallid) as f_userid, f_amountcash, f_amountcard, f_source from o_header where f_id=:f_id");
+    db.exec("select * from o_header where f_id=:f_id");
     if (db.nextRow()) {
-        ui->deDate->setDate(db.getDate(0));
-        ui->teTime->setText(db.getString(1));
-        ui->leUserId->setText(db.getString("f_userid"));
+        ui->deDate->setDate(db.getDate("f_datecash"));
+        ui->teTime->setText(db.getString("f_timeclose"));
+        ui->leUserId->setText(db.getString("f_prefix") + db.getString("f_hallid"));
         ui->leTotalCash->setDouble(db.getDouble("f_amountcash"));
         ui->leTotalCard->setDouble(db.getDouble("f_amountcard"));
+        ui->lePartner->setValue(db.getString("f_partner"));
         ui->btnRemove->setVisible(db.getInt("f_source") > 0);
     } else {
         C5Message::error(tr("No such order"));
         return;
     }
+    db[":f_order"] = ui->leID->text();
+    db.exec("select * from b_clients_debts where f_order=:f_order");
+    ui->chDebt->setChecked(db.nextRow());
     db[":f_id"] = id;
     db.exec("select og.f_id, og.f_goods, g.f_name, og.f_qty, gu.f_name, og.f_price, og.f_total,"
             "t.f_taxdept, t.f_adgcode, "
@@ -124,6 +130,7 @@ void C5SaleFromStoreOrder::on_btnRemove_clicked()
     db[":f_id"] = ui->leID->text();
     db.exec("delete from o_header where f_id=:f_id");
 
+    db.deleteFromTable("b_clients_debts", "f_order", ui->leID->text());
     db.commit();
     ui->btnRemove->setVisible(false);
     C5Message::info(tr("Removal complete"));
@@ -182,4 +189,33 @@ void C5SaleFromStoreOrder::on_btnPrintTax_clicked()
         delete q;
         C5Message::error(err + "<br>" + jsonOut + "<br>" + jsonIn);
     }
+}
+
+void C5SaleFromStoreOrder::on_btnSave_clicked()
+{
+    C5Database db(fDBParams);
+    if (ui->chDebt->isChecked()) {
+        if (ui->lePartner->getInteger() == 0) {
+            C5Message::error(tr("Dept option is selected, but no partner selected"));
+            return;
+        }
+        db[":f_order"] = ui->leID->text();
+        db.exec("select * from b_clients_debt where f_order=:f_header");
+        if (db.nextRow()) {
+            db[":f_costumer"] = ui->lePartner->getInteger();
+            db.update("b_clients_debts", "f_header", ui->leID->text());
+        } else {
+            db[":f_order"] = ui->leID->text();
+            db[":f_costumer"] = ui->lePartner->getInteger();
+            db[":f_date"] = ui->deDate->date();
+            db[":f_amount"] = ui->leTotalCash->getDouble() * -1;
+            db.insert("b_clients_debts");
+        }
+    } else {
+        db.deleteFromTable("b_clients_debts", "f_order", ui->leID->text());
+    }
+    db[":f_partner"] = ui->lePartner->getInteger();
+    db.update("o_header", where_id(ui->leID->text()));
+
+    C5Message::info(tr("Saved"));
 }

@@ -68,13 +68,12 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
     if (!dw.hallId(headerPrefix, headerId, __c5config.defaultHall().toInt())) {
         return returnFalse(dw.fErrorMsg, db);
     }
-    QString oheaderid;
-    if (!dw.writeOHeader(oheaderid, headerId, headerPrefix, ORDER_STATE_CLOSE, __c5config.defaultHall().toInt(), __c5config.defaultTable(), fDateOpen, QDate::currentDate(), QDate::currentDate(), fTimeOpen, QTime::currentTime(), __userid, "", 1, total, (total - card), card, 0, 0, 0, 0, discount, 0, fCardValue, 0, 0, 1, 2, fSaleType, fPartnerCode)) {
+    if (!dw.writeOHeader(fHeader, headerId, headerPrefix, ORDER_STATE_CLOSE, __c5config.defaultHall().toInt(), __c5config.defaultTable(), fDateOpen, QDate::currentDate(), QDate::currentDate(), fTimeOpen, QTime::currentTime(), __userid, "", 1, total, (total - card), card, 0, 0, 0, 0, discount, 0, fCardValue, 0, 0, 1, 2, fSaleType, fPartnerCode)) {
         return returnFalse(dw.fErrorMsg, db);
     }
     QString sn, firm, address, fiscal, hvhh, rseq, devnum, time;
     if (fCustomerId > 0) {
-        if (!dw.writeBHistory(oheaderid, fCardMode, fCardId, fCardValue, 0)) {
+        if (!dw.writeBHistory(fHeader, fCardMode, fCardId, fCardValue, 0)) {
             return returnFalse(dw.fErrorMsg, db);
         }
     }
@@ -96,7 +95,7 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
         result = pt.makeJsonAndPrint(card, prepaid, jsonIn, jsonOut, err);
 
         dblog[":f_id"] = db.uuid();
-        dblog[":f_order"] = oheaderid;
+        dblog[":f_order"] = fHeader;
         dblog[":f_date"] = QDate::currentDate();
         dblog[":f_time"] = QTime::currentTime();
         dblog[":f_in"] = jsonIn;
@@ -107,9 +106,9 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
         QSqlQuery *q = new QSqlQuery(dblog.fDb);
         if (result == pt_err_ok) {
             PrintTaxN::parseResponse(jsonOut, firm, hvhh, fiscal, rseq, sn, address, devnum, time);
-            dblog[":f_id"] = oheaderid;
+            dblog[":f_id"] = fHeader;
             db.exec("delete from o_tax where f_id=:f_id");
-            dblog[":f_id"] = oheaderid;
+            dblog[":f_id"] = fHeader;
             dblog[":f_dept"] = C5Config::taxDept();
             dblog[":f_firmname"] = firm;
             dblog[":f_address"] = address;
@@ -121,10 +120,10 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
             dblog[":f_fiscalmode"] = tr("(F)");
             dblog[":f_time"] = time;
             dblog.insert("o_tax", false);
-            pt.saveTimeResult(oheaderid, *q);
+            pt.saveTimeResult(fHeader, *q);
             delete q;
         } else {
-            pt.saveTimeResult("Not saved - " + oheaderid, *q);
+            pt.saveTimeResult("Not saved - " + fHeader, *q);
             delete q;
             return returnFalse(err + "<br>" + jsonOut + "<br>" + jsonIn, db);
         }
@@ -161,7 +160,7 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
                 return returnFalse(dw.fErrorMsg, db);
             }
         }
-        if (!dw.writeOGoods(ogoodsid, oheaderid, "", __c5config.defaultStore(), g.goodsId, g.goodsQty, g.goodsPrice,  g.goodsTotal, tax ? rseq.toInt() : 0, 1, i + 1, adraftid, g.discountFactor, g.discountMode)) {
+        if (!dw.writeOGoods(ogoodsid, fHeader, "", __c5config.defaultStore(), g.goodsId, g.goodsQty, g.goodsPrice,  g.goodsTotal, tax ? rseq.toInt() : 0, 1, i + 1, adraftid, g.discountFactor, g.discountMode)) {
             return returnFalse(dw.fErrorMsg, db);
         }
     }
@@ -176,7 +175,7 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
         if (!dw.writeAHeader(cashdocid, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH, __userid, QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, cash, __c5config.cashPrefix() + " " + headerPrefix + QString::number(headerId), 0, 0)) {
             return returnFalse(dw.fErrorMsg, db);
         }
-        if (!dw.writeAHeaderCash(cashdocid, __c5config.cashId(), 0, 1, "", oheaderid)) {
+        if (!dw.writeAHeaderCash(cashdocid, __c5config.cashId(), 0, 1, "", fHeader)) {
             return returnFalse(dw.fErrorMsg, db);
         }
         QString cashUUID;
@@ -192,7 +191,7 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
         if (!dw.writeAHeader(nocashdocid, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH, __userid, QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, card, __c5config.nocashPrefix() + " " + headerPrefix + QString::number(headerId), 0, 0)) {
             return returnFalse(dw.fErrorMsg, db);
         }
-        if (!dw.writeAHeaderCash(nocashdocid, __c5config.nocashId(), 0, 1, "", oheaderid)) {
+        if (!dw.writeAHeaderCash(nocashdocid, __c5config.nocashId(), 0, 1, "", fHeader)) {
             return returnFalse(dw.fErrorMsg, db);
         }
         QString cashUUID;
@@ -309,8 +308,8 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
 
     if (!C5Config::localReceiptPrinter().isEmpty()) {
         PrintReceiptGroup p;
-        p.print(oheaderid, db, 1);
-        p.print(oheaderid, db, 2);
+        p.print(fHeader, db, 1);
+        p.print(fHeader, db, 2);
         //p.print2(oheaderid, db);
     }
 

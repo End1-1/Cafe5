@@ -1,8 +1,10 @@
 #include "cr5goods.h"
 #include "ce5goods.h"
 #include "c5goodspricing.h"
+#include "c5tablemodel.h"
 #include "c5mainwindow.h"
 #include "cr5goodsfilter.h"
+#include "c5goodspricing.h"
 
 CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
@@ -32,6 +34,8 @@ CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
                    << "gg.f_saleprice2"
                    << "gg.f_lowlevel"
                    << "gg.f_lastinputprice"
+                   << "g.f_chargevalue"
+                   << "(gg.f_saleprice/gg.f_lastinputprice*100)-100 as f_realchargevalue"
                    << "gca.f_name as gname1"
                    << "gcb.f_name as gname2"
                    << "gcc.f_name as gname3"
@@ -47,6 +51,8 @@ CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
     fColumnsVisible["gg.f_saleprice2"] = true;
     fColumnsVisible["gg.f_lowlevel"] = true;
     fColumnsVisible["gg.f_lastinputprice"] = true;
+    fColumnsVisible["g.f_chargevalue"] = false;
+    fColumnsVisible["(gg.f_saleprice/gg.f_lastinputprice*100)-100 as f_realchargevalue"] = false;
     fColumnsVisible["gca.f_name as gname1"] = true;
     fColumnsVisible["gcb.f_name as gname2"] = true;
     fColumnsVisible["gcc.f_name as gname3"] = true;
@@ -62,6 +68,8 @@ CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_saleprice2"] = tr("Wholesale price");
     fTranslation["f_lowlevel"] = tr("Low level");
     fTranslation["f_lastinputprice"] = tr("Last input price");
+    fTranslation["f_chargevalue"] = tr("Charge value");
+    fTranslation["f_realchargevalue"] = tr("Real charge value");
     fTranslation["gname1"] = tr("Class 1");
     fTranslation["gname2"] = tr("Class 2");
     fTranslation["gname3"] = tr("Class 3");
@@ -85,8 +93,8 @@ QToolBar *CR5Goods::toolBar()
             << ToolBarButtons::tbPrint;
             createStandartToolbar(btn);
     }
-    if (pr(fDBParams.at(4), cp_t1_goods_pricing)) {
-        fToolBar->addAction(QIcon(":/pricing.png"), tr("Pricing"), this, SLOT(princing()));
+    if (pr(fDBParams.at(1), cp_t1_goods_pricing)) {
+        fToolBar->addAction(QIcon(":/pricing.png"), tr("Pricing"), this, SLOT(pricing()));
     }
     return fToolBar;
 }
@@ -102,5 +110,46 @@ bool CR5Goods::on_tblView_doubleClicked(const QModelIndex &index)
 
 void CR5Goods::pricing()
 {
-    __mainWindow->createTab<C5GoodsPricing>(fDBParams);
+    if (C5Message::question(tr("Warning! This operation will applied to all goods in the current report! Continue?")) != QDialog::Accepted) {
+        return;
+    }
+    C5GoodsPricing *gp = new C5GoodsPricing(fDBParams);
+    if (gp->exec() == QDialog::Accepted) {
+        int rv = gp->roundValue();
+        C5Database db(fDBParams);
+        int colId = fModel->indexForColumnName("f_id");
+        if (colId < 0) {
+            C5Message::error(tr("You must select Code field in the report"));
+            return;
+        }
+        int colSelfcost = fModel->indexForColumnName("f_lastinputprice");
+        if (colSelfcost < 0) {
+            C5Message::error(tr("You must select Last Input field in the report"));
+            return;
+        }
+        int chargeValueCol = fModel->indexForColumnName("f_chargevalue");
+        if (chargeValueCol < 0) {
+            C5Message::error(tr("You must select Charge value field in the report"));
+            return;
+        }
+        int colNewPrice = fModel->indexForColumnName("f_saleprice");
+        for (int i = 0; i < fModel->rowCount(); i++) {
+            double newPrice = fModel->data(i, colSelfcost, Qt::EditRole).toDouble();
+            double chargeValue = fModel->data(i, chargeValueCol, Qt::EditRole).toDouble() / 100;
+            if (newPrice < 0.0001) {
+                continue;
+            }
+            if (chargeValue < 0.001) {
+                continue;
+            }
+            newPrice += (newPrice * chargeValue);
+            newPrice = ceil(trunc(newPrice));
+            db[":f_saleprice"] = newPrice;
+            db.update("c_goods", where_id(fModel->data(i, colId, Qt::EditRole).toInt()));
+            if (colNewPrice > -1) {
+                fModel->setData(i, colNewPrice, newPrice);
+            }
+        }
+    }
+    delete gp;
 }

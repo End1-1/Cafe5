@@ -184,6 +184,17 @@ int C5StoreDraftWriter::counterAType(int type)
     return result > 0;
 }
 
+bool C5StoreDraftWriter::updateField(const QString &tableName, const QString &fieldName, const QVariant &fieldValue, const QString &whereFieldName, const QVariant &whereFieldValue)
+{
+    fDb[":" + fieldName] = fieldValue;
+    fDb[":" + whereFieldName] = whereFieldValue;
+    bool r = fDb.exec("update " + tableName + " set " + fieldName + "=:" + fieldName + " where " + whereFieldName + "=:" + whereFieldName);
+    if (!r) {
+        fErrorMsg = fDb.fLastError;
+    }
+    return r;
+}
+
 bool C5StoreDraftWriter::readAHeaderStore(const QString &id)
 {
     fDb[":f_id"] = id;

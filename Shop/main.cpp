@@ -80,6 +80,7 @@ int main(int argc, char *argv[])
         __c5config.initParamsFromDb();
     }
     Working w;
+    C5Dialog::setMainWindow(&w);
     w.showMaximized();
 
     return a.exec();

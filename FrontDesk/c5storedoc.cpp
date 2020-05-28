@@ -1172,6 +1172,26 @@ void C5StoreDoc::printDoc()
 
     if (fDocType == DOC_TYPE_COMPLECTATION) {
         points.clear();
+        points << 50 << 100 << 800 << 250;
+        vals.clear();
+        vals.append(tr("NN"));
+        vals.append(tr("Other charges"));
+        vals.append(tr("Amount"));
+        p.setFontBold(true);
+        p.tableText(points, vals, p.fLineHeight + 20);
+        p.br(p.fLineHeight + 20);
+        for (int i = 0; i < ui->tblAdd->rowCount(); i++) {
+            vals.clear();
+            vals.append(QString::number(i + 1));
+            vals.append(ui->tblAdd->getString(i, 1));
+            vals.append(float_str(ui->tblAdd->lineEdit(i, 2)->getDouble(), 2));
+            p.setFontBold(false);
+            p.tableText(points, vals, p.fLineHeight + 20);
+            p.br(p.fLineHeight + 20);
+        }
+        p.br();
+
+        points.clear();
         points << 50 << 100 << 200 << 600 << 250 << 250 << 250;
         vals.clear();
         vals.append(tr("NN"));

@@ -23,6 +23,8 @@ private slots:
 
     void on_btnPrintTax_clicked();
 
+    void on_btnSave_clicked();
+
 private:
     Ui::C5SaleFromStoreOrder *ui;
 

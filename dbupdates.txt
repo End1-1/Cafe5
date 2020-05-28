@@ -435,6 +435,12 @@ alter table o_goods add column f_discountfactor decimal(14,2) default 0;
 alter table o_goods add column f_discountmode smallint default 0;
 
 /* DB - 23*/
-update s_app set f_version ='22' where f_app='DB';
-ALTER TABLE `a_store` ADD INDEX `idx_astore_base` (`f_base` ASC);
+update s_app set f_version ='23' where f_app='DB';
+ALTER TABLE `a_store` ADD CONSTRAINT `fk_header`  FOREIGN KEY (`f_document`)  REFERENCES a_header (`f_id`)  ON DELETE NO ACTION  ON UPDATE NO ACTION;
+alter table c_groups add column f_chargevalue decimal(14,3);
+alter table o_goods add f_return smallint default 0;
+
+
+
+
 ;

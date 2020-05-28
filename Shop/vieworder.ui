@@ -59,6 +59,16 @@
        <string>Scancode</string>
       </property>
      </column>
+     <column>
+      <property name="text">
+       <string>Service</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Returned</string>
+      </property>
+     </column>
     </widget>
    </item>
    <item>
@@ -77,6 +87,32 @@
        <number>0</number>
       </property>
       <item>
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Tax number</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="C5LineEdit" name="leTaxNumber">
+        <property name="minimumSize">
+         <size>
+          <width>150</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>150</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QLabel" name="label">
         <property name="text">
          <string>Amount</string>
@@ -85,6 +121,12 @@
       </item>
       <item>
        <widget class="C5LineEdit" name="leAmount">
+        <property name="minimumSize">
+         <size>
+          <width>200</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="maximumSize">
          <size>
           <width>200</width>

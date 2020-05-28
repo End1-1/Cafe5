@@ -47,6 +47,12 @@ QString CR5GoodsFilter::condition()
     if (ui->rbNoService->isChecked()) {
         addCond(w, "gg.f_service=0 ");
     }
+    if (ui->rbActiveYes->isChecked()) {
+        addCond(w, "gg.f_enabled=1 ");
+    }
+    if (ui->rbActiveNo->isChecked()) {
+        addCond(w, "gg.f_enabled=0 ");
+    }
     if (!w.isEmpty()) {
         " where " + w;
     }

@@ -85,6 +85,8 @@ public:
 
     int counterAType(int type);
 
+    bool updateField(const QString &tableName, const QString &fieldName, const QVariant &fieldValue, const QString &whereFieldName, const QVariant &whereFieldValue);
+
     QString fErrorMsg;
 
     int rowCount(int container);

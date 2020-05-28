@@ -21,6 +21,8 @@ public:
 
     bool returnFalse(const QString &msg, C5Database &db);
 
+    QString fHeader;
+
 private:
     QDate fDateOpen;
 

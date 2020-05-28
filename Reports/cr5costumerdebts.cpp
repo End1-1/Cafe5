@@ -2,6 +2,7 @@
 #include "cr5costumerdebtsfilter.h"
 #include "c5tablemodel.h"
 #include "c5costumerdebtpayment.h"
+#include "c5salefromstoreorder.h"
 #include "c5waiterorder.h"
 #include "c5mainwindow.h"
 
@@ -109,8 +110,22 @@ bool CR5CostumerDebts::tblDoubleClicked(int row, int column, const QList<QVarian
         return true;
     }
     if (!vals.at(0).toString().isEmpty()) {
-        C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>(fDBParams);
-        wo->setOrder(vals.at(0).toString());
+        C5Database db(fDBParams);
+        db[":f_id"] = vals.at(0).toString();
+        db.exec("select f_source from o_header where f_id=:f_id");
+        if (db.nextRow()) {
+            switch (abs(db.getInt(0))) {
+            case 1: {
+                C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>(fDBParams);
+                wo->setOrder(vals.at(0).toString());
+                break;
+            }
+            case 2: {
+                C5SaleFromStoreOrder::openOrder(fDBParams, vals.at(0).toString());
+                break;
+            }
+            }
+        }
         return true;
     }
     if (!vals.at(1).toString().isEmpty()) {

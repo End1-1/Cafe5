@@ -215,19 +215,6 @@ font-size:13pt;
         </property>
        </widget>
       </item>
-      <item row="0" column="8">
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>108</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
       <item row="0" column="2">
        <widget class="C5LineEdit" name="leTotal">
         <property name="minimumSize">
@@ -396,6 +383,29 @@ font-size:13pt;
          <bool>true</bool>
         </property>
        </widget>
+      </item>
+      <item row="2" column="7">
+       <widget class="QCheckBox" name="chDebt">
+        <property name="layoutDirection">
+         <enum>Qt::RightToLeft</enum>
+        </property>
+        <property name="text">
+         <string>Debt</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="7" colspan="2">
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>108</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
      </layout>
     </widget>

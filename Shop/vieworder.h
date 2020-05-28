@@ -1,7 +1,7 @@
 #ifndef VIEWORDER_H
 #define VIEWORDER_H
 
-#include <QDialog>
+#include "c5dialog.h"
 
 namespace Ui {
 class ViewOrder;
@@ -9,12 +9,12 @@ class ViewOrder;
 
 class C5Database;
 
-class ViewOrder : public QDialog
+class ViewOrder : public C5Dialog
 {
     Q_OBJECT
 
 public:
-    explicit ViewOrder(const QString &order, QWidget *parent = nullptr);
+    explicit ViewOrder(const QString &order);
 
     ~ViewOrder();
 
