@@ -3165,12 +3165,17 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="c5storebarcode.cpp" line="15"/>
+        <location filename="c5storebarcode.ui" line="41"/>
+        <source>Price</source>
+        <translation type="unfinished">Գին</translation>
+    </message>
+    <message>
+        <location filename="c5storebarcode.cpp" line="16"/>
         <source>Barcode print</source>
         <translation>Տպել շտրիխերը</translation>
     </message>
     <message>
-        <location filename="c5storebarcode.cpp" line="43"/>
+        <location filename="c5storebarcode.cpp" line="52"/>
         <source>Set list</source>
         <translation>Նշել
 ցանկը</translation>

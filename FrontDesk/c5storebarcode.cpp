@@ -5,6 +5,7 @@
 #include "c5lineedit.h"
 #include "c5checkbox.h"
 #include <QPainter>
+#include <QDebug>
 
 C5StoreBarcode::C5StoreBarcode(const QStringList &dbParams, QWidget *parent) :
     C5Widget(dbParams, parent),
@@ -32,6 +33,14 @@ void C5StoreBarcode::addRow(const QString &name, const QString &barcode, int qty
     ui->tbl->setString(row, 1, barcode);
     ui->tbl->createLineEdit(row, 2)->setInteger(qty);
     ui->tbl->createCheckbox(row, 3)->setChecked(true);
+    C5Database db(fDBParams);
+    db[":f_scancode"] = barcode;
+    db.exec("select * from c_goods where f_scancode=:f_scancode");
+    if (db.nextRow()) {
+        ui->tbl->setDouble(row, 4, db.getDouble("f_saleprice"));
+    } else {
+        ui->tbl->setDouble(row, 4, 0);
+    }
 }
 
 QToolBar *C5StoreBarcode::toolBar()
@@ -45,6 +54,35 @@ QToolBar *C5StoreBarcode::toolBar()
     return fToolBar;
 }
 
+bool C5StoreBarcode::printOneBarcode(const QString &code, const QString &price, QPrintDialog &pd)
+{
+    QPrinter printer(QPrinter::HighResolution);
+    printer.setPrinterName(pd.printer()->printerName());
+    printer.setOrientation(pd.printer()->orientation());
+    QSizeF szf = printer.pageSizeMM();
+    szf = pd.printer()->pageSizeMM();
+    printer.setPageSizeMM(szf);
+    QPrinter::PageSize ps = printer.pageSize();
+    ps = pd.printer()->pageSize();
+    printer.setPageSize(ps);
+    QPainter p(&printer);
+    BarcodeEan13 b;
+    bool r = b.EncodeEan13(code.toLatin1().data());
+    qDebug() << r;
+    QFont f("ArTarumianHandes", 30, QFont::Normal);
+    p.setFont(f);
+    qreal plen = 2.5;
+
+    f.setPointSize(14);
+    f.setBold(true);
+    p.setFont(f);
+    b.DrawBarcode(p, 10, 10, 150, 150, plen);
+
+    return printer.printerState() != QPrinter::Error;
+}
+
+/*
+//ELINA VERSION
 bool C5StoreBarcode::printOneBarcode(const QString &code, QPrintDialog &pd)
 {
     QPrinter printer(QPrinter::HighResolution);
@@ -157,6 +195,7 @@ bool C5StoreBarcode::printOneBarcode(const QString &code, QPrintDialog &pd)
     p.drawText(QPoint(45, 400), "MADE IN ARMENIA");
     return printer.printerState() != QPrinter::Error;
 }
+*/
 
 void C5StoreBarcode::print()
 {
@@ -171,7 +210,7 @@ void C5StoreBarcode::print()
             continue;
         }
         for (int j = 0; j < ui->tbl->lineEdit(i, 2)->getInteger(); j++) {
-            printOneBarcode(ui->tbl->getString(i, 1), pd);
+            printOneBarcode(ui->tbl->getString(i, 1), ui->tbl->getString(i, 4), pd);
             ui->tbl->checkBox(i, 3)->setChecked(false);
         }
     }
