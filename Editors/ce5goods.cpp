@@ -99,7 +99,7 @@ bool CE5Goods::save(QString &err, QList<QMap<QString, QVariant> > &data)
     }
     ui->chEnabled->setChecked(true);
     fStrings.insert(ui->leName->text());
-    static_cast<QStringListModel*>(ui->leName->completer()->model())->setStringList(fStrings.toList());
+    static_cast<QStringListModel*>(ui->leName->completer()->model())->setStringList(fStrings.values());
     return true;
 }
 

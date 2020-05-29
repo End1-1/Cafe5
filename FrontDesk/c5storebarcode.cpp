@@ -14,7 +14,7 @@ C5StoreBarcode::C5StoreBarcode(const QStringList &dbParams, QWidget *parent) :
     ui->setupUi(this);
     fIcon = ":/barcode.png";
     fLabel = tr("Barcode print");
-    ui->tbl->setColumnWidths(4, 300, 300, 80, 30);
+    ui->tbl->setColumnWidths(ui->tbl->columnCount(), 300, 300, 80, 30, 80);
 }
 
 C5StoreBarcode::~C5StoreBarcode()
@@ -61,7 +61,10 @@ bool C5StoreBarcode::printOneBarcode(const QString &code, const QString &price, 
     printer.setOrientation(pd.printer()->orientation());
     QSizeF szf = printer.pageSizeMM();
     szf = pd.printer()->pageSizeMM();
+    szf.setWidth(300);
+//    szf.setHeight(20);
     printer.setPageSizeMM(szf);
+//    printer.setResolution(pd.printer()->resolution());
     QPrinter::PageSize ps = printer.pageSize();
     ps = pd.printer()->pageSize();
     printer.setPageSize(ps);
@@ -69,14 +72,18 @@ bool C5StoreBarcode::printOneBarcode(const QString &code, const QString &price, 
     BarcodeEan13 b;
     bool r = b.EncodeEan13(code.toLatin1().data());
     qDebug() << r;
-    QFont f("ArTarumianHandes", 30, QFont::Normal);
+    QFont f("Arial", 25, QFont::Normal);
     p.setFont(f);
-    qreal plen = 2.5;
+    qreal plen = 2;
 
-    f.setPointSize(14);
+    f.setPointSize(8);
     f.setBold(true);
     p.setFont(f);
-    b.DrawBarcode(p, 10, 10, 150, 150, plen);
+    b.DrawBarcode(p, 100, 10, 80, 80, plen);
+    p.drawText(110, 100, code);
+    f.setPointSize(10);
+    p.setFont(f);
+    p.drawText(110, 140, price + " AMD");
 
     return printer.printerState() != QPrinter::Error;
 }

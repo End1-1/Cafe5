@@ -5,6 +5,7 @@
 #include "c5mainwindow.h"
 #include "cr5goodsfilter.h"
 #include "c5goodspricing.h"
+#include <math.h>
 
 CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)

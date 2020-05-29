@@ -9,7 +9,7 @@
 
 class Barcode39;
 class Barcode93;
-class BarcodeIof5;
+class BarcodeI2of5;
 class Barcode128;
 
 const int ga2_Code128[2][207]=
@@ -97,6 +97,7 @@ public:
 	{
 		i_Ratio=iRatio;
 		if(i_Ratio<=0)	i_Ratio=1;
+        return i_Ratio;
 	}
 
     void DrawBarcode(QPainter &pr, qreal iX, qreal iY0, qreal iY10, qreal iY11, qreal iPenW) {
