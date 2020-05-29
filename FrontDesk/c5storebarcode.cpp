@@ -75,6 +75,7 @@ bool C5StoreBarcode::printOneBarcode(const QString &code, const QString &price, 
     QPainter p(&printer);
     BarcodeEan13 b;
     bool r = b.EncodeEan13(code.toLatin1().data());
+    Barcode bb;
     qDebug() << r;
     QFont f("Arial", 25, QFont::Normal);
     p.setFont(f);
@@ -84,7 +85,7 @@ bool C5StoreBarcode::printOneBarcode(const QString &code, const QString &price, 
     f.setBold(true);
     p.setFont(f);
     b.DrawBarcode(p, 100, 10, 80, 80, plen);
-    p.drawText(110, 100, code);
+    p.drawText(110, 100, code + QString::number(bb.ean13CheckSum(code)));
     f.setPointSize(10);
     p.setFont(f);
     p.drawText(110, 140, price + " AMD");
@@ -250,7 +251,7 @@ void C5StoreBarcode::printDescriptions()
             printer.setOrientation(pd.printer()->orientation());
             QSizeF szf = printer.pageSizeMM();
             szf = pd.printer()->pageSizeMM();
-            szf.setWidth(300);
+            szf.setWidth(250);
         //    szf.setHeight(20);
             printer.setPageSizeMM(szf);
             QPrinter::PageSize ps = printer.pageSize();
@@ -259,7 +260,7 @@ void C5StoreBarcode::printDescriptions()
             QPainter p(&printer);
             QFont f("Arial", 4, QFont::Normal);
             p.setFont(f);
-            QRectF tr(0, 0, 300, 200);
+            QRectF tr(80, 0, 250, 200);
             QTextOption to;
             to.setWrapMode(QTextOption::WordWrap);
             p.drawText (tr, ui->tbl->getString(i, 5), to);
