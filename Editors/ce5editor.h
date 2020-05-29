@@ -9,6 +9,7 @@ class C5LineEditWithSelector;
 class C5CheckBox;
 class C5DateEdit;
 class C5ComboBox;
+class QPlainTextEdit;
 
 class CE5Editor : public C5Widget
 {
@@ -61,6 +62,8 @@ private:
     QSet<C5CheckBox*> fChecks;
 
     QSet<C5DateEdit*> fDates;
+
+    QSet<QPlainTextEdit*> fPlainText;
 };
 
 #endif // CE5EDITOR_H

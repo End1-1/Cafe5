@@ -7,6 +7,7 @@
 #include "c5message.h"
 #include "ce5goodsclass.h"
 #include "c5selector.h"
+#include "barcode.h"
 #include <QClipboard>
 #include <QFontDatabase>
 #include <QCompleter>
@@ -39,6 +40,8 @@ CE5Goods::CE5Goods(const QStringList &dbParams, QWidget *parent) :
     QCompleter *c = new QCompleter(m);
     c->setCaseSensitivity(Qt::CaseInsensitive);
     ui->leName->setCompleter(c);
+    fBarcode = new Barcode();
+    ui->lbScancodeType->setVisible(false);
 }
 
 CE5Goods::~CE5Goods()
@@ -407,5 +410,26 @@ void CE5Goods::on_tabWidget_currentChanged(int index)
             }
         }
     }
+    }
+}
+
+void CE5Goods::on_leScanCode_textChanged(const QString &arg1)
+{
+    if (fBarcode->isEan13(arg1)) {
+        ui->lbScancodeType->setVisible(true);
+        ui->lbScancodeType->setText("EAN13");
+        ui->btnSetControlSum->setVisible(false);
+    } else {
+        ui->lbScancodeType->setVisible(false);
+        ui->btnSetControlSum->setVisible(true);
+        ui->btnSetControlSum->setEnabled(arg1.length() == 12);
+    }
+}
+
+void CE5Goods::on_btnSetControlSum_clicked()
+{
+    int checksum = fBarcode->ean13CheckSum(ui->leScanCode->text());
+    if (checksum > -1) {
+        ui->leScanCode->setText(ui->leScanCode->text() + QString::number(checksum));
     }
 }

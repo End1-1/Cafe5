@@ -41,6 +41,11 @@
        <string>Price</string>
       </property>
      </column>
+     <column>
+      <property name="text">
+       <string>Description</string>
+      </property>
+     </column>
     </widget>
    </item>
   </layout>

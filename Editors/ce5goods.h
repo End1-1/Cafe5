@@ -7,6 +7,8 @@ namespace Ui {
 class CE5Goods;
 }
 
+class Barcode;
+
 class CE5Goods : public CE5Editor
 {
     Q_OBJECT
@@ -65,6 +67,10 @@ private slots:
 
     void on_tabWidget_currentChanged(int index);
 
+    void on_leScanCode_textChanged(const QString &arg1);
+
+    void on_btnSetControlSum_clicked();
+
 private:
     Ui::CE5Goods *ui;
 
@@ -73,6 +79,8 @@ private:
     void countTotal();
 
     QSet<QString> fStrings;
+
+    Barcode *fBarcode;
 };
 
 #endif // CE5GOODS_H

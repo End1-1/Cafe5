@@ -29,6 +29,8 @@ private:
 private slots:
     void print();
 
+    void printDescriptions();
+
     void setList();
 
 };

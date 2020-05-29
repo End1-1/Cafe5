@@ -85,5 +85,6 @@
         <file>reset.png</file>
         <file>restore.png</file>
         <file>cleardb.sql</file>
+        <file>print_description.png</file>
     </qresource>
 </RCC>

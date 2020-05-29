@@ -6,6 +6,7 @@
 #include "c5combobox.h"
 #include "c5selector.h"
 #include <QValidator>
+#include <QPlainTextEdit>
 
 CE5Editor::CE5Editor(const QStringList &dbParams, QWidget *parent) :
     C5Widget(dbParams, parent)
@@ -95,6 +96,15 @@ void CE5Editor::setId(int id)
                     }
                 }
             }
+            if (!found) {
+                foreach (QPlainTextEdit *pt, fPlainText) {
+                    if (pt->property("Field").toString() == colName) {
+                        pt->setPlainText(db.getString(i));
+                        found = true;
+                        break;
+                    }
+                }
+            }
         }
     } else {
         C5Message::error(tr("Invalid code"));
@@ -168,6 +178,10 @@ bool CE5Editor::save(QString &err, QList<QMap<QString, QVariant> > &data)
             db[":" + cb->property("Field").toString()] = cb->currentText();
             row[cb->property("Field").toString()] = cb->currentText();
         }
+    }
+    foreach (QPlainTextEdit *pt, fPlainText) {
+        db[":" + pt->property("Field").toString()] = pt->toPlainText();
+        row[pt->property("Field").toString()] = pt->toPlainText();
     }
     if (leId->getInteger() == 0) {
         db[":f_id"] = 0;
@@ -257,9 +271,15 @@ void CE5Editor::clear()
                 le->setInteger(-1);
             }
         }
+        if (le->property("Default").isValid()) {
+            le->setText(le->property("Default").toString());
+        }
     }
     foreach (C5ComboBox *cb, fCombos) {
         cb->setCurrentIndex(-1);
+    }
+    foreach (QPlainTextEdit *pt, fPlainText) {
+        pt->clear();
     }
     focusFirst();
 }
@@ -280,6 +300,7 @@ void CE5Editor::getLineEdit(QObject *parent)
     C5CheckBox *ch = nullptr;
     C5DateEdit *de = nullptr;
     C5ComboBox *cb = nullptr;
+    QPlainTextEdit *pt = nullptr;
     QObjectList ol = parent->children();
     foreach (QObject *o, ol) {
         if (o->children().count() > 0) {
@@ -303,6 +324,10 @@ void CE5Editor::getLineEdit(QObject *parent)
                     break;
                 }
             }
+            if (le->property("Default").isValid()) {
+                QVariant v = le->property("Default");
+                le->setText(v.toString());
+            }
             fLines << le;
         } else if (ch = dynamic_cast<C5CheckBox*>(o)) {
             fChecks << ch;
@@ -310,6 +335,8 @@ void CE5Editor::getLineEdit(QObject *parent)
             fDates << de;
         } else if (cb = dynamic_cast<C5ComboBox*>(o)) {
             fCombos << cb;
+        } else if (pt = dynamic_cast<QPlainTextEdit*>(o)) {
+            fPlainText << pt;
         }
     }
 }

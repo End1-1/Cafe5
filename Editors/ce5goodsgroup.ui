@@ -22,6 +22,9 @@
      <property name="Type" stdset="0">
       <number>1</number>
      </property>
+     <property name="Default" stdset="0">
+      <string>1</string>
+     </property>
     </widget>
    </item>
    <item row="0" column="2">
@@ -93,6 +96,9 @@
     <widget class="C5LineEditWithSelector" name="lineEdit_5">
      <property name="Field" stdset="0">
       <string>f_chargevalue</string>
+     </property>
+     <property name="Default" stdset="0">
+      <string>0</string>
      </property>
     </widget>
    </item>

@@ -1,5 +1,6 @@
 #include "c5storebarcode.h"
 #include "ui_c5storebarcode.h"
+#include "barcode.h"
 #include "barcode5.h"
 #include "c5storebarcodelist.h"
 #include "c5lineedit.h"
@@ -14,7 +15,7 @@ C5StoreBarcode::C5StoreBarcode(const QStringList &dbParams, QWidget *parent) :
     ui->setupUi(this);
     fIcon = ":/barcode.png";
     fLabel = tr("Barcode print");
-    ui->tbl->setColumnWidths(ui->tbl->columnCount(), 300, 300, 80, 30, 80);
+    ui->tbl->setColumnWidths(ui->tbl->columnCount(), 300, 300, 80, 30, 80, 200);
 }
 
 C5StoreBarcode::~C5StoreBarcode()
@@ -38,8 +39,10 @@ void C5StoreBarcode::addRow(const QString &name, const QString &barcode, int qty
     db.exec("select * from c_goods where f_scancode=:f_scancode");
     if (db.nextRow()) {
         ui->tbl->setDouble(row, 4, db.getDouble("f_saleprice"));
+        ui->tbl->setString(row, 5, db.getString("f_description"));
     } else {
         ui->tbl->setDouble(row, 4, 0);
+        ui->tbl->setString(row, 5, "");
     }
 }
 
@@ -49,6 +52,7 @@ QToolBar *C5StoreBarcode::toolBar()
         QList<ToolBarButtons> btn;
         btn << ToolBarButtons::tbPrint;
         createStandartToolbar(btn);
+        fToolBar->addAction(QIcon(":/print_description.png"), tr("Print\ndescriptions"), this, SLOT(printDescriptions()));
         fToolBar->addAction(QIcon(":/show_list.png"), tr("Set list"), this, SLOT(setList()));
     }
     return fToolBar;
@@ -216,10 +220,51 @@ void C5StoreBarcode::print()
         if (!ui->tbl->checkBox(i, 3)->isChecked()) {
             continue;
         }
+        Barcode bc;
         for (int j = 0; j < ui->tbl->lineEdit(i, 2)->getInteger(); j++) {
-            printOneBarcode(ui->tbl->getString(i, 1), ui->tbl->getString(i, 4), pd);
+            QString code = ui->tbl->getString(i, 1);
+            if (bc.isEan13(code)) {
+                code = code.left(code.length() - 1);
+            }
+            printOneBarcode(code, ui->tbl->getString(i, 4), pd);
             ui->tbl->checkBox(i, 3)->setChecked(false);
         }
+    }
+}
+
+void C5StoreBarcode::printDescriptions()
+{
+    QPrintDialog pd;
+    if (pd.exec() == QDialog::Accepted) {
+
+    } else {
+        return;
+    }
+    for (int i = 0; i < ui->tbl->rowCount(); i++) {
+        if (!ui->tbl->checkBox(i, 3)->isChecked()) {
+            continue;
+        }
+        for (int j = 0; j < ui->tbl->lineEdit(i, 2)->getInteger(); j++) {
+            QPrinter printer(QPrinter::HighResolution);
+            printer.setPrinterName(pd.printer()->printerName());
+            printer.setOrientation(pd.printer()->orientation());
+            QSizeF szf = printer.pageSizeMM();
+            szf = pd.printer()->pageSizeMM();
+            szf.setWidth(300);
+        //    szf.setHeight(20);
+            printer.setPageSizeMM(szf);
+            QPrinter::PageSize ps = printer.pageSize();
+            ps = pd.printer()->pageSize();
+            printer.setPageSize(ps);
+            QPainter p(&printer);
+            QFont f("Arial", 4, QFont::Normal);
+            p.setFont(f);
+            QRectF tr(0, 0, 300, 200);
+            QTextOption to;
+            to.setWrapMode(QTextOption::WordWrap);
+            p.drawText (tr, ui->tbl->getString(i, 5), to);
+        }
+        ui->tbl->checkBox(i, 3)->setChecked(false);
     }
 }
 
