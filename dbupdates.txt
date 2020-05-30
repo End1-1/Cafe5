@@ -440,6 +440,10 @@ ALTER TABLE `a_store` ADD CONSTRAINT `fk_header`  FOREIGN KEY (`f_document`)  RE
 alter table c_groups add column f_chargevalue decimal(14,3);
 alter table o_goods add f_return smallint default 0;
 
+/* DB - 24*/
+alter table c_goods add column f_description text;
+update s_app set f_version ='24' where f_app='DB';
+
 
 
 

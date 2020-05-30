@@ -260,7 +260,7 @@ void C5StoreBarcode::printDescriptions()
             QPainter p(&printer);
             QFont f("Arial", 6, QFont::Normal);
             p.setFont(f);
-            QRectF tr(80, 20, 200, 200);
+            QRectF tr(80, 20>, 200, 200);
             QTextOption to;
             to.setWrapMode(QTextOption::WordWrap);
             p.drawText (tr, ui->tbl->getString(i, 5), to);

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>685</width>
+    <width>848</width>
     <height>443</height>
    </rect>
   </property>
@@ -41,6 +41,12 @@
        </property>
        <item row="8" column="1">
         <widget class="C5LineEditWithSelector" name="leClass2">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="maximumSize">
           <size>
            <width>100</width>
@@ -57,6 +63,12 @@
        </item>
        <item row="1" column="1">
         <widget class="C5LineEditWithSelector" name="leSupplier">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="maximumSize">
           <size>
            <width>100</width>
@@ -187,6 +199,12 @@
        </item>
        <item row="9" column="1">
         <widget class="C5LineEditWithSelector" name="leClass3">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="maximumSize">
           <size>
            <width>100</width>
@@ -250,6 +268,12 @@
        </item>
        <item row="15" column="5">
         <widget class="C5LineEditWithSelector" name="lineEdit_6">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="maximumSize">
           <size>
            <width>100</width>
@@ -339,6 +363,12 @@
        </item>
        <item row="5" column="1">
         <widget class="C5LineEditWithSelector" name="leGroup">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="maximumSize">
           <size>
            <width>100</width>
@@ -388,6 +418,12 @@
        </item>
        <item row="15" column="3">
         <widget class="C5LineEditWithSelector" name="lineEdit_7">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="maximumSize">
           <size>
            <width>100</width>
@@ -574,6 +610,12 @@
        </item>
        <item row="7" column="1">
         <widget class="C5LineEditWithSelector" name="leClass1">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="maximumSize">
           <size>
            <width>100</width>
@@ -590,6 +632,12 @@
        </item>
        <item row="15" column="7">
         <widget class="C5LineEditWithSelector" name="leLowLevel">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="maximumSize">
           <size>
            <width>100</width>
@@ -606,6 +654,12 @@
        </item>
        <item row="6" column="1">
         <widget class="C5LineEditWithSelector" name="leUnit">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="maximumSize">
           <size>
            <width>100</width>
@@ -622,6 +676,12 @@
        </item>
        <item row="10" column="1">
         <widget class="C5LineEditWithSelector" name="leClass4">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="maximumSize">
           <size>
            <width>100</width>
@@ -638,6 +698,12 @@
        </item>
        <item row="15" column="1">
         <widget class="C5LineEditWithSelector" name="lineEdit_5">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="maximumSize">
           <size>
            <width>100</width>
@@ -654,6 +720,12 @@
        </item>
        <item row="0" column="1">
         <widget class="C5LineEditWithSelector" name="leCode">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="maximumSize">
           <size>
            <width>100</width>
