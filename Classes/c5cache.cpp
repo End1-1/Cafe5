@@ -24,7 +24,7 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         fCacheQuery[cache_goods_group] = QString("select f_id as `%1`, f_name as `%2` from c_groups")
                 .arg(tr("Code"))
                 .arg(tr("Name"));
-        fCacheQuery[cache_goods] = QString("select g.f_id as `%1`, gg.f_name as `%2`, trim(concat(g.f_name, ' ', g.f_scancode)) as `%3`, u.f_name as `%4`, \
+        fCacheQuery[cache_goods] = QString("select g.f_id as `%1`, gg.f_name as `%2`, concat(g.f_name, if(g.f_scancode is null, '', concat(' ', g.f_scancode))) as `%3`, u.f_name as `%4`, \
                                            g.f_scancode as `%5` \
                                            from c_goods g \
                                            left join c_groups gg on gg.f_id=g.f_group \

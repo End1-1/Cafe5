@@ -2,6 +2,7 @@
 #define WORKING_H
 
 #include "goods.h"
+#include "c5storedraftwriter.h"
 #include <QWidget>
 
 namespace Ui {
@@ -33,9 +34,13 @@ public:
 
     bool getAdministratorRights();
 
+    void decQty(const IGoods &g);
+
     static QMap<QString, Goods> fGoods;
 
     static QHash<int, QString> fGoodsCodeForPrint;
+
+    static QHash<QString, int> fGoodsRows;
 
     QList<IUser> fCurrentUsers;
 
@@ -43,8 +48,6 @@ public:
 
 private:
     Ui::Working *ui;
-
-    void getGoodsList();
 
     void makeWGoods();
 
@@ -60,8 +63,12 @@ private:
 
     bool fHaveChanges;
 
+    bool fUpFinished;
+
 private slots:
     void timeout();
+
+    void uploadDataFinished();
 
     void escape();
 

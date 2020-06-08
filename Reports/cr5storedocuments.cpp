@@ -68,11 +68,6 @@ QToolBar *CR5StoreDocuments::toolBar()
     return fToolBar;
 }
 
-void CR5StoreDocuments::setPartnersFilter(int partner)
-{
-    fFilter->setPartnerFilter(partner);
-}
-
 bool CR5StoreDocuments::tblDoubleClicked(int row, int column, const QList<QVariant> &values)
 {
     Q_UNUSED(row);

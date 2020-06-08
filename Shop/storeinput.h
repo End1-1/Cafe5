@@ -13,9 +13,12 @@ class StoreInput : public QDialog
 
 public:
     explicit StoreInput(QWidget *parent = nullptr);
+
     ~StoreInput();
 
 private slots:
+    void checkboxCheck(bool v);
+
     void on_btnView_clicked();
 
     void on_btnAccept_clicked();
@@ -32,6 +35,12 @@ private slots:
 
     void on_leFilter_textChanged(const QString &arg1);
 
+    void on_chAll_clicked(bool checked);
+
+    void on_btnStore_clicked();
+
+    void on_btnStoreGoods_clicked();
+
 private:
     Ui::StoreInput *ui;
 
@@ -41,9 +50,15 @@ private:
 
     void history();
 
+    void storeByGroup();
+
+    void storeByItems();
+
     void changeDate(int d);
 
     void refresh();
+
+    void disableMenuButtons(QPushButton *b);
 };
 
 #endif // STOREINPUT_H

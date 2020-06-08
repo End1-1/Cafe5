@@ -126,6 +126,38 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="btnStore">
+        <property name="styleSheet">
+         <string notr="true">                QPushButton:checked{
+                    background-color: rgb(0, 150, 0);
+					font-weight:bold;
+                }</string>
+        </property>
+        <property name="text">
+         <string>Store by groups</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnStoreGoods">
+        <property name="styleSheet">
+         <string notr="true">                QPushButton:checked{
+                    background-color: rgb(0, 150, 0);
+					font-weight:bold;
+                }</string>
+        </property>
+        <property name="text">
+         <string>Store by goods</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="btnHistoryMode">
         <property name="styleSheet">
          <string notr="true">                QPushButton:checked{
@@ -226,6 +258,25 @@
    <item>
     <widget class="QWidget" name="widget_2" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QCheckBox" name="chAll">
+        <property name="text">
+         <string>Check all</string>
+        </property>
+       </widget>
+      </item>
       <item>
        <spacer name="horizontalSpacer_2">
         <property name="orientation">
@@ -238,6 +289,51 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Checked rows/qty</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="C5LineEdit" name="leRows">
+        <property name="minimumSize">
+         <size>
+          <width>80</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>80</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="C5LineEdit" name="leQty">
+        <property name="minimumSize">
+         <size>
+          <width>80</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>80</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QLabel" name="label">

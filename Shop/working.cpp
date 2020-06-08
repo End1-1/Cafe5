@@ -20,6 +20,7 @@
 
 QMap<QString, Goods> Working::fGoods;
 QHash<int, QString> Working::fGoodsCodeForPrint;
+QHash<QString, int> Working::fGoodsRows;
 static QSettings __s(QString("%1\\%2\\%3").arg(_ORGANIZATION_).arg(_APPLICATION_).arg(_MODULE_));
 
 Working::Working(QWidget *parent) :
@@ -55,7 +56,7 @@ Working::Working(QWidget *parent) :
     connect(sDown, SIGNAL(activated()), this, SLOT(shortcutDown()));
     connect(sUp, SIGNAL(activated()), this, SLOT(shortcutUp()));
     connect(sEsc, SIGNAL(activated()), this, SLOT(escape()));
-    getGoodsList();
+    makeWGoods();
     ui->leCode->installEventFilter(this);
     ui->tab->installEventFilter(this);
     on_btnNewOrder_clicked();
@@ -72,6 +73,7 @@ Working::Working(QWidget *parent) :
         loadStaff();
     }
     fHaveChanges = false;
+    fUpFinished = true;
     fTab = ui->tab;
 }
 
@@ -188,11 +190,12 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
                 db[":f_hall"] = __c5config.defaultHall();
                 db[":f_datecash"] = QDate::currentDate();
                 db[":f_state"] = ORDER_STATE_CLOSE;
-                db.exec("select concat(w.f_last, ' ', w.f_first) as f_staff,"
+                db.exec("select concat(w.f_last, ' ', w.f_first) as f_staff, if(f_amounttotal<0,-1,1) as f_sign,"
                         "sum(oh.f_amounttotal) as f_amounttotal "
                         "from o_header oh "
                         "left join s_user w on w.f_id=oh.f_staff  "
-                        "where oh.f_hall=:f_hall and oh.f_datecash=:f_datecash  and oh.f_state=:f_state  group by concat(w.f_last, ' ', w.f_first)");
+                        "where oh.f_hall=:f_hall and oh.f_datecash=:f_datecash  and oh.f_state=:f_state "
+                        "group by 1, 2");
                 QString info = tr("Total today") + "<br>";
                 while (db.nextRow()) {
                     info += QString("%1: %2<br>").arg(db.getString("f_staff")).arg(float_str(db.getDouble("f_amounttotal"), 2));
@@ -251,9 +254,12 @@ bool Working::getAdministratorRights()
     return true;
 }
 
-void Working::getGoodsList()
+void Working::decQty(const IGoods &g)
 {
-    makeWGoods();
+    QString code = fGoodsCodeForPrint[g.goodsId];
+    int row = fGoodsRows[code];
+    ui->tblGoods->setDouble(row, 14, ui->tblGoods->getDouble(row, 14) - g.goodsQty);
+    fGoods[code].fQty -= g.goodsQty;
 }
 
 void Working::makeWGoods()
@@ -293,7 +299,7 @@ void Working::makeWGoods()
                     "left join c_goods_classes gcc on gcc.f_id=g.f_group3 "
                     "left join c_goods_classes gcd on gcd.f_id=g.f_group4 "
                     "left join c_partners cp on cp.f_id=g.f_supplier "
-                    "where s.f_store=:f_store  ");
+                    "where s.f_store=:f_store and s.f_qty>0 ");
         } else {
             db[":f_store"] = C5Config::defaultStore();
             db[":f_date"] = QDate::currentDate();
@@ -312,7 +318,7 @@ void Working::makeWGoods()
                     "left join c_goods_classes gcd on gcd.f_id=g.f_group4 "
                     "left join c_partners cp on cp.f_id=g.f_supplier "
                     "inner join a_header h on h.f_id=s.f_document "
-                    "where h.f_date<=:f_date and s.f_store=:f_store and h.f_state=:f_state and g.f_enabled=1 and h.f_state=:f_state "
+                    "where h.f_date<=:f_date and s.f_store=:f_store and h.f_state=:f_state and g.f_enabled=1 "
                     "group by g.f_id,gg.f_name,g.f_name,g.f_lastinputprice,g.f_saleprice "
                     "having sum(s.f_qty*s.f_type) > 0 ");
         }
@@ -350,6 +356,7 @@ void Working::makeWGoods()
         g.fIsService = false;
         fGoods[g.fScanCode] = g;
         fGoodsCodeForPrint[g.fCode.toInt()] = g.fScanCode;
+        fGoodsRows[g.fScanCode] = row;
         for (int i = 0; i < db.columnCount(); i++) {
             QTableWidgetItem *item = new QTableWidgetItem();
             item->setData(Qt::EditRole, db.getValue(i));
@@ -544,20 +551,22 @@ void Working::timeout()
 {
     fTimerCounter++;
     if (__c5config.rdbReplica()) {
-        if (fTimerCounter % 20 == 0) {
-            auto *r = new C5Replication();
-            r->start(SLOT(uploadToServer()));
+        if (fTimerCounter % 20 == 0 && fUpFinished && __c5config.rdbReplica()) {
+//            fUpFinished = false;
+//            auto *r = new C5Replication();
+//            connect(r, SIGNAL(finished()), this, SLOT(uploadDataFinished()));
+//            r->start(SLOT(uploadToServer()));
         }
-        if (fTimerCounter % 120 == 0) {
-            auto *r = new C5Replication();
-            connect(r, SIGNAL(haveChanges(bool)), this, SLOT(haveChanges(bool)));
-            r->start(SLOT(downloadFromServer()));
-        }
+//        if (fTimerCounter % 120 == 0) {
+//            auto *r = new C5Replication();
+//            connect(r, SIGNAL(haveChanges(bool)), this, SLOT(haveChanges(bool)));
+//            r->start(SLOT(downloadFromServer()));
+//        }
 
     }
-    if (fTimerCounter % 180 == 0) {
-        getGoodsList();
-    }
+//    if (fTimerCounter % 180 == 0) {
+//        getGoodsList();
+//    }
     if (fHaveChanges) {
         QString style = "background: green;";
         switch (fTimerCounter % 4) {
@@ -577,6 +586,11 @@ void Working::timeout()
         }
         w->changeIshmarColor(style);
     }
+}
+
+void Working::uploadDataFinished()
+{
+    fUpFinished = true;
 }
 
 void Working::escape()
@@ -758,7 +772,6 @@ void Working::on_btnSaveOrder_clicked()
     if (!w->writeOrder()) {
         return;
     }
-    getGoodsList();
     ui->tab->removeTab(ui->tab->currentIndex());
     if (ui->tab->count() == 0) {
         on_btnNewOrder_clicked();
@@ -777,7 +790,6 @@ void Working::on_btnSaveOrderNoTax_clicked()
     if (!w->writeOrder(false)) {
         return;
     }
-    getGoodsList();
     ui->tab->removeTab(ui->tab->currentIndex());
     if (ui->tab->count() == 0) {
         on_btnNewOrder_clicked();

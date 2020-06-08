@@ -59,7 +59,7 @@ void C5Replication::downloadDataFromServer(const QStringList &src, const QString
     int lastid = db.getInt(0);
     QStringList tl;
     dr.exec("select * from s_syncronize_in order by f_id");
-    while (dr.nextRow()) {
+     while (dr.nextRow()) {
         tl.append(dr.getString("f_table"));
     }
     steps = 2;
@@ -147,6 +147,9 @@ void C5Replication::downloadDataFromServer(const QStringList &src, const QString
 bool C5Replication::uploadDataToServer(const QStringList &src, const QStringList &dst)
 {
     C5Database dr(dst);
+    if (!dr.open()) {
+        return false;
+    }
     C5Database db(src);
     QStringList idlist;
     db.exec("select f_id from o_header");

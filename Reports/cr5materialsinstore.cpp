@@ -60,6 +60,10 @@ void CR5MaterialsInStore::prepareDrafts()
                     << "inner join c_units u on u.f_id=g.f_unit [u]"
                     << "inner join c_groups gg on gg.f_id=g.f_group [gg]"
                     << "inner join c_goods g on g.f_id=s.f_goods [g]"
+                    << "left join c_goods_classes gca on gca.f_id=g.f_group1 [gca]"
+                    << "left join c_goods_classes gcb on gca.f_id=g.f_group2 [gcb]"
+                    << "left join c_goods_classes gcc on gca.f_id=g.f_group3 [gcc]"
+                    << "left join c_goods_classes gcd on gca.f_id=g.f_group4 [gcd]"
                        ;
 
     fColumnsFields << "g.f_id as f_code"
@@ -67,6 +71,10 @@ void CR5MaterialsInStore::prepareDrafts()
                    << "gg.f_name as f_group"
                    << "g.f_name as f_goods"
                    << "g.f_scancode"
+                   << "gca.f_name as f_class1"
+                   << "gcb.f_name as f_class2"
+                   << "gcc.f_name as f_class3"
+                   << "gcd.f_name as f_class4"
                    << "sum(s.f_qty*s.f_type) as f_qty"
                    << "u.f_name as f_unit"
                    << "g.f_lastinputprice"
@@ -87,6 +95,10 @@ void CR5MaterialsInStore::prepareDrafts()
                    << "g.f_lowlevel"
                    << "g.f_saleprice"
                    << "g.f_saleprice2"
+                   << "gca.f_name as f_class1"
+                   << "gcb.f_name as f_class2"
+                   << "gcc.f_name as f_class3"
+                   << "gcd.f_name as f_class4"
                       ;
 
     fColumnsSum << "f_qty"
@@ -111,6 +123,10 @@ void CR5MaterialsInStore::prepareDrafts()
     fTranslation["f_totalsale"] = tr("Retail amount");
     fTranslation["f_saleprice2"] = tr("Whosale price");
     fTranslation["f_totalsale2"] = tr("Whosale amount");
+    fTranslation["f_class1"] = tr("Class 1");
+    fTranslation["f_class2"] = tr("Class 2");
+    fTranslation["f_class3"] = tr("Class 3");
+    fTranslation["f_class4"] = tr("Class 4");
 
     fColumnsVisible["g.f_id as f_code"] = true;
     fColumnsVisible["ss.f_name as f_storage"] = true;
@@ -126,6 +142,10 @@ void CR5MaterialsInStore::prepareDrafts()
     fColumnsVisible["sum(s.f_qty*s.f_type)*g.f_saleprice as f_totalsale"] = false;
     fColumnsVisible["g.f_saleprice2"] = false;
     fColumnsVisible["sum(s.f_qty*s.f_type)*g.f_saleprice2 as f_totalsale2"] = false;
+    fColumnsVisible["gca.f_name as f_class1"] = false;
+    fColumnsVisible["gcb.f_name as f_class2"] = false;
+    fColumnsVisible["gcc.f_name as f_class3"] = false;
+    fColumnsVisible["gcd.f_name as f_class4"] = false;
     restoreColumnsVisibility();
 }
 
@@ -145,6 +165,10 @@ void CR5MaterialsInStore::prepareNoDrafts()
                     << "inner join c_units u on u.f_id=g.f_unit [u]"
                     << "inner join c_groups gg on gg.f_id=g.f_group [gg]"
                     << "inner join c_goods g on g.f_id=s.f_goods [g]"
+                    << "left join c_goods_classes gca on gca.f_id=g.f_group1 [gca]"
+                    << "left join c_goods_classes gcb on gca.f_id=g.f_group2 [gcb]"
+                    << "left join c_goods_classes gcc on gca.f_id=g.f_group3 [gcc]"
+                    << "left join c_goods_classes gcd on gca.f_id=g.f_group4 [gcd]"
                        ;
 
     fColumnsFields << "g.f_id as f_code"
@@ -152,6 +176,10 @@ void CR5MaterialsInStore::prepareNoDrafts()
                    << "gg.f_name as f_group"
                    << "g.f_name as f_goods"
                    << "g.f_scancode"
+                   << "gca.f_name as f_class1"
+                   << "gcb.f_name as f_class2"
+                   << "gcc.f_name as f_class3"
+                   << "gcd.f_name as f_class4"
                    << "sum(s.f_qty*s.f_type) as f_qty"
                    << "u.f_name as f_unit"
                    << "s.f_price"
@@ -172,6 +200,10 @@ void CR5MaterialsInStore::prepareNoDrafts()
                    << "g.f_lowlevel"
                    << "g.f_saleprice"
                    << "g.f_saleprice2"
+                   << "gca.f_name as f_class1"
+                   << "gcb.f_name as f_class2"
+                   << "gcc.f_name as f_class3"
+                   << "gcd.f_name as f_class4"
                       ;
 
     fColumnsSum << "f_qty"
@@ -196,6 +228,11 @@ void CR5MaterialsInStore::prepareNoDrafts()
     fTranslation["f_totalsale"] = tr("Retail amount");
     fTranslation["f_saleprice2"] = tr("Whosale price");
     fTranslation["f_totalsale2"] = tr("Whosale amount");
+    fTranslation["f_class1"] = tr("Class 1");
+    fTranslation["f_class2"] = tr("Class 2");
+    fTranslation["f_class3"] = tr("Class 3");
+    fTranslation["f_class4"] = tr("Class 4");
+
 
     fColumnsVisible["g.f_id as f_code"] = true;
     fColumnsVisible["ss.f_name as f_storage"] = true;
@@ -211,6 +248,10 @@ void CR5MaterialsInStore::prepareNoDrafts()
     fColumnsVisible["sum(s.f_qty*s.f_type)*g.f_saleprice as f_totalsale"] = false;
     fColumnsVisible["g.f_saleprice2"] = false;
     fColumnsVisible["sum(s.f_qty*s.f_type)*g.f_saleprice2 as f_totalsale2"] = false;
+    fColumnsVisible["gca.f_name as f_class1"] = false;
+    fColumnsVisible["gcb.f_name as f_class2"] = false;
+    fColumnsVisible["gcc.f_name as f_class3"] = false;
+    fColumnsVisible["gcd.f_name as f_class4"] = false;
     restoreColumnsVisibility();
 }
 

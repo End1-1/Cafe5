@@ -72,7 +72,7 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QTableWidget" name="tblGoods">
+       <widget class="C5TableWidget" name="tblGoods">
         <property name="font">
          <font>
           <pointsize>12</pointsize>
@@ -90,7 +90,7 @@ color:white;font-size:13pt;
 };</string>
         </property>
         <property name="verticalScrollBarPolicy">
-         <enum>Qt::ScrollBarAsNeeded</enum>
+         <enum>Qt::ScrollBarAlwaysOn</enum>
         </property>
         <property name="horizontalScrollBarPolicy">
          <enum>Qt::ScrollBarAlwaysOff</enum>
@@ -108,10 +108,10 @@ color:white;font-size:13pt;
          <bool>false</bool>
         </property>
         <attribute name="horizontalHeaderVisible">
-         <bool>true</bool>
+         <bool>false</bool>
         </attribute>
         <attribute name="verticalHeaderVisible">
-         <bool>true</bool>
+         <bool>false</bool>
         </attribute>
         <column>
          <property name="text">
@@ -754,6 +754,11 @@ Esc
    <class>C5LineEdit</class>
    <extends>QLineEdit</extends>
    <header>c5lineedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5TableWidget</class>
+   <extends>QTableWidget</extends>
+   <header location="global">c5tablewidget.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

@@ -17,9 +17,16 @@ CR5CostumerDebtsFilter::~CR5CostumerDebtsFilter()
 
 QString CR5CostumerDebtsFilter::condition()
 {
-    QString cond = QString(" cd.f_date between %1 and %2")
+    QString cond;
+    if (ui->chShowTotal->isChecked()) {
+        cond = QString(" cd.f_date between '%1' and '%2'")
+            .arg(QDate::fromString("2000-01-01", FORMAT_DATE_TO_STR_MYSQL).toString(FORMAT_DATE_TO_STR_MYSQL))
+            .arg(QDate::currentDate().toString(FORMAT_DATE_TO_STR_MYSQL));
+    } else {
+        cond = QString(" cd.f_date between %1 and %2")
             .arg(ui->deStart->toMySQLDate())
             .arg(ui->deEnd->toMySQLDate());
+    }
     if (!ui->leCostumer->isEmpty()) {
         cond += " and cd.f_costumer in (" + ui->leCostumer->text() + ") ";
     }
@@ -30,4 +37,9 @@ QString CR5CostumerDebtsFilter::condition()
         cond += " and cd.f_amount>0 ";
     }
     return cond;
+}
+
+bool CR5CostumerDebtsFilter::isTotal()
+{
+    return ui->chShowTotal->isChecked();
 }

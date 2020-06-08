@@ -444,6 +444,20 @@ alter table o_goods add f_return smallint default 0;
 alter table c_goods add column f_description text;
 update s_app set f_version ='24' where f_app='DB';
 
+/* DB - 25*/
+/* check select f_scancode, count(f_scancode) from c_goods group by 1  */
+ALTER TABLE `a_header_shop2partneraccept` CHANGE COLUMN `f_id` `f_id` CHAR(36) NOT NULL , ADD PRIMARY KEY (`f_id`);
+update c_goods set f_scancode=null where f_scancode='';
+ALTER TABLE `c_goods` CHANGE COLUMN `f_scancode` `f_scancode` VARCHAR(32) NULL DEFAULT NULL , ADD UNIQUE INDEX `f_scancode_UNIQUE` (`f_scancode` ASC);
+create table o_goods_return_reason (f_id integer primary key, f_name tinytext);
+insert into o_goods_return_reason values (1, 'Հետվերադարձ'), (2, 'Փոխանակում');
+update s_app set f_version ='25' where f_app='DB';
+
+
+/* DB - 26*/
+ALTER TABLE `c_goods` ADD INDEX `idx_goods_enabled` (`f_enabled` ASC);
+update s_app set f_version ='26' where f_app='DB';
+
 
 
 

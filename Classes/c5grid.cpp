@@ -861,11 +861,17 @@ void C5Grid::refreshData()
                 }
                 sqlQuery += " and " + fWhereCondition;
             } else {
+                if (!fWhereCondition.contains("where", Qt::CaseInsensitive)) {
+                    fWhereCondition = " where " + fWhereCondition;
+                }
                 sqlQuery += fWhereCondition;
             }
         }
         if (!fGroupCondition.isEmpty()) {
             sqlQuery += fGroupCondition;
+        }
+        if (!fHavindCondition.isEmpty()) {
+            sqlQuery += fHavindCondition;
         }
         if (!fOrderCondition.isEmpty()) {
             sqlQuery += fOrderCondition;

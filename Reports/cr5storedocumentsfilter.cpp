@@ -11,7 +11,6 @@ CR5StoreDocumentsFilter::CR5StoreDocumentsFilter(const QStringList &dbParams, QW
     ui->leType->setSelector(dbParams, ui->leTypeName, cache_doc_type).setMultiselection(true);
     ui->leReason->setSelector(dbParams, ui->leReasonName, cache_store_reason).setMultiselection(true);
     ui->lePayment->setSelector(dbParams, ui->lePaymentName, cache_header_payment).setMultiselection(true);
-    ui->lePaid->setSelector(dbParams, ui->lePaidName, cache_header_paid).setMultiselection(true);
     ui->lePartner->setSelector(dbParams, ui->lePartnerName, cache_goods_partners).setMultiselection(true);
 }
 
@@ -29,8 +28,11 @@ QString CR5StoreDocumentsFilter::condition()
     if (!ui->lePayment->isEmpty()) {
         result += " and h.f_payment in (" + ui->lePaymentName->text() + ") ";
     }
-    if (!ui->lePaid->isEmpty()) {
-        result += " and h.f_paid in (" + QString::number(ui->lePaid->getInteger() - 1) + ") ";
+    if (ui->rbpNo->isChecked()) {
+        result += " and h.f_paid=0 ";
+    }
+    if (ui->rbpYes->isChecked()) {
+        result += " and h.f_paid=1 ";
     }
     if (!ui->lePartner->isEmpty()) {
         result += " and h.f_partner in (" + ui->lePartner->text() + ") ";
@@ -51,4 +53,27 @@ QString CR5StoreDocumentsFilter::reason() const
 void CR5StoreDocumentsFilter::setPartnerFilter(int partner)
 {
     ui->lePartner->setValue(partner);
+}
+
+void CR5StoreDocumentsFilter::setDateFilter(const QDate &d1, const QDate &d2)
+{
+    ui->deStart->setDate(d1);
+    ui->deEnd->setDate(d2);
+}
+
+void CR5StoreDocumentsFilter::setPaidFilter(int paid)
+{
+    switch (paid) {
+    case 0 :
+        ui->rbpAll->setChecked(true);
+        break;
+    case 1:
+        ui->rbpNo->setChecked(true);
+        break;
+    case 2:
+        ui->rbpYes->setChecked(true);
+        break;
+    default:
+        break;
+    }
 }

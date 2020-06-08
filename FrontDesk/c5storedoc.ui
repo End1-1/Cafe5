@@ -397,6 +397,9 @@
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
             </property>
+            <property name="toolTip">
+             <string>New row</string>
+            </property>
             <property name="text">
              <string/>
             </property>
@@ -411,6 +414,9 @@
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
             </property>
+            <property name="toolTip">
+             <string>Remove row</string>
+            </property>
             <property name="text">
              <string/>
             </property>
@@ -421,9 +427,29 @@
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="btnEditGoods">
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string>Edit goods on selected row</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="../resources/res.qrc">
+              <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="btnNewGoods">
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string>New goods</string>
             </property>
             <property name="text">
              <string/>
@@ -1079,24 +1105,24 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5LineEdit</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5lineedit.h</header>
-  </customwidget>
-  <customwidget>
-   <class>C5TableWidget</class>
-   <extends>QTableWidget</extends>
-   <header location="global">c5tablewidget.h</header>
-  </customwidget>
-  <customwidget>
    <class>C5LineEditWithSelector</class>
    <extends>QLineEdit</extends>
    <header location="global">c5lineeditwithselector.h</header>
   </customwidget>
   <customwidget>
+   <class>C5LineEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5lineedit.h</header>
+  </customwidget>
+  <customwidget>
    <class>C5DateEdit</class>
    <extends>QLineEdit</extends>
    <header location="global">c5dateedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5TableWidget</class>
+   <extends>QTableWidget</extends>
+   <header location="global">c5tablewidget.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

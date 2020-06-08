@@ -1,6 +1,7 @@
 #include "cr5debtstopartner.h"
 #include "c5mainwindow.h"
 #include "cr5storedocuments.h"
+#include "cr5storedocumentsfilter.h"
 
 CR5DebtsToPartner::CR5DebtsToPartner(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
@@ -38,7 +39,10 @@ bool CR5DebtsToPartner::tblDoubleClicked(int row, int column, const QList<QVaria
         return true;
     }
     CR5StoreDocuments *d = __mainWindow->createTab<CR5StoreDocuments>(fDBParams);
-    d->setPartnersFilter(vals.at(0).toInt());
+    CR5StoreDocumentsFilter *f = d->fFilter;
+    f->setPartnerFilter(vals.at(0).toInt());
+    f->setDateFilter(QDate::fromString("01/01/2000", "dd/MM/yyyy"), QDate::currentDate());
+    f->setPaidFilter(1);
     d->buildQuery();
     return true;
 }

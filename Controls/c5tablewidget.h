@@ -79,6 +79,8 @@ public:
 
     double sumOfColumn(int column);
 
+    int visibleRows();
+
     void setColumnDecimals(int column, int decimals);
 
 private:

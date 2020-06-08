@@ -2,6 +2,7 @@
 #include "ui_vieworder.h"
 #include "c5config.h"
 #include "c5message.h"
+#include "goodsreturnreason.h"
 #include "c5database.h"
 #include "c5utils.h"
 #include "c5checkbox.h"
@@ -44,7 +45,7 @@ ViewOrder::ViewOrder(const QString &order) :
         ui->tbl->setString(r, 7, db.getString("f_scancode"));
         ui->tbl->setString(r, 8, db.getString("f_service"));
         ui->tbl->setInteger(r, 9, db.getInt("f_return"));
-        if (db.getInt("f_return") == 1 || db.getDouble("f_price") < 0) {
+        if (db.getInt("f_return") > 0 || db.getDouble("f_price") < 0) {
             ui->tbl->checkBox(r, 1)->setEnabled(false);
         }
         ui->leTaxNumber->setText(db.getString("f_tax"));
@@ -61,6 +62,13 @@ ViewOrder::~ViewOrder()
 
 void ViewOrder::on_btnReturn_clicked()
 {
+    GoodsReturnReason *r = new GoodsReturnReason();
+    r->exec();
+    int reason = r->fReason;
+    delete r;
+    if (reason == 0) {
+        return;
+    }
     bool ret = false;
     double returnAmount = 0;
     QList<int> rows;
@@ -120,10 +128,10 @@ void ViewOrder::on_btnReturn_clicked()
                 return returnFalse(dw.fErrorMsg, &db);
             }
         }
-        if (!dw.writeOGoods(ogoodsid, oheaderid, "", __c5config.defaultStore(), ui->tbl->getInteger(i, 6), ui->tbl->getDouble(i, 3), ui->tbl->getDouble(i, 4) * -1,  ui->tbl->getDouble(i, 5) * -1, ui->leTaxNumber->getInteger(), 1, i + 1, adraftid, 0, 0)) {
+        if (!dw.writeOGoods(ogoodsid, oheaderid, "", __c5config.defaultStore(), ui->tbl->getInteger(i, 6), ui->tbl->getDouble(i, 3), ui->tbl->getDouble(i, 4) * -1,  ui->tbl->getDouble(i, 5) * -1, ui->leTaxNumber->getInteger(), 1, i + 1, adraftid, 0, 0, reason)) {
             return returnFalse(dw.fErrorMsg, &db);
         }
-        if (!dw.updateField("o_goods", "f_return", 1, "f_id", ui->tbl->getString(i, 0))) {
+        if (!dw.updateField("o_goods", "f_return", reason, "f_id", ui->tbl->getString(i, 0))) {
             return returnFalse(dw.fErrorMsg, &db);
         }
         ui->tbl->setInteger(i, 9, 1);

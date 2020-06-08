@@ -26,6 +26,7 @@ C5Editor *C5Editor::createEditor(const QStringList &dbParams, CE5Editor *e, int 
     de->fVerticalLayout->addWidget(e);
     de->adjustSize();
     e->getLineEdit(e);
+    e->clear();
     e->setId(id);
     de->setWindowTitle(e->title());
     return de;

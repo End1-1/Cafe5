@@ -30,7 +30,7 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
     ui->leComplectationCode->setSelector(fDBParams, ui->leComplectationName, cache_goods, 1, 3);
     disconnect(ui->leComplectationName, SIGNAL(textChanged(QString)), this, SLOT(on_leComplectationName_textChanged(QString)));
     connect(ui->leComplectationName, SIGNAL(textChanged(QString)), this, SLOT(on_leComplectationName_textChanged(QString)));
-    ui->tblGoods->setColumnWidths(ui->tblGoods->columnCount(), 0, 0, 0, 0, 300, 80, 80, 80, 80);
+    ui->tblGoods->setColumnWidths(ui->tblGoods->columnCount(), 0, 0, 0, 0, 400, 80, 80, 80, 80);
     ui->tblGoodsStore->setColumnWidths(7, 0, 0, 200, 70, 50, 50, 70);
     ui->btnNewPartner->setVisible(pr(dbParams.at(1), cp_t7_partners));
     ui->btnNewGoods->setVisible(pr(dbParams.at(1), cp_t6_goods));
@@ -117,7 +117,9 @@ bool C5StoreDoc::openDoc(QString id)
         if (row < 0) {
             row = addGoodsRow();
         }
-        ui->leReason->setValue(dw.value(container_astoredraft, i, "f_reason").toString());
+        if (ui->leReason->getInteger() == 0) {
+            ui->leReason->setValue(dw.value(container_astoredraft, i, "f_reason").toString());
+        }
         if (dw.value(container_astoredraft, i, "f_type").toInt() == 1) {
             ui->tblGoods->setString(row, 0, dw.value(container_astoredraft, i, "f_id").toString());
         } else {
@@ -152,7 +154,7 @@ bool C5StoreDoc::openDoc(QString id)
     if (fDocType == DOC_TYPE_COMPLECTATION) {
         db[":f_document"] = id;
         db[":f_type"] = 1;
-        db.exec("select d.f_id, d.f_goods, concat(g.f_name, ' ', g.f_scancode) as f_goodsname, \
+        db.exec("select d.f_id, d.f_goods, concat(g.f_name, if(g.f_scancode is null, '', concat(' ', g.f_scancode))) as f_goodsname, \
                 d.f_qty, u.f_name, d.f_price, d.f_total, d.f_reason \
                 from a_store_draft d \
                 left join c_goods g on g.f_id=d.f_goods \
@@ -1667,4 +1669,26 @@ void C5StoreDoc::on_btnInsertLast_clicked()
             connect(l, SIGNAL(textEdited(QString)), this, SLOT(tblAddChanged(QString)));
         }
     }
+}
+
+void C5StoreDoc::on_btnEditGoods_clicked()
+{
+    int row = ui->tblGoods->currentRow();
+    if (row < 0) {
+        return;
+    }
+    if (ui->tblGoods->getInteger(row, 3) == 0) {
+        return;
+    }
+    CE5Goods *ep = new CE5Goods(fDBParams);
+    C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
+    ep->setId(ui->tblGoods->getInteger(row, 3));
+    QList<QMap<QString, QVariant> > data;
+    if(e->getResult(data)) {
+        ui->tblGoods->setData(row, 3, data.at(0)["f_id"]);
+        ui->tblGoods->setData(row, 4, data.at(0)["f_name"]);
+        ui->tblGoods->setData(row, 6, data.at(0)["f_unitname"]);
+        ui->tblGoods->lineEdit(row, 5)->setFocus();
+    }
+    delete e;
 }

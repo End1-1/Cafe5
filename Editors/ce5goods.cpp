@@ -65,7 +65,7 @@ void CE5Goods::setId(int id)
     C5Database db(fDBParams);
     /* Complectation */
     db[":f_base"] = id;
-    db.exec("select c.f_id, c.f_goods, concat(g.f_name, ' ', g.f_scancode) as f_goodsname, c.f_qty, u.f_name as f_unitname, "
+    db.exec("select c.f_id, c.f_goods, concat(g.f_name, if(g.f_scancode is null, '', concat(' ', g.f_scancode))) as f_goodsname, c.f_qty, u.f_name as f_unitname, "
             "g.f_lastinputprice, c.f_qty*g.f_lastinputprice as f_total "
             "from c_goods_complectation c "
             "left join c_goods g on g.f_id=c.f_goods "

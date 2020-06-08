@@ -60,7 +60,7 @@ bool C5StoreDraftWriter::writeFromShopOutput(const QString &doc, int state, QStr
                 err += fDb.fLastError;
                 return returnResult(false, err);
             }
-            writeOGoods(i.recId, doc, i.bodyId, i.store, i.goodsId, i.goodsQty, i.goodsPrice, i.goodsTotal, i.tax, 1, i.row, drid, i.discountFactor, i.discountMode);
+            writeOGoods(i.recId, doc, i.bodyId, i.store, i.goodsId, i.goodsQty, i.goodsPrice, i.goodsTotal, i.tax, 1, i.row, drid, i.discountFactor, i.discountMode, 0);
         }
         if (state == DOC_STATE_SAVED) {
             if (!writeOutput(id, err)) {
@@ -213,7 +213,8 @@ bool C5StoreDraftWriter::readAHeaderStore(const QString &id)
 bool C5StoreDraftWriter::readAStoreDraft(const QString &id)
 {
     fDb[":f_document"] = id;
-    if (fDb.exec("select d.f_id, d.f_goods, concat(g.f_name, ' ', g.f_scancode) as f_goodsname, "
+    if (fDb.exec("select d.f_id, d.f_goods, "
+                 "concat(g.f_name, if(g.f_scancode is null, '', concat(' ', g.f_scancode))) as f_goodsname, "
                  "d.f_qty, u.f_name as f_unitname, d.f_price, d.f_total, d.f_reason, d.f_type, d.f_base "
                  "from a_store_draft d "
                  "left join c_goods g on g.f_id=d.f_goods "
@@ -613,7 +614,7 @@ bool C5StoreDraftWriter::writeOBodyToOGoods(const QString &id, const QString &he
     while (fDb.nextRow()) {
         QString gid;
         if (!writeOGoods(gid, headerid, id, fDb.getInt("f_store"), fDb.getInt("f_goods"), fDb.getDouble("f_qty"), fDb.getDouble("f_lastinputprice"),
-                         fDb.getDouble("f_qty") * fDb.getDouble("f_lastinputprice"), 0, 1, ++row, "", 0, 0)) {
+                         fDb.getDouble("f_qty") * fDb.getDouble("f_lastinputprice"), 0, 1, ++row, "", 0, 0, 0)) {
             return false;
         }
     }
@@ -669,7 +670,7 @@ bool C5StoreDraftWriter::writeOHeader(QString &id, int hallid, const QString &pr
     }
 }
 
-bool C5StoreDraftWriter::writeOGoods(QString &id, const QString &header, const QString &body, int store, int goods, double qty, double price, double total, int tax, int sign, int row, const QString &storerec, double discount, int discountMode)
+bool C5StoreDraftWriter::writeOGoods(QString &id, const QString &header, const QString &body, int store, int goods, double qty, double price, double total, int tax, int sign, int row, const QString &storerec, double discount, int discountMode, int returnMode)
 {
     bool u = true;
     if (id.isEmpty()) {
@@ -690,6 +691,7 @@ bool C5StoreDraftWriter::writeOGoods(QString &id, const QString &header, const Q
     fDb[":f_storerec"] = storerec;
     fDb[":f_discountfactor"] = discount;
     fDb[":f_discountmode"] = discountMode;
+    fDb[":f_return"] = returnMode;
     if (u) {
         return returnResult(fDb.update("o_goods", where_id(id)));
     } else {
@@ -762,7 +764,7 @@ bool C5StoreDraftWriter::writeOutput(const QString &docId, QString &err)
     QList<double> priceList;
     QList<double> totalList;
     fDb[":f_document"] = docId;
-    fDb.exec("select s.f_id, s.f_goods, s.f_store, s.f_qty, s.f_price, s.f_total, concat(g.f_name, ' ', g.f_scancode) as f_name, s.f_base, s.f_reason "
+    fDb.exec("select s.f_id, s.f_goods, s.f_store, s.f_qty, s.f_price, s.f_total, concat(g.f_name, if(g.f_scancode is null, '', concat(' ', g.f_scancode))) as f_name, s.f_base, s.f_reason "
                "from a_store_draft s inner join c_goods g on g.f_id=s.f_goods "
                "where f_document=:f_document and f_type=-1");
     while (fDb.nextRow()) {
@@ -779,10 +781,11 @@ bool C5StoreDraftWriter::writeOutput(const QString &docId, QString &err)
     QList<QList<QVariant> > storeData;
     fDb[":f_store"] = storeOut;
     fDb[":f_date"] = date;
+    fDb[":f_state"] = DOC_STATE_SAVED;
     if (!fDb.exec(QString("select s.f_base, s.f_goods, sum(s.f_qty*s.f_type), s.f_price, sum(s.f_total*s.f_type) "
             "from a_store s "
             "inner join a_header d on d.f_id=s.f_document "
-            "where s.f_goods in (%1) and s.f_store=:f_store and d.f_date<=:f_date "
+            "where s.f_goods in (%1) and s.f_store=:f_store and d.f_date<=:f_date and d.f_state=:f_state "
             "group by 1, 2, 4 "
             "having sum(s.f_qty*s.f_type) > 0.001 "
             "for update ").arg(goodsID.join(",")), storeData)) {

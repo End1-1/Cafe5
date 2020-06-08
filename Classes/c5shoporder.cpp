@@ -160,7 +160,7 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
                 return returnFalse(dw.fErrorMsg, db);
             }
         }
-        if (!dw.writeOGoods(ogoodsid, fHeader, "", __c5config.defaultStore(), g.goodsId, g.goodsQty, g.goodsPrice,  g.goodsTotal, tax ? rseq.toInt() : 0, 1, i + 1, adraftid, g.discountFactor, g.discountMode)) {
+        if (!dw.writeOGoods(ogoodsid, fHeader, "", __c5config.defaultStore(), g.goodsId, g.goodsQty, g.goodsPrice,  g.goodsTotal, tax ? rseq.toInt() : 0, 1, i + 1, adraftid, g.discountFactor, g.discountMode, 0)) {
             return returnFalse(dw.fErrorMsg, db);
         }
     }

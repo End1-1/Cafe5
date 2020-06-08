@@ -16,13 +16,10 @@ public:
 
     QToolBar *toolBar();
 
-    void setPartnersFilter(int partner);
+    CR5StoreDocumentsFilter *fFilter;
 
 protected:
     virtual bool tblDoubleClicked(int row, int column, const QList<QVariant> &values);
-
-private:
-    CR5StoreDocumentsFilter *fFilter;
 
 };
 

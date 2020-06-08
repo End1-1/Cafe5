@@ -65,6 +65,7 @@ SOURCES += \
     ../FrontDesk/c5filterwidget.cpp \
     ../FrontDesk/c5selector.cpp \
     dlgpin.cpp \
+    goodsreturnreason.cpp \
     imageloader.cpp \
         main.cpp \
     preorders.cpp \
@@ -140,6 +141,7 @@ HEADERS += \
     ../FrontDesk/c5filterwidget.h \
     ../FrontDesk/c5selector.h \
     dlgpin.h \
+    goodsreturnreason.h \
     imageloader.h \
     preorders.h \
     printreceipt.h \
@@ -186,6 +188,7 @@ FORMS += \
     ../FrontDesk/c5filtervalues.ui \
     ../FrontDesk/c5selector.ui \
     dlgpin.ui \
+    goodsreturnreason.ui \
     preorders.ui \
     replicadialog.ui \
     sales.ui \

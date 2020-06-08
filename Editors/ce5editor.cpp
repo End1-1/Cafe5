@@ -144,6 +144,9 @@ bool CE5Editor::save(QString &err, QList<QMap<QString, QVariant> > &data)
         switch (leField->property("Type").toInt()) {
         case 0:
             value = leField->text();
+            if (value.toString().isEmpty()) {
+                value = QVariant();
+            }
             break;
         case 1:
             value = leField->getInteger();
@@ -280,6 +283,12 @@ void CE5Editor::clear()
     }
     foreach (QPlainTextEdit *pt, fPlainText) {
         pt->clear();
+    }
+    foreach (C5CheckBox *c, fChecks) {
+        c->setChecked(false);
+        if (c->property("Default").isValid()) {
+            c->setChecked(c->property("Default").toInt() > 0);
+        }
     }
     focusFirst();
 }

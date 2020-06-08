@@ -50,8 +50,8 @@ QToolBar *C5StoreBarcode::toolBar()
 {
     if (!fToolBar) {
         QList<ToolBarButtons> btn;
-        btn << ToolBarButtons::tbPrint;
         createStandartToolbar(btn);
+        fToolBar->addAction(QIcon(":/print_description.png"), tr("Print\nscancodes"), this, SLOT(print()));
         fToolBar->addAction(QIcon(":/print_description.png"), tr("Print\ndescriptions"), this, SLOT(printDescriptions()));
         fToolBar->addAction(QIcon(":/show_list.png"), tr("Set list"), this, SLOT(setList()));
     }

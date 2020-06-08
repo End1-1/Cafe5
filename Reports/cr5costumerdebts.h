@@ -16,6 +16,8 @@ public:
 
     virtual int newRow() override;
 
+    virtual void buildQuery() override;
+
 protected:
     virtual void restoreColumnsWidths() override;
 

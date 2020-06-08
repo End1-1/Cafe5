@@ -26,16 +26,16 @@ CR5CostumerDebts::CR5CostumerDebts(const QStringList &dbParams, QWidget *parent)
                    << "cd.f_date"
                    << "concat(oh.f_prefix, f_hallid) as f_ordernum"
                    << "cd.f_govnumber"
-                   << "sum(cd.f_amount) as f_amount"
+                   << "cd.f_amount"
                       ;
 
-    fColumnsGroup << "cd.f_order"
-                  << "cd.f_id"
-                  << "c.f_contact"
-                  << "cd.f_date"
-                  << "concat(oh.f_prefix, f_hallid) as f_ordernum"
-                  << "cd.f_govnumber"
-                      ;
+    //    fColumnsGroup << "cd.f_order"
+    //                  << "cd.f_id"
+    //                  << "c.f_contact"
+    //                  << "cd.f_date"
+    //                  << "concat(oh.f_prefix, f_hallid) as f_ordernum"
+    //                  << "cd.f_govnumber"
+    //                      ;
 
     fColumnsSum << "f_amount"
                       ;
@@ -53,10 +53,8 @@ CR5CostumerDebts::CR5CostumerDebts(const QStringList &dbParams, QWidget *parent)
     fColumnsVisible["c.f_contact"] = true;
     fColumnsVisible["cd.f_date"] = true;
     fColumnsVisible["concat(oh.f_prefix, f_hallid) as f_ordernum"] = true;
-    fColumnsVisible["sum(cd.f_amount) as f_amount"] = true;
+    fColumnsVisible["cd.f_amount"] = true;
     fColumnsVisible["cd.f_govnumber"] = true;
-
-    fHavindCondition = " having sum(cd.f_amount) <> 0 ";
 
     restoreColumnsVisibility();
 
@@ -87,14 +85,35 @@ int CR5CostumerDebts::newRow()
     return 0;
 }
 
+void CR5CostumerDebts::buildQuery()
+{
+    if (fFilter->isTotal()) {
+        fSimpleQuery = true;
+        fSqlQuery = "select c.f_contact,cd.f_govnumber,sum(cd.f_amount) as f_amount "
+                "from b_clients_debts cd "
+                "left join c_partners c on c.f_id=cd.f_costumer "
+                "left join o_header oh on oh.f_id=cd.f_order ";
+        fGroupCondition = " group by c.f_contact,cd.f_govnumber ";
+        fHavindCondition = " having sum(cd.f_amount)<> 0 ";
+        fModel->translate(fTranslation);
+        refreshData();
+    } else {
+        fSimpleQuery = false;
+        fHavindCondition = ""; //" having sum(cd.f_amount) <> 0 ";
+        C5ReportWidget::buildQuery();
+    }
+}
+
 void CR5CostumerDebts::restoreColumnsWidths()
 {
     C5Grid::restoreColumnsWidths();
-    if (fColumnsVisible["cd.f_order"]) {
-        fTableView->setColumnWidth(fModel->fColumnNameIndex["f_order"], 0);
-    }
-    if (fColumnsVisible["cd.f_id"]) {
-        fTableView->setColumnWidth(fModel->fColumnNameIndex["f_id"], 0);
+    if (!fSimpleQuery) {
+        if (fColumnsVisible["cd.f_order"]) {
+            fTableView->setColumnWidth(fModel->fColumnNameIndex["f_order"], 0);
+        }
+        if (fColumnsVisible["cd.f_id"]) {
+            fTableView->setColumnWidth(fModel->fColumnNameIndex["f_id"], 0);
+        }
     }
 }
 

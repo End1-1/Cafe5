@@ -15,6 +15,7 @@
 #include "working.h"
 #include "c5utils.h"
 #include "c5storedraftwriter.h"
+#include "c5replication.h"
 #include <QInputDialog>
 
 #define col_qty 2
@@ -130,6 +131,9 @@ void WOrder::addGoodsToTable(const Goods &g)
 
 bool WOrder::writeOrder(bool tax)
 {
+    QElapsedTimer t;
+    t.start();
+
     if (__c5config.shopDifferentStaff() && fWorking->fCurrentUsers.count() > 0) {
         SelectStaff ss(fWorking);
         ss.exec();
@@ -171,12 +175,7 @@ bool WOrder::writeOrder(bool tax)
             db[":f_store"] = __c5config.defaultStore();
             db[":f_qty"] = g.goodsQty;
             db.exec("update a_store_temp set f_qty=f_qty-:f_qty where f_goods=:f_goods and f_store=:f_store");
-            for (QMap<QString, Goods>::iterator it = fWorking->fGoods.begin(); it != fWorking->fGoods.end(); it++) {
-                if (it.value().fCode == g.goodsId) {
-                    it.value().fQty -= g.goodsQty;
-                    break;
-                }
-            }
+            fWorking->decQty(g);
         }
         if (!fPreorderUUID.isEmpty()) {
             db[":f_state"] = 2;
@@ -194,7 +193,11 @@ bool WOrder::writeOrder(bool tax)
                 db.insert("b_clients_debts", false);
             }
         }
+
+        auto *r = new C5Replication();
+        r->start(SLOT(uploadToServer()));
     }
+    qDebug() << "Order writed about " << t.elapsed();
     return w;
 }
 

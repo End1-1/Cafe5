@@ -14,47 +14,35 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>Costumer</string>
-     </property>
-    </widget>
+   <item row="3" column="1" colspan="2">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QRadioButton" name="rbAll">
+       <property name="text">
+        <string>All</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="rbDebts">
+       <property name="text">
+        <string>Debts</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="rbPaid">
+       <property name="text">
+        <string>Payments</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
-   <item row="1" column="1">
-    <widget class="C5DateEdit" name="deEnd">
-     <property name="minimumSize">
-      <size>
-       <width>100</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="FilterName" stdset="0">
-      <string>date2</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Date start</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Date end</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="1">
+   <item row="5" column="1">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -86,22 +74,24 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="1">
-    <widget class="C5LineEditWithSelector" name="leCostumer">
-     <property name="minimumSize">
-      <size>
-       <width>100</width>
-       <height>0</height>
-      </size>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Date start</string>
      </property>
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Costumer</string>
      </property>
-     <property name="FilterName" stdset="0">
-      <string>doctype</string>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Date end</string>
      </property>
     </widget>
    </item>
@@ -122,46 +112,78 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="1" colspan="2">
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QRadioButton" name="rbAll">
-       <property name="text">
-        <string>All</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QRadioButton" name="rbDebts">
-       <property name="text">
-        <string>Debts</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QRadioButton" name="rbPaid">
-       <property name="text">
-        <string>Payments</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
+   <item row="1" column="1">
+    <widget class="C5DateEdit" name="deEnd">
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>date2</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="C5LineEditWithSelector" name="leCostumer">
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>doctype</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>Show totals</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="C5CheckBox" name="chShowTotal">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>showtotal</string>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5LineEdit</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5lineedit.h</header>
-  </customwidget>
-  <customwidget>
    <class>C5LineEditWithSelector</class>
    <extends>QLineEdit</extends>
    <header location="global">c5lineeditwithselector.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5CheckBox</class>
+   <extends>QCheckBox</extends>
+   <header location="global">c5checkbox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5LineEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5lineedit.h</header>
   </customwidget>
   <customwidget>
    <class>C5DateEdit</class>
@@ -176,6 +198,7 @@
   <tabstop>rbAll</tabstop>
   <tabstop>rbDebts</tabstop>
   <tabstop>rbPaid</tabstop>
+  <tabstop>chShowTotal</tabstop>
  </tabstops>
  <resources/>
  <connections/>

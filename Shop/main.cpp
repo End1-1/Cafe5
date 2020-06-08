@@ -4,10 +4,13 @@
 #include "c5license.h"
 #include "dlgpin.h"
 #include "c5userauth.h"
+#include "c5replication.h"
 #include "replicadialog.h"
 #include "settingsselection.h"
 #include <QApplication>
 #include <QMessageBox>
+#include <QLockFile>
+#include <QDir>
 #include <QTranslator>
 
 int main(int argc, char *argv[])
@@ -40,6 +43,18 @@ int main(int argc, char *argv[])
     C5Config::fSettingsName = connectionParams.at(4);
     C5Config::initParamsFromDb();
     C5Database::uuid(C5Config::dbParams());
+
+    QDir d;
+    if (!d.exists(d.homePath() + "/" + _APPLICATION_)) {
+        d.mkpath(d.homePath() + "/" + _APPLICATION_);
+    }
+    QFile file(d.homePath() + "/" + _APPLICATION_ + "/lock.pid");
+    file.remove();
+    QLockFile lockFile(d.homePath() + "/" + _APPLICATION_ + "/lock.pid");
+    if (!lockFile.tryLock()) {
+        C5Message::error(QObject::tr("An instance of application already running"));
+        return -1;
+    }
 
     if (__c5config.shopEnterPin()) {
         bool login = false;
@@ -74,6 +89,9 @@ int main(int argc, char *argv[])
         __userid = 1;
     }
     if (__c5config.rdbReplica()) {
+        auto *r = new C5Replication();
+        r->uploadToServer();
+
         ReplicaDialog *rp = new ReplicaDialog();
         rp->exec();
         delete rp;

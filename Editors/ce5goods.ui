@@ -122,6 +122,9 @@
             <property name="Field" stdset="0">
              <string>f_service</string>
             </property>
+            <property name="Default" stdset="0">
+             <string>0</string>
+            </property>
            </widget>
           </item>
           <item>
@@ -137,6 +140,9 @@
             </property>
             <property name="Field" stdset="0">
              <string>f_enabled</string>
+            </property>
+            <property name="Default" stdset="0">
+             <string>1</string>
             </property>
            </widget>
           </item>

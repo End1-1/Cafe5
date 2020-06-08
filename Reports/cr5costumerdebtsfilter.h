@@ -18,6 +18,8 @@ public:
 
     virtual QString condition() override;
 
+    bool isTotal();
+
 private:
     Ui::CR5CostumerDebtsFilter *ui;
 };

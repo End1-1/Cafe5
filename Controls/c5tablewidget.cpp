@@ -254,9 +254,22 @@ double C5TableWidget::sumOfColumn(int column)
 {
     double total = 0;
     for (int i = 0; i < rowCount(); i++) {
-        total += getDouble(i, column);
+        if (!isRowHidden(i)) {
+            total += getDouble(i, column);
+        }
     }
     return total;
+}
+
+int C5TableWidget::visibleRows()
+{
+    int rows = 0;
+    for (int i = 0; i < rowCount(); i++) {
+        if (!isRowHidden(i)) {
+            rows++;
+        }
+    }
+    return rows;
 }
 
 void C5TableWidget::setColumnDecimals(int column, int decimals)

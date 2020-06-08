@@ -24,6 +24,10 @@ public:
 
     void setPartnerFilter(int partner);
 
+    void setDateFilter(const QDate &d1, const QDate &d2);
+
+    void setPaidFilter(int paid);
+
 private:
     Ui::CR5StoreDocumentsFilter *ui;
 };

@@ -24,6 +24,11 @@ CR5MaterialInStoreFilter::~CR5MaterialInStoreFilter()
 QString CR5MaterialInStoreFilter::condition()
 {
     QString cond = QString(" h.f_date<=%1 ").arg(ui->deDate->toMySQLDate());
+    if (ui->chShowDrafts->isChecked()) {
+        cond += " and (h.f_state=2 or h.f_state=1) ";
+    } else {
+        cond += " and h.f_state=1 ";
+    }
     if (!ui->leStore->isEmpty()) {
         cond += " and s.f_store in (" + ui->leStore->text() + ") ";
     }
