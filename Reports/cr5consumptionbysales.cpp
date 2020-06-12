@@ -15,14 +15,15 @@
 static const int col_goodsid = 0;
 static const int col_goodsgroup = 1;
 static const int col_goodsname = 2;
-static const int col_qtybefore = 3;
-static const int col_qtyinput = 4;
-static const int col_qtysale = 5;
-static const int col_qtyout = 6;
-static const int col_qtystore = 7;
-static const int col_qtyafter = 8;
-static const int col_qtyinv = 9;
-static const int col_qtydiff = 10;
+static const int col_goodscode = 3;
+static const int col_qtybefore = 4;
+static const int col_qtyinput = 5;
+static const int col_qtysale = 6;
+static const int col_qtyout = 7;
+static const int col_qtystore = 8;
+static const int col_qtyafter = 9;
+static const int col_qtyinv = 10;
+static const int col_qtydiff = 11;
 
 CR5ConsumptionBySales::CR5ConsumptionBySales(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
@@ -33,6 +34,7 @@ CR5ConsumptionBySales::CR5ConsumptionBySales(const QStringList &dbParams, QWidge
     fColumnNameIndex["f_goodsid"] = col_goodsid;
     fColumnNameIndex["f_goodsgroup"] = col_goodsgroup;
     fColumnNameIndex["f_goodsname"] = col_goodsname;
+    fColumnNameIndex["f_goodscode"] = col_goodscode;
     fColumnNameIndex["f_qtybefore"] = col_qtybefore;
     fColumnNameIndex["f_qtyinput"] = col_qtyinput;
     fColumnNameIndex["f_qtysale"] = col_qtysale;
@@ -54,6 +56,7 @@ CR5ConsumptionBySales::CR5ConsumptionBySales(const QStringList &dbParams, QWidge
     fTranslation["f_goodsid"] = tr("Goods code");
     fTranslation["f_goodsgroup"] = tr("Group");
     fTranslation["f_goodsname"] = tr("Goods name");
+    fTranslation["f_goodscode"] = tr("Scancode");
     fTranslation["f_qtybefore"] = tr("Qty, before");
     fTranslation["f_qtyinput"] = tr("Qty, input");
     fTranslation["f_qtysale"] = tr("Qty, sale");
@@ -112,7 +115,7 @@ void CR5ConsumptionBySales::buildQuery()
     QMap<int, int> goodsMap;
     C5Database db(fDBParams);
     /* get all goods */
-    db.exec("select c.f_id, g.f_name as f_groupname, c.f_name "
+    db.exec("select c.f_id, g.f_name as f_groupname, c.f_name, c.f_scancode "
             "from c_goods c "
             "left join c_groups g on g.f_id=c.f_group "
             "order by 2, 3");
@@ -121,6 +124,7 @@ void CR5ConsumptionBySales::buildQuery()
         row << db.getInt("f_id")
             << db.getString("f_groupname")
             << db.getString("f_name")
+            << db.getString("f_scancode")
             << QVariant()
             << QVariant()
             << QVariant()

@@ -91,8 +91,9 @@ int main(int argc, char *argv[])
     if (__c5config.rdbReplica()) {
         auto *r = new C5Replication();
         r->uploadToServer();
+        delete r;
 
-        ReplicaDialog *rp = new ReplicaDialog();
+        auto *rp = new ReplicaDialog();
         rp->exec();
         delete rp;
         __c5config.initParamsFromDb();

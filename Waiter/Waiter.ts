@@ -812,37 +812,37 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="223"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="224"/>
         <source>Empty store document</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="243"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="244"/>
         <source>Error in cash document, partial data was lost</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="253"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="254"/>
         <source>Empty cash document</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="343"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="344"/>
         <source>Document not exists</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="747"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="748"/>
         <source>Invalid document id</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="854"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="855"/>
         <source>Not enough materials in the store</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="950"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="951"/>
         <source>This order used in next documents</source>
         <translation type="unfinished"></translation>
     </message>

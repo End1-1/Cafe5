@@ -3,6 +3,7 @@
 #include "c5config.h"
 #include "printreceiptgroup.h"
 #include "c5database.h"
+#include "c5replication.h"
 #include "c5utils.h"
 #include "c5message.h"
 #include "printtaxn.h"
@@ -22,6 +23,13 @@ Sales::Sales(QWidget *parent) :
     ui->lbWhosale->setVisible(!__c5config.shopDenyF2());
     ui->leWhosale->setVisible(!__c5config.shopDenyF2());
     fViewMode = VM_TOTAL;
+    C5Database db(__c5config.dbParams());
+    if (__c5config.rdbReplica()) {
+        db.exec("select * from o_header");
+        ui->btnRetryUpload->setVisible(db.nextRow());
+    } else {
+        ui->btnRetryUpload->setVisible(false);
+    }
     refresh();
 }
 
@@ -381,5 +389,15 @@ void Sales::on_btnPrintTax_clicked()
         pt.saveTimeResult("Not saved - " + id, *q);
         delete q;
         C5Message::error(err + "<br>" + jsonOut + "<br>" + jsonIn);
+    }
+}
+
+void Sales::on_btnRetryUpload_clicked()
+{
+    C5Replication r;
+    if (r.uploadToServer()) {
+        ui->btnRetryUpload->setVisible(false);
+    } else {
+        C5Message::error(tr("Cannot upload data"));
     }
 }

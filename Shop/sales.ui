@@ -359,6 +359,13 @@
        <number>0</number>
       </property>
       <item>
+       <widget class="QCommandLinkButton" name="btnRetryUpload">
+        <property name="text">
+         <string>Upload incomplete, retry</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="horizontalSpacer_2">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>

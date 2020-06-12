@@ -37,6 +37,8 @@ private slots:
 
     void on_btnPrintTax_clicked();
 
+    void on_btnRetryUpload_clicked();
+
 private:
     Ui::Sales *ui;
 

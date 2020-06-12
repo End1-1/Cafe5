@@ -109,7 +109,7 @@ void C5CostumerDebtPayment::on_btnOK_clicked()
                 doc->setDate(ui->deDate->date());
                 doc->setComment(tr("Dept payment") + ", " + ui->leCostumerName->text());
                 doc->updateRow(0, tr("Dept payment") + ", " + ui->leCostumerName->text(), ui->leAmount->getDouble());
-                doc->save();
+                doc->save(true);
             }
             delete doc;
         }

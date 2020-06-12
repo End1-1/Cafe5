@@ -172,6 +172,7 @@ private slots:
     void on_btnRemoveAdd_clicked();
 
     void on_btnInsertLast_clicked();
+
     void on_btnEditGoods_clicked();
 };
 

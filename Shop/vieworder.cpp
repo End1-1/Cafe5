@@ -5,6 +5,7 @@
 #include "goodsreturnreason.h"
 #include "c5database.h"
 #include "c5utils.h"
+#include "c5replication.h"
 #include "c5checkbox.h"
 #include "c5storedraftwriter.h"
 #include "printreceipt.h"
@@ -52,6 +53,12 @@ ViewOrder::ViewOrder(const QString &order) :
     }
     if (ui->leAmount->getDouble() < 0) {
         ui->btnReturn->setVisible(false);
+    }
+    if (__c5config.rdbReplica()) {
+        db.exec("select * from o_header");
+        ui->btnRetryUpload->setVisible(db.nextRow());
+    } else {
+        ui->btnRetryUpload->setVisible(false);
     }
 }
 
@@ -200,4 +207,14 @@ void ViewOrder::returnFalse(const QString &msg, C5Database *db)
     C5Message::error(msg);
     db->rollback();
     db->close();
+}
+
+void ViewOrder::on_btnRetryUpload_clicked()
+{
+    C5Replication r;
+    if (r.uploadToServer()) {
+        ui->btnRetryUpload->setVisible(false);
+    } else {
+        C5Message::error(tr("Cannot upload data"));
+    }
 }

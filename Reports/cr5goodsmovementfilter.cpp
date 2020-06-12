@@ -7,8 +7,10 @@ CR5GoodsMovementFilter::CR5GoodsMovementFilter(const QStringList &dbParams, QWid
     ui(new Ui::CR5GoodsMovementFilter)
 {
     ui->setupUi(this);
-    ui->leGoods->setSelector(fDBParams, ui->leGoodsName, cache_goods, 1, 3);
-    ui->leStore->setSelector(fDBParams, ui->leStoreName, cache_goods_store);
+    ui->leDocType->setSelector(fDBParams, ui->leDocTypeName, cache_doc_type).setMultiselection(true);
+    ui->leGroup->setSelector(fDBParams, ui->leGroupName, cache_goods_group).setMultiselection(true);
+    ui->leGoods->setSelector(fDBParams, ui->leGoodsName, cache_goods, 1, 3).setMultiselection(true);
+    ui->leStore->setSelector(fDBParams, ui->leStoreName, cache_goods_store).setMultiselection(true);
     ui->leInOut->setSelector(fDBParams, ui->leInOutName, cache_store_inout);
 }
 
@@ -26,6 +28,12 @@ QString CR5GoodsMovementFilter::condition()
     }
     if (!ui->leStore->isEmpty()) {
         cond += " and s.f_store in (" + ui->leStore->text() + ") ";
+    }
+    if (!ui->leGroup->isEmpty()) {
+        cond += " and g.f_group in (" + ui->leGroup->text() + ") ";
+    }
+    if (!ui->leDocType->isEmpty()) {
+        cond += " and a.f_type in (" + ui->leDocType->text() + ") ";
     }
     if (!ui->leGoods->isEmpty()) {
         cond += " and s.f_goods in (" + ui->leGoods->text() + ") ";

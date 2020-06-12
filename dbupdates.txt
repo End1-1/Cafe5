@@ -456,6 +456,9 @@ update s_app set f_version ='25' where f_app='DB';
 
 /* DB - 26*/
 ALTER TABLE `c_goods` ADD INDEX `idx_goods_enabled` (`f_enabled` ASC);
+ALTER TABLE `a_store` ADD INDEX `idx_store_type` (`f_type` ASC);
+alter table b_clients_debts add f_storedoc char(36);
+
 update s_app set f_version ='26' where f_app='DB';
 
 

@@ -15,7 +15,7 @@ C5StoreBarcode::C5StoreBarcode(const QStringList &dbParams, QWidget *parent) :
     ui->setupUi(this);
     fIcon = ":/barcode.png";
     fLabel = tr("Barcode print");
-    ui->tbl->setColumnWidths(ui->tbl->columnCount(), 300, 300, 80, 30, 80, 200);
+    ui->tbl->setColumnWidths(ui->tbl->columnCount(), 300, 300, 80, 30, 80, 200, 100);
 }
 
 C5StoreBarcode::~C5StoreBarcode()
@@ -36,13 +36,17 @@ void C5StoreBarcode::addRow(const QString &name, const QString &barcode, int qty
     ui->tbl->createCheckbox(row, 3)->setChecked(true);
     C5Database db(fDBParams);
     db[":f_scancode"] = barcode;
-    db.exec("select * from c_goods where f_scancode=:f_scancode");
+    db.exec("select c.*, c1.f_name as f_class1name from c_goods c "
+            "left join c_goods_classes c1 on c1.f_id=c.f_group1 "
+            "where f_scancode=:f_scancode");
     if (db.nextRow()) {
         ui->tbl->setDouble(row, 4, db.getDouble("f_saleprice"));
         ui->tbl->setString(row, 5, db.getString("f_description"));
+        ui->tbl->setString(row, 6, db.getString("f_class1name"));
     } else {
         ui->tbl->setDouble(row, 4, 0);
         ui->tbl->setString(row, 5, "");
+        ui->tbl->setString(row, 6, "");
     }
 }
 
@@ -58,7 +62,7 @@ QToolBar *C5StoreBarcode::toolBar()
     return fToolBar;
 }
 
-bool C5StoreBarcode::printOneBarcode(const QString &code, const QString &price, QPrintDialog &pd)
+bool C5StoreBarcode::printOneBarcode(const QString &code, const QString &price, const QString &class1, QPrintDialog &pd)
 {
     QPrinter printer(QPrinter::HighResolution);
     printer.setPrinterName(pd.printer()->printerName());
@@ -84,11 +88,12 @@ bool C5StoreBarcode::printOneBarcode(const QString &code, const QString &price, 
     f.setPointSize(8);
     f.setBold(true);
     p.setFont(f);
-    b.DrawBarcode(p, 100, 10, 80, 80, plen);
-    p.drawText(110, 100, code + QString::number(bb.ean13CheckSum(code)));
+    b.DrawBarcode(p, 100, 40, 100, 100, plen);
+    p.drawText(110, 120, code + QString::number(bb.ean13CheckSum(code)));
     f.setPointSize(10);
     p.setFont(f);
-    p.drawText(110, 140, price + " AMD");
+    p.drawText(110, 150, price + " AMD");
+    p.drawText(160, 35, class1);
 
     return printer.printerState() != QPrinter::Error;
 }
@@ -227,7 +232,7 @@ void C5StoreBarcode::print()
             if (bc.isEan13(code)) {
                 code = code.left(code.length() - 1);
             }
-            printOneBarcode(code, ui->tbl->getString(i, 4), pd);
+            printOneBarcode(code, ui->tbl->getString(i, 4), ui->tbl->getString(i, 6), pd);
             ui->tbl->checkBox(i, 3)->setChecked(false);
         }
     }

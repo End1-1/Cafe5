@@ -12,16 +12,21 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
     fSimpleQuery = false;
 
     fMainTable = "a_store s";
-    fLeftJoinTables << "inner join a_type_sign st on st.f_id=s.f_type [st]"
-                    << "inner join c_storages ss on ss.f_id=s.f_store [ss]"
-                    << "inner join c_goods g on g.f_id=s.f_goods [g]"
-                    << "inner join c_groups gg on gg.f_id=g.f_group [gg]"
-                    << "inner join c_units u on u.f_id=g.f_unit [u]"
-                    << "inner join a_header a on a.f_id=s.f_document [a]"
-                    << "inner join "
+    fLeftJoinTables << "left join a_type_sign st on st.f_id=s.f_type [st]"
+                    << "left join a_type dt on dt.f_id=a.f_type [dt]"
+                    << "left join c_storages ss on ss.f_id=s.f_store [ss]"
+                    << "left join c_goods g on g.f_id=s.f_goods [g]"
+                    << "left join c_groups gg on gg.f_id=g.f_group [gg]"
+                    << "left join c_units u on u.f_id=g.f_unit [u]"
+                    << "left join a_header a on a.f_id=s.f_document [a]"
+                    << "left join c_goods_classes gca on gca.f_id=g.f_group1 [gca]"
+                    << "left join c_goods_classes gcb on gca.f_id=g.f_group2 [gcb]"
+                    << "left join c_goods_classes gcc on gca.f_id=g.f_group3 [gcc]"
+                    << "left join c_goods_classes gcd on gca.f_id=g.f_group4 [gcd]"
                        ;
 
     fColumnsFields << "s.f_document"
+                   << "dt.f_name as f_docname"
                    << "a.f_userid"
                    << "a.f_date"
                    << "s.f_userid"
@@ -30,15 +35,20 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
                    << "gg.f_name as f_group"
                    << "g.f_name as f_goods"
                    << "g.f_scancode"
-                   << "g.f_saleprice"
-                   << "g.f_saleprice2"
+                   << "gca.f_name as f_class1"
+                   << "gcb.f_name as f_class2"
+                   << "gcc.f_name as f_class3"
+                   << "gcd.f_name as f_class4"
                    << "sum(s.f_qty) as f_qty"
                    << "u.f_name as f_unit"
                    << "s.f_price"
                    << "sum(s.f_total) as f_total"
+                   << "g.f_saleprice"
+                   << "g.f_saleprice2"
                       ;
 
     fColumnsGroup << "s.f_document"
+                  << "dt.f_name as f_docname"
                   << "a.f_userid"
                   << "a.f_date"
                   << "s.f_userid"
@@ -47,6 +57,10 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
                   << "gg.f_name as f_group"
                   << "g.f_name as f_goods"
                   << "g.f_scancode"
+                  << "gca.f_name as f_class1"
+                  << "gcb.f_name as f_class2"
+                  << "gcc.f_name as f_class3"
+                  << "gcd.f_name as f_class4"
                   << "g.f_saleprice"
                   << "g.f_saleprice2"
                   << "s.f_price"
@@ -59,6 +73,7 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
                       ;
 
     fTranslation["f_userid"] = tr("Document");
+    fTranslation["f_docname"] = tr("Type");
     fTranslation["f_date"] = tr("Date");
     fTranslation["f_document"]  = tr("Op.num.");
     fTranslation["f_type"] = tr("In/Out");
@@ -66,6 +81,10 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
     fTranslation["f_group"] = tr("Group");
     fTranslation["f_goods"] = tr("Goods");
     fTranslation["f_scancode"] = tr("Scancode");
+    fTranslation["f_class1"] = tr("Class 1");
+    fTranslation["f_class2"] = tr("Class 2");
+    fTranslation["f_class3"] = tr("Class 3");
+    fTranslation["f_class4"] = tr("Class 4");
     fTranslation["f_saleprice"] = tr("Retail price");
     fTranslation["f_saleprice2"] = tr("Whosale price");
     fTranslation["f_qty"] = tr("Qty");
@@ -74,6 +93,7 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
     fTranslation["f_total"] = tr("Amount");;
 
     fColumnsVisible["a.f_date"] = true;
+    fColumnsVisible["dt.f_name as f_docname"] = true;
     fColumnsVisible["a.f_userid"] = true;
     fColumnsVisible["s.f_document"] = false;
     fColumnsVisible["st.f_name as f_type"] = true;
@@ -87,6 +107,10 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
     fColumnsVisible["u.f_name as f_unit"] = true;
     fColumnsVisible["s.f_price"] = true;
     fColumnsVisible["sum(s.f_total) as f_total"] = true;
+    fColumnsVisible["gca.f_name as f_class1"] = false;
+    fColumnsVisible["gcb.f_name as f_class2"] = false;
+    fColumnsVisible["gcc.f_name as f_class3"] = false;
+    fColumnsVisible["gcd.f_name as f_class4"] = false;
 
     restoreColumnsVisibility();
     fFilterWidget = new CR5GoodsMovementFilter(fDBParams);
