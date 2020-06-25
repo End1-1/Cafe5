@@ -869,7 +869,7 @@ void C5StoreDoc::loadGoods(int store)
               "left join a_header d on d.f_id=s.f_document "
               "inner join c_groups gg on gg.f_id=g.f_group "
               "inner join c_units u on u.f_id=g.f_unit "
-              "where s.f_store=%1 and d.f_date<=%2 "
+              "where s.f_store=%1 and d.f_date<=%2 and d.f_state=1 "
               "group by 1, 2, 3, 4 "
               "having sum(s.f_qty*s.f_type) > 0.001")
             .arg(store)
@@ -999,6 +999,10 @@ void C5StoreDoc::getInput()
     if (!C5Selector::getValue(fDBParams, cache_goods, vals)) {
         return;
     }
+    if (vals.at(1).toInt() == 0) {
+        C5Message::error(tr("Could not add goods without code"));
+        return;
+    }
     int row = addGoodsRow();
     ui->tblGoods->setString(row, 3, vals.at(1).toString());
     ui->tblGoods->setString(row, 4, vals.at(3).toString());
@@ -1023,7 +1027,7 @@ void C5StoreDoc::getOutput()
                           "inner join c_goods g on g.f_id=s.f_goods "
                           "inner join c_groups gg on gg.f_id=g.f_group "
                           "inner join c_units u on u.f_id=g.f_unit "
-                          "where s.f_store=%1 and d.f_date<=%2 "
+                          "where s.f_store=%1 and d.f_date<=%2 and d.f_state=1 "
                           "group by 1, 2, 3, 4 "
                           "having sum(s.f_qty*s.f_type) > 0.001 ")
             .arg(ui->leStoreOutput->getInteger())
@@ -1525,9 +1529,13 @@ void C5StoreDoc::on_btnNewGoods_clicked()
     C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
     QList<QMap<QString, QVariant> > data;
     if(e->getResult(data)) {
+        if (data.at(0)["f_id"].toInt() == 0) {
+            C5Message::error(tr("Cannot add goods without code"));
+            return;
+        }
         int row = addGoodsRow();
         ui->tblGoods->setData(row, 3, data.at(0)["f_id"]);
-        ui->tblGoods->setData(row, 4, data.at(0)["f_name"]);
+        ui->tblGoods->setData(row, 4, data.at(0)["f_name"].toString() + " " + data.at(0)["f_scancode"].toString());
         ui->tblGoods->setData(row, 6, data.at(0)["f_unitname"]);
         ui->tblGoods->lineEdit(row, 5)->setFocus();
     }
@@ -1536,7 +1544,7 @@ void C5StoreDoc::on_btnNewGoods_clicked()
 
 void C5StoreDoc::on_leScancode_returnPressed()
 {
-    C5Database db(C5Config::dbParams());
+    C5Database db(fDBParams);
     db[":f_scancode"] = ui->leScancode->text();
     db.exec("select gg.f_scancode, gg.f_id, concat(gg.f_name, ' ', gg.f_scancode) as f_name, gu.f_name as f_unitname, gg.f_saleprice, "
             "gr.f_taxdept, gr.f_adgcode "
@@ -1685,6 +1693,10 @@ void C5StoreDoc::on_btnEditGoods_clicked()
     ep->setId(ui->tblGoods->getInteger(row, 3));
     QList<QMap<QString, QVariant> > data;
     if(e->getResult(data)) {
+        if (data.at(0)["f_id"].toInt() == 0) {
+            C5Message::error(tr("Cannot change goods without code"));
+            return;
+        }
         ui->tblGoods->setData(row, 3, data.at(0)["f_id"]);
         ui->tblGoods->setData(row, 4, data.at(0)["f_name"]);
         ui->tblGoods->setData(row, 6, data.at(0)["f_unitname"]);

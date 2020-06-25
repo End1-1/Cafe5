@@ -1877,64 +1877,64 @@ MS Excel</source>
     <message>
         <location filename="storeinput.ui" line="218"/>
         <location filename="storeinput.cpp" line="117"/>
-        <location filename="storeinput.cpp" line="160"/>
+        <location filename="storeinput.cpp" line="159"/>
         <source>UUID</source>
         <translation></translation>
     </message>
     <message>
         <location filename="storeinput.ui" line="223"/>
         <location filename="storeinput.cpp" line="117"/>
-        <location filename="storeinput.cpp" line="160"/>
-        <location filename="storeinput.cpp" line="210"/>
-        <location filename="storeinput.cpp" line="250"/>
+        <location filename="storeinput.cpp" line="159"/>
+        <location filename="storeinput.cpp" line="209"/>
+        <location filename="storeinput.cpp" line="249"/>
         <source>X</source>
         <translation></translation>
     </message>
     <message>
         <location filename="storeinput.ui" line="228"/>
         <location filename="storeinput.cpp" line="117"/>
-        <location filename="storeinput.cpp" line="160"/>
+        <location filename="storeinput.cpp" line="159"/>
         <source>Date</source>
         <translation>Ամսաթիվ</translation>
     </message>
     <message>
         <location filename="storeinput.ui" line="233"/>
         <location filename="storeinput.cpp" line="117"/>
-        <location filename="storeinput.cpp" line="160"/>
+        <location filename="storeinput.cpp" line="159"/>
         <source>Store</source>
         <translation>Պահեստ</translation>
     </message>
     <message>
         <location filename="storeinput.ui" line="238"/>
         <location filename="storeinput.cpp" line="117"/>
-        <location filename="storeinput.cpp" line="160"/>
-        <location filename="storeinput.cpp" line="250"/>
+        <location filename="storeinput.cpp" line="159"/>
+        <location filename="storeinput.cpp" line="249"/>
         <source>Goods</source>
         <translation>Ապրանքի անվանում</translation>
     </message>
     <message>
         <location filename="storeinput.ui" line="243"/>
         <location filename="storeinput.cpp" line="117"/>
-        <location filename="storeinput.cpp" line="160"/>
-        <location filename="storeinput.cpp" line="250"/>
+        <location filename="storeinput.cpp" line="159"/>
+        <location filename="storeinput.cpp" line="249"/>
         <source>Scancode</source>
         <translation>Սկանկոդ</translation>
     </message>
     <message>
         <location filename="storeinput.ui" line="248"/>
         <location filename="storeinput.cpp" line="117"/>
-        <location filename="storeinput.cpp" line="160"/>
-        <location filename="storeinput.cpp" line="210"/>
-        <location filename="storeinput.cpp" line="250"/>
+        <location filename="storeinput.cpp" line="159"/>
+        <location filename="storeinput.cpp" line="209"/>
+        <location filename="storeinput.cpp" line="249"/>
         <source>Qty</source>
         <translation>Քանակ</translation>
     </message>
     <message>
         <location filename="storeinput.ui" line="253"/>
         <location filename="storeinput.cpp" line="117"/>
-        <location filename="storeinput.cpp" line="160"/>
-        <location filename="storeinput.cpp" line="210"/>
-        <location filename="storeinput.cpp" line="250"/>
+        <location filename="storeinput.cpp" line="159"/>
+        <location filename="storeinput.cpp" line="209"/>
+        <location filename="storeinput.cpp" line="249"/>
         <source>Retail</source>
         <translation>Մանրածախ</translation>
     </message>
@@ -1964,8 +1964,8 @@ MS Excel</source>
         <translation>Ոչինչ նշված չէ</translation>
     </message>
     <message>
-        <location filename="storeinput.cpp" line="210"/>
-        <location filename="storeinput.cpp" line="250"/>
+        <location filename="storeinput.cpp" line="209"/>
+        <location filename="storeinput.cpp" line="249"/>
         <source>Group</source>
         <translation>Խումբ</translation>
     </message>

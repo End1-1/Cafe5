@@ -99,6 +99,7 @@ void CR5MaterialsInStore::prepareDrafts()
                    << "gcb.f_name as f_class2"
                    << "gcc.f_name as f_class3"
                    << "gcd.f_name as f_class4"
+                   << "g.f_scancode"
                       ;
 
     fColumnsSum << "f_qty"

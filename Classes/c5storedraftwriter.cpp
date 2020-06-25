@@ -515,7 +515,7 @@ bool C5StoreDraftWriter::writeAStoreInventory(QString &id, const QString &docId,
     fDb[":f_price"] = price;
     fDb[":f_total"] = total;
     if (u) {
-        return returnResult(fDb.update("a_store_inventory", where_id(id)));
+        return returnResult(fDb.update("a_store_inventory", "f_id", id));
     } else {
         return returnResult(fDb.insert("a_store_inventory", true));
     }

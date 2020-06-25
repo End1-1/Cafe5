@@ -26,6 +26,16 @@ public:
 
     QDate date2();
 
+    QString group() const;
+
+    QString class1() const;
+
+    QString class2() const;
+
+    QString class3() const;
+
+    QString class4() const;
+
 private:
     Ui::CR5ConsumptionBySalesFilter *ui;
 };

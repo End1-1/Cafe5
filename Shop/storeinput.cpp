@@ -147,7 +147,6 @@ void StoreInput::getList()
         ui->tbl->setString(r, 7, db.getString("f_saleprice"));
         ui->leTotal->setDouble(ui->leTotal->getDouble() + (db.getDouble("f_qty") * db.getDouble("f_saleprice")));
     }
-    ui->chAll->clicked(true);
 }
 
 void StoreInput::history()
@@ -165,7 +164,7 @@ void StoreInput::history()
     db[":f_store"] = __c5config.defaultStore();
     db[":f_date1"] = ui->deStart->date();
     db[":f_date2"] = ui->deEnd->date();
-    db[":f_reason"] = DOC_REASON_INPUT;
+    db[":f_type"] = 1;
     if (!db.exec("select ad.f_id, '', ah.f_date, g.f_name, g.f_scancode, ad.f_qty, g.f_saleprice, "
             "spa.f_id as f_spa "
             "from a_store_draft ad "
@@ -173,7 +172,7 @@ void StoreInput::history()
             "inner join a_header ah on ah.f_id=ad.f_document "
             "left join a_header_shop2partneraccept spa on spa.f_id=ad.f_id "
             "where ad.f_store=:f_store and ah.f_date between :f_date1 and :f_date2 and ad.f_type=1 "
-                 "and ad.f_reason=:f_reason ")) {
+                 "and ad.f_type=:f_type ")) {
         C5Message::error(db.fLastError);
         return;
     }

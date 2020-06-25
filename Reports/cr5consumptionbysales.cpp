@@ -113,11 +113,27 @@ void CR5ConsumptionBySales::buildQuery()
     QList<QList<QVariant> > &rows = fModel->fRawData;
     rows.clear();
     QMap<int, int> goodsMap;
+    QString cond = " where c.f_id>0 ";
+    if (fFilter->group().length() > 0) {
+        cond += " and c.f_group in (" + fFilter->group() + ") ";
+    }
+    if (fFilter->class1().length() > 0) {
+        cond += " and c.f_group1 in (" + fFilter->class1() + ") ";
+    }
+    if (fFilter->class2().length() > 0) {
+        cond += " and c.f_group2 in (" + fFilter->class2() + ") ";
+    }
+    if (fFilter->class3().length() > 0) {
+        cond += " and c.f_group3 in (" + fFilter->class3() + ") ";
+    }
+    if (fFilter->class4().length() > 0) {
+        cond += " and c.f_group4 in (" + fFilter->class4() + ") ";
+    }
     C5Database db(fDBParams);
     /* get all goods */
     db.exec("select c.f_id, g.f_name as f_groupname, c.f_name, c.f_scancode "
             "from c_goods c "
-            "left join c_groups g on g.f_id=c.f_group "
+            "left join c_groups g on g.f_id=c.f_group " + cond +
             "order by 2, 3");
     while (db.nextRow()) {
     QList<QVariant> row;
@@ -146,6 +162,9 @@ void CR5ConsumptionBySales::buildQuery()
                 "group by 1 "
                 "having sum(s.f_qty*s.f_type) > 0.001");
     while (db.nextRow()) {
+        if (!goodsMap.contains(db.getInt(0))) {
+            continue;
+        }
         int r = goodsMap[db.getInt(0)];
         rows[r][col_qtybefore] = db.getDouble("f_qty");
     }
@@ -163,6 +182,9 @@ void CR5ConsumptionBySales::buildQuery()
             "and h.f_state=:f_state and s.f_type=:f_type "
             "group by 1 ");
     while (db.nextRow()) {
+        if (!goodsMap.contains(db.getInt(0))) {
+            continue;
+        }
         int r = goodsMap[db.getInt(0)];
         rows[r][col_qtyinput] = db.getDouble(1);
     }
@@ -179,6 +201,9 @@ void CR5ConsumptionBySales::buildQuery()
             "and s.f_reason=:f_reason and h.f_type=:f_type "
             "group by 1 ");
     while (db.nextRow()) {
+        if (!goodsMap.contains(db.getInt(0))) {
+            continue;
+        }
         int r = goodsMap[db.getInt(0)];
         rows[r][col_qtysale] = db.getDouble("f_qty");
     }
@@ -197,6 +222,9 @@ void CR5ConsumptionBySales::buildQuery()
             "and s.f_reason<>:f_reason "
             "group by 1 ");
     while (db.nextRow()) {
+        if (!goodsMap.contains(db.getInt(0))) {
+            continue;
+        }
         int r = goodsMap[db.getInt(0)];
         rows[r][col_qtyout] = db.getDouble(1);
     }
@@ -210,6 +238,9 @@ void CR5ConsumptionBySales::buildQuery()
                 "group by 1 "
                 "having sum(s.f_qty*s.f_type) > 0.001");
     while (db.nextRow()) {
+        if (!goodsMap.contains(db.getInt(0))) {
+            continue;
+        }
         int r = goodsMap[db.getInt(0)];
         rows[r][col_qtystore] = db.getDouble("f_qty");
     }
@@ -232,6 +263,9 @@ void CR5ConsumptionBySales::buildQuery()
             "and i.f_store=:f_store "
             "group by 1, 2 ");
     while (db.nextRow()) {
+        if (!goodsMap.contains(db.getInt(0))) {
+            continue;
+        }
         int r = goodsMap[db.getInt(0)];
         rows[r][col_qtyinv] = db.getDouble("f_qty");
     }
@@ -340,7 +374,8 @@ bool CR5ConsumptionBySales::tblDoubleClicked(int row, int column, const QList<QV
         db.exec(QString("delete from a_store_inventory where f_document in (%1) and f_goods=:f_goods").arg(docid));
         QString id;
         if (qty > 0.0001) {
-            dw.writeAStoreInventory(id, docid.split(",", QString::SkipEmptyParts).at(0), fFilter->store(), values.at(0).toInt(), qty, 0, 0);
+            QString d = docid.split(",", QString::SkipEmptyParts).at(0);
+            dw.writeAStoreInventory(id, d.replace("'", ""), fFilter->store(), values.at(0).toInt(), qty, 0, 0);
         }
         fModel->setData(row, column, qty);
         countRowQty(row);
@@ -487,13 +522,20 @@ C5StoreDoc *CR5ConsumptionBySales::writeDocs(int doctype, int reason, const QLis
         break;
     }
     QString documentId;
-    QString cashid;
+    QString cashid, cashrowid;
     dw.writeAHeader(documentId, dw.storeDocNum(doctype, store, true, 0), DOC_STATE_DRAFT, doctype, __userid, docDate,
                     QDate::currentDate(), QTime::currentTime(), 0, 0, comment, 0, 0);
-    dw.writeAHeaderStore(documentId, __userid, __userid, "", QDate(), storein, storeout, 0, cashid, 0, 0);
     if (storein > 0) {
+        C5Document c5doc(fDBParams);
+        QString purpose = tr("Store input, correction") + QDate::currentDate().toString(FORMAT_DATE_TO_STR);
+        QString cashUserId = QString("%1").arg(c5doc.genNumber(DOC_TYPE_CASH), C5Config::docNumDigitsInput(), 10, QChar('0'));
+        dw.writeAHeader(cashid, cashUserId, DOC_STATE_DRAFT, DOC_TYPE_CASH, __userid, QDate::currentDate(),
+                        QDate::currentDate(), QTime::currentTime(), 0, 0,
+                        purpose, 0, 0);
         dw.writeAHeaderCash(cashid, 0, 0, 1, documentId, "");
+        dw.writeECash(cashrowid, cashid, 0, -1, purpose, 0, cashrowid, 1);
     }
+    dw.writeAHeaderStore(documentId, __userid, __userid, "", QDate(), storein, storeout, 0, cashid, 0, 0);
     int rownum = 1;
     foreach (const IGoods &g, data) {
         QString sdid;
