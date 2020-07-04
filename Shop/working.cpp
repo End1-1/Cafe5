@@ -194,7 +194,13 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
                         "sum(oh.f_amounttotal) as f_amounttotal "
                         "from o_header oh "
                         "left join s_user w on w.f_id=oh.f_staff  "
-                        "where oh.f_hall=:f_hall and oh.f_datecash=:f_datecash  and oh.f_state=:f_state "
+                        "where oh.f_hall=:f_hall and oh.f_datecash=:f_datecash  and oh.f_state=:f_state and oh.f_amounttotal>0 "
+                        "union "
+                        "select '-' as f_staff, if(f_amounttotal<0,-1,1) as f_sign,"
+                        "sum(oh.f_amounttotal) as f_amounttotal "
+                        "from o_header oh "
+                        "left join s_user w on w.f_id=oh.f_staff  "
+                        "where oh.f_hall=:f_hall and oh.f_datecash=:f_datecash  and oh.f_state=:f_state and oh.f_amounttotal<0 "
                         "group by 1, 2");
                 QString info = tr("Total today") + "<br>";
                 while (db.nextRow()) {

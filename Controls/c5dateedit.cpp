@@ -13,7 +13,9 @@ C5DateEdit::C5DateEdit(QWidget *parent) :
     setInputMask("00/00/0000");
     setDate(C5DateEditFirstDate);
     connect(this, SIGNAL(textChanged(QString)), this, SLOT(newText(QString)));
-    setMaximumWidth(100);
+    if (maximumWidth() == 0) {
+        setMaximumWidth(100);
+    }
     fRow = 0;
     fColumn = 0;
     fDoNoCheckMinDate = false;

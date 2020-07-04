@@ -7,6 +7,7 @@
 #include "c5checkbox.h"
 #include "c5message.h"
 #include "viewinputitem.h"
+#include <QSet>
 
 #define VM_ACCEPT 0
 #define VM_STORE 1
@@ -95,8 +96,12 @@ void StoreInput::on_btnAccept_clicked()
         return;
     }
     C5Database db(__c5config.replicaDbParams());
+    db.startTransaction();
+    QSet<QString> ids;
     foreach (int r, rows) {
-        db[":f_id"] = ui->tbl->getString(r, 0);
+        QString id = ui->tbl->getString(r, 0);
+        ids.insert(QString("'%1'").arg(id));
+        db[":f_id"] = id;
         db[":f_datetime"] = QDateTime::currentDateTime();
         if (!db.insert("a_header_shop2partneraccept", false)) {
             C5Message::error(db.fLastError);
@@ -104,6 +109,34 @@ void StoreInput::on_btnAccept_clicked()
             return;
         }
     }
+    QString idlist = ids.toList().join(",");
+    db.exec(QString("select f_document from a_store_draft where f_id in (%1)").arg(idlist));
+    ids.clear();
+    while (db.nextRow()) {
+        ids.insert(db.getString("f_document"));
+    }
+    for (const QString &s: ids) {
+        db[":f_id"] = s;
+        db.exec("select count(a1.f_id) as c1, count(a2.f_id) as c2 "
+                "from a_header_shop2partner p "
+                "left join a_store_draft a1 on a1.f_document=p.f_id "
+                "left join a_header_shop2partneraccept a2 on a2.f_id=a1.f_id "
+                "where p.f_id=:f_id");
+        if (db.nextRow()){
+            if (db.getInt("c1") == db.getInt("c2")) {
+                C5StoreDraftWriter dw(db);
+                QString err;
+                dw.updateField("a_header", "f_date", QDate::currentDate(), "f_id", s);
+                dw.updateField("a_header", "f_state", DOC_STATE_SAVED, "f_id", s);
+                if (!dw.writeInput(s, err)) {
+                    C5Message::error(err);
+                    db.rollback();
+                    return;
+                }
+            }
+        }
+    }
+    db.commit();
     getList();
 }
 

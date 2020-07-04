@@ -8,6 +8,7 @@
 #include "c5message.h"
 #include "printtaxn.h"
 #include "vieworder.h"
+#include "cashcollection.h"
 
 #define VM_TOTAL 0
 #define VM_ITEMS 1
@@ -399,5 +400,26 @@ void Sales::on_btnRetryUpload_clicked()
         ui->btnRetryUpload->setVisible(false);
     } else {
         C5Message::error(tr("Cannot upload data"));
+    }
+}
+
+void Sales::on_btnCashColletion_clicked()
+{
+    auto *cc = new CashCollection();
+    cc->exec();
+    delete cc;
+}
+
+void Sales::on_leFilter_textChanged(const QString &arg1)
+{
+    for (int r = 0; r < ui->tbl->rowCount(); r++) {
+        bool h = true;
+        for (int c = 0; c < ui->tbl->columnCount(); c++) {
+            if (ui->tbl->getString(r, c).contains(arg1, Qt::CaseInsensitive)) {
+                h = false;
+                break;
+            }
+        }
+        ui->tbl->setRowHidden(r, h);
     }
 }

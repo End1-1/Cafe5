@@ -701,12 +701,13 @@ bool C5StoreDraftWriter::writeOGoods(QString &id, const QString &header, const Q
 
 bool C5StoreDraftWriter::writeInput(const QString &docId, QString &err)
 {
-
+    double total = 0;
     fDb[":f_document"] = docId;
     fDb.exec("select * from a_store_draft where f_document=:f_document");
     QList<QMap<QString, QVariant> > rows;
     while (fDb.nextRow()) {
         rows.append(fDb.getBindValues());
+        total += fDb.getDouble("f_total");
     }
     for (int i = 0; i < rows.count(); i++) {
         QMap<QString, QVariant> &r = rows[i];
@@ -720,6 +721,7 @@ bool C5StoreDraftWriter::writeInput(const QString &docId, QString &err)
             return false;
         }
     }
+    updateField("a_header", "f_amount", total, "f_id", docId);
     return true;
 }
 

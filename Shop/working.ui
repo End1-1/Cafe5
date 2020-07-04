@@ -306,43 +306,6 @@ color:white;font-size:13pt;
       <property name="horizontalSpacing">
        <number>3</number>
       </property>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label">
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Goods code (F7)</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QLineEdit" name="leCode"/>
-      </item>
-      <item row="1" column="1">
-       <widget class="QLineEdit" name="lePartner">
-        <property name="focusPolicy">
-         <enum>Qt::ClickFocus</enum>
-        </property>
-        <property name="readOnly">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_3">
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Partner tax code (F6)</string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="2" rowspan="2">
        <widget class="QToolButton" name="btnNewOrder">
         <property name="minimumSize">
@@ -383,6 +346,56 @@ F1</string>
         </property>
        </widget>
       </item>
+      <item row="0" column="4" rowspan="2">
+       <widget class="QToolButton" name="btnDuplicateReceipt">
+        <property name="minimumSize">
+         <size>
+          <width>70</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>70</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
+        </property>
+        <property name="text">
+         <string>Sales
+report
+</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="shortcut">
+         <string>F9</string>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonTextUnderIcon</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="lePartner">
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
+        </property>
+        <property name="readOnly">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="3" rowspan="2">
        <widget class="QToolButton" name="btnNewWhosale">
         <property name="minimumSize">
@@ -417,86 +430,6 @@ F2</string>
         </property>
         <property name="shortcut">
          <string>F11</string>
-        </property>
-        <property name="toolButtonStyle">
-         <enum>Qt::ToolButtonTextUnderIcon</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="4" rowspan="2">
-       <widget class="QToolButton" name="btnDuplicateReceipt">
-        <property name="minimumSize">
-         <size>
-          <width>70</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>70</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::ClickFocus</enum>
-        </property>
-        <property name="text">
-         <string>Duplicate
-receipt
-</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../resources/res.qrc">
-          <normaloff>:/print.png</normaloff>:/print.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>32</width>
-          <height>32</height>
-         </size>
-        </property>
-        <property name="shortcut">
-         <string>F9</string>
-        </property>
-        <property name="toolButtonStyle">
-         <enum>Qt::ToolButtonTextUnderIcon</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="5" rowspan="2">
-       <widget class="QToolButton" name="btnShowGoodsList">
-        <property name="minimumSize">
-         <size>
-          <width>70</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>70</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::ClickFocus</enum>
-        </property>
-        <property name="text">
-         <string>Goods
-list
-F5</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../resources/res.qrc">
-          <normaloff>:/reports.png</normaloff>:/reports.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>32</width>
-          <height>32</height>
-         </size>
-        </property>
-        <property name="shortcut">
-         <string>F10</string>
         </property>
         <property name="toolButtonStyle">
          <enum>Qt::ToolButtonTextUnderIcon</enum>
@@ -543,8 +476,8 @@ F9</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="7" rowspan="2">
-       <widget class="QToolButton" name="btnItemBack">
+      <item row="0" column="8" rowspan="2">
+       <widget class="QToolButton" name="btnSaveOrder">
         <property name="minimumSize">
          <size>
           <width>70</width>
@@ -561,13 +494,13 @@ F9</string>
          <enum>Qt::ClickFocus</enum>
         </property>
         <property name="text">
-         <string>Item
-back
-F10</string>
+         <string>Save
+order
+F12</string>
         </property>
         <property name="icon">
          <iconset resource="../resources/res.qrc">
-          <normaloff>:/cancel.png</normaloff>:/cancel.png</iconset>
+          <normaloff>:/save.png</normaloff>:/save.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -576,14 +509,121 @@ F10</string>
          </size>
         </property>
         <property name="shortcut">
-         <string>F9</string>
+         <string>F12</string>
         </property>
         <property name="toolButtonStyle">
          <enum>Qt::ToolButtonTextUnderIcon</enum>
         </property>
        </widget>
       </item>
-      <item row="0" column="8" rowspan="2">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Goods code (F7)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="leCode"/>
+      </item>
+      <item row="0" column="11" rowspan="2">
+       <widget class="QToolButton" name="btnExit">
+        <property name="minimumSize">
+         <size>
+          <width>70</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>70</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
+        </property>
+        <property name="text">
+         <string>Exit
+Esc
+</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/logout.png</normaloff>:/logout.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="shortcut">
+         <string>F10</string>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonTextUnderIcon</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="5" rowspan="2">
+       <widget class="QToolButton" name="btnShowGoodsList">
+        <property name="minimumSize">
+         <size>
+          <width>70</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>70</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
+        </property>
+        <property name="text">
+         <string>Goods
+list
+F5</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/reports.png</normaloff>:/reports.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="shortcut">
+         <string>F10</string>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonTextUnderIcon</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Partner tax code (F6)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="7" rowspan="2">
        <widget class="QToolButton" name="btnStoreInput">
         <property name="minimumSize">
          <size>
@@ -624,46 +664,6 @@ F11</string>
        </widget>
       </item>
       <item row="0" column="9" rowspan="2">
-       <widget class="QToolButton" name="btnSaveOrder">
-        <property name="minimumSize">
-         <size>
-          <width>70</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>70</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::ClickFocus</enum>
-        </property>
-        <property name="text">
-         <string>Save
-order
-F12</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../resources/res.qrc">
-          <normaloff>:/save.png</normaloff>:/save.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>32</width>
-          <height>32</height>
-         </size>
-        </property>
-        <property name="shortcut">
-         <string>F12</string>
-        </property>
-        <property name="toolButtonStyle">
-         <enum>Qt::ToolButtonTextUnderIcon</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="10" rowspan="2">
        <widget class="QToolButton" name="btnConnection">
         <property name="minimumSize">
          <size>
@@ -688,46 +688,6 @@ F12</string>
         <property name="icon">
          <iconset resource="../resources/res.qrc">
           <normaloff>:/configure.png</normaloff>:/configure.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>32</width>
-          <height>32</height>
-         </size>
-        </property>
-        <property name="shortcut">
-         <string>F10</string>
-        </property>
-        <property name="toolButtonStyle">
-         <enum>Qt::ToolButtonTextUnderIcon</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="12" rowspan="2">
-       <widget class="QToolButton" name="btnExit">
-        <property name="minimumSize">
-         <size>
-          <width>70</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>70</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::ClickFocus</enum>
-        </property>
-        <property name="text">
-         <string>Exit
-Esc
-</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../resources/res.qrc">
-          <normaloff>:/logout.png</normaloff>:/logout.png</iconset>
         </property>
         <property name="iconSize">
          <size>

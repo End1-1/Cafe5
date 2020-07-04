@@ -99,6 +99,7 @@ int main(int argc, char *argv[])
         __c5config.initParamsFromDb();
     }
     Working w;
+    __c5config.fParentWidget = &w;
     C5Dialog::setMainWindow(&w);
     w.showMaximized();
 

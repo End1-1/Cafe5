@@ -86,5 +86,6 @@
         <file>restore.png</file>
         <file>cleardb.sql</file>
         <file>print_description.png</file>
+        <file>cashcollection.png</file>
     </qresource>
 </RCC>

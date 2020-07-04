@@ -9,7 +9,7 @@ C5CostumerDebtPayment::C5CostumerDebtPayment(const QStringList &dbParams) :
     ui(new Ui::C5CostumerDebtPayment)
 {
     ui->setupUi(this);
-    ui->leAmount->setValidator(new QDoubleValidator(-999999999, 999999999, 0));
+    ui->leAmount->setValidator(new QDoubleValidator(-999999999, 999999999, 2));
     ui->leCostumer->setSelector(dbParams, ui->leCostumerName, cache_discount_client);
     ui->leCostumer->setCallbackDialog(this);
     ui->leCash->setSelector(dbParams, ui->leCashName, cache_cash_names);

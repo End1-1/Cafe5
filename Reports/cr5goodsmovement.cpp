@@ -44,7 +44,9 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
                    << "s.f_price"
                    << "sum(s.f_total) as f_total"
                    << "g.f_saleprice"
+                   << "sum(g.f_saleprice*s.f_qty) as f_salepricetotal"
                    << "g.f_saleprice2"
+                   << "sum(g.f_saleprice2*s.f_qty) as f_salepricetotal2"
                       ;
 
     fColumnsGroup << "s.f_document"
@@ -70,6 +72,8 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
 
     fColumnsSum << "f_qty"
                 << "f_total"
+                << "f_salepricetotal"
+                << "f_salepricetotal2"
                       ;
 
     fTranslation["f_userid"] = tr("Document");
@@ -90,7 +94,9 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
     fTranslation["f_qty"] = tr("Qty");
     fTranslation["f_unit"] = tr("Unit");
     fTranslation["f_price"] = tr("Price");
-    fTranslation["f_total"] = tr("Amount");;
+    fTranslation["f_total"] = tr("Amount");
+    fTranslation["f_salepricetotal"] = tr("Total retail");
+    fTranslation["f_salepricetotal2"] = tr("Total whosale");
 
     fColumnsVisible["a.f_date"] = true;
     fColumnsVisible["dt.f_name as f_docname"] = true;
@@ -111,6 +117,8 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
     fColumnsVisible["gcb.f_name as f_class2"] = false;
     fColumnsVisible["gcc.f_name as f_class3"] = false;
     fColumnsVisible["gcd.f_name as f_class4"] = false;
+    fColumnsVisible["sum(g.f_saleprice*s.f_qty) as f_salepricetotal"] = true;
+    fColumnsVisible["sum(g.f_saleprice2*s.f_qty) as f_salepricetotal2"] = false;
 
     restoreColumnsVisibility();
     fFilterWidget = new CR5GoodsMovementFilter(fDBParams);

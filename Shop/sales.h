@@ -39,6 +39,10 @@ private slots:
 
     void on_btnRetryUpload_clicked();
 
+    void on_btnCashColletion_clicked();
+
+    void on_leFilter_textChanged(const QString &arg1);
+
 private:
     Ui::Sales *ui;
 

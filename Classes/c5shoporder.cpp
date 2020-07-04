@@ -223,7 +223,7 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
                 if (!dw.writeAHeader(pstoredoc, storedocUserNum, DOC_STATE_DRAFT, DOC_TYPE_STORE_INPUT, __userid, QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, 0, tr("Store input") + " " + fPartnerName, 0, 0)) {
                     return returnFalse(dw.fErrorMsg, db);
                 }
-                if (!dw.writeAHeaderStore(pstoredoc, __userid, __userid, "", QDate(), partnerStore, 0, 1, "", 0, 0)) {
+                if (!dw.writeAHeaderStore(pstoredoc, __userid, __userid, "", QDate(), partnerStore, 0, 0, "", 0, 0)) {
                     return returnFalse(dw.fErrorMsg, db);
                 }
                 // DO NOT UNCOMPLECT THE GOODS WITH UNIT ID THAT EQUAL TO 10
@@ -281,26 +281,23 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
                         return returnFalse(dw.fErrorMsg, db);
                     }
                 }
-                if (dw.writeInput(pstoredoc, err)) {
-                    int counter = dw.counterAType(DOC_TYPE_CASH);
-                    if (!dw.writeAHeader(pstoredoc, storedocUserNum, DOC_STATE_SAVED, DOC_TYPE_STORE_INPUT, __userid, QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), fPartnerCode, total, comment, 0, 0)) {
-                        return returnFalse(dw.fErrorMsg, db);
-                    }
-                    QString partnerCashDoc;
-                    if (!dw.writeAHeader(partnerCashDoc, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH, __userid, QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), fPartnerCode, total, comment, 0, 0)) {
-                        return returnFalse(dw.fErrorMsg, db);
-                    }
-                    if (!dw.writeAHeaderCash(partnerCashDoc, partnerCash, 0, 1, partnerCashDoc, "")) {
-                        return returnFalse(dw.fErrorMsg, db);
-                    }
-                    QString cashUUID;
-                    if (!dw.writeECash(cashUUID, partnerCashDoc, partnerCash, -1, comment, total, cashUUID, 1)) {
-                        return returnFalse(dw.fErrorMsg, db);
-                    }
-                    if (!dw.writeAHeaderStore(pstoredoc, __userid, __userid, "", QDate(), partnerStore, 0, 1, partnerCashDoc, 0, 0)) {
-                        return returnFalse(dw.fErrorMsg, db);
-                    }
+
+                int counter = dw.counterAType(DOC_TYPE_CASH);
+                QString partnerCashDoc;
+                if (!dw.writeAHeader(partnerCashDoc, QString::number(counter), DOC_STATE_DRAFT, DOC_TYPE_CASH, __userid, QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), fPartnerCode, total, comment, 0, 0)) {
+                    return returnFalse(dw.fErrorMsg, db);
                 }
+                if (!dw.writeAHeaderCash(partnerCashDoc, partnerCash, 0, 1, partnerCashDoc, "")) {
+                    return returnFalse(dw.fErrorMsg, db);
+                }
+                QString cashUUID;
+                if (!dw.writeECash(cashUUID, partnerCashDoc, partnerCash, -1, comment, total, cashUUID, 1)) {
+                    return returnFalse(dw.fErrorMsg, db);
+                }
+                if (!dw.writeAHeaderStore(pstoredoc, __userid, __userid, "", QDate(), partnerStore, 0, 0, partnerCashDoc, 0, 0)) {
+                    return returnFalse(dw.fErrorMsg, db);
+                }
+
                 dw.writeAHeader2ShopStore(pstoredoc, partnerStore, 0);
             }
         }

@@ -3,6 +3,8 @@
 #include <QValidator>
 #include <QKeyEvent>
 
+static QLocale mLocale;
+
 C5LineEdit::C5LineEdit(QWidget *parent) :
     QLineEdit(parent)
 {
@@ -35,7 +37,9 @@ void C5LineEdit::setDouble(double i)
 
 double C5LineEdit::getDouble()
 {
-    return QLocale().toDouble(text());
+    QString t = text();
+    t.replace(mLocale.groupSeparator(), "");
+    return mLocale.toDouble(text());
 }
 
 int C5LineEdit::getTag()

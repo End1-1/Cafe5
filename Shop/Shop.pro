@@ -64,6 +64,7 @@ SOURCES += \
     ../FrontDesk/c5filtervalues.cpp \
     ../FrontDesk/c5filterwidget.cpp \
     ../FrontDesk/c5selector.cpp \
+    cashcollection.cpp \
     dlgpin.cpp \
     goodsreturnreason.cpp \
     imageloader.cpp \
@@ -140,6 +141,7 @@ HEADERS += \
     ../FrontDesk/c5filtervalues.h \
     ../FrontDesk/c5filterwidget.h \
     ../FrontDesk/c5selector.h \
+    cashcollection.h \
     dlgpin.h \
     goodsreturnreason.h \
     imageloader.h \
@@ -187,6 +189,7 @@ FORMS += \
     ../Editors/ce5partner.ui \
     ../FrontDesk/c5filtervalues.ui \
     ../FrontDesk/c5selector.ui \
+    cashcollection.ui \
     dlgpin.ui \
     goodsreturnreason.ui \
     preorders.ui \
