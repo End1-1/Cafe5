@@ -184,6 +184,7 @@ void C5SalaryDoc::countSalary()
     QMap<int, double> posTotal;
     QMap<int, double> posIndividual;
     QMap<int, double> posPercent;
+    QMap<int, double> posIndividualLow;
     for (int i = 0; i < ui->tbl->rowCount(); i++) {
         posCount[ui->tbl->lineEditWithSelector(i, 1)->getInteger()] = posCount[ui->tbl->lineEditWithSelector(i, 1)->getInteger()] + 1;
     }
@@ -192,7 +193,7 @@ void C5SalaryDoc::countSalary()
     for (QMap<int, int>::const_iterator it = posCount.begin(); it != posCount.end(); it++) {
         db[":f_position"] = it.key();
         db[":f_shift"] = ui->leShift->getInteger();
-        db.exec("select f_raw, f_individual, f_percent from s_salary_account where f_position=:f_position and f_shift=:f_shift");
+        db.exec("select f_raw, f_individual, f_percent, f_individuallow from s_salary_account where f_position=:f_position and f_shift=:f_shift");
         while (db.nextRow()) {
             posCondition[it.key()] = db.getString(0);
             posPercent[it.key()] = db.getDouble(2);

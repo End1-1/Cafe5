@@ -1664,7 +1664,7 @@ MS Excel</source>
     </message>
     <message>
         <location filename="sales.ui" line="273"/>
-        <location filename="sales.cpp" line="322"/>
+        <location filename="sales.cpp" line="330"/>
         <source>Print tax</source>
         <translation>Տպել
 ՀԴՄ</translation>
@@ -1683,62 +1683,62 @@ MS Excel</source>
     </message>
     <message>
         <location filename="sales.ui" line="335"/>
-        <location filename="sales.cpp" line="80"/>
-        <location filename="sales.cpp" line="135"/>
+        <location filename="sales.cpp" line="81"/>
+        <location filename="sales.cpp" line="136"/>
         <source>UUID</source>
         <translation></translation>
     </message>
     <message>
         <location filename="sales.ui" line="340"/>
-        <location filename="sales.cpp" line="81"/>
-        <location filename="sales.cpp" line="136"/>
+        <location filename="sales.cpp" line="82"/>
+        <location filename="sales.cpp" line="137"/>
         <source>Sale type code</source>
         <translation>Վաճառքի տեսակի կոդ</translation>
     </message>
     <message>
         <location filename="sales.ui" line="345"/>
-        <location filename="sales.cpp" line="83"/>
-        <location filename="sales.cpp" line="138"/>
+        <location filename="sales.cpp" line="84"/>
+        <location filename="sales.cpp" line="139"/>
         <source>Sale type</source>
         <translation>Վաճառքի տեսակ</translation>
     </message>
     <message>
         <location filename="sales.ui" line="350"/>
-        <location filename="sales.cpp" line="84"/>
-        <location filename="sales.cpp" line="139"/>
+        <location filename="sales.cpp" line="85"/>
+        <location filename="sales.cpp" line="140"/>
         <source>Number</source>
         <translation>Համար</translation>
     </message>
     <message>
         <location filename="sales.ui" line="355"/>
-        <location filename="sales.cpp" line="85"/>
-        <location filename="sales.cpp" line="140"/>
+        <location filename="sales.cpp" line="86"/>
+        <location filename="sales.cpp" line="141"/>
         <source>Tax</source>
         <translation>ՀԴՄ</translation>
     </message>
     <message>
         <location filename="sales.ui" line="360"/>
-        <location filename="sales.cpp" line="86"/>
-        <location filename="sales.cpp" line="141"/>
+        <location filename="sales.cpp" line="87"/>
+        <location filename="sales.cpp" line="142"/>
         <source>Date</source>
         <translation>Ամսաթիվ</translation>
     </message>
     <message>
         <location filename="sales.ui" line="365"/>
-        <location filename="sales.cpp" line="87"/>
-        <location filename="sales.cpp" line="142"/>
+        <location filename="sales.cpp" line="88"/>
+        <location filename="sales.cpp" line="143"/>
         <source>Time</source>
         <translation>Ժամ</translation>
     </message>
     <message>
         <location filename="sales.ui" line="370"/>
-        <location filename="sales.cpp" line="88"/>
+        <location filename="sales.cpp" line="89"/>
         <source>Amount</source>
         <translation>Գումար</translation>
     </message>
     <message>
         <location filename="sales.ui" line="375"/>
-        <location filename="sales.cpp" line="89"/>
+        <location filename="sales.cpp" line="90"/>
         <source>Customer</source>
         <translation>Հաճախորդ</translation>
     </message>
@@ -1763,67 +1763,67 @@ MS Excel</source>
         <translation>Ընդհանուր գումար</translation>
     </message>
     <message>
-        <location filename="sales.cpp" line="82"/>
-        <location filename="sales.cpp" line="137"/>
+        <location filename="sales.cpp" line="83"/>
+        <location filename="sales.cpp" line="138"/>
         <source>Seller</source>
         <translation>Վաճարող</translation>
     </message>
     <message>
-        <location filename="sales.cpp" line="143"/>
-        <location filename="sales.cpp" line="195"/>
+        <location filename="sales.cpp" line="144"/>
+        <location filename="sales.cpp" line="196"/>
         <source>Scancode</source>
         <translation>Սկանկոդ</translation>
     </message>
     <message>
-        <location filename="sales.cpp" line="144"/>
-        <location filename="sales.cpp" line="196"/>
+        <location filename="sales.cpp" line="145"/>
+        <location filename="sales.cpp" line="197"/>
         <source>Goods</source>
         <translation>Ապրանքի անվանում</translation>
     </message>
     <message>
-        <location filename="sales.cpp" line="145"/>
-        <location filename="sales.cpp" line="197"/>
+        <location filename="sales.cpp" line="146"/>
+        <location filename="sales.cpp" line="198"/>
         <source>Qty</source>
         <translation>Քանակ</translation>
     </message>
     <message>
-        <location filename="sales.cpp" line="146"/>
+        <location filename="sales.cpp" line="147"/>
         <source>Price</source>
         <translation>Գին</translation>
     </message>
     <message>
-        <location filename="sales.cpp" line="147"/>
-        <location filename="sales.cpp" line="198"/>
+        <location filename="sales.cpp" line="148"/>
+        <location filename="sales.cpp" line="199"/>
         <source>Total</source>
         <translation>Ընդամենը</translation>
     </message>
     <message>
-        <location filename="sales.cpp" line="260"/>
+        <location filename="sales.cpp" line="268"/>
         <source>No row selected</source>
         <translation>Ոչինչ նշված չէ</translation>
     </message>
     <message>
-        <location filename="sales.cpp" line="264"/>
+        <location filename="sales.cpp" line="272"/>
         <source>Return inpossible to return, just view</source>
         <translation>Հետվերադարձը հնարավոր է միայն դիտել</translation>
     </message>
     <message>
-        <location filename="sales.cpp" line="319"/>
+        <location filename="sales.cpp" line="327"/>
         <source>Cannot print tax twice</source>
         <translation>ՀԴՄ կտրոնը արդեն տպված է</translation>
     </message>
     <message>
-        <location filename="sales.cpp" line="379"/>
+        <location filename="sales.cpp" line="387"/>
         <source>(F)</source>
         <translation>(Ֆ)</translation>
     </message>
     <message>
-        <location filename="sales.cpp" line="388"/>
+        <location filename="sales.cpp" line="396"/>
         <source>Printed</source>
         <translation>Տպված է</translation>
     </message>
     <message>
-        <location filename="sales.cpp" line="402"/>
+        <location filename="sales.cpp" line="410"/>
         <source>Cannot upload data</source>
         <translation>Սերվերը անհասանելի է։</translation>
     </message>
