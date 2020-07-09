@@ -79,10 +79,12 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Reports/cr5preorders.cpp \
     ../Reports/cr5salarybyworkers.cpp \
     ../Reports/cr5salarybyworkersfilter.cpp \
+    ../Reports/cr5saleandstorefilter.cpp \
     ../Reports/cr5salefromstoretotal.cpp \
     ../Reports/cr5salefromstoretotalfilter.cpp \
     ../Reports/cr5saleremoveddishes.cpp \
     ../Reports/cr5saleremoveddishesfilter.cpp \
+    ../Reports/cr5salesandstore.cpp \
     ../Reports/cr5salesbydishes.cpp \
     ../Reports/cr5salesbydishesfilter.cpp \
     ../Reports/cr5storereason.cpp \
@@ -271,10 +273,12 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Reports/cr5preorders.h \
     ../Reports/cr5salarybyworkers.h \
     ../Reports/cr5salarybyworkersfilter.h \
+    ../Reports/cr5saleandstorefilter.h \
     ../Reports/cr5salefromstoretotal.h \
     ../Reports/cr5salefromstoretotalfilter.h \
     ../Reports/cr5saleremoveddishes.h \
     ../Reports/cr5saleremoveddishesfilter.h \
+    ../Reports/cr5salesandstore.h \
     ../Reports/cr5salesbydishes.h \
     ../Reports/cr5salesbydishesfilter.h \
     ../Reports/cr5storereason.h \
@@ -442,6 +446,7 @@ FORMS += \
     ../Reports/cr5goodsimages.ui \
     ../Reports/cr5menureviewfilter.ui \
     ../Reports/cr5salarybyworkersfilter.ui \
+    ../Reports/cr5saleandstorefilter.ui \
     ../Reports/cr5salefromstoretotalfilter.ui \
     ../Reports/cr5saleremoveddishesfilter.ui \
     ../Reports/cr5salesbydishesfilter.ui \

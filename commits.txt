@@ -63,3 +63,6 @@
 	1. Shop: refund option.
 	2. Cash doc.
 	3. First Working configuration
+	
+04.07.2020
+	1. Do not register cash document in write order with partner option. Store document also writed like draft.

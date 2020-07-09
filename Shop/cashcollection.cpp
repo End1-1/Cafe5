@@ -21,11 +21,12 @@ CashCollection::CashCollection() :
         ui->leAmount->setDouble(db.getDouble("f_amount"));
     }
     db[":f_cash"] = __c5config.nocashId();
+    db[":f_date"] = QDate::currentDate();
     db.exec("select  sum(ec.f_amount*ec.f_sign) as f_amount "
             "from e_cash ec "
             "left join a_header h on h.f_id=ec.f_header "
             "left join e_cash_names cn on cn.f_id=ec.f_cash  "
-            "where  h.f_state=1 and ec.f_cash=:f_cash");
+            "where  h.f_state=1 and ec.f_cash=:f_cash and h.f_date=:f_date ");
     if (db.nextRow()) {
         ui->leAmountCard->setDouble(db.getDouble("f_amount"));
     }

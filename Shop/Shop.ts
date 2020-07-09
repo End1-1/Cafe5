@@ -478,43 +478,43 @@
 <context>
     <name>C5ShopOrder</name>
     <message>
-        <location filename="../Classes/c5shoporder.cpp" line="43"/>
+        <location filename="../Classes/c5shoporder.cpp" line="44"/>
         <source>Negative amount</source>
         <translation>Բացասական գումար</translation>
     </message>
     <message>
-        <location filename="../Classes/c5shoporder.cpp" line="53"/>
+        <location filename="../Classes/c5shoporder.cpp" line="54"/>
         <source>Empty order</source>
         <translation>Դատարկ պատվեր</translation>
     </message>
     <message>
-        <location filename="../Classes/c5shoporder.cpp" line="57"/>
+        <location filename="../Classes/c5shoporder.cpp" line="58"/>
         <source>Cashdesk for cash not defined</source>
         <translation>Կանխիկի դրամարկղը նշանակված չէ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5shoporder.cpp" line="60"/>
+        <location filename="../Classes/c5shoporder.cpp" line="61"/>
         <source>Cashdesk for card not defined</source>
         <translation>Անկանխիկի դրամարկղը նշանակված չէ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5shoporder.cpp" line="62"/>
+        <location filename="../Classes/c5shoporder.cpp" line="63"/>
         <source>Write order?</source>
         <translation>Գրանցել՞</translation>
     </message>
     <message>
-        <location filename="../Classes/c5shoporder.cpp" line="120"/>
+        <location filename="../Classes/c5shoporder.cpp" line="121"/>
         <source>(F)</source>
         <translation>(Ֆ)</translation>
     </message>
     <message>
-        <location filename="../Classes/c5shoporder.cpp" line="141"/>
+        <location filename="../Classes/c5shoporder.cpp" line="142"/>
         <source>Output of sale</source>
         <translation>Ելք ըստ վաճառքի</translation>
     </message>
     <message>
-        <location filename="../Classes/c5shoporder.cpp" line="220"/>
-        <location filename="../Classes/c5shoporder.cpp" line="223"/>
+        <location filename="../Classes/c5shoporder.cpp" line="221"/>
+        <location filename="../Classes/c5shoporder.cpp" line="224"/>
         <source>Store input</source>
         <translation>Պահեստի մուտք</translation>
     </message>
@@ -562,17 +562,17 @@
         <translation>Փասթաթուղթը գոյություն չունի</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="748"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="750"/>
         <source>Invalid document id</source>
         <translation>Փասթաթուղթը գոյություն չունի</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="855"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="857"/>
         <source>Not enough materials in the store</source>
         <translation>Բացասական քանակ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="951"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="953"/>
         <source>This order used in next documents</source>
         <translation>Փասթաթուղթը օգտագործվում է հետևյալ փասթաթղթերում</translation>
     </message>
@@ -1172,34 +1172,60 @@ MS Excel</source>
     <name>CashCollection</name>
     <message>
         <location filename="cashcollection.ui" line="19"/>
-        <location filename="cashcollection.cpp" line="9"/>
+        <location filename="cashcollection.cpp" line="11"/>
         <source>Cash collection</source>
-        <translation type="unfinished"></translation>
+        <translation>Կանխիկի հանձնում</translation>
     </message>
     <message>
-        <location filename="cashcollection.ui" line="28"/>
+        <location filename="cashcollection.ui" line="30"/>
+        <source>*collection not supported</source>
+        <translation>*ցուցադրվում է միայն ստուգելու նպատակով</translation>
+    </message>
+    <message>
+        <location filename="cashcollection.ui" line="47"/>
+        <source>Amount,cash</source>
+        <translation>Կանխիկ գումար</translation>
+    </message>
+    <message>
+        <location filename="cashcollection.ui" line="54"/>
+        <source>Amount,card *</source>
+        <translation>Անկանխիկ գումար</translation>
+    </message>
+    <message>
+        <location filename="cashcollection.ui" line="61"/>
+        <location filename="cashcollection.ui" line="71"/>
+        <source>0</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="cashcollection.ui" line="81"/>
         <source>Date</source>
-        <translation type="unfinished">Ամսաթիվ</translation>
+        <translation>Ամսաթիվ</translation>
     </message>
     <message>
-        <location filename="cashcollection.ui" line="57"/>
+        <location filename="cashcollection.ui" line="37"/>
         <source>Purpose</source>
-        <translation type="unfinished"></translation>
+        <translation>Նպատակ</translation>
     </message>
     <message>
-        <location filename="cashcollection.ui" line="73"/>
-        <source>Amount</source>
-        <translation type="unfinished">Գումար</translation>
-    </message>
-    <message>
-        <location filename="cashcollection.ui" line="115"/>
+        <location filename="cashcollection.ui" line="104"/>
         <source>Save</source>
-        <translation type="unfinished">Պահպանել</translation>
+        <translation>Պահպանել</translation>
     </message>
     <message>
-        <location filename="cashcollection.ui" line="122"/>
+        <location filename="cashcollection.ui" line="111"/>
         <source>Cancel</source>
-        <translation type="unfinished">Հրաժարվել</translation>
+        <translation>Հրաժարվել</translation>
+    </message>
+    <message>
+        <location filename="cashcollection.cpp" line="48"/>
+        <source>Amount must be greater then 0</source>
+        <translation>Ելքագրվող գումարը պետք է մեծ լինի 0-ից</translation>
+    </message>
+    <message>
+        <location filename="cashcollection.cpp" line="91"/>
+        <source>Saved</source>
+        <translation>Պահպանված է</translation>
     </message>
 </context>
 <context>
@@ -1598,136 +1624,141 @@ MS Excel</source>
         <translation>Վաճառքներ</translation>
     </message>
     <message>
-        <location filename="sales.ui" line="94"/>
+        <location filename="sales.ui" line="76"/>
         <source>Date range</source>
         <translation>Ժամանակաշրջան</translation>
     </message>
     <message>
-        <location filename="sales.ui" line="131"/>
+        <location filename="sales.ui" line="62"/>
         <source>Seller code</source>
         <translation>Վաճարողի կոդ</translation>
     </message>
     <message>
-        <location filename="sales.ui" line="182"/>
+        <location filename="sales.ui" line="69"/>
+        <source>Filter</source>
+        <translation>Ֆիլտր</translation>
+    </message>
+    <message>
+        <location filename="sales.ui" line="199"/>
         <source>Total mode</source>
         <translation>Վաճառք, 
 ըստ կտրոնների</translation>
     </message>
     <message>
-        <location filename="sales.ui" line="205"/>
+        <location filename="sales.ui" line="222"/>
         <source>Item mode</source>
         <translation>Վաճառք,
 ըստ տեսականիի</translation>
     </message>
     <message>
-        <location filename="sales.ui" line="228"/>
+        <location filename="sales.ui" line="245"/>
         <source>Total items</source>
         <translation>Տեսականի,
 ընդհանուր</translation>
     </message>
     <message>
-        <location filename="sales.ui" line="245"/>
+        <location filename="sales.ui" line="262"/>
         <source>Duplicate receipt</source>
         <translation>Հաշվի 
 կրկօրինակ</translation>
     </message>
     <message>
-        <location filename="sales.ui" line="256"/>
+        <location filename="sales.ui" line="273"/>
         <location filename="sales.cpp" line="322"/>
         <source>Print tax</source>
         <translation>Տպել
 ՀԴՄ</translation>
     </message>
     <message>
-        <location filename="sales.ui" line="267"/>
+        <location filename="sales.ui" line="284"/>
         <source>Item return</source>
         <translation>Հետ 
 վերադարձ</translation>
     </message>
     <message>
-        <location filename="sales.ui" line="278"/>
+        <location filename="sales.ui" line="295"/>
         <source>Cash collection</source>
         <translation>Կանխիկի
 հանձնում</translation>
     </message>
     <message>
-        <location filename="sales.ui" line="318"/>
+        <location filename="sales.ui" line="335"/>
         <location filename="sales.cpp" line="80"/>
         <location filename="sales.cpp" line="135"/>
         <source>UUID</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="sales.ui" line="323"/>
+        <location filename="sales.ui" line="340"/>
         <location filename="sales.cpp" line="81"/>
         <location filename="sales.cpp" line="136"/>
         <source>Sale type code</source>
         <translation>Վաճառքի տեսակի կոդ</translation>
     </message>
     <message>
-        <location filename="sales.ui" line="328"/>
+        <location filename="sales.ui" line="345"/>
         <location filename="sales.cpp" line="83"/>
         <location filename="sales.cpp" line="138"/>
         <source>Sale type</source>
         <translation>Վաճառքի տեսակ</translation>
     </message>
     <message>
-        <location filename="sales.ui" line="333"/>
+        <location filename="sales.ui" line="350"/>
         <location filename="sales.cpp" line="84"/>
         <location filename="sales.cpp" line="139"/>
         <source>Number</source>
         <translation>Համար</translation>
     </message>
     <message>
-        <location filename="sales.ui" line="338"/>
+        <location filename="sales.ui" line="355"/>
         <location filename="sales.cpp" line="85"/>
         <location filename="sales.cpp" line="140"/>
         <source>Tax</source>
         <translation>ՀԴՄ</translation>
     </message>
     <message>
-        <location filename="sales.ui" line="343"/>
+        <location filename="sales.ui" line="360"/>
         <location filename="sales.cpp" line="86"/>
         <location filename="sales.cpp" line="141"/>
         <source>Date</source>
         <translation>Ամսաթիվ</translation>
     </message>
     <message>
-        <location filename="sales.ui" line="348"/>
+        <location filename="sales.ui" line="365"/>
         <location filename="sales.cpp" line="87"/>
         <location filename="sales.cpp" line="142"/>
         <source>Time</source>
         <translation>Ժամ</translation>
     </message>
     <message>
-        <location filename="sales.ui" line="353"/>
+        <location filename="sales.ui" line="370"/>
         <location filename="sales.cpp" line="88"/>
         <source>Amount</source>
         <translation>Գումար</translation>
     </message>
     <message>
-        <location filename="sales.ui" line="358"/>
+        <location filename="sales.ui" line="375"/>
         <location filename="sales.cpp" line="89"/>
         <source>Customer</source>
         <translation>Հաճախորդ</translation>
     </message>
     <message>
-        <location filename="sales.ui" line="375"/>
+        <location filename="sales.ui" line="392"/>
         <source>Upload incomplete, retry</source>
         <translation>Ոչ բոլոր տվյալները բեռնվել են սերվեր։</translation>
     </message>
     <message>
-        <location filename="sales.ui" line="395"/>
+        <location filename="sales.ui" line="412"/>
         <source>Retail</source>
         <translation>Մանրածախ</translation>
     </message>
     <message>
-        <location filename="sales.ui" line="418"/>
+        <location filename="sales.ui" line="435"/>
         <source>Whosale</source>
         <translation>Մեծածախ</translation>
     </message>
     <message>
-        <location filename="sales.ui" line="441"/>
+        <location filename="sales.ui" line="458"/>
         <source>Total amount</source>
         <translation>Ընդհանուր գումար</translation>
     </message>
@@ -1846,6 +1877,34 @@ MS Excel</source>
     </message>
 </context>
 <context>
+    <name>SelectPrinters</name>
+    <message>
+        <location filename="selectprinters.ui" line="19"/>
+        <source>Select printers</source>
+        <translation>Տպել</translation>
+    </message>
+    <message>
+        <location filename="selectprinters.ui" line="25"/>
+        <source>Print #1</source>
+        <translation>Տպել առաջին կտրոն</translation>
+    </message>
+    <message>
+        <location filename="selectprinters.ui" line="35"/>
+        <source>Print #2</source>
+        <translation>Տպել երկրորդ կտրոն</translation>
+    </message>
+    <message>
+        <location filename="selectprinters.ui" line="61"/>
+        <source>OK</source>
+        <translation>Ընդունել</translation>
+    </message>
+    <message>
+        <location filename="selectprinters.ui" line="68"/>
+        <source>Cancel</source>
+        <translation>Հրաժարվել</translation>
+    </message>
+</context>
+<context>
     <name>SelectStaff</name>
     <message>
         <location filename="selectstaff.ui" line="14"/>
@@ -1916,65 +1975,65 @@ MS Excel</source>
     </message>
     <message>
         <location filename="storeinput.ui" line="218"/>
-        <location filename="storeinput.cpp" line="117"/>
-        <location filename="storeinput.cpp" line="159"/>
+        <location filename="storeinput.cpp" line="150"/>
+        <location filename="storeinput.cpp" line="192"/>
         <source>UUID</source>
         <translation></translation>
     </message>
     <message>
         <location filename="storeinput.ui" line="223"/>
-        <location filename="storeinput.cpp" line="117"/>
-        <location filename="storeinput.cpp" line="159"/>
-        <location filename="storeinput.cpp" line="209"/>
-        <location filename="storeinput.cpp" line="249"/>
+        <location filename="storeinput.cpp" line="150"/>
+        <location filename="storeinput.cpp" line="192"/>
+        <location filename="storeinput.cpp" line="242"/>
+        <location filename="storeinput.cpp" line="282"/>
         <source>X</source>
         <translation></translation>
     </message>
     <message>
         <location filename="storeinput.ui" line="228"/>
-        <location filename="storeinput.cpp" line="117"/>
-        <location filename="storeinput.cpp" line="159"/>
+        <location filename="storeinput.cpp" line="150"/>
+        <location filename="storeinput.cpp" line="192"/>
         <source>Date</source>
         <translation>Ամսաթիվ</translation>
     </message>
     <message>
         <location filename="storeinput.ui" line="233"/>
-        <location filename="storeinput.cpp" line="117"/>
-        <location filename="storeinput.cpp" line="159"/>
+        <location filename="storeinput.cpp" line="150"/>
+        <location filename="storeinput.cpp" line="192"/>
         <source>Store</source>
         <translation>Պահեստ</translation>
     </message>
     <message>
         <location filename="storeinput.ui" line="238"/>
-        <location filename="storeinput.cpp" line="117"/>
-        <location filename="storeinput.cpp" line="159"/>
-        <location filename="storeinput.cpp" line="249"/>
+        <location filename="storeinput.cpp" line="150"/>
+        <location filename="storeinput.cpp" line="192"/>
+        <location filename="storeinput.cpp" line="282"/>
         <source>Goods</source>
         <translation>Ապրանքի անվանում</translation>
     </message>
     <message>
         <location filename="storeinput.ui" line="243"/>
-        <location filename="storeinput.cpp" line="117"/>
-        <location filename="storeinput.cpp" line="159"/>
-        <location filename="storeinput.cpp" line="249"/>
+        <location filename="storeinput.cpp" line="150"/>
+        <location filename="storeinput.cpp" line="192"/>
+        <location filename="storeinput.cpp" line="282"/>
         <source>Scancode</source>
         <translation>Սկանկոդ</translation>
     </message>
     <message>
         <location filename="storeinput.ui" line="248"/>
-        <location filename="storeinput.cpp" line="117"/>
-        <location filename="storeinput.cpp" line="159"/>
-        <location filename="storeinput.cpp" line="209"/>
-        <location filename="storeinput.cpp" line="249"/>
+        <location filename="storeinput.cpp" line="150"/>
+        <location filename="storeinput.cpp" line="192"/>
+        <location filename="storeinput.cpp" line="242"/>
+        <location filename="storeinput.cpp" line="282"/>
         <source>Qty</source>
         <translation>Քանակ</translation>
     </message>
     <message>
         <location filename="storeinput.ui" line="253"/>
-        <location filename="storeinput.cpp" line="117"/>
-        <location filename="storeinput.cpp" line="159"/>
-        <location filename="storeinput.cpp" line="209"/>
-        <location filename="storeinput.cpp" line="249"/>
+        <location filename="storeinput.cpp" line="150"/>
+        <location filename="storeinput.cpp" line="192"/>
+        <location filename="storeinput.cpp" line="242"/>
+        <location filename="storeinput.cpp" line="282"/>
         <source>Retail</source>
         <translation>Մանրածախ</translation>
     </message>
@@ -1994,18 +2053,18 @@ MS Excel</source>
         <translation>Ընդամենը</translation>
     </message>
     <message>
-        <location filename="storeinput.cpp" line="84"/>
+        <location filename="storeinput.cpp" line="85"/>
         <source>Set checking view mode</source>
         <translation>Նշեք պատմության կոճակը</translation>
     </message>
     <message>
-        <location filename="storeinput.cpp" line="94"/>
+        <location filename="storeinput.cpp" line="95"/>
         <source>Nothing is selected</source>
         <translation>Ոչինչ նշված չէ</translation>
     </message>
     <message>
-        <location filename="storeinput.cpp" line="209"/>
-        <location filename="storeinput.cpp" line="249"/>
+        <location filename="storeinput.cpp" line="242"/>
+        <location filename="storeinput.cpp" line="282"/>
         <source>Group</source>
         <translation>Խումբ</translation>
     </message>
@@ -2477,12 +2536,12 @@ MS Excel</source>
         <translation>ՎԱՃԱՌԱՏԵՂ</translation>
     </message>
     <message>
-        <location filename="working.ui" line="317"/>
+        <location filename="working.ui" line="527"/>
         <source>Goods code (F7)</source>
         <translation>Ապրանքի կոդ (F7)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="484"/>
+        <location filename="working.ui" line="592"/>
         <source>Goods
 list
 F5</source>
@@ -2517,7 +2576,7 @@ F5</translation>
     </message>
     <message>
         <location filename="working.ui" line="143"/>
-        <location filename="working.cpp" line="523"/>
+        <location filename="working.cpp" line="530"/>
         <source>Retail</source>
         <translation>Մանրածախ</translation>
     </message>
@@ -2582,36 +2641,27 @@ F5</translation>
         <translation>Մանրածախ գումար</translation>
     </message>
     <message>
-        <location filename="working.ui" line="342"/>
+        <location filename="working.ui" line="367"/>
+        <source>Sales
+report
+</source>
+        <translation>Վաճառք
+
+</translation>
+    </message>
+    <message>
+        <location filename="working.ui" line="622"/>
         <source>Partner tax code (F6)</source>
         <translation>Գնորդի ՀՎՀՀ (F6)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="444"/>
-        <source>Duplicate
-receipt
-</source>
-        <translation>Հաշվի 
-կրկօրինակ
-</translation>
-    </message>
-    <message>
-        <location filename="working.ui" line="604"/>
+        <location filename="working.ui" line="644"/>
         <source>Store 
 input
 F11</source>
         <translation>Պահեստի
 մուտք
 F11</translation>
-    </message>
-    <message>
-        <location filename="working.ui" line="564"/>
-        <source>Item
-back
-F10</source>
-        <translation>Հետ
-վերադարձ
-F10</translation>
     </message>
     <message>
         <location filename="working.ui" line="684"/>
@@ -2623,7 +2673,7 @@ F10</translation>
 </translation>
     </message>
     <message>
-        <location filename="working.ui" line="724"/>
+        <location filename="working.ui" line="552"/>
         <source>Exit
 Esc
 </source>
@@ -2632,7 +2682,7 @@ Esc
 </translation>
     </message>
     <message>
-        <location filename="working.ui" line="524"/>
+        <location filename="working.ui" line="457"/>
         <source>Save
 order
 F9</source>
@@ -2641,7 +2691,7 @@ F9
 </translation>
     </message>
     <message>
-        <location filename="working.ui" line="404"/>
+        <location filename="working.ui" line="417"/>
         <source>New
 whosale
 F2</source>
@@ -2650,16 +2700,15 @@ F2</source>
 F2</translation>
     </message>
     <message>
-        <location filename="working.ui" line="459"/>
-        <location filename="working.ui" line="539"/>
-        <location filename="working.ui" line="579"/>
-        <location filename="working.ui" line="619"/>
+        <location filename="working.ui" line="382"/>
+        <location filename="working.ui" line="472"/>
+        <location filename="working.ui" line="659"/>
         <source>F9</source>
         <translation> Նոր պատվեր
 (F9)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="644"/>
+        <location filename="working.ui" line="497"/>
         <source>Save
 order
 F12</source>
@@ -2668,7 +2717,7 @@ F12
 </translation>
     </message>
     <message>
-        <location filename="working.ui" line="364"/>
+        <location filename="working.ui" line="327"/>
         <source>New
 retail
 F1</source>
@@ -2677,22 +2726,22 @@ F1</source>
 F1</translation>
     </message>
     <message>
-        <location filename="working.ui" line="499"/>
+        <location filename="working.ui" line="567"/>
+        <location filename="working.ui" line="607"/>
         <location filename="working.ui" line="699"/>
-        <location filename="working.ui" line="739"/>
         <source>F10</source>
         <translation> Նոր պատվեր
 (F10)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="379"/>
-        <location filename="working.ui" line="419"/>
+        <location filename="working.ui" line="342"/>
+        <location filename="working.ui" line="432"/>
         <source>F11</source>
         <translation> Նոր պատվեր
 (F11)</translation>
     </message>
     <message>
-        <location filename="working.ui" line="659"/>
+        <location filename="working.ui" line="512"/>
         <source>F12</source>
         <translation> Նոր պատվեր
 (F12)</translation>
@@ -2718,35 +2767,35 @@ F1</translation>
         <translation>Կրկին ելքը հնարավոր չէ։</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="199"/>
+        <location filename="working.cpp" line="206"/>
         <source>Total today</source>
         <translation>Ընդամենը այսօր</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="230"/>
-        <location filename="working.cpp" line="738"/>
+        <location filename="working.cpp" line="237"/>
+        <location filename="working.cpp" line="745"/>
         <source>Password</source>
         <translation>Գախտնաբառ</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="230"/>
+        <location filename="working.cpp" line="237"/>
         <source>Administrator password</source>
         <translation>Ադմինիստրատորի գախտնաբառ</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="246"/>
-        <location filename="working.cpp" line="251"/>
-        <location filename="working.cpp" line="740"/>
+        <location filename="working.cpp" line="253"/>
+        <location filename="working.cpp" line="258"/>
+        <location filename="working.cpp" line="747"/>
         <source>Access denied</source>
         <translation>Մուտքը արգելված է</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="526"/>
+        <location filename="working.cpp" line="533"/>
         <source>Whosale</source>
         <translation>Մեծածախ</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="529"/>
+        <location filename="working.cpp" line="536"/>
         <source>Preorder</source>
         <translation>Պատվեր</translation>
     </message>

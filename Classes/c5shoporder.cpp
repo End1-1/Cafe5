@@ -5,6 +5,7 @@
 #include "c5utils.h"
 #include "c5config.h"
 #include "c5message.h"
+#include "selectprinters.h"
 #include "printtaxn.h"
 
 C5ShopOrder::C5ShopOrder()
@@ -304,10 +305,17 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
     }
 
     if (!C5Config::localReceiptPrinter().isEmpty()) {
-        PrintReceiptGroup p;
-        p.print(fHeader, db, 1);
-        p.print(fHeader, db, 2);
-        //p.print2(oheaderid, db);
+        bool p1, p2;
+        if (SelectPrinters::selectPrinters(p1, p2)) {
+            PrintReceiptGroup p;
+            if (p1) {
+                p.print(fHeader, db, 1);
+            }
+            if (p2) {
+                p.print(fHeader, db, 2);
+            }
+            //p.print2(oheaderid, db);
+        }
     }
 
     db.commit();

@@ -75,6 +75,7 @@ SOURCES += \
     replicadialog.cpp \
     sales.cpp \
     searchitems.cpp \
+    selectprinters.cpp \
     selectstaff.cpp \
     settingsselection.cpp \
     storeinput.cpp \
@@ -151,6 +152,7 @@ HEADERS += \
     replicadialog.h \
     sales.h \
     searchitems.h \
+    selectprinters.h \
     selectstaff.h \
     settingsselection.h \
     storeinput.h \
@@ -196,6 +198,7 @@ FORMS += \
     replicadialog.ui \
     sales.ui \
     searchitems.ui \
+    selectprinters.ui \
     selectstaff.ui \
     settingsselection.ui \
     storeinput.ui \

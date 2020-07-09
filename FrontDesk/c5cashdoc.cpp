@@ -25,6 +25,8 @@ C5CashDoc::C5CashDoc(const QStringList &dbParams, QWidget *parent) :
     ui->btnOpenStoreDoc->setEnabled(false);
     fRelation = false;
     fActionFromSale = nullptr;
+    fActionDraft = nullptr;
+    fActionSave = nullptr;
 }
 
 C5CashDoc::~C5CashDoc()
@@ -39,8 +41,9 @@ QToolBar *C5CashDoc::toolBar()
 {
     if (!fToolBar) {
         C5Widget::toolBar();
-        fToolBar->addAction(QIcon(":/save.png"), tr("Save"), this, SLOT(save()));
+        fActionSave = fToolBar->addAction(QIcon(":/save.png"), tr("Save"), this, SLOT(save()));
         fToolBar->addAction(QIcon(":/delete.png"), tr("Remove"), this, SLOT(removeDoc()));
+        fActionDraft = fToolBar->addAction(QIcon(":/draft.png"), tr("Draft"), this, SLOT(draft()));
         fActionFromSale = fToolBar->addAction(QIcon(":/cash.png"), tr("Input from sale"), this, SLOT(inputFromSale()));
     }
     return fToolBar;
@@ -101,6 +104,9 @@ bool C5CashDoc::openDoc(const QString &uuid)
     if (!dw.readAHeader(uuid)) {
         C5Message::error(dw.fErrorMsg);
         return false;
+    }
+    if (fActionDraft) {
+        fActionDraft->setEnabled(dw.value(container_aheader, 0, "f_state").toInt() == DOC_STATE_SAVED);
     }
     ui->deDate->setDate(dw.value(container_aheader, 0, "f_date").toDate());
     ui->leDocNum->setText(dw.value(container_aheader, 0, "f_userid").toString());
@@ -217,6 +223,23 @@ void C5CashDoc::amountChanged(const QString &arg1)
     ui->leTotal->setDouble(total);
 }
 
+void C5CashDoc::draft()
+{
+    C5Database db(fDBParams);
+    C5StoreDraftWriter dw(db);
+    dw.updateField("a_header", "f_state", DOC_STATE_DRAFT, "f_id", fUuid);
+    C5Message::info(tr("Draft created"));
+    fActionDraft->setEnabled(false);
+    if (fRelation) {
+        ui->witems->setEnabled(true);
+        ui->leInput->setEnabled(true);
+        ui->leOutput->setEnabled(true);
+        ui->tbl->setEnabled(true);
+        ui->leRemarks->setEnabled(true);
+        ui->lePartner->setEnabled(true);
+    }
+}
+
 void C5CashDoc::save(bool fromrelation)
 {
     if (fRelation && !fromrelation) {
@@ -265,6 +288,9 @@ void C5CashDoc::save(bool fromrelation)
     }
     fRemovedRows.clear();
     C5Message::info(tr("Saved"));
+    if (fActionDraft) {
+        fActionDraft->setEnabled(true);
+    }
 }
 
 void C5CashDoc::removeDoc()

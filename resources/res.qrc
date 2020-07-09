@@ -87,5 +87,6 @@
         <file>cleardb.sql</file>
         <file>print_description.png</file>
         <file>cashcollection.png</file>
+        <file>effectiveness.png</file>
     </qresource>
 </RCC>

@@ -52,6 +52,8 @@ public slots:
 private slots:
     void amountChanged(const QString &arg1);
 
+    void draft();
+
     void removeDoc();
 
     void inputFromSale();
@@ -74,6 +76,10 @@ private:
     QAction *fActionFromSale;
 
     QStringList fRemovedRows;
+
+    QAction *fActionSave;
+
+    QAction *fActionDraft;
 };
 
 #endif // C5CASHDOC_H

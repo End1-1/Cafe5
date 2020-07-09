@@ -1,0 +1,26 @@
+#ifndef CR5SALESANDSTORE_H
+#define CR5SALESANDSTORE_H
+
+#include "c5reportwidget.h"
+
+class CR5SaleAndStoreFilter;
+
+class CR5SalesAndStore : public C5ReportWidget
+{
+    Q_OBJECT
+public:
+    CR5SalesAndStore(const QStringList &dbParams, QWidget *parent = nullptr);
+
+    virtual QToolBar *toolBar() override;
+
+    virtual void buildQuery();
+
+    virtual void refreshData() override;
+
+private:
+    QHash<QString, int> fColumnNameIndex;
+
+    CR5SaleAndStoreFilter *fFilter;
+};
+
+#endif // CR5SALESANDSTORE_H

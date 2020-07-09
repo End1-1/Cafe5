@@ -3,6 +3,7 @@
 #include "c5config.h"
 #include "printreceiptgroup.h"
 #include "c5database.h"
+#include "selectprinters.h"
 #include "c5replication.h"
 #include "c5utils.h"
 #include "c5message.h"
@@ -246,11 +247,18 @@ void Sales::on_btnPrint_clicked()
     if (ml.count() == 0) {
         return;
     }
-    PrintReceiptGroup pr(this);
-    C5Database db(C5Config::dbParams());
-    pr.print(ui->tbl->getString(ml.at(0).row(), 0), db, 1);
-    pr.print(ui->tbl->getString(ml.at(0).row(), 0), db, 2);
-    //pr.print2(ui->tbl->getString(ml.at(0).row(), 0), db);
+    bool p1, p2;
+    if (SelectPrinters::selectPrinters(p1, p2)) {
+        PrintReceiptGroup p;
+        C5Database db(C5Config::dbParams());
+        if (p1) {
+            p.print(ui->tbl->getString(ml.at(0).row(), 0), db, 1);
+        }
+        if (p2) {
+            p.print(ui->tbl->getString(ml.at(0).row(), 0), db, 2);
+        }
+        //p.print2(oheaderid, db);
+    }
 }
 
 void Sales::on_btnItemBack_clicked()

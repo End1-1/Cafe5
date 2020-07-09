@@ -42,6 +42,7 @@
 #include "c5storeinventory.h"
 #include "cr5discountsystem.h"
 #include "cr5dishpackage.h"
+#include "cr5salesandstore.h"
 #include "cr5goodsgroup.h"
 #include "cr5menureview.h"
 #include "cr5databases.h"
@@ -161,6 +162,9 @@ void C5MainWindow::twCustomMenu(const QPoint &p)
 {
     QTreeWidgetItem *item = ui->twDb->itemAt(p);
     QMenu menu(this);
+    if (!item) {
+        return;
+    }
     if (!item->parent()) {
 
     }
@@ -316,6 +320,7 @@ void C5MainWindow::on_actionLogin_triggered()
             addTreeL3Item(it, cp_t2_count_output_of_sale, tr("Consumption of goods based on sales"), ":/goods.png");
             addTreeL3Item(it, cp_t3_consuption_reason, tr("Reason for consuption"), ":/goods.png");
             addTreeL3Item(it, cp_t3_sales_common, tr("Sales, expert mode"), ":/graph.png");
+            addTreeL3Item(it, cp_t3_sale_effectiveness, tr("Effectiveness of sales"), ":/effectiveness.png");
             if (__c5config.frontDeskMode() == FRONTDESK_WAITER) {
                 addTreeL3Item(it, cp_t3_sale_dishes, tr("Sales, dishes"), ":/graph.png");
                 addTreeL3Item(it, cp_t3_sale_removed_dishes, tr("Sales, removed dishes"), ":/delete.png");
@@ -627,6 +632,9 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
         break;
     case cp_t3_preorders:
         createTab<CR5Preorders>(dbParams);
+        break;
+    case cp_t3_sale_effectiveness:
+        createTab<CR5SalesAndStore>(dbParams);
         break;
     case cp_t4_part1:
         createTab<CR5DishPart1>(dbParams);

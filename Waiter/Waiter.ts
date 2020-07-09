@@ -832,17 +832,17 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="748"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="750"/>
         <source>Invalid document id</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="855"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="857"/>
         <source>Not enough materials in the store</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="951"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="953"/>
         <source>This order used in next documents</source>
         <translation type="unfinished"></translation>
     </message>
