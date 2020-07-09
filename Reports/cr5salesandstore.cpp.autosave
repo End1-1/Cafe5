@@ -403,6 +403,8 @@ void CR5SalesAndStore::rep2()
         }
         if (rows[i][storeIdx].toDouble() > 0.0001) {
             rows[i][storeIdx + 5] = ((rows[i][storeIdx + 3].toDouble() * 100) / rows[i][storeIdx].toDouble()) - 100;
+        } else {
+            rows[i][storeIdx + 5] = 100.0;
         }
     }
     fModel->setExternalData(fColumnNameIndex, fTranslation);

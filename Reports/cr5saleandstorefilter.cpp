@@ -46,3 +46,14 @@ const QString CR5SaleAndStoreFilter::goods() const
 {
     return ui->leGoods->text();
 }
+
+CR5SaleAndStoreFilter::Display CR5SaleAndStoreFilter::display()
+{
+    if (ui->rbDisplayGoods->isChecked()) {
+        return dGoods;
+    }
+    if (ui->rbDisplayGroups->isChecked()) {
+        return dGroups;
+    }
+    return dNone;
+}

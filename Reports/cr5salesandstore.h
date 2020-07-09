@@ -21,6 +21,10 @@ private:
     QHash<QString, int> fColumnNameIndex;
 
     CR5SaleAndStoreFilter *fFilter;
+
+    void rep1();
+
+    void rep2();
 };
 
 #endif // CR5SALESANDSTORE_H

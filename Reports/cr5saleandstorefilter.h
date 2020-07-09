@@ -16,6 +16,8 @@ public:
 
     ~CR5SaleAndStoreFilter();
 
+    enum Display {dNone = 0, dGoods, dGroups};
+
     virtual QString condition() override;
 
     const QDate date1() const;
@@ -27,6 +29,8 @@ public:
     const QString goodsGroup() const;
 
     const QString goods() const;
+
+    Display display();
 
 private:
     Ui::CR5SaleAndStoreFilter *ui;
