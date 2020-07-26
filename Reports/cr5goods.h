@@ -17,6 +17,8 @@ public slots:
 
 private slots:
     void pricing();
+
+    void groupPrice();
 };
 
 #endif // CR5GOODS_H

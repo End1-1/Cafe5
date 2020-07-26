@@ -4,6 +4,7 @@
 #include "c5tablemodel.h"
 #include "c5mainwindow.h"
 #include "cr5goodsfilter.h"
+#include "c5changepriceofgroup.h"
 #include "c5goodspricing.h"
 #include <math.h>
 
@@ -100,6 +101,7 @@ QToolBar *CR5Goods::toolBar()
     if (pr(fDBParams.at(1), cp_t1_goods_pricing)) {
         fToolBar->addAction(QIcon(":/pricing.png"), tr("Pricing"), this, SLOT(pricing()));
     }
+    fToolBar->addAction(QIcon(":/dress.png"), tr("Group price"), this, SLOT(groupPrice()));
     return fToolBar;
 }
 
@@ -156,4 +158,32 @@ void CR5Goods::pricing()
         }
     }
     delete gp;
+}
+
+void CR5Goods::groupPrice()
+{
+    double price1, price2;
+    if (C5ChangePriceOfGroup::groupPrice(fDBParams, price1, price2)) {
+        QString p1, p2;
+        if (price1 < 0.0001 && price2 < 0.0002) {
+            return;
+        }
+        if (price1 > 0.0001) {
+            p1 = " f_saleprice=" + QString::number(price1, 'f', 2);
+        }
+        if (price2 > 0.0001) {
+            p2 = " f_saleprice2=" + QString::number(price2, 'f', 2);
+        }
+        QString codes;
+        for (int i = 0; i < fModel->rowCount(); i++) {
+            if (codes.length() > 0) {
+                codes += ",";
+            }
+            codes += fModel->data(i, fModel->indexForColumnName("f_id"), Qt::EditRole).toString();
+        }
+        C5Database db(dbParams());
+        QString query = "update c_goods set " + p1 + (p1.length() > 0 && p2.length() > 0? "," : "") + p2 + " where f_id in (" + codes + ")";
+        db.exec(query);
+        C5Message::tr("Done");
+    }
 }

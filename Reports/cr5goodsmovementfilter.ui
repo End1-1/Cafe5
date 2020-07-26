@@ -29,7 +29,7 @@
       </size>
      </property>
      <property name="FilterName" stdset="0">
-      <string>inout</string>
+      <string>doctype</string>
      </property>
     </widget>
    </item>
@@ -74,7 +74,7 @@
       </size>
      </property>
      <property name="FilterName" stdset="0">
-      <string>material</string>
+      <string>matgroup</string>
      </property>
     </widget>
    </item>
@@ -332,6 +332,16 @@
    <header location="global">c5dateedit.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>deStart</tabstop>
+  <tabstop>deEnd</tabstop>
+  <tabstop>leDocType</tabstop>
+  <tabstop>leReason</tabstop>
+  <tabstop>leInOut</tabstop>
+  <tabstop>leStore</tabstop>
+  <tabstop>leGroup</tabstop>
+  <tabstop>leGoods</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

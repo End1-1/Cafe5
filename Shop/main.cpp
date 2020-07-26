@@ -3,6 +3,7 @@
 #include "c5connection.h"
 #include "c5license.h"
 #include "dlgpin.h"
+#include "c5logsystem.h"
 #include "c5userauth.h"
 #include "c5replication.h"
 #include "replicadialog.h"
@@ -25,7 +26,16 @@ int main(int argc, char *argv[])
 #endif
 
     QApplication a(argc, argv);
+    QDir d;
+    if (!d.exists(d.homePath() + "/" + _APPLICATION_)) {
+        d.mkpath(d.homePath() + "/" + _APPLICATION_);
+    }
+    if (!d.exists(d.homePath() + "/" + _APPLICATION_ + "/logs")) {
+        d.mkpath(d.homePath() + "/" + _APPLICATION_ + "/logs");
+    }
+    ls(QObject::tr("Application start"));
     if (!C5License::isOK()) {
+        ls(QObject::tr("License check failed"));
         QMessageBox::critical(0, QObject::tr("Application error"), QObject::tr("Please, register application."));
         return 0;
     }
@@ -44,14 +54,11 @@ int main(int argc, char *argv[])
     C5Config::initParamsFromDb();
     C5Database::uuid(C5Config::dbParams());
 
-    QDir d;
-    if (!d.exists(d.homePath() + "/" + _APPLICATION_)) {
-        d.mkpath(d.homePath() + "/" + _APPLICATION_);
-    }
     QFile file(d.homePath() + "/" + _APPLICATION_ + "/lock.pid");
     file.remove();
     QLockFile lockFile(d.homePath() + "/" + _APPLICATION_ + "/lock.pid");
     if (!lockFile.tryLock()) {
+        ls(QObject::tr("Application instance found, exiting"));
         C5Message::error(QObject::tr("An instance of application already running"));
         return -1;
     }

@@ -13,6 +13,7 @@
 #include <QScrollBar>
 #include <QInputDialog>
 #include <QScreen>
+#include <QFile>
 
 
 Workspace::Workspace(const QStringList &dbParams) :

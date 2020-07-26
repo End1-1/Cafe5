@@ -249,8 +249,8 @@ INCLUDEPATH += ../Cache
 INCLUDEPATH += ../Controls
 INCLUDEPATH += C:/Projects/NewTax/Src
 INCLUDEPATH += ../Editors
-INCLUDEPATH += C:/OpenSSL-Win32/include
-INCLUDEPATH += C:/OpenSSL-Win32/include/openssl
+INCLUDEPATH += C:/Soft/OpenSSL-Win32/include
+INCLUDEPATH += C:/Soft/OpenSSL-Win32/include/openssl
 INCLUDEPATH += C:/Projects/XLSX/src
 
 RESOURCES += \
@@ -263,6 +263,6 @@ DISTFILES += \
 
 LIBS += -lVersion
 LIBS += -lwsock32
-LIBS += -LC:/OpenSSL-Win32/lib
+LIBS += -LC:/Soft/OpenSSL-Win32/lib
 LIBS += -lopenssl
 LIBS += -llibcrypto

@@ -90,6 +90,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Reports/cr5storereason.cpp \
     barcode.cpp \
     c5cashdoc.cpp \
+    c5changepriceofgroup.cpp \
     c5checkdatabase.cpp \
     c5costumerdebtpayment.cpp \
     c5dbresetoption.cpp \
@@ -285,6 +286,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Service/servicecommands.h \
     barcode.h \
     c5cashdoc.h \
+    c5changepriceofgroup.h \
     c5checkdatabase.h \
     c5costumerdebtpayment.h \
     c5dbresetoption.h \
@@ -451,6 +453,7 @@ FORMS += \
     ../Reports/cr5saleremoveddishesfilter.ui \
     ../Reports/cr5salesbydishesfilter.ui \
     c5cashdoc.ui \
+    c5changepriceofgroup.ui \
     c5checkdatabase.ui \
     c5costumerdebtpayment.ui \
     c5dbresetoption.ui \
@@ -528,10 +531,10 @@ INCLUDEPATH += ../Editors
 INCLUDEPATH += ../Waiter
 INCLUDEPATH += ../RESOURCES
 INCLUDEPATH += ../Service
-INCLUDEPATH += c:/projects/xlsx/src
-INCLUDEPATH += C:/Projects/NewTax/Src
-INCLUDEPATH += C:/OpenSSL-Win32/include
-INCLUDEPATH += C:/OpenSSL-Win32/include/openssl
+INCLUDEPATH += /projects/xlsx/src
+INCLUDEPATH += /Projects/NewTax/Src
+INCLUDEPATH += /Soft/OpenSSL-Win32/include
+INCLUDEPATH += /Soft/OpenSSL-Win32/include/openssl
 
 RESOURCES += \
     ../resources/res.qrc \
@@ -546,6 +549,6 @@ ICON = storehouse.ico
 
 LIBS += -lVersion
 LIBS += -lwsock32
-LIBS += -LC:/OpenSSL-Win32/lib
+LIBS += -LC:/Soft/OpenSSL-Win32/lib
 LIBS += -lopenssl
 LIBS += -llibcrypto

@@ -19,6 +19,8 @@ public:
     QString fAdgCode;
     double fQty;
     bool fIsService;
+    int fUncomplectFrom;
+    double fUncomplectQty;
 };
 
 #endif // GOODS_H

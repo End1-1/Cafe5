@@ -19,6 +19,11 @@ struct IUser {
     QPixmap photo;
 };
 
+struct UncomplectGoods {
+    int uncomplectGoods;
+    double qty;
+};
+
 class Working : public QWidget
 {
     Q_OBJECT
@@ -36,11 +41,15 @@ public:
 
     void decQty(const IGoods &g);
 
+    void makeWGoods();
+
     static QMap<QString, Goods> fGoods;
 
     static QHash<int, QString> fGoodsCodeForPrint;
 
     static QHash<QString, int> fGoodsRows;
+
+    static QHash<int, UncomplectGoods> fUncomplectGoods;
 
     QList<IUser> fCurrentUsers;
 
@@ -48,8 +57,6 @@ public:
 
 private:
     Ui::Working *ui;
-
-    void makeWGoods();
 
     void loadStaff();
 
@@ -131,6 +138,8 @@ private slots:
     void on_btnItemBack_clicked();
 
     void on_btnStoreInput_clicked();
+
+    void on_tab_currentChanged(int index);
 };
 
 #endif // WORKING_H

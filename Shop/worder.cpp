@@ -8,7 +8,9 @@
 #include "c5message.h"
 #include "c5permissions.h"
 #include "c5printing.h"
+#include "c5storedoc.h"
 #include "preorders.h"
+#include "c5logsystem.h"
 #include "printreceipt.h"
 #include "selectstaff.h"
 #include "c5shoporder.h"
@@ -54,6 +56,12 @@ WOrder::WOrder(int saleType, QWidget *parent) :
         ui->wPreorder->setVisible(true);
     }
     ui->leAdvance->setValidator(new QDoubleValidator(0, 99999999, 2));
+    connect(ui->leCard, &C5LineEdit::focusOut, [=](){
+        C5LogSystem::writeEvent(QString("%1: %2").arg(tr("Card value")).arg(ui->leCard->text()));
+    });
+    connect(ui->leCash, &C5LineEdit::focusOut, [=](){
+        C5LogSystem::writeEvent(QString("%1: %2").arg(tr("Cash value")).arg(ui->leCard->text()));
+    });
 }
 
 WOrder::~WOrder()
@@ -86,9 +94,45 @@ void WOrder::addGoods(const Goods &g)
     }
     Goods gg = fWorking->fGoods[g.fScanCode];
     if (__c5config.controlShopQty()) {
-        if (!gg.fIsService && gg.fQty < totalQty) {
-            C5Message::error(tr("Insufficient quantity") + "<br>" + float_str(totalQty - gg.fQty, 3));
-            return;
+        if (gg.fQty < totalQty) {
+            if (!gg.fIsService && gg.fUncomplectFrom == 0) {
+                C5Message::error(tr("Insufficient quantity") + "<br>" + float_str(totalQty - gg.fQty, 3));
+                return;
+            }
+            if (gg.fUncomplectFrom > 0) {
+                if (fWorking->fUncomplectGoods.contains(gg.fCode.toInt())) {
+                    UncomplectGoods ug = fWorking->fUncomplectGoods[gg.fCode.toInt()];
+                    Goods gu = fWorking->fGoods[fWorking->fGoodsCodeForPrint[ug.uncomplectGoods]];
+                    if (C5Message::question(tr("Insufficient quantity, but can uncomplect from ") + "<br>" + gu.fName) == QDialog::Accepted) {
+                        C5StoreDoc d(__c5config.replicaDbParams());
+                        d.setMode(C5StoreDoc::sdOutput);
+                        d.setStore(0, __c5config.defaultStore());
+                        d.setComment(tr("Uncomplect for sale"));
+                        d.addByScancode(gu.fScanCode, "1", "");
+                        d.saveDoc();
+                        double price = d.total() / ug.qty;
+                        C5StoreDoc *di = new C5StoreDoc(__c5config.replicaDbParams());
+                        di->setMode(C5StoreDoc::sdInput);
+                        di->setStore(__c5config.defaultStore(), 0);
+                        di->setComment(tr("Uncomplect for sale"));
+                        di->addByScancode(gg.fScanCode, QLocale().toString(ug.qty), QLocale().toString(price));
+                        di->saveDoc();
+                        di->deleteLater();
+                        fWorking->makeWGoods();
+                        addGoods(g);
+                        return;
+                    } else {
+                        C5Message::error(tr("Insufficient quantity") + "<br>" + float_str(totalQty - gg.fQty, 3));
+                        return;
+                    }
+                } else {
+                    C5Message::error(tr("Insufficient quantity") + "<br>" + float_str(totalQty - gg.fQty, 3));
+                    return;
+                }
+            } else {
+                C5Message::error(tr("Insufficient quantity") + "<br>" + float_str(totalQty - gg.fQty, 3));
+                return;
+            }
         }
     }
     addGoodsToTable(g);
@@ -106,6 +150,11 @@ void WOrder::addGoodsToTable(const Goods &g)
         price = g.fWhosalePrice;
         break;
     }
+    ls(QString("%1: %2, %3: %4, %5: %6")
+       .arg(tr("New goods with code"))
+       .arg(g.fScanCode).arg(tr("name"))
+       .arg(g.fName).arg(tr("retail price"))
+       .arg(g.fRetailPrice));
     int row = ui->tblGoods->addEmptyRow();
     ui->tblGoods->setString(row, 0, g.fCode);
     ui->tblGoods->setString(row, 1, g.fName + " " + g.fScanCode);
@@ -164,6 +213,7 @@ bool WOrder::writeOrder(bool tax)
     so.setPartner(fPartner, ui->lePartner->text());
     so.setDiscount(fCostumerId, fCardId, fCardMode, fCardValue);
     so.setParams(fDateOpen, fTimeOpen, fSaleType);
+    C5LogSystem::writeEvent(QString("%1. %2:%3, %4:%5, %6:%7, %8:%9").arg(tr("Before write")).arg(tr("Total")).arg(ui->leTotal->text()).arg(tr("Card")).arg(ui->leCard->text()).arg(tr("Advance")).arg(ui->leAdvance->text()).arg(tr("Dicount")).arg(ui->leDisc->text()));
     bool w = so.write(ui->leTotal->getDouble(), ui->leCard->getDouble(), ui->leAdvance->getDouble(), ui->leDisc->getDouble(), tax, goods);
     C5Database db(__c5config.dbParams());
     if (w) {
@@ -197,7 +247,7 @@ bool WOrder::writeOrder(bool tax)
         auto *r = new C5Replication();
         r->start(SLOT(uploadToServer()));
     }
-    qDebug() << "Order writed about " << t.elapsed();
+    C5LogSystem::writeEvent(QString("%1. %2:%3ms, %4:%5, %6").arg(tr("Order saved")).arg(tr("Elapsed")).arg(t.elapsed()).arg(tr("Order number")).arg(so.fHallId).arg(so.fHeader));
     return w;
 }
 
@@ -319,6 +369,7 @@ void WOrder::fixCostumer(const QString &code)
     ui->lbDisc->setVisible(true);
     ui->chDebt->setVisible(true);
     ui->leCustomer->setText(db.getString("f_firstname") + " " + db.getString("f_lastname"));
+    C5LogSystem::writeEvent(QString("%1: %2:%3").arg(tr("Fix costumer")).arg(code).arg(db.getString("f_firstname") + " " + db.getString("f_lastname")));
     countTotal();
 }
 
@@ -356,6 +407,7 @@ void WOrder::changeQty()
     }
     ui->tblGoods->setDouble(row, 2, qty);
     ui->tblGoods->setDouble(row, 5, ui->tblGoods->getDouble(row, 4) * qty);
+    C5LogSystem::writeEvent(QString("%1 %2:%3 %4").arg(tr("Change qty")).arg(g.fCode).arg(g.fName).arg(float_str(qty, 2)));
     countTotal();
 }
 
@@ -413,6 +465,7 @@ void WOrder::discountRow(const QString &code)
     }
     ui->tblGoods->item(row, col_discount_value)->setData(Qt::UserRole, v);
     ui->tblGoods->item(row, col_discount_mode)->setData(Qt::UserRole, discType);
+    C5LogSystem::writeEvent(QString("%1: %2:%3, %4:%5").arg(tr("Discount")).arg(tr("Discount type")).arg(discType).arg(tr("Value")).arg(v));
     countTotal();
 }
 
@@ -437,10 +490,14 @@ void WOrder::removeRow()
     if (row < 0) {
         return;
     }
+    QString code = ui->tblGoods->getString(row, 0);
+    QString name = ui->tblGoods->getString(row, 1);
+    double qty = ui->tblGoods->getDouble(row, 2);
     ui->tblGoods->removeRow(row);
     ui->leCard->clear();
     ui->leCash->clear();
     ui->leChange->clear();
+    C5LogSystem::writeEvent(QString("%1 #%2 %3:%4 %5").arg(tr("Remove row")).arg(row).arg(code).arg(name).arg(float_str(qty, 2)));
     countTotal();
 }
 
@@ -541,6 +598,7 @@ void WOrder::countTotal()
         break;
     }
     ui->leTotal->setDouble(total);
+    C5LogSystem::writeEvent(QString("%1: %3").arg(tr("Total amount")).arg(float_str(total, 2)));
 }
 
 bool WOrder::returnFalse(const QString &msg, C5Database &db)
@@ -596,12 +654,13 @@ void WOrder::noImage()
 
 void WOrder::on_btnInfo_clicked()
 {
-    QString info = QString("Ctrl+S: %1<br>Ctrl+I: %2<br>Ctrl+O: %3<br>Ctrl+T: %4<br>Ctrl+A: %5")
+    QString info = QString("Ctrl+S: %1<br>Ctrl+I: %2<br>Ctrl+O: %3<br>Ctrl+T: %4<br>Ctrl+A: %5<br>Ctrl+H: %6")
             .arg(tr("Search goods in the storages"))
             .arg(tr("Input staff at the work"))
             .arg(tr("Output staff from the work"))
             .arg(tr("Total today"))
-            .arg(tr("Preorder"));
+            .arg(tr("Preorder"))
+            .arg(tr("Show log"));
     C5Message::info(info);
 }
 

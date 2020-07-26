@@ -2,5 +2,5 @@
 
 Goods::Goods()
 {
-
+    fUncomplectFrom = 0;
 }

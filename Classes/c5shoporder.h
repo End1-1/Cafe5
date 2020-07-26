@@ -23,6 +23,8 @@ public:
 
     QString fHeader;
 
+    QString fHallId;
+
 private:
     QDate fDateOpen;
 

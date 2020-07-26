@@ -34,6 +34,10 @@ public:
 
     void setLastInputPrices();
 
+    void setStore(int store1, int store2);
+
+    void setComment(const QString comment);
+
     virtual QToolBar *toolBar() override;
 
     bool writeDocument(int state, QString &err);
@@ -41,6 +45,13 @@ public:
     static bool removeDoc(const QStringList &dbParams, QString id, bool showmessage = true);
 
     virtual bool allowChangeDatabase() override;
+
+    void addByScancode(const QString &code, const QString &qty, const QString &price);
+
+    double total();
+
+public slots:
+    void saveDoc();
     
 protected:
     virtual bool eventFilter(QObject *o, QEvent *e) override;
@@ -110,8 +121,6 @@ private slots:
     void getInput();
 
     void getOutput();
-
-    void saveDoc();
 
     void draftDoc();
 

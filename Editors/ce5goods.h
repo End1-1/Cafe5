@@ -71,6 +71,8 @@ private slots:
 
     void on_btnSetControlSum_clicked();
 
+    void on_chUncomplectIfZero_clicked(bool checked);
+
 private:
     Ui::CE5Goods *ui;
 

@@ -102,12 +102,12 @@ INCLUDEPATH += c:/projects/cafe5/Cafe5
 INCLUDEPATH += c:/projects/cafe5/Classes
 INCLUDEPATH += c:/projects/cafe5/Controls
 INCLUDEPATH += c:/Projects/NewTax/Src
-INCLUDEPATH += C:/OpenSSL-Win32/include
-INCLUDEPATH += C:/OpenSSL-Win32/include/openssl
+INCLUDEPATH += C:/Soft/OpenSSL-Win32/include
+INCLUDEPATH += C:/Soft/OpenSSL-Win32/include/openssl
 
 LIBS += -lVersion
 LIBS += -lwsock32
-LIBS += -LC:/OpenSSL-Win32/lib
+LIBS += -LC:/Soft/OpenSSL-Win32/lib
 LIBS += -lopenssl
 LIBS += -llibcrypto
 

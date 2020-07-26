@@ -412,52 +412,52 @@
         <translation>ՀԱՇԻՎ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="49"/>
+        <location filename="workspace.cpp" line="50"/>
         <source>ENTER</source>
         <translation>ՄՈՒՏՔ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="62"/>
+        <location filename="workspace.cpp" line="63"/>
         <source>All</source>
         <translation>Բոլորը</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="302"/>
+        <location filename="workspace.cpp" line="303"/>
         <source>Receipt #</source>
         <translation>Պատվեր №</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="319"/>
+        <location filename="workspace.cpp" line="320"/>
         <source>Printed:</source>
         <translation>Տպված</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="363"/>
+        <location filename="workspace.cpp" line="364"/>
         <source>Confirm to close application</source>
         <translation>Փակել՞ ծրագիրը</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="391"/>
+        <location filename="workspace.cpp" line="392"/>
         <source>Enter qty</source>
         <translation>Մուտքագրեք քանակը</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="391"/>
+        <location filename="workspace.cpp" line="392"/>
         <source>Qty</source>
         <translation>Քանակ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="419"/>
+        <location filename="workspace.cpp" line="420"/>
         <source>End of day</source>
         <translation>Օրվա հասույթ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="453"/>
+        <location filename="workspace.cpp" line="454"/>
         <source>Total today</source>
         <translation>Ընդամենը</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="462"/>
+        <location filename="workspace.cpp" line="463"/>
         <source>Printed</source>
         <translation>Տպված</translation>
     </message>

@@ -5,6 +5,7 @@
 #include "c5utils.h"
 #include "c5config.h"
 #include "c5message.h"
+#include "c5logsystem.h"
 #include "selectprinters.h"
 #include "printtaxn.h"
 
@@ -69,6 +70,7 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
     if (!dw.hallId(headerPrefix, headerId, __c5config.defaultHall().toInt())) {
         return returnFalse(dw.fErrorMsg, db);
     }
+    fHallId = QString("%1%2").arg(headerPrefix).arg( headerId);
     if (!dw.writeOHeader(fHeader, headerId, headerPrefix, ORDER_STATE_CLOSE, __c5config.defaultHall().toInt(), __c5config.defaultTable(), fDateOpen, QDate::currentDate(), QDate::currentDate(), fTimeOpen, QTime::currentTime(), __userid, "", 1, total, (total - card), card, 0, 0, 0, 0, discount, 0, fCardValue, 0, 0, 1, 2, fSaleType, fPartnerCode)) {
         return returnFalse(dw.fErrorMsg, db);
     }
@@ -326,6 +328,7 @@ bool C5ShopOrder::returnFalse(const QString &msg, C5Database &db)
 {
     db.rollback();
     db.close();
+    C5LogSystem::writeEvent(msg);
     C5Message::error(msg);
     return false;
 }

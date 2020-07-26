@@ -30,6 +30,7 @@ CE5Goods::CE5Goods(const QStringList &dbParams, QWidget *parent) :
     ui->leClass2->setSelector(dbParams, ui->leClassName2, cache_goods_classes);
     ui->leClass3->setSelector(dbParams, ui->leClassName3, cache_goods_classes);
     ui->leClass4->setSelector(dbParams, ui->leClassName4, cache_goods_classes);
+    ui->leUncomplectGoods->setSelector(dbParams, ui->leUncomplectGoodsName, cache_goods, 1, 3);
 
     C5Database db(dbParams);
     db.exec("select f_name from c_goods");
@@ -81,11 +82,31 @@ void CE5Goods::setId(int id)
         ui->tblGoods->lineEdit(row, 5)->setDouble(db.getDouble("f_lastinputprice"));
         ui->tblGoods->lineEdit(row, 6)->setDouble(db.getDouble("f_total"));
     }
+    db[":f_id"] = id;
+    db.exec("select * from c_goods_option where f_id=:f_id");
+    if (db.nextRow()) {
+        ui->chUncomplectIfZero->setChecked(db.getInt("f_flaguncomplectfrom") > 0);
+        ui->leUncomplectGoods->setValue(db.getString("f_flaguncomplectfrom"));
+        ui->leUncomplectGoodsQty->setDouble(db.getDouble("f_uncomplectfromqty"));
+    } else {
+        on_chUncomplectIfZero_clicked(false);
+    }
     countTotal();
 }
 
 bool CE5Goods::save(QString &err, QList<QMap<QString, QVariant> > &data)
 {
+    if (ui->chUncomplectIfZero->isChecked()) {
+        if (ui->leUncomplectGoods->getInteger() == 0) {
+            err += tr("Uncomplect goods is not defined");
+        }
+        if (ui->leUncomplectGoodsQty->getDouble() < 0.0001) {
+            err += tr("Uncomplect goods quantity cannot be zero");
+        }
+    }
+    if (!err.isEmpty()) {
+        return false;
+    }
     if (!CE5Editor::save(err, data)) {
         return false;
     }
@@ -100,6 +121,12 @@ bool CE5Goods::save(QString &err, QList<QMap<QString, QVariant> > &data)
         db[":f_price"] = ui->tblGoods->lineEdit(i, 5)->getDouble();
         db.insert("c_goods_complectation", false);
     }
+    db[":f_id"] = ui->leCode->text();
+    db.exec("delete from c_goods_option where f_id=:f_id");
+    db[":f_id"] = ui->leCode->getInteger();
+    db[":f_flaguncomplectfrom"] = ui->leUncomplectGoods->getInteger();
+    db[":f_uncomplectfromqty"] = ui->leUncomplectGoodsQty->getDouble();
+    db.insert("c_goods_option");
     ui->chEnabled->setChecked(true);
     fStrings.insert(ui->leName->text());
     static_cast<QStringListModel*>(ui->leName->completer()->model())->setStringList(fStrings.values());
@@ -117,6 +144,9 @@ void CE5Goods::clear()
     }
     ui->lbImage->setText(tr("Image"));
     ui->leTotal->clear();
+    ui->chUncomplectIfZero->setChecked(false);
+    ui->leUncomplectGoods->setValue("");
+    ui->leUncomplectGoodsQty->clear();
 }
 
 void CE5Goods::tblQtyChanged(const QString &arg1)
@@ -432,4 +462,11 @@ void CE5Goods::on_btnSetControlSum_clicked()
     if (checksum > -1) {
         ui->leScanCode->setText(ui->leScanCode->text() + QString::number(checksum));
     }
+}
+
+void CE5Goods::on_chUncomplectIfZero_clicked(bool checked)
+{
+    ui->leUncomplectGoods->setEnabled(checked);
+    ui->leUncomplectGoodsName->setEnabled(checked);
+    ui->leUncomplectGoodsQty->setEnabled(checked);
 }

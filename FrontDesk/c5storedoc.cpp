@@ -308,6 +308,17 @@ void C5StoreDoc::setLastInputPrices()
     countTotal();
 }
 
+void C5StoreDoc::setStore(int store1, int store2)
+{
+    ui->leStoreInput->setValue(store1);
+    ui->leStoreOutput->setValue(store2);
+}
+
+void C5StoreDoc::setComment(const QString comment)
+{
+    ui->leComment->setText(comment);
+}
+
 QToolBar *C5StoreDoc::toolBar()
 {
     if (!fToolBar) {
@@ -373,6 +384,41 @@ bool C5StoreDoc::removeDoc(const QStringList &dbParams, QString id, bool showmes
 bool C5StoreDoc::allowChangeDatabase()
 {
     return false;
+}
+
+void C5StoreDoc::addByScancode(const QString &code, const QString &qty, const QString &price)
+{
+    C5Database db(fDBParams);
+    db[":f_scancode"] = code;
+    db.exec("select gg.f_scancode, gg.f_id, concat(gg.f_name, ' ', gg.f_scancode) as f_name, gu.f_name as f_unitname, gg.f_saleprice, "
+            "gr.f_taxdept, gr.f_adgcode "
+            "from c_goods gg  "
+            "left join c_groups gr on gr.f_id=gg.f_group "
+            "left join c_units gu on gu.f_id=gg.f_unit "
+            "where gg.f_scancode=:f_scancode");
+    ui->leScancode->clear();
+    if (db.nextRow()) {
+        int row = addGoodsRow();
+        ui->tblGoods->setInteger(row, 3, db.getInt("f_id"));
+        ui->tblGoods->setString(row, 4, db.getString("f_name"));
+        ui->tblGoods->setString(row, 6, db.getString("f_unitname"));
+        ui->tblGoods->item(row, 4)->setSelected(true);
+        fCanChangeFocus = false;
+        ui->tblGoods->lineEdit(row, 5)->setText(qty);
+        ui->tblGoods->lineEdit(row, 5)->setFocus();
+        ui->tblGoods->lineEdit(row, 7)->setText(price);
+        ui->tblGoods->lineEdit(row, 7)->textEdited(price);
+        markGoodsComplited();
+    } else {
+        C5Message::error(tr("Goods not found"));
+        fCanChangeFocus = false;
+        ui->leScancode->setFocus();
+    }
+}
+
+double C5StoreDoc::total()
+{
+    return ui->leTotal->getDouble();
 }
 
 bool C5StoreDoc::eventFilter(QObject *o, QEvent *e)
@@ -1412,7 +1458,10 @@ void C5StoreDoc::tblPriceChanged(const QString &arg1)
     C5LineEdit *lqty = ui->tblGoods->lineEdit(row, col - 2);
     C5LineEdit *lprice = ui->tblGoods->lineEdit(row, col);
     C5LineEdit *ltotal = ui->tblGoods->lineEdit(row, col + 1);
-    ltotal->setDouble(lqty->getDouble() * lprice->getDouble());
+    double d1 = lqty->getDouble();
+    double d2 = lprice->getDouble();
+    qDebug() << d1 << d2;
+    ltotal->setDouble(d1 * d2);
     countTotal();
 }
 
@@ -1544,29 +1593,7 @@ void C5StoreDoc::on_btnNewGoods_clicked()
 
 void C5StoreDoc::on_leScancode_returnPressed()
 {
-    C5Database db(fDBParams);
-    db[":f_scancode"] = ui->leScancode->text();
-    db.exec("select gg.f_scancode, gg.f_id, concat(gg.f_name, ' ', gg.f_scancode) as f_name, gu.f_name as f_unitname, gg.f_saleprice, "
-            "gr.f_taxdept, gr.f_adgcode "
-            "from c_goods gg  "
-            "left join c_groups gr on gr.f_id=gg.f_group "
-            "left join c_units gu on gu.f_id=gg.f_unit "
-            "where gg.f_scancode=:f_scancode");
-    ui->leScancode->clear();
-    if (db.nextRow()) {
-        int row = addGoodsRow();
-        ui->tblGoods->setInteger(row, 3, db.getInt("f_id"));
-        ui->tblGoods->setString(row, 4, db.getString("f_name"));
-        ui->tblGoods->setString(row, 6, db.getString("f_unitname"));
-        ui->tblGoods->item(row, 4)->setSelected(true);
-        fCanChangeFocus = false;
-        ui->tblGoods->lineEdit(row, 5)->setFocus();
-        markGoodsComplited();
-    } else {
-        C5Message::error(tr("Goods not found"));
-        fCanChangeFocus = false;
-        ui->leScancode->setFocus();
-    }
+    addByScancode(ui->leScancode->text(), "", "");
 }
 
 TableCell::TableCell(QWidget *parent, QTableWidgetItem *item) :
