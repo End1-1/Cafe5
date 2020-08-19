@@ -789,7 +789,7 @@ bool C5StoreDraftWriter::writeOutput(const QString &docId, QString &err)
             "inner join a_header d on d.f_id=s.f_document "
             "where s.f_goods in (%1) and s.f_store=:f_store and d.f_date<=:f_date and d.f_state=:f_state "
             "group by 1, 2, 4 "
-            "having sum(s.f_qty*s.f_type) > 0.001 "
+            "having sum(s.f_qty*s.f_type) > 0.00001 "
             "for update ").arg(goodsID.join(",")), storeData)) {
         err = fDb.fLastError + "<br>";
         return false;
@@ -852,7 +852,7 @@ bool C5StoreDraftWriter::writeOutput(const QString &docId, QString &err)
                 break;
             }
         }
-        if (qty > 0.001) {
+        if (qty > 0.00001) {
             if (err.isEmpty()) {
                 err += tr("Not enough materials in the store") + "<br>";
             }

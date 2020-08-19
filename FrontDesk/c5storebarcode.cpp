@@ -62,43 +62,44 @@ QToolBar *C5StoreBarcode::toolBar()
     return fToolBar;
 }
 
-bool C5StoreBarcode::printOneBarcode(const QString &code, const QString &price, const QString &class1, QPrintDialog &pd)
-{
-    QPrinter printer(QPrinter::HighResolution);
-    printer.setPrinterName(pd.printer()->printerName());
-    printer.setOrientation(pd.printer()->orientation());
-    QSizeF szf = printer.pageSizeMM();
-    szf = pd.printer()->pageSizeMM();
-    szf.setWidth(300);
-//    szf.setHeight(20);
-    printer.setPageSizeMM(szf);
-//    printer.setResolution(pd.printer()->resolution());
-    QPrinter::PageSize ps = printer.pageSize();
-    ps = pd.printer()->pageSize();
-    printer.setPageSize(ps);
-    QPainter p(&printer);
-    BarcodeEan13 b;
-    bool r = b.EncodeEan13(code.toLatin1().data());
-    Barcode bb;
-    qDebug() << r;
-    QFont f("Arial", 25, QFont::Normal);
-    p.setFont(f);
-    qreal plen = 2;
+//SAMO XANUT VERSION
+//bool C5StoreBarcode::printOneBarcode(const QString &code, const QString &price, const QString &class1, QPrintDialog &pd)
+//{
+//    QPrinter printer(QPrinter::HighResolution);
+//    printer.setPrinterName(pd.printer()->printerName());
+//    printer.setOrientation(pd.printer()->orientation());
+//    QSizeF szf = printer.pageSizeMM();
+//    szf = pd.printer()->pageSizeMM();
+//    szf.setWidth(300);
+////    szf.setHeight(20);
+//    printer.setPageSizeMM(szf);
+////    printer.setResolution(pd.printer()->resolution());
+//    QPrinter::PageSize ps = printer.pageSize();
+//    ps = pd.printer()->pageSize();
+//    printer.setPageSize(ps);
+//    QPainter p(&printer);
+//    BarcodeEan13 b;
+//    bool r = b.EncodeEan13(code.toLatin1().data());
+//    Barcode bb;
+//    qDebug() << r;
+//    QFont f("Arial", 25, QFont::Normal);
+//    p.setFont(f);
+//    qreal plen = 2;
 
-    f.setPointSize(8);
-    f.setBold(true);
-    p.setFont(f);
-    b.DrawBarcode(p, 100, 40, 100, 100, plen);
-    p.drawText(110, 120, code + QString::number(bb.ean13CheckSum(code)));
-    f.setPointSize(10);
-    p.setFont(f);
-    p.drawText(110, 150, price + " AMD");
-    p.drawText(160, 35, class1);
+//    f.setPointSize(8);
+//    f.setBold(true);
+//    p.setFont(f);
+//    b.DrawBarcode(p, 100, 40, 100, 100, plen);
+//    p.drawText(110, 120, code + QString::number(bb.ean13CheckSum(code)));
+//    f.setPointSize(10);
+//    p.setFont(f);
+//    p.drawText(110, 150, price + " AMD");
+//    p.drawText(160, 35, class1);
 
-    return printer.printerState() != QPrinter::Error;
-}
+//    return printer.printerState() != QPrinter::Error;
+//}
 
-/*
+
 //ELINA VERSION
 bool C5StoreBarcode::printOneBarcode(const QString &code, QPrintDialog &pd)
 {
@@ -212,7 +213,7 @@ bool C5StoreBarcode::printOneBarcode(const QString &code, QPrintDialog &pd)
     p.drawText(QPoint(45, 400), "MADE IN ARMENIA");
     return printer.printerState() != QPrinter::Error;
 }
-*/
+
 
 void C5StoreBarcode::print()
 {
@@ -232,7 +233,8 @@ void C5StoreBarcode::print()
             if (bc.isEan13(code)) {
                 code = code.left(code.length() - 1);
             }
-            printOneBarcode(code, ui->tbl->getString(i, 4), ui->tbl->getString(i, 6), pd);
+            //printOneBarcode(code, ui->tbl->getString(i, 4), ui->tbl->getString(i, 6), pd);
+            printOneBarcode(code, pd);
             ui->tbl->checkBox(i, 3)->setChecked(false);
         }
     }

@@ -1565,7 +1565,7 @@ AMOUNT</source>
         <translation>Սպասարկում</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="994"/>
+        <location filename="dlgorder.cpp" line="998"/>
         <source>You should not change the car, becouse discount was applied</source>
         <translation>Մեքենայի փոխելը հնարավոր չէ, քանի որ կիրարվել է զեղչ</translation>
     </message>
@@ -1591,7 +1591,7 @@ AMOUNT</source>
         <translation>Պատվերը անավարտ է</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="807"/>
+        <location filename="dlgorder.cpp" line="811"/>
         <source>Confirm to remove</source>
         <translation>Հաստատեք հեռացումը</translation>
     </message>

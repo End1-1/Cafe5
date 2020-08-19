@@ -8,8 +8,11 @@
 #include "ce5goodsclass.h"
 #include "c5selector.h"
 #include "barcode.h"
+#include "c5printpreview.h"
+#include "c5printing.h"
 #include <QClipboard>
 #include <QFontDatabase>
+#include <QDateTime>
 #include <QCompleter>
 #include <QMenu>
 #include <QFileDialog>
@@ -147,6 +150,62 @@ void CE5Goods::clear()
     ui->chUncomplectIfZero->setChecked(false);
     ui->leUncomplectGoods->setValue("");
     ui->leUncomplectGoodsQty->clear();
+}
+
+QPushButton *CE5Goods::b1()
+{
+    QPushButton *btn = new QPushButton(tr("Print card"));
+    connect(btn, SIGNAL(clicked()), this, SLOT(printCard()));
+    return btn;
+}
+
+void CE5Goods::printCard()
+{
+    C5Printing p;
+    QList<qreal> points;
+    QStringList vals;
+    p.setSceneParams(2000, 2700, QPrinter::Portrait);
+
+    p.setFontSize(16);
+    p.setFontBold(true);
+    p.ltext(QString("%1: %2").arg(tr("Printed")).arg(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR)), 0);
+    p.setFontSize(25);
+    QString docTypeText = tr("Goods card") + " " + ui->leName->text() + " " + ui->leScanCode->text();
+    p.ctext(QString("%1").arg(docTypeText));
+    p.br();
+    p.ltext(tr("Goods group")  + ": " + ui->leGroupName->text(), 5);
+    p.rtext(tr("Internal code") + ": " + ui->leCode->text());
+    p.br();
+    p.ltext(tr("Retail price")  + ": " + ui->leRetailPrice->text(), 5);
+    p.rtext(tr("Whosale price") + ": " + ui->leWhosalePrice->text());
+    p.br();
+    if (ui->tblGoods->rowCount() > 0) {
+        p.br();
+        p.ctext(tr("Complecation"));
+        p.br();
+        points << 5 << 250 << 700 << 200 << 200 << 200 << 200;
+        vals << tr("Code") << tr("Name") << tr("Qty") << tr("Unit") << tr("Price") << tr("Total");
+        p.tableText(points, vals, p.fLineHeight + 20);
+        p.br(p.fLineHeight + 20);
+        for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+            vals.clear();
+            for (int c = 1; c < ui->tblGoods->columnCount(); c++) {
+                vals << ui->tblGoods->getString(i, c);
+            }
+            p.tableText(points, vals, p.fLineHeight + 20);
+            p.br(p.fLineHeight + 20);
+        }
+        p.br(p.fLineHeight + 20);
+        p.br(p.fLineHeight + 20);
+        p.rtext(QString("%1: %2").arg(tr("Complectation cost")).arg(ui->leTotal->text()));
+    }
+
+    fEditor->close();
+    C5PrintPreview pp(&p, fDBParams);
+    pp.setWindowState( (windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+    pp.raise();  // for MacOS
+    pp.activateWindow();
+    pp.exec();
 }
 
 void CE5Goods::tblQtyChanged(const QString &arg1)

@@ -34,6 +34,7 @@ QToolBar *C5StoreInventory::toolBar()
 
 bool C5StoreInventory::openDoc(QString id)
 {
+    fInternalID = id;
     C5Database db(fDBParams);
     db[":f_id"] = id;
     db.exec("select * from a_header where f_id=:f_id");
@@ -41,11 +42,12 @@ bool C5StoreInventory::openDoc(QString id)
         C5Message::error(tr("Invalid document number"));
         return false;
     }
-    ui->leDocNum->setText(db.getString("f_id"));
+    ui->leDocNum->setText(db.getString("f_userid"));
     ui->deDate->setDate(db.getDate("f_date"));
     ui->leComment->setText(db.getString("f_comment"));
     db[":f_document"] = id;
-    db.exec("select d.f_id, d.f_goods, g.f_name, d.f_qty, u.f_name, d.f_price, d.f_total, d.f_store \
+    db.exec("select d.f_id, d.f_goods, concat(g.f_name, if(g.f_scancode is null, '', concat(' ', g.f_scancode))) as f_name, \
+            d.f_qty, u.f_name, d.f_price, d.f_total, d.f_store \
             from a_store_inventory d \
             left join c_goods g on g.f_id=d.f_goods \
             left join c_units u on u.f_id=g.f_unit \
@@ -53,7 +55,7 @@ bool C5StoreInventory::openDoc(QString id)
     while (db.nextRow()) {
         int row = addGoodsRow();
         ui->leStore->setValue(db.getString("f_store"));
-        ui->tblGoods->setInteger(row, 0, db.getInt(0));
+        ui->tblGoods->setString(row, 0, db.getString(0));
         ui->tblGoods->setInteger(row, 1, db.getInt(1));
         ui->tblGoods->setString(row, 2, db.getString(2));
         ui->tblGoods->lineEdit(row, 3)->setDouble(db.getDouble(3));
@@ -89,15 +91,17 @@ void C5StoreInventory::saveDoc()
     }
 
     C5StoreDraftWriter dw(db);
-    ui->leDocNum->setInteger(dw.counterAType(DOC_TYPE_STORE_INVENTORY));
+    if (ui->leDocNum->isEmpty()) {
+        ui->leDocNum->setInteger(dw.counterAType(DOC_TYPE_STORE_INVENTORY));
+    }
     dw.writeAHeader(fInternalID, ui->leDocNum->text(), DOC_STATE_SAVED, DOC_TYPE_STORE_INVENTORY, __userid, ui->deDate->date(), QDate::currentDate(), QTime::currentTime(), 0, ui->leTotal->getDouble(), ui->leComment->text(), 0, 0);
 
-    db[":f_document"] = ui->leDocNum->text();
+    db[":f_document"] = fInternalID;
     db.exec("delete from a_store_inventory where f_document=:f_document");
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
         QString id = ui->tblGoods->getString(i, 0);
         dw.writeAStoreInventory(id, fInternalID, ui->leStore->getInteger(), ui->tblGoods->getInteger(i, 1), ui->tblGoods->lineEdit(i, 3)->getDouble(),  ui->tblGoods->lineEdit(i, 5)->getDouble(), ui->tblGoods->lineEdit(i, 6)->getDouble());
-        ui->tblGoods->setString(i, 0,id);
+        ui->tblGoods->setString(i, 0, id);
     }
 
     C5Message::info(tr("Saved"));
@@ -212,6 +216,7 @@ void C5StoreInventory::printDoc()
     vals << ui->leTotal->text();
     p.tableText(points, vals, p.fLineHeight + 20);
     p.br(p.fLineHeight + 20);
+    p.br(p.fLineHeight + 20);
     p.line(50, p.fTop, 700, p.fTop);
     p.line(1000, p.fTop, 1650, p.fTop);
 
@@ -226,9 +231,9 @@ void C5StoreInventory::on_btnAddGoods_clicked()
         return;
     }
     int row = addGoodsRow();
-    ui->tblGoods->setString(row, 1, vals.at(0).toString());
-    ui->tblGoods->setString(row, 2, vals.at(2).toString());
-    ui->tblGoods->setString(row, 4, vals.at(3).toString());
+    ui->tblGoods->setString(row, 1, vals.at(1).toString());
+    ui->tblGoods->setString(row, 2, vals.at(3).toString());
+    ui->tblGoods->setString(row, 4, vals.at(4).toString());
     ui->tblGoods->lineEdit(row, 3)->setFocus();
 }
 

@@ -2,6 +2,7 @@
 #define C5SELECTOR_H
 
 #include "c5dialog.h"
+#include <QTableView>
 
 namespace Ui {
 class C5Selector;
@@ -31,6 +32,8 @@ public:
 
 private slots:
     void tblSingleClick(const QModelIndex &index);
+
+    void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 
     virtual bool tblDoubleClicked(int row, int column, const QList<QVariant> &values);
 

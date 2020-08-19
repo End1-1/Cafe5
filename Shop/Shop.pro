@@ -127,6 +127,7 @@ SOURCES += \
     ../FrontDesk/c5checkdatabase.cpp \
     ../FrontDesk/c5costumerdebtpayment.cpp \
     ../FrontDesk/c5datasynchronize.cpp \
+    ../FrontDesk/c5daterange.cpp \
     ../FrontDesk/c5dbresetoption.cpp \
     ../FrontDesk/c5dbuseraccess.cpp \
     ../FrontDesk/c5dishgroupaction.cpp \
@@ -201,6 +202,10 @@ SOURCES += \
     ../Reports/cr5goodswaste.cpp \
     ../Reports/cr5hall.cpp \
     ../Reports/cr5materialinstorefilter.cpp \
+    ../Reports/cr5materialinstoreuncomplect.cpp \
+    ../Reports/cr5materialinstoreuncomplectfilter.cpp \
+    ../Reports/cr5materialmoveuncomplect.cpp \
+    ../Reports/cr5materialmoveuncomplectfilter.cpp \
     ../Reports/cr5materialsinstore.cpp \
     ../Reports/cr5menunames.cpp \
     ../Reports/cr5menureview.cpp \
@@ -250,6 +255,7 @@ SOURCES += \
     selectstaff.cpp \
     settingsselection.cpp \
     storeinput.cpp \
+    taxprint.cpp \
     userphoto.cpp \
     viewinputitem.cpp \
     vieworder.cpp \
@@ -377,6 +383,7 @@ HEADERS += \
     ../FrontDesk/c5checkdatabase.h \
     ../FrontDesk/c5costumerdebtpayment.h \
     ../FrontDesk/c5datasynchronize.h \
+    ../FrontDesk/c5daterange.h \
     ../FrontDesk/c5dbresetoption.h \
     ../FrontDesk/c5dbuseraccess.h \
     ../FrontDesk/c5dishgroupaction.h \
@@ -451,6 +458,10 @@ HEADERS += \
     ../Reports/cr5goodswaste.h \
     ../Reports/cr5hall.h \
     ../Reports/cr5materialinstorefilter.h \
+    ../Reports/cr5materialinstoreuncomplect.h \
+    ../Reports/cr5materialinstoreuncomplectfilter.h \
+    ../Reports/cr5materialmoveuncomplect.h \
+    ../Reports/cr5materialmoveuncomplectfilter.h \
     ../Reports/cr5materialsinstore.h \
     ../Reports/cr5menunames.h \
     ../Reports/cr5menureview.h \
@@ -500,6 +511,7 @@ HEADERS += \
     selectstaff.h \
     settingsselection.h \
     storeinput.h \
+    taxprint.h \
     userphoto.h \
     viewinputitem.h \
     vieworder.h \
@@ -564,6 +576,7 @@ FORMS += \
     ../FrontDesk/c5checkdatabase.ui \
     ../FrontDesk/c5costumerdebtpayment.ui \
     ../FrontDesk/c5datasynchronize.ui \
+    ../FrontDesk/c5daterange.ui \
     ../FrontDesk/c5dbresetoption.ui \
     ../FrontDesk/c5dbuseraccess.ui \
     ../FrontDesk/c5dishgroupaction.ui \
@@ -605,6 +618,8 @@ FORMS += \
     ../Reports/cr5goodsimages.ui \
     ../Reports/cr5goodsmovementfilter.ui \
     ../Reports/cr5materialinstorefilter.ui \
+    ../Reports/cr5materialinstoreuncomplectfilter.ui \
+    ../Reports/cr5materialmoveuncomplectfilter.ui \
     ../Reports/cr5menureviewfilter.ui \
     ../Reports/cr5menutranslator.ui \
     ../Reports/cr5salarybyworkersfilter.ui \
@@ -630,6 +645,7 @@ FORMS += \
     selectstaff.ui \
     settingsselection.ui \
     storeinput.ui \
+    taxprint.ui \
     userphoto.ui \
     viewinputitem.ui \
     vieworder.ui \

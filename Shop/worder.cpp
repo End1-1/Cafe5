@@ -16,6 +16,7 @@
 #include "c5shoporder.h"
 #include "working.h"
 #include "c5utils.h"
+#include "taxprint.h"
 #include "c5storedraftwriter.h"
 #include "c5replication.h"
 #include <QInputDialog>
@@ -130,8 +131,13 @@ void WOrder::addGoods(const Goods &g)
                     return;
                 }
             } else {
-                C5Message::error(tr("Insufficient quantity") + "<br>" + float_str(totalQty - gg.fQty, 3));
-                return;
+                if (gg.fIsService) {
+                    addGoodsToTable(g);
+                    return;
+                } else {
+                    C5Message::error(tr("Insufficient quantity") + "<br>" + float_str(totalQty - gg.fQty, 3));
+                    return;
+                }
             }
         }
     }
@@ -739,7 +745,7 @@ void WOrder::on_btnPrintTaxPrepaid_clicked()
         C5Message::error(tr("Save first"));
         return;
     }
-    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), this);
+    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
     QString inJson;
     QString outJson;
     QString err;
@@ -786,4 +792,11 @@ void WOrder::on_leAdvance_textChanged(const QString &arg1)
     if (arg1.toDouble() > ui->leTotal->getDouble()) {
         ui->leAdvance->setDouble(ui->leTotal->getDouble());
     }
+}
+
+void WOrder::on_btnPrintManualTax_clicked()
+{
+    TaxPrint *tp = new TaxPrint();
+    tp->exec();
+    tp->deleteLater();
 }

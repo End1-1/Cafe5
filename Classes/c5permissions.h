@@ -44,6 +44,8 @@
 #define cp_t3_car_visits 314
 #define cp_t3_preorders 315
 #define cp_t3_sale_effectiveness 316
+#define cp_t3_storage_uncomplected 317
+#define cp_t3_move_uncomplected 318
 
 #define cp_t4_menu 400
 #define cp_t4_menu_names 401

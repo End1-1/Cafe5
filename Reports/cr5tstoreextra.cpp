@@ -212,12 +212,13 @@ QString CR5TStoreExtra::documentForInventory()
             if (!result.isEmpty()) {
                 result += ",";
             }
-            result += db.getString(0);
+            result += "'" + db.getString(0) + "'";
         }
     }
     if (result.isEmpty()) {
         C5StoreDraftWriter dw(db);
         dw.writeAHeader(result, QString::number(dw.counterAType(DOC_TYPE_STORE_INVENTORY)), DOC_STATE_SAVED, DOC_TYPE_STORE_INVENTORY, __userid, f->dateEnd(), QDate::currentDate(), QTime::currentTime(), 0, 0, tr("Created automaticaly"), 0, 0);
+        result = "'" + result + "'";
     }
     return result;
 }
@@ -241,7 +242,8 @@ bool CR5TStoreExtra::tblDoubleClicked(int row, int column, const QList<QVariant>
         db.exec(QString("delete from a_store_inventory where f_document in (%1) and f_goods=:f_goods").arg(docid));
         QString id;
         if (qty > 0.0001) {
-            dw.writeAStoreInventory(id, docid.split(",", QString::SkipEmptyParts).at(0), f->store(), values.at(0).toInt(), qty, 0, 0);
+            QString d = docid.split(",", QString::SkipEmptyParts).at(0);
+            dw.writeAStoreInventory(id, d.replace("'", ""), f->store(), values.at(0).toInt(), qty, 0, 0);
         }
         fModel->setData(row, column, qty);
         break;

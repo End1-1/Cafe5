@@ -843,7 +843,7 @@ void C5WaiterServer::processCloseOrder(QJsonObject &o, C5Database &db)
 
 int C5WaiterServer::printTax(const QJsonObject &h, const QJsonArray &ja, C5Database &db)
 {
-    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), this);
+    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(),  this);
     double serviceTotal = 0;
     for (int i = 0; i < ja.count(); i++) {
         QJsonObject d = ja[i].toObject();

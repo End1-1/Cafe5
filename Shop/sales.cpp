@@ -346,7 +346,7 @@ void Sales::on_btnPrintTax_clicked()
             "left join c_units gu on gu.f_id=g.f_unit "
             "left join c_groups t on t.f_id=g.f_group "
             "where og.f_header=:f_id");
-    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), this);
+    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
     while (db.nextRow()) {
         pt.addGoods(db.getString("f_taxdept"), //dep
                     db.getString("f_adgcode"), //adg

@@ -18,6 +18,8 @@ class CE5Editor : public C5Widget
 public:
     CE5Editor(const QStringList &dbParams, QWidget *parent = nullptr);
 
+    ~CE5Editor();
+
     virtual void setId(int id);
 
     virtual QString title() = 0;
@@ -30,11 +32,15 @@ public:
 
     virtual void clear();
 
+    virtual QPushButton *b1();
+
     void getLineEdit(QObject *parent);
 
     void focusFirst();
 
     void setDatabase(const QStringList &dbParams);
+
+    QWidget *fEditor;
 
     template<typename T>
     bool getId(QString &id) {

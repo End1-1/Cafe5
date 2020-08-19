@@ -26,11 +26,11 @@ QToolBar *CR5MaterialsInStore::toolBar()
 {
     if (!fToolBar) {
         QList<ToolBarButtons> btn;
-            btn << ToolBarButtons::tbFilter
-            << ToolBarButtons::tbClearFilter
-            << ToolBarButtons::tbRefresh
-            << ToolBarButtons::tbExcel
-            << ToolBarButtons::tbPrint;
+        btn << ToolBarButtons::tbFilter
+        << ToolBarButtons::tbClearFilter
+        << ToolBarButtons::tbRefresh
+        << ToolBarButtons::tbExcel
+        << ToolBarButtons::tbPrint;
         fToolBar = createStandartToolbar(btn);
         fToolBar->addAction(QIcon(":/barcode.png"), tr("Print\nbarcode"), this, SLOT(printBarcode()));
     }

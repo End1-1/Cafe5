@@ -77,6 +77,8 @@ private slots:
 
     void on_leAdvance_textChanged(const QString &arg1);
 
+    void on_btnPrintManualTax_clicked();
+
 private:
     Ui::WOrder *ui;
 

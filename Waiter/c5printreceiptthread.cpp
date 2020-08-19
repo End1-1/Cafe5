@@ -104,7 +104,7 @@ void C5PrintReceiptThread::print()
         }
         total += o["f_qty2"].toString().toDouble() * o["f_price"].toString().toDouble();
         p.ltext(QString("%1. %2: %3, %4").arg(nn++).arg(__translator.tt(tr("Class"))).arg(o["f_adgcode"].toString()).arg(o["f_name"].toString()), 0);
-//        p.br();
+        p.br();
 //        p.ltext(o["f_name"].toString(), 0);
 //        p.br(); <--- this row fuck
         QString servPlus;

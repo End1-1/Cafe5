@@ -14,7 +14,6 @@ public:
 
     virtual QToolBar *toolBar();
 
-
     virtual void buildQuery() override;
 
     virtual bool on_tblView_doubleClicked(const QModelIndex &index);

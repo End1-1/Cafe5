@@ -359,6 +359,11 @@ bool C5Config::shopDifferentStaff()
     return getValue(param_shop_defferentStaff).toInt() == 1;
 }
 
+bool C5Config::waiterLoginAfterPayment()
+{
+    return getValue(param_waiter_login_after_payment).toInt() == 1;
+}
+
 QString C5Config::getValue(int key)
 {
     QMutexLocker ml(&settingsMutex);

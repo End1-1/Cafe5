@@ -6,12 +6,21 @@
 #include "c5combobox.h"
 #include "c5selector.h"
 #include <QValidator>
+#include <QPushButton>
 #include <QPlainTextEdit>
 
 CE5Editor::CE5Editor(const QStringList &dbParams, QWidget *parent) :
     C5Widget(dbParams, parent)
 {
     fRememberFields = false;
+    fEditor = nullptr;
+}
+
+CE5Editor::~CE5Editor()
+{
+    if (b1()) {
+        b1()->deleteLater();
+    }
 }
 
 void CE5Editor::setId(int id)
@@ -291,6 +300,11 @@ void CE5Editor::clear()
         }
     }
     focusFirst();
+}
+
+QPushButton *CE5Editor::b1()
+{
+    return nullptr;
 }
 
 C5LineEditWithSelector *CE5Editor::findLineEditWithId()

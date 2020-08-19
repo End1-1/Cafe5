@@ -29,6 +29,10 @@ C5Editor *C5Editor::createEditor(const QStringList &dbParams, CE5Editor *e, int 
     e->clear();
     e->setId(id);
     de->setWindowTitle(e->title());
+    if (e->b1()) {
+        de->insertButton(e->b1());
+    }
+    e->fEditor = de;
     return de;
 }
 
@@ -46,6 +50,11 @@ void C5Editor::reject()
 {
     fEditor->clear();
     C5Dialog::reject();
+}
+
+void C5Editor::insertButton(QPushButton *b)
+{
+    ui->horizontalLayout->insertWidget(3, b);
 }
 
 void C5Editor::closeEvent(QCloseEvent *e)

@@ -64,8 +64,6 @@ Working::Working(QWidget *parent) :
     ui->leCode->installEventFilter(this);
     ui->tab->installEventFilter(this);
     on_btnNewOrder_clicked();
-    PrintTaxN::fTaxCashier = __c5config.taxCashier();
-    PrintTaxN::fTaxPin = __c5config.taxPin();
     ui->wGoods->setVisible(false);
     ui->btnNewOrder->setVisible(!__c5config.shopDenyF1());
     ui->btnNewWhosale->setVisible(!__c5config.shopDenyF2());

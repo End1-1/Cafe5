@@ -97,11 +97,11 @@ QToolBar *CR5Goods::toolBar()
             << ToolBarButtons::tbExcel
             << ToolBarButtons::tbPrint;
             createStandartToolbar(btn);
+            if (pr(fDBParams.at(1), cp_t1_goods_pricing)) {
+                fToolBar->addAction(QIcon(":/pricing.png"), tr("Pricing"), this, SLOT(pricing()));
+            }
+            fToolBar->addAction(QIcon(":/dress.png"), tr("Group price"), this, SLOT(groupPrice()));
     }
-    if (pr(fDBParams.at(1), cp_t1_goods_pricing)) {
-        fToolBar->addAction(QIcon(":/pricing.png"), tr("Pricing"), this, SLOT(pricing()));
-    }
-    fToolBar->addAction(QIcon(":/dress.png"), tr("Group price"), this, SLOT(groupPrice()));
     return fToolBar;
 }
 

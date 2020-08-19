@@ -2,6 +2,7 @@
 #include "ui_c5salarydoc.h"
 #include "c5selector.h"
 #include "c5cache.h"
+#include "c5daterange.h"
 #include "c5cashdoc.h"
 #include "c5mainwindow.h"
 #include "c5lineeditwithselector.h"
@@ -37,6 +38,7 @@ bool C5SalaryDoc::openDoc(const QString &id)
     if (!db.nextRow()) {
         return false;
     }
+    ui->deDate->setDate(db.getDate("f_date"));
     ui->leRemarks->setText(db.getString("f_comment"));
     ui->leTotal->setDouble(db.getDouble("f_amount"));
     ui->leDocnumber->setText(db.getString("f_userid"));
@@ -175,73 +177,84 @@ void C5SalaryDoc::save()
 
 void C5SalaryDoc::countSalary()
 {
-    if (ui->leShift->getInteger() == 0) {
-        C5Message::error(tr("Shift was not selected"));
+    C5Database db(fDBParams);
+    db[":f_id"] = ui->leShift->getInteger();
+    db.exec("select cast(f_formula as char) from s_salary_shift where f_id=:f_id");
+    if (!db.nextRow()) {
         return;
     }
-    QMap<int, int> posCount;
-    QMap<int, QString> posCondition;
-    QMap<int, double> posTotal;
-    QMap<int, double> posIndividual;
-    QMap<int, double> posPercent;
-    QMap<int, double> posIndividualLow;
-    for (int i = 0; i < ui->tbl->rowCount(); i++) {
-        posCount[ui->tbl->lineEditWithSelector(i, 1)->getInteger()] = posCount[ui->tbl->lineEditWithSelector(i, 1)->getInteger()] + 1;
-    }
 
-    C5Database db(fDBParams);
-    for (QMap<int, int>::const_iterator it = posCount.begin(); it != posCount.end(); it++) {
-        db[":f_position"] = it.key();
-        db[":f_shift"] = ui->leShift->getInteger();
-        db.exec("select f_raw, f_individual, f_percent, f_individuallow from s_salary_account where f_position=:f_position and f_shift=:f_shift");
-        while (db.nextRow()) {
-            posCondition[it.key()] = db.getString(0);
-            posPercent[it.key()] = db.getDouble(2);
-            if (db.getDouble(1) > 0.001) {
-                posIndividual[it.key()] = db.getDouble(1);
-            }
-        }
-    }
-
-    for (QMap<int, int>::const_iterator it = posCount.begin(); it != posCount.end(); it++) {
-        if (posIndividual.contains(it.key())) {
-            continue;
-        }
-        db[":f_shift"] = ui->leShift->getInteger();
-        db[":f_datecash1"] = ui->deDate->date();
-        db[":f_datecash2"] = ui->deDate->date();
-        QString cond;
-        QJsonParseError jerr;
-        QJsonDocument joc = QJsonDocument::fromJson(posCondition[it.key()].toUtf8(), &jerr);
-        if (jerr.error == QJsonParseError::NoError) {
-            QJsonArray ja = joc.array();
-            for (int i = 0; i < ja.count(); i++) {
-                QJsonObject jo = ja.at(i).toObject();
-                if (jo.contains("i_dishpart2")) {
-                    cond += " and ob.f_dish in (select f_id from d_dish where f_part in (" + jo["i_dishpart2"].toString() + ")) ";
+    QJsonObject jo = QJsonDocument::fromJson(db.getString(0).toUtf8()).object();
+    if (jo.contains("fixed_amounts")) {
+        QJsonArray jfixed = jo["fixed_amounts"].toArray();
+        for (int i = 0; i < jfixed.count(); i++) {
+            QJsonObject jfa = jfixed[i].toObject();
+            for (int r = 0; r < ui->tbl->rowCount(); r++) {
+                if (jfa["position"].toInt() == ui->tbl->getInteger(r, 1)) {
+                    ui->tbl->lineEdit(r, 5)->setDouble(jfa["amount"].toDouble());
                 }
             }
         }
-        db.exec("select sum(ob.f_total) "
-                "from o_body ob "
-                "inner join o_header oh on oh.f_id=ob.f_header "
-                "where oh.f_datecash between :f_datecash1 and :f_datecash2 "
-                "and oh.f_shift=:f_shift "
-                "and oh.f_state=2 and ob.f_state=1 " + cond);
-        if (db.nextRow()) {
-            posTotal[it.key()] = db.getDouble(0);
-        } else {
-            posTotal[it.key()] = 0;
-        }
     }
 
-    for (int i = 0; i < ui->tbl->rowCount(); i++) {
-        if (posIndividual[ui->tbl->lineEditWithSelector(i, 1)->getInteger()] > 0.001) {
-            ui->tbl->lineEditWithSelector(i, 5)->setDouble(posIndividual[ui->tbl->lineEditWithSelector(i, 1)->getInteger()]);
-        } else {
-            ui->tbl->lineEditWithSelector(i, 5)->setDouble((posTotal[ui->tbl->lineEditWithSelector(i, 1)->getInteger()]
-                                                           * posPercent[ui->tbl->lineEditWithSelector(i, 1)->getInteger()])
-                    / posCount[ui->tbl->lineEditWithSelector(i, 1)->getInteger()]);
+    if (jo.contains("date_interval_by_days")) {
+        QDate d1, d2;
+        if (!C5DateRange::dateRange(d1, d2)) {
+            return;
+        }
+        if (d1 > d2) {
+            C5Message::error(tr("The date range is valid. Start date cannot be greater than end date."));
+        }
+        QJsonArray jarr = jo["date_interval_by_days"].toArray();
+        for (int i = 0; i < jarr.count(); i++) {
+            QJsonObject jf = jarr[i].toObject();
+            QJsonArray jpos = jf["position"].toArray();
+            bool divideBetweenEmployes = jf["divide_between_employes"].toBool();
+            for (int r = 0; r < ui->tbl->rowCount(); r++) {
+                for (int p = 0; p < jpos.count(); p++) {
+                    if (ui->tbl->getInteger(r, 1) == jpos[i].toInt()) {
+                        ui->tbl->lineEdit(r, 5)->setDouble(0);
+                    }
+                }
+            }
+            if (jf["amount_source"].toString() ==  "sql") {
+                for (QDate da = d1; da != d2; da = da.addDays(1)) {
+                    QString query = jf["sql"].toString();
+                    query = query.replace("%date%", da.toString(FORMAT_DATE_TO_STR_MYSQL));
+                    db.exec(query);
+                    if (db.nextRow()) {
+                        if (divideBetweenEmployes) {
+                            int count = 0;
+                            for (int r = 0; r < ui->tbl->rowCount(); r++) {
+                                for (int p = 0; p < jpos.count(); p++) {
+                                    if (ui->tbl->getInteger(r, 1) == jpos[p].toInt()) {
+                                        count++;
+                                    }
+                                }
+                            }
+                            if (count == 0) {
+                                continue;
+                            }
+                            double amount = db.getDouble(0) / count;
+                            for (int r = 0; r < ui->tbl->rowCount(); r++) {
+                                for (int p = 0; p < jpos.count(); p++) {
+                                    if (ui->tbl->getInteger(r, 1) == jpos[p].toInt()) {
+                                        ui->tbl->lineEdit(r, 5)->setDouble(ui->tbl->lineEdit(r, 5)->getDouble() + amount);
+                                    }
+                                }
+                            }
+                        } else {
+                            for (int r = 0; r < ui->tbl->rowCount(); r++) {
+                                for (int p = 0; p < jpos.count(); p++) {
+                                    if (ui->tbl->getInteger(r, 1) == jpos[p].toInt()) {
+                                        ui->tbl->lineEdit(r, 5)->setDouble(ui->tbl->lineEdit(r, 5)->getDouble() + db.getDouble(0));
+                                    }
+                                }
+                            }
+                        }
+                    } //if (db.nextRow())
+                } //for (QDate da = d1; da != d2; da = da.addDays(1))
+            } //if (jf["amount_source"].toString() ==  "sql")
         }
     }
 }
@@ -324,7 +337,7 @@ void C5SalaryDoc::on_btnAddEmployee_clicked()
     if (db.nextRow()) {
         int row = newRow();
         ui->tbl->lineEditWithSelector(row, 1)->setValue(db.getInt(0));
-        ui->tbl->setInteger(row, 3, vals.at(0).toInt());
+        ui->tbl->setInteger(row, 3, vals.at(1).toInt());
         ui->tbl->setString(row, 4, db.getString(1));
     }
 }

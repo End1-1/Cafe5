@@ -28,7 +28,11 @@ public:
 
     virtual void clear();
 
+    virtual QPushButton *b1() override;
+
 private slots:
+    void printCard();
+
     void tblQtyChanged(const QString &arg1);
 
     void tblPriceChanged(const QString &arg1);

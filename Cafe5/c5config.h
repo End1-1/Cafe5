@@ -53,6 +53,7 @@
 #define param_shop_noF2 48
 #define param_shop_noPriceChange 49
 #define param_shop_defferentStaff 50
+#define param_waiter_login_after_payment 51
 
 #define FRONTDESK_WAITER 0
 #define FRONTDESK_SHOP 1
@@ -201,6 +202,8 @@ public:
     static bool shopDenyPriceChange();
 
     static bool shopDifferentStaff();
+
+    static bool waiterLoginAfterPayment();
 
 private:
     static QString getValue(int key);

@@ -10,6 +10,7 @@
 #include "cr5commonsales.h"
 #include "checkforupdatethread.h"
 #include "cr5usersgroups.h"
+#include "cr5materialinstoreuncomplect.h"
 #include "cr5consumptionbysales.h"
 #include "cr5storereason.h"
 #include "cr5carvisits.h"
@@ -31,6 +32,7 @@
 #include "cr5preorders.h"
 #include "c5dishselfcostgenprice.h"
 #include "cr5salefromstoretotal.h"
+#include "cr5materialmoveuncomplect.h"
 #include "cr5dishcomment.h"
 #include "cr5salesbydishes.h"
 #include "cr5tstoreextra.h"
@@ -315,6 +317,8 @@ void C5MainWindow::on_actionLogin_triggered()
             addTreeL3Item(it, cp_t3_documents_store, tr("Documents in the store"), ":/documents.png");
             addTreeL3Item(it, cp_t3_store, tr("Storage"), ":/goods.png");
             addTreeL3Item(it, cp_t3_store_movement, tr("Storages movements"), ":/goods.png");
+            addTreeL3Item(it, cp_t3_move_uncomplected, tr("Storage movement, uncomplected"), ":/goods.png");
+            addTreeL3Item(it, cp_t3_storage_uncomplected, tr("Storage uncomplected"), ":/goods.png");
             addTreeL3Item(it, cp_t3_sale_from_store_total, tr("Detailed movement in the storage"), ":/graph.png");
             addTreeL3Item(it, cp_t3_tstore_extra, tr("T-account, extra"), ":/documents.png");
             addTreeL3Item(it, cp_t2_count_output_of_sale, tr("Consumption of goods based on sales"), ":/goods.png");
@@ -635,6 +639,12 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
         break;
     case cp_t3_sale_effectiveness:
         createTab<CR5SalesAndStore>(dbParams);
+        break;
+    case cp_t3_storage_uncomplected:
+        createTab<CR5MaterialInStoreUncomplect>(dbParams);
+        break;
+    case cp_t3_move_uncomplected:
+        createTab<CR5MaterialMoveUncomplect>(dbParams);
         break;
     case cp_t4_part1:
         createTab<CR5DishPart1>(dbParams);

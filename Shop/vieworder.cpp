@@ -130,8 +130,19 @@ void ViewOrder::on_btnReturn_clicked()
         int i = rows.at(j);
         QString ogoodsid;
         QString adraftid;
+        double price = 0;
+        db[":f_id"] = ui->tbl->getString(i, 0);
+        db.exec("select f_storerec from o_goods where f_id=:f_id");
+        if (db.nextRow()) {
+            db[":f_id"] = db.getString(0);
+            db.exec("select f_price from a_store_draft where f_id=:f_id");
+            if (db.nextRow()) {
+                price = db.getDouble(0);
+            }
+        }
         if (haveStore && ui->tbl->getInteger(i, 8) == 0) {
-            if (!dw.writeAStoreDraft(adraftid, storeDocId, __c5config.defaultStore(), 1, ui->tbl->getInteger(i, 6), ui->tbl->getDouble(i, 3), ui->tbl->getDouble(i, 4), ui->tbl->getDouble(i, 5), DOC_REASON_SALE_RETURN, adraftid, i + 1)) {
+            if (!dw.writeAStoreDraft(adraftid, storeDocId, __c5config.defaultStore(), 1,
+                                     ui->tbl->getInteger(i, 6), ui->tbl->getDouble(i, 3), price, price * ui->tbl->getDouble(i, 3), DOC_REASON_SALE_RETURN, adraftid, i + 1)) {
                 return returnFalse(dw.fErrorMsg, &db);
             }
         }

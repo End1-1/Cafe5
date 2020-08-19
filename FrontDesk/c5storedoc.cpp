@@ -634,7 +634,7 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
     }
     if (fDocType == DOC_TYPE_COMPLECTATION) {
         db[":f_id"] = ui->leComplectationCode->getInteger();
-        db[":f_lastinputprice"] = ui->leTotal->getDouble();
+        db[":f_lastinputprice"] = ui->leTotal->getDouble() / ui->leComplectationQty->getDouble();
         db.exec("update c_goods set f_lastinputprice=:f_lastinputprice where f_id=:f_id");
     }
 
@@ -745,7 +745,7 @@ bool C5StoreDoc::docCheck(QString &err)
         if (ui->leStoreOutput->getInteger() == 0) {
             err += tr("Output store is not defined") + "<br>";
         }
-        if (ui->leComplectationQty->getDouble() < 0.0001) {
+        if (ui->leComplectationQty->getDouble() < 0.00001) {
             err += tr("The quantity of complectation cannot be zero") + "<br>";
         }
         if (ui->leComplectationCode->getInteger() == 0) {
@@ -757,7 +757,7 @@ bool C5StoreDoc::docCheck(QString &err)
         err += tr("Cannot save an emtpy document") + "<br>";
     }
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
-        if (ui->tblGoods->lineEdit(i, 5)->getDouble() < 0.001) {
+        if (ui->tblGoods->lineEdit(i, 5)->getDouble() < 0.00001) {
             err += QString("%1 #%2, %3, %4").arg(tr("Row")).arg(i + 1).arg(ui->tblGoods->getString(i, 4)).arg(tr("missing quantity")) + "<br>";
         }
     }
@@ -917,7 +917,7 @@ void C5StoreDoc::loadGoods(int store)
               "inner join c_units u on u.f_id=g.f_unit "
               "where s.f_store=%1 and d.f_date<=%2 and d.f_state=1 "
               "group by 1, 2, 3, 4 "
-              "having sum(s.f_qty*s.f_type) > 0.001")
+              "having sum(s.f_qty*s.f_type) > 0.00001")
             .arg(store)
             .arg(ui->deDate->toMySQLDate()));
     while (db.nextRow()) {
@@ -1075,7 +1075,7 @@ void C5StoreDoc::getOutput()
                           "inner join c_units u on u.f_id=g.f_unit "
                           "where s.f_store=%1 and d.f_date<=%2 and d.f_state=1 "
                           "group by 1, 2, 3, 4 "
-                          "having sum(s.f_qty*s.f_type) > 0.001 ")
+                          "having sum(s.f_qty*s.f_type) > 0.00001 ")
             .arg(ui->leStoreOutput->getInteger())
             .arg(ui->deDate->toMySQLDate());
     QList<QVariant> vals;

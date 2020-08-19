@@ -74,6 +74,10 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Reports/cr5goodsclasses.cpp \
     ../Reports/cr5goodsfilter.cpp \
     ../Reports/cr5goodsimages.cpp \
+    ../Reports/cr5materialinstoreuncomplect.cpp \
+    ../Reports/cr5materialinstoreuncomplectfilter.cpp \
+    ../Reports/cr5materialmoveuncomplect.cpp \
+    ../Reports/cr5materialmoveuncomplectfilter.cpp \
     ../Reports/cr5menureview.cpp \
     ../Reports/cr5menureviewfilter.cpp \
     ../Reports/cr5preorders.cpp \
@@ -93,6 +97,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     c5changepriceofgroup.cpp \
     c5checkdatabase.cpp \
     c5costumerdebtpayment.cpp \
+    c5daterange.cpp \
     c5dbresetoption.cpp \
     c5dishgroupaction.cpp \
     c5document.cpp \
@@ -269,6 +274,10 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Reports/cr5goodsclasses.h \
     ../Reports/cr5goodsfilter.h \
     ../Reports/cr5goodsimages.h \
+    ../Reports/cr5materialinstoreuncomplect.h \
+    ../Reports/cr5materialinstoreuncomplectfilter.h \
+    ../Reports/cr5materialmoveuncomplect.h \
+    ../Reports/cr5materialmoveuncomplectfilter.h \
     ../Reports/cr5menureview.h \
     ../Reports/cr5menureviewfilter.h \
     ../Reports/cr5preorders.h \
@@ -289,6 +298,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     c5changepriceofgroup.h \
     c5checkdatabase.h \
     c5costumerdebtpayment.h \
+    c5daterange.h \
     c5dbresetoption.h \
     c5dishgroupaction.h \
     c5document.h \
@@ -446,6 +456,8 @@ FORMS += \
     ../Reports/cr5discountstatisticsfilter.ui \
     ../Reports/cr5goodsfilter.ui \
     ../Reports/cr5goodsimages.ui \
+    ../Reports/cr5materialinstoreuncomplectfilter.ui \
+    ../Reports/cr5materialmoveuncomplectfilter.ui \
     ../Reports/cr5menureviewfilter.ui \
     ../Reports/cr5salarybyworkersfilter.ui \
     ../Reports/cr5saleandstorefilter.ui \
@@ -456,6 +468,7 @@ FORMS += \
     c5changepriceofgroup.ui \
     c5checkdatabase.ui \
     c5costumerdebtpayment.ui \
+    c5daterange.ui \
     c5dbresetoption.ui \
     c5dishgroupaction.ui \
     c5goodsimage.ui \

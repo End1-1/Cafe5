@@ -28,7 +28,8 @@ bool CE5MenuName::checkData(QString &err)
     bool result = CE5Editor::checkData(err);
     C5Database db(fDBParams);
     db[":f_name"] = ui->leName->text();
-    db.exec("select * from d_menu_names where lower(f_name)=lower(:f_name)");
+    db[":f_id"] = ui->leCode->getInteger();
+    db.exec("select * from d_menu_names where lower(f_name)=lower(:f_name) and f_id<>:f_id");
     if (db.nextRow()) {
         err += tr("Duplicate name") + "<br>";
         return false;

@@ -17,6 +17,7 @@ C5Selector::C5Selector(const QStringList &dbParams) :
     ui->hl->addWidget(fGrid);
     connect(fGrid, SIGNAL(tblDoubleClick(int,int,QList<QVariant>)), this, SLOT(tblDoubleClicked(int,int,QList<QVariant>)));
     connect(fGrid, SIGNAL(tblSingleClick(QModelIndex)), this, SLOT(tblSingleClick(QModelIndex)));
+    connect(fGrid->fTableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(selectionChanged(QItemSelection,QItemSelection)));
     fReset = true;
 }
 
@@ -38,6 +39,7 @@ bool C5Selector::getValue(const QStringList &dbParams, int cache, QList<QVariant
         c = fSelectorList[cacheName][cache];
     }
     c->fMultipleSelection = false;
+    c->fGrid->fModel->setSingleCheckBoxSelection(true);
     if (c->fReset) {
         c->fReset = false;
         c->refresh();
@@ -61,6 +63,7 @@ bool C5Selector::getMultipleValues(const QStringList &dbParams, int cache, QList
         c = fSelectorList[cacheName][cache];
     }
     c->fMultipleSelection = true;
+    c->fGrid->fModel->setSingleCheckBoxSelection(false);
     if (c->fReset) {
         c->fReset = false;
         c->refresh();
@@ -135,6 +138,21 @@ void C5Selector::tblSingleClick(const QModelIndex &index)
     }
     int v = fGrid->fModel->data(index.row(), 0, Qt::EditRole).toInt() == 0 ? 1 : 0;
     fGrid->fModel->setData(index.row(), 0, v, Qt::CheckStateRole);
+    qDebug() << "SINGLE slicl";
+}
+
+void C5Selector::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
+{
+    qDebug() << "SEPARATOR";
+    for (QModelIndex i: deselected.indexes()) {
+        fGrid->fModel->setData(i.row(), 0, 0, Qt::CheckStateRole);
+    }
+    qDebug() << deselected.indexes();
+
+    for (QModelIndex i: selected.indexes()) {
+        fGrid->fModel->setData(i.row(), 0, 1, Qt::CheckStateRole);
+    }
+    qDebug() << selected.indexes();
 }
 
 bool C5Selector::tblDoubleClicked(int row, int column, const QList<QVariant> &values)

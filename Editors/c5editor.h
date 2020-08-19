@@ -25,6 +25,8 @@ public:
 
     virtual void reject() override;
 
+    void insertButton(QPushButton *b);
+
 protected:
     virtual void closeEvent(QCloseEvent *e);
 

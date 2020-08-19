@@ -782,7 +782,11 @@ void DlgOrder::on_btnPayment_clicked()
         fOrder->fHeader = QJsonObject();
         fOrder->fItems = QJsonArray();
         itemsToTable();
-        on_btnChangeTable_clicked();
+        if (__c5config.waiterLoginAfterPayment())  {
+            accept();
+        } else {
+            on_btnChangeTable_clicked();
+        }
         break;
     case PAYDLG_NONE:
         saveOrder();

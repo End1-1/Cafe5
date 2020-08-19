@@ -82,7 +82,7 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
     }
 
     if (tax) {
-        PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), this);
+        PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
         for (int i = 0; i < goods.count(); i++) {
             IGoods &g = goods[i];
             pt.addGoods(g.taxDept, //dep

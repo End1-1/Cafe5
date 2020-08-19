@@ -423,7 +423,7 @@
         </widget>
        </item>
        <item row="15" column="3">
-        <widget class="C5LineEditWithSelector" name="lineEdit_7">
+        <widget class="C5LineEditWithSelector" name="leWhosalePrice">
          <property name="minimumSize">
           <size>
            <width>100</width>
@@ -703,7 +703,7 @@
         </widget>
        </item>
        <item row="15" column="1">
-        <widget class="C5LineEditWithSelector" name="lineEdit_5">
+        <widget class="C5LineEditWithSelector" name="leRetailPrice">
          <property name="minimumSize">
           <size>
            <width>100</width>
@@ -1273,8 +1273,8 @@
   <tabstop>leClass4</tabstop>
   <tabstop>leName</tabstop>
   <tabstop>leScanCode</tabstop>
-  <tabstop>lineEdit_5</tabstop>
-  <tabstop>lineEdit_7</tabstop>
+  <tabstop>leRetailPrice</tabstop>
+  <tabstop>leWhosalePrice</tabstop>
   <tabstop>lineEdit_6</tabstop>
   <tabstop>leLowLevel</tabstop>
   <tabstop>plainTextEdit</tabstop>
