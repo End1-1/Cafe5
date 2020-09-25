@@ -90,5 +90,6 @@
         <file>effectiveness.png</file>
         <file>dress.png</file>
         <file>broom.png</file>
+        <file>storeinput.png</file>
     </qresource>
 </RCC>

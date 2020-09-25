@@ -2,7 +2,7 @@
 #include "c5tablemodel.h"
 #include "cr5saleandstorefilter.h"
 
-CR5SalesAndStore::CR5SalesAndStore(const QStringList &dbParams, QWidget *parent) :
+CR5SalesEffectiveness::CR5SalesEffectiveness(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
 {
     fLabel = tr("Effectiveness of sales");
@@ -11,7 +11,7 @@ CR5SalesAndStore::CR5SalesAndStore(const QStringList &dbParams, QWidget *parent)
     fFilter = static_cast<CR5SaleAndStoreFilter*>(fFilterWidget);
 }
 
-QToolBar *CR5SalesAndStore::toolBar()
+QToolBar *CR5SalesEffectiveness::toolBar()
 {
     if (!fToolBar) {
         QList<ToolBarButtons> btn;
@@ -24,7 +24,7 @@ QToolBar *CR5SalesAndStore::toolBar()
     return fToolBar;
 }
 
-void CR5SalesAndStore::buildQuery()
+void CR5SalesEffectiveness::buildQuery()
 {
     fColumnsSum.clear();
     fTranslation.clear();
@@ -41,12 +41,12 @@ void CR5SalesAndStore::buildQuery()
     }
 }
 
-void CR5SalesAndStore::refreshData()
+void CR5SalesEffectiveness::refreshData()
 {
     buildQuery();
 }
 
-void CR5SalesAndStore::rep1()
+void CR5SalesEffectiveness::rep1()
 {
     fColumnNameIndex["f_goodsid"] = 0;
     fColumnNameIndex["f_groupname"] = 1;
@@ -59,9 +59,10 @@ void CR5SalesAndStore::rep1()
     fColumnNameIndex["f_startqty"] = 8;
     fColumnNameIndex["f_inputqty"] = 9;
     fColumnNameIndex["f_outputqty"] = 10;
-    fColumnNameIndex["f_finalqty"] = 11;
-    fColumnNameIndex["f_effectivity"] = 12;
-    fColumnNameIndex["f_storedelta"] = 13;
+    fColumnNameIndex["f_output"] = 11;
+    fColumnNameIndex["f_finalqty"] = 12;
+    fColumnNameIndex["f_effectivity"] = 13;
+    fColumnNameIndex["f_storedelta"] = 14;
 
     fTranslation["f_goodsid"] = tr("Goods code");
     fTranslation["f_groupname"] = tr("Group");
@@ -73,7 +74,8 @@ void CR5SalesAndStore::rep1()
     fTranslation["f_class4"] = tr("Class 4");
     fTranslation["f_startqty"] = tr("Start qty");
     fTranslation["f_inputqty"] = tr("Input qty");
-    fTranslation["f_outputqty"] = tr("Output qty");
+    fTranslation["f_outputqty"] = tr("Sales qty");
+    fTranslation["f_output"] = tr("Output");
     fTranslation["f_finalqty"] = tr("Final qty");
     fTranslation["f_effectivity"] = tr("Effectivity");
     fTranslation["f_storedelta"] = tr("Store delta");
@@ -118,6 +120,8 @@ void CR5SalesAndStore::rep1()
         //store
         row.append(0);
         //input
+        row.append(0);
+        //sales
         row.append(0);
         //output
         row.append(0);
@@ -182,7 +186,7 @@ void CR5SalesAndStore::rep1()
         int r = goodsRowMap[db.getInt("f_goods")];
         rows[r][c] = db.getDouble("f_qty");
     }
-    //OUTPUT QTY
+    //SALES QTY
     query = "select og.f_goods,sum(og.f_qty*og.f_sign) as f_qty "
             "from o_goods og "
             "left join o_header oh on oh.f_id=og.f_header ";
@@ -208,6 +212,32 @@ void CR5SalesAndStore::rep1()
         int r = goodsRowMap[db.getInt("f_goods")];
         rows[r][c] = db.getDouble("f_qty");
     }
+    //OTHER OUTPUT
+    query = "select s.f_goods ,sum(s.f_qty) as f_qty "
+            "from a_store s "
+            "left join a_header a on a.f_id=s.f_document  ";
+    if (!fFilter->goods().isEmpty() || !fFilter->goodsGroup().isEmpty()) {
+        query += "inner join c_goods g on g.f_id=s.f_goods ";
+    }
+    query += "where  a.f_date between :f_date1 and :f_date2 and s.f_type=-1 and s.f_reason <>4 ";
+    if (!fFilter->goodsGroup().isEmpty()) {
+        query += QString(" and g.f_group in (%1) ").arg(fFilter->goodsGroup());
+    }
+    if (!fFilter->goods().isEmpty()) {
+        query += QString(" and g.f_id in (%1) ").arg(fFilter->goods());
+    }
+    if (!fFilter->store().isEmpty()) {
+        query += QString(" and s.f_store in (%1) ").arg(fFilter->store());
+    }
+    query += "group by 1 ";
+    db[":f_date1"] = fFilter->date1();
+    db[":f_date2"] = fFilter->date2();
+    db.exec(query);
+    while (db.nextRow()) {
+        int c = storeIdx + 3;
+        int r = goodsRowMap[db.getInt("f_goods")];
+        rows[r][c] = db.getDouble("f_qty");
+    }
     //FINAL QTY
     query = "select s.f_goods as f_code, sum(s.f_qty*s.f_type) as f_qty,sum(s.f_total*s.f_type) as f_total "
             "from a_store s "
@@ -229,7 +259,7 @@ void CR5SalesAndStore::rep1()
     db[":f_date"] = fFilter->date2();
     db.exec(query);
     while (db.nextRow()) {
-        int c = storeIdx + 3;
+        int c = storeIdx + 4;
         int r = goodsRowMap[db.getInt("f_goods")];
         rows[r][c] = db.getDouble("f_qty");
     }
@@ -243,34 +273,43 @@ void CR5SalesAndStore::rep1()
     }
     for (int i = rows.count() - 1; i > -1; i--) {
         if ((rows[i][storeIdx].toDouble() + rows[i][storeIdx + 1].toDouble()) > 0.0001) {
-            rows[i][storeIdx + 4] = (rows[i][storeIdx + 2].toDouble() * 100) / (rows[i][storeIdx].toDouble() + rows[i][storeIdx + 1].toDouble());
+            rows[i][storeIdx + 5] = (rows[i][storeIdx + 2].toDouble() * 100) / (rows[i][storeIdx].toDouble() + rows[i][storeIdx + 1].toDouble());
         }
         if (rows[i][storeIdx].toDouble() > 0.0001) {
-            rows[i][storeIdx + 5] = ((rows[i][storeIdx + 3].toDouble() * 100) / rows[i][storeIdx].toDouble()) - 100;
+            rows[i][storeIdx + 6] = ((rows[i][storeIdx + 4].toDouble() * 100) / rows[i][storeIdx].toDouble()) - 100;
         } else {
-            rows[i][storeIdx + 5] = 100.0;
+            rows[i][storeIdx + 6] = 100.0;
         }
     }
     fModel->setExternalData(fColumnNameIndex, fTranslation);
+    fColumnsSum.clear();
+    fColumnsSum.append("f_startqty");
+    fColumnsSum.append("f_inputqty");
+    fColumnsSum.append("f_outputqty");
+    fColumnsSum.append("f_output");
+    fColumnsSum.append("f_finalqty");
+    sumColumnsData();
     restoreColumnsWidths();
 }
 
-void CR5SalesAndStore::rep2()
+void CR5SalesEffectiveness::rep2()
 {
     fColumnNameIndex["f_groupid"] = 0;
     fColumnNameIndex["f_groupname"] = 1;
     fColumnNameIndex["f_startqty"] = 2;
     fColumnNameIndex["f_inputqty"] = 3;
     fColumnNameIndex["f_outputqty"] = 4;
-    fColumnNameIndex["f_finalqty"] = 5;
-    fColumnNameIndex["f_effectivity"] = 6;
-    fColumnNameIndex["f_storedelta"] = 7;
+    fColumnNameIndex["f_output"] = 5;
+    fColumnNameIndex["f_finalqty"] = 6;
+    fColumnNameIndex["f_effectivity"] = 7;
+    fColumnNameIndex["f_storedelta"] = 8;
 
     fTranslation["f_groupid"] = tr("Group code");
     fTranslation["f_groupname"] = tr("Group");
     fTranslation["f_startqty"] = tr("Start qty");
     fTranslation["f_inputqty"] = tr("Input qty");
-    fTranslation["f_outputqty"] = tr("Output qty");
+    fTranslation["f_outputqty"] = tr("Sale qty");
+    fTranslation["f_output"] = tr("Output qty");
     fTranslation["f_finalqty"] = tr("Final qty");
     fTranslation["f_effectivity"] = tr("Effectivity");
     fTranslation["f_storedelta"] = tr("Store delta");
@@ -296,6 +335,8 @@ void CR5SalesAndStore::rep2()
         //store
         row.append(0);
         //input
+        row.append(0);
+        //sales
         row.append(0);
         //output
         row.append(0);
@@ -350,7 +391,7 @@ void CR5SalesAndStore::rep2()
         int r = goodsRowMap[db.getInt("f_group")];
         rows[r][c] = db.getDouble("f_qty");
     }
-    //OUTPUT QTY
+    //SALES QTY
     query = "select g.f_group,sum(og.f_qty*og.f_sign) as f_qty "
             "from o_goods og "
             "left join o_header oh on oh.f_id=og.f_header "
@@ -371,6 +412,27 @@ void CR5SalesAndStore::rep2()
         int r = goodsRowMap[db.getInt("f_group")];
         rows[r][c] = db.getDouble("f_qty");
     }
+    //OUTPUT QTY
+    query = "select g.f_group ,sum(s.f_qty) as f_qty "
+            "from a_store s "
+            "left join a_header a on a.f_id=s.f_document  "
+            "inner join c_goods g on g.f_id=s.f_goods "
+            "where  a.f_date between :f_date1 and :f_date2 and s.f_type=-1 and s.f_reason<>4 ";
+    if (!fFilter->goodsGroup().isEmpty()) {
+        query += QString(" and g.f_group in (%1) ").arg(fFilter->goodsGroup());
+    }
+    if (!fFilter->store().isEmpty()) {
+        query += QString(" and s.f_store in (%1) ").arg(fFilter->store());
+    }
+    query += "group by 1 ";
+    db[":f_date1"] = fFilter->date1();
+    db[":f_date2"] = fFilter->date2();
+    db.exec(query);
+    while (db.nextRow()) {
+        int c = storeIdx + 3;
+        int r = goodsRowMap[db.getInt("f_group")];
+        rows[r][c] = db.getDouble("f_qty");
+    }
     //FINAL QTY
     query = "select g.f_group, sum(s.f_qty*s.f_type) as f_qty,sum(s.f_total*s.f_type) as f_total "
             "from a_store s "
@@ -387,7 +449,7 @@ void CR5SalesAndStore::rep2()
     db[":f_date"] = fFilter->date2();
     db.exec(query);
     while (db.nextRow()) {
-        int c = storeIdx + 3;
+        int c = storeIdx + 4;
         int r = goodsRowMap[db.getInt("f_group")];
         rows[r][c] = db.getDouble("f_qty");
     }
@@ -395,20 +457,27 @@ void CR5SalesAndStore::rep2()
         if (rows[i][storeIdx].toDouble() < 0.0001
                 && rows[i][storeIdx + 1].toDouble() < 0.0001
                 && rows[i][storeIdx + 2].toDouble() < 0.0001
-                && rows[i][storeIdx + 3].toDouble() < 0.0001) {
+                && rows[i][storeIdx + 4].toDouble() < 0.0001) {
             rows.removeAt(i);
         }
     }
     for (int i = rows.count() - 1; i > -1; i--) {
         if ((rows[i][storeIdx].toDouble() + rows[i][storeIdx + 1].toDouble()) > 0.0001) {
-            rows[i][storeIdx + 4] = (rows[i][storeIdx + 2].toDouble() * 100) / (rows[i][storeIdx].toDouble() + rows[i][storeIdx + 1].toDouble());
+            rows[i][storeIdx + 5] = (rows[i][storeIdx + 2].toDouble() * 100) / (rows[i][storeIdx].toDouble() + rows[i][storeIdx + 1].toDouble());
         }
         if (rows[i][storeIdx].toDouble() > 0.0001) {
-            rows[i][storeIdx + 5] = ((rows[i][storeIdx + 3].toDouble() * 100) / rows[i][storeIdx].toDouble()) - 100;
+            rows[i][storeIdx + 6] = ((rows[i][storeIdx + 4].toDouble() * 100) / rows[i][storeIdx].toDouble()) - 100;
         } else {
-            rows[i][storeIdx + 5] = 100.0;
+            rows[i][storeIdx + 6] = 100.0;
         }
     }
     fModel->setExternalData(fColumnNameIndex, fTranslation);
+    fColumnsSum.clear();
+    fColumnsSum.append("f_startqty");
+    fColumnsSum.append("f_inputqty");
+    fColumnsSum.append("f_outputqty");
+    fColumnsSum.append("f_output");
+    fColumnsSum.append("f_finalqty");
     restoreColumnsWidths();
+    sumColumnsData();
 }

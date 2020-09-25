@@ -173,17 +173,17 @@
         <translation>Փաստաթուղթը գոյություն չունի</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="750"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="754"/>
         <source>Invalid document id</source>
         <translation>Սխալ փաստաթղթի համար</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="857"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="861"/>
         <source>Not enough materials in the store</source>
         <translation>Բացասական քանակ պահեստում</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="953"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="957"/>
         <source>This order used in next documents</source>
         <translation>Այս փաստաթուղթը օգտագործվում է հետևյալ պահեստի ելքերի մեջ</translation>
     </message>
@@ -311,6 +311,11 @@
 </context>
 <context>
     <name>PrintTaxN</name>
+    <message>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="39"/>
+        <source>You should to setup cashier and pin before to use fiscal printer</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
         <location filename="../../NewTax/Src/printtaxn.cpp" line="75"/>
         <source>Socket read error</source>
@@ -520,99 +525,134 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="payment.ui" line="346"/>
+        <location filename="payment.ui" line="317"/>
+        <source>500</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="payment.ui" line="322"/>
+        <source>1000</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="payment.ui" line="327"/>
+        <source>2000</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="payment.ui" line="332"/>
+        <source>5000</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="payment.ui" line="337"/>
+        <source>10000</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="payment.ui" line="342"/>
+        <source>15000</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="payment.ui" line="347"/>
+        <source>20000</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="payment.ui" line="381"/>
         <source>Received card</source>
         <translation>Անկանխիկ</translation>
     </message>
     <message>
-        <location filename="payment.cpp" line="158"/>
+        <location filename="payment.cpp" line="138"/>
         <source>Receipt #</source>
         <translation>Պատվեր №</translation>
     </message>
     <message>
-        <location filename="payment.cpp" line="166"/>
+        <location filename="payment.cpp" line="146"/>
         <source>Department</source>
         <translation>Բաժին</translation>
     </message>
     <message>
         <location filename="payment.ui" line="235"/>
-        <location filename="payment.cpp" line="169"/>
+        <location filename="payment.cpp" line="149"/>
         <source>Tax number</source>
         <translation>ՀԴՄ կտրոնի համար</translation>
     </message>
     <message>
-        <location filename="payment.cpp" line="172"/>
+        <location filename="payment.cpp" line="152"/>
         <source>Device number</source>
         <translation>ԳՀ</translation>
     </message>
     <message>
-        <location filename="payment.cpp" line="175"/>
+        <location filename="payment.cpp" line="155"/>
         <source>Serial</source>
         <translation>ԱՀ</translation>
     </message>
     <message>
-        <location filename="payment.cpp" line="178"/>
+        <location filename="payment.cpp" line="158"/>
         <source>Fiscal</source>
         <translation>Ֆիսկալ</translation>
     </message>
     <message>
-        <location filename="payment.cpp" line="181"/>
+        <location filename="payment.cpp" line="161"/>
         <source>Receipt number</source>
         <translation>ԿՀ</translation>
     </message>
     <message>
-        <location filename="payment.cpp" line="184"/>
+        <location filename="payment.cpp" line="164"/>
         <source>Date</source>
         <translation>Ամսաթիվ</translation>
     </message>
     <message>
-        <location filename="payment.cpp" line="187"/>
-        <location filename="payment.cpp" line="291"/>
+        <location filename="payment.cpp" line="167"/>
+        <location filename="payment.cpp" line="271"/>
         <source>(F)</source>
         <translation>(Ֆ)</translation>
     </message>
     <message>
-        <location filename="payment.cpp" line="243"/>
+        <location filename="payment.cpp" line="223"/>
         <source>Printed</source>
         <translation>Տպված</translation>
     </message>
     <message>
-        <location filename="payment.cpp" line="190"/>
+        <location filename="payment.cpp" line="170"/>
         <source>Staff</source>
         <translation>Սպասարկող</translation>
     </message>
     <message>
-        <location filename="payment.cpp" line="154"/>
+        <location filename="payment.cpp" line="134"/>
         <source>Invalid order number</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="payment.cpp" line="196"/>
+        <location filename="payment.cpp" line="176"/>
         <source>Class | Name | Qty | Price | Total</source>
         <translation>Դաս՝ | Անվանում | Քնկ | Գին | Ընդամենը</translation>
     </message>
     <message>
-        <location filename="payment.cpp" line="221"/>
+        <location filename="payment.cpp" line="201"/>
         <source>Need to pay</source>
         <translation>Ենթակա է վճարման</translation>
     </message>
     <message>
-        <location filename="payment.cpp" line="230"/>
+        <location filename="payment.cpp" line="210"/>
         <source>Payment, cash</source>
         <translation>Կանխիկ</translation>
     </message>
     <message>
-        <location filename="payment.cpp" line="234"/>
+        <location filename="payment.cpp" line="214"/>
         <source>Payment, card</source>
         <translation>Անկանխիկ</translation>
     </message>
     <message>
-        <location filename="payment.cpp" line="241"/>
+        <location filename="payment.cpp" line="221"/>
         <source>Thank you for visit!</source>
         <translation>Շնորհակալություն այցելության համար</translation>
     </message>
     <message>
-        <location filename="payment.cpp" line="246"/>
+        <location filename="payment.cpp" line="226"/>
         <source>Sample</source>
         <translation>Օրնկ․</translation>
     </message>

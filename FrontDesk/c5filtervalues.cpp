@@ -58,3 +58,20 @@ void C5FilterValues::on_buttonBox_accepted()
 {
     accept();
 }
+
+void C5FilterValues::on_lst_itemSelectionChanged()
+{
+    QList<QListWidgetItem*> l = ui->lst->selectedItems();
+    for (int i = 0; i < ui->lst->count(); i++) {
+        static_cast<QCheckBox*>(ui->lst->itemWidget(ui->lst->item(i)))->setChecked(l.contains(ui->lst->item(i)));
+    }
+}
+
+void C5FilterValues::on_chAll_clicked(bool checked)
+{
+    if (checked) {
+        ui->lst->selectAll();
+    } else {
+        ui->lst->clearSelection();
+    }
+}

@@ -638,7 +638,7 @@ void C5MainWindow::on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column)
         createTab<CR5Preorders>(dbParams);
         break;
     case cp_t3_sale_effectiveness:
-        createTab<CR5SalesAndStore>(dbParams);
+        createTab<CR5SalesEffectiveness>(dbParams);
         break;
     case cp_t3_storage_uncomplected:
         createTab<CR5MaterialInStoreUncomplect>(dbParams);

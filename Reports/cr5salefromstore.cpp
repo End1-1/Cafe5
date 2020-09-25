@@ -49,6 +49,8 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
                    << "gcd.f_name as gname4"
                    << "cpb.f_taxname as f_buyer"
                    << "cpb.f_taxcode as f_buyertaxcode"
+                   << "og.f_discountfactor*100 as f_discountfactor"
+                   << "sum(og.f_discountamount) as f_discamount"
                    << "sum(og.f_qty*og.f_sign) as f_qty"
                    << "sum(og.f_total*og.f_sign) as f_total"
                    << "sum(ad.f_total) as f_selfcost"
@@ -71,11 +73,13 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
                    << "gcb.f_name as gname2"
                    << "gcc.f_name as gname3"
                    << "gcd.f_name as gname4"
+                   << "og.f_discountfactor*100 as f_discountfactor"
                       ;
 
     fColumnsSum << "f_qty"
                 << "f_total"
                 << "f_selfcost"
+                << "f_discamount"
                       ;
 
     fTranslation["f_header"] = tr("UUID");
@@ -99,6 +103,8 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
     fTranslation["f_hallname"] = tr("Hall");
     fTranslation["f_buyer"] = tr("Buyer");
     fTranslation["f_buyertaxcode"] = tr("Buyer taxcode");
+    fTranslation["f_discountfactor"] = tr("Discount factor");
+    fTranslation["f_discamount"] = tr("Discount amount");
 
     fColumnsVisible["oh.f_id as f_header"] = true;
     fColumnsVisible["concat(oh.f_prefix, oh.f_hallid) as f_number"] = true;
@@ -120,6 +126,8 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
     fColumnsVisible["hl.f_name as f_hallname"] = true;
     fColumnsVisible["cpb.f_taxname as f_buyer"] = false;
     fColumnsVisible["cpb.f_taxcode as f_buyertaxcode"] = false;
+    fColumnsVisible["og.f_discountfactor*100 as f_discountfactor"] = false;
+    fColumnsVisible["sum(og.f_discountamount) as f_discamount"] = false;
 
     restoreColumnsVisibility();
     fFilterWidget = new CR5SaleFromStoreFilter(fDBParams);

@@ -25,6 +25,10 @@ private slots:
 
     void on_buttonBox_accepted();
 
+    void on_lst_itemSelectionChanged();
+
+    void on_chAll_clicked(bool checked);
+
 private:
     Ui::C5FilterValues *ui;
 };

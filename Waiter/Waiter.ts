@@ -404,104 +404,104 @@
         <translation>Դաս | Անվանում | Քանակ | Գին | Ընդամենը</translation>
     </message>
     <message>
-        <location filename="c5printreceiptthread.cpp" line="106"/>
+        <location filename="c5printreceiptthread.cpp" line="108"/>
         <source>Class</source>
         <translation>Դաս</translation>
     </message>
     <message>
-        <location filename="c5printreceiptthread.cpp" line="112"/>
+        <location filename="c5printreceiptthread.cpp" line="117"/>
         <source>Present</source>
         <translation>Նվեր</translation>
     </message>
     <message>
-        <location filename="c5printreceiptthread.cpp" line="154"/>
+        <location filename="c5printreceiptthread.cpp" line="159"/>
         <source>Service</source>
         <translation>Սպասարկում</translation>
     </message>
     <message>
-        <location filename="c5printreceiptthread.cpp" line="255"/>
+        <location filename="c5printreceiptthread.cpp" line="260"/>
         <source>Debt</source>
         <translation>Պարտք</translation>
     </message>
     <message>
-        <location filename="c5printreceiptthread.cpp" line="273"/>
+        <location filename="c5printreceiptthread.cpp" line="278"/>
         <source>Costumer</source>
         <translation>Հաճախորդ</translation>
     </message>
     <message>
-        <location filename="c5printreceiptthread.cpp" line="287"/>
+        <location filename="c5printreceiptthread.cpp" line="292"/>
         <source>Sample</source>
         <translation>Օրնկ․</translation>
     </message>
     <message>
-        <location filename="c5printreceiptthread.cpp" line="151"/>
+        <location filename="c5printreceiptthread.cpp" line="156"/>
         <source>Total</source>
         <translation>Ընդամենը</translation>
     </message>
     <message>
-        <location filename="c5printreceiptthread.cpp" line="163"/>
+        <location filename="c5printreceiptthread.cpp" line="168"/>
         <source>Grand total</source>
         <translation>Վերջնահաշիվ</translation>
     </message>
     <message>
-        <location filename="c5printreceiptthread.cpp" line="167"/>
+        <location filename="c5printreceiptthread.cpp" line="172"/>
         <source>Service included</source>
         <translation>Այդ թվում սպասարկում</translation>
     </message>
     <message>
-        <location filename="c5printreceiptthread.cpp" line="172"/>
+        <location filename="c5printreceiptthread.cpp" line="177"/>
         <source>Discount included</source>
         <translation>Այդ թվում զեղչ</translation>
     </message>
     <message>
-        <location filename="c5printreceiptthread.cpp" line="177"/>
+        <location filename="c5printreceiptthread.cpp" line="182"/>
         <source>Need to pay</source>
         <translation>Ենթակա է վճարման</translation>
     </message>
     <message>
-        <location filename="c5printreceiptthread.cpp" line="184"/>
+        <location filename="c5printreceiptthread.cpp" line="189"/>
         <source>Pay by IDRAM</source>
         <translation>Վճարում IDRAM-ով</translation>
     </message>
     <message>
-        <location filename="c5printreceiptthread.cpp" line="219"/>
+        <location filename="c5printreceiptthread.cpp" line="224"/>
         <source>Payment, cash</source>
         <translation>Վճարումը առնձերն</translation>
     </message>
     <message>
-        <location filename="c5printreceiptthread.cpp" line="223"/>
+        <location filename="c5printreceiptthread.cpp" line="228"/>
         <source>Payment, card</source>
         <translation>Վճարումը անկանխիկ</translation>
     </message>
     <message>
-        <location filename="c5printreceiptthread.cpp" line="227"/>
+        <location filename="c5printreceiptthread.cpp" line="232"/>
         <source>Bank transfer</source>
         <translation>Փոխանցում բանկով</translation>
     </message>
     <message>
-        <location filename="c5printreceiptthread.cpp" line="236"/>
+        <location filename="c5printreceiptthread.cpp" line="241"/>
         <source>Transfer to room</source>
         <translation>Կցել սենյակի հաշվին</translation>
     </message>
     <message>
-        <location filename="c5printreceiptthread.cpp" line="241"/>
-        <location filename="c5printreceiptthread.cpp" line="258"/>
-        <location filename="c5printreceiptthread.cpp" line="267"/>
+        <location filename="c5printreceiptthread.cpp" line="246"/>
+        <location filename="c5printreceiptthread.cpp" line="263"/>
+        <location filename="c5printreceiptthread.cpp" line="272"/>
         <source>Signature</source>
         <translation>Ստորագրություն</translation>
     </message>
     <message>
-        <location filename="c5printreceiptthread.cpp" line="247"/>
+        <location filename="c5printreceiptthread.cpp" line="252"/>
         <source>City ledger</source>
         <translation>Դեբիտորական պարտք</translation>
     </message>
     <message>
-        <location filename="c5printreceiptthread.cpp" line="264"/>
+        <location filename="c5printreceiptthread.cpp" line="269"/>
         <source>Complimentary</source>
         <translation>Հյուրասիրություն</translation>
     </message>
     <message>
-        <location filename="c5printreceiptthread.cpp" line="285"/>
+        <location filename="c5printreceiptthread.cpp" line="290"/>
         <source>Thank you for visit!</source>
         <translation>Շնորհակալություն այցելության համար</translation>
     </message>
@@ -832,17 +832,17 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="750"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="754"/>
         <source>Invalid document id</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="857"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="861"/>
         <source>Not enough materials in the store</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="953"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="957"/>
         <source>This order used in next documents</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2091,6 +2091,11 @@ ORDER</source>
 </context>
 <context>
     <name>PrintTaxN</name>
+    <message>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="39"/>
+        <source>You should to setup cashier and pin before to use fiscal printer</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
         <location filename="../../NewTax/Src/printtaxn.cpp" line="75"/>
         <source>Socket read error</source>

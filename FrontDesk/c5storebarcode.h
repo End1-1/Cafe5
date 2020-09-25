@@ -24,9 +24,9 @@ public:
 private:
     Ui::C5StoreBarcode *ui;
 
-    //bool printOneBarcode(const QString &code, const QString &price, const QString &class1, QPrintDialog &pd);
+    bool printOneBarcode(const QString &code, const QString &price, const QString &class1, QPrintDialog &pd);
 
-    bool printOneBarcode(const QString &code, QPrintDialog &pd);
+    //bool printOneBarcode(const QString &code, QPrintDialog &pd);
 
 private slots:
     void print();

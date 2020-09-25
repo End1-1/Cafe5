@@ -7,11 +7,11 @@ CR5SalesByDishesFilter::CR5SalesByDishesFilter(const QStringList &dbParams, QWid
     ui(new Ui::CR5SalesByDishesFilter)
 {
     ui->setupUi(this);
-    ui->leDishState->setSelector(dbParams, ui->leStateName, cache_dish_state);
+    ui->leDishState->setSelector(dbParams, ui->leStateName, cache_dish_state).setMultiselection(true);
     ui->leDishState->setValue(DISH_STATE_OK);
-    ui->lePart1->setSelector(dbParams, ui->lePart1Name, cache_dish_part1);
-    ui->lePart2->setSelector(dbParams, ui->lePart2Name, cache_dish_part2);
-    ui->leStore->setSelector(dbParams, ui->leStoreName, cache_goods_store);
+    ui->lePart1->setSelector(dbParams, ui->lePart1Name, cache_dish_part1).setMultiselection(true);
+    ui->lePart2->setSelector(dbParams, ui->lePart2Name, cache_dish_part2).setMultiselection(true);
+    ui->leStore->setSelector(dbParams, ui->leStoreName, cache_goods_store).setMultiselection(true);
 }
 
 CR5SalesByDishesFilter::~CR5SalesByDishesFilter()

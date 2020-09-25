@@ -2,6 +2,7 @@
 #include "ui_replicadialog.h"
 #include "c5database.h"
 #include "c5config.h"
+#include "c5logsystem.h"
 #include "c5message.h"
 #include "c5replication.h"
 
@@ -25,4 +26,5 @@ void ReplicaDialog::progress(const QString &msg)
 {
     ui->lbMsg->setText(msg);
     qApp->processEvents();
+    C5LogSystem::writeEvent(msg);
 }

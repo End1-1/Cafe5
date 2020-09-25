@@ -29,6 +29,8 @@ private slots:
 
     void on_btnCheckoutCard_clicked();
 
+    void on_tblChange_cellClicked(int row, int column);
+
 private:
     Ui::payment *ui;
 

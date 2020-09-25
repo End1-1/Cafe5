@@ -323,16 +323,16 @@ void DlgOrder::changeQty(double qty)
     }
     QString oldQty = o["f_qty1"].toString();
     if (qty > 0) {
-        if (o["f_qty1"].toString().toDouble() + qty > 99) {
+        if (str_float(o["f_qty1"].toString()) + qty > 99) {
             logRecord(o["f_id"].toString(), "Try set qty more than 99", "", "");
             return;
         }
         o["f_qty1"] = float_str(o["f_qty1"].toString().toDouble() + qty, 1);
     } else {
-        if (o["f_qty1"].toString().toDouble() + qty < 0.4) {
+        if (str_float(o["f_qty1"].toString()) + qty < 0.4) {
             return;
         }
-        if (o["f_qty2"].toString().toDouble() <= o["f_qty1"].toString().toDouble() + qty) {
+        if (str_float(o["f_qty2"].toString()) <= str_float(o["f_qty1"].toString()) + qty) {
             o["f_qty1"] = float_str(o["f_qty1"].toString().toDouble() + qty, 1);
         }
     }

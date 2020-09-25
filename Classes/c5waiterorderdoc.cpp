@@ -436,7 +436,7 @@ int C5WaiterOrderDoc::iInt(const QString &name, int index)
 
 double C5WaiterOrderDoc::iDouble(const QString &name, int index)
 {
-    return fItems[index].toObject()[name].toString().toDouble();
+    return str_float(fItems[index].toObject()[name].toString());
 }
 
 QString C5WaiterOrderDoc::iString(const QString &name, int index)

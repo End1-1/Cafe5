@@ -15,6 +15,7 @@ ViewOrder::ViewOrder(const QString &order) :
     ui(new Ui::ViewOrder)
 {
     ui->setupUi(this);
+    fUuid = order;
     ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 30, 300, 100, 100, 100, 0, 200);
     C5Database db(__c5config.replicaDbParams());
     db[":f_id"] = order;
@@ -69,6 +70,10 @@ ViewOrder::~ViewOrder()
 
 void ViewOrder::on_btnReturn_clicked()
 {
+    C5Database db(__c5config.replicaDbParams());
+    C5StoreDraftWriter dw(db);
+    db.startTransaction();
+
     GoodsReturnReason *r = new GoodsReturnReason();
     r->exec();
     int reason = r->fReason;
@@ -97,13 +102,30 @@ void ViewOrder::on_btnReturn_clicked()
             rows.append(i);
         }
     }
+
+    db[":f_oheader"] = fUuid;
+    db.exec("SELECT a.f_cashin, e.f_amount "
+            "from a_header_cash a "
+            "inner join e_cash e on e.f_header=a.f_id "
+            "where a.f_oheader=:f_oheader");
+    if (db.rowCount() > 1) {
+        if (rows.count() != ui->tbl->rowCount()) {
+            C5Message::info(tr("Mixed payment mode. Only full return available."));
+            db.rollback();
+            return;
+        }
+    }
+    QMap<int, double> cashmap;
+    while (db.nextRow()) {
+        cashmap[db.getInt("f_cashin")] = db.getDouble("f_amount");
+    }
+
+
     if (!ret) {
         C5Message::error(tr("Nothing to return"));
         return;
     }
-    C5Database db(__c5config.replicaDbParams());
-    C5StoreDraftWriter dw(db);
-    db.startTransaction();
+
     QString headerPrefix;
     int headerId;
     if (!dw.hallId(headerPrefix, headerId, __c5config.defaultHall().toInt())) {
@@ -146,7 +168,7 @@ void ViewOrder::on_btnReturn_clicked()
                 return returnFalse(dw.fErrorMsg, &db);
             }
         }
-        if (!dw.writeOGoods(ogoodsid, oheaderid, "", __c5config.defaultStore(), ui->tbl->getInteger(i, 6), ui->tbl->getDouble(i, 3), ui->tbl->getDouble(i, 4) * -1,  ui->tbl->getDouble(i, 5) * -1, ui->leTaxNumber->getInteger(), 1, i + 1, adraftid, 0, 0, reason)) {
+        if (!dw.writeOGoods(ogoodsid, oheaderid, "", __c5config.defaultStore(), ui->tbl->getInteger(i, 6), ui->tbl->getDouble(i, 3), ui->tbl->getDouble(i, 4) * -1,  ui->tbl->getDouble(i, 5) * -1, ui->leTaxNumber->getInteger(), 1, i + 1, adraftid, 0, 0, reason, 0)) {
             return returnFalse(dw.fErrorMsg, &db);
         }
         if (!dw.updateField("o_goods", "f_return", reason, "f_id", ui->tbl->getString(i, 0))) {
@@ -173,20 +195,23 @@ void ViewOrder::on_btnReturn_clicked()
         }
     }
 
-    QString cashdocid;
-    int counter = dw.counterAType(DOC_TYPE_CASH);
-    if (counter == 0) {
-        return returnFalse(dw.fErrorMsg, &db);
-    }
-    if (!dw.writeAHeader(cashdocid, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH, __userid, QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, returnAmount, tr("Return of") + " " + fSaleDoc, 0, 0)) {
-        return returnFalse(dw.fErrorMsg, &db);
-    }
-    if (!dw.writeAHeaderCash(cashdocid, 0, __c5config.cashId(), 1, "", oheaderid)) {
-        return returnFalse(dw.fErrorMsg, &db);
-    }
-    QString cashUUID;
-    if (!dw.writeECash(cashUUID, cashdocid, __c5config.cashId(), -1, fSaleDoc, returnAmount, cashUUID, 1)) {
-        return returnFalse(dw.fErrorMsg, &db);
+    for (QMap<int, double>::const_iterator it = cashmap.begin(); it != cashmap.end(); it++) {
+        QString cashdocid;
+        double cashamount = cashmap.count() == 1 ? returnAmount : it.value();
+        int counter = dw.counterAType(DOC_TYPE_CASH);
+        if (counter == 0) {
+            return returnFalse(dw.fErrorMsg, &db);
+        }
+        if (!dw.writeAHeader(cashdocid, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH, __userid, QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, cashamount, tr("Return of") + " " + fSaleDoc, 0, 0)) {
+            return returnFalse(dw.fErrorMsg, &db);
+        }
+        if (!dw.writeAHeaderCash(cashdocid, 0, it.key(), 1, "", oheaderid)) {
+            return returnFalse(dw.fErrorMsg, &db);
+        }
+        QString cashUUID;
+        if (!dw.writeECash(cashUUID, cashdocid, it.key(), -1, fSaleDoc, cashamount, cashUUID, 1)) {
+            return returnFalse(dw.fErrorMsg, &db);
+        }
     }
 
     QString err;

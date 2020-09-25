@@ -1,0 +1,44 @@
+* {
+	padding:0;
+	margin:0;
+}
+
+body {
+	padding:30px;
+	display:flex;
+	flex-direction:column;
+}
+
+.div-menu {
+	min-width:300px;
+	padding:10px;
+}
+
+.div-history {
+	padding:10px;
+}
+
+.ul1 {
+	margin-left: 10px;
+}
+
+.ul2 {
+	margin-left: 50px;
+}
+
+.textimg {
+	width:20px;
+	height:20px;
+}
+
+.header {
+	font-size:14pt;
+	color:#0044ff;
+	margin-top:30px;
+	text-indent:25px;
+}
+
+.history {
+	font-size:12pt;
+	text-indent:25px;
+}

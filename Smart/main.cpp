@@ -6,7 +6,19 @@
 
 int main(int argc, char *argv[])
 {
+
     QApplication a(argc, argv);
+
+#ifndef QT_DEBUG
+    QStringList libPath = QCoreApplication::libraryPaths();
+    libPath << a.applicationDirPath();
+    libPath << a.applicationDirPath() + "/platforms";
+    libPath << a.applicationDirPath() + "/sqldrivers";
+    libPath << a.applicationDirPath() + "/printsupport";
+    libPath << a.applicationDirPath() + "/imageformats";
+    QCoreApplication::setLibraryPaths(libPath);
+#endif
+
     QTranslator t;
     t.load(":/Smart.qm");
     a.installTranslator(&t);

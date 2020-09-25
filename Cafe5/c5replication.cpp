@@ -64,6 +64,7 @@ void C5Replication::downloadDataFromServer(const QStringList &src, const QString
     }
     steps = 2;
     if (lastid == 0) {
+        emit progress("Initializing");
         steps = tl.count() + 2;
         dr.exec("select max(f_id) from s_syncronize");
         dr.nextRow();
@@ -83,6 +84,7 @@ void C5Replication::downloadDataFromServer(const QStringList &src, const QString
             "inner join s_syncronize_in si on si.f_table=s.f_table "
             "where s.f_id>:f_id");
     while (dr.nextRow()) {
+        emit progress(QString("%1 started").arg(dr.getString("f_table")));
         hc = true;
         switch (dr.getInt("f_op")) {
         case 1:
@@ -340,10 +342,11 @@ bool C5Replication::uploadToServer()
 
 void C5Replication::updateTable(C5Database &dr, C5Database &db, int &step, int steps, const QString &tableName)
 {
+    emit progress(QString("%1 updatetable").arg(tableName));
     dr.exec("select * from " + tableName);
     while (dr.nextRow()) {
         if (dr.pos() % 10 == 0) {
-            emit progress(QString("Step %1 of %2. %3 %4/%5").arg(step).arg(steps).arg(tableName).arg(dr.pos()).arg(dr.rowCount()));
+            emit progress(QString("Update table. Step %1 of %2. %3 %4/%5").arg(step).arg(steps).arg(tableName).arg(dr.pos()).arg(dr.rowCount()));
         }
         db.setBindValues(dr.getBindValues());
         if (!db.insert(tableName, false)) {

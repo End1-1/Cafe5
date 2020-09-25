@@ -41,6 +41,7 @@ WOrder::WOrder(int saleType, QWidget *parent) :
     ui->tblGoods->setColumnWidths(ui->tblGoods->columnCount(), 0, 300, 80, 80, 80, 80, 80, 80, 0, 0, 0, 80, 30);
     fCostumerId = 0;
     fCardValue = 0;
+    fCardMode = 0;
     ui->lbDisc->setVisible(false);
     ui->leDisc->setVisible(false);
     ui->lbCustomer->setVisible(false);
@@ -220,7 +221,7 @@ bool WOrder::writeOrder(bool tax)
     so.setDiscount(fCostumerId, fCardId, fCardMode, fCardValue);
     so.setParams(fDateOpen, fTimeOpen, fSaleType);
     C5LogSystem::writeEvent(QString("%1. %2:%3, %4:%5, %6:%7, %8:%9").arg(tr("Before write")).arg(tr("Total")).arg(ui->leTotal->text()).arg(tr("Card")).arg(ui->leCard->text()).arg(tr("Advance")).arg(ui->leAdvance->text()).arg(tr("Dicount")).arg(ui->leDisc->text()));
-    bool w = so.write(ui->leTotal->getDouble(), ui->leCard->getDouble(), ui->leAdvance->getDouble(), ui->leDisc->getDouble(), tax, goods);
+    bool w = so.write(ui->leTotal->getDouble(), ui->leCard->getDouble(), ui->leAdvance->getDouble(), ui->leDisc->getDouble(), tax, goods, fCardValue, fCardMode);
     C5Database db(__c5config.dbParams());
     if (w) {
         foreach (const IGoods &g, goods) {

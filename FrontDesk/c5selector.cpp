@@ -143,16 +143,14 @@ void C5Selector::tblSingleClick(const QModelIndex &index)
 
 void C5Selector::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
 {
-    qDebug() << "SEPARATOR";
     for (QModelIndex i: deselected.indexes()) {
         fGrid->fModel->setData(i.row(), 0, 0, Qt::CheckStateRole);
     }
-    qDebug() << deselected.indexes();
 
     for (QModelIndex i: selected.indexes()) {
         fGrid->fModel->setData(i.row(), 0, 1, Qt::CheckStateRole);
     }
-    qDebug() << selected.indexes();
+
 }
 
 bool C5Selector::tblDoubleClicked(int row, int column, const QList<QVariant> &values)

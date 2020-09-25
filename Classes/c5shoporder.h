@@ -17,7 +17,7 @@ public:
 
     void setParams(const QDate &dateOpen, const QTime &timeOpen, int saletype);
 
-    bool write(double total, double card, double prepaid, double discount, bool tax, QList<IGoods> goods);
+    bool write(double total, double card, double prepaid, double discount, bool tax, QList<IGoods> goods, double fDiscountFactor, int discmode);
 
     bool returnFalse(const QString &msg, C5Database &db);
 

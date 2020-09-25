@@ -93,8 +93,8 @@ void TaxPrint::on_btnPrint_clicked()
 {
     PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
     for (int i = 0; i < ui->tbl->rowCount(); i++) {
-        Goods gg = Working::fGoods[ui->tbl->getString(i, 0)];
-        pt.addGoods(QString(gg.fTaxDept), //dep
+        Goods gg = Working::fGoods[Working::fGoodsCodeForPrint[ui->tbl->getInteger(i, 0)]];
+        pt.addGoods(QString::number(gg.fTaxDept), //dep
                     gg.fAdgCode, //adg
                     gg.fCode, //goods id
                     gg.fName, //name

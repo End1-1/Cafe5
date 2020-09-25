@@ -36,6 +36,8 @@ public:
 
     void setStore(int store1, int store2);
 
+    void setReason(int reason);
+
     void setComment(const QString comment);
 
     virtual QToolBar *toolBar() override;
@@ -125,6 +127,8 @@ private slots:
     void draftDoc();
 
     void removeDocument();
+
+    void createStoreInput();
 
     void printDoc();
 

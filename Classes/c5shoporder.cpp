@@ -35,7 +35,7 @@ void C5ShopOrder::setParams(const QDate &dateOpen, const QTime &timeOpen, int sa
     fSaleType = saletype;
 }
 
-bool C5ShopOrder::write(double total, double card, double prepaid, double discount, bool tax, QList<IGoods> goods)
+bool C5ShopOrder::write(double total, double card, double prepaid, double discount, bool tax, QList<IGoods> goods, double fDiscountFactor, int discmode)
 {
     C5Database db(__c5config.dbParams());
     C5Database dblog(__c5config.dbParams());
@@ -163,7 +163,13 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
                 return returnFalse(dw.fErrorMsg, db);
             }
         }
-        if (!dw.writeOGoods(ogoodsid, fHeader, "", __c5config.defaultStore(), g.goodsId, g.goodsQty, g.goodsPrice,  g.goodsTotal, tax ? rseq.toInt() : 0, 1, i + 1, adraftid, g.discountFactor, g.discountMode, 0)) {
+        double discamount = 0;
+        if (fDiscountFactor > 0.0001) {
+            discamount = g.goodsPrice * fDiscountFactor;
+            g.goodsPrice -= discamount;
+            g.goodsTotal = g.goodsPrice * g.goodsQty;
+        }
+        if (!dw.writeOGoods(ogoodsid, fHeader, "", __c5config.defaultStore(), g.goodsId, g.goodsQty, g.goodsPrice,  g.goodsTotal, tax ? rseq.toInt() : 0, 1, i + 1, adraftid, discamount, discmode, 0, fDiscountFactor)) {
             return returnFalse(dw.fErrorMsg, db);
         }
     }

@@ -467,7 +467,7 @@ update s_app set f_version ='27' where f_app='DB';
 
 /* db - 28 */
 update s_app set f_version ='28' where f_app='DB';
-create table c_goods_option (fid integer primary key , f_flaguncomplectfrom integer, f_uncomplectfromqty decimal(14,4));
+create table c_goods_option (f_id integer primary key , f_flaguncomplectfrom integer, f_uncomplectfromqty decimal(14,4));
 
 ALTER TABLE `c_goods_complectation` ADD INDEX `fk_goods_complectation_1_idx` (`f_base` ASC) , ADD INDEX `fk_goods_complectation_2_idx` (`f_goods` ASC) ;
 ALTER TABLE `c_goods_complectation` ADD CONSTRAINT `fk_goods_complectation_1`  FOREIGN KEY (`f_base`)  REFERENCES `cafe5`.`c_goods` (`f_id`)  ON DELETE NO ACTION  ON UPDATE NO ACTION,

@@ -28,37 +28,30 @@ INCLUDEPATH += ../../Controls
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    ../../Classes/notificationwidget.cpp \
     dll.cpp \
     ../../Cafe5/c5database.cpp \
     ../../Cafe5/c5message.cpp \
     ../../Cafe5/c5config.cpp \
     ../../Cafe5/c5utils.cpp \
     ../../Classes/c5printing.cpp \
-    ../../Controls/c5tablewidget.cpp \
     ../../Controls/c5checkbox.cpp \
-    ../../Controls/c5combobox.cpp \
-    ../../Controls/c5dateedit.cpp \
-    ../../Controls/c5lineedit.cpp \
-    ../../Cafe5/excel.cpp \
-    ../../Classes/c5cache.cpp
+    ../../Controls/c5lineedit.cpp
 
 HEADERS += \
+    ../../Classes/notificationwidget.h \
     dll.h \
     ../../Cafe5/c5database.h \
     ../../Cafe5/c5message.h \
     ../../Cafe5/c5config.h \
     ../../Cafe5/c5utils.h \
     ../../Classes/c5printing.h \
-    ../../Controls/c5tablewidget.h \
     ../../Controls/c5checkbox.h \
-    ../../Controls/c5combobox.h \
-    ../../Controls/c5dateedit.h \
-    ../../Controls/c5lineedit.h \
-    ../../Cafe5/excel.h \
-    ../../Classes/c5cache.h
+    ../../Controls/c5lineedit.h
 
 FORMS += \
-    ../../Cafe5/c5message.ui
+    ../../Cafe5/c5message.ui \
+    ../../Classes/notificationwidget.ui
 
 RESOURCES += \
     res.qrc

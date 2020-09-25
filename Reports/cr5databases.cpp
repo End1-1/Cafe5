@@ -11,6 +11,7 @@
 #include "c5random.h"
 #include <QFileDialog>
 #include <QProcess>
+#include <QDesktopServices>
 #include <QApplication>
 
 CR5Databases::CR5Databases(const QStringList &dbParams, QWidget *parent) :
@@ -185,10 +186,22 @@ void CR5Databases::resetDatabase()
             QFile f(":/cleardb.sql");
             if (f.open(QIODevice::ReadOnly)) {
                 QList<QByteArray> sqls = f.readAll().split(';');
+                QStringList errors;
                 foreach (const QString &s, sqls) {
-                    db.exec(s);
+                    if (!db.exec(s)) {
+                        errors += db.fLastError + "\r\n";
+                    }
                 }
                 f.close();
+                if (!errors.isEmpty()) {
+                    QFile fe(QDir::tempPath() + "/clearerrors.txt");
+                    if (fe.open(QIODevice::WriteOnly)) {
+                        QString ba = errors.join("\r\n");
+                        fe.write(ba.toUtf8());
+                        fe.close();
+                        QDesktopServices::openUrl(QDir::tempPath() + "/clearerrors.txt");
+                    }
+                }
             } else {
                 C5Message::error("Cannot open file <br>" + f.errorString());
             }

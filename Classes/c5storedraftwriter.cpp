@@ -60,7 +60,7 @@ bool C5StoreDraftWriter::writeFromShopOutput(const QString &doc, int state, QStr
                 err += fDb.fLastError;
                 return returnResult(false, err);
             }
-            writeOGoods(i.recId, doc, i.bodyId, i.store, i.goodsId, i.goodsQty, i.goodsPrice, i.goodsTotal, i.tax, 1, i.row, drid, i.discountFactor, i.discountMode, 0);
+            writeOGoods(i.recId, doc, i.bodyId, i.store, i.goodsId, i.goodsQty, i.goodsPrice, i.goodsTotal, i.tax, 1, i.row, drid, i.discountFactor, i.discountMode, 0, 0);
         }
         if (state == DOC_STATE_SAVED) {
             if (!writeOutput(id, err)) {
@@ -614,7 +614,7 @@ bool C5StoreDraftWriter::writeOBodyToOGoods(const QString &id, const QString &he
     while (fDb.nextRow()) {
         QString gid;
         if (!writeOGoods(gid, headerid, id, fDb.getInt("f_store"), fDb.getInt("f_goods"), fDb.getDouble("f_qty"), fDb.getDouble("f_lastinputprice"),
-                         fDb.getDouble("f_qty") * fDb.getDouble("f_lastinputprice"), 0, 1, ++row, "", 0, 0, 0)) {
+                         fDb.getDouble("f_qty") * fDb.getDouble("f_lastinputprice"), 0, 1, ++row, "", 0, 0, 0, 0)) {
             return false;
         }
     }
@@ -670,7 +670,10 @@ bool C5StoreDraftWriter::writeOHeader(QString &id, int hallid, const QString &pr
     }
 }
 
-bool C5StoreDraftWriter::writeOGoods(QString &id, const QString &header, const QString &body, int store, int goods, double qty, double price, double total, int tax, int sign, int row, const QString &storerec, double discount, int discountMode, int returnMode)
+bool C5StoreDraftWriter::writeOGoods(QString &id, const QString &header, const QString &body, int store, int goods,
+                                     double qty, double price, double total, int tax, int sign, int row,
+                                     const QString &storerec, double discount, int discountMode, int returnMode,
+                                     double discFactor)
 {
     bool u = true;
     if (id.isEmpty()) {
@@ -689,8 +692,9 @@ bool C5StoreDraftWriter::writeOGoods(QString &id, const QString &header, const Q
     fDb[":f_sign"] = sign;
     fDb[":f_row"] = row;
     fDb[":f_storerec"] = storerec;
-    fDb[":f_discountfactor"] = discount;
+    fDb[":f_discountfactor"] = discFactor;
     fDb[":f_discountmode"] = discountMode;
+    fDb[":f_discountamount"] = discount;
     fDb[":f_return"] = returnMode;
     if (u) {
         return returnResult(fDb.update("o_goods", where_id(id)));

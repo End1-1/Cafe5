@@ -34,6 +34,8 @@ private:
 
     QString fSaleDoc;
 
+    QString fUuid;
+
     void returnFalse(const QString &msg, C5Database *db);
 };
 

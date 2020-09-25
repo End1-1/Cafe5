@@ -5,11 +5,11 @@
 
 class CR5SaleAndStoreFilter;
 
-class CR5SalesAndStore : public C5ReportWidget
+class CR5SalesEffectiveness : public C5ReportWidget
 {
     Q_OBJECT
 public:
-    CR5SalesAndStore(const QStringList &dbParams, QWidget *parent = nullptr);
+    CR5SalesEffectiveness(const QStringList &dbParams, QWidget *parent = nullptr);
 
     virtual QToolBar *toolBar() override;
 

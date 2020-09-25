@@ -12,6 +12,7 @@
 #include "c5storebarcode.h"
 #include "c5storedraftwriter.h"
 #include <QMenu>
+#include <QHash>
 #include <QShortcut>
 
 C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
@@ -201,6 +202,9 @@ bool C5StoreDoc::openDoc(QString id)
         ui->leComment->setEnabled(false);
         ui->leReason->setEnabled(false);
     }
+    if (fToolBar && fDocType == sdOutput) {
+        fToolBar->addAction(QIcon(":/storeinput.png"), tr("Create store input"), this, SLOT(createStoreInput()));
+    }
     return true;
 }
 
@@ -312,6 +316,11 @@ void C5StoreDoc::setStore(int store1, int store2)
 {
     ui->leStoreInput->setValue(store1);
     ui->leStoreOutput->setValue(store2);
+}
+
+void C5StoreDoc::setReason(int reason)
+{
+    ui->leReason->setValue(reason);
 }
 
 void C5StoreDoc::setComment(const QString comment)
@@ -1112,6 +1121,31 @@ void C5StoreDoc::removeDocument()
 {
     if (removeDoc(fDBParams, fInternalId, true)) {
         __mainWindow->removeTab(this);
+    }
+}
+
+void C5StoreDoc::createStoreInput()
+{
+    C5Database db(fDBParams);
+    QHash<int, double> prices1;
+    db.exec("select f_id, f_lastinputprice from c_goods");
+    while (db.nextRow()) {
+        prices1[db.getInt(0)] = db.getDouble(1);
+    }
+
+    C5StoreDoc *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);
+    sd->setMode(C5StoreDoc::sdInput);
+    sd->setStore(ui->leStoreOutput->getInteger(), 1);
+    sd->setReason(DOC_REASON_INPUT);
+    sd->setComment(ui->leComment->text());
+    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+        int row = sd->addGoodsRow();
+        sd->ui->tblGoods->setString(row, 3, ui->tblGoods->getString(row, 3));
+        sd->ui->tblGoods->setString(row, 4, ui->tblGoods->getString(row, 4));
+        sd->ui->tblGoods->lineEdit(row, 5)->setDouble(ui->tblGoods->lineEdit(row, 5)->getDouble());
+        sd->ui->tblGoods->setString(row, 6, ui->tblGoods->getString(row, 6));
+        sd->ui->tblGoods->lineEdit(row, 7)->setDouble(prices1[ui->tblGoods->getInteger(row, 3)]);
+        sd->ui->tblGoods->lineEdit(row, 7)->textEdited(sd->ui->tblGoods->lineEdit(row, 7)->text());
     }
 }
 

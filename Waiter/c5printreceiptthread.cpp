@@ -103,21 +103,26 @@ void C5PrintReceiptThread::print()
             continue;
         }
         total += o["f_qty2"].toString().toDouble() * o["f_price"].toString().toDouble();
-        p.ltext(QString("%1. %2: %3, %4").arg(nn++).arg(__translator.tt(tr("Class"))).arg(o["f_adgcode"].toString()).arg(o["f_name"].toString()), 0);
+        QString name = QString("%1.").arg(nn++);
+        if (!o["f_adgcode"].toString().isEmpty()) {
+            name += QString("%1: %2").arg(__translator.tt(tr("Class"))).arg(o["f_adgcode"].toString());
+        }
+        name += o["f_name"].toString();
+        p.ltext(name, 0);
         p.br();
 //        p.ltext(o["f_name"].toString(), 0);
 //        p.br(); <--- this row fuck
         QString servPlus;
         QString servValue = float_str(fHeader["f_servicefactor"].toString().toDouble() * 100, 2) + "% ";
-        QString total = o["f_total"].toString().toDouble() > 0.001 ? float_str(o["f_total"].toString().toDouble(), 2) : tr("Present");
+        QString totalStr = str_float(o["f_total"].toString()) > 0.001 ? float_str(str_float(o["f_total"].toString()), 2) : tr("Present");
         if (fHeader["f_servicemode"].toString().toInt() == SERVICE_AMOUNT_MODE_INCREASE_PRICE) {
-            if (fHeader["f_servicefactor"].toString().toDouble() > 0.001) {
+            if (str_float(fHeader["f_servicefactor"].toString()) > 0.001) {
                 servPlus = "+";
             } else {
                 servValue = "";
             }
-            if (total.toDouble() < 0.001) {
-                p.rtext(total);
+            if (str_float(totalStr) < 0.001) {
+                p.rtext(totalStr);
             } else {
                 p.ltext(QString("%1 x %2 %3 %4 = %5")
                         .arg(float_str(o["f_qty2"].toString().toDouble(), 2))
@@ -126,13 +131,13 @@ void C5PrintReceiptThread::print()
                         .arg(total), 0);
             }
         } else {
-            if (total.toDouble() < 0.001) {
-                p.rtext(total);
+            if (str_float(totalStr) < 0.001) {
+                p.rtext(totalStr);
             } else {
                 p.rtext(QString("%1 x %2 = %5")
                         .arg(float_str(o["f_qty2"].toString().toDouble(), 2))
                         .arg(float_str(o["f_price"].toString().toDouble(), 2))
-                        .arg(total));
+                        .arg(totalStr));
             }
         }
         p.br();
@@ -145,14 +150,14 @@ void C5PrintReceiptThread::print()
     case SERVICE_AMOUNT_MODE_INCREASE_PRICE:
         break;
     case SERVICE_AMOUNT_MODE_SEPARATE:
-        if (fHeader["f_servicefactor"].toString().toDouble() > 0.0001) {
+        if (str_float(fHeader["f_servicefactor"].toString()) > 0.0001) {
             p.br(2);
             p.line();
             p.ltext(QString("%1").arg(__translator.tt(tr("Total"))), 0);
             p.rtext(float_str(total, 2));
             p.br();
-            p.ltext(QString("%1 %2%").arg(__translator.tt(tr("Service"))).arg(float_str(fHeader["f_servicefactor"].toString().toDouble() * 100, 2)), 0);
-            p.rtext(float_str(fHeader["f_amountservice"].toString().toDouble(), 2));
+            p.ltext(QString("%1 %2%").arg(__translator.tt(tr("Service"))).arg(float_str(str_float(fHeader["f_servicefactor"].toString()) * 100, 2)), 0);
+            p.rtext(float_str(str_float(fHeader["f_amountservice"].toString()), 2));
             p.br();
             p.br(2);
             p.line();
@@ -161,21 +166,21 @@ void C5PrintReceiptThread::print()
         break;
     }
     p.ltext(__translator.tt(tr("Grand total")), 0);
-    p.rtext(float_str(fHeader["f_amounttotal"].toString().toDouble(), 2));
+    p.rtext(float_str(str_float(fHeader["f_amounttotal"].toString()), 2));
     p.br();
-    if (fHeader["f_servicemode"].toString().toInt() == SERVICE_AMOUNT_MODE_INCREASE_PRICE && fHeader["f_servicefactor"].toString().toDouble() > 0.001) {
-        p.ltext(QString("%1 %2%").arg(__translator.tt(tr("Service included"))).arg(float_str(fHeader["f_servicefactor"].toString().toDouble() * 100, 2)), 0);
+    if (fHeader["f_servicemode"].toString().toInt() == SERVICE_AMOUNT_MODE_INCREASE_PRICE && str_float(fHeader["f_servicefactor"].toString()) > 0.001) {
+        p.ltext(QString("%1 %2%").arg(__translator.tt(tr("Service included"))).arg(float_str(str_float(fHeader["f_servicefactor"].toString()) * 100, 2)), 0);
         p.rtext(float_str(fHeader["f_amountservice"].toString().toDouble(), 2));
         p.br();
     }
-    if (fHeader["f_discountfactor"].toString().toDouble() > 0.01) {
-        p.ltext(QString("%1 %2%").arg(__translator.tt(tr("Discount included"))).arg(float_str(fHeader["f_discountfactor"].toString().toDouble() * 100, 2)), 0);
-        p.rtext(float_str(fHeader["f_amountdiscount"].toString().toDouble(), 2));
+    if (str_float(fHeader["f_discountfactor"].toString()) > 0.01) {
+        p.ltext(QString("%1 %2%").arg(__translator.tt(tr("Discount included"))).arg(float_str(str_float(fHeader["f_discountfactor"].toString()) * 100, 2)), 0);
+        p.rtext(float_str(str_float(fHeader["f_amountdiscount"].toString()), 2));
         p.br();
     }
     p.setFontBold(true);
     p.ltext(__translator.tt(tr("Need to pay")), 0);
-    p.rtext(float_str(fHeader["f_amounttotal"].toString().toDouble(), 2));
+    p.rtext(float_str(str_float(fHeader["f_amounttotal"].toString()), 2));
 
     p.line();
     p.br();
@@ -215,17 +220,17 @@ void C5PrintReceiptThread::print()
     }
 
     if (!fBill) {
-        if (fHeader["f_amountcash"].toString().toDouble() > 0.001) {
+        if (str_float(fHeader["f_amountcash"].toString()) > 0.001) {
             p.ltext(__translator.tt(tr("Payment, cash")), 0);
-            p.rtext(float_str(fHeader["f_amountcash"].toString().toDouble(), 2));
+            p.rtext(float_str(str_float(fHeader["f_amountcash"].toString()), 2));
         }
-        if (fHeader["f_amountcard"].toString().toDouble() > 0.001) {
+        if (str_float(fHeader["f_amountcard"].toString()) > 0.001) {
             p.ltext(__translator.tt(tr("Payment, card")), 0);
-            p.rtext(float_str(fHeader["f_amountcard"].toString().toDouble(), 2));
+            p.rtext(float_str(str_float(fHeader["f_amountcard"].toString()), 2));
         }
-        if (fHeader["f_amountbank"].toString().toDouble() > 0.001) {
+        if (str_float(fHeader["f_amountbank"].toString()) > 0.001) {
             p.ltext(__translator.tt(tr("Bank transfer")), 0);
-            p.rtext(float_str(fHeader["f_amountbank"].toString().toDouble(), 2));
+            p.rtext(float_str(str_float(fHeader["f_amountbank"].toString()), 2));
         }
         p.br();
     }

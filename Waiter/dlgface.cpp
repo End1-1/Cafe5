@@ -34,7 +34,7 @@ DlgFace::DlgFace() :
     ui->btnCancel->setVisible(false);
     fModeJustSelectTable = false;
     connect(&fTimerCheckVersion, SIGNAL(timeout()), this, SLOT(checkVersionTimeout()));
-    fTimerCheckVersion.start(60000);
+    fTimerCheckVersion.start(2000);
 }
 
 DlgFace::~DlgFace()

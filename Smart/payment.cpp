@@ -27,27 +27,7 @@ payment::payment(const QString order, const QStringList &dbParams) :
         ui->leCard->setDouble(db.getDouble("f_amountcard"));
         ui->leChange->setDouble(0);
     }
-    QStringList cash;
-    cash << "500"
-         << "1000"
-         << "2000"
-         << "5000"
-         << "10000"
-         << "15000"
-         << "20000";
-    int r = 0, c = 0;
-    for (int i = 0; i < cash.count(); i++) {
-        ui->tblChange->setItem(r, c, new QTableWidgetItem(cash.at(i)));
-        c++;
-        if (c == ui->tblChange->columnCount()) {
-            c = 0;
-            r++;
-        }
-        if (r > 1) {
-            return;
-        }
-    }
-    ui->tblChange->setVisible(false);
+
     adjustSize();
 }
 
@@ -258,7 +238,7 @@ bool payment::printTax(double cardAmount)
             "from o_body b "
             "left join d_dish d on d.f_id=b.f_dish "
             "where b.f_header=:f_header and b.f_state=:f_state");
-    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), this);
+    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
     while (db.nextRow()) {
         pt.addGoods(C5Config::taxDept(), db.getString("f_adgcode"), db.getString("f_dish"), db.getString("f_name"), db.getDouble("f_price"), db.getDouble("f_qty1"), 0.0);
     }
@@ -296,4 +276,14 @@ bool payment::printTax(double cardAmount)
     }
     C5Message::error(err);
     return false;
+}
+
+void payment::on_tblChange_cellClicked(int row, int column)
+{
+    QTableWidgetItem *item = ui->tblChange->item(row, column);
+    if (!item) {
+        return;
+    }
+    double v = item->text().toDouble();
+    ui->leChange->setDouble(v - ui->leCash->getDouble());
 }
