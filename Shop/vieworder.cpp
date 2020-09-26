@@ -168,7 +168,8 @@ void ViewOrder::on_btnReturn_clicked()
                 return returnFalse(dw.fErrorMsg, &db);
             }
         }
-        if (!dw.writeOGoods(ogoodsid, oheaderid, "", __c5config.defaultStore(), ui->tbl->getInteger(i, 6), ui->tbl->getDouble(i, 3), ui->tbl->getDouble(i, 4) * -1,  ui->tbl->getDouble(i, 5) * -1, ui->leTaxNumber->getInteger(), 1, i + 1, adraftid, 0, 0, reason, 0)) {
+        if (!dw.writeOGoods(ogoodsid, oheaderid, "", __c5config.defaultStore(), ui->tbl->getInteger(i, 6), ui->tbl->getDouble(i, 3),
+                            ui->tbl->getDouble(i, 4),  ui->tbl->getDouble(i, 5), ui->leTaxNumber->getInteger(), -1, i + 1, adraftid, 0, 0, reason, 0)) {
             return returnFalse(dw.fErrorMsg, &db);
         }
         if (!dw.updateField("o_goods", "f_return", reason, "f_id", ui->tbl->getString(i, 0))) {

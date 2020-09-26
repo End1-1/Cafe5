@@ -53,7 +53,7 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
                    << "sum(og.f_discountamount) as f_discamount"
                    << "sum(og.f_qty*og.f_sign) as f_qty"
                    << "sum(og.f_total*og.f_sign) as f_total"
-                   << "sum(ad.f_total) as f_selfcost"
+                   << "sum(ad.f_total*og.f_sign) as f_selfcost"
                       ;
 
     fColumnsGroup << "oh.f_id as f_header"
@@ -122,7 +122,7 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
     fColumnsVisible["gcb.f_name as gname2"] = true;
     fColumnsVisible["gcc.f_name as gname3"] = true;
     fColumnsVisible["gcd.f_name as gname4"] = true;
-    fColumnsVisible["sum(ad.f_total) as f_selfcost"] = true;
+    fColumnsVisible["sum(ad.f_total*og.f_sign) as f_selfcost"] = true;
     fColumnsVisible["hl.f_name as f_hallname"] = true;
     fColumnsVisible["cpb.f_taxname as f_buyer"] = false;
     fColumnsVisible["cpb.f_taxcode as f_buyertaxcode"] = false;
