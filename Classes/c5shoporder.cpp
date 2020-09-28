@@ -164,12 +164,30 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
             }
         }
         double discamount = 0;
+        double discfactor = fDiscountFactor;
         if (fDiscountFactor > 0.0001) {
-            discamount = g.goodsPrice * fDiscountFactor;
-            g.goodsPrice -= discamount;
-            g.goodsTotal = g.goodsPrice * g.goodsQty;
+            if (discmode == CARD_TYPE_DISCOUNT) {
+                discfactor = fDiscountFactor;
+                discamount = g.goodsPrice * fDiscountFactor;
+                g.goodsPrice -= discamount;
+                g.goodsTotal = g.goodsPrice * g.goodsQty;
+            } else {
+                if (fDiscountFactor > g.goodsTotal) {
+                    discamount = g.goodsTotal;
+                    discfactor = discamount;
+                    fDiscountFactor -= g.goodsTotal;
+                    g.goodsTotal = 0;
+                    g.goodsPrice = 0;
+                } else {
+                    discamount = fDiscountFactor;
+                    discfactor = discamount;
+                    g.goodsTotal -= fDiscountFactor;
+                    g.goodsPrice = g.goodsTotal / g.goodsQty;
+                    fDiscountFactor = 0;
+                }
+            }
         }
-        if (!dw.writeOGoods(ogoodsid, fHeader, "", __c5config.defaultStore(), g.goodsId, g.goodsQty, g.goodsPrice,  g.goodsTotal, tax ? rseq.toInt() : 0, 1, i + 1, adraftid, discamount, discmode, 0, fDiscountFactor)) {
+        if (!dw.writeOGoods(ogoodsid, fHeader, "", __c5config.defaultStore(), g.goodsId, g.goodsQty, g.goodsPrice,  g.goodsTotal, tax ? rseq.toInt() : 0, 1, i + 1, adraftid, discamount, discmode, 0, discfactor)) {
             return returnFalse(dw.fErrorMsg, db);
         }
     }

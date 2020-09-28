@@ -5,6 +5,9 @@
 #include "c5sockethandler.h"
 #include <QApplication>
 #include <QTranslator>
+#include <QFile>
+#include <QDir>
+#include <QLockFile>
 #include <QMessageBox>
 
 int main(int argc, char *argv[])
@@ -22,6 +25,16 @@ int main(int argc, char *argv[])
     libPath << qApp->applicationDirPath() + "/printsupport";
     QCoreApplication::setLibraryPaths(libPath);
 #endif
+
+    QDir d;
+    QFile file(d.homePath() + "/" + _APPLICATION_ + "/lock.pid");
+    file.remove();
+    QLockFile lockFile(d.homePath() + "/" + _APPLICATION_ + "/lock.pid");
+    if (!lockFile.tryLock()) {
+        C5Message::error(QObject::tr("An instance of application already running"));
+        return -1;
+    }
+
     QList<QByteArray> connectionParams;
     C5Connection::readParams(connectionParams);
     if (connectionParams.count() > 0) {

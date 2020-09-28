@@ -137,7 +137,7 @@ void C5Replication::downloadDataFromServer(const QStringList &src, const QString
         db[":f_goods"] = dr.getInt("f_code");
         db[":f_qty"] = dr.getDouble("f_qty");
         db.insert("a_store_temp", false);
-        if (dr.pos() % 20 == 0) {
+        if (dr.pos() % 50 == 0) {
             emit progress(QString("Step %1 of %2. %3 %4/%5").arg(step).arg(steps).arg("Store").arg(dr.pos()).arg(dr.rowCount()));
         }
     }
@@ -345,7 +345,7 @@ void C5Replication::updateTable(C5Database &dr, C5Database &db, int &step, int s
     emit progress(QString("%1 updatetable").arg(tableName));
     dr.exec("select * from " + tableName);
     while (dr.nextRow()) {
-        if (dr.pos() % 10 == 0) {
+        if (dr.pos() % 50 == 0) {
             emit progress(QString("Update table. Step %1 of %2. %3 %4/%5").arg(step).arg(steps).arg(tableName).arg(dr.pos()).arg(dr.rowCount()));
         }
         db.setBindValues(dr.getBindValues());

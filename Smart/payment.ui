@@ -10,6 +10,13 @@
     <height>292</height>
    </rect>
   </property>
+  <property name="font">
+   <font>
+    <pointsize>12</pointsize>
+    <weight>75</weight>
+    <bold>true</bold>
+   </font>
+  </property>
   <property name="windowTitle">
    <string>Payment</string>
   </property>
@@ -91,6 +98,9 @@
            </property>
            <property name="checkable">
             <bool>true</bool>
+           </property>
+           <property name="checked">
+            <bool>false</bool>
            </property>
           </widget>
          </item>
@@ -237,7 +247,7 @@
        </widget>
       </item>
       <item row="2" column="0" colspan="4">
-       <widget class="QTableWidget" name="tblChange">
+       <widget class="C5TableWidget" name="tblChange">
         <property name="maximumSize">
          <size>
           <width>16777215</width>
@@ -287,11 +297,6 @@
           <string>New Row</string>
          </property>
         </row>
-        <column>
-         <property name="text">
-          <string>New Column</string>
-         </property>
-        </column>
         <column>
          <property name="text">
           <string>New Column</string>
@@ -392,6 +397,11 @@
    <class>C5LineEdit</class>
    <extends>QLineEdit</extends>
    <header>c5lineedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5TableWidget</class>
+   <extends>QTableWidget</extends>
+   <header location="global">c5tablewidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

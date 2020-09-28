@@ -1,8 +1,11 @@
 #include "workspace.h"
 #include "c5config.h"
+#include <QFile>
+#include <QLockFile>
 #include "c5connection.h"
 #include <QApplication>
 #include <QTranslator>
+#include <QDir>
 
 int main(int argc, char *argv[])
 {
@@ -18,6 +21,15 @@ int main(int argc, char *argv[])
     libPath << a.applicationDirPath() + "/imageformats";
     QCoreApplication::setLibraryPaths(libPath);
 #endif
+
+    QDir d;
+    QFile file(d.homePath() + "/" + _APPLICATION_ + "/lock.pid");
+    file.remove();
+    QLockFile lockFile(d.homePath() + "/" + _APPLICATION_ + "/lock.pid");
+    if (!lockFile.tryLock()) {
+        C5Message::error(QObject::tr("An instance of application already running"));
+        return -1;
+    }
 
     QTranslator t;
     t.load(":/Smart.qm");

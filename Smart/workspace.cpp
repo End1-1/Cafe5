@@ -132,7 +132,12 @@ void Workspace::changeQty()
         return;
     }
     QPushButton *b = static_cast<QPushButton*>(sender());
-    d.qty += b->text().toDouble();
+    double q = b->text().toDouble();
+    if (d.qty + q < 0.0001) {
+        removeDish();
+        return;
+    }
+    d.qty += q;
     setCurrentDish(d);
 }
 

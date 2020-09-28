@@ -7,6 +7,7 @@
 #include "dish.h"
 #include <QFile>
 #include <QPrinter>
+#include <QShortcut>
 
 payment::payment(const QString order, const QStringList &dbParams) :
     C5Dialog(dbParams),
@@ -27,13 +28,39 @@ payment::payment(const QString order, const QStringList &dbParams) :
         ui->leCard->setDouble(db.getDouble("f_amountcard"));
         ui->leChange->setDouble(0);
     }
-
+    C5LineEdit *l = ui->tblChange->createLineEdit(1, 3);
+    l->setValidator(new QDoubleValidator(0, 999999999, 2));
+    l->setFocus();
+    connect(l, &C5LineEdit::textChanged, this, [this](const QString &t) {
+        ui->leChange->setDouble(t.toDouble() - ui->leCash->getDouble());
+    });
     adjustSize();
+    QShortcut *s = new QShortcut(QKeySequence("F2"), this, SLOT(focusChangeLineEdit()));
+    s = new QShortcut(QKeySequence("F9"), this, SLOT(keyF9()));
+    s = new QShortcut(QKeySequence("F10"), this, SLOT(keyF10()));
 }
 
 payment::~payment()
 {
     delete ui;
+}
+
+void payment::focusChangeLineEdit()
+{
+    ui->tblChange->lineEdit(1, 3)->setFocus();
+}
+
+void payment::keyF9()
+{
+    ui->btnTax->setChecked(false);
+    on_btnCheckoutCash_clicked();
+}
+
+void payment::keyF10()
+{
+    ui->btnTax->setChecked(true);
+    qApp->processEvents();
+    on_btnCheckoutCash_clicked();
 }
 
 void payment::on_btnTax_clicked(bool checked)

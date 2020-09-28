@@ -19,6 +19,12 @@ public:
     ~payment();
 
 private slots:
+    void focusChangeLineEdit();
+
+    void keyF9();
+
+    void keyF10();
+
     void on_btnTax_clicked(bool checked);
 
     void on_btnCancel_clicked();
