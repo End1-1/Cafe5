@@ -164,7 +164,7 @@ void ViewOrder::on_btnReturn_clicked()
         }
         if (haveStore && ui->tbl->getInteger(i, 8) == 0) {
             if (!dw.writeAStoreDraft(adraftid, storeDocId, __c5config.defaultStore(), 1,
-                                     ui->tbl->getInteger(i, 6), ui->tbl->getDouble(i, 3), price, price * ui->tbl->getDouble(i, 3), DOC_REASON_SALE_RETURN, adraftid, i + 1)) {
+                                     ui->tbl->getInteger(i, 6), ui->tbl->getDouble(i, 3), price, price * ui->tbl->getDouble(i, 3), DOC_REASON_SALE_RETURN, adraftid, i + 1, "")) {
                 return returnFalse(dw.fErrorMsg, &db);
             }
         }

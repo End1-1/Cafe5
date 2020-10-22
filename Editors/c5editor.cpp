@@ -2,6 +2,7 @@
 #include "ui_c5editor.h"
 #include "ce5editor.h"
 #include <QShortcut>
+#include <QKeyEvent>
 
 C5Editor::C5Editor(const QStringList &dbParams) :
     C5Dialog(dbParams),
@@ -11,6 +12,7 @@ C5Editor::C5Editor(const QStringList &dbParams) :
     fVerticalLayout = ui->vl;
     QShortcut *s = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_S), this);
     connect(s, SIGNAL(activated()), this, SLOT(on_btnSave_clicked()));
+    installEventFilter(this);
 }
 
 C5Editor::~C5Editor()
@@ -55,6 +57,23 @@ void C5Editor::reject()
 void C5Editor::insertButton(QPushButton *b)
 {
     ui->horizontalLayout->insertWidget(3, b);
+}
+
+bool C5Editor::event(QEvent *e)
+{
+    if (e->type() == QEvent::KeyPress) {
+        QKeyEvent *ke = static_cast<QKeyEvent*>(e);
+        if (ke->key() == Qt::Key_Return || ke->key() == Qt::Key_Enter) {
+            if (ke->modifiers() & Qt::ControlModifier) {
+                if (ke->modifiers() & Qt::ShiftModifier) {
+                    on_btnSaveAndNew_clicked();
+                } else {
+                    on_btnSave_clicked();
+                }
+            }
+        }
+    }
+    return C5Dialog::event(e);
 }
 
 void C5Editor::closeEvent(QCloseEvent *e)

@@ -109,6 +109,36 @@
            <number>0</number>
           </property>
           <item>
+           <widget class="QToolButton" name="btnPinLast">
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="../resources/res.qrc">
+              <normaloff>:/pushpin.png</normaloff>:/pushpin.png</iconset>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_4">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
            <widget class="C5CheckBox" name="chService">
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
@@ -167,6 +197,9 @@
         <widget class="C5LineEditWithSelector" name="leName">
          <property name="Field" stdset="0">
           <string>f_name</string>
+         </property>
+         <property name="Check" stdset="0">
+          <string>empty=&quot;Name&quot;</string>
          </property>
         </widget>
        </item>

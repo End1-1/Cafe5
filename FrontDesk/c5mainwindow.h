@@ -11,6 +11,7 @@ class C5MainWindow;
 }
 
 class C5ToolBarWidget;
+class QListWidget;
 
 class C5MainWindow : public QMainWindow
 {
@@ -26,7 +27,7 @@ public:
     template<typename T>
     T *createTab(const QStringList &dbParams) {
         T *t = new T(dbParams);
-        fTab->addTab(t, t->icon(), QString("[%1] %2").arg(dbParams.at(4)).arg(t->label()));
+        fTab->addTab(t, t->icon(), QString("[%1] %2").arg(dbParams.at(5)).arg(t->label()));
         fTab->setCurrentIndex(fTab->count() - 1);
         t->postProcess();
         return t;
@@ -46,29 +47,15 @@ private slots:
 
     void hotKey();
 
-    void twCustomMenu(const QPoint &p);
-
-    void tabCustomMenu(const QPoint &p);
-
     void tabCloseRequested(int index);
-
-    void actionChangeDatabase();
 
     void currentTabChange(int index);
 
     void on_actionConnection_triggered();
 
-    void on_twDb_itemDoubleClicked(QTreeWidgetItem *item, int column);
+    void on_listWidgetItemClicked(const QModelIndex &index);
 
     void on_actionClose_application_triggered();
-
-    void on_btnHideMenu_clicked();
-
-    void on_actionHome_triggered();
-
-    void on_actionGo_to_home_triggered();
-
-    void on_twDb_itemExpanded(QTreeWidgetItem *item);
 
     void on_actionLogout_triggered();
 
@@ -76,8 +63,20 @@ private slots:
 
     void on_splitter_splitterMoved(int pos, int index);
 
+    void on_btnHideMenu_clicked();
+
+    void on_btnChangeDB_clicked();
+
+    void on_btnMenuClick();
+
+    void on_btnFavoriteClicked();
+
 private:
     Ui::C5MainWindow *ui;
+
+    QList<QListWidget*> fMenuLists;
+
+    QMap<QString, QStringList> fDatabases;
 
     QLabel *fStatusLabel;
 
@@ -93,13 +92,21 @@ private:
 
     bool fLogin;
 
+    void readFavoriteMenu();
+
+    bool addMainLevel(const QString &db, int permission, const QString &title, const QString &icon, QListWidget *&l);
+
+    void setDB(const QString &dbname);
+
     void enableMenu(bool v);
 
-    void addTreeL3Item(QTreeWidgetItem *item, int permission, const QString &text, const QString &icon);
+    void addTreeL3Item(QListWidget *l, int permission, const QString &text, const QString &icon);
 
-    void showWelcomePage();
+    void animateMenu(QListWidget *l, bool hide);
 
-    QStringList getDbParams(QTreeWidgetItem *item);
+    QString itemIconName(int permission);
+
+    void removeFromFavorite(int permission);
 };
 
 extern C5MainWindow *__mainWindow;

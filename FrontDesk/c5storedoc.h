@@ -118,6 +118,8 @@ private:
     void updateCashDoc();
 
 private slots:
+    void lineEditKeyPressed(const QChar &key);
+
     void newDoc();
 
     void getInput();
@@ -187,6 +189,10 @@ private slots:
     void on_btnInsertLast_clicked();
 
     void on_btnEditGoods_clicked();
+
+    void on_btnCalculator_clicked();
+
+    void outputOfService();
 };
 
 #endif // C5STOREDOC_H

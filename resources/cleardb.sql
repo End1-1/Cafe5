@@ -66,6 +66,7 @@ delete from s_station_conf;
 delete from s_salary_body;
 delete from s_salary_options;
 delete from s_syncronize;
+delete from s_draft;
 delete from e_cash_names;
 alter table a_store_temp auto_increment=0;
 alter table c_goods_classes auto_increment = 0;

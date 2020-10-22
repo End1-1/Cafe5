@@ -2110,14 +2110,19 @@ ORDER</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="main.cpp" line="14"/>
+        <location filename="main.cpp" line="17"/>
         <source>Applicatin error</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main.cpp" line="14"/>
+        <location filename="main.cpp" line="17"/>
         <source>Please, register application.</source>
         <translation></translation>
+    </message>
+    <message>
+        <location filename="main.cpp" line="34"/>
+        <source>An instance of application already running</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

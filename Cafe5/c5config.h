@@ -54,6 +54,8 @@
 #define param_shop_noPriceChange 49
 #define param_shop_defferentStaff 50
 #define param_waiter_login_after_payment 51
+#define param_shop_print_v1 52
+#define param_shop_print_v2 53
 
 #define FRONTDESK_WAITER 0
 #define FRONTDESK_SHOP 1
@@ -204,6 +206,8 @@ public:
     static bool shopDifferentStaff();
 
     static bool waiterLoginAfterPayment();
+
+    static int shopPrintVersion();
 
 private:
     static QString getValue(int key);

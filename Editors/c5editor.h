@@ -27,6 +27,8 @@ public:
 
     void insertButton(QPushButton *b);
 
+    bool event(QEvent *e) override;
+
 protected:
     virtual void closeEvent(QCloseEvent *e);
 

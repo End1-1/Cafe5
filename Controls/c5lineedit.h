@@ -36,8 +36,12 @@ public:
 
     int color();
 
+    void addEventKeys(const QString &keys);
+
 protected:
     void keyPressEvent(QKeyEvent *e);
+
+    void keyReleaseEvent(QKeyEvent *event);
 
     void focusOutEvent(QFocusEvent *event);
 
@@ -46,11 +50,15 @@ private:
 
     int fColor;
 
+    QString fEventKeys;
+
 private slots:
     void editText(const QString &arg);
 
 signals:
     void focusOut();
+
+    void keyPressed(const QChar &key);
 
 };
 

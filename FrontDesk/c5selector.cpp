@@ -133,24 +133,25 @@ void C5Selector::resetCache(const QStringList &dbParams, int cacheId)
 
 void C5Selector::tblSingleClick(const QModelIndex &index)
 {
-    if (index.column() == 0) {
-        return;
-    }
-    int v = fGrid->fModel->data(index.row(), 0, Qt::EditRole).toInt() == 0 ? 1 : 0;
-    fGrid->fModel->setData(index.row(), 0, v, Qt::CheckStateRole);
-    qDebug() << "SINGLE slicl";
+//    if (index.column() == 0) {
+//        return;
+//    }
+//    int v = fGrid->fModel->data(index.row(), 0, Qt::EditRole).toInt() == 0 ? 1 : 0;
+//    fGrid->fModel->setData(index.row(), 0, v, Qt::CheckStateRole);
+//    qDebug() << "SINGLE slicl";
 }
 
 void C5Selector::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
 {
     for (QModelIndex i: deselected.indexes()) {
         fGrid->fModel->setData(i.row(), 0, 0, Qt::CheckStateRole);
+        qDebug() << "selection changed deselect";
     }
 
     for (QModelIndex i: selected.indexes()) {
         fGrid->fModel->setData(i.row(), 0, 1, Qt::CheckStateRole);
+        qDebug() << "selection changed select";
     }
-
 }
 
 bool C5Selector::tblDoubleClicked(int row, int column, const QList<QVariant> &values)

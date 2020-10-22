@@ -159,7 +159,7 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
         QString ogoodsid;
         QString adraftid;
         if (!g.isService) {
-            if (!dw.writeAStoreDraft(adraftid, storeDocId, __c5config.defaultStore(), -1, g.goodsId, g.goodsQty, 0, 0, DOC_REASON_SALE, adraftid, i + 1)) {
+            if (!dw.writeAStoreDraft(adraftid, storeDocId, __c5config.defaultStore(), -1, g.goodsId, g.goodsQty, 0, 0, DOC_REASON_SALE, adraftid, i + 1, "")) {
                 return returnFalse(dw.fErrorMsg, db);
             }
         }
@@ -304,7 +304,7 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
                 for (int i = 0; i < ingoods.count(); i++) {
                     IGoods &g = ingoods[i];
                     QString adraftid;
-                    if (!dw.writeAStoreDraft(adraftid, pstoredoc, partnerStore, 1, g.goodsId, g.goodsQty, g.goodsPrice, g.goodsTotal, DOC_REASON_INPUT, adraftid, i + 1)) {
+                    if (!dw.writeAStoreDraft(adraftid, pstoredoc, partnerStore, 1, g.goodsId, g.goodsQty, g.goodsPrice, g.goodsTotal, DOC_REASON_INPUT, adraftid, i + 1, "")) {
                         return returnFalse(dw.fErrorMsg, db);
                     }
                 }
@@ -331,16 +331,26 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
     }
 
     if (!C5Config::localReceiptPrinter().isEmpty()) {
-        bool p1, p2;
-        if (SelectPrinters::selectPrinters(p1, p2)) {
-            PrintReceiptGroup p;
-            if (p1) {
-                p.print(fHeader, db, 1);
+        PrintReceiptGroup p;
+        qDebug() << C5Config::shopPrintVersion();
+        switch (C5Config::shopPrintVersion()) {
+        case 1: {
+            bool p1, p2;
+            if (SelectPrinters::selectPrinters(p1, p2)) {
+                if (p1) {
+                    p.print(fHeader, db, 1);
+                }
+                if (p2) {
+                    p.print(fHeader, db, 2);
+                }
             }
-            if (p2) {
-                p.print(fHeader, db, 2);
-            }
-            //p.print2(oheaderid, db);
+            break;
+        }
+        case 2:
+            p.print2(fHeader, db);
+            break;
+        default:
+            break;
         }
     }
 

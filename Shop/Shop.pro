@@ -84,6 +84,7 @@ SOURCES += \
     ../Classes/c5waiterserver.cpp \
     ../Classes/c5widget.cpp \
     ../Classes/c5witerconf.cpp \
+    ../Classes/calculator.cpp \
     ../Classes/checkforupdatethread.cpp \
     ../Classes/fileversion.cpp \
     ../Classes/notificationwidget.cpp \
@@ -155,7 +156,6 @@ SOURCES += \
     ../FrontDesk/c5toolbarwidget.cpp \
     ../FrontDesk/c5translatorform.cpp \
     ../FrontDesk/c5waiterorder.cpp \
-    ../FrontDesk/c5welcomepage.cpp \
     ../FrontDesk/dlgchangeoutputstore.cpp \
     ../Reports/c5settingswidget.cpp \
     ../Reports/cr5carvisits.cpp \
@@ -340,6 +340,7 @@ HEADERS += \
     ../Classes/c5waiterserver.h \
     ../Classes/c5widget.h \
     ../Classes/c5witerconf.h \
+    ../Classes/calculator.h \
     ../Classes/checkforupdatethread.h \
     ../Classes/fileversion.h \
     ../Classes/notificationwidget.h \
@@ -411,7 +412,6 @@ HEADERS += \
     ../FrontDesk/c5toolbarwidget.h \
     ../FrontDesk/c5translatorform.h \
     ../FrontDesk/c5waiterorder.h \
-    ../FrontDesk/c5welcomepage.h \
     ../FrontDesk/dlgchangeoutputstore.h \
     ../Reports/c5settingswidget.h \
     ../Reports/cr5carvisits.h \
@@ -542,6 +542,7 @@ FORMS += \
     ../Classes/c5grid.ui \
     ../Classes/c5gridgilter.ui \
     ../Classes/c5printpreview.ui \
+    ../Classes/calculator.ui \
     ../Classes/notificationwidget.ui \
     ../Classes/rkeyboard.ui \
     ../Editors/c5cashname.ui \
@@ -601,7 +602,6 @@ FORMS += \
     ../FrontDesk/c5toolbarwidget.ui \
     ../FrontDesk/c5translatorform.ui \
     ../FrontDesk/c5waiterorder.ui \
-    ../FrontDesk/c5welcomepage.ui \
     ../FrontDesk/dlgchangeoutputstore.ui \
     ../Reports/c5settingswidget.ui \
     ../Reports/cr5carvisitsfilter.ui \

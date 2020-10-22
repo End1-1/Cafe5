@@ -483,3 +483,8 @@ update s_app set f_version ='30' where f_app='DB';
 alter table o_goods add column f_discountAmount decimal(14,3);
 update o_goods set f_sign=-1 where f_total<0;
 update o_goods set f_total=abs(f_total), f_price=abs(f_price) where f_sign=-1;
+
+/* db - 31 */
+update s_app set f_version ='31' where f_app='DB';
+ALTER TABLE `b_history` CHANGE COLUMN `f_value` `f_value` DECIMAL(14,3) NULL DEFAULT NULL ;
+alter table a_store_draft add column f_comment tinytext;

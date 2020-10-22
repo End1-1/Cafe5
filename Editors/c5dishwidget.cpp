@@ -9,6 +9,7 @@
 #include "ce5dishpart2.h"
 #include "c5printpreview.h"
 #include <QColorDialog>
+#include <QInputDialog>
 
 C5DishWidget::C5DishWidget(const QStringList &dbParams, QWidget *parent) :
     CE5Editor(dbParams, parent),
@@ -101,7 +102,8 @@ void C5DishWidget::setDish(int id)
     ui->tblRecipe->setRowCount(0);
     int row = 0;
     db[":f_dish"] = id;
-    db.exec("select r.f_id, r.f_goods, g.f_name, r.f_qty, u.f_name as f_unit, r.f_price, r.f_qty*r.f_price as f_total, r.f_complex, f_complexQty, f_complexBaseQty "
+    db.exec("select r.f_id, r.f_goods, g.f_name, r.f_qty, u.f_name as f_unit, g.f_lastinputprice as f_price, r.f_qty*g.f_lastinputprice as f_total, "
+            "r.f_complex, f_complexQty, f_complexBaseQty "
             "from d_recipes r "
             "left join c_goods g on g.f_id=r.f_goods "
             "left join c_units u on u.f_id=g.f_unit "
@@ -553,4 +555,19 @@ void C5DishWidget::on_btnAddComment_clicked()
 void C5DishWidget::on_leDishComment_returnPressed()
 {
     on_btnAddComment_clicked();
+}
+
+void C5DishWidget::on_btnDivQty_clicked()
+{
+    bool ok;
+    double d = QInputDialog::getDouble(this, tr("Divider"), "", 0, 0, 99999, 3, &ok);
+    if (!ok) {
+        return;
+    }
+    if (d > 0.00001) {
+        for (int i = 0; i < ui->tblRecipe->rowCount(); i++) {
+            ui->tblRecipe->lineEdit(i, 3)->setDouble(ui->tblRecipe->lineEdit(i, 3)->getDouble() / d);
+            ui->tblRecipe->lineEdit(i, 3)->textEdited(ui->tblRecipe->lineEdit(i, 3)->text());
+        }
+    }
 }

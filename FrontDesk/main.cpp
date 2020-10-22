@@ -43,9 +43,9 @@ int main(int argc, char *argv[])
     a.setStyle(QStyleFactory::create("fusion"));
 
     QFontDatabase::addApplicationFont(":/barcode.ttf");
-    int id = QFontDatabase::addApplicationFont(":/ahuni.ttf");
-    QString family = QFontDatabase::applicationFontFamilies(id).at(0);
-    QFont font(family);
+//    int id = QFontDatabase::addApplicationFont(":/ahuni.ttf");
+//    QString family = QFontDatabase::applicationFontFamilies(id).at(0);
+    QFont font(a.font());
     font.setPointSize(C5Config::fronDeskFontSize());
     a.setFont(font);
 

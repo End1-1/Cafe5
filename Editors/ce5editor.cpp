@@ -253,6 +253,7 @@ bool CE5Editor::checkData(QString &err)
             QStringList rules = le->property("Check").toString().split(";", QString::SkipEmptyParts);
             foreach (QString rule, rules) {
                 if (rule.mid(0, 5) == "empty") {
+                    le->setText(le->text().trimmed());
                     if (le->isEmpty()) {
                         err += QString("%1 %2<br>")
                                 .arg(rule.mid(rule.indexOf("=") + 1, rule.length() - rule.indexOf("=")))

@@ -47,6 +47,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Classes/c5random.cpp \
     ../Classes/c5storedraftwriter.cpp \
     ../Classes/c5threadobject.cpp \
+    ../Classes/calculator.cpp \
     ../Classes/notificationwidget.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
     ../Controls/c5guicontrols.cpp \
@@ -186,7 +187,6 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Editors/ce5menuname.cpp \
     ../Editors/ce5goodsgroup.cpp \
     ../Editors/ce5goodswaste.cpp \
-    c5welcomepage.cpp \
     ../Editors/ce5usergroup.cpp \
     ../Editors/ce5user.cpp \
     ../Reports/cr5creditcards.cpp \
@@ -247,6 +247,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Classes/c5random.h \
     ../Classes/c5storedraftwriter.h \
     ../Classes/c5threadobject.h \
+    ../Classes/calculator.h \
     ../Classes/notificationwidget.h \
     ../Classes/proxytablewidgetdatabase.h \
     ../Controls/c5guicontrols.h \
@@ -388,7 +389,6 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Editors/ce5menuname.h \
     ../Editors/ce5goodsgroup.h \
     ../Editors/ce5goodswaste.h \
-    c5welcomepage.h \
     ../Editors/ce5usergroup.h \
     ../Editors/ce5user.h \
     ../Reports/cr5creditcards.h \
@@ -442,6 +442,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
 
 FORMS += \
     ../Cafe5/c5licensedlg.ui \
+    ../Classes/calculator.ui \
     ../Classes/notificationwidget.ui \
     ../Editors/c5cashname.ui \
     ../Editors/ce5dishpackage.ui \
@@ -510,7 +511,6 @@ FORMS += \
     ../Editors/ce5menuname.ui \
     ../Editors/ce5goodsgroup.ui \
     ../Editors/ce5goodswaste.ui \
-    c5welcomepage.ui \
     ../Editors/ce5usergroup.ui \
     ../Editors/ce5user.ui \
     ../Editors/ce5creditcard.ui \

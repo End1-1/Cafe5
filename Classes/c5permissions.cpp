@@ -11,6 +11,7 @@ C5Permissions::C5Permissions()
 
 void C5Permissions::init(C5Database &db)
 {
+
     fPermissions[db.database()].clear();
     fTemplate << cp_append_database
 

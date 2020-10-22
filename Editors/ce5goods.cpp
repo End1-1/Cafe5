@@ -19,6 +19,9 @@
 #include <QStringListModel>
 #include <QPaintEngine>
 
+static int fLastGroup = 0;
+static int fLastUnit = 0;
+
 CE5Goods::CE5Goods(const QStringList &dbParams, QWidget *parent) :
     CE5Editor(dbParams, parent),
     ui(new Ui::CE5Goods)
@@ -46,6 +49,7 @@ CE5Goods::CE5Goods(const QStringList &dbParams, QWidget *parent) :
     ui->leName->setCompleter(c);
     fBarcode = new Barcode();
     ui->lbScancodeType->setVisible(false);
+    ui->btnPinLast->setChecked(__c5config.getRegValue("last_goods_editor").toBool());
 }
 
 CE5Goods::~CE5Goods()
@@ -99,6 +103,8 @@ void CE5Goods::setId(int id)
 
 bool CE5Goods::save(QString &err, QList<QMap<QString, QVariant> > &data)
 {
+    fLastGroup = ui->leGroup->getInteger();
+    fLastUnit = ui->leUnit->getInteger();
     if (ui->chUncomplectIfZero->isChecked()) {
         if (ui->leUncomplectGoods->getInteger() == 0) {
             err += tr("Uncomplect goods is not defined");
@@ -138,7 +144,8 @@ bool CE5Goods::save(QString &err, QList<QMap<QString, QVariant> > &data)
 
 void CE5Goods::clear()
 {
-    CE5Editor::clear();;
+    int scancode = ui->leScanCode->getInteger();
+    CE5Editor::clear();
     ui->tblGoods->clearContents();
     ui->tblGoods->setRowCount(0);
     ui->leLowLevel->setText("0");
@@ -150,6 +157,14 @@ void CE5Goods::clear()
     ui->chUncomplectIfZero->setChecked(false);
     ui->leUncomplectGoods->setValue("");
     ui->leUncomplectGoodsQty->clear();
+    if (__c5config.getRegValue("last_goods_editor").toBool()) {
+        ui->leGroup->setValue(fLastGroup);
+        ui->leUnit->setValue(fLastUnit);
+        if (scancode) {
+            ui->leScanCode->setInteger(scancode + 1);
+        }
+        ui->leName->setFocus();
+    }
 }
 
 QPushButton *CE5Goods::b1()
@@ -528,4 +543,9 @@ void CE5Goods::on_chUncomplectIfZero_clicked(bool checked)
     ui->leUncomplectGoods->setEnabled(checked);
     ui->leUncomplectGoodsName->setEnabled(checked);
     ui->leUncomplectGoodsQty->setEnabled(checked);
+}
+
+void CE5Goods::on_btnPinLast_clicked(bool checked)
+{
+    __c5config.setRegValue("last_goods_editor", checked);
 }

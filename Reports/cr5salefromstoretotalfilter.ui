@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>464</width>
+    <height>399</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -153,9 +153,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5LineEditWithSelector</class>
+   <class>C5DateEdit</class>
    <extends>QLineEdit</extends>
-   <header location="global">c5lineeditwithselector.h</header>
+   <header location="global">c5dateedit.h</header>
   </customwidget>
   <customwidget>
    <class>C5LineEdit</class>
@@ -163,9 +163,9 @@
    <header location="global">c5lineedit.h</header>
   </customwidget>
   <customwidget>
-   <class>C5DateEdit</class>
+   <class>C5LineEditWithSelector</class>
    <extends>QLineEdit</extends>
-   <header location="global">c5dateedit.h</header>
+   <header location="global">c5lineeditwithselector.h</header>
   </customwidget>
   <customwidget>
    <class>C5CheckBox</class>

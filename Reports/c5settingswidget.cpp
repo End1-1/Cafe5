@@ -105,6 +105,8 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     fTags[ui->chDenyWhosale->getTag()] = ui->chDenyWhosale->isChecked() ? "1" : "0";
     fTags[ui->chFixShopStaff->getTag()] = ui->chFixShopStaff->isChecked() ? "1" : "0";
     fTags[ui->chWaiterLoginAfterPayment->getTag()] = ui->chWaiterLoginAfterPayment->isChecked() ? "1" : "0";
+    fTags[ui->rbPrintV1->property("tag").toInt()] = ui->rbPrintV1->isChecked() ? "1" : "0";
+    fTags[ui->rbPrintV2->property("tag").toInt()] = ui->rbPrintV2->isChecked() ? "1" : "0";
     C5Database db(fDBParams);
     db[":f_settings"] = ui->leCode->getInteger();
     db.exec("delete from s_settings_values where f_settings=:f_settings");
@@ -141,6 +143,8 @@ void C5SettingsWidget::setWidgetValue(QWidget *w, const QString &value)
         static_cast<C5ComboBox*>(w)->setIndexForValue(value);
     } else if (!strcmp(w->metaObject()->className(), "C5CheckBox")) {
         static_cast<C5CheckBox*>(w)->setChecked(value == "1");
+    } else if  (!strcmp(w->metaObject()->className(), "QRadioButton")) {
+        static_cast<QRadioButton*>(w)->setChecked(value == "1");
     }
 }
 
@@ -184,6 +188,8 @@ QWidget *C5SettingsWidget::widget(QWidget *parent, int tag)
             if (c->getTag() == tag) {
                 return c;
             }
+        } else if (!strcmp(o->metaObject()->className(), "QGroupBox")) {
+            return widget(static_cast<QGroupBox*>(o), tag);
         }
         if (o->children().count() > 0) {
             QWidget *w = widget(static_cast<QWidget*>(o), tag);

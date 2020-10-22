@@ -167,7 +167,7 @@ void CR5SalesEffectiveness::rep1()
     if (!fFilter->goods().isEmpty() || !fFilter->goodsGroup().isEmpty()) {
         query += "inner join c_goods g on g.f_id=s.f_goods ";
     }
-    query += "where  a.f_date between :f_date1 and :f_date2 and s.f_type=1  and a.f_type=1 ";
+    query += "where  a.f_date between :f_date1 and :f_date2 and s.f_type=1  ";
     if (!fFilter->goodsGroup().isEmpty()) {
         query += QString(" and g.f_group in (%1) ").arg(fFilter->goodsGroup());
     }
@@ -187,13 +187,13 @@ void CR5SalesEffectiveness::rep1()
         rows[r][c] = db.getDouble("f_qty");
     }
     //SALES QTY
-    query = "select og.f_goods,sum(og.f_qty*og.f_sign) as f_qty "
+    query = "select og.f_goods,sum(og.f_qty) as f_qty "
             "from o_goods og "
             "left join o_header oh on oh.f_id=og.f_header ";
     if (!fFilter->goods().isEmpty() || !fFilter->goodsGroup().isEmpty()) {
         query += "inner join c_goods g on g.f_id=og.f_goods ";
     }
-    query += "where oh.f_datecash between :f_date1 and :f_date2 ";
+    query += "where oh.f_datecash between :f_date1 and :f_date2 and og.f_sign=1 ";
     if (!fFilter->goodsGroup().isEmpty()) {
         query += QString(" and g.f_group in (%1) ").arg(fFilter->goodsGroup());
     }
@@ -238,6 +238,7 @@ void CR5SalesEffectiveness::rep1()
         int r = goodsRowMap[db.getInt("f_goods")];
         rows[r][c] = db.getDouble("f_qty");
     }
+
     //FINAL QTY
     query = "select s.f_goods as f_code, sum(s.f_qty*s.f_type) as f_qty,sum(s.f_total*s.f_type) as f_total "
             "from a_store s "
@@ -245,7 +246,7 @@ void CR5SalesEffectiveness::rep1()
     if (!fFilter->goods().isEmpty() || !fFilter->goodsGroup().isEmpty()) {
         query += "inner join c_goods g on g.f_id=s.f_goods ";
     }
-    query += "where h.f_date<:f_date and h.f_state=1 ";
+    query += "where h.f_date<=:f_date and h.f_state=1 ";
     if (!fFilter->goodsGroup().isEmpty()) {
         query += QString(" and g.f_group in (%1) ").arg(fFilter->goodsGroup());
     }
@@ -375,7 +376,7 @@ void CR5SalesEffectiveness::rep2()
             "from a_store s "
             "left join a_header a on a.f_id=s.f_document  "
             "inner join c_goods g on g.f_id=s.f_goods "
-            "where  a.f_date between :f_date1 and :f_date2 and s.f_type=1 and a.f_type=1 ";
+            "where  a.f_date between :f_date1 and :f_date2 and s.f_type=1  ";
     if (!fFilter->goodsGroup().isEmpty()) {
         query += QString(" and g.f_group in (%1) ").arg(fFilter->goodsGroup());
     }
@@ -392,11 +393,11 @@ void CR5SalesEffectiveness::rep2()
         rows[r][c] = db.getDouble("f_qty");
     }
     //SALES QTY
-    query = "select g.f_group,sum(og.f_qty*og.f_sign) as f_qty "
+    query = "select g.f_group,sum(og.f_qty) as f_qty "
             "from o_goods og "
             "left join o_header oh on oh.f_id=og.f_header "
             "inner join c_goods g on g.f_id=og.f_goods "
-            "where oh.f_datecash between :f_date1 and :f_date2 ";
+            "where oh.f_datecash between :f_date1 and :f_date2 and og.f_sign=1 ";
     if (!fFilter->goodsGroup().isEmpty()) {
         query += QString(" and g.f_group in (%1) ").arg(fFilter->goodsGroup());
     }
@@ -438,7 +439,7 @@ void CR5SalesEffectiveness::rep2()
             "from a_store s "
             "inner join a_header h on h.f_id=s.f_document  "
             "inner join c_goods g on g.f_id=s.f_goods "
-            "where h.f_date<:f_date and h.f_state=1 ";
+            "where h.f_date<=:f_date and h.f_state=1 ";
     if (!fFilter->goodsGroup().isEmpty()) {
         query += QString(" and g.f_group in (%1) ").arg(fFilter->goodsGroup());
     }

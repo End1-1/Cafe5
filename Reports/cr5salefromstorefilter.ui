@@ -539,25 +539,37 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5DateEdit</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5dateedit.h</header>
-  </customwidget>
-  <customwidget>
    <class>C5LineEditWithSelector</class>
    <extends>QLineEdit</extends>
    <header location="global">c5lineeditwithselector.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5DateEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5dateedit.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>deStart</tabstop>
   <tabstop>deEnd</tabstop>
+  <tabstop>leHall</tabstop>
   <tabstop>leSupplier</tabstop>
+  <tabstop>leBuyer</tabstop>
   <tabstop>leGroup</tabstop>
   <tabstop>leClass1</tabstop>
   <tabstop>leClass2</tabstop>
   <tabstop>leClass3</tabstop>
   <tabstop>leClass4</tabstop>
+  <tabstop>rbFiscalAll</tabstop>
+  <tabstop>rbFiscalNone</tabstop>
+  <tabstop>rbFiscal</tabstop>
+  <tabstop>rbRIAll</tabstop>
+  <tabstop>rbRIYes</tabstop>
+  <tabstop>rbRINo</tabstop>
+  <tabstop>rbSrvAll</tabstop>
+  <tabstop>rbSrvYes</tabstop>
+  <tabstop>rbSrvNo</tabstop>
+  <tabstop>btnFixDates</tabstop>
  </tabstops>
  <resources>
   <include location="../resources/res.qrc"/>

@@ -56,7 +56,7 @@ bool C5StoreDraftWriter::writeFromShopOutput(const QString &doc, int state, QStr
                 continue;
             }
             QString drid;
-            if (!writeAStoreDraft(drid, id, store, -1, i.goodsId, i.goodsQty, i.goodsPrice, i.goodsPrice * i.goodsQty, DOC_REASON_SALE, i.recId, rownum++)) {
+            if (!writeAStoreDraft(drid, id, store, -1, i.goodsId, i.goodsQty, i.goodsPrice, i.goodsPrice * i.goodsQty, DOC_REASON_SALE, i.recId, rownum++, "")) {
                 err += fDb.fLastError;
                 return returnResult(false, err);
             }
@@ -215,7 +215,7 @@ bool C5StoreDraftWriter::readAStoreDraft(const QString &id)
     fDb[":f_document"] = id;
     if (fDb.exec("select d.f_id, d.f_goods, "
                  "concat(g.f_name, if(g.f_scancode is null, '', concat(' ', g.f_scancode))) as f_goodsname, "
-                 "d.f_qty, u.f_name as f_unitname, d.f_price, d.f_total, d.f_reason, d.f_type, d.f_base "
+                 "d.f_qty, u.f_name as f_unitname, d.f_price, d.f_total, d.f_reason, d.f_type, d.f_base, d.f_comment "
                  "from a_store_draft d "
                  "left join c_goods g on g.f_id=d.f_goods "
                  "left join c_units u on u.f_id=g.f_unit "
@@ -470,7 +470,8 @@ QVariant C5StoreDraftWriter::value(int container, int row, const QString &key)
 }
 
 bool C5StoreDraftWriter::writeAStoreDraft(QString &id, const QString &docId, int store, int type, int goods,
-                                          double qty, double price, double total, int reason, const QString &baseid, int rownum)
+                                          double qty, double price, double total, int reason, const QString &baseid, int rownum,
+                                          const QString &comment)
 {
     bool u = true;
     if (id.isEmpty()) {
@@ -492,6 +493,7 @@ bool C5StoreDraftWriter::writeAStoreDraft(QString &id, const QString &docId, int
     fDb[":f_reason"] = reason;
     fDb[":f_base"] = baseid;
     fDb[":f_row"] = rownum;
+    fDb[":f_comment"] = comment;
     if (u) {
         return returnResult(fDb.update("a_store_draft", where_id(id)));
     } else {
@@ -716,6 +718,7 @@ bool C5StoreDraftWriter::writeInput(const QString &docId, QString &err)
     for (int i = 0; i < rows.count(); i++) {
         QMap<QString, QVariant> &r = rows[i];
         r.remove(":f_row");
+        r.remove(":f_comment");
         r[":f_basedoc"] = docId;
         r[":f_base"] = r[":f_id"];
         r[":f_draft"] = r[":f_id"];

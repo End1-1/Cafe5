@@ -50,6 +50,10 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
                    << "cpb.f_taxname as f_buyer"
                    << "cpb.f_taxcode as f_buyertaxcode"
                    << "og.f_discountfactor*100 as f_discountfactor"
+                   << "gg.f_saleprice"
+                   << "gg.f_saleprice2"
+                   << "sum(gg.f_saleprice*og.f_qty) as f_totalsaleprice"
+                   << "sum(gg.f_saleprice2*og.f_qty) as f_totalsaleprice2"
                    << "sum(og.f_discountamount) as f_discamount"
                    << "sum(og.f_qty*og.f_sign) as f_qty"
                    << "sum(og.f_total*og.f_sign) as f_total"
@@ -74,12 +78,18 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
                    << "gcc.f_name as gname3"
                    << "gcd.f_name as gname4"
                    << "og.f_discountfactor*100 as f_discountfactor"
+                   << "gg.f_saleprice"
+                   << "gg.f_saleprice2"
                       ;
 
     fColumnsSum << "f_qty"
                 << "f_total"
                 << "f_selfcost"
                 << "f_discamount"
+                << "gg.f_saleprice"
+                << "gg.f_saleprice2"
+                << "f_totalsaleprice"
+                << "f_totalsaleprice2"
                       ;
 
     fTranslation["f_header"] = tr("UUID");
@@ -105,6 +115,10 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
     fTranslation["f_buyertaxcode"] = tr("Buyer taxcode");
     fTranslation["f_discountfactor"] = tr("Discount factor");
     fTranslation["f_discamount"] = tr("Discount amount");
+    fTranslation["f_saleprice"] = tr("Sale price");
+    fTranslation["f_saleprice2"] = tr("Whosale price");
+    fTranslation["f_totalsaleprice"] = tr("Total of retail price");
+    fTranslation["f_totalsaleprice2"] = tr("Total of whosale price");
 
     fColumnsVisible["oh.f_id as f_header"] = true;
     fColumnsVisible["concat(oh.f_prefix, oh.f_hallid) as f_number"] = true;
@@ -128,6 +142,10 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
     fColumnsVisible["cpb.f_taxcode as f_buyertaxcode"] = false;
     fColumnsVisible["og.f_discountfactor*100 as f_discountfactor"] = false;
     fColumnsVisible["sum(og.f_discountamount) as f_discamount"] = false;
+    fColumnsVisible["gg.f_saleprice"] = false;
+    fColumnsVisible["gg.f_saleprice2"] = false;
+    fColumnsVisible["sum(gg.f_saleprice*og.f_qty) as f_totalsaleprice"] = false;
+    fColumnsVisible["sum(gg.f_saleprice2*og.f_qty) as f_totalsaleprice2"] = false;
 
     restoreColumnsVisibility();
     fFilterWidget = new CR5SaleFromStoreFilter(fDBParams);

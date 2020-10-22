@@ -11,6 +11,7 @@
 #include "ce5goods.h"
 #include "c5storebarcode.h"
 #include "c5storedraftwriter.h"
+#include "calculator.h"
 #include <QMenu>
 #include <QHash>
 #include <QShortcut>
@@ -31,7 +32,7 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
     ui->leComplectationCode->setSelector(fDBParams, ui->leComplectationName, cache_goods, 1, 3);
     disconnect(ui->leComplectationName, SIGNAL(textChanged(QString)), this, SLOT(on_leComplectationName_textChanged(QString)));
     connect(ui->leComplectationName, SIGNAL(textChanged(QString)), this, SLOT(on_leComplectationName_textChanged(QString)));
-    ui->tblGoods->setColumnWidths(ui->tblGoods->columnCount(), 0, 0, 0, 0, 400, 80, 80, 80, 80);
+    ui->tblGoods->setColumnWidths(ui->tblGoods->columnCount(), 0, 0, 0, 0, 400, 80, 80, 80, 80, 300);
     ui->tblGoodsStore->setColumnWidths(7, 0, 0, 200, 70, 50, 50, 70);
     ui->btnNewPartner->setVisible(pr(dbParams.at(1), cp_t7_partners));
     ui->btnNewGoods->setVisible(pr(dbParams.at(1), cp_t6_goods));
@@ -54,6 +55,14 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
     fBasedOnSale = 0;
     connect(ui->leInvoiceNumber, SIGNAL(focusOut()), this, SLOT(checkInvoiceDuplicate()));
     QShortcut *f2 = new QShortcut(QKeySequence(Qt::Key_F2), this);
+    QShortcut *fplus = new QShortcut(QKeySequence(Qt::Key_Plus), this);
+    QShortcut *fminus = new QShortcut(QKeySequence(Qt::Key_Minus), this);
+    connect(fplus, &QShortcut::activated, [this]() {
+        on_btnAddGoods_clicked();
+    });
+    connect(fminus, &QShortcut::activated, [this]() {
+        on_btnRemoveGoods_clicked();
+    });
     connect(f2, &QShortcut::activated, [this](){
         ui->leScancode->setFocus();
     });
@@ -133,6 +142,7 @@ bool C5StoreDoc::openDoc(QString id)
         ui->tblGoods->setString(row, 6, dw.value(container_astoredraft, i, "f_unitname").toString());
         ui->tblGoods->lineEdit(row, 7)->setDouble(dw.value(container_astoredraft, i, "f_price").toDouble());
         ui->tblGoods->lineEdit(row, 8)->setDouble(dw.value(container_astoredraft, i, "f_total").toDouble());
+        ui->tblGoods->lineEdit(row, 9)->setText(dw.value(container_astoredraft, i, "f_comment").toString());
     }
     disconnect(ui->leComplectationName, SIGNAL(textChanged(QString)), this, SLOT(on_leComplectationName_textChanged(QString)));
     disconnect(ui->leComplectationQty, SIGNAL(textChanged(QString)), this, SLOT(on_leComplectationQty_textChanged(QString)));
@@ -235,6 +245,7 @@ void C5StoreDoc::setMode(C5StoreDoc::STORE_DOC sd)
         ui->leCashName->setVisible(false);
         ui->leCash->setVisible(false);
         ui->deCashDate->setVisible(false);
+        fToolBar->addAction(QIcon(":/goods_store.png"), tr("Output of service"), this, SLOT(outputOfSerice()));
         break;
     case DOC_TYPE_COMPLECTATION:
         ui->grComplectation->setVisible(true);
@@ -545,10 +556,11 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
                               ui->leComplectationQty->getDouble())) {
         err += db.fLastError + "<br>";
     }
+    //TODO: complectation store document
     if (fDocType == DOC_TYPE_COMPLECTATION) {
         if (!dw.writeAStoreDraft(fComplectationId, fInternalId, ui->leStoreInput->getInteger(), 1, ui->leComplectationCode->getInteger(),
                                  ui->leComplectationQty->getDouble(), ui->leTotal->getDouble() / ui->leComplectationQty->getDouble(), ui->leTotal->getDouble(),
-                                 ui->leReason->getInteger(), "", 1)) {
+                                 ui->leReason->getInteger(), "", 1, "")) {
             err += db.fLastError + "<br>";
         }
     }
@@ -570,7 +582,7 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
                     || fDocType == DOC_TYPE_STORE_MOVE) {
                 if (!dw.writeAStoreDraft(inid, fInternalId, ui->leStoreInput->getInteger(), 1, ui->tblGoods->getInteger(i, 3),
                                          ui->tblGoods->lineEdit(i, 5)->getDouble(), ui->tblGoods->lineEdit(i, 7)->getDouble(), ui->tblGoods->lineEdit(i, 8)->getDouble(),
-                                         ui->leReason->getInteger(), "", i)) {
+                                         ui->leReason->getInteger(), "", i, ui->tblGoods->lineEdit(i, 9)->text())) {
                     err += db.fLastError + "<br>";
                 }
                 if (fDocType == DOC_TYPE_STORE_INPUT) {
@@ -584,7 +596,7 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
         if (ui->leStoreOutput->getInteger() > 0) {
             if (!dw.writeAStoreDraft(outid, fInternalId, ui->leStoreOutput->getInteger(), -1, ui->tblGoods->getInteger(i, 3),
                                      ui->tblGoods->lineEdit(i, 5)->getDouble(), ui->tblGoods->lineEdit(i, 7)->getDouble(), ui->tblGoods->lineEdit(i, 8)->getDouble(),
-                                     ui->leReason->getInteger(), inid, i)){
+                                     ui->leReason->getInteger(), inid, i, ui->tblGoods->lineEdit(i, 9)->text())){
                 err += db.fLastError + "<br>";
             }
             ui->tblGoods->setString(i, 1, outid);
@@ -809,12 +821,20 @@ int C5StoreDoc::addGoodsRow()
     C5LineEdit *lqty = ui->tblGoods->createLineEdit(row, 5);
     lqty->setValidator(new QDoubleValidator(0, 1000000, 4));
     lqty->fDecimalPlaces = 4;
+    lqty->addEventKeys("+-*");
+    connect(lqty, SIGNAL(keyPressed(QChar)), this, SLOT(lineEditKeyPressed(QChar)));
     ui->tblGoods->setItem(row, 6, new QTableWidgetItem());
     C5LineEdit *lprice = ui->tblGoods->createLineEdit(row, 7);
     lprice->setValidator(new QDoubleValidator(0, 100000000, 3));
     lprice->fDecimalPlaces = 3;
+    lprice->addEventKeys("+-*");
+    connect(lprice, SIGNAL(keyPressed(QChar)), this, SLOT(lineEditKeyPressed(QChar)));
     C5LineEdit *ltotal = ui->tblGoods->createLineEdit(row, 8);
     ltotal->setValidator(new QDoubleValidator(0, 100000000, 2));
+    ltotal->addEventKeys("+-*");
+    connect(ltotal, SIGNAL(keyPressed(QChar)), this, SLOT(lineEditKeyPressed(QChar)));
+    ui->tblGoods->createLineEdit(row, 9);
+
     connect(lqty, SIGNAL(textEdited(QString)), this, SLOT(tblQtyChanged(QString)));
     connect(lprice, SIGNAL(textEdited(QString)), this, SLOT(tblPriceChanged(QString)));
     connect(ltotal, SIGNAL(textEdited(QString)), this, SLOT(tblTotalChanged(QString)));
@@ -1007,6 +1027,26 @@ void C5StoreDoc::updateCashDoc()
     delete doc;
 }
 
+void C5StoreDoc::lineEditKeyPressed(const QChar &key)
+{
+    switch (key.toLatin1()) {
+    case '+':
+        on_btnAddGoods_clicked();
+        break;
+    case '-':
+        on_btnRemoveGoods_clicked();
+        break;
+    case '*':
+        double v;
+        if (Calculator::get(fDBParams, v)) {
+            C5LineEdit *l = static_cast<C5LineEdit*>(sender());
+            l->setDouble(v);
+            l->textEdited(float_str(v, 2));
+        }
+        break;
+    }
+}
+
 void C5StoreDoc::newDoc()
 {
     fInternalId.clear();
@@ -1062,6 +1102,7 @@ void C5StoreDoc::getInput()
     ui->tblGoods->setString(row, 3, vals.at(1).toString());
     ui->tblGoods->setString(row, 4, vals.at(3).toString());
     ui->tblGoods->setString(row, 6, vals.at(4).toString());
+    ui->tblGoods->lineEdit(row, 7)->setPlaceholderText(float_str(vals.at(6).toDouble(), 2));
     ui->tblGoods->lineEdit(row, 5)->setFocus();
 }
 
@@ -1764,4 +1805,15 @@ void C5StoreDoc::on_btnEditGoods_clicked()
         ui->tblGoods->lineEdit(row, 5)->setFocus();
     }
     delete e;
+}
+
+void C5StoreDoc::on_btnCalculator_clicked()
+{
+    double v;
+    Calculator::get(fDBParams, v);
+}
+
+void C5StoreDoc::outputOfService()
+{
+    C5Database db(fDBParams);
 }

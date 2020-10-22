@@ -77,6 +77,8 @@ private slots:
 
     void on_chUncomplectIfZero_clicked(bool checked);
 
+    void on_btnPinLast_clicked(bool checked);
+
 private:
     Ui::CE5Goods *ui;
 

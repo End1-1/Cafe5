@@ -59,6 +59,8 @@ private slots:
 
     void on_leDishComment_returnPressed();
 
+    void on_btnDivQty_clicked();
+
 private:
     Ui::C5DishWidget *ui;
 

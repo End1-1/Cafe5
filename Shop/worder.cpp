@@ -46,9 +46,9 @@ WOrder::WOrder(int saleType, QWidget *parent) :
     ui->leDisc->setVisible(false);
     ui->lbCustomer->setVisible(false);
     ui->leCustomer->setVisible(false);
-    ui->leCard->setValidator(new QDoubleValidator(0, 1000000000,2 ));
-    ui->leCash->setValidator(new QDoubleValidator(0, 1000000000,2 ));
-    ui->leChange->setValidator(new QDoubleValidator(0, 1000000000,2 ));
+    ui->leCard->setValidator(new QDoubleValidator(0, 1000000000, 2));
+    ui->leCash->setValidator(new QDoubleValidator(0, 1000000000, 2));
+    ui->leChange->setValidator(new QDoubleValidator(0, 1000000000, 2));
     ui->lbPartner->setVisible(false);
     ui->lePartner->setVisible(false);
     ui->chDebt->setVisible(false);

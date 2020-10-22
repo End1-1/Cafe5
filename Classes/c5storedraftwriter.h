@@ -47,7 +47,7 @@ public:
 
     bool writeAHeader2ShopStore(const QString &id, int store, int accept);
 
-    bool writeAStoreDraft(QString &id, const QString &docId, int store, int type, int goods, double qty, double price, double total, int reason, const QString &baseid, int rownum);
+    bool writeAStoreDraft(QString &id, const QString &docId, int store, int type, int goods, double qty, double price, double total, int reason, const QString &baseid, int rownum, const QString &comment);
 
     bool writeAStoreInventory(QString &id, const QString &docId, int store, int goods, double qty, double price, double total);
 

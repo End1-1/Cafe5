@@ -68,21 +68,51 @@ int C5LineEdit::color()
     return fColor;
 }
 
+void C5LineEdit::addEventKeys(const QString &keys)
+{
+    fEventKeys.append(keys);
+}
+
 void C5LineEdit::keyPressEvent(QKeyEvent *e)
 {
     const QValidator *v = validator();
     if (v) {
         if (!strcmp(v->metaObject()->className(), "QDoubleValidator")) {
+            const QDoubleValidator *dv = static_cast<const QDoubleValidator*>(v);
             switch (e->key()) {
+            case 43:
+                //e->accept();
+                //e->ignore();
+                //break;
+                return;
+            case 45:
+                if (dv->bottom() > 0.0000001) {
+                    return;
+                }
+                break;
             case 46:
             case 44:
             case 8228:
                 e = new QKeyEvent (QEvent::KeyRelease,Qt::Key_A,Qt::NoModifier, QLocale().decimalPoint());
                 break;
+            case 16777219:
+                //backspace ;)
+                break;
             }
         }
     }
+    //qDebug() << e->key();
     QLineEdit::keyPressEvent(e);
+}
+
+void C5LineEdit::keyReleaseEvent(QKeyEvent *event)
+{
+    QLineEdit::keyReleaseEvent(event);
+    if (!fEventKeys.isEmpty()) {
+        if (fEventKeys.contains(QChar(event->key()))) {
+            keyPressed(QChar(event->key()));
+        }
+    }
 }
 
 void C5LineEdit::focusOutEvent(QFocusEvent *event)

@@ -364,6 +364,22 @@ bool C5Config::waiterLoginAfterPayment()
     return getValue(param_waiter_login_after_payment).toInt() == 1;
 }
 
+int C5Config::shopPrintVersion()
+{
+    /*
+     * 0 - no print
+     * 1 - v1
+     * 2 - v2
+     */
+    if (getValue(param_shop_print_v1).toInt() == 1) {
+        return 1;
+    } else if (getValue(param_shop_print_v2).toInt() == 1) {
+        return 2;
+    } else {
+        return 0;
+    }
+}
+
 QString C5Config::getValue(int key)
 {
     QMutexLocker ml(&settingsMutex);
