@@ -30,6 +30,8 @@ public:
 
     virtual bool save(QString &err, QList<QMap<QString, QVariant> > &data);
 
+    bool event(QEvent *e) override;
+
 private slots:
     void complextQtyChanged(const QString &arg);
 
@@ -61,10 +63,16 @@ private slots:
 
     void on_btnDivQty_clicked();
 
+    void on_btnCopy_clicked();
+
+    void on_btnPasteRecipt_clicked();
+
 private:
     Ui::C5DishWidget *ui;
 
     void countTotalSelfCost();
+
+    int addRecipeRow();
 };
 
 #endif // C5DISHWIDGET_H

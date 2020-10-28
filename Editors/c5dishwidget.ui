@@ -23,7 +23,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -378,6 +378,9 @@
                <property name="focusPolicy">
                 <enum>Qt::NoFocus</enum>
                </property>
+               <property name="toolTip">
+                <string>Add goods (+)</string>
+               </property>
                <property name="text">
                 <string/>
                </property>
@@ -391,6 +394,9 @@
               <widget class="QPushButton" name="btnNewGoods">
                <property name="focusPolicy">
                 <enum>Qt::NoFocus</enum>
+               </property>
+               <property name="toolTip">
+                <string>New goods (Control + N)</string>
                </property>
                <property name="text">
                 <string/>
@@ -406,6 +412,9 @@
                <property name="focusPolicy">
                 <enum>Qt::NoFocus</enum>
                </property>
+               <property name="toolTip">
+                <string>Remove selected row (-)</string>
+               </property>
                <property name="text">
                 <string/>
                </property>
@@ -416,9 +425,46 @@
               </widget>
              </item>
              <item>
+              <widget class="QPushButton" name="btnCopy">
+               <property name="focusPolicy">
+                <enum>Qt::NoFocus</enum>
+               </property>
+               <property name="toolTip">
+                <string>Copy recipe (Control + C)</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="../resources/res.qrc">
+                 <normaloff>:/copy.png</normaloff>:/copy.png</iconset>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btnPasteRecipt">
+               <property name="focusPolicy">
+                <enum>Qt::NoFocus</enum>
+               </property>
+               <property name="toolTip">
+                <string>Paste recipe (Control + P)</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="../resources/res.qrc">
+                 <normaloff>:/paste.png</normaloff>:/paste.png</iconset>
+               </property>
+              </widget>
+             </item>
+             <item>
               <widget class="QPushButton" name="btnPrintRecipe">
                <property name="focusPolicy">
                 <enum>Qt::NoFocus</enum>
+               </property>
+               <property name="toolTip">
+                <string>Print receipe (Control + P)</string>
                </property>
                <property name="text">
                 <string/>
@@ -489,6 +535,38 @@
                 </size>
                </property>
               </spacer>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_9">
+               <property name="text">
+                <string>One portion qty</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="C5LineEditWithSelector" name="lePortionQty">
+               <property name="enabled">
+                <bool>true</bool>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>100</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="focusPolicy">
+                <enum>Qt::ClickFocus</enum>
+               </property>
+               <property name="readOnly">
+                <bool>false</bool>
+               </property>
+               <property name="Field" stdset="0">
+                <string>f_recipeqty</string>
+               </property>
+               <property name="Type" stdset="0">
+                <number>2</number>
+               </property>
+              </widget>
              </item>
              <item>
               <widget class="QLabel" name="label_8">

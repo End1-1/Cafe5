@@ -40,6 +40,8 @@ public:
 
     void setComment(const QString comment);
 
+    void setFlag(const QString &name, const QVariant &value);
+
     virtual QToolBar *toolBar() override;
 
     bool writeDocument(int state, QString &err);
@@ -79,6 +81,8 @@ private:
 
     TableCell *fGroupTableCell;
 
+    QMap<QString, QVariant> fFlags;
+
     QMap<int, double> fBaseQtyOfComplectation;
 
     bool fGroupTableCellMove;
@@ -100,6 +104,8 @@ private:
     void writeDocumentWithState(int state);
 
     int addGoodsRow();
+
+    void addGoods(int goods, const QString &name, double qty, const QString &unit, double price, double total, const QString &comment);
 
     void setDocEnabled(bool v);
 
@@ -191,6 +197,8 @@ private slots:
     void on_btnEditGoods_clicked();
 
     void on_btnCalculator_clicked();
+
+    void inputOfService();
 
     void outputOfService();
 };

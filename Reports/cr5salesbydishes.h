@@ -16,6 +16,9 @@ public:
 
 protected:
     virtual bool tblDoubleClicked(int row, int column, const QList<QVariant> &v);
+
+private slots:
+    void actionShowDish();
 };
 
 #endif // CR5SALESBYDISHES_H

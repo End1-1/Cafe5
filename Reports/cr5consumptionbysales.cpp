@@ -542,7 +542,7 @@ C5StoreDoc *CR5ConsumptionBySales::writeDocs(int doctype, int reason, const QLis
         dw.writeAStoreDraft(sdid, documentId, store, sdtype, g.goodsId, g.goodsQty, g.goodsPrice, g.goodsPrice * g.goodsQty, reason, "", rownum++, "");
     }
     //= dw.writeDraft(docDate, doctype, store, reason, data, comment);
-    C5StoreDoc *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);
+    auto *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);
     if (!sd->openDoc(documentId)) {
         __mainWindow->removeTab(sd);
         sd = nullptr;

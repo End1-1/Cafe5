@@ -7,6 +7,7 @@
 #include "c5printpreview.h"
 #include "c5editor.h"
 #include "c5mainwindow.h"
+#include "c5daterange.h"
 #include "ce5partner.h"
 #include "ce5goods.h"
 #include "c5storebarcode.h"
@@ -233,6 +234,8 @@ void C5StoreDoc::setMode(C5StoreDoc::STORE_DOC sd)
         ui->lePayment->setVisible(paymentVisible && true);
         ui->lePaymentName->setVisible(paymentVisible && true);
         ui->chPaid->setVisible(paymentVisible && true);
+        fToolBar->addAction(QIcon(":/goods_store.png"), tr("Input of service"), this, SLOT(inputOfService()));
+        fToolBar->addAction(QIcon(":/goods_store.png"), tr("Output of service"), this, SLOT(outputOfService()));
         break;
     case DOC_TYPE_STORE_MOVE:
         ui->lbCashDoc->setVisible(false);
@@ -245,7 +248,6 @@ void C5StoreDoc::setMode(C5StoreDoc::STORE_DOC sd)
         ui->leCashName->setVisible(false);
         ui->leCash->setVisible(false);
         ui->deCashDate->setVisible(false);
-        fToolBar->addAction(QIcon(":/goods_store.png"), tr("Output of service"), this, SLOT(outputOfSerice()));
         break;
     case DOC_TYPE_COMPLECTATION:
         ui->grComplectation->setVisible(true);
@@ -337,6 +339,11 @@ void C5StoreDoc::setReason(int reason)
 void C5StoreDoc::setComment(const QString comment)
 {
     ui->leComment->setText(comment);
+}
+
+void C5StoreDoc::setFlag(const QString &name, const QVariant &value)
+{
+    fFlags[name] = value;
 }
 
 QToolBar *C5StoreDoc::toolBar()
@@ -804,6 +811,14 @@ void C5StoreDoc::writeDocumentWithState(int state)
     writeDocument(state, err);
     if (err.isEmpty()) {
         C5Message::info(tr("Saved"));
+        if (fFlags.contains("outputservice")) {
+            C5Database db(fDBParams);
+            for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+                QString goodsid = ui->tblGoods->lineEdit(i, 9)->text().right(36);
+                db[":f_storerec"] = ui->tblGoods->getString(i, 1);
+                db.update("o_goods", "f_id", goodsid);
+            }
+        }
     } else {
         C5Message::error(err);
     }
@@ -839,6 +854,18 @@ int C5StoreDoc::addGoodsRow()
     connect(lprice, SIGNAL(textEdited(QString)), this, SLOT(tblPriceChanged(QString)));
     connect(ltotal, SIGNAL(textEdited(QString)), this, SLOT(tblTotalChanged(QString)));
     return row;
+}
+
+void C5StoreDoc::addGoods(int goods, const QString &name, double qty, const QString &unit, double price, double total, const QString &comment)
+{
+    int row = addGoodsRow();
+    ui->tblGoods->setData(row, 3, goods);
+    ui->tblGoods->setData(row, 4, name);
+    ui->tblGoods->setData(row, 6, unit);
+    ui->tblGoods->lineEdit(row, 5)->setDouble(qty);
+    ui->tblGoods->lineEdit(row, 7)->setDouble(price);
+    ui->tblGoods->lineEdit(row, 8)->setDouble(total);
+    ui->tblGoods->lineEdit(row, 9)->setText(comment);
 }
 
 void C5StoreDoc::setDocEnabled(bool v)
@@ -1813,7 +1840,56 @@ void C5StoreDoc::on_btnCalculator_clicked()
     Calculator::get(fDBParams, v);
 }
 
+void C5StoreDoc::inputOfService()
+{
+    if (ui->leStoreInput->getInteger() == 0) {
+        C5Message::error(tr("Store must be defined"));
+        return;
+    }
+    QDate d1, d2;
+    if (!C5DateRange::dateRange(d1, d2)) {
+        return;
+    }
+    C5Database db(fDBParams);
+    db[":date1"] = d1;
+    db[":date2"] = d2;
+    db[":f_store"] = ui->leStoreInput->getInteger();
+    db.exec("select og.f_id, oh.f_prefix, oh.f_hallid, oh.f_datecash, g.f_name, g.f_scancode, og.f_qty, "
+            "u.f_name as f_unitname, og.f_goods "
+            "from o_goods og "
+            "inner join o_header oh on oh.f_id=og.f_header "
+            "inner join c_goods g on g.f_id=og.f_goods "
+            "inner join c_units u on u.f_id=g.f_unit "
+            "where oh.f_datecash between :date1 and :date2 "
+            "and og.f_store=:f_store and og.f_storerec is null ");
+    while (db.nextRow()) {
+        int row = addGoodsRow();
+        ui->tblGoods->setData(row, 3, db.getInt("f_goods"));
+        ui->tblGoods->setData(row, 4, db.getString("f_name") + " " + db.getString("f_scancode"));
+        ui->tblGoods->setData(row, 6, db.getString("f_unitname"));
+        ui->tblGoods->lineEdit(row, 5)->setDouble(db.getDouble("f_qty"));
+        ui->tblGoods->lineEdit(row, 9)->setText(QString("%1, %2%3, %4").arg(db.getDate("f_datecash").toString(FORMAT_DATE_TO_STR)).arg(db.getString("f_prefix")).arg(db.getInt("f_hallid")).arg(db.getString("f_id")));
+    }
+}
+
 void C5StoreDoc::outputOfService()
 {
-    C5Database db(fDBParams);
+    if (fDocState != DOC_STATE_SAVED) {
+        C5Message::error(tr("Document must be saved"));
+        return;
+    }
+    auto *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);
+    sd->setMode(sdOutput);
+    sd->setStore(0, ui->leStoreInput->getInteger());
+    sd->setReason(DOC_REASON_SALE);
+    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+        sd->addGoods(ui->tblGoods->getInteger(i, 3),
+                     ui->tblGoods->getString(i, 4),
+                     ui->tblGoods->lineEdit(i, 5)->getDouble(),
+                     ui->tblGoods->getString(i, 6),
+                     ui->tblGoods->lineEdit(i, 7)->getDouble(),
+                     ui->tblGoods->lineEdit(i, 8)->getDouble(),
+                     ui->tblGoods->lineEdit(i, 9)->text());
+    }
+    sd->setFlag("outputservice", 1);
 }

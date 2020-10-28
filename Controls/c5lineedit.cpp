@@ -107,12 +107,13 @@ void C5LineEdit::keyPressEvent(QKeyEvent *e)
 
 void C5LineEdit::keyReleaseEvent(QKeyEvent *event)
 {
-    QLineEdit::keyReleaseEvent(event);
     if (!fEventKeys.isEmpty()) {
         if (fEventKeys.contains(QChar(event->key()))) {
             keyPressed(QChar(event->key()));
+            event->ignore();
         }
     }
+    QLineEdit::keyReleaseEvent(event);
 }
 
 void C5LineEdit::focusOutEvent(QFocusEvent *event)

@@ -4,6 +4,8 @@
 #include "c5tablemodel.h"
 #include "c5mainwindow.h"
 #include "c5message.h"
+#include "ce5editor.h"
+#include "c5dishwidget.h"
 
 CR5SalesByDishes::CR5SalesByDishes(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
@@ -34,6 +36,7 @@ CR5SalesByDishes::CR5SalesByDishes(const QStringList &dbParams, QWidget *parent)
                    << "bs.f_name as f_dishstate"
                    << "dpd.f_name as f_dishdept"
                    << "dp.f_name as f_dishpart"
+                   << "d.f_id as f_dishid"
                    << "d.f_name as f_dishname"
                    << "cst.f_name as f_storename"
                    << "ob.f_removereason"
@@ -50,6 +53,7 @@ CR5SalesByDishes::CR5SalesByDishes(const QStringList &dbParams, QWidget *parent)
                   << "oh.f_timeclose"
                   << "dpd.f_name as f_dishdept"
                   << "dp.f_name as f_dishpart"
+                  << "d.f_id as f_dishid"
                   << "d.f_name as f_dishname"
                   << "bs.f_name as f_dishstate"
                   << "ob.f_removereason"
@@ -72,6 +76,7 @@ CR5SalesByDishes::CR5SalesByDishes(const QStringList &dbParams, QWidget *parent)
     fTranslation["f_timeclose"] = tr("Time, close");
     fTranslation["f_dishdept"] = tr("Dept");
     fTranslation["f_dishpart"] = tr("Type of dish");
+    fTranslation["f_dishid"] = tr("Dish code");
     fTranslation["f_dishname"] = tr("Dish");
     fTranslation["f_dishstate"] = tr("Dish state");
     fTranslation["f_removereason"] = tr("Remove reason");
@@ -88,6 +93,7 @@ CR5SalesByDishes::CR5SalesByDishes(const QStringList &dbParams, QWidget *parent)
     fColumnsVisible["t.f_name as f_tablename"] = true;
     fColumnsVisible["dpd.f_name as f_dishdept"] = true;
     fColumnsVisible["dp.f_name as f_dishpart"] = true;
+    fColumnsVisible["d.f_id as f_dishid"] = false;
     fColumnsVisible["d.f_name as f_dishname"] = true;
     fColumnsVisible["bs.f_name as f_dishstate"] = true;
     fColumnsVisible["ob.f_removereason"] = true;
@@ -110,6 +116,7 @@ QToolBar *CR5SalesByDishes::toolBar()
             << ToolBarButtons::tbExcel
             << ToolBarButtons::tbPrint;
         fToolBar = createStandartToolbar(btn);
+        fToolBar->addAction(QIcon(":/menu.png"), tr("Dish"), this, SLOT(actionShowDish()));
     }
     return fToolBar;
 }
@@ -136,4 +143,21 @@ bool CR5SalesByDishes::tblDoubleClicked(int row, int column, const QList<QVarian
     C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>(fDBParams);
     wo->setOrder(v.at(fModel->fColumnNameIndex["f_id"]).toString());
     return true;
+}
+
+void CR5SalesByDishes::actionShowDish()
+{
+    if (!fColumnsVisible["d.f_id as f_dishid"]) {
+        C5Message::info(tr("Column 'Dish code' must be checked in filter"));
+        return;
+    }
+    int r;
+    if (!currentRow(r)) {
+        return;
+    }
+    C5DishWidget *ep = new C5DishWidget(fDBParams);
+    C5Editor *e = C5Editor::createEditor(fDBParams, ep, fModel->data(r, fModel->fColumnNameIndex["f_dishid"], Qt::EditRole).toInt());
+    QList<QMap<QString, QVariant> > data;
+    e->getResult(data);
+    delete e;
 }

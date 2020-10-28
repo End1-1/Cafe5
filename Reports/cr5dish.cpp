@@ -8,7 +8,7 @@
 CR5Dish::CR5Dish(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
 {
-    fIcon = ":/users_groups.png";
+    fIcon = ":/menu.png";
     fLabel = tr("Dishes");
 
     fSqlQuery = "select d.f_id, p1.f_name as f_part1, p2.f_name as f_part2, d.f_name, \
