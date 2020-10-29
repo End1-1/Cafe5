@@ -126,6 +126,8 @@ private:
 private slots:
     void lineEditKeyPressed(const QChar &key);
 
+    void focusNextChildren();
+
     void newDoc();
 
     void getInput();

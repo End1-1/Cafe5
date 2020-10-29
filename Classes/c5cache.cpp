@@ -28,7 +28,8 @@ C5Cache::C5Cache(const QStringList &dbParams) :
                                            g.f_scancode as `%5`, g.f_lastinputprice as `%6` \
                                            from c_goods g \
                                            left join c_groups gg on gg.f_id=g.f_group \
-                                           left join c_units as u on u.f_id=g.f_unit")
+                                           left join c_units as u on u.f_id=g.f_unit \
+                                           order by g.f_name ")
                 .arg(tr("Code"))
                 .arg(tr("Group"))
                 .arg(tr("Name"))

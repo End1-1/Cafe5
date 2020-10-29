@@ -98,6 +98,12 @@ void C5LineEdit::keyPressEvent(QKeyEvent *e)
             case 16777219:
                 //backspace ;)
                 break;
+            case 16777220:
+            case 16777221:
+                if (isEmpty()) {
+                    emit returnPressed();
+                }
+                break;
             }
         }
     }

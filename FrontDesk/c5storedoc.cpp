@@ -495,7 +495,7 @@ bool C5StoreDoc::eventFilter(QObject *o, QEvent *e)
 void C5StoreDoc::nextChild()
 {
     if (fCanChangeFocus) {
-        focusNextChild();
+       // focusNextChild();
     } else {
         fCanChangeFocus = true;
     }
@@ -838,16 +838,19 @@ int C5StoreDoc::addGoodsRow()
     lqty->fDecimalPlaces = 4;
     lqty->addEventKeys("+-*");
     connect(lqty, SIGNAL(keyPressed(QChar)), this, SLOT(lineEditKeyPressed(QChar)));
+    connect(lqty, SIGNAL(returnPressed()), this, SLOT(focusNextChildren()));
     ui->tblGoods->setItem(row, 6, new QTableWidgetItem());
     C5LineEdit *lprice = ui->tblGoods->createLineEdit(row, 7);
     lprice->setValidator(new QDoubleValidator(0, 100000000, 3));
     lprice->fDecimalPlaces = 3;
     lprice->addEventKeys("+-*");
     connect(lprice, SIGNAL(keyPressed(QChar)), this, SLOT(lineEditKeyPressed(QChar)));
+    connect(lprice, SIGNAL(returnPressed()), this, SLOT(focusNextChildren()));
     C5LineEdit *ltotal = ui->tblGoods->createLineEdit(row, 8);
     ltotal->setValidator(new QDoubleValidator(0, 100000000, 2));
     ltotal->addEventKeys("+-*");
     connect(ltotal, SIGNAL(keyPressed(QChar)), this, SLOT(lineEditKeyPressed(QChar)));
+    connect(ltotal, SIGNAL(returnPressed()), this, SLOT(focusNextChildren()));
     ui->tblGoods->createLineEdit(row, 9);
 
     connect(lqty, SIGNAL(textEdited(QString)), this, SLOT(tblQtyChanged(QString)));
@@ -1072,6 +1075,11 @@ void C5StoreDoc::lineEditKeyPressed(const QChar &key)
         }
         break;
     }
+}
+
+void C5StoreDoc::focusNextChildren()
+{
+    focusNextChild();
 }
 
 void C5StoreDoc::newDoc()
