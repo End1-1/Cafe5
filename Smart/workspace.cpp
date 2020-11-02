@@ -84,7 +84,8 @@ bool Workspace::login()
         }        
     }
     db[":f_menu"] = C5Config::defaultMenu();
-    db.exec("SELECT d.f_id, d.f_part, d.f_name,  m.f_print1, m.f_store, m.f_price, p2.f_adgcode, d.f_color \
+    db.exec("SELECT d.f_id, d.f_part, d.f_name,  m.f_print1, m.f_store, m.f_price, p2.f_adgcode, d.f_color, \
+            d.f_netweight, d.f_cost \
             FROM d_menu m \
             left join d_dish d on d.f_id=m.f_dish \
             left join d_part2 p2 on p2.f_id=d.f_part \
@@ -112,6 +113,13 @@ bool Workspace::login()
     stretchTableColumns(ui->tblOrder);
     stretchTableColumns(ui->tblPart2);
     return true;
+}
+
+void Workspace::reject()
+{
+    if (C5Message::question(tr("Confirm to close application"))) {
+        C5Dialog::reject();
+    }
 }
 
 void Workspace::setQty()

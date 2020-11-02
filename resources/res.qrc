@@ -95,5 +95,6 @@
         <file>star-passive.png</file>
         <file>backspace.png</file>
         <file>goods_store.png</file>
+        <file>minus.png</file>
     </qresource>
 </RCC>

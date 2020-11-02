@@ -34,5 +34,11 @@ QString CR5SalesByDishesFilter::condition()
     if (!ui->leStore->isEmpty()) {
         result += QString(" and ob.f_store in (%1) ").arg(ui->leStore->text());
     }
+    if (ui->rbNoRecipt->isChecked()) {
+        result += QString(" and d.f_netweight<0.0001 ");
+    }
+    if (ui->rbWithRecipe->isChecked()) {
+        result += QString(" and d.f_netweight>0.0001 ");
+    }
     return result;
 }

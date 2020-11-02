@@ -46,5 +46,6 @@
         <file>bill.png</file>
         <file>alarm-clock.png</file>
         <file>weight.png</file>
+        <file>minus.png</file>
     </qresource>
 </RCC>

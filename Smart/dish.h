@@ -13,6 +13,8 @@ struct Dish {
     int store;
     double price;
     double qty;
+    double netWeight;
+    double cost;
     int color;
     Dish() {
         id = 0;

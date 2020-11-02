@@ -623,7 +623,7 @@ void C5DishWidget::on_leDishComment_returnPressed()
 void C5DishWidget::on_btnDivQty_clicked()
 {
     bool ok;
-    double d = QInputDialog::getDouble(this, tr("Divider"), "", 0, 0, 99999, 3, &ok);
+    double d = QInputDialog::getDouble(this, tr("Divider"), "", ui->lePortionQty->getDouble(), 0, 99999, 3, &ok);
     if (!ok) {
         return;
     }
@@ -670,4 +670,20 @@ void C5DishWidget::on_btnPasteRecipt_clicked()
         ui->tblRecipe->setString(r, 9, c.at(8));
     }
     countTotalSelfCost();
+}
+
+void C5DishWidget::on_btnMultRecipe_clicked()
+{
+    bool mult = !ui->btnMultRecipe->property("mult").toBool();
+    ui->btnMultRecipe->setProperty("mult", mult);
+    for (int i = 0; i < ui->tblRecipe->rowCount(); i++) {
+        if (mult) {
+            ui->tblRecipe->lineEdit(i, 3)->setDouble(ui->tblRecipe->lineEdit(i, 3)->getDouble() * ui->lePortionQty->getDouble());
+        } else {
+            if (ui->lePortionQty->getDouble() > 0.00001) {
+                ui->tblRecipe->lineEdit(i, 3)->setDouble(ui->tblRecipe->lineEdit(i, 3)->getDouble() / ui->lePortionQty->getDouble());
+            }
+        }
+        ui->tblRecipe->lineEdit(i, 3)->textEdited(ui->tblRecipe->lineEdit(i, 3)->text());
+    }
 }

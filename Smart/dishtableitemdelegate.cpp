@@ -2,9 +2,13 @@
 #include "dish.h"
 #include <QPainter>
 
+static QPixmap *minusPixmap = nullptr;
+
 DishTableItemDelegate::DishTableItemDelegate()
 {
-
+    if (minusPixmap == nullptr) {
+        minusPixmap = new QPixmap(":/minus.png");
+    }
 }
 
 
@@ -39,5 +43,9 @@ void DishTableItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
     QString price = QString::number(d->price, 'f', 0);
     rPrice.adjust(rPrice.width() - fm.width(price) - 2, rPrice.height() - fm.height() - 2, -2, -2);
     painter->drawText(rPrice, price);
+
+    if (d->netWeight < 0.00001) {
+        painter->drawPixmap(option.rect.right() - 22, option.rect.top() + 2, 20, 20, *minusPixmap);
+    }
     painter->restore();
 }

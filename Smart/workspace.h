@@ -23,6 +23,8 @@ public:
 
     bool login();
 
+    virtual void reject() override;
+
 private slots:
     void setQty();
 

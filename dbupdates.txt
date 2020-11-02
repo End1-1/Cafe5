@@ -489,3 +489,9 @@ update s_app set f_version ='31' where f_app='DB';
 ALTER TABLE `b_history` CHANGE COLUMN `f_value` `f_value` DECIMAL(14,3) NULL DEFAULT NULL ;
 alter table d_dish add f_recipeqty decimal(14,2);
 alter table a_store_draft add column f_comment tinytext;
+
+/* db - 31 */
+update s_app set f_version ='32' where f_app='DB';
+alter table d_dish add column f_netweight decimal(14,5);
+alter table d_dish add column f_cost decimal(14,2);
+update d_dish  d set f_netweight= (select sum(f_qty) from d_recipes r where r.f_dish=d.f_id) , f_cost = (select sum(r.f_qty*g.f_lastinputprice) from d_recipes r inner join c_goods g on g.f_id=r.f_goods where r.f_goods=d.f_id);

@@ -67,6 +67,8 @@ private slots:
 
     void on_btnPasteRecipt_clicked();
 
+    void on_btnMultRecipe_clicked();
+
 private:
     Ui::C5DishWidget *ui;
 

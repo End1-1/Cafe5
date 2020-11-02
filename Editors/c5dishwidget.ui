@@ -544,6 +544,26 @@
               </widget>
              </item>
              <item>
+              <widget class="QPushButton" name="btnMultRecipe">
+               <property name="focusPolicy">
+                <enum>Qt::NoFocus</enum>
+               </property>
+               <property name="toolTip">
+                <string>Multiple recipe quantity</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="../resources/res.qrc">
+                 <normaloff>:/order.png</normaloff>:/order.png</iconset>
+               </property>
+               <property name="mult" stdset="0">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
               <widget class="C5LineEditWithSelector" name="lePortionQty">
                <property name="enabled">
                 <bool>true</bool>
@@ -576,7 +596,7 @@
               </widget>
              </item>
              <item>
-              <widget class="C5LineEdit" name="leWeight">
+              <widget class="C5LineEditWithSelector" name="leWeight">
                <property name="enabled">
                 <bool>true</bool>
                </property>
@@ -591,6 +611,12 @@
                </property>
                <property name="readOnly">
                 <bool>true</bool>
+               </property>
+               <property name="Field" stdset="0">
+                <string>f_netweight</string>
+               </property>
+               <property name="Type" stdset="0">
+                <number>2</number>
                </property>
               </widget>
              </item>
@@ -602,7 +628,7 @@
               </widget>
              </item>
              <item>
-              <widget class="C5LineEdit" name="leTotal">
+              <widget class="C5LineEditWithSelector" name="leTotal">
                <property name="enabled">
                 <bool>true</bool>
                </property>
@@ -617,6 +643,12 @@
                </property>
                <property name="readOnly">
                 <bool>true</bool>
+               </property>
+               <property name="Field" stdset="0">
+                <string>f_cost</string>
+               </property>
+               <property name="Type" stdset="0">
+                <number>2</number>
                </property>
               </widget>
              </item>
@@ -923,11 +955,6 @@
   </layout>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>C5LineEdit</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5lineedit.h</header>
-  </customwidget>
   <customwidget>
    <class>C5TableWidget</class>
    <extends>QTableWidget</extends>
