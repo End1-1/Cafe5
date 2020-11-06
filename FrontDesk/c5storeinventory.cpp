@@ -4,7 +4,10 @@
 #include "c5cache.h"
 #include "c5printing.h"
 #include "c5printpreview.h"
+#include "ce5goods.h"
+#include "ce5editor.h"
 #include "c5storedraftwriter.h"
+#include <QKeyEvent>
 
 C5StoreInventory::C5StoreInventory(const QStringList &dbParams, QWidget *parent) :
     C5Widget(dbParams, parent),
@@ -15,6 +18,11 @@ C5StoreInventory::C5StoreInventory(const QStringList &dbParams, QWidget *parent)
     fLabel = tr("Store inventory");
     ui->leStore->setSelector(fDBParams, ui->leStoreName, cache_goods_store);
     ui->tblGoods->setColumnWidths(7, 0, 0, 300, 80, 80, 80, 80);
+    installEventFilter(this);
+    ui->tblGoods->installEventFilter(this);
+    ui->tblGoods->viewport()->installEventFilter(this);
+    ui->leStore->addEventKeys("+-");
+    connect(ui->leStore, SIGNAL(keyPressed(QChar)), this, SLOT(keyPressed(QChar)));
 }
 
 C5StoreInventory::~C5StoreInventory()
@@ -79,6 +87,34 @@ bool C5StoreInventory::removeDoc(const QStringList &dbParams, QString id)
 bool C5StoreInventory::allowChangeDatabase()
 {
     return false;
+}
+
+bool C5StoreInventory::event(QEvent *e)
+{
+    if (e->type() == QEvent::KeyPress) {
+        QKeyEvent *ke = static_cast<QKeyEvent*>(e);
+        switch (ke->key()) {
+        case Qt::Key_Plus:
+            keyPressed('+');
+            break;
+        case Qt::Key_Minus:
+            keyPressed('-');
+            break;
+        }
+    }
+    return C5Widget::event(e);
+}
+
+void C5StoreInventory::keyPressed(const QChar &c)
+{
+    switch (c.toLatin1()) {
+    case '+':
+        on_btnAddGoods_clicked();
+        break;
+    case '-':
+        on_btnRemoveGoods_clicked();
+        break;
+    }
 }
 
 void C5StoreInventory::saveDoc()
@@ -254,6 +290,12 @@ int C5StoreInventory::addGoodsRow()
     connect(lqty, SIGNAL(textChanged(QString)), this, SLOT(tblQtyChanged(QString)));
     connect(lprice, SIGNAL(textChanged(QString)), this, SLOT(tblPriceChanged(QString)));
     connect(ltotal, SIGNAL(textChanged(QString)), this, SLOT(tblTotalChanged(QString)));
+    lqty->addEventKeys("+-");
+    lprice->addEventKeys("+-");
+    ltotal->addEventKeys("+-");
+    connect(lqty, SIGNAL(keyPressed(QChar)), this, SLOT(keyPressed(QChar)));
+    connect(lprice, SIGNAL(keyPressed(QChar)), this, SLOT(keyPressed(QChar)));
+    connect(ltotal, SIGNAL(keyPressed(QChar)), this, SLOT(keyPressed(QChar)));
     return row;
 }
 
@@ -337,4 +379,23 @@ void C5StoreInventory::tblTotalChanged(const QString &arg1)
         lprice->setDouble(ltotal->getDouble() / lqty->getDouble());
     }
     countTotal();
+}
+
+void C5StoreInventory::on_btnNew_clicked()
+{
+    CE5Goods *ep = new CE5Goods(fDBParams);
+    C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
+    QList<QMap<QString, QVariant> > data;
+    if(e->getResult(data)) {
+        if (data.at(0)["f_id"].toInt() == 0) {
+            C5Message::error(tr("Cannot add goods without code"));
+            return;
+        }
+        int row = addGoodsRow();
+        ui->tblGoods->setData(row, 1, data.at(0)["f_id"]);
+        ui->tblGoods->setData(row, 2, data.at(0)["f_name"].toString() + " " + data.at(0)["f_scancode"].toString());
+        ui->tblGoods->setData(row, 4, data.at(0)["f_unitname"]);
+        ui->tblGoods->lineEdit(row, 3)->setFocus();
+    }
+    delete e;
 }

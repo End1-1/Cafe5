@@ -18,6 +18,8 @@ public:
 
     static bool getDate(QDate &d);
 
+    static bool getDate2(QDate &d1, QDate &d2);
+
 private slots:
     void on_btnCancel_clicked();
 

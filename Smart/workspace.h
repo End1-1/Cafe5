@@ -54,6 +54,8 @@ private slots:
 
     void on_btnPrintReport_clicked();
 
+    void on_btnPrintReport2_clicked();
+
 private:
     Ui::Workspace *ui;
 
@@ -70,6 +72,8 @@ private:
     void filter();
 
     void countTotal();
+
+    void printReport(const QDate &d1, const QDate &d2);
 
     void stretchTableColumns(QTableWidget *t);
 

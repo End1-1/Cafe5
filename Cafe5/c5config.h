@@ -209,9 +209,9 @@ public:
 
     static int shopPrintVersion();
 
-private:
     static QString getValue(int key);
 
+private:
     static QMap<int, QString> fSettings;
 };
 

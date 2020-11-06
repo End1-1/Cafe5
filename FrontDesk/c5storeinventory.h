@@ -24,7 +24,11 @@ public:
 
     virtual bool allowChangeDatabase();
 
+    virtual bool event(QEvent *e) override;
+
 private slots:
+    void keyPressed(const QChar &c);
+
     void saveDoc();
 
     void printDoc();
@@ -38,6 +42,8 @@ private slots:
     void tblPriceChanged(const QString &arg1);
 
     void tblTotalChanged(const QString &arg1);
+
+    void on_btnNew_clicked();
 
 private:
     Ui::C5StoreInventory *ui;

@@ -101,6 +101,8 @@ bool Workspace::login()
         d->store = db.getInt(4);
         d->adgCode = db.getString(6);
         d->color = db.getInt("f_color");
+        d->netWeight = db.getDouble("f_netweight");
+        d->cost = db.getDouble("f_cost");
         fDishes.append(d);
     }
     db[":f_id"] = C5Config::defaultTable();
@@ -201,6 +203,73 @@ void Workspace::countTotal()
     ui->leTotal->setDouble(total);
 }
 
+void Workspace::printReport(const QDate &d1, const QDate &d2)
+{
+    QFont font(qApp->font());
+    font.setPointSize(28);
+    C5Printing p;
+    p.setSceneParams(650, 2800, QPrinter::Portrait);
+    p.setFont(font);
+
+    if (QFile::exists("./logo_receipt.png")) {
+        p.image("./logo_receipt.png", Qt::AlignHCenter);
+        p.br();
+    }
+    p.setFontBold(true);
+    p.ctext(tr("End of day"));
+    p.br();
+    p.ctext(d1.toString(FORMAT_DATE_TO_STR));
+    p.br();
+    p.ctext("-");
+    p.br();
+    p.ctext(d2.toString(FORMAT_DATE_TO_STR));
+    p.br();
+    double total = 0;
+
+    C5Database dd(fDBParams);
+    dd[":f_datecash1"] = d1;
+    dd[":f_datecash2"] = d2;
+    dd[":f_stateh"] = ORDER_STATE_CLOSE;
+    dd[":f_stated"] = DISH_STATE_OK;
+    dd.exec("select d.f_name, sum(b.f_qty1) as f_qty, b.f_price, sum(b.f_qty1*b.f_price) as f_total "
+            "from o_body b "
+            "inner join o_header h on h.f_id=b.f_header "
+            "left join d_dish d on d.f_id=b.f_dish "
+            "where h.f_state=:f_stateh and b.f_state=:f_stated and h.f_datecash between :f_datecash1 and :f_datecash2 "
+            "group by 1, 3 ");
+    p.setFontBold(false);
+    p.setFontSize(22);
+    while (dd.nextRow()) {
+        if (p.checkBr(p.fLineHeight + 2)) {
+            p.br();
+        }
+        total += dd.getDouble("f_total");
+        p.ltext(dd.getString("f_name"), 0);
+        p.br();
+        p.ltext(QString("%1 X %2 = %3").arg(float_str(dd.getDouble("f_qty"), 2)).arg(dd.getDouble("f_price"), 2).arg(float_str(dd.getDouble("f_total"), 2)), 0);
+        p.br();
+        p.line();
+        p.br(2);
+    }
+    p.line(4);
+    p.br(3);
+    p.setFontBold(true);
+    p.setFontSize(28);
+    p.ltext(tr("Total today"), 0);
+    p.rtext(float_str(total, 2));
+    p.br();
+    p.br();
+
+    p.line();
+    p.br();
+
+    p.setFontSize(18);
+    p.ltext(tr("Printed"), 0);
+    p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
+    p.br();
+    p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
+}
+
 void Workspace::stretchTableColumns(QTableWidget *t)
 {
     int freeSpace = t->width() - (t->columnCount() * t->horizontalHeader()->defaultSectionSize()) - 5;
@@ -233,6 +302,15 @@ void Workspace::on_tblDishes_itemClicked(QTableWidgetItem *item)
         return;
     }
     Dish nd = *d;
+    for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
+        Dish dd = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
+        if (dd.id == nd.id) {
+            dd.qty += 1;
+            ui->tblOrder->item(i, 0)->setData(Qt::UserRole, qVariantFromValue(dd));
+            countTotal();
+            return;
+        }
+    }
     int row = ui->tblOrder->rowCount();
     ui->tblOrder->setRowCount(row + 1);
     ui->tblOrder->setItem(row, 0, new QTableWidgetItem(nd.name));
@@ -265,11 +343,19 @@ void Workspace::on_btnCheckout_clicked()
         hallid ="[-]";
     }
 
+    QDate dateCash = QDate::currentDate();
+    QTime tc = QTime::fromString(__c5config.getValue(param_working_date_change_time), "00:00:00");
+    if (tc.isValid()) {
+        if (QTime::currentTime() < tc) {
+            dateCash = dateCash.addDays(-1);
+        }
+    }
     db.startTransaction();
     C5StoreDraftWriter dw(db);
     QString id;
-    if (!dw.writeOHeader(id, hallid.toInt(), prefix, ORDER_STATE_CLOSE, __c5config.defaultHall().toInt(), __c5config.defaultTable(), QDate::currentDate(), QDate::currentDate(),
-                    QDate::currentDate(), QTime::currentTime(), QTime::currentTime(), fUser.fId, "", 1, ui->leTotal->getDouble(), ui->leTotal->getDouble(),
+    if (!dw.writeOHeader(id, hallid.toInt(), prefix, ORDER_STATE_CLOSE, __c5config.defaultHall().toInt(),
+                         __c5config.defaultTable(), QDate::currentDate(), QDate::currentDate(), dateCash,
+                         QTime::currentTime(), QTime::currentTime(), fUser.fId, "", 1, ui->leTotal->getDouble(), ui->leTotal->getDouble(),
                          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0)) {
         C5Message::error(dw.fErrorMsg);
         db.rollback();
@@ -341,7 +427,8 @@ void Workspace::on_btnCheckout_clicked()
     ui->tblOrder->setRowCount(0);
     ui->leTotal->setDouble(0);
     payment *p = new payment(id, fDBParams);
-    p->exec();
+    //p->exec();
+    p->justPrint();
     delete p;
 }
 
@@ -419,62 +506,14 @@ void Workspace::on_btnPrintReport_clicked()
     if (!Calendar::getDate(date)) {
         return;
     }
-    QFont font(qApp->font());
-    font.setPointSize(28);
-    C5Printing p;
-    p.setSceneParams(650, 2800, QPrinter::Portrait);
-    p.setFont(font);
+    printReport(date, date);
+}
 
-    if (QFile::exists("./logo_receipt.png")) {
-        p.image("./logo_receipt.png", Qt::AlignHCenter);
-        p.br();
+void Workspace::on_btnPrintReport2_clicked()
+{
+    QDate date1, date2;
+    if (!Calendar::getDate2(date1, date2)) {
+        return;
     }
-    p.setFontBold(true);
-    p.ctext(tr("End of day"));
-    p.br();
-    p.ctext(date.toString(FORMAT_DATE_TO_STR));
-    p.br();
-    double total = 0;
-
-    C5Database dd(fDBParams);
-    dd[":f_datecash"] = date;
-    dd[":f_stateh"] = ORDER_STATE_CLOSE;
-    dd[":f_stated"] = DISH_STATE_OK;
-    dd.exec("select d.f_name, sum(b.f_qty1) as f_qty, b.f_price, sum(b.f_qty1*b.f_price) as f_total "
-            "from o_body b "
-            "inner join o_header h on h.f_id=b.f_header "
-            "left join d_dish d on d.f_id=b.f_dish "
-            "where h.f_state=:f_stateh and b.f_state=:f_stated and h.f_datecash=:f_datecash "
-            "group by 1, 3 ");
-    p.setFontBold(false);
-    p.setFontSize(22);
-    while (dd.nextRow()) {
-        if (p.checkBr(p.fLineHeight + 2)) {
-            p.br();
-        }
-        total += dd.getDouble("f_total");
-        p.ltext(dd.getString("f_name"), 0);
-        p.br();
-        p.ltext(QString("%1 X %2 = %3").arg(float_str(dd.getDouble("f_qty"), 2)).arg(dd.getDouble("f_price"), 2).arg(float_str(dd.getDouble("f_total"), 2)), 0);
-        p.br();
-        p.line();
-        p.br(2);
-    }
-    p.line(4);
-    p.br(3);
-    p.setFontBold(true);
-    p.setFontSize(28);
-    p.ltext(tr("Total today"), 0);
-    p.rtext(float_str(total, 2));
-    p.br();
-    p.br();
-
-    p.line();
-    p.br();
-
-    p.setFontSize(18);
-    p.ltext(tr("Printed"), 0);
-    p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
-    p.br();
-    p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
+    printReport(date1, date2);
 }

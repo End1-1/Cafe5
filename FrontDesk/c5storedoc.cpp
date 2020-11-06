@@ -27,6 +27,10 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
     ui->leCash->setSelector(fDBParams, ui->leCashName, cache_cash_names);
     ui->leStoreInput->setSelector(fDBParams, ui->leStoreInputName, cache_goods_store);
     ui->leStoreOutput->setSelector(fDBParams, ui->leStoreOutputName, cache_goods_store);
+    ui->leStoreInput->addEventKeys("+-");
+    ui->leStoreOutput->addEventKeys("+-");
+    connect(ui->leStoreInput, SIGNAL(keyPressed(QChar)), this, SLOT(lineEditKeyPressed(QChar)));
+    connect(ui->leStoreOutput, SIGNAL(keyPressed(QChar)), this, SLOT(lineEditKeyPressed(QChar)));
     ui->lePayment->setSelector(fDBParams, ui->lePaymentName, cache_header_payment);
     ui->leReason->setSelector(fDBParams, ui->leReasonName, cache_store_reason);
     ui->lePartner->setSelector(fDBParams, ui->lePartnerName, cache_goods_partners);

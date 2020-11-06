@@ -16,9 +16,24 @@ Calendar::~Calendar()
 bool Calendar::getDate(QDate &d)
 {
     Calendar *c = new Calendar();
+    c->ui->calendarWidget_2->setVisible(false);
+    c->adjustSize();
     bool result = false;
     if (c->exec() == QDialog::Accepted) {
         d = c->ui->calendarWidget->selectedDate();
+        result = true;
+    }
+    delete c;
+    return result;
+}
+
+bool Calendar::getDate2(QDate &d1, QDate &d2)
+{
+    Calendar *c = new Calendar();
+    bool result = false;
+    if (c->exec() == QDialog::Accepted) {
+        d1 = c->ui->calendarWidget->selectedDate();
+        d2 = c->ui->calendarWidget_2->selectedDate();
         result = true;
     }
     delete c;

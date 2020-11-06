@@ -107,6 +107,13 @@ void C5LineEdit::keyPressEvent(QKeyEvent *e)
             }
         }
     }
+    if (!fEventKeys.isEmpty()) {
+        if (fEventKeys.contains(QChar(e->key()))) {
+            e->ignore();
+            keyPressed(QChar(e->key()));
+            return;
+        }
+    }
     //qDebug() << e->key();
     QLineEdit::keyPressEvent(e);
 }

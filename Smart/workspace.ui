@@ -279,7 +279,7 @@ QLabel {color:green;}
                      <string/>
                     </property>
                     <property name="icon">
-                     <iconset>
+                     <iconset resource="../resources/resources.qrc">
                       <normaloff>:/up.png</normaloff>:/up.png</iconset>
                     </property>
                     <property name="iconSize">
@@ -302,7 +302,7 @@ QLabel {color:green;}
                      <string/>
                     </property>
                     <property name="icon">
-                     <iconset>
+                     <iconset resource="../resources/resources.qrc">
                       <normaloff>:/down.png</normaloff>:/down.png</iconset>
                     </property>
                     <property name="iconSize">
@@ -325,7 +325,7 @@ QLabel {color:green;}
                      <string/>
                     </property>
                     <property name="icon">
-                     <iconset>
+                     <iconset resource="../resources/resources.qrc">
                       <normaloff>:/filter_clear.png</normaloff>:/filter_clear.png</iconset>
                     </property>
                     <property name="iconSize">
@@ -467,7 +467,7 @@ QLabel {color:green;}
                      <string/>
                     </property>
                     <property name="icon">
-                     <iconset>
+                     <iconset resource="../resources/resources.qrc">
                       <normaloff>:/up.png</normaloff>:/up.png</iconset>
                     </property>
                     <property name="iconSize">
@@ -490,7 +490,7 @@ QLabel {color:green;}
                      <string/>
                     </property>
                     <property name="icon">
-                     <iconset>
+                     <iconset resource="../resources/resources.qrc">
                       <normaloff>:/down.png</normaloff>:/down.png</iconset>
                     </property>
                     <property name="iconSize">
@@ -513,7 +513,30 @@ QLabel {color:green;}
                      <string/>
                     </property>
                     <property name="icon">
-                     <iconset>
+                     <iconset resource="../resources/resources.qrc">
+                      <normaloff>:/report.png</normaloff>:/report.png</iconset>
+                    </property>
+                    <property name="iconSize">
+                     <size>
+                      <width>32</width>
+                      <height>32</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="btnPrintReport2">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string/>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="../resources/resources.qrc">
                       <normaloff>:/report.png</normaloff>:/report.png</iconset>
                     </property>
                     <property name="iconSize">
@@ -536,7 +559,7 @@ QLabel {color:green;}
                      <string/>
                     </property>
                     <property name="icon">
-                     <iconset>
+                     <iconset resource="../resources/resources.qrc">
                       <normaloff>:/exit.png</normaloff>:/exit.png</iconset>
                     </property>
                     <property name="iconSize">
@@ -695,7 +718,7 @@ QLabel {color:green;}
                <string/>
               </property>
               <property name="icon">
-               <iconset>
+               <iconset resource="../resources/resources.qrc">
                 <normaloff>:/weight.png</normaloff>:/weight.png</iconset>
               </property>
               <property name="iconSize">
@@ -800,7 +823,7 @@ QLabel {color:green;}
                <string/>
               </property>
               <property name="icon">
-               <iconset>
+               <iconset resource="../resources/resources.qrc">
                 <normaloff>:/recycle.png</normaloff>:/recycle.png</iconset>
               </property>
               <property name="iconSize">
@@ -928,7 +951,7 @@ QLabel {color:green;}
                   <string>Checkout</string>
                  </property>
                  <property name="icon">
-                  <iconset>
+                  <iconset resource="../resources/resources.qrc">
                    <normaloff>:/wallet-with-money.png</normaloff>:/wallet-with-money.png</iconset>
                  </property>
                  <property name="iconSize">
@@ -964,7 +987,9 @@ QLabel {color:green;}
    <header>c5lineedit.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../resources/resources.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>btn1</sender>

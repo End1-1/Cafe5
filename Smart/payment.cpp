@@ -45,6 +45,11 @@ payment::~payment()
     delete ui;
 }
 
+void payment::justPrint()
+{
+    on_btnCheckoutCash_clicked();
+}
+
 void payment::focusChangeLineEdit()
 {
     ui->tblChange->lineEdit(1, 3)->setFocus();
@@ -140,7 +145,7 @@ bool payment::printReceipt()
 {
     C5Database db(fDBParams);
     QFont font(qApp->font());
-    font.setPointSize(20);
+    font.setPointSize(26);
     C5Printing p;
     p.setSceneParams(650, 2800, QPrinter::Portrait);
     p.setFont(font);
@@ -152,7 +157,7 @@ bool payment::printReceipt()
     db[":f_id"] = fOrderUUID;
     db.exec("select o.f_prefix, o.f_hallid, t.f_firmname, t.f_address, t.f_dept, t.f_hvhh, t.f_devnum, "
             "t.f_serial, t.f_fiscal, t.f_receiptnumber, t.f_time as f_taxtime, concat(left(u.f_first, 1), '. ', u.f_last) as f_staff, "
-            "o.f_amountcash, o.f_amountcard, o.f_amounttotal "
+            "o.f_amountcash, o.f_amountcard, o.f_amounttotal, o.f_print "
             "from o_header o "
             "left join o_tax t on t.f_id=o.f_id "
             "left join s_user u on u.f_id=o.f_staff "
@@ -253,6 +258,9 @@ bool payment::printReceipt()
     p.ltext(QString("%1: %2").arg(tr("Sample")).arg(db.getInt("f_print")), 0);
     p.br();
     p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
+
+    db[":f_print"] = db.getInt("f_print") + 1;
+    db.update("o_header", "f_id", fOrderUUID);
     return true;
 }
 

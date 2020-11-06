@@ -18,6 +18,8 @@ public:
 
     ~payment();
 
+    void justPrint();
+
 private slots:
     void focusChangeLineEdit();
 

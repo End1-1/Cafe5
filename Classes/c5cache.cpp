@@ -29,7 +29,7 @@ C5Cache::C5Cache(const QStringList &dbParams) :
                                            from c_goods g \
                                            left join c_groups gg on gg.f_id=g.f_group \
                                            left join c_units as u on u.f_id=g.f_unit \
-                                           order by g.f_name ")
+                                           order by 3 ")
                 .arg(tr("Code"))
                 .arg(tr("Group"))
                 .arg(tr("Name"))
