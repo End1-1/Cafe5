@@ -25,7 +25,7 @@ bool C5StoreDraftWriter::writeFromShopOutput(const QString &doc, int state, QStr
     QSet<int> stores;
     QList<IGoods> items;
     fDb[":f_header"] = doc;
-    fDb.exec("select f_id, f_store, f_goods, f_qty, f_body, f_tax, f_row, f_discountfactor from o_goods where f_header=:f_header and f_sign=1");
+    fDb.exec("select f_id, f_store, f_goods, f_qty, f_body, f_tax, f_row, f_discountfactor, f_discountmode from o_goods where f_header=:f_header and f_sign=1");
     while (fDb.nextRow()) {
         IGoods i;
         i.recId = fDb.getString(0);
@@ -38,6 +38,7 @@ bool C5StoreDraftWriter::writeFromShopOutput(const QString &doc, int state, QStr
         i.tax = fDb.getInt("f_tax");
         i.row = fDb.getInt("f_row");
         i.discountFactor = fDb.getDouble("f_discountfactor");
+        i.discountMode = fDb.getDouble("f_discountmode");
         items.append(i);
         stores.insert(i.store);
     }

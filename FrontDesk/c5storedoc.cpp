@@ -1215,7 +1215,7 @@ void C5StoreDoc::createStoreInput()
 
     C5StoreDoc *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);
     sd->setMode(C5StoreDoc::sdInput);
-    sd->setStore(ui->leStoreOutput->getInteger(), 1);
+    sd->setStore(0, 0);
     sd->setReason(DOC_REASON_INPUT);
     sd->setComment(ui->leComment->text());
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {

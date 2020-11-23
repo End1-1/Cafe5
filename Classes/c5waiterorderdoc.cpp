@@ -354,6 +354,52 @@ bool C5WaiterOrderDoc::makeOutputOfStore(C5Database &db, QString &err)
     return true;
 }
 
+bool C5WaiterOrderDoc::clearStoreOutput(C5Database &db, const QDate &d1, const QDate &d2)
+{
+    db[":f_date1"] = d1;
+    db[":f_date2"] = d2;
+    db.exec("select oh.f_id, ah.f_id, ad.f_id, ast.f_id,og.f_id "
+            "from a_header_store ah "
+            "left join a_header a on a.f_id=ah.f_id "
+            "left join a_store_draft ad on ad.f_document=ah.f_id "
+            "left join o_goods og on og.f_storerec=ad.f_id "
+            "left join o_body ob on ob.f_id=og.f_body "
+            "left join a_store ast on ast.f_document=ah.f_id "
+            "left join o_header oh on oh.f_id=ob.f_header "
+            " where ah.f_baseonsale=1 and a.f_date between :f_date1 and :f_date2 ");
+    QSet<QString> oh;
+    QSet<QString> ah;
+    QSet<QString> as;
+    QSet<QString> ad;
+    QSet<QString> og;
+    while (db.nextRow()) {
+        oh.insert(db.getString(0));
+        ah.insert(db.getString(1));
+        ad.insert(db.getString(2));
+        as.insert(db.getString(3));
+        og.insert(db.getString(4));
+    }
+    for (const QString &id: as) {
+        db[":f_id"] = id;
+        db.exec("delete from a_store where f_id=:f_id");
+    }
+    for (const QString &id: ad) {
+        db[":f_id"] = id;
+        db.exec("delete from a_store_draft where f_id=:f_id");
+    }
+    for (const QString &id: og) {
+        db[":f_id"] = id;
+        db.exec("update o_goods set f_storerec=null where f_id=:f_id");
+    }
+    for (const QString &id: ah) {
+        db[":f_id"] = id;
+        db.exec("delete from a_header where f_id=:f_id");
+        db[":f_id"] = id;
+        db.exec("delete from a_header_store where f_id=:f_id");
+    }
+    return true;
+}
+
 void C5WaiterOrderDoc::removeDocument(C5Database &db, const QString &id)
 {
     db[":f_state"] = DISH_STATE_MISTAKE;
@@ -666,8 +712,8 @@ void C5WaiterOrderDoc::open(C5Database &db)
     }
     // Discount
     QJsonArray jda;
-    db[":f_order"] = fHeader["f_id"].toString();
-    db.exec("select f_id, f_type, f_value from b_history where f_order=:f_order");
+    db[":f_id"] = fHeader["f_id"].toString();
+    db.exec("select f_id, f_type, f_value from b_history where f_id=:f_id");
     if (db.nextRow()) {
         fHeader["f_bonusid"] = db.getString("f_id");
         fHeader["f_bonustype"] = db.getString("f_type");

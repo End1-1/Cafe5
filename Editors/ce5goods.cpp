@@ -227,9 +227,11 @@ void CE5Goods::tblQtyChanged(const QString &arg1)
 {
     Q_UNUSED(arg1);
     C5LineEdit *l = static_cast<C5LineEdit*>(sender());
-    C5LineEdit *lqty = ui->tblGoods->lineEdit(l->property("row").toInt(), 3);
-    C5LineEdit *lprice = ui->tblGoods->lineEdit(l->property("row").toInt(), 5);
-    C5LineEdit *ltotal = ui->tblGoods->lineEdit(l->property("row").toInt(), 6);
+    int row, col;
+    ui->tblGoods->findWidget(l, row, col);
+    C5LineEdit *lqty = ui->tblGoods->lineEdit(row, 3);
+    C5LineEdit *lprice = ui->tblGoods->lineEdit(row, 5);
+    C5LineEdit *ltotal = ui->tblGoods->lineEdit(row, 6);
     ltotal->setDouble(lqty->getDouble() * lprice->getDouble());
     countTotal();
 }
@@ -238,9 +240,11 @@ void CE5Goods::tblPriceChanged(const QString &arg1)
 {
     Q_UNUSED(arg1);
     C5LineEdit *l = static_cast<C5LineEdit*>(sender());
-    C5LineEdit *lqty = ui->tblGoods->lineEdit(l->property("row").toInt(), 3);
-    C5LineEdit *lprice = ui->tblGoods->lineEdit(l->property("row").toInt(), 5);
-    C5LineEdit *ltotal = ui->tblGoods->lineEdit(l->property("row").toInt(), 6);
+    int row, col;
+    ui->tblGoods->findWidget(l, row, col);
+    C5LineEdit *lqty = ui->tblGoods->lineEdit(row, 3);
+    C5LineEdit *lprice = ui->tblGoods->lineEdit(row, 5);
+    C5LineEdit *ltotal = ui->tblGoods->lineEdit(row, 6);
     ltotal->setDouble(lqty->getDouble() * lprice->getDouble());
     countTotal();
 }
@@ -249,9 +253,11 @@ void CE5Goods::tblTotalChanged(const QString &arg1)
 {
     Q_UNUSED(arg1);
     C5LineEdit *l = static_cast<C5LineEdit*>(sender());
-    C5LineEdit *lqty = ui->tblGoods->lineEdit(l->property("row").toInt(), 3);
-    C5LineEdit *lprice = ui->tblGoods->lineEdit(l->property("row").toInt(), 5);
-    C5LineEdit *ltotal = ui->tblGoods->lineEdit(l->property("row").toInt(), 6);
+    int row, col;
+    ui->tblGoods->findWidget(l, row, col);
+    C5LineEdit *lqty = ui->tblGoods->lineEdit(row, 3);
+    C5LineEdit *lprice = ui->tblGoods->lineEdit(row, 5);
+    C5LineEdit *ltotal = ui->tblGoods->lineEdit(row, 6);
     if (lqty->getDouble() > 0.0001) {
         lprice->setDouble(ltotal->getDouble() / lqty->getDouble());
     } else {

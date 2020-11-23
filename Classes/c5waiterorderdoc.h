@@ -34,6 +34,8 @@ public:
 
     bool makeOutputOfStore(C5Database &db, QString &err);
 
+    static bool clearStoreOutput(C5Database &db, const QDate &d1, const QDate &d2);
+
     static void removeDocument(C5Database &db, const QString &id);
 
     QJsonObject fHeader;

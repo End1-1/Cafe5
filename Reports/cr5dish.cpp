@@ -12,7 +12,7 @@ CR5Dish::CR5Dish(const QStringList &dbParams, QWidget *parent) :
     fLabel = tr("Dishes");
 
     fSqlQuery = "select d.f_id, p1.f_name as f_part1, p2.f_name as f_part2, d.f_name, \
-                f_remind, f_service, f_discount, d.f_queue, d.f_color \
+                f_remind, f_service, f_discount, d.f_queue, d.f_color, f_netweight \
                 from d_dish d \
                 left join d_part2 p2 on p2.f_id=d.f_part \
                 left join d_part1 p1 on p1.f_id=p2.f_part ";
@@ -25,6 +25,7 @@ CR5Dish::CR5Dish(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_discount"] = tr("Discount");
     fTranslation["f_queue"] = tr("Queue");
     fTranslation["f_color"] = tr("Color");
+    fTranslation["f_netweight"] = tr("Weight");
     fEditor = new C5DishWidget(dbParams);
 }
 

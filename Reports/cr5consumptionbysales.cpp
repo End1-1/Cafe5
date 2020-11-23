@@ -94,6 +94,9 @@ QToolBar *CR5ConsumptionBySales::toolBar()
         auto *c = new QAction(QIcon(":/goods.png"), tr("Sales\noutput"), this);
         connect(c, SIGNAL(triggered(bool)), this, SLOT(salesOutput(bool)));
         fToolBar->insertAction(a, c);
+        auto *e = new QAction(QIcon(":/goodsback.png"), tr("Rollback goods output"));
+        connect(e, SIGNAL(triggered(bool)), this, SLOT(rollbackGoodsOutput(bool)));
+        fToolBar->insertAction(c, e);
     }
     return fToolBar;
 }
@@ -459,6 +462,13 @@ void CR5ConsumptionBySales::salesOutput(bool v)
         }
         writeDocs(DOC_TYPE_STORE_OUTPUT, DOC_REASON_SALE, gl, tr("Sale"));
     }
+}
+
+void CR5ConsumptionBySales::rollbackGoodsOutput(bool v)
+{
+    C5Database db(fDBParams);
+    C5WaiterOrderDoc::clearStoreOutput(db, fFilter->date1(), fFilter->date2());
+    C5Message::info(tr("Done"));
 }
 
 void CR5ConsumptionBySales::countOutputBasedOnRecipes()

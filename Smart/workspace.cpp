@@ -427,8 +427,8 @@ void Workspace::on_btnCheckout_clicked()
     ui->tblOrder->setRowCount(0);
     ui->leTotal->setDouble(0);
     payment *p = new payment(id, fDBParams);
-    //p->exec();
-    p->justPrint();
+    p->exec();
+    //p->justPrint();
     delete p;
 }
 

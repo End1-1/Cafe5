@@ -22,7 +22,6 @@ QString C5Widget::label()
 
 void C5Widget::postProcess()
 {
-
 }
 
 QToolBar *C5Widget::toolBar()

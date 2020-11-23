@@ -395,7 +395,8 @@ void C5DishWidget::recipeQtyPriceChanged(const QString &arg)
 {
     Q_UNUSED(arg);
     C5LineEdit *l = static_cast<C5LineEdit*>(sender());
-    int row = l->property("row").toInt();
+    int row, col;
+    ui->tblRecipe->findWidget(l, row, col);
     switch (l->property("column").toInt()) {
     case 3:
         ui->tblRecipe->lineEdit(row, 6)->setDouble(ui->tblRecipe->lineEdit(row, 5)->getDouble() * l->getDouble());

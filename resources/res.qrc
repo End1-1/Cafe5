@@ -96,5 +96,6 @@
         <file>backspace.png</file>
         <file>goods_store.png</file>
         <file>minus.png</file>
+        <file>goodsback.png</file>
     </qresource>
 </RCC>

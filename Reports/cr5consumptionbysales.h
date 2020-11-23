@@ -37,6 +37,8 @@ private slots:
 
     void salesOutput(bool v);
 
+    void rollbackGoodsOutput(bool v);
+
     void countOutputBasedOnRecipes();
 
     void changeOutputStore();

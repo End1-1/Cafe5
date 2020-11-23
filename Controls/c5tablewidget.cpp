@@ -280,19 +280,25 @@ void C5TableWidget::setColumnDecimals(int column, int decimals)
 void C5TableWidget::lineEditTextChanged(const QString arg1)
 {
     C5LineEdit *l = static_cast<C5LineEdit*>(sender());
-    setString(l->property("row").toInt(), l->property("column").toInt(), arg1);
+    int row, col;
+    findWidget(l, row, col);
+    setString(row, col, arg1);
 }
 
 void C5TableWidget::comboTextChanged(const QString &text)
 {
     C5ComboBox *c = static_cast<C5ComboBox*>(sender());
-    setString(c->property("row").toInt(), c->property("column").toInt(), text);
+    int row, col;
+    findWidget(c, row, col);
+    setString(row, col, text);
 }
 
 void C5TableWidget::checkBoxChecked(bool v)
 {
     C5CheckBox *c = static_cast<C5CheckBox*>(sender());
-    setString(c->property("row").toInt(), c->property("column").toInt(), (v ? "1" : "0"));
+    int row, col;
+    findWidget(c, row, col);
+    setString(row, col, (v ? "1" : "0"));
 }
 
 C5TableWidgetItem::C5TableWidgetItem(int type) :
