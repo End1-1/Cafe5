@@ -154,7 +154,7 @@ bool CE5Editor::save(QString &err, QList<QMap<QString, QVariant> > &data)
         case 0:
             value = leField->text();
             if (value.toString().isEmpty()) {
-                value = QVariant();
+                value = QVariant("");
             }
             break;
         case 1:

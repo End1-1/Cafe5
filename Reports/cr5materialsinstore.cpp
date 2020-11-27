@@ -57,9 +57,9 @@ void CR5MaterialsInStore::prepareDrafts()
 
     fLeftJoinTables << "inner join a_header h on h.f_id=s.f_document [h]"
                     << "inner join c_storages ss on ss.f_id=s.f_store [ss]"
-                    << "inner join c_units u on u.f_id=g.f_unit [u]"
+                    << "left join c_units u on u.f_id=g.f_unit [u]"
                     << "inner join c_groups gg on gg.f_id=g.f_group [gg]"
-                    << "inner join c_goods g on g.f_id=s.f_goods [g]"
+                    << "left join c_goods g on g.f_id=s.f_goods [g]"
                     << "left join c_goods_classes gca on gca.f_id=g.f_group1 [gca]"
                     << "left join c_goods_classes gcb on gca.f_id=g.f_group2 [gcb]"
                     << "left join c_goods_classes gcc on gca.f_id=g.f_group3 [gcc]"
@@ -163,9 +163,9 @@ void CR5MaterialsInStore::prepareNoDrafts()
 
     fLeftJoinTables << "inner join a_header h on h.f_id=s.f_document [h]"
                     << "inner join c_storages ss on ss.f_id=s.f_store [ss]"
-                    << "inner join c_units u on u.f_id=g.f_unit [u]"
+                    << "left join c_units u on u.f_id=g.f_unit [u]"
                     << "inner join c_groups gg on gg.f_id=g.f_group [gg]"
-                    << "inner join c_goods g on g.f_id=s.f_goods [g]"
+                    << "left join c_goods g on g.f_id=s.f_goods [g]"
                     << "left join c_goods_classes gca on gca.f_id=g.f_group1 [gca]"
                     << "left join c_goods_classes gcb on gca.f_id=g.f_group2 [gcb]"
                     << "left join c_goods_classes gcc on gca.f_id=g.f_group3 [gcc]"

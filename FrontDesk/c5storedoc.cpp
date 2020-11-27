@@ -725,14 +725,16 @@ void C5StoreDoc::setUserId(bool withUpdate, int value)
 
 void C5StoreDoc::countTotal()
 {
-    double total = 0;
+    double total = 0, totalQty = 0.0;
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
         total += ui->tblGoods->lineEdit(i, 8)->getDouble();
+        totalQty += ui->tblGoods->lineEdit(i, 5)->getDouble();
     }
     for (int i = 0; i < ui->tblAdd->rowCount(); i++) {
         total += ui->tblAdd->lineEdit(i, 2)->getDouble();
     }
     ui->leTotal->setDouble(total);
+    ui->leTotalQty->setDouble(totalQty);
 }
 
 void C5StoreDoc::countQtyOfComplectation()
