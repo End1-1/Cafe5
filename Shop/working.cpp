@@ -802,7 +802,26 @@ void Working::on_leCode_returnPressed()
         }
     } else {
         QString code = ui->leCode->text();
-        addGoods(code);
+        if (code.mid(0, 2) == "23") {
+            if (code.length() != 13) {
+                addGoods(code);
+                return;
+            }
+            QString code2 = QString("%1").arg(code.mid(2, 5).toInt());
+            QString qtyStr = code.mid(7,5);
+            addGoods(code2);
+            WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
+            if (!w) {
+                return;
+            }
+            int row = w->lastRow();
+            if (row < 0) {
+                return;
+            }
+            w->setQtyOfRow(row, qtyStr.toDouble() / 1000);
+        } else {
+            addGoods(code);
+        }
     }
 }
 

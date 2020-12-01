@@ -51,6 +51,7 @@ WOrder::WOrder(int saleType, QWidget *parent) :
     ui->leChange->setValidator(new QDoubleValidator(0, 1000000000, 2));
     ui->lbPartner->setVisible(false);
     ui->lePartner->setVisible(false);
+    ui->lbDept->setVisible(false);
     ui->chDebt->setVisible(false);
     noImage();
     if (fSaleType == SALE_PREORDER) {
@@ -166,6 +167,7 @@ void WOrder::addGoodsToTable(const Goods &g)
     ui->tblGoods->setString(row, 0, g.fCode);
     ui->tblGoods->setString(row, 1, g.fName + " " + g.fScanCode);
     ui->tblGoods->setDouble(row, 2, 1);
+    ui->tblGoods->item(row, 2)->fDecimals = 3;
     ui->tblGoods->setString(row, 3, g.fUnit);
     ui->tblGoods->setDouble(row, 4, price);
     ui->tblGoods->setDouble(row, 5, price);
@@ -374,6 +376,7 @@ void WOrder::fixCostumer(const QString &code)
     ui->leCustomer->setVisible(true);
     ui->lbCustomer->setVisible(true);
     ui->lbDisc->setVisible(true);
+    ui->lbDept->setVisible(true);
     ui->chDebt->setVisible(true);
     ui->leCustomer->setText(db.getString("f_firstname") + " " + db.getString("f_lastname"));
     C5LogSystem::writeEvent(QString("%1: %2:%3").arg(tr("Fix costumer")).arg(code).arg(db.getString("f_firstname") + " " + db.getString("f_lastname")));
@@ -394,28 +397,7 @@ void WOrder::changeQty()
     if (qty < 0.001) {
         return;
     }
-    double totalQty = qty;
-    QString goodsCode = fWorking->fGoodsCodeForPrint[ui->tblGoods->getInteger(row, 0)];
-    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
-        if (i == row) {
-            continue;
-        }
-        if (ui->tblGoods->getString(i, 0) == goodsCode) {
-            totalQty += ui->tblGoods->getDouble(i, 2);
-        }
-    }
-
-    Goods g = fWorking->fGoods[goodsCode];
-    if (__c5config.controlShopQty()) {
-        if (!g.fIsService && g.fQty < totalQty) {
-            C5Message::error(tr("Insufficient quantity") + "<br>" + float_str(totalQty - g.fQty, 3));
-            return;
-        }
-    }
-    ui->tblGoods->setDouble(row, 2, qty);
-    ui->tblGoods->setDouble(row, 5, ui->tblGoods->getDouble(row, 4) * qty);
-    C5LogSystem::writeEvent(QString("%1 %2:%3 %4").arg(tr("Change qty")).arg(g.fCode).arg(g.fName).arg(float_str(qty, 2)));
-    countTotal();
+    setQtyOfRow(row, qty);
 }
 
 void WOrder::discountRow(const QString &code)
@@ -524,6 +506,11 @@ void WOrder::prevRow()
     }
 }
 
+int WOrder::lastRow()
+{
+    return ui->tblGoods->rowCount() - 1;
+}
+
 void WOrder::setDiscount(const QString &label, const QString &value)
 {
     if (label.isEmpty()) {
@@ -548,6 +535,7 @@ void WOrder::setPartner(const QString &taxcode, int id, const QString &taxname)
     fPartner = id;
     ui->lbPartner->setVisible(true);
     ui->lePartner->setVisible(true);
+    ui->lbDept->setVisible(true);
     ui->chDebt->setVisible(true);
 }
 
@@ -634,6 +622,32 @@ bool WOrder::getDiscountValue(int discountType, double &v)
     }
     v = QInputDialog::getDouble(this, tr("Discount"), disctitle, 0, 0.001, maxvalue, 3, &ok);
     return ok;
+}
+
+void WOrder::setQtyOfRow(int row, double qty)
+{
+    double totalQty = qty;
+    QString goodsCode = fWorking->fGoodsCodeForPrint[ui->tblGoods->getInteger(row, 0)];
+    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+        if (i == row) {
+            continue;
+        }
+        if (ui->tblGoods->getString(i, 0) == goodsCode) {
+            totalQty += ui->tblGoods->getDouble(i, 2);
+        }
+    }
+
+    Goods g = fWorking->fGoods[goodsCode];
+    if (__c5config.controlShopQty()) {
+        if (!g.fIsService && g.fQty < totalQty) {
+            C5Message::error(tr("Insufficient quantity") + "<br>" + float_str(totalQty - g.fQty, 3));
+            return;
+        }
+    }
+    ui->tblGoods->setDouble(row, 2, qty);
+    ui->tblGoods->setDouble(row, 5, ui->tblGoods->getDouble(row, 4) * qty);
+    C5LogSystem::writeEvent(QString("%1 %2:%3 %4").arg(tr("Change qty")).arg(g.fCode).arg(g.fName).arg(float_str(qty, 2)));
+    countTotal();
 }
 
 void WOrder::on_leCash_textChanged(const QString &arg1)

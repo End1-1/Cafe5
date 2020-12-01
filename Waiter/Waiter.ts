@@ -1002,50 +1002,50 @@
 <context>
     <name>C5Widget</name>
     <message>
-        <location filename="../Classes/c5widget.cpp" line="48"/>
+        <location filename="../Classes/c5widget.cpp" line="47"/>
         <source>New</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5widget.cpp" line="51"/>
+        <location filename="../Classes/c5widget.cpp" line="50"/>
         <source>Edit</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5widget.cpp" line="54"/>
+        <location filename="../Classes/c5widget.cpp" line="53"/>
         <source>Remove</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5widget.cpp" line="57"/>
+        <location filename="../Classes/c5widget.cpp" line="56"/>
         <source>Save
 changes</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5widget.cpp" line="60"/>
+        <location filename="../Classes/c5widget.cpp" line="59"/>
         <source>Search by
 parameters</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5widget.cpp" line="63"/>
+        <location filename="../Classes/c5widget.cpp" line="62"/>
         <source>Clear
 filter</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5widget.cpp" line="66"/>
+        <location filename="../Classes/c5widget.cpp" line="65"/>
         <source>Refresh</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5widget.cpp" line="69"/>
+        <location filename="../Classes/c5widget.cpp" line="68"/>
         <source>Print</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5widget.cpp" line="72"/>
+        <location filename="../Classes/c5widget.cpp" line="71"/>
         <source>Export to
 MS Excel</source>
         <translation></translation>

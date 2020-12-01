@@ -130,7 +130,7 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
     for (int i = 0; i < data.count(); i++) {
         p.ltext(QString("%1").arg(data.at(i).at(0).toString()), 0);
         p.rtext(QString("%1 X %2 = %3")
-                .arg(float_str(data.at(i).at(1).toDouble(), 2))
+                .arg(float_str(data.at(i).at(1).toDouble(), 3))
                 .arg(data.at(i).at(2).toDouble(), 2)
                 .arg(float_str(data.at(i).at(3).toDouble(), 2)));
         p.br();
@@ -200,7 +200,7 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
     }
 
     QString price1, price2;
-    int rw = 2;
+    int rw = 1;
     switch (rw) {
     case 1:
         price1 = "ad.f_price";
@@ -295,7 +295,7 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
     for (int i = 0; i < data.count(); i++) {
         p.ltext(QString("%1").arg(data.at(i).at(0).toString()), 0);
         p.rtext(QString("%1 X %2 = %3")
-                .arg(float_str(data.at(i).at(1).toDouble(), 2))
+                .arg(float_str(data.at(i).at(1).toDouble(), 3))
                 .arg(data.at(i).at(2).toDouble(), 2)
                 .arg(float_str(data.at(i).at(3).toDouble(), 2)));
         p.br();

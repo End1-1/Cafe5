@@ -97,5 +97,6 @@
         <file>goods_store.png</file>
         <file>minus.png</file>
         <file>goodsback.png</file>
+        <file>scales.png</file>
     </qresource>
 </RCC>

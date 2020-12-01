@@ -52,9 +52,13 @@ public:
 
     void prevRow();
 
+    int lastRow();
+
     void setDiscount(const QString &label, const QString &value);
 
     void setPartner(const QString &taxcode, int id, const QString &taxname);
+
+    void setQtyOfRow(int row, double qty);
 
 private slots:
     void on_leCash_textChanged(const QString &arg1);
@@ -107,6 +111,7 @@ private:
     bool returnFalse(const QString &msg, C5Database &db);
 
     bool getDiscountValue(int discountType, double &v);
+
 };
 
 #endif // WORDER_H

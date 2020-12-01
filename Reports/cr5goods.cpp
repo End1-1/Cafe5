@@ -7,6 +7,7 @@
 #include "c5changepriceofgroup.h"
 #include "c5goodspricing.h"
 #include <math.h>
+#include <QFile>
 
 CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
@@ -101,6 +102,7 @@ QToolBar *CR5Goods::toolBar()
                 fToolBar->addAction(QIcon(":/pricing.png"), tr("Pricing"), this, SLOT(pricing()));
             }
             fToolBar->addAction(QIcon(":/dress.png"), tr("Group price"), this, SLOT(groupPrice()));
+            fToolBar->addAction(QIcon(":/scales.png"), tr("Scales"), this, SLOT(exportToScales()));
     }
     return fToolBar;
 }
@@ -186,4 +188,25 @@ void CR5Goods::groupPrice()
         db.exec(query);
         C5Message::tr("Done");
     }
+}
+
+void CR5Goods::exportToScales()
+{
+    C5Database db(fDBParams);
+    QFile f("c:/scales/export.xml");
+    f.open(QIODevice::WriteOnly);
+    f.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
+    f.write("<NewDataSet>\r\n");
+    db.exec("select f_scancode, f_name, f_saleprice from c_goods where f_enabled=1");
+    while (db.nextRow()) {
+        f.write("<Report>\r\n");
+        f.write(QString("<CodeSort>%1</CodeSort>").arg(db.getString(0)).toUtf8());
+        f.write(QString("<Code>%1</Code>").arg(db.getString(0)).toUtf8());
+        f.write(QString("<GoodName>%1</GoodName>").arg(db.getString(1)).toUtf8());
+        f.write(QString("<PriceOut2>%1</PriceOut2>").arg(db.getDouble(2)).toUtf8());
+        f.write("</Report>\r\n");
+    }
+    f.write("</NewDataSet>");
+    f.close();
+    C5Message::info(tr("Done"));
 }

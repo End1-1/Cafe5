@@ -19,6 +19,8 @@ private slots:
     void pricing();
 
     void groupPrice();
+
+    void exportToScales();
 };
 
 #endif // CR5GOODS_H
