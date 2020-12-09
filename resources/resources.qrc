@@ -47,5 +47,7 @@
         <file>alarm-clock.png</file>
         <file>weight.png</file>
         <file>minus.png</file>
+        <file>customer.png</file>
+        <file>delivery.png</file>
     </qresource>
 </RCC>

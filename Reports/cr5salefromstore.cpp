@@ -13,7 +13,7 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
 {
 
     fIcon = ":/graph.png";
-    fLabel = tr("Sales, items");
+    fLabel = tr("Sales by goods");
     fSimpleQuery = false;
 
     fMainTable = "o_goods og";

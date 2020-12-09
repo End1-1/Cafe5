@@ -159,7 +159,7 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
         QString ogoodsid;
         QString adraftid;
         if (!g.isService) {
-            if (!dw.writeAStoreDraft(adraftid, storeDocId, __c5config.defaultStore(), -1, g.goodsId, g.goodsQty, 0, 0, DOC_REASON_SALE, adraftid, i + 1, "")) {
+            if (!dw.writeAStoreDraft(adraftid, storeDocId, __c5config.defaultStore(), -1, g.storeId, g.goodsQty, 0, 0, DOC_REASON_SALE, adraftid, i + 1, "")) {
                 return returnFalse(dw.fErrorMsg, db);
             }
         }

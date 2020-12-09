@@ -8,6 +8,7 @@
 #include "dishtableitemdelegate.h"
 #include "c5storedraftwriter.h"
 #include "calendar.h"
+#include "supplier.h"
 #include "payment.h"
 #include "c5printing.h"
 #include <QScrollBar>
@@ -34,6 +35,9 @@ Workspace::Workspace(const QStringList &dbParams) :
         ui->tblDishes->setColumnCount(4);
         break;
     }
+    ui->lbPhone->clear();
+    fSupplierId = __c5config.defaultTable();
+    fSupplierName = "";
 }
 
 Workspace::~Workspace()
@@ -354,8 +358,9 @@ void Workspace::on_btnCheckout_clicked()
     C5StoreDraftWriter dw(db);
     QString id;
     if (!dw.writeOHeader(id, hallid.toInt(), prefix, ORDER_STATE_CLOSE, __c5config.defaultHall().toInt(),
-                         __c5config.defaultTable(), QDate::currentDate(), QDate::currentDate(), dateCash,
-                         QTime::currentTime(), QTime::currentTime(), fUser.fId, "", 1, ui->leTotal->getDouble(), ui->leTotal->getDouble(),
+                         fSupplierId, QDate::currentDate(), QDate::currentDate(), dateCash,
+                         QTime::currentTime(), QTime::currentTime(), fUser.fId, fPhone, 1,
+                         ui->leTotal->getDouble(), ui->leTotal->getDouble(),
                          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0)) {
         C5Message::error(dw.fErrorMsg);
         db.rollback();
@@ -423,9 +428,13 @@ void Workspace::on_btnCheckout_clicked()
         p.print(s, QPrinter::Custom);
     }
 
+    fSupplierId = __c5config.defaultTable();
+    fSupplierName = "";
+    fPhone = "";
     ui->tblOrder->clear();
     ui->tblOrder->setRowCount(0);
     ui->leTotal->setDouble(0);
+    ui->lbPhone->clear();
     payment *p = new payment(id, fDBParams);
     p->exec();
     //p->justPrint();
@@ -516,4 +525,23 @@ void Workspace::on_btnPrintReport2_clicked()
         return;
     }
     printReport(date1, date2);
+}
+
+void Workspace::on_btnCustomer_clicked()
+{
+    bool ok;
+    QString phone = QInputDialog::getText(this, tr("Phone number"), tr("Phone number"), QLineEdit::Normal, "", &ok);
+    if (!ok) {
+        return;
+    }
+    fPhone = phone;
+    ui->lbPhone->setText(QString("%1<br>%2").arg(fPhone).arg(fSupplierName));
+}
+
+void Workspace::on_btnSupplier_clicked()
+{
+    if (!supplier::getSupplier(fDBParams, fSupplierId, fSupplierName)) {
+        return;
+    }
+    ui->lbPhone->setText(QString("%1<br>%2").arg(fPhone).arg(fSupplierName));
 }

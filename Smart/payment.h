@@ -46,7 +46,7 @@ private:
 
     void checkout(bool cash);
 
-    bool printReceipt();
+    bool printReceipt(bool printSecond);
 
     bool printTax(double cardAmount);
 };

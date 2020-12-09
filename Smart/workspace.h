@@ -56,6 +56,10 @@ private slots:
 
     void on_btnPrintReport2_clicked();
 
+    void on_btnCustomer_clicked();
+
+    void on_btnSupplier_clicked();
+
 private:
     Ui::Workspace *ui;
 
@@ -64,6 +68,12 @@ private:
     QList<Dish*> fDishes;
 
     int fTypeFilter;
+
+    int fSupplierId;
+
+    QString fPhone;
+
+    QString fSupplierName;
 
     bool currentDish(Dish &d);
 

@@ -27,6 +27,7 @@ struct IGoods {
     QString taxDept;
     QString taxAdg;
     bool isService;
+    int storeId;
     IGoods() {changed = false; }
 };
 

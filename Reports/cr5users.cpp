@@ -1,6 +1,7 @@
 #include "cr5users.h"
 #include "c5passwords.h"
 #include "ce5user.h"
+#include "cr5usersfilter.h"
 
 CR5Users::CR5Users(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
@@ -18,6 +19,7 @@ CR5Users::CR5Users(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_first"] = tr("First name");
     fTranslation["f_last"] = tr("Last name");
     fEditor = new CE5User(dbParams);
+    fFilterWidget = new CR5UsersFilter(dbParams);
 }
 
 QToolBar *CR5Users::toolBar()
@@ -25,6 +27,7 @@ QToolBar *CR5Users::toolBar()
     if (!fToolBar) {
         QList<ToolBarButtons> btn;
         btn << ToolBarButtons::tbNew
+            << ToolBarButtons::tbFilter
             << ToolBarButtons::tbClearFilter
             << ToolBarButtons::tbRefresh
             << ToolBarButtons::tbExcel

@@ -21,6 +21,8 @@ public:
     bool fIsService;
     int fUncomplectFrom;
     double fUncomplectQty;
+    bool fWholeNumber;
+    int fStoreId;
 };
 
 #endif // GOODS_H

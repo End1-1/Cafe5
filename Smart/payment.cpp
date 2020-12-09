@@ -136,12 +136,12 @@ void payment::checkout(bool cash)
         C5Message::error(dw.fErrorMsg);
         return;
     }
-    if (printReceipt()) {
+    if (printReceipt(true)) {
         accept();
     }
 }
 
-bool payment::printReceipt()
+bool payment::printReceipt(bool printSecond)
 {
     C5Database db(fDBParams);
     QFont font(qApp->font());
@@ -157,10 +157,11 @@ bool payment::printReceipt()
     db[":f_id"] = fOrderUUID;
     db.exec("select o.f_prefix, o.f_hallid, t.f_firmname, t.f_address, t.f_dept, t.f_hvhh, t.f_devnum, "
             "t.f_serial, t.f_fiscal, t.f_receiptnumber, t.f_time as f_taxtime, concat(left(u.f_first, 1), '. ', u.f_last) as f_staff, "
-            "o.f_amountcash, o.f_amountcard, o.f_amounttotal, o.f_print "
+            "o.f_amountcash, o.f_amountcard, o.f_amounttotal, o.f_print, o.f_comment, ht.f_name as f_tablename "
             "from o_header o "
             "left join o_tax t on t.f_id=o.f_id "
             "left join s_user u on u.f_id=o.f_staff "
+            "left join h_tables ht on ht.f_id=o.f_table "
             "where o.f_id=:f_id");
     if (!db.nextRow()) {
         C5Message::error(tr("Invalid order number"));
@@ -199,8 +200,11 @@ bool payment::printReceipt()
         p.ltext(tr("(F)"), 0);
         p.br();
     }
-    p.ltext(tr("Staff"), 0);
+    p.ltext(tr("Cashier"), 0);
     p.rtext(db.getString("f_staff"));
+    p.br();
+    p.ltext(tr("Delivery"), 0);
+    p.rtext(db.getString("f_tablename"));
     p.br();
     p.line(3);
     p.br(2);
@@ -219,8 +223,11 @@ bool payment::printReceipt()
             "left join d_dish d on d.f_id=b.f_dish "
             "where b.f_header=:f_header and b.f_state=:f_state");
     while (dd.nextRow()) {
-        //p.ltext(QString("%1 %2, %3").arg(tr("Class:")).arg(dd.getString("f_adgcode")).arg(dd.getString("f_name")), 0);
-        p.ltext(QString("%3").arg(dd.getString("f_name")), 0);
+        if (dd.getString(0).isEmpty()) {
+            p.ltext(QString("%3").arg(dd.getString("f_name")), 0);
+        } else {
+            p.ltext(QString("%1 %2, %3").arg(tr("Class:")).arg(dd.getString("f_adgcode")).arg(dd.getString("f_name")), 0);
+        }
         p.br();
         p.ltext(QString("%1 X %2 = %3").arg(float_str(dd.getDouble("f_qty1"), 2)).arg(dd.getDouble("f_price"), 2).arg(float_str(dd.getDouble("f_qty1") * dd.getDouble("f_price"), 2)), 0);
         p.br();
@@ -247,6 +254,13 @@ bool payment::printReceipt()
         p.rtext(float_str(db.getDouble("f_amountcard"), 2));
     }
 
+    if (db.getString("f_comment").length() > 0) {
+        p.br();
+        p.br();
+        p.ltext(tr("Customer"), 0);
+        p.rtext(db.getString("f_comment"));
+    }
+
     p.setFontSize(20);
     p.setFontBold(true);
     p.br(p.fLineHeight * 3);
@@ -261,6 +275,11 @@ bool payment::printReceipt()
 
     db[":f_print"] = db.getInt("f_print") + 1;
     db.update("o_header", "f_id", fOrderUUID);
+
+    qDebug() << printSecond << __c5config.getValue(param_shop_print_v2);
+    if (printSecond && __c5config.getValue(param_shop_print_v2) == "1") {
+        printReceipt(false);
+    }
     return true;
 }
 

@@ -717,7 +717,7 @@ void C5MainWindow::setDB(const QString &dbname)
         addTreeL3Item(l, cp_t3_tstore_extra, tr("T-account, extra"), ":/documents.png");
         addTreeL3Item(l, cp_t2_count_output_of_sale, tr("Consumption of goods based on sales"), ":/goods.png");
         addTreeL3Item(l, cp_t3_consuption_reason, tr("Reason for consuption"), ":/goods.png");
-        addTreeL3Item(l, cp_t3_sales_common, tr("Sales, expert mode"), ":/graph.png");
+        addTreeL3Item(l, cp_t3_sales_common, tr("Sales by tickets"), ":/graph.png");
         addTreeL3Item(l, cp_t3_sale_effectiveness, tr("Effectiveness of sales"), ":/effectiveness.png");
         if (__c5config.frontDeskMode() == FRONTDESK_WAITER) {
             addTreeL3Item(l, cp_t3_sale_dishes, tr("Sales, dishes"), ":/graph.png");
@@ -726,7 +726,7 @@ void C5MainWindow::setDB(const QString &dbname)
         if (__c5config.carMode()) {
             addTreeL3Item(l, cp_t3_car_visits, tr("Car visits"), ":/car.png");
         }
-        addTreeL3Item(l, cp_t3_store_sale, tr("Sales from store"), ":/graph.png");
+        addTreeL3Item(l, cp_t3_store_sale, tr("Sales by goods"), ":/graph.png");
         addTreeL3Item(l, cp_t3_debts_to_partners, tr("Debts to partners"), ":/contract.png");
         addTreeL3Item(l, cp_t3_discount_statistics, tr("Discount statistics"), ":/discount.png");
         addTreeL3Item(l, cp_t3_preorders, tr("Preorders"), ":/customers.png");

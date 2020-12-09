@@ -499,3 +499,10 @@ update d_dish  d set f_netweight= (select sum(f_qty) from d_recipes r where r.f_
 /* db - 33 */
 update s_app set f_version ='33' where f_app='DB';
 ALTER TABLE `b_cards_discount` CHANGE COLUMN `f_code` `f_code` TEXT NULL DEFAULT NULL ;
+
+/* db - 34 */
+update s_app set f_version ='34' where f_app='DB';
+alter table c_goods add column f_storeid integer;
+update c_goods set f_storeid=f_id;
+alter table c_goods add column f_wholenumber smallint;
+ALTER TABLE `h_tables` CHANGE COLUMN `f_name` `f_name` TINYTEXT NULL DEFAULT NULL ;

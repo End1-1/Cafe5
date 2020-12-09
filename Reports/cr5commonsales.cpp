@@ -10,7 +10,7 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
 {
     fIcon = ":/graph.png";
-    fLabel = tr("Sales, common");
+    fLabel = tr("Sales by tickets");
     fSimpleQuery = false;
 
     fMainTable = "o_header oh";
@@ -25,6 +25,7 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
                    << "oh.f_id"
                    << "os.f_name as f_statename"
                    << "oh.f_datecash"
+                   << "dayofweek(oh.f_datecash) as f_dayofweek"
                    << "hl.f_name as f_hallname"
                    << "ht.f_name as f_tablename"
                    << "concat(w.f_last, ' ', w.f_first) as f_staff"
@@ -46,6 +47,7 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
     fColumnsGroup << "concat(oh.f_prefix, oh.f_hallid) as f_prefix"
                    << "oh.f_id"
                    << "oh.f_datecash"
+                   << "dayofweek(oh.f_datecash) as f_dayofweek"
                    << "os.f_name as f_statename"
                    << "hl.f_name as f_hallname"
                    << "ht.f_name as f_tablename"
@@ -81,6 +83,7 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_timeopen"] = tr("Open time");
     fTranslation["f_timeclose"] = tr("Close time");
     fTranslation["f_datecash"] = tr("Date, cash");
+    fTranslation["f_dayofweek"] = tr("Day of week");
     fTranslation["f_hallname"] = tr("Hall");
     fTranslation["f_buyer"] = tr("Buyer");
     fTranslation["f_buyertaxcode"] = tr("Buyer taxcode");
@@ -101,6 +104,7 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
     fColumnsVisible["oh.f_id"] = true;
     fColumnsVisible["os.f_name as f_statename"] = true;
     fColumnsVisible["oh.f_datecash"] = true;
+    fColumnsVisible["dayofweek(oh.f_datecash) as f_dayofweek"] = false;
     fColumnsVisible["hl.f_name as f_hallname"] = true;
     fColumnsVisible["ht.f_name as f_tablename"] = true;
     fColumnsVisible["oh.f_dateopen"] = false;

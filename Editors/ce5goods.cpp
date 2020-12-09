@@ -36,6 +36,7 @@ CE5Goods::CE5Goods(const QStringList &dbParams, QWidget *parent) :
     ui->leClass2->setSelector(dbParams, ui->leClassName2, cache_goods_classes);
     ui->leClass3->setSelector(dbParams, ui->leClassName3, cache_goods_classes);
     ui->leClass4->setSelector(dbParams, ui->leClassName4, cache_goods_classes);
+    ui->leStoreId->setSelector(dbParams, ui->leStoreIdName, cache_goods, 1, 3);
     ui->leUncomplectGoods->setSelector(dbParams, ui->leUncomplectGoodsName, cache_goods, 1, 3);
 
     C5Database db(dbParams);
@@ -98,6 +99,8 @@ void CE5Goods::setId(int id)
     } else {
         on_chUncomplectIfZero_clicked(false);
     }
+    ui->chSameStoreId->setChecked(ui->leStoreId->getInteger() == ui->leCode->getInteger());
+    ui->chSameStoreId->clicked();
     countTotal();
 }
 
@@ -113,13 +116,30 @@ bool CE5Goods::save(QString &err, QList<QMap<QString, QVariant> > &data)
             err += tr("Uncomplect goods quantity cannot be zero");
         }
     }
+    if (!ui->chSameStoreId->isChecked()) {
+        if (ui->leStoreId->getInteger() == 0) {
+            err += tr("Goods code for store output cannot be undefined") + "<br>";
+        }
+    }
     if (!err.isEmpty()) {
         return false;
+    }
+    if (ui->leCode->getInteger() > 0) {
+        if (ui->chSameStoreId->isChecked() && ui->leStoreId->getInteger() == 0) {
+            ui->leStoreId->setInteger(ui->leCode->getInteger());
+        }
     }
     if (!CE5Editor::save(err, data)) {
         return false;
     }
     C5Database db(fDBParams);
+    if (ui->chSameStoreId->isChecked()) {
+        if (ui->leStoreId->getInteger() == 0) {
+            ui->leStoreId->setInteger(ui->leCode->getInteger());
+            db[":f_storeid"] = ui->leStoreId->getInteger();
+            db.update("c_goods", where_id(ui->leCode->getInteger()));
+        }
+    }
     /* Complectation */
     db[":f_base"] = ui->leCode->text();
     db.exec("delete from c_goods_complectation where f_base=:f_base");
@@ -157,6 +177,9 @@ void CE5Goods::clear()
     ui->chUncomplectIfZero->setChecked(false);
     ui->leUncomplectGoods->setValue("");
     ui->leUncomplectGoodsQty->clear();
+    ui->chOnlyWholeNumber->setChecked(false);
+    ui->chSameStoreId->setChecked(true);
+    ui->chSameStoreId->clicked(true);
     if (__c5config.getRegValue("last_goods_editor").toBool()) {
         ui->leGroup->setValue(fLastGroup);
         ui->leUnit->setValue(fLastUnit);
@@ -554,4 +577,13 @@ void CE5Goods::on_chUncomplectIfZero_clicked(bool checked)
 void CE5Goods::on_btnPinLast_clicked(bool checked)
 {
     __c5config.setRegValue("last_goods_editor", checked);
+}
+
+void CE5Goods::on_chSameStoreId_clicked()
+{
+    ui->leStoreId->setEnabled(!ui->chSameStoreId->isChecked());
+    ui->leStoreIdName->setEnabled(!ui->chSameStoreId->isChecked());
+    if (ui->chSameStoreId->isChecked()) {
+        ui->leStoreId->setValue(ui->leCode->getInteger());
+    }
 }

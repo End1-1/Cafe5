@@ -43,6 +43,8 @@ public:
 
     void makeWGoods();
 
+    static int storeId(int id);
+
     static QMap<QString, Goods> fGoods;
 
     static QHash<int, QString> fGoodsCodeForPrint;

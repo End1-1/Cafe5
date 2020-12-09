@@ -79,6 +79,8 @@ private slots:
 
     void on_btnPinLast_clicked(bool checked);
 
+    void on_chSameStoreId_clicked();
+
 private:
     Ui::CE5Goods *ui;
 

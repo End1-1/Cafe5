@@ -93,6 +93,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Reports/cr5salesbydishes.cpp \
     ../Reports/cr5salesbydishesfilter.cpp \
     ../Reports/cr5storereason.cpp \
+    ../Reports/cr5usersfilter.cpp \
     barcode.cpp \
     c5cashdoc.cpp \
     c5changepriceofgroup.cpp \
@@ -293,6 +294,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Reports/cr5salesbydishes.h \
     ../Reports/cr5salesbydishesfilter.h \
     ../Reports/cr5storereason.h \
+    ../Reports/cr5usersfilter.h \
     ../Service/servicecommands.h \
     barcode.h \
     c5cashdoc.h \
@@ -465,6 +467,7 @@ FORMS += \
     ../Reports/cr5salefromstoretotalfilter.ui \
     ../Reports/cr5saleremoveddishesfilter.ui \
     ../Reports/cr5salesbydishesfilter.ui \
+    ../Reports/cr5usersfilter.ui \
     c5cashdoc.ui \
     c5changepriceofgroup.ui \
     c5checkdatabase.ui \

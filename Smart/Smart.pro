@@ -242,6 +242,7 @@ SOURCES += \
     ../Reports/cr5tstoreextra.cpp \
     ../Reports/cr5tstoreextrafilter.cpp \
     ../Reports/cr5users.cpp \
+    ../Reports/cr5usersfilter.cpp \
     ../Reports/cr5usersgroups.cpp \
     ../Shop/printreceipt.cpp \
     ../Shop/printreceiptgroup.cpp \
@@ -253,6 +254,7 @@ SOURCES += \
     dishtableitemdelegate.cpp \
         main.cpp \
     payment.cpp \
+    supplier.cpp \
         workspace.cpp \
     ../Cafe5/c5config.cpp \
     ../Cafe5/c5connection.cpp \
@@ -481,6 +483,7 @@ HEADERS += \
     ../Reports/cr5tstoreextra.h \
     ../Reports/cr5tstoreextrafilter.h \
     ../Reports/cr5users.h \
+    ../Reports/cr5usersfilter.h \
     ../Reports/cr5usersgroups.h \
     ../Service/servicecommands.h \
     ../Shop/printreceipt.h \
@@ -495,6 +498,7 @@ HEADERS += \
     payment.h \
     rc.h \
     res.rc \
+    supplier.h \
         workspace.h \
     ../Cafe5/c5config.h \
     ../Cafe5/c5connection.h \
@@ -604,8 +608,10 @@ FORMS += \
     ../Reports/cr5salesbydishesfilter.ui \
     ../Reports/cr5storedocumentsfilter.ui \
     ../Reports/cr5tstoreextrafilter.ui \
+    ../Reports/cr5usersfilter.ui \
     ../Shop/selectprinters.ui \
     payment.ui \
+    supplier.ui \
         workspace.ui \
     ../Cafe5/c5connection.ui \
     ../Cafe5/c5message.ui \

@@ -197,13 +197,16 @@ void CR5Goods::exportToScales()
     f.open(QIODevice::WriteOnly);
     f.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
     f.write("<NewDataSet>\r\n");
-    db.exec("select f_scancode, f_name, f_saleprice from c_goods where f_enabled=1");
+    db.exec("select f_scancode, f_name, f_saleprice, f_wholenumber from c_goods where f_enabled=1 and length(f_scancode) between 1 and 5 ");
     while (db.nextRow()) {
         f.write("<Report>\r\n");
         f.write(QString("<CodeSort>%1</CodeSort>").arg(db.getString(0)).toUtf8());
         f.write(QString("<Code>%1</Code>").arg(db.getString(0)).toUtf8());
         f.write(QString("<GoodName>%1</GoodName>").arg(db.getString(1)).toUtf8());
         f.write(QString("<PriceOut2>%1</PriceOut2>").arg(db.getDouble(2)).toUtf8());
+        if (db.getInt("f_wholenumber") > 0) {
+            f.write(QString("<IsPiece>1</IsPiece>").toUtf8());
+        }
         f.write("</Report>\r\n");
     }
     f.write("</NewDataSet>");

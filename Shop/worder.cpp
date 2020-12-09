@@ -216,6 +216,7 @@ bool WOrder::writeOrder(bool tax)
         g.isService = ui->tblGoods->getInteger(i, 10) == 1;
         g.discountFactor = ui->tblGoods->item(i, col_discount_value)->data(Qt::UserRole).toDouble();
         g.discountMode = ui->tblGoods->item(i, col_discount_mode)->data(Qt::UserRole).toInt();
+        g.storeId = Working::storeId(g.goodsId);
         goods.append(g);
     }
     C5ShopOrder so;
@@ -638,12 +639,18 @@ void WOrder::setQtyOfRow(int row, double qty)
     }
 
     Goods g = fWorking->fGoods[goodsCode];
-    if (__c5config.controlShopQty()) {
-        if (!g.fIsService && g.fQty < totalQty) {
-            C5Message::error(tr("Insufficient quantity") + "<br>" + float_str(totalQty - g.fQty, 3));
-            return;
-        }
+    if (g.fWholeNumber) {
+        totalQty = trunc(totalQty);
     }
+    if (totalQty < 0.00001) {
+        C5Message::error(tr("Incorrect quantity value"));
+        return;
+    }
+    if (!g.fIsService && g.fQty < totalQty) {
+        C5Message::error(tr("Insufficient quantity") + "<br>" + float_str(totalQty - g.fQty, 3));
+        return;
+    }
+
     ui->tblGoods->setDouble(row, 2, qty);
     ui->tblGoods->setDouble(row, 5, ui->tblGoods->getDouble(row, 4) * qty);
     C5LogSystem::writeEvent(QString("%1 %2:%3 %4").arg(tr("Change qty")).arg(g.fCode).arg(g.fName).arg(float_str(qty, 2)));

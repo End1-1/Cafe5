@@ -299,65 +299,50 @@ void Working::makeWGoods()
     fGoods.clear();
     fGoodsCodeForPrint.clear();
     C5Database db(C5Config::dbParams());
-    if (C5Config::controlShopQty()) {
-        if (__c5config.rdbReplica()) {
-            db[":f_store"] = C5Config::defaultStore();
-            db.exec("select g.f_id, g.f_scancode, cp.f_taxname, gg.f_name as f_groupname, g.f_name as f_goodsname, "
-                    "g.f_saleprice, g.f_saleprice2, u.f_name as f_unitname, "
-                    "gca.f_name as group1, gcb.f_name group2, gcc.f_name as group3, gcd.f_name as group4, "
-                    "gg.f_taxdept, gg.f_adgcode, s.f_qty, g.f_unit, go.f_flaguncomplectfrom, go.f_uncomplectfromqty  "
-                    "from a_store_temp s "
-                    "inner join c_goods g on g.f_id=s.f_goods "
-                    "inner join c_groups gg on gg.f_id=g.f_group "
-                    "inner join c_units u on u.f_id=g.f_unit "
-                    "left join c_goods_classes gca on gca.f_id=g.f_group1 "
-                    "left join c_goods_classes gcb on gcb.f_id=g.f_group2 "
-                    "left join c_goods_classes gcc on gcc.f_id=g.f_group3 "
-                    "left join c_goods_classes gcd on gcd.f_id=g.f_group4 "
-                    "left join c_goods_option go on go.f_id=g.f_id and go.f_flaguncomplectfrom>0 "
-                    "left join c_partners cp on cp.f_id=g.f_supplier "
-                    "where s.f_store=:f_store and s.f_qty>0 ");
-        } else {
-            db[":f_store"] = C5Config::defaultStore();
-            db[":f_date"] = QDate::currentDate();
-            db[":f_state"] = DOC_STATE_SAVED;
-            db.exec("select g.f_id, g.f_scancode, cp.f_taxname, gg.f_name as f_groupname, g.f_name as f_goodsname, "
-                    "g.f_saleprice, g.f_saleprice2, u.f_name as f_unitname, "
-                    "gca.f_name as group1, gcb.f_name group2, gcc.f_name as group3, gcd.f_name as group4, "
-                    "gg.f_taxdept, gg.f_adgcode, sum(s.f_qty*s.f_type) as f_qty, g.f_unit, "
-                    "go.f_flaguncomplectfrom, go.f_uncomplectfromqty "
-                    "from a_store_draft s "
-                    "inner join c_goods g on g.f_id=s.f_goods "
-                    "inner join c_groups gg on gg.f_id=g.f_group "
-                    "inner join c_units u on u.f_id=g.f_unit "
-                    "left join c_goods_classes gca on gca.f_id=g.f_group1 "
-                    "left join c_goods_classes gcb on gcb.f_id=g.f_group2 "
-                    "left join c_goods_classes gcc on gcc.f_id=g.f_group3 "
-                    "left join c_goods_classes gcd on gcd.f_id=g.f_group4 "
-                    "left join c_goods_option go on go.f_id=g.f_id and go.f_flaguncomplectfrom>0 "
-                    "left join c_partners cp on cp.f_id=g.f_supplier "
-                    "inner join a_header h on h.f_id=s.f_document "
-                    "where h.f_date<=:f_date and s.f_store=:f_store and h.f_state=:f_state and g.f_enabled=1 "
-                    "group by g.f_id,gg.f_name,g.f_name,g.f_lastinputprice,g.f_saleprice "
-                    "having sum(s.f_qty*s.f_type) > 0 ");
-        }
-    } else {
-        db.exec("select gs.f_id, gs.f_scancode, cp.f_taxname, gr.f_name as f_groupname, gs.f_name as f_goodsname,  "
-                "gs.f_saleprice, gs.f_saleprice2, gu.f_name as f_unitname, "
+
+    if (__c5config.rdbReplica()) {
+        db[":f_store"] = C5Config::defaultStore();
+        db.exec("select g.f_id, g.f_scancode, cp.f_taxname, gg.f_name as f_groupname, g.f_name as f_goodsname, "
+                "g.f_saleprice, g.f_saleprice2, u.f_name as f_unitname, "
                 "gca.f_name as group1, gcb.f_name group2, gcc.f_name as group3, gcd.f_name as group4, "
-                "gr.f_taxdept, gr.f_adgcode, 0 as f_qty, gs.f_unit, go.f_flaguncomplectfrom, go.f_uncomplectfromqty "
-                "from c_goods gs "
-                "left join c_groups gr on gr.f_id=gs.f_group "
-                "left join c_units gu on gu.f_id=gs.f_unit "
-                "left join c_partners cp on cp.f_id=gs.f_supplier "
-                "left join c_goods_classes gca on gca.f_id=gs.f_group1 "
-                "left join c_goods_classes gcb on gcb.f_id=gs.f_group2 "
-                "left join c_goods_classes gcc on gcc.f_id=gs.f_group3 "
-                "left join c_goods_classes gcd on gcd.f_id=gs.f_group4 "
-                "left join c_goods_option go on go.f_id=gs.f_id and go.f_flaguncomplectfrom>0 "
-                "where gs.f_enabled=1 and gs.f_service=0 "
-                "order by gr.f_name, gca.f_name ");
+                "gg.f_taxdept, gg.f_adgcode, s.f_qty, g.f_unit, go.f_flaguncomplectfrom, go.f_uncomplectfromqty,  "
+                "g.f_wholenumber, g.f_storeid "
+                "from a_store_temp s "
+                "inner join c_goods g on g.f_id=s.f_goods "
+                "inner join c_groups gg on gg.f_id=g.f_group "
+                "inner join c_units u on u.f_id=g.f_unit "
+                "left join c_goods_classes gca on gca.f_id=g.f_group1 "
+                "left join c_goods_classes gcb on gcb.f_id=g.f_group2 "
+                "left join c_goods_classes gcc on gcc.f_id=g.f_group3 "
+                "left join c_goods_classes gcd on gcd.f_id=g.f_group4 "
+                "left join c_goods_option go on go.f_id=g.f_id and go.f_flaguncomplectfrom>0 "
+                "left join c_partners cp on cp.f_id=g.f_supplier "
+                "where s.f_store=:f_store and s.f_qty>0 ");
+    } else {
+        db[":f_store"] = C5Config::defaultStore();
+        db[":f_date"] = QDate::currentDate();
+        db[":f_state"] = DOC_STATE_SAVED;
+        db.exec("select g.f_id, g.f_scancode, cp.f_taxname, gg.f_name as f_groupname, g.f_name as f_goodsname, "
+                "g.f_saleprice, g.f_saleprice2, u.f_name as f_unitname, "
+                "gca.f_name as group1, gcb.f_name group2, gcc.f_name as group3, gcd.f_name as group4, "
+                "gg.f_taxdept, gg.f_adgcode, sum(s.f_qty*s.f_type) as f_qty, g.f_unit, "
+                "go.f_flaguncomplectfrom, go.f_uncomplectfromqty, g.f_wholenumber, g.f_storeid "
+                "from a_store_draft s "
+                "inner join c_goods g on g.f_storeid=s.f_goods "
+                "inner join c_groups gg on gg.f_id=g.f_group "
+                "inner join c_units u on u.f_id=g.f_unit "
+                "left join c_goods_classes gca on gca.f_id=g.f_group1 "
+                "left join c_goods_classes gcb on gcb.f_id=g.f_group2 "
+                "left join c_goods_classes gcc on gcc.f_id=g.f_group3 "
+                "left join c_goods_classes gcd on gcd.f_id=g.f_group4 "
+                "left join c_goods_option go on go.f_id=g.f_id and go.f_flaguncomplectfrom>0 "
+                "left join c_partners cp on cp.f_id=g.f_supplier "
+                "inner join a_header h on h.f_id=s.f_document "
+                "where h.f_date<=:f_date and s.f_store=:f_store and h.f_state=:f_state and g.f_enabled=1 "
+                "group by g.f_id,gg.f_name,g.f_name,g.f_lastinputprice,g.f_saleprice "
+                "having sum(s.f_qty*s.f_type) > 0 ");
     }
+
     ui->tblGoods->setRowCount(db.rowCount());
     ui->leTotalRetail->setDouble(0);
     ui->leTotalRetail->setDouble(0);
@@ -376,6 +361,8 @@ void Working::makeWGoods()
         g.fIsService = false;
         g.fUncomplectFrom = db.getInt("f_flaguncomplectfrom");
         g.fUncomplectQty = db.getDouble("f_uncomplectfromqty");
+        g.fWholeNumber = db.getInt("f_wholenumber") == 1;
+        g.fStoreId = db.getInt("f_storeid");
         fGoods[g.fScanCode] = g;
         fGoodsCodeForPrint[g.fCode.toInt()] = g.fScanCode;
         fGoodsRows[g.fScanCode] = row;
@@ -393,7 +380,7 @@ void Working::makeWGoods()
             "gs.f_saleprice, gs.f_saleprice2, gu.f_name as f_unitname, "
             "gca.f_name as group1, gcb.f_name group2, gcc.f_name as group3, gcd.f_name as group4, "
             "gr.f_taxdept, gr.f_adgcode, 0 as f_qty, gs.f_unit, go.f_flaguncomplectfrom, go.f_uncomplectfromqty, "
-            "gs.f_service "
+            "gs.f_service, gs.f_wholenumber "
             "from c_goods gs "
             "left join c_groups gr on gr.f_id=gs.f_group "
             "left join c_units gu on gu.f_id=gs.f_unit "
@@ -427,6 +414,7 @@ void Working::makeWGoods()
         g.fIsService = db.getInt("f_service") > 0;
         g.fUncomplectFrom = db.getInt("f_flaguncomplectfrom");
         g.fUncomplectQty = db.getDouble("f_uncomplectfromqty");
+        g.fWholeNumber = db.getInt("f_wholenumber") == 1;
         fGoods[g.fScanCode] = g;
         fGoodsCodeForPrint[g.fCode.toInt()] = g.fScanCode;
         for (int i = 0; i < db.columnCount(); i++) {
@@ -449,6 +437,18 @@ void Working::makeWGoods()
     }
 
     ui->lbLastUpdate->setText(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
+}
+
+int Working::storeId(int id)
+{
+    if (!fGoodsCodeForPrint.contains(id)) {
+        return 0;
+    }
+    QString s = fGoodsCodeForPrint[id];
+    if (!fGoods.contains(s)) {
+        return 0;
+    }
+    return fGoods[s].fStoreId;
 }
 
 void Working::loadStaff()
@@ -508,7 +508,7 @@ void Working::addGoods(QString &code)
             db.exec("select gs.f_id, gs.f_scancode, cp.f_taxname, gr.f_name as f_groupname, gs.f_name as f_goodsname,  "
                       "gs.f_saleprice, gs.f_saleprice2, gu.f_name as f_unitname, "
                       "gca.f_name as group1, gcb.f_name group2, gcc.f_name as group3, gcd.f_name as group4, "
-                      "gr.f_taxdept, gr.f_adgcode, 0 as f_qty, gs.f_unit, gs.f_service "
+                      "gr.f_taxdept, gr.f_adgcode, 0 as f_qty, gs.f_unit, gs.f_service, gs.f_wholenumber "
                       "from c_goods gs "
                       "left join c_groups gr on gr.f_id=gs.f_group "
                       "left join c_units gu on gu.f_id=gs.f_unit "
@@ -531,6 +531,7 @@ void Working::addGoods(QString &code)
                 g.fAdgCode = db.getString("f_adgcode");
                 g.fQty = db.getDouble("f_qty");
                 g.fIsService = db.getInt("f_service") == 1;
+                g.fWholeNumber = db.getInt("f_wholenumber") == 1;
             }
         }
     }
