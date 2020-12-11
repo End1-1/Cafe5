@@ -22,6 +22,8 @@ public:
 
     virtual QString table();
 
+    virtual QString dbError(QString err);
+
     virtual void setId(int id);
 
     virtual bool save(QString &err, QList<QMap<QString, QVariant> > &data);

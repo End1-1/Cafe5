@@ -42,6 +42,7 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
                    << "sum(oh.f_amountother) as f_amountother"
                    << "oh.f_amountservice"
                    << "oh.f_amountdiscount"
+                   << "oh.f_comment"
                       ;
 
     fColumnsGroup << "concat(oh.f_prefix, oh.f_hallid) as f_prefix"
@@ -60,6 +61,7 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
                    << "cpb.f_taxname as f_buyer"
                    << "cpb.f_taxcode as f_buyertaxcode"
                    << "concat(w.f_last, ' ', w.f_first) as f_staff"
+                   << "oh.f_comment"
                       ;
 
     fColumnsSum << "f_amounttotal"
@@ -99,6 +101,7 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_amountother"] = tr("Other");
     fTranslation["f_amountservice"] = tr("Service");
     fTranslation["f_amountdiscount"] = tr("Discount");
+    fTranslation["f_comment"] = tr("Comment");
 
     fColumnsVisible["concat(oh.f_prefix, oh.f_hallid) as f_prefix"] = true;
     fColumnsVisible["oh.f_id"] = true;
@@ -121,6 +124,7 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
     fColumnsVisible["sum(oh.f_amountother) as f_amountother"] = true;
     fColumnsVisible["oh.f_amountservice"] = false;
     fColumnsVisible["oh.f_amountdiscount"] = false;
+    fColumnsVisible["oh.f_comment"] = false;
 
     restoreColumnsVisibility();
 

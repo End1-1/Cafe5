@@ -42,6 +42,7 @@ CR5SalesByDishes::CR5SalesByDishes(const QStringList &dbParams, QWidget *parent)
                    << "ob.f_removereason"
                    << "sum(ob.f_qty2) as f_qty"
                    << "sum(ob.f_total) as f_total"
+                   << "oh.f_comment"
                       ;
 
     fColumnsGroup << "oh.f_id as f_header"
@@ -58,6 +59,7 @@ CR5SalesByDishes::CR5SalesByDishes(const QStringList &dbParams, QWidget *parent)
                   << "bs.f_name as f_dishstate"
                   << "ob.f_removereason"
                   <<"cst.f_name as f_storename"
+                 << "oh.f_comment"
                       ;
 
     fColumnsSum << "f_qty"
@@ -83,6 +85,7 @@ CR5SalesByDishes::CR5SalesByDishes(const QStringList &dbParams, QWidget *parent)
     fTranslation["f_storename"] = tr("Store");
     fTranslation["f_qty"] = tr("Qty");
     fTranslation["f_total"] = tr("Total");
+    fTranslation["f_comment"] = tr("Comment");
 
     fColumnsVisible["oh.f_id as f_header"] = true;
     fColumnsVisible["oh.f_datecash"] = true;
@@ -100,6 +103,7 @@ CR5SalesByDishes::CR5SalesByDishes(const QStringList &dbParams, QWidget *parent)
     fColumnsVisible["cst.f_name as f_storename"] = true;
     fColumnsVisible["sum(ob.f_qty2) as f_qty"] = true;
     fColumnsVisible["sum(ob.f_total) as f_total"] = true;
+    fColumnsVisible["oh.f_comment"] = false;
 
     restoreColumnsVisibility();
 

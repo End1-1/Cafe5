@@ -120,6 +120,11 @@ void CE5Editor::setId(int id)
     }
 }
 
+QString CE5Editor::dbError(QString err)
+{
+    return err;
+}
+
 bool CE5Editor::save(QString &err, QList<QMap<QString, QVariant> > &data)
 {
     C5Database db(fDBParams);
@@ -199,7 +204,7 @@ bool CE5Editor::save(QString &err, QList<QMap<QString, QVariant> > &data)
         db[":f_id"] = 0;
         leId->setInteger(db.insert(table()));
         if (leId->getInteger() < 1) {
-            err = db.fLastError;
+            err = dbError(db.fLastError);
         }
     } else {
         if (leId->property("Manual") != QVariant::Invalid) {
@@ -214,10 +219,12 @@ bool CE5Editor::save(QString &err, QList<QMap<QString, QVariant> > &data)
                 }
                 leId->setEnabled(false);
                 db[":f_id"] = leId->getInteger();
-                db.insert(table(), false);
+                if (!db.insert(table(), false)) {
+                    err = dbError(db.fLastError);
+                }
             } else {
                 if (!db.update(table(), where_id(leId->getInteger()))) {
-                    err = db.fLastError;
+                    err = dbError(db.fLastError);
                 }
             }
         } else {

@@ -26,6 +26,8 @@ public:
 
     virtual QString table() = 0;
 
+    virtual QString dbError(QString err);
+
     virtual bool save(QString &err, QList<QMap<QString, QVariant> > &data);
 
     virtual bool checkData(QString &err);

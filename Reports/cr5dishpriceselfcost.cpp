@@ -38,12 +38,20 @@ void CR5DishPriceSelfCost::buildQuery()
 void CR5DishPriceSelfCost::buildQueryV1()
 {
     fTableView->clearSpans();
-    fSqlQuery = "select d.f_id, p2.f_name as f_part, d.f_name, sum(r.f_qty*r.f_price) as f_selfcost \
-                from d_recipes r \
-                left join d_dish d on d.f_id=r.f_dish \
-                left join d_part2 p2 on p2.f_id=d.f_part \
-                left join d_menu m on m.f_dish=d.f_id \
-                where m.f_state=1 ";
+    fSqlQuery = "select d.f_id, p2.f_name as f_part, d.f_name, sum(r.f_qty*r.f_price) as f_selfcost "
+                "from d_recipes r "
+                "left join d_dish d on d.f_id=r.f_dish "
+                "left join d_part2 p2 on p2.f_id=d.f_part "
+                "left join d_menu m on m.f_dish=d.f_id "
+                "where m.f_state=1 ";
+    if (fFilter->baseOnSale()) {
+        fSqlQuery += QString(" and r.f_dish in (select distinct(b.f_dish) "
+                             "from o_body b "
+                             "left join o_header h on h.f_id=b.f_header "
+                             "where h.f_datecash between '%1' and '%2') ")
+            .arg(fFilter->d1().toString(FORMAT_DATE_TO_STR_MYSQL))
+            .arg(fFilter->d2().toString(FORMAT_DATE_TO_STR_MYSQL));
+    }
     fTranslation["f_id"] = tr("Code");
     fTranslation["f_part"] = tr("Part");
     fTranslation["f_name"] = tr("Name");
@@ -98,11 +106,13 @@ void CR5DishPriceSelfCost::buildQueryV2()
     fModel->insertColumn(7, tr("Price"));
     fModel->insertColumn(8, tr("Cost"));
     C5Database db(fDBParams);
-    db.exec("select r.f_goods, g.f_name, r.f_qty, u.f_name, r.f_price, r.f_price*r.f_qty, r.f_dish \
-            from d_recipes r \
-            left join c_goods g on g.f_id=r.f_goods \
-            left join c_units u on u.f_id=g.f_unit \
-            order by r.f_dish ");
+    QString query = "select r.f_goods, g.f_name, r.f_qty, u.f_name, r.f_price, r.f_price*r.f_qty, r.f_dish "
+            "from d_recipes r "
+            "left join c_goods g on g.f_id=r.f_goods "
+            "left join c_units u on u.f_id=g.f_unit "
+            "order by r.f_dish ";
+
+    db.exec(query);
     int currDish = 0;
     int currRow = 0;
     int totalRows = 1;

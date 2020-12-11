@@ -60,3 +60,18 @@ QString CR5DishPriceSelfCostFilter::menuId()
 {
     return ui->leMenu->text();
 }
+
+bool CR5DishPriceSelfCostFilter::baseOnSale()
+{
+    return ui->chSaleDate->isChecked();
+}
+
+const QDate CR5DishPriceSelfCostFilter::d1()
+{
+    return ui->de1->date();
+}
+
+const QDate CR5DishPriceSelfCostFilter::d2()
+{
+    return ui->de2->date();
+}

@@ -108,6 +108,7 @@ void C5DishSelfCostGenPrice::saveDataChanges()
         db[":f_price"] = ui->tbl->lineEdit(i, 4)->getDouble();
         db.exec("update d_recipes set f_price=:f_price where f_goods=:f_goods");
     }
+    db.exec("update d_dish d set d.f_cost=(select sum(f_qty*f_price) from d_recipes r where r.f_dish=d.f_id)");
     C5Message::info(tr("The prices was updated"));
 }
 

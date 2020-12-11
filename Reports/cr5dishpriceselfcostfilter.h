@@ -26,6 +26,12 @@ public:
 
     QString menuId();
 
+    bool baseOnSale();
+
+    const QDate d1();
+
+    const QDate d2();
+
 private:
     Ui::CR5DishPriceSelfCostFilter *ui;
 };

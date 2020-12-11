@@ -68,6 +68,14 @@ QString CE5Goods::table()
     return "c_goods";
 }
 
+QString CE5Goods::dbError(QString err)
+{
+    if (err.contains("f_scancode_UNIQUE")) {
+        return tr("Duplicate scancode");
+    }
+    return CE5Editor::dbError(err);
+}
+
 void CE5Goods::setId(int id)
 {
     CE5Editor::setId(id);

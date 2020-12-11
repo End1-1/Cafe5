@@ -132,9 +132,9 @@ bool C5StoreDoc::openDoc(QString id)
         if (row < 0) {
             row = addGoodsRow();
         }
-        if (ui->leReason->getInteger() == 0) {
+        //if (ui->leReason->getInteger() == 0) {
             ui->leReason->setValue(dw.value(container_astoredraft, i, "f_reason").toString());
-        }
+        //}
         if (dw.value(container_astoredraft, i, "f_type").toInt() == 1) {
             ui->tblGoods->setString(row, 0, dw.value(container_astoredraft, i, "f_id").toString());
         } else {
