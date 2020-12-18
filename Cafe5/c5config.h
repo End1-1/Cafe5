@@ -211,6 +211,8 @@ public:
 
     static QString getValue(int key);
 
+    static void setValues(const QMap<int, QString> &values);
+
 private:
     static QMap<int, QString> fSettings;
 };

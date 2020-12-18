@@ -8,6 +8,7 @@
 #include "c5permissions.h"
 #include "printtaxn.h"
 #include "c5waiterorderdoc.h"
+#include "c5storedraftwriter.h"
 #include "c5printing.h"
 #include "c5utils.h"
 #include "notificationwidget.h"
@@ -52,7 +53,8 @@ void C5WaiterServer::reply(QJsonObject &o)
         srh.getJsonFromQuery(QString("select t.f_id, t.f_hall, t.f_name, t.f_lock, t.f_lockSrc, \
                             h.f_id as f_header, concat(u.f_last, ' ', left(u.f_first, 1), '.') as f_staffName, \
                             h.f_amountTotal as f_amount, h.f_print, bc.f_govnumber, \
-                            date_format(h.f_dateOpen, '%d.%m.%Y') as f_dateOpen, h.f_timeOpen \
+                            date_format(h.f_dateOpen, '%d.%m.%Y') as f_dateOpen, h.f_timeOpen, \
+                            t.f_special_config \
                             from h_tables t \
                             left join o_header h on h.f_table=t.f_id and h.f_state=1 \
                             left join b_car_orders bco on bco.f_order = h.f_id  \
@@ -757,6 +759,24 @@ void C5WaiterServer::processCloseOrder(QJsonObject &o, C5Database &db)
     if (jh["f_print"].toString().toInt() < 1) {
         err += tr("Receipt was not printed");
     }
+    // Get settgins
+    QMap<int, QString> settings;
+    db[":f_id"] = jh["f_hall"].toString().toInt();
+    db.exec("select f_settings from h_halls where f_id=:f_id");
+    db.nextRow();
+    int settings_id = db.getInt(0);
+    db[":f_id"] = jh["f_table"].toString().toInt();
+    db.exec("select f_special_config from h_tables where f_id=:f_id");
+    db.nextRow();
+    if (db.getInt(0) > 0) {
+        settings_id = db.getInt(0);
+    }
+    db[":f_settings"] = settings_id;
+    db.exec("select f_key, f_value from s_settings_values where f_settings=:f_settings");
+    while (db.nextRow()) {
+        settings[db.getInt(0)] = db.getString(1);
+    }
+
     QDate dateCash = QDate::currentDate();
     int dateShift = 0;
     bool isAuto;
@@ -832,7 +852,59 @@ void C5WaiterServer::processCloseOrder(QJsonObject &o, C5Database &db)
             C5Database fDD(C5Config::dbParams().at(0), C5Config::hotelDatabase(), C5Config::dbParams().at(2), C5Config::dbParams().at(3));
             C5WaiterOrderDoc w(db, jh, jb);
             w.transferToHotel(db, fDD, err);
-            w.makeOutputOfStore(db, err);
+            w.makeOutputOfStore(db, err); qDebug() << jh;
+
+            C5StoreDraftWriter dw(db);
+            if (settings[param_autoinput_salecash].toInt() == 1) {
+                QString headerPrefix;
+                int headerId;
+                if (!dw.hallId(headerPrefix, headerId, jh["f_hall"].toString().toInt())) {
+                    err = dw.fErrorMsg;
+                }
+                QString cashdocid, nocashdocid;
+                if (jh["f_amountcash"].toString().toDouble() > 0.0001) {
+                    int counter = dw.counterAType(DOC_TYPE_CASH);
+                    if (counter == 0) {
+                        err = dw.fErrorMsg;;
+                    }
+                    if (!dw.writeAHeader(cashdocid, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH,
+                                         jh["f_currentstaff"].toString().toInt(), dateCash, QDate::currentDate(),
+                                         QTime::currentTime(), 0, jh["f_amountcash"].toString().toDouble(),
+                                         settings[param_autocash_prefix] + " " + headerPrefix + QString::number(headerId), 0, 0)) {
+                        err = dw.fErrorMsg;
+                    }
+                    if (!dw.writeAHeaderCash(cashdocid, settings[param_cash_id].toInt(), 0, 1, "", jh["f_id"].toString())) {
+                        err = dw.fErrorMsg;
+                    }
+                    QString cashUUID;
+                    if (!dw.writeECash(cashUUID, cashdocid, settings[param_cash_id].toInt(), 1,
+                                       settings[param_autocash_prefix] + " " + headerPrefix + QString::number(headerId),
+                                       jh["f_amountcash"].toString().toDouble(), cashUUID, 1)) {
+                        err = dw.fErrorMsg;
+                    }
+                }
+                if (jh["f_amountcard"].toString().toDouble() > 0.0001) {
+                    int counter = dw.counterAType(DOC_TYPE_CASH);
+                    if (counter == 0) {
+                        err = dw.fErrorMsg;
+                    }
+                    if (!dw.writeAHeader(nocashdocid, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH,
+                                         jh["f_currentstaff"].toString().toInt(), dateCash, QDate::currentDate(),
+                                         QTime::currentTime(), 0, jh["f_amountcard"].toString().toDouble(),
+                                         settings[param_autonocash_prefix] + " " + headerPrefix + QString::number(headerId), 0, 0)) {
+                        err = dw.fErrorMsg;
+                    }
+                    if (!dw.writeAHeaderCash(nocashdocid, settings[param_nocash_id].toInt(), 0, 1, "", jh["f_id"].toString())) {
+                        err = dw.fErrorMsg;
+                    }
+                    QString cashUUID;
+                    if (!dw.writeECash(cashUUID, nocashdocid, settings[param_nocash_id].toInt(), 1,
+                                       settings[param_autonocash_prefix] + " " + headerPrefix + QString::number(headerId),
+                                       jh["f_amountcard"].toString().toDouble(), cashUUID, 1)) {
+                        err = dw.fErrorMsg;
+                    }
+                }
+            }
         } else {
             C5WaiterOrderDoc::removeDocument(db, jh["f_id"].toString());
         }

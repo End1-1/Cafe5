@@ -324,8 +324,8 @@ void C5CashDoc::inputFromSale()
         if (db.nextRow()) {
             ui->leRemarks->setText(QString("%1 %2, %3").arg(tr("Input from sale")).arg(d.toString(FORMAT_DATE_TO_STR)).arg(shiftname));
             int row = ui->tbl->addEmptyRow();
-            ui->tbl->createLineEdit(row, 0)->setText(QString("%1 %2, %3").arg(tr("Input from sale")).arg(d.toString(FORMAT_DATE_TO_STR)).arg(shiftname));
-            ui->tbl->createLineEdit(row, 1)->setDouble(db.getDouble("f_amount"));
+            ui->tbl->createLineEdit(row, 2)->setText(QString("%1 %2, %3").arg(tr("Input from sale")).arg(d.toString(FORMAT_DATE_TO_STR)).arg(shiftname));
+            ui->tbl->createLineEdit(row, 3)->setDouble(db.getDouble("f_amount"));
             amountChanged("");
         }
     }

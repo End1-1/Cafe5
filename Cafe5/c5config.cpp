@@ -385,3 +385,8 @@ QString C5Config::getValue(int key)
     QMutexLocker ml(&settingsMutex);
     return fSettings[key];
 }
+
+void C5Config::setValues(const QMap<int, QString> &values)
+{
+    fSettings = values;
+}

@@ -55,12 +55,18 @@ void DlgOrder::openTable(const QJsonObject &table, C5User *user)
     __userid = user->fId;
     __username = user->fFull;
     QJsonObject hall = C5CafeCommon::hall(table["f_hall"].toString());
-    if (hall.count() > 0) {
-        C5Config::setServiceFactor(C5CafeCommon::fHallConfigs[hall["f_settings"].toString().toInt()][param_service_factor]);
-        QString menuName = C5Menu::fMenuNames[C5CafeCommon::fHallConfigs[hall["f_settings"].toString().toInt()][param_default_menu]];
-        C5Config::setValue(param_default_menu_name, menuName);
+    C5Config::setValues(C5CafeCommon::fHallConfigs[hall["f_settings"].toString().toInt()]);
+    if (table["f_special_config"].toString().toInt() > 0) {
+        C5Config::setValues(C5CafeCommon::fHallConfigs[table["f_special_config"].toString().toInt()]);
     }
+//    if (hall.count() > 0) {
+//        C5Config::setServiceFactor(C5CafeCommon::fHallConfigs[hall["f_settings"].toString().toInt()][param_service_factor]);
+//        QString menuName = C5Menu::fMenuNames[C5CafeCommon::fHallConfigs[hall["f_settings"].toString().toInt()][param_default_menu]];
+//        C5Config::setValue(param_default_menu_name, menuName);
+//    }
     DlgOrder *d = new DlgOrder();
+    d->ui->lbCar->setVisible(C5Config::carMode());
+    d->ui->btnCar->setVisible(C5Config::carMode());
     d->fMenuName = C5Config::defaultMenuName();
     d->showFullScreen();
     d->hide();
@@ -264,6 +270,7 @@ void DlgOrder::addDishToOrder(const QJsonObject &obj)
 
 void DlgOrder::loadOrder(const QJsonObject &obj)
 {
+
     ui->lbCar->clear();
     ui->lbVisit->clear();
     ui->lbVisit->setVisible(false);
@@ -288,6 +295,16 @@ void DlgOrder::loadOrder(const QJsonObject &obj)
     } else {
         logRecord("", "Open order", fOrder->hString("f_tablename"), "");
     }
+
+    QJsonObject hall = C5CafeCommon::hall(fOrder->hString("f_hall"));
+    C5Config::setValues(C5CafeCommon::fHallConfigs[hall["f_settings"].toString().toInt()]);
+    QJsonObject table = C5CafeCommon::table(fOrder->hInt("f_table"));
+    if (table["f_special_config"].toString().toInt() > 0) {
+        C5Config::setValues(C5CafeCommon::fHallConfigs[table["f_special_config"].toString().toInt()]);
+    }
+    ui->lbCar->setVisible(C5Config::carMode());
+    ui->btnCar->setVisible(C5Config::carMode());
+
     ui->lbTable->setText(fOrder->hString("f_tablename"));
     fOrder->hSetInt("f_currentstaff", fUser->fId);
     fOrder->hSetString("f_currentstaffname", fUser->fFull);

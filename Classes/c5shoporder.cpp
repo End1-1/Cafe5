@@ -222,7 +222,7 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
             return returnFalse(dw.fErrorMsg, db);
         }
         QString cashUUID;
-        if (!dw.writeECash(cashUUID, nocashdocid, __c5config.nocashId(), 1, __c5config.cashPrefix() + " " + headerPrefix + QString::number(headerId), card, cashUUID, 1)) {
+        if (!dw.writeECash(cashUUID, nocashdocid, __c5config.nocashId(), 1, __c5config.nocashPrefix() + " " + headerPrefix + QString::number(headerId), card, cashUUID, 1)) {
             return returnFalse(dw.fErrorMsg, db);
         }
     }

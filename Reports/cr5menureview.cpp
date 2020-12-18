@@ -11,7 +11,7 @@ CR5MenuReview::CR5MenuReview(const QStringList &dbParams, QWidget *parent) :
     fIcon = ":/menu.png";
     fLabel = tr("Review menu");
     fSqlQuery = "select  d.f_id, m.f_id as f_mid, md.f_name as f_statename, mn.f_name as f_menuname, dp1.f_name as f_part1, dp2.f_name as f_part2, "
-            "d.f_name as f_dishname, m.f_price, s.f_name as f_storename, m.f_print1, m.f_print2, d.f_color "
+            "d.f_name as f_dishname, m.f_price, d.f_cost, s.f_name as f_storename, m.f_print1, m.f_print2, d.f_color "
             "from d_menu m "
             "left join d_dish_state md on md.f_id=m.f_state "
             "left join d_dish d on d.f_id=m.f_dish "
@@ -28,6 +28,7 @@ CR5MenuReview::CR5MenuReview(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_part2"] = tr("Type");
     fTranslation["f_dishname"] = tr("Dish name");
     fTranslation["f_price"] = tr("Price");
+    fTranslation["f_cost"] = tr("f_cost");
     fTranslation["f_storename"] = tr("Storage");
     fTranslation["f_print1"] = tr("Print 1");
     fTranslation["f_print2"] = tr("Print 2");

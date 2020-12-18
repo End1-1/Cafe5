@@ -197,6 +197,42 @@ void C5SalaryDoc::countSalary()
         }
     }
 
+    if (jo.contains("percent_from_dishpart2")) {
+        QJsonArray jfixed = jo["percent_from_dishpart2"].toArray();
+        for (int i = 0; i < jfixed.count(); i++) {
+            QJsonObject jfa = jfixed[i].toObject();
+            db[":bstate"] = DISH_STATE_OK;
+            db[":hstate"] = ORDER_STATE_CLOSE;
+            db[":date1"] = ui->deDate->date();
+            db[":shift"] = ui->leShift->getInteger();
+            db.exec(QString("select sum(f_total) "
+                            "from o_body b "
+                            "left join o_header h on h.f_Id=b.f_header "
+                            "where b.f_state=:bstate and h.f_state=:hstate "
+                            "and h.f_datecash=:date1 and h.f_shift=:shift "
+                            "and b.f_dish in (select f_id from d_dish where f_part in(%1))")
+                    .arg(jfa["part2"].toString()));
+            db.nextRow();
+            double total = db.getDouble(0) * (jfa["percent"].toDouble() / 100);
+            int poscount = 0;
+            for (int r = 0; r < ui->tbl->rowCount(); r++) {
+                if (jfa["position"].toInt() == ui->tbl->getInteger(r, 1)) {
+                    poscount++;
+                }
+            }
+            if (poscount == 0) {
+                continue;
+            }
+            total /= poscount;
+            total = (int) (total / 10) * 10;
+            for (int r = 0; r < ui->tbl->rowCount(); r++) {
+                if (jfa["position"].toInt() == ui->tbl->getInteger(r, 1)) {
+                    ui->tbl->lineEdit(r, 5)->setDouble(total);
+                }
+            }
+        }
+    }
+
     if (jo.contains("date_interval_by_days")) {
         QDate d1, d2;
         if (!C5DateRange::dateRange(d1, d2)) {

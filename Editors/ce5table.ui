@@ -7,13 +7,29 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>90</height>
+    <height>116</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="1" column="2">
+    <widget class="C5LineEditWithSelector" name="leHallName">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+     <property name="FieldRef" stdset="0">
+      <string>f_hallname</string>
+     </property>
+    </widget>
+   </item>
    <item row="0" column="0">
     <widget class="QLabel" name="label">
      <property name="text">
@@ -21,11 +37,15 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="1">
-    <widget class="C5LineEditWithSelector" name="lineEdit">
-     <property name="enabled">
-      <bool>false</bool>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Hall</string>
      </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="C5LineEditWithSelector" name="leConfig">
      <property name="maximumSize">
       <size>
        <width>80</width>
@@ -33,17 +53,7 @@
       </size>
      </property>
      <property name="Field" stdset="0">
-      <string>f_id</string>
-     </property>
-     <property name="Primary" stdset="0">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Hall</string>
+      <string>f_special_config</string>
      </property>
     </widget>
    </item>
@@ -60,30 +70,65 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="2">
-    <widget class="C5LineEditWithSelector" name="leHallName">
+   <item row="0" column="1">
+    <widget class="C5LineEditWithSelector" name="lineEdit">
      <property name="enabled">
       <bool>false</bool>
      </property>
-     <property name="FieldRef" stdset="0">
-      <string>f_hallname</string>
+     <property name="maximumSize">
+      <size>
+       <width>80</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="Field" stdset="0">
+      <string>f_id</string>
+     </property>
+     <property name="Primary" stdset="0">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>Name</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1" colspan="2">
+   <item row="3" column="1" colspan="2">
     <widget class="C5LineEditWithSelector" name="lineEdit_3">
      <property name="Field" stdset="0">
       <string>f_name</string>
      </property>
      <property name="First" stdset="0">
       <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Name</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Special config</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="2">
+    <widget class="C5LineEditWithSelector" name="leConfigName">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+     <property name="FieldRef" stdset="0">
+      <string>f_hallname</string>
      </property>
     </widget>
    </item>
@@ -96,6 +141,14 @@
    <header location="global">c5lineeditwithselector.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>leHallCode</tabstop>
+  <tabstop>leConfig</tabstop>
+  <tabstop>lineEdit_3</tabstop>
+  <tabstop>leHallName</tabstop>
+  <tabstop>lineEdit</tabstop>
+  <tabstop>leConfigName</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

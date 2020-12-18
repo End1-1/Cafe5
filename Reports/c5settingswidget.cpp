@@ -68,6 +68,7 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     fTags[ui->leTaxPassword->getTag()] = ui->leTaxPassword->text();
     fTags[ui->leTaxDept->getTag()] = ui->leTaxDept->text();
     fTags[ui->cbMenu->getTag()] = ui->cbMenu->currentData().toString();
+    fTags[param_default_menu_name] = ui->cbMenu->currentText();
     fTags[ui->leOrderPrefix->getTag()] = ui->leOrderPrefix->text();
     fTags[ui->leHall->getTag()] = ui->leHall->text();
     fTags[ui->leTable->getTag()] = ui->leTable->text();

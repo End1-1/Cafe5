@@ -22,6 +22,8 @@ public:
 
     bool salesCounted();
 
+    bool draft();
+
     QDate date1();
 
     QDate date2();

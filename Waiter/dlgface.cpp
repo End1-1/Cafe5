@@ -282,11 +282,13 @@ void DlgFace::handleVersion(const QJsonObject &obj)
         if (o["app"].toString() == _MODULE_) {
             QString version = FileVersion::getVersionString(qApp->applicationFilePath());
             if (o["version"].toString() != version) {
+                fTimer.stop();
                 DlgExitByVersion::exit(version, o["version"].toString());
             }
         }
         if (o["app"].toString() == "menu") {
             if (o["version"].toString() != C5Menu::fMenuVersion) {
+                fTimer.stop();
                 DlgExitByVersion::exit(tr("Menu was updated"));
             }
         }

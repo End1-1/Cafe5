@@ -192,6 +192,11 @@ void CR5ConsumptionBySales::buildQuery()
         rows[r][col_qtyinput] = db.getDouble(1);
     }
     /* get output based on recipes */
+    QString cond1;
+    if (!fFilter->draft()) {
+        db[":f_state"] = DOC_STATE_SAVED;
+        cond1 += " and h.f_state=:f_state ";
+    }
     db[":f_store"] = f->store();
     db[":f_date1"] = f->date1();
     db[":f_date2"] = f->date2();
@@ -201,7 +206,7 @@ void CR5ConsumptionBySales::buildQuery()
             "from a_store_draft s "
             "inner join a_header h on h.f_id=s.f_document "
             "where h.f_date between :f_date1 and :f_date2 and s.f_store=:f_store "
-            "and s.f_reason=:f_reason and h.f_type=:f_type "
+            "and s.f_reason=:f_reason and h.f_type=:f_type " + cond1 +
             "group by 1 ");
     while (db.nextRow()) {
         if (!goodsMap.contains(db.getInt(0))) {

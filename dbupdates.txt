@@ -506,3 +506,7 @@ alter table c_goods add column f_storeid integer;
 update c_goods set f_storeid=f_id;
 alter table c_goods add column f_wholenumber smallint;
 ALTER TABLE `h_tables` CHANGE COLUMN `f_name` `f_name` TINYTEXT NULL DEFAULT NULL ;
+
+/* db - 35 */
+update s_app set f_version='35' where f_app='DB';
+alter table h_tables add column f_special_config integer;

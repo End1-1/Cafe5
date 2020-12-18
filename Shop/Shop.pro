@@ -232,6 +232,7 @@ SOURCES += \
     ../Reports/cr5tstoreextra.cpp \
     ../Reports/cr5tstoreextrafilter.cpp \
     ../Reports/cr5users.cpp \
+    ../Reports/cr5usersfilter.cpp \
     ../Reports/cr5usersgroups.cpp \
     ../Waiter/c5lineeditwithselector.cpp \
     ../Waiter/c5printreceiptthread.cpp \
@@ -488,6 +489,7 @@ HEADERS += \
     ../Reports/cr5tstoreextra.h \
     ../Reports/cr5tstoreextrafilter.h \
     ../Reports/cr5users.h \
+    ../Reports/cr5usersfilter.h \
     ../Reports/cr5usersgroups.h \
     ../Service/servicecommands.h \
     ../Waiter/c5lineeditwithselector.h \
@@ -630,6 +632,7 @@ FORMS += \
     ../Reports/cr5salesbydishesfilter.ui \
     ../Reports/cr5storedocumentsfilter.ui \
     ../Reports/cr5tstoreextrafilter.ui \
+    ../Reports/cr5usersfilter.ui \
     ../Waiter/dlgcarnumber.ui \
     ../Waiter/dlgcl.ui \
     ../Waiter/dlgcreditcardlist.ui \

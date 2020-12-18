@@ -35,6 +35,11 @@ bool CR5ConsumptionBySalesFilter::salesCounted()
     return ui->chSalesCounted->isChecked();
 }
 
+bool CR5ConsumptionBySalesFilter::draft()
+{
+    return ui->chDraft->isChecked();
+}
+
 QDate CR5ConsumptionBySalesFilter::date1()
 {
     return ui->deStart->date();
