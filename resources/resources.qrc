@@ -49,5 +49,6 @@
         <file>minus.png</file>
         <file>customer.png</file>
         <file>delivery.png</file>
+        <file>danger.png</file>
     </qresource>
 </RCC>

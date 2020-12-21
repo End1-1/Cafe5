@@ -133,6 +133,7 @@ SOURCES += \
     ../Editors/ce5usergroup.cpp \
     ../FrontDesk/barcode.cpp \
     ../FrontDesk/c5cashdoc.cpp \
+    ../FrontDesk/c5changedocinputprice.cpp \
     ../FrontDesk/c5changepassword.cpp \
     ../FrontDesk/c5changepriceofgroup.cpp \
     ../FrontDesk/c5checkdatabase.cpp \
@@ -374,6 +375,7 @@ HEADERS += \
     ../Editors/ce5usergroup.h \
     ../FrontDesk/barcode.h \
     ../FrontDesk/c5cashdoc.h \
+    ../FrontDesk/c5changedocinputprice.h \
     ../FrontDesk/c5changepassword.h \
     ../FrontDesk/c5changepriceofgroup.h \
     ../FrontDesk/c5checkdatabase.h \
@@ -550,6 +552,7 @@ FORMS += \
     ../Editors/ce5user.ui \
     ../Editors/ce5usergroup.ui \
     ../FrontDesk/c5cashdoc.ui \
+    ../FrontDesk/c5changedocinputprice.ui \
     ../FrontDesk/c5changepassword.ui \
     ../FrontDesk/c5changepriceofgroup.ui \
     ../FrontDesk/c5checkdatabase.ui \

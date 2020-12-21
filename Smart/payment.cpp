@@ -258,7 +258,8 @@ bool payment::printReceipt(bool printSecond)
         p.br();
         p.br();
         p.ltext(tr("Customer"), 0);
-        p.rtext(db.getString("f_comment"));
+        p.br();
+        p.ltext(db.getString("f_comment"), 0);
     }
 
     p.setFontSize(20);

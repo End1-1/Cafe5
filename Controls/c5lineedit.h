@@ -38,6 +38,12 @@ public:
 
     void addEventKeys(const QString &keys);
 
+    void fixValue();
+
+    QString old();
+
+    void setBgColor(const QColor &color);
+
 protected:
     void keyPressEvent(QKeyEvent *e);
 

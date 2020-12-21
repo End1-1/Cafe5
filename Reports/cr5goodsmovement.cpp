@@ -2,6 +2,7 @@
 #include "cr5goodsmovementfilter.h"
 #include "c5mainwindow.h"
 #include "c5storedoc.h"
+#include "c5changedocinputprice.h"
 #include "c5tablemodel.h"
 
 CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent) :
@@ -26,6 +27,7 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
                        ;
 
     fColumnsFields << "s.f_document"
+                   << "s.f_id as f_storerec"
                    << "dt.f_name as f_docname"
                    << "a.f_userid"
                    << "a.f_date"
@@ -50,6 +52,7 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
                       ;
 
     fColumnsGroup << "s.f_document"
+                  << "s.f_id as f_storerec"
                   << "dt.f_name as f_docname"
                   << "a.f_userid"
                   << "a.f_date"
@@ -77,6 +80,7 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
                       ;
 
     fTranslation["f_userid"] = tr("Document");
+    fTranslation["f_storerec"] = tr("Store record");
     fTranslation["f_docname"] = tr("Type");
     fTranslation["f_date"] = tr("Date");
     fTranslation["f_document"]  = tr("Op.num.");
@@ -99,6 +103,7 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
     fTranslation["f_salepricetotal2"] = tr("Total whosale");
 
     fColumnsVisible["a.f_date"] = true;
+    fColumnsVisible["s.f_id as f_storerec"] = false;
     fColumnsVisible["dt.f_name as f_docname"] = true;
     fColumnsVisible["a.f_userid"] = true;
     fColumnsVisible["s.f_document"] = false;
@@ -134,6 +139,7 @@ QToolBar *CR5GoodsMovement::toolBar()
             << ToolBarButtons::tbExcel
             << ToolBarButtons::tbPrint;
         fToolBar = createStandartToolbar(btn);
+        fToolBar->addAction(QIcon(":/pricing.png"), tr("Change price"), this, SLOT(changePrice()));
     }
     return fToolBar;
 }
@@ -151,6 +157,28 @@ bool CR5GoodsMovement::tblDoubleClicked(int row, int column, const QList<QVarian
         __mainWindow->removeTab(sd);
     }
     return true;
+}
+
+void CR5GoodsMovement::changePrice()
+{
+    if (!fColumnsVisible["s.f_id as f_storerec"]) {
+        C5Message::info(tr("The store record column must be included in the report"));
+        return;
+    }
+    QModelIndexList ml = this->fTableView->selectionModel()->selectedIndexes();
+    QSet<int> rows;
+    foreach (QModelIndex m, ml) {
+        rows << m.row();
+    }
+    if (rows.count() > 1) {
+        C5Message::error(tr("Select only one row"));
+        return;
+    }
+    if (rows.count() == 0) {
+        C5Message::error(tr("Nothing was selected"));
+        return;
+    }
+    C5ChangeDocInputPrice::changePrice(fDBParams, fModel->data(rows.toList().at(0), fModel->indexForColumnName("f_storerec"), Qt::EditRole).toString());
 }
 
 void CR5GoodsMovement::restoreColumnsWidths()

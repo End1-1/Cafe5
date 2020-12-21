@@ -44,6 +44,7 @@ C5DishWidget::C5DishWidget(const QStringList &dbParams, QWidget *parent) :
     ui->lePortionQty->setValidator(new QDoubleValidator(0, 14, 2));
     connect(ui->leColor, SIGNAL(doubleClicked()), this, SLOT(setColor()));
     installEventFilter(this);
+    ui->leWeight->fDecimalPlaces = 3;
 }
 
 C5DishWidget::~C5DishWidget()

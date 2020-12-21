@@ -73,6 +73,23 @@ void C5LineEdit::addEventKeys(const QString &keys)
     fEventKeys.append(keys);
 }
 
+void C5LineEdit::fixValue()
+{
+    setProperty("old", text());
+}
+
+QString C5LineEdit::old()
+{
+    return property("old").toString();
+}
+
+void C5LineEdit::setBgColor(const QColor &color)
+{
+    QPalette palette;
+    palette.setColor(QPalette::Base, color);
+    setPalette(palette);
+}
+
 void C5LineEdit::keyPressEvent(QKeyEvent *e)
 {
     const QValidator *v = validator();
@@ -140,6 +157,13 @@ void C5LineEdit::editText(const QString &arg)
     int cursPos = cursorPosition();
     setText(arg);
     setCursorPosition(cursPos);
+    if (property("old").isValid()) {
+        if (property("old").toString().compare(text(), Qt::CaseInsensitive) == 0) {
+            setBgColor(Qt::white);
+        } else {
+            setBgColor(Qt::yellow);
+        }
+    }
 }
 
 C5LineEdit *isLineEdit(QObject *o)

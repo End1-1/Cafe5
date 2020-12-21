@@ -115,6 +115,9 @@ void CE5Editor::setId(int id)
                 }
             }
         }
+        for (C5LineEditWithSelector *l: fLines) {
+            l->fixValue();
+        }
     } else {
         C5Message::error(tr("Invalid code"));
     }

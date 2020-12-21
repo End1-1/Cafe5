@@ -3,11 +3,13 @@
 #include <QPainter>
 
 static QPixmap *minusPixmap = nullptr;
+static QPixmap *dangerPixmap = nullptr;
 
 DishTableItemDelegate::DishTableItemDelegate()
 {
     if (minusPixmap == nullptr) {
         minusPixmap = new QPixmap(":/minus.png");
+        dangerPixmap = new QPixmap(":/danger.png");
     }
 }
 
@@ -44,8 +46,15 @@ void DishTableItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
     rPrice.adjust(rPrice.width() - fm.width(price) - 2, rPrice.height() - fm.height() - 2, -2, -2);
     painter->drawText(rPrice, price);
 
+    int iconright = 22;
     if (d->netWeight < 0.00001) {
-        painter->drawPixmap(option.rect.right() - 22, option.rect.top() + 2, 20, 20, *minusPixmap);
+        painter->drawPixmap(option.rect.right() - iconright, option.rect.top() + 2, 20, 20, *minusPixmap);
+        iconright += 22;
+    }
+
+    if (d->price <= d->cost) {
+        painter->drawPixmap(option.rect.right() - iconright, option.rect.top() +2, 20, 20, *dangerPixmap);
+        iconright += 22;
     }
     painter->restore();
 }
