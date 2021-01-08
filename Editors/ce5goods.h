@@ -45,6 +45,12 @@ private slots:
 
     void removeImage();
 
+    void newScancode();
+
+    void removeScancode();
+
+    void tblMultiscancodeContextMenu(const QPoint &p);
+
     void on_btnNewGroup_clicked();
 
     void on_btnNewUnit_clicked();
@@ -93,6 +99,10 @@ private:
     QSet<QString> fStrings;
 
     Barcode *fBarcode;
+
+    QStringList fScancodeRemove;
+
+    QStringList fScancodeAppend;
 };
 
 #endif // CE5GOODS_H

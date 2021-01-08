@@ -8,6 +8,7 @@
 #define container_aheadercash 3
 #define container_aheaderstore 4
 #define container_astoredraft 5
+#define container_astoredishwaste 6
 
 struct IGoods {
     QString recId;
@@ -51,6 +52,8 @@ public:
     bool writeAStoreDraft(QString &id, const QString &docId, int store, int type, int goods, double qty, double price, double total, int reason, const QString &baseid, int rownum, const QString &comment);
 
     bool writeAStoreInventory(QString &id, const QString &docId, int store, int goods, double qty, double price, double total);
+
+    bool writeAStoreDishWaste(QString &id, const QString &docId, int dish, double qty, const QString &data);
 
     bool writeBHistory(const QString &id, int type, int card, double value, double data);
 
@@ -105,6 +108,10 @@ private:
 
     QHash<QString, int> fAHeaderStoreDataMap;
 
+    QList<QList<QVariant> > fAStoreDishWaste;
+
+    QHash<QString, int> fAStoreDishWasteDataMap;
+
     QList<QList<QVariant> > fAHeaderData;
 
     QHash<QString, int> fAHeaderDataMap;
@@ -120,6 +127,8 @@ private:
     bool readAHeaderStore(const QString &id);
 
     bool readAStoreDraft(const QString &id);
+
+    bool readAStoreDishWaste(const QString &id);
 
     bool readAHeaderCash(const QString &id);
 

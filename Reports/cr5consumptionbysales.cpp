@@ -423,10 +423,12 @@ void CR5ConsumptionBySales::makeOutput(bool v)
     }
     if (goodsLost.count() > 0) {
         QList<IGoods> gl;
-        for (QMap<int, double>::const_iterator it = goodsLost.begin(); it != goodsLost.end(); it++) {
+        for (QMap<int, double>::const_iterator it = goodsLost.constBegin(); it != goodsLost.constEnd(); it++) {
             IGoods g;
             g.goodsId = it.key();
             g.goodsQty = it.value();
+            g.goodsPrice = 0;
+            g.goodsTotal = 0;
             gl.append(g);
         }
         writeDocs(DOC_TYPE_STORE_OUTPUT, DOC_REASON_LOST, gl, tr("Lost"));
@@ -478,12 +480,12 @@ void CR5ConsumptionBySales::rollbackGoodsOutput(bool v)
 
 void CR5ConsumptionBySales::countOutputBasedOnRecipes()
 {
-    C5ProgressDialog *pd = new C5ProgressDialog();
+    C5ProgressDialog *pd = new C5ProgressDialog(this);
     connect(this, SIGNAL(updateProgressValue(int)), pd, SLOT(updateProgressValue(int)));
     C5Database db(fDBParams);
     db[":f_datecash1"] = fFilter->date1();
     db[":f_datecash2"] = fFilter->date2();
-    db.exec("select f_id from o_header where f_datecash between :f_datecash1 and :f_datecash2");
+    db.exec("select f_id from o_header where f_datecash between :f_datecash1 and :f_datecash2 order by f_datecash");
     QStringList idList;
     while (db.nextRow()) {
         idList.append(db.getString(0));
@@ -492,12 +494,10 @@ void CR5ConsumptionBySales::countOutputBasedOnRecipes()
     pd->show();
     QString err;
     int count = 0;
-    for (QString id: idList) {
+    for (const QString &id: idList) {
         C5WaiterOrderDoc(id, db).makeOutputOfStore(db, err);
         count++;
-        if (count % 20 == 0) {
-            emit updateProgressValue(count);
-        }
+        emit updateProgressValue(count);
     }
     delete pd;
     if (err.isEmpty()) {
@@ -558,9 +558,11 @@ C5StoreDoc *CR5ConsumptionBySales::writeDocs(int doctype, int reason, const QLis
     }
     //= dw.writeDraft(docDate, doctype, store, reason, data, comment);
     auto *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);
-    if (!sd->openDoc(documentId)) {
+    QString e;
+    if (!sd->openDoc(documentId, e)) {
         __mainWindow->removeTab(sd);
         sd = nullptr;
+        C5Message::error(e);
     }
     return sd;
 }

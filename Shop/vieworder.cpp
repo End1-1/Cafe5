@@ -163,8 +163,14 @@ void ViewOrder::on_btnReturn_clicked()
             }
         }
         if (haveStore && ui->tbl->getInteger(i, 8) == 0) {
+            db[":f_id"] = ui->tbl->getInteger(i, 6);
+            db.exec("select f_storeid from c_goods where f_id=:f_id");
+            db.nextRow();
+            int storeid = db.getInt("f_storeid");
             if (!dw.writeAStoreDraft(adraftid, storeDocId, __c5config.defaultStore(), 1,
-                                     ui->tbl->getInteger(i, 6), ui->tbl->getDouble(i, 3), price, price * ui->tbl->getDouble(i, 3), DOC_REASON_SALE_RETURN, adraftid, i + 1, "")) {
+                                     storeid, ui->tbl->getDouble(i, 3),
+                                     price, price * ui->tbl->getDouble(i, 3),
+                                     DOC_REASON_SALE_RETURN, adraftid, i + 1, "")) {
                 return returnFalse(dw.fErrorMsg, &db);
             }
         }
@@ -196,7 +202,7 @@ void ViewOrder::on_btnReturn_clicked()
         }
     }
 
-    for (QMap<int, double>::const_iterator it = cashmap.begin(); it != cashmap.end(); it++) {
+    for (QMap<int, double>::const_iterator it = cashmap.constBegin(); it != cashmap.constEnd(); it++) {
         QString cashdocid;
         double cashamount = cashmap.count() == 1 ? returnAmount : it.value();
         int counter = dw.counterAType(DOC_TYPE_CASH);

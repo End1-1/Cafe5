@@ -20,10 +20,17 @@ bool DlgPin::getPin(QString &pin, QString &pass)
 {
     bool result = false;
     DlgPin *d = new DlgPin();
-    if (d->exec() == QDialog::Accepted) {
-        pin = d->ui->leUser->text();
-        pass = d->ui->lePin->text();
+    if (!pin.isEmpty()) {
+        d->ui->leUser->setText(pin);
+        d->ui->lePin->setText(pass);
         result = true;
+    }
+    if (!result) {
+        if (d->exec() == QDialog::Accepted) {
+            pin = d->ui->leUser->text();
+            pass = d->ui->lePin->text();
+            result = true;
+        }
     }
     delete d;
     return result;

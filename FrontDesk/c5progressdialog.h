@@ -23,6 +23,8 @@ public:
 public slots:
     void updateProgressValue(int value);
 
+    void updateProgressValueWithMessage(int value, const QString &msg);
+
 private:
     Ui::C5ProgressDialog *ui;
 

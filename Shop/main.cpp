@@ -63,38 +63,46 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    if (__c5config.shopEnterPin()) {
-        bool login = false;
-        C5Database db(C5Config::dbParams());
-        do {
-            QString user, pin;
-            if (!DlgPin::getPin(user, pin)) {
-                return 0;
-            }
-            C5UserAuth ua(db);
-            if (ua.authByPinPass(user, pin, __userid, __usergroup, __username)) {
-                login = true;
-            } else {
-                C5Message::error(ua.error());
-            }
-        } while (!login);
-        db[":f_user"] = __userid;
-        db.exec("select sn.f_id, sn.f_name from s_settings_names sn where sn.f_id in (select f_settings from s_user_config where f_user=:f_user)");
-        SettingsSelection *s = new SettingsSelection();
-        while (db.nextRow()) {
-            s->addSettingsId(db.getInt("f_id"), db.getString("f_name"));
-        }
-        s->addSettingsId(-1, QObject::tr("Cancel"));
-        if (db.rowCount() > 1) {
-            if (s->exec() == QDialog::Accepted) {
-
-            }
-        }
-        s->deleteLater();
-
-    } else {
-        __userid = 1;
+    bool login = false;
+    C5Database db(C5Config::dbParams());
+    QString user, pin;
+    if (!__c5config.shopEnterPin()) {
+        user = __c5config.getValue(param_shop_autologin_pin1);
+        pin = __c5config.getValue(param_shop_autologin_pin2);
     }
+    do {
+        if (!DlgPin::getPin(user, pin)) {
+            return 0;
+        }
+        C5UserAuth ua(db);
+        if (ua.authByPinPass(user, pin, __userid, __usergroup, __username)) {
+            login = true;
+        } else {
+            C5Message::error(ua.error());
+        }
+        pin.clear();
+        user.clear();
+    } while (!login);
+    db[":f_group"] = __usergroup;
+    db.exec("select f_key from s_user_access where f_group=:f_group");
+    while (db.nextRow()) {
+        __userpermissions.append(db.getInt(0));
+    }
+    db[":f_user"] = __userid;
+    db.exec("select sn.f_id, sn.f_name from s_settings_names sn where sn.f_id in (select f_settings from s_user_config where f_user=:f_user)");
+    auto *s = new SettingsSelection();
+    while (db.nextRow()) {
+        s->addSettingsId(db.getInt("f_id"), db.getString("f_name"));
+    }
+    s->addSettingsId(-1, QObject::tr("Cancel"));
+    if (db.rowCount() > 1) {
+        if (s->exec() == QDialog::Accepted) {
+
+        }
+    }
+    s->deleteLater();
+
+
     if (__c5config.rdbReplica()) {
         auto *r = new C5Replication();
         r->uploadToServer();

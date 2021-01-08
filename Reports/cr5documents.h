@@ -35,6 +35,11 @@ private slots:
     void removeDocs();
 
     void copySelectedDocs();
+
+signals:
+    void updateProgressValue(int);
+
+    void updateProgressValueWithMessage(int, QString);
 };
 
 #endif // CR5DOCUMENTS_H

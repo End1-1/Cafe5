@@ -7,6 +7,7 @@
 #include "c5salarydoc.h"
 #include "c5storedraftwriter.h"
 #include "c5cashdoc.h"
+#include "c5progressdialog.h"
 #include <QMenu>
 
 CR5Documents::CR5Documents(const QStringList &dbParams, QWidget *parent) :
@@ -134,14 +135,16 @@ void CR5Documents::callEditor(const QString &id)
 
 void CR5Documents::openDoc(QString id)
 {
+    QString err;
     switch (docType(id)) {
     case DOC_TYPE_STORE_INPUT:
     case DOC_TYPE_STORE_OUTPUT:
     case DOC_TYPE_STORE_MOVE:
     case DOC_TYPE_COMPLECTATION: {
         auto *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);
-        if (!sd->openDoc(id)) {
+        if (!sd->openDoc(id, err)) {
             __mainWindow->removeTab(sd);
+            C5Message::error(err);
         }
         break;
     }
@@ -191,15 +194,22 @@ void CR5Documents::saveDocs()
     }
     if (C5Message::question(tr("Confirm to save selected documents")) != QDialog::Accepted) {
         return;
-    }
+    }    
     QSet<int> rowsTemp;
     foreach (QModelIndex mi, ml) {
         rowsTemp << mi.row();
     }
     QList<int> rows = rowsTemp.values();
     std::sort(rows.begin(), rows.end());
+
+    auto *pd = new C5ProgressDialog(this);
+    pd->setMax(rows.count());
+    connect(this, SIGNAL(updateProgressValueWithMessage(int,QString)), pd, SLOT(updateProgressValueWithMessage(int, QString)));
+    pd->show();
     C5Database db(fDBParams);
     QString err;
+    int rowLeft = 0;
+    int complete = 0;
     foreach (int row, rows) {
         QString docid = fModel->data(row, fModel->indexForColumnName("f_id"), Qt::EditRole).toString();
         db[":f_id"] = docid;
@@ -208,6 +218,7 @@ void CR5Documents::saveDocs()
             continue;
         }
         if (db.getInt("f_state") == DOC_STATE_SAVED) {
+            emit updateProgressValueWithMessage(++rowLeft, QString("%1 %2, %3 %4").arg(tr("Success")).arg(complete).arg(tr("Fail")).arg(rowLeft - complete));
             continue;
         }
         C5StoreDoc d(fDBParams);
@@ -217,10 +228,15 @@ void CR5Documents::saveDocs()
         case DOC_TYPE_STORE_MOVE:
         case DOC_TYPE_STORE_OUTPUT:
         case DOC_TYPE_COMPLECTATION:
-            d.openDoc(docid);
-            if (d.writeDocument(DOC_STATE_SAVED, err)) {
-                fModel->setData(row, fModel->indexForColumnName("f_statename"), tr("Saved"));
-                fModel->setData(row, fModel->indexForColumnName("f_amount"), 0);
+            if (d.openDoc(docid, e)) {
+                if (d.writeDocument(DOC_STATE_SAVED, e)) {
+                    fModel->setData(row, fModel->indexForColumnName("f_statename"), tr("Saved"));
+                    fModel->setData(row, fModel->indexForColumnName("f_amount"), 0);
+                    complete++;
+                } else {
+                    qDebug() << e;
+                    err += e;
+                }
             } else {
                 err += e;
             }
@@ -230,7 +246,9 @@ void CR5Documents::saveDocs()
             continue;
             break;
         }
+        emit updateProgressValueWithMessage(++rowLeft, QString("%1 %2, %3 %4").arg(tr("Success")).arg(complete).arg(tr("Fail")).arg(rowLeft - complete));
     }
+    delete pd;
     if (!err.isEmpty()) {
         C5Message::error(err);
     }
@@ -267,17 +285,22 @@ void CR5Documents::draftDocs()
         if (db.getInt("f_state") == DOC_STATE_DRAFT) {
             continue;
         }
+        QString e;
         C5StoreDoc d(fDBParams);
         switch (db.getInt("f_type")) {
         case DOC_TYPE_STORE_INPUT:
         case DOC_TYPE_STORE_MOVE:
         case DOC_TYPE_STORE_OUTPUT:
         case DOC_TYPE_COMPLECTATION:
-            d.openDoc(docid);
-            if (d.writeDocument(DOC_STATE_DRAFT, err)) {
-                fModel->setData(row, fModel->indexForColumnName("f_statename"), tr("Draft"));
-                fModel->setData(row, fModel->indexForColumnName("f_amount"), 0);
+            if (d.openDoc(docid, e)) {
+                if (d.writeDocument(DOC_STATE_DRAFT, e)) {
+                    fModel->setData(row, fModel->indexForColumnName("f_statename"), tr("Draft"));
+                    fModel->setData(row, fModel->indexForColumnName("f_amount"), 0);
+                } else {
+                    err += e;
+                }
             } else {
+                err += e;
             }
             break;
         default:

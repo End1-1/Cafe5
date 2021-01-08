@@ -55,6 +55,8 @@ public:
 
     inline QList<QVariant> getRow(int row) {return fCacheData.at(row);}
 
+    inline QList<QVariant> getValuesForId(int id) {return find(id) > -1 ? getRow(find(id)) : QList<QVariant>(); }
+
     QString getString(int id);
 
     inline int getInt(int row, int column) {return fCacheData.at(row).at(column).toInt();}

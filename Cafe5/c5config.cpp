@@ -19,6 +19,7 @@ C5Config __c5config;
 int __userid;
 int __usergroup;
 QString __username;
+QList<int> __userpermissions;
 QStringList __databases;
 QMap<int, QString> C5Config::fSettings;
 static QMutex settingsMutex;

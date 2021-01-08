@@ -37,6 +37,11 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
     ui->leComplectationCode->setSelector(fDBParams, ui->leComplectationName, cache_goods, 1, 3);
     disconnect(ui->leComplectationName, SIGNAL(textChanged(QString)), this, SLOT(on_leComplectationName_textChanged(QString)));
     connect(ui->leComplectationName, SIGNAL(textChanged(QString)), this, SLOT(on_leComplectationName_textChanged(QString)));
+#ifdef QT_DEBUG
+    ui->tblDishes->setColumnWidths(ui->tblDishes->columnCount(), 0, 0, 400, 80, 400);
+#else
+    ui->tblDishes->setColumnWidths(ui->tblDishes->columnCount(), 0, 0, 400, 80, 0);
+#endif
     ui->tblGoods->setColumnWidths(ui->tblGoods->columnCount(), 0, 0, 0, 0, 400, 80, 80, 80, 80, 300);
     ui->tblGoodsStore->setColumnWidths(7, 0, 0, 200, 70, 50, 50, 70);
     ui->btnNewPartner->setVisible(pr(dbParams.at(1), cp_t7_partners));
@@ -85,13 +90,13 @@ C5StoreDoc::~C5StoreDoc()
     delete ui;
 }
 
-bool C5StoreDoc::openDoc(QString id)
+bool C5StoreDoc::openDoc(QString id, QString &err)
 {
     ui->leDocNum->setPlaceholderText("");
     C5Database db(fDBParams);
     C5StoreDraftWriter dw(db);
     if (!dw.readAHeader(id)) {
-        C5Message::error(dw.fErrorMsg);
+        err = dw.fErrorMsg;
         return false;
     }
 
@@ -106,6 +111,14 @@ bool C5StoreDoc::openDoc(QString id)
     ui->lePayment->setValue(dw.value(container_aheader, 0, "f_payment").toInt());
     ui->chPaid->setChecked(dw.value(container_aheader, 0, "f_paid").toInt() == 1);
     setMode(static_cast<STORE_DOC>(fDocType));
+    for (int i = 0; i < dw.rowCount(container_astoredishwaste); i++) {
+        int row = ui->tblDishes->addEmptyRow();
+        ui->tblDishes->setString(row, 0, dw.value(container_astoredishwaste, i, "f_id").toString());
+        ui->tblDishes->setString(row, 1, dw.value(container_astoredishwaste, i, "f_dish").toString());
+        ui->tblDishes->setString(row, 2, dw.value(container_astoredishwaste, i, "f_dishname").toString());
+        ui->tblDishes->lineEdit(row, 3)->setDouble(dw.value(container_astoredishwaste, i, "f_qty").toDouble());
+        ui->tblDishes->setString(row, 4, dw.value(container_astoredishwaste, i, "f_data").toString());
+    }
     for (int i = 0; i < dw.rowCount(container_astoredraft); i++) {
         int row = -1;
         if (dw.value(container_astoredraft, i, "f_type").toInt() == 1) {
@@ -181,7 +194,7 @@ bool C5StoreDoc::openDoc(QString id)
             ui->leComplectationCode->setValue(db.getInt("f_goods"));
             ui->leComplectationQty->setDouble(db.getDouble("f_qty"));
         } else {
-            C5Message::error(tr("Error in complectation document"));
+            err = tr("Error in complectation document");
             return false;
         }
     }
@@ -385,7 +398,7 @@ bool C5StoreDoc::removeDoc(const QStringList &dbParams, QString id, bool showmes
     QString cashDoc;
     if (db.nextRow()) {
         if (db.getInt(0) > 0) {
-            err += tr("Document based on sale cannot be edited manually");
+            //err += tr("Document based on sale cannot be edited manually");
         }
         cashDoc = db.getString("f_cashuuid");
     }
@@ -409,6 +422,8 @@ bool C5StoreDoc::removeDoc(const QStringList &dbParams, QString id, bool showmes
         db[":f_id"] = cashDoc;
         db.exec("delete from a_header where f_id=:f_id");
     }
+    db[":f_document"] = id;
+    db.exec("delete from a_store_dish_waste where f_document=:f_document");
     return err.isEmpty();
 }
 
@@ -585,6 +600,13 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
         db[":f_row"] = i + 1;
         db.insert("a_complectation_additions", false);
     }
+    for (int i = 0; i < ui->tblDishes->rowCount(); i++) {
+        QString id = ui->tblDishes->getString(i, 0);
+        if (!dw.writeAStoreDishWaste(id, fInternalId, ui->tblDishes->getInteger(i, 1), ui->tblDishes->lineEdit(i, 3)->getDouble(), ui->tblDishes->getString(i, 4))) {
+            err += db.fLastError + "<br>";
+        }
+        ui->tblDishes->setString(i, 0, id);
+    }
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
         QString inid = ui->tblGoods->getString(i, 0);
         QString outid = ui->tblGoods->getString(i, 1);
@@ -721,6 +743,19 @@ void C5StoreDoc::setUserId(bool withUpdate, int value)
     C5Database db(fDBParams);
     C5StoreDraftWriter dw(db);
     ui->leDocNum->setPlaceholderText(dw.storeDocNum(fDocType, storeId, withUpdate, value));
+}
+
+void C5StoreDoc::correctDishesRows(int row, int count)
+{
+    for (int i = row; i < ui->tblDishes->rowCount(); i++) {
+        QJsonArray ja = QJsonDocument::fromJson(ui->tblDishes->getString(i, 4).toUtf8()).array();
+        for (int j = 0; j < ja.count(); j++) {
+            QJsonObject jo = ja.at(j).toObject();
+            jo["f_row"] = jo["f_row"].toInt() - count;
+            ja[j] = jo;
+        }
+        ui->tblDishes->setString(i, 4, QJsonDocument(ja).toJson());
+    }
 }
 
 void C5StoreDoc::countTotal()
@@ -1104,6 +1139,8 @@ void C5StoreDoc::newDoc()
     ui->leStoreOutput->setValue(0);
     ui->tblGoods->clearContents();
     ui->tblGoods->setRowCount(0);
+    ui->tblDishes->clearContents();
+    ui->tblDishes->setRowCount(0);
     ui->leInvoiceNumber->clear();
     ui->leComplectationCode->setValue("");
     ui->leComplectationQty->clear();
@@ -1550,6 +1587,20 @@ void C5StoreDoc::cancelGoodsGroupOrder()
     loadGroupsInput();
 }
 
+void C5StoreDoc::tblDishQtyChanged(const QString &arg1)
+{
+    int r, c;
+    C5LineEdit *l = static_cast<C5LineEdit*>(sender());
+    if (!ui->tblDishes->findWidget(l, r, c) ) {
+        return;
+    }
+    QJsonArray ja = QJsonDocument::fromJson(ui->tblDishes->getString(r, 4).toUtf8()).array();
+    for (int i = 0; i < ja.count(); i++) {
+        QJsonObject jo = ja.at(i).toObject();
+        ui->tblGoods->lineEdit(jo["f_row"].toInt(), 5)->setDouble(jo["f_qty"].toDouble() * arg1.toDouble());
+    }
+}
+
 void C5StoreDoc::tblQtyChanged(const QString &arg1)
 {
     Q_UNUSED(arg1);
@@ -1628,6 +1679,23 @@ void C5StoreDoc::on_btnRemoveGoods_clicked()
         return;
     }
     ui->tblGoods->removeRow(row);
+    if (ui->tblDishes->rowCount() > 0) {
+        for (int i = 0; i < ui->tblDishes->rowCount(); i++) {
+            QJsonArray ja = QJsonDocument::fromJson(ui->tblDishes->getString(i, 4).toUtf8()).array();
+            for (int j = ja.count() - 1; j > -1; j--) {
+                QJsonObject jo = ja[j].toObject();
+                if (jo["f_row"].toInt() == row) {
+                    ja.removeAt(j);
+                    continue;
+                }
+                if (jo["f_row"].toInt() > row) {
+                    jo["f_row"] = jo["f_row"].toInt() - 1;
+                    ja[j] = jo;
+                }
+            }
+            ui->tblDishes->setString(i, 4, QJsonDocument(ja).toJson());
+        }
+    }
     countTotal();
 }
 
@@ -1906,4 +1974,69 @@ void C5StoreDoc::outputOfService()
                      ui->tblGoods->lineEdit(i, 9)->text());
     }
     sd->setFlag("outputservice", 1);
+}
+
+void C5StoreDoc::on_btnAddDish_clicked()
+{
+    QList<QVariant> vals;
+    if (!C5Selector::getValue(fDBParams, cache_dish, vals)) {
+        return;
+    }
+    if (vals.at(1).toInt() == 0) {
+        C5Message::error(tr("Could not add goods without code"));
+        return;
+    }
+    QJsonArray ja;
+    C5Database db(fDBParams);
+    db[":f_dish"] = vals.at(1);
+    db.exec("select f_goods, f_qty from d_recipes where f_dish=:f_dish");
+    int r;
+    auto *c = C5Cache::cache(fDBParams, cache_goods);
+    while (db.nextRow()) {
+        QList<QVariant> vg = c->getValuesForId(db.getInt("f_goods"));
+        if (vals.count() == 0) {
+            continue;
+        }
+        r = addGoodsRow();
+        ui->tblGoods->setString(r, 3, vg.at(0).toString());
+        ui->tblGoods->setString(r, 4, vg.at(2).toString());
+        ui->tblGoods->setString(r, 6, vg.at(3).toString());
+        ui->tblGoods->lineEdit(r, 7)->setPlaceholderText(float_str(vg.at(5).toDouble(), 2));
+        //ui->tblGoods->lineEdit(r, 5)->setDouble(db.getDouble("f_qty"));
+        QJsonObject jo;
+        jo["f_goods"] = db.getInt("f_goods");
+        jo["f_qty"] = db.getDouble("f_qty");
+        jo["f_row"] = r;
+        ja.append(jo);
+    }
+    r = ui->tblDishes->addEmptyRow();
+    ui->tblDishes->setString(r, 1, vals.at(0).toString());
+    ui->tblDishes->setString(r, 2, vals.at(2).toString());
+    ui->tblDishes->createLineEdit(r, 3)->setFocus();
+    ui->tblDishes->setString(r, 4, QJsonDocument(ja).toJson());
+    connect(ui->tblDishes->lineEdit(r, 3), SIGNAL(textChanged(QString)), this, SLOT(tblDishQtyChanged(QString)));
+}
+
+void C5StoreDoc::on_btnRemoveRows_clicked()
+{
+    int row = ui->tblDishes->currentRow();
+    if (row < 0) {
+        return;
+    }
+    if (C5Message::question(tr("Confirm to remove") + "<br>" + ui->tblDishes->item(row, 2)->text()) != QDialog::Accepted) {
+        return;
+    }
+    QJsonArray ja = QJsonDocument::fromJson(ui->tblDishes->getString(row, 4).toUtf8()).array();
+    QList<int> rows;
+    for (int i = 0; i < ja.count(); i++) {
+        QJsonObject jo = ja[i].toObject();
+        rows.append(jo["f_row"].toInt());
+    }
+    std::reverse(rows.begin(), rows.end());
+    for (int i: rows) {
+        ui->tblGoods->removeRow(i);
+    }
+    ui->tblDishes->removeRow(row);
+    correctDishesRows(row, rows.count());
+    countTotal();
 }

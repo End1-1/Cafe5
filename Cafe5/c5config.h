@@ -56,6 +56,8 @@
 #define param_waiter_login_after_payment 51
 #define param_shop_print_v1 52
 #define param_shop_print_v2 53
+#define param_shop_autologin_pin1 54
+#define param_shop_autologin_pin2 55
 
 #define FRONTDESK_WAITER 0
 #define FRONTDESK_SHOP 1
@@ -224,6 +226,8 @@ extern int __userid;
 extern int __usergroup;
 
 extern QString __username;
+
+extern QList<int> __userpermissions;
 
 extern QStringList __databases;
 

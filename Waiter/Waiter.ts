@@ -818,32 +818,32 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="245"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="258"/>
         <source>Error in cash document, partial data was lost</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="255"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="268"/>
         <source>Empty cash document</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="345"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="361"/>
         <source>Document not exists</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="758"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="800"/>
         <source>Invalid document id</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="865"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="907"/>
         <source>Not enough materials in the store</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="961"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="1003"/>
         <source>This order used in next documents</source>
         <translation type="unfinished"></translation>
     </message>

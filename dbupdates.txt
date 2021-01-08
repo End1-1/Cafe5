@@ -510,3 +510,13 @@ ALTER TABLE `h_tables` CHANGE COLUMN `f_name` `f_name` TINYTEXT NULL DEFAULT NUL
 /* db - 35 */
 update s_app set f_version='35' where f_app='DB';
 alter table h_tables add column f_special_config integer;
+alter table s_station_conf add column f_datecash date, add column f_datecashauto smallint default 0;
+create table s_log_store_price (f_id integer primary key auto_increment, f_date datetime, f_user integer, f_base char(36), f_old_goods integer, f_new_goods integer, f_old_price decimal(14,2), f_new_price decimal(14,2));
+
+/* db - 36 */
+update s_app set f_version='36' where f_app='DB';
+create table a_store_dish_waste (f_id char(36) primary key, f_document char(36), f_dish integer, f_qty decimal(14,4), f_data json);
+
+/* db - 37 */
+update s_app set f_version='37' where f_app='DB';
+create table c_goods_multiscancode (f_id varchar(32) primary key, f_goods integer);

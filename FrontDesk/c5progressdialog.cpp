@@ -31,3 +31,10 @@ void C5ProgressDialog::updateProgressValue(int value)
     ui->progressBar->setValue(value);
     qApp->processEvents();
 }
+
+void C5ProgressDialog::updateProgressValueWithMessage(int value, const QString &msg)
+{
+    ui->lbHint->setText(QString("%1/%2 %3").arg(value).arg(fMax).arg(msg));
+    ui->progressBar->setValue(value);
+    qApp->processEvents();
+}

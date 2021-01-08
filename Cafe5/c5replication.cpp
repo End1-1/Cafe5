@@ -47,6 +47,7 @@ void C5Replication::downloadDataFromServer(const QStringList &src, const QString
         emit finished();
         return;
     }
+    emit progress("Connected");
     C5Database db(dst);
     db[":f_host"] = db.fDb.hostName();
     db[":f_db"] = db.fDb.databaseName();
@@ -116,6 +117,7 @@ void C5Replication::downloadDataFromServer(const QStringList &src, const QString
     db[":f_syncin"] = lastid;
     db.exec("update s_db set f_syncin=:f_syncin, f_synctime=current_timestamp where f_host=:f_host and f_db=:f_db");
 
+    emit progress("Clear temp storage");
     db.exec("delete from a_store_temp");
     dr[":date"] = QDate::currentDate();
     dr[":store"] = __c5config.defaultStore();
@@ -137,7 +139,7 @@ void C5Replication::downloadDataFromServer(const QStringList &src, const QString
         db[":f_goods"] = dr.getInt("f_code");
         db[":f_qty"] = dr.getDouble("f_qty");
         db.insert("a_store_temp", false);
-        if (dr.pos() % 50 == 0) {
+        if (dr.pos() % 5 == 0) {
             emit progress(QString("Step %1 of %2. %3 %4/%5").arg(step).arg(steps).arg("Store").arg(dr.pos()).arg(dr.rowCount()));
         }
     }
@@ -345,7 +347,7 @@ void C5Replication::updateTable(C5Database &dr, C5Database &db, int &step, int s
     emit progress(QString("%1 updatetable").arg(tableName));
     dr.exec("select * from " + tableName);
     while (dr.nextRow()) {
-        if (dr.pos() % 50 == 0) {
+        if (dr.pos() % 5 == 0) {
             emit progress(QString("Update table. Step %1 of %2. %3 %4/%5").arg(step).arg(steps).arg(tableName).arg(dr.pos()).arg(dr.rowCount()));
         }
         db.setBindValues(dr.getBindValues());

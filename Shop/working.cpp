@@ -24,6 +24,7 @@
 QMap<QString, Goods> Working::fGoods;
 QHash<int, QString> Working::fGoodsCodeForPrint;
 QHash<QString, int> Working::fGoodsRows;
+QHash<QString, QString> Working::fMultiscancode;
 static QSettings __s(QString("%1\\%2\\%3").arg(_ORGANIZATION_).arg(_APPLICATION_).arg(_MODULE_));
 QHash<int, UncomplectGoods> Working::fUncomplectGoods;
 
@@ -240,8 +241,14 @@ QString Working::goodsCode(int code) const
     }
 }
 
-bool Working::getAdministratorRights()
+bool Working::getAdministratorRights(int right)
 {
+    if (__usergroup == 1) {
+        return true;
+    }
+    if (__userpermissions.contains(right)) {
+        return true;
+    }
     bool ok;
     QString pwd = QInputDialog::getText(this, tr("Administrator password"), tr("Password"), QLineEdit::Password, "", &ok);
     if (!ok) {
@@ -254,7 +261,7 @@ bool Working::getAdministratorRights()
     if (db.nextRow()) {
         if (db.getInt(1) != 1) {
             db[":f_group"] = db.getValue(1);
-            db[":f_key"] = cp_t5_refund_goods;
+            db[":f_key"] = right;
             db.exec("select f_key from s_user_access where f_group=:f_group and f_key=:f_key and f_value=1");
             if (db.nextRow()) {
                 return true;
@@ -436,6 +443,13 @@ void Working::makeWGoods()
         fUncomplectGoods.insert(db.getInt(0), g);
     }
 
+    db.exec("select m.f_id, g.f_scancode from c_goods_multiscancode m "
+            "inner join c_goods g on g.f_id=m.f_goods "
+            "where length(g.f_scancode)>0");
+    while (db.nextRow()) {
+        fMultiscancode[db.getString(0)] = db.getString(1);
+    }
+
     ui->lbLastUpdate->setText(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
 }
 
@@ -501,7 +515,13 @@ void Working::addGoods(QString &code)
     g.fCode = "0";
     if (fGoods.contains(code)) {
         g = fGoods[code];
-    } else {
+    } if (fMultiscancode.contains(code)) {
+        QString mcode = fMultiscancode[code];
+        if (fGoods.contains(mcode)) {
+            g = fGoods[mcode];
+        }
+    }
+    if (g.fCode == "0") {
         if (w->fSaleType == SALE_PREORDER) {
             C5Database db(__c5config.dbParams());
             db[":f_scancode"] = code;
@@ -891,7 +911,7 @@ void Working::on_tblGoods_itemClicked(QTableWidgetItem *item)
 
 void Working::on_btnDuplicateReceipt_clicked()
 {
-    if (!getAdministratorRights()) {
+    if (!getAdministratorRights(cp_t5_refund_goods)) {
         return;
     }
     Sales::showSales(this);
@@ -970,7 +990,7 @@ void Working::on_tab_tabCloseRequested(int index)
 
 void Working::on_btnItemBack_clicked()
 {
-    if (!getAdministratorRights()) {
+    if (!getAdministratorRights(cp_t5_refund_goods)) {
         return;
     }
     Sales::showSales(this);
@@ -978,7 +998,7 @@ void Working::on_btnItemBack_clicked()
 
 void Working::on_btnStoreInput_clicked()
 {
-    if (!getAdministratorRights()) {
+    if (!getAdministratorRights(cp_t5_refund_goods)) {
         return;
     }
     StoreInput *si = new StoreInput(this);

@@ -37,7 +37,7 @@ public:
 
     QString goodsCode(int code) const;
 
-    bool getAdministratorRights();
+    bool getAdministratorRights(int right);
 
     void decQty(const IGoods &g);
 
@@ -52,6 +52,8 @@ public:
     static QHash<QString, int> fGoodsRows;
 
     static QHash<int, UncomplectGoods> fUncomplectGoods;
+
+    static QHash<QString,QString> fMultiscancode;
 
     QList<IUser> fCurrentUsers;
 

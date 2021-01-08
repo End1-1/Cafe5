@@ -232,6 +232,19 @@ bool C5StoreDraftWriter::readAStoreDraft(const QString &id)
     }
 }
 
+bool C5StoreDraftWriter::readAStoreDishWaste(const QString &id)
+{
+    fDb[":f_document"] = id;
+    if (!fDb.exec("select w.f_id, w.f_dish, d.f_name as f_dishname, w.f_qty, w.f_data "
+           "from a_store_dish_waste w "
+            "left join d_dish d on d.f_id=w.f_dish "
+            "where w.f_document=:f_document", fAStoreDishWaste, fAStoreDishWasteDataMap)) {
+        fErrorMsg = fDb.fLastError;
+        return false;
+    }
+    return true;
+}
+
 bool C5StoreDraftWriter::readAHeaderCash(const QString &id)
 {
     fDb[":f_id"] = id;
@@ -341,6 +354,9 @@ bool C5StoreDraftWriter::readAHeader(const QString &id)
             }
             break;
         }
+        if (result) {
+            result = readAStoreDishWaste(id);
+        }
     } else {
         fErrorMsg = tr("Document not exists");
         return false;
@@ -433,6 +449,9 @@ int C5StoreDraftWriter::rowCount(int container)
      case container_astoredraft:
         rc = fAStoreDraftData.count();
         break;
+    case container_astoredishwaste:
+        rc = fAStoreDishWaste.count();
+        break;
     }
     Q_ASSERT(rc != -1);
     return rc;
@@ -462,6 +481,10 @@ QVariant C5StoreDraftWriter::value(int container, int row, const QString &key)
     case container_astoredraft:
         c = &fAStoreDraftData;
         d = &fAStoreDraftDataMap;
+        break;
+    case container_astoredishwaste:
+        c = &fAStoreDishWaste;
+        d = &fAStoreDishWasteDataMap;
         break;
     }
     Q_ASSERT(c);
@@ -521,6 +544,25 @@ bool C5StoreDraftWriter::writeAStoreInventory(QString &id, const QString &docId,
         return returnResult(fDb.update("a_store_inventory", "f_id", id));
     } else {
         return returnResult(fDb.insert("a_store_inventory", true));
+    }
+}
+
+bool C5StoreDraftWriter::writeAStoreDishWaste(QString &id, const QString &docId, int dish, double qty, const QString &data)
+{
+    bool u = true;
+    if (id.isEmpty()) {
+        id = fDb.uuid();
+        u = false;
+    }
+    fDb[":f_id"] = id;
+    fDb[":f_document"] = docId;
+    fDb[":f_dish"] = dish;
+    fDb[":f_qty"] = qty;
+    fDb[":f_data"] = data;
+    if (u) {
+        return returnResult(fDb.update("a_store_dish_waste", "f_id", id));
+    } else {
+        return returnResult(fDb.insert("a_store_dish_waste", false));
     }
 }
 
@@ -856,7 +898,7 @@ bool C5StoreDraftWriter::writeOutput(const QString &docId, QString &err)
                     }
                 }
             }
-            if (qty < 0.001) {
+            if (qty < 0.00001) {
                 break;
             }
         }

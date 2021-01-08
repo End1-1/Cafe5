@@ -75,9 +75,11 @@ bool CR5StoreDocuments::tblDoubleClicked(int row, int column, const QList<QVaria
     if (values.count() == 0) {
         return true;
     }
+    QString e;
     C5StoreDoc *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);
-    if (!sd->openDoc(values.at(0).toString())) {
+    if (!sd->openDoc(values.at(0).toString(),e )) {
         __mainWindow->removeTab(sd);
+        C5Message::error(e);
     }
     return true;
 }

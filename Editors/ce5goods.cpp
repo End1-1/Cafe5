@@ -17,6 +17,7 @@
 #include <QMenu>
 #include <QFileDialog>
 #include <QStringListModel>
+#include <QInputDialog>
 #include <QPaintEngine>
 
 static int fLastGroup = 0;
@@ -51,6 +52,7 @@ CE5Goods::CE5Goods(const QStringList &dbParams, QWidget *parent) :
     fBarcode = new Barcode();
     ui->lbScancodeType->setVisible(false);
     ui->btnPinLast->setChecked(__c5config.getRegValue("last_goods_editor").toBool());
+    connect(ui->tblMultiscancode, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(tblMultiscancodeContextMenu(QPoint)));
 }
 
 CE5Goods::~CE5Goods()
@@ -106,6 +108,12 @@ void CE5Goods::setId(int id)
         ui->leUncomplectGoodsQty->setDouble(db.getDouble("f_uncomplectfromqty"));
     } else {
         on_chUncomplectIfZero_clicked(false);
+    }
+    db[":f_goods"] = ui->leCode->getInteger();
+    db.exec("select f_id from c_goods_multiscancode where f_goods=:f_goods");
+    while (db.nextRow()) {
+        int r = ui->tblMultiscancode->addEmptyRow();
+        ui->tblMultiscancode->setString(r, 0, db.getString(0));
     }
     ui->chSameStoreId->setChecked(ui->leStoreId->getInteger() == ui->leCode->getInteger());
     ui->chSameStoreId->clicked();
@@ -167,6 +175,18 @@ bool CE5Goods::save(QString &err, QList<QMap<QString, QVariant> > &data)
     ui->chEnabled->setChecked(true);
     fStrings.insert(ui->leName->text());
     static_cast<QStringListModel*>(ui->leName->completer()->model())->setStringList(fStrings.values());
+
+    for (const QString &s: fScancodeAppend) {
+        db[":f_id"] = s;
+        db[":f_goods"] = ui->leCode->getInteger();
+        db.insert("c_goods_multiscancode", false);
+    }
+    for (const QString &s: fScancodeRemove) {
+        db[":f_id"] = s;
+        db.exec("delete from c_go╠ods_multiscancode where f_id=:f_id");
+    }
+    fScancodeAppend.clear();
+    fScancodeRemove.clear();
     return true;
 }
 
@@ -196,6 +216,10 @@ void CE5Goods::clear()
         }
         ui->leName->setFocus();
     }
+    ui->tblMultiscancode->clearContents();
+    ui->tblMultiscancode->setRowCount(0);
+    fScancodeAppend.clear();
+    fScancodeRemove.clear();
 }
 
 QPushButton *CE5Goods::b1()
@@ -343,6 +367,40 @@ void CE5Goods::removeImage()
     db[":f_id"] = ui->leCode->getInteger();
     db.exec("delete from c_goods_images where f_id=:f_id");
     ui->lbImage->setText(tr("Image"));
+}
+
+void CE5Goods::newScancode()
+{
+    bool ok;
+    QString scancode = QInputDialog::getText(this, tr("Scancode"), "", QLineEdit::Normal, "", &ok);
+    ok = ok && !scancode.trimmed().isEmpty();
+    if (!ok) {
+        return;
+    }
+    int r = ui->tblMultiscancode->addEmptyRow();
+    ui->tblMultiscancode->setString(r, 0, scancode);
+    fScancodeAppend.append(scancode);
+}
+
+void CE5Goods::removeScancode()
+{
+    int r = ui->tblMultiscancode->currentRow();
+    if (r < 0) {
+        return;
+    }
+    if (C5Message::question(tr("Confirm to remove scancode")) != QDialog::Accepted) {
+        return;
+    }
+    fScancodeRemove.append(ui->tblMultiscancode->getString(r, 0));
+    ui->tblMultiscancode->removeRow(r);
+}
+
+void CE5Goods::tblMultiscancodeContextMenu(const QPoint &p)
+{
+    QMenu m;
+    m.addAction(QIcon(":/new.png"), tr("New"), this, SLOT(newScancode()));
+    m.addAction(QIcon(":/delete.png"), tr("Remove"), this, SLOT(removeScancode()));
+    m.exec(ui->tblMultiscancode->mapToGlobal(p));
 }
 
 void CE5Goods::on_btnNewGroup_clicked()

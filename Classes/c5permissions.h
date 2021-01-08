@@ -68,6 +68,7 @@
 #define cp_t5_pay_cityledger 507
 #define cp_t5_refund_goods 508
 #define cp_t5_shift_rotation 509
+#define cp_t5_remove_row_from_shop 510
 
 #define cp_t6_goods_menu 600
 #define cp_t6_units 601

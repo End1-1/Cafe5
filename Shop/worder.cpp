@@ -476,6 +476,9 @@ void WOrder::changePrice()
 
 void WOrder::removeRow()
 {
+    if (!fWorking->getAdministratorRights(cp_t5_remove_row_from_shop)) {
+        return;
+    }
     int row = ui->tblGoods->currentRow();
     if (row < 0) {
         return;

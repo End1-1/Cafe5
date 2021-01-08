@@ -345,9 +345,11 @@ void C5CashDoc::on_btnOpenStoreDoc_clicked()
     if (fStoreUuid.isEmpty()) {
         return;
     }
+    QString e;
     auto *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);
-    if (!sd->openDoc(fStoreUuid)) {
+    if (!sd->openDoc(fStoreUuid, e)) {
         __mainWindow->removeTab(sd);
+        C5Message::error(e);
     }
 }
 

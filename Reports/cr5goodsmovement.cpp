@@ -24,6 +24,7 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
                     << "left join c_goods_classes gcb on gca.f_id=g.f_group2 [gcb]"
                     << "left join c_goods_classes gcc on gca.f_id=g.f_group3 [gcc]"
                     << "left join c_goods_classes gcd on gca.f_id=g.f_group4 [gcd]"
+                    << "left join a_store_draft asd on asd.f_id=s.f_draft [asd]"
                        ;
 
     fColumnsFields << "s.f_document"
@@ -41,6 +42,8 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
                    << "gcb.f_name as f_class2"
                    << "gcc.f_name as f_class3"
                    << "gcd.f_name as f_class4"
+                    << "asd.f_comment as f_storecomment"
+                    << "a.f_comment as f_doccomment"
                    << "sum(s.f_qty) as f_qty"
                    << "u.f_name as f_unit"
                    << "s.f_price"
@@ -66,6 +69,8 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
                   << "gcb.f_name as f_class2"
                   << "gcc.f_name as f_class3"
                   << "gcd.f_name as f_class4"
+                    << "asd.f_comment as f_storecomment"
+                    << "a.f_comment as f_doccomment"
                   << "g.f_saleprice"
                   << "g.f_saleprice2"
                   << "s.f_price"
@@ -93,6 +98,8 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
     fTranslation["f_class2"] = tr("Class 2");
     fTranslation["f_class3"] = tr("Class 3");
     fTranslation["f_class4"] = tr("Class 4");
+    fTranslation["f_storecomment"] = tr("Record comment");
+    fTranslation["f_doccomment"] = tr("Document comment");
     fTranslation["f_saleprice"] = tr("Retail price");
     fTranslation["f_saleprice2"] = tr("Whosale price");
     fTranslation["f_qty"] = tr("Qty");
@@ -122,6 +129,8 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
     fColumnsVisible["gcb.f_name as f_class2"] = false;
     fColumnsVisible["gcc.f_name as f_class3"] = false;
     fColumnsVisible["gcd.f_name as f_class4"] = false;
+    fColumnsVisible["asd.f_comment as f_storecomment"] = false;
+    fColumnsVisible["a.f_comment as f_doccomment"] = false;
     fColumnsVisible["sum(g.f_saleprice*s.f_qty) as f_salepricetotal"] = true;
     fColumnsVisible["sum(g.f_saleprice2*s.f_qty) as f_salepricetotal2"] = false;
 
@@ -153,8 +162,10 @@ bool CR5GoodsMovement::tblDoubleClicked(int row, int column, const QList<QVarian
         return true;
     }
     C5StoreDoc *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);
-    if (!sd->openDoc(values.at(fModel->indexForColumnName("f_document")).toString())) {
+    QString e;
+    if (!sd->openDoc(values.at(fModel->indexForColumnName("f_document")).toString(), e)) {
         __mainWindow->removeTab(sd);
+        C5Message::error(e);
     }
     return true;
 }

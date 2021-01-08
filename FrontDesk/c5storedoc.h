@@ -28,7 +28,7 @@ public:
 
     ~C5StoreDoc() override;
 
-    bool openDoc(QString id);
+    bool openDoc(QString id, QString &err);
 
     void setMode(STORE_DOC sd);
 
@@ -93,6 +93,8 @@ private:
 
     void setUserId(bool withUpdate, int value);
 
+    void correctDishesRows(int row, int count);
+
     void countTotal();
 
     void countQtyOfComplectation();
@@ -156,6 +158,8 @@ private slots:
 
     void cancelGoodsGroupOrder();
 
+    void tblDishQtyChanged(const QString &arg1);
+
     void tblQtyChanged(const QString &arg1);
 
     void tblPriceChanged(const QString &arg1);
@@ -203,6 +207,10 @@ private slots:
     void inputOfService();
 
     void outputOfService();
+
+    void on_btnAddDish_clicked();
+
+    void on_btnRemoveRows_clicked();
 };
 
 #endif // C5STOREDOC_H
