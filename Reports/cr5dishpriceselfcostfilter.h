@@ -32,6 +32,8 @@ public:
 
     const QDate d2();
 
+    int menuState();
+
 private:
     Ui::CR5DishPriceSelfCostFilter *ui;
 };

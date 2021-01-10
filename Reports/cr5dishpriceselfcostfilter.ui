@@ -14,19 +14,6 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="2" colspan="2">
-    <widget class="C5LineEditWithSelector" name="leMenuName">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-    </widget>
-   </item>
    <item row="0" column="1">
     <widget class="C5LineEditWithSelector" name="leMenu">
      <property name="maximumSize">
@@ -38,29 +25,6 @@
      <property name="FilterName" stdset="0">
       <string>Menu</string>
      </property>
-    </widget>
-   </item>
-   <item row="1" column="0" colspan="4">
-    <widget class="QWidget" name="widget" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="QRadioButton" name="rbSimpleView">
-        <property name="text">
-         <string>Simple view, without calculation</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="rbExtendedView">
-        <property name="text">
-         <string>Extended view, with calculation</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
     </widget>
    </item>
    <item row="0" column="0">
@@ -76,7 +40,20 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="2">
+   <item row="0" column="2" colspan="2">
+    <widget class="C5LineEditWithSelector" name="leMenuName">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="2">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -89,7 +66,30 @@
      </property>
     </spacer>
    </item>
-   <item row="2" column="0" colspan="4">
+   <item row="1" column="0" colspan="4">
+    <widget class="QWidget" name="widget" native="true">
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="2">
+       <widget class="QRadioButton" name="rbExtendedView">
+        <property name="text">
+         <string>Extended view, with calculation</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QRadioButton" name="rbSimpleView">
+        <property name="text">
+         <string>Simple view, without calculation</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="3" column="0" colspan="4">
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
       <string>Sale</string>
@@ -131,6 +131,36 @@
           <width>150</width>
           <height>16777215</height>
          </size>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="4">
+    <widget class="QWidget" name="widget_2" native="true">
+     <layout class="QGridLayout" name="gridLayout_4">
+      <item row="0" column="3">
+       <widget class="QRadioButton" name="rbAllState">
+        <property name="text">
+         <string>All items</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QRadioButton" name="rbActiveState">
+        <property name="text">
+         <string>Active items</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QRadioButton" name="rbInactiveitems">
+        <property name="text">
+         <string>Inactive items</string>
         </property>
        </widget>
       </item>

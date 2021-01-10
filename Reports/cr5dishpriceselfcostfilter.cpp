@@ -75,3 +75,16 @@ const QDate CR5DishPriceSelfCostFilter::d2()
 {
     return ui->de2->date();
 }
+
+int CR5DishPriceSelfCostFilter::menuState()
+{
+    if (ui->rbAllState->isChecked()) {
+        return 2;
+    }
+    if (ui->rbInactiveitems->isChecked()) {
+        return 0;
+    }
+    if (ui->rbActiveState->isChecked()) {
+        return 1;
+    }
+}

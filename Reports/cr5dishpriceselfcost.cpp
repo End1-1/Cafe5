@@ -43,7 +43,16 @@ void CR5DishPriceSelfCost::buildQueryV1()
                 "left join d_dish d on d.f_id=r.f_dish "
                 "left join d_part2 p2 on p2.f_id=d.f_part "
                 "left join d_menu m on m.f_dish=d.f_id "
-                "where m.f_state=1 ";
+                "where d.f_id>0 ";
+    switch (fFilter->menuState()) {
+    case 0:
+        fSqlQuery += " and m.f_state=0 ";
+        break;
+    case 1:
+        fSqlQuery += " and m.f_state=1 ";
+        break;
+    }
+
     if (fFilter->baseOnSale()) {
         fSqlQuery += QString(" and r.f_dish in (select distinct(b.f_dish) "
                              "from o_body b "
