@@ -342,3 +342,28 @@ void payment::on_tblChange_cellClicked(int row, int column)
     double v = item->text().toDouble();
     ui->leChange->setDouble(v - ui->leCash->getDouble());
 }
+
+void payment::on_btnCheckoutOther_clicked()
+{
+    C5Database db(fDBParams);
+    db[":f_id"] = fOrderUUID;
+    db.exec("select * from o_header where f_id=:f_id");
+    if (!db.nextRow()) {
+        C5Message::error(db.fLastError);
+        return;
+    }
+
+    db[":f_id"] = fOrderUUID;
+    db.exec("update o_header set f_amountother=f_amounttotal where f_id=:f_id");
+
+    C5StoreDraftWriter dw(db);
+    int counter = dw.counterAType(DOC_TYPE_CASH);
+    if (counter == 0) {
+        C5Message::error(dw.fErrorMsg);
+        return;
+    }
+
+    if (printReceipt(true)) {
+        accept();
+    }
+}
