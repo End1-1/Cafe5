@@ -11,6 +11,7 @@
 #include <QApplication>
 #include <QMessageBox>
 #include <QLockFile>
+#include <QInputDialog>
 #include <QDir>
 #include <QTranslator>
 
@@ -43,6 +44,28 @@ int main(int argc, char *argv[])
     QTranslator t;
     t.load(":/lang/Shop.qm");
     a.installTranslator(&t);
+
+    QStringList args;
+    for (int i = 0; i < argc; i++) {
+        args << argv[i];
+    }
+    if (args.contains("--config")) {
+        QList<QByteArray> connectionParams;
+        C5Connection::readParams(connectionParams);
+        if (connectionParams.count() > 3) {
+            if (connectionParams[3].length() > 0) {
+                QString password = QInputDialog::getText(nullptr, QObject::tr("Password"), QObject::tr("Password"), QLineEdit::Password);
+                if (connectionParams[3] != password) {
+                    C5Message::error(QObject::tr("Access denied"));
+                    return 0;
+                }
+            }
+        }
+        const QStringList dbParams;
+        C5Connection *cnf = new C5Connection(dbParams);
+        cnf->exec();
+        delete cnf;
+    }
 
     QList<QByteArray> connectionParams;
     C5Connection::readParams(connectionParams);

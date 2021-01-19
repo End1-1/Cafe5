@@ -12,6 +12,10 @@ PrintReceiptGroup::PrintReceiptGroup(QObject *parent) :
 
 void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
 {
+    C5Database dtax(db);
+    dtax[":f_id"] = id;
+    dtax.exec("select * from o_tax where f_id=:f_id");
+
     db[":f_id"] = id;
     db.exec("select * from o_header where f_id=:f_id");
     db.nextRow();
@@ -111,6 +115,34 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
         p.br();
         p.setFontSize(20);
     }
+    if (dtax.nextRow()) {
+        p.ltext(dtax.getString("f_firmname"), 0);
+        p.br();
+        p.ltext(dtax.getString("f_address"), 0);
+        p.br();
+        p.ltext(tr("Department"), 0);
+        p.rtext(dtax.getString("f_dept"));
+        p.br();
+        p.ltext(tr("Tax number"), 0);
+        p.rtext(dtax.getString("f_hvhh"));
+        p.br();
+        p.ltext(tr("Device number"), 0);
+        p.rtext(dtax.getString("f_devnum"));
+        p.br();
+        p.ltext(tr("Serial"), 0);
+        p.rtext(dtax.getString("f_serial"));
+        p.br();
+        p.ltext(tr("Fiscal"), 0);
+        p.rtext(dtax.getString("f_fiscal"));
+        p.br();
+        p.ltext(tr("Receipt number"), 0);
+        p.rtext(dtax.getString("f_receiptnumber"));
+        p.br();
+        p.ltext(tr("Date"), 0);
+        p.rtext(dtax.getString("f_time"));
+        p.br();
+        p.ltext(tr("(F)"), 0);
+    }
     if (!partnerName.isEmpty()) {
         p.ltext(tr("Buyer taxcode"), 0);
         p.rtext(partnerTaxcode);
@@ -129,10 +161,11 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
     p.br(3);
     for (int i = 0; i < data.count(); i++) {
         p.ltext(QString("%1").arg(data.at(i).at(0).toString()), 0);
-        p.rtext(QString("%1 X %2 = %3")
+        p.br();
+        p.ltext(QString("%1 X %2 = %3")
                 .arg(float_str(data.at(i).at(1).toDouble(), 3))
                 .arg(data.at(i).at(2).toDouble(), 2)
-                .arg(float_str(data.at(i).at(3).toDouble(), 2)));
+                .arg(float_str(data.at(i).at(3).toDouble(), 2)), 0);
         p.br();
         p.br();
         p.line();
@@ -176,6 +209,10 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
 
 void PrintReceiptGroup::print2(const QString &id, C5Database &db)
 {
+    C5Database dtax(db);
+    dtax[":f_id"] = id;
+    dtax.exec("select * from o_tax where f_id=:f_id");
+
     db[":f_id"] = id;
     db.exec("select * from o_header where f_id=:f_id");
     db.nextRow();
@@ -276,6 +313,36 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
         p.br();
         p.setFontSize(20);
     }
+
+    if (dtax.nextRow()) {
+        p.ltext(dtax.getString("f_firmname"), 0);
+        p.br();
+        p.ltext(dtax.getString("f_address"), 0);
+        p.br();
+        p.ltext(tr("Department"), 0);
+        p.rtext(dtax.getString("f_dept"));
+        p.br();
+        p.ltext(tr("Tax number"), 0);
+        p.rtext(dtax.getString("f_hvhh"));
+        p.br();
+        p.ltext(tr("Device number"), 0);
+        p.rtext(dtax.getString("f_devnum"));
+        p.br();
+        p.ltext(tr("Serial"), 0);
+        p.rtext(dtax.getString("f_serial"));
+        p.br();
+        p.ltext(tr("Fiscal"), 0);
+        p.rtext(dtax.getString("f_fiscal"));
+        p.br();
+        p.ltext(tr("Receipt number"), 0);
+        p.rtext(dtax.getString("f_receiptnumber"));
+        p.br();
+        p.ltext(tr("Date"), 0);
+        p.rtext(dtax.getString("f_time"));
+        p.br();
+        p.ltext(tr("(F)"), 0);
+    }
+
     if (!partnerName.isEmpty()) {
         p.ltext(tr("Buyer taxcode"), 0);
         p.rtext(partnerTaxcode);
@@ -294,10 +361,11 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
     p.br(3);
     for (int i = 0; i < data.count(); i++) {
         p.ltext(QString("%1").arg(data.at(i).at(0).toString()), 0);
-        p.rtext(QString("%1 X %2 = %3")
+        p.br();
+        p.ltext(QString("%1 X %2 = %3")
                 .arg(float_str(data.at(i).at(1).toDouble(), 3))
                 .arg(data.at(i).at(2).toDouble(), 2)
-                .arg(float_str(data.at(i).at(3).toDouble(), 2)));
+                .arg(float_str(data.at(i).at(3).toDouble(), 2)), 0);
         p.br();
         p.br();
         p.line();

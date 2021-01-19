@@ -432,12 +432,12 @@ bool C5StoreDoc::allowChangeDatabase()
     return false;
 }
 
-void C5StoreDoc::addByScancode(const QString &code, const QString &qty, const QString &price)
+void C5StoreDoc::addByScancode(const QString &code, const QString &qty, QString price)
 {
     C5Database db(fDBParams);
     db[":f_scancode"] = code;
     db.exec("select gg.f_scancode, gg.f_id, concat(gg.f_name, ' ', gg.f_scancode) as f_name, gu.f_name as f_unitname, gg.f_saleprice, "
-            "gr.f_taxdept, gr.f_adgcode "
+            "gr.f_taxdept, gr.f_adgcode, gg.f_lastinputprice "
             "from c_goods gg  "
             "left join c_groups gr on gr.f_id=gg.f_group "
             "left join c_units gu on gu.f_id=gg.f_unit "
@@ -453,7 +453,16 @@ void C5StoreDoc::addByScancode(const QString &code, const QString &qty, const QS
         ui->tblGoods->lineEdit(row, 5)->setText(qty);
         ui->tblGoods->lineEdit(row, 5)->setFocus();
         ui->tblGoods->lineEdit(row, 7)->setText(price);
-        ui->tblGoods->lineEdit(row, 7)->textEdited(price);
+        ui->tblGoods->lineEdit(row, 7)->setPlaceholderText(float_str(db.getDouble("f_lastinputprice"), 2));
+        if (__c5config.getValue(param_input_doc_fix_price).toInt() > 0) {
+            if (price.toDouble() < 0.001) {
+                if (db.getDouble("f_lastinputprice") > 0.001) {
+                    ui->tblGoods->lineEdit(row, 7)->setDouble(db.getDouble("f_lastinputprice"));
+                    price = db.getString("f_lastinputprice");
+                }
+            }
+        }
+        emit ui->tblGoods->lineEdit(row, 7)->textEdited(price);
         markGoodsComplited();
     } else {
         C5Message::error(tr("Goods not found"));
@@ -1627,7 +1636,6 @@ void C5StoreDoc::tblPriceChanged(const QString &arg1)
     C5LineEdit *ltotal = ui->tblGoods->lineEdit(row, col + 1);
     double d1 = lqty->getDouble();
     double d2 = lprice->getDouble();
-    qDebug() << d1 << d2;
     ltotal->setDouble(d1 * d2);
     countTotal();
 }

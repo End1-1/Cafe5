@@ -50,7 +50,7 @@ public:
 
     virtual bool allowChangeDatabase() override;
 
-    void addByScancode(const QString &code, const QString &qty, const QString &price);
+    void addByScancode(const QString &code, const QString &qty, QString price);
 
     double total();
 

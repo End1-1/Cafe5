@@ -58,6 +58,8 @@
 #define param_shop_print_v2 53
 #define param_shop_autologin_pin1 54
 #define param_shop_autologin_pin2 55
+#define param_recipe_footer_text 56
+#define param_input_doc_fix_price 57
 
 #define FRONTDESK_WAITER 0
 #define FRONTDESK_SHOP 1

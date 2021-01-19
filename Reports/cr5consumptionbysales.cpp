@@ -473,6 +473,7 @@ void CR5ConsumptionBySales::salesOutput(bool v)
 
 void CR5ConsumptionBySales::rollbackGoodsOutput(bool v)
 {
+    Q_UNUSED(v);
     C5Database db(fDBParams);
     C5WaiterOrderDoc::clearStoreOutput(db, fFilter->date1(), fFilter->date2());
     C5Message::info(tr("Done"));

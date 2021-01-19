@@ -33,6 +33,8 @@ void C5SettingsWidget::setId(int id)
         QWidget *w = widget(this, db.getInt(0));
         if (w) {
             setWidgetValue(w, db.getString(1));
+        } else {
+            qDebug() << "No widget for: " << db.getInt(0) << db.getString(1);
         }
     }
     db.exec("select f_id, f_counter from a_type");
@@ -110,10 +112,12 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     fTags[ui->rbPrintV2->property("tag").toInt()] = ui->rbPrintV2->isChecked() ? "1" : "0";
     fTags[ui->leAutologinPin1->getTag()] = ui->leAutologinPin1->text();
     fTags[ui->leAutologinPin2->getTag()] = ui->leAutologinPin2->text();
+    fTags[ui->chFixAutoenterInputDocPrice->getTag()] = ui->chFixAutoenterInputDocPrice->isChecked() ? "1" : "0";
+    fTags[ui->leReceiptFooterText->getTag()] = ui->leReceiptFooterText->text();
     C5Database db(fDBParams);
     db[":f_settings"] = ui->leCode->getInteger();
     db.exec("delete from s_settings_values where f_settings=:f_settings");
-    for (QMap<int, QString>::const_iterator it = fTags.begin(); it != fTags.end(); it++) {
+    for (QMap<int, QString>::const_iterator it = fTags.constBegin(); it != fTags.constEnd(); it++) {
         db[":f_settings"] = ui->leCode->getInteger();
         db[":f_key"] = it.key();
         db[":f_value"] = it.value();
@@ -135,6 +139,10 @@ void C5SettingsWidget::clearWidgetValue(QWidget *w)
         static_cast<C5LineEdit*>(w)->clear();
     } else if (!strcmp(w->metaObject()->className(), "C5ComboBox")) {
         static_cast<C5ComboBox*>(w)->setCurrentIndex(-1);
+    } else if  (!strcmp(w->metaObject()->className(), "QRadioButton")) {
+        static_cast<QRadioButton*>(w)->setAutoExclusive(false);
+        static_cast<QRadioButton*>(w)->setChecked(false);
+        static_cast<QRadioButton*>(w)->setAutoExclusive(true);
     }
 }
 
@@ -165,6 +173,11 @@ void C5SettingsWidget::clear(QWidget *parent)
         QVariant p = o->property("Tag");
         if (p.isValid()) {
             clearWidgetValue(static_cast<QWidget*>(o));
+        } else {
+            p = o->property("tag");
+            if (p.isValid()) {
+                clearWidgetValue(static_cast<QWidget*>(o));
+            }
         }
     }
     ui->leInputDocCounter->clear();
@@ -174,9 +187,11 @@ void C5SettingsWidget::clear(QWidget *parent)
 
 QWidget *C5SettingsWidget::widget(QWidget *parent, int tag)
 {
+    Q_ASSERT(tag != 0);
     QObjectList ol = parent->children();
     foreach (QObject *o, ol) {
-        if (!strcmp(o->metaObject()->className(), "C5LineEdit")) {
+        if (!strcmp(o->metaObject()->className(), "C5LineEdit")
+                || !strcmp(o->metaObject()->className(), "C5LineEditWithSelector")) {
             C5LineEdit *l = static_cast<C5LineEdit*>(o);
             if (l->getTag() == tag) {
                 return l;
@@ -191,14 +206,17 @@ QWidget *C5SettingsWidget::widget(QWidget *parent, int tag)
             if (c->getTag() == tag) {
                 return c;
             }
-        } else if (!strcmp(o->metaObject()->className(), "QGroupBox")) {
-            return widget(static_cast<QGroupBox*>(o), tag);
-        }
-        if (o->children().count() > 0) {
+        } else if (!strcmp(o->metaObject()->className(), "QRadioButton")) {
+            if (o->property("tag").toInt() == tag) {
+                return static_cast<QRadioButton*>(o);
+            }
+        } else if (o->children().count() > 0) {
             QWidget *w = widget(static_cast<QWidget*>(o), tag);
             if (w) {
                 return w;
             }
+        } else {
+            //qDebug() << "Strange widget" << o ;
         }
     }
     return nullptr;

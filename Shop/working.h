@@ -55,6 +55,8 @@ public:
 
     static QHash<QString,QString> fMultiscancode;
 
+    static QMap<QString, double> fUnitDefaultQty;
+
     QList<IUser> fCurrentUsers;
 
     QTabWidget *fTab;

@@ -123,7 +123,6 @@ void CR5Goods::pricing()
     }
     C5GoodsPricing *gp = new C5GoodsPricing(fDBParams);
     if (gp->exec() == QDialog::Accepted) {
-        int rv = gp->roundValue();
         C5Database db(fDBParams);
         int colId = fModel->indexForColumnName("f_id");
         if (colId < 0) {

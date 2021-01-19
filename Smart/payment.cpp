@@ -265,7 +265,7 @@ bool payment::printReceipt(bool printSecond)
     p.setFontSize(20);
     p.setFontBold(true);
     p.br(p.fLineHeight * 3);
-    p.ltext(tr("Thank you for visit!"), 0);
+    p.ltext(__c5config.getValue(param_recipe_footer_text), 0);
     p.br();
     p.ltext(tr("Printed"), 0);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));

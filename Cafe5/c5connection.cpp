@@ -34,6 +34,7 @@ C5Connection::~C5Connection()
 
 void C5Connection::readParams(QList<QByteArray> &params)
 {
+    params.clear();
     QSettings s(_ORGANIZATION_, _APPLICATION_+ QString("\\") + _MODULE_);
     if (s.value("db_ver").toInt() == 0) {
         s.setValue("db_ver", db_ver);

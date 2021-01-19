@@ -159,7 +159,6 @@ void CR5Databases::resetDatabase()
         if (dr->saleAndBuy()) {
             db.exec("delete from op_body");
             db.exec("delete from op_header");
-            db.exec("delete from a_store_temp");
             db.exec("delete from a_complectation_additions");
             db.exec("delete from a_header_shop2partner");
             db.exec("delete from a_header_shop2partneraccept");

@@ -118,6 +118,7 @@ void C5Replication::downloadDataFromServer(const QStringList &src, const QString
     db.exec("update s_db set f_syncin=:f_syncin, f_synctime=current_timestamp where f_host=:f_host and f_db=:f_db");
 
     emit progress("Clear temp storage");
+    db.exec("delete from a_header where f_type=99 ");
     db.exec("delete from a_store_temp");
     dr[":date"] = QDate::currentDate();
     dr[":store"] = __c5config.defaultStore();

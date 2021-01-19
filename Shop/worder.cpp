@@ -89,7 +89,7 @@ void WOrder::focusCard()
 
 void WOrder::addGoods(const Goods &g)
 {
-    double totalQty = 1;
+    double totalQty = g.fQty;
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
         if (ui->tblGoods->getString(i, 0) == g.fCode) {
             totalQty += ui->tblGoods->getDouble(i, 2);
@@ -166,7 +166,7 @@ void WOrder::addGoodsToTable(const Goods &g)
     int row = ui->tblGoods->addEmptyRow();
     ui->tblGoods->setString(row, 0, g.fCode);
     ui->tblGoods->setString(row, 1, g.fName + " " + g.fScanCode);
-    ui->tblGoods->setDouble(row, 2, 1);
+    ui->tblGoods->setDouble(row, 2, g.fQty);
     ui->tblGoods->item(row, 2)->fDecimals = 3;
     ui->tblGoods->setString(row, 3, g.fUnit);
     ui->tblGoods->setDouble(row, 4, price);
@@ -191,6 +191,13 @@ bool WOrder::writeOrder(bool tax)
 {
     QElapsedTimer t;
     t.start();
+
+    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+        if (ui->tblGoods->getDouble(i, 2) < 0.0001) {
+            C5Message::error(tr("Invalid qty"));
+            return false;
+        }
+    }
 
     if (__c5config.shopDifferentStaff() && fWorking->fCurrentUsers.count() > 0) {
         SelectStaff ss(fWorking);
@@ -231,11 +238,6 @@ bool WOrder::writeOrder(bool tax)
             if (g.isService) {
                 continue;
             }
-            db[":f_goods"] = g.goodsId;
-            db[":f_store"] = __c5config.defaultStore();
-            db[":f_qty"] = g.goodsQty;
-            db.exec("update a_store_temp set f_qty=f_qty-:f_qty where f_goods=:f_goods and f_store=:f_store");
-            fWorking->decQty(g);
         }
         if (!fPreorderUUID.isEmpty()) {
             db[":f_state"] = 2;
@@ -631,17 +633,21 @@ bool WOrder::getDiscountValue(int discountType, double &v)
 void WOrder::setQtyOfRow(int row, double qty)
 {
     double totalQty = qty;
-    QString goodsCode = fWorking->fGoodsCodeForPrint[ui->tblGoods->getInteger(row, 0)];
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
         if (i == row) {
             continue;
         }
-        if (ui->tblGoods->getString(i, 0) == goodsCode) {
+        if (ui->tblGoods->getInteger(i, 0) == ui->tblGoods->getInteger(row, 0)) {
             totalQty += ui->tblGoods->getDouble(i, 2);
         }
     }
 
-    Goods g = fWorking->fGoods[goodsCode];
+    QString scancode = fWorking->fGoodsCodeForPrint[ui->tblGoods->getInteger(row, 0)];
+    if (!fWorking->fGoods.contains(scancode)) {
+        C5Message::error(QString("%1 %2").arg(tr("Programm Error worder:setQtyOfRow:invalid scancode")).arg(scancode));
+        return;
+    }
+    Goods g = fWorking->fGoods[scancode];
     if (g.fWholeNumber) {
         totalQty = trunc(totalQty);
     }
@@ -649,6 +655,7 @@ void WOrder::setQtyOfRow(int row, double qty)
         C5Message::error(tr("Incorrect quantity value"));
         return;
     }
+    qDebug() << g.fQty << totalQty;
     if (!g.fIsService && g.fQty < totalQty) {
         C5Message::error(tr("Insufficient quantity") + "<br>" + float_str(totalQty - g.fQty, 3));
         return;

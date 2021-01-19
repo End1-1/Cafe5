@@ -25,6 +25,7 @@ QMap<QString, Goods> Working::fGoods;
 QHash<int, QString> Working::fGoodsCodeForPrint;
 QHash<QString, int> Working::fGoodsRows;
 QHash<QString, QString> Working::fMultiscancode;
+QMap<QString, double> Working::fUnitDefaultQty;
 static QSettings __s(QString("%1\\%2\\%3").arg(_ORGANIZATION_).arg(_APPLICATION_).arg(_MODULE_));
 QHash<int, UncomplectGoods> Working::fUncomplectGoods;
 
@@ -307,48 +308,30 @@ void Working::makeWGoods()
     fGoodsCodeForPrint.clear();
     C5Database db(C5Config::dbParams());
 
-    if (__c5config.rdbReplica()) {
-        db[":f_store"] = C5Config::defaultStore();
-        db.exec("select g.f_id, g.f_scancode, cp.f_taxname, gg.f_name as f_groupname, g.f_name as f_goodsname, "
-                "g.f_saleprice, g.f_saleprice2, u.f_name as f_unitname, "
-                "gca.f_name as group1, gcb.f_name group2, gcc.f_name as group3, gcd.f_name as group4, "
-                "gg.f_taxdept, gg.f_adgcode, s.f_qty, g.f_unit, go.f_flaguncomplectfrom, go.f_uncomplectfromqty,  "
-                "g.f_wholenumber, g.f_storeid "
-                "from a_store_temp s "
-                "inner join c_goods g on g.f_id=s.f_goods "
-                "inner join c_groups gg on gg.f_id=g.f_group "
-                "inner join c_units u on u.f_id=g.f_unit "
-                "left join c_goods_classes gca on gca.f_id=g.f_group1 "
-                "left join c_goods_classes gcb on gcb.f_id=g.f_group2 "
-                "left join c_goods_classes gcc on gcc.f_id=g.f_group3 "
-                "left join c_goods_classes gcd on gcd.f_id=g.f_group4 "
-                "left join c_goods_option go on go.f_id=g.f_id and go.f_flaguncomplectfrom>0 "
-                "left join c_partners cp on cp.f_id=g.f_supplier "
-                "where s.f_store=:f_store and s.f_qty>0 ");
-    } else {
-        db[":f_store"] = C5Config::defaultStore();
-        db[":f_date"] = QDate::currentDate();
-        db[":f_state"] = DOC_STATE_SAVED;
-        db.exec("select g.f_id, g.f_scancode, cp.f_taxname, gg.f_name as f_groupname, g.f_name as f_goodsname, "
-                "g.f_saleprice, g.f_saleprice2, u.f_name as f_unitname, "
-                "gca.f_name as group1, gcb.f_name group2, gcc.f_name as group3, gcd.f_name as group4, "
-                "gg.f_taxdept, gg.f_adgcode, sum(s.f_qty*s.f_type) as f_qty, g.f_unit, "
-                "go.f_flaguncomplectfrom, go.f_uncomplectfromqty, g.f_wholenumber, g.f_storeid "
-                "from a_store_draft s "
-                "inner join c_goods g on g.f_storeid=s.f_goods "
-                "inner join c_groups gg on gg.f_id=g.f_group "
-                "inner join c_units u on u.f_id=g.f_unit "
-                "left join c_goods_classes gca on gca.f_id=g.f_group1 "
-                "left join c_goods_classes gcb on gcb.f_id=g.f_group2 "
-                "left join c_goods_classes gcc on gcc.f_id=g.f_group3 "
-                "left join c_goods_classes gcd on gcd.f_id=g.f_group4 "
-                "left join c_goods_option go on go.f_id=g.f_id and go.f_flaguncomplectfrom>0 "
-                "left join c_partners cp on cp.f_id=g.f_supplier "
-                "inner join a_header h on h.f_id=s.f_document "
-                "where h.f_date<=:f_date and s.f_store=:f_store and h.f_state=:f_state and g.f_enabled=1 "
-                "group by g.f_id,gg.f_name,g.f_name,g.f_lastinputprice,g.f_saleprice "
-                "having sum(s.f_qty*s.f_type) > 0 ");
-    }
+
+    db[":f_store"] = C5Config::defaultStore();
+    db[":f_date"] = QDate::currentDate();
+    db[":f_state"] = DOC_STATE_SAVED;
+    db.exec("select g.f_id, g.f_scancode, cp.f_taxname, gg.f_name as f_groupname, g.f_name as f_goodsname, "
+            "g.f_saleprice, g.f_saleprice2, u.f_name as f_unitname, "
+            "gca.f_name as group1, gcb.f_name group2, gcc.f_name as group3, gcd.f_name as group4, "
+            "gg.f_taxdept, gg.f_adgcode, sum(s.f_qty*s.f_type) as f_qty, g.f_unit, "
+            "go.f_flaguncomplectfrom, go.f_uncomplectfromqty, g.f_wholenumber, g.f_storeid "
+            "from a_store_draft s "
+            "inner join c_goods g on g.f_storeid=s.f_goods "
+            "inner join c_groups gg on gg.f_id=g.f_group "
+            "inner join c_units u on u.f_id=g.f_unit "
+            "left join c_goods_classes gca on gca.f_id=g.f_group1 "
+            "left join c_goods_classes gcb on gcb.f_id=g.f_group2 "
+            "left join c_goods_classes gcc on gcc.f_id=g.f_group3 "
+            "left join c_goods_classes gcd on gcd.f_id=g.f_group4 "
+            "left join c_goods_option go on go.f_id=g.f_id and go.f_flaguncomplectfrom>0 "
+            "left join c_partners cp on cp.f_id=g.f_supplier "
+            "inner join a_header h on h.f_id=s.f_document "
+            "where h.f_date<=:f_date and s.f_store=:f_store and h.f_state=:f_state and g.f_enabled=1 "
+            "group by g.f_id,gg.f_name,g.f_name,g.f_lastinputprice,g.f_saleprice "
+            "having sum(s.f_qty*s.f_type) > 0 ");
+
 
     ui->tblGoods->setRowCount(db.rowCount());
     ui->leTotalRetail->setDouble(0);
@@ -450,6 +433,12 @@ void Working::makeWGoods()
         fMultiscancode[db.getString(0)] = db.getString(1);
     }
 
+    fUnitDefaultQty.clear();
+    db.exec("select f_name, f_defaultqty from c_units");
+    while (db.nextRow()) {
+        fUnitDefaultQty[db.getString(0)] = db.getDouble(1);
+    }
+
     ui->lbLastUpdate->setText(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
 }
 
@@ -549,7 +538,7 @@ void Working::addGoods(QString &code)
                 g.fWhosalePrice = db.getDouble("f_saleprice2");
                 g.fTaxDept = db.getInt("f_taxdept");
                 g.fAdgCode = db.getString("f_adgcode");
-                g.fQty = db.getDouble("f_qty");
+                g.fQty = fUnitDefaultQty[db.getString("f_unitname")];
                 g.fIsService = db.getInt("f_service") == 1;
                 g.fWholeNumber = db.getInt("f_wholenumber") == 1;
             }
@@ -562,6 +551,7 @@ void Working::addGoods(QString &code)
     switch (w->fSaleType) {
     case SALE_RETAIL:
     case SALE_WHOSALE:
+        g.fQty = fUnitDefaultQty[g.fUnit];
         w->addGoods(g);
         break;
     case SALE_PREORDER:

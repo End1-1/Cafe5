@@ -520,3 +520,8 @@ create table a_store_dish_waste (f_id char(36) primary key, f_document char(36),
 /* db - 37 */
 update s_app set f_version='37' where f_app='DB';
 create table c_goods_multiscancode (f_id varchar(32) primary key, f_goods integer);
+
+/* db - 38 */
+update s_app set f_version='38' where f_app='DB';
+alter table c_units add column f_defaultqty decimal(14,3);
+drop table a_store_temp;
