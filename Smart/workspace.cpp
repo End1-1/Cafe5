@@ -344,7 +344,7 @@ void Workspace::on_btnCheckout_clicked()
             db.update("h_halls", where_id(hid));
         }
     } else {
-        hallid ="[-]";
+        hallid = "[-]";
     }
 
     QDate dateCash = QDate::currentDate();

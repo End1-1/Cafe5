@@ -145,7 +145,7 @@
     </message>
     <message>
         <location filename="../Cafe5/c5connection.ui" line="54"/>
-        <location filename="../Cafe5/c5connection.cpp" line="81"/>
+        <location filename="../Cafe5/c5connection.cpp" line="82"/>
         <source>Password</source>
         <translation>Գախտնաբառ</translation>
     </message>
@@ -200,38 +200,38 @@
         <translation>Ծրագիրը ամբողջ էկրանով</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="81"/>
+        <location filename="../Cafe5/c5connection.cpp" line="82"/>
         <source>Configuration settings</source>
         <translation>Կոնֆիգուրացիա</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="84"/>
+        <location filename="../Cafe5/c5connection.cpp" line="85"/>
         <source>Access denied</source>
         <translation>Մուտքը արգելված է</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="102"/>
-        <location filename="../Cafe5/c5connection.cpp" line="127"/>
+        <location filename="../Cafe5/c5connection.cpp" line="103"/>
+        <location filename="../Cafe5/c5connection.cpp" line="128"/>
         <source>Cannot connect to database</source>
         <translation>Հնարավոր չէ կապ հաստատել տվյալների պահոցի հետ</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="106"/>
+        <location filename="../Cafe5/c5connection.cpp" line="107"/>
         <source>Connection successfull</source>
         <translation>Կապը հաստատված է</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="119"/>
+        <location filename="../Cafe5/c5connection.cpp" line="120"/>
         <source>Saved</source>
         <translation>Պահպանված է</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="136"/>
+        <location filename="../Cafe5/c5connection.cpp" line="137"/>
         <source>Already initialized</source>
         <translation>Արդեն ստեղծված է</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="154"/>
+        <location filename="../Cafe5/c5connection.cpp" line="155"/>
         <source>Ready to use</source>
         <translation>Պատրաստ է օգտագործման</translation>
     </message>
@@ -833,17 +833,17 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="800"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="808"/>
         <source>Invalid document id</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="907"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="915"/>
         <source>Not enough materials in the store</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="1003"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="1011"/>
         <source>This order used in next documents</source>
         <translation type="unfinished"></translation>
     </message>

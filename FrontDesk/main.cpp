@@ -26,6 +26,10 @@ int main(int argc, char *argv[])
         return 0;
     }
 
+    for (int i = 1; i < argc; i++){
+        __autologin_store.append(argv[i]);
+    }
+
     QList<QByteArray> connectionParams;
     C5Connection::readParams(connectionParams);
     C5Config::fDBHost = connectionParams.at(0);

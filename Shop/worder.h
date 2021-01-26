@@ -12,6 +12,7 @@ class WOrder;
 }
 
 class Working;
+class C5TableWidget;
 
 class WOrder : public QWidget
 {
@@ -46,6 +47,8 @@ public:
 
     void changePrice();
 
+    int rowCount();
+
     void removeRow();
 
     void nextRow();
@@ -54,11 +57,15 @@ public:
 
     int lastRow();
 
+    void countTotal();
+
     void setDiscount(const QString &label, const QString &value);
 
     void setPartner(const QString &taxcode, int id, const QString &taxname);
 
     void setQtyOfRow(int row, double qty);
+
+    C5TableWidget *table();
 
 private slots:
     void on_leCash_textChanged(const QString &arg1);
@@ -85,8 +92,6 @@ private slots:
 
 private:
     Ui::WOrder *ui;
-
-    void countTotal();
 
     QDate fDateOpen;
 

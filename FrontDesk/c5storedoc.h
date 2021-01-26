@@ -211,6 +211,8 @@ private slots:
     void on_btnAddDish_clicked();
 
     void on_btnRemoveRows_clicked();
+
+    void on_btnRememberStoreIn_clicked(bool checked);
 };
 
 #endif // C5STOREDOC_H

@@ -12,6 +12,15 @@ PrintReceiptGroup::PrintReceiptGroup(QObject *parent) :
 
 void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
 {
+    double cash = 0;
+    double change = 0;
+    db[":f_id"] = id;
+    db.exec("select f_cash, f_change from o_payment where f_id=:f_id");
+    if (db.nextRow()) {
+        cash = db.getDouble("f_cash");
+        change = db.getDouble("f_change");
+    }
+
     C5Database dtax(db);
     dtax[":f_id"] = id;
     dtax.exec("select * from o_tax where f_id=:f_id");
@@ -184,9 +193,20 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
     p.br();
 
     if (amountCash > 0.001) {
-        p.ltext(tr("Payment, cash"), 0);
-        p.rtext(float_str(amountTotal, 2));
-        p.br();
+        if (cash > 0.001) {
+            p.ltext(tr("Payment, cash"), 0);
+            p.rtext(float_str(cash, 2));
+            p.br();
+            if (change > 0.001) {
+                p.ltext(tr("Change"), 0);
+                p.rtext(float_str(-1 * change, 2));
+                p.br();
+            }
+        } else {
+            p.ltext(tr("Payment, cash"), 0);
+            p.rtext(float_str(amountTotal, 2));
+            p.br();
+        }
     }
     if (amountCard > 0.001) {
         p.ltext(tr("Payment, card"), 0);
@@ -209,6 +229,15 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
 
 void PrintReceiptGroup::print2(const QString &id, C5Database &db)
 {
+    double cash = 0;
+    double change = 0;
+    db[":f_id"] = id;
+    db.exec("select f_cash, f_change from o_payment where f_id=:f_id");
+    if (db.nextRow()) {
+        cash = db.getDouble("f_cash");
+        change = db.getDouble("f_change");
+    }
+
     C5Database dtax(db);
     dtax[":f_id"] = id;
     dtax.exec("select * from o_tax where f_id=:f_id");
@@ -383,10 +412,21 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
     p.line();
     p.br();
 
-    if (tt > 0.001) {
-        p.ltext(tr("Payment, cash"), 0);
-        p.rtext(float_str(tt, 2));
-        p.br();
+    if (amountCash > 0.001) {
+        if (cash > 0.001) {
+            p.ltext(tr("Payment, cash"), 0);
+            p.rtext(float_str(cash, 2));
+            p.br();
+            if (change > 0.001) {
+                p.ltext(tr("Change"), 0);
+                p.rtext(float_str(-1 * change, 2));
+                p.br();
+            }
+        } else {
+            p.ltext(tr("Payment, cash"), 0);
+            p.rtext(float_str(amountTotal, 2));
+            p.br();
+        }
     }
     if (amountCard > 0.001) {
         p.ltext(tr("Payment, card"), 0);

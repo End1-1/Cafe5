@@ -715,6 +715,14 @@ bool C5StoreDraftWriter::writeOHeader(QString &id, int hallid, const QString &pr
     }
 }
 
+bool C5StoreDraftWriter::writeOPayment(const QString &id, double cash, double change)
+{
+    fDb[":f_id"] = id;
+    fDb[":f_cash"] = cash;
+    fDb[":f_change"] = change;
+    return returnResult(fDb.insert("o_payment", false));
+}
+
 bool C5StoreDraftWriter::writeOGoods(QString &id, const QString &header, const QString &body, int store, int goods,
                                      double qty, double price, double total, int tax, int sign, int row,
                                      const QString &storerec, double discount, int discountMode, int returnMode,

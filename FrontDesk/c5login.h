@@ -15,6 +15,8 @@ public:
 
     ~C5Login();
 
+    virtual int exec() override;
+
 private slots:
     void on_btnCancel_clicked();
 

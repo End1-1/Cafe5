@@ -230,6 +230,15 @@ void C5MainWindow::on_actionLogin_triggered()
         }
     }
 
+    QStringList dbParams = fDatabases[__c5config.getRegValue("lastdb").toString()];
+    if (dbParams.count() > 3) {
+        C5Config::fDBHost = dbParams.at(0);
+        C5Config::fDBPath = dbParams.at(1);
+        C5Config::fDBUser = dbParams.at(2);
+        C5Config::fDBPassword = dbParams.at(3);
+        C5Config::initParamsFromDb();
+    }
+
     if (!lastdb.isEmpty()) {
         setDB(lastdb);
     }
@@ -299,6 +308,9 @@ void C5MainWindow::enableMenu(bool v)
         }
     }
     fLogin = v;
+    if (v) {
+        autoLogin();
+    }
 }
 
 void C5MainWindow::addTreeL3Item(QListWidget *l, int permission, const QString &text, const QString &icon)
@@ -397,6 +409,34 @@ void C5MainWindow::removeFromFavorite(int permission)
                 }
             }
         }
+    }
+}
+
+void C5MainWindow::autoLogin()
+{
+    int doctype = 0;
+    int storein = 0;
+    if (__autologin_store.count() > 0) {
+        for (const QString &s: qAsConst(__autologin_store)) {
+            if (s.contains("--newdoc:")) {
+                doctype = s.mid(s.indexOf(":") + 1, s.length() - s.indexOf(":")).toInt();
+            }
+            if (s.contains("--storein:")) {
+                storein = s.mid(s.indexOf(":") + 1, s.length() - s.indexOf(":")).toInt();
+            }
+        }
+    }
+    __autologin_store.clear();
+    QStringList dbParams = fDatabases[__c5config.getRegValue("lastdb").toString()];
+    switch (doctype) {
+    case DOC_TYPE_STORE_INPUT: {
+        auto *doc = createTab<C5StoreDoc>(dbParams);
+        doc->setMode(C5StoreDoc::sdInput);
+        doc->setStore(storein, 0);
+        break;
+    }
+    default:
+        break;
     }
 }
 
@@ -629,6 +669,7 @@ void C5MainWindow::on_actionLogout_triggered()
         li->widget()->deleteLater();
         delete li;
     }
+    fMenuLists.clear();
     ui->actionLogin->setVisible(true);
     ui->actionLogout->setVisible(false);
     ui->actionChange_password->setVisible(false);
@@ -675,6 +716,10 @@ void C5MainWindow::setDB(const QString &dbname)
 {
     __c5config.setRegValue("lastdb", dbname);
     QStringList db = fDatabases[dbname];
+    if (db.count() == 0) {
+        C5Message::info(tr("No access to this database"));
+        return;
+    }
     QIcon icon = db.at(4).toInt() == 0 ? QIcon(":/database.png") : QIcon(":/database_main.png");
     qDeleteAll(fMenuLists);
     fMenuLists.clear();

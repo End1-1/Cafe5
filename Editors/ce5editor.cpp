@@ -170,6 +170,7 @@ bool CE5Editor::save(QString &err, QList<QMap<QString, QVariant> > &data)
             break;
         case 2:
         case 3:
+        case 4:
             value = leField->getDouble();
             break;
         }
@@ -355,6 +356,9 @@ void CE5Editor::getLineEdit(QObject *parent)
                     break;
                 case 3:
                     le->setValidator(new QDoubleValidator(-99999999, 999999999, 3));
+                    break;
+                case 4:
+                    le->setValidator(new QDoubleValidator(-1, 999999999, 3));
                     break;
                 }
             }

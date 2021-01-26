@@ -45,5 +45,8 @@ void C5ChangePassword::on_btnOK_clicked()
         C5Message::error(tr("Old password doesnt match"));
         return;
     }
+    db[":f_id"] = __userid;
+    db[":f_password"] = ui->leNewPassword->text();
+    db.exec("update s_user set f_password=md5(:f_password) where f_id=:f_id");
     accept();
 }

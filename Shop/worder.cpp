@@ -170,7 +170,7 @@ void WOrder::addGoodsToTable(const Goods &g)
     ui->tblGoods->item(row, 2)->fDecimals = 3;
     ui->tblGoods->setString(row, 3, g.fUnit);
     ui->tblGoods->setDouble(row, 4, price);
-    ui->tblGoods->setDouble(row, 5, price);
+    ui->tblGoods->setDouble(row, 5, g.fQty * price);
     ui->tblGoods->setInteger(row, 6, g.fTaxDept);
     ui->tblGoods->setString(row, 7, g.fAdgCode);
     ui->tblGoods->setString(row, 8, "");
@@ -180,6 +180,27 @@ void WOrder::addGoodsToTable(const Goods &g)
     ui->tblGoods->setString(row, col_discount_mode, "");
     ui->tblGoods->setCurrentItem(ui->tblGoods->item(row, 0));
     countTotal();
+
+    C5Database db(__c5config.dbParams());
+    db[":f_station"] = hostinfo + ": " + hostusername();
+    db[":f_saletype"] = fSaleType;
+    db[":f_window"] = fWorking->fTab->currentIndex();
+    db[":f_row"] = row;
+    db[":f_state"] = 0;
+    db[":f_goodsid"] = g.fCode;
+    db[":f_name"] = g.fName + " " + g.fScanCode;
+    db[":f_qty"] = g.fQty;
+    db[":f_unit"] = g.fUnit;
+    db[":f_price"] = price;
+    db[":f_total"] = g.fQty * price;
+    db[":f_taxdept"] = g.fTaxDept;
+    db[":f_adgcode"] = g.fAdgCode;
+    db[":f_tablerec"] = 0;
+    db[":f_unitcode"] = g.fUnitCode;
+    db[":f_service"] = g.fIsService;
+    db[":f_discountvalue"] = 0;
+    db[":f_discountmode"] = "";
+    db.insert("a_sale_temp");
 
     ImageLoader *il = new ImageLoader(g.fScanCode, this);
     connect(il, SIGNAL(imageLoaded(QPixmap)), this, SLOT(imageLoaded(QPixmap)));
@@ -227,6 +248,7 @@ bool WOrder::writeOrder(bool tax)
         goods.append(g);
     }
     C5ShopOrder so;
+    so.setPayment(ui->leCash->getDouble(), ui->leChange->getDouble());
     so.setPartner(fPartner, ui->lePartner->text());
     so.setDiscount(fCostumerId, fCardId, fCardMode, fCardValue);
     so.setParams(fDateOpen, fTimeOpen, fSaleType);
@@ -238,6 +260,7 @@ bool WOrder::writeOrder(bool tax)
             if (g.isService) {
                 continue;
             }
+            fWorking->decQty(g);
         }
         if (!fPreorderUUID.isEmpty()) {
             db[":f_state"] = 2;
@@ -256,8 +279,15 @@ bool WOrder::writeOrder(bool tax)
             }
         }
 
-        auto *r = new C5Replication();
-        r->start(SLOT(uploadToServer()));
+        db[":f_station"] = hostinfo + ": " + hostusername();
+        db[":f_order"] = so.fHeader;
+        db[":f_window"] = fWorking->fTab->currentIndex();
+        db.exec("update a_sale_temp set f_state=2, f_order=:f_order where f_station=:f_station and f_window=:f_window and f_state=0");
+
+        if(__c5config.rdbReplica()) {
+            auto *r = new C5Replication();
+            r->start(SLOT(uploadToServer()));
+        }
     }
     C5LogSystem::writeEvent(QString("%1. %2:%3ms, %4:%5, %6").arg(tr("Order saved")).arg(tr("Elapsed")).arg(t.elapsed()).arg(tr("Order number")).arg(so.fHallId).arg(so.fHeader));
     return w;
@@ -467,22 +497,31 @@ void WOrder::changePrice()
     if (row < 0) {
         return;
     }
-    double qty = DQty::getQty(tr("Price"), this);
-    if (qty < 0.001) {
+    double currentPrice = ui->tblGoods->getDouble(row, 4);
+    if (__c5config.shopDenyPriceChange() && !(currentPrice <0)) {
         return;
     }
-    ui->tblGoods->setDouble(row, 4, qty);
-    ui->tblGoods->setDouble(row, 5, ui->tblGoods->getDouble(row, 2) * qty);
+    double price = DQty::getQty(tr("Price"), this);
+    if (price < 0.001) {
+        return;
+    }
+    ui->tblGoods->setDouble(row, 4, price);
+    ui->tblGoods->setDouble(row, 5, ui->tblGoods->getDouble(row, 2) * price);
     countTotal();
+}
+
+int WOrder::rowCount()
+{
+    return ui->tblGoods->rowCount();
 }
 
 void WOrder::removeRow()
 {
-    if (!fWorking->getAdministratorRights(cp_t5_remove_row_from_shop)) {
-        return;
-    }
     int row = ui->tblGoods->currentRow();
     if (row < 0) {
+        return;
+    }
+    if (!fWorking->getAdministratorRights(cp_t5_remove_row_from_shop)) {
         return;
     }
     QString code = ui->tblGoods->getString(row, 0);
@@ -492,6 +531,17 @@ void WOrder::removeRow()
     ui->leCard->clear();
     ui->leCash->clear();
     ui->leChange->clear();
+    C5Database db(__c5config.dbParams());
+    db[":f_window"] = fWorking->fTab->currentIndex();
+    db[":f_state"] = 0;
+    db[":f_row"] = row;
+    db[":f_station"] = hostinfo + ": " + hostusername();
+    db.exec("update a_sale_temp set f_state=1 where f_station=:f_station and f_state=:f_state and f_window=:f_window and f_row=:f_row");
+    db[":f_window"] = fWorking->fTab->currentIndex();
+    db[":f_state"] = 0;
+    db[":f_row"] = row;
+    db[":f_station"] = hostinfo + ": " + hostusername();
+    db.exec("update a_sale_temp set f_row=f_row-1 where f_station=:f_station and f_row>:f_row and f_state=:f_state and f_window=:f_window");
     C5LogSystem::writeEvent(QString("%1 #%2 %3:%4 %5").arg(tr("Remove row")).arg(row).arg(code).arg(name).arg(float_str(qty, 2)));
     countTotal();
 }
@@ -655,7 +705,6 @@ void WOrder::setQtyOfRow(int row, double qty)
         C5Message::error(tr("Incorrect quantity value"));
         return;
     }
-    qDebug() << g.fQty << totalQty;
     if (!g.fIsService && g.fQty < totalQty) {
         C5Message::error(tr("Insufficient quantity") + "<br>" + float_str(totalQty - g.fQty, 3));
         return;
@@ -665,6 +714,11 @@ void WOrder::setQtyOfRow(int row, double qty)
     ui->tblGoods->setDouble(row, 5, ui->tblGoods->getDouble(row, 4) * qty);
     C5LogSystem::writeEvent(QString("%1 %2:%3 %4").arg(tr("Change qty")).arg(g.fCode).arg(g.fName).arg(float_str(qty, 2)));
     countTotal();
+}
+
+C5TableWidget *WOrder::table()
+{
+    return ui->tblGoods;
 }
 
 void WOrder::on_leCash_textChanged(const QString &arg1)
@@ -692,13 +746,14 @@ void WOrder::noImage()
 
 void WOrder::on_btnInfo_clicked()
 {
-    QString info = QString("Ctrl+S: %1<br>Ctrl+I: %2<br>Ctrl+O: %3<br>Ctrl+T: %4<br>Ctrl+A: %5<br>Ctrl+H: %6")
+    QString info = QString("Ctrl+S: %1<br>Ctrl+I: %2<br>Ctrl+O: %3<br>Ctrl+T: %4<br>Ctrl+A: %5<br>Ctrl+H: %6<br>Ctrl+Z: %7")
             .arg(tr("Search goods in the storages"))
             .arg(tr("Input staff at the work"))
             .arg(tr("Output staff from the work"))
             .arg(tr("Total today"))
             .arg(tr("Preorder"))
-            .arg(tr("Show log"));
+            .arg(tr("Show log"))
+            .arg(tr("Open new store input document"));
     C5Message::info(info);
 }
 

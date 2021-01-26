@@ -221,6 +221,8 @@ private:
     static QMap<int, QString> fSettings;
 };
 
+extern QStringList __autologin_store;
+
 extern C5Config __c5config;
 
 extern int __userid;

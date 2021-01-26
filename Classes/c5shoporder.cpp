@@ -14,6 +14,12 @@ C5ShopOrder::C5ShopOrder()
 
 }
 
+void C5ShopOrder::setPayment(double cash, double change)
+{
+    fCash = cash;
+    fChange = change;
+}
+
 void C5ShopOrder::setPartner(int partnerCode, const QString &partnerName)
 {
     fPartnerCode = partnerCode;
@@ -72,6 +78,9 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
     }
     fHallId = QString("%1%2").arg(headerPrefix).arg( headerId);
     if (!dw.writeOHeader(fHeader, headerId, headerPrefix, ORDER_STATE_CLOSE, __c5config.defaultHall().toInt(), __c5config.defaultTable(), fDateOpen, QDate::currentDate(), QDate::currentDate(), fTimeOpen, QTime::currentTime(), __userid, "", 1, total, (total - card), card, 0, 0, 0, 0, discount, 0, fCardValue, 0, 0, 1, 2, fSaleType, fPartnerCode)) {
+        return returnFalse(dw.fErrorMsg, db);
+    }
+    if (!dw.writeOPayment(fHeader, fCash, fChange)) {
         return returnFalse(dw.fErrorMsg, db);
     }
     QString sn, firm, address, fiscal, hvhh, rseq, devnum, time;

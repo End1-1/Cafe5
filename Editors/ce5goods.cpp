@@ -183,7 +183,7 @@ bool CE5Goods::save(QString &err, QList<QMap<QString, QVariant> > &data)
     }
     for (const QString &s: fScancodeRemove) {
         db[":f_id"] = s;
-        db.exec("delete from c_go╠ods_multiscancode where f_id=:f_id");
+        db.exec("delete from c_goods_multiscancode where f_id=:f_id");
     }
     fScancodeAppend.clear();
     fScancodeRemove.clear();

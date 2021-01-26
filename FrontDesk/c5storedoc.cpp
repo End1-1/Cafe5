@@ -57,6 +57,8 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
     ui->lbPayment->setVisible(!C5Config::noCashDocStore());
     ui->chPaid->setVisible(!C5Config::noCashDocStore());
     ui->leScancode->setVisible(!C5Config::noScanCodeStore());
+    ui->btnNewGoods->setVisible(pr(dbParams.at(1), cp_t6_goods));
+    ui->btnEditGoods->setVisible(pr(dbParams.at(1), cp_t6_goods));
     fInternalId = "";
     fDocState = DOC_STATE_DRAFT;
     ui->tblGoodsGroup->viewport()->installEventFilter(this);
@@ -82,6 +84,10 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
     ui->leComplectationQty->setValidator(new QDoubleValidator(0, 999999999, 3));
     if (pr(dbParams.at(1), cp_t1_deny_change_store_doc_date)) {
         ui->deDate->setEnabled(false);
+    }
+    ui->btnRememberStoreIn->setChecked(__c5config.getRegValue("storedoc_storeinput").toBool());
+    if (__c5config.getRegValue("storedoc_storeinput").toBool()) {
+        ui->leStoreInput->setValue(__c5config.getRegValue("storedoc_storeinput_id").toInt());
     }
 }
 
@@ -465,9 +471,39 @@ void C5StoreDoc::addByScancode(const QString &code, const QString &qty, QString 
         emit ui->tblGoods->lineEdit(row, 7)->textEdited(price);
         markGoodsComplited();
     } else {
-        C5Message::error(tr("Goods not found"));
-        fCanChangeFocus = false;
-        ui->leScancode->setFocus();
+        db[":f_scancode"] = code;
+        db.exec("select gg.f_scancode, gg.f_id, concat(gg.f_name, ' ', gg.f_scancode) as f_name, gu.f_name as f_unitname, gg.f_saleprice, "
+                "gr.f_taxdept, gr.f_adgcode, gg.f_lastinputprice "
+                "from c_goods gg  "
+                "left join c_groups gr on gr.f_id=gg.f_group "
+                "left join c_units gu on gu.f_id=gg.f_unit "
+                "where gg.f_id in (select f_goods from c_goods_multiscancode where f_id=:f_scancode)");
+        if (db.nextRow()) {
+            int row = addGoodsRow();
+            ui->tblGoods->setInteger(row, 3, db.getInt("f_id"));
+            ui->tblGoods->setString(row, 4, db.getString("f_name"));
+            ui->tblGoods->setString(row, 6, db.getString("f_unitname"));
+            ui->tblGoods->item(row, 4)->setSelected(true);
+            fCanChangeFocus = false;
+            ui->tblGoods->lineEdit(row, 5)->setText(qty);
+            ui->tblGoods->lineEdit(row, 5)->setFocus();
+            ui->tblGoods->lineEdit(row, 7)->setText(price);
+            ui->tblGoods->lineEdit(row, 7)->setPlaceholderText(float_str(db.getDouble("f_lastinputprice"), 2));
+            if (__c5config.getValue(param_input_doc_fix_price).toInt() > 0) {
+                if (price.toDouble() < 0.001) {
+                    if (db.getDouble("f_lastinputprice") > 0.001) {
+                        ui->tblGoods->lineEdit(row, 7)->setDouble(db.getDouble("f_lastinputprice"));
+                        price = db.getString("f_lastinputprice");
+                    }
+                }
+            }
+            emit ui->tblGoods->lineEdit(row, 7)->textEdited(price);
+            markGoodsComplited();
+        } else {
+            C5Message::error(tr("Goods not found"));
+            fCanChangeFocus = false;
+            ui->leScancode->setFocus();
+        }
     }
 }
 
@@ -1172,6 +1208,9 @@ void C5StoreDoc::newDoc()
         ui->leDocNum->setPlaceholderText(QString("%1").arg(db.getInt(0) + 1, C5Config::docNumDigitsOut(), 10, QChar('0')));
         break;
     }
+    if (__c5config.getRegValue("storedoc_storeinput").toBool()) {
+        ui->leStoreInput->setValue(__c5config.getRegValue("storedoc_storeinput_id").toInt());
+    }
     countTotal();
 }
 
@@ -1189,6 +1228,9 @@ void C5StoreDoc::getInput()
     ui->tblGoods->setString(row, 3, vals.at(1).toString());
     ui->tblGoods->setString(row, 4, vals.at(3).toString());
     ui->tblGoods->setString(row, 6, vals.at(4).toString());
+    if (__c5config.getValue(param_input_doc_fix_price).toInt() > 0) {
+        ui->tblGoods->lineEdit(row, 7)->setDouble(vals.at(6).toDouble());
+    }
     ui->tblGoods->lineEdit(row, 7)->setPlaceholderText(float_str(vals.at(6).toDouble(), 2));
     ui->tblGoods->lineEdit(row, 5)->setFocus();
 }
@@ -1237,6 +1279,9 @@ void C5StoreDoc::getOutput()
 void C5StoreDoc::saveDoc()
 {
     writeDocumentWithState(DOC_STATE_SAVED);
+    if (__c5config.getRegValue("storedoc_storeinput").toBool()) {
+        __c5config.setRegValue("storedoc_storeinput_id", ui->leStoreInput->getInteger());
+    }
 }
 
 void C5StoreDoc::draftDoc()
@@ -2047,4 +2092,9 @@ void C5StoreDoc::on_btnRemoveRows_clicked()
     ui->tblDishes->removeRow(row);
     correctDishesRows(row, rows.count());
     countTotal();
+}
+
+void C5StoreDoc::on_btnRememberStoreIn_clicked(bool checked)
+{
+    __c5config.setRegValue("storedoc_storeinput", checked);
 }

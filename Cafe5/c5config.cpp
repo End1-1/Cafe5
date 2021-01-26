@@ -15,6 +15,7 @@ QString C5Config::fDBPath;
 QString C5Config::fDBUser;
 QString C5Config::fDBPassword;
 QString C5Config::fFullScreen;
+QStringList __autologin_store;
 C5Config __c5config;
 int __userid;
 int __usergroup;

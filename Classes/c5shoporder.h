@@ -11,6 +11,8 @@ class C5ShopOrder : public QObject
 public:
     C5ShopOrder();
 
+    void setPayment(double cash, double change);
+
     void setPartner(int partnerCode, const QString &partnerName);
 
     void setDiscount(int customer, int cardid, int cardmode, double cardvalue);
@@ -43,6 +45,10 @@ private:
     int fCardMode;
 
     double fCardValue;
+
+    double fCash;
+
+    double fChange;
 };
 
 #endif // C5SHOPORDER_H

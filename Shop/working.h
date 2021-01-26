@@ -78,6 +78,8 @@ private:
 
     bool fUpFinished;
 
+    void restoreSales();
+
 private slots:
     void timeout();
 

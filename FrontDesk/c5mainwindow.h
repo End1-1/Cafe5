@@ -107,6 +107,8 @@ private:
     QString itemIconName(int permission);
 
     void removeFromFavorite(int permission);
+
+    void autoLogin();
 };
 
 extern C5MainWindow *__mainWindow;

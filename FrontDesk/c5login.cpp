@@ -11,11 +11,30 @@ C5Login::C5Login(const QStringList &dbParams) :
         ui->leUsername->setText(C5Config::fLastUsername);
         ui->lePassword->setFocus();
     }
+    if (__autologin_store.contains("--autologin")) {
+        for (const QString &s: qAsConst(__autologin_store)) {
+            if (s.contains("--user:")) {
+                ui->leUsername->setText(s.mid(s.indexOf(":") + 1, s.length() - s.indexOf(":")));
+            } else if (s.contains("--password:")) {
+                ui->lePassword->setText(s.mid(s.indexOf(":") + 1, s.length() - s.indexOf(":")));
+            }
+        }
+        on_btnOk_clicked();
+    }
 }
 
 C5Login::~C5Login()
 {
     delete ui;
+}
+
+int C5Login::exec()
+{
+    if (__autologin_store.count() > 0) {
+        on_btnOk_clicked();
+        return result();
+    }
+    return C5Dialog::exec();
 }
 
 void C5Login::on_btnCancel_clicked()
@@ -30,10 +49,12 @@ void C5Login::on_btnOk_clicked()
     db[":f_password"] = password(ui->lePassword->text());
     db.exec("select f_id, f_group, f_state, concat(f_last, ' ', f_first) from s_user where f_login=:f_login and f_password=:f_password");
     if (!db.nextRow()) {
+        __autologin_store.clear();
         C5Message::error(tr("Login failed"));
         return;
     }
     if (db.getInt(2) == 0) {
+        __autologin_store.clear();
         C5Message::error(tr("User is inactive"));
         return;
     }

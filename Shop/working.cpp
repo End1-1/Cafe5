@@ -19,6 +19,7 @@
 #include <QInputDialog>
 #include <QKeyEvent>
 #include <QTimer>
+#include <QProcess>
 #include <QSettings>
 
 QMap<QString, Goods> Working::fGoods;
@@ -65,7 +66,6 @@ Working::Working(QWidget *parent) :
     makeWGoods();
     ui->leCode->installEventFilter(this);
     ui->tab->installEventFilter(this);
-    on_btnNewOrder_clicked();
     ui->wGoods->setVisible(false);
     ui->btnNewOrder->setVisible(!__c5config.shopDenyF1());
     ui->btnNewWhosale->setVisible(!__c5config.shopDenyF2());
@@ -79,6 +79,8 @@ Working::Working(QWidget *parent) :
     fHaveChanges = false;
     fUpFinished = true;
     fTab = ui->tab;
+
+    restoreSales();
 }
 
 Working::~Working()
@@ -109,9 +111,6 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
             event->accept();
             return true;
         case Qt::Key_Asterisk:
-            if (__c5config.shopDenyPriceChange()) {
-                return QWidget::eventFilter(watched, event);
-            }
             ui->leCode->clear();
             w = static_cast<WOrder*>(ui->tab->currentWidget());
             if (w) {
@@ -227,6 +226,17 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
                 l->exec();
                 delete l;
             }
+            break;
+        case Qt::Key_Z:
+            QStringList args;
+            args << QString("--newdoc:%1").arg(DOC_TYPE_STORE_INPUT);
+            args << QString("--storein:1");
+            args << QString("--autologin");
+            args << QString("--user:%1").arg(__c5config.getValue(param_shop_autologin_pin1));
+            args << QString("--password:%1").arg(__c5config.getValue(param_shop_autologin_pin2));
+            auto *proc = new QProcess(this);
+            proc->startDetached(qApp->applicationDirPath() + "/FrontDesk.exe", args);
+            qApp->quit();
             break;
         }
     }
@@ -601,6 +611,33 @@ int Working::ordersCount()
     }
 }
 
+void Working::restoreSales()
+{
+    C5Database db(__c5config.dbParams());
+    db[":f_station"] = hostinfo + ": " + hostusername();
+    db.exec("select distinct(f_window), f_saletype from a_sale_temp where f_state=0 and f_station=:f_station");
+    while (db.nextRow()) {
+        newSale(db.getInt(1));
+    }
+    db[":f_station"] = hostinfo + ": " + hostusername();
+    db.exec("select * from a_sale_temp where f_state=0 and f_station=:f_station order by f_window, f_row");
+    while (db.nextRow()) {
+        WOrder *w = static_cast<WOrder*>(ui->tab->widget(db.getInt("f_window")));
+        if (!w) {
+            C5Message::error(tr("Program error: Working:restoreSales: detected invalid window"));
+            continue;
+        }
+        int r = w->table()->addEmptyRow();
+        for (int i = 7; i < db.columnCount(); i++) {
+            w->table()->setData(r, i - 7, db.getValue(i));
+        }
+        w->countTotal();
+    }
+    if (fTab->count() == 0) {
+        on_btnNewOrder_clicked();
+    }
+}
+
 void Working::timeout()
 {
     fTimerCounter++;
@@ -846,6 +883,7 @@ void Working::on_btnSaveOrder_clicked()
     if (!w->writeOrder()) {
         return;
     }
+    w->table()->setRowCount(0);
     ui->tab->removeTab(ui->tab->currentIndex());
     if (ui->tab->count() == 0) {
         on_btnNewOrder_clicked();
@@ -865,6 +903,7 @@ void Working::on_btnSaveOrderNoTax_clicked()
     if (!w->writeOrder(false)) {
         return;
     }
+    w->table()->setRowCount(0);
     ui->tab->removeTab(ui->tab->currentIndex());
     if (ui->tab->count() == 0) {
         on_btnNewOrder_clicked();
@@ -969,12 +1008,23 @@ void Working::on_lePartner_returnPressed()
 
 void Working::on_tab_tabCloseRequested(int index)
 {
-    QWidget *w = ui->tab->widget(index);
+    C5Database db(__c5config.dbParams());
+    WOrder *w = static_cast<WOrder*>(ui->tab->widget(index));
+    if (w->rowCount() > 0) {
+        if (!getAdministratorRights(cp_t5_remove_row_from_shop)) {
+            return;
+        }
+        db[":f_window"] = index;
+        db.exec("update a_sale_temp set f_state=1 where f_window=:f_window and f_state=0");
+    }
     ui->tab->removeTab(index);
     w->deleteLater();
     C5LogSystem::writeEvent(QString("%1 #%2").arg(tr("Window closed")).arg(index + 1));
     if (ui->tab->count() == 0) {
         newSale(SALE_RETAIL);
+    } else {
+        db[":f_window"] = index;
+        db.exec("update a_sale_temp set f_window=f_window-1 where f_window>:f_window");
     }
 }
 
@@ -1001,3 +1051,4 @@ void Working::on_tab_currentChanged(int index)
 {
     C5LogSystem::writeEvent(QString("%1 #%2").arg(tr("Current window")).arg(index + 1));
 }
+\
