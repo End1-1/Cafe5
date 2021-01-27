@@ -529,3 +529,8 @@ drop table a_store_temp;
 /* db - 39 */
 update s_app set f_version='39' where f_app='DB';
 create table a_sale_temp (f_id integer primary key auto_increment, f_station tinytext, f_saletype smallint, f_window smallint, f_row smallint, f_order char(36), f_state smallint, f_goodsid integer, f_name tinytext, f_qty decimal(14,4), f_unit tinytext, f_price decimal(14,2), f_total decimal(14,2), f_taxdept integer, f_adgcode tinytext, f_tablerec smallint, f_unitcode integer, f_service smallint, f_discountvalue decimal(14,3), f_discountmode tinytext);
+
+/* db - 40 */
+update s_app set f_version='40' where f_app='DB';
+drop table o_payment;
+create table o_payment (f_id char(36) primary key, f_cash decimal(14,2), f_change decimal(14,2));

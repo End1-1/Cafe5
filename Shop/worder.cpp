@@ -218,6 +218,10 @@ bool WOrder::writeOrder(bool tax)
             C5Message::error(tr("Invalid qty"));
             return false;
         }
+        if (ui->tblGoods->getDouble(i, 4) < 0) {
+            C5Message::error(tr("Invalid price"));
+            return false;
+        }
     }
 
     if (__c5config.shopDifferentStaff() && fWorking->fCurrentUsers.count() > 0) {
