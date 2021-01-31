@@ -6,77 +6,217 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>350</width>
-    <height>113</height>
+    <width>800</width>
+    <height>462</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>800</width>
+    <height>0</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QFormLayout" name="formLayout">
+  <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Code</string>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="focusPolicy">
+      <enum>Qt::ClickFocus</enum>
      </property>
-    </widget>
-   </item>
-   <item row="0" column="1">
-    <widget class="C5LineEditWithSelector" name="lineEdit">
-     <property name="Field" stdset="0">
-      <string>f_id</string>
+     <property name="currentIndex">
+      <number>0</number>
      </property>
-     <property name="Primary" stdset="0">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Name</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <widget class="C5LineEditWithSelector" name="lineEdit_2">
-     <property name="Field" stdset="0">
-      <string>f_name</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>Price</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1">
-    <widget class="C5LineEditWithSelector" name="lineEdit_3">
-     <property name="Field" stdset="0">
-      <string>f_price</string>
-     </property>
-     <property name="Type" stdset="0">
-      <number>2</number>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1">
-    <widget class="C5CheckBox" name="checkBox">
-     <property name="text">
-      <string/>
-     </property>
-     <property name="Field" stdset="0">
-      <string>f_enabled</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>Enabled</string>
-     </property>
+     <widget class="QWidget" name="tab">
+      <attribute name="title">
+       <string>Name</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>Enabled</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Code</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2">
+        <widget class="C5LineEditWithSelector" name="leMenu">
+         <property name="maximumSize">
+          <size>
+           <width>100</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="Field" stdset="0">
+          <string>f_menu</string>
+         </property>
+         <property name="Type" stdset="0">
+          <number>1</number>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="2">
+        <widget class="C5CheckBox" name="checkBox">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="Field" stdset="0">
+          <string>f_enabled</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Name</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="2">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>Menu</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="3">
+        <widget class="C5LineEditWithSelector" name="leMenuName">
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+         <property name="FieldRef" stdset="0">
+          <string>f_menuname</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2" colspan="2">
+        <widget class="C5LineEditWithSelector" name="leCode">
+         <property name="Field" stdset="0">
+          <string>f_id</string>
+         </property>
+         <property name="Primary" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="2" colspan="2">
+        <widget class="C5LineEditWithSelector" name="lineEdit_2">
+         <property name="Field" stdset="0">
+          <string>f_name</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_2">
+      <attribute name="title">
+       <string>Dishes</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_3">
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>Price</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="C5LineEditWithSelector" name="lePrice">
+         <property name="maximumSize">
+          <size>
+           <width>120</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+         <property name="Field" stdset="0">
+          <string>f_price</string>
+         </property>
+         <property name="Type" stdset="0">
+          <number>2</number>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0" colspan="2">
+        <widget class="C5TableWidget" name="tblDishes">
+         <property name="focusPolicy">
+          <enum>Qt::ClickFocus</enum>
+         </property>
+         <property name="contextMenuPolicy">
+          <enum>Qt::CustomContextMenu</enum>
+         </property>
+         <property name="editTriggers">
+          <set>QAbstractItemView::NoEditTriggers</set>
+         </property>
+         <property name="selectionMode">
+          <enum>QAbstractItemView::SingleSelection</enum>
+         </property>
+         <column>
+          <property name="text">
+           <string>Record</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Dish code</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Dish name</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Price</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Store</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Printer</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
   </layout>
@@ -92,7 +232,22 @@
    <extends>QCheckBox</extends>
    <header location="global">c5checkbox.h</header>
   </customwidget>
+  <customwidget>
+   <class>C5TableWidget</class>
+   <extends>QTableWidget</extends>
+   <header location="global">c5tablewidget.h</header>
+  </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>leCode</tabstop>
+  <tabstop>leMenu</tabstop>
+  <tabstop>lineEdit_2</tabstop>
+  <tabstop>checkBox</tabstop>
+  <tabstop>tblDishes</tabstop>
+  <tabstop>lePrice</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>leMenuName</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

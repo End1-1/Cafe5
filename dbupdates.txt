@@ -534,3 +534,8 @@ create table a_sale_temp (f_id integer primary key auto_increment, f_station tin
 update s_app set f_version='40' where f_app='DB';
 drop table o_payment;
 create table o_payment (f_id char(36) primary key, f_cash decimal(14,2), f_change decimal(14,2));
+
+/* db - 41 */
+update s_app set f_version='41' where f_app='DB';
+alter table d_package add column f_menu integer after f_id;
+create table o_package (f_id integer primary key auto_increment, f_header char(36), f_package integer, f_qty decimal(14,2), f_price decimal(14,2));

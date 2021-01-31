@@ -852,7 +852,7 @@ void C5WaiterServer::processCloseOrder(QJsonObject &o, C5Database &db)
             C5Database fDD(C5Config::dbParams().at(0), C5Config::hotelDatabase(), C5Config::dbParams().at(2), C5Config::dbParams().at(3));
             C5WaiterOrderDoc w(db, jh, jb);
             w.transferToHotel(db, fDD, err);
-            w.makeOutputOfStore(db, err); qDebug() << jh;
+            w.makeOutputOfStore(db, err, DOC_STATE_SAVED);
 
             C5StoreDraftWriter dw(db);
             if (settings[param_autoinput_salecash].toInt() == 1) {

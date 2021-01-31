@@ -32,7 +32,7 @@ public:
 
     bool transferToHotel(C5Database &db, C5Database &fDD, QString &err);
 
-    bool makeOutputOfStore(C5Database &db, QString &err);
+    bool makeOutputOfStore(C5Database &db, QString &err, int storedocstate);
 
     static bool clearStoreOutput(C5Database &db, const QDate &d1, const QDate &d2);
 

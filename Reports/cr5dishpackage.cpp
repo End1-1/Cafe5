@@ -8,11 +8,12 @@ CR5DishPackage::CR5DishPackage(const QStringList &dbParams, QWidget *parent) :
 {
     fIcon = ":/menu.png";
     fLabel = tr("Dish package");
-    fSqlQuery = "select f_id, f_name, f_price, f_enabled from d_package";
+    fSqlQuery = "select p.f_id, m.f_name as f_menuname, p.f_name, p.f_price, p.f_enabled from d_package p left join d_menu_names m on m.f_id=p.f_menu ";
     fTranslation["f_id"] = tr("Code");
     fTranslation["f_name"] = tr("Name");
     fTranslation["f_price"] = tr("Price");
     fTranslation["f_enabled"] = tr("Active");
+    fTranslation["f_menuname"] = tr("Menu");
     fEditor = new CE5DishPackage(dbParams);
 }
 

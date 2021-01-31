@@ -195,6 +195,9 @@ QLabel {color:green;}
                </size>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_5">
+               <property name="spacing">
+                <number>2</number>
+               </property>
                <property name="leftMargin">
                 <number>0</number>
                </property>
@@ -244,6 +247,60 @@ QLabel {color:green;}
                    <string>New Column</string>
                   </property>
                  </column>
+                </widget>
+               </item>
+               <item>
+                <widget class="QListWidget" name="lstCombo">
+                 <property name="verticalScrollBarPolicy">
+                  <enum>Qt::ScrollBarAlwaysOff</enum>
+                 </property>
+                 <property name="horizontalScrollBarPolicy">
+                  <enum>Qt::ScrollBarAlwaysOff</enum>
+                 </property>
+                 <property name="editTriggers">
+                  <set>QAbstractItemView::NoEditTriggers</set>
+                 </property>
+                 <property name="selectionMode">
+                  <enum>QAbstractItemView::NoSelection</enum>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QToolButton" name="btnShowDishes">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>DISHES</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QToolButton" name="btnShowPackages">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>PACKAGES</string>
+                 </property>
                 </widget>
                </item>
                <item>
@@ -364,6 +421,9 @@ QLabel {color:green;}
                </sizepolicy>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_4">
+               <property name="spacing">
+                <number>2</number>
+               </property>
                <property name="leftMargin">
                 <number>0</number>
                </property>
@@ -919,6 +979,9 @@ QLabel {color:green;}
          <item>
           <widget class="QWidget" name="widgt" native="true">
            <layout class="QVBoxLayout" name="verticalLayout_2">
+            <property name="spacing">
+             <number>2</number>
+            </property>
             <property name="leftMargin">
              <number>0</number>
             </property>
@@ -947,6 +1010,12 @@ QLabel {color:green;}
               </property>
               <property name="selectionBehavior">
                <enum>QAbstractItemView::SelectRows</enum>
+              </property>
+              <property name="showGrid">
+               <bool>false</bool>
+              </property>
+              <property name="gridStyle">
+               <enum>Qt::SolidLine</enum>
               </property>
               <attribute name="horizontalHeaderVisible">
                <bool>false</bool>

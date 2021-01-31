@@ -251,6 +251,7 @@ SOURCES += \
     ../Waiter/c5printreceiptthread.cpp \
     ../Waiter/c5printreceiptthread50mm.cpp \
     dishitemdelegate.cpp \
+    dishpackage.cpp \
     dishpartitemdelegate.cpp \
     dishtableitemdelegate.cpp \
         main.cpp \
@@ -495,6 +496,7 @@ HEADERS += \
     ../Waiter/c5printreceiptthread50mm.h \
     dish.h \
     dishitemdelegate.h \
+    dishpackage.h \
     dishpartitemdelegate.h \
     dishtableitemdelegate.h \
     payment.h \

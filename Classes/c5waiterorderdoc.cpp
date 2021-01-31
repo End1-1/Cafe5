@@ -287,7 +287,7 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &db, C5Database &fDD, QString 
     return true;
 }
 
-bool C5WaiterOrderDoc::makeOutputOfStore(C5Database &db, QString &err)
+bool C5WaiterOrderDoc::makeOutputOfStore(C5Database &db, QString &err, int storedocstate)
 {
     //Check for store doc
     db[":f_header"] = fHeader["f_id"].toString();
@@ -347,7 +347,7 @@ bool C5WaiterOrderDoc::makeOutputOfStore(C5Database &db, QString &err)
         db.insert("o_goods", false);
     }
     C5StoreDraftWriter dw(db);
-    if (!dw.writeFromShopOutput(fHeader["f_id"].toString(), DOC_STATE_DRAFT, err)) {
+    if (!dw.writeFromShopOutput(fHeader["f_id"].toString(), storedocstate, err)) {
         err += dw.fErrorMsg + "<br>";
         return false;
     }

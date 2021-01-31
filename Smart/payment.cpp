@@ -149,10 +149,23 @@ bool payment::printReceipt(bool printSecond)
     C5Printing p;
     p.setSceneParams(650, 2800, QPrinter::Portrait);
     p.setFont(font);
+    QMap<int, QMap<QString, QVariant> > packages;
 
     if (QFile::exists("./logo_receipt.png")) {
         p.image("./logo_receipt.png", Qt::AlignHCenter);
         p.br();
+    }
+    db[":f_header"] = fOrderUUID;
+    db.exec("select p.f_id, d.f_name, p.f_qty, p.f_price "
+            "from o_package p "
+            "inner join d_package d on d.f_id=p.f_package "
+            "where p.f_header=:f_header");
+    while (db.nextRow()) {
+        QMap<QString, QVariant> p;
+        for (int i = 0; i < db.columnCount(); i++) {
+            p[db.columnName(i)] = db.getValue(i);
+        }
+        packages[db.getInt("f_id")] = p;
     }
     db[":f_id"] = fOrderUUID;
     db.exec("select o.f_prefix, o.f_hallid, t.f_firmname, t.f_address, t.f_dept, t.f_hvhh, t.f_devnum, "
@@ -218,21 +231,54 @@ bool payment::printReceipt(bool printSecond)
     C5Database dd(fDBParams);
     dd[":f_header"] = fOrderUUID;
     dd[":f_state"] = DISH_STATE_OK;
-    dd.exec("select b.f_adgcode, b.f_dish, d.f_name, b.f_price, b.f_qty1 "
+    dd.exec("select b.f_adgcode, b.f_dish, d.f_name, b.f_price, b.f_qty1, b.f_package "
             "from o_body b "
             "left join d_dish d on d.f_id=b.f_dish "
-            "where b.f_header=:f_header and b.f_state=:f_state");
+            "where b.f_header=:f_header and b.f_state=:f_state "
+            "order by b.f_package ");
+    int package = 0;
     while (dd.nextRow()) {
-        if (dd.getString(0).isEmpty()) {
-            p.ltext(QString("%3").arg(dd.getString("f_name")), 0);
+        if (dd.getInt("f_package") > 0) {
+            if (package != dd.getInt("f_package")) {
+                if (package > 0) {
+                    p.br();
+                    p.line();
+                    p.br(2);
+                    package = 0;
+                }
+                p.setFontBold(true);
+                p.setFontSize(28);
+                package = dd.getInt("f_package");
+                p.ltext(packages[package]["f_name"].toString(), 0);
+                p.br();
+                p.ltext(QString("%1 x %2 = %3")
+                        .arg(float_str(packages[package]["f_qty"].toDouble(), 2))
+                        .arg(packages[package]["f_price"].toDouble(), 2)
+                        .arg(packages[package]["f_qty"].toDouble() * packages[package]["f_price"].toDouble()), 0);
+                p.br();
+                p.setFontBold(false);
+                p.setFontSize(26);
+            }
+            p.ltext(QString("*** %1 %2, %3 x%4").arg(tr("Class:")).arg(dd.getString("f_adgcode")).arg(dd.getString("f_name")).arg(float_str(dd.getDouble("f_qty1"), 2)), 0);
+            p.br();
         } else {
-            p.ltext(QString("%1 %2, %3").arg(tr("Class:")).arg(dd.getString("f_adgcode")).arg(dd.getString("f_name")), 0);
+            if (package > 0) {
+                p.br();
+                p.line();
+                p.br(2);
+                package = 0;
+            }
+            if (dd.getString(0).isEmpty()) {
+                p.ltext(QString("%3").arg(dd.getString("f_name")), 0);
+            } else {
+                p.ltext(QString("%1 %2, %3").arg(tr("Class:")).arg(dd.getString("f_adgcode")).arg(dd.getString("f_name")), 0);
+            }
+            p.br();
+            p.ltext(QString("%1 x %2 = %3").arg(float_str(dd.getDouble("f_qty1"), 2)).arg(dd.getDouble("f_price"), 2).arg(float_str(dd.getDouble("f_qty1") * dd.getDouble("f_price"), 2)), 0);
+            p.br();
+            p.line();
+            p.br(2);
         }
-        p.br();
-        p.ltext(QString("%1 X %2 = %3").arg(float_str(dd.getDouble("f_qty1"), 2)).arg(dd.getDouble("f_price"), 2).arg(float_str(dd.getDouble("f_qty1") * dd.getDouble("f_price"), 2)), 0);
-        p.br();
-        p.line();
-        p.br(2);
     }
     p.line(4);
     p.br(3);

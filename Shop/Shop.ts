@@ -4615,17 +4615,17 @@ barcode</source>
         <translation>Փասթաթուղթը գոյություն չունի</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="808"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="827"/>
         <source>Invalid document id</source>
         <translation>Փասթաթուղթը գոյություն չունի</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="915"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="934"/>
         <source>Not enough materials in the store</source>
         <translation>Բացասական քանակ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="1011"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="1030"/>
         <source>This order used in next documents</source>
         <translation>Փասթաթուղթը օգտագործվում է հետևյալ փասթաթղթերում</translation>
     </message>
@@ -5691,53 +5691,111 @@ MS Excel</source>
 <context>
     <name>CE5DishPackage</name>
     <message>
-        <location filename="../Editors/ce5dishpackage.ui" line="14"/>
+        <location filename="../Editors/ce5dishpackage.ui" line="20"/>
         <source>Form</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5dishpackage.ui" line="20"/>
+        <location filename="../Editors/ce5dishpackage.ui" line="46"/>
         <source>Code</source>
         <translation type="unfinished">Կոդ</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5dishpackage.ui" line="27"/>
+        <location filename="../Editors/ce5dishpackage.ui" line="119"/>
         <source>f_id</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5dishpackage.ui" line="37"/>
+        <location filename="../Editors/ce5dishpackage.ui" line="33"/>
+        <location filename="../Editors/ce5dishpackage.ui" line="79"/>
         <source>Name</source>
         <translation type="unfinished">Անվանում</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5dishpackage.ui" line="44"/>
+        <location filename="../Editors/ce5dishpackage.ui" line="59"/>
+        <source>f_menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Editors/ce5dishpackage.ui" line="99"/>
+        <source>Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Editors/ce5dishpackage.ui" line="112"/>
+        <source>f_menuname</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Editors/ce5dishpackage.ui" line="129"/>
         <source>f_name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5dishpackage.ui" line="51"/>
+        <location filename="../Editors/ce5dishpackage.ui" line="137"/>
+        <source>Dishes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Editors/ce5dishpackage.ui" line="143"/>
+        <location filename="../Editors/ce5dishpackage.ui" line="203"/>
         <source>Price</source>
         <translation type="unfinished">Գին</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5dishpackage.ui" line="58"/>
+        <location filename="../Editors/ce5dishpackage.ui" line="165"/>
         <source>f_price</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5dishpackage.ui" line="71"/>
+        <location filename="../Editors/ce5dishpackage.ui" line="188"/>
+        <source>Record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Editors/ce5dishpackage.ui" line="193"/>
+        <source>Dish code</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Editors/ce5dishpackage.ui" line="198"/>
+        <source>Dish name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Editors/ce5dishpackage.ui" line="208"/>
+        <source>Store</source>
+        <translation type="unfinished">Պահեստ</translation>
+    </message>
+    <message>
+        <location filename="../Editors/ce5dishpackage.ui" line="213"/>
+        <source>Printer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Editors/ce5dishpackage.ui" line="72"/>
         <source>f_enabled</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5dishpackage.ui" line="78"/>
+        <location filename="../Editors/ce5dishpackage.ui" line="39"/>
         <source>Enabled</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5dishpackage.cpp" line="18"/>
+        <location filename="../Editors/ce5dishpackage.cpp" line="24"/>
         <source>Dish package</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Editors/ce5dishpackage.cpp" line="62"/>
+        <source>Storage not selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Editors/ce5dishpackage.cpp" line="142"/>
+        <location filename="../Editors/ce5dishpackage.cpp" line="143"/>
+        <source>Append</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8812,7 +8870,12 @@ data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dishpackage.cpp" line="30"/>
+        <location filename="../Reports/cr5dishpackage.cpp" line="16"/>
+        <source>Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Reports/cr5dishpackage.cpp" line="31"/>
         <source>Edit</source>
         <translation type="unfinished"></translation>
     </message>

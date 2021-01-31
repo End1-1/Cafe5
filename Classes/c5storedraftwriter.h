@@ -69,6 +69,8 @@ public:
 
     bool writeOGoods(QString &id, const QString &header, const QString &body, int store, int goods, double qty, double price, double total, int tax, int sign, int row, const QString &storerec, double discount, int discountMode, int returnMode, double discFactor);
 
+    bool writeOPackage(int &id, const QString &header, int package, double qty, double price);
+
     bool readAHeader(const QString &id);
 
     bool writeInput(const QString &docId, QString &err);

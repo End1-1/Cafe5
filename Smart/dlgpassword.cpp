@@ -160,6 +160,7 @@ void DlgPassword::on_pushButton_12_clicked()
                 __username = fUser->fFull;
                 accept();
             } else {
+                ui->lePassword->clear();
                 C5Message::error(tr("Access denied"));
             }
         } else {

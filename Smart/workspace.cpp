@@ -10,10 +10,13 @@
 #include "calendar.h"
 #include "supplier.h"
 #include "payment.h"
+#include "dishpackage.h"
 #include "c5printing.h"
 #include <QScrollBar>
 #include <QInputDialog>
 #include <QScreen>
+#include <QPropertyAnimation>
+#include <QParallelAnimationGroup>
 #include <QFile>
 
 
@@ -114,10 +117,34 @@ bool Workspace::login()
     if (db.nextRow()) {
         ui->lbTable->setText(db.getString(0));
     }
+    db[":f_menu"] = __c5config.defaultMenu();
+    db.exec("select p.f_package, p.f_dish, d.f_name, p.f_price, dg.f_adgcode, "
+            "p.f_store, p.f_printer "
+            "from d_package_list p "
+            "inner join d_dish d on d.f_id=p.f_dish "
+            "inner join d_package dp on dp.f_id=p.f_package "
+            "inner join d_part2 dg on dg.f_id=d.f_part "
+            "where dp.f_menu=:f_menu and dp.f_enabled=1 ");
+    while (db.nextRow()) {
+        DishPackageDriver::fPackageDriver.addMember(db.getInt(0), db.getInt(1), db.getString(2), db.getDouble(3), db.getString(4), db.getInt(5), db.getString(6));
+    }
+    db[":f_menu"] = __c5config.defaultMenu();
+    db.exec("select f_id, f_name, f_price from d_package where f_menu=:f_menu and f_enabled=1");
+    while (db.nextRow()) {
+        QListWidgetItem *item = new QListWidgetItem(ui->lstCombo);
+        item->setText(db.getString(1));
+        item->setData(Qt::UserRole, db.getInt(0));
+        item->setData(Qt::UserRole + 1, db.getDouble(2));
+        item->setSizeHint(QSize(ui->lstCombo->width() - 5, DishPackageDriver::fPackageDriver.itemHeight(db.getInt(0))));
+        ui->lstCombo->addItem(item);
+        ui->lstCombo->setItemDelegate(new DishMemberDelegate());
+    }
+    ui->btnShowPackages->setVisible(ui->lstCombo->count() > 0);
     filter();
     stretchTableColumns(ui->tblDishes);
     stretchTableColumns(ui->tblOrder);
     stretchTableColumns(ui->tblPart2);
+    on_btnShowDishes_clicked();
     return true;
 }
 
@@ -132,27 +159,84 @@ void Workspace::setQty()
 {
     Dish d;
     if (!currentDish(d)) {
-        return;
+        if (d.package == 0) {
+            return;
+        }
     }
     QPushButton *b = static_cast<QPushButton*>(sender());
-    d.qty = b->text().toDouble();
-    setCurrentDish(d);
+    double qty = b->text().toDouble();
+    if (d.package == 0) {
+        d.qty = qty;
+        setCurrentDish(d);
+    } else {
+        int i = ui->tblOrder->currentRow();
+        while (i > -1 && ui->tblOrder->item(i, 0)->data(Qt::UserRole + 100).toInt() != -1) {
+            d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
+            d.qty = qty;
+            ui->tblOrder->item(i, 0)->setData(Qt::UserRole, qVariantFromValue<Dish>(d));
+            i--;
+        }
+        ui->tblOrder->item(i, 0)->setData(Qt::UserRole + 101, qty);
+        i = ui->tblOrder->currentRow() + 1;
+        while (i < ui->tblOrder->rowCount() && ui->tblOrder->item(i, 0)->data(Qt::UserRole + 100).toInt() != -2) {
+            d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
+            d.qty = qty;
+            ui->tblOrder->item(i, 0)->setData(Qt::UserRole, qVariantFromValue<Dish>(d));
+            i++;
+        }
+        ui->tblOrder->viewport()->update();
+        countTotal();
+    }
 }
 
 void Workspace::changeQty()
 {
     Dish d;
     if (!currentDish(d)) {
-        return;
+        if (d.package == 0) {
+            return;
+        }
     }
     QPushButton *b = static_cast<QPushButton*>(sender());
     double q = b->text().toDouble();
-    if (d.qty + q < 0.0001) {
-        removeDish();
-        return;
+    if (d.package == 0) {
+        if (d.qty + q < 0.0001) {
+            removeDish();
+            return;
+        }
+        d.qty += q;
+        setCurrentDish(d);
+    } else {
+        bool removepackage = false;
+        int i = ui->tblOrder->currentRow();
+        while (i > -1 && ui->tblOrder->item(i, 0)->data(Qt::UserRole + 100).toInt() != -1) {
+            d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
+            d.qty += q;
+            ui->tblOrder->item(i, 0)->setData(Qt::UserRole, qVariantFromValue<Dish>(d));
+            i--;
+            if (d.qty + q < 0.0001) {
+                removepackage = true;
+                break;
+            }
+        }
+        ui->tblOrder->item(i, 0)->setData(Qt::UserRole + 101, ui->tblOrder->item(i, 0)->data(Qt::UserRole + 101).toDouble() + q);
+        i = ui->tblOrder->currentRow() + 1;
+        while (i < ui->tblOrder->rowCount() && ui->tblOrder->item(i, 0)->data(Qt::UserRole + 100).toInt() != -2) {
+            d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
+            d.qty += q;
+            ui->tblOrder->item(i, 0)->setData(Qt::UserRole, qVariantFromValue<Dish>(d));
+            i++;
+            if (d.qty + q < 0.0001) {
+                removepackage = true;
+                break;
+            }
+        }
+        if (removepackage) {
+            removeDish();
+        }
+        ui->tblOrder->viewport()->update();
+        countTotal();
     }
-    d.qty += q;
-    setCurrentDish(d);
 }
 
 void Workspace::removeDish()
@@ -161,7 +245,30 @@ void Workspace::removeDish()
     if (row < 0) {
         return;
     }
-    ui->tblOrder->removeRow(row);
+    Dish d;
+    currentDish(d);
+    if (ui->tblOrder->item(row, 0)->data(Qt::UserRole + 100) < 0 || d.package > 0) {
+        bool stop = false;
+        do {
+            if (ui->tblOrder->item(row, 0)->data(Qt::UserRole + 100).toInt() < 0) {
+                stop = true;
+            }
+            ui->tblOrder->removeRow(row);
+        } while (!stop);
+        stop = false;
+        int row2 = row - 1;
+        if (row2 > -1) {
+            do {
+                if (ui->tblOrder->item(row2, 0)->data(Qt::UserRole + 100).toInt() < 0) {
+                    stop = true;
+                }
+                ui->tblOrder->removeRow(row2);
+                row2--;
+            } while (!stop);
+        }
+    } else {
+        ui->tblOrder->removeRow(row);
+    }
     row--;
     if (row > 0) {
         ui->tblOrder->setCurrentCell(row, 0);
@@ -368,17 +475,39 @@ void Workspace::on_btnCheckout_clicked()
     }
 
     for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
-        Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
-        QString bid;
-        if (!dw.writeOBody(bid, id, DISH_STATE_OK, d.id, d.qty, d.qty, d.price, d.qty*d.price, __c5config.serviceFactor().toDouble(), 0, d.store, d.printer, "", "", 0, d.adgCode, 0, 0, 0)) {
-            C5Message::error(dw.fErrorMsg);
-            db.rollback();
-            return;
-        }
-        if (!dw.writeOBodyToOGoods(bid, id)) {
-            C5Message::error(dw.fErrorMsg);
-            db.rollback();
-            return;
+        if (ui->tblOrder->item(i, 0)->data(Qt::UserRole + 100) == -1) {
+            int pid = 0;
+            if (!dw.writeOPackage(pid, id, ui->tblOrder->item(i, 0)->data(Qt::UserRole + 99).toInt(), ui->tblOrder->item(i, 0)->data(Qt::UserRole + 101).toDouble(), ui->tblOrder->item(i, 0)->data(Qt::UserRole + 102).toDouble())) {
+                C5Message::error(dw.fErrorMsg);
+                db.rollback();
+                return;
+            }
+            ui->tblOrder->item(i, 0)->setData(Qt::UserRole + 98, pid);
+        } else if (ui->tblOrder->item(i, 0)->data(Qt::UserRole + 100) == -2) {
+            continue;
+        } else {
+            Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
+            int pid = 0;
+            if (d.package > 0) {
+                int rr = i - 1;
+                while (pid == 0) {
+                    if (ui->tblOrder->item(rr, 0)->data(Qt::UserRole + 100) == -1) {
+                        pid = ui->tblOrder->item(rr, 0)->data(Qt::UserRole + 98).toInt();
+                    }
+                    rr--;
+                }
+            }
+            QString bid;
+            if (!dw.writeOBody(bid, id, DISH_STATE_OK, d.id, d.qty, d.qty, d.price, d.qty*d.price, __c5config.serviceFactor().toDouble(), 0, d.store, d.printer, "", "", 0, d.adgCode, 0, 0, pid)) {
+                C5Message::error(dw.fErrorMsg);
+                db.rollback();
+                return;
+            }
+            if (!dw.writeOBodyToOGoods(bid, id)) {
+                C5Message::error(dw.fErrorMsg);
+                db.rollback();
+                return;
+            }
         }
     }
 
@@ -454,6 +583,9 @@ bool Workspace::currentDish(Dish &d)
         return false;
     }
     d = ui->tblOrder->item(row, 0)->data(Qt::UserRole).value<Dish>();
+    if (d.package > 0) {
+        return false;
+    }
     return true;
 }
 
@@ -544,4 +676,106 @@ void Workspace::on_btnSupplier_clicked()
         return;
     }
     ui->lbPhone->setText(QString("%1<br>%2").arg(fPhone).arg(fSupplierName));
+}
+
+void Workspace::on_btnShowPackages_clicked()
+{
+    int h = ui->wDishPart->height() - ui->btnShowPackages->height() - ui->btnPartUp->height() - 6;
+    QPropertyAnimation *p1 = new QPropertyAnimation(ui->lstCombo, "minimumHeight", this);
+    QPropertyAnimation *p2 = new QPropertyAnimation(ui->lstCombo, "maximumHeight", this);
+    QPropertyAnimation *p3 = new QPropertyAnimation(ui->tblPart2, "minimumHeight", this);
+    QPropertyAnimation *p4 = new QPropertyAnimation(ui->tblPart2, "maximumHeight", this);
+
+    p1->setStartValue(0);
+    p1->setEndValue(h - 100);
+    p2->setStartValue(0);
+    p2->setEndValue(h);
+    p3->setStartValue(h - 100);
+    p3->setEndValue(0);
+    p4->setStartValue(h);
+    p4->setEndValue(0);
+
+    p1->setDuration(100);
+    p2->setDuration(100);
+    p3->setDuration(100);
+    p4->setDuration(100);
+    QParallelAnimationGroup *ag = new QParallelAnimationGroup(this);
+    ag->addAnimation(p1);
+    ag->addAnimation(p2);
+    ag->addAnimation(p3);
+    ag->addAnimation(p4);
+    ag->start();
+
+    ui->btnShowPackages->setVisible(false);
+    ui->btnShowDishes->setVisible(true);
+}
+
+void Workspace::on_btnShowDishes_clicked()
+{
+    int h = ui->wDishPart->height() - ui->btnShowDishes->height() - ui->btnPartUp->height() - 6;
+    QPropertyAnimation *p1 = new QPropertyAnimation(ui->tblPart2, "minimumHeight", this);
+    QPropertyAnimation *p2 = new QPropertyAnimation(ui->tblPart2, "maximumHeight", this);
+    QPropertyAnimation *p3 = new QPropertyAnimation(ui->lstCombo, "minimumHeight", this);
+    QPropertyAnimation *p4 = new QPropertyAnimation(ui->lstCombo, "maximumHeight", this);
+
+    p1->setStartValue(0);
+    p1->setEndValue(h - 100);
+    p2->setStartValue(0);
+    p2->setEndValue(h);
+    p3->setStartValue(h - 100);
+    p3->setEndValue(0);
+    p4->setStartValue(h);
+    p4->setEndValue(0);
+
+    p1->setDuration(100);
+    p2->setDuration(100);
+    p3->setDuration(100);
+    p4->setDuration(100);
+    QParallelAnimationGroup *ag = new QParallelAnimationGroup(this);
+    ag->addAnimation(p1);
+    ag->addAnimation(p2);
+    ag->addAnimation(p3);
+    ag->addAnimation(p4);
+    ag->start();
+
+    ui->btnShowPackages->setVisible(true);
+    ui->btnShowDishes->setVisible(false);
+}
+
+void Workspace::on_lstCombo_itemClicked(QListWidgetItem *item)
+{
+    const QList<DishPackageMember> &p = DishPackageDriver::fPackageDriver.fPackage[item->data(Qt::UserRole).toInt()];
+    int row = ui->tblOrder->rowCount();
+    ui->tblOrder->setRowCount(row + 1);
+    ui->tblOrder->setSpan(row, 0, 1, 2);
+    ui->tblOrder->setRowHeight(row, 30);
+    auto *packageItem = new QTableWidgetItem(item->text());
+    packageItem->setData(Qt::UserRole + 99, item->data(Qt::UserRole));
+    packageItem->setData(Qt::UserRole + 100, -1);
+    packageItem->setData(Qt::UserRole + 101, 1);
+    packageItem->setData(Qt::UserRole + 102, item->data(Qt::UserRole + 1));
+    ui->tblOrder->setItem(row, 0, packageItem);
+    for (const DishPackageMember &dm: p) {
+        Dish nd;
+        nd.id = dm.fDish;
+        nd.adgCode = dm.fAdgCode;
+        nd.name = dm.fName;
+        nd.price = dm.fPrice;
+        nd.store = dm.fStore;
+        nd.printer = dm.fPrinter;
+        nd.package = dm.fPackage;
+        nd.packageName = item->data(Qt::DisplayRole).toString();
+        row = ui->tblOrder->rowCount();
+        ui->tblOrder->setRowCount(row + 1);
+        ui->tblOrder->setItem(row, 0, new QTableWidgetItem(nd.name));
+        ui->tblOrder->item(row, 0)->setData(Qt::UserRole, qVariantFromValue(nd));
+    }
+    row = ui->tblOrder->rowCount();
+    ui->tblOrder->setRowCount(row + 1);
+    ui->tblOrder->setSpan(row, 0, 1, 2);
+    ui->tblOrder->setRowHeight(row, 10);
+    packageItem = new QTableWidgetItem(item->text());
+    packageItem->setData(Qt::UserRole + 100, -2);
+    ui->tblOrder->setItem(row, 0, packageItem);
+    countTotal();
 }

@@ -496,7 +496,7 @@ void CR5ConsumptionBySales::countOutputBasedOnRecipes()
     QString err;
     int count = 0;
     for (const QString &id: idList) {
-        C5WaiterOrderDoc(id, db).makeOutputOfStore(db, err);
+        C5WaiterOrderDoc(id, db).makeOutputOfStore(db, err, DOC_STATE_SAVED);
         count++;
         emit updateProgressValue(count);
     }

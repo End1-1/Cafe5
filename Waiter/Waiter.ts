@@ -795,7 +795,7 @@
     <message>
         <location filename="../Classes/c5storedraftwriter.cpp" line="23"/>
         <source>Output of sale</source>
-        <translation type="unfinished"></translation>
+        <translation>Ելք ըստ վաճառքի</translation>
     </message>
     <message>
         <location filename="../Classes/c5storedraftwriter.cpp" line="98"/>
@@ -805,47 +805,47 @@
     <message>
         <location filename="../Classes/c5storedraftwriter.cpp" line="165"/>
         <source>No hall with id</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Classes/c5storedraftwriter.cpp" line="209"/>
         <source>Error in store document, partial data was lost</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Classes/c5storedraftwriter.cpp" line="225"/>
         <source>Empty store document</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Classes/c5storedraftwriter.cpp" line="258"/>
         <source>Error in cash document, partial data was lost</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Classes/c5storedraftwriter.cpp" line="268"/>
         <source>Empty cash document</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Classes/c5storedraftwriter.cpp" line="361"/>
         <source>Document not exists</source>
-        <translation type="unfinished"></translation>
+        <translation>Փասթաթուղթը նշված համարով չկա</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="808"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="827"/>
         <source>Invalid document id</source>
-        <translation type="unfinished"></translation>
+        <translation>Փասթաթուղթը նշված համարով չկա</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="915"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="934"/>
         <source>Not enough materials in the store</source>
-        <translation type="unfinished"></translation>
+        <translation>Բաղասական քանակ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="1011"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="1030"/>
         <source>This order used in next documents</source>
-        <translation type="unfinished"></translation>
+        <translation>Այս պետվերը գրանցված է հետևյալ փասթաթղթերում</translation>
     </message>
 </context>
 <context>
@@ -2095,17 +2095,17 @@ ORDER</source>
     <message>
         <location filename="../../NewTax/Src/printtaxn.cpp" line="39"/>
         <source>You should to setup cashier and pin before to use fiscal printer</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../NewTax/Src/printtaxn.cpp" line="75"/>
         <source>Socket read error</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../NewTax/Src/printtaxn.cpp" line="83"/>
         <source>Data read timeout</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2123,7 +2123,7 @@ ORDER</source>
     <message>
         <location filename="main.cpp" line="34"/>
         <source>An instance of application already running</source>
-        <translation type="unfinished"></translation>
+        <translation>Ծրագիրը արդեն միացրած է</translation>
     </message>
 </context>
 <context>

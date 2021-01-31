@@ -11,6 +11,7 @@ class Workspace;
 
 class QTableWidgetItem;
 class QTableWidget;
+class QListWidgetItem;
 
 class Workspace : public C5Dialog
 {
@@ -59,6 +60,12 @@ private slots:
     void on_btnCustomer_clicked();
 
     void on_btnSupplier_clicked();
+
+    void on_btnShowPackages_clicked();
+
+    void on_btnShowDishes_clicked();
+
+    void on_lstCombo_itemClicked(QListWidgetItem *item);
 
 private:
     Ui::Workspace *ui;

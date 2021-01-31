@@ -756,6 +756,25 @@ bool C5StoreDraftWriter::writeOGoods(QString &id, const QString &header, const Q
     }
 }
 
+bool C5StoreDraftWriter::writeOPackage(int &id, const QString &header, int package, double qty, double price)
+{
+    fDb[":f_id"] = id;
+    fDb[":f_header"] = header;
+    fDb[":f_package"] = package;
+    fDb[":f_qty"] = qty;
+    fDb[":f_price"] = price;
+    if (id == 0) {
+        id = fDb.insert("o_package");
+        if (id == 0) {
+            fErrorMsg = fDb.fLastError;
+            return false;
+        }
+    } else {
+        return returnResult(fDb.update("o_package", "f_id", id));
+    }
+    return true;
+}
+
 bool C5StoreDraftWriter::writeInput(const QString &docId, QString &err)
 {
     double total = 0;
