@@ -287,6 +287,7 @@ void C5StoreDoc::setMode(C5StoreDoc::STORE_DOC sd)
     case sdOutput:
         ui->leStoreInput->setVisible(false);
         ui->leStoreInputName->setVisible(false);
+        ui->btnRememberStoreIn->setVisible(false);
         ui->lePartner->setVisible(false);
         ui->lePartnerName->setVisible(false);
         ui->leInvoiceNumber->setVisible(false);

@@ -254,6 +254,9 @@ void Workspace::removeDish()
                 stop = true;
             }
             ui->tblOrder->removeRow(row);
+            if (ui->tblOrder->rowCount() == 0) {
+                stop = true;
+            }
         } while (!stop);
         stop = false;
         int row2 = row - 1;
@@ -528,7 +531,7 @@ void Workspace::on_btnCheckout_clicked()
     }
     for (const QString &s: prn) {
         QFont font(qApp->font());
-        font.setPointSize(22);
+        font.setPointSize(24);
         C5Printing p;
         p.setSceneParams(650, 2800, QPrinter::Portrait);
         p.setFont(font);
@@ -542,7 +545,11 @@ void Workspace::on_btnCheckout_clicked()
         for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
             Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
             if (d.printer == s) {
+                p.setFontSize(24);
+                p.setFontBold(false);
                 p.ltext(d.name, 0);
+                p.setFontSize(32);
+                p.setFontBold(true);
                 p.rtext(float_str(d.qty, 2));
                 p.br();
             }
@@ -550,6 +557,8 @@ void Workspace::on_btnCheckout_clicked()
         p.br();
         p.line(3);
         p.br(3);
+        p.setFontSize(22);
+        p.setFontBold(false);
         p.ltext(QString("%1 %2").arg(tr("Printed:")).arg(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR)), 0);
         p.br();
         p.ltext("_", 0);

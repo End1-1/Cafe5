@@ -538,4 +538,19 @@ create table o_payment (f_id char(36) primary key, f_cash decimal(14,2), f_chang
 /* db - 41 */
 update s_app set f_version='41' where f_app='DB';
 alter table d_package add column f_menu integer after f_id;
-create table o_package (f_id integer primary key auto_increment, f_header char(36), f_package integer, f_qty decimal(14,2), f_price decimal(14,2));
+alter table d_package_list add column f_store integer, add column f_printer tinytext;
+/* db - 39 */
+update s_app set f_version='39' where f_app='DB';
+create table a_sale_temp (f_id integer primary key auto_increment, f_station tinytext, f_saletype smallint, f_window smallint, f_row smallint, f_order char(36), f_state smallint, f_goodsid integer, f_name tinytext, f_qty decimal(14,4), f_unit tinytext, f_price decimal(14,2), f_total decimal(14,2), f_taxdept integer, f_adgcode tinytext, f_tablerec smallint, f_unitcode integer, f_service smallint, f_discountvalue decimal(14,3), f_discountmode tinytext);
+
+/* db - 40 */
+update s_app set f_version='40' where f_app='DB';
+drop table o_payment;
+create table o_payment (f_id char(36) primary key, f_cash decimal(14,2), f_change decimal(14,2));
+
+/* db - 41 */
+update s_app set f_version='41' where f_app='DB';
+alter table d_package add column f_menu integer after f_id;
+alter table d_package_list add column f_store integer, add column f_printer tinytext;
+CREATE TABLE `o_package` (՝f_id` int NOT NULL AUTO_INCREMENT, `f_header` char(36) DEFAULT NULL, `f_package` int DEFAULT NULL, `f_qty` decimal(14,2) DEFAULT NULL, `f_price` decimal(14,2) DEFAULT NULL,  PRIMARY KEY (`f_id`))ENGINE=InnoDB AUTO_INCREMENT=0;
+

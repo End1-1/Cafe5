@@ -377,6 +377,25 @@ void CE5Goods::newScancode()
     if (!ok) {
         return;
     }
+    for (int i = 0; i < ui->tblMultiscancode->rowCount(); i++) {
+        if (ui->tblMultiscancode->getString(i, 0) == scancode) {
+            C5Message::error(tr("Scancode exists"));
+            return;
+        }
+    }
+    C5Database db(fDBParams);
+    db[":f_scancode"] = scancode;
+    db.exec("select f_name from c_goods where f_scancode=:f_scancode");
+    if (db.nextRow()) {
+        C5Message::error(tr("This code already used") + "<br>" + db.getString(0));
+        return;
+    }
+    db[":f_id"] = scancode;
+    db.exec("select g.f_name from c_goods_multiscancode m left join c_goods g on g.f_id=m.f_goods where m.f_id=:f_id");
+    if (db.nextRow()) {
+        C5Message::error(tr("This code already used") + "<br>" + db.getString(0));
+        return;
+    }
     int r = ui->tblMultiscancode->addEmptyRow();
     ui->tblMultiscancode->setString(r, 0, scancode);
     fScancodeAppend.append(scancode);

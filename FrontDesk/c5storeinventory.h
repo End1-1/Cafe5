@@ -24,9 +24,9 @@ public:
 
     virtual bool allowChangeDatabase();
 
-    virtual bool event(QEvent *e) override;
-
 private slots:
+    void keyShortcut();
+
     void keyPressed(const QChar &c);
 
     void saveDoc();

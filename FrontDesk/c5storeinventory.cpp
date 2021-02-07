@@ -7,7 +7,7 @@
 #include "ce5goods.h"
 #include "ce5editor.h"
 #include "c5storedraftwriter.h"
-#include <QKeyEvent>
+#include <QShortcut>
 
 C5StoreInventory::C5StoreInventory(const QStringList &dbParams, QWidget *parent) :
     C5Widget(dbParams, parent),
@@ -18,11 +18,10 @@ C5StoreInventory::C5StoreInventory(const QStringList &dbParams, QWidget *parent)
     fLabel = tr("Store inventory");
     ui->leStore->setSelector(fDBParams, ui->leStoreName, cache_goods_store);
     ui->tblGoods->setColumnWidths(7, 0, 0, 300, 80, 80, 80, 80);
-    installEventFilter(this);
-    ui->tblGoods->installEventFilter(this);
-    ui->tblGoods->viewport()->installEventFilter(this);
-    ui->leStore->addEventKeys("+-");
     connect(ui->leStore, SIGNAL(keyPressed(QChar)), this, SLOT(keyPressed(QChar)));
+    new QShortcut(QKeySequence("Ctrl+Shift++"), this, SLOT(keyShortcut()));
+    new QShortcut(QKeySequence("Ctrl+Shift+="), this, SLOT(keyShortcut()));
+    new QShortcut(QKeySequence("Ctrl+Shift+-"), this, SLOT(keyShortcut()));
 }
 
 C5StoreInventory::~C5StoreInventory()
@@ -89,20 +88,11 @@ bool C5StoreInventory::allowChangeDatabase()
     return false;
 }
 
-bool C5StoreInventory::event(QEvent *e)
+void C5StoreInventory::keyShortcut()
 {
-    if (e->type() == QEvent::KeyPress) {
-        QKeyEvent *ke = static_cast<QKeyEvent*>(e);
-        switch (ke->key()) {
-        case Qt::Key_Plus:
-            keyPressed('+');
-            break;
-        case Qt::Key_Minus:
-            keyPressed('-');
-            break;
-        }
-    }
-    return C5Widget::event(e);
+    QString s = static_cast<QShortcut*>(sender())->key().toString();
+    qDebug() << s;
+    keyPressed(s.at(s.length() - 1));
 }
 
 void C5StoreInventory::keyPressed(const QChar &c)
@@ -290,9 +280,6 @@ int C5StoreInventory::addGoodsRow()
     connect(lqty, SIGNAL(textChanged(QString)), this, SLOT(tblQtyChanged(QString)));
     connect(lprice, SIGNAL(textChanged(QString)), this, SLOT(tblPriceChanged(QString)));
     connect(ltotal, SIGNAL(textChanged(QString)), this, SLOT(tblTotalChanged(QString)));
-    lqty->addEventKeys("+-");
-    lprice->addEventKeys("+-");
-    ltotal->addEventKeys("+-");
     connect(lqty, SIGNAL(keyPressed(QChar)), this, SLOT(keyPressed(QChar)));
     connect(lprice, SIGNAL(keyPressed(QChar)), this, SLOT(keyPressed(QChar)));
     connect(ltotal, SIGNAL(keyPressed(QChar)), this, SLOT(keyPressed(QChar)));
