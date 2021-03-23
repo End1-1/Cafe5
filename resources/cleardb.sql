@@ -4,6 +4,7 @@ delete from a_complectation_additions;
 delete from a_header_shop2partner;
 delete from a_header_shop2partneraccept;
 delete from o_body;
+delete from o_header_flags;
 delete from o_header;
 delete from o_goods;
 delete from o_pay_cl;

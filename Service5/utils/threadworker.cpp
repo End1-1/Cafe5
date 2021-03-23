@@ -1,6 +1,7 @@
 #include "threadworker.h"
 #include "logwriter.h"
-#include <QDebug>
+#include "debug.h"
+#include <QThread>
 
 ThreadWorker::ThreadWorker() :
     QObject(nullptr)
@@ -10,7 +11,9 @@ ThreadWorker::ThreadWorker() :
 
 ThreadWorker::~ThreadWorker()
 {
+#ifdef QT_DEBUG
     qDebug() << "~ThreadWorker()";
+#endif
 }
 
 void ThreadWorker::start()

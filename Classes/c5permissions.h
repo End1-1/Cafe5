@@ -89,6 +89,7 @@
 #define cp_t7_translator 707
 #define cp_t7_store_reason 708
 #define cp_t7_partners 709
+#define cp_t7_order_marks 710
 
 #define cp_t8_cash 800
 #define cp_t8_cash_doc 801

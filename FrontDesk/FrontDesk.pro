@@ -55,6 +55,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Editors/ce5dishpackage.cpp \
     ../Editors/ce5goodsbarcodelabelview.cpp \
     ../Editors/ce5goodsclass.cpp \
+    ../Editors/ce5ordermark.cpp \
     ../Editors/ce5packagelist.cpp \
     ../Editors/ce5storereason.cpp \
     ../Reports/cr5carvisits.cpp \
@@ -81,10 +82,12 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Reports/cr5materialmoveuncomplectfilter.cpp \
     ../Reports/cr5menureview.cpp \
     ../Reports/cr5menureviewfilter.cpp \
+    ../Reports/cr5ordermarks.cpp \
     ../Reports/cr5preorders.cpp \
     ../Reports/cr5salarybyworkers.cpp \
     ../Reports/cr5salarybyworkersfilter.cpp \
     ../Reports/cr5saleandstorefilter.cpp \
+    ../Reports/cr5saleflags.cpp \
     ../Reports/cr5salefromstoretotal.cpp \
     ../Reports/cr5salefromstoretotalfilter.cpp \
     ../Reports/cr5saleremoveddishes.cpp \
@@ -257,6 +260,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Editors/ce5dishpackage.h \
     ../Editors/ce5goodsbarcodelabelview.h \
     ../Editors/ce5goodsclass.h \
+    ../Editors/ce5ordermark.h \
     ../Editors/ce5packagelist.h \
     ../Editors/ce5storereason.h \
     ../Reports/cr5carvisits.h \
@@ -283,10 +287,12 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Reports/cr5materialmoveuncomplectfilter.h \
     ../Reports/cr5menureview.h \
     ../Reports/cr5menureviewfilter.h \
+    ../Reports/cr5ordermarks.h \
     ../Reports/cr5preorders.h \
     ../Reports/cr5salarybyworkers.h \
     ../Reports/cr5salarybyworkersfilter.h \
     ../Reports/cr5saleandstorefilter.h \
+    ../Reports/cr5saleflags.h \
     ../Reports/cr5salefromstoretotal.h \
     ../Reports/cr5salefromstoretotalfilter.h \
     ../Reports/cr5saleremoveddishes.h \
@@ -451,6 +457,7 @@ FORMS += \
     ../Editors/c5cashname.ui \
     ../Editors/ce5dishpackage.ui \
     ../Editors/ce5goodsclass.ui \
+    ../Editors/ce5ordermark.ui \
     ../Editors/ce5packagelist.ui \
     ../Editors/ce5storereason.ui \
     ../Reports/cr5carvisitsfilter.ui \
@@ -466,6 +473,7 @@ FORMS += \
     ../Reports/cr5menureviewfilter.ui \
     ../Reports/cr5salarybyworkersfilter.ui \
     ../Reports/cr5saleandstorefilter.ui \
+    ../Reports/cr5saleflags.ui \
     ../Reports/cr5salefromstoretotalfilter.ui \
     ../Reports/cr5saleremoveddishesfilter.ui \
     ../Reports/cr5salesbydishesfilter.ui \

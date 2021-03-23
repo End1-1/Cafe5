@@ -98,5 +98,7 @@
         <file>minus.png</file>
         <file>goodsback.png</file>
         <file>scales.png</file>
+        <file>flag.png</file>
+        <file>waiter.qss</file>
     </qresource>
 </RCC>

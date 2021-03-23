@@ -958,6 +958,16 @@
         </widget>
        </item>
        <item>
+        <widget class="C5CheckBox" name="checkBox_149">
+         <property name="text">
+          <string>Order marks</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>710</number>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="verticalSpacer_7">
          <property name="orientation">
           <enum>Qt::Vertical</enum>

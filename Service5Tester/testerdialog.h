@@ -21,7 +21,6 @@ private slots:
     void n1Error(int code, const QString &msg);
     void data(int code, const QVariant &d);
     void on_btnTestN1_clicked();
-
     void on_btnTestN2_clicked();
 
 private:

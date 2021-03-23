@@ -17,7 +17,7 @@ BEGIN
             VALUE "FileDescription", "Shop\0"
             VALUE "FileVersion", _FILE_VERSION_STR
             VALUE "InternalName", "Shopping\0"
-            VALUE "LegalCopyright", "(C)2017-2019, Kudryashov Vasili\0"
+            VALUE "LegalCopyright", "(C)2017-2021, Kudryashov Vasili\0"
             VALUE "OriginalFilename", "Shop.exe\0"
             VALUE "Email", "end1_1@yahoo.com\0"
             VALUE "ProductName", "Shopping\0"

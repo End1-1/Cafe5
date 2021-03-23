@@ -43,6 +43,7 @@
 #define cache_salary_shift 38
 #define cache_goods_classes 39
 #define cache_dish_menu_state 40
+#define cache_order_mark 41
 
 class C5Cache : public QObject
 {

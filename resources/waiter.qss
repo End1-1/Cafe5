@@ -1,0 +1,35 @@
+QDialog: {
+border: 1px solid black;
+color: #000000;
+}
+
+QFrame: {
+border: 1px solid black;
+color: #000000;
+}
+
+QWidget {
+border:none;
+}
+
+QDialog {
+border: #000000;
+}
+
+QWidget {
+background: #eeeeee;
+}
+
+QPushButton {
+background: #aaaaaa;
+padding: 10px;
+}
+
+QToolButton {
+background: #aaaaaa;
+padding: 10px;
+}
+
+QLineEdit {
+background: #ffffff;
+}

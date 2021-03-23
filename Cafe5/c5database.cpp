@@ -315,7 +315,7 @@ bool C5Database::nextRow(QList<QVariant> &row)
 
 bool C5Database::nextRow()
 {
-    if (fCursorPos < rowCount() - 1 && rowCount() > 0) {
+    if ((fCursorPos < rowCount() - 1) && (rowCount() > 0)) {
         fCursorPos++;
         return true;
     }
@@ -597,8 +597,9 @@ bool C5Database::exec(const QString &sqlQuery, bool &isSelect)
         return false;
     }
     isSelect = fQuery->isSelect();
+    QString call = "call";
     if (!isSelect) {
-        isSelect = sqlQuery.mid(0, 4).compare("call", Qt::CaseInsensitive) == 0;
+        isSelect = sqlQuery.midRef(0, 4).compare(QStringRef(&call), Qt::CaseInsensitive) == 0;
     }
     fTimerCount = fTimer.elapsed();
     return true;

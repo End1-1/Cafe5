@@ -75,7 +75,8 @@ void C5WaiterServer::reply(QJsonObject &o)
         QJsonArray jMenu;
         QString query = "select d.f_id as f_dish, mn.f_name as menu_name, p1.f_name as part1, p2.f_name as part2, p2.f_adgCode, d.f_name, \
                 m.f_price, m.f_store, m.f_print1, m.f_print2, d.f_remind, d.f_comment as f_description, \
-                s.f_name as f_storename, d.f_color as dish_color, p2.f_color as type_color, 1 as f_timeorder \
+                s.f_name as f_storename, d.f_color as dish_color, p2.f_color as type_color, 1 as f_timeorder, d.f_hourlypayment, \
+                d.f_service as f_canservice, d.f_discount as f_candiscount \
                 from d_menu m \
                 left join d_menu_names mn on mn.f_id=m.f_menu \
                 left join d_dish d on d.f_id=m.f_dish \
@@ -733,6 +734,8 @@ void C5WaiterServer::saveDish(const QJsonObject &h, QJsonObject &o, C5Database &
     db[":f_removereason"] = o["f_removereason"].toString();
     db[":f_timeorder"] = o["f_timeorder"].toString().toInt();
     db[":f_package"] = o["f_package"].toString().toInt();
+    db[":f_candiscount"] = o["f_candiscount"].toString().toInt();
+    db[":f_canservice"] = o["f_canservice"].toString().toInt();
     db.update("o_body", where_id(o["f_id"].toString()));
 }
 

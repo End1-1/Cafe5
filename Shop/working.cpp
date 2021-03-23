@@ -27,6 +27,7 @@ QHash<int, QString> Working::fGoodsCodeForPrint;
 QHash<QString, int> Working::fGoodsRows;
 QHash<QString, QString> Working::fMultiscancode;
 QMap<QString, double> Working::fUnitDefaultQty;
+QMap<int, Flag> Working::fFlags;
 static QSettings __s(QString("%1\\%2\\%3").arg(_ORGANIZATION_).arg(_APPLICATION_).arg(_MODULE_));
 QHash<int, UncomplectGoods> Working::fUncomplectGoods;
 
@@ -228,15 +229,17 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
             }
             break;
         case Qt::Key_Z:
-            QStringList args;
-            args << QString("--newdoc:%1").arg(DOC_TYPE_STORE_INPUT);
-            args << QString("--storein:1");
-            args << QString("--autologin");
-            args << QString("--user:%1").arg(__c5config.getValue(param_shop_autologin_pin1));
-            args << QString("--password:%1").arg(__c5config.getValue(param_shop_autologin_pin2));
-            auto *proc = new QProcess(this);
-            proc->startDetached(qApp->applicationDirPath() + "/FrontDesk.exe", args);
-            qApp->quit();
+            if (ke->modifiers() & Qt::ControlModifier) {
+                QStringList args;
+                args << QString("--newdoc:%1").arg(DOC_TYPE_STORE_INPUT);
+                args << QString("--storein:1");
+                args << QString("--autologin");
+                args << QString("--user:%1").arg(__c5config.getValue(param_shop_autologin_pin1));
+                args << QString("--password:%1").arg(__c5config.getValue(param_shop_autologin_pin2));
+                auto *proc = new QProcess(this);
+                proc->startDetached(qApp->applicationDirPath() + "/FrontDesk.exe", args);
+                qApp->quit();
+            }
             break;
         }
     }
@@ -317,6 +320,17 @@ void Working::makeWGoods()
     fGoods.clear();
     fGoodsCodeForPrint.clear();
     C5Database db(C5Config::dbParams());
+
+    db[":f_enabled"] = 1;
+    db.exec("select * from o_flags where f_enabled=:f_enabled");
+    fFlags.clear();
+    while (db.nextRow()) {
+        Flag f;
+        f.id = db.getInt("f_id");
+        f.field = db.getString("f_field");
+        f.name = db.getString("f_name");
+        fFlags[f.id] = f;
+    }
 
 
     db[":f_store"] = C5Config::defaultStore();
@@ -464,6 +478,15 @@ int Working::storeId(int id)
     return fGoods[s].fStoreId;
 }
 
+Flag Working::flag(int id)
+{
+    if (fFlags.contains(id)) {
+        return fFlags[id];
+    } else {
+        return Flag();
+    }
+}
+
 void Working::loadStaff()
 {
     fCurrentUsers.clear();
@@ -558,10 +581,10 @@ void Working::addGoods(QString &code)
         ls(tr("Invalid code entered: ") + code);
         return;
     }
+    g.fQty = fUnitDefaultQty[g.fUnit];
     switch (w->fSaleType) {
     case SALE_RETAIL:
     case SALE_WHOSALE:
-        g.fQty = fUnitDefaultQty[g.fUnit];
         w->addGoods(g);
         break;
     case SALE_PREORDER:

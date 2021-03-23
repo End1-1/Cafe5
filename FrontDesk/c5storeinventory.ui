@@ -182,6 +182,19 @@
         </property>
        </spacer>
       </item>
+      <item>
+       <widget class="C5LineEdit" name="leSearch">
+        <property name="maximumSize">
+         <size>
+          <width>200</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="placeholderText">
+         <string>Search</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>

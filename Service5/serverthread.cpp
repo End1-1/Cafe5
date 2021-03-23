@@ -3,7 +3,7 @@
 #include "sslsocket.h"
 #include "socketthread.h"
 #include "logwriter.h"
-#include <QDebug>
+#include "debug.h"
 
 ServerThread::ServerThread(const QString &configPath) :
     ThreadWorker(),
@@ -12,13 +12,20 @@ ServerThread::ServerThread(const QString &configPath) :
 
 }
 
+ServerThread::~ServerThread()
+{
+    fSslServer->deleteLater();
+}
+
 void ServerThread::run()
 {
     QString certFileName = fConfigPath + "cert.pem";
     QString keyFileName = fConfigPath + "key.pem";
     fSslServer = new SslServer(this);
     fSslServer->setMaxPendingConnections(10000);
+#ifdef QT_DEBUG
     qDebug() << fSslServer->maxPendingConnections();
+#endif
     if (!fSslServer->setSslLocalCertificate(certFileName)) {
         LogWriter::write(10, 1, "", QString("%1 certificate is not instaled").arg(certFileName));
     }

@@ -135,7 +135,7 @@ bool Workspace::login()
         item->setText(db.getString(1));
         item->setData(Qt::UserRole, db.getInt(0));
         item->setData(Qt::UserRole + 1, db.getDouble(2));
-        item->setSizeHint(QSize(ui->lstCombo->width() - 5, DishPackageDriver::fPackageDriver.itemHeight(db.getInt(0))));
+        item->setSizeHint(QSize(ui->lstCombo->width() - 5, DishPackageDriver::fPackageDriver.itemHeight(db.getInt(0), ui->lstCombo->width(), item->text())));
         ui->lstCombo->addItem(item);
         ui->lstCombo->setItemDelegate(new DishMemberDelegate());
     }
@@ -417,6 +417,9 @@ void Workspace::on_tblDishes_itemClicked(QTableWidgetItem *item)
     }
     Dish nd = *d;
     for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
+        if (ui->tblOrder->item(i, 0)->data(Qt::UserRole + 98).toInt() < 0) {
+            continue;
+        }
         Dish dd = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
         if (dd.id == nd.id) {
             dd.qty += 1;
@@ -429,6 +432,7 @@ void Workspace::on_tblDishes_itemClicked(QTableWidgetItem *item)
     ui->tblOrder->setRowCount(row + 1);
     ui->tblOrder->setItem(row, 0, new QTableWidgetItem(nd.name));
     ui->tblOrder->item(row, 0)->setData(Qt::UserRole, qVariantFromValue(nd));
+    ui->tblOrder->item(row, 0)->setData(Qt::UserRole + 100, 0);
     countTotal();
     ui->tblOrder->setCurrentCell(row, 0);
 }
@@ -471,7 +475,7 @@ void Workspace::on_btnCheckout_clicked()
                          fSupplierId, QDate::currentDate(), QDate::currentDate(), dateCash,
                          QTime::currentTime(), QTime::currentTime(), fUser.fId, fPhone, 1,
                          ui->leTotal->getDouble(), ui->leTotal->getDouble(),
-                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0)) {
+                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, "")) {
         C5Message::error(dw.fErrorMsg);
         db.rollback();
         return;
@@ -778,6 +782,7 @@ void Workspace::on_lstCombo_itemClicked(QListWidgetItem *item)
         ui->tblOrder->setRowCount(row + 1);
         ui->tblOrder->setItem(row, 0, new QTableWidgetItem(nd.name));
         ui->tblOrder->item(row, 0)->setData(Qt::UserRole, qVariantFromValue(nd));
+        ui->tblOrder->item(row, 0)->setData(Qt::UserRole + 98, -1);
     }
     row = ui->tblOrder->rowCount();
     ui->tblOrder->setRowCount(row + 1);

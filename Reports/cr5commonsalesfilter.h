@@ -18,8 +18,13 @@ public:
 
     virtual QString condition();
 
+private slots:
+    void on_btnFlags_clicked();
+
 private:
     Ui::CR5CommonSalesFilter *ui;
+
+    QString fFlags;
 };
 
 #endif // CR5COMMONSALESFILTER_H

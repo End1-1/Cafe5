@@ -127,6 +127,7 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         fCacheQuery[cache_dish_menu_state] = QString("select f_id as `%1`, f_name as `%2` from d_dish_state")
                 .arg(tr("Code"))
                 .arg(tr("Name"));
+        setCacheSimpleQuery(cache_order_mark, "b_marks");
     }
     if (fTableCache.count() == 0) {
         fTableCache["c_partners"] = cache_goods_partners;
@@ -160,6 +161,7 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         fTableCache["d_package"] = cache_dish_package;
         fTableCache["s_salary_shift"] = cache_salary_shift;
         fTableCache["c_goods_classes"] = cache_goods_classes;
+        fTableCache["b_marks"] = cache_order_mark;
     }
     fVersion = 0;
     C5Database db(dbParams);

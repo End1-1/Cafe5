@@ -124,6 +124,7 @@ SOURCES += \
     ../Editors/ce5goodswaste.cpp \
     ../Editors/ce5halls.cpp \
     ../Editors/ce5menuname.cpp \
+    ../Editors/ce5ordermark.cpp \
     ../Editors/ce5packagelist.cpp \
     ../Editors/ce5partner.cpp \
     ../Editors/ce5storage.cpp \
@@ -222,6 +223,7 @@ SOURCES += \
     ../Reports/cr5menureview.cpp \
     ../Reports/cr5menureviewfilter.cpp \
     ../Reports/cr5menutranslator.cpp \
+    ../Reports/cr5ordermarks.cpp \
     ../Reports/cr5preorders.cpp \
     ../Reports/cr5salarybyworkers.cpp \
     ../Reports/cr5salarybyworkersfilter.cpp \
@@ -367,6 +369,7 @@ HEADERS += \
     ../Editors/ce5goodswaste.h \
     ../Editors/ce5halls.h \
     ../Editors/ce5menuname.h \
+    ../Editors/ce5ordermark.h \
     ../Editors/ce5packagelist.h \
     ../Editors/ce5partner.h \
     ../Editors/ce5storage.h \
@@ -465,6 +468,7 @@ HEADERS += \
     ../Reports/cr5menureview.h \
     ../Reports/cr5menureviewfilter.h \
     ../Reports/cr5menutranslator.h \
+    ../Reports/cr5ordermarks.h \
     ../Reports/cr5preorders.h \
     ../Reports/cr5salarybyworkers.h \
     ../Reports/cr5salarybyworkersfilter.h \
@@ -546,6 +550,7 @@ FORMS += \
     ../Editors/ce5goodswaste.ui \
     ../Editors/ce5halls.ui \
     ../Editors/ce5menuname.ui \
+    ../Editors/ce5ordermark.ui \
     ../Editors/ce5packagelist.ui \
     ../Editors/ce5partner.ui \
     ../Editors/ce5storage.ui \

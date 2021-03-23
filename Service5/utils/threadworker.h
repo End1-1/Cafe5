@@ -2,7 +2,8 @@
 #define THREADWORKER_H
 
 #include <QObject>
-#include <QThread>
+
+class QThread;
 
 class ThreadWorker : public QObject
 {

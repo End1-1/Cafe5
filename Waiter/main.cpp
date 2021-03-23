@@ -53,6 +53,10 @@ int main(int argc, char *argv[])
     QTranslator t;
     t.load(":/Waiter.qm");
 
+    QFile styleSheet(":/waiter.qss");
+    styleSheet.open(QIODevice::ReadOnly);
+    a.setStyleSheet(styleSheet.readAll());
+
     a.installTranslator(&t);
     QFont font(a.font());
     font.setFamily("Arial LatArm Unicode");

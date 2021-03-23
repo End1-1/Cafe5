@@ -31,7 +31,7 @@ public:
     DishPackageDriver();
     void addMember(int package, int dish, const QString &name, double price, const QString &adgcode, int store, const QString &printer);
     QHash<int, QList<DishPackageMember> > fPackage;
-    int itemHeight(int package);
+    int itemHeight(int package, int width, const QString &text);
     static DishPackageDriver fPackageDriver;
 
 private:

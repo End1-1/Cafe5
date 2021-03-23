@@ -386,3 +386,10 @@ void C5StoreInventory::on_btnNew_clicked()
     }
     delete e;
 }
+
+void C5StoreInventory::on_leSearch_textChanged(const QString &arg1)
+{
+    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+        ui->tblGoods->setRowHidden(i, !ui->tblGoods->getString(i, 2).contains(arg1));
+    }
+}

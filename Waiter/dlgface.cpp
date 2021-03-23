@@ -30,6 +30,7 @@ DlgFace::DlgFace() :
     ui(new Ui::DlgFace)
 {
     ui->setupUi(this);
+    setWindowFlags(windowFlags() | Qt::WindowMinimizeButtonHint);
     fCanClose = false;
     ui->btnCancel->setVisible(false);
     fModeJustSelectTable = false;

@@ -98,6 +98,8 @@ C5StoreDoc::~C5StoreDoc()
 
 bool C5StoreDoc::openDoc(QString id, QString &err)
 {
+
+
     ui->leDocNum->setPlaceholderText("");
     C5Database db(fDBParams);
     C5StoreDraftWriter dw(db);
@@ -239,6 +241,7 @@ bool C5StoreDoc::openDoc(QString id, QString &err)
     if (fToolBar && fDocType == sdOutput) {
         fToolBar->addAction(QIcon(":/storeinput.png"), tr("Create store input"), this, SLOT(createStoreInput()));
     }
+
     return true;
 }
 
@@ -1171,6 +1174,10 @@ void C5StoreDoc::focusNextChildren()
 
 void C5StoreDoc::newDoc()
 {
+    if (fDocState != DOC_STATE_SAVED && ui->tblGoods->rowCount() > 0) {
+        C5Message::error(tr("Save current document first"));
+        return;
+    }
     fInternalId.clear();
     fCashRowId.clear();
     fCashUuid.clear();
@@ -1805,7 +1812,7 @@ void C5StoreDoc::on_btnNewPartner_clicked()
     C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
     QList<QMap<QString, QVariant> > data;
     if(e->getResult(data)) {
-        ui->lePartner->setValue(data.at(0)["f_id"].toString());
+       // ui->lePartner->setValue(data.at(0)["f_id"].toString());
     }
     delete e;
 }

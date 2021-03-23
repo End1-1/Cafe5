@@ -102,7 +102,7 @@ void C5PrintReceiptThread::print()
         if (o["f_state"].toString().toInt() != DISH_STATE_OK) {
             continue;
         }
-        total += str_float(o["f_qty2"].toString()) * str_float(o["f_price"].toString());
+        total += str_float(o["f_total"].toString()); //str_float(o["f_qty2"].toString()) * str_float(o["f_price"].toString());
         QString name = QString("%1.").arg(nn++);
         if (!o["f_adgcode"].toString().isEmpty()) {
             name += QString("%1: %2").arg(__translator.tt(tr("Class"))).arg(o["f_adgcode"].toString());
@@ -124,20 +124,28 @@ void C5PrintReceiptThread::print()
             if (str_float(totalStr) < 0.001) {
                 p.rtext(totalStr);
             } else {
-                p.ltext(QString("%1 x %2 %3 %4 = %5")
-                        .arg(float_str(str_float(o["f_qty2"].toString()), 2))
-                        .arg(float_str(str_float(o["f_price"].toString()), 2))
-                        .arg(servPlus).arg(servValue)
-                        .arg(total), 0);
+                if (o["f_hourlypayment"].toString().toInt() > 0) {
+                    p.ltext(QString("%1 = %2").arg(o["f_comment"].toString()).arg(float_str(str_float(o["f_total"].toString()), 2)), 0);
+                } else {
+                    p.ltext(QString("%1 x %2 %3 %4 = %5")
+                            .arg(float_str(str_float(o["f_qty2"].toString()), 2))
+                            .arg(float_str(str_float(o["f_price"].toString()), 2))
+                            .arg(servPlus).arg(servValue)
+                           .arg(total), 0);
+                }
             }
         } else {
             if (str_float(totalStr) < 0.001) {
                 p.rtext(totalStr);
             } else {
-                p.rtext(QString("%1 x %2 = %5")
-                        .arg(float_str(str_float(o["f_qty2"].toString()), 2))
-                        .arg(float_str(str_float(o["f_price"].toString()), 2))
-                        .arg(totalStr));
+                if (o["f_hourlypayment"].toString().toInt() > 0) {
+                    p.ltext(QString("%1 = %2").arg(o["f_comment"].toString()).arg(float_str(str_float(o["f_total"].toString()), 2)), 0);
+                } else {
+                    p.rtext(QString("%1 x %2 = %5")
+                            .arg(float_str(str_float(o["f_qty2"].toString()), 2))
+                            .arg(float_str(str_float(o["f_price"].toString()), 2))
+                            .arg(totalStr));
+                }
             }
         }
         p.br();

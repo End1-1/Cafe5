@@ -10,6 +10,7 @@ class ServerThread : public ThreadWorker
     Q_OBJECT
 public:
     ServerThread(const QString &configPath);
+    ~ServerThread();
 
 protected slots:
     virtual void run() override;

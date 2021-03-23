@@ -1,6 +1,7 @@
 #include "cr5salefromstorefilter.h"
 #include "ui_cr5salefromstorefilter.h"
 #include "c5cache.h"
+#include "cr5saleflags.h"
 
 CR5SaleFromStoreFilter::CR5SaleFromStoreFilter(const QStringList &dbParams, QWidget *parent) :
     C5FilterWidget(dbParams, parent),
@@ -67,6 +68,7 @@ QString CR5SaleFromStoreFilter::condition()
     if (ui->rbSrvNo->isChecked()) {
         w += " and gg.f_service=0 ";
     }
+    w += fFlags;
     return w;
 }
 
@@ -78,4 +80,12 @@ QDate CR5SaleFromStoreFilter::d1()
 QDate CR5SaleFromStoreFilter::d2()
 {
     return ui->deEnd->date();
+}
+
+void CR5SaleFromStoreFilter::on_btnFlags_clicked()
+{
+    CR5SaleFlags f(fDBParams);
+    if (f.exec() == QDialog::Accepted) {
+        fFlags = f.flagsCond();
+    }
 }

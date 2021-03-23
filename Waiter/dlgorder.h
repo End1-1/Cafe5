@@ -3,6 +3,7 @@
 
 #include "c5dialog.h"
 #include <QTableWidgetItem>
+#include <QTimer>
 
 namespace Ui {
 class DlgOrder;
@@ -40,6 +41,10 @@ private:
 
     QString fPart1Name;
 
+    QTimer fTimer;
+
+    int fTimerCounter;
+
     void load(int table);
 
     void buildMenu(const QString &menu, QString part1, QString part2);
@@ -64,7 +69,11 @@ private:
 
     void setCar(int num);
 
+    void countHourlyPayment();
+
 private slots:
+    void timeout();
+
     void handleDiscount(const QJsonObject &obj);
 
     void handleVisit(const QJsonObject &obj);
@@ -98,8 +107,6 @@ private slots:
     void on_btnMin05_clicked();
 
     void on_btnCustom_clicked();
-
-    void on_btnPrintService_clicked();
 
     void on_btnPayment_clicked();
 
@@ -140,6 +147,8 @@ private slots:
     void on_btnCar_clicked();
 
     void on_btnPackage_clicked();
+
+    void on_btnPrintService_clicked();
 };
 
 #endif // DLGORDER_H

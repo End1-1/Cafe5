@@ -96,6 +96,7 @@ void C5Permissions::init(C5Database &db)
               << cp_t7_translator
               << cp_t7_store_reason
               << cp_t7_partners
+              << cp_t7_order_marks
 
               << cp_t8_cash
               << cp_t8_cash_doc

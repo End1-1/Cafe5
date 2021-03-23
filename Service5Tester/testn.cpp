@@ -1,11 +1,12 @@
 #include "testn.h"
 
-TestN::TestN(const QString &serverIP, int port, const QSslCertificate &certificate, int number) :
+TestN::TestN(const QString &serverIP, int port, const QSslCertificate &certificate, int number, const QVariant &data) :
     ThreadWorker(),
     fServerIP(serverIP),
     fPort(port),
     fCertificate(certificate),
-    fNumber(number)
+    fNumber(number),
+    fData(data)
 {
 
 }

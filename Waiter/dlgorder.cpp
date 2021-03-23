@@ -42,6 +42,9 @@ DlgOrder::DlgOrder() :
     fOrder = new C5WaiterOrderDoc();
     ui->btnGuest->setVisible(C5Config::useHotel());
     ui->btnCompactDishAddMode->setChecked(C5Config::getRegValue("compact dish add mode", true).toBool());
+    fTimerCounter = 0;
+    connect(&fTimer, &QTimer::timeout, this, &DlgOrder::timeout);
+    fTimer.start(1000);
 }
 
 DlgOrder::~DlgOrder()
@@ -209,6 +212,14 @@ void DlgOrder::buildMenu(const QString &menu, QString part1, QString part2)
 void DlgOrder::addDishToOrder(const QJsonObject &obj)
 {
     QJsonObject o = obj;
+    if (o["f_hourlypayment"].toString().toInt() > 0) {
+        for (int i = 0; i < fOrder->itemsCount(); i++) {
+            if (fOrder->iInt("f_hourlypayment", i) > 0 && fOrder->iInt("f_state", i) == DISH_STATE_OK) {
+                C5Message::error(tr("Hourly payment already exists"));
+                return;
+            }
+        }
+    }
     bool found = false;
     QString special = DlgListDishSpecial::getSpecial(obj["f_dish"].toString(), fDBParams);
     o["f_comment"] = special;
@@ -338,6 +349,10 @@ void DlgOrder::changeQty(double qty)
         C5Message::error(tr("You cannot change the quantity of items of package"));
         return;
     }
+    if (o["f_hourlypayment"].toString().toInt() > 0) {
+        C5Message::error(tr("This is hourly payment item"));
+        return;
+    }
     QString oldQty = o["f_qty1"].toString();
     if (qty > 0) {
         if (str_float(o["f_qty1"].toString()) + qty > 99) {
@@ -364,6 +379,7 @@ void DlgOrder::changeQty(double qty)
 
 void DlgOrder::itemsToTable()
 {
+    countHourlyPayment();
     fOrder->countTotal();
     ui->tblOrder->clear();
     ui->tblOrder->setRowCount(fOrder->fItems.count());
@@ -512,6 +528,46 @@ void DlgOrder::setCar(int num)
         o["body"] = fOrder->fItems;
         o["govnumber"] = govnumber;
         sh->send(o);
+    }
+}
+
+void DlgOrder::countHourlyPayment()
+{
+    if (fOrder->hInt("f_print") > 0) {
+        return;
+    }
+    for (int i = 0; i < fOrder->itemsCount(); i++) {
+        if (fOrder->iInt("f_hourlypayment", i) > 0) {
+            QString ts = fOrder->hString("f_dateopen") + " " + fOrder->hString("f_timeopen");
+            QDateTime t1 = QDateTime::fromString(ts, "dd/MM/yyyy HH:mm:ss");
+            QDateTime t2 = QDateTime::currentDateTime();
+            qDebug() << t1 << t2;
+            int min = t1.secsTo(t2);
+            QString hint = QString("%1:%2").arg(min / 3600, 2, 10, QChar('0')).arg((min % 3600) / 60, 2, 10, QChar('0'));
+            min /= 60;
+            min /= fOrder->iInt("f_hourlypayment", i);
+            qDebug() << min % fOrder->iInt("f_hourlypayment", i);
+            if (min % fOrder->iInt("f_hourlypayment", i) > 0) {
+                min++;
+            }
+            if (min == 0) {
+                min = 1;
+            }
+            fOrder->iSetDouble("f_total", min * fOrder->iDouble("f_price", i), i);
+            fOrder->iSetString("f_comment", hint, i);
+            if (ui->tblOrder->rowCount() > i) {
+                ui->tblOrder->item(i, 0)->setData(Qt::UserRole, fOrder->fItems[i].toObject());
+            }
+        }
+    }
+    ui->tblOrder->viewport()->update();
+}
+
+void DlgOrder::timeout()
+{
+    fTimerCounter++;
+    if ((fTimerCounter % 60) == 0) {
+        countHourlyPayment();
     }
 }
 
@@ -739,57 +795,6 @@ void DlgOrder::on_btnCustom_clicked()
 {
     QModelIndexList ml = ui->tblOrder->selectionModel()->selectedIndexes();
     if (ml.count() == 0) {
-        return;
-    }
-    int index = ml.at(0).row();
-    QJsonObject o = fOrder->fItems.at(index).toObject();
-    int qty;
-    if (!DlgPassword::getQty(o["f_qty1"].toString(), qty)) {
-        return;
-    }
-    QString oldQty = o["f_qty1"].toString();
-    if (qty > o["f_qty2"].toString().toDouble()) {
-        o["f_qty1"] = QString::number(qty);
-    }
-    fOrder->fItems[index] = o;
-    ui->tblOrder->item(index, 0)->setData(Qt::UserRole, o);
-    ui->tblOrder->viewport()->update();
-    logRecord(o["f_id"].toString(), "Qty of " + o["f_name"].toString(), oldQty, o["f_qty1"].toString());
-    setButtonsState();
-    ui->lePrepaiment->setText(fOrder->prepayment());
-}
-
-void DlgOrder::on_btnPrintService_clicked()
-{
-    C5SocketHandler *sh = createSocketHandler(SLOT(handlePrintService(QJsonObject)));
-    sh->bind("cmd", sm_printservice);
-    QJsonObject o;
-    o["header"] = fOrder->fHeader;
-    o["body"] = fOrder->fItems;
-    sh->send(o);
-    logRecord("", "Send to cooking", "", "");
-}
-
-void DlgOrder::on_btnPayment_clicked()
-{
-    if (C5Config::carMode()) {
-        if (fOrder->hInt("car") == 0) {
-            C5Message::error(tr("Car model and costumer not specified"));
-            return;
-        }
-    }
-    bool empty = true;
-    for (int i = 0; i < fOrder->itemsCount(); i++) {
-        if (fOrder->iInt("f_state", i) != DISH_STATE_OK) {
-            continue;
-        }
-        if (fOrder->iDouble("f_qty1", i) > fOrder->iDouble("f_qty2", i)) {
-            C5Message::error(tr("Order is incomplete"));
-            return;
-        }
-        empty = false;
-    }
-    if (empty) {
         C5Message::error(tr("Order is incomplete"));
         return;
     }
@@ -899,6 +904,10 @@ void DlgOrder::on_btnComment_clicked()
         return;
     }
     QJsonObject o = fOrder->fItems.at(index).toObject();
+    if (o["f_hourlypayment"].toString().toInt() > 0) {
+        C5Message::error(tr("Cannot add comment to hourly payment"));
+        return;
+    }
     QString comment = o["f_name"].toString();
     if (!DlgListOfDishComments::getComment(comment)) {
         return;
@@ -1033,4 +1042,56 @@ void DlgOrder::on_btnPackage_clicked()
         }
         logRecord("", "New package", name, "");
     }
+}
+
+void DlgOrder::on_btnPayment_clicked()
+{
+    if (C5Config::carMode()) {
+        if (fOrder->hInt("car") == 0) {
+            C5Message::error(tr("Car model and costumer not specified"));
+            return;
+        }
+    }
+    bool empty = true;
+    for (int i = 0; i < fOrder->itemsCount(); i++) {
+        if (fOrder->iInt("f_state", i) != DISH_STATE_OK) {
+            continue;
+        }
+        if (fOrder->iDouble("f_qty1", i) > fOrder->iDouble("f_qty2", i)) {
+            C5Message::error(tr("Order is incomplete"));
+            return;
+        }
+        empty = false;
+    }
+    if (empty) {
+        C5Message::error(tr("Order is incomplete"));
+        return;
+    }
+    int paymentResult = DlgPayment::payment(fUser, fOrder);
+    switch (paymentResult) {
+    case PAYDLG_ORDER_CLOSE:
+        fOrder->fHeader = QJsonObject();
+        fOrder->fItems = QJsonArray();
+        itemsToTable();
+        if (__c5config.waiterLoginAfterPayment())  {
+            accept();
+        } else {
+            on_btnChangeTable_clicked();
+        }
+        break;
+    case PAYDLG_NONE:
+        saveOrder();
+        break;
+    }
+}
+
+void DlgOrder::on_btnPrintService_clicked()
+{
+    C5SocketHandler *sh = createSocketHandler(SLOT(handlePrintService(QJsonObject)));
+    sh->bind("cmd", sm_printservice);
+    QJsonObject o;
+    o["header"] = fOrder->fHeader;
+    o["body"] = fOrder->fItems;
+    sh->send(o);
+    logRecord("", "Send to cooking", "", "");
 }

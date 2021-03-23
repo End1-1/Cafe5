@@ -32,6 +32,7 @@ void C5Passwords::on_btnOK_clicked()
         } else {
             db[":f_password"] = password(ui->leFrontPass->text());
         }
+        db.update("s_user", where_id(fUserId));
     }
     if (ui->chWaiterPassword->isChecked()) {
         db[":f_altpassword"] = password(ui->leWaiterPass->text());
@@ -41,9 +42,9 @@ void C5Passwords::on_btnOK_clicked()
         } else {
             db[":f_altpassword"] = password(ui->leWaiterPass->text());
         }
+        db.update("s_user", where_id(fUserId));
     }
     if (ui->chFrontPassword->isChecked() || ui->chWaiterPassword->isChecked()) {
-        db.update("s_user", where_id(fUserId));
         C5Message::info(tr("Saved"));
     }
     accept();

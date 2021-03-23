@@ -33,14 +33,15 @@ void DishPackageDriver::addMember(int package, int dish, const QString &name, do
     fPackage[package].append(DishPackageMember(package, dish, name, price, adgcode, store, printer));
 }
 
-int DishPackageDriver::itemHeight(int package)
+int DishPackageDriver::itemHeight(int package, int width, const QString &text)
 {
     if (!fPackage.contains(package)) {
         return 10;
     }
     int count = fPackage[package].count();
-    int height = QFontMetrics(QFont("Arial", 12)).height();
-    return height * (count + 4);
+    QFontMetrics fm(QFont("Arial", 12));
+    int height = fm.boundingRect(QRect(0, 0, width, fm.height()), Qt::TextWordWrap | Qt::TextExpandTabs, text).height();
+    return height + (fm.height() * (count + 4));
 }
 
 void DishMemberDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
@@ -66,7 +67,9 @@ void DishMemberDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
     font.setPointSize(font.pointSize() + 2);
     painter->setFont(font);
     painter->drawText(textRect, index.data(Qt::DisplayRole).toString(), to);
-    textRect.adjust(0, QFontMetrics(painter->font()).height() + 2, 0, 0);
+    QFontMetrics fm(painter->font());
+    int height = fm.boundingRect(QRect(0, 0, textRect.width(), fm.height()), Qt::TextWordWrap | Qt::TextExpandTabs, index.data(Qt::DisplayRole).toString()).height();
+    textRect.adjust(0, height + 2, 0, 0);
     painter->drawText(textRect, float_str(index.data(Qt::UserRole + 1).toDouble(), 2), to);
     textRect.adjust(0, QFontMetrics(painter->font()).height() + 2, 0, 0);
     font.setPointSize(font.pointSize() - 2);

@@ -41,6 +41,7 @@
 #include "cr5goodsimages.h"
 #include "cr5storedocuments.h"
 #include "cr5dishpart2.h"
+#include "cr5ordermarks.h"
 #include "cr5dishpriceselfcost.h"
 #include "c5storeinventory.h"
 #include "cr5discountsystem.h"
@@ -616,6 +617,9 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
     case cp_t7_store_reason:
         createTab<CR5StoreReason>(dbParams);
         break;
+    case cp_t7_order_marks:
+        createTab<CR5OrderMarks>(dbParams);
+        break;
     case cp_t8_cash_names:
         createTab<CR5CashNames>(dbParams);
         break;
@@ -822,6 +826,7 @@ void C5MainWindow::setDB(const QString &dbname)
         addTreeL3Item(l, cp_t7_credit_card, tr("Credit cards"), ":/credit-card.png");
         addTreeL3Item(l, cp_t7_discount_system, tr("Discount system"), ":/discount.png");
         addTreeL3Item(l, cp_t7_store_reason, tr("Store reason"), ":/documents.png");
+        addTreeL3Item(l, cp_t7_order_marks, tr("Order marks"), ":/flag.png");
     }
 
     if (addMainLevel(db.at(1), cp_t1_preference, tr("Preferences"), ":/configure.png", l)) {
@@ -833,7 +838,7 @@ void C5MainWindow::setDB(const QString &dbname)
     }
 
     readFavoriteMenu();
-    for (QListWidget *ll: fMenuLists) {
+    for (QListWidget *ll: qAsConst(fMenuLists)) {
         int size = ll->count() == 0 ? 0 : (ll->count() * (ll->item(0)->sizeHint().height() + 1));
         ll->setMinimumHeight(size);
         ll->setMaximumHeight(ll->minimumHeight());

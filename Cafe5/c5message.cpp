@@ -3,7 +3,11 @@
 #include "c5config.h"
 
 C5Message::C5Message(QWidget *parent) :
+#ifdef WAITER
+    QDialog(parent, Qt::FramelessWindowHint),
+#else
     QDialog(parent),
+#endif
     ui(new Ui::C5Message)
 {
     ui->setupUi(this);
@@ -33,11 +37,11 @@ int C5Message::showMessage(const QString &text, const QString &color)
 {
     C5Message *c5 = new C5Message(__c5config.fParentWidget);
 #ifdef FRONTDESK
-    c5->ui->te->setText(QString("<html><body><h4><font color=\"%1\">%2</font></h4></body></html>").arg(color).arg(text));
+    c5->ui->te->setText(QString("<html><body><center><h4><font color=\"%1\">%2</font></h4></center></body></html>").arg(color).arg(text));
 #else
     c5->ui->btnYes->setMinimumHeight(50);
     c5->ui->btnCancel->setMinimumHeight(50);
-    c5->ui->te->setText(QString("<html><body><h4><font color=\"%1\">%2</font></h1></body></html>").arg(color).arg(text));
+    c5->ui->te->setText(QString("<html><body><center><h4><font color=\"%1\">%2</font></h1></center></body></html>").arg(color).arg(text));
 #endif
     c5->adjustSize();
     int result = c5->exec();

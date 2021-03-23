@@ -65,6 +65,16 @@ WOrder::WOrder(int saleType, QWidget *parent) :
     connect(ui->leCash, &C5LineEdit::focusOut, [=](){
         C5LogSystem::writeEvent(QString("%1: %2").arg(tr("Cash value")).arg(ui->leCard->text()));
     });
+    ui->btnF1->setVisible(fWorking->fFlags.contains(1));
+    ui->btnF2->setVisible(fWorking->fFlags.contains(2));
+    ui->btnF3->setVisible(fWorking->fFlags.contains(3));
+    ui->btnF4->setVisible(fWorking->fFlags.contains(4));
+    ui->btnF5->setVisible(fWorking->fFlags.contains(5));
+    ui->btnF1->setText(fWorking->flag(1).name);
+    ui->btnF2->setText(fWorking->flag(2).name);
+    ui->btnF3->setText(fWorking->flag(3).name);
+    ui->btnF4->setText(fWorking->flag(4).name);
+    ui->btnF5->setText(fWorking->flag(5).name);
 }
 
 WOrder::~WOrder()
@@ -258,6 +268,9 @@ bool WOrder::writeOrder(bool tax)
     so.setParams(fDateOpen, fTimeOpen, fSaleType);
     C5LogSystem::writeEvent(QString("%1. %2:%3, %4:%5, %6:%7, %8:%9").arg(tr("Before write")).arg(tr("Total")).arg(ui->leTotal->text()).arg(tr("Card")).arg(ui->leCard->text()).arg(tr("Advance")).arg(ui->leAdvance->text()).arg(tr("Dicount")).arg(ui->leDisc->text()));
     bool w = so.write(ui->leTotal->getDouble(), ui->leCard->getDouble(), ui->leAdvance->getDouble(), ui->leDisc->getDouble(), tax, goods, fCardValue, fCardMode);
+    if (w) {
+        w = so.writeFlags(ui->btnF1->isChecked(), ui->btnF2->isChecked(), ui->btnF3->isChecked(), ui->btnF4->isChecked(), ui->btnF5->isChecked());
+    }
     C5Database db(__c5config.dbParams());
     if (w) {
         foreach (const IGoods &g, goods) {
@@ -891,3 +904,4 @@ void WOrder::on_btnPrintManualTax_clicked()
     tp->exec();
     tp->deleteLater();
 }
+

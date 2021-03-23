@@ -16,12 +16,13 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
     fMainTable = "o_header oh";
     fLeftJoinTables << "left join h_halls hl on hl.f_id=oh.f_hall [hl]"
                     << "left join h_tables ht on ht.f_id=oh.f_table [ht]"
+                    << "left join o_header_flags ohf on ohf.f_id=oh.f_id [ohf]"
                     << "left join s_user w on w.f_id=oh.f_staff [w]"
                     << "left join o_state os on os.f_id=oh.f_state [os]"
                     << "left join c_partners cpb on cpb.f_id=oh.f_partner [cpb]"
                        ;
 
-    fColumnsFields << "concat(oh.f_prefix, oh.f_hallid) as f_prefix"
+    fColumnsFields << "concat(oh.f_prefix, oh.f_hallid) as f_prefix" 
                    << "oh.f_id"
                    << "os.f_name as f_statename"
                    << "oh.f_datecash"

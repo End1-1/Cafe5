@@ -10,10 +10,11 @@ template<typename T>
 class Test : public ThreadWorker
 {
 public:
-    Test(const QString &serverIP, int port, int count, QObject *parent, const char *data_slot, const char *finished_slot, const char *error_slot) :
+    Test(const QString &serverIP, int port, int count, const QVariant &data, QObject *parent, const char *data_slot, const char *finished_slot, const char *error_slot) :
         fServerIP(serverIP),
         fPort(port),
         fCount(count),
+        fData(data),
         fParent(parent),
         fSlotData(data_slot),
         fSlotFinished(finished_slot),
@@ -31,7 +32,7 @@ public:
 protected slots:
     virtual void run() {
         for (int i = 0; i < fCount; i++) {
-            T *t  = new T(fServerIP, fPort, fSslCertificate, i);
+            T *t  = new T(fServerIP, fPort, fSslCertificate, i, fData);
             t->connect(t, SIGNAL(finished()), fParent, fSlotFinished);
             t->connect(t, SIGNAL(threadError(int,QString)), fParent, fSlotError);
             t->connect(t, SIGNAL(data(int,QVariant)), fParent, fSlotData);
@@ -43,6 +44,7 @@ private:
     QString fServerIP;
     int fPort;
     int fCount;
+    QVariant fData;
     QObject *fParent;
     const char *fSlotFinished;
     const char *fSlotError;

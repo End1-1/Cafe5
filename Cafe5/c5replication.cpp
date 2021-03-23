@@ -118,31 +118,39 @@ void C5Replication::downloadDataFromServer(const QStringList &src, const QString
     db.exec("update s_db set f_syncin=:f_syncin, f_synctime=current_timestamp where f_host=:f_host and f_db=:f_db");
 
     emit progress("Clear temp storage");
-    db.exec("delete from a_header where f_type=99 ");
-    db.exec("delete from a_store_temp");
+    db[":doc_type"] = DOC_TYPE_SALE_INPUT;
+    db.exec("delete from a_store_draft where f_document in (select f_id from a_header where f_type=:doc_type)");
+    db[":doc_type"] = DOC_TYPE_SALE_INPUT;
+    db.exec("delete from a_store where f_document in (select f_id from a_header where f_type=:doc_type)");
+    db.exec("delete from a_store_current");
+    db[":doc_type"] = DOC_TYPE_SALE_INPUT;
+    db.exec("delete from a_header where f_type=:doc_type ");
     dr[":date"] = QDate::currentDate();
     dr[":store"] = __c5config.defaultStore();
     dr[":state"] = DOC_STATE_SAVED;
-    dr.exec("select g.f_id as f_code,ss.f_name as f_storage,gg.f_name as f_group,g.f_name as f_goods,g.f_scancode,sum(s.f_qty*s.f_type) as f_qty, "
-            "u.f_name as f_unit,g.f_lastinputprice,sum(g.f_lastinputprice*s.f_type*s.f_qty) as f_total,g.f_saleprice,sum(s.f_qty*s.f_type)*g.f_saleprice as f_totalsale,"
-            "g.f_saleprice2,sum(s.f_qty*s.f_type)*g.f_saleprice2 as f_totalsale2 "
-            "from a_store_draft s "
-            "inner join c_goods g on g.f_id=s.f_goods "
-            "inner join c_storages ss on ss.f_id=s.f_store "
-            "inner join c_groups gg on gg.f_id=g.f_group "
-            "inner join c_units u on u.f_id=g.f_unit "
-            "inner join a_header h on h.f_id=s.f_document  "
-            "where  h.f_date<=:date  and s.f_store=:store and h.f_state=:state "
-            "group by g.f_id,ss.f_name,gg.f_name,g.f_name,u.f_name,g.f_lastinputprice,g.f_saleprice,g.f_saleprice2 "
-            "having sum(s.f_qty*s.f_type) > 0");
+    dr.exec("select s.f_goods, s.f_price, sum(s.f_qty*s.f_type) as f_qty, sum(s.f_total) as f_total "
+            "from a_store s "
+            "left join a_header h on h.f_id=s.f_document "
+            "where h.f_date<=:date and h.f_state=:state and s.f_store=:store "
+            "group by 1, 2 "
+            "having sum(s.f_qty*s.f_type)>0 ");
+
+    C5StoreDraftWriter dw(db);
+    int rownum = 1;
+    QString docId;
+    dw.writeAHeader(docId, "SL", DOC_STATE_SAVED, DOC_TYPE_SALE_INPUT, 1, QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, 0, "", 0, 0);
+    emit progress(QString("Step %1 of %2. Write header").arg(step).arg(steps));
     while (dr.nextRow()) {
-        db[":f_store"] = __c5config.defaultStore();
-        db[":f_goods"] = dr.getInt("f_code");
-        db[":f_qty"] = dr.getDouble("f_qty");
-        db.insert("a_store_temp", false);
-        if (dr.pos() % 5 == 0) {
-            emit progress(QString("Step %1 of %2. %3 %4/%5").arg(step).arg(steps).arg("Store").arg(dr.pos()).arg(dr.rowCount()));
-        }
+        QString id;
+        dw.writeAStoreDraft(id, docId, __c5config.defaultStore(), DOC_TYPE_STORE_INPUT, dr.getInt("f_goods"), dr.getDouble("f_qty"), dr.getDouble("f_price"),
+                            dr.getDouble("f_total"), DOC_REASON_INPUT, id, rownum++, "");
+        db.setBindValues(dr.getBindValues());
+        emit progress(QString("Step %1 of %2. %3 %4/%5").arg(step).arg(steps).arg("Store").arg(dr.pos()).arg(dr.rowCount()));
+    }
+    emit progress(QString("Step %1 of %2. Store document: write input").arg(step).arg(steps));
+    QString err;
+    if (!dw.writeInput(docId, err)) {
+        emit progress(err);
     }
     step++;
     emit haveChanges(hc);
@@ -151,188 +159,205 @@ void C5Replication::downloadDataFromServer(const QStringList &src, const QString
 
 bool C5Replication::uploadDataToServer(const QStringList &src, const QStringList &dst)
 {
-    C5Database dr(dst);
-    if (!dr.open()) {
+    C5Database db_dst(dst);
+    if (!db_dst.open()) {
         return false;
     }
-    C5Database db(src);
+    C5Database db_src(src);
+    if (!db_src.open()) {
+        return false;
+    }
     QStringList idlist;
-    db.exec("select f_id from o_header");
-    while (db.nextRow()) {
-        idlist.append(db.getString("f_id"));
+    db_src.exec("select f_id from o_header");
+    while (db_src.nextRow()) {
+        idlist.append(db_src.getString("f_id"));
     }
     foreach (const QString &s, idlist) {
-        db.startTransaction();
-        dr.startTransaction();
+        db_src.startTransaction();
+        db_dst.startTransaction();
 
-        db[":f_id"] = s;
-        db.exec("select * from o_header where f_id=:f_id");
-        if (!db.nextRow()) {
-            return ret(dr, db);
+        db_src[":f_id"] = s;
+        db_src.exec("select * from o_header where f_id=:f_id ");
+        if (!db_src.nextRow()) {
+            qDebug() << db_src.fDb.hostName() << db_src.fDb.databaseName();
+            return ret(db_dst, db_src);
         }
-        dr.setBindValues(db.getBindValues());
-        if (!dr.insert("o_header", false)) {
+        db_dst.setBindValues(db_src.getBindValues());
+        if (!db_dst.insert("o_header", false)) {
             if (!fIgnoreErrors) {
-                return ret(dr, db);
+                return ret(db_dst, db_src);
+            }
+        }
+
+        db_src[":f_id"] = s;
+        db_src.exec("select * from o_header_flags where f_id=:f_id");
+        if (!db_src.nextRow()) {
+            qDebug() << db_src.fDb.hostName() << db_src.fDb.databaseName();
+            return ret(db_dst, db_src);
+        }
+        db_dst.setBindValues(db_src.getBindValues());
+        if (!db_dst.insert("o_header_flags", false)) {
+            if (!fIgnoreErrors) {
+                return ret(db_dst, db_src);
             }
         }
 
         QSet<QString> storeRec;
-        db[":f_header"] = s;
-        db.exec("select * from o_goods where f_header=:f_header");
-        while (db.nextRow()) {
-            dr.setBindValues(db.getBindValues());
-            storeRec.insert(db.getString("f_storerec"));
-            if (!dr.insert("o_goods", false)) {
+        db_src[":f_header"] = s;
+        db_src.exec("select * from o_goods where f_header=:f_header");
+        while (db_src.nextRow()) {
+            db_dst.setBindValues(db_src.getBindValues());
+            storeRec.insert(db_src.getString("f_storerec"));
+            if (!db_dst.insert("o_goods", false)) {
                 if (!fIgnoreErrors) {
-                    return ret(dr, db);
+                    return ret(db_dst, db_src);
                 }
             }
         }
 
-        db[":f_header"] = s;
-        db.exec("select * from o_body where f_header=:f_header");
-        while (db.nextRow()) {
-            dr.setBindValues(db.getBindValues());
-            if (!dr.insert("o_body", false)) {
+        db_src[":f_header"] = s;
+        db_src.exec("select * from o_body where f_header=:f_header");
+        while (db_src.nextRow()) {
+            db_dst.setBindValues(db_src.getBindValues());
+            if (!db_dst.insert("o_body", false)) {
                 if (!fIgnoreErrors) {
-                    return ret(dr, db);
+                    return ret(db_dst, db_src);
                 }
             }
         }
 
-        db[":f_order"] = s;
-        db.exec("select * from o_tax_log where f_order=:f_order");
-        while (db.nextRow()) {
-            dr.setBindValues(db.getBindValues());
-            dr.insert("o_tax_log", false);
+        db_src[":f_order"] = s;
+        db_src.exec("select * from o_tax_log where f_order=:f_order");
+        while (db_src.nextRow()) {
+            db_dst.setBindValues(db_src.getBindValues());
+            db_dst.insert("o_tax_log", false);
         }
 
-        db[":f_id"] = s;
-        db.exec("select * from o_tax where f_id=:f_id");
-        if (db.nextRow()) {
-            dr.setBindValues(db.getBindValues());
-            dr.insert("o_tax", false);
+        db_src[":f_id"] = s;
+        db_src.exec("select * from o_tax where f_id=:f_id");
+        if (db_src.nextRow()) {
+            db_dst.setBindValues(db_src.getBindValues());
+            db_dst.insert("o_tax", false);
         }
 
         QSet<QString> storeHeader;
         foreach (const QString &s1, storeRec) {
-            db[":f_id"] = s1;
-            db.exec("select f_document from a_store_draft where f_id=:f_id");
-            if (db.nextRow()) {
-                storeHeader.insert(db.getString("f_document"));
+            db_src[":f_id"] = s1;
+            db_src.exec("select f_document from a_store_draft where f_id=:f_id");
+            if (db_src.nextRow()) {
+                storeHeader.insert(db_src.getString("f_document"));
             }
         }
         foreach (const QString &s1, storeHeader) {
-            db[":f_id"] = s1;
-            db.exec("select * from a_header where f_id=:f_id");
-            if (db.nextRow()) {
-                dr.setBindValues(db.getBindValues());
-                if (!dr.insert("a_header", false)) {
+            db_src[":f_id"] = s1;
+            db_src.exec("select * from a_header where f_id=:f_id");
+            if (db_src.nextRow()) {
+                db_dst.setBindValues(db_src.getBindValues());
+                if (!db_dst.insert("a_header", false)) {
                     if (!fIgnoreErrors) {
-                        return ret(dr, db);
+                        return ret(db_dst, db_src);
                     }
                 }
             }
-            db[":f_id"] = s1;
-            db.exec("select * from a_header_store where f_id=:f_id");
-            if (db.nextRow()) {
-                dr.setBindValues(db.getBindValues());
-                if (!dr.insert("a_header_store", false)) {
+            db_src[":f_id"] = s1;
+            db_src.exec("select * from a_header_store where f_id=:f_id");
+            if (db_src.nextRow()) {
+                db_dst.setBindValues(db_src.getBindValues());
+                if (!db_dst.insert("a_header_store", false)) {
                     if (!fIgnoreErrors) {
-                        return ret(dr, db);
+                        return ret(db_dst, db_src);
                     }
                 }
             }
-            db[":f_document"] = s1;
-            db.exec("select * from a_store_draft where f_document=:f_document");
-            while (db.nextRow()) {
-                dr.setBindValues(db.getBindValues());
-                if (!dr.insert("a_store_draft", false)) {
+            db_src[":f_document"] = s1;
+            db_src.exec("select * from a_store_draft where f_document=:f_document");
+            while (db_src.nextRow()) {
+                db_dst.setBindValues(db_src.getBindValues());
+                if (!db_dst.insert("a_store_draft", false)) {
                     if (!fIgnoreErrors) {
-                        return ret(dr, db);
+                        return ret(db_dst, db_src);
                     }
                 }
             }
         }
 
         QSet<QString> cashHeader;
-        db[":f_oheader"] = s;
-        db.exec("select * from a_header_cash where f_oheader=:f_oheader");
-        while (db.nextRow()) {
-            cashHeader.insert(db.getString("f_id"));
-            dr.setBindValues(db.getBindValues());
-            if (!dr.insert("a_header_cash", false)) {
+        db_src[":f_oheader"] = s;
+        db_src.exec("select * from a_header_cash where f_oheader=:f_oheader");
+        while (db_src.nextRow()) {
+            cashHeader.insert(db_src.getString("f_id"));
+            db_dst.setBindValues(db_src.getBindValues());
+            if (!db_dst.insert("a_header_cash", false)) {
                 if (!fIgnoreErrors) {
-                    return ret(dr, db);
+                    return ret(db_dst, db_src);
                 }
             }
         }
         foreach (const QString &s1, cashHeader) {
-            db[":f_id"] = s1;
-            db.exec("select * from a_header where f_id=:f_id");
-            if (db.nextRow()) {
-                dr.setBindValues(db.getBindValues());
-                if (!dr.insert("a_header", false)) {
+            db_src[":f_id"] = s1;
+            db_src.exec("select * from a_header where f_id=:f_id");
+            if (db_src.nextRow()) {
+                db_dst.setBindValues(db_src.getBindValues());
+                if (!db_dst.insert("a_header", false)) {
                     if (!fIgnoreErrors) {
-                        return ret(dr, db);
+                        return ret(db_dst, db_src);
                     }
                 }
             }
-            db[":f_header"] = s1;
-            db.exec("select * from e_cash where f_header=:f_header");
-            while (db.nextRow()) {
-                dr.setBindValues(db.getBindValues());
-                if (!dr.insert("e_cash", false)) {
+            db_src[":f_header"] = s1;
+            db_src.exec("select * from e_cash where f_header=:f_header");
+            while (db_src.nextRow()) {
+                db_dst.setBindValues(db_src.getBindValues());
+                if (!db_dst.insert("e_cash", false)) {
                     if (!fIgnoreErrors) {
-                        return ret(dr, db);
+                        return ret(db_dst, db_src);
                     }
                 }
             }
         }
 
         QString err;
-        C5StoreDraftWriter dw(dr);
+        C5StoreDraftWriter dw(db_dst);
         foreach (const QString &s1, storeHeader) {
             if (dw.writeOutput(s1, err)) {
-                dr[":f_id"] = s1;
-                dr[":f_state"] = DOC_STATE_SAVED;
-                dr.exec("update a_header set f_state=:f_state where f_id=:f_id");
+                db_dst[":f_id"] = s1;
+                db_dst[":f_state"] = DOC_STATE_SAVED;
+                db_dst.exec("update a_header set f_state=:f_state where f_id=:f_id");
             } else {
                 dw.haveRelations(s1, err, true);
             }
         }
 
-        db[":f_header"] = s;
-        db.exec("delete from o_goods where f_header=:f_header");
-        db[":f_header"] = s;
-        db.exec("delete from o_body where f_header=:f_header");
-        db[":f_id"] = s;
-        db.exec("delete from o_header where f_id=:f_id");
-        db[":f_order"] = s;
-        db.exec("delete from o_tax_log where f_order=:f_order");
-        db[":f_id"] = s;
-        db.exec("delete from o_tax where f_id=:f_id");
+        db_src[":f_header"] = s;
+        db_src.exec("delete from o_goods where f_header=:f_header");
+        db_src[":f_header"] = s;
+        db_src.exec("delete from o_body where f_header=:f_header");
+        db_src[":f_id"] = s;
+        db_src.exec("delete from o_header where f_id=:f_id");
+        db_src[":f_order"] = s;
+        db_src.exec("delete from o_tax_log where f_order=:f_order");
+        db_src[":f_id"] = s;
+        db_src.exec("delete from o_tax where f_id=:f_id");
         foreach (const QString &s1, storeHeader) {
-            db[":f_document"] = s1;
-            db.exec("delete from a_store where f_document=:f_document");
-            db[":f_document"] = s1;
-            db.exec("delete from a_store_draft where f_document=:f_document");
-            db[":f_id"] = s1;
-            db.exec("delete from a_header_store where f_id=:f_id");
-            db[":f_id"] = s1;
-            db.exec("delete from a_header where f_id=:f_id");
+            db_src[":f_document"] = s1;
+            db_src.exec("delete from a_store where f_document=:f_document");
+            db_src[":f_document"] = s1;
+            db_src.exec("delete from a_store_draft where f_document=:f_document");
+            db_src[":f_id"] = s1;
+            db_src.exec("delete from a_header_store where f_id=:f_id");
+            db_src[":f_id"] = s1;
+            db_src.exec("delete from a_header where f_id=:f_id");
         }
         foreach (const QString &s1, cashHeader) {
-            db[":f_header"] = s1;
-            db.exec("delete from e_cash where f_header=:f_header");
-            db[":f_id"] = s1;
-            db.exec("delete from a_header_cash where f_id=:f_id");
-            db[":f_id"] = s1;
-            db.exec("delete from a_header where f_id=:f_id");
+            db_src[":f_header"] = s1;
+            db_src.exec("delete from e_cash where f_header=:f_header");
+            db_src[":f_id"] = s1;
+            db_src.exec("delete from a_header_cash where f_id=:f_id");
+            db_src[":f_id"] = s1;
+            db_src.exec("delete from a_header where f_id=:f_id");
         }
-        db.commit();
-        dr.commit();
+        db_src.commit();
+        db_dst.commit();
     }
     emit finished();
     return true;

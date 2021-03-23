@@ -140,6 +140,6 @@ void CE5DishPackage::on_tblDishes_customContextMenuRequested(const QPoint &pos)
 {
     auto *m = new QMenu(this);
     m->addAction(QIcon(":/add.png"), tr("Append"), this, SLOT(newDish()));
-    m->addAction(QIcon(":/remove.png"), tr("Append"), this, SLOT(removeDish()));
+    m->addAction(QIcon(":/remove.png"), tr("Remove"), this, SLOT(removeDish()));
     m->popup(ui->tblDishes->mapToGlobal(pos));
 }

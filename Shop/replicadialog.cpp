@@ -25,6 +25,6 @@ ReplicaDialog::~ReplicaDialog()
 void ReplicaDialog::progress(const QString &msg)
 {
     ui->lbMsg->setText(msg);
-    qApp->processEvents();
+    //qApp->processEvents();
     C5LogSystem::writeEvent(msg);
 }

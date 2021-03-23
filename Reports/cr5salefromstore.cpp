@@ -18,6 +18,7 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
 
     fMainTable = "o_goods og";
     fLeftJoinTables << "left join o_header oh on oh.f_id=og.f_header [oh]"
+                    << "left join o_header_flags ohf on ohf.f_id=oh.f_id [ohf]"
                     << "left join c_storages s on s.f_id=og.f_store [s]"
                     << "left join c_goods gg on gg.f_id=og.f_goods [gg]"
                     << "left join c_groups gr on gr.f_id=gg.f_group [gr]"

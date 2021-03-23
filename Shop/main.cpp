@@ -14,6 +14,7 @@
 #include <QInputDialog>
 #include <QDir>
 #include <QTranslator>
+#include <QStyleFactory>
 
 int main(int argc, char *argv[])
 {
@@ -25,6 +26,7 @@ int main(int argc, char *argv[])
     libPath << "./printsupport";
     QCoreApplication::setLibraryPaths(libPath);
 #endif
+
 
     QApplication a(argc, argv);
     QDir d;
@@ -39,6 +41,13 @@ int main(int argc, char *argv[])
         ls(QObject::tr("License check failed"));
         QMessageBox::critical(0, QObject::tr("Application error"), QObject::tr("Please, register application."));
         return 0;
+    }
+
+    a.setStyle(QStyleFactory::create("fusion"));
+    QFile styleSheet("./styles.qss");
+    if (styleSheet.exists()) {
+        styleSheet.open(QIODevice::ReadOnly);
+        a.setStyleSheet(styleSheet.readAll());
     }
 
     QTranslator t;

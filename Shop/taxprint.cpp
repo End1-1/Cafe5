@@ -72,6 +72,7 @@ void TaxPrint::addGoods(const QString &code)
     le->setDouble(g.fRetailPrice);
     connect(le, SIGNAL(textEdited(QString)), this, SLOT(totalChanged(QString)));
     ui->tbl->setString(row, 5, g.fAdgCode);
+    countTotal();
 }
 
 void TaxPrint::countTotal()
@@ -92,6 +93,7 @@ void TaxPrint::on_leCode_returnPressed()
 void TaxPrint::on_btnPrint_clicked()
 {
     PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
+    pt.fPartnerTin = ui->leTaxpayerPin->text();
     for (int i = 0; i < ui->tbl->rowCount(); i++) {
         Goods gg = Working::fGoods[Working::fGoodsCodeForPrint[ui->tbl->getInteger(i, 0)]];
         pt.addGoods(QString::number(gg.fTaxDept), //dep

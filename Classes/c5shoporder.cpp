@@ -92,6 +92,7 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
 
     if (tax) {
         PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
+        pt.fPartnerTin = fPartnerName;
         for (int i = 0; i < goods.count(); i++) {
             IGoods &g = goods[i];
             pt.addGoods(g.taxDept, //dep
@@ -365,6 +366,13 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
 
     db.commit();
     return true;
+}
+
+bool C5ShopOrder::writeFlags(int f1, int f2, int f3, int f4, int f5)
+{
+    C5Database db(__c5config.dbParams());
+    C5StoreDraftWriter dw(db);
+    return dw.writeOHeaderFlags(fHeader, f1, f2, f3, f4, f5);
 }
 
 bool C5ShopOrder::returnFalse(const QString &msg, C5Database &db)

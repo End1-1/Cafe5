@@ -29,6 +29,8 @@ private slots:
 
     void on_chAll_clicked(bool checked);
 
+    void on_chSelected_clicked(bool checked);
+
 private:
     Ui::C5FilterValues *ui;
 };

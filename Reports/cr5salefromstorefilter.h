@@ -22,8 +22,13 @@ public:
 
     QDate d2();
 
+private slots:
+    void on_btnFlags_clicked();
+
 private:
     Ui::CR5SaleFromStoreFilter *ui;
+
+    QString fFlags;
 };
 
 #endif // CR5SALEFROMSTOREFILTER_H

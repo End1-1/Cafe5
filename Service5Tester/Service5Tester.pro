@@ -23,6 +23,7 @@ SOURCES += \
 HEADERS += \
     ../Service5/socket/sslserver.h \
     ../Service5/socket/sslsocket.h \
+    ../Service5/utils/debug.h \
     ../Service5/utils/logwriter.h \
     ../Service5/utils/threadworker.h \
     test.h \
@@ -36,10 +37,10 @@ FORMS += \
 
 INCLUDEPATH += $$PWD/../Service5/socket
 INCLUDEPATH += $$PWD/../Service5/utils
-INCLUDEPATH += C:/Soft/OpenSSL-Win32/include
-INCLUDEPATH += C:/Soft/OpenSSL-Win32/include/openssl
+INCLUDEPATH += C:/Soft/OpenSSL-Win64/include
+INCLUDEPATH += C:/Soft/OpenSSL-Win64/include/openssl
 
-LIBS += -LC:/Soft/OpenSSL-Win32/lib
+LIBS += -LC:/Soft/OpenSSL-Win64/lib
 LIBS += -lopenssl
 LIBS += -llibcrypto
 

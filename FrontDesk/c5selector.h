@@ -31,8 +31,6 @@ public:
     static void resetCache(const QStringList &dbParams, int cacheId);
 
 private slots:
-    void tblSingleClick(const QModelIndex &index);
-
     void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 
     virtual bool tblDoubleClicked(int row, int column, const QList<QVariant> &values);

@@ -540,9 +540,13 @@ void C5WaiterOrderDoc::countTotalV1()
     double totalService = 0;
     double totalDiscount = 0;
     for (int i = 0, count = fItems.count(); i < count; i++) {
-        iSetString("f_discount", hString("f_discountfactor"), i);
-        iSetString("f_service", hString("f_servicefactor"), i);
+        iSetString("f_discount", iInt("f_candiscount", i) == 0 ? 0 : hString("f_discountfactor"), i);
+        iSetString("f_service",  iInt("f_canservice", i) == 0 ? 0 : hString("f_servicefactor"), i);
         if (iInt("f_state", i) != DISH_STATE_OK) {
+            continue;
+        }
+        if (iInt("f_hourlypayment", i) > 0) {
+            total += iDouble("f_total", i);
             continue;
         }
         double price = iDouble("f_price", i);
@@ -580,9 +584,13 @@ void C5WaiterOrderDoc::countTotalV2()
     double totalService = 0;
     double totalDiscount = 0;
     for (int i = 0, count = fItems.count(); i < count; i++) {
-        iSetString("f_discount", hString("f_discountfactor"), i);
-        iSetString("f_service", hString("f_servicefactor"), i);
+        iSetString("f_discount", iInt("f_candiscount", i) == 0 ? 0 : hString("f_discountfactor"), i);
+        iSetString("f_service",  iInt("f_canservice", i) == 0 ? 0 : hString("f_servicefactor"), i);
         if (iInt("f_state", i) != DISH_STATE_OK) {
+            continue;
+        }
+        if (iInt("f_hourlypayment", i) > 0) {
+            total += iDouble("f_total", i);
             continue;
         }
         double price = iDouble("f_price", i);
@@ -616,9 +624,13 @@ double C5WaiterOrderDoc::countPreTotalV1()
     double totalService = 0;
     double totalDiscount = 0;
     for (int i = 0, count = fItems.count(); i < count; i++) {
-        iSetString("f_discount", hString("f_discountfactor"), i);
-        iSetString("f_service", hString("f_servicefactor"), i);
+        iSetString("f_discount", iInt("f_candiscount", i) == 0 ? 0 : hString("f_discountfactor"), i);
+        iSetString("f_service",  iInt("f_canservice", i) == 0 ? 0 : hString("f_servicefactor"), i);
         if (iInt("f_state", i) != DISH_STATE_OK) {
+            continue;
+        }
+        if (iInt("f_hourlypayment", i) > 0) {
+            total += iDouble("f_total", i);
             continue;
         }
         double price = iDouble("f_price", i);
@@ -642,9 +654,13 @@ double C5WaiterOrderDoc::countPreTotalV2()
     double totalService = 0;
     double totalDiscount = 0;
     for (int i = 0, count = fItems.count(); i < count; i++) {
-        iSetString("f_discount", hString("f_discountfactor"), i);
-        iSetString("f_service", hString("f_servicefactor"), i);
+        iSetString("f_discount", iInt("f_candiscount", i) == 0 ? 0 : hString("f_discountfactor"), i);
+        iSetString("f_service",  iInt("f_canservice", i) == 0 ? 0 : hString("f_servicefactor"), i);
         if (iInt("f_state", i) != DISH_STATE_OK) {
+            continue;
+        }
+        if (iInt("f_hourlypayment", i) > 0) {
+            total += iDouble("f_total", i);
             continue;
         }
         double price = iDouble("f_price", i);
@@ -696,7 +712,8 @@ void C5WaiterOrderDoc::open(C5Database &db)
     db.exec("select ob.f_id, ob.f_header, ob.f_state, dp1.f_name as part1, dp2.f_name as part2, ob.f_adgcode, d.f_name as f_name, \
              ob.f_qty1, ob.f_qty2, ob.f_price, ob.f_service, ob.f_discount, ob.f_total, \
              ob.f_store, ob.f_print1, ob.f_print2, ob.f_comment, ob.f_remind, ob.f_dish, \
-             s.f_name as f_storename, ob.f_removereason, ob.f_timeorder, ob.f_package \
+             s.f_name as f_storename, ob.f_removereason, ob.f_timeorder, ob.f_package, d.f_hourlypayment, \
+             ob.f_canservice, ob.f_candiscount \
              from o_body ob \
              left join d_dish d on d.f_id=ob.f_dish \
              left join d_part2 dp2 on dp2.f_id=d.f_part \

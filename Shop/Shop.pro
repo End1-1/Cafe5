@@ -114,6 +114,7 @@ SOURCES += \
     ../Editors/ce5goodswaste.cpp \
     ../Editors/ce5halls.cpp \
     ../Editors/ce5menuname.cpp \
+    ../Editors/ce5ordermark.cpp \
     ../Editors/ce5packagelist.cpp \
     ../Editors/ce5partner.cpp \
     ../Editors/ce5storage.cpp \
@@ -212,10 +213,12 @@ SOURCES += \
     ../Reports/cr5menureview.cpp \
     ../Reports/cr5menureviewfilter.cpp \
     ../Reports/cr5menutranslator.cpp \
+    ../Reports/cr5ordermarks.cpp \
     ../Reports/cr5preorders.cpp \
     ../Reports/cr5salarybyworkers.cpp \
     ../Reports/cr5salarybyworkersfilter.cpp \
     ../Reports/cr5saleandstorefilter.cpp \
+    ../Reports/cr5saleflags.cpp \
     ../Reports/cr5salefromstore.cpp \
     ../Reports/cr5salefromstorefilter.cpp \
     ../Reports/cr5salefromstoretotal.cpp \
@@ -235,7 +238,6 @@ SOURCES += \
     ../Reports/cr5users.cpp \
     ../Reports/cr5usersfilter.cpp \
     ../Reports/cr5usersgroups.cpp \
-    ../Waiter/c5lineeditwithselector.cpp \
     ../Waiter/c5printreceiptthread.cpp \
     ../Waiter/c5printreceiptthread50mm.cpp \
     ../Waiter/dlgcarnumber.cpp \
@@ -372,6 +374,7 @@ HEADERS += \
     ../Editors/ce5goodswaste.h \
     ../Editors/ce5halls.h \
     ../Editors/ce5menuname.h \
+    ../Editors/ce5ordermark.h \
     ../Editors/ce5packagelist.h \
     ../Editors/ce5partner.h \
     ../Editors/ce5storage.h \
@@ -470,10 +473,12 @@ HEADERS += \
     ../Reports/cr5menureview.h \
     ../Reports/cr5menureviewfilter.h \
     ../Reports/cr5menutranslator.h \
+    ../Reports/cr5ordermarks.h \
     ../Reports/cr5preorders.h \
     ../Reports/cr5salarybyworkers.h \
     ../Reports/cr5salarybyworkersfilter.h \
     ../Reports/cr5saleandstorefilter.h \
+    ../Reports/cr5saleflags.h \
     ../Reports/cr5salefromstore.h \
     ../Reports/cr5salefromstorefilter.h \
     ../Reports/cr5salefromstoretotal.h \
@@ -494,7 +499,6 @@ HEADERS += \
     ../Reports/cr5usersfilter.h \
     ../Reports/cr5usersgroups.h \
     ../Service/servicecommands.h \
-    ../Waiter/c5lineeditwithselector.h \
     ../Waiter/c5printreceiptthread.h \
     ../Waiter/c5printreceiptthread50mm.h \
     ../Waiter/dlgcarnumber.h \
@@ -568,6 +572,7 @@ FORMS += \
     ../Editors/ce5goodswaste.ui \
     ../Editors/ce5halls.ui \
     ../Editors/ce5menuname.ui \
+    ../Editors/ce5ordermark.ui \
     ../Editors/ce5packagelist.ui \
     ../Editors/ce5partner.ui \
     ../Editors/ce5storage.ui \
@@ -629,6 +634,7 @@ FORMS += \
     ../Reports/cr5menutranslator.ui \
     ../Reports/cr5salarybyworkersfilter.ui \
     ../Reports/cr5saleandstorefilter.ui \
+    ../Reports/cr5saleflags.ui \
     ../Reports/cr5salefromstorefilter.ui \
     ../Reports/cr5salefromstoretotalfilter.ui \
     ../Reports/cr5saleremoveddishesfilter.ui \

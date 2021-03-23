@@ -9,6 +9,7 @@ class SslSocket : public QSslSocket
 
 public:
     SslSocket(QObject *parent = nullptr);
+    ~SslSocket();
     QString fUuid;
 };
 

@@ -30,7 +30,7 @@
         <location filename="../../Classes/c5cache.cpp" line="122"/>
         <location filename="../../Classes/c5cache.cpp" line="125"/>
         <location filename="../../Classes/c5cache.cpp" line="128"/>
-        <location filename="../../Classes/c5cache.cpp" line="268"/>
+        <location filename="../../Classes/c5cache.cpp" line="270"/>
         <source>Code</source>
         <translation>Կոդ</translation>
     </message>
@@ -60,7 +60,7 @@
         <location filename="../../Classes/c5cache.cpp" line="123"/>
         <location filename="../../Classes/c5cache.cpp" line="126"/>
         <location filename="../../Classes/c5cache.cpp" line="129"/>
-        <location filename="../../Classes/c5cache.cpp" line="269"/>
+        <location filename="../../Classes/c5cache.cpp" line="271"/>
         <source>Name</source>
         <translation>Անվանում</translation>
     </message>
@@ -139,12 +139,12 @@
 <context>
     <name>C5Message</name>
     <message>
-        <location filename="../../Cafe5/c5message.ui" line="66"/>
+        <location filename="../../Cafe5/c5message.ui" line="124"/>
         <source>OK</source>
         <translation>ԸՆԴՈՒՆԵԼ</translation>
     </message>
     <message>
-        <location filename="../../Cafe5/c5message.ui" line="73"/>
+        <location filename="../../Cafe5/c5message.ui" line="137"/>
         <source>Cancel</source>
         <translation>ՀՐԱԺԱՐՎԵԼ</translation>
     </message>

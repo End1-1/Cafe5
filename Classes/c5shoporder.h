@@ -21,6 +21,8 @@ public:
 
     bool write(double total, double card, double prepaid, double discount, bool tax, QList<IGoods> goods, double fDiscountFactor, int discmode);
 
+    bool writeFlags(int f1, int f2, int f3, int f4, int f5);
+
     bool returnFalse(const QString &msg, C5Database &db);
 
     QString fHeader;

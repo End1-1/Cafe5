@@ -7,7 +7,7 @@ class TestN1 : public TestN
 {
     Q_OBJECT
 public:
-    explicit TestN1(const QString &serverIP, int port, const QSslCertificate &certificate, int number);
+    explicit TestN1(const QString &serverIP, int port, const QSslCertificate &certificate, int number, const QVariant &data = QVariant());
     ~TestN1();
 
 public slots:

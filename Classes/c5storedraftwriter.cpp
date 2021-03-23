@@ -1,6 +1,7 @@
 #include "c5storedraftwriter.h"
 #include "c5utils.h"
 #include "c5config.h"
+#include "c5storedoc.h"
 #include <QVariant>
 #include <QMap>
 
@@ -75,34 +76,20 @@ bool C5StoreDraftWriter::writeFromShopOutput(const QString &doc, int state, QStr
 
 bool C5StoreDraftWriter::rollbackOutput(C5Database &db, const QString &id)
 {
+    QSet<QString> docs;
     db[":f_id"] = id;
-    db.exec("select f_storerec, f_qty from o_goods where f_id=:f_id");
-    if (db.nextRow()) {
-        QString recid = db.getString("f_storerec");
-        double qty = db.getDouble("f_qty");
-        db[":f_id"] = recid;
-        db.exec("select f_document, f_qty from a_store_draft where f_id=:f_id for update");
-        if (db.nextRow()) {
-            double draftQty = db.getDouble("f_qty");
-            db[":f_qty"] = qty;
-            db[":f_id"] = recid;
-            db.exec("update a_store_draft set f_qty=f_qty-:f_qty where f_id=:f_id");
-            if (draftQty - qty < 0.0001) {
-                db[":f_id"] = recid;
-                db.exec("delete from a_store_draft where f_id=:f_id");
-            }
-            db[":f_id"] = db.getString("f_document");
-            db.exec("select * from a_header where f_id=:f_id");
-            if (db.nextRow()) {
-                if (db.getInt("f_state") == DOC_STATE_SAVED) {
-                    fErrorMsg = tr("Store document has been registered for this sale");
-                    return false;
-                }
-            }
-        }
+    db.exec("select d.f_document, g.f_storerec "
+            "from o_goods g "
+            "inner join a_store_draft d on g.f_storerec=d.f_id "
+            "where g.f_id=:f_id");
+    while (db.nextRow()) {
+        docs.insert(db.getString(0));
     }
     db[":f_id"] = id;
     db.exec("delete from o_goods where f_id=:f_id");
+    for (const QString &doc: docs) {
+        C5StoreDoc::removeDoc(db.dbParams(), doc, false);
+    }
     return true;
 }
 
@@ -711,8 +698,28 @@ bool C5StoreDraftWriter::writeOHeader(QString &id, int hallid, const QString &pr
     if (u) {
         return returnResult(fDb.update("o_header", where_id(id)));
     } else {
-        return returnResult(fDb.insert("o_header", false));
+        bool b = returnResult(fDb.insert("o_header", false));
+        if (b) {
+            fDb[":f_id"] = id;
+            fDb[":f_1"] = 0;
+            fDb[":f_2"] = 0;
+            fDb[":f_3"] = 0;
+            fDb[":f_4"] = 0;
+            fDb[":f_5"] = 0;
+            b = b && returnResult(fDb.insert("o_header_flags", false));
+        }
+        return b;
     }
+}
+
+bool C5StoreDraftWriter::writeOHeaderFlags(const QString &id, int f1, int f2, int f3, int f4, int f5)
+{
+    fDb[":f_1"] = f1;
+    fDb[":f_2"] = f2;
+    fDb[":f_3"] = f3;
+    fDb[":f_4"] = f4;
+    fDb[":f_5"] = f5;
+    return returnResult(fDb.update("o_header_flags", "f_id", id));
 }
 
 bool C5StoreDraftWriter::writeOPayment(const QString &id, double cash, double change)

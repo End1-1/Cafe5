@@ -35,9 +35,9 @@ payment::payment(const QString order, const QStringList &dbParams) :
         ui->leChange->setDouble(t.toDouble() - ui->leCash->getDouble());
     });
     adjustSize();
-    QShortcut *s = new QShortcut(QKeySequence("F2"), this, SLOT(focusChangeLineEdit()));
-    s = new QShortcut(QKeySequence("F9"), this, SLOT(keyF9()));
-    s = new QShortcut(QKeySequence("F10"), this, SLOT(keyF10()));
+    new QShortcut(QKeySequence("F2"), this, SLOT(focusChangeLineEdit()));
+    new QShortcut(QKeySequence("F9"), this, SLOT(keyF9()));
+    new QShortcut(QKeySequence("F10"), this, SLOT(keyF10()));
 }
 
 payment::~payment()

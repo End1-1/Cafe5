@@ -14,6 +14,7 @@ C5SaleFromStoreOrder::C5SaleFromStoreOrder(const QStringList &dbParams) :
     ui->tblData->setColumnWidths(ui->tblData->columnCount(), 0, 0, 300, 80, 80, 80, 80, 0);
     ui->leID->setVisible(false);
     ui->lePartner->setSelector(dbParams, ui->lePartnerName, cache_goods_partners);
+    ui->leSeller->setSelector(dbParams, ui->leSellerName, cache_users);
     //ui->btnRemove->setVisible(pr(fDBParams, cp_t5_refund_goods));
 }
 
@@ -44,6 +45,7 @@ void C5SaleFromStoreOrder::loadOrder(const QString &id)
         ui->leTotalCard->setDouble(db.getDouble("f_amountcard"));
         ui->lePartner->setValue(db.getString("f_partner"));
         ui->btnRemove->setVisible(db.getInt("f_source") > 0);
+        ui->leSeller->setValue(db.getInt("f_staff"));
     } else {
         C5Message::error(tr("No such order"));
         return;
@@ -215,6 +217,7 @@ void C5SaleFromStoreOrder::on_btnSave_clicked()
         db.deleteFromTable("b_clients_debts", "f_order", ui->leID->text());
     }
     db[":f_partner"] = ui->lePartner->getInteger();
+    db[":f_staff"] = ui->leSeller->getInteger();
     db.update("o_header", where_id(ui->leID->text()));
 
     C5Message::info(tr("Saved"));

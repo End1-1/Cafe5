@@ -267,36 +267,6 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="0" colspan="2">
-           <widget class="C5CheckBox" name="checkBox_2">
-            <property name="text">
-             <string>Append service fee</string>
-            </property>
-            <property name="Field" stdset="0">
-             <string>f_service</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0" colspan="2">
-           <widget class="C5CheckBox" name="checkBox">
-            <property name="text">
-             <string>Can discount</string>
-            </property>
-            <property name="Field" stdset="0">
-             <string>f_discount</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0">
-           <widget class="C5CheckBox" name="checkBox_3">
-            <property name="text">
-             <string>Reminder</string>
-            </property>
-            <property name="Field" stdset="0">
-             <string>f_remind</string>
-            </property>
-           </widget>
-          </item>
           <item row="0" column="1">
            <widget class="C5LineEditWithSelector" name="leQueue">
             <property name="maximumSize">
@@ -320,6 +290,16 @@
             </property>
            </widget>
           </item>
+          <item row="3" column="0" colspan="2">
+           <widget class="C5CheckBox" name="checkBox_2">
+            <property name="text">
+             <string>Append service fee</string>
+            </property>
+            <property name="Field" stdset="0">
+             <string>f_service</string>
+            </property>
+           </widget>
+          </item>
           <item row="1" column="1">
            <widget class="C5LineEditWithSelector" name="leColor">
             <property name="maximumSize">
@@ -339,6 +319,49 @@
             </property>
             <property name="SetColor" stdset="0">
              <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0" colspan="2">
+           <widget class="C5CheckBox" name="checkBox">
+            <property name="text">
+             <string>Can discount</string>
+            </property>
+            <property name="Field" stdset="0">
+             <string>f_discount</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="C5CheckBox" name="checkBox_3">
+            <property name="text">
+             <string>Reminder</string>
+            </property>
+            <property name="Field" stdset="0">
+             <string>f_remind</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_10">
+            <property name="text">
+             <string>Hourly payment</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="C5LineEditWithSelector" name="leHourlyPayment">
+            <property name="maximumSize">
+             <size>
+              <width>50</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="Field" stdset="0">
+             <string>f_hourlypayment</string>
+            </property>
+            <property name="Type" stdset="0">
+             <number>1</number>
             </property>
            </widget>
           </item>
@@ -978,21 +1001,18 @@
   <tabstop>lineEdit_3</tabstop>
   <tabstop>leQueue</tabstop>
   <tabstop>leColor</tabstop>
+  <tabstop>leHourlyPayment</tabstop>
   <tabstop>checkBox_2</tabstop>
   <tabstop>checkBox</tabstop>
   <tabstop>checkBox_3</tabstop>
-  <tabstop>btnNewType</tabstop>
   <tabstop>tblPricing</tabstop>
-  <tabstop>tabWidget</tabstop>
-  <tabstop>btnAddRecipe</tabstop>
-  <tabstop>btnNewGoods</tabstop>
-  <tabstop>btnRemoveRecipe</tabstop>
-  <tabstop>btnPrintRecipe</tabstop>
   <tabstop>tblRecipe</tabstop>
-  <tabstop>btnAddDish</tabstop>
   <tabstop>tblComplex</tabstop>
-  <tabstop>btnDeleteDish</tabstop>
-  <tabstop>leTotal</tabstop>
+  <tabstop>leDishComment</tabstop>
+  <tabstop>btnRemoveComment</tabstop>
+  <tabstop>lwComment</tabstop>
+  <tabstop>btnAddComment</tabstop>
+  <tabstop>tabWidget</tabstop>
  </tabstops>
  <resources>
   <include location="../resources/res.qrc"/>

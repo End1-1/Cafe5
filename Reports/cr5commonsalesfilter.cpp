@@ -1,6 +1,7 @@
 #include "cr5commonsalesfilter.h"
 #include "ui_cr5commonsalesfilter.h"
 #include "c5cache.h"
+#include "cr5saleflags.h"
 
 CR5CommonSalesFilter::CR5CommonSalesFilter(const QStringList &dbParams, QWidget *parent) :
     C5FilterWidget(dbParams, parent),
@@ -47,5 +48,14 @@ QString CR5CommonSalesFilter::condition()
     if (!ui->leBuyer->isEmpty()) {
         result += " and oh.f_partner in (" + ui->leBuyer->text() + ") ";
     }
+    result += fFlags;
     return result;
+}
+
+void CR5CommonSalesFilter::on_btnFlags_clicked()
+{
+    CR5SaleFlags f(fDBParams);
+    if (f.exec() == QDialog::Accepted) {
+        fFlags = f.flagsCond();
+    }
 }

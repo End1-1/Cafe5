@@ -24,6 +24,12 @@ struct UncomplectGoods {
     double qty;
 };
 
+struct Flag {
+    int id;
+    QString field;
+    QString name;
+};
+
 class Working : public QWidget
 {
     Q_OBJECT
@@ -45,6 +51,8 @@ public:
 
     static int storeId(int id);
 
+    static QMap<int, Flag> fFlags;
+
     static QMap<QString, Goods> fGoods;
 
     static QHash<int, QString> fGoodsCodeForPrint;
@@ -60,6 +68,8 @@ public:
     QList<IUser> fCurrentUsers;
 
     QTabWidget *fTab;
+
+    Flag flag(int id);
 
 private:
     Ui::Working *ui;

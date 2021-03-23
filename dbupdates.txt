@@ -458,7 +458,6 @@ update s_app set f_version ='25' where f_app='DB';
 ALTER TABLE `c_goods` ADD INDEX `idx_goods_enabled` (`f_enabled` ASC);
 ALTER TABLE `a_store` ADD INDEX `idx_store_type` (`f_type` ASC);
 alter table b_clients_debts add f_storedoc char(36);
-
 update s_app set f_version ='26' where f_app='DB';
 
 /* DB - 27*/
@@ -552,5 +551,29 @@ create table o_payment (f_id char(36) primary key, f_cash decimal(14,2), f_chang
 update s_app set f_version='41' where f_app='DB';
 alter table d_package add column f_menu integer after f_id;
 alter table d_package_list add column f_store integer, add column f_printer tinytext;
-CREATE TABLE `o_package` (՝f_id` int NOT NULL AUTO_INCREMENT, `f_header` char(36) DEFAULT NULL, `f_package` int DEFAULT NULL, `f_qty` decimal(14,2) DEFAULT NULL, `f_price` decimal(14,2) DEFAULT NULL,  PRIMARY KEY (`f_id`))ENGINE=InnoDB AUTO_INCREMENT=0;
+CREATE TABLE `o_package` (`f_id` int NOT NULL AUTO_INCREMENT, `f_header` char(36) DEFAULT NULL, `f_package` int DEFAULT NULL, `f_qty` decimal(14,2) DEFAULT NULL, `f_price` decimal(14,2) DEFAULT NULL,  PRIMARY KEY (`f_id`))ENGINE=InnoDB AUTO_INCREMENT=0;
 
+/* db - 42 */
+update s_app set f_version='42' where f_app='DB';
+create table a_store_current (f_id char(36), f_document char(36), f_state smallint, f_store integer, f_goods integer, f_originalqty decimal(14,4), f_currentqty decimal(14,4), f_price decimal(14,2));
+create table b_marks (f_id integer primary key auto_increment, f_active smallint, f_name tinytext);
+alter table o_header add column f_flags tinytext;
+ALTER TABLE `c_goods` ADD INDEX `idx_storeid` (`f_storeid` ASC) ;
+INSERT INTO `a_type` (`f_id`, `f_name`, `f_counter`) VALUES ('9', 'Վաճառքի մուտք', '0');
+
+/* db - 43 */
+update s_app set f_version='43' where f_app='DB';
+alter table o_header drop column f_flags;
+create table o_header_flags (f_id char(36) primary key, f_1 tinyint , f_2 tinyint , f_3 tinyint , f_4 tinyint , f_5 tinyint );
+create table o_flags (f_id tinyint  primary key, f_name tinytext, f_enabled tinyint, f_field tinytext );
+insert into o_flags values (1, 'Flag #1', 0, 'f_1'), (2, 'Flag #2', 0, 'f_2'), (3, 'Flag #3', 0, 'f_3'), (4, 'Flag #4', 0, 'f_4'), (5, 'Flag #5', 0, 'f_5');
+INSERT INTO `s_syncronize_in` (`f_table`) VALUES ('o_flags');
+update s_syncronize_in set f_id=100 where f_id=8;
+update s_syncronize_in set f_id=8 where f_id=7;
+update s_syncronize_in set f_id=7 where f_id=100;
+
+/* db - 44 */
+update s_app set f_version='44' where f_app='DB';
+alter table d_dish add f_hourlypayment int;
+UPDATE `s_app` SET `f_version` = '1.1.5.79' WHERE (`f_app` = 'WAITER');
+alter table o_body add column f_canservice tinyint, add column f_candiscount tinyint;
