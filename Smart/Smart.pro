@@ -180,7 +180,9 @@ SOURCES += \
     ../Reports/cr5commonsales.cpp \
     ../Reports/cr5commonsalesfilter.cpp \
     ../Reports/cr5consumptionbysales.cpp \
+    ../Reports/cr5consumptionbysalesdraft.cpp \
     ../Reports/cr5consumptionbysalesfilter.cpp \
+    ../Reports/cr5consumptionbysalesfilterdraft.cpp \
     ../Reports/cr5consuptionreason.cpp \
     ../Reports/cr5consuptionreasonfilter.cpp \
     ../Reports/cr5costumerdebts.cpp \
@@ -228,6 +230,7 @@ SOURCES += \
     ../Reports/cr5salarybyworkers.cpp \
     ../Reports/cr5salarybyworkersfilter.cpp \
     ../Reports/cr5saleandstorefilter.cpp \
+    ../Reports/cr5saleflags.cpp \
     ../Reports/cr5salefromstore.cpp \
     ../Reports/cr5salefromstorefilter.cpp \
     ../Reports/cr5salefromstoretotal.cpp \
@@ -425,7 +428,9 @@ HEADERS += \
     ../Reports/cr5commonsales.h \
     ../Reports/cr5commonsalesfilter.h \
     ../Reports/cr5consumptionbysales.h \
+    ../Reports/cr5consumptionbysalesdraft.h \
     ../Reports/cr5consumptionbysalesfilter.h \
+    ../Reports/cr5consumptionbysalesfilterdraft.h \
     ../Reports/cr5consuptionreason.h \
     ../Reports/cr5consuptionreasonfilter.h \
     ../Reports/cr5costumerdebts.h \
@@ -473,6 +478,7 @@ HEADERS += \
     ../Reports/cr5salarybyworkers.h \
     ../Reports/cr5salarybyworkersfilter.h \
     ../Reports/cr5saleandstorefilter.h \
+    ../Reports/cr5saleflags.h \
     ../Reports/cr5salefromstore.h \
     ../Reports/cr5salefromstorefilter.h \
     ../Reports/cr5salefromstoretotal.h \
@@ -597,6 +603,7 @@ FORMS += \
     ../Reports/cr5cashmovementfilter.ui \
     ../Reports/cr5commonsalesfilter.ui \
     ../Reports/cr5consumptionbysalesfilter.ui \
+    ../Reports/cr5consumptionbysalesfilterdraft.ui \
     ../Reports/cr5consuptionreasonfilter.ui \
     ../Reports/cr5costumerdebtsfilter.ui \
     ../Reports/cr5discountstatisticsfilter.ui \
@@ -612,6 +619,7 @@ FORMS += \
     ../Reports/cr5menutranslator.ui \
     ../Reports/cr5salarybyworkersfilter.ui \
     ../Reports/cr5saleandstorefilter.ui \
+    ../Reports/cr5saleflags.ui \
     ../Reports/cr5salefromstorefilter.ui \
     ../Reports/cr5salefromstoretotalfilter.ui \
     ../Reports/cr5saleremoveddishesfilter.ui \

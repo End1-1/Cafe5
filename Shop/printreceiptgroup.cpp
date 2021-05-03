@@ -169,13 +169,23 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
     p.line(3);
     p.br(3);
     for (int i = 0; i < data.count(); i++) {
-        p.ltext(QString("%1").arg(data.at(i).at(0).toString()), 0);
-        p.br();
-        p.ltext(QString("%1 X %2 = %3")
-                .arg(float_str(data.at(i).at(1).toDouble(), 3))
-                .arg(data.at(i).at(2).toDouble(), 2)
-                .arg(float_str(data.at(i).at(3).toDouble(), 2)), 0);
-        p.br();
+        if (__c5config.getValue(param_shop_print_goods_qty_side_down).toInt() == 1) {
+            p.ltext(QString("%1").arg(data.at(i).at(0).toString()), 0);
+            p.br();
+            p.ltext(QString("%1 X %2 = %3")
+                    .arg(float_str(data.at(i).at(1).toDouble(), 3))
+                    .arg(data.at(i).at(2).toDouble(), 2)
+                    .arg(float_str(data.at(i).at(3).toDouble(), 2)), 0);
+            p.br();
+        }
+        if (__c5config.getValue(param_shop_print_goods_qty_side_left).toInt() == 1) {
+            p.ltext(QString("%1").arg(data.at(i).at(0).toString()), 0);
+            p.rtext(QString("%1 X %2 = %3")
+                    .arg(float_str(data.at(i).at(1).toDouble(), 3))
+                    .arg(data.at(i).at(2).toDouble(), 2)
+                    .arg(float_str(data.at(i).at(3).toDouble(), 2)));
+            p.br();
+        }
         p.br();
         p.line();
         p.br(2);
@@ -314,13 +324,17 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
         break;
     }
     db[":f_header"] = id;
-    db.exec(QString("select concat(g.f_name, ' ', g.f_scancode) as f_goods, sum(ad.f_qty) as f_qty, %1,  sum(%1*ad.f_qty) as f_total "
+    QString goodsNameField = "g.f_name as f_goods";
+    if (__c5config.getValue(param_print_scancode_with_name).toInt() == 1) {
+        goodsNameField = "concat(g.f_name, ' ', g.f_scancode) as f_goods";
+    }
+    db.exec(QString("select %1, sum(ad.f_qty) as f_qty, %2,  sum(%2*ad.f_qty) as f_total "
             "from o_goods ad "
             "left join c_goods g on g.f_id=ad.f_goods "
             "inner join o_header oh on oh.f_id=ad.f_header "
             "left join c_groups t1 on t1.f_id=g.f_group "
             "where oh.f_id=:f_header and g.f_unit<>10 "
-            "group by 1, 3 ").arg(price1));
+            "group by 1, 3 ").arg(goodsNameField).arg(price1));
     while (db.nextRow()) {
         QList<QVariant> v;
         for (int i = 0; i < db.columnCount(); i++) {

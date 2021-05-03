@@ -71,6 +71,8 @@ private:
 
     void countHourlyPayment();
 
+    void restoreStoplistQty(int dish, double qty);
+
 private slots:
     void timeout();
 
@@ -83,6 +85,8 @@ private slots:
     void handleOpenTable(const QJsonObject &obj);
 
     void handlePrintService(const QJsonObject &obj);
+
+    void handleStopList(const QJsonObject &obj);
 
     void saveAndQuit(const QJsonObject &obj);
 
@@ -149,6 +153,11 @@ private slots:
     void on_btnPackage_clicked();
 
     void on_btnPrintService_clicked();
+
+    void on_btnSit_clicked();
+
+    void on_btnJoinTable_clicked();
+    void on_btnTools_clicked();
 };
 
 #endif // DLGORDER_H

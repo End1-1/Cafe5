@@ -5,13 +5,14 @@
 #include "QRCodeGenerator.h"
 #include <QApplication>
 
-C5PrintReceiptThread::C5PrintReceiptThread(const QStringList &dbParams, const QJsonObject &header, const QJsonArray &body, const QString &printer, QObject *parent) :
+C5PrintReceiptThread::C5PrintReceiptThread(const QStringList &dbParams, const QJsonObject &header, const QJsonArray &body, const QString &printer, int paperWidth, QObject *parent) :
     QThread(parent)
 {
     fHeader = header;
     fBody = body;
     fPrinter = printer;
     fDbParams = dbParams;
+    fPaperWidth = paperWidth;
     fBill = false;
     connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
     connect(this, SIGNAL(startPrint()), this, SLOT(print()));
@@ -30,7 +31,7 @@ void C5PrintReceiptThread::print()
     QFont font(qApp->font());
     font.setPointSize(20);
     C5Printing p;
-    p.setSceneParams(650, 2800, QPrinter::Portrait);
+    p.setSceneParams(fPaperWidth, 2800, QPrinter::Portrait);
     p.setFont(font);
 
     p.image("./logo_receipt.png", Qt::AlignHCenter);
@@ -107,7 +108,7 @@ void C5PrintReceiptThread::print()
         if (!o["f_adgcode"].toString().isEmpty()) {
             name += QString("%1: %2").arg(__translator.tt(tr("Class"))).arg(o["f_adgcode"].toString());
         }
-        name += o["f_name"].toString();
+        name += __translator.td(o["f_dish"].toString().toInt());
         p.ltext(name, 0);
         p.br();
 //        p.ltext(o["f_name"].toString(), 0);
@@ -127,11 +128,15 @@ void C5PrintReceiptThread::print()
                 if (o["f_hourlypayment"].toString().toInt() > 0) {
                     p.ltext(QString("%1 = %2").arg(o["f_comment"].toString()).arg(float_str(str_float(o["f_total"].toString()), 2)), 0);
                 } else {
-                    p.ltext(QString("%1 x %2 %3 %4 = %5")
+//                    p.ltext(QString("%1 x %2 %3 %4 = %5")
+//                            .arg(float_str(str_float(o["f_qty2"].toString()), 2))
+//                            .arg(float_str(str_float(o["f_price"].toString()), 2))
+//                            .arg(servPlus).arg(servValue)
+//                           .arg(total), 0);
+                    p.ltext(QString("%1 x %2 = %3")
                             .arg(float_str(str_float(o["f_qty2"].toString()), 2))
                             .arg(float_str(str_float(o["f_price"].toString()), 2))
-                            .arg(servPlus).arg(servValue)
-                           .arg(total), 0);
+                           .arg(totalStr), 0);
                 }
             }
         } else {

@@ -689,3 +689,8 @@ void C5DishWidget::on_btnMultRecipe_clicked()
         ui->tblRecipe->lineEdit(i, 3)->textEdited(ui->tblRecipe->lineEdit(i, 3)->text());
     }
 }
+
+void C5DishWidget::on_leName_textChanged(const QString &arg1)
+{
+    setWindowTitle(tr("Dish") + ": " + arg1);
+}

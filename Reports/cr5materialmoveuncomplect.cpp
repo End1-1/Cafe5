@@ -102,4 +102,5 @@ void CR5MaterialMoveUncomplect::buildQuery()
             .arg(fields);
     fModel->translate(fTranslation);
     refreshData();
+    emit refreshed();
 }

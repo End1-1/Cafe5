@@ -3,6 +3,7 @@
 #include "c5cafecommon.h"
 #include "c5config.h"
 #include "c5sockethandler.h"
+#include "c5storedoc.h"
 #include "c5storedraftwriter.h"
 #include <QHostInfo>
 
@@ -14,10 +15,11 @@ struct tmpg {
     int store;
     double price;
     tmpg(){}
-    tmpg(const QString &n, double dr, double goods){
+    tmpg(const QString &n, double dr, double goods, double pr){
         recId = n;
         qtyDraft = dr;
         qtyGoods = goods;
+        price = pr;
     }
 };
 
@@ -289,9 +291,18 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &db, C5Database &fDD, QString 
 
 bool C5WaiterOrderDoc::makeOutputOfStore(C5Database &db, QString &err, int storedocstate)
 {
+    //Remove old docs
+    db[":f_id"] = fHeader["f_id"].toString();
+    db.exec("select distinct(ad.f_document) from o_goods g "
+            "left join a_store_draft ad on ad.f_id=g.f_storerec "
+            "where g.f_header=:f_id");
+    while (db.nextRow()) {
+        C5StoreDoc::removeDoc(db.dbParams(), db.getString(0), false);
+    }
+
     //Check for store doc
     db[":f_header"] = fHeader["f_id"].toString();
-    db.exec("select h.f_state, d.f_id, d.f_qty as f_dqty, g.f_qty as f_gqty from o_goods g "
+    db.exec("select h.f_state, d.f_id, d.f_qty as f_dqty, g.f_qty as f_gqty, g.f_lastinputprice as f_gprice from o_goods g "
              "inner join a_store_draft d on d.f_id=g.f_storerec "
              "inner join a_header h on h.f_id=d.f_document "
              "where g.f_header=:f_header");
@@ -303,7 +314,7 @@ bool C5WaiterOrderDoc::makeOutputOfStore(C5Database &db, QString &err, int store
             err += tr("Document saved") + "<br>";
             return false;
         }
-        goods.append(tmpg(db.getString("f_id"), db.getDouble("f_dqty"), db.getDouble("f_gqty")));
+        goods.append(tmpg(db.getString("f_id"), db.getDouble("f_dqty"), db.getDouble("f_gqty"), db.getDouble("f_gprice")));
     }
     foreach (const tmpg &t, goods) {
         db[":f_id"] = t.recId;
@@ -507,15 +518,15 @@ void C5WaiterOrderDoc::iSetDouble(const QString &name, double value, int index)
     iSetString(name, QString::number(value, 'f', 2), index);
 }
 
-QString C5WaiterOrderDoc::prepayment()
+QString C5WaiterOrderDoc::prepayment(int guest)
 {
     switch (hInt("f_servicemode")) {
     case SERVICE_AMOUNT_MODE_INCREASE_PRICE:
-        return float_str(countPreTotalV1(), 2);
+        return float_str(countPreTotalV1(guest), 2);
     case SERVICE_AMOUNT_MODE_SEPARATE:
-        return float_str(countPreTotalV2(), 2);
+        return float_str(countPreTotalV2(guest), 2);
     default:
-        return float_str(countPreTotalV1(), 2);
+        return float_str(countPreTotalV1(guest), 2);
     }
 }
 
@@ -618,7 +629,7 @@ void C5WaiterOrderDoc::countTotalV2()
     }
 }
 
-double C5WaiterOrderDoc::countPreTotalV1()
+double C5WaiterOrderDoc::countPreTotalV1(int guest)
 {
     double total = 0;
     double totalService = 0;
@@ -628,6 +639,11 @@ double C5WaiterOrderDoc::countPreTotalV1()
         iSetString("f_service",  iInt("f_canservice", i) == 0 ? 0 : hString("f_servicefactor"), i);
         if (iInt("f_state", i) != DISH_STATE_OK) {
             continue;
+        }
+        if (guest > 0) {
+            if (iInt("f_guest", i) != guest) {
+                continue;
+            }
         }
         if (iInt("f_hourlypayment", i) > 0) {
             total += iDouble("f_total", i);
@@ -648,7 +664,7 @@ double C5WaiterOrderDoc::countPreTotalV1()
     return total;
 }
 
-double C5WaiterOrderDoc::countPreTotalV2()
+double C5WaiterOrderDoc::countPreTotalV2(int guest)
 {
     double total = 0;
     double totalService = 0;
@@ -658,6 +674,11 @@ double C5WaiterOrderDoc::countPreTotalV2()
         iSetString("f_service",  iInt("f_canservice", i) == 0 ? 0 : hString("f_servicefactor"), i);
         if (iInt("f_state", i) != DISH_STATE_OK) {
             continue;
+        }
+        if (guest > 0) {
+            if (iInt("f_guest", i) != guest) {
+                continue;
+            }
         }
         if (iInt("f_hourlypayment", i) > 0) {
             total += iDouble("f_total", i);
@@ -679,11 +700,12 @@ void C5WaiterOrderDoc::open(C5Database &db)
 {
     db[":f_id"] = hString("f_id");
     db.exec("select h.f_name as f_hallname, t.f_name as f_tableName, concat(s.f_last, ' ', s.f_first) as f_staffname, \
-        o.* \
+        o.*, oo.f_guests, oo.f_splitted \
         from o_header o \
         left join h_tables t on t.f_id=o.f_table \
         left join h_halls h on h.f_id=t.f_hall \
         left join s_user s on s.f_id=o.f_staff \
+        left join o_header_options oo on oo.f_id=o.f_id \
         where o.f_id=:f_id \
         order by o.f_id ");
     if (db.nextRow()) {
@@ -694,6 +716,7 @@ void C5WaiterOrderDoc::open(C5Database &db)
                 fHeader[db.columnName(i)] = db.getDate(i).toString(FORMAT_DATE_TO_STR);
                 break;
             case QVariant::DateTime:
+
                 fHeader[db.columnName(i)] = db.getDateTime(i).toString(FORMAT_DATETIME_TO_STR);
                 break;
             default:
@@ -713,7 +736,7 @@ void C5WaiterOrderDoc::open(C5Database &db)
              ob.f_qty1, ob.f_qty2, ob.f_price, ob.f_service, ob.f_discount, ob.f_total, \
              ob.f_store, ob.f_print1, ob.f_print2, ob.f_comment, ob.f_remind, ob.f_dish, \
              s.f_name as f_storename, ob.f_removereason, ob.f_timeorder, ob.f_package, d.f_hourlypayment, \
-             ob.f_canservice, ob.f_candiscount \
+             ob.f_canservice, ob.f_candiscount, ob.f_guest \
              from o_body ob \
              left join d_dish d on d.f_id=ob.f_dish \
              left join d_part2 dp2 on dp2.f_id=d.f_part \

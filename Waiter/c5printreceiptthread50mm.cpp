@@ -7,13 +7,14 @@
 #include "QRCodeGenerator.h"
 #include <QApplication>
 
-C5PrintReceiptThread50mm::C5PrintReceiptThread50mm(const QStringList &dbParams, const QJsonObject &header, const QJsonArray &body, const QString &printer, QObject *parent) :
+C5PrintReceiptThread50mm::C5PrintReceiptThread50mm(const QStringList &dbParams, const QJsonObject &header, const QJsonArray &body, const QString &printer, int paperWidth, QObject *parent) :
     QThread(parent)
 {
     fHeader = header;
     fBody = body;
     fPrinter = printer;
     fDbParams = dbParams;
+    fPaperWidth = paperWidth == 0 ? 450 : paperWidth;
     fBill = false;
     connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
     connect(this, SIGNAL(startPrint()), this, SLOT(print()));
@@ -32,7 +33,7 @@ void C5PrintReceiptThread50mm::print()
     QFont font(qApp->font());
     font.setPointSize(19);
     C5Printing p;
-    p.setSceneParams(450, 2800, QPrinter::Portrait);
+    p.setSceneParams(fPaperWidth, 2800, QPrinter::Portrait);
     p.setFont(font);
 
     p.image("./logo_receipt.png", Qt::AlignHCenter);
@@ -170,7 +171,10 @@ void C5PrintReceiptThread50mm::print()
     }
     p.setFontBold(true);
     p.ltext(__translator.tt(tr("Need to pay")), 0);
+    p.br();
+    p.ltext(".................................", 0);
     p.rtext(float_str(fHeader["f_amounttotal"].toString().toDouble(), 2));
+    p.br();
 
     p.line();
     p.br();
@@ -212,14 +216,20 @@ void C5PrintReceiptThread50mm::print()
     if (!fBill) {
         if (fHeader["f_amountcash"].toString().toDouble() > 0.001) {
             p.ltext(__translator.tt(tr("Payment, cash")), 0);
+            p.br();
+            p.ltext(".................................", 0);
             p.rtext(float_str(fHeader["f_amountcash"].toString().toDouble(), 2));
         }
         if (fHeader["f_amountcard"].toString().toDouble() > 0.001) {
             p.ltext(__translator.tt(tr("Payment, card")), 0);
+            p.br();
+            p.ltext(".................................", 0);
             p.rtext(float_str(fHeader["f_amountcard"].toString().toDouble(), 2));
         }
         if (fHeader["f_amountbank"].toString().toDouble() > 0.001) {
             p.ltext(__translator.tt(tr("Bank transfer")), 0);
+            p.br();
+            p.ltext(".................................", 0);
             p.rtext(float_str(fHeader["f_amountbank"].toString().toDouble(), 2));
         }
         p.br();

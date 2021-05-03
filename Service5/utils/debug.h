@@ -2,6 +2,7 @@
 #define DEBUG_H
 
 #include <QObject>
+#include <QElapsedTimer>
 
 #ifdef QT_DEBUG
 #include <QDebug>

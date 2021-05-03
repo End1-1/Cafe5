@@ -501,6 +501,27 @@ QLabel {color:green;}
                 </widget>
                </item>
                <item>
+                <widget class="QWidget" name="leAddress" native="true">
+                 <layout class="QHBoxLayout" name="horizontalLayout_6">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QLineEdit" name="leInfo"/>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
                 <widget class="QWidget" name="wDishButtons" native="true">
                  <layout class="QHBoxLayout" name="horizontalLayout_3">
                   <property name="leftMargin">
@@ -763,8 +784,8 @@ QLabel {color:green;}
             <property name="spacing">
              <number>1</number>
             </property>
-            <item row="1" column="0">
-             <widget class="QPushButton" name="btnP10">
+            <item row="0" column="2">
+             <widget class="QPushButton" name="btn3">
               <property name="minimumSize">
                <size>
                 <width>50</width>
@@ -778,26 +799,7 @@ QLabel {color:green;}
                </size>
               </property>
               <property name="text">
-               <string>+10</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QPushButton" name="btnP1">
-              <property name="minimumSize">
-               <size>
-                <width>50</width>
-                <height>50</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>50</width>
-                <height>50</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>+1</string>
+               <string>3</string>
               </property>
              </widget>
             </item>
@@ -820,8 +822,8 @@ QLabel {color:green;}
               </property>
              </widget>
             </item>
-            <item row="0" column="4">
-             <widget class="QPushButton" name="btnAny">
+            <item row="0" column="0">
+             <widget class="QPushButton" name="btn1">
               <property name="minimumSize">
                <size>
                 <width>50</width>
@@ -835,22 +837,12 @@ QLabel {color:green;}
                </size>
               </property>
               <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset resource="../resources/resources.qrc">
-                <normaloff>:/weight.png</normaloff>:/weight.png</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>32</width>
-                <height>32</height>
-               </size>
+               <string>1</string>
               </property>
              </widget>
             </item>
-            <item row="0" column="3">
-             <widget class="QPushButton" name="btn4">
+            <item row="1" column="0">
+             <widget class="QPushButton" name="btnP10">
               <property name="minimumSize">
                <size>
                 <width>50</width>
@@ -864,26 +856,7 @@ QLabel {color:green;}
                </size>
               </property>
               <property name="text">
-               <string>4</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="2">
-             <widget class="QPushButton" name="btn3">
-              <property name="minimumSize">
-               <size>
-                <width>50</width>
-                <height>50</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>50</width>
-                <height>50</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>3</string>
+               <string>+10</string>
               </property>
              </widget>
             </item>
@@ -906,8 +879,8 @@ QLabel {color:green;}
               </property>
              </widget>
             </item>
-            <item row="0" column="0">
-             <widget class="QPushButton" name="btn1">
+            <item row="1" column="4">
+             <widget class="QPushButton" name="btnP05">
               <property name="minimumSize">
                <size>
                 <width>50</width>
@@ -921,11 +894,30 @@ QLabel {color:green;}
                </size>
               </property>
               <property name="text">
-               <string>1</string>
+               <string>0.5</string>
               </property>
              </widget>
             </item>
-            <item row="1" column="4">
+            <item row="0" column="4">
+             <widget class="QPushButton" name="btn4">
+              <property name="minimumSize">
+               <size>
+                <width>50</width>
+                <height>50</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>50</width>
+                <height>50</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>4</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="5">
              <widget class="QPushButton" name="btnVoid">
               <property name="minimumSize">
                <size>
@@ -954,8 +946,8 @@ QLabel {color:green;}
               </property>
              </widget>
             </item>
-            <item row="1" column="3">
-             <widget class="QPushButton" name="btnP05">
+            <item row="0" column="5">
+             <widget class="QPushButton" name="btnAny">
               <property name="minimumSize">
                <size>
                 <width>50</width>
@@ -969,7 +961,55 @@ QLabel {color:green;}
                </size>
               </property>
               <property name="text">
-               <string>0.5</string>
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="../resources/resources.qrc">
+                <normaloff>:/weight.png</normaloff>:/weight.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>32</width>
+                <height>32</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QPushButton" name="btnP1">
+              <property name="minimumSize">
+               <size>
+                <width>50</width>
+                <height>50</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>50</width>
+                <height>50</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>+1</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QPushButton" name="btnP025">
+              <property name="minimumSize">
+               <size>
+                <width>50</width>
+                <height>50</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>50</width>
+                <height>50</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>0.25</string>
               </property>
              </widget>
             </item>
@@ -1239,8 +1279,8 @@ QLabel {color:green;}
    <slot>removeDish()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>917</x>
-     <y>97</y>
+     <x>993</x>
+     <y>122</y>
     </hint>
     <hint type="destinationlabel">
      <x>498</x>
@@ -1257,6 +1297,22 @@ QLabel {color:green;}
     <hint type="sourcelabel">
      <x>917</x>
      <y>97</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>498</x>
+     <y>359</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnP025</sender>
+   <signal>clicked()</signal>
+   <receiver>Workspace</receiver>
+   <slot>setQty()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>764</x>
+     <y>148</y>
     </hint>
     <hint type="destinationlabel">
      <x>498</x>

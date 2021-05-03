@@ -24,6 +24,8 @@ public:
     static QMap<QString, QJsonObject> fPackages;
 
     static QMap<int, QList<QJsonObject> > fPackagesList;
+
+    static QMap<int, double> fStopList;
 };
 
 #endif // C5MENU_H

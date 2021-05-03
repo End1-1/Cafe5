@@ -89,6 +89,11 @@ void DlgPassword::on_pushButton_clicked()
 
 void DlgPassword::click(const QString &text)
 {
+    if (text == ".") {
+        if (ui->lePassword->text().contains(".")) {
+            return;
+        }
+    }
     ui->lePassword->setText(ui->lePassword->text() + text);
 }
 
@@ -188,4 +193,9 @@ void DlgPassword::on_lePassword_textChanged(const QString &arg1)
 void DlgPassword::on_btnClear_clicked()
 {
     ui->lePassword->clear();
+}
+
+void DlgPassword::on_pushButton_13_clicked()
+{
+    click(".");
 }

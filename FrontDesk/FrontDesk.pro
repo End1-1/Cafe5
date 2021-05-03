@@ -65,6 +65,8 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Reports/cr5cashmovement.cpp \
     ../Reports/cr5cashmovementfilter.cpp \
     ../Reports/cr5cashnames.cpp \
+    ../Reports/cr5consumptionbysalesdraft.cpp \
+    ../Reports/cr5consumptionbysalesfilterdraft.cpp \
     ../Reports/cr5consuptionreason.cpp \
     ../Reports/cr5consuptionreasonfilter.cpp \
     ../Reports/cr5costumerdebts.cpp \
@@ -270,6 +272,8 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Reports/cr5cashmovement.h \
     ../Reports/cr5cashmovementfilter.h \
     ../Reports/cr5cashnames.h \
+    ../Reports/cr5consumptionbysalesdraft.h \
+    ../Reports/cr5consumptionbysalesfilterdraft.h \
     ../Reports/cr5consuptionreason.h \
     ../Reports/cr5consuptionreasonfilter.h \
     ../Reports/cr5costumerdebts.h \
@@ -463,6 +467,7 @@ FORMS += \
     ../Reports/cr5carvisitsfilter.ui \
     ../Reports/cr5cashdetailedfilter.ui \
     ../Reports/cr5cashmovementfilter.ui \
+    ../Reports/cr5consumptionbysalesfilterdraft.ui \
     ../Reports/cr5consuptionreasonfilter.ui \
     ../Reports/cr5costumerdebtsfilter.ui \
     ../Reports/cr5discountstatisticsfilter.ui \

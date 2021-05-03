@@ -29,7 +29,6 @@ QHash<QString, QString> Working::fMultiscancode;
 QMap<QString, double> Working::fUnitDefaultQty;
 QMap<int, Flag> Working::fFlags;
 static QSettings __s(QString("%1\\%2\\%3").arg(_ORGANIZATION_).arg(_APPLICATION_).arg(_MODULE_));
-QHash<int, UncomplectGoods> Working::fUncomplectGoods;
 
 Working::Working(QWidget *parent) :
     QWidget(parent),
@@ -336,11 +335,11 @@ void Working::makeWGoods()
     db[":f_store"] = C5Config::defaultStore();
     db[":f_date"] = QDate::currentDate();
     db[":f_state"] = DOC_STATE_SAVED;
-    db.exec("select g.f_id, g.f_scancode, cp.f_taxname, gg.f_name as f_groupname, g.f_name as f_goodsname, "
+    if (!db.exec("select g.f_id, g.f_scancode, cp.f_taxname, gg.f_name as f_groupname, g.f_name as f_goodsname, "
             "g.f_saleprice, g.f_saleprice2, u.f_name as f_unitname, "
             "gca.f_name as group1, gcb.f_name group2, gcc.f_name as group3, gcd.f_name as group4, "
             "gg.f_taxdept, gg.f_adgcode, sum(s.f_qty*s.f_type) as f_qty, g.f_unit, "
-            "go.f_flaguncomplectfrom, go.f_uncomplectfromqty, g.f_wholenumber, g.f_storeid "
+            "go.f_storeinputbeforesale, g.f_wholenumber, g.f_storeid, g.f_lastinputprice "
             "from a_store_draft s "
             "inner join c_goods g on g.f_storeid=s.f_goods "
             "inner join c_groups gg on gg.f_id=g.f_group "
@@ -349,12 +348,15 @@ void Working::makeWGoods()
             "left join c_goods_classes gcb on gcb.f_id=g.f_group2 "
             "left join c_goods_classes gcc on gcc.f_id=g.f_group3 "
             "left join c_goods_classes gcd on gcd.f_id=g.f_group4 "
-            "left join c_goods_option go on go.f_id=g.f_id and go.f_flaguncomplectfrom>0 "
+            "left join c_goods_option go on go.f_id=g.f_id  "
             "left join c_partners cp on cp.f_id=g.f_supplier "
             "inner join a_header h on h.f_id=s.f_document "
             "where h.f_date<=:f_date and s.f_store=:f_store and h.f_state=:f_state and g.f_enabled=1 "
             "group by g.f_id,gg.f_name,g.f_name,g.f_lastinputprice,g.f_saleprice "
-            "having sum(s.f_qty*s.f_type) > 0 ");
+                 "having sum(s.f_qty*s.f_type) > 0 ")) {
+        C5Message::error(db.fLastError);
+        return;
+    }
 
 
     ui->tblGoods->setRowCount(db.rowCount());
@@ -373,10 +375,10 @@ void Working::makeWGoods()
         g.fAdgCode = db.getString("f_adgcode");
         g.fQty = db.getDouble("f_qty");
         g.fIsService = false;
-        g.fUncomplectFrom = db.getInt("f_flaguncomplectfrom");
-        g.fUncomplectQty = db.getDouble("f_uncomplectfromqty");
+        g.fStoreInputBeforeSale = db.getInt("f_storeinputbeforesale") == 1;
         g.fWholeNumber = db.getInt("f_wholenumber") == 1;
         g.fStoreId = db.getInt("f_storeid");
+        g.fLastInputPrice = db.getDouble("f_lastinputprice");
         fGoods[g.fScanCode] = g;
         fGoodsCodeForPrint[g.fCode.toInt()] = g.fScanCode;
         fGoodsRows[g.fScanCode] = row;
@@ -390,11 +392,11 @@ void Working::makeWGoods()
         row++;
     }
     //services
-    db.exec("select gs.f_id, gs.f_scancode, cp.f_taxname, gr.f_name as f_groupname, gs.f_name as f_goodsname,  "
+    if (!db.exec("select gs.f_id, gs.f_scancode, cp.f_taxname, gr.f_name as f_groupname, gs.f_name as f_goodsname,  "
             "gs.f_saleprice, gs.f_saleprice2, gu.f_name as f_unitname, "
             "gca.f_name as group1, gcb.f_name group2, gcc.f_name as group3, gcd.f_name as group4, "
-            "gr.f_taxdept, gr.f_adgcode, 0 as f_qty, gs.f_unit, go.f_flaguncomplectfrom, go.f_uncomplectfromqty, "
-            "gs.f_service, gs.f_wholenumber "
+            "gr.f_taxdept, gr.f_adgcode, 0 as f_qty, gs.f_unit, go.f_storeinputbeforesale, "
+            "gs.f_service, gs.f_wholenumber, gs.f_lastinputprice, gs.f_storeid "
             "from c_goods gs "
             "left join c_groups gr on gr.f_id=gs.f_group "
             "left join c_units gu on gu.f_id=gs.f_unit "
@@ -403,16 +405,14 @@ void Working::makeWGoods()
             "left join c_goods_classes gcb on gcb.f_id=gs.f_group2 "
             "left join c_goods_classes gcc on gcc.f_id=gs.f_group3 "
             "left join c_goods_classes gcd on gcd.f_id=gs.f_group4 "
-            "left join c_goods_option go on go.f_id=gs.f_id and go.f_flaguncomplectfrom>0 "
-            "where gs.f_enabled=1 and gs.f_service=1 or (gs.f_id in (select f_id from c_goods_option where f_flaguncomplectfrom>0)) "
-            "order by gr.f_name, gca.f_name ");
+            "left join c_goods_option go on go.f_id=gs.f_id  "
+            "where gs.f_enabled=1 and gs.f_service=1  "
+                 "order by gr.f_name, gca.f_name ")) {
+        C5Message::error(db.fLastError);
+        return;
+    }
     //ui->tblGoods->setRowCount(ui->tblGoods->rowCount() + db.rowCount());
     while (db.nextRow()) {
-        if (db.getInt("f_flaguncomplectfrom") > 0) {
-            if (fGoods.contains(db.getString("f_scancode"))) {
-                continue;
-            }
-        }
         ui->tblGoods->setRowCount(ui->tblGoods->rowCount() + 1);
         Goods g;
         g.fScanCode = db.getString("f_scancode");
@@ -426,9 +426,10 @@ void Working::makeWGoods()
         g.fAdgCode = db.getString("f_adgcode");
         g.fQty = db.getDouble("f_qty");
         g.fIsService = db.getInt("f_service") > 0;
-        g.fUncomplectFrom = db.getInt("f_flaguncomplectfrom");
-        g.fUncomplectQty = db.getDouble("f_uncomplectfromqty");
+        g.fStoreId = db.getInt("f_storeid");
+        g.fStoreInputBeforeSale = db.getInt("f_storeinputbeforesale");
         g.fWholeNumber = db.getInt("f_wholenumber") == 1;
+        g.fLastInputPrice = db.getDouble("f_lastinputprice");
         fGoods[g.fScanCode] = g;
         fGoodsCodeForPrint[g.fCode.toInt()] = g.fScanCode;
         for (int i = 0; i < db.columnCount(); i++) {
@@ -439,15 +440,6 @@ void Working::makeWGoods()
         ui->leTotalRetail->setDouble(ui->leTotalRetail->getDouble() + (g.fRetailPrice * g.fQty));
         ui->leTotalWhosale->setDouble(ui->leTotalWhosale->getDouble() + (g.fWhosalePrice * g.fQty));
         row++;
-    }
-
-    fUncomplectGoods.clear();
-    db.exec("select f_id, f_flaguncomplectfrom, f_uncomplectfromqty from c_goods_option where f_flaguncomplectfrom>0 ");
-    while (db.nextRow()) {
-        UncomplectGoods g;
-        g.uncomplectGoods = db.getInt(1);
-        g.qty = db.getDouble(2);
-        fUncomplectGoods.insert(db.getInt(0), g);
     }
 
     db.exec("select m.f_id, g.f_scancode from c_goods_multiscancode m "

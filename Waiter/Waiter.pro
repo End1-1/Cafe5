@@ -152,7 +152,9 @@ SOURCES += \
     ../Reports/cr5commonsales.cpp \
     ../Reports/cr5commonsalesfilter.cpp \
     ../Reports/cr5consumptionbysales.cpp \
+    ../Reports/cr5consumptionbysalesdraft.cpp \
     ../Reports/cr5consumptionbysalesfilter.cpp \
+    ../Reports/cr5consumptionbysalesfilterdraft.cpp \
     ../Reports/cr5consuptionreason.cpp \
     ../Reports/cr5consuptionreasonfilter.cpp \
     ../Reports/cr5costumerdebts.cpp \
@@ -225,10 +227,13 @@ SOURCES += \
     ../Shop/selectprinters.cpp \
     c5printreceiptthread50mm.cpp \
     dlgcarnumber.cpp \
+    dlgguests.cpp \
     dlglistdishspecial.cpp \
     dlglistofpackages.cpp \
     dlglistofshifts.cpp \
     dlgshiftrotation.cpp \
+    dlgsplitorder.cpp \
+    dlgtools.cpp \
         main.cpp \
         dlgface.cpp \
     ../Cafe5/c5database.cpp \
@@ -265,6 +270,8 @@ SOURCES += \
     ../Classes/c5tableview.cpp \
     ../Classes/c5printpreview.cpp \
     ../Classes/c5widget.cpp \
+    wguestorder.cpp \
+    worder.cpp \
     wpaymentoptions.cpp \
     dlgcreditcardlist.cpp \
     dlgdishremovereason.cpp \
@@ -411,7 +418,9 @@ HEADERS += \
     ../Reports/cr5commonsales.h \
     ../Reports/cr5commonsalesfilter.h \
     ../Reports/cr5consumptionbysales.h \
+    ../Reports/cr5consumptionbysalesdraft.h \
     ../Reports/cr5consumptionbysalesfilter.h \
+    ../Reports/cr5consumptionbysalesfilterdraft.h \
     ../Reports/cr5consuptionreason.h \
     ../Reports/cr5consuptionreasonfilter.h \
     ../Reports/cr5costumerdebts.h \
@@ -495,6 +504,7 @@ HEADERS += \
     ../Cafe5/c5sockethandler.h \
     ../Cafe5/c5socketmessage.h \
     ../Cafe5/c5serverhandler.h \
+    dlgguests.h \
     dlglistdishspecial.h \
     dlglistofpackages.h \
     dlglistofshifts.h \
@@ -515,6 +525,8 @@ HEADERS += \
     ../Controls/c5lineedit.h \
     ../Classes/c5printremovedservicethread.h \
     dlgshiftrotation.h \
+    dlgsplitorder.h \
+    dlgtools.h \
     rc.h \
     res.rc \
     ../Controls/c5tablewidget.h \
@@ -527,6 +539,9 @@ HEADERS += \
     ../Classes/c5printpreview.h \
     ../Classes/c5widget.h \
     ../Classes/c5cache.h \
+    stoplist.h \
+    wguestorder.h \
+    worder.h \
     wpaymentoptions.h \
     dlgcreditcardlist.h \
     dlgdishremovereason.h \
@@ -624,6 +639,7 @@ FORMS += \
     ../Reports/cr5cashmovementfilter.ui \
     ../Reports/cr5commonsalesfilter.ui \
     ../Reports/cr5consumptionbysalesfilter.ui \
+    ../Reports/cr5consumptionbysalesfilterdraft.ui \
     ../Reports/cr5consuptionreasonfilter.ui \
     ../Reports/cr5costumerdebtsfilter.ui \
     ../Reports/cr5discountstatisticsfilter.ui \
@@ -652,6 +668,7 @@ FORMS += \
         dlgface.ui \
     ../Cafe5/c5connection.ui \
     ../Cafe5/c5message.ui \
+    dlgguests.ui \
     dlglistdishspecial.ui \
     dlglistofpackages.ui \
     dlglistofshifts.ui \
@@ -660,6 +677,10 @@ FORMS += \
     dlgpayment.ui \
     ../Classes/c5printpreview.ui \
     dlgshiftrotation.ui \
+    dlgsplitorder.ui \
+    dlgtools.ui \
+    wguestorder.ui \
+    worder.ui \
     wpaymentoptions.ui \
     dlgcreditcardlist.ui \
     dlgdishremovereason.ui \

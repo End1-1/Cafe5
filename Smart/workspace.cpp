@@ -8,6 +8,7 @@
 #include "dishtableitemdelegate.h"
 #include "c5storedraftwriter.h"
 #include "calendar.h"
+#include "ce5partner.h"
 #include "supplier.h"
 #include "payment.h"
 #include "dishpackage.h"
@@ -38,9 +39,11 @@ Workspace::Workspace(const QStringList &dbParams) :
         ui->tblDishes->setColumnCount(4);
         break;
     }
+    ui->leInfo->setVisible(false);
     ui->lbPhone->clear();
     fSupplierId = __c5config.defaultTable();
     fSupplierName = "";
+    fCustomer = 0;
 }
 
 Workspace::~Workspace()
@@ -475,7 +478,7 @@ void Workspace::on_btnCheckout_clicked()
                          fSupplierId, QDate::currentDate(), QDate::currentDate(), dateCash,
                          QTime::currentTime(), QTime::currentTime(), fUser.fId, fPhone, 1,
                          ui->leTotal->getDouble(), ui->leTotal->getDouble(),
-                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, "")) {
+                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, fCustomer)) {
         C5Message::error(dw.fErrorMsg);
         db.rollback();
         return;
@@ -577,6 +580,7 @@ void Workspace::on_btnCheckout_clicked()
     ui->tblOrder->setRowCount(0);
     ui->leTotal->setDouble(0);
     ui->lbPhone->clear();
+    ui->leInfo->setVisible(false);
     payment *p = new payment(id, fDBParams);
     p->exec();
     //p->justPrint();
@@ -681,6 +685,36 @@ void Workspace::on_btnCustomer_clicked()
     }
     fPhone = phone;
     ui->lbPhone->setText(QString("%1<br>%2").arg(fPhone).arg(fSupplierName));
+    //check phone number exists
+    C5Database db(fDBParams);
+    db.exec(QString("select * from c_partners where if(length('%1') > 7, f_phone like '%%1', f_id=-1) ").arg(fPhone));
+    if (db.nextRow()) {
+        ui->leInfo->setVisible(true);
+        fCustomer = db.getInt("f_id");
+        ui->leInfo->setText(QString("%1 %2").arg(db.getString("f_contact")).arg(db.getString("f_address")));
+    } else {
+        ui->leInfo->setVisible(false);
+        bool done = false;
+        db[":f_phone"] = fPhone;
+        fCustomer = db.insert("c_partners");
+        do {
+            CE5Partner *ep = new CE5Partner(fDBParams);
+            C5Editor *e = C5Editor::createEditor(fDBParams, ep, fCustomer);
+            QList<QMap<QString, QVariant> > data;
+            if(e->getResult(data)) {
+               ui->leInfo->setVisible(true);
+               fPhone = data[0]["f_phone"].toString();
+               ui->leInfo->setText(QString("%1 %2 %3, %4")
+                                   .arg(data[0]["f_taxname"].toString())
+                       .arg(data[0]["f_contact"].toString())
+                       .arg(data[0]["f_address"].toString())
+                       .arg(data[0]["f_phone"].toString()));
+               ui->lbPhone->setText(QString("%1<br>%2").arg(fPhone).arg(fSupplierName));
+               done = true;
+            }
+            delete e;
+        } while (!done);
+    }
 }
 
 void Workspace::on_btnSupplier_clicked()

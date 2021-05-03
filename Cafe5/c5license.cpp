@@ -22,7 +22,7 @@ bool C5License::isOK()
     qDebug() << key << in << out;
     c.decryptData(key.toUtf8(), out, in);
     qDebug() << key << in << out;
-    if (QDate::currentDate() > QDate::fromString("01.04.2021", "dd.MM.yyyy")) {
+    if (QDate::currentDate() > QDate::fromString("01.06.2021", "dd.MM.yyyy")) {
         return false;
     }
     return true;    

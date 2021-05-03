@@ -156,6 +156,7 @@ void C5Grid::buildQuery()
     }
     fModel->translate(fTranslation);
     refreshData();
+    emit refreshed();
 }
 
 void C5Grid::buildQuery(const QString &query)

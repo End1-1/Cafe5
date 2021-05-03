@@ -21,6 +21,7 @@ C5ReportWidget::C5ReportWidget(const QStringList &dbParams, QWidget *parent) :
         fModel->setFilter(-1, arg1);
         sumColumnsData();
     });
+    connect(this, SIGNAL(refreshed()), this, SLOT(completeRefresh()));
 }
 
 C5ReportWidget::~C5ReportWidget()
@@ -58,4 +59,10 @@ void C5ReportWidget::clearFilter()
     fFilterLineEdit->clear();
     widget()->setVisible(false);
     C5Grid::clearFilter();
+}
+
+void C5ReportWidget::completeRefresh()
+{
+    fModel->setFilter(-1, fFilterLineEdit->text());
+    sumColumnsData();
 }

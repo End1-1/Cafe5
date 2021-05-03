@@ -97,6 +97,7 @@ void CR5CostumerDebts::buildQuery()
         fHavindCondition = " having sum(cd.f_amount)<> 0 ";
         fModel->translate(fTranslation);
         refreshData();
+        emit refreshed();
     } else {
         fSimpleQuery = false;
         fHavindCondition = ""; //" having sum(cd.f_amount) <> 0 ";

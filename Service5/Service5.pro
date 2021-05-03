@@ -29,7 +29,9 @@ SOURCES += \
     socket/sslsocket.cpp \
     socketdata.cpp \
     socketthread.cpp \
+    store/store.cpp \
     store/storemanager.cpp \
+    store/storerecord.cpp \
     utils/logwriter.cpp \
     utils/threadworker.cpp
 
@@ -54,7 +56,9 @@ HEADERS += \
     socket/sslsocket.h \
     socketdata.h \
     socketthread.h \
+    store/store.h \
     store/storemanager.h \
+    store/storerecord.h \
     utils/debug.h \
     utils/logwriter.h \
     utils/threadworker.h

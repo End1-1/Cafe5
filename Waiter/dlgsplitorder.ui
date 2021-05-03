@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DlgSplitOrder</class>
+ <widget class="QDialog" name="DlgSplitOrder">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1243</width>
+    <height>659</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Join/Split</string>
+  </property>
+  <widget class="WOrder" name="o1" native="true">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>100</y>
+     <width>481</width>
+     <height>471</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="WOrder" name="o2" native="true">
+   <property name="geometry">
+    <rect>
+     <x>580</x>
+     <y>110</y>
+     <width>391</width>
+     <height>421</height>
+    </rect>
+   </property>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>WOrder</class>
+   <extends>QWidget</extends>
+   <header location="global">worder.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

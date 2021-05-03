@@ -195,6 +195,8 @@ signals:
 
     void tblDoubleClick(int row, int column, const QList<QVariant> &values);
 
+    void refreshed();
+
 
 };
 

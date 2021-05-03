@@ -1,33 +1,38 @@
-QDialog: {
-border: 1px solid black;
-color: #000000;
-}
-
-QFrame: {
-border: 1px solid black;
-color: #000000;
-}
-
-QWidget {
-border:none;
-}
-
 QDialog {
-border: #000000;
+border: 1px solid black;
+color: #000000;
 }
 
-QWidget {
-background: #eeeeee;
+QFrame#frame {
+border: 1px solid black;
+color: #000000;
 }
 
 QPushButton {
 background: #aaaaaa;
+color: #000000;
 padding: 10px;
+border: 1px solid #eeeeee;
+}
+
+QPushButton:checked {
+background: #00ff00;
+color: #000000;
+padding: 10px;
+border: 1px solid #eeeeee;
+}
+
+QPushButton:pressed {
+background: #ffffff;
+color: #000000
+padding: 10px;
+border: 1px solid #eeeeee;
 }
 
 QToolButton {
 background: #aaaaaa;
 padding: 10px;
+border: 1px solid #eeeeee;
 }
 
 QLineEdit {

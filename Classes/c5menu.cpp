@@ -7,6 +7,7 @@ QMap<QString, QStringList> C5Menu::fDishSpecial;
 QString C5Menu::fMenuVersion;
 QMap<QString, QJsonObject> C5Menu::fPackages;
 QMap<int, QList<QJsonObject> > C5Menu::fPackagesList;
+QMap<int, double> C5Menu::fStopList;
 
 C5Menu::C5Menu()
 {

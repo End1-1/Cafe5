@@ -129,6 +129,7 @@ void CR5CashDetailed::buildQuery()
     fModel->setExternalData(fColumnNameIndex, fTranslation);
     restoreColumnsWidths();
     sum();
+    emit refreshed();
 }
 
 void CR5CashDetailed::refreshData()

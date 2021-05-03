@@ -74,6 +74,8 @@ private:
 
     QList<Dish*> fDishes;
 
+    int fCustomer;
+
     int fTypeFilter;
 
     int fSupplierId;

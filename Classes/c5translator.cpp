@@ -3,8 +3,9 @@
 static C5Translator __tr;
 static QMap<QString, QString> fEn;
 static QMap<QString, QString> fRu;
-static QMap<QString, QString> fEnDish;
-static QMap<QString, QString> fRuDish;
+static QMap<int, QString> fAmDish;
+static QMap<int, QString> fEnDish;
+static QMap<int, QString> fRuDish;
 
 C5Translator::C5Translator()
 {
@@ -22,9 +23,13 @@ void C5Translator::initTranslator(const QStringList &dbParams)
         fEn[db.getString(0)] = db.getString(1);
         fRu[db.getString(0)] = db.getString(2);
     }
-    db.exec("select * from d_translator");
+    db.exec("select d.f_id, d.f_name, t.f_en, t.f_ru "
+            "from d_dish d "
+            "left join d_translator t on d.f_id=t.f_id ");
     while (db.nextRow()) {
-
+        fAmDish.insert(db.getInt("f_id"), db.getString("f_name"));
+        fEnDish.insert(db.getInt("f_id"), db.getString("f_en"));
+        fRuDish.insert(db.getInt("f_id"), db.getString("f_ru"));
     }
 }
 
@@ -45,6 +50,35 @@ QString C5Translator::tt(const QString &value)
     default:
         return "UNKNOWN LANGUAGE " + QString("%1").arg(fLanguage);
     }
+}
+
+QString C5Translator::td(int id) const
+{
+    switch (fLanguage) {
+    case LANG_AM:
+        return fAmDish[id];
+    case LANG_EN:
+        if (fEnDish.contains(id)) {
+            if (fEnDish[id].isEmpty()) {
+                return fAmDish[id];
+            } else {
+                return fEnDish[id];
+            }
+        } else {
+            return fAmDish[id];
+        }
+    case LANG_RU:
+        if (fRuDish.contains(id)) {
+            if (fRuDish[id].isEmpty()) {
+                return fAmDish[id];
+            } else {
+                return fRuDish[id];
+            }
+        } else {
+            return fAmDish[id];
+        }
+    }
+    return "DISH TRANSLATE ERROR";
 }
 
 QString C5Translator::EN(const QString &value)

@@ -26,7 +26,8 @@ bool C5StoreDraftWriter::writeFromShopOutput(const QString &doc, int state, QStr
     QSet<int> stores;
     QList<IGoods> items;
     fDb[":f_header"] = doc;
-    fDb.exec("select f_id, f_store, f_goods, f_qty, f_body, f_tax, f_row, f_discountfactor, f_discountmode from o_goods where f_header=:f_header and f_sign=1");
+    fDb.exec("select f_id, f_store, f_goods, f_qty, f_body, f_tax, f_row, f_discountfactor, f_discountmode, f_price "
+             "from o_goods where f_header=:f_header and f_sign=1");
     while (fDb.nextRow()) {
         IGoods i;
         i.recId = fDb.getString(0);
@@ -34,8 +35,8 @@ bool C5StoreDraftWriter::writeFromShopOutput(const QString &doc, int state, QStr
         i.store = fDb.getInt(1);
         i.goodsId = fDb.getInt(2);
         i.goodsQty = fDb.getDouble(3);
-        i.goodsPrice = 0;
-        i.goodsTotal = 0;
+        i.goodsPrice = fDb.getDouble("f_price");
+        i.goodsTotal = fDb.getDouble("f_price") * fDb.getDouble("f_qty");
         i.tax = fDb.getInt("f_tax");
         i.row = fDb.getInt("f_row");
         i.discountFactor = fDb.getDouble("f_discountfactor");
@@ -65,10 +66,10 @@ bool C5StoreDraftWriter::writeFromShopOutput(const QString &doc, int state, QStr
             writeOGoods(i.recId, doc, i.bodyId, i.store, i.goodsId, i.goodsQty, i.goodsPrice, i.goodsTotal, i.tax, 1, i.row, drid, i.discountFactor, i.discountMode, 0, 0);
         }
         if (state == DOC_STATE_SAVED) {
-            if (!writeOutput(id, err)) {
-                haveRelations(id, err, true);
-                writeAHeader(id, userid, DOC_STATE_DRAFT, DOC_TYPE_STORE_OUTPUT, operatorId, docDate, QDate::currentDate(), QTime::currentTime(), 0, 0, comment, 0, 0);
-            }
+//            if (!writeOutput(id, err)) {
+//                haveRelations(id, err, true);
+//                writeAHeader(id, userid, DOC_STATE_DRAFT, DOC_TYPE_STORE_OUTPUT, operatorId, docDate, QDate::currentDate(), QTime::currentTime(), 0, 0, comment, 0, 0);
+//            }
         }
     }
     return true;
@@ -113,7 +114,9 @@ QString C5StoreDraftWriter::storeDocNum(int docType, int storeId, bool withUpdat
 
     fDb[":f_id"] = storeId;
     fDb.exec("select " + counterField + " + 1 from c_storages where f_id=:f_id for update");
-    fDb.nextRow();
+    if (!fDb.nextRow()) {
+        return "UNKNOWN STORE";
+    }
     int val = fDb.getInt(0);
     if (value > 0) {
         val = value;

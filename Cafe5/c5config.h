@@ -60,6 +60,13 @@
 #define param_shop_autologin_pin2 55
 #define param_recipe_footer_text 56
 #define param_input_doc_fix_price 57
+#define param_shop_print_goods_qty_side_left 58
+#define param_shop_print_goods_qty_side_down 59
+#define param_print_scancode_with_name 60
+#define param_print_paper_width 61
+#define param_print_dish_timeorder 62
+#define param_printer_paper_width_50mm 63
+#define param_printer_parer_width_80mm 64
 
 #define FRONTDESK_WAITER 0
 #define FRONTDESK_SHOP 1
@@ -212,6 +219,10 @@ public:
     static bool waiterLoginAfterPayment();
 
     static int shopPrintVersion();
+
+    static int receiptParepWidth();
+    
+    static int receipPrinterWidth();
 
     static QString getValue(int key);
 

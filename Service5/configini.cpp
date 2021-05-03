@@ -1,4 +1,5 @@
 #include "configini.h"
+#include <QDir>
 
 ConfigIni *ConfigIni::fInstance = nullptr;
 
@@ -7,17 +8,20 @@ ConfigIni::ConfigIni()
 
 }
 
+ConfigIni::~ConfigIni()
+{
+    delete fSettings;
+}
+
 void ConfigIni::init()
 {
-    QSettings::setDefaultFormat(QSettings::IniFormat);
-    QSettings::setPath(QSettings::IniFormat, QSettings::SystemScope, "F");
     fInstance = new ConfigIni();
-    fInstance->fSettings.setValue("A", "aF");
+    fInstance->fSettings = new QSettings(QDir::currentPath() + "/config.ini", QSettings::IniFormat);
 }
 
 QString ConfigIni::value(const QString &key)
 {
-    return fInstance->fSettings.value(key, "").toString();
+    return fInstance->fSettings->value(key, "").toString();
 }
 
 bool ConfigIni::isTrue(const QString &key)

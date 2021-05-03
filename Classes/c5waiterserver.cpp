@@ -13,6 +13,7 @@
 #include "c5utils.h"
 #include "notificationwidget.h"
 #include "c5jsondb.h"
+#include "stoplist.h"
 #include <QDebug>
 #include <QJsonArray>
 #include <QMutex>
@@ -76,13 +77,14 @@ void C5WaiterServer::reply(QJsonObject &o)
         QString query = "select d.f_id as f_dish, mn.f_name as menu_name, p1.f_name as part1, p2.f_name as part2, p2.f_adgCode, d.f_name, \
                 m.f_price, m.f_store, m.f_print1, m.f_print2, d.f_remind, d.f_comment as f_description, \
                 s.f_name as f_storename, d.f_color as dish_color, p2.f_color as type_color, 1 as f_timeorder, d.f_hourlypayment, \
-                d.f_service as f_canservice, d.f_discount as f_candiscount \
+                d.f_service as f_canservice, d.f_discount as f_candiscount, dsl.f_qty as f_stoplistqty \
                 from d_menu m \
                 left join d_menu_names mn on mn.f_id=m.f_menu \
                 left join d_dish d on d.f_id=m.f_dish \
                 left join d_part2 p2 on p2.f_id=d.f_part \
                 left join d_part1 p1 on p1.f_id=p2.f_part \
                 left join c_storages s on s.f_id=m.f_store \
+                left join d_stoplist dsl on dsl.f_dish=d.f_id \
                 where m.f_state=1 \
                 order by d.f_queue, d.f_name ";
         srh.getJsonFromQuery(query, jMenu);
@@ -101,12 +103,15 @@ void C5WaiterServer::reply(QJsonObject &o)
                              "left join d_part2 p2 on p2.f_id=d.f_part "
                              "left join d_part1 p1 on p1.f_id=p2.f_part "
                              "where dp.f_enabled=1 ", jPackagesList);
+        QJsonArray jStopList;
+        srh.getJsonFromQuery("select f_dish, f_qty from d_stoplist", jStopList);
         o["reply"] = 1;
         o["menu"] = jMenu;
         o["menunames"] = jMenuNames;
         o["dishspecial"] = jDishSpecial;
         o["packages"] = jPackages;
         o["packageslist"] = jPackagesList;
+        o["stoplist"] = jStopList;
         srh.fDb.exec("select f_version from s_app where lower(f_app)='menu'");
         if (srh.fDb.nextRow()) {
             o["version"] = srh.fDb.getString(0);
@@ -507,6 +512,9 @@ void C5WaiterServer::reply(QJsonObject &o)
     case sm_checkdiscount_by_visit:
         processCheckDiscountByVisit(o);
         break;
+    case sm_stoplist:
+        processStopList(o);
+        break;
     default:
         o["reply"] = 0;
         o["msg"] = QString("%1: %2").arg(tr("Unknown command for socket handler from dlgface")).arg(cmd);
@@ -620,6 +628,9 @@ void C5WaiterServer::saveOrder(QJsonObject &o, QJsonObject &jh, QJsonArray &ja, 
         db[":f_timeOpen"] = QTime::fromString(jh["f_timeopen"].toString(), FORMAT_TIME_TO_STR);
         db[":f_prefix"] = jh["f_prefix"].toString();
         db.insert("o_header", false);
+        db[":f_id"] = jh["f_id"].toString();
+        db[":f_guests"] = jh["f_guests"].toString().toInt();
+        db.insert("o_header_options", false);
     }
     if (jh["car"].toString().toInt() > 0) {
         db[":f_id"] = jh["f_id"].toString();
@@ -700,6 +711,9 @@ void C5WaiterServer::saveOrder(QJsonObject &o, QJsonObject &jh, QJsonArray &ja, 
         db[":f_creditcardid"] = jh["f_creditcardid"].toString().toInt();
         db[":f_otherid"] = jh["f_otherid"].toString().toInt();
         db.update("o_header", where_id(jh["f_id"].toString()));
+        db[":f_splitted"] = jh["f_splitted"].toString().toInt();
+        db[":f_guests"] = jh["f_guests"].toString().toInt();
+        db.update("o_header_options", where_id(jh["f_id"].toString()));
     }
     db.commit();
 }
@@ -736,6 +750,7 @@ void C5WaiterServer::saveDish(const QJsonObject &h, QJsonObject &o, C5Database &
     db[":f_package"] = o["f_package"].toString().toInt();
     db[":f_candiscount"] = o["f_candiscount"].toString().toInt();
     db[":f_canservice"] = o["f_canservice"].toString().toInt();
+    db[":f_guest"] = o["f_guest"].toString().toInt();
     db.update("o_body", where_id(o["f_id"].toString()));
 }
 
@@ -766,7 +781,11 @@ void C5WaiterServer::processCloseOrder(QJsonObject &o, C5Database &db)
     QMap<int, QString> settings;
     db[":f_id"] = jh["f_hall"].toString().toInt();
     db.exec("select f_settings from h_halls where f_id=:f_id");
-    db.nextRow();
+    if (!db.nextRow()) {
+        o["reply"] = 0;
+        o["msg"] = QString("%1. %2: %3").arg(tr("Get settings failed")).arg("Settings id").arg(jh["f_hall"].toString());
+        return;
+    }
     int settings_id = db.getInt(0);
     db[":f_id"] = jh["f_table"].toString().toInt();
     db.exec("select f_special_config from h_tables where f_id=:f_id");
@@ -1016,7 +1035,7 @@ bool C5WaiterServer::printBill(QJsonObject &jh, QJsonArray &jb, QString &err, C5
     }
     // TODO: CHECK FOR DESTINATION PRINTER AND REDIRECT QUERY
     if (err.isEmpty()) {
-        C5PrintReceiptThread *pr = new C5PrintReceiptThread(C5Config::dbParams(), jh, jb, C5Config::localReceiptPrinter());
+        C5PrintReceiptThread *pr = new C5PrintReceiptThread(C5Config::dbParams(), jh, jb, C5Config::localReceiptPrinter(), C5Config::receiptParepWidth());
         //C5PrintReceiptThread50mm *pr = new C5PrintReceiptThread50mm(C5Config::dbParams(), jh, jb, C5Config::localReceiptPrinter());
         pr->fBill = true;
         pr->start();
@@ -1091,14 +1110,30 @@ bool C5WaiterServer::printReceipt(QJsonObject &jh, QJsonArray &jb, QString &err,
         jh["f_idramphone"] = C5Config::idramPhone();
         C5Database db(C5Config::dbParams());
         QString printerName = "local";
+        int paperWidth = 650, printType = 80;
         db[":f_name"] = jh["receipt_printer"].toString();
         db.exec("select f_id from s_settings_names where lower(f_name)=lower(:f_name)");
         if (db.nextRow()) {
-            db[":f_settings"] = db.getInt(0);
+            int s = db.getInt(0);
+            db[":f_settings"] = s;
             db[":f_key"] = param_local_receipt_printer;
             db.exec("select f_value from s_settings_values where f_settings=:f_settings and f_key=:f_key");
             if (db.nextRow()) {
                 printerName = db.getString(0);
+            }
+            db[":f_settings"] = s;
+            db[":f_key"] = param_print_paper_width;
+            db.exec("select f_value from s_settings_values where f_settings=:f_settings and f_key=:f_key");
+            if (db.nextRow()) {
+                paperWidth = db.getString(0).toInt() == 0 ? 650 : db.getString(0).toInt();
+            }
+            db[":f_settings"] = s;
+            db[":f_key"] = param_printer_paper_width_50mm;
+            db.exec("select f_value from s_settings_values where f_settings=:f_settings and f_key=:f_key");
+            if (db.nextRow()) {
+                if (db.getString(0).toInt() == 1) {
+                    printType = 50;
+                }
             }
         }
 
@@ -1118,9 +1153,18 @@ bool C5WaiterServer::printReceipt(QJsonObject &jh, QJsonArray &jb, QString &err,
             }
         }
 
-        C5PrintReceiptThread *pr = new C5PrintReceiptThread(C5Config::dbParams(), jh, jb, printerName);
-        //C5PrintReceiptThread50mm *pr = new C5PrintReceiptThread50mm(C5Config::dbParams(), jh, jb, printerName);
-        pr->start();
+        switch (printType) {
+        case 50: {
+            C5PrintReceiptThread50mm *pr = new C5PrintReceiptThread50mm(C5Config::dbParams(), jh, jb, printerName, paperWidth);
+            pr->start();
+            break;
+        }
+        case 80: {
+            C5PrintReceiptThread *pr = new C5PrintReceiptThread(C5Config::dbParams(), jh, jb, printerName, paperWidth);
+            pr->start();
+            break;
+        }
+        }
     }
     return err.isEmpty();
 }
@@ -1392,4 +1436,72 @@ void C5WaiterServer::processCheckDiscountByVisit(QJsonObject &o)
         o["current"] = o["visit"].toInt() % db.getInt("f_value");
     }
     o["reply"] = 1;
+}
+
+void C5WaiterServer::processStopList(QJsonObject &o)
+{
+    qDebug() << fIn;
+    C5Database db(C5Config::dbParams());
+    bool r = true;
+    switch (fIn["state"].toInt()) {
+    case sl_set:
+        db[":f_dish"] = fIn["f_dish"].toString().toInt();
+        db.exec("delete from d_stoplist where f_dish=:f_dish");
+        db[":f_dish"] = fIn["f_dish"].toString().toInt();
+        db[":f_qty"] = fIn["f_stopqty"].toDouble();
+        o["f_dish"] = fIn["f_dish"];
+        o["f_qty"] = fIn["f_stopqty"];
+        r =  r && db.insert("d_stoplist", false);
+        break;
+    case sl_add: {
+        QJsonObject jdish = QJsonDocument::fromJson(fIn["dish"].toString().toUtf8()).object();
+        db[":f_dish"] = jdish["f_dish"].toString().toInt();
+        db.startTransaction();
+        db.exec("select f_qty from d_stoplist where f_dish=:f_dish for update");
+        if (db.nextRow()) {
+            double qty = db.getDouble("f_qty");
+            if (qty > 1) {
+                qty -= 1;
+                db[":f_dish"] = jdish["f_dish"].toString().toInt();
+                db[":f_qty"] = qty;
+                db.exec("update d_stoplist set f_qty=:f_qty where f_dish=:f_dish");
+                o["status"] = sl_ok;
+                o["newqty"] = qty;
+            } else {
+                o["status"] = sl_not_enough_qty;
+                o["sl_msg"] = tr("Not enough quantity");
+            }
+        } else {
+            o["status"] = sl_not_in_stoplist;
+        }
+        db.commit();
+        o["dish"] = fIn["dish"];
+        break;
+    }
+    case sl_restore_qty:
+        db.startTransaction();
+        o["dish"] = fIn["dish"];
+        db[":f_dish"] = fIn["dish"].toInt();
+        db.exec("select f_qty from d_stoplist where f_dish=:f_dish for update");
+        if (db.nextRow()) {
+            double qty = db.getDouble("f_qty");
+            qty += fIn["qty"].toDouble();
+            db[":f_dish"] = fIn["dish"].toInt();
+            db[":f_qty"] = qty;
+            db.exec("update d_stoplist set f_qty=:f_qty where f_dish=:f_dish");
+            o["status"] = sl_ok;
+            o["newqty"] = qty;
+        } else {
+            o["status"] = sl_not_in_stoplist;
+        }
+        db.commit();
+        break;
+    }
+    if (r) {
+        o["reply"] = 1;
+    } else {
+        o["reply"] = 0;
+        o["msg"] = db.fLastError;
+    }
+    o["state"] = fIn["state"];
 }

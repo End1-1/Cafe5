@@ -2,6 +2,7 @@
 #include "c5config.h"
 #include "c5utils.h"
 #include "c5shoporder.h"
+#include "c5storedoc.h"
 #include <QThread>
 
 C5Replication::C5Replication() :
@@ -66,6 +67,11 @@ void C5Replication::downloadDataFromServer(const QStringList &src, const QString
     steps = 2;
     if (lastid == 0) {
         emit progress("Initializing");
+        db.exec("select f_id from a_header where f_userid='SL'");
+        if (db.nextRow()) {
+            QString sl = db.getString(0);
+            C5StoreDoc::removeDoc(db.dbParams(), sl, false);
+        }
         steps = tl.count() + 2;
         dr.exec("select max(f_id) from s_syncronize");
         dr.nextRow();

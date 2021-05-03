@@ -50,5 +50,6 @@
         <file>customer.png</file>
         <file>delivery.png</file>
         <file>danger.png</file>
+        <file>stop.png</file>
     </qresource>
 </RCC>

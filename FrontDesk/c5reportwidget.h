@@ -27,6 +27,9 @@ protected:
     virtual void clearFilter();
 
     C5LineEdit *fFilterLineEdit;
+
+private slots:
+    void completeRefresh();
 };
 
 #endif // C5REPORTWIDGET_H

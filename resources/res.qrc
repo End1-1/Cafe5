@@ -100,5 +100,8 @@
         <file>scales.png</file>
         <file>flag.png</file>
         <file>waiter.qss</file>
+        <file>sit.png</file>
+        <file>atom.png</file>
+        <file>tool-box.png</file>
     </qresource>
 </RCC>

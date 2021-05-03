@@ -56,6 +56,9 @@ void C5SocketHandler::send()
         case QVariant::Int:
             jObj[it.key()] = it.value().toInt();
             break;
+        case QVariant::Double:
+            jObj[it.key()] = it.value().toDouble();
+            break;
         default:
             jObj[it.key()] = it.value().toString();
             break;

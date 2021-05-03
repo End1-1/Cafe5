@@ -5,6 +5,7 @@
 
 class CR5OrderMarks : public C5ReportWidget
 {
+    Q_OBJECT
 public:
     CR5OrderMarks(const QStringList &dbParams, QWidget *parent = nullptr);
 

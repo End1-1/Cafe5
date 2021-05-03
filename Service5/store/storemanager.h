@@ -3,6 +3,8 @@
 
 #include <QString>
 
+class Store;
+
 class StoreManager
 {
 public:
@@ -12,6 +14,8 @@ public:
 private:
     QString fDatabaseName;
     static StoreManager *fInstance;
+    static QMap<int, Store*> fStores;
+    static Store *getStore(int id);
 };
 
 #endif // STOREMANAGER_H

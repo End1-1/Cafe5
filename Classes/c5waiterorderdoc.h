@@ -68,7 +68,7 @@ public:
 
     void iSetDouble(const QString &name, double value, int index);
 
-    QString prepayment();
+    QString prepayment(int guest);
 
     void countTotal();
 
@@ -86,9 +86,9 @@ private:
 
     void countTotalV2();
 
-    double countPreTotalV1();
+    double countPreTotalV1(int guest);
 
-    double countPreTotalV2();
+    double countPreTotalV2(int guest);
 
     QString getHotelID(C5Database &db, const QString &source, QString &err);
 

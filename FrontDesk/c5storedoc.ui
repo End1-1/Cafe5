@@ -490,7 +490,7 @@
              <string/>
             </property>
             <property name="icon">
-             <iconset resource="../resources/res.qrc">
+             <iconset resource="../resources/resources.qrc">
               <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
             </property>
            </widget>
@@ -524,7 +524,7 @@
              <string/>
             </property>
             <property name="icon">
-             <iconset resource="../resources/res.qrc">
+             <iconset resource="../resources/resources.qrc">
               <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
             </property>
            </widget>
@@ -1358,6 +1358,7 @@
   <tabstop>chPaid</tabstop>
  </tabstops>
  <resources>
+  <include location="../resources/resources.qrc"/>
   <include location="../resources/res.qrc"/>
  </resources>
  <connections/>

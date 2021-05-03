@@ -21,6 +21,7 @@ struct IGoods {
     double goodsPrice;
     double goodsTotal;
     double discountFactor;
+    double lastInputPrice;
     int discountMode;
     int store;
     int unitId;
@@ -28,6 +29,7 @@ struct IGoods {
     QString taxDept;
     QString taxAdg;
     bool isService;
+    bool writeStoreDocBeforeOutput;
     int storeId;
     IGoods() {changed = false; }
 };

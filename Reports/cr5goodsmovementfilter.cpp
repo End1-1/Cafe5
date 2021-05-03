@@ -13,6 +13,7 @@ CR5GoodsMovementFilter::CR5GoodsMovementFilter(const QStringList &dbParams, QWid
     ui->leStore->setSelector(fDBParams, ui->leStoreName, cache_goods_store).setMultiselection(true);
     ui->leReason->setSelector(fDBParams, ui->leReasonName, cache_store_reason).setMultiselection(true);
     ui->leInOut->setSelector(fDBParams, ui->leInOutName, cache_store_inout);
+    ui->leDocState->setSelector(fDBParams, ui->leDocStateName, cache_doc_state);
 }
 
 CR5GoodsMovementFilter::~CR5GoodsMovementFilter()
@@ -42,5 +43,45 @@ QString CR5GoodsMovementFilter::condition()
     if (!ui->leReason->isEmpty()) {
         cond += " and s.f_reason in (" + ui->leReason->text() + ") ";
     }
+    if (!ui->leDocState->isEmpty()) {
+        cond += " and a.f_state in (" + ui->leDocState->text() + ") ";
+    }
     return cond;
+}
+
+void CR5GoodsMovementFilter::setDate(const QDate &d1, const QDate &d2)
+{
+    ui->deStart->setDate(d1);
+    ui->deEnd->setDate(d2);
+    saveFilter(this);
+}
+
+void CR5GoodsMovementFilter::setDocType(const QString &docType)
+{
+    ui->leDocType->setValue(docType);
+    saveFilter(this);
+}
+
+void CR5GoodsMovementFilter::setStore(const QString &store)
+{
+    ui->leStore->setValue(store);
+    saveFilter(this);
+}
+
+void CR5GoodsMovementFilter::setGoods(const QString &goods)
+{
+    ui->leGoods->setValue(goods);
+    saveFilter(this);
+}
+
+void CR5GoodsMovementFilter::setReason(const QString &reason)
+{
+    ui->leReason->setText(reason);
+    saveFilter(this);
+}
+
+void CR5GoodsMovementFilter::setInOut(int inout)
+{
+    ui->leInOut->setValue(inout);
+    saveFilter(this);
 }

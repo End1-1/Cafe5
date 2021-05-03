@@ -2,6 +2,7 @@
 #define GOODS_H
 
 #include <QString>
+#include <QVariant>
 
 class Goods
 {
@@ -15,14 +16,15 @@ public:
     int fUnitCode;
     double fRetailPrice;
     double fWhosalePrice;
+    double fLastInputPrice;
     int fTaxDept;
     QString fAdgCode;
     double fQty;
     bool fIsService;
-    int fUncomplectFrom;
-    double fUncomplectQty;
+    bool fStoreInputBeforeSale;
     bool fWholeNumber;
     int fStoreId;
 };
+Q_DECLARE_METATYPE(Goods)
 
 #endif // GOODS_H

@@ -20,7 +20,7 @@
       <enum>Qt::NoFocus</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -1178,48 +1178,14 @@
        <string>Options</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_3">
-       <item row="5" column="0">
-        <widget class="QLabel" name="label_4">
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_2">
          <property name="text">
-          <string>Uncomplect qty</string>
+          <string>Store input before sale</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_5">
-         <property name="text">
-          <string>Same store id</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="C5CheckBox" name="chSameStoreId">
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="label_3">
-         <property name="text">
-          <string>Uncomplect from</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="3">
-        <spacer name="horizontalSpacer">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="6" column="1">
+       <item row="5" column="1">
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -1231,6 +1197,13 @@
           </size>
          </property>
         </spacer>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>Only whole number</string>
+         </property>
+        </widget>
        </item>
        <item row="2" column="1">
         <widget class="C5LineEditWithSelector" name="leStoreId">
@@ -1248,13 +1221,6 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
-        <widget class="C5CheckBox" name="chUncomplectIfZero">
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
        <item row="2" column="0">
         <widget class="QLabel" name="label_6">
          <property name="text">
@@ -1262,37 +1228,18 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="1">
-        <widget class="C5LineEditWithSelector" name="leUncomplectGoods">
-         <property name="minimumSize">
+       <item row="4" column="3">
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
           <size>
-           <width>0</width>
-           <height>0</height>
+           <width>40</width>
+           <height>20</height>
           </size>
          </property>
-         <property name="maximumSize">
-          <size>
-           <width>100</width>
-           <height>16777215</height>
-          </size>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="1">
-        <widget class="C5LineEdit" name="leUncomplectGoodsQty">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>100</width>
-           <height>16777215</height>
-          </size>
-         </property>
-        </widget>
+        </spacer>
        </item>
        <item row="2" column="2">
         <widget class="C5LineEditWithSelector" name="leStoreIdName">
@@ -1301,20 +1248,10 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="label_2">
+       <item row="3" column="1">
+        <widget class="C5CheckBox" name="chStoreInputBeforeSale">
          <property name="text">
-          <string>If quantity zero, uncomplect</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="2">
-        <widget class="C5LineEditWithSelector" name="leUncomplectGoodsName"/>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_7">
-         <property name="text">
-          <string>Only whole number</string>
+          <string/>
          </property>
         </widget>
        </item>
@@ -1328,6 +1265,20 @@
          </property>
          <property name="Default" stdset="0">
           <number>0</number>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="C5CheckBox" name="chSameStoreId">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>Same store id</string>
          </property>
         </widget>
        </item>

@@ -305,6 +305,7 @@ void CR5ConsumptionBySales::buildQuery()
     fColumnsVisible["f_qtyinv"] = true;
     fColumnsVisible["f_qtydiff"] = true;
     restoreColumnsWidths();
+    emit refreshed();
 }
 
 void CR5ConsumptionBySales::refreshData()

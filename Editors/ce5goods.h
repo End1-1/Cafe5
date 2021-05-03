@@ -83,8 +83,6 @@ private slots:
 
     void on_btnSetControlSum_clicked();
 
-    void on_chUncomplectIfZero_clicked(bool checked);
-
     void on_btnPinLast_clicked(bool checked);
 
     void on_chSameStoreId_clicked();

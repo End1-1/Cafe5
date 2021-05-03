@@ -19,8 +19,6 @@ int main(int argc, char *argv[])
     }
     RequestManager::init();
 
-    qDebug() << QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
-
     Monitor w;
     w.show();
     return a.exec();

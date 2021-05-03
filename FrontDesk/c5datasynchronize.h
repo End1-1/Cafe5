@@ -19,6 +19,8 @@ public:
 private slots:
     void on_btnSaveSyncTables_clicked();
 
+    void on_btnRevert_clicked();
+
 private:
     Ui::C5DataSynchronize *ui;
 

@@ -382,6 +382,20 @@ int C5Config::shopPrintVersion()
     }
 }
 
+int C5Config::receiptParepWidth()
+{
+    int w = getValue(param_print_paper_width).toInt();
+    return w == 0 ? 650 : w;
+}
+
+int C5Config::receipPrinterWidth()
+{
+    if (getValue(param_printer_paper_width_50mm).toInt() == 1) {
+        return 50;
+    }
+    return 80;
+}
+
 QString C5Config::getValue(int key)
 {
     QMutexLocker ml(&settingsMutex);

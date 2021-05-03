@@ -57,6 +57,8 @@ private:
 
     void processCheckDiscountByVisit(QJsonObject &o);
 
+    void processStopList(QJsonObject &o);
+
     QTcpSocket *fSocket;
 };
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.14.0, 2021-03-01T21:34:46. -->
+<!-- Written by QtCreator 4.14.0, 2021-04-29T11:01:55. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -293,6 +293,7 @@
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:C:/Projects/Cafe5/Smart/Smart.pro</value>
     <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">C:/Projects/Cafe5/Smart/Smart.pro</value>
+    <value type="QString" key="RunConfiguration.Arguments">--config</value>
     <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
     <value type="bool" key="RunConfiguration.UseLibrarySearchPath">true</value>

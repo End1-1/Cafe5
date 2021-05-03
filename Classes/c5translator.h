@@ -18,6 +18,8 @@ public:
 
     QString tt(const QString &value);
 
+    QString td(int id) const;
+
 private:
 
     QStringList fDbParams;

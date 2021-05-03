@@ -7,13 +7,14 @@ class ConfigIni
 {
 public:
     ConfigIni();
+    ~ConfigIni();
     static void init();
     static QString value(const QString &key);
     static bool isTrue(const QString &key);
 
 private:
     static ConfigIni *fInstance;
-    QSettings fSettings;
+    QSettings *fSettings;
 };
 
 #endif // CONFIGINI_H

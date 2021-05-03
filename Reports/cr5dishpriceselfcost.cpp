@@ -33,6 +33,7 @@ void CR5DishPriceSelfCost::buildQuery()
     } else {
         buildQueryV2();
     }
+    emit refreshed();
 }
 
 void CR5DishPriceSelfCost::buildQueryV1()

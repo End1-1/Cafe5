@@ -272,6 +272,10 @@ void DlgPayment::on_btnReceipt_clicked()
             return;
         }
     }
+    if (fOrder->hDouble("f_amountcash") + fOrder->hDouble("f_amountcard") + fOrder->hDouble("f_amountother") + fOrder->hDouble("f_amountbank") < fOrder->hDouble("f_amounttotal")) {
+        C5Message::error(tr("Check the all payment methods"));
+        return;
+    }
     C5SocketHandler *sh = createSocketHandler(SLOT(handleReceipt(QJsonObject)));
     sh->bind("cmd", sm_printreceipt);
     sh->bind("station", hostinfo);

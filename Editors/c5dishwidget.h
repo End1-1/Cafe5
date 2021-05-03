@@ -69,6 +69,8 @@ private slots:
 
     void on_btnMultRecipe_clicked();
 
+    void on_leName_textChanged(const QString &arg1);
+
 private:
     Ui::C5DishWidget *ui;
 

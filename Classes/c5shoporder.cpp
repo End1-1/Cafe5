@@ -143,11 +143,63 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
     }
 
     bool needStoreDoc = false;
+    bool writeStoreBeforeOutput = false;
     for (int i = 0; i < goods.count(); i++) {
         IGoods &g = goods[i];
         if (!g.isService) {
             needStoreDoc = true;
+        }
+        if (g.writeStoreDocBeforeOutput) {
+            writeStoreBeforeOutput = true;
+            needStoreDoc = true;
             break;
+        }
+    }
+
+    if (writeStoreBeforeOutput) {
+        double wsbTotal = 0;
+        QString wsbDocId;
+        QString wsbDocUserNum;
+        QString wsbComment = tr("Input before sale");
+        wsbDocUserNum = dw.storeDocNum(DOC_TYPE_STORE_INPUT, __c5config.defaultStore(), true, 0);
+        if (!dw.writeAHeader(wsbDocId, wsbDocUserNum, DOC_STATE_SAVED, DOC_TYPE_STORE_INPUT, __userid, QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, 0, wsbComment, 0, 0)) {
+            return returnFalse(dw.fErrorMsg, db);
+        }
+        if (!dw.writeAHeaderStore(wsbDocId, __userid, __userid, "", QDate(), 0, __c5config.defaultStore(), 1, "", 0, 0)) {
+            return returnFalse(dw.fErrorMsg, db);
+        }
+        int rownum = 1;
+        for (int i = 0; i < goods.count(); i++) {
+            IGoods &g = goods[i];
+            if (g.writeStoreDocBeforeOutput) {
+                QString wsbDraftId;
+                if (!dw.writeAStoreDraft(wsbDraftId, wsbDocId, __c5config.defaultStore(), 1, g.storeId, g.goodsQty, g.lastInputPrice, g.lastInputPrice * g.goodsQty, DOC_REASON_INPUT, wsbDraftId, rownum++, "")) {
+                    return returnFalse(dw.fErrorMsg, db);
+                }
+            }
+        }
+        QString err;
+        if (!dw.writeInput(wsbDocId, err)) {
+            return returnFalse(err, db);
+        }
+        if (!dw.writeTotalStoreAmount(wsbDocId)) {
+            return returnFalse(dw.fErrorMsg, db);
+        }
+
+        QString wsbCashDoc;
+        QString wsbCashRowId;
+        QString wsbCashUserId = QString("%1").arg(wsbDocUserNum.toInt(), C5Config::docNumDigitsInput(), 10, QChar('0'));
+        if (!dw.writeAHeader(wsbCashDoc, wsbCashUserId, DOC_STATE_SAVED, DOC_TYPE_CASH, __userid, QDate::currentDate(),  QDate::currentDate(), QTime::currentTime(), 0, wsbTotal, wsbComment, 0, 0)) {
+            return returnFalse(dw.fErrorMsg, db);
+        }
+        if (!dw.writeAHeaderCash(wsbCashDoc, 0, __c5config.cashId(), 1, wsbDocId, "")) {
+            return returnFalse(dw.fErrorMsg, db);
+        }
+        if (!dw.writeECash(wsbCashRowId, wsbCashDoc, __c5config.cashId(), -1, wsbComment, wsbTotal, wsbCashRowId, 1)) {
+            return returnFalse(dw.fErrorMsg, db);
+        }
+        if (!dw.writeAHeaderStore(wsbDocId, 0, 0, "", QVariant().toDate(), __c5config.defaultStore(), 0, 0, wsbCashDoc, 0, 0)) {
+            return returnFalse(dw.fErrorMsg, db);
         }
     }
 
@@ -171,6 +223,12 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
         if (!g.isService) {
             if (!dw.writeAStoreDraft(adraftid, storeDocId, __c5config.defaultStore(), -1, g.storeId, g.goodsQty, 0, 0, DOC_REASON_SALE, adraftid, i + 1, "")) {
                 return returnFalse(dw.fErrorMsg, db);
+            }
+        } else {
+            if (g.writeStoreDocBeforeOutput) {
+                if (!dw.writeAStoreDraft(adraftid, storeDocId, __c5config.defaultStore(), -1, g.storeId, g.goodsQty, 0, 0, DOC_REASON_SALE, adraftid, i + 1, "")) {
+                    return returnFalse(dw.fErrorMsg, db);
+                }
             }
         }
         double discamount = 0;
@@ -342,7 +400,6 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
 
     if (!C5Config::localReceiptPrinter().isEmpty()) {
         PrintReceiptGroup p;
-        qDebug() << C5Config::shopPrintVersion();
         switch (C5Config::shopPrintVersion()) {
         case 1: {
             bool p1, p2;

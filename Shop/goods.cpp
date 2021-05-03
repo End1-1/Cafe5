@@ -2,7 +2,7 @@
 
 Goods::Goods()
 {
-    fUncomplectFrom = 0;
+    fStoreInputBeforeSale = false;
     fWholeNumber = false;
     fUnitCode = 0;
     fIsService = false;

@@ -108,49 +108,19 @@ void WOrder::addGoods(const Goods &g)
     Goods gg = fWorking->fGoods[g.fScanCode];
     if (__c5config.controlShopQty()) {
         if (gg.fQty < totalQty) {
-            if (!gg.fIsService && gg.fUncomplectFrom == 0) {
+            if (!gg.fIsService) {
                 C5Message::error(tr("Insufficient quantity") + "<br>" + float_str(totalQty - gg.fQty, 3));
                 return;
             }
-            if (gg.fUncomplectFrom > 0) {
-                if (fWorking->fUncomplectGoods.contains(gg.fCode.toInt())) {
-                    UncomplectGoods ug = fWorking->fUncomplectGoods[gg.fCode.toInt()];
-                    Goods gu = fWorking->fGoods[fWorking->fGoodsCodeForPrint[ug.uncomplectGoods]];
-                    if (C5Message::question(tr("Insufficient quantity, but can uncomplect from ") + "<br>" + gu.fName) == QDialog::Accepted) {
-                        C5StoreDoc d(__c5config.replicaDbParams());
-                        d.setMode(C5StoreDoc::sdOutput);
-                        d.setStore(0, __c5config.defaultStore());
-                        d.setComment(tr("Uncomplect for sale"));
-                        d.addByScancode(gu.fScanCode, "1", "");
-                        d.saveDoc();
-                        double price = d.total() / ug.qty;
-                        C5StoreDoc *di = new C5StoreDoc(__c5config.replicaDbParams());
-                        di->setMode(C5StoreDoc::sdInput);
-                        di->setStore(__c5config.defaultStore(), 0);
-                        di->setComment(tr("Uncomplect for sale"));
-                        di->addByScancode(gg.fScanCode, QLocale().toString(ug.qty), QLocale().toString(price));
-                        di->saveDoc();
-                        di->deleteLater();
-                        fWorking->makeWGoods();
-                        addGoods(g);
-                        return;
-                    } else {
-                        C5Message::error(tr("Insufficient quantity") + "<br>" + float_str(totalQty - gg.fQty, 3));
-                        return;
-                    }
-                } else {
-                    C5Message::error(tr("Insufficient quantity") + "<br>" + float_str(totalQty - gg.fQty, 3));
-                    return;
-                }
+
+            if (gg.fIsService) {
+                addGoodsToTable(g);
+                return;
             } else {
-                if (gg.fIsService) {
-                    addGoodsToTable(g);
-                    return;
-                } else {
-                    C5Message::error(tr("Insufficient quantity") + "<br>" + float_str(totalQty - gg.fQty, 3));
-                    return;
-                }
+                C5Message::error(tr("Insufficient quantity") + "<br>" + float_str(totalQty - gg.fQty, 3));
+                return;
             }
+
         }
     }
     addGoodsToTable(g);
@@ -174,6 +144,7 @@ void WOrder::addGoodsToTable(const Goods &g)
        .arg(g.fName).arg(tr("retail price"))
        .arg(g.fRetailPrice));
     int row = ui->tblGoods->addEmptyRow();
+    ui->tblGoods->item(row, 0)->setData(Qt::UserRole, QVariant::fromValue(g));
     ui->tblGoods->setString(row, 0, g.fCode);
     ui->tblGoods->setString(row, 1, g.fName + " " + g.fScanCode);
     ui->tblGoods->setDouble(row, 2, g.fQty);
@@ -247,6 +218,7 @@ bool WOrder::writeOrder(bool tax)
     QList<IGoods> goods;
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
         IGoods g;
+        Goods gt = ui->tblGoods->item(i, 0)->data(Qt::UserRole).value<Goods>();
         g.taxDept = ui->tblGoods->getString(i, 6);
         g.taxAdg = ui->tblGoods->getString(i, 7);
         g.goodsId = ui->tblGoods->getString(i, 0).toInt();
@@ -259,6 +231,8 @@ bool WOrder::writeOrder(bool tax)
         g.discountFactor = ui->tblGoods->item(i, col_discount_value)->data(Qt::UserRole).toDouble();
         g.discountMode = ui->tblGoods->item(i, col_discount_mode)->data(Qt::UserRole).toInt();
         g.storeId = Working::storeId(g.goodsId);
+        g.writeStoreDocBeforeOutput = gt.fStoreInputBeforeSale;
+        g.lastInputPrice = gt.fLastInputPrice;
         goods.append(g);
     }
     C5ShopOrder so;
@@ -826,6 +800,7 @@ void WOrder::on_btnOpenOrder_clicked()
             ui->tblGoods->setCurrentItem(ui->tblGoods->item(row, 0));
         }
         fPreorderUUID = p->fUUID;
+        fSaleType = SALE_RETAIL;
         countTotal();
         ui->leAdvance->setDouble(adv);
     }

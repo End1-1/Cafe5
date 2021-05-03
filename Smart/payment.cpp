@@ -170,11 +170,13 @@ bool payment::printReceipt(bool printSecond)
     db[":f_id"] = fOrderUUID;
     db.exec("select o.f_prefix, o.f_hallid, t.f_firmname, t.f_address, t.f_dept, t.f_hvhh, t.f_devnum, "
             "t.f_serial, t.f_fiscal, t.f_receiptnumber, t.f_time as f_taxtime, concat(left(u.f_first, 1), '. ', u.f_last) as f_staff, "
-            "o.f_amountcash, o.f_amountcard, o.f_amounttotal, o.f_print, o.f_comment, ht.f_name as f_tablename "
+            "o.f_amountcash, o.f_amountcard, o.f_amounttotal, o.f_print, o.f_comment, ht.f_name as f_tablename, "
+            "p.f_contact, p.f_phone, p.f_address "
             "from o_header o "
             "left join o_tax t on t.f_id=o.f_id "
             "left join s_user u on u.f_id=o.f_staff "
             "left join h_tables ht on ht.f_id=o.f_table "
+            "left join c_partners p on p.f_id=o.f_partner "
             "where o.f_id=:f_id");
     if (!db.nextRow()) {
         C5Message::error(tr("Invalid order number"));
@@ -300,12 +302,17 @@ bool payment::printReceipt(bool printSecond)
         p.rtext(float_str(db.getDouble("f_amountcard"), 2));
     }
 
-    if (db.getString("f_comment").length() > 0) {
+    if (db.getString("f_phone").length() > 0) {
         p.br();
         p.br();
         p.ltext(tr("Customer"), 0);
         p.br();
-        p.ltext(db.getString("f_comment"), 0);
+        p.ltext(db.getString("f_phone"), 0);
+        p.br();
+        p.ltext(db.getString("f_address"), 0);
+        p.br();
+        p.ltext(db.getString("f_contact"), 0);
+        p.br();
     }
 
     p.setFontSize(20);

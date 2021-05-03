@@ -565,7 +565,7 @@ INSERT INTO `a_type` (`f_id`, `f_name`, `f_counter`) VALUES ('9', 'Վաճառք�
 update s_app set f_version='43' where f_app='DB';
 alter table o_header drop column f_flags;
 create table o_header_flags (f_id char(36) primary key, f_1 tinyint , f_2 tinyint , f_3 tinyint , f_4 tinyint , f_5 tinyint );
-create table o_flags (f_id tinyint  primary key, f_name tinytext, f_enabled tinyint, f_field tinytext );
+create table o_flags (f_id tinyint  primary key, f_name tinytext, f_enabled tinyint, f_field tinytext);
 insert into o_flags values (1, 'Flag #1', 0, 'f_1'), (2, 'Flag #2', 0, 'f_2'), (3, 'Flag #3', 0, 'f_3'), (4, 'Flag #4', 0, 'f_4'), (5, 'Flag #5', 0, 'f_5');
 INSERT INTO `s_syncronize_in` (`f_table`) VALUES ('o_flags');
 update s_syncronize_in set f_id=100 where f_id=8;
@@ -577,3 +577,16 @@ update s_app set f_version='44' where f_app='DB';
 alter table d_dish add f_hourlypayment int;
 UPDATE `s_app` SET `f_version` = '1.1.5.79' WHERE (`f_app` = 'WAITER');
 alter table o_body add column f_canservice tinyint, add column f_candiscount tinyint;
+
+/* db - 45 */
+update s_app set f_version='45' where f_app='DB';
+alter table c_goods_option add column f_storeinputbeforesale tinyint, drop column  f_flaguncomplectfrom, drop column f_uncomplectfromqty;
+UPDATE `s_app` SET `f_version` = '1.1.5.81' WHERE (`f_app` = 'WAITER');
+alter table op_header add column f_state tinyint, add column f_total decimal(14,2);
+
+/* db - 46 */
+update s_app set f_version='46' where f_app='DB';
+create table o_header_options (f_id char(36) primary key, f_guests tinyint);
+ALTER TABLE `o_body` ADD COLUMN `f_guest` TINYINT NULL AFTER `f_candiscount`;
+alter table o_Header_options add column f_splitted tinyint;
+create table d_stoplist (f_dish integer primary key, f_qty decimal(14,2));

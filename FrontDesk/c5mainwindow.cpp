@@ -12,6 +12,7 @@
 #include "cr5usersgroups.h"
 #include "cr5materialinstoreuncomplect.h"
 #include "cr5consumptionbysales.h"
+#include "cr5consumptionbysalesdraft.h"
 #include "cr5storereason.h"
 #include "cr5carvisits.h"
 #include "cr5documents.h"
@@ -548,6 +549,11 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
     case cp_t3_move_uncomplected:
         createTab<CR5MaterialMoveUncomplect>(dbParams);
         break;
+
+    case cp_t3_count_output_of_sale_draft:
+        createTab<CR5ConsumptionBySalesDraft>(dbParams);
+        break;
+
     case cp_t4_part1:
         createTab<CR5DishPart1>(dbParams);
         break;
@@ -765,6 +771,7 @@ void C5MainWindow::setDB(const QString &dbname)
         addTreeL3Item(l, cp_t3_sale_from_store_total, tr("Detailed movement in the storage"), ":/graph.png");
         addTreeL3Item(l, cp_t3_tstore_extra, tr("T-account, extra"), ":/documents.png");
         addTreeL3Item(l, cp_t2_count_output_of_sale, tr("Consumption of goods based on sales"), ":/goods.png");
+        addTreeL3Item(l, cp_t3_count_output_of_sale_draft, tr("Consumption of goods based on sales, draft"), ":/goods.png");
         addTreeL3Item(l, cp_t3_consuption_reason, tr("Reason for consuption"), ":/goods.png");
         addTreeL3Item(l, cp_t3_sales_common, tr("Sales by tickets"), ":/graph.png");
         addTreeL3Item(l, cp_t3_sale_effectiveness, tr("Effectiveness of sales"), ":/effectiveness.png");

@@ -101,7 +101,7 @@ void Sales::refreshTotal()
             "from o_header oh "
             "left join b_history h on h.f_id=oh.f_id "
             "left join b_cards_discount d on d.f_id=h.f_card "
-            "left join c_partners c on c.f_id=d.f_client "
+            "left join c_partners c on c.f_id=oh.f_partner "
             "left join o_tax ot on ot.f_id=oh.f_id "
             "left join o_sale_type os on os.f_id=oh.f_saletype "
             "left join s_user u on u.f_id=oh.f_staff "

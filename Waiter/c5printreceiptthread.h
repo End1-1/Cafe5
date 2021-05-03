@@ -11,7 +11,8 @@ class C5PrintReceiptThread : public QThread
     Q_OBJECT
 
 public:
-    C5PrintReceiptThread(const QStringList &dbParams, const QJsonObject &header, const QJsonArray &body, const QString &printer, QObject *parent = nullptr);
+    C5PrintReceiptThread(const QStringList &dbParams, const QJsonObject &header, const QJsonArray &body,
+                         const QString &printer, int paperWidth, QObject *parent = nullptr);
 
     bool fBill;
 
@@ -26,6 +27,8 @@ private:
     QString fPrinter;
 
     QStringList fDbParams;
+
+    int fPaperWidth;
 
 private slots:
     void print();

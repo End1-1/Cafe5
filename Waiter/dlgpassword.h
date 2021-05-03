@@ -59,6 +59,8 @@ private slots:
 
     void on_btnClear_clicked();
 
+    void on_pushButton_13_clicked();
+
 private:
     Ui::DlgPassword *ui;
 

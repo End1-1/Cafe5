@@ -1,5 +1,6 @@
 #include "c5printservicethread.h"
 #include "c5printing.h"
+#include "c5config.h"
 #include "c5utils.h"
 #include <QApplication>
 
@@ -47,7 +48,7 @@ void C5PrintServiceThread::print(const QString &printer, const QString &side)
     QFont font(qApp->font());
     font.setPointSize(30);
     C5Printing p;
-    p.setSceneParams(650, 2800, QPrinter::Portrait);
+    p.setSceneParams(__c5config.receiptParepWidth(), 2800, QPrinter::Portrait);
     p.setFont(font);
 
     p.ctext(tr("New order"));
@@ -80,7 +81,11 @@ void C5PrintServiceThread::print(const QString &printer, const QString &side)
             continue;
         }
         storages << o["f_storename"].toString();
-        p.ltext(QString("[%1] %2").arg(o["f_timeorder"].toString()).arg(o["f_name"].toString()), 0);
+        if (__c5config.getValue(param_print_dish_timeorder).toInt() == 1) {
+            p.ltext(QString("[%1] %2").arg(o["f_timeorder"].toString()).arg(o["f_name"].toString()), 0);
+        } else {
+            p.ltext(QString("%1").arg(o["f_name"].toString()), 0);
+        }
         p.br();
         if (o["f_comment"].toString().length() > 0) {
             p.ltext(o["f_comment"].toString(), 0);

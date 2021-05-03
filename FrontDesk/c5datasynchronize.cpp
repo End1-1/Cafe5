@@ -42,7 +42,6 @@ void C5DataSynchronize::on_btnSaveSyncTables_clicked()
         ds.execDirect(QString("drop trigger if exists %1_ai").arg(ds.getString(0)));
         ds.execDirect(QString("drop trigger if exists %1_bu").arg(ds.getString(0)));
         ds.execDirect(QString("drop trigger if exists %1_bd").arg(ds.getString(0)));
-        ds.execDirect(QString("alter table %1 drop column a").arg(ds.getString(0)));
     }
     if (ui->leAddSyncTable->text().toLower() == "clear") {
         c5logf(QString("Clear synchronization on  %1").arg(fDBParams.at(4)), logFileName);
@@ -108,7 +107,13 @@ void C5DataSynchronize::dropTriggers(C5Database &ds)
         ds.execDirect(QString("drop trigger if exists %1_ai").arg(ds.getString(0)));
         ds.execDirect(QString("drop trigger if exists %1_bu").arg(ds.getString(0)));
         ds.execDirect(QString("drop trigger if exists %1_bd").arg(ds.getString(0)));
-        ds.execDirect(QString("alter table %1 drop column a").arg(ds.getString(0)));
     }
 }
 
+
+void C5DataSynchronize::on_btnRevert_clicked()
+{
+    C5Database ds(fDBParams);
+    dropTriggers(ds);
+    C5Message::error(tr("Synchronization removed"));
+}
