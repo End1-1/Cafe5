@@ -10,7 +10,7 @@ class DlgOrder;
 }
 
 class C5User;
-class C5WaiterOrderDoc;
+class C5OrderDriver;
 
 class DlgOrder : public C5Dialog
 {
@@ -23,6 +23,8 @@ public:
 
     static void openTable(const QJsonObject &table, C5User *user);
 
+    void saveOrder();
+
 protected:
     virtual void accept();
 
@@ -31,11 +33,11 @@ protected:
 private:
     Ui::DlgOrder *ui;
 
+    QDateTime fOpenDateTime;
+
     C5User *fUser;
 
     int fCarNumber;
-
-    C5WaiterOrderDoc *fOrder;
 
     QString fMenuName;
 
@@ -44,6 +46,8 @@ private:
     QTimer fTimer;
 
     int fTimerCounter;
+
+    C5OrderDriver *fOrderDriver;
 
     void load(int table);
 
@@ -54,8 +58,6 @@ private:
     void changeQty(double qty);
 
     void itemsToTable();
-
-    void saveOrder();
 
     void setServiceLabel();
 
@@ -157,7 +159,11 @@ private slots:
     void on_btnSit_clicked();
 
     void on_btnJoinTable_clicked();
+
     void on_btnTools_clicked();
+
+    void on_btnSetReserve_clicked();
+
 };
 
 #endif // DLGORDER_H

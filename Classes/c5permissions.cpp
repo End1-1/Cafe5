@@ -54,6 +54,7 @@ void C5Permissions::init(C5Database &db)
               << cp_t3_storage_uncomplected
               << cp_t3_move_uncomplected
               << cp_t3_count_output_of_sale_draft
+              << cp_t3_custom_reports
 
               << cp_t4_menu
               << cp_t4_menu_names

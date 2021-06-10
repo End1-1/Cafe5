@@ -13,17 +13,12 @@ Authentication::~Authentication()
     __debug_log("~Authentication");
 }
 
-void Authentication::handle(const QByteArray &data, const QHash<QString, DataAddress> &dataMap)
+bool Authentication::handle(const QByteArray &data, const QHash<QString, DataAddress> &dataMap)
 {
     JsonHandler jh;
     Database db;
     if (!db.open("127.0.0.1", "server5", "root", "osyolia")) {
-        jh["message"] = "Database error: " + db.lastDbError() + " #" + db.fDatabaseNumber;
-        fHttpHeader.setResponseCode(HTTP_INTERNAL_SERVER_ERROR);
-        fHttpHeader.setContentLength(jh.length());
-        fResponse.append(fHttpHeader.toString());
-        fResponse.append(jh.toString());
-        return;
+        return setInternalServerError("Database error: " + db.lastDbError() + " #" + db.fDatabaseNumber);
     }
     jh["db"] = db.fDatabaseNumber;
     db[":fphone"] = getData(data, dataMap["phone"]);
@@ -36,14 +31,10 @@ void Authentication::handle(const QByteArray &data, const QHash<QString, DataAdd
         fResponse.append(fHttpHeader.toString());
         fResponse.append(jh.toString());
     } else {
-        jh["message"] = "Authentication failed.";
-        fHttpHeader.setResponseCode(HTTP_FORBIDDEN);
-        fHttpHeader.setContentLength(jh.length());
-        fResponse.append(fHttpHeader.toString());
-        fResponse.append(jh.toString());
-        return;
+        return setForbiddenError("Authentication failed.");
     }
     db.close();
+    return true;
 }
 
 bool Authentication::validateData(const QByteArray &data, const QHash<QString, DataAddress> &dataMap)

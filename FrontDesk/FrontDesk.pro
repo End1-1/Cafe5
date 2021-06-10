@@ -58,6 +58,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Editors/ce5ordermark.cpp \
     ../Editors/ce5packagelist.cpp \
     ../Editors/ce5storereason.cpp \
+    ../Reports/c5customfilter.cpp \
     ../Reports/cr5carvisits.cpp \
     ../Reports/cr5carvisitsfilter.cpp \
     ../Reports/cr5cashdetailed.cpp \
@@ -71,6 +72,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Reports/cr5consuptionreasonfilter.cpp \
     ../Reports/cr5costumerdebts.cpp \
     ../Reports/cr5costumerdebtsfilter.cpp \
+    ../Reports/cr5custom.cpp \
     ../Reports/cr5debtstopartner.cpp \
     ../Reports/cr5discountstatisics.cpp \
     ../Reports/cr5discountstatisticsfilter.cpp \
@@ -265,6 +267,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Editors/ce5ordermark.h \
     ../Editors/ce5packagelist.h \
     ../Editors/ce5storereason.h \
+    ../Reports/c5customfilter.h \
     ../Reports/cr5carvisits.h \
     ../Reports/cr5carvisitsfilter.h \
     ../Reports/cr5cashdetailed.h \
@@ -278,6 +281,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Reports/cr5consuptionreasonfilter.h \
     ../Reports/cr5costumerdebts.h \
     ../Reports/cr5costumerdebtsfilter.h \
+    ../Reports/cr5custom.h \
     ../Reports/cr5debtstopartner.h \
     ../Reports/cr5discountstatisics.h \
     ../Reports/cr5discountstatisticsfilter.h \
@@ -464,6 +468,7 @@ FORMS += \
     ../Editors/ce5ordermark.ui \
     ../Editors/ce5packagelist.ui \
     ../Editors/ce5storereason.ui \
+    ../Reports/c5customfilter.ui \
     ../Reports/cr5carvisitsfilter.ui \
     ../Reports/cr5cashdetailedfilter.ui \
     ../Reports/cr5cashmovementfilter.ui \

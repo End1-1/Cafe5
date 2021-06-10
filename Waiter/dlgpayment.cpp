@@ -56,6 +56,7 @@ int DlgPayment::payment(C5User *user, C5WaiterOrderDoc *order)
     d->ui->btnSelfCost->setVisible(d->fUser->check(cp_t5_pay_breakfast));
     d->fOrder = order;
     d->setRoomComment();
+    d->setDiscountComment();
     d->setComplimentary();
     d->setSelfCost();
     d->ui->tblInfo->setString(1, 0, order->hString("f_tablename"));
@@ -103,22 +104,28 @@ void DlgPayment::handleDiscount(const QJsonObject &obj)
         C5Message::error(obj["msg"].toString());
         return;
     }
-    switch (obj["type"].toInt()) {
+    fOrder->hSetString("f_bonustype", obj["card"].toObject()["f_cardtype"].toString());
+    fOrder->hSetString("f_bonusid", obj["card"].toObject()["f_cardid"].toString());
+    fOrder->hSetString("f_bonusvalue", obj["card"].toObject()["f_cardvalue"].toString());
+    fOrder->hSetString("f_bonusholder", obj["card"].toObject()["f_cardholder"].toString());
+    fOrder->hSetString("f_bonusname", obj["card"].toObject()["f_cardname"].toString());
+
+    switch (obj["card"].toObject()["f_cardtype"].toString().toInt()) {
     case CARD_TYPE_DISCOUNT:
-        fOrder->hSetString("f_bonustype", obj["card"].toObject()["f_type"].toString());
-        fOrder->hSetString("f_bonusid", obj["card"].toObject()["f_id"].toString());
-        switch (obj["card"].toObject()["f_type"].toString().toInt()) {
-        case CARD_TYPE_DISCOUNT:
-            fOrder->hSetDouble("f_discountfactor", obj["card"].toObject()["f_value"].toString().toDouble() / 100.0);
-            for (int i = 0; i < fOrder->fItems.count(); i++) {
-                fOrder->iSetString("f_discount", fOrder->hString("f_discountfactor"), i);
-            }
-            break;
+        fOrder->hSetDouble("f_discountfactor", obj["card"].toObject()["f_cardvalue"].toString().toDouble() / 100.0);
+        for (int i = 0; i < fOrder->fItems.count(); i++) {
+            fOrder->iSetString("f_discount", fOrder->hString("f_discountfactor"), i);
         }
-        fOrder->countTotal();
+        break;
+    fOrder->countTotal();
+    break;
+    case CARD_TYPE_ACCUMULATIVE:
+
         break;
     }
+    fOrder->countTotal();
     setPaymentInfo();
+    setDiscountComment();
 }
 
 void DlgPayment::handleError(int err, const QString &msg)
@@ -387,6 +394,19 @@ void DlgPayment::setCLComment()
     }
 }
 
+void DlgPayment::setDiscountComment()
+{
+    bool v = (fOrder->hInt("f_bonusid") > 0);
+    ui->leDiscountComment->setVisible(v);
+    if (v) {
+        ui->leDiscountComment->setText(QString("%1, N%2, %3%, %4")
+                                       .arg(fOrder->hString("f_bonusname"))
+                                       .arg(fOrder->hString("f_bonusid"))
+                                       .arg(fOrder->hDouble("f_bonusvalue"))
+                                       .arg(fOrder->hString("f_bonusholder")));
+    }
+}
+
 void DlgPayment::setComplimentary()
 {
     if (fOrder->hInt("f_otherid") == PAYOTHER_COMPLIMENTARY) {
@@ -604,6 +624,9 @@ void DlgPayment::on_btnDiscount_clicked()
     if (!ok) {
         return;
     }
+    code = code.replace("?", "");
+    code = code.replace(";", "");
+    code = code.replace(":", "");
     if (code.isEmpty()) {
         C5Message::error(tr("Card code is empty"));
         return;

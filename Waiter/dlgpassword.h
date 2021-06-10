@@ -26,6 +26,10 @@ public:
 
     static bool getAmount(const QString &title, double &amount, bool defaultAmount = false);
 
+    static bool getString(const QString &title, QString &str);
+
+    static bool getPassword(const QString &title, QString &str);
+
 private slots:
     void handlePassword(const QJsonObject &obj);
 

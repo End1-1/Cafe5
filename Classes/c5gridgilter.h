@@ -20,6 +20,11 @@ public:
 
     static bool filter(C5FilterWidget *filterWidget, QString &condition, QHash<QString, bool> &showColumns, QHash<QString, QString> &colTranslation);
 
+protected:
+    virtual void keyControlPlusEnter() override;
+
+    virtual void keyAlterPlusEnter() override;
+
 private slots:
     void on_btnCancel_clicked();
 

@@ -7,6 +7,7 @@
 RequestHandler::RequestHandler()
 {
     fIdle = false;
+    fContentType = ContentType::MultipartFormData;
 }
 
 RequestHandler::~RequestHandler()
@@ -14,12 +15,13 @@ RequestHandler::~RequestHandler()
     __debug_log("~RequestHandler");
 }
 
-RequestHandler *RequestHandler::route(const QString &remoteHost, const QString &r, const QByteArray &data, const QHash<QString, DataAddress> &dataMap)
+RequestHandler *RequestHandler::route(const QString &remoteHost, const QString &r, const QByteArray &data, const QHash<QString, DataAddress> &dataMap, ContentType contentType)
 {
     QElapsedTimer et;
     et.start();
     __debug_log("New request from " + remoteHost);
     RequestHandler *rh = RequestManager::getHandler(r);
+    rh->fContentType = contentType;
     if (rh->validateData(data, dataMap)) {
         rh->handle(data, dataMap);
     }
@@ -51,10 +53,29 @@ void RequestHandler::setIdle(bool v)
     }
 }
 
-void RequestHandler::setResponse(int responseCode, const QString &data)
+bool RequestHandler::setResponse(int responseCode, const QString &data)
 {
     fHttpHeader.setResponseCode(responseCode);
     fHttpHeader.setContentLength(data.toUtf8().length());
     fResponse.append(fHttpHeader.toString());
-    fResponse.append(data);
+    fResponse.append(data.toUtf8());
+    return true;
+}
+
+bool RequestHandler::setInternalServerError(const QString &msg)
+{
+    setResponse(HTTP_INTERNAL_SERVER_ERROR, msg);
+    return false;
+}
+
+bool RequestHandler::setForbiddenError(const QString &msg)
+{
+    setResponse(HTTP_FORBIDDEN, msg);
+    return false;
+}
+
+bool RequestHandler::setDataValidationError(const QString &msg)
+{
+    setResponse(HTTP_DATA_VALIDATION_ERROR, msg);
+    return false;
 }

@@ -69,6 +69,30 @@ bool DlgPassword::getAmount(const QString &title, double &amount, bool defaultAm
     return result;
 }
 
+bool DlgPassword::getString(const QString &title, QString &str)
+{
+    DlgPassword *d = new DlgPassword();
+    d->ui->label->setText(title);
+    d->ui->lePassword->setEchoMode(QLineEdit::Normal);
+    d->ui->lePassword->setMaxLength(20);
+    bool result = d->exec() == QDialog::Accepted;
+    str = d->ui->lePassword->text();
+    delete d;
+    return result;
+}
+
+bool DlgPassword::getPassword(const QString &title, QString &str)
+{
+    DlgPassword *d = new DlgPassword();
+    d->ui->label->setText(title);
+    d->ui->lePassword->setEchoMode(QLineEdit::Password);
+    d->ui->lePassword->setMaxLength(20);
+    bool result = d->exec() == QDialog::Accepted;
+    str = d->ui->lePassword->text();
+    delete d;
+    return result;
+}
+
 void DlgPassword::handlePassword(const QJsonObject &obj)
 {
     sender()->deleteLater();

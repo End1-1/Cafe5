@@ -46,6 +46,10 @@ protected:
 
     virtual void keyPressEvent(QKeyEvent *e);
 
+    virtual void keyControlPlusEnter();
+
+    virtual void keyAlterPlusEnter();
+
 protected slots:
     void handleError(int err, const QString &msg);
 

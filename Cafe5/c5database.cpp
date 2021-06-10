@@ -23,6 +23,7 @@ C5Database::C5Database() :
     QObject()
 {
     fQuery = nullptr;
+    init();
 }
 
 C5Database::C5Database(const QStringList &dbParams) :

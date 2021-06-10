@@ -252,6 +252,7 @@ void C5StoreDoc::setMode(C5StoreDoc::STORE_DOC sd)
     ui->lePaymentName->setVisible(false);
     ui->chPaid->setVisible(false);
     ui->grComplectation->setVisible(false);
+    ui->chWholeGroup->setVisible(false);
     fDocType = sd;
     bool paymentVisible = !C5Config::noCashDocStore();
     switch (fDocType) {
@@ -268,12 +269,14 @@ void C5StoreDoc::setMode(C5StoreDoc::STORE_DOC sd)
         ui->leCashName->setVisible(false);
         ui->leCash->setVisible(false);
         ui->deCashDate->setVisible(false);
+        ui->chWholeGroup->setVisible(true);
         break;
     case DOC_TYPE_STORE_OUTPUT:
         ui->lbCashDoc->setVisible(false);
         ui->leCashName->setVisible(false);
         ui->leCash->setVisible(false);
         ui->deCashDate->setVisible(false);
+        ui->chWholeGroup->setVisible(true);
         break;
     case DOC_TYPE_COMPLECTATION:
         ui->grComplectation->setVisible(true);
@@ -445,6 +448,40 @@ bool C5StoreDoc::allowChangeDatabase()
 void C5StoreDoc::addByScancode(const QString &code, const QString &qty, QString price)
 {
     C5Database db(fDBParams);
+    if (ui->chWholeGroup->isChecked()) {
+        db[":f_scancode"] = code;
+        db.exec("select f_group from c_goods where f_scancode=:f_scancode");
+        if (!db.nextRow()) {
+            C5Message::error(tr("Scancode doesnt exists"));
+            return;
+        }
+        db[":f_store"] = ui->leStoreOutput->getInteger();
+        db[":f_date"] = ui->deDate->date();
+        db[":f_group"] = db.getInt("f_group");
+        db.exec("select g.f_id as f_code,ss.f_name as f_storage,gg.f_name as f_group, "
+                "concat(g.f_name, ' ', coalesce(g.f_scancode, '')) as f_goods,sum(s.f_qty*s.f_type) as f_qty, "
+                "u.f_name as f_unitname "
+                "from a_store s left join c_goods g on g.f_id=s.f_goods "
+                "inner join c_storages ss on ss.f_id=s.f_store "
+                "inner join c_groups gg on gg.f_id=g.f_group "
+                "left join c_units u on u.f_id=g.f_unit "
+                "inner join a_header h on h.f_id=s.f_document  "
+                "where h.f_date<=:f_date and h.f_state=1 and gg.f_id=:f_group and ss.f_id=:f_store "
+                "group by g.f_id,ss.f_name,gg.f_name,g.f_name,u.f_name "
+                "having sum(s.f_qty*s.f_type) <> 0 ");
+        while (db.nextRow()) {
+            int row = addGoodsRow();
+            ui->tblGoods->setInteger(row, 3, db.getInt("f_code"));
+            ui->tblGoods->setString(row, 4, db.getString("f_goods"));
+            ui->tblGoods->lineEdit(row, 5)->setDouble(db.getDouble("f_qty"));
+            ui->tblGoods->setString(row, 6, db.getString("f_unitname"));
+            ui->tblGoods->item(row, 4)->setSelected(true);
+            fCanChangeFocus = false;
+        }
+        markGoodsComplited();
+        return;
+    }
+
     db[":f_scancode"] = code;
     db.exec("select gg.f_scancode, gg.f_id, concat(gg.f_name, ' ', gg.f_scancode) as f_name, gu.f_name as f_unitname, gg.f_saleprice, "
             "gr.f_taxdept, gr.f_adgcode, gg.f_lastinputprice "

@@ -1,0 +1,93 @@
+#include "c5customfilter.h"
+#include "ui_c5customfilter.h"
+#include "c5dateedit.h"
+#include <QListWidgetItem>
+#include <QRegularExpression>
+#include <QLabel>
+#include <QLayoutItem>
+
+C5CustomFilter::C5CustomFilter(const QStringList &dbParams) :
+    C5Dialog(dbParams),
+    ui(new Ui::C5CustomFilter)
+{
+    ui->setupUi(this);
+}
+
+C5CustomFilter::~C5CustomFilter()
+{
+    delete ui;
+}
+
+void C5CustomFilter::setQueries(const QStringList &names, const QStringList &sqls)
+{
+    for (int  i = 0; i < names.count(); i++) {
+        QListWidgetItem *item = new QListWidgetItem(ui->lw);
+        item->setText(names.at(i));
+        item->setData(Qt::UserRole, sqls.at(i));
+        ui->lw->addItem(item);
+    }
+}
+
+QString C5CustomFilter::sql() const
+{
+    return fSql;
+}
+
+void C5CustomFilter::on_btnReject_clicked()
+{
+    reject();
+}
+
+void C5CustomFilter::on_btnOK_clicked()
+{
+    if (ui->lw->currentRow() < 0) {
+        C5Message::error(tr("Nothing was selected"));
+        return;
+    }
+    for (QWidget *w: fWidgets) {
+        if (w->property("t").toString() == "date") {
+            C5DateEdit *d = static_cast<C5DateEdit*>(w);
+            fSql.replace("%" + w->property("replace").toString() + "%", d->toMySQLDate());
+        }
+    }
+    accept();
+}
+
+void C5CustomFilter::on_lw_itemClicked(QListWidgetItem *item)
+{
+    fSql = item->data(Qt::UserRole).toString();
+    fParams.clear();
+    fWidgets.clear();
+    QLayoutItem *li;
+    while ((li = ui->gl->takeAt(0))) {
+        if (li->widget()) {
+            li->widget()->deleteLater();
+        }
+    }
+    QRegularExpression re("%.*?%");
+    int pos = 0;
+    ;
+    do {
+        QRegularExpressionMatch rm = re.match(fSql, pos);
+        if (rm.hasMatch()) {
+            fParams.append(rm.captured(0).replace("%", ""));
+            pos = rm.capturedEnd();
+        } else {
+            break;
+        }
+    } while (true);
+    int row = 0;
+    for (QString &s: fParams) {
+        QString type = s.mid(s.indexOf(":") + 1, s.length() - s.indexOf(":") + 1);
+        ui->gl->addWidget(new QLabel(s.mid(s.indexOf(";") + 1, s.indexOf(":") - s.indexOf(";") - 1)), row, 0, 1, 1);
+        if (type == "date") {
+            C5DateEdit *d = new C5DateEdit();
+            d->setProperty("replace", s);
+            d->setProperty("t", "date");
+            ui->gl->addWidget(d, row, 1, 1, 2);
+            fWidgets.append(d);
+        }
+        row ++;
+    }
+    ui->gl->addItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding), row, 0, 1, 1);
+}

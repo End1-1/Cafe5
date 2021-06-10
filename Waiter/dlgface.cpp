@@ -18,6 +18,7 @@
 #include "fileversion.h"
 #include "c5cafecommon.h"
 #include "c5logtoserverthread.h"
+#include "c5userauth.h"
 #include <QTcpSocket>
 #include <QCloseEvent>
 
@@ -36,6 +37,7 @@ DlgFace::DlgFace() :
     fModeJustSelectTable = false;
     connect(&fTimerCheckVersion, SIGNAL(timeout()), this, SLOT(checkVersionTimeout()));
     fTimerCheckVersion.start(2000);
+    viewMode(0);
 }
 
 DlgFace::~DlgFace()
@@ -359,6 +361,12 @@ void DlgFace::filterHall(const QString &hall)
     ui->tblHall->setRowCount(r + 1);
 }
 
+void DlgFace::viewMode(int m)
+{
+    ui->tblHall->setVisible(m == 0);
+    ui->tblReserved->setVisible(m == 1);
+}
+
 void DlgFace::on_tblHall_itemClicked(QTableWidgetItem *item)
 {
     if (!item) {
@@ -433,4 +441,30 @@ void DlgFace::on_btnSetSession_clicked()
         delete d;
     }
     confTimeout();
+}
+
+void DlgFace::on_btnEnter_clicked()
+{
+    QString pass;
+    if (!DlgPassword::getString(tr("Password"), pass)) {
+        return;
+    }C5Database db(fDBParams);
+    C5UserAuth *ua  = new C5UserAuth(db);
+    if (!ua->enterWork(pass)) {
+        C5Message::error(ua->error());
+    }
+}
+
+void DlgFace::on_btnOut_clicked()
+{
+    QString pass;
+    if (!DlgPassword::getString(tr("Password"), pass)) {
+        return;
+    }
+    C5Database db(fDBParams);
+    C5UserAuth *ua  = new C5UserAuth(db);
+    if (!ua->leaveWork(pass)) {
+        C5Message::error(ua->error());
+    }
+    delete ua;
 }

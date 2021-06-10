@@ -68,8 +68,10 @@ void WOrder::addItem(const QJsonObject &o)
 
 void WOrder::updateItem(const QJsonObject &o, int index)
 {
-    ui->tblOrder->item(index, 0)->setData(Qt::UserRole, o);
-    ui->tblOrder->viewport()->update();
+    if (index > -1) {
+        ui->tblOrder->item(index, 0)->setData(Qt::UserRole, o);
+        ui->tblOrder->viewport()->update();
+    }
     ui->tblOrder->scrollToItem(ui->tblOrder->item(index, 0));
     ui->tblOrder->setCurrentItem(ui->tblOrder->item(index, 0));
     ui->lePrepaiment->setText(fOrder->prepayment(fGuest));

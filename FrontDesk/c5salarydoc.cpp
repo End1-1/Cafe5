@@ -85,6 +85,7 @@ QToolBar *C5SalaryDoc::toolBar()
         fToolBar->addAction(QIcon(":/delete.png"), tr("Remove"), this, SLOT(removeDoc()));
         fToolBar->addAction(QIcon(":/cash.png"), tr("Create cash document"), this, SLOT(createCashDocument()));
         fToolBar->addAction(QIcon(":/calculator.png"), tr("Count salary"), this, SLOT(countSalary()));
+        fToolBar->addAction(QIcon(":/employee.png"), tr("Get employes list"), this, SLOT(getEmployesInOutList()));
     }
     return fToolBar;
 }
@@ -184,7 +185,12 @@ void C5SalaryDoc::countSalary()
         return;
     }
 
-    QJsonObject jo = QJsonDocument::fromJson(db.getString(0).toUtf8()).object();
+    QJsonParseError jsonError;
+    QJsonObject jo = QJsonDocument::fromJson(db.getString(0).toUtf8(), &jsonError).object();
+    if (jsonError.error != QJsonParseError::NoError) {
+        C5Message::error(jsonError.errorString());
+        return;
+    }
     if (jo.contains("fixed_amounts")) {
         QJsonArray jfixed = jo["fixed_amounts"].toArray();
         for (int i = 0; i < jfixed.count(); i++) {
@@ -292,6 +298,57 @@ void C5SalaryDoc::countSalary()
                 } //for (QDate da = d1; da != d2; da = da.addDays(1))
             } //if (jf["amount_source"].toString() ==  "sql")
         }
+    }
+
+    qDebug() << jo;
+    if(jo.contains("day_sale_by_worker")) {
+        QJsonArray ja = jo["day_sale_by_worker"].toArray();
+        for (int i = 0; i < ja.count(); i++) {
+            QJsonObject jo = ja.at(i).toObject();
+            QList<int> positions;
+            for (QVariant &v: jo["positions"].toArray().toVariantList()) {
+                positions.append(v.toInt());
+            }
+            if (jo["type"].toString() == "free_amount_range") {
+                QJsonArray jranges = jo["ranges"].toArray();
+                for (int j = 0; j < ui->tbl->rowCount(); j++) {
+                    if (!positions.contains(ui->tbl->getInteger(j, 1))) {
+                        continue;
+                    }
+                    db[":f_staff"] = ui->tbl->getInteger(j, 3);
+                    db[":f_state"] = ORDER_STATE_CLOSE;
+                    db[":f_datecash"] = ui->deDate->date();
+                    db.exec("select sum(f_amounttotal) from o_header where f_datecash=:f_datecash and f_staff=:f_staff and f_state=:f_state");
+                    if (db.nextRow()) {
+                        for (int k = 0; k < jranges.count(); k++) {
+                            QJsonObject r = jranges.at(k).toObject();
+                            if (db.getDouble(0) >= r["min"].toDouble() && db.getDouble(0) <= r["max"].toDouble()) {
+                                ui->tbl->lineEditWithSelector(j, 5)->setDouble(r["value"].toDouble());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+void C5SalaryDoc::getEmployesInOutList()
+{
+    C5Database db(fDBParams);
+    db[":f_date"] = ui->deDate->date();
+    db.exec("select u.f_group, ug.f_name as position_name, u.f_id, concat(u.f_last, ' ', u.f_first) as employee_name "
+            "from s_salary_inout io "
+            "left join s_user u on u.f_id=io.f_user "
+            "left join s_user_group ug on ug.f_id=u.f_id "
+            "where io.f_datein=:f_date and io.f_dateout is not null ");
+    ui->tbl->clearContents();
+    ui->tbl->setRowCount(0);
+    while (db.nextRow()) {
+        int r = newRow();
+        ui->tbl->lineEditWithSelector(r, 1)->setValue(db.getInt("f_group"));
+        ui->tbl->setInteger(r, 3, db.getInt("f_id"));
+        ui->tbl->setString(r, 4, db.getString("employee_name"));
     }
 }
 

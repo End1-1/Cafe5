@@ -7,10 +7,12 @@ class Store
 {
 public:
     Store(int id);
-    void addRecord(const QDate &date, const QString &base, int goods, double price, double qty);
+    void addRecord(const QDate &date, const QString &base, int store, const QString &scancode, int goods, double price, double qty);
+    QList<StoreRecord> getRecords(const QString &sku);
+    int fStore;
 
 private:
-    int fStore;
+    QHash<QString, QList<StoreRecord> > fGoods;
 };
 
 #endif // STORE_H

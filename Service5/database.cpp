@@ -7,8 +7,16 @@ QMutex Database::fMutex;
 int Database::fDatabaseCounter = 0;
 
 Database::Database() :
-    fQuery(nullptr)
+    Database("QMYSQL")
 {
+    QMutexLocker ml(&fMutex);
+    fDatabaseNumber = QString::number(++fDatabaseCounter);
+}
+
+Database::Database(const QString &driverName)
+{
+    fQuery = nullptr;
+    fDatabaseDriver = driverName;
     QMutexLocker ml(&fMutex);
     fDatabaseNumber = QString::number(++fDatabaseCounter);
 }
@@ -20,13 +28,13 @@ Database::~Database()
         fQuery->finish();
         delete fQuery;
     }
-    fSqlDatabase = QSqlDatabase::addDatabase("QMYSQL");
+    fSqlDatabase = QSqlDatabase::addDatabase(fDatabaseDriver);
     QSqlDatabase::removeDatabase(fDatabaseNumber);
 }
 
 bool Database::open(const QString &host, const QString &schema, const QString &username, const QString &password)
 {
-    fSqlDatabase = QSqlDatabase::addDatabase("QMYSQL", fDatabaseNumber);
+    fSqlDatabase = QSqlDatabase::addDatabase(fDatabaseDriver, fDatabaseNumber);
     fSqlDatabase.setHostName(host);
     fSqlDatabase.setDatabaseName(schema);
     fSqlDatabase.setUserName(username);
@@ -41,7 +49,7 @@ bool Database::open(const QString &host, const QString &schema, const QString &u
 bool Database::exec(const QString &query)
 {
     if (!fQuery->prepare(query)) {
-        __debug_log(fQuery->lastError());
+        __debug_log(fQuery->lastError().databaseText());
         __debug_log(lastQuery());
         return false;
     }
@@ -51,16 +59,18 @@ bool Database::exec(const QString &query)
     }
     fBindValues.clear();
     if (!fQuery->exec()) {
-        __debug_log(fQuery->lastError());
+        __debug_log(fQuery->lastError().databaseText());
         __debug_log(lastQuery());
     }
     __debug_log(lastQuery());
     bool isSelect = fQuery->isSelect();
     if (isSelect) {
+        //fQuery->first();
         fColumnsNames.clear();
         QSqlRecord rec = fQuery->record();
         for (int i = 0; i < rec.count(); i++) {
             fColumnsNames[rec.fieldName(i)] = i;
+            fColumnsIndexes[i] = rec.fieldName(i);
         }
     }
     return true;
@@ -112,6 +122,16 @@ bool Database::update(const QString &table)
     }
     sql += " where fid=:fid";
     return exec(sql);
+}
+
+QString Database::uuid()
+{
+    if (exec("select uuid() as _uuid")) {
+        if (next()) {
+            return value("_uuid").toString();
+        }
+    }
+    return "";
 }
 
 void Database::close()

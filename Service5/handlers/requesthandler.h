@@ -3,6 +3,7 @@
 
 #include "socketdata.h"
 #include "debug.h"
+#include "socketdata.h"
 #include "httpheader.h"
 #include <QByteArray>
 #include <QHash>
@@ -12,16 +13,20 @@ class RequestHandler
 public:
     explicit RequestHandler();
     virtual ~RequestHandler();
-    static RequestHandler *route(const QString &remoteHost, const QString &r, const QByteArray &data, const QHash<QString, DataAddress> &dataMap);
+    static RequestHandler *route(const QString &remoteHost, const QString &r, const QByteArray &data, const QHash<QString, DataAddress> &dataMap, ContentType contentType);
     QByteArray fResponse;
+    ContentType fContentType;
     bool idle();
     void setIdle(bool v);
 
 protected:
     HttpHeader fHttpHeader;
-    virtual void handle(const QByteArray &data, const QHash<QString, DataAddress> &dataMap) = 0;
+    virtual bool handle(const QByteArray &data, const QHash<QString, DataAddress> &dataMap) = 0;
     virtual bool validateData(const QByteArray &data, const QHash<QString, DataAddress> &dataMap) = 0;
-    void setResponse(int responseCode, const QString &data);
+    bool setResponse(int responseCode, const QString &data);
+    bool setInternalServerError(const QString &msg);
+    bool setForbiddenError(const QString &msg);
+    bool setDataValidationError(const QString &msg);
 
 private:
     bool fIdle;

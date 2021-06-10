@@ -12,6 +12,12 @@ public:
 
     bool authByPinPass(const QString &pin, const QString &pass, int &id, int &group, QString &name);
 
+    bool authByPass(const QString &pass, int &id, int &group, QString &name);
+
+    bool enterWork(const QString &pass);
+
+    bool leaveWork(const QString &pass);
+
     QString error() const;
 
 private:

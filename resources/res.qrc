@@ -103,5 +103,7 @@
         <file>sit.png</file>
         <file>atom.png</file>
         <file>tool-box.png</file>
+        <file>login.png</file>
+        <file>reservation.png</file>
     </qresource>
 </RCC>

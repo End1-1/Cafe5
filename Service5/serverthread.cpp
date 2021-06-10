@@ -19,13 +19,11 @@ ServerThread::~ServerThread()
 
 void ServerThread::run()
 {
+    qDebug() << "SSL version: " << QSslSocket::sslLibraryBuildVersionString();
     QString certFileName = fConfigPath + "cert.pem";
     QString keyFileName = fConfigPath + "key.pem";
     fSslServer = new SslServer(this);
     fSslServer->setMaxPendingConnections(10000);
-#ifdef QT_DEBUG
-    qDebug() << fSslServer->maxPendingConnections();
-#endif
     if (!fSslServer->setSslLocalCertificate(certFileName)) {
         LogWriter::write(10, 1, "", QString("%1 certificate is not instaled").arg(certFileName));
     }

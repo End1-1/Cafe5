@@ -73,7 +73,9 @@ void C5Dialog::keyPressEvent(QKeyEvent *e)
     case Qt::Key_Enter:
     case Qt::Key_Return:
         if (e->modifiers() & Qt::ControlModifier) {
-            QDialog::keyPressEvent(e);
+            keyControlPlusEnter();
+        } if (e->modifiers() & Qt::AltModifier) {
+            keyAlterPlusEnter();
         } else {
             focusNextChild();
         }
@@ -81,6 +83,16 @@ void C5Dialog::keyPressEvent(QKeyEvent *e)
         return;
     }
     QDialog::keyPressEvent(e);
+}
+
+void C5Dialog::keyControlPlusEnter()
+{
+
+}
+
+void C5Dialog::keyAlterPlusEnter()
+{
+
 }
 
 void C5Dialog::handleError(int err, const QString &msg)

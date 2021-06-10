@@ -115,8 +115,8 @@ void C5PrintReceiptThread::print()
 //        p.br(); <--- this row fuck
         QString servPlus;
         QString servValue = float_str(fHeader["f_servicefactor"].toString().toDouble() * 100, 2) + "% ";
-        QString totalStr = str_float(o["f_total"].toString()) > 0.001 ? float_str(str_float(o["f_total"].toString()), 2) : tr("Present");
         if (fHeader["f_servicemode"].toString().toInt() == SERVICE_AMOUNT_MODE_INCREASE_PRICE) {
+            QString totalStr = str_float(o["f_total"].toString()) > 0.001 ? float_str(str_float(o["f_total"].toString()), 2) : tr("Present");
             if (str_float(fHeader["f_servicefactor"].toString()) > 0.001) {
                 servPlus = "+";
             } else {
@@ -128,25 +128,29 @@ void C5PrintReceiptThread::print()
                 if (o["f_hourlypayment"].toString().toInt() > 0) {
                     p.ltext(QString("%1 = %2").arg(o["f_comment"].toString()).arg(float_str(str_float(o["f_total"].toString()), 2)), 0);
                 } else {
-//                    p.ltext(QString("%1 x %2 %3 %4 = %5")
-//                            .arg(float_str(str_float(o["f_qty2"].toString()), 2))
-//                            .arg(float_str(str_float(o["f_price"].toString()), 2))
-//                            .arg(servPlus).arg(servValue)
-//                           .arg(total), 0);
-                    p.ltext(QString("%1 x %2 = %3")
-                            .arg(float_str(str_float(o["f_qty2"].toString()), 2))
-                            .arg(float_str(str_float(o["f_price"].toString()), 2))
-                           .arg(totalStr), 0);
+                    if (o["f_canservice"].toString().toInt() > 0) {
+                        p.ltext(QString("%1 x %2 %3 %4 = %5")
+                                .arg(float_str(str_float(o["f_qty2"].toString()), 2))
+                                .arg(float_str(str_float(o["f_price"].toString()), 2))
+                                .arg(servPlus).arg(servValue)
+                               .arg(total), 0);
+                    } else {
+                        p.ltext(QString("%1 x %2 = %3")
+                                .arg(float_str(str_float(o["f_qty2"].toString()), 2))
+                                .arg(float_str(str_float(o["f_price"].toString()), 2))
+                               .arg(float_str(str_float(o["f_qty2"].toString()) * str_float(o["f_price"].toString()), 2)), 0);
+                    }
                 }
             }
         } else {
+            QString totalStr = str_float(o["f_total"].toString()) > 0.001 ? float_str(str_float(o["f_qty2"].toString())*str_float(o["f_price"].toString()), 2) : tr("Present");
             if (str_float(totalStr) < 0.001) {
                 p.rtext(totalStr);
             } else {
                 if (o["f_hourlypayment"].toString().toInt() > 0) {
                     p.ltext(QString("%1 = %2").arg(o["f_comment"].toString()).arg(float_str(str_float(o["f_total"].toString()), 2)), 0);
                 } else {
-                    p.rtext(QString("%1 x %2 = %5")
+                    p.rtext(QString("%1 x %2 = %3")
                             .arg(float_str(str_float(o["f_qty2"].toString()), 2))
                             .arg(float_str(str_float(o["f_price"].toString()), 2))
                             .arg(totalStr));

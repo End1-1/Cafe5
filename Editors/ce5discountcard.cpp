@@ -54,3 +54,8 @@ void CE5DiscountCard::on_leFirstName_textChanged(const QString &arg1)
         ui->leClientInfo->setText(c->getString(r, 3));
     }
 }
+
+void CE5DiscountCard::on_leCard_returnPressed()
+{
+    ui->leCard->setText(ui->leCard->text().replace("?", "").replace(";", "").replace(":", ""));
+}

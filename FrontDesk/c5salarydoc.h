@@ -28,6 +28,8 @@ public slots:
 private slots:
     void countSalary();
 
+    void getEmployesInOutList();
+
     void countAmounts(const QString &arg1);
 
     void createCashDocument();

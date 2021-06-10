@@ -480,6 +480,7 @@ ALTER TABLE `s_salary_shift` ADD COLUMN `f_formula` JSON NULL AFTER `f_number`;
 /* db - 30 */
 update s_app set f_version ='30' where f_app='DB';
 alter table o_goods add column f_discountAmount decimal(14,3);
+alter table o_goods add column f_sign tinyint;
 update o_goods set f_sign=-1 where f_total<0;
 update o_goods set f_total=abs(f_total), f_price=abs(f_price) where f_sign=-1;
 
@@ -538,8 +539,7 @@ create table o_payment (f_id char(36) primary key, f_cash decimal(14,2), f_chang
 update s_app set f_version='41' where f_app='DB';
 alter table d_package add column f_menu integer after f_id;
 alter table d_package_list add column f_store integer, add column f_printer tinytext;
-/* db - 39 */
-update s_app set f_version='39' where f_app='DB';
+drop table a_sale_temp;
 create table a_sale_temp (f_id integer primary key auto_increment, f_station tinytext, f_saletype smallint, f_window smallint, f_row smallint, f_order char(36), f_state smallint, f_goodsid integer, f_name tinytext, f_qty decimal(14,4), f_unit tinytext, f_price decimal(14,2), f_total decimal(14,2), f_taxdept integer, f_adgcode tinytext, f_tablerec smallint, f_unitcode integer, f_service smallint, f_discountvalue decimal(14,3), f_discountmode tinytext);
 
 /* db - 40 */
@@ -590,3 +590,14 @@ create table o_header_options (f_id char(36) primary key, f_guests tinyint);
 ALTER TABLE `o_body` ADD COLUMN `f_guest` TINYINT NULL AFTER `f_candiscount`;
 alter table o_Header_options add column f_splitted tinyint;
 create table d_stoplist (f_dish integer primary key, f_qty decimal(14,2));
+
+/* db - 47 */
+INSERT INTO `o_state` (`f_id`, `f_name`) VALUES ('5', 'Նախնական ամրագրում');
+INSERT INTO `o_state` (`f_id`, `f_name`) VALUES ('6', 'Բանկետ ամրագրում');
+UPDATE `s_app` SET `f_version` = '1.1.5.83' WHERE (`f_app` = 'WAITER');
+create table o_preorder (f_id char(36), f_datefor date, f_timefor time, f_guests tinyint, f_prepaidcash decimal(14,2), f_prepaidcard decimal(14,2));
+ALTER TABLE s_salary_shift DROP f_formula, add column f_formula text;
+
+/* db - 48 */
+update s_app set f_version='48' where f_app='DB';
+UPDATE `s_app` SET `f_version` = '1.1.6.85' WHERE (`f_app` = 'WAITER');

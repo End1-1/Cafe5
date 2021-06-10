@@ -33,6 +33,7 @@
 #include "c5toolbarwidget.h"
 #include "cr5preorders.h"
 #include "c5dishselfcostgenprice.h"
+#include "cr5custom.h"
 #include "cr5salefromstoretotal.h"
 #include "cr5materialmoveuncomplect.h"
 #include "cr5dishcomment.h"
@@ -549,11 +550,12 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
     case cp_t3_move_uncomplected:
         createTab<CR5MaterialMoveUncomplect>(dbParams);
         break;
-
     case cp_t3_count_output_of_sale_draft:
         createTab<CR5ConsumptionBySalesDraft>(dbParams);
         break;
-
+    case cp_t3_custom_reports:
+        createTab<CR5Custom>(dbParams);
+        break;
     case cp_t4_part1:
         createTab<CR5DishPart1>(dbParams);
         break;
@@ -704,7 +706,7 @@ void C5MainWindow::on_splitter_splitterMoved(int pos, int index)
 
 bool C5MainWindow::addMainLevel(const QString &db, int permission, const QString &title, const QString &icon, QListWidget *&l)
 {
-    if (pr(db, cp_t2_action)) {
+    if (pr(db, permission)) {
         QPushButton *b = new QPushButton(QIcon(icon), title);
         b->setProperty("cp", permission);
         connect(b, SIGNAL(clicked()), this, SLOT(on_btnMenuClick()));
@@ -786,6 +788,7 @@ void C5MainWindow::setDB(const QString &dbname)
         addTreeL3Item(l, cp_t3_debts_to_partners, tr("Debts to partners"), ":/contract.png");
         addTreeL3Item(l, cp_t3_discount_statistics, tr("Discount statistics"), ":/discount.png");
         addTreeL3Item(l, cp_t3_preorders, tr("Preorders"), ":/customers.png");
+        addTreeL3Item(l, cp_t3_custom_reports, tr("Custom reports"), ":/constructor.png");
     }
 
     if (addMainLevel(db.at(1), cp_t8_cash, tr("Cash"), ":/reports.png", l)) {

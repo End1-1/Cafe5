@@ -65,6 +65,16 @@ bool C5GridGilter::filter(C5FilterWidget *filterWidget, QString &condition, QHas
     return result;
 }
 
+void C5GridGilter::keyControlPlusEnter()
+{
+    ui->btnOK->click();
+}
+
+void C5GridGilter::keyAlterPlusEnter()
+{
+
+}
+
 void C5GridGilter::on_btnCancel_clicked()
 {
     reject();

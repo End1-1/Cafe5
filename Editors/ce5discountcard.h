@@ -27,6 +27,8 @@ private slots:
 
     void on_leFirstName_textChanged(const QString &arg1);
 
+    void on_leCard_returnPressed();
+
 private:
     Ui::CE5DiscountCard *ui;
 };

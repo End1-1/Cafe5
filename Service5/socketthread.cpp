@@ -54,7 +54,7 @@ void SocketThread::httpRequest()
     case INCOMPLETE:
         return;
     }
-    RequestHandler *rh = RequestHandler::route(QHostAddress(fSslSocket->peerAddress().toIPv4Address()).toString(), route, fData, fRequestBody);
+    RequestHandler *rh = RequestHandler::route(QHostAddress(fSslSocket->peerAddress().toIPv4Address()).toString(), route, fData, fRequestBody, fContentType);
     fSslSocket->write(rh->fResponse);
     RequestManager::releaseHandler(rh);
     fSslSocket->close();
@@ -143,6 +143,7 @@ HttpRequestMethod SocketThread::parseRequest(HttpRequestMethod &requestMethod, Q
             }
             QString contentType = header("content-type");
             if (contentType.contains("multipart/form-data")) {
+                fContentType = ContentType::MultipartFormData;
                 s1 = fData.indexOf("boundary=");
                 if (s1 == -1) {
                     return UNKNOWN_REQUEST_METHOD;
@@ -177,12 +178,20 @@ HttpRequestMethod SocketThread::parseRequest(HttpRequestMethod &requestMethod, Q
                     }
                 } while (!bodyEnd);
             } else if (contentType.contains("application/x-www-form-urlencoded")) {
+                fContentType = ContentType::UrlEncoded;
                 s1 = fData.indexOf("\r\n\r\n");
                 if (s1 == -1) {
                     return UNKNOWN_REQUEST_METHOD;
                 }
                 s1 += 4;
                 parseBody(fData.mid(s1, fData.length() - s1), s1);
+            } else if (contentType.contains("application/json")) {
+                fContentType = ContentType::ApplilcationJson;
+                s1 = fData.indexOf("\r\n\r\n");
+                if (s1 == -1) {
+                    return UNKNOWN_REQUEST_METHOD;
+                }
+                fRequestBody.insert("json", DataAddress(s1, fData.length() - 1, fData.length() - s1));
             }
         }
     }

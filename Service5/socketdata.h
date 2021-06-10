@@ -40,8 +40,9 @@ enum HttpRequestMethod {
 
 enum ContentType {
     UNKNOWN_CONTENT_TYPE,
-    MultipartFromData,
-    UrlEncoded
+    MultipartFormData,
+    UrlEncoded,
+    ApplilcationJson
 };
 
 QByteArray getData(const QByteArray &data, const DataAddress &da);

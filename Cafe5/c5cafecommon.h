@@ -42,7 +42,7 @@ public:
 
     static QMap<int, QMap<int, QString> > fHallConfigs;
 
-    static QString serviceMode(const QString &hall);
+    static QString serviceMode(int hall);
 };
 
 #endif // C5CAFECOMMON_H

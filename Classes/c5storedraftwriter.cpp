@@ -52,7 +52,7 @@ bool C5StoreDraftWriter::writeFromShopOutput(const QString &doc, int state, QStr
         int rownum = 1;
         QString id;
         QString userid = storeDocNum(DOC_TYPE_STORE_OUTPUT, store, true, 0);
-        writeAHeader(id, userid, state, DOC_TYPE_STORE_OUTPUT, operatorId, docDate, QDate::currentDate(), QTime::currentTime(), 0, 0, comment, 0, 0);
+        writeAHeader(id, userid, DOC_STATE_DRAFT, DOC_TYPE_STORE_OUTPUT, operatorId, docDate, QDate::currentDate(), QTime::currentTime(), 0, 0, comment, 0, 0);
         writeAHeaderStore(id, operatorId, operatorId, "", QDate(), 0, store, 1, "", 0, 0);
         for (IGoods i: items) {
             if (i.store != store) {

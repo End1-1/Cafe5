@@ -11,13 +11,12 @@ Registration::Registration() :
 
 }
 
-void Registration::handle(const QByteArray &data, const QHash<QString, DataAddress> &dataMap)
+bool Registration::handle(const QByteArray &data, const QHash<QString, DataAddress> &dataMap)
 {
     JsonHandler jh;
     Database db;
     if (!DatabaseConnectionManager::openDatabase(db, jh)) {
-        setResponse(HTTP_INTERNAL_SERVER_ERROR, jh.toString());
-        return;
+        return setInternalServerError(jh.toString());
     }
     db[":fphone"] = getData(data, dataMap["phone"]);
     db[":femail"] = getData(data, dataMap["email"]);
@@ -29,7 +28,7 @@ void Registration::handle(const QByteArray &data, const QHash<QString, DataAddre
         fHttpHeader.setContentLength(jh.length());
         fResponse.append(fHttpHeader.toString());
         fResponse.append(jh.toString());
-        return;
+        return true;
     }
     const quint32 low = 100000;
     const quint32 high = 999999;
@@ -52,7 +51,7 @@ void Registration::handle(const QByteArray &data, const QHash<QString, DataAddre
         jh["message"] = "A confirmation code was sent to your email.";
     }
     jh["token"] = token;
-    setResponse(HTTP_OK, jh.toString());
+    return setResponse(HTTP_OK, jh.toString());
 }
 
 bool Registration::validateData(const QByteArray &data, const QHash<QString, DataAddress> &dataMap)

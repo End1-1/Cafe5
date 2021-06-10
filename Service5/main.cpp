@@ -3,6 +3,7 @@
 #include "databaseconnectionmanager.h"
 #include "configini.h"
 #include "storemanager.h"
+#include "shopmanager.h"
 #include <QApplication>
 #include <QStandardPaths>
 
@@ -16,6 +17,9 @@ int main(int argc, char *argv[])
     DatabaseConnectionManager::init();
     if (ConfigIni::isTrue("store/init")) {
         StoreManager::init(ConfigIni::value("store/db"));
+    }
+    if (ConfigIni::isTrue("shop/init")) {
+        ShopManager::init(ConfigIni::value("shop/db"));
     }
     RequestManager::init();
 

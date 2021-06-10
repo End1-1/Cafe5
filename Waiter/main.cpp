@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
     if (C5Config::isAppFullScreen()) {
         w.showFullScreen();
     } else {
-        w.showMaximized();
+        w.show();
     }
     a.processEvents();
     w.setup();

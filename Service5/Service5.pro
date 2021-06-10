@@ -16,10 +16,13 @@ SOURCES += \
     handlers/authentication.cpp \
     handlers/confirmregistration.cpp \
     handlers/forbidden.cpp \
+    handlers/jzstore.cpp \
     handlers/notfound.cpp \
     handlers/registration.cpp \
     handlers/requesthandler.cpp \
     handlers/requestmanager.cpp \
+    handlers/shoprequest.cpp \
+    handlers/storerequest.cpp \
     httpheader.cpp \
     jsonhandler.cpp \
     main.cpp \
@@ -29,9 +32,11 @@ SOURCES += \
     socket/sslsocket.cpp \
     socketdata.cpp \
     socketthread.cpp \
+    store/shopmanager.cpp \
     store/store.cpp \
     store/storemanager.cpp \
     store/storerecord.cpp \
+    utils/debug.cpp \
     utils/logwriter.cpp \
     utils/threadworker.cpp
 
@@ -43,10 +48,13 @@ HEADERS += \
     handlers/authentication.h \
     handlers/confirmregistration.h \
     handlers/forbidden.h \
+    handlers/jzstore.h \
     handlers/notfound.h \
     handlers/registration.h \
     handlers/requesthandler.h \
     handlers/requestmanager.h \
+    handlers/shoprequest.h \
+    handlers/storerequest.h \
     headers/registrationstate.h \
     httpheader.h \
     jsonhandler.h \
@@ -56,6 +64,7 @@ HEADERS += \
     socket/sslsocket.h \
     socketdata.h \
     socketthread.h \
+    store/shopmanager.h \
     store/store.h \
     store/storemanager.h \
     store/storerecord.h \

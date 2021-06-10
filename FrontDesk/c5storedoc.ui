@@ -490,7 +490,7 @@
              <string/>
             </property>
             <property name="icon">
-             <iconset resource="../resources/resources.qrc">
+             <iconset resource="../resources/res.qrc">
               <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
             </property>
            </widget>
@@ -524,7 +524,7 @@
              <string/>
             </property>
             <property name="icon">
-             <iconset resource="../resources/resources.qrc">
+             <iconset resource="../resources/res.qrc">
               <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
             </property>
            </widget>
@@ -541,6 +541,13 @@
              </size>
             </property>
            </spacer>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="chWholeGroup">
+            <property name="text">
+             <string>Whole group</string>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="C5LineEdit" name="leScancode">
@@ -1358,7 +1365,6 @@
   <tabstop>chPaid</tabstop>
  </tabstops>
  <resources>
-  <include location="../resources/resources.qrc"/>
   <include location="../resources/res.qrc"/>
  </resources>
  <connections/>

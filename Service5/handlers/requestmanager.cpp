@@ -4,6 +4,9 @@
 #include "notfound.h"
 #include "forbidden.h"
 #include "confirmregistration.h"
+#include "shoprequest.h"
+#include "storerequest.h"
+#include "jzstore.h"
 #include <QMutex>
 #include <QElapsedTimer>
 
@@ -23,12 +26,15 @@ void RequestManager::init()
     fInstance->fHandlers.insert("/confirmregistration", QList<RequestHandler*>());
     fInstance->fHandlers.insert("/authentication", QList<RequestHandler*>());
     fInstance->fHandlers.insert("/notfound", QList<RequestHandler*>());
+    fInstance->fHandlers.insert("/storerequest", QList<RequestHandler*>());
+    fInstance->fHandlers.insert("/shoprequest", QList<RequestHandler*>());
+    fInstance->fHandlers.insert("/jzstore", QList<RequestHandler*>());
 }
 
 RequestHandler *RequestManager::getHandler(const QString &route)
 {
     if (!fInstance->fHandlers.contains(route)) {
-        RequestHandler *rh = fInstance->findHandler("/notfound");
+        NotFound *rh = new NotFound(route);
         return rh;
     }
     return fInstance->findHandler(route);
@@ -73,8 +79,14 @@ RequestHandler *RequestManager::createHandler(const QString &route)
         rh = new Registration();
     } else if (route == "/confirmregistration") {
         rh = new ConfirmRegistration();
+    } else if (route == "/storerequest") {
+        rh = new StoreRequest();
+    } else if (route == "/shoprequest") {
+        rh = new ShopRequest();
     } else if (route == "/notfound") {
         rh = new NotFound(route);
+    } else if (route == "/jzstore") {
+        rh = new JZStore();
     } else {
         rh = new NotFound(route);
     }

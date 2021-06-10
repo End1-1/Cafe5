@@ -160,6 +160,19 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
                 }
             }
             break;
+        case Qt::Key_L:
+            if (ke->modifiers() & Qt::ControlModifier) {
+                C5Database db(__c5config.dbParams());
+                db.exec("select concat(u.f_last, ' ', u.f_first) as f_name, u.f_login from s_salary_inout io "
+                        "left join s_user u on u.f_id=io.f_user "
+                        "where io.f_dateout is null ");
+                QString users;
+                while (db.nextRow()) {
+                    users += QString("%1, %2<br>").arg(db.getString("f_login")).arg(db.getString("f_name"));
+                }
+                C5Message::info(users);
+            }
+            break;
         case Qt::Key_O:
             if (ke->modifiers() & Qt::ControlModifier) {
                 QString pin, pass;

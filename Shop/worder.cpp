@@ -737,14 +737,16 @@ void WOrder::noImage()
 
 void WOrder::on_btnInfo_clicked()
 {
-    QString info = QString("Ctrl+S: %1<br>Ctrl+I: %2<br>Ctrl+O: %3<br>Ctrl+T: %4<br>Ctrl+A: %5<br>Ctrl+H: %6<br>Ctrl+Z: %7")
+    QString info = QString("Ctrl+S: %1<br>Ctrl+I: %2<br>Ctrl+O: %3<br>Ctrl+T: %4<br>Ctrl+A: %5<br>Ctrl+H: %6<br>Ctrl+Z: %7"
+                            "<br>Ctrl+L: %8")
             .arg(tr("Search goods in the storages"))
             .arg(tr("Input staff at the work"))
             .arg(tr("Output staff from the work"))
             .arg(tr("Total today"))
             .arg(tr("Preorder"))
             .arg(tr("Show log"))
-            .arg(tr("Open new store input document"));
+            .arg(tr("Open new store input document"))
+            .arg(tr("List of workers at work"));
     C5Message::info(info);
 }
 

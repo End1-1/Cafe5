@@ -69,6 +69,10 @@ private slots:
 
     void on_btnSetSession_clicked();
 
+    void on_btnEnter_clicked();
+
+    void on_btnOut_clicked();
+
 private:
     Ui::DlgFace *ui;
 
@@ -89,6 +93,8 @@ private:
     QJsonObject fSelectedTable;
 
     void filterHall(const QString &hall);
+
+    void viewMode(int m);
 };
 
 #endif // DLGFACE_H

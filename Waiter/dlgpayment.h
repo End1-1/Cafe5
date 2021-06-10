@@ -88,6 +88,8 @@ private:
 
     void setCLComment();
 
+    void setDiscountComment();
+
     void setComplimentary();
 
     void setTaxState();

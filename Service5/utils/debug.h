@@ -11,7 +11,9 @@
 #ifdef QT_DEBUG
 #define __debug_log(x) qDebug() << x;
 #else
-#define __debug_log(x)
+#define __debug_log(x) __debug_log_to_file(x)
 #endif
+
+void __debug_log_to_file(const QVariant &msg);
 
 #endif // DEBUG_H

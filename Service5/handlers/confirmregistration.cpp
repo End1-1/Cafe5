@@ -9,22 +9,19 @@ ConfirmRegistration::ConfirmRegistration() :
 
 }
 
-void ConfirmRegistration::handle(const QByteArray &data, const QHash<QString, DataAddress> &dataMap)
+bool ConfirmRegistration::handle(const QByteArray &data, const QHash<QString, DataAddress> &dataMap)
 {
     Database db;
     JsonHandler jh;
     if (!DatabaseConnectionManager::openDatabase(db, jh)) {
-        setResponse(HTTP_INTERNAL_SERVER_ERROR, jh.toString());
-        return;
+        return setInternalServerError(jh.toString());
     }
     db[":ftoken"] = getData(data, dataMap["token"]);
     db[":fconfirmation_code"] = getData(data, dataMap["code"]);
     db[":fstate"] = RegistrationState::rsNew;
     db.exec("select * from users_registration where fconfirmation_code=:fconfirmation_code and ftoken=:ftoken and fstate=:fstate");
     if (!db.next()) {
-        jh["message"] = "Invalid code";
-        setResponse(HTTP_DATA_VALIDATION_ERROR, jh.toString());
-        return;
+        return setDataValidationError("Invalid code");
     }
     int id = db("fid").toInt();
     int confirmid = 0;
@@ -35,9 +32,7 @@ void ConfirmRegistration::handle(const QByteArray &data, const QHash<QString, Da
     db[":ffirstname"] = "";
     db[":flastname"] = "";
     if (!db.insert("users_list", confirmid)) {
-        jh["message"] = db.lastDbError();
-        setResponse(HTTP_INTERNAL_SERVER_ERROR, jh.toString());
-        return;
+        return setInternalServerError(db.lastDbError());
     }
     db[":fid"] = id;
     db[":fstate"] = RegistrationState::rsConfirmed;

@@ -40,8 +40,11 @@ C5WaiterServer::C5WaiterServer(QJsonObject &o, QTcpSocket *socket) :
 void C5WaiterServer::reply(QJsonObject &o)
 {
     C5ServerHandler srh;
+#ifdef QT_DEBUG
+    srh.fDb[":f_json"] = QJsonDocument(fIn).toJson();
+    srh.fDb.insert("o_waiterserver_debug", false);
+#endif
     QMap<QString, QVariant> bv;
-
     int cmd = fIn["cmd"].toInt();
     o["cmd"] = cmd;
     switch (cmd) {
@@ -322,8 +325,8 @@ void C5WaiterServer::reply(QJsonObject &o)
     }
     case sm_discount: {
         QJsonArray ja;
-        bv[":f_order"] = fIn["order"].toString();
-        srh.getJsonFromQuery("select * from b_history where f_order=:f_order", ja, bv);
+        bv[":f_id"] = fIn["order"].toString();
+        srh.getJsonFromQuery("select * from b_history where f_id=:f_id", ja, bv);
         if (ja.count() > 0) {
             o["reply"] = 0;
             o["msg"] = tr("Bonus system alreay exists for this order");
@@ -332,18 +335,24 @@ void C5WaiterServer::reply(QJsonObject &o)
         QJsonObject jo;
         //Check discount type
         bv[":f_code"] = fIn["code"].toString();
-        srh.getJsonFromQuery("select f_id, f_value from b_cards_discount where f_code=:f_code", ja, bv);
+        srh.getJsonFromQuery("select c.f_id, c.f_value, c.f_mode, cn.f_name, p.f_contact "
+                            "from b_cards_discount c "
+                            "left join c_partners p on p.f_id=c.f_client "
+                            "left join b_card_types cn on cn.f_id=c.f_mode "
+                            "where f_code=:f_code", ja, bv);
         if (ja.count() > 0) {
             o["reply"] = 1;
-            o["type"] = CARD_TYPE_DISCOUNT;
-            srh.fDb[":f_type"] = CARD_TYPE_DISCOUNT;
+            srh.fDb[":f_type"] = ja.at(0).toObject()["f_value"].toString().toInt();
             srh.fDb[":f_value"] = ja.at(0).toObject()["f_value"].toString().toDouble();
             srh.fDb[":f_card"] = ja.at(0).toObject()["f_id"].toString().toInt();
             srh.fDb[":f_data"] = 0;
-            srh.fDb[":f_order"] = fIn["order"].toString();
-            jo["f_id"] = QString::number(srh.fDb.insert("b_history"));
-            jo["f_type"] = QString::number(CARD_TYPE_DISCOUNT);
-            jo["f_value"] = ja.at(0).toObject()["f_value"].toString();
+            srh.fDb[":f_id"] = fIn["order"].toString();
+            srh.fDb.insert("b_history");
+            jo["f_cardid"] = ja.at(0).toObject()["f_id"].toString();
+            jo["f_cardtype"] = ja.at(0).toObject()["f_mode"].toString();
+            jo["f_cardvalue"] = ja.at(0).toObject()["f_value"].toString();
+            jo["f_cardname"] = ja.at(0).toObject()["f_name"].toString();
+            jo["f_cardholder"] = ja.at(0).toObject()["f_contact"].toString();
             o["card"] = jo;
             break;
         } else {
@@ -551,26 +560,33 @@ void C5WaiterServer::openActiveOrder(QJsonObject &jh, QJsonArray &jb, QJsonArray
     srh.fDb[":f_id"] = fIn["table"].toInt();
     srh.fDb.exec("update h_tables set f_lock=:f_lock, f_lockSrc=:f_lockSrc where f_id=:f_id");
     QJsonArray jo;
-    bv[":f_table"] = fIn["table"].toInt();
-    bv[":f_state"] = ORDER_STATE_OPEN;
-    srh.getJsonFromQuery("select o.f_id from o_header o  where o.f_table=:f_table and o.f_state=:f_state limit 1 ", jo, bv);
-    if (jo.count() == 0) {
-        srh.fDb[":f_id"] = fIn["table"].toInt();
-        srh.fDb.exec("select f_name from h_tables where f_id=:f_id");
-        if (srh.fDb.nextRow()) {
-            jh["f_tablename"] = srh.fDb.getString(0);
+    if (fIn["orderid"].toString().isEmpty()) {
+        bv[":f_table"] = fIn["table"].toInt();
+        bv[":f_state"] = ORDER_STATE_OPEN;
+        srh.getJsonFromQuery("select o.f_id from o_header o  where o.f_table=:f_table and o.f_state=:f_state limit 1 ", jo, bv);
+        if (jo.count() == 0) {
+            srh.fDb[":f_id"] = fIn["table"].toInt();
+            srh.fDb.exec("select f_name from h_tables where f_id=:f_id");
+            if (srh.fDb.nextRow()) {
+                jh["f_tablename"] = srh.fDb.getString(0);
+            }
+            srh.fDb[":f_id"] = jt.at(0).toObject()["f_hall"].toString();
+            srh.fDb.exec("select f_name from h_halls where f_id=:f_id");
+            if (srh.fDb.nextRow()) {
+                jh["f_hallname"] = srh.fDb.getString(0);
+            }
+            jh["f_id"] = "";
+            jh["f_hall"] = jt.at(0).toObject()["f_hall"];
+            jh["f_table"] = QString::number(fIn["table"].toInt());
+            jh["f_state"] = QString::number(ORDER_STATE_OPEN);
+            jh["f_dateopen"] = current_date;
+            jh["f_timeopen"] = current_time;
+        } else {
+            jh["f_id"] = jo.at(0).toObject()["f_id"].toString();
+            C5WaiterOrderDoc w(jh["f_id"].toString(), srh.fDb);
+            jh = w.fHeader;
+            jb = w.fItems;
         }
-        srh.fDb[":f_id"] = jt.at(0).toObject()["f_hall"].toString();
-        srh.fDb.exec("select f_name from h_halls where f_id=:f_id");
-        if (srh.fDb.nextRow()) {
-            jh["f_hallname"] = srh.fDb.getString(0);
-        }
-        jh["f_id"] = "";
-        jh["f_hall"] = jt.at(0).toObject()["f_hall"];
-        jh["f_table"] = QString::number(fIn["table"].toInt());
-        jh["f_state"] = QString::number(ORDER_STATE_OPEN);
-        jh["f_dateopen"] = current_date;
-        jh["f_timeopen"] = current_time;
     } else {
         jh["f_id"] = jo.at(0).toObject()["f_id"].toString();
         C5WaiterOrderDoc w(jh["f_id"].toString(), srh.fDb);
@@ -714,6 +730,23 @@ void C5WaiterServer::saveOrder(QJsonObject &o, QJsonObject &jh, QJsonArray &ja, 
         db[":f_splitted"] = jh["f_splitted"].toString().toInt();
         db[":f_guests"] = jh["f_guests"].toString().toInt();
         db.update("o_header_options", where_id(jh["f_id"].toString()));
+    }
+    if (jh["preorder"].toString().toInt() == 1) {
+        db[":f_id"] = jh["f_id"].toString();
+        db.exec("select * from o_preorder where f_id=:f_id");
+        db[":f_datefor"] = QDate::fromString(jh["date"].toString(), FORMAT_DATETIME_TO_STR);
+        db[":f_timefor"] = QTime::fromString(jh["time"].toString(), FORMAT_TIME_TO_STR);
+        db[":f_guests"] = jh["guest"].toString().toInt();
+        db[":f_prepaidcash"] = jh["cash"].toString().toDouble();
+        db[":f_prepaidcard"] = jh["card"].toString().toDouble();
+        if (db.nextRow()) {
+            db.update("o_preorder", "f_id", jh["f_id"].toString());
+        } else {
+            db[":f_id"] = jh["f_id"].toString();
+            db.insert("o_preorder", false);
+        }
+        db[":f_state"] = ja.count() == 0 ? ORDER_STATE_PREORDER_1 : ORDER_STATE_PREORDER_2;
+        db.update("o_header", "f_id", jh["f_id"].toString());
     }
     db.commit();
 }
@@ -871,6 +904,19 @@ void C5WaiterServer::processCloseOrder(QJsonObject &o, C5Database &db)
         }
 
         if (orderstate == ORDER_STATE_CLOSE) {
+            if (jh["f_bonusid"].toString().toInt() > 0) {
+                db[":f_id"] = jh["f_id"].toString();
+                qDebug() << jh;
+                switch (jh["f_bonustype"].toString().toInt()) {
+                case CARD_TYPE_DISCOUNT:
+                    db[":f_data"] = jh["f_amountdiscount"].toString().toDouble();
+                    break;
+                case CARD_TYPE_ACCUMULATIVE:
+                    db[":f_data"] = jh["f_amounttotal"].toString().toDouble() * (jh["f_bonusvalue"].toString().toDouble() / 100);
+                    break;
+                }
+                db.exec("update b_history set f_data=:f_data where f_id=:f_id");
+            }
             C5Database fDD(C5Config::dbParams().at(0), C5Config::hotelDatabase(), C5Config::dbParams().at(2), C5Config::dbParams().at(3));
             C5WaiterOrderDoc w(db, jh, jb);
             w.transferToHotel(db, fDD, err);
@@ -1460,7 +1506,7 @@ void C5WaiterServer::processStopList(QJsonObject &o)
         db.exec("select f_qty from d_stoplist where f_dish=:f_dish for update");
         if (db.nextRow()) {
             double qty = db.getDouble("f_qty");
-            if (qty > 1) {
+            if (qty > 0.1) {
                 qty -= 1;
                 db[":f_dish"] = jdish["f_dish"].toString().toInt();
                 db[":f_qty"] = qty;

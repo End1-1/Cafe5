@@ -6,13 +6,13 @@
 #include "c5menu.h"
 #include "dlgdishremovereason.h"
 #include "c5dishtabledelegate.h"
+#include "c5orderdriver.h"
 #include "c5ordertabledelegate.h"
 #include "c5part2tabledelegate.h"
 #include "dlgpayment.h"
 #include "dlgsearchinmenu.h"
 #include "dlgpassword.h"
 #include "dlgguest.h"
-#include "c5waiterorderdoc.h"
 #include "c5logtoserverthread.h"
 #include "dlglistofdishcomments.h"
 #include "dlglistdishspecial.h"
@@ -21,8 +21,10 @@
 #include "dlglistofpackages.h"
 #include "dlgtools.h"
 #include "dlgsplitorder.h"
+#include "dlgpreorder.h"
 #include "dlgcarnumber.h"
 #include "dlglistofmenu.h"
+#include "datadriver.h"
 #include "dlgguests.h"
 #include <QCloseEvent>
 #include <QScrollBar>
@@ -39,22 +41,24 @@ DlgOrder::DlgOrder() :
     ui(new Ui::DlgOrder)
 {
     ui->setupUi(this);
+    fOrderDriver = new C5OrderDriver(C5Config::dbParams());
+    fOpenDateTime = QDateTime::currentDateTime();
     fCarNumber = 0;
     ui->lbCar->setVisible(C5Config::carMode());
     ui->btnCar->setVisible(C5Config::carMode());
     ui->lbVisit->setVisible(false);
-    fOrder = new C5WaiterOrderDoc();
     ui->btnGuest->setVisible(C5Config::useHotel());
     ui->btnCompactDishAddMode->setChecked(C5Config::getRegValue("compact dish add mode", true).toBool());
     fTimerCounter = 0;
     connect(&fTimer, &QTimer::timeout, this, &DlgOrder::timeout);
     fTimer.start(1000);
+    ui->btnSetReserve->setVisible(false);
 }
 
 DlgOrder::~DlgOrder()
 {
     delete ui;
-    delete fOrder;
+    delete fOrderDriver;
 }
 
 void DlgOrder::openTable(const QJsonObject &table, C5User *user)
@@ -99,6 +103,7 @@ void DlgOrder::openTable(const QJsonObject &table, C5User *user)
     d->fUser = user;
     d->ui->lbTable->setText(table["f_name"].toString());
     d->ui->lbStaffName->setText(QString("%1%2").arg(user->fFull).arg(__c5config.autoDateCash() ? "" : " [" + __c5config.dateCash() + " / " + QString::number(__c5config.dateShift()) + "]"));
+
     d->load(table["f_id"].toString().toInt());
     d->exec();
     delete d;
@@ -125,11 +130,67 @@ void DlgOrder::reject()
 
 void DlgOrder::load(int table)
 {
-    C5SocketHandler *sh = createSocketHandler(SLOT(handleOpenTable(QJsonObject)));
-    sh->bind("cmd", sm_opentable);
-    sh->bind("table", table);
-    sh->bind("host", hostinfo);
-    sh->send();
+//    C5SocketHandler *sh = createSocketHandler(SLOT(handleOpenTable(QJsonObject)));
+//    sh->bind("cmd", sm_opentable);
+//    sh->bind("table", table);
+//    sh->bind("host", hostinfo);
+//    sh->send();
+    if (!fOrderDriver->openTable(table)) {
+        C5Message::error(fOrderDriver->error());
+        reject();
+        return;
+    }
+    ui->lbCar->clear();
+    ui->lbVisit->clear();
+    ui->lbVisit->setVisible(false);
+    if (fOrderDriver->ordersCount() == 0) {
+        logRecord("", "New order", dbtable->name(table), "");
+        fOrderDriver->setHeader("f_staff", fUser->fId);
+        fOrderDriver->setHeader("f_state", ORDER_STATE_OPEN);
+        fOrderDriver->setHeader("f_guests", 1);
+        fOrderDriver->setHeader("f_comment", "");
+        fOrderDriver->setHeader("f_hall", dbtable->hall(table));
+        fOrderDriver->setHeader("f_amounttotal", 0);
+        fOrderDriver->setHeader("f_amountcash", 0);
+        fOrderDriver->setHeader("f_amountcard", 0);
+        fOrderDriver->setHeader("f_amountbank", 0);
+        fOrderDriver->setHeader("f_amountother", 0);
+        fOrderDriver->setHeader("f_amountservice", 0);
+        fOrderDriver->setHeader("f_amountdiscount", 0);
+        fOrderDriver->setHeader("f_servicemode", C5CafeCommon::serviceMode(dbhall->settings(dbtable->hall(table))));
+        fOrderDriver->setHeader("f_servicefactor", C5Config::serviceFactor());
+        fOrderDriver->setHeader("f_discountfactor", 0);
+    } else {
+        logRecord("", "Open order", dbtable->name(table), "");
+
+        C5Config::setValues(C5CafeCommon::fHallConfigs[dbhall->settings(dbtable->hall(table))]);
+        QJsonObject table = C5CafeCommon::table(table);
+        if (table["f_special_config"].toString().toInt() > 0) {
+            C5Config::setValues(C5CafeCommon::fHallConfigs[table["f_special_config"].toString().toInt()]);
+        }
+        ui->lbCar->setVisible(C5Config::carMode());
+        ui->btnCar->setVisible(C5Config::carMode());
+
+        ui->lbTable->setText(fOrder->hString("f_tablename"));
+        fOrder->hSetInt("f_currentstaff", fUser->fId);
+        fOrder->hSetString("f_currentstaffname", fUser->fFull);
+        fOrder->fItems = obj["body"].toArray();
+        itemsToTable();
+        if (fOrder->hDouble("f_discountfactor") > 0) {
+            ui->lbDiscount->setEnabled(true);
+            ui->lbDiscount->setText(QString("[%1: %2%]").arg(tr("Discount")).arg(fOrder->hDouble("f_discountfactor") * 100));
+        } else {
+            ui->lbDiscount->setEnabled(false);
+            ui->lbDiscount->setText(tr("[Discount]"));
+        }
+        if (fOrder->hString("car").toInt() > 0) {
+            setCar(fOrder->hInt("car"));
+        }
+        setServiceLabel();
+        if (fOrder->hInt("f_staff") != fOrder->hInt("f_currentstaff")) {
+            C5Message::info(QString("%1\r\n%2").arg(tr("Order owner")).arg(fOrder->hString("f_staffname")));
+        }
+    }
 }
 
 void DlgOrder::buildMenu(const QString &menu, QString part1, QString part2)
@@ -270,6 +331,7 @@ void DlgOrder::addDishToOrder(const QJsonObject &obj)
     fOrder->hSetDouble("f_amountbank", 0);
     fOrder->hSetDouble("f_amountother", 0);
     fOrder->countTotal();
+    ui->worder->updateItem(QJsonObject(), -1);
     setButtonsState();
 }
 
@@ -823,6 +885,7 @@ void DlgOrder::on_tblDishes_itemClicked(QTableWidgetItem *item)
         sh->send();
     } else {
         if (C5Menu::fStopList.contains(o["f_dish"].toString().toInt())) {
+            qDebug() << C5Menu::fStopList[o["f_dish"].toString().toInt()];
             if (C5Menu::fStopList[o["f_dish"].toString().toInt()] < 0.01) {
                 return;
             }
@@ -1171,6 +1234,12 @@ void DlgOrder::on_btnJoinTable_clicked()
 
 void DlgOrder::on_btnTools_clicked()
 {
-    DlgTools d(fDBParams);
+    DlgTools d(fOrder, this, fDBParams);
+    d.exec();
+}
+
+void DlgOrder::on_btnSetReserve_clicked()
+{
+    DlgPreorder d(fOrder, fDBParams);
     d.exec();
 }

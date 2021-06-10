@@ -347,6 +347,13 @@ void Workspace::printReport(const QDate &d1, const QDate &d2)
     dd[":f_datecash1"] = d1;
     dd[":f_datecash2"] = d2;
     dd[":f_stateh"] = ORDER_STATE_CLOSE;
+    dd.exec("select count(f_id) from o_header h "
+            "where h.f_state=:f_stateh  and h.f_datecash between :f_datecash1 and :f_datecash2 ");
+    dd.nextRow();
+    int totalQty = dd.getInt(0);
+    dd[":f_datecash1"] = d1;
+    dd[":f_datecash2"] = d2;
+    dd[":f_stateh"] = ORDER_STATE_CLOSE;
     dd[":f_stated"] = DISH_STATE_OK;
     dd.exec("select d.f_name, sum(b.f_qty1) as f_qty, b.f_price, sum(b.f_qty1*b.f_price) as f_total "
             "from o_body b "
@@ -372,6 +379,12 @@ void Workspace::printReport(const QDate &d1, const QDate &d2)
     p.br(3);
     p.setFontBold(true);
     p.setFontSize(28);
+    p.br();
+    p.br();
+    p.ltext(tr("Quantity of orders"), 0);
+    p.rtext(QString::number(totalQty));
+    p.br();
+    p.br();
     p.ltext(tr("Total today"), 0);
     p.rtext(float_str(total, 2));
     p.br();
@@ -513,20 +526,20 @@ void Workspace::on_btnCheckout_clicked()
                 db.rollback();
                 return;
             }
-            if (!dw.writeOBodyToOGoods(bid, id)) {
-                C5Message::error(dw.fErrorMsg);
-                db.rollback();
-                return;
-            }
+//            if (!dw.writeOBodyToOGoods(bid, id)) {
+//                C5Message::error(dw.fErrorMsg);
+//                db.rollback();
+//                return;
+//            }
         }
     }
 
-    QString err;
-    if (!dw.writeFromShopOutput(id, DOC_STATE_SAVED, err)) {
-        C5Message::error(err);
-        db.rollback();
-        return;
-    }
+//    QString err;
+//    if (!dw.writeFromShopOutput(id, DOC_STATE_SAVED, err)) {
+//        C5Message::error(err);
+//        db.rollback();
+//        return;
+//    }
     db.commit();
 
     QSet<QString> prn;

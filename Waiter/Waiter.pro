@@ -62,6 +62,7 @@ SOURCES += \
     ../Classes/c5grid.cpp \
     ../Classes/c5gridgilter.cpp \
     ../Classes/c5jsondb.cpp \
+    ../Classes/c5orderdriver.cpp \
     ../Classes/c5random.cpp \
     ../Classes/c5shoporder.cpp \
     ../Classes/c5storedraftwriter.cpp \
@@ -75,6 +76,11 @@ SOURCES += \
     ../Classes/proxytablewidgetdatabase.cpp \
     ../Controls/c5guicontrols.cpp \
     ../Controls/c5lineeditwithselector.cpp \
+    ../DbData/datadriver.cpp \
+    ../DbData/dbdata.cpp \
+    ../DbData/dbhalls.cpp \
+    ../DbData/dbtables.cpp \
+    ../DbData/dbusers.cpp \
     ../Editors/c5cashname.cpp \
     ../Editors/c5dishwidget.cpp \
     ../Editors/c5editor.cpp \
@@ -231,6 +237,7 @@ SOURCES += \
     dlglistdishspecial.cpp \
     dlglistofpackages.cpp \
     dlglistofshifts.cpp \
+    dlgpreorder.cpp \
     dlgshiftrotation.cpp \
     dlgsplitorder.cpp \
     dlgtools.cpp \
@@ -328,6 +335,7 @@ HEADERS += \
     ../Classes/c5grid.h \
     ../Classes/c5gridgilter.h \
     ../Classes/c5jsondb.h \
+    ../Classes/c5orderdriver.h \
     ../Classes/c5random.h \
     ../Classes/c5shoporder.h \
     ../Classes/c5storedraftwriter.h \
@@ -341,6 +349,11 @@ HEADERS += \
     ../Classes/proxytablewidgetdatabase.h \
     ../Controls/c5guicontrols.h \
     ../Controls/c5lineeditwithselector.h \
+    ../DbData/datadriver.h \
+    ../DbData/dbdata.h \
+    ../DbData/dbhalls.h \
+    ../DbData/dbtables.h \
+    ../DbData/dbusers.h \
     ../Editors/c5cashname.h \
     ../Editors/c5dishwidget.h \
     ../Editors/c5editor.h \
@@ -524,6 +537,7 @@ HEADERS += \
     ../../NewTax/Src/printtaxn.h \
     ../Controls/c5lineedit.h \
     ../Classes/c5printremovedservicethread.h \
+    dlgpreorder.h \
     dlgshiftrotation.h \
     dlgsplitorder.h \
     dlgtools.h \
@@ -676,6 +690,7 @@ FORMS += \
     dlgorder.ui \
     dlgpayment.ui \
     ../Classes/c5printpreview.ui \
+    dlgpreorder.ui \
     dlgshiftrotation.ui \
     dlgsplitorder.ui \
     dlgtools.ui \
@@ -704,6 +719,7 @@ INCLUDEPATH += ../Controls
 INCLUDEPATH += ../FrontDesk
 INCLUDEPATH += ../Reports
 INCLUDEPATH += ../Service
+INCLUDEPATH += ../DbData
 INCLUDEPATH += ../Shop
 INCLUDEPATH += ../Editors
 INCLUDEPATH += C:/Projects/NewTax/Src

@@ -564,13 +564,17 @@ void C5WaiterOrderDoc::countTotalV1()
         double service = iDouble("f_service", i);
         double discount = iDouble("f_discount", i);
         double itemTotal = price * iDouble("f_qty2", i);
-        double serviceAmount = (itemTotal * service);
-        itemTotal += serviceAmount;
-        double discountAmount = (itemTotal * discount);
-        itemTotal -= discountAmount;
+        if (iInt("f_canservice", i) > 0) {
+            double serviceAmount = (itemTotal * service);
+            itemTotal += serviceAmount;
+            totalService += serviceAmount;
+        }
+        if (iInt("f_candiscount", i) > 0) {
+            double discountAmount = (itemTotal * discount);
+            itemTotal -= discountAmount;
+            totalDiscount += discountAmount;
+        }
         total += itemTotal;
-        totalService += serviceAmount;
-        totalDiscount += discountAmount;
         iSetDouble("f_total", itemTotal, i);
     }
     hSetDouble("f_amounttotal", total);
@@ -604,15 +608,23 @@ void C5WaiterOrderDoc::countTotalV2()
             total += iDouble("f_total", i);
             continue;
         }
+        double service = iDouble("f_service", i);
+        double discount = iDouble("f_discount", i);
         double price = iDouble("f_price", i);
         double itemTotal = price * iDouble("f_qty2", i);
+        if (iInt("f_canservice", i) > 0) {
+            double serviceAmount = (itemTotal * service);
+            itemTotal += serviceAmount;
+            totalService += serviceAmount;
+        }
+        if (iInt("f_candiscount", i) > 0) {
+            double discountAmount = (itemTotal * discount);
+            itemTotal -= discountAmount;
+            totalDiscount += discountAmount;
+        }
         iSetDouble("f_total", itemTotal, i);
         total += itemTotal;
     }
-    totalService = total * hDouble("f_servicefactor");
-    total += totalService;
-    totalDiscount = total * hDouble("f_discountfactor");
-    total -= totalDiscount;
     hSetDouble("f_amounttotal", total);
     hSetDouble("f_amountservice", totalService);
     hSetDouble("f_amountdiscount", totalDiscount);
@@ -653,13 +665,18 @@ double C5WaiterOrderDoc::countPreTotalV1(int guest)
         double service = iDouble("f_service", i);
         double discount = iDouble("f_discount", i);
         double itemTotal = price * iDouble("f_qty1", i);
-        double serviceAmount = (itemTotal * service);
-        itemTotal += serviceAmount;
-        double discountAmount = (itemTotal * discount);
-        itemTotal -= discountAmount;
+
+        if (iInt("f_canservice", i) > 0) {
+            double serviceAmount = (itemTotal * service);
+            itemTotal += serviceAmount;
+            totalService += serviceAmount;
+        }
+        if (iInt("f_candiscount", i) > 0) {
+            double discountAmount = (itemTotal * discount);
+            itemTotal -= discountAmount;
+            totalDiscount += discountAmount;
+        }
         total += itemTotal;
-        totalService += serviceAmount;
-        totalDiscount += discountAmount;
     }
     return total;
 }
@@ -686,51 +703,59 @@ double C5WaiterOrderDoc::countPreTotalV2(int guest)
         }
         double price = iDouble("f_price", i);
         double itemTotal = price * iDouble("f_qty1", i);
+        double service = iDouble("f_service", i);
+        double discount = iDouble("f_discount", i);
+        if (iInt("f_canservice", i) > 0) {
+            double serviceAmount = (itemTotal * service);
+            itemTotal += serviceAmount;
+            totalService += serviceAmount;
+        }
+        if (iInt("f_candiscount", i) > 0) {
+            double discountAmount = (itemTotal * discount);
+            itemTotal -= discountAmount;
+            totalDiscount += discountAmount;
+        }
         iSetDouble("f_total", itemTotal, i);
         total += itemTotal;
     }
-    totalService = total * hDouble("f_servicefactor");
-    total += totalService;
-    totalDiscount = total * hDouble("f_discountfactor");
-    total -= totalDiscount;
     return total;
 }
 
 void C5WaiterOrderDoc::open(C5Database &db)
 {
-    db[":f_id"] = hString("f_id");
-    db.exec("select h.f_name as f_hallname, t.f_name as f_tableName, concat(s.f_last, ' ', s.f_first) as f_staffname, \
-        o.*, oo.f_guests, oo.f_splitted \
-        from o_header o \
-        left join h_tables t on t.f_id=o.f_table \
-        left join h_halls h on h.f_id=t.f_hall \
-        left join s_user s on s.f_id=o.f_staff \
-        left join o_header_options oo on oo.f_id=o.f_id \
-        where o.f_id=:f_id \
-        order by o.f_id ");
-    if (db.nextRow()) {
-        for (int i = 0, count = db.columnCount(); i < count; i++) {
-            QVariant v = db.getValue(i);
-            switch (v.type()) {
-            case QVariant::Date:
-                fHeader[db.columnName(i)] = db.getDate(i).toString(FORMAT_DATE_TO_STR);
-                break;
-            case QVariant::DateTime:
+//    db[":f_id"] = hString("f_id");
+//    db.exec("select h.f_name as f_hallname, t.f_name as f_tableName, concat(s.f_last, ' ', s.f_first) as f_staffname, \
+//        o.*, oo.f_guests, oo.f_splitted \
+//        from o_header o \
+//        left join h_tables t on t.f_id=o.f_table \
+//        left join h_halls h on h.f_id=t.f_hall \
+//        left join s_user s on s.f_id=o.f_staff \
+//        left join o_header_options oo on oo.f_id=o.f_id \
+//        where o.f_id=:f_id \
+//        order by o.f_id ");
+//    if (db.nextRow()) {
+//        for (int i = 0, count = db.columnCount(); i < count; i++) {
+//            QVariant v = db.getValue(i);
+//            switch (v.type()) {
+//            case QVariant::Date:
+//                fHeader[db.columnName(i)] = db.getDate(i).toString(FORMAT_DATE_TO_STR);
+//                break;
+//            case QVariant::DateTime:
 
-                fHeader[db.columnName(i)] = db.getDateTime(i).toString(FORMAT_DATETIME_TO_STR);
-                break;
-            default:
-                fHeader[db.columnName(i)] = db.getString(i);
-                break;
-            }
-        }
-    }
-    db[":f_order"] = fHeader["f_id"].toString();
-    db.exec("select f_car from b_car_orders where f_order=:f_order");
-    if (db.nextRow()) {
-        fHeader["car"] = db.getString(0);
-    }
-    getTaxInfo(db);
+//                fHeader[db.columnName(i)] = db.getDateTime(i).toString(FORMAT_DATETIME_TO_STR);
+//                break;
+//            default:
+//                fHeader[db.columnName(i)] = db.getString(i);
+//                break;
+//            }
+//        }
+//    }
+//    db[":f_order"] = fHeader["f_id"].toString();
+//    db.exec("select f_car from b_car_orders where f_order=:f_order");
+//    if (db.nextRow()) {
+//        fHeader["car"] = db.getString(0);
+//    }
+//    getTaxInfo(db);
     db[":f_header"] = fHeader["f_id"].toString();
     db.exec("select ob.f_id, ob.f_header, ob.f_state, dp1.f_name as part1, dp2.f_name as part2, ob.f_adgcode, d.f_name as f_name, \
              ob.f_qty1, ob.f_qty2, ob.f_price, ob.f_service, ob.f_discount, ob.f_total, \
@@ -753,10 +778,18 @@ void C5WaiterOrderDoc::open(C5Database &db)
     // Discount
     QJsonArray jda;
     db[":f_id"] = fHeader["f_id"].toString();
-    db.exec("select f_id, f_type, f_value from b_history where f_id=:f_id");
+    db.exec("select c.f_id, c.f_value, c.f_mode, cn.f_name, p.f_contact "
+                            "from b_history h "
+                            "left join b_cards_discount c on c.f_id=h.f_card "
+                            "left join c_partners p on p.f_id=c.f_client "
+                            "left join b_card_types cn on cn.f_id=c.f_mode "
+                            "where h.f_id=:f_id");
     if (db.nextRow()) {
         fHeader["f_bonusid"] = db.getString("f_id");
-        fHeader["f_bonustype"] = db.getString("f_type");
+        fHeader["f_bonustype"] = db.getString("f_mode");
+        fHeader["f_bonusname"] = db.getString("f_name");
+        fHeader["f_bonusvalue"] = db.getString("f_value");
+        fHeader["f_bonusholder"] = db.getString("f_contact");
         fHeader["f_discountfactor"] = QString::number(db.getDouble("f_value") / 100, 'f', 3);
     }
     db[":f_id"] = fHeader["f_id"].toString();

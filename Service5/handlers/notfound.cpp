@@ -17,10 +17,11 @@ NotFound::~NotFound()
     __debug_log("~NotFound");
 }
 
-void NotFound::handle(const QByteArray &data, const QHash<QString, DataAddress> &dataMap)
+bool NotFound::handle(const QByteArray &data, const QHash<QString, DataAddress> &dataMap)
 {
     Q_UNUSED(data);
     Q_UNUSED(dataMap);
+    return true;
 }
 
 bool NotFound::validateData(const QByteArray &data, const QHash<QString, DataAddress> &dataMap)

@@ -22,7 +22,7 @@
        <verstretch>1</verstretch>
       </sizepolicy>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <layout class="QVBoxLayout" name="verticalLayout_2">
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -59,6 +59,9 @@
          <bool>false</bool>
         </attribute>
        </widget>
+      </item>
+      <item>
+       <widget class="QTableWidget" name="tblReserved"/>
       </item>
      </layout>
     </widget>
@@ -125,7 +128,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="../resources/res.qrc">
+         <iconset resource="../resources/resources.qrc">
           <normaloff>:/cancel.png</normaloff>:/cancel.png</iconset>
         </property>
         <property name="iconSize">
@@ -154,7 +157,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="../resources/res.qrc">
+         <iconset resource="../resources/resources.qrc">
           <normaloff>:/configure.png</normaloff>:/configure.png</iconset>
         </property>
         <property name="iconSize">
@@ -214,6 +217,64 @@
         <property name="icon">
          <iconset resource="../resources/res.qrc">
           <normaloff>:/rotation.png</normaloff>:/rotation.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="btnEnter">
+        <property name="minimumSize">
+         <size>
+          <width>48</width>
+          <height>48</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>48</width>
+          <height>48</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/login.png</normaloff>:/login.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="btnOut">
+        <property name="minimumSize">
+         <size>
+          <width>48</width>
+          <height>48</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>48</width>
+          <height>48</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/resources.qrc">
+          <normaloff>:/logout.png</normaloff>:/logout.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -329,8 +390,8 @@ AMOUNT</string>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="../resources/res.qrc"/>
   <include location="../resources/resources.qrc"/>
+  <include location="../resources/res.qrc"/>
  </resources>
  <connections/>
 </ui>

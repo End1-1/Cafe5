@@ -13,7 +13,7 @@ void json(C5Database &db, const QJsonObject &params, QJsonArray &jarr)
     db[":f_state"] = ORDER_STATE_CLOSE;
     db[":f_datecash1"] = QDate::fromString(params["date1"].toString(), FORMAT_DATE_TO_STR_MYSQL);
     db[":f_datecash2"] = QDate::fromString(params["date2"].toString(), FORMAT_DATE_TO_STR_MYSQL);
-    db.exec("select oh.f_id,t.f_name as tablename, oh.f_dateclose, oh.f_timeclose, oh.f_amounttotal, "
+    db.exec("select concat(oh.f_prefix, '', oh.f_hallid) as f_id,t.f_name as tablename, oh.f_dateclose, oh.f_timeclose, oh.f_amounttotal, "
             "oh.f_amountcash, oh.f_amountcard, oh.f_amountbank, oh.f_amountother "
             "from o_header oh "
             "left join h_tables t on t.f_id=oh.f_table "

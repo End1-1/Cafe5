@@ -7,7 +7,7 @@ Forbidden::Forbidden() :
 
 }
 
-void Forbidden::handle(const QByteArray &data, const QHash<QString, DataAddress> &dataMap)
+bool Forbidden::handle(const QByteArray &data, const QHash<QString, DataAddress> &dataMap)
 {
     Q_UNUSED(data);
     Q_UNUSED(dataMap);
@@ -17,6 +17,7 @@ void Forbidden::handle(const QByteArray &data, const QHash<QString, DataAddress>
     fHttpHeader.setContentLength(jh.length());
     fResponse.append(fHttpHeader.toString());
     fResponse.append(jh.toString());
+    return true;
 }
 
 bool Forbidden::validateData(const QByteArray &data, const QHash<QString, DataAddress> &dataMap)

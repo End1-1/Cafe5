@@ -101,7 +101,7 @@ CASH</string>
 CARD</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/resources.qrc">
+         <iconset resource="../resources/res.qrc">
           <normaloff>:/credit-card.png</normaloff>:/credit-card.png</iconset>
         </property>
         <property name="iconSize">
@@ -161,7 +161,7 @@ BANK</string>
 OTHER</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/resources.qrc">
+         <iconset resource="../resources/res.qrc">
           <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
         </property>
         <property name="iconSize">
@@ -186,6 +186,25 @@ OTHER</string>
        </spacer>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="leDiscountComment">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
     </widget>
    </item>
    <item>
@@ -463,7 +482,7 @@ LANGUAGE</string>
          <string>DISCOUNT</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/resources.qrc">
+         <iconset resource="../resources/res.qrc">
           <normaloff>:/discount.png</normaloff>:/discount.png</iconset>
         </property>
         <property name="iconSize">
@@ -617,6 +636,7 @@ ORDER</string>
   </customwidget>
  </customwidgets>
  <resources>
+  <include location="../resources/res.qrc"/>
   <include location="../resources/resources.qrc"/>
  </resources>
  <connections/>
