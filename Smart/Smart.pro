@@ -169,6 +169,7 @@ SOURCES += \
     ../FrontDesk/c5translatorform.cpp \
     ../FrontDesk/c5waiterorder.cpp \
     ../FrontDesk/dlgchangeoutputstore.cpp \
+    ../Reports/c5customfilter.cpp \
     ../Reports/c5settingswidget.cpp \
     ../Reports/cr5carvisits.cpp \
     ../Reports/cr5carvisitsfilter.cpp \
@@ -188,6 +189,7 @@ SOURCES += \
     ../Reports/cr5costumerdebts.cpp \
     ../Reports/cr5costumerdebtsfilter.cpp \
     ../Reports/cr5creditcards.cpp \
+    ../Reports/cr5custom.cpp \
     ../Reports/cr5databases.cpp \
     ../Reports/cr5debtstopartner.cpp \
     ../Reports/cr5discountstatisics.cpp \
@@ -417,6 +419,7 @@ HEADERS += \
     ../FrontDesk/c5translatorform.h \
     ../FrontDesk/c5waiterorder.h \
     ../FrontDesk/dlgchangeoutputstore.h \
+    ../Reports/c5customfilter.h \
     ../Reports/c5settingswidget.h \
     ../Reports/cr5carvisits.h \
     ../Reports/cr5carvisitsfilter.h \
@@ -436,6 +439,7 @@ HEADERS += \
     ../Reports/cr5costumerdebts.h \
     ../Reports/cr5costumerdebtsfilter.h \
     ../Reports/cr5creditcards.h \
+    ../Reports/cr5custom.h \
     ../Reports/cr5databases.h \
     ../Reports/cr5debtstopartner.h \
     ../Reports/cr5discountstatisics.h \
@@ -597,6 +601,7 @@ FORMS += \
     ../FrontDesk/c5translatorform.ui \
     ../FrontDesk/c5waiterorder.ui \
     ../FrontDesk/dlgchangeoutputstore.ui \
+    ../Reports/c5customfilter.ui \
     ../Reports/c5settingswidget.ui \
     ../Reports/cr5carvisitsfilter.ui \
     ../Reports/cr5cashdetailedfilter.ui \

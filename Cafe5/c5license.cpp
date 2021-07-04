@@ -16,8 +16,9 @@ C5License::C5License()
 
 }
 
-bool C5License::isOK()
+bool C5License::isOK(QString &err)
 {
+    return true;
 //    if (QDate::currentDate() > QDate::fromString("08/06/2021", "dd/MM/yyyy")) {
 //        return false;
 //    }
@@ -25,6 +26,7 @@ bool C5License::isOK()
     std::string result;
     std::shared_ptr<FILE> pipe(_popen("wmic path win32_physicalmedia get SerialNumber", "r"), _pclose);
     if (!pipe)  {
+        err = "Cannot run OS command";
         return false;
     }
     while (!feof(pipe.get())) {
@@ -33,16 +35,22 @@ bool C5License::isOK()
         }
     }
     QString key = QString::fromStdString(result).replace("\r\n", "").replace(" ", "");
+    if (key.isEmpty()) {
+        err = "Cannot determine device";
+        return false;
+    }
 
     QDir dir;
-    QString fileName = dir.absolutePath() + "/lic.dat";
+    QString fileName = dir.homePath() + "\\" + _APPLICATION_ + "\\" + _MODULE_ + "/lic.dat";
     QFile f(fileName);
     if (!f.open(QIODevice::ReadOnly)) {
         if (!f.open(QIODevice::WriteOnly)) {
+            err = f.errorString();
             return false;
         }
         f.write(key.toUtf8());
         f.close();
+        err = "Please, register application.";
         return false;
     }
 
@@ -55,23 +63,12 @@ bool C5License::isOK()
     outStr = outStr.replace('\006', "");
     QDate validTo = QDate::fromString(outStr, "dd/MM/yyyy");
     if (!validTo.isValid()) {
-        f.open(QIODevice::WriteOnly);
-        f.write(in);
-        f.write("\r\n\r\n\r\n\r\n");
-        f.write(outStr.toUtf8());
-        f.write("\r\n\r\n\r\n\r\n");
-        outStr = "Invalid date";
-        f.write(outStr.toUtf8());
-        f.close();
+        err = "Invalid date. Please, register application.";
         return false;
     }
     qDebug() << key << in << out;
     if (QDate::currentDate() > validTo) {
-        f.open(QIODevice::WriteOnly);
-        f.write(outStr.toUtf8());
-        outStr = "Expired";
-        f.write(outStr.toUtf8());
-        f.close();
+        err = "License expired";
         return false;
     }
     return true;

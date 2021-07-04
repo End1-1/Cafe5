@@ -10,6 +10,7 @@
 #define FORMAT_DATETIME_TO_STR2 "dd/MM/yyyy HH:mm"
 #define FORMAT_DATE_TO_STR "dd/MM/yyyy"
 #define FORMAT_TIME_TO_STR "HH:mm:ss"
+#define FORMAT_TIME_TO_SHORT_STR "HH:mm"
 #define FORMAT_DATE_TO_STR_MYSQL "yyyy-MM-dd"
 
 #define current_date QDate::currentDate().toString(FORMAT_DATE_TO_STR)
@@ -25,6 +26,7 @@
 #define ORDER_STATE_EMPTY 4
 #define ORDER_STATE_PREORDER_1 5 //empty
 #define ORDER_STATE_PREORDER_2 6 //with order
+#define ORDER_STATE_MOVED 7
 
 #define DISH_STATE_NONE 0
 #define DISH_STATE_OK 1
@@ -65,9 +67,6 @@
 #define PAYOTHER_CL 3
 #define PAYOTHER_SELFCOST 4
 #define PAYOTHER_DEBT 5
-
-#define SERVICE_AMOUNT_MODE_INCREASE_PRICE 1
-#define SERVICE_AMOUNT_MODE_SEPARATE 2
 
 #define TRANSLATOR_MENU_DISHES 1
 

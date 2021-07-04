@@ -6,6 +6,7 @@
 #include "c5logsystem.h"
 #include "c5userauth.h"
 #include "c5replication.h"
+#include "datadriver.h"
 #include "replicadialog.h"
 #include "settingsselection.h"
 #include <QApplication>
@@ -37,9 +38,10 @@ int main(int argc, char *argv[])
         d.mkpath(d.homePath() + "/" + _APPLICATION_ + "/logs");
     }
     ls(QObject::tr("Application start"));
-    if (!C5License::isOK()) {
+    QString err;
+    if (!C5License::isOK(err)) {
         ls(QObject::tr("License check failed"));
-        QMessageBox::critical(0, QObject::tr("Application error"), QObject::tr("Please, register application."));
+        QMessageBox::critical(0, QObject::tr("Application error"), err);
         return 0;
     }
 
@@ -94,6 +96,8 @@ int main(int argc, char *argv[])
         C5Message::error(QObject::tr("An instance of application already running"));
         return -1;
     }
+
+    DataDriver::init(__c5config.dbParams());
 
     bool login = false;
     C5Database db(C5Config::dbParams());

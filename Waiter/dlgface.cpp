@@ -1,17 +1,17 @@
 #include "dlgface.h"
 #include "ui_dlgface.h"
 #include "c5connection.h"
-#include "c5serverhandler.h"
 #include "dlgpassword.h"
 #include "c5user.h"
 #include "dlgorder.h"
 #include "c5menu.h"
 #include "c5witerconf.h"
 #include "dlgexitbyversion.h"
-#include "c5waiterserver.h"
 #include "dlgshiftrotation.h"
 #include "dlglistofhall.h"
+#include "tablewidgetv1.h"
 #include "c5utils.h"
+#include "datadriver.h"
 #include "dlgreports.h"
 #include "dlgexitwithmessage.h"
 #include "c5halltabledelegate.h"
@@ -19,25 +19,44 @@
 #include "c5cafecommon.h"
 #include "c5logtoserverthread.h"
 #include "c5userauth.h"
-#include <QTcpSocket>
+#include <QPushButton>
 #include <QCloseEvent>
 
 #define HALL_COL_WIDTH 175
 #define HALL_ROW_HEIGHT 60
 #define TIMER_TIMEOUT_INTERVAL 5000
 
-DlgFace::DlgFace() :
+#define view_mode_hall 1
+#define view_mode_waiter 2
+#define view_mode_preorder 3
+
+DlgFace::DlgFace(C5User *user) :
     C5Dialog(C5Config::dbParams()),
-    ui(new Ui::DlgFace)
+    ui(new Ui::DlgFace),
+    fUser(user)
+
 {
     ui->setupUi(this);
     setWindowFlags(windowFlags() | Qt::WindowMinimizeButtonHint);
-    fCanClose = false;
     ui->btnCancel->setVisible(false);
+    ui->btnShowHidePreorders->setVisible(fUser->check(cp_t5_preorder));
     fModeJustSelectTable = false;
     connect(&fTimerCheckVersion, SIGNAL(timeout()), this, SLOT(checkVersionTimeout()));
-    fTimerCheckVersion.start(2000);
+    setViewMode(view_mode_hall);
     viewMode(0);
+    ui->wall->setVisible(false);
+    ui->lbTime->setText(QTime::currentTime().toString(FORMAT_TIME_TO_SHORT_STR));
+    for (int id: dbhall->list()) {
+        QPushButton *btn = new QPushButton(dbhall->name(id));
+        btn->setMinimumSize(QSize(140, 60));
+        btn->setProperty("id", id);
+        connect(btn, &QPushButton::clicked, this, &DlgFace::hallClicked);
+        ui->vlHall->addWidget(btn);
+    }
+    filterHall(__c5config.defaultHall(), 0);
+    refreshTables();
+    connect(&fTimer, SIGNAL(timeout()), this, SLOT(timeout()));
+    fTimer.start(TIMER_TIMEOUT_INTERVAL);
 }
 
 DlgFace::~DlgFace()
@@ -47,30 +66,10 @@ DlgFace::~DlgFace()
 
 void DlgFace::setup()
 {
-    ui->tblHall->setItemDelegate(new C5HallTableDelegate());
-    ui->tblHall->horizontalHeader()->setDefaultSectionSize(HALL_COL_WIDTH);
-    ui->tblHall->setColumnCount(ui->tblHall->width() / HALL_COL_WIDTH);
-    if (ui->tblHall->columnCount() == 0) {
-        ui->tblHall->setColumnCount(1);
-    }
-    int delta = ui->tblHall->width() - (ui->tblHall->columnCount() * HALL_COL_WIDTH) - 5;
-    delta /= ui->tblHall->columnCount();
-    ui->tblHall->horizontalHeader()->setDefaultSectionSize(HALL_COL_WIDTH + delta);
-    ui->tblHall->verticalHeader()->setDefaultSectionSize(HALL_ROW_HEIGHT);
-    connect(&fTcpServer, SIGNAL(newConnection()), this, SLOT(newConnection()));
-    fTcpServer.listen(QHostAddress::Any, 1000);
-    C5SocketHandler *sh = createSocketHandler(SLOT(handleHall(QJsonObject)));
-    sh->bind("cmd", sm_hall);
-    sh->bind("hall", C5Config::hallList());
-    sh->send();
-    sh = createSocketHandler(SLOT(handleMenu(QJsonObject)));
+    C5SocketHandler *sh = createSocketHandler(SLOT(handleMenu(QJsonObject)));
     sh->bind("cmd", sm_menu);
     sh->send();
-    sh = createSocketHandler(SLOT(handleConf(QJsonObject)));
-    sh->bind("cmd", sm_waiterconf);
-    sh->bind("config", __c5config.fSettingsName);
-    sh->bind("station", hostinfo);
-    sh->send();
+
     sh = createSocketHandler(SLOT(handleCreditCards(QJsonObject)));
     sh->bind("cmd", sm_creditcards);
     sh->send();
@@ -80,45 +79,31 @@ void DlgFace::setup()
     sh = createSocketHandler(SLOT(handleDishComment(QJsonObject)));
     sh->bind("cmd", sm_dishcomment);
     sh->send();
-    connect(&fTimer, SIGNAL(timeout()), this, SLOT(timeout()));
-    fTimer.start(TIMER_TIMEOUT_INTERVAL);
-    connect(&fTimer, SIGNAL(timeout()), this, SLOT(confTimeout()));
-    fConfTimer.start(TIMER_TIMEOUT_INTERVAL * 12);
+
     if (!fModeJustSelectTable) {
         C5LogToServerThread::remember(LOG_WAITER, "", "", "", "", "Program started", "", "");
     }
 }
 
-void DlgFace::accept()
-{
-    if (fCanClose) {
-        C5Dialog::accept();
-    }
-}
-
-void DlgFace::reject()
-{
-    on_btnExit_clicked();
-}
-
-bool DlgFace::getTable(int &tableId, const QString &hall)
+bool DlgFace::getTable(int &tableId, int hall, C5User *user)
 {
     bool result = false;
-    DlgFace *df = new DlgFace();
+    DlgFace *df = new DlgFace(user);
     df->ui->lbDate->setVisible(false);
-    df->ui->btnConnection->setVisible(false);
     df->ui->btnReports->setVisible(false);
     df->ui->btnExit->setVisible(false);
     df->ui->btnCancel->setVisible(true);
+    df->ui->btnEnter->setVisible(false);
+    df->ui->btnExit->setVisible(false);
+    df->ui->btnSetSession->setVisible(false);
     df->fModeJustSelectTable = true;
     df->showFullScreen();
     df->hide();
-    df->setup();
     df->fCurrentHall = hall;
-    df->filterHall(hall);
+    df->filterHall(hall, 0);
     result = df->exec() == QDialog::Accepted;
     if (result) {
-        tableId = df->fSelectedTable["f_id"].toString().toInt();
+        tableId = df->fSelectedTable;
     }
     delete df;
     return result;
@@ -126,12 +111,20 @@ bool DlgFace::getTable(int &tableId, const QString &hall)
 
 void DlgFace::timeout()
 {
-    C5SocketHandler *sh = createSocketHandler(SLOT(handleHall(QJsonObject)));
-    sh->bind("hall", C5Config::hallList());
-    sh->bind("cmd", sm_hall);
-    sh->bind("hall", C5Config::hallList());
-    sh->send();
+    C5Database db(__c5config.dbParams());
+    if (__c5config.getValue(param_date_cash_auto).toInt() == 0) {
+        db[":f_key"] = param_date_cash;
+        db.exec("select f_value from s_settings_value where f_key=:f_key");
+        if (db.nextRow()) {
+            if (db.getString("f_value") != __c5config.getValue(param_date_cash)) {
+                DlgExitWithMessage::openDialog(tr("Working date was changed, application now will quit"));
+                return;
+            }
+        }
+    }
     ui->lbDate->setText(QString("%1 %2").arg(QDate::fromString(__c5config.dateCash(), FORMAT_DATE_TO_STR_MYSQL).toString(FORMAT_DATE_TO_STR)).arg(QTime::currentTime().toString("HH:mm")));
+
+    refreshTables();
 }
 
 void DlgFace::checkVersionTimeout()
@@ -141,31 +134,32 @@ void DlgFace::checkVersionTimeout()
     sh->send();
 }
 
-void DlgFace::confTimeout()
+void DlgFace::hallClicked()
 {
-    C5SocketHandler *sh = createSocketHandler(SLOT(handleConf(QJsonObject)));
-    sh->bind("cmd", sm_waiterconf);
-    sh->bind("station", hostinfo);
-    sh->send();
-}
-
-void DlgFace::newConnection()
-{
-    QTcpSocket *s = fTcpServer.nextPendingConnection();
-    C5SocketHandler *sh = new C5SocketHandler(s, this);
-    connect(sh, SIGNAL(handleCommand(QJsonObject)), this, SLOT(handleSocket(QJsonObject)));
-}
-
-void DlgFace::handleHall(const QJsonObject &obj)
-{
-    sender()->deleteLater();
-    C5CafeCommon::fHalls = obj["halls"].toArray();
-    C5CafeCommon::fTables = obj["tables"].toArray();
-    C5CafeCommon::fShifts = obj["shifts"].toArray();
-    if (fCurrentHall.isEmpty()) {
-        fCurrentHall = C5Config::defaultHall();
+    if (fView != view_mode_hall || fView != view_mode_waiter) {
+        setViewMode(view_mode_hall);
     }
-    filterHall(fCurrentHall);
+    QPushButton *btn = static_cast<QPushButton*>(sender());
+    filterHall(btn->property("id").toInt(), 0);
+}
+
+void DlgFace::tableClicked(int id)
+{
+    if (fModeJustSelectTable) {
+        fSelectedTable = id;
+        accept();
+        return;
+    }
+    C5User *tmp = fUser;
+    if (!tmp->check(cp_t5_edit_table)) {
+        if (!DlgPassword::getUserAndCheck(dbtable->name(id), tmp, cp_t5_edit_table)) {
+            return;
+        }
+    }
+    fTimer.stop();
+    DlgOrder::openTable(id, tmp);
+    refreshTables();
+    fTimer.start(TIMER_TIMEOUT_INTERVAL);
 }
 
 void DlgFace::handleMenu(const QJsonObject &obj)
@@ -213,32 +207,7 @@ void DlgFace::handleMenu(const QJsonObject &obj)
         QJsonObject o = ja.at(i).toObject();
         C5Menu::fStopList[o["f_dish"].toString().toInt()] = o["f_qty"].toString().toDouble();
     }
-}
-
-void DlgFace::handleConf(const QJsonObject &obj)
-{
-    sender()->deleteLater();
-    if (obj["reply"].toInt() == 0) {
-        return;
-    }
-    if (!__c5config.autoDateCash() && !__c5config.dateCash().isEmpty()) {
-        if (__c5config.dateCash() != obj["date_cash"].toString() || __c5config.dateShift() != obj["date_shift"].toString().toInt()) {
-            DlgExitWithMessage::openDialog(tr("Working date was changed, application now will quit"));
-            return;
-        }
-    }
-    __c5config.setValue(param_date_cash_auto, obj["date_auto"].toString());
-    __c5config.setValue(param_date_cash, obj["date_cash"].toString());
-    __c5config.setValue(param_date_cash_shift, obj["date_shift"].toString());
-    QStringList keys = obj["conf"].toObject().keys();
-    foreach (QString k, keys) {
-        __c5config.setValue(k.toInt(), obj["conf"].toObject()[k].toString());
-    }
-    QJsonArray ja = obj["otherconf"].toArray();
-    C5CafeCommon::fHallConfigs.clear();
-    for (int i = 0; i < ja.count(); i++) {
-        C5CafeCommon::fHallConfigs[ja.at(i).toObject()["f_settings"].toString().toInt()][ja.at(i).toObject()["f_key"].toString().toInt()] = ja.at(i).toObject()["f_value"].toString();
-    }
+    fTimerCheckVersion.start(2000);
 }
 
 void DlgFace::handleCreditCards(const QJsonObject &obj)
@@ -304,114 +273,158 @@ void DlgFace::handleVersion(const QJsonObject &obj)
     }
 }
 
-void DlgFace::handleSocket(const QJsonObject &obj)
-{
-    QJsonObject no(obj);
-    C5SocketHandler *sh = static_cast<C5SocketHandler*>(sender());
-    C5WaiterServer ws(no, sh->fSocket);
-    QJsonObject o;
-    ws.reply(o);
-    o["cmd"] = ws.cmd();
-    sh->send(o);
-    sh->close();
-    sh->deleteLater();
-}
-
-void DlgFace::on_btnConnection_clicked()
-{
-    go<C5Connection>(C5Config::dbParams());
-}
-
 void DlgFace::on_btnExit_clicked()
 {
     if (fModeJustSelectTable) {
         C5Dialog::reject();
         return;
     }
-    if (C5Message::question(tr("Are you sure to close application")) == QDialog::Accepted) {
-        fCanClose = true;
-        qApp->quit();
-    }
+    accept();
 }
 
-void DlgFace::filterHall(const QString &hall)
+void DlgFace::filterHall(int hall, int staff)
 {
-    ui->tblHall->clearContents();
-    ui->tblHall->setRowCount(0);
-    int c = 0, r = 0;
-    for (int i = 0; i < C5CafeCommon::fTables.count(); i++)  {
-        if (hall != "*" && !hall.isEmpty()) {
-            if (C5CafeCommon::fTables.at(i).toObject()["f_hall"].toString() != hall) {
+    fCurrentHall = hall;
+    fCurrentStaff = staff;
+    while (ui->glTables->itemAt(0)) {
+        ui->glTables->itemAt(0)->widget()->deleteLater();
+        ui->glTables->removeItem(ui->glTables->itemAt(0));
+    }
+    int col = 0;
+    int row = 0;
+    for (int id: dbtable->list()) {
+        if (hall > 0) {
+            if (dbtable->hall(id) != hall) {
                 continue;
             }
         }
-        if (c == ui->tblHall->columnCount()) {
-            c = 0;
-            r++;
-        }
-        if (r > ui->tblHall->rowCount() - 1) {
-            ui->tblHall->setRowCount(r + 1);
-            for (int j = 0; j < ui->tblHall->columnCount(); j++) {
-                ui->tblHall->setItem(r, j, new QTableWidgetItem());
+        if (staff > 0) {
+            if (dboheader->staff(dboheader->fTableOrder[id]) != staff) {
+                continue;
             }
         }
-        QTableWidgetItem *item = ui->tblHall->item(r, c++);
-        item->setData(Qt::UserRole, C5CafeCommon::fTables.at(i).toObject());
+        TableWidgetV1 *t = new TableWidgetV1();
+        connect(t, &TableWidgetV1::clicked, this, &DlgFace::tableClicked);
+        t->config(id);
+        t->configOrder(dboheader->fTableOrder.contains(id) ? dboheader->fTableOrder[id] : "");
+        ui->glTables->addWidget(t, row, col++, 1, 1);
+        if (col > 4) {
+            row++;
+            col = 0;
+        }
     }
-    ui->tblHall->setRowCount(r + 1);
+    ui->glTables->setRowStretch(row + 1, 1);
+    colorizeHall();
+}
+
+void DlgFace::colorizeHall()
+{
+    for (int i = 0; i < ui->vlHall->count(); i++) {
+        QPushButton *btn = dynamic_cast<QPushButton*>(ui->vlHall->itemAt(i)->widget());
+        if (btn) {
+            if (btn->property("id").toInt() == fCurrentHall) {
+                btn->setProperty("stylesheet_button_selected", true);
+            } else {
+                btn->setProperty("stylesheet_button_selected", false);
+            }
+        }
+    }
 }
 
 void DlgFace::viewMode(int m)
 {
-    ui->tblHall->setVisible(m == 0);
+    ui->whall->setVisible(m == 0);
     ui->tblReserved->setVisible(m == 1);
 }
 
-void DlgFace::on_tblHall_itemClicked(QTableWidgetItem *item)
+void DlgFace::setViewMode(int v)
 {
-    if (!item) {
-        return;
+    fView = v;
+    ui->btnViewHall->setProperty("stylesheet_button_selected", fView == view_mode_hall ?  true: false);
+    ui->btnViewHall->style()->polish(ui->btnViewHall);
+    ui->btnViewWaiter->setProperty("stylesheet_button_selected", fView == view_mode_waiter ?  true: false);
+    ui->btnViewWaiter->style()->polish(ui->btnViewWaiter);
+    ui->btnShowHidePreorders->setProperty("stylesheet_button_selected", fView == view_mode_preorder ?  true: false);
+    ui->btnShowHidePreorders->style()->polish(ui->btnShowHidePreorders);
+    switch (fView) {
+    case view_mode_hall:
+        ui->whall->setVisible(true);
+        ui->tblReserved->setVisible(false);
+        ui->wstaff->setVisible(false);
+        break;
+    case view_mode_waiter:
+        ui->whall->setVisible(true);
+        ui->tblReserved->setVisible(false);
+        ui->wstaff->setVisible(true);
+        break;
+    case view_mode_preorder:
+        ui->tblReserved->setColumnWidths(7, 0, 50, 180, 150, 150, 100, 100, 0);
+        ui->tblReserved->clearContents();
+        ui->tblReserved->setRowCount(0);
+        C5Database db(__c5config.dbParams());
+        db[":f_state1"] = ORDER_STATE_PREORDER_1;
+        db[":f_state2"] = ORDER_STATE_PREORDER_2;
+        db.exec("select h.f_id, t.f_name as f_tablename, p.f_datefor, p.f_timefor, p.f_prepaidcash, p.f_prepaidcard, p.f_guests, h.f_state "
+                "from o_preorder p "
+                "left join o_header h on h.f_id=p.f_id "
+                "left join h_tables t on t.f_id=h.f_table "
+                "where (h.f_state=:f_state1 or h.f_state=:f_state2) "
+                "order by 1, 2");
+        ui->tblReserved->setRowCount(db.rowCount());
+        int row = 0;
+        while (db.nextRow()) {
+            for (int i = 0; i < db.columnCount(); i++) {
+                ui->tblReserved->setItem(row, i, new QTableWidgetItem());
+                ui->tblReserved->setData(row, i, db.getValue(i));
+            }
+            if (db.getInt("f_state") == ORDER_STATE_PREORDER_1) {
+                for (int i = 0; i < ui->tblReserved->columnCount(); i++) {
+                    ui->tblReserved->item(row, i)->setData(Qt::BackgroundColorRole, QColor::fromRgb(200, 200, 200));
+                }
+            }
+            row++;
+        }
+        ui->whall->setVisible(false);
+        ui->tblReserved->setVisible(true);
+        ui->wstaff->setVisible(false);
+        break;
     }
-    QJsonObject o = item->data(Qt::UserRole).toJsonObject();
-    if (o["f_id"].toString().toInt() == 0) {
-        return;
-    }
-    if (fModeJustSelectTable) {
-        fSelectedTable = o;
-        fCanClose = true;
-        accept();
-        return;
-    }
-    C5User user;
-    if (!DlgPassword::getUser(o["f_name"].toString(), &user)) {
-        return;
-    }
-    fTimer.stop();
-    DlgOrder::openTable(o, &user);
-    C5SocketHandler *sh = createSocketHandler(SLOT(handleHall(QJsonObject)));
-    sh->bind("cmd", sm_hall);
-    sh->bind("hall", C5Config::hallList());
-    sh->send();
-    fTimer.start(TIMER_TIMEOUT_INTERVAL);
 }
 
-void DlgFace::on_btnHallFilter_clicked()
+void DlgFace::refreshTables()
 {
-    QString hall;
-    if (!DlgListOfHall::getHall(hall)) {
-        return;
+    dboheader->refresh();
+    for (int i = 0; i < ui->glTables->count(); i++) {
+        TableWidgetV1 *tw = dynamic_cast<TableWidgetV1*>(ui->glTables->itemAt(i)->widget());
+        if (tw) {
+            tw->configOrder(dboheader->fTableOrder.contains(tw->fTable) ? dboheader->fTableOrder[tw->fTable] : "");
+        }
     }
-    fCurrentHall = hall;
-    filterHall(hall);
+    while (ui->vlStaff->itemAt(0)) {
+        ui->vlStaff->itemAt(0)->widget()->deleteLater();
+        ui->vlStaff->removeItem(ui->vlStaff->itemAt(0));
+    }
+    for (int staff: dboheader->fStaffTable.keys()) {
+        QPushButton *btn = new QPushButton(dbuser->fullShort(staff));
+        btn->setMinimumSize(QSize(150, 50));
+        connect(btn, &QPushButton::clicked, this, &DlgFace::filterStaffClicked);
+        btn->setProperty("id", staff);
+        ui->vlStaff->addWidget(btn);
+    }
+    ui->vlStaff->addStretch(0);
 }
 
 void DlgFace::on_btnReports_clicked()
 {
-    C5User user;
-    if (!DlgPassword::getUser(tr("Reports"), &user)) {
-        return;
+    C5User *tmp;
+    if (!fUser->check(cp_t5_reports)) {
+        if (!DlgPassword::getUserAndCheck(tr("Reports"), tmp, cp_t5_reports)) {
+            return;
+        }
+    } else {
+        tmp = fUser;
     }
-    DlgReports::openReports(&user);
+    DlgReports::openReports(tmp);
 }
 
 void DlgFace::on_btnCancel_clicked()
@@ -419,40 +432,19 @@ void DlgFace::on_btnCancel_clicked()
     on_btnExit_clicked();
 }
 
-void DlgFace::on_btnClearDroid_clicked()
-{
-    if (C5Message::question(tr("Are you sure to clear droids?")) != QDialog::Accepted) {
-        return;
-    }
-    C5Database db(C5Config::dbParams());
-    db[":msg"] = 1;
-    db.insert("droid_message", false);
-}
-
 void DlgFace::on_btnSetSession_clicked()
 {
-    C5User user;
-    if (!DlgPassword::getUser(tr("Shift rotation"), &user)) {
+    if (!fUser->isValid()) {
+        if (!DlgPassword::getUser(tr("Shift rotation"), fUser)) {
+            return;
+        }
+    }
+    if (!fUser->check(cp_t5_shift_rotation)) {
+        C5Message::error(fUser->error());
         return;
     }
-    if (user.check(cp_t5_shift_rotation)) {
-        DlgShiftRotation *d = new DlgShiftRotation(fDBParams);
-        d->exec();
-        delete d;
-    }
-    confTimeout();
-}
-
-void DlgFace::on_btnEnter_clicked()
-{
-    QString pass;
-    if (!DlgPassword::getString(tr("Password"), pass)) {
-        return;
-    }C5Database db(fDBParams);
-    C5UserAuth *ua  = new C5UserAuth(db);
-    if (!ua->enterWork(pass)) {
-        C5Message::error(ua->error());
-    }
+    DlgShiftRotation d(fDBParams);
+    d.exec();
 }
 
 void DlgFace::on_btnOut_clicked()
@@ -467,4 +459,43 @@ void DlgFace::on_btnOut_clicked()
         C5Message::error(ua->error());
     }
     delete ua;
+}
+
+void DlgFace::on_btnShowHidePreorders_clicked()
+{
+    setViewMode(view_mode_preorder);
+}
+
+void DlgFace::on_tblReserved_cellClicked(int row, int column)
+{
+    Q_UNUSED(column);
+    QString orderid = ui->tblReserved->item(row, 0)->data(Qt::DisplayRole).toString();
+    if (!fUser->isValid()) {
+        if (!DlgPassword::getUser(ui->tblReserved->getString(row, 1), fUser)) {
+            return;
+        }
+    }
+    if (!fUser->check(cp_t5_edit_reserve)) {
+        C5Message::error(fUser->error());
+        return;
+    }
+    fTimer.stop();
+    DlgOrder::openTableById(orderid, fUser);
+    fTimer.start(TIMER_TIMEOUT_INTERVAL);
+}
+
+void DlgFace::on_btnViewHall_clicked()
+{
+    setViewMode(view_mode_hall);
+}
+
+void DlgFace::on_btnViewWaiter_clicked()
+{
+    setViewMode(view_mode_waiter);
+}
+
+void DlgFace::filterStaffClicked()
+{
+    QPushButton *btn = static_cast<QPushButton*>(sender());
+    filterHall(fCurrentHall, btn->property("id").toInt());
 }

@@ -14,7 +14,7 @@ class DlgReports : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgReports(const QStringList &dbParams);
+    explicit DlgReports(const QStringList &dbParams, C5User *user);
 
     ~DlgReports();
 
@@ -25,7 +25,7 @@ private:
 
     C5User *fUser;
 
-    QString fCurrentHall;
+    int fCurrentHall;
 
     int fShiftId;
 

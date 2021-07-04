@@ -105,5 +105,9 @@
         <file>tool-box.png</file>
         <file>login.png</file>
         <file>reservation.png</file>
+        <file>addguest.png</file>
+        <file>prepayment.png</file>
+        <file>back-arrow.png</file>
+        <file>sauces.png</file>
     </qresource>
 </RCC>

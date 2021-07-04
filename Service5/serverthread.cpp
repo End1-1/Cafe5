@@ -31,7 +31,11 @@ void ServerThread::run()
         LogWriter::write(10, 1, "", QString("%1 private key is not instaled").arg(keyFileName));
     }
     fSslServer->setSslProtocol(QSsl::TlsV1_2OrLater);
+#ifdef QT_DEBUG
     fSslServer->listen(QHostAddress::AnyIPv4, 10002);
+#else
+    fSslServer->listen(QHostAddress::AnyIPv4, 10002);
+#endif
     while (fSslServer->waitForNewConnection(-1)) {
         while (fSslServer->hasPendingConnections()) {
             SslSocket *sslSocket = dynamic_cast<SslSocket*>(fSslServer->nextPendingConnection());

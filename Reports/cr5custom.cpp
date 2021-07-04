@@ -7,6 +7,8 @@ QStringList rsqls;
 CR5Custom::CR5Custom(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
 {
+    fLabel = tr("Custom reports");
+    fIcon = ":/constructor.png";
     rnames.clear();
     rsqls.clear();
     C5Database db(dbParams);

@@ -6,13 +6,13 @@
 #include <QCryptographicHash>
 #include <QDoubleValidator>
 
-DlgPassword::DlgPassword() :
+DlgPassword::DlgPassword(C5User *u) :
     C5Dialog(QStringList()),
-    ui(new Ui::DlgPassword)
+    ui(new Ui::DlgPassword),
+    fUser(u)
 {
     ui->setupUi(this);
     fMax = 0;
-    fAutoFromDb = false;
 }
 
 DlgPassword::~DlgPassword()
@@ -22,28 +22,30 @@ DlgPassword::~DlgPassword()
 
 bool DlgPassword::getUser(const QString &title, C5User *user)
 {
-    DlgPassword *d = new DlgPassword();
-    d->fUser = user;
+    user = new C5User(0);
+    DlgPassword *d = new DlgPassword(user);
     d->ui->label->setText(title);
     bool result = d->exec() == QDialog::Accepted;
     delete d;
     return result;
 }
 
-bool DlgPassword::getUserDB(const QString &title, C5User *user)
+bool DlgPassword::getUserAndCheck(const QString &title, C5User *user, int permission)
 {
-    DlgPassword *d = new DlgPassword();
-    d->fUser = user;
-    d->fAutoFromDb = true;
-    d->ui->label->setText(title);
-    bool result = d->exec() == QDialog::Accepted;
-    delete d;
-    return result;
+    if (!getUser(title, user)) {
+        return false;
+    }
+    if (!user->check(permission)) {
+        C5Message::error(tr("You have not permission for this action"));
+        return false;
+    }
+    return true;
 }
 
 bool DlgPassword::getQty(const QString &title, int &qty)
 {
-    DlgPassword *d = new DlgPassword();
+    C5User u(0);
+    DlgPassword *d = new DlgPassword(&u);
     d->ui->label->setText(title);
     d->ui->lePassword->setEchoMode(QLineEdit::Normal);
     d->ui->lePassword->setMaxLength(2);
@@ -55,7 +57,8 @@ bool DlgPassword::getQty(const QString &title, int &qty)
 
 bool DlgPassword::getAmount(const QString &title, double &amount, bool defaultAmount)
 {
-    DlgPassword *d = new DlgPassword();
+    C5User u(0);
+    DlgPassword *d = new DlgPassword(&u);
     d->ui->label->setText(title);
     d->ui->lePassword->setEchoMode(QLineEdit::Normal);
     d->ui->lePassword->setValidator(new QDoubleValidator(0, amount, 2));
@@ -71,7 +74,8 @@ bool DlgPassword::getAmount(const QString &title, double &amount, bool defaultAm
 
 bool DlgPassword::getString(const QString &title, QString &str)
 {
-    DlgPassword *d = new DlgPassword();
+    C5User u(0);
+    DlgPassword *d = new DlgPassword(&u);
     d->ui->label->setText(title);
     d->ui->lePassword->setEchoMode(QLineEdit::Normal);
     d->ui->lePassword->setMaxLength(20);
@@ -83,7 +87,8 @@ bool DlgPassword::getString(const QString &title, QString &str)
 
 bool DlgPassword::getPassword(const QString &title, QString &str)
 {
-    DlgPassword *d = new DlgPassword();
+    C5User u(0);
+    DlgPassword *d = new DlgPassword(&u);
     d->ui->label->setText(title);
     d->ui->lePassword->setEchoMode(QLineEdit::Password);
     d->ui->lePassword->setMaxLength(20);
@@ -91,19 +96,6 @@ bool DlgPassword::getPassword(const QString &title, QString &str)
     str = d->ui->lePassword->text();
     delete d;
     return result;
-}
-
-void DlgPassword::handlePassword(const QJsonObject &obj)
-{
-    sender()->deleteLater();
-    if (obj["reply"].toInt() == 0) {
-        ui->lePassword->clear();
-        C5Message::error(tr("Access denied"));
-        ui->lePassword->setFocus();
-        return;
-    }
-    fUser->fromJson(obj);
-    accept();
 }
 
 void DlgPassword::on_pushButton_clicked()
@@ -173,28 +165,14 @@ void DlgPassword::on_pushButton_11_clicked()
 
 void DlgPassword::on_pushButton_12_clicked()
 {
+    QString pwd = ui->lePassword->text();
     if (ui->lePassword->echoMode() == QLineEdit::Password) {
-        if (fAutoFromDb) {
-            C5Database db(C5Config::fDBHost, C5Config::fDBPath, C5Config::fDBUser, C5Config::fDBPassword);
-            db[":f_altpassword"] = password(ui->lePassword->text());
-            db.exec("select f_first, f_last, f_id from s_user where f_altpassword=:f_altpassword");
-            if (db.nextRow()) {
-                fUser->fFirst = db.getString(0);
-                fUser->fLast = db.getString(1);
-                fUser->fFull = fUser->fLast + " " + fUser->fFirst;
-                fUser->fId = db.getInt(2);
-                __userid = fUser->fId;
-                __username = fUser->fFull;
-                accept();
-            } else {
-                C5Message::error(tr("Access denied"));
-            }
-        } else {
-            C5SocketHandler *s = createSocketHandler(SLOT(handlePassword(QJsonObject)));
-            s->bind("cmd", sm_checkuser);
-            s->bind("pass", password(ui->lePassword->text()));
-            s->send();
+        ui->lePassword->clear();
+        if (!fUser->authorize(pwd)) {
+            C5Message::error(fUser->error());
+            return;
         }
+        accept();
     } else {
         accept();
     }

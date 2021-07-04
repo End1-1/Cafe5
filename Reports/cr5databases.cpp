@@ -170,7 +170,6 @@ void CR5Databases::resetDatabase()
             db.exec("delete from a_header");
             db.exec("delete from b_history");
             db.exec("delete from b_clients_debts");
-            db.exec("delete from b_car_orders");
             db.exec("delete from o_tax_log");
             db.exec("delete from o_tax_debug");
             db.exec("delete from o_tax");

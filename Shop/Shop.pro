@@ -53,7 +53,6 @@ SOURCES += \
     ../Classes/c5combodelegate.cpp \
     ../Classes/c5crypt.cpp \
     ../Classes/c5datedelegate.cpp \
-    ../Classes/c5dishtabledelegate.cpp \
     ../Classes/c5filelogwriter.cpp \
     ../Classes/c5grid.cpp \
     ../Classes/c5gridgilter.cpp \
@@ -61,8 +60,8 @@ SOURCES += \
     ../Classes/c5jsondb.cpp \
     ../Classes/c5logtoserverthread.cpp \
     ../Classes/c5menu.cpp \
+    ../Classes/c5orderdriver.cpp \
     ../Classes/c5ordertabledelegate.cpp \
-    ../Classes/c5part2tabledelegate.cpp \
     ../Classes/c5permissions.cpp \
     ../Classes/c5printing.cpp \
     ../Classes/c5printjson.cpp \
@@ -93,6 +92,20 @@ SOURCES += \
     ../Controls/c5graphicsview.cpp \
     ../Controls/c5guicontrols.cpp \
     ../Controls/c5lineeditwithselector.cpp \
+    ../DbData/datadriver.cpp \
+    ../DbData/dbcar.cpp \
+    ../DbData/dbdata.cpp \
+    ../DbData/dbdishes.cpp \
+    ../DbData/dbdishpart1.cpp \
+    ../DbData/dbgoods.cpp \
+    ../DbData/dbgoodsgroup.cpp \
+    ../DbData/dbhalls.cpp \
+    ../DbData/dboheader.cpp \
+    ../DbData/dbpartner.cpp \
+    ../DbData/dbservicevalues.cpp \
+    ../DbData/dbstore.cpp \
+    ../DbData/dbtables.cpp \
+    ../DbData/dbusers.cpp \
     ../Editors/c5cashname.cpp \
     ../Editors/c5dishwidget.cpp \
     ../Editors/c5editor.cpp \
@@ -159,6 +172,7 @@ SOURCES += \
     ../FrontDesk/c5translatorform.cpp \
     ../FrontDesk/c5waiterorder.cpp \
     ../FrontDesk/dlgchangeoutputstore.cpp \
+    ../Reports/c5customfilter.cpp \
     ../Reports/c5settingswidget.cpp \
     ../Reports/cr5carvisits.cpp \
     ../Reports/cr5carvisitsfilter.cpp \
@@ -178,6 +192,7 @@ SOURCES += \
     ../Reports/cr5costumerdebts.cpp \
     ../Reports/cr5costumerdebtsfilter.cpp \
     ../Reports/cr5creditcards.cpp \
+    ../Reports/cr5custom.cpp \
     ../Reports/cr5databases.cpp \
     ../Reports/cr5debtstopartner.cpp \
     ../Reports/cr5discountstatisics.cpp \
@@ -315,7 +330,6 @@ HEADERS += \
     ../Classes/c5combodelegate.h \
     ../Classes/c5crypt.h \
     ../Classes/c5datedelegate.h \
-    ../Classes/c5dishtabledelegate.h \
     ../Classes/c5filelogwriter.h \
     ../Classes/c5grid.h \
     ../Classes/c5gridgilter.h \
@@ -323,8 +337,8 @@ HEADERS += \
     ../Classes/c5jsondb.h \
     ../Classes/c5logtoserverthread.h \
     ../Classes/c5menu.h \
+    ../Classes/c5orderdriver.h \
     ../Classes/c5ordertabledelegate.h \
-    ../Classes/c5part2tabledelegate.h \
     ../Classes/c5permissions.h \
     ../Classes/c5printing.h \
     ../Classes/c5printjson.h \
@@ -355,6 +369,20 @@ HEADERS += \
     ../Controls/c5graphicsview.h \
     ../Controls/c5guicontrols.h \
     ../Controls/c5lineeditwithselector.h \
+    ../DbData/datadriver.h \
+    ../DbData/dbcar.h \
+    ../DbData/dbdata.h \
+    ../DbData/dbdishes.h \
+    ../DbData/dbdishpart1.h \
+    ../DbData/dbgoods.h \
+    ../DbData/dbgoodsgroup.h \
+    ../DbData/dbhalls.h \
+    ../DbData/dboheader.h \
+    ../DbData/dbpartner.h \
+    ../DbData/dbservicevalues.h \
+    ../DbData/dbstore.h \
+    ../DbData/dbtables.h \
+    ../DbData/dbusers.h \
     ../Editors/c5cashname.h \
     ../Editors/c5dishwidget.h \
     ../Editors/c5editor.h \
@@ -421,6 +449,7 @@ HEADERS += \
     ../FrontDesk/c5translatorform.h \
     ../FrontDesk/c5waiterorder.h \
     ../FrontDesk/dlgchangeoutputstore.h \
+    ../Reports/c5customfilter.h \
     ../Reports/c5settingswidget.h \
     ../Reports/cr5carvisits.h \
     ../Reports/cr5carvisitsfilter.h \
@@ -440,6 +469,7 @@ HEADERS += \
     ../Reports/cr5costumerdebts.h \
     ../Reports/cr5costumerdebtsfilter.h \
     ../Reports/cr5creditcards.h \
+    ../Reports/cr5custom.h \
     ../Reports/cr5databases.h \
     ../Reports/cr5debtstopartner.h \
     ../Reports/cr5discountstatisics.h \
@@ -617,6 +647,7 @@ FORMS += \
     ../FrontDesk/c5translatorform.ui \
     ../FrontDesk/c5waiterorder.ui \
     ../FrontDesk/dlgchangeoutputstore.ui \
+    ../Reports/c5customfilter.ui \
     ../Reports/c5settingswidget.ui \
     ../Reports/cr5carvisitsfilter.ui \
     ../Reports/cr5cashdetailedfilter.ui \
@@ -684,6 +715,7 @@ INCLUDEPATH += ../FrontDesk
 INCLUDEPATH += ../Cache
 INCLUDEPATH += ../Reports
 INCLUDEPATH += ../Controls
+INCLUDEPATH += ../DbData
 INCLUDEPATH += ../Editors
 INCLUDEPATH += ../Service
 INCLUDEPATH += ../Waiter

@@ -10,8 +10,6 @@ C5SettingsWidget::C5SettingsWidget(const QStringList &dbParams, QWidget *parent)
     ui->cbDefaultStore->setDBValues(fDBParams, "select f_id, f_name from c_storages order by 2");
     ui->cbTaxUseExtPos->addItem(tr("Yes"), "true");
     ui->cbTaxUseExtPos->addItem(tr("No"), "false");
-    ui->cbServiceMode->addItem(tr("Increase price of dish"), SERVICE_AMOUNT_MODE_INCREASE_PRICE);
-    ui->cbServiceMode->addItem(tr("Print on receipt like a dish"), SERVICE_AMOUNT_MODE_SEPARATE);
     ui->cbFronDeskMode->addItem(tr("Waiter"), 0);
     ui->cbFronDeskMode->addItem(tr("Shop"), 1);
 }
@@ -80,7 +78,6 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     fTags[ui->cbDefaultStore->getTag()] = ui->cbDefaultStore->currentData().toString();
     fTags[ui->cbTaxUseExtPos->getTag()] = ui->cbTaxUseExtPos->currentData().toString();
     fTags[ui->leHotelDatabase->getTag()] = ui->leHotelDatabase->text();
-    fTags[ui->cbServiceMode->getTag()] = ui->cbServiceMode->currentData().toString();
     fTags[ui->leItemCodeForHotel->getTag()] = ui->leItemCodeForHotel->text();
     fTags[ui->chNoCashDoc->getTag()] = ui->chNoCashDoc->isChecked() ? "1" : "0";
     fTags[ui->chNoScanCode->getTag()] = ui->chNoScanCode->isChecked() ? "1" : "0";
@@ -119,6 +116,9 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     fTags[ui->chPrintScancodeWithName->getTag()] = ui->chPrintScancodeWithName->isChecked() ? "1" : "0";
     fTags[ui->chPrintDishOrder->getTag()] = ui->chPrintDishOrder->isChecked() ? "1" : "0";
     fTags[ui->leReceipPaperWidth->getTag()] = ui->leReceipPaperWidth->text();
+    fTags[ui->chAutoDateCash->getTag()] = ui->chAutoDateCash->isChecked() ? "1" : "0";
+    fTags[ui->leDateOfClose->getTag()] = ui->leDateOfClose->text();
+    fTags[ui->leShift->getTag()] = ui->leShift->text();
     C5Database db(fDBParams);
     db[":f_settings"] = ui->leCode->getInteger();
     db.exec("delete from s_settings_values where f_settings=:f_settings");

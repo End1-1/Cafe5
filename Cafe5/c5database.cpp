@@ -452,6 +452,13 @@ QMap<QString, QVariant> C5Database::getBindValues()
     return b;
 }
 
+void C5Database::rowToMap(QMap<QString, QVariant> &m)
+{
+    for (int i = 0; i < columnCount(); i++) {
+        m[columnName(i)] = getValue(i);
+    }
+}
+
 void C5Database::getBindValues(QMap<QString, QVariant> &b)
 {
     getBindValues(fCursorPos, b);

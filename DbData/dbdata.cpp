@@ -2,10 +2,13 @@
 
 QStringList DbData::fDbParams;
 
-DbData::DbData(const QString &tableName) :
+DbData::DbData(const QString &tableName, const QString &cond) :
+    QObject(),
     fDb(fDbParams)
 {
-    getFromDatabase(tableName);
+    fTable = tableName;
+    fCondition = cond;
+    getFromDatabase();
 }
 
 QVariant DbData::get(int id, const QString &key)
@@ -15,12 +18,27 @@ QVariant DbData::get(int id, const QString &key)
 
 void DbData::setDBParams(const QStringList &dbParams)
 {
-
+    fDbParams = dbParams;
 }
 
-void DbData::getFromDatabase(const QString &tableName)
+QString DbData::name(int id)
 {
-    fDb.exec("select * from " + tableName);
+    return get(id, "f_name").toString();
+}
+
+QList<int> DbData::list()
+{
+    return fData.keys();
+}
+
+void DbData::refresh()
+{
+    getFromDatabase();
+}
+
+void DbData::getFromDatabase()
+{
+    fDb.exec("select * from " + fTable + (fCondition.isEmpty() ? "" : " where " + fCondition));
     fData.clear();
     while (fDb.nextRow()) {
         QMap<QString, QVariant> row;

@@ -53,7 +53,6 @@
 #define param_shop_noF2 48
 #define param_shop_noPriceChange 49
 #define param_shop_defferentStaff 50
-#define param_waiter_login_after_payment 51
 #define param_shop_print_v1 52
 #define param_shop_print_v2 53
 #define param_shop_autologin_pin1 54
@@ -128,7 +127,7 @@ public:
 
     static QString defaultMenuName();
 
-    static QString defaultHall();
+    static int defaultHall();
 
     static QString hallList();
 
@@ -215,8 +214,6 @@ public:
     static bool shopDenyPriceChange();
 
     static bool shopDifferentStaff();
-
-    static bool waiterLoginAfterPayment();
 
     static int shopPrintVersion();
 

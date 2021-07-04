@@ -4,6 +4,7 @@
 #include "c5shoporder.h"
 #include "c5storedoc.h"
 #include <QThread>
+#include <QUuid>
 
 C5Replication::C5Replication() :
     QObject()
@@ -146,12 +147,36 @@ void C5Replication::downloadDataFromServer(const QStringList &src, const QString
     QString docId;
     dw.writeAHeader(docId, "SL", DOC_STATE_SAVED, DOC_TYPE_SALE_INPUT, 1, QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, 0, "", 0, 0);
     emit progress(QString("Step %1 of %2. Write header").arg(step).arg(steps));
+    QString logsql = "insert into a_store_draft (f_id, f_document, f_store, f_type, f_goods, f_qty, f_price, f_total, f_base, f_row, f_comment) values ";
+    bool f = true;
     while (dr.nextRow()) {
-        QString id;
-        dw.writeAStoreDraft(id, docId, __c5config.defaultStore(), DOC_TYPE_STORE_INPUT, dr.getInt("f_goods"), dr.getDouble("f_qty"), dr.getDouble("f_price"),
-                            dr.getDouble("f_total"), DOC_REASON_INPUT, id, rownum++, "");
-        db.setBindValues(dr.getBindValues());
+        if (f) {
+            f = false;
+        } else {
+            logsql.append(",");
+        }
+        QString u = QUuid::createUuid().toString().replace("{", "").replace("}", "");
+        logsql.append(QString("('%1', '%2', %3, %4, %5, %6, %7, %8, '', %9, '')")
+                      .arg(u)
+                      .arg(docId)
+                      .arg(__c5config.defaultStore())
+                      .arg(DOC_TYPE_STORE_INPUT)
+                      .arg(dr.getInt("f_goods"))
+                      .arg(dr.getDouble("f_qty"))
+                      .arg(dr.getDouble("f_price"))
+                      .arg(dr.getDouble("f_total"))
+                      .arg(rownum++));
+//        QString id;
+//        dw.writeAStoreDraft(id, docId, __c5config.defaultStore(), DOC_TYPE_STORE_INPUT, dr.getInt("f_goods"),
+//                            dr.getDouble("f_qty"), dr.getDouble("f_price"),
+//                            dr.getDouble("f_total"), DOC_REASON_INPUT, id, rownum++, "");
+//        db.setBindValues(dr.getBindValues());
         emit progress(QString("Step %1 of %2. %3 %4/%5").arg(step).arg(steps).arg("Store").arg(dr.pos()).arg(dr.rowCount()));
+    }
+    if(!db.exec(logsql)) {
+        emit progress(db.fLastError);
+        emit finished();
+        return;
     }
     emit progress(QString("Step %1 of %2. Store document: write input").arg(step).arg(steps));
     QString err;

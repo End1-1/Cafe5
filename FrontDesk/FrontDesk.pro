@@ -88,6 +88,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Reports/cr5menureviewfilter.cpp \
     ../Reports/cr5ordermarks.cpp \
     ../Reports/cr5preorders.cpp \
+    ../Reports/cr5printers.cpp \
     ../Reports/cr5salarybyworkers.cpp \
     ../Reports/cr5salarybyworkersfilter.cpp \
     ../Reports/cr5saleandstorefilter.cpp \
@@ -297,6 +298,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Reports/cr5menureviewfilter.h \
     ../Reports/cr5ordermarks.h \
     ../Reports/cr5preorders.h \
+    ../Reports/cr5printers.h \
     ../Reports/cr5salarybyworkers.h \
     ../Reports/cr5salarybyworkersfilter.h \
     ../Reports/cr5saleandstorefilter.h \

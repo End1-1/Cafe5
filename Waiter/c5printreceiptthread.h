@@ -1,40 +1,36 @@
 #ifndef C5PRINTRECEIPTTHREAD_H
 #define C5PRINTRECEIPTTHREAD_H
 
-#include <QThread>
-#include <QJsonArray>
-#include <QJsonObject>
+#include <QMap>
 #include <QObject>
 
-class C5PrintReceiptThread : public QThread
+class C5PrintReceiptThread : public QObject
 {
     Q_OBJECT
 
 public:
-    C5PrintReceiptThread(const QStringList &dbParams, const QJsonObject &header, const QJsonArray &body,
-                         const QString &printer, int paperWidth, QObject *parent = nullptr);
+    C5PrintReceiptThread(const QString &header, const QMap<QString, QVariant> &headerInfo, const QList<QMap<QString, QVariant> > &bodyinfo, const QString &printer, int language, int paperWidth, QObject *parent = nullptr);
 
     bool fBill;
 
-protected:
-    virtual void run();
+    bool print();
+
+    QString fError;
 
 private:
-    QJsonObject fHeader;
+    QMap<QString, QVariant> fHeaderInfo;
 
-    QJsonArray fBody;
+    QList<QMap<QString, QVariant> > fBodyInfo;
+
+    QString fHeader;
 
     QString fPrinter;
 
-    QStringList fDbParams;
-
     int fPaperWidth;
 
-private slots:
-    void print();
+    int fLanguage;
 
-signals:
-    void startPrint();
+
 };
 
 #endif // C5PRINTRECEIPTTHREAD_H

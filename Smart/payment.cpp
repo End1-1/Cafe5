@@ -38,6 +38,10 @@ payment::payment(const QString order, const QStringList &dbParams) :
     new QShortcut(QKeySequence("F2"), this, SLOT(focusChangeLineEdit()));
     new QShortcut(QKeySequence("F9"), this, SLOT(keyF9()));
     new QShortcut(QKeySequence("F10"), this, SLOT(keyF10()));
+    if (__c5config.getValue(param_tax_print_always_offer).toInt() != 0) {
+        ui->btnTax->setEnabled(false);
+        ui->btnTax->setChecked(true);
+    }
 }
 
 payment::~payment()

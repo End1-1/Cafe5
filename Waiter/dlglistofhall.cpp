@@ -2,6 +2,7 @@
 #include "ui_dlglistofhall.h"
 #include "c5config.h"
 #include "c5cafecommon.h"
+#include "datadriver.h"
 #include "c5dialog.h"
 
 DlgListOfHall::DlgListOfHall(QWidget *parent) :
@@ -9,12 +10,11 @@ DlgListOfHall::DlgListOfHall(QWidget *parent) :
     ui(new Ui::DlgListOfHall)
 {
     ui->setupUi(this);
-    for (int i = 0; i < C5CafeCommon::fHalls.count(); i++) {
-        QJsonObject o = C5CafeCommon::fHalls[i].toObject();
+    for (int id: dbhall->list()) {
         QListWidgetItem *item = new QListWidgetItem(ui->lst);
         item->setSizeHint(QSize(50, 50));
-        item->setText(o["f_name"].toString());
-        item->setData(Qt::UserRole, o["f_id"].toString());
+        item->setText(dbhall->name(id));
+        item->setData(Qt::UserRole, id);
         ui->lst->addItem(item);
     }
     QListWidgetItem *item = new QListWidgetItem(ui->lst);
@@ -29,7 +29,7 @@ DlgListOfHall::~DlgListOfHall()
     delete ui;
 }
 
-bool DlgListOfHall::getHall(QString &hall)
+bool DlgListOfHall::getHall(int &hall)
 {
     DlgListOfHall *d = new DlgListOfHall();
     bool result = d->exec() == QDialog::Accepted;
@@ -49,6 +49,6 @@ void DlgListOfHall::on_lst_clicked(const QModelIndex &index)
         reject();
         return;
     }
-    fHall = index.data(Qt::UserRole).toString();
+    fHall = index.data(Qt::UserRole).toInt();
     accept();
 }

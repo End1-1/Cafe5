@@ -63,7 +63,7 @@ void CashCollection::on_btnSave_clicked()
     }
     QString headerPrefix;
     int headerId;
-    if (!dw.hallId(headerPrefix, headerId, __c5config.defaultHall().toInt())) {
+    if (!dw.hallId(headerPrefix, headerId, __c5config.defaultHall())) {
         db.rollback();
         C5Message::error(dw.fErrorMsg);
         return;

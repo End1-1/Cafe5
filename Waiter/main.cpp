@@ -1,8 +1,9 @@
-#include "dlgface.h"
 #include "c5translator.h"
 #include "c5connection.h"
 #include "c5license.h"
 #include "c5sockethandler.h"
+#include "datadriver.h"
+#include "dlgscreen.h"
 #include <QApplication>
 #include <QTranslator>
 #include <QFile>
@@ -13,8 +14,9 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    if (!C5License::isOK()) {
-        QMessageBox::critical(0, QObject::tr("Applicatin error"), QObject::tr("Please, register application."));
+    QString err;
+    if (!C5License::isOK(err)) {
+        QMessageBox::critical(0, QObject::tr("Applicatin error"), err);
         return 0;
     }
 #ifndef QT_DEBUG
@@ -53,17 +55,22 @@ int main(int argc, char *argv[])
     QTranslator t;
     t.load(":/Waiter.qm");
 
-//    QFile styleSheet(":/waiter.qss");
-//    styleSheet.open(QIODevice::ReadOnly);
-//    a.setStyleSheet(styleSheet.readAll());
+    QFile styleSheet(a.applicationDirPath() + "/waiter.qss");
+    if (styleSheet.open(QIODevice::ReadOnly)) {
+        a.setStyleSheet(styleSheet.readAll());
+        styleSheet.close();
+    }
 
     a.installTranslator(&t);
     QFont font(a.font());
     font.setFamily("Arial LatArm Unicode");
-    font.setPointSize(12);
+    font.setPointSize(11);
     a.setFont(font);
 
-    DlgFace w;
+    DbData::setDBParams(__c5config.dbParams());
+    DataDriver::init(__c5config.dbParams());
+
+    DlgScreen w;
     C5Config::fParentWidget = &w;
     if (C5Config::isAppFullScreen()) {
         w.showFullScreen();
@@ -71,7 +78,6 @@ int main(int argc, char *argv[])
         w.show();
     }
     a.processEvents();
-    w.setup();
 
     return a.exec();
 }

@@ -124,10 +124,32 @@ void C5StoreInventory::saveDoc()
 
     db[":f_document"] = fInternalID;
     db.exec("delete from a_store_inventory where f_document=:f_document");
+    QString longsql = "insert into a_store_inventory (f_id, f_document, f_store, f_goods, f_qty, f_price, f_total) values ";
+    bool f = true;
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
-        QString id = ui->tblGoods->getString(i, 0);
-        dw.writeAStoreInventory(id, fInternalID, ui->leStore->getInteger(), ui->tblGoods->getInteger(i, 1), ui->tblGoods->lineEdit(i, 3)->getDouble(),  ui->tblGoods->lineEdit(i, 5)->getDouble(), ui->tblGoods->lineEdit(i, 6)->getDouble());
+        if (f) {
+            f = false;
+        } else {
+            longsql.append(",");
+        }
+        QString id = QUuid::createUuid().toString().replace("{", "").replace("}", "");
+        longsql.append(QString("('%1', '%2', %3, %4, %5, %6, %7)")
+                       .arg(id)
+                       .arg(fInternalID)
+                       .arg(ui->leStore->getInteger())
+                       .arg(ui->tblGoods->getInteger(i, 1))
+                       .arg(ui->tblGoods->lineEdit(i, 3)->getDouble())
+                       .arg(ui->tblGoods->lineEdit(i, 5)->getDouble())
+                       .arg(ui->tblGoods->lineEdit(i, 6)->getDouble()));
+//        QString id = ui->tblGoods->getString(i, 0);
+//        dw.writeAStoreInventory(id, fInternalID, ui->leStore->getInteger(), ui->tblGoods->getInteger(i, 1),
+//                                ui->tblGoods->lineEdit(i, 3)->getDouble(),  ui->tblGoods->lineEdit(i, 5)->getDouble(),
+//                                ui->tblGoods->lineEdit(i, 6)->getDouble());
         ui->tblGoods->setString(i, 0, id);
+    }
+    if (!db.exec(longsql)) {
+        C5Message::error(db.fLastError);
+        return;
     }
 
     C5Message::info(tr("Saved"));

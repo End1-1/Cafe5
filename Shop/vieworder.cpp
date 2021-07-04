@@ -128,11 +128,21 @@ void ViewOrder::on_btnReturn_clicked()
 
     QString headerPrefix;
     int headerId;
-    if (!dw.hallId(headerPrefix, headerId, __c5config.defaultHall().toInt())) {
+    if (!dw.hallId(headerPrefix, headerId, __c5config.defaultHall())) {
         return returnFalse(dw.fErrorMsg, &db);
     }
     QString oheaderid;
-    if (!dw.writeOHeader(oheaderid, headerId, headerPrefix, ORDER_STATE_CLOSE, __c5config.defaultHall().toInt(), __c5config.defaultTable(), QDate::currentDate(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), QTime::currentTime(), __userid, "", 1, returnAmount * -1, returnAmount * -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, fSaleType, fPartner)) {
+    if (!dw.writeOHeader(oheaderid, headerId, headerPrefix, ORDER_STATE_CLOSE,
+                         __c5config.defaultHall(),
+                         __c5config.defaultTable(),
+                         QDate::currentDate(),
+                         QDate::currentDate(),
+                         QDate::currentDate(),
+                         QTime::currentTime(),
+                         QTime::currentTime(),
+                         __userid,
+                         "", 1,
+                         returnAmount * -1, returnAmount * -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, fSaleType, fPartner)) {
         return returnFalse(dw.fErrorMsg, &db);
     }
 

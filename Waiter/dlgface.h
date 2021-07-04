@@ -2,7 +2,7 @@
 #define DLGFACE_H
 
 #include "c5dialog.h"
-#include <QTcpServer>
+#include "c5user.h"
 #include <QTableWidgetItem>
 #include <QTimer>
 
@@ -15,17 +15,13 @@ class DlgFace : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgFace();
+    explicit DlgFace(C5User *user);
 
     ~DlgFace();
 
     void setup();
 
-    void accept();
-
-    void reject();
-
-    static bool getTable(int &tableId, const QString &hall);
+    static bool getTable(int &tableId, int hall, C5User *user);
 
 private slots:
 
@@ -33,15 +29,13 @@ private slots:
 
     void checkVersionTimeout();
 
-    void confTimeout();
+    void hallClicked();
 
-    void newConnection();
+    void tableClicked(int id);
 
-    void handleHall(const QJsonObject &obj);
+    void filterStaffClicked();
 
     void handleMenu(const QJsonObject &obj);
-
-    void handleConf(const QJsonObject &obj);
 
     void handleCreditCards(const QJsonObject &obj);
 
@@ -51,50 +45,52 @@ private slots:
 
     void handleVersion(const QJsonObject &obj);
 
-    void handleSocket(const QJsonObject &obj);
-
-    void on_btnConnection_clicked();
-
     void on_btnExit_clicked();
-
-    void on_tblHall_itemClicked(QTableWidgetItem *item);
-
-    void on_btnHallFilter_clicked();
 
     void on_btnReports_clicked();
 
     void on_btnCancel_clicked();
 
-    void on_btnClearDroid_clicked();
-
     void on_btnSetSession_clicked();
 
-    void on_btnEnter_clicked();
-
     void on_btnOut_clicked();
+
+    void on_btnShowHidePreorders_clicked();
+
+    void on_tblReserved_cellClicked(int row, int column);
+
+    void on_btnViewHall_clicked();
+
+    void on_btnViewWaiter_clicked();
 
 private:
     Ui::DlgFace *ui;
 
-    QString fCurrentHall;
+    C5User *fUser;
 
-    QTcpServer fTcpServer;
+    int fCurrentHall;
+
+    int fCurrentStaff;
 
     QTimer fTimer;
 
     QTimer fTimerCheckVersion;
 
-    QTimer fConfTimer;
-
-    bool fCanClose;
-
     bool fModeJustSelectTable;
 
-    QJsonObject fSelectedTable;
+    int fSelectedTable;
 
-    void filterHall(const QString &hall);
+    int fView;
+
+    void filterHall(int hall, int staff);
+
+    void colorizeHall();
 
     void viewMode(int m);
+
+    void setViewMode(int v);
+
+    void refreshTables();
 };
 
 #endif // DLGFACE_H

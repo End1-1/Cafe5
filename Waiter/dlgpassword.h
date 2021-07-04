@@ -14,13 +14,15 @@ class DlgPassword : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgPassword();
+    explicit DlgPassword(C5User *u);
+
+    explicit DlgPassword(int i);
 
     ~DlgPassword();
 
     static bool getUser(const QString &title, C5User *user);
 
-    static bool getUserDB(const QString &title, C5User *user);
+    static bool getUserAndCheck(const QString &title, C5User *user, int permission);
 
     static bool getQty(const QString &title, int &qty);
 
@@ -31,8 +33,6 @@ public:
     static bool getPassword(const QString &title, QString &str);
 
 private slots:
-    void handlePassword(const QJsonObject &obj);
-
     void on_pushButton_clicked();
 
     void on_pushButton_2_clicked();
@@ -70,11 +70,9 @@ private:
 
     void click(const QString &text);
 
-    C5User *fUser;
-
     double fMax;
 
-    bool fAutoFromDb;
+    C5User *fUser;
 };
 
 #endif // DLGPASSWORD_H

@@ -2,6 +2,7 @@
 #include "ui_dialog.h"
 #include "c5crypt.h"
 #include <QFileDialog>
+#include <QMessageBox>
 
 Dialog::Dialog(QWidget *parent)
     : QDialog(parent)
@@ -37,4 +38,5 @@ void Dialog::on_btnGenerate_clicked()
         f.write(out);
         f.close();
     }
+    QMessageBox::information(this, "License", tr("Generated"));
 }

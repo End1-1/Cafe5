@@ -43,6 +43,8 @@ private slots:
 
     void on_leFilter_textChanged(const QString &arg1);
 
+    void on_btnGroups_clicked();
+
 private:
     Ui::Sales *ui;
 
@@ -55,6 +57,8 @@ private:
     void refreshItems();
 
     void refreshTotalItems();
+
+    void refreshGroups();
 
     int fViewMode;
 

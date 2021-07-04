@@ -1,10 +1,10 @@
 #include "dlgpreorder.h"
 #include "ui_dlgpreorder.h"
-#include "c5waiterorderdoc.h"
+#include "c5orderdriver.h"
 #include "dlgpassword.h"
 #include <QCalendarWidget>
 
-DlgPreorder::DlgPreorder(C5WaiterOrderDoc *w, const QStringList &dbParams) :
+DlgPreorder::DlgPreorder(C5OrderDriver *w, const QStringList &dbParams) :
     C5Dialog(dbParams),
     ui(new Ui::DlgPreorder),
     fOrder(w)
@@ -25,12 +25,13 @@ void DlgPreorder::on_btnCancel_clicked()
 
 void DlgPreorder::on_btnOK_clicked()
 {
-    fOrder->hSetInt("preorder", 1);
-    fOrder->hSetString("date", ui->leDate->date().toString(FORMAT_DATETIME_TO_STR));
-    fOrder->hSetString("time", ui->timeEdit->time().toString(FORMAT_TIME_TO_STR));
-    fOrder->hSetInt("guest", ui->leGuest->value());
-    fOrder->hSetDouble("cash", ui->leCash->getDouble());
-    fOrder->hSetDouble("card", ui->leCard->getDouble());
+    fOrder->setHeader("f_state", fOrder->dishesCount() == 0 ? ORDER_STATE_PREORDER_1 : ORDER_STATE_PREORDER_2);
+    fOrder->setPreorder("f_datefor", ui->leDate->date());
+    fOrder->setPreorder("f_timefor", ui->timeEdit->time());
+    fOrder->setPreorder("f_guests", ui->leGuest->value());
+    fOrder->setPreorder("f_prepaidcash", ui->leCash->getDouble());
+    fOrder->setPreorder("f_prepaidcard", ui->leCard->getDouble());
+    fOrder->save();
     accept();
 }
 

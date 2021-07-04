@@ -14,6 +14,7 @@
 #define VM_TOTAL 0
 #define VM_ITEMS 1
 #define VM_TOTAL_ITEMS 2
+#define VM_GROUPS 3
 
 Sales::Sales(QWidget *parent) :
     QDialog(parent),
@@ -71,6 +72,9 @@ void Sales::refresh()
         break;
     case VM_TOTAL_ITEMS:
         refreshTotalItems();
+        break;
+    case VM_GROUPS:
+        refreshGroups();
         break;
     }
 }
@@ -228,6 +232,47 @@ void Sales::refreshTotalItems()
     ui->leWhosale->setDouble(0);
 }
 
+void Sales::refreshGroups()
+{
+    QStringList h;
+    h.append(tr("Date"));
+    h.append(tr("Hall"));
+    h.append(tr("Group"));
+    h.append(tr("Qty"));
+    h.append(tr("Total"));
+    ui->tbl->setColumnCount(h.count());
+    ui->tbl->setHorizontalHeaderLabels(h);
+    ui->tbl->setColumnWidths(ui->tbl->columnCount(), 150, 250, 80, 80);
+    C5Database db(__c5config.replicaDbParams());
+    db[":f_hall"] = __c5config.defaultHall();
+    db[":f_start"] = ui->deStart->date();
+    db[":f_end"] = ui->deEnd->date();
+    db[":f_state"] = ORDER_STATE_CLOSE;
+    db.exec("select oh.f_datecash, h.f_name as f_hallname, gg.f_name as f_groupname, sum(og.f_qty), sum(og.f_total) "
+            "from o_goods og "
+            "inner join o_header oh on oh.f_id=og.f_header "
+            "inner join c_goods g on g.f_id=og.f_goods "
+            "left join c_groups gg on gg.f_id=g.f_group "
+            "left join s_user u on u.f_id=oh.f_staff "
+            "left join h_halls h on h.f_id=oh.f_hall "
+            "where oh.f_datecash between :f_start and :f_end and oh.f_state=:f_state " + userCond() +
+            "and oh.f_hall=:f_hall "
+            "group by 1, 2, 3 "
+            "order by oh.f_datecash, oh.f_timeclose ");
+    ui->tbl->setRowCount(db.rowCount());
+    int row = 0;
+    while (db.nextRow()) {
+        for (int i = 0; i < ui->tbl->columnCount(); i++) {
+            ui->tbl->setData(row, i, db.getValue(i));
+        }
+        row++;
+    }
+    int acol = 3;
+    ui->leTotal->setDouble(ui->tbl->sumOfColumn(acol));
+    ui->leRetail->setDouble(0);
+    ui->leWhosale->setDouble(0);
+}
+
 QString Sales::userCond() const
 {
     if (!ui->leLogin->isEmpty()) {
@@ -286,6 +331,7 @@ void Sales::on_btnModeTotal_clicked()
     ui->btnModeItems->setChecked(false);
     ui->btnModeTotal->setChecked(true);
     ui->btnTotalByItems->setChecked(false);
+    ui->btnGroups->setChecked(false);
     ui->btnPrint->setEnabled(true);
     ui->btnItemBack->setEnabled(true);
     ui->btnPrintTax->setEnabled(true);
@@ -298,6 +344,7 @@ void Sales::on_btnModeItems_clicked()
     ui->btnModeItems->setChecked(true);
     ui->btnModeTotal->setChecked(false);
     ui->btnTotalByItems->setChecked(false);
+    ui->btnGroups->setChecked(false);
     ui->btnPrint->setEnabled(true);
     ui->btnItemBack->setEnabled(true);
     ui->btnPrintTax->setEnabled(false);
@@ -430,4 +477,16 @@ void Sales::on_leFilter_textChanged(const QString &arg1)
         }
         ui->tbl->setRowHidden(r, h);
     }
+}
+
+void Sales::on_btnGroups_clicked()
+{
+    ui->btnModeItems->setChecked(false);
+    ui->btnModeTotal->setChecked(false);
+    ui->btnTotalByItems->setChecked(false);
+    ui->btnPrint->setEnabled(false);
+    ui->btnItemBack->setEnabled(false);
+    ui->btnPrintTax->setEnabled(false);
+    fViewMode = VM_GROUPS;
+    refresh();
 }

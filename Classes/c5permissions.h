@@ -71,6 +71,24 @@
 #define cp_t5_refund_goods 508
 #define cp_t5_shift_rotation 509
 #define cp_t5_remove_row_from_shop 510
+#define cp_t5_reports 511
+#define cp_t5_view_reserved_tables 512
+#define cp_t5_edit_reserve 513
+#define cp_t5_movetable 514
+
+#define cp_t5_enter_dlgface 515
+#define cp_t5_change_staff_of_table 516
+#define cp_t5_change_menu 517
+#define cp_t5_stoplist 518
+#define cp_t5_preorder 519
+#define cp_t5_discount 520
+#define cp_t5_cancel_discount 521
+#define cp_t5_print_precheck 522
+#define cp_t5_cancel_precheck 523
+#define cp_t5_repeat_precheck 524
+#define cp_t5_final_check 525
+#define cp_t5_edit_table 526
+#define cp_t5_splitguest 527
 
 #define cp_t6_goods_menu 600
 #define cp_t6_units 601

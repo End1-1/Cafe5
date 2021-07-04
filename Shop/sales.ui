@@ -257,6 +257,29 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="btnGroups">
+        <property name="styleSheet">
+         <string notr="true">                QPushButton:checked{
+                    background-color: rgb(0, 150, 0);
+					font-weight:bold;
+                }</string>
+        </property>
+        <property name="text">
+         <string>By groups</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/print.png</normaloff>:/print.png</iconset>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="btnPrint">
         <property name="text">
          <string>Duplicate receipt</string>

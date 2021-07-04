@@ -18,6 +18,8 @@ public:
 
     void setText(const QString &arg);
 
+    void appendText(const QString &arg);
+
     void setInteger(int i);
 
     int getInteger();
@@ -31,6 +33,8 @@ public:
     void setTag(int tag);
 
     inline bool isEmpty() {setText(text().trimmed()); return text().isEmpty();}
+
+    inline bool isNotEmpty() {setText(text().trimmed()); return !text().isEmpty();}
 
     void setColor(int c);
 

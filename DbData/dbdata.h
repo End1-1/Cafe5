@@ -3,22 +3,34 @@
 
 #include "c5database.h"
 
-class DbData
+class DbData : public QObject
 {
+    Q_OBJECT
 public:
-    DbData(const QString &tableName);
+    DbData(const QString &tableName, const QString &cond = "");
 
     static void setDBParams(const QStringList &dbParams);
 
+    virtual QString name(int id);
+
+    QList<int> list();
+
+    void refresh();
+
 protected:
+    C5Database fDb;
+
+    QString fTable;
+
+    QString fCondition;
+
     QMap<int, QMap<QString, QVariant> > fData;
 
     QVariant get(int id, const QString &key);
 
-    void getFromDatabase(const QString &tableName);
+    virtual void getFromDatabase();
 
 private:
-    C5Database fDb;
 
     static QStringList fDbParams;
 };

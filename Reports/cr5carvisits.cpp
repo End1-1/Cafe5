@@ -13,8 +13,8 @@ CR5CarVisits::CR5CarVisits(const QStringList &dbParams, QWidget *parent) :
     fSimpleQuery = false;
 
     fMainTable = "o_header oh";
-    fLeftJoinTables << "left join b_car_orders bco on bco.f_order=oh.f_id [bco]"
-                    << "left join b_car car on car.f_id=bco.f_car [car]"
+    fLeftJoinTables << "left join o_header_options o on o.f_id=oh.f_id [o]"
+                    << "left join b_car car on car.f_id=o.f_car [car]"
                     << "left join c_partners bc on bc.f_id=car.f_costumer [bc]"
                     << "left join s_car cm on cm.f_id=car.f_car [cm]";
 

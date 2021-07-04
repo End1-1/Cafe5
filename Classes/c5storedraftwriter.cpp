@@ -66,10 +66,10 @@ bool C5StoreDraftWriter::writeFromShopOutput(const QString &doc, int state, QStr
             writeOGoods(i.recId, doc, i.bodyId, i.store, i.goodsId, i.goodsQty, i.goodsPrice, i.goodsTotal, i.tax, 1, i.row, drid, i.discountFactor, i.discountMode, 0, 0);
         }
         if (state == DOC_STATE_SAVED) {
-//            if (!writeOutput(id, err)) {
-//                haveRelations(id, err, true);
-//                writeAHeader(id, userid, DOC_STATE_DRAFT, DOC_TYPE_STORE_OUTPUT, operatorId, docDate, QDate::currentDate(), QTime::currentTime(), 0, 0, comment, 0, 0);
-//            }
+            if (!writeOutput(id, err)) {
+                haveRelations(id, err, true);
+                writeAHeader(id, userid, DOC_STATE_DRAFT, DOC_TYPE_STORE_OUTPUT, operatorId, docDate, QDate::currentDate(), QTime::currentTime(), 0, 0, comment, 0, 0);
+            }
         }
     }
     return true;
@@ -660,7 +660,7 @@ bool C5StoreDraftWriter::writeOHeader(QString &id, int hallid, const QString &pr
                                       const QDate &dateopen, const QDate &dateclose, const QDate &datecash, const QTime &timeopen, const QTime &timeclose,
                                       int staff, const QString &comment, int print,
                                       double amountTotal, double amountCash, double amountCard, double amountBank, double amountOther,
-                                      int serviceMode, double amountService, double amountDiscount, double serviceFactor, double discountFactor,
+                                      double amountService, double amountDiscount, double serviceFactor, double discountFactor,
                                       int creditCardId, int otherId, int shift, int source, int saletype, int partner)
 {
     bool u = true;
@@ -687,7 +687,6 @@ bool C5StoreDraftWriter::writeOHeader(QString &id, int hallid, const QString &pr
     fDb[":f_amountcard"] = amountCard;
     fDb[":f_amountbank"] = amountBank;
     fDb[":f_amountother"] = amountOther;
-    fDb[":f_servicemode"] = serviceMode;
     fDb[":f_amountservice"] = amountService;
     fDb[":f_amountdiscount"] = amountDiscount;
     fDb[":f_servicefactor"] = serviceFactor;
@@ -790,23 +789,34 @@ bool C5StoreDraftWriter::writeInput(const QString &docId, QString &err)
     double total = 0;
     fDb[":f_document"] = docId;
     fDb.exec("select * from a_store_draft where f_document=:f_document");
-    QList<QMap<QString, QVariant> > rows;
+
+    QString longsql = "insert into a_store (f_id, f_document, f_store, f_type, f_goods, f_qty, f_price, f_total, f_base, f_basedoc, f_reason, f_draft) values ";
+    bool f = true;
+
     while (fDb.nextRow()) {
-        rows.append(fDb.getBindValues());
+        if (f) {
+            f = false;
+        } else {
+            longsql.append(",");
+        }
+        longsql.append(QString("('%1', '%2', %3, %4, %5, %6, %7, %8, '%9', '%10', %11, '%12')")
+                     .arg(fDb.getString("f_id"))
+                     .arg(fDb.getString("f_document"))
+                     .arg(fDb.getInt("f_store"))
+                     .arg(fDb.getInt("f_type"))
+                     .arg(fDb.getInt("f_goods"))
+                     .arg(fDb.getDouble("f_qty"))
+                     .arg(fDb.getDouble("f_price"))
+                     .arg(fDb.getDouble("f_total"))
+                     .arg(fDb.getString("f_id"))
+                     .arg(docId)
+                     .arg(fDb.getInt("f_reason"))
+                       .arg(fDb.getString("f_id")));
         total += fDb.getDouble("f_total");
     }
-    for (int i = 0; i < rows.count(); i++) {
-        QMap<QString, QVariant> &r = rows[i];
-        r.remove(":f_row");
-        r.remove(":f_comment");
-        r[":f_basedoc"] = docId;
-        r[":f_base"] = r[":f_id"];
-        r[":f_draft"] = r[":f_id"];
-        fDb.setBindValues(r);
-        if (!fDb.insert("a_store", false)) {
-            err += fDb.fLastError + "<br>";
-            return false;
-        }
+    if (!fDb.exec(longsql)) {
+        err += fDb.fLastError + "<br>";
+        return false;
     }
     updateField("a_header", "f_amount", total, "f_id", docId);
     return true;

@@ -10,7 +10,7 @@ class C5Menu
 {
 public:
     C5Menu();
-    /*          Menu          Part1         Part2       Dishews */
+    /*          Menu          Part1         Part2       Dishes */
     static QMap<QString, QMap<QString, QMap<QString, QList<QJsonObject> > > >  fMenu;
 
     static QMap<QString, int> fPart2Color;

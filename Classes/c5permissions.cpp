@@ -78,6 +78,9 @@ void C5Permissions::init(C5Database &db)
               << cp_t5_refund_goods
               << cp_t5_shift_rotation
               << cp_t5_remove_row_from_shop
+              << cp_t5_reports
+              << cp_t5_view_reserved_tables
+              << cp_t5_movetable
 
               << cp_t6_storage
               << cp_t6_goods_menu

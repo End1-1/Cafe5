@@ -33,11 +33,9 @@ private:
 
     void processCloseOrder(QJsonObject &o, C5Database &db);
 
-    int printTax(const QJsonObject &h, const QJsonArray &ja, C5Database &db);
+    int printTax(const QMap<QString, QVariant> &header, const QList<QMap<QString, QVariant> > &body, QString &err);
 
-    bool printBill(QJsonObject &jh, QJsonArray &jb, QString &err, C5ServerHandler &srh);
-
-    bool printReceipt(QJsonObject &jh, QJsonArray &jb, QString &err, C5ServerHandler &srh);
+    bool printReceipt(QString &err, C5Database &db, bool isBill);
 
     void remember(const QJsonObject &h);
 

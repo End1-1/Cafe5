@@ -21,8 +21,9 @@ int main(int argc, char *argv[])
 #endif
 
     QApplication a(argc, argv);
-    if (!C5License::isOK()) {
-        QMessageBox::critical(0, QObject::tr("Application error"), QObject::tr("Please, register application."));
+    QString err;
+    if (!C5License::isOK(err)) {
+        QMessageBox::critical(0, QObject::tr("Application error"), err);
         return 0;
     }
 

@@ -3,7 +3,7 @@
 
 #include "c5dialog.h"
 
-class C5WaiterOrderDoc;
+class C5OrderDriver;
 
 namespace Ui {
 class DlgPreorder;
@@ -14,7 +14,7 @@ class DlgPreorder : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgPreorder(C5WaiterOrderDoc *w, const QStringList &dbParams);
+    explicit DlgPreorder(C5OrderDriver *w, const QStringList &dbParams);
 
     ~DlgPreorder();
 
@@ -44,7 +44,7 @@ private slots:
 private:
     Ui::DlgPreorder *ui;
 
-    C5WaiterOrderDoc *fOrder;
+    C5OrderDriver *fOrder;
 };
 
 #endif // DLGPREORDER_H

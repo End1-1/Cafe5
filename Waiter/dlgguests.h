@@ -7,14 +7,14 @@ namespace Ui {
 class DlgGuests;
 }
 
-class C5WaiterOrderDoc;
+class C5OrderDriver;
 
 class DlgGuests : public C5Dialog
 {
     Q_OBJECT
 
 public:
-    explicit DlgGuests(const QStringList &dbParams, C5WaiterOrderDoc *order);
+    explicit DlgGuests(const QStringList &dbParams, C5OrderDriver *order);
 
     ~DlgGuests();
 
@@ -28,7 +28,7 @@ private slots:
 private:
     Ui::DlgGuests *ui;
 
-    C5WaiterOrderDoc *fOrder;
+    C5OrderDriver *fOrder;
 };
 
 #endif // DLGGUESTS_H

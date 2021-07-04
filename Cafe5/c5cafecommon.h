@@ -24,25 +24,14 @@ public:
 
     static QString creditCardName(int id);
 
-    static QJsonObject table(const QString &id);
-
-    static QJsonObject table(int id);
-
-    static QJsonObject hall(const QString &id);
-
     static QStringList fDishRemoveReason;
 
     static QStringList fDishComments;
-
-    static QJsonArray fHalls;
-
-    static QJsonArray fTables;
 
     static QJsonArray fShifts;
 
     static QMap<int, QMap<int, QString> > fHallConfigs;
 
-    static QString serviceMode(int hall);
 };
 
 #endif // C5CAFECOMMON_H

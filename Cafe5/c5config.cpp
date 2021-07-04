@@ -188,13 +188,13 @@ QString C5Config::defaultMenuName()
     return getValue(param_default_menu_name);
 }
 
-QString C5Config::defaultHall()
+int C5Config::defaultHall()
 {
     QStringList halls = getValue(param_default_hall).split(",", QString::SkipEmptyParts);
     if (halls.count() > 0) {
-        return halls.at(0);
+        return halls.at(0).toInt();
     } else {
-        return "";
+        return 0;
     }
 }
 
@@ -359,11 +359,6 @@ bool C5Config::shopDenyPriceChange()
 bool C5Config::shopDifferentStaff()
 {
     return getValue(param_shop_defferentStaff).toInt() == 1;
-}
-
-bool C5Config::waiterLoginAfterPayment()
-{
-    return getValue(param_waiter_login_after_payment).toInt() == 1;
 }
 
 int C5Config::shopPrintVersion()

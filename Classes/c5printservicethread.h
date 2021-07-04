@@ -1,26 +1,28 @@
 #ifndef C5PRINTSERVICETHREAD_H
 #define C5PRINTSERVICETHREAD_H
 
-#include <QThread>
-#include <QJsonArray>
-#include <QJsonObject>
+#include <QObject>
+#include <QMap>
 
-class C5PrintServiceThread : public QThread
+class C5PrintServiceThread : public QObject
 {
     Q_OBJECT
 
 public:
-    C5PrintServiceThread(const QJsonObject &header, const QJsonArray &body, QObject *parent = nullptr);
+    C5PrintServiceThread(const QString &header, QObject *parent = nullptr);
 
     ~C5PrintServiceThread();
 
-protected:
-    virtual void run();
+    bool run();
 
 private:
-    QJsonObject fHeader;
+    QString fHeader;
 
-    QJsonArray fBody;
+    QMap<QString, QVariant> fHeaderData;
+
+    QMap<QString, QVariant> fPreorderData;
+
+    QList<QMap<QString, QVariant> > fBodyData;
 
     void print(const QString &printer, const QString &side);
 };

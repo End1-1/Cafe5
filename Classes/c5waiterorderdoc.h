@@ -68,10 +68,6 @@ public:
 
     void iSetDouble(const QString &name, double value, int index);
 
-    QString prepayment(int guest);
-
-    void countTotal();
-
     void calculateSelfCost(C5Database &db);
 
 private:
@@ -81,14 +77,6 @@ private:
     void open(C5Database &db);
 
     void getTaxInfo(C5Database &db);
-
-    void countTotalV1();
-
-    void countTotalV2();
-
-    double countPreTotalV1(int guest);
-
-    double countPreTotalV2(int guest);
 
     QString getHotelID(C5Database &db, const QString &source, QString &err);
 

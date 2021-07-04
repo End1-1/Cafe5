@@ -16,7 +16,7 @@ public:
 
     ~DlgListOfHall();
 
-    static bool getHall(QString &hall);
+    static bool getHall(int &hall);
 
 private slots:
     void on_lst_clicked(const QModelIndex &index);
@@ -24,7 +24,7 @@ private slots:
 private:
     Ui::DlgListOfHall *ui;
 
-    QString fHall;
+    int fHall;
 };
 
 #endif // DLGLISTOFHALL_H

@@ -77,8 +77,17 @@ SOURCES += \
     ../Controls/c5guicontrols.cpp \
     ../Controls/c5lineeditwithselector.cpp \
     ../DbData/datadriver.cpp \
+    ../DbData/dbcar.cpp \
     ../DbData/dbdata.cpp \
+    ../DbData/dbdishes.cpp \
+    ../DbData/dbdishpart1.cpp \
+    ../DbData/dbgoods.cpp \
+    ../DbData/dbgoodsgroup.cpp \
     ../DbData/dbhalls.cpp \
+    ../DbData/dboheader.cpp \
+    ../DbData/dbpartner.cpp \
+    ../DbData/dbservicevalues.cpp \
+    ../DbData/dbstore.cpp \
     ../DbData/dbtables.cpp \
     ../DbData/dbusers.cpp \
     ../Editors/c5cashname.cpp \
@@ -147,6 +156,7 @@ SOURCES += \
     ../FrontDesk/c5translatorform.cpp \
     ../FrontDesk/c5waiterorder.cpp \
     ../FrontDesk/dlgchangeoutputstore.cpp \
+    ../Reports/c5customfilter.cpp \
     ../Reports/c5settingswidget.cpp \
     ../Reports/cr5carvisits.cpp \
     ../Reports/cr5carvisitsfilter.cpp \
@@ -166,6 +176,7 @@ SOURCES += \
     ../Reports/cr5costumerdebts.cpp \
     ../Reports/cr5costumerdebtsfilter.cpp \
     ../Reports/cr5creditcards.cpp \
+    ../Reports/cr5custom.cpp \
     ../Reports/cr5databases.cpp \
     ../Reports/cr5debtstopartner.cpp \
     ../Reports/cr5discountstatisics.cpp \
@@ -232,15 +243,22 @@ SOURCES += \
     ../Shop/printreceiptgroup.cpp \
     ../Shop/selectprinters.cpp \
     c5printreceiptthread50mm.cpp \
+    dishitem.cpp \
     dlgcarnumber.cpp \
+    dlgchosesplitorderoption.cpp \
     dlgguests.cpp \
+    dlglist.cpp \
     dlglistdishspecial.cpp \
     dlglistofpackages.cpp \
     dlglistofshifts.cpp \
+    dlgprecheckoptions.cpp \
     dlgpreorder.cpp \
+    dlgqty.cpp \
+    dlgscreen.cpp \
     dlgshiftrotation.cpp \
     dlgsplitorder.cpp \
-    dlgtools.cpp \
+    dlgsystem.cpp \
+    dlgtimeorder.cpp \
         main.cpp \
         dlgface.cpp \
     ../Cafe5/c5database.cpp \
@@ -257,12 +275,10 @@ SOURCES += \
     ../Classes/c5menu.cpp \
     ../Classes/c5witerconf.cpp \
     ../Classes/c5waiterserver.cpp \
-    ../Classes/c5dishtabledelegate.cpp \
     ../Classes/c5ordertabledelegate.cpp \
     ../Classes/c5halltabledelegate.cpp \
     ../Classes/c5printing.cpp \
     ../Classes/c5printservicethread.cpp \
-    dlgpayment.cpp \
     ../Classes/QRCodeGenerator.cpp \
     ../../NewTax/Src/printtaxn.cpp \
     ../Controls/c5lineedit.cpp \
@@ -277,6 +293,9 @@ SOURCES += \
     ../Classes/c5tableview.cpp \
     ../Classes/c5printpreview.cpp \
     ../Classes/c5widget.cpp \
+    qdishbutton.cpp \
+    qdishpart2button.cpp \
+    tablewidgetv1.cpp \
     wguestorder.cpp \
     worder.cpp \
     wpaymentoptions.cpp \
@@ -288,7 +307,6 @@ SOURCES += \
     dlgreports.cpp \
     dlgreportslist.cpp \
     dlglistofmenu.cpp \
-    ../Classes/c5part2tabledelegate.cpp \
     dlgguest.cpp \
     ../Classes/rkeyboard.cpp \
     dlgreceiptlanguage.cpp \
@@ -350,8 +368,17 @@ HEADERS += \
     ../Controls/c5guicontrols.h \
     ../Controls/c5lineeditwithselector.h \
     ../DbData/datadriver.h \
+    ../DbData/dbcar.h \
     ../DbData/dbdata.h \
+    ../DbData/dbdishes.h \
+    ../DbData/dbdishpart1.h \
+    ../DbData/dbgoods.h \
+    ../DbData/dbgoodsgroup.h \
     ../DbData/dbhalls.h \
+    ../DbData/dboheader.h \
+    ../DbData/dbpartner.h \
+    ../DbData/dbservicevalues.h \
+    ../DbData/dbstore.h \
     ../DbData/dbtables.h \
     ../DbData/dbusers.h \
     ../Editors/c5cashname.h \
@@ -420,6 +447,7 @@ HEADERS += \
     ../FrontDesk/c5translatorform.h \
     ../FrontDesk/c5waiterorder.h \
     ../FrontDesk/dlgchangeoutputstore.h \
+    ../Reports/c5customfilter.h \
     ../Reports/c5settingswidget.h \
     ../Reports/cr5carvisits.h \
     ../Reports/cr5carvisitsfilter.h \
@@ -439,6 +467,7 @@ HEADERS += \
     ../Reports/cr5costumerdebts.h \
     ../Reports/cr5costumerdebtsfilter.h \
     ../Reports/cr5creditcards.h \
+    ../Reports/cr5custom.h \
     ../Reports/cr5databases.h \
     ../Reports/cr5debtstopartner.h \
     ../Reports/cr5discountstatisics.h \
@@ -506,7 +535,9 @@ HEADERS += \
     ../Shop/printreceiptgroup.h \
     ../Shop/selectprinters.h \
     c5printreceiptthread50mm.h \
+    dishitem.h \
     dlgcarnumber.h \
+    dlgchosesplitorderoption.h \
         dlgface.h \
     ../Cafe5/c5database.h \
     ../Cafe5/c5config.h \
@@ -518,6 +549,7 @@ HEADERS += \
     ../Cafe5/c5socketmessage.h \
     ../Cafe5/c5serverhandler.h \
     dlgguests.h \
+    dlglist.h \
     dlglistdishspecial.h \
     dlglistofpackages.h \
     dlglistofshifts.h \
@@ -527,20 +559,24 @@ HEADERS += \
     ../Classes/c5menu.h \
     ../Classes/c5witerconf.h \
     ../Classes/c5waiterserver.h \
-    ../Classes/c5dishtabledelegate.h \
     ../Classes/c5ordertabledelegate.h \
     ../Classes/c5halltabledelegate.h \
     ../Classes/c5printing.h \
     ../Classes/c5printservicethread.h \
-    dlgpayment.h \
     ../Classes/QRCodeGenerator.h \
     ../../NewTax/Src/printtaxn.h \
     ../Controls/c5lineedit.h \
     ../Classes/c5printremovedservicethread.h \
+    dlgprecheckoptions.h \
     dlgpreorder.h \
+    dlgqty.h \
+    dlgscreen.h \
     dlgshiftrotation.h \
     dlgsplitorder.h \
-    dlgtools.h \
+    dlgsystem.h \
+    dlgtimeorder.h \
+    qdishbutton.h \
+    qdishpart2button.h \
     rc.h \
     res.rc \
     ../Controls/c5tablewidget.h \
@@ -554,6 +590,7 @@ HEADERS += \
     ../Classes/c5widget.h \
     ../Classes/c5cache.h \
     stoplist.h \
+    tablewidgetv1.h \
     wguestorder.h \
     worder.h \
     wpaymentoptions.h \
@@ -565,7 +602,6 @@ HEADERS += \
     dlgreports.h \
     dlgreportslist.h \
     dlglistofmenu.h \
-    ../Classes/c5part2tabledelegate.h \
     dlgguest.h \
     ../Classes/rkeyboard.h \
     dlgreceiptlanguage.h \
@@ -647,6 +683,7 @@ FORMS += \
     ../FrontDesk/c5translatorform.ui \
     ../FrontDesk/c5waiterorder.ui \
     ../FrontDesk/dlgchangeoutputstore.ui \
+    ../Reports/c5customfilter.ui \
     ../Reports/c5settingswidget.ui \
     ../Reports/cr5carvisitsfilter.ui \
     ../Reports/cr5cashdetailedfilter.ui \
@@ -678,22 +715,29 @@ FORMS += \
     ../Reports/cr5tstoreextrafilter.ui \
     ../Reports/cr5usersfilter.ui \
     ../Shop/selectprinters.ui \
+    dishitem.ui \
     dlgcarnumber.ui \
+    dlgchosesplitorderoption.ui \
         dlgface.ui \
     ../Cafe5/c5connection.ui \
     ../Cafe5/c5message.ui \
     dlgguests.ui \
+    dlglist.ui \
     dlglistdishspecial.ui \
     dlglistofpackages.ui \
     dlglistofshifts.ui \
     dlgpassword.ui \
     dlgorder.ui \
-    dlgpayment.ui \
     ../Classes/c5printpreview.ui \
+    dlgprecheckoptions.ui \
     dlgpreorder.ui \
+    dlgqty.ui \
+    dlgscreen.ui \
     dlgshiftrotation.ui \
     dlgsplitorder.ui \
-    dlgtools.ui \
+    dlgsystem.ui \
+    dlgtimeorder.ui \
+    tablewidgetv1.ui \
     wguestorder.ui \
     worder.ui \
     wpaymentoptions.ui \

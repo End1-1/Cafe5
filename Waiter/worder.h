@@ -7,7 +7,8 @@ namespace Ui {
 class WOrder;
 }
 
-class C5WaiterOrderDoc;
+class C5OrderDriver;
+class DlgOrder;
 
 class WOrder : public QWidget
 {
@@ -18,28 +19,40 @@ public:
 
     ~WOrder();
 
-    void config(C5WaiterOrderDoc *order);
+    void setDlg(DlgOrder *dlg);
 
-    void itemsToTable(int guest);
+    void addStretch();
 
-    void setOrder(C5WaiterOrderDoc *order, int guest);
+    void itemsToTable();
 
-    void addItem(const QJsonObject &o);
+    int addItem(QJsonObject o);
 
-    void updateItem(const QJsonObject &o, int index);
-
-    int rowCount();
+    QPoint updateItem(int index);
 
     bool currentRow(int &row);
 
-    void updatePayment(int guest);
+    void setSelected(bool v = true);
+
+    bool isSelected();
+
+    C5OrderDriver *fOrderDriver;
 
 private:
     Ui::WOrder *ui;
 
-    C5WaiterOrderDoc *fOrder;
+    DlgOrder *fDlg;
 
-    int fGuest;
+    bool fSelected;
+
+    void setChanges();
+
+private slots:
+    QPoint focused(int index);
+
+    void on_btnActivate_clicked();
+
+signals:
+    void activated();
 };
 
 #endif // WORDER_H

@@ -5,13 +5,15 @@
 #include "c5translator.h"
 #include "c5cafecommon.h"
 #include "c5user.h"
+#include "datadriver.h"
 #include "dlglistofshifts.h"
 #include "dlgreceiptlanguage.h"
 #include "dlglistofhall.h"
 
-DlgReports::DlgReports(const QStringList &dbParams) :
+DlgReports::DlgReports(const QStringList &dbParams, C5User *user) :
     C5Dialog(dbParams),
-    ui(new Ui::DlgReports)
+    ui(new Ui::DlgReports),
+    fUser(user)
 {
     ui->setupUi(this);
     ui->date1->setDate(QDate::currentDate());
@@ -27,8 +29,7 @@ DlgReports::~DlgReports()
 
 void DlgReports::openReports(C5User *user)
 {
-    DlgReports *d = new DlgReports(QStringList());
-    d->fUser = user;
+    DlgReports *d = new DlgReports(QStringList(), user);
     d->showFullScreen();
     d->hide();
     d->getDailyCommon();
@@ -188,8 +189,8 @@ void DlgReports::on_btnPrintOrderReceipt_clicked()
     }
     C5SocketHandler *sh = createSocketHandler(SLOT(handleReceipt(QJsonObject)));
     sh->bind("cmd", sm_printreceipt);
-    sh->bind("staffid", QString::number(fUser->fId));
-    sh->bind("staffname", fUser->fFull);
+    sh->bind("staffid", QString::number(fUser->id()));
+    sh->bind("staffname", fUser->fullName());
     sh->bind("f_receiptlanguage", QString::number(C5Config::getRegValue("receipt_language").toInt()));
     sh->bind("id", ui->tbl->getString(l.at(0).row(), 0));
     sh->send();
@@ -206,12 +207,12 @@ void DlgReports::on_btnReceiptLanguage_clicked()
 
 void DlgReports::on_btnHall_clicked()
 {
-    QString hall;
+    int hall;
     if (!DlgListOfHall::getHall(hall)) {
         return;
     }
     fCurrentHall = hall;
-    ui->btnHall->setText(C5CafeCommon::hall(hall)["f_name"].toString());
+    ui->btnHall->setText(dbhall->name(fCurrentHall));
 }
 
 void DlgReports::on_btnShift_clicked()

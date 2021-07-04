@@ -21,7 +21,7 @@ JZStore::JZStore() :
         fStorages[3] = QString::fromUtf8("Խոհանոց");
         fStorages[4] = QString::fromUtf8("Սառնարան");
 
-        fAsStorageMap[2][2] = "021";
+        fAsStorageMap[2][2] = "022";
         fAsStorageMap[2][3] = "023";
         fAsStorageMap[2][4] = "025";
         fAsStorageMap[3][2] = "031";

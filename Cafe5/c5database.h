@@ -151,6 +151,8 @@ public:
 
     QMap<QString, QVariant> getBindValues();
 
+    void rowToMap(QMap<QString, QVariant> &m);
+
     void getBindValues(QMap<QString, QVariant> &b);
 
     void getBindValues(int row, QMap<QString, QVariant> &b);

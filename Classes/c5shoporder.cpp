@@ -73,11 +73,14 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
 
     QString headerPrefix;
     int headerId;
-    if (!dw.hallId(headerPrefix, headerId, __c5config.defaultHall().toInt())) {
+    if (!dw.hallId(headerPrefix, headerId, __c5config.defaultHall())) {
         return returnFalse(dw.fErrorMsg, db);
     }
     fHallId = QString("%1%2").arg(headerPrefix).arg( headerId);
-    if (!dw.writeOHeader(fHeader, headerId, headerPrefix, ORDER_STATE_CLOSE, __c5config.defaultHall().toInt(), __c5config.defaultTable(), fDateOpen, QDate::currentDate(), QDate::currentDate(), fTimeOpen, QTime::currentTime(), __userid, "", 1, total, (total - card), card, 0, 0, 0, 0, discount, 0, fCardValue, 0, 0, 1, 2, fSaleType, fPartnerCode)) {
+    if (!dw.writeOHeader(fHeader, headerId, headerPrefix, ORDER_STATE_CLOSE, __c5config.defaultHall(),
+                         __c5config.defaultTable(), fDateOpen, QDate::currentDate(), QDate::currentDate(), fTimeOpen,
+                         QTime::currentTime(), __userid, "", 1, total, (total - card), card, 0, 0,
+                         0, 0,  discount, fCardValue, 0, 0, 1, 2, fSaleType, fPartnerCode)) {
         return returnFalse(dw.fErrorMsg, db);
     }
     if (!dw.writeOPayment(fHeader, fCash, fChange)) {

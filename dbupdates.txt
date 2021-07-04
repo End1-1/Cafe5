@@ -601,3 +601,30 @@ ALTER TABLE s_salary_shift DROP f_formula, add column f_formula text;
 /* db - 48 */
 update s_app set f_version='48' where f_app='DB';
 UPDATE `s_app` SET `f_version` = '1.1.6.85' WHERE (`f_app` = 'WAITER');
+create table o_waiterserver_debug (f_id integer primary key auto_increment, f_json MEDIUMTEXT);
+alter table h_tables add column f_locktime timestamp;
+create table s_custom_reports (f_id integer primary key auto_increment, f_access smallint, f_name tinytext, f_sql text, f_params text);
+
+/* db - 49 */
+update s_app set f_version='49' where f_app='DB';
+alter table o_header add column f_currentstaff integer;
+alter table o_body add f_row smallint;
+alter table o_header_options add column f_car integer;
+update o_header_options  o set o.f_car=(select b.f_Car from b_car_orders b where b.f_order=o.f_id);
+drop table b_car_orders;
+alter table o_header add column f_guests tinyint default 0;
+
+/* db - 50 */
+update s_app set f_version='50' where f_app='DB';
+drop table droid_message;
+alter table o_header drop column f_servicemode;
+create table o_service_values (f_id integer primary key auto_increment, f_value decimal (4,2));
+alter table o_header add column f_precheck tinyint default 0;
+alter table o_header add column f_amountprepaid decimal(14,2) after f_amountcard;
+INSERT INTO`o_state` (`f_id`, `f_name`) VALUES ('7', 'Տեղափոխված');
+alter table o_body add column f_fromtable integer default 0;
+alter table d_part2 add column f_parent integer default 0;
+ALTER TABLE `o_goods` ADD INDEX `fk_oheader_id_idx` (`f_header` ASC);
+ALTER TABLE `o_goods` ADD CONSTRAINT `fk_oheader_id`  FOREIGN KEY (`f_header`)  REFERENCES `store`.`o_header` (`f_id`)  ON DELETE NO ACTION  ON UPDATE NO ACTION;
+ALTER TABLE `o_goods` ADD INDEX `fk_cgoods_id_idx` (`f_goods` ASC);
+ALTER TABLE `o_goods` ADD CONSTRAINT `fk_cgoods_id`  FOREIGN KEY (`f_goods`)  REFERENCES `store`.`c_goods` (`f_id`)  ON DELETE NO ACTION  ON UPDATE NO ACTION;

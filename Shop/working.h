@@ -19,11 +19,6 @@ struct IUser {
     QPixmap photo;
 };
 
-struct UncomplectGoods {
-    int uncomplectGoods;
-    double qty;
-};
-
 struct Flag {
     int id;
     QString field;

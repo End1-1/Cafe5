@@ -19,6 +19,11 @@ void C5LineEdit::setText(const QString &arg)
     QLineEdit::setText(t);
 }
 
+void C5LineEdit::appendText(const QString &arg)
+{
+    setText(text() + arg);
+}
+
 void C5LineEdit::setInteger(int i)
 {
     setText(QString::number(i));

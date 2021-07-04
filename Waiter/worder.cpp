@@ -1,100 +1,156 @@
 #include "worder.h"
 #include "ui_worder.h"
 #include "c5ordertabledelegate.h"
-#include "c5waiterorderdoc.h"
+#include "c5orderdriver.h"
+#include "c5message.h"
 #include "c5utils.h"
+#include "dishitem.h"
+#include "dlgorder.h"
+#include "dlgqty.h"
+#include <QJsonObject>
 
 #define PART2_COL_WIDTH 150
 #define PART2_ROW_HEIGHT 60
 #define PART3_ROW_HEIGHT 80
-#define PART4_ROW_HEIGHT 80
+#define PART4_ROW_HEIGHT 50
 
 WOrder::WOrder(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::WOrder)
 {
     ui->setupUi(this);
+    fSelected = false;
+    fOrderDriver = new C5OrderDriver(__c5config.dbParams());
+    fDlg = nullptr;
+    setChanges();
 }
 
 WOrder::~WOrder()
 {
     delete ui;
+    delete fOrderDriver;
 }
 
-void WOrder::config(C5WaiterOrderDoc *order)
+void WOrder::setDlg(DlgOrder *dlg)
 {
-    fOrder = order;
-    ui->tblOrder->setItemDelegate(new C5OrderTableDelegate());
-    ui->tblOrder->setColumnWidth(0, ui->tblOrder->width() - 2);
-    ui->tblOrder->verticalHeader()->setDefaultSectionSize(PART4_ROW_HEIGHT);
+    fDlg = dlg;
 }
 
-void WOrder::itemsToTable(int guest)
+void WOrder::addStretch()
 {
-    ui->tblOrder->clear();
-    ui->tblOrder->setRowCount(fOrder->fItems.count());
-    for (int i = 0; i < fOrder->fItems.count(); i++) {
-        ui->tblOrder->setItem(i, 0, new QTableWidgetItem());
-        ui->tblOrder->item(i, 0)->setData(Qt::UserRole, fOrder->fItems[i].toObject());
-        if (fOrder->iInt("f_state", i) != DISH_STATE_OK) {
-            ui->tblOrder->setRowHidden(i, true);
+    ui->vl->addStretch();
+}
+
+void WOrder::itemsToTable()
+{
+    while (ui->vl->itemAt(0)) {
+        ui->vl->itemAt(0)->widget()->deleteLater();
+        ui->vl->removeItem(ui->vl->itemAt(0));
+    }
+    if (fOrderDriver->currentOrderId().isEmpty()) {
+        return;
+    }
+    for (int i = 0; i < fOrderDriver->dishesCount(); i++) {
+        DishItem *w = new DishItem(fOrderDriver, i);
+        connect(w, SIGNAL(focused(int)), this, SLOT(focused(int)));
+        if (fDlg) {
+            connect(w, &DishItem::changeQty, fDlg, &DlgOrder::changeQty);
         } else {
-            bool h = false;
-            if (guest > 0) {
-                h = guest != fOrder->iInt("f_guest", i);
-            }
-            ui->tblOrder->setRowHidden(i, h);
+            w->setReadyOnly(true);
         }
+        ui->vl->addWidget(w);
     }
-    ui->leTotal->setText(float_str(fOrder->hString("f_amounttotal").toDouble(), 2));
-    ui->lePrepaiment->setText(fOrder->prepayment(guest));
 }
 
-void WOrder::setOrder(C5WaiterOrderDoc *order, int guest)
+int WOrder::addItem(QJsonObject o)
 {
-    fOrder = order;
-    fGuest = guest;
-}
-
-void WOrder::addItem(const QJsonObject &o)
-{
-    int row = ui->tblOrder->rowCount();
-    ui->tblOrder->setRowCount(row + 1);
-    ui->tblOrder->setItem(row, 0, new QTableWidgetItem());
-    ui->tblOrder->item(row, 0)->setData(Qt::UserRole, o);
-    ui->tblOrder->setCurrentCell(ui->tblOrder->rowCount() - 1, 0);
-    ui->lePrepaiment->setText(fOrder->prepayment(fGuest));
-}
-
-void WOrder::updateItem(const QJsonObject &o, int index)
-{
-    if (index > -1) {
-        ui->tblOrder->item(index, 0)->setData(Qt::UserRole, o);
-        ui->tblOrder->viewport()->update();
+    o["f_row"] = fOrderDriver->dishesCount();
+    if (!fOrderDriver->addDish(o)) {
+        C5Message::error(fOrderDriver->error());
+        return -1;
     }
-    ui->tblOrder->scrollToItem(ui->tblOrder->item(index, 0));
-    ui->tblOrder->setCurrentItem(ui->tblOrder->item(index, 0));
-    ui->lePrepaiment->setText(fOrder->prepayment(fGuest));
+    int row = fOrderDriver->dishesCount() - 1;
+    DishItem *di = new DishItem(fOrderDriver, row);
+    connect(di, &DishItem::focused, this, &WOrder::focused);
+    if (fDlg) {
+        connect(di, &DishItem::changeQty, fDlg, &DlgOrder::changeQty);
+    } else {
+        di->setReadyOnly(true);
+    }
+    ui->vl->insertWidget(row, di);
+    focused(row);
+    setMinimumHeight(((row + 1) *50) + 10);
+    return row;
 }
 
-int WOrder::rowCount()
+QPoint WOrder::updateItem(int index)
 {
-    return ui->tblOrder->rowCount();
+    QPoint p = focused(index);
+    return p;
 }
 
 bool WOrder::currentRow(int &row)
 {
-    QModelIndexList ml = ui->tblOrder->selectionModel()->selectedIndexes();
-    if (ml.count() == 0) {
-        return false;
+    row = -1;
+    for (int i = 0, count = ui->vl->count(); i < count; i++) {
+        QLayoutItem *l = ui->vl->itemAt(i);
+        DishItem *d = dynamic_cast<DishItem*>(l->widget());
+        if (d) {
+            if (d->isFocused()) {
+                row = d->index();
+                break;
+            }
+        }
     }
-    row = ml.at(0).row();
-    return true;
+    return row > -1;
 }
 
-void WOrder::updatePayment(int guest)
+void WOrder::setSelected(bool v)
 {
-    ui->leTotal->setText(float_str(fOrder->hString("f_amounttotal").toDouble(), 2));
-    ui->lePrepaiment->setText(fOrder->prepayment(guest));
-    ui->tblOrder->viewport()->update();
+    fSelected = v;
+    setChanges();
+    if (!fSelected) {
+        for (int i = 0, count = ui->vl->count(); i < count; i++) {
+            QLayoutItem *l = ui->vl->itemAt(i);
+            DishItem *d = dynamic_cast<DishItem*>(l->widget());
+            if (d) {
+                d->clearFocus(-1);
+            }
+        }
+    }
+}
+
+bool WOrder::isSelected()
+{
+    return fSelected;
+}
+
+void WOrder::setChanges()
+{
+    ui->frameHeader->setProperty("guest_selected", fSelected ? "1" : "2");
+    ui->frameHeader->style()->polish(ui->frameHeader);
+}
+
+QPoint WOrder::focused(int index)
+{
+    if (!fSelected) {
+        emit activated();
+    }
+    QPoint p(0, 0);
+    for (int i = 0, count = ui->vl->count(); i < count; i++) {
+        QLayoutItem *l = ui->vl->itemAt(i);
+        DishItem *d = dynamic_cast<DishItem*>(l->widget());
+        if (d) {
+            d->clearFocus(index);
+            if (d->isFocused()) {
+                p = d->mapTo(fDlg, QPoint(0, 0));
+            }
+        }
+    }
+    return p;
+}
+
+void WOrder::on_btnActivate_clicked()
+{
+    emit activated();
 }

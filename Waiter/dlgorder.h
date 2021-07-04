@@ -11,19 +11,28 @@ class DlgOrder;
 
 class C5User;
 class C5OrderDriver;
+class WOrder;
+class C5LineEdit;
 
 class DlgOrder : public C5Dialog
 {
     Q_OBJECT
 
 public:
-    explicit DlgOrder();
+    explicit DlgOrder(C5User *user);
 
     ~DlgOrder();
 
-    static void openTable(const QJsonObject &table, C5User *user);
+    C5User *fUser;
 
-    void saveOrder();
+    static void openTable(int table, C5User *user);
+
+    static void openTableById(const QString &id, C5User *user);
+
+    void itemsToTable();
+
+public slots:
+    void changeQty(double qty);
 
 protected:
     virtual void accept();
@@ -35,9 +44,9 @@ private:
 
     QDateTime fOpenDateTime;
 
-    C5User *fUser;
-
     int fCarNumber;
+
+    int fTable;
 
     QString fMenuName;
 
@@ -47,74 +56,68 @@ private:
 
     int fTimerCounter;
 
-    C5OrderDriver *fOrderDriver;
+    WOrder *worder();
+
+    QList<WOrder *> worders();
 
     void load(int table);
 
     void buildMenu(const QString &menu, QString part1, QString part2);
 
-    void loadOrder(const QJsonObject &obj);
-
-    void changeQty(double qty);
-
-    void itemsToTable();
-
-    void setServiceLabel();
-
-    void logRecord(const QString &rec, const QString &action, const QString &value1, const QString &value2);
-
-    void processDelayedLogs();
+    void logRecord(const QString &username, const QString &orderid, const QString &rec, const QString &action, const QString &value1, const QString &value2);
 
     void setButtonsState();
 
-    void changeTimeOrder();
+    void removeWOrder(WOrder *wo);
 
-    void setCar(int num);
+    //void setCar(int num);
 
-    void countHourlyPayment();
+    void countHourlyPayment(WOrder *order);
 
     void restoreStoplistQty(int dish, double qty);
+
+    void setLangIcon();
+
+    void calcAmount(C5LineEdit *l);
+
+    void headerToLineEdit();
+
+    void clearOther();
+
+    void setCLComment();
+
+    void setComplimentary();
+
+    void setRoomComment();
+
+    void setSelfcost();
+
+    void setDiscountComment();
+
+    bool worderPaymentOK();
 
 private slots:
     void timeout();
 
-    void handleDiscount(const QJsonObject &obj);
+    void worderActivated();
 
-    void handleVisit(const QJsonObject &obj);
+    void dishpart1Clicked();
+
+    //void handleVisit(const QJsonObject &obj);
 
     void addDishToOrder(const QJsonObject &obj);
 
-    void handleOpenTable(const QJsonObject &obj);
-
     void handlePrintService(const QJsonObject &obj);
+
+    void handleReceipt(const QJsonObject &obj);
 
     void handleStopList(const QJsonObject &obj);
 
-    void saveAndQuit(const QJsonObject &obj);
-
-    void saveAndDiscount(const QJsonObject &obj);
-
-    void changeTable(const QJsonObject &obj);
-
     virtual void handleError(int err, const QString &msg);
 
-    void on_tblPart1_itemClicked(QTableWidgetItem *item);
+    void dishPart2Clicked();
 
-    void on_tblPart2_itemClicked(QTableWidgetItem *item);
-
-    void on_tblDishes_itemClicked(QTableWidgetItem *item);
-
-    void on_btnPlus1_clicked();
-
-    void on_btnMin1_clicked();
-
-    void on_btnPlus05_clicked();
-
-    void on_btnMin05_clicked();
-
-    void on_btnCustom_clicked();
-
-    void on_btnPayment_clicked();
+    void dishClicked();
 
     void on_btnExit_clicked();
 
@@ -122,33 +125,15 @@ private slots:
 
     void on_btnComment_clicked();
 
-    void on_btnDishScrollDown_clicked();
-
-    void on_btnTypeScrollDown_clicked();
-
-    void on_btnTypeScrollUp_clicked();
-
-    void on_btnDishScrollUp_clicked();
-
-    void on_btnExpandDishTable_clicked();
+    //void on_btnExpandDishTable_clicked();
 
     void on_btnChangeMenu_clicked();
 
-    void on_btnChangeTable_clicked();
-
     void on_btnGuest_clicked();
-
-    void on_btnRoomService_clicked();
 
     void on_btnSearchInMenu_clicked();
 
     void on_btnCompactDishAddMode_clicked();
-
-    void on_btnTime1_clicked();
-
-    void on_btnTime2_clicked();
-
-    void on_btnTime3_clicked();
 
     void on_btnCar_clicked();
 
@@ -158,12 +143,63 @@ private slots:
 
     void on_btnSit_clicked();
 
-    void on_btnJoinTable_clicked();
-
-    void on_btnTools_clicked();
-
     void on_btnSetReserve_clicked();
 
+    void on_btnSplitGuest_clicked();
+
+    void on_btnMovement_clicked();
+
+    void on_btnRecent_clicked();
+
+    void on_btnTable_clicked();
+
+    void on_btnChangeStaff_clicked();
+
+    void on_btnScrollUp_clicked();
+
+    void on_btnScrollDown_clicked();
+
+    void on_btnDiscount_clicked();
+
+    void on_btnTotal_clicked();
+
+    void on_btnReceiptLanguage_clicked();
+
+    void on_btnCalcCash_clicked();
+
+    void on_btnCalcCard_clicked();
+
+    void on_btnCalcBank_clicked();
+
+    void on_btnCalcPrepaid_clicked();
+
+    void on_btnCalcOther_clicked();
+
+    void on_btnPaymentCash_clicked();
+
+    void on_btnPaymentCard_clicked();
+
+    void on_btnPaymentBank_clicked();
+
+    void on_btnPrepayment_clicked();
+
+    void on_btnPaymentOther_clicked();
+
+    void on_btnPayCityLedger_clicked();
+
+    void on_btnPayComplimentary_clicked();
+
+    void on_btnPayTransferToRoom_clicked();
+
+    void on_btnReceipt_clicked();
+
+    void on_btnCloseOrder_clicked();
+
+    void on_btnService_clicked();
+
+    void on_btnTax_clicked();
+
+    void on_btnStopListMode_clicked();
 };
 
 #endif // DLGORDER_H
