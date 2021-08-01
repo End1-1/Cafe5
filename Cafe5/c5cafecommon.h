@@ -28,8 +28,6 @@ public:
 
     static QStringList fDishComments;
 
-    static QJsonArray fShifts;
-
     static QMap<int, QMap<int, QString> > fHallConfigs;
 
 };

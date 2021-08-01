@@ -17,16 +17,24 @@ public:
     bool setSslPrivateKey(const QString &path, QSsl::KeyAlgorithm algorithm = QSsl::Rsa, QSsl::EncodingFormat format = QSsl::Pem, const QByteArray &passPhrase = QByteArray());
     void setSslProtocol(QSsl::SslProtocol p);
 
-protected:
-    virtual void incomingConnection(qintptr handle) override final;
-
-private:
     QSslCertificate fSslLocalCertificate;
     QSslKey fSslPrivateKey;
     QSsl::SslProtocol fSslProtocol;
 
+public slots:
+    void startListen();
+
+protected:
+    virtual void incomingConnection(qintptr handle) override final;
+
+private:
+
+
 private slots:
     void acceptError(QAbstractSocket::SocketError err);
+
+signals:
+    void connectionRequest(int);
 };
 
 #endif // QSSLSERVER_H

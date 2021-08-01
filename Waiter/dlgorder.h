@@ -2,6 +2,7 @@
 #define DLGORDER_H
 
 #include "c5dialog.h"
+#include "c5menu.h"
 #include <QTableWidgetItem>
 #include <QTimer>
 
@@ -31,8 +32,9 @@ public:
 
     void itemsToTable();
 
-public slots:
-    void changeQty(double qty);
+    void setStoplistmode();
+
+    bool stoplistMode();
 
 protected:
     virtual void accept();
@@ -48,21 +50,23 @@ private:
 
     int fTable;
 
-    QString fMenuName;
+    int fMenuID;
 
-    QString fPart1Name;
+    int fPart1;
 
     QTimer fTimer;
 
     int fTimerCounter;
 
+    bool fStoplistMode;
+
     WOrder *worder();
 
     QList<WOrder *> worders();
 
-    void load(int table);
+    bool load(int table);
 
-    void buildMenu(const QString &menu, QString part1, QString part2);
+    void buildMenu(int menuid, int part1, int part2);
 
     void logRecord(const QString &username, const QString &orderid, const QString &rec, const QString &action, const QString &value1, const QString &value2);
 
@@ -96,6 +100,10 @@ private:
 
     bool worderPaymentOK();
 
+    bool buildDishes(int part2, const QList<DPart2> &dpart2);
+
+    bool fetchDishes(const DPart2 &part2, bool recent, int colcount, int &col, int &row);
+
 private slots:
     void timeout();
 
@@ -103,9 +111,11 @@ private slots:
 
     void dishpart1Clicked();
 
+    void processMenuID(int menuid);
+
     //void handleVisit(const QJsonObject &obj);
 
-    void addDishToOrder(const QJsonObject &obj);
+    void addDishToOrder(int menuid);
 
     void handlePrintService(const QJsonObject &obj);
 
@@ -118,6 +128,8 @@ private slots:
     void dishPart2Clicked();
 
     void dishClicked();
+
+    void dishPartClicked();
 
     void on_btnExit_clicked();
 
@@ -200,6 +212,18 @@ private slots:
     void on_btnTax_clicked();
 
     void on_btnStopListMode_clicked();
+
+    void on_btnOrderComment_clicked();
+
+    void on_btnPlus1_clicked();
+
+    void on_btnMinus1_clicked();
+
+    void on_btnAnyqty_clicked();
+
+    void on_btnDishPart2Down_clicked();
+
+    void on_btnDishPart2Up_clicked();
 };
 
 #endif // DLGORDER_H

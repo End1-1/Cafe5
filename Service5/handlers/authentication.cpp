@@ -1,6 +1,8 @@
 #include "authentication.h"
 #include "database.h"
 #include "jsonhandler.h"
+#include "databaseconnectionmanager.h"
+#include "dduser.h"
 
 Authentication::Authentication() :
     RequestHandler()
@@ -17,15 +19,13 @@ bool Authentication::handle(const QByteArray &data, const QHash<QString, DataAdd
 {
     JsonHandler jh;
     Database db;
-    if (!db.open("127.0.0.1", "server5", "root", "osyolia")) {
-        return setInternalServerError("Database error: " + db.lastDbError() + " #" + db.fDatabaseNumber);
+    if (!DatabaseConnectionManager::openDatabase(db, jh)) {
+        return setInternalServerError(jh.toString());
     }
     jh["db"] = db.fDatabaseNumber;
-    db[":fphone"] = getData(data, dataMap["phone"]);
-    db[":femail"] = getData(data, dataMap["email"]);
-    db[":fpassword"] = getData(data, dataMap["password"]);
-    db.exec("select uuid(), u.* from users_list u where (u.femail=:femail or u.fphone=:fphone) and u.fpassword=:fpassword");
-    if (db.next()) {
+    DDUser u;
+
+    if (u.authUserPass(db, getData(data, dataMap["email"]), getData(data, dataMap["phone"]), getData(data, dataMap["password"]))) {
         jh["uuid"] = db("uuid");
         fHttpHeader.setContentLength(jh.length());
         fResponse.append(fHttpHeader.toString());

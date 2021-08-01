@@ -12,15 +12,14 @@
 #include "tablewidgetv1.h"
 #include "c5utils.h"
 #include "datadriver.h"
-#include "dlgreports.h"
 #include "dlgexitwithmessage.h"
 #include "c5halltabledelegate.h"
 #include "fileversion.h"
 #include "c5cafecommon.h"
 #include "c5logtoserverthread.h"
-#include "c5userauth.h"
 #include <QPushButton>
 #include <QCloseEvent>
+#include <QDesktopWidget>
 
 #define HALL_COL_WIDTH 175
 #define HALL_ROW_HEIGHT 60
@@ -37,7 +36,9 @@ DlgFace::DlgFace(C5User *user) :
 
 {
     ui->setupUi(this);
-    setWindowFlags(windowFlags() | Qt::WindowMinimizeButtonHint);
+    if (C5Config::isAppFullScreen()) {
+        setWindowFlags(windowFlags() | Qt::WindowMinimizeButtonHint);
+    }
     ui->btnCancel->setVisible(false);
     ui->btnShowHidePreorders->setVisible(fUser->check(cp_t5_preorder));
     fModeJustSelectTable = false;
@@ -66,19 +67,15 @@ DlgFace::~DlgFace()
 
 void DlgFace::setup()
 {
-    C5SocketHandler *sh = createSocketHandler(SLOT(handleMenu(QJsonObject)));
-    sh->bind("cmd", sm_menu);
-    sh->send();
-
-    sh = createSocketHandler(SLOT(handleCreditCards(QJsonObject)));
-    sh->bind("cmd", sm_creditcards);
-    sh->send();
-    sh = createSocketHandler(SLOT(handleDishRemoveReason(QJsonObject)));
-    sh->bind("cmd", sm_dishremovereason);
-    sh->send();
-    sh = createSocketHandler(SLOT(handleDishComment(QJsonObject)));
-    sh->bind("cmd", sm_dishcomment);
-    sh->send();
+//    C5SocketHandler *sh = createSocketHandler(SLOT(handleCreditCards(QJsonObject)));
+//    sh->bind("cmd", sm_creditcards);
+//    sh->send();
+//    sh = createSocketHandler(SLOT(handleDishRemoveReason(QJsonObject)));
+//    sh->bind("cmd", sm_dishremovereason);
+//    sh->send();
+//    sh = createSocketHandler(SLOT(handleDishComment(QJsonObject)));
+//    sh->bind("cmd", sm_dishcomment);
+//    sh->send();
 
     if (!fModeJustSelectTable) {
         C5LogToServerThread::remember(LOG_WAITER, "", "", "", "", "Program started", "", "");
@@ -89,13 +86,9 @@ bool DlgFace::getTable(int &tableId, int hall, C5User *user)
 {
     bool result = false;
     DlgFace *df = new DlgFace(user);
-    df->ui->lbDate->setVisible(false);
-    df->ui->btnReports->setVisible(false);
     df->ui->btnExit->setVisible(false);
     df->ui->btnCancel->setVisible(true);
-    df->ui->btnEnter->setVisible(false);
     df->ui->btnExit->setVisible(false);
-    df->ui->btnSetSession->setVisible(false);
     df->fModeJustSelectTable = true;
     df->showFullScreen();
     df->hide();
@@ -111,19 +104,19 @@ bool DlgFace::getTable(int &tableId, int hall, C5User *user)
 
 void DlgFace::timeout()
 {
+    ui->lbTime->setText(QTime::currentTime().toString(FORMAT_TIME_TO_SHORT_STR));
     C5Database db(__c5config.dbParams());
     if (__c5config.getValue(param_date_cash_auto).toInt() == 0) {
         db[":f_key"] = param_date_cash;
-        db.exec("select f_value from s_settings_value where f_key=:f_key");
+        db.exec("select f_value from s_settings_values where f_key=:f_key");
         if (db.nextRow()) {
             if (db.getString("f_value") != __c5config.getValue(param_date_cash)) {
-                DlgExitWithMessage::openDialog(tr("Working date was changed, application now will quit"));
+                DlgExitWithMessage::openDialog(tr("Working date was changed, application now will quit")
+                                               + "<br>" + db.getString("f_value") + "/" + __c5config.getValue(param_date_cash));
                 return;
             }
         }
     }
-    ui->lbDate->setText(QString("%1 %2").arg(QDate::fromString(__c5config.dateCash(), FORMAT_DATE_TO_STR_MYSQL).toString(FORMAT_DATE_TO_STR)).arg(QTime::currentTime().toString("HH:mm")));
-
     refreshTables();
 }
 
@@ -160,59 +153,66 @@ void DlgFace::tableClicked(int id)
     DlgOrder::openTable(id, tmp);
     refreshTables();
     fTimer.start(TIMER_TIMEOUT_INTERVAL);
+    if (tmp != fUser) {
+        delete tmp;
+    }
 }
 
-void DlgFace::handleMenu(const QJsonObject &obj)
-{
-    sender()->deleteLater();
-    C5Menu::fMenu.clear();;
-    C5Menu::fMenuNames.clear();
-    C5Menu::fPart2Color.clear();
-    C5Menu::fDishSpecial.clear();
-    C5Menu::fPackages.clear();
-    C5Menu::fPackagesList.clear();
-    C5Menu::fStopList.clear();
-    sender()->deleteLater();
-    QJsonArray jMenu = obj["menu"].toArray();
-    C5Menu::fMenuVersion = obj["version"].toString();
-    for (int i = 0, count = jMenu.count(); i < count; i++) {
-        QJsonObject o = jMenu.at(i).toObject();
-        C5Menu::fMenu[o["menu_name"].toString()]
-                [o["part1"].toString()]
-                [o["part2"].toString()]
-                .append(o);
-        C5Menu::fPart2Color[o["part2"].toString()] = o["type_color"].toString().toInt();
-    }
-    C5Menu::fPart2Color[""] = -1;
-    for (int i = 0; i < obj["menunames"].toArray().count(); i++) {
-        C5Menu::fMenuNames[obj["menunames"].toArray().at(i).toObject()["f_id"].toString()] = obj["menunames"].toArray().at(i).toObject()["f_name"].toString();
-    }
-    QJsonArray ja = obj["dishspecial"].toArray();
-    for (int i = 0; i < ja.count(); i++) {
-        QJsonObject o = ja.at(i).toObject();
-        C5Menu::fDishSpecial[o["f_dish"].toString()].append(o["f_comment"].toString());
-    }
-    ja = obj["packages"].toArray();
-    for (int i = 0; i < ja.count(); i++) {
-        QJsonObject o = ja.at(i).toObject();
-        C5Menu::fPackages[o["f_name"].toString()] = o;
-    }
-    ja = obj["packageslist"].toArray();
-    for (int i = 0; i < ja.count(); i++) {
-        QJsonObject o = ja.at(i).toObject();
-        C5Menu::fPackagesList[o["f_package"].toString().toInt()].append(o);
-    }
-    ja = obj["stoplist"].toArray();
-    for (int i = 0; i < ja.count(); i++) {
-        QJsonObject o = ja.at(i).toObject();
-        C5Menu::fStopList[o["f_dish"].toString().toInt()] = o["f_qty"].toString().toDouble();
-    }
-    fTimerCheckVersion.start(2000);
-}
+//void DlgFace::handleMenu(const QJsonObject &obj)
+//{
+//    sender()->deleteLater();
+//    C5Menu::fMenu.clear();;
+//    C5Menu::fMenuNames.clear();
+//    C5Menu::fPart2Color.clear();
+//    C5Menu::fDishSpecial.clear();
+//    C5Menu::fPackages.clear();
+//    C5Menu::fPackagesList.clear();
+//    C5Menu::fStopList.clear();
+//    sender()->deleteLater();
+//    QJsonArray jMenu = obj["menu"].toArray();
+//    C5Menu::fMenuVersion = obj["version"].toString();
+//    for (int i = 0, count = jMenu.count(); i < count; i++) {
+//        QJsonObject o = jMenu.at(i).toObject();
+//        C5Menu::fMenu[o["menu_name"].toString()]
+//                [o["part1"].toString()]
+//                [o["part2"].toString()]
+//                .append(o);
+//        C5Menu::fPart2Color[o["part2"].toString()] = o["type_color"].toString().toInt();
+//    }
+//    C5Menu::fPart2Color[""] = -1;
+//    for (int i = 0; i < obj["menunames"].toArray().count(); i++) {
+//        C5Menu::fMenuNames[obj["menunames"].toArray().at(i).toObject()["f_id"].toString()] = obj["menunames"].toArray().at(i).toObject()["f_name"].toString();
+//    }
+//    QJsonArray ja = obj["dishspecial"].toArray();
+//    for (int i = 0; i < ja.count(); i++) {
+//        QJsonObject o = ja.at(i).toObject();
+//        C5Menu::fDishSpecial[o["f_dish"].toString()].append(o["f_comment"].toString());
+//    }
+//    ja = obj["packages"].toArray();
+//    for (int i = 0; i < ja.count(); i++) {
+//        QJsonObject o = ja.at(i).toObject();
+//        C5Menu::fPackages[o["f_name"].toString()] = o;
+//    }
+//    ja = obj["packageslist"].toArray();
+//    for (int i = 0; i < ja.count(); i++) {
+//        QJsonObject o = ja.at(i).toObject();
+//        C5Menu::fPackagesList[o["f_package"].toString().toInt()].append(o);
+//    }
+//    ja = obj["stoplist"].toArray();
+//    for (int i = 0; i < ja.count(); i++) {
+//        QJsonObject o = ja.at(i).toObject();
+//        C5Menu::fStopList[o["f_dish"].toString().toInt()] = o["f_qty"].toString().toDouble();
+//    }
+//    fTimerCheckVersion.start(2000);
+//}
 
 void DlgFace::handleCreditCards(const QJsonObject &obj)
 {
     sender()->deleteLater();
+    if (obj["reply"].toInt() == 0) {
+        C5Message::error(obj["msg"].toString());
+        return;
+    }
     C5CafeCommon::fCreditCards.clear();
     QJsonArray jCC = obj["cards"].toArray();
     for (int i = 0; i < jCC.count(); i++) {
@@ -231,6 +231,10 @@ void DlgFace::handleCreditCards(const QJsonObject &obj)
 void DlgFace::handleDishRemoveReason(const QJsonObject &obj)
 {
     sender()->deleteLater();
+    if (obj["reply"].toInt() == 0) {
+        C5Message::error(obj["msg"].toString());
+        return;
+    }
     C5CafeCommon::fDishRemoveReason.clear();
     QJsonArray jr = obj["reasons"].toArray();
     for (int i = 0; i < jr.count(); i++) {
@@ -241,6 +245,10 @@ void DlgFace::handleDishRemoveReason(const QJsonObject &obj)
 void DlgFace::handleDishComment(const QJsonObject &obj)
 {
     sender()->deleteLater();
+    if (obj["reply"].toInt() == 0) {
+        C5Message::error(obj["msg"].toString());
+        return;
+    }
     C5CafeCommon::fDishComments.clear();
     QJsonArray ja = obj["comments"].toArray();
     for (int i = 0; i < ja.count(); i++) {
@@ -264,12 +272,12 @@ void DlgFace::handleVersion(const QJsonObject &obj)
                 DlgExitByVersion::exit(version, o["version"].toString());
             }
         }
-        if (o["app"].toString() == "menu") {
-            if (o["version"].toString() != C5Menu::fMenuVersion) {
-                fTimer.stop();
-                DlgExitByVersion::exit(tr("Menu was updated"));
-            }
-        }
+        //TODO: UPDATE MENU
+//        if (o["app"].toString() == "menu") {
+//            if (o["version"].toString() != C5Menu::fMenuVersion) {
+//                refreshMenu();
+//            }
+//        }
     }
 }
 
@@ -290,6 +298,8 @@ void DlgFace::filterHall(int hall, int staff)
         ui->glTables->itemAt(0)->widget()->deleteLater();
         ui->glTables->removeItem(ui->glTables->itemAt(0));
     }
+    QRect scr = qApp->desktop()->screenGeometry();
+    int cc = scr.width() > 1024 ? 4 : 3;
     int col = 0;
     int row = 0;
     for (int id: dbtable->list()) {
@@ -308,7 +318,7 @@ void DlgFace::filterHall(int hall, int staff)
         t->config(id);
         t->configOrder(dboheader->fTableOrder.contains(id) ? dboheader->fTableOrder[id] : "");
         ui->glTables->addWidget(t, row, col++, 1, 1);
-        if (col > 4) {
+        if (col > cc) {
             row++;
             col = 0;
         }
@@ -324,8 +334,10 @@ void DlgFace::colorizeHall()
         if (btn) {
             if (btn->property("id").toInt() == fCurrentHall) {
                 btn->setProperty("stylesheet_button_selected", true);
+                btn->style()->polish(btn);
             } else {
                 btn->setProperty("stylesheet_button_selected", false);
+                btn->style()->polish(btn);
             }
         }
     }
@@ -414,51 +426,9 @@ void DlgFace::refreshTables()
     ui->vlStaff->addStretch(0);
 }
 
-void DlgFace::on_btnReports_clicked()
-{
-    C5User *tmp;
-    if (!fUser->check(cp_t5_reports)) {
-        if (!DlgPassword::getUserAndCheck(tr("Reports"), tmp, cp_t5_reports)) {
-            return;
-        }
-    } else {
-        tmp = fUser;
-    }
-    DlgReports::openReports(tmp);
-}
-
 void DlgFace::on_btnCancel_clicked()
 {
     on_btnExit_clicked();
-}
-
-void DlgFace::on_btnSetSession_clicked()
-{
-    if (!fUser->isValid()) {
-        if (!DlgPassword::getUser(tr("Shift rotation"), fUser)) {
-            return;
-        }
-    }
-    if (!fUser->check(cp_t5_shift_rotation)) {
-        C5Message::error(fUser->error());
-        return;
-    }
-    DlgShiftRotation d(fDBParams);
-    d.exec();
-}
-
-void DlgFace::on_btnOut_clicked()
-{
-    QString pass;
-    if (!DlgPassword::getString(tr("Password"), pass)) {
-        return;
-    }
-    C5Database db(fDBParams);
-    C5UserAuth *ua  = new C5UserAuth(db);
-    if (!ua->leaveWork(pass)) {
-        C5Message::error(ua->error());
-    }
-    delete ua;
 }
 
 void DlgFace::on_btnShowHidePreorders_clicked()

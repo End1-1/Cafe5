@@ -78,7 +78,6 @@ SOURCES += \
     ../Classes/c5threadobject.cpp \
     ../Classes/c5translator.cpp \
     ../Classes/c5user.cpp \
-    ../Classes/c5userauth.cpp \
     ../Classes/c5waiterorderdoc.cpp \
     ../Classes/c5waiterserver.cpp \
     ../Classes/c5widget.cpp \
@@ -97,12 +96,17 @@ SOURCES += \
     ../DbData/dbdata.cpp \
     ../DbData/dbdishes.cpp \
     ../DbData/dbdishpart1.cpp \
+    ../DbData/dbdishpart2.cpp \
+    ../DbData/dbdishspecial.cpp \
     ../DbData/dbgoods.cpp \
     ../DbData/dbgoodsgroup.cpp \
     ../DbData/dbhalls.cpp \
+    ../DbData/dbmenu.cpp \
+    ../DbData/dbmenuname.cpp \
     ../DbData/dboheader.cpp \
     ../DbData/dbpartner.cpp \
     ../DbData/dbservicevalues.cpp \
+    ../DbData/dbshift.cpp \
     ../DbData/dbstore.cpp \
     ../DbData/dbtables.cpp \
     ../DbData/dbusers.cpp \
@@ -172,6 +176,7 @@ SOURCES += \
     ../FrontDesk/c5translatorform.cpp \
     ../FrontDesk/c5waiterorder.cpp \
     ../FrontDesk/dlgchangeoutputstore.cpp \
+    ../FrontDesk/dlgstoreutils.cpp \
     ../Reports/c5customfilter.cpp \
     ../Reports/c5settingswidget.cpp \
     ../Reports/cr5carvisits.cpp \
@@ -277,6 +282,9 @@ SOURCES += \
     settingsselection.cpp \
     storeinput.cpp \
     taxprint.cpp \
+    threadcheckmessage.cpp \
+    threadreadmessage.cpp \
+    threadworker.cpp \
     userphoto.cpp \
     viewinputitem.cpp \
     vieworder.cpp \
@@ -355,7 +363,6 @@ HEADERS += \
     ../Classes/c5threadobject.h \
     ../Classes/c5translator.h \
     ../Classes/c5user.h \
-    ../Classes/c5userauth.h \
     ../Classes/c5waiterorderdoc.h \
     ../Classes/c5waiterserver.h \
     ../Classes/c5widget.h \
@@ -374,12 +381,17 @@ HEADERS += \
     ../DbData/dbdata.h \
     ../DbData/dbdishes.h \
     ../DbData/dbdishpart1.h \
+    ../DbData/dbdishpart2.h \
+    ../DbData/dbdishspecial.h \
     ../DbData/dbgoods.h \
     ../DbData/dbgoodsgroup.h \
     ../DbData/dbhalls.h \
+    ../DbData/dbmenu.h \
+    ../DbData/dbmenuname.h \
     ../DbData/dboheader.h \
     ../DbData/dbpartner.h \
     ../DbData/dbservicevalues.h \
+    ../DbData/dbshift.h \
     ../DbData/dbstore.h \
     ../DbData/dbtables.h \
     ../DbData/dbusers.h \
@@ -449,6 +461,7 @@ HEADERS += \
     ../FrontDesk/c5translatorform.h \
     ../FrontDesk/c5waiterorder.h \
     ../FrontDesk/dlgchangeoutputstore.h \
+    ../FrontDesk/dlgstoreutils.h \
     ../Reports/c5customfilter.h \
     ../Reports/c5settingswidget.h \
     ../Reports/cr5carvisits.h \
@@ -554,6 +567,9 @@ HEADERS += \
     settingsselection.h \
     storeinput.h \
     taxprint.h \
+    threadcheckmessage.h \
+    threadreadmessage.h \
+    threadworker.h \
     userphoto.h \
     viewinputitem.h \
     vieworder.h \
@@ -647,6 +663,7 @@ FORMS += \
     ../FrontDesk/c5translatorform.ui \
     ../FrontDesk/c5waiterorder.ui \
     ../FrontDesk/dlgchangeoutputstore.ui \
+    ../FrontDesk/dlgstoreutils.ui \
     ../Reports/c5customfilter.ui \
     ../Reports/c5settingswidget.ui \
     ../Reports/cr5carvisitsfilter.ui \
@@ -719,6 +736,7 @@ INCLUDEPATH += ../DbData
 INCLUDEPATH += ../Editors
 INCLUDEPATH += ../Service
 INCLUDEPATH += ../Waiter
+INCLUDEPATH += ../Service5
 INCLUDEPATH += ../RESOURCES
 INCLUDEPATH += ../../XLSX/Src
 INCLUDEPATH += C:/Projects/NewTax/Src
@@ -733,7 +751,7 @@ RESOURCES += \
 
 LIBS += -lVersion
 LIBS += -lwsock32
-LIBS += -LC:/Soft/OpenSSL-Win32/lib
+LIBS += -LC:/Soft/OpenSSL-Win64/lib
 LIBS += -lopenssl
 LIBS += -llibcrypto
 

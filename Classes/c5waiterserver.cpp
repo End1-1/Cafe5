@@ -167,18 +167,10 @@ void C5WaiterServer::reply(QJsonObject &o)
     }
     case sm_waiterconf: {
         QJsonObject jConf;
-        srh.fDb[":f_ip"] = fPeerAddress;;
-        srh.fDb.exec("select * from s_station_conf where f_ip=:f_ip");
+        srh.fDb[":f_name"] = fIn["settings_name"].toString();
+        srh.fDb.exec("select * from s_settings_names where f_name=:f_name");
         if (srh.fDb.nextRow()) {
-           o["date_cash"] = srh.fDb.getString("f_datecash");
-           o["date_auto"] = srh.fDb.getString("f_datecashauto");
-           o["date_shift"] = srh.fDb.getString("f_shift");
-           int settingsId = srh.fDb.getInt("f_conf");
-           srh.fDb[":f_name"] = fIn["config"].toString();
-           srh.fDb.exec("select f_id from s_settings_names where f_name=:f_name");
-           if (srh.fDb.nextRow()) {
-                settingsId = srh.fDb.getInt(0);
-           }
+           int settingsId = srh.fDb.getInt("f_id");
            srh.fDb[":f_settings"] = settingsId;
            srh.fDb.exec("select f_key, f_value from s_settings_values where f_settings=:f_settings");
            while (srh.fDb.nextRow()) {
@@ -192,10 +184,8 @@ void C5WaiterServer::reply(QJsonObject &o)
                jConf[QString::number(param_default_menu_name)] = "NO MENU DEFINED";
            }
         } else {
-            srh.fDb[":f_station"] = fIn["station"].toString();
-            srh.fDb[":f_conf"] = 1;
-            srh.fDb[":f_ip"] = QHostAddress(fSocket->peerAddress().toIPv4Address()).toString();
-            srh.fDb.insert("s_station_conf", false);
+            o["reply"] = 0;
+            o["msg"] = tr("Invalid settings name");
         }
         QJsonArray jOther;
         srh.getJsonFromQuery("select f_settings, f_key, f_value from s_settings_values", jOther);
@@ -779,33 +769,24 @@ void C5WaiterServer::processCloseOrder(QJsonObject &o, C5Database &db)
     }
 
     QDate dateCash = QDate::currentDate();
-    int dateShift = 0;
-    bool isAuto;
-    db[":f_ip"] = fPeerAddress;
-    db.exec("select f_dateCash, f_dateCashAuto, f_shift from s_station_conf where f_ip=:f_ip");
-    if (db.nextRow()) {
-        isAuto = db.getInt(1) == 1;
-        if (isAuto) {
-            db[":f_ip"] = fPeerAddress;;
-            db.exec("select * from s_station_conf where f_ip=:f_ip");
-            if (db.nextRow()) {
-               db[":f_settings"] = db.getInt("f_conf");
-               db[":f_key"] = param_working_date_change_time;
-               db.exec("select f_value from s_settings_values where f_settings=:f_settings and f_key=:f_key");
-               if (db.nextRow()) {
-                   QTime t = QTime::fromString(db.getString(0), "HH:mm:ss");
-                   if (t.isValid()) {
-                       if (QTime::currentTime() < t) {
-                           dateCash = dateCash.addDays(-1);
-                       }
-                   }
-               }
-            }
-        } else {
-            dateCash = db.getDate("f_datecash");
-            dateShift = db.getInt("f_shift");
+    int dateShift = settings[param_date_cash_shift].toInt();
+    bool isAuto = settings[param_date_cash_auto].toInt() > 0;
+    if (isAuto) {
+       QTime t = QTime::fromString(settings[param_working_date_change_time], "HH:mm:ss");
+       if (t.isValid()) {
+           if (QTime::currentTime() < t) {
+               dateCash = dateCash.addDays(-1);
+           }
+       }
+    } else {
+        dateCash = QDate::fromString(settings[param_date_cash], FORMAT_DATE_TO_STR_MYSQL);
+        if (!dateCash.isValid()) {
+            o["reply"] = 0;
+            o["msg"] = tr("Date cash set manual and it is not valid.");
+            return;
         }
     }
+
     if (err.isEmpty()) {
         jh["f_timeclose"] = QTime::currentTime().toString(FORMAT_TIME_TO_STR);
         jh["f_dateclose"] = QDate::currentDate().toString(FORMAT_DATE_TO_STR);
@@ -938,7 +919,7 @@ int C5WaiterServer::printTax(const QMap<QString, QVariant> &header, const QList<
             continue;
         }
         pt.addGoods(C5Config::taxDept(),
-                m["f_adgcode"].toString(),
+                dbdishpart2->adgcode(dbdish->part2(m["f_dish"].toInt())),
                 m["f_dish"].toString(),
                 dbdish->name(m["f_dish"].toInt()),
                 m["f_price"].toDouble(),
@@ -1027,6 +1008,10 @@ bool C5WaiterServer::printReceipt(QString &err, C5Database &db, bool isBill)
             }
         }
     }
+#ifdef QT_DEBUG
+                qDebug() << "Error after printtax" << err;
+                err.clear();
+#endif
 
     // CHECKING FOR RECEIPT PRINT COUNT
 //    if (jh["f_print"].toString().toInt() > 0) {
@@ -1060,10 +1045,10 @@ bool C5WaiterServer::printReceipt(QString &err, C5Database &db, bool isBill)
 
     QString printerName = "local";
     int paperWidth = 650, printType = 80;
-    db[":f_name"] = fIn["receipt_printer"].toString();
-    db.exec("select f_id from s_settings_names where lower(f_name)=lower(:f_name)");
+    db[":f_id"] = headerInfo["f_hall"];
+    db.exec("select * from h_halls where f_id=:f_id");
     if (db.nextRow()) {
-        int s = db.getInt(0);
+        int s = db.getInt("f_settings");
         db[":f_settings"] = s;
         db[":f_key"] = param_local_receipt_printer;
         db.exec("select f_value from s_settings_values where f_settings=:f_settings and f_key=:f_key");
@@ -1088,6 +1073,7 @@ bool C5WaiterServer::printReceipt(QString &err, C5Database &db, bool isBill)
 
     switch (printType) {
     case 50: {
+        //TODO: remove from thread
         C5PrintReceiptThread50mm *pr = new C5PrintReceiptThread50mm(C5Config::dbParams(), QJsonObject(), QJsonArray(), printerName, paperWidth);
         pr->start();
         break;
@@ -1338,9 +1324,12 @@ void C5WaiterServer::processGetCostumerByCar(QJsonObject &o)
 void C5WaiterServer::processRotateShift(QJsonObject &o)
 {
     C5Database db(C5Config::dbParams());
-    db[":f_datecash"] = QDate::fromString(fIn["date"].toString(), FORMAT_DATE_TO_STR_MYSQL);
-    db[":f_shift"] = fIn["shift"].toString().toInt();
-    db.exec("update s_station_conf set f_datecash=:f_datecash, f_shift=:f_shift");
+    db[":f_value"] = fIn["date"].toString();
+    db[":f_key"] = param_date_cash;
+    db.exec("update s_settings_values set f_value=:f_value where f_key=:f_key");
+    db[":f_value"] = fIn["shift"].toString();
+    db[":f_key"] = param_date_cash_shift;
+    db.exec("update s_settings_values set f_value=:f_value where f_key=:f_key");
     o["reply"] = 1;
 }
 
@@ -1387,10 +1376,21 @@ void C5WaiterServer::processCheckDiscountByVisit(QJsonObject &o)
 
 void C5WaiterServer::processStopList(QJsonObject &o)
 {
-    qDebug() << fIn;
     C5Database db(C5Config::dbParams());
     bool r = true;
     switch (fIn["state"].toInt()) {
+    case sl_get: {
+        db.exec("select f_dish, f_qty from d_stoplist");
+        QJsonArray ja;
+        while (db.nextRow()) {
+            QJsonObject jg;
+            jg["dish"] = db.getInt("f_dish");
+            jg["qty"] = db.getDouble("f_qty");
+            ja.append(jg);
+        }
+        o["list"] = ja;
+        break;
+    }
     case sl_set:
         db[":f_dish"] = fIn["f_dish"].toString().toInt();
         db.exec("delete from d_stoplist where f_dish=:f_dish");
@@ -1401,15 +1401,16 @@ void C5WaiterServer::processStopList(QJsonObject &o)
         r =  r && db.insert("d_stoplist", false);
         break;
     case sl_add: {
-        QJsonObject jdish = QJsonDocument::fromJson(fIn["dish"].toString().toUtf8()).object();
-        db[":f_dish"] = jdish["f_dish"].toString().toInt();
+        o["f_menu"] = fIn["f_menu"];
+        o["f_dish"] = fIn["f_dish"];
+        db[":f_dish"] = fIn["f_dish"].toString().toInt();
         db.startTransaction();
         db.exec("select f_qty from d_stoplist where f_dish=:f_dish for update");
         if (db.nextRow()) {
             double qty = db.getDouble("f_qty");
             if (qty > 0.1) {
                 qty -= 1;
-                db[":f_dish"] = jdish["f_dish"].toString().toInt();
+                db[":f_dish"] = fIn["f_dish"].toString().toInt();
                 db[":f_qty"] = qty;
                 db.exec("update d_stoplist set f_qty=:f_qty where f_dish=:f_dish");
                 o["status"] = sl_ok;
@@ -1442,6 +1443,11 @@ void C5WaiterServer::processStopList(QJsonObject &o)
             o["status"] = sl_not_in_stoplist;
         }
         db.commit();
+        break;
+    case sl_remove:
+        if (!db.exec("delete from d_stoplist")) {
+            r = false;
+        }
         break;
     }
     if (r) {

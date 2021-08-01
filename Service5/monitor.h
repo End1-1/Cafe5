@@ -21,5 +21,8 @@ private:
     Ui::Monitor *ui;
     ServerThread *fSslServer;
     void startSslServer();
+
+private slots:
+    void receiveData(int code, const QString &session, const QString &data1, const QVariant &data2);
 };
 #endif // MONITOR_H

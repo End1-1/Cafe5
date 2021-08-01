@@ -15,10 +15,9 @@ SOURCES += \
     ../Service5/utils/threadworker.cpp \
     main.cpp \
     test.cpp \
+    testchat.cpp \
     testerdialog.cpp \
-    testn.cpp \
-    testn1.cpp \
-    testn2.cpp
+    testn.cpp
 
 HEADERS += \
     ../Service5/socket/sslserver.h \
@@ -27,10 +26,9 @@ HEADERS += \
     ../Service5/utils/logwriter.h \
     ../Service5/utils/threadworker.h \
     test.h \
+    testchat.h \
     testerdialog.h \
-    testn.h \
-    testn1.h \
-    testn2.h
+    testn.h
 
 FORMS += \
     testerdialog.ui

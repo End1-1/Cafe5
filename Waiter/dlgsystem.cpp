@@ -1,6 +1,6 @@
 #include "dlgsystem.h"
 #include "ui_dlgsystem.h"
-#include <QInputDialog>
+#include "c5connection.h"
 
 DlgSystem::DlgSystem(const QStringList &dbParams) :
     C5Dialog(__c5config.dbParams()),
@@ -14,4 +14,9 @@ DlgSystem::DlgSystem(const QStringList &dbParams) :
 DlgSystem::~DlgSystem()
 {
     delete ui;
+}
+
+void DlgSystem::on_btnConnection_clicked()
+{
+    C5Dialog::go<C5Connection>(__c5config.dbParams());
 }

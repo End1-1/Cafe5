@@ -50,6 +50,8 @@ private slots:
 
     void readyRead();
 
+    void error(QAbstractSocket::SocketError err);
+
 signals:
     void handleCommand(const QJsonObject &data);
 

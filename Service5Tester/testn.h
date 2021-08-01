@@ -8,11 +8,12 @@ class TestN : public ThreadWorker
 {
     Q_OBJECT
 public:
-    explicit TestN(const QString &serverIP, int port, const QSslCertificate &certificate, int number, const QVariant &data = QVariant());
+    explicit TestN(const QString &serverIP, int port, const QSslCertificate &certificate, int number, int timeout, const QVariant &data = QVariant());
 
 
 protected:
     int fNumber;
+    int fTimeout;
     QString fServerIP;
     int fPort;
     QVariant fData;
@@ -20,6 +21,8 @@ protected:
 
 protected slots:
     void err(QAbstractSocket::SocketError e);
+
 };
+
 
 #endif // TESTN_H

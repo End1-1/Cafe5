@@ -81,6 +81,21 @@ void C5Permissions::init(C5Database &db)
               << cp_t5_reports
               << cp_t5_view_reserved_tables
               << cp_t5_movetable
+              << cp_t5_enter_dlgface
+              << cp_t5_change_staff_of_table
+              << cp_t5_change_menu
+              << cp_t5_stoplist
+              << cp_t5_preorder
+              << cp_t5_discount
+              << cp_t5_cancel_discount
+              << cp_t5_print_precheck
+              << cp_t5_cancel_precheck
+              << cp_t5_repeat_precheck
+              << cp_t5_final_check
+              << cp_t5_edit_table
+              << cp_t5_splitguest
+              << cp_t5_manager_tools
+              << cp_t5_print_receipt
 
               << cp_t6_storage
               << cp_t6_goods_menu

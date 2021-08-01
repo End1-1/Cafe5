@@ -42,6 +42,9 @@ QToolBar *CR5Dish::toolBar()
         fToolBar->addAction(QIcon(":/translate.png"), tr("Translator"), this, SLOT(translator()));
         fToolBar->addAction(QIcon(":/delete.png"), tr("Remove"), this, SLOT(deleteDish()));
         fToolBar->addAction(QIcon(":/upload.png"), tr("Raise menu version"), this, SLOT(raiseMenuVersion()));
+        auto *g = new QAction(QIcon(":/goodsback.png"), tr("Output to AS"));
+        connect(g, SIGNAL(triggered(bool)), this, SLOT(asoutput(bool)));
+        fToolBar->addAction(g);
     }
     return fToolBar;
 }

@@ -26,6 +26,8 @@ public:
 
     int print(const QString &id);
 
+    QString comment(const QString &id);
+
 private:
     virtual void getFromDatabase() override;
 

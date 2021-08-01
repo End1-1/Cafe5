@@ -12,14 +12,19 @@ class Database
 {
 public:
     explicit Database();
+    explicit Database(Database &other);
     explicit Database(const QString &driverName);
     ~Database();
     QSqlDatabase fSqlDatabase;
     bool open(const QString &host, const QString &schema, const QString &username, const QString &password);
+    bool startTransaction();
+    bool commit();
+    bool rollback();
     bool exec(const QString &query);
     bool insert(const QString &table);
     bool insert(const QString &table, int &id);
     bool update(const QString &table);
+    bool update(const QString &table, const QString &field, const QVariant &value);
     inline int rowCount() {return fQuery->size();}
     inline int columnCount() {return fColumnsNames.count();}
     inline QString columnName(int index) {return fColumnsIndexes[index];}
@@ -32,6 +37,8 @@ public:
     inline QDate dateValue(const QString &columnName) {return value(columnName).toDate(); }
     inline QDateTime dateTimeValue(const QString &columnName) {return value(columnName).toDateTime(); }
     QString uuid();
+    void setBindValues(const QMap<QString, QVariant> &v);
+    QMap<QString, QVariant> getBindValues();
     void close();
     QSqlQuery *fQuery;
     QVariant &operator [](const QString &name);

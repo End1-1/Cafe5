@@ -381,10 +381,6 @@ bool C5WaiterOrderDoc::clearStoreOutput(C5Database &db, const QDate &d1, const Q
         as.insert(db.getString(3));
         og.insert(db.getString(4));
     }
-    for (const QString &id: as) {
-        db[":f_id"] = id;
-        db.exec("delete from a_store where f_id=:f_id");
-    }
     for (const QString &id: ad) {
         db[":f_id"] = id;
         db.exec("delete from a_store_draft where f_id=:f_id");
@@ -393,11 +389,15 @@ bool C5WaiterOrderDoc::clearStoreOutput(C5Database &db, const QDate &d1, const Q
         db[":f_id"] = id;
         db.exec("update o_goods set f_storerec=null where f_id=:f_id");
     }
+    C5StoreDraftWriter dw(db);
     for (const QString &id: ah) {
         db[":f_id"] = id;
         db.exec("delete from a_header where f_id=:f_id");
         db[":f_id"] = id;
         db.exec("delete from a_header_store where f_id=:f_id");
+        if (!dw.outputRollback(db, id)) {
+            return false;
+        }
     }
     return true;
 }

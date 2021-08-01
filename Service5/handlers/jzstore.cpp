@@ -109,7 +109,7 @@ bool JZStore::requestGoodsGroups(const QByteArray &data, const QHash<QString, Da
     while (db.next()) {
         JsonHandler r;
         for (int i = 0; i < db.columnCount(); i++) {
-            r[db.columnName(i)] = db.value(i);
+            r[db.columnName(i).toUpper()] = db.value(i);
         }
         goods[db.integerValue("id")] = r;
     }
@@ -144,7 +144,7 @@ bool JZStore::requestStore(const QByteArray &data, const QHash<QString, DataAddr
     while (db.next()) {
         JsonHandler r;
         for (int i = 0; i < db.columnCount(); i++) {
-            r[db.columnName(i)] = db.value(i);
+            r[db.columnName(i).toUpper()] = db.value(i);
         }
         goods[db.integerValue("id")] = r;
     }
@@ -163,9 +163,9 @@ bool JZStore::requestStore(const QByteArray &data, const QHash<QString, DataAddr
         return setInternalServerError(db.lastDbError());
     }
     while (db.next()) {
-        JsonHandler &j = goods[db.integerValue("GOODS_ID")];
-        j["QTY_TILL"] = db.doubleValue("QTY");
-        j["AMOUNT_TILL"] = db.doubleValue("AMOUNT");
+        JsonHandler &j = goods[db.integerValue("goods_id")];
+        j["QTY_TILL"] = db.doubleValue("qty");
+        j["AMOUNT_TILL"] = db.doubleValue("amount");
     }
     Database mssqldb("QODBC3");
     if (!mssqldb.open("10.1.0.4,1433", "Driver={SQL Server Native Client 11.0};Server=10.1.0.4,1433;DATABASE=Jazzve", "sa", "SaSa111")) {
@@ -212,9 +212,10 @@ bool JZStore::requestStore(const QByteArray &data, const QHash<QString, DataAddr
         return setInternalServerError(db.lastDbError());
     }
     while (db.next()) {
-        JsonHandler &j = goods[db.integerValue("GOODS_ID")];
-        j["QTY_OUT"] = db.doubleValue("QTY");
-        j["AMOUNT_OUT"] = db.doubleValue("AMOUNT");
+        qDebug() << db.doubleValue("qty");
+        JsonHandler &j = goods[db.integerValue("goods_id")];
+        j["QTY_OUT"] = db.doubleValue("qty");
+        j["AMOUNT_OUT"] = db.doubleValue("amount");
     }
 
 
@@ -228,14 +229,14 @@ bool JZStore::requestStore(const QByteArray &data, const QHash<QString, DataAddr
                  "left join st_storages s2 on s2.id=sd.store_output "
                  "left join st_draft sdd on sdd.doc_id=sd.id "
                  "left join food_names fn on fn.id=sdd.goods_id "
-                 "where sd.doc_date between :date1 and :date and sa.id in (2) and s2.id=:store "
+                 "where sd.doc_date between :date1 and :date2 and sa.id in (2) and s2.id=:store "
                  "group by 1 ")) {
         return setInternalServerError(db.lastDbError());
     }
     while (db.next()) {
-        JsonHandler &j = goods[db.integerValue("GOODS_ID")];
-        j["QTY_OUT2"] = db.doubleValue("QTY");
-        j["AMOUNT_OUT2"] = db.doubleValue("AMOUNT");
+        JsonHandler &j = goods[db.integerValue("goods_id")];
+        j["QTY_OUT2"] = db.doubleValue("qty");
+        j["AMOUNT_OUT2"] = db.doubleValue("amount");
     }
     QString goodsArray;
     for (QMap<int, JsonHandler>::iterator it = goods.begin(); it != goods.end(); it++) {

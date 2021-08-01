@@ -16,7 +16,7 @@ public:
 
     ~DlgListOfMenu();
 
-    static bool getMenuId(QString &id, const QStringList &dbParams);
+    static bool getMenuId(int &id, const QStringList &dbParams);
 
 private slots:
     void on_lst_clicked(const QModelIndex &index);
@@ -24,7 +24,7 @@ private slots:
 private:
     Ui::DlgListOfMenu *ui;
 
-    QString fMenuId;
+    int fMenuId;
 };
 
 #endif // DLGLISTOFMENU_H

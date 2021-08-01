@@ -109,5 +109,7 @@
         <file>prepayment.png</file>
         <file>back-arrow.png</file>
         <file>sauces.png</file>
+        <file>atention.png</file>
+        <file>quickmenu.png</file>
     </qresource>
 </RCC>

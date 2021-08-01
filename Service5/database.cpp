@@ -2,6 +2,7 @@
 #include "debug.h"
 #include <QDateTime>
 #include <QSqlRecord>
+#include <QUuid>
 
 QMutex Database::fMutex;
 int Database::fDatabaseCounter = 0;
@@ -11,6 +12,12 @@ Database::Database() :
 {
     QMutexLocker ml(&fMutex);
     fDatabaseNumber = QString::number(++fDatabaseCounter);
+}
+
+Database::Database(Database &other) :
+    Database("QMYSQL")
+{
+    open(other.fSqlDatabase.hostName(), other.fSqlDatabase.databaseName(), other.fSqlDatabase.userName(), other.fSqlDatabase.password());
 }
 
 Database::Database(const QString &driverName)
@@ -46,6 +53,21 @@ bool Database::open(const QString &host, const QString &schema, const QString &u
     return true;
 }
 
+bool Database::startTransaction()
+{
+    return fSqlDatabase.transaction();
+}
+
+bool Database::commit()
+{
+    return fSqlDatabase.commit();
+}
+
+bool Database::rollback()
+{
+    return fSqlDatabase.rollback();
+}
+
 bool Database::exec(const QString &query)
 {
     if (!fQuery->prepare(query)) {
@@ -69,8 +91,8 @@ bool Database::exec(const QString &query)
         fColumnsNames.clear();
         QSqlRecord rec = fQuery->record();
         for (int i = 0; i < rec.count(); i++) {
-            fColumnsNames[rec.fieldName(i)] = i;
-            fColumnsIndexes[i] = rec.fieldName(i);
+            fColumnsNames[rec.fieldName(i).toLower()] = i;
+            fColumnsIndexes[i] = rec.fieldName(i).toLower();
         }
     }
     return true;
@@ -109,6 +131,12 @@ bool Database::insert(const QString &table, int &id)
 
 bool Database::update(const QString &table)
 {
+    return update(table, "fid", fBindValues[":fid"]);
+}
+
+bool Database::update(const QString &table, const QString &field, const QVariant &value)
+{
+    fBindValues[":" + field] = value;
     QString sql = "update " + table + " set ";
     bool first = true;
     for (QMap<QString, QVariant>::const_iterator it = fBindValues.begin(); it != fBindValues.end(); it++) {
@@ -120,18 +148,27 @@ bool Database::update(const QString &table)
         QString f = it.key();
         sql += f.remove(0, 1) + "=" + it.key();
     }
-    sql += " where fid=:fid";
+    sql += QString(" where %1=:%1").arg(field);
     return exec(sql);
 }
 
 QString Database::uuid()
 {
-    if (exec("select uuid() as _uuid")) {
-        if (next()) {
-            return value("_uuid").toString();
-        }
+    return QUuid::createUuid().toString().replace("{", "").replace("}", "");
+}
+
+void Database::setBindValues(const QMap<QString, QVariant> &v)
+{
+    fBindValues = v;
+}
+
+QMap<QString, QVariant> Database::getBindValues()
+{
+    QMap<QString, QVariant> b;
+    for (QHash<QString, int>::const_iterator it = fColumnsNames.begin(); it != fColumnsNames.end(); it++) {
+        b[":" + it.key()] = fQuery->value(fColumnsNames[it.key()]);
     }
-    return "";
+    return b;
 }
 
 void Database::close()

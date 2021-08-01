@@ -19,6 +19,8 @@ public:
 private slots:
     void on_btnStart_clicked();
 
+    void on_btnStoreUtlis_clicked();
+
 private:
     Ui::C5CheckDatabase *ui;
 };

@@ -47,6 +47,8 @@ public:
 
     QVariant headerValue(const QString &key);
 
+    QVariant taxValue(const QString &key);
+
     C5OrderDriver &setHeaderOption(const QString &key, const QVariant &value);
 
     QVariant headerOptionsValue(const QString &key);
@@ -61,7 +63,7 @@ public:
 
     const QMap<QString, QVariant> &dish(int index) const;
 
-    bool addDish(const QJsonObject &o);
+    bool addDish(int menuid, const QString &comment);
 
     bool addDish(QMap<QString, QVariant> o);
 

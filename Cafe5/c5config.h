@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <QVariant>
+#include <QSslCertificate>
 
 #define param_local_receipt_printer 1
 #define param_service_factor 2
@@ -66,6 +67,10 @@
 #define param_print_dish_timeorder 62
 #define param_printer_paper_width_50mm 63
 #define param_printer_parer_width_80mm 64
+#define param_http_server_ip 65
+#define param_http_server_port 66
+#define param_http_server_user 67
+#define param_http_server_pass 68
 
 #define FRONTDESK_WAITER 0
 #define FRONTDESK_SHOP 1
@@ -221,6 +226,14 @@ public:
     
     static int receipPrinterWidth();
 
+    static QString httpServerIP();
+
+    static int httpServerPort();
+
+    static QString httpServerUsername();
+
+    static QString httpServerPassword();
+
     static QString getValue(int key);
 
     static void setValues(const QMap<int, QString> &values);
@@ -242,6 +255,8 @@ extern QString __username;
 extern QList<int> __userpermissions;
 
 extern QStringList __databases;
+
+extern QSslCertificate fSslCertificate;
 
 
 #endif // C5CONFIG_H

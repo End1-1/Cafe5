@@ -8,6 +8,7 @@
 #include <QFile>
 #include <QDate>
 #include <QDebug>
+#include <QUuid>
 #include <QSqlField>
 
 #ifndef _NOAPP_
@@ -252,15 +253,7 @@ bool C5Database::execDirect(const QString &sqlQuery)
 
 QString C5Database::uuid(const QStringList &dbParams)
 {
-    if (dbParams.count() > 0) {
-        fDbParamsForUuid = dbParams;
-    }
-    C5Database db(fDbParamsForUuid);
-    db.exec("select uuid()");
-    if (db.nextRow()) {
-        return db.getString(0);
-    }
-    return "";
+    return QUuid::createUuid().toString().replace("{", "").replace("}", "");
 }
 
 QByteArray C5Database::uuid_bin()
@@ -604,6 +597,7 @@ bool C5Database::exec(const QString &sqlQuery, bool &isSelect)
         logEvent(fDb.hostName() + " (" + QString::number(fTimerCount) + " ms):" + fDb.databaseName() + " " + lastQuery(fQuery));
         return false;
     }
+    logEvent(fDb.hostName() + " (" + QString::number(fTimerCount) + " ms):" + fDb.databaseName() + " " + lastQuery(fQuery));
     isSelect = fQuery->isSelect();
     QString call = "call";
     if (!isSelect) {

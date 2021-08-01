@@ -4,25 +4,22 @@
 #include "socketthread.h"
 #include "logwriter.h"
 #include "debug.h"
+#include "monitoringwindow.h"
+#include <QApplication>
 
 ServerThread::ServerThread(const QString &configPath) :
-    ThreadWorker(),
+    QObject(),
     fConfigPath(configPath)
 {
-
-}
-
-ServerThread::~ServerThread()
-{
-    fSslServer->deleteLater();
-}
-
-void ServerThread::run()
-{
+    qDebug() << thread() << fThread.thread();
+    MonitoringWindow::connectSender(this);
     qDebug() << "SSL version: " << QSslSocket::sslLibraryBuildVersionString();
     QString certFileName = fConfigPath + "cert.pem";
     QString keyFileName = fConfigPath + "key.pem";
-    fSslServer = new SslServer(this);
+    fSslServer = new SslServer();
+    qDebug() << "SSL SERVER THREAD BEFORE MOVE" << fSslServer->thread();
+    fSslServer->moveToThread(&fThread);
+    qDebug() << "SSL SERVER THREAD AFTER MOVE" << fSslServer->thread();
     fSslServer->setMaxPendingConnections(10000);
     if (!fSslServer->setSslLocalCertificate(certFileName)) {
         LogWriter::write(10, 1, "", QString("%1 certificate is not instaled").arg(certFileName));
@@ -31,17 +28,22 @@ void ServerThread::run()
         LogWriter::write(10, 1, "", QString("%1 private key is not instaled").arg(keyFileName));
     }
     fSslServer->setSslProtocol(QSsl::TlsV1_2OrLater);
-#ifdef QT_DEBUG
-    fSslServer->listen(QHostAddress::AnyIPv4, 10002);
-#else
-    fSslServer->listen(QHostAddress::AnyIPv4, 10002);
-#endif
-    while (fSslServer->waitForNewConnection(-1)) {
-        while (fSslServer->hasPendingConnections()) {
-            SslSocket *sslSocket = dynamic_cast<SslSocket*>(fSslServer->nextPendingConnection());
-            auto *socketThread = new SocketThread(sslSocket);
-            socketThread->start();
-        }
-    }
-    emit finished();
+    fSslLocalCertificate = fSslServer->fSslLocalCertificate;
+    fSslPrivateKey = fSslServer->fSslPrivateKey;
+    fSslProtocol = fSslServer->fSslProtocol;
+    connect(&fThread, &QThread::started, fSslServer, &SslServer::startListen);
+    connect(fSslServer, &SslServer::connectionRequest, this, &ServerThread::newConnection);
+    fThread.start();
+    qDebug() << thread() << fThread.thread();
+}
+
+ServerThread::~ServerThread()
+{
+    fSslServer->deleteLater();
+}
+
+void ServerThread::newConnection(int socketDescriptor)
+{
+    auto *socketThread = new SocketThread(socketDescriptor, fSslLocalCertificate, fSslPrivateKey, fSslProtocol);
+    socketThread->start();
 }

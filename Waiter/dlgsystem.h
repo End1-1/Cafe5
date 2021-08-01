@@ -16,6 +16,9 @@ public:
 
     ~DlgSystem();
 
+private slots:
+    void on_btnConnection_clicked();
+
 private:
     Ui::DlgSystem *ui;
 };

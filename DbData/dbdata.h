@@ -15,7 +15,7 @@ public:
 
     QList<int> list();
 
-    void refresh();
+    virtual void refresh();
 
 protected:
     C5Database fDb;
@@ -31,7 +31,6 @@ protected:
     virtual void getFromDatabase();
 
 private:
-
     static QStringList fDbParams;
 };
 

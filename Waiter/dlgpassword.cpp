@@ -20,17 +20,20 @@ DlgPassword::~DlgPassword()
     delete ui;
 }
 
-bool DlgPassword::getUser(const QString &title, C5User *user)
+bool DlgPassword::getUser(const QString &title, C5User *&user)
 {
     user = new C5User(0);
     DlgPassword *d = new DlgPassword(user);
     d->ui->label->setText(title);
     bool result = d->exec() == QDialog::Accepted;
     delete d;
+    if (!result) {
+        delete user;
+    }
     return result;
 }
 
-bool DlgPassword::getUserAndCheck(const QString &title, C5User *user, int permission)
+bool DlgPassword::getUserAndCheck(const QString &title, C5User *&user, int permission)
 {
     if (!getUser(title, user)) {
         return false;

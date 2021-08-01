@@ -6,9 +6,9 @@
 QDishPart2Button::QDishPart2Button(QWidget *parent) :
     QPushButton(parent)
 {
-    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     setMinimumSize(QSize(95, 60));
-    setMaximumSize(QSize(95, 60));
+    setMaximumSize(QSize(9005, 60));
 }
 
 void QDishPart2Button::paintEvent(QPaintEvent *pe)

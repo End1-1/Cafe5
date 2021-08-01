@@ -1,6 +1,6 @@
 #include "dlglistofshifts.h"
 #include "ui_dlglistofshifts.h"
-#include "c5cafecommon.h"
+#include "datadriver.h"
 
 DlgListOfShifts::DlgListOfShifts(QWidget *parent) :
     QDialog(parent),
@@ -11,12 +11,11 @@ DlgListOfShifts::DlgListOfShifts(QWidget *parent) :
     item->setSizeHint(QSize(50, 50));
     item->setText(tr("All"));
     item->setData(Qt::UserRole, 0);
-    for (int i = 0; i < C5CafeCommon::fShifts.count(); i++) {
-        QJsonObject o = C5CafeCommon::fShifts[i].toObject();
+    for (int id: dbshift->list()) {
         item = new QListWidgetItem(ui->lst);
         item->setSizeHint(QSize(50, 50));
-        item->setText(o["f_name"].toString());
-        item->setData(Qt::UserRole, o["f_id"].toString().toInt());
+        item->setText(dbshift->name(id));
+        item->setData(Qt::UserRole, id);
         ui->lst->addItem(item);
     }
     item = new QListWidgetItem(ui->lst);

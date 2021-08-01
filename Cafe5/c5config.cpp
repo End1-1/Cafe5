@@ -4,6 +4,7 @@
 #include <QMutex>
 #include <QDebug>
 #include <QSettings>
+#include <QApplication>
 
 QString C5Config::fAppHomePath;
 QString C5Config::fAppLogFile;
@@ -24,6 +25,7 @@ QList<int> __userpermissions;
 QStringList __databases;
 QMap<int, QString> C5Config::fSettings;
 static QMutex settingsMutex;
+QSslCertificate fSslCertificate;
 
 C5Config::C5Config()
 {
@@ -210,6 +212,13 @@ int C5Config::defaultTable()
 
 void C5Config::initParamsFromDb()
 {
+    QString certFileName = qApp->applicationDirPath() + "/" + "cert.pem";
+    QFile file(certFileName);
+    if (file.open(QIODevice::ReadOnly)) {
+        fSslCertificate = QSslCertificate(file.readAll());
+    }
+
+
     C5Database db(fDBHost, fDBPath, fDBUser, fDBPassword);
     fSettings.clear();
     db[":f_name"] = fSettingsName;
@@ -381,6 +390,26 @@ int C5Config::receiptParepWidth()
 {
     int w = getValue(param_print_paper_width).toInt();
     return w == 0 ? 650 : w;
+}
+
+QString C5Config::httpServerIP()
+{
+    return getValue(param_http_server_ip);
+}
+
+int C5Config::httpServerPort()
+{
+    return getValue(param_http_server_port).toInt();
+}
+
+QString C5Config::httpServerUsername()
+{
+    return getValue(param_http_server_user);
+}
+
+QString C5Config::httpServerPassword()
+{
+    return getValue(param_http_server_pass);
 }
 
 int C5Config::receipPrinterWidth()

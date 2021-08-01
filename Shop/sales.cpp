@@ -8,6 +8,7 @@
 #include "c5utils.h"
 #include "c5message.h"
 #include "printtaxn.h"
+#include "sslsocket.h"
 #include "vieworder.h"
 #include "cashcollection.h"
 
@@ -288,22 +289,45 @@ void Sales::on_btnDateRight_clicked()
 
 void Sales::on_btnPrint_clicked()
 {
+    C5Database db(C5Config::dbParams());
     QModelIndexList ml = ui->tbl->selectionModel()->selectedRows();
     if (ml.count() == 0) {
         return;
     }
-    bool p1, p2;
-    if (SelectPrinters::selectPrinters(p1, p2)) {
+    if (!C5Config::localReceiptPrinter().isEmpty()) {
         PrintReceiptGroup p;
-        C5Database db(C5Config::dbParams());
-        if (p1) {
-            p.print(ui->tbl->getString(ml.at(0).row(), 0), db, 1);
+        switch (C5Config::shopPrintVersion()) {
+        case 1: {
+            bool p1, p2;
+            if (SelectPrinters::selectPrinters(p1, p2)) {
+                if (p1) {
+                    p.print(ui->tbl->getString(ml.at(0).row(), 0), db, 1);
+                }
+                if (p2) {
+                    p.print(ui->tbl->getString(ml.at(0).row(), 0), db, 2);
+                }
+            }
+            break;
         }
-        if (p2) {
-            p.print(ui->tbl->getString(ml.at(0).row(), 0), db, 2);
+        case 2:
+            p.print2(ui->tbl->getString(ml.at(0).row(), 0), db);
+            break;
+        default:
+            break;
         }
-        //p.print2(oheaderid, db);
     }
+//    bool p1, p2;
+//    if (SelectPrinters::selectPrinters(p1, p2)) {
+//        PrintReceiptGroup p;
+//        C5Database db(C5Config::dbParams());
+//        if (p1) {
+//            p.print(ui->tbl->getString(ml.at(0).row(), 0), db, 1);
+//        }
+//        if (p2) {
+//            p.print(ui->tbl->getString(ml.at(0).row(), 0), db, 2);
+//        }
+//        //p.print2(oheaderid, db);
+//    }
 }
 
 void Sales::on_btnItemBack_clicked()
@@ -378,6 +402,30 @@ void Sales::on_btnPrintTax_clicked()
         return;
     }
     QString id = ui->tbl->getString(ml.at(0).row(), 0);
+    if (__c5config.taxIP().toLower() == "http") {
+        QString url = QString("GET /printtax?auth=up&a=get&user=%1&pass=%2&order=%3 HTTP/1.1\r\n\r\n")
+                .arg(__c5config.httpServerUsername())
+                .arg(__c5config.httpServerPassword())
+                .arg(id);
+        auto *s = new QSslSocket(this);
+        connect(s, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(err(QAbstractSocket::SocketError)));
+        s->addCaCertificate(fSslCertificate);
+        s->setPeerVerifyMode(QSslSocket::VerifyNone);
+        s->connectToHostEncrypted(__c5config.httpServerIP(), __c5config.httpServerPort());
+        if (s->waitForEncrypted(5000)) {
+            s->write(url.toUtf8());
+            if (s->waitForBytesWritten()) {
+                s->waitForReadyRead();
+                QByteArray d = s->readAll();
+                C5Message::info(d);
+            } else {
+                C5Message::error(s->errorString());
+            }
+            s->close();
+        }
+        s->deleteLater();
+        return;
+    }
     C5Database db(__c5config.replicaDbParams());
     db[":f_id"] = id;
     db.exec("select * from o_header where f_id=:f_id");

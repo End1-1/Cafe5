@@ -59,6 +59,8 @@ private slots:
 
     void on_btnWorkersInOut_clicked();
 
+    void on_btnManagerToosl_clicked();
+
 private:
     Ui::DlgScreen *ui;
 

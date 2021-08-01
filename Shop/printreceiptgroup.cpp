@@ -38,6 +38,7 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
     double amountTotal = db.getDouble("f_amounttotal");
     double amountCash = db.getDouble("f_amountcash");
     double amountCard = db.getDouble("f_amountcard");
+    QString comment = db.getString("f_comment");
     QString partnerName, partnerTaxcode;
     if (partner > 0) {
         db[":f_id"] = partner;
@@ -182,7 +183,7 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
             p.ltext(QString("%1").arg(data.at(i).at(0).toString()), 0);
             p.rtext(QString("%1 X %2 = %3")
                     .arg(float_str(data.at(i).at(1).toDouble(), 3))
-                    .arg(data.at(i).at(2).toDouble(), 2)
+                     .arg(data.at(i).at(2).toDouble(), 2)
                     .arg(float_str(data.at(i).at(3).toDouble(), 2)));
             p.br();
         }
@@ -230,6 +231,12 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
     p.ltext(tr("Thank you for visit!"), 0);
     p.br();
 
+    if (!comment.isEmpty()) {
+        p.br();
+        p.ltext(comment, 0);
+        p.br();
+    }
+
     p.ltext(tr("Printed"), 0);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
     p.br();
@@ -241,11 +248,15 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
 {
     double cash = 0;
     double change = 0;
+    double idram = 0;
+    double tellcell = 0;
     db[":f_id"] = id;
-    db.exec("select f_cash, f_change from o_payment where f_id=:f_id");
+    db.exec("select * from o_payment where f_id=:f_id");
     if (db.nextRow()) {
         cash = db.getDouble("f_cash");
         change = db.getDouble("f_change");
+        idram = db.getDouble("f_idram");
+        tellcell = db.getDouble("f_tellcell");
     }
 
     C5Database dtax(db);
@@ -265,6 +276,7 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
     double amountTotal = db.getDouble("f_amounttotal");
     double amountCash = db.getDouble("f_amountcash");
     double amountCard = db.getDouble("f_amountcard");
+    QString comment = db.getString("f_comment");
     QString partnerName, partnerTaxcode;
     if (partner > 0) {
         db[":f_id"] = partner;
@@ -445,6 +457,23 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
     if (amountCard > 0.001) {
         p.ltext(tr("Payment, card"), 0);
         p.rtext(float_str(amountCard, 2));
+        p.br();
+    }
+
+    if (idram > 0.001) {
+        p.ltext(tr("Payment, idram"), 0);
+        p.rtext(float_str(idram, 2));
+        p.br();
+    }
+    if (tellcell > 0.001){
+        p.ltext(tr("Payment, TellCell"), 0);
+        p.rtext(float_str(tellcell, 2));
+        p.br();
+    }
+
+    if (!comment.isEmpty()) {
+        p.br();
+        p.ltext(comment, 0);
         p.br();
     }
 

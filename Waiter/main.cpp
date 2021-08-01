@@ -4,6 +4,7 @@
 #include "c5sockethandler.h"
 #include "datadriver.h"
 #include "dlgscreen.h"
+#include "c5menu.h"
 #include <QApplication>
 #include <QTranslator>
 #include <QFile>
@@ -67,8 +68,15 @@ int main(int argc, char *argv[])
     font.setPointSize(11);
     a.setFont(font);
 
-    DbData::setDBParams(__c5config.dbParams());
-    DataDriver::init(__c5config.dbParams());
+    C5Database db(__c5config.dbParams());
+    if (db.open()) {
+        DbData::setDBParams(__c5config.dbParams());
+        DataDriver::init(__c5config.dbParams());
+        menu5 = new C5Menu();
+        menu5->refresh();
+    } else {
+        C5Message::error(db.fLastError);
+    }
 
     DlgScreen w;
     C5Config::fParentWidget = &w;

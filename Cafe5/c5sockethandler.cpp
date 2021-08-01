@@ -19,6 +19,8 @@ C5SocketHandler::C5SocketHandler(QTcpSocket *socket, QObject *parent) :
     if (fSocket == nullptr) {
         fSocket = new QTcpSocket(parent);
         connect(fSocket, SIGNAL(connected()), this, SLOT(connected()));
+        qRegisterMetaType <QAbstractSocket::SocketError> ("QAbstractSocket::SocketError");
+        connect(fSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(error(QAbstractSocket::SocketError)));
         fSocket->connectToHost(__socketServerHost, __socketServerPort);
         fSocket->waitForConnected(5000);
     }
@@ -67,7 +69,16 @@ void C5SocketHandler::send()
     QJsonDocument jDoc(jObj);
     QByteArray data = jDoc.toJson();
     int docSize = data.size();
-    fSocket->write(reinterpret_cast<const char*>(&docSize), sizeof(quint32));
+    if (fSocket->write(reinterpret_cast<const char*>(&docSize), sizeof(quint32)) < 0) {
+        QJsonObject obj;
+        obj["reply"] = 0;
+        obj["msg"] = QString("Socket error.\r\n%1\r\n%2:%3")
+                .arg(fSocket->errorString())
+                .arg(__socketServerHost)
+                .arg(__socketServerPort);
+        emit handleCommand(obj);
+        return;
+    }
     fSocket->write(data);
     fSocket->flush();
 }
@@ -135,4 +146,10 @@ void C5SocketHandler::readyRead()
         qDebug() << "PIZDA";
         close();
     }
+}
+
+void C5SocketHandler::error(QAbstractSocket::SocketError err)
+{
+    QTcpSocket *s = static_cast<QTcpSocket*>(sender());
+    qDebug() << s->errorString();
 }

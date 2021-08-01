@@ -88,6 +88,10 @@ private slots:
 
     void uploadDataFinished();
 
+    void threadMessageError(int code, const QString &message);
+
+    void threadMessageData(int code, const QVariant &data);
+
     void escape();
 
     void shortcutF1();

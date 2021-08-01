@@ -400,6 +400,12 @@
        </item>
        <item row="12" column="1">
         <widget class="C5LineEdit" name="leDateOfClose">
+         <property name="readOnly">
+          <bool>false</bool>
+         </property>
+         <property name="placeholderText">
+          <string>yyyy-MM-dd</string>
+         </property>
          <property name="Tag" stdset="0">
           <number>20</number>
          </property>
@@ -569,7 +575,7 @@
        </item>
        <item row="13" column="1">
         <widget class="C5LineEdit" name="leShift">
-         <property name="Shift" stdset="0">
+         <property name="Tag" stdset="0">
           <number>31</number>
          </property>
         </widget>
@@ -1215,7 +1221,7 @@
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <item>
-           <widget class="QRadioButton" name="rbPrintLeft_2">
+           <widget class="QRadioButton" name="rbPrint50">
             <property name="text">
              <string>50mm</string>
             </property>
@@ -1225,7 +1231,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QRadioButton" name="rbPrintDown_2">
+           <widget class="QRadioButton" name="rbPrint80">
             <property name="text">
              <string>80mm</string>
             </property>
@@ -1242,20 +1248,96 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="tab_8">
+      <attribute name="title">
+       <string>Http server</string>
+      </attribute>
+      <layout class="QFormLayout" name="formLayout">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_62">
+         <property name="text">
+          <string>HTTP server ip</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="C5LineEditWithSelector" name="leHttpIP">
+         <property name="Tag" stdset="0">
+          <number>65</number>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_63">
+         <property name="text">
+          <string>HTTP server port</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="C5LineEditWithSelector" name="leHttpPort">
+         <property name="Tag" stdset="0">
+          <number>66</number>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_64">
+         <property name="text">
+          <string>HTTP server username</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="C5LineEditWithSelector" name="leHttpUsername">
+         <property name="Tag" stdset="0">
+          <number>67</number>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_65">
+         <property name="text">
+          <string>HTTP server password</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="C5LineEditWithSelector" name="leHttpPassword">
+         <property name="Tag" stdset="0">
+          <number>68</number>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <spacer name="verticalSpacer_8">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>390</width>
+           <height>400</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5LineEdit</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5lineedit.h</header>
-  </customwidget>
-  <customwidget>
    <class>C5LineEditWithSelector</class>
    <extends>QLineEdit</extends>
    <header location="global">c5lineeditwithselector.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5LineEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5lineedit.h</header>
   </customwidget>
   <customwidget>
    <class>C5CheckBox</class>

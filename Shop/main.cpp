@@ -4,7 +4,7 @@
 #include "c5license.h"
 #include "dlgpin.h"
 #include "c5logsystem.h"
-#include "c5userauth.h"
+#include "c5user.h"
 #include "c5replication.h"
 #include "datadriver.h"
 #include "replicadialog.h"
@@ -102,6 +102,7 @@ int main(int argc, char *argv[])
     bool login = false;
     C5Database db(C5Config::dbParams());
     QString user, pin;
+    C5User ua(0);
     if (!__c5config.shopEnterPin()) {
         user = __c5config.getValue(param_shop_autologin_pin1);
         pin = __c5config.getValue(param_shop_autologin_pin2);
@@ -110,8 +111,8 @@ int main(int argc, char *argv[])
         if (!DlgPin::getPin(user, pin)) {
             return 0;
         }
-        C5UserAuth ua(db);
-        if (ua.authByPinPass(user, pin, __userid, __usergroup, __username)) {
+
+        if (ua.authByPinPass(user, pin)) {
             login = true;
         } else {
             C5Message::error(ua.error());
@@ -119,12 +120,12 @@ int main(int argc, char *argv[])
         pin.clear();
         user.clear();
     } while (!login);
-    db[":f_group"] = __usergroup;
+    db[":f_group"] = ua.group();
     db.exec("select f_key from s_user_access where f_group=:f_group");
     while (db.nextRow()) {
         __userpermissions.append(db.getInt(0));
     }
-    db[":f_user"] = __userid;
+    db[":f_user"] = ua.id();
     db.exec("select sn.f_id, sn.f_name from s_settings_names sn where sn.f_id in (select f_settings from s_user_config where f_user=:f_user)");
     auto *s = new SettingsSelection();
     while (db.nextRow()) {
@@ -149,6 +150,7 @@ int main(int argc, char *argv[])
         delete rp;
         __c5config.initParamsFromDb();
     }
+    __userid = ua.id();
     Working w;
     __c5config.fParentWidget = &w;
     C5Dialog::setMainWindow(&w);

@@ -6,18 +6,23 @@
 #include "socketdata.h"
 #include "httpheader.h"
 #include <QByteArray>
+#include <QDateTime>
 #include <QHash>
 
-class RequestHandler
+class RequestHandler : public QObject
 {
+    Q_OBJECT
+
 public:
     explicit RequestHandler();
     virtual ~RequestHandler();
-    static RequestHandler *route(const QString &remoteHost, const QString &r, const QByteArray &data, const QHash<QString, DataAddress> &dataMap, ContentType contentType);
+    static RequestHandler *route(const QString &session, const QString &remoteHost, const QString &r, const QByteArray &data, const QHash<QString, DataAddress> &dataMap, ContentType contentType);
     QByteArray fResponse;
     ContentType fContentType;
     bool idle();
     void setIdle(bool v);
+    long liveDuration();
+    QString fSession;
 
 protected:
     HttpHeader fHttpHeader;
@@ -30,6 +35,10 @@ protected:
 
 private:
     bool fIdle;
+    QDateTime fCreated;
+
+signals:
+    void sendData(int code, const QString &, const QString &, const QVariant &);
 
 };
 

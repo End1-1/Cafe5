@@ -3,7 +3,6 @@
 #include "c5cafecommon.h"
 #include "c5user.h"
 #include "c5witerconf.h"
-#include "c5menu.h"
 #include "dlgdishremovereason.h"
 #include "c5orderdriver.h"
 #include "c5ordertabledelegate.h"
@@ -32,6 +31,8 @@
 #include "dlgchosesplitorderoption.h"
 #include "qdishpart2button.h"
 #include "qdishbutton.h"
+#include "dlgstoplistoption.h"
+#include "dlgtext.h"
 #include <QToolButton>
 #include <QCloseEvent>
 #include <QDesktopWidget>
@@ -67,6 +68,7 @@ DlgOrder::DlgOrder(C5User *user) :
     ui->btnPayComplimentary->setVisible(fUser->check(cp_t5_pay_complimentary));
     ui->btnPayCityLedger->setVisible(fUser->check(cp_t5_pay_cityledger));
     ui->btnSelfCost->setVisible(fUser->check(cp_t5_pay_breakfast));
+    ui->btnPackage->setVisible(false); //TODO: THIS IS A OPTIOIN
     setRoomComment();
     setDiscountComment();
     setComplimentary();
@@ -81,6 +83,10 @@ DlgOrder::DlgOrder(C5User *user) :
         ui->btnTax->setChecked(false);
         break;
     }
+
+    fMenuID = C5Config::defaultMenu();
+    fPart1 = 0;
+    fStoplistMode = false;
 }
 
 DlgOrder::~DlgOrder()
@@ -106,8 +112,9 @@ void DlgOrder::openTable(int table, C5User *user)
     QFont f(qApp->font());
     f.setBold(true);
 
-    d->load(table);
-    d->exec();
+    if (d->load(table)) {
+        d->exec();
+    }
     delete d;
 }
 
@@ -121,13 +128,12 @@ void DlgOrder::openTableById(const QString &id, C5User *user)
     DlgOrder *d = new DlgOrder(user);
     d->ui->lbCar->setVisible(C5Config::carMode());
     d->ui->btnCar->setVisible(C5Config::carMode());
-    d->fMenuName = C5Config::defaultMenuName();
     d->showFullScreen();
     d->hide();
     qApp->processEvents();
     QFont f(qApp->font());
     f.setBold(true);
-    d->buildMenu(d->fMenuName, "", "");
+    d->buildMenu(d->fMenuID, 0, 0);
     d->ui->btnChangeStaff->setText(QString("%1\n%2").arg(tr("Staff")).arg(user->fullName()));
     //d->ui->btnChangeStaff->setText(QString("%1%2").arg(user.fullName()).arg(__c5config.autoDateCash() ? "" : " [" + __c5config.dateCash() + " / " + QString::number(__c5config.dateShift()) + "]"));
 
@@ -218,14 +224,27 @@ QList<WOrder *> DlgOrder::worders()
     return lst;
 }
 
-void DlgOrder::load(int table)
+bool DlgOrder::load(int table)
 {
+    QStringList orders;
+    QString err;
+    if (!dbtable->openTable(table, orders, err)) {
+        C5Message::error(err);
+        return false;
+    }
+
+    //TODO: replace stoplist to correct place
+    auto *sh = createSocketHandler(SLOT(handleStopList(QJsonObject)));
+    sh->bind("cmd", sm_stoplist);
+    sh->bind("state", sl_get);
+    sh->send();
 
     fTable = table;
     ui->lbCar->setVisible(C5Config::carMode());
     ui->btnCar->setVisible(C5Config::carMode());
-    fMenuName = C5Config::defaultMenuName();
-    buildMenu(fMenuName, "", "");
+    fMenuID = C5Config::defaultMenu();
+    buildMenu(fMenuID, 0, 0);
+    on_btnRecent_clicked();
     ui->btnTable->setText(tr("Table") + ": " + dbtable->name(table));
     ui->btnChangeStaff->setText(QString("%1\n%2").arg(tr("Staff")).arg(fUser->fullName())); //.arg(__c5config.autoDateCash() ? "" : " [" + __c5config.dateCash() + " / " + QString::number(__c5config.dateShift()) + "]"));
 
@@ -233,13 +252,7 @@ void DlgOrder::load(int table)
         ui->vs->itemAt(0)->widget()->deleteLater();
         ui->vs->removeItem(ui->vs->itemAt(0));
     }
-    QStringList orders;
-    QString err;
-    if (!dbtable->openTable(table, orders, err)) {
-        C5Message::error(err);
-        reject();
-        return;
-    }
+
     ui->lbCar->clear();
     ui->lbVisit->clear();
     ui->lbVisit->setVisible(false);
@@ -277,25 +290,25 @@ void DlgOrder::load(int table)
     }
     ui->vs->addStretch();
     itemsToTable();
+    return true;
 }
 
-void DlgOrder::buildMenu(const QString &menu, QString part1, QString part2)
+void DlgOrder::buildMenu(int menuid, int part1, int part2)
 {
-    if (menu.isEmpty()) {
+    if (menuid == 0) {
         C5Message::error(tr("Menu is not defined"));
         return;
     }
-    ui->btnChangeMenu->setText(QString("%1\n%2").arg(tr("Menu")).arg(menu));
+    ui->btnChangeMenu->setText(QString("%1\n%2").arg(tr("Menu")).arg(dbmenuname->name(menuid)));
 
-    QStringList p1 = C5Menu::fMenu[menu].keys();
+    fMenuID = menuid;
+    fPart1 = part1;
+
     while (ui->hlDishPart1->itemAt(0)) {
         ui->hlDishPart1->itemAt(0)->widget()->deleteLater();
         ui->hlDishPart1->removeItem(ui->hlDishPart1->itemAt(0));
     }
-    for (int id: dbdishpart1->list()) {
-        if (!p1.contains(dbdishpart1->name(id))) {
-            continue;
-        }
+    for (int id: menu5->fMenuList.data[menuid].keys()) {
         QPushButton *btn = new QPushButton(dbdishpart1->name(id));
         btn->setProperty("btn_part1", true);
         connect(btn, &QPushButton::clicked, this, &DlgOrder::dishpart1Clicked);
@@ -303,28 +316,30 @@ void DlgOrder::buildMenu(const QString &menu, QString part1, QString part2)
         ui->hlDishPart1->addWidget(btn);
     }
 
-    if (part1.isEmpty()) {
+    if (fPart1 == 0) {
         if (!ui->hlDishPart1->itemAt(0)) {
             C5Message::error(tr("Menu is not defined"));
             return;
         }
-        part1 = static_cast<QPushButton*>(ui->hlDishPart1->itemAt(0)->widget())->text();
+        fPart1 = static_cast<QPushButton*>(ui->hlDishPart1->itemAt(0)->widget())->property("id").toInt();
     }
 
     while (ui->glDishPart2->itemAt(0)) {
         ui->glDishPart2->itemAt(0)->widget()->deleteLater();
         ui->glDishPart2->removeItem(ui->glDishPart2->itemAt(0));
     }
-    QStringList p2 = C5Menu::fMenu[menu][part1].keys();
+
     int colCount = 2;
     int col = 0;
     int row = 0;
-    for (const QString &s: p2) {
+    for (const DPart2 &d2: menu5->fMenuList.part1(fMenuID, fPart1).data) {
         QDishPart2Button *btn = new QDishPart2Button();
         connect(btn, &QDishPart2Button::clicked, this, &DlgOrder::dishPart2Clicked);
-        btn->setText(s);
+        btn->setText(dbdishpart2->name(d2.fId));
+        btn->setProperty("id", d2.fId);
         QPalette pal = btn->palette();
-        pal.setColor(QPalette::Base, QColor::fromRgb(C5Menu::fPart2Color[s]));
+        //TODO: color of part2
+        //pal.setColor(QPalette::Base, QColor::fromRgb(menu->fPart2Color[d2.fId]));
         btn->setPalette(pal);
         ui->glDishPart2->addWidget(btn, row, col++, 1, 1);
         if (col == colCount) {
@@ -333,38 +348,14 @@ void DlgOrder::buildMenu(const QString &menu, QString part1, QString part2)
         }
     }
     ui->glDishPart2->setRowStretch(row + 1, 1);
-
-    while (ui->grDish->itemAt(0)) {
-        ui->grDish->itemAt(0)->widget()->deleteLater();
-        ui->grDish->removeItem(ui->grDish->itemAt(0));
-    }
-    if (part2.isEmpty()) {
-        return;
-    }
-    QRect scr = qApp->desktop()->screenGeometry();
-    colCount = scr.width() > 1024 ? 3 : 2;
-    col = 0;
-    row = 0;
-    QList<QJsonObject> dishes = C5Menu::fMenu[menu][part1][part2];
-    for (int i = 0; i < dishes.count(); i++) {
-        QJsonObject &o = dishes[i];
-        QDishButton *btn = new QDishButton();
-        btn->setProperty("dish", o);
-        connect(btn, &QDishButton::clicked, this, &DlgOrder::dishClicked);
-        ui->grDish->addWidget(btn, row, col++, 1, 1);
-        if (col == colCount) {
-            col = 0;
-            row ++;
-        }
-    }
-    ui->grDish->setRowStretch(row + 1, 1);
+    buildDishes(part2, menu5->fMenuList.part1(fMenuID, fPart1).data);
 }
 
-void DlgOrder::addDishToOrder(const QJsonObject &obj)
+void DlgOrder::addDishToOrder(int menuid)
 {
-    QJsonObject o = obj;
-    o["f_guest"] = "1";
-    if (o["f_hourlypayment"].toString().toInt() > 0) {
+    WOrder *wo = worder();
+    int dishid = dbmenu->dishid(menuid);
+    if (dbdish->isHourlyPayment(dishid)) {
         for (int i = 0; i < worder()->fOrderDriver->dishesCount(); i++) {
             if (dbdish->isHourlyPayment(worder()->fOrderDriver->dishesValue("f_id", i).toInt()) && worder()->fOrderDriver->dishesValue("f_state", i).toInt() == DISH_STATE_OK) {
                 C5Message::error(tr("Hourly payment already exists"));
@@ -374,98 +365,53 @@ void DlgOrder::addDishToOrder(const QJsonObject &obj)
     }
     bool found = false;
     int itemindex = -1;
-    QString special = DlgListDishSpecial::getSpecial(obj["f_dish"].toString(), fDBParams);
-    o["f_comment"] = special;
+    QString special;
+    if (!DlgListDishSpecial::getSpecial(dishid, fDBParams, special)) {
+        return;
+    }
+    QString comment = "";
     if (ui->btnCompactDishAddMode->isChecked()) {
-        for (int i = 0; i < worder()->fOrderDriver->dishesCount(); i++) {
-            if (o["f_dish"].toString().toInt() == worder()->fOrderDriver->dishesValue("f_dish", i).toInt()) {
-                if (worder()->fOrderDriver->dishesValue("f_state", i) != DISH_STATE_OK) {
+        for (int i = 0; i < wo->fOrderDriver->dishesCount(); i++) {
+            if (dishid == wo->fOrderDriver->dishesValue("f_dish", i).toInt()) {
+                if (wo->fOrderDriver->dishesValue("f_state", i) != DISH_STATE_OK) {
                     continue;
                 }
-                if (o["f_store"].toString() != worder()->fOrderDriver->dishesValue("f_store", i).toString()) {
-                    break;
+                if (dbmenu->store(menuid) != wo->fOrderDriver->dishesValue("f_store", i).toInt()) {
+                    continue;
                 }
-                if (o["f_print1"].toString() != worder()->fOrderDriver->dishesValue("f_print1", i).toString()) {
-                    break;
+                if (dbmenu->print1(menuid) != wo->fOrderDriver->dishesValue("f_print1", i).toString()) {
+                    continue;
                 }
-                if (o["f_print2"].toString() != worder()->fOrderDriver->dishesValue("f_print2", i).toString()) {
-                    break;
+                if (dbmenu->print2(menuid) != wo->fOrderDriver->dishesValue("f_print2", i).toString()) {
+                    continue;
                 }
-                if (o["f_comment"].toString() != worder()->fOrderDriver->dishesValue("f_comment", i).toString()) {
-                    break;
+                if (comment != wo->fOrderDriver->dishesValue("f_comment", i).toString()) {
+                    continue;
                 }
-                worder()->fOrderDriver->setDishesValue("f_qty1", float_str(worder()->fOrderDriver->dishesValue("f_qty1", i).toDouble() + 1, 1), i);
-                worder()->updateItem(i);
+                if (wo->fOrderDriver->dishesValue("f_qty2", i).toDouble() > 0.0001) {
+                    continue;
+                }
+                wo->fOrderDriver->setDishesValue("f_qty1", float_str(wo->fOrderDriver->dishesValue("f_qty1", i).toDouble() + 1, 1), i);
+                wo->updateItem(i);
                 found = true;
                 itemindex = i;
             }
         }
     }
 
+    comment = special;
     if (!found) {
-        if (obj["f_id"].toString().isEmpty()) {
-            o["f_id"] = "";
-            o["f_header"] = worder()->fOrderDriver->currentOrderId();
-            o["f_state"] = QString::number(DISH_STATE_OK);
-            o["f_service"] = C5Config::serviceFactor();
-            o["f_discount"] = worder()->fOrderDriver->headerValue("f_discountfactor").toDouble();
-            o["f_total"] = 0;
-            o["f_qty1"] = 1;
-            o["f_qty2"] = 0;
-            logRecord(fUser->fullName(), worder()->fOrderDriver->headerValue("f_id").toString(), "", "New dish", o["f_name"].toString() + " " + o["f_comment"].toString(), "");
-        }
-        itemindex = worder()->addItem(o);
+        itemindex = wo->addItem(menuid, comment);
+        logRecord(fUser->fullName(), wo->fOrderDriver->headerValue("f_id").toString(), "", "New dish", dbdish->name(dishid) + " " + comment, "");
     }
-    worder()->fOrderDriver->setHeader("f_amountcash", 0);
-    worder()->fOrderDriver->setHeader("f_amountcard", 0);
-    worder()->fOrderDriver->setHeader("f_amountbank", 0);
-    worder()->fOrderDriver->setHeader("f_amountother", 0);
-    worder()->fOrderDriver->amountTotal();
-    worder()->updateItem(itemindex);
-    ui->scrollArea->verticalScrollBar()->setValue(worder()->updateItem(itemindex).y() + 50);
+    wo->fOrderDriver->setHeader("f_amountcash", 0);
+    wo->fOrderDriver->setHeader("f_amountcard", 0);
+    wo->fOrderDriver->setHeader("f_amountbank", 0);
+    wo->fOrderDriver->setHeader("f_amountother", 0);
+    wo->fOrderDriver->amountTotal();
+    wo->updateItem(itemindex);
+    ui->scrollArea->verticalScrollBar()->setValue(wo->updateItem(itemindex).y() + 50);
     setButtonsState();
-}
-
-void DlgOrder::changeQty(double qty)
-{
-    int index = 0;
-    if (!worder()->currentRow(index)) {
-        return;
-    }
-    //TODO: DO SOMETHING WITH PACKAGE
-//    if (worder()->fOrderDriver->dishesValue("d_package", index).toInt() > 0) {
-//        C5Message::error(tr("You cannot change the quantity of items of package"));
-//        return;
-//    }
-    if (dbdish->isHourlyPayment(worder()->fOrderDriver->dishesValue("f_id", index).toInt())) {
-        C5Message::error(tr("This is hourly payment item"));
-        return;
-    }
-    QString oldQty = float_str(worder()->fOrderDriver->dishesValue("f_qty1", index).toDouble(), 2);
-    if (qty > 0) {
-        if (worder()->fOrderDriver->dishesValue("f_qty1", index).toDouble() + qty > 999) {
-            return;
-        }
-        if (qty < 1 && worder()->fOrderDriver->dishesValue("f_qty2", index).toDouble() < 0.09) {
-            worder()->fOrderDriver->setDishesValue("f_qty1", qty, index);
-        } else {
-            worder()->fOrderDriver->setDishesValue("f_qty1", worder()->fOrderDriver->dishesValue("f_qty1", index).toDouble() + qty, index);
-        }
-    } else {
-        if (worder()->fOrderDriver->dishesValue("f_qty1", index).toDouble() + qty < 0.09) {
-            return;
-        }
-        if (worder()->fOrderDriver->dishesValue("f_qty2", index).toDouble() <= worder()->fOrderDriver->dishesValue("f_qty1", index).toDouble() + qty) {
-            worder()->fOrderDriver->setDishesValue("f_qty1", worder()->fOrderDriver->dishesValue("f_qty1", index).toDouble() + qty, index);
-        }
-    }
-    logRecord(fUser->fullName(), worder()->fOrderDriver->headerValue("f_id").toString(),
-              worder()->fOrderDriver->dishesValue("f_id", index).toString(),
-              "Qty of " + dbdish->name(worder()->fOrderDriver->dishesValue("f_id", index).toInt()),
-              oldQty,
-              worder()->fOrderDriver->dishesValue("f_qty1", index).toString());
-    setButtonsState();
-    worder()->updateItem(index);
 }
 
 void DlgOrder::itemsToTable()
@@ -475,11 +421,12 @@ void DlgOrder::itemsToTable()
         countHourlyPayment(o);
         o->itemsToTable();
     }
-    if (!worder()) {
-        setButtonsState();
+    WOrder *wo = worder();
+    setButtonsState();
+    if (!wo) {
         return;
     }
-    worder()->fOrderDriver->amountTotal();
+    wo->fOrderDriver->amountTotal();
     ui->btnService->setText(QString("%1 %2%\n%3")
                             .arg(tr("Service amount"))
                             .arg(worder()->fOrderDriver->headerValue("f_servicefactor").toDouble() * 100)
@@ -488,9 +435,18 @@ void DlgOrder::itemsToTable()
                                 .arg(tr("Discount"))
                                 .arg(worder()->fOrderDriver->headerValue("f_discountfactor").toDouble() * 100)
                                 .arg(float_str(worder()->fOrderDriver->headerValue("f_amountdiscount").toDouble(), 2)));
-
+    ui->leTaxNumber->setText(wo->fOrderDriver->taxValue("f_receiptnumber").toString());
     //ui->btnSit->setText(worder()->fOrderDriver->headerValue("f_guests").toString());
-    setButtonsState();
+}
+
+void DlgOrder::setStoplistmode()
+{
+    fStoplistMode = !fStoplistMode;
+}
+
+bool DlgOrder::stoplistMode()
+{
+    return fStoplistMode;
 }
 
 void DlgOrder::logRecord(const QString &username, const QString &orderid, const QString &rec, const QString &action, const QString &value1, const QString &value2)
@@ -535,15 +491,20 @@ void DlgOrder::setButtonsState()
     setSelfcost();
     setDiscountComment();
 
-    if (!worder()) {
+    WOrder *wo = worder();
+    if (!wo) {
         return;
     }
+    headerToLineEdit();
 
-    if (worder()->fOrderDriver->headerValue("f_precheck").toInt() == 1) {
+    QString orderComment = wo->fOrderDriver->headerValue("f_comment").toString().isEmpty() ? tr("Comment") : wo->fOrderDriver->headerValue("f_comment").toString();
+    ui->btnOrderComment->setText(orderComment);
+
+    if (wo->fOrderDriver->headerValue("f_precheck").toInt() == 1) {
         ui->btnTotal->setProperty("stylesheet_button_redalert", true);
         ui->btnTotal->style()->polish(ui->btnTotal);
         ui->btnTotal->setText(QString("%1\n%2").arg(tr("Cancel bill")).arg(float_str(worder()->fOrderDriver->headerValue("f_amounttotal").toDouble(), 2)));
-        ui->wpayment->setVisible(true);
+        ui->wpayment->setVisible(fUser->check(cp_t5_print_receipt));
         ui->wdishes->setVisible(false);
         ui->wleft->setVisible(false);
         ui->wdtOrder->setEnabled(false);
@@ -559,10 +520,10 @@ void DlgOrder::setButtonsState()
     }
     ui->btnTotal->style()->polish(ui->btnTotal);
 
-    ui->btnTotal->setEnabled(btnPayment || worder()->fOrderDriver->headerValue("f_state").toInt() == ORDER_STATE_PREORDER_1 || worder()->fOrderDriver->headerValue("f_state").toInt() == ORDER_STATE_PREORDER_2);
+    ui->btnTotal->setEnabled(btnPayment || wo->fOrderDriver->headerValue("f_state").toInt() == ORDER_STATE_PREORDER_1 || wo->fOrderDriver->headerValue("f_state").toInt() == ORDER_STATE_PREORDER_2);
 
-    ui->btnSplitGuest->setEnabled(worder()->fOrderDriver->headerValue("f_state").toInt() != ORDER_STATE_PREORDER_1 && worder()->fOrderDriver->headerValue("f_state").toInt() != ORDER_STATE_PREORDER_2);
-    ui->wleft->setVisible(!worder()->fOrderDriver->headerValue("f_precheck").toInt() == 1);
+    ui->btnSplitGuest->setEnabled(wo->fOrderDriver->headerValue("f_state").toInt() != ORDER_STATE_PREORDER_1 && wo->fOrderDriver->headerValue("f_state").toInt() != ORDER_STATE_PREORDER_2);
+    ui->wleft->setVisible(!wo->fOrderDriver->headerValue("f_precheck").toInt() == 1);
 }
 
 void DlgOrder::removeWOrder(WOrder *wo)
@@ -716,6 +677,7 @@ void DlgOrder::restoreStoplistQty(int dish, double qty)
 
 void DlgOrder::timeout()
 {
+    ui->lbTime->setText(QTime::currentTime().toString(FORMAT_TIME_TO_SHORT_STR));
     fTimerCounter++;
     if ((fTimerCounter % 60) == 0) {
         for (WOrder *o: worders()) {
@@ -792,24 +754,27 @@ void DlgOrder::handleReceipt(const QJsonObject &obj)
 void DlgOrder::handleStopList(const QJsonObject &obj)
 {
     sender()->deleteLater();
+    if (obj["reply"].toInt() == 0) {
+        C5Message::error(obj["msg"].toString());
+        return;
+    }
     switch (obj["state"].toInt()) {
     case sl_set:
         C5Menu::fStopList[obj["f_dish"].toString().toInt()] = obj["f_qty"].toDouble();
         break;
     case sl_add: {
-        QJsonObject jdish = QJsonDocument::fromJson(obj["dish"].toString().toUtf8()).object();
         switch (obj["status"].toInt()) {
         case sl_ok: {
-            C5Menu::fStopList[jdish["f_dish"].toString().toInt()] = obj["newqty"].toDouble();
-            addDishToOrder(jdish);
+            C5Menu::fStopList[obj["f_dish"].toString().toInt()] = obj["newqty"].toDouble();
+            addDishToOrder(obj["f_menu"].toString().toInt());
             break;
         }
         case sl_not_enough_qty:
             C5Message::error(obj["sl_msg"].toString());
             break;
         case sl_not_in_stoplist:
-            addDishToOrder(jdish);
-            C5Menu::fStopList.remove(jdish["f_dish"].toString().toInt());
+            addDishToOrder(obj["f_menu"].toString().toInt());
+            C5Menu::fStopList.remove(obj["f_dish"].toString().toInt());
             break;
         }
     }
@@ -831,6 +796,20 @@ void DlgOrder::handleStopList(const QJsonObject &obj)
             break;
         }
         break;
+    case sl_get:
+        C5Menu::fStopList.clear();
+        QJsonArray jga = obj["list"].toArray();
+        for (int i = 0; i < jga.count(); i++) {
+            QJsonObject jgo = jga.at(i).toObject();
+            C5Menu::fStopList[jgo["dish"].toInt()] = jgo["qty"].toDouble();
+        }
+        break;
+    }
+    for (QObject *o: ui->wdishes->children()) {
+        QWidget *w = dynamic_cast<QWidget*>(o);
+        if (w) {
+            w->repaint();
+        }
     }
 }
 
@@ -844,18 +823,42 @@ void DlgOrder::handleError(int err, const QString &msg)
 void DlgOrder::dishpart1Clicked()
 {
     QPushButton *btn = static_cast<QPushButton*>(sender());
-    fPart1Name = btn->text();
-    buildMenu(fMenuName, fPart1Name, "");
+    buildMenu(fMenuID, btn->property("id").toInt(), 0);
+}
+
+void DlgOrder::processMenuID(int menuid)
+{
+    int dishid = dbmenu->dishid(menuid);
+    if (fStoplistMode) {
+        double max = 999;
+        if (!DlgPassword::getAmount(dbdish->name(dishid), max, false)) {
+            return;
+        }
+        auto *sh = createSocketHandler(SLOT(handleStopList(QJsonObject)));
+        sh->bind("cmd", sm_stoplist);
+        sh->bind("f_dish", QString::number(dishid));
+        sh->bind("f_stopqty", max);
+        sh->bind("state", 1);
+        sh->send();
+    } else {
+        auto *sh = createSocketHandler(SLOT(handleStopList(QJsonObject)));
+        sh->bind("cmd", sm_stoplist);
+        sh->bind("f_dish", QString::number(dishid));
+        sh->bind("f_menu", QString::number(menuid));
+        sh->bind("f_qty", 1);
+        sh->bind("state", sl_add);
+        sh->bind("dish", QString::number(dishid));
+        sh->send();
+        return;
+    }
 }
 
 void DlgOrder::dishPart2Clicked()
 {
     QDishPart2Button *btn = static_cast<QDishPart2Button*>(sender());
-    QString part2 = btn->text();
-    if (part2.isEmpty()) {
-        return;
-    }
-    buildMenu(fMenuName, fPart1Name, part2);
+    int part2 = btn->property("id").toInt();
+    Q_ASSERT(part2 > 0);
+    buildMenu(fMenuID, fPart1, part2);
 }
 
 void DlgOrder::dishClicked()
@@ -864,36 +867,14 @@ void DlgOrder::dishClicked()
         on_btnSplitGuest_clicked();
     }
     QDishButton *btn = static_cast<QDishButton*>(sender());
-    const QJsonObject &o = btn->property("dish").toJsonObject();
-    if (ui->btnStopListMode->isChecked()) {
-        double max = 999;
-        if (!DlgPassword::getAmount(o["f_name"].toString(), max, false)) {
-            return;
-        }
-        auto *sh = createSocketHandler(SLOT(handleStopList(QJsonObject)));
-        sh->bind("cmd", sm_stoplist);
-        sh->bind("f_dish", o["f_dish"].toString());
-        sh->bind("f_stopqty", max);
-        sh->bind("state", 1);
-        sh->send();
-    } else {
-        if (C5Menu::fStopList.contains(o["f_dish"].toString().toInt())) {
-            qDebug() << C5Menu::fStopList[o["f_dish"].toString().toInt()];
-            if (C5Menu::fStopList[o["f_dish"].toString().toInt()] < 0.01) {
-                return;
-            }
-            auto *sh = createSocketHandler(SLOT(handleStopList(QJsonObject)));
-            sh->bind("cmd", sm_stoplist);
-            sh->bind("f_dish", o["f_dish"].toString());
-            sh->bind("f_qty", 1);
-            sh->bind("state", sl_add);
-            sh->bind("dish", QJsonDocument(o).toJson(QJsonDocument::Compact));
-            sh->send();
-            return;
-        }
-        addDishToOrder(o);
-        ui->scrollArea->verticalScrollBar()->setValue(1000);
-    }
+    processMenuID(btn->property("id").toInt());
+}
+
+void DlgOrder::dishPartClicked()
+{
+    QPushButton *btn = static_cast<QPushButton*>(sender());
+    int id = btn->property("id").toInt();
+    buildMenu(fMenuID, fPart1, id);
 }
 
 void DlgOrder::on_btnExit_clicked()
@@ -912,6 +893,19 @@ void DlgOrder::on_btnVoid_clicked()
     if (!wo->currentRow(index)) {
         return;
     }
+    if (wo->fOrderDriver->dishesValue("f_qty2", index).toDouble() < 0.001) {
+        if (C5Message::question(QString("%1<br>%2(%3)")
+                                .arg(tr("Confirm to remove"))
+                                .arg(dbdish->name(wo->fOrderDriver->dishesValue("f_dish", index).toInt()))
+                                .arg(float_str(wo->fOrderDriver->dishesValue("f_qty1", index).toDouble(), 2))) != QDialog::Accepted) {
+            return;
+        }
+        restoreStoplistQty(wo->fOrderDriver->dishesValue("f_dish", index).toInt(), wo->fOrderDriver->dishesValue("f_qty1", index).toDouble());
+        wo->fOrderDriver->setDishesValue("f_state", DISH_STATE_NONE, index);
+        wo->fOrderDriver->save();
+        itemsToTable();
+        return;
+    }
     if (!tmp->check(cp_t5_remove_printed_service)) {
         if (!DlgPassword::getUserAndCheck(tr("Void dish"), tmp, cp_t5_remove_printed_service)) {
             return;
@@ -919,7 +913,7 @@ void DlgOrder::on_btnVoid_clicked()
     }
     QString oldQty = wo->fOrderDriver->dishesValue("f_qty1", index).toString() + "/" + worder()->fOrderDriver->dishesValue("f_qty2", index).toString();
     double max = wo->fOrderDriver->dishesValue("f_qty1", index).toDouble();
-    if (!DlgPassword::getAmount(wo->fOrderDriver->dishesValue("f_name", index).toString(), max, true)) {
+    if (!DlgPassword::getAmount(dbdish->name(wo->fOrderDriver->dishesValue("f_dish", index).toInt()), max, true)) {
         return;
     }
     if (max < 0.01) {
@@ -932,7 +926,7 @@ void DlgOrder::on_btnVoid_clicked()
     }
     if (C5Message::question(QString("%1<br>%2(%3)")
                             .arg(tr("Confirm to remove"))
-                            .arg(wo->fOrderDriver->dishesValue("f_name", index).toString())
+                            .arg(dbdish->name(wo->fOrderDriver->dishesValue("f_dish", index).toInt()))
                             .arg(float_str(max, 2))) != QDialog::Accepted) {
         return;
     }
@@ -950,8 +944,10 @@ void DlgOrder::on_btnVoid_clicked()
         wo->fOrderDriver->setDishesValue("f_state", reasonid, index);
     }
     restoreStoplistQty(wo->fOrderDriver->dishesValue("f_dish", index).toInt(), max);
-    logRecord(tmp->fullName(), wo->fOrderDriver->headerValue("f_id").toString(), wo->fOrderDriver->dishesValue("f_id", index).toString(),
-              "Remove dish or change qty of " + wo->fOrderDriver->dishesValue("f_name", index).toString(),
+    logRecord(tmp->fullName(),
+              wo->fOrderDriver->headerValue("f_id").toString(),
+              wo->fOrderDriver->dishesValue("f_id", index).toString(),
+              "Remove dish or change qty of " + dbdish->name(wo->fOrderDriver->dishesValue("f_dish", index).toInt()),
               oldQty, wo->fOrderDriver->dishesValue("f_qty1", index).toString() + "/" + wo->fOrderDriver->dishesValue("f_qty2", index).toString());
     if (wo->fOrderDriver->headerValue("f_print").toInt() > 0) {
         wo->fOrderDriver->setHeader("f_print", wo->fOrderDriver->headerValue("f_print").toInt() * -1);
@@ -964,38 +960,32 @@ void DlgOrder::on_btnVoid_clicked()
 void DlgOrder::on_btnComment_clicked()
 {
     int index = 0;
-    if (!worder()->currentRow(index)) {
+    WOrder *wo = worder();
+    if (!wo) {
         return;
     }
-    if (worder()->fOrderDriver->dishesValue("f_hourlypayment", index).toInt() > 0) {
+    if (!wo->currentRow(index)) {
+        return;
+    }
+    if (dbdish->isHourlyPayment(wo->fOrderDriver->dishesValue("f_dish", index).toInt())) {
         C5Message::error(tr("Cannot add comment to hourly payment"));
         return;
     }
-    if (worder()->fOrderDriver->dishesValue("f_qty2", index).toDouble() > 0.001) {
+    if (wo->fOrderDriver->dishesValue("f_qty2", index).toDouble() > 0.001) {
         C5Message::error(tr("Cannot add comment to dish that already printed"));
         return;
     }
-    QString comment = worder()->fOrderDriver->dishesValue("f_name", index).toString();
-    if (!DlgListOfDishComments::getComment(comment)) {
+    QString comment = wo->fOrderDriver->dishesValue("f_comment", index).toString();
+    if (!DlgListOfDishComments::getComment(dbdish->name(wo->fOrderDriver->dishesValue("f_dish", index).toInt()), comment)) {
         return;
     }
-    worder()->fOrderDriver->setDishesValue("f_comment", comment, index);
-    logRecord(fUser->fullName(), worder()->fOrderDriver->headerValue("f_id").toString(), worder()->fOrderDriver->dishesValue("f_id", index).toString(), "Comment for dish", worder()->fOrderDriver->dishesValue("f_name", index).toString(), comment);
-    worder()->updateItem(index);
+    wo->fOrderDriver->setDishesValue("f_comment", comment, index);
+    logRecord(fUser->fullName(), wo->fOrderDriver->headerValue("f_id").toString(),
+              wo->fOrderDriver->dishesValue("f_id", index).toString(),
+              "Comment for dish",
+              dbdish->name(wo->fOrderDriver->dishesValue("f_dish", index).toInt()), comment);
+    wo->updateItem(index);
 }
-
-//void DlgOrder::on_btnExpandDishTable_clicked()
-//{
-//    if (ui->wDishTypes->isVisible()) {
-//        ui->wDishTypes->setVisible(false);
-//        ui->wDishTypesControl->setVisible(false);
-//        ui->btnExpandDishTable->setIcon(QIcon(":/minimize.png"));
-//    } else {
-//        ui->wDishTypes->setVisible(true);
-//        ui->wDishTypesControl->setVisible(true);
-//        ui->btnExpandDishTable->setIcon(QIcon(":/expand2.png"));
-//    }
-//}
 
 void DlgOrder::on_btnChangeMenu_clicked()
 {
@@ -1005,12 +995,12 @@ void DlgOrder::on_btnChangeMenu_clicked()
             return;
         }
     }
-    QString menu;
-    if (!DlgListOfMenu::getMenuId(menu, fDBParams)) {
+    int menuid;
+    if (!DlgListOfMenu::getMenuId(menuid, fDBParams)) {
         return;
     }
-    fMenuName = menu;
-    buildMenu(menu, "", "");
+    fMenuID = menuid;
+    buildMenu(menuid, 0, 0);
 }
 
 void DlgOrder::on_btnGuest_clicked()
@@ -1022,8 +1012,8 @@ void DlgOrder::on_btnGuest_clicked()
 void DlgOrder::on_btnSearchInMenu_clicked()
 {
     DlgSearchInMenu *d = new DlgSearchInMenu();
-    connect(d, SIGNAL(dish(QJsonObject)), this, SLOT(addDishToOrder(QJsonObject)));
-    d->buildMenu(fMenuName);
+    connect(d, SIGNAL(dish(int)), this, SLOT(processMenuID(int)));
+    d->buildMenu(fMenuID);
     d->exec();
     delete d;
 }
@@ -1049,25 +1039,32 @@ void DlgOrder::on_btnCar_clicked()
 
 void DlgOrder::on_btnPackage_clicked()
 {
-    int id;
-    QString name;
-    if (DlgListOfPackages::package(id, name)) {
-        QList<QJsonObject> items = C5Menu::fPackagesList[id];
-        for (const QJsonObject &o: items) {
-            addDishToOrder(o);
-        }
-        logRecord(fUser->fullName(), worder()->fOrderDriver->headerValue("f_id").toString(), "", "New package", name, "");
-    }
+    //TODO: PACKAGE ADd
+//    int id;
+//    QString name;
+//    if (DlgListOfPackages::package(id, name)) {
+//        QList<QJsonObject> items = C5Menu::fPackagesList[id];
+//        for (const QJsonObject &o: items) {
+//            addDishToOrder(o);
+//        }
+//        logRecord(fUser->fullName(), worder()->fOrderDriver->headerValue("f_id").toString(), "", "New package", name, "");
+//    }
 }
 
 void DlgOrder::on_btnPrintService_clicked()
 {
     QList<WOrder*> orders = worders();
     for (WOrder *o: orders) {
+        for (int i = 0; i < o->fOrderDriver->dishesCount(); i++) {
+            if (o->fOrderDriver->dishesValue("f_qty2", i).toDouble() < 0.001) {
+                o->fOrderDriver->setDishesValue("f_printtime", QDateTime::currentDateTime(), i);
+            }
+        }
         if (!o->fOrderDriver->save()) {
             C5Message::error(worder()->fOrderDriver->error());
             return;
         }
+
         ui->btnPrintService->setEnabled(false);
         C5SocketHandler *sh = createSocketHandler(SLOT(handlePrintService(QJsonObject)));
         sh->bind("cmd", sm_printservice);
@@ -1143,7 +1140,24 @@ void DlgOrder::on_btnMovement_clicked()
 
 void DlgOrder::on_btnRecent_clicked()
 {
-
+    if (fMenuID == 0) {
+        return;
+    }
+    while (ui->grDish->itemAt(0)) {
+        ui->grDish->itemAt(0)->widget()->deleteLater();
+        ui->grDish->removeItem(ui->grDish->itemAt(0));
+    }
+    QRect scr = qApp->desktop()->screenGeometry();
+    int dcolCount = scr.width() > 1024 ? 3 : 2;
+    int dcol = 0;
+    int drow = 0;
+    for (DPart1 p1: menu5->fMenuList.data[fMenuID]) {
+        QList<DPart2> dpart2 = p1.data;
+        for (const DPart2 &d2: dpart2) {
+            fetchDishes(d2, true, dcolCount, dcol, drow);
+        }
+    }
+    ui->grDish->setRowStretch(drow + 1, 1);
 }
 
 void DlgOrder::on_btnTable_clicked()
@@ -1379,8 +1393,14 @@ void DlgOrder::on_btnTotal_clicked()
         sh->send();
     } else {
         int o = DlgPrecheckOptions::precheck();
+        C5User *tmp = fUser;
         switch (o) {
         case PRECHECK_CANCEL: {
+            if (!tmp->check(cp_t5_cancel_precheck)) {
+                if (!DlgPassword::getUserAndCheck(tr("Cancel precheck"), tmp, cp_t5_cancel_precheck)) {
+                    return;
+                }
+            }
             if (C5Message::question(tr("Confirm to cancel bill")) != QDialog::Accepted) {
                 return;
             }
@@ -1393,6 +1413,11 @@ void DlgOrder::on_btnTotal_clicked()
             break;
         }
         case PRECHECK_REPEAT:
+            if (!tmp->check(cp_t5_print_precheck)) {
+                if (!DlgPassword::getUserAndCheck(tr("Cancel precheck"), tmp, cp_t5_print_precheck)) {
+                    return;
+                }
+            }
             C5SocketHandler *sh = createSocketHandler(SLOT(handleReceipt(QJsonObject)));
             sh->bind("cmd", sm_bill);
             sh->bind("station", hostinfo);
@@ -1402,6 +1427,9 @@ void DlgOrder::on_btnTotal_clicked()
             sh->bind("receipt_printer", C5Config::fSettingsName);
             sh->send();
             break;
+        }
+        if (tmp != fUser) {
+            delete tmp;
         }
     }
 }
@@ -1451,6 +1479,10 @@ void DlgOrder::calcAmount(C5LineEdit *l)
         return;
     }
     l->setDouble(max);
+    if (l == ui->lePrepaid || l == ui->leCard || l == ui->leCash) {
+        ui->leBank->setDouble(0);
+        ui->leOther->setDouble(0);
+    }
     worder()->fOrderDriver->setHeader("f_amountcash", ui->leCash->getDouble());
     worder()->fOrderDriver->setHeader("f_amountcard", ui->leCard->getDouble());
     worder()->fOrderDriver->setHeader("f_amountbank", ui->leBank->getDouble());
@@ -1473,6 +1505,7 @@ void DlgOrder::clearOther()
     worder()->fOrderDriver->setCL("", "");
     ui->leRoomComment->clear();
     ui->leRoomComment->setVisible(false);
+    ui->lbRoom->setVisible(false);
 }
 
 void DlgOrder::setCLComment()
@@ -1482,6 +1515,7 @@ void DlgOrder::setCLComment()
     }
     bool v = !worder()->fOrderDriver->clValue("f_code").toString().isEmpty();
     ui->leRoomComment->setVisible(v);
+    ui->lbRoom->setVisible(v);
     if (v) {
         ui->leRoomComment->setText(worder()->fOrderDriver->clValue("f_code").toString() + ", " + worder()->fOrderDriver->clValue("f_name").toString());
     }
@@ -1495,6 +1529,7 @@ void DlgOrder::setComplimentary()
     if (worder()->fOrderDriver->headerValue("f_otherid").toInt() == PAYOTHER_COMPLIMENTARY) {
         ui->leRoomComment->setVisible(true);
         ui->leRoomComment->setText(tr("Complimentary"));
+        ui->lbRoom->setVisible(true);
     }
 }
 
@@ -1505,6 +1540,7 @@ void DlgOrder::setRoomComment()
     }
     bool v = !worder()->fOrderDriver->payRoomValue("f_room").toString().isEmpty();
     ui->leRoomComment->setVisible(v);
+    ui->lbRoom->setVisible(v);
     if (v) {
         ui->leRoomComment->setText(worder()->fOrderDriver->payRoomValue("f_room").toString() + ", " + worder()->fOrderDriver->payRoomValue("f_guest").toString());
     }
@@ -1517,6 +1553,7 @@ void DlgOrder::setSelfcost()
     }
     if (worder()->fOrderDriver->headerValue("f_otherid").toInt() == PAYOTHER_SELFCOST) {
         ui->leRoomComment->setVisible(true);
+        ui->lbRoom->setVisible(true);
         ui->leRoomComment->setText(tr("Selfcost"));
     }
 }
@@ -1527,6 +1564,7 @@ void DlgOrder::setDiscountComment()
         return;
     }
     ui->leDiscountComment->setVisible(false);
+    ui->lbDiscount->setVisible(false);
     //TODO: DISCOUTN COMMENT
 //    bool v = (fOrder->hInt("f_bonusid") > 0);
 //    ui->leDiscountComment->setVisible(v);
@@ -1550,6 +1588,77 @@ bool DlgOrder::worderPaymentOK()
             + ui->lePrepaid->getDouble()
             + ui->leOther->getDouble() < worder()->fOrderDriver->headerValue("f_amounttotal").toDouble()) {
         return false;
+    }
+    return true;
+}
+
+bool DlgOrder::buildDishes(int part2, const QList<DPart2> &dpart2)
+{
+    while (ui->grDish->itemAt(0)) {
+        ui->grDish->itemAt(0)->widget()->deleteLater();
+        ui->grDish->removeItem(ui->grDish->itemAt(0));
+    }
+    for (const DPart2 &d2: dpart2) {
+        if (d2.data1.count() > 0) {
+            if (buildDishes(part2, d2.data1)) {
+                return true;
+            }
+        }
+       // C5Message::info(QString("%1-%2").arg(part2).arg(d2.fId));
+        if (d2.fId == part2) {
+            QRect scr = qApp->desktop()->screenGeometry();
+            int dcolCount = scr.width() > 1024 ? 3 : 2;
+            int dcol = 0;
+            int drow = 0;
+            for (int i = 0; i < d2.data1.count(); i++) {
+                QDishPart2Button *btn = new QDishPart2Button();
+                btn->setProperty("id", d2.data1.at(i).fId);
+                btn->setText(dbdishpart2->name(d2.data1.at(i).fId));
+                connect(btn, &QDishPart2Button::clicked, this, &DlgOrder::dishPartClicked);
+                ui->grDish->addWidget(btn, drow, dcol++, 1, 1);
+                if (dcol == dcolCount) {
+                    dcol = 0;
+                    drow ++;
+                }
+            }
+
+            for (int i = 0; i < d2.data2.data.count(); i++) {
+                QDishButton *btn = new QDishButton();
+                btn->setProperty("id", d2.data2.data.at(i));
+                connect(btn, &QDishButton::clicked, this, &DlgOrder::dishClicked);
+                ui->grDish->addWidget(btn, drow, dcol++, 1, 1);
+                if (dcol == dcolCount) {
+                    dcol = 0;
+                    drow ++;
+                }
+            }
+            ui->grDish->setRowStretch(drow + 1, 1);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool DlgOrder::fetchDishes(const DPart2 &part2, bool recent, int colcount, int &col, int &row)
+{
+    for (int i = 0; i < part2.data1.count(); i++) {
+        fetchDishes(part2.data1[i], recent, colcount, col, row);
+    }
+
+    for (int i = 0; i < part2.data2.data.count(); i++) {
+        if (recent) {
+            if (!dbmenu->recent(part2.data2.data.at(i))) {
+                continue;
+            }
+        }
+        QDishButton *btn = new QDishButton();
+        btn->setProperty("id", part2.data2.data.at(i));
+        connect(btn, &QDishButton::clicked, this, &DlgOrder::dishClicked);
+        ui->grDish->addWidget(btn, row, col++, 1, 1);
+        if (col == colcount) {
+            col = 0;
+            row ++;
+        }
     }
     return true;
 }
@@ -1676,8 +1785,15 @@ void DlgOrder::on_btnPayTransferToRoom_clicked()
 
 void DlgOrder::on_btnReceipt_clicked()
 {
-    if (worder()->fOrderDriver->headerValue("f_amountother").toDouble() > 0.001) {
-        if (worder()->fOrderDriver->headerValue("f_otherid").toInt() == 0) {
+    WOrder *wo = worder();
+    C5User *tmp = fUser;
+    if (!tmp->check(cp_t5_print_receipt)) {
+        if (!DlgPassword::getUserAndCheck(tr("Print receipt"), tmp, cp_t5_print_receipt)) {
+            return;
+        }
+    }
+    if (wo->fOrderDriver->headerValue("f_amountother").toDouble() > 0.001) {
+        if (wo->fOrderDriver->headerValue("f_otherid").toInt() == 0) {
             C5Message::error(tr("Other method is not selected"));
             return;
         }
@@ -1739,7 +1855,7 @@ void DlgOrder::on_btnReceipt_clicked()
         amounts = float_str(worder()->fOrderDriver->headerValue("f_amountother").toDouble(), 2);
     }
     amounts += ui->btnTax->isChecked() ? " Tax: yes" : " Tax: no";
-    C5LogToServerThread::remember(LOG_WAITER, __username, "", worder()->fOrderDriver->currentOrderId(), "", "Receipt", payMethods, amounts);
+    C5LogToServerThread::remember(LOG_WAITER, tmp->fullName(), "", worder()->fOrderDriver->currentOrderId(), "", "Receipt", payMethods, amounts);
 }
 
 void DlgOrder::on_btnCloseOrder_clicked()
@@ -1798,5 +1914,151 @@ void DlgOrder::on_btnTax_clicked()
 
 void DlgOrder::on_btnStopListMode_clicked()
 {
+    DlgStopListOption d(this);
+    d.exec();
+}
 
+void DlgOrder::on_btnOrderComment_clicked()
+{
+    if (WOrder *wo = worder()) {
+        QString comment = wo->fOrderDriver->headerValue("f_comment").toString();
+        if (!DlgText::getText(tr("Order comment"), comment)) {
+            return;
+        }
+        wo->fOrderDriver->setHeader("f_comment", comment);
+        setButtonsState();
+    }
+}
+
+void DlgOrder::on_btnPlus1_clicked()
+{
+    int index = 0;
+    WOrder *wo = worder();
+    if (!wo) {
+        return;
+    }
+    if (!wo->currentRow(index)) {
+        return;
+    }
+    if (dbdish->isHourlyPayment(wo->fOrderDriver->dishesValue("f_dish", index).toInt())) {
+        C5Message::error(tr("Cannot add comment to hourly payment"));
+        return;
+    }
+    if (wo->fOrderDriver->dishesValue("f_qty2", index).toDouble() > 0.0001) {
+        int newindex = wo->fOrderDriver->duplicateDish(index);
+        wo->fOrderDriver->setDishesValue("f_qty1", 1, newindex);
+        wo->fOrderDriver->setDishesValue("f_qty2", 0, newindex);
+        itemsToTable();
+        wo->updateItem(newindex);
+    } else {
+        QString oldQty = wo->fOrderDriver->dishesValue("f_qty1", index).toString();
+        wo->fOrderDriver->setDishesValue("f_qty1", wo->fOrderDriver->dishesValue("f_qty1", index).toDouble() + 1, index);
+        logRecord(fUser->fullName(), wo->fOrderDriver->headerValue("f_id").toString(),
+                  wo->fOrderDriver->dishesValue("f_id", index).toString(),
+                  "Qty of " + dbdish->name(wo->fOrderDriver->dishesValue("f_id", index).toInt()),
+                  oldQty,
+                  wo->fOrderDriver->dishesValue("f_qty1", index).toString());
+        wo->updateItem(index);
+    }
+}
+
+void DlgOrder::on_btnMinus1_clicked()
+{
+    int index = 0;
+    WOrder *wo = worder();
+    if (!wo) {
+        return;
+    }
+    if (!wo->currentRow(index)) {
+        return;
+    }
+    if (dbdish->isHourlyPayment(wo->fOrderDriver->dishesValue("f_dish", index).toInt())) {
+        C5Message::error(tr("Cannot add comment to hourly payment"));
+        return;
+    }
+    if (wo->fOrderDriver->dishesValue("f_qty2", index).toDouble() > 0.0001) {
+        C5Message::error(tr("Use removal tool"));
+        return;
+    } else {
+        if (wo->fOrderDriver->dishesValue("f_qty1", index).toDouble() - 1 > 0.001) {
+            QString oldQty = wo->fOrderDriver->dishesValue("f_qty1", index).toString();
+            wo->fOrderDriver->setDishesValue("f_qty1", wo->fOrderDriver->dishesValue("f_qty1", index).toDouble() - 1, index);
+            logRecord(fUser->fullName(), wo->fOrderDriver->headerValue("f_id").toString(),
+                      wo->fOrderDriver->dishesValue("f_id", index).toString(),
+                      "Qty of " + dbdish->name(wo->fOrderDriver->dishesValue("f_id", index).toInt()),
+                      oldQty,
+                      wo->fOrderDriver->dishesValue("f_qty1", index).toString());
+            wo->updateItem(index);
+        } else if (C5Message::question(tr("Do you want to remove this item")) == QDialog::Accepted) {
+            wo->fOrderDriver->setDishesValue("f_state", DISH_STATE_NONE, index);
+            logRecord(fUser->fullName(), wo->fOrderDriver->headerValue("f_id").toString(),
+                      wo->fOrderDriver->dishesValue("f_id", index).toString(),
+                      "Remove not printed " + dbdish->name(wo->fOrderDriver->dishesValue("f_id", index).toInt()),
+                      "-",
+                      wo->fOrderDriver->dishesValue("f_qty1", index).toString());
+            itemsToTable();
+        }
+    }
+}
+
+void DlgOrder::on_btnAnyqty_clicked()
+{
+    int index = 0;
+    WOrder *wo = worder();
+    if (!wo) {
+        return;
+    }
+    if (!wo->currentRow(index)) {
+        return;
+    }
+    if (dbdish->isHourlyPayment(wo->fOrderDriver->dishesValue("f_dish", index).toInt())) {
+        C5Message::error(tr("Cannot add comment to hourly payment"));
+        return;
+    }
+    if (wo->fOrderDriver->dishesValue("f_qty2", index).toDouble() > 0.0001) {
+        C5Message::error(tr("Use removal tool"));
+        return;
+    }
+    if (wo->fOrderDriver->dishesValue("d_package", index).toInt() > 0) {
+        C5Message::error(tr("You cannot change the quantity of items of package"));
+        return;
+    }
+    if (wo->fOrderDriver->dishesValue("f_hourlypayment", index).toInt() > 0) {
+        C5Message::error(tr("This is hourly payment item"));
+        return;
+    }
+    double max = 999;
+    if (!DlgQty::getQty(max, wo->fOrderDriver->dishesValue("f_name", index).toString())) {
+        return;
+    }
+    QString oldQty = wo->fOrderDriver->dishesValue("f_qty1", index).toString();
+    wo->fOrderDriver->setDishesValue("f_qty1", max, index);
+    logRecord(fUser->fullName(), wo->fOrderDriver->headerValue("f_id").toString(),
+              wo->fOrderDriver->dishesValue("f_id", index).toString(),
+              "Qty of " + dbdish->name(wo->fOrderDriver->dishesValue("f_id", index).toInt()),
+              oldQty,
+              wo->fOrderDriver->dishesValue("f_qty1", index).toString());
+    wo->updateItem(index);
+}
+
+void DlgOrder::on_btnDishPart2Down_clicked()
+{
+    ui->scrollAreaPart2->verticalScrollBar()->setValue(ui->scrollAreaPart2->verticalScrollBar()->value() + 300);
+    for (QObject *o: ui->scrollAreaWidgetContents->children()) {
+        QWidget *w = dynamic_cast<QWidget*>(o);
+        if (w) {
+            w->repaint();
+        }
+    }
+}
+
+void DlgOrder::on_btnDishPart2Up_clicked()
+{
+    ui->scrollAreaPart2->verticalScrollBar()->setValue(ui->scrollAreaPart2->verticalScrollBar()->value() - 300);
+    for (QObject *o: ui->scrollAreaWidgetContents->children()) {
+        QWidget *w = dynamic_cast<QWidget*>(o);
+        if (w) {
+            w->repaint();
+        }
+    }
 }

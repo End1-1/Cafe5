@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>475</width>
-    <height>198</height>
+    <height>202</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -211,7 +211,7 @@
       <enum>Qt::NoFocus</enum>
      </property>
      <property name="FieldRef" stdset="0">
-      <string>part_name</string>
+      <string>f_parentname</string>
      </property>
     </widget>
    </item>

@@ -33,10 +33,10 @@ bool C5PrintServiceThread::run()
     }
     db[":f_header"] = fHeader;
     db[":f_state"] = DISH_STATE_OK;
-    db.exec("select f_id, f_dish, f_timeorder, f_print1, f_print2, f_qty1 - f_qty2 as f_qty, f_comment "
+    db.exec("select f_id, f_dish, f_timeorder, f_print1, f_print2, f_qty1 as f_qty, f_comment "
             "from o_body b "
             "where b.f_header=:f_header and b.f_state=:f_state "
-            "and (length(f_print1)>0 or length(f_print2)>0) and b.f_qty1-b.f_qty2>0 ");
+            "and (length(f_print1)>0 or length(f_print2)>0) and b.f_qty2=0 ");
     while (db.nextRow()) {
         QMap<QString, QVariant> m;
         db.rowToMap(m);
@@ -64,6 +64,11 @@ bool C5PrintServiceThread::run()
     if (fHeaderData["f_state"].toInt() == ORDER_STATE_OPEN) {
         db[":f_header"] = fHeader;
         db.exec("update o_body set f_qty2=f_qty1 where f_header=:f_header");
+        for (int i = 0; i < fBodyData.count(); i++) {
+            const QMap<QString, QVariant> &o = fBodyData.at(i);
+            db[":f_id"] = o["f_id"];
+            db.exec("update o_body set f_printtime=current_timestamp() where f_id=:f_id");
+        }
     }
     return true;
 }
@@ -71,7 +76,7 @@ bool C5PrintServiceThread::run()
 void C5PrintServiceThread::print(const QString &printer, const QString &side)
 {
     QFont font(qApp->font());
-    font.setPointSize(30);
+    font.setPointSize(20);
     C5Printing p;
     p.setSceneParams(__c5config.receiptParepWidth(), 2800, QPrinter::Portrait);
     p.setFont(font);
@@ -112,6 +117,7 @@ void C5PrintServiceThread::print(const QString &printer, const QString &side)
     p.line(0, p.fTop, p.fNormalWidth, p.fTop);
     p.br(2);
 
+    p.setFontSize(30);
     QSet<QString> storages;
     for (int i = 0; i < fBodyData.count(); i++) {
         const QMap<QString, QVariant> &o = fBodyData.at(i);
@@ -124,12 +130,18 @@ void C5PrintServiceThread::print(const QString &printer, const QString &side)
         } else {
             p.ltext(QString("%1").arg(dbdish->name(o["f_dish"].toInt())), 0);
         }
-        p.br();
+        p.setFontBold(true);
+        p.rtext(QString("%1").arg(float_str(o["f_qty"].toDouble(), 2)));
+        p.setFontBold(false);
+
         if (o["f_comment"].toString().length() > 0) {
+            p.br();
+            p.setFontSize(25);
             p.ltext(o["f_comment"].toString(), 0);
             p.br();
+            p.setFontSize(30);
         }
-        p.ctext(QString("%1: %2").arg(tr("Qty")).arg(float_str(o["f_qty"].toDouble(), 2)));
+
         p.br();
         p.line(0, p.fTop, p.fNormalWidth, p.fTop);
         p.br(1);

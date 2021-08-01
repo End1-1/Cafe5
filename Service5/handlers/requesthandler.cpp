@@ -1,13 +1,16 @@
 #include "requesthandler.h"
 #include "database.h"
 #include "requestmanager.h"
-#include <QDateTime>
+#include "monitoringwindow.h"
+#include "databaseconnectionmanager.h"
 #include <QElapsedTimer>
 
 RequestHandler::RequestHandler()
 {
     fIdle = false;
     fContentType = ContentType::MultipartFormData;
+    MonitoringWindow::connectSender(this);
+    fCreated = QDateTime::currentDateTime();
 }
 
 RequestHandler::~RequestHandler()
@@ -15,22 +18,27 @@ RequestHandler::~RequestHandler()
     __debug_log("~RequestHandler");
 }
 
-RequestHandler *RequestHandler::route(const QString &remoteHost, const QString &r, const QByteArray &data, const QHash<QString, DataAddress> &dataMap, ContentType contentType)
+RequestHandler *RequestHandler::route(const QString &session, const QString &remoteHost, const QString &r, const QByteArray &data, const QHash<QString, DataAddress> &dataMap, ContentType contentType)
 {
     QElapsedTimer et;
     et.start();
     __debug_log("New request from " + remoteHost);
     RequestHandler *rh = RequestManager::getHandler(r);
+    rh->fSession = session;
     rh->fContentType = contentType;
+    emit rh->sendData(0, rh->fSession, QString("Request data: %1").arg(QString(data)), QVariant());
     if (rh->validateData(data, dataMap)) {
         rh->handle(data, dataMap);
     }
+    int ms = et.elapsed();
+    emit rh->sendData(0, rh->fSession, QString("Request handler(%1ms). %2").arg(ms).arg(r), QVariant());
     Database db;
-    if (db.open("127.0.0.1", "server5", "root", "osyolia")) {
+    JsonHandler jh;
+    if (DatabaseConnectionManager::openDatabase(db, jh)) {
         db[":fdate"] = QDate::currentDate();
         db[":ftime"] = QTime::currentTime();
         db[":fhost"] = remoteHost;
-        db[":felapsed"] = et.elapsed();
+        db[":felapsed"] = ms;
         db[":froute"] = r;
         db.insert("system_requests");
     } else {
@@ -53,12 +61,18 @@ void RequestHandler::setIdle(bool v)
     }
 }
 
+long RequestHandler::liveDuration()
+{
+    return fCreated.secsTo(QDateTime::currentDateTime());
+}
+
 bool RequestHandler::setResponse(int responseCode, const QString &data)
 {
     fHttpHeader.setResponseCode(responseCode);
     fHttpHeader.setContentLength(data.toUtf8().length());
     fResponse.append(fHttpHeader.toString());
     fResponse.append(data.toUtf8());
+    sendData(0, fSession, "http response: " + data, QVariant());
     return true;
 }
 

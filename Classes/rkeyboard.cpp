@@ -95,12 +95,14 @@ void RKeyboard::btnTextClicked()
 void RKeyboard::on_btnSpace_clicked()
 {
     fText.append(" ");
+    ui->leResult->setText(fText);
     emit textChanged(fText);
 }
 
 void RKeyboard::on_btnBackspace_clicked()
 {
     fText.remove(fText.length() - 1, 1);
+    ui->leResult->setText(fText);
     emit textChanged(fText);
 }
 

@@ -19,6 +19,7 @@
 #include "taxprint.h"
 #include "c5storedraftwriter.h"
 #include "c5replication.h"
+#include "threadcheckmessage.h"
 #include <QInputDialog>
 
 #define col_qty 2

@@ -33,8 +33,6 @@ public:
     bool event(QEvent *e) override;
 
 private slots:
-    void complextQtyChanged(const QString &arg);
-
     void on_btnAddRecipe_clicked();
 
     void on_btnRemoveRecipe_clicked();
@@ -46,12 +44,6 @@ private slots:
     void recipeQtyPriceChanged(const QString &arg);
 
     void on_btnPrintRecipe_clicked();
-
-    void on_btnAddDish_clicked();
-
-    void on_tblComplex_cellClicked(int row, int column);
-
-    void on_btnDeleteDish_clicked();
 
     void on_btnNewGoods_clicked();
 

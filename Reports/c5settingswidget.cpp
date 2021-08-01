@@ -119,6 +119,12 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     fTags[ui->chAutoDateCash->getTag()] = ui->chAutoDateCash->isChecked() ? "1" : "0";
     fTags[ui->leDateOfClose->getTag()] = ui->leDateOfClose->text();
     fTags[ui->leShift->getTag()] = ui->leShift->text();
+    fTags[ui->leHttpIP->getTag()] = ui->leHttpIP->text();
+    fTags[ui->leHttpPort->getTag()] = ui->leHttpPort->text();
+    fTags[ui->leHttpUsername->getTag()] = ui->leHttpUsername->text();
+    fTags[ui->leHttpPassword->getTag()] = ui->leHttpPassword->text();
+    fTags[ui->rbPrint50->property("tag").toInt()] = ui->rbPrint50->isChecked() ? "1" : "0";
+    fTags[ui->rbPrint80->property("tag").toInt()] = ui->rbPrint80->isChecked() ? "1" : "0";
     C5Database db(fDBParams);
     db[":f_settings"] = ui->leCode->getInteger();
     db.exec("delete from s_settings_values where f_settings=:f_settings");

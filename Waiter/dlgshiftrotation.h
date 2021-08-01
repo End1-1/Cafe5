@@ -3,6 +3,8 @@
 
 #include "c5dialog.h"
 
+class C5User;
+
 namespace Ui {
 class DlgShiftRotation;
 }
@@ -12,12 +14,11 @@ class DlgShiftRotation : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgShiftRotation(const QStringList &dbParams);
+    explicit DlgShiftRotation(C5User *user);
 
     ~DlgShiftRotation();
 
 private slots:
-    void handleShift(const QJsonObject &obj);
 
     void on_btnNextDate_clicked();
 
@@ -29,6 +30,8 @@ private slots:
 
 private:
     Ui::DlgShiftRotation *ui;
+
+    C5User *fUser;
 };
 
 #endif // DLGSHIFTROTATION_H

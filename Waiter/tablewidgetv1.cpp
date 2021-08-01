@@ -27,6 +27,8 @@ void TableWidgetV1::config(int id)
 
 void TableWidgetV1::configOrder(const QString &orderid)
 {
+    bool commentVisible = !dboheader->comment(orderid).isEmpty();
+    ui->lbComment->setVisible(commentVisible);
     QString state = "1";
     if (orderid.isEmpty()) {
         ui->tw1lbStaff->setText("-");
@@ -40,6 +42,7 @@ void TableWidgetV1::configOrder(const QString &orderid)
         if (dboheader->print(orderid) > 0) {
             state = "4";
         }
+        ui->lbComment->setText(dboheader->comment(orderid));
         ui->tw1lbStaff->setText(dbuser->fullShort(dboheader->staff(orderid)));
         ui->tw1lbAmount->setText(float_str(dboheader->amount(orderid), 2));
         ui->tw1lbTime->setText(QDate::currentDate() == dboheader->dateOpen(orderid) ? dboheader->timeOpen(orderid).toString(FORMAT_TIME_TO_SHORT_STR) : dboheader->dateOpen(orderid).toString(FORMAT_DATE_TO_STR) + "\n" + dboheader->timeOpen(orderid).toString(FORMAT_TIME_TO_SHORT_STR));

@@ -83,12 +83,14 @@
 #include <QParallelAnimationGroup>
 
 C5MainWindow *__mainWindow;
+QStringList mainDbParams;
 
 C5MainWindow::C5MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::C5MainWindow)
 {
     ui->setupUi(this);
+    mainDbParams = __c5config.dbParams();
     ui->splitter->setStretchFactor(0, 0);
     ui->splitter->setStretchFactor(1, 1);
     __c5config.fParentWidget = this;
@@ -868,7 +870,7 @@ void C5MainWindow::on_btnHideMenu_clicked()
 void C5MainWindow::on_btnChangeDB_clicked()
 {
     QList<QVariant> values;
-    if (!C5Selector::getValue(__c5config.dbParams(), cache_s_db, values)) {
+    if (!C5Selector::getValue(mainDbParams, cache_s_db, values)) {
         return;
     }
     setDB(values.at(2).toString());

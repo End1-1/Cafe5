@@ -43,6 +43,10 @@ void DlgList::on_lst_clicked(const QModelIndex &index)
         reject();
     }
     fResult = index.row();
-    accept();
+    if (fResult < ui->lst->count() - 1) {
+        accept();
+    } else {
+        reject();
+    }
 }
 

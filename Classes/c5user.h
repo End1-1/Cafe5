@@ -10,6 +10,8 @@ class C5User : public QObject
     Q_OBJECT
 
 public:
+    enum UserState {usAtWork, usNotAtWork};
+
     C5User(const QMap<QString, QVariant> &m);
 
     C5User(const QString &altPassword);
@@ -26,11 +28,17 @@ public:
 
     int group();
 
-    int fId;
+    bool authByPinPass(const QString &pin, const QString &pass);
 
     bool authorize(const QString &altPassword);
 
     bool check(int permission);
+
+    bool enterWork();
+
+    bool leaveWork();
+
+    UserState state();
 
 private:
     C5User();
@@ -44,6 +52,12 @@ private:
     QVariant data(const QString &name);
 
     QMap<QString, QVariant> fUserData;
+
+    UserState fState;
+
+    void getState();
+
+    void getPermissions();
 };
 
 #endif // C5USER_H

@@ -7,6 +7,7 @@ SslServer::SslServer(QObject *parent) :
     QTcpServer(parent)
 {
     //connect(this, SIGNAL(acceptError(QAbstractSocket::SocketError)), this, SLOT(acceptError(QAbstractSocket::SocketError)));
+
 }
 
 void SslServer::setSslLocalCertificate(const QSslCertificate &s)
@@ -44,16 +45,26 @@ void SslServer::setSslProtocol(QSsl::SslProtocol p)
     fSslProtocol = p;
 }
 
+void SslServer::startListen()
+{
+#ifdef QT_DEBUG
+    listen(QHostAddress::AnyIPv4, 10002);
+#else
+    listen(QHostAddress::AnyIPv4, 10002);
+#endif
+}
+
 void SslServer::incomingConnection(qintptr handle)
 {
+    emit connectionRequest((int)handle);
     //LogWriter::write(10, 1, "", "SslServer::incomingConnection prepear");
-    SslSocket *sslSocket = new SslSocket(nullptr);
-    sslSocket->setSocketDescriptor(handle);
-    sslSocket->setLocalCertificate(fSslLocalCertificate);
-    sslSocket->setPrivateKey(fSslPrivateKey);
-    sslSocket->setProtocol(fSslProtocol);
-    sslSocket->startServerEncryption();
-    addPendingConnection(sslSocket);
+//    SslSocket *sslSocket = new SslSocket(nullptr);
+//    sslSocket->setSocketDescriptor(handle);
+//    sslSocket->setLocalCertificate(fSslLocalCertificate);
+//    sslSocket->setPrivateKey(fSslPrivateKey);
+//    sslSocket->setProtocol(fSslProtocol);
+//    sslSocket->startServerEncryption();
+//    addPendingConnection(sslSocket);
     //LogWriter::write(10, 1, "", "SslServer::incomingConnection ready");
 }
 

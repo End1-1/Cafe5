@@ -101,9 +101,11 @@ void C5SaleFromStoreOrder::on_btnRemove_clicked()
             storeHeader.insert(db.getString(0));
         }
     }
+    C5StoreDraftWriter dw(db);
     foreach (const QString &s, storeHeader) {
-        db[":f_document"] = s;
-        db.exec("delete from a_store where f_document=:f_document");
+        if (!dw.outputRollback(db, s)) {
+
+        }
         db[":f_document"] = s;
         db.exec("delete from a_store_draft where f_document=:f_document");
         db[":f_id"] = s;

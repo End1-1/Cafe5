@@ -28,10 +28,10 @@ DlgListOfDishComments::~DlgListOfDishComments()
     delete ui;
 }
 
-bool DlgListOfDishComments::getComment(QString &comment)
+bool DlgListOfDishComments::getComment(const QString &caption, QString &comment)
 {
     DlgListOfDishComments *d = new DlgListOfDishComments();
-    d->ui->lbComment->setText(comment);
+    d->ui->lbComment->setText(tr("Comment for") + " " + caption);
     d->showFullScreen();
     d->hide();
     d->ui->tbl->fitColumnsToWidth();

@@ -30,13 +30,7 @@ public:
     void setReadyOnly(bool v);
 
 private slots:
-    void on_btnName_clicked();
-
-    void on_btnPlus1_clicked();
-
-    void on_btnMinus1_clicked();
-
-    void on_btnAnyqty_clicked();
+    void on_btnDish_clicked();
 
 private:
     Ui::DishItem *ui;
@@ -51,8 +45,6 @@ private:
 
 signals:
     void focused(int);
-
-    void changeQty(double);
 };
 
 #endif // DISHITEM_H

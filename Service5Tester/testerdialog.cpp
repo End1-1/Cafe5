@@ -1,8 +1,7 @@
 #include "testerdialog.h"
 #include "ui_testerdialog.h"
 #include "test.h"
-#include "testn1.h"
-#include "testn2.h"
+#include "testchat.h"
 #include <QSettings>
 #include <QFile>
 
@@ -15,6 +14,7 @@ TesterDialog::TesterDialog(QWidget *parent)
     ui->leServerIP->setText(s.value("server_ip").toString());
     ui->leServerPort->setText(s.value("server_port").toString());
     ui->peHttpRequest->setPlainText(s.value("http_request").toString());
+    ui->peChatRequest->setPlainText(s.value("chat_request").toString());
     fTextN1Count = 0;
     ui->peLog->appendPlainText(QString("SSL support: %1").arg(QSslSocket::supportsSsl() ? "YES" : "NO"));
     ui->peLog->appendPlainText(QSslSocket::sslLibraryBuildVersionString());
@@ -27,11 +27,13 @@ TesterDialog::~TesterDialog()
     s.setValue("server_ip", ui->leServerIP->text());
     s.setValue("server_port", ui->leServerPort->text());
     s.setValue("http_request", ui->peHttpRequest->toPlainText());
+    s.setValue("chat_request", ui->peChatRequest->toPlainText());
     delete ui;
 }
 
 void TesterDialog::n1Finished()
 {
+    delete sender();
     ui->peLog->appendPlainText(QString("N1 count: %1").arg(--fTextN1Count));
 }
 
@@ -48,20 +50,22 @@ void TesterDialog::data(int code, const QVariant &d)
 
 void TesterDialog::on_btnTestN1_clicked()
 {
-    ui->peLog->appendPlainText("Test N1. Open connection, write data, read data, close");
-    qApp->processEvents();
-    QMap<QString, QVariant> mp;
-    mp["http_request"] = ui->peHttpRequest->toPlainText().replace("\n", "\r\n");
-    auto *t = new Test<TestN1>(ui->leServerIP->text(), ui->leServerPort->text().toInt(), ui->leN1->text().toInt(), mp, this, SLOT(data(int,QVariant)), SLOT(n1Finished()), SLOT(n1Error(int,QString)));
-    t->start();
-    ui->peLog->appendPlainText(QString("N1 count: %1").arg(fTextN1Count += ui->leN1->text().toInt()));
+
 }
 
 void TesterDialog::on_btnTestN2_clicked()
 {
-    ui->peLog->appendPlainText("Test N1. Open connection.");
-    qApp->processEvents();
-    auto *t = new Test<TestN2>(ui->leServerIP->text(), ui->leServerPort->text().toInt(), ui->leN2->text().toInt(), ui->leN2Timeout->text().toInt(), this, SLOT(data(int,QVariant)), SLOT(n1Finished()), SLOT(n1Error(int,QString)));
+
+}
+
+void TesterDialog::on_pushButton_clicked()
+{
+    ui->peLog->appendPlainText("Test chat");
+    QMap<QString, QVariant> mp;
+    mp["http_request"] = ui->peChatRequest->toPlainText().replace("\n", "\r\n");
+    auto *t = new Test<TestChat>(ui->leServerIP->text(), ui->leServerPort->text().toInt(),
+                                 ui->leChatCount->text().toInt(), ui->leChatTimeout->text().toInt(),
+                                 mp, this, SLOT(data(int,QVariant)), SLOT(n1Finished()), SLOT(n1Error(int,QString)));
     t->start();
-    ui->peLog->appendPlainText(QString("N1 count: %1").arg(fTextN1Count += ui->leN2->text().toInt()));
+
 }

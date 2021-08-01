@@ -41,7 +41,7 @@ bool ConfirmRegistration::handle(const QByteArray &data, const QHash<QString, Da
     db[":fconfirmid"] = confirmid;
     db.update("users_registration");
     jh["message"] = "ok";
-    setResponse(HTTP_OK, jh.toString());
+    return setResponse(HTTP_OK, jh.toString());
 }
 
 bool ConfirmRegistration::validateData(const QByteArray &data, const QHash<QString, DataAddress> &dataMap)

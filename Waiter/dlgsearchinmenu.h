@@ -2,6 +2,7 @@
 #define DLGSEARCHINMENU_H
 
 #include "c5dialog.h"
+#include "c5menu.h"
 
 namespace Ui {
 class DlgSearchInMenu;
@@ -16,10 +17,12 @@ public:
 
     ~DlgSearchInMenu();
 
-    void buildMenu(const QString &name);
+    void buildMenu(int menuid);
 
 private:
     Ui::DlgSearchInMenu *ui;
+
+    void extractDishes(const DPart2 &p2);
 
 private slots:
     void searchDish(const QString &name);
@@ -29,7 +32,7 @@ private slots:
     void kbdAccept();
 
 signals:
-    void dish(const QJsonObject &o);
+    void dish(int);
 };
 
 #endif // DLGSEARCHINMENU_H

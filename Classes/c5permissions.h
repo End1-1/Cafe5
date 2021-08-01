@@ -89,6 +89,8 @@
 #define cp_t5_final_check 525
 #define cp_t5_edit_table 526
 #define cp_t5_splitguest 527
+#define cp_t5_manager_tools 528
+#define cp_t5_print_receipt 529
 
 #define cp_t6_goods_menu 600
 #define cp_t6_units 601

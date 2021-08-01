@@ -10,7 +10,6 @@ DatabaseConnectionManager::DatabaseConnectionManager()
 
 bool DatabaseConnectionManager::init()
 {
-    qDebug() << ConfigIni::value("A");
     DatabaseConnection dc;
     dc.name = SYSTEM;
     dc.host = ConfigIni::value("db/host");

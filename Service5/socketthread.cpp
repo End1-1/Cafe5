@@ -1,31 +1,47 @@
 #include "socketthread.h"
 #include "requesthandler.h"
 #include "requestmanager.h"
+#include "monitoringwindow.h"
 #include <QHostAddress>
+#include <QApplication>
+#include <QUuid>
 
-SocketThread::SocketThread(SslSocket *sslSocket) :
-    ThreadWorker(),
-    fSslSocket(sslSocket)
+SocketThread::SocketThread(int handle, QSslCertificate cert, QSslKey key, QSsl::SslProtocol proto) :
+    QThread(),
+    fSocketDescriptor(handle),
+    fSslLocalCertificate(cert),
+    fSslPrivateKey(key),
+    fSslProtocol(proto)
 {
     fSocketType = Invalid;
-    fSslSocket->setParent(0);
-    fSslSocket->moveToThread(fThread);
-}
+    setProperty("session", QUuid::createUuid().toString());
 
-SocketThread::~SocketThread()
-{
-    delete fSslSocket;
-    __debug_log("~SocketThread()");
-}
-
-void SocketThread::run()
-{
+    fSslSocket = new SslSocket();
+    fSslSocket->setSocketDescriptor(fSocketDescriptor);
+    fSslSocket->setLocalCertificate(fSslLocalCertificate);
+    fSslSocket->setPrivateKey(fSslPrivateKey);
+    fSslSocket->setProtocol(fSslProtocol);
+    fSslSocket->startServerEncryption();
     fTimer.start();
     fContentLenght = 0;
     qRegisterMetaType <QAbstractSocket::SocketError> ("QAbstractSocket::SocketError");
     connect(fSslSocket, SIGNAL(readyRead()), this, SLOT(readyRead()));
     connect(fSslSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(error(QAbstractSocket::SocketError)));
     connect(fSslSocket, SIGNAL(disconnected()), this, SLOT(disconnected()));
+    connect(this, &SocketThread::finished, this, &QObject::deleteLater);
+    MonitoringWindow::connectSender(this);
+    emit sendData(0, property("session").toString(), QString("New connection from %1:%2").arg(QHostAddress(fSslSocket->peerAddress().toIPv4Address()).toString()).arg(fSslSocket->peerPort()), QVariant());
+}
+
+SocketThread::~SocketThread()
+{
+    qDebug() << "~SocketThread()";
+    delete fSslSocket;
+}
+
+void SocketThread::run()
+{
+    exec();
 }
 
 void SocketThread::httpRequest()
@@ -33,6 +49,19 @@ void SocketThread::httpRequest()
     if (fContentLenght > 0) {
         if (fData.length() < fContentLenght + fHeaderLength) {
             return;
+        }
+    } else {
+        if (QString(fData.mid(0, 3).toUpper()) == "POST") {
+            if (!fData.contains("Content-Length")) {
+                return;
+            }
+        } else if (QString(fData.mid(0, 3).toUpper()) == "GET") {
+            if ((QString(fData.mid(fData.length() - 4, 4)) != "\r\n\r\n") && (QString(fData.mid(fData.length() - 4, 4)) != "\n\n\n\n")){
+                return;
+            }
+            if (QString(fData.mid(fData.length() - 4, 4)) == "\n\n\n\n") {
+                fData.replace(fData.length() - 4, "\r\n\r\n");
+            }
         }
     }
     HttpRequestMethod m;
@@ -52,13 +81,13 @@ void SocketThread::httpRequest()
         fSslSocket->close();
         break;
     case INCOMPLETE:
+        emit sendData(0, property("session").toString(), QString("Error in request. %1").arg(QString(fData)), QVariant());
         return;
     }
-    RequestHandler *rh = RequestHandler::route(QHostAddress(fSslSocket->peerAddress().toIPv4Address()).toString(), route, fData, fRequestBody, fContentType);
+    RequestHandler *rh = RequestHandler::route(property("session").toString(), QHostAddress(fSslSocket->peerAddress().toIPv4Address()).toString(), route, fData, fRequestBody, fContentType);
     fSslSocket->write(rh->fResponse);
     RequestManager::releaseHandler(rh);
     fSslSocket->close();
-    qDebug() << "Request hadler time: " << route << fTimer.elapsed();
 }
 
 HttpRequestMethod SocketThread::parseRequest(HttpRequestMethod &requestMethod, QString &httpVersion, QString &route)
@@ -99,6 +128,7 @@ HttpRequestMethod SocketThread::parseRequest(HttpRequestMethod &requestMethod, Q
         if (s2 == -1) {
             return UNKNOWN_REQUEST_METHOD;
         } else {
+
             httpVersion = fData.mid(s1, s2 - s1);
         }
         bool headerEnd = false;
@@ -240,6 +270,8 @@ QString SocketThread::data(const DataAddress &da) const
     return result;
 }
 
+
+
 void SocketThread::readyRead()
 {
     /* Raw data in socket pattern, otherwise means http request */
@@ -268,12 +300,11 @@ void SocketThread::readyRead()
 
 void SocketThread::disconnected()
 {
-    emit finished();
+    quit();
 }
 
 void SocketThread::error(QAbstractSocket::SocketError err)
 {
     Q_UNUSED(err);
-    emit threadError(1, fSslSocket->errorString());
     disconnect();
 }

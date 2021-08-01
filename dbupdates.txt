@@ -625,6 +625,23 @@ INSERT INTO`o_state` (`f_id`, `f_name`) VALUES ('7', 'Տեղափոխված');
 alter table o_body add column f_fromtable integer default 0;
 alter table d_part2 add column f_parent integer default 0;
 ALTER TABLE `o_goods` ADD INDEX `fk_oheader_id_idx` (`f_header` ASC);
-ALTER TABLE `o_goods` ADD CONSTRAINT `fk_oheader_id`  FOREIGN KEY (`f_header`)  REFERENCES `store`.`o_header` (`f_id`)  ON DELETE NO ACTION  ON UPDATE NO ACTION;
+ALTER TABLE `o_goods` ADD CONSTRAINT `fk_oheader_id`  FOREIGN KEY (`f_header`)  REFERENCES `o_header` (`f_id`)  ON DELETE NO ACTION  ON UPDATE NO ACTION;
 ALTER TABLE `o_goods` ADD INDEX `fk_cgoods_id_idx` (`f_goods` ASC);
-ALTER TABLE `o_goods` ADD CONSTRAINT `fk_cgoods_id`  FOREIGN KEY (`f_goods`)  REFERENCES `store`.`c_goods` (`f_id`)  ON DELETE NO ACTION  ON UPDATE NO ACTION;
+ALTER TABLE `o_goods` ADD CONSTRAINT `fk_cgoods_id`  FOREIGN KEY (`f_goods`)  REFERENCES `c_goods` (`f_id`)  ON DELETE NO ACTION  ON UPDATE NO ACTION;
+
+
+/* db - 51 */
+update s_app set f_version='51' where f_app='DB';
+alter table c_storages add column f_partner integer;
+alter table d_menu add f_recent tinyint default 0;
+alter table d_recipes drop column f_complex, drop column f_complexBaseQty, drop column f_complexQty, drop column f_complexBase;
+drop table s_station_conf;
+
+/* db - 52 */
+update s_app set f_version='52' where f_app='DB';
+alter table c_goods add column f_weight decimal(14,4);
+INSERT INTO `o_pay_other` (`f_id`, `f_name`) VALUES ('6', 'IDRAM');
+INSERT INTO `o_pay_other` (`f_id`, `f_name`) VALUES ('7', 'TellCell');
+alter table o_payment add column f_idram decimal(14,2) default 0, add column f_tellcell decimal(14,2) default 0, change f_cash f_cash decimal(14,2) default 0, change f_change f_change decimal(14,2) default 0;
+alter table o_payment add column f_card decimal(14,2) default 0 after f_cash, add column f_prepaid decimal(14,2) default 0 after f_card;
+alter table d_translator add f_am tinytext;

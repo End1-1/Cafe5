@@ -10,6 +10,12 @@
     <height>100</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>200</width>
+    <height>0</height>
+   </size>
+  </property>
   <property name="maximumSize">
    <size>
     <width>200</width>
@@ -56,12 +62,18 @@
       <property name="bottomMargin">
        <number>3</number>
       </property>
-      <item row="0" column="0">
-       <widget class="QLabel" name="tw1lbName">
-        <property name="text">
-         <string>A1</string>
+      <item row="4" column="0">
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
         </property>
-       </widget>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
       </item>
       <item row="1" column="0">
        <widget class="QLabel" name="label">
@@ -88,10 +100,10 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QLabel" name="tw1lbTime">
+      <item row="1" column="3">
+       <widget class="QLabel" name="tw1lbAmount">
         <property name="text">
-         <string>00:00</string>
+         <string>0</string>
         </property>
        </widget>
       </item>
@@ -108,32 +120,33 @@
         </property>
        </spacer>
       </item>
-      <item row="1" column="3">
-       <widget class="QLabel" name="tw1lbAmount">
+      <item row="1" column="1">
+       <widget class="QLabel" name="tw1lbTime">
         <property name="text">
-         <string>0</string>
+         <string>00:00</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="0" colspan="2">
+      <item row="0" column="0">
+       <widget class="QLabel" name="tw1lbName">
+        <property name="text">
+         <string>A1</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="3">
        <widget class="QLabel" name="tw1lbStaff">
         <property name="text">
          <string>Staff name</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="0">
-       <spacer name="verticalSpacer">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
+      <item row="3" column="0" colspan="3">
+       <widget class="QLabel" name="lbComment">
+        <property name="text">
+         <string>Comment</string>
         </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>40</height>
-         </size>
-        </property>
-       </spacer>
+       </widget>
       </item>
      </layout>
     </widget>

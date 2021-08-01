@@ -7,7 +7,7 @@
 #include "sales.h"
 #include "c5replication.h"
 #include "c5config.h"
-#include "c5userauth.h"
+#include "c5user.h"
 #include "loghistory.h"
 #include "dlgpin.h"
 #include "searchitems.h"
@@ -15,6 +15,9 @@
 #include "c5logsystem.h"
 #include "storeinput.h"
 #include "selectstaff.h"
+#include "threadcheckmessage.h"
+#include "threadreadmessage.h"
+#include "c5printing.h"
 #include <QShortcut>
 #include <QInputDialog>
 #include <QKeyEvent>
@@ -138,16 +141,15 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
                 QString pin, pass;
                 if (DlgPin::getPin(pin, pass)) {
                     C5Database db(__c5config.dbParams());
-                    C5UserAuth ua(db);
-                    int user, group;
+                    C5User ua(0);
                     QString name;
-                    if (ua.authByPinPass(pin, pass, user, group, name)) {
-                        db[":f_user"] = user;
+                    if (ua.authByPinPass(pin, pass)) {
+                        db[":f_user"] = ua.id();
                         db.exec("select * from s_salary_inout where f_user=:f_user and f_dateout is null");
                         if (db.nextRow()) {
                             C5Message::error(tr("Cannot input without output"));
                         } else {
-                            db[":f_user"] = user;
+                            db[":f_user"] = ua.id();
                             db[":f_datein"] = QDate::currentDate();
                             db[":f_timein"] = QTime::currentTime();
                             db.insert("s_salary_inout", false);
@@ -178,14 +180,13 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
                 QString pin, pass;
                 if (DlgPin::getPin(pin, pass)) {
                     C5Database db(__c5config.dbParams());
-                    C5UserAuth ua(db);
-                    int user, group;
+                    C5User ua(0);
                     QString name;
-                    if (ua.authByPinPass(pin, pass, user, group, name)) {
-                        db[":f_user"] = user;
+                    if (ua.authByPinPass(pin, pass)) {
+                        db[":f_user"] = ua.id();
                         db.exec("select * from s_salary_inout where f_user=:f_user and f_dateout is null");
                         if (db.nextRow()) {
-                            db[":f_user"] = user;
+                            db[":f_user"] = ua.id();
                             db[":f_dateout"] = QDate::currentDate();
                             db[":f_timeout"] = QTime::currentTime();
                             db.update("s_salary_inout", where_id(db.getInt("f_id")));
@@ -351,9 +352,9 @@ void Working::makeWGoods()
     if (!db.exec("select g.f_id, g.f_scancode, cp.f_taxname, gg.f_name as f_groupname, g.f_name as f_goodsname, "
             "g.f_saleprice, g.f_saleprice2, u.f_name as f_unitname, "
             "gca.f_name as group1, gcb.f_name group2, gcc.f_name as group3, gcd.f_name as group4, "
-            "gg.f_taxdept, gg.f_adgcode, sum(s.f_qty*s.f_type) as f_qty, g.f_unit, "
+            "gg.f_taxdept, gg.f_adgcode, sum(s.f_qtyleft) as f_qty, g.f_unit, "
             "go.f_storeinputbeforesale, g.f_wholenumber, g.f_storeid, g.f_lastinputprice "
-            "from a_store_draft s "
+            "from a_store s "
             "inner join c_goods g on g.f_storeid=s.f_goods "
             "inner join c_groups gg on gg.f_id=g.f_group "
             "inner join c_units u on u.f_id=g.f_unit "
@@ -365,8 +366,8 @@ void Working::makeWGoods()
             "left join c_partners cp on cp.f_id=g.f_supplier "
             "inner join a_header h on h.f_id=s.f_document "
             "where h.f_date<=:f_date and s.f_store=:f_store and h.f_state=:f_state and g.f_enabled=1 "
-            "group by g.f_id,gg.f_name,g.f_name,g.f_lastinputprice,g.f_saleprice "
-                 "having sum(s.f_qty*s.f_type) > 0 ")) {
+            "and s.f_qtyleft>0 "
+            "group by g.f_id,gg.f_name,g.f_name,g.f_lastinputprice,g.f_saleprice ")) {
         C5Message::error(db.fLastError);
         return;
     }
@@ -375,6 +376,7 @@ void Working::makeWGoods()
     ui->tblGoods->setRowCount(db.rowCount());
     ui->leTotalRetail->setDouble(0);
     ui->leTotalRetail->setDouble(0);
+    fGoods.clear();
     while (db.nextRow()) {
         Goods g;
         g.fScanCode = db.getString("f_scancode");
@@ -458,6 +460,7 @@ void Working::makeWGoods()
     db.exec("select m.f_id, g.f_scancode from c_goods_multiscancode m "
             "inner join c_goods g on g.f_id=m.f_goods "
             "where length(g.f_scancode)>0");
+    fMultiscancode.clear();
     while (db.nextRow()) {
         fMultiscancode[db.getString(0)] = db.getString(1);
     }
@@ -669,6 +672,12 @@ void Working::restoreSales()
 void Working::timeout()
 {
     fTimerCounter++;
+    if (fTimerCounter % 10 == 0) {
+        auto *tcm = new ThreadCheckMessage();
+        connect(tcm, &ThreadCheckMessage::threadError, this, &Working::threadMessageError);
+        connect(tcm, &ThreadCheckMessage::data, this, &Working::threadMessageData);
+        tcm->start();
+    }
     if (__c5config.rdbReplica()) {
         if (fTimerCounter % 20 == 0 && fUpFinished && __c5config.rdbReplica()) {
 //            fUpFinished = false;
@@ -696,7 +705,7 @@ void Working::timeout()
             style = "background: blue";
             break;
         case 3:
-            style = "background: white;";
+            style = "back   ground: white;";
             break;
         }
         WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
@@ -710,6 +719,51 @@ void Working::timeout()
 void Working::uploadDataFinished()
 {
     fUpFinished = true;
+}
+
+void Working::threadMessageError(int code, const QString &message)
+{
+    qDebug() << code << message;
+}
+
+void Working::threadMessageData(int code, const QVariant &data)
+{
+    qDebug() << code << data;
+    int start = data.toString().indexOf("\r\n\r\n") + 4;
+    int len = data.toString().length() - start;
+    QString msg = data.toString().mid(start, len);
+    QJsonObject jo = QJsonDocument::fromJson(msg.toUtf8()).object();
+    if (jo["messages"].toArray().isEmpty()) {
+        return;
+    }
+    QFont font(qApp->font());
+    font.setPointSize(30);
+    C5Printing p;
+    p.setSceneParams(650, 2800, QPrinter::Portrait);
+    p.setFont(font);
+    p.br(2);
+    QPixmap img(":/atention.png");
+    img = img.scaled(400, 400);
+    p.image(img, Qt::AlignCenter);
+    p.br(img.height() / 2);
+    p.br(img.height() / 2);
+    for (int i = 0; i < jo["messages"].toArray().count(); i++) {
+        QJsonObject jom = jo["messages"].toArray().at(i).toObject();
+        p.ltext(jom["message"].toString(), 0);
+        p.br();
+        p.br();
+        p.line();
+        p.br();
+        C5Message::info(jom["message"].toString());
+    }
+    p.br();
+    p.br();
+    p.ltext(tr("Printed"), 0);
+    p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
+    p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
+    auto *trm = new ThreadReadMessage(jo["idlist"].toString());
+    trm->start();
+    makeWGoods();
 }
 
 void Working::escape()

@@ -69,7 +69,6 @@ SOURCES += \
     ../Classes/c5tablerec.cpp \
     ../Classes/c5textdelegate.cpp \
     ../Classes/c5threadobject.cpp \
-    ../Classes/c5userauth.cpp \
     ../Classes/calculator.cpp \
     ../Classes/checkforupdatethread.cpp \
     ../Classes/notificationwidget.cpp \
@@ -81,12 +80,17 @@ SOURCES += \
     ../DbData/dbdata.cpp \
     ../DbData/dbdishes.cpp \
     ../DbData/dbdishpart1.cpp \
+    ../DbData/dbdishpart2.cpp \
+    ../DbData/dbdishspecial.cpp \
     ../DbData/dbgoods.cpp \
     ../DbData/dbgoodsgroup.cpp \
     ../DbData/dbhalls.cpp \
+    ../DbData/dbmenu.cpp \
+    ../DbData/dbmenuname.cpp \
     ../DbData/dboheader.cpp \
     ../DbData/dbpartner.cpp \
     ../DbData/dbservicevalues.cpp \
+    ../DbData/dbshift.cpp \
     ../DbData/dbstore.cpp \
     ../DbData/dbtables.cpp \
     ../DbData/dbusers.cpp \
@@ -156,6 +160,7 @@ SOURCES += \
     ../FrontDesk/c5translatorform.cpp \
     ../FrontDesk/c5waiterorder.cpp \
     ../FrontDesk/dlgchangeoutputstore.cpp \
+    ../FrontDesk/dlgstoreutils.cpp \
     ../Reports/c5customfilter.cpp \
     ../Reports/c5settingswidget.cpp \
     ../Reports/cr5carvisits.cpp \
@@ -244,6 +249,7 @@ SOURCES += \
     ../Shop/selectprinters.cpp \
     c5printreceiptthread50mm.cpp \
     dishitem.cpp \
+    dishitembutton.cpp \
     dlgcarnumber.cpp \
     dlgchosesplitorderoption.cpp \
     dlgguests.cpp \
@@ -251,14 +257,18 @@ SOURCES += \
     dlglistdishspecial.cpp \
     dlglistofpackages.cpp \
     dlglistofshifts.cpp \
+    dlgmanagertools.cpp \
     dlgprecheckoptions.cpp \
     dlgpreorder.cpp \
     dlgqty.cpp \
     dlgscreen.cpp \
     dlgshiftrotation.cpp \
     dlgsplitorder.cpp \
+    dlgstoplistoption.cpp \
     dlgsystem.cpp \
+    dlgtext.cpp \
     dlgtimeorder.cpp \
+    dlgviewstoplist.cpp \
         main.cpp \
         dlgface.cpp \
     ../Cafe5/c5database.cpp \
@@ -360,7 +370,6 @@ HEADERS += \
     ../Classes/c5tablerec.h \
     ../Classes/c5textdelegate.h \
     ../Classes/c5threadobject.h \
-    ../Classes/c5userauth.h \
     ../Classes/calculator.h \
     ../Classes/checkforupdatethread.h \
     ../Classes/notificationwidget.h \
@@ -372,12 +381,17 @@ HEADERS += \
     ../DbData/dbdata.h \
     ../DbData/dbdishes.h \
     ../DbData/dbdishpart1.h \
+    ../DbData/dbdishpart2.h \
+    ../DbData/dbdishspecial.h \
     ../DbData/dbgoods.h \
     ../DbData/dbgoodsgroup.h \
     ../DbData/dbhalls.h \
+    ../DbData/dbmenu.h \
+    ../DbData/dbmenuname.h \
     ../DbData/dboheader.h \
     ../DbData/dbpartner.h \
     ../DbData/dbservicevalues.h \
+    ../DbData/dbshift.h \
     ../DbData/dbstore.h \
     ../DbData/dbtables.h \
     ../DbData/dbusers.h \
@@ -447,6 +461,7 @@ HEADERS += \
     ../FrontDesk/c5translatorform.h \
     ../FrontDesk/c5waiterorder.h \
     ../FrontDesk/dlgchangeoutputstore.h \
+    ../FrontDesk/dlgstoreutils.h \
     ../Reports/c5customfilter.h \
     ../Reports/c5settingswidget.h \
     ../Reports/cr5carvisits.h \
@@ -536,6 +551,7 @@ HEADERS += \
     ../Shop/selectprinters.h \
     c5printreceiptthread50mm.h \
     dishitem.h \
+    dishitembutton.h \
     dlgcarnumber.h \
     dlgchosesplitorderoption.h \
         dlgface.h \
@@ -553,6 +569,7 @@ HEADERS += \
     dlglistdishspecial.h \
     dlglistofpackages.h \
     dlglistofshifts.h \
+    dlgmanagertools.h \
     dlgpassword.h \
     dlgorder.h \
     ../Classes/c5user.h \
@@ -573,8 +590,11 @@ HEADERS += \
     dlgscreen.h \
     dlgshiftrotation.h \
     dlgsplitorder.h \
+    dlgstoplistoption.h \
     dlgsystem.h \
+    dlgtext.h \
     dlgtimeorder.h \
+    dlgviewstoplist.h \
     qdishbutton.h \
     qdishpart2button.h \
     rc.h \
@@ -683,6 +703,7 @@ FORMS += \
     ../FrontDesk/c5translatorform.ui \
     ../FrontDesk/c5waiterorder.ui \
     ../FrontDesk/dlgchangeoutputstore.ui \
+    ../FrontDesk/dlgstoreutils.ui \
     ../Reports/c5customfilter.ui \
     ../Reports/c5settingswidget.ui \
     ../Reports/cr5carvisitsfilter.ui \
@@ -726,6 +747,7 @@ FORMS += \
     dlglistdishspecial.ui \
     dlglistofpackages.ui \
     dlglistofshifts.ui \
+    dlgmanagertools.ui \
     dlgpassword.ui \
     dlgorder.ui \
     ../Classes/c5printpreview.ui \
@@ -735,8 +757,11 @@ FORMS += \
     dlgscreen.ui \
     dlgshiftrotation.ui \
     dlgsplitorder.ui \
+    dlgstoplistoption.ui \
     dlgsystem.ui \
+    dlgtext.ui \
     dlgtimeorder.ui \
+    dlgviewstoplist.ui \
     tablewidgetv1.ui \
     wguestorder.ui \
     worder.ui \
@@ -782,7 +807,7 @@ DISTFILES += \
 
 LIBS += -lVersion
 LIBS += -lwsock32
-LIBS += -LC:/Soft/OpenSSL-Win32/lib
+LIBS += -LC:/Soft/OpenSSL-Win64/lib
 LIBS += -lopenssl
 LIBS += -llibcrypto
 

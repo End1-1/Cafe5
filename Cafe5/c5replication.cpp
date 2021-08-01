@@ -135,12 +135,11 @@ void C5Replication::downloadDataFromServer(const QStringList &src, const QString
     dr[":date"] = QDate::currentDate();
     dr[":store"] = __c5config.defaultStore();
     dr[":state"] = DOC_STATE_SAVED;
-    dr.exec("select s.f_goods, s.f_price, sum(s.f_qty*s.f_type) as f_qty, sum(s.f_total) as f_total "
+    dr.exec("select s.f_goods, s.f_price, sum(s.f_qtyleft) as f_qty, sum(s.f_total) as f_total "
             "from a_store s "
             "left join a_header h on h.f_id=s.f_document "
-            "where h.f_date<=:date and h.f_state=:state and s.f_store=:store "
-            "group by 1, 2 "
-            "having sum(s.f_qty*s.f_type)>0 ");
+            "where h.f_date<=:date and h.f_state=:state and s.f_store=:store and s.f_qtyleft>0 "
+            "group by 1, 2 ");
 
     C5StoreDraftWriter dw(db);
     int rownum = 1;
@@ -190,6 +189,7 @@ void C5Replication::downloadDataFromServer(const QStringList &src, const QString
 
 bool C5Replication::uploadDataToServer(const QStringList &src, const QStringList &dst)
 {
+    fIgnoreErrors = false;
     C5Database db_dst(dst);
     if (!db_dst.open()) {
         return false;

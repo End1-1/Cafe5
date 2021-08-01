@@ -6,7 +6,9 @@
 #include "confirmregistration.h"
 #include "shoprequest.h"
 #include "storerequest.h"
+#include "chat.h"
 #include "jzstore.h"
+#include "tax.h"
 #include <QMutex>
 #include <QElapsedTimer>
 
@@ -29,6 +31,8 @@ void RequestManager::init()
     fInstance->fHandlers.insert("/storerequest", QList<RequestHandler*>());
     fInstance->fHandlers.insert("/shoprequest", QList<RequestHandler*>());
     fInstance->fHandlers.insert("/jzstore", QList<RequestHandler*>());
+    fInstance->fHandlers.insert("/chat", QList<RequestHandler*>());
+    fInstance->fHandlers.insert("/printtax", QList<RequestHandler*>());
 }
 
 RequestHandler *RequestManager::getHandler(const QString &route)
@@ -42,31 +46,33 @@ RequestHandler *RequestManager::getHandler(const QString &route)
 
 void RequestManager::releaseHandler(RequestHandler *rh)
 {
-    //QMutexLocker ml(&fMutex);
-    rh->setIdle(true);
+//    QMutexLocker ml(&fMutex);
+//    rh->setIdle(true);
+    delete rh;
 }
 
 RequestHandler *RequestManager::findHandler(const QString &route)
 {
-    QElapsedTimer t;
-    t.start();
+//    QElapsedTimer t;
+//    t.start();
 
-    QMutexLocker ml(&fMutex);
-    QList<RequestHandler*> &l = fHandlers[route];
-    for (RequestHandler *r: l) {
-        if (r->idle()) {
-            r->setIdle(false);
-            __debug_log("Find handler exists");
-            __debug_log(t.elapsed());
-            return r;
-        }
-    }
+//    QMutexLocker ml(&fMutex);
+//    QList<RequestHandler*> &l = fHandlers[route];
+//    RequestHandler *result = nullptr;
+//    for (RequestHandler *r: l) {
+//        if (!result) {
+//            if (r->idle()) {
+//                r->setIdle(false);
+//                result = r;
+//            }
+//        } else {
+
+//        }
+//    }
 
 
     RequestHandler *rh = createHandler(route);
-    l.append(rh);
-    __debug_log("Find handler new");
-    __debug_log(t.elapsed());
+    //l.append(rh);
     return rh;
 }
 
@@ -87,6 +93,10 @@ RequestHandler *RequestManager::createHandler(const QString &route)
         rh = new NotFound(route);
     } else if (route == "/jzstore") {
         rh = new JZStore();
+    } else if (route == "/chat") {
+        rh = new Chat();
+    } else if (route == "/printtax") {
+        rh = new Tax();
     } else {
         rh = new NotFound(route);
     }

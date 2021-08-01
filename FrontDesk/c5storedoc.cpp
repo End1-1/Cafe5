@@ -415,12 +415,15 @@ bool C5StoreDoc::removeDoc(const QStringList &dbParams, QString id, bool showmes
         }
         cashDoc = db.getString("f_cashuuid");
     }
+    if (err.isEmpty()) {
+        if (!dw.outputRollback(db, id)) {
+            err += db.fLastError;
+        }
+    }
     if (!err.isEmpty()) {
         C5Message::error(err);
         return false;
     }
-    db[":f_document"] = id;
-    db.exec("delete from a_store where f_document=:f_document");
     db[":f_document"] = id;
     db.exec("delete from a_store_draft where f_document=:f_document");
     db[":f_id"] = id;

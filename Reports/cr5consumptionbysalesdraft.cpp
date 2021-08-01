@@ -113,6 +113,12 @@ QToolBar *CR5ConsumptionBySalesDraft::toolBar()
         if (__c5config.frontDeskMode() == FRONTDESK_WAITER) {
             fToolBar->insertAction(a, b);
         }
+        auto *f = new QAction(QIcon(":/goodsback.png"), tr("Get from AS"));
+        connect(f, SIGNAL(triggered(bool)), this, SLOT(asinput(bool)));
+        fToolBar->insertAction(b, f);
+        auto *g = new QAction(QIcon(":/goodsback.png"), tr("Output to AS"));
+        connect(g, SIGNAL(triggered(bool)), this, SLOT(asoutput(bool)));
+        fToolBar->insertAction(b, g);
     }
     return fToolBar;
 }

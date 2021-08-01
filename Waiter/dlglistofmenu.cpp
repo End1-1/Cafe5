@@ -7,8 +7,12 @@ DlgListOfMenu::DlgListOfMenu(const QStringList &dbParams) :
     ui(new Ui::DlgListOfMenu)
 {
     ui->setupUi(this);
-    QStringList menuNames = C5Menu::fMenu.keys();
-    ui->lst->addItems(menuNames);
+    for (int id: dbmenuname->list()) {
+        QListWidgetItem *item = new QListWidgetItem(ui->lst);
+        item->setText(dbmenuname->name(id));
+        item->setData(Qt::UserRole, id);
+        ui->lst->addItem(item);
+    }
     QListWidgetItem *item = new QListWidgetItem(ui->lst);
     item->setIcon(QIcon(":/cancel.png"));
     item->setText(tr("Cancel"));
@@ -24,7 +28,7 @@ DlgListOfMenu::~DlgListOfMenu()
     delete ui;
 }
 
-bool DlgListOfMenu::getMenuId(QString &id, const QStringList &dbParams)
+bool DlgListOfMenu::getMenuId(int &id, const QStringList &dbParams)
 {
     bool result = false;
     DlgListOfMenu *d = new DlgListOfMenu(dbParams);
@@ -44,6 +48,6 @@ void DlgListOfMenu::on_lst_clicked(const QModelIndex &index)
         reject();
         return;
     }
-    fMenuId = index.data(Qt::DisplayRole).toString();
+    fMenuId = index.data(Qt::UserRole).toInt();
     accept();
 }

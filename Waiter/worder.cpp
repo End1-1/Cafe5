@@ -54,18 +54,18 @@ void WOrder::itemsToTable()
         DishItem *w = new DishItem(fOrderDriver, i);
         connect(w, SIGNAL(focused(int)), this, SLOT(focused(int)));
         if (fDlg) {
-            connect(w, &DishItem::changeQty, fDlg, &DlgOrder::changeQty);
+
         } else {
             w->setReadyOnly(true);
         }
         ui->vl->addWidget(w);
     }
+    addStretch();
 }
 
-int WOrder::addItem(QJsonObject o)
+int WOrder::addItem(int menuid, const QString &comment)
 {
-    o["f_row"] = fOrderDriver->dishesCount();
-    if (!fOrderDriver->addDish(o)) {
+    if (!fOrderDriver->addDish(menuid, comment)) {
         C5Message::error(fOrderDriver->error());
         return -1;
     }
@@ -73,13 +73,24 @@ int WOrder::addItem(QJsonObject o)
     DishItem *di = new DishItem(fOrderDriver, row);
     connect(di, &DishItem::focused, this, &WOrder::focused);
     if (fDlg) {
-        connect(di, &DishItem::changeQty, fDlg, &DlgOrder::changeQty);
+
     } else {
         di->setReadyOnly(true);
     }
     ui->vl->insertWidget(row, di);
     focused(row);
     setMinimumHeight(((row + 1) *50) + 10);
+    bool spacer = false;
+    for (int i = 0; i < ui->vl->count(); i++) {
+        qDebug() << ui->vl->itemAt(i);
+        qDebug() << ui->vl->itemAt(i)->widget();
+        if (!ui->vl->itemAt(i)->widget()) {
+            spacer = true;
+        }
+    }
+    if (spacer) {
+        addStretch();
+    }
     return row;
 }
 

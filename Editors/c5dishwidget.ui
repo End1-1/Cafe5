@@ -125,6 +125,9 @@
             <property name="Primary" stdset="0">
              <bool>true</bool>
             </property>
+            <property name="Manual" stdset="0">
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
           <item row="0" column="0">
@@ -247,6 +250,11 @@
             <column>
              <property name="text">
               <string>X</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Recent</string>
              </property>
             </column>
            </widget>
@@ -381,6 +389,61 @@
           <string>Recipes</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_4">
+          <item row="2" column="0">
+           <widget class="C5TableWidget" name="tblRecipe">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>2</verstretch>
+             </sizepolicy>
+            </property>
+            <column>
+             <property name="text">
+              <string>Record</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Goods code</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Goods name</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Qty</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Weight netto</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Weight brutto</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Unit</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Price</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Total</string>
+             </property>
+            </column>
+           </widget>
+          </item>
           <item row="0" column="0">
            <widget class="QWidget" name="widget" native="true">
             <layout class="QHBoxLayout" name="horizontalLayout">
@@ -678,189 +741,6 @@
             </layout>
            </widget>
           </item>
-          <item row="2" column="0">
-           <widget class="C5TableWidget" name="tblRecipe">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-              <horstretch>0</horstretch>
-              <verstretch>2</verstretch>
-             </sizepolicy>
-            </property>
-            <column>
-             <property name="text">
-              <string>Record</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Goods code</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Goods name</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Qty</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Unit</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Price</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Total</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Complex</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>New Column</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>BaseQty</string>
-             </property>
-            </column>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QWidget" name="widget_3" native="true">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>330</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <layout class="QVBoxLayout" name="verticalLayout_2">
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="C5TableWidget" name="tblComplex">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                 <horstretch>0</horstretch>
-                 <verstretch>2</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="horizontalScrollBarPolicy">
-                <enum>Qt::ScrollBarAlwaysOff</enum>
-               </property>
-               <column>
-                <property name="text">
-                 <string>Dish Code</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>Dish</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>Qty</string>
-                </property>
-               </column>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QWidget" name="widget_4" native="true">
-            <property name="maximumSize">
-             <size>
-              <width>300</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_4">
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QPushButton" name="btnAddDish">
-               <property name="focusPolicy">
-                <enum>Qt::NoFocus</enum>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset resource="../resources/res.qrc">
-                 <normaloff>:/add.png</normaloff>:/add.png</iconset>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="btnDeleteDish">
-               <property name="focusPolicy">
-                <enum>Qt::NoFocus</enum>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset resource="../resources/res.qrc">
-                 <normaloff>:/remove.png</normaloff>:/remove.png</iconset>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <spacer name="horizontalSpacer_3">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>584</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-            </layout>
-           </widget>
-          </item>
          </layout>
         </widget>
        </item>
@@ -979,6 +859,11 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>C5LineEditWithSelector</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5lineeditwithselector.h</header>
+  </customwidget>
+  <customwidget>
    <class>C5TableWidget</class>
    <extends>QTableWidget</extends>
    <header location="global">c5tablewidget.h</header>
@@ -987,11 +872,6 @@
    <class>C5CheckBox</class>
    <extends>QCheckBox</extends>
    <header location="global">c5checkbox.h</header>
-  </customwidget>
-  <customwidget>
-   <class>C5LineEditWithSelector</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5lineeditwithselector.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
@@ -1007,7 +887,6 @@
   <tabstop>checkBox_3</tabstop>
   <tabstop>tblPricing</tabstop>
   <tabstop>tblRecipe</tabstop>
-  <tabstop>tblComplex</tabstop>
   <tabstop>leDishComment</tabstop>
   <tabstop>btnRemoveComment</tabstop>
   <tabstop>lwComment</tabstop>

@@ -25,7 +25,7 @@ public:
 
     void itemsToTable();
 
-    int addItem(QJsonObject o);
+    int addItem(int menuid, const QString &comment);
 
     QPoint updateItem(int index);
 

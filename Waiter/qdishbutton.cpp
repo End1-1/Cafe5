@@ -17,12 +17,12 @@ void QDishButton::paintEvent(QPaintEvent *pe)
 {
     QPushButton::paintEvent(pe);
 
-    const QJsonObject &o = property("dish").toJsonObject();
-    bool stop = C5Menu::fStopList.contains(o["f_dish"].toString().toInt());
+    int id = dbmenu->dishid(property("id").toInt());
+    bool stop = C5Menu::fStopList.contains(id);
     bool stopreached = false;
-    QString name = o["f_name"].toString();
+    QString name = dbdish->name(id);
     if (stop) {
-        double qty = C5Menu::fStopList[o["f_dish"].toString().toInt()];
+        double qty = C5Menu::fStopList[id];
         if (qty < 0.001) {
             stopreached = true;
         } else {
@@ -33,7 +33,7 @@ void QDishButton::paintEvent(QPaintEvent *pe)
     QPainter p(this);
     QStyleOptionButton option;
     option.initFrom(this);
-    QColor bgcolor = option.state == QStyle::State_Sunken ? Qt::white : QColor::fromRgb(o["dish_color"].toString().toInt());
+    QColor bgcolor = option.state == QStyle::State_Sunken ? Qt::white : QColor::fromRgb(dbdish->color(id));
     p.fillRect(pe->rect(), stopreached ? qRgba(0xee,0xee,0xee, 0) : bgcolor);
     QRect r = pe->rect();
     p.setPen(QColor::fromRgb(44, 67, 131));
@@ -50,7 +50,7 @@ void QDishButton::paintEvent(QPaintEvent *pe)
 
     QRect rectPrice = option.rect;
     QFontMetrics fm(p.font());
-    QString price = o["f_price"].toString();
+    QString price = float_str(dbmenu->price(property("id").toInt()), 2);
     rectPrice.adjust(rectPrice.width() - (fm.width(price) + 5), rectPrice.height() - (fm.height() + 5), -2, -2);
     p.drawText(rectPrice, price);
 

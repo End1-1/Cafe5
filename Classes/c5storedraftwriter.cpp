@@ -94,6 +94,32 @@ bool C5StoreDraftWriter::rollbackOutput(C5Database &db, const QString &id)
     return true;
 }
 
+bool C5StoreDraftWriter::outputRollback(C5Database &db, const QString &id)
+{
+    QStringList base;
+    QList<double> qty;
+    db[":f_document"] = id;
+    if (!db.exec("select f_base, f_qty from a_store where f_document=:f_document")) {
+        return false;
+    }
+    while (db.nextRow()) {
+        base.append(db.getString("f_base"));
+        qty.append(db.getDouble("f_qty"));
+    }
+    for (int i = 0; i < base.count(); i++) {
+        db[":f_id"] = base.at(i);
+        db[":f_qtyleft"] = qty.at(i);
+        if (!db.exec("update a_store set f_qtyleft=f_qtyleft+:f_qtyleft where f_id=:f_id")) {
+            return false;
+        }
+    }
+    db[":f_document"] = id;
+    if (!db.exec("delete from a_store where f_document=:f_document")) {
+        return false;
+    }
+    return true;
+}
+
 QString C5StoreDraftWriter::storeDocNum(int docType, int storeId, bool withUpdate, int value)
 {
     QString counterField;
@@ -369,7 +395,8 @@ bool C5StoreDraftWriter::writeAHeaderPartial(QString &id, const QString &userid,
 }
 
 bool C5StoreDraftWriter::writeAHeaderStore(const QString &id, int userAccept, int userPass, const QString &invoice, const QDate &invoiceDate,
-                                           int storeIn, int storeOut, int basedOnSale, const QString &cashUUID, int complectation, double complectationQty)
+                                           int storeIn, int storeOut, int basedOnSale, const QString &cashUUID, int complectation,
+                                           double complectationQty)
 {
     bool u = false;
     fDb[":f_id"] = id;
@@ -790,7 +817,7 @@ bool C5StoreDraftWriter::writeInput(const QString &docId, QString &err)
     fDb[":f_document"] = docId;
     fDb.exec("select * from a_store_draft where f_document=:f_document");
 
-    QString longsql = "insert into a_store (f_id, f_document, f_store, f_type, f_goods, f_qty, f_price, f_total, f_base, f_basedoc, f_reason, f_draft) values ";
+    QString longsql = "insert into a_store (f_id, f_document, f_store, f_type, f_goods, f_qty, f_price, f_total, f_base, f_basedoc, f_reason, f_draft, f_qtyleft) values ";
     bool f = true;
 
     while (fDb.nextRow()) {
@@ -799,7 +826,7 @@ bool C5StoreDraftWriter::writeInput(const QString &docId, QString &err)
         } else {
             longsql.append(",");
         }
-        longsql.append(QString("('%1', '%2', %3, %4, %5, %6, %7, %8, '%9', '%10', %11, '%12')")
+        longsql.append(QString("('%1', '%2', %3, %4, %5, %6, %7, %8, '%9', '%10', %11, '%12', %13)")
                      .arg(fDb.getString("f_id"))
                      .arg(fDb.getString("f_document"))
                      .arg(fDb.getInt("f_store"))
@@ -811,7 +838,8 @@ bool C5StoreDraftWriter::writeInput(const QString &docId, QString &err)
                      .arg(fDb.getString("f_id"))
                      .arg(docId)
                      .arg(fDb.getInt("f_reason"))
-                       .arg(fDb.getString("f_id")));
+                     .arg(fDb.getString("f_id"))
+                     .arg(fDb.getDouble("f_qty")));
         total += fDb.getDouble("f_total");
     }
     if (!fDb.exec(longsql)) {
@@ -880,17 +908,17 @@ bool C5StoreDraftWriter::writeOutput(const QString &docId, QString &err)
     QList<QList<QVariant> > storeData;
     fDb[":f_store"] = storeOut;
     fDb[":f_date"] = date;
-    fDb[":f_state"] = DOC_STATE_SAVED;
-    if (!fDb.exec(QString("select s.f_base, s.f_goods, sum(s.f_qty*s.f_type), s.f_price, sum(s.f_total*s.f_type) "
+    if (!fDb.exec(QString("select s.f_id, s.f_goods, s.f_qtyleft, s.f_price, s.f_total*s.f_type, "
+                          "s.f_document, s.f_base "
             "from a_store s "
             "inner join a_header d on d.f_id=s.f_document "
-            "where s.f_goods in (%1) and s.f_store=:f_store and d.f_date<=:f_date and d.f_state=:f_state "
-            "group by 1, 2, 4 "
-            "having sum(s.f_qty*s.f_type) > 0.00001 "
+            "where s.f_goods in (%1) and s.f_store=:f_store and d.f_date<=:f_date "
+            "and s.f_qtyleft>0 "
             "for update ").arg(goodsID.join(",")), storeData)) {
         err = fDb.fLastError + "<br>";
         return false;
     }
+    QMap<QString, double> qtyleft;
     QList<QMap<QString, QVariant> > queries;
     for (int i = 0; i < goodsID.count(); i++) {
         double qty = qtyList.at(i);
@@ -900,9 +928,6 @@ bool C5StoreDraftWriter::writeOutput(const QString &docId, QString &err)
                 if (storeData.at(j).at(2).toDouble() > 0) {
                     if (storeData.at(j).at(2).toDouble() >= qty) {
                         storeData[j][2] = storeData.at(j).at(2).toDouble() - qty;
-                        fDb[":f_base"] = storeData.at(j).at(0).toString();
-                        fDb.exec("select f_document from a_store where f_base=:f_base and f_type=1");
-                        fDb.nextRow();
                         QMap<QString, QVariant> newrec;
                         newrec[":f_document"] = docId;
                         newrec[":f_store"] = storeOut;
@@ -911,19 +936,17 @@ bool C5StoreDraftWriter::writeOutput(const QString &docId, QString &err)
                         newrec[":f_qty"] = qty;
                         newrec[":f_price"] = storeData.at(j).at(3).toDouble();
                         newrec[":f_total"] = storeData.at(j).at(3).toDouble() * qty;
-                        newrec[":f_base"] = storeData.at(j).at(0).toString();
-                        newrec[":f_basedoc"] = fDb.getString(0);
+                        newrec[":f_base"] = storeData.at(j).at(6).toString();
+                        newrec[":f_basedoc"] = storeData.at(j).at(5);
                         newrec[":f_reason"] = reason;
                         newrec[":f_draft"] = recID.at(i);
                         queries << newrec;
                         amount += storeData.at(j).at(3).toDouble() * qty;
                         totalList[i] = totalList[i] + (storeData.at(j).at(3).toDouble() * qty);
                         priceList[i] = totalList[i] / qtyList.at(i);
+                        qtyleft[storeData.at(j).at(0).toString()] = qty;
                         qty = 0;
                     } else {
-                        fDb[":f_base"] = storeData.at(j).at(0).toString();
-                        fDb.exec("select f_document from a_store where f_base=:f_base and f_type=1");
-                        fDb.nextRow();
                         QMap<QString, QVariant> newrec;
                         newrec[":f_document"] = docId;
                         newrec[":f_store"] = storeOut;
@@ -932,14 +955,15 @@ bool C5StoreDraftWriter::writeOutput(const QString &docId, QString &err)
                         newrec[":f_qty"] = storeData.at(j).at(2).toDouble();
                         newrec[":f_price"] = storeData.at(j).at(3).toDouble();
                         newrec[":f_total"] = storeData.at(j).at(3).toDouble() * storeData.at(j).at(2).toDouble();
-                        newrec[":f_base"] = storeData.at(j).at(0).toString();
-                        newrec[":f_basedoc"] = fDb.getString(0);
+                        newrec[":f_base"] = storeData.at(j).at(6).toString();
+                        newrec[":f_basedoc"] = storeData.at(j).at(5);
                         newrec[":f_reason"] = reason;
                         newrec[":f_draft"] = recID.at(i);
                         queries << newrec;
                         totalList[i] = totalList[i] + (storeData.at(j).at(3).toDouble() * storeData.at(j).at(2).toDouble());
                         priceList[i] = totalList[i] / qtyList.at(i);
                         amount += storeData.at(j).at(3).toDouble() * storeData.at(j).at(2).toDouble();
+                        qtyleft[storeData.at(j).at(0).toString()] = storeData.at(j).at(2).toDouble();
                         qty -= storeData.at(j).at(2).toDouble();
                         storeData[j][2] = 0.0;
                     }
@@ -965,6 +989,11 @@ bool C5StoreDraftWriter::writeOutput(const QString &docId, QString &err)
             fDb[":f_id"] = newId;
             fDb.insert("a_store", false);
         }
+        for (QMap<QString, double>::const_iterator it = qtyleft.begin(); it != qtyleft.end(); it++) {
+            fDb[":f_id"] = it.key();
+            fDb[":f_qtyleft"] = it.value();
+            fDb.exec("update a_store set f_qtyleft=f_qtyleft-:f_qtyleft where f_id=:f_id");
+        }
         writeTotalStoreAmount(docId);
         if (storeIn > 0) {
             switch (docType) {
@@ -974,11 +1003,14 @@ bool C5StoreDraftWriter::writeOutput(const QString &docId, QString &err)
                     fDb.exec("select * from a_store where f_id=:f_id");
                     fDb.nextRow();
                     fDb.setBindValues(fDb.getBindValues());
-                    fDb.removeBindValue(":f_id");
-                    fDb[":f_id"] = C5Database::uuid();
+                    QString mid = C5Database::uuid();
+                    fDb[":f_base"] = mid;
+                    fDb[":f_basedoc"] = fDb[":f_id"];
+                    fDb[":f_id"] = mid;
                     fDb[":f_document"] = docId;
                     fDb[":f_type"] = 1;
                     fDb[":f_store"] = storeIn;
+                    fDb[":f_qtyleft"] = fDb[":f_qty"];
                     fDb.insert("a_store", false);
                 }
                 break;
@@ -994,6 +1026,7 @@ bool C5StoreDraftWriter::writeOutput(const QString &docId, QString &err)
                 fDb[":f_type"] = 1;
                 fDb[":f_goods"] = complectCode;
                 fDb[":f_qty"] = complectQty;
+                fDb[":f_qtyleft"] = complectQty;
                 fDb[":f_price"] = amount / complectQty;
                 fDb[":f_total"] = amount;
                 fDb[":f_base"] = outId.at(0);
@@ -1050,8 +1083,9 @@ bool C5StoreDraftWriter::haveRelations(const QString &id, QString &err, bool cle
         err = tr("This order used in next documents") + "<br>" + err;
     }
     if (clear && err.isEmpty()) {
-        fDb[":f_document"] = id;
-        fDb.exec("delete from a_store where f_document=:f_document");
+        if (!outputRollback(fDb, id)) {
+            err = fDb.fLastError;
+        }
     }
     return !err.isEmpty();
 }

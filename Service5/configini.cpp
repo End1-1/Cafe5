@@ -1,5 +1,6 @@
 #include "configini.h"
 #include <QDir>
+#include <QDebug>
 
 ConfigIni *ConfigIni::fInstance = nullptr;
 

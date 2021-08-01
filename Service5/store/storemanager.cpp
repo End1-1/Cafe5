@@ -1,11 +1,10 @@
 #include "storemanager.h"
 #include "database.h"
 #include "databaseconnectionmanager.h"
-#include "store.h"
 #include "debug.h"
+#include "configini.h"
 
 StoreManager *StoreManager::fInstance = nullptr;
-QMap<int, Store*> StoreManager::fStores;
 
 StoreManager::StoreManager()
 {
@@ -23,46 +22,95 @@ void StoreManager::init(const QString &databaseName)
     if (!DatabaseConnectionManager::openDatabase(databaseName, db, jh)) {
         return;
     }
-    db.exec("select d.f_date, s.f_store, s.f_base, s.f_goods, s.f_price, g.f_scancode, "
-            "sum(s.f_qty*s.f_type) as f_qty,  sum(s.f_total*s.f_type) as f_total "
-            "from a_store s  "
-            "inner join a_header d on d.f_id=s.f_document "
-            "left join c_goods g on g.f_id=s.f_goods "
-            "where d.f_state=1 "
-            "group by 1, 2, 3, 4, 5 "
-            "having sum(s.f_qty*s.f_type) > 0.00001 ");
+    db.exec("select f_id, f_name, f_scancode from c_goods");
     while (db.next()) {
-        Store *s = getStore(db.integerValue("f_store"));
-        s->addRecord(db.dateValue("f_date"), db.stringValue("f_base"), db.integerValue("f_store"), db.stringValue("f_scancode"), db.integerValue("f_goods"), db.doubleValue("f_price"), db.doubleValue("f_qty"));
+        fInstance->fSkuCodeMap.insert(db.stringValue("f_scancode"), db.integerValue("f_id"));
+        fInstance->fCodeSkuMap.insert(db.integerValue("f_id"), db.stringValue("f_scancode"));
+        fInstance->fSkuNameMap.insert(db.stringValue("f_scancode"), db.stringValue("f_name"));
     }
-    __debug_log(QString("Store initialization complete in %1 ms").arg(e.elapsed()));
 }
 
-Store *StoreManager::getStore(int id)
+int StoreManager::queryQty(int store, const QStringList &sku, QMap<QString, double> &out)
 {
-    if (fStores.contains(id)) {
-        return fStores[id];
+    Database db;
+    JsonHandler jh;
+    if (!DatabaseConnectionManager::openDatabase(fInstance->fDatabaseName, db, jh)) {
+        return -1;
     }
-    auto *s = new Store(id);
-    fStores.insert(id, s);
-    return s;
-}
 
-int StoreManager::queryQty(int store, const QStringList &sku, QList<StoreRecord> &sr)
-{
+    QStringList codes;
+    for (const QString &s: sku) {
+        if (fInstance->fSkuCodeMap.contains(s)) {
+            codes.append(QString::number(fInstance->fSkuCodeMap.value(s)));
+        }
+    }
+    if (codes.empty()) {
+        return -1;
+    }
+    QString sql = QString("select  s.f_goods, sum(s.f_qty*s.f_type) as f_qty "
+                    "from a_store s "
+                    "inner join a_header h on h.f_id=s.f_document "
+                    "where h.f_date<=current_date()  %store "
+                    "and s.f_goods in (%1) "
+                    "group by 1 "
+                    "having sum(s.f_qty*s.f_type)>0 ")
+            .arg(codes.join(","));
     if (store == 0) {
+        QString storelist = ConfigIni::value("shop/store") + "," + ConfigIni::value("shop/storeorder");
+        sql.replace("%store", QString("and s.f_store in (%1)").arg(storelist));
+    } else {
+        sql.replace("%store", QString("and s.f_store=%1").arg(store));
+    }
+    db.exec(sql);
+    __debug_log(sql);
+    while (db.next()) {
+        out.insert(fInstance->fCodeSkuMap.value(db.integerValue("f_goods")), db.doubleValue("f_qty"));
+    }
+    return out.count();
+}
 
+int StoreManager::queryQty(const QStringList &sku, QMap<int, QMap<QString, double> > &out)
+{
+    Database db;
+    JsonHandler jh;
+    if (!DatabaseConnectionManager::openDatabase(fInstance->fDatabaseName, db, jh)) {
+        return -1;
     }
-    for (Store *s: fStores) {
-        if (store != 0) {
-            if (s->fStore != store) {
-                continue;
-            }
-        }
-        for (const QString &g: sku) {
-            QList<StoreRecord> records = s->getRecords(g);
-            sr.append(records);
+
+    QStringList codes;
+    for (const QString &s: sku) {
+        if (fInstance->fSkuCodeMap.contains(s)) {
+            codes.append(QString::number(fInstance->fSkuCodeMap.value(s)));
         }
     }
-    return sr.count();
+    if (codes.empty()) {
+        return -1;
+    }
+    QString storelist = ConfigIni::value("shop/store") + "," + ConfigIni::value("shop/storeorder");
+    QString sql = QString("select s.f_store, s.f_goods, sum(s.f_qty*s.f_type) as f_qty "
+                    "from a_store s "
+                    "inner join a_header h on h.f_id=s.f_document "
+                    "where h.f_date<=current_date()  and h.f_state=1  "
+                    "and s.f_goods in (%1) and s.f_store in(%2) "
+                    "group by 1, 2 "
+                    "having sum(s.f_qty*s.f_type)>0 ")
+            .arg(codes.join(","))
+            .arg(storelist);
+
+    db.exec(sql);
+    __debug_log(sql);
+    while (db.next()) {
+        out[db.integerValue("f_store")].insert(fInstance->fCodeSkuMap.value(db.integerValue("f_goods")), db.doubleValue("f_qty"));
+    }
+    return out.count();
+}
+
+int StoreManager::codeOfSku(const QString &sku)
+{
+    return fInstance->fSkuCodeMap[sku];
+}
+
+QString StoreManager::nameOfSku(const QString &sku)
+{
+    return fInstance->fSkuNameMap[sku];
 }

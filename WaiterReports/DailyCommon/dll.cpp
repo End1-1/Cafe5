@@ -36,7 +36,8 @@ void json(C5Database &db, const QJsonObject &params, QJsonArray &jarr)
             cash = 0.0,
             card = 0.0,
             bank = 0.0,
-            other = 0.0;
+            other = 0.0,
+            prepaid = 0.0;
     while (db.nextRow()) {
         p.br();
         p.ltext(QObject::tr("Date"), 5);

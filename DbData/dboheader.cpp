@@ -37,6 +37,11 @@ int DbOHeader::print(const QString &id)
     return get(id, "f_print").toInt();
 }
 
+QString DbOHeader::comment(const QString &id)
+{
+    return get(id, "f_comment").toString();
+}
+
 void DbOHeader::getFromDatabase()
 {
     fDb.exec("select * from " + fTable + (fCondition.isEmpty() ? "" : " where " + fCondition));

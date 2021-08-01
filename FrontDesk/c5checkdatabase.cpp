@@ -2,6 +2,7 @@
 #include "ui_c5checkdatabase.h"
 #include "c5document.h"
 #include "c5storedraftwriter.h"
+#include "dlgstoreutils.h"
 
 C5CheckDatabase::C5CheckDatabase(const QStringList &dbParams) :
     C5Dialog(dbParams),
@@ -58,4 +59,10 @@ void C5CheckDatabase::on_btnStart_clicked()
         qApp->processEvents();
     }
     C5Message::info(tr("Complete"));
+}
+
+void C5CheckDatabase::on_btnStoreUtlis_clicked()
+{
+    DlgStoreUtils d(fDBParams);
+    d.exec();
 }

@@ -121,6 +121,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     c5storebarcode.cpp \
     c5storebarcodelist.cpp \
     dlgchangeoutputstore.cpp \
+    dlgstoreutils.cpp \
         main.cpp \
         c5mainwindow.cpp \
     ../Cafe5/c5config.cpp \
@@ -395,6 +396,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Reports/cr5consumptionbysales.h \
     ../Reports/cr5consumptionbysalesfilter.h \
     dlgchangeoutputstore.h \
+    dlgstoreutils.h \
     rc.h \
     res.rc \
     ../Editors/ce5partner.h \
@@ -559,7 +561,8 @@ FORMS += \
     c5translatorform.ui \
     c5toolbarwidget.ui \
     c5waiterorder.ui \
-    dlgchangeoutputstore.ui
+    dlgchangeoutputstore.ui \
+    dlgstoreutils.ui
 
 INCLUDEPATH += ../Cafe5
 INCLUDEPATH += ../Cache
@@ -588,6 +591,6 @@ ICON = storehouse.ico
 
 LIBS += -lVersion
 LIBS += -lwsock32
-LIBS += -LC:/Soft/OpenSSL-Win32/lib
+LIBS += -LC:/Soft/OpenSSL-Win64/lib
 LIBS += -lopenssl
 LIBS += -llibcrypto

@@ -35,8 +35,6 @@ private slots:
 
     void filterStaffClicked();
 
-    void handleMenu(const QJsonObject &obj);
-
     void handleCreditCards(const QJsonObject &obj);
 
     void handleDishRemoveReason(const QJsonObject &obj);
@@ -47,13 +45,7 @@ private slots:
 
     void on_btnExit_clicked();
 
-    void on_btnReports_clicked();
-
     void on_btnCancel_clicked();
-
-    void on_btnSetSession_clicked();
-
-    void on_btnOut_clicked();
 
     void on_btnShowHidePreorders_clicked();
 

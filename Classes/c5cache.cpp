@@ -166,7 +166,9 @@ C5Cache::C5Cache(const QStringList &dbParams) :
     fVersion = 0;
     C5Database db(dbParams);
     db.startTransaction();
-    db.exec("select f_id from s_cache for update");
+    if (!db.exec("select f_id from s_cache for update")) {
+        return;
+    }
     QList<int> missingCache;
     for (QMap<QString, int>::const_iterator it = fTableCache.begin(); it != fTableCache.end(); it++) {
         bool found = false;
@@ -183,7 +185,9 @@ C5Cache::C5Cache(const QStringList &dbParams) :
     foreach (int k, missingCache) {
         db[":f_id"] = k;
         db[":f_version"] = 0;
-        db.insert("s_cache", false);
+        if (!db.insert("s_cache", false)) {
+            break;
+        }
     }
     db.commit();
 }

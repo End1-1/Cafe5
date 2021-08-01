@@ -38,8 +38,8 @@ void DbData::refresh()
 
 void DbData::getFromDatabase()
 {
-    fDb.exec("select * from " + fTable + (fCondition.isEmpty() ? "" : " where " + fCondition));
-    fData.clear();
+    bool success = fDb.exec("select * from " + fTable + (fCondition.isEmpty() ? "" : " where " + fCondition));
+    Q_ASSERT(success);
     while (fDb.nextRow()) {
         QMap<QString, QVariant> row;
         for (int i = 0; i < fDb.columnCount(); i++) {

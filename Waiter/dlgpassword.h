@@ -20,9 +20,9 @@ public:
 
     ~DlgPassword();
 
-    static bool getUser(const QString &title, C5User *user);
+    static bool getUser(const QString &title, C5User *&user);
 
-    static bool getUserAndCheck(const QString &title, C5User *user, int permission);
+    static bool getUserAndCheck(const QString &title, C5User *&user, int permission);
 
     static bool getQty(const QString &title, int &qty);
 

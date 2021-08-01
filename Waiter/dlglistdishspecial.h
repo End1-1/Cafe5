@@ -16,14 +16,14 @@ class DlgListDishSpecial : public C5Dialog
 public:
     explicit DlgListDishSpecial(const QStringList &dbParams);
     ~DlgListDishSpecial();
-    static QString getSpecial(const QString &dish, const QStringList &dbParams);
+    static bool getSpecial(int dish, const QStringList &dbParams, QString &special);
 
 private slots:
     void on_lst_itemClicked(QListWidgetItem *item);
 
 private:
     Ui::DlgListDishSpecial *ui;
-    void loadComments(const QString &dish);
+    void loadComments(int dish);
     QString fResult;
 };
 

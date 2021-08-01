@@ -3,8 +3,6 @@
 
 #include <QObject>
 
-class QThread;
-
 class ThreadWorker : public QObject
 {
     Q_OBJECT
@@ -14,18 +12,12 @@ public:
     void start();
 
 public slots:
-    void finishedWithError(int code, const QString &errorString);
-
-protected:
-    QThread *fThread;
-
-protected slots:
     virtual void run();
 
 signals:
     void data(int code, const QVariant &emittedData);
-    void finished();
-    void threadError(int , const QString &errorString);
+    void done();
+    void threadError(int,QString);
 
 };
 

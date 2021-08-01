@@ -22,4 +22,9 @@ void DataDriver::init(const QStringList &dbParams)
     fInstance->fDbOHeader = new DbOHeader();
     fInstance->fDbGoodsGroup = new DbGoodsGroup();
     fInstance->fDbGoods = new DbGoods();
+    fInstance->fDbMenuName = new DbMenuName();
+    fInstance->fDbDishPart2 = new DbDishPart2();
+    fInstance->fDbMenu = new DbMenu();
+    fInstance->fDbDishSpecial = new DbDishSpecial();
+    fInstance->fDbShift = new DbShift();
 }

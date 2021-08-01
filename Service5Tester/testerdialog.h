@@ -23,6 +23,8 @@ private slots:
     void on_btnTestN1_clicked();
     void on_btnTestN2_clicked();
 
+    void on_pushButton_clicked();
+
 private:
     Ui::TesterDialog *ui;
     int fTextN1Count;

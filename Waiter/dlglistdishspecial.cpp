@@ -16,23 +16,26 @@ DlgListDishSpecial::~DlgListDishSpecial()
     delete ui;
 }
 
-QString DlgListDishSpecial::getSpecial(const QString &dish, const QStringList &dbParams)
+bool DlgListDishSpecial::getSpecial(int dish, const QStringList &dbParams, QString &special)
 {
     if (!__d) {
         __d = new DlgListDishSpecial(dbParams);
     }
     __d->fResult = "";
-    if (C5Menu::fDishSpecial.contains(dish)) {
+    if (dbdishspecial->contains(dish)) {
         __d->loadComments(dish);
-        __d->exec();
+        if (__d->exec() == QDialog::Accepted) {
+            special = __d->fResult.trimmed();
+        }
+        return special.length() > 0;
     }
-    return __d->fResult;
+    return true;
 }
 
-void DlgListDishSpecial::loadComments(const QString &dish)
+void DlgListDishSpecial::loadComments(int dish)
 {
     ui->lst->clear();
-    ui->lst->addItems(C5Menu::fDishSpecial[dish]);
+    ui->lst->addItems(dbdishspecial->special(dish));
     QListWidgetItem *item = new QListWidgetItem(ui->lst);
     item->setIcon(QIcon(":/cancel.png"));
     item->setText(tr("Cancel"));

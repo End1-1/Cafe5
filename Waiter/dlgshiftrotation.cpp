@@ -1,32 +1,27 @@
 #include "dlgshiftrotation.h"
 #include "ui_dlgshiftrotation.h"
-#include "c5cafecommon.h"
+#include "datadriver.h"
+#include "c5user.h"
 
-DlgShiftRotation::DlgShiftRotation(const QStringList &dbParams) :
-    C5Dialog(dbParams),
-    ui(new Ui::DlgShiftRotation)
+DlgShiftRotation::DlgShiftRotation(C5User *user) :
+    C5Dialog(__c5config.dbParams()),
+    ui(new Ui::DlgShiftRotation),
+    fUser(user)
 {
     ui->setupUi(this);
     ui->de->setDate(QDate::fromString(__c5config.dateCash(), FORMAT_DATE_TO_STR_MYSQL));
-    for (int i = 0; i < C5CafeCommon::fShifts.count(); i++) {
-        QJsonObject o = C5CafeCommon::fShifts.at(i).toObject();
-        ui->cb->addItem(o["f_name"].toString(), o["f_id"].toString().toInt());
+    if (!ui->de->date().isValid()) {
+        ui->de->setDate(QDate::currentDate());
     }
+    for (int id: dbshift->list()) {
+        ui->cb->addItem(dbshift->name(id), id);
+    }
+    ui->cb->setCurrentIndex(ui->cb->findData(__c5config.dateShift()));
 }
 
 DlgShiftRotation::~DlgShiftRotation()
 {
     delete ui;
-}
-
-void DlgShiftRotation::handleShift(const QJsonObject &obj)
-{
-    if (obj["reply"].toInt() == 1) {
-        C5Message::info(tr("Shift was rotated"));
-        accept();
-    } else {
-        C5Message::error(obj["msg"].toString());
-    }
 }
 
 void DlgShiftRotation::on_btnNextDate_clicked()
@@ -44,11 +39,14 @@ void DlgShiftRotation::on_btnChange_clicked()
     if (C5Message::question(tr("Change the shift?")) != QDialog::Accepted) {
         return;
     }
-    C5SocketHandler *sh = createSocketHandler(SLOT(handleShift(QJsonObject)));
-    sh->bind("cmd", sm_rotate_shift);
-    sh->bind("date", ui->de->toMySQLDate(false));
-    sh->bind("shift", ui->cb->currentData().toString());
-    sh->send();
+    C5Database db(__c5config.dbParams());
+    db[":f_value"] = ui->de->date().toString(FORMAT_DATE_TO_STR_MYSQL);
+    db[":f_key"] = param_date_cash;
+    db.exec("update s_settings_values set f_value=:f_value where f_key=:f_key");
+    db[":f_value"] = ui->cb->currentData().toString();
+    db[":f_key"] = param_date_cash_shift;
+    db.exec("update s_settings_values set f_value=:f_value where f_key=:f_key");
+    C5Message::info(tr("Session was changed"));
 }
 
 void DlgShiftRotation::on_btnCancel_clicked()

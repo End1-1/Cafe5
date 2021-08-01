@@ -18,7 +18,7 @@ public:
 
     ~DlgListOfDishComments();
 
-    static bool getComment(QString &comment);
+    static bool getComment(const QString &caption, QString &comment);
 
 private slots:
     void kbdAccept();

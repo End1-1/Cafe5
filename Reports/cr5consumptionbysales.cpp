@@ -97,6 +97,13 @@ QToolBar *CR5ConsumptionBySales::toolBar()
         auto *e = new QAction(QIcon(":/goodsback.png"), tr("Rollback goods output"));
         connect(e, SIGNAL(triggered(bool)), this, SLOT(rollbackGoodsOutput(bool)));
         fToolBar->insertAction(c, e);
+
+        auto *f = new QAction(QIcon(":/goodsback.png"), tr("Get from AS"));
+        connect(f, SIGNAL(triggered(bool)), this, SLOT(asinput(bool)));
+        fToolBar->insertAction(e, f);
+        auto *g = new QAction(QIcon(":/goodsback.png"), tr("Output to AS"));
+        connect(g, SIGNAL(triggered(bool)), this, SLOT(asoutput(bool)));
+        fToolBar->insertAction(e, g);
     }
     return fToolBar;
 }

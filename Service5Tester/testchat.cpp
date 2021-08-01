@@ -1,18 +1,13 @@
-#include "testn1.h"
+#include "testchat.h"
 #include <QElapsedTimer>
 
-TestN1::TestN1(const QString &serverIP, int port, const QSslCertificate &certificate, int number, const QVariant &data) :
-    TestN(serverIP, port, certificate, number, data)
+TestChat::TestChat(const QString &serverIP, int port, const QSslCertificate &certificate, int number, int timeout, const QVariant &data) :
+    TestN(serverIP, port, certificate, number, timeout, data)
 {
 
 }
 
-TestN1::~TestN1()
-{
-    qDebug() << "~TestN1()";
-}
-
-void TestN1::run()
+void TestChat::run()
 {
     QElapsedTimer t;
     t.start();
@@ -25,14 +20,14 @@ void TestN1::run()
         s->write(fData.toMap()["http_request"].toString().toUtf8());
         if (s->waitForBytesWritten()) {
         } else {
-            emit threadError(1, s->errorString());
+
             return;
         }
         s->waitForReadyRead();
         emit data(2, s->readAll());
         s->close();
-        s->deleteLater();
         emit data(1, QString("Elapsed %1").arg(t.elapsed()));
-        emit finished();
+        emit done();
     }
+    delete s;
 }
