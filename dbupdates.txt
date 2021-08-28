@@ -645,3 +645,25 @@ INSERT INTO `o_pay_other` (`f_id`, `f_name`) VALUES ('7', 'TellCell');
 alter table o_payment add column f_idram decimal(14,2) default 0, add column f_tellcell decimal(14,2) default 0, change f_cash f_cash decimal(14,2) default 0, change f_change f_change decimal(14,2) default 0;
 alter table o_payment add column f_card decimal(14,2) default 0 after f_cash, add column f_prepaid decimal(14,2) default 0 after f_card;
 alter table d_translator add f_am tinytext;
+
+/* db - 53 */
+update s_app set f_version='53' where f_app='DB';
+alter table o_preorder add column f_fiscal integer default 0;
+alter table o_body add column f_removetime timestamp;
+alter table o_body add column f_removeuser integer;
+ALTER TABLE `o_body` ADD INDEX `fk_obdy_removeuser_idx` (`f_removeuser` ASC) ;
+ALTER TABLE `o_body` ADD CONSTRAINT `fk_obdy_removeuser` FOREIGN KEY (`f_removeuser`) REFERENCES `s_user` (`f_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+
+/* db - 54 */
+update s_app set f_version='54' where f_app='DB';
+alter table d_dish add column f_extra tinyint default 0;
+alter table o_body add column f_removeprecheck tinyint;
+alter table o_body add f_comment2 tinytext;
+alter table o_body add f_reprint tinyint;
+create table d_print_aliases (f_id integer primary key auto_increment, f_alias tinytext, f_printer tinytext);
+create table a_store_reserve (f_id integer primary key auto_increment, f_date date, f_time time, f_state tinyint, f_source integer, f_completed integer, f_completeddate date, f_completedtime time, f_canceled integer, f_canceleddate date, f_canceledtime time, f_store integer, f_goods integer, f_qty decimal(14,3), f_message text);
+create table a_store_reserve_state (f_id integer primary key auto_increment, f_name tinytext);
+insert into a_store_reserve_state (f_id, f_name) values (1, 'Ամրագրված'),(2, 'Ավարտված'),(3, 'Չեղարկված');
+alter table a_store_reserve add column f_enddate date after f_time;
+

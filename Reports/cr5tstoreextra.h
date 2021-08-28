@@ -3,6 +3,8 @@
 
 #include "c5reportwidget.h"
 
+class CR5TStoreExtraFilter;
+
 class CR5TStoreExtra : public C5ReportWidget
 {
     Q_OBJECT
@@ -23,6 +25,8 @@ private:
     QHash<QString, int> fColumnNameIndex;
 
     QString documentForInventory();
+
+    CR5TStoreExtraFilter *fFilter;
 };
 
 #endif // CR5TSTOREEXTRA_H

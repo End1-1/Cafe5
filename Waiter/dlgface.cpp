@@ -36,9 +36,12 @@ DlgFace::DlgFace(C5User *user) :
 
 {
     ui->setupUi(this);
-    if (C5Config::isAppFullScreen()) {
+    if (!C5Config::isAppFullScreen()) {
         setWindowFlags(windowFlags() | Qt::WindowMinimizeButtonHint);
+    } else {
+        setWindowState(Qt::WindowFullScreen);
     }
+    ui->lbStaff->setText(user->fullName());
     ui->btnCancel->setVisible(false);
     ui->btnShowHidePreorders->setVisible(fUser->check(cp_t5_preorder));
     fModeJustSelectTable = false;
@@ -90,8 +93,6 @@ bool DlgFace::getTable(int &tableId, int hall, C5User *user)
     df->ui->btnCancel->setVisible(true);
     df->ui->btnExit->setVisible(false);
     df->fModeJustSelectTable = true;
-    df->showFullScreen();
-    df->hide();
     df->fCurrentHall = hall;
     df->filterHall(hall, 0);
     result = df->exec() == QDialog::Accepted;

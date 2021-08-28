@@ -95,13 +95,14 @@ void DlgStopListOption::on_btnClearStopList_clicked()
 
 void DlgStopListOption::on_btnSetStoplist_clicked()
 {
-    fDlgOrder->setStoplistmode();
     accept();
+    fDlgOrder->setStoplistmode();
 }
 
 void DlgStopListOption::on_btnViewStopList_clicked()
 {
     accept();
+    fDlgOrder->viewStoplist();
 }
 
 void DlgStopListOption::on_btnPrintStoplist_clicked()

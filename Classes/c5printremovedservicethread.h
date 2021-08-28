@@ -2,24 +2,28 @@
 #define C5PRINTREMOVEDSERVICETHREAD_H
 
 #include <QThread>
-#include <QJsonObject>
+#include <QMap>
 
 class C5PrintRemovedServiceThread : public QThread
 {
     Q_OBJECT
 
 public:
-    C5PrintRemovedServiceThread(const QJsonObject &h, const QJsonObject &b, QObject *parent = 0);
+    C5PrintRemovedServiceThread(const QString &id, QObject *parent = 0);
 
 protected:
     virtual void run();
 
 private:
-    QJsonObject fHeader;
+    QString fId;
 
-    QJsonObject fBody;
+    QMap<QString, QVariant> fBody;
 
-    void print(const QString &printName);
+    QMap<QString, QVariant> fHeader;
+
+    QMap<QString, QString> fPrinterAliases;
+
+    void print(QString printName);
 };
 
 #endif // C5PRINTREMOVEDSERVICETHREAD_H

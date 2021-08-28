@@ -20,6 +20,14 @@ private slots:
 
     void on_leCode_returnPressed();
 
+    void on_btnReserve_clicked();
+
+    void on_btnViewReservations_clicked();
+
+    void on_btnViewAllReservations_clicked();
+
+    void on_btnEditReserve_clicked();
+
 private:
     Ui::SearchItems *ui;
 };

@@ -1,5 +1,5 @@
 #include "dboheader.h"
-
+#include "c5database.h"
 
 DbOHeader::DbOHeader() :
     DbData("o_header", "f_state=1")
@@ -44,18 +44,19 @@ QString DbOHeader::comment(const QString &id)
 
 void DbOHeader::getFromDatabase()
 {
-    fDb.exec("select * from " + fTable + (fCondition.isEmpty() ? "" : " where " + fCondition));
+    C5Database db(fDbParams);
+    db.exec("select * from " + fTable + (fCondition.isEmpty() ? "" : " where " + fCondition));
     fOrderData.clear();
     fTableOrder.clear();
     fStaffTable.clear();
-    while (fDb.nextRow()) {
+    while (db.nextRow()) {
         QMap<QString, QVariant> row;
-        for (int i = 0; i < fDb.columnCount(); i++) {
-            row[fDb.columnName(i)] = fDb.getValue(i);
+        for (int i = 0; i < db.columnCount(); i++) {
+            row[db.columnName(i)] = db.getValue(i);
         }
-        fTableOrder[fDb.getInt("f_table")] = fDb.getString("f_id");
-        fStaffTable[fDb.getInt("f_staff")] = fDb.getInt("f_table");
-        fOrderData[fDb.getString("f_id")] = row;
+        fTableOrder[db.getInt("f_table")] = db.getString("f_id");
+        fStaffTable[db.getInt("f_staff")] = db.getInt("f_table");
+        fOrderData[db.getString("f_id")] = row;
     }
 }
 

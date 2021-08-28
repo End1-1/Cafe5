@@ -240,8 +240,9 @@ void C5WaiterServer::reply(QJsonObject &o)
     }
     case sm_printservice: {
         o["reply"] = 1;
-        o["order"] = fIn["order"].toString();
+        o["order"] = fIn["order"];
         C5PrintServiceThread ps(fIn["order"].toString());
+        ps.fReprintList = fIn["reprint"].toString();
         ps.run();
         break;
     }
@@ -250,6 +251,8 @@ void C5WaiterServer::reply(QJsonObject &o)
         printReceipt(err, srh.fDb, false);
         o["reply"] = err.isEmpty() ? 1 : 0;
         o["msg"] = err;
+        o["close"] = fIn["close"];
+        o["order"] = fIn["order"];
         break;
     }
     case sm_bill: {
@@ -257,6 +260,8 @@ void C5WaiterServer::reply(QJsonObject &o)
         printReceipt(err, srh.fDb, true);
         o["reply"] = err.isEmpty() ? 1 : 0;
         o["msg"] = err;
+        o["close"] = fIn["close"];
+        o["order"] = fIn["order"];
         break;
     }
     case sm_closeorder: {
@@ -329,22 +334,24 @@ void C5WaiterServer::reply(QJsonObject &o)
         if (__c5config.carMode()) {
             sqlQuery = "select oh.f_id, concat(oh.f_prefix, oh.f_hallid) as f_order, date_format(oh.f_datecash, '%d.%m.%Y') as f_datecash, oh.f_timeclose, "
                            "h.f_name as f_hall, t.f_name as f_table, concat(u.f_last, ' ', u.f_first) as f_staff,"
-                           "oh.f_amounttotal, bc.f_govnumber "
+                           "oh.f_amounttotal, bc.f_govnumber, ot.f_receiptnumber "
                            "from o_header oh "
                             "left join o_header_options o on o.f_id=oh.f_id "
                            "left join h_halls h on h.f_id=oh.f_hall "
                            "left join h_tables t on t.f_id=oh.f_table "
+                            "left join o_tax ot on ot.f_id=oh.f_id "
                            "left join s_user u on u.f_id=oh.f_staff "
                             "left join b_car bc on bc.f_id=o.f_car "
                            "where oh.f_state=:f_state and oh.f_datecash between :f_datecash1 and :f_datecash2 ";
         } else {
             sqlQuery = "select oh.f_id, concat(oh.f_prefix, oh.f_hallid) as f_order, date_format(oh.f_datecash, '%d.%m.%Y') as f_datecash, oh.f_timeclose, "
                        "h.f_name as f_hall, t.f_name as f_table, concat(u.f_last, ' ', u.f_first) as f_staff,"
-                       "oh.f_amounttotal "
+                       "oh.f_amounttotal, ot.f_receiptnumber "
                        "from o_header oh "
                        "left join h_halls h on h.f_id=oh.f_hall "
                        "left join h_tables t on t.f_id=oh.f_table "
                        "left join s_user u on u.f_id=oh.f_staff "
+                        "left join o_tax ot on ot.f_id=oh.f_id "
                        "where oh.f_state=:f_state and oh.f_datecash between :f_datecash1 and :f_datecash2 ";
         }
         if (!fIn["hall"].toString().isEmpty()) {
@@ -424,6 +431,7 @@ void C5WaiterServer::reply(QJsonObject &o)
         jo["date1"] = fIn["date1"];
         jo["date2"] = fIn["date2"];
         jo["f_shift"] = fIn["shift"];
+        jo["paper_width"] = fIn["paper_width"];
         o["reply"] = 0;
         QJsonArray report;
         j(srh.fDb, jo, report);
@@ -470,6 +478,9 @@ void C5WaiterServer::reply(QJsonObject &o)
         break;
     case sm_stoplist:
         processStopList(o);
+        break;
+    case sm_print_removed_service:
+        processPrintRemovedService(o);
         break;
     default:
         o["reply"] = 0;
@@ -693,11 +704,7 @@ void C5WaiterServer::saveDish(const QJsonObject &h, QJsonObject &o, C5Database &
         db[":f_id"] = o["f_id"].toString();
         db.insert("o_body", false);
     }
-    if (o["f_state"].toString().toInt() < 0) {
-        o["f_state"] = QString::number(o["f_state"].toString().toInt() * -1);
-        C5PrintRemovedServiceThread *pr = new C5PrintRemovedServiceThread(h, o);
-        pr->start();
-    }
+
     db[":f_header"] = h["f_id"].toString();
     db[":f_state"] = o["f_state"].toString().toInt();
     db[":f_dish"] = o["f_dish"].toString().toInt();
@@ -844,9 +851,8 @@ void C5WaiterServer::processCloseOrder(QJsonObject &o, C5Database &db)
                 }
                 db.exec("update b_history set f_data=:f_data where f_id=:f_id");
             }
-            C5Database fDD(C5Config::dbParams().at(0), C5Config::hotelDatabase(), C5Config::dbParams().at(2), C5Config::dbParams().at(3));
             C5WaiterOrderDoc w(db, jh, jb);
-            w.transferToHotel(db, fDD, err);
+            w.transferToHotel(db, err);
             w.makeOutputOfStore(db, err, DOC_STATE_SAVED);
 
             C5StoreDraftWriter dw(db);
@@ -981,7 +987,11 @@ bool C5WaiterServer::printReceipt(QString &err, C5Database &db, bool isBill)
 
     QList<QMap<QString, QVariant> > bodyInfo;
     db[":f_header"] = fIn["order"].toString();
-    if (!db.exec("select * from o_body where f_header=:f_header")) {
+    if (!db.exec("select f_state, f_dish, f_price, f_canservice, f_candiscount, sum(f_qty1) as f_qty1, sum(f_qty2) as f_qty2, "
+                 "sum(f_total) as f_total, f_adgcode, f_comment "
+                 "from o_body "
+                 "where f_header=:f_header "
+                 "group by f_dish, f_state, f_price ")) {
         err = db.fLastError;
         return false;
     }
@@ -1008,9 +1018,10 @@ bool C5WaiterServer::printReceipt(QString &err, C5Database &db, bool isBill)
             }
         }
     }
+
 #ifdef QT_DEBUG
-                qDebug() << "Error after printtax" << err;
-                err.clear();
+    qDebug() << "Error after printtax" << err;
+    err.clear();
 #endif
 
     // CHECKING FOR RECEIPT PRINT COUNT
@@ -1045,10 +1056,10 @@ bool C5WaiterServer::printReceipt(QString &err, C5Database &db, bool isBill)
 
     QString printerName = "local";
     int paperWidth = 650, printType = 80;
-    db[":f_id"] = headerInfo["f_hall"];
-    db.exec("select * from h_halls where f_id=:f_id");
+    db[":f_name"] = fIn["receipt_printer"].toString();
+    db.exec("select f_id from s_settings_names where f_name=:f_name");
     if (db.nextRow()) {
-        int s = db.getInt("f_settings");
+        int s = db.getInt("f_id");
         db[":f_settings"] = s;
         db[":f_key"] = param_local_receipt_printer;
         db.exec("select f_value from s_settings_values where f_settings=:f_settings and f_key=:f_key");
@@ -1091,14 +1102,14 @@ bool C5WaiterServer::printReceipt(QString &err, C5Database &db, bool isBill)
     if (err.isEmpty()) {
         if (isBill) {
             db[":f_id"] = fIn["order"].toString();
-            db[":f_precheck"] = 1;
+            db[":f_precheck"] = abs(headerInfo["f_precheck"].toInt()) + 1;
             db.exec("update o_header set f_precheck=:f_precheck where f_id=:f_id");
         } else {
             db[":f_id"] = fIn["order"].toString();
-            db.exec("update o_header set f_print=abs(f_print) + 1 where f_id=:f_id");
+            db[":f_print"] = abs(headerInfo["f_print"].toInt()) + 1;
+            db.exec("update o_header set f_print=:f_print where f_id=:f_id");
         }
     }
-
     return err.isEmpty();
 }
 
@@ -1195,11 +1206,7 @@ void C5WaiterServer::processAppOrder(QJsonObject &o)
             d["qty2"] = d["qty1"].toString();
             orderinfo += QString("%1: %2<br>").arg(jdp["f_name"].toString()).arg(jdp["f_qtyprint"].toString());
         }
-//        if (o["f_state"].toString().toInt() < 0) {
-//            o["f_state"] = QString::number(o["f_state"].toString().toInt() * -1);
-//            C5PrintRemovedServiceThread *pr = new C5PrintRemovedServiceThread(h, o);
-//            pr->start();
-//        }
+
         db[":f_header"] = id;
         db[":f_state"] = d["state"].toString();
         db[":f_dish"] = d["dishcode"].toString().toInt();
@@ -1449,6 +1456,13 @@ void C5WaiterServer::processStopList(QJsonObject &o)
             r = false;
         }
         break;
+    case sl_remove_one:
+        db[":f_dish"] = fIn["dish"].toString().toInt();
+        if (!db.exec("delete from d_stoplist where f_dish=:f_dish")) {
+            r = false;
+        }
+        o["dish"] = fIn["dish"].toString().toInt();
+        break;
     }
     if (r) {
         o["reply"] = 1;
@@ -1457,4 +1471,10 @@ void C5WaiterServer::processStopList(QJsonObject &o)
         o["msg"] = db.fLastError;
     }
     o["state"] = fIn["state"];
+}
+
+void C5WaiterServer::processPrintRemovedService(QJsonObject &o)
+{
+    C5PrintRemovedServiceThread *pr = new C5PrintRemovedServiceThread(fIn["id"].toString());
+    pr->start();
 }

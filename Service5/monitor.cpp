@@ -35,6 +35,4 @@ void Monitor::receiveData(int code, const QString &session, const QString &data1
     if (ui->ptRawLog->toPlainText().length() > 30000) {
         ui->ptRawLog->setPlainText(ui->ptRawLog->toPlainText().remove(0, 9000));
     }
-
-    qApp->processEvents();
 }

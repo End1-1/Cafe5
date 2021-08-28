@@ -25,6 +25,8 @@ public:
     bool canDiscount(int id);
 
     int group(int id);
+
+    bool isExtra(int id);
 };
 
 #endif // DBDISHES_H

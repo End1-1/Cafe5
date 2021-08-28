@@ -26,6 +26,9 @@ public:
 
     void clear(QWidget *parent);
 
+private slots:
+    void on_btnTestAsConnection_clicked();
+
 private:
     Ui::C5SettingsWidget *ui;
 

@@ -1,7 +1,9 @@
 #ifndef DBDATA_H
 #define DBDATA_H
 
-#include "c5database.h"
+#include <QObject>
+#include <QMap>
+#include <QVariant>
 
 class DbData : public QObject
 {
@@ -9,16 +11,22 @@ class DbData : public QObject
 public:
     DbData(const QString &tableName, const QString &cond = "");
 
+    DbData(int id);
+
     static void setDBParams(const QStringList &dbParams);
 
     virtual QString name(int id);
+
+    int id();
 
     QList<int> list();
 
     virtual void refresh();
 
 protected:
-    C5Database fDb;
+    int fId;
+
+    static QStringList fDbParams;
 
     QString fTable;
 
@@ -29,9 +37,6 @@ protected:
     QVariant get(int id, const QString &key);
 
     virtual void getFromDatabase();
-
-private:
-    static QStringList fDbParams;
 };
 
 #endif // DBDATA_H

@@ -36,6 +36,8 @@ public:
 
     bool stoplistMode();
 
+    void viewStoplist();
+
 protected:
     virtual void accept();
 
@@ -224,6 +226,7 @@ private slots:
     void on_btnDishPart2Down_clicked();
 
     void on_btnDishPart2Up_clicked();
+    void on_btnReprint_clicked();
 };
 
 #endif // DLGORDER_H

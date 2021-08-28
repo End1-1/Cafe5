@@ -5,6 +5,7 @@
 #include "c5sockethandler.h"
 #include "c5storedoc.h"
 #include "c5storedraftwriter.h"
+#include "doubledatabase.h"
 #include <QHostInfo>
 
 struct tmpg {
@@ -84,8 +85,14 @@ void C5WaiterOrderDoc::sendToServer(C5SocketHandler *sh)
     sh->send(o);
 }
 
-bool C5WaiterOrderDoc::transferToHotel(C5Database &db, C5Database &fDD, QString &err)
+bool C5WaiterOrderDoc::transferToHotel(C5Database &db, QString &err)
 {
+    qDebug() << fHeader;
+    if (fHeader["f_state"].toString().toInt() != ORDER_STATE_CLOSE) {
+        err = tr("Order state is not closed");
+        return false;
+    }
+    DoubleDatabase fDD;
     int settings = 0;
     int item = 0;
     QString itemName;
@@ -102,15 +109,16 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &db, C5Database &fDD, QString 
     db[":f_key"] = param_item_code_for_hotel;
     db.exec("select f_value from s_settings_values where f_settings=:f_settings and f_key=:f_key");
     if (db.nextRow()) {
-        item = db.getString(0).toInt();
+        qDebug() << db.getString("f_value");
+        item = db.getString("f_value").toInt();
     }
     if (item == 0) {
-        //err = "Cannot retrieve invoice item for hotel";
+        err = "Cannot retrieve invoice item for hotel";
         return true;
     }
 
     QString result = fHeader["f_prefix"].toString() + fHeader["f_hallid"].toString();
-    correctHotelID(result, fDD, err);
+    correctHotelID(result, err);
     if (!err.isEmpty()) {
         return false;
     }
@@ -149,7 +157,7 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &db, C5Database &fDD, QString 
         paymentMode = 3;
     }
 
-    fDD.open();
+    fDD.open(true, doubleDatabase);
     fDD.startTransaction();
     fDD[":f_id"] = item;
     fDD.exec("select f_en from f_invoice_item where f_id=:f_id");
@@ -173,7 +181,7 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &db, C5Database &fDD, QString 
     fDD[":f_wdate"] = QDate::fromString(hString("f_datecash"), ("dd/MM/yyyy"));
     fDD[":f_rdate"] = QDate::currentDate();
     fDD[":f_time"] = QTime::currentTime();
-    fDD[":f_user"] = 1;
+    fDD[":f_user"] = __c5config.getValue(param_hotel_user_Id).toInt();
     fDD[":f_room"] = hInt("f_otherid") == PAYOTHER_TRANSFER_TO_ROOM ? room : clcode;
     fDD[":f_guest"] = hInt("f_otherid") == PAYOTHER_TRANSFER_TO_ROOM ? guest : clname + ", " + hString("f_prefix") + hString("f_hallid");
     fDD[":f_itemCode"] = item;
@@ -208,9 +216,9 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &db, C5Database &fDD, QString 
 
     fDD[":f_id"] = result;
     fDD[":f_state"] = 2;
-    fDD[":f_hall"] = hInt("f_hall");
-    fDD[":f_table"] = hInt("f_table");
-    fDD[":f_staff"] = 1;
+    fDD[":f_hall"] = __c5config.getValue(param_hotel_hall_id).toInt();
+    fDD[":f_table"] = 1;
+    fDD[":f_staff"] = __c5config.getValue(param_hotel_user_Id).toInt();
     fDD[":f_dateopen"] = QDateTime::fromString(hString("f_dateopen") + " " + hString("f_timeopen"), "dd/MM/yyyy HH:mm:ss");
     fDD[":f_dateclose"] = QDateTime::fromString(hString("f_dateclose") + " " + hString("f_timeclose"), "dd/MM/yyyy HH:mm:ss");
     fDD[":f_datecash"] = QDate::fromString(hString("f_datecash"), ("dd/MM/yyyy"));
@@ -235,18 +243,25 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &db, C5Database &fDD, QString 
         if (o["f_state"].toString().toInt() != DISH_STATE_OK) {
             continue;
         }
-        fDD[":f_id"] = getHotelID(fDD, "DR", err);
+        double price = o["f_price"].toString().toDouble();
+        if (o["f_service"].toString().toDouble() > 0.001){
+            price += price * o["f_service"].toString().toDouble();
+        }
+        if (o["f_discount"].toString().toDouble() > 0.001) {
+            price -= price * o["f_discount"].toString().toDouble();
+        }
+        fDD[":f_id"] = getHotelID("DR", err);
         fDD[":f_state"] = 1;
         fDD[":f_header"] = result;
         fDD[":f_dish"] = o["f_dish"].toString().toInt();
         fDD[":f_qty"] = o["f_qty1"].toString().toDouble();
         fDD[":f_qtyprint"] = o["f_qty2"].toString().toDouble();
-        fDD[":f_price"] = o["f_price"].toString().toDouble();
-        fDD[":f_svcvalue"] = 0;
+        fDD[":f_price"] = price;
+        fDD[":f_svcvalue"] = o["f_service"].toString().toDouble();
         fDD[":f_svcamount"] = 0;
         fDD[":f_dctvalue"] = 0;
         fDD[":f_dctamount"] = 0;
-        fDD[":f_total"] = o["f_total"].toString().toDouble();
+        fDD[":f_total"] = o["f_qty1"].toString().toDouble() * price;
         fDD[":f_totalusd"] = 0;
         fDD[":f_print1"] = "";
         fDD[":f_print2"] = "";
@@ -510,39 +525,36 @@ void C5WaiterOrderDoc::iSetDouble(const QString &name, double value, int index)
 
 void C5WaiterOrderDoc::open(C5Database &db)
 {
-//    db[":f_id"] = hString("f_id");
-//    db.exec("select h.f_name as f_hallname, t.f_name as f_tableName, concat(s.f_last, ' ', s.f_first) as f_staffname, \
-//        o.*, oo.f_guests, oo.f_splitted \
-//        from o_header o \
-//        left join h_tables t on t.f_id=o.f_table \
-//        left join h_halls h on h.f_id=t.f_hall \
-//        left join s_user s on s.f_id=o.f_staff \
-//        left join o_header_options oo on oo.f_id=o.f_id \
-//        where o.f_id=:f_id \
-//        order by o.f_id ");
-//    if (db.nextRow()) {
-//        for (int i = 0, count = db.columnCount(); i < count; i++) {
-//            QVariant v = db.getValue(i);
-//            switch (v.type()) {
-//            case QVariant::Date:
-//                fHeader[db.columnName(i)] = db.getDate(i).toString(FORMAT_DATE_TO_STR);
-//                break;
-//            case QVariant::DateTime:
+    db[":f_id"] = hString("f_id");
+    db.exec("select h.f_name as f_hallname, t.f_name as f_tableName, concat(s.f_last, ' ', s.f_first) as f_staffname, \
+        o.*, oo.f_guests, oo.f_splitted \
+        from o_header o \
+        left join h_tables t on t.f_id=o.f_table \
+        left join h_halls h on h.f_id=t.f_hall \
+        left join s_user s on s.f_id=o.f_staff \
+        left join o_header_options oo on oo.f_id=o.f_id \
+        where o.f_id=:f_id \
+        order by o.f_id ");
+    if (db.nextRow()) {
+        for (int i = 0, count = db.columnCount(); i < count; i++) {
+            QVariant v = db.getValue(i);
+            switch (v.type()) {
+            case QVariant::Date:
+                fHeader[db.columnName(i)] = db.getDate(i).toString(FORMAT_DATE_TO_STR);
+                break;
+            case QVariant::DateTime:
 
-//                fHeader[db.columnName(i)] = db.getDateTime(i).toString(FORMAT_DATETIME_TO_STR);
-//                break;
-//            default:
-//                fHeader[db.columnName(i)] = db.getString(i);
-//                break;
-//            }
-//        }
-//    }
-//    db[":f_order"] = fHeader["f_id"].toString();
-//    db.exec("select f_car from b_car_orders where f_order=:f_order");
-//    if (db.nextRow()) {
-//        fHeader["car"] = db.getString(0);
-//    }
-//    getTaxInfo(db);
+                fHeader[db.columnName(i)] = db.getDateTime(i).toString(FORMAT_DATETIME_TO_STR);
+                break;
+            default:
+                fHeader[db.columnName(i)] = db.getString(i);
+                break;
+            }
+        }
+    }
+
+
+    getTaxInfo(db);
     db[":f_header"] = fHeader["f_id"].toString();
     db.exec("select ob.f_id, ob.f_header, ob.f_state, dp1.f_name as part1, dp2.f_name as part2, ob.f_adgcode, d.f_name as f_name, \
              ob.f_qty1, ob.f_qty2, ob.f_price, ob.f_service, ob.f_discount, ob.f_total, \
@@ -563,7 +575,6 @@ void C5WaiterOrderDoc::open(C5Database &db)
         fItems.append(o);
     }
     // Discount
-    QJsonArray jda;
     db[":f_id"] = fHeader["f_id"].toString();
     db.exec("select c.f_id, c.f_value, c.f_mode, cn.f_name, p.f_contact "
                             "from b_history h "
@@ -606,8 +617,12 @@ void C5WaiterOrderDoc::getTaxInfo(C5Database &db)
     }
 }
 
-bool C5WaiterOrderDoc::correctHotelID(QString &id, C5Database &dba, QString &err) {
-    dba.open();
+bool C5WaiterOrderDoc::correctHotelID(QString &id, QString &err) {
+    DoubleDatabase dba(__dd1Host, __dd1Database, __dd1Username, __dd1Password);
+    if (!dba.open(true, false)) {
+        err = dba.fLastError;
+        return false;
+    }
     dba.startTransaction();
     int totaltrynum = 0;
     bool success = false;
@@ -654,8 +669,8 @@ bool C5WaiterOrderDoc::correctHotelID(QString &id, C5Database &dba, QString &err
     return true;
 }
 
-QString C5WaiterOrderDoc::getHotelID(C5Database &db, const QString &source, QString &err) {
-    C5Database dba(db.dbParams().at(0), "airwick", db.dbParams().at(2), db.dbParams().at(3));
+QString C5WaiterOrderDoc::getHotelID(const QString &source, QString &err) {
+    C5Database dba(__dd1Host, "airwick", __dd1Username, __dd1Password);
     dba.open();
     int totaltrynum = 0;
     bool done = false;

@@ -5,6 +5,10 @@
 #include "c5mainwindow.h"
 #include "c5salefromstoreorder.h"
 #include "c5waiterorderdoc.h"
+#include "dlgexportsaletoasoptions.h"
+#include <QDir>
+#include <QFile>
+#include <QDesktopServices>
 
 CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
@@ -19,6 +23,7 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
                     << "left join o_header_flags ohf on ohf.f_id=oh.f_id [ohf]"
                     << "left join s_user w on w.f_id=oh.f_staff [w]"
                     << "left join o_state os on os.f_id=oh.f_state [os]"
+                    << "left join o_tax ot on ot.f_id=oh.f_id [ot]"
                     << "left join c_partners cpb on cpb.f_id=oh.f_partner [cpb]"
                        ;
 
@@ -37,6 +42,7 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
                    << "cpb.f_taxname as f_buyer"
                    << "cpb.f_taxcode as f_buyertaxcode"
                    << "count(oh.f_id) as f_count"
+                   << "ot.f_receiptnumber"
                    << "sum(oh.f_amounttotal) as f_amounttotal"
                    << "sum(oh.f_amountcash) as f_amountcash"
                    << "sum(oh.f_amountcard) as f_amountcard"
@@ -54,6 +60,7 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
                    << "os.f_name as f_statename"
                    << "hl.f_name as f_hallname"
                    << "ht.f_name as f_tablename"
+                   << "ot.f_receiptnumber"
                    << "oh.f_dateopen"
                    << "oh.f_timeopen"
                    << "oh.f_dateclose"
@@ -91,6 +98,7 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_dayofweek"] = tr("Day of week");
     fTranslation["f_hallname"] = tr("Hall");
     fTranslation["f_buyer"] = tr("Buyer");
+    fTranslation["f_receiptnumber"] = tr("Tax");
     fTranslation["f_buyertaxcode"] = tr("Buyer taxcode");
     if (__c5config.frontDeskMode() == FRONTDESK_SHOP) {
         fTranslation["f_tablename"] = tr("Cash");
@@ -130,6 +138,7 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
     fColumnsVisible["oh.f_amountdiscount"] = false;
     fColumnsVisible["oh.f_comment"] = false;
     fColumnsVisible["count(oh.f_id) as f_count"] = false;
+    fColumnsVisible["ot.f_receiptnumber"] = false;
 
     restoreColumnsVisibility();
 
@@ -147,6 +156,7 @@ QToolBar *CR5CommonSales::toolBar()
             << ToolBarButtons::tbExcel
             << ToolBarButtons::tbPrint;
         fToolBar = createStandartToolbar(btn);
+        fToolBar->addAction(QIcon(":/AS.png"), tr("Export to AS"), this, SLOT(exportToAS()));
     }
     return fToolBar;
 }
@@ -215,16 +225,233 @@ void CR5CommonSales::transferToRoom()
     foreach (QModelIndex m, ml) {
         rows << m.row();
     }
-    C5Database db1(fDBParams);
-    C5Database db2(fDBParams.at(0), C5Config::hotelDatabase(), fDBParams.at(2), fDBParams.at(3));
+    C5Database db1(fDBParams);;
     foreach (int r, rows) {
         QString err;
         C5WaiterOrderDoc w(fModel->data(r, fModel->fColumnNameIndex["f_id"], Qt::EditRole).toString(), db1);
-        w.transferToHotel(db1, db2, err);
+        w.transferToHotel(db1, err);
         if (!err.isEmpty()) {
             C5Message::error(err + "<br>" + fModel->data(r, 0, Qt::EditRole).toString());
             return;
         }
     }
+    C5Message::info(tr("Done"));
+}
+
+void CR5CommonSales::exportToAS()
+{
+    if (!fColumnsVisible["oh.f_id"]) {
+        C5Message::info(tr("Column 'Header' must be checked in filter"));
+        return;
+    }
+    QStringList idlist;
+    for (int i = 0; i < fModel->rowCount(); i++) {
+        idlist.append(fModel->data(i, fModel->fColumnNameIndex["f_id"], Qt::EditRole).toString());
+    }
+    QString partnercode, storecode, servicecode, srvinacc, srvoutacc, iteminacc, itemoutacc;
+    int option = DlgExportSaleToAsOptions::getOption(fDBParams, partnercode, storecode, servicecode, srvinacc, srvoutacc, iteminacc, itemoutacc);
+    if (option == 0) {
+        return;
+    }
+    switch (option) {
+    case 1:
+        break;
+    case 2:
+        break;
+    case 3:
+        break;
+    }
+
+    C5Database dbas("QODBC3");
+    dbas.setDatabase("", __c5config.getValue(param_as_connection_string), "", "");
+    if (!dbas.open()) {
+        C5Message::error(dbas.fLastError);
+    }
+    QMap<QString, QMap<QString, QVariant> > goodsMap;
+    QMap<QString, QString> unitMap;
+    QMap<QString, QVariant> partnerMap;
+    QMap<QString, QVariant> serviceMap;
+    dbas.exec("select fMTCODE, fMTID, fCAPTION, fUNIT from MATERIALS");
+    while (dbas.nextRow()) {
+        QMap<QString, QVariant> temp;
+        dbas.rowToMap(temp);
+        goodsMap[dbas.getString(0)] = temp;
+    }
+    dbas.exec("select fCODE, fBRIEF from QNTUNIT");
+    while (dbas.nextRow()) {
+        unitMap[dbas.getString(0)] = dbas.getString(1);
+    }
+    dbas[":fPARTCODE"] = partnercode;
+    dbas.exec("select * from PARTNERS where fPARTCODE=:fPARTCODE");
+    if (dbas.nextRow()) {
+        dbas.rowToMap(partnerMap);
+    } else {
+        C5Message::error(tr("Invalid partner code"));
+        return;
+    }
+    dbas[":fSERVCODE"] = servicecode;
+    dbas.exec("select * FROm SERVICES where fSERVCODE=:fSERVCODE");
+    if (dbas.nextRow()) {
+        dbas.rowToMap(serviceMap);
+    } else {
+        C5Message::error(tr("Invalid service code"));
+        return;
+    }
+
+    QStringList codeErrors;
+    C5Database db(fDBParams);
+    for (const QString id: idlist) {
+        QMap<QString, QVariant> oh;
+        QMap<QString, QVariant> otax;
+        QList<QMap<QString, QVariant> > ob;
+        db[":f_id"] = id;
+        db.exec("select f_receiptnumber from o_tax where f_id=:f_id");
+        int rn = 0;
+        if (db.nextRow()) {
+            rn = db.getInt(0);
+        }
+        switch (option) {
+        case 1:
+            if (rn == 0) {
+                continue;
+            }
+            break;
+        case 2:
+            if (rn > 0) {
+                continue;
+            }
+            break;
+        }
+
+        db[":f_id"] = id;
+        db.exec("select * from o_header where f_id=:f_id");
+        db.nextRow();
+        db.rowToMap(oh);
+        db[":f_id"] = id;
+        db.exec("select * from o_tax where f_id=:f_id");
+        if (db.nextRow()) {
+            db.rowToMap(otax);
+        }
+        db[":f_header"] = id;
+        db[":f_state"] = DISH_STATE_OK;
+        db.exec("select * from o_body where f_header=:f_header and f_state=:f_state");
+        while (db.nextRow()) {
+            QMap<QString, QVariant> temp;
+            db.rowToMap(temp);
+            ob.append(temp);
+        }
+        QString docid = db.uuid();
+        dbas.startTransaction();
+        dbas[":fISN"] = docid;
+        dbas[":fDOCTYPE"] = 20;
+        dbas[":fDOCSTATE"] = 1;
+        dbas[":fORDERNUM"] = "";
+        dbas[":fDOCNUM"] = oh["f_prefix"].toString() + oh["f_hallid"].toString();
+        dbas[":fCUR"] = "AMD";
+        dbas[":fSUMM"] = oh["f_amounttotal"];
+        dbas[":fCOMMENT"] = "";
+        dbas[":fBODY"] =  "\r\nPREPAYMENTACC:5231\r\nVATACC:5243\r\nSUMMVAT:469.8300\r\nBUYERACC:2211\r\nBUYCHACCPOST:Գլխավոր հաշվապահ \r\nMAXROWID:2\r\n";
+        dbas[":fPARTNAME"] = partnerMap["ffullcaption"]; // set to kamar
+        dbas[":fUSERID"] = 0;
+        dbas[":fPARTID"] = partnerMap["fpartid"];
+        dbas[":fCRPARTID"] = - 1;
+        dbas[":fMTID"] = -1;
+        dbas[":fINVN"] = "";
+        dbas[":fENTRYSTATE"] = 0;
+        dbas[":fEMPLIDRESPIN"] = -1;
+        dbas[":fEMPLIDRESPOUT"] = -1;
+        dbas[":fVATTYPE"] = "5";
+        dbas[":fSPEC"] = otax["f_receiptnumber"];
+        if (!dbas.exec("insert into DOCUMENTS ("
+                  "fISN, fDOCTYPE, fDOCSTATE, fDATE, fORDERNUM, fDOCNUM, fCUR, fSUMM, fCOMMENT, fBODY, fPARTNAME, "
+                  "fUSERID, fPARTID, fCRPARTID, fMTID, fEXPTYPE, fINVN, fENTRYSTATE, "
+                  "fEMPLIDRESPIN, fEMPLIDRESPOUT, fVATTYPE, fSPEC, fCHANGEDATE,fEXTBODY,fETLSTATE) VALUES ("
+                  ":fISN, :fDOCTYPE, :fDOCSTATE, '" + oh["f_datecash"].toDate().toString("yyyy-MM-dd") + "', "
+                  ":fORDERNUM, :fDOCNUM, :fCUR, :fSUMM, :fCOMMENT, :fBODY, :fPARTNAME, "
+                  ":fUSERID, :fPARTID, :fCRPARTID, :fMTID, '', :fINVN, :fENTRYSTATE, "
+                       ":fEMPLIDRESPIN, :fEMPLIDRESPOUT, :fVATTYPE, :fSPEC, current_timestamp,'', '')")) {
+            dbas.rollback();
+            C5Message::error(dbas.fLastError);
+            return;
+        }
+
+        for (int ib = 0; ib < ob.count(); ib++) {
+            QMap<QString, QVariant> &m = ob[ib];
+            if (!goodsMap.contains(m["f_dish"].toString())) {
+                if (!codeErrors.contains(m["f_dish"].toString())) {
+                    codeErrors.append(QString("%1 - %2").arg(oh["f_prefix"].toString() + oh["f_hallid"].toString()).arg(m["f_dish"].toString()));
+                }
+                continue;
+            }
+            dbas[":fISN"] = docid;
+            dbas[":fROWNUM"] = ib;
+            dbas[":fITEMTYPE"] = 1;
+            dbas[":fITEMID"] = goodsMap[m["f_dish"].toString()]["fmtid"];
+            dbas[":fITEMNAME"] = goodsMap[m["f_dish"].toString()]["fcaption"];
+            dbas[":fUNITBRIEF"] = unitMap[goodsMap[m["f_dish"].toString()]["funit"].toString()];
+            dbas[":fSTORAGE"] = storecode;
+            dbas[":fQUANTITY"] = m["f_qty1"];
+            dbas[":fINITPRICE"] = m["f_price"];
+            dbas[":fDISCOUNT"] = 0;
+            dbas[":fPRICE"] = m["f_price"];
+            dbas[":fSUMMA"] = m["f_total"];
+            dbas[":fSUMMA1"] = 0;
+            dbas[":fENVFEEPERCENT"] = 0;
+            dbas[":fENVFEESUMMA"] = 0;
+            dbas[":fVAT"] = 1;
+            dbas[":fEXPMETHOD"] = 1;
+            dbas[":fACCEXPENSE"] = iteminacc;
+            dbas[":fACCINCOME"] = itemoutacc;
+            dbas[":fPARTYMETHOD"] = 0;
+            dbas[":fROWID"] = ib;
+            if (!dbas.insert("MTINVOICELIST", false)) {
+                dbas.rollback();
+                C5Message::error(dbas.fLastError);
+                return;
+            }
+        }
+        if (oh["f_amountservice"].toDouble() > 0.001) {
+            dbas[":fISN"] = docid;
+            dbas[":fROWNUM"] = ob.count();
+            dbas[":fITEMTYPE"] = 2;
+            dbas[":fITEMID"] = serviceMap["fservid"];
+            dbas[":fITEMNAME"] = serviceMap["fcaption"];
+            dbas[":fUNITBRIEF"] = unitMap[serviceMap["funit"].toString()];
+            dbas[":fSTORAGE"] = storecode;
+            dbas[":fQUANTITY"] = 1;
+            dbas[":fINITPRICE"] = oh["f_amountservice"];
+            dbas[":fDISCOUNT"] = 0;
+            dbas[":fPRICE"] = oh["f_amountservice"];
+            dbas[":fSUMMA"] = oh["f_amountservice"];
+            dbas[":fSUMMA1"] = 0;
+            dbas[":fENVFEEPERCENT"] = 0;
+            dbas[":fENVFEESUMMA"] = 0;
+            dbas[":fVAT"] = 1;
+            dbas[":fEXPMETHOD"] = 1;
+            dbas[":fACCEXPENSE"] = srvinacc;
+            dbas[":fACCINCOME"] = srvoutacc;
+            dbas[":fPARTYMETHOD"] = 0;
+            dbas[":fROWID"] = ob.count();
+            if (!dbas.insert("MTINVOICELIST", false)) {
+                dbas.rollback();
+                C5Message::error(dbas.fLastError);
+                return;
+            }
+        }
+        dbas.commit();
+    }
+
+    if (!codeErrors.isEmpty()) {
+        QDir d;
+        QFile f(d.tempPath() + "/err.txt");
+        if (f.open(QIODevice::WriteOnly)) {
+            QString ba = codeErrors.join("\r\n");
+            f.write(ba.toUtf8());
+            f.close();
+            QDesktopServices::openUrl(d.tempPath() + "/err.txt");
+        }
+    }
+
+
     C5Message::info(tr("Done"));
 }

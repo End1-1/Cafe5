@@ -3,7 +3,7 @@
 
 #include "dbdata.h"
 
-class DbUsers : DbData
+class DbUsers : public DbData
 {
 public:
     DbUsers();

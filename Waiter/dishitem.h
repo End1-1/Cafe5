@@ -29,8 +29,13 @@ public:
 
     void setReadyOnly(bool v);
 
+protected:
+    virtual bool event(QEvent *event);
+
 private slots:
     void on_btnDish_clicked();
+
+    void on_btnReprint_clicked();
 
 private:
     Ui::DishItem *ui;

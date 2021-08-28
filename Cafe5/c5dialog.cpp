@@ -1,6 +1,8 @@
 #include "c5dialog.h"
 #include "c5database.h"
+#include <QDesktopWidget>
 #include <QKeyEvent>
+#include <QApplication>
 
 static QWidget *__mainWindow = nullptr;
 
@@ -13,6 +15,9 @@ C5Dialog::C5Dialog(const QStringList &dbParams) :
     fDBParams(dbParams)
 #endif
 {
+#ifdef WAITER
+    //setMaximumSize(qApp->desktop()->geometry());
+#endif
     if (__mainWindow == nullptr) {
         __mainWindow = this;
     }

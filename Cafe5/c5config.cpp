@@ -320,11 +320,6 @@ QString C5Config::taxPin()
     return getValue(param_tax_cashier_pin);
 }
 
-bool C5Config::controlShopQty()
-{
-    return getValue(param_control_shop_qty).toInt() == 1;
-}
-
 bool C5Config::rdbReplica()
 {
     return getValue(param_rootdb_replica).toInt() == 1;

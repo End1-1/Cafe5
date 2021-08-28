@@ -84,6 +84,7 @@ SOURCES += \
     ../Classes/c5witerconf.cpp \
     ../Classes/calculator.cpp \
     ../Classes/checkforupdatethread.cpp \
+    ../Classes/doubledatabase.cpp \
     ../Classes/fileversion.cpp \
     ../Classes/notificationwidget.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
@@ -109,6 +110,7 @@ SOURCES += \
     ../DbData/dbshift.cpp \
     ../DbData/dbstore.cpp \
     ../DbData/dbtables.cpp \
+    ../DbData/dbunit.cpp \
     ../DbData/dbusers.cpp \
     ../Editors/c5cashname.cpp \
     ../Editors/c5dishwidget.cpp \
@@ -176,6 +178,7 @@ SOURCES += \
     ../FrontDesk/c5translatorform.cpp \
     ../FrontDesk/c5waiterorder.cpp \
     ../FrontDesk/dlgchangeoutputstore.cpp \
+    ../FrontDesk/dlgexportsaletoasoptions.cpp \
     ../FrontDesk/dlgstoreutils.cpp \
     ../Reports/c5customfilter.cpp \
     ../Reports/c5settingswidget.cpp \
@@ -266,7 +269,9 @@ SOURCES += \
     ../Waiter/dlgcl.cpp \
     ../Waiter/dlgcreditcardlist.cpp \
     cashcollection.cpp \
+    dlggoodslist.cpp \
     dlgpin.cpp \
+    dlgreservgoods.cpp \
     goodsreturnreason.cpp \
     imageloader.cpp \
     loghistory.cpp \
@@ -284,13 +289,13 @@ SOURCES += \
     taxprint.cpp \
     threadcheckmessage.cpp \
     threadreadmessage.cpp \
+    threadsendmessage.cpp \
     threadworker.cpp \
     userphoto.cpp \
     viewinputitem.cpp \
     vieworder.cpp \
         working.cpp \
     worder.cpp \
-    goods.cpp \
     ../Cafe5/c5config.cpp \
     ../Cafe5/c5connection.cpp \
     ../Cafe5/c5database.cpp \
@@ -369,6 +374,7 @@ HEADERS += \
     ../Classes/c5witerconf.h \
     ../Classes/calculator.h \
     ../Classes/checkforupdatethread.h \
+    ../Classes/doubledatabase.h \
     ../Classes/fileversion.h \
     ../Classes/notificationwidget.h \
     ../Classes/proxytablewidgetdatabase.h \
@@ -394,6 +400,7 @@ HEADERS += \
     ../DbData/dbshift.h \
     ../DbData/dbstore.h \
     ../DbData/dbtables.h \
+    ../DbData/dbunit.h \
     ../DbData/dbusers.h \
     ../Editors/c5cashname.h \
     ../Editors/c5dishwidget.h \
@@ -461,6 +468,7 @@ HEADERS += \
     ../FrontDesk/c5translatorform.h \
     ../FrontDesk/c5waiterorder.h \
     ../FrontDesk/dlgchangeoutputstore.h \
+    ../FrontDesk/dlgexportsaletoasoptions.h \
     ../FrontDesk/dlgstoreutils.h \
     ../Reports/c5customfilter.h \
     ../Reports/c5settingswidget.h \
@@ -552,7 +560,11 @@ HEADERS += \
     ../Waiter/dlgcl.h \
     ../Waiter/dlgcreditcardlist.h \
     cashcollection.h \
+    chatmessage.h \
+    dlggoodslist.h \
     dlgpin.h \
+    dlgreservgoods.h \
+    goodsreserve.h \
     goodsreturnreason.h \
     imageloader.h \
     loghistory.h \
@@ -569,13 +581,13 @@ HEADERS += \
     taxprint.h \
     threadcheckmessage.h \
     threadreadmessage.h \
+    threadsendmessage.h \
     threadworker.h \
     userphoto.h \
     viewinputitem.h \
     vieworder.h \
         working.h \
     worder.h \
-    goods.h \
     ../Cafe5/c5config.h \
     ../Cafe5/c5connection.h \
     ../Cafe5/c5database.h \
@@ -663,6 +675,7 @@ FORMS += \
     ../FrontDesk/c5translatorform.ui \
     ../FrontDesk/c5waiterorder.ui \
     ../FrontDesk/dlgchangeoutputstore.ui \
+    ../FrontDesk/dlgexportsaletoasoptions.ui \
     ../FrontDesk/dlgstoreutils.ui \
     ../Reports/c5customfilter.ui \
     ../Reports/c5settingswidget.ui \
@@ -699,7 +712,9 @@ FORMS += \
     ../Waiter/dlgcl.ui \
     ../Waiter/dlgcreditcardlist.ui \
     cashcollection.ui \
+    dlggoodslist.ui \
     dlgpin.ui \
+    dlgreservgoods.ui \
     goodsreturnreason.ui \
     loghistory.ui \
     preorders.ui \

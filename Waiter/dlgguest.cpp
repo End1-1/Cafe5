@@ -6,6 +6,7 @@ DlgGuest::DlgGuest() :
     ui(new Ui::DlgGuest)
 {
     ui->setupUi(this);
+    setWindowState(Qt::WindowFullScreen);
     QStringList dbp(C5Config::dbParams());
     dbp[1] = C5Config::hotelDatabase();
     C5Database db(dbp);
@@ -38,8 +39,6 @@ DlgGuest::~DlgGuest()
 bool DlgGuest::getGuest(QString &res, QString &inv, QString &room, QString &guest)
 {
     DlgGuest *d = new DlgGuest();
-    d->showFullScreen();
-    d->hide();
     d->ui->kbd->adjustSize();
     qApp->processEvents();
     bool result = d->exec() == QDialog::Accepted;

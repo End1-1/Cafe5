@@ -81,10 +81,9 @@ int main(int argc, char *argv[])
     DlgScreen w;
     C5Config::fParentWidget = &w;
     if (C5Config::isAppFullScreen()) {
-        w.showFullScreen();
-    } else {
-        w.show();
+        w.setWindowState(Qt::WindowFullScreen);
     }
+    w.show();
     a.processEvents();
 
     return a.exec();

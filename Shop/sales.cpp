@@ -9,6 +9,7 @@
 #include "c5message.h"
 #include "printtaxn.h"
 #include "sslsocket.h"
+#include "datadriver.h"
 #include "vieworder.h"
 #include "cashcollection.h"
 
@@ -17,11 +18,12 @@
 #define VM_TOTAL_ITEMS 2
 #define VM_GROUPS 3
 
-Sales::Sales(QWidget *parent) :
-    QDialog(parent),
+Sales::Sales() :
+    C5Dialog(__c5config.dbParams()),
     ui(new Ui::Sales)
 {
     ui->setupUi(this);
+    setWindowTitle(dbhall->name(__c5config.defaultHall()) + "," + dbstore->name(__c5config.defaultStore()));
     ui->lbRetail->setVisible(!__c5config.shopDenyF1());
     ui->leRetail->setVisible(!__c5config.shopDenyF1());
     ui->lbWhosale->setVisible(!__c5config.shopDenyF2());
@@ -42,9 +44,9 @@ Sales::~Sales()
     delete ui;
 }
 
-void Sales::showSales(QWidget *parent)
+void Sales::showSales()
 {
-    Sales *s = new Sales(parent);
+    Sales *s = new Sales();
     s->showMaximized();
     s->exec();
     delete s;
@@ -236,20 +238,27 @@ void Sales::refreshTotalItems()
 void Sales::refreshGroups()
 {
     QStringList h;
-    h.append(tr("Date"));
-    h.append(tr("Hall"));
     h.append(tr("Group"));
     h.append(tr("Qty"));
-    h.append(tr("Total"));
+    h.append(tr(""));
+    h.append(tr("Group"));
+    h.append(tr("Qty"));
+    h.append(tr(""));
+    h.append(tr("Group"));
+    h.append(tr("Qty"));
+    ui->tbl->clearContents();
+    ui->tbl->setRowCount(0);
     ui->tbl->setColumnCount(h.count());
     ui->tbl->setHorizontalHeaderLabels(h);
-    ui->tbl->setColumnWidths(ui->tbl->columnCount(), 150, 250, 80, 80);
+    //ui->tbl->setColumnWidths(ui->tbl->columnCount(), 200, 80, 10, 200, 80, 10, 200, 80);
+    ui->tbl->setColumnWidths(ui->tbl->columnCount(), 200, 80);
     C5Database db(__c5config.replicaDbParams());
     db[":f_hall"] = __c5config.defaultHall();
     db[":f_start"] = ui->deStart->date();
     db[":f_end"] = ui->deEnd->date();
     db[":f_state"] = ORDER_STATE_CLOSE;
-    db.exec("select oh.f_datecash, h.f_name as f_hallname, gg.f_name as f_groupname, sum(og.f_qty), sum(og.f_total) "
+    db.exec("select oh.f_datecash, h.f_name as f_hallname, gg.f_name as f_groupname, "
+            "sum(og.f_qty * og.f_sign) as f_qty, sum(og.f_total*og.f_sign) as f_total "
             "from o_goods og "
             "inner join o_header oh on oh.f_id=og.f_header "
             "inner join c_goods g on g.f_id=og.f_goods "
@@ -259,17 +268,23 @@ void Sales::refreshGroups()
             "where oh.f_datecash between :f_start and :f_end and oh.f_state=:f_state " + userCond() +
             "and oh.f_hall=:f_hall "
             "group by 1, 2, 3 "
-            "order by oh.f_datecash, oh.f_timeclose ");
-    ui->tbl->setRowCount(db.rowCount());
-    int row = 0;
+            "order by 3 desc ");
+    int row = 0, col = 0;
+    ui->leTotal->setDouble(0);
     while (db.nextRow()) {
-        for (int i = 0; i < ui->tbl->columnCount(); i++) {
-            ui->tbl->setData(row, i, db.getValue(i));
+        if (row > ui->tbl->rowCount() - 1) {
+            ui->tbl->addEmptyRow();
         }
+        ui->tbl->setString(row, col, db.getString("f_groupname"));
+        ui->tbl->setDouble(row, col + 1, db.getDouble("f_qty"));
+        ui->leTotal->setDouble(ui->leTotal->getDouble() + db.getDouble("f_total"));
+//        col += 3;
+//        if (col > 7) {
+//            col = 0;
+//            row++;
+//        }
         row++;
     }
-    int acol = 3;
-    ui->leTotal->setDouble(ui->tbl->sumOfColumn(acol));
     ui->leRetail->setDouble(0);
     ui->leWhosale->setDouble(0);
 }
@@ -394,14 +409,19 @@ void Sales::on_btnPrintTax_clicked()
     if (ml.count() == 0) {
         return;
     }
-    if (ui->tbl->getInteger(ml.at(0).row(), 5) > 0) {
-        C5Message::error(tr("Cannot print tax twice"));
-        return;
-    }
     if (C5Message::question(tr("Print tax") + "<br>" + float_str(ui->tbl->getDouble(ml.at(0).row(), 8), 2)) != QDialog::Accepted) {
         return;
     }
     QString id = ui->tbl->getString(ml.at(0).row(), 0);
+    C5Database db(__c5config.replicaDbParams());
+    db[":f_id"] = id;
+    db.exec("select * from o_tax where f_id=:f_id");
+    if (db.nextRow()) {
+        if (db.getInt("f_receiptnumber") > 0) {
+            C5Message::error(tr("Cannot print tax twice"));
+            return;
+        }
+    }
     if (__c5config.taxIP().toLower() == "http") {
         QString url = QString("GET /printtax?auth=up&a=get&user=%1&pass=%2&order=%3 HTTP/1.1\r\n\r\n")
                 .arg(__c5config.httpServerUsername())
@@ -426,7 +446,6 @@ void Sales::on_btnPrintTax_clicked()
         s->deleteLater();
         return;
     }
-    C5Database db(__c5config.replicaDbParams());
     db[":f_id"] = id;
     db.exec("select * from o_header where f_id=:f_id");
     db.nextRow();
@@ -486,7 +505,6 @@ void Sales::on_btnPrintTax_clicked()
         db[":f_tax"] = rseq.toInt();
         db.update("o_goods", "f_header", id);
         delete q;
-        ui->btnPrintTax->setVisible(false);
         ui->tbl->setString(ml.at(0).row(), 5, rseq);
         C5Message::info(tr("Printed"));
     } else {

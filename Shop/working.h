@@ -1,7 +1,6 @@
 #ifndef WORKING_H
 #define WORKING_H
 
-#include "goods.h"
 #include "c5storedraftwriter.h"
 #include <QWidget>
 
@@ -36,21 +35,11 @@ public:
 
     bool eventFilter(QObject *watched, QEvent *event);
 
-    QString goodsCode(int code) const;
-
     bool getAdministratorRights(int right);
 
-    void decQty(const IGoods &g);
-
-    void makeWGoods();
-
-    static int storeId(int id);
+    void decQty(int id, double qty);
 
     static QMap<int, Flag> fFlags;
-
-    static QMap<QString, Goods> fGoods;
-
-    static QHash<int, QString> fGoodsCodeForPrint;
 
     static QHash<QString, int> fGoodsRows;
 

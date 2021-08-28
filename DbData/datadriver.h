@@ -11,6 +11,7 @@
 #include "dbdishpart1.h"
 #include "dboheader.h"
 #include "dbgoodsgroup.h"
+#include "dbunit.h"
 #include "dbgoods.h"
 #include "dbmenuname.h"
 #include "dbdishpart2.h"
@@ -33,6 +34,9 @@
 #define dbmenu DataDriver::fInstance->fDbMenu
 #define dbdishspecial DataDriver::fInstance->fDbDishSpecial
 #define dbshift DataDriver::fInstance->fDbShift
+#define dbgoods DataDriver::fInstance->fDbGoods
+#define dbgoodsgroup DataDriver::fInstance->fDbGoodsGroup
+#define dbunit DataDriver::fInstance->fDbUnit
 
 class DataDriver
 {
@@ -60,6 +64,8 @@ public:
     DbGoodsGroup *fDbGoodsGroup;
 
     DbGoods *fDbGoods;
+
+    DbUnit *fDbUnit;
 
     DbMenuName *fDbMenuName;
 

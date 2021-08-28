@@ -1,42 +1,58 @@
 #include "c5printremovedservicethread.h"
 #include "c5printing.h"
 #include "c5utils.h"
+#include "c5config.h"
+#include "datadriver.h"
+#include "c5database.h"
 #include <QApplication>
 
-C5PrintRemovedServiceThread::C5PrintRemovedServiceThread(const QJsonObject &h, const QJsonObject &b, QObject *parent) :
-    QThread(parent)
+C5PrintRemovedServiceThread::C5PrintRemovedServiceThread(const QString &id, QObject *parent) :
+    QThread(parent),
+    fId(id)
 {
-    fHeader = h;
-    fBody = b;
+    connect(this, &C5PrintRemovedServiceThread::finished, this, &C5PrintRemovedServiceThread::deleteLater);
 }
 
 void C5PrintRemovedServiceThread::run()
 {
+    C5Database db(__c5config.dbParams());
+    db.exec("select f_alias, f_printer from d_print_aliases");
+    while (db.nextRow()) {
+        fPrinterAliases[db.getString("f_alias")] = db.getString("f_printer");
+    }
+    db[":f_id"] = fId;
+    db.exec("select * from o_body where f_id=:f_id");
+    if (db.nextRow()) {
+        db.rowToMap(fBody);
+    }
+    db[":f_id"] = fBody["f_header"];
+    db.exec("select * from o_header where f_id=:f_id");
+    if (db.nextRow()) {
+        db.rowToMap(fHeader);
+    }
     if (fBody["f_print1"].toString().length() > 0) {
         print(fBody["f_print1"].toString());
     }
     if (fBody["f_print2"].toString().length() > 0) {
-        if (fBody["f_print2"].toString() != fBody["f_print1"].toString()) {
-            print(fBody["f_print2"].toString());
-        }
+        print(fBody["f_print2"].toString());
     }
 }
 
-void C5PrintRemovedServiceThread::print(const QString &printName)
+void C5PrintRemovedServiceThread::print(QString printName)
 {
-    QJsonObject o = fBody;
     QFont font(qApp->font());
-    font.setPointSize(24);
+    font.setPointSize(18);
     C5Printing p;
     p.setSceneParams(650, 2800, QPrinter::Portrait);
     p.setFont(font);
 
     p.image(":/cancel.png", Qt::AlignHCenter);
     p.br();
+    p.br();
     p.ctext(tr("REMOVED FROM ORDER"));
     p.br();
     p.ltext(tr("Reason"), 0);
-    switch (abs(o["f_state"].toString().toInt())) {
+    switch (fBody["f_state"].toInt()) {
     case DISH_STATE_MISTAKE:
         p.rtext(tr("Mistake"));
         break;
@@ -50,10 +66,10 @@ void C5PrintRemovedServiceThread::print(const QString &printName)
     p.br();
     p.ltext(tr("Comment"), 0);
     p.br();
-    p.ltext(o["f_removereason"].toString(), 50);
+    p.ltext(fBody["f_removereason"].toString(), 50);
     p.br();
     p.ltext(tr("Table"), 0);
-    p.rtext(fHeader["f_tablename"].toString());
+    p.rtext(dbtable->name(fHeader["f_table"].toInt()));
     p.br();
     p.ltext(tr("Order no"), 0);
     p.rtext(QString("%1%2").arg(fHeader["f_prefix"].toString()).arg(fHeader["f_hallid"].toString()));
@@ -65,15 +81,17 @@ void C5PrintRemovedServiceThread::print(const QString &printName)
     p.rtext(QTime::currentTime().toString(FORMAT_TIME_TO_STR));
     p.br();
     p.ltext(tr("Staff"), 0);
-    p.rtext(fHeader["f_currentstaffname"].toString());
+    p.rtext(dbuser->fullName(fBody["f_removeuser"].toInt()));
     p.br(p.fLineHeight + 2);
     p.line(0, p.fTop, p.fNormalWidth, p.fTop);
 
-    QSet<QString> storages;
-    storages << o["f_storename"].toString();
-    p.ltext(o["f_name"].toString(), 0);
+
+    p.ltext(dbstore->name(fBody["f_store"].toInt()), 0);
     p.br();
-    p.ctext(float_str(o["f_qty1"].toString().toDouble(), 2));
+    p.setFontSize(26);
+    p.ltext(dbdish->name(fBody["f_dish"].toInt()), 0);
+    p.br();
+    p.ctext(float_str(fBody["f_qty1"].toDouble(), 2));
     p.br();
     p.line(0, p.fTop, p.fNormalWidth, p.fTop);
     p.br(1);
@@ -81,9 +99,11 @@ void C5PrintRemovedServiceThread::print(const QString &printName)
     p.line(0, p.fTop, p.fNormalWidth, p.fTop);
     p.br(1);
     p.setFontSize(8);
-    p.ltext(tr("Printer: ") + printName, 0);
+    p.ltext(tr("Printer: ") + " " + printName, 0);
     p.br();
-    p.ltext(tr("Storage: ") + storages.toList().join(","), 0);
 
+    if (fPrinterAliases.contains(printName)) {
+        printName = fPrinterAliases[printName];
+    }
     p.print(printName, QPrinter::Custom);
 }

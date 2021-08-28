@@ -17,6 +17,14 @@ public:
 
 private:
     Ui::DlgViewStopList *ui;
+
+private slots:
+    void handleStopList(const QJsonObject &obj);
+    void handleStopListQty(const QJsonObject &obj);
+    void handleStopListRemoveOne(const QJsonObject &obj);
+    void on_btnBack_clicked();
+    void on_btnChangeQty_clicked();
+    void on_btnRemoveFromStoplist_clicked();
 };
 
 #endif // DLGVIEWSTOPLIST_H

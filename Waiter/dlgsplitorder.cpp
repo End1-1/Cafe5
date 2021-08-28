@@ -4,6 +4,7 @@
 #include "dlgface.h"
 #include "dlgpassword.h"
 #include "datadriver.h"
+#include <QScrollBar>
 
 DlgSplitOrder::DlgSplitOrder(C5User *user) :
     C5Dialog(__c5config.dbParams()),
@@ -11,8 +12,7 @@ DlgSplitOrder::DlgSplitOrder(C5User *user) :
     ui(new Ui::DlgSplitOrder)
 {
     ui->setupUi(this);
-    showFullScreen();
-    hide();
+    setWindowState(Qt::WindowFullScreen);
 }
 
 DlgSplitOrder::~DlgSplitOrder()
@@ -29,7 +29,6 @@ void DlgSplitOrder::configOrder(const QString &orderId)
     ui->o1->itemsToTable();
     ui->lbLeft->setText(dbtable->name(ui->o1->fOrderDriver->headerValue("f_table").toInt()));
     ui->lbRight->setText(tr("Select table"));
-    ui->o1->addStretch();
 }
 
 void DlgSplitOrder::on_btnChoseTable_clicked()
@@ -78,7 +77,6 @@ void DlgSplitOrder::on_btnChoseTable_clicked()
     ui->o2->setDlg(nullptr);
     ui->o2->itemsToTable();
     ui->lbRight->setText(dbtable->name(ui->o2->fOrderDriver->headerValue("f_table").toInt()));
-    ui->o2->addStretch();
 }
 
 void DlgSplitOrder::on_btnExit_clicked()
@@ -127,8 +125,6 @@ bool DlgSplitOrder::moveItem(C5OrderDriver *or1, C5OrderDriver *or2, int row)
     or1->removeDish(row);
     ui->o1->itemsToTable();
     ui->o2->itemsToTable();
-    ui->o1->addStretch();
-    ui->o2->addStretch();
     return true;
 }
 
@@ -176,4 +172,24 @@ void DlgSplitOrder::on_btnSave_clicked()
         }
     }
     accept();
+}
+
+void DlgSplitOrder::on_btnScrollUp1_clicked()
+{
+    ui->scrollArea->verticalScrollBar()->setValue(ui->scrollArea->verticalScrollBar()->value() + 300);
+}
+
+void DlgSplitOrder::on_btnScrollDown1_clicked()
+{
+    ui->scrollArea->verticalScrollBar()->setValue(ui->scrollArea->verticalScrollBar()->value() - 300);
+}
+
+void DlgSplitOrder::on_btnScrollUp2_clicked()
+{
+    ui->scrollArea_2->verticalScrollBar()->setValue(ui->scrollArea_2->verticalScrollBar()->value() + 300);
+}
+
+void DlgSplitOrder::on_btnScrollDown2_clicked()
+{
+    ui->scrollArea_2->verticalScrollBar()->setValue(ui->scrollArea_2->verticalScrollBar()->value() - 300);
 }

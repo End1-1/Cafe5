@@ -1,22 +1,22 @@
 #ifndef SALES_H
 #define SALES_H
 
-#include <QDialog>
+#include "c5dialog.h"
 
 namespace Ui {
 class Sales;
 }
 
-class Sales : public QDialog
+class Sales : public C5Dialog
 {
     Q_OBJECT
 
 public:
-    explicit Sales(QWidget *parent = nullptr);
+    explicit Sales();
 
     ~Sales();
 
-    static void showSales(QWidget *parent = nullptr);
+    static void showSales();
 
 private slots:
     void on_btnDateLeft_clicked();

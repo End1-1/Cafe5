@@ -27,6 +27,21 @@ C5Database::C5Database() :
     init();
 }
 
+C5Database::C5Database(const QString &dbdriver)
+{
+    fIsReady = false;
+    if (QSqlDatabase::drivers().count() == 0) {
+        return;
+    }
+    fIsReady = true;
+    fQuery = nullptr;
+
+    QMutexLocker ml(&fMutex);
+    ++fCounter;
+    fDbName = getDbNumber("DB1");
+    fDb = QSqlDatabase::addDatabase(dbdriver, fDbName);
+}
+
 C5Database::C5Database(const QStringList &dbParams) :
     C5Database()
 {
@@ -169,14 +184,6 @@ bool C5Database::exec(const QString &sqlQuery, QList<QList<QVariant> > &dbrows, 
         return false;
     }
 
-//#define LOGGING 1
-
-#ifdef QT_DEBUG
-    logEvent(fDb.hostName() + " (" + QString::number(fTimerCount) + " ms):" + fDb.databaseName() + " " + lastQuery(fQuery));
-#elif  LOGGING
-    logEvent(fDb.hostName() + " (" + QString::number(fTimerCount) + " ms):" + fDb.databaseName() + " " + lastQuery(fQuery));
-#endif
-
     fBindValues.clear();
     if (isSelect) {
         fCursorPos = -1;
@@ -251,7 +258,7 @@ bool C5Database::execDirect(const QString &sqlQuery)
     return true;
 }
 
-QString C5Database::uuid(const QStringList &dbParams)
+QString C5Database::uuid()
 {
     return QUuid::createUuid().toString().replace("{", "").replace("}", "");
 }
@@ -496,7 +503,7 @@ void C5Database::init()
     ++fCounter;
     fDbName = getDbNumber("DB1");
     fDb = QSqlDatabase::addDatabase(_DBDRIVER_, fDbName);
-    fDb.setConnectOptions("MYSQL_OPT_CONNECT_TIMEOUT=2");
+    fDb.setConnectOptions("MYSQL_OPT_CONNECT_TIMEOUT=5");
 }
 
 bool C5Database::isOpened()
@@ -597,7 +604,15 @@ bool C5Database::exec(const QString &sqlQuery, bool &isSelect)
         logEvent(fDb.hostName() + " (" + QString::number(fTimerCount) + " ms):" + fDb.databaseName() + " " + lastQuery(fQuery));
         return false;
     }
-    logEvent(fDb.hostName() + " (" + QString::number(fTimerCount) + " ms):" + fDb.databaseName() + " " + lastQuery(fQuery));
+
+    //#define LOGGING 1
+
+    #ifdef QT_DEBUG
+        logEvent(fDb.hostName() + " (" + QString::number(fTimerCount) + " ms):" + fDb.databaseName() + " " + lastQuery(fQuery));
+    #elif  LOGGING
+        logEvent(fDb.hostName() + " (" + QString::number(fTimerCount) + " ms):" + fDb.databaseName() + " " + lastQuery(fQuery));
+    #endif
+
     isSelect = fQuery->isSelect();
     QString call = "call";
     if (!isSelect) {

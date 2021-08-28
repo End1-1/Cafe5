@@ -27,4 +27,5 @@ void DataDriver::init(const QStringList &dbParams)
     fInstance->fDbMenu = new DbMenu();
     fInstance->fDbDishSpecial = new DbDishSpecial();
     fInstance->fDbShift = new DbShift();
+    fInstance->fDbUnit = new DbUnit();
 }

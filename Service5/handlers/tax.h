@@ -5,6 +5,8 @@
 
 class Tax : public RequestHandler
 {
+    Q_OBJECT
+
 public:
     Tax();
 

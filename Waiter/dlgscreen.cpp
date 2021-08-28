@@ -23,9 +23,7 @@ DlgScreen::DlgScreen() :
     connect(&fTcpServer, SIGNAL(newConnection()), this, SLOT(newConnection()));
     fTcpServer.listen(QHostAddress::Any, 1000);
     colorize(mode_hall);
-    ui->lbDateOfClose->setText(QString("%1: %2")
-                               .arg(tr("Date of close"))
-                               .arg(QDate::fromString(__c5config.getValue(param_date_cash), FORMAT_DATE_TO_STR_MYSQL).toString(FORMAT_DATE_TO_STR)));
+
     QTimer *t = new QTimer(this);
     connect(t, &QTimer::timeout, this, &DlgScreen::timerTimeout);
     t->start(1000);
@@ -52,7 +50,28 @@ void DlgScreen::newConnection()
 
 void DlgScreen::timerTimeout()
 {
-    ui->lbCurrentTime->setText(QString("%1: %2").arg(tr("System datetime")).arg(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR)));
+
+    QDate d = QDate::currentDate();
+    int dateShift = 1;
+    if (__c5config.getValue(param_date_cash_auto).toInt() == 1) {
+       QTime t = QTime::fromString(__c5config.getValue(param_working_date_change_time), "HH:mm:ss");
+       if (t.isValid()) {
+           if (QTime::currentTime() < t) {
+               d = d.addDays(-1);
+               dateShift = 2;
+           }
+       }
+    } else {
+        d = QDate::fromString(__c5config.dateCash(), FORMAT_DATE_TO_STR_MYSQL);
+        dateShift = __c5config.dateShift();
+    }
+    ui->lbDateOfClose->setText(QString("%1: %2")
+                               .arg(tr("Date of close"))
+                               .arg(QDate::fromString(__c5config.getValue(param_date_cash), FORMAT_DATE_TO_STR_MYSQL).toString(FORMAT_DATE_TO_STR)));
+
+    ui->lbCurrentTime->setText(QString("%1: %2")
+                               .arg(tr("System datetime"))
+                               .arg(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR)));
 }
 
 void DlgScreen::handleSocket(const QJsonObject &obj)
@@ -135,7 +154,7 @@ void DlgScreen::on_btnP_clicked()
 
 void DlgScreen::on_btnAccept_clicked()
 {
-    QString pass = ui->lePassword->text();
+    QString pass = ui->lePassword->text().replace(";", "").replace("?", "");
     ui->lePassword->clear();
     switch (fMode) {
     case mode_hall: {
@@ -161,8 +180,6 @@ void DlgScreen::on_btnAccept_clicked()
             }
         }
         DlgFace d(&u);
-        d.showFullScreen();
-        d.hide();
         d.setup();
         d.exec();
         break;

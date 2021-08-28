@@ -2,6 +2,7 @@
 #define DBOHEADER_H
 
 #include "dbdata.h"
+#include <QMap>
 
 class DbOHeader : public DbData
 {

@@ -56,6 +56,7 @@ CR5TStoreExtra::CR5TStoreExtra(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_sumdif"] = tr("Sum, dif");
 
     fFilterWidget = new CR5TStoreExtraFilter(dbParams);
+    fFilter = static_cast<CR5TStoreExtraFilter*>(fFilterWidget);
 }
 
 QToolBar *CR5TStoreExtra::toolBar()
@@ -84,15 +85,17 @@ void CR5TStoreExtra::buildQuery()
         C5Message::info(tr("Store must be defined"));
         return;
     }
+    QMap<int, double> goodsSalePrice;
     QList<QList<QVariant> > &rows = fModel->fRawData;
     rows.clear();
     C5Database db(fDBParams);
 
     //names
-    db.exec("select f_id, f_name from c_goods order by f_name");
+    db.exec("select f_id, f_name, f_saleprice from c_goods order by f_name");
     int row = 0;
     QMap<int, int> goodsRowMap;
     while (db.nextRow()) {
+        goodsSalePrice[db.getInt("f_id")] = db.getDouble("f_saleprice");
         QList<QVariant> emptyRow;
         for (int i = 0; i < 14; i++) {
             emptyRow << QVariant();

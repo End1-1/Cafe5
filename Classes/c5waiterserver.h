@@ -57,6 +57,8 @@ private:
 
     void processStopList(QJsonObject &o);
 
+    void processPrintRemovedService(QJsonObject &o);
+
     QTcpSocket *fSocket;
 };
 

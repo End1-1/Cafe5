@@ -163,6 +163,11 @@ int C5TableWidget::getInteger(int row, int column)
     return getData(row, column).toInt();
 }
 
+int C5TableWidget::getInteger(int row, const QString &columnName)
+{
+    return getInteger(row, columnIndexOfName(columnName));
+}
+
 void C5TableWidget::setInteger(int row, int column, int value)
 {
     setData(row, column, value);
@@ -185,6 +190,11 @@ void C5TableWidget::setString(int row, int column, const QString &str)
 double C5TableWidget::getDouble(int row, int column)
 {
     return getData(row, column).toDouble();
+}
+
+double C5TableWidget::getDouble(int row, const QString &columnName)
+{
+    return getDouble(row, columnIndexOfName(columnName));
 }
 
 void C5TableWidget::setDouble(int row, int column, double value)
@@ -275,6 +285,19 @@ int C5TableWidget::visibleRows()
 void C5TableWidget::setColumnDecimals(int column, int decimals)
 {
     fColumnsDecimals[column] = decimals;
+}
+
+int C5TableWidget::columnIndexOfName(const QString &name)
+{
+    int col = -1;
+    for (int i = 0; i < columnCount(); i++) {
+        if (horizontalHeaderItem(i)->text().toLower() == name.toLower()) {
+            col = i;
+            break;
+        }
+    }
+    Q_ASSERT(col > -1);
+    return col;
 }
 
 void C5TableWidget::lineEditTextChanged(const QString arg1)

@@ -20,11 +20,6 @@ DlgDishRemoveReason::DlgDishRemoveReason(QWidget *parent) :
     item->setSizeHint(QSize(50, 50));
     item->setText(tr("Other"));
     ui->lst->addItem(item);
-    item = new QListWidgetItem(ui->lst);
-    item->setSizeHint(QSize(50, 50));
-    item->setText("Cancel");
-    item->setIcon(QIcon(":/cancel.png"));
-    ui->lst->addItem(item);
     connect(ui->kbd, SIGNAL(accept()), this, SLOT(kbdAccept()));
     connect(ui->kbd, SIGNAL(textChanged(QString)), this, SLOT(textChanged(QString)));
     connect(ui->kbd, SIGNAL(reject()), this, SLOT(reject()));
@@ -49,10 +44,25 @@ bool DlgDishRemoveReason::getReason(QString &reason, int &state)
 
 void DlgDishRemoveReason::kbdAccept()
 {
-    if (ui->kbd->text().isEmpty()) {
+    if (ui->lst->currentRow() < 0) {
+        fName = ui->kbd->text();
+    } else {
+        fName = ui->lst->currentItem()->text();
+    }
+    if (fName.isEmpty()) {
+        C5Message::error(tr("Reason is not selected"));
         return;
     }
-    fName = ui->kbd->text();
+
+    if (ui->btnMistake->isChecked()) {
+        fState = DISH_STATE_MISTAKE;
+    } else if (ui->btnVoid->isChecked()) {
+        fState = DISH_STATE_VOID;
+    } else {
+        C5Message::error(tr("Void or mistake must be selected"));
+        return;
+    }
+    accept();
 }
 
 void DlgDishRemoveReason::textChanged(const QString &text)
@@ -61,40 +71,13 @@ void DlgDishRemoveReason::textChanged(const QString &text)
     ui->lst->setCurrentRow(-1);
 }
 
-void DlgDishRemoveReason::on_lst_clicked(const QModelIndex &index)
-{
-    if (!index.isValid()) {
-        return;
-    }
-    if (index.row() == ui->lst->count() - 1) {
-        reject();
-        return;
-    }
-    fName = index.data(Qt::DisplayRole).toString();
-}
-
 void DlgDishRemoveReason::on_btnMistake_clicked()
 {
-    if (ui->lst->currentRow() < 0 && ui->kbd->text().isEmpty()) {
-        C5Message::error(tr("Reason is not selected"));
-        return;
-    }
-    if (ui->lst->currentRow() < 0) {
-        fName = ui->kbd->text();
-    }
-    fState = DISH_STATE_MISTAKE;
-    accept();
+    ui->btnVoid->setChecked(false);
+
 }
 
 void DlgDishRemoveReason::on_btnVoid_clicked()
 {
-    if (ui->lst->currentRow() < 0 && ui->kbd->text().isEmpty()) {
-        C5Message::error(tr("Reason is not selected"));
-        return;
-    }
-    if (ui->lst->currentRow() < 0) {
-        fName = ui->kbd->text();
-    }
-    fState = DISH_STATE_VOID;
-    accept();
+    ui->btnMistake->setChecked(false);
 }

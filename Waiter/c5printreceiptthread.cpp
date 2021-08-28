@@ -90,7 +90,11 @@ bool C5PrintReceiptThread::print()
         db.rowToMap(carinfo);
     }
 
-    p.image("./logo_receipt.png", Qt::AlignHCenter);
+    if (fBill) {
+        p.image("./logo_bill.png", Qt::AlignHCenter);
+    } else {
+        p.image("./logo_receipt.png", Qt::AlignHCenter);
+    }
     p.br();
     p.setFontBold(true);
     p.ctext(__translator.tt(tr("Receipt #")) + QString("%1%2").arg(fHeaderInfo["f_prefix"].toString()).arg(fHeaderInfo["f_hallid"].toString()));
@@ -153,14 +157,13 @@ bool C5PrintReceiptThread::print()
     p.line();
     p.br(1);
 
-    int nn = 1;
     bool noservice = false, nodiscount = false;
     for (int i = 0; i < fBodyInfo.count(); i++) {
         const QMap<QString, QVariant> &m = fBodyInfo.at(i);
         if (m["f_state"].toInt() != DISH_STATE_OK) {
             continue;
         }
-        QString name = QString("%1.").arg(nn++);
+        QString name;
         if (!m["f_adgcode"].toString().isEmpty()) {
             name += QString("%1: %2").arg(__translator.tt(tr("Class"))).arg(m["f_adgcode"].toString());
         }
@@ -338,7 +341,11 @@ bool C5PrintReceiptThread::print()
     p.setFontBold(true);
     p.ltext(__translator.tt(tr("Thank you for visit!")), 0);
     p.br();
-    p.ltext(QString("%1: %2").arg(tr("Sample")).arg(fHeaderInfo["f_print"].toInt()), 0);
+    if (fBill) {
+        p.ltext(QString("%1: %2").arg(tr("Sample")).arg(abs(fHeaderInfo["f_precheck"].toInt()) + 1), 0);
+    } else {
+        p.ltext(QString("%1: %2").arg(tr("Sample")).arg(abs(fHeaderInfo["f_print"].toInt()) + 1), 0);
+    }
     p.br();
     p.print(fPrinter, QPrinter::Custom);
 

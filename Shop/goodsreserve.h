@@ -1,0 +1,8 @@
+#ifndef GOODSRESERVE_H
+#define GOODSRESERVE_H
+
+#define GR_RESERVED 1
+#define GR_COMPLETED 2
+#define GR_REMOVED 3
+
+#endif // GOODSRESERVE_H

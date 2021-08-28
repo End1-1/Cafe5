@@ -23,8 +23,6 @@ public:
 private slots:
     void kbdAccept();
 
-    void on_btnCancel_clicked();
-
     void on_tbl_itemClicked(QTableWidgetItem *item);
 
 private:

@@ -21,19 +21,23 @@ public:
 
     void setDlg(DlgOrder *dlg);
 
-    void addStretch();
-
     void itemsToTable();
 
-    int addItem(int menuid, const QString &comment);
+    int addItem(int menuid, const QString &comment, double price = 0.0);
 
-    QPoint updateItem(int index);
+    void updateItem(int index);
 
     bool currentRow(int &row);
+
+    void setCurrentRow(int row);
 
     void setSelected(bool v = true);
 
     bool isSelected();
+
+    bool isReprintMode();
+
+    void setReprintMode(bool v);
 
     C5OrderDriver *fOrderDriver;
 

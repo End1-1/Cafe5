@@ -159,12 +159,14 @@ void PrintReceipt::print(const QString &id, C5Database &db)
                 p.ltext(QString("%1 %2").arg(data.at(i).at(2).toString()).arg(data.at(i).at(0).toString()), 0);
             }
             p.br();
-            if (complectation.contains(data.at(i).at(8).toString())) {
-                QList<QList<QVariant> > rows = complectation[data.at(i).at(8).toString()];
-                for (int ri = 0; ri < rows.count(); ri++) {
-                    QList<QVariant> rv = rows.at(ri);
-                    p.ltext(QString("|---%1 %2 X %3").arg(rv.at(1).toString()).arg(rv.at(2).toString()).arg(float_str(rv.at(3).toDouble() * data.at(i).at(3).toDouble(), 2)), 0);
-                    p.br();
+            if (amountTotal > 0) {
+                if (complectation.contains(data.at(i).at(8).toString())) {
+                    QList<QList<QVariant> > rows = complectation[data.at(i).at(8).toString()];
+                    for (int ri = 0; ri < rows.count(); ri++) {
+                        QList<QVariant> rv = rows.at(ri);
+                        p.ltext(QString("|---%1 %2 X %3").arg(rv.at(1).toString()).arg(rv.at(2).toString()).arg(float_str(rv.at(3).toDouble() * data.at(i).at(3).toDouble(), 2)), 0);
+                        p.br();
+                    }
                 }
             }
             p.ltext(QString("%1 X %2 = %3")

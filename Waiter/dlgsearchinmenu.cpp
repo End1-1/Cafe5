@@ -6,17 +6,24 @@ DlgSearchInMenu::DlgSearchInMenu() :
     ui(new Ui::DlgSearchInMenu)
 {
     ui->setupUi(this);
-    ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 100, 150, 200, 100);
+    ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 100, 200, 350, 100);
     connect(ui->kb, SIGNAL(textChanged(QString)), this, SLOT(searchDish(QString)));
     connect(ui->kb, SIGNAL(accept()), this, SLOT(kbdAccept()));
     connect(ui->kb, SIGNAL(reject()), this, SLOT(reject()));
 
+    QPushButton *firstBtn = nullptr;
     for (int id: dbmenuname->list()) {
         QPushButton *b = new QPushButton();
+        if (!firstBtn) {
+            firstBtn = b;
+        }
         b->setText(dbmenuname->name(id));
         b->setProperty("id", id);
         ui->hl->insertWidget(0, b);
         connect(b, SIGNAL(clicked()), this, SLOT(menuClicked()));
+    }
+    if (firstBtn) {
+        firstBtn->click();
     }
 }
 
@@ -45,8 +52,11 @@ void DlgSearchInMenu::buildMenu(int menuid)
 
 void DlgSearchInMenu::extractDishes(const DPart2 &p2)
 {
-    int row = ui->tbl->addEmptyRow();
+    for (const DPart2 &pc: p2.data1) {
+        extractDishes(pc);
+    }
     for (int d: p2.data2.data) {
+        int row = ui->tbl->addEmptyRow();
         int dishid = dbmenu->dishid(d);
         ui->tbl->setInteger(row, 0, d);
         ui->tbl->setString(row, 1, dbdish->part1name(dishid));

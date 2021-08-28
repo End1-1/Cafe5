@@ -10,5 +10,6 @@
 #define sl_not_enough_qty 7
 #define sl_restore_qty 8
 #define sl_get 9
+#define sl_remove_one 10
 
 #endif // STOPLIST_H

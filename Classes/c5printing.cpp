@@ -291,7 +291,7 @@ QPrinter::Orientation C5Printing::orientation(int index)
     return fCanvasOrientation[fCanvasList.at(index)];
 }
 
-void C5Printing::print(const QString &printername, QPrinter::PageSize pageSize, bool rotate90)
+bool C5Printing::print(const QString &printername, QPrinter::PageSize pageSize, bool rotate90)
 {
     if (printername.contains("print://", Qt::CaseInsensitive)) {
         QRegExp re("(print:\\/\\/)(.*):(\\d*)\\/(.*)", Qt::CaseInsensitive);
@@ -323,11 +323,11 @@ void C5Printing::print(const QString &printername, QPrinter::PageSize pageSize, 
                 NotificationWidget::showMessage(tr("Failed send order to remote printer"), 1);
             }
         }
-        return;
+        return true;
     }
     QPrinterInfo pi;
     if (!pi.availablePrinterNames().contains(printername, Qt::CaseInsensitive)) {
-        return;
+        return false;
     }
     if (fCanvasList.count() > 0) {
         QPrinter printer(QPrinter::PrinterResolution);
@@ -348,7 +348,11 @@ void C5Printing::print(const QString &printername, QPrinter::PageSize pageSize, 
             }
             fCanvasList.at(i)->render(&painter);
         }
+        if (printer.printerState() == QPrinter::Error) {
+            return false;
+        }
     }
+    return true;
 }
 
 void C5Printing::print(QPainter *p)

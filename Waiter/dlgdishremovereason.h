@@ -23,8 +23,6 @@ private slots:
 
     void textChanged(const QString &text);
 
-    void on_lst_clicked(const QModelIndex &index);
-
     void on_btnMistake_clicked();
 
     void on_btnVoid_clicked();

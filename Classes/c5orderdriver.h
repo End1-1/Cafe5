@@ -1,8 +1,8 @@
 #ifndef C5ORDERDRIVER_H
 #define C5ORDERDRIVER_H
 
-#include "c5database.h"
 #include <QObject>
+#include <QMap>
 
 #define va(x) QVariant(x)
 
@@ -16,6 +16,8 @@ public:
     bool newOrder(int userid, QString &id, int tableId);
 
     bool closeOrder();
+
+    void setCloseHeader();
 
     bool loadData(const QString id);
 
@@ -63,7 +65,7 @@ public:
 
     const QMap<QString, QVariant> &dish(int index) const;
 
-    bool addDish(int menuid, const QString &comment);
+    bool addDish(int menuid, const QString &comment, double price = 0.0);
 
     bool addDish(QMap<QString, QVariant> o);
 
@@ -75,10 +77,12 @@ public:
 
     double dishTotal(int index);
 
+    double dishTotal2(int index);
+
     int duplicateDish(int index);
 
 private:
-    C5Database fDb;
+    QStringList fDbParams;
 
     QString fLastError;
 
@@ -109,6 +113,8 @@ private:
     bool fetchDishesData(const QString &header, const QString &id);
 
     void clearOrder();
+
+    void dateCash(QDate &d, int &dateShift);
 };
 
 #endif // C5ORDERDRIVER_H

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1630</width>
-    <height>734</height>
+    <height>759</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -53,6 +53,16 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
+      <item>
+       <widget class="QLabel" name="lbStaff">
+        <property name="text">
+         <string>00:00</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
       <item>
        <widget class="QLabel" name="lbTime">
         <property name="text">
@@ -162,7 +172,7 @@ QLabel {color:yellow;background:green;}
         <property name="maximumSize">
          <size>
           <width>16777215</width>
-          <height>50</height>
+          <height>16777215</height>
          </size>
         </property>
         <property name="text">
@@ -478,36 +488,66 @@ QLabel {color:yellow;background:green;}
        </widget>
       </item>
       <item>
-       <widget class="QToolButton" name="btnTotal">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
+       <widget class="QFrame" name="frame">
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>40</height>
+          <height>50</height>
          </size>
         </property>
-        <property name="text">
-         <string>Bill
+        <property name="frameShape">
+         <enum>QFrame::Box</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <property name="leftMargin">
+          <number>2</number>
+         </property>
+         <property name="topMargin">
+          <number>2</number>
+         </property>
+         <property name="rightMargin">
+          <number>2</number>
+         </property>
+         <property name="bottomMargin">
+          <number>2</number>
+         </property>
+         <item>
+          <widget class="QToolButton" name="btnTotal">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>60</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Bill
 150000</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../resources/res.qrc">
-          <normaloff>:/contract.png</normaloff>:/contract.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>32</width>
-          <height>32</height>
-         </size>
-        </property>
-        <property name="toolButtonStyle">
-         <enum>Qt::ToolButtonTextBesideIcon</enum>
-        </property>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources/res.qrc">
+             <normaloff>:/contract.png</normaloff>:/contract.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>32</width>
+             <height>32</height>
+            </size>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonTextBesideIcon</enum>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
       <item>
@@ -713,6 +753,47 @@ LANGUAGE</string>
                  </property>
                  <property name="flat">
                   <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="btnReprint">
+                 <property name="minimumSize">
+                  <size>
+                   <width>50</width>
+                   <height>50</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>50</width>
+                   <height>50</height>
+                  </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::NoFocus</enum>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true"/>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../resources/resources.qrc">
+                   <normaloff>:/print_receipt.png</normaloff>:/print_receipt.png</iconset>
+                 </property>
+                 <property name="iconSize">
+                  <size>
+                   <width>32</width>
+                   <height>32</height>
+                  </size>
+                 </property>
+                 <property name="checkable">
+                  <bool>true</bool>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>
@@ -940,7 +1021,7 @@ background:#fff6e5;
               <x>0</x>
               <y>0</y>
               <width>380</width>
-              <height>634</height>
+              <height>659</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="vs">
@@ -1185,6 +1266,12 @@ background:#fff6e5;
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
+     <property name="maximumSize">
+      <size>
+       <width>530</width>
+       <height>16777215</height>
+      </size>
+     </property>
      <layout class="QGridLayout" name="gridLayout_3">
       <property name="leftMargin">
        <number>0</number>
@@ -1287,7 +1374,7 @@ background:#fff6e5;
           <widget class="C5LineEdit" name="lePrepaid">
            <property name="maximumSize">
             <size>
-             <width>200</width>
+             <width>16777215</width>
              <height>16777215</height>
             </size>
            </property>
@@ -1381,7 +1468,7 @@ CARD</string>
           <widget class="C5LineEdit" name="leOther">
            <property name="maximumSize">
             <size>
-             <width>200</width>
+             <width>16777215</width>
              <height>16777215</height>
             </size>
            </property>
@@ -1475,7 +1562,7 @@ BANK</string>
           <widget class="C5LineEdit" name="leCard">
            <property name="maximumSize">
             <size>
-             <width>200</width>
+             <width>16777215</width>
              <height>16777215</height>
             </size>
            </property>
@@ -1510,7 +1597,7 @@ BANK</string>
           <widget class="C5LineEdit" name="leBank">
            <property name="maximumSize">
             <size>
-             <width>200</width>
+             <width>16777215</width>
              <height>16777215</height>
             </size>
            </property>
@@ -1605,7 +1692,7 @@ OTHER</string>
           <widget class="C5LineEdit" name="leCash">
            <property name="maximumSize">
             <size>
-             <width>200</width>
+             <width>16777215</width>
              <height>16777215</height>
             </size>
            </property>
@@ -1703,7 +1790,7 @@ OTHER</string>
         </property>
         <property name="maximumSize">
          <size>
-          <width>400</width>
+          <width>16777215</width>
           <height>16777215</height>
          </size>
         </property>
@@ -1832,7 +1919,7 @@ OTHER</string>
                </size>
               </property>
               <property name="text">
-               <string>RECEIPT</string>
+               <string>CLOSE ORDER</string>
               </property>
               <property name="icon">
                <iconset resource="../resources/resources.qrc">
@@ -1858,36 +1945,6 @@ OTHER</string>
                </size>
               </property>
              </spacer>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btnCloseOrder">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>50</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>50</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>CLOSE
-ORDER</string>
-              </property>
-              <property name="icon">
-               <iconset resource="../resources/resources.qrc">
-                <normaloff>:/ok.png</normaloff>:/ok.png</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>32</width>
-                <height>32</height>
-               </size>
-              </property>
-             </widget>
             </item>
            </layout>
           </widget>
@@ -2025,7 +2082,7 @@ ORDER</string>
         </property>
         <property name="maximumSize">
          <size>
-          <width>400</width>
+          <width>16777215</width>
           <height>16777215</height>
          </size>
         </property>
@@ -2129,7 +2186,7 @@ ORDER</string>
            <x>0</x>
            <y>0</y>
            <width>198</width>
-           <height>660</height>
+           <height>685</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_4">

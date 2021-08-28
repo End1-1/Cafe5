@@ -31,5 +31,6 @@ static const int sm_getcostumer_by_car = 25;
 static const int sm_rotate_shift = 26;
 static const int sm_checkdiscount_by_visit = 27;
 static const int sm_stoplist = 28;
+static const int sm_print_removed_service = 29;
 
 #endif // C5SOCKETMESSAGE_H

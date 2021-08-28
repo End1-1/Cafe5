@@ -5,6 +5,9 @@
 #include "c5utils.h"
 #include "c5database.h"
 #include <QApplication>
+#include <QJsonDocument>
+#include <QFile>
+#include <QDir>
 
 C5PrintServiceThread::C5PrintServiceThread(const QString &header, QObject *parent) :
     QObject(parent)
@@ -21,6 +24,10 @@ bool C5PrintServiceThread::run()
 {
     QSet<QString> fPrint1, fPrint2;
     C5Database db(__c5config.dbParams());
+    db.exec("select f_alias, f_printer from d_print_aliases");
+    while (db.nextRow()) {
+        fPrinterAliases[db.getString("f_alias")] = db.getString("f_printer");
+    }
     db[":f_id"] = fHeader;
     db.exec("select * from o_header where f_id=:f_id");
     if (db.nextRow()) {
@@ -33,8 +40,7 @@ bool C5PrintServiceThread::run()
     }
     db[":f_header"] = fHeader;
     db[":f_state"] = DISH_STATE_OK;
-    db.exec("select f_id, f_dish, f_timeorder, f_print1, f_print2, f_qty1 as f_qty, f_comment "
-            "from o_body b "
+    db.exec("select * from o_body b "
             "where b.f_header=:f_header and b.f_state=:f_state "
             "and (length(f_print1)>0 or length(f_print2)>0) and b.f_qty2=0 ");
     while (db.nextRow()) {
@@ -54,26 +60,58 @@ bool C5PrintServiceThread::run()
     }
 
     foreach (QString s, fPrint1) {
-        print(s, "f_print1");
+        print(s, "f_print1", false);
     }
 
     foreach (QString s, fPrint2) {
-        print(s, "f_print2");
+        print(s, "f_print2", false);
     }
 
     if (fHeaderData["f_state"].toInt() == ORDER_STATE_OPEN) {
         db[":f_header"] = fHeader;
-        db.exec("update o_body set f_qty2=f_qty1 where f_header=:f_header");
+        db.exec("update o_body set f_qty2=f_qty1, f_reprint=abs(f_reprint) where f_header=:f_header");
         for (int i = 0; i < fBodyData.count(); i++) {
             const QMap<QString, QVariant> &o = fBodyData.at(i);
             db[":f_id"] = o["f_id"];
             db.exec("update o_body set f_printtime=current_timestamp() where f_id=:f_id");
         }
     }
+
+    if (!fReprintList.isEmpty()) {
+        fBodyData.clear();
+        db.exec(QString("select * from o_body where f_id in (%1) ").arg(fReprintList));
+        while (db.nextRow()) {
+            QMap<QString, QVariant> m;
+            db.rowToMap(m);
+            fBodyData.append(m);
+        }
+        fPrint1.clear();
+        fPrint2.clear();
+
+        for (int i = 0; i < fBodyData.count(); i++) {
+            if (fBodyData.at(i)["f_print1"].toString().length() > 0) {
+                fPrint1 << fBodyData.at(i)["f_print1"].toString();
+            }
+            if (fBodyData.at(i)["f_print1"].toString() != fBodyData.at(i)["f_print2"].toString()) {
+                if (fBodyData.at(i)["f_print2"].toString() > 0) {
+                    fPrint2 << fBodyData.at(i)["f_print2"].toString();
+                }
+            }
+        }
+
+        foreach (QString s, fPrint1) {
+            print(s, "f_print1", true);
+        }
+
+        foreach (QString s, fPrint2) {
+            print(s, "f_print2", true);
+        }
+    }
+
     return true;
 }
 
-void C5PrintServiceThread::print(const QString &printer, const QString &side)
+void C5PrintServiceThread::print(QString printer, const QString &side, bool reprint)
 {
     QFont font(qApp->font());
     font.setPointSize(20);
@@ -97,6 +135,16 @@ void C5PrintServiceThread::print(const QString &printer, const QString &side)
         p.br();
     }
 
+    if (reprint) {
+        p.setFontSize(34);
+        p.setFontBold(true);
+        p.ctext(tr("REPRINT"));
+        p.br();
+        p.br();
+    }
+
+    p.setFontBold(false);
+    p.setFontSize(20);
     p.ctext(tr("New order"));
     p.br();
     p.ltext(tr("Table"), 0);
@@ -131,8 +179,26 @@ void C5PrintServiceThread::print(const QString &printer, const QString &side)
             p.ltext(QString("%1").arg(dbdish->name(o["f_dish"].toInt())), 0);
         }
         p.setFontBold(true);
-        p.rtext(QString("%1").arg(float_str(o["f_qty"].toDouble(), 2)));
+        p.rtext(QString("%1").arg(float_str(o["f_qty1"].toDouble(), 2)));
         p.setFontBold(false);
+
+        if (dbdish->isExtra(o["f_dish"].toInt())) {
+            p.br();
+            p.setFontSize(25);
+            p.ltext(QString("%1: %2")
+                    .arg(tr("Extra price"))
+                    .arg(float_str(o["f_price"].toDouble(), 2)), 0);
+        }
+
+        if (o["f_comment2"].toString().length() > 0) {
+            p.br();
+            p.setFontSize(25);
+            p.setFontBold(true);
+            p.ltext(o["f_comment2"].toString(), 0);
+            p.br();
+            p.setFontSize(30);
+            p.setFontBold(false);
+        }
 
         if (o["f_comment"].toString().length() > 0) {
             p.br();
@@ -150,8 +216,45 @@ void C5PrintServiceThread::print(const QString &printer, const QString &side)
     p.br(1);
     p.setFontSize(20);
     p.ltext(tr("Printer: ") + printer, 0);
+    p.setFontBold(true);
+    p.rtext(side == "f_print1" ? " [1]" : "[2]");
     p.br();
     p.ltext(tr("Storage: ") + storages.toList().join(","), 0);
 
-    p.print(printer, QPrinter::Custom);
+    QString originalPrinter = printer;
+    if (fPrinterAliases.contains(printer)) {
+        printer = fPrinterAliases[printer];
+    }
+
+    QString final = "OK";
+    if (!p.print(printer, QPrinter::Custom)) {
+        final = "FAIL";
+    }
+
+    QDir dir;
+    if (!dir.exists(dir.tempPath() + "/Waiter")) {
+        dir.mkpath(dir.tempPath() + "/Waiter");
+    }
+    QString fileName = QString("%1/%2-%3%4-1-%5.txt")
+            .arg(dir.tempPath() + "/Waiter")
+            .arg(originalPrinter)
+            .arg(fHeaderData["f_prefix"].toString())
+            .arg(fHeaderData["f_hallid"].toString())
+            .arg(final);
+    int i = 2;
+    while (QFile::exists(fileName)) {
+        fileName = QString("%1/%2-%3%4-%5-%6.txt")
+                .arg(dir.tempPath() + "/Waiter")
+                .arg(printer)
+                .arg(fHeaderData["f_prefix"].toString())
+                .arg(fHeaderData["f_hallid"].toString())
+                .arg(i++)
+                .arg(final);
+    }
+    QFile f(fileName);
+    if (f.open(QIODevice::WriteOnly)) {
+        QJsonDocument jdoc(p.jsonData());
+        f.write(jdoc.toJson());
+    }
+    f.close();
 }

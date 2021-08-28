@@ -71,6 +71,7 @@ SOURCES += \
     ../Classes/c5threadobject.cpp \
     ../Classes/calculator.cpp \
     ../Classes/checkforupdatethread.cpp \
+    ../Classes/doubledatabase.cpp \
     ../Classes/notificationwidget.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
     ../Controls/c5guicontrols.cpp \
@@ -93,6 +94,7 @@ SOURCES += \
     ../DbData/dbshift.cpp \
     ../DbData/dbstore.cpp \
     ../DbData/dbtables.cpp \
+    ../DbData/dbunit.cpp \
     ../DbData/dbusers.cpp \
     ../Editors/c5cashname.cpp \
     ../Editors/c5dishwidget.cpp \
@@ -160,6 +162,7 @@ SOURCES += \
     ../FrontDesk/c5translatorform.cpp \
     ../FrontDesk/c5waiterorder.cpp \
     ../FrontDesk/dlgchangeoutputstore.cpp \
+    ../FrontDesk/dlgexportsaletoasoptions.cpp \
     ../FrontDesk/dlgstoreutils.cpp \
     ../Reports/c5customfilter.cpp \
     ../Reports/c5settingswidget.cpp \
@@ -264,6 +267,7 @@ SOURCES += \
     dlgscreen.cpp \
     dlgshiftrotation.cpp \
     dlgsplitorder.cpp \
+    dlgstafflist.cpp \
     dlgstoplistoption.cpp \
     dlgsystem.cpp \
     dlgtext.cpp \
@@ -372,6 +376,7 @@ HEADERS += \
     ../Classes/c5threadobject.h \
     ../Classes/calculator.h \
     ../Classes/checkforupdatethread.h \
+    ../Classes/doubledatabase.h \
     ../Classes/notificationwidget.h \
     ../Classes/proxytablewidgetdatabase.h \
     ../Controls/c5guicontrols.h \
@@ -394,6 +399,7 @@ HEADERS += \
     ../DbData/dbshift.h \
     ../DbData/dbstore.h \
     ../DbData/dbtables.h \
+    ../DbData/dbunit.h \
     ../DbData/dbusers.h \
     ../Editors/c5cashname.h \
     ../Editors/c5dishwidget.h \
@@ -461,6 +467,7 @@ HEADERS += \
     ../FrontDesk/c5translatorform.h \
     ../FrontDesk/c5waiterorder.h \
     ../FrontDesk/dlgchangeoutputstore.h \
+    ../FrontDesk/dlgexportsaletoasoptions.h \
     ../FrontDesk/dlgstoreutils.h \
     ../Reports/c5customfilter.h \
     ../Reports/c5settingswidget.h \
@@ -590,6 +597,7 @@ HEADERS += \
     dlgscreen.h \
     dlgshiftrotation.h \
     dlgsplitorder.h \
+    dlgstafflist.h \
     dlgstoplistoption.h \
     dlgsystem.h \
     dlgtext.h \
@@ -703,6 +711,7 @@ FORMS += \
     ../FrontDesk/c5translatorform.ui \
     ../FrontDesk/c5waiterorder.ui \
     ../FrontDesk/dlgchangeoutputstore.ui \
+    ../FrontDesk/dlgexportsaletoasoptions.ui \
     ../FrontDesk/dlgstoreutils.ui \
     ../Reports/c5customfilter.ui \
     ../Reports/c5settingswidget.ui \
@@ -757,6 +766,7 @@ FORMS += \
     dlgscreen.ui \
     dlgshiftrotation.ui \
     dlgsplitorder.ui \
+    dlgstafflist.ui \
     dlgstoplistoption.ui \
     dlgsystem.ui \
     dlgtext.ui \

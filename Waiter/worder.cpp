@@ -36,16 +36,22 @@ void WOrder::setDlg(DlgOrder *dlg)
     fDlg = dlg;
 }
 
-void WOrder::addStretch()
-{
-    ui->vl->addStretch();
-}
-
 void WOrder::itemsToTable()
 {
+    int r = -1, c = 0;
     while (ui->vl->itemAt(0)) {
+        if (ui->vl->count() == 1) {
+            break;
+        }
+        DishItem *item = dynamic_cast<DishItem*>(ui->vl->itemAt(0)->widget());
+        if (item) {
+            if (item->isFocused()) {
+                r = c;
+            }
+        }
         ui->vl->itemAt(0)->widget()->deleteLater();
         ui->vl->removeItem(ui->vl->itemAt(0));
+        c++;
     }
     if (fOrderDriver->currentOrderId().isEmpty()) {
         return;
@@ -58,14 +64,18 @@ void WOrder::itemsToTable()
         } else {
             w->setReadyOnly(true);
         }
-        ui->vl->addWidget(w);
+        ui->vl->insertWidget(ui->vl->count() - 1, w);
+        if (r > -1) {
+            if (r == i) {
+                w->clearFocus(i);
+            }
+        }
     }
-    addStretch();
 }
 
-int WOrder::addItem(int menuid, const QString &comment)
+int WOrder::addItem(int menuid, const QString &comment, double price)
 {
-    if (!fOrderDriver->addDish(menuid, comment)) {
+    if (!fOrderDriver->addDish(menuid, comment, price)) {
         C5Message::error(fOrderDriver->error());
         return -1;
     }
@@ -79,25 +89,18 @@ int WOrder::addItem(int menuid, const QString &comment)
     }
     ui->vl->insertWidget(row, di);
     focused(row);
-    setMinimumHeight(((row + 1) *50) + 10);
-    bool spacer = false;
-    for (int i = 0; i < ui->vl->count(); i++) {
-        qDebug() << ui->vl->itemAt(i);
-        qDebug() << ui->vl->itemAt(i)->widget();
-        if (!ui->vl->itemAt(i)->widget()) {
-            spacer = true;
-        }
-    }
-    if (spacer) {
-        addStretch();
-    }
+    setMinimumHeight(((row + 5) * 50) + 10);
     return row;
 }
 
-QPoint WOrder::updateItem(int index)
+void WOrder::updateItem(int index)
 {
-    QPoint p = focused(index);
-    return p;
+    for (int i = 0; i < ui->vl->count(); i++) {
+        DishItem *item = dynamic_cast<DishItem*>(ui->vl->itemAt(i)->widget());
+        if (item) {
+            item->setChanges();
+        }
+    }
 }
 
 bool WOrder::currentRow(int &row)
@@ -114,6 +117,21 @@ bool WOrder::currentRow(int &row)
         }
     }
     return row > -1;
+}
+
+void WOrder::setCurrentRow(int row)
+{
+    for (int i = 0, count = ui->vl->count(); i < count; i++) {
+        QLayoutItem *l = ui->vl->itemAt(i);
+        DishItem *d = dynamic_cast<DishItem*>(l->widget());
+        if (d) {
+            if (i == row) {
+                d->clearFocus(row);
+            } else {
+                d->clearFocus(-1);
+            }
+        }
+    }
 }
 
 void WOrder::setSelected(bool v)
@@ -134,6 +152,24 @@ void WOrder::setSelected(bool v)
 bool WOrder::isSelected()
 {
     return fSelected;
+}
+
+bool WOrder::isReprintMode()
+{
+    return property("reprint").toBool();
+}
+
+void WOrder::setReprintMode(bool v)
+{
+    setProperty("reprint", v);
+    for (int i = 0, count = ui->vl->count(); i < count; i++) {
+        QLayoutItem *l = ui->vl->itemAt(i);
+        DishItem *d = dynamic_cast<DishItem*>(l->widget());
+        if (d) {
+            d->setProperty("reprint", v);
+            d->setChanges();
+        }
+    }
 }
 
 void WOrder::setChanges()

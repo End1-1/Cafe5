@@ -48,6 +48,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Classes/c5storedraftwriter.cpp \
     ../Classes/c5threadobject.cpp \
     ../Classes/calculator.cpp \
+    ../Classes/doubledatabase.cpp \
     ../Classes/notificationwidget.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
     ../Controls/c5guicontrols.cpp \
@@ -121,6 +122,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     c5storebarcode.cpp \
     c5storebarcodelist.cpp \
     dlgchangeoutputstore.cpp \
+    dlgexportsaletoasoptions.cpp \
     dlgstoreutils.cpp \
         main.cpp \
         c5mainwindow.cpp \
@@ -259,6 +261,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Classes/c5storedraftwriter.h \
     ../Classes/c5threadobject.h \
     ../Classes/calculator.h \
+    ../Classes/doubledatabase.h \
     ../Classes/notificationwidget.h \
     ../Classes/proxytablewidgetdatabase.h \
     ../Controls/c5guicontrols.h \
@@ -396,6 +399,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Reports/cr5consumptionbysales.h \
     ../Reports/cr5consumptionbysalesfilter.h \
     dlgchangeoutputstore.h \
+    dlgexportsaletoasoptions.h \
     dlgstoreutils.h \
     rc.h \
     res.rc \
@@ -562,6 +566,7 @@ FORMS += \
     c5toolbarwidget.ui \
     c5waiterorder.ui \
     dlgchangeoutputstore.ui \
+    dlgexportsaletoasoptions.ui \
     dlgstoreutils.ui
 
 INCLUDEPATH += ../Cafe5

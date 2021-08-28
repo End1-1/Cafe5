@@ -44,82 +44,52 @@
     <name>QObject</name>
     <message>
         <location filename="dll.cpp" line="8"/>
-        <location filename="dll.cpp" line="28"/>
-        <source>Daily, common</source>
+        <location filename="dll.cpp" line="74"/>
+        <source>Daily, general</source>
+        <oldsource>Daily, common</oldsource>
         <translation>Ընդհանուր հաշվետվություն</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="43"/>
-        <source>Date</source>
-        <translation>Ամսաթիվ</translation>
-    </message>
-    <message>
-        <location filename="dll.cpp" line="46"/>
+        <location filename="dll.cpp" line="84"/>
         <source>Number of orders</source>
         <translation>Պատվերների քանակ</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="51"/>
+        <location filename="dll.cpp" line="91"/>
+        <location filename="dll.cpp" line="123"/>
         <source>Cash</source>
         <translation>Կանխիկ</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="57"/>
+        <location filename="dll.cpp" line="96"/>
+        <location filename="dll.cpp" line="128"/>
         <source>Card</source>
         <translation>Անկանխիկ</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="63"/>
+        <location filename="dll.cpp" line="101"/>
+        <location filename="dll.cpp" line="133"/>
         <source>Bank</source>
         <translation>Փոխանցում</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="69"/>
+        <location filename="dll.cpp" line="106"/>
+        <location filename="dll.cpp" line="138"/>
         <source>Other</source>
         <translation>Այլ</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="87"/>
-        <source>Other:</source>
-        <translation>Այլ՝</translation>
+        <location filename="dll.cpp" line="113"/>
+        <source>By staff</source>
+        <translation>Ըստ մատուցողների</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="97"/>
+        <location filename="dll.cpp" line="87"/>
         <source>Total amount</source>
         <translation>Ընդամենը</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="109"/>
-        <source>Total order quantity</source>
-        <translation>Ընդամենը, քանակ</translation>
-    </message>
-    <message>
-        <location filename="dll.cpp" line="113"/>
-        <source>Total cash</source>
-        <translation>Ընդամենը կանխիկ</translation>
-    </message>
-    <message>
-        <location filename="dll.cpp" line="118"/>
-        <source>Total card</source>
-        <translation>Ընդամենը, քարտ</translation>
-    </message>
-    <message>
-        <location filename="dll.cpp" line="123"/>
-        <source>Total bank</source>
-        <translation>Ընդամենը, փոխանցում</translation>
-    </message>
-    <message>
-        <location filename="dll.cpp" line="128"/>
-        <source>Total other</source>
-        <translation>Ընդամենը, այլ</translation>
-    </message>
-    <message>
-        <location filename="dll.cpp" line="133"/>
-        <source>Grand total</source>
-        <translation>Վերջնական</translation>
-    </message>
-    <message>
-        <location filename="dll.cpp" line="139"/>
+        <location filename="dll.cpp" line="148"/>
         <source>Printed</source>
         <translation>Տպված</translation>
     </message>

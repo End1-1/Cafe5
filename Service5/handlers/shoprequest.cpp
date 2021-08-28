@@ -477,53 +477,53 @@ bool ShopRequest::writeOutput(const QString &docId, QString &err, Database &db)
         totalList.append(db.doubleValue("f_total"));
     }
 
-    QList<QList<QVariant> > storeData;
+    QList<QMap<QString, QVariant> > storeData;
     db[":f_store"] = storeOut;
     db[":f_date"] = date;
-    if (!db.exec(QString("select s.f_id, s.f_goods, s.f_qtyleft, s.f_price, s.f_total*s.f_type, "
-                          "s.f_document, s.f_base "
-            "from a_store s "
-            "inner join a_header d on d.f_id=s.f_document "
-            "where s.f_goods in (%1) and s.f_store=:f_store and d.f_date<=:f_date "
-            "and s.f_qtyleft>0 "
-            "for update ").arg(goodsID.join(",")))) {
+    if (!db.exec(QString("select s.f_id, s.f_goods, sum(s.f_qty*s.f_type) as f_qty, s.f_price, s.f_total*s.f_type, "
+                         "s.f_document, s.f_base, d.f_date "
+                           "from a_store s "
+                           "inner join a_header d on d.f_id=s.f_document "
+                           "where s.f_goods in (%1) and s.f_store=:f_store and d.f_date<=:f_date "
+                           "group by s.f_base "
+                           "having sum(s.f_qty*s.f_type)>0 "
+                           "order by d.f_date "
+                           "for update ").arg(goodsID.join(",")))) {
         err = db.lastDbError() + "<br>";
         return false;
     }
     while (db.next()) {
-        QList<QVariant> r;
+        QMap<QString, QVariant> v;
         for (int i = 0; i < db.columnCount(); i++) {
-            r.append(db.value(i));
+            v[db.columnName(i)] = db.value(i);
         }
-        storeData.append(r);
+        storeData.append(v);
     }
-    QMap<QString, double> qtyleft;
     QList<QMap<QString, QVariant> > queries;
     for (int i = 0; i < goodsID.count(); i++) {
         double qty = qtyList.at(i);
         totalList[i] = 0;
         for (int j = 0; j < storeData.count(); j++) {
-            if (storeData.at(j).at(1).toInt() == goodsID.at(i).toInt()) {
-                if (storeData.at(j).at(2).toDouble() > 0) {
-                    if (storeData.at(j).at(2).toDouble() >= qty) {
-                        storeData[j][2] = storeData.at(j).at(2).toDouble() - qty;
+            if (storeData.at(j)["f_goods"].toInt() == goodsID.at(i).toInt()) {
+                if (storeData.at(j)["f_qty"].toDouble() > 0) {
+                    if (storeData.at(j)["f_qty"].toDouble() >= qty) {
+                        storeData[j]["f_qty"] = storeData.at(j)["f_qty"].toDouble() - qty;
                         QMap<QString, QVariant> newrec;
                         newrec[":f_document"] = docId;
                         newrec[":f_store"] = storeOut;
                         newrec[":f_type"] = -1;
                         newrec[":f_goods"] = goodsID.at(i).toInt();
                         newrec[":f_qty"] = qty;
-                        newrec[":f_price"] = storeData.at(j).at(3).toDouble();
-                        newrec[":f_total"] = storeData.at(j).at(3).toDouble() * qty;
-                        newrec[":f_base"] = storeData.at(j).at(6).toString();
-                        newrec[":f_basedoc"] = storeData.at(j).at(5);
+                        newrec[":f_price"] = storeData.at(j)["f_price"];
+                        newrec[":f_total"] = storeData.at(j)["f_price"].toDouble() * qty;
+                        newrec[":f_base"] = storeData.at(j)["f_base"].toString();
+                        newrec[":f_basedoc"] = storeData.at(j)["f_document"];
                         newrec[":f_reason"] = reason;
                         newrec[":f_draft"] = recID.at(i);
                         queries << newrec;
-                        amount += storeData.at(j).at(3).toDouble() * qty;
-                        totalList[i] = totalList[i] + (storeData.at(j).at(3).toDouble() * qty);
+                        amount += storeData.at(j)["f_price"].toDouble() * qty;
+                        totalList[i] = totalList[i] + (storeData.at(j)["f_price"].toDouble() * qty);
                         priceList[i] = totalList[i] / qtyList.at(i);
-                        qtyleft[storeData.at(j).at(0).toString()] = qty;
                         qty = 0;
                     } else {
                         QMap<QString, QVariant> newrec;
@@ -531,20 +531,19 @@ bool ShopRequest::writeOutput(const QString &docId, QString &err, Database &db)
                         newrec[":f_store"] = storeOut;
                         newrec[":f_type"] = -1;
                         newrec[":f_goods"] = goodsID.at(i).toInt();
-                        newrec[":f_qty"] = storeData.at(j).at(2).toDouble();
-                        newrec[":f_price"] = storeData.at(j).at(3).toDouble();
-                        newrec[":f_total"] = storeData.at(j).at(3).toDouble() * storeData.at(j).at(2).toDouble();
-                        newrec[":f_base"] = storeData.at(j).at(6).toString();
-                        newrec[":f_basedoc"] = storeData.at(j).at(5);
+                        newrec[":f_qty"] = storeData.at(j)["f_qty"].toDouble();
+                        newrec[":f_price"] = storeData.at(j)["f_price"].toDouble();
+                        newrec[":f_total"] = storeData.at(j)["f_price"].toDouble() * storeData.at(j)["f_qty"].toDouble();
+                        newrec[":f_base"] = storeData.at(j)["f_base"];
+                        newrec[":f_basedoc"] = storeData.at(j)["f_document"];
                         newrec[":f_reason"] = reason;
                         newrec[":f_draft"] = recID.at(i);
                         queries << newrec;
-                        totalList[i] = totalList[i] + (storeData.at(j).at(3).toDouble() * storeData.at(j).at(2).toDouble());
+                        totalList[i] = totalList[i] + (storeData.at(j)["f_qty"].toDouble() * storeData.at(j)["f_price"].toDouble());
                         priceList[i] = totalList[i] / qtyList.at(i);
-                        amount += storeData.at(j).at(3).toDouble() * storeData.at(j).at(2).toDouble();
-                        qtyleft[storeData.at(j).at(0).toString()] = storeData.at(j).at(2).toDouble();
-                        qty -= storeData.at(j).at(2).toDouble();
-                        storeData[j][2] = 0.0;
+                        amount += storeData.at(j)["f_qty"].toDouble() * storeData.at(j)["f_price"].toDouble();
+                        qty -= storeData.at(j)["f_qty"].toDouble();
+                        storeData[j]["f_qty"] = 0.0;
                     }
                 }
             }
@@ -567,11 +566,6 @@ bool ShopRequest::writeOutput(const QString &docId, QString &err, Database &db)
             db.setBindValues(*it);
             db[":f_id"] = newId;
             db.insert("a_store");
-        }
-        for (QMap<QString, double>::const_iterator it = qtyleft.begin(); it != qtyleft.end(); it++) {
-            db[":f_id"] = it.key();
-            db[":f_qtyleft"] = it.value();
-            db.exec("update a_store set f_qtyleft=f_qtyleft-:f_qtyleft where f_id=:f_id");
         }
 
         db[":f_document"] = docId;
@@ -596,7 +590,6 @@ bool ShopRequest::writeOutput(const QString &docId, QString &err, Database &db)
                     db[":f_document"] = docId;
                     db[":f_type"] = 1;
                     db[":f_store"] = storeIn;
-                    db[":f_qtyleft"] = db[":f_qty"];
                     if (!db.insert("a_store")) {
                         err = db.lastDbError();
                         return false;
@@ -615,7 +608,6 @@ bool ShopRequest::writeOutput(const QString &docId, QString &err, Database &db)
                 db[":f_type"] = 1;
                 db[":f_goods"] = complectCode;
                 db[":f_qty"] = complectQty;
-                db[":f_qtyleft"] = complectQty;
                 db[":f_price"] = amount / complectQty;
                 db[":f_total"] = amount;
                 db[":f_base"] = outId.at(0);

@@ -99,11 +99,7 @@ void CE5Goods::setId(int id)
         ui->tblGoods->lineEdit(row, 5)->setDouble(db.getDouble("f_lastinputprice"));
         ui->tblGoods->lineEdit(row, 6)->setDouble(db.getDouble("f_total"));
     }
-    db[":f_id"] = id;
-    db.exec("select * from c_goods_option where f_id=:f_id");
-    if (db.nextRow()) {
-        ui->chStoreInputBeforeSale->setChecked(db.getInt("f_storeinputbeforesale") == 1);
-    }
+
     db[":f_goods"] = ui->leCode->getInteger();
     db.exec("select f_id from c_goods_multiscancode where f_goods=:f_goods");
     while (db.nextRow()) {
@@ -156,12 +152,6 @@ bool CE5Goods::save(QString &err, QList<QMap<QString, QVariant> > &data)
     }
 
     /* Additional Options */
-    db[":f_id"] = ui->leCode->text();
-    db.exec("delete from c_goods_option where f_id=:f_id");
-    db[":f_id"] = ui->leCode->getInteger();
-    db[":f_storeinputbeforesale"] = ui->chStoreInputBeforeSale->isChecked() ? 1 : 0;
-    db.insert("c_goods_option");
-    ui->chEnabled->setChecked(true);
     fStrings.insert(ui->leName->text());
     static_cast<QStringListModel*>(ui->leName->completer()->model())->setStringList(fStrings.values());
 

@@ -2,6 +2,10 @@
 #include "ui_searchitems.h"
 #include "c5database.h"
 #include "c5config.h"
+#include "dlgreservgoods.h"
+#include "datadriver.h"
+#include "goodsreserve.h"
+#include <QDebug>
 
 SearchItems::SearchItems(QWidget *parent) :
     QDialog(parent),
@@ -9,6 +13,7 @@ SearchItems::SearchItems(QWidget *parent) :
 {
     ui->setupUi(this);
     showMaximized();
+    ui->tblReserve->setVisible(false);
 }
 
 SearchItems::~SearchItems()
@@ -18,25 +23,33 @@ SearchItems::~SearchItems()
 
 void SearchItems::on_btnSearch_clicked()
 {
+    ui->tblReserve->setVisible(false);
+    ui->tblReserve->clearContents();
+    ui->tbl->setVisible(true);
     ui->tbl->setRowCount(0);
     ui->leTotalQty->setDouble(0);
     if (ui->leCode->isEmpty()) {
         return;
     }
-    ui->tbl->setColumnWidths(ui->tbl->columnCount(), 200, 200, 200, 80, 100, 100, 100);
+    ui->tbl->setColumnWidths(ui->tbl->columnCount(), 200, 200, 200, 80, 100, 100, 100, 100, 0, 0);
     ui->tbl->setColumnHidden(4, __c5config.shopDenyF1());
     ui->tbl->setColumnHidden(5, __c5config.shopDenyF2());
     C5Database db(__c5config.replicaDbParams());
+    int goods = dbgoods->idOfScancode(ui->leCode->text());
     db[":f_date"] = QDate::currentDate();
-    db[":f_scancode"] = ui->leCode->text();
-    db.exec("select ss.f_name as f_storage,g.f_name as f_goods,g.f_scancode, "
-            "u.f_name as f_unit,g.f_saleprice,g.f_saleprice2, sum(s.f_qty*s.f_type) as f_qty "
+    db[":f_goods"] = goods;
+    db[":f_store"] = __c5config.defaultStore();
+    db[":f_reservestate"] = GR_RESERVED;
+    db.exec("select ss.f_name as f_storename,g.f_name as f_goodname,g.f_scancode, "
+            "u.f_name as f_unit,g.f_saleprice,g.f_saleprice2, sum(s.f_qty*s.f_type) as f_qty, "
+            "rs.f_qty as f_reserveqty, s.f_store, s.f_goods "
             "from a_store s "
             "inner join c_storages ss on ss.f_id=s.f_store "
             "inner join c_goods g on g.f_id=s.f_goods "
             "inner join c_units u on u.f_id=g.f_unit "
             "inner join a_header h on h.f_id=s.f_document  "
-            "where  h.f_date<=:f_date and g.f_scancode=:f_scancode "
+            "left join (select f_goods, sum(f_qty) as f_qty from a_store_reserve where f_state=:f_reservestate and f_store=:f_store and f_goods=:f_goods group by 1) rs on rs.f_goods=s.f_goods "
+            "where  h.f_date<=:f_date and s.f_goods=:f_goods "
             "group by ss.f_name,g.f_name,u.f_name,g.f_saleprice,g.f_saleprice2 "
             "having sum(s.f_qty*s.f_type) > 0");
     while (db.nextRow()) {
@@ -52,4 +65,78 @@ void SearchItems::on_btnSearch_clicked()
 void SearchItems::on_leCode_returnPressed()
 {
     on_btnSearch_clicked();
+}
+
+void SearchItems::on_btnReserve_clicked()
+{
+    int row = ui->tbl->currentRow();
+    if (row < 0) {
+        return;
+    }
+    DlgReservGoods r(ui->tbl->getInteger(row, tr("Store code")),
+                     ui->tbl->getInteger(row, tr("Goods code")),
+                     ui->tbl->getDouble(row, tr("Qty")) - ui->tbl->getDouble(row, tr("Reserved")), this);
+    r.exec();
+}
+
+void SearchItems::on_btnViewReservations_clicked()
+{
+    ui->tblReserve->setRowCount(0);
+    C5Database db(__c5config.replicaDbParams());
+    db[":f_reservestate"] = GR_RESERVED;
+    db.exec("select rs.f_id, arn.f_name as f_statename, rs.f_date, ss.f_name as f_sourcestore, sd.f_name as f_storename, "
+            "g.f_name as f_goodsname, g.f_scancode, "
+            "rs.f_qty, rs.f_message "
+            "from a_store_reserve rs "
+            "left join c_storages ss on ss.f_id=rs.f_source "
+            "left join c_storages sd on sd.f_id=rs.f_store "
+            "left join c_goods g on g.f_id=rs.f_goods "
+            "left join a_store_reserve_state arn on arn.f_id=rs.f_state "
+            "where rs.f_state=:f_reservestate "
+            "order by rs.f_date ");
+    while (db.nextRow()) {
+        int r = ui->tblReserve->addEmptyRow();
+        for (int i = 0; i < ui->tblReserve->columnCount(); i++) {
+            ui->tblReserve->setData(r, i, db.getValue(i));
+        }
+    }
+    ui->tbl->setVisible(false);
+    ui->tbl->clearContents();
+    ui->tblReserve->setColumnWidths(ui->tblReserve->columnCount(), 0, 120, 120, 200, 200, 200, 120, 80, 200);
+    ui->tblReserve->setVisible(true);
+}
+
+void SearchItems::on_btnViewAllReservations_clicked()
+{
+    ui->tblReserve->setRowCount(0);
+    C5Database db(__c5config.replicaDbParams());
+    db.exec("select rs.f_id, arn.f_name as f_statename, rs.f_date, ss.f_name as f_sourcestore, sd.f_name as f_storename, "
+            "g.f_name as f_goodsname, g.f_scancode, "
+            "rs.f_qty, rs.f_message "
+            "from a_store_reserve rs "
+            "left join c_storages ss on ss.f_id=rs.f_source "
+            "left join c_storages sd on sd.f_id=rs.f_store "
+            "left join c_goods g on g.f_id=rs.f_goods "
+            "left join a_store_reserve_state arn on arn.f_id=rs.f_state "
+            "order by rs.f_date ");
+    while (db.nextRow()) {
+        int r = ui->tblReserve->addEmptyRow();
+        for (int i = 0; i < ui->tblReserve->columnCount(); i++) {
+            ui->tblReserve->setData(r, i, db.getValue(i));
+        }
+    }
+    ui->tbl->setVisible(false);
+    ui->tbl->clearContents();
+    ui->tblReserve->setColumnWidths(ui->tblReserve->columnCount(), 0, 120, 120, 200, 200, 200, 120, 80, 200);
+    ui->tblReserve->setVisible(true);
+}
+
+void SearchItems::on_btnEditReserve_clicked()
+{
+    int r = ui->tblReserve->currentRow();
+    if (r < 0) {
+        return;
+    }
+    DlgReservGoods rg(ui->tblReserve->getInteger(r, "id"), this);
+    rg.exec();
 }

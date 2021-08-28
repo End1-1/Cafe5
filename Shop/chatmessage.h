@@ -1,0 +1,6 @@
+#ifndef CHATMESSAGE_H
+#define CHATMESSAGE_H
+
+#define MSG_GOODS_RESERVE 1
+
+#endif // CHATMESSAGE_H

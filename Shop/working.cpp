@@ -2,22 +2,26 @@
 #include "ui_working.h"
 #include "worder.h"
 #include "c5database.h"
-#include "goods.h"
+#include "datadriver.h"
 #include "printtaxn.h"
 #include "sales.h"
 #include "c5replication.h"
 #include "c5config.h"
 #include "c5user.h"
 #include "loghistory.h"
+#include "dlggoodslist.h"
 #include "dlgpin.h"
 #include "searchitems.h"
 #include "c5connection.h"
+#include "goodsreserve.h"
 #include "c5logsystem.h"
 #include "storeinput.h"
 #include "selectstaff.h"
 #include "threadcheckmessage.h"
+#include "chatmessage.h"
 #include "threadreadmessage.h"
 #include "c5printing.h"
+#include "c5tablewidget.h"
 #include <QShortcut>
 #include <QInputDialog>
 #include <QKeyEvent>
@@ -25,8 +29,6 @@
 #include <QProcess>
 #include <QSettings>
 
-QMap<QString, Goods> Working::fGoods;
-QHash<int, QString> Working::fGoodsCodeForPrint;
 QHash<QString, int> Working::fGoodsRows;
 QHash<QString, QString> Working::fMultiscancode;
 QMap<QString, double> Working::fUnitDefaultQty;
@@ -66,7 +68,7 @@ Working::Working(QWidget *parent) :
     connect(sDown, SIGNAL(activated()), this, SLOT(shortcutDown()));
     connect(sUp, SIGNAL(activated()), this, SLOT(shortcutUp()));
     connect(sEsc, SIGNAL(activated()), this, SLOT(escape()));
-    makeWGoods();
+
     ui->leCode->installEventFilter(this);
     ui->tab->installEventFilter(this);
     ui->wGoods->setVisible(false);
@@ -82,6 +84,15 @@ Working::Working(QWidget *parent) :
     fHaveChanges = false;
     fUpFinished = true;
     fTab = ui->tab;
+
+    C5Database db(__c5config.dbParams());
+    db.exec("select m.f_id, g.f_scancode from c_goods_multiscancode m "
+            "inner join c_goods g on g.f_id=m.f_goods "
+            "where length(g.f_scancode)>0");
+    fMultiscancode.clear();
+    while (db.nextRow()) {
+        fMultiscancode[db.getString(0)] = db.getString(1);
+    }
 
     restoreSales();
 }
@@ -259,15 +270,6 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
     return QWidget::eventFilter(watched, event);
 }
 
-QString Working::goodsCode(int code) const
-{
-    if (fGoodsCodeForPrint.contains(code)) {
-        return fGoodsCodeForPrint[code] + " ";
-    } else {
-        return "";
-    }
-}
-
 bool Working::getAdministratorRights(int right)
 {
     if (__usergroup == 1) {
@@ -304,186 +306,13 @@ bool Working::getAdministratorRights(int right)
     return true;
 }
 
-void Working::decQty(const IGoods &g)
+void Working::decQty(int id, double qty)
 {
-    QString code = fGoodsCodeForPrint[g.goodsId];
-    int row = fGoodsRows[code];
-    ui->tblGoods->setDouble(row, 14, ui->tblGoods->getDouble(row, 14) - g.goodsQty);
-    fGoods[code].fQty -= g.goodsQty;
-}
-
-void Working::makeWGoods()
-{
-    QList<int> cw;
-    //cw << 0 << 100 << 200 << 200 << 300 << 80 << 80 << 80 << 100 << 100 << 100 << 100 << 0 << 0 << 80;
-    cw << 0 << 150 << 0 << 200 << 400 << 80 << 80 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 80 << 0;
-    for (int i = 0; i < cw.count(); i++) {
-        ui->tblGoods->setColumnWidth(i, cw.at(i));
-    }
-    ui->tblGoods->setColumnHidden(5, __c5config.shopDenyF1());
-    ui->tblGoods->setColumnHidden(6, __c5config.shopDenyF2());
-    ui->lbTotalRetail->setVisible(!__c5config.shopDenyF1());
-    ui->leTotalRetail->setVisible(!__c5config.shopDenyF1());
-    ui->lbTotalWhosale->setVisible(!__c5config.shopDenyF2());
-    ui->leTotalWhosale->setVisible(!__c5config.shopDenyF2());
-    ui->tblGoods->verticalHeader()->setDefaultSectionSize(30);
-    ui->tblGoods->clearContents();
-    ui->tblGoods->setRowCount(0);
-    int row = 0;
-    fGoods.clear();
-    fGoodsCodeForPrint.clear();
-    C5Database db(C5Config::dbParams());
-
-    db[":f_enabled"] = 1;
-    db.exec("select * from o_flags where f_enabled=:f_enabled");
-    fFlags.clear();
-    while (db.nextRow()) {
-        Flag f;
-        f.id = db.getInt("f_id");
-        f.field = db.getString("f_field");
-        f.name = db.getString("f_name");
-        fFlags[f.id] = f;
-    }
-
-
-    db[":f_store"] = C5Config::defaultStore();
-    db[":f_date"] = QDate::currentDate();
-    db[":f_state"] = DOC_STATE_SAVED;
-    if (!db.exec("select g.f_id, g.f_scancode, cp.f_taxname, gg.f_name as f_groupname, g.f_name as f_goodsname, "
-            "g.f_saleprice, g.f_saleprice2, u.f_name as f_unitname, "
-            "gca.f_name as group1, gcb.f_name group2, gcc.f_name as group3, gcd.f_name as group4, "
-            "gg.f_taxdept, gg.f_adgcode, sum(s.f_qtyleft) as f_qty, g.f_unit, "
-            "go.f_storeinputbeforesale, g.f_wholenumber, g.f_storeid, g.f_lastinputprice "
-            "from a_store s "
-            "inner join c_goods g on g.f_storeid=s.f_goods "
-            "inner join c_groups gg on gg.f_id=g.f_group "
-            "inner join c_units u on u.f_id=g.f_unit "
-            "left join c_goods_classes gca on gca.f_id=g.f_group1 "
-            "left join c_goods_classes gcb on gcb.f_id=g.f_group2 "
-            "left join c_goods_classes gcc on gcc.f_id=g.f_group3 "
-            "left join c_goods_classes gcd on gcd.f_id=g.f_group4 "
-            "left join c_goods_option go on go.f_id=g.f_id  "
-            "left join c_partners cp on cp.f_id=g.f_supplier "
-            "inner join a_header h on h.f_id=s.f_document "
-            "where h.f_date<=:f_date and s.f_store=:f_store and h.f_state=:f_state and g.f_enabled=1 "
-            "and s.f_qtyleft>0 "
-            "group by g.f_id,gg.f_name,g.f_name,g.f_lastinputprice,g.f_saleprice ")) {
-        C5Message::error(db.fLastError);
-        return;
-    }
-
-
-    ui->tblGoods->setRowCount(db.rowCount());
-    ui->leTotalRetail->setDouble(0);
-    ui->leTotalRetail->setDouble(0);
-    fGoods.clear();
-    while (db.nextRow()) {
-        Goods g;
-        g.fScanCode = db.getString("f_scancode");
-        g.fCode = db.getString("f_id");
-        g.fName = db.getString("f_goodsname");
-        g.fUnit = db.getString("f_unitname");
-        g.fUnitCode = db.getInt("f_unit");
-        g.fRetailPrice = db.getDouble("f_saleprice");
-        g.fWhosalePrice = db.getDouble("f_saleprice2");
-        g.fTaxDept = db.getInt("f_taxdept");
-        g.fAdgCode = db.getString("f_adgcode");
-        g.fQty = db.getDouble("f_qty");
-        g.fIsService = false;
-        g.fStoreInputBeforeSale = db.getInt("f_storeinputbeforesale") == 1;
-        g.fWholeNumber = db.getInt("f_wholenumber") == 1;
-        g.fStoreId = db.getInt("f_storeid");
-        g.fLastInputPrice = db.getDouble("f_lastinputprice");
-        fGoods[g.fScanCode] = g;
-        fGoodsCodeForPrint[g.fCode.toInt()] = g.fScanCode;
-        fGoodsRows[g.fScanCode] = row;
-        for (int i = 0; i < db.columnCount(); i++) {
-            QTableWidgetItem *item = new QTableWidgetItem();
-            item->setData(Qt::EditRole, db.getValue(i));
-            ui->tblGoods->setItem(row, i, item);
-        }
-        ui->leTotalRetail->setDouble(ui->leTotalRetail->getDouble() + (g.fRetailPrice * g.fQty));
-        ui->leTotalWhosale->setDouble(ui->leTotalWhosale->getDouble() + (g.fWhosalePrice * g.fQty));
-        row++;
-    }
-    //services
-    if (!db.exec("select gs.f_id, gs.f_scancode, cp.f_taxname, gr.f_name as f_groupname, gs.f_name as f_goodsname,  "
-            "gs.f_saleprice, gs.f_saleprice2, gu.f_name as f_unitname, "
-            "gca.f_name as group1, gcb.f_name group2, gcc.f_name as group3, gcd.f_name as group4, "
-            "gr.f_taxdept, gr.f_adgcode, 0 as f_qty, gs.f_unit, go.f_storeinputbeforesale, "
-            "gs.f_service, gs.f_wholenumber, gs.f_lastinputprice, gs.f_storeid "
-            "from c_goods gs "
-            "left join c_groups gr on gr.f_id=gs.f_group "
-            "left join c_units gu on gu.f_id=gs.f_unit "
-            "left join c_partners cp on cp.f_id=gs.f_supplier "
-            "left join c_goods_classes gca on gca.f_id=gs.f_group1 "
-            "left join c_goods_classes gcb on gcb.f_id=gs.f_group2 "
-            "left join c_goods_classes gcc on gcc.f_id=gs.f_group3 "
-            "left join c_goods_classes gcd on gcd.f_id=gs.f_group4 "
-            "left join c_goods_option go on go.f_id=gs.f_id  "
-            "where gs.f_enabled=1 and gs.f_service=1  "
-                 "order by gr.f_name, gca.f_name ")) {
-        C5Message::error(db.fLastError);
-        return;
-    }
-    //ui->tblGoods->setRowCount(ui->tblGoods->rowCount() + db.rowCount());
-    while (db.nextRow()) {
-        ui->tblGoods->setRowCount(ui->tblGoods->rowCount() + 1);
-        Goods g;
-        g.fScanCode = db.getString("f_scancode");
-        g.fCode = db.getString("f_id");
-        g.fName = db.getString("f_goodsname");
-        g.fUnit = db.getString("f_unitname");
-        g.fUnitCode = db.getInt("f_unit");
-        g.fRetailPrice = db.getDouble("f_saleprice");
-        g.fWhosalePrice = db.getDouble("f_saleprice2");
-        g.fTaxDept = db.getInt("f_taxdept");
-        g.fAdgCode = db.getString("f_adgcode");
-        g.fQty = db.getDouble("f_qty");
-        g.fIsService = db.getInt("f_service") > 0;
-        g.fStoreId = db.getInt("f_storeid");
-        g.fStoreInputBeforeSale = db.getInt("f_storeinputbeforesale");
-        g.fWholeNumber = db.getInt("f_wholenumber") == 1;
-        g.fLastInputPrice = db.getDouble("f_lastinputprice");
-        fGoods[g.fScanCode] = g;
-        fGoodsCodeForPrint[g.fCode.toInt()] = g.fScanCode;
-        for (int i = 0; i < db.columnCount(); i++) {
-            QTableWidgetItem *item = new QTableWidgetItem();
-            item->setData(Qt::EditRole, db.getValue(i));
-            ui->tblGoods->setItem(row, i, item);
-        }
-        ui->leTotalRetail->setDouble(ui->leTotalRetail->getDouble() + (g.fRetailPrice * g.fQty));
-        ui->leTotalWhosale->setDouble(ui->leTotalWhosale->getDouble() + (g.fWhosalePrice * g.fQty));
-        row++;
-    }
-
-    db.exec("select m.f_id, g.f_scancode from c_goods_multiscancode m "
-            "inner join c_goods g on g.f_id=m.f_goods "
-            "where length(g.f_scancode)>0");
-    fMultiscancode.clear();
-    while (db.nextRow()) {
-        fMultiscancode[db.getString(0)] = db.getString(1);
-    }
-
-    fUnitDefaultQty.clear();
-    db.exec("select f_name, f_defaultqty from c_units");
-    while (db.nextRow()) {
-        fUnitDefaultQty[db.getString(0)] = db.getDouble(1);
-    }
-
-    ui->lbLastUpdate->setText(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
-}
-
-int Working::storeId(int id)
-{
-    if (!fGoodsCodeForPrint.contains(id)) {
-        return 0;
-    }
-    QString s = fGoodsCodeForPrint[id];
-    if (!fGoods.contains(s)) {
-        return 0;
-    }
-    return fGoods[s].fStoreId;
+    C5Database db(__c5config.dbParams());
+    db[":f_goods"] = id;
+    db[":f_store"] = __c5config.defaultStore();
+    db[":f_qty"] = qty;
+    db.exec("update a_store_sale set f_qty=f_qty+:f_qty where f_goods=:f_goods and f_store=:f_store");
 }
 
 Flag Working::flag(int id)
@@ -541,62 +370,25 @@ void Working::addGoods(QString &code)
         w->discountRow(code);
         return;
     }
-    Goods g;
-    g.fCode = "0";
-    if (fGoods.contains(code)) {
-        g = fGoods[code];
-    } if (fMultiscancode.contains(code)) {
-        QString mcode = fMultiscancode[code];
-        if (fGoods.contains(mcode)) {
-            g = fGoods[mcode];
+    int id = dbgoods->idOfScancode(code);
+    if (id == 0) {
+        if (fMultiscancode.contains(code)) {
+            QString mcode = fMultiscancode[code];
+            id = dbgoods->idOfScancode(mcode);
         }
     }
-    if (g.fCode == "0") {
-        if (w->fSaleType == SALE_PREORDER) {
-            C5Database db(__c5config.dbParams());
-            db[":f_scancode"] = code;
-            db.exec("select gs.f_id, gs.f_scancode, cp.f_taxname, gr.f_name as f_groupname, gs.f_name as f_goodsname,  "
-                      "gs.f_saleprice, gs.f_saleprice2, gu.f_name as f_unitname, "
-                      "gca.f_name as group1, gcb.f_name group2, gcc.f_name as group3, gcd.f_name as group4, "
-                      "gr.f_taxdept, gr.f_adgcode, 0 as f_qty, gs.f_unit, gs.f_service, gs.f_wholenumber "
-                      "from c_goods gs "
-                      "left join c_groups gr on gr.f_id=gs.f_group "
-                      "left join c_units gu on gu.f_id=gs.f_unit "
-                      "left join c_partners cp on cp.f_id=gs.f_supplier "
-                      "left join c_goods_classes gca on gca.f_id=gs.f_group1 "
-                      "left join c_goods_classes gcb on gcb.f_id=gs.f_group2 "
-                      "left join c_goods_classes gcc on gcc.f_id=gs.f_group3 "
-                      "left join c_goods_classes gcd on gcd.f_id=gs.f_group4 "
-                      "where gs.f_enabled=1 and gs.f_scancode=:f_scancode "
-                      "order by gr.f_name, gca.f_name ");
-            if (db.nextRow()) {
-                g.fScanCode = db.getString("f_scancode");
-                g.fCode = db.getString("f_id");
-                g.fName = db.getString("f_goodsname");
-                g.fUnit = db.getString("f_unitname");
-                g.fUnitCode = db.getInt("f_unit");
-                g.fRetailPrice = db.getDouble("f_saleprice");
-                g.fWhosalePrice = db.getDouble("f_saleprice2");
-                g.fTaxDept = db.getInt("f_taxdept");
-                g.fAdgCode = db.getString("f_adgcode");
-                g.fQty = fUnitDefaultQty[db.getString("f_unitname")];
-                g.fIsService = db.getInt("f_service") == 1;
-                g.fWholeNumber = db.getInt("f_wholenumber") == 1;
-            }
-        }
-    }
-    if (g.fCode.toInt() == 0) {
+    if (id == 0) {
         ls(tr("Invalid code entered: ") + code);
         return;
     }
-    g.fQty = fUnitDefaultQty[g.fUnit];
+
     switch (w->fSaleType) {
     case SALE_RETAIL:
     case SALE_WHOSALE:
-        w->addGoods(g);
+        w->addGoods(id);
         break;
     case SALE_PREORDER:
-        w->addGoodsToTable(g);
+        w->addGoodsToTable(id);
         break;
     }
 }
@@ -749,12 +541,47 @@ void Working::threadMessageData(int code, const QVariant &data)
     p.br(img.height() / 2);
     for (int i = 0; i < jo["messages"].toArray().count(); i++) {
         QJsonObject jom = jo["messages"].toArray().at(i).toObject();
-        p.ltext(jom["message"].toString(), 0);
-        p.br();
-        p.br();
-        p.line();
-        p.br();
-        C5Message::info(jom["message"].toString());
+        qDebug() << jom;
+        QJsonParseError jerr;
+        QJsonDocument jdocmsg = QJsonDocument::fromJson(jom["message"].toString().toUtf8(), &jerr);
+        if (jerr.error == QJsonParseError::NoError) {
+            QJsonObject jjm = jdocmsg.object();
+            switch (jjm["action"].toInt()) {
+            case MSG_GOODS_RESERVE:
+                p.ltext(tr("Goods reserved"), 0);
+                p.br();
+                p.ltext(jjm["goodsname"].toString(), 0);
+                p.br();
+                p.ltext(jjm["scancode"].toString(), 0);
+                p.br();
+                p.ltext(QString("%1 %2").arg(jjm["qty"].toDouble()).arg(jjm["unit"].toString()), 0);
+                p.br();
+                p.ltext(jjm["usermessage"].toString(), 0);
+                p.br();
+                p.ltext(QString("%1 %2").arg(tr("End date")).arg(jjm["enddate"].toString()), 0);
+                p.br();
+                p.br();
+                p.line();
+                p.br();
+                C5Message::info(QString("%1<br>%2<br>%3<br>%4<br>%5<br>%6")
+                                .arg(tr("Goods reserved"))
+                                .arg(jjm["goodsname"].toString())
+                                .arg(jjm["scancode"].toString())
+                                .arg(QString("%1 %2").arg(jjm["qty"].toDouble()).arg(jjm["unit"].toString()))
+                                .arg(jjm["usermessage"].toString())
+                                .arg(QString("%1 %2").arg(tr("End date")).arg(jjm["enddate"].toString())));
+                break;
+            default:
+                break;
+            }
+        } else {
+            p.ltext(jom["message"].toString(), 0);
+            p.br();
+            p.br();
+            p.line();
+            p.br();
+            C5Message::info(jom["message"].toString());
+        }
     }
     p.br();
     p.br();
@@ -763,15 +590,10 @@ void Working::threadMessageData(int code, const QVariant &data)
     p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
     auto *trm = new ThreadReadMessage(jo["idlist"].toString());
     trm->start();
-    makeWGoods();
 }
 
 void Working::escape()
 {
-    if (ui->tblGoods->isVisible()) {
-        ui->wGoods->setVisible(!ui->wGoods->isVisible());
-        ui->tab->setVisible(!ui->wGoods->isVisible());
-    }
     ui->leCode->clear();
 }
 
@@ -851,46 +673,20 @@ void Working::shortcutF12()
 
 void Working::shortcutDown()
 {
-    if (ui->tblGoods->isVisible()) {
-        bool stop = false;
-        do {
-            if (ui->tblGoods->currentRow() == ui->tblGoods->rowCount() - 1) {
-                break;
-            }
-            ui->tblGoods->setCurrentCell(ui->tblGoods->currentRow() + 1, 0);
-            if (!ui->tblGoods->isRowHidden(ui->tblGoods->currentRow())) {
-                stop = true;
-            }
-        } while (!stop);
-    } else {
-        WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
-        if (!w) {
-            return;
-        }
-        w->nextRow();
+    WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
+    if (!w) {
+        return;
     }
+    w->nextRow();
 }
 
 void Working::shortcutUp()
 {
-    if (ui->tblGoods->isVisible()) {
-        bool stop = false;
-        do {
-            if (ui->tblGoods->currentRow() == 0) {
-                break;
-            }
-            ui->tblGoods->setCurrentCell(ui->tblGoods->currentRow() - 1, 0);
-            if (!ui->tblGoods->isRowHidden(ui->tblGoods->currentRow())) {
-                stop = true;
-            }
-        } while (!stop);
-    } else {
-        WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
-        if (!w) {
-            return;
-        }
-        w->prevRow();
+    WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
+    if (!w) {
+        return;
     }
+    w->prevRow();
 }
 
 void Working::haveChanges(bool v)
@@ -922,36 +718,26 @@ void Working::on_btnConnection_clicked()
 
 void Working::on_leCode_returnPressed()
 {
-    if (ui->tblGoods->isVisible()) {
-        int row = ui->tblGoods->currentRow();
-        if (row > -1) {
-            QString code = ui->tblGoods->item(row, 1)->data(Qt::EditRole).toString();
-            if (!code.isEmpty()) {
-                addGoods(code);
-            }
-        }
-    } else {
-        QString code = ui->leCode->text();
-        if (code.mid(0, 2) == "23") {
-            if (code.length() != 13) {
-                addGoods(code);
-                return;
-            }
-            QString code2 = QString("%1").arg(code.mid(2, 5).toInt());
-            QString qtyStr = code.mid(7,5);
-            addGoods(code2);
-            WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
-            if (!w) {
-                return;
-            }
-            int row = w->lastRow();
-            if (row < 0) {
-                return;
-            }
-            w->setQtyOfRow(row, qtyStr.toDouble() / 1000);
-        } else {
+    QString code = ui->leCode->text();
+    if (code.mid(0, 2) == "23") {
+        if (code.length() != 13) {
             addGoods(code);
+            return;
         }
+        QString code2 = QString("%1").arg(code.mid(2, 5).toInt());
+        QString qtyStr = code.mid(7,5);
+        addGoods(code2);
+        WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
+        if (!w) {
+            return;
+        }
+        int row = w->lastRow();
+        if (row < 0) {
+            return;
+        }
+        w->setQtyOfRow(row, qtyStr.toDouble() / 1000);
+    } else {
+        addGoods(code);
     }
 }
 
@@ -1002,9 +788,10 @@ void Working::on_btnExit_clicked()
 
 void Working::on_btnShowGoodsList_clicked()
 {
-    ui->wGoods->setVisible(!ui->wGoods->isVisible());
-    ui->tab->setVisible(!ui->wGoods->isVisible());
-    __s.setValue("goodslist", false);
+    int id;
+    if (DlgGoodsList::getGoods(id)) {
+
+    }
 }
 
 void Working::on_tblGoods_itemClicked(QTableWidgetItem *item)
@@ -1025,14 +812,11 @@ void Working::on_btnDuplicateReceipt_clicked()
     if (!getAdministratorRights(cp_t5_refund_goods)) {
         return;
     }
-    Sales::showSales(this);
+    Sales::showSales();
 }
 
 void Working::on_leCode_textChanged(const QString &arg1)
 {
-    if (!ui->tblGoods->isVisible()) {
-        return;
-    }
     if (arg1 == "+") {
         return;
     }
@@ -1041,23 +825,6 @@ void Working::on_leCode_textChanged(const QString &arg1)
     }
     if (arg1 == "*") {
         return;
-    }
-    bool selectRow = false;
-    for (int r = 0; r < ui->tblGoods->rowCount(); r++) {
-        for (int c = 1; c < ui->tblGoods->columnCount(); c++) {
-            QTableWidgetItem *item = ui->tblGoods->item(r, c);
-            if (item->data(Qt::EditRole).toString().contains(arg1, Qt::CaseInsensitive)) {
-                ui->tblGoods->setRowHidden(r, false);
-                if (!selectRow) {
-                    selectRow = true;
-                    ui->tblGoods->setCurrentCell(r, 0);
-                }
-                goto C;
-            }
-        }
-        ui->tblGoods->setRowHidden(r, true);
-        C:
-        continue;
     }
 }
 
@@ -1115,7 +882,7 @@ void Working::on_btnItemBack_clicked()
     if (!getAdministratorRights(cp_t5_refund_goods)) {
         return;
     }
-    Sales::showSales(this);
+    Sales::showSales();
 }
 
 void Working::on_btnStoreInput_clicked()

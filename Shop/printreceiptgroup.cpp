@@ -116,7 +116,7 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
     QFont font(qApp->font());
     font.setPointSize(20);
     C5Printing p;
-    p.setSceneParams(650, 2800, QPrinter::Portrait);
+    p.setSceneParams(600, 2800, QPrinter::Portrait);
     p.setFont(font);
     p.br(2);
     if (!saletype.isEmpty()) {
@@ -359,7 +359,7 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
     QFont font(qApp->font());
     font.setPointSize(20);
     C5Printing p;
-    p.setSceneParams(650, 2800, QPrinter::Portrait);
+    p.setSceneParams(600, 2800, QPrinter::Portrait);
     p.setFont(font);
     p.br(2);
     if (!saletype.isEmpty()) {

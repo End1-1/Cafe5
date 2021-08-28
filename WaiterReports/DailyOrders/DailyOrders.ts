@@ -54,37 +54,37 @@
         <translation>Ժամանակաշրջան</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="71"/>
+        <location filename="dll.cpp" line="72"/>
         <source>Total order quantity</source>
         <translation>Պատվերների քանակ</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="75"/>
+        <location filename="dll.cpp" line="76"/>
         <source>Total cash</source>
         <translation>Կանխիկ</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="80"/>
+        <location filename="dll.cpp" line="81"/>
         <source>Total card</source>
         <translation>Անկանխիկ</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="85"/>
+        <location filename="dll.cpp" line="86"/>
         <source>Total bank</source>
         <translation>Փոխանցում</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="90"/>
+        <location filename="dll.cpp" line="91"/>
         <source>Total other</source>
         <translation>Այլ</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="95"/>
+        <location filename="dll.cpp" line="96"/>
         <source>Grand total</source>
         <translation>Ընդամենը</translation>
     </message>
     <message>
-        <location filename="dll.cpp" line="101"/>
+        <location filename="dll.cpp" line="102"/>
         <source>Printed</source>
         <translation>Տպված</translation>
     </message>

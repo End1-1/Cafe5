@@ -86,7 +86,6 @@ int main(int argc, char *argv[])
     C5Config::fDBPassword = connectionParams.at(3);
     C5Config::fSettingsName = connectionParams.at(4);
     C5Config::initParamsFromDb();
-    C5Database::uuid(C5Config::dbParams());
 
     QFile file(d.homePath() + "/" + _APPLICATION_ + "/lock.pid");
     file.remove();
@@ -152,6 +151,7 @@ int main(int argc, char *argv[])
     }
     __userid = ua.id();
     Working w;
+    w.setWindowTitle(dbhall->name(__c5config.defaultHall()) + "," + dbstore->name(__c5config.defaultStore()));
     __c5config.fParentWidget = &w;
     C5Dialog::setMainWindow(&w);
     w.showMaximized();

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>701</width>
+    <width>866</width>
     <height>682</height>
    </rect>
   </property>
@@ -65,42 +65,287 @@
     </widget>
    </item>
    <item>
-    <widget class="C5TableWidget" name="tbl">
-     <column>
-      <property name="text">
-       <string>Store</string>
+    <widget class="QWidget" name="widget_4" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <property name="leftMargin">
+       <number>0</number>
       </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Goods</string>
+      <property name="topMargin">
+       <number>0</number>
       </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Code</string>
+      <property name="rightMargin">
+       <number>0</number>
       </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Unit</string>
+      <property name="bottomMargin">
+       <number>0</number>
       </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Retail price</string>
+      <item>
+       <widget class="C5TableWidget" name="tbl">
+        <column>
+         <property name="text">
+          <string>Store</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Goods</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Code</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Unit</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Retail price</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Whosale price</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Qty</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Reserved</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Store Code</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Goods Code</string>
+         </property>
+        </column>
+       </widget>
+      </item>
+      <item>
+       <widget class="C5TableWidget" name="tblReserve">
+        <column>
+         <property name="text">
+          <string>ID</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>State</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Date</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Source</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Store</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Name</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Scancode</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Qty</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Message</string>
+         </property>
+        </column>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="widget_3" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <property name="leftMargin">
+       <number>0</number>
       </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Whosale price</string>
+      <property name="topMargin">
+       <number>0</number>
       </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Qty</string>
+      <property name="rightMargin">
+       <number>0</number>
       </property>
-     </column>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QToolButton" name="btnReserve">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Reserve
+</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/reserve.png</normaloff>:/reserve.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>35</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonTextUnderIcon</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="btnViewReservations">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>View
+reservations</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/reserve.png</normaloff>:/reserve.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>35</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonTextUnderIcon</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="btnViewAllReservations">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>View all
+reservations</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/reserve.png</normaloff>:/reserve.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>35</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonTextUnderIcon</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="btnEditReserve">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Edit
+reservation</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/reserve.png</normaloff>:/reserve.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>35</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonTextUnderIcon</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>554</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>

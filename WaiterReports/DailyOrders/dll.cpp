@@ -29,7 +29,8 @@ void json(C5Database &db, const QJsonObject &params, QJsonArray &jarr)
     p.ctext(QObject::tr("Date range"));
     p.br();
     //p.ctext(params["date1"].toString() + " - " + params["date2"].toString());
-    p.ctext(QDate::fromString(params["date1"].toString(), FORMAT_DATE_TO_STR_MYSQL).toString(FORMAT_DATE_TO_STR) + " - " + QDate::fromString(params["date2"].toString(), FORMAT_DATE_TO_STR_MYSQL).toString(FORMAT_DATE_TO_STR));
+    p.ctext(QDate::fromString(params["date1"].toString(), FORMAT_DATE_TO_STR_MYSQL).toString(FORMAT_DATE_TO_STR)
+            + " - " + QDate::fromString(params["date2"].toString(), FORMAT_DATE_TO_STR_MYSQL).toString(FORMAT_DATE_TO_STR));
     p.br();
     p.br();
     p.line();
@@ -41,8 +42,8 @@ void json(C5Database &db, const QJsonObject &params, QJsonArray &jarr)
             other = 0.0;
     while (db.nextRow()) {
         p.br();
-        p.ltext(QString("%1/%2/%3 %3")
-                .arg(db.getString("f_id"))
+        p.ltext(QString("%1/%2/%3")
+                //.arg(db.getString("f_id"))
                 .arg(db.getString("tablename"))
                 .arg(db.getDate("f_dateclose").toString(FORMAT_DATE_TO_STR))
                 .arg(db.getTime("f_timeclose").toString(FORMAT_TIME_TO_STR)), 5);

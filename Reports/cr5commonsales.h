@@ -21,6 +21,8 @@ protected:
 
 private slots:
     void transferToRoom();
+
+    void exportToAS();
 };
 
 #endif // CR5COMMONSALES_H

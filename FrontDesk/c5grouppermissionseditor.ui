@@ -157,7 +157,7 @@
        <string>Sales</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_3">
-       <item row="20" column="0">
+       <item row="21" column="0">
         <widget class="C5CheckBox" name="checkBox_42">
          <property name="text">
           <string>Payment, complimentary</string>
@@ -167,7 +167,7 @@
          </property>
         </widget>
        </item>
-       <item row="17" column="0">
+       <item row="18" column="0">
         <widget class="C5CheckBox" name="checkBox_9">
          <property name="text">
           <string>Mutliple receipt</string>
@@ -177,7 +177,7 @@
          </property>
         </widget>
        </item>
-       <item row="25" column="0">
+       <item row="26" column="0">
         <widget class="C5CheckBox" name="checkBox_74">
          <property name="text">
           <string>Delete row from shop</string>
@@ -187,7 +187,7 @@
          </property>
         </widget>
        </item>
-       <item row="8" column="0">
+       <item row="9" column="0">
         <widget class="C5CheckBox" name="checkBox_87">
          <property name="text">
           <string>Edit preorder</string>
@@ -197,7 +197,7 @@
          </property>
         </widget>
        </item>
-       <item row="7" column="0">
+       <item row="8" column="0">
         <widget class="C5CheckBox" name="checkBox_81">
          <property name="text">
           <string>Edit stoplist</string>
@@ -207,7 +207,7 @@
          </property>
         </widget>
        </item>
-       <item row="23" column="0">
+       <item row="24" column="0">
         <widget class="C5CheckBox" name="checkBox_54">
          <property name="text">
           <string>Refund goods (Shop)</string>
@@ -217,7 +217,7 @@
          </property>
         </widget>
        </item>
-       <item row="11" column="0">
+       <item row="12" column="0">
         <widget class="C5CheckBox" name="checkBox_84">
          <property name="text">
           <string>Print precheck</string>
@@ -227,7 +227,7 @@
          </property>
         </widget>
        </item>
-       <item row="24" column="0">
+       <item row="25" column="0">
         <widget class="C5CheckBox" name="checkBox_60">
          <property name="text">
           <string>Shift rotation</string>
@@ -247,7 +247,7 @@
          </property>
         </widget>
        </item>
-       <item row="16" column="0">
+       <item row="17" column="0">
         <widget class="C5CheckBox" name="checkBox_10">
          <property name="text">
           <string>Remove printed service</string>
@@ -257,7 +257,7 @@
          </property>
         </widget>
        </item>
-       <item row="14" column="0">
+       <item row="15" column="0">
         <widget class="C5CheckBox" name="checkBox_86">
          <property name="text">
           <string>Cancel prechek</string>
@@ -267,7 +267,7 @@
          </property>
         </widget>
        </item>
-       <item row="21" column="0">
+       <item row="22" column="0">
         <widget class="C5CheckBox" name="checkBox_43">
          <property name="text">
           <string>Payment, breakfast</string>
@@ -277,7 +277,7 @@
          </property>
         </widget>
        </item>
-       <item row="10" column="0">
+       <item row="11" column="0">
         <widget class="C5CheckBox" name="checkBox_83">
          <property name="text">
           <string>Cancel discount of order</string>
@@ -287,17 +287,7 @@
          </property>
         </widget>
        </item>
-       <item row="22" column="0">
-        <widget class="C5CheckBox" name="checkBox_44">
-         <property name="text">
-          <string>Payment, dept</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>507</number>
-         </property>
-        </widget>
-       </item>
-       <item row="26" column="0">
+       <item row="27" column="0">
         <spacer name="verticalSpacer_3">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -310,7 +300,17 @@
          </property>
         </spacer>
        </item>
-       <item row="9" column="0">
+       <item row="23" column="0">
+        <widget class="C5CheckBox" name="checkBox_44">
+         <property name="text">
+          <string>Payment, dept</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>507</number>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="0">
         <widget class="C5CheckBox" name="checkBox_82">
          <property name="text">
           <string>Discount order</string>
@@ -320,7 +320,7 @@
          </property>
         </widget>
        </item>
-       <item row="18" column="0">
+       <item row="19" column="0">
         <widget class="C5CheckBox" name="checkBox_39">
          <property name="text">
           <string>Change value of service fee</string>
@@ -340,7 +340,7 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="0">
+       <item row="5" column="0">
         <widget class="C5CheckBox" name="checkBox_79">
          <property name="text">
           <string>Change staff of table</string>
@@ -350,7 +350,7 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="0">
+       <item row="7" column="0">
         <widget class="C5CheckBox" name="checkBox_179">
          <property name="text">
           <string>Split guests</string>
@@ -360,7 +360,7 @@
          </property>
         </widget>
        </item>
-       <item row="19" column="0">
+       <item row="20" column="0">
         <widget class="C5CheckBox" name="checkBox_41">
          <property name="text">
           <string>Payment, transfer to room</string>
@@ -370,7 +370,7 @@
          </property>
         </widget>
        </item>
-       <item row="13" column="0">
+       <item row="14" column="0">
         <widget class="C5CheckBox" name="checkBox_85">
          <property name="text">
           <string>Repeat precheck</string>
@@ -390,7 +390,17 @@
          </property>
         </widget>
        </item>
-       <item row="15" column="0">
+       <item row="13" column="0">
+        <widget class="C5CheckBox" name="checkBox_90">
+         <property name="text">
+          <string>Print receipt</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>529</number>
+         </property>
+        </widget>
+       </item>
+       <item row="16" column="0">
         <widget class="C5CheckBox" name="checkBox_88">
          <property name="text">
           <string>Final bill</string>
@@ -400,7 +410,7 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="0">
+       <item row="6" column="0">
         <widget class="C5CheckBox" name="checkBox_80">
          <property name="text">
           <string>Change menu of table</string>
@@ -420,13 +430,13 @@
          </property>
         </widget>
        </item>
-       <item row="12" column="0">
-        <widget class="C5CheckBox" name="checkBox_90">
+       <item row="4" column="0">
+        <widget class="C5CheckBox" name="checkBox_91">
          <property name="text">
-          <string>Print receipt</string>
+          <string>Move table</string>
          </property>
          <property name="Tag" stdset="0">
-          <number>529</number>
+          <number>514</number>
          </property>
         </widget>
        </item>
@@ -1263,18 +1273,23 @@
  <tabstops>
   <tabstop>chWaiterAllItems</tabstop>
   <tabstop>checkBox_77</tabstop>
+  <tabstop>checkBox_89</tabstop>
   <tabstop>checkBox_78</tabstop>
+  <tabstop>checkBox_91</tabstop>
   <tabstop>checkBox_79</tabstop>
   <tabstop>checkBox_80</tabstop>
+  <tabstop>checkBox_179</tabstop>
   <tabstop>checkBox_81</tabstop>
   <tabstop>checkBox_87</tabstop>
   <tabstop>checkBox_82</tabstop>
   <tabstop>checkBox_83</tabstop>
   <tabstop>checkBox_84</tabstop>
+  <tabstop>checkBox_90</tabstop>
   <tabstop>checkBox_85</tabstop>
   <tabstop>checkBox_86</tabstop>
   <tabstop>checkBox_88</tabstop>
   <tabstop>checkBox_10</tabstop>
+  <tabstop>checkBox_9</tabstop>
   <tabstop>checkBox_39</tabstop>
   <tabstop>checkBox_41</tabstop>
   <tabstop>checkBox_42</tabstop>
@@ -1283,11 +1298,6 @@
   <tabstop>checkBox_54</tabstop>
   <tabstop>checkBox_60</tabstop>
   <tabstop>checkBox_74</tabstop>
-  <tabstop>chActions</tabstop>
-  <tabstop>checkBox_16</tabstop>
-  <tabstop>checkBox_21</tabstop>
-  <tabstop>checkBox_17</tabstop>
-  <tabstop>checkBox_23</tabstop>
   <tabstop>checkBox_63</tabstop>
   <tabstop>checkBox_24</tabstop>
   <tabstop>checkBox_56</tabstop>
@@ -1359,11 +1369,15 @@
   <tabstop>tw</tabstop>
   <tabstop>checkBox_13</tabstop>
   <tabstop>chGoods</tabstop>
-  <tabstop>checkBox_9</tabstop>
+  <tabstop>checkBox_16</tabstop>
   <tabstop>checkBox_61</tabstop>
   <tabstop>checkBox_12</tabstop>
   <tabstop>chREportsAllItems</tabstop>
   <tabstop>checkBox_40</tabstop>
+  <tabstop>checkBox_21</tabstop>
+  <tabstop>checkBox_17</tabstop>
+  <tabstop>chActions</tabstop>
+  <tabstop>checkBox_23</tabstop>
  </tabstops>
  <resources/>
  <connections/>

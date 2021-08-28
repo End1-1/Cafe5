@@ -16,6 +16,7 @@ DlgReports::DlgReports(const QStringList &dbParams, C5User *user) :
     fUser(user)
 {
     ui->setupUi(this);
+    setWindowState(Qt::WindowFullScreen);
     ui->date1->setDate(QDate::currentDate());
     ui->date2->setDate(QDate::currentDate());
     fShiftId = 0;
@@ -30,8 +31,6 @@ DlgReports::~DlgReports()
 void DlgReports::openReports(C5User *user)
 {
     DlgReports *d = new DlgReports(QStringList(), user);
-    d->showFullScreen();
-    d->hide();
     d->getDailyCommon();
     d->exec();
     delete d;
@@ -92,6 +91,7 @@ void DlgReports::handleDailyCommon(const QJsonObject &obj)
         if (__c5config.carMode()) {
             ui->tbl->setString(r, 8, o["f_govnumber"].toString());
         }
+        ui->tbl->setString(r, 8, o["f_receiptnumber"].toString());
         total += o["f_amounttotal"].toString().toDouble();
     }
     ui->tblTotal->setColumnCount(ui->tbl->columnCount());
@@ -123,6 +123,7 @@ void DlgReports::handleReportsList(const QJsonObject &obj)
     sh->bind("date1", ui->date1->date().toString(FORMAT_DATE_TO_STR_MYSQL));
     sh->bind("date2", ui->date2->date().toString(FORMAT_DATE_TO_STR_MYSQL));
     sh->bind("shift", QString::number(fShiftId));
+    sh->bind("paper_width", __c5config.getValue(param_print_paper_width).toInt() == 0 ? 650 : __c5config.getValue(param_print_paper_width).toInt());
     sh->send();
 }
 
@@ -187,12 +188,36 @@ void DlgReports::on_btnPrintOrderReceipt_clicked()
     if (l.count() == 0) {
         return;
     }
+    QString orderid = ui->tbl->getString(l.at(0).row(), 0);
+    C5Database db(__c5config.dbParams());
+    db[":f_id"] = orderid;
+    db.exec("select * from o_header where f_id=:f_id");
+    if (!db.nextRow()) {
+        C5Message::error(tr("Invalid order id"));
+        return;
+    }
+    int tax = 0;
+    if (db.getDouble("f_amounttotal") - db.getDouble("f_amountcash") < 0.001) {
+        db[":f_id"] = orderid;
+        db.exec("select f_receiptnumber from o_tax where f_id=:f_id");
+        if (db.nextRow()) {
+            if (db.getInt("f_receiptnumber") == 0) {
+                tax = C5Message::question(tr("Do you want to print fiscal receipt?")) == QDialog::Accepted ? 1 : 0;
+            }
+        } else {
+            tax = C5Message::question(tr("Do you want to print fiscal receipt?")) == QDialog::Accepted ? 1 : 0;
+        }
+    } else if (db.getDouble("f_amountcard") > 0.001) {
+        tax = 1;
+    }
+
     C5SocketHandler *sh = createSocketHandler(SLOT(handleReceipt(QJsonObject)));
     sh->bind("cmd", sm_printreceipt);
     sh->bind("staffid", QString::number(fUser->id()));
     sh->bind("staffname", fUser->fullName());
     sh->bind("f_receiptlanguage", QString::number(C5Config::getRegValue("receipt_language").toInt()));
-    sh->bind("id", ui->tbl->getString(l.at(0).row(), 0));
+    sh->bind("order", orderid);
+    sh->bind("printtax", tax);
     sh->send();
 }
 

@@ -220,8 +220,7 @@ void C5WaiterOrder::transferToHotel()
     C5Database db(fDBParams);
     C5WaiterOrderDoc d(ui->leUuid->text(), db);
     QString err;
-    C5Database fDD(fDBParams.at(0), C5Config::hotelDatabase(), fDBParams.at(2), fDBParams.at(3));
-    d.transferToHotel(db, fDD, err);
+    d.transferToHotel(db, err);
     if (err.isEmpty()) {
         C5Message::info(tr("Done"));
     } else {

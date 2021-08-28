@@ -15,6 +15,8 @@ public:
 
     bool run();
 
+    QString fReprintList;
+
 private:
     QString fHeader;
 
@@ -24,7 +26,9 @@ private:
 
     QList<QMap<QString, QVariant> > fBodyData;
 
-    void print(const QString &printer, const QString &side);
+    QMap<QString, QString> fPrinterAliases;
+
+    void print(QString printer, const QString &side, bool reprint);
 };
 
 #endif // C5PRINTSERVICETHREAD_H

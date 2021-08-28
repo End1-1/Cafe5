@@ -24,6 +24,8 @@ public:
 
     int store();
 
+    int pricing();
+
 private:
     Ui::CR5TStoreExtraFilter *ui;
 };

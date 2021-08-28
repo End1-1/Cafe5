@@ -61,6 +61,8 @@ public:
 
     int getInteger(int row, int column);
 
+    int getInteger(int row, const QString &columnName);
+
     void setInteger(int row, int column, int value);
 
     QString getString(int row, int column);
@@ -68,6 +70,8 @@ public:
     void setString(int row, int column, const QString &str);
 
     double getDouble(int row, int column);
+
+    double getDouble(int row, const QString &columnName);
 
     void setDouble(int row, int column, double value);
 
@@ -82,6 +86,8 @@ public:
     int visibleRows();
 
     void setColumnDecimals(int column, int decimals);
+
+    int columnIndexOfName(const QString &name);
 
 private:
     QMap<int, int> fColumnsDecimals;

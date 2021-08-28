@@ -159,7 +159,8 @@ void StoreInput::getList()
                 "inner join c_goods g on g.f_id=ad.f_goods "
                 "inner join a_header ah on ah.f_id=ad.f_document "
                 "inner join a_header_shop2partner sp on sp.f_id=ah.f_id "
-                 "where sp.f_store=:f_store and sp.f_accept=0 ")) {
+                 "where sp.f_store=:f_store and sp.f_accept=0 "
+                 "order by g.f_scancode ")) {
         C5Message::error(db.fLastError);
         return;
     }

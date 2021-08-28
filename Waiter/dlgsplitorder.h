@@ -36,6 +36,14 @@ private slots:
 
     void on_btnSave_clicked();
 
+    void on_btnScrollUp1_clicked();
+
+    void on_btnScrollDown1_clicked();
+
+    void on_btnScrollUp2_clicked();
+
+    void on_btnScrollDown2_clicked();
+
 private:
     Ui::DlgSplitOrder *ui;
 

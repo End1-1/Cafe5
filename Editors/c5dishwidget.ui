@@ -268,36 +268,6 @@
           <string>Additional</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_3">
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_5">
-            <property name="text">
-             <string>Queue</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="C5LineEditWithSelector" name="leQueue">
-            <property name="maximumSize">
-             <size>
-              <width>50</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="Field" stdset="0">
-             <string>f_queue</string>
-            </property>
-            <property name="Type" stdset="0">
-             <string>1</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_7">
-            <property name="text">
-             <string>Color</string>
-            </property>
-           </widget>
-          </item>
           <item row="3" column="0" colspan="2">
            <widget class="C5CheckBox" name="checkBox_2">
             <property name="text">
@@ -305,6 +275,13 @@
             </property>
             <property name="Field" stdset="0">
              <string>f_service</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_5">
+            <property name="text">
+             <string>Queue</string>
             </property>
            </widget>
           </item>
@@ -330,16 +307,6 @@
             </property>
            </widget>
           </item>
-          <item row="4" column="0" colspan="2">
-           <widget class="C5CheckBox" name="checkBox">
-            <property name="text">
-             <string>Can discount</string>
-            </property>
-            <property name="Field" stdset="0">
-             <string>f_discount</string>
-            </property>
-           </widget>
-          </item>
           <item row="5" column="0">
            <widget class="C5CheckBox" name="checkBox_3">
             <property name="text">
@@ -357,6 +324,39 @@
             </property>
            </widget>
           </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_7">
+            <property name="text">
+             <string>Color</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="C5LineEditWithSelector" name="leQueue">
+            <property name="maximumSize">
+             <size>
+              <width>50</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="Field" stdset="0">
+             <string>f_queue</string>
+            </property>
+            <property name="Type" stdset="0">
+             <string>1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0" colspan="2">
+           <widget class="C5CheckBox" name="checkBox">
+            <property name="text">
+             <string>Can discount</string>
+            </property>
+            <property name="Field" stdset="0">
+             <string>f_discount</string>
+            </property>
+           </widget>
+          </item>
           <item row="2" column="1">
            <widget class="C5LineEditWithSelector" name="leHourlyPayment">
             <property name="maximumSize">
@@ -370,6 +370,16 @@
             </property>
             <property name="Type" stdset="0">
              <number>1</number>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0">
+           <widget class="C5CheckBox" name="checkBox_4">
+            <property name="text">
+             <string>Extra</string>
+            </property>
+            <property name="Field" stdset="0">
+             <string>f_extra</string>
             </property>
            </widget>
           </item>

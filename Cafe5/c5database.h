@@ -17,6 +17,8 @@ class C5Database : public QObject
 public:
     C5Database();
 
+    C5Database(const QString &dbdriver);
+
     C5Database(const QStringList &dbParams);
 
     C5Database(C5Database &db);
@@ -59,7 +61,7 @@ public:
 
     bool execDirect(const QString &sqlQuery);
 
-    static QString uuid(const QStringList &dbParams = QStringList());
+    static QString uuid();
 
     QByteArray uuid_bin();
 

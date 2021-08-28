@@ -44,7 +44,6 @@
 #define param_autoinput_salecash 38
 #define param_tax_cashier_login 39
 #define param_tax_cashier_pin 40
-#define param_control_shop_qty 41
 #define param_rootdb_replica 42
 #define param_rootdb_host 43
 #define param_rootdb_schema 44
@@ -71,6 +70,9 @@
 #define param_http_server_port 66
 #define param_http_server_user 67
 #define param_http_server_pass 68
+#define param_as_connection_string 69
+#define param_hotel_user_Id 70
+#define param_hotel_hall_id 71
 
 #define FRONTDESK_WAITER 0
 #define FRONTDESK_SHOP 1
@@ -199,8 +201,6 @@ public:
     static QString taxCashier();
 
     static QString taxPin();
-
-    static bool controlShopQty();
 
     static bool rdbReplica();
 

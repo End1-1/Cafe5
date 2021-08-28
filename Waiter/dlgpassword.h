@@ -32,6 +32,8 @@ public:
 
     static bool getPassword(const QString &title, QString &str);
 
+    static bool getPasswordString(const QString &title, QString &pass);
+
 private slots:
     void on_pushButton_clicked();
 

@@ -23,6 +23,12 @@ private slots:
 
     void on_btnChangeSession_clicked();
 
+    void on_btnChangeMyPassword_clicked();
+
+    void on_btnChangeStaffPassword_clicked();
+
+    void on_btnExit_clicked();
+
 private:
     Ui::DlgManagerTools *ui;
 

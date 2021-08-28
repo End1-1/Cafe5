@@ -57,7 +57,7 @@ public:
 
     QPrinter::Orientation orientation(int index);
 
-    void print(const QString &printername, QPagedPaintDevice::PageSize pageSize, bool rotate90 = false);
+    bool print(const QString &printername, QPagedPaintDevice::PageSize pageSize, bool rotate90 = false);
 
     void print(QPainter *p);
 

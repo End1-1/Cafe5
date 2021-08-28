@@ -111,5 +111,7 @@
         <file>sauces.png</file>
         <file>atention.png</file>
         <file>quickmenu.png</file>
+        <file>reserve.png</file>
+        <file>AS.png</file>
     </qresource>
 </RCC>

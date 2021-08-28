@@ -94,7 +94,6 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     fTags[ui->leCardIdPrefix->getTag()] = ui->leCardIdPrefix->text();
     fTags[ui->leCashierLogin->getTag()] = ui->leCashierLogin->text();
     fTags[ui->leCashierPin->getTag()] = ui->leCashierPin->text();
-    fTags[ui->chControlShopQuantity->getTag()] = ui->chControlShopQuantity->isChecked() ? "1" : "0";
     fTags[ui->chRDB->getTag()] = ui->chRDB->isChecked() ? "1" : "0";
     fTags[ui->leRDBHost->getTag()] = ui->leRDBHost->text();
     fTags[ui->leRDBSchema->getTag()] = ui->leRDBSchema->text();
@@ -125,6 +124,9 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     fTags[ui->leHttpPassword->getTag()] = ui->leHttpPassword->text();
     fTags[ui->rbPrint50->property("tag").toInt()] = ui->rbPrint50->isChecked() ? "1" : "0";
     fTags[ui->rbPrint80->property("tag").toInt()] = ui->rbPrint80->isChecked() ? "1" : "0";
+    fTags[ui->leASConnectionString->getTag()] = ui->leASConnectionString->text();
+    fTags[ui->leUserIdForHotelVoucher->getTag()] = ui->leUserIdForHotelVoucher->text();
+    fTags[ui->leHallIdForHotel->getTag()] = ui->leHallIdForHotel->text();
     C5Database db(fDBParams);
     db[":f_settings"] = ui->leCode->getInteger();
     db.exec("delete from s_settings_values where f_settings=:f_settings");
@@ -231,4 +233,15 @@ QWidget *C5SettingsWidget::widget(QWidget *parent, int tag)
         }
     }
     return nullptr;
+}
+
+void C5SettingsWidget::on_btnTestAsConnection_clicked()
+{
+    C5Database dbas("QODBC3");
+    dbas.setDatabase("", ui->leASConnectionString->text(), "", "");
+    if (dbas.open()) {
+        C5Message::error(tr("Connection successfull"));
+    } else {
+        C5Message::error(dbas.fLastError);
+    }
 }

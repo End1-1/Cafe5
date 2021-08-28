@@ -1,7 +1,6 @@
 #ifndef WORDER_H
 #define WORDER_H
 
-#include "goods.h"
 #include "c5database.h"
 #include <QWidget>
 #include <QDate>
@@ -31,9 +30,9 @@ public:
 
     void focusCard();
 
-    void addGoods(const Goods &g);
+    void addGoods(int id);
 
-    void addGoodsToTable(const Goods &g);
+    void addGoodsToTable(int id);
 
     bool writeOrder(bool tax = true);
 

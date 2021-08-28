@@ -34,3 +34,13 @@ int CR5TStoreExtraFilter::store()
 {
     return ui->leStore->getInteger();
 }
+
+int CR5TStoreExtraFilter::pricing()
+{
+    if (ui->rbStorePrice->isChecked()) {
+        return 1;
+    } else if (ui->rbGoodsPrice->isChecked()) {
+        return 2;
+    }
+    return 0;
+}

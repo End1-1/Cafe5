@@ -30,7 +30,7 @@ public:
 
     void sendToServer(C5SocketHandler *sh);
 
-    bool transferToHotel(C5Database &db, C5Database &fDD, QString &err);
+    bool transferToHotel(C5Database &db, QString &err);
 
     bool makeOutputOfStore(C5Database &db, QString &err, int storedocstate);
 
@@ -78,9 +78,9 @@ private:
 
     void getTaxInfo(C5Database &db);
 
-    QString getHotelID(C5Database &db, const QString &source, QString &err);
+    QString getHotelID(const QString &source, QString &err);
 
-    bool correctHotelID(QString &id, C5Database &dba, QString &err);
+    bool correctHotelID(QString &id, QString &err);
 };
 
 #endif // C5WAITERORDERDOC_H

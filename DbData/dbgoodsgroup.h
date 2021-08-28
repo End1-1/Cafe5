@@ -7,6 +7,12 @@ class DbGoodsGroup : public DbData
 {
 public:
     DbGoodsGroup();
+
+    DbGoodsGroup(int id);
+
+    QString adgt();
+
+    QString taxDept();
 };
 
 #endif // DBGOODSGROUP_H

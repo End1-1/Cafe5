@@ -177,6 +177,9 @@ void CR5Databases::resetDatabase()
             db.exec("delete from o_package");
             db.exec("delete from o_goods");
             db.exec("delete from o_body");
+            db.exec("delete from o_preorder");
+            db.exec("delete from o_header_options");
+            db.exec("delete from o_header_flags");
             db.exec("delete from o_header");
             db.exec("delete from o_pay_cl");
             db.exec("delete from o_pay_room");

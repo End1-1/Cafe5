@@ -51,7 +51,7 @@ void SocketThread::httpRequest()
             return;
         }
     } else {
-        if (QString(fData.mid(0, 3).toUpper()) == "POST") {
+        if (QString(fData.mid(0, 4).toUpper()) == "POST") {
             if (!fData.contains("Content-Length")) {
                 return;
             }

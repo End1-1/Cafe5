@@ -15,6 +15,7 @@
 #include "selectstaff.h"
 #include "c5shoporder.h"
 #include "working.h"
+#include "datadriver.h"
 #include "c5utils.h"
 #include "taxprint.h"
 #include "c5storedraftwriter.h"
@@ -98,66 +99,69 @@ void WOrder::focusCard()
     ui->leCard->setFocus();
 }
 
-void WOrder::addGoods(const Goods &g)
+void WOrder::addGoods(int id)
 {
-    double totalQty = g.fQty;
+    DbGoods g(id);
+    double totalQty = g.unit()->defaultQty();
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
-        if (ui->tblGoods->getString(i, 0) == g.fCode) {
+        if (ui->tblGoods->getInteger(i, 0) == id) {
             totalQty += ui->tblGoods->getDouble(i, 2);
         }
     }
-    Goods gg = fWorking->fGoods[g.fScanCode];
-    if (__c5config.controlShopQty()) {
-        if (gg.fQty < totalQty) {
-            if (!gg.fIsService) {
-                C5Message::error(tr("Insufficient quantity") + "<br>" + float_str(totalQty - gg.fQty, 3));
-                return;
-            }
+    C5Database db(__c5config.dbParams());
+    db[":f_store"] = __c5config.defaultStore();
+    db[":f_goods"] = id;
+    db[":f_qty"] = totalQty;
+    db.exec("select f_qty-:f_qty-:f_reserved from a_store_sale where f_goods=:f_goods and f_store=:f_store");
+    double storeQty = 0;
+    if (db.nextRow()) {
+        storeQty = 0;
+    }
 
-            if (gg.fIsService) {
-                addGoodsToTable(g);
-                return;
-            } else {
-                C5Message::error(tr("Insufficient quantity") + "<br>" + float_str(totalQty - gg.fQty, 3));
-                return;
-            }
-
+    if (storeQty < 0) {
+        if (!g.isService()) {
+            C5Message::error(tr("Insufficient quantity") + "<br>" + float_str(storeQty, 3));
+            return;
         }
     }
-    addGoodsToTable(g);
+
+    addGoodsToTable(id);
 }
 
-void WOrder::addGoodsToTable(const Goods &g)
+void WOrder::addGoodsToTable(int id)
 {
+    DbGoods g(id);
     double price = 0;
     switch (fSaleType) {
     case SALE_RETAIL:
     case SALE_PREORDER:
-        price = g.fRetailPrice;
+        price = g.retailPrice();
         break;
     case SALE_WHOSALE:
-        price = g.fWhosalePrice;
+        price = g.whosalePrice();
         break;
     }
     ls(QString("%1: %2, %3: %4, %5: %6")
        .arg(tr("New goods with code"))
-       .arg(g.fScanCode).arg(tr("name"))
-       .arg(g.fName).arg(tr("retail price"))
-       .arg(g.fRetailPrice));
+       .arg(g.scancode())
+       .arg(tr("name"))
+       .arg(g.goodsName())
+       .arg(tr("Price"))
+       .arg(price));
     int row = ui->tblGoods->addEmptyRow();
-    ui->tblGoods->item(row, 0)->setData(Qt::UserRole, QVariant::fromValue(g));
-    ui->tblGoods->setString(row, 0, g.fCode);
-    ui->tblGoods->setString(row, 1, g.fName + " " + g.fScanCode);
-    ui->tblGoods->setDouble(row, 2, g.fQty);
+    ui->tblGoods->item(row, 0)->setData(Qt::UserRole, QVariant::fromValue(id));
+    ui->tblGoods->setInteger(row, 0, id);
+    ui->tblGoods->setString(row, 1, g.goodsName() + " " + g.scancode());
+    ui->tblGoods->setDouble(row, 2, g.unit()->defaultQty());
     ui->tblGoods->item(row, 2)->fDecimals = 3;
-    ui->tblGoods->setString(row, 3, g.fUnit);
+    ui->tblGoods->setString(row, 3, g.unit()->unitName());
     ui->tblGoods->setDouble(row, 4, price);
-    ui->tblGoods->setDouble(row, 5, g.fQty * price);
-    ui->tblGoods->setInteger(row, 6, g.fTaxDept);
-    ui->tblGoods->setString(row, 7, g.fAdgCode);
+    ui->tblGoods->setDouble(row, 5, g.unit()->defaultQty() * price);
+    ui->tblGoods->setString(row, 6, g.group()->taxDept());
+    ui->tblGoods->setString(row, 7, g.group()->adgt());
     ui->tblGoods->setString(row, 8, "");
-    ui->tblGoods->setInteger(row, 9, g.fUnitCode);
-    ui->tblGoods->setInteger(row, 10, g.fIsService ? 1 : 0);
+    ui->tblGoods->setInteger(row, 9, g.unit()->id());
+    ui->tblGoods->setInteger(row, 10, g.isService() ? 1 : 0);
     ui->tblGoods->setDouble(row, col_discount_value, 0);
     ui->tblGoods->setString(row, col_discount_mode, "");
     ui->tblGoods->setCurrentItem(ui->tblGoods->item(row, 0));
@@ -169,22 +173,22 @@ void WOrder::addGoodsToTable(const Goods &g)
     db[":f_window"] = fWorking->fTab->currentIndex();
     db[":f_row"] = row;
     db[":f_state"] = 0;
-    db[":f_goodsid"] = g.fCode;
-    db[":f_name"] = g.fName + " " + g.fScanCode;
-    db[":f_qty"] = g.fQty;
-    db[":f_unit"] = g.fUnit;
+    db[":f_goodsid"] = g.id();
+    db[":f_name"] = g.goodsName() + " " + g.scancode();
+    db[":f_qty"] = g.unit()->defaultQty();
+    db[":f_unit"] = g.unit()->unitName();
     db[":f_price"] = price;
-    db[":f_total"] = g.fQty * price;
-    db[":f_taxdept"] = g.fTaxDept;
-    db[":f_adgcode"] = g.fAdgCode;
+    db[":f_total"] = g.unit()->defaultQty() * price;
+    db[":f_taxdept"] = g.group()->taxDept();
+    db[":f_adgcode"] = g.group()->adgt();
     db[":f_tablerec"] = 0;
-    db[":f_unitcode"] = g.fUnitCode;
-    db[":f_service"] = g.fIsService;
+    db[":f_unitcode"] = g.unit()->id();
+    db[":f_service"] = g.isService();
     db[":f_discountvalue"] = 0;
     db[":f_discountmode"] = "";
     db.insert("a_sale_temp");
 
-    ImageLoader *il = new ImageLoader(g.fScanCode, this);
+    ImageLoader *il = new ImageLoader(g.scancode(), this);
     connect(il, SIGNAL(imageLoaded(QPixmap)), this, SLOT(imageLoaded(QPixmap)));
     connect(il, SIGNAL(noImage()), this, SLOT(noImage()));
     il->start();
@@ -219,7 +223,7 @@ bool WOrder::writeOrder(bool tax)
     QList<IGoods> goods;
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
         IGoods g;
-        Goods gt = ui->tblGoods->item(i, 0)->data(Qt::UserRole).value<Goods>();
+        DbGoods gt(ui->tblGoods->getInteger(i, 0));
         g.taxDept = ui->tblGoods->getString(i, 6);
         g.taxAdg = ui->tblGoods->getString(i, 7);
         g.goodsId = ui->tblGoods->getString(i, 0).toInt();
@@ -231,9 +235,9 @@ bool WOrder::writeOrder(bool tax)
         g.isService = ui->tblGoods->getInteger(i, 10) == 1;
         g.discountFactor = ui->tblGoods->item(i, col_discount_value)->data(Qt::UserRole).toDouble();
         g.discountMode = ui->tblGoods->item(i, col_discount_mode)->data(Qt::UserRole).toInt();
-        g.storeId = Working::storeId(g.goodsId);
-        g.writeStoreDocBeforeOutput = gt.fStoreInputBeforeSale;
-        g.lastInputPrice = gt.fLastInputPrice;
+        g.storeId = __c5config.defaultStore();
+        g.writeStoreDocBeforeOutput = gt.writeStoreInputBeforeSale();
+        g.lastInputPrice = gt.lastInputPrice();
         goods.append(g);
     }
     C5ShopOrder so;
@@ -252,7 +256,6 @@ bool WOrder::writeOrder(bool tax)
             if (g.isService) {
                 continue;
             }
-            fWorking->decQty(g);
         }
         if (!fPreorderUUID.isEmpty()) {
             db[":f_state"] = 2;
@@ -684,27 +687,36 @@ void WOrder::setQtyOfRow(int row, double qty)
         }
     }
 
-    QString scancode = fWorking->fGoodsCodeForPrint[ui->tblGoods->getInteger(row, 0)];
-    if (!fWorking->fGoods.contains(scancode)) {
-        C5Message::error(QString("%1 %2").arg(tr("Programm Error worder:setQtyOfRow:invalid scancode")).arg(scancode));
-        return;
-    }
-    Goods g = fWorking->fGoods[scancode];
-    if (g.fWholeNumber) {
+    DbGoods g(ui->tblGoods->getInteger(row, 0));
+    if (g.acceptIntegerQty()) {
         totalQty = trunc(totalQty);
     }
     if (totalQty < 0.00001) {
         C5Message::error(tr("Incorrect quantity value"));
         return;
     }
-    if (!g.fIsService && g.fQty < totalQty) {
-        C5Message::error(tr("Insufficient quantity") + "<br>" + float_str(totalQty - g.fQty, 3));
-        return;
+    if (!g.isService()) {
+        C5Database db(__c5config.dbParams());
+        db[":f_store"] = __c5config.defaultStore();
+        db[":f_goods"] = g.id();
+        db[":f_qty"] = totalQty;
+        db.exec("select f_qty-:f_qty-:f_reserved from a_store_sale where f_goods=:f_goods and f_store=:f_store");
+        double storeQty = 0;
+        if (db.nextRow()) {
+            storeQty = 0;
+        }
+
+        if (storeQty < 0) {
+            if (!g.isService()) {
+                C5Message::error(tr("Insufficient quantity") + "<br>" + float_str(storeQty, 3));
+                return;
+            }
+        }
     }
 
     ui->tblGoods->setDouble(row, 2, qty);
     ui->tblGoods->setDouble(row, 5, ui->tblGoods->getDouble(row, 4) * qty);
-    C5LogSystem::writeEvent(QString("%1 %2:%3 %4").arg(tr("Change qty")).arg(g.fCode).arg(g.fName).arg(float_str(qty, 2)));
+    C5LogSystem::writeEvent(QString("%1 %2:%3 %4").arg(tr("Change qty")).arg(g.scancode()).arg(g.goodsName()).arg(float_str(qty, 2)));
     countTotal();
 }
 
@@ -882,4 +894,3 @@ void WOrder::on_btnPrintManualTax_clicked()
     tp->exec();
     tp->deleteLater();
 }
-

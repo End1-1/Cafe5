@@ -1,5 +1,6 @@
 #include "dbdishes.h"
 #include "datadriver.h"
+#include <QDebug>
 
 DbDishes::DbDishes() :
     DbData("d_dish")
@@ -49,5 +50,10 @@ bool DbDishes::canDiscount(int id)
 
 int DbDishes::group(int id)
 {
-    return get(id, "f_group").toInt();
+    return get(id, "f_part").toInt();
+}
+
+bool DbDishes::isExtra(int id)
+{
+    return get(id, "f_extra").toInt() == 1;
 }

@@ -96,6 +96,7 @@ void C5Permissions::init(C5Database &db)
               << cp_t5_splitguest
               << cp_t5_manager_tools
               << cp_t5_print_receipt
+              << cp_t5_repeat_service
 
               << cp_t6_storage
               << cp_t6_goods_menu

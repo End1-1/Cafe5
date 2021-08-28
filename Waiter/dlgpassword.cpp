@@ -101,6 +101,20 @@ bool DlgPassword::getPassword(const QString &title, QString &str)
     return result;
 }
 
+bool DlgPassword::getPasswordString(const QString &title, QString &pass)
+{
+    C5User u(0);
+    DlgPassword *d = new DlgPassword(&u);
+    d->setProperty("pass", true);
+    d->ui->label->setText(title);
+    d->ui->lePassword->setEchoMode(QLineEdit::Password);
+    d->ui->lePassword->setMaxLength(20);
+    bool result = d->exec() == QDialog::Accepted;
+    pass = d->ui->lePassword->text();
+    delete d;
+    return result;
+}
+
 void DlgPassword::on_pushButton_clicked()
 {
     click("1");
@@ -169,6 +183,10 @@ void DlgPassword::on_pushButton_11_clicked()
 void DlgPassword::on_pushButton_12_clicked()
 {
     QString pwd = ui->lePassword->text();
+    if (property("pass").toBool()) {
+        accept();
+        return;
+    }
     if (ui->lePassword->echoMode() == QLineEdit::Password) {
         ui->lePassword->clear();
         if (!fUser->authorize(pwd)) {

@@ -8,6 +8,7 @@ DlgListOfDishComments::DlgListOfDishComments(QWidget *parent) :
     ui(new Ui::DlgListOfDishComments)
 {
     ui->setupUi(this);
+    setWindowState(Qt::WindowFullScreen);
     int col = 0;
     int row = 0;
     foreach (QString s, C5CafeCommon::fDishComments) {
@@ -21,6 +22,7 @@ DlgListOfDishComments::DlgListOfDishComments(QWidget *parent) :
         }
     }
     connect(ui->kbd, SIGNAL(accept()), this, SLOT(kbdAccept()));
+    connect(ui->kbd, SIGNAL(reject()), this, SLOT(reject()));
 }
 
 DlgListOfDishComments::~DlgListOfDishComments()
@@ -32,8 +34,6 @@ bool DlgListOfDishComments::getComment(const QString &caption, QString &comment)
 {
     DlgListOfDishComments *d = new DlgListOfDishComments();
     d->ui->lbComment->setText(tr("Comment for") + " " + caption);
-    d->showFullScreen();
-    d->hide();
     d->ui->tbl->fitColumnsToWidth();
     d->ui->tbl->fitRowToHeight();
     bool result = d->exec() == QDialog::Accepted;
@@ -51,11 +51,6 @@ void DlgListOfDishComments::kbdAccept()
     }
     fResult = ui->kbd->text();
     accept();
-}
-
-void DlgListOfDishComments::on_btnCancel_clicked()
-{
-    reject();
 }
 
 void DlgListOfDishComments::on_tbl_itemClicked(QTableWidgetItem *item)
