@@ -39,6 +39,8 @@ public:
 
     double amountTotal();
 
+    double clearAmount();
+
     double prepayment();
 
     C5OrderDriver &setCurrentOrderID(const QString &id);

@@ -29,6 +29,17 @@ QString CE5DishPart2::table()
     return "d_part2";
 }
 
+bool CE5DishPart2::checkData(QString &err)
+{
+    CE5Editor::checkData(err);
+    if (ui->leParent->getInteger()) {
+        if (ui->leParent->getInteger() == ui->leCode->getInteger()) {
+            err += "<br>" + tr("Cannot parent itself");
+        }
+    }
+    return err.isEmpty();
+}
+
 void CE5DishPart2::selectColor()
 {
     QColor initColor = QColor::fromRgb(ui->leColor->color());

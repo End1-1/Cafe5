@@ -51,18 +51,7 @@ void C5PrintRemovedServiceThread::print(QString printName)
     p.br();
     p.ctext(tr("REMOVED FROM ORDER"));
     p.br();
-    p.ltext(tr("Reason"), 0);
-    switch (fBody["f_state"].toInt()) {
-    case DISH_STATE_MISTAKE:
-        p.rtext(tr("Mistake"));
-        break;
-    case DISH_STATE_VOID:
-        p.rtext(tr("Void"));
-        break;
-    default:
-        p.rtext(tr("May be, programm error occured"));
-        break;
-    }
+    p.ctext(dbbodystate->name(fBody["f_state"].toInt()));
     p.br();
     p.ltext(tr("Comment"), 0);
     p.br();

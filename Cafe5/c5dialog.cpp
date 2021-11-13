@@ -16,7 +16,7 @@ C5Dialog::C5Dialog(const QStringList &dbParams) :
 #endif
 {
 #ifdef WAITER
-    //setMaximumSize(qApp->desktop()->geometry());
+    setMaximumSize(qApp->desktop()->geometry().size());
 #endif
     if (__mainWindow == nullptr) {
         __mainWindow = this;

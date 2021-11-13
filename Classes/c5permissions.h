@@ -92,6 +92,8 @@
 #define cp_t5_manager_tools 528
 #define cp_t5_print_receipt 529
 #define cp_t5_repeat_service 530
+#define cp_t5_change_date_of_sale 531
+#define cp_t5_bill_without_service 532
 
 #define cp_t6_goods_menu 600
 #define cp_t6_units 601

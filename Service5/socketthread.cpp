@@ -7,11 +7,22 @@
 #include <QUuid>
 
 SocketThread::SocketThread(int handle, QSslCertificate cert, QSslKey key, QSsl::SslProtocol proto) :
-    QThread(),
+    ThreadWorker(),
     fSocketDescriptor(handle),
     fSslLocalCertificate(cert),
     fSslPrivateKey(key),
     fSslProtocol(proto)
+{
+
+}
+
+SocketThread::~SocketThread()
+{
+    qDebug() << "~SocketThread()";
+    delete fSslSocket;
+}
+
+void SocketThread::run()
 {
     fSocketType = Invalid;
     setProperty("session", QUuid::createUuid().toString());
@@ -28,20 +39,8 @@ SocketThread::SocketThread(int handle, QSslCertificate cert, QSslKey key, QSsl::
     connect(fSslSocket, SIGNAL(readyRead()), this, SLOT(readyRead()));
     connect(fSslSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(error(QAbstractSocket::SocketError)));
     connect(fSslSocket, SIGNAL(disconnected()), this, SLOT(disconnected()));
-    connect(this, &SocketThread::finished, this, &QObject::deleteLater);
     MonitoringWindow::connectSender(this);
     emit sendData(0, property("session").toString(), QString("New connection from %1:%2").arg(QHostAddress(fSslSocket->peerAddress().toIPv4Address()).toString()).arg(fSslSocket->peerPort()), QVariant());
-}
-
-SocketThread::~SocketThread()
-{
-    qDebug() << "~SocketThread()";
-    delete fSslSocket;
-}
-
-void SocketThread::run()
-{
-    exec();
 }
 
 void SocketThread::httpRequest()
@@ -88,6 +87,7 @@ void SocketThread::httpRequest()
     fSslSocket->write(rh->fResponse);
     RequestManager::releaseHandler(rh);
     fSslSocket->close();
+    emit endOfWork();
 }
 
 HttpRequestMethod SocketThread::parseRequest(HttpRequestMethod &requestMethod, QString &httpVersion, QString &route)
@@ -270,8 +270,6 @@ QString SocketThread::data(const DataAddress &da) const
     return result;
 }
 
-
-
 void SocketThread::readyRead()
 {
     /* Raw data in socket pattern, otherwise means http request */
@@ -300,7 +298,7 @@ void SocketThread::readyRead()
 
 void SocketThread::disconnected()
 {
-    quit();
+    emit endOfWork();
 }
 
 void SocketThread::error(QAbstractSocket::SocketError err)

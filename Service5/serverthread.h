@@ -1,22 +1,23 @@
 #ifndef SERVERTHREAD_H
 #define SERVERTHREAD_H
 
-#include <QThread>
+#include "threadworker.h"
 #include <QSslCertificate>
 #include <QSslKey>
 
 class SslServer;
 
-class ServerThread : public QObject
+class ServerThread : public ThreadWorker
 {
     Q_OBJECT
 public:
     ServerThread(const QString &configPath);
     ~ServerThread();
 
+public slots:
+    void run();
 
 private:
-    QThread fThread;
     SslServer *fSslServer;
     const QString fConfigPath;
     QSslCertificate fSslLocalCertificate;
@@ -25,8 +26,6 @@ private:
 
 private slots:
     void newConnection(int socketDescriptor);
-
-signals:
 
 };
 

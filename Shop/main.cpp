@@ -9,6 +9,7 @@
 #include "datadriver.h"
 #include "replicadialog.h"
 #include "settingsselection.h"
+#include "dlgsplashscreen.h"
 #include <QApplication>
 #include <QMessageBox>
 #include <QLockFile>
@@ -96,8 +97,6 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    DataDriver::init(__c5config.dbParams());
-
     bool login = false;
     C5Database db(C5Config::dbParams());
     QString user, pin;
@@ -150,6 +149,15 @@ int main(int argc, char *argv[])
         __c5config.initParamsFromDb();
     }
     __userid = ua.id();
+    __usergroup = ua.group();
+
+    DataDriver::init(__c5config.dbParams());
+    C5Permissions::init(db);
+
+    auto *dlgsplash = new DlgSplashScreen();
+    dlgsplash->exec();
+    delete dlgsplash;
+
     Working w;
     w.setWindowTitle(dbhall->name(__c5config.defaultHall()) + "," + dbstore->name(__c5config.defaultStore()));
     __c5config.fParentWidget = &w;

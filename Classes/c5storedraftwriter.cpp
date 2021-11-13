@@ -63,7 +63,7 @@ bool C5StoreDraftWriter::writeFromShopOutput(const QString &doc, int state, QStr
                 err += fDb.fLastError;
                 return returnResult(false, err);
             }
-            writeOGoods(i.recId, doc, i.bodyId, i.store, i.goodsId, i.goodsQty, i.goodsPrice, i.goodsTotal, i.tax, 1, i.row, drid, i.discountFactor, i.discountMode, 0, 0);
+            writeOGoods(i.recId, doc, i.bodyId, i.store, i.goodsId, i.goodsQty, i.goodsPrice, i.goodsTotal, i.tax, 1, i.row, drid, i.discountFactor, i.discountMode, 0, "", 0);
         }
         if (state == DOC_STATE_SAVED) {
             if (!writeOutput(id, err)) {
@@ -659,7 +659,7 @@ bool C5StoreDraftWriter::writeOBodyToOGoods(const QString &id, const QString &he
     while (fDb.nextRow()) {
         QString gid;
         if (!writeOGoods(gid, headerid, id, fDb.getInt("f_store"), fDb.getInt("f_goods"), fDb.getDouble("f_qty"), fDb.getDouble("f_lastinputprice"),
-                         fDb.getDouble("f_qty") * fDb.getDouble("f_lastinputprice"), 0, 1, ++row, "", 0, 0, 0, 0)) {
+                         fDb.getDouble("f_qty") * fDb.getDouble("f_lastinputprice"), 0, 1, ++row, "", 0, 0, 0, "", 0)) {
             return false;
         }
     }
@@ -745,7 +745,7 @@ bool C5StoreDraftWriter::writeOPayment(const QString &id, double cash, double ch
 bool C5StoreDraftWriter::writeOGoods(QString &id, const QString &header, const QString &body, int store, int goods,
                                      double qty, double price, double total, int tax, int sign, int row,
                                      const QString &storerec, double discount, int discountMode, int returnMode,
-                                     double discFactor)
+                                     const QString &returnFrom, double discFactor)
 {
     bool u = true;
     if (id.isEmpty()) {
@@ -768,6 +768,7 @@ bool C5StoreDraftWriter::writeOGoods(QString &id, const QString &header, const Q
     fDb[":f_discountmode"] = discountMode;
     fDb[":f_discountamount"] = discount;
     fDb[":f_return"] = returnMode;
+    fDb[":f_returnfrom"] = returnFrom;
     if (u) {
         return returnResult(fDb.update("o_goods", where_id(id)));
     } else {
@@ -895,7 +896,7 @@ bool C5StoreDraftWriter::writeOutput(const QString &docId, QString &err)
                           "s.f_document, s.f_base, d.f_date "
             "from a_store s "
             "inner join a_header d on d.f_id=s.f_document "
-            "where s.f_goods in (%1) and s.f_store=:f_store and d.f_date<=:f_date "
+            "where s.f_goods in (%1) and s.f_store=:f_store "
             "group by s.f_base "
             "having sum(s.f_qty*s.f_type)>0 "
             "order by d.f_date "
@@ -904,6 +905,9 @@ bool C5StoreDraftWriter::writeOutput(const QString &docId, QString &err)
         return false;
     }
     while (fDb.nextRow()) {
+        if (fDb.getDate("f_date") > date) {
+            continue;
+        }
         QMap<QString, QVariant> v;
         fDb.rowToMap(v);
         storeData.append(v);

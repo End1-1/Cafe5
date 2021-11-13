@@ -324,6 +324,17 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="btnChangeDate">
+        <property name="text">
+         <string>Change date of sale</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/calendar.png</normaloff>:/calendar.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="horizontalSpacer_3">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -352,6 +363,9 @@
      </property>
      <property name="selectionBehavior">
       <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+     <property name="sortingEnabled">
+      <bool>true</bool>
      </property>
      <attribute name="verticalHeaderDefaultSectionSize">
       <number>25</number>
@@ -508,14 +522,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5LineEdit</class>
-   <extends>QLineEdit</extends>
-   <header>c5lineedit.h</header>
-  </customwidget>
-  <customwidget>
    <class>C5TableWidget</class>
    <extends>QTableWidget</extends>
    <header location="global">c5tablewidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5LineEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5lineedit.h</header>
   </customwidget>
   <customwidget>
    <class>C5DateEdit</class>

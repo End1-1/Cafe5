@@ -96,10 +96,19 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &db, QString &err)
     int settings = 0;
     int item = 0;
     QString itemName;
-    db[":f_id"] = fHeader["f_hall"].toString().toInt();
-    db.exec("select f_settings from h_halls where f_id=:f_id");
+    db[":f_id"] = fHeader["f_table"].toString().toInt();
+    db.exec("select f_special_config from h_tables where f_id=:f_id");
     if (db.nextRow()) {
-        settings = db.getInt(0);
+        if (db.getInt(0) > 0) {
+            settings = db.getInt(0);
+        }
+    }
+    if (settings == 0) {
+        db[":f_id"] = fHeader["f_hall"].toString().toInt();
+        db.exec("select f_settings from h_halls where f_id=:f_id");
+        if (db.nextRow()) {
+            settings = db.getInt(0);
+        }
     }
     if (settings == 0) {
         err = "Cannot get settings for hall";
@@ -177,7 +186,7 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &db, QString &err)
     }
     fDD[":f_id"] = result;
     fDD[":f_source"] = "PS";
-    fDD[":f_res"] = res;
+    fDD[":f_res"] = __c5config.getValue(param_hotel_noinvoice).toInt() == 1 ? "" : res;
     fDD[":f_wdate"] = QDate::fromString(hString("f_datecash"), ("dd/MM/yyyy"));
     fDD[":f_rdate"] = QDate::currentDate();
     fDD[":f_time"] = QTime::currentTime();
@@ -199,7 +208,7 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &db, QString &err)
     fDD[":f_sign"] = sign;
     fDD[":f_doc"] = "";
     fDD[":f_rec"] = "";
-    fDD[":f_inv"] = inv;
+    fDD[":f_inv"] = __c5config.getValue(param_hotel_noinvoice).toInt() == 1 ? "" : inv;
     fDD[":f_vatmode"] = 1;
     fDD[":f_finance"] = 1;
     fDD[":f_remarks"] = "";

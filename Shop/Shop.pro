@@ -93,6 +93,7 @@ SOURCES += \
     ../Controls/c5guicontrols.cpp \
     ../Controls/c5lineeditwithselector.cpp \
     ../DbData/datadriver.cpp \
+    ../DbData/dbbodystate.cpp \
     ../DbData/dbcar.cpp \
     ../DbData/dbdata.cpp \
     ../DbData/dbdishes.cpp \
@@ -269,9 +270,11 @@ SOURCES += \
     ../Waiter/dlgcl.cpp \
     ../Waiter/dlgcreditcardlist.cpp \
     cashcollection.cpp \
+    dlgdate.cpp \
     dlggoodslist.cpp \
     dlgpin.cpp \
     dlgreservgoods.cpp \
+    dlgsplashscreen.cpp \
     goodsreturnreason.cpp \
     imageloader.cpp \
     loghistory.cpp \
@@ -383,6 +386,7 @@ HEADERS += \
     ../Controls/c5guicontrols.h \
     ../Controls/c5lineeditwithselector.h \
     ../DbData/datadriver.h \
+    ../DbData/dbbodystate.h \
     ../DbData/dbcar.h \
     ../DbData/dbdata.h \
     ../DbData/dbdishes.h \
@@ -561,9 +565,11 @@ HEADERS += \
     ../Waiter/dlgcreditcardlist.h \
     cashcollection.h \
     chatmessage.h \
+    dlgdate.h \
     dlggoodslist.h \
     dlgpin.h \
     dlgreservgoods.h \
+    dlgsplashscreen.h \
     goodsreserve.h \
     goodsreturnreason.h \
     imageloader.h \
@@ -712,9 +718,11 @@ FORMS += \
     ../Waiter/dlgcl.ui \
     ../Waiter/dlgcreditcardlist.ui \
     cashcollection.ui \
+    dlgdate.ui \
     dlggoodslist.ui \
     dlgpin.ui \
     dlgreservgoods.ui \
+    dlgsplashscreen.ui \
     goodsreturnreason.ui \
     loghistory.ui \
     preorders.ui \

@@ -15,16 +15,19 @@ ViewOrder::ViewOrder(const QString &order) :
     ui(new Ui::ViewOrder)
 {
     ui->setupUi(this);
+    ui->btnSave->setVisible(pr(__c5config.dbParams().at(1), cp_t5_change_date_of_sale));
     fUuid = order;
     ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 30, 300, 100, 100, 100, 0, 200);
     C5Database db(__c5config.replicaDbParams());
     db[":f_id"] = order;
     db.exec("select * from o_header where f_id=:f_id");
     if (db.nextRow()) {
+        ui->lbOrderNum->setText(QString("%1%2").arg(db.getString("f_prefix")).arg(db.getInt("f_hallid")));
         ui->leAmount->setDouble(db.getDouble("f_amounttotal"));
         fSaleType = db.getInt("f_saletype");
         fPartner = db.getInt("f_partner");
         fSaleDoc = QString("%1%2, %3").arg(db.getString("f_prefix")).arg(db.getString("f_hallid")).arg(db.getDate("f_datecash").toString(FORMAT_DATE_TO_STR));
+        ui->leDate->setDate(db.getDate("f_datecash"));
     } else {
         C5Message::error(tr("Document is not exists"));
         return;
@@ -188,10 +191,16 @@ void ViewOrder::on_btnReturn_clicked()
         }
         if (!dw.writeOGoods(ogoodsid, oheaderid, "", __c5config.defaultStore(), ui->tbl->getInteger(i, 6), ui->tbl->getDouble(i, 3),
                             ui->tbl->getDouble(i, 4),  ui->tbl->getDouble(i, 5), ui->leTaxNumber->getInteger(), -1, i + 1,
-                            adraftid, 0, 0, reason, 0)) {
+                            adraftid, 0, 0, reason, ui->tbl->getString(i, 0), 0)) {
             return returnFalse(dw.fErrorMsg, &db);
         }
         if (!dw.updateField("o_goods", "f_return", reason, "f_id", ui->tbl->getString(i, 0))) {
+            return returnFalse(dw.fErrorMsg, &db);
+        }
+        if (!dw.updateField("o_goods", "f_returnfrom", ogoodsid, "f_id", ui->tbl->getString(i, 0))) {
+            return returnFalse(dw.fErrorMsg, &db);
+        }
+        if (!dw.updateField("o_header", "f_comment", QString("%1 %2").arg(tr("Return from")).arg(ui->lbOrderNum->text()), "f_id", oheaderid)) {
             return returnFalse(dw.fErrorMsg, &db);
         }
         ui->tbl->setInteger(i, 9, 1);
@@ -273,4 +282,12 @@ void ViewOrder::on_btnRetryUpload_clicked()
     } else {
         C5Message::error(tr("Cannot upload data"));
     }
+}
+
+void ViewOrder::on_btnSave_clicked()
+{
+    C5Database db(__c5config.dbParams());
+    db[":f_datecash"] = ui->leDate->date();
+    db.update("o_header", "f_id", fUuid);
+    C5Message::info(tr("Saved"));
 }

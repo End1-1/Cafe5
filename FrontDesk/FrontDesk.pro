@@ -580,8 +580,8 @@ INCLUDEPATH += ../RESOURCES
 INCLUDEPATH += ../Service
 INCLUDEPATH += /projects/xlsx/src
 INCLUDEPATH += /Projects/NewTax/Src
-INCLUDEPATH += /Soft/OpenSSL-Win32/include
-INCLUDEPATH += /Soft/OpenSSL-Win32/include/openssl
+INCLUDEPATH += /Soft/OpenSSL-Win64/include
+INCLUDEPATH += /Soft/OpenSSL-Win64/include/openssl
 
 RESOURCES += \
     ../resources/res.qrc \

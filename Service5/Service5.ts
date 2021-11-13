@@ -208,18 +208,18 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="handlers/shoprequest.cpp" line="557"/>
+        <location filename="handlers/shoprequest.cpp" line="556"/>
         <source>Not enough materials in the store</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="handlers/shoprequest.cpp" line="674"/>
+        <location filename="handlers/shoprequest.cpp" line="666"/>
         <source>AUTOMATICALY (%1, %2)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="handlers/shoprequest.cpp" line="803"/>
-        <location filename="handlers/shoprequest.cpp" line="813"/>
+        <location filename="handlers/shoprequest.cpp" line="795"/>
+        <location filename="handlers/shoprequest.cpp" line="805"/>
         <source>Moved to online store</source>
         <translation>Տեղափոխված է առաքման պահեստ</translation>
     </message>

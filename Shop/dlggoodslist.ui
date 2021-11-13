@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Goods list</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -59,6 +59,9 @@
       </item>
       <item>
        <widget class="QCheckBox" name="chName">
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
+        </property>
         <property name="text">
          <string>Name</string>
         </property>
@@ -69,6 +72,9 @@
       </item>
       <item>
        <widget class="QCheckBox" name="chScancode">
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
+        </property>
         <property name="text">
          <string>Scancode</string>
         </property>
@@ -95,9 +101,26 @@
    </item>
    <item>
     <widget class="C5TableWidget" name="tbl">
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::SingleSelection</enum>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
      <column>
       <property name="text">
        <string>Code</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Group</string>
       </property>
      </column>
      <column>
@@ -112,7 +135,17 @@
      </column>
      <column>
       <property name="text">
-       <string>Group</string>
+       <string>Qty</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Retail price</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Wholesale price</string>
       </property>
      </column>
     </widget>
@@ -153,12 +186,15 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="leTotalRetail">
+       <widget class="C5LineEdit" name="leTotalRetail">
         <property name="maximumSize">
          <size>
           <width>200</width>
           <height>16777215</height>
          </size>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
         </property>
        </widget>
       </item>
@@ -173,7 +209,19 @@
    <extends>QTableWidget</extends>
    <header location="global">c5tablewidget.h</header>
   </customwidget>
+  <customwidget>
+   <class>C5LineEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5lineedit.h</header>
+  </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>leSearch</tabstop>
+  <tabstop>tbl</tabstop>
+  <tabstop>chName</tabstop>
+  <tabstop>chScancode</tabstop>
+  <tabstop>leTotalRetail</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

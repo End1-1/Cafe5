@@ -42,6 +42,7 @@ bool DatabaseConnectionManager::openDatabase(Database &db, JsonHandler &jh)
 
 bool DatabaseConnectionManager::openDatabase(const QString &name, Database &db, JsonHandler &jh)
 {
+    Q_ASSERT(fDatabaseConnections.contains(name));
     DatabaseConnection &dc = fDatabaseConnections[name];
     if (!db.open(dc.host, dc.schema, dc.username, dc.password)) {
         jh["message"] = "Database error: " + db.lastDbError();

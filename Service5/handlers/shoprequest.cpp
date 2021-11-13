@@ -647,7 +647,7 @@ bool ShopRequest::writeMovement(const QString &orderid, int goods, double qty, i
 {
     db.startTransaction();
     db[":f_id"] = srcStore;
-    db.exec("select f_name from c_storages where f_id=:f_id");
+    db.exec("select f_name from c_storages where f_id=:f_id ");
     QString storename = "unknown";
     if (db.next()) {
         storename = db.stringValue("f_name");

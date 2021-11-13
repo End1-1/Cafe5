@@ -3,6 +3,8 @@
 
 #include "c5reportwidget.h"
 
+class CR5CommonSalesFilter;
+
 class CR5CommonSales : public C5ReportWidget
 {
     Q_OBJECT
@@ -23,6 +25,11 @@ private slots:
     void transferToRoom();
 
     void exportToAS();
+
+    void createStoreOutputAS();
+
+private:
+    CR5CommonSalesFilter *fFilter;
 };
 
 #endif // CR5COMMONSALES_H

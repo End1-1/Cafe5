@@ -224,12 +224,12 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
         QString ogoodsid;
         QString adraftid;
         if (!g.isService) {
-            if (!dw.writeAStoreDraft(adraftid, storeDocId, __c5config.defaultStore(), -1, g.storeId, g.goodsQty, 0, 0, DOC_REASON_SALE, adraftid, i + 1, "")) {
+            if (!dw.writeAStoreDraft(adraftid, storeDocId, __c5config.defaultStore(), -1, g.goodsId, g.goodsQty, 0, 0, DOC_REASON_SALE, adraftid, i + 1, "")) {
                 return returnFalse(dw.fErrorMsg, db);
             }
         } else {
             if (g.writeStoreDocBeforeOutput) {
-                if (!dw.writeAStoreDraft(adraftid, storeDocId, __c5config.defaultStore(), -1, g.storeId, g.goodsQty, 0, 0, DOC_REASON_SALE, adraftid, i + 1, "")) {
+                if (!dw.writeAStoreDraft(adraftid, storeDocId, __c5config.defaultStore(), -1, g.goodsId, g.goodsQty, 0, 0, DOC_REASON_SALE, adraftid, i + 1, "")) {
                     return returnFalse(dw.fErrorMsg, db);
                 }
             }
@@ -258,7 +258,7 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
                 }
             }
         }
-        if (!dw.writeOGoods(ogoodsid, fHeader, "", __c5config.defaultStore(), g.goodsId, g.goodsQty, g.goodsPrice,  g.goodsTotal, tax ? rseq.toInt() : 0, 1, i + 1, adraftid, discamount, discmode, 0, discfactor)) {
+        if (!dw.writeOGoods(ogoodsid, fHeader, "", __c5config.defaultStore(), g.goodsId, g.goodsQty, g.goodsPrice,  g.goodsTotal, tax ? rseq.toInt() : 0, 1, i + 1, adraftid, discamount, discmode, 0, "", discfactor)) {
             return returnFalse(dw.fErrorMsg, db);
         }
     }
@@ -423,7 +423,6 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
             break;
         }
     }
-
     db.commit();
     return true;
 }

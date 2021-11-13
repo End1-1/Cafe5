@@ -42,6 +42,7 @@ void CR5MaterialsInStore::refreshData()
 {
     C5Grid::refreshData();
     setColors();
+    completeRefresh();
 }
 
 void CR5MaterialsInStore::prepareDrafts()

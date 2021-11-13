@@ -41,6 +41,8 @@ SOURCES += \
     socketthread.cpp \
     store/shopmanager.cpp \
     store/storemanager.cpp \
+    thread.cpp \
+    threadworker.cpp \
     utils/c5printing.cpp \
     utils/debug.cpp \
     utils/logwriter.cpp \
@@ -79,6 +81,8 @@ HEADERS += \
     socketthread.h \
     store/shopmanager.h \
     store/storemanager.h \
+    thread.h \
+    threadworker.h \
     utils/c5printing.h \
     utils/debug.h \
     utils/logwriter.h \

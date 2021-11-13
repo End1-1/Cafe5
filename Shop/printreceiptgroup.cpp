@@ -2,6 +2,7 @@
 #include "c5printing.h"
 #include "c5config.h"
 #include "c5utils.h"
+#include "QRCodeGenerator.h"
 #include <QApplication>
 
 PrintReceiptGroup::PrintReceiptGroup(QObject *parent) :
@@ -28,9 +29,25 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
     db[":f_id"] = id;
     db.exec("select * from o_header where f_id=:f_id");
     db.nextRow();
+
     QString saletype;
+    QMap<QString, QVariant> returnFrom;
     if (db.getDouble("f_amounttotal") < 0) {
         saletype = tr("Return");
+        db[":f_header"] = id;
+        db.exec("select f_returnfrom from o_goods where f_header=:f_header");
+        if (db.nextRow()){
+            db[":f_id"] = db.getString("f_returnfrom");
+            db.exec("select f_header from o_goods where f_id=:f_id");
+            db.nextRow();
+            db[":f_id"] = db.getString("f_header");
+            db.exec("select * from o_header where f_id=:f_id");
+            db.nextRow();
+            db.rowToMap(returnFrom);
+            db[":f_id"] = id;
+            db.exec("select * from o_header where f_id=:f_id");
+            db.nextRow();
+        }
     }
     QString hallid = db.getString("f_hallid");
     QString pref = db.getString("f_prefix");
@@ -153,7 +170,7 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
         p.br();
         p.ltext(tr("(F)"), 0);
     }
-    if (!partnerName.isEmpty()) {
+    if (!partnerName.isEmpty() || !partnerTaxcode.isEmpty()) {
         p.ltext(tr("Buyer taxcode"), 0);
         p.rtext(partnerTaxcode);
         p.br();
@@ -163,6 +180,10 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
     p.setFontBold(true);
     p.ctext(QString("#%1%2").arg(pref).arg(hallid));
     p.br();
+    if (returnFrom.count() > 0) {
+        p.ctext(QString("(%1 %2%3)").arg(tr("Return from")).arg(returnFrom["f_prefix"].toString()).arg(returnFrom["f_hallid"].toString()));
+        p.br();
+    }
     p.setFontSize(20);
     p.ctext(tr("Class | Name | Qty | Price | Total"));
     p.setFontBold(false);
@@ -225,17 +246,50 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
         p.br();
     }
 
-    p.setFontSize(20);
-    p.setFontBold(true);
-    p.br(p.fLineHeight * 3);
-    p.ltext(tr("Thank you for visit!"), 0);
-    p.br();
-
     if (!comment.isEmpty()) {
         p.br();
         p.ltext(comment, 0);
         p.br();
     }
+
+    if (!__c5config.getValue(param_static_qr_text).isEmpty()) {
+        p.br();
+        int levelIndex = 1;
+        int versionIndex = 0;
+        bool bExtent = true;
+        int maskIndex = -1;
+        QString encodeString = __c5config.getValue(param_static_qr_text);
+
+        CQR_Encode qrEncode;
+        bool successfulEncoding = qrEncode.EncodeData(levelIndex, versionIndex, bExtent, maskIndex, encodeString.toUtf8().data() );
+        if (!successfulEncoding) {
+            //fLog.append("Cannot encode qr image");
+        }
+        int qrImageSize = qrEncode.m_nSymbleSize;
+        int encodeImageSize = qrImageSize + ( QR_MARGIN * 2 );
+        QImage encodeImage(encodeImageSize, encodeImageSize, QImage::Format_Mono);
+        encodeImage.fill(1);
+
+        for ( int i = 0; i < qrImageSize; i++ ) {
+            for ( int j = 0; j < qrImageSize; j++ ) {
+                if ( qrEncode.m_byModuleData[i][j] ) {
+                    encodeImage.setPixel(i + QR_MARGIN, j + QR_MARGIN, 0);
+                }
+            }
+        }
+
+        QPixmap pix = QPixmap::fromImage(encodeImage);
+        pix = pix.scaled(300, 300);
+        p.image(pix, Qt::AlignHCenter);
+        p.br();
+        /* End QRCode */
+    }
+
+    p.setFontSize(20);
+    p.setFontBold(true);
+    p.br();
+    p.ltext(tr("Thank you for visit!"), 0);
+    p.br();
 
     p.ltext(tr("Printed"), 0);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
@@ -246,6 +300,7 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
 
 void PrintReceiptGroup::print2(const QString &id, C5Database &db)
 {
+    QMap<QString, QVariant> returnFrom;
     double cash = 0;
     double change = 0;
     double idram = 0;
@@ -269,6 +324,20 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
     QString saletype;
     if (db.getDouble("f_amounttotal") < 0) {
         saletype = tr("Return");
+        db[":f_header"] = id;
+        db.exec("select f_returnfrom from o_goods where f_header=:f_header");
+        if (db.nextRow()){
+            db[":f_id"] = db.getString("f_returnfrom");
+            db.exec("select f_header from o_goods where f_id=:f_id");
+            db.nextRow();
+            db[":f_id"] = db.getString("f_header");
+            db.exec("select * from o_header where f_id=:f_id");
+            db.nextRow();
+            db.rowToMap(returnFrom);
+            db[":f_id"] = id;
+            db.exec("select * from o_header where f_id=:f_id");
+            db.nextRow();
+        }
     }
     QString hallid = db.getString("f_hallid");
     QString pref = db.getString("f_prefix");
@@ -396,9 +465,10 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
         p.rtext(dtax.getString("f_time"));
         p.br();
         p.ltext(tr("(F)"), 0);
+        p.br();
     }
 
-    if (!partnerName.isEmpty()) {
+    if (!partnerName.isEmpty() || !partnerTaxcode.isEmpty()) {
         p.ltext(tr("Buyer taxcode"), 0);
         p.rtext(partnerTaxcode);
         p.br();
@@ -408,6 +478,10 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
     p.setFontBold(true);
     p.ctext(QString("#%1%2").arg(pref).arg(hallid));
     p.br();
+    if (returnFrom.count() > 0) {
+        p.ctext(QString("(%1 %2%3)").arg(tr("Return from")).arg(returnFrom["f_prefix"].toString()).arg(returnFrom["f_hallid"].toString()));
+        p.br();
+    }
     p.setFontSize(20);
     p.ctext(tr("Class | Name | Qty | Price | Total"));
     p.setFontBold(false);
@@ -477,9 +551,42 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
         p.br();
     }
 
+    if (!__c5config.getValue(param_static_qr_text).isEmpty()) {
+        p.br();
+        int levelIndex = 1;
+        int versionIndex = 0;
+        bool bExtent = true;
+        int maskIndex = -1;
+        QString encodeString = __c5config.getValue(param_static_qr_text);
+
+        CQR_Encode qrEncode;
+        bool successfulEncoding = qrEncode.EncodeData(levelIndex, versionIndex, bExtent, maskIndex, encodeString.toUtf8().data() );
+        if (!successfulEncoding) {
+            //fLog.append("Cannot encode qr image");
+        }
+        int qrImageSize = qrEncode.m_nSymbleSize;
+        int encodeImageSize = qrImageSize + ( QR_MARGIN * 2 );
+        QImage encodeImage(encodeImageSize, encodeImageSize, QImage::Format_Mono);
+        encodeImage.fill(1);
+
+        for ( int i = 0; i < qrImageSize; i++ ) {
+            for ( int j = 0; j < qrImageSize; j++ ) {
+                if ( qrEncode.m_byModuleData[i][j] ) {
+                    encodeImage.setPixel(i + QR_MARGIN, j + QR_MARGIN, 0);
+                }
+            }
+        }
+
+        QPixmap pix = QPixmap::fromImage(encodeImage);
+        pix = pix.scaled(300, 300);
+        p.image(pix, Qt::AlignHCenter);
+        p.br();
+        /* End QRCode */
+    }
+
     p.setFontSize(20);
     p.setFontBold(true);
-    p.br(p.fLineHeight * 3);
+    p.br();
     p.ltext(tr("Thank you for visit!"), 0);
     p.br();
 

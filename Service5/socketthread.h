@@ -1,14 +1,14 @@
 #ifndef SOCKETTHREAD_H
 #define SOCKETTHREAD_H
 
+#include "threadworker.h"
 #include "sslsocket.h"
 #include "socketdata.h"
 #include <QElapsedTimer>
 #include <QSslCertificate>
 #include <QSslKey>
-#include <QThread>
 
-class SocketThread : public QThread
+class SocketThread : public ThreadWorker
 {
     Q_OBJECT
 
@@ -16,7 +16,7 @@ public:
     SocketThread(int handle, QSslCertificate cert, QSslKey key, QSsl::SslProtocol proto);
     ~SocketThread();
 
-protected:
+public slots:
     virtual void run() override;
 
 private:
@@ -48,9 +48,6 @@ private slots:
     void readyRead();
     void disconnected();
     void error(QAbstractSocket::SocketError err);
-
-signals:
-    void sendData(int code, const QString &, const QString &, const QVariant &);
 };
 
 #endif // SOCKETTHREAD_H

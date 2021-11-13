@@ -161,7 +161,7 @@ bool C5User::authorize(const QString &altPassword)
 {
     C5Database db(__c5config.dbParams());
     db[":f_altpassword"] = altPassword;
-    db.exec("select * from s_user where f_altpassword=md5(:f_altpassword)");
+    db.exec("select * from s_user where f_altpassword=md5(:f_altpassword) and f_state=1 ");
     if (!db.nextRow()) {
         fError = tr("Access denied");
         return false;

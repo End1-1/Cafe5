@@ -1,5 +1,6 @@
 #include "dlgexportsaletoasoptions.h"
 #include "ui_dlgexportsaletoasoptions.h"
+#include <QDoubleValidator>
 
 DlgExportSaleToAsOptions::DlgExportSaleToAsOptions(const QStringList &dbParams) :
     C5Dialog(dbParams),
@@ -13,6 +14,11 @@ DlgExportSaleToAsOptions::DlgExportSaleToAsOptions(const QStringList &dbParams) 
     ui->leServiceOutAccount->setText(__c5config.getRegValue("asserviceoutaccount").toString());
     ui->leItemInAccount->setText(__c5config.getRegValue("asiteminaccount").toString());
     ui->leItemOutAccount->setText(__c5config.getRegValue("asitemoutaccount").toString());
+    ui->leBankAcc->setText(__c5config.getRegValue("asbankacc").toString());
+    ui->leVATValue->setText(__c5config.getRegValue("vatvalue").toString());
+    ui->leVATValue->setValidator(new QDoubleValidator(0, 100, 2));
+    ui->leSimpleItem->setText(__c5config.getRegValue("simpleitem").toString());
+    ui->chExportSimple->setChecked(__c5config.getRegValue("simplemode").toBool());
 }
 
 DlgExportSaleToAsOptions::~DlgExportSaleToAsOptions()
@@ -20,7 +26,9 @@ DlgExportSaleToAsOptions::~DlgExportSaleToAsOptions()
     delete ui;
 }
 
-int DlgExportSaleToAsOptions::getOption(const QStringList &dbParams, QString &partner, QString &store, QString &service, QString &srvinacc, QString &srvoutacc, QString &iteminacc, QString &itemoutacc)
+int DlgExportSaleToAsOptions::getOption(const QStringList &dbParams, QString &partner, QString &store, QString &service, QString &srvinacc,
+                                        QString &srvoutacc, QString &iteminacc, QString &itemoutacc, QString &bankacc, QString &vat, bool &exportSimple,
+                                        QString &simpleItem)
 {
     DlgExportSaleToAsOptions d(dbParams);
     if (d.exec() == QDialog::Accepted) {
@@ -31,6 +39,9 @@ int DlgExportSaleToAsOptions::getOption(const QStringList &dbParams, QString &pa
         srvoutacc = d.ui->leServiceOutAccount->text();
         iteminacc = d.ui->leItemInAccount->text();
         itemoutacc = d.ui->leItemOutAccount->text();
+        bankacc = d.ui->leBankAcc->text();
+        vat = d.ui->leVATValue->text();
+        simpleItem = d.ui->leSimpleItem->text();
         if (d.ui->rbTax->isChecked()) {
             return 1;
         } else if (d.ui->rbNoTax->isChecked()) {
@@ -38,6 +49,7 @@ int DlgExportSaleToAsOptions::getOption(const QStringList &dbParams, QString &pa
         } else {
             return 3;
         }
+        exportSimple = d.ui->chExportSimple->isChecked();
     } else {
         return 0;
     }
@@ -86,4 +98,24 @@ void DlgExportSaleToAsOptions::on_leItemOutAccount_textEdited(const QString &arg
 void DlgExportSaleToAsOptions::on_leItemInAccount_textEdited(const QString &arg1)
 {
     __c5config.setRegValue("asiteminaccount", arg1);
+}
+
+void DlgExportSaleToAsOptions::on_leBankAcc_textEdited(const QString &arg1)
+{
+    __c5config.setRegValue("asbankacc", arg1);
+}
+
+void DlgExportSaleToAsOptions::on_leVATValue_textEdited(const QString &arg1)
+{
+    __c5config.setRegValue("vatvalue", arg1);
+}
+
+void DlgExportSaleToAsOptions::on_chExportSimple_clicked(bool checked)
+{
+    __c5config.setRegValue("simplemode", checked);
+}
+
+void DlgExportSaleToAsOptions::on_leSimpleItem_textChanged(const QString &arg1)
+{
+    __c5config.setRegValue("simpleitem", arg1);
 }

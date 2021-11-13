@@ -15,7 +15,7 @@ DbUnit::DbUnit(int id) :
 
 QString DbUnit::unitName()
 {
-    return name(fId);
+    return dbunit->name(fId);
 }
 
 double DbUnit::defaultQty()

@@ -139,15 +139,11 @@ private slots:
 
     void on_btnComment_clicked();
 
-    //void on_btnExpandDishTable_clicked();
-
     void on_btnChangeMenu_clicked();
 
     void on_btnGuest_clicked();
 
     void on_btnSearchInMenu_clicked();
-
-    void on_btnCompactDishAddMode_clicked();
 
     void on_btnCar_clicked();
 
@@ -226,7 +222,10 @@ private slots:
     void on_btnDishPart2Down_clicked();
 
     void on_btnDishPart2Up_clicked();
+
     void on_btnReprint_clicked();
+
+    void on_btnBillWithoutService_clicked();
 };
 
 #endif // DLGORDER_H

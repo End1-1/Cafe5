@@ -6,69 +6,49 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>310</height>
+    <width>382</width>
+    <height>535</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Export options</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Partner code</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1">
-    <widget class="QLineEdit" name="leServiceItem"/>
-   </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>Service out account</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="1">
-    <widget class="QLineEdit" name="leServiceInAccount"/>
-   </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Store code</string>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="0" colspan="2">
-    <widget class="QRadioButton" name="rbTax">
-     <property name="text">
-      <string>Tax</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="0" colspan="2">
-    <widget class="QRadioButton" name="rbNoTax">
-     <property name="text">
-      <string>No tax</string>
-     </property>
-    </widget>
-   </item>
-   <item row="9" column="0" colspan="2">
+   <item row="14" column="0" colspan="2">
     <widget class="QRadioButton" name="rbBoth">
      <property name="text">
       <string>Both</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="1">
+   <item row="10" column="1">
+    <widget class="QLineEdit" name="leBankAcc"/>
+   </item>
+   <item row="6" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Service out account</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="0">
+    <widget class="QLabel" name="label_6">
+     <property name="text">
+      <string>Items in account</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Partner code</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1">
     <widget class="QLineEdit" name="leServiceOutAccount"/>
    </item>
-   <item row="10" column="0" colspan="2">
+   <item row="15" column="0" colspan="2">
     <widget class="QWidget" name="widget" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
@@ -114,45 +94,109 @@
      </layout>
     </widget>
    </item>
-   <item row="0" column="1">
+   <item row="7" column="1">
+    <widget class="QLineEdit" name="leServiceInAccount"/>
+   </item>
+   <item row="11" column="1">
+    <widget class="QLineEdit" name="leVATValue"/>
+   </item>
+   <item row="5" column="1">
+    <widget class="QLineEdit" name="leServiceItem"/>
+   </item>
+   <item row="3" column="1">
     <widget class="C5LineEdit" name="leStoreCode"/>
    </item>
-   <item row="1" column="1">
-    <widget class="C5LineEdit" name="lePartnerCode"/>
-   </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_3">
+   <item row="12" column="0" colspan="2">
+    <widget class="QRadioButton" name="rbTax">
      <property name="text">
-      <string>Service item</string>
+      <string>Tax</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
-   <item row="4" column="0">
-    <widget class="QLabel" name="label_5">
+   <item row="8" column="1">
+    <widget class="QLineEdit" name="leItemOutAccount"/>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label">
      <property name="text">
-      <string>Service in account</string>
+      <string>Store code</string>
      </property>
     </widget>
    </item>
-   <item row="6" column="0">
-    <widget class="QLabel" name="label_6">
+   <item row="11" column="0">
+    <widget class="QLabel" name="label_9">
      <property name="text">
-      <string>Items in account</string>
+      <string>VAT value</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="0">
+   <item row="8" column="0">
     <widget class="QLabel" name="label_7">
      <property name="text">
       <string>Items out account</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="1">
-    <widget class="QLineEdit" name="leItemOutAccount"/>
+   <item row="4" column="1">
+    <widget class="C5LineEdit" name="lePartnerCode"/>
    </item>
-   <item row="6" column="1">
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_10">
+     <property name="text">
+      <string>Export simple</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>Service in account</string>
+     </property>
+    </widget>
+   </item>
+   <item row="13" column="0" colspan="2">
+    <widget class="QRadioButton" name="rbNoTax">
+     <property name="text">
+      <string>No tax</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="0">
+    <widget class="QLabel" name="label_8">
+     <property name="text">
+      <string>Bank acquiring account</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Service item</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="1">
     <widget class="QLineEdit" name="leItemInAccount"/>
+   </item>
+   <item row="0" column="1">
+    <widget class="QCheckBox" name="chExportSimple">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_11">
+     <property name="text">
+      <string>Simple  item</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QLineEdit" name="leSimpleItem"/>
    </item>
   </layout>
  </widget>
@@ -163,6 +207,24 @@
    <header location="global">c5lineedit.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>chExportSimple</tabstop>
+  <tabstop>leSimpleItem</tabstop>
+  <tabstop>leStoreCode</tabstop>
+  <tabstop>lePartnerCode</tabstop>
+  <tabstop>leServiceItem</tabstop>
+  <tabstop>leServiceOutAccount</tabstop>
+  <tabstop>leServiceInAccount</tabstop>
+  <tabstop>leItemOutAccount</tabstop>
+  <tabstop>leItemInAccount</tabstop>
+  <tabstop>leBankAcc</tabstop>
+  <tabstop>leVATValue</tabstop>
+  <tabstop>rbTax</tabstop>
+  <tabstop>rbNoTax</tabstop>
+  <tabstop>rbBoth</tabstop>
+  <tabstop>btnOK</tabstop>
+  <tabstop>btnCancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

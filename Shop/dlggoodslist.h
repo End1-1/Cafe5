@@ -17,11 +17,16 @@ public:
 
     static bool getGoods(int &id);
 
+protected:
+    virtual bool event(QEvent *event) override;
+
 private slots:
     void on_leSearch_textChanged(const QString &arg1);
 
 private:
     Ui::DlgGoodsList *ui;
+
+    int fGoodsId;
 };
 
 #endif // DLGGOODSLIST_H

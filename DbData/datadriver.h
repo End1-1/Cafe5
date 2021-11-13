@@ -18,6 +18,7 @@
 #include "dbshift.h"
 #include "dbmenu.h"
 #include "dbdishspecial.h"
+#include "dbbodystate.h"
 #include <QStringList>
 
 #define dbuser DataDriver::fInstance->fDbUser
@@ -37,6 +38,7 @@
 #define dbgoods DataDriver::fInstance->fDbGoods
 #define dbgoodsgroup DataDriver::fInstance->fDbGoodsGroup
 #define dbunit DataDriver::fInstance->fDbUnit
+#define dbbodystate DataDriver::fInstance->fDbBodyState
 
 class DataDriver
 {
@@ -76,6 +78,8 @@ public:
     DbDishSpecial *fDbDishSpecial;
 
     DbShift *fDbShift;
+
+    DbBodyState *fDbBodyState;
 
     static void init(const QStringList &dbParams);
 

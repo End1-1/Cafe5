@@ -1063,7 +1063,7 @@
     <message>
         <location filename="../Editors/c5dishwidget.ui" line="232"/>
         <location filename="../Editors/c5dishwidget.ui" line="447"/>
-        <location filename="../Editors/c5dishwidget.cpp" line="372"/>
+        <location filename="../Editors/c5dishwidget.cpp" line="365"/>
         <source>Price</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1169,7 +1169,7 @@
     </message>
     <message>
         <location filename="../Editors/c5dishwidget.ui" line="393"/>
-        <location filename="../Editors/c5dishwidget.cpp" line="363"/>
+        <location filename="../Editors/c5dishwidget.cpp" line="356"/>
         <source>Recipe</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1275,25 +1275,25 @@
     </message>
     <message>
         <location filename="../Editors/c5dishwidget.ui" line="427"/>
-        <location filename="../Editors/c5dishwidget.cpp" line="370"/>
+        <location filename="../Editors/c5dishwidget.cpp" line="363"/>
         <source>Qty</source>
         <translation type="unfinished">Քանակ</translation>
     </message>
     <message>
         <location filename="../Editors/c5dishwidget.ui" line="442"/>
-        <location filename="../Editors/c5dishwidget.cpp" line="371"/>
+        <location filename="../Editors/c5dishwidget.cpp" line="364"/>
         <source>Unit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../Editors/c5dishwidget.ui" line="452"/>
-        <location filename="../Editors/c5dishwidget.cpp" line="391"/>
+        <location filename="../Editors/c5dishwidget.cpp" line="384"/>
         <source>Total</source>
         <translation type="unfinished">Ընդամենը</translation>
     </message>
     <message>
         <location filename="../Editors/c5dishwidget.cpp" line="57"/>
-        <location filename="../Editors/c5dishwidget.cpp" line="523"/>
+        <location filename="../Editors/c5dishwidget.cpp" line="516"/>
         <source>Dish</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1303,27 +1303,27 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Editors/c5dishwidget.cpp" line="281"/>
+        <location filename="../Editors/c5dishwidget.cpp" line="274"/>
         <source>Background color</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Editors/c5dishwidget.cpp" line="369"/>
+        <location filename="../Editors/c5dishwidget.cpp" line="362"/>
         <source>Goods</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Editors/c5dishwidget.cpp" line="373"/>
+        <location filename="../Editors/c5dishwidget.cpp" line="366"/>
         <source>Cost</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Editors/c5dishwidget.cpp" line="432"/>
+        <location filename="../Editors/c5dishwidget.cpp" line="425"/>
         <source>Confirm to remove dish comment</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Editors/c5dishwidget.cpp" line="456"/>
+        <location filename="../Editors/c5dishwidget.cpp" line="449"/>
         <source>Divider</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1566,7 +1566,7 @@
     </message>
     <message>
         <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="113"/>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="873"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="899"/>
         <source>All actions</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1581,53 +1581,53 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="163"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="408"/>
         <source>Payment, complimentary</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="306"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="428"/>
         <source>Payment, dept</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="366"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="398"/>
         <source>Payment, transfer to room</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="336"/>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="453"/>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="563"/>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="806"/>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1016"/>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1053"/>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1173"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="178"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="479"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="589"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="832"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1042"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1079"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1199"/>
         <source>All items</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="273"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="418"/>
         <source>Payment, breakfast</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="253"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="358"/>
         <source>Remove printed service</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="326"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="388"/>
         <source>Change value of service fee</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="173"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="368"/>
         <source>Mutliple receipt</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="213"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="438"/>
         <source>Refund goods (Shop)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1637,428 +1637,438 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="233"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="448"/>
         <source>Shift rotation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="183"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="458"/>
         <source>Delete row from shop</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="447"/>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="463"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="473"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="489"/>
         <source>Goods</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="473"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="499"/>
         <source>Storages</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="483"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="509"/>
         <source>Auto waste</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="506"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="532"/>
         <source>Units</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="516"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="542"/>
         <source>Classes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="526"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="552"/>
         <source>Groups</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="536"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="562"/>
         <source>Images</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="547"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="573"/>
         <source>Reports</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="756"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="782"/>
         <source>Documents</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="623"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="649"/>
         <source>Sales, expert mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="696"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="722"/>
         <source>Storage</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="553"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="579"/>
         <source>Reason for consuption</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="736"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="762"/>
         <source>Sales, removed dishes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="663"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="689"/>
         <source>Sales, effectiveness</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="573"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="599"/>
         <source>Goods movement</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="643"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="669"/>
         <source>Sales, car visits</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="593"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="619"/>
         <source>Detailed movement in the storage</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="583"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="609"/>
         <source>Preorders</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="653"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="679"/>
         <source>Discount statistics</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="613"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="639"/>
         <source>Sales, dishes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="716"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="742"/>
         <source>Debts to partners</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="633"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="659"/>
         <source>T-store extra</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="673"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="699"/>
         <source>Sales from store</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="603"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="629"/>
         <source>Documents in the store</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="193"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="268"/>
         <source>Edit preorder</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="346"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="228"/>
         <source>Change staff of table</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="416"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="238"/>
         <source>Change menu of table</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="223"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="308"/>
         <source>Print precheck</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="426"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="188"/>
         <source>Enter working area</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="283"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="288"/>
         <source>Cancel discount of order</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="386"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="208"/>
         <source>Edit table order</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="203"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="258"/>
         <source>Edit stoplist</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="263"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="338"/>
         <source>Cancel prechek</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="316"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="278"/>
         <source>Discount order</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="406"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="348"/>
         <source>Final bill</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="376"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="328"/>
         <source>Repeat precheck</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="356"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="248"/>
         <source>Split guests</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="243"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="198"/>
         <source>Manger tools</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="396"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="318"/>
         <source>Print receipt</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="436"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="218"/>
         <source>Move table</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="706"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="298"/>
+        <source>Bill without service</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="378"/>
+        <source>Change date of sale</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="732"/>
         <source>Storage uncomplected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="726"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="752"/>
         <source>Goods movement, uncomplected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="746"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="772"/>
         <source>Goods consuption, draft</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="766"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="792"/>
         <source>Custom reports</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="777"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="803"/>
         <source>Salary</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="783"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="809"/>
         <source>Edit document</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="816"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="842"/>
         <source>Report</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="827"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="853"/>
         <source>Cash</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="833"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="859"/>
         <source>Cash names</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="843"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="869"/>
         <source>Costumer debts pay</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="853"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="879"/>
         <source>Costumer debts report</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="863"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="889"/>
         <source>Cash detailed report</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="883"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="909"/>
         <source>Cash common report</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="906"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="932"/>
         <source>Edit cash documents</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="916"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="942"/>
         <source>Movement in the cash</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="927"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="953"/>
         <source>Menu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="933"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="959"/>
         <source>Dish price and self cost report</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="943"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="969"/>
         <source>Dish remove reasons</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="953"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="979"/>
         <source>Dishes list</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="976"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1002"/>
         <source>Menu names</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="986"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1012"/>
         <source>Types of dishes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="996"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1022"/>
         <source>Dish comments</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1006"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1032"/>
         <source>Dish departments</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1026"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1052"/>
         <source>Review menu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1036"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1062"/>
         <source>Dishes packages</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1047"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1073"/>
         <source>Other</source>
         <translation type="unfinished">Այլ</translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1063"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1089"/>
         <source>Partners</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1073"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1099"/>
         <source>Credit cards</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1083"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1109"/>
         <source>Halls</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1093"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1119"/>
         <source>Tables</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1103"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1129"/>
         <source>Discount system</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1113"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1139"/>
         <source>Upload data to other server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1123"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1149"/>
         <source>Settings for data synchronization</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1133"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1159"/>
         <source>Store reasons</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1143"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1169"/>
         <source>Order marks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1167"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1193"/>
         <source>Preferences</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1183"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1209"/>
         <source>Login to manager</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1193"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1219"/>
         <source>Login to waiter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1203"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1229"/>
         <source>Users groups</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1213"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1239"/>
         <source>Users</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1223"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1249"/>
         <source>Databases</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1233"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1259"/>
         <source>Settings</source>
         <translation type="unfinished">Կարգավորումներ</translation>
     </message>
     <message>
-        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1260"/>
+        <location filename="../FrontDesk/c5grouppermissionseditor.ui" line="1286"/>
         <source>CommandLinkButton</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2863,90 +2873,90 @@
         <translation type="unfinished">Դաս՝ | Անվանում | Քնկ | Գին | Ընդամենը</translation>
     </message>
     <message>
-        <location filename="../Waiter/c5printreceiptthread.cpp" line="169"/>
+        <location filename="../Waiter/c5printreceiptthread.cpp" line="168"/>
         <source>Class</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Waiter/c5printreceiptthread.cpp" line="182"/>
+        <location filename="../Waiter/c5printreceiptthread.cpp" line="181"/>
         <source>Present</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Waiter/c5printreceiptthread.cpp" line="201"/>
+        <location filename="../Waiter/c5printreceiptthread.cpp" line="204"/>
         <source>Total</source>
         <translation type="unfinished">Ընդամենը</translation>
     </message>
     <message>
-        <location filename="../Waiter/c5printreceiptthread.cpp" line="206"/>
+        <location filename="../Waiter/c5printreceiptthread.cpp" line="209"/>
         <source>Service</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Waiter/c5printreceiptthread.cpp" line="212"/>
+        <location filename="../Waiter/c5printreceiptthread.cpp" line="215"/>
         <source>Discount</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Waiter/c5printreceiptthread.cpp" line="219"/>
+        <location filename="../Waiter/c5printreceiptthread.cpp" line="222"/>
         <source>Need to pay</source>
         <translation type="unfinished">Ենթակա է վճարման</translation>
     </message>
     <message>
-        <location filename="../Waiter/c5printreceiptthread.cpp" line="277"/>
+        <location filename="../Waiter/c5printreceiptthread.cpp" line="280"/>
         <source>Payment, cash</source>
         <translation type="unfinished">Կանխիկ</translation>
     </message>
     <message>
-        <location filename="../Waiter/c5printreceiptthread.cpp" line="281"/>
+        <location filename="../Waiter/c5printreceiptthread.cpp" line="284"/>
         <source>Payment, card</source>
         <translation type="unfinished">Անկանխիկ</translation>
     </message>
     <message>
-        <location filename="../Waiter/c5printreceiptthread.cpp" line="285"/>
+        <location filename="../Waiter/c5printreceiptthread.cpp" line="288"/>
         <source>Bank transfer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Waiter/c5printreceiptthread.cpp" line="294"/>
+        <location filename="../Waiter/c5printreceiptthread.cpp" line="297"/>
         <source>Transfer to room</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Waiter/c5printreceiptthread.cpp" line="299"/>
-        <location filename="../Waiter/c5printreceiptthread.cpp" line="316"/>
-        <location filename="../Waiter/c5printreceiptthread.cpp" line="325"/>
+        <location filename="../Waiter/c5printreceiptthread.cpp" line="302"/>
+        <location filename="../Waiter/c5printreceiptthread.cpp" line="319"/>
+        <location filename="../Waiter/c5printreceiptthread.cpp" line="328"/>
         <source>Signature</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Waiter/c5printreceiptthread.cpp" line="305"/>
+        <location filename="../Waiter/c5printreceiptthread.cpp" line="308"/>
         <source>City ledger</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Waiter/c5printreceiptthread.cpp" line="313"/>
+        <location filename="../Waiter/c5printreceiptthread.cpp" line="316"/>
         <source>Debt</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Waiter/c5printreceiptthread.cpp" line="322"/>
+        <location filename="../Waiter/c5printreceiptthread.cpp" line="325"/>
         <source>Complimentary</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Waiter/c5printreceiptthread.cpp" line="331"/>
+        <location filename="../Waiter/c5printreceiptthread.cpp" line="334"/>
         <source>Costumer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Waiter/c5printreceiptthread.cpp" line="343"/>
+        <location filename="../Waiter/c5printreceiptthread.cpp" line="346"/>
         <source>Thank you for visit!</source>
         <translation type="unfinished">Շնորհակալություն այցելության համար</translation>
     </message>
     <message>
-        <location filename="../Waiter/c5printreceiptthread.cpp" line="346"/>
-        <location filename="../Waiter/c5printreceiptthread.cpp" line="348"/>
+        <location filename="../Waiter/c5printreceiptthread.cpp" line="349"/>
+        <location filename="../Waiter/c5printreceiptthread.cpp" line="351"/>
         <source>Sample</source>
         <translation type="unfinished">Օրնկ․</translation>
     </message>
@@ -3113,57 +3123,37 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5printremovedservicethread.cpp" line="54"/>
-        <source>Reason</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Classes/c5printremovedservicethread.cpp" line="57"/>
-        <source>Mistake</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Classes/c5printremovedservicethread.cpp" line="60"/>
-        <source>Void</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Classes/c5printremovedservicethread.cpp" line="63"/>
-        <source>May be, programm error occured</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Classes/c5printremovedservicethread.cpp" line="67"/>
+        <location filename="../Classes/c5printremovedservicethread.cpp" line="56"/>
         <source>Comment</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5printremovedservicethread.cpp" line="71"/>
+        <location filename="../Classes/c5printremovedservicethread.cpp" line="60"/>
         <source>Table</source>
         <translation type="unfinished">ՍԵՂԱՆ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printremovedservicethread.cpp" line="74"/>
+        <location filename="../Classes/c5printremovedservicethread.cpp" line="63"/>
         <source>Order no</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5printremovedservicethread.cpp" line="77"/>
+        <location filename="../Classes/c5printremovedservicethread.cpp" line="66"/>
         <source>Date</source>
         <translation type="unfinished">Ամսաթիվ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printremovedservicethread.cpp" line="80"/>
+        <location filename="../Classes/c5printremovedservicethread.cpp" line="69"/>
         <source>Time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5printremovedservicethread.cpp" line="83"/>
+        <location filename="../Classes/c5printremovedservicethread.cpp" line="72"/>
         <source>Staff</source>
         <translation type="unfinished">Սպասարկող</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printremovedservicethread.cpp" line="102"/>
+        <location filename="../Classes/c5printremovedservicethread.cpp" line="91"/>
         <source>Printer: </source>
         <translation type="unfinished"></translation>
     </message>
@@ -3743,69 +3733,89 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1190"/>
+        <location filename="../Reports/c5settingswidget.ui" line="662"/>
+        <source>User id for hotel voucher</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Reports/c5settingswidget.ui" line="752"/>
+        <source>Hall id for hotel record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Reports/c5settingswidget.ui" line="759"/>
+        <source>No invoice record for hotel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Reports/c5settingswidget.ui" line="1152"/>
         <source>Print dish timeorder</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1197"/>
-        <source>Print scancode with name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1220"/>
-        <source>Widthe of printer</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1226"/>
-        <source>50mm</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1236"/>
-        <source>80mm</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1253"/>
-        <source>Http server</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1259"/>
-        <source>HTTP server ip</source>
+        <location filename="../Reports/c5settingswidget.ui" line="1221"/>
+        <source>Static QR code text</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../Reports/c5settingswidget.ui" line="1273"/>
-        <source>HTTP server port</source>
+        <source>Print scancode with name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1287"/>
-        <source>HTTP server username</source>
+        <location filename="../Reports/c5settingswidget.ui" line="1234"/>
+        <source>Widthe of printer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Reports/c5settingswidget.ui" line="1240"/>
+        <source>50mm</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Reports/c5settingswidget.ui" line="1250"/>
+        <source>80mm</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Reports/c5settingswidget.ui" line="1295"/>
+        <source>Http server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../Reports/c5settingswidget.ui" line="1301"/>
-        <source>HTTP server password</source>
+        <source>HTTP server ip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Reports/c5settingswidget.ui" line="1315"/>
+        <source>HTTP server port</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../Reports/c5settingswidget.ui" line="1329"/>
+        <source>HTTP server username</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Reports/c5settingswidget.ui" line="1343"/>
+        <source>HTTP server password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Reports/c5settingswidget.ui" line="1371"/>
         <source>AS integration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1335"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1377"/>
         <source>Connection string</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1349"/>
-        <source>Buyer code</source>
-        <translation type="unfinished"></translation>
+        <location filename="../Reports/c5settingswidget.ui" line="1404"/>
+        <source>Test</source>
+        <translation type="unfinished">Սուգել</translation>
     </message>
     <message>
         <location filename="../Reports/c5settingswidget.ui" line="215"/>
@@ -3868,7 +3878,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1134"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1214"/>
         <source>Receipt printer</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3918,27 +3928,27 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="717"/>
+        <location filename="../Reports/c5settingswidget.ui" line="731"/>
         <source>Default table</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="628"/>
+        <location filename="../Reports/c5settingswidget.ui" line="745"/>
         <source>Default hall</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="614"/>
+        <location filename="../Reports/c5settingswidget.ui" line="669"/>
         <source>Item code for hotel voucher</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="686"/>
+        <location filename="../Reports/c5settingswidget.ui" line="641"/>
         <source>Login after payment</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="621"/>
+        <location filename="../Reports/c5settingswidget.ui" line="648"/>
         <source>Service value</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3948,7 +3958,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="607"/>
+        <location filename="../Reports/c5settingswidget.ui" line="634"/>
         <source>Hotel database</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3958,133 +3968,128 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="642"/>
+        <location filename="../Reports/c5settingswidget.ui" line="700"/>
         <source>Car mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="703"/>
+        <location filename="../Reports/c5settingswidget.ui" line="707"/>
         <source>Main menu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="732"/>
+        <location filename="../Reports/c5settingswidget.ui" line="777"/>
         <source>Sale, shop</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="745"/>
+        <location filename="../Reports/c5settingswidget.ui" line="821"/>
         <source>Autologin pin</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="871"/>
-        <source>Control quantity</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Reports/c5settingswidget.ui" line="738"/>
+        <location filename="../Reports/c5settingswidget.ui" line="814"/>
         <source>Deny retail</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="864"/>
+        <location filename="../Reports/c5settingswidget.ui" line="800"/>
         <source>Enter pin</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="752"/>
+        <location filename="../Reports/c5settingswidget.ui" line="807"/>
         <source>Deny price changing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="857"/>
+        <location filename="../Reports/c5settingswidget.ui" line="870"/>
         <source>Deny whosale</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="837"/>
+        <location filename="../Reports/c5settingswidget.ui" line="793"/>
         <source>Fix staff</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1060"/>
-        <location filename="../Reports/c5settingswidget.ui" line="1154"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1088"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1113"/>
         <source>Printing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1141"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1266"/>
         <source>Receipt paper width</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1160"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1119"/>
         <source>V1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1170"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1129"/>
         <source>V2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1089"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1182"/>
         <source>Printing goods qty side</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1095"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1188"/>
         <source>Left of name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1105"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1198"/>
         <source>Down of name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="925"/>
+        <location filename="../Reports/c5settingswidget.ui" line="953"/>
         <source>Tax options</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="931"/>
+        <location filename="../Reports/c5settingswidget.ui" line="959"/>
         <source>Tax port</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="945"/>
+        <location filename="../Reports/c5settingswidget.ui" line="973"/>
         <source>Tax IP</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="959"/>
+        <location filename="../Reports/c5settingswidget.ui" line="987"/>
         <source>Tax use external POS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="973"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1001"/>
         <source>Always offer tax</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="980"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1008"/>
         <source>Tax department</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="987"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1015"/>
         <source>Tax password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1017"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1045"/>
         <source>Cashier login</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1038"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1066"/>
         <source>Cashier pin</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4107,6 +4112,11 @@
         <location filename="../Reports/c5settingswidget.cpp" line="14"/>
         <source>Shop</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Reports/c5settingswidget.cpp" line="244"/>
+        <source>Connection successfull</source>
+        <translation type="unfinished">Կապը հաստատվեց</translation>
     </message>
     <message>
         <location filename="../Reports/c5settingswidget.h" line="19"/>
@@ -4851,47 +4861,47 @@ barcode</source>
         <translation>Ելք ըստ վաճառքի</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="181"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="164"/>
         <source>No hall with id</source>
         <translation>Նշված կոդով սրահը բացակայում է</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="225"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="208"/>
         <source>Error in store document, partial data was lost</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="241"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="224"/>
         <source>Empty store document</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="274"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="257"/>
         <source>Error in cash document, partial data was lost</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="284"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="267"/>
         <source>Empty cash document</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="377"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="360"/>
         <source>Document not exists</source>
         <translation>Փաստաթուղթը գոյություն չունի</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="875"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="858"/>
         <source>Invalid document id</source>
         <translation>Սխալ փաստաթղթի համար</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="978"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="970"/>
         <source>Not enough materials in the store</source>
         <translation>Բացասական քանակ պահեստում</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="1083"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="1069"/>
         <source>This order used in next documents</source>
         <translation>Այս փաստաթուղթը օգտագործվում է հետևյալ պահեստի ելքերի մեջ</translation>
     </message>
@@ -5420,7 +5430,7 @@ barcode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterorderdoc.cpp" line="320"/>
+        <location filename="../Classes/c5waiterorderdoc.cpp" line="329"/>
         <source>Document saved</source>
         <translation>Պահպանված է</translation>
     </message>
@@ -6267,7 +6277,12 @@ MS Excel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5dishpart2.cpp" line="35"/>
+        <location filename="../Editors/ce5dishpart2.cpp" line="37"/>
+        <source>Cannot parent itself</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Editors/ce5dishpart2.cpp" line="46"/>
         <source>Background color</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6365,7 +6380,7 @@ MS Excel</source>
     </message>
     <message>
         <location filename="../Editors/ce5goods.ui" line="233"/>
-        <location filename="../Editors/ce5goods.cpp" line="244"/>
+        <location filename="../Editors/ce5goods.cpp" line="234"/>
         <source>Name</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6442,7 +6457,7 @@ MS Excel</source>
     <message>
         <location filename="../Editors/ce5goods.ui" line="664"/>
         <location filename="../Editors/ce5goods.ui" line="1105"/>
-        <location filename="../Editors/ce5goods.cpp" line="244"/>
+        <location filename="../Editors/ce5goods.cpp" line="234"/>
         <source>Unit</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6463,7 +6478,7 @@ MS Excel</source>
     </message>
     <message>
         <location filename="../Editors/ce5goods.ui" line="240"/>
-        <location filename="../Editors/ce5goods.cpp" line="244"/>
+        <location filename="../Editors/ce5goods.cpp" line="234"/>
         <source>Code</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6484,8 +6499,8 @@ MS Excel</source>
     </message>
     <message>
         <location filename="../Editors/ce5goods.ui" line="200"/>
-        <location filename="../Editors/ce5goods.ui" line="1355"/>
-        <location filename="../Editors/ce5goods.cpp" line="362"/>
+        <location filename="../Editors/ce5goods.ui" line="1358"/>
+        <location filename="../Editors/ce5goods.cpp" line="352"/>
         <source>Scancode</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6622,29 +6637,29 @@ MS Excel</source>
     </message>
     <message>
         <location filename="../Editors/ce5goods.ui" line="1100"/>
-        <location filename="../Editors/ce5goods.cpp" line="244"/>
+        <location filename="../Editors/ce5goods.cpp" line="234"/>
         <source>Qty</source>
         <translation type="unfinished">Քանակ</translation>
     </message>
     <message>
         <location filename="../Editors/ce5goods.ui" line="1110"/>
-        <location filename="../Editors/ce5goods.cpp" line="244"/>
+        <location filename="../Editors/ce5goods.cpp" line="234"/>
         <source>Price</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../Editors/ce5goods.ui" line="1115"/>
         <location filename="../Editors/ce5goods.ui" line="1139"/>
-        <location filename="../Editors/ce5goods.cpp" line="244"/>
+        <location filename="../Editors/ce5goods.cpp" line="234"/>
         <source>Total</source>
         <translation type="unfinished">Ընդամենը</translation>
     </message>
     <message>
         <location filename="../Editors/ce5goods.ui" line="1178"/>
         <location filename="../Editors/ce5goods.ui" line="1193"/>
-        <location filename="../Editors/ce5goods.cpp" line="192"/>
-        <location filename="../Editors/ce5goods.cpp" line="325"/>
-        <location filename="../Editors/ce5goods.cpp" line="356"/>
+        <location filename="../Editors/ce5goods.cpp" line="182"/>
+        <location filename="../Editors/ce5goods.cpp" line="315"/>
+        <location filename="../Editors/ce5goods.cpp" line="346"/>
         <source>Image</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6659,7 +6674,12 @@ MS Excel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="1313"/>
+        <location filename="../Editors/ce5goods.ui" line="1289"/>
+        <source>f_storeinputbeforesale</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Editors/ce5goods.ui" line="1316"/>
         <source>Same store id</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6679,12 +6699,12 @@ MS Excel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="1296"/>
+        <location filename="../Editors/ce5goods.ui" line="1299"/>
         <source>f_wholenumber</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="1321"/>
+        <location filename="../Editors/ce5goods.ui" line="1324"/>
         <source>Multiple scancodes</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6699,104 +6719,104 @@ MS Excel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="125"/>
+        <location filename="../Editors/ce5goods.cpp" line="121"/>
         <source>Goods code for store output cannot be undefined</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="214"/>
+        <location filename="../Editors/ce5goods.cpp" line="204"/>
         <source>Print card</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="228"/>
+        <location filename="../Editors/ce5goods.cpp" line="218"/>
         <source>Printed</source>
         <translation type="unfinished">Տպված</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="230"/>
+        <location filename="../Editors/ce5goods.cpp" line="220"/>
         <source>Goods card</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="233"/>
+        <location filename="../Editors/ce5goods.cpp" line="223"/>
         <source>Goods group</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="234"/>
+        <location filename="../Editors/ce5goods.cpp" line="224"/>
         <source>Internal code</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="236"/>
+        <location filename="../Editors/ce5goods.cpp" line="226"/>
         <source>Retail price</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="237"/>
+        <location filename="../Editors/ce5goods.cpp" line="227"/>
         <source>Whosale price</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="241"/>
+        <location filename="../Editors/ce5goods.cpp" line="231"/>
         <source>Complecation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="257"/>
+        <location filename="../Editors/ce5goods.cpp" line="247"/>
         <source>Complectation cost</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="314"/>
+        <location filename="../Editors/ce5goods.cpp" line="304"/>
         <source>You should to item before upload an image</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="331"/>
+        <location filename="../Editors/ce5goods.cpp" line="321"/>
         <source>Could not load image</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="350"/>
-        <location filename="../Editors/ce5goods.cpp" line="600"/>
+        <location filename="../Editors/ce5goods.cpp" line="340"/>
+        <location filename="../Editors/ce5goods.cpp" line="590"/>
         <source>Remove image</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="369"/>
+        <location filename="../Editors/ce5goods.cpp" line="359"/>
         <source>Scancode exists</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="377"/>
-        <location filename="../Editors/ce5goods.cpp" line="383"/>
+        <location filename="../Editors/ce5goods.cpp" line="367"/>
+        <location filename="../Editors/ce5goods.cpp" line="373"/>
         <source>This code already used</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="397"/>
+        <location filename="../Editors/ce5goods.cpp" line="387"/>
         <source>Confirm to remove scancode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="407"/>
+        <location filename="../Editors/ce5goods.cpp" line="397"/>
         <source>New</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="408"/>
+        <location filename="../Editors/ce5goods.cpp" line="398"/>
         <source>Remove</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="453"/>
+        <location filename="../Editors/ce5goods.cpp" line="443"/>
         <source>Confirm to remove</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="599"/>
+        <location filename="../Editors/ce5goods.cpp" line="589"/>
         <source>Upload image</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8217,36 +8237,63 @@ MS Excel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5commonsales.cpp" line="159"/>
+        <location filename="../Reports/cr5commonsales.cpp" line="160"/>
         <source>Export to AS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5commonsales.cpp" line="183"/>
-        <location filename="../Reports/cr5commonsales.cpp" line="220"/>
-        <location filename="../Reports/cr5commonsales.cpp" line="244"/>
+        <location filename="../Reports/cr5commonsales.cpp" line="161"/>
+        <source>Create store output in AS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Reports/cr5commonsales.cpp" line="185"/>
+        <location filename="../Reports/cr5commonsales.cpp" line="222"/>
+        <location filename="../Reports/cr5commonsales.cpp" line="246"/>
         <source>Column &apos;Header&apos; must be checked in filter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5commonsales.cpp" line="187"/>
+        <location filename="../Reports/cr5commonsales.cpp" line="189"/>
         <source>Nothing selected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5commonsales.cpp" line="238"/>
-        <location filename="../Reports/cr5commonsales.cpp" line="449"/>
+        <location filename="../Reports/cr5commonsales.cpp" line="240"/>
+        <location filename="../Reports/cr5commonsales.cpp" line="445"/>
+        <location filename="../Reports/cr5commonsales.cpp" line="613"/>
+        <location filename="../Reports/cr5commonsales.cpp" line="734"/>
         <source>Done</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5commonsales.cpp" line="290"/>
+        <location filename="../Reports/cr5commonsales.cpp" line="293"/>
         <source>Invalid partner code</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5commonsales.cpp" line="298"/>
+        <location filename="../Reports/cr5commonsales.cpp" line="301"/>
         <source>Invalid service code</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Reports/cr5commonsales.cpp" line="310"/>
+        <source>Invalid simple item code</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Reports/cr5commonsales.cpp" line="357"/>
+        <source>Revenue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Reports/cr5commonsales.cpp" line="671"/>
+        <source>Output of %1 - %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Reports/cr5commonsales.cpp" line="730"/>
+        <source>Nothing to create</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8258,103 +8305,111 @@ MS Excel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5commonsalesfilter.ui" line="260"/>
+        <location filename="../Reports/cr5commonsalesfilter.ui" line="214"/>
         <source>End date</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5commonsalesfilter.ui" line="194"/>
+        <location filename="../Reports/cr5commonsalesfilter.ui" line="260"/>
         <source>hall</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5commonsalesfilter.ui" line="210"/>
+        <location filename="../Reports/cr5commonsalesfilter.ui" line="143"/>
+        <location filename="../Reports/cr5commonsalesfilter.ui" line="343"/>
         <source>All</source>
         <translation type="unfinished">Բոլորը</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5commonsalesfilter.ui" line="217"/>
+        <location filename="../Reports/cr5commonsalesfilter.ui" line="150"/>
+        <location filename="../Reports/cr5commonsalesfilter.ui" line="350"/>
         <source>Yes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5commonsalesfilter.ui" line="224"/>
+        <location filename="../Reports/cr5commonsalesfilter.ui" line="157"/>
+        <location filename="../Reports/cr5commonsalesfilter.ui" line="357"/>
         <source>No</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5commonsalesfilter.ui" line="286"/>
-        <location filename="../Reports/cr5commonsalesfilter.ui" line="300"/>
+        <location filename="../Reports/cr5commonsalesfilter.ui" line="227"/>
+        <location filename="../Reports/cr5commonsalesfilter.ui" line="294"/>
         <source>State</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5commonsalesfilter.ui" line="320"/>
+        <location filename="../Reports/cr5commonsalesfilter.ui" line="43"/>
         <source>Flags</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5commonsalesfilter.ui" line="168"/>
+        <location filename="../Reports/cr5commonsalesfilter.ui" line="247"/>
         <source>shift</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5commonsalesfilter.ui" line="142"/>
+        <location filename="../Reports/cr5commonsalesfilter.ui" line="127"/>
         <source>date2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5commonsalesfilter.ui" line="85"/>
+        <location filename="../Reports/cr5commonsalesfilter.ui" line="67"/>
         <source>Staff</source>
         <translation type="unfinished">Սպասարկող</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5commonsalesfilter.ui" line="27"/>
+        <location filename="../Reports/cr5commonsalesfilter.ui" line="207"/>
         <source>Hall</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5commonsalesfilter.ui" line="102"/>
+        <location filename="../Reports/cr5commonsalesfilter.ui" line="287"/>
         <source>Table</source>
         <translation type="unfinished">ՍԵՂԱՆ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5commonsalesfilter.ui" line="181"/>
+        <location filename="../Reports/cr5commonsalesfilter.ui" line="307"/>
         <source>staff</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5commonsalesfilter.ui" line="58"/>
+        <location filename="../Reports/cr5commonsalesfilter.ui" line="327"/>
+        <source>Tax</source>
+        <translation type="unfinished">ՀԴՄ</translation>
+    </message>
+    <message>
+        <location filename="../Reports/cr5commonsalesfilter.ui" line="60"/>
         <source>Shift</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5commonsalesfilter.ui" line="20"/>
+        <location filename="../Reports/cr5commonsalesfilter.ui" line="167"/>
         <source>Start date</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5commonsalesfilter.ui" line="253"/>
+        <location filename="../Reports/cr5commonsalesfilter.ui" line="200"/>
         <source>date1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5commonsalesfilter.ui" line="293"/>
+        <location filename="../Reports/cr5commonsalesfilter.ui" line="101"/>
         <source>Returned item</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5commonsalesfilter.ui" line="313"/>
+        <location filename="../Reports/cr5commonsalesfilter.ui" line="94"/>
         <source>table</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5commonsalesfilter.ui" line="109"/>
+        <location filename="../Reports/cr5commonsalesfilter.ui" line="234"/>
         <source>Buyer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5commonsalesfilter.ui" line="240"/>
+        <location filename="../Reports/cr5commonsalesfilter.ui" line="36"/>
         <source>buyer</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9491,42 +9546,47 @@ data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dish.cpp" line="42"/>
-        <source>Translator</source>
+        <location filename="../Reports/cr5dish.cpp" line="29"/>
+        <source>Cost</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../Reports/cr5dish.cpp" line="43"/>
-        <source>Remove</source>
+        <source>Translator</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../Reports/cr5dish.cpp" line="44"/>
-        <source>Raise menu version</source>
+        <source>Remove</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../Reports/cr5dish.cpp" line="45"/>
+        <source>Raise menu version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Reports/cr5dish.cpp" line="46"/>
         <source>Output to AS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dish.cpp" line="96"/>
+        <location filename="../Reports/cr5dish.cpp" line="97"/>
         <source>This name in use and cannot be removed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dish.cpp" line="99"/>
+        <location filename="../Reports/cr5dish.cpp" line="100"/>
         <source>Confirm to remove the selected dish</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dish.cpp" line="111"/>
+        <location filename="../Reports/cr5dish.cpp" line="112"/>
         <source>Deleted</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dish.cpp" line="128"/>
+        <location filename="../Reports/cr5dish.cpp" line="129"/>
         <source>Current menu version</source>
         <translation type="unfinished"></translation>
     </message>
@@ -11318,115 +11378,115 @@ barcode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5materialsinstore.cpp" line="113"/>
-        <location filename="../Reports/cr5materialsinstore.cpp" line="218"/>
-        <source>Code</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../Reports/cr5materialsinstore.cpp" line="114"/>
         <location filename="../Reports/cr5materialsinstore.cpp" line="219"/>
-        <source>Storage</source>
+        <source>Code</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../Reports/cr5materialsinstore.cpp" line="115"/>
         <location filename="../Reports/cr5materialsinstore.cpp" line="220"/>
-        <source>Group</source>
+        <source>Storage</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../Reports/cr5materialsinstore.cpp" line="116"/>
         <location filename="../Reports/cr5materialsinstore.cpp" line="221"/>
-        <source>Goods</source>
+        <source>Group</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../Reports/cr5materialsinstore.cpp" line="117"/>
         <location filename="../Reports/cr5materialsinstore.cpp" line="222"/>
-        <source>Scancode</source>
+        <source>Goods</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../Reports/cr5materialsinstore.cpp" line="118"/>
         <location filename="../Reports/cr5materialsinstore.cpp" line="223"/>
-        <source>Qty</source>
-        <translation type="unfinished">Քանակ</translation>
+        <source>Scancode</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../Reports/cr5materialsinstore.cpp" line="119"/>
         <location filename="../Reports/cr5materialsinstore.cpp" line="224"/>
-        <source>Unit</source>
-        <translation type="unfinished"></translation>
+        <source>Qty</source>
+        <translation type="unfinished">Քանակ</translation>
     </message>
     <message>
         <location filename="../Reports/cr5materialsinstore.cpp" line="120"/>
         <location filename="../Reports/cr5materialsinstore.cpp" line="225"/>
-        <source>Price</source>
+        <source>Unit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../Reports/cr5materialsinstore.cpp" line="121"/>
         <location filename="../Reports/cr5materialsinstore.cpp" line="226"/>
-        <source>Amount</source>
+        <source>Price</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../Reports/cr5materialsinstore.cpp" line="122"/>
         <location filename="../Reports/cr5materialsinstore.cpp" line="227"/>
-        <source>Warning</source>
+        <source>Amount</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../Reports/cr5materialsinstore.cpp" line="123"/>
         <location filename="../Reports/cr5materialsinstore.cpp" line="228"/>
-        <source>Retail price</source>
+        <source>Warning</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../Reports/cr5materialsinstore.cpp" line="124"/>
         <location filename="../Reports/cr5materialsinstore.cpp" line="229"/>
-        <source>Retail amount</source>
+        <source>Retail price</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../Reports/cr5materialsinstore.cpp" line="125"/>
         <location filename="../Reports/cr5materialsinstore.cpp" line="230"/>
-        <source>Whosale price</source>
+        <source>Retail amount</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../Reports/cr5materialsinstore.cpp" line="126"/>
         <location filename="../Reports/cr5materialsinstore.cpp" line="231"/>
-        <source>Whosale amount</source>
+        <source>Whosale price</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../Reports/cr5materialsinstore.cpp" line="127"/>
         <location filename="../Reports/cr5materialsinstore.cpp" line="232"/>
-        <source>Class 1</source>
+        <source>Whosale amount</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../Reports/cr5materialsinstore.cpp" line="128"/>
         <location filename="../Reports/cr5materialsinstore.cpp" line="233"/>
-        <source>Class 2</source>
+        <source>Class 1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../Reports/cr5materialsinstore.cpp" line="129"/>
         <location filename="../Reports/cr5materialsinstore.cpp" line="234"/>
-        <source>Class 3</source>
+        <source>Class 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../Reports/cr5materialsinstore.cpp" line="130"/>
         <location filename="../Reports/cr5materialsinstore.cpp" line="235"/>
+        <source>Class 3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Reports/cr5materialsinstore.cpp" line="131"/>
+        <location filename="../Reports/cr5materialsinstore.cpp" line="236"/>
         <source>Class 4</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5materialsinstore.cpp" line="299"/>
+        <location filename="../Reports/cr5materialsinstore.cpp" line="300"/>
         <source>Code column must be included in report</source>
         <translation type="unfinished"></translation>
     </message>
@@ -11977,138 +12037,138 @@ action</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="96"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="97"/>
         <source>UUID</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="97"/>
-        <source>Number</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../Reports/cr5salefromstore.cpp" line="98"/>
-        <source>Date, cash</source>
+        <source>Tax receipt</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../Reports/cr5salefromstore.cpp" line="99"/>
-        <source>Store</source>
+        <source>Number</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../Reports/cr5salefromstore.cpp" line="100"/>
-        <source>Goods</source>
+        <source>Date, cash</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../Reports/cr5salefromstore.cpp" line="101"/>
-        <source>Scancode</source>
+        <source>Store</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../Reports/cr5salefromstore.cpp" line="102"/>
-        <location filename="../Reports/cr5salefromstore.cpp" line="112"/>
-        <source>Group</source>
+        <source>Goods</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../Reports/cr5salefromstore.cpp" line="103"/>
-        <source>Unit</source>
+        <source>Scancode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../Reports/cr5salefromstore.cpp" line="104"/>
-        <source>TAX</source>
+        <location filename="../Reports/cr5salefromstore.cpp" line="113"/>
+        <source>Group</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../Reports/cr5salefromstore.cpp" line="105"/>
+        <source>Unit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Reports/cr5salefromstore.cpp" line="106"/>
         <source>Qty</source>
         <translation type="unfinished">Քանակ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="106"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="107"/>
         <source>Total</source>
         <translation type="unfinished">Ընդամենը</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="107"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="108"/>
         <source>Class 1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="108"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="109"/>
         <source>Class 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="109"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="110"/>
         <source>Class 3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="110"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="111"/>
         <source>Class 4</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="111"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="112"/>
         <source>Supplier</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="113"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="114"/>
         <source>Selfcost</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="114"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="115"/>
         <source>Hall</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="115"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="116"/>
         <source>Buyer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="116"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="117"/>
         <source>Buyer taxcode</source>
         <translation type="unfinished">Գնորդի ՀՎՀՀ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="117"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="118"/>
         <source>Discount factor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="118"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="119"/>
         <source>Discount amount</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="119"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="120"/>
         <source>Sale price</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="120"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="121"/>
         <source>Whosale price</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="121"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="122"/>
         <source>Total of retail price</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="122"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="123"/>
         <source>Total of whosale price</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="183"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="184"/>
         <source>Column &apos;Header&apos; must be checked in filter</source>
         <translation type="unfinished"></translation>
     </message>
@@ -13068,22 +13128,22 @@ settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5tstoreextra.cpp" line="84"/>
+        <location filename="../Reports/cr5tstoreextra.cpp" line="85"/>
         <source>Store must be defined</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5tstoreextra.cpp" line="220"/>
+        <location filename="../Reports/cr5tstoreextra.cpp" line="223"/>
         <source>Created automaticaly</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5tstoreextra.cpp" line="236"/>
+        <location filename="../Reports/cr5tstoreextra.cpp" line="239"/>
         <source>Inventory qty</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5tstoreextra.cpp" line="236"/>
+        <location filename="../Reports/cr5tstoreextra.cpp" line="239"/>
         <source>Qty</source>
         <translation type="unfinished">Քանակ</translation>
     </message>
@@ -13096,7 +13156,7 @@ settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5tstoreextrafilter.ui" line="20"/>
+        <location filename="../Reports/cr5tstoreextrafilter.ui" line="121"/>
         <source>Start</source>
         <translation type="unfinished"></translation>
     </message>
@@ -13107,21 +13167,31 @@ settings</source>
     </message>
     <message>
         <location filename="../Reports/cr5tstoreextrafilter.ui" line="46"/>
+        <source>Store price</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Reports/cr5tstoreextrafilter.ui" line="53"/>
         <source>End</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5tstoreextrafilter.ui" line="65"/>
+        <location filename="../Reports/cr5tstoreextrafilter.ui" line="104"/>
         <source>date2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5tstoreextrafilter.ui" line="72"/>
+        <location filename="../Reports/cr5tstoreextrafilter.ui" line="128"/>
+        <source>Retail price</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Reports/cr5tstoreextrafilter.ui" line="20"/>
         <source>Store</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5tstoreextrafilter.ui" line="91"/>
+        <location filename="../Reports/cr5tstoreextrafilter.ui" line="85"/>
         <source>store</source>
         <translation type="unfinished"></translation>
     </message>
@@ -13583,97 +13653,102 @@ permissions</source>
 <context>
     <name>PrintReceipt</name>
     <message>
-        <location filename="../Shop/printreceipt.cpp" line="20"/>
+        <location filename="../Shop/printreceipt.cpp" line="21"/>
         <source>Return</source>
         <translation>Հետվերադարձ</translation>
     </message>
     <message>
-        <location filename="../Shop/printreceipt.cpp" line="101"/>
+        <location filename="../Shop/printreceipt.cpp" line="116"/>
         <source>Department</source>
         <translation>Բաժին</translation>
     </message>
     <message>
-        <location filename="../Shop/printreceipt.cpp" line="104"/>
+        <location filename="../Shop/printreceipt.cpp" line="119"/>
         <source>Tax number</source>
         <translation>ՀԴՄ կտրոնի համար</translation>
     </message>
     <message>
-        <location filename="../Shop/printreceipt.cpp" line="107"/>
+        <location filename="../Shop/printreceipt.cpp" line="122"/>
         <source>Device number</source>
         <translation>ԳՀ</translation>
     </message>
     <message>
-        <location filename="../Shop/printreceipt.cpp" line="110"/>
+        <location filename="../Shop/printreceipt.cpp" line="125"/>
         <source>Serial</source>
         <translation>ԱՀ</translation>
     </message>
     <message>
-        <location filename="../Shop/printreceipt.cpp" line="113"/>
+        <location filename="../Shop/printreceipt.cpp" line="128"/>
         <source>Fiscal</source>
         <translation>Ֆիսկալ</translation>
     </message>
     <message>
-        <location filename="../Shop/printreceipt.cpp" line="116"/>
+        <location filename="../Shop/printreceipt.cpp" line="131"/>
         <source>Receipt number</source>
         <translation>ԿՀ</translation>
     </message>
     <message>
-        <location filename="../Shop/printreceipt.cpp" line="119"/>
+        <location filename="../Shop/printreceipt.cpp" line="134"/>
         <source>Date</source>
         <translation>Ամսաթիվ</translation>
     </message>
     <message>
-        <location filename="../Shop/printreceipt.cpp" line="122"/>
+        <location filename="../Shop/printreceipt.cpp" line="137"/>
         <source>(F)</source>
         <translation>(Ֆ)</translation>
     </message>
     <message>
-        <location filename="../Shop/printreceipt.cpp" line="133"/>
+        <location filename="../Shop/printreceipt.cpp" line="148"/>
         <source>Buyer taxcode</source>
         <translation>Գնորդի ՀՎՀՀ</translation>
     </message>
     <message>
-        <location filename="../Shop/printreceipt.cpp" line="142"/>
+        <location filename="../Shop/printreceipt.cpp" line="157"/>
         <source>Refund</source>
         <translation>Հետվերադարձ</translation>
     </message>
     <message>
-        <location filename="../Shop/printreceipt.cpp" line="148"/>
+        <location filename="../Shop/printreceipt.cpp" line="163"/>
+        <source>Return from</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Shop/printreceipt.cpp" line="167"/>
         <source>Class | Name | Qty | Price | Total</source>
         <translation>Դաս՝ | Անվանում | Քնկ | Գին | Ընդամենը</translation>
     </message>
     <message>
-        <location filename="../Shop/printreceipt.cpp" line="155"/>
+        <location filename="../Shop/printreceipt.cpp" line="174"/>
         <source>Class:</source>
         <translation>Դաս</translation>
     </message>
     <message>
-        <location filename="../Shop/printreceipt.cpp" line="184"/>
+        <location filename="../Shop/printreceipt.cpp" line="203"/>
         <source>Total</source>
         <translation>Ընդամենը</translation>
     </message>
     <message>
-        <location filename="../Shop/printreceipt.cpp" line="188"/>
+        <location filename="../Shop/printreceipt.cpp" line="207"/>
         <source>Need to pay</source>
         <translation>Ենթակա է վճարման</translation>
     </message>
     <message>
-        <location filename="../Shop/printreceipt.cpp" line="197"/>
+        <location filename="../Shop/printreceipt.cpp" line="216"/>
         <source>Payment, cash</source>
         <translation>Կանխիկ</translation>
     </message>
     <message>
-        <location filename="../Shop/printreceipt.cpp" line="202"/>
+        <location filename="../Shop/printreceipt.cpp" line="221"/>
         <source>Payment, card</source>
         <translation>Անկանխիկ</translation>
     </message>
     <message>
-        <location filename="../Shop/printreceipt.cpp" line="210"/>
+        <location filename="../Shop/printreceipt.cpp" line="229"/>
         <source>Thank you for visit!</source>
         <translation>Շնորհակալություն այցելության համար</translation>
     </message>
     <message>
-        <location filename="../Shop/printreceipt.cpp" line="213"/>
+        <location filename="../Shop/printreceipt.cpp" line="232"/>
         <source>Printed</source>
         <translation>Տպված</translation>
     </message>
@@ -13681,116 +13756,122 @@ permissions</source>
 <context>
     <name>PrintReceiptGroup</name>
     <message>
-        <location filename="../Shop/printreceiptgroup.cpp" line="33"/>
-        <location filename="../Shop/printreceiptgroup.cpp" line="271"/>
+        <location filename="../Shop/printreceiptgroup.cpp" line="36"/>
+        <location filename="../Shop/printreceiptgroup.cpp" line="326"/>
         <source>Return</source>
         <translation>Հետվերադարձ</translation>
     </message>
     <message>
-        <location filename="../Shop/printreceiptgroup.cpp" line="133"/>
-        <location filename="../Shop/printreceiptgroup.cpp" line="377"/>
+        <location filename="../Shop/printreceiptgroup.cpp" line="150"/>
+        <location filename="../Shop/printreceiptgroup.cpp" line="446"/>
         <source>Department</source>
         <translation>Բաժին</translation>
     </message>
     <message>
-        <location filename="../Shop/printreceiptgroup.cpp" line="136"/>
-        <location filename="../Shop/printreceiptgroup.cpp" line="380"/>
+        <location filename="../Shop/printreceiptgroup.cpp" line="153"/>
+        <location filename="../Shop/printreceiptgroup.cpp" line="449"/>
         <source>Tax number</source>
         <translation>ՀԴՄ կտրոնի համար</translation>
     </message>
     <message>
-        <location filename="../Shop/printreceiptgroup.cpp" line="139"/>
-        <location filename="../Shop/printreceiptgroup.cpp" line="383"/>
+        <location filename="../Shop/printreceiptgroup.cpp" line="156"/>
+        <location filename="../Shop/printreceiptgroup.cpp" line="452"/>
         <source>Device number</source>
         <translation>ԳՀ</translation>
     </message>
     <message>
-        <location filename="../Shop/printreceiptgroup.cpp" line="142"/>
-        <location filename="../Shop/printreceiptgroup.cpp" line="386"/>
+        <location filename="../Shop/printreceiptgroup.cpp" line="159"/>
+        <location filename="../Shop/printreceiptgroup.cpp" line="455"/>
         <source>Serial</source>
         <translation>ԱՀ</translation>
     </message>
     <message>
-        <location filename="../Shop/printreceiptgroup.cpp" line="145"/>
-        <location filename="../Shop/printreceiptgroup.cpp" line="389"/>
+        <location filename="../Shop/printreceiptgroup.cpp" line="162"/>
+        <location filename="../Shop/printreceiptgroup.cpp" line="458"/>
         <source>Fiscal</source>
         <translation>Ֆիսկալ</translation>
     </message>
     <message>
-        <location filename="../Shop/printreceiptgroup.cpp" line="148"/>
-        <location filename="../Shop/printreceiptgroup.cpp" line="392"/>
+        <location filename="../Shop/printreceiptgroup.cpp" line="165"/>
+        <location filename="../Shop/printreceiptgroup.cpp" line="461"/>
         <source>Receipt number</source>
         <translation>ԿՀ</translation>
     </message>
     <message>
-        <location filename="../Shop/printreceiptgroup.cpp" line="151"/>
-        <location filename="../Shop/printreceiptgroup.cpp" line="395"/>
+        <location filename="../Shop/printreceiptgroup.cpp" line="168"/>
+        <location filename="../Shop/printreceiptgroup.cpp" line="464"/>
         <source>Date</source>
         <translation>Ամսաթիվ</translation>
     </message>
     <message>
-        <location filename="../Shop/printreceiptgroup.cpp" line="154"/>
-        <location filename="../Shop/printreceiptgroup.cpp" line="398"/>
+        <location filename="../Shop/printreceiptgroup.cpp" line="171"/>
+        <location filename="../Shop/printreceiptgroup.cpp" line="467"/>
         <source>(F)</source>
         <translation>(Ֆ)</translation>
     </message>
     <message>
-        <location filename="../Shop/printreceiptgroup.cpp" line="157"/>
-        <location filename="../Shop/printreceiptgroup.cpp" line="402"/>
+        <location filename="../Shop/printreceiptgroup.cpp" line="174"/>
+        <location filename="../Shop/printreceiptgroup.cpp" line="472"/>
         <source>Buyer taxcode</source>
         <translation>Գնորդի ՀՎՀՀ</translation>
     </message>
     <message>
-        <location filename="../Shop/printreceiptgroup.cpp" line="167"/>
-        <location filename="../Shop/printreceiptgroup.cpp" line="412"/>
+        <location filename="../Shop/printreceiptgroup.cpp" line="184"/>
+        <location filename="../Shop/printreceiptgroup.cpp" line="482"/>
+        <source>Return from</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Shop/printreceiptgroup.cpp" line="188"/>
+        <location filename="../Shop/printreceiptgroup.cpp" line="486"/>
         <source>Class | Name | Qty | Price | Total</source>
         <translation>Դաս՝ | Անվանում | Քնկ | Գին | Ընդամենը</translation>
     </message>
     <message>
-        <location filename="../Shop/printreceiptgroup.cpp" line="198"/>
-        <location filename="../Shop/printreceiptgroup.cpp" line="433"/>
+        <location filename="../Shop/printreceiptgroup.cpp" line="219"/>
+        <location filename="../Shop/printreceiptgroup.cpp" line="507"/>
         <source>Need to pay</source>
         <translation>Ենթակա է վճարման</translation>
     </message>
     <message>
-        <location filename="../Shop/printreceiptgroup.cpp" line="208"/>
-        <location filename="../Shop/printreceiptgroup.cpp" line="217"/>
-        <location filename="../Shop/printreceiptgroup.cpp" line="443"/>
-        <location filename="../Shop/printreceiptgroup.cpp" line="452"/>
+        <location filename="../Shop/printreceiptgroup.cpp" line="229"/>
+        <location filename="../Shop/printreceiptgroup.cpp" line="238"/>
+        <location filename="../Shop/printreceiptgroup.cpp" line="517"/>
+        <location filename="../Shop/printreceiptgroup.cpp" line="526"/>
         <source>Payment, cash</source>
         <translation>Կանխիկ</translation>
     </message>
     <message>
-        <location filename="../Shop/printreceiptgroup.cpp" line="212"/>
-        <location filename="../Shop/printreceiptgroup.cpp" line="447"/>
+        <location filename="../Shop/printreceiptgroup.cpp" line="233"/>
+        <location filename="../Shop/printreceiptgroup.cpp" line="521"/>
         <source>Change</source>
         <translation>Մանրը</translation>
     </message>
     <message>
-        <location filename="../Shop/printreceiptgroup.cpp" line="223"/>
-        <location filename="../Shop/printreceiptgroup.cpp" line="458"/>
+        <location filename="../Shop/printreceiptgroup.cpp" line="244"/>
+        <location filename="../Shop/printreceiptgroup.cpp" line="532"/>
         <source>Payment, card</source>
         <translation>Անկանխիկ</translation>
     </message>
     <message>
-        <location filename="../Shop/printreceiptgroup.cpp" line="231"/>
-        <location filename="../Shop/printreceiptgroup.cpp" line="483"/>
+        <location filename="../Shop/printreceiptgroup.cpp" line="291"/>
+        <location filename="../Shop/printreceiptgroup.cpp" line="590"/>
         <source>Thank you for visit!</source>
         <translation>Շնորհակալություն այցելության համար</translation>
     </message>
     <message>
-        <location filename="../Shop/printreceiptgroup.cpp" line="240"/>
-        <location filename="../Shop/printreceiptgroup.cpp" line="486"/>
+        <location filename="../Shop/printreceiptgroup.cpp" line="294"/>
+        <location filename="../Shop/printreceiptgroup.cpp" line="593"/>
         <source>Printed</source>
         <translation>Տպված</translation>
     </message>
     <message>
-        <location filename="../Shop/printreceiptgroup.cpp" line="464"/>
+        <location filename="../Shop/printreceiptgroup.cpp" line="538"/>
         <source>Payment, idram</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Shop/printreceiptgroup.cpp" line="469"/>
+        <location filename="../Shop/printreceiptgroup.cpp" line="543"/>
         <source>Payment, TellCell</source>
         <translation type="unfinished"></translation>
     </message>

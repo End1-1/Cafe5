@@ -62,7 +62,7 @@ void C5Replication::downloadDataFromServer(const QStringList &src, const QString
     int lastid = db.getInt(0);
     QStringList tl;
     dr.exec("select * from s_syncronize_in order by f_id");
-     while (dr.nextRow()) {
+    while (dr.nextRow()) {
         tl.append(dr.getString("f_table"));
     }
     steps = 2;

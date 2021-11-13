@@ -16,8 +16,18 @@ public:
 
     ~DlgSystem();
 
+    void setupNoPassword();
+
 private slots:
     void on_btnConnection_clicked();
+
+    void on_btnShutdown_clicked();
+
+    void on_btnRestart_clicked();
+
+    void on_btnExit_clicked();
+
+    void on_btnExitToWindows_clicked();
 
 private:
     Ui::DlgSystem *ui;

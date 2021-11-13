@@ -96,7 +96,7 @@ bool DlgPassword::getPassword(const QString &title, QString &str)
     d->ui->lePassword->setEchoMode(QLineEdit::Password);
     d->ui->lePassword->setMaxLength(20);
     bool result = d->exec() == QDialog::Accepted;
-    str = d->ui->lePassword->text();
+    str = d->ui->lePassword->text().replace(";", "").replace("?", "");
     delete d;
     return result;
 }
@@ -110,7 +110,7 @@ bool DlgPassword::getPasswordString(const QString &title, QString &pass)
     d->ui->lePassword->setEchoMode(QLineEdit::Password);
     d->ui->lePassword->setMaxLength(20);
     bool result = d->exec() == QDialog::Accepted;
-    pass = d->ui->lePassword->text();
+    pass = d->ui->lePassword->text().replace(";", "").replace("?", "");
     delete d;
     return result;
 }
@@ -182,7 +182,7 @@ void DlgPassword::on_pushButton_11_clicked()
 
 void DlgPassword::on_pushButton_12_clicked()
 {
-    QString pwd = ui->lePassword->text();
+    QString pwd = ui->lePassword->text().replace(";", "").replace("?", "");
     if (property("pass").toBool()) {
         accept();
         return;

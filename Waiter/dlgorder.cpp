@@ -59,8 +59,8 @@ DlgOrder::DlgOrder(C5User *user) :
     ui->btnCar->setVisible(C5Config::carMode());
     ui->lbVisit->setVisible(false);
     ui->btnGuest->setVisible(C5Config::useHotel());
-    ui->btnCompactDishAddMode->setChecked(C5Config::getRegValue("compact dish add mode", true).toBool());
     ui->lbStaff->setText(user->fullName());
+    ui->btnBillWithoutService->setEnabled(user->check(cp_t5_bill_without_service));
     fTimerCounter = 0;
     connect(&fTimer, &QTimer::timeout, this, &DlgOrder::timeout);
     fTimer.start(1000);
@@ -188,6 +188,7 @@ void DlgOrder::accept()
                 C5Message::error(wo->fOrderDriver->error());
                 return;
             }
+            logRecord(fUser->fullName(), wo->fOrderDriver->headerValue("f_id").toString(), "", "Close window", "", "");
         }
     }
     QString err;
@@ -276,7 +277,7 @@ bool DlgOrder::load(int table)
 //        }
         wo->setDlg(this);
         ui->vs->insertWidget(ui->vs->count() - 1, wo);
-        logRecord(fUser->fullName(), newid, newid, "New order", dbtable->name(table), "");
+        logRecord(fUser->fullName(), newid, newid, "New order", dbtable->name(table), QString("%1%2").arg(wo->fOrderDriver->headerValue("f_prefix").toString()).arg(wo->fOrderDriver->headerValue("f_hallid").toInt()));
     } else {
         for (const QString &oid: orders) {
             WOrder *wo = new WOrder();
@@ -393,34 +394,6 @@ void DlgOrder::addDishToOrder(int menuid)
         return;
     }
     QString comment = "";
-    if (ui->btnCompactDishAddMode->isChecked() && !dbdish->isExtra(dishid)) {
-        for (int i = 0; i < wo->fOrderDriver->dishesCount(); i++) {
-            if (dishid == wo->fOrderDriver->dishesValue("f_dish", i).toInt()) {
-                if (wo->fOrderDriver->dishesValue("f_state", i) != DISH_STATE_OK) {
-                    continue;
-                }
-                if (dbmenu->store(menuid) != wo->fOrderDriver->dishesValue("f_store", i).toInt()) {
-                    continue;
-                }
-                if (dbmenu->print1(menuid) != wo->fOrderDriver->dishesValue("f_print1", i).toString()) {
-                    continue;
-                }
-                if (dbmenu->print2(menuid) != wo->fOrderDriver->dishesValue("f_print2", i).toString()) {
-                    continue;
-                }
-                if (comment != wo->fOrderDriver->dishesValue("f_comment", i).toString()) {
-                    continue;
-                }
-                if (wo->fOrderDriver->dishesValue("f_qty2", i).toDouble() > 0.0001) {
-                    continue;
-                }
-                wo->fOrderDriver->setDishesValue("f_qty1", float_str(wo->fOrderDriver->dishesValue("f_qty1", i).toDouble() + 1, 1), i);
-                found = true;
-                itemindex = i;
-            }
-        }
-    }
-
     comment = special;
     if (!found) {
         itemindex = wo->addItem(menuid, comment, price);
@@ -978,6 +951,11 @@ void DlgOrder::on_btnVoid_clicked()
         wo->fOrderDriver->setDishesValue("f_removetime", QDateTime::currentDateTime(), index);
         wo->fOrderDriver->setDishesValue("f_removeuser", tmp->id(), index);
         wo->fOrderDriver->save();
+        logRecord(fUser->fullName(), wo->fOrderDriver->headerValue("f_id").toString(),
+                  wo->fOrderDriver->dishesValue("f_id", index).toString(),
+                  "Remove not printed " + dbdish->name(wo->fOrderDriver->dishesValue("f_dish", index).toInt()),
+                  "-",
+                  wo->fOrderDriver->dishesValue("f_qty1", index).toString());
         itemsToTable();
         return;
     }
@@ -1119,11 +1097,6 @@ void DlgOrder::on_btnSearchInMenu_clicked()
     delete d;
 }
 
-void DlgOrder::on_btnCompactDishAddMode_clicked()
-{
-    C5Config::setRegValue("compact dish add mode", ui->btnCompactDishAddMode->isChecked());
-}
-
 void DlgOrder::on_btnCar_clicked()
 {
     //TODO: set acr
@@ -1183,7 +1156,6 @@ void DlgOrder::on_btnPrintService_clicked()
         sh->bind("reprint", reprintList.join(","));
         sh->send();
         logRecord(fUser->fullName(), o->fOrderDriver->headerValue("f_id").toString(), "", "Send to cooking", "", "");
-
     }
 }
 
@@ -1504,6 +1476,7 @@ void DlgOrder::on_btnTotal_clicked()
         sh->bind("language", C5Config::getRegValue("receipt_language").toInt());
         sh->bind("receipt_printer", C5Config::fSettingsName);
         sh->send();
+        C5LogToServerThread::remember(LOG_WAITER, fUser->fullName(), "", wo->fOrderDriver->currentOrderId(), "", "Precheck", float_str(wo->fOrderDriver->headerValue("f_amounttotal").toDouble(), 2), "");
     } else {
         int o = DlgPrecheckOptions::precheck();
         C5User *tmp = fUser;
@@ -1523,6 +1496,7 @@ void DlgOrder::on_btnTotal_clicked()
             db.exec("update o_header set f_precheck=:f_precheck where f_id=:f_id");
             wo->fOrderDriver->reloadOrder();
             setButtonsState();
+            C5LogToServerThread::remember(LOG_WAITER, fUser->fullName(), "", wo->fOrderDriver->currentOrderId(), "", "Cancel precheck", "", "");
             break;
         }
         case PRECHECK_REPEAT:
@@ -1539,6 +1513,7 @@ void DlgOrder::on_btnTotal_clicked()
             sh->bind("language", C5Config::getRegValue("receipt_language").toInt());
             sh->bind("receipt_printer", C5Config::fSettingsName);
             sh->send();
+            C5LogToServerThread::remember(LOG_WAITER, fUser->fullName(), "", wo->fOrderDriver->currentOrderId(), "", "Repeat precheck", float_str(wo->fOrderDriver->headerValue("f_amounttotal").toDouble(), 2), "");
             break;
         }
         if (tmp != fUser) {
@@ -1596,6 +1571,24 @@ void DlgOrder::calcAmount(C5LineEdit *l)
     if (l == ui->lePrepaid || l == ui->leCard || l == ui->leCash) {
         ui->leBank->setDouble(0);
         ui->leOther->setDouble(0);
+    }
+    if (l == ui->leCash) {
+        if (ui->leCash->getDouble() + ui->leCard->getDouble() + ui->lePrepaid->getDouble() > wo->fOrderDriver->headerValue("f_amounttotal").toDouble()) {
+            ui->leCard->setDouble(wo->fOrderDriver->headerValue("f_amounttotal").toDouble() - ui->leCash->getDouble());
+            ui->lePrepaid->setDouble(0);
+        }
+    }
+    if (l == ui->leCard) {
+        if (ui->leCash->getDouble() + ui->leCard->getDouble() + ui->lePrepaid->getDouble() > wo->fOrderDriver->headerValue("f_amounttotal").toDouble()) {
+            ui->leCash->setDouble(wo->fOrderDriver->headerValue("f_amounttotal").toDouble() - ui->leCash->getDouble());
+            ui->lePrepaid->setDouble(0);
+        }
+    }
+    if (l == ui->lePrepaid) {
+        if (ui->leCash->getDouble() + ui->leCard->getDouble() + ui->lePrepaid->getDouble() > wo->fOrderDriver->headerValue("f_amounttotal").toDouble()) {
+            ui->leCash->setDouble(wo->fOrderDriver->headerValue("f_amounttotal").toDouble() - ui->leCash->getDouble());
+            ui->leCard->setDouble(0);
+        }
     }
     wo->fOrderDriver->setHeader("f_amountcash", ui->leCash->getDouble());
     wo->fOrderDriver->setHeader("f_amountcard", ui->leCard->getDouble());
@@ -1938,6 +1931,14 @@ void DlgOrder::on_btnReceipt_clicked()
         C5Message::error(tr("Check the all payment methods"));
         return;
     }
+    if (wo->fOrderDriver->headerValue("f_amountcash").toDouble()
+            + wo->fOrderDriver->headerValue("f_amountcard").toDouble()
+            + wo->fOrderDriver->headerValue("f_amountother").toDouble()
+            + wo->fOrderDriver->headerValue("f_amountprepaid").toDouble()
+            + wo->fOrderDriver->headerValue("f_amountbank").toDouble() > wo->fOrderDriver->headerValue("f_amounttotal").toDouble()) {
+        C5Message::error(tr("Total amount of payments methods greater than total amount"));
+        return;
+    }
     if (!wo->fOrderDriver->save()) {
         C5Message::error(wo->fOrderDriver->error());
         return;
@@ -2001,11 +2002,12 @@ void DlgOrder::on_btnCloseOrder_clicked()
         return;
     }
     WOrder *wo = worder();
+    QString orderid = wo->fOrderDriver->currentOrderId();
     if (!wo->fOrderDriver->closeOrder()) {
         C5Message::error(wo->fOrderDriver->error());
         return;
     }
-    C5LogToServerThread::remember(LOG_WAITER, fUser->fullName(), "", wo->fOrderDriver->currentOrderId(), "", "Close order", "", "");
+    C5LogToServerThread::remember(LOG_WAITER, fUser->fullName(), "", orderid, "", "Close order", "", "");
     removeWOrder(wo);
     if (!worder()) {
         accept();
@@ -2105,6 +2107,12 @@ void DlgOrder::on_btnPlus1_clicked()
         wo->fOrderDriver->setDishesValue("f_qty2", 0, newindex);
         wo->fOrderDriver->setDishesValue("f_comment2", special, newindex);
         wo->fOrderDriver->setDishesValue("f_comment", "", newindex);
+        logRecord(fUser->fullName(),
+                  wo->fOrderDriver->headerValue("f_id").toString(),
+                  wo->fOrderDriver->dishesValue("f_id", newindex).toString(),
+                  "Copy dish " + dbdish->name(wo->fOrderDriver->dishesValue("f_dish", index).toInt()),
+                  "from: " + wo->fOrderDriver->dishesValue("f_id", index).toString(),
+                  wo->fOrderDriver->dishesValue("f_qty1", newindex).toString());
         itemsToTable();
         wo->setCurrentRow(newindex);
     } else {
@@ -2113,7 +2121,7 @@ void DlgOrder::on_btnPlus1_clicked()
         itemsToTable();
         logRecord(fUser->fullName(), wo->fOrderDriver->headerValue("f_id").toString(),
                   wo->fOrderDriver->dishesValue("f_id", index).toString(),
-                  "Qty of " + dbdish->name(wo->fOrderDriver->dishesValue("f_id", index).toInt()),
+                  "Qty of " + dbdish->name(wo->fOrderDriver->dishesValue("f_dish", index).toInt()),
                   oldQty,
                   wo->fOrderDriver->dishesValue("f_qty1", index).toString());
     }
@@ -2145,18 +2153,18 @@ void DlgOrder::on_btnMinus1_clicked()
             wo->fOrderDriver->setDishesValue("f_qty1", wo->fOrderDriver->dishesValue("f_qty1", index).toDouble() - 1, index);
             logRecord(fUser->fullName(), wo->fOrderDriver->headerValue("f_id").toString(),
                       wo->fOrderDriver->dishesValue("f_id", index).toString(),
-                      "Qty of " + dbdish->name(wo->fOrderDriver->dishesValue("f_id", index).toInt()),
+                      "Qty of " + dbdish->name(wo->fOrderDriver->dishesValue("f_dish", index).toInt()),
                       oldQty,
                       wo->fOrderDriver->dishesValue("f_qty1", index).toString());
         } else if (C5Message::question(tr("Do you want to remove this item")) == QDialog::Accepted) {
             wo->fOrderDriver->setDishesValue("f_state", DISH_STATE_NONE, index);
             logRecord(fUser->fullName(), wo->fOrderDriver->headerValue("f_id").toString(),
                       wo->fOrderDriver->dishesValue("f_id", index).toString(),
-                      "Remove not printed " + dbdish->name(wo->fOrderDriver->dishesValue("f_id", index).toInt()),
+                      "Remove not printed " + dbdish->name(wo->fOrderDriver->dishesValue("f_dish", index).toInt()),
                       "-",
                       wo->fOrderDriver->dishesValue("f_qty1", index).toString());
-            itemsToTable();
         }
+        itemsToTable();
     }
 }
 
@@ -2198,9 +2206,10 @@ void DlgOrder::on_btnAnyqty_clicked()
     QString oldQty = wo->fOrderDriver->dishesValue("f_qty1", index).toString();
     wo->fOrderDriver->setDishesValue("f_qty1", max, index);
     wo->updateItem(index);
+    itemsToTable();
     logRecord(fUser->fullName(), wo->fOrderDriver->headerValue("f_id").toString(),
               wo->fOrderDriver->dishesValue("f_id", index).toString(),
-              "Qty of " + dbdish->name(wo->fOrderDriver->dishesValue("f_id", index).toInt()),
+              "Qty of " + dbdish->name(wo->fOrderDriver->dishesValue("f_dish", index).toInt()),
               oldQty,
               wo->fOrderDriver->dishesValue("f_qty1", index).toString());
 }
@@ -2248,4 +2257,13 @@ void DlgOrder::on_btnReprint_clicked()
     if (tmp != fUser) {
         delete tmp;
     }
+}
+
+void DlgOrder::on_btnBillWithoutService_clicked()
+{
+    WOrder *wo = worder();
+    if (!wo) {
+        return;
+    }
+    C5Message::info(QString("%1<br>%2").arg(tr("Counted")).arg(float_str(wo->fOrderDriver->clearAmount(), 2)));
 }

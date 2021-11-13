@@ -48,8 +48,24 @@ QString CR5CommonSalesFilter::condition()
     if (!ui->leBuyer->isEmpty()) {
         result += " and oh.f_partner in (" + ui->leBuyer->text() + ") ";
     }
+    if (ui->rbTaxYes->isChecked()) {
+        result += " and ot.f_receiptnumber>0 ";
+    }
+    if (ui->rbTaxNo->isChecked()) {
+        result += " and (ot.f_receiptnumber=0 or ot.f_receiptnumber is null) ";
+    }
     result += fFlags;
     return result;
+}
+
+QDate CR5CommonSalesFilter::date1() const
+{
+    return ui->deStart->date();
+}
+
+QDate CR5CommonSalesFilter::date2() const
+{
+    return ui->deEnd->date();
 }
 
 void CR5CommonSalesFilter::on_btnFlags_clicked()

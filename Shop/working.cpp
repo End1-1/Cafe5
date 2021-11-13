@@ -450,6 +450,10 @@ void Working::restoreSales()
             C5Message::error(tr("Program error: Working:restoreSales: detected invalid window"));
             continue;
         }
+        QString err;
+        if (!w->checkQty(db.getInt("f_goodsid"), db.getDouble("f_qty"), err)) {
+            continue;
+        }
         int r = w->table()->addEmptyRow();
         for (int i = 7; i < db.columnCount(); i++) {
             w->table()->setData(r, i - 7, db.getValue(i));
@@ -539,6 +543,7 @@ void Working::threadMessageData(int code, const QVariant &data)
     p.image(img, Qt::AlignCenter);
     p.br(img.height() / 2);
     p.br(img.height() / 2);
+    C5Database db(__c5config.dbParams());
     for (int i = 0; i < jo["messages"].toArray().count(); i++) {
         QJsonObject jom = jo["messages"].toArray().at(i).toObject();
         qDebug() << jom;
@@ -790,7 +795,19 @@ void Working::on_btnShowGoodsList_clicked()
 {
     int id;
     if (DlgGoodsList::getGoods(id)) {
-
+        WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
+        if (!w) {
+            return;
+        }
+        switch (w->fSaleType) {
+        case SALE_RETAIL:
+        case SALE_WHOSALE:
+            w->addGoods(id);
+            break;
+        case SALE_PREORDER:
+            w->addGoodsToTable(id);
+            break;
+        }
     }
 }
 
@@ -865,6 +882,10 @@ void Working::on_tab_tabCloseRequested(int index)
         }
         db[":f_window"] = index;
         db.exec("update a_sale_temp set f_state=1 where f_window=:f_window and f_state=0");
+    }
+    while (w->table()->rowCount() > 0) {
+        w->table()->setCurrentCell(0, 0);
+        w->removeRow();
     }
     ui->tab->removeTab(index);
     w->deleteLater();

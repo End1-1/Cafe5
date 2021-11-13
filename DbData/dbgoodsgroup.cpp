@@ -8,9 +8,8 @@ DbGoodsGroup::DbGoodsGroup() :
 }
 
 DbGoodsGroup::DbGoodsGroup(int id) :
-    DbData("")
+    DbData(id)
 {
-    fId = id;
 }
 
 QString DbGoodsGroup::adgt()

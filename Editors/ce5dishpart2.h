@@ -20,6 +20,8 @@ public:
 
     virtual QString table();
 
+    virtual bool checkData(QString &err) override;
+
 private:
     Ui::CE5DishPart2 *ui;
 

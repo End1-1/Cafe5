@@ -50,7 +50,7 @@ int StoreManager::queryQty(int store, const QStringList &sku, QMap<QString, doub
     QString sql = QString("select  s.f_goods, sum(s.f_qty*s.f_type) as f_qty "
                     "from a_store s "
                     "inner join a_header h on h.f_id=s.f_document "
-                    "where h.f_date<=current_date()  %store "
+                    "where h.f_date<=current_date() %store "
                     "and s.f_goods in (%1) "
                     "group by 1 "
                     "having sum(s.f_qty*s.f_type)>0 ")
@@ -65,6 +65,12 @@ int StoreManager::queryQty(int store, const QStringList &sku, QMap<QString, doub
     __debug_log(sql);
     while (db.next()) {
         out.insert(fInstance->fCodeSkuMap.value(db.integerValue("f_goods")), db.doubleValue("f_qty"));
+    }
+    db.exec("select f_goods, sum(f_qty) as f_qty from a_store_reserve where f_state=1 and f_enddate>=current_date group by 1");
+    while (db.next()) {
+        if (out.contains(fInstance->fCodeSkuMap.value(db.integerValue("f_goods")))) {
+            out[fInstance->fCodeSkuMap.value(db.integerValue("f_goods"))] = out[fInstance->fCodeSkuMap.value(db.integerValue("f_goods"))] - db.doubleValue("f_qty");
+        }
     }
     return out.count();
 }
@@ -101,6 +107,14 @@ int StoreManager::queryQty(const QStringList &sku, QMap<int, QMap<QString, doubl
     __debug_log(sql);
     while (db.next()) {
         out[db.integerValue("f_store")].insert(fInstance->fCodeSkuMap.value(db.integerValue("f_goods")), db.doubleValue("f_qty"));
+    }
+    db.exec("select f_store, f_goods, sum(f_qty) as f_qty from a_store_reserve where f_state=1 and f_enddate>=current_date group by 1, 2");
+    while (db.next()) {
+        if (out.contains(db.integerValue("f_store"))) {
+            if (out[db.integerValue("f_store")].contains(fInstance->fCodeSkuMap.value(db.integerValue("f_goods")))) {
+                out[db.integerValue("f_store")][fInstance->fCodeSkuMap.value(db.integerValue("f_goods"))] = out[db.integerValue("f_store")][fInstance->fCodeSkuMap.value(db.integerValue("f_goods"))] - db.doubleValue("f_qty");
+            }
+        }
     }
     return out.count();
 }

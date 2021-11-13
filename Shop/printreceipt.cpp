@@ -12,12 +12,27 @@ PrintReceipt::PrintReceipt(QObject *parent) : QObject(parent)
 
 void PrintReceipt::print(const QString &id, C5Database &db)
 {
+    QMap<QString, QVariant> returnFrom;
     db[":f_id"] = id;
     db.exec("select * from o_header where f_id=:f_id");
     db.nextRow();
     QString saletype;
     if (db.getDouble("f_amounttotal") < 0) {
         saletype = tr("Return");
+        db[":f_header"] = id;
+        db.exec("select f_returnfrom from o_goods where f_header=:f_header");
+        if (db.nextRow()){
+            db[":f_id"] = db.getString("f_returnfrom");
+            db.exec("select f_header from o_goods where f_id=:f_id");
+            db.nextRow();
+            db[":f_id"] = db.getString("f_header");
+            db.exec("select * from o_header where f_id=:f_id");
+            db.nextRow();
+            db.rowToMap(returnFrom);
+            db[":f_id"] = id;
+            db.exec("select * from o_header where f_id=:f_id");
+            db.nextRow();
+        }
     }
     QString hallid = db.getString("f_hallid");
     QString pref = db.getString("f_prefix");
@@ -144,6 +159,10 @@ void PrintReceipt::print(const QString &id, C5Database &db)
         }
         p.ctext(QString("#%1%2").arg(pref).arg(hallid));
         p.br();
+        if (returnFrom.count() > 0) {
+            p.ctext(QString("(%1 %2%3)").arg(tr("Return from")).arg(returnFrom["f_prefix"].toString()).arg(returnFrom["f_hallid"].toString()));
+            p.br();
+        }
         p.setFontSize(20);
         p.ctext(tr("Class | Name | Qty | Price | Total"));
         p.setFontBold(false);

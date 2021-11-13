@@ -45,7 +45,15 @@ void TableWidgetV1::configOrder(const QString &orderid)
         ui->lbComment->setText(dboheader->comment(orderid));
         ui->tw1lbStaff->setText(dbuser->fullShort(dboheader->staff(orderid)));
         ui->tw1lbAmount->setText(float_str(dboheader->amount(orderid), 2));
-        ui->tw1lbTime->setText(QDate::currentDate() == dboheader->dateOpen(orderid) ? dboheader->timeOpen(orderid).toString(FORMAT_TIME_TO_SHORT_STR) : dboheader->dateOpen(orderid).toString(FORMAT_DATE_TO_STR) + "\n" + dboheader->timeOpen(orderid).toString(FORMAT_TIME_TO_SHORT_STR));
+        QString dd = QString("<html><body><p align=\"center\" "
+               "style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"> "
+               "<span style=\" font-size:6pt;\">%1</span></p>\n<p align=\"center\" "
+               "style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"> "
+               "<span style=\" font-size:8pt;\">%2</span></p></body></html>")
+                                                 .arg(dboheader->dateOpen(orderid).toString(FORMAT_DATE_TO_STR))
+                                                 .arg(dboheader->timeOpen(orderid).toString(FORMAT_TIME_TO_SHORT_STR));
+        ui->tw1lbTime->setText(QDate::currentDate() == dboheader->dateOpen(orderid) ?
+                                   dboheader->timeOpen(orderid).toString(FORMAT_TIME_TO_SHORT_STR) : dd );
     }
     ui->frame->setProperty("t1_state", state);
     ui->frame->style()->polish(ui->frame);

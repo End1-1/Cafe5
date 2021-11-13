@@ -28,7 +28,7 @@ protected:
 
     C5LineEdit *fFilterLineEdit;
 
-private slots:
+protected slots:
     void completeRefresh();
 };
 

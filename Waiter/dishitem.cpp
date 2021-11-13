@@ -59,10 +59,18 @@ void DishItem::setChanges()
         if (fOrder->dishesValue("f_state", fIndex) == DISH_STATE_OK) {
             ui->lbQty1->setProperty("state", fOrder->dishesValue("f_qty2", fIndex).toDouble() > 0.001 ? "1" : "");
             ui->lbQty1->style()->polish(ui->lbQty1);
-            ui->lbTimeOfDish->setText(fOrder->dishesValue("f_state", fIndex).toInt() == DISH_STATE_OK ?
-                                          (fOrder->dishesValue("f_qty2", fIndex).toDouble() > 0.001 ?
-                                          fOrder->dishesValue("f_printtime", fIndex).toDateTime().toString(FORMAT_TIME_TO_SHORT_STR) :
-                                          fOrder->dishesValue("f_appendtime", fIndex).toDateTime().toString(FORMAT_TIME_TO_SHORT_STR)) : "-");
+            QDateTime dt = fOrder->dishesValue("f_qty2", fIndex).toDouble() > 0.001 ?
+                                fOrder->dishesValue("f_printtime", fIndex).toDateTime() :
+                                fOrder->dishesValue("f_appendtime", fIndex).toDateTime();
+            QString dd = dt.date() == QDate::currentDate() ? dt.toString(FORMAT_TIME_TO_SHORT_STR) :
+                    QString("<html><body><p align=\"center\" "
+                           "style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"> "
+                           "<span style=\" font-size:6pt;\">%1</span></p>\n<p align=\"center\" "
+                           "style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"> "
+                           "<span style=\" font-size:8pt;\">%2</span></p></body></html>")
+                                                             .arg(dt.toString(FORMAT_DATE_TO_STR))
+                                                             .arg(dt.toString(FORMAT_TIME_TO_STR));
+            ui->lbTimeOfDish->setText(fOrder->dishesValue("f_state", fIndex).toInt() == DISH_STATE_OK ? dd : "-");
             ui->frame->setProperty("dish_focused", fFocus ? "1" : "2");
             ui->frame->style()->polish(ui->frame);
             ui->btnReprint->setVisible(property("reprint").toBool() && fOrder->dishesValue("f_qty2", fIndex).toDouble() > 0.001);

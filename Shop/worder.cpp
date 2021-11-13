@@ -102,25 +102,10 @@ void WOrder::focusCard()
 void WOrder::addGoods(int id)
 {
     DbGoods g(id);
-    double totalQty = g.unit()->defaultQty();
-    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
-        if (ui->tblGoods->getInteger(i, 0) == id) {
-            totalQty += ui->tblGoods->getDouble(i, 2);
-        }
-    }
-    C5Database db(__c5config.dbParams());
-    db[":f_store"] = __c5config.defaultStore();
-    db[":f_goods"] = id;
-    db[":f_qty"] = totalQty;
-    db.exec("select f_qty-:f_qty-:f_reserved from a_store_sale where f_goods=:f_goods and f_store=:f_store");
-    double storeQty = 0;
-    if (db.nextRow()) {
-        storeQty = 0;
-    }
-
-    if (storeQty < 0) {
-        if (!g.isService()) {
-            C5Message::error(tr("Insufficient quantity") + "<br>" + float_str(storeQty, 3));
+    if (!g.isService()) {
+        QString err;
+        if (!checkQty(id, g.unit()->defaultQty(), err)) {
+            C5Message::error(err);
             return;
         }
     }
@@ -256,6 +241,10 @@ bool WOrder::writeOrder(bool tax)
             if (g.isService) {
                 continue;
             }
+            db[":f_store"] = __c5config.defaultStore();
+            db[":f_goods"] = g.goodsId;
+            db[":f_qty"] = g.goodsQty;
+            db.exec("update a_store_sale set f_qty=f_qty-:f_qty, f_qtyprogram=f_qtyprogram-:f_qty where f_store=:f_store and f_goods=:f_goods");
         }
         if (!fPreorderUUID.isEmpty()) {
             db[":f_state"] = 2;
@@ -537,6 +526,10 @@ void WOrder::removeRow()
     db[":f_row"] = row;
     db[":f_station"] = hostinfo + ": " + hostusername();
     db.exec("update a_sale_temp set f_row=f_row-1 where f_station=:f_station and f_row>:f_row and f_state=:f_state and f_window=:f_window");
+    db[":f_store"] = __c5config.defaultStore();
+    db[":f_goods"] = code.toInt();
+    db[":f_qty"] = qty;
+    db.exec("update a_store_sale set f_qtyprogram=f_qtyprogram-:f_qty where f_store=:f_store and f_goods=:f_goods");
     C5LogSystem::writeEvent(QString("%1 #%2 %3:%4 %5").arg(tr("Remove row")).arg(row).arg(code).arg(name).arg(float_str(qty, 2)));
     countTotal();
 }
@@ -677,40 +670,17 @@ bool WOrder::getDiscountValue(int discountType, double &v)
 
 void WOrder::setQtyOfRow(int row, double qty)
 {
-    double totalQty = qty;
-    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
-        if (i == row) {
-            continue;
-        }
-        if (ui->tblGoods->getInteger(i, 0) == ui->tblGoods->getInteger(row, 0)) {
-            totalQty += ui->tblGoods->getDouble(i, 2);
-        }
-    }
-
     DbGoods g(ui->tblGoods->getInteger(row, 0));
     if (g.acceptIntegerQty()) {
-        totalQty = trunc(totalQty);
+        qty = trunc(qty);
     }
-    if (totalQty < 0.00001) {
-        C5Message::error(tr("Incorrect quantity value"));
-        return;
-    }
-    if (!g.isService()) {
-        C5Database db(__c5config.dbParams());
-        db[":f_store"] = __c5config.defaultStore();
-        db[":f_goods"] = g.id();
-        db[":f_qty"] = totalQty;
-        db.exec("select f_qty-:f_qty-:f_reserved from a_store_sale where f_goods=:f_goods and f_store=:f_store");
-        double storeQty = 0;
-        if (db.nextRow()) {
-            storeQty = 0;
-        }
+    double diffqty = qty - ui->tblGoods->getInteger(row, tr("Qty"));
 
-        if (storeQty < 0) {
-            if (!g.isService()) {
-                C5Message::error(tr("Insufficient quantity") + "<br>" + float_str(storeQty, 3));
-                return;
-            }
+    if (!g.isService()) {
+        QString err;
+        if (!checkQty(g.id(), diffqty, err)) {
+            C5Message::error(err);
+            return;
         }
     }
 
@@ -723,6 +693,36 @@ void WOrder::setQtyOfRow(int row, double qty)
 C5TableWidget *WOrder::table()
 {
     return ui->tblGoods;
+}
+
+bool WOrder::checkQty(int goods, double qty, QString &err)
+{
+    C5Database db(__c5config.dbParams());
+    db[":f_store"] = __c5config.defaultStore();
+    db[":f_goods"] = goods;
+    db[":f_qty"] = qty;
+    if (!db.exec("select f_qty-:f_qty-f_qtyreserve-f_qtyprogram as f_qty from a_store_sale where f_store=:f_store and f_goods=:f_goods ")) {
+        err = db.fLastError;
+        return false;
+    }
+    double storeQty = 0;
+    if (db.nextRow()) {
+        storeQty = db.getDouble(0);
+    } else {
+        storeQty -= qty;
+    }
+
+    if (storeQty < 0) {
+        err = tr("Insufficient quantity") + "<br>" + float_str(storeQty, 3);
+        return false;
+    }
+
+    db[":f_qty"] = qty;
+    db[":f_store"] = __c5config.defaultStore();
+    db[":f_goods"] = goods;
+    db.exec("update a_store_sale set f_qtyprogram=f_qtyprogram+:f_qty where f_store=:f_store and f_goods=:f_goods");
+
+    return true;
 }
 
 void WOrder::on_leCash_textChanged(const QString &arg1)

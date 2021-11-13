@@ -185,6 +185,12 @@ void DlgScreen::on_btnAccept_clicked()
         break;
     }
     case mode_system: {
+        if (pass.isEmpty()) {
+            DlgSystem d(C5Config::dbParams());
+            d.setupNoPassword();
+            d.exec();
+            return;
+        }
         if (pass != __c5config.dbParams().at(3)) {
             C5Message::error(tr("Access denied"));
             return;

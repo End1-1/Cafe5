@@ -27,7 +27,7 @@ void json(C5Database &db, const QJsonObject &params, QJsonArray &jarr)
             "left join d_dish d on d.f_id=ob.f_dish "
             "left join o_body_state bs on bs.f_id=ob.f_state "
             "where oh.f_datecash between :f_datecash1 and :f_datecash2 "
-            "and ob.f_state in (:f_state1, :f_state2) and ob.f_precheck>0 "
+            "and ob.f_state in (:f_state1, :f_state2) and ob.f_removeprecheck<>0 "
             "order by 1 ");
     while (db.nextRow()) {
         QMap<QString, QVariant> v;

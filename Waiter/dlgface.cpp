@@ -48,7 +48,7 @@ DlgFace::DlgFace(C5User *user) :
     connect(&fTimerCheckVersion, SIGNAL(timeout()), this, SLOT(checkVersionTimeout()));
     setViewMode(view_mode_hall);
     viewMode(0);
-    ui->wall->setVisible(false);
+    //ui->wall->setVisible(false);
     ui->lbTime->setText(QTime::currentTime().toString(FORMAT_TIME_TO_SHORT_STR));
     for (int id: dbhall->list()) {
         QPushButton *btn = new QPushButton(dbhall->name(id));
@@ -295,9 +295,9 @@ void DlgFace::filterHall(int hall, int staff)
 {
     fCurrentHall = hall;
     fCurrentStaff = staff;
-    while (ui->glTables->itemAt(0)) {
-        ui->glTables->itemAt(0)->widget()->deleteLater();
-        ui->glTables->removeItem(ui->glTables->itemAt(0));
+    while (ui->sglHall->itemAt(0)) {
+        ui->sglHall->itemAt(0)->widget()->deleteLater();
+        ui->sglHall->removeItem(ui->sglHall->itemAt(0));
     }
     QRect scr = qApp->desktop()->screenGeometry();
     int cc = scr.width() > 1024 ? 4 : 3;
@@ -318,13 +318,13 @@ void DlgFace::filterHall(int hall, int staff)
         connect(t, &TableWidgetV1::clicked, this, &DlgFace::tableClicked);
         t->config(id);
         t->configOrder(dboheader->fTableOrder.contains(id) ? dboheader->fTableOrder[id] : "");
-        ui->glTables->addWidget(t, row, col++, 1, 1);
+        ui->sglHall->addWidget(t, row, col++, 1, 1);
         if (col > cc) {
             row++;
             col = 0;
         }
     }
-    ui->glTables->setRowStretch(row + 1, 1);
+    ui->sglHall->setRowStretch(row + 1, 1);
     colorizeHall();
 }
 
@@ -407,8 +407,8 @@ void DlgFace::setViewMode(int v)
 void DlgFace::refreshTables()
 {
     dboheader->refresh();
-    for (int i = 0; i < ui->glTables->count(); i++) {
-        TableWidgetV1 *tw = dynamic_cast<TableWidgetV1*>(ui->glTables->itemAt(i)->widget());
+    for (int i = 0; i < ui->sglHall->count(); i++) {
+        TableWidgetV1 *tw = dynamic_cast<TableWidgetV1*>(ui->sglHall->itemAt(i)->widget());
         if (tw) {
             tw->configOrder(dboheader->fTableOrder.contains(tw->fTable) ? dboheader->fTableOrder[tw->fTable] : "");
         }

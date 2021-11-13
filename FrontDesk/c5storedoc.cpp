@@ -231,13 +231,13 @@ bool C5StoreDoc::openDoc(QString id, QString &err)
         fCashUserId = db.getString("f_userid");
         ui->leCash->setValue(dw.value(container_ecash, 0, "f_cash").toString());
     }
-    if (fBasedOnSale > 0) {
-        ui->wbody->setEnabled(false);
-        ui->deDate->setEnabled(false);
-        ui->leStoreOutput->setEnabled(false);
-        ui->leComment->setEnabled(false);
-        ui->leReason->setEnabled(false);
-    }
+//    if (fBasedOnSale > 0) {
+//        ui->wbody->setEnabled(false);
+//        ui->deDate->setEnabled(false);
+//        ui->leStoreOutput->setEnabled(false);
+//        ui->leComment->setEnabled(false);
+//        ui->leReason->setEnabled(false);
+//    }
     if (fToolBar && fDocType == sdOutput) {
         fToolBar->addAction(QIcon(":/storeinput.png"), tr("Create store input"), this, SLOT(createStoreInput()));
     }

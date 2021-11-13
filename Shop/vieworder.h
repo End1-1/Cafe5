@@ -25,6 +25,8 @@ private slots:
 
     void on_btnRetryUpload_clicked();
 
+    void on_btnSave_clicked();
+
 private:
     Ui::ViewOrder *ui;
 

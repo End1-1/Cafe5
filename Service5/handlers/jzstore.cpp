@@ -55,6 +55,13 @@ bool JZStore::handle(const QByteArray &data, const QHash<QString, DataAddress> &
 bool JZStore::validateData(const QByteArray &data, const QHash<QString, DataAddress> &dataMap)
 {
     QString message;
+    if (!dataMap.contains("month")) {
+        message += "The month is required.";
+    } else {
+        if (getData(data, dataMap["month"]).toInt() < 0 || getData(data, dataMap["month"]).toInt() > 11) {
+            message += "Invalid month range.";
+        }
+    }
     if (!dataMap.contains("request")) {
         message += "The type of request is missing.";
     } else {
@@ -148,9 +155,10 @@ bool JZStore::requestStore(const QByteArray &data, const QHash<QString, DataAddr
         }
         goods[db.integerValue("id")] = r;
     }
+    int month = getData(data, dataMap["month"]).toInt() + 1;
     QDate d = QDate::currentDate();
-    QDate d1 = QDate::fromString(QString("%1/%2/%3").arg(1, 2, 10, QChar('0')).arg(d.month(), 2, 10, QChar('0')).arg(d.year()), "dd/MM/yyyy");
-    QDate d2 = QDate::fromString(QString("%1/%2/%3").arg(d.daysInMonth(), 2, 10, QChar('0')).arg(d.month(), 2, 10, QChar('0')).arg(d.year()), "dd/MM/yyyy");
+    QDate d1 = QDate::fromString(QString("%1/%2/%3").arg(1, 2, 10, QChar('0')).arg(month, 2, 10, QChar('0')).arg(d.year()), "dd/MM/yyyy");
+    QDate d2 = QDate::fromString(QString("%1/%2/%3").arg(d1.daysInMonth(), 2, 10, QChar('0')).arg(month, 2, 10, QChar('0')).arg(d1.year()), "dd/MM/yyyy");
     db[":date"] = d1.addDays(-1);
     db[":store_id"] = store;
     db[":action_id"] = 7;
@@ -212,7 +220,6 @@ bool JZStore::requestStore(const QByteArray &data, const QHash<QString, DataAddr
         return setInternalServerError(db.lastDbError());
     }
     while (db.next()) {
-        qDebug() << db.doubleValue("qty");
         JsonHandler &j = goods[db.integerValue("goods_id")];
         j["QTY_OUT"] = db.doubleValue("qty");
         j["AMOUNT_OUT"] = db.doubleValue("amount");

@@ -191,6 +191,10 @@ bool C5PrintReceiptThread::print()
                         .arg(totalStr));
             }
         }
+        if (dbdish->isExtra(m["f_dish"].toInt())) {
+            p.br();
+            p.ltext(m["f_comment"].toString(), 0);
+        }
         p.br();
         p.br(2);
         p.line();
@@ -347,6 +351,18 @@ bool C5PrintReceiptThread::print()
         p.ltext(QString("%1: %2").arg(tr("Sample")).arg(abs(fHeaderInfo["f_print"].toInt()) + 1), 0);
     }
     p.br();
+
+    if (!fHeaderInfo["f_comment"].toString().isEmpty()) {
+        p.br();
+        p.br();
+        p.br();
+        p.br();
+        p.br();
+        p.line();
+        p.br();
+        p.ltext(fHeaderInfo["f_comment"].toString(), 0);
+        p.br();
+    }
     p.print(fPrinter, QPrinter::Custom);
 
     return true;

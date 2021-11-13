@@ -2,6 +2,7 @@
 #include <QFile>
 #include <QDateTime>
 #include <QDebug>
+#include <QDir>
 
 QMutex LogWriter::fMutex;
 QMap<int, QString> LogWriter::fFilesMap;
@@ -26,6 +27,9 @@ void LogWriter::write(int level, int file, const QString &session, const QString
 #endif;
     if (fCurrentLevel < level) {
         return;
+    }
+    if (fFilesMap.empty()) {
+        fFilesMap[level] = QDir::tempPath() + "/" + _APPLICATION_ + "." + _MODULE_ + ".log";
     }
     QString fileName = fFilesMap[file];
     writeToFile(fileName, session, message);

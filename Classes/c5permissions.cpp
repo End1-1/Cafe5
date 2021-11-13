@@ -97,6 +97,8 @@ void C5Permissions::init(C5Database &db)
               << cp_t5_manager_tools
               << cp_t5_print_receipt
               << cp_t5_repeat_service
+              << cp_t5_change_date_of_sale
+              << cp_t5_bill_without_service
 
               << cp_t6_storage
               << cp_t6_goods_menu

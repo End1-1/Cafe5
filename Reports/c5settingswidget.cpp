@@ -127,6 +127,7 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     fTags[ui->leASConnectionString->getTag()] = ui->leASConnectionString->text();
     fTags[ui->leUserIdForHotelVoucher->getTag()] = ui->leUserIdForHotelVoucher->text();
     fTags[ui->leHallIdForHotel->getTag()] = ui->leHallIdForHotel->text();
+    fTags[ui->leStaticQRCode->getTag()] = ui->leStaticQRCode->text();
     C5Database db(fDBParams);
     db[":f_settings"] = ui->leCode->getInteger();
     db.exec("delete from s_settings_values where f_settings=:f_settings");

@@ -7,6 +7,7 @@ QStringList DbData::fDbParams;
 DbData::DbData(const QString &tableName, const QString &cond) :
     QObject()
 {
+    Q_ASSERT(!tableName.isEmpty());
     fTable = tableName;
     fCondition = cond;
     getFromDatabase();

@@ -143,6 +143,7 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
     restoreColumnsVisibility();
 
     fFilterWidget = new CR5CommonSalesFilter(fDBParams);
+    fFilter = static_cast<CR5CommonSalesFilter*>(fFilterWidget);
 }
 
 QToolBar *CR5CommonSales::toolBar()
@@ -157,6 +158,7 @@ QToolBar *CR5CommonSales::toolBar()
             << ToolBarButtons::tbPrint;
         fToolBar = createStandartToolbar(btn);
         fToolBar->addAction(QIcon(":/AS.png"), tr("Export to AS"), this, SLOT(exportToAS()));
+        fToolBar->addAction(QIcon(":/AS.png"), tr("Create store output in AS"), this, SLOT(createStoreOutputAS()));
     }
     return fToolBar;
 }
@@ -248,8 +250,9 @@ void CR5CommonSales::exportToAS()
     for (int i = 0; i < fModel->rowCount(); i++) {
         idlist.append(fModel->data(i, fModel->fColumnNameIndex["f_id"], Qt::EditRole).toString());
     }
-    QString partnercode, storecode, servicecode, srvinacc, srvoutacc, iteminacc, itemoutacc;
-    int option = DlgExportSaleToAsOptions::getOption(fDBParams, partnercode, storecode, servicecode, srvinacc, srvoutacc, iteminacc, itemoutacc);
+    QString partnercode, storecode, servicecode, srvinacc, srvoutacc, iteminacc, itemoutacc, bankacc, vat, simpleItem;
+    bool simple;
+    int option = DlgExportSaleToAsOptions::getOption(fDBParams, partnercode, storecode, servicecode, srvinacc, srvoutacc, iteminacc, itemoutacc, bankacc, vat, simple, simpleItem);
     if (option == 0) {
         return;
     }
@@ -271,6 +274,7 @@ void CR5CommonSales::exportToAS()
     QMap<QString, QString> unitMap;
     QMap<QString, QVariant> partnerMap;
     QMap<QString, QVariant> serviceMap;
+    QMap<QString, QVariant> simpleMap;
     dbas.exec("select fMTCODE, fMTID, fCAPTION, fUNIT from MATERIALS");
     while (dbas.nextRow()) {
         QMap<QString, QVariant> temp;
@@ -297,9 +301,151 @@ void CR5CommonSales::exportToAS()
         C5Message::error(tr("Invalid service code"));
         return;
     }
+    if (simple) {
+        dbas[":fSIMPLEITEM"] = simpleItem;
+        dbas.exec("select * FROM SERVICES where fSERVCODE=:fSIMPLEITEM");
+        if (dbas.nextRow()) {
+            dbas.rowToMap(simpleMap);
+        } else {
+            C5Message::error(tr("Invalid simple item code"));
+            return;
+        }
+    }
 
     QStringList codeErrors;
     C5Database db(fDBParams);
+    if (simple) {
+        //TODO: check for single date, date range in simple mode is not allowed
+        double total = 0, card = 0, service = 0;
+        QDate date;
+        for (const QString id: idlist) {
+            db[":f_id"] = id;
+            db.exec("select f_receiptnumber from o_tax where f_id=:f_id");
+            int rn = 0;
+            if (db.nextRow()) {
+                rn = db.getInt(0);
+            }
+            switch (option) {
+            case 1:
+                if (rn == 0) {
+                    continue;
+                }
+                break;
+            case 2:
+                if (rn > 0) {
+                    continue;
+                }
+                break;
+            }
+            db[":f_id"] = id;
+            db.exec("select * from o_header where f_id=:f_id");
+            db.nextRow();
+            total += db.getDouble("f_amounttotal");
+            card += db.getDouble("f_amountcard");
+            service += db.getDouble("f_amountservice");
+            date= db.getDate("f_datecash");
+        }
+        QString docid = db.uuid();
+        dbas.startTransaction();
+        dbas[":fISN"] = docid;
+        dbas[":fDOCTYPE"] = 20;
+        dbas[":fDOCSTATE"] = 1;
+        dbas[":fORDERNUM"] = "";
+        dbas[":fDOCNUM"] = "";
+        dbas[":fCUR"] = "AMD";
+        dbas[":fSUMM"] = total;
+        dbas[":fCOMMENT"] = QString("%1 %2").arg(tr("Revenue")).arg(date.toString(FORMAT_DATE_TO_STR));
+        dbas[":fBODY"] = QString("\r\nPREPAYMENTACC:5231\r\nVATACC:5243\r\nSUMMVAT:%2\r\nBUYERACC:2211\r\nBUYCHACCPOST:Գլխավոր հաշվապահ \r\nMAXROWID:%1\r\n")
+                .arg(2)
+                .arg(vat.toDouble() > 0.001 ? (vat.toDouble() / 100) * total : 0);
+        dbas[":fPARTNAME"] = partnerMap["ffullcaption"]; // set to kamar
+        dbas[":fUSERID"] = 0;
+        dbas[":fPARTID"] = partnerMap["fpartid"];
+        dbas[":fCRPARTID"] = -1;
+        dbas[":fMTID"] = -1;
+        dbas[":fINVN"] = "";
+        dbas[":fENTRYSTATE"] = 0;
+        dbas[":fEMPLIDRESPIN"] = -1;
+        dbas[":fEMPLIDRESPOUT"] = -1;
+        dbas[":fVATTYPE"] = "5";
+        dbas[":fSPEC"] = "                    00"; // <--- Tax receipt id
+        if (card > 0.001) {
+            dbas[":fBODY"] = dbas[":fBODY"].toString() +
+                    QString("BANKACQUIRINGACCOUNT:%1\r\nSUMMPLCARD:%2\r\n")
+                    .arg(bankacc)
+                    .arg(float_str(card, 2).replace(",", "").replace(" ", ""));
+        }
+        if (!dbas.exec("insert into DOCUMENTS ("
+                  "fISN, fDOCTYPE, fDOCSTATE, fDATE, fORDERNUM, fDOCNUM, fCUR, fSUMM, fCOMMENT, fBODY, fPARTNAME, "
+                  "fUSERID, fPARTID, fCRPARTID, fMTID, fEXPTYPE, fINVN, fENTRYSTATE, "
+                  "fEMPLIDRESPIN, fEMPLIDRESPOUT, fVATTYPE, fSPEC, fCHANGEDATE,fEXTBODY,fETLSTATE) VALUES ("
+                  ":fISN, :fDOCTYPE, :fDOCSTATE, '" + date.toString("yyyy-MM-dd") + "', "
+                  ":fORDERNUM, :fDOCNUM, :fCUR, :fSUMM, :fCOMMENT, :fBODY, :fPARTNAME, "
+                  ":fUSERID, :fPARTID, :fCRPARTID, :fMTID, '', :fINVN, :fENTRYSTATE, "
+                       ":fEMPLIDRESPIN, :fEMPLIDRESPOUT, :fVATTYPE, :fSPEC, current_timestamp,'', '')")) {
+            dbas.rollback();
+            C5Message::error(dbas.fLastError);
+            return;
+        }
+        dbas[":fISN"] = docid;
+        dbas[":fROWNUM"] = 0;
+        dbas[":fITEMTYPE"] = 2;
+        dbas[":fITEMID"] = simpleMap["fservid"];
+        dbas[":fITEMNAME"] = simpleMap["fcaption"];
+        dbas[":fUNITBRIEF"] = unitMap[simpleMap["funit"].toString()];
+        dbas[":fSTORAGE"] = storecode;
+        dbas[":fQUANTITY"] = 1;
+        dbas[":fINITPRICE"] = total - service;
+        dbas[":fDISCOUNT"] = 0;
+        dbas[":fPRICE"] = total - service;
+        dbas[":fSUMMA"] = total - service;
+        dbas[":fSUMMA1"] = 0;
+        dbas[":fENVFEEPERCENT"] = 0;
+        dbas[":fENVFEESUMMA"] = 0;
+        dbas[":fVAT"] = 1;
+        dbas[":fEXPMETHOD"] = 1;
+        dbas[":fACCEXPENSE"] = iteminacc;
+        dbas[":fACCINCOME"] = itemoutacc;
+        dbas[":fPARTYMETHOD"] = 0;
+        dbas[":fROWID"] = 0;
+        if (!dbas.insert("MTINVOICELIST", false)) {
+            dbas.rollback();
+            C5Message::error(dbas.fLastError);
+            return;
+        }
+        if (service > 0.001) {
+            dbas[":fISN"] = docid;
+            dbas[":fROWNUM"] = 1;
+            dbas[":fITEMTYPE"] = 2;
+            dbas[":fITEMID"] = serviceMap["fservid"];
+            dbas[":fITEMNAME"] = serviceMap["fcaption"];
+            dbas[":fUNITBRIEF"] = unitMap[serviceMap["funit"].toString()];
+            dbas[":fSTORAGE"] = storecode;
+            dbas[":fQUANTITY"] = 1;
+            dbas[":fINITPRICE"] = service;
+            dbas[":fDISCOUNT"] = 0;
+            dbas[":fPRICE"] = service;
+            dbas[":fSUMMA"] = service;
+            dbas[":fSUMMA1"] = 0;
+            dbas[":fENVFEEPERCENT"] = 0;
+            dbas[":fENVFEESUMMA"] = 0;
+            dbas[":fVAT"] = 1;
+            dbas[":fEXPMETHOD"] = 1;
+            dbas[":fACCEXPENSE"] = srvinacc;
+            dbas[":fACCINCOME"] = srvoutacc;
+            dbas[":fPARTYMETHOD"] = 0;
+            dbas[":fROWID"] = 1;
+            if (!dbas.insert("MTINVOICELIST", false)) {
+                dbas.rollback();
+                C5Message::error(dbas.fLastError);
+                return;
+            }
+        }
+        dbas.commit();
+        C5Message::info(tr("Done"));
+        return;
+    }
+
     for (const QString id: idlist) {
         QMap<QString, QVariant> oh;
         QMap<QString, QVariant> otax;
@@ -350,18 +496,26 @@ void CR5CommonSales::exportToAS()
         dbas[":fCUR"] = "AMD";
         dbas[":fSUMM"] = oh["f_amounttotal"];
         dbas[":fCOMMENT"] = "";
-        dbas[":fBODY"] =  "\r\nPREPAYMENTACC:5231\r\nVATACC:5243\r\nSUMMVAT:469.8300\r\nBUYERACC:2211\r\nBUYCHACCPOST:Գլխավոր հաշվապահ \r\nMAXROWID:2\r\n";
+        dbas[":fBODY"] = QString("\r\nPREPAYMENTACC:5231\r\nVATACC:5243\r\nSUMMVAT:%2\r\nBUYERACC:2211\r\nBUYCHACCPOST:Գլխավոր հաշվապահ \r\nMAXROWID:%1\r\n")
+                .arg(ob.count()) //<---- Errror
+                .arg(vat.toDouble() > 0.001 ? (vat.toDouble() / 100) * oh["f_amounttotal"].toDouble() : 0);
         dbas[":fPARTNAME"] = partnerMap["ffullcaption"]; // set to kamar
         dbas[":fUSERID"] = 0;
         dbas[":fPARTID"] = partnerMap["fpartid"];
-        dbas[":fCRPARTID"] = - 1;
+        dbas[":fCRPARTID"] = -1;
         dbas[":fMTID"] = -1;
         dbas[":fINVN"] = "";
         dbas[":fENTRYSTATE"] = 0;
         dbas[":fEMPLIDRESPIN"] = -1;
         dbas[":fEMPLIDRESPOUT"] = -1;
         dbas[":fVATTYPE"] = "5";
-        dbas[":fSPEC"] = otax["f_receiptnumber"];
+        dbas[":fSPEC"] = otax["f_receiptnumber"].toString().isEmpty() ? "                    00" : otax["f_receiptnumber"];
+        if (oh["f_amountcard"].toDouble() > 0.001) {
+            dbas[":fBODY"] = dbas[":fBODY"].toString() +
+                    QString("BANKACQUIRINGACCOUNT:%1\r\nSUMMPLCARD:%2\r\n")
+                    .arg(bankacc)
+                    .arg(float_str(oh["f_amountcard"].toDouble(), 2).replace(",", "").replace(" ", ""));
+        }
         if (!dbas.exec("insert into DOCUMENTS ("
                   "fISN, fDOCTYPE, fDOCSTATE, fDATE, fORDERNUM, fDOCNUM, fCUR, fSUMM, fCOMMENT, fBODY, fPARTNAME, "
                   "fUSERID, fPARTID, fCRPARTID, fMTID, fEXPTYPE, fINVN, fENTRYSTATE, "
@@ -375,6 +529,7 @@ void CR5CommonSales::exportToAS()
             return;
         }
 
+        int rownum = 0;
         for (int ib = 0; ib < ob.count(); ib++) {
             QMap<QString, QVariant> &m = ob[ib];
             if (!goodsMap.contains(m["f_dish"].toString())) {
@@ -384,7 +539,7 @@ void CR5CommonSales::exportToAS()
                 continue;
             }
             dbas[":fISN"] = docid;
-            dbas[":fROWNUM"] = ib;
+            dbas[":fROWNUM"] = rownum;
             dbas[":fITEMTYPE"] = 1;
             dbas[":fITEMID"] = goodsMap[m["f_dish"].toString()]["fmtid"];
             dbas[":fITEMNAME"] = goodsMap[m["f_dish"].toString()]["fcaption"];
@@ -403,16 +558,17 @@ void CR5CommonSales::exportToAS()
             dbas[":fACCEXPENSE"] = iteminacc;
             dbas[":fACCINCOME"] = itemoutacc;
             dbas[":fPARTYMETHOD"] = 0;
-            dbas[":fROWID"] = ib;
+            dbas[":fROWID"] = rownum;
             if (!dbas.insert("MTINVOICELIST", false)) {
                 dbas.rollback();
                 C5Message::error(dbas.fLastError);
                 return;
             }
+            rownum++;
         }
         if (oh["f_amountservice"].toDouble() > 0.001) {
             dbas[":fISN"] = docid;
-            dbas[":fROWNUM"] = ob.count();
+            dbas[":fROWNUM"] = rownum;
             dbas[":fITEMTYPE"] = 2;
             dbas[":fITEMID"] = serviceMap["fservid"];
             dbas[":fITEMNAME"] = serviceMap["fcaption"];
@@ -431,12 +587,13 @@ void CR5CommonSales::exportToAS()
             dbas[":fACCEXPENSE"] = srvinacc;
             dbas[":fACCINCOME"] = srvoutacc;
             dbas[":fPARTYMETHOD"] = 0;
-            dbas[":fROWID"] = ob.count();
+            dbas[":fROWID"] = rownum;
             if (!dbas.insert("MTINVOICELIST", false)) {
                 dbas.rollback();
                 C5Message::error(dbas.fLastError);
                 return;
             }
+            rownum++;
         }
         dbas.commit();
     }
@@ -452,6 +609,131 @@ void CR5CommonSales::exportToAS()
         }
     }
 
+
+    C5Message::info(tr("Done"));
+}
+
+void CR5CommonSales::createStoreOutputAS()
+{
+    C5Database db(fDBParams);
+    db[":date1"] = fFilter->date1();
+    db[":date2"] = fFilter->date2();
+    db[":ostate"] = ORDER_STATE_CLOSE;
+    db.exec("select ob.f_dish ,sum(ob.f_qty1) as f_qty "
+            "from o_body ob "
+            "left join o_header oh on oh.f_id=ob.f_header  "
+            "where oh.f_datecash between :date1 and :date2 and oh.f_state=:ostate and ob.f_state in (1, 3) "
+            "group by ob.f_dish ");
+    QMap<QString, double> dishesList;
+    while (db.nextRow()) {
+        dishesList[db.getString("f_dish")] = db.getDouble("f_qty");
+    }
+
+    C5Database dbas("QODBC3");
+    dbas.setDatabase("", __c5config.getValue(param_as_connection_string), "", "");
+    if (!dbas.open()) {
+        C5Message::error(dbas.fLastError);
+    }
+    dbas.exec("select fMTCODE, fMTID, fCAPTION, fUNIT from MATERIALS");
+    QMap<QString, QMap<QString, QVariant> > goodsMap;
+    while (dbas.nextRow()) {
+        QMap<QString, QVariant> temp;
+        dbas.rowToMap(temp);
+        goodsMap[dbas.getString(0)] = temp;
+    }
+
+    QStringList nocalc;
+    QMap<QString, QMap<QString, double> > calc;
+    for (const QString &s: dishesList.keys()) {
+        dbas[":fMTDESTID"] = goodsMap[s]["fmtid"].toString();
+        dbas[":fSALED"] = dishesList[s];
+        dbas.exec("select fMTSOURCEID,fQTY*:fSALED from MTCOMPLECTS where fMTDESTID=:fMTDESTID");
+        bool hascalc = false;
+        while (dbas.nextRow()) {
+            hascalc = true;
+            calc[s][dbas.getString(0)] = dbas.getDouble(1);
+        }
+        if (!hascalc) {
+            nocalc.append(s);
+        }
+    }
+
+    dbas.startTransaction();
+    QString docid = db.uuid();
+    dbas.startTransaction();
+    dbas[":fISN"] = docid;
+    dbas[":fDOCTYPE"] = 7;
+    dbas[":fDOCSTATE"] = 1;
+    dbas[":fORDERNUM"] = "";
+    dbas[":fDOCNUM"] = "";
+    dbas[":fCUR"] = "AMD";
+    dbas[":fSUMM"] = 0;
+    dbas[":fCOMMENT"] = QString("%1")
+            .arg(QString("%1 %2 - %3")
+                 .arg(tr("Output"))
+                 .arg(fFilter->date1().toString(FORMAT_DATE_TO_STR))
+                 .arg(fFilter->date2().toString(FORMAT_DATE_TO_STR)));
+    dbas[":fBODY"] = QString("\r\nPREPAYMENTACC:5231\r\nVATACC:5243\r\nSUMMVAT:0\r\nBUYERACC:2211\r\nBUYCHACCPOST:Գլխավոր հաշվապահ \r\nMAXROWID:%1\r\n")
+            .arg(calc.count());
+    dbas[":fPARTNAME"] = ""; // set to kamar
+    dbas[":fUSERID"] = 0;
+    dbas[":fPARTID"] = -1;
+    dbas[":fCRPARTID"] = -1;
+    dbas[":fMTID"] = -1;
+    dbas[":fINVN"] = "";
+    dbas[":fENTRYSTATE"] = 0;
+    dbas[":fEMPLIDRESPIN"] = -1;
+    dbas[":fEMPLIDRESPOUT"] = -1;
+    dbas[":fVATTYPE"] = "5";
+    dbas[":fSPEC"] = "                    00"; // <--- Tax receipt id
+    if (!dbas.exec("insert into DOCUMENTS ("
+              "fISN, fDOCTYPE, fDOCSTATE, fDATE, fORDERNUM, fDOCNUM, fCUR, fSUMM, fCOMMENT, fBODY, fPARTNAME, "
+              "fUSERID, fPARTID, fCRPARTID, fMTID, fEXPTYPE, fINVN, fENTRYSTATE, "
+              "fEMPLIDRESPIN, fEMPLIDRESPOUT, fVATTYPE, fSPEC, fCHANGEDATE,fEXTBODY,fETLSTATE) VALUES ("
+              ":fISN, :fDOCTYPE, :fDOCSTATE, '" + fFilter->date2().toString("yyyy-MM-dd") + "', "
+              ":fORDERNUM, :fDOCNUM, :fCUR, :fSUMM, :fCOMMENT, :fBODY, :fPARTNAME, "
+              ":fUSERID, :fPARTID, :fCRPARTID, :fMTID, '', :fINVN, :fENTRYSTATE, "
+                   ":fEMPLIDRESPIN, :fEMPLIDRESPOUT, :fVATTYPE, :fSPEC, current_timestamp,'', '')")) {
+        dbas.rollback();
+        C5Message::error(dbas.fLastError);
+        return;
+    }
+
+    int rownum = 0;
+    for (const QString &s: calc.keys()) {
+        for (const QString &m: calc[s].keys()) {
+            dbas[":fISN"] = docid;
+            dbas[":fROWNUM"] = rownum;
+            dbas[":fMTID"] = m;
+            dbas[":fQUANTITY"] = calc[s][m];
+            dbas[":fSUMMA"] = 0;
+            dbas[":fEXPMETHOD"] = 1;
+            dbas[":fPARTYMETHOD"] = 0;
+            dbas[":fROWID"] = rownum++;
+            if (!dbas.insert("MTEXPENSELIST", false)) {
+                dbas.rollback();
+                C5Message::error(dbas.fLastError);
+                return;
+            }
+        }
+    }
+
+    if (!nocalc.isEmpty()) {
+        QDir d;
+        QFile f(d.tempPath() + "/err.txt");
+        if (f.open(QIODevice::WriteOnly)) {
+            f.write("No calculation\r\n");
+            QString ba = nocalc.join("\r\n");
+            f.write(ba.toUtf8());
+            f.close();
+            QDesktopServices::openUrl(d.tempPath() + "/err.txt");
+        }
+    }
+
+    if (calc.count() == 0) {
+        C5Message::info(tr("Nothing to create"));
+        return;
+    }
 
     C5Message::info(tr("Done"));
 }

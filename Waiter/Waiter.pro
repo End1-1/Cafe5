@@ -77,6 +77,7 @@ SOURCES += \
     ../Controls/c5guicontrols.cpp \
     ../Controls/c5lineeditwithselector.cpp \
     ../DbData/datadriver.cpp \
+    ../DbData/dbbodystate.cpp \
     ../DbData/dbcar.cpp \
     ../DbData/dbdata.cpp \
     ../DbData/dbdishes.cpp \
@@ -382,6 +383,7 @@ HEADERS += \
     ../Controls/c5guicontrols.h \
     ../Controls/c5lineeditwithselector.h \
     ../DbData/datadriver.h \
+    ../DbData/dbbodystate.h \
     ../DbData/dbcar.h \
     ../DbData/dbdata.h \
     ../DbData/dbdishes.h \

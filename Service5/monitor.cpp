@@ -2,6 +2,7 @@
 #include "ui_monitor.h"
 #include "serverthread.h"
 #include "monitoringwindow.h"
+#include <QThread>
 #include <QDebug>
 #include <QDateTime>
 
@@ -21,9 +22,12 @@ Monitor::~Monitor()
 
 void Monitor::startSslServer()
 {
-    qDebug() << "GUI THREAD" << thread();
+    auto *thread = new QThread();
     fSslServer = new ServerThread(qApp->applicationDirPath() + "/");
-    //fSslServer->start();
+    connect(fSslServer, &ServerThread::endOfWork, thread, &QThread::deleteLater);
+    connect(thread, &QThread::started, fSslServer, &ServerThread::run);
+    fSslServer->moveToThread(thread);
+    thread->start();
 }
 
 void Monitor::receiveData(int code, const QString &session, const QString &data1, const QVariant &data2)

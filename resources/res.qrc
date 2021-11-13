@@ -113,5 +113,6 @@
         <file>quickmenu.png</file>
         <file>reserve.png</file>
         <file>AS.png</file>
+        <file>calendar.png</file>
     </qresource>
 </RCC>

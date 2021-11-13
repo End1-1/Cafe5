@@ -30,7 +30,7 @@ bool DbTables::openTable(int table, QStringList &orders, QString &err)
     }
     QDateTime lockTime = db.getDateTime("f_locktime");
     if (lockTime.isValid()) {
-        if (lockTime.msecsTo(QDateTime::currentDateTime()) < 60000) {
+        if (lockTime.msecsTo(QDateTime::currentDateTime()) < 600000) {
             if (db.getString("f_locksrc") != hostinfo) {
                 err = QObject::tr("Table already locked");
                 db.commit();

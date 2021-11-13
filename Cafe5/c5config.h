@@ -73,6 +73,8 @@
 #define param_as_connection_string 69
 #define param_hotel_user_Id 70
 #define param_hotel_hall_id 71
+#define param_hotel_noinvoice 72
+#define param_static_qr_text 73
 
 #define FRONTDESK_WAITER 0
 #define FRONTDESK_SHOP 1

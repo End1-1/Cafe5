@@ -18,6 +18,10 @@ public:
 
     virtual QString condition();
 
+    QDate date1() const;
+
+    QDate date2() const;
+
 private slots:
     void on_btnFlags_clicked();
 

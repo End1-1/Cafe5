@@ -50,6 +50,8 @@ private:
     C5User *fUser;
 
     bool moveItem(C5OrderDriver *or1, C5OrderDriver *or2, int row);
+
+    QMultiMap<QString, QString> fHistory;
 };
 
 #endif // DLGSPLITORDER_H

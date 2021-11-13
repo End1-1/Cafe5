@@ -66,6 +66,8 @@ public:
 
     C5TableWidget *table();
 
+    bool checkQty(int goods, double qty, QString &err);
+
 private slots:
     void on_leCash_textChanged(const QString &arg1);
 

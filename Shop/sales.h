@@ -45,6 +45,8 @@ private slots:
 
     void on_btnGroups_clicked();
 
+    void on_btnChangeDate_clicked();
+
 private:
     Ui::Sales *ui;
 
@@ -63,6 +65,10 @@ private:
     int fViewMode;
 
     QString userCond() const;
+
+    void printpreview();
+
+    int sumOfColumnsWidghtBefore(int column);
 };
 
 #endif // SALES_H

@@ -301,6 +301,55 @@ double C5OrderDriver::amountTotal()
     return total;
 }
 
+double C5OrderDriver::clearAmount()
+{
+    double total = 0;
+    double totalService = 0;
+    double totalDiscount = 0;
+    for (int i = 0, count = dishesCount(); i < count; i++) {
+        setDishesValue("f_discount", dishesValue("f_candiscount", i) == 0 ? 0 : headerValue("f_discountfactor"), i);
+        setDishesValue("f_service",  dishesValue("f_canservice", i) == 0 ? 0 : headerValue("f_servicefactor"), i);
+        if (dishesValue("f_state", i).toInt() != DISH_STATE_OK) {
+            continue;
+        }
+        if (dbdish->isHourlyPayment(dishesValue("f_dish", i).toInt())) {
+            total += dishesValue("f_total", i).toDouble();
+            continue;
+        }
+        double price = dishesValue("f_price", i).toDouble();
+        double service = dishesValue("f_service", i).toDouble();
+        double discount = dishesValue("f_discount", i).toDouble();
+        double itemTotal = price * dishesValue("f_qty1", i).toDouble();
+        if (dishesValue("f_canservice", i).toInt() > 0) {
+            double serviceAmount = (itemTotal * service);
+            itemTotal += serviceAmount;
+            totalService += serviceAmount;
+        }
+        if (dishesValue("f_candiscount", i).toInt() > 0) {
+            double discountAmount = (itemTotal * discount);
+            itemTotal -= discountAmount;
+            totalDiscount += discountAmount;
+        }
+        setDishesValue("f_total", price * dishesValue("f_qty1", i).toDouble(), i);
+        total += itemTotal;
+    }
+    setHeader("f_amounttotal", total);
+    setHeader("f_amountservice", totalService);
+    setHeader("f_amountdiscount", totalDiscount);
+    double acash = headerValue("f_amountcash").toDouble(),
+            acard = headerValue("f_amountcard").toDouble(),
+            abank = headerValue("f_amountbank").toDouble(),
+            aother = headerValue("f_amountother").toDouble();
+    double adiff = total - (acash + acard + abank + aother);
+    if (adiff < 0.001) {
+        setHeader("f_amountother", 0);
+        setHeader("f_amountbank", 0);
+        setHeader("f_amountcard", 0);
+        setHeader("f_amountcash", headerValue("f_amounttotal"));
+    }
+    return total;
+}
+
 double C5OrderDriver::prepayment()
 {
     double total = 0;

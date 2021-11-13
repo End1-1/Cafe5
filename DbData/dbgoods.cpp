@@ -9,9 +9,8 @@ DbGoods::DbGoods() :
 }
 
 DbGoods::DbGoods(int id) :
-    DbData("")
+    DbData(id)
 {
-    fId = id;
     fGroup = new DbGoodsGroup(groupCode());
     fUnit = new DbUnit(unitCode());
 }

@@ -83,14 +83,14 @@ bool StoreRequest::validateData(const QByteArray &data, const QHash<QString, Dat
         }
     }
 
-        if (!dataMap.contains("goods")) {
-            message += "Goods list missing.";
-        } else {
-            fGoods = QString(getData(data, dataMap["goods"])).split(",", Qt::SkipEmptyParts);
-            if (fGoods.isEmpty()) {
-                message += "Emtpy goods list";
-            }
+    if (!dataMap.contains("goods")) {
+        message += "Goods list missing.";
+    } else {
+        fGoods = QString(getData(data, dataMap["goods"])).split(",", Qt::SkipEmptyParts);
+        if (fGoods.isEmpty()) {
+            message += "Emtpy goods list";
         }
+    }
 
     if (!message.isEmpty()) {
         JsonHandler jh;
