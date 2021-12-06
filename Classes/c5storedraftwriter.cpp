@@ -891,15 +891,31 @@ bool C5StoreDraftWriter::writeOutput(const QString &docId, QString &err)
 
     QList<QMap<QString, QVariant> > storeData;
     fDb[":f_store"] = storeOut;
-    fDb[":f_date"] = date;
-    if (!fDb.exec(QString("select s.f_id, s.f_goods, sum(s.f_qty*s.f_type) as f_qty, s.f_price, s.f_total*s.f_type, "
-                          "s.f_document, s.f_base, d.f_date "
-            "from a_store s "
-            "inner join a_header d on d.f_id=s.f_document "
-            "where s.f_goods in (%1) and s.f_store=:f_store "
-            "group by s.f_base "
-            "having sum(s.f_qty*s.f_type)>0 "
-            "order by d.f_date "
+//    fDb[":f_date"] = date;
+//    if (!fDb.exec(QString("select s.f_id, s.f_goods, sum(s.f_qty*s.f_type) as f_qty, s.f_price, s.f_total*s.f_type, "
+//                          "s.f_document, s.f_base, d.f_date "
+//            "from a_store s "
+//            "inner join a_header d on d.f_id=s.f_document "
+//            "where s.f_goods in (%1) and s.f_store=:f_store "
+//            "group by s.f_base "
+//            "having sum(s.f_qty*s.f_type)>0 "
+//            "order by d.f_date "
+//            "for update ").arg(goodsID.join(",")))) {
+//        err = fDb.fLastError + "<br>";
+//        return false;
+//    }
+    if (!fDb.exec(QString("select s.f_id, s.f_goods, sm.f_qty, sm.f_price, sm.f_total, s.f_document, s.f_base, s.f_basedoc, d.f_date "
+                          "from a_store s "
+                          "left join ( "
+                          "select   sum(ss.f_qty*ss.f_type) as f_qty, ss.f_price, sum(ss.f_total*ss.f_type) as f_total, ss.f_base "
+                          "from a_store ss "
+                          "where ss.f_goods in (%1) and ss.f_store=:f_store "
+                           "group by ss.f_base  "
+                          "having sum(ss.f_qty*ss.f_type)>0 "
+                           ") sm on sm.f_base=s.f_id "
+                           "inner join a_header d on d.f_id=s.f_document "
+                           "where s.f_goods in (%1) and s.f_store=:f_store and s.f_type=1 and sm.f_qty>0 "
+                           "order by d.f_date "
             "for update ").arg(goodsID.join(",")))) {
         err = fDb.fLastError + "<br>";
         return false;
@@ -1015,7 +1031,7 @@ bool C5StoreDraftWriter::writeOutput(const QString &docId, QString &err)
                 fDb[":f_qty"] = complectQty;
                 fDb[":f_price"] = amount / complectQty;
                 fDb[":f_total"] = amount;
-                fDb[":f_base"] = outId.at(0);
+                fDb[":f_base"] = id;
                 fDb[":f_basedoc"] = docId;
                 fDb[":f_reason"] = reason;
                 fDb[":f_draft"] = complectId;

@@ -317,9 +317,12 @@ bool C5WaiterOrderDoc::makeOutputOfStore(C5Database &db, QString &err, int store
 
     //Check for store doc
     db[":f_header"] = fHeader["f_id"].toString();
-    db.exec("select h.f_state, d.f_id, d.f_qty as f_dqty, g.f_qty as f_gqty, g.f_lastinputprice as f_gprice from o_goods g "
+    db.exec("select h.f_state, d.f_id, d.f_qty as f_dqty, g.f_qty as f_gqty, "
+             "gg.f_lastinputprice as f_gprice "
+             "from o_goods g "
              "inner join a_store_draft d on d.f_id=g.f_storerec "
              "inner join a_header h on h.f_id=d.f_document "
+             "inner join c_goods gg on g.f_id=g.f_goods "
              "where g.f_header=:f_header");
 
     QList<tmpg> goods;

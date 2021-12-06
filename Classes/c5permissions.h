@@ -48,6 +48,7 @@
 #define cp_t3_move_uncomplected 318
 #define cp_t3_count_output_of_sale_draft 319
 #define cp_t3_custom_reports 320
+#define cp_t3_draft_output_recipes 321
 
 #define cp_t4_menu 400
 #define cp_t4_menu_names 401
@@ -94,6 +95,8 @@
 #define cp_t5_repeat_service 530
 #define cp_t5_change_date_of_sale 531
 #define cp_t5_bill_without_service 532
+#define cp_t5_edit_closed_order 533
+#define cp_t5_present 534
 
 #define cp_t6_goods_menu 600
 #define cp_t6_units 601
@@ -128,6 +131,12 @@
 #define cp_t9_salary 900
 #define cp_t9_salary_doc 901
 #define cp_t9_report 902
+
+#define cp_t10_manufacture 1000
+#define cp_t10_action_list 1001
+#define cp_t10_daily 1002
+#define cp_t10_product_list 1003
+#define cp_t10_general_report 1004
 
 
 class C5Permissions

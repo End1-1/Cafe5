@@ -44,6 +44,9 @@
 #define cache_goods_classes 39
 #define cache_dish_menu_state 40
 #define cache_order_mark 41
+#define cache_mf_actions 42
+#define cache_mf_process 43
+#define cache_mf_products 44
 
 class C5Cache : public QObject
 {
@@ -59,6 +62,8 @@ public:
     inline QList<QVariant> getValuesForId(int id) {return find(id) > -1 ? getRow(find(id)) : QList<QVariant>(); }
 
     QString getString(int id);
+
+    QString getString(int row, const QString &columnName);
 
     inline int getInt(int row, int column) {return fCacheData.at(row).at(column).toInt();}
 
@@ -91,6 +96,8 @@ private:
     static QMap<int, QString> fCacheQuery;
 
     static QMap<QString, int> fTableCache;
+
+    static QMap<int, QHash<QString, int> > fCacheColumns;
 
     int fId;
 

@@ -15,6 +15,7 @@
 #include "notificationwidget.h"
 #include "c5jsondb.h"
 #include "stoplist.h"
+#include "c5logsystem.h"
 #include <QDebug>
 #include <QJsonArray>
 #include <QMutex>
@@ -437,7 +438,38 @@ void C5WaiterServer::reply(QJsonObject &o)
         j(srh.fDb, jo, report);
         QJsonObject jp;
         jp["pagesize"] = static_cast<int> (QPrinter::Custom);
-        jp["printer"] = "local";
+
+        C5Database &db = srh.fDb;
+        QString printerName = "local";
+        int paperWidth = 500, printType = 80;
+        db[":f_name"] = fIn["receipt_printer"].toString();
+        db.exec("select f_id from s_settings_names where f_name=:f_name");
+        if (db.nextRow()) {
+            int s = db.getInt("f_id");
+            db[":f_settings"] = s;
+            db[":f_key"] = param_local_receipt_printer;
+            db.exec("select f_value from s_settings_values where f_settings=:f_settings and f_key=:f_key");
+            if (db.nextRow()) {
+                printerName = db.getString(0);
+            }
+            db[":f_settings"] = s;
+            db[":f_key"] = param_print_paper_width;
+            db.exec("select f_value from s_settings_values where f_settings=:f_settings and f_key=:f_key");
+            if (db.nextRow()) {
+                paperWidth = db.getString(0).toInt() == 0 ? 500 : db.getString(0).toInt();
+            }
+            db[":f_settings"] = s;
+            db[":f_key"] = param_printer_paper_width_50mm;
+            db.exec("select f_value from s_settings_values where f_settings=:f_settings and f_key=:f_key");
+            if (db.nextRow()) {
+                if (db.getString(0).toInt() == 1) {
+                    printType = 50;
+                }
+            }
+        }
+
+        jp["paper_width"] = paperWidth;
+        jp["printer"] = printerName;
         jp["cmd"] = "print";
         report.append(jp);
         l.unload();
@@ -481,6 +513,12 @@ void C5WaiterServer::reply(QJsonObject &o)
         break;
     case sm_print_removed_service:
         processPrintRemovedService(o);
+        break;
+    case sm_retrun_tax_receipt:
+        processReturnTaxReceipt(o);
+        break;
+    case sm_tax_report:
+        processTaxReport(o);
         break;
     default:
         o["reply"] = 0;
@@ -929,7 +967,8 @@ int C5WaiterServer::printTax(const QMap<QString, QVariant> &header, const QList<
                 m["f_dish"].toString(),
                 dbdish->name(m["f_dish"].toInt()),
                 m["f_price"].toDouble(),
-                m["f_qty2"].toDouble(), 0);
+                m["f_qty2"].toDouble(),
+                m["f_discount"].toDouble() * 100);
     }
     if (header["f_amountservice"] > 0.001) {
         pt.addGoods(C5Config::taxDept(),
@@ -987,11 +1026,11 @@ bool C5WaiterServer::printReceipt(QString &err, C5Database &db, bool isBill)
 
     QList<QMap<QString, QVariant> > bodyInfo;
     db[":f_header"] = fIn["order"].toString();
-    if (!db.exec("select f_state, f_dish, f_price, f_canservice, f_candiscount, sum(f_qty1) as f_qty1, sum(f_qty2) as f_qty2, "
+    if (!db.exec("select f_state, f_dish, f_price, f_canservice, f_candiscount, f_discount, sum(f_qty1) as f_qty1, sum(f_qty2) as f_qty2, "
                  "sum(f_total) as f_total, f_adgcode, f_comment "
                  "from o_body "
                  "where f_header=:f_header "
-                 "group by f_dish, f_state, f_price ")) {
+                 "group by f_dish, f_state, f_price, f_discount ")) {
         err = db.fLastError;
         return false;
     }
@@ -1055,7 +1094,8 @@ bool C5WaiterServer::printReceipt(QString &err, C5Database &db, bool isBill)
 //        jh["f_idramphone"] = C5Config::idramPhone();
 
     QString printerName = "local";
-    int paperWidth = 650, printType = 80;
+    int paperWidth = 500, printType = 80;
+    C5LogSystem::writeEvent("Settings name: " + fIn["receipt_printer"].toString());
     db[":f_name"] = fIn["receipt_printer"].toString();
     db.exec("select f_id from s_settings_names where f_name=:f_name");
     if (db.nextRow()) {
@@ -1071,6 +1111,7 @@ bool C5WaiterServer::printReceipt(QString &err, C5Database &db, bool isBill)
         db.exec("select f_value from s_settings_values where f_settings=:f_settings and f_key=:f_key");
         if (db.nextRow()) {
             paperWidth = db.getString(0).toInt() == 0 ? 650 : db.getString(0).toInt();
+            C5LogSystem::writeEvent(QString("Paper width was changed: %1").arg(paperWidth));
         }
         db[":f_settings"] = s;
         db[":f_key"] = param_printer_paper_width_50mm;
@@ -1477,4 +1518,61 @@ void C5WaiterServer::processPrintRemovedService(QJsonObject &o)
 {
     C5PrintRemovedServiceThread *pr = new C5PrintRemovedServiceThread(fIn["id"].toString());
     pr->start();
+}
+
+void C5WaiterServer::processReturnTaxReceipt(QJsonObject &o)
+{
+    C5Database db(C5Config::dbParams());
+    db[":f_id"] = fIn["order"].toString();
+    db.exec("select * from o_tax where f_id=:f_id");
+    QString crn, rseq;
+    if (db.nextRow()) {
+        crn = db.getString("f_devnum");
+        rseq = db.getString("f_receiptnumber");
+    } else {
+        o["reply"] = 0;
+        o["msg"] = tr("No tax receipt exists for this order");
+        return;
+    }
+    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
+    QString jsnin, jsnout, err;
+    int result;
+    result = pt.printTaxback(rseq, crn, jsnin, jsnout, err);
+    o["reply"] = result == pt_err_ok ? 1 : 0;
+    o["msg"] = result == pt_err_ok ? tr("Success") : err;
+    db[":f_id"] = db.uuid();
+    db[":f_order"] = fIn["order"].toString();
+    db[":f_date"] = QDate::currentDate();
+    db[":f_time"] = QTime::currentTime();
+    db[":f_in"] = jsnin;
+    db[":f_out"] = jsnout;
+    db[":f_err"] = err;
+    db[":f_result"] = result;
+    db.insert("o_tax_log", false);
+    if (result != pt_err_ok) {
+        QSqlQuery *q = new QSqlQuery(db.fDb);
+        pt.saveTimeResult(fIn["order"].toString(), *q);
+        delete q;
+    }
+}
+
+void C5WaiterServer::processTaxReport(QJsonObject &o)
+{
+    Q_UNUSED(o);
+    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
+    QString jsnin, jsnout, err;
+    int result;
+    result = pt.printReport(QDateTime::fromString(fIn["d1"].toString(), FORMAT_DATE_TO_STR),
+                            QDateTime::fromString(fIn["d2"].toString(), FORMAT_DATE_TO_STR),
+                            fIn["type"].toInt(), jsnin, jsnout, err);
+    C5Database db(C5Config::dbParams());
+    db[":f_id"] = db.uuid();
+    db[":f_order"] = QString("Report %1").arg(fIn["type"].toInt() == report_x ? "X" : "Z");
+    db[":f_date"] = QDate::currentDate();
+    db[":f_time"] = QTime::currentTime();
+    db[":f_in"] = jsnin;
+    db[":f_out"] = jsnout;
+    db[":f_err"] = err;
+    db[":f_result"] = result;
+    db.insert("o_tax_log", false);
 }

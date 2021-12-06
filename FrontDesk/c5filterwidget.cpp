@@ -155,3 +155,14 @@ void C5FilterWidget::setFixDate(bool v)
                 .arg(metaObject()->className()));
     s.setValue("fixdate", v);
 }
+
+QString C5FilterWidget::in(QString &cond, const QString &field, C5LineEditWithSelector *l)
+{
+    if (l->isEmpty()) {
+        return cond;
+    }
+    cond += QString (" and %1 in (%2)")
+            .arg(field)
+            .arg(l->text());
+    return cond;
+}

@@ -1042,6 +1042,52 @@
                </property>
               </spacer>
              </item>
+             <item>
+              <widget class="QLabel" name="label_3">
+               <property name="text">
+                <string>Ready output</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="C5LineEditWithSelector" name="leComplectOutputQty">
+               <property name="maximumSize">
+                <size>
+                 <width>100</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="Field" stdset="0">
+                <string>f_complectout</string>
+               </property>
+               <property name="Type" stdset="0">
+                <number>4</number>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="C5LineEditWithSelector" name="leIsComplect">
+               <property name="maximumSize">
+                <size>
+                 <width>30</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="Field" stdset="0">
+                <string>f_iscomplect</string>
+               </property>
+               <property name="Type" stdset="0">
+                <number>1</number>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="lbOutputUnit">
+               <property name="text">
+                <string>unit</string>
+               </property>
+              </widget>
+             </item>
             </layout>
            </widget>
           </item>
@@ -1370,7 +1416,7 @@
   <customwidget>
    <class>C5LineEdit</class>
    <extends>QLineEdit</extends>
-   <header>c5lineedit.h</header>
+   <header location="global">c5lineedit.h</header>
   </customwidget>
   <customwidget>
    <class>C5TableWidget</class>

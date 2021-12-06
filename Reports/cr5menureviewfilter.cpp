@@ -12,6 +12,7 @@ CR5MenuReviewFilter::CR5MenuReviewFilter(const QStringList &dbParams, QWidget *p
     ui->leType->setSelector(dbParams, ui->leTypeName, cache_dish_part2, 1, 2).setMultiselection(true);
     ui->leStore->setSelector(dbParams, ui->leStoreName, cache_goods_store);
     ui->leState->setSelector(dbParams, ui->leStateName, cache_dish_menu_state);
+    ui->leGoods->setSelector(dbParams, ui->leGoods, cache_goods, 1, 3).setMultiselection(true);
 }
 
 CR5MenuReviewFilter::~CR5MenuReviewFilter()
@@ -36,6 +37,12 @@ QString CR5MenuReviewFilter::condition()
     }
     if (!ui->leState->isEmpty()) {
         cond += " and m.f_state in (" + ui->leState->text() + ") ";
+    }
+    if (!ui->leGoods->isEmpty()) {
+        cond += " and m.f_dish in (select f_dish from d_recipes where f_goods in (" + ui->leGoods->text() + ")) ";
+    }
+    if (ui->chNoRecipe->isChecked()) {
+        cond += " and d.f_recipeqty=0 ";
     }
     return cond;
 }

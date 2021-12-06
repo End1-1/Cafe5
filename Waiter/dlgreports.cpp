@@ -9,6 +9,7 @@
 #include "dlglistofshifts.h"
 #include "dlgreceiptlanguage.h"
 #include "dlglistofhall.h"
+#include "printtaxn.h"
 
 DlgReports::DlgReports(const QStringList &dbParams, C5User *user) :
     C5Dialog(dbParams),
@@ -124,6 +125,7 @@ void DlgReports::handleReportsList(const QJsonObject &obj)
     sh->bind("date2", ui->date2->date().toString(FORMAT_DATE_TO_STR_MYSQL));
     sh->bind("shift", QString::number(fShiftId));
     sh->bind("paper_width", __c5config.getValue(param_print_paper_width).toInt() == 0 ? 650 : __c5config.getValue(param_print_paper_width).toInt());
+    sh->bind("receipt_printer", __c5config.fSettingsName);
     sh->send();
 }
 
@@ -142,6 +144,25 @@ void DlgReports::handleReceipt(const QJsonObject &obj)
 {
     if (obj["reply"].toInt() == 0) {
         C5Message::error(obj["msg"].toString());
+    }
+}
+
+void DlgReports::handleTaxback(const QJsonObject &obj)
+{
+    if (obj["reply"].toInt() == 0) {
+        C5Message::error(obj["msg"].toString());
+        return;
+    }
+    C5Message::info(obj["msg"].toString());
+}
+
+void DlgReports::handleTaxReport(const QJsonObject &obj)
+{
+    if (obj["reply"].toInt() == 0) {
+        C5Message::error(obj["msg"].toString());
+        return;
+    } else {
+        C5Message::info(tr("Printed"));
     }
 }
 
@@ -218,6 +239,7 @@ void DlgReports::on_btnPrintOrderReceipt_clicked()
     sh->bind("f_receiptlanguage", QString::number(C5Config::getRegValue("receipt_language").toInt()));
     sh->bind("order", orderid);
     sh->bind("printtax", tax);
+    sh->bind("receipt_printer", C5Config::fSettingsName);
     sh->send();
 }
 
@@ -246,3 +268,37 @@ void DlgReports::on_btnShift_clicked()
         ui->btnShift->setText(fShiftName);
     }
 }
+
+void DlgReports::on_btnReturnTaxReceipt_clicked()
+{
+    QModelIndexList l = ui->tbl->selectionModel()->selectedRows();
+    if (l.count() == 0) {
+        return;
+    }
+    QString orderid = ui->tbl->getString(l.at(0).row(), 0);
+    C5SocketHandler *sh = createSocketHandler(SLOT(handleTaxback(QJsonObject)));
+    sh->bind("cmd", sm_retrun_tax_receipt);
+    sh->bind("order", orderid);
+    sh->send();
+}
+
+void DlgReports::on_btnPrintTaxX_clicked()
+{
+    C5SocketHandler *sh = createSocketHandler(SLOT(handleTaxReport(QJsonObject)));
+    sh->bind("cmd", sm_tax_report);
+    sh->bind("d1", ui->date1->date().toString(FORMAT_DATE_TO_STR));
+    sh->bind("d2", ui->date1->date().toString(FORMAT_DATE_TO_STR));
+    sh->bind("type", report_x);
+    sh->send();
+}
+
+void DlgReports::on_btnPrintTaxZ_clicked()
+{
+    C5SocketHandler *sh = createSocketHandler(SLOT(handleTaxReport(QJsonObject)));
+    sh->bind("cmd", sm_tax_report);
+    sh->bind("d1", ui->date1->date().toString(FORMAT_DATE_TO_STR));
+    sh->bind("d2", ui->date1->date().toString(FORMAT_DATE_TO_STR));
+    sh->bind("type", report_z);
+    sh->send();
+}
+

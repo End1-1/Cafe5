@@ -7,6 +7,9 @@ namespace Ui {
 class CR5ConsumptionBySalesFilter;
 }
 
+static const int REPORTTYPE_QUANTITEIS = 1;
+static const int REPORTTYPE_AMOUNTS = 2;
+
 class CR5ConsumptionBySalesFilter : public C5FilterWidget
 {
     Q_OBJECT
@@ -37,6 +40,8 @@ public:
     QString class3() const;
 
     QString class4() const;
+
+    int reportType();
 
 private:
     Ui::CR5ConsumptionBySalesFilter *ui;

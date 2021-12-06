@@ -24,7 +24,7 @@ bool DbTables::openTable(int table, QStringList &orders, QString &err)
     db[":f_id"] = table;
     db.exec("select * from h_tables where f_id=:f_id for update");
     if (!db.nextRow()) {
-        err = db.fLastError;
+        err = "No result and " + db.fLastError;
         db.commit();
         return false;
     }

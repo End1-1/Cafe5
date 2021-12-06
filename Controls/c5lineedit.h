@@ -28,6 +28,8 @@ public:
 
     double getDouble();
 
+    void setData(const QVariant &data);
+
     int getTag();
 
     void setTag(int tag);

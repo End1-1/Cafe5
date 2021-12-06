@@ -14,6 +14,8 @@ CR5CommonSalesFilter::CR5CommonSalesFilter(const QStringList &dbParams, QWidget 
     ui->leStaff->setSelector(dbParams, ui->leStaffName, cache_users).setMultiselection(true);
     ui->leShift->setSelector(dbParams, ui->leShiftName, cache_salary_shift).setMultiselection(true);
     ui->leBuyer->setSelector(dbParams, ui->leBuyerName, cache_goods_partners).setMultiselection(true);
+    ui->dt1->setDateTime(QDateTime::fromString(QDate::currentDate().toString("dd.MM.yyyy") + " 00:00", "dd.MM.yyyy HH:mm"));
+    ui->dt2->setDateTime(QDateTime::fromString(QDate::currentDate().addDays(1).toString("dd.MM.yyyy") + " 00:00", "dd.MM.yyyy HH:mm"));
 }
 
 CR5CommonSalesFilter::~CR5CommonSalesFilter()
@@ -23,7 +25,14 @@ CR5CommonSalesFilter::~CR5CommonSalesFilter()
 
 QString CR5CommonSalesFilter::condition()
 {
-    QString result = " oh.f_datecash between " + ui->deStart->toMySQLDate() + " and " + ui->deEnd->toMySQLDate() + " ";
+    QString result;
+    if (ui->chUseClosingDateTime->isChecked()) {
+        result = QString(" cast(concat(oh.f_dateclose, ' ', oh.f_timeclose) as datetime) between '%1' and '%2'")
+                .arg(ui->dt1->dateTime().toString(FORMAT_DATETIME_TO_STR_MYSQL))
+                .arg(ui->dt2->dateTime().toString(FORMAT_DATETIME_TO_STR_MYSQL));
+    } else {
+        result = " oh.f_datecash between " + ui->deStart->toMySQLDate() + " and " + ui->deEnd->toMySQLDate() + " ";
+    }
     if (!ui->leState->isEmpty()) {
         result += " and oh.f_state in (" + ui->leState->text() + ") ";
     }
@@ -74,4 +83,9 @@ void CR5CommonSalesFilter::on_btnFlags_clicked()
     if (f.exec() == QDialog::Accepted) {
         fFlags = f.flagsCond();
     }
+}
+void CR5CommonSalesFilter::on_chUseClosingDateTime_clicked(bool checked)
+{
+    ui->dt1->setEnabled(checked);
+    ui->dt2->setEnabled(checked);
 }

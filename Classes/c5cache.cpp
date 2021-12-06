@@ -4,6 +4,7 @@
 QMap<QString, C5Cache*> C5Cache::fCacheList;
 QMap<int, QString> C5Cache::fCacheQuery;
 QMap<QString, int> C5Cache::fTableCache;
+QMap<int, QHash<QString, int> > C5Cache::fCacheColumns;
 
 C5Cache::C5Cache(const QStringList &dbParams) :
     fDBParams(dbParams)
@@ -25,7 +26,7 @@ C5Cache::C5Cache(const QStringList &dbParams) :
                 .arg(tr("Code"))
                 .arg(tr("Name"));
         fCacheQuery[cache_goods] = QString("select g.f_id as `%1`, gg.f_name as `%2`, concat(g.f_name, if(g.f_scancode is null, '', concat(' ', g.f_scancode))) as `%3`, u.f_name as `%4`, \
-                                           g.f_scancode as `%5`, g.f_lastinputprice as `%6` \
+                                           g.f_scancode as `%5`, g.f_lastinputprice as `%6`, g.f_complectout as `%7` \
                                            from c_goods g \
                                            left join c_groups gg on gg.f_id=g.f_group \
                                            left join c_units as u on u.f_id=g.f_unit \
@@ -35,7 +36,8 @@ C5Cache::C5Cache(const QStringList &dbParams) :
                 .arg(tr("Name"))
                 .arg(tr("Unit"))
                 .arg(tr("Scancode"))
-                .arg(tr("Price"));
+                .arg(tr("Price"))
+                .arg(tr("Complect output"));
         fCacheQuery[cache_goods_store] = QString("select f_id as `%1`, f_name as `%2` from c_storages")
                 .arg(tr("Code"))
                 .arg(tr("Name"));
@@ -128,6 +130,25 @@ C5Cache::C5Cache(const QStringList &dbParams) :
                 .arg(tr("Code"))
                 .arg(tr("Name"));
         setCacheSimpleQuery(cache_order_mark, "b_marks");
+        fCacheQuery[cache_mf_actions] = QString("select f_id as `%1`, f_name as `%2` from mf_actions ")
+                .arg(tr("Code"))
+                .arg(tr("Name"));
+        fCacheQuery[cache_mf_process] = QString("select p.f_id as `%1`, p.f_rowid as `%2`, p.f_product as `%3`, gr.f_name as `%4`, "
+                                                "p.f_process as `%5`, ac.f_name as `%6`, "
+                                                "p.f_durationsec as `%7`, p.f_price as `%8` "
+                                                "from mf_process p "
+                                                "inner join mf_actions_group gr on gr.f_id=p.f_product "
+                                                "inner join mf_actions ac on ac.f_id=p.f_process "
+                                                "order by gr.f_name, p.f_rowid")
+                .arg(tr("Code"))
+                .arg(tr("Row"))
+                .arg(tr("Product code"))
+                .arg(tr("Product"))
+                .arg(tr("Process code"))
+                .arg(tr("Process"))
+                .arg(tr("Duration"))
+                .arg(tr("Price"));
+        setCacheSimpleQuery(cache_mf_products, "mf_actions_group");
     }
     if (fTableCache.count() == 0) {
         fTableCache["c_partners"] = cache_goods_partners;
@@ -162,6 +183,9 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         fTableCache["s_salary_shift"] = cache_salary_shift;
         fTableCache["c_goods_classes"] = cache_goods_classes;
         fTableCache["b_marks"] = cache_order_mark;
+        fTableCache["mf_actions"] = cache_mf_actions;
+        fTableCache["mf_process"] = cache_mf_process;
+        fTableCache["mf_actions_group"] = cache_mf_products;
     }
     fVersion = 0;
     C5Database db(dbParams);
@@ -200,6 +224,15 @@ QString C5Cache::getString(int id)
     } else {
         return "FIND ERROR";
     }
+}
+
+QString C5Cache::getString(int row, const QString &columnName)
+{
+#ifdef QT_DEBUG
+    Q_ASSERT(fCacheColumns[fId].contains(columnName.toLower()));
+#endif
+    int col = fCacheColumns[fId][columnName.toLower()];
+    return getString(row, col);
 }
 
 void C5Cache::refresh()
@@ -257,7 +290,7 @@ void C5Cache::loadFromDatabase(const QString &query)
 {
     fCacheIdRow.clear();
     C5Database db(fDBParams);
-    db.exec(query, fCacheData);
+    db.exec(query, fCacheData, fCacheColumns[fId]);
     for (int i = 0; i < fCacheData.count(); i++) {
         fCacheIdRow[fCacheData[i][0].toInt()] = i;
     }

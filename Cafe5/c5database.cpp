@@ -547,30 +547,34 @@ QString C5Database::lastQuery(QSqlQuery *q)
     while (it.hasNext()) {
         it.next();
         QVariant value = it.value();
-        switch (it.value().type()) {
-        case QVariant::String:
-            value = QString("'%1'").arg(value.toString().replace("'", "''"));
-            break;
-        case QVariant::Date:
-            value = QString("'%1'").arg(value.toDate().toString("yyyy-MM-dd"));
-            break;
-        case QVariant::DateTime:
-            value = QString("'%1'").arg(value.toDateTime().toString("yyyy-MM-dd HH:mm:ss"));
-            break;
-        case QVariant::Double:
-            value = QString("%1").arg(value.toDouble());
-            break;
-        case QVariant::Int:
-            value = QString("%1").arg(value.toInt());
-            break;
-        case QVariant::Time:
-            value = QString("'%1'").arg(value.toTime().toString("HH:mm:ss"));
-            break;
-        case QVariant::ByteArray:
-            value = QString("'%1'").arg(QString(value.toByteArray().toHex()));
-            break;
-        default:
-            break;
+        if(!it.value().isValid()) {
+            value = "null";
+        } else {
+            switch (it.value().type()) {
+            case QVariant::String:
+                value = QString("'%1'").arg(value.toString().replace("'", "''"));
+                break;
+            case QVariant::Date:
+                value = QString("'%1'").arg(value.toDate().toString("yyyy-MM-dd"));
+                break;
+            case QVariant::DateTime:
+                value = QString("'%1'").arg(value.toDateTime().toString("yyyy-MM-dd HH:mm:ss"));
+                break;
+            case QVariant::Double:
+                value = QString("%1").arg(value.toDouble());
+                break;
+            case QVariant::Int:
+                value = QString("%1").arg(value.toInt());
+                break;
+            case QVariant::Time:
+                value = QString("'%1'").arg(value.toTime().toString("HH:mm:ss"));
+                break;
+            case QVariant::ByteArray:
+                value = QString("'%1'").arg(QString(value.toByteArray().toHex()));
+                break;
+            default:
+                break;
+            }
         }
         sql.replace(QRegExp(it.key() + "\\b"), value.toString());
     }

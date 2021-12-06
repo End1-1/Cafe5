@@ -187,7 +187,9 @@ void DlgScreen::on_btnAccept_clicked()
     case mode_system: {
         if (pass.isEmpty()) {
             DlgSystem d(C5Config::dbParams());
-            d.setupNoPassword();
+            if (!__c5config.dbParams().at(3).isEmpty()) {
+                d.setupNoPassword();
+            }
             d.exec();
             return;
         }

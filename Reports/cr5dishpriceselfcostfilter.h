@@ -34,6 +34,8 @@ public:
 
     int menuState();
 
+    QString goods();
+
 private:
     Ui::CR5DishPriceSelfCostFilter *ui;
 };

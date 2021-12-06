@@ -5,6 +5,7 @@
 #include "printtaxn.h"
 #include "c5cache.h"
 #include <QMenu>
+#include <QClipboard>
 
 C5SaleFromStoreOrder::C5SaleFromStoreOrder(const QStringList &dbParams) :
     C5Dialog(dbParams),
@@ -38,6 +39,7 @@ void C5SaleFromStoreOrder::loadOrder(const QString &id)
     db[":f_id"] = id;
     db.exec("select * from o_header where f_id=:f_id");
     if (db.nextRow()) {
+        ui->leUUID->setText(id);
         ui->deDate->setDate(db.getDate("f_datecash"));
         ui->teTime->setText(db.getString("f_timeclose"));
         ui->leUserId->setText(db.getString("f_prefix") + db.getString("f_hallid"));
@@ -56,7 +58,7 @@ void C5SaleFromStoreOrder::loadOrder(const QString &id)
     db[":f_id"] = id;
     db.exec("select og.f_id, og.f_goods, g.f_name, og.f_qty, gu.f_name, og.f_price, og.f_total,"
             "t.f_taxdept, t.f_adgcode, "
-            "og.f_store "
+            "og.f_store, g.f_scancode "
             "from o_goods og "
             "left join c_goods g on g.f_id=og.f_goods "
             "left join c_units gu on gu.f_id=g.f_unit "
@@ -66,7 +68,7 @@ void C5SaleFromStoreOrder::loadOrder(const QString &id)
         int row = ui->tblData->addEmptyRow();
         ui->tblData->setString(row, 0, db.getString(0));
         ui->tblData->setInteger(row, 1, db.getInt(1));
-        ui->tblData->setString(row, 2, db.getString(2));
+        ui->tblData->setString(row, 2, db.getString(2) + " " + db.getString("f_scancode"));
         ui->tblData->setDouble(row, 3, db.getDouble(3));
         ui->tblData->setString(row, 4, db.getString(4));
         ui->tblData->setDouble(row, 5, db.getDouble(5));
@@ -223,4 +225,9 @@ void C5SaleFromStoreOrder::on_btnSave_clicked()
     db.update("o_header", where_id(ui->leID->text()));
 
     C5Message::info(tr("Saved"));
+}
+
+void C5SaleFromStoreOrder::on_btnCopyUUID_clicked()
+{
+    qApp->clipboard()->setText(ui->leUUID->text());
 }

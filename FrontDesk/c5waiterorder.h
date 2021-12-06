@@ -33,6 +33,8 @@ private:
     void showStore();
 
 private slots:
+    void saveOrder();
+
     void removeOrder();
 
     void showAll();
@@ -43,11 +45,17 @@ private slots:
 
     void recountSelfCost();
 
+    void storeOutput();
+
     void openMenuItem();
 
     void on_tblDishes_customContextMenuRequested(const QPoint &pos);
 
     void on_tabWidget_currentChanged(int index);
+
+    void on_btnCopyUUID_clicked();
+
+    void on_btnClearTax_clicked();
 };
 
 #endif // C5WAITERORDER_H

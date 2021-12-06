@@ -658,6 +658,10 @@ void CR5CommonSales::createStoreOutputAS()
         }
     }
 
+    int maxrowid = 0;
+    for (const QString &s: calc.keys()) {
+        maxrowid += calc[s].count();
+    }
     dbas.startTransaction();
     QString docid = db.uuid();
     dbas.startTransaction();
@@ -674,7 +678,7 @@ void CR5CommonSales::createStoreOutputAS()
                  .arg(fFilter->date1().toString(FORMAT_DATE_TO_STR))
                  .arg(fFilter->date2().toString(FORMAT_DATE_TO_STR)));
     dbas[":fBODY"] = QString("\r\nPREPAYMENTACC:5231\r\nVATACC:5243\r\nSUMMVAT:0\r\nBUYERACC:2211\r\nBUYCHACCPOST:Գլխավոր հաշվապահ \r\nMAXROWID:%1\r\n")
-            .arg(calc.count());
+            .arg(maxrowid);
     dbas[":fPARTNAME"] = ""; // set to kamar
     dbas[":fUSERID"] = 0;
     dbas[":fPARTID"] = -1;

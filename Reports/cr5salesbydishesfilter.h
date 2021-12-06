@@ -18,6 +18,9 @@ public:
 
     virtual QString condition() override;
 
+private slots:
+    void on_chUseCloseDateTime_clicked(bool checked);
+
 private:
     Ui::CR5SalesByDishesFilter *ui;
 };

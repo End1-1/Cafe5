@@ -25,6 +25,8 @@ public:
 private slots:
     void on_btnFlags_clicked();
 
+    void on_chUseClosingDateTime_clicked(bool checked);
+
 private:
     Ui::CR5CommonSalesFilter *ui;
 

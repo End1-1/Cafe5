@@ -168,7 +168,7 @@
             <x>0</x>
             <y>0</y>
             <width>597</width>
-            <height>679</height>
+            <height>725</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -263,12 +263,32 @@
             </widget>
            </item>
            <item>
+            <widget class="C5CheckBox" name="checkBox_95">
+             <property name="text">
+              <string>Present dish</string>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>534</number>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="C5CheckBox" name="checkBox_87">
              <property name="text">
               <string>Edit preorder</string>
              </property>
              <property name="Tag" stdset="0">
               <number>519</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="C5CheckBox" name="checkBox_94">
+             <property name="text">
+              <string>Edit closed order</string>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>533</number>
              </property>
             </widget>
            </item>
@@ -573,7 +593,200 @@
        <string>Reports</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_6">
+       <item row="12" column="0">
+        <widget class="C5CheckBox" name="checkBox_19">
+         <property name="text">
+          <string>Sales, expert mode</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>301</number>
+         </property>
+        </widget>
+       </item>
+       <item row="16" column="0">
+        <widget class="C5CheckBox" name="checkBox_31">
+         <property name="text">
+          <string>Sales from store</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>306</number>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="C5CheckBox" name="checkBox_20">
+         <property name="text">
+          <string>Documents</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>302</number>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="C5CheckBox" name="checkBox_75">
+         <property name="text">
+          <string>Goods consuption, draft</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>209</number>
+         </property>
+        </widget>
+       </item>
+       <item row="11" column="0">
+        <widget class="C5CheckBox" name="checkBox_48">
+         <property name="text">
+          <string>Detailed movement in the storage</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>310</number>
+         </property>
+        </widget>
+       </item>
+       <item row="18" column="0">
+        <widget class="C5CheckBox" name="checkBox_57">
+         <property name="text">
+          <string>Debts to partners</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>312</number>
+         </property>
+        </widget>
+       </item>
+       <item row="14" column="0">
+        <widget class="C5CheckBox" name="checkBox_45">
+         <property name="text">
+          <string>Sales, removed dishes</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>308</number>
+         </property>
+        </widget>
+       </item>
+       <item row="22" column="0">
+        <widget class="C5CheckBox" name="checkBox_76">
+         <property name="text">
+          <string>Custom reports</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>320</number>
+         </property>
+        </widget>
+       </item>
+       <item row="23" column="1">
+        <spacer name="verticalSpacer_6">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>521</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="2" column="0">
+        <widget class="C5CheckBox" name="checkBox_27">
+         <property name="text">
+          <string>Documents in the store</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>307</number>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="0">
+        <widget class="C5CheckBox" name="checkBox_72">
+         <property name="text">
+          <string>Storage uncomplected</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>317</number>
+         </property>
+        </widget>
+       </item>
        <item row="19" column="0">
+        <widget class="C5CheckBox" name="checkBox_55">
+         <property name="text">
+          <string>Discount statistics</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>311</number>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="C5CheckBox" name="checkBox_40">
+         <property name="text">
+          <string>Goods movement</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>304</number>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="0">
+        <widget class="C5CheckBox" name="checkBox_25">
+         <property name="text">
+          <string>T-store extra</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>305</number>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="C5CheckBox" name="checkBox_73">
+         <property name="text">
+          <string>Goods movement, uncomplected</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>318</number>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0">
+        <widget class="C5CheckBox" name="checkBox_22">
+         <property name="text">
+          <string>Storage</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>303</number>
+         </property>
+        </widget>
+       </item>
+       <item row="21" column="0">
+        <widget class="C5CheckBox" name="checkBox_70">
+         <property name="text">
+          <string>Preorders</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>315</number>
+         </property>
+        </widget>
+       </item>
+       <item row="17" column="0">
+        <widget class="C5CheckBox" name="checkBox_64">
+         <property name="text">
+          <string>Sales, car visits</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>314</number>
+         </property>
+        </widget>
+       </item>
+       <item row="15" column="0">
+        <widget class="C5CheckBox" name="checkBox_47">
+         <property name="text">
+          <string>Sales, dishes</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>309</number>
+         </property>
+        </widget>
+       </item>
+       <item row="20" column="0">
         <widget class="C5CheckBox" name="checkBox_61">
          <property name="text">
           <string>Reason for consuption</string>
@@ -593,97 +806,7 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="0">
-        <widget class="C5CheckBox" name="checkBox_40">
-         <property name="text">
-          <string>Goods movement</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>304</number>
-         </property>
-        </widget>
-       </item>
-       <item row="20" column="0">
-        <widget class="C5CheckBox" name="checkBox_70">
-         <property name="text">
-          <string>Preorders</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>315</number>
-         </property>
-        </widget>
-       </item>
-       <item row="10" column="0">
-        <widget class="C5CheckBox" name="checkBox_48">
-         <property name="text">
-          <string>Detailed movement in the storage</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>310</number>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="C5CheckBox" name="checkBox_27">
-         <property name="text">
-          <string>Documents in the store</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>307</number>
-         </property>
-        </widget>
-       </item>
-       <item row="14" column="0">
-        <widget class="C5CheckBox" name="checkBox_47">
-         <property name="text">
-          <string>Sales, dishes</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>309</number>
-         </property>
-        </widget>
-       </item>
-       <item row="11" column="0">
-        <widget class="C5CheckBox" name="checkBox_19">
-         <property name="text">
-          <string>Sales, expert mode</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>301</number>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="0">
-        <widget class="C5CheckBox" name="checkBox_25">
-         <property name="text">
-          <string>T-store extra</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>305</number>
-         </property>
-        </widget>
-       </item>
-       <item row="16" column="0">
-        <widget class="C5CheckBox" name="checkBox_64">
-         <property name="text">
-          <string>Sales, car visits</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>314</number>
-         </property>
-        </widget>
-       </item>
-       <item row="18" column="0">
-        <widget class="C5CheckBox" name="checkBox_55">
-         <property name="text">
-          <string>Discount statistics</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>311</number>
-         </property>
-        </widget>
-       </item>
-       <item row="12" column="0">
+       <item row="13" column="0">
         <widget class="C5CheckBox" name="checkBox_71">
          <property name="text">
           <string>Sales, effectiveness</string>
@@ -693,106 +816,13 @@
          </property>
         </widget>
        </item>
-       <item row="15" column="0">
-        <widget class="C5CheckBox" name="checkBox_31">
-         <property name="text">
-          <string>Sales from store</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>306</number>
-         </property>
-        </widget>
-       </item>
-       <item row="22" column="1">
-        <spacer name="verticalSpacer_6">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>521</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
        <item row="6" column="0">
-        <widget class="C5CheckBox" name="checkBox_22">
+        <widget class="C5CheckBox" name="checkBox_96">
          <property name="text">
-          <string>Storage</string>
+          <string>Goods output by calculation and sales</string>
          </property>
          <property name="Tag" stdset="0">
-          <number>303</number>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="0">
-        <widget class="C5CheckBox" name="checkBox_72">
-         <property name="text">
-          <string>Storage uncomplected</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>317</number>
-         </property>
-        </widget>
-       </item>
-       <item row="17" column="0">
-        <widget class="C5CheckBox" name="checkBox_57">
-         <property name="text">
-          <string>Debts to partners</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>312</number>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="C5CheckBox" name="checkBox_73">
-         <property name="text">
-          <string>Goods movement, uncomplected</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>318</number>
-         </property>
-        </widget>
-       </item>
-       <item row="13" column="0">
-        <widget class="C5CheckBox" name="checkBox_45">
-         <property name="text">
-          <string>Sales, removed dishes</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>308</number>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <widget class="C5CheckBox" name="checkBox_75">
-         <property name="text">
-          <string>Goods consuption, draft</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>209</number>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="C5CheckBox" name="checkBox_20">
-         <property name="text">
-          <string>Documents</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>302</number>
-         </property>
-        </widget>
-       </item>
-       <item row="21" column="0">
-        <widget class="C5CheckBox" name="checkBox_76">
-         <property name="text">
-          <string>Custom reports</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>320</number>
+          <number>321</number>
          </property>
         </widget>
        </item>
@@ -1278,6 +1308,113 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="tab_10">
+      <attribute name="title">
+       <string>Manufacture</string>
+      </attribute>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QScrollArea" name="scrollArea_2">
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Sunken</enum>
+         </property>
+         <property name="widgetResizable">
+          <bool>true</bool>
+         </property>
+         <widget class="QWidget" name="scrollAreaWidgetContents_2">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>632</width>
+            <height>632</height>
+           </rect>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_5">
+           <item>
+            <widget class="C5CheckBox" name="chManufactureAvailbility">
+             <property name="text">
+              <string>Menu availbility</string>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>1000</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="C5CheckBox" name="checkBox_100">
+             <property name="text">
+              <string>Product list</string>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>1003</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="C5CheckBox" name="checkBox_98">
+             <property name="text">
+              <string>Action list</string>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>1001</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="C5CheckBox" name="checkBox_99">
+             <property name="text">
+              <string>Daily processes</string>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>1002</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="C5CheckBox" name="checkBox_101">
+             <property name="text">
+              <string>General report</string>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>1004</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>542</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
    <item>
@@ -1297,19 +1434,18 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>scrollArea</tabstop>
-  <tabstop>chWaiterAllItems</tabstop>
-  <tabstop>checkBox_77</tabstop>
-  <tabstop>checkBox_89</tabstop>
-  <tabstop>checkBox_78</tabstop>
+  <tabstop>chManufactureAvailbility</tabstop>
+  <tabstop>checkBox_100</tabstop>
+  <tabstop>checkBox_98</tabstop>
+  <tabstop>checkBox_99</tabstop>
   <tabstop>checkBox_91</tabstop>
   <tabstop>checkBox_79</tabstop>
   <tabstop>checkBox_80</tabstop>
   <tabstop>checkBox_179</tabstop>
   <tabstop>checkBox_81</tabstop>
   <tabstop>checkBox_87</tabstop>
+  <tabstop>checkBox_94</tabstop>
   <tabstop>checkBox_82</tabstop>
-  <tabstop>checkBox_24</tabstop>
   <tabstop>checkBox_83</tabstop>
   <tabstop>checkBox_93</tabstop>
   <tabstop>checkBox_84</tabstop>
@@ -1327,16 +1463,17 @@
   <tabstop>checkBox_44</tabstop>
   <tabstop>checkBox_54</tabstop>
   <tabstop>checkBox_60</tabstop>
-  <tabstop>checkBox_74</tabstop>
-  <tabstop>lbGroup</tabstop>
+  <tabstop>chActions</tabstop>
+  <tabstop>checkBox_16</tabstop>
+  <tabstop>checkBox_21</tabstop>
+  <tabstop>checkBox_23</tabstop>
+  <tabstop>checkBox_24</tabstop>
+  <tabstop>checkBox_56</tabstop>
   <tabstop>checkBox_26</tabstop>
   <tabstop>checkBox_11</tabstop>
   <tabstop>checkBox_66</tabstop>
   <tabstop>checkBox_67</tabstop>
   <tabstop>checkBox_69</tabstop>
-  <tabstop>chActions</tabstop>
-  <tabstop>checkBox_16</tabstop>
-  <tabstop>chGoods</tabstop>
   <tabstop>checkBox_12</tabstop>
   <tabstop>checkBox_13</tabstop>
   <tabstop>checkBox_14</tabstop>
@@ -1403,10 +1540,18 @@
   <tabstop>checkBox_2</tabstop>
   <tabstop>checkBox_3</tabstop>
   <tabstop>checkBox_8</tabstop>
-  <tabstop>checkBox_56</tabstop>
+  <tabstop>chGoods</tabstop>
   <tabstop>tw</tabstop>
-  <tabstop>checkBox_21</tabstop>
-  <tabstop>checkBox_23</tabstop>
+  <tabstop>lbGroup</tabstop>
+  <tabstop>checkBox_74</tabstop>
+  <tabstop>chWaiterAllItems</tabstop>
+  <tabstop>checkBox_95</tabstop>
+  <tabstop>checkBox_96</tabstop>
+  <tabstop>scrollArea_2</tabstop>
+  <tabstop>scrollArea</tabstop>
+  <tabstop>checkBox_89</tabstop>
+  <tabstop>checkBox_78</tabstop>
+  <tabstop>checkBox_77</tabstop>
  </tabstops>
  <resources/>
  <connections/>

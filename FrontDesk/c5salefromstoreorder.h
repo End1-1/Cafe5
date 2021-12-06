@@ -25,6 +25,8 @@ private slots:
 
     void on_btnSave_clicked();
 
+    void on_btnCopyUUID_clicked();
+
 private:
     Ui::C5SaleFromStoreOrder *ui;
 

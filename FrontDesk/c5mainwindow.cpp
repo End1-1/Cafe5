@@ -18,6 +18,7 @@
 #include "cr5documents.h"
 #include "cr5goodsclasses.h"
 #include "c5translatorform.h"
+#include "cr5mfgeneralreport.h"
 #include "cr5saleremoveddishes.h"
 #include "cr5cashmovement.h"
 #include "c5costumerdebtpayment.h"
@@ -31,6 +32,8 @@
 #include "cr5debtstopartner.h"
 #include "cr5dishpart1.h"
 #include "c5toolbarwidget.h"
+#include "cr5mfactions.h"
+#include "cr5mfdaily.h"
 #include "cr5preorders.h"
 #include "c5dishselfcostgenprice.h"
 #include "cr5custom.h"
@@ -44,6 +47,7 @@
 #include "cr5storedocuments.h"
 #include "cr5dishpart2.h"
 #include "cr5ordermarks.h"
+#include "cr5draftoutputbyrecipe.h"
 #include "cr5dishpriceselfcost.h"
 #include "c5storeinventory.h"
 #include "cr5discountsystem.h"
@@ -51,6 +55,7 @@
 #include "cr5salesandstore.h"
 #include "cr5goodsgroup.h"
 #include "cr5menureview.h"
+#include "cr5mfproduct.h"
 #include "cr5databases.h"
 #include "cr5consuptionreason.h"
 #include "cr5storereason.h"
@@ -558,6 +563,9 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
     case cp_t3_custom_reports:
         createTab<CR5Custom>(dbParams);
         break;
+    case cp_t3_draft_output_recipes:
+        createTab<CR5DraftOutputByRecipe>(dbParams);
+        break;
     case cp_t4_part1:
         createTab<CR5DishPart1>(dbParams);
         break;
@@ -656,6 +664,18 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
         break;
     case cp_t9_report:
         createTab<CR5SalaryByWorkers>(dbParams);
+        break;
+    case cp_t10_action_list:
+        createTab<CR5MfActions>(dbParams);
+        break;
+    case cp_t10_daily:
+        createTab<CR5MfDaily>(dbParams);
+        break;
+    case cp_t10_product_list:
+        createTab<CR5MFProduct>(dbParams);
+        break;
+    case cp_t10_general_report:
+        createTab<CR5MFGeneralReport>(dbParams);
         break;
     default:
         break;
@@ -776,6 +796,7 @@ void C5MainWindow::setDB(const QString &dbname)
         addTreeL3Item(l, cp_t3_tstore_extra, tr("T-account, extra"), ":/documents.png");
         addTreeL3Item(l, cp_t2_count_output_of_sale, tr("Consumption of goods based on sales"), ":/goods.png");
         addTreeL3Item(l, cp_t3_count_output_of_sale_draft, tr("Consumption of goods based on sales, draft"), ":/goods.png");
+        addTreeL3Item(l, cp_t3_draft_output_recipes, tr("Draft output by recipes"), ":/goods.png");
         addTreeL3Item(l, cp_t3_consuption_reason, tr("Reason for consuption"), ":/goods.png");
         addTreeL3Item(l, cp_t3_sales_common, tr("Sales by tickets"), ":/graph.png");
         addTreeL3Item(l, cp_t3_sale_effectiveness, tr("Effectiveness of sales"), ":/effectiveness.png");
@@ -829,6 +850,13 @@ void C5MainWindow::setDB(const QString &dbname)
         addTreeL3Item(l, cp_t6_units, tr("Units"), ":/goods.png");
         addTreeL3Item(l, cp_t6_classes, tr("Classes"), ":/goods.png");
         addTreeL3Item(l, cp_t6_goods_images, tr("Images"), ":/images.png");
+    }
+
+    if (addMainLevel(db.at(1), cp_t10_manufacture, tr("Manufacture"), ":/manufacturing.png", l)) {
+        addTreeL3Item(l, cp_t10_product_list, tr("Products"), ":/manufacturing.png");
+        addTreeL3Item(l, cp_t10_action_list, tr("Action list"), ":/manufacturing.png");
+        addTreeL3Item(l, cp_t10_daily, tr("Daily processes"), ":/manufacturing.png");
+        addTreeL3Item(l, cp_t10_general_report, tr("General report"), ":/manufacturing.png");
     }
 
     if (addMainLevel(db.at(1), cp_t7_other, tr("Other"), ":/other.png", l)) {

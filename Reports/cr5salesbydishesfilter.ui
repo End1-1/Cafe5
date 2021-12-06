@@ -14,51 +14,19 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="3" column="1">
-    <widget class="C5LineEditWithSelector" name="lePart1">
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
+   <item row="2" column="0" rowspan="2">
+    <widget class="QCheckBox" name="chUseCloseDateTime">
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
      </property>
-    </widget>
-   </item>
-   <item row="4" column="0">
-    <widget class="QLabel" name="label_5">
      <property name="text">
-      <string>Type of dish</string>
+      <string>Use closing
+datetime</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="2">
+   <item row="5" column="2">
     <widget class="QLineEdit" name="lePart1Name">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1">
-    <widget class="C5LineEditWithSelector" name="leDishState">
-     <property name="minimumSize">
-      <size>
-       <width>100</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="FilterName" stdset="0">
-      <string>store</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="2">
-    <widget class="C5LineEdit" name="leStateName">
      <property name="enabled">
       <bool>false</bool>
      </property>
@@ -67,24 +35,40 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="1">
-    <widget class="C5LineEditWithSelector" name="leStore">
+   <item row="6" column="1">
+    <widget class="C5LineEditWithSelector" name="lePart2">
      <property name="maximumSize">
       <size>
        <width>100</width>
        <height>16777215</height>
       </size>
      </property>
-    </widget>
-   </item>
-   <item row="5" column="2">
-    <widget class="QLineEdit" name="leStoreName">
-     <property name="enabled">
-      <bool>false</bool>
+     <property name="FilterName" stdset="0">
+      <string>typeofdish</string>
      </property>
     </widget>
    </item>
-   <item row="8" column="1">
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>End</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1" colspan="2">
+    <widget class="QDateTimeEdit" name="dt1">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="displayFormat">
+      <string>dd.MM.yyyy HH:mm</string>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="1">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -97,17 +81,34 @@
      </property>
     </spacer>
    </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>Department</string>
+   <item row="4" column="2">
+    <widget class="C5LineEdit" name="leStateName">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
      </property>
     </widget>
    </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label_2">
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
      <property name="text">
-      <string>End</string>
+      <string>Start</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0">
+    <widget class="QLabel" name="label_6">
+     <property name="text">
+      <string>Store</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Department</string>
      </property>
     </widget>
    </item>
@@ -130,34 +131,60 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>State</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="2">
-    <widget class="QLineEdit" name="lePart2Name">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="1">
-    <widget class="C5LineEditWithSelector" name="lePart2">
+   <item row="5" column="1">
+    <widget class="C5LineEditWithSelector" name="lePart1">
      <property name="maximumSize">
       <size>
        <width>100</width>
        <height>16777215</height>
       </size>
      </property>
+     <property name="FilterName" stdset="0">
+      <string>department</string>
+     </property>
     </widget>
    </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
+   <item row="6" column="0">
+    <widget class="QLabel" name="label_5">
      <property name="text">
-      <string>Start</string>
+      <string>Type of dish</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="0">
+    <widget class="QLabel" name="label_7">
+     <property name="text">
+      <string>Recipe</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>State</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="2">
+    <widget class="QLineEdit" name="leStoreName">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1">
+    <widget class="C5LineEditWithSelector" name="leStore">
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>store</string>
      </property>
     </widget>
    </item>
@@ -180,14 +207,39 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="0">
-    <widget class="QLabel" name="label_6">
-     <property name="text">
-      <string>Store</string>
+   <item row="4" column="1">
+    <widget class="C5LineEditWithSelector" name="leDishState">
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>state</string>
      </property>
     </widget>
    </item>
-   <item row="6" column="1" colspan="2">
+   <item row="3" column="1" colspan="2">
+    <widget class="QDateTimeEdit" name="dt2">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="displayFormat">
+      <string>dd.MM.yyyy HH:mm</string>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="1" colspan="2">
     <widget class="QWidget" name="widget" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
@@ -217,16 +269,37 @@
      </layout>
     </widget>
    </item>
-   <item row="6" column="0">
-    <widget class="QLabel" name="label_7">
-     <property name="text">
-      <string>Recipe</string>
+   <item row="6" column="2">
+    <widget class="QLineEdit" name="lePart2Name">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
      </property>
     </widget>
+   </item>
+   <item row="0" column="3">
+    <spacer name="horizontalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>C5DateEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5dateedit.h</header>
+  </customwidget>
   <customwidget>
    <class>C5LineEdit</class>
    <extends>QLineEdit</extends>
@@ -237,22 +310,19 @@
    <extends>QLineEdit</extends>
    <header location="global">c5lineeditwithselector.h</header>
   </customwidget>
-  <customwidget>
-   <class>C5DateEdit</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5dateedit.h</header>
-  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>deStart</tabstop>
   <tabstop>deEnd</tabstop>
+  <tabstop>dt1</tabstop>
+  <tabstop>dt2</tabstop>
   <tabstop>leDishState</tabstop>
   <tabstop>lePart1</tabstop>
   <tabstop>lePart2</tabstop>
   <tabstop>leStore</tabstop>
-  <tabstop>lePart1Name</tabstop>
-  <tabstop>lePart2Name</tabstop>
-  <tabstop>leStoreName</tabstop>
+  <tabstop>rbAllRecipe</tabstop>
+  <tabstop>rbNoRecipt</tabstop>
+  <tabstop>rbWithRecipe</tabstop>
  </tabstops>
  <resources/>
  <connections/>

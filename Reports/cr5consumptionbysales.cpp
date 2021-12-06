@@ -10,6 +10,7 @@
 #include "dlgchangeoutputstore.h"
 #include "c5storedraftwriter.h"
 #include "c5storedoc.h"
+#include "cr5goodsmovement.h"
 #include <QInputDialog>
 
 static const int col_goodsid = 0;
@@ -44,6 +45,19 @@ CR5ConsumptionBySales::CR5ConsumptionBySales(const QStringList &dbParams, QWidge
     fColumnNameIndex["f_qtyinv"] = col_qtyinv;
     fColumnNameIndex["f_qtydiff"] = col_qtydiff;
 
+    fTranslation["f_goodsid"] = tr("Goods code");
+    fTranslation["f_goodsgroup"] = tr("Group");
+    fTranslation["f_goodsname"] = tr("Goods name");
+    fTranslation["f_goodscode"] = tr("Scancode");
+    fTranslation["f_qtybefore"] = tr("Before");
+    fTranslation["f_qtyinput"] = tr("Input");
+    fTranslation["f_qtysale"] = tr("Sale");
+    fTranslation["f_qtyout"] = tr("Out");
+    fTranslation["f_qtystore"] = tr("Store");
+    fTranslation["f_qtyafter"] = tr("After");
+    fTranslation["f_qtyinv"] = tr("Inventory");
+    fTranslation["f_qtydiff"] = tr("Diff");
+
     fColumnsSum << "f_qtybefore"
                 << "f_qtyinput"
                 << "f_qtysale"
@@ -52,19 +66,6 @@ CR5ConsumptionBySales::CR5ConsumptionBySales(const QStringList &dbParams, QWidge
                 << "f_qtyafter"
                 << "f_qtyinv"
                 << "f_qtydiff";
-
-    fTranslation["f_goodsid"] = tr("Goods code");
-    fTranslation["f_goodsgroup"] = tr("Group");
-    fTranslation["f_goodsname"] = tr("Goods name");
-    fTranslation["f_goodscode"] = tr("Scancode");
-    fTranslation["f_qtybefore"] = tr("Qty, before");
-    fTranslation["f_qtyinput"] = tr("Qty, input");
-    fTranslation["f_qtysale"] = tr("Qty, sale");
-    fTranslation["f_qtyout"] = tr("Qty, out");
-    fTranslation["f_qtystore"] = tr("Qty, store");
-    fTranslation["f_qtyafter"] = tr("Qty, after");
-    fTranslation["f_qtyinv"] = tr("Qty, inv");
-    fTranslation["f_qtydiff"] = tr("Qty, diff");
 
     fFilterWidget = new CR5ConsumptionBySalesFilter(dbParams);
     fFilter = static_cast<CR5ConsumptionBySalesFilter*>(fFilterWidget);
@@ -120,6 +121,7 @@ void CR5ConsumptionBySales::buildQuery()
         C5Message::info(tr("Store must be defined"));
         return;
     }
+
     QList<QList<QVariant> > &rows = fModel->fRawData;
     rows.clear();
     QMap<int, int> goodsMap;
@@ -165,12 +167,13 @@ void CR5ConsumptionBySales::buildQuery()
     /* get qty before */
     db[":f_store"] = f->store();
     db[":f_date"] = f->date1().addDays(-1);
-    db.exec("select s.f_goods, sum(s.f_qty*s.f_type) as f_qty "
+    db.exec(QString("select s.f_goods, sum(%1*s.f_type) as f_qty "
                 "from a_store s "
                 "inner join a_header d on d.f_id=s.f_document "
                 "where s.f_store=:f_store and d.f_date<=:f_date "
                 "group by 1 "
-                "having sum(s.f_qty*s.f_type) > 0.001");
+                "having sum(%1*s.f_type) > 0.001")
+            .arg(fFilter->reportType() == REPORTTYPE_AMOUNTS ? "s.f_total" : "s.f_qty"));
     while (db.nextRow()) {
         if (!goodsMap.contains(db.getInt(0))) {
             continue;
@@ -185,12 +188,13 @@ void CR5ConsumptionBySales::buildQuery()
     db[":f_type"] = 1;
     db[":f_store"] = f->store();
     db[":f_state"] = DOC_STATE_SAVED;
-    db.exec("select s.f_goods, sum(s.f_qty) "
+    db.exec(QString("select s.f_goods, sum(%1) "
             "from a_store s "
             "left join a_header h on h.f_id=s.f_document "
             "where h.f_date between :f_date1 and :f_date2 and s.f_store=:f_store "
             "and h.f_state=:f_state and s.f_type=:f_type "
-            "group by 1 ");
+            "group by 1 ")
+            .arg(fFilter->reportType() == REPORTTYPE_AMOUNTS ? "s.f_total" : "s.f_qty"));
     while (db.nextRow()) {
         if (!goodsMap.contains(db.getInt(0))) {
             continue;
@@ -209,12 +213,13 @@ void CR5ConsumptionBySales::buildQuery()
     db[":f_date2"] = f->date2();
     db[":f_type"] = DOC_TYPE_STORE_OUTPUT;
     db[":f_reason"] = DOC_REASON_SALE;
-    db.exec("select s.f_goods, sum(s.f_qty) as f_qty "
+    db.exec(QString("select s.f_goods, sum(%1) as f_qty "
             "from a_store_draft s "
             "inner join a_header h on h.f_id=s.f_document "
             "where h.f_date between :f_date1 and :f_date2 and s.f_store=:f_store "
             "and s.f_reason=:f_reason and h.f_type=:f_type " + cond1 +
-            "group by 1 ");
+            "group by 1 ")
+            .arg(fFilter->reportType() == REPORTTYPE_AMOUNTS ? "s.f_total" : "s.f_qty"));
     while (db.nextRow()) {
         if (!goodsMap.contains(db.getInt(0))) {
             continue;
@@ -229,13 +234,14 @@ void CR5ConsumptionBySales::buildQuery()
     db[":f_type"] = -1;
     db[":f_state"] = DOC_STATE_SAVED;
     db[":f_reason"] = DOC_REASON_SALE;
-    db.exec("select s.f_goods, sum(s.f_qty) as f_qty "
+    db.exec(QString("select s.f_goods, sum(%1) as f_qty "
             "from a_store s "
             "left join a_header h on h.f_id=s.f_document "
             "where h.f_date between :f_date1 and :f_date2 and s.f_store=:f_store "
             "and s.f_type=:f_type and h.f_state=:f_state  "
             "and s.f_reason<>:f_reason "
-            "group by 1 ");
+            "group by 1 ")
+            .arg(fFilter->reportType() == REPORTTYPE_AMOUNTS ? "s.f_total" : "s.f_qty"));
     while (db.nextRow()) {
         if (!goodsMap.contains(db.getInt(0))) {
             continue;
@@ -246,12 +252,13 @@ void CR5ConsumptionBySales::buildQuery()
     /* get store at the date end */
     db[":f_store"] = f->store();
     db[":f_date"] = f->date2();
-    db.exec("select s.f_goods, sum(s.f_qty*s.f_type) as f_qty "
+    db.exec(QString("select s.f_goods, sum(%1*s.f_type) as f_qty "
                 "from a_store s "
                 "inner join a_header d on d.f_id=s.f_document "
                 "where s.f_store=:f_store and d.f_date<=:f_date "
                 "group by 1 "
-                "having sum(s.f_qty*s.f_type) > 0.001");
+                "having sum(%1*s.f_type) > 0.001")
+            .arg(fFilter->reportType() == REPORTTYPE_AMOUNTS ? "s.f_total" : "s.f_qty"));
     while (db.nextRow()) {
         if (!goodsMap.contains(db.getInt(0))) {
             continue;
@@ -270,13 +277,14 @@ void CR5ConsumptionBySales::buildQuery()
     db[":f_date"] = f->date2();
     db[":f_store"] = f->store();
     db[":f_type"] = DOC_TYPE_STORE_INVENTORY;
-    db.exec("select i.f_goods, g.f_name, sum(i.f_qty) as f_qty "
+    db.exec(QString("select i.f_goods, g.f_name, sum(%1) as f_qty "
             "from a_store_inventory i "
             "inner join a_header h on h.f_id=i.f_document "
             "inner join c_goods g on g.f_id=i.f_goods "
             "where h.f_date=:f_date and h.f_type=:f_type "
             "and i.f_store=:f_store "
-            "group by 1, 2 ");
+            "group by 1, 2 ")
+            .arg(fFilter->reportType() == REPORTTYPE_AMOUNTS ? "i.f_total" : "i.f_qty"));
     while (db.nextRow()) {
         if (!goodsMap.contains(db.getInt(0))) {
             continue;
@@ -373,6 +381,28 @@ bool CR5ConsumptionBySales::tblDoubleClicked(int row, int column, const QList<QV
     C5Database db(fDBParams);
     C5StoreDraftWriter dw(db);
     switch (column) {
+    case col_qtyinput: {
+        auto *ddi = __mainWindow->createTab<CR5GoodsMovement>(fDBParams);
+        ddi->setDocType(QString("%1,%2").arg(DOC_TYPE_STORE_INPUT).arg(DOC_TYPE_STORE_MOVE));
+        ddi->setDate(fFilter->date1(), fFilter->date2());
+        ddi->setStore(QString::number(fFilter->store()));
+        ddi->setGoods(QString::number(values.at(0).toInt()));
+        ddi->setReason(QString("%1,%2, %3").arg(DOC_REASON_INPUT).arg(DOC_REASON_MOVE).arg(DOC_REASON_SALE_RETURN));
+        ddi->setInOut(1);
+        ddi->buildQuery();
+        break;
+    }
+    case col_qtyout: {
+        auto *ddo = __mainWindow->createTab<CR5GoodsMovement>(fDBParams);
+        ddo->setDate(fFilter->date1(), fFilter->date2());
+        ddo->setDocType(QString("%1,%2").arg(DOC_TYPE_STORE_OUTPUT).arg(DOC_TYPE_STORE_MOVE));
+        ddo->setStore(QString::number(fFilter->store()));
+        ddo->setGoods(QString::number(values.at(0).toInt()));
+        ddo->setReason(QString("%1,%2").arg(DOC_REASON_OUT).arg(DOC_REASON_MOVE));
+        ddo->setInOut(-1);
+        ddo->buildQuery();
+        break;
+    }
     case col_qtysale: {
         //if (pr(fDBParams, cp_t3_consuption_reason)) {
             CR5ConsuptionReason *s = __mainWindow->createTab<CR5ConsuptionReason>(fDBParams);

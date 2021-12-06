@@ -8,6 +8,7 @@
 #include "c5mainwindow.h"
 #include "proxytablewidgetdatabase.h"
 #include <QMenu>
+#include <QClipboard>
 
 C5WaiterOrder::C5WaiterOrder(const QStringList &dbParams, QWidget *parent) :
     C5Widget(dbParams, parent),
@@ -99,6 +100,12 @@ void C5WaiterOrder::setOrder(const QString &id)
         }
     }
     ui->tblDishes->setColumnWidths(ui->tblDishes->columnCount(), 0, 0, 100, 0, 300, 80, 80, 80, 80, 0, 0, 0, 100, 100, 100);
+
+    db[":f_id"] = ui->leUuid->text();
+    db.exec("select * from o_tax where f_id=:f_id");
+    if (db.nextRow()) {
+        ui->leTax->setText(db.getString("f_receiptnumber"));
+    }
 }
 
 bool C5WaiterOrder::allowChangeDatabase()
@@ -116,6 +123,17 @@ QToolBar *C5WaiterOrder::toolBar()
         fToolBar->addAction(QIcon(":/eye.png"), tr("Show all"), this, SLOT(showAll()));
         fToolBar->addAction(QIcon(":/eye-no.png"), tr("Hide removed"), this, SLOT(hideRemoved()));
         fToolBar->addAction(QIcon(":/delete.png"), tr("Remove"), this, SLOT(removeOrder()));
+        if (pr(fDBParams.at(1), cp_t5_edit_closed_order)) {
+            fToolBar->addAction(QIcon(":/save.png"), tr("Save"), this, SLOT(saveOrder()));
+            fToolBar->addAction(QIcon(":/storeinput.png"), tr("Store output"), this, SLOT(storeOutput()));
+        } else {
+            ui->deDateCash->setReadOnly(true);
+            ui->leCard->setReadOnly(true);
+            ui->leCash->setReadOnly(true);
+            ui->leBank->setReadOnly(true);
+            ui->leOther->setReadOnly(true);
+            ui->btnClearTax->setEnabled(false);
+        }
     }
     return fToolBar;
 }
@@ -167,6 +185,17 @@ void C5WaiterOrder::showStore()
             "inner join c_goods g on g.f_id=r.f_goods and r.f_goods=o.f_goods "
             "where b.f_header=:f_header and (b.f_state=:f_state1 or b.f_state=:f_state2)");
     ProxyTableWidgetDatabase::fillTableWidgetRowFromDatabase(&db, ui->tblStore);
+}
+
+void C5WaiterOrder::saveOrder()
+{
+    C5Database db(fDBParams);
+    db[":f_datecash"] = ui->deDateCash->date();
+    db[":f_amountcard"] = ui->leCard->getDouble();
+    db[":f_amountcash"] = ui->leCash->getDouble();
+    db[":f_amountother"] = ui->leOther->getDouble();
+    db.update("o_header", "f_id", ui->leUuid->text());
+    C5Message::info(tr("Saved"));
 }
 
 void C5WaiterOrder::removeOrder()
@@ -237,6 +266,18 @@ void C5WaiterOrder::recountSelfCost()
     C5Message::info(tr("Done"));
 }
 
+void C5WaiterOrder::storeOutput()
+{
+    C5Database db(fDBParams);
+    QString err;
+    C5WaiterOrderDoc(ui->leUuid->text(), db).makeOutputOfStore(db, err, DOC_STATE_SAVED);
+    if (err.isEmpty()) {
+        C5Message::info(tr("Done"));
+    } else {
+        C5Message::error(err);
+    }
+}
+
 void C5WaiterOrder::openMenuItem()
 {
     QModelIndexList ml = ui->tblDishes->selectionModel()->selectedRows();
@@ -267,5 +308,27 @@ void C5WaiterOrder::on_tabWidget_currentChanged(int index)
     case 3:
         showLog();
         break;
+    }
+}
+
+void C5WaiterOrder::on_btnCopyUUID_clicked()
+{
+    qApp->clipboard()->setText(ui->leUuid->text());
+}
+
+void C5WaiterOrder::on_btnClearTax_clicked()
+{
+    if (C5Message::question(tr("Are you sure to clear tax info?")) != QDialog::Accepted) {
+        return;
+    }
+    C5Database db(fDBParams);
+    db[":f_id"] = ui->leUuid->text();
+    db.exec("select * from o_tax where f_id=:f_id");
+    if (db.nextRow()) {
+        for (int i = 0; i < db.columnCount(); i++) {
+            db[":" + db.columnName(i)] = QVariant();
+        }
+        db.update("o_tax", "f_id", ui->leUuid->text());
+        ui->leTax->clear();
     }
 }

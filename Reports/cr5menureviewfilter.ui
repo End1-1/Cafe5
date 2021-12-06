@@ -14,10 +14,10 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_4">
      <property name="text">
-      <string>Menu</string>
+      <string>Store</string>
      </property>
     </widget>
    </item>
@@ -40,8 +40,34 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="2">
-    <widget class="QLineEdit" name="leMenuName">
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>State</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="C5LineEditWithSelector" name="leState">
+     <property name="minimumSize">
+      <size>
+       <width>150</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>150</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>state</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="2">
+    <widget class="QLineEdit" name="leGoodsName">
      <property name="readOnly">
       <bool>true</bool>
      </property>
@@ -73,22 +99,8 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="2">
-    <widget class="QLineEdit" name="leDeptName">
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>Type</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1">
-    <widget class="C5LineEditWithSelector" name="leType">
+   <item row="5" column="1">
+    <widget class="C5LineEditWithSelector" name="leGoods">
      <property name="minimumSize">
       <size>
        <width>150</width>
@@ -102,23 +114,50 @@
       </size>
      </property>
      <property name="FilterName" stdset="0">
-      <string>type</string>
+      <string>state</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="2">
-    <widget class="QLineEdit" name="leTypeName">
+   <item row="1" column="2">
+    <widget class="QLineEdit" name="leDeptName">
      <property name="readOnly">
       <bool>true</bool>
      </property>
     </widget>
    </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="label_4">
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
      <property name="text">
-      <string>Store</string>
+      <string>Menu</string>
      </property>
     </widget>
+   </item>
+   <item row="0" column="2">
+    <widget class="QLineEdit" name="leMenuName">
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="2">
+    <widget class="QLineEdit" name="leStateName">
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="2">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>245</height>
+      </size>
+     </property>
+    </spacer>
    </item>
    <item row="3" column="1">
     <widget class="C5LineEditWithSelector" name="leStore">
@@ -146,15 +185,8 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="0">
-    <widget class="QLabel" name="label_5">
-     <property name="text">
-      <string>State</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="1">
-    <widget class="C5LineEditWithSelector" name="leState">
+   <item row="2" column="1">
+    <widget class="C5LineEditWithSelector" name="leType">
      <property name="minimumSize">
       <size>
        <width>150</width>
@@ -168,29 +200,44 @@
       </size>
      </property>
      <property name="FilterName" stdset="0">
-      <string>state</string>
+      <string>type</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="2">
-    <widget class="QLineEdit" name="leStateName">
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_6">
+     <property name="text">
+      <string>Goods</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="2">
+    <widget class="QLineEdit" name="leTypeName">
      <property name="readOnly">
       <bool>true</bool>
      </property>
     </widget>
    </item>
-   <item row="5" column="2">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Type</string>
      </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>245</height>
-      </size>
+    </widget>
+   </item>
+   <item row="6" column="0">
+    <widget class="QLabel" name="label_7">
+     <property name="text">
+      <string>No recipe</string>
      </property>
-    </spacer>
+    </widget>
+   </item>
+   <item row="6" column="1">
+    <widget class="QCheckBox" name="chNoRecipe">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

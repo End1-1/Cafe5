@@ -13,6 +13,9 @@ C5LogSystem::C5LogSystem()
 QString C5LogSystem::fileName(const QDate &date)
 {
     QDir d;
+    if (!d.exists(d.homePath() + "/" + _APPLICATION_ + "/logs/")) {
+        d.mkpath(d.homePath() + "/" + _APPLICATION_ + "/logs/");
+    }
     return d.homePath() + "/" + _APPLICATION_ + "/logs/info." + date.toString("dd.MM.yyyy.log");
 }
 

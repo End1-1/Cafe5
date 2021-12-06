@@ -32,5 +32,7 @@ static const int sm_rotate_shift = 26;
 static const int sm_checkdiscount_by_visit = 27;
 static const int sm_stoplist = 28;
 static const int sm_print_removed_service = 29;
+static const int sm_retrun_tax_receipt = 30;
+static const int sm_tax_report = 31;
 
 #endif // C5SOCKETMESSAGE_H

@@ -46,6 +46,7 @@ QToolBar *CR5Dish::toolBar()
         auto *g = new QAction(QIcon(":/goodsback.png"), tr("Output to AS"));
         connect(g, SIGNAL(triggered(bool)), this, SLOT(asoutput(bool)));
         fToolBar->addAction(g);
+
     }
     return fToolBar;
 }

@@ -74,3 +74,14 @@ QString CR5ConsumptionBySalesFilter::class4() const
 {
     return ui->leClass4->text();
 }
+
+int CR5ConsumptionBySalesFilter::reportType()
+{
+    if (ui->rbQty->isChecked()) {
+        return REPORTTYPE_QUANTITEIS;
+    }
+    if (ui->rbAmount->isChecked()) {
+        return REPORTTYPE_AMOUNTS;
+    }
+    return 0;
+}

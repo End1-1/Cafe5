@@ -170,12 +170,12 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="80"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="88"/>
         <source>Socket read error</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="88"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="96"/>
         <source>Data read timeout</source>
         <translation></translation>
     </message>

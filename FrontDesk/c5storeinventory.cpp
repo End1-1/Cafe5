@@ -282,6 +282,7 @@ void C5StoreInventory::on_btnAddGoods_clicked()
     ui->tblGoods->setString(row, 1, vals.at(1).toString());
     ui->tblGoods->setString(row, 2, vals.at(3).toString());
     ui->tblGoods->setString(row, 4, vals.at(4).toString());
+    ui->tblGoods->lineEdit(row, 5)->setDouble(vals.at(6).toDouble());
     ui->tblGoods->lineEdit(row, 3)->setFocus();
 }
 

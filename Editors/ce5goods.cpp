@@ -38,6 +38,9 @@ CE5Goods::CE5Goods(const QStringList &dbParams, QWidget *parent) :
     ui->leClass3->setSelector(dbParams, ui->leClassName3, cache_goods_classes);
     ui->leClass4->setSelector(dbParams, ui->leClassName4, cache_goods_classes);
     ui->leStoreId->setSelector(dbParams, ui->leStoreIdName, cache_goods, 1, 3);
+#ifndef QT_DEBUG
+    ui->leIsComplect->setVisible(false);
+#endif
 
     C5Database db(dbParams);
     db.exec("select f_name from c_goods");
@@ -476,6 +479,12 @@ void CE5Goods::countTotal()
         total += ui->tblGoods->lineEdit(i, 6)->getDouble();
     }
     ui->leTotal->setDouble(total);
+    setComplectFlag();
+}
+
+void CE5Goods::setComplectFlag()
+{
+    ui->leIsComplect->setInteger(ui->tblGoods->rowCount() == 0 ? 0 : 1);
 }
 
 void CE5Goods::on_btnNewGoods_clicked()
@@ -641,4 +650,9 @@ void CE5Goods::on_chSameStoreId_clicked()
     if (ui->chSameStoreId->isChecked()) {
         ui->leStoreId->setValue(ui->leCode->getInteger());
     }
+}
+
+void CE5Goods::on_leUnitName_textChanged(const QString &arg1)
+{
+    ui->lbOutputUnit->setText(arg1);
 }

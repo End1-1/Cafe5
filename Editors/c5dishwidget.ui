@@ -400,58 +400,86 @@
          </property>
          <layout class="QGridLayout" name="gridLayout_4">
           <item row="2" column="0">
-           <widget class="C5TableWidget" name="tblRecipe">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-              <horstretch>0</horstretch>
-              <verstretch>2</verstretch>
-             </sizepolicy>
-            </property>
-            <column>
-             <property name="text">
-              <string>Record</string>
+           <widget class="QWidget" name="widget_2" native="true">
+            <layout class="QHBoxLayout" name="horizontalLayout_2">
+             <property name="leftMargin">
+              <number>0</number>
              </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Goods code</string>
+             <property name="topMargin">
+              <number>0</number>
              </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Goods name</string>
+             <property name="rightMargin">
+              <number>0</number>
              </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Qty</string>
+             <property name="bottomMargin">
+              <number>0</number>
              </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Weight netto</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Weight brutto</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Unit</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Price</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Total</string>
-             </property>
-            </column>
+             <item>
+              <spacer name="horizontalSpacer_2">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>473</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_9">
+               <property name="text">
+                <string>One portion qty</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btnMultRecipe">
+               <property name="focusPolicy">
+                <enum>Qt::NoFocus</enum>
+               </property>
+               <property name="toolTip">
+                <string>Multiple recipe quantity</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="../resources/res.qrc">
+                 <normaloff>:/order.png</normaloff>:/order.png</iconset>
+               </property>
+               <property name="mult" stdset="0">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="C5LineEditWithSelector" name="lePortionQty">
+               <property name="enabled">
+                <bool>true</bool>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>100</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="focusPolicy">
+                <enum>Qt::ClickFocus</enum>
+               </property>
+               <property name="readOnly">
+                <bool>false</bool>
+               </property>
+               <property name="Field" stdset="0">
+                <string>f_recipeqty</string>
+               </property>
+               <property name="Type" stdset="0">
+                <number>2</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </item>
           <item row="0" column="0">
@@ -604,9 +632,18 @@
             </layout>
            </widget>
           </item>
-          <item row="3" column="0">
-           <widget class="QWidget" name="widget_2" native="true">
-            <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item row="1" column="0">
+           <widget class="QFrame" name="frame">
+            <property name="frameShape">
+             <enum>QFrame::Box</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Sunken</enum>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_2">
+             <property name="spacing">
+              <number>0</number>
+             </property>
              <property name="leftMargin">
               <number>0</number>
              </property>
@@ -620,132 +657,142 @@
               <number>0</number>
              </property>
              <item>
-              <spacer name="horizontalSpacer_2">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
+              <widget class="C5TableWidget" name="tblRecipe">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                 <horstretch>0</horstretch>
+                 <verstretch>2</verstretch>
+                </sizepolicy>
                </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>473</width>
-                 <height>20</height>
-                </size>
+               <property name="frameShape">
+                <enum>QFrame::NoFrame</enum>
                </property>
-              </spacer>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_9">
-               <property name="text">
-                <string>One portion qty</string>
+               <property name="verticalScrollBarPolicy">
+                <enum>Qt::ScrollBarAlwaysOn</enum>
                </property>
+               <property name="horizontalScrollBarPolicy">
+                <enum>Qt::ScrollBarAlwaysOff</enum>
+               </property>
+               <column>
+                <property name="text">
+                 <string>Record</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Goods code</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Goods name</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Qty</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Weight netto</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Weight brutto</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Unit</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Price</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Total</string>
+                </property>
+               </column>
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="btnMultRecipe">
-               <property name="focusPolicy">
-                <enum>Qt::NoFocus</enum>
+              <widget class="C5TableWidget" name="tblRecipeTotal">
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>40</height>
+                </size>
                </property>
-               <property name="toolTip">
-                <string>Multiple recipe quantity</string>
+               <property name="frameShape">
+                <enum>QFrame::NoFrame</enum>
                </property>
-               <property name="text">
-                <string/>
+               <property name="verticalScrollBarPolicy">
+                <enum>Qt::ScrollBarAlwaysOn</enum>
                </property>
-               <property name="icon">
-                <iconset resource="../resources/res.qrc">
-                 <normaloff>:/order.png</normaloff>:/order.png</iconset>
+               <property name="horizontalScrollBarPolicy">
+                <enum>Qt::ScrollBarAlwaysOn</enum>
                </property>
-               <property name="mult" stdset="0">
+               <property name="editTriggers">
+                <set>QAbstractItemView::NoEditTriggers</set>
+               </property>
+               <attribute name="horizontalHeaderVisible">
                 <bool>false</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="C5LineEditWithSelector" name="lePortionQty">
-               <property name="enabled">
-                <bool>true</bool>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>100</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="focusPolicy">
-                <enum>Qt::ClickFocus</enum>
-               </property>
-               <property name="readOnly">
-                <bool>false</bool>
-               </property>
-               <property name="Field" stdset="0">
-                <string>f_recipeqty</string>
-               </property>
-               <property name="Type" stdset="0">
-                <number>2</number>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_8">
-               <property name="text">
-                <string>Weight</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="C5LineEditWithSelector" name="leWeight">
-               <property name="enabled">
-                <bool>true</bool>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>100</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="focusPolicy">
-                <enum>Qt::NoFocus</enum>
-               </property>
-               <property name="readOnly">
-                <bool>true</bool>
-               </property>
-               <property name="Field" stdset="0">
-                <string>f_netweight</string>
-               </property>
-               <property name="Type" stdset="0">
-                <number>2</number>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="label">
-               <property name="text">
-                <string>Total self cost</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="C5LineEditWithSelector" name="leTotal">
-               <property name="enabled">
-                <bool>true</bool>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>100</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="focusPolicy">
-                <enum>Qt::NoFocus</enum>
-               </property>
-               <property name="readOnly">
-                <bool>true</bool>
-               </property>
-               <property name="Field" stdset="0">
-                <string>f_cost</string>
-               </property>
-               <property name="Type" stdset="0">
-                <number>2</number>
-               </property>
+               </attribute>
+               <row>
+                <property name="text">
+                 <string>1</string>
+                </property>
+               </row>
+               <column>
+                <property name="text">
+                 <string>New Column</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>New Column</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>New Column</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>New Column</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>New Column</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>New Column</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>New Column</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>New Column</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>New Column</string>
+                </property>
+               </column>
               </widget>
              </item>
             </layout>
@@ -869,9 +916,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5TableWidget</class>
-   <extends>QTableWidget</extends>
-   <header location="global">c5tablewidget.h</header>
+   <class>C5CheckBox</class>
+   <extends>QCheckBox</extends>
+   <header location="global">c5checkbox.h</header>
   </customwidget>
   <customwidget>
    <class>C5LineEditWithSelector</class>
@@ -879,9 +926,9 @@
    <header location="global">c5lineeditwithselector.h</header>
   </customwidget>
   <customwidget>
-   <class>C5CheckBox</class>
-   <extends>QCheckBox</extends>
-   <header location="global">c5checkbox.h</header>
+   <class>C5TableWidget</class>
+   <extends>QTableWidget</extends>
+   <header location="global">c5tablewidget.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
@@ -896,7 +943,6 @@
   <tabstop>checkBox</tabstop>
   <tabstop>checkBox_3</tabstop>
   <tabstop>tblPricing</tabstop>
-  <tabstop>tblRecipe</tabstop>
   <tabstop>leDishComment</tabstop>
   <tabstop>btnRemoveComment</tabstop>
   <tabstop>lwComment</tabstop>

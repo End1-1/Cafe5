@@ -44,6 +44,10 @@ private slots:
 
     void handleReceipt(const QJsonObject &obj);
 
+    void handleTaxback(const QJsonObject &obj);
+
+    void handleTaxReport(const QJsonObject &obj);
+
     void on_btnRefresh_clicked();
 
     void on_btnDateLeft1_clicked();
@@ -65,6 +69,12 @@ private slots:
     void on_btnHall_clicked();
 
     void on_btnShift_clicked();
+
+    void on_btnReturnTaxReceipt_clicked();
+
+    void on_btnPrintTaxX_clicked();
+
+    void on_btnPrintTaxZ_clicked();
 };
 
 #endif // DLGREPORTS_H

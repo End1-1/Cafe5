@@ -54,6 +54,8 @@ public:
 
     double total();
 
+    virtual void hotKey(const QString &key);
+
 public slots:
     void saveDoc();
     
@@ -84,6 +86,8 @@ private:
     QMap<QString, QVariant> fFlags;
 
     QMap<int, double> fBaseQtyOfComplectation;
+
+    double fBaseComplectOutput;
 
     bool fGroupTableCellMove;
 
@@ -213,6 +217,12 @@ private slots:
     void on_btnRemoveRows_clicked();
 
     void on_btnRememberStoreIn_clicked(bool checked);
+
+    void on_btnCopyUUID_clicked();
+
+    void on_leSearchInDoc_textChanged(const QString &arg1);
+
+    void on_btnCloseSearch_clicked();
 };
 
 #endif // C5STOREDOC_H

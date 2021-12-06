@@ -48,6 +48,18 @@ double C5LineEdit::getDouble()
     return d;
 }
 
+void C5LineEdit::setData(const QVariant &data)
+{
+    switch (data.type()) {
+    case QVariant::Double:
+        setDouble(data.toDouble());
+        break;
+    default:
+        setText(data.toString());
+        break;
+    }
+}
+
 int C5LineEdit::getTag()
 {
     return fTag;

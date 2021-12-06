@@ -274,7 +274,11 @@ double C5OrderDriver::amountTotal()
         if (dishesValue("f_canservice", i).toInt() > 0) {
             double serviceAmount = (itemTotal * service);
             itemTotal += serviceAmount;
-            totalService += serviceAmount;
+            if (dishesValue("f_candiscount", i).toInt() > 0) {
+                totalService += serviceAmount - (serviceAmount * discount);
+            } else {
+                totalService += serviceAmount;
+            }
         }
         if (dishesValue("f_candiscount", i).toInt() > 0) {
             double discountAmount = (itemTotal * discount);

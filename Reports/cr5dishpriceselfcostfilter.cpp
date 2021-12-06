@@ -9,6 +9,7 @@ CR5DishPriceSelfCostFilter::CR5DishPriceSelfCostFilter(const QStringList &dbPara
 {
     ui->setupUi(this);
     ui->leMenu->setSelector(dbParams, ui->leMenuName, cache_menu_names);
+    ui->leGoods->setSelector(dbParams, ui->leGoodsName, cache_goods, 1, 3).setMultiselection(true);
     QSettings s(_ORGANIZATION_, QString("%1\\%2\\reportfilter\\%3")
                         .arg(_APPLICATION_)
                         .arg(_MODULE_)
@@ -87,4 +88,9 @@ int CR5DishPriceSelfCostFilter::menuState()
     if (ui->rbActiveState->isChecked()) {
         return 1;
     }
+}
+
+QString CR5DishPriceSelfCostFilter::goods()
+{
+    return ui->leGoods->text();
 }

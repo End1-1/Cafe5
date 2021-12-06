@@ -53,6 +53,9 @@ void CR5DishPriceSelfCost::buildQueryV1()
         fSqlQuery += " and m.f_state=1 ";
         break;
     }
+    if (!fFilter->goods().isEmpty()) {
+        fSqlQuery += " and r.f_goods in (" + fFilter->goods() + ") ";
+    }
 
     if (fFilter->baseOnSale()) {
         fSqlQuery += QString(" and r.f_dish in (select distinct(b.f_dish) "

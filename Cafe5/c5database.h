@@ -179,6 +179,8 @@ public:
 
     QSqlDatabase fDb;
 
+    QHash<QString, int> fNameColumnMap;
+
 private:
     bool fIsReady;
 
@@ -197,8 +199,6 @@ private:
     QString lastQuery(QSqlQuery *q);
 
     bool exec(const QString &sqlQuery, bool &isSelect);
-
-    QHash<QString, int> fNameColumnMap;
 
     static QStringList fDbParamsForUuid;
 

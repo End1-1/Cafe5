@@ -15,6 +15,7 @@
 #include "calculator.h"
 #include <QMenu>
 #include <QHash>
+#include <QClipboard>
 #include <QShortcut>
 
 C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
@@ -29,6 +30,8 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
     ui->leStoreOutput->setSelector(fDBParams, ui->leStoreOutputName, cache_goods_store);
     ui->leStoreInput->addEventKeys("+-");
     ui->leStoreOutput->addEventKeys("+-");
+    ui->lbComplectUnit->setText("");
+    ui->wSearchInDocs->setVisible(false);
     connect(ui->leStoreInput, SIGNAL(keyPressed(QChar)), this, SLOT(lineEditKeyPressed(QChar)));
     connect(ui->leStoreOutput, SIGNAL(keyPressed(QChar)), this, SLOT(lineEditKeyPressed(QChar)));
     ui->lePayment->setSelector(fDBParams, ui->lePaymentName, cache_header_payment);
@@ -121,11 +124,13 @@ bool C5StoreDoc::openDoc(QString id, QString &err)
     setMode(static_cast<STORE_DOC>(fDocType));
     for (int i = 0; i < dw.rowCount(container_astoredishwaste); i++) {
         int row = ui->tblDishes->addEmptyRow();
+        ui->tblDishes->createLineEdit(row, 3);
         ui->tblDishes->setString(row, 0, dw.value(container_astoredishwaste, i, "f_id").toString());
         ui->tblDishes->setString(row, 1, dw.value(container_astoredishwaste, i, "f_dish").toString());
         ui->tblDishes->setString(row, 2, dw.value(container_astoredishwaste, i, "f_dishname").toString());
         ui->tblDishes->lineEdit(row, 3)->setDouble(dw.value(container_astoredishwaste, i, "f_qty").toDouble());
         ui->tblDishes->setString(row, 4, dw.value(container_astoredishwaste, i, "f_data").toString());
+        connect(ui->tblDishes->lineEdit(row, 3), SIGNAL(textChanged(QString)), this, SLOT(tblDishQtyChanged(QString)));
     }
     for (int i = 0; i < dw.rowCount(container_astoredraft); i++) {
         int row = -1;
@@ -556,6 +561,15 @@ double C5StoreDoc::total()
     return ui->leTotal->getDouble();
 }
 
+void C5StoreDoc::hotKey(const QString &key)
+{
+    if (key.toLower() == "ctrl+f") {
+        ui->wSearchInDocs->setVisible(true);
+    } else {
+        C5Document::hotKey(key);
+    }
+}
+
 bool C5StoreDoc::eventFilter(QObject *o, QEvent *e)
 {
     if (o == ui->tblGoodsGroup->viewport() && fGroupTableCellMove) {
@@ -638,6 +652,8 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
         dw.writeECash(fCashRowId, fCashUuid, ui->leCash->getInteger(), -1, purpose, ui->leTotal->getDouble(), fCashRowId, 1);
     }
 
+    dw.updateField("a_store_draft", "f_reason", ui->leReason->getInteger(), "f_document", fInternalId);
+    dw.updateField("a_store", "f_reason", ui->leReason->getInteger(), "f_document", fInternalId);
     if (state == fDocState && state == DOC_STATE_SAVED) {
         dw.writeAHeaderPartial(fInternalId, ui->leDocNum->text(), __userid, QDate::currentDate(), QTime::currentTime(),
                                  ui->lePartner->getInteger(),ui->leComment->text(), ui->lePayment->getInteger(), ui->chPaid->isChecked());
@@ -674,8 +690,8 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
     //TODO: complectation store document
     if (fDocType == DOC_TYPE_COMPLECTATION) {
         if (!dw.writeAStoreDraft(fComplectationId, fInternalId, ui->leStoreInput->getInteger(), 1, ui->leComplectationCode->getInteger(),
-                                 ui->leComplectationQty->getDouble(), ui->leTotal->getDouble() / ui->leComplectationQty->getDouble(), ui->leTotal->getDouble(),
-                                 ui->leReason->getInteger(), "", 1, "")) {
+                                 ui->leComplectationQty->getDouble(), ui->leTotal->getDouble() / ui->leComplectationQty->getDouble(),
+                                 ui->leTotal->getDouble(), ui->leReason->getInteger(), "", 1, "")) {
             err += db.fLastError + "<br>";
         }
     }
@@ -864,7 +880,7 @@ void C5StoreDoc::countTotal()
 void C5StoreDoc::countQtyOfComplectation()
 {
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
-        ui->tblGoods->lineEdit(i, 5)->setDouble(fBaseQtyOfComplectation[i] * ui->leComplectationQty->getDouble());
+        ui->tblGoods->lineEdit(i, 5)->setDouble((fBaseQtyOfComplectation[i] * ui->leComplectationQty->getDouble()) / fBaseComplectOutput);
     }
 }
 
@@ -918,6 +934,9 @@ bool C5StoreDoc::docCheck(QString &err)
         if (ui->tblGoods->lineEdit(i, 5)->getDouble() < 0.00001) {
             err += QString("%1 #%2, %3, %4").arg(tr("Row")).arg(i + 1).arg(ui->tblGoods->getString(i, 4)).arg(tr("missing quantity")) + "<br>";
         }
+    }
+    if (ui->leReason->getInteger() == 0) {
+        err += tr("The reason of document cannot be empty");
     }
     return err.isEmpty();
 }
@@ -1905,6 +1924,15 @@ void C5StoreDoc::on_leComplectationName_textChanged(const QString &arg1)
     ui->tblGoods->clearContents();
     ui->tblGoods->setRowCount(0);
     fBaseQtyOfComplectation.clear();
+    fBaseComplectOutput = 0;
+    C5Cache *c = C5Cache::cache(fDBParams, cache_goods);
+    int gr = c->find(ui->leComplectationCode->getInteger());
+    if (gr > -1) {
+        ui->lbComplectUnit->setText(c->getString(gr, tr("Unit")));
+        fBaseComplectOutput = c->getString(gr, tr("Complect output")).toDouble();
+    } else {
+        ui->lbComplectUnit->clear();
+    }
     if (arg1.isEmpty()) {
         countTotal();
         return;
@@ -2111,7 +2139,7 @@ void C5StoreDoc::on_btnAddDish_clicked()
         ja.append(jo);
     }
     r = ui->tblDishes->addEmptyRow();
-    ui->tblDishes->setString(r, 1, vals.at(0).toString());
+    ui->tblDishes->setString(r, 1, vals.at(1).toString());
     ui->tblDishes->setString(r, 2, vals.at(2).toString());
     ui->tblDishes->createLineEdit(r, 3)->setFocus();
     ui->tblDishes->setString(r, 4, QJsonDocument(ja).toJson());
@@ -2145,4 +2173,26 @@ void C5StoreDoc::on_btnRemoveRows_clicked()
 void C5StoreDoc::on_btnRememberStoreIn_clicked(bool checked)
 {
     __c5config.setRegValue("storedoc_storeinput", checked);
+}
+
+void C5StoreDoc::on_btnCopyUUID_clicked()
+{
+    qApp->clipboard()->setText(fInternalId);
+}
+
+void C5StoreDoc::on_leSearchInDoc_textChanged(const QString &arg1)
+{
+    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+        bool hidden = !arg1.isEmpty();
+        if (!arg1.isEmpty()) {
+            hidden = !(ui->tblGoods->getString(i, 4).contains(arg1, Qt::CaseInsensitive) || ui->tblGoods->getString(i, 3).contains(arg1, Qt::CaseInsensitive));
+        }
+        ui->tblGoods->setRowHidden(i, hidden);
+    }
+}
+
+void C5StoreDoc::on_btnCloseSearch_clicked()
+{
+    ui->wSearchInDocs->setVisible(false);
+    on_leSearchInDoc_textChanged("");
 }

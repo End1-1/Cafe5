@@ -55,6 +55,7 @@ void C5Permissions::init(C5Database &db)
               << cp_t3_move_uncomplected
               << cp_t3_count_output_of_sale_draft
               << cp_t3_custom_reports
+              << cp_t3_draft_output_recipes
 
               << cp_t4_menu
               << cp_t4_menu_names
@@ -99,6 +100,8 @@ void C5Permissions::init(C5Database &db)
               << cp_t5_repeat_service
               << cp_t5_change_date_of_sale
               << cp_t5_bill_without_service
+              << cp_t5_edit_closed_order
+              << cp_t5_present
 
               << cp_t6_storage
               << cp_t6_goods_menu
@@ -133,6 +136,12 @@ void C5Permissions::init(C5Database &db)
               << cp_t9_salary
               << cp_t9_salary_doc
               << cp_t9_report
+
+              << cp_t10_manufacture
+              << cp_t10_action_list
+              << cp_t10_daily
+              << cp_t10_product_list
+              << cp_t10_general_report
                  ;
     if (__usergroup == 1) {
         fPermissions[db.database()] = fTemplate;

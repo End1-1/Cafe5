@@ -141,8 +141,6 @@ private slots:
 
     void on_btnChangeMenu_clicked();
 
-    void on_btnGuest_clicked();
-
     void on_btnSearchInMenu_clicked();
 
     void on_btnCar_clicked();
@@ -226,6 +224,18 @@ private slots:
     void on_btnReprint_clicked();
 
     void on_btnBillWithoutService_clicked();
+
+    void on_btnFillCash_clicked();
+
+    void on_btnFillCard_clicked();
+
+    void on_btnFillPrepaiment_clicked();
+
+    void on_btnDishDown_clicked();
+
+    void on_btnDishUp_clicked();
+
+    void on_btnPresent_clicked();
 };
 
 #endif // DLGORDER_H

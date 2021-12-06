@@ -39,6 +39,10 @@ private slots:
 
     void setColor();
 
+    void recipeHeaderResized(int section, int oldsize, int newsize);
+
+    void tableRecipeScroll(int value);
+
     void on_btnNewType_clicked();
 
     void recipeQtyPriceChanged(const QString &arg);

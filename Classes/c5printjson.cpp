@@ -11,6 +11,7 @@ C5PrintJson::C5PrintJson(const QJsonArray &obj, QObject *parent) :
 
 void C5PrintJson::run()
 {
+    qDebug() << fJson;
     C5Printing p;
     for (int i = 0; i < fJson.count(); i++) {
         QJsonObject jo = fJson.at(i).toObject();

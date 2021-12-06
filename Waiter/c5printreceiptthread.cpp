@@ -21,11 +21,12 @@ C5PrintReceiptThread::C5PrintReceiptThread(const QString &header, const QMap<QSt
 
 bool C5PrintReceiptThread::print()
 {
+    int bs = 18;
     C5Translator __translator;
     __translator.initTranslator(__c5config.dbParams());
     __translator.setLanguage(fLanguage);
     QFont font(qApp->font());
-    font.setPointSize(20);
+    font.setPointSize(bs);
     C5Printing p;
     p.setSceneParams(fPaperWidth, 2800, QPrinter::Portrait);
     p.setFont(font);
@@ -100,12 +101,12 @@ bool C5PrintReceiptThread::print()
     p.ctext(__translator.tt(tr("Receipt #")) + QString("%1%2").arg(fHeaderInfo["f_prefix"].toString()).arg(fHeaderInfo["f_hallid"].toString()));
     p.br();
     if (fHeaderInfo["f_otherid"].toInt() == PAYOTHER_SELFCOST) {
-        p.setFontSize(24);
+        p.setFontSize(bs + 4);
         p.setFontBold(true);
         p.ctext(__translator.tt(tr("Breakfast")));
         p.br();
         p.br(4);
-        p.setFontSize(20);
+        p.setFontSize(bs);
         p.setFontBold(false);
     }
     p.setFontBold(false);
@@ -205,27 +206,28 @@ bool C5PrintReceiptThread::print()
     p.rtext(float_str(fHeaderInfo["f_amounttotal"].toDouble() + fHeaderInfo["f_amountdiscount"].toDouble() - fHeaderInfo["f_amountservice"].toDouble(), 2));
     p.br();
     p.br(1);
+    qDebug()<< fHeaderInfo;
     if (fHeaderInfo["f_amountservice"].toDouble() > 0.001) {
         p.ltext(QString("%1 %2%").arg(__translator.tt(tr("Service"))).arg(fHeaderInfo["f_servicefactor"].toDouble() * 100), 0);
         p.rtext(float_str(fHeaderInfo["f_amountservice"].toDouble(), 2));
         p.br();
         p.br(1);
     }
-    if (fHeaderInfo["f_discountfactor"].toDouble() > 0.01) {
+    if (fHeaderInfo["f_discountfactor"].toDouble() > 0.001) {
         p.ltext(QString("%1 %2%").arg(__translator.tt(tr("Discount"))).arg(float_str(fHeaderInfo["f_discountfactor"].toDouble() * 100, 2)), 0);
         p.rtext(float_str(fHeaderInfo["f_amountdiscount"].toDouble(), 2));
         p.br();
         p.br(1);
     }
-    p.setFontSize(24);
+    p.setFontSize(bs + 4);
     p.setFontBold(true);
     p.ltext(__translator.tt(tr("Need to pay")), 0);
-    p.setFontSize(28);
+    p.setFontSize(bs + 8);
     p.rtext(float_str(fHeaderInfo["f_amounttotal"].toDouble(), 2));
     p.br();
     p.br();
     p.line();
-    p.setFontSize(20);
+    p.setFontSize(bs);
     p.setFontBold(false);
     if (noservice) {
         p.ltext(QString("* - %1").arg("No service"), 0);
@@ -291,7 +293,7 @@ bool C5PrintReceiptThread::print()
         p.br();
     }
 
-    p.setFontSize(24);
+    p.setFontSize(bs + 2);
     if (!roominfo["f_res"].toString().isEmpty()) {
         p.br();
         p.ctext(__translator.tt(tr("Transfer to room")));
@@ -341,7 +343,7 @@ bool C5PrintReceiptThread::print()
         p.br(p.fLineHeight * 2);
     }
 
-    p.setFontSize(20);
+    p.setFontSize(bs);
     p.setFontBold(true);
     p.ltext(__translator.tt(tr("Thank you for visit!")), 0);
     p.br();

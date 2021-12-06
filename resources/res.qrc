@@ -114,5 +114,15 @@
         <file>reserve.png</file>
         <file>AS.png</file>
         <file>calendar.png</file>
+        <file>fill.png</file>
+        <file>return_receipt.png</file>
+        <file>present.png</file>
+        <file>tomorrow.png</file>
+        <file>yesterday.png</file>
+        <file>manufacturing.png</file>
+        <file>add-user.png</file>
+        <file>add_work.png</file>
+        <file>delete-user.png</file>
+        <file>delete-action.png</file>
     </qresource>
 </RCC>

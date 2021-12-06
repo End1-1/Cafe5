@@ -189,7 +189,7 @@ void C5TableWidget::setString(int row, int column, const QString &str)
 
 double C5TableWidget::getDouble(int row, int column)
 {
-    return getData(row, column).toDouble();
+    return str_float(getData(row, column).toString());
 }
 
 double C5TableWidget::getDouble(int row, const QString &columnName)

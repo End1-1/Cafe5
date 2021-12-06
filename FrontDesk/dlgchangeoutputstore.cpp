@@ -45,7 +45,8 @@ void DlgChangeOutputStore::refresh(const QDate &d1, const QDate &d2)
             "left join d_part2 p2 on p2.f_id=d.f_part "
             "left join h_halls hl on hl.f_id=h.f_hall "
             "where h.f_datecash between :f_datecash1 and :f_datecash2 and h.f_state=:f_headerstate "
-            "and (b.f_state=:f_bodystate1 or b.f_state=:f_bodystate2)");
+            "and (b.f_state=:f_bodystate1 or b.f_state=:f_bodystate2) "
+            "order by p2.f_name ");
     ui->tbl->setRowCount(1 + db.rowCount());
     int row = 1;
     while (db.nextRow()) {

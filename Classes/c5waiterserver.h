@@ -59,6 +59,10 @@ private:
 
     void processPrintRemovedService(QJsonObject &o);
 
+    void processReturnTaxReceipt(QJsonObject &o);
+
+    void processTaxReport(QJsonObject &o);
+
     QTcpSocket *fSocket;
 };
 

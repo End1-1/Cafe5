@@ -87,6 +87,8 @@ private slots:
 
     void on_chSameStoreId_clicked();
 
+    void on_leUnitName_textChanged(const QString &arg1);
+
 private:
     Ui::CE5Goods *ui;
 
@@ -101,6 +103,8 @@ private:
     QStringList fScancodeRemove;
 
     QStringList fScancodeAppend;
+
+    void setComplectFlag();
 };
 
 #endif // CE5GOODS_H

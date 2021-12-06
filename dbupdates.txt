@@ -690,3 +690,17 @@ ALTER TABLE `o_body_state` CHANGE COLUMN `f_id` `f_id` SMALLINT NOT NULL ;
 ALTER TABLE `o_body` DROP FOREIGN KEY `fk_obody_state`;
 ALTER TABLE `o_body` ADD INDEX `fk_obody_state_idx` (`f_state` ASC) ,DROP INDEX `fk_obody_state_idx` ;
 ALTER TABLE `o_body` ADD CONSTRAINT `fk_obody_state`  FOREIGN KEY (`f_state`)  REFERENCES `cafe5`.`o_body_state` (`f_id`);
+
+/* db - 58 */
+update s_app set f_version='58' where f_app='DB';
+alter table c_goods add f_complectout decimal(14,3) default 1;
+alter table c_goods add f_iscomplect tinyint default 0;
+create table mf_actions_group (f_id integer primary key auto_increment, f_name tinytext);
+create table mf_actions (f_id integer primary key auto_increment, f_name tinytext);
+create table mf_process (f_id integer primary key auto_increment, f_rowid integer, f_group integer, f_action integer, f_durationsec integer, f_price decimal(14,2));
+create table mf_daily_workers (f_id integer primary key auto_increment, f_date date, f_worker integer);
+create table mf_daily_process (f_id integer primary key auto_increment, f_date date, f_worker integer, f_product integer, f_process integer, f_qty integer, f_price decimal(14,2));
+ALTER TABLE `mf_daily_workers` ADD UNIQUE INDEX `idx_mfdailyworkers_date_worker` (`f_date` ASC, `f_worker` ASC);
+ALTER TABLE `mf_daily_process` ADD INDEX `idx_mfdailyprocess_date` (`f_date` ASC) ,ADD INDEX `idx_mfdailyprocess_worker` (`f_worker` ASC) ;
+alter table mf_process add column f_goalprice decimal(14,2);
+ALTER TABLE `mf_process` CHANGE COLUMN `f_group` `f_product` INT(11) NULL DEFAULT NULL ,CHANGE COLUMN `f_action` `f_process` INT(11) NULL DEFAULT NULL ,ADD INDEX `idx_mfprocess_product` (`f_product` ASC);

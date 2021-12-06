@@ -10,11 +10,6 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 RC_FILE = res.rc
 
-win32: QMAKE_CXXFLAGS_RELEASE -= -Zc:strictStrings
-win32: QMAKE_CFLAGS_RELEASE -= -Zc:strictStrings
-win32: QMAKE_CFLAGS -= -Zc:strictStrings
-win32: QMAKE_CXXFLAGS -= -Zc:strictStrings
-
 TARGET = FrontDesk
 TEMPLATE = app
 
@@ -52,10 +47,34 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Classes/notificationwidget.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
     ../Controls/c5guicontrols.cpp \
+    ../Controls/c5tablewithtotal.cpp \
+    ../DbData/datadriver.cpp \
+    ../DbData/dbbodystate.cpp \
+    ../DbData/dbcar.cpp \
+    ../DbData/dbdata.cpp \
+    ../DbData/dbdishes.cpp \
+    ../DbData/dbdishpart1.cpp \
+    ../DbData/dbdishpart2.cpp \
+    ../DbData/dbdishspecial.cpp \
+    ../DbData/dbgoods.cpp \
+    ../DbData/dbgoodsgroup.cpp \
+    ../DbData/dbhalls.cpp \
+    ../DbData/dbmenu.cpp \
+    ../DbData/dbmenuname.cpp \
+    ../DbData/dboheader.cpp \
+    ../DbData/dbpartner.cpp \
+    ../DbData/dbservicevalues.cpp \
+    ../DbData/dbshift.cpp \
+    ../DbData/dbstore.cpp \
+    ../DbData/dbtables.cpp \
+    ../DbData/dbunit.cpp \
+    ../DbData/dbusers.cpp \
     ../Editors/c5cashname.cpp \
     ../Editors/ce5dishpackage.cpp \
     ../Editors/ce5goodsbarcodelabelview.cpp \
     ../Editors/ce5goodsclass.cpp \
+    ../Editors/ce5mfprocess.cpp \
+    ../Editors/ce5mfproduct.cpp \
     ../Editors/ce5ordermark.cpp \
     ../Editors/ce5packagelist.cpp \
     ../Editors/ce5storereason.cpp \
@@ -78,6 +97,8 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Reports/cr5discountstatisics.cpp \
     ../Reports/cr5discountstatisticsfilter.cpp \
     ../Reports/cr5dishpackage.cpp \
+    ../Reports/cr5draftoutputbyrecipe.cpp \
+    ../Reports/cr5draftoutputbyrecipefilter.cpp \
     ../Reports/cr5goodsclasses.cpp \
     ../Reports/cr5goodsfilter.cpp \
     ../Reports/cr5goodsimages.cpp \
@@ -87,6 +108,11 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Reports/cr5materialmoveuncomplectfilter.cpp \
     ../Reports/cr5menureview.cpp \
     ../Reports/cr5menureviewfilter.cpp \
+    ../Reports/cr5mfactions.cpp \
+    ../Reports/cr5mfdaily.cpp \
+    ../Reports/cr5mfgeneralreport.cpp \
+    ../Reports/cr5mfgeneralreportfilter.cpp \
+    ../Reports/cr5mfproduct.cpp \
     ../Reports/cr5ordermarks.cpp \
     ../Reports/cr5preorders.cpp \
     ../Reports/cr5printers.cpp \
@@ -265,10 +291,34 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Classes/notificationwidget.h \
     ../Classes/proxytablewidgetdatabase.h \
     ../Controls/c5guicontrols.h \
+    ../Controls/c5tablewithtotal.h \
+    ../DbData/datadriver.h \
+    ../DbData/dbbodystate.h \
+    ../DbData/dbcar.h \
+    ../DbData/dbdata.h \
+    ../DbData/dbdishes.h \
+    ../DbData/dbdishpart1.h \
+    ../DbData/dbdishpart2.h \
+    ../DbData/dbdishspecial.h \
+    ../DbData/dbgoods.h \
+    ../DbData/dbgoodsgroup.h \
+    ../DbData/dbhalls.h \
+    ../DbData/dbmenu.h \
+    ../DbData/dbmenuname.h \
+    ../DbData/dboheader.h \
+    ../DbData/dbpartner.h \
+    ../DbData/dbservicevalues.h \
+    ../DbData/dbshift.h \
+    ../DbData/dbstore.h \
+    ../DbData/dbtables.h \
+    ../DbData/dbunit.h \
+    ../DbData/dbusers.h \
     ../Editors/c5cashname.h \
     ../Editors/ce5dishpackage.h \
     ../Editors/ce5goodsbarcodelabelview.h \
     ../Editors/ce5goodsclass.h \
+    ../Editors/ce5mfprocess.h \
+    ../Editors/ce5mfproduct.h \
     ../Editors/ce5ordermark.h \
     ../Editors/ce5packagelist.h \
     ../Editors/ce5storereason.h \
@@ -291,6 +341,8 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Reports/cr5discountstatisics.h \
     ../Reports/cr5discountstatisticsfilter.h \
     ../Reports/cr5dishpackage.h \
+    ../Reports/cr5draftoutputbyrecipe.h \
+    ../Reports/cr5draftoutputbyrecipefilter.h \
     ../Reports/cr5goodsclasses.h \
     ../Reports/cr5goodsfilter.h \
     ../Reports/cr5goodsimages.h \
@@ -300,6 +352,11 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Reports/cr5materialmoveuncomplectfilter.h \
     ../Reports/cr5menureview.h \
     ../Reports/cr5menureviewfilter.h \
+    ../Reports/cr5mfactions.h \
+    ../Reports/cr5mfdaily.h \
+    ../Reports/cr5mfgeneralreport.h \
+    ../Reports/cr5mfgeneralreportfilter.h \
+    ../Reports/cr5mfproduct.h \
     ../Reports/cr5ordermarks.h \
     ../Reports/cr5preorders.h \
     ../Reports/cr5printers.h \
@@ -470,9 +527,12 @@ FORMS += \
     ../Cafe5/c5licensedlg.ui \
     ../Classes/calculator.ui \
     ../Classes/notificationwidget.ui \
+    ../Controls/c5tablewithtotal.ui \
     ../Editors/c5cashname.ui \
     ../Editors/ce5dishpackage.ui \
     ../Editors/ce5goodsclass.ui \
+    ../Editors/ce5mfprocess.ui \
+    ../Editors/ce5mfproduct.ui \
     ../Editors/ce5ordermark.ui \
     ../Editors/ce5packagelist.ui \
     ../Editors/ce5storereason.ui \
@@ -484,11 +544,14 @@ FORMS += \
     ../Reports/cr5consuptionreasonfilter.ui \
     ../Reports/cr5costumerdebtsfilter.ui \
     ../Reports/cr5discountstatisticsfilter.ui \
+    ../Reports/cr5draftoutputbyrecipefilter.ui \
     ../Reports/cr5goodsfilter.ui \
     ../Reports/cr5goodsimages.ui \
     ../Reports/cr5materialinstoreuncomplectfilter.ui \
     ../Reports/cr5materialmoveuncomplectfilter.ui \
     ../Reports/cr5menureviewfilter.ui \
+    ../Reports/cr5mfdaily.ui \
+    ../Reports/cr5mfgeneralreportfilter.ui \
     ../Reports/cr5salarybyworkersfilter.ui \
     ../Reports/cr5saleandstorefilter.ui \
     ../Reports/cr5saleflags.ui \
@@ -575,6 +638,7 @@ INCLUDEPATH += ../Classes
 INCLUDEPATH += ../Reports
 INCLUDEPATH += ../Controls
 INCLUDEPATH += ../Editors
+INCLUDEPATH += ../DbData
 INCLUDEPATH += ../Waiter
 INCLUDEPATH += ../RESOURCES
 INCLUDEPATH += ../Service
@@ -599,3 +663,8 @@ LIBS += -lwsock32
 LIBS += -LC:/Soft/OpenSSL-Win64/lib
 LIBS += -lopenssl
 LIBS += -llibcrypto
+
+win32: QMAKE_CXXFLAGS_RELEASE -= -Zc:strictStrings
+win32: QMAKE_CFLAGS_RELEASE -= -Zc:strictStrings
+win32: QMAKE_CFLAGS -= -Zc:strictStrings
+win32: QMAKE_CXXFLAGS -= -Zc:strictStrings
