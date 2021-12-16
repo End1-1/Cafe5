@@ -286,7 +286,8 @@ bool C5StoreDraftWriter::returnResult(bool r, const QString &msg)
     return r;
 }
 
-bool C5StoreDraftWriter::writeAHeader(QString &id, const QString &userid, int state, int type, int op, const QDate &docDate, const QDate &dateCreate,
+bool C5StoreDraftWriter::writeAHeader(QString &id, const QString &userid, int state, int type, int op,
+                                      const QDate &docDate, const QDate &dateCreate,
                                      const QTime &timeCreate, int partner, double amount, const QString &comment, int payment, int paid)
 {
     bool u = true;
@@ -667,7 +668,8 @@ bool C5StoreDraftWriter::writeOBodyToOGoods(const QString &id, const QString &he
 }
 
 bool C5StoreDraftWriter::writeOHeader(QString &id, int hallid, const QString &prefix, int state, int hall, int table,
-                                      const QDate &dateopen, const QDate &dateclose, const QDate &datecash, const QTime &timeopen, const QTime &timeclose,
+                                      const QDate &dateopen, const QDate &dateclose, const QDate &datecash,
+                                      const QTime &timeopen, const QTime &timeclose,
                                       int staff, const QString &comment, int print,
                                       double amountTotal, double amountCash, double amountCard, double amountBank, double amountOther,
                                       double amountService, double amountDiscount, double serviceFactor, double discountFactor,

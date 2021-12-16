@@ -69,6 +69,8 @@ public:
 
     bool addDish(int menuid, const QString &comment, double price = 0.0);
 
+    bool addDish2(int packageid, double qty);
+
     bool addDish(QMap<QString, QVariant> o);
 
     void removeDish(int index);

@@ -59,7 +59,7 @@ void DlgSplashScreen::timeout()
     C5Database dr(__c5config.replicaDbParams());
     emit messageSignal(tr("Clear expired reservations"));
     dr.exec(QString("update a_store_reserve set f_state=%2, f_canceleddate=current_date, f_canceledtime=current_time, "
-                    "f_message=concat(f_message, ' (%1)') where f_enddate<current_date or f_enddate is null and f_state=%3 ")
+                    "f_message=concat(f_message, ' (%1)') where (f_enddate<current_date or f_enddate is null) and f_state=%3 ")
             .arg(tr("Expired"))
             .arg(GR_EXPIRED)
             .arg(GR_RESERVED));

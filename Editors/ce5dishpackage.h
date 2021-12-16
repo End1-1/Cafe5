@@ -26,10 +26,14 @@ public:
 
     virtual void clear() override;
 
+    virtual bool checkData(QString &err) override;
+
 private slots:
     void newDish();
 
     void removeDish();
+
+    void setQty(const QString &arg1);
 
     void setPrice(const QString &arg);
 

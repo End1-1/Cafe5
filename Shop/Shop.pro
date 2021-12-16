@@ -92,6 +92,7 @@ SOURCES += \
     ../Controls/c5graphicsview.cpp \
     ../Controls/c5guicontrols.cpp \
     ../Controls/c5lineeditwithselector.cpp \
+    ../Controls/c5tablewithtotal.cpp \
     ../DbData/datadriver.cpp \
     ../DbData/dbbodystate.cpp \
     ../DbData/dbcar.cpp \
@@ -134,6 +135,8 @@ SOURCES += \
     ../Editors/ce5goodswaste.cpp \
     ../Editors/ce5halls.cpp \
     ../Editors/ce5menuname.cpp \
+    ../Editors/ce5mfprocess.cpp \
+    ../Editors/ce5mfproduct.cpp \
     ../Editors/ce5ordermark.cpp \
     ../Editors/ce5packagelist.cpp \
     ../Editors/ce5partner.cpp \
@@ -217,6 +220,8 @@ SOURCES += \
     ../Reports/cr5dishremovereason.cpp \
     ../Reports/cr5documents.cpp \
     ../Reports/cr5documentsfilter.cpp \
+    ../Reports/cr5draftoutputbyrecipe.cpp \
+    ../Reports/cr5draftoutputbyrecipefilter.cpp \
     ../Reports/cr5goods.cpp \
     ../Reports/cr5goodsclasses.cpp \
     ../Reports/cr5goodsfilter.cpp \
@@ -239,6 +244,11 @@ SOURCES += \
     ../Reports/cr5menureview.cpp \
     ../Reports/cr5menureviewfilter.cpp \
     ../Reports/cr5menutranslator.cpp \
+    ../Reports/cr5mfactions.cpp \
+    ../Reports/cr5mfdaily.cpp \
+    ../Reports/cr5mfgeneralreport.cpp \
+    ../Reports/cr5mfgeneralreportfilter.cpp \
+    ../Reports/cr5mfproduct.cpp \
     ../Reports/cr5ordermarks.cpp \
     ../Reports/cr5preorders.cpp \
     ../Reports/cr5salarybyworkers.cpp \
@@ -385,6 +395,7 @@ HEADERS += \
     ../Controls/c5graphicsview.h \
     ../Controls/c5guicontrols.h \
     ../Controls/c5lineeditwithselector.h \
+    ../Controls/c5tablewithtotal.h \
     ../DbData/datadriver.h \
     ../DbData/dbbodystate.h \
     ../DbData/dbcar.h \
@@ -427,6 +438,8 @@ HEADERS += \
     ../Editors/ce5goodswaste.h \
     ../Editors/ce5halls.h \
     ../Editors/ce5menuname.h \
+    ../Editors/ce5mfprocess.h \
+    ../Editors/ce5mfproduct.h \
     ../Editors/ce5ordermark.h \
     ../Editors/ce5packagelist.h \
     ../Editors/ce5partner.h \
@@ -510,6 +523,8 @@ HEADERS += \
     ../Reports/cr5dishremovereason.h \
     ../Reports/cr5documents.h \
     ../Reports/cr5documentsfilter.h \
+    ../Reports/cr5draftoutputbyrecipe.h \
+    ../Reports/cr5draftoutputbyrecipefilter.h \
     ../Reports/cr5goods.h \
     ../Reports/cr5goodsclasses.h \
     ../Reports/cr5goodsfilter.h \
@@ -532,6 +547,11 @@ HEADERS += \
     ../Reports/cr5menureview.h \
     ../Reports/cr5menureviewfilter.h \
     ../Reports/cr5menutranslator.h \
+    ../Reports/cr5mfactions.h \
+    ../Reports/cr5mfdaily.h \
+    ../Reports/cr5mfgeneralreport.h \
+    ../Reports/cr5mfgeneralreportfilter.h \
+    ../Reports/cr5mfproduct.h \
     ../Reports/cr5ordermarks.h \
     ../Reports/cr5preorders.h \
     ../Reports/cr5salarybyworkers.h \
@@ -621,6 +641,7 @@ FORMS += \
     ../Classes/calculator.ui \
     ../Classes/notificationwidget.ui \
     ../Classes/rkeyboard.ui \
+    ../Controls/c5tablewithtotal.ui \
     ../Editors/c5cashname.ui \
     ../Editors/c5dishwidget.ui \
     ../Editors/c5editor.ui \
@@ -640,6 +661,8 @@ FORMS += \
     ../Editors/ce5goodswaste.ui \
     ../Editors/ce5halls.ui \
     ../Editors/ce5menuname.ui \
+    ../Editors/ce5mfprocess.ui \
+    ../Editors/ce5mfproduct.ui \
     ../Editors/ce5ordermark.ui \
     ../Editors/ce5packagelist.ui \
     ../Editors/ce5partner.ui \
@@ -696,6 +719,7 @@ FORMS += \
     ../Reports/cr5discountstatisticsfilter.ui \
     ../Reports/cr5dishpriceselfcostfilter.ui \
     ../Reports/cr5documentsfilter.ui \
+    ../Reports/cr5draftoutputbyrecipefilter.ui \
     ../Reports/cr5goodsfilter.ui \
     ../Reports/cr5goodsimages.ui \
     ../Reports/cr5goodsmovementfilter.ui \
@@ -704,6 +728,8 @@ FORMS += \
     ../Reports/cr5materialmoveuncomplectfilter.ui \
     ../Reports/cr5menureviewfilter.ui \
     ../Reports/cr5menutranslator.ui \
+    ../Reports/cr5mfdaily.ui \
+    ../Reports/cr5mfgeneralreportfilter.ui \
     ../Reports/cr5salarybyworkersfilter.ui \
     ../Reports/cr5saleandstorefilter.ui \
     ../Reports/cr5saleflags.ui \

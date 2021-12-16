@@ -17,6 +17,11 @@ int DbTables::specialConfig(int id)
     return get(id, "f_special_config").toInt();
 }
 
+bool DbTables::bookingOnly(int id)
+{
+    return get(id, "f_booking").toInt() == 1;
+}
+
 bool DbTables::openTable(int table, QStringList &orders, QString &err)
 {
     C5Database db(fDbParams);

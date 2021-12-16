@@ -14,6 +14,8 @@ public:
 
     int specialConfig(int id);
 
+    bool bookingOnly(int id);
+
     bool openTable(int table, QStringList &orders, QString &err);
 
     bool closeTable(int id, QString &err);

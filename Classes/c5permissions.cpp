@@ -102,6 +102,7 @@ void C5Permissions::init(C5Database &db)
               << cp_t5_bill_without_service
               << cp_t5_edit_closed_order
               << cp_t5_present
+              << cp_t5_edit_booking
 
               << cp_t6_storage
               << cp_t6_goods_menu

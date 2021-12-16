@@ -251,7 +251,7 @@ void C5Grid::callEditor(const QString &id)
 void C5Grid::removeWithId(int id, int row)
 {
     Q_UNUSED(id);
-    Q_UNUSED(row);
+    fModel->removeRow(row);
 }
 
 void C5Grid::sumColumnsData()

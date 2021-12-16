@@ -10,6 +10,8 @@
 #include "c5printpreview.h"
 #include <QColorDialog>
 #include <QKeyEvent>
+#include <QMenu>
+#include <QFileDialog>
 #include <QClipboard>
 #include <QInputDialog>
 #include <QScrollBar>
@@ -85,6 +87,7 @@ void C5DishWidget::clear()
     ui->lwComment->clear();
     ui->leDishComment->clear();
     ui->leQueue->setText("999");
+    ui->lbImage->setText(tr("Image, right click to begin"));
 }
 
 void C5DishWidget::setDish(int id)
@@ -143,6 +146,10 @@ void C5DishWidget::setDish(int id)
         QListWidgetItem *item = new QListWidgetItem(ui->lwComment);
         item->setText(db.getString(0));
     }
+
+    if (ui->tabWidget->currentIndex() == 3) {
+        loadImage();
+    }
 }
 
 void C5DishWidget::selectorCallback(int row, const QList<QVariant> &values)
@@ -199,6 +206,7 @@ bool C5DishWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     }
     db[":f_recipeqty"] = ui->tblRecipeTotal->getDouble(0, 3);
     db[":f_netweight"] = ui->tblRecipeTotal->getDouble(0, 4);
+    db[":f_cost"] = ui->tblRecipeTotal->getDouble(0, 8);
     db.update("d_dish", "f_id", ui->leCode->text());
     return true;
 }
@@ -282,6 +290,54 @@ void C5DishWidget::setColor()
     ui->leColor->setInteger(color);
 }
 
+void C5DishWidget::uploadImage()
+{
+    if (ui->leCode->getInteger() == 0) {
+        if (C5Message::question(tr("You should to save dish before upload an image")) ==  QDialog::Accepted) {
+            QString err;
+            QList<QMap<QString, QVariant> > data;
+            if (!save(err, data)) {
+                C5Message::error(err);
+                return;
+            }
+        } else {
+            return;
+        }
+    }
+    QString fn = QFileDialog::getOpenFileName(this, tr("Image"), "", "*.jpg;*.png;*.bmp");
+    if (fn.isEmpty()) {
+        return;
+    }
+    QPixmap pm;
+    if (!pm.load(fn)) {
+        C5Message::error(tr("Could not load image"));
+        return;
+    }
+    ui->lbImage->setPixmap(pm.scaled(ui->lbImage->size(), Qt::KeepAspectRatio));
+    qApp->processEvents();
+    QFile f(fn);
+    if (f.open(QIODevice::ReadOnly)) {
+        C5Database db(fDBParams);
+        db[":f_id"] = ui->leCode->getInteger();
+        db.exec("delete from d_image where f_id=:f_id");
+        db[":f_id"] = ui->leCode->getInteger();
+        db[":f_image"] = f.readAll();
+        db.exec("insert into d_image (f_id, f_image) values (:f_id, :f_image)");
+        f.close();
+    }
+}
+
+void C5DishWidget::removeImage()
+{
+    if (C5Message::question(tr("Remove image")) !=  QDialog::Accepted) {
+        return;
+    }
+    C5Database db(fDBParams);
+    db[":f_id"] = ui->leCode->getInteger();
+    db.exec("delete from d_image where f_id=:f_id");
+    ui->lbImage->setText(tr("Image"));
+}
+
 void C5DishWidget::recipeHeaderResized(int section, int oldsize, int newsize)
 {
     Q_UNUSED(oldsize);
@@ -331,6 +387,19 @@ int C5DishWidget::addRecipeRow()
     h.append(QString::number(row + 1));
     ui->tblRecipeTotal->setVerticalHeaderLabels(h);
     return row;
+}
+
+void C5DishWidget::loadImage()
+{
+    C5Database db(fDBParams);
+    db[":f_id"] = ui->leCode->getInteger();
+    db.exec("select * from d_image where f_id=:f_id");
+    if (db.nextRow()) {
+        QPixmap p;
+        if (p.loadFromData(db.getValue("f_image").toByteArray())) {
+            ui->lbImage->setPixmap(p.scaled(ui->lbImage->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        }
+    }
 }
 
 void C5DishWidget::on_btnNewType_clicked()
@@ -539,4 +608,21 @@ void C5DishWidget::on_btnMultRecipe_clicked()
 void C5DishWidget::on_leName_textChanged(const QString &arg1)
 {
     setWindowTitle(tr("Dish") + ": " + arg1);
+}
+
+void C5DishWidget::on_lbImage_customContextMenuRequested(const QPoint &pos)
+{
+    QMenu *m = new QMenu(this);
+    m->addAction(QIcon(":/new.png"), tr("Upload image"), this, SLOT(uploadImage()));
+    m->addAction(QIcon(":/delete.png"), tr("Remove image"), this, SLOT(removeImage()));
+    m->popup(ui->lbImage->mapToGlobal(pos));
+}
+
+void C5DishWidget::on_tabWidget_currentChanged(int index)
+{
+    switch (index) {
+    case 3:
+        loadImage();
+        break;
+    }
 }

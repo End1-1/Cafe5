@@ -106,6 +106,7 @@ QToolBar *CR5Goods::toolBar()
             }
             fToolBar->addAction(QIcon(":/dress.png"), tr("Group price"), this, SLOT(groupPrice()));
             fToolBar->addAction(QIcon(":/scales.png"), tr("Scales"), this, SLOT(exportToScales()));
+            fToolBar->addAction(QIcon(":/delete.png"), tr("Remove"), this, SLOT(deleteGoods()));
     }
     return fToolBar;
 }
@@ -214,4 +215,50 @@ void CR5Goods::exportToScales()
     f.write("</NewDataSet>");
     f.close();
     C5Message::info(tr("Done"));
+}
+
+void CR5Goods::deleteGoods()
+{
+    int row = 0;
+    int id = rowId(row, 0);
+    if (id == 0) {
+        return;
+    }
+    if (C5Message::question(QString("%1<br>%2")
+                            .arg(tr("Confirm to remove"))
+                            .arg(fModel->data(row, fModel->indexForColumnName("f_name"), Qt::EditRole).toString())) != QDialog::Accepted) {
+        return;
+    }
+    C5Database db(fDBParams);
+    db[":f_goods"] = id;
+    db.exec("select * from d_recipes where f_goods=:f_goods");
+    QString err;
+    if (db.nextRow()) {
+        err.append("<br>" + tr("Used in recipes"));
+    }
+    db[":f_goods"] = id;
+    db.exec("select * from c_goods_complectation where f_goods=:f_goods");
+    if (db.nextRow()) {
+        err.append("<br>" + tr("Used in complectation"));
+    }
+    db[":f_goods"] = id;
+    db.exec("select from a_store_draft where f_goods=:f_goods");
+    if (db.nextRow()) {
+        err.append("<br>" + tr("Used in store documents"));
+    }
+    db[":f_goods"] = id;
+    db.exec("select * from o_goods where f_goods=:f_goods");
+    if (db.nextRow()) {
+        err.append("<br>" + tr("Used in sales (shop)"));
+    }
+    if (!err.isEmpty()) {
+        C5Message::error(tr("Cannot remove ") + err);
+        return;
+    }
+    db[":f_id"] = id;
+    if (db.exec("delete from c_goods where f_id=:f_id")) {
+        removeRow(row);
+    } else {
+        C5Message::error(db.fLastError);
+    }
 }

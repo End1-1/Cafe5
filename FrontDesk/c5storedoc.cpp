@@ -266,8 +266,10 @@ void C5StoreDoc::setMode(C5StoreDoc::STORE_DOC sd)
         ui->lePayment->setVisible(paymentVisible && true);
         ui->lePaymentName->setVisible(paymentVisible && true);
         ui->chPaid->setVisible(paymentVisible && true);
-        fToolBar->addAction(QIcon(":/goods_store.png"), tr("Input of service"), this, SLOT(inputOfService()));
-        fToolBar->addAction(QIcon(":/goods_store.png"), tr("Output of service"), this, SLOT(outputOfService()));
+        if (fToolBar) {
+            fToolBar->addAction(QIcon(":/goods_store.png"), tr("Input of service"), this, SLOT(inputOfService()));
+            fToolBar->addAction(QIcon(":/goods_store.png"), tr("Output of service"), this, SLOT(outputOfService()));
+        }
         break;
     case DOC_TYPE_STORE_MOVE:
         ui->lbCashDoc->setVisible(false);

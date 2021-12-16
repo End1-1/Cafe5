@@ -69,7 +69,6 @@ DlgOrder::DlgOrder(C5User *user) :
     ui->btnPayComplimentary->setVisible(fUser->check(cp_t5_pay_complimentary));
     ui->btnPayCityLedger->setVisible(fUser->check(cp_t5_pay_cityledger));
     ui->btnSelfCost->setVisible(fUser->check(cp_t5_pay_breakfast));
-    ui->btnPackage->setVisible(false); //TODO: THIS IS A OPTIOIN
     setRoomComment();
     setDiscountComment();
     setComplimentary();
@@ -1114,16 +1113,29 @@ void DlgOrder::on_btnCar_clicked()
 
 void DlgOrder::on_btnPackage_clicked()
 {
-    //TODO: PACKAGE ADd
-//    int id;
-//    QString name;
-//    if (DlgListOfPackages::package(id, name)) {
-//        QList<QJsonObject> items = C5Menu::fPackagesList[id];
-//        for (const QJsonObject &o: items) {
-//            addDishToOrder(o);
-//        }
-//        logRecord(fUser->fullName(), worder()->fOrderDriver->headerValue("f_id").toString(), "", "New package", name, "");
-//    }
+    WOrder *wo = worder();
+    if (!wo) {
+        return;
+    }
+    int id;
+    QString name;
+    if (DlgListOfPackages::package(id, name)) {
+        double max = 100;
+        if (!DlgPassword::getAmount(name, max)) {
+            return;
+        }
+        QList<int> lst = dbmenupackagelist->listOf(id);
+        for (int id: lst) {
+            wo->fOrderDriver->addDish2(id, max);
+            DbMenuPackageList p(id);
+            logRecord(fUser->fullName(), worder()->fOrderDriver->headerValue("f_id").toString(), "", "Dish in package",
+                      QString("%1, %2 x %3").arg(dbdish->name(p.dish()))
+                      .arg(p.qty())
+                      .arg(p.price()), "");
+        }
+        logRecord(fUser->fullName(), worder()->fOrderDriver->headerValue("f_id").toString(), "", "New package", name, "");
+    }
+    itemsToTable();
 }
 
 void DlgOrder::on_btnPrintService_clicked()

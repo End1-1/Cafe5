@@ -61,6 +61,8 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../DbData/dbhalls.cpp \
     ../DbData/dbmenu.cpp \
     ../DbData/dbmenuname.cpp \
+    ../DbData/dbmenupackagelist.cpp \
+    ../DbData/dbmenupackages.cpp \
     ../DbData/dboheader.cpp \
     ../DbData/dbpartner.cpp \
     ../DbData/dbservicevalues.cpp \
@@ -305,6 +307,8 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../DbData/dbhalls.h \
     ../DbData/dbmenu.h \
     ../DbData/dbmenuname.h \
+    ../DbData/dbmenupackagelist.h \
+    ../DbData/dbmenupackages.h \
     ../DbData/dboheader.h \
     ../DbData/dbpartner.h \
     ../DbData/dbservicevalues.h \

@@ -649,6 +649,7 @@ alter table d_translator add f_am tinytext;
 /* db - 53 */
 update s_app set f_version='53' where f_app='DB';
 alter table o_preorder add column f_fiscal integer default 0;
+alter table o_body add column f_appendtime timestamp, add column f_printtime timestamp;
 alter table o_body add column f_removetime timestamp;
 alter table o_body add column f_removeuser integer;
 ALTER TABLE `o_body` ADD INDEX `fk_obdy_removeuser_idx` (`f_removeuser` ASC) ;
@@ -704,3 +705,18 @@ ALTER TABLE `mf_daily_workers` ADD UNIQUE INDEX `idx_mfdailyworkers_date_worker`
 ALTER TABLE `mf_daily_process` ADD INDEX `idx_mfdailyprocess_date` (`f_date` ASC) ,ADD INDEX `idx_mfdailyprocess_worker` (`f_worker` ASC) ;
 alter table mf_process add column f_goalprice decimal(14,2);
 ALTER TABLE `mf_process` CHANGE COLUMN `f_group` `f_product` INT(11) NULL DEFAULT NULL ,CHANGE COLUMN `f_action` `f_process` INT(11) NULL DEFAULT NULL ,ADD INDEX `idx_mfprocess_product` (`f_product` ASC);
+
+/*db - 59 */
+/* 06.12.2021 */
+update s_app set f_version='59' where f_app='DB';
+alter table h_halls add column f_booking tinyint default 0;
+
+/*db - 60 */
+/* 13.12.2021 */
+update s_app set f_version='60' where f_app='DB';
+alter table d_package_list add column f_qty decimal(14,2) after f_dish;
+
+/*db - 61 */
+/* 14.12.2021 */
+update s_app set f_version='61' where f_app='DB';
+create table d_image (f_id integer primary key, f_image blob);

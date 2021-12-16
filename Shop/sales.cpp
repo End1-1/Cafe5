@@ -454,6 +454,26 @@ void Sales::printpreview()
     pp.exec();
 }
 
+void Sales::printTaxReport(int report_type)
+{
+    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
+    QString jsnin, jsnout, err;
+    int result;
+    result = pt.printReport(QDateTime(ui->deStart->date()),
+                            QDateTime(ui->deEnd->date()),
+                            report_type, jsnin, jsnout, err);
+    C5Database db(C5Config::dbParams());
+    db[":f_id"] = db.uuid();
+    db[":f_order"] = QString("Report %1").arg(report_type == report_x ? "X" : "Z");
+    db[":f_date"] = QDate::currentDate();
+    db[":f_time"] = QTime::currentTime();
+    db[":f_in"] = jsnin;
+    db[":f_out"] = jsnout;
+    db[":f_err"] = err;
+    db[":f_result"] = result;
+    db.insert("o_tax_log", false);
+}
+
 int Sales::sumOfColumnsWidghtBefore(int column)
 {
     int sum = 0;
@@ -760,4 +780,14 @@ void Sales::on_btnChangeDate_clicked()
     } else {
         C5Message::info(tr("Nothing was selected"));
     }
+}
+
+void Sales::on_btnPrintTaxZ_clicked()
+{
+    printTaxReport(report_z);
+}
+
+void Sales::on_btnPrintTaxX_clicked()
+{
+    printTaxReport(report_x);
 }

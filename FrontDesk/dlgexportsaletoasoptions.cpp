@@ -27,8 +27,8 @@ DlgExportSaleToAsOptions::~DlgExportSaleToAsOptions()
 }
 
 int DlgExportSaleToAsOptions::getOption(const QStringList &dbParams, QString &partner, QString &store, QString &service, QString &srvinacc,
-                                        QString &srvoutacc, QString &iteminacc, QString &itemoutacc, QString &bankacc, QString &vat, bool &exportSimple,
-                                        QString &simpleItem)
+                                        QString &srvoutacc, QString &iteminacc, QString &itemoutacc, QString &bankacc, QString &vat,
+                                        bool &exportSimple, QString &simpleItem)
 {
     DlgExportSaleToAsOptions d(dbParams);
     if (d.exec() == QDialog::Accepted) {
@@ -42,6 +42,7 @@ int DlgExportSaleToAsOptions::getOption(const QStringList &dbParams, QString &pa
         bankacc = d.ui->leBankAcc->text();
         vat = d.ui->leVATValue->text();
         simpleItem = d.ui->leSimpleItem->text();
+        exportSimple = d.ui->chExportSimple->isChecked();
         if (d.ui->rbTax->isChecked()) {
             return 1;
         } else if (d.ui->rbNoTax->isChecked()) {
@@ -49,7 +50,6 @@ int DlgExportSaleToAsOptions::getOption(const QStringList &dbParams, QString &pa
         } else {
             return 3;
         }
-        exportSimple = d.ui->chExportSimple->isChecked();
     } else {
         return 0;
     }

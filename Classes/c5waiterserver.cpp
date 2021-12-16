@@ -1553,6 +1553,11 @@ void C5WaiterServer::processReturnTaxReceipt(QJsonObject &o)
         QSqlQuery *q = new QSqlQuery(db.fDb);
         pt.saveTimeResult(fIn["order"].toString(), *q);
         delete q;
+    } else {
+        db[":f_fiscal"] = QVariant();
+        db[":f_receiptnumber"] = QVariant();
+        db[":f_time"] = QVariant();
+        db.update("o_tax", "f_id", fIn["order"].toString());
     }
 }
 

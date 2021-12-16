@@ -60,7 +60,6 @@ SOURCES += \
     ../Classes/c5combodelegate.cpp \
     ../Classes/c5crypt.cpp \
     ../Classes/c5datedelegate.cpp \
-    ../Classes/c5dishtabledelegate.cpp \
     ../Classes/c5filelogwriter.cpp \
     ../Classes/c5grid.cpp \
     ../Classes/c5gridgilter.cpp \
@@ -68,8 +67,8 @@ SOURCES += \
     ../Classes/c5jsondb.cpp \
     ../Classes/c5logtoserverthread.cpp \
     ../Classes/c5menu.cpp \
+    ../Classes/c5orderdriver.cpp \
     ../Classes/c5ordertabledelegate.cpp \
-    ../Classes/c5part2tabledelegate.cpp \
     ../Classes/c5permissions.cpp \
     ../Classes/c5printing.cpp \
     ../Classes/c5printjson.cpp \
@@ -85,13 +84,13 @@ SOURCES += \
     ../Classes/c5textdelegate.cpp \
     ../Classes/c5threadobject.cpp \
     ../Classes/c5translator.cpp \
-    ../Classes/c5userauth.cpp \
     ../Classes/c5waiterorderdoc.cpp \
     ../Classes/c5waiterserver.cpp \
     ../Classes/c5widget.cpp \
     ../Classes/c5witerconf.cpp \
     ../Classes/calculator.cpp \
     ../Classes/checkforupdatethread.cpp \
+    ../Classes/doubledatabase.cpp \
     ../Classes/fileversion.cpp \
     ../Classes/notificationwidget.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
@@ -103,6 +102,28 @@ SOURCES += \
     ../Controls/c5guicontrols.cpp \
     ../Controls/c5lineeditwithselector.cpp \
     ../Controls/c5tablewidget.cpp \
+    ../Controls/c5tablewithtotal.cpp \
+    ../DbData/datadriver.cpp \
+    ../DbData/dbbodystate.cpp \
+    ../DbData/dbcar.cpp \
+    ../DbData/dbdata.cpp \
+    ../DbData/dbdishes.cpp \
+    ../DbData/dbdishpart1.cpp \
+    ../DbData/dbdishpart2.cpp \
+    ../DbData/dbdishspecial.cpp \
+    ../DbData/dbgoods.cpp \
+    ../DbData/dbgoodsgroup.cpp \
+    ../DbData/dbhalls.cpp \
+    ../DbData/dbmenu.cpp \
+    ../DbData/dbmenuname.cpp \
+    ../DbData/dboheader.cpp \
+    ../DbData/dbpartner.cpp \
+    ../DbData/dbservicevalues.cpp \
+    ../DbData/dbshift.cpp \
+    ../DbData/dbstore.cpp \
+    ../DbData/dbtables.cpp \
+    ../DbData/dbunit.cpp \
+    ../DbData/dbusers.cpp \
     ../Editors/c5cashname.cpp \
     ../Editors/c5dishwidget.cpp \
     ../Editors/c5editor.cpp \
@@ -124,6 +145,8 @@ SOURCES += \
     ../Editors/ce5goodswaste.cpp \
     ../Editors/ce5halls.cpp \
     ../Editors/ce5menuname.cpp \
+    ../Editors/ce5mfprocess.cpp \
+    ../Editors/ce5mfproduct.cpp \
     ../Editors/ce5ordermark.cpp \
     ../Editors/ce5packagelist.cpp \
     ../Editors/ce5partner.cpp \
@@ -169,6 +192,8 @@ SOURCES += \
     ../FrontDesk/c5translatorform.cpp \
     ../FrontDesk/c5waiterorder.cpp \
     ../FrontDesk/dlgchangeoutputstore.cpp \
+    ../FrontDesk/dlgexportsaletoasoptions.cpp \
+    ../FrontDesk/dlgstoreutils.cpp \
     ../Reports/c5customfilter.cpp \
     ../Reports/c5settingswidget.cpp \
     ../Reports/cr5carvisits.cpp \
@@ -205,6 +230,8 @@ SOURCES += \
     ../Reports/cr5dishremovereason.cpp \
     ../Reports/cr5documents.cpp \
     ../Reports/cr5documentsfilter.cpp \
+    ../Reports/cr5draftoutputbyrecipe.cpp \
+    ../Reports/cr5draftoutputbyrecipefilter.cpp \
     ../Reports/cr5goods.cpp \
     ../Reports/cr5goodsclasses.cpp \
     ../Reports/cr5goodsfilter.cpp \
@@ -227,6 +254,11 @@ SOURCES += \
     ../Reports/cr5menureview.cpp \
     ../Reports/cr5menureviewfilter.cpp \
     ../Reports/cr5menutranslator.cpp \
+    ../Reports/cr5mfactions.cpp \
+    ../Reports/cr5mfdaily.cpp \
+    ../Reports/cr5mfgeneralreport.cpp \
+    ../Reports/cr5mfgeneralreportfilter.cpp \
+    ../Reports/cr5mfproduct.cpp \
     ../Reports/cr5ordermarks.cpp \
     ../Reports/cr5preorders.cpp \
     ../Reports/cr5salarybyworkers.cpp \
@@ -274,8 +306,7 @@ SOURCES += \
     ../Cafe5/c5sockethandler.cpp \
     ../Waiter/dlgpassword.cpp \
     ../Controls/c5lineedit.cpp \
-    ../Classes/c5user.cpp \
-    dlgpassword.cpp
+    ../Classes/c5user.cpp
 
 HEADERS += \
     ../../NewTax/Src/printtaxn.h \
@@ -310,7 +341,6 @@ HEADERS += \
     ../Classes/c5combodelegate.h \
     ../Classes/c5crypt.h \
     ../Classes/c5datedelegate.h \
-    ../Classes/c5dishtabledelegate.h \
     ../Classes/c5filelogwriter.h \
     ../Classes/c5grid.h \
     ../Classes/c5gridgilter.h \
@@ -318,8 +348,8 @@ HEADERS += \
     ../Classes/c5jsondb.h \
     ../Classes/c5logtoserverthread.h \
     ../Classes/c5menu.h \
+    ../Classes/c5orderdriver.h \
     ../Classes/c5ordertabledelegate.h \
-    ../Classes/c5part2tabledelegate.h \
     ../Classes/c5permissions.h \
     ../Classes/c5printing.h \
     ../Classes/c5printjson.h \
@@ -335,13 +365,13 @@ HEADERS += \
     ../Classes/c5textdelegate.h \
     ../Classes/c5threadobject.h \
     ../Classes/c5translator.h \
-    ../Classes/c5userauth.h \
     ../Classes/c5waiterorderdoc.h \
     ../Classes/c5waiterserver.h \
     ../Classes/c5widget.h \
     ../Classes/c5witerconf.h \
     ../Classes/calculator.h \
     ../Classes/checkforupdatethread.h \
+    ../Classes/doubledatabase.h \
     ../Classes/fileversion.h \
     ../Classes/notificationwidget.h \
     ../Classes/proxytablewidgetdatabase.h \
@@ -353,6 +383,28 @@ HEADERS += \
     ../Controls/c5guicontrols.h \
     ../Controls/c5lineeditwithselector.h \
     ../Controls/c5tablewidget.h \
+    ../Controls/c5tablewithtotal.h \
+    ../DbData/datadriver.h \
+    ../DbData/dbbodystate.h \
+    ../DbData/dbcar.h \
+    ../DbData/dbdata.h \
+    ../DbData/dbdishes.h \
+    ../DbData/dbdishpart1.h \
+    ../DbData/dbdishpart2.h \
+    ../DbData/dbdishspecial.h \
+    ../DbData/dbgoods.h \
+    ../DbData/dbgoodsgroup.h \
+    ../DbData/dbhalls.h \
+    ../DbData/dbmenu.h \
+    ../DbData/dbmenuname.h \
+    ../DbData/dboheader.h \
+    ../DbData/dbpartner.h \
+    ../DbData/dbservicevalues.h \
+    ../DbData/dbshift.h \
+    ../DbData/dbstore.h \
+    ../DbData/dbtables.h \
+    ../DbData/dbunit.h \
+    ../DbData/dbusers.h \
     ../Editors/c5cashname.h \
     ../Editors/c5dishwidget.h \
     ../Editors/c5editor.h \
@@ -374,6 +426,8 @@ HEADERS += \
     ../Editors/ce5goodswaste.h \
     ../Editors/ce5halls.h \
     ../Editors/ce5menuname.h \
+    ../Editors/ce5mfprocess.h \
+    ../Editors/ce5mfproduct.h \
     ../Editors/ce5ordermark.h \
     ../Editors/ce5packagelist.h \
     ../Editors/ce5partner.h \
@@ -419,6 +473,8 @@ HEADERS += \
     ../FrontDesk/c5translatorform.h \
     ../FrontDesk/c5waiterorder.h \
     ../FrontDesk/dlgchangeoutputstore.h \
+    ../FrontDesk/dlgexportsaletoasoptions.h \
+    ../FrontDesk/dlgstoreutils.h \
     ../Reports/c5customfilter.h \
     ../Reports/c5settingswidget.h \
     ../Reports/cr5carvisits.h \
@@ -455,6 +511,8 @@ HEADERS += \
     ../Reports/cr5dishremovereason.h \
     ../Reports/cr5documents.h \
     ../Reports/cr5documentsfilter.h \
+    ../Reports/cr5draftoutputbyrecipe.h \
+    ../Reports/cr5draftoutputbyrecipefilter.h \
     ../Reports/cr5goods.h \
     ../Reports/cr5goodsclasses.h \
     ../Reports/cr5goodsfilter.h \
@@ -477,6 +535,11 @@ HEADERS += \
     ../Reports/cr5menureview.h \
     ../Reports/cr5menureviewfilter.h \
     ../Reports/cr5menutranslator.h \
+    ../Reports/cr5mfactions.h \
+    ../Reports/cr5mfdaily.h \
+    ../Reports/cr5mfgeneralreport.h \
+    ../Reports/cr5mfgeneralreportfilter.h \
+    ../Reports/cr5mfproduct.h \
     ../Reports/cr5ordermarks.h \
     ../Reports/cr5preorders.h \
     ../Reports/cr5salarybyworkers.h \
@@ -528,8 +591,7 @@ HEADERS += \
     ../Cafe5/c5socketmessage.h \
     ../Waiter/dlgpassword.h \
     ../Controls/c5lineedit.h \
-    ../Classes/c5user.h \
-    dlgpassword.h
+    ../Classes/c5user.h
 
 FORMS += \
     ../Cafe5/c5licensedlg.ui \
@@ -541,6 +603,7 @@ FORMS += \
     ../Classes/calculator.ui \
     ../Classes/notificationwidget.ui \
     ../Classes/rkeyboard.ui \
+    ../Controls/c5tablewithtotal.ui \
     ../Editors/c5cashname.ui \
     ../Editors/c5dishwidget.ui \
     ../Editors/c5editor.ui \
@@ -560,6 +623,8 @@ FORMS += \
     ../Editors/ce5goodswaste.ui \
     ../Editors/ce5halls.ui \
     ../Editors/ce5menuname.ui \
+    ../Editors/ce5mfprocess.ui \
+    ../Editors/ce5mfproduct.ui \
     ../Editors/ce5ordermark.ui \
     ../Editors/ce5packagelist.ui \
     ../Editors/ce5partner.ui \
@@ -601,6 +666,8 @@ FORMS += \
     ../FrontDesk/c5translatorform.ui \
     ../FrontDesk/c5waiterorder.ui \
     ../FrontDesk/dlgchangeoutputstore.ui \
+    ../FrontDesk/dlgexportsaletoasoptions.ui \
+    ../FrontDesk/dlgstoreutils.ui \
     ../Reports/c5customfilter.ui \
     ../Reports/c5settingswidget.ui \
     ../Reports/cr5carvisitsfilter.ui \
@@ -614,6 +681,7 @@ FORMS += \
     ../Reports/cr5discountstatisticsfilter.ui \
     ../Reports/cr5dishpriceselfcostfilter.ui \
     ../Reports/cr5documentsfilter.ui \
+    ../Reports/cr5draftoutputbyrecipefilter.ui \
     ../Reports/cr5goodsfilter.ui \
     ../Reports/cr5goodsimages.ui \
     ../Reports/cr5goodsmovementfilter.ui \
@@ -622,6 +690,8 @@ FORMS += \
     ../Reports/cr5materialmoveuncomplectfilter.ui \
     ../Reports/cr5menureviewfilter.ui \
     ../Reports/cr5menutranslator.ui \
+    ../Reports/cr5mfdaily.ui \
+    ../Reports/cr5mfgeneralreportfilter.ui \
     ../Reports/cr5salarybyworkersfilter.ui \
     ../Reports/cr5saleandstorefilter.ui \
     ../Reports/cr5saleflags.ui \
@@ -638,8 +708,7 @@ FORMS += \
         workspace.ui \
     ../Cafe5/c5connection.ui \
     ../Cafe5/c5message.ui \
-    ../Waiter/dlgpassword.ui \
-    dlgpassword.ui
+    ../Waiter/dlgpassword.ui
 
 DEFINES += _DBDRIVER_=\\\"QMYSQL\\\"
 DEFINES += _ORGANIZATION_=\\\"Jazzve\\\"
@@ -656,6 +725,7 @@ INCLUDEPATH += c:/projects/cafe5/Shop
 INCLUDEPATH += c:/projects/cafe5/Waiter
 INCLUDEPATH += c:/projects/cafe5/Reports
 INCLUDEPATH += c:/projects/cafe5/Service
+INCLUDEPATH += c:/projects/cafe5/DbData
 INCLUDEPATH += c:/Projects/NewTax/Src
 INCLUDEPATH += C:/Soft/OpenSSL-Win32/include
 INCLUDEPATH += C:/Soft/OpenSSL-Win32/include/openssl
@@ -663,7 +733,7 @@ INCLUDEPATH += /projects/xlsx/src
 
 LIBS += -lVersion
 LIBS += -lwsock32
-LIBS += -LC:/Soft/OpenSSL-Win32/lib
+LIBS += -LC:/Soft/OpenSSL-Win64/lib
 LIBS += -lopenssl
 LIBS += -llibcrypto
 

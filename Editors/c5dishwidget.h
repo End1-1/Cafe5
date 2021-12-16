@@ -39,6 +39,10 @@ private slots:
 
     void setColor();
 
+    void uploadImage();
+
+    void removeImage();
+
     void recipeHeaderResized(int section, int oldsize, int newsize);
 
     void tableRecipeScroll(int value);
@@ -67,12 +71,18 @@ private slots:
 
     void on_leName_textChanged(const QString &arg1);
 
+    void on_lbImage_customContextMenuRequested(const QPoint &pos);
+
+    void on_tabWidget_currentChanged(int index);
+
 private:
     Ui::C5DishWidget *ui;
 
     void countTotalSelfCost();
 
     int addRecipeRow();
+
+    void loadImage();
 };
 
 #endif // C5DISHWIDGET_H

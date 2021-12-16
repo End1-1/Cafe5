@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>976</width>
+    <width>1053</width>
     <height>755</height>
    </rect>
   </property>
@@ -331,6 +331,28 @@
         <property name="icon">
          <iconset resource="../resources/res.qrc">
           <normaloff>:/calendar.png</normaloff>:/calendar.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnPrintTaxZ">
+        <property name="text">
+         <string>Print tax Z</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/print.png</normaloff>:/print.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnPrintTaxX">
+        <property name="text">
+         <string>Print tax X</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/print.png</normaloff>:/print.png</iconset>
         </property>
        </widget>
       </item>

@@ -47,6 +47,10 @@ private slots:
 
     void on_btnChangeDate_clicked();
 
+    void on_btnPrintTaxZ_clicked();
+
+    void on_btnPrintTaxX_clicked();
+
 private:
     Ui::Sales *ui;
 
@@ -67,6 +71,8 @@ private:
     QString userCond() const;
 
     void printpreview();
+
+    void printTaxReport(int report_type);
 
     int sumOfColumnsWidghtBefore(int column);
 };

@@ -8,6 +8,7 @@
 #include "dishtableitemdelegate.h"
 #include "c5storedraftwriter.h"
 #include "calendar.h"
+#include "c5user.h"
 #include "ce5partner.h"
 #include "supplier.h"
 #include "payment.h"
@@ -57,11 +58,11 @@ bool Workspace::login()
         go<C5Connection>(fDBParams);
         return false;
     }
-    if (!DlgPassword::getUserDB(tr("ENTER"), &fUser)) {
+    if (!DlgPassword::getUser(tr("ENTER"), fUser)) {
         accept();
         return false;
     }
-    ui->lbStaffName->setText(fUser.fFull);
+    ui->lbStaffName->setText(fUser->fullName());
     C5Database db(fDBParams);
     db[":f_menu"] = C5Config::defaultMenu();
     db.exec("select f_id, f_name, f_color \
@@ -487,11 +488,13 @@ void Workspace::on_btnCheckout_clicked()
     db.startTransaction();
     C5StoreDraftWriter dw(db);
     QString id;
-    if (!dw.writeOHeader(id, hallid.toInt(), prefix, ORDER_STATE_CLOSE, __c5config.defaultHall().toInt(),
-                         fSupplierId, QDate::currentDate(), QDate::currentDate(), dateCash,
-                         QTime::currentTime(), QTime::currentTime(), fUser.fId, fPhone, 1,
-                         ui->leTotal->getDouble(), ui->leTotal->getDouble(),
-                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, fCustomer)) {
+    if (!dw.writeOHeader(id, hallid.toInt(), prefix, ORDER_STATE_CLOSE,  __c5config.defaultHall(), fSupplierId,
+                         QDate::currentDate(), QDate::currentDate(), dateCash,
+                         QTime::currentTime(), QTime::currentTime(),
+                         fUser->id(), fPhone, 1,
+                         ui->leTotal->getDouble(), ui->leTotal->getDouble(), 0, 0, 0,
+                         0, 0, 0, 0,
+                         0, 0, 1, 1, 1, fCustomer)) {
         C5Message::error(dw.fErrorMsg);
         db.rollback();
         return;
@@ -594,7 +597,7 @@ void Workspace::on_btnCheckout_clicked()
     ui->leTotal->setDouble(0);
     ui->lbPhone->clear();
     ui->leInfo->setVisible(false);
-    payment *p = new payment(id, fDBParams);
+    payment *p = new payment(id, fDBParams, fUser);
     p->exec();
     //p->justPrint();
     delete p;

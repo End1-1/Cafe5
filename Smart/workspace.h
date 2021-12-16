@@ -2,7 +2,6 @@
 #define WORKSPACE_H
 
 #include "c5dialog.h"
-#include "c5user.h"
 #include "dish.h"
 
 namespace Ui {
@@ -12,6 +11,7 @@ class Workspace;
 class QTableWidgetItem;
 class QTableWidget;
 class QListWidgetItem;
+class C5User;
 
 class Workspace : public C5Dialog
 {
@@ -70,7 +70,7 @@ private slots:
 private:
     Ui::Workspace *ui;
 
-    C5User fUser;
+    C5User *fUser;
 
     QList<Dish*> fDishes;
 

@@ -67,8 +67,10 @@ bool C5User::authByPinPass(const QString &pin, const QString &pass)
     } else {
         fError = tr("Login failed");
     }
-    getPermissions();
-    getState();
+    if (fError.isEmpty()) {
+        getPermissions();
+        getState();
+    }
     return fError.isEmpty();
 }
 

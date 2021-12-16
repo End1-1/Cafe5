@@ -97,6 +97,7 @@
 #define cp_t5_bill_without_service 532
 #define cp_t5_edit_closed_order 533
 #define cp_t5_present 534
+#define cp_t5_edit_booking 535
 
 #define cp_t6_goods_menu 600
 #define cp_t6_units 601

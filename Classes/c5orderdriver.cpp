@@ -501,6 +501,46 @@ bool C5OrderDriver::addDish(int menuid, const QString &comment, double price)
     return fetchDishesData("", id);
 }
 
+bool C5OrderDriver::addDish2(int packageid, double qty)
+{
+    if (fCurrentOrderId.isEmpty()) {
+        save();
+    }
+    QString id = C5Database::uuid();
+    C5Database db(fDbParams);
+    DbMenuPackageList p(packageid);
+    db[":f_id"] = id;
+    db[":f_header"] = fCurrentOrderId;
+    db[":f_state"] = DISH_STATE_OK;
+    db[":f_dish"] = p.dish();
+    db[":f_qty1"] = p.qty() * qty;
+    db[":f_qty2"] = 0;
+    db[":f_price"] = p.price();
+    db[":f_service"] = dbdish->canService(p.dish()) ? headerValue("f_servicefactor").toDouble() : 0;
+    db[":f_discount"] = dbdish->canDiscount(p.dish()) ? headerValue("f_discountfactor").toDouble() : 0;
+    db[":f_total"] = 0;
+    db[":f_store"] = p.store();
+    db[":f_print1"] = p.print1();
+    db[":f_print2"] = p.print2();
+    db[":f_comment"] = "";
+    db[":f_comment2"] = "";
+    db[":f_remind"] = 0;
+    db[":f_adgcode"] = dbdishpart2->adgcode(dbdish->group(p.dish()));
+    db[":f_removereason"] = "";
+    db[":f_timeorder"] = 1;
+    db[":f_package"] = 0;
+    db[":f_candiscount"] = dbdish->canDiscount(p.dish());
+    db[":f_canservice"] = dbdish->canService(p.dish());
+    db[":f_guest"] = 1;
+    db[":f_row"] = dishesCount();
+    db[":f_appendtime"] = QDateTime::currentDateTime();
+    if (!db.insert("o_body", false)) {
+        fLastError = db.fLastError;
+        return false;
+    }
+    return fetchDishesData("", id);
+}
+
 bool C5OrderDriver::addDish(QMap<QString, QVariant> o)
 {
     if (fCurrentOrderId.isEmpty()) {

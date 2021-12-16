@@ -8,17 +8,22 @@ class payment;
 }
 
 class QTableWidget;
+class C5User;
 
 class payment : public C5Dialog
 {
     Q_OBJECT
 
 public:
-    explicit payment(const QString order, const QStringList &dbParams);
+    explicit payment(const QString order, const QStringList &dbParams, C5User *user);
 
     ~payment();
 
     void justPrint();
+
+    virtual void accept() override;
+
+    virtual void reject() override;
 
 private slots:
     void focusChangeLineEdit();
@@ -45,6 +50,10 @@ private:
     Ui::payment *ui;
 
     QString fOrderUUID;
+
+    C5User *fUser;
+
+    bool fCanAccept;
 
     void checkout(bool cash);
 

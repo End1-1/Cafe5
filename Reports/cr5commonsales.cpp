@@ -252,7 +252,8 @@ void CR5CommonSales::exportToAS()
     }
     QString partnercode, storecode, servicecode, srvinacc, srvoutacc, iteminacc, itemoutacc, bankacc, vat, simpleItem;
     bool simple;
-    int option = DlgExportSaleToAsOptions::getOption(fDBParams, partnercode, storecode, servicecode, srvinacc, srvoutacc, iteminacc, itemoutacc, bankacc, vat, simple, simpleItem);
+    int option = DlgExportSaleToAsOptions::getOption(fDBParams, partnercode, storecode, servicecode, srvinacc, srvoutacc,
+                                                     iteminacc, itemoutacc, bankacc, vat, simple, simpleItem);
     if (option == 0) {
         return;
     }

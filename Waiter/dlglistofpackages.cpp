@@ -1,20 +1,24 @@
 #include "dlglistofpackages.h"
 #include "ui_dlglistofpackages.h"
 #include "c5menu.h"
+#include "datadriver.h"
 
 DlgListOfPackages::DlgListOfPackages(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::DlgListOfPackages)
 {
     ui->setupUi(this);
-    ui->tbl->setRowCount(C5Menu::fPackages.count() + 1);
+    ui->tbl->setRowCount(dbmenupackage->list().count() + 1);
     ui->tbl->setColumnWidths(3, 0, 300, 100);
     int row = 0;
-    for (QMap<QString, QJsonObject>::const_iterator it = C5Menu::fPackages.begin(); it != C5Menu::fPackages.end(); it++) {
-        QJsonObject o = it.value();
-        ui->tbl->setString(row, 0, o["f_id"].toString());
-        ui->tbl->setString(row, 1, o["f_name"].toString());
-        ui->tbl->setString(row, 2, o["f_price"].toString());
+    for (int id: dbmenupackage->list()) {
+        DbMenuPackages p(id);
+        if (!p.isEnabled()) {
+            continue;
+        }
+        ui->tbl->setInteger(row, 0, id);
+        ui->tbl->setString(row, 1, p.name());
+        ui->tbl->setDouble(row, 2, p.price());
         row++;
     }
     ui->tbl->setSpan(ui->tbl->rowCount() - 1, 0, 1, 3);

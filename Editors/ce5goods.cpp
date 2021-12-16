@@ -485,6 +485,9 @@ void CE5Goods::countTotal()
 void CE5Goods::setComplectFlag()
 {
     ui->leIsComplect->setInteger(ui->tblGoods->rowCount() == 0 ? 0 : 1);
+    if (ui->leComplectOutputQty->getDouble() < 0.001) {
+        ui->leComplectOutputQty->setDouble(1);
+    }
 }
 
 void CE5Goods::on_btnNewGoods_clicked()

@@ -4,16 +4,19 @@
 #include "c5storedraftwriter.h"
 #include "c5printing.h"
 #include "c5database.h"
+#include "c5user.h"
 #include "dish.h"
 #include <QFile>
 #include <QPrinter>
 #include <QShortcut>
 
-payment::payment(const QString order, const QStringList &dbParams) :
+payment::payment(const QString order, const QStringList &dbParams, C5User *user) :
     C5Dialog(dbParams),
     ui(new Ui::payment)
 {
     ui->setupUi(this);
+    fUser = user;
+    fCanAccept = false;
     fOrderUUID = order;
     ui->btnTax->setChecked(__c5config.getRegValue("taxprint").toBool());
     QFont f(qApp->font());
@@ -41,7 +44,9 @@ payment::payment(const QString order, const QStringList &dbParams) :
     if (__c5config.getValue(param_tax_print_always_offer).toInt() != 0) {
         ui->btnTax->setEnabled(false);
         ui->btnTax->setChecked(true);
+        ui->btnCancel->setVisible(false);
     }
+    ui->btnCheckoutOther->setEnabled(pr(dbParams.at(1), cp_t5_pay_complimentary));
 }
 
 payment::~payment()
@@ -52,6 +57,18 @@ payment::~payment()
 void payment::justPrint()
 {
     on_btnCheckoutCash_clicked();
+}
+
+void payment::accept()
+{
+    if (fCanAccept) {
+        C5Dialog::accept();
+    }
+}
+
+void payment::reject()
+{
+    accept();
 }
 
 void payment::focusChangeLineEdit()
@@ -79,6 +96,7 @@ void payment::on_btnTax_clicked(bool checked)
 
 void payment::on_btnCancel_clicked()
 {
+    fCanAccept = true;
     reject();
 }
 
@@ -127,7 +145,9 @@ void payment::checkout(bool cash)
         return;
     }
     QString cashdoc;
-    if (!dw.writeAHeader(cashdoc, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH, __userid, QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, ui->leAmount->getDouble(), cashprefix + " " + headerNum, 0, 0)) {
+    if (!dw.writeAHeader(cashdoc, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH,
+                         fUser->id(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(),
+                         0, ui->leAmount->getDouble(), cashprefix + " " + headerNum, 0, 0)) {
         C5Message::error(dw.fErrorMsg);
         return;
     }
@@ -141,6 +161,7 @@ void payment::checkout(bool cash)
         return;
     }
     if (printReceipt(true)) {
+        fCanAccept = true;
         accept();
     }
 }
@@ -421,6 +442,7 @@ void payment::on_btnCheckoutOther_clicked()
     }
 
     if (printReceipt(true)) {
+        fCanAccept = true;
         accept();
     }
 }
