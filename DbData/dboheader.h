@@ -21,6 +21,8 @@ public:
 
     int staff(const QString &id);
 
+    int state(const QString &id);
+
     double amount(const QString &id);
 
     int precheck(const QString &id);

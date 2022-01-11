@@ -9,7 +9,7 @@ C5Permissions::C5Permissions()
 
 }
 
-void C5Permissions::init(C5Database &db)
+void C5Permissions::init(C5Database &db, int group)
 {
 
     fPermissions[db.database()].clear();
@@ -103,6 +103,8 @@ void C5Permissions::init(C5Database &db)
               << cp_t5_edit_closed_order
               << cp_t5_present
               << cp_t5_edit_booking
+              << cp_t5_pay_idram
+              << cp_t5_pay_payx
 
               << cp_t6_storage
               << cp_t6_goods_menu
@@ -144,11 +146,11 @@ void C5Permissions::init(C5Database &db)
               << cp_t10_product_list
               << cp_t10_general_report
                  ;
-    if (__usergroup == 1) {
+    if (group == 1) {
         fPermissions[db.database()] = fTemplate;
         return;
     }
-    db[":f_group"] = __usergroup;
+    db[":f_group"] = group;
     db.exec("select f_key from s_user_access where f_group=:f_group");
     while (db.nextRow()) {
         fPermissions[db.database()] << db.getInt(0);
@@ -159,10 +161,4 @@ void C5Permissions::clear()
 {
     fPermissions.clear();
     fTemplate.clear();
-}
-
-bool pr(const QString &db, int permission)
-{
-    QList<int> &p = C5Permissions::fPermissions[db];
-    return p.contains(permission);
 }

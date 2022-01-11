@@ -1,5 +1,6 @@
 #include "c5config.h"
 #include "c5database.h"
+#include "c5user.h";
 #include <QDir>
 #include <QMutex>
 #include <QDebug>
@@ -18,10 +19,7 @@ QString C5Config::fDBPassword;
 QString C5Config::fFullScreen;
 QStringList __autologin_store;
 C5Config __c5config;
-int __userid;
-int __usergroup;
-QString __username;
-QList<int> __userpermissions;
+C5User *__user;
 QStringList __databases;
 QMap<int, QString> C5Config::fSettings;
 static QMutex settingsMutex;

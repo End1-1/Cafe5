@@ -183,43 +183,43 @@
 <context>
     <name>ShopRequest</name>
     <message>
-        <location filename="handlers/shoprequest.cpp" line="82"/>
+        <location filename="handlers/shoprequest.cpp" line="97"/>
         <source>Delivery address</source>
         <translation>Առաքման հասցե</translation>
     </message>
     <message>
-        <location filename="handlers/shoprequest.cpp" line="85"/>
+        <location filename="handlers/shoprequest.cpp" line="100"/>
         <source>phone</source>
         <translation>հեռ․</translation>
     </message>
     <message>
-        <location filename="handlers/shoprequest.cpp" line="158"/>
+        <location filename="handlers/shoprequest.cpp" line="173"/>
         <source>Delivery</source>
         <translation>Առաքում</translation>
     </message>
     <message>
-        <location filename="handlers/shoprequest.cpp" line="179"/>
+        <location filename="handlers/shoprequest.cpp" line="194"/>
         <source>(F)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="handlers/shoprequest.cpp" line="447"/>
+        <location filename="handlers/shoprequest.cpp" line="462"/>
         <source>Invalid document id</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="handlers/shoprequest.cpp" line="556"/>
+        <location filename="handlers/shoprequest.cpp" line="571"/>
         <source>Not enough materials in the store</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="handlers/shoprequest.cpp" line="666"/>
+        <location filename="handlers/shoprequest.cpp" line="681"/>
         <source>AUTOMATICALY (%1, %2)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="handlers/shoprequest.cpp" line="795"/>
-        <location filename="handlers/shoprequest.cpp" line="805"/>
+        <location filename="handlers/shoprequest.cpp" line="810"/>
+        <location filename="handlers/shoprequest.cpp" line="820"/>
         <source>Moved to online store</source>
         <translation>Տեղափոխված է առաքման պահեստ</translation>
     </message>

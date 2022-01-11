@@ -48,6 +48,8 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
                    << "sum(oh.f_amountcard) as f_amountcard"
                    << "sum(oh.f_amountbank) as f_amountbank"
                    << "sum(oh.f_amountother) as f_amountother"
+                   << "sum(oh.f_amountidram) as f_amountidram"
+                   << "sum(oh.f_amountpayx) as f_amountpayx"
                    << "oh.f_amountservice"
                    << "oh.f_amountdiscount"
                    << "oh.f_comment"
@@ -78,6 +80,8 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
                 << "f_amountcard"
                 << "f_amountbank"
                 << "f_amountother"
+                << "f_amountidram"
+                << "f_amountpayx"
                 << "f_amountservice"
                 << "f_amountdiscount"
                 << "f_count"
@@ -110,6 +114,8 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_amountcard"] = tr("Card");
     fTranslation["f_amountbank"] = tr("Bank");
     fTranslation["f_amountother"] = tr("Other");
+    fTranslation["f_amountidram"] = tr("Idram");
+    fTranslation["f_amountpayx"] = tr("PayX");
     fTranslation["f_amountservice"] = tr("Service");
     fTranslation["f_amountdiscount"] = tr("Discount");
     fTranslation["f_comment"] = tr("Comment");
@@ -134,6 +140,8 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
     fColumnsVisible["sum(oh.f_amountcard) as f_amountcard"] = true;
     fColumnsVisible["sum(oh.f_amountbank) as f_amountbank"] = true;
     fColumnsVisible["sum(oh.f_amountother) as f_amountother"] = true;
+    fColumnsVisible["sum(oh.f_amountidram) as f_amountidram"] = true;
+    fColumnsVisible["sum(oh.f_amountpayx) as f_amountpayx"] = true;
     fColumnsVisible["oh.f_amountservice"] = false;
     fColumnsVisible["oh.f_amountdiscount"] = false;
     fColumnsVisible["oh.f_comment"] = false;

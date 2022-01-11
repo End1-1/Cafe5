@@ -5,6 +5,8 @@
 
 class CR5MFProduct : public C5ReportWidget
 {
+    Q_OBJECT
+
 public:
     CR5MFProduct(const QStringList &dbParams, QWidget *parent = nullptr);
 

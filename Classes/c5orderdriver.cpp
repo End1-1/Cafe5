@@ -132,6 +132,10 @@ bool C5OrderDriver::loadData(const QString id)
         return false;
     }
 
+    if (!fetchTableData("select * from o_preorder where f_id='" + id +"'", fHeaderPreorder)) {
+        return false;
+    }
+
     if (!fetchDishesData(id, "")) {
         return false;
     }
@@ -240,12 +244,26 @@ bool C5OrderDriver::isEmpty()
     if (fHeader.count() == 0) {
         return true;
     }
-    if (headerValue("f_state").toInt() == ORDER_STATE_PREORDER_1 ||
-            headerValue("f_state").toInt() == ORDER_STATE_PREORDER_2) {
+    if (headerValue("f_state").toInt() == ORDER_STATE_VOID) {
+        return true;
+    }
+    if (preorder("f_prepaidcash").toDouble()
+            + preorder("f_prepaidcard").toDouble()
+            + preorder("f_prepaidpayx").toDouble() > 0.01) {
+        if (dbhall->booking(headerValue("f_hall").toInt())) {
+            setHeader("f_state", ORDER_STATE_PREORDER_EMPTY);
+        }
+        return false;
+    }
+    if (headerValue("f_state").toInt() == ORDER_STATE_PREORDER_EMPTY ||
+            headerValue("f_state").toInt() == ORDER_STATE_PREORDER_WITH_ORDER) {
         return false;
     }
     for (int i = 0; i < fDishes.count(); i++) {
         if (dishesValue("f_state", i).toInt() == DISH_STATE_OK) {
+            if (dbhall->booking(headerValue("f_hall").toInt())) {
+                setHeader("f_state", ORDER_STATE_PREORDER_WITH_ORDER);
+            }
             return false;
         }
     }
@@ -427,11 +445,13 @@ C5OrderDriver &C5OrderDriver::setHeaderOption(const QString &key, const QVariant
 
 QVariant C5OrderDriver::headerOptionsValue(const QString &key)
 {
+    Q_ASSERT(fHeaderOptions.contains(key));
     return fHeaderOptions[key];
 }
 
 C5OrderDriver &C5OrderDriver::setPreorder(const QString &key, const QVariant &value)
 {
+    Q_ASSERT(fHeaderPreorder.contains(key));
     fHeaderPreorder[key] = value;
     fTableData["o_preorder"][key] = value;
     return *this;

@@ -140,21 +140,21 @@
        <widget class="QToolButton" name="btnCancel">
         <property name="minimumSize">
          <size>
-          <width>48</width>
-          <height>48</height>
+          <width>60</width>
+          <height>60</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>48</width>
-          <height>48</height>
+          <width>60</width>
+          <height>60</height>
          </size>
         </property>
         <property name="text">
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="../resources/res.qrc">
+         <iconset resource="../resources/resources.qrc">
           <normaloff>:/cancel.png</normaloff>:/cancel.png</iconset>
         </property>
         <property name="iconSize">
@@ -188,31 +188,6 @@
         </property>
         <property name="text">
          <string>By waiters</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QToolButton" name="btnShowHidePreorders">
-        <property name="minimumSize">
-         <size>
-          <width>140</width>
-          <height>60</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Preorders</string>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>32</width>
-          <height>32</height>
-         </size>
         </property>
        </widget>
       </item>
@@ -286,56 +261,6 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="C5TableWidget" name="tblReserved">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-          <horstretch>1</horstretch>
-          <verstretch>1</verstretch>
-         </sizepolicy>
-        </property>
-        <column>
-         <property name="text">
-          <string>Order UUID</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Table</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Date for</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Time for</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Cash prepaid</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Card prepaid</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Guests</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>State</string>
-         </property>
-        </column>
-       </widget>
-      </item>
-      <item>
        <widget class="QWidget" name="whall" native="true">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -373,7 +298,7 @@
               <x>0</x>
               <y>0</y>
               <width>888</width>
-              <height>337</height>
+              <height>682</height>
              </rect>
             </property>
             <layout class="QGridLayout" name="sglHall">
@@ -408,14 +333,8 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <customwidgets>
-  <customwidget>
-   <class>C5TableWidget</class>
-   <extends>QTableWidget</extends>
-   <header location="global">c5tablewidget.h</header>
-  </customwidget>
- </customwidgets>
  <resources>
+  <include location="../resources/resources.qrc"/>
   <include location="../resources/res.qrc"/>
  </resources>
  <connections/>

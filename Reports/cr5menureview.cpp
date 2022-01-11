@@ -28,7 +28,7 @@ CR5MenuReview::CR5MenuReview(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_part2"] = tr("Type");
     fTranslation["f_dishname"] = tr("Dish name");
     fTranslation["f_price"] = tr("Price");
-    fTranslation["f_cost"] = tr("f_cost");
+    fTranslation["f_cost"] = tr("Selfcost");
     fTranslation["f_storename"] = tr("Storage");
     fTranslation["f_print1"] = tr("Print 1");
     fTranslation["f_print2"] = tr("Print 2");

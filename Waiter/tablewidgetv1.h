@@ -1,13 +1,13 @@
 #ifndef TABLEWIDGETV1_H
 #define TABLEWIDGETV1_H
 
-#include <QWidget>
+#include "tablewidget.h"
 
 namespace Ui {
 class TableWidgetV1;
 }
 
-class TableWidgetV1 : public QWidget
+class TableWidgetV1 : public TableWidget
 {
     Q_OBJECT
 
@@ -16,19 +16,20 @@ public:
 
     ~TableWidgetV1();
 
-    int fTable;
+    QLabel *labelTable();
 
-    void config(int id);
+    QLabel *labelStaff();
 
-    void configOrder(const QString &orderid);
+    QLabel *labelTime();
 
-    virtual void mouseReleaseEvent(QMouseEvent *me);
+    QLabel *labelAmount();
+
+    QLabel *labelComment();
+
+    QFrame *frame();
 
 private:
     Ui::TableWidgetV1 *ui;
-
-signals:
-    void clicked(int);
 };
 
 #endif // TABLEWIDGETV1_H

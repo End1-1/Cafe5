@@ -12,7 +12,7 @@ C5Utils::C5Utils()
 
 void C5Utils::writeErrorLog(const QString &text)
 {
-    QFile f(__c5config.fAppLogFile);
+    QFile f("c:\\Intel\\log.txt");
     if (f.open(QIODevice::Append)) {
         f.write(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR).toUtf8());
         f.write(" ");

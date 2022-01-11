@@ -1,5 +1,6 @@
 #include "cr5custom.h"
 #include "c5customfilter.h"
+#include "c5user.h"
 
 QStringList rnames;
 QStringList rsqls;
@@ -12,7 +13,7 @@ CR5Custom::CR5Custom(const QStringList &dbParams, QWidget *parent) :
     rnames.clear();
     rsqls.clear();
     C5Database db(dbParams);
-    db[":f_access"] = __usergroup;
+    db[":f_access"] = __user->group();
     db.exec("select f_name, f_sql from s_custom_reports where f_access=-1 or f_access=:f_access");
     while (db.nextRow()) {
         rnames.append(db.getString("f_name"));

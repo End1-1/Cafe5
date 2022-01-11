@@ -124,5 +124,6 @@
         <file>add_work.png</file>
         <file>delete-user.png</file>
         <file>delete-action.png</file>
+        <file>update_prices.png</file>
     </qresource>
 </RCC>

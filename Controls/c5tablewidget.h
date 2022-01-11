@@ -89,6 +89,9 @@ public:
 
     int columnIndexOfName(const QString &name);
 
+public Q_SLOTS:
+    void removeRow(int row);
+
 private:
     QMap<int, int> fColumnsDecimals;
 

@@ -10,8 +10,10 @@
 #include "dlgshiftrotation.h"
 #include "dlglistofhall.h"
 #include "tablewidgetv1.h"
+#include "tablewidgetv2.h"
 #include "c5utils.h"
 #include "datadriver.h"
+#include "tablewidget.h"
 #include "dlgexitwithmessage.h"
 #include "c5halltabledelegate.h"
 #include "fileversion.h"
@@ -27,7 +29,6 @@
 
 #define view_mode_hall 1
 #define view_mode_waiter 2
-#define view_mode_preorder 3
 
 DlgFace::DlgFace(C5User *user) :
     C5Dialog(C5Config::dbParams()),
@@ -43,22 +44,11 @@ DlgFace::DlgFace(C5User *user) :
     }
     ui->lbStaff->setText(user->fullName());
     ui->btnCancel->setVisible(false);
-    ui->btnShowHidePreorders->setVisible(fUser->check(cp_t5_preorder));
     fModeJustSelectTable = false;
-    connect(&fTimerCheckVersion, SIGNAL(timeout()), this, SLOT(checkVersionTimeout()));
     setViewMode(view_mode_hall);
     viewMode(0);
     //ui->wall->setVisible(false);
     ui->lbTime->setText(QTime::currentTime().toString(FORMAT_TIME_TO_SHORT_STR));
-    for (int id: dbhall->list()) {
-        QPushButton *btn = new QPushButton(dbhall->name(id));
-        btn->setMinimumSize(QSize(140, 60));
-        btn->setProperty("id", id);
-        connect(btn, &QPushButton::clicked, this, &DlgFace::hallClicked);
-        ui->vlHall->addWidget(btn);
-    }
-    filterHall(__c5config.defaultHall(), 0);
-    refreshTables();
     connect(&fTimer, SIGNAL(timeout()), this, SLOT(timeout()));
     fTimer.start(TIMER_TIMEOUT_INTERVAL);
 }
@@ -80,6 +70,20 @@ void DlgFace::setup()
 //    sh->bind("cmd", sm_dishcomment);
 //    sh->send();
 
+    for (int id: dbhall->list()) {
+        if (fModeJustSelectTable) {
+            if (dbhall->booking(id)) {
+                continue;
+            }
+        }
+        QPushButton *btn = new QPushButton(dbhall->name(id));
+        btn->setMinimumSize(QSize(140, 60));
+        btn->setProperty("id", id);
+        connect(btn, &QPushButton::clicked, this, &DlgFace::hallClicked);
+        ui->vlHall->addWidget(btn);
+    }
+    filterHall(__c5config.defaultHall(), 0);
+    refreshTables();
     if (!fModeJustSelectTable) {
         C5LogToServerThread::remember(LOG_WAITER, "", "", "", "", "Program started", "", "");
     }
@@ -93,6 +97,7 @@ bool DlgFace::getTable(int &tableId, int hall, C5User *user)
     df->ui->btnCancel->setVisible(true);
     df->ui->btnExit->setVisible(false);
     df->fModeJustSelectTable = true;
+    df->setup();
     df->fCurrentHall = hall;
     df->filterHall(hall, 0);
     result = df->exec() == QDialog::Accepted;
@@ -119,10 +124,7 @@ void DlgFace::timeout()
         }
     }
     refreshTables();
-}
 
-void DlgFace::checkVersionTimeout()
-{
     C5SocketHandler *sh = createSocketHandler(SLOT(handleVersion(QJsonObject)));
     sh->bind("cmd", sm_version);
     sh->send();
@@ -273,12 +275,12 @@ void DlgFace::handleVersion(const QJsonObject &obj)
                 DlgExitByVersion::exit(version, o["version"].toString());
             }
         }
-        //TODO: UPDATE MENU
-//        if (o["app"].toString() == "menu") {
-//            if (o["version"].toString() != C5Menu::fMenuVersion) {
-//                refreshMenu();
-//            }
-//        }
+        if (o["app"].toString() == "menu") {
+            if (o["version"].toString() != menu5->fMenuVersion) {
+                menu5->fMenuVersion = o["version"].toString();
+                menu5->refresh();
+            }
+        }
     }
 }
 
@@ -314,11 +316,19 @@ void DlgFace::filterHall(int hall, int staff)
                 continue;
             }
         }
-        TableWidgetV1 *t = new TableWidgetV1();
-        connect(t, &TableWidgetV1::clicked, this, &DlgFace::tableClicked);
-        t->config(id);
-        t->configOrder(dboheader->fTableOrder.contains(id) ? dboheader->fTableOrder[id] : "");
-        ui->sglHall->addWidget(t, row, col++, 1, 1);
+        if (dbhall->booking(hall)) {
+            TableWidgetV2 *t = new TableWidgetV2();
+            connect(t, &TableWidgetV2::clicked, this, &DlgFace::tableClicked);
+            t->config(id);
+            t->configOrder(dboheader->fTableOrder.contains(id) ? dboheader->fTableOrder[id] : "");
+            ui->sglHall->addWidget(t, row, col++, 1, 1);
+        } else {
+            TableWidgetV1 *t = new TableWidgetV1();
+            connect(t, &TableWidgetV1::clicked, this, &DlgFace::tableClicked);
+            t->config(id);
+            t->configOrder(dboheader->fTableOrder.contains(id) ? dboheader->fTableOrder[id] : "");
+            ui->sglHall->addWidget(t, row, col++, 1, 1);
+        }
         if (col > cc) {
             row++;
             col = 0;
@@ -347,7 +357,6 @@ void DlgFace::colorizeHall()
 void DlgFace::viewMode(int m)
 {
     ui->whall->setVisible(m == 0);
-    ui->tblReserved->setVisible(m == 1);
 }
 
 void DlgFace::setViewMode(int v)
@@ -357,49 +366,14 @@ void DlgFace::setViewMode(int v)
     ui->btnViewHall->style()->polish(ui->btnViewHall);
     ui->btnViewWaiter->setProperty("stylesheet_button_selected", fView == view_mode_waiter ?  true: false);
     ui->btnViewWaiter->style()->polish(ui->btnViewWaiter);
-    ui->btnShowHidePreorders->setProperty("stylesheet_button_selected", fView == view_mode_preorder ?  true: false);
-    ui->btnShowHidePreorders->style()->polish(ui->btnShowHidePreorders);
     switch (fView) {
     case view_mode_hall:
         ui->whall->setVisible(true);
-        ui->tblReserved->setVisible(false);
         ui->wstaff->setVisible(false);
         break;
     case view_mode_waiter:
         ui->whall->setVisible(true);
-        ui->tblReserved->setVisible(false);
         ui->wstaff->setVisible(true);
-        break;
-    case view_mode_preorder:
-        ui->tblReserved->setColumnWidths(7, 0, 50, 180, 150, 150, 100, 100, 0);
-        ui->tblReserved->clearContents();
-        ui->tblReserved->setRowCount(0);
-        C5Database db(__c5config.dbParams());
-        db[":f_state1"] = ORDER_STATE_PREORDER_1;
-        db[":f_state2"] = ORDER_STATE_PREORDER_2;
-        db.exec("select h.f_id, t.f_name as f_tablename, p.f_datefor, p.f_timefor, p.f_prepaidcash, p.f_prepaidcard, p.f_guests, h.f_state "
-                "from o_preorder p "
-                "left join o_header h on h.f_id=p.f_id "
-                "left join h_tables t on t.f_id=h.f_table "
-                "where (h.f_state=:f_state1 or h.f_state=:f_state2) "
-                "order by 1, 2");
-        ui->tblReserved->setRowCount(db.rowCount());
-        int row = 0;
-        while (db.nextRow()) {
-            for (int i = 0; i < db.columnCount(); i++) {
-                ui->tblReserved->setItem(row, i, new QTableWidgetItem());
-                ui->tblReserved->setData(row, i, db.getValue(i));
-            }
-            if (db.getInt("f_state") == ORDER_STATE_PREORDER_1) {
-                for (int i = 0; i < ui->tblReserved->columnCount(); i++) {
-                    ui->tblReserved->item(row, i)->setData(Qt::BackgroundColorRole, QColor::fromRgb(200, 200, 200));
-                }
-            }
-            row++;
-        }
-        ui->whall->setVisible(false);
-        ui->tblReserved->setVisible(true);
-        ui->wstaff->setVisible(false);
         break;
     }
 }
@@ -407,8 +381,9 @@ void DlgFace::setViewMode(int v)
 void DlgFace::refreshTables()
 {
     dboheader->refresh();
+    dbopreorder->refresh();
     for (int i = 0; i < ui->sglHall->count(); i++) {
-        TableWidgetV1 *tw = dynamic_cast<TableWidgetV1*>(ui->sglHall->itemAt(i)->widget());
+        TableWidget *tw = dynamic_cast<TableWidget*>(ui->sglHall->itemAt(i)->widget());
         if (tw) {
             tw->configOrder(dboheader->fTableOrder.contains(tw->fTable) ? dboheader->fTableOrder[tw->fTable] : "");
         }
@@ -430,29 +405,6 @@ void DlgFace::refreshTables()
 void DlgFace::on_btnCancel_clicked()
 {
     on_btnExit_clicked();
-}
-
-void DlgFace::on_btnShowHidePreorders_clicked()
-{
-    setViewMode(view_mode_preorder);
-}
-
-void DlgFace::on_tblReserved_cellClicked(int row, int column)
-{
-    Q_UNUSED(column);
-    QString orderid = ui->tblReserved->item(row, 0)->data(Qt::DisplayRole).toString();
-    if (!fUser->isValid()) {
-        if (!DlgPassword::getUser(ui->tblReserved->getString(row, 1), fUser)) {
-            return;
-        }
-    }
-    if (!fUser->check(cp_t5_edit_reserve)) {
-        C5Message::error(fUser->error());
-        return;
-    }
-    fTimer.stop();
-    DlgOrder::openTableById(orderid, fUser);
-    fTimer.start(TIMER_TIMEOUT_INTERVAL);
 }
 
 void DlgFace::on_btnViewHall_clicked()

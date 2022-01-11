@@ -1,6 +1,7 @@
 #include "c5login.h"
 #include "ui_c5login.h"
 #include "c5connection.h"
+#include "c5user.h"
 
 C5Login::C5Login(const QStringList &dbParams) :
     C5Dialog(dbParams),
@@ -44,23 +45,19 @@ void C5Login::on_btnCancel_clicked()
 
 void C5Login::on_btnOk_clicked()
 {
-    C5Database db(fDBParams);
-    db[":f_login"] = ui->leUsername->text();
-    db[":f_password"] = password(ui->lePassword->text());
-    db.exec("select f_id, f_group, f_state, concat(f_last, ' ', f_first) from s_user where f_login=:f_login and f_password=:f_password");
-    if (!db.nextRow()) {
+    if (!__user) {
+        __user = new C5User(0);
+    }
+    if (!__user->authByUsernamePass(ui->leUsername->text(), ui->lePassword->text())) {
         __autologin_store.clear();
         C5Message::error(tr("Login failed"));
         return;
     }
-    if (db.getInt(2) == 0) {
+    if (!__user->isActive()) {
         __autologin_store.clear();
         C5Message::error(tr("User is inactive"));
         return;
     }
-    __userid = db.getInt(0);
-    __usergroup = db.getInt(1);
-    __username = db.getString(3);
 
     C5Config::fLastUsername = ui->leUsername->text();
     C5Connection::writeParams();

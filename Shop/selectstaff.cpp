@@ -2,6 +2,7 @@
 #include "ui_selectstaff.h"
 #include "working.h"
 #include "userphoto.h"
+#include "c5user.h"
 #include "c5config.h"
 
 SelectStaff::SelectStaff(QWidget *parent) :
@@ -9,6 +10,7 @@ SelectStaff::SelectStaff(QWidget *parent) :
     ui(new Ui::SelectStaff)
 {
     ui->setupUi(this);
+    fUser = new C5User(0);
     fWorking = static_cast<Working*>(parent);
     int r = 0, c = 0;
     for (int i = 0; i < fWorking->fCurrentUsers.count(); i++) {
@@ -27,6 +29,7 @@ SelectStaff::SelectStaff(QWidget *parent) :
 SelectStaff::~SelectStaff()
 {
     delete ui;
+    delete fUser;
 }
 
 void SelectStaff::on_leNum_returnPressed()
@@ -36,8 +39,7 @@ void SelectStaff::on_leNum_returnPressed()
         return;
     }
     const IUser &u = fWorking->fCurrentUsers.at(ui->leNum->getInteger() - 1);
-    __userid = u.id;
-    __usergroup = u.group;
-    __username = u.name;
-    accept();
+    if (fUser->loadFromDB(u.id)) {
+        accept();
+    }
 }

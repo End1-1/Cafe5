@@ -86,6 +86,8 @@ private:
 
     void calcAmount(C5LineEdit *l);
 
+    void lineEditToHeader();
+
     void headerToLineEdit();
 
     void clearOther();
@@ -150,8 +152,6 @@ private slots:
     void on_btnPrintService_clicked();
 
     void on_btnSit_clicked();
-
-    void on_btnSetReserve_clicked();
 
     void on_btnSplitGuest_clicked();
 
@@ -236,6 +236,18 @@ private slots:
     void on_btnDishUp_clicked();
 
     void on_btnPresent_clicked();
+
+    void on_btnPreorder_clicked();
+
+    void on_btnPaymentIdram_clicked();
+
+    void on_btnFillPayX_clicked();
+
+    void on_btnCalcPayX_clicked();
+
+    void on_btnPayX_clicked();
+
+    void on_btnFillIdram_clicked();
 };
 
 #endif // DLGORDER_H

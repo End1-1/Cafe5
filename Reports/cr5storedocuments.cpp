@@ -28,9 +28,9 @@ void CR5StoreDocuments::buildQuery()
     fSqlQuery = "select distinct(b.f_document) as f_document, h.f_date, h.f_userid, ds.f_name as f_docstatename, \
             p.f_taxname as f_partnername, t.f_name as f_typename, coalesce(concat(b2.f_storename2, '->', s.f_name), s.f_name) as f_storename, \
             sum(b.f_total*b.f_type) as f_amount \
-            from a_store b \
+            from a_store_draft b \
             left join (select b.f_document,  b.f_store, s2.f_name as f_storename2, sum(b.f_total) as f_total \
-                from a_store b \
+                from a_store_draft b \
                 left join a_header h on h.f_id=b.f_document  \
                 left join c_storages s2 on s2.f_id=b.f_store "
             + fFilterWidget->condition() + " and b.f_type=-1 and h.f_type=3 \

@@ -150,7 +150,7 @@ QLabel {color:yellow;background:green;}
          <string>Comment</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/res.qrc">
+         <iconset resource="../resources/resources.qrc">
           <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
         </property>
         <property name="iconSize">
@@ -237,7 +237,7 @@ QLabel {color:yellow;background:green;}
          <string>Menu</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/res.qrc">
+         <iconset resource="../resources/resources.qrc">
           <normaloff>:/search.png</normaloff>:/search.png</iconset>
         </property>
         <property name="iconSize">
@@ -376,38 +376,6 @@ QLabel {color:yellow;background:green;}
         </property>
         <property name="checkable">
          <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btnSetReserve">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>300</width>
-          <height>50</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Preorder</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../resources/res.qrc">
-          <normaloff>:/reservation.png</normaloff>:/reservation.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>32</width>
-          <height>32</height>
-         </size>
-        </property>
-        <property name="checkable">
-         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -668,7 +636,7 @@ LANGUAGE</string>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout">
          <property name="spacing">
-          <number>0</number>
+          <number>1</number>
          </property>
          <property name="leftMargin">
           <number>0</number>
@@ -682,6 +650,65 @@ LANGUAGE</string>
          <property name="bottomMargin">
           <number>0</number>
          </property>
+         <item>
+          <widget class="QWidget" name="wPreorder" native="true">
+           <layout class="QGridLayout" name="gridLayout_6">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item row="1" column="2">
+             <widget class="QLineEdit" name="leGuest">
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_2">
+              <property name="text">
+               <string>Guest</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="3">
+             <widget class="QToolButton" name="btnPreorder">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>...</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="2">
+             <widget class="C5LineEdit" name="lePrepaidAmount">
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_3">
+              <property name="text">
+               <string>Prepaid</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
          <item>
           <widget class="QWidget" name="wqty" native="true">
            <layout class="QGridLayout" name="gridLayout">
@@ -914,7 +941,7 @@ LANGUAGE</string>
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset resource="../resources/res.qrc">
+                  <iconset resource="../resources/resources.qrc">
                    <normaloff>:/recycle.png</normaloff>:/recycle.png</iconset>
                  </property>
                  <property name="iconSize">
@@ -1021,7 +1048,7 @@ background:#fff6e5;
               <x>0</x>
               <y>0</y>
               <width>380</width>
-              <height>659</height>
+              <height>609</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="vs">
@@ -1167,7 +1194,7 @@ background:#fff6e5;
                <string/>
               </property>
               <property name="icon">
-               <iconset resource="../resources/res.qrc">
+               <iconset resource="../resources/resources.qrc">
                 <normaloff>:/minus.png</normaloff>:/minus.png</iconset>
               </property>
               <property name="iconSize">
@@ -1196,7 +1223,7 @@ background:#fff6e5;
                <string/>
               </property>
               <property name="icon">
-               <iconset resource="../resources/res.qrc">
+               <iconset resource="../resources/resources.qrc">
                 <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
               </property>
               <property name="iconSize">
@@ -1312,8 +1339,110 @@ background:#fff6e5;
          <property name="spacing">
           <number>2</number>
          </property>
-         <item row="0" column="3">
-          <widget class="QPushButton" name="btnFillCash">
+         <item row="10" column="1">
+          <widget class="QLineEdit" name="leRoomComment">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="C5LineEdit" name="leCash">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>22</pointsize>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
+           <property name="text">
+            <string>0</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+           <property name="clearButtonEnabled">
+            <bool>true</bool>
+           </property>
+           <property name="pay" stdset="0">
+            <string>Cash</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="C5LineEdit" name="leIDRAM">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>22</pointsize>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
+           <property name="text">
+            <string>0</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+           <property name="clearButtonEnabled">
+            <bool>true</bool>
+           </property>
+           <property name="pay" stdset="0">
+            <string>Other</string>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="0">
+          <widget class="QLabel" name="Taxreceipt">
+           <property name="text">
+            <string>Tax receipt</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="3">
+          <widget class="QPushButton" name="btnFillCard">
            <property name="minimumSize">
             <size>
              <width>50</width>
@@ -1341,7 +1470,161 @@ background:#fff6e5;
            </property>
           </widget>
          </item>
-         <item row="4" column="0">
+         <item row="9" column="1">
+          <widget class="QLineEdit" name="leDiscountComment">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="9" column="0">
+          <widget class="QLabel" name="lbDiscount">
+           <property name="text">
+            <string>Discount</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QPushButton" name="btnCalcCash">
+           <property name="minimumSize">
+            <size>
+             <width>50</width>
+             <height>50</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>50</width>
+             <height>50</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources/resources.qrc">
+             <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>32</width>
+             <height>32</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="3">
+          <widget class="QPushButton" name="btnFillPrepaiment">
+           <property name="minimumSize">
+            <size>
+             <width>50</width>
+             <height>50</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>50</width>
+             <height>50</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources/res.qrc">
+             <normaloff>:/fill.png</normaloff>:/fill.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>32</width>
+             <height>32</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="C5LineEdit" name="lePrepaid">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>22</pointsize>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
+           <property name="text">
+            <string>0</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+           <property name="clearButtonEnabled">
+            <bool>true</bool>
+           </property>
+           <property name="pay" stdset="0">
+            <string>Prepaid</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="2">
+          <widget class="QPushButton" name="btnCalcPayX">
+           <property name="minimumSize">
+            <size>
+             <width>50</width>
+             <height>50</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>50</width>
+             <height>50</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources/resources.qrc">
+             <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>32</width>
+             <height>32</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
           <widget class="QPushButton" name="btnPaymentOther">
            <property name="minimumSize">
             <size>
@@ -1360,8 +1643,37 @@ background:#fff6e5;
 OTHER</string>
            </property>
            <property name="icon">
-            <iconset resource="../resources/res.qrc">
+            <iconset resource="../resources/resources.qrc">
              <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>32</width>
+             <height>32</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="3">
+          <widget class="QPushButton" name="btnFillCash">
+           <property name="minimumSize">
+            <size>
+             <width>50</width>
+             <height>50</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>50</width>
+             <height>50</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources/res.qrc">
+             <normaloff>:/fill.png</normaloff>:/fill.png</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -1406,25 +1718,8 @@ OTHER</string>
            </property>
           </widget>
          </item>
-         <item row="5" column="0">
-          <widget class="QLabel" name="label">
-           <property name="text">
-            <string>Remain</string>
-           </property>
-          </widget>
-         </item>
-         <item row="7" column="0">
-          <widget class="QLabel" name="lbDiscount">
-           <property name="text">
-            <string>Discount</string>
-           </property>
-          </widget>
-         </item>
          <item row="7" column="1">
-          <widget class="QLineEdit" name="leDiscountComment">
-           <property name="enabled">
-            <bool>true</bool>
-           </property>
+          <widget class="C5LineEdit" name="leRemain">
            <property name="maximumSize">
             <size>
              <width>16777215</width>
@@ -1433,20 +1728,33 @@ OTHER</string>
            </property>
            <property name="font">
             <font>
+             <pointsize>22</pointsize>
              <weight>75</weight>
              <bold>true</bold>
             </font>
            </property>
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
+           <property name="text">
+            <string>0</string>
+           </property>
            <property name="alignment">
-            <set>Qt::AlignCenter</set>
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
            </property>
            <property name="readOnly">
             <bool>true</bool>
            </property>
+           <property name="clearButtonEnabled">
+            <bool>true</bool>
+           </property>
+           <property name="pay" stdset="0">
+            <string>Other</string>
+           </property>
           </widget>
          </item>
-         <item row="0" column="0">
-          <widget class="QPushButton" name="btnPaymentCash">
+         <item row="3" column="0">
+          <widget class="QPushButton" name="btnPrepayment">
            <property name="minimumSize">
             <size>
              <width>0</width>
@@ -1460,12 +1768,11 @@ OTHER</string>
             </size>
            </property>
            <property name="text">
-            <string>PAYMENT
-CASH</string>
+            <string>PREPAYMENT</string>
            </property>
            <property name="icon">
-            <iconset resource="../resources/resources.qrc">
-             <normaloff>:/wallet-with-money.png</normaloff>:/wallet-with-money.png</iconset>
+            <iconset resource="../resources/res.qrc">
+             <normaloff>:/prepayment.png</normaloff>:/prepayment.png</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -1505,108 +1812,8 @@ BANK</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="2">
-          <widget class="QPushButton" name="btnCalcCard">
-           <property name="minimumSize">
-            <size>
-             <width>50</width>
-             <height>50</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>50</width>
-             <height>50</height>
-            </size>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="../resources/res.qrc">
-             <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="3">
-          <widget class="QPushButton" name="btnFillCard">
-           <property name="minimumSize">
-            <size>
-             <width>50</width>
-             <height>50</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>50</width>
-             <height>50</height>
-            </size>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="../resources/res.qrc">
-             <normaloff>:/fill.png</normaloff>:/fill.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item row="6" column="0">
-          <widget class="QLabel" name="Taxreceipt">
-           <property name="text">
-            <string>Tax receipt</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="1">
-          <widget class="C5LineEdit" name="lePrepaid">
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="font">
-            <font>
-             <pointsize>22</pointsize>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="layoutDirection">
-            <enum>Qt::LeftToRight</enum>
-           </property>
-           <property name="text">
-            <string>0</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-           <property name="readOnly">
-            <bool>true</bool>
-           </property>
-           <property name="clearButtonEnabled">
-            <bool>true</bool>
-           </property>
-           <property name="pay" stdset="0">
-            <string>Prepaid</string>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="1">
-          <widget class="C5LineEdit" name="leRemain">
+         <item row="6" column="1">
+          <widget class="C5LineEdit" name="lePayX">
            <property name="maximumSize">
             <size>
              <width>16777215</width>
@@ -1637,6 +1844,13 @@ BANK</string>
            </property>
            <property name="pay" stdset="0">
             <string>Other</string>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="1">
+          <widget class="QLineEdit" name="leTaxNumber">
+           <property name="readOnly">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -1659,7 +1873,7 @@ BANK</string>
 CARD</string>
            </property>
            <property name="icon">
-            <iconset resource="../resources/res.qrc">
+            <iconset resource="../resources/resources.qrc">
              <normaloff>:/credit-card.png</normaloff>:/credit-card.png</iconset>
            </property>
            <property name="iconSize">
@@ -1670,15 +1884,8 @@ CARD</string>
            </property>
           </widget>
          </item>
-         <item row="6" column="1">
-          <widget class="QLineEdit" name="leTaxNumber">
-           <property name="readOnly">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="0">
-          <widget class="QPushButton" name="btnPrepayment">
+         <item row="0" column="0">
+          <widget class="QPushButton" name="btnPaymentCash">
            <property name="minimumSize">
             <size>
              <width>0</width>
@@ -1692,17 +1899,120 @@ CARD</string>
             </size>
            </property>
            <property name="text">
-            <string>PREPAYMENT</string>
+            <string>PAYMENT
+CASH</string>
            </property>
            <property name="icon">
-            <iconset resource="../resources/res.qrc">
-             <normaloff>:/prepayment.png</normaloff>:/prepayment.png</iconset>
+            <iconset resource="../resources/resources.qrc">
+             <normaloff>:/wallet-with-money.png</normaloff>:/wallet-with-money.png</iconset>
            </property>
            <property name="iconSize">
             <size>
              <width>32</width>
              <height>32</height>
             </size>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0">
+          <widget class="QPushButton" name="btnPayX">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>50</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>150</width>
+             <height>50</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>PAY X</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources/resources.qrc">
+             <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>32</width>
+             <height>32</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item row="10" column="0">
+          <widget class="QLabel" name="lbRoom">
+           <property name="text">
+            <string>Room</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QPushButton" name="btnPaymentIdram">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>50</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>150</width>
+             <height>50</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>PAYMENT
+IDRAM</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources/resources.qrc">
+             <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>32</width>
+             <height>32</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="2">
+          <widget class="QPushButton" name="btnCalcCard">
+           <property name="minimumSize">
+            <size>
+             <width>50</width>
+             <height>50</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>50</width>
+             <height>50</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources/resources.qrc">
+             <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>32</width>
+             <height>32</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="0">
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Remain</string>
            </property>
           </widget>
          </item>
@@ -1724,7 +2034,7 @@ CARD</string>
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/res.qrc">
+            <iconset resource="../resources/resources.qrc">
              <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
            </property>
            <property name="iconSize">
@@ -1732,83 +2042,6 @@ CARD</string>
              <width>32</width>
              <height>32</height>
             </size>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="C5LineEdit" name="leCash">
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="font">
-            <font>
-             <pointsize>22</pointsize>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="layoutDirection">
-            <enum>Qt::LeftToRight</enum>
-           </property>
-           <property name="text">
-            <string>0</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-           <property name="readOnly">
-            <bool>true</bool>
-           </property>
-           <property name="clearButtonEnabled">
-            <bool>true</bool>
-           </property>
-           <property name="pay" stdset="0">
-            <string>Cash</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="1">
-          <widget class="C5LineEdit" name="leOther">
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="font">
-            <font>
-             <pointsize>22</pointsize>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="layoutDirection">
-            <enum>Qt::LeftToRight</enum>
-           </property>
-           <property name="text">
-            <string>0</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-           <property name="readOnly">
-            <bool>true</bool>
-           </property>
-           <property name="clearButtonEnabled">
-            <bool>true</bool>
-           </property>
-           <property name="pay" stdset="0">
-            <string>Other</string>
-           </property>
-          </widget>
-         </item>
-         <item row="8" column="0">
-          <widget class="QLabel" name="lbRoom">
-           <property name="text">
-            <string>Room</string>
            </property>
           </widget>
          </item>
@@ -1847,8 +2080,43 @@ CARD</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="2">
-          <widget class="QPushButton" name="btnCalcCash">
+         <item row="5" column="1">
+          <widget class="C5LineEdit" name="leOther">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>22</pointsize>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
+           <property name="text">
+            <string>0</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+           <property name="clearButtonEnabled">
+            <bool>true</bool>
+           </property>
+           <property name="pay" stdset="0">
+            <string>Other</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="3">
+          <widget class="QPushButton" name="btnFillPayX">
            <property name="minimumSize">
             <size>
              <width>50</width>
@@ -1866,7 +2134,7 @@ CARD</string>
            </property>
            <property name="icon">
             <iconset resource="../resources/res.qrc">
-             <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
+             <normaloff>:/fill.png</normaloff>:/fill.png</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -1876,33 +2144,8 @@ CARD</string>
            </property>
           </widget>
          </item>
-         <item row="8" column="1">
-          <widget class="QLineEdit" name="leRoomComment">
-           <property name="enabled">
-            <bool>true</bool>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="font">
-            <font>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-           <property name="readOnly">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="3">
-          <widget class="QPushButton" name="btnFillPrepaiment">
+         <item row="4" column="2">
+          <widget class="QPushButton" name="btnFillIdram">
            <property name="minimumSize">
             <size>
              <width>50</width>
@@ -2676,8 +2919,8 @@ background:#696969;
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../resources/res.qrc"/>
   <include location="../resources/resources.qrc"/>
+  <include location="../resources/res.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -31,8 +31,6 @@ private slots:
     void translator();
 
     void deleteDish();
-
-    void raiseMenuVersion();
 };
 
 #endif // CR5DISH_H

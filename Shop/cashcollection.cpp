@@ -1,6 +1,7 @@
 #include "cashcollection.h"
 #include "ui_cashcollection.h"
 #include "c5storedraftwriter.h"
+#include "c5user.h"
 
 CashCollection::CashCollection() :
     C5Dialog(__c5config.dbParams()),
@@ -69,7 +70,7 @@ void CashCollection::on_btnSave_clicked()
         return;
     }
     QString cashdocid;
-    if (!dw.writeAHeader(cashdocid, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH, __userid,
+    if (!dw.writeAHeader(cashdocid, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH, __user->id(),
                          QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, ui->leAmount->getDouble(),
                          ui->lePurpose->text(), 0, 0)) {
         db.rollback();

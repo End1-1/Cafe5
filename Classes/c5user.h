@@ -28,6 +28,10 @@ public:
 
     int group();
 
+    bool isActive();
+
+    bool authByUsernamePass(const QString &username, const QString &pass);
+
     bool authByPinPass(const QString &pin, const QString &pass);
 
     bool authorize(const QString &altPassword);
@@ -39,6 +43,8 @@ public:
     bool leaveWork();
 
     UserState state();
+
+    bool loadFromDB(int id);
 
 private:
     C5User();

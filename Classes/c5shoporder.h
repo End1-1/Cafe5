@@ -4,12 +4,14 @@
 #include "c5database.h"
 #include "c5storedraftwriter.h"
 
+class C5User;
+
 class C5ShopOrder : public QObject
 {
     Q_OBJECT
 
 public:
-    C5ShopOrder();
+    C5ShopOrder(C5User *user);
 
     void setPayment(double cash, double change);
 
@@ -51,6 +53,8 @@ private:
     double fCash;
 
     double fChange;
+
+    C5User *fUser;
 };
 
 #endif // C5SHOPORDER_H

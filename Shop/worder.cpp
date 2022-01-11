@@ -15,6 +15,7 @@
 #include "selectstaff.h"
 #include "c5shoporder.h"
 #include "working.h"
+#include "c5user.h"
 #include "datadriver.h"
 #include "c5utils.h"
 #include "taxprint.h"
@@ -29,7 +30,7 @@
 #define col_discount_value 11
 #define col_discount_mode 12
 
-WOrder::WOrder(int saleType, QWidget *parent) :
+WOrder::WOrder(C5User *user, int saleType, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::WOrder)
 {
@@ -37,6 +38,7 @@ WOrder::WOrder(int saleType, QWidget *parent) :
     ui->wPreorder->setVisible(false);
     fSaleType = saleType;
     fPartner = 0;
+    fUser = user;
     fWorking = static_cast<Working*>(parent);
     fDateOpen = QDate::currentDate();
     fTimeOpen = QTime::currentTime();
@@ -179,7 +181,7 @@ void WOrder::addGoodsToTable(int id)
     il->start();
 }
 
-bool WOrder::writeOrder(bool tax)
+bool WOrder::writeOrder()
 {
     QElapsedTimer t;
     t.start();
@@ -195,9 +197,15 @@ bool WOrder::writeOrder(bool tax)
         }
     }
 
+    C5User *u = fUser;
+    SelectStaff ss(fWorking);
     if (__c5config.shopDifferentStaff() && fWorking->fCurrentUsers.count() > 0) {
-        SelectStaff ss(fWorking);
-        ss.exec();
+        do {
+            if (ss.exec() == QDialog::Rejected) {
+                break;
+            }
+            u = ss.fUser;
+        } while (!u->isValid());
     }
     if (fSaleType == SALE_PREORDER) {
         if (fPreorderUUID.isEmpty()) {
@@ -225,16 +233,17 @@ bool WOrder::writeOrder(bool tax)
         g.lastInputPrice = gt.lastInputPrice();
         goods.append(g);
     }
-    C5ShopOrder so;
+    C5ShopOrder so(u);
     so.setPayment(ui->leCash->getDouble(), ui->leChange->getDouble());
     so.setPartner(fPartner, ui->lePartner->text());
     so.setDiscount(fCostumerId, fCardId, fCardMode, fCardValue);
     so.setParams(fDateOpen, fTimeOpen, fSaleType);
     C5LogSystem::writeEvent(QString("%1. %2:%3, %4:%5, %6:%7, %8:%9").arg(tr("Before write")).arg(tr("Total")).arg(ui->leTotal->text()).arg(tr("Card")).arg(ui->leCard->text()).arg(tr("Advance")).arg(ui->leAdvance->text()).arg(tr("Dicount")).arg(ui->leDisc->text()));
-    bool w = so.write(ui->leTotal->getDouble(), ui->leCard->getDouble(), ui->leAdvance->getDouble(), ui->leDisc->getDouble(), tax, goods, fCardValue, fCardMode);
+    bool w = so.write(ui->leTotal->getDouble(), ui->leCard->getDouble(), ui->leAdvance->getDouble(), ui->leDisc->getDouble(), false, goods, fCardValue, fCardMode);
     if (w) {
         w = so.writeFlags(ui->btnF1->isChecked(), ui->btnF2->isChecked(), ui->btnF3->isChecked(), ui->btnF4->isChecked(), ui->btnF5->isChecked());
     }
+    fOrderUUID = so.fHeader;
     C5Database db(__c5config.dbParams());
     if (w) {
         foreach (const IGoods &g, goods) {
@@ -267,11 +276,6 @@ bool WOrder::writeOrder(bool tax)
         db[":f_order"] = so.fHeader;
         db[":f_window"] = fWorking->fTab->currentIndex();
         db.exec("update a_sale_temp set f_state=2, f_order=:f_order where f_station=:f_station and f_window=:f_window and f_state=0");
-
-        if(__c5config.rdbReplica()) {
-            auto *r = new C5Replication();
-            r->start(SLOT(uploadToServer()));
-        }
     }
     C5LogSystem::writeEvent(QString("%1. %2:%3ms, %4:%5, %6").arg(tr("Order saved")).arg(tr("Elapsed")).arg(t.elapsed()).arg(tr("Order number")).arg(so.fHallId).arg(so.fHeader));
     return w;
@@ -308,7 +312,7 @@ bool WOrder::writePreorder()
     db[":f_state"] = 1;
     db[":f_datecreate"] = QDate::currentDate();
     db[":f_timecreate"] = QTime::currentTime();
-    db[":f_staff"] = __userid;
+    db[":f_staff"] = fUser->id();
     db[":f_datefor"] = ui->dePreorerDate->date();
     db[":f_timefor"] = ui->tmTime->time();
     db[":f_total"] = ui->leTotal->getDouble();
@@ -505,8 +509,17 @@ void WOrder::removeRow()
     if (row < 0) {
         return;
     }
-    if (!fWorking->getAdministratorRights(cp_t5_remove_row_from_shop)) {
-        return;
+    C5User *tmp = fUser;
+    if (!tmp->check(cp_t5_remove_row_from_shop)) {
+        QString password = QInputDialog::getText(this, tr("Password"), tr("Password"), QLineEdit::Password);
+        C5User *tmp = new C5User(password);
+        if (tmp->error().isEmpty()) {
+
+        } else {
+            C5Message::error(tmp->error());
+            delete tmp;
+            return;
+        }
     }
     QString code = ui->tblGoods->getString(row, 0);
     QString name = ui->tblGoods->getString(row, 1);
@@ -697,9 +710,11 @@ C5TableWidget *WOrder::table()
 
 bool WOrder::checkQty(int goods, double qty, QString &err)
 {
+    DbGoods gd(goods);
+    int storegoods = gd.storeGoods();
     C5Database db(__c5config.dbParams());
     db[":f_store"] = __c5config.defaultStore();
-    db[":f_goods"] = goods;
+    db[":f_goods"] = storegoods;
     db[":f_qty"] = qty;
     if (!db.exec("select f_qty-:f_qty-f_qtyreserve-f_qtyprogram as f_qty from a_store_sale where f_store=:f_store and f_goods=:f_goods ")) {
         err = db.fLastError;
@@ -719,7 +734,7 @@ bool WOrder::checkQty(int goods, double qty, QString &err)
 
     db[":f_qty"] = qty;
     db[":f_store"] = __c5config.defaultStore();
-    db[":f_goods"] = goods;
+    db[":f_goods"] = storegoods;
     db.exec("update a_store_sale set f_qtyprogram=f_qtyprogram+:f_qty where f_store=:f_store and f_goods=:f_goods");
 
     return true;

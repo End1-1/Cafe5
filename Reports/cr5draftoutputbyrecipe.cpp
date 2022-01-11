@@ -4,6 +4,7 @@
 #include "c5storedraftwriter.h"
 #include "c5storedoc.h"
 #include "c5mainwindow.h"
+#include "c5user.h"
 
 CR5DraftOutputByRecipe::CR5DraftOutputByRecipe(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
@@ -129,10 +130,10 @@ void CR5DraftOutputByRecipe::createStoreOutput()
                 .arg(tr("Output of sale"))
                 .arg(fFilter->date1().toString(FORMAT_DATE_TO_STR))
                 .arg(fFilter->date2().toString(FORMAT_DATE_TO_STR));
-        dw.writeAHeader(documentId, dw.storeDocNum(DOC_TYPE_STORE_OUTPUT, fFilter->store(), true, 0), DOC_STATE_DRAFT, DOC_TYPE_STORE_OUTPUT, __userid, fFilter->date2(),
+        dw.writeAHeader(documentId, dw.storeDocNum(DOC_TYPE_STORE_OUTPUT, fFilter->store(), true, 0), DOC_STATE_DRAFT, DOC_TYPE_STORE_OUTPUT, __user->id(), fFilter->date2(),
                         QDate::currentDate(), QTime::currentTime(), 0, 0, comment, 0, 0);
 
-        dw.writeAHeaderStore(documentId, __userid, __userid, "", QDate(), 0, fFilter->store(), 0, cashid, 0, 0);
+        dw.writeAHeaderStore(documentId, __user->id(), __user->id(), "", QDate(), 0, fFilter->store(), 0, cashid, 0, 0);
         int rownum = 1;
         foreach (const IGoods &g, goodsSale) {
             QString sdid;

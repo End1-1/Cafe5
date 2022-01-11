@@ -3,6 +3,7 @@
 #include "c5goodspricing.h"
 #include "c5tablemodel.h"
 #include "c5mainwindow.h"
+#include "c5user.h"
 #include "cr5goodsfilter.h"
 #include "c5changepriceofgroup.h"
 #include "c5goodspricing.h"
@@ -101,7 +102,7 @@ QToolBar *CR5Goods::toolBar()
             << ToolBarButtons::tbExcel
             << ToolBarButtons::tbPrint;
             createStandartToolbar(btn);
-            if (pr(fDBParams.at(1), cp_t1_goods_pricing)) {
+            if (__user->check(cp_t1_goods_pricing)) {
                 fToolBar->addAction(QIcon(":/pricing.png"), tr("Pricing"), this, SLOT(pricing()));
             }
             fToolBar->addAction(QIcon(":/dress.png"), tr("Group price"), this, SLOT(groupPrice()));

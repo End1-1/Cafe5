@@ -106,7 +106,10 @@ SOURCES += \
     ../DbData/dbhalls.cpp \
     ../DbData/dbmenu.cpp \
     ../DbData/dbmenuname.cpp \
+    ../DbData/dbmenupackagelist.cpp \
+    ../DbData/dbmenupackages.cpp \
     ../DbData/dboheader.cpp \
+    ../DbData/dbopreorder.cpp \
     ../DbData/dbpartner.cpp \
     ../DbData/dbservicevalues.cpp \
     ../DbData/dbshift.cpp \
@@ -409,7 +412,10 @@ HEADERS += \
     ../DbData/dbhalls.h \
     ../DbData/dbmenu.h \
     ../DbData/dbmenuname.h \
+    ../DbData/dbmenupackagelist.h \
+    ../DbData/dbmenupackages.h \
     ../DbData/dboheader.h \
+    ../DbData/dbopreorder.h \
     ../DbData/dbpartner.h \
     ../DbData/dbservicevalues.h \
     ../DbData/dbshift.h \

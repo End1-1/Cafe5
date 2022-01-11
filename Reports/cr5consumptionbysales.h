@@ -6,6 +6,7 @@
 
 class CR5ConsumptionBySalesFilter;
 class C5StoreDoc;
+class C5User;
 
 class CR5ConsumptionBySales : public C5ReportWidget
 {
@@ -30,6 +31,8 @@ private:
 
     QString documentForInventory();
 
+    C5User *fUser;
+
     void countRowQty(int row);
 
 private slots:
@@ -42,6 +45,8 @@ private slots:
     void countOutputBasedOnRecipes();
 
     void changeOutputStore();
+
+    void updateInventorizatinPrices();
 
     C5StoreDoc *writeDocs(int doctype, int reason, const QList<IGoods> &data, const QString &comment);
 

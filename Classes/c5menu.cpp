@@ -21,6 +21,7 @@ void C5Menu::refresh()
     dbdishpart1->refresh();
     dbdishpart2->refresh();
     dbdishspecial->refresh();
+    menu5->fMenuList.data.clear();
     for (int id: dbmenu->list()) {
         int dishid = dbmenu->dishid(id);
         int part2id = dbdish->part2(dishid);

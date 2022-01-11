@@ -21,6 +21,8 @@ public:
 
     bool isService();
 
+    int storeGoods();
+
     QString goodsName();
 
     QString scancode(int id);

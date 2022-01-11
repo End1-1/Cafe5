@@ -7,16 +7,20 @@ namespace Ui {
 class Sales;
 }
 
+class C5User;
+
 class Sales : public C5Dialog
 {
     Q_OBJECT
 
 public:
-    explicit Sales();
+    explicit Sales(C5User *user);
 
     ~Sales();
 
-    static void showSales();
+    static void showSales(C5User *u);
+
+    static bool printCheckWithTax(C5Database &db, const QString &id, QString &rseq);
 
 private slots:
     void on_btnDateLeft_clicked();
@@ -53,6 +57,8 @@ private slots:
 
 private:
     Ui::Sales *ui;
+
+    C5User *fUser;
 
     void changeDate(int d);
 

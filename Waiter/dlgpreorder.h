@@ -14,7 +14,11 @@ class DlgPreorder : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgPreorder(C5OrderDriver *w, const QStringList &dbParams);
+    const static int RESULT_OK = 1;
+
+    const static int RESULT_CANCELED = 2;
+
+    explicit DlgPreorder(C5OrderDriver *w, C5User *user, const QStringList &dbParams);
 
     ~DlgPreorder();
 
@@ -41,10 +45,22 @@ private slots:
 
     void on_btnEditCard_clicked();
 
+    void on_btnEditPayX_clicked();
+
+    void on_btnEditGuestname_clicked();
+
+    void on_btnEditCLCode_clicked();
+
+    void on_btnCancelReserve_clicked();
+
+    void on_btnSelectTable_clicked();
+
 private:
     Ui::DlgPreorder *ui;
 
     C5OrderDriver *fOrder;
+
+    C5User *fUser;
 };
 
 #endif // DLGPREORDER_H

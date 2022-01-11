@@ -3,6 +3,7 @@
 #include "c5gridgilter.h"
 #include "cr5consuptionreason.h"
 #include "c5tablemodel.h"
+#include "c5user.h"
 #include "c5mainwindow.h"
 #include "c5waiterorderdoc.h"
 #include "c5progressdialog.h"
@@ -347,7 +348,7 @@ QString CR5ConsumptionBySalesDraft::documentForInventory()
     }
     if (result.isEmpty()) {
         C5StoreDraftWriter dw(db);
-        dw.writeAHeader(result, QString::number(dw.counterAType(DOC_TYPE_STORE_INVENTORY)), DOC_STATE_SAVED, DOC_TYPE_STORE_INVENTORY, __userid, f->date2(), QDate::currentDate(), QTime::currentTime(), 0, 0, tr("Created automaticaly"), 0, 0);
+        dw.writeAHeader(result, QString::number(dw.counterAType(DOC_TYPE_STORE_INVENTORY)), DOC_STATE_SAVED, DOC_TYPE_STORE_INVENTORY, __user->id(), f->date2(), QDate::currentDate(), QTime::currentTime(), 0, 0, tr("Created automaticaly"), 0, 0);
     }
     return result;
 }
@@ -601,19 +602,19 @@ C5StoreDoc *CR5ConsumptionBySalesDraft::writeDocs(int doctype, int reason, const
     }
     QString documentId;
     QString cashid, cashrowid;
-    dw.writeAHeader(documentId, dw.storeDocNum(doctype, store, true, 0), DOC_STATE_DRAFT, doctype, __userid, docDate,
+    dw.writeAHeader(documentId, dw.storeDocNum(doctype, store, true, 0), DOC_STATE_DRAFT, doctype, __user->id(), docDate,
                     QDate::currentDate(), QTime::currentTime(), 0, 0, comment, 0, 0);
     if (storein > 0) {
         C5Document c5doc(fDBParams);
         QString purpose = tr("Store input, correction") + QDate::currentDate().toString(FORMAT_DATE_TO_STR);
         QString cashUserId = QString("%1").arg(c5doc.genNumber(DOC_TYPE_CASH), C5Config::docNumDigitsInput(), 10, QChar('0'));
-        dw.writeAHeader(cashid, cashUserId, DOC_STATE_DRAFT, DOC_TYPE_CASH, __userid, QDate::currentDate(),
+        dw.writeAHeader(cashid, cashUserId, DOC_STATE_DRAFT, DOC_TYPE_CASH, __user->id(), QDate::currentDate(),
                         QDate::currentDate(), QTime::currentTime(), 0, 0,
                         purpose, 0, 0);
         dw.writeAHeaderCash(cashid, 0, 0, 1, documentId, "");
         dw.writeECash(cashrowid, cashid, 0, -1, purpose, 0, cashrowid, 1);
     }
-    dw.writeAHeaderStore(documentId, __userid, __userid, "", QDate(), storein, storeout, 0, cashid, 0, 0);
+    dw.writeAHeaderStore(documentId, __user->id(), __user->id(), "", QDate(), storein, storeout, 0, cashid, 0, 0);
     int rownum = 1;
     foreach (const IGoods &g, data) {
         QString sdid;

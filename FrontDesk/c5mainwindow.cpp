@@ -73,6 +73,7 @@
 #include "c5changepassword.h"
 #include "cr5dishremovereason.h"
 #include "cr5goods.h"
+#include "c5user.h"
 #include "cr5users.h"
 #include "cr5goodsstorages.h"
 #include "c5storedoc.h"
@@ -210,12 +211,13 @@ void C5MainWindow::on_actionLogin_triggered()
         return;
     }
     showMaximized();
-    fStatusLabel->setText(__username);
+    fStatusLabel->setText(__user->fullName());
 
     C5Database db(C5Config::fDBHost, C5Config::fDBPath, C5Config::fDBUser, C5Config::fDBPassword);
-    db[":f_user"] = __userid;
+    db[":f_user"] = __user->id();
     db.exec("select f_name, f_description, f_host, f_db, f_user, f_password, f_main from s_db "
             "where f_id in (select f_db from s_db_access where f_user=:f_user and f_permit=1)");
+
     while (db.nextRow()) {
         QStringList dbl;
         for (int i = 2; i < db.columnCount(); i++) {
@@ -325,7 +327,7 @@ void C5MainWindow::enableMenu(bool v)
 
 void C5MainWindow::addTreeL3Item(QListWidget *l, int permission, const QString &text, const QString &icon)
 {
-    if (!pr(fDatabases[__c5config.getRegValue("lastdb").toString()].at(1), permission)) {
+    if (!__user->check(permission)) {
         return;
     }
     QListWidgetItem *item = new QListWidgetItem(l);
@@ -728,7 +730,7 @@ void C5MainWindow::on_splitter_splitterMoved(int pos, int index)
 
 bool C5MainWindow::addMainLevel(const QString &db, int permission, const QString &title, const QString &icon, QListWidget *&l)
 {
-    if (pr(db, permission)) {
+    if (__user->check(permission)) {
         QPushButton *b = new QPushButton(QIcon(icon), title);
         b->setProperty("cp", permission);
         connect(b, SIGNAL(clicked()), this, SLOT(on_btnMenuClick()));
@@ -771,7 +773,7 @@ void C5MainWindow::setDB(const QString &dbname)
     ui->lMenu->addWidget(l);
 
     C5Database dbpr(db.at(0),  db.at(1),  db.at(2),  db.at(3));
-    C5Permissions::init(dbpr);
+    C5Permissions::init(dbpr, __user->group());
 
     if (addMainLevel(db.at(1), cp_t2_action, tr("Actions"), ":/edit.png", l)) {
         addTreeL3Item(l, cp_t2_store_input, tr("New store input"), ":/goods.png");
@@ -940,18 +942,18 @@ void C5MainWindow::readFavoriteMenu()
     if (fMenuLists.count() == 0) {
         return;
     }
-    QStringList db = fDatabases[__c5config.getRegValue("lastdb").toString()];
     QListWidget *l = fMenuLists.at(0);
     l->clear();
     QSettings ss(_ORGANIZATION_, _APPLICATION_+ QString("\\") + _MODULE_);
     QStringList keys = ss.allKeys();
     for (const QString &s: keys) {
-        if (!s.contains("favorite")) {
+        if (!s.contains("favorite") || s.contains("-name")) {
             continue;
         }
+        qDebug() << s;
         if (ss.value(s).toBool()) {
             int prm = s.right(3).toInt();
-            if (pr(db.at(1), prm)) {
+            if (__user->check(prm)) {
                 addTreeL3Item(l, prm, ss.value(s + "-name").toString(), itemIconName(prm));
             }
         } else {

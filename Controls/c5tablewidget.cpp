@@ -212,6 +212,19 @@ int C5TableWidget::addEmptyRow()
     return row;
 }
 
+void C5TableWidget::removeRow(int row)
+{
+    QTableWidget::removeRow(row);
+    for (int r = row; r < rowCount(); r++) {
+        for (int c = 0; c < columnCount(); c++) {
+            QWidget *w = cellWidget(r, c);
+            if (w) {
+                w->setProperty("row", r);
+            }
+        }
+    }
+}
+
 void C5TableWidget::exportToExcel()
 {
     if (columnCount() == 0 || rowCount() == 0) {

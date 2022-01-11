@@ -21,7 +21,9 @@ void json(C5Database &db, const QJsonObject &params, QJsonArray &jarr)
     db[":f_datecash2"] = QDate::fromString(params["date2"].toString(), FORMAT_DATE_TO_STR_MYSQL);
     db.exec("select count(oh.f_id) as f_count, sum(oh.f_amounttotal) as f_amounttotal, "
             "sum(oh.f_amountcash) as f_amountcash, sum(oh.f_amountcard) as f_amountcard, "
-            "sum(oh.f_amountbank) as f_amountbank, sum(oh.f_amountother) as f_amountother "
+            "sum(oh.f_amountbank) as f_amountbank, sum(oh.f_amountother) as f_amountother, "
+            "sum(oh.f_amountidram) as f_amountidram,  "
+            "sum(oh.f_amountpayx) as f_amountpayx  "
             "from o_header oh "
             "where oh.f_state=:f_state1 "
             "and oh.f_datecash between :f_datecash1 and :f_datecash2 ");
@@ -53,7 +55,9 @@ void json(C5Database &db, const QJsonObject &params, QJsonArray &jarr)
     db.exec("select concat(u.f_last, ' ', u.f_first) as f_staff, count(oh.f_id) as f_count, "
             "sum(oh.f_amounttotal) as f_amounttotal, "
             "sum(oh.f_amountcash) as f_amountcash, sum(oh.f_amountcard) as f_amountcard, "
-            "sum(oh.f_amountbank) as f_amountbank, sum(oh.f_amountother) as f_amountother "
+            "sum(oh.f_amountbank) as f_amountbank, sum(oh.f_amountother) as f_amountother, "
+            "sum(oh.f_amountidram) as f_amountidram,  "
+            "sum(oh.f_amountpayx) as f_amountpayx  "
             "from o_header oh "
             "left join s_user u on u.f_id=oh.f_staff "
             "where oh.f_state=:f_state1 "
@@ -102,6 +106,16 @@ void json(C5Database &db, const QJsonObject &params, QJsonArray &jarr)
         p.rtext(float_str(rtotal["f_amountbank"].toDouble(), 2));
         p.br();
     }
+    if (rtotal["f_amountidram"].toDouble() > 0.001) {
+        p.ltext(QObject::tr("Idram"), 5);
+        p.rtext(float_str(rtotal["f_amountidram"].toDouble(), 2));
+        p.br();
+    }
+    if (rtotal["f_amountpayx"].toDouble() > 0.001) {
+        p.ltext(QObject::tr("PayX"), 5);
+        p.rtext(float_str(rtotal["f_amountpayx"].toDouble(), 2));
+        p.br();
+    }
     if (rtotal["f_amountother"].toDouble() > 0.001) {
         p.ltext(QObject::tr("Other"), 5);
         p.rtext(float_str(rtotal["f_amountother"].toDouble(), 2));
@@ -132,6 +146,16 @@ void json(C5Database &db, const QJsonObject &params, QJsonArray &jarr)
         if (m["f_amountbank"].toDouble() > 0.001) {
             p.ltext(QObject::tr("Bank"), 5);
             p.rtext(float_str(m["f_amountbank"].toDouble(), 2));
+            p.br();
+        }
+        if (rtotal["f_amountidram"].toDouble() > 0.001) {
+            p.ltext(QObject::tr("Idram"), 5);
+            p.rtext(float_str(rtotal["f_amountidram"].toDouble(), 2));
+            p.br();
+        }
+        if (rtotal["f_amountpayx"].toDouble() > 0.001) {
+            p.ltext(QObject::tr("PayX"), 5);
+            p.rtext(float_str(rtotal["f_amountpayx"].toDouble(), 2));
             p.br();
         }
         if (m["f_amountother"].toDouble() > 0.001) {

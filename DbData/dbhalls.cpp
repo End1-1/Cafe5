@@ -6,7 +6,18 @@ DbHalls::DbHalls() :
 
 }
 
+DbHalls::DbHalls(int id) :
+    DbData(id)
+{
+
+}
+
 int DbHalls::settings(int id)
 {
     return get(id, "f_settings").toInt();
+}
+
+int DbHalls::booking(int id)
+{
+    return get(id, "f_booking").toInt();
 }

@@ -20,8 +20,10 @@
 #include "threadcheckmessage.h"
 #include "chatmessage.h"
 #include "threadreadmessage.h"
+#include "selectprinters.h"
 #include "c5printing.h"
 #include "c5tablewidget.h"
+#include "printreceiptgroup.h"
 #include <QShortcut>
 #include <QInputDialog>
 #include <QKeyEvent>
@@ -35,11 +37,12 @@ QMap<QString, double> Working::fUnitDefaultQty;
 QMap<int, Flag> Working::fFlags;
 static QSettings __s(QString("%1\\%2\\%3").arg(_ORGANIZATION_).arg(_APPLICATION_).arg(_MODULE_));
 
-Working::Working(QWidget *parent) :
+Working::Working(C5User *user, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Working)
 {
     ui->setupUi(this);
+    fUser = user;
     QShortcut *sF1 = new QShortcut(QKeySequence(Qt::Key_F1), this);
     QShortcut *sF2 = new QShortcut(QKeySequence(Qt::Key_F2), this);
     QShortcut *sF3 = new QShortcut(QKeySequence(Qt::Key_F3), this);
@@ -134,9 +137,6 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
             return true;
         case Qt::Key_F5:
             on_btnShowGoodsList_clicked();
-            break;
-        case Qt::Key_F9:
-            on_btnSaveOrderNoTax_clicked();
             break;
         case Qt::Key_S:
             if (ke->modifiers() & Qt::ControlModifier) {
@@ -270,42 +270,6 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
     return QWidget::eventFilter(watched, event);
 }
 
-bool Working::getAdministratorRights(int right)
-{
-    if (__usergroup == 1) {
-        return true;
-    }
-    if (__userpermissions.contains(right)) {
-        return true;
-    }
-    bool ok;
-    QString pwd = QInputDialog::getText(this, tr("Administrator password"), tr("Password"), QLineEdit::Password, "", &ok);
-    if (!ok) {
-        return false;
-    }
-    C5Database db(C5Config::dbParams());
-    db[":f_altPassword"] = password(pwd);
-    db[":f_state"] = 1;
-    db.exec("select f_id, f_group, f_first, f_last from s_user where f_altPassword=:f_altPassword and f_state=:f_state");
-    if (db.nextRow()) {
-        if (db.getInt(1) != 1) {
-            db[":f_group"] = db.getValue(1);
-            db[":f_key"] = right;
-            db.exec("select f_key from s_user_access where f_group=:f_group and f_key=:f_key and f_value=1");
-            if (db.nextRow()) {
-                return true;
-            } else {
-                C5Message::error(tr("Access denied"));
-                return false;
-            }
-        }
-    } else {
-        C5Message::error(tr("Access denied"));
-        return false;
-    }
-    return true;
-}
-
 void Working::decQty(int id, double qty)
 {
     C5Database db(__c5config.dbParams());
@@ -395,7 +359,7 @@ void Working::addGoods(QString &code)
 
 void Working::newSale(int type)
 {
-    WOrder *w = new WOrder(type, this);
+    WOrder *w = new WOrder(fUser, type, this);
     QObjectList ol = w->children();
     for (QObject *o: ol) {
         auto wd = dynamic_cast<QWidget*>(o);
@@ -658,7 +622,7 @@ void Working::shortcutF8()
 
 void Working::shortcutF9()
 {
-    on_btnSaveOrderNoTax_clicked();
+
 }
 
 void Working::shortcutF10()
@@ -756,6 +720,36 @@ void Working::on_btnSaveOrder_clicked()
     if (!w->writeOrder()) {
         return;
     }
+    if (__c5config.getValue(param_no_tax).toInt() != 1) {
+        if (C5Message::question(tr("Salute?")) == QDialog::Accepted) {
+            QString rseq;
+            C5Database db(C5Config::dbParams());
+            if (Sales::printCheckWithTax(db, w->fOrderUUID, rseq)) {
+                if (!C5Config::localReceiptPrinter().isEmpty()) {
+                    PrintReceiptGroup p;
+                    switch (C5Config::shopPrintVersion()) {
+                    case 1: {
+                        bool p1, p2;
+                        if (SelectPrinters::selectPrinters(p1, p2)) {
+                            if (p1) {
+                                p.print(w->fOrderUUID, db, 1);
+                            }
+                            if (p2) {
+                                p.print(w->fOrderUUID, db, 2);
+                            }
+                        }
+                        break;
+                    }
+                    case 2:
+                        p.print2(w->fOrderUUID, db);
+                        break;
+                    default:
+                        break;
+                    }
+                }
+            }
+        }
+    }
     w->table()->setRowCount(0);
     ui->tab->removeTab(ui->tab->currentIndex());
     if (ui->tab->count() == 0) {
@@ -764,26 +758,11 @@ void Working::on_btnSaveOrder_clicked()
     w->deleteLater();
     ui->leCode->setFocus();
     ui->lePartner->clear();
-}
 
-void Working::on_btnSaveOrderNoTax_clicked()
-{
-    WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
-    if (!w) {
-        return;
+    if(__c5config.rdbReplica()) {
+        auto *r = new C5Replication();
+        r->start(SLOT(uploadToServer()));
     }
-    C5LogSystem::writeEvent(QString("F9"));
-    if (!w->writeOrder(false)) {
-        return;
-    }
-    w->table()->setRowCount(0);
-    ui->tab->removeTab(ui->tab->currentIndex());
-    if (ui->tab->count() == 0) {
-        on_btnNewOrder_clicked();
-    }
-    w->deleteLater();
-    ui->leCode->setFocus();
-    ui->lePartner->clear();
 }
 
 void Working::on_btnExit_clicked()
@@ -826,10 +805,22 @@ void Working::on_tblGoods_itemClicked(QTableWidgetItem *item)
 
 void Working::on_btnDuplicateReceipt_clicked()
 {
-    if (!getAdministratorRights(cp_t5_refund_goods)) {
-        return;
+    C5User *u = fUser;
+    if (!u->check(cp_t5_refund_goods)) {
+        QString password = QInputDialog::getText(this, tr("Password"), tr("Password"), QLineEdit::Password);
+        C5User *tmp = new C5User(password);
+        if (tmp->error().isEmpty()) {
+            u = tmp;
+        } else {
+            C5Message::error(tmp->error());
+            delete tmp;
+            return;
+        }
     }
-    Sales::showSales();
+    Sales::showSales(u);
+    if (u != fUser) {
+        delete u;
+    }
 }
 
 void Working::on_leCode_textChanged(const QString &arg1)
@@ -877,7 +868,7 @@ void Working::on_tab_tabCloseRequested(int index)
     C5Database db(__c5config.dbParams());
     WOrder *w = static_cast<WOrder*>(ui->tab->widget(index));
     if (w->rowCount() > 0) {
-        if (!getAdministratorRights(cp_t5_remove_row_from_shop)) {
+        if (!fUser->check(cp_t5_remove_row_from_shop)) {
             return;
         }
         db[":f_window"] = index;
@@ -900,21 +891,35 @@ void Working::on_tab_tabCloseRequested(int index)
 
 void Working::on_btnItemBack_clicked()
 {
-    if (!getAdministratorRights(cp_t5_refund_goods)) {
+    if (!fUser->check(cp_t5_refund_goods)) {
         return;
     }
-    Sales::showSales();
+    Sales::showSales(fUser);
 }
 
 void Working::on_btnStoreInput_clicked()
 {
-    if (!getAdministratorRights(cp_t5_refund_goods)) {
-        return;
+    C5User *u = fUser;
+    if (!u->check(cp_t5_refund_goods)) {
+        QString password = QInputDialog::getText(this, tr("Password"), tr("Password"), QLineEdit::Password);
+        C5User *tmp = new C5User(password);
+        if (tmp->error().isEmpty()) {
+            u = tmp;
+        } else {
+            C5Message::error(tmp->error());
+            delete tmp;
+            return;
+        }
     }
-    StoreInput *si = new StoreInput(this);
+
+    StoreInput *si = new StoreInput(u, this);
     si->showMaximized();
     si->exec();
     si->deleteLater();
+
+    if (u != fUser) {
+        delete u;
+    }
 }
 
 void Working::on_tab_currentChanged(int index)

@@ -2,7 +2,7 @@
 #include "c5database.h"
 
 DbOHeader::DbOHeader() :
-    DbData("o_header", "f_state=1")
+    DbData("o_header", "f_state=1 or f_state=5 or f_state=6")
 {
 
 }
@@ -20,6 +20,11 @@ QTime DbOHeader::timeOpen(const QString &id)
 int DbOHeader::staff(const QString &id)
 {
     return get(id, "f_staff").toInt();
+}
+
+int DbOHeader::state(const QString &id)
+{
+    return get(id, "f_state").toInt();
 }
 
 double DbOHeader::amount(const QString &id)

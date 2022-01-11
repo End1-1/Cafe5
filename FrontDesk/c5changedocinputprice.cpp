@@ -1,6 +1,7 @@
 #include "c5changedocinputprice.h"
 #include "ui_c5changedocinputprice.h"
 #include "c5cache.h"
+#include "c5user.h"
 
 C5ChangeDocInputPrice::C5ChangeDocInputPrice(const QStringList &dbParams, const QString &uuid) :
     C5Dialog(dbParams),
@@ -74,7 +75,7 @@ void C5ChangeDocInputPrice::on_btnChange_clicked()
         db.exec("update a_header set f_amount=(select sum(f_total) from a_store_draft where f_document=:f_id) where f_id=:f_id");
     }
     db[":f_date"] = QDateTime::currentDateTime();
-    db[":f_user"] = __userid;
+    db[":f_user"] = __user->id();
     db[":f_base"] = base;
     db[":f_old_goods"] = ui->leGoods->old();
     db[":f_new_goods"] = ui->leGoods->text();

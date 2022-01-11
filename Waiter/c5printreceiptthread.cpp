@@ -1,9 +1,11 @@
 #include "c5printreceiptthread.h"
 #include "c5printing.h"
-#include "c5utils.h"
+#include "c5logsystem.h"
 #include "c5translator.h"
 #include "QRCodeGenerator.h"
 #include "datadriver.h"
+#include "c5utils.h"
+#include "logwriter.h"
 #include "c5config.h"
 #include <QApplication>
 
@@ -35,6 +37,7 @@ bool C5PrintReceiptThread::print()
     QMap<QString, QVariant> taxinfo;
     QMap<QString, QVariant> clinfo;
     QMap<QString, QVariant> roominfo;
+    QMap<QString, QVariant> preorder;
     QMap<QString, QVariant> carinfo;
     C5Database db(__c5config.dbParams());
 
@@ -48,6 +51,17 @@ bool C5PrintReceiptThread::print()
         return false;
     }
     db.rowToMap(options);
+
+    db[":f_id"] = fHeader;
+    if (!db.exec("select * from o_preorder where f_id=:f_id")) {
+        fError = db.fLastError;
+        return false;
+    }
+    if (!db.nextRow()) {
+        fError = db.fLastError;
+        return false;
+    }
+    db.rowToMap(preorder);
 
     db[":f_id"] = fHeader;
     if (!db.exec("select * from o_tax where f_id=:f_id")) {
@@ -219,11 +233,35 @@ bool C5PrintReceiptThread::print()
         p.br();
         p.br(1);
     }
-    p.setFontSize(bs + 4);
-    p.setFontBold(true);
-    p.ltext(__translator.tt(tr("Need to pay")), 0);
-    p.setFontSize(bs + 8);
-    p.rtext(float_str(fHeaderInfo["f_amounttotal"].toDouble(), 2));
+
+    double prepaid = preorder["f_prepaidcash"].toDouble()
+            + preorder["f_prepaidcard"].toDouble()
+            + preorder["f_prepaidpayx"].toDouble();
+    double needtopay = fHeaderInfo["f_amounttotal"].toDouble();
+    if (prepaid > 0){
+        p.setFontSize(bs + 4);
+        p.setFontBold(true);
+        p.ltext(__translator.tt(tr("Prepaid amount")), 0);
+        p.setFontSize(bs + 8);
+        p.rtext(float_str(prepaid * -1, 2));
+        needtopay -= prepaid;
+        p.br();
+        p.br();
+    }
+
+    if (needtopay > 0.01) {
+        p.setFontSize(bs + 4);
+        p.setFontBold(true);
+        p.ltext(__translator.tt(tr("Need to pay")), 0);
+        p.setFontSize(bs + 8);
+        p.rtext(float_str(needtopay, 2));
+    } else {
+        p.setFontSize(bs + 4);
+        p.setFontBold(true);
+        p.ltext(__translator.tt(tr("Refund")), 0);
+        p.setFontSize(bs + 8);
+        p.rtext(float_str(needtopay, 2));
+    }
     p.br();
     p.br();
     p.line();
@@ -239,56 +277,81 @@ bool C5PrintReceiptThread::print()
     }
     p.br();
     p.line();
-    /*
-     TODO: uncomment this
-    if (fHeader["f_idramid"].toString().length() > 0) {
-        p.setFontBold(false);
-        p.ctext(__translator.tt(tr("Pay by IDRAM")));
+
+    if (fIdram[param_idram_id].length() > 0 && fBill){
+        C5LogSystem::writeEvent("Idram QR");
         p.br();
+        p.br();
+        p.br();
+        p.br();
+        p.ctext(QString::fromUtf8("Վճարեք Idram-ով"));
+        p.br();
+
         int levelIndex = 1;
         int versionIndex = 0;
         bool bExtent = true;
         int maskIndex = -1;
-        QString encodeString = QString("%1;%2;%3;%4|%5;%6;")
-                .arg("Jazzve")
-                .arg(fHeader["f_idramid"].toString()) //IDram ID
-                .arg(fHeader["f_amounttotal"].toString())
-                .arg(QString("%1-%2").arg(fHeader["f_prefix"].toString()).arg(fHeader["f_id"].toString()))
-                .arg(fHeader["f_idramphone"].toString())
-                .arg("1");
+        QString encodeString = QString("%1;%2;%3;%4|%5;%6;%7")
+                .arg(fIdram[param_idram_name])
+                .arg(fIdram[param_idram_id]) //IDram ID
+                .arg(fHeaderInfo["f_amounttotal"].toDouble())
+                .arg(fHeader)
+                .arg(fIdram[param_idram_phone])
+                .arg(fIdram[param_idram_tips].toInt() == 1 ? "1" : "0")
+                .arg(fIdram[param_idram_tips].toInt() == 1 ? fIdram[param_idram_tips_wallet] : "");
+
         CQR_Encode qrEncode;
         bool successfulEncoding = qrEncode.EncodeData( levelIndex, versionIndex, bExtent, maskIndex, encodeString.toUtf8().data() );
-        if (successfulEncoding) {
-            int qrImageSize = qrEncode.m_nSymbleSize;
-            int encodeImageSize = qrImageSize + ( QR_MARGIN * 2 );
-            QImage encodeImage(encodeImageSize, encodeImageSize, QImage::Format_Mono);
-            encodeImage.fill(1);
-
-            for ( int i = 0; i < qrImageSize; i++ )
-                for ( int j = 0; j < qrImageSize; j++ )
-                    if ( qrEncode.m_byModuleData[i][j] )
-                        encodeImage.setPixel( i + QR_MARGIN, j + QR_MARGIN, 0 );
-
-            QPixmap pix = QPixmap::fromImage( encodeImage );
-            pix = pix.scaled(300, 300);
-            p.image(pix, Qt::AlignHCenter);
-            p.br();
+        if (!successfulEncoding) {
+//            fLog.append("Cannot encode qr image");
         }
+        int qrImageSize = qrEncode.m_nSymbleSize;
+        int encodeImageSize = qrImageSize + ( QR_MARGIN * 2 );
+        QImage encodeImage(encodeImageSize, encodeImageSize, QImage::Format_Mono);
+        encodeImage.fill(1);
+
+        for ( int i = 0; i < qrImageSize; i++ ) {
+            for ( int j = 0; j < qrImageSize; j++ ) {
+                if ( qrEncode.m_byModuleData[i][j] ) {
+                    encodeImage.setPixel(i + QR_MARGIN, j + QR_MARGIN, 0);
+                }
+            }
+        }
+
+        QPixmap pix = QPixmap::fromImage(encodeImage);
+        pix = pix.scaled(300, 300);
+        p.image(pix, Qt::AlignHCenter);
+        p.br();
+        /* End QRCode */
+    } else {
+        C5LogSystem::writeEvent("No Idram QR");
     }
-    */
 
     if (!fBill) {
         if (fHeaderInfo["f_amountcash"].toDouble() > 0.001) {
             p.ltext(__translator.tt(tr("Payment, cash")), 0);
             p.rtext(float_str(fHeaderInfo["f_amountcash"].toDouble(), 2));
+            p.br();
         }
         if (fHeaderInfo["f_amountcard"].toDouble() > 0.001) {
             p.ltext(__translator.tt(tr("Payment, card")), 0);
             p.rtext(float_str(fHeaderInfo["f_amountcard"].toDouble(), 2));
+            p.br();
         }
         if (fHeaderInfo["f_amountbank"].toDouble() > 0.001) {
             p.ltext(__translator.tt(tr("Bank transfer")), 0);
             p.rtext(float_str(fHeaderInfo["f_amountbank"].toDouble(), 2));
+            p.br();
+        }
+        if (fHeaderInfo["f_amountidram"].toDouble() > 0.001) {
+            p.ltext(__translator.tt(tr("Idram")), 0);
+            p.rtext(float_str(fHeaderInfo["f_amountidram"].toDouble(), 2));
+            p.br();
+        }
+        if (fHeaderInfo["f_amountpayx"].toDouble() > 0.001) {
+            p.ltext(__translator.tt(tr("PayX")), 0);
+            p.rtext(float_str(fHeaderInfo["f_amountpayx"].toDouble(), 2));
+            p.br();
         }
         p.br();
     }
@@ -365,6 +428,7 @@ bool C5PrintReceiptThread::print()
         p.ltext(fHeaderInfo["f_comment"].toString(), 0);
         p.br();
     }
+
     p.print(fPrinter, QPrinter::Custom);
 
     return true;

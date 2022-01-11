@@ -98,6 +98,10 @@
 #define cp_t5_edit_closed_order 533
 #define cp_t5_present 534
 #define cp_t5_edit_booking 535
+#define cp_t5_view_all_sales 536
+
+#define cp_t5_pay_idram 537
+#define cp_t5_pay_payx 538
 
 #define cp_t6_goods_menu 600
 #define cp_t6_units 601
@@ -145,11 +149,9 @@ class C5Permissions
 public:
     C5Permissions();
     static QList<int> fTemplate;
-    static void init(C5Database &db);
+    static void init(C5Database &db, int group);
     static void clear();
     static QMap<QString, QList<int> > fPermissions;
 };
-
-bool pr(const QString &db, int permission);
 
 #endif // C5PERMISSIONS_H

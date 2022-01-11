@@ -25,8 +25,8 @@
 #define ORDER_STATE_CLOSE 2
 #define ORDER_STATE_VOID 3
 #define ORDER_STATE_EMPTY 4
-#define ORDER_STATE_PREORDER_1 5 //empty
-#define ORDER_STATE_PREORDER_2 6 //with order
+#define ORDER_STATE_PREORDER_EMPTY 5 //empty
+#define ORDER_STATE_PREORDER_WITH_ORDER 6 //with order
 #define ORDER_STATE_MOVED 7
 
 #define DISH_STATE_NONE 0

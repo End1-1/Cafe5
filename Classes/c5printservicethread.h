@@ -17,6 +17,8 @@ public:
 
     QString fReprintList;
 
+    bool fBooking;
+
 private:
     QString fHeader;
 

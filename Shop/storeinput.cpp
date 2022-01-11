@@ -6,6 +6,7 @@
 #include "c5storedraftwriter.h"
 #include "c5checkbox.h"
 #include "c5message.h"
+#include "c5user.h"
 #include "viewinputitem.h"
 #include <QSet>
 
@@ -14,13 +15,14 @@
 #define VM_STORE_GROUP 2
 #define VM_STORE_ITEMS 3
 
-StoreInput::StoreInput(QWidget *parent) :
+StoreInput::StoreInput(C5User *user, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::StoreInput)
 {
     ui->setupUi(this);
     ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 30, 100, 0, 300, 140, 100, 100);
     fViewMode = VM_ACCEPT;
+    fUser = user;
     refresh();
 }
 

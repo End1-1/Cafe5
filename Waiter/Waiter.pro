@@ -93,6 +93,7 @@ SOURCES += \
     ../DbData/dbmenupackagelist.cpp \
     ../DbData/dbmenupackages.cpp \
     ../DbData/dboheader.cpp \
+    ../DbData/dbopreorder.cpp \
     ../DbData/dbpartner.cpp \
     ../DbData/dbservicevalues.cpp \
     ../DbData/dbshift.cpp \
@@ -322,7 +323,9 @@ SOURCES += \
     ../Classes/c5widget.cpp \
     qdishbutton.cpp \
     qdishpart2button.cpp \
+    tablewidget.cpp \
     tablewidgetv1.cpp \
+    tablewidgetv2.cpp \
     wguestorder.cpp \
     worder.cpp \
     wpaymentoptions.cpp \
@@ -411,6 +414,7 @@ HEADERS += \
     ../DbData/dbmenupackagelist.h \
     ../DbData/dbmenupackages.h \
     ../DbData/dboheader.h \
+    ../DbData/dbopreorder.h \
     ../DbData/dbpartner.h \
     ../DbData/dbservicevalues.h \
     ../DbData/dbshift.h \
@@ -644,7 +648,9 @@ HEADERS += \
     ../Classes/c5widget.h \
     ../Classes/c5cache.h \
     stoplist.h \
+    tablewidget.h \
     tablewidgetv1.h \
+    tablewidgetv2.h \
     wguestorder.h \
     worder.h \
     wpaymentoptions.h \
@@ -805,6 +811,7 @@ FORMS += \
     dlgtimeorder.ui \
     dlgviewstoplist.ui \
     tablewidgetv1.ui \
+    tablewidgetv2.ui \
     wguestorder.ui \
     worder.ui \
     wpaymentoptions.ui \

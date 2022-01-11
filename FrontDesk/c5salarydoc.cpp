@@ -5,6 +5,7 @@
 #include "c5daterange.h"
 #include "c5cashdoc.h"
 #include "c5mainwindow.h"
+#include "c5user.h"
 #include "c5lineeditwithselector.h"
 
 C5SalaryDoc::C5SalaryDoc(const QStringList &dbParams, QWidget *parent) :
@@ -124,7 +125,7 @@ void C5SalaryDoc::save()
         updateGenNumber(ui->leDocnumber->getInteger(), DOC_TYPE_SALARY);
     }
     C5Database db(fDBParams);
-    db[":f_operator"] = __userid;
+    db[":f_operator"] = __user->id();
     db[":f_userid"] = ui->leDocnumber->text();
     db[":f_comment"] = ui->leRemarks->text();
     db[":f_type"] = DOC_TYPE_SALARY;

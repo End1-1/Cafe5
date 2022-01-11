@@ -20,6 +20,7 @@ void DataDriver::init(const QStringList &dbParams)
     fInstance->fDbPartner = new DbPartner();
     fInstance->fDbDishPart1 = new DbDishPart1();
     fInstance->fDbOHeader = new DbOHeader();
+    fInstance->fDbOPreorder = new DbOPreorder();
     fInstance->fDbGoodsGroup = new DbGoodsGroup();
     fInstance->fDbGoods = new DbGoods();
     fInstance->fDbMenuName = new DbMenuName();

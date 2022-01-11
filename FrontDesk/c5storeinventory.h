@@ -47,6 +47,10 @@ private slots:
 
     void on_leSearch_textChanged(const QString &arg1);
 
+    void on_btnCloseSearch_clicked();
+
+    void on_leFind_textChanged(const QString &arg1);
+
 private:
     Ui::C5StoreInventory *ui;
 

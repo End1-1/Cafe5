@@ -156,9 +156,14 @@ bool JZStore::requestStore(const QByteArray &data, const QHash<QString, DataAddr
         goods[db.integerValue("id")] = r;
     }
     int month = getData(data, dataMap["month"]).toInt() + 1;
+    QList<int> years;
+    years.append(2021);
+    years.append(2022);
+    int year = getData(data, dataMap["year"]).toInt();
+    year = years.at(year);
     QDate d = QDate::currentDate();
-    QDate d1 = QDate::fromString(QString("%1/%2/%3").arg(1, 2, 10, QChar('0')).arg(month, 2, 10, QChar('0')).arg(d.year()), "dd/MM/yyyy");
-    QDate d2 = QDate::fromString(QString("%1/%2/%3").arg(d1.daysInMonth(), 2, 10, QChar('0')).arg(month, 2, 10, QChar('0')).arg(d1.year()), "dd/MM/yyyy");
+    QDate d1 = QDate::fromString(QString("%1/%2/%3").arg(1, 2, 10, QChar('0')).arg(month, 2, 10, QChar('0')).arg(year), "dd/MM/yyyy");
+    QDate d2 = QDate::fromString(QString("%1/%2/%3").arg(d1.daysInMonth(), 2, 10, QChar('0')).arg(month, 2, 10, QChar('0')).arg(year), "dd/MM/yyyy");
     db[":date"] = d1.addDays(-1);
     db[":store_id"] = store;
     db[":action_id"] = 7;

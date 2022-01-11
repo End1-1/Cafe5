@@ -10,6 +10,7 @@ class Working;
 
 class QTableWidgetItem;
 class QTabWidget;
+class C5User;
 
 struct IUser {
     int id;
@@ -29,13 +30,11 @@ class Working : public QWidget
     Q_OBJECT
 
 public:
-    explicit Working(QWidget *parent = nullptr);
+    explicit Working(C5User *user, QWidget *parent = nullptr);
 
     ~Working();
 
     bool eventFilter(QObject *watched, QEvent *event);
-
-    bool getAdministratorRights(int right);
 
     void decQty(int id, double qty);
 
@@ -55,6 +54,8 @@ public:
 
 private:
     Ui::Working *ui;
+
+    C5User *fUser;
 
     void loadStaff();
 
@@ -120,8 +121,6 @@ private slots:
     void on_leCode_returnPressed();
 
     void on_btnSaveOrder_clicked();
-
-    void on_btnSaveOrderNoTax_clicked();
 
     void on_btnExit_clicked();
 

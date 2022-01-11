@@ -53,6 +53,7 @@ void DbData::refresh()
 
 void DbData::getFromDatabase()
 {
+    fData.clear();
     if (fTable.isEmpty()) {
         return;
     }

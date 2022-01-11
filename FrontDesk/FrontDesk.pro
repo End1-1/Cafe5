@@ -42,6 +42,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Classes/c5random.cpp \
     ../Classes/c5storedraftwriter.cpp \
     ../Classes/c5threadobject.cpp \
+    ../Classes/c5user.cpp \
     ../Classes/calculator.cpp \
     ../Classes/doubledatabase.cpp \
     ../Classes/notificationwidget.cpp \
@@ -64,6 +65,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../DbData/dbmenupackagelist.cpp \
     ../DbData/dbmenupackages.cpp \
     ../DbData/dboheader.cpp \
+    ../DbData/dbopreorder.cpp \
     ../DbData/dbpartner.cpp \
     ../DbData/dbservicevalues.cpp \
     ../DbData/dbshift.cpp \
@@ -288,6 +290,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Classes/c5random.h \
     ../Classes/c5storedraftwriter.h \
     ../Classes/c5threadobject.h \
+    ../Classes/c5user.h \
     ../Classes/calculator.h \
     ../Classes/doubledatabase.h \
     ../Classes/notificationwidget.h \
@@ -310,6 +313,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../DbData/dbmenupackagelist.h \
     ../DbData/dbmenupackages.h \
     ../DbData/dboheader.h \
+    ../DbData/dbopreorder.h \
     ../DbData/dbpartner.h \
     ../DbData/dbservicevalues.h \
     ../DbData/dbshift.h \

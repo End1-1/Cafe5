@@ -1,5 +1,6 @@
 #include "c5changepassword.h"
 #include "ui_c5changepassword.h"
+#include "c5user.h"
 
 C5ChangePassword::C5ChangePassword(const QStringList &dbParams) :
     C5Dialog(dbParams),
@@ -38,14 +39,14 @@ void C5ChangePassword::on_btnOK_clicked()
         return;
     }
     C5Database db(fDBParams);
-    db[":f_id"] = __userid;
+    db[":f_id"] = __user->id();
     db[":f_password"] = ui->leOldPassword->text();
     db.exec("select * from s_user where f_id=:f_id and f_password=md5(:f_password)");
     if (!db.nextRow()) {
         C5Message::error(tr("Old password doesnt match"));
         return;
     }
-    db[":f_id"] = __userid;
+    db[":f_id"] = __user->id();
     db[":f_password"] = ui->leNewPassword->text();
     db.exec("update s_user set f_password=md5(:f_password) where f_id=:f_id");
     accept();

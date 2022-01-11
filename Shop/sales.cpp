@@ -13,6 +13,7 @@
 #include "vieworder.h"
 #include "cashcollection.h"
 #include "c5printpreview.h"
+#include "c5user.h"
 #include "c5printing.h"
 #include "dlgdate.h"
 
@@ -21,17 +22,18 @@
 #define VM_TOTAL_ITEMS 2
 #define VM_GROUPS 3
 
-Sales::Sales() :
+Sales::Sales(C5User *user) :
     C5Dialog(__c5config.dbParams()),
     ui(new Ui::Sales)
 {
     ui->setupUi(this);
-    setWindowTitle(dbhall->name(__c5config.defaultHall()) + "," + dbstore->name(__c5config.defaultStore()));
+    fUser = user;
+    setWindowTitle(__c5config.getRegValue("windowtitle").toString());
     ui->lbRetail->setVisible(!__c5config.shopDenyF1());
     ui->leRetail->setVisible(!__c5config.shopDenyF1());
     ui->lbWhosale->setVisible(!__c5config.shopDenyF2());
     ui->leWhosale->setVisible(!__c5config.shopDenyF2());
-    ui->btnChangeDate->setVisible(pr(__c5config.dbParams().at(1), cp_t5_change_date_of_sale));
+    ui->btnChangeDate->setVisible(fUser->check(cp_t5_change_date_of_sale));
     fViewMode = VM_TOTAL;
     C5Database db(__c5config.dbParams());
     if (__c5config.rdbReplica()) {
@@ -48,12 +50,117 @@ Sales::~Sales()
     delete ui;
 }
 
-void Sales::showSales()
+void Sales::showSales(C5User *u)
 {
-    Sales *s = new Sales();
+    Sales *s = new Sales(u);
     s->showMaximized();
     s->exec();
     delete s;
+}
+
+bool Sales::printCheckWithTax(C5Database &db, const QString &id, QString &rseq)
+{
+    bool resultb = true;
+    db[":f_id"] = id;
+    db.exec("select * from o_tax where f_id=:f_id");
+    if (db.nextRow()) {
+        if (db.getInt("f_receiptnumber") > 0) {
+            C5Message::error(tr("Cannot print tax twice"));
+            return resultb;
+        }
+    }
+    if (__c5config.taxIP().toLower() == "http") {
+        QString url = QString("GET /printtax?auth=up&a=get&user=%1&pass=%2&order=%3 HTTP/1.1\r\n\r\n")
+                .arg(__c5config.httpServerUsername())
+                .arg(__c5config.httpServerPassword())
+                .arg(id);
+        auto *s = new QSslSocket(0);
+        //connect(s, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(err(QAbstractSocket::SocketError)));
+        s->addCaCertificate(fSslCertificate);
+        s->setPeerVerifyMode(QSslSocket::VerifyNone);
+        s->connectToHostEncrypted(__c5config.httpServerIP(), __c5config.httpServerPort());
+        if (s->waitForEncrypted(5000)) {
+            s->write(url.toUtf8());
+            if (s->waitForBytesWritten()) {
+                s->waitForReadyRead();
+                QByteArray d = s->readAll();
+                C5Message::info(d);
+            } else {
+                resultb = false;
+                C5Message::error(s->errorString());
+            }
+            s->close();
+        }
+        s->deleteLater();
+        return resultb;
+    }
+    db[":f_id"] = id;
+    db.exec("select * from o_header where f_id=:f_id");
+    db.nextRow();
+    double disc = db.getDouble("f_discountfactor");
+    double card = db.getDouble("f_amountcard");
+    db[":f_id"] = id;
+    db.exec("select og.f_id, og.f_goods, g.f_name, og.f_qty, gu.f_name as f_unitname, og.f_price, og.f_total,"
+            "t.f_taxdept, t.f_adgcode, "
+            "og.f_store "
+            "from o_goods og "
+            "left join c_goods g on g.f_id=og.f_goods "
+            "left join c_units gu on gu.f_id=g.f_unit "
+            "left join c_groups t on t.f_id=g.f_group "
+            "where og.f_header=:f_id");
+    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), 0);
+    while (db.nextRow()) {
+        pt.addGoods(db.getString("f_taxdept"), //dep
+                    db.getString("f_adgcode"), //adg
+                    db.getString("f_goods"), //goods id
+                    db.getString("f_name"), //name
+                    db.getDouble("f_price"), //price
+                    db.getDouble("f_qty"), //qty
+                    disc); //discount
+    }
+    QString jsonIn, jsonOut, err;
+    QString sn, firm, address, fiscal, hvhh, devnum, time;
+    int result = 0;
+    result = pt.makeJsonAndPrint(card, 0, jsonIn, jsonOut, err);
+
+    db[":f_id"] = db.uuid();
+    db[":f_order"] = id;
+    db[":f_date"] = QDate::currentDate();
+    db[":f_time"] = QTime::currentTime();
+    db[":f_in"] = jsonIn;
+    db[":f_out"] = jsonOut;
+    db[":f_err"] = err;
+    db[":f_result"] = result;
+    db.insert("o_tax_log", false);
+    QSqlQuery *q = new QSqlQuery(db.fDb);
+    if (result == pt_err_ok) {
+        PrintTaxN::parseResponse(jsonOut, firm, hvhh, fiscal, rseq, sn, address, devnum, time);
+        db[":f_id"] = id;
+        db.exec("delete from o_tax where f_id=:f_id");
+        db[":f_id"] = id;
+        db[":f_dept"] = C5Config::taxDept();
+        db[":f_firmname"] = firm;
+        db[":f_address"] = address;
+        db[":f_devnum"] = devnum;
+        db[":f_serial"] = sn;
+        db[":f_fiscal"] = fiscal;
+        db[":f_receiptnumber"] = rseq;
+        db[":f_hvhh"] = hvhh;
+        db[":f_fiscalmode"] = tr("(F)");
+        db[":f_time"] = time;
+        db.insert("o_tax", false);
+        pt.saveTimeResult(id, *q);
+        db[":f_tax"] = rseq.toInt();
+        db.update("o_goods", "f_header", id);
+        delete q;
+        C5Message::info(tr("Printed"));
+    } else {
+        resultb = false;
+        pt.saveTimeResult("Not saved - " + id, *q);
+        delete q;
+        C5Message::error(err + "<br>" + jsonOut + "<br>" + jsonIn);
+    }
+    return resultb;
 }
 
 void Sales::on_btnDateLeft_clicked()
@@ -108,7 +215,11 @@ void Sales::refreshTotal()
     db[":f_start"] = ui->deStart->date();
     db[":f_end"] = ui->deEnd->date();
     db[":f_state"] = ORDER_STATE_CLOSE;
-    db.exec("select '', oh.f_id, oh.f_saletype, u.f_login, os.f_name, concat(oh.f_prefix, oh.f_hallid) as f_number, ot.f_receiptnumber, "
+    QString sqlCond = userCond();
+    if (!fUser->check(cp_t5_view_all_sales)) {
+        sqlCond += " and length(ot.f_receiptnumber)>0 ";
+    }
+    QString sql = QString("select '', oh.f_id, oh.f_saletype, u.f_login, os.f_name, concat(oh.f_prefix, oh.f_hallid) as f_number, ot.f_receiptnumber, "
             "oh.f_datecash, oh.f_timeclose, oh.f_amounttotal, concat(c.f_taxname, ' ', c.f_contact) as f_client "
             "from o_header oh "
             "left join b_history h on h.f_id=oh.f_id "
@@ -117,9 +228,10 @@ void Sales::refreshTotal()
             "left join o_tax ot on ot.f_id=oh.f_id "
             "left join o_sale_type os on os.f_id=oh.f_saletype "
             "left join s_user u on u.f_id=oh.f_staff "
-            "where oh.f_datecash between :f_start and :f_end and oh.f_state=:f_state " + userCond() +
+            "where oh.f_datecash between :f_start and :f_end and oh.f_state=:f_state " + sqlCond +
             "and oh.f_hall=:f_hall "
             "order by oh.f_datecash, oh.f_timeclose ");
+    db.exec(sql);
     ui->tbl->setRowCount(db.rowCount());
     int row = 0;
     while (db.nextRow()) {
@@ -167,6 +279,10 @@ void Sales::refreshItems()
     db[":f_start"] = ui->deStart->date();
     db[":f_end"] = ui->deEnd->date();
     db[":f_state"] = ORDER_STATE_CLOSE;
+    QString sqlCond = userCond();
+    if (!fUser->check(cp_t5_view_all_sales)) {
+        sqlCond += " and length(ot.f_receiptnumber)>0 ";
+    }
     db.exec("select oh.f_id, oh.f_saletype, u.f_login, os.f_name, concat(oh.f_prefix, oh.f_hallid) as f_number, ot.f_receiptnumber, "
             "oh.f_datecash, oh.f_timeclose, g.f_scancode, g.f_name as f_goodsname, og.f_qty, og.f_price, og.f_total "
             "from o_goods og "
@@ -178,7 +294,7 @@ void Sales::refreshItems()
             "left join o_tax ot on ot.f_id=oh.f_id "
             "left join o_sale_type os on os.f_id=oh.f_saletype "
             "left join s_user u on u.f_id=oh.f_staff "
-            "where oh.f_datecash between :f_start and :f_end and oh.f_state=:f_state " + userCond() +
+            "where oh.f_datecash between :f_start and :f_end and oh.f_state=:f_state " + sqlCond +
             "and oh.f_hall=:f_hall "
             "order by oh.f_datecash, oh.f_timeclose ");
     ui->tbl->setRowCount(db.rowCount());
@@ -218,12 +334,17 @@ void Sales::refreshTotalItems()
     db[":f_start"] = ui->deStart->date();
     db[":f_end"] = ui->deEnd->date();
     db[":f_state"] = ORDER_STATE_CLOSE;
+    QString sqlCond = userCond();
+    if (!fUser->check(cp_t5_view_all_sales)) {
+        sqlCond += " and length(ot.f_receiptnumber)>0 ";
+    }
     db.exec("select g.f_scancode, g.f_name as f_goodsname, sum(og.f_qty), sum(og.f_total) "
             "from o_goods og "
             "inner join o_header oh on oh.f_id=og.f_header "
             "inner join c_goods g on g.f_id=og.f_goods "
             "left join s_user u on u.f_id=oh.f_staff "
-            "where oh.f_datecash between :f_start and :f_end and oh.f_state=:f_state " + userCond() +
+            "left join o_tax ot on ot.f_id=oh.f_id "
+            "where oh.f_datecash between :f_start and :f_end and oh.f_state=:f_state " + sqlCond +
             "and oh.f_hall=:f_hall "
             "group by 1, 2 "
             "order by oh.f_datecash, oh.f_timeclose ");
@@ -260,15 +381,20 @@ void Sales::refreshGroups()
     db[":f_start"] = ui->deStart->date();
     db[":f_end"] = ui->deEnd->date();
     db[":f_state"] = ORDER_STATE_CLOSE;
+    QString sqlCond = userCond();
+    if (!fUser->check(cp_t5_view_all_sales)) {
+        sqlCond += " and length(ot.f_receiptnumber)>0 ";
+    }
     db.exec("select oh.f_datecash, h.f_name as f_hallname, gg.f_name as f_groupname, "
             "sum(og.f_qty * og.f_sign) as f_qty, sum(og.f_total*og.f_sign) as f_total "
             "from o_goods og "
             "inner join o_header oh on oh.f_id=og.f_header "
+            "left join o_tax ot on ot.f_id=oh.f_id "
             "inner join c_goods g on g.f_id=og.f_goods "
             "left join c_groups gg on gg.f_id=g.f_group "
             "left join s_user u on u.f_id=oh.f_staff "
             "left join h_halls h on h.f_id=oh.f_hall "
-            "where oh.f_datecash between :f_start and :f_end and oh.f_state=:f_state " + userCond() +
+            "where oh.f_datecash between :f_start and :f_end and oh.f_state=:f_state " + sqlCond +
             "and oh.f_hall=:f_hall "
             "group by 1, 2, 3 "
             "order by 3 desc ");
@@ -608,105 +734,10 @@ void Sales::on_btnPrintTax_clicked()
         return;
     }
     QString id = ui->tbl->getString(ml.at(0).row(), 1);
+    QString rseq;
     C5Database db(__c5config.replicaDbParams());
-    db[":f_id"] = id;
-    db.exec("select * from o_tax where f_id=:f_id");
-    if (db.nextRow()) {
-        if (db.getInt("f_receiptnumber") > 0) {
-            C5Message::error(tr("Cannot print tax twice"));
-            return;
-        }
-    }
-    if (__c5config.taxIP().toLower() == "http") {
-        QString url = QString("GET /printtax?auth=up&a=get&user=%1&pass=%2&order=%3 HTTP/1.1\r\n\r\n")
-                .arg(__c5config.httpServerUsername())
-                .arg(__c5config.httpServerPassword())
-                .arg(id);
-        auto *s = new QSslSocket(this);
-        connect(s, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(err(QAbstractSocket::SocketError)));
-        s->addCaCertificate(fSslCertificate);
-        s->setPeerVerifyMode(QSslSocket::VerifyNone);
-        s->connectToHostEncrypted(__c5config.httpServerIP(), __c5config.httpServerPort());
-        if (s->waitForEncrypted(5000)) {
-            s->write(url.toUtf8());
-            if (s->waitForBytesWritten()) {
-                s->waitForReadyRead();
-                QByteArray d = s->readAll();
-                C5Message::info(d);
-            } else {
-                C5Message::error(s->errorString());
-            }
-            s->close();
-        }
-        s->deleteLater();
-        return;
-    }
-    db[":f_id"] = id;
-    db.exec("select * from o_header where f_id=:f_id");
-    db.nextRow();
-    double disc = db.getDouble("f_discountfactor");
-    double card = db.getDouble("f_amountcard");
-    db[":f_id"] = id;
-    db.exec("select og.f_id, og.f_goods, g.f_name, og.f_qty, gu.f_name as f_unitname, og.f_price, og.f_total,"
-            "t.f_taxdept, t.f_adgcode, "
-            "og.f_store "
-            "from o_goods og "
-            "left join c_goods g on g.f_id=og.f_goods "
-            "left join c_units gu on gu.f_id=g.f_unit "
-            "left join c_groups t on t.f_id=g.f_group "
-            "where og.f_header=:f_id");
-    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
-    while (db.nextRow()) {
-        pt.addGoods(db.getString("f_taxdept"), //dep
-                    db.getString("f_adgcode"), //adg
-                    db.getString("f_goods"), //goods id
-                    db.getString("f_name"), //name
-                    db.getDouble("f_price"), //price
-                    db.getDouble("f_qty"), //qty
-                    disc); //discount
-    }
-    QString jsonIn, jsonOut, err;
-    QString sn, firm, address, fiscal, hvhh, rseq, devnum, time;
-    int result = 0;
-    result = pt.makeJsonAndPrint(card, 0, jsonIn, jsonOut, err);
-
-    db[":f_id"] = db.uuid();
-    db[":f_order"] = id;
-    db[":f_date"] = QDate::currentDate();
-    db[":f_time"] = QTime::currentTime();
-    db[":f_in"] = jsonIn;
-    db[":f_out"] = jsonOut;
-    db[":f_err"] = err;
-    db[":f_result"] = result;
-    db.insert("o_tax_log", false);
-    QSqlQuery *q = new QSqlQuery(db.fDb);
-    if (result == pt_err_ok) {
-        PrintTaxN::parseResponse(jsonOut, firm, hvhh, fiscal, rseq, sn, address, devnum, time);
-        db[":f_id"] = id;
-        db.exec("delete from o_tax where f_id=:f_id");
-        db[":f_id"] = id;
-        db[":f_dept"] = C5Config::taxDept();
-        db[":f_firmname"] = firm;
-        db[":f_address"] = address;
-        db[":f_devnum"] = devnum;
-        db[":f_serial"] = sn;
-        db[":f_fiscal"] = fiscal;
-        db[":f_receiptnumber"] = rseq;
-        db[":f_hvhh"] = hvhh;
-        db[":f_fiscalmode"] = tr("(F)");
-        db[":f_time"] = time;
-        db.insert("o_tax", false);
-        pt.saveTimeResult(id, *q);
-        db[":f_tax"] = rseq.toInt();
-        db.update("o_goods", "f_header", id);
-        delete q;
-        ui->tbl->setString(ml.at(0).row(), 5, rseq);
-        C5Message::info(tr("Printed"));
-    } else {
-        pt.saveTimeResult("Not saved - " + id, *q);
-        delete q;
-        C5Message::error(err + "<br>" + jsonOut + "<br>" + jsonIn);
-    }
+    printCheckWithTax(db, id, rseq);
+    ui->tbl->setString(ml.at(0).row(), 5, rseq);
 }
 
 void Sales::on_btnRetryUpload_clicked()

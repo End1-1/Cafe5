@@ -21,7 +21,6 @@ ShopRequest::ShopRequest() :
 
 bool ShopRequest::handle(const QByteArray &data, const QHash<QString, DataAddress> &dataMap)
 {
-    qDebug() << fOrderJson;
     JsonHandler jh;
     Database db;
     if (!DatabaseConnectionManager::openDatabase(ShopManager::databaseName(), db, jh)) {
@@ -50,6 +49,22 @@ bool ShopRequest::handle(const QByteArray &data, const QHash<QString, DataAddres
     db.commit();
 
     double amountTotal = 0;
+    //Check for multiple quantity and separate one by one
+    QJsonArray ja = fOrderJson["items"].toArray();
+    for (int i = 0; i < ja.count(); i++) {
+        QJsonObject o = fOrderJson["items"].toArray().at(i).toObject();
+        while (o["qty"].toDouble() > 1) {
+            o["qty"] = o["qty"].toDouble() - 1;
+            ja[i] = o;
+            QJsonObject oc = o;
+            oc["qty"] = 1;
+            oc["row"] = ja.count();
+            ja.append(oc);
+        }
+    }
+    qDebug() << fOrderJson;
+    fOrderJson["items"] = ja;
+    qDebug() << fOrderJson;
     for (int i = 0; i < fOrderJson["items"].toArray().count(); i++) {
         QJsonObject o = fOrderJson["items"].toArray().at(i).toObject();
         amountTotal += o["price"].toDouble() * o["qty"].toDouble();

@@ -8,7 +8,13 @@ class DbHalls : public DbData
 public:
     DbHalls();
 
+    DbHalls(int id);
+
     int settings(int id);
+
+    int booking(int id);
+
+
 };
 
 #endif // DBHALLS_H

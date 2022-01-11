@@ -26,6 +26,7 @@ int main(int argc, char *argv[])
     libPath << qApp->applicationDirPath() + "/platforms";
     libPath << qApp->applicationDirPath() + "/sqldrivers";
     libPath << qApp->applicationDirPath() + "/printsupport";
+    libPath << qApp->applicationDirPath() + "/imageformats";
     QCoreApplication::setLibraryPaths(libPath);
 #endif
 

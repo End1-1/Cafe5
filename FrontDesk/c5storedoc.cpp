@@ -11,6 +11,7 @@
 #include "ce5partner.h"
 #include "ce5goods.h"
 #include "c5storebarcode.h"
+#include "c5user.h"
 #include "c5storedraftwriter.h"
 #include "calculator.h"
 #include <QMenu>
@@ -47,8 +48,8 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
 #endif
     ui->tblGoods->setColumnWidths(ui->tblGoods->columnCount(), 0, 0, 0, 0, 400, 80, 80, 80, 80, 300);
     ui->tblGoodsStore->setColumnWidths(7, 0, 0, 200, 70, 50, 50, 70);
-    ui->btnNewPartner->setVisible(pr(dbParams.at(1), cp_t7_partners));
-    ui->btnNewGoods->setVisible(pr(dbParams.at(1), cp_t6_goods));
+    ui->btnNewPartner->setVisible(__user->check(cp_t7_partners));
+    ui->btnNewGoods->setVisible(__user->check(cp_t6_goods));
     ui->leAccepted->setSelector(dbParams, ui->leAcceptedName, cache_users);
     ui->lePassed->setSelector(dbParams, ui->lePassedName, cache_users);
     ui->lbCashDoc->setVisible(!C5Config::noCashDocStore());
@@ -60,8 +61,8 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
     ui->lbPayment->setVisible(!C5Config::noCashDocStore());
     ui->chPaid->setVisible(!C5Config::noCashDocStore());
     ui->leScancode->setVisible(!C5Config::noScanCodeStore());
-    ui->btnNewGoods->setVisible(pr(dbParams.at(1), cp_t6_goods));
-    ui->btnEditGoods->setVisible(pr(dbParams.at(1), cp_t6_goods));
+    ui->btnNewGoods->setVisible(__user->check(cp_t6_goods));
+    ui->btnEditGoods->setVisible(__user->check(cp_t6_goods));
     fInternalId = "";
     fDocState = DOC_STATE_DRAFT;
     ui->tblGoodsGroup->viewport()->installEventFilter(this);
@@ -85,7 +86,7 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
     fCanChangeFocus = true;
     ui->tblAdd->setColumnWidths(ui->tblAdd->columnCount(), 0, 300, 80);
     ui->leComplectationQty->setValidator(new QDoubleValidator(0, 999999999, 3));
-    if (pr(dbParams.at(1), cp_t1_deny_change_store_doc_date)) {
+    if (!__user->check(cp_t1_deny_change_store_doc_date)) {
         ui->deDate->setEnabled(false);
     }
     ui->btnRememberStoreIn->setChecked(__c5config.getRegValue("storedoc_storeinput").toBool());
@@ -647,7 +648,7 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
         if (state == DOC_STATE_SAVED && ui->chPaid->isChecked()) {
             cashstate = DOC_STATE_SAVED;
         }
-        dw.writeAHeader(fCashUuid, fCashUserId, cashstate, DOC_TYPE_CASH, __userid, ui->deCashDate->date(),
+        dw.writeAHeader(fCashUuid, fCashUserId, cashstate, DOC_TYPE_CASH, __user->id(), ui->deCashDate->date(),
                         QDate::currentDate(), QTime::currentTime(), ui->lePartner->getInteger(), ui->leTotal->getDouble(),
                         purpose, 0, 0);
         dw.writeAHeaderCash(fCashUuid, 0, ui->leCash->getInteger(), 1, fInternalId, "");
@@ -657,7 +658,7 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
     dw.updateField("a_store_draft", "f_reason", ui->leReason->getInteger(), "f_document", fInternalId);
     dw.updateField("a_store", "f_reason", ui->leReason->getInteger(), "f_document", fInternalId);
     if (state == fDocState && state == DOC_STATE_SAVED) {
-        dw.writeAHeaderPartial(fInternalId, ui->leDocNum->text(), __userid, QDate::currentDate(), QTime::currentTime(),
+        dw.writeAHeaderPartial(fInternalId, ui->leDocNum->text(), __user->id(), QDate::currentDate(), QTime::currentTime(),
                                  ui->lePartner->getInteger(),ui->leComment->text(), ui->lePayment->getInteger(), ui->chPaid->isChecked());
         db.commit();
         return true;
@@ -680,7 +681,7 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
     }
 
     dw.clearAStoreDraft(fInternalId);
-    if (!dw.writeAHeader(fInternalId, ui->leDocNum->text(), fDocState, fDocType, __userid, ui->deDate->date(), QDate::currentDate(), QTime::currentTime(),
+    if (!dw.writeAHeader(fInternalId, ui->leDocNum->text(), fDocState, fDocType, __user->id(), ui->deDate->date(), QDate::currentDate(), QTime::currentTime(),
                          ui->lePartner->getInteger(), ui->leTotal->getDouble(), ui->leComment->text(), ui->lePayment->getInteger(), ui->chPaid->isChecked())) {
         err += db.fLastError + "<br>";
     }
@@ -789,7 +790,7 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
     }
 
     countTotal();
-    if (!dw.writeAHeader(fInternalId, ui->leDocNum->text(), state, fDocType, __userid, ui->deDate->date(), QDate::currentDate(), QTime::currentTime(),
+    if (!dw.writeAHeader(fInternalId, ui->leDocNum->text(), state, fDocType, __user->id(), ui->deDate->date(), QDate::currentDate(), QTime::currentTime(),
                          ui->lePartner->getInteger(), ui->leTotal->getDouble(), ui->leComment->text(), ui->lePayment->getInteger(), ui->chPaid->isChecked())) {
         err += db.fLastError + "<br>";
     }
@@ -1025,7 +1026,7 @@ void C5StoreDoc::addGoods(int goods, const QString &name, double qty, const QStr
 void C5StoreDoc::setDocEnabled(bool v)
 {
     ui->deDate->setEnabled(v);
-    if (pr(fDBParams.at(1), cp_t1_deny_change_store_doc_date)) {
+    if (!__user->check(cp_t1_deny_change_store_doc_date)) {
         ui->deDate->setEnabled(false);
     }
     ui->leStoreInput->setEnabled(v);

@@ -12,17 +12,20 @@ class WOrder;
 
 class Working;
 class C5TableWidget;
+class C5User;
 
 class WOrder : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit WOrder(int saleType, QWidget *parent = nullptr);
+    explicit WOrder(C5User *user, int saleType, QWidget *parent = nullptr);
 
     ~WOrder();
 
     int fSaleType;
+
+    QString fOrderUUID;
 
     void changeIshmarColor(const QString &c);
 
@@ -34,7 +37,7 @@ public:
 
     void addGoodsToTable(int id);
 
-    bool writeOrder(bool tax = true);
+    bool writeOrder();
 
     bool writePreorder();
 
@@ -93,6 +96,8 @@ private slots:
 
 private:
     Ui::WOrder *ui;
+
+    C5User *fUser;
 
     QDate fDateOpen;
 

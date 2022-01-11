@@ -868,7 +868,6 @@ bool C5StoreDraftWriter::writeOutput(const QString &docId, QString &err)
         }
     }
 
-    QList<QMap<QString, QVariant> > goodsData;
     QStringList recID;
     QStringList baseID;
     QStringList goodsID;
@@ -877,9 +876,11 @@ bool C5StoreDraftWriter::writeOutput(const QString &docId, QString &err)
     QList<double> priceList;
     QList<double> totalList;
     fDb[":f_document"] = docId;
-    fDb.exec("select s.f_id, s.f_goods, s.f_store, s.f_qty, s.f_price, s.f_total, concat(g.f_name, if(g.f_scancode is null, '', concat(' ', g.f_scancode))) as f_name, s.f_base, s.f_reason "
-               "from a_store_draft s inner join c_goods g on g.f_id=s.f_goods "
-               "where f_document=:f_document and f_type=-1");
+    fDb.exec("select s.f_id, g.f_storeid as f_goods, s.f_store, s.f_qty, s.f_price, s.f_total, "
+            "concat(g.f_name, if(g.f_scancode is null, '', concat(' ', g.f_scancode))) as f_name, s.f_base, s.f_reason "
+            "from a_store_draft s "
+            "inner join c_goods g on g.f_id=s.f_goods "
+            "where f_document=:f_document and f_type=-1");
     while (fDb.nextRow()) {
         recID.append(fDb.getString("f_id"));
         baseID.append(fDb.getString("f_base"));

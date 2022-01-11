@@ -39,10 +39,14 @@ private slots:
 
     void on_btnPrint_clicked();
 
+    void on_btnClear_clicked();
+
 private:
     Ui::CE5MFProduct *ui;
 
     QString durationStr(int sec);
+
+    QList<int> fRemovedRow;
 };
 
 #endif // CE5MFPRODUCT_H

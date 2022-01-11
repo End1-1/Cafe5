@@ -27,8 +27,6 @@ private slots:
 
     void timeout();
 
-    void checkVersionTimeout();
-
     void hallClicked();
 
     void tableClicked(int id);
@@ -47,10 +45,6 @@ private slots:
 
     void on_btnCancel_clicked();
 
-    void on_btnShowHidePreorders_clicked();
-
-    void on_tblReserved_cellClicked(int row, int column);
-
     void on_btnViewHall_clicked();
 
     void on_btnViewWaiter_clicked();
@@ -65,8 +59,6 @@ private:
     int fCurrentStaff;
 
     QTimer fTimer;
-
-    QTimer fTimerCheckVersion;
 
     bool fModeJustSelectTable;
 

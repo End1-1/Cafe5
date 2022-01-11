@@ -719,4 +719,13 @@ alter table d_package_list add column f_qty decimal(14,2) after f_dish;
 /*db - 61 */
 /* 14.12.2021 */
 update s_app set f_version='61' where f_app='DB';
-create table d_image (f_id integer primary key, f_image blob);
+create table d_image (f_id integer primary key, f_image mediumblob);
+drop table d_img;
+
+
+/*db - 62 */
+/* 30.12.2021 */
+update s_app set f_version='62' where f_app='DB';
+alter table o_preorder add column f_guestname tinytext, add column f_cityledger integer, add column f_prepaidpayx decimal(14,2) after f_prepaidcard; 
+alter table o_preorder add column f_fortable integer;
+alter table o_header add column f_amountidram decimal(14,3), add column f_amountpayx decimal(14,2);

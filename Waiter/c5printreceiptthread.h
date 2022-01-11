@@ -17,6 +17,8 @@ public:
 
     QString fError;
 
+    QMap<int, QString> fIdram;
+
 private:
     QMap<QString, QVariant> fHeaderInfo;
 

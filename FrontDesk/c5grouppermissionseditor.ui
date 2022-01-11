@@ -20,7 +20,7 @@
       <enum>QTabWidget::West</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
@@ -166,9 +166,9 @@
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>0</y>
+            <y>-134</y>
             <width>597</width>
-            <height>725</height>
+            <height>794</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -199,6 +199,16 @@
              </property>
              <property name="Tag" stdset="0">
               <number>528</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="C5CheckBox" name="checkBox_97">
+             <property name="text">
+              <string>Show all sales</string>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>536</number>
              </property>
             </widget>
            </item>
@@ -409,6 +419,26 @@
              </property>
              <property name="Tag" stdset="0">
               <number>503</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="C5CheckBox" name="checkBox_102">
+             <property name="text">
+              <string>Payment, Idram</string>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>537</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="C5CheckBox" name="checkBox_103">
+             <property name="text">
+              <string>Payment, PayX</string>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>538</number>
              </property>
             </widget>
            </item>

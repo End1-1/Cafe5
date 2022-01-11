@@ -6,6 +6,7 @@
 #include "c5database.h"
 #include "c5utils.h"
 #include "c5replication.h"
+#include "c5user.h"
 #include "c5checkbox.h"
 #include "c5storedraftwriter.h"
 #include "printreceipt.h"
@@ -15,7 +16,7 @@ ViewOrder::ViewOrder(const QString &order) :
     ui(new Ui::ViewOrder)
 {
     ui->setupUi(this);
-    ui->btnSave->setVisible(pr(__c5config.dbParams().at(1), cp_t5_change_date_of_sale));
+    ui->btnSave->setVisible(__user->check(cp_t5_change_date_of_sale));
     fUuid = order;
     ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 30, 300, 100, 100, 100, 0, 200);
     C5Database db(__c5config.replicaDbParams());

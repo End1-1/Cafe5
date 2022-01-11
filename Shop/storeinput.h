@@ -7,12 +7,14 @@ namespace Ui {
 class StoreInput;
 }
 
+class C5User;
+
 class StoreInput : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit StoreInput(QWidget *parent = nullptr);
+    explicit StoreInput(C5User *user, QWidget *parent = nullptr);
 
     ~StoreInput();
 
@@ -45,6 +47,8 @@ private:
     Ui::StoreInput *ui;
 
     int fViewMode;
+
+    C5User *fUser;
 
     void getList();
 

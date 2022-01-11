@@ -22,8 +22,9 @@ C5User::C5User(const QString &altPassword) :
 C5User::C5User(int id) :
     C5User()
 {
-    Q_UNUSED(id);
-    //TODO: remove this constructor
+    if (id > 0) {
+        loadFromDB(id);
+    }
 }
 
 bool C5User::isValid()
@@ -51,18 +52,24 @@ int C5User::group()
     return data("f_group").toInt();
 }
 
-bool C5User::authByPinPass(const QString &pin, const QString &pass)
+bool C5User::isActive()
 {
+    return data("f_state").toInt() == 1;
+}
+
+bool C5User::authByUsernamePass(const QString &username, const QString &pass)
+{
+    fError.clear();
+    fValid = false;
     C5Database db(__c5config.dbParams());
-    db[":f_login"] = pin;
+    db[":f_login"] = username;
     db[":f_password"] = pass;
-    db.exec("select * from s_user where f_login=:f_login and f_altpassword=md5(:f_password)");
+    db.exec("select * from s_user where f_login=:f_login and f_password=md5(:f_password)");
     if (db.nextRow()) {
         if (db.getInt(2) == 2){
             fError = tr("User is inactive");
         } else {
             db.rowToMap(fUserData);
-            return true;
         }
     } else {
         fError = tr("Login failed");
@@ -70,6 +77,31 @@ bool C5User::authByPinPass(const QString &pin, const QString &pass)
     if (fError.isEmpty()) {
         getPermissions();
         getState();
+        fValid = true;
+    }
+    return fError.isEmpty();
+}
+
+bool C5User::authByPinPass(const QString &pin, const QString &pass)
+{
+    fValid = false;
+    C5Database db(__c5config.dbParams());
+    db[":f_login"] = pin;
+    db[":f_password"] = pass;
+    db.exec("select * from s_user where f_login=:f_login and f_altpassword=md5(:f_password)");
+    if (db.nextRow()) {
+        if (db.getInt("f_state") == 2){
+            fError = tr("User is inactive");
+        } else {
+            db.rowToMap(fUserData);
+        }
+    } else {
+        fError = tr("Login failed");
+    }
+    if (fError.isEmpty()) {
+        getPermissions();
+        getState();
+        fValid = true;
     }
     return fError.isEmpty();
 }
@@ -126,6 +158,23 @@ bool C5User::leaveWork()
 C5User::UserState C5User::state()
 {
     return fState;
+}
+
+bool C5User::loadFromDB(int id)
+{
+    C5Database db(__c5config.dbParams());
+    db[":f_id"] = id;
+    db.exec("select * from s_user where f_id=:f_id ");
+    if (!db.nextRow()) {
+        fError = tr("Access denied");
+        fValid = false;
+        return false;
+    }
+    db.rowToMap(fUserData);
+    getPermissions();
+    getState();
+    fValid = true;
+    return true;
 }
 
 C5User::C5User() :

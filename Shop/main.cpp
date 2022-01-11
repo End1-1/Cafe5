@@ -97,33 +97,29 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    bool login = false;
     C5Database db(C5Config::dbParams());
     QString user, pin;
-    C5User ua(0);
+    __user = new C5User(0);
     if (!__c5config.shopEnterPin()) {
         user = __c5config.getValue(param_shop_autologin_pin1);
         pin = __c5config.getValue(param_shop_autologin_pin2);
+        __user->authByPinPass(user, pin);
     }
-    do {
+    while (!__user->isValid() || !__user->isActive()) {
         if (!DlgPin::getPin(user, pin)) {
             return 0;
         }
 
-        if (ua.authByPinPass(user, pin)) {
-            login = true;
+        if (__user->authByPinPass(user, pin)) {
+
         } else {
-            C5Message::error(ua.error());
+            C5Message::error(__user->error());
         }
         pin.clear();
         user.clear();
-    } while (!login);
-    db[":f_group"] = ua.group();
-    db.exec("select f_key from s_user_access where f_group=:f_group");
-    while (db.nextRow()) {
-        __userpermissions.append(db.getInt(0));
-    }
-    db[":f_user"] = ua.id();
+    };
+
+    db[":f_user"] = __user->id();
     db.exec("select sn.f_id, sn.f_name from s_settings_names sn where sn.f_id in (select f_settings from s_user_config where f_user=:f_user)");
     auto *s = new SettingsSelection();
     while (db.nextRow()) {
@@ -148,18 +144,25 @@ int main(int argc, char *argv[])
         delete rp;
         __c5config.initParamsFromDb();
     }
-    __userid = ua.id();
-    __usergroup = ua.group();
 
     DataDriver::init(__c5config.dbParams());
-    C5Permissions::init(db);
 
     auto *dlgsplash = new DlgSplashScreen();
     dlgsplash->exec();
     delete dlgsplash;
 
-    Working w;
-    w.setWindowTitle(dbhall->name(__c5config.defaultHall()) + "," + dbstore->name(__c5config.defaultStore()));
+    Working w(__user);
+    w.setWindowTitle("");
+    if (__c5config.defaultHall() > 0) {
+        w.setWindowTitle(w.windowTitle() + "[" + dbhall->name(__c5config.defaultHall()) + "]");
+    }
+    if (__c5config.defaultStore() > 0) {
+        w.setWindowTitle(w.windowTitle() + "[" + dbstore->name(__c5config.defaultStore()) + "]");
+    } else {
+        C5Message::error(QObject::tr("Store is not defined."));
+        return 0;
+    }
+    __c5config.setRegValue("windowtitle", w.windowTitle());
     __c5config.fParentWidget = &w;
     C5Dialog::setMainWindow(&w);
     w.showMaximized();

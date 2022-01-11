@@ -75,6 +75,11 @@
 #define param_hotel_hall_id 71
 #define param_hotel_noinvoice 72
 #define param_static_qr_text 73
+#define param_idram_tips 74
+#define param_idram_tips_wallet 75
+#define param_idram_name 76
+#define param_idram_session_id 77
+#define param_no_tax 78
 
 #define FRONTDESK_WAITER 0
 #define FRONTDESK_SHOP 1
@@ -82,6 +87,8 @@
 #define SALE_RETAIL 1
 #define SALE_WHOSALE 2
 #define SALE_PREORDER 3
+
+class C5User;
 
 class C5Config
 {
@@ -248,15 +255,9 @@ extern QStringList __autologin_store;
 
 extern C5Config __c5config;
 
-extern int __userid;
-
-extern int __usergroup;
-
-extern QString __username;
-
-extern QList<int> __userpermissions;
-
 extern QStringList __databases;
+
+extern C5User *__user;
 
 extern QSslCertificate fSslCertificate;
 

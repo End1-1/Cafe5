@@ -43,8 +43,7 @@ void C5WaiterServer::reply(QJsonObject &o)
 {
     C5ServerHandler srh;
 #ifdef QT_DEBUG
-    srh.fDb[":f_json"] = QJsonDocument(fIn).toJson();
-    srh.fDb.insert("o_waiterserver_debug", false);
+    qDebug() << fIn;
 #endif
     QMap<QString, QVariant> bv;
     int cmd = fIn["cmd"].toInt();
@@ -244,6 +243,7 @@ void C5WaiterServer::reply(QJsonObject &o)
         o["order"] = fIn["order"];
         C5PrintServiceThread ps(fIn["order"].toString());
         ps.fReprintList = fIn["reprint"].toString();
+        ps.fBooking = fIn["booking"].toInt() == 1;
         ps.run();
         break;
     }
@@ -729,7 +729,7 @@ void C5WaiterServer::saveOrder(QJsonObject &o, QJsonObject &jh, QJsonArray &ja, 
             db[":f_id"] = jh["f_id"].toString();
             db.insert("o_preorder", false);
         }
-        db[":f_state"] = ja.count() == 0 ? ORDER_STATE_PREORDER_1 : ORDER_STATE_PREORDER_2;
+        db[":f_state"] = ja.count() == 0 ? ORDER_STATE_PREORDER_EMPTY : ORDER_STATE_PREORDER_WITH_ORDER;
         db.update("o_header", "f_id", jh["f_id"].toString());
     }
     db.commit();
@@ -979,7 +979,10 @@ int C5WaiterServer::printTax(const QMap<QString, QVariant> &header, const QList<
     }
     QString jsonIn, jsonOut;
     int result = 0;
-    result = pt.makeJsonAndPrint(header["f_amountcard"].toDouble(), 0, jsonIn, jsonOut, err);
+    double cardamount = header["f_amountcard"].toDouble()
+            + header["f_amountidram"].toDouble()
+            + header["f_amountpayx"].toDouble();
+    result = pt.makeJsonAndPrint(cardamount, 0, jsonIn, jsonOut, err);
     db[":f_id"] = db.uuid();
     db[":f_order"] = header["f_id"].toString();
     db[":f_date"] = QDate::currentDate();
@@ -1133,6 +1136,11 @@ bool C5WaiterServer::printReceipt(QString &err, C5Database &db, bool isBill)
     case 80: {
         C5PrintReceiptThread pr(fIn["order"].toString(), headerInfo, bodyInfo, printerName, fIn["language"].toInt(), paperWidth);
         pr.fBill = isBill;
+        pr.fIdram[param_idram_name] = C5Config::getValue(param_idram_name);
+        pr.fIdram[param_idram_id] = C5Config::getValue(param_idram_id);
+        pr.fIdram[param_idram_phone] = C5Config::getValue(param_idram_phone);
+        pr.fIdram[param_idram_tips] = C5Config::getValue(param_idram_tips);
+        pr.fIdram[param_idram_tips_wallet] = C5Config::getValue(param_idram_tips_wallet);
         if (!pr.print()) {
             err = pr.fError;
         }

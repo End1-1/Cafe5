@@ -128,6 +128,11 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     fTags[ui->leUserIdForHotelVoucher->getTag()] = ui->leUserIdForHotelVoucher->text();
     fTags[ui->leHallIdForHotel->getTag()] = ui->leHallIdForHotel->text();
     fTags[ui->leStaticQRCode->getTag()] = ui->leStaticQRCode->text();
+    fTags[ui->leIdramTipsWallet->getTag()] = ui->leIdramTipsWallet->text();
+    fTags[ui->chIdramTips->getTag()] = ui->chIdramTips->isChecked() ? "1" : "0";
+    fTags[ui->leIdramName->getTag()] = ui->leIdramName->text();
+    fTags[ui->leIdramSessionId->getTag()] = ui->leIdramSessionId->text();
+    fTags[ui->chExternalTax->getTag()] = ui->chExternalTax->isChecked() ? "1" : "0";
     C5Database db(fDBParams);
     db[":f_settings"] = ui->leCode->getInteger();
     db.exec("delete from s_settings_values where f_settings=:f_settings");

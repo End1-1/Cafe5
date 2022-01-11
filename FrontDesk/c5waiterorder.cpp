@@ -4,6 +4,7 @@
 #include "c5waiterorder.h"
 #include "c5waiterorderdoc.h"
 #include "c5storedraftwriter.h"
+#include "c5user.h"
 #include "c5dishwidget.h"
 #include "c5mainwindow.h"
 #include "proxytablewidgetdatabase.h"
@@ -123,7 +124,7 @@ QToolBar *C5WaiterOrder::toolBar()
         fToolBar->addAction(QIcon(":/eye.png"), tr("Show all"), this, SLOT(showAll()));
         fToolBar->addAction(QIcon(":/eye-no.png"), tr("Hide removed"), this, SLOT(hideRemoved()));
         fToolBar->addAction(QIcon(":/delete.png"), tr("Remove"), this, SLOT(removeOrder()));
-        if (pr(fDBParams.at(1), cp_t5_edit_closed_order)) {
+        if (__user->check(cp_t5_edit_closed_order)) {
             fToolBar->addAction(QIcon(":/save.png"), tr("Save"), this, SLOT(saveOrder()));
             fToolBar->addAction(QIcon(":/storeinput.png"), tr("Store output"), this, SLOT(storeOutput()));
         } else {
@@ -193,6 +194,7 @@ void C5WaiterOrder::saveOrder()
     db[":f_datecash"] = ui->deDateCash->date();
     db[":f_amountcard"] = ui->leCard->getDouble();
     db[":f_amountcash"] = ui->leCash->getDouble();
+    db[":f_amountbank"] = ui->leBank->getDouble();
     db[":f_amountother"] = ui->leOther->getDouble();
     db.update("o_header", "f_id", ui->leUuid->text());
     C5Message::info(tr("Saved"));

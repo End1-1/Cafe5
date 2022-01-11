@@ -8,6 +8,7 @@ class SelectStaff;
 }
 
 class Working;
+class C5User;
 
 class SelectStaff : public QDialog
 {
@@ -17,6 +18,8 @@ public:
     explicit SelectStaff(QWidget *parent = nullptr);
 
     ~SelectStaff();
+
+    C5User *fUser;
 
 private slots:
     void on_leNum_returnPressed();

@@ -10,7 +10,7 @@ CE5DishPackage::CE5DishPackage(const QStringList &dbParams, QWidget *parent) :
     ui(new Ui::CE5DishPackage)
 {
     ui->setupUi(this);
-    ui->tblDishes->setColumnWidths(ui->tblDishes->columnCount(), 0, 0, 300, 80, 80, 200, 200);
+    ui->tblDishes->setColumnWidths(ui->tblDishes->columnCount(), 0, 0, 300, 80, 80, 200, 200, 80);
     ui->leMenu->setSelector(fDBParams, ui->leMenuName, cache_menu_names);
 }
 
@@ -34,7 +34,8 @@ void CE5DishPackage::setId(int id)
     CE5Editor::setId(id);
     C5Database db(fDBParams);
     db[":f_package"] = id;
-    db.exec("select p.f_id, p.f_dish, d.f_name, p.f_qty, p.f_price, p.f_store, p.f_printer "
+    db.exec("select p.f_id, p.f_dish, d.f_name, p.f_qty, p.f_price, p.f_store, p.f_printer, "
+            "d.f_cost "
             "from d_package_list p "
             "inner join d_dish d on d.f_id=p.f_dish "
             "where p.f_package=:f_package");
@@ -55,8 +56,16 @@ void CE5DishPackage::setId(int id)
         cb = ui->tblDishes->createComboBox(r, 6);
         cb->setCache(fDBParams, cache_waiter_printers);
         cb->setCurrentIndex(cb->findText(db.getString(6)));
+
+        ui->tblDishes->setData(r, 7, db.getDouble("f_cost"));
     }
-    setPrice("");
+    double p = 0, sc = 0;
+    for (int i = 0; i < ui->tblDishes->rowCount(); i++) {
+        p += ui->tblDishes->lineEdit(i, 3)->getDouble() * ui->tblDishes->lineEdit(i, 4)->getDouble();
+        sc += ui->tblDishes->getDouble(i, 7) * ui->tblDishes->lineEdit(i, 3)->getDouble();
+    }
+    ui->lePrice->setDouble(p);
+    ui->leSelfCost->setDouble(sc);
 }
 
 bool CE5DishPackage::save(QString &err, QList<QMap<QString, QVariant> > &data)
@@ -142,27 +151,37 @@ void CE5DishPackage::removeDish()
         fRemovedDish.append(ui->tblDishes->getInteger(r, 0));
     }
     ui->tblDishes->removeRow(r);
-    setPrice("");
+    double p = 0, sc = 0;
+    for (int i = 0; i < ui->tblDishes->rowCount(); i++) {
+        p += ui->tblDishes->lineEdit(i, 3)->getDouble() * ui->tblDishes->lineEdit(i, 4)->getDouble();
+        sc += ui->tblDishes->getDouble(i, 7) * ui->tblDishes->lineEdit(i, 3)->getDouble();
+    }
+    ui->lePrice->setDouble(p);
+    ui->leSelfCost->setDouble(sc);
 }
 
 void CE5DishPackage::setQty(const QString &arg1)
 {
     Q_UNUSED(arg1);
-    double p = 0;
+    double p = 0, sc = 0;
     for (int i = 0; i < ui->tblDishes->rowCount(); i++) {
         p += ui->tblDishes->lineEdit(i, 3)->getDouble() * ui->tblDishes->lineEdit(i, 4)->getDouble();
+        sc += ui->tblDishes->getDouble(i, 7) * ui->tblDishes->lineEdit(i, 3)->getDouble();
     }
     ui->lePrice->setDouble(p);
+    ui->leSelfCost->setDouble(sc);
 }
 
 void CE5DishPackage::setPrice(const QString &arg)
 {
     Q_UNUSED(arg);
-    double p = 0;
+    double p = 0, sc = 0;
     for (int i = 0; i < ui->tblDishes->rowCount(); i++) {
         p += ui->tblDishes->lineEdit(i, 3)->getDouble() * ui->tblDishes->lineEdit(i, 4)->getDouble();
+        sc += ui->tblDishes->getDouble(i, 7) * ui->tblDishes->lineEdit(i, 3)->getDouble();
     }
     ui->lePrice->setDouble(p);
+    ui->leSelfCost->setDouble(sc);
 }
 
 void CE5DishPackage::on_tblDishes_customContextMenuRequested(const QPoint &pos)

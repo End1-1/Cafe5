@@ -48,9 +48,11 @@ bool DbTables::openTable(int table, QStringList &orders, QString &err)
     db.update("h_tables", "f_id", table);
     db.commit();
 
-    db[":f_state"] = ORDER_STATE_OPEN;
+    db[":f_state1"] = ORDER_STATE_OPEN;
+    db[":f_state2"] = ORDER_STATE_PREORDER_EMPTY;
+    db[":f_state3"] = ORDER_STATE_PREORDER_WITH_ORDER;
     db[":f_table"] = table;
-    db.exec("select o.f_id from o_header o where o.f_table=:f_table and o.f_state=:f_state");
+    db.exec("select o.f_id from o_header o where o.f_table=:f_table and (o.f_state=:f_state1 or o.f_state=:f_state2 or f_state=:f_state3)");
     while (db.nextRow()) {
         orders.append(db.getString("f_id"));
     }

@@ -13,6 +13,7 @@ C5PrintServiceThread::C5PrintServiceThread(const QString &header, QObject *paren
     QObject(parent)
 {
     fHeader = header;
+    fBooking = false;
 }
 
 C5PrintServiceThread::~C5PrintServiceThread()
@@ -67,7 +68,7 @@ bool C5PrintServiceThread::run()
         print(s, "f_print2", false);
     }
 
-    if (fHeaderData["f_state"].toInt() == ORDER_STATE_OPEN) {
+    if (fHeaderData["f_state"].toInt() == ORDER_STATE_OPEN && !fBooking) {
         db[":f_header"] = fHeader;
         db.exec("update o_body set f_qty2=f_qty1, f_reprint=abs(f_reprint) where f_header=:f_header");
         for (int i = 0; i < fBodyData.count(); i++) {
@@ -119,7 +120,7 @@ void C5PrintServiceThread::print(QString printer, const QString &side, bool repr
     p.setSceneParams(__c5config.receiptParepWidth(), 2800, QPrinter::Portrait);
     p.setFont(font);
 
-    if (fHeaderData["f_state"].toInt() == ORDER_STATE_PREORDER_1 || fHeaderData["f_state"].toInt() == ORDER_STATE_PREORDER_2) {
+    if (fHeaderData["f_state"].toInt() == ORDER_STATE_PREORDER_EMPTY || fHeaderData["f_state"].toInt() == ORDER_STATE_PREORDER_WITH_ORDER || fBooking) {
         p.setFontSize(32);
         p.setFontBold(true);
         p.ctext(tr("PREORDER"));

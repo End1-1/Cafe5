@@ -2,6 +2,7 @@
 #include "c5tablemodel.h"
 #include "cr5tstoreextrafilter.h"
 #include "c5gridgilter.h"
+#include "c5user.h"
 #include "c5storedraftwriter.h"
 #include <QInputDialog>
 
@@ -220,7 +221,7 @@ QString CR5TStoreExtra::documentForInventory()
     }
     if (result.isEmpty()) {
         C5StoreDraftWriter dw(db);
-        dw.writeAHeader(result, QString::number(dw.counterAType(DOC_TYPE_STORE_INVENTORY)), DOC_STATE_SAVED, DOC_TYPE_STORE_INVENTORY, __userid, f->dateEnd(), QDate::currentDate(), QTime::currentTime(), 0, 0, tr("Created automaticaly"), 0, 0);
+        dw.writeAHeader(result, QString::number(dw.counterAType(DOC_TYPE_STORE_INVENTORY)), DOC_STATE_SAVED, DOC_TYPE_STORE_INVENTORY, __user->id(), f->dateEnd(), QDate::currentDate(), QTime::currentTime(), 0, 0, tr("Created automaticaly"), 0, 0);
         result = "'" + result + "'";
     }
     return result;

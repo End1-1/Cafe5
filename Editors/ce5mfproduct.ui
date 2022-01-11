@@ -129,6 +129,17 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="btnClear">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/broom.png</normaloff>:/broom.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="btnPrint">
         <property name="text">
          <string/>
@@ -170,6 +181,15 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>leCode</tabstop>
+  <tabstop>leName</tabstop>
+  <tabstop>btnAdd</tabstop>
+  <tabstop>btnNew</tabstop>
+  <tabstop>btnMinus</tabstop>
+  <tabstop>btnClear</tabstop>
+  <tabstop>btnPrint</tabstop>
+ </tabstops>
  <resources>
   <include location="../resources/res.qrc"/>
  </resources>

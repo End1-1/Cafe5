@@ -40,6 +40,11 @@ bool DbGoods::isService()
     return dbgoods->get(fId, "f_service").toInt() == 1;
 }
 
+int DbGoods::storeGoods()
+{
+    return dbgoods->get(fId, "f_storeid").toInt();
+}
+
 QString DbGoods::goodsName()
 {
     return dbgoods->name(fId);

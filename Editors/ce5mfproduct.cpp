@@ -70,9 +70,13 @@ bool CE5MFProduct::save(QString &err, QList<QMap<QString, QVariant> > &data)
         C5Database db(fDBParams);
         for (int i = 0; i < ui->wt->rowCount(); i++) {
             db[":f_durationsec"] = ui->wt->getData(i, 3);
-            db[":f_goalprice"] = ui->wt->getData(i, 5);
+            db[":f_goalprice"] = ui->wt->lineEdit(i, 5)->getDouble();
             db[":f_price"] = ui->wt->getData(i, 6);
             db.update("mf_process", "f_id", ui->wt->getData(i, 0));
+        }
+        for (int id: fRemovedRow) {
+            db[":f_id"] = id;
+            db.exec("delete from mf_process where f_id=:f_id");
         }
     } else {
         return false;
@@ -163,6 +167,9 @@ void CE5MFProduct::on_btnMinus_clicked()
     if (C5Message::question(tr("Confirm to remove") + "<br>" + ui->wt->getData(r, 1).toString()) != QDialog::Accepted) {
         return;
     }
+    if (ui->wt->getData(r, 0).toInt() > 0) {
+        fRemovedRow.append(ui->wt->getData(r, 0).toInt());
+    }
     ui->wt->removeRow(r);
     ui->wt->countTotal(-1);
 }
@@ -227,4 +234,16 @@ void CE5MFProduct::on_btnPrint_clicked()
 
     C5PrintPreview pp(&p, fDBParams);
     pp.exec();
+}
+
+void CE5MFProduct::on_btnClear_clicked()
+{
+    if (C5Message::question(tr("Confirm to clear whole process")) != QDialog::Accepted) {
+        return;
+    }
+    for (int i = 0; i < ui->wt->rowCount(); i++) {
+        fRemovedRow.append(ui->wt->getData(i, 0).toInt());
+    }
+    ui->wt->clearTables();
+    ui->wt->countTotal(-1);
 }

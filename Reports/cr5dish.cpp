@@ -42,11 +42,9 @@ QToolBar *CR5Dish::toolBar()
             createStandartToolbar(btn);
         fToolBar->addAction(QIcon(":/translate.png"), tr("Translator"), this, SLOT(translator()));
         fToolBar->addAction(QIcon(":/delete.png"), tr("Remove"), this, SLOT(deleteDish()));
-        fToolBar->addAction(QIcon(":/upload.png"), tr("Raise menu version"), this, SLOT(raiseMenuVersion()));
         auto *g = new QAction(QIcon(":/goodsback.png"), tr("Output to AS"));
         connect(g, SIGNAL(triggered(bool)), this, SLOT(asoutput(bool)));
         fToolBar->addAction(g);
-
     }
     return fToolBar;
 }
@@ -111,21 +109,4 @@ void CR5Dish::deleteDish()
     db.exec("delete from d_dish where f_id=:f_id");
     fModel->removeRow(row);
     C5Message::info(tr("Deleted"));
-}
-
-void CR5Dish::raiseMenuVersion()
-{
-    C5Database db(fDBParams);
-    db.exec("select f_version from s_app where lower(f_app)='menu'");
-    int version = 1;
-    if (db.nextRow()) {
-        version = db.getInt(0) + 1;
-        db[":f_version"] = QString::number(version);
-        db.exec("update s_app set f_version=:f_version where lower(f_app)='menu'");
-    } else {
-        db[":f_app"] = "menu";
-        db[":f_version"] = QString::number(version);;
-        db.insert("s_app", false);
-    }
-    C5Message::info(tr("Current menu version") + "<br>" + QString::number(version));
 }

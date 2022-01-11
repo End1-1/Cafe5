@@ -12,6 +12,7 @@ CR5StoreDocumentsFilter::CR5StoreDocumentsFilter(const QStringList &dbParams, QW
     ui->leReason->setSelector(dbParams, ui->leReasonName, cache_store_reason).setMultiselection(true);
     ui->lePayment->setSelector(dbParams, ui->lePaymentName, cache_header_payment).setMultiselection(true);
     ui->lePartner->setSelector(dbParams, ui->lePartnerName, cache_goods_partners).setMultiselection(true);
+    ui->leState->setSelector(dbParams, ui->leStateName, cache_doc_state);
 }
 
 CR5StoreDocumentsFilter::~CR5StoreDocumentsFilter()
@@ -37,6 +38,7 @@ QString CR5StoreDocumentsFilter::condition()
     if (!ui->lePartner->isEmpty()) {
         result += " and h.f_partner in (" + ui->lePartner->text() + ") ";
     }
+    in(result, "h.f_state", ui->leState);
     return result;
 }
 

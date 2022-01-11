@@ -41,6 +41,8 @@
 #include <QInputDialog>
 #include <QPaintEvent>
 #include <QPainter>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
 
 #define PART2_COL_WIDTH 150
 #define PART2_ROW_HEIGHT 60
@@ -69,6 +71,20 @@ DlgOrder::DlgOrder(C5User *user) :
     ui->btnPayComplimentary->setVisible(fUser->check(cp_t5_pay_complimentary));
     ui->btnPayCityLedger->setVisible(fUser->check(cp_t5_pay_cityledger));
     ui->btnSelfCost->setVisible(fUser->check(cp_t5_pay_breakfast));
+
+    if (!cp_t5_pay_idram) {
+        ui->btnPaymentIdram->setVisible(false);
+        ui->leIDRAM->setVisible(false);
+    }
+    if (!cp_t5_pay_payx) {
+        ui->btnPayX->setVisible(false);
+        ui->lePayX->setVisible(false);
+        ui->btnFillPayX->setVisible(false);
+        ui->btnCalcPayX->setVisible(false);
+    }
+#ifndef QT_DEBUG
+    ui->btnFillIdram->setVisible(false);
+#endif
     setRoomComment();
     setDiscountComment();
     setComplimentary();
@@ -82,6 +98,10 @@ DlgOrder::DlgOrder(C5User *user) :
     case 2:
         ui->btnTax->setChecked(false);
         break;
+    }
+    if (__c5config.getValue(param_tax_print_always_offer).toInt() == 1) {
+        ui->btnTax->setChecked(true);
+        ui->btnTax->setEnabled(false);
     }
 
     fMenuID = C5Config::defaultMenu();
@@ -301,6 +321,11 @@ bool DlgOrder::load(int table)
     }
     ui->vs->addStretch();
     itemsToTable();
+    bool isbooking = dbhall->booking(dbtable->hall(table));
+    if (isbooking) {
+        ui->wPreorder->setVisible(isbooking);
+        ui->btnSplitGuest->setEnabled(!isbooking);
+    }
     return true;
 }
 
@@ -432,7 +457,15 @@ void DlgOrder::itemsToTable()
                                 .arg(worder()->fOrderDriver->headerValue("f_discountfactor").toDouble() * 100)
                                 .arg(float_str(worder()->fOrderDriver->headerValue("f_amountdiscount").toDouble(), 2)));
     ui->leTaxNumber->setText(wo->fOrderDriver->taxValue("f_receiptnumber").toString());
-    //ui->btnSit->setText(worder()->fOrderDriver->headerValue("f_guests").toString());
+    ui->lePrepaidAmount->setDouble(wo->fOrderDriver->preorder("f_prepaidcash").toDouble()
+                                   + wo->fOrderDriver->preorder("f_prepaidcard").toDouble()
+                                   + wo->fOrderDriver->preorder("f_prepaidpayx").toDouble());
+    ui->leGuest->setText(wo->fOrderDriver->preorder("f_guestname").toString());
+    if (ui->lePrepaidAmount->getDouble() > 0.01) {
+        ui->wPreorder->setVisible(true);
+    } else {
+        ui->wPreorder->setVisible(false);
+    }
 }
 
 void DlgOrder::setStoplistmode()
@@ -485,7 +518,6 @@ void DlgOrder::setButtonsState()
 
     ui->wleft->setVisible(false);
     ui->wdish->setVisible(false);
-    ui->btnSetReserve->setEnabled(worders().count() < 2);
     ui->btnTotal->setEnabled(false);
     ui->btnTotal->setProperty("stylesheet_button_redalert", false);
     ui->btnTotal->style()->polish(ui->btnTotal);
@@ -536,9 +568,11 @@ void DlgOrder::setButtonsState()
     }
     ui->btnTotal->style()->polish(ui->btnTotal);
 
-    ui->btnTotal->setEnabled(btnPayment || wo->fOrderDriver->headerValue("f_state").toInt() == ORDER_STATE_PREORDER_1 || wo->fOrderDriver->headerValue("f_state").toInt() == ORDER_STATE_PREORDER_2);
+    ui->btnTotal->setEnabled(btnPayment
+                             || wo->fOrderDriver->headerValue("f_state").toInt() == ORDER_STATE_PREORDER_EMPTY
+                             || wo->fOrderDriver->headerValue("f_state").toInt() == ORDER_STATE_PREORDER_WITH_ORDER);
 
-    ui->btnSplitGuest->setEnabled(wo->fOrderDriver->headerValue("f_state").toInt() != ORDER_STATE_PREORDER_1 && wo->fOrderDriver->headerValue("f_state").toInt() != ORDER_STATE_PREORDER_2);
+    ui->btnSplitGuest->setEnabled(wo->fOrderDriver->headerValue("f_state").toInt() != ORDER_STATE_PREORDER_EMPTY && wo->fOrderDriver->headerValue("f_state").toInt() != ORDER_STATE_PREORDER_WITH_ORDER);
     ui->wleft->setVisible(wo->fOrderDriver->headerValue("f_precheck").toInt() < 1);
     ui->wdish->setVisible(wo->fOrderDriver->headerValue("f_precheck").toInt() < 1);
 }
@@ -1167,6 +1201,7 @@ void DlgOrder::on_btnPrintService_clicked()
         sh->bind("cmd", sm_printservice);
         sh->bind("order", o->fOrderDriver->currentOrderId());
         sh->bind("reprint", reprintList.join(","));
+        sh->bind("booking", dbhall->booking(o->fOrderDriver->headerValue("f_hall").toInt()));
         sh->send();
         logRecord(fUser->fullName(), o->fOrderDriver->headerValue("f_id").toString(), "", "Send to cooking", "", "");
     }
@@ -1178,27 +1213,6 @@ void DlgOrder::on_btnSit_clicked()
     d->exec();
     delete d;
     itemsToTable();
-}
-
-void DlgOrder::on_btnSetReserve_clicked()
-{
-    C5User *tmp = fUser;
-    if (!tmp->check(cp_t5_preorder)) {
-        if (!DlgPassword::getUserAndCheck(tr("Preorder"), tmp, cp_t5_preorder)) {
-            return;
-        }
-    }
-    if (!worder()) {
-        QString newid;
-        WOrder *wo = new WOrder();
-        connect(wo, &WOrder::activated, this, &DlgOrder::worderActivated);
-        wo->fOrderDriver->newOrder(tmp->id(), newid, fTable);
-        wo->setDlg(this);
-        ui->vs->insertWidget(ui->vs->count() - 1, wo);
-        logRecord(tmp->fullName(), newid, newid, "New Preorder", dbtable->name(fTable), "");
-    }
-    DlgPreorder d(worder()->fOrderDriver, fDBParams);
-    d.exec();
 }
 
 void DlgOrder::on_btnSplitGuest_clicked()
@@ -1267,6 +1281,7 @@ void DlgOrder::on_btnTable_clicked()
     if (wo->fOrderDriver->currentOrderId().isEmpty()) {
         return;
     }
+
     C5User *tmp = fUser;
     if (!tmp->check(cp_t5_movetable)) {
         if (!DlgPassword::getUserAndCheck(tr("Move table"), tmp, cp_t5_movetable)) {
@@ -1291,6 +1306,11 @@ void DlgOrder::on_btnTable_clicked()
     if (!dbtable->closeTable(fTable, err)) {
         C5Message::error(err);
         return;
+    }
+    if (wo->fOrderDriver->headerValue("f_state").toInt() == ORDER_STATE_PREORDER_EMPTY
+            || wo->fOrderDriver->headerValue("f_state").toInt() == ORDER_STATE_PREORDER_WITH_ORDER) {
+        wo->fOrderDriver->setHeader("f_state", ORDER_STATE_OPEN);
+        wo->fOrderDriver->save();
     }
     C5Database db(__c5config.dbParams());
     if (orders.isEmpty()) {
@@ -1586,6 +1606,7 @@ void DlgOrder::calcAmount(C5LineEdit *l)
             max -= lt->getDouble();
         }
     }
+    max -= ui->leIDRAM->getDouble();
     if (!DlgPassword::getAmount(l->property("pay").toString(), max)) {
         return;
     }
@@ -1595,7 +1616,11 @@ void DlgOrder::calcAmount(C5LineEdit *l)
         ui->leOther->setDouble(0);
     }
     if (l == ui->leCash) {
-        double excess = ui->leCash->getDouble() + ui->leCard->getDouble() + ui->lePrepaid->getDouble() - wo->fOrderDriver->headerValue("f_amounttotal").toDouble();
+        double excess = ui->leCash->getDouble()
+                + ui->leCard->getDouble()
+                + ui->lePrepaid->getDouble()
+                + ui->leIDRAM->getDouble()
+                - wo->fOrderDriver->headerValue("f_amounttotal").toDouble();
         while (excess > 0.0001) {
             if (ui->leCard->getDouble() > 0) {
                 if (ui->leCard->getDouble() - excess > 0.0001) {
@@ -1620,7 +1645,11 @@ void DlgOrder::calcAmount(C5LineEdit *l)
         }
     }
     if (l == ui->leCard) {
-        double excess = ui->leCash->getDouble() + ui->leCard->getDouble() + ui->lePrepaid->getDouble() - wo->fOrderDriver->headerValue("f_amounttotal").toDouble();
+        double excess = ui->leCash->getDouble()
+                + ui->leCard->getDouble()
+                + ui->lePrepaid->getDouble()
+                + ui->leIDRAM->getDouble()
+                - wo->fOrderDriver->headerValue("f_amounttotal").toDouble();
         while (excess > 0.0001) {
             if (ui->leCash->getDouble() > 0) {
                 if (ui->leCash->getDouble() - excess > 0.0001) {
@@ -1645,7 +1674,11 @@ void DlgOrder::calcAmount(C5LineEdit *l)
         }
     }
     if (l == ui->lePrepaid) {
-        double excess = ui->leCash->getDouble() + ui->leCard->getDouble() + ui->lePrepaid->getDouble() - wo->fOrderDriver->headerValue("f_amounttotal").toDouble();
+        double excess = ui->leCash->getDouble()
+                + ui->leCard->getDouble()
+                + ui->lePrepaid->getDouble()
+                + ui->leIDRAM->getDouble()
+                - wo->fOrderDriver->headerValue("f_amounttotal").toDouble();
         while (excess > 0.0001) {
             if (ui->leCash->getDouble() > 0) {
                 if (ui->leCash->getDouble() - excess > 0.0001) {
@@ -1669,15 +1702,28 @@ void DlgOrder::calcAmount(C5LineEdit *l)
             }
         }
     }
+    lineEditToHeader();
+}
+
+void DlgOrder::lineEditToHeader()
+{
+    auto *wo = worder();
+    if (!wo) {
+        return;
+    }
     wo->fOrderDriver->setHeader("f_amountcash", ui->leCash->getDouble());
     wo->fOrderDriver->setHeader("f_amountcard", ui->leCard->getDouble());
     wo->fOrderDriver->setHeader("f_amountbank", ui->leBank->getDouble());
     wo->fOrderDriver->setHeader("f_amountprepaid", ui->lePrepaid->getDouble());
     wo->fOrderDriver->setHeader("f_amountother", ui->leOther->getDouble());
+    wo->fOrderDriver->setHeader("f_amountidram", ui->leIDRAM->getDouble());
+    wo->fOrderDriver->setHeader("f_amountpayx", ui->lePayX->getDouble());
     ui->leRemain->setDouble(wo->fOrderDriver->headerValue("f_amounttotal").toDouble()
                             - ui->leCash->getDouble()
                             - ui->leCard->getDouble()
-                            - ui->lePrepaid->getDouble());
+                            - ui->lePrepaid->getDouble()
+                            - ui->leIDRAM->getDouble()
+                            - ui->lePayX->getDouble());
 }
 
 void DlgOrder::headerToLineEdit()
@@ -1688,6 +1734,35 @@ void DlgOrder::headerToLineEdit()
     ui->leBank->setDouble(wo->fOrderDriver->headerValue("f_amountbank").toDouble());
     ui->lePrepaid->setDouble(wo->fOrderDriver->headerValue("f_amountprepaid").toDouble());
     ui->leOther->setDouble(wo->fOrderDriver->headerValue("f_amountother").toDouble());
+    ui->leIDRAM->setDouble(wo->fOrderDriver->headerValue("f_amountidram").toDouble());
+    ui->lePayX->setDouble(wo->fOrderDriver->headerValue("f_amountpayx").toDouble());
+    if (wo->fOrderDriver->preorder("f_prepaidcash").toDouble() > 0) {
+        if (wo->fOrderDriver->headerValue("f_amountcash").toDouble() < 1) {
+            wo->fOrderDriver->setHeader("f_amountcash",
+                                        wo->fOrderDriver->preorder("f_prepaidcash").toDouble() > wo->fOrderDriver->headerValue("f_amounttotal").toDouble()
+                                        ? wo->fOrderDriver->headerValue("f_amounttotal").toDouble()
+                                        : wo->fOrderDriver->preorder("f_prepaidcash").toDouble());
+            ui->leCash->setDouble(wo->fOrderDriver->headerValue("f_amountcash").toDouble());
+        }
+    }
+    if (wo->fOrderDriver->preorder("f_prepaidcard").toDouble() > 0) {
+        if (wo->fOrderDriver->headerValue("f_amountcard").toDouble() < 1) {
+            wo->fOrderDriver->setHeader("f_amountcard",
+                                        wo->fOrderDriver->preorder("f_prepaidcard").toDouble() > wo->fOrderDriver->headerValue("f_amounttotal").toDouble()
+                                        ? wo->fOrderDriver->headerValue("f_amounttotal").toDouble()
+                                        : wo->fOrderDriver->preorder("f_prepaidcard").toDouble());
+            ui->leCard->setDouble(wo->fOrderDriver->headerValue("f_amountcard").toDouble());
+        }
+    }
+    if (wo->fOrderDriver->preorder("f_prepaidpayx").toDouble() > 0) {
+        if (wo->fOrderDriver->headerValue("f_amountpayx").toDouble() < 1) {
+            wo->fOrderDriver->setHeader("f_amountpayx",
+                                        wo->fOrderDriver->preorder("f_prepaidpayx").toDouble() > wo->fOrderDriver->headerValue("f_amounttotal").toDouble()
+                                        ? wo->fOrderDriver->headerValue("f_amounttotal").toDouble()
+                                        : wo->fOrderDriver->preorder("f_prepaidpayx").toDouble());
+            ui->lePayX->setDouble(wo->fOrderDriver->headerValue("f_amountpayx").toDouble());
+        }
+    }
     ui->leRemain->setDouble(wo->fOrderDriver->headerValue("f_amounttotal").toDouble()
                             - ui->leCash->getDouble()
                             - ui->leCard->getDouble()
@@ -1888,6 +1963,8 @@ void DlgOrder::on_btnPaymentCash_clicked()
     worder()->fOrderDriver->setHeader("f_amountbank", 0);
     worder()->fOrderDriver->setHeader("f_amountprepaid", 0);
     worder()->fOrderDriver->setHeader("f_amountother", 0);
+    worder()->fOrderDriver->setHeader("f_amountpayx", 0);
+    worder()->fOrderDriver->setHeader("f_amountidram", 0);
     ui->leRemain->setDouble(0);
     clearOther();
     headerToLineEdit();
@@ -1902,6 +1979,8 @@ void DlgOrder::on_btnPaymentCard_clicked()
     worder()->fOrderDriver->setHeader("f_amountbank", 0);
     worder()->fOrderDriver->setHeader("f_amountprepaid", 0);
     worder()->fOrderDriver->setHeader("f_amountother", 0);
+    worder()->fOrderDriver->setHeader("f_amountpayx", 0);
+    worder()->fOrderDriver->setHeader("f_amountidram", 0);
     ui->leRemain->setDouble(0);
     clearOther();
     headerToLineEdit();
@@ -2021,16 +2100,23 @@ void DlgOrder::on_btnReceipt_clicked()
             + wo->fOrderDriver->headerValue("f_amountcard").toDouble()
             + wo->fOrderDriver->headerValue("f_amountother").toDouble()
             + wo->fOrderDriver->headerValue("f_amountprepaid").toDouble()
-            + wo->fOrderDriver->headerValue("f_amountbank").toDouble() < wo->fOrderDriver->headerValue("f_amounttotal").toDouble()) {
+            + wo->fOrderDriver->headerValue("f_amountbank").toDouble()
+            + wo->fOrderDriver->headerValue("f_amountidram").toDouble()
+            + wo->fOrderDriver->headerValue("f_amountpayx").toDouble() < wo->fOrderDriver->headerValue("f_amounttotal").toDouble()) {
         C5Message::error(tr("Check the all payment methods"));
         return;
     }
-    if (wo->fOrderDriver->headerValue("f_amountcash").toDouble()
+    double a = wo->fOrderDriver->headerValue("f_amountcash").toDouble()
             + wo->fOrderDriver->headerValue("f_amountcard").toDouble()
             + wo->fOrderDriver->headerValue("f_amountother").toDouble()
             + wo->fOrderDriver->headerValue("f_amountprepaid").toDouble()
-            + wo->fOrderDriver->headerValue("f_amountbank").toDouble() > wo->fOrderDriver->headerValue("f_amounttotal").toDouble()) {
-        C5Message::error(tr("Total amount of payments methods greater than total amount"));
+            + wo->fOrderDriver->headerValue("f_amountbank").toDouble()
+            + wo->fOrderDriver->headerValue("f_amountidram").toDouble()
+            + wo->fOrderDriver->headerValue("f_amountpayx").toDouble();
+    if (a > wo->fOrderDriver->headerValue("f_amounttotal").toDouble()) {
+        C5Message::error(QString("%1, %2/%3").arg(tr("Total amount of payments methods greater than total amount"))
+                         .arg(a)
+                         .arg(wo->fOrderDriver->headerValue("f_amounttotal").toDouble()));
         return;
     }
     if (!wo->fOrderDriver->save()) {
@@ -2152,7 +2238,7 @@ void DlgOrder::on_btnTax_clicked()
     if (ui->lePrepaid->getDouble() > 0.001) {
         ui->btnTax->setChecked(false);
     }
-    C5Config::setRegValue("btn_tax_state", ui->btnTax->isChecked() ? 2 : 1);
+    C5Config::setRegValue("btn_tax_state", ui->btnTax->isChecked() ? 1 : 2);
 }
 
 void DlgOrder::on_btnStopListMode_clicked()
@@ -2368,7 +2454,9 @@ void DlgOrder::on_btnFillCash_clicked()
     worder()->fOrderDriver->setHeader("f_amountcash",
                                       worder()->fOrderDriver->headerValue("f_amounttotal").toDouble()
                                       - worder()->fOrderDriver->headerValue("f_amountcard").toDouble()
-                                      - worder()->fOrderDriver->headerValue("f_amountprepaid").toDouble());
+                                      - worder()->fOrderDriver->headerValue("f_amountprepaid").toDouble()
+                                      - worder()->fOrderDriver->headerValue("f_amountidram").toDouble()
+                                      - worder()->fOrderDriver->headerValue("f_amountpayx").toDouble());
     worder()->fOrderDriver->setHeader("f_amountbank", 0);
     worder()->fOrderDriver->setHeader("f_amountother", 0);
     ui->leRemain->setDouble(0);
@@ -2382,7 +2470,9 @@ void DlgOrder::on_btnFillCard_clicked()
     worder()->fOrderDriver->setHeader("f_amountcard",
                                       worder()->fOrderDriver->headerValue("f_amounttotal").toDouble()
                                       - worder()->fOrderDriver->headerValue("f_amountcash").toDouble()
-                                      - worder()->fOrderDriver->headerValue("f_amountprepaid").toDouble());
+                                      - worder()->fOrderDriver->headerValue("f_amountprepaid").toDouble()
+                                      - worder()->fOrderDriver->headerValue("f_amountidram").toDouble()
+                                      - worder()->fOrderDriver->headerValue("f_amountpayx").toDouble());
     worder()->fOrderDriver->setHeader("f_amountbank", 0);
     worder()->fOrderDriver->setHeader("f_amountother", 0);
     ui->leRemain->setDouble(0);
@@ -2457,4 +2547,136 @@ void DlgOrder::on_btnPresent_clicked()
               "Present dish",
               dbdish->name(wo->fOrderDriver->dishesValue("f_dish", index).toInt()),
               "");
+    if (tmp != fUser) {
+        delete tmp;
+    }
+}
+
+
+void DlgOrder::on_btnPreorder_clicked()
+{
+    C5User *tmp = fUser;
+    if (!tmp->check(cp_t5_preorder)) {
+        if (!DlgPassword::getUserAndCheck(tr("Preorder"), tmp, cp_t5_preorder)) {
+            return;
+        }
+    }
+    WOrder *wo = worder();
+    if (!wo) {
+        return;
+    }
+    DlgPreorder dlg(wo->fOrderDriver, tmp, fDBParams);
+    dlg.exec();
+    if (tmp != fUser) {
+        delete tmp;
+    }
+    ui->leGuest->setText(wo->fOrderDriver->preorder("f_guestname").toString());
+    ui->lePrepaidAmount->setDouble(wo->fOrderDriver->preorder("f_prepaidcash").toDouble()
+                                   + wo->fOrderDriver->preorder("f_prepaidcard").toDouble()
+                                   + wo->fOrderDriver->preorder("f_prepaidpayx").toDouble());
+    if (dlg.result() == DlgPreorder::RESULT_CANCELED) {
+        wo->fOrderDriver->setHeader("f_state", ORDER_STATE_VOID);
+        for (int i = 0; i < wo->fOrderDriver->dishesCount(); i++) {
+            if (wo->fOrderDriver->dishesValue("f_state", i).toInt() == DISH_STATE_OK) {
+                wo->fOrderDriver->setDishesValue("f_state", DISH_STATE_NONE, i);
+            }
+        }
+        accept();
+    }
+}
+
+void DlgOrder::on_btnPaymentIdram_clicked()
+{
+    auto *wo = worder();
+    if (!wo) {
+        return;
+    }
+    QNetworkAccessManager *na = new QNetworkAccessManager(this);
+    connect(na, &QNetworkAccessManager::finished, this, [=](QNetworkReply *r) {
+        ui->btnReceipt->setEnabled(true);
+        ui->btnExit->setEnabled(true);
+        QJsonDocument jdoc = QJsonDocument::fromJson(r->readAll());
+        QJsonObject jo = jdoc.object();
+        QJsonArray ja = jo["Result"].toArray();
+        if (ja.count() > 0) {
+            ui->leIDRAM->setDouble(ja.at(0)["DEBIT"].toString().toDouble());
+        }
+        r->deleteLater();
+        sender()->deleteLater();
+        C5LogToServerThread::remember(LOG_WAITER, fUser->fullName(), "", wo->fOrderDriver->currentOrderId(), "", "Idram request", QString(jdoc.toJson()), "");
+        lineEditToHeader();
+    });
+    QNetworkRequest nr = QNetworkRequest(QUrl("https://money.idram.am/api/History/Search"));
+    nr.setRawHeader("_SessionId_", __c5config.getValue(param_idram_session_id).toLatin1()); //"3497ae22-8623-45be-84d9-f9f9671b0628");
+    nr.setRawHeader("_EncMethod_", "NONE");
+    nr.setRawHeader("Content-Type", "application/json");
+    //nr->setRawHeader("Content-Length", QString::number(m_data.length()).toLatin1());
+    nr.setRawHeader("Cache-Control", "no-cache");
+    nr.setRawHeader("Accept", "*/*");
+    QString request = QString("{\"Detail\":\"%1\"}").arg(wo->fOrderDriver->headerValue("f_id").toString());
+    na->post(nr, request.toLatin1());
+    ui->btnReceipt->setEnabled(false);
+    ui->btnExit->setEnabled(false);
+}
+
+void DlgOrder::on_btnFillPayX_clicked()
+{
+    WOrder *wo = worder();
+    if (!wo) {
+        return;
+    }
+    ui->lePayX->setDouble(
+                wo->fOrderDriver->headerValue("f_amounttotal").toDouble()
+                - wo->fOrderDriver->headerValue("f_amountcash").toDouble()
+                - wo->fOrderDriver->headerValue("f_amountcard").toDouble()
+                - wo->fOrderDriver->headerValue("f_amountbank").toDouble()
+                - wo->fOrderDriver->headerValue("f_amountprepaid").toDouble()
+                - wo->fOrderDriver->headerValue("f_amountidram").toDouble());
+    if (ui->lePayX->getDouble() < 0) {
+        ui->lePayX->setDouble(0);
+    }
+    wo->fOrderDriver->setHeader("f_amountpayx", ui->lePayX->getDouble());
+}
+
+void DlgOrder::on_btnCalcPayX_clicked()
+{
+    auto *wo = worder();
+    if (!wo) {
+        return;
+    }
+    double max = wo->fOrderDriver->headerValue("f_amounttotal").toDouble();
+    if (!DlgPassword::getAmount(tr("PayX"), max)) {
+        return;
+    }
+
+}
+
+void DlgOrder::on_btnPayX_clicked()
+{
+    auto *wo = worder();
+    if (!wo) {
+        return;
+    }
+    ui->lePayX->setDouble(wo->fOrderDriver->headerValue("f_amounttotal").toDouble() - ui->leIDRAM->getDouble());
+    ui->leCash->setDouble(0);
+    ui->leCard->setDouble(0);
+    ui->leBank->setDouble(0);
+    ui->leOther->setDouble(0);
+    lineEditToHeader();
+}
+
+void DlgOrder::on_btnFillIdram_clicked()
+{
+
+    auto *wo = worder();
+    if (!wo) {
+        return;
+    }
+    ui->leIDRAM->setDouble(wo->fOrderDriver->headerValue("f_amounttotal").toDouble());
+    ui->lePayX->setDouble(0);
+    ui->leCash->setDouble(0);
+    ui->leCard->setDouble(0);
+    ui->leBank->setDouble(0);
+    ui->leOther->setDouble(0);
+    lineEditToHeader();
 }

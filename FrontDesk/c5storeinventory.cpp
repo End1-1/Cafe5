@@ -4,6 +4,7 @@
 #include "c5cache.h"
 #include "c5printing.h"
 #include "c5printpreview.h"
+#include "c5user.h"
 #include "ce5goods.h"
 #include "ce5editor.h"
 #include "c5storedraftwriter.h"
@@ -18,6 +19,7 @@ C5StoreInventory::C5StoreInventory(const QStringList &dbParams, QWidget *parent)
     fLabel = tr("Store inventory");
     ui->leStore->setSelector(fDBParams, ui->leStoreName, cache_goods_store);
     ui->tblGoods->setColumnWidths(7, 0, 0, 300, 80, 80, 80, 80);
+    ui->wSearch->setVisible(false);
     connect(ui->leStore, SIGNAL(keyPressed(QChar)), this, SLOT(keyPressed(QChar)));
     new QShortcut(QKeySequence("Ctrl+Shift++"), this, SLOT(keyShortcut()));
     new QShortcut(QKeySequence("Ctrl+Shift+="), this, SLOT(keyShortcut()));
@@ -120,7 +122,7 @@ void C5StoreInventory::saveDoc()
     if (ui->leDocNum->isEmpty()) {
         ui->leDocNum->setInteger(dw.counterAType(DOC_TYPE_STORE_INVENTORY));
     }
-    dw.writeAHeader(fInternalID, ui->leDocNum->text(), DOC_STATE_SAVED, DOC_TYPE_STORE_INVENTORY, __userid, ui->deDate->date(), QDate::currentDate(), QTime::currentTime(), 0, ui->leTotal->getDouble(), ui->leComment->text(), 0, 0);
+    dw.writeAHeader(fInternalID, ui->leDocNum->text(), DOC_STATE_SAVED, DOC_TYPE_STORE_INVENTORY, __user->id(), ui->deDate->date(), QDate::currentDate(), QTime::currentTime(), 0, ui->leTotal->getDouble(), ui->leComment->text(), 0, 0);
 
     db[":f_document"] = fInternalID;
     db.exec("delete from a_store_inventory where f_document=:f_document");
@@ -414,5 +416,19 @@ void C5StoreInventory::on_leSearch_textChanged(const QString &arg1)
 {
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
         ui->tblGoods->setRowHidden(i, !ui->tblGoods->getString(i, 2).contains(arg1));
+    }
+}
+
+void C5StoreInventory::on_btnCloseSearch_clicked()
+{
+    ui->wSearch->setVisible(false);
+}
+
+void C5StoreInventory::on_leFind_textChanged(const QString &arg1)
+{
+    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+        bool rh = (!ui->tblGoods->getString(i, 1).contains(arg1, Qt::CaseInsensitive)
+                   && !ui->tblGoods->getString(i, 2).contains(arg1, Qt::CaseInsensitive)) ;
+        ui->tblGoods->setRowHidden(i, rh);
     }
 }

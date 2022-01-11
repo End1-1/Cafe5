@@ -6,6 +6,7 @@
 #include "c5cache.h"
 #include "c5mainwindow.h"
 #include "c5inputdate.h"
+#include "c5user.h"
 #include "c5storedraftwriter.h"
 
 C5CashDoc::C5CashDoc(const QStringList &dbParams, QWidget *parent) :
@@ -266,7 +267,7 @@ void C5CashDoc::save(bool fromrelation)
         ui->leDocNum->setInteger(genNumber(DOC_TYPE_CASH));
         updateGenNumber(ui->leDocNum->getInteger(), DOC_TYPE_CASH);
     }
-    dw.writeAHeader(fUuid, ui->leDocNum->text(), DOC_STATE_SAVED, DOC_TYPE_CASH, __userid, ui->deDate->date(), QDate::currentDate(), QTime::currentTime(), ui->lePartner->getInteger(), ui->leTotal->getDouble(), ui->leRemarks->text(), 0, 0);
+    dw.writeAHeader(fUuid, ui->leDocNum->text(), DOC_STATE_SAVED, DOC_TYPE_CASH, __user->id(), ui->deDate->date(), QDate::currentDate(), QTime::currentTime(), ui->lePartner->getInteger(), ui->leTotal->getDouble(), ui->leRemarks->text(), 0, 0);
     dw.writeAHeaderCash(fUuid, ui->leInput->getInteger(), ui->leOutput->getInteger(), fRelation, fStoreUuid, "");
     for (int i = 0; i < ui->tbl->rowCount(); i++) {
         QString idin = ui->tbl->getString(i, 0);

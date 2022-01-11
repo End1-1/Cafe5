@@ -208,6 +208,18 @@ bool C5DishWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     db[":f_netweight"] = ui->tblRecipeTotal->getDouble(0, 4);
     db[":f_cost"] = ui->tblRecipeTotal->getDouble(0, 8);
     db.update("d_dish", "f_id", ui->leCode->text());
+
+    db[":f_app"] = "menu";
+    db.exec("select f_version from s_app where f_app=:f_app");
+    if (db.nextRow()) {
+        db[":f_app"] = "menu";
+        db[":f_version"] = db.getString("f_version").toInt() + 1;
+        db.exec("update s_app set f_version=:f_version where f_app=:f_app");
+    } else {
+        db[":f_app"] = "menu";
+        db[":f_version"] = "1";
+        db.insert("s_app", false);
+    }
     return true;
 }
 
