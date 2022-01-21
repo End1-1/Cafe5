@@ -56,6 +56,8 @@ private slots:
     void on_btnCopyUUID_clicked();
 
     void on_btnClearTax_clicked();
+
+    void on_btnOpenTable_clicked();
 };
 
 #endif // C5WAITERORDER_H

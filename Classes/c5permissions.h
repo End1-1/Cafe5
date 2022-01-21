@@ -111,6 +111,7 @@
 #define cp_t6_storage 605
 #define cp_t6_classes 607
 #define cp_t6_goods_images 608
+#define cp_t6_qty_reminder 609
 
 #define cp_t7_other 700
 #define cp_t7_credit_card 701

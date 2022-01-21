@@ -249,8 +249,8 @@ void C5WaiterServer::reply(QJsonObject &o)
     }
     case sm_printreceipt: {
         QString err;
-        printReceipt(err, srh.fDb, false);
-        o["reply"] = err.isEmpty() ? 1 : 0;
+        bool r = printReceipt(err, srh.fDb, false);
+        o["reply"] = r ? 1 : 0;
         o["msg"] = err;
         o["close"] = fIn["close"];
         o["order"] = fIn["order"];
@@ -1009,6 +1009,8 @@ int C5WaiterServer::printTax(const QMap<QString, QVariant> &header, const QList<
         db[":f_fiscalmode"] = tr("(F)");
         db[":f_time"] = time;
         db.insert("o_tax", false);
+    } else {
+        err = jsonOut;
     }
     return result;
 }

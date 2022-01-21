@@ -27,6 +27,8 @@ private slots:
 
     void on_btnSave_clicked();
 
+    void on_btnTaxReturn_clicked();
+
 private:
     Ui::ViewOrder *ui;
 

@@ -77,6 +77,7 @@ void C5Grid::buildQuery()
     QMap<QString, QString> leftJoinTablesMap;
     QStringList groupFields;
     if (fSimpleQuery) {
+
     } else {
         fSqlQuery = "select ";
         bool first = true;
@@ -856,7 +857,9 @@ void C5Grid::refreshData()
             fWhereCondition = fFilterWidget->condition();
         }
         if (!fWhereCondition.isEmpty()) {
-            if (fSqlQuery.contains("where")) {
+            if (sqlQuery.contains("%where%")) {
+                sqlQuery.replace("%where%", fWhereCondition);
+            } else if (fSqlQuery.contains("where")) {
                 if (fWhereCondition.contains("where")) {
                     fWhereCondition.replace("where", " ");
                 }

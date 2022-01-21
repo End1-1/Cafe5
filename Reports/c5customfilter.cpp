@@ -86,8 +86,14 @@ void C5CustomFilter::on_lw_itemClicked(QListWidgetItem *item)
         }
     } while (true);
     int row = 0;
+    QStringList availableWidgets;
+    availableWidgets.append("date");
+    availableWidgets.append("cache");
     for (QString &s: fParams) {
         QString type = s.mid(s.indexOf(":") + 1, s.length() - s.indexOf(":") + 1);
+        if (!availableWidgets.contains(type) && !type.contains("cache")) {
+            continue;
+        }
         ui->gl->addWidget(new QLabel(s.mid(s.indexOf(";") + 1, s.indexOf(":") - s.indexOf(";") - 1)), row, 0, 1, 1);
         if (type == "date") {
             C5DateEdit *d = new C5DateEdit();

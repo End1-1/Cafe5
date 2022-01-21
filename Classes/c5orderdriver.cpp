@@ -166,7 +166,9 @@ bool C5OrderDriver::setRoom(const QString &res, const QString &inv, const QStrin
     fPayRoom["f_res"] = res;
     fPayRoom["f_inv"] = inv;
     fPayRoom["f_room"] = room;
-    setHeader("f_otherid", PAYOTHER_TRANSFER_TO_ROOM);
+    if (!res.isEmpty()) {
+        setHeader("f_otherid", PAYOTHER_TRANSFER_TO_ROOM);
+    }
     return true;
 }
 
@@ -183,6 +185,9 @@ bool C5OrderDriver::setCL(const QString &code, const QString &name)
     }
     fPayCL["f_code"] = code;
     fPayCL["f_name"] = name;
+    if (!code.isEmpty()) {
+        setHeader("f_otherid", PAYOTHER_TRANSFER_TO_ROOM);
+    }
     return true;
 }
 

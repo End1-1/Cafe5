@@ -801,11 +801,11 @@ void DlgOrder::handleReceipt(const QJsonObject &obj)
         if (wo->fOrderDriver->currentOrderId() == obj["order"].toString()) {
             wo->fOrderDriver->reloadOrder();
             if (obj["close"].toInt() == 1) {
+                C5LogToServerThread::remember(LOG_WAITER, fUser->fullName(), "", wo->fOrderDriver->currentOrderId(), "", "Close order", "", "");
                 if (!wo->fOrderDriver->closeOrder()) {
                     C5Message::error(wo->fOrderDriver->error());
                     return;
                 }
-                C5LogToServerThread::remember(LOG_WAITER, fUser->fullName(), "", wo->fOrderDriver->currentOrderId(), "", "Close order", "", "");
                 removeWOrder(wo);
                 if (!worder()) {
                     accept();
@@ -1721,7 +1721,9 @@ void DlgOrder::lineEditToHeader()
     ui->leRemain->setDouble(wo->fOrderDriver->headerValue("f_amounttotal").toDouble()
                             - ui->leCash->getDouble()
                             - ui->leCard->getDouble()
+                            - ui->leBank->getDouble()
                             - ui->lePrepaid->getDouble()
+                            - ui->leOther->getDouble()
                             - ui->leIDRAM->getDouble()
                             - ui->lePayX->getDouble());
 }
@@ -1768,6 +1770,8 @@ void DlgOrder::headerToLineEdit()
                             - ui->leCard->getDouble()
                             - ui->lePrepaid->getDouble()
                             - ui->leBank->getDouble()
+                            - ui->leIDRAM->getDouble()
+                            - ui->lePayX->getDouble()
                             - ui->leOther->getDouble());
 }
 
@@ -2124,16 +2128,6 @@ void DlgOrder::on_btnReceipt_clicked()
         return;
     }
     ui->btnExit->setEnabled(false);
-    C5SocketHandler *sh = createSocketHandler(SLOT(handleReceipt(QJsonObject)));
-    sh->bind("cmd", sm_printreceipt);
-    sh->bind("station", hostinfo);
-    sh->bind("printer", C5Config::localReceiptPrinter());
-    sh->bind("order", wo->fOrderDriver->currentOrderId());
-    sh->bind("language", C5Config::getRegValue("receipt_language").toInt());
-    sh->bind("printtax", ui->btnTax->isChecked() ? 1 : 0);
-    sh->bind("receipt_printer", C5Config::fSettingsName);
-    sh->bind("close", 1);
-    sh->send();
 
     //LOG
     QString payMethods;
@@ -2175,6 +2169,17 @@ void DlgOrder::on_btnReceipt_clicked()
     }
     amounts += ui->btnTax->isChecked() ? " Tax: yes" : " Tax: no";
     C5LogToServerThread::remember(LOG_WAITER, tmp->fullName(), "", wo->fOrderDriver->currentOrderId(), "", "Receipt", payMethods, amounts);
+
+    C5SocketHandler *sh = createSocketHandler(SLOT(handleReceipt(QJsonObject)));
+    sh->bind("cmd", sm_printreceipt);
+    sh->bind("station", hostinfo);
+    sh->bind("printer", C5Config::localReceiptPrinter());
+    sh->bind("order", wo->fOrderDriver->currentOrderId());
+    sh->bind("language", C5Config::getRegValue("receipt_language").toInt());
+    sh->bind("printtax", ui->btnTax->isChecked() ? 1 : 0);
+    sh->bind("receipt_printer", C5Config::fSettingsName);
+    sh->bind("close", 1);
+    sh->send();
 }
 
 void DlgOrder::on_btnCloseOrder_clicked()
@@ -2599,11 +2604,13 @@ void DlgOrder::on_btnPaymentIdram_clicked()
         QJsonObject jo = jdoc.object();
         QJsonArray ja = jo["Result"].toArray();
         if (ja.count() > 0) {
-            ui->leIDRAM->setDouble(ja.at(0)["DEBIT"].toString().toDouble());
+            QString DEBIT = ja.at(0)["DEBIT"].toString();
+            ui->leIDRAM->setDouble(str_float(DEBIT));
+            lineEditToHeader();
         }
         r->deleteLater();
         sender()->deleteLater();
-        C5LogToServerThread::remember(LOG_WAITER, fUser->fullName(), "", wo->fOrderDriver->currentOrderId(), "", "Idram request", QString(jdoc.toJson()), "");
+        C5LogToServerThread::remember(LOG_WAITER, fUser->fullName(), "", wo->fOrderDriver->currentOrderId(), "", "Idram request", QString(jdoc.toJson().simplified()), "");
         lineEditToHeader();
     });
     QNetworkRequest nr = QNetworkRequest(QUrl("https://money.idram.am/api/History/Search"));
@@ -2614,6 +2621,7 @@ void DlgOrder::on_btnPaymentIdram_clicked()
     nr.setRawHeader("Cache-Control", "no-cache");
     nr.setRawHeader("Accept", "*/*");
     QString request = QString("{\"Detail\":\"%1\"}").arg(wo->fOrderDriver->headerValue("f_id").toString());
+    //QString request = QString("{\"Detail\":\"%1\"}").arg("229eb2c3-083f-4bf5-b410-8ced2b6450ce");
     na->post(nr, request.toLatin1());
     ui->btnReceipt->setEnabled(false);
     ui->btnExit->setEnabled(false);

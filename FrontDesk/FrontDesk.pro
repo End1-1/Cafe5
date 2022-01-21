@@ -106,6 +106,8 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Reports/cr5goodsclasses.cpp \
     ../Reports/cr5goodsfilter.cpp \
     ../Reports/cr5goodsimages.cpp \
+    ../Reports/cr5goodsqtyreminder.cpp \
+    ../Reports/cr5goodsqtyreminderfilter.cpp \
     ../Reports/cr5materialinstoreuncomplect.cpp \
     ../Reports/cr5materialinstoreuncomplectfilter.cpp \
     ../Reports/cr5materialmoveuncomplect.cpp \
@@ -354,6 +356,8 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Reports/cr5goodsclasses.h \
     ../Reports/cr5goodsfilter.h \
     ../Reports/cr5goodsimages.h \
+    ../Reports/cr5goodsqtyreminder.h \
+    ../Reports/cr5goodsqtyreminderfilter.h \
     ../Reports/cr5materialinstoreuncomplect.h \
     ../Reports/cr5materialinstoreuncomplectfilter.h \
     ../Reports/cr5materialmoveuncomplect.h \
@@ -555,6 +559,7 @@ FORMS += \
     ../Reports/cr5draftoutputbyrecipefilter.ui \
     ../Reports/cr5goodsfilter.ui \
     ../Reports/cr5goodsimages.ui \
+    ../Reports/cr5goodsqtyreminderfilter.ui \
     ../Reports/cr5materialinstoreuncomplectfilter.ui \
     ../Reports/cr5materialmoveuncomplectfilter.ui \
     ../Reports/cr5menureviewfilter.ui \

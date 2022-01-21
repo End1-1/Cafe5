@@ -30,7 +30,7 @@ bool C5PrintReceiptThread::print()
     QFont font(qApp->font());
     font.setPointSize(bs);
     C5Printing p;
-    p.setSceneParams(fPaperWidth, 2800, QPrinter::Portrait);
+    p.setSceneParams(fPaperWidth, 2600, QPrinter::Portrait);
     p.setFont(font);
 
     QMap<QString, QVariant> options;

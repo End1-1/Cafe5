@@ -99,6 +99,15 @@ bool Sales::printCheckWithTax(C5Database &db, const QString &id, QString &rseq)
     db.nextRow();
     double disc = db.getDouble("f_discountfactor");
     double card = db.getDouble("f_amountcard");
+    int partner = db.getInt("f_partner");
+    QString partnerHvhh;
+    if (partner > 0) {
+        db[":f_id"] = partner;
+        db.exec("select f_taxcode from c_partners where f_id=:f_id");
+        if (db.nextRow()) {
+            partnerHvhh = db.getString(0);
+        }
+    }
     db[":f_id"] = id;
     db.exec("select og.f_id, og.f_goods, g.f_name, og.f_qty, gu.f_name as f_unitname, og.f_price, og.f_total,"
             "t.f_taxdept, t.f_adgcode, "
@@ -109,6 +118,7 @@ bool Sales::printCheckWithTax(C5Database &db, const QString &id, QString &rseq)
             "left join c_groups t on t.f_id=g.f_group "
             "where og.f_header=:f_id");
     PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), 0);
+    pt.fPartnerTin = partnerHvhh;
     while (db.nextRow()) {
         pt.addGoods(db.getString("f_taxdept"), //dep
                     db.getString("f_adgcode"), //adg
@@ -737,7 +747,7 @@ void Sales::on_btnPrintTax_clicked()
     QString rseq;
     C5Database db(__c5config.replicaDbParams());
     printCheckWithTax(db, id, rseq);
-    ui->tbl->setString(ml.at(0).row(), 5, rseq);
+    ui->tbl->setString(ml.at(0).row(), 6, rseq);
 }
 
 void Sales::on_btnRetryUpload_clicked()

@@ -349,7 +349,7 @@ void CR5CommonSales::exportToAS()
             db[":f_id"] = id;
             db.exec("select * from o_header where f_id=:f_id");
             db.nextRow();
-            total += db.getDouble("f_amounttotal");
+            total += db.getDouble("f_amountcash");
             card += db.getDouble("f_amountcard");
             service += db.getDouble("f_amountservice");
             date= db.getDate("f_datecash");
@@ -362,11 +362,11 @@ void CR5CommonSales::exportToAS()
         dbas[":fORDERNUM"] = "";
         dbas[":fDOCNUM"] = "";
         dbas[":fCUR"] = "AMD";
-        dbas[":fSUMM"] = total;
+        dbas[":fSUMM"] = total + card;
         dbas[":fCOMMENT"] = QString("%1 %2").arg(tr("Revenue")).arg(date.toString(FORMAT_DATE_TO_STR));
         dbas[":fBODY"] = QString("\r\nPREPAYMENTACC:5231\r\nVATACC:5243\r\nSUMMVAT:%2\r\nBUYERACC:2211\r\nBUYCHACCPOST:Գլխավոր հաշվապահ \r\nMAXROWID:%1\r\n")
                 .arg(2)
-                .arg(vat.toDouble() > 0.001 ? (vat.toDouble() / 100) * total : 0);
+                .arg(vat.toDouble() > 0.001 ? (vat.toDouble() / 100) * (total + card) : 0);
         dbas[":fPARTNAME"] = partnerMap["ffullcaption"]; // set to kamar
         dbas[":fUSERID"] = 0;
         dbas[":fPARTID"] = partnerMap["fpartid"];
@@ -404,10 +404,10 @@ void CR5CommonSales::exportToAS()
         dbas[":fUNITBRIEF"] = unitMap[simpleMap["funit"].toString()];
         dbas[":fSTORAGE"] = storecode;
         dbas[":fQUANTITY"] = 1;
-        dbas[":fINITPRICE"] = total - service;
+        dbas[":fINITPRICE"] = (total + card) - service;
         dbas[":fDISCOUNT"] = 0;
-        dbas[":fPRICE"] = total - service;
-        dbas[":fSUMMA"] = total - service;
+        dbas[":fPRICE"] = (total + card) - service;
+        dbas[":fSUMMA"] = (total + card) - service;
         dbas[":fSUMMA1"] = 0;
         dbas[":fENVFEEPERCENT"] = 0;
         dbas[":fENVFEESUMMA"] = 0;

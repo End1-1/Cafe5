@@ -10,6 +10,7 @@
 #include "c5checkbox.h"
 #include "c5storedraftwriter.h"
 #include "printreceipt.h"
+#include "printtaxn.h"
 
 ViewOrder::ViewOrder(const QString &order) :
     C5Dialog(__c5config.dbParams()),
@@ -291,4 +292,35 @@ void ViewOrder::on_btnSave_clicked()
     db[":f_datecash"] = ui->leDate->date();
     db.update("o_header", "f_id", fUuid);
     C5Message::info(tr("Saved"));
+}
+
+void ViewOrder::on_btnTaxReturn_clicked()
+{
+    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
+    QString jsnin, jsnout, err;
+    int result;
+    QString crn, rseq = ui->leTaxNumber->text();
+    result = pt.printTaxback(rseq, crn, jsnin, jsnout, err);
+    C5Database db(__c5config.dbParams());
+    db[":f_id"] = db.uuid();
+    db[":f_order"] = fUuid;
+    db[":f_date"] = QDate::currentDate();
+    db[":f_time"] = QTime::currentTime();
+    db[":f_in"] = jsnin;
+    db[":f_out"] = jsnout;
+    db[":f_err"] = err;
+    db[":f_result"] = result;
+    db.insert("o_tax_log", false);
+    if (result != pt_err_ok) {
+        QSqlQuery *q = new QSqlQuery(db.fDb);
+        pt.saveTimeResult(fUuid, *q);
+        delete q;
+        C5Message::error(err);
+    } else {
+        db[":f_fiscal"] = QVariant();
+        db[":f_receiptnumber"] = QVariant();
+        db[":f_time"] = QVariant();
+        db.update("o_tax", "f_id", fUuid);
+        C5Message::info(tr("Taxback complete"));
+    }
 }

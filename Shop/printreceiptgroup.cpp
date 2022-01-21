@@ -94,7 +94,8 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
             "left join c_groups t1 on t1.f_id=g.f_group "
             "left join c_groups t2 on t2.f_id=g2.f_group "
             "where oh.f_id=:f_header and g2.f_unit=10 "
-            "group by 1, 3 ").arg(price1).arg(price2));
+            "group by 1, 3 "
+            "order by ad.f_row ").arg(price1).arg(price2));
     QList<QList<QVariant> > data;
     while (db.nextRow()) {
         QList<QVariant> v;
@@ -120,7 +121,8 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
             "inner join o_header oh on oh.f_id=ad.f_header "
             "left join c_groups t1 on t1.f_id=g.f_group "
             "where oh.f_id=:f_header and g.f_unit<>10 "
-            "group by 1, 3 ").arg(price1));
+            "group by 1, 3 "
+            "order by ad.f_row ").arg(price1));
     while (db.nextRow()) {
         QList<QVariant> v;
         for (int i = 0; i < db.columnCount(); i++) {
@@ -385,7 +387,8 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
             "left join c_groups t1 on t1.f_id=g.f_group "
             "left join c_groups t2 on t2.f_id=g2.f_group "
             "where oh.f_id=:f_header and g2.f_unit=10 "
-            "group by 1, 3 ").arg(price1).arg(price2));
+            "group by 1, 3 "
+            "order by ad.f_row ").arg(price1).arg(price2));
     QList<QList<QVariant> > data;
     while (db.nextRow()) {
         QList<QVariant> v;
@@ -415,7 +418,8 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
             "inner join o_header oh on oh.f_id=ad.f_header "
             "left join c_groups t1 on t1.f_id=g.f_group "
             "where oh.f_id=:f_header and g.f_unit<>10 "
-            "group by 1, 3 ").arg(goodsNameField).arg(price1));
+            "group by 1, 3 "
+            "order by ad.f_row ").arg(goodsNameField).arg(price1));
     while (db.nextRow()) {
         QList<QVariant> v;
         for (int i = 0; i < db.columnCount(); i++) {

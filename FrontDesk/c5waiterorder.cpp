@@ -53,11 +53,14 @@ void C5WaiterOrder::setOrder(const QString &id)
         ui->leState->setText(db.getString("f_statename"));
         ui->leHall->setText(db.getString("f_hallname"));
         ui->leTable->setText(db.getString("f_tablename"));
+        ui->leTable->setProperty("table_id", db.getInt("f_table"));
         ui->leTotal->setText(float_str(db.getDouble("f_amounttotal"), 2));
         ui->leCash->setDouble(db.getDouble("f_amountcash"));
         ui->leCard->setDouble(db.getDouble("f_amountcard"));
         ui->leBank->setDouble(db.getDouble("f_amountbank"));
         ui->leOther->setDouble(db.getDouble("f_amountother"));
+        ui->leIdram->setDouble(db.getDouble("f_amountidram"));
+        ui->lePayX->setDouble(db.getDouble("f_amountpayx"));
         ui->leOtherName->setText(db.getString("f_othername"));
         if (db.getDouble("f_servicefactor") > 0.001) {
             ui->lbService->setText(QString("%1 %2%").arg(tr("Service")).arg(db.getDouble("f_servicefactor") * 100));
@@ -152,7 +155,11 @@ void C5WaiterOrder::showLog()
     db.exec("select f_date, f_time, f_user, f_action, f_value1, f_value2 "
             "from airlog.log "
             "where f_invoice=:f_invoice "
-            "order by f_id desc ");
+            "union "
+            "select f_date, f_time, '', 'TAX', f_err, f_result "
+            "from o_tax_log "
+            "where f_order=:f_invoice "
+            "order by 1 desc, 2 desc ");
     ui->tblLog->setRowCount(db.rowCount());
     int row = 0;
     while (db.nextRow()) {
@@ -195,6 +202,9 @@ void C5WaiterOrder::saveOrder()
     db[":f_amountcard"] = ui->leCard->getDouble();
     db[":f_amountcash"] = ui->leCash->getDouble();
     db[":f_amountbank"] = ui->leBank->getDouble();
+    db[":f_amountother"] = ui->leOther->getDouble();
+    db[":f_amountidram"] = ui->leIdram->getDouble();
+    db[":f_amountpayx"] = ui->lePayX->getDouble();
     db[":f_amountother"] = ui->leOther->getDouble();
     db.update("o_header", "f_id", ui->leUuid->text());
     C5Message::info(tr("Saved"));
@@ -333,4 +343,22 @@ void C5WaiterOrder::on_btnClearTax_clicked()
         db.update("o_tax", "f_id", ui->leUuid->text());
         ui->leTax->clear();
     }
+}
+
+void C5WaiterOrder::on_btnOpenTable_clicked()
+{
+    if (C5Message::question(tr("Open order?")) != QDialog::Accepted) {
+        return;
+    }
+    C5Database db(fDBParams);
+    db[":f_table"] = ui->leTable->property("table_id");
+    db[":f_state"] = ORDER_STATE_OPEN;
+    db.exec("select f_id from o_header where f_table=:f_table and f_state=:f_state");
+    if (db.nextRow()) {
+        C5Message::error(tr("An opened order exists on table, cannot continue"));
+        return;
+    }
+    db[":f_id"] = ui->leUuid->text();
+    db[":f_state"] = ORDER_STATE_OPEN;
+    db.exec("update o_header set f_state=:f_state where f_id=:f_id");
 }

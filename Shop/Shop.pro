@@ -233,6 +233,8 @@ SOURCES += \
     ../Reports/cr5goodsmovement.cpp \
     ../Reports/cr5goodsmovementfilter.cpp \
     ../Reports/cr5goodspartners.cpp \
+    ../Reports/cr5goodsqtyreminder.cpp \
+    ../Reports/cr5goodsqtyreminderfilter.cpp \
     ../Reports/cr5goodsstorages.cpp \
     ../Reports/cr5goodsunit.cpp \
     ../Reports/cr5goodswaste.cpp \
@@ -539,6 +541,8 @@ HEADERS += \
     ../Reports/cr5goodsmovement.h \
     ../Reports/cr5goodsmovementfilter.h \
     ../Reports/cr5goodspartners.h \
+    ../Reports/cr5goodsqtyreminder.h \
+    ../Reports/cr5goodsqtyreminderfilter.h \
     ../Reports/cr5goodsstorages.h \
     ../Reports/cr5goodsunit.h \
     ../Reports/cr5goodswaste.h \
@@ -729,6 +733,7 @@ FORMS += \
     ../Reports/cr5goodsfilter.ui \
     ../Reports/cr5goodsimages.ui \
     ../Reports/cr5goodsmovementfilter.ui \
+    ../Reports/cr5goodsqtyreminderfilter.ui \
     ../Reports/cr5materialinstorefilter.ui \
     ../Reports/cr5materialinstoreuncomplectfilter.ui \
     ../Reports/cr5materialmoveuncomplectfilter.ui \

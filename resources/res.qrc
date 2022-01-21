@@ -125,5 +125,6 @@
         <file>delete-user.png</file>
         <file>delete-action.png</file>
         <file>update_prices.png</file>
+        <file>folder_open.png</file>
     </qresource>
 </RCC>

@@ -114,6 +114,7 @@ void C5Permissions::init(C5Database &db, int group)
               << cp_t6_waste
               << cp_t6_classes
               << cp_t6_goods_images
+              << cp_t6_qty_reminder
 
               << cp_t7_other
               << cp_t7_credit_card
