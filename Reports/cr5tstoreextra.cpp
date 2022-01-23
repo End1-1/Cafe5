@@ -119,7 +119,14 @@ void CR5TStoreExtra::buildQuery()
     while (db.nextRow()) {
         int row = goodsRowMap[db.getInt("f_goods")];
         rows[row][2] = db.getDouble("f_qty");
-        rows[row][3] = db.getDouble("f_amount");
+        switch (fFilter->pricing()) {
+        case 1:
+            rows[row][3] = db.getDouble("f_amount");
+            break;
+        case 2:
+            rows[row][3] = db.getDouble("f_qty") * goodsSalePrice[db.getInt("f_goods")];
+            break;
+        }
     }
 
     //inputs
@@ -135,7 +142,14 @@ void CR5TStoreExtra::buildQuery()
     while (db.nextRow()) {
         int row = goodsRowMap[db.getInt("f_goods")];
         rows[row][4] = db.getDouble("f_qty");
-        rows[row][5] = db.getDouble("f_amount");
+        switch (fFilter->pricing()) {
+        case 1:
+            rows[row][5] = db.getDouble("f_amount");
+            break;
+        case 2:
+            rows[row][5] = db.getDouble("f_qty") * goodsSalePrice[db.getInt("f_goods")];
+            break;
+        }
     }
 
     //outputs
@@ -151,7 +165,14 @@ void CR5TStoreExtra::buildQuery()
     while (db.nextRow()) {
         int row = goodsRowMap[db.getInt("f_goods")];
         rows[row][6] = db.getDouble("f_qty");
-        rows[row][7] = db.getDouble("f_amount");
+        switch (fFilter->pricing()) {
+        case 1:
+            rows[row][7] = db.getDouble("f_amount");
+            break;
+        case 2:
+            rows[row][7] = db.getDouble("f_qty") * goodsSalePrice[db.getInt("f_goods")];
+            break;
+        }
     }
 
     //fact in the end, inventory
@@ -165,7 +186,14 @@ void CR5TStoreExtra::buildQuery()
     while (db.nextRow()) {
         int row = goodsRowMap[db.getInt("f_goods")];
         rows[row][10] = db.getDouble("f_qty");
-        rows[row][11] = db.getDouble("f_amount");
+        switch (fFilter->pricing()) {
+        case 1:
+            rows[row][11] = db.getDouble("f_amount");
+            break;
+        case 2:
+            rows[row][11] = db.getDouble("f_qty") * goodsSalePrice[db.getInt("f_goods")];
+            break;
+        }
     }
 
     //finaly, count

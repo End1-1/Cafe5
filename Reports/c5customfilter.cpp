@@ -73,6 +73,7 @@ void C5CustomFilter::on_lw_itemClicked(QListWidgetItem *item)
             li->widget()->deleteLater();
         }
     }
+    QStringList duplicate;
     QRegularExpression re("%.*?%");
     int pos = 0;
     ;
@@ -90,6 +91,11 @@ void C5CustomFilter::on_lw_itemClicked(QListWidgetItem *item)
     availableWidgets.append("date");
     availableWidgets.append("cache");
     for (QString &s: fParams) {
+        if (duplicate.contains(s)) {
+            continue;
+        } else {
+            duplicate.append(s);
+        }
         QString type = s.mid(s.indexOf(":") + 1, s.length() - s.indexOf(":") + 1);
         if (!availableWidgets.contains(type) && !type.contains("cache")) {
             continue;
