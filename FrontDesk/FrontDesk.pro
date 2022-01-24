@@ -33,6 +33,7 @@ DEFINES += FRONTDESK
 
 SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../../NewTax/Src/printtaxn.cpp \
+    ../../NewTax/Src/printtaxn.cpp \
     ../Cafe5/c5double.cpp \
     ../Cafe5/c5license.cpp \
     ../Cafe5/c5licensedlg.cpp \
@@ -281,6 +282,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../../XLSX/src/xlsxwriter.cpp
 
 HEADERS += ../Cafe5/c5cafecommon.h \
+    ../../NewTax/Src/printtaxn.h \
     ../../NewTax/Src/printtaxn.h \
     ../Cafe5/c5double.h \
     ../Cafe5/c5license.h \

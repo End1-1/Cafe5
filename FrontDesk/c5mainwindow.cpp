@@ -91,6 +91,8 @@
 
 C5MainWindow *__mainWindow;
 QStringList mainDbParams;
+QString fUdpBroadcastSession;
+const quint32 DATAGRAM_PORT = 3390;
 
 C5MainWindow::C5MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -261,6 +263,13 @@ void C5MainWindow::on_actionLogin_triggered()
     ui->actionLogin->setVisible(false);
     ui->actionLogout->setVisible(true);
     ui->actionChange_password->setVisible(true);
+    if (fUdpBroadcastSession.isEmpty()) {
+        fUdpBroadcastSession = C5Database::uuid();
+        if (!fUdpSocket.bind(DATAGRAM_PORT, QUdpSocket::ShareAddress)) {
+
+        }
+        connect(&fUdpSocket, &QUdpSocket::channelReadyRead, this, &C5MainWindow::datagramRead);
+    }
 }
 
 void C5MainWindow::updateTimeout()
@@ -271,6 +280,19 @@ void C5MainWindow::updateTimeout()
     ut->fDbParams = C5Config::dbParams();
     connect(ut, SIGNAL(checked(bool, int, QString)), this, SLOT(updateChecked(bool, int, QString)));
     ut->start();
+}
+
+void C5MainWindow::datagramRead()
+{
+    while (fUdpSocket.hasPendingDatagrams()) {
+        QByteArray datagram;
+        datagram.resize(fUdpSocket.pendingDatagramSize());
+        QHostAddress remoteAddress;
+        quint16 remotePort;
+        fUdpSocket.readDatagram(datagram.data(), datagram.size(), &remoteAddress, &remotePort);
+        qDebug() << datagram;
+        fUdpSocket.writeDatagram(datagram, remoteAddress, remotePort);
+    }
 }
 
 void C5MainWindow::updateChecked(bool needUpdate, int source, const QString &path)

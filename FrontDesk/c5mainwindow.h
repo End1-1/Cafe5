@@ -5,6 +5,7 @@
 #include <QLabel>
 #include <QTreeWidgetItem>
 #include <QTimer>
+#include <QUdpSocket>
 
 namespace Ui {
 class C5MainWindow;
@@ -42,6 +43,8 @@ public slots:
 
 private slots:
     void updateTimeout();
+
+    void datagramRead();
 
     void updateChecked(bool needUpdate, int source, const QString &path);
 
@@ -89,6 +92,8 @@ private:
     C5ToolBarWidget *fToolbarWidget;
 
     QTimer fUpdateTimer;
+
+    QUdpSocket fUdpSocket;
 
     bool fLogin;
 
