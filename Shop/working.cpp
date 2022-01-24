@@ -515,6 +515,10 @@ void Working::threadMessageData(int code, const QVariant &data)
         QJsonDocument jdocmsg = QJsonDocument::fromJson(jom["message"].toString().toUtf8(), &jerr);
         if (jerr.error == QJsonParseError::NoError) {
             QJsonObject jjm = jdocmsg.object();
+            p.ctext(tr("Message date and time"));
+            p.br();
+            p.ctext(jom["msgdate"].toString());
+            p.br();
             switch (jjm["action"].toInt()) {
             case MSG_GOODS_RESERVE:
                 p.ltext(tr("Goods reserved"), 0);

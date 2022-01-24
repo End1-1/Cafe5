@@ -79,11 +79,12 @@ bool Chat::handle(const QByteArray &data, const QHash<QString, DataAddress> &dat
         QJsonArray ja;
         db[":freceiver"] = u.fId;
         db[":fstate"] = 1;
-        db.exec("select fid, fsender, fmessage from users_chat where fstate=:fstate and freceiver=:freceiver order by fdateserver");
+        db.exec("select fid, fdateserver, fsender, fmessage from users_chat where fstate=:fstate and freceiver=:freceiver order by fdateserver");
         QStringList ids;
         while (db.next()) {
             QJsonObject jo;
             jo["id"] = db.integerValue("fid");
+            jo["msgdate"] = db.dateTimeValue("fdateserver").toString("dd/MM/yyyy HH:mm");
             jo["sender"] = db.integerValue("fsender");
             jo["message"] = db.stringValue("fmessage");
             ja.append(jo);
