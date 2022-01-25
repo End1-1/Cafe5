@@ -573,6 +573,17 @@ void C5StoreDoc::hotKey(const QString &key)
     }
 }
 
+void C5StoreDoc::setListenBroadcast(bool v)
+{
+    if (v) {
+        ui->btnFillRemote->setIcon(QIcon(":/wifi.png"));
+        __mainWindow->setStoreDocBroadcastListenerDoc(this);
+    } else {
+        ui->btnFillRemote->setIcon(QIcon(":/wifib.png"));
+        __mainWindow->setStoreDocBroadcastListenerDoc(nullptr);
+    }
+}
+
 bool C5StoreDoc::eventFilter(QObject *o, QEvent *e)
 {
     if (o == ui->tblGoodsGroup->viewport() && fGroupTableCellMove) {
@@ -2199,3 +2210,16 @@ void C5StoreDoc::on_btnCloseSearch_clicked()
     ui->wSearchInDocs->setVisible(false);
     on_leSearchInDoc_textChanged("");
 }
+
+
+void C5StoreDoc::on_btnFillRemote_clicked(bool checked)
+{
+    if (checked) {
+        ui->btnFillRemote->setIcon(QIcon(":/wifi.png"));
+        __mainWindow->setStoreDocBroadcastListenerDoc(this);
+    } else {
+        ui->btnFillRemote->setIcon(QIcon(":/wifib.png"));
+        __mainWindow->setStoreDocBroadcastListenerDoc(nullptr);
+    }
+}
+

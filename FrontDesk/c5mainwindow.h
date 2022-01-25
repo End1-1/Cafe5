@@ -13,6 +13,7 @@ class C5MainWindow;
 
 class C5ToolBarWidget;
 class QListWidget;
+class C5StoreDoc;
 
 class C5MainWindow : public QMainWindow
 {
@@ -37,6 +38,8 @@ public:
     void removeTab(QWidget *w);
 
     void writeLog(const QString &message);
+
+    void setStoreDocBroadcastListenerDoc(C5StoreDoc *storedoc);
 
 public slots:
     void on_actionLogin_triggered();
@@ -84,6 +87,8 @@ private:
     QLabel *fStatusLabel;
 
     QTabWidget *fTab;
+
+    C5StoreDoc *fStoreDocBroadcastListener;
 
     QToolBar *fReportToolbar;
 

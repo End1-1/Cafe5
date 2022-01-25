@@ -20,6 +20,7 @@
 #include "c5translatorform.h"
 #include "cr5mfgeneralreport.h"
 #include "cr5saleremoveddishes.h"
+#include "c5broadcasting.h"
 #include "cr5goodsqtyreminder.h"
 #include "cr5cashmovement.h"
 #include "c5costumerdebtpayment.h"
@@ -171,7 +172,15 @@ void C5MainWindow::writeLog(const QString &message)
 {
     ui->ptLog->appendPlainText(QString("%1: %2")
                                .arg(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR))
-                                .arg(message));
+                               .arg(message));
+}
+
+void C5MainWindow::setStoreDocBroadcastListenerDoc(C5StoreDoc *storedoc)
+{
+    if (fStoreDocBroadcastListener != nullptr) {
+        fStoreDocBroadcastListener->setListenBroadcast(false);
+    }
+    fStoreDocBroadcastListener = storedoc;
 }
 
 void C5MainWindow::tabCloseRequested(int index)
@@ -290,7 +299,17 @@ void C5MainWindow::datagramRead()
         QHostAddress remoteAddress;
         quint16 remotePort;
         fUdpSocket.readDatagram(datagram.data(), datagram.size(), &remoteAddress, &remotePort);
-        qDebug() << datagram;
+        QJsonParseError jerr;
+        QJsonDocument jdoc = QJsonDocument::fromJson(datagram, &jerr);
+        if (jerr.error == QJsonParseError::NoError) {
+            QJsonObject jobj = jdoc.object();
+            switch (jobj["what"].toInt()) {
+                case WHAT_GETSERVER:
+                break;
+            }
+
+            qDebug() << datagram;
+        }
         fUdpSocket.writeDatagram(datagram, remoteAddress, remotePort);
     }
 }

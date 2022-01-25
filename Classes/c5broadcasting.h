@@ -1,0 +1,6 @@
+#ifndef C5BROADCASTING_H
+#define C5BROADCASTING_H
+
+#define WHAT_GETSERVER 1
+
+#endif // C5BROADCASTING_H

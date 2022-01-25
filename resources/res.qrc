@@ -126,5 +126,7 @@
         <file>delete-action.png</file>
         <file>update_prices.png</file>
         <file>folder_open.png</file>
+        <file>wifi.png</file>
+        <file>wifib.png</file>
     </qresource>
 </RCC>

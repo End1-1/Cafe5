@@ -56,6 +56,8 @@ public:
 
     virtual void hotKey(const QString &key);
 
+    void setListenBroadcast(bool v);
+
 public slots:
     void saveDoc();
     
@@ -223,6 +225,8 @@ private slots:
     void on_leSearchInDoc_textChanged(const QString &arg1);
 
     void on_btnCloseSearch_clicked();
+
+    void on_btnFillRemote_clicked(bool checked);
 };
 
 #endif // C5STOREDOC_H

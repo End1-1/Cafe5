@@ -289,6 +289,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Cafe5/c5licensedlg.h \
     ../Cafe5/c5replication.h \
     ../Classes/barcode5.h \
+    ../Classes/c5broadcasting.h \
     ../Classes/c5crypt.h \
     ../Classes/c5filelogwriter.h \
     ../Classes/c5random.h \
