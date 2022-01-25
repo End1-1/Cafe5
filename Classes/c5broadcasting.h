@@ -2,5 +2,9 @@
 #define C5BROADCASTING_H
 
 #define WHAT_GETSERVER 1
+#define WHAT_GETDOC 2
+
+#define ACCEPT_REJECT 0
+#define ACCEPT_ACCEPT 1
 
 #endif // C5BROADCASTING_H

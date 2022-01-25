@@ -729,3 +729,9 @@ update s_app set f_version='62' where f_app='DB';
 alter table o_preorder add column f_guestname tinytext, add column f_cityledger integer, add column f_prepaidpayx decimal(14,2) after f_prepaidcard; 
 alter table o_preorder add column f_fortable integer;
 alter table o_header add column f_amountidram decimal(14,3), add column f_amountpayx decimal(14,2);
+
+/*db - 63 */
+/*19.01.2022 */
+update s_app set f_version='63' where f_app='DB';
+ALTER TABLE `a_store` ADD INDEX `fk_store_draft_idx` (`f_draft` ASC) ;
+ALTER TABLE `a_store` ADD CONSTRAINT `fk_store_draft`  FOREIGN KEY (`f_draft`)  REFERENCES `a_store_draft` (`f_id`)  ON DELETE NO ACTION  ON UPDATE NO ACTION;

@@ -299,15 +299,24 @@ void C5MainWindow::datagramRead()
         QHostAddress remoteAddress;
         quint16 remotePort;
         fUdpSocket.readDatagram(datagram.data(), datagram.size(), &remoteAddress, &remotePort);
+        qDebug() << remoteAddress;
         QJsonParseError jerr;
         QJsonDocument jdoc = QJsonDocument::fromJson(datagram, &jerr);
         if (jerr.error == QJsonParseError::NoError) {
             QJsonObject jobj = jdoc.object();
+            QJsonObject jreply;
             switch (jobj["what"].toInt()) {
-                case WHAT_GETSERVER:
+            case WHAT_GETSERVER: {
+                jreply["what"] = WHAT_GETSERVER;
+                jreply["reply"] = 1;
+                jreply["uuid"] = jobj["uuid"];
+                jreply["server_uuid"] = fUdpBroadcastSession;
+                jreply["accept"] = ACCEPT_ACCEPT;
                 break;
             }
+            }
 
+            datagram = QJsonDocument(jreply).toJson(QJsonDocument::Compact);
             qDebug() << datagram;
         }
         fUdpSocket.writeDatagram(datagram, remoteAddress, remotePort);
