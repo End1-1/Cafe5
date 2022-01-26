@@ -3,6 +3,7 @@
 
 #define WHAT_GETSERVER 1
 #define WHAT_GETDOC 2
+#define WHAT_PARSE_STORE_STRING 3
 
 #define ACCEPT_REJECT 0
 #define ACCEPT_ACCEPT 1

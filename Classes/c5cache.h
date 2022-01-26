@@ -61,6 +61,8 @@ public:
 
     inline QList<QVariant> getValuesForId(int id) {return find(id) > -1 ? getRow(find(id)) : QList<QVariant>(); }
 
+    QList<QVariant> getJoinedColumn(const QString &columnName);
+
     QString getString(int id);
 
     QString getString(int row, const QString &columnName);

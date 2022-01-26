@@ -58,6 +58,8 @@ public:
 
     void setListenBroadcast(bool v);
 
+    bool parseBroadcastMessage(const QString &msg, QString &replystr);
+
 public slots:
     void saveDoc();
     

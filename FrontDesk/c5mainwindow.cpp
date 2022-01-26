@@ -299,21 +299,34 @@ void C5MainWindow::datagramRead()
         QHostAddress remoteAddress;
         quint16 remotePort;
         fUdpSocket.readDatagram(datagram.data(), datagram.size(), &remoteAddress, &remotePort);
-        qDebug() << remoteAddress;
+        qDebug() << remoteAddress << datagram;
         QJsonParseError jerr;
         QJsonDocument jdoc = QJsonDocument::fromJson(datagram, &jerr);
         if (jerr.error == QJsonParseError::NoError) {
             QJsonObject jobj = jdoc.object();
             QJsonObject jreply;
+            jreply["what"] = jobj["what"].toInt();
+            jreply["reply"] = 1;
             switch (jobj["what"].toInt()) {
             case WHAT_GETSERVER: {
-                jreply["what"] = WHAT_GETSERVER;
-                jreply["reply"] = 1;
                 jreply["uuid"] = jobj["uuid"];
                 jreply["server_uuid"] = fUdpBroadcastSession;
                 jreply["accept"] = ACCEPT_ACCEPT;
                 break;
             }
+            case WHAT_PARSE_STORE_STRING:
+                if (fStoreDocBroadcastListener) {
+                    QString replystr;
+                    if (!fStoreDocBroadcastListener->parseBroadcastMessage(jobj["data"].toString(), replystr)) {
+                        jreply["error"] = 1;
+                        jreply["message"] = replystr;
+                    }
+                    jreply["data"] = QJsonDocument::fromJson(replystr.toUtf8()).object();
+                } else {
+                    jreply["error"] = 1;
+                    jreply["message"] = tr("No store document is listening for message");
+                }
+                break;
             }
 
             datagram = QJsonDocument(jreply).toJson(QJsonDocument::Compact);

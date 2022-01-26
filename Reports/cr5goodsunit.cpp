@@ -7,9 +7,10 @@ CR5GoodsUnit::CR5GoodsUnit(const QStringList &dbParams, QWidget *parent) :
     fIcon = ":/goods.png";
     fLabel = tr("Units");
 
-    fSqlQuery = "select f_id, f_name, f_defaultqty from c_units ";
+    fSqlQuery = "select f_id, f_name, f_fullname, f_defaultqty from c_units ";
     fTranslation["f_id"] = tr("Code");
     fTranslation["f_name"] = tr("Name");
+    fTranslation["f_fullname"] = tr("Full caption");
     fTranslation["f_defaultqty"] = tr("Default qty");
 
     fEditor = new CE5GoodsUnit(dbParams);

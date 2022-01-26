@@ -19,9 +19,10 @@ C5Cache::C5Cache(const QStringList &dbParams) :
                 .arg(tr("Code"))
                 .arg(tr("Name"))
                 .arg(tr("Part"));
-        fCacheQuery[cache_goods_unit] = QString("select f_id as `%1`, f_name as `%2` from c_units")
+        fCacheQuery[cache_goods_unit] = QString("select f_id as `%1`, f_name as `%2`, f_fullname as `%3` from c_units")
                 .arg(tr("Code"))
-                .arg(tr("Name"));
+                .arg(tr("Name"))
+                .arg(tr("Full caption"));
         fCacheQuery[cache_goods_group] = QString("select f_id as `%1`, f_name as `%2` from c_groups")
                 .arg(tr("Code"))
                 .arg(tr("Name"));
@@ -214,6 +215,16 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         }
     }
     db.commit();
+}
+
+QList<QVariant> C5Cache::getJoinedColumn(const QString &columnName)
+{
+    QList<QVariant> result;
+    int columnIndex = fCacheColumns[fId][columnName.toLower()];
+    for (int i = 0; i < fCacheData.count(); i++) {
+        result.append(fCacheData.at(i).at(columnIndex));
+    }
+    return result;
 }
 
 QString C5Cache::getString(int id)

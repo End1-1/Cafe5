@@ -17,6 +17,9 @@
 #include <QMenu>
 #include <QHash>
 #include <QClipboard>
+#include <QJsonParseError>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QShortcut>
 
 C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
@@ -582,6 +585,74 @@ void C5StoreDoc::setListenBroadcast(bool v)
         ui->btnFillRemote->setIcon(QIcon(":/wifib.png"));
         __mainWindow->setStoreDocBroadcastListenerDoc(nullptr);
     }
+}
+
+bool C5StoreDoc::parseBroadcastMessage(const QString &msg, QString &replystr)
+{
+    QJsonParseError jerr;
+    QJsonDocument jdoc = QJsonDocument::fromJson(msg.toUtf8(), &jerr);
+    if (jerr.error == QJsonParseError::NoError) {
+        C5Database db(fDBParams);
+        QJsonObject jobj = jdoc.object();
+        QString message = jobj["data"].toString();
+        jobj = QJsonObject();
+        jobj["parsed"] = true;
+        // search for measurment unit and extract quantity
+        QList<QVariant> temp = C5Cache::cache(fDBParams, cache_goods_unit)->getJoinedColumn(tr("Full caption"));
+        QStringList units;
+        for (const QVariant &v: temp) {
+            units.append(" " + v.toString().toLower());
+        }
+        double qty = 0;
+        int min_qtystart = -1;
+        for (const QString &s: units) {
+            if (s.isEmpty()) {
+                continue;
+            }
+            int up = message.indexOf(s);
+            int qtystart;
+            if (up > -1) {
+                qtystart = message.mid(0, up).lastIndexOf(" ", up - 1);
+                if (min_qtystart == -1) {
+                    min_qtystart = qtystart;
+                }
+                min_qtystart = min_qtystart < qtystart ? qtystart : min_qtystart;
+                jobj["mid"] = message.mid(0, up);
+                jobj["qtystart"] = qtystart;
+                jobj["qty"] = message.mid(qtystart + 1, up - qtystart - 1);
+            }
+        }
+
+        //search name
+        QString name;
+        QJsonArray jarr;
+        if (min_qtystart > -1) {
+            name = message.mid(0, min_qtystart);
+            jobj["searchname"] = name;
+            if (!name.isEmpty()) {
+                db.exec(QString("select g.f_id, g.f_name, u.f_fullname as f_unitname, g.f_scancode "
+                        "from c_goods g "
+                        "left join c_units u on u.f_id=g.f_unit "
+                        "where g.f_name like '%1%' "
+                        "limit 6 ").arg(name));
+                while (db.nextRow()) {
+                    QJsonObject jo;
+                    jo["f_id"] = db.getInt("f_id");
+                    jo["f_name"] = db.getString("f_name");
+                    jo["f_unitname"] = db.getString("f_unitname");
+                    jo["f_scancode"] = db.getString("f_scancode");
+                    jarr.append(jo);
+                }
+            }
+        }
+        jobj["goods"] = jarr;
+
+        replystr = QJsonDocument(jobj).toJson(QJsonDocument::Compact);
+    } else {
+        replystr = jerr.errorString();
+        return false;
+    }
+    return true;
 }
 
 bool C5StoreDoc::eventFilter(QObject *o, QEvent *e)
