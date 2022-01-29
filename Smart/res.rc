@@ -17,7 +17,7 @@ BEGIN
             VALUE "FileDescription", "Waiter\0"
             VALUE "FileVersion", _FILE_VERSION_STR
             VALUE "InternalName", "Smart\0"
-            VALUE "LegalCopyright", "(C)2017-2020, Kudryashov Vasili\0"
+            VALUE "LegalCopyright", "(C)2017-2022, Kudryashov Vasili\0"
             VALUE "OriginalFilename", "Smart.exe\0"
             VALUE "Email", "end1_1@yahoo.com\0"
             VALUE "ProductName", "Smart\0"

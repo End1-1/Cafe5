@@ -9,6 +9,8 @@
 #include <QFile>
 #include <QPrinter>
 #include <QShortcut>
+#include <QNetworkReply>
+#include <QNetworkAccessManager>
 
 payment::payment(const QString order, const QStringList &dbParams, C5User *user) :
     C5Dialog(dbParams),
@@ -46,7 +48,7 @@ payment::payment(const QString order, const QStringList &dbParams, C5User *user)
         ui->btnTax->setChecked(true);
         ui->btnCancel->setVisible(false);
     }
-    ui->btnCheckoutOther->setEnabled(pr(dbParams.at(1), cp_t5_pay_complimentary));
+    ui->btnCheckoutOther->setEnabled(fUser->check(cp_t5_pay_complimentary));
 }
 
 payment::~payment()
@@ -107,18 +109,18 @@ void payment::on_leCash_textChanged(const QString &arg1)
 
 void payment::on_btnCheckoutCash_clicked()
 {
-    checkout(true);
+    checkout(true, false);
 }
 
 void payment::on_btnCheckoutCard_clicked()
 {
-    checkout(false);
+    checkout(false, false);
 }
 
-void payment::checkout(bool cash)
+void payment::checkout(bool cash, bool idram)
 {
     if (ui->btnTax->isChecked()) {
-        if (!printTax(cash ? 0 : ui->leAmount->getDouble())) {
+        if (!printTax(cash ? 0 : ui->leAmount->getDouble(), idram ? true : (C5Config::taxUseExtPos() == "true" ? true : false))) {
             return;
         }
     }
@@ -134,6 +136,10 @@ void payment::checkout(bool cash)
     QString cashprefix = cash ? __c5config.cashPrefix() : __c5config.nocashPrefix();
     if (cash) {
 
+    } else if (idram) {
+        db[":f_amountcash"] = 0;
+        db[":f_amountidram"] = ui->leAmount->getDouble();
+        db.update("o_header", "f_id", fOrderUUID);
     } else {
         db[":f_id"] = fOrderUUID;
         db.exec("update o_header set f_amountcash=0, f_amountcard=f_amounttotal where f_id=:f_id");
@@ -362,7 +368,7 @@ bool payment::printReceipt(bool printSecond)
     return true;
 }
 
-bool payment::printTax(double cardAmount)
+bool payment::printTax(double cardAmount, bool useextpos)
 {
     C5Database db(fDBParams);
     db[":f_header"] = fOrderUUID;
@@ -371,7 +377,7 @@ bool payment::printTax(double cardAmount)
             "from o_body b "
             "left join d_dish d on d.f_id=b.f_dish "
             "where b.f_header=:f_header and b.f_state=:f_state");
-    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
+    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), useextpos ? "true" : "false", C5Config::taxCashier(), C5Config::taxPin(), this);
     while (db.nextRow()) {
         pt.addGoods(C5Config::taxDept(), db.getString("f_adgcode"), db.getString("f_dish"), db.getString("f_name"), db.getDouble("f_price"), db.getDouble("f_qty1"), 0.0);
     }
@@ -445,4 +451,45 @@ void payment::on_btnCheckoutOther_clicked()
         fCanAccept = true;
         accept();
     }
+}
+
+void payment::on_btnCheckoutIdram_clicked()
+{
+    QNetworkAccessManager *na = new QNetworkAccessManager(this);
+    connect(na, &QNetworkAccessManager::finished, this, [=](QNetworkReply *r) {
+        if (r->error() != QNetworkReply::NoError) {
+            C5Message::error(r->errorString());
+            return;
+        }
+        QByteArray ba = r->readAll();
+
+        QJsonDocument jdoc = QJsonDocument::fromJson(ba);
+        QJsonObject jo = jdoc.object();
+        qDebug() << jo;
+        QJsonArray ja = jo["Result"].toArray();
+        if (ja.count() > 0) {
+            QString DEBIT = ja.at(0)["DEBIT"].toString();
+            if (str_float(DEBIT) > 0.01) {
+                checkout(false, true);
+            } else {
+                C5Message::info(ba);
+            }
+        } else {
+            C5Message::info(tr("Unpaid"));
+        }
+        sender()->deleteLater();
+    });
+    connect(na, &QNetworkAccessManager::sslErrors, this, [=](QNetworkReply *reply, const QList<QSslError> &error) {
+       C5Message::error(reply->errorString());
+    });
+    QNetworkRequest nr = QNetworkRequest(QUrl("https://money.idram.am/api/History/Search"));
+    nr.setRawHeader("_SessionId_", __c5config.getValue(param_idram_session_id).toLatin1()); //"3497ae22-8623-45be-84d9-f9f9671b0628");
+    nr.setRawHeader("_EncMethod_", "NONE");
+    nr.setRawHeader("Content-Type", "application/json");
+    //nr->setRawHeader("Content-Length", QString::number(m_data.length()).toLatin1());
+    nr.setRawHeader("Cache-Control", "no-cache");
+    nr.setRawHeader("Accept", "*/*");
+    QString request = QString("{\"Detail\":\"%1\"}").arg(fOrderUUID);
+    //QString request = QString("{\"Detail\":\"%1\"}").arg("229eb2c3-083f-4bf5-b410-8ced2b6450ce");
+    na->post(nr, request.toLatin1());
 }

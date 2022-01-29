@@ -14,6 +14,7 @@
 #include "payment.h"
 #include "dishpackage.h"
 #include "c5printing.h"
+#include "QRCodeGenerator.h"
 #include <QScrollBar>
 #include <QInputDialog>
 #include <QScreen>
@@ -552,6 +553,72 @@ void Workspace::on_btnCheckout_clicked()
             prn.insert(d.printer);
         }
     }
+
+    if (__c5config.getValue(param_idram_id).length() > 0 && !__c5config.localReceiptPrinter().isEmpty()) {
+        QFont font(qApp->font());
+        font.setPointSize(24);
+        C5Printing p;
+        p.setSceneParams(650, 2800, QPrinter::Portrait);
+        p.setFont(font);
+        p.setFontBold(true);
+        p.ctext(tr("Receipt #") + QString("%1%2").arg(prefix).arg(hallid));
+        p.br();
+        p.setFontBold(false);
+        p.line(3);
+        p.br(3);
+        p.br();
+        p.br();
+        p.ctext(tr("Amount to paid"));
+        p.br();
+        p.ctext(ui->leTotal->text());
+        p.br();
+        p.br();
+        p.ctext(QString::fromUtf8("Վճարեք Idram-ով"));
+        p.br();
+
+        int levelIndex = 1;
+        int versionIndex = 0;
+        bool bExtent = true;
+        int maskIndex = -1;
+        QString encodeString = QString("%1;%2;%3;%4|%5;%6;%7")
+                .arg(__c5config.getValue(param_idram_name))
+                .arg(__c5config.getValue(param_idram_id)) //IDram ID
+                .arg(str_float(ui->leTotal->text()))
+                .arg(id)
+                .arg(__c5config.getValue(param_idram_phone))
+                .arg(__c5config.getValue(param_idram_tips).toInt() == 1 ? "1" : "0")
+                .arg(__c5config.getValue(param_idram_tips).toInt() == 1 ? __c5config.getValue(param_idram_tips_wallet) : "");
+
+        CQR_Encode qrEncode;
+        bool successfulEncoding = qrEncode.EncodeData( levelIndex, versionIndex, bExtent, maskIndex, encodeString.toUtf8().data() );
+        if (!successfulEncoding) {
+//            fLog.append("Cannot encode qr image");
+        }
+        int qrImageSize = qrEncode.m_nSymbleSize;
+        int encodeImageSize = qrImageSize + ( QR_MARGIN * 2 );
+        QImage encodeImage(encodeImageSize, encodeImageSize, QImage::Format_Mono);
+        encodeImage.fill(1);
+
+        for ( int i = 0; i < qrImageSize; i++ ) {
+            for ( int j = 0; j < qrImageSize; j++ ) {
+                if ( qrEncode.m_byModuleData[i][j] ) {
+                    encodeImage.setPixel(i + QR_MARGIN, j + QR_MARGIN, 0);
+                }
+            }
+        }
+
+        QPixmap pix = QPixmap::fromImage(encodeImage);
+        pix = pix.scaled(300, 300);
+        p.image(pix, Qt::AlignHCenter);
+        p.br();
+        /* End QRCode */
+        p.ltext(QString("%1 %2").arg(tr("Printed:")).arg(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR)), 0);
+        p.br();
+        p.ltext("_", 0);
+        p.br();
+        p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
+    }
+
     for (const QString &s: prn) {
         QFont font(qApp->font());
         font.setPointSize(24);
@@ -582,6 +649,7 @@ void Workspace::on_btnCheckout_clicked()
         p.br(3);
         p.setFontSize(22);
         p.setFontBold(false);
+
         p.ltext(QString("%1 %2").arg(tr("Printed:")).arg(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR)), 0);
         p.br();
         p.ltext("_", 0);
@@ -597,10 +665,10 @@ void Workspace::on_btnCheckout_clicked()
     ui->leTotal->setDouble(0);
     ui->lbPhone->clear();
     ui->leInfo->setVisible(false);
-    payment *p = new payment(id, fDBParams, fUser);
-    p->exec();
+    payment *pay = new payment(id, fDBParams, fUser);
+    pay->exec();
     //p->justPrint();
-    delete p;
+    delete pay;
 }
 
 void Workspace::on_btnClearFilter_clicked()

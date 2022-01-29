@@ -75,12 +75,22 @@ void SearchItems::on_btnReserve_clicked()
     }
     DlgReservGoods r(ui->tbl->getInteger(row, tr("Store code")),
                      ui->tbl->getInteger(row, tr("Goods code")),
-                     ui->tbl->getDouble(row, tr("Qty")) - ui->tbl->getDouble(row, tr("Reserved")), this);
+                     ui->tbl->getDouble(row, tr("Qty")) - ui->tbl->getDouble(row, tr("Reserved")));
     r.exec();
 }
 
 void SearchItems::on_btnViewReservations_clicked()
 {
+    int goods = 0;
+    int store = 0;
+    QString where;
+    if (ui->tbl->currentRow() > -1) {
+        goods = ui->tbl->getInteger(ui->tbl->currentRow(), 9);
+        store = ui->tbl->getInteger(ui->tbl->currentRow(), 8);
+        where = QString(" and rs.f_goods=%1 and rs.f_store=%2 ")
+                .arg(goods)
+                .arg(store);
+    }
     ui->tblReserve->setRowCount(0);
     C5Database db(__c5config.replicaDbParams());
     db[":f_reservestate"] = GR_RESERVED;
@@ -92,7 +102,7 @@ void SearchItems::on_btnViewReservations_clicked()
             "left join c_storages sd on sd.f_id=rs.f_store "
             "left join c_goods g on g.f_id=rs.f_goods "
             "left join a_store_reserve_state arn on arn.f_id=rs.f_state "
-            "where rs.f_state=:f_reservestate "
+            "where rs.f_state=:f_reservestate " + where +
             "order by rs.f_date ");
     while (db.nextRow()) {
         int r = ui->tblReserve->addEmptyRow();
@@ -133,10 +143,17 @@ void SearchItems::on_btnViewAllReservations_clicked()
 
 void SearchItems::on_btnEditReserve_clicked()
 {
-    int r = ui->tblReserve->currentRow();
-    if (r < 0) {
+    if (!ui->tblReserve->isVisible()) {
+        ui->btnViewReservations->click();
         return;
     }
-    DlgReservGoods rg(ui->tblReserve->getInteger(r, "id"), this);
+    int r = ui->tblReserve->currentRow();
+    int reserveid = 0;
+    if (r > -1) {
+        reserveid = ui->tblReserve->getInteger(r, "id");
+    } else {
+        return;
+    }
+    DlgReservGoods rg(reserveid);
     rg.exec();
 }

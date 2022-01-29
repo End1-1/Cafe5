@@ -16,6 +16,7 @@
 #include <QCompleter>
 #include <QMenu>
 #include <QFileDialog>
+#include <QBuffer>
 #include <QStringListModel>
 #include <QInputDialog>
 #include <QPaintEngine>
@@ -325,17 +326,22 @@ void CE5Goods::uploadImage()
         return;
     }
     ui->lbImage->setPixmap(pm.scaled(ui->lbImage->size(), Qt::KeepAspectRatio));
-    qApp->processEvents();
-    QFile f(fn);
-    if (f.open(QIODevice::ReadOnly)) {
-        C5Database db(fDBParams);
-        db[":f_id"] = ui->leCode->getInteger();
-        db.exec("delete from c_goods_images where f_id=:f_id");
-        db[":f_id"] = ui->leCode->getInteger();
-        db[":f_data"] = f.readAll();
-        db.exec("insert into c_goods_images (f_id, f_data) values (:f_id, :f_data)");
-        f.close();
-    }
+
+    QByteArray ba;
+    do {
+        pm = pm.scaled(pm.width() * 0.8,  pm.height() * 0.8);
+        ba.clear();
+        QBuffer buff(&ba);
+        buff.open(QIODevice::WriteOnly);
+        pm.save(&buff, "JPG");
+    } while (ba.size() > 100000);
+
+    C5Database db(fDBParams);
+    db[":f_id"] = ui->leCode->getInteger();
+    db.exec("delete from c_goods_images where f_id=:f_id");
+    db[":f_id"] = ui->leCode->getInteger();
+    db[":f_data"] = ba;
+    db.exec("insert into c_goods_images (f_id, f_data) values (:f_id, :f_data)");
 }
 
 void CE5Goods::removeImage()

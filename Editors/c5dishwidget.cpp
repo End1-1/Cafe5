@@ -14,6 +14,7 @@
 #include <QFileDialog>
 #include <QClipboard>
 #include <QInputDialog>
+#include <QBuffer>
 #include <QScrollBar>
 
 C5DishWidget::C5DishWidget(const QStringList &dbParams, QWidget *parent) :
@@ -326,17 +327,23 @@ void C5DishWidget::uploadImage()
         return;
     }
     ui->lbImage->setPixmap(pm.scaled(ui->lbImage->size(), Qt::KeepAspectRatio));
-    qApp->processEvents();
-    QFile f(fn);
-    if (f.open(QIODevice::ReadOnly)) {
-        C5Database db(fDBParams);
-        db[":f_id"] = ui->leCode->getInteger();
-        db.exec("delete from d_image where f_id=:f_id");
-        db[":f_id"] = ui->leCode->getInteger();
-        db[":f_image"] = f.readAll();
-        db.exec("insert into d_image (f_id, f_image) values (:f_id, :f_image)");
-        f.close();
-    }
+
+    QByteArray ba;
+    do {
+        pm = pm.scaled(pm.width() * 0.8,  pm.height() * 0.8);
+        ba.clear();
+        QBuffer buff(&ba);
+        buff.open(QIODevice::WriteOnly);
+        pm.save(&buff, "JPG");
+    } while (ba.size() > 100000);
+
+    C5Database db(fDBParams);
+    db[":f_id"] = ui->leCode->getInteger();
+    db.exec("delete from d_image where f_id=:f_id");
+    db[":f_id"] = ui->leCode->getInteger();
+    db[":f_image"] = ba;
+    db.exec("insert into d_image (f_id, f_image) values (:f_id, :f_image)");
+
 }
 
 void C5DishWidget::removeImage()

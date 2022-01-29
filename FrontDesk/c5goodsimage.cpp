@@ -2,6 +2,7 @@
 #include "ui_c5goodsimage.h"
 #include "ce5goods.h"
 #include "c5editor.h"
+#include <QBuffer>
 
 C5GoodsImage::C5GoodsImage(const QStringList &dbParams, QWidget *parent) :
     C5Widget(dbParams, parent),
@@ -20,6 +21,11 @@ void C5GoodsImage::setImage(const QPixmap &p, const QString &name, const QString
     ui->lbImage->setPixmap(p);
     ui->lbName->setText(name);
     ui->lbScancode->setText(scancode);
+}
+
+void C5GoodsImage::showCompressButton(bool b)
+{
+    ui->btnCompress->setVisible(b);
 }
 
 void C5GoodsImage::on_btnEdit_clicked()
@@ -42,4 +48,31 @@ void C5GoodsImage::on_btnEdit_clicked()
         }
     }
     delete e;
+}
+
+void C5GoodsImage::on_btnCompress_clicked()
+{
+    C5Database db(fDBParams);
+    db[":f_id"] = property("goodsid");
+    db.exec("select f_data from c_goods_images where f_id=:f_id");
+    if (db.nextRow()) {
+        QByteArray ba = db.getValue("f_data").toByteArray();
+        QPixmap pm;
+        pm.loadFromData(ba);
+        do {
+            pm = pm.scaled(pm.width() * 0.8,  pm.height() * 0.8);
+            ba.clear();
+            QBuffer buff(&ba);
+            buff.open(QIODevice::WriteOnly);
+            pm.save(&buff, "JPG");
+        } while (ba.size() > 100000);
+
+        C5Database db(fDBParams);
+        db[":f_id"] =  property("goodsid");
+        db.exec("delete from c_goods_images where f_id=:f_id");
+        db[":f_id"] = property("goodsid");
+        db[":f_image"] = ba;
+        db.exec("insert into c_goods_images (f_id, f_data) values (:f_id, :f_image)");
+    }
+    ui->btnCompress->setVisible(false);
 }

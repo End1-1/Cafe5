@@ -2,6 +2,7 @@
 #include "ui_c5tablewithtotal.h"
 #include "c5lineedit.h"
 #include <QScrollBar>
+#include <QDebug>
 
 C5TableWithTotal::C5TableWithTotal(QWidget *parent) :
     QWidget(parent),
@@ -130,6 +131,42 @@ void C5TableWithTotal::clearTables()
         if (it.value()) {
             ui->tblTotal->setDouble(0, it.key(), 0);
         }
+    }
+}
+
+void C5TableWithTotal::moveRowUp(int row)
+{
+    if (row > 0 && ui->tblMain->rowCount() > 1) {
+        replaceRows(row, row - 1);
+        ui->tblMain->setCurrentCell(row - 1, 0);
+    }
+}
+
+void C5TableWithTotal::moveRowDown(int row)
+{
+    if (row < ui->tblMain->rowCount() - 1) {
+        replaceRows(row, row + 1);
+        ui->tblMain->setCurrentCell(row + 1, 0);
+    }
+}
+
+void C5TableWithTotal::replaceRows(int row1, int row2)
+{
+    for (int i = 0; i < ui->tblMain->columnCount(); i++) {
+        qDebug() << ui->tblMain->getData(row1, i) << ui->tblMain->getData(row2, i);
+        QVariant t;
+        if (ui->tblMain->cellWidget(row1, i)) {
+            if (dynamic_cast<C5LineEdit*>(ui->tblMain->cellWidget(row1, i))) {
+                t = ui->tblMain->lineEdit(row1, i)->text();
+                ui->tblMain->lineEdit(row1, i)->setText(ui->tblMain->lineEdit(row2, i)->text());
+                ui->tblMain->lineEdit(row2, i)->setText(t.toString());
+                continue;
+            }
+        }
+        t = ui->tblMain->getData(row1, i);
+        ui->tblMain->setData(row1, i, ui->tblMain->getData(row2, i));
+        ui->tblMain->setData(row2, i, t);
+        qDebug() << ui->tblMain->getData(row1, i) << ui->tblMain->getData(row2, i);
     }
 }
 

@@ -1096,6 +1096,22 @@ QLabel {color:green;}
                </property>
                <item row="0" column="1">
                 <widget class="C5LineEdit" name="leTotal">
+                 <property name="font">
+                  <font>
+                   <pointsize>28</pointsize>
+                   <weight>75</weight>
+                   <bold>true</bold>
+                  </font>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">color:red;</string>
+                 </property>
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 </property>
                  <property name="readOnly">
                   <bool>true</bool>
                  </property>
@@ -1103,6 +1119,13 @@ QLabel {color:green;}
                </item>
                <item row="0" column="0">
                 <widget class="QLabel" name="label">
+                 <property name="font">
+                  <font>
+                   <pointsize>14</pointsize>
+                   <weight>75</weight>
+                   <bold>true</bold>
+                  </font>
+                 </property>
                  <property name="text">
                   <string>Total</string>
                  </property>

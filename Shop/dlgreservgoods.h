@@ -1,20 +1,20 @@
 #ifndef DLGRESERVGOODS_H
 #define DLGRESERVGOODS_H
 
-#include <QDialog>
+#include "c5dialog.h"
 
 namespace Ui {
 class DlgReservGoods;
 }
 
-class DlgReservGoods : public QDialog
+class DlgReservGoods : public C5Dialog
 {
     Q_OBJECT
 
 public:
-    explicit DlgReservGoods(int store, int goods, double qty, QWidget *parent = nullptr);
+    explicit DlgReservGoods(int store, int goods, double qty);
 
-    explicit DlgReservGoods(int id, QWidget *parent = nullptr);
+    explicit DlgReservGoods(int id);
 
     ~DlgReservGoods();
 
@@ -39,6 +39,10 @@ private:
     int fGoods;
 
     void setState(int state);
+
+    void updateState(const QStringList &dbparams, int state);
+
+    void insertReserve(const QStringList &dbparams);
 };
 
 #endif // DLGRESERVGOODS_H

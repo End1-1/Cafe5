@@ -10,8 +10,8 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
-DlgReservGoods::DlgReservGoods(int store, int goods, double qty, QWidget *parent) :
-    QDialog(parent),
+DlgReservGoods::DlgReservGoods(int store, int goods, double qty) :
+    C5Dialog(__c5config.dbParams()),
     ui(new Ui::DlgReservGoods)
 {
     ui->setupUi(this);
@@ -26,8 +26,8 @@ DlgReservGoods::DlgReservGoods(int store, int goods, double qty, QWidget *parent
     ui->leEndDay->setDate(QDate::currentDate().addDays(1));
 }
 
-DlgReservGoods::DlgReservGoods(int id, QWidget *parent) :
-    QDialog(parent),
+DlgReservGoods::DlgReservGoods(int id) :
+    C5Dialog(__c5config.dbParams()),
     ui(new Ui::DlgReservGoods)
 {
     ui->setupUi(this);
@@ -38,6 +38,8 @@ DlgReservGoods::DlgReservGoods(int id, QWidget *parent) :
         C5Message::error(tr("Invalid reservation code"));
         return;
     }
+    fGoods = db.getInt("f_goods");
+    fStore = db.getInt("f_store");
     ui->leCode->setInteger(db.getInt("f_id"));
     ui->leDate->setDate(db.getDate("f_date"));
     ui->leEndDay->setDate(db.getDate("f_enddate"));
@@ -50,7 +52,7 @@ DlgReservGoods::DlgReservGoods(int id, QWidget *parent) :
     ui->btnSave->setVisible(false);
     ui->btnCancelReserve->setVisible(db.getInt("f_state") == GR_RESERVED);
     ui->btnCompleteReserve->setVisible(db.getInt("f_state") == GR_RESERVED);
-
+    ui->leReservedQty->setReadOnly(true);
 }
 
 DlgReservGoods::~DlgReservGoods()
@@ -70,20 +72,9 @@ void DlgReservGoods::on_btnSave_clicked()
         return;
     }
     DbGoods g(fGoods);
-    C5Database db(__c5config.replicaDbParams());
-    db[":f_store"] = fStore;
-    db[":f_goods"] = fGoods;
-    db[":f_qty"] = ui->leReservedQty->getDouble();
-    db[":f_message"] = ui->leMessage->text();
-    db[":f_source"] = __c5config.defaultStore();
-    db[":f_enddate"] = ui->leEndDay->date();
-    if (ui->leCode->isEmpty()) {
-        db[":f_date"] = QDate::currentDate();
-        db[":f_time"] = QTime::currentTime();
-        db[":f_state"] = GR_RESERVED;
-        ui->leCode->setInteger(db.insert("a_store_reserve", true));
-    } else {
-        db.update("a_store_reserve", "f_id", ui->leCode->getInteger());
+    insertReserve(__c5config.replicaDbParams());
+    if (__c5config.rdbReplica()) {
+        insertReserve(__c5config.dbParams());
     }
     ui->btnSave->setVisible(false);
     ui->btnCancelReserve->setVisible(true);
@@ -114,7 +105,17 @@ void DlgReservGoods::on_btnCancelReserve_clicked()
 
 void DlgReservGoods::setState(int state)
 {
-    C5Database db(__c5config.replicaDbParams());
+    updateState(__c5config.replicaDbParams(), state);
+    if (__c5config.rdbReplica()) {
+        updateState(__c5config.dbParams(), state);
+    }
+    ui->btnCancelReserve->setVisible(false);
+    ui->btnCompleteReserve->setVisible(false);
+}
+
+void DlgReservGoods::updateState(const QStringList &dbparams, int state)
+{
+    C5Database db(dbparams);
     db[":f_state"] = state;
     switch (state) {
     case GR_COMPLETED:
@@ -129,8 +130,33 @@ void DlgReservGoods::setState(int state)
         break;
     }
     db.update("a_store_reserve", "f_id", ui->leCode->getInteger());
-    ui->btnCancelReserve->setVisible(false);
-    ui->btnCompleteReserve->setVisible(false);
+    db[":f_qty"] = ui->leReservedQty->getDouble();
+    db[":f_goods"] = fGoods;
+    db[":f_store"] = fStore;
+    db.exec("update a_store_sale set f_qtyreserve=f_qtyreserve-:f_qty where f_store=:f_store and f_goods=:f_goods");
+}
+
+void DlgReservGoods::insertReserve(const QStringList &dbparams)
+{
+    C5Database db(dbparams);
+    db[":f_store"] = fStore;
+    db[":f_goods"] = fGoods;
+    db[":f_qty"] = ui->leReservedQty->getDouble();
+    db[":f_message"] = ui->leMessage->text();
+    db[":f_source"] = __c5config.defaultStore();
+    db[":f_enddate"] = ui->leEndDay->date();
+    if (ui->leCode->isEmpty()) {
+        db[":f_date"] = QDate::currentDate();
+        db[":f_time"] = QTime::currentTime();
+        db[":f_state"] = GR_RESERVED;
+        ui->leCode->setInteger(db.insert("a_store_reserve", true));
+        db[":f_qty"] = ui->leReservedQty->getDouble();
+        db[":f_goods"] = fGoods;
+        db[":f_store"] = fStore;
+        db.exec("update a_store_sale set f_qtyreserve=f_qtyreserve+:f_qty where f_store=:f_store and f_goods=:f_goods");
+    } else {
+        db.update("a_store_reserve", "f_id", ui->leCode->getInteger());
+    }
 }
 
 void DlgReservGoods::on_btnCompleteReserve_clicked()

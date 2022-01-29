@@ -792,6 +792,7 @@ void Working::on_btnShowGoodsList_clicked()
             break;
         }
     }
+    ui->leCode->setFocus();
 }
 
 void Working::on_tblGoods_itemClicked(QTableWidgetItem *item)

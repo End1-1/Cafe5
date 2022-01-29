@@ -119,6 +119,7 @@ SOURCES += \
     ../DbData/dbmenupackagelist.cpp \
     ../DbData/dbmenupackages.cpp \
     ../DbData/dboheader.cpp \
+    ../DbData/dbopreorder.cpp \
     ../DbData/dbpartner.cpp \
     ../DbData/dbservicevalues.cpp \
     ../DbData/dbshift.cpp \
@@ -242,6 +243,8 @@ SOURCES += \
     ../Reports/cr5goodsmovement.cpp \
     ../Reports/cr5goodsmovementfilter.cpp \
     ../Reports/cr5goodspartners.cpp \
+    ../Reports/cr5goodsqtyreminder.cpp \
+    ../Reports/cr5goodsqtyreminderfilter.cpp \
     ../Reports/cr5goodsstorages.cpp \
     ../Reports/cr5goodsunit.cpp \
     ../Reports/cr5goodswaste.cpp \
@@ -402,6 +405,7 @@ HEADERS += \
     ../DbData/dbmenupackagelist.h \
     ../DbData/dbmenupackages.h \
     ../DbData/dboheader.h \
+    ../DbData/dbopreorder.h \
     ../DbData/dbpartner.h \
     ../DbData/dbservicevalues.h \
     ../DbData/dbshift.h \
@@ -525,6 +529,8 @@ HEADERS += \
     ../Reports/cr5goodsmovement.h \
     ../Reports/cr5goodsmovementfilter.h \
     ../Reports/cr5goodspartners.h \
+    ../Reports/cr5goodsqtyreminder.h \
+    ../Reports/cr5goodsqtyreminderfilter.h \
     ../Reports/cr5goodsstorages.h \
     ../Reports/cr5goodsunit.h \
     ../Reports/cr5goodswaste.h \
@@ -689,6 +695,7 @@ FORMS += \
     ../Reports/cr5goodsfilter.ui \
     ../Reports/cr5goodsimages.ui \
     ../Reports/cr5goodsmovementfilter.ui \
+    ../Reports/cr5goodsqtyreminderfilter.ui \
     ../Reports/cr5materialinstorefilter.ui \
     ../Reports/cr5materialinstoreuncomplectfilter.ui \
     ../Reports/cr5materialmoveuncomplectfilter.ui \

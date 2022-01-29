@@ -72,6 +72,7 @@ bool CE5MFProduct::save(QString &err, QList<QMap<QString, QVariant> > &data)
             db[":f_durationsec"] = ui->wt->getData(i, 3);
             db[":f_goalprice"] = ui->wt->lineEdit(i, 5)->getDouble();
             db[":f_price"] = ui->wt->getData(i, 6);
+            db[":f_rowid"] = i;
             db.update("mf_process", "f_id", ui->wt->getData(i, 0));
         }
         for (int id: fRemovedRow) {
@@ -103,7 +104,7 @@ void CE5MFProduct::durationChanged(const QString &arg1)
 void CE5MFProduct::goalPriceChanged(const QString &arg1)
 {
     int row = static_cast<C5LineEdit*>(sender())->property("row").toInt();
-    ui->wt->setData(row, 6, arg1.toDouble() / ui->wt->getData(row, 4).toInt());
+    ui->wt->setData(row, 6, str_float(arg1) / ui->wt->getData(row, 4).toInt());
 }
 
 QString CE5MFProduct::durationStr(int sec)
@@ -246,4 +247,28 @@ void CE5MFProduct::on_btnClear_clicked()
     }
     ui->wt->clearTables();
     ui->wt->countTotal(-1);
+}
+
+void CE5MFProduct::on_btnMoveRowUp_clicked()
+{
+    int row = ui->wt->currentRow();
+    if (row > 0) {
+        ui->wt->moveRowUp(row);
+        emit ui->wt->lineEdit(row, 3)->textChanged(ui->wt->lineEdit(row, 3)->text());
+        emit ui->wt->lineEdit(row, 5)->textChanged(ui->wt->lineEdit(row, 5)->text());
+        emit ui->wt->lineEdit(row - 1, 3)->textChanged(ui->wt->lineEdit(row - 1, 3)->text());
+        emit ui->wt->lineEdit(row - 1, 5)->textChanged(ui->wt->lineEdit(row - 1, 5)->text());
+    }
+}
+
+void CE5MFProduct::on_btnMoveRowDown_clicked()
+{
+    int row = ui->wt->currentRow();
+    if (row < ui->wt->rowCount() - 1) {
+        ui->wt->moveRowDown(row);
+        emit ui->wt->lineEdit(row, 3)->textChanged(ui->wt->lineEdit(row, 3)->text());
+        emit ui->wt->lineEdit(row, 5)->textChanged(ui->wt->lineEdit(row, 5)->text());
+        emit ui->wt->lineEdit(row + 1, 3)->textChanged(ui->wt->lineEdit(row + 1, 3)->text());
+        emit ui->wt->lineEdit(row + 1, 5)->textChanged(ui->wt->lineEdit(row + 1, 5)->text());
+    }
 }

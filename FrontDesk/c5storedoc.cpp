@@ -14,6 +14,7 @@
 #include "c5user.h"
 #include "c5storedraftwriter.h"
 #include "calculator.h"
+#include "c5broadcasting.h"
 #include <QMenu>
 #include <QHash>
 #include <QClipboard>
@@ -587,71 +588,99 @@ void C5StoreDoc::setListenBroadcast(bool v)
     }
 }
 
-bool C5StoreDoc::parseBroadcastMessage(const QString &msg, QString &replystr)
+bool C5StoreDoc::parseBroadcastMessage(int what, const QString &msg, QString &replystr)
 {
     QJsonParseError jerr;
     QJsonDocument jdoc = QJsonDocument::fromJson(msg.toUtf8(), &jerr);
     if (jerr.error == QJsonParseError::NoError) {
-        C5Database db(fDBParams);
         QJsonObject jobj = jdoc.object();
-        QString message = jobj["data"].toString();
-        jobj = QJsonObject();
-        jobj["parsed"] = true;
-        // search for measurment unit and extract quantity
-        QList<QVariant> temp = C5Cache::cache(fDBParams, cache_goods_unit)->getJoinedColumn(tr("Full caption"));
-        QStringList units;
-        for (const QVariant &v: temp) {
-            units.append(" " + v.toString().toLower());
+        switch (what) {
+        case WHAT_PARSE_STORE_STRING:
+            return parseBroadcastSuggest(jobj, replystr);
+        case WHAT_STORE_APPEND_ITEM:
+            return parseBroadcastAddGoods(jobj, replystr);
         }
-        double qty = 0;
-        int min_qtystart = -1;
-        for (const QString &s: units) {
-            if (s.isEmpty()) {
-                continue;
-            }
-            int up = message.indexOf(s);
-            int qtystart;
-            if (up > -1) {
-                qtystart = message.mid(0, up).lastIndexOf(" ", up - 1);
-                if (min_qtystart == -1) {
-                    min_qtystart = qtystart;
-                }
-                min_qtystart = min_qtystart < qtystart ? qtystart : min_qtystart;
-                jobj["mid"] = message.mid(0, up);
-                jobj["qtystart"] = qtystart;
-                jobj["qty"] = message.mid(qtystart + 1, up - qtystart - 1);
-            }
-        }
-
-        //search name
-        QString name;
-        QJsonArray jarr;
-        if (min_qtystart > -1) {
-            name = message.mid(0, min_qtystart);
-            jobj["searchname"] = name;
-            if (!name.isEmpty()) {
-                db.exec(QString("select g.f_id, g.f_name, u.f_fullname as f_unitname, g.f_scancode "
-                        "from c_goods g "
-                        "left join c_units u on u.f_id=g.f_unit "
-                        "where g.f_name like '%1%' "
-                        "limit 6 ").arg(name));
-                while (db.nextRow()) {
-                    QJsonObject jo;
-                    jo["f_id"] = db.getInt("f_id");
-                    jo["f_name"] = db.getString("f_name");
-                    jo["f_unitname"] = db.getString("f_unitname");
-                    jo["f_scancode"] = db.getString("f_scancode");
-                    jarr.append(jo);
-                }
-            }
-        }
-        jobj["goods"] = jarr;
-
-        replystr = QJsonDocument(jobj).toJson(QJsonDocument::Compact);
     } else {
         replystr = jerr.errorString();
         return false;
     }
+    return true;
+}
+
+bool C5StoreDoc::parseBroadcastSuggest(QJsonObject jobj, QString &replystr)
+{
+    C5Database db(fDBParams);
+    QString message = jobj["data"].toString();
+    jobj = QJsonObject();
+    jobj["parsed"] = true;
+    // search for measurment unit and extract quantity
+    QList<QVariant> temp = C5Cache::cache(fDBParams, cache_goods_unit)->getJoinedColumn(tr("Full caption"));
+    QStringList units;
+    for (const QVariant &v: temp) {
+        units.append(" " + v.toString().toLower());
+    }
+    double qty = 0;
+    int min_qtystart = -1;
+    for (const QString &s: units) {
+        if (s.isEmpty()) {
+            continue;
+        }
+        int up = message.indexOf(s);
+        int qtystart;
+        if (up > -1) {
+            qtystart = message.mid(0, up).lastIndexOf(" ", up - 1);
+            if (min_qtystart == -1) {
+                min_qtystart = qtystart;
+            }
+            min_qtystart = min_qtystart < qtystart ? qtystart : min_qtystart;
+            jobj["mid"] = message.mid(0, up);
+            jobj["qtystart"] = qtystart;
+            if (qtystart > -1) {
+                jobj["qty"] = message.mid(qtystart + 1, up - qtystart - 1);
+            } else {
+                jobj["qty"] = 0;
+            }
+        }
+    }
+
+    //search name
+    QString name;
+    int nameend = message.length();
+    QJsonArray jarr;
+    if (min_qtystart > -1) {
+        nameend = min_qtystart;
+    }
+
+    name = message.mid(0, nameend);
+    jobj["searchname"] = name;
+    if (!name.isEmpty()) {
+        db.exec(QString("select g.f_id, g.f_name, u.f_name as f_unitname, g.f_scancode "
+                "from c_goods g "
+                "left join c_units u on u.f_id=g.f_unit "
+                "where g.f_name like '%%1%' "
+                "limit 10 ").arg(name));
+        while (db.nextRow()) {
+            QJsonObject jo;
+            jo["f_id"] = db.getInt("f_id");
+            jo["f_name"] = db.getString("f_name");
+            jo["f_unitname"] = db.getString("f_unitname");
+            jo["f_scancode"] = db.getString("f_scancode");
+            jarr.append(jo);
+        }
+    }
+
+    jobj["goods"] = jarr;
+
+    replystr = QJsonDocument(jobj).toJson(QJsonDocument::Compact);
+    return true;
+}
+
+bool C5StoreDoc::parseBroadcastAddGoods(QJsonObject jobj, QString &replystr)
+{
+    addGoods(jobj["id"].toInt(), jobj["name"].toString(), jobj["qty"].toDouble(), jobj["unit"].toString(), jobj["price"].toDouble(), jobj["amount"].toDouble(), "");
+    jobj = QJsonObject();
+    jobj["add_goods"] = true;
+    replystr = QJsonDocument(jobj).toJson(QJsonDocument::Compact);
     return true;
 }
 

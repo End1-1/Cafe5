@@ -302,11 +302,11 @@ void C5MainWindow::datagramRead()
         qDebug() << remoteAddress << datagram;
         QJsonParseError jerr;
         QJsonDocument jdoc = QJsonDocument::fromJson(datagram, &jerr);
+        QJsonObject jreply;
+        jreply["reply"] = 1;
         if (jerr.error == QJsonParseError::NoError) {
             QJsonObject jobj = jdoc.object();
-            QJsonObject jreply;
             jreply["what"] = jobj["what"].toInt();
-            jreply["reply"] = 1;
             switch (jobj["what"].toInt()) {
             case WHAT_GETSERVER: {
                 jreply["uuid"] = jobj["uuid"];
@@ -315,9 +315,10 @@ void C5MainWindow::datagramRead()
                 break;
             }
             case WHAT_PARSE_STORE_STRING:
+            case WHAT_STORE_APPEND_ITEM:
                 if (fStoreDocBroadcastListener) {
                     QString replystr;
-                    if (!fStoreDocBroadcastListener->parseBroadcastMessage(jobj["data"].toString(), replystr)) {
+                    if (!fStoreDocBroadcastListener->parseBroadcastMessage(jobj["what"].toInt(), jobj["data"].toString(), replystr)) {
                         jreply["error"] = 1;
                         jreply["message"] = replystr;
                     }
@@ -328,10 +329,12 @@ void C5MainWindow::datagramRead()
                 }
                 break;
             }
-
-            datagram = QJsonDocument(jreply).toJson(QJsonDocument::Compact);
-            qDebug() << datagram;
+        } else {
+            jreply["error"] = 1;
+            jreply["message"] = jerr.errorString();
         }
+        datagram = QJsonDocument(jreply).toJson(QJsonDocument::Compact);
+        qDebug() << datagram;
         fUdpSocket.writeDatagram(datagram, remoteAddress, remotePort);
     }
 }

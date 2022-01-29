@@ -46,6 +46,8 @@ private slots:
 
     void on_btnCheckoutOther_clicked();
 
+    void on_btnCheckoutIdram_clicked();
+
 private:
     Ui::payment *ui;
 
@@ -55,11 +57,11 @@ private:
 
     bool fCanAccept;
 
-    void checkout(bool cash);
+    void checkout(bool cash, bool idram);
 
     bool printReceipt(bool printSecond);
 
-    bool printTax(double cardAmount);
+    bool printTax(double cardAmount, bool useextpos);
 };
 
 #endif // PAYMENT_H

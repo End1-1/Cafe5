@@ -35,14 +35,17 @@ void CR5GoodsImages::postProcess()
     C5Database db(fDBParams);
     db.exec("select g.f_id, g.f_name, gi.f_data, g.f_scancode "
             "from c_goods_images gi "
-            "inner join c_goods g on g.f_id=gi.f_id ");
+            "inner join c_goods g on g.f_id=gi.f_id "
+            "order by 1 ");
     while (db.nextRow()) {
         C5GoodsImage *gi = new C5GoodsImage(fDBParams);
         gi->setProperty("goodsid", db.getString("f_id"));
         fImages.append(gi);
         QPixmap p;
-        p.loadFromData(db.getValue("f_data").toByteArray());
+        QByteArray ba = db.getValue("f_data").toByteArray();
+        p.loadFromData(ba);
         gi->setImage(p.scaled(190, 190, Qt::KeepAspectRatio), db.getString("f_name"), db.getString("f_scancode"));
+        gi->showCompressButton(ba.size() > 100000);
         ui->gl->addWidget(gi, r, c);
         c++;
         if (c > 4) {

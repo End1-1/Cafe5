@@ -126,9 +126,9 @@ void C5Replication::downloadDataFromServer(const QStringList &src, const QString
 
     emit progress("Clear temp storage");
     db[":doc_type"] = DOC_TYPE_SALE_INPUT;
-    db.exec("delete from a_store_draft where f_document in (select f_id from a_header where f_type=:doc_type)");
-    db[":doc_type"] = DOC_TYPE_SALE_INPUT;
     db.exec("delete from a_store where f_document in (select f_id from a_header where f_type=:doc_type)");
+    db[":doc_type"] = DOC_TYPE_SALE_INPUT;
+    db.exec("delete from a_store_draft where f_document in (select f_id from a_header where f_type=:doc_type)");
     db.exec("delete from a_store_current");
     db[":doc_type"] = DOC_TYPE_SALE_INPUT;
     db.exec("delete from a_header where f_type=:doc_type ");

@@ -2600,6 +2600,10 @@ void DlgOrder::on_btnPaymentIdram_clicked()
     connect(na, &QNetworkAccessManager::finished, this, [=](QNetworkReply *r) {
         ui->btnReceipt->setEnabled(true);
         ui->btnExit->setEnabled(true);
+        if (r->error() != QNetworkReply::NoError) {
+            C5Message::error(r->errorString());
+            return;
+        }
         QJsonDocument jdoc = QJsonDocument::fromJson(r->readAll());
         QJsonObject jo = jdoc.object();
         QJsonArray ja = jo["Result"].toArray();

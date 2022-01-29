@@ -47,10 +47,16 @@ public:
 
     void clearTables();
 
+    void moveRowUp(int row);
+
+    void moveRowDown(int row);
+
 private:
     Ui::C5TableWithTotal *ui;
 
     QMap<int, bool> fSumColumns;
+
+    void replaceRows(int row1, int row2);
 
 private slots:
     void mainHeaderResized(int index, int oldsize, int newsize);

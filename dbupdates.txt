@@ -735,3 +735,10 @@ alter table o_header add column f_amountidram decimal(14,3), add column f_amount
 update s_app set f_version='63' where f_app='DB';
 ALTER TABLE `a_store` ADD INDEX `fk_store_draft_idx` (`f_draft` ASC) ;
 ALTER TABLE `a_store` ADD CONSTRAINT `fk_store_draft`  FOREIGN KEY (`f_draft`)  REFERENCES `a_store_draft` (`f_id`)  ON DELETE NO ACTION  ON UPDATE NO ACTION;
+
+/*db - 64 */
+/*25.01.2022 */
+update s_app set f_version='64' where f_app='DB';
+alter table c_units add f_fullname tinytext;
+ALTER TABLE `a_store_draft` DROP INDEX `fk_store_draft_document_idx` ;
+ALTER TABLE `a_store_draft` ADD CONSTRAINT `fk_store_draft_document`  FOREIGN KEY (`f_document`)  REFERENCES `a_header` (`f_id`)  ON DELETE NO ACTION  ON UPDATE NO ACTION;

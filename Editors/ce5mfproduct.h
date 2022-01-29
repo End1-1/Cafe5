@@ -41,6 +41,10 @@ private slots:
 
     void on_btnClear_clicked();
 
+    void on_btnMoveRowUp_clicked();
+
+    void on_btnMoveRowDown_clicked();
+
 private:
     Ui::CE5MFProduct *ui;
 

@@ -670,6 +670,8 @@ RESOURCES += \
 #QMAKE_CXXFLAGS += -Werror
 
 DISTFILES += \
+    ../resources/down-arrow.png \
+    ../resources/up-arrow.png \
     storehouse.ico
 
 ICON = storehouse.ico

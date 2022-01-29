@@ -17,7 +17,7 @@ BEGIN
             VALUE "FileDescription", "Waiter\0"
             VALUE "FileVersion", _FILE_VERSION_STR
             VALUE "InternalName", "Waiter\0"
-            VALUE "LegalCopyright", "(C)2017-2021, Kudryashov Vasili\0"
+            VALUE "LegalCopyright", "(C)2017-2022, Kudryashov Vasili\0"
             VALUE "OriginalFilename", "Waiter.exe\0"
             VALUE "Email", "end1_1@yahoo.com\0"
             VALUE "ProductName", "Waiter\0"

@@ -18,8 +18,12 @@ public:
 
     void setImage(const QPixmap &p, const QString &name, const QString &scancode);
 
+    void showCompressButton(bool b);
+
 private slots:
     void on_btnEdit_clicked();
+
+    void on_btnCompress_clicked();
 
 private:
     Ui::C5GoodsImage *ui;

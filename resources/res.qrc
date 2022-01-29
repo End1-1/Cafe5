@@ -128,5 +128,8 @@
         <file>folder_open.png</file>
         <file>wifi.png</file>
         <file>wifib.png</file>
+        <file>down-arrow.png</file>
+        <file>up-arrow.png</file>
+        <file>compress.png</file>
     </qresource>
 </RCC>

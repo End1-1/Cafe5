@@ -59,7 +59,18 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <item row="0" column="0" colspan="2">
+      <item row="2" column="3">
+       <widget class="QToolButton" name="btnEdit">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/constructor.png</normaloff>:/constructor.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="4">
        <widget class="QLabel" name="lbImage">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -75,7 +86,7 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="0" colspan="2">
+      <item row="1" column="0" colspan="4">
        <widget class="QLabel" name="lbName">
         <property name="text">
          <string>Name</string>
@@ -86,23 +97,23 @@
        </widget>
       </item>
       <item row="2" column="0">
+       <widget class="QToolButton" name="btnCompress">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/compress.png</normaloff>:/compress.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" colspan="2">
        <widget class="QLabel" name="lbScancode">
         <property name="text">
          <string>000111222</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QToolButton" name="btnEdit">
-        <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset resource="../resources/res.qrc">
-          <normaloff>:/constructor.png</normaloff>:/constructor.png</iconset>
         </property>
        </widget>
       </item>
