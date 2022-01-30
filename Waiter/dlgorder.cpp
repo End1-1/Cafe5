@@ -2610,6 +2610,10 @@ void DlgOrder::on_btnPaymentIdram_clicked()
         if (ja.count() > 0) {
             QString DEBIT = ja.at(0)["DEBIT"].toString();
             ui->leIDRAM->setDouble(str_float(DEBIT));
+            ui->leCash->setText("0");
+            ui->leCard->setText("0");
+            ui->leBank->setText("0");
+            ui->leOther->setText("0");
             lineEditToHeader();
         }
         r->deleteLater();
