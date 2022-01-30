@@ -13,7 +13,7 @@ class C5MainWindow;
 
 class C5ToolBarWidget;
 class QListWidget;
-class C5StoreDoc;
+class C5Widget;
 
 class C5MainWindow : public QMainWindow
 {
@@ -39,7 +39,9 @@ public:
 
     void writeLog(const QString &message);
 
-    void setStoreDocBroadcastListenerDoc(C5StoreDoc *storedoc);
+    void addBroadcastListener(C5Widget *w);
+
+    void removeBroadcastListener(C5Widget *w);
 
 public slots:
     void on_actionLogin_triggered();
@@ -88,7 +90,7 @@ private:
 
     QTabWidget *fTab;
 
-    C5StoreDoc *fStoreDocBroadcastListener;
+    QMap<QString, C5Widget *> fBroadcastListeners;
 
     QToolBar *fReportToolbar;
 

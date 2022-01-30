@@ -175,12 +175,19 @@ void C5MainWindow::writeLog(const QString &message)
                                .arg(message));
 }
 
-void C5MainWindow::setStoreDocBroadcastListenerDoc(C5StoreDoc *storedoc)
+void C5MainWindow::addBroadcastListener(C5Widget *w)
 {
-    if (fStoreDocBroadcastListener != nullptr) {
-        fStoreDocBroadcastListener->setListenBroadcast(false);
+    if (fBroadcastListeners.values().contains(w)) {
+        return;
     }
-    fStoreDocBroadcastListener = storedoc;
+    fBroadcastListeners.insert(w->fWindowUuid, w);
+}
+
+void C5MainWindow::removeBroadcastListener(C5Widget *w)
+{
+    if (fBroadcastListeners.contains(w->fWindowUuid)) {
+        fBroadcastListeners.remove(w->fWindowUuid);
+    }
 }
 
 void C5MainWindow::tabCloseRequested(int index)
@@ -307,6 +314,7 @@ void C5MainWindow::datagramRead()
         if (jerr.error == QJsonParseError::NoError) {
             QJsonObject jobj = jdoc.object();
             jreply["what"] = jobj["what"].toInt();
+            QString windowsUuid = jobj["windowuuid"].toString();
             switch (jobj["what"].toInt()) {
             case WHAT_GETSERVER: {
                 jreply["uuid"] = jobj["uuid"];
@@ -316,16 +324,21 @@ void C5MainWindow::datagramRead()
             }
             case WHAT_PARSE_STORE_STRING:
             case WHAT_STORE_APPEND_ITEM:
-                if (fStoreDocBroadcastListener) {
+            case WHAT_PARSE_STORE_QTY:
+            case WHAT_PARSE_STORE_PRICE:
+            case WHAT_PARSE_STORE_AMOUNT:
+                for (C5Widget *w: fBroadcastListeners.values()) {
+                    if (!windowsUuid.isEmpty()) {
+                        if (w->fWindowUuid != windowsUuid) {
+                            continue;
+                        }
+                    }
                     QString replystr;
-                    if (!fStoreDocBroadcastListener->parseBroadcastMessage(jobj["what"].toInt(), jobj["data"].toString(), replystr)) {
+                    if (!w->parseBroadcastMessage(jobj["what"].toInt(), jobj["data"].toString(), replystr)) {
                         jreply["error"] = 1;
                         jreply["message"] = replystr;
                     }
                     jreply["data"] = QJsonDocument::fromJson(replystr.toUtf8()).object();
-                } else {
-                    jreply["error"] = 1;
-                    jreply["message"] = tr("No store document is listening for message");
                 }
                 break;
             }

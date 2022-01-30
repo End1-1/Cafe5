@@ -58,11 +58,17 @@ public:
 
     void setListenBroadcast(bool v);
 
-    bool parseBroadcastMessage(int what, const QString &msg, QString &replystr);
+    virtual bool parseBroadcastMessage(int what, const QString &msg, QString &replystr) override;
 
     bool parseBroadcastSuggest(QJsonObject jobj, QString &replystr);
 
     bool parseBroadcastAddGoods(QJsonObject jobj, QString &replystr);
+
+    bool parseBroadcastQty(QJsonObject jobj, QString &replystr);
+
+    bool parseBroadcastPrice(QJsonObject jobj, QString &replystr);
+
+    bool parseBroadcastAmount(QJsonObject jobj, QString &replystr);
 
 public slots:
     void saveDoc();

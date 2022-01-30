@@ -19,6 +19,8 @@ public:
 
     explicit C5Widget(const QStringList &dbParams, QWidget *parent = nullptr);
 
+    ~C5Widget();
+
     QIcon icon();
 
     QString label();
@@ -38,6 +40,10 @@ public:
     virtual void changeDatabase(const QStringList &dbParams);
 
     virtual bool allowChangeDatabase();
+
+    virtual bool parseBroadcastMessage(int what, const QString &msg, QString &replystr);
+
+    QString fWindowUuid;
 
 protected:
     QToolBar *fToolBar;

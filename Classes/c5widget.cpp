@@ -1,6 +1,7 @@
 #include "c5widget.h"
 #include <QEvent>
 #include <QKeyEvent>
+#include <QUuid>
 
 C5Widget::C5Widget(const QStringList &dbParams, QWidget *parent) :
     QWidget(parent),
@@ -8,6 +9,12 @@ C5Widget::C5Widget(const QStringList &dbParams, QWidget *parent) :
 {
     fToolBar = nullptr;
     fFocusNextChild = true;
+    fWindowUuid = QUuid::createUuid().toString();
+}
+
+C5Widget::~C5Widget()
+{
+
 }
 
 QIcon C5Widget::icon()
@@ -129,5 +136,13 @@ void C5Widget::changeDatabase(const QStringList &dbParams)
 
 bool C5Widget::allowChangeDatabase()
 {
+    return true;
+}
+
+bool C5Widget::parseBroadcastMessage(int what, const QString &msg, QString &replystr)
+{
+    Q_UNUSED(what);
+    Q_UNUSED(msg);
+    Q_UNUSED(replystr);
     return true;
 }

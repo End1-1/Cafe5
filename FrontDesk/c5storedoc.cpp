@@ -581,10 +581,10 @@ void C5StoreDoc::setListenBroadcast(bool v)
 {
     if (v) {
         ui->btnFillRemote->setIcon(QIcon(":/wifi.png"));
-        __mainWindow->setStoreDocBroadcastListenerDoc(this);
+        __mainWindow->addBroadcastListener(this);
     } else {
         ui->btnFillRemote->setIcon(QIcon(":/wifib.png"));
-        __mainWindow->setStoreDocBroadcastListenerDoc(nullptr);
+        __mainWindow->addBroadcastListener(nullptr);
     }
 }
 
@@ -599,6 +599,12 @@ bool C5StoreDoc::parseBroadcastMessage(int what, const QString &msg, QString &re
             return parseBroadcastSuggest(jobj, replystr);
         case WHAT_STORE_APPEND_ITEM:
             return parseBroadcastAddGoods(jobj, replystr);
+        case WHAT_PARSE_STORE_QTY:
+            return parseBroadcastQty(jobj, replystr);
+        case WHAT_PARSE_STORE_PRICE:
+            return parseBroadcastPrice(jobj, replystr);
+        case WHAT_PARSE_STORE_AMOUNT:
+            return parseBroadcastAmount(jobj, replystr);
         }
     } else {
         replystr = jerr.errorString();
@@ -637,6 +643,7 @@ bool C5StoreDoc::parseBroadcastSuggest(QJsonObject jobj, QString &replystr)
             jobj["qtystart"] = qtystart;
             if (qtystart > -1) {
                 jobj["qty"] = message.mid(qtystart + 1, up - qtystart - 1);
+                jobj["qty"] = jobj["qty"].toString().replace(",", ".");
             } else {
                 jobj["qty"] = 0;
             }
@@ -679,8 +686,59 @@ bool C5StoreDoc::parseBroadcastAddGoods(QJsonObject jobj, QString &replystr)
 {
     addGoods(jobj["id"].toInt(), jobj["name"].toString(), jobj["qty"].toDouble(), jobj["unit"].toString(), jobj["price"].toDouble(), jobj["amount"].toDouble(), "");
     jobj = QJsonObject();
-    jobj["add_goods"] = true;
-    replystr = QJsonDocument(jobj).toJson(QJsonDocument::Compact);
+    int row = ui->tblGoods->currentRow();
+    if (row < 0) {
+
+    } else {
+        ui->tblGoods->lineEdit(row, 5)->setFocus();
+    }
+    return true;
+}
+
+bool C5StoreDoc::parseBroadcastQty(QJsonObject jobj, QString &replystr)
+{
+    qDebug() << jobj;
+    double qty = str_float(jobj["data"].toString().replace(",", ".").replace(" ", ""));
+    jobj = QJsonObject();
+    int row = ui->tblGoods->currentRow();
+    if (row < 0) {
+        replystr = tr("No row selected");
+        return false;
+    }
+    ui->tblGoods->lineEdit(row, 5)->setDouble(qty);
+    emit ui->tblGoods->lineEdit(row, 5)->textEdited(ui->tblGoods->lineEdit(row, 5)->text());
+    ui->tblGoods->lineEdit(row, 7)->setFocus();
+    return true;
+}
+
+bool C5StoreDoc::parseBroadcastPrice(QJsonObject jobj, QString &replystr)
+{
+    qDebug() << jobj;
+    double price = str_float(jobj["data"].toString().replace(",", ".").replace(" ", ""));
+    jobj = QJsonObject();
+    int row = ui->tblGoods->currentRow();
+    if (row < 0) {
+        replystr = tr("No row selected");
+        return false;
+    }
+    ui->tblGoods->lineEdit(row, 7)->setDouble(price);
+    emit ui->tblGoods->lineEdit(row, 7)->textEdited(ui->tblGoods->lineEdit(row, 7)->text());
+    ui->tblGoods->lineEdit(row, 8)->setFocus();
+    return true;
+}
+
+bool C5StoreDoc::parseBroadcastAmount(QJsonObject jobj, QString &replystr)
+{
+    qDebug() << jobj;
+    double total = str_float(jobj["data"].toString().replace(",", ".").replace(" ", ""));
+    jobj = QJsonObject();
+    int row = ui->tblGoods->currentRow();
+    if (row < 0) {
+        replystr = tr("No row selected");
+        return false;
+    }
+    ui->tblGoods->lineEdit(row, 8)->setDouble(total);
+    emit ui->tblGoods->lineEdit(row, 8)->textEdited(ui->tblGoods->lineEdit(row, 8)->text());
     return true;
 }
 
@@ -1132,6 +1190,7 @@ void C5StoreDoc::addGoods(int goods, const QString &name, double qty, const QStr
     ui->tblGoods->lineEdit(row, 7)->setDouble(price);
     ui->tblGoods->lineEdit(row, 8)->setDouble(total);
     ui->tblGoods->lineEdit(row, 9)->setText(comment);
+    ui->tblGoods->setCurrentCell(row, 0);
 }
 
 void C5StoreDoc::setDocEnabled(bool v)
@@ -2316,10 +2375,9 @@ void C5StoreDoc::on_btnFillRemote_clicked(bool checked)
 {
     if (checked) {
         ui->btnFillRemote->setIcon(QIcon(":/wifi.png"));
-        __mainWindow->setStoreDocBroadcastListenerDoc(this);
+        __mainWindow->addBroadcastListener(this);
     } else {
         ui->btnFillRemote->setIcon(QIcon(":/wifib.png"));
-        __mainWindow->setStoreDocBroadcastListenerDoc(nullptr);
+        __mainWindow->removeBroadcastListener(this);
     }
 }
-
