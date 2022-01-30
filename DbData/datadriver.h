@@ -22,6 +22,7 @@
 #include "dbbodystate.h"
 #include "dbmenupackages.h"
 #include "dbmenupackagelist.h"
+#include "dbstoredoctype.h"
 #include <QStringList>
 
 #define dbuser DataDriver::fInstance->fDbUser
@@ -38,6 +39,7 @@
 #define dbdishpart2 DataDriver::fInstance->fDbDishPart2
 #define dbmenu DataDriver::fInstance->fDbMenu
 #define dbdishspecial DataDriver::fInstance->fDbDishSpecial
+#define dbstoredoctype DataDriver::fInstance->fDbStoreDocType
 #define dbshift DataDriver::fInstance->fDbShift
 #define dbgoods DataDriver::fInstance->fDbGoods
 #define dbgoodsgroup DataDriver::fInstance->fDbGoodsGroup
@@ -60,6 +62,8 @@ public:
     DbDishes *fDbDishes;
 
     DbStore *fDbStore;
+
+    DbStoreDocType *fDbStoreDocType;
 
     DbCar *fDbCar;
 

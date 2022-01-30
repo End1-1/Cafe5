@@ -71,6 +71,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../DbData/dbservicevalues.cpp \
     ../DbData/dbshift.cpp \
     ../DbData/dbstore.cpp \
+    ../DbData/dbstoredoctype.cpp \
     ../DbData/dbtables.cpp \
     ../DbData/dbunit.cpp \
     ../DbData/dbusers.cpp \
@@ -323,6 +324,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../DbData/dbservicevalues.h \
     ../DbData/dbshift.h \
     ../DbData/dbstore.h \
+    ../DbData/dbstoredoctype.h \
     ../DbData/dbtables.h \
     ../DbData/dbunit.h \
     ../DbData/dbusers.h \

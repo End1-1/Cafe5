@@ -48,6 +48,8 @@ public:
 
     static bool removeDoc(const QStringList &dbParams, QString id, bool showmessage = true);
 
+    QVariant docProperty(const QString &field) const;
+
     virtual bool allowChangeDatabase() override;
 
     void addByScancode(const QString &code, const QString &qty, QString price);

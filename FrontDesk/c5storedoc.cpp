@@ -14,6 +14,7 @@
 #include "c5user.h"
 #include "c5storedraftwriter.h"
 #include "calculator.h"
+#include "datadriver.h"
 #include "c5broadcasting.h"
 #include <QMenu>
 #include <QHash>
@@ -453,6 +454,35 @@ bool C5StoreDoc::removeDoc(const QStringList &dbParams, QString id, bool showmes
     db[":f_document"] = id;
     db.exec("delete from a_store_dish_waste where f_document=:f_document");
     return err.isEmpty();
+}
+
+QVariant C5StoreDoc::docProperty(const QString &field) const
+{
+    if (field == "date") {
+        return ui->deDate->date();
+    } else if (field == "uuid") {
+        return fInternalId;
+    } else if (field == "docnumber") {
+        if (ui->leDocNum->text().isEmpty()) {
+            return ui->leDocNum->placeholderText();
+        } else {
+            return ui->leDocNum->text();
+        }
+    } else if (field == "inputstorename") {
+        return ui->leStoreInputName->text();
+    } else if (field == "outputstorename") {
+        return ui->leStoreOutputName->text();
+    } else if (field == "typename") {
+        int row = C5Cache::cache(fDBParams, cache_doc_type)->find(fDocType);
+        return C5Cache::cache(fDBParams, cache_doc_type)->getString(row, 1);
+//        DbStoreDocType dt(fDocType);
+//        return dt.typeName();
+    } else if (field == "typeid") {
+        return fDocType;
+    } else {
+        Q_ASSERT(field == "unknown");
+    }
+    return "";
 }
 
 bool C5StoreDoc::allowChangeDatabase()

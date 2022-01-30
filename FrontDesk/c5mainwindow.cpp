@@ -322,6 +322,28 @@ void C5MainWindow::datagramRead()
                 jreply["accept"] = ACCEPT_ACCEPT;
                 break;
             }
+            case WHAT_GETDOCS: {
+                QJsonArray jdocs;
+                for (C5Widget *w: fBroadcastListeners.values()) {
+                    C5StoreDoc *d = dynamic_cast<C5StoreDoc*>(w);
+                    if (d) {
+                        QJsonObject jdoc;
+                        jdoc["date"] = d->docProperty("date").toDate().toString(FORMAT_DATE_TO_STR);
+                        jdoc["uuid"] = d->docProperty("uuid").toString();
+                        jdoc["docnumber"] = d->docProperty("docnumber").toString();
+                        jdoc["inputstorename"] = d->docProperty("inputstorename").toString();
+                        jdoc["outputstorename"] = d->docProperty("outputstorename").toString();
+                        jdoc["typename"] = d->docProperty("typename").toString();
+                        jdoc["typeid"] = d->docProperty("typeid").toInt();
+                        jdoc["windowid"] = d->fWindowUuid;
+                        jdocs.append(jdoc);
+                    }
+                }
+                QJsonObject jdocobj;
+                jdocobj["documents"] = jdocs;
+                jreply["data"] = jdocobj;
+                break;
+            }
             case WHAT_PARSE_STORE_STRING:
             case WHAT_STORE_APPEND_ITEM:
             case WHAT_PARSE_STORE_QTY:
