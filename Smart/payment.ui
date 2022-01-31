@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>643</width>
-    <height>292</height>
+    <width>694</width>
+    <height>285</height>
    </rect>
   </property>
   <property name="font">
@@ -33,6 +33,198 @@
       <enum>QFrame::Raised</enum>
      </property>
      <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="1">
+       <widget class="QLabel" name="label_2">
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
+        </property>
+        <property name="text">
+         <string>Received cash</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="4">
+       <widget class="QTableWidget" name="tblChange">
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>102</height>
+         </size>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">border:0xp;</string>
+        </property>
+        <property name="verticalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOff</enum>
+        </property>
+        <property name="horizontalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOff</enum>
+        </property>
+        <property name="editTriggers">
+         <set>QAbstractItemView::NoEditTriggers</set>
+        </property>
+        <property name="selectionMode">
+         <enum>QAbstractItemView::NoSelection</enum>
+        </property>
+        <attribute name="horizontalHeaderVisible">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="horizontalHeaderDefaultSectionSize">
+         <number>120</number>
+        </attribute>
+        <attribute name="verticalHeaderVisible">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="verticalHeaderMinimumSectionSize">
+         <number>50</number>
+        </attribute>
+        <attribute name="verticalHeaderDefaultSectionSize">
+         <number>50</number>
+        </attribute>
+        <row>
+         <property name="text">
+          <string>New Row</string>
+         </property>
+        </row>
+        <row>
+         <property name="text">
+          <string>New Row</string>
+         </property>
+        </row>
+        <column>
+         <property name="text">
+          <string>New Column</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>New Column</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>New Column</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>New Column</string>
+         </property>
+        </column>
+        <item row="0" column="0">
+         <property name="text">
+          <string>500</string>
+         </property>
+        </item>
+        <item row="0" column="1">
+         <property name="text">
+          <string>1000</string>
+         </property>
+        </item>
+        <item row="0" column="2">
+         <property name="text">
+          <string>2000</string>
+         </property>
+        </item>
+        <item row="0" column="3">
+         <property name="text">
+          <string>5000</string>
+         </property>
+        </item>
+        <item row="1" column="0">
+         <property name="text">
+          <string>10000</string>
+         </property>
+        </item>
+        <item row="1" column="1">
+         <property name="text">
+          <string>15000</string>
+         </property>
+        </item>
+        <item row="1" column="2">
+         <property name="text">
+          <string>20000</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
+        </property>
+        <property name="text">
+         <string>Amount to pay</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="C5LineEdit" name="leCard">
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="C5LineEdit" name="leChange">
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Tax number</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="C5LineEdit" name="leCash">
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="C5LineEdit" name="leAmount">
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QLabel" name="label_5">
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
+        </property>
+        <property name="text">
+         <string>Received card</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="C5LineEdit" name="leTaxNumber">
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
+        </property>
+       </widget>
+      </item>
       <item row="4" column="0" colspan="4">
        <widget class="QWidget" name="widget" native="true">
         <property name="focusPolicy">
@@ -233,46 +425,6 @@
         </layout>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="C5LineEdit" name="leAmount">
-        <property name="focusPolicy">
-         <enum>Qt::ClickFocus</enum>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QLabel" name="label_2">
-        <property name="focusPolicy">
-         <enum>Qt::ClickFocus</enum>
-        </property>
-        <property name="text">
-         <string>Received cash</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="3">
-       <widget class="C5LineEdit" name="leChange">
-        <property name="focusPolicy">
-         <enum>Qt::ClickFocus</enum>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label">
-        <property name="focusPolicy">
-         <enum>Qt::ClickFocus</enum>
-        </property>
-        <property name="text">
-         <string>Amount to pay</string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="3">
        <widget class="QLabel" name="label_3">
         <property name="focusPolicy">
@@ -280,158 +432,6 @@
         </property>
         <property name="text">
          <string>Change</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="label_4">
-        <property name="text">
-         <string>Tax number</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0" colspan="4">
-       <widget class="C5TableWidget" name="tblChange">
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>102</height>
-         </size>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::ClickFocus</enum>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">border:0xp;</string>
-        </property>
-        <property name="verticalScrollBarPolicy">
-         <enum>Qt::ScrollBarAlwaysOff</enum>
-        </property>
-        <property name="horizontalScrollBarPolicy">
-         <enum>Qt::ScrollBarAlwaysOff</enum>
-        </property>
-        <property name="editTriggers">
-         <set>QAbstractItemView::NoEditTriggers</set>
-        </property>
-        <property name="selectionMode">
-         <enum>QAbstractItemView::NoSelection</enum>
-        </property>
-        <attribute name="horizontalHeaderVisible">
-         <bool>false</bool>
-        </attribute>
-        <attribute name="horizontalHeaderDefaultSectionSize">
-         <number>120</number>
-        </attribute>
-        <attribute name="verticalHeaderVisible">
-         <bool>false</bool>
-        </attribute>
-        <attribute name="verticalHeaderMinimumSectionSize">
-         <number>50</number>
-        </attribute>
-        <attribute name="verticalHeaderDefaultSectionSize">
-         <number>50</number>
-        </attribute>
-        <row>
-         <property name="text">
-          <string>New Row</string>
-         </property>
-        </row>
-        <row>
-         <property name="text">
-          <string>New Row</string>
-         </property>
-        </row>
-        <column>
-         <property name="text">
-          <string>New Column</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>New Column</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>New Column</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>New Column</string>
-         </property>
-        </column>
-        <item row="0" column="0">
-         <property name="text">
-          <string>500</string>
-         </property>
-        </item>
-        <item row="0" column="1">
-         <property name="text">
-          <string>1000</string>
-         </property>
-        </item>
-        <item row="0" column="2">
-         <property name="text">
-          <string>2000</string>
-         </property>
-        </item>
-        <item row="0" column="3">
-         <property name="text">
-          <string>5000</string>
-         </property>
-        </item>
-        <item row="1" column="0">
-         <property name="text">
-          <string>10000</string>
-         </property>
-        </item>
-        <item row="1" column="1">
-         <property name="text">
-          <string>15000</string>
-         </property>
-        </item>
-        <item row="1" column="2">
-         <property name="text">
-          <string>20000</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="C5LineEdit" name="leCash">
-        <property name="focusPolicy">
-         <enum>Qt::ClickFocus</enum>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="C5LineEdit" name="leTaxNumber">
-        <property name="focusPolicy">
-         <enum>Qt::NoFocus</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2">
-       <widget class="C5LineEdit" name="leCard">
-        <property name="focusPolicy">
-         <enum>Qt::ClickFocus</enum>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2">
-       <widget class="QLabel" name="label_5">
-        <property name="focusPolicy">
-         <enum>Qt::ClickFocus</enum>
-        </property>
-        <property name="text">
-         <string>Received card</string>
         </property>
        </widget>
       </item>
@@ -445,11 +445,6 @@
    <class>C5LineEdit</class>
    <extends>QLineEdit</extends>
    <header>c5lineedit.h</header>
-  </customwidget>
-  <customwidget>
-   <class>C5TableWidget</class>
-   <extends>QTableWidget</extends>
-   <header location="global">c5tablewidget.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

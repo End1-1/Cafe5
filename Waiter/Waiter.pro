@@ -63,6 +63,8 @@ SOURCES += \
     ../Classes/c5gridgilter.cpp \
     ../Classes/c5jsondb.cpp \
     ../Classes/c5orderdriver.cpp \
+    ../Classes/c5printreceiptthread.cpp \
+    ../Classes/c5printreceiptthread50mm.cpp \
     ../Classes/c5random.cpp \
     ../Classes/c5shoporder.cpp \
     ../Classes/c5storedraftwriter.cpp \
@@ -71,6 +73,7 @@ SOURCES += \
     ../Classes/c5threadobject.cpp \
     ../Classes/calculator.cpp \
     ../Classes/checkforupdatethread.cpp \
+    ../Classes/dlgpassword.cpp \
     ../Classes/doubledatabase.cpp \
     ../Classes/notificationwidget.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
@@ -98,6 +101,7 @@ SOURCES += \
     ../DbData/dbservicevalues.cpp \
     ../DbData/dbshift.cpp \
     ../DbData/dbstore.cpp \
+    ../DbData/dbstoredoctype.cpp \
     ../DbData/dbtables.cpp \
     ../DbData/dbunit.cpp \
     ../DbData/dbusers.cpp \
@@ -266,7 +270,6 @@ SOURCES += \
     ../Shop/printreceipt.cpp \
     ../Shop/printreceiptgroup.cpp \
     ../Shop/selectprinters.cpp \
-    c5printreceiptthread50mm.cpp \
     dishitem.cpp \
     dishitembutton.cpp \
     dlgcarnumber.cpp \
@@ -299,7 +302,6 @@ SOURCES += \
     ../Cafe5/c5message.cpp \
     ../Cafe5/c5sockethandler.cpp \
     ../Cafe5/c5serverhandler.cpp \
-    dlgpassword.cpp \
     dlgorder.cpp \
     ../Classes/c5user.cpp \
     ../Classes/c5menu.cpp \
@@ -347,7 +349,6 @@ SOURCES += \
     ../Classes/c5permissions.cpp \
     dlgexitwithmessage.cpp \
     ../Classes/c5translator.cpp \
-    c5printreceiptthread.cpp \
     ../Cafe5/dlgexitbyversion.cpp \
     ../Classes/fileversion.cpp \
     dlgsearchinmenu.cpp \
@@ -386,6 +387,8 @@ HEADERS += \
     ../Classes/c5gridgilter.h \
     ../Classes/c5jsondb.h \
     ../Classes/c5orderdriver.h \
+    ../Classes/c5printreceiptthread.h \
+    ../Classes/c5printreceiptthread50mm.h \
     ../Classes/c5random.h \
     ../Classes/c5shoporder.h \
     ../Classes/c5storedraftwriter.h \
@@ -394,6 +397,7 @@ HEADERS += \
     ../Classes/c5threadobject.h \
     ../Classes/calculator.h \
     ../Classes/checkforupdatethread.h \
+    ../Classes/dlgpassword.h \
     ../Classes/doubledatabase.h \
     ../Classes/notificationwidget.h \
     ../Classes/proxytablewidgetdatabase.h \
@@ -421,6 +425,7 @@ HEADERS += \
     ../DbData/dbservicevalues.h \
     ../DbData/dbshift.h \
     ../DbData/dbstore.h \
+    ../DbData/dbstoredoctype.h \
     ../DbData/dbtables.h \
     ../DbData/dbunit.h \
     ../DbData/dbusers.h \
@@ -611,7 +616,6 @@ HEADERS += \
     dlglistofpackages.h \
     dlglistofshifts.h \
     dlgmanagertools.h \
-    dlgpassword.h \
     dlgorder.h \
     ../Classes/c5user.h \
     ../Classes/c5menu.h \
@@ -686,6 +690,7 @@ FORMS += \
     ../Classes/c5grid.ui \
     ../Classes/c5gridgilter.ui \
     ../Classes/calculator.ui \
+    ../Classes/dlgpassword.ui \
     ../Classes/notificationwidget.ui \
     ../Controls/c5tablewithtotal.ui \
     ../Editors/c5cashname.ui \
@@ -800,7 +805,6 @@ FORMS += \
     dlglistofpackages.ui \
     dlglistofshifts.ui \
     dlgmanagertools.ui \
-    dlgpassword.ui \
     dlgorder.ui \
     ../Classes/c5printpreview.ui \
     dlgprecheckoptions.ui \

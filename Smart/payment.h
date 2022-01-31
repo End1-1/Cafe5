@@ -26,7 +26,6 @@ public:
     virtual void reject() override;
 
 private slots:
-    void focusChangeLineEdit();
 
     void keyF9();
 

@@ -40,6 +40,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Cafe5/c5replication.cpp \
     ../Classes/c5crypt.cpp \
     ../Classes/c5filelogwriter.cpp \
+    ../Classes/c5filterwidget.cpp \
     ../Classes/c5random.cpp \
     ../Classes/c5storedraftwriter.cpp \
     ../Classes/c5threadobject.cpp \
@@ -84,6 +85,10 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Editors/ce5ordermark.cpp \
     ../Editors/ce5packagelist.cpp \
     ../Editors/ce5storereason.cpp \
+    ../Forms/c5filtervalues.cpp \
+    ../Forms/c5salarydoc.cpp \
+    ../Forms/c5storedoc.cpp \
+    ../Forms/c5waiterorder.cpp \
     ../Reports/c5customfilter.cpp \
     ../Reports/cr5carvisits.cpp \
     ../Reports/cr5carvisitsfilter.cpp \
@@ -151,7 +156,6 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     c5goodspricing.cpp \
     c5inputdate.cpp \
     c5progressdialog.cpp \
-    c5salarydoc.cpp \
     c5serviceconfig.cpp \
     c5storebarcode.cpp \
     c5storebarcodelist.cpp \
@@ -180,10 +184,8 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Classes/c5cache.cpp \
     ../Controls/c5lineedit.cpp \
     ../Controls/c5combobox.cpp \
-    c5filtervalues.cpp \
     ../Reports/cr5commonsales.cpp \
     ../Classes/c5gridgilter.cpp \
-    c5filterwidget.cpp \
     ../Reports/cr5commonsalesfilter.cpp \
     ../Controls/c5dateedit.cpp \
     c5passwords.cpp \
@@ -202,7 +204,6 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Reports/cr5goodswaste.cpp \
     c5selector.cpp \
     ../Controls/c5lineeditwithselector.cpp \
-    c5storedoc.cpp \
     ../Reports/cr5goodsstorages.cpp \
     ../Reports/cr5goodspartners.cpp \
     ../Controls/c5tablewidget.cpp \
@@ -266,7 +267,6 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     c5toolbarwidget.cpp \
     ../Classes/checkforupdatethread.cpp \
     ../Classes/fileversion.cpp \
-    c5waiterorder.cpp \
     ../Classes/c5waiterorderdoc.cpp \
     ../../XLSX/src/xlsx.cpp \
     ../../XLSX/src/xlsxcell.cpp \
@@ -293,6 +293,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Classes/c5broadcasting.h \
     ../Classes/c5crypt.h \
     ../Classes/c5filelogwriter.h \
+    ../Classes/c5filterwidget.h \
     ../Classes/c5random.h \
     ../Classes/c5storedraftwriter.h \
     ../Classes/c5threadobject.h \
@@ -337,6 +338,10 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Editors/ce5ordermark.h \
     ../Editors/ce5packagelist.h \
     ../Editors/ce5storereason.h \
+    ../Forms/c5filtervalues.h \
+    ../Forms/c5salarydoc.h \
+    ../Forms/c5storedoc.h \
+    ../Forms/c5waiterorder.h \
     ../Reports/c5customfilter.h \
     ../Reports/cr5carvisits.h \
     ../Reports/cr5carvisitsfilter.h \
@@ -426,10 +431,8 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Classes/c5cache.h \
     ../Controls/c5lineedit.h \
     ../Controls/c5combobox.h \
-    c5filtervalues.h \
     ../Reports/cr5commonsales.h \
     ../Classes/c5gridgilter.h \
-    c5filterwidget.h \
     ../Reports/cr5commonsalesfilter.h \
     ../Controls/c5dateedit.h \
     c5passwords.h \
@@ -446,13 +449,11 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Reports/cr5goodsgroup.h \
     ../Reports/cr5goods.h \
     ../Reports/cr5goodswaste.h \
-    c5salarydoc.h \
     c5selector.h \
     ../Controls/c5lineeditwithselector.h \
     c5serviceconfig.h \
     c5storebarcode.h \
     c5storebarcodelist.h \
-    c5storedoc.h \
     ../Reports/cr5goodsstorages.h \
     ../Reports/cr5goodspartners.h \
     ../Controls/c5tablewidget.h \
@@ -521,7 +522,6 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     c5toolbarwidget.h \
     ../Classes/checkforupdatethread.h \
     ../Classes/fileversion.h \
-    c5waiterorder.h \
     ../Classes/c5waiterorderdoc.h \
     ../../XLSX/src/crs32.h \
     ../../XLSX/src/xlsx.h \
@@ -553,6 +553,10 @@ FORMS += \
     ../Editors/ce5ordermark.ui \
     ../Editors/ce5packagelist.ui \
     ../Editors/ce5storereason.ui \
+    ../Forms/c5filtervalues.ui \
+    ../Forms/c5salarydoc.ui \
+    ../Forms/c5storedoc.ui \
+    ../Forms/c5waiterorder.ui \
     ../Reports/c5customfilter.ui \
     ../Reports/cr5carvisitsfilter.ui \
     ../Reports/cr5cashdetailedfilter.ui \
@@ -593,19 +597,16 @@ FORMS += \
     ../Cafe5/c5message.ui \
     c5login.ui \
     ../Classes/c5grid.ui \
-    c5filtervalues.ui \
     ../Classes/c5gridgilter.ui \
     ../Reports/cr5commonsalesfilter.ui \
     c5passwords.ui \
     c5grouppermissionseditor.ui \
     ../Reports/c5settingswidget.ui \
     c5progressdialog.ui \
-    c5salarydoc.ui \
     c5selector.ui \
     c5serviceconfig.ui \
     c5storebarcode.ui \
     c5storebarcodelist.ui \
-    c5storedoc.ui \
     ../Reports/cr5materialinstorefilter.ui \
     ../Reports/cr5goodsmovementfilter.ui \
     ../Classes/c5printpreview.ui \
@@ -645,7 +646,6 @@ FORMS += \
     ../Reports/cr5storedocumentsfilter.ui \
     c5translatorform.ui \
     c5toolbarwidget.ui \
-    c5waiterorder.ui \
     dlgchangeoutputstore.ui \
     dlgexportsaletoasoptions.ui \
     dlgstoreutils.ui
@@ -660,6 +660,7 @@ INCLUDEPATH += ../DbData
 INCLUDEPATH += ../Waiter
 INCLUDEPATH += ../RESOURCES
 INCLUDEPATH += ../Service
+INCLUDEPATH += ../Forms
 INCLUDEPATH += /projects/xlsx/src
 INCLUDEPATH += /Projects/NewTax/Src
 INCLUDEPATH += /Soft/OpenSSL-Win64/include

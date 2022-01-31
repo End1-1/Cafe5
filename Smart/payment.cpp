@@ -1,8 +1,8 @@
 #include "payment.h"
 #include "ui_payment.h"
 #include "printtaxn.h"
-#include "c5storedraftwriter.h"
 #include "c5printing.h"
+#include "c5storedraftwriter.h"
 #include "c5database.h"
 #include "c5user.h"
 #include "dish.h"
@@ -33,12 +33,7 @@ payment::payment(const QString order, const QStringList &dbParams, C5User *user)
         ui->leCard->setDouble(db.getDouble("f_amountcard"));
         ui->leChange->setDouble(0);
     }
-    C5LineEdit *l = ui->tblChange->createLineEdit(1, 3);
-    l->setValidator(new QDoubleValidator(0, 999999999, 2));
-    l->setFocus();
-    connect(l, &C5LineEdit::textChanged, this, [this](const QString &t) {
-        ui->leChange->setDouble(t.toDouble() - ui->leCash->getDouble());
-    });
+
     adjustSize();
     new QShortcut(QKeySequence("F2"), this, SLOT(focusChangeLineEdit()));
     new QShortcut(QKeySequence("F9"), this, SLOT(keyF9()));
@@ -71,11 +66,6 @@ void payment::accept()
 void payment::reject()
 {
     accept();
-}
-
-void payment::focusChangeLineEdit()
-{
-    ui->tblChange->lineEdit(1, 3)->setFocus();
 }
 
 void payment::keyF9()

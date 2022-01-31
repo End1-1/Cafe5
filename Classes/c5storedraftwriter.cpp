@@ -1,7 +1,6 @@
 #include "c5storedraftwriter.h"
 #include "c5utils.h"
 #include "c5config.h"
-#include "c5storedoc.h"
 #include <QVariant>
 #include <QMap>
 
@@ -89,9 +88,55 @@ bool C5StoreDraftWriter::rollbackOutput(C5Database &db, const QString &id)
     db[":f_id"] = id;
     db.exec("delete from o_goods where f_id=:f_id");
     for (const QString &doc: docs) {
-        C5StoreDoc::removeDoc(db.dbParams(), doc, false);
+        QString err;
+        if (!removeStoreDocument(db, doc, err)) {
+            return false;
+        }
     }
     return true;
+}
+
+bool C5StoreDraftWriter::removeStoreDocument(C5Database &db, const QString &id, QString &err)
+{
+    C5StoreDraftWriter dw(db);
+    if (dw.haveRelations(id, err, false)) {
+        return false;
+    }
+
+    db[":f_id"] = id;
+    db.exec("select f_baseonsale, f_cashuuid from a_header_store where f_id=:f_id");
+    QString cashDoc;
+    if (db.nextRow()) {
+        if (db.getInt(0) > 0) {
+            //err += tr("Document based on sale cannot be edited manually");
+        }
+        cashDoc = db.getString("f_cashuuid");
+    }
+    if (err.isEmpty()) {
+        if (!dw.outputRollback(db, id)) {
+            err += db.fLastError;
+        }
+    }
+    if (!err.isEmpty()) {
+        return false;
+    }
+    db[":f_document"] = id;
+    db.exec("delete from a_store_draft where f_document=:f_document");
+    db[":f_id"] = id;
+    db.exec("delete from a_header where f_id=:f_id");
+    db[":f_id"] = id;
+    db.exec("delete from a_header_store where f_id=:f_id");
+    if (!cashDoc.isEmpty()) {
+        db[":f_header"] = cashDoc;
+        db.exec("delete from e_cash where f_header=:f_header");
+        db[":f_id"] = cashDoc;
+        db.exec("delete from a_header_cash where f_id=:f_id");
+        db[":f_id"] = cashDoc;
+        db.exec("delete from a_header where f_id=:f_id");
+    }
+    db[":f_document"] = id;
+    db.exec("delete from a_store_dish_waste where f_document=:f_document");
+    return err.isEmpty();
 }
 
 bool C5StoreDraftWriter::outputRollback(C5Database &db, const QString &id)

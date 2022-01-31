@@ -57,8 +57,6 @@ private slots:
 
     void on_btnPrintReport2_clicked();
 
-    void on_btnCustomer_clicked();
-
     void on_btnSupplier_clicked();
 
     void on_btnShowPackages_clicked();
@@ -66,6 +64,8 @@ private slots:
     void on_btnShowDishes_clicked();
 
     void on_lstCombo_itemClicked(QListWidgetItem *item);
+
+    void on_leReadCode_returnPressed();
 
 private:
     Ui::Workspace *ui;

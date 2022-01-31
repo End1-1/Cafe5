@@ -91,6 +91,8 @@ public:
 
     bool rollbackOutput(C5Database &db, const QString &id);
 
+    bool removeStoreDocument(C5Database &db, const QString &id, QString &err);
+
     bool outputRollback(C5Database &db, const QString &id);
 
     QString storeDocNum(int docType, int storeId, bool withUpdate, int value);

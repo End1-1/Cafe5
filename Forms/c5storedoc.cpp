@@ -414,46 +414,13 @@ bool C5StoreDoc::removeDoc(const QStringList &dbParams, QString id, bool showmes
     QString err;
     C5Database db(dbParams);
     C5StoreDraftWriter dw(db);
-    if (dw.haveRelations(id, err, false)) {
-        C5Message::error(err);
+    if (!dw.removeStoreDocument(db, id, err)){
+        if (showmessage) {
+            C5Message::error(err);
+        }
         return false;
     }
-
-    db[":f_id"] = id;
-    db.exec("select f_baseonsale, f_cashuuid from a_header_store where f_id=:f_id");
-    QString cashDoc;
-    if (db.nextRow()) {
-        if (db.getInt(0) > 0) {
-            //err += tr("Document based on sale cannot be edited manually");
-        }
-        cashDoc = db.getString("f_cashuuid");
-    }
-    if (err.isEmpty()) {
-        if (!dw.outputRollback(db, id)) {
-            err += db.fLastError;
-        }
-    }
-    if (!err.isEmpty()) {
-        C5Message::error(err);
-        return false;
-    }
-    db[":f_document"] = id;
-    db.exec("delete from a_store_draft where f_document=:f_document");
-    db[":f_id"] = id;
-    db.exec("delete from a_header where f_id=:f_id");
-    db[":f_id"] = id;
-    db.exec("delete from a_header_store where f_id=:f_id");
-    if (!cashDoc.isEmpty()) {
-        db[":f_header"] = cashDoc;
-        db.exec("delete from e_cash where f_header=:f_header");
-        db[":f_id"] = cashDoc;
-        db.exec("delete from a_header_cash where f_id=:f_id");
-        db[":f_id"] = cashDoc;
-        db.exec("delete from a_header where f_id=:f_id");
-    }
-    db[":f_document"] = id;
-    db.exec("delete from a_store_dish_waste where f_document=:f_document");
-    return err.isEmpty();
+    return true;
 }
 
 QVariant C5StoreDoc::docProperty(const QString &field) const

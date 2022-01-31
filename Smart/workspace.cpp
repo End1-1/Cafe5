@@ -9,7 +9,6 @@
 #include "c5storedraftwriter.h"
 #include "calendar.h"
 #include "c5user.h"
-#include "ce5partner.h"
 #include "supplier.h"
 #include "payment.h"
 #include "dishpackage.h"
@@ -28,6 +27,9 @@ Workspace::Workspace(const QStringList &dbParams) :
     ui(new Ui::Workspace)
 {
     ui->setupUi(this);
+#ifndef QT_DEBUG
+    ui->leReadCode->setMaximumWidth(1);
+#endif
     fTypeFilter = 0;
     ui->tblPart2->setItemDelegate(new DishPartItemDelegate());
     ui->tblOrder->setItemDelegate(new DishItemDelegate());
@@ -760,47 +762,6 @@ void Workspace::on_btnPrintReport2_clicked()
     printReport(date1, date2);
 }
 
-void Workspace::on_btnCustomer_clicked()
-{
-    bool ok;
-    QString phone = QInputDialog::getText(this, tr("Phone number"), tr("Phone number"), QLineEdit::Normal, "", &ok);
-    if (!ok) {
-        return;
-    }
-    fPhone = phone;
-    ui->lbPhone->setText(QString("%1<br>%2").arg(fPhone).arg(fSupplierName));
-    //check phone number exists
-    C5Database db(fDBParams);
-    db.exec(QString("select * from c_partners where if(length('%1') > 7, f_phone like '%%1', f_id=-1) ").arg(fPhone));
-    if (db.nextRow()) {
-        ui->leInfo->setVisible(true);
-        fCustomer = db.getInt("f_id");
-        ui->leInfo->setText(QString("%1 %2").arg(db.getString("f_contact")).arg(db.getString("f_address")));
-    } else {
-        ui->leInfo->setVisible(false);
-        bool done = false;
-        db[":f_phone"] = fPhone;
-        fCustomer = db.insert("c_partners");
-        do {
-            CE5Partner *ep = new CE5Partner(fDBParams);
-            C5Editor *e = C5Editor::createEditor(fDBParams, ep, fCustomer);
-            QList<QMap<QString, QVariant> > data;
-            if(e->getResult(data)) {
-               ui->leInfo->setVisible(true);
-               fPhone = data[0]["f_phone"].toString();
-               ui->leInfo->setText(QString("%1 %2 %3, %4")
-                                   .arg(data[0]["f_taxname"].toString())
-                       .arg(data[0]["f_contact"].toString())
-                       .arg(data[0]["f_address"].toString())
-                       .arg(data[0]["f_phone"].toString()));
-               ui->lbPhone->setText(QString("%1<br>%2").arg(fPhone).arg(fSupplierName));
-               done = true;
-            }
-            delete e;
-        } while (!done);
-    }
-}
-
 void Workspace::on_btnSupplier_clicked()
 {
     if (!supplier::getSupplier(fDBParams, fSupplierId, fSupplierName)) {
@@ -910,4 +871,11 @@ void Workspace::on_lstCombo_itemClicked(QListWidgetItem *item)
     packageItem->setData(Qt::UserRole + 100, -2);
     ui->tblOrder->setItem(row, 0, packageItem);
     countTotal();
+}
+
+void Workspace::on_leReadCode_returnPressed()
+{
+    QString code = ui->leReadCode->text().replace("?", "").replace(";", "");
+    ui->leReadCode->clear();
+    C5Database db(fDBParams);
 }

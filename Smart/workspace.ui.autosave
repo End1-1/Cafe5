@@ -1206,6 +1206,15 @@ QLabel {color:green;}
              </widget>
             </item>
             <item>
+             <widget class="QWidget" name="wDiscount" native="true">
+              <layout class="QHBoxLayout" name="horizontalLayout_7">
+               <item>
+                <widget class="QLineEdit" name="leDiscount"/>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
              <widget class="QWidget" name="wTotal" native="true">
               <property name="minimumSize">
                <size>
