@@ -19,6 +19,7 @@ C5Selector::C5Selector(const QStringList &dbParams) :
     connect(fGrid, SIGNAL(tblSingleClick(QModelIndex)), this, SLOT(tblSingleClick(QModelIndex)));
     connect(fGrid->fTableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(selectionChanged(QItemSelection,QItemSelection)));
     fReset = true;
+    fSearchColumn = -1;
 }
 
 C5Selector::~C5Selector()
@@ -38,6 +39,32 @@ bool C5Selector::getValue(const QStringList &dbParams, int cache, QList<QVariant
     } else {
         c = fSelectorList[cacheName][cache];
     }
+    c->fSearchColumn = -1;
+    c->fMultipleSelection = false;
+    c->fGrid->fModel->setSingleCheckBoxSelection(true);
+    if (c->fReset) {
+        c->fReset = false;
+        c->refresh();
+    }
+    c->ui->leFilter->setFocus();
+    bool result = c->exec() == QDialog::Accepted;
+    values = c->fValues;
+    return result;
+}
+
+bool C5Selector::getValueOfColumn(const QStringList &dbParams, int cache, QList<QVariant> &values, int column)
+{
+    QString cacheName = C5Cache::cacheName(dbParams, cache);
+    C5Selector *c = nullptr;
+    if (!fSelectorList[cacheName].contains(cache)) {
+        c = new C5Selector(dbParams);
+        c->fQuery = C5Cache(dbParams).query(cache);
+        c->fCache = cache;
+        fSelectorList[cacheName][cache] = c;
+    } else {
+        c = fSelectorList[cacheName][cache];
+    }
+    c->fSearchColumn = column;
     c->fMultipleSelection = false;
     c->fGrid->fModel->setSingleCheckBoxSelection(true);
     if (c->fReset) {
@@ -171,7 +198,7 @@ void C5Selector::refresh()
 
 void C5Selector::on_leFilter_textChanged(const QString &arg1)
 {
-    fGrid->setFilter(-1, arg1);
+    fGrid->setFilter(fSearchColumn, arg1);
 }
 
 void C5Selector::on_btnCheck_clicked()

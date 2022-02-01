@@ -103,6 +103,7 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
 C5StoreDoc::~C5StoreDoc()
 {
     delete ui;
+    __mainWindow->removeBroadcastListener(this);
 }
 
 bool C5StoreDoc::openDoc(QString id, QString &err)
@@ -1448,13 +1449,16 @@ void C5StoreDoc::newDoc()
     if (__c5config.getRegValue("storedoc_storeinput").toBool()) {
         ui->leStoreInput->setValue(__c5config.getRegValue("storedoc_storeinput_id").toInt());
     }
+    if (__c5config.getRegValue("storedoc_storeinput").toBool()) {
+        ui->leStoreInput->setValue(__c5config.getRegValue("storedoc_storeinput_id").toInt());
+    }
     countTotal();
 }
 
 void C5StoreDoc::getInput()
 {
     QList<QVariant> vals;
-    if (!C5Selector::getValue(fDBParams, cache_goods, vals)) {
+    if (!C5Selector::getValueOfColumn(fDBParams, cache_goods, vals, 3)) {
         return;
     }
     if (vals.at(1).toInt() == 0) {

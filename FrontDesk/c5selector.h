@@ -22,6 +22,8 @@ public:
 
     static bool getValue(const QStringList &dbParams, int cache, QList<QVariant> &values);
 
+    static bool getValueOfColumn(const QStringList &dbParams, int cache, QList<QVariant> &values, int column);
+
     static bool getMultipleValues(const QStringList &dbParams, int cache, QList<QList<QVariant> > &values);
 
     static bool getValues(const QStringList &dbParams, const QString &sql, QList<QVariant> &values, const QHash<QString, QString> &translator);
@@ -45,6 +47,8 @@ private:
     Ui::C5Selector *ui;
 
     int fCache;
+
+    int fSearchColumn;
 
     QString fQuery;
 
