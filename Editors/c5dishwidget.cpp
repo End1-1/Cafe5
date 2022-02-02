@@ -275,7 +275,7 @@ bool C5DishWidget::event(QEvent *e)
 void C5DishWidget::on_btnAddRecipe_clicked()
 {
     QList<QVariant> values;
-    if (!C5Selector::getValue(fDBParams, cache_goods, values)) {
+    if (!C5Selector::getValueOfColumn(fDBParams, cache_goods, values, 3)) {
         return;
     }
     int row = addRecipeRow();
