@@ -93,11 +93,6 @@ void DlgReservGoods::on_btnSave_clicked()
     t.send(fStore, jdoc.toJson(QJsonDocument::Compact));
 }
 
-void DlgReservGoods::on_leReservedQty_textChanged(const QString &arg1)
-{
-
-}
-
 void DlgReservGoods::on_btnCancelReserve_clicked()
 {
     setState(GR_REMOVED);

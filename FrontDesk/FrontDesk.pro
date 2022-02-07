@@ -39,6 +39,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Cafe5/c5licensedlg.cpp \
     ../Cafe5/c5replication.cpp \
     ../Classes/c5crypt.cpp \
+    ../Classes/c5document.cpp \
     ../Classes/c5filelogwriter.cpp \
     ../Classes/c5filterwidget.cpp \
     ../Classes/c5random.cpp \
@@ -97,6 +98,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Reports/cr5cashmovement.cpp \
     ../Reports/cr5cashmovementfilter.cpp \
     ../Reports/cr5cashnames.cpp \
+    ../Reports/cr5complectations.cpp \
     ../Reports/cr5consumptionbysalesdraft.cpp \
     ../Reports/cr5consumptionbysalesfilterdraft.cpp \
     ../Reports/cr5consuptionreason.cpp \
@@ -151,7 +153,6 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     c5daterange.cpp \
     c5dbresetoption.cpp \
     c5dishgroupaction.cpp \
-    c5document.cpp \
     c5goodsimage.cpp \
     c5goodspricing.cpp \
     c5inputdate.cpp \
@@ -292,6 +293,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Classes/barcode5.h \
     ../Classes/c5broadcasting.h \
     ../Classes/c5crypt.h \
+    ../Classes/c5document.h \
     ../Classes/c5filelogwriter.h \
     ../Classes/c5filterwidget.h \
     ../Classes/c5random.h \
@@ -350,6 +352,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Reports/cr5cashmovement.h \
     ../Reports/cr5cashmovementfilter.h \
     ../Reports/cr5cashnames.h \
+    ../Reports/cr5complectations.h \
     ../Reports/cr5consumptionbysalesdraft.h \
     ../Reports/cr5consumptionbysalesfilterdraft.h \
     ../Reports/cr5consuptionreason.h \
@@ -405,7 +408,6 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     c5daterange.h \
     c5dbresetoption.h \
     c5dishgroupaction.h \
-    c5document.h \
     c5goodsimage.h \
     c5goodspricing.h \
     c5inputdate.h \

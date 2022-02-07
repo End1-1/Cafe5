@@ -27,6 +27,7 @@
 #include "cr5cashnames.h"
 #include "cr5dish.h"
 #include "cr5settings.h"
+#include "cr5complectations.h"
 #include "c5selector.h"
 #include "cr5goodsmovement.h"
 #include "c5salarydoc.h"
@@ -718,6 +719,9 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
     case cp_t6_qty_reminder:
         createTab<CR5GoodsQtyReminder>(dbParams);
         break;
+    case cp_t6_complectations:
+        createTab<CR5Complectations>(dbParams);
+        break;
     case cp_t7_partners:
         createTab<CR5GoodsPartners>(dbParams);
         break;
@@ -958,6 +962,7 @@ void C5MainWindow::setDB(const QString &dbname)
         addTreeL3Item(l, cp_t6_classes, tr("Classes"), ":/goods.png");
         addTreeL3Item(l, cp_t6_goods_images, tr("Images"), ":/images.png");
         addTreeL3Item(l, cp_t6_qty_reminder, tr("Quantity reminder"), ":/goods.png");
+        addTreeL3Item(l, cp_t6_complectations, tr("Complectations"), ":/goods.png");
     }
 
     if (addMainLevel(db.at(1), cp_t10_manufacture, tr("Manufacture"), ":/manufacturing.png", l)) {

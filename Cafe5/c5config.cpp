@@ -1,6 +1,6 @@
 #include "c5config.h"
 #include "c5database.h"
-#include "c5user.h";
+#include "c5user.h"
 #include <QDir>
 #include <QMutex>
 #include <QDebug>

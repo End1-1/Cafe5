@@ -780,6 +780,10 @@ void DlgOrder::worderActivated()
 void DlgOrder::handlePrintService(const QJsonObject &obj)
 {
     sender()->deleteLater();
+    if (__c5config.getValue(param_waiter_closeorder_after_serviceprint).toInt() == 1) {
+        on_btnExit_clicked();
+        return;
+    }
     for (WOrder *o: worders()) {
         if (o->fOrderDriver->currentOrderId() == obj["order"].toString()) {
             o->fOrderDriver->reloadOrder();

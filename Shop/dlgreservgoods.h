@@ -23,8 +23,6 @@ private slots:
 
     void on_btnSave_clicked();
 
-    void on_leReservedQty_textChanged(const QString &arg1);
-
     void on_btnCancelReserve_clicked();
 
     void on_btnCompleteReserve_clicked();

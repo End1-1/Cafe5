@@ -80,6 +80,8 @@
 #define param_idram_name 76
 #define param_idram_session_id 77
 #define param_no_tax 78
+#define param_waiter_closeorder_after_serviceprint 79
+#define param_frontdesk_scale_dir 80
 
 #define FRONTDESK_WAITER 0
 #define FRONTDESK_SHOP 1

@@ -19,6 +19,7 @@
 #include <QScreen>
 #include <QPropertyAnimation>
 #include <QParallelAnimationGroup>
+#include <QTimer>
 #include <QFile>
 
 
@@ -43,11 +44,12 @@ Workspace::Workspace(const QStringList &dbParams) :
         ui->tblDishes->setColumnCount(4);
         break;
     }
-    ui->leInfo->setVisible(false);
-    ui->lbPhone->clear();
-    fSupplierId = __c5config.defaultTable();
-    fSupplierName = "";
-    fCustomer = 0;
+    resetOrder();
+    QTimer *t = new QTimer(this);
+    connect(t, &QTimer::timeout, this, [=]() {
+       ui->leReadCode->setFocus();
+    });
+    t->start(1000);
 }
 
 Workspace::~Workspace()
@@ -321,7 +323,42 @@ void Workspace::countTotal()
         Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
         total += d.price * d.qty;
     }
+    if (fDiscountMode > 0) {
+        ui->wDiscount->setVisible(true);
+        switch (fDiscountMode) {
+        case CARD_TYPE_DISCOUNT:
+            fDiscountAmount = total * fDiscountValue;
+            ui->leDiscount->setText(QString("-%1% (%2)").arg(fDiscountValue * 100).arg(fDiscountAmount));
+            total -= fDiscountAmount;
+            break;
+        }
+    }
     ui->leTotal->setDouble(total);
+}
+
+void Workspace::resetOrder()
+{
+    ui->leInfo->setVisible(false);
+    ui->lbPhone->clear();
+    ui->wDiscount->setVisible(false);
+    fSupplierId = __c5config.defaultTable();
+    fSupplierName = "";
+    fCustomer = 0;
+    fDiscountAmount = 0;
+    fDiscountMode = 0;
+    fDiscountValue = 0;
+    fDiscountId = 0;
+    fSupplierId = __c5config.defaultTable();
+    fSupplierName = "";
+    fPhone = "";
+    ui->tblOrder->clear();
+    ui->tblOrder->setRowCount(0);
+    ui->leTotal->setDouble(0);
+    ui->lbPhone->clear();
+    ui->leInfo->setVisible(false);
+    fDiscountMode = 0;
+    fDiscountValue = 0;
+    fDiscountAmount = 0;
 }
 
 void Workspace::printReport(const QDate &d1, const QDate &d2)
@@ -496,7 +533,7 @@ void Workspace::on_btnCheckout_clicked()
                          QTime::currentTime(), QTime::currentTime(),
                          fUser->id(), fPhone, 1,
                          ui->leTotal->getDouble(), ui->leTotal->getDouble(), 0, 0, 0,
-                         0, 0, 0, 0,
+                         0, fDiscountAmount, 0, fDiscountValue,
                          0, 0, 1, 1, 1, fCustomer)) {
         C5Message::error(dw.fErrorMsg);
         db.rollback();
@@ -527,7 +564,15 @@ void Workspace::on_btnCheckout_clicked()
                 }
             }
             QString bid;
-            if (!dw.writeOBody(bid, id, DISH_STATE_OK, d.id, d.qty, d.qty, d.price, d.qty*d.price, __c5config.serviceFactor().toDouble(), 0, d.store, d.printer, "", "", 0, d.adgCode, 0, 0, pid)) {
+            double disc;
+            switch (fDiscountMode) {
+            case CARD_TYPE_DISCOUNT:
+                disc = fDiscountValue;
+                break;
+            default:
+                break;
+            }
+            if (!dw.writeOBody(bid, id, DISH_STATE_OK, d.id, d.qty, d.qty, d.price, (d.qty*d.price) - (d.qty*d.price*disc), __c5config.serviceFactor().toDouble(), fDiscountValue, d.store, d.printer, "", "", 0, d.adgCode, 0, 0, pid)) {
                 C5Message::error(dw.fErrorMsg);
                 db.rollback();
                 return;
@@ -659,14 +704,7 @@ void Workspace::on_btnCheckout_clicked()
         p.print(s, QPrinter::Custom);
     }
 
-    fSupplierId = __c5config.defaultTable();
-    fSupplierName = "";
-    fPhone = "";
-    ui->tblOrder->clear();
-    ui->tblOrder->setRowCount(0);
-    ui->leTotal->setDouble(0);
-    ui->lbPhone->clear();
-    ui->leInfo->setVisible(false);
+    resetOrder();
     payment *pay = new payment(id, fDBParams, fUser);
     pay->exec();
     //p->justPrint();
@@ -878,4 +916,17 @@ void Workspace::on_leReadCode_returnPressed()
     QString code = ui->leReadCode->text().replace("?", "").replace(";", "");
     ui->leReadCode->clear();
     C5Database db(fDBParams);
+    db[":f_code"] = code;
+    db.exec("select * from b_cards_discount where f_code=:f_code");
+    if (db.nextRow()) {
+        fDiscountMode = db.getInt("f_mode");
+        fDiscountValue = db.getDouble("f_value");
+        switch (fDiscountMode) {
+        case CARD_TYPE_DISCOUNT:
+            fDiscountValue /= 100;
+            break;
+        }
+
+        countTotal();
+    }
 }

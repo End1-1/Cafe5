@@ -3,7 +3,6 @@
 #include "c5cafecommon.h"
 #include "c5config.h"
 #include "c5sockethandler.h"
-#include "c5storedoc.h"
 #include "c5storedraftwriter.h"
 #include "doubledatabase.h"
 #include <QHostInfo>
@@ -312,7 +311,8 @@ bool C5WaiterOrderDoc::makeOutputOfStore(C5Database &db, QString &err, int store
             "left join a_store_draft ad on ad.f_id=g.f_storerec "
             "where g.f_header=:f_id");
     while (db.nextRow()) {
-        C5StoreDoc::removeDoc(db.dbParams(), db.getString(0), false);
+        C5StoreDraftWriter dw(db);
+        dw.removeStoreDocument(db, db.getString(0), err);
     }
 
     //Check for store doc

@@ -234,7 +234,7 @@ QLabel {color:yellow;background:green;}
          </size>
         </property>
         <property name="text">
-         <string>Menu</string>
+         <string>Search</string>
         </property>
         <property name="icon">
          <iconset resource="../resources/resources.qrc">

@@ -197,7 +197,7 @@ void CR5Goods::groupPrice()
 void CR5Goods::exportToScales()
 {
     C5Database db(fDBParams);
-    QFile f("c:/scales/export.xml");
+    QFile f(__c5config.getValue(param_frontdesk_scale_dir) + "/export.xml");
     f.open(QIODevice::WriteOnly);
     f.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
     f.write("<NewDataSet>\r\n");

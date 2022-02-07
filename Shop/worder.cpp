@@ -8,7 +8,6 @@
 #include "c5message.h"
 #include "c5permissions.h"
 #include "c5printing.h"
-#include "c5storedoc.h"
 #include "preorders.h"
 #include "c5logsystem.h"
 #include "printreceipt.h"

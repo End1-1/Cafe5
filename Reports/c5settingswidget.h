@@ -29,6 +29,8 @@ public:
 private slots:
     void on_btnTestAsConnection_clicked();
 
+    void on_btnScalePath_clicked();
+
 private:
     Ui::C5SettingsWidget *ui;
 

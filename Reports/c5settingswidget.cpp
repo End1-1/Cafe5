@@ -1,5 +1,6 @@
 #include "c5settingswidget.h"
 #include "ui_c5settingswidget.h"
+#include <QFileDialog>
 
 C5SettingsWidget::C5SettingsWidget(const QStringList &dbParams, QWidget *parent) :
     CE5Editor(dbParams, parent),
@@ -133,6 +134,8 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     fTags[ui->leIdramName->getTag()] = ui->leIdramName->text();
     fTags[ui->leIdramSessionId->getTag()] = ui->leIdramSessionId->text();
     fTags[ui->chExternalTax->getTag()] = ui->chExternalTax->isChecked() ? "1" : "0";
+    fTags[ui->chCloseTablefterServicePrint->getTag()] = ui->chCloseTablefterServicePrint->isChecked() ? "1" : "0";
+    fTags[ui->leScalePath->getTag()] = ui->leScalePath->text();
     C5Database db(fDBParams);
     db[":f_settings"] = ui->leCode->getInteger();
     db.exec("delete from s_settings_values where f_settings=:f_settings");
@@ -249,5 +252,13 @@ void C5SettingsWidget::on_btnTestAsConnection_clicked()
         C5Message::error(tr("Connection successfull"));
     } else {
         C5Message::error(dbas.fLastError);
+    }
+}
+
+void C5SettingsWidget::on_btnScalePath_clicked()
+{
+    QString path = QFileDialog::getExistingDirectory(this, "", "");
+    if (!path.isEmpty()) {
+        ui->leScalePath->setText(path);
     }
 }

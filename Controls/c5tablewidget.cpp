@@ -78,17 +78,6 @@ C5LineEdit *C5TableWidget::lineEdit(int row, int column)
     return static_cast<C5LineEdit*>(cellWidget(row, column));
 }
 
-C5LineEditWithSelector *C5TableWidget::createLineEditWiSelector(int row, int column)
-{
-    C5LineEditWithSelector *l = new C5LineEditWithSelector(this);
-    l->setProperty("row", row);
-    l->setProperty("column", column);
-    l->setFrame(false);
-    connect(l, SIGNAL(textChanged(QString)), this, SLOT(lineEditTextChanged(QString)));
-    setCellWidget(row, column, l);
-    return l;
-}
-
 C5LineEditWithSelector *C5TableWidget::lineEditWithSelector(int row, int column)
 {
     return static_cast<C5LineEditWithSelector*>(cellWidget(row, column));

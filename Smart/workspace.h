@@ -84,6 +84,14 @@ private:
 
     QString fSupplierName;
 
+    int fDiscountId;
+
+    int fDiscountMode;
+
+    double fDiscountValue;
+
+    double fDiscountAmount;
+
     bool currentDish(Dish &d);
 
     void setCurrentDish(Dish &d);
@@ -91,6 +99,8 @@ private:
     void filter();
 
     void countTotal();
+
+    void resetOrder();
 
     void printReport(const QDate &d1, const QDate &d2);
 

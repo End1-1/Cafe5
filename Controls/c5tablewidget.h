@@ -41,9 +41,18 @@ public:
 
     C5LineEdit *lineEdit(int row, int column);
 
-    C5LineEditWithSelector *createLineEditWiSelector(int row, int column);
-
     C5LineEditWithSelector *lineEditWithSelector(int row, int column);
+
+    template<class T>
+    T *createWidget(int row, int column) {
+        T *l = new T(this);
+        l->setProperty("row", row);
+        l->setProperty("column", column);
+        l->setFrame(false);
+        connect(l, SIGNAL(textChanged(QString)), this, SLOT(lineEditTextChanged(QString)));
+        setCellWidget(row, column, l);
+        return l;
+    }
 
     C5ComboBox *createComboBox(int row, int column);
 

@@ -448,11 +448,11 @@ void C5SalaryDoc::on_btnRemoveEmploye_clicked()
 int C5SalaryDoc::newRow()
 {
     int row = ui->tbl->addEmptyRow();
-    C5LineEditWithSelector *l1 = ui->tbl->createLineEditWiSelector(row, 1);
-    C5LineEditWithSelector *l2 = ui->tbl->createLineEditWiSelector(row, 2);
+    C5LineEditWithSelector *l1 = ui->tbl->createWidget<C5LineEditWithSelector>(row, 1);
+    C5LineEditWithSelector *l2 = ui->tbl->createWidget<C5LineEditWithSelector>(row, 2);
     l2->setReadOnly(true);
     l1->setSelector(fDBParams, l2, cache_users_groups);
-    l1 = ui->tbl->createLineEditWiSelector(row, 5);
+    l1 = ui->tbl->createWidget<C5LineEditWithSelector>(row, 5);
     l1->setValidator(new QDoubleValidator(0, 999999999, 2));
     connect(l1, SIGNAL(textChanged(QString)), this, SLOT(countAmounts(QString)));
     l1->setFocus();

@@ -2,7 +2,6 @@
 #include "c5config.h"
 #include "c5utils.h"
 #include "c5shoporder.h"
-#include "c5storedoc.h"
 #include <QThread>
 #include <QUuid>
 
@@ -65,13 +64,15 @@ void C5Replication::downloadDataFromServer(const QStringList &src, const QString
     while (dr.nextRow()) {
         tl.append(dr.getString("f_table"));
     }
+    QString err;
     steps = 2;
     if (lastid == 0) {
         emit progress("Initializing");
         db.exec("select f_id from a_header where f_userid='SL'");
         if (db.nextRow()) {
             QString sl = db.getString(0);
-            C5StoreDoc::removeDoc(db.dbParams(), sl, false);
+            C5StoreDraftWriter dw(db);
+            dw.removeStoreDocument(db, sl, err);
         }
         steps = tl.count() + 2;
         dr.exec("select max(f_id) from s_syncronize");
@@ -176,7 +177,7 @@ void C5Replication::downloadDataFromServer(const QStringList &src, const QString
         return;
     }
     emit progress(QString("Step %1 of %2. Store document: write input").arg(step).arg(steps));
-    QString err;
+
     if (!dw.writeInput(docId, err)) {
         emit progress(err);
     }

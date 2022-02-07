@@ -88,6 +88,7 @@ int CR5DishPriceSelfCostFilter::menuState()
     if (ui->rbActiveState->isChecked()) {
         return 1;
     }
+    return -1;
 }
 
 QString CR5DishPriceSelfCostFilter::goods()

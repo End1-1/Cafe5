@@ -13,6 +13,7 @@
 #include <QApplication>
 #include <QMessageBox>
 #include <QLockFile>
+#include <QFontDatabase>
 #include <QInputDialog>
 #include <QDir>
 #include <QTranslator>
@@ -78,6 +79,12 @@ int main(int argc, char *argv[])
         cnf->exec();
         delete cnf;
     }
+
+    QFontDatabase::addApplicationFont(":/barcode.ttf");
+//    int id = QFontDatabase::addApplicationFont(":/ahuni.ttf");
+//    QString family = QFontDatabase::applicationFontFamilies(id).at(0);
+    QFont font(a.font());
+    a.setFont(font);
 
     QList<QByteArray> connectionParams;
     C5Connection::readParams(connectionParams);
