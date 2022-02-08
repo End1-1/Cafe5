@@ -432,3 +432,13 @@ void C5StoreInventory::on_leFind_textChanged(const QString &arg1)
         ui->tblGoods->setRowHidden(i, rh);
     }
 }
+
+void C5StoreInventory::on_btnBroadcast_clicked(bool checked)
+{
+    if (checked) {
+        ui->btnBroadcast->setIcon(QIcon(":/wifi.png"));
+    } else {
+        ui->btnBroadcast->setIcon(QIcon(":/wifib.png"));
+    }
+}
+

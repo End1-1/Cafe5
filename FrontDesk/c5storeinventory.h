@@ -51,6 +51,8 @@ private slots:
 
     void on_leFind_textChanged(const QString &arg1);
 
+    void on_btnBroadcast_clicked(bool checked);
+
 private:
     Ui::C5StoreInventory *ui;
 
