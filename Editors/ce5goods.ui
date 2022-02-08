@@ -192,6 +192,9 @@
          <property name="Type" stdset="0">
           <string>1</string>
          </property>
+         <property name="Check" stdset="0">
+          <string>empty=&quot;Unit&quot;</string>
+         </property>
         </widget>
        </item>
        <item row="14" column="0">
@@ -382,6 +385,9 @@
          </property>
          <property name="Type" stdset="0">
           <string>1</string>
+         </property>
+         <property name="Check" stdset="0">
+          <string>empty=&quot;Group&quot;</string>
          </property>
         </widget>
        </item>

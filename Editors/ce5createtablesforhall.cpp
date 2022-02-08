@@ -31,7 +31,7 @@ void CE5CreateTablesForHall::on_btnCreate_clicked()
         return;
     }
     C5Database db(fDBParams);
-    for (int i = ui->leStart->getInteger(); i < ui->leCount->getInteger() + 1; i++) {
+    for (int i = ui->leStart->getInteger(); i < ui->leStart->getInteger() + ui->leCount->getInteger() + 1; i++) {
         db[":f_hall"] = ui->leHall->getInteger();
         db[":f_name"] = ui->lePrefix->text() + QString::number(i);
         db[":f_lock"] = 0;
