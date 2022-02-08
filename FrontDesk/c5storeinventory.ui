@@ -176,7 +176,7 @@
         </property>
         <property name="icon">
          <iconset resource="../resources/res.qrc">
-          <normaloff>:/wifi.png</normaloff>:/wifi.png</iconset>
+          <normaloff>:/wifib.png</normaloff>:/wifib.png</iconset>
         </property>
         <property name="checkable">
          <bool>true</bool>
