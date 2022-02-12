@@ -91,7 +91,7 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
     fCanChangeFocus = true;
     ui->tblAdd->setColumnWidths(ui->tblAdd->columnCount(), 0, 300, 80);
     ui->leComplectationQty->setValidator(new QDoubleValidator(0, 999999999, 3));
-    if (!__user->check(cp_t1_deny_change_store_doc_date)) {
+    if (__user->check(cp_t1_deny_change_store_doc_date)) {
         ui->deDate->setEnabled(false);
     }
     ui->btnRememberStoreIn->setChecked(__c5config.getRegValue("storedoc_storeinput").toBool());
@@ -1250,7 +1250,7 @@ void C5StoreDoc::loadGoodsInput()
     ui->tblGoodsStore->clearContents();
     ui->tblGoodsStore->setRowCount(0);
     C5Database db(fDBParams);
-    db.exec(QString("select g.f_id, g.f_group, concat(g.f_name, ' ', g.f_scancode) as f_goodsname, "
+    db.exec(QString("select g.f_id, g.f_group, concat(g.f_name, if (g.f_scancode is null, '', concat(' ', g.f_scancode))) as f_goodsname, "
                     "u.f_name as f_unitname, "
                     "sum(s.f_qty*s.f_type) as f_qty, sum(s.f_total*s.f_type) as f_amount "
                     "from c_goods g "
@@ -1258,7 +1258,8 @@ void C5StoreDoc::loadGoodsInput()
                     "left join a_header d on d.f_id=s.f_document and d.f_date<=%2 "
                     "inner join c_groups gg on gg.f_id=g.f_group "
                     "inner join c_units u on u.f_id=g.f_unit "
-                    "group by 1, 2, 3, 4 ")
+                    "group by 1, 2, 3, 4 "
+                    "having sum(s.f_qty*s.f_type) > 0.00001 ")
             .arg(ui->leStoreInput->getInteger())
             .arg(ui->deDate->toMySQLDate()));
     while (db.nextRow()) {

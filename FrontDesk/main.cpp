@@ -1,6 +1,7 @@
 #include "c5mainwindow.h"
 #include "c5connection.h"
 #include "c5license.h"
+#include "c5systempreference.h"
 #include <QMessageBox>
 #include <QApplication>
 #include <QTranslator>
@@ -19,6 +20,10 @@ int main(int argc, char *argv[])
     libPath << qApp->applicationDirPath() + "/imageformats";
     QCoreApplication::setLibraryPaths(libPath);
 #endif
+
+    if (!C5SystemPreference::checkDecimalPointAndSeparator()) {
+        return 0;
+    }
 
     QApplication a(argc, argv);
     QString err;

@@ -53,6 +53,7 @@ SOURCES += \
     ../Cafe5/c5license.cpp \
     ../Cafe5/c5licensedlg.cpp \
     ../Cafe5/c5logsystem.cpp \
+    ../Cafe5/c5systempreference.cpp \
     ../Cafe5/calendar.cpp \
     ../Classes/c5combodelegate.cpp \
     ../Classes/c5crypt.cpp \
@@ -212,6 +213,7 @@ HEADERS += \
     ../Cafe5/c5license.h \
     ../Cafe5/c5licensedlg.h \
     ../Cafe5/c5logsystem.h \
+    ../Cafe5/c5systempreference.h \
     ../Cafe5/calendar.h \
     ../Classes/barcode5.h \
     ../Classes/c5combodelegate.h \

@@ -52,6 +52,7 @@ SOURCES += \
     ../Cafe5/c5licensedlg.cpp \
     ../Cafe5/c5logsystem.cpp \
     ../Cafe5/c5serverhandler.cpp \
+    ../Cafe5/c5systempreference.cpp \
     ../Cafe5/calendar.cpp \
     ../Cafe5/dlgexitbyversion.cpp \
     ../Classes/QRCodeGenerator.cpp \
@@ -165,6 +166,7 @@ HEADERS += \
     ../Cafe5/c5licensedlg.h \
     ../Cafe5/c5logsystem.h \
     ../Cafe5/c5serverhandler.h \
+    ../Cafe5/c5systempreference.h \
     ../Cafe5/calendar.h \
     ../Cafe5/dlgexitbyversion.h \
     ../Classes/QRCodeGenerator.h \

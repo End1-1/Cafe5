@@ -2,5 +2,6 @@
 #define CHATMESSAGE_H
 
 #define MSG_GOODS_RESERVE 1
+#define MSG_PRINT_TAX 2
 
 #endif // CHATMESSAGE_H

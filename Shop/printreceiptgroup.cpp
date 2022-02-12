@@ -85,7 +85,7 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
             "if (gc.f_base is null, t2.f_name, t1.f_name) as f_goods, "
             "sum(if(gc.f_base is null, ad.f_qty, gc.f_qty*ad.f_qty)) as f_qty, "
             "if(gc.f_base is null, %1, %2) as f_price, "
-            "sum(if(gc.f_base is null, %1*ad.f_qty, %2*(gc.f_qty*ad.f_qty))) as f_total "
+            "sum(if(gc.f_base is null, %1*ad.f_qty, %2*(gc.f_qty*ad.f_qty))) as f_total %3 "
             "from o_goods ad "
             "left join c_goods_complectation gc on gc.f_base=ad.f_goods "
             "left join c_goods g on g.f_id=gc.f_goods "
@@ -94,8 +94,12 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
             "left join c_groups t1 on t1.f_id=g.f_group "
             "left join c_groups t2 on t2.f_id=g2.f_group "
             "where oh.f_id=:f_header and g2.f_unit=10 "
-            "group by 1, 3 "
-            "order by ad.f_row ").arg(price1).arg(price2));
+            "group by 1, 3 %4 "
+            "order by ad.f_row ")
+            .arg(price1)
+            .arg(price2)
+            .arg(__c5config.getValue(param_shop_print_dontgroup).toInt() == 0 ? "" : ",ad.f_id")
+            .arg(__c5config.getValue(param_shop_print_dontgroup).toInt() == 0 ? "" : ",5"));
     QList<QList<QVariant> > data;
     while (db.nextRow()) {
         QList<QVariant> v;
@@ -115,14 +119,17 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
         break;
     }
     db[":f_header"] = id;
-    db.exec(QString("select t1.f_name as f_goods, sum(ad.f_qty) as f_qty, %1,  sum(%1*ad.f_qty) as f_total "
+    db.exec(QString("select t1.f_name as f_goods, sum(ad.f_qty) as f_qty, %1,  sum(%1*ad.f_qty) as f_total %3 "
             "from o_goods ad "
             "left join c_goods g on g.f_id=ad.f_goods "
             "inner join o_header oh on oh.f_id=ad.f_header "
             "left join c_groups t1 on t1.f_id=g.f_group "
             "where oh.f_id=:f_header and g.f_unit<>10 "
-            "group by 1, 3 "
-            "order by ad.f_row ").arg(price1));
+            "group by 1, 3 %4 "
+            "order by ad.f_row ")
+            .arg(price1)
+            .arg(__c5config.getValue(param_shop_print_dontgroup).toInt() == 0 ? "" : ",ad.f_id")
+            .arg(__c5config.getValue(param_shop_print_dontgroup).toInt() == 0 ? "" : ",4"));
     while (db.nextRow()) {
         QList<QVariant> v;
         for (int i = 0; i < db.columnCount(); i++) {
@@ -378,7 +385,7 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
             "if (gc.f_base is null, g2.f_scancode, g.f_scancode) as f_goods, "
             "sum(if(gc.f_base is null, ad.f_qty, gc.f_qty*ad.f_qty)) as f_qty, "
             "if(gc.f_base is null, %1, %2) as f_price, "
-            "sum(if(gc.f_base is null, %1*ad.f_qty, %2*(gc.f_qty*ad.f_qty))) as f_total "
+            "sum(if(gc.f_base is null, %1*ad.f_qty, %2*(gc.f_qty*ad.f_qty))) as f_total %3 "
             "from o_goods ad "
             "left join c_goods_complectation gc on gc.f_base=ad.f_goods "
             "left join c_goods g on g.f_id=gc.f_goods "
@@ -387,8 +394,12 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
             "left join c_groups t1 on t1.f_id=g.f_group "
             "left join c_groups t2 on t2.f_id=g2.f_group "
             "where oh.f_id=:f_header and g2.f_unit=10 "
-            "group by 1, 3 "
-            "order by ad.f_row ").arg(price1).arg(price2));
+            "group by 1, 3 %4 "
+            "order by ad.f_row ")
+            .arg(price1)
+            .arg(price2)
+            .arg(__c5config.getValue(param_shop_print_dontgroup).toInt() == 0 ? "" : ",ad.f_id")
+            .arg(__c5config.getValue(param_shop_print_dontgroup).toInt() == 0 ? "" : ",4"));
     QList<QList<QVariant> > data;
     while (db.nextRow()) {
         QList<QVariant> v;
@@ -412,14 +423,18 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
     if (__c5config.getValue(param_print_scancode_with_name).toInt() == 1) {
         goodsNameField = "concat(g.f_name, ' ', g.f_scancode) as f_goods";
     }
-    db.exec(QString("select %1, sum(ad.f_qty) as f_qty, %2,  sum(%2*ad.f_qty) as f_total "
+    db.exec(QString("select %1, sum(ad.f_qty) as f_qty, %2,  sum(%2*ad.f_qty) as f_total %3 "
             "from o_goods ad "
             "left join c_goods g on g.f_id=ad.f_goods "
             "inner join o_header oh on oh.f_id=ad.f_header "
             "left join c_groups t1 on t1.f_id=g.f_group "
             "where oh.f_id=:f_header and g.f_unit<>10 "
-            "group by 1, 3 "
-            "order by ad.f_row ").arg(goodsNameField).arg(price1));
+            "group by 1, 3 %4 "
+            "order by ad.f_row ")
+            .arg(goodsNameField)
+            .arg(price1)
+            .arg(__c5config.getValue(param_shop_print_dontgroup).toInt() == 0 ? "" : ",ad.f_id")
+            .arg(__c5config.getValue(param_shop_print_dontgroup).toInt() == 0 ? "" : ",5"));
     while (db.nextRow()) {
         QList<QVariant> v;
         for (int i = 0; i < db.columnCount(); i++) {

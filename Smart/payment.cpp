@@ -383,6 +383,10 @@ bool payment::printTax(double cardAmount, bool useextpos)
     db[":f_err"] = err;
     db[":f_result"] = result;
     db.insert("o_tax_log", false);
+    if (__c5config.getValue(param_debuge_mode).toInt() == 1) {
+        QSqlQuery q(db.fDb);
+        pt.saveTimeResult(fOrderUUID, q);
+    }
     if (result == pt_err_ok) {
         QString sn, firm, address, fiscal, hvhh, rseq, devnum, time;
         PrintTaxN::parseResponse(jsonOut, firm, hvhh, fiscal, rseq, sn, address, devnum, time);
@@ -452,13 +456,18 @@ void payment::on_btnCheckoutIdram_clicked()
             return;
         }
         QByteArray ba = r->readAll();
-
+        qDebug() << ba;
+#ifdef QT_DEBUG
+        ba = QString("{\"Result\":[{\"TRANSACTION_ID\":\"22021100127207\",\"TR_DATE\":\"11/02/2022 10:21\",\"SRC_STATUS\":\"0\",\"COR_ACCOUNT_ID\":\"356943140\",\"REF_NUM\":\"\",\"DEBIT\":\"%1\",\"CREDIT\":\"0.00\",\"COMM\":\"0.00\",\"OPERATION_NAME\":\"\",\"COR_ACCOUNT_NAME\":\"\",\"EXT_TR_ID\":null}],\"OpCode\":0,\"OpDesc\":\"Err:EN-0\"}")
+                .arg("1,500.00").toUtf8();
+#endif
         QJsonDocument jdoc = QJsonDocument::fromJson(ba);
         QJsonObject jo = jdoc.object();
         qDebug() << jo;
         QJsonArray ja = jo["Result"].toArray();
         if (ja.count() > 0) {
             QString DEBIT = ja.at(0)["DEBIT"].toString();
+            DEBIT.replace(",", " ");
             if (str_float(DEBIT) > 0.01) {
                 checkout(false, true);
             } else {

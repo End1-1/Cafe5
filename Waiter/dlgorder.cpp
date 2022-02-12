@@ -2613,6 +2613,7 @@ void DlgOrder::on_btnPaymentIdram_clicked()
         QJsonArray ja = jo["Result"].toArray();
         if (ja.count() > 0) {
             QString DEBIT = ja.at(0)["DEBIT"].toString();
+            DEBIT.replace(",", "");
             ui->leIDRAM->setDouble(str_float(DEBIT));
             ui->leCash->setText("0");
             ui->leCard->setText("0");

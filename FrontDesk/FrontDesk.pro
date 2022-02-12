@@ -38,6 +38,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Cafe5/c5license.cpp \
     ../Cafe5/c5licensedlg.cpp \
     ../Cafe5/c5replication.cpp \
+    ../Cafe5/c5systempreference.cpp \
     ../Classes/c5crypt.cpp \
     ../Classes/c5document.cpp \
     ../Classes/c5filelogwriter.cpp \
@@ -50,6 +51,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Classes/doubledatabase.cpp \
     ../Classes/notificationwidget.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
+    ../Classes/threadsendmessage.cpp \
     ../Controls/c5guicontrols.cpp \
     ../Controls/c5tablewithtotal.cpp \
     ../DbData/datadriver.cpp \
@@ -88,6 +90,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Editors/ce5storereason.cpp \
     ../Forms/c5filtervalues.cpp \
     ../Forms/c5salarydoc.cpp \
+    ../Forms/c5selecttaxprintdialog.cpp \
     ../Forms/c5storedoc.cpp \
     ../Forms/c5waiterorder.cpp \
     ../Reports/c5customfilter.cpp \
@@ -290,6 +293,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Cafe5/c5license.h \
     ../Cafe5/c5licensedlg.h \
     ../Cafe5/c5replication.h \
+    ../Cafe5/c5systempreference.h \
     ../Classes/barcode5.h \
     ../Classes/c5broadcasting.h \
     ../Classes/c5crypt.h \
@@ -301,9 +305,11 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Classes/c5threadobject.h \
     ../Classes/c5user.h \
     ../Classes/calculator.h \
+    ../Classes/chatmessage.h \
     ../Classes/doubledatabase.h \
     ../Classes/notificationwidget.h \
     ../Classes/proxytablewidgetdatabase.h \
+    ../Classes/threadsendmessage.h \
     ../Controls/c5guicontrols.h \
     ../Controls/c5tablewithtotal.h \
     ../DbData/datadriver.h \
@@ -342,6 +348,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Editors/ce5storereason.h \
     ../Forms/c5filtervalues.h \
     ../Forms/c5salarydoc.h \
+    ../Forms/c5selecttaxprintdialog.h \
     ../Forms/c5storedoc.h \
     ../Forms/c5waiterorder.h \
     ../Reports/c5customfilter.h \
@@ -557,6 +564,7 @@ FORMS += \
     ../Editors/ce5storereason.ui \
     ../Forms/c5filtervalues.ui \
     ../Forms/c5salarydoc.ui \
+    ../Forms/c5selecttaxprintdialog.ui \
     ../Forms/c5storedoc.ui \
     ../Forms/c5waiterorder.ui \
     ../Reports/c5customfilter.ui \

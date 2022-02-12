@@ -28,6 +28,7 @@ void DlgStaffList::searchStaff(const QString &txt)
     ui->tbl->setColumnCount(property("cols").toInt());
     ui->tbl->setRowCount(0);
     int c = 0, r = 0;
+    dbuser->refresh();
     for (int id: dbuser->list()) {
         if (!txt.isEmpty()) {
             if (!dbuser->fullName(id).contains(txt, Qt::CaseInsensitive)) {
