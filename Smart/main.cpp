@@ -1,5 +1,6 @@
 #include "workspace.h"
 #include "c5config.h"
+#include "c5systempreference.h"
 #include <QFile>
 #include <QLockFile>
 #include "c5connection.h"
@@ -21,6 +22,10 @@ int main(int argc, char *argv[])
     libPath << a.applicationDirPath() + "/imageformats";
     QCoreApplication::setLibraryPaths(libPath);
 #endif
+
+    if (!C5SystemPreference::checkDecimalPointAndSeparator()) {
+        return 0;
+    }
 
     QDir d;
     QFile file(d.homePath() + "/" + _APPLICATION_ + "/lock.pid");

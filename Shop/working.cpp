@@ -115,7 +115,9 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
             ui->leCode->clear();
             w = static_cast<WOrder*>(ui->tab->currentWidget());
             if (w) {
-                w->changeQty();
+                if (__c5config.getValue(param_shop_deny_qtychange).toInt() == 0) {
+                    w->changeQty();
+                }
             }
             event->accept();
             return true;

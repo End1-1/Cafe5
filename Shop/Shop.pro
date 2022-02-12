@@ -87,6 +87,7 @@ SOURCES += \
     ../Classes/notificationwidget.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
     ../Classes/rkeyboard.cpp \
+    ../Classes/threadsendmessage.cpp \
     ../Controls/c5graphicsview.cpp \
     ../Controls/c5guicontrols.cpp \
     ../Controls/c5tablewithtotal.cpp \
@@ -138,7 +139,6 @@ SOURCES += \
     taxprint.cpp \
     threadcheckmessage.cpp \
     threadreadmessage.cpp \
-    threadsendmessage.cpp \
     threadworker.cpp \
     userphoto.cpp \
     viewinputitem.cpp \
@@ -220,12 +220,14 @@ HEADERS += \
     ../Classes/c5widget.h \
     ../Classes/c5witerconf.h \
     ../Classes/calculator.h \
+    ../Classes/chatmessage.h \
     ../Classes/checkforupdatethread.h \
     ../Classes/doubledatabase.h \
     ../Classes/fileversion.h \
     ../Classes/notificationwidget.h \
     ../Classes/proxytablewidgetdatabase.h \
     ../Classes/rkeyboard.h \
+    ../Classes/threadsendmessage.h \
     ../Controls/c5graphicsview.h \
     ../Controls/c5guicontrols.h \
     ../Controls/c5tablewithtotal.h \
@@ -255,7 +257,6 @@ HEADERS += \
     ../DbData/dbunit.h \
     ../DbData/dbusers.h \
     cashcollection.h \
-    chatmessage.h \
     dlgdate.h \
     dlggoodslist.h \
     dlgpin.h \
@@ -278,7 +279,6 @@ HEADERS += \
     taxprint.h \
     threadcheckmessage.h \
     threadreadmessage.h \
-    threadsendmessage.h \
     threadworker.h \
     userphoto.h \
     viewinputitem.h \

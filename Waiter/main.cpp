@@ -5,6 +5,7 @@
 #include "datadriver.h"
 #include "dlgscreen.h"
 #include "c5menu.h"
+#include "c5systempreference.h"
 #include <QApplication>
 #include <QTranslator>
 #include <QFile>
@@ -29,6 +30,10 @@ int main(int argc, char *argv[])
     libPath << qApp->applicationDirPath() + "/imageformats";
     QCoreApplication::setLibraryPaths(libPath);
 #endif
+
+    if (!C5SystemPreference::checkDecimalPointAndSeparator()) {
+        return 0;
+    }
 
     QDir d;
     QFile file(d.homePath() + "/" + _APPLICATION_ + "/lock.pid");

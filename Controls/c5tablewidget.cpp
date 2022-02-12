@@ -13,6 +13,12 @@ C5TableWidget::C5TableWidget(QWidget *parent) :
     QTableWidget(parent)
 {
     setEditTriggers(NoEditTriggers);
+    if (!property("columns").toString().isEmpty()) {
+        QStringList cols = property("columns").toString().split(",", Qt::SkipEmptyParts);
+        for (int i = 0; i < cols.count(); i++) {
+            setColumnWidth(i, cols.at(i).toInt());
+        }
+    }
 }
 
 C5TableWidgetItem *C5TableWidget::item(int row, int column) const

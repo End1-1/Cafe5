@@ -82,6 +82,9 @@
 #define param_no_tax 78
 #define param_waiter_closeorder_after_serviceprint 79
 #define param_frontdesk_scale_dir 80
+#define param_shop_deny_qtychange 81
+#define param_shop_print_dontgroup 82
+#define param_debuge_mode 83
 
 #define FRONTDESK_WAITER 0
 #define FRONTDESK_SHOP 1

@@ -66,7 +66,14 @@ int StoreManager::queryQty(int store, const QStringList &sku, QMap<QString, doub
     while (db.next()) {
         out.insert(fInstance->fCodeSkuMap.value(db.integerValue("f_goods")), db.doubleValue("f_qty"));
     }
-    db.exec("select f_goods, sum(f_qty) as f_qty from a_store_reserve where f_state=1 and f_enddate>=current_date group by 1");
+    sql = "select f_goods, sum(f_qty) as f_qty from a_store_reserve where f_state=1 and f_enddate>=current_date %store group by 1";
+    if (store == 0) {
+        QString storelist = ConfigIni::value("shop/store") + "," + ConfigIni::value("shop/storeorder");
+        sql.replace("%store", QString("and f_store in (%1)").arg(storelist));
+    } else {
+        sql.replace("%store", QString("and f_store=%1").arg(store));
+    }
+    db.exec(sql);
     while (db.next()) {
         if (out.contains(fInstance->fCodeSkuMap.value(db.integerValue("f_goods")))) {
             out[fInstance->fCodeSkuMap.value(db.integerValue("f_goods"))] = out[fInstance->fCodeSkuMap.value(db.integerValue("f_goods"))] - db.doubleValue("f_qty");
