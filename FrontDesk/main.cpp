@@ -21,14 +21,14 @@ int main(int argc, char *argv[])
     QCoreApplication::setLibraryPaths(libPath);
 #endif
 
-    if (!C5SystemPreference::checkDecimalPointAndSeparator()) {
-        return 0;
-    }
-
     QApplication a(argc, argv);
     QString err;
     if (!C5License::isOK(err)) {
         QMessageBox::critical(0, QObject::tr("Application error"), err);
+        return 0;
+    }
+
+    if (!C5SystemPreference::checkDecimalPointAndSeparator()) {
         return 0;
     }
 
