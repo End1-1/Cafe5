@@ -19,6 +19,8 @@ public:
     ~DlgReservGoods();
 
 private slots:
+    void messageResult(const QJsonObject &jo);
+
     void on_btnClose_clicked();
 
     void on_btnSave_clicked();

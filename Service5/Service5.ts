@@ -165,19 +165,32 @@
 <context>
     <name>PrintTaxN</name>
     <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="44"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="28"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="84"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="92"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="340"/>
+        <source>Connection error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="40"/>
         <source>You should to setup cashier and pin before to use fiscal printer</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="88"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="84"/>
         <source>Socket read error</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="96"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="92"/>
         <source>Data read timeout</source>
         <translation></translation>
+    </message>
+    <message>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="338"/>
+        <source>Tax error code</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

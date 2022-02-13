@@ -22,6 +22,8 @@ public:
 
     static bool printCheckWithTax(C5Database &db, const QString &id, QString &rseq);
 
+    static bool printReceipt(const QString &id);
+
 private slots:
     void on_btnDateLeft_clicked();
 

@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QSslSocket>
+#include <QJsonObject>
 
 class ThreadSendMessage : public QObject
 {
@@ -13,9 +14,19 @@ public:
     void send(int recipient, const QString &message);
 
 protected slots:
+    void start();
+
     void err(QAbstractSocket::SocketError e);
 
+private:
+    int fRecipient;
+
+    QString fMessage;
+
 signals:
+    void finished();
+
+    void result(const QJsonObject &);
 
 };
 

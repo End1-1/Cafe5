@@ -89,8 +89,8 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Editors/ce5packagelist.cpp \
     ../Editors/ce5storereason.cpp \
     ../Forms/c5filtervalues.cpp \
+    ../Forms/c5printtaxanywhere.cpp \
     ../Forms/c5salarydoc.cpp \
-    ../Forms/c5selecttaxprintdialog.cpp \
     ../Forms/c5storedoc.cpp \
     ../Forms/c5waiterorder.cpp \
     ../Reports/c5customfilter.cpp \
@@ -347,8 +347,8 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Editors/ce5packagelist.h \
     ../Editors/ce5storereason.h \
     ../Forms/c5filtervalues.h \
+    ../Forms/c5printtaxanywhere.h \
     ../Forms/c5salarydoc.h \
-    ../Forms/c5selecttaxprintdialog.h \
     ../Forms/c5storedoc.h \
     ../Forms/c5waiterorder.h \
     ../Reports/c5customfilter.h \
@@ -563,8 +563,8 @@ FORMS += \
     ../Editors/ce5packagelist.ui \
     ../Editors/ce5storereason.ui \
     ../Forms/c5filtervalues.ui \
+    ../Forms/c5printtaxanywhere.ui \
     ../Forms/c5salarydoc.ui \
-    ../Forms/c5selecttaxprintdialog.ui \
     ../Forms/c5storedoc.ui \
     ../Forms/c5waiterorder.ui \
     ../Reports/c5customfilter.ui \

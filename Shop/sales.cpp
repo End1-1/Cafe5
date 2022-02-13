@@ -15,6 +15,7 @@
 #include "c5printpreview.h"
 #include "c5user.h"
 #include "c5printing.h"
+#include "c5printtaxanywhere.h"
 #include "dlgdate.h"
 
 #define VM_TOTAL 0
@@ -171,6 +172,34 @@ bool Sales::printCheckWithTax(C5Database &db, const QString &id, QString &rseq)
         C5Message::error(err + "<br>" + jsonOut + "<br>" + jsonIn);
     }
     return resultb;
+}
+
+bool Sales::printReceipt(const QString &id)
+{
+    if (!C5Config::localReceiptPrinter().isEmpty()) {
+        C5Database db(C5Config::dbParams());
+        PrintReceiptGroup p;
+        switch (C5Config::shopPrintVersion()) {
+        case 1: {
+            bool p1, p2;
+            if (SelectPrinters::selectPrinters(p1, p2)) {
+                if (p1) {
+                    p.print(id, db, 1);
+                }
+                if (p2) {
+                    p.print(id, db, 2);
+                }
+            }
+            break;
+        }
+        case 2:
+            p.print2(id, db);
+            break;
+        default:
+            break;
+        }
+    }
+    return true;
 }
 
 void Sales::on_btnDateLeft_clicked()
@@ -626,45 +655,11 @@ void Sales::on_btnDateRight_clicked()
 
 void Sales::on_btnPrint_clicked()
 {
-    C5Database db(C5Config::dbParams());
     QModelIndexList ml = ui->tbl->selectionModel()->selectedRows();
     if (ml.count() == 0) {
         return;
     }
-    if (!C5Config::localReceiptPrinter().isEmpty()) {
-        PrintReceiptGroup p;
-        switch (C5Config::shopPrintVersion()) {
-        case 1: {
-            bool p1, p2;
-            if (SelectPrinters::selectPrinters(p1, p2)) {
-                if (p1) {
-                    p.print(ui->tbl->getString(ml.at(0).row(), 1), db, 1);
-                }
-                if (p2) {
-                    p.print(ui->tbl->getString(ml.at(0).row(), 1), db, 2);
-                }
-            }
-            break;
-        }
-        case 2:
-            p.print2(ui->tbl->getString(ml.at(0).row(), 1), db);
-            break;
-        default:
-            break;
-        }
-    }
-//    bool p1, p2;
-//    if (SelectPrinters::selectPrinters(p1, p2)) {
-//        PrintReceiptGroup p;
-//        C5Database db(C5Config::dbParams());
-//        if (p1) {
-//            p.print(ui->tbl->getString(ml.at(0).row(), 0), db, 1);
-//        }
-//        if (p2) {
-//            p.print(ui->tbl->getString(ml.at(0).row(), 0), db, 2);
-//        }
-//        //p.print2(oheaderid, db);
-//    }
+    printReceipt(ui->tbl->getString(ml.at(0).row(), 1));
 }
 
 void Sales::on_btnItemBack_clicked()
@@ -745,8 +740,17 @@ void Sales::on_btnPrintTax_clicked()
     }
     QString id = ui->tbl->getString(ml.at(0).row(), 1);
     QString rseq;
-    C5Database db(__c5config.replicaDbParams());
-    printCheckWithTax(db, id, rseq);
+    if (__c5config.taxPort() == 0) {
+        auto *p = new C5PrintTaxAnywhere(__c5config.replicaDbParams(), id);
+        if (p->exec() == QDialog::Accepted) {
+            rseq = p->fReceiptNumber;
+        }
+        p->deleteLater();
+        printReceipt(id);
+    } else {
+        C5Database db(__c5config.replicaDbParams());
+        printCheckWithTax(db, id, rseq);
+    }
     ui->tbl->setString(ml.at(0).row(), 6, rseq);
 }
 

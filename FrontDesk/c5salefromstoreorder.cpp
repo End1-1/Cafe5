@@ -3,7 +3,7 @@
 #include "c5mainwindow.h"
 #include "c5storedraftwriter.h"
 #include "printtaxn.h"
-#include "c5selecttaxprintdialog.h"
+#include "c5printtaxanywhere.h"
 #include "c5cache.h"
 #include <QMenu>
 #include <QClipboard>
@@ -146,9 +146,9 @@ void C5SaleFromStoreOrder::on_btnRemove_clicked()
 void C5SaleFromStoreOrder::on_btnPrintTax_clicked()
 {
 
-    auto *d = new C5SelectTaxPrintDialog(ui->leUUID->text(), fDBParams);
+    auto *d = new C5PrintTaxAnywhere(fDBParams, ui->leUUID->text());
     d->exec();
-    delete d;
+    d->deleteLater();
     return;
     C5Database db(fDBParams);
     PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);

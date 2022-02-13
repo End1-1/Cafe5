@@ -116,6 +116,7 @@ SOURCES += \
     ../DbData/dbtables.cpp \
     ../DbData/dbunit.cpp \
     ../DbData/dbusers.cpp \
+    ../Forms/c5printtaxanywhere.cpp \
     cashcollection.cpp \
     dlgdate.cpp \
     dlggoodslist.cpp \
@@ -256,6 +257,7 @@ HEADERS += \
     ../DbData/dbtables.h \
     ../DbData/dbunit.h \
     ../DbData/dbusers.h \
+    ../Forms/c5printtaxanywhere.h \
     cashcollection.h \
     dlgdate.h \
     dlggoodslist.h \
@@ -312,6 +314,7 @@ FORMS += \
     ../Classes/notificationwidget.ui \
     ../Classes/rkeyboard.ui \
     ../Controls/c5tablewithtotal.ui \
+    ../Forms/c5printtaxanywhere.ui \
     cashcollection.ui \
     dlgdate.ui \
     dlggoodslist.ui \
@@ -349,6 +352,7 @@ INCLUDEPATH += ../Classes
 INCLUDEPATH += ../Cache
 INCLUDEPATH += ../Controls
 INCLUDEPATH += ../DbData
+INCLUDEPATH += ../Forms
 INCLUDEPATH += ../Service
 INCLUDEPATH += ../Service5
 INCLUDEPATH += ../RESOURCES

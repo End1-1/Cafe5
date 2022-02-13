@@ -1,12 +1,26 @@
 #include "threadsendmessage.h"
 #include "c5config.h"
+#include <QThread>
 
-ThreadSendMessage::ThreadSendMessage(QObject *parent) : QObject(parent)
+ThreadSendMessage::ThreadSendMessage(QObject *parent) :
+    QObject(parent)
 {
 
 }
 
 void ThreadSendMessage::send(int recipient, const QString &message)
+{
+    fRecipient = recipient;
+    fMessage = message;
+    auto *t = new QThread();
+    connect(t, SIGNAL(finished()), t, SLOT(deleteLater()));
+    connect(t, SIGNAL(started()), this, SLOT(start()));
+    connect(this, SIGNAL(finished()), t, SLOT(quit()));
+    moveToThread(t);
+    t->start();
+}
+
+void ThreadSendMessage::start()
 {
     QString url = QString("POST /chat HTTP/1.1\r\n"
             "Content-Type: multipart/form-data; boundary=--hdhdhdjfjfjgkgk85858\r\n"
@@ -37,13 +51,14 @@ void ThreadSendMessage::send(int recipient, const QString &message)
             "----hdhdhdjfjfjgkgk85858\r\n")
             .arg(__c5config.httpServerUsername())
             .arg(__c5config.httpServerPassword())
-            .arg(recipient)
-            .arg(message);
+            .arg(fRecipient)
+            .arg(fMessage);
     url.replace("%content-length%", QString::number(body.toUtf8().length()));
     auto *s = new QSslSocket(this);
-    connect(s, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(err(QAbstractSocket::SocketError)));
+    //connect(s, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(err(QAbstractSocket::SocketError)));
     s->addCaCertificate(fSslCertificate);
     s->setPeerVerifyMode(QSslSocket::VerifyNone);
+    QJsonObject jo;
     s->connectToHostEncrypted(__c5config.httpServerIP(), __c5config.httpServerPort());
     if (s->waitForEncrypted(5000)) {
         s->write(url.toUtf8());
@@ -52,13 +67,27 @@ void ThreadSendMessage::send(int recipient, const QString &message)
         } else {
         }
         s->waitForReadyRead();
-        qDebug() << s->readAll();
+        QString reply = s->readAll();
+        int msgbodystart = reply.indexOf("\r\n\r\n") + 4;
+        jo["status"] = 0;
+        jo["data"] = reply.mid(msgbodystart, reply.length() - msgbodystart);
         s->close();
+    } else {
+        jo["status"] = 1;
+        jo["data"] = s->errorString();
     }
     s->deleteLater();
+    emit result(jo);
+    emit finished();
 }
 
 void ThreadSendMessage::err(QAbstractSocket::SocketError e)
 {
-    qDebug() << e;
+    Q_UNUSED(e);
+    auto *s = static_cast<QTcpSocket*>(sender());
+    QJsonObject jo;
+    jo["status"] = 1;
+    jo["data"] = s->errorString();
+    emit result(jo);
+    emit finished();
 }

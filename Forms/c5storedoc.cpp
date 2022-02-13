@@ -19,6 +19,7 @@
 #include <QMenu>
 #include <QHash>
 #include <QClipboard>
+#include <QInputDialog>
 #include <QJsonParseError>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -1378,6 +1379,47 @@ void C5StoreDoc::updateCashDoc()
     delete doc;
 }
 
+void C5StoreDoc::addGoodsByCalculation(int goods, const QString &name, double qty)
+{
+    QJsonArray ja;
+    C5Database db(fDBParams);
+    db[":f_dish"] = goods;
+    db.exec("select f_goods, f_qty from d_recipes where f_dish=:f_dish");
+    int r;
+    auto *c = C5Cache::cache(fDBParams, cache_goods);
+    while (db.nextRow()) {
+        QList<QVariant> vg = c->getValuesForId(db.getInt("f_goods"));
+        r = -1;
+        for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+            if (ui->tblGoods->getInteger(i, 3) == db.getInt("f_goods")) {
+                r = i;
+                break;
+            }
+        }
+        if (r < 0) {
+            r = addGoodsRow();
+        }
+        ui->tblGoods->setString(r, 3, vg.at(0).toString());
+        ui->tblGoods->setString(r, 4, vg.at(2).toString());
+        ui->tblGoods->setString(r, 6, vg.at(3).toString());
+        ui->tblGoods->lineEdit(r, 7)->setPlaceholderText(float_str(vg.at(5).toDouble() , 2));
+        //ui->tblGoods->lineEdit(r, 5)->setDouble(db.getDouble("f_qty") * qty);
+        QJsonObject jo;
+        jo["f_goods"] = db.getInt("f_goods");
+        jo["f_qty"] = db.getDouble("f_qty");
+        jo["f_row"] = r;
+        jo["f_prevqty"] = 0;
+        ja.append(jo);
+    }
+    r = ui->tblDishes->addEmptyRow();
+    ui->tblDishes->setInteger(r, 1, goods);
+    ui->tblDishes->setString(r, 2, name);
+    ui->tblDishes->createLineEdit(r, 3)->setFocus();
+    ui->tblDishes->setString(r, 4, QJsonDocument(ja).toJson());
+    connect(ui->tblDishes->lineEdit(r, 3), SIGNAL(textChanged(QString)), this, SLOT(tblDishQtyChanged(QString)));
+    ui->tblDishes->lineEdit(r, 3)->setDouble(qty);
+}
+
 void C5StoreDoc::lineEditKeyPressed(const QChar &key)
 {
     switch (key.toLatin1()) {
@@ -1892,9 +1934,27 @@ void C5StoreDoc::tblDishQtyChanged(const QString &arg1)
     }
     QJsonArray ja = QJsonDocument::fromJson(ui->tblDishes->getString(r, 4).toUtf8()).array();
     for (int i = 0; i < ja.count(); i++) {
+        bool found = false;
         QJsonObject jo = ja.at(i).toObject();
-        ui->tblGoods->lineEdit(jo["f_row"].toInt(), 5)->setDouble(jo["f_qty"].toDouble() * arg1.toDouble());
+        for (int j = 0; j < ui->tblGoods->rowCount(); j++) {
+            qDebug() << jo << ui->tblGoods->getInteger(j, 3);
+            if (ui->tblGoods->getInteger(j, 3) == jo["f_goods"].toInt()) {
+                ui->tblGoods->lineEdit(j, 5)->setDouble(ui->tblGoods->lineEdit(j, 5)->getDouble() - (jo["f_qty"].toDouble() * jo["f_prevqty"].toDouble()));
+                jo["f_prevqty"] = arg1.toDouble();
+                ui->tblGoods->lineEdit(j, 5)->setDouble(ui->tblGoods->lineEdit(j, 5)->getDouble() + (jo["f_qty"].toDouble() * jo["f_prevqty"].toDouble()));
+                ja[i] = jo;
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            int r = addGoodsRow();
+            ui->tblGoods->setString(r, 3, jo["f_goods"].toString());
+            ui->tblGoods->lineEdit(r, 5)->setDouble(jo["f_qty"].toDouble() * jo["f_prevqty"].toDouble());
+
+        }
     }
+    ui->tblDishes->setString(r, 4, QJsonDocument(ja).toJson());
 }
 
 void C5StoreDoc::tblQtyChanged(const QString &arg1)
@@ -2290,35 +2350,7 @@ void C5StoreDoc::on_btnAddDish_clicked()
         C5Message::error(tr("Could not add goods without code"));
         return;
     }
-    QJsonArray ja;
-    C5Database db(fDBParams);
-    db[":f_dish"] = vals.at(1);
-    db.exec("select f_goods, f_qty from d_recipes where f_dish=:f_dish");
-    int r;
-    auto *c = C5Cache::cache(fDBParams, cache_goods);
-    while (db.nextRow()) {
-        QList<QVariant> vg = c->getValuesForId(db.getInt("f_goods"));
-        if (vals.count() == 0) {
-            continue;
-        }
-        r = addGoodsRow();
-        ui->tblGoods->setString(r, 3, vg.at(0).toString());
-        ui->tblGoods->setString(r, 4, vg.at(2).toString());
-        ui->tblGoods->setString(r, 6, vg.at(3).toString());
-        ui->tblGoods->lineEdit(r, 7)->setPlaceholderText(float_str(vg.at(5).toDouble(), 2));
-        //ui->tblGoods->lineEdit(r, 5)->setDouble(db.getDouble("f_qty"));
-        QJsonObject jo;
-        jo["f_goods"] = db.getInt("f_goods");
-        jo["f_qty"] = db.getDouble("f_qty");
-        jo["f_row"] = r;
-        ja.append(jo);
-    }
-    r = ui->tblDishes->addEmptyRow();
-    ui->tblDishes->setString(r, 1, vals.at(1).toString());
-    ui->tblDishes->setString(r, 2, vals.at(2).toString());
-    ui->tblDishes->createLineEdit(r, 3)->setFocus();
-    ui->tblDishes->setString(r, 4, QJsonDocument(ja).toJson());
-    connect(ui->tblDishes->lineEdit(r, 3), SIGNAL(textChanged(QString)), this, SLOT(tblDishQtyChanged(QString)));
+    addGoodsByCalculation(vals.at(1).toInt(), vals.at(2).toString(), 0);
 }
 
 void C5StoreDoc::on_btnRemoveRows_clicked()
@@ -2331,17 +2363,19 @@ void C5StoreDoc::on_btnRemoveRows_clicked()
         return;
     }
     QJsonArray ja = QJsonDocument::fromJson(ui->tblDishes->getString(row, 4).toUtf8()).array();
-    QList<int> rows;
     for (int i = 0; i < ja.count(); i++) {
         QJsonObject jo = ja[i].toObject();
-        rows.append(jo["f_row"].toInt());
-    }
-    std::reverse(rows.begin(), rows.end());
-    for (int i: rows) {
-        ui->tblGoods->removeRow(i);
+        for (int j = 0; j < ui->tblGoods->rowCount(); j++) {
+            if (jo["f_goods"].toInt() == ui->tblGoods->getInteger(j, 3)) {
+                ui->tblGoods->lineEdit(j, 5)->setDouble(ui->tblGoods->lineEdit(j, 5)->getDouble() - (jo["f_prevqty"].toDouble() * jo["f_qty"].toDouble()));
+                if (ui->tblGoods->lineEdit(j, 5)->getDouble() < 0.001) {
+                    ui->tblGoods->removeRow(j);
+                }
+                break;
+            }
+        }
     }
     ui->tblDishes->removeRow(row);
-    correctDishesRows(row, rows.count());
     countTotal();
 }
 
@@ -2381,5 +2415,28 @@ void C5StoreDoc::on_btnFillRemote_clicked(bool checked)
     } else {
         ui->btnFillRemote->setIcon(QIcon(":/wifib.png"));
         __mainWindow->removeBroadcastListener(this);
+    }
+}
+
+void C5StoreDoc::on_btnAddPackages_clicked()
+{
+    QList<QVariant> vals;
+    if (!C5Selector::getValue(fDBParams, cache_dish_package, vals)) {
+        return;
+    }
+    if (vals.at(1).toInt() == 0) {
+        C5Message::error(tr("Could not add package without code"));
+        return;
+    }
+    bool ok = false;
+    double qty = QInputDialog::getDouble(this, tr("Qty of package"), "", 0, 1, 999999, 2, &ok);
+    if (!ok) {
+        return;
+    }
+    C5Database db(fDBParams);
+    db[":f_package"] = vals.at(1);
+    db.exec("select d.f_name, p.f_dish, p.f_qty from d_package_list p left join d_dish d on d.f_id=p.f_dish where f_package=:f_package");
+    while (db.nextRow()) {
+        addGoodsByCalculation(db.getInt("f_dish"), db.getString("f_name"), db.getDouble("f_qty") * qty);
     }
 }

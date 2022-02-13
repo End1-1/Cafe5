@@ -13,6 +13,7 @@ C5TableWidget::C5TableWidget(QWidget *parent) :
     QTableWidget(parent)
 {
     setEditTriggers(NoEditTriggers);
+    qDebug() << property("columns");
     if (!property("columns").toString().isEmpty()) {
         QStringList cols = property("columns").toString().split(",", Qt::SkipEmptyParts);
         for (int i = 0; i < cols.count(); i++) {

@@ -145,6 +145,8 @@ private:
 
     void updateCashDoc();
 
+    void addGoodsByCalculation(int goods, const QString &name, double qty);
+
 private slots:
     void lineEditKeyPressed(const QChar &key);
 
@@ -241,6 +243,8 @@ private slots:
     void on_btnCloseSearch_clicked();
 
     void on_btnFillRemote_clicked(bool checked);
+
+    void on_btnAddPackages_clicked();
 };
 
 #endif // C5STOREDOC_H

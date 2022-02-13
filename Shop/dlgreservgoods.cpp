@@ -60,6 +60,14 @@ DlgReservGoods::~DlgReservGoods()
     delete ui;
 }
 
+void DlgReservGoods::messageResult(const QJsonObject &jo)
+{
+    sender()->deleteLater();
+    if (jo["status"].toInt() > 0) {
+        C5Message::error(jo["data"].toString());
+    }
+}
+
 void DlgReservGoods::on_btnClose_clicked()
 {
     reject();
@@ -89,8 +97,9 @@ void DlgReservGoods::on_btnSave_clicked()
     jo["usermessage"] = ui->leMessage->text();
     jo["enddate"] = ui->leEndDay->text();
     QJsonDocument jdoc(jo);
-    ThreadSendMessage t;
-    t.send(fStore, jdoc.toJson(QJsonDocument::Compact));
+    auto *t = new ThreadSendMessage();
+    connect(t, SIGNAL(result(QJsonObject)), this, SLOT(messageResult(QJsonObject)));
+    t->send(fStore, jdoc.toJson(QJsonDocument::Compact));
 }
 
 void DlgReservGoods::on_btnCancelReserve_clicked()

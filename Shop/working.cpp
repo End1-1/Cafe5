@@ -509,7 +509,6 @@ void Working::threadMessageData(int code, const QVariant &data)
     p.image(img, Qt::AlignCenter);
     p.br(img.height() / 2);
     p.br(img.height() / 2);
-    C5Database db(__c5config.dbParams());
     for (int i = 0; i < jo["messages"].toArray().count(); i++) {
         QJsonObject jom = jo["messages"].toArray().at(i).toObject();
         qDebug() << jom;
@@ -546,6 +545,20 @@ void Working::threadMessageData(int code, const QVariant &data)
                                 .arg(jjm["usermessage"].toString())
                                 .arg(QString("%1 %2").arg(tr("End date")).arg(jjm["enddate"].toString())));
                 break;
+            case MSG_PRINT_TAX: {
+                C5Database db(__c5config.replicaDbParams());
+                QJsonObject jord = jjm["usermessage"].toObject();
+                QString id = jord["id"].toString();
+                QString rseq;
+                p.br();
+                p.br();
+                if (Sales::printCheckWithTax(db, id, rseq)) {
+                    p.ctext(QString("%1: %2").arg(tr("Fiscal printed")).arg(jord["ordernum"].toString()));
+                } else {
+                    p.ctext(QString("%1: %2").arg(tr("Fiscal not printed")).arg(jord["ordernum"].toString()));
+                }
+                break;
+            }
             default:
                 break;
             }
@@ -561,7 +574,7 @@ void Working::threadMessageData(int code, const QVariant &data)
     p.br();
     p.br();
     p.ltext(tr("Printed"), 0);
-    p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
+    p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR2));
     p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
     auto *trm = new ThreadReadMessage(jo["idlist"].toString());
     trm->start();
