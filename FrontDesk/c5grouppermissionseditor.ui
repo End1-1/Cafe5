@@ -80,7 +80,7 @@
        <item row="9" column="0">
         <widget class="C5CheckBox" name="checkBox_67">
          <property name="text">
-          <string>Deny change store document date</string>
+          <string>Allow change store document date</string>
          </property>
          <property name="Tag" stdset="0">
           <number>108</number>
@@ -120,7 +120,7 @@
        <item row="8" column="0">
         <widget class="C5CheckBox" name="checkBox_66">
          <property name="text">
-          <string>Deny change cash document date</string>
+          <string>Allow change cash document date</string>
          </property>
          <property name="Tag" stdset="0">
           <number>107</number>

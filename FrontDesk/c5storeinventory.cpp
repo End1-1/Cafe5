@@ -277,7 +277,7 @@ void C5StoreInventory::printDoc()
 void C5StoreInventory::on_btnAddGoods_clicked()
 {
     QList<QVariant> vals;
-    if (!C5Selector::getValue(fDBParams, cache_goods, vals)) {
+    if (!C5Selector::getValueOfColumn(fDBParams, cache_goods, vals, 3)) {
         return;
     }
     int row = addGoodsRow();

@@ -92,9 +92,7 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
     fCanChangeFocus = true;
     ui->tblAdd->setColumnWidths(ui->tblAdd->columnCount(), 0, 300, 80);
     ui->leComplectationQty->setValidator(new QDoubleValidator(0, 999999999, 3));
-    if (__user->check(cp_t1_deny_change_store_doc_date)) {
-        ui->deDate->setEnabled(false);
-    }
+    ui->deDate->setEnabled(__user->check(cp_t1_allow_change_store_doc_date));
     ui->btnRememberStoreIn->setChecked(__c5config.getRegValue("storedoc_storeinput").toBool());
     if (__c5config.getRegValue("storedoc_storeinput").toBool()) {
         ui->leStoreInput->setValue(__c5config.getRegValue("storedoc_storeinput_id").toInt());
@@ -109,8 +107,6 @@ C5StoreDoc::~C5StoreDoc()
 
 bool C5StoreDoc::openDoc(QString id, QString &err)
 {
-
-
     ui->leDocNum->setPlaceholderText("");
     C5Database db(fDBParams);
     C5StoreDraftWriter dw(db);
@@ -1194,10 +1190,7 @@ void C5StoreDoc::addGoods(int goods, const QString &name, double qty, const QStr
 
 void C5StoreDoc::setDocEnabled(bool v)
 {
-    ui->deDate->setEnabled(v);
-    if (!__user->check(cp_t1_deny_change_store_doc_date)) {
-        ui->deDate->setEnabled(false);
-    }
+    ui->deDate->setEnabled(v && __user->check(cp_t1_allow_change_store_doc_date));
     ui->leStoreInput->setEnabled(v);
     ui->leStoreOutput->setEnabled(v);
     ui->wtoolbar->setEnabled(v);

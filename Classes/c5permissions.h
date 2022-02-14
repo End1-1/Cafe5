@@ -13,8 +13,8 @@
 #define cp_t1_settigns 104
 #define cp_t1_login_to_manager 105
 #define cp_t1_login_to_waiter 106
-#define cp_t1_deny_change_cash_doc_date 107
-#define cp_t1_deny_change_store_doc_date 108
+#define cp_t1_allow_change_cash_doc_date 107
+#define cp_t1_allow_change_store_doc_date 108
 #define cp_t1_goods_pricing 109
 
 #define cp_t2_action 200

@@ -24,7 +24,7 @@ C5CashDoc::C5CashDoc(const QStringList &dbParams, QWidget *parent) :
     ui->lbStoreDoc->setEnabled(false);
     ui->leStoreDoc->setEnabled(false);
     ui->btnOpenStoreDoc->setEnabled(false);
-    if (__user->check(cp_t1_deny_change_cash_doc_date)) {
+    if (__user->check(cp_t1_allow_change_cash_doc_date)) {
         ui->deDate->setEnabled(false);
     }
     fRelation = false;
