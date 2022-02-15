@@ -992,6 +992,10 @@ int C5WaiterServer::printTax(const QMap<QString, QVariant> &header, const QList<
     db[":f_err"] = err;
     db[":f_result"] = result;
     db.insert("o_tax_log", false);
+    if (__c5config.getValue(param_debuge_mode).toInt() == 1) {
+        QSqlQuery q(db.fDb);
+        pt.saveTimeResult(header["f_id"].toString(), q);
+    }
     if (result == pt_err_ok) {
         QString sn, firm, address, fiscal, hvhh, rseq, devnum, time;
         PrintTaxN::parseResponse(jsonOut, firm, hvhh, fiscal, rseq, sn, address, devnum, time);
