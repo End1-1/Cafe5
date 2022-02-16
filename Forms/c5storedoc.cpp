@@ -685,8 +685,11 @@ bool C5StoreDoc::parseBroadcastAddGoods(QJsonObject jobj, QString &replystr)
     if (row < 0) {
 
     } else {
-        ui->tblGoods->lineEdit(row, 5)->setFocus();
+        C5LineEdit *l = ui->tblGoods->lineEdit(row, 5);
+        l->setFocus();
+        l->setSelection(0, l->text().length());
     }
+    countTotal();
     return true;
 }
 
@@ -1211,7 +1214,7 @@ void C5StoreDoc::setDocEnabled(bool v)
         }
     }
     if (fToolBar) {
-        fToolBar->actions().at(1)->setEnabled(!v);
+        //fToolBar->actions().at(1)->setEnabled(!v);
     }
     ui->grComplectation->setEnabled(v);
 }

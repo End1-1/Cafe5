@@ -364,6 +364,24 @@ void C5MainWindow::datagramRead()
                     jreply["data"] = QJsonDocument::fromJson(replystr.toUtf8()).object();
                 }
                 break;
+            case WHAT_SET_ACTIVE_WINDOW: {
+                bool found = false;
+                if (!windowsUuid.isEmpty()) {
+                    for (C5Widget *w: fBroadcastListeners.values()) {
+                        if (w->fWindowUuid == windowsUuid) {
+                            ui->tabWidget->setCurrentWidget(w);
+                            found = true;
+                        }
+                    }
+                }
+                if (found) {
+
+                } else {
+                    jreply["error"] = 1;
+                    jreply["message"] = tr("Requested window not exists");
+                }
+                break;
+            }
             }
         } else {
             jreply["error"] = 1;
