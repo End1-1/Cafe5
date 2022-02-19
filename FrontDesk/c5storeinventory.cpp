@@ -122,7 +122,7 @@ void C5StoreInventory::saveDoc()
     if (ui->leDocNum->isEmpty()) {
         ui->leDocNum->setInteger(dw.counterAType(DOC_TYPE_STORE_INVENTORY));
     }
-    dw.writeAHeader(fInternalID, ui->leDocNum->text(), DOC_STATE_SAVED, DOC_TYPE_STORE_INVENTORY, __user->id(), ui->deDate->date(), QDate::currentDate(), QTime::currentTime(), 0, ui->leTotal->getDouble(), ui->leComment->text(), 0, 0);
+    dw.writeAHeader(fInternalID, ui->leDocNum->text(), DOC_STATE_SAVED, DOC_TYPE_STORE_INVENTORY, __user->id(), ui->deDate->date(), QDate::currentDate(), QTime::currentTime(), 0, ui->leTotal->getDouble(), ui->leComment->text());
 
     db[":f_document"] = fInternalID;
     db.exec("delete from a_store_inventory where f_document=:f_document");

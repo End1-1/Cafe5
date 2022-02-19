@@ -25,11 +25,16 @@ public:
 
     void setDatabase(const QStringList &dbParams);
 
+    void setFilterValue(const QString &key, const QVariant &value);
+
 public slots:
     void setFixDate(bool v);
 
 protected:
     QString in(QString &cond, const QString &field, C5LineEditWithSelector *l);
+
+private:
+    QWidget *getWidget(const QString &key, QWidget *parent);
 };
 
 #endif // C5FILTERWIDGET_H

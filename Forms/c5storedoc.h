@@ -91,11 +91,7 @@ private:
 
     QString fInternalId;
 
-    QString fCashUuid;
-
-    QString fCashRowId;
-
-    QString fCashUserId;
+    QString fCashDocUuid;
 
     TableCell *fGroupTableCell;
 
@@ -142,8 +138,6 @@ private:
     void setGoodsPanelHidden(bool v);
 
     void markGoodsComplited();
-
-    void updateCashDoc();
 
     void addGoodsByCalculation(int goods, const QString &name, double qty);
 

@@ -68,6 +68,11 @@ void C5CashDoc::setCashOutput(int id)
     ui->leOutput->setValue(id);
 }
 
+void C5CashDoc::setPartner(int id)
+{
+    ui->lePartner->setValue(id);
+}
+
 void C5CashDoc::setDate(const QDate &d)
 {
     ui->deDate->setDate(d);
@@ -208,12 +213,16 @@ int C5CashDoc::outputCash()
 bool C5CashDoc::removeDoc(const QStringList &dbParams, const QString &uuid)
 {
     C5Database db(dbParams);
+    db[":f_doc"] = uuid;
+    db.exec("delete from a_dc where f_doc=:f_doc");
     db[":f_header"] = uuid;
     db.exec("delete from e_cash where f_header=:f_header");
     db[":f_id"] = uuid;
     db.exec("delete from a_header where f_id=:f_id");
     db[":f_id"] = uuid;
     db.exec("delete from a_header_cash where f_id=:f_id");
+    db[":f_cashuuid"] = uuid;
+    db.exec("update a_header_store set f_cashuuid='' where f_cashuuid=:f_cashuuid");
     return true;
 }
 
@@ -270,7 +279,7 @@ void C5CashDoc::save(bool fromrelation)
         ui->leDocNum->setInteger(genNumber(DOC_TYPE_CASH));
         updateGenNumber(ui->leDocNum->getInteger(), DOC_TYPE_CASH);
     }
-    dw.writeAHeader(fUuid, ui->leDocNum->text(), DOC_STATE_SAVED, DOC_TYPE_CASH, __user->id(), ui->deDate->date(), QDate::currentDate(), QTime::currentTime(), ui->lePartner->getInteger(), ui->leTotal->getDouble(), ui->leRemarks->text(), 0, 0);
+    dw.writeAHeader(fUuid, ui->leDocNum->text(), DOC_STATE_SAVED, DOC_TYPE_CASH, __user->id(), ui->deDate->date(), QDate::currentDate(), QTime::currentTime(), ui->lePartner->getInteger(), ui->leTotal->getDouble(), ui->leRemarks->text());
     dw.writeAHeaderCash(fUuid, ui->leInput->getInteger(), ui->leOutput->getInteger(), fRelation, fStoreUuid, "");
     for (int i = 0; i < ui->tbl->rowCount(); i++) {
         QString idin = ui->tbl->getString(i, 0);
@@ -286,6 +295,22 @@ void C5CashDoc::save(bool fromrelation)
         }
         ui->tbl->setString(i, 4, base);
     }    
+    db[":f_doc"] = fUuid;
+    db.exec("delete from a_dc where f_doc=:f_doc");
+    if (ui->lePartner->getInteger() > 0) {
+        if (ui->leOutput->getInteger() > 0) {
+            db[":f_doc"] = fUuid;
+            db[":f_dc"] = 1;
+            db[":f_amount"] = ui->leTotal->getDouble();
+            db.insert("a_dc");
+        }
+        if (ui->leInput->getInteger() > 0) {
+            db[":f_doc"] = fUuid;
+            db[":f_dc"] = -1;
+            db[":f_amount"] = ui->leTotal->getDouble();
+            db.insert("a_dc");
+        }
+    }
     foreach (const QString &s, fRemovedRows) {
         db[":f_base"] = s;
         db.exec("delete from e_cash where f_base=:f_base");
@@ -295,6 +320,8 @@ void C5CashDoc::save(bool fromrelation)
     if (fActionDraft) {
         fActionDraft->setEnabled(true);
     }
+    setProperty("amount", ui->leTotal->getDouble());
+    emit saved(fUuid);
 }
 
 void C5CashDoc::removeDoc()

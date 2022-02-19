@@ -51,7 +51,7 @@ bool C5StoreDraftWriter::writeFromShopOutput(const QString &doc, int state, QStr
         int rownum = 1;
         QString id;
         QString userid = storeDocNum(DOC_TYPE_STORE_OUTPUT, store, true, 0);
-        writeAHeader(id, userid, DOC_STATE_DRAFT, DOC_TYPE_STORE_OUTPUT, operatorId, docDate, QDate::currentDate(), QTime::currentTime(), 0, 0, comment, 0, 0);
+        writeAHeader(id, userid, DOC_STATE_DRAFT, DOC_TYPE_STORE_OUTPUT, operatorId, docDate, QDate::currentDate(), QTime::currentTime(), 0, 0, comment);
         writeAHeaderStore(id, operatorId, operatorId, "", QDate(), 0, store, 1, "", 0, 0);
         for (IGoods i: items) {
             if (i.store != store) {
@@ -67,7 +67,7 @@ bool C5StoreDraftWriter::writeFromShopOutput(const QString &doc, int state, QStr
         if (state == DOC_STATE_SAVED) {
             if (!writeOutput(id, err)) {
                 haveRelations(id, err, true);
-                writeAHeader(id, userid, DOC_STATE_DRAFT, DOC_TYPE_STORE_OUTPUT, operatorId, docDate, QDate::currentDate(), QTime::currentTime(), 0, 0, comment, 0, 0);
+                writeAHeader(id, userid, DOC_STATE_DRAFT, DOC_TYPE_STORE_OUTPUT, operatorId, docDate, QDate::currentDate(), QTime::currentTime(), 0, 0, comment);
             }
         }
     }
@@ -122,6 +122,8 @@ bool C5StoreDraftWriter::removeStoreDocument(C5Database &db, const QString &id, 
     }
     db[":f_document"] = id;
     db.exec("delete from a_store_draft where f_document=:f_document");
+    db[":f_doc"] = id;
+    db.exec("delete from a_dc where f_doc=:f_doc");
     db[":f_id"] = id;
     db.exec("delete from a_header where f_id=:f_id");
     db[":f_id"] = id;
@@ -333,7 +335,7 @@ bool C5StoreDraftWriter::returnResult(bool r, const QString &msg)
 
 bool C5StoreDraftWriter::writeAHeader(QString &id, const QString &userid, int state, int type, int op,
                                       const QDate &docDate, const QDate &dateCreate,
-                                     const QTime &timeCreate, int partner, double amount, const QString &comment, int payment, int paid)
+                                     const QTime &timeCreate, int partner, double amount, const QString &comment)
 {
     bool u = true;
     if (id.isEmpty()) {
@@ -354,8 +356,6 @@ bool C5StoreDraftWriter::writeAHeader(QString &id, const QString &userid, int st
     fDb[":f_partner"] = partner;
     fDb[":f_amount"] = amount;
     fDb[":f_comment"] = comment;
-    fDb[":f_payment"] = payment;
-    fDb[":f_paid"] = paid;
     if (u) {
         return returnResult(fDb.update("a_header", where_id(id)));
     } else {
@@ -374,14 +374,6 @@ bool C5StoreDraftWriter::readAHeader(const QString &id)
             result = readAHeaderStore(id);
             if (result) {
                 result = readAStoreDraft(id);
-            }
-            if (value(container_aheader, 0, "f_type").toInt() == DOC_TYPE_STORE_INPUT) {
-                if (result) {
-                    result = readAHeaderCash(value(container_aheaderstore, 0, "f_cashuuid").toString());
-                }
-                if (result) {
-                    result = readECash(value(container_aheaderstore, 0, "f_cashuuid").toString());
-                }
             }
             break;
         case DOC_TYPE_CASH:
@@ -409,7 +401,7 @@ bool C5StoreDraftWriter::readAHeader(const QString &id)
     return result;
 }
 
-bool C5StoreDraftWriter::writeAHeaderPartial(QString &id, const QString &userid, int op, const QDate &dateCreate, const QTime &timeCreate, int partner, const QString &comment, int payment, int paid)
+bool C5StoreDraftWriter::writeAHeaderPartial(QString &id, const QString &userid, int op, const QDate &dateCreate, const QTime &timeCreate, int partner, const QString &comment)
 {
     fDb[":f_id"] = id;
     fDb[":f_userid"] = userid;
@@ -418,8 +410,6 @@ bool C5StoreDraftWriter::writeAHeaderPartial(QString &id, const QString &userid,
     fDb[":f_createtime"] = timeCreate;
     fDb[":f_partner"] = partner;
     fDb[":f_comment"] = comment;
-    fDb[":f_payment"] = payment;
-    fDb[":f_paid"] = paid;
     return returnResult(fDb.update("a_header", where_id(id)));
 }
 

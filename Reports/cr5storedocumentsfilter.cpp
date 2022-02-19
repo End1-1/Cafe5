@@ -30,10 +30,13 @@ QString CR5StoreDocumentsFilter::condition()
         result += " and h.f_payment in (" + ui->lePaymentName->text() + ") ";
     }
     if (ui->rbpNo->isChecked()) {
-        result += " and h.f_paid=0 ";
+        result += " and h.f_paid<h.f_amount ";
     }
     if (ui->rbpYes->isChecked()) {
-        result += " and h.f_paid=1 ";
+        result += " and h.f_paid=h.f_amount ";
+    }
+    if (ui->rbpPartial->isChecked()) {
+        result += " and (h.f_paid>0 and h.f_paid<h.f_amount) ";
     }
     if (!ui->lePartner->isEmpty()) {
         result += " and h.f_partner in (" + ui->lePartner->text() + ") ";
@@ -74,6 +77,9 @@ void CR5StoreDocumentsFilter::setPaidFilter(int paid)
         break;
     case 2:
         ui->rbpYes->setChecked(true);
+        break;
+    case 4:
+        ui->rbpPartial->setChecked(true);
         break;
     default:
         break;

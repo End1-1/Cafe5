@@ -11,8 +11,15 @@ public:
 
     virtual QToolBar *toolBar();
 
+    virtual void buildQuery() override;
+
+    virtual void refreshData() override;
+
 protected:
     virtual bool tblDoubleClicked(int row, int column, const QList<QVariant> &vals) override;
+
+private slots:
+    void pay();
 };
 
 #endif // CR5DEBTSTOPARTNER_H

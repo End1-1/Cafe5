@@ -166,7 +166,7 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
         QString wsbDocUserNum;
         QString wsbComment = tr("Input before sale");
         wsbDocUserNum = dw.storeDocNum(DOC_TYPE_STORE_INPUT, __c5config.defaultStore(), true, 0);
-        if (!dw.writeAHeader(wsbDocId, wsbDocUserNum, DOC_STATE_SAVED, DOC_TYPE_STORE_INPUT, fUser->id(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, 0, wsbComment, 0, 0)) {
+        if (!dw.writeAHeader(wsbDocId, wsbDocUserNum, DOC_STATE_SAVED, DOC_TYPE_STORE_INPUT, fUser->id(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, 0, wsbComment)) {
             return returnFalse(dw.fErrorMsg, db);
         }
         if (!dw.writeAHeaderStore(wsbDocId, fUser->id(), fUser->id(), "", QDate(), 0, __c5config.defaultStore(), 1, "", 0, 0)) {
@@ -193,7 +193,7 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
         QString wsbCashDoc;
         QString wsbCashRowId;
         QString wsbCashUserId = QString("%1").arg(wsbDocUserNum.toInt(), C5Config::docNumDigitsInput(), 10, QChar('0'));
-        if (!dw.writeAHeader(wsbCashDoc, wsbCashUserId, DOC_STATE_SAVED, DOC_TYPE_CASH, fUser->id(), QDate::currentDate(),  QDate::currentDate(), QTime::currentTime(), 0, wsbTotal, wsbComment, 0, 0)) {
+        if (!dw.writeAHeader(wsbCashDoc, wsbCashUserId, DOC_STATE_SAVED, DOC_TYPE_CASH, fUser->id(), QDate::currentDate(),  QDate::currentDate(), QTime::currentTime(), 0, wsbTotal, wsbComment)) {
             return returnFalse(dw.fErrorMsg, db);
         }
         if (!dw.writeAHeaderCash(wsbCashDoc, 0, __c5config.cashId(), 1, wsbDocId, "")) {
@@ -212,7 +212,7 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
     QString storedocUserNum;
     if (needStoreDoc) {
         storedocUserNum = dw.storeDocNum(DOC_TYPE_STORE_OUTPUT, __c5config.defaultStore(), true, 0);
-        if (!dw.writeAHeader(storeDocId, storedocUserNum, DOC_STATE_DRAFT, DOC_TYPE_STORE_OUTPUT, fUser->id(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, 0, storeDocComment, 0, 0)) {
+        if (!dw.writeAHeader(storeDocId, storedocUserNum, DOC_STATE_DRAFT, DOC_TYPE_STORE_OUTPUT, fUser->id(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, 0, storeDocComment)) {
             return returnFalse(dw.fErrorMsg, db);
         }
         if (!dw.writeAHeaderStore(storeDocId, fUser->id(), fUser->id(), "", QDate(), 0, __c5config.defaultStore(), 1, "", 0, 0)) {
@@ -271,7 +271,7 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
         if (counter == 0) {
             return returnFalse(dw.fErrorMsg, db);
         }
-        if (!dw.writeAHeader(cashdocid, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH, fUser->id(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, cash, __c5config.cashPrefix() + " " + headerPrefix + QString::number(headerId), 0, 0)) {
+        if (!dw.writeAHeader(cashdocid, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH, fUser->id(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, cash, __c5config.cashPrefix() + " " + headerPrefix + QString::number(headerId))) {
             return returnFalse(dw.fErrorMsg, db);
         }
         if (!dw.writeAHeaderCash(cashdocid, __c5config.cashId(), 0, 1, "", fHeader)) {
@@ -287,7 +287,7 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
         if (counter == 0) {
             return returnFalse(dw.fErrorMsg, db);
         }
-        if (!dw.writeAHeader(nocashdocid, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH, fUser->id(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, card, __c5config.nocashPrefix() + " " + headerPrefix + QString::number(headerId), 0, 0)) {
+        if (!dw.writeAHeader(nocashdocid, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH, fUser->id(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, card, __c5config.nocashPrefix() + " " + headerPrefix + QString::number(headerId))) {
             return returnFalse(dw.fErrorMsg, db);
         }
         if (!dw.writeAHeaderCash(nocashdocid, __c5config.nocashId(), 0, 1, "", fHeader)) {
@@ -302,7 +302,7 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
     QString err;
     if (needStoreDoc) {
         if (dw.writeOutput(storeDocId, err)) {
-            if (!dw.writeAHeader(storeDocId, storedocUserNum, DOC_STATE_SAVED, DOC_TYPE_STORE_OUTPUT, fUser->id(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, 0, storeDocComment, 0, 0)) {
+            if (!dw.writeAHeader(storeDocId, storedocUserNum, DOC_STATE_SAVED, DOC_TYPE_STORE_OUTPUT, fUser->id(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, 0, storeDocComment)) {
                 return returnFalse(dw.fErrorMsg, db);
             }
             dw.writeTotalStoreAmount(storeDocId);
@@ -319,7 +319,7 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
                 QString comment = tr("Store input") + " " + fPartnerName;
                 QString pstoredoc;
                 storedocUserNum = dw.storeDocNum(DOC_TYPE_STORE_INPUT, partnerStore, true, 0);
-                if (!dw.writeAHeader(pstoredoc, storedocUserNum, DOC_STATE_DRAFT, DOC_TYPE_STORE_INPUT, fUser->id(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, 0, tr("Store input") + " " + fPartnerName, 0, 0)) {
+                if (!dw.writeAHeader(pstoredoc, storedocUserNum, DOC_STATE_DRAFT, DOC_TYPE_STORE_INPUT, fUser->id(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, 0, tr("Store input") + " " + fPartnerName)) {
                     return returnFalse(dw.fErrorMsg, db);
                 }
                 if (!dw.writeAHeaderStore(pstoredoc, fUser->id(), fUser->id(), "", QDate(), partnerStore, 0, 0, "", 0, 0)) {
@@ -383,7 +383,7 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
 
                 int counter = dw.counterAType(DOC_TYPE_CASH);
                 QString partnerCashDoc;
-                if (!dw.writeAHeader(partnerCashDoc, QString::number(counter), DOC_STATE_DRAFT, DOC_TYPE_CASH, fUser->id(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), fPartnerCode, total, comment, 0, 0)) {
+                if (!dw.writeAHeader(partnerCashDoc, QString::number(counter), DOC_STATE_DRAFT, DOC_TYPE_CASH, fUser->id(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), fPartnerCode, total, comment)) {
                     return returnFalse(dw.fErrorMsg, db);
                 }
                 if (!dw.writeAHeaderCash(partnerCashDoc, partnerCash, 0, 1, partnerCashDoc, "")) {

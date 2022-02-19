@@ -742,3 +742,11 @@ update s_app set f_version='64' where f_app='DB';
 alter table c_units add f_fullname tinytext;
 ALTER TABLE `a_store_draft` DROP INDEX `fk_store_draft_document_idx` ;
 ALTER TABLE `a_store_draft` ADD CONSTRAINT `fk_store_draft_document`  FOREIGN KEY (`f_document`)  REFERENCES `a_header` (`f_id`)  ON DELETE NO ACTION  ON UPDATE NO ACTION;
+
+/*db - 65 */
+/* 18.02.2022 */
+update s_app set f_version='65' where f_app='DB';
+create table a_dc (f_id char(36), f_debit varchar(12), f_credit varchar(12), f_doc char(36), f_dc tinyint, f_amount decimal(14,2));
+ALTER TABLE `a_dc` ADD INDEX `id_adc_dc` (`f_dc` ASC) ;
+ALTER TABLE `a_dc` ADD INDEX `fk_adc_doc_idx` (`f_doc` ASC) VISIBLE;
+ALTER TABLE `a_dc` ADD CONSTRAINT `fk_adc_doc` FOREIGN KEY (`f_doc`) REFERENCES `a_header` (`f_id`)  ON DELETE NO ACTION  ON UPDATE NO ACTION;

@@ -112,6 +112,13 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QRadioButton" name="rbpPartial">
+        <property name="text">
+         <string>Partial</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>

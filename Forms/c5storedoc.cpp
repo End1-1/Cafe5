@@ -41,7 +41,6 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
     ui->wSearchInDocs->setVisible(false);
     connect(ui->leStoreInput, SIGNAL(keyPressed(QChar)), this, SLOT(lineEditKeyPressed(QChar)));
     connect(ui->leStoreOutput, SIGNAL(keyPressed(QChar)), this, SLOT(lineEditKeyPressed(QChar)));
-    ui->lePayment->setSelector(fDBParams, ui->lePaymentName, cache_header_payment);
     ui->leReason->setSelector(fDBParams, ui->leReasonName, cache_store_reason);
     ui->lePartner->setSelector(fDBParams, ui->lePartnerName, cache_goods_partners);
     ui->leComplectationCode->setSelector(fDBParams, ui->leComplectationName, cache_goods, 1, 3);
@@ -62,9 +61,6 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
     ui->leCash->setVisible(!C5Config::noCashDocStore());
     ui->leCashName->setVisible(!C5Config::noCashDocStore());
     ui->deCashDate->setVisible(!C5Config::noCashDocStore());
-    ui->lePayment->setVisible(!C5Config::noCashDocStore());
-    ui->lePaymentName->setVisible(!C5Config::noCashDocStore());
-    ui->lbPayment->setVisible(!C5Config::noCashDocStore());
     ui->chPaid->setVisible(!C5Config::noCashDocStore());
     ui->leScancode->setVisible(!C5Config::noScanCodeStore());
     ui->btnNewGoods->setVisible(__user->check(cp_t6_goods));
@@ -123,8 +119,6 @@ bool C5StoreDoc::openDoc(QString id, QString &err)
     ui->lePartner->setValue(dw.value(container_aheader, 0, "f_partner").toInt());
     ui->leComment->setText(dw.value(container_aheader, 0, "f_comment").toString());
     ui->leTotal->setDouble(dw.value(container_aheader, 0, "f_amount").toDouble());
-    ui->lePayment->setValue(dw.value(container_aheader, 0, "f_payment").toInt());
-    ui->chPaid->setChecked(dw.value(container_aheader, 0, "f_paid").toInt() == 1);
     setMode(static_cast<STORE_DOC>(fDocType));
     for (int i = 0; i < dw.rowCount(container_astoredishwaste); i++) {
         int row = ui->tblDishes->addEmptyRow();
@@ -190,13 +184,21 @@ bool C5StoreDoc::openDoc(QString id, QString &err)
     ui->leComplectationQty->setDouble(dw.value(container_aheaderstore, 0, "f_complectationqty").toDouble());
     ui->deInvoiceDate->setDate(dw.value(container_aheaderstore, 0, "f_invoicedate").toDate());
     ui->leInvoiceNumber->setText(dw.value(container_aheaderstore, 0, "f_invoice").toString());
+    fCashDocUuid = dw.value(container_aheaderstore, 0, "f_cashuuid").toString();
+    ui->chPaid->setChecked(!fCashDocUuid.isEmpty());
+    if (!fCashDocUuid.isEmpty()) {
+        on_chPaid_clicked(true);
+        C5CashDoc cd(fDBParams);
+        cd.openDoc(fCashDocUuid);
+        ui->deCashDate->setDate(cd.date());
+        ui->leCash->setValue(cd.outputCash());
+    } else {
+        on_chPaid_clicked(false);
+    }
 
     connect(ui->leComplectationName, SIGNAL(textChanged(QString)), this, SLOT(on_leComplectationName_textChanged(QString)));
     connect(ui->leComplectationQty, SIGNAL(textChanged(QString)), this, SLOT(on_leComplectationQty_textChanged(QString)));
-    if (fDocType == DOC_TYPE_STORE_INPUT) {
-        fCashUuid = dw.value(container_aheaderstore, 0, "f_cashuuid").toString();
-        fCashRowId = dw.value(container_ecash, 0, "f_id").toString();
-    }
+
     if (fDocType == DOC_TYPE_COMPLECTATION) {
         db[":f_document"] = id;
         db[":f_type"] = 1;
@@ -229,24 +231,7 @@ bool C5StoreDoc::openDoc(QString id, QString &err)
     }
     setDocEnabled(fDocState == DOC_STATE_DRAFT);
     countTotal();
-    db[":f_id"] = fCashUuid;
-    db.exec("select * from a_header where f_id=:f_id");
-    if (db.nextRow()) {
-        ui->leCashName->setEnabled(true);
-        ui->leCash->setEnabled(true);
-        ui->lbCashDoc->setEnabled(true);
-        ui->deCashDate->setEnabled(true);
-        ui->deCashDate->setDate(db.getDate("f_date"));
-        fCashUserId = db.getString("f_userid");
-        ui->leCash->setValue(dw.value(container_ecash, 0, "f_cash").toString());
-    }
-//    if (fBasedOnSale > 0) {
-//        ui->wbody->setEnabled(false);
-//        ui->deDate->setEnabled(false);
-//        ui->leStoreOutput->setEnabled(false);
-//        ui->leComment->setEnabled(false);
-//        ui->leReason->setEnabled(false);
-//    }
+
     if (fToolBar && fDocType == sdOutput) {
         fToolBar->addAction(QIcon(":/storeinput.png"), tr("Create store input"), this, SLOT(createStoreInput()));
     }
@@ -256,9 +241,6 @@ bool C5StoreDoc::openDoc(QString id, QString &err)
 
 void C5StoreDoc::setMode(C5StoreDoc::STORE_DOC sd)
 {
-    ui->lbPayment->setVisible(false);
-    ui->lePayment->setVisible(false);
-    ui->lePaymentName->setVisible(false);
     ui->chPaid->setVisible(false);
     ui->grComplectation->setVisible(false);
     ui->chWholeGroup->setVisible(false);
@@ -266,9 +248,6 @@ void C5StoreDoc::setMode(C5StoreDoc::STORE_DOC sd)
     bool paymentVisible = !C5Config::noCashDocStore();
     switch (fDocType) {
     case DOC_TYPE_STORE_INPUT:
-        ui->lbPayment->setVisible(paymentVisible && true);
-        ui->lePayment->setVisible(paymentVisible && true);
-        ui->lePaymentName->setVisible(paymentVisible && true);
         ui->chPaid->setVisible(paymentVisible && true);
         if (fToolBar) {
             fToolBar->addAction(QIcon(":/goods_store.png"), tr("Input of service"), this, SLOT(inputOfService()));
@@ -804,29 +783,30 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
 
     /*write cash doc */
     if (fDocType == DOC_TYPE_STORE_INPUT) {
-        QString purpose = tr("Store input") + " #" + ui->leDocNum->text() + ", " + ui->deDate->text();
-        if (state == DOC_STATE_DRAFT) {
-            purpose = tr("Store input") + " " + ui->deDate->text();
+        db[":f_id"] = fCashDocUuid;
+        db.exec("select * from a_header where f_id=:f_id");
+        if (db.nextRow()) {
+            C5CashDoc::removeDoc(fDBParams, fCashDocUuid);
         }
-        if (fCashUserId.isEmpty()) {
-            fCashUserId = QString("%1").arg(genNumber(DOC_TYPE_CASH), C5Config::docNumDigitsInput(), 10, QChar('0'));
+        fCashDocUuid.clear();
+        if (ui->chPaid->isChecked() && state == DOC_STATE_SAVED) {
+            C5CashDoc cd(fDBParams);
+            QString purpose = tr("Store input") + " #" + ui->leDocNum->text() + ", " + ui->deDate->text();
+            cd.addRow(purpose, ui->leTotal->getDouble());
+            cd.setDate(ui->deCashDate->date());
+            cd.setCashOutput(ui->leCash->getInteger());
+            cd.setComment(purpose);
+            cd.setPartner(ui->lePartner->getInteger());
+            cd.save();
+            fCashDocUuid = cd.uuid();
         }
-        int cashstate = DOC_STATE_DRAFT;
-        if (state == DOC_STATE_SAVED && ui->chPaid->isChecked()) {
-            cashstate = DOC_STATE_SAVED;
-        }
-        dw.writeAHeader(fCashUuid, fCashUserId, cashstate, DOC_TYPE_CASH, __user->id(), ui->deCashDate->date(),
-                        QDate::currentDate(), QTime::currentTime(), ui->lePartner->getInteger(), ui->leTotal->getDouble(),
-                        purpose, 0, 0);
-        dw.writeAHeaderCash(fCashUuid, 0, ui->leCash->getInteger(), 1, fInternalId, "");
-        dw.writeECash(fCashRowId, fCashUuid, ui->leCash->getInteger(), -1, purpose, ui->leTotal->getDouble(), fCashRowId, 1);
     }
 
     dw.updateField("a_store_draft", "f_reason", ui->leReason->getInteger(), "f_document", fInternalId);
     dw.updateField("a_store", "f_reason", ui->leReason->getInteger(), "f_document", fInternalId);
     if (state == fDocState && state == DOC_STATE_SAVED) {
         dw.writeAHeaderPartial(fInternalId, ui->leDocNum->text(), __user->id(), QDate::currentDate(), QTime::currentTime(),
-                                 ui->lePartner->getInteger(),ui->leComment->text(), ui->lePayment->getInteger(), ui->chPaid->isChecked());
+                                 ui->lePartner->getInteger(),ui->leComment->text());
         db.commit();
         return true;
     }
@@ -849,11 +829,11 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
 
     dw.clearAStoreDraft(fInternalId);
     if (!dw.writeAHeader(fInternalId, ui->leDocNum->text(), fDocState, fDocType, __user->id(), ui->deDate->date(), QDate::currentDate(), QTime::currentTime(),
-                         ui->lePartner->getInteger(), ui->leTotal->getDouble(), ui->leComment->text(), ui->lePayment->getInteger(), ui->chPaid->isChecked())) {
+                         ui->lePartner->getInteger(), ui->leTotal->getDouble(), ui->leComment->text())) {
         err += db.fLastError + "<br>";
     }
     if (!dw.writeAHeaderStore(fInternalId, ui->leAccepted->getInteger(), ui->lePassed->getInteger(), ui->leInvoiceNumber->text(), ui->deInvoiceDate->date(),
-                              ui->leStoreInput->getInteger(), ui->leStoreOutput->getInteger(), fBasedOnSale, fCashUuid, ui->leComplectationCode->getInteger(),
+                              ui->leStoreInput->getInteger(), ui->leStoreOutput->getInteger(), fBasedOnSale, fCashDocUuid, ui->leComplectationCode->getInteger(),
                               ui->leComplectationQty->getDouble())) {
         err += db.fLastError + "<br>";
     }
@@ -911,6 +891,19 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
             ui->tblGoods->setString(i, 2, inid);
         }
     }
+
+    if (fDocType == DOC_TYPE_STORE_INPUT) {
+        db[":f_doc"] = fInternalId;
+        db.exec("delete from a_dc where f_doc=:f_doc");
+        if (state == DOC_STATE_SAVED) {
+            if (ui->lePartner->getInteger() > 0) {
+                db[":f_doc"] = fInternalId;
+                db[":f_dc"] = -1;
+                db[":f_amount"] = ui->leTotal->getDouble();
+                db.insert("a_dc");
+            }
+        }
+    }
     if (!err.isEmpty()) {
         db.rollback();
         return false;
@@ -958,7 +951,7 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
 
     countTotal();
     if (!dw.writeAHeader(fInternalId, ui->leDocNum->text(), state, fDocType, __user->id(), ui->deDate->date(), QDate::currentDate(), QTime::currentTime(),
-                         ui->lePartner->getInteger(), ui->leTotal->getDouble(), ui->leComment->text(), ui->lePayment->getInteger(), ui->chPaid->isChecked())) {
+                         ui->lePartner->getInteger(), ui->leTotal->getDouble(), ui->leComment->text())) {
         err += db.fLastError + "<br>";
     }
     if (fDocType == DOC_TYPE_COMPLECTATION) {
@@ -1107,6 +1100,11 @@ bool C5StoreDoc::docCheck(QString &err)
     }
     if (ui->leReason->getInteger() == 0) {
         err += tr("The reason of document cannot be empty");
+    }
+    if (ui->chPaid->isChecked()) {
+        if (ui->lePartner->getInteger() == 0) {
+            err += tr("Supplier not specified") + "<br>";
+        }
     }
     return err.isEmpty();
 }
@@ -1362,19 +1360,6 @@ void C5StoreDoc::markGoodsComplited()
     }
 }
 
-void C5StoreDoc::updateCashDoc()
-{
-    C5CashDoc *doc = new C5CashDoc(fDBParams);
-    doc->openDoc(fCashUuid);
-    doc->setCashOutput(ui->leCash->getInteger());
-    doc->setDate(ui->deDate->date());
-    doc->setComment(tr("Store input") + " #" + ui->leDocNum->text() + "/" + ui->deDate->text());
-    doc->updateRow(0, tr("Store input") + " #" + ui->leDocNum->text() + "/" + ui->deDate->text(), ui->leTotal->getDouble());
-    doc->save();
-    fCashUuid = doc->uuid();
-    delete doc;
-}
-
 void C5StoreDoc::addGoodsByCalculation(int goods, const QString &name, double qty)
 {
     QJsonArray ja;
@@ -1448,9 +1433,6 @@ void C5StoreDoc::newDoc()
         return;
     }
     fInternalId.clear();
-    fCashRowId.clear();
-    fCashUuid.clear();
-    fCashUserId.clear();
     fBasedOnSale = 0;
     fComplectationId.clear();
     fDocState = DOC_STATE_DRAFT;
@@ -1801,23 +1783,6 @@ void C5StoreDoc::printDoc()
     vals << ui->leTotal->text();
     p.tableText(points, vals, p.fLineHeight + 20);
     p.br(p.fLineHeight + 20);
-    if (ui->lePayment->getInteger() > 0) {
-        points.clear();
-        points << 1200
-               << 500
-               << 270;
-        vals.clear();
-        vals << tr("Payment type");
-        vals << ui->lePaymentName->text();
-        p.tableText(points, vals, p.fLineHeight + 20);
-        p.br(p.fLineHeight + 20);
-        if (ui->chPaid->isChecked()) {
-            p.ltext(tr("Paid"), 1200);
-        } else {
-            p.ltext(tr("Not paid"), 1200);
-        }
-        p.br();
-    }
     p.br(p.fLineHeight + 20);
     p.br(p.fLineHeight + 20);
     switch (fDocType) {

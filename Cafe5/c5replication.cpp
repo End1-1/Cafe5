@@ -143,7 +143,7 @@ void C5Replication::downloadDataFromServer(const QStringList &src, const QString
     C5StoreDraftWriter dw(db);
     int rownum = 1;
     QString docId;
-    dw.writeAHeader(docId, "SL", DOC_STATE_SAVED, DOC_TYPE_SALE_INPUT, 1, QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, 0, "", 0, 0);
+    dw.writeAHeader(docId, "SL", DOC_STATE_SAVED, DOC_TYPE_SALE_INPUT, 1, QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, 0, "");
     emit progress(QString("Step %1 of %2. Write header").arg(step).arg(steps));
     QString logsql = "insert into a_store_draft (f_id, f_document, f_store, f_type, f_goods, f_qty, f_price, f_total, f_base, f_row, f_comment) values ";
     bool f = true;

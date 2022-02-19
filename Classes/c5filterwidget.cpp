@@ -147,6 +147,16 @@ void C5FilterWidget::setDatabase(const QStringList &dbParams)
     restoreFilter(this);
 }
 
+void C5FilterWidget::setFilterValue(const QString &key, const QVariant &value)
+{
+    QWidget *w = getWidget(key, this);
+    if (dynamic_cast<C5DateEdit*>(w)) {
+        static_cast<C5DateEdit*>(w)->setDate(value.toDate());
+    } else if (dynamic_cast<C5LineEditWithSelector*>(w)) {
+        static_cast<C5LineEditWithSelector*>(w)->setValue(value.toString());
+    }
+}
+
 void C5FilterWidget::setFixDate(bool v)
 {
     QSettings s(_ORGANIZATION_, QString("%1\\%2\\reportfilter\\%3")
@@ -165,4 +175,25 @@ QString C5FilterWidget::in(QString &cond, const QString &field, C5LineEditWithSe
             .arg(field)
             .arg(l->text());
     return cond;
+}
+
+QWidget *C5FilterWidget::getWidget(const QString &key, QWidget *parent)
+{
+    QObjectList ol = parent->children();
+    for (QObject *o: ol) {
+        QWidget *w = dynamic_cast<QWidget*>(o);
+        if (!w) {
+            continue;
+        }
+        if (w->property("FilterName") == key) {
+            return w;
+        }
+        if (w->children().count() > 0) {
+            w = getWidget(key, w);
+            if (w) {
+                return w;
+            }
+        }
+    }
+    return nullptr;
 }

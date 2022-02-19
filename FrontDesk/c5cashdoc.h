@@ -24,6 +24,8 @@ public:
 
     void setCashOutput(int id);
 
+    void setPartner(int id);
+
     void setDate(const QDate &d);
 
     void setComment(const QString &t);
@@ -80,6 +82,9 @@ private:
     QAction *fActionSave;
 
     QAction *fActionDraft;
+
+signals:
+    void saved(const QString &);
 };
 
 #endif // C5CASHDOC_H

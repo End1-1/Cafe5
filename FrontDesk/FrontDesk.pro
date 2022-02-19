@@ -110,6 +110,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Reports/cr5costumerdebtsfilter.cpp \
     ../Reports/cr5custom.cpp \
     ../Reports/cr5debtstopartner.cpp \
+    ../Reports/cr5debtstopartnerfilter.cpp \
     ../Reports/cr5discountstatisics.cpp \
     ../Reports/cr5discountstatisticsfilter.cpp \
     ../Reports/cr5dishpackage.cpp \
@@ -368,6 +369,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Reports/cr5costumerdebtsfilter.h \
     ../Reports/cr5custom.h \
     ../Reports/cr5debtstopartner.h \
+    ../Reports/cr5debtstopartnerfilter.h \
     ../Reports/cr5discountstatisics.h \
     ../Reports/cr5discountstatisticsfilter.h \
     ../Reports/cr5dishpackage.h \
@@ -574,6 +576,7 @@ FORMS += \
     ../Reports/cr5consumptionbysalesfilterdraft.ui \
     ../Reports/cr5consuptionreasonfilter.ui \
     ../Reports/cr5costumerdebtsfilter.ui \
+    ../Reports/cr5debtstopartnerfilter.ui \
     ../Reports/cr5discountstatisticsfilter.ui \
     ../Reports/cr5draftoutputbyrecipefilter.ui \
     ../Reports/cr5goodsfilter.ui \

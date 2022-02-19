@@ -909,7 +909,7 @@ void C5WaiterServer::processCloseOrder(QJsonObject &o, C5Database &db)
                     if (!dw.writeAHeader(cashdocid, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH,
                                          jh["f_currentstaff"].toString().toInt(), dateCash, QDate::currentDate(),
                                          QTime::currentTime(), 0, jh["f_amountcash"].toString().toDouble(),
-                                         settings[param_autocash_prefix] + " " + headerPrefix + QString::number(headerId), 0, 0)) {
+                                         settings[param_autocash_prefix] + " " + headerPrefix + QString::number(headerId))) {
                         err = dw.fErrorMsg;
                     }
                     if (!dw.writeAHeaderCash(cashdocid, settings[param_cash_id].toInt(), 0, 1, "", jh["f_id"].toString())) {
@@ -930,7 +930,7 @@ void C5WaiterServer::processCloseOrder(QJsonObject &o, C5Database &db)
                     if (!dw.writeAHeader(nocashdocid, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH,
                                          jh["f_currentstaff"].toString().toInt(), dateCash, QDate::currentDate(),
                                          QTime::currentTime(), 0, jh["f_amountcard"].toString().toDouble(),
-                                         settings[param_autonocash_prefix] + " " + headerPrefix + QString::number(headerId), 0, 0)) {
+                                         settings[param_autonocash_prefix] + " " + headerPrefix + QString::number(headerId))) {
                         err = dw.fErrorMsg;
                     }
                     if (!dw.writeAHeaderCash(nocashdocid, settings[param_nocash_id].toInt(), 0, 1, "", jh["f_id"].toString())) {

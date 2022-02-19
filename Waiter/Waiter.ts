@@ -977,47 +977,47 @@
         <translation>Ելք ըստ վաճառքի</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="209"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="211"/>
         <source>No hall with id</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="253"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="255"/>
         <source>Error in store document, partial data was lost</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="269"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="271"/>
         <source>Empty store document</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="302"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="304"/>
         <source>Error in cash document, partial data was lost</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="312"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="314"/>
         <source>Empty cash document</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="406"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="398"/>
         <source>Document not exists</source>
         <translation>Փասթաթուղթը նշված համարով չկա</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="905"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="895"/>
         <source>Invalid document id</source>
         <translation>Փասթաթուղթը նշված համարով չկա</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="1034"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="1024"/>
         <source>Not enough materials in the store</source>
         <translation>Բաղասական քանակ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="1133"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="1123"/>
         <source>This order used in next documents</source>
         <translation>Այս պետվերը գրանցված է հետևյալ փասթաթղթերում</translation>
     </message>
@@ -1107,79 +1107,79 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="1027"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="1031"/>
         <source>No order with this id</source>
         <translation>Չկա պատվեր այս համարով</translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="1238"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="1242"/>
         <source>Order</source>
         <translation>Պատվեր</translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="1286"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="1290"/>
         <source>Your order was accepted</source>
         <translation>Ձեր պատվերը ընդունված է</translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="1296"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="1300"/>
         <source>Your order is empty or already was accepted</source>
         <translation>Ոչինչ պատվիրված չէ, կամ արդեն պատվերը ընդունված է</translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="1297"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="1301"/>
         <source>The customer was make an empty order, can you help him?</source>
         <translation>Հաճախորդը կատարել է դատարկ պատվեր, գուցե օգնություն ՞ է պատք։</translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="1309"/>
-        <location filename="../Classes/c5waiterserver.cpp" line="1325"/>
-        <location filename="../Classes/c5waiterserver.cpp" line="1345"/>
-        <location filename="../Classes/c5waiterserver.cpp" line="1361"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="1313"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="1329"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="1349"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="1365"/>
         <source>Table</source>
         <translation>Սեղան</translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="1312"/>
-        <location filename="../Classes/c5waiterserver.cpp" line="1325"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="1316"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="1329"/>
         <source>Call staff</source>
         <translation>Կանչ սպասարկողին</translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="1314"/>
-        <location filename="../Classes/c5waiterserver.cpp" line="1350"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="1318"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="1354"/>
         <source>Date</source>
         <translation>Ամսաթիվ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="1317"/>
-        <location filename="../Classes/c5waiterserver.cpp" line="1353"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="1321"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="1357"/>
         <source>Time</source>
         <translation>Ժամ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="1348"/>
-        <location filename="../Classes/c5waiterserver.cpp" line="1361"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="1352"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="1365"/>
         <source>Call receipt</source>
         <translation>Տպել հաշիվը</translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="1406"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="1410"/>
         <source>Invalide card code</source>
         <translation>Քարտի կոդը սխալ է</translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="1478"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="1482"/>
         <source>Not enough quantity</source>
         <translation>Անբավարար քանակ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="1544"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="1548"/>
         <source>No tax receipt exists for this order</source>
         <translation>ՀԴՄ կտրոնը բացակայում է այս պատվերի համար</translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="1552"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="1556"/>
         <source>Success</source>
         <translation>Կատարված է</translation>
     </message>
@@ -1231,7 +1231,7 @@
         <translation>Սպասարկում</translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterserver.cpp" line="1009"/>
+        <location filename="../Classes/c5waiterserver.cpp" line="1013"/>
         <source>(F)</source>
         <translation>(Ֆ)</translation>
     </message>
@@ -3619,30 +3619,30 @@ STOPLIST-ից</translation>
 <context>
     <name>PrintTaxN</name>
     <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="28"/>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="84"/>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="92"/>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="340"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="29"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="85"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="93"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="341"/>
         <source>Connection error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="40"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="41"/>
         <source>You should to setup cashier and pin before to use fiscal printer</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="84"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="85"/>
         <source>Socket read error</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="92"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="93"/>
         <source>Data read timeout</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="338"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="339"/>
         <source>Tax error code</source>
         <translation type="unfinished"></translation>
     </message>

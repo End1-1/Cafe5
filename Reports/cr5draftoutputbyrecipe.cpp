@@ -131,7 +131,7 @@ void CR5DraftOutputByRecipe::createStoreOutput()
                 .arg(fFilter->date1().toString(FORMAT_DATE_TO_STR))
                 .arg(fFilter->date2().toString(FORMAT_DATE_TO_STR));
         dw.writeAHeader(documentId, dw.storeDocNum(DOC_TYPE_STORE_OUTPUT, fFilter->store(), true, 0), DOC_STATE_DRAFT, DOC_TYPE_STORE_OUTPUT, __user->id(), fFilter->date2(),
-                        QDate::currentDate(), QTime::currentTime(), 0, 0, comment, 0, 0);
+                        QDate::currentDate(), QTime::currentTime(), 0, 0, comment);
 
         dw.writeAHeaderStore(documentId, __user->id(), __user->id(), "", QDate(), 0, fFilter->store(), 0, cashid, 0, 0);
         int rownum = 1;

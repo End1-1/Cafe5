@@ -37,7 +37,7 @@ void C5CheckDatabase::on_btnStart_clicked()
                 QString purpose = tr("Store input") + " #" + db1.getString("f_userid") + ", " + db1.getDate("f_date").toString(FORMAT_DATE_TO_STR);
                 QString fCashRowId;
                 QString cashdocnum = QString("%1").arg(doc.genNumber(DOC_TYPE_CASH), C5Config::docNumDigitsInput(), 10, QChar('0'));
-                dw.writeAHeader(cashuuid, cashdocnum, DOC_STATE_DRAFT, DOC_TYPE_CASH, 1, db1.getDate("f_date"), QDate::currentDate(), QTime::currentTime(), db1.getInt("f_partner"), db1.getDouble("f_amount"), purpose, 0, 0);
+                dw.writeAHeader(cashuuid, cashdocnum, DOC_STATE_DRAFT, DOC_TYPE_CASH, 1, db1.getDate("f_date"), QDate::currentDate(), QTime::currentTime(), db1.getInt("f_partner"), db1.getDouble("f_amount"), purpose);
                 dw.writeAHeaderCash(cashuuid, 0, 1, 1, db1.getString("f_id"), "");
                 dw.writeECash(fCashRowId, cashuuid, 1, -1, purpose, db1.getDouble("f_amount"), fCashRowId, 1);
                 db2[":f_id"] = db1.getString("f_id");

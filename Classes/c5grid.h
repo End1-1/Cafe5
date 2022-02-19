@@ -57,6 +57,11 @@ public:
 
     virtual void setCheckboxes(bool v);
 
+    template<class T>
+    T *filter() {
+        return static_cast<T*>(fFilterWidget);
+    }
+
 public slots:
     virtual bool on_tblView_doubleClicked(const QModelIndex &index);
 
