@@ -9,6 +9,7 @@
 #include <QDir>
 #include <QFile>
 #include <QDesktopServices>
+#include <QUrl>
 
 CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
@@ -614,7 +615,7 @@ void CR5CommonSales::exportToAS()
             QString ba = codeErrors.join("\r\n");
             f.write(ba.toUtf8());
             f.close();
-            QDesktopServices::openUrl(d.tempPath() + "/err.txt");
+            QDesktopServices::openUrl(QUrl(d.tempPath() + "/err.txt"));
         }
     }
 
@@ -739,7 +740,7 @@ void CR5CommonSales::createStoreOutputAS()
             QString ba = nocalc.join("\r\n");
             f.write(ba.toUtf8());
             f.close();
-            QDesktopServices::openUrl(d.tempPath() + "/err.txt");
+            QDesktopServices::openUrl(QUrl(d.tempPath() + "/err.txt"));
         }
     }
 

@@ -42,7 +42,7 @@ QToolBar *CR5Dish::toolBar()
             createStandartToolbar(btn);
         fToolBar->addAction(QIcon(":/translate.png"), tr("Translator"), this, SLOT(translator()));
         fToolBar->addAction(QIcon(":/delete.png"), tr("Remove"), this, SLOT(deleteDish()));
-        auto *g = new QAction(QIcon(":/goodsback.png"), tr("Output to AS"));
+        auto *g = new QAction(QIcon(":/goodsback.png"), tr("Output to AS"), this);
         connect(g, SIGNAL(triggered(bool)), this, SLOT(asoutput(bool)));
         fToolBar->addAction(g);
     }

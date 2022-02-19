@@ -85,13 +85,13 @@ QToolBar *CR5Documents::toolBar()
             << ToolBarButtons::tbExcel
             << ToolBarButtons::tbPrint;
         fToolBar = createStandartToolbar(btn);
-        QAction *a = new QAction(QIcon(":/save.png"), tr("Save\ndocuments"));
+        QAction *a = new QAction(QIcon(":/save.png"), tr("Save\ndocuments"), this);
         connect(a, SIGNAL(triggered()), this, SLOT(saveDocs()));
         fToolBar->insertAction(fToolBar->actions().at(0), a);
-        a = new QAction(QIcon(":/draft.png"), tr("Create\ndraft"));
+        a = new QAction(QIcon(":/draft.png"), tr("Create\ndraft"), this);
         connect(a, SIGNAL(triggered()), this, SLOT(draftDocs()));
         fToolBar->insertAction(fToolBar->actions().at(1), a);
-        a = new QAction(QIcon(":/recycle.png"), tr("Remove"));
+        a = new QAction(QIcon(":/recycle.png"), tr("Remove"), this);
         connect(a, SIGNAL(triggered()), this, SLOT(removeDocs()));
         fToolBar->insertAction(fToolBar->actions().at(2), a);
     }

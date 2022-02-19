@@ -1,9 +1,12 @@
 #ifndef C5USER_H
 #define C5USER_H
 
+#include <QObject>
 #include <QString>
 #include <QJsonObject>
 #include <QStringList>
+#include <QMap>
+#include <QVariant>
 
 class C5User : public QObject
 {

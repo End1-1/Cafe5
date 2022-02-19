@@ -3,6 +3,7 @@
 
 #include <QThread>
 #include <QMap>
+#include <QVariant>
 
 class C5PrintRemovedServiceThread : public QThread
 {

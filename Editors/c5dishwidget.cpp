@@ -591,9 +591,9 @@ void C5DishWidget::on_btnCopy_clicked()
 
 void C5DishWidget::on_btnPasteRecipt_clicked()
 {
-    QStringList s = qApp->clipboard()->text().split("\r\n", Qt::SkipEmptyParts);
+    QStringList s = qApp->clipboard()->text().split("\r\n", QString::SkipEmptyParts);
     for (const QString &l: s) {
-        QStringList c = l.split("\t", Qt::SkipEmptyParts);
+        QStringList c = l.split("\t", QString::SkipEmptyParts);
         int r = addRecipeRow();
         ui->tblRecipe->setString(r, 1, c.at(0));
         ui->tblRecipe->setString(r, 2, c.at(1));

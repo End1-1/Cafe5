@@ -13,7 +13,7 @@ C5Login::C5Login(const QStringList &dbParams) :
         ui->lePassword->setFocus();
     }
     if (__autologin_store.contains("--autologin")) {
-        for (const QString &s: qAsConst(__autologin_store)) {
+        for (const QString &s: __autologin_store) {
             if (s.contains("--user:")) {
                 ui->leUsername->setText(s.mid(s.indexOf(":") + 1, s.length() - s.indexOf(":")));
             } else if (s.contains("--password:")) {

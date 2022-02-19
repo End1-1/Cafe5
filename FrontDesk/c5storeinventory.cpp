@@ -9,6 +9,7 @@
 #include "ce5editor.h"
 #include "c5storedraftwriter.h"
 #include <QShortcut>
+#include <QUuid>
 
 C5StoreInventory::C5StoreInventory(const QStringList &dbParams, QWidget *parent) :
     C5Widget(dbParams, parent),

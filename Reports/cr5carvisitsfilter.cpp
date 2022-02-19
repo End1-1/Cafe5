@@ -27,7 +27,7 @@ QString CR5CarVisitsFilter::condition()
         for (int i = 0; i < l.count(); i++) {
             QString t = l[i].trimmed();
             if (!t.isEmpty()) {
-                if (t.at(0) != "'") {
+                if (t.at(0) != '\'') {
                     t = "'" + t + "'";
                 }
                 if (!gov.isEmpty()) {
