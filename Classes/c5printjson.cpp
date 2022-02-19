@@ -1,6 +1,7 @@
 #include "c5printjson.h"
 #include "c5printing.h"
 #include <QJsonObject>
+#include <QDebug>
 
 C5PrintJson::C5PrintJson(const QJsonArray &obj, QObject *parent) :
     QThread(parent)

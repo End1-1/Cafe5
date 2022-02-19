@@ -466,7 +466,8 @@ void payment::on_btnCheckoutIdram_clicked()
         qDebug() << jo;
         QJsonArray ja = jo["Result"].toArray();
         if (ja.count() > 0) {
-            QString DEBIT = ja.at(0)["DEBIT"].toString();
+            QJsonObject jr = ja.at(0).toObject();
+            QString DEBIT = jr["DEBIT"].toString();
             DEBIT.replace(",", " ");
             if (str_float(DEBIT) > 0.01) {
                 checkout(false, true);

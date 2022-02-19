@@ -7,6 +7,7 @@
 #include <QTranslator>
 #include <QStyleFactory>
 #include <QFontDatabase>
+#include <ctime>
 
 int main(int argc, char *argv[])
 {

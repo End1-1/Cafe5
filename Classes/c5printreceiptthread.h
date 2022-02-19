@@ -3,6 +3,7 @@
 
 #include <QMap>
 #include <QObject>
+#include <QVariant>
 
 class C5PrintReceiptThread : public QObject
 {

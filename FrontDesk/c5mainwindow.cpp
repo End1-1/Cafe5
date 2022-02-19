@@ -285,7 +285,7 @@ void C5MainWindow::on_actionLogin_triggered()
         if (!fUdpSocket.bind(DATAGRAM_PORT, QUdpSocket::ShareAddress)) {
 
         }
-        connect(&fUdpSocket, &QUdpSocket::channelReadyRead, this, &C5MainWindow::datagramRead);
+        connect(&fUdpSocket, &QUdpSocket::readyRead, this, &C5MainWindow::datagramRead);
     }
 }
 
@@ -550,7 +550,7 @@ void C5MainWindow::autoLogin()
     int doctype = 0;
     int storein = 0;
     if (__autologin_store.count() > 0) {
-        for (const QString &s: qAsConst(__autologin_store)) {
+        for (const QString &s: __autologin_store) {
             if (s.contains("--newdoc:")) {
                 doctype = s.mid(s.indexOf(":") + 1, s.length() - s.indexOf(":")).toInt();
             }
@@ -1009,7 +1009,7 @@ void C5MainWindow::setDB(const QString &dbname)
     }
 
     readFavoriteMenu();
-    for (QListWidget *ll: qAsConst(fMenuLists)) {
+    for (QListWidget *ll: fMenuLists) {
         int size = ll->count() == 0 ? 0 : (ll->count() * (ll->item(0)->sizeHint().height() + 1));
         ll->setMinimumHeight(size);
         ll->setMaximumHeight(ll->minimumHeight());

@@ -82,7 +82,7 @@ bool CE5DishPackage::save(QString &err, QList<QMap<QString, QVariant> > &data)
         return false;
     }
     C5Database db(fDBParams);
-    for (int id: qAsConst(fRemovedDish)) {
+    for (int id: fRemovedDish) {
         db[":f_id"] = id;
         db.exec("delete from d_package_list where f_id=:f_id");
     }

@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
         c->exec();
         delete c;
     }
-    QFont f("Arial", 10);
+    QFont f("Arial LatArm Unicode", 10);
     qApp->setFont(f);
     QList<QByteArray> connectionParams;
     C5Connection::readParams(connectionParams);

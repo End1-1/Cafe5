@@ -15,7 +15,7 @@ C5TableWidget::C5TableWidget(QWidget *parent) :
     setEditTriggers(NoEditTriggers);
     qDebug() << property("columns");
     if (!property("columns").toString().isEmpty()) {
-        QStringList cols = property("columns").toString().split(",", Qt::SkipEmptyParts);
+        QStringList cols = property("columns").toString().split(",", QString::SkipEmptyParts);
         for (int i = 0; i < cols.count(); i++) {
             setColumnWidth(i, cols.at(i).toInt());
         }

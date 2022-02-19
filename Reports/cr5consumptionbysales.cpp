@@ -99,18 +99,18 @@ QToolBar *CR5ConsumptionBySales::toolBar()
         auto *c = new QAction(QIcon(":/goods.png"), tr("Sales\noutput"), this);
         connect(c, SIGNAL(triggered(bool)), this, SLOT(salesOutput(bool)));
         fToolBar->insertAction(a, c);
-        auto *e = new QAction(QIcon(":/goodsback.png"), tr("Rollback goods output"));
+        auto *e = new QAction(QIcon(":/goodsback.png"), tr("Rollback goods output"), this);
         connect(e, SIGNAL(triggered(bool)), this, SLOT(rollbackGoodsOutput(bool)));
         fToolBar->insertAction(c, e);
 
-        auto *f = new QAction(QIcon(":/goodsback.png"), tr("Get from AS"));
+        auto *f = new QAction(QIcon(":/goodsback.png"), tr("Get from AS"), this);
         connect(f, SIGNAL(triggered(bool)), this, SLOT(asinput(bool)));
         fToolBar->insertAction(e, f);
-        auto *g = new QAction(QIcon(":/goodsback.png"), tr("Output to AS"));
+        auto *g = new QAction(QIcon(":/goodsback.png"), tr("Output to AS"), this);
         connect(g, SIGNAL(triggered(bool)), this, SLOT(asoutput(bool)));
         fToolBar->insertAction(e, g);
 
-        auto *h = new QAction(QIcon(":/update_prices.png"), tr("Update prices\nof inventorization"));
+        auto *h = new QAction(QIcon(":/update_prices.png"), tr("Update prices\nof inventorization"), this);
         connect(h, SIGNAL(triggered(bool)), this, SLOT(updateInventorizatinPrices()));
         fToolBar->addAction(h);
     }
