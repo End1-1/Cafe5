@@ -1,5 +1,6 @@
 #include "databaseconnectionmanager.h"
 #include "configini.h"
+#include "logwriter.h"
 
 QHash<QString, DatabaseConnection> DatabaseConnectionManager::fDatabaseConnections;
 
@@ -42,7 +43,15 @@ bool DatabaseConnectionManager::openDatabase(Database &db, JsonHandler &jh)
 
 bool DatabaseConnectionManager::openDatabase(const QString &name, Database &db, JsonHandler &jh)
 {
+#ifdef QT_DEBUG
     Q_ASSERT(fDatabaseConnections.contains(name));
+#else
+    if (!fDatabaseConnections.contains(name)) {
+        LogWriter::write(LogWriterLevel::errors, "", QString("The database with name '%1' is not exist.").arg(name));
+        jh["message"] = "Database error: " + QString("The database with name '%1' is not exist.").arg(name);
+        return false;
+    }
+#endif
     DatabaseConnection &dc = fDatabaseConnections[name];
     if (!db.open(dc.host, dc.schema, dc.username, dc.password)) {
         jh["message"] = "Database error: " + db.lastDbError();

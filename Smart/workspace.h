@@ -67,6 +67,8 @@ private slots:
 
     void on_leReadCode_returnPressed();
 
+    void on_btnPrintByOrder_clicked();
+
 private:
     Ui::Workspace *ui;
 

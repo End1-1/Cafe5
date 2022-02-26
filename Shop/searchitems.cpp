@@ -73,7 +73,8 @@ void SearchItems::on_btnReserve_clicked()
     if (row < 0) {
         return;
     }
-    DlgReservGoods r(ui->tbl->getInteger(row, tr("Store code")),
+    DlgReservGoods r(__c5config.dbParams(),
+                     ui->tbl->getInteger(row, tr("Store code")),
                      ui->tbl->getInteger(row, tr("Goods code")),
                      ui->tbl->getDouble(row, tr("Qty")) - ui->tbl->getDouble(row, tr("Reserved")));
     r.exec();
@@ -154,6 +155,6 @@ void SearchItems::on_btnEditReserve_clicked()
     } else {
         return;
     }
-    DlgReservGoods rg(reserveid);
+    DlgReservGoods rg(__c5config.dbParams(), reserveid);
     rg.exec();
 }

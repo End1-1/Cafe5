@@ -147,20 +147,6 @@
      </layout>
     </widget>
    </item>
-   <item row="0" column="3">
-    <widget class="QToolButton" name="toolButton">
-     <property name="text">
-      <string/>
-     </property>
-     <property name="icon">
-      <iconset resource="../resources/res.qrc">
-       <normaloff>:/pushpin.png</normaloff>:/pushpin.png</iconset>
-     </property>
-     <property name="FixDate" stdset="0">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
    <item row="4" column="3">
     <widget class="C5LineEditWithSelector" name="leStateName">
      <property name="focusPolicy">
@@ -451,6 +437,27 @@ datetime</string>
      </layout>
     </widget>
    </item>
+   <item row="1" column="2">
+    <widget class="QCheckBox" name="chDoNotUseCashDate">
+     <property name="text">
+      <string>Date cash is null</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2">
+    <widget class="QToolButton" name="toolButton">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources/res.qrc">
+       <normaloff>:/pushpin.png</normaloff>:/pushpin.png</iconset>
+     </property>
+     <property name="FixDate" stdset="0">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -482,7 +489,6 @@ datetime</string>
   <tabstop>rbTaxAll</tabstop>
   <tabstop>rbTaxYes</tabstop>
   <tabstop>rbTaxNo</tabstop>
-  <tabstop>toolButton</tabstop>
   <tabstop>btnFlags</tabstop>
   <tabstop>chUseClosingDateTime</tabstop>
  </tabstops>

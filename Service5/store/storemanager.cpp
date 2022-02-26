@@ -1,8 +1,9 @@
 #include "storemanager.h"
 #include "database.h"
 #include "databaseconnectionmanager.h"
-#include "debug.h"
 #include "configini.h"
+#include "logwriter.h"
+#include <QElapsedTimer>
 
 StoreManager *StoreManager::fInstance = nullptr;
 
@@ -62,7 +63,7 @@ int StoreManager::queryQty(int store, const QStringList &sku, QMap<QString, doub
         sql.replace("%store", QString("and s.f_store=%1").arg(store));
     }
     db.exec(sql);
-    __debug_log(sql);
+    LogWriter::write(LogWriterLevel::verbose, "", sql);
     while (db.next()) {
         out.insert(fInstance->fCodeSkuMap.value(db.integerValue("f_goods")), db.doubleValue("f_qty"));
     }
@@ -111,7 +112,7 @@ int StoreManager::queryQty(const QStringList &sku, QMap<int, QMap<QString, doubl
             .arg(storelist);
 
     db.exec(sql);
-    __debug_log(sql);
+    LogWriter::write(LogWriterLevel::verbose, "", sql);
     while (db.next()) {
         out[db.integerValue("f_store")].insert(fInstance->fCodeSkuMap.value(db.integerValue("f_goods")), db.doubleValue("f_qty"));
     }

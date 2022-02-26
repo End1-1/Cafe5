@@ -1322,7 +1322,7 @@ MS Excel</source>
     <message>
         <location filename="../Shop/printreceipt.cpp" line="163"/>
         <source>Return from</source>
-        <translation type="unfinished"></translation>
+        <translation>Հետվերադարձ</translation>
     </message>
     <message>
         <location filename="../Shop/printreceipt.cpp" line="167"/>
@@ -1623,7 +1623,7 @@ MS Excel</source>
         <location filename="workspace.ui" line="554"/>
         <location filename="workspace.ui" line="559"/>
         <location filename="workspace.ui" line="564"/>
-        <location filename="workspace.ui" line="1203"/>
+        <location filename="workspace.ui" line="1229"/>
         <source>New Column</source>
         <translation></translation>
     </message>
@@ -1638,67 +1638,68 @@ MS Excel</source>
         <translation>Փաթեթներ</translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="932"/>
+        <location filename="workspace.ui" line="958"/>
         <source>1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="976"/>
+        <location filename="workspace.ui" line="1002"/>
         <source>2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="1020"/>
+        <location filename="workspace.ui" line="1046"/>
         <source>4</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="888"/>
+        <location filename="workspace.ui" line="914"/>
         <source>3</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="954"/>
+        <location filename="workspace.ui" line="980"/>
         <source>+10</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="800"/>
+        <location filename="workspace.ui" line="826"/>
         <source>+37477019107&lt;br&gt;Supplier</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="1106"/>
+        <location filename="workspace.ui" line="1132"/>
         <source>+1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="910"/>
+        <location filename="workspace.ui" line="936"/>
         <source>-1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="998"/>
+        <location filename="workspace.ui" line="1024"/>
         <source>0.5</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="1128"/>
+        <location filename="workspace.ui" line="1154"/>
         <source>0.25</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="1271"/>
+        <location filename="workspace.ui" line="1297"/>
         <source>0</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="1294"/>
+        <location filename="workspace.ui" line="1320"/>
+        <location filename="workspace.cpp" line="1011"/>
         <source>Total</source>
         <translation>Ընդամենը</translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="1310"/>
+        <location filename="workspace.ui" line="1336"/>
         <source>Checkout</source>
         <translation>ՀԱՇԻՎ</translation>
     </message>
@@ -1735,6 +1736,30 @@ MS Excel</source>
         <translation>Տպված</translation>
     </message>
     <message>
+        <location filename="workspace.cpp" line="978"/>
+        <location filename="workspace.cpp" line="1015"/>
+        <source>Cash</source>
+        <translation>Կանխիկ</translation>
+    </message>
+    <message>
+        <location filename="workspace.cpp" line="984"/>
+        <location filename="workspace.cpp" line="1020"/>
+        <source>Card</source>
+        <translation>Քարտ</translation>
+    </message>
+    <message>
+        <location filename="workspace.cpp" line="990"/>
+        <location filename="workspace.cpp" line="1025"/>
+        <source>Idram</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="workspace.cpp" line="996"/>
+        <location filename="workspace.cpp" line="1030"/>
+        <source>Other</source>
+        <translation>Այլ</translation>
+    </message>
+    <message>
         <location filename="workspace.cpp" line="162"/>
         <location filename="workspace.cpp" line="746"/>
         <source>Confirm to close application</source>
@@ -1752,6 +1777,7 @@ MS Excel</source>
     </message>
     <message>
         <location filename="workspace.cpp" line="377"/>
+        <location filename="workspace.cpp" line="961"/>
         <source>End of day</source>
         <translation>Օրվա հասույթ</translation>
     </message>
@@ -1762,6 +1788,7 @@ MS Excel</source>
     </message>
     <message>
         <location filename="workspace.cpp" line="438"/>
+        <location filename="workspace.cpp" line="1037"/>
         <source>Printed</source>
         <translation>Տպված</translation>
     </message>
@@ -1976,7 +2003,7 @@ MS Excel</source>
         <translation>Օրնկ․</translation>
     </message>
     <message>
-        <location filename="payment.cpp" line="477"/>
+        <location filename="payment.cpp" line="478"/>
         <source>Unpaid</source>
         <translation>Վճարված չէ</translation>
     </message>

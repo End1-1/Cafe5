@@ -2,9 +2,9 @@
 #define REQUESTHANDLER_H
 
 #include "socketdata.h"
-#include "debug.h"
 #include "socketdata.h"
 #include "httpheader.h"
+#include <QObject>
 #include <QByteArray>
 #include <QDateTime>
 #include <QHash>

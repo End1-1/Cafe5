@@ -8,6 +8,8 @@ CONFIG += c++11
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+RC_FILE = res.rc
+
 SOURCES += \
     ../../NewTax/Src/printtax.cpp \
     ../../NewTax/Src/printtaxn.cpp \
@@ -44,7 +46,6 @@ SOURCES += \
     thread.cpp \
     threadworker.cpp \
     utils/c5printing.cpp \
-    utils/debug.cpp \
     utils/logwriter.cpp \
     utils/printreceiptgroup.cpp
 
@@ -74,6 +75,8 @@ HEADERS += \
     jsonhandler.h \
     monitor.h \
     monitoringwindow.h \
+    rc.h \
+    res.rc \
     serverthread.h \
     socket/sslserver.h \
     socket/sslsocket.h \
@@ -84,7 +87,6 @@ HEADERS += \
     thread.h \
     threadworker.h \
     utils/c5printing.h \
-    utils/debug.h \
     utils/logwriter.h \
     utils/printreceiptgroup.h
 
@@ -112,6 +114,7 @@ LIBS += -lVersion
 LIBS += -lwsock32
 LIBS += -LC:/Soft/OpenSSL-Win64/lib
 LIBS += -lopenssl
+LIBS += advapi32.lib
 LIBS += -llibcrypto
 
 # Default rules for deployment.

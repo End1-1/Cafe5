@@ -1,11 +1,12 @@
 #include "c5tablemodel.h"
 #include "c5utils.h"
+#include "c5database.h"
 #include <QIcon>
 #include <QTableView>
 
-C5TableModel::C5TableModel(C5Database &db, QObject *parent) :
+C5TableModel::C5TableModel(const QStringList &dbParams, QObject *parent) :
     QAbstractTableModel(parent),
-    fDb(db)
+    fDBParams(dbParams)
 {
     fTableView = dynamic_cast<QTableView*>(parent);
     fSortAsc = true;
@@ -23,7 +24,8 @@ void C5TableModel::execQuery(const QString &query)
 {
     beginResetModel();
     clearModel();
-    if (fDb.exec(query, fRawData, fColumnNameIndex)) {
+    C5Database db(fDBParams);
+    if (db.exec(query, fRawData, fColumnNameIndex)) {
         for (int i = 0, count = fRawData.count(); i < count; i++) {
             if (fCheckboxes) {
                 fRawData[i].insert(0, QVariant());
@@ -296,22 +298,23 @@ QList<QVariant> C5TableModel::getRowValues(int row)
 
 void C5TableModel::saveDataChanges()
 {
+    C5Database db(fDBParams);
     QList<int> rows = fRowToUpdate.values();
     std::sort(rows.begin(), rows.end());
     for (int i = 0, count = rows.count(); i < count; i++) {
         int row = rows.at(i);
         for (int j = 0; j < fColumnsForUpdate.count(); j++) {
-            fDb[":" + fColumnIndexName[fColumnsForUpdate.at(j)]] = fRawData.at(row).at(fColumnsForUpdate.at(j));
+            db[":" + fColumnIndexName[fColumnsForUpdate.at(j)]] = fRawData.at(row).at(fColumnsForUpdate.at(j));
         }
         if (fAddDataToUpdate.contains(row)) {
             for (QMap<QString, QVariant>::const_iterator it = fAddDataToUpdate[row].begin(); it != fAddDataToUpdate[row].end(); it++) {
-                fDb[":" + it.key()] = it.value();
+                db[":" + it.key()] = it.value();
             }
         }
         if (fRawData.at(row).at(0).toString() == 0) {
-            fRawData[row][0] = fDb.insert(fTableForUpdate, true);;
+            fRawData[row][0] = db.insert(fTableForUpdate, true);;
         } else {
-            fDb.update(fTableForUpdate, where_id(fRawData.at(row).at(0).toInt()));
+            db.update(fTableForUpdate, where_id(fRawData.at(row).at(0).toInt()));
         }
     }
     fRowToUpdate.clear();

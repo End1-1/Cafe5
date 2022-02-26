@@ -16,23 +16,25 @@ LogWriter::LogWriter()
 void LogWriter::setFile(int num, const QString &fileName)
 {
     QMutexLocker ml(&fMutex);
+    QDir().mkpath(QFileInfo(fileName).path());
     fFilesMap[num] = fileName;
 }
 
-void LogWriter::write(int level, int file, const QString &session, const QString &message)
+void LogWriter::write(int file, const QString &session, const QString &message)
 {
     QMutexLocker ml(&fMutex);
 #ifdef QT_DEBUG
     qDebug() << QDateTime::currentDateTime().toString("dd/MM/yyyy HH:mm:ss ") << message;
 #endif;
-    if (fCurrentLevel < level) {
-        return;
-    }
     if (fFilesMap.empty()) {
-        fFilesMap[level] = QDir::tempPath() + "/" + _APPLICATION_ + "." + _MODULE_ + ".log";
+        fFilesMap[file] = QDir::tempPath() + "/" + _APPLICATION_ + "." + _MODULE_ + ".log";
     }
+
     QString fileName = fFilesMap[file];
     writeToFile(fileName, session, message);
+    if (file != LogWriterLevel::verbose) {
+        writeToFile(fFilesMap[LogWriterLevel::verbose], session, message);
+    }
 }
 
 void LogWriter::writeToFile(const QString &fileName, const QString &session, const QString &message)

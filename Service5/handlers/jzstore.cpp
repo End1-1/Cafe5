@@ -107,7 +107,7 @@ bool JZStore::requestGoodsGroups(const QByteArray &data, const QHash<QString, Da
     JsonHandler jh;
     Database db("QIBASE");
     if (!db.open("10.1.0.4", "c:\\fb\\maindb.fdb", "SYSDBA", "Inter_OneStep")) {
-        return setInternalServerError(db.lastDbError());
+        return setInternalServerError("QIBASE " + db.lastDbError());
     }
     QMap<int, JsonHandler> goods;
     db.exec("select f.id, t.name as typename, f.name as foodname "
@@ -215,11 +215,12 @@ bool JZStore::requestStore(const QByteArray &data, const QHash<QString, DataAddr
     db[":date1"] = d1;
     db[":date2"] = d2;
     if (!db.exec("select r.goods_id, sum(r.qty*d.qty) as qty, 0 as AMOUNT "
-            "from me_recipes r "
-            "left join o_dishes d on d.dish_id=r.dish_id "
+            "from o_dishes d  "
+            "left join me_recipes r on d.dish_id=r.dish_id "
             "left join o_order o on o.id=d.order_id "
             "where o.date_cash between :date1 and :date2 "
             "and (o.state_id=2 or o.state_id=1) and d.state_id=1 "
+            "and r.goods_id is not null "
             "and d.store_id=:store "
             "group by 1")) {
         return setInternalServerError(db.lastDbError());

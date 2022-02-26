@@ -14,7 +14,6 @@ NotFound::NotFound(const QString &route) :
 
 NotFound::~NotFound()
 {
-    __debug_log("~NotFound");
 }
 
 bool NotFound::handle(const QByteArray &data, const QHash<QString, DataAddress> &dataMap)

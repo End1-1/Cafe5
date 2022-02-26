@@ -748,5 +748,17 @@ ALTER TABLE `a_store_draft` ADD CONSTRAINT `fk_store_draft_document`  FOREIGN KE
 update s_app set f_version='65' where f_app='DB';
 create table a_dc (f_id char(36), f_debit varchar(12), f_credit varchar(12), f_doc char(36), f_dc tinyint, f_amount decimal(14,2));
 ALTER TABLE `a_dc` ADD INDEX `id_adc_dc` (`f_dc` ASC) ;
-ALTER TABLE `a_dc` ADD INDEX `fk_adc_doc_idx` (`f_doc` ASC) VISIBLE;
+ALTER TABLE `a_dc` ADD INDEX `fk_adc_doc_idx` (`f_doc` ASC);
 ALTER TABLE `a_dc` ADD CONSTRAINT `fk_adc_doc` FOREIGN KEY (`f_doc`) REFERENCES `a_header` (`f_id`)  ON DELETE NO ACTION  ON UPDATE NO ACTION;
+
+/*db - 66 */
+/* 21.02.2022 */
+update s_app set f_version='66' where f_app='DB';
+create table sys_cache_tables (f_name varchar(128) primary key, f_sql text);
+insert into sys_cache_tables (f_name) values ('c_goods'), ('c_groups'), ('c_units'), ('c_partners'), ('c_storages');
+delete from sys_cache_tables;
+INSERT INTO `sys_cache_tables` (`f_name`, `f_sql`) VALUES ('c_goods', 'select t.f_id as `Կոդ`, gg.f_name as `Խումբ`, t.f_name as `Անվանում`, u.f_name as `ՉՄ`, t.f_scancode as `Շտրիխ կոդ`, t.f_lastinputprice as `ՎԵրջին մուտքի գին`, t.f_complectout as `Կոմպլեկտի ելքի քանակ`\nfrom c_goods t\nleft join c_groups gg on gg.f_id=t.f_group \nleft join c_units as u on u.f_id=t.f_unit ');
+INSERT INTO `sys_cache_tables` (`f_name`, `f_sql`) VALUES ('c_groups', NULL);
+INSERT INTO `sys_cache_tables` (`f_name`, `f_sql`) VALUES ('c_partners', NULL);
+INSERT INTO `sys_cache_tables` (`f_name`, `f_sql`) VALUES ('c_storages', 'select f_id as `Կոդ`, f_name as `Անվանում` from c_storages t');
+INSERT INTO `sys_cache_tables` (`f_name`, `f_sql`) VALUES ('c_units', NULL);

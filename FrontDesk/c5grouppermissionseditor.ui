@@ -27,26 +27,6 @@
        <string>Actions</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_5">
-       <item row="5" column="0">
-        <widget class="C5CheckBox" name="checkBox_56">
-         <property name="text">
-          <string>Store complectation</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>207</number>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="C5CheckBox" name="checkBox_23">
-         <property name="text">
-          <string>Store movement</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>203</number>
-         </property>
-        </widget>
-       </item>
        <item row="7" column="0">
         <widget class="C5CheckBox" name="checkBox_11">
          <property name="text">
@@ -54,6 +34,49 @@
          </property>
          <property name="Tag" stdset="0">
           <number>206</number>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="C5CheckBox" name="checkBox_21">
+         <property name="text">
+          <string>Store output</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>202</number>
+         </property>
+        </widget>
+       </item>
+       <item row="12" column="1">
+        <spacer name="verticalSpacer_5">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>567</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="8" column="0">
+        <widget class="C5CheckBox" name="checkBox_66">
+         <property name="text">
+          <string>Allow change cash document date</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>107</number>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="C5CheckBox" name="checkBox_24">
+         <property name="text">
+          <string>Store inventory</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>204</number>
          </property>
         </widget>
        </item>
@@ -67,13 +90,13 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="0">
-        <widget class="C5CheckBox" name="checkBox_24">
+       <item row="3" column="0">
+        <widget class="C5CheckBox" name="checkBox_23">
          <property name="text">
-          <string>Store inventory</string>
+          <string>Store movement</string>
          </property>
          <property name="Tag" stdset="0">
-          <number>204</number>
+          <number>203</number>
          </property>
         </widget>
        </item>
@@ -97,16 +120,6 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
-        <widget class="C5CheckBox" name="checkBox_21">
-         <property name="text">
-          <string>Store output</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>202</number>
-         </property>
-        </widget>
-       </item>
        <item row="0" column="0">
         <widget class="C5CheckBox" name="chActions">
          <property name="text">
@@ -117,29 +130,6 @@
          </property>
         </widget>
        </item>
-       <item row="8" column="0">
-        <widget class="C5CheckBox" name="checkBox_66">
-         <property name="text">
-          <string>Allow change cash document date</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>107</number>
-         </property>
-        </widget>
-       </item>
-       <item row="11" column="1">
-        <spacer name="verticalSpacer_5">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>567</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
        <item row="10" column="0">
         <widget class="C5CheckBox" name="checkBox_69">
          <property name="text">
@@ -147,6 +137,26 @@
          </property>
          <property name="Tag" stdset="0">
           <number>109</number>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="C5CheckBox" name="checkBox_56">
+         <property name="text">
+          <string>Store complectation</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>207</number>
+         </property>
+        </widget>
+       </item>
+       <item row="11" column="0">
+        <widget class="C5CheckBox" name="checkBox_104">
+         <property name="text">
+          <string>Goods reservatoins</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>209</number>
          </property>
         </widget>
        </item>

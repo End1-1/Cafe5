@@ -14,10 +14,10 @@ ConfigIni::~ConfigIni()
     delete fSettings;
 }
 
-void ConfigIni::init()
+void ConfigIni::init(const QString &path)
 {
     fInstance = new ConfigIni();
-    fInstance->fSettings = new QSettings(QDir::currentPath() + "/config.ini", QSettings::IniFormat);
+    fInstance->fSettings = new QSettings(path + "/config.ini", QSettings::IniFormat);
 }
 
 QString ConfigIni::value(const QString &key)

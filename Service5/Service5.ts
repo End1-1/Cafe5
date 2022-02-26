@@ -170,7 +170,7 @@
         <location filename="../../NewTax/Src/printtaxn.cpp" line="93"/>
         <location filename="../../NewTax/Src/printtaxn.cpp" line="341"/>
         <source>Connection error</source>
-        <translation type="unfinished"></translation>
+        <translation>Կապի սխալ</translation>
     </message>
     <message>
         <location filename="../../NewTax/Src/printtaxn.cpp" line="41"/>
@@ -190,7 +190,7 @@
     <message>
         <location filename="../../NewTax/Src/printtaxn.cpp" line="339"/>
         <source>Tax error code</source>
-        <translation type="unfinished"></translation>
+        <translation>ՀԴՄ սխոլի կոդ</translation>
     </message>
 </context>
 <context>

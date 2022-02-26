@@ -930,3 +930,112 @@ void Workspace::on_leReadCode_returnPressed()
         countTotal();
     }
 }
+
+void Workspace::on_btnPrintByOrder_clicked()
+{
+    QDate date1, date2;
+    if (!Calendar::getDate2(date1, date2)) {
+        return;
+    }
+    C5Database db(fDBParams);
+    db[":f_datecash1"] = date1;
+    db[":f_datecash2"] = date2;
+    db[":f_state"] = ORDER_STATE_CLOSE;
+    db.exec("select concat(oh.f_prefix, oh.f_hallid) as f_ordernum, t.f_receiptnumber, oh.f_amounttotal, oh.f_amountcash, oh.f_amountcard, oh.f_amountidram, oh.f_amountother "
+            "from o_header oh "
+            "left join o_tax t on t.f_id=oh.f_id  "
+            "where oh.f_state=:f_state and oh.f_datecash between :f_datecash1 and :f_datecash2 "
+            "order by oh.f_dateopen, oh.f_timeopen ");
+
+    QFont font(qApp->font());
+    font.setPointSize(28);
+    C5Printing p;
+    p.setSceneParams(650, 2800, QPrinter::Portrait);
+    p.setFont(font);
+
+    if (QFile::exists("./logo_receipt.png")) {
+        p.image("./logo_receipt.png", Qt::AlignHCenter);
+        p.br();
+    }
+    p.setFontBold(true);
+    p.ctext(tr("End of day"));
+    p.br();
+    p.ctext(date1.toString(FORMAT_DATE_TO_STR));
+    p.br();
+    p.ctext("-");
+    p.br();
+    p.ctext(date2.toString(FORMAT_DATE_TO_STR));
+    p.br();
+    double total = 0, totalcash = 0, totalcard=0, totalidram=0, totalother=0;
+
+    while (db.nextRow()) {
+        p.ltext(QString("[%1]%2").arg((db.getString("f_receiptnumber").toInt() == 0 ? "*" : db.getString("f_receiptnumber")), db.getString("f_ordernum")), 0);
+        p.rtext(QString("%1 %2").arg(db.getDate("f_datecash").toString(FORMAT_DATE_TO_STR), db.getTime("f_dateclose").toString(FORMAT_TIME_TO_SHORT_STR)));
+        p.br();
+        total += db.getDouble("f_amounttotal");
+        if (db.getDouble("f_amountcash") > 0.001) {
+            totalcash += db.getDouble("f_amountcash");
+            p.ltext(tr("Cash"), 0);
+            p.rtext(float_str(db.getDouble("f_amountcash"), 2));
+            p.br();
+        }
+        if (db.getDouble("f_amountcard") > 0.001) {
+            totalcard += db.getDouble("f_amountcard");
+            p.ltext(tr("Card"), 0);
+            p.rtext(float_str(db.getDouble("f_amountcard"), 2));
+            p.br();
+        }
+        if (db.getDouble("f_amountidram") > 0.001) {
+            totalidram += db.getDouble("f_amountidram");
+            p.ltext(tr("Idram"), 0);
+            p.rtext(float_str(db.getDouble("f_amountidram"), 2));
+            p.br();
+        }
+        if (db.getDouble("f_amountother") > 0.001) {
+            totalother += db.getDouble("f_amountother");
+            p.ltext(tr("Other"), 0);
+            p.rtext(float_str(db.getDouble("f_amountother"), 2));
+            p.br();
+        }
+        p.line();
+        p.br();
+    }
+
+    p.line(2);
+    p.br();
+    p.line(2);
+    p.br();
+
+    p.setFontSize(24);
+    p.setFontBold(true);
+    p.ltext(tr("Total"), 0);
+    p.rtext(float_str(total, 2));
+    p.br();
+    if (totalcash > 0.001) {
+        p.ltext(tr("Cash"), 0);
+        p.rtext(float_str(totalcash, 2));
+        p.br();
+    }
+    if (totalcard > 0.001) {
+        p.ltext(tr("Card"), 0);
+        p.rtext(float_str(totalcard, 2));
+        p.br();
+    }
+    if (totalidram > 0.001) {
+        p.ltext(tr("Idram"), 0);
+        p.rtext(float_str(totalidram, 2));
+        p.br();
+    }
+    if (totalother > 0.001) {
+        p.ltext(tr("Other"), 0);
+        p.rtext(float_str(totalother, 2));
+        p.br();
+    }
+
+    p.setFontSize(18);
+    p.setFontBold(false);
+    p.ltext(tr("Printed"), 0);
+    p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
+    p.br();
+    p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
+}

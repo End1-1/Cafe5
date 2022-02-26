@@ -10,7 +10,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 RC_FILE = res.rc
 
-TARGET = FrontDesk
+TARGET = Office
 TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use
@@ -48,6 +48,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Classes/c5threadobject.cpp \
     ../Classes/c5user.cpp \
     ../Classes/calculator.cpp \
+    ../Classes/dataonline.cpp \
     ../Classes/doubledatabase.cpp \
     ../Classes/notificationwidget.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
@@ -93,6 +94,8 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Forms/c5salarydoc.cpp \
     ../Forms/c5storedoc.cpp \
     ../Forms/c5waiterorder.cpp \
+    ../Forms/dlgdataonline.cpp \
+    ../Forms/dlgreservgoods.cpp \
     ../Reports/c5customfilter.cpp \
     ../Reports/cr5carvisits.cpp \
     ../Reports/cr5carvisitsfilter.cpp \
@@ -121,6 +124,8 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Reports/cr5goodsimages.cpp \
     ../Reports/cr5goodsqtyreminder.cpp \
     ../Reports/cr5goodsqtyreminderfilter.cpp \
+    ../Reports/cr5goodsreservations.cpp \
+    ../Reports/cr5goodsreservationsfilter.cpp \
     ../Reports/cr5materialinstoreuncomplect.cpp \
     ../Reports/cr5materialinstoreuncomplectfilter.cpp \
     ../Reports/cr5materialmoveuncomplect.cpp \
@@ -307,7 +312,9 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Classes/c5user.h \
     ../Classes/calculator.h \
     ../Classes/chatmessage.h \
+    ../Classes/dataonline.h \
     ../Classes/doubledatabase.h \
+    ../Classes/goodsreserve.h \
     ../Classes/notificationwidget.h \
     ../Classes/proxytablewidgetdatabase.h \
     ../Classes/threadsendmessage.h \
@@ -352,6 +359,8 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Forms/c5salarydoc.h \
     ../Forms/c5storedoc.h \
     ../Forms/c5waiterorder.h \
+    ../Forms/dlgdataonline.h \
+    ../Forms/dlgreservgoods.h \
     ../Reports/c5customfilter.h \
     ../Reports/cr5carvisits.h \
     ../Reports/cr5carvisitsfilter.h \
@@ -380,6 +389,8 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Reports/cr5goodsimages.h \
     ../Reports/cr5goodsqtyreminder.h \
     ../Reports/cr5goodsqtyreminderfilter.h \
+    ../Reports/cr5goodsreservations.h \
+    ../Reports/cr5goodsreservationsfilter.h \
     ../Reports/cr5materialinstoreuncomplect.h \
     ../Reports/cr5materialinstoreuncomplectfilter.h \
     ../Reports/cr5materialmoveuncomplect.h \
@@ -569,6 +580,8 @@ FORMS += \
     ../Forms/c5salarydoc.ui \
     ../Forms/c5storedoc.ui \
     ../Forms/c5waiterorder.ui \
+    ../Forms/dlgdataonline.ui \
+    ../Forms/dlgreservgoods.ui \
     ../Reports/c5customfilter.ui \
     ../Reports/cr5carvisitsfilter.ui \
     ../Reports/cr5cashdetailedfilter.ui \
@@ -582,6 +595,7 @@ FORMS += \
     ../Reports/cr5goodsfilter.ui \
     ../Reports/cr5goodsimages.ui \
     ../Reports/cr5goodsqtyreminderfilter.ui \
+    ../Reports/cr5goodsreservationsfilter.ui \
     ../Reports/cr5materialinstoreuncomplectfilter.ui \
     ../Reports/cr5materialmoveuncomplectfilter.ui \
     ../Reports/cr5menureviewfilter.ui \

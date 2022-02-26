@@ -1,4 +1,5 @@
 #include "monitoringwindow.h"
+#include "logwriter.h"
 
 MonitoringWindow *MonitoringWindow::fInstance = nullptr;
 
@@ -14,7 +15,12 @@ void MonitoringWindow::connectReceiver(QObject *r)
 
 void MonitoringWindow::connectSender(QObject *s)
 {
-    s->connect(s, SIGNAL(sendData(int,QString,QString,QVariant)), fInstance, SLOT(monitoring(int,QString,QString,QVariant)));
+    if (fInstance) {
+        s->connect(s, SIGNAL(sendData(int,QString,QString,QVariant)), fInstance, SLOT(monitoring(int,QString,QString,QVariant)));
+    } else {
+        LogWriter::write(LogWriterLevel::warning, "", "Monitoring window not initialized, but connection requested");
+    }
+    return;
 }
 
 void MonitoringWindow::monitoring(int code, const QString &session, const QString &data1, const QVariant &data2)

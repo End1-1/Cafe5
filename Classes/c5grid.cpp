@@ -6,9 +6,8 @@
 #include "c5printing.h"
 #include "c5printpreview.h"
 #include "c5gridgilter.h"
-#include "c5editor.h"
-#include "ce5editor.h"
 #include "xlsxall.h"
+#include "c5database.h"
 #include <QMenu>
 #include <QScrollBar>
 #include <QClipboard>
@@ -16,13 +15,12 @@
 
 C5Grid::C5Grid(const QStringList &dbParams, QWidget *parent) :
     C5Widget(dbParams, parent),
-    fDb(dbParams),
     ui(new Ui::C5Grid)
 {
     ui->setupUi(this);
     fCheckboxes = false;
     fDBParams = dbParams;
-    fModel = new C5TableModel(fDb, ui->tblView);
+    fModel = new C5TableModel(dbParams, ui->tblView);
     ui->tblView->setModel(fModel);
     fSimpleQuery = true;
     fTableView = ui->tblView;
@@ -35,7 +33,6 @@ C5Grid::C5Grid(const QStringList &dbParams, QWidget *parent) :
     connect(fTableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(tableViewContextMenuRequested(QPoint)));
     connect(ui->tblTotal->horizontalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(tblValueChanged(int)));
     fFilterWidget = nullptr;
-    fEditor = nullptr;
     ui->tblTotal->setVisible(false);
     ui->tblView->resizeRowsToContents();
     QShortcut *s = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Enter), this);
@@ -48,9 +45,6 @@ C5Grid::~C5Grid()
 {
     if (fFilterWidget) {
         delete fFilterWidget;
-    }
-    if (fEditor) {
-        delete fEditor;
     }
     delete ui;
 }
@@ -183,12 +177,7 @@ void C5Grid::hotKey(const QString &key)
 void C5Grid::changeDatabase(const QStringList &dbParams)
 {
     C5Widget::changeDatabase(dbParams);
-    fDb.close();
-    fDb.setDatabase(dbParams.at(0), dbParams.at(1), dbParams.at(2), dbParams.at(3));
     refreshData();
-    if (fEditor) {
-        fEditor->setDatabase(dbParams);
-    }
     if (fFilterWidget) {
         fFilterWidget->setDatabase(dbParams);
     }
@@ -197,6 +186,18 @@ void C5Grid::changeDatabase(const QStringList &dbParams)
 void C5Grid::setCheckboxes(bool v)
 {
     fCheckboxes = v;
+}
+
+bool C5Grid::on_tblView_doubleClicked(const QModelIndex &index)
+{
+    if (index.row() < 0 || index.column() < 0) {
+        return false;
+    }
+    QList<QVariant> values = fModel->getRowValues(index.row());
+    if (tblDoubleClicked(index.row(), index.column(), values)) {
+        return false;
+    }
+    return true;
 }
 
 QWidget *C5Grid::widget()
@@ -511,42 +512,6 @@ void C5Grid::removeFilterForColumn()
 void C5Grid::tblValueChanged(int pos)
 {
     fTableView->horizontalScrollBar()->setValue(pos);
-}
-
-int C5Grid::newRow()
-{
-    if (fEditor == nullptr) {
-        return -1;
-    }
-    C5Editor *e = C5Editor::createEditor(fDBParams, fEditor, 0);
-    QList<QMap<QString, QVariant> > data;
-    bool yes = e->getResult(data);
-    fEditor->setParent(nullptr);
-    delete e;
-    if (!yes) {
-        return -1;
-    }
-    int row = 0;
-    QModelIndexList ml = ui->tblView->selectionModel()->selectedIndexes();
-    if (ml.count() > 0) {
-        row = ml.at(0).row();
-    } else {
-        row = fModel->rowCount();
-    }
-    for (int i = 0; i < data.count(); i++) {
-        fModel->insertRow(row);
-        if (ml.count() > 0) {
-            row++;
-        }
-        for (QMap<QString, QVariant>::const_iterator it = data.at(i).begin(); it != data.at(i).end(); it++) {
-            int col = fModel->indexForColumnName(it.key());
-            if (col > -1) {
-                fModel->setData(row, col, it.value());
-            }
-        }
-    }
-    ui->tblView->setCurrentIndex(fModel->index(row + 1, 0));
-    return row;
 }
 
 bool C5Grid::currentRow(int &row)
@@ -898,41 +863,4 @@ void C5Grid::refreshData()
 void C5Grid::on_tblView_clicked(const QModelIndex &index)
 {
     cellClicked(index);
-}
-
-bool C5Grid::on_tblView_doubleClicked(const QModelIndex &index)
-{
-    if (index.row() < 0 || index.column() < 0) {
-        return false;
-    }
-    QList<QVariant> values = fModel->getRowValues(index.row());
-    if (tblDoubleClicked(index.row(), index.column(), values)) {
-        return false;
-    }
-    if (fEditor) {
-        if (values.count() > 0) {
-            C5Editor *e = C5Editor::createEditor(fDBParams, fEditor, values.at(0).toInt());
-            QList<QMap<QString, QVariant> > data;
-            bool yes = e->getResult(data);
-            fEditor->setParent(nullptr);
-            delete e;
-            if (!yes) {
-                return false;
-            }
-            int row = index.row();
-            for (int i = 0; i < data.count(); i++) {
-                if (i > 0) {
-                    fModel->insertRow(row);
-                    row++;
-                }
-                for (QMap<QString, QVariant>::const_iterator it = data.at(i).begin(); it != data.at(i).end(); it++) {
-                    int col = fModel->indexForColumnName(it.key());
-                    if (col > -1) {
-                        fModel->setData(row, col, it.value());
-                    }
-                }
-            }
-        }
-    }
-    return fEditor != nullptr;
 }

@@ -1,7 +1,6 @@
 #ifndef C5TABLEMODEL_H
 #define C5TABLEMODEL_H
 
-#include "c5database.h"
 #include <QAbstractTableModel>
 #include <QSet>
 #include <QColor>
@@ -11,7 +10,7 @@ class QTableView;
 class C5TableModel : public QAbstractTableModel
 {
 public:
-    C5TableModel(C5Database &db, QObject *parent = 0);
+    C5TableModel(const QStringList &dbParams, QObject *parent = 0);
 
     void translate(const QHash<QString, QString> &t);
 
@@ -86,7 +85,7 @@ public:
     QList<QList<QVariant> > fRawData;
 
 private:
-    C5Database &fDb;
+    QStringList fDBParams;
 
     QTableView *fTableView;
 

@@ -1021,22 +1021,30 @@ MS Excel</source>
     </message>
 </context>
 <context>
+    <name>DlgDataOnline</name>
+    <message>
+        <location filename="../Forms/dlgdataonline.ui" line="14"/>
+        <source>Dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>DlgDate</name>
     <message>
         <location filename="dlgdate.ui" line="14"/>
         <location filename="dlgdate.ui" line="20"/>
         <source>Date</source>
-        <translation type="unfinished">Ամսաթիվ</translation>
+        <translation>Ամսաթիվ</translation>
     </message>
     <message>
         <location filename="dlgdate.ui" line="46"/>
         <source>OK</source>
-        <translation type="unfinished">Ընդունել</translation>
+        <translation>Ընդունել</translation>
     </message>
     <message>
         <location filename="dlgdate.ui" line="53"/>
         <source>Cancel</source>
-        <translation type="unfinished">Հրաժարվել</translation>
+        <translation>Հրաժարվել</translation>
     </message>
 </context>
 <context>
@@ -1198,89 +1206,125 @@ MS Excel</source>
 <context>
     <name>DlgReservGoods</name>
     <message>
-        <location filename="dlgreservgoods.ui" line="14"/>
+        <location filename="../Forms/dlgreservgoods.ui" line="14"/>
         <source>Goods reservation</source>
         <translation>Ապրանքի ամրագրում</translation>
     </message>
     <message>
-        <location filename="dlgreservgoods.ui" line="123"/>
+        <location filename="../Forms/dlgreservgoods.ui" line="34"/>
         <source>Available qty</source>
         <translation>Առկա քանակ</translation>
     </message>
     <message>
-        <location filename="dlgreservgoods.ui" line="109"/>
+        <location filename="../Forms/dlgreservgoods.ui" line="197"/>
+        <location filename="../Forms/dlgreservgoods.cpp" line="20"/>
+        <location filename="../Forms/dlgreservgoods.cpp" line="44"/>
+        <location filename="../Forms/dlgreservgoods.cpp" line="201"/>
         <source>Scancode</source>
         <translation>Սկանկոդ</translation>
     </message>
     <message>
-        <location filename="dlgreservgoods.ui" line="81"/>
+        <location filename="../Forms/dlgreservgoods.ui" line="27"/>
         <source>Message</source>
         <translation>Հաղորդագրություն</translation>
     </message>
     <message>
-        <location filename="dlgreservgoods.ui" line="20"/>
+        <location filename="../Forms/dlgreservgoods.ui" line="20"/>
         <source>Reserve number</source>
         <translation>Ամրագրման համար</translation>
     </message>
     <message>
-        <location filename="dlgreservgoods.ui" line="95"/>
+        <location filename="../Forms/dlgreservgoods.ui" line="58"/>
+        <location filename="../Forms/dlgreservgoods.cpp" line="19"/>
+        <location filename="../Forms/dlgreservgoods.cpp" line="21"/>
+        <location filename="../Forms/dlgreservgoods.cpp" line="43"/>
+        <location filename="../Forms/dlgreservgoods.cpp" line="45"/>
+        <location filename="../Forms/dlgreservgoods.cpp" line="200"/>
+        <location filename="../Forms/dlgreservgoods.cpp" line="211"/>
         <source>Name</source>
         <translation>Անվանում</translation>
     </message>
     <message>
-        <location filename="dlgreservgoods.ui" line="146"/>
+        <location filename="../Forms/dlgreservgoods.ui" line="88"/>
         <source>Save</source>
         <translation>Պահպանել</translation>
     </message>
     <message>
-        <location filename="dlgreservgoods.ui" line="153"/>
+        <location filename="../Forms/dlgreservgoods.ui" line="95"/>
         <source>Cancel reserve</source>
         <translation>Չեղարկել ամրագրումը</translation>
     </message>
     <message>
-        <location filename="dlgreservgoods.ui" line="160"/>
+        <location filename="../Forms/dlgreservgoods.ui" line="102"/>
         <source>Complete reserve</source>
         <translation>Կատարել ամրագրումը</translation>
     </message>
     <message>
-        <location filename="dlgreservgoods.ui" line="167"/>
+        <location filename="../Forms/dlgreservgoods.ui" line="109"/>
         <source>Close</source>
         <translation>Փակել</translation>
     </message>
     <message>
-        <location filename="dlgreservgoods.ui" line="190"/>
+        <location filename="../Forms/dlgreservgoods.ui" line="166"/>
         <source>Day of end</source>
         <translation>Վերջնաժամկետ</translation>
     </message>
     <message>
-        <location filename="dlgreservgoods.ui" line="30"/>
+        <location filename="../Forms/dlgreservgoods.ui" line="204"/>
+        <location filename="../Forms/dlgreservgoods.ui" line="211"/>
+        <source>...</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../Forms/dlgreservgoods.ui" line="51"/>
         <source>Reserved qty</source>
         <translation>Ամրագրման քանակ</translation>
     </message>
     <message>
-        <location filename="dlgreservgoods.ui" line="44"/>
+        <location filename="../Forms/dlgreservgoods.ui" line="142"/>
         <source>Store</source>
         <translation>Պահեստ</translation>
     </message>
     <message>
-        <location filename="dlgreservgoods.ui" line="116"/>
+        <location filename="../Forms/dlgreservgoods.ui" line="65"/>
         <source>Reserve date</source>
         <translation>Ամսաթիվ</translation>
     </message>
     <message>
-        <location filename="dlgreservgoods.cpp" line="38"/>
+        <location filename="../Forms/dlgreservgoods.cpp" line="35"/>
         <source>Invalid reservation code</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="dlgreservgoods.cpp" line="79"/>
+        <location filename="../Forms/dlgreservgoods.cpp" line="86"/>
+        <source>Goods is not specified</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Forms/dlgreservgoods.cpp" line="89"/>
+        <source>Store is not specified</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Forms/dlgreservgoods.cpp" line="92"/>
         <source>The end date is not valid</source>
         <translation>ՎԵրջնաժամկետը սխալ է</translation>
     </message>
     <message>
-        <location filename="dlgreservgoods.cpp" line="176"/>
+        <location filename="../Forms/dlgreservgoods.cpp" line="111"/>
+        <source>Unit</source>
+        <translation>ՉՄ</translation>
+    </message>
+    <message>
+        <location filename="../Forms/dlgreservgoods.cpp" line="191"/>
         <source>Insufficient quantity</source>
         <translation>Անբավարար քանակ</translation>
+    </message>
+    <message>
+        <location filename="../Forms/dlgreservgoods.cpp" line="202"/>
+        <location filename="../Forms/dlgreservgoods.cpp" line="212"/>
+        <source>Code</source>
+        <translation>Կոդ</translation>
     </message>
 </context>
 <context>
@@ -2095,13 +2139,13 @@ X հաշվետվություն</translation>
     <message>
         <location filename="searchitems.ui" line="125"/>
         <location filename="searchitems.ui" line="193"/>
-        <location filename="searchitems.cpp" line="78"/>
+        <location filename="searchitems.cpp" line="79"/>
         <source>Qty</source>
         <translation>Քանակ</translation>
     </message>
     <message>
         <location filename="searchitems.ui" line="130"/>
-        <location filename="searchitems.cpp" line="78"/>
+        <location filename="searchitems.cpp" line="79"/>
         <source>Reserved</source>
         <translation>Ամրագրված</translation>
     </message>
@@ -2184,12 +2228,12 @@ reservation</source>
         <translation>Ընդհանուր քանակ</translation>
     </message>
     <message>
-        <location filename="searchitems.cpp" line="76"/>
+        <location filename="searchitems.cpp" line="77"/>
         <source>Store code</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="searchitems.cpp" line="77"/>
+        <location filename="searchitems.cpp" line="78"/>
         <source>Goods code</source>
         <translation>Ապրանքի կոդ</translation>
     </message>
@@ -2629,27 +2673,27 @@ reservation</source>
         <translation>Վերադարձի կտրոն</translation>
     </message>
     <message>
-        <location filename="vieworder.cpp" line="236"/>
+        <location filename="vieworder.cpp" line="235"/>
         <source>Return of</source>
         <translation>Հետ վերադարձ</translation>
     </message>
     <message>
-        <location filename="vieworder.cpp" line="264"/>
+        <location filename="vieworder.cpp" line="263"/>
         <source>Return completed</source>
         <translation>Հետվերադարձը հաջողվեց</translation>
     </message>
     <message>
-        <location filename="vieworder.cpp" line="285"/>
+        <location filename="vieworder.cpp" line="284"/>
         <source>Cannot upload data</source>
         <translation>Սերվերը անհասանելի է։</translation>
     </message>
     <message>
-        <location filename="vieworder.cpp" line="294"/>
+        <location filename="vieworder.cpp" line="293"/>
         <source>Saved</source>
         <translation>Պահպանված է</translation>
     </message>
     <message>
-        <location filename="vieworder.cpp" line="324"/>
+        <location filename="vieworder.cpp" line="323"/>
         <source>Taxback complete</source>
         <translation>Հետվերադարձը հաջողվեց</translation>
     </message>
@@ -3236,14 +3280,14 @@ F1</translation>
         <translation>Ընդամենը այսօր</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="695"/>
-        <location filename="working.cpp" line="830"/>
-        <location filename="working.cpp" line="924"/>
+        <location filename="working.cpp" line="697"/>
+        <location filename="working.cpp" line="832"/>
+        <location filename="working.cpp" line="926"/>
         <source>Password</source>
         <translation>Գախտնաբառ</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="697"/>
+        <location filename="working.cpp" line="699"/>
         <source>Access denied</source>
         <translation>Մուտքը արգելված է</translation>
     </message>
@@ -3295,27 +3339,27 @@ F1</translation>
         <translation>Հդմ կտրոնը տպված է</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="558"/>
+        <location filename="working.cpp" line="560"/>
         <source>Fiscal not printed</source>
         <translation>Հդմ կտրոնը տպված չէ</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="576"/>
+        <location filename="working.cpp" line="578"/>
         <source>Printed</source>
         <translation>Տպված</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="743"/>
+        <location filename="working.cpp" line="745"/>
         <source>Salute?</source>
         <translation>Հրավառություն՞</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="903"/>
+        <location filename="working.cpp" line="905"/>
         <source>Window closed</source>
         <translation>Պատուհանը փակվեց</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="947"/>
+        <location filename="working.cpp" line="949"/>
         <source>Current window</source>
         <translation>Ընդացիք պատուհան</translation>
     </message>

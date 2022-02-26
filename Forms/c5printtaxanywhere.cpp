@@ -141,7 +141,7 @@ void C5PrintTaxAnywhere::on_btnPrintTax_clicked()
     int store = ui->tbl->item(row, 1)->data(Qt::UserRole).toInt();
     C5Database db(fDBParams);
     db[":f_id"] = fId;
-    db.exec("select concat(f_prefix, f_hallid) from o_header where f_id=:f_id");
+    db.exec("select concat(f_prefix, f_hallid), f_amounttotal from o_header where f_id=:f_id");
     QString ordernum;
     if (db.nextRow()) {
         ordernum = db.getString(0);
@@ -150,6 +150,7 @@ void C5PrintTaxAnywhere::on_btnPrintTax_clicked()
     QJsonObject jmsg;
     jmsg["id"] = fId;
     jmsg["ordernum"] = ordernum;
+    jmsg["orderamount"] = float_str(db.getDouble("f_amounttotal"), 2);
     jo["action"] = MSG_PRINT_TAX;
     jo["usermessage"] = jmsg;
     QJsonDocument jdoc(jo);

@@ -1,6 +1,7 @@
 #include "requesthandler.h"
 #include "database.h"
 #include "requestmanager.h"
+#include "logwriter.h"
 #include "monitoringwindow.h"
 #include "databaseconnectionmanager.h"
 #include <QElapsedTimer>
@@ -15,14 +16,13 @@ RequestHandler::RequestHandler()
 
 RequestHandler::~RequestHandler()
 {
-    __debug_log("~RequestHandler");
 }
 
 RequestHandler *RequestHandler::route(const QString &session, const QString &remoteHost, const QString &r, const QByteArray &data, const QHash<QString, DataAddress> &dataMap, ContentType contentType)
 {
     QElapsedTimer et;
     et.start();
-    __debug_log("New request from " + remoteHost);
+    LogWriter::write(LogWriterLevel::verbose, session, "New request from " + remoteHost);
     RequestHandler *rh = RequestManager::getHandler(r);
     rh->fSession = session;
     rh->fContentType = contentType;
@@ -42,7 +42,7 @@ RequestHandler *RequestHandler::route(const QString &session, const QString &rem
         db[":froute"] = r;
         db.insert("system_requests");
     } else {
-        __debug_log(db.lastDbError());
+        LogWriter::write(LogWriterLevel::errors, session, db.lastDbError());
     }
     return rh;
 }

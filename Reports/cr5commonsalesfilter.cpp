@@ -31,7 +31,11 @@ QString CR5CommonSalesFilter::condition()
                 .arg(ui->dt1->dateTime().toString(FORMAT_DATETIME_TO_STR_MYSQL))
                 .arg(ui->dt2->dateTime().toString(FORMAT_DATETIME_TO_STR_MYSQL));
     } else {
-        result = " oh.f_datecash between " + ui->deStart->toMySQLDate() + " and " + ui->deEnd->toMySQLDate() + " ";
+        if (ui->chDoNotUseCashDate->isChecked()) {
+            result = " oh.f_datecash is null ";
+        } else {
+            result = " oh.f_datecash between " + ui->deStart->toMySQLDate() + " and " + ui->deEnd->toMySQLDate() + " ";
+        }
     }
     if (!ui->leState->isEmpty()) {
         result += " and oh.f_state in (" + ui->leState->text() + ") ";

@@ -72,7 +72,7 @@ void CashCollection::on_btnSave_clicked()
     QString cashdocid;
     if (!dw.writeAHeader(cashdocid, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH, __user->id(),
                          QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, ui->leAmount->getDouble(),
-                         ui->lePurpose->text(), 0, 0)) {
+                         ui->lePurpose->text())) {
         db.rollback();
         C5Message::error(dw.fErrorMsg);
         return;

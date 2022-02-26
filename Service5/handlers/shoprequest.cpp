@@ -146,56 +146,59 @@ bool ShopRequest::handle(const QByteArray &data, const QHash<QString, DataAddres
     }
 
     /* PRINT TAX */
-    QString sn, firm, address, fiscal, hvhh, rseq, devnum, time;
-    PrintTaxN pt(ConfigIni::value("shop/taxip"),
-                 ConfigIni::value("shop/taxport").toInt(),
-                 ConfigIni::value("shop/taxpass"),
-                 ConfigIni::value("shop/taxextpos"),
-                 ConfigIni::value("shop/taxcashier"),
-                 ConfigIni::value("shop/taxpin"),
-                 this);
-    for (int i = 0; i < fOrderJson["items"].toArray().count(); i++) {
-        QJsonObject o = fOrderJson["items"].toArray().at(i).toObject();
-        amountTotal += o["price"].toDouble() * o["qty"].toDouble();
-        pt.addGoods(ConfigIni::value("shop/taxdep"), //dep
-                    "6204", //adg
-                    QString::number(StoreManager::codeOfSku(o["sku"].toString())), //goods id
-                    StoreManager::nameOfSku(o["sku"].toString()), //name
-                    o["price"].toDouble(), //price
-                    o["qty"].toDouble(), //qty
-                    0); //discount
-    }
-    if (fOrderJson["delivery"].toDouble() > 0) {
-        amountTotal += fOrderJson["delivery"].toDouble();
-        pt.addGoods(ConfigIni::value("shop/taxdep"), //dep
-                    "6204", //adg
-                    ConfigIni::value("shop/delivery"), //goods id
-                    tr("Delivery"), //name
-                    fOrderJson["delivery"].toDouble(), //price
-                    1, //qty
-                    0); //discount
-    }
-    QString jsonIn, jsonOut, err;
-    int result = 0;
-    result = pt.makeJsonAndPrint(amountCard, 0, jsonIn, jsonOut, err);
-    if (result == pt_err_ok) {
-        PrintTaxN::parseResponse(jsonOut, firm, hvhh, fiscal, rseq, sn, address, devnum, time);
-        db[":f_id"] = uuid;
-        db.exec("delete from o_tax where f_id=:f_id");
-        db[":f_id"] = uuid;
-        db[":f_dept"] = ConfigIni::value("shop/taxdep");
-        db[":f_firmname"] = firm;
-        db[":f_address"] = address;
-        db[":f_devnum"] = devnum;
-        db[":f_serial"] = sn;
-        db[":f_fiscal"] = fiscal;
-        db[":f_receiptnumber"] = rseq;
-        db[":f_hvhh"] = hvhh;
-        db[":f_fiscalmode"] = tr("(F)");
-        db[":f_time"] = time;
-        db.insert("o_tax");
-    } else {
-        jh["atention"] = err + "<br>" + jsonOut + "<br>" + jsonIn;
+    QString err, rseq;
+    if (ConfigIni::value("shop/taxport").toInt() > 0) {
+        QString sn, firm, address, fiscal, hvhh, devnum, time;
+        PrintTaxN pt(ConfigIni::value("shop/taxip"),
+                     ConfigIni::value("shop/taxport").toInt(),
+                     ConfigIni::value("shop/taxpass"),
+                     ConfigIni::value("shop/taxextpos"),
+                     ConfigIni::value("shop/taxcashier"),
+                     ConfigIni::value("shop/taxpin"),
+                     this);
+        for (int i = 0; i < fOrderJson["items"].toArray().count(); i++) {
+            QJsonObject o = fOrderJson["items"].toArray().at(i).toObject();
+            amountTotal += o["price"].toDouble() * o["qty"].toDouble();
+            pt.addGoods(ConfigIni::value("shop/taxdep"), //dep
+                        "6204", //adg
+                        QString::number(StoreManager::codeOfSku(o["sku"].toString())), //goods id
+                        StoreManager::nameOfSku(o["sku"].toString()), //name
+                        o["price"].toDouble(), //price
+                        o["qty"].toDouble(), //qty
+                        0); //discount
+        }
+        if (fOrderJson["delivery"].toDouble() > 0) {
+            amountTotal += fOrderJson["delivery"].toDouble();
+            pt.addGoods(ConfigIni::value("shop/taxdep"), //dep
+                        "6204", //adg
+                        ConfigIni::value("shop/delivery"), //goods id
+                        tr("Delivery"), //name
+                        fOrderJson["delivery"].toDouble(), //price
+                        1, //qty
+                        0); //discount
+        }
+        QString jsonIn, jsonOut;
+        int result = 0;
+        result = pt.makeJsonAndPrint(amountCard, 0, jsonIn, jsonOut, err);
+        if (result == pt_err_ok) {
+            PrintTaxN::parseResponse(jsonOut, firm, hvhh, fiscal, rseq, sn, address, devnum, time);
+            db[":f_id"] = uuid;
+            db.exec("delete from o_tax where f_id=:f_id");
+            db[":f_id"] = uuid;
+            db[":f_dept"] = ConfigIni::value("shop/taxdep");
+            db[":f_firmname"] = firm;
+            db[":f_address"] = address;
+            db[":f_devnum"] = devnum;
+            db[":f_serial"] = sn;
+            db[":f_fiscal"] = fiscal;
+            db[":f_receiptnumber"] = rseq;
+            db[":f_hvhh"] = hvhh;
+            db[":f_fiscalmode"] = tr("(F)");
+            db[":f_time"] = time;
+            db.insert("o_tax");
+        } else {
+            jh["atention"] = err + "<br>" + jsonOut + "<br>" + jsonIn;
+        }
     }
 
     /* A_HEADER of store */

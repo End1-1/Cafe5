@@ -12,7 +12,6 @@ Authentication::Authentication() :
 
 Authentication::~Authentication()
 {
-    __debug_log("~Authentication");
 }
 
 bool Authentication::handle(const QByteArray &data, const QHash<QString, DataAddress> &dataMap)

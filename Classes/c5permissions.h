@@ -26,6 +26,7 @@
 #define cp_t2_calculate_self_cost 206
 #define cp_t2_store_complectation 207
 #define cp_t2_store_decomplectation 208
+#define cp_t2_goods_reservations 209
 
 #define cp_t3_reports 300
 #define cp_t3_sales_common 301

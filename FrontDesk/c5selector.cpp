@@ -16,7 +16,7 @@ C5Selector::C5Selector(const QStringList &dbParams) :
     fGrid->fTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->hl->addWidget(fGrid);
     connect(fGrid, SIGNAL(tblDoubleClick(int,int,QList<QVariant>)), this, SLOT(tblDoubleClicked(int,int,QList<QVariant>)));
-    connect(fGrid, SIGNAL(tblSingleClick(QModelIndex)), this, SLOT(tblSingleClick(QModelIndex)));
+    //connect(fGrid, SIGNAL(tblSingleClick(QModelIndex)), this, SLOT(tblSingleClick(QModelIndex)));
     connect(fGrid->fTableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(selectionChanged(QItemSelection,QItemSelection)));
     fReset = true;
     fSearchColumn = -1;
@@ -162,12 +162,10 @@ void C5Selector::selectionChanged(const QItemSelection &selected, const QItemSel
 {
     for (QModelIndex i: deselected.indexes()) {
         fGrid->fModel->setData(i.row(), 0, 0, Qt::CheckStateRole);
-        qDebug() << "selection changed deselect";
     }
 
     for (QModelIndex i: selected.indexes()) {
         fGrid->fModel->setData(i.row(), 0, 1, Qt::CheckStateRole);
-        qDebug() << "selection changed select";
     }
 }
 

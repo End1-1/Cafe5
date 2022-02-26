@@ -143,7 +143,7 @@ void payment::checkout(bool cash, bool idram)
     QString cashdoc;
     if (!dw.writeAHeader(cashdoc, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH,
                          fUser->id(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(),
-                         0, ui->leAmount->getDouble(), cashprefix + " " + headerNum, 0, 0)) {
+                         0, ui->leAmount->getDouble(), cashprefix + " " + headerNum)) {
         C5Message::error(dw.fErrorMsg);
         return;
     }

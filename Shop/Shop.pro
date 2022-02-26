@@ -82,6 +82,7 @@ SOURCES += \
     ../Classes/c5witerconf.cpp \
     ../Classes/calculator.cpp \
     ../Classes/checkforupdatethread.cpp \
+    ../Classes/dataonline.cpp \
     ../Classes/doubledatabase.cpp \
     ../Classes/fileversion.cpp \
     ../Classes/notificationwidget.cpp \
@@ -117,11 +118,12 @@ SOURCES += \
     ../DbData/dbunit.cpp \
     ../DbData/dbusers.cpp \
     ../Forms/c5printtaxanywhere.cpp \
+    ../Forms/dlgdataonline.cpp \
+    ../Forms/dlgreservgoods.cpp \
     cashcollection.cpp \
     dlgdate.cpp \
     dlggoodslist.cpp \
     dlgpin.cpp \
-    dlgreservgoods.cpp \
     dlgsplashscreen.cpp \
     goodsreturnreason.cpp \
     imageloader.cpp \
@@ -223,8 +225,10 @@ HEADERS += \
     ../Classes/calculator.h \
     ../Classes/chatmessage.h \
     ../Classes/checkforupdatethread.h \
+    ../Classes/dataonline.h \
     ../Classes/doubledatabase.h \
     ../Classes/fileversion.h \
+    ../Classes/goodsreserve.h \
     ../Classes/notificationwidget.h \
     ../Classes/proxytablewidgetdatabase.h \
     ../Classes/rkeyboard.h \
@@ -258,13 +262,13 @@ HEADERS += \
     ../DbData/dbunit.h \
     ../DbData/dbusers.h \
     ../Forms/c5printtaxanywhere.h \
+    ../Forms/dlgdataonline.h \
+    ../Forms/dlgreservgoods.h \
     cashcollection.h \
     dlgdate.h \
     dlggoodslist.h \
     dlgpin.h \
-    dlgreservgoods.h \
     dlgsplashscreen.h \
-    goodsreserve.h \
     goodsreturnreason.h \
     imageloader.h \
     loghistory.h \
@@ -315,11 +319,12 @@ FORMS += \
     ../Classes/rkeyboard.ui \
     ../Controls/c5tablewithtotal.ui \
     ../Forms/c5printtaxanywhere.ui \
+    ../Forms/dlgdataonline.ui \
+    ../Forms/dlgreservgoods.ui \
     cashcollection.ui \
     dlgdate.ui \
     dlggoodslist.ui \
     dlgpin.ui \
-    dlgreservgoods.ui \
     dlgsplashscreen.ui \
     goodsreturnreason.ui \
     loghistory.ui \

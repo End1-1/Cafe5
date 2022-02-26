@@ -8,6 +8,7 @@ class ThreadWorker : public QObject
     Q_OBJECT
 public:
     explicit ThreadWorker(QObject *parent = nullptr);
+    ~ThreadWorker();
 
 public slots:
     virtual void run();

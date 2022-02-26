@@ -1,6 +1,7 @@
 #include "c5reportwidget.h"
 #include "c5cache.h"
 #include "c5tablemodel.h"
+#include "ce5editor.h"
 #include <QIcon>
 #include <QLayout>
 #include <QLabel>
@@ -11,6 +12,7 @@ C5ReportWidget::C5ReportWidget(const QStringList &dbParams, QWidget *parent) :
     fIcon = ":/configure.png";
     fLabel = "C5ReportWidget";
     fToolBar = 0;
+    fEditor = nullptr;
     QLabel *l = new QLabel(tr("Global search"), widget());
     fFilterLineEdit = new C5LineEdit(widget());
     fFilterLineEdit->setPlaceholderText(tr("Use \"|\" for separator multiple values"));
@@ -28,6 +30,9 @@ C5ReportWidget::~C5ReportWidget()
 {
     if (fToolBar) {
         delete fToolBar;
+    }
+    if (fEditor) {
+        delete fEditor;
     }
 }
 
@@ -49,9 +54,54 @@ void C5ReportWidget::hotKey(const QString &key)
     }
 }
 
+void C5ReportWidget::changeDatabase(const QStringList &dbParams)
+{
+    C5Grid::changeDatabase(dbParams);
+    if (fEditor) {
+        fEditor->setDatabase(dbParams);
+    }
+}
+
+bool C5ReportWidget::on_tblView_doubleClicked(const QModelIndex &index)
+{
+    if (index.row() < 0 || index.column() < 0) {
+        return false;
+    }
+    QList<QVariant> values = fModel->getRowValues(index.row());
+    if (tblDoubleClicked(index.row(), index.column(), values)) {
+        return false;
+    }
+    if (fEditor) {
+        if (values.count() > 0) {
+            C5Editor *e = C5Editor::createEditor(fDBParams, fEditor, values.at(0).toInt());
+            QList<QMap<QString, QVariant> > data;
+            bool yes = e->getResult(data);
+            fEditor->setParent(nullptr);
+            delete e;
+            if (!yes) {
+                return false;
+            }
+            int row = index.row();
+            for (int i = 0; i < data.count(); i++) {
+                if (i > 0) {
+                    fModel->insertRow(row);
+                    row++;
+                }
+                for (QMap<QString, QVariant>::const_iterator it = data.at(i).begin(); it != data.at(i).end(); it++) {
+                    int col = fModel->indexForColumnName(it.key());
+                    if (col > -1) {
+                        fModel->setData(row, col, it.value());
+                    }
+                }
+            }
+        }
+    }
+    return fEditor != nullptr;
+}
+
 C5Cache *C5ReportWidget::createCache(int cacheId)
 {
-    return C5Cache::cache(fDb.dbParams(), cacheId);
+    return C5Cache::cache(fDBParams, cacheId);
 }
 
 void C5ReportWidget::clearFilter()
@@ -65,4 +115,40 @@ void C5ReportWidget::completeRefresh()
 {
     fModel->setFilter(-1, fFilterLineEdit->text());
     sumColumnsData();
+}
+
+int C5ReportWidget::newRow()
+{
+    if (fEditor == nullptr) {
+        return -1;
+    }
+    C5Editor *e = C5Editor::createEditor(fDBParams, fEditor, 0);
+    QList<QMap<QString, QVariant> > data;
+    bool yes = e->getResult(data);
+    fEditor->setParent(nullptr);
+    delete e;
+    if (!yes) {
+        return -1;
+    }
+    int row = 0;
+    QModelIndexList ml = fTableView->selectionModel()->selectedIndexes();
+    if (ml.count() > 0) {
+        row = ml.at(0).row();
+    } else {
+        row = fModel->rowCount();
+    }
+    for (int i = 0; i < data.count(); i++) {
+        fModel->insertRow(row);
+        if (ml.count() > 0) {
+            row++;
+        }
+        for (QMap<QString, QVariant>::const_iterator it = data.at(i).begin(); it != data.at(i).end(); it++) {
+            int col = fModel->indexForColumnName(it.key());
+            if (col > -1) {
+                fModel->setData(row, col, it.value());
+            }
+        }
+    }
+    fTableView->setCurrentIndex(fModel->index(row + 1, 0));
+    return row;
 }

@@ -1,5 +1,5 @@
 #include "database.h"
-#include "debug.h"
+#include "logwriter.h"
 #include <QDateTime>
 #include <QSqlRecord>
 #include <QUuid>
@@ -30,7 +30,6 @@ Database::Database(const QString &driverName)
 
 Database::~Database()
 {
-    __debug_log("~Database");
     if (fQuery) {
         fQuery->finish();
         delete fQuery;
@@ -71,8 +70,8 @@ bool Database::rollback()
 bool Database::exec(const QString &query)
 {
     if (!fQuery->prepare(query)) {
-        __debug_log(fQuery->lastError().databaseText());
-        __debug_log(lastQuery());
+        LogWriter::write(LogWriterLevel::errors, "", fQuery->lastError().databaseText());
+        LogWriter::write(LogWriterLevel::errors, "", lastQuery());
         return false;
     }
     QStringList keys = fBindValues.keys();
@@ -81,10 +80,10 @@ bool Database::exec(const QString &query)
     }
     fBindValues.clear();
     if (!fQuery->exec()) {
-        __debug_log(fQuery->lastError().databaseText());
-        __debug_log(lastQuery());
+        LogWriter::write(LogWriterLevel::errors, "", fQuery->lastError().databaseText());
+        LogWriter::write(LogWriterLevel::errors, "", lastQuery());
     }
-    __debug_log(lastQuery());
+    LogWriter::write(LogWriterLevel::verbose, "", lastQuery());
     bool isSelect = fQuery->isSelect();
     if (isSelect) {
         //fQuery->first();

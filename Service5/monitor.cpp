@@ -11,7 +11,7 @@ Monitor::Monitor(QWidget *parent)
     , ui(new Ui::Monitor)
 {
     ui->setupUi(this);
-    startSslServer();
+    MonitoringWindow::init();
     MonitoringWindow::connectReceiver(this);
 }
 
@@ -20,20 +20,10 @@ Monitor::~Monitor()
     delete ui;
 }
 
-void Monitor::startSslServer()
-{
-    auto *thread = new QThread();
-    fSslServer = new ServerThread(qApp->applicationDirPath() + "/");
-    connect(fSslServer, &ServerThread::endOfWork, thread, &QThread::deleteLater);
-    connect(thread, &QThread::started, fSslServer, &ServerThread::run);
-    fSslServer->moveToThread(thread);
-    thread->start();
-}
-
 void Monitor::receiveData(int code, const QString &session, const QString &data1, const QVariant &data2)
 {
     Q_UNUSED(data2);
-    QString logstr = QString("[%1][%2][%3] %4").arg(code).arg(session).arg(QDateTime::currentDateTime().toString("dd/MM/yyyy HH:mm:ss")).arg(data1);
+    QString logstr = QString("[%1][%2][%3] %4").arg(QString::number(code), session, QDateTime::currentDateTime().toString("dd/MM/yyyy HH:mm:ss"), data1);
     ui->ptRawLog->appendPlainText(logstr);
 
     if (ui->ptRawLog->toPlainText().length() > 30000) {

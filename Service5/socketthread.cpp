@@ -2,6 +2,7 @@
 #include "requesthandler.h"
 #include "requestmanager.h"
 #include "monitoringwindow.h"
+#include "logwriter.h"
 #include <QHostAddress>
 #include <QApplication>
 #include <QUuid>
@@ -83,10 +84,10 @@ void SocketThread::httpRequest()
         emit sendData(0, property("session").toString(), QString("Error in request. %1").arg(QString(fData)), QVariant());
         return;
     }
-    __debug_log(property("session").toString() + "::::" + route);
+    LogWriter::write(LogWriterLevel::verbose, property("session").toString(), route);
     RequestHandler *rh = RequestHandler::route(property("session").toString(), QHostAddress(fSslSocket->peerAddress().toIPv4Address()).toString(), route, fData, fRequestBody, fContentType);
     fSslSocket->write(rh->fResponse);
-    __debug_log(property("session").toString() + "::::" + rh->fResponse);
+    LogWriter::write(LogWriterLevel::verbose, property("session").toString(), rh->fResponse);
     RequestManager::releaseHandler(rh);
     fSslSocket->close();
     emit endOfWork();

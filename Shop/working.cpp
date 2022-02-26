@@ -554,6 +554,8 @@ void Working::threadMessageData(int code, const QVariant &data)
                 p.br();
                 if (Sales::printCheckWithTax(db, id, rseq)) {
                     p.ctext(QString("%1: %2").arg(tr("Fiscal printed")).arg(jord["ordernum"].toString()));
+                    p.br();
+                    p.ctext(jord["orderamount"].toString());
                 } else {
                     p.ctext(QString("%1: %2").arg(tr("Fiscal not printed")).arg(jord["ordernum"].toString()));
                 }

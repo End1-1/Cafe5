@@ -7,8 +7,6 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class Monitor; }
 QT_END_NAMESPACE
 
-class ServerThread;
-
 class Monitor : public QDialog
 {
     Q_OBJECT
@@ -19,8 +17,6 @@ public:
 
 private:
     Ui::Monitor *ui;
-    ServerThread *fSslServer;
-    void startSslServer();
 
 private slots:
     void receiveData(int code, const QString &session, const QString &data1, const QVariant &data2);

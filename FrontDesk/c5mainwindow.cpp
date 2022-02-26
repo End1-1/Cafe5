@@ -20,6 +20,7 @@
 #include "c5translatorform.h"
 #include "cr5mfgeneralreport.h"
 #include "cr5saleremoveddishes.h"
+#include "cr5goodsreservations.h"
 #include "c5broadcasting.h"
 #include "cr5goodsqtyreminder.h"
 #include "cr5cashmovement.h"
@@ -626,6 +627,9 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
         sd->setMode(C5StoreDoc::sdDeComplectation);
         break;
     }
+    case cp_t2_goods_reservations:
+        createTab<CR5GoodsReservations>(dbParams);
+        break;
     case cp_t3_sales_common:
         createTab<CR5CommonSales>(dbParams);
         break;
@@ -912,6 +916,7 @@ void C5MainWindow::setDB(const QString &dbname)
         if (__c5config.frontDeskMode() == FRONTDESK_WAITER) {
             addTreeL3Item(l, cp_t2_calculate_self_cost, tr("Calculate dishes self cost"), ":/menu.png");
         }
+        addTreeL3Item(l, cp_t2_goods_reservations, tr("Goods reservations"), ":/calendar.png");
     }
 
     if (addMainLevel(db.at(1), cp_t3_reports, tr("Reports"), ":/reports.png", l)) {

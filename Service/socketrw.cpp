@@ -6,7 +6,6 @@
 #include "sockethandlerservicelogin.h"
 #include "sockethandlerserviceconfig.h"
 #include "sockethandlerlocationchanged.h"
-#include "sockethandleruploadsale.h"
 #include "sockethandleruuid.h"
 #include "servicecommands.h"
 
@@ -61,7 +60,7 @@ void SocketRW::go()
                     sh = SocketHandler::create<SocketHandlerLocationChanged>(&fSocketData, data);
                     break;
                 case dt_upload_sale:
-                    sh = SocketHandler::create<SocketHandlerUploadSale>(&fSocketData, data);
+                    //sh = SocketHandler::create<SocketHandlerUploadSale>(&fSocketData, data);
                     break;
                 case dt_wonna_uuid:
                     sh = SocketHandler::create<SocketHandlerUUID>(&fSocketData, data);

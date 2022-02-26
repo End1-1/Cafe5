@@ -1,7 +1,6 @@
 #ifndef C5GRID_H
 #define C5GRID_H
 
-#include "c5database.h"
 #include "c5textdelegate.h"
 #include "c5datedelegate.h"
 #include "c5combodelegate.h"
@@ -14,15 +13,13 @@
 #include <QTableView>
 #include <QSettings>
 
-class C5TableModel;
-
 namespace Ui {
 class C5Grid;
 }
 
 class C5FilterWidget;
-class CE5Editor;
 class C5TableWidget;
+class C5TableModel;
 
 class C5Grid : public C5Widget
 {
@@ -66,8 +63,6 @@ public slots:
     virtual bool on_tblView_doubleClicked(const QModelIndex &index);
 
 protected:
-    C5Database fDb;
-
     bool fSimpleQuery;
 
     QString fSqlQuery;
@@ -95,8 +90,6 @@ protected:
     QString fOrderCondition;
 
     C5FilterWidget *fFilterWidget;
-
-    CE5Editor *fEditor;
 
     QWidget *widget();
 
@@ -153,8 +146,6 @@ protected slots:
     virtual void copyAll();
 
     virtual void saveDataChanges();
-
-    virtual int newRow();
 
     bool currentRow(int &row);
 

@@ -21,6 +21,11 @@ public:
 
     virtual void hotKey(const QString &key);
 
+    virtual void changeDatabase(const QStringList &dbParams) override;
+
+public slots:
+    virtual bool on_tblView_doubleClicked(const QModelIndex &index);
+
 protected:
     C5Cache *createCache(int cacheId);
 
@@ -28,8 +33,12 @@ protected:
 
     C5LineEdit *fFilterLineEdit;
 
+    CE5Editor *fEditor;
+
 protected slots:
     void completeRefresh();
+
+    virtual int newRow();
 };
 
 #endif // C5REPORTWIDGET_H

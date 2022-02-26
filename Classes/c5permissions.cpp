@@ -33,6 +33,7 @@ void C5Permissions::init(C5Database &db, int group)
               << cp_t2_calculate_self_cost
               << cp_t2_store_complectation
               << cp_t2_store_decomplectation
+              << cp_t2_goods_reservations
 
               << cp_t3_reports
               << cp_t3_sales_common
