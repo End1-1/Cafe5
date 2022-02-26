@@ -97,8 +97,8 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
 
 C5StoreDoc::~C5StoreDoc()
 {
-    delete ui;
     __mainWindow->removeBroadcastListener(this);
+    delete ui;
 }
 
 bool C5StoreDoc::openDoc(QString id, QString &err)

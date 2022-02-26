@@ -147,6 +147,7 @@ C5MainWindow::C5MainWindow(QWidget *parent) :
 
 C5MainWindow::~C5MainWindow()
 {
+    fBroadcastListeners.clear();
     fUpdateTimer.stop();
     delete ui;
 }
