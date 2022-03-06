@@ -5,7 +5,9 @@
 #include "storemanager.h"
 #include "requestmanager.h"
 #include "shopmanager.h"
+#include "rawdataexchange.h"
 #include "monitor.h"
+#include "thread.h"
 #include <QFileInfo>
 #include <QDir>
 #include <windows.h>
@@ -56,9 +58,15 @@ DWORD WINAPI ThreadProc(CONST LPVOID lpParam) {
         ShopManager::init(ConfigIni::value("shop/db"));
     }
     RequestManager::init();
-    auto *serverThread = new ServerThread(APPDIR);
-    serverThread->connect(serverThread, &ServerThread::endOfWork, &app, &QApplication::quit);
-    serverThread->run();
+    RawDataExchange::init();
+    auto *server = new ServerThread(APPDIR);
+    auto *thread = new Thread();
+    thread->connect(thread, &QThread::started, server, &ServerThread::run);
+    thread->connect(thread, &QThread::finished, thread, &QThread::deleteLater);
+    server->connect(server, &ServerThread::endOfWork, &app, &QApplication::quit);
+    server->connect(server, &ServerThread::endOfWork, thread, &Thread::quit);
+    server->moveToThread(thread);
+    thread->start();
     app.exec();
     LogWriter::write(LogWriterLevel::verbose, "", "Exit service thread");
     return 0;

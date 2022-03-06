@@ -36,6 +36,12 @@ bool DatabaseConnectionManager::init()
     return true;
 }
 
+bool DatabaseConnectionManager::openSystemDatabase(Database &db)
+{
+    DatabaseConnection &dc = fDatabaseConnections[SYSTEM];
+    return db.open(dc.host, dc.schema, dc.username, dc.password);
+}
+
 bool DatabaseConnectionManager::openDatabase(Database &db, JsonHandler &jh)
 {
     return openDatabase(SYSTEM, db, jh);

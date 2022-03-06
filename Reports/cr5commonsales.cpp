@@ -351,7 +351,7 @@ void CR5CommonSales::exportToAS()
             db.exec("select * from o_header where f_id=:f_id");
             db.nextRow();
             total += db.getDouble("f_amountcash");
-            card += db.getDouble("f_amountcard");
+            card += db.getDouble("f_amountcard") + db.getDouble("f_amountidram");
             service += db.getDouble("f_amountservice");
             date= db.getDate("f_datecash");
         }
@@ -364,7 +364,7 @@ void CR5CommonSales::exportToAS()
         dbas[":fDOCNUM"] = "";
         dbas[":fCUR"] = "AMD";
         dbas[":fSUMM"] = total + card;
-        dbas[":fCOMMENT"] = QString("%1 %2").arg(tr("Revenue")).arg(date.toString(FORMAT_DATE_TO_STR));
+        dbas[":fCOMMENT"] = QString("%1 %2").arg(tr("Revenue"), date.toString(FORMAT_DATE_TO_STR));
         dbas[":fBODY"] = QString("\r\nPREPAYMENTACC:5231\r\nVATACC:5243\r\nSUMMVAT:%2\r\nBUYERACC:2211\r\nBUYCHACCPOST:Գլխավոր հաշվապահ \r\nMAXROWID:%1\r\n")
                 .arg(2)
                 .arg(vat.toDouble() > 0.001 ? (vat.toDouble() / 100) * (total + card) : 0);

@@ -17,8 +17,5 @@ public:
 
 private:
     Ui::Monitor *ui;
-
-private slots:
-    void receiveData(int code, const QString &session, const QString &data1, const QVariant &data2);
 };
 #endif // MONITOR_H

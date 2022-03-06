@@ -2,7 +2,6 @@
 #include "database.h"
 #include "requestmanager.h"
 #include "logwriter.h"
-#include "monitoringwindow.h"
 #include "databaseconnectionmanager.h"
 #include <QElapsedTimer>
 
@@ -10,7 +9,6 @@ RequestHandler::RequestHandler()
 {
     fIdle = false;
     fContentType = ContentType::MultipartFormData;
-    MonitoringWindow::connectSender(this);
     fCreated = QDateTime::currentDateTime();
 }
 
@@ -72,7 +70,7 @@ bool RequestHandler::setResponse(int responseCode, const QString &data)
     fHttpHeader.setContentLength(data.toUtf8().length());
     fResponse.append(fHttpHeader.toString());
     fResponse.append(data.toUtf8());
-    sendData(0, fSession, "http response: " + data, QVariant());
+    emit sendData(0, fSession, "http response: " + data, QVariant());
     return true;
 }
 

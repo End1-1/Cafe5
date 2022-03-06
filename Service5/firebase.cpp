@@ -7,20 +7,26 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 
-Firebase::Firebase(QObject *parent) : QObject(parent)
+Firebase::Firebase(QObject *parent) :
+    QObject(parent)
 {
     fNetworkAccessManager = new QNetworkAccessManager(this);
-    connect(fNetworkAccessManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(finished(QNetworkReply*)));
+    connect(fNetworkAccessManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(finished(QNetworkReply*)), Qt::DirectConnection);
 }
 
-void Firebase::sendMessage()
+Firebase::~Firebase()
+{
+    qDebug() << "~Firebase";
+}
+
+void Firebase::sendMessage(const QString &token, const QString &msg)
 {
     QJsonObject jo;
-    jo["to"] = "fPIVUjE8TfC5ev63nFajml:APA91bG8g2avi-JINFimAi-PEnvfBL8DG-I1uq4zVGxkrTyGtXTD_wD34QyjX_O_EmpRSOONhWd3mciCgVuWMu9Ezeerx9vgZdVOKezW_H7V8Ans5kvidzbFQXMnsNUl3jQ-zK9ymMma";
+    jo["to"] = token;
     QJsonObject joNotification;
     joNotification["sound"] = "default";
-    joNotification["body"] = "THE BODY";
-    joNotification["title"] = "THE TITLE";
+    joNotification["body"] = msg;
+    joNotification["title"] = "Your code";
     joNotification["content_available"] = true;
     joNotification["priority"] = "high";
     joNotification["click_action"] = "FLUTTER_NOTIFICATION_CLICK";
@@ -44,4 +50,5 @@ void Firebase::finished(QNetworkReply *reply)
 {
     qDebug() << reply->readAll();
     reply->deleteLater();
+    emit sendFinished();
 }

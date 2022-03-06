@@ -10,3 +10,8 @@ Thread::~Thread()
 {
     qDebug() << "~Thread()";
 }
+
+void Thread::quit()
+{
+    QThread::quit();
+}

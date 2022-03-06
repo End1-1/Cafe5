@@ -35,7 +35,16 @@ SOURCES += \
     jsonhandler.cpp \
     main.cpp \
     monitor.cpp \
-    monitoringwindow.cpp \
+    raw/raw.cpp \
+    raw/rawbalancehistory.cpp \
+    raw/rawcoordinate.cpp \
+    raw/rawdataexchange.cpp \
+    raw/rawhandler.cpp \
+    raw/rawhello.cpp \
+    raw/rawregisterphone.cpp \
+    raw/rawregistersms.cpp \
+    raw/rawsilentauth.cpp \
+    raw/rawyandexkey.cpp \
     serverthread.cpp \
     socket/sslserver.cpp \
     socket/sslsocket.cpp \
@@ -74,7 +83,17 @@ HEADERS += \
     httpheader.h \
     jsonhandler.h \
     monitor.h \
-    monitoringwindow.h \
+    raw/messagelist.h \
+    raw/raw.h \
+    raw/rawbalancehistory.h \
+    raw/rawcoordinate.h \
+    raw/rawdataexchange.h \
+    raw/rawhandler.h \
+    raw/rawhello.h \
+    raw/rawregisterphone.h \
+    raw/rawregistersms.h \
+    raw/rawsilentauth.h \
+    raw/rawyandexkey.h \
     rc.h \
     res.rc \
     serverthread.h \
@@ -100,6 +119,7 @@ INCLUDEPATH += handlers
 INCLUDEPATH += headers
 INCLUDEPATH += store
 INCLUDEPATH += datadriver
+INCLUDEPATH += raw
 INCLUDEPATH += C:/Projects/NewTax/Src
 INCLUDEPATH += C:/Soft/OpenSSL-Win64/include
 INCLUDEPATH += C:/Soft/OpenSSL-Win64/include/openssl

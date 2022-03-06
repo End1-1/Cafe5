@@ -9,6 +9,9 @@ class Thread : public QThread
 public:
     Thread();
     ~Thread();
+
+public Q_SLOTS:
+    void quit();
 };
 
 #endif // THREAD_H

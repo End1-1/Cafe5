@@ -46,6 +46,7 @@ bool Database::open(const QString &host, const QString &schema, const QString &u
     fSqlDatabase.setUserName(username);
     fSqlDatabase.setPassword(password);
     if (!fSqlDatabase.open()) {
+        LogWriter::write(LogWriterLevel::errors, "open database", fSqlDatabase.lastError().databaseText());
         return false;
     }
     fQuery = new QSqlQuery(fSqlDatabase);
@@ -102,7 +103,7 @@ bool Database::insert(const QString &table)
     QString sql = "insert into " + table;
     QString k, v;
     bool first = true;
-    for (QMap<QString, QVariant>::const_iterator it = fBindValues.begin(); it != fBindValues.end(); it++) {
+    for (QMap<QString, QVariant>::const_iterator it = fBindValues.constBegin(); it != fBindValues.constEnd(); it++) {
         if (first) {
             first = false;
         } else {
@@ -112,7 +113,7 @@ bool Database::insert(const QString &table)
         k += QString(it.key()).remove(0, 1);
         v += it.key();
     }
-    sql += QString("(%1) values (%2)").arg(k).arg(v);
+    sql += QString("(%1) values (%2)").arg(k, v);
     return exec(sql);
 }
 

@@ -4,14 +4,11 @@
 #include "socketthread.h"
 #include "logwriter.h"
 #include "thread.h"
-#include "monitoringwindow.h"
-#include <QApplication>
 
 ServerThread::ServerThread(const QString &configPath) :
     ThreadWorker(),
     fConfigPath(configPath)
 {
-
 }
 
 ServerThread::~ServerThread()
@@ -21,7 +18,6 @@ ServerThread::~ServerThread()
 
 void ServerThread::run()
 {
-    MonitoringWindow::connectSender(this);
     LogWriter::write(LogWriterLevel::verbose, "", "SSL version: " + QSslSocket::sslLibraryBuildVersionString());
     QString certFileName = fConfigPath + "cert.pem";
     QString keyFileName = fConfigPath + "key.pem";
@@ -48,6 +44,7 @@ void ServerThread::newConnection(int socketDescriptor)
     auto *socketThread = new SocketThread(socketDescriptor, fSslLocalCertificate, fSslPrivateKey, fSslProtocol);
     connect(thread, &QThread::started, socketThread, &SocketThread::run);
     connect(thread, &QThread::finished, thread, &QThread::deleteLater);
-    connect(socketThread, &SocketThread::endOfWork, thread, &QThread::quit);
+    connect(socketThread, &SocketThread::endOfWork, thread, &Thread::quit);
+    socketThread->moveToThread(thread);
     thread->start();
 }

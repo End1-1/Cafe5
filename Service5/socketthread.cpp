@@ -1,8 +1,8 @@
 #include "socketthread.h"
 #include "requesthandler.h"
 #include "requestmanager.h"
-#include "monitoringwindow.h"
 #include "logwriter.h"
+#include "rawhandler.h"
 #include <QHostAddress>
 #include <QApplication>
 #include <QUuid>
@@ -14,19 +14,24 @@ SocketThread::SocketThread(int handle, QSslCertificate cert, QSslKey key, QSsl::
     fSslPrivateKey(key),
     fSslProtocol(proto)
 {
-
+    fMessageNumber = 0;
+    fPreviouseMessageNumber = 0;
 }
 
 SocketThread::~SocketThread()
 {
     qDebug() << "~SocketThread()";
     delete fSslSocket;
+    delete fTimeoutControl;
 }
 
 void SocketThread::run()
 {
     fSocketType = Invalid;
     setProperty("session", QUuid::createUuid().toString());
+    fTimeoutControl = new QTimer();
+    connect(fTimeoutControl, &QTimer::timeout, this, &SocketThread::timeoutControl);
+    fTimeoutControl->start(3000);
 
     fSslSocket = new SslSocket();
     fSslSocket->setSocketDescriptor(fSocketDescriptor);
@@ -40,8 +45,42 @@ void SocketThread::run()
     connect(fSslSocket, SIGNAL(readyRead()), this, SLOT(readyRead()));
     connect(fSslSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(error(QAbstractSocket::SocketError)));
     connect(fSslSocket, SIGNAL(disconnected()), this, SLOT(disconnected()));
-    MonitoringWindow::connectSender(this);
-    emit sendData(0, property("session").toString(), QString("New connection from %1:%2").arg(QHostAddress(fSslSocket->peerAddress().toIPv4Address()).toString()).arg(fSslSocket->peerPort()), QVariant());
+    LogWriter::write(LogWriterLevel::verbose, property("session").toString(), QString("New connection from %1:%2").arg(QHostAddress(fSslSocket->peerAddress().toIPv4Address()).toString()).arg(fSslSocket->peerPort()));
+}
+
+void SocketThread::rawRequest()
+{
+    int headersize = 3 + sizeof(fMessageNumber) + sizeof(fMessageId) + sizeof(fMessageListData) + sizeof(fContentLenght);
+    if (fData.length() >= headersize) {
+        int pos = 3;
+        memcpy(&fMessageNumber, &fData.data()[pos], sizeof(fMessageNumber));
+        pos += sizeof(fMessageNumber);
+        memcpy(&fMessageId, &fData.data()[pos], sizeof(fMessageId));
+        pos += sizeof(fMessageId);
+        memcpy(&fMessageListData, &fData.data()[pos], sizeof(fMessageListData));
+        pos += sizeof(fMessageListData);
+        memcpy(&fContentLenght, &fData.data()[pos], sizeof(fContentLenght));
+        pos += sizeof(fContentLenght);
+    } else {
+        fTimeoutControl->stop();
+        fTimeoutControl->start(3000);
+        return;
+    }
+    if (fPreviouseMessageNumber + 1 != fMessageNumber) {
+        LogWriter::write(LogWriterLevel::errors, property("session").toString(), QString("Packet message number error, previous: %1, current: %2").arg(fPreviouseMessageNumber).arg(fMessageNumber));
+        fSslSocket->close();
+        emit endOfWork();
+        return;
+    }
+    fPreviouseMessageNumber = fMessageNumber;
+    fTimeoutControl->stop();
+    if (fData.length() - headersize >= fContentLenght) {
+        parseBody(fMessageListData, fData.mid(headersize, fContentLenght));
+        fData.remove(0, headersize + fContentLenght);
+        if (fData.length() > 0) {
+            rawRequest();
+        }
+    }
 }
 
 void SocketThread::httpRequest()
@@ -64,6 +103,7 @@ void SocketThread::httpRequest()
             }
         }
     }
+    fTimeoutControl->stop();
     HttpRequestMethod m;
     QString route;
     QString httpVersion;
@@ -231,6 +271,11 @@ HttpRequestMethod SocketThread::parseRequest(HttpRequestMethod &requestMethod, Q
     return requestMethod;
 }
 
+void SocketThread::parseBody(quint16 msgType, const QByteArray &data)
+{
+    auto *rh = new RawHandler(fSslSocket, property("session").toString(), fPreviouseMessageNumber, fMessageId, msgType, data);
+}
+
 void SocketThread::parseBody(const QString &request, int offset)
 {
     int s1 = 0;
@@ -273,6 +318,12 @@ QString SocketThread::data(const DataAddress &da) const
     return result;
 }
 
+void SocketThread::timeoutControl()
+{
+    fSslSocket->close();
+    LogWriter::write(LogWriterLevel::errors, property("session").toString(), tr("Connection timeout"));
+}
+
 void SocketThread::readyRead()
 {
     /* Raw data in socket pattern, otherwise means http request */
@@ -292,6 +343,7 @@ void SocketThread::readyRead()
     fData.append(fSslSocket->readAll());
     switch (fSocketType) {
     case RawData:
+        rawRequest();
         break;
     case HttpRequest:
         httpRequest();
@@ -307,5 +359,6 @@ void SocketThread::disconnected()
 void SocketThread::error(QAbstractSocket::SocketError err)
 {
     Q_UNUSED(err);
-    disconnect();
+    fSslSocket->disconnect();
+    emit endOfWork();
 }

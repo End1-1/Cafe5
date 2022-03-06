@@ -19,6 +19,7 @@ class DatabaseConnectionManager
 public:
     DatabaseConnectionManager();
     static bool init();
+    static bool openSystemDatabase(Database &db);
     static bool openDatabase(Database &db, JsonHandler &jh);
     static bool openDatabase(const QString &name, Database &db, JsonHandler &jh);
     static QHash<QString, DatabaseConnection> fDatabaseConnections;

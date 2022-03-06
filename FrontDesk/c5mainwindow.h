@@ -88,6 +88,8 @@ private:
 
     QLabel *fStatusLabel;
 
+    QStringList fPrevTabUuid;
+
     QTabWidget *fTab;
 
     QMap<QString, C5Widget *> fBroadcastListeners;

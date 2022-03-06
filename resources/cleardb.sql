@@ -46,6 +46,7 @@ delete from d_menu_names;
 delete from d_recipes;
 delete from d_dish;
 delete from d_part2;
+delete from c_goods_option;
 delete from c_goods_multiscancode;
 delete from d_part1;
 delete from d_printers;
@@ -93,6 +94,7 @@ alter table c_goods_classes auto_increment = 0;
 alter table s_login_session auto_increment=0;
 ALTER TABLE d_part1 AUTO_INCREMENT = 0 ;
 ALTER TABLE d_part2 AUTO_INCREMENT = 0 ;
+alter table c_goods_option auto_increment = 0;
 
 ALTER TABLE s_syncronize AUTO_INCREMENT = 0 ;
 ALTER TABLE d_package AUTO_INCREMENT = 0 ;

@@ -195,9 +195,26 @@ void C5MainWindow::removeBroadcastListener(C5Widget *w)
 
 void C5MainWindow::tabCloseRequested(int index)
 {
-    C5ReportWidget *w = static_cast<C5ReportWidget*>(fTab->widget(index));
+    auto *w = static_cast<C5Widget*>(fTab->widget(index));
+    QString prevWindow;
+    if (fPrevTabUuid.count() > 1) {
+        prevWindow = fPrevTabUuid.at(fPrevTabUuid.count() - 2);
+    }
     fTab->removeTab(index);
     delete w;
+    if (!prevWindow.isEmpty() && index == fTab->currentIndex()) {
+        for (int i = 0; i < fTab->count(); i++) {
+            w = static_cast<C5Widget*>(fTab->widget(i));
+            if (w->fWindowUuid == prevWindow) {
+                fPrevTabUuid.append(w->fWindowUuid);
+                fTab->setCurrentIndex(i);
+                fPrevTabUuid.removeAll(w->fWindowUuid);
+                return;
+            }
+        }
+    } else {
+        fPrevTabUuid.removeAll(w->fWindowUuid);
+    }
 }
 
 void C5MainWindow::currentTabChange(int index)
@@ -206,11 +223,12 @@ void C5MainWindow::currentTabChange(int index)
         removeToolBar(fReportToolbar);
     }
     fReportToolbar = nullptr;
-    C5ReportWidget *w = dynamic_cast<C5ReportWidget*>(fTab->widget(index));
-    C5Widget *w2 = dynamic_cast<C5Widget*>(fTab->widget(index));
+    auto *w = dynamic_cast<C5ReportWidget*>(fTab->widget(index));
+    auto *w2 = dynamic_cast<C5Widget*>(fTab->widget(index));
     if (!w && !w2) {
         return;
     }
+    fPrevTabUuid.append(w2->fWindowUuid);
     if (w) {
         fReportToolbar = w->toolBar();
     } else if (w2) {

@@ -24,7 +24,7 @@ void LogWriter::write(int file, const QString &session, const QString &message)
 {
     QMutexLocker ml(&fMutex);
 #ifdef QT_DEBUG
-    qDebug() << QDateTime::currentDateTime().toString("dd/MM/yyyy HH:mm:ss ") << message;
+    qDebug() << QDateTime::currentDateTime().toString("dd/MM/yyyy HH:mm:ss ") << session << message;
 #endif;
     if (fFilesMap.empty()) {
         fFilesMap[file] = QDir::tempPath() + "/" + _APPLICATION_ + "." + _MODULE_ + ".log";
