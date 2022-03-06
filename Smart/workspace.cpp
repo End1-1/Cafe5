@@ -22,6 +22,8 @@
 #include <QTimer>
 #include <QFile>
 
+QHash<QString, QString> fPrinterAliases;
+
 
 Workspace::Workspace(const QStringList &dbParams) :
     C5Dialog(dbParams),
@@ -69,6 +71,10 @@ bool Workspace::login()
     }
     ui->lbStaffName->setText(fUser->fullName());
     C5Database db(fDBParams);
+    db.exec("select * from d_print_aliases");
+    while (db.nextRow()) {
+        fPrinterAliases[db.getString("f_alias")] = db.getString("f_printer");
+    }
     db[":f_menu"] = C5Config::defaultMenu();
     db.exec("select f_id, f_name, f_color \
             from d_part2 \
@@ -701,7 +707,11 @@ void Workspace::on_btnCheckout_clicked()
         p.br();
         p.ltext("_", 0);
         p.br();
-        p.print( s, QPrinter::Custom);
+        QString finalPrinter = s;
+        if (fPrinterAliases.contains(s)) {
+            finalPrinter = fPrinterAliases[s];
+        }
+        p.print(finalPrinter, QPrinter::Custom);
     }
 
     resetOrder();

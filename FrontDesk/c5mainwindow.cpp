@@ -196,10 +196,11 @@ void C5MainWindow::removeBroadcastListener(C5Widget *w)
 void C5MainWindow::tabCloseRequested(int index)
 {
     auto *w = static_cast<C5Widget*>(fTab->widget(index));
-    QString prevWindow;
+    QString prevWindow, currWindow;
     if (fPrevTabUuid.count() > 1) {
         prevWindow = fPrevTabUuid.at(fPrevTabUuid.count() - 2);
     }
+    currWindow = w->fWindowUuid;
     fTab->removeTab(index);
     delete w;
     if (!prevWindow.isEmpty() && index == fTab->currentIndex()) {
@@ -213,7 +214,7 @@ void C5MainWindow::tabCloseRequested(int index)
             }
         }
     } else {
-        fPrevTabUuid.removeAll(w->fWindowUuid);
+        fPrevTabUuid.removeAll(currWindow);
     }
 }
 
