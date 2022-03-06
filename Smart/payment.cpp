@@ -480,6 +480,7 @@ void payment::on_btnCheckoutIdram_clicked()
         sender()->deleteLater();
     });
     connect(na, &QNetworkAccessManager::sslErrors, this, [=](QNetworkReply *reply, const QList<QSslError> &error) {
+       Q_UNUSED(error);
        C5Message::error(reply->errorString());
     });
     QNetworkRequest nr = QNetworkRequest(QUrl("https://money.idram.am/api/History/Search"));

@@ -564,7 +564,7 @@ void Workspace::on_btnCheckout_clicked()
                 }
             }
             QString bid;
-            double disc;
+            double disc = 0;
             switch (fDiscountMode) {
             case CARD_TYPE_DISCOUNT:
                 disc = fDiscountValue;
@@ -701,7 +701,7 @@ void Workspace::on_btnCheckout_clicked()
         p.br();
         p.ltext("_", 0);
         p.br();
-        p.print(s, QPrinter::Custom);
+        p.print( s, QPrinter::Custom);
     }
 
     resetOrder();
