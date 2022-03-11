@@ -92,6 +92,7 @@
 #define SALE_RETAIL 1
 #define SALE_WHOSALE 2
 #define SALE_PREORDER 3
+#define SALE_RETURN 4
 
 class C5User;
 

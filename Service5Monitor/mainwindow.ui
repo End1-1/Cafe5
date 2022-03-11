@@ -14,8 +14,41 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget"/>
-  <widget class="QMenuBar" name="menubar"/>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuMap">
+    <property name="title">
+     <string>Map</string>
+    </property>
+    <addaction name="actionOpenMap"/>
+   </widget>
+   <widget class="QMenu" name="menuConnections">
+    <property name="title">
+     <string>Connections</string>
+    </property>
+    <addaction name="actionCommon_statistics"/>
+   </widget>
+   <addaction name="menuMap"/>
+   <addaction name="menuConnections"/>
+  </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionOpenMap">
+   <property name="text">
+    <string>Open map</string>
+   </property>
+  </action>
+  <action name="actionCommon_statistics">
+   <property name="text">
+    <string>Common statistics</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

@@ -13,4 +13,5 @@ public:
     QString fUuid;
 };
 
+Q_DECLARE_METATYPE(SslSocket*)
 #endif // SSLSOCKET_H

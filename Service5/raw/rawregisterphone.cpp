@@ -5,21 +5,13 @@
 RawRegisterPhone::RawRegisterPhone(SslSocket *s, const QByteArray &d) :
     Raw(s, d)
 {
-
+    connect(this, &RawRegisterPhone::registerPhone, RawDataExchange::instance(), &RawDataExchange::registerPhone);
 }
 
 void RawRegisterPhone::run()
 {
     QString phone = readString();
-    QString smsCode;
-    RawDataExchange::instance()->createRegisterPhoneRequest(phone, smsCode, fSocket);
-    putUShort(0);
-    auto *f = new Firebase();
-    connect(f, &Firebase::sendFinished, this, &RawRegisterPhone::fcmFinished);
-    f->sendMessage(RawDataExchange::instance()->tokenOfSocket(fSocket), QString("Your confirmation code: %1").arg(smsCode));
-}
+    emit registerPhone(fSocket, phone);
 
-void RawRegisterPhone::fcmFinished()
-{
-    emit finish();
+
 }

@@ -7,6 +7,8 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 
+Firebase *Firebase::fInstance = nullptr;
+
 Firebase::Firebase(QObject *parent) :
     QObject(parent)
 {
@@ -17,6 +19,14 @@ Firebase::Firebase(QObject *parent) :
 Firebase::~Firebase()
 {
     qDebug() << "~Firebase";
+}
+
+Firebase *Firebase::instance()
+{
+    if (fInstance == nullptr) {
+        fInstance = new Firebase();
+    }
+    return fInstance;
 }
 
 void Firebase::sendMessage(const QString &token, const QString &msg)

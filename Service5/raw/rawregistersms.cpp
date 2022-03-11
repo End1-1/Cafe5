@@ -4,13 +4,11 @@
 RawRegisterSMS::RawRegisterSMS(SslSocket *s, const QByteArray &d) :
     Raw(s, d)
 {
-
+    connect(this, &RawRegisterSMS::registerSms, RawDataExchange::instance(), &RawDataExchange::registerSms);
 }
 
 void RawRegisterSMS::run()
 {
     QString sms = readString();
-    short reply = RawDataExchange::instance()->checkPhoneSMSRequest(sms, fSocket) ? 1 : 0;
-    putUShort(reply);
-    emit finish();
+    emit registerSms(fSocket, sms);
 }

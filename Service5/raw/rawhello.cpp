@@ -6,7 +6,7 @@
 RawHello::RawHello(SslSocket *s, const QByteArray &d) :
     Raw(s, d)
 {
-
+    connect(this, &RawHello::registerFirebaseToken, RawDataExchange::instance(), &RawDataExchange::registerFirebaseToken);
 }
 
 void RawHello::run()
@@ -14,6 +14,5 @@ void RawHello::run()
     quint32 strLen;
     memcpy(&strLen, fData.data(), sizeof(strLen));
     QString firebaseToken = fData.mid(4, fData.length() - 4);
-    RawDataExchange::instance()->registerFirebaseToken(firebaseToken, fSocket);
-    emit finish();
+    emit registerFirebaseToken(fSocket, firebaseToken);
 }

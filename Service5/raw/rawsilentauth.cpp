@@ -4,14 +4,12 @@
 RawSilentAuth::RawSilentAuth(SslSocket *s, const QByteArray &d) :
     Raw(s, d)
 {
-
+    connect(this, &RawSilentAuth::auth, RawDataExchange::instance(), &RawDataExchange::silentAuth);
 }
 
 void RawSilentAuth::run()
 {
     QString phone = readString();
     QString password = readString();
-    quint8 reply = RawDataExchange::instance()->silentAuth(phone, password) ? 1 : 0;
-    putUByte(reply);
-    emit finish();
+    emit auth(fSocket, phone, password);
 }

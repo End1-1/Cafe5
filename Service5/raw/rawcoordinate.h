@@ -2,23 +2,21 @@
 #define RAWCOORDINATE_H
 
 #include "raw.h"
+#include "structs.h"
+
 class RawCoordinate : public Raw
 {
     Q_OBJECT
 
-    struct CoordinateData {
-        double latitude;
-        double longitude;
-        double speed;
-        double azimuth;
-        double datetime;
-    };
-
 public:
     explicit RawCoordinate(SslSocket *s, const QByteArray &d);
+    ~RawCoordinate();
 
 public slots:
     virtual void run() override;
+
+signals:
+    void devicePosition(SslSocket*, const CoordinateData &);
 };
 
 #endif // RAWCOORDINATE_H

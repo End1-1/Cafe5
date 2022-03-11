@@ -40,7 +40,7 @@ QToolBar *CR5DishPart2::toolBar()
 
 bool CR5DishPart2::on_tblView_doubleClicked(const QModelIndex &index)
 {
-    if (C5Grid::on_tblView_doubleClicked(index)) {
+    if (C5ReportWidget::on_tblView_doubleClicked(index)) {
         fModel->setRowColor(index.row(), QColor::fromRgb(fModel->data(index.row(), fModel->indexForColumnName("f_color"), Qt::EditRole).toInt()));
     }
     return true;

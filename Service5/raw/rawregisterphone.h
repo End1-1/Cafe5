@@ -12,8 +12,8 @@ public:
 public slots:
     virtual void run() override;
 
-private slots:
-    void fcmFinished();
+signals:
+    void registerPhone(SslSocket*, const QString &);
 
 };
 

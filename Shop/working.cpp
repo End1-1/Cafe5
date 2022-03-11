@@ -235,7 +235,7 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
                         "group by 1, 2 ");
                 QString info = tr("Total today") + "<br>";
                 while (db.nextRow()) {
-                    info += QString("%1: %2<br>").arg(db.getString("f_staff")).arg(float_str(db.getDouble("f_amounttotal"), 2));
+                    info += QString("%1: %2<br>").arg(db.getString("f_staff"), float_str(db.getDouble("f_amounttotal"), 2));
                 }
                 C5Message::info(info);
                 event->accept();
@@ -532,7 +532,7 @@ void Working::threadMessageData(int code, const QVariant &data)
                 p.br();
                 p.ltext(jjm["usermessage"].toString(), 0);
                 p.br();
-                p.ltext(QString("%1 %2").arg(tr("End date")).arg(jjm["enddate"].toString()), 0);
+                p.ltext(QString("%1 %2").arg(tr("End date"), jjm["enddate"].toString()), 0);
                 p.br();
                 p.br();
                 p.line();
@@ -553,11 +553,11 @@ void Working::threadMessageData(int code, const QVariant &data)
                 p.br();
                 p.br();
                 if (Sales::printCheckWithTax(db, id, rseq)) {
-                    p.ctext(QString("%1: %2").arg(tr("Fiscal printed")).arg(jord["ordernum"].toString()));
+                    p.ctext(QString("%1: %2").arg(tr("Fiscal printed"), jord["ordernum"].toString()));
                     p.br();
                     p.ctext(jord["orderamount"].toString());
                 } else {
-                    p.ctext(QString("%1: %2").arg(tr("Fiscal not printed")).arg(jord["ordernum"].toString()));
+                    p.ctext(QString("%1: %2").arg(tr("Fiscal not printed"), jord["ordernum"].toString()));
                 }
                 break;
             }

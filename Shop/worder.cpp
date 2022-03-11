@@ -237,7 +237,7 @@ bool WOrder::writeOrder()
     so.setPartner(fPartner, ui->lePartner->text());
     so.setDiscount(fCostumerId, fCardId, fCardMode, fCardValue);
     so.setParams(fDateOpen, fTimeOpen, fSaleType);
-    C5LogSystem::writeEvent(QString("%1. %2:%3, %4:%5, %6:%7, %8:%9").arg(tr("Before write")).arg(tr("Total")).arg(ui->leTotal->text()).arg(tr("Card")).arg(ui->leCard->text()).arg(tr("Advance")).arg(ui->leAdvance->text()).arg(tr("Discount")).arg(ui->leDisc->text()));
+    C5LogSystem::writeEvent(QString("%1. %2:%3, %4:%5, %6:%7, %8:%9").arg(tr("Before write"), tr("Total"), ui->leTotal->text(), tr("Card"), ui->leCard->text(),tr("Advance"), ui->leAdvance->text(), tr("Discount"), ui->leDisc->text()));
     bool w = so.write(ui->leTotal->getDouble(), ui->leCard->getDouble(), ui->leAdvance->getDouble(), ui->leDisc->getDouble(), false, goods, fCardValue, fCardMode);
     if (w) {
         w = so.writeFlags(ui->btnF1->isChecked(), ui->btnF2->isChecked(), ui->btnF3->isChecked(), ui->btnF4->isChecked(), ui->btnF5->isChecked());

@@ -124,6 +124,7 @@ SOURCES += \
     dlgdate.cpp \
     dlggoodslist.cpp \
     dlgpin.cpp \
+    dlgreturnitem.cpp \
     dlgsplashscreen.cpp \
     goodsreturnreason.cpp \
     imageloader.cpp \
@@ -268,6 +269,7 @@ HEADERS += \
     dlgdate.h \
     dlggoodslist.h \
     dlgpin.h \
+    dlgreturnitem.h \
     dlgsplashscreen.h \
     goodsreturnreason.h \
     imageloader.h \
@@ -325,6 +327,7 @@ FORMS += \
     dlgdate.ui \
     dlggoodslist.ui \
     dlgpin.ui \
+    dlgreturnitem.ui \
     dlgsplashscreen.ui \
     goodsreturnreason.ui \
     loghistory.ui \

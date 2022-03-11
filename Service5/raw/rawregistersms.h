@@ -11,6 +11,9 @@ public:
 
 public slots:
     virtual void run() override;
+
+signals:
+    void registerSms(SslSocket*, const QString &);
 };
 
 #endif // RAWREGISTERSMS_H

@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>wifi_off.png</file>
+        <file>wifi_on.png</file>
+        <file>car_up.png</file>
+    </qresource>
+</RCC>

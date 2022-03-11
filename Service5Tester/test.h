@@ -1,7 +1,6 @@
 #ifndef TEST_H
 #define TEST_H
 
-#include "threadworker.h"
 #include <QSslSocket>
 #include <QThread>
 #include <QFile>

@@ -11,6 +11,9 @@ public:
 
 public slots:
     virtual void run() override;
+
+signals:
+    void balanceAmountTotal(SslSocket *s);
 };
 
 #endif // RAWBALANCEHISTORY_H

@@ -36,7 +36,7 @@ protected:
     CE5Editor *fEditor;
 
 protected slots:
-    void completeRefresh();
+    virtual void completeRefresh();
 
     virtual int newRow();
 };

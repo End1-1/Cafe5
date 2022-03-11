@@ -373,6 +373,69 @@ void C5TableModel::sumForColumns(const QStringList &columns, QMap<QString, doubl
     }
 }
 
+void C5TableModel::insertSubTotals(int col, const QList<int> &totalCols)
+{
+    if (totalCols.count() == 0) {
+        return;
+    }
+    QList<QVariant> emptyRow;
+    for (int i = 0; i < columnCount(); i++) {
+        emptyRow << QVariant();
+    }
+    QList<double> totals;
+    for (int i = 0; i < totalCols.count(); i++) {
+        totals << 0.000;
+    }
+    QString currName;
+    int r = 0;
+    QList<int> subtotalSpans;
+    while (r < fProxyData.count()) {
+        if (r == 0) {
+            currName = data(r, col, Qt::EditRole).toString();
+        } else {
+            if (data(r, col, Qt::EditRole).toString().compare(currName) != 0) {
+                QList<QVariant> newrow = emptyRow;
+                newrow[0] = tr("SUBTOTAL") + " " + currName;
+                for (int c = 0; c < totalCols.count(); c++) {
+                    newrow[totalCols.at(c)] = totals[c];
+                }
+                insertRow(r - 1);
+                for (int c = 0; c < columnCount(); c++) {
+                    setData(r, c, newrow[c]);
+                }
+                subtotalSpans.append(r);
+                r++;
+                insertRow(r - 1);
+                fTableView->setSpan(r, 0, 1, columnCount());
+                r++;
+                currName = data(r, col, Qt::EditRole).toString();
+                for (int i = 0; i < totalCols.count(); i++) {
+                    totals[i] = 0.000;
+                }
+            }
+        }
+        for (int c = 0; c < totalCols.count(); c++) {
+            totals[c] += data(r, totalCols.at(c), Qt::EditRole).toDouble();
+        }
+        r++;
+    }
+    if (r > 0) {
+        QList<QVariant> newrow = emptyRow;
+        newrow[0] = tr("Subtotal") + " " + currName;
+        for (int c = 0; c < totalCols.count(); c++) {
+            newrow[totalCols.at(c)] = totals[c];
+        }
+        insertRow(r - 1);
+        for (int c = 0; c < columnCount(); c++) {
+            setData(r, c, newrow[c]);
+        }
+        subtotalSpans.append(r);
+    }
+    for (int r: subtotalSpans) {
+        fTableView->setSpan(r, 0, 1, totalCols[0]);
+    }
+}
+
 void C5TableModel::filterData()
 {
     beginResetModel();

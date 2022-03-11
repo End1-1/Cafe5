@@ -5,6 +5,7 @@
 
 class RawYandexKey : public Raw
 {
+    Q_OBJECT
 public:
     RawYandexKey(SslSocket *s, const QByteArray &d);
 

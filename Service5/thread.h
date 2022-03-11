@@ -7,11 +7,15 @@ class Thread : public QThread
 {
     Q_OBJECT
 public:
-    Thread();
+    Thread(const QString &n);
     ~Thread();
 
 public Q_SLOTS:
     void quit();
+
+private:
+    Thread(QObject *parent = nullptr);
+    QString fName;
 };
 
 #endif // THREAD_H

@@ -1,7 +1,6 @@
 #ifndef SOCKETTHREAD_H
 #define SOCKETTHREAD_H
 
-#include "threadworker.h"
 #include "sslsocket.h"
 #include "socketdata.h"
 #include <QTimer>
@@ -9,27 +8,30 @@
 #include <QSslCertificate>
 #include <QSslKey>
 
-class SocketThread : public ThreadWorker
+class RawHandler;
+
+class SocketThread : public QObject
 {
     Q_OBJECT
 
 public:
     SocketThread(int handle, QSslCertificate cert, QSslKey key, QSsl::SslProtocol proto);
     ~SocketThread();
+    SslSocket *fSslSocket;
 
 public slots:
-    virtual void run() override;
+    virtual void run();
 
 private:
     QSslCertificate fSslLocalCertificate;
     QSslKey fSslPrivateKey;
     QSsl::SslProtocol fSslProtocol;
 
-
+    RawHandler *fRawHandler;
+    bool fFinished;
     QTimer *fTimeoutControl;
     QElapsedTimer fTimer;
     int fSocketDescriptor;
-    SslSocket *fSslSocket;
     quint32 fPreviouseMessageNumber;
     quint32 fMessageNumber;
     quint32 fMessageId;
@@ -43,6 +45,7 @@ private:
     quint32 fContentLenght;
     quint16 fMessageListData;
     QString fBoundary;
+    void setFinished();
     void rawRequest();
     void httpRequest();
     HttpRequestMethod parseRequest(HttpRequestMethod &requestMethod, QString &httpVersion, QString &route);
@@ -55,8 +58,12 @@ private:
 private slots:
     void timeoutControl();
     void readyRead();
+    void writeToSocket(const QByteArray &d);
     void disconnected();
     void error(QAbstractSocket::SocketError err);
+
+signals:
+    void finished();
 };
 
 #endif // SOCKETTHREAD_H

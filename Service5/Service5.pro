@@ -41,6 +41,8 @@ SOURCES += \
     raw/rawdataexchange.cpp \
     raw/rawhandler.cpp \
     raw/rawhello.cpp \
+    raw/rawmessage.cpp \
+    raw/rawmonitor.cpp \
     raw/rawregisterphone.cpp \
     raw/rawregistersms.cpp \
     raw/rawsilentauth.cpp \
@@ -90,10 +92,13 @@ HEADERS += \
     raw/rawdataexchange.h \
     raw/rawhandler.h \
     raw/rawhello.h \
+    raw/rawmessage.h \
+    raw/rawmonitor.h \
     raw/rawregisterphone.h \
     raw/rawregistersms.h \
     raw/rawsilentauth.h \
     raw/rawyandexkey.h \
+    raw/structs.h \
     rc.h \
     res.rc \
     serverthread.h \

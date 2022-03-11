@@ -10,6 +10,9 @@ public:
     CR5MFGeneralReport(const QStringList &dbParams, QWidget *parent = nullptr);
 
     virtual QToolBar *toolBar();
+
+protected slots:
+    virtual void refreshData() override;
 };
 
 #endif // CR5MFGENERALREPORT_H

@@ -15,6 +15,7 @@
 #include "c5printpreview.h"
 #include "c5user.h"
 #include "c5printing.h"
+#include "dlgreturnitem.h"
 #include "c5printtaxanywhere.h"
 #include "dlgdate.h"
 
@@ -664,26 +665,28 @@ void Sales::on_btnPrint_clicked()
 
 void Sales::on_btnItemBack_clicked()
 {
-    QModelIndexList l = ui->tbl->selectionModel()->selectedRows();
-    if (l.count() == 0) {
-        C5Message::error(tr("No row selected"));
-        return;
-    }
-    if (ui->tbl->getDouble(l.at(0).row(), 4) < 0) {
-        C5Message::error(tr("Return inpossible to return, just view"));
-    }
-    int col = 1;
-    switch (fViewMode) {
-    case VM_ITEMS:
-        col = 0;
-        break;
-    default:
-        break;
-    }
-    QString uuid = ui->tbl->getString(l.at(0).row(), col);
-    ViewOrder *vo = new ViewOrder(uuid);
-    vo->exec();
-    vo->deleteLater();
+    DlgReturnItem i;
+    i.exec();
+//    QModelIndexList l = ui->tbl->selectionModel()->selectedRows();
+//    if (l.count() == 0) {
+//        C5Message::error(tr("No row selected"));
+//        return;
+//    }
+//    if (ui->tbl->getDouble(l.at(0).row(), 4) < 0) {
+//        C5Message::error(tr("Return inpossible to return, just view"));
+//    }
+//    int col = 1;
+//    switch (fViewMode) {
+//    case VM_ITEMS:
+//        col = 0;
+//        break;
+//    default:
+//        break;
+//    }
+//    QString uuid = ui->tbl->getString(l.at(0).row(), col);
+//    ViewOrder *vo = new ViewOrder(uuid);
+//    vo->exec();
+//    vo->deleteLater();
 }
 
 void Sales::on_btnRefresh_clicked()

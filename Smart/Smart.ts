@@ -1431,7 +1431,7 @@ MS Excel</source>
         <location filename="../Shop/printreceiptgroup.cpp" line="193"/>
         <location filename="../Shop/printreceiptgroup.cpp" line="501"/>
         <source>Return from</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Հետվերադարձ</translation>
     </message>
     <message>
         <location filename="../Shop/printreceiptgroup.cpp" line="197"/>
@@ -1694,7 +1694,7 @@ MS Excel</source>
     </message>
     <message>
         <location filename="workspace.ui" line="1320"/>
-        <location filename="workspace.cpp" line="1011"/>
+        <location filename="workspace.cpp" line="1021"/>
         <source>Total</source>
         <translation>Ընդամենը</translation>
     </message>
@@ -1704,91 +1704,91 @@ MS Excel</source>
         <translation>ՀԱՇԻՎ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="66"/>
+        <location filename="workspace.cpp" line="68"/>
         <source>ENTER</source>
         <translation>ՄՈՒՏՔ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="79"/>
+        <location filename="workspace.cpp" line="85"/>
         <source>All</source>
         <translation>Բոլորը</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="425"/>
+        <location filename="workspace.cpp" line="431"/>
         <source>Quantity of orders</source>
         <translation>Պատվերների քանակ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="611"/>
-        <location filename="workspace.cpp" line="676"/>
+        <location filename="workspace.cpp" line="617"/>
+        <location filename="workspace.cpp" line="682"/>
         <source>Receipt #</source>
         <translation>Պատվեր №</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="618"/>
+        <location filename="workspace.cpp" line="624"/>
         <source>Amount to paid</source>
         <translation>Ենթակա է վճարման</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="662"/>
-        <location filename="workspace.cpp" line="700"/>
+        <location filename="workspace.cpp" line="668"/>
+        <location filename="workspace.cpp" line="706"/>
         <source>Printed:</source>
         <translation>Տպված</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="978"/>
-        <location filename="workspace.cpp" line="1015"/>
+        <location filename="workspace.cpp" line="988"/>
+        <location filename="workspace.cpp" line="1025"/>
         <source>Cash</source>
         <translation>Կանխիկ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="984"/>
-        <location filename="workspace.cpp" line="1020"/>
+        <location filename="workspace.cpp" line="994"/>
+        <location filename="workspace.cpp" line="1030"/>
         <source>Card</source>
         <translation>Քարտ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="990"/>
-        <location filename="workspace.cpp" line="1025"/>
+        <location filename="workspace.cpp" line="1000"/>
+        <location filename="workspace.cpp" line="1035"/>
         <source>Idram</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="996"/>
-        <location filename="workspace.cpp" line="1030"/>
+        <location filename="workspace.cpp" line="1006"/>
+        <location filename="workspace.cpp" line="1040"/>
         <source>Other</source>
         <translation>Այլ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="162"/>
-        <location filename="workspace.cpp" line="746"/>
+        <location filename="workspace.cpp" line="168"/>
+        <location filename="workspace.cpp" line="756"/>
         <source>Confirm to close application</source>
         <translation>Փակել՞ ծրագիրը</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="774"/>
+        <location filename="workspace.cpp" line="784"/>
         <source>Enter qty</source>
         <translation>Մուտքագրեք քանակը</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="774"/>
+        <location filename="workspace.cpp" line="784"/>
         <source>Qty</source>
         <translation>Քանակ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="377"/>
-        <location filename="workspace.cpp" line="961"/>
+        <location filename="workspace.cpp" line="383"/>
+        <location filename="workspace.cpp" line="971"/>
         <source>End of day</source>
         <translation>Օրվա հասույթ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="429"/>
+        <location filename="workspace.cpp" line="435"/>
         <source>Total today</source>
         <translation>Ընդամենը</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="438"/>
-        <location filename="workspace.cpp" line="1037"/>
+        <location filename="workspace.cpp" line="444"/>
+        <location filename="workspace.cpp" line="1047"/>
         <source>Printed</source>
         <translation>Տպված</translation>
     </message>

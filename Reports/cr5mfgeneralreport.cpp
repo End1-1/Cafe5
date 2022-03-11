@@ -1,5 +1,6 @@
 #include "cr5mfgeneralreport.h"
 #include "cr5mfgeneralreportfilter.h"
+#include "c5tablemodel.h"
 
 CR5MFGeneralReport::CR5MFGeneralReport(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
@@ -36,8 +37,8 @@ CR5MFGeneralReport::CR5MFGeneralReport(const QStringList &dbParams, QWidget *par
     fColumnsSum << "f_qty"
                 << "f_total";
 
-    fColumnsOrder << "p.f_date"
-                  << "concat(w.f_last, ' ', w.f_first)";
+    fColumnsOrder << "concat(w.f_last, ' ', w.f_first)"
+                  << "p.f_date";
 
 
     fTranslation["f_date"] = tr("Date");
@@ -71,4 +72,17 @@ QToolBar *CR5MFGeneralReport::toolBar()
             createStandartToolbar(btn);
     }
     return fToolBar;
+}
+
+void CR5MFGeneralReport::refreshData()
+{
+    C5ReportWidget::refreshData();
+    int subtotalcol = fModel->indexForColumnName("f_workername");
+    if (subtotalcol > -1) {
+    QList<int> totals;
+        if (fModel->indexForColumnName("f_total") > -1) {
+            totals.append(fModel->indexForColumnName("f_total"));
+        }
+        fModel->insertSubTotals(subtotalcol, totals);
+    }
 }

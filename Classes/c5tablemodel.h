@@ -74,6 +74,8 @@ public:
 
     void sumForColumns(const QStringList &columns, QMap<QString, double> &values);
 
+    void insertSubTotals(int column, const QList<int> &totalCols);
+
     QHash<QString, int> fColumnNameIndex;
 
     QHash<int, QString> fColumnIndexName;

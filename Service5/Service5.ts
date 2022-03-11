@@ -206,35 +206,43 @@
         <translation>հեռ․</translation>
     </message>
     <message>
-        <location filename="handlers/shoprequest.cpp" line="173"/>
+        <location filename="handlers/shoprequest.cpp" line="175"/>
         <source>Delivery</source>
         <translation>Առաքում</translation>
     </message>
     <message>
-        <location filename="handlers/shoprequest.cpp" line="194"/>
+        <location filename="handlers/shoprequest.cpp" line="196"/>
         <source>(F)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="handlers/shoprequest.cpp" line="462"/>
+        <location filename="handlers/shoprequest.cpp" line="465"/>
         <source>Invalid document id</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="handlers/shoprequest.cpp" line="571"/>
+        <location filename="handlers/shoprequest.cpp" line="574"/>
         <source>Not enough materials in the store</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="handlers/shoprequest.cpp" line="681"/>
+        <location filename="handlers/shoprequest.cpp" line="684"/>
         <source>AUTOMATICALY (%1, %2)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="handlers/shoprequest.cpp" line="810"/>
-        <location filename="handlers/shoprequest.cpp" line="820"/>
+        <location filename="handlers/shoprequest.cpp" line="813"/>
+        <location filename="handlers/shoprequest.cpp" line="823"/>
         <source>Moved to online store</source>
         <translation>Տեղափոխված է առաքման պահեստ</translation>
+    </message>
+</context>
+<context>
+    <name>SocketThread</name>
+    <message>
+        <location filename="socketthread.cpp" line="327"/>
+        <source>Connection timeout</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

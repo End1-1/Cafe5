@@ -13,12 +13,14 @@ class Firebase : public QObject
 public:
     explicit Firebase(QObject *parent = nullptr);
     ~Firebase();
+    static Firebase *instance();
 
 public slots:
     void sendMessage(const QString &token, const QString &msg);
 
 private:
     QNetworkAccessManager *fNetworkAccessManager;
+    static Firebase *fInstance;
 
 private slots:
     void finished(QNetworkReply *reply);

@@ -9,6 +9,10 @@ namespace MessageList {
     const short register_phone = 5;
     const short register_sms = 6;
     const short balance_history = 7;
+    const short monitor = 8;
+
+    const short srv_connections_count = 100;
+    const short srv_device_position = 101;
 }
 
 #endif // MESSAGELIST_H

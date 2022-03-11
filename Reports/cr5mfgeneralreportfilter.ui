@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>550</width>
-    <height>168</height>
+    <height>174</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,6 +23,9 @@
    </item>
    <item row="2" column="2">
     <widget class="C5LineEditWithSelector" name="leProducName">
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
      <property name="readOnly">
       <bool>true</bool>
      </property>
@@ -74,6 +77,9 @@
    </item>
    <item row="5" column="2">
     <widget class="C5LineEditWithSelector" name="leWorkerName">
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
      <property name="readOnly">
       <bool>true</bool>
      </property>
@@ -115,6 +121,9 @@
    </item>
    <item row="3" column="2">
     <widget class="C5LineEditWithSelector" name="leProcessName">
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
      <property name="readOnly">
       <bool>true</bool>
      </property>
@@ -129,6 +138,9 @@
    </item>
    <item row="4" column="2">
     <widget class="C5LineEditWithSelector" name="lePositionName">
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
      <property name="readOnly">
       <bool>true</bool>
      </property>
@@ -171,6 +183,18 @@
    <header location="global">c5dateedit.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>leStart</tabstop>
+  <tabstop>leEnd</tabstop>
+  <tabstop>leProduct</tabstop>
+  <tabstop>leProcess</tabstop>
+  <tabstop>lePosition</tabstop>
+  <tabstop>leWorker</tabstop>
+  <tabstop>leProducName</tabstop>
+  <tabstop>leProcessName</tabstop>
+  <tabstop>lePositionName</tabstop>
+  <tabstop>leWorkerName</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

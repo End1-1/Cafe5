@@ -46,6 +46,7 @@ DWORD WINAPI ThreadProcSocketClient(CONST LPVOID lpParam) {
 DWORD WINAPI ThreadProc(CONST LPVOID lpParam) {
     LogWriter::write(LogWriterLevel::verbose, "", "Start service thread");
     QApplication app(ARGC, ARGV);
+    qRegisterMetaType<CoordinateData>("CoordinateData");
     QTranslator t;
     t.load(":/Service5.qm");
     app.installTranslator(&t);
@@ -60,7 +61,7 @@ DWORD WINAPI ThreadProc(CONST LPVOID lpParam) {
     RequestManager::init();
     RawDataExchange::init();
     auto *server = new ServerThread(APPDIR);
-    auto *thread = new Thread();
+    auto *thread = new Thread("ServerThread");
     thread->connect(thread, &QThread::started, server, &ServerThread::run);
     thread->connect(thread, &QThread::finished, thread, &QThread::deleteLater);
     server->connect(server, &ServerThread::endOfWork, &app, &QApplication::quit);

@@ -11,6 +11,9 @@ public:
 
 public slots:
     virtual void run() override;
+
+signals:
+    void auth(SslSocket*, const QString&, const QString&);
 };
 
 #endif // RAWSILENTAUTH_H

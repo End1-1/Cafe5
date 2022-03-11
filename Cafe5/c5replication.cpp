@@ -388,6 +388,14 @@ bool C5Replication::uploadDataToServer(const QStringList &src, const QStringList
         }
         db_src.commit();
         db_dst.commit();
+
+        db_src[":f_id"] = __c5config.defaultHall();
+        db_src.exec("select f_counter where f_id=:f_id");
+        if (db_src.nextRow()) {
+            db_dst[":f_id"] = __c5config.defaultHall();
+            db_dst[":f_counter"] = db_src.getInt("f_counter");
+            db_dst.exec("update h_halls set f_counter=:f_counter where f_id=:f_id");
+        }
     }
     emit finished();
     return true;

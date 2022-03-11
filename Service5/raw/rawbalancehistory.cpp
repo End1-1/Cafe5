@@ -4,23 +4,15 @@
 RawBalanceHistory::RawBalanceHistory(SslSocket *s, const QByteArray &d) :
     Raw(s, d)
 {
-
+    connect(this, &RawBalanceHistory::balanceAmountTotal, RawDataExchange::instance(), &RawDataExchange::balanceAmountTotal);
 }
 
 void RawBalanceHistory::run()
 {
     quint8 h = readUByte();
-    quint8 reply = 0;
     switch (h) {
     case 1:
-        double amount;
-        if (RawDataExchange::instance()->balanceAmount(fSocket, amount)) {
-            reply = 1;
-            putUByte(reply);
-            putDouble(amount);
-            emit finish();
-            return;
-        }
+        emit balanceAmountTotal(fSocket);
         break;
     case 2:
         break;
