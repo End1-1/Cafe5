@@ -9,6 +9,7 @@ class RawHello : public Raw
 
 public:
     RawHello(SslSocket *s, const QByteArray &d);
+    ~RawHello();
 
 public slots:
     virtual void run();

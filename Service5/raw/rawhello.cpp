@@ -9,6 +9,11 @@ RawHello::RawHello(SslSocket *s, const QByteArray &d) :
     connect(this, &RawHello::registerFirebaseToken, RawDataExchange::instance(), &RawDataExchange::registerFirebaseToken);
 }
 
+RawHello::~RawHello()
+{
+    disconnect(this, &RawHello::registerFirebaseToken, RawDataExchange::instance(), &RawDataExchange::registerFirebaseToken);
+}
+
 void RawHello::run()
 {
     quint32 strLen;

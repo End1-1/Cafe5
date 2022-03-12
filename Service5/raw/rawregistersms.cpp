@@ -7,6 +7,11 @@ RawRegisterSMS::RawRegisterSMS(SslSocket *s, const QByteArray &d) :
     connect(this, &RawRegisterSMS::registerSms, RawDataExchange::instance(), &RawDataExchange::registerSms);
 }
 
+RawRegisterSMS::~RawRegisterSMS()
+{
+    disconnect(this, &RawRegisterSMS::registerSms, RawDataExchange::instance(), &RawDataExchange::registerSms);
+}
+
 void RawRegisterSMS::run()
 {
     QString sms = readString();

@@ -10,6 +10,7 @@ class Raw : public RawMessage
     Q_OBJECT
 public:
     explicit Raw(SslSocket *s, const QByteArray &d);
+    ~Raw();
 
 public slots:
     virtual void run() = 0;    
@@ -18,7 +19,8 @@ protected slots:
     virtual void receiveReply(SslSocket *s, const QByteArray &d);
 
 signals:
-    void finish(QByteArray);
+    void reply(QByteArray);
+    void finish();
 };
 
 #endif // RAW_H

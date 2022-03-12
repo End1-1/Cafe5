@@ -7,6 +7,11 @@ RawMonitor::RawMonitor(SslSocket *s, const QByteArray &d) :
     connect(this, &RawMonitor::registerMonitor, RawDataExchange::instance(), &RawDataExchange::registerMonitor);
 }
 
+RawMonitor::~RawMonitor()
+{
+    disconnect(this, &RawMonitor::registerMonitor, RawDataExchange::instance(), &RawDataExchange::registerMonitor);
+}
+
 void RawMonitor::run()
 {
     emit registerMonitor(fSocket);

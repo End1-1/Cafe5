@@ -131,6 +131,7 @@ void SocketConnection::encrypted()
 
 void SocketConnection::disconnected()
 {
+    fTcpPacketNumber = 0;
     emit connectionLost();
     fTimer->start(3000);
 }

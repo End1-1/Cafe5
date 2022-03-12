@@ -7,6 +7,11 @@ RawBalanceHistory::RawBalanceHistory(SslSocket *s, const QByteArray &d) :
     connect(this, &RawBalanceHistory::balanceAmountTotal, RawDataExchange::instance(), &RawDataExchange::balanceAmountTotal);
 }
 
+RawBalanceHistory::~RawBalanceHistory()
+{
+    disconnect(this, &RawBalanceHistory::balanceAmountTotal, RawDataExchange::instance(), &RawDataExchange::balanceAmountTotal);
+}
+
 void RawBalanceHistory::run()
 {
     quint8 h = readUByte();

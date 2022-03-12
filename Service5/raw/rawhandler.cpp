@@ -62,18 +62,17 @@ void RawHandler::run(quint32 msgNum, quint32 msgId, qint16 msgType, const QByteA
         return;
     }
     r->setHeader(fMsgNum, fMsgId, fMsgType);
-    connect(r, &Raw::finish, this, &RawHandler::writeReply);
+    connect(r, &Raw::reply, this, &RawHandler::writeReply);
     auto *t = new Thread(QString("RawHandler %1").arg(r->metaObject()->className()));
     connect(t, &QThread::started, r, &Raw::run);
     connect(t, &QThread::finished, t, &QThread::deleteLater);
-    connect(r, &Raw::destroyed, t, &Thread::quit);
+    connect(r, &Raw::finish, t, &Thread::quit);
     r->moveToThread(t);
     t->start();
 }
 
 void RawHandler::writeReply(QByteArray d)
 {
-    sender()->deleteLater();
     Raw::setHeader(d, fMsgNum, fMsgId, fMsgType);
     emit writeToSocket(d);
 }

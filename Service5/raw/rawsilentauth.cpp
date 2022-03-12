@@ -7,6 +7,11 @@ RawSilentAuth::RawSilentAuth(SslSocket *s, const QByteArray &d) :
     connect(this, &RawSilentAuth::auth, RawDataExchange::instance(), &RawDataExchange::silentAuth);
 }
 
+RawSilentAuth::~RawSilentAuth()
+{
+    disconnect(this, &RawSilentAuth::auth, RawDataExchange::instance(), &RawDataExchange::silentAuth);
+}
+
 void RawSilentAuth::run()
 {
     QString phone = readString();

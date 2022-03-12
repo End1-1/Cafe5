@@ -8,6 +8,11 @@ RawRegisterPhone::RawRegisterPhone(SslSocket *s, const QByteArray &d) :
     connect(this, &RawRegisterPhone::registerPhone, RawDataExchange::instance(), &RawDataExchange::registerPhone);
 }
 
+RawRegisterPhone::~RawRegisterPhone()
+{
+    disconnect(this, &RawRegisterPhone::registerPhone, RawDataExchange::instance(), &RawDataExchange::registerPhone);
+}
+
 void RawRegisterPhone::run()
 {
     QString phone = readString();

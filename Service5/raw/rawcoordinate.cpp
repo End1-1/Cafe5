@@ -9,10 +9,12 @@ RawCoordinate::RawCoordinate(SslSocket *s, const QByteArray &d) :
     Raw(s, d)
 {
     connect(this, &RawCoordinate::devicePosition, RawDataExchange::instance(), &RawDataExchange::devicePosition);
+    connect(this, &RawCoordinate::finish, this, &RawCoordinate::deleteLater);
 }
 
 RawCoordinate::~RawCoordinate()
 {
+    disconnect(this, &RawCoordinate::devicePosition, RawDataExchange::instance(), &RawDataExchange::devicePosition);
     qDebug() << "~RawCoordinate";
 }
 

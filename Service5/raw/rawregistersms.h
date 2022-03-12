@@ -8,6 +8,7 @@ class RawRegisterSMS : public Raw
     Q_OBJECT
 public:
     RawRegisterSMS(SslSocket *s, const QByteArray &d);
+    ~RawRegisterSMS();
 
 public slots:
     virtual void run() override;

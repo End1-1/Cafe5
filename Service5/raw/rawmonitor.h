@@ -8,7 +8,9 @@ class RawMonitor : public Raw
     Q_OBJECT
 public:
     RawMonitor(SslSocket *s, const QByteArray &d);
+    ~RawMonitor();
 
+public slots:
     virtual void run() override;
 
 signals:

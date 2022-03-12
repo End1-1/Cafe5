@@ -8,6 +8,7 @@ class RawBalanceHistory : public Raw
     Q_OBJECT
 public:
     RawBalanceHistory(SslSocket *s, const QByteArray &d);
+    ~RawBalanceHistory();
 
 public slots:
     virtual void run() override;
