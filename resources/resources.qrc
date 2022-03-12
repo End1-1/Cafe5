@@ -51,5 +51,6 @@
         <file>delivery.png</file>
         <file>danger.png</file>
         <file>stop.png</file>
+        <file>phone-call.png</file>
     </qresource>
 </RCC>

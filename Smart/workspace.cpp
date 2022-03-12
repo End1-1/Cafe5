@@ -13,6 +13,7 @@
 #include "payment.h"
 #include "dishpackage.h"
 #include "c5printing.h"
+#include "touchdlgphonenumber.h"
 #include "QRCodeGenerator.h"
 #include <QScrollBar>
 #include <QInputDialog>
@@ -365,6 +366,7 @@ void Workspace::resetOrder()
     fDiscountMode = 0;
     fDiscountValue = 0;
     fDiscountAmount = 0;
+    setCustomerPhoneNumber("");
 }
 
 void Workspace::printReport(const QDate &d1, const QDate &d2)
@@ -590,6 +592,19 @@ void Workspace::on_btnCheckout_clicked()
 //            }
         }
     }
+    if (ui->lbCostumerPhone->text().isEmpty() == false) {
+        int partner;
+        db[":f_phone"] = ui->lbCostumerPhone->text();
+        db.exec("select * from c_partners where f_phone=:f_phone");
+        if (db.nextRow()) {
+            partner = db.getInt("f_id");
+        } else {
+            db[":f_phone"] = ui->lbCostumerPhone->text();
+            partner = db.insert("c_partners");
+        }
+        db[":f_partner"] = partner;
+        db.update("o_header", "f_id", id);
+    }
 
 //    QString err;
 //    if (!dw.writeFromShopOutput(id, DOC_STATE_SAVED, err)) {
@@ -704,6 +719,10 @@ void Workspace::on_btnCheckout_clicked()
         p.setFontBold(false);
 
         p.ltext(QString("%1 %2").arg(tr("Printed:")).arg(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR)), 0);
+        p.br();
+        p.br();
+        p.br();
+        p.br();
         p.br();
         p.ltext("_", 0);
         p.br();
@@ -1048,4 +1067,18 @@ void Workspace::on_btnPrintByOrder_clicked()
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
     p.br();
     p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
+}
+
+void Workspace::on_btnCostumer_clicked()
+{
+    QString phone;
+    if (TouchDlgPhoneNumber::getPhoneNumber(phone)) {
+        setCustomerPhoneNumber(phone);
+    }
+}
+
+void Workspace::setCustomerPhoneNumber(const QString &number)
+{
+    ui->lbCostumerPhone->setText(number);
+    ui->lbCostumerPhone->setVisible(number.isEmpty() == false);
 }
