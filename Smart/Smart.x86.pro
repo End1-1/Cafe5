@@ -140,7 +140,8 @@ SOURCES += \
     ../Cafe5/c5utils.cpp \
     ../Cafe5/c5sockethandler.cpp \
     ../Controls/c5lineedit.cpp \
-    ../Classes/c5user.cpp
+    ../Classes/c5user.cpp \
+    ../Forms/touchdlgphonenumber.cpp
 
 HEADERS += \
     ../../NewTax/Src/printtaxn.h \
@@ -259,7 +260,8 @@ HEADERS += \
     ../Cafe5/c5sockethandler.h \
     ../Cafe5/c5socketmessage.h \
     ../Controls/c5lineedit.h \
-    ../Classes/c5user.h
+    ../Classes/c5user.h \
+    ../Forms/touchdlgphonenumber.h
 
 FORMS += \
     ../Cafe5/c5licensedlg.ui \
@@ -276,7 +278,8 @@ FORMS += \
     supplier.ui \
         workspace.ui \
     ../Cafe5/c5connection.ui \
-    ../Cafe5/c5message.ui
+    ../Cafe5/c5message.ui \
+    ../Forms/touchdlgphonenumber.ui
 
 DEFINES += _DBDRIVER_=\\\"QMYSQL\\\"
 DEFINES += _ORGANIZATION_=\\\"Jazzve\\\"
@@ -289,6 +292,7 @@ INCLUDEPATH += c:/projects/cafe5/Classes
 INCLUDEPATH += c:/projects/cafe5/Controls
 INCLUDEPATH += c:/projects/cafe5/Service
 INCLUDEPATH += c:/projects/cafe5/DbData
+INCLUDEPATH += c:/projects/cafe5/Forms
 INCLUDEPATH += c:/Projects/NewTax/Src
 INCLUDEPATH += C:/Soft/OpenSSL-Win32/include
 INCLUDEPATH += C:/Soft/OpenSSL-Win32/include/openssl

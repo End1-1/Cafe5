@@ -346,10 +346,18 @@ bool payment::printReceipt(bool printSecond)
     p.br();
     p.ltext(QString("%1: %2").arg(tr("Sample")).arg(db.getInt("f_print")), 0);
     p.br();
+    p.br();
+    p.br();
+    p.br();
+    p.br();
+    p.br();
+    p.br();
+    p.ltext(".", 0);
     p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
 
     db[":f_print"] = db.getInt("f_print") + 1;
     db.update("o_header", "f_id", fOrderUUID);
+
 
     qDebug() << printSecond << __c5config.getValue(param_shop_print_v2);
     if (printSecond && __c5config.getValue(param_shop_print_v2) == "1") {

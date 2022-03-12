@@ -31,6 +31,7 @@ private:
     QTimer *fTimer;
     QTimer *fRouteTimer;
     int fRouteId;
+    int fRouteDisconnectTimeout;
     quint32 getTcpPacketNumber();
     QList<CoordinateData> fRoute;
 

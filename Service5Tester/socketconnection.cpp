@@ -8,6 +8,7 @@
 #include <QDataStream>
 #include <QApplication>
 #include <QMutex>
+#include <QRandomGenerator>
 #include <QDebug>
 
 QMutex fMutex;
@@ -93,6 +94,10 @@ void SocketConnection::timeout()
 
 void SocketConnection::routeTimeout()
 {
+    if (fRouteDisconnectTimeout-- == 0) {
+        fSocket->disconnectFromHost();
+        return;
+    }
     if (fRouteId < fRoute.count() - 1) {
         CoordinateData c = fRoute.at(++fRouteId);
         RawMessage r(nullptr, QByteArray());
@@ -114,6 +119,10 @@ void SocketConnection::encrypted()
 {
     fTimer->stop();
     fTcpPacketNumber = 0;
+    unsigned int ms = static_cast<unsigned>(QDateTime::currentMSecsSinceEpoch());
+    std::mt19937 gen(ms);
+    std::uniform_int_distribution<> uid(300, 600);
+    fRouteDisconnectTimeout = uid(gen);
     RawMessage r(fSocket, QByteArray());
     r.setHeader(0, 0, MessageList::hello);
     r.putString(fUuid);
@@ -149,7 +158,7 @@ void SocketConnection::readyRead()
         }
     }
     fData.append(fSocket->readAll());
-    quint32 headersize = 3 + sizeof(fMessageNumber) + sizeof(fMessageId) + sizeof(fMessageCommand) + sizeof(fMessageSize);
+    int headersize = 3 + sizeof(fMessageNumber) + sizeof(fMessageId) + sizeof(fMessageCommand) + sizeof(fMessageSize);
     while (fData.length() >= headersize) {
         int pos = 3;
         memcpy(&fMessageNumber, &fData.data()[pos], sizeof(fMessageNumber));

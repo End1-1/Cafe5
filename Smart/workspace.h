@@ -69,6 +69,8 @@ private slots:
 
     void on_btnPrintByOrder_clicked();
 
+    void on_btnCostumer_clicked();
+
 private:
     Ui::Workspace *ui;
 
@@ -93,6 +95,8 @@ private:
     double fDiscountValue;
 
     double fDiscountAmount;
+
+    void setCustomerPhoneNumber(const QString &number);
 
     bool currentDish(Dish &d);
 
