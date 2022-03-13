@@ -16,7 +16,8 @@ RawBalanceHistory::~RawBalanceHistory()
 
 void RawBalanceHistory::run(const QByteArray &d)
 {
-    quint8 h = readUByte(d);
+    quint8 h;
+    readUByte(h, d);
     switch (h) {
     case 1:
         balanceAmountTotal();

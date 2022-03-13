@@ -12,7 +12,9 @@ struct CoordinateData {
 };
 
 struct ConnectionStatus {
+    quint32 user;
     bool online;
+    bool authorized;
     CoordinateData lastCoordinate;
 };
 

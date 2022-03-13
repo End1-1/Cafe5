@@ -16,7 +16,8 @@ RawRegisterSMS::~RawRegisterSMS()
 
 void RawRegisterSMS::run(const QByteArray &d)
 {
-    QString sms = readString(d);
+    QString sms;
+    readString(sms, d);
     quint16 reply = 0;
     putUShort(reply);
     QString token = fMapSocketToken[fSocket];

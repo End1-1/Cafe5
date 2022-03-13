@@ -37,6 +37,7 @@ SOURCES += \
     monitor.cpp \
     raw/raw.cpp \
     raw/rawbalancehistory.cpp \
+    raw/rawcarnear.cpp \
     raw/rawcoordinate.cpp \
     raw/rawhandler.cpp \
     raw/rawhello.cpp \
@@ -87,6 +88,7 @@ HEADERS += \
     raw/messagelist.h \
     raw/raw.h \
     raw/rawbalancehistory.h \
+    raw/rawcarnear.h \
     raw/rawcoordinate.h \
     raw/rawhandler.h \
     raw/rawhello.h \

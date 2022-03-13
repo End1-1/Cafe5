@@ -8,6 +8,7 @@
 #include "rawbalancehistory.h"
 #include "rawsilentauth.h"
 #include "rawmonitor.h"
+#include "rawcarnear.h"
 #include "sslsocket.h"
 #include "logwriter.h"
 #include "thread.h"
@@ -58,6 +59,9 @@ void RawHandler::run(quint32 msgNum, quint32 msgId, qint16 msgType, const QByteA
         break;
     case MessageList::monitor:
         r = new RawMonitor(fSocket);
+        break;
+    case MessageList::car_near:
+        r = new RawCarNear(fSocket);
         break;
     default:
         LogWriter::write(LogWriterLevel::errors, property("session").toString(), QString("Unknown raw command received: %1").arg(msgType));

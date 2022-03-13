@@ -16,7 +16,8 @@ RawHello::~RawHello()
 void RawHello::run(const QByteArray &d)
 {
     QMutexLocker ml(fMutexTokenUser);
-    QString firebaseToken = readString(d);
+    QString firebaseToken;
+    readString(firebaseToken, d);
     if (fMapTokenUser.contains(firebaseToken)) {
     } else {
         Database db;

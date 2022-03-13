@@ -59,12 +59,16 @@ void Raw::removeSocket(SslSocket *s)
     ml1.unlock();
 
     QMutexLocker ml2(fMutexTokenUser);
+    ConnectionStatus &cs = fMapTokenConnectionStatus[fMapSocketToken[s]];
+    cs.online = false;
     fMapTokenSocket.remove(fMapSocketToken[s]);
     fMapSocketToken.remove(s);
     ml2.unlock();
 
-    RawMessage r(s);
+    RawMessage r(nullptr);
     r.setHeader(0, 0, MessageList::srv_connections_count);
     r.putUInt(fMapTokenSocket.count());
+    r.putUInt(cs.user);
+    r.putUByte(0);
     informMonitors(r.data());
 }

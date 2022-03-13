@@ -88,32 +88,36 @@ void RawMessage::putBytes(const char *data, quint32 size)
     increaseDataSize(size);
 }
 
-quint8 RawMessage::readUByte(const QByteArray &d)
+void RawMessage::readUByte(quint8 &i, const QByteArray &d)
 {
-    quint8 i;
     memcpy(reinterpret_cast<char*>(&i), &d.data()[fDataPosition], sizeof(quint8));
     fDataPosition += sizeof(quint8);
-    return i;
 }
 
-quint32 RawMessage::readUInt(const QByteArray &d)
+void RawMessage::readUInt(quint32 &i, const QByteArray &d)
 {
-    quint32 i;
     memcpy(reinterpret_cast<char*>(&i), &d.data()[fDataPosition], sizeof(quint32));
     fDataPosition += sizeof(quint32);
-    return i;
 }
 
-const QString RawMessage::readString(const QByteArray &d)
+void RawMessage::readDouble(double &v, const QByteArray &d)
 {
-    quint32 sz = readUInt(d);
+    memcpy(reinterpret_cast<char*>(&v), &d.data()[fDataPosition], sizeof(v));
+    fDataPosition += sizeof(v);
+}
+
+void RawMessage::readString(QString &s, const QByteArray &d)
+{
+    quint32 sz;
+    readUInt(sz, d);
     fDataPosition += sz;
-    return d.mid(fDataPosition - sz, sz);
+    s = d.mid(fDataPosition - sz, sz);
 }
 
 void RawMessage::readBytes(char *buf, const QByteArray &d)
 {
-    quint32 sz = readUInt(d);
+    quint32 sz;
+    readUInt(sz, d);
     fDataPosition += sz;
     memcpy(buf, &d.data()[fDataPosition - sz], sz);
 }

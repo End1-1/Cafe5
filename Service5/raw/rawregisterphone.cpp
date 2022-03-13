@@ -18,7 +18,8 @@ RawRegisterPhone::~RawRegisterPhone()
 
 void RawRegisterPhone::run(const QByteArray &d)
 {
-    QString phone = readString(d);
+    QString phone;
+    readString(phone, d);
 
     std::random_device rd; // obtain a random number from hardware
     std::mt19937 gen(rd()); // seed the generator

@@ -24,9 +24,10 @@ public:
     void putDouble(double v);
     void putString(const QString &v);
     void putBytes(const char *data, quint32 size);
-    quint8 readUByte(const QByteArray &d);
-    quint32 readUInt(const QByteArray &d);
-    const QString readString(const QByteArray &d);
+    void readUByte(quint8 &i, const QByteArray &d);
+    void readUInt(quint32 &i, const QByteArray &d);
+    void readDouble(double &v, const QByteArray &d);
+    void readString(QString &s, const QByteArray &d);
     void readBytes(char *buf, const QByteArray &d);
     void clear();
 
