@@ -31,7 +31,7 @@ Item {
             delegate: Component {
                 MapQuickItem {
                     id: point
-                    property var user: 0
+                    property int user: 0
                        coordinate: QtPositioning.coordinate(latitude, longitude)
                        anchorPoint.x: image.width/2
                        anchorPoint.y: image.height/2

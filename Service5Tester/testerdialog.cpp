@@ -78,6 +78,15 @@ void TesterDialog::on_btnDriverRoute_clicked()
     for (SocketConnection *s: fSockets) {
         int fileIndex = (i++) % routes.count();
         emit driveRoute(s, dirName + "/" + routes.at(fileIndex));
-        QThread::sleep(3);
+        QThread::sleep(i % 2 ? 1 : 2);
     }
 }
+
+void TesterDialog::on_btnClientsLogout_clicked()
+{
+    for (SocketConnection *s: fSockets) {
+        s->deleteLater();
+    }
+    fSockets.clear();
+}
+

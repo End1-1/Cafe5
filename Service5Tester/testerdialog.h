@@ -26,6 +26,8 @@ private slots:
 
     void on_btnDriverRoute_clicked();
 
+    void on_btnClientsLogout_clicked();
+
 private:
     Ui::TesterDialog *ui;
 
