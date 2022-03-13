@@ -8,14 +8,11 @@ class RawHello : public Raw
     Q_OBJECT
 
 public:
-    RawHello(SslSocket *s, const QByteArray &d);
+    RawHello(SslSocket *s);
     ~RawHello();
 
 public slots:
-    virtual void run();
-
-signals:
-    void registerFirebaseToken(SslSocket*, const QString &);
+    virtual void run(const QByteArray &d) override;
 };
 
 #endif // RAWHELLO_H

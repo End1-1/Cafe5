@@ -11,6 +11,11 @@ struct CoordinateData {
     double datetime;
 };
 
-Q_DECLARE_METATYPE(CoordinateData)
+struct ConnectionStatus {
+    quint32 user;
+    bool online;
+    bool authorized;
+    CoordinateData lastCoordinate;
+};
 
 #endif // STRUCTS_H

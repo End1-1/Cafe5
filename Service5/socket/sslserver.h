@@ -31,7 +31,7 @@ private:
 
 
 private slots:
-    void acceptError(QAbstractSocket::SocketError err);
+    //void acceptError(QAbstractSocket::SocketError err);
 
 signals:
     void connectionRequest(int);

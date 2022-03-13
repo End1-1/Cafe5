@@ -7,14 +7,14 @@ class RawRegisterPhone : public Raw
 {
     Q_OBJECT
 public:
-    RawRegisterPhone(SslSocket *s, const QByteArray &d);
+    RawRegisterPhone(SslSocket *s);
     ~RawRegisterPhone();
 
 public slots:
-    virtual void run() override;
+    virtual void run(const QByteArray &d) override;
 
 signals:
-    void registerPhone(SslSocket*, const QString &);
+    void firebaseMessage(const QString &, const QString &);
 
 };
 

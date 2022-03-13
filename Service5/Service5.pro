@@ -37,8 +37,8 @@ SOURCES += \
     monitor.cpp \
     raw/raw.cpp \
     raw/rawbalancehistory.cpp \
+    raw/rawcarnear.cpp \
     raw/rawcoordinate.cpp \
-    raw/rawdataexchange.cpp \
     raw/rawhandler.cpp \
     raw/rawhello.cpp \
     raw/rawmessage.cpp \
@@ -88,8 +88,8 @@ HEADERS += \
     raw/messagelist.h \
     raw/raw.h \
     raw/rawbalancehistory.h \
+    raw/rawcarnear.h \
     raw/rawcoordinate.h \
-    raw/rawdataexchange.h \
     raw/rawhandler.h \
     raw/rawhello.h \
     raw/rawmessage.h \
@@ -130,10 +130,9 @@ INCLUDEPATH += C:/Soft/OpenSSL-Win64/include
 INCLUDEPATH += C:/Soft/OpenSSL-Win64/include/openssl
 
 DEFINES += _DBDRIVER_=\\\"QMYSQL\\\"
-DEFINES += _ORGANIZATION_=\\\"Hotelicca\\\"
+DEFINES += _ORGANIZATION_=\\\"BreezeDevs\\\"
 DEFINES += _APPLICATION_=\\\"Cafe5\\\"
 DEFINES += _MODULE_=\\\"Service5\\\"
-DEFINES += SHOP
 
 LIBS += -lVersion
 LIBS += -lwsock32

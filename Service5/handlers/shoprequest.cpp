@@ -810,7 +810,7 @@ void ShopRequest::checkQty(const QString &orderid, Database &db)
                 dbsys[":fstate"] = 1;
                 dbsys[":fsender"] = ConfigIni::value("shop/store").toInt();
                 dbsys[":freceiver"] = usersStoreMap[so.toInt()];
-                dbsys[":fmessage"] = QString("%1 - %2 (%4) : %3").arg(iq.key()).arg(iq.value()).arg(tr("Moved to online store")).arg(orderid);
+                dbsys[":fmessage"] = QString("%1 - %2 (%4) : %3").arg(iq.key()).arg(iq.value()).arg(tr("Moved to online store"), orderid);
                 dbsys.insert("users_chat");
                 qty[iq.key()] = 0;
             } else {
@@ -820,7 +820,7 @@ void ShopRequest::checkQty(const QString &orderid, Database &db)
                 dbsys[":fstate"] = 1;
                 dbsys[":fsender"] = ConfigIni::value("shop/store").toInt();
                 dbsys[":freceiver"] = usersStoreMap[so.toInt()];
-                dbsys[":fmessage"] = QString("%1 - %2 (%4): %3").arg(iq.key()).arg(store[iq.key()]).arg(tr("Moved to online store")).arg(orderid);
+                dbsys[":fmessage"] = QString("%1 - %2 (%4): %3").arg(iq.key()).arg(store[iq.key()]).arg(tr("Moved to online store"), orderid);
                 dbsys.insert("users_chat");
                 iq.value() -= store[iq.key()];
             }

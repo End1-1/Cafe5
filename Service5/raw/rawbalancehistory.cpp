@@ -1,25 +1,49 @@
 #include "rawbalancehistory.h"
-#include "rawdataexchange.h"
+#include "databaseconnectionmanager.h"
+#include "database.h"
+#include "logwriter.h"
 
-RawBalanceHistory::RawBalanceHistory(SslSocket *s, const QByteArray &d) :
-    Raw(s, d)
+RawBalanceHistory::RawBalanceHistory(SslSocket *s) :
+    Raw(s)
 {
-    connect(this, &RawBalanceHistory::balanceAmountTotal, RawDataExchange::instance(), &RawDataExchange::balanceAmountTotal);
+
 }
 
 RawBalanceHistory::~RawBalanceHistory()
 {
-    disconnect(this, &RawBalanceHistory::balanceAmountTotal, RawDataExchange::instance(), &RawDataExchange::balanceAmountTotal);
+    qDebug() << "RawBalanceHistory";
 }
 
-void RawBalanceHistory::run()
+void RawBalanceHistory::run(const QByteArray &d)
 {
-    quint8 h = readUByte();
+    quint8 h;
+    readUByte(h, d);
     switch (h) {
     case 1:
-        emit balanceAmountTotal(fSocket);
+        balanceAmountTotal();
         break;
     case 2:
         break;
     }
+}
+
+void RawBalanceHistory::balanceAmountTotal()
+{
+    double amount = 0;
+    int user = fMapTokenUser[fMapSocketToken[fSocket]];
+    qDebug() << user << "request balance amount";
+    Database db;
+    if (DatabaseConnectionManager::openSystemDatabase(db)) {
+        if (!db.exec("select sum(finout*famount) as famount from acc_balance ")) {
+            LogWriter::write(LogWriterLevel::errors, "RawBalanceHistory::balanceAmount", db.lastDbError());
+        }
+        if (db.next()) {
+            amount = db.doubleValue("famount");
+        }
+    } else {
+        LogWriter::write(LogWriterLevel::errors, "RawBalanceHistory::balanceAmount", db.lastDbError());
+    }
+    quint8 reply = 1;
+    putUByte(reply);
+    putDouble(amount);
 }

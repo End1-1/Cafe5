@@ -7,10 +7,10 @@ class RawYandexKey : public Raw
 {
     Q_OBJECT
 public:
-    RawYandexKey(SslSocket *s, const QByteArray &d);
+    RawYandexKey(SslSocket *s);
 
 public slots:
-    virtual void run() override;
+    virtual void run(const QByteArray &d) override;
 };
 
 #endif // RAWYANDEXKEY_H

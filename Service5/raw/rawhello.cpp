@@ -1,23 +1,41 @@
 #include "rawhello.h"
 #include "databaseconnectionmanager.h"
 #include "logwriter.h"
-#include "rawdataexchange.h"
+#include "messagelist.h"
 
-RawHello::RawHello(SslSocket *s, const QByteArray &d) :
-    Raw(s, d)
+RawHello::RawHello(SslSocket *s) :
+    Raw(s)
 {
-    connect(this, &RawHello::registerFirebaseToken, RawDataExchange::instance(), &RawDataExchange::registerFirebaseToken);
 }
 
 RawHello::~RawHello()
 {
-    disconnect(this, &RawHello::registerFirebaseToken, RawDataExchange::instance(), &RawDataExchange::registerFirebaseToken);
+    qDebug() << "~RawHello";
 }
 
-void RawHello::run()
+void RawHello::run(const QByteArray &d)
 {
-    quint32 strLen;
-    memcpy(&strLen, fData.data(), sizeof(strLen));
-    QString firebaseToken = fData.mid(4, fData.length() - 4);
-    emit registerFirebaseToken(fSocket, firebaseToken);
+    QMutexLocker ml(fMutexTokenUser);
+    QString firebaseToken;
+    readString(firebaseToken, d);
+    if (fMapTokenUser.contains(firebaseToken)) {
+    } else {
+        Database db;
+        if (DatabaseConnectionManager::openSystemDatabase(db)) {
+            db[":ftoken"] = firebaseToken;
+            db[":fuser"] = 0;
+            db.insert("users_devices");
+            fMapTokenUser[firebaseToken] = 0;
+        } else {
+            LogWriter::write(LogWriterLevel::errors, "RawHello::registerFirebaseToken", db.lastDbError());
+        }
+    }
+    fMapTokenSocket[firebaseToken] = fSocket;
+    fMapSocketToken[fSocket] = firebaseToken;
+
+
+    setHeader(0, 0, MessageList::srv_connections_count);
+    putUInt(fMapSocketToken.count());
+    informMonitors(fReply);
+    clear();
 }

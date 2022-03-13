@@ -2,13 +2,13 @@
 #include "requesthandler.h"
 #include "requestmanager.h"
 #include "logwriter.h"
-#include "rawdataexchange.h"
 #include "rawhandler.h"
+#include "raw.h"
 #include <QHostAddress>
 #include <QApplication>
 #include <QUuid>
 
-SocketThread::SocketThread(int handle, QSslCertificate cert, QSslKey key, QSsl::SslProtocol proto) :
+SocketThread::SocketThread(int handle, const QSslCertificate &cert, const QSslKey &key, QSsl::SslProtocol proto) :
     QObject(),
     fSocketDescriptor(handle),
     fSslLocalCertificate(cert),
@@ -17,13 +17,13 @@ SocketThread::SocketThread(int handle, QSslCertificate cert, QSslKey key, QSsl::
 {
     fMessageNumber = 0;
     fPreviouseMessageNumber = 0;
-    fFinished = false;
-    connect(this, &SocketThread::finished, RawDataExchange::instance(), &RawDataExchange::removeSocket);
+    connect(this, &SocketThread::finished, this, &SocketThread::deleteLater);
 }
 
 SocketThread::~SocketThread()
 {
     qDebug() << "~SocketThread()";
+    Raw::removeSocket(fSslSocket);
     fSslSocket->disconnectFromHost();
     delete fSslSocket;
     delete fTimeoutControl;
@@ -56,16 +56,6 @@ void SocketThread::run()
     LogWriter::write(LogWriterLevel::verbose, property("session").toString(), QString("New connection from %1:%2").arg(QHostAddress(fSslSocket->peerAddress().toIPv4Address()).toString()).arg(fSslSocket->peerPort()));
 }
 
-void SocketThread::setFinished()
-{
-    if (fFinished) {
-        return;
-    }
-    fFinished = true;
-    qDebug() << "FINISHED";
-    emit finished();
-}
-
 void SocketThread::rawRequest()
 {
     int headersize = 3 + sizeof(fMessageNumber) + sizeof(fMessageId) + sizeof(fMessageListData) + sizeof(fContentLenght);
@@ -87,7 +77,6 @@ void SocketThread::rawRequest()
     if (fPreviouseMessageNumber + 1 != fMessageNumber) {
         LogWriter::write(LogWriterLevel::errors, property("session").toString(), QString("Packet message number error, previous: %1, current: %2").arg(fPreviouseMessageNumber).arg(fMessageNumber));
         fSslSocket->close();
-        setFinished();
         return;
     }
     fPreviouseMessageNumber = fMessageNumber;
@@ -148,7 +137,6 @@ void SocketThread::httpRequest()
     LogWriter::write(LogWriterLevel::verbose, property("session").toString(), rh->fResponse);
     RequestManager::releaseHandler(rh);
     fSslSocket->close();
-    setFinished();
 }
 
 HttpRequestMethod SocketThread::parseRequest(HttpRequestMethod &requestMethod, QString &httpVersion, QString &route)
@@ -372,17 +360,16 @@ void SocketThread::readyRead()
 void SocketThread::writeToSocket(const QByteArray &d)
 {
     fSslSocket->write(d);
-    fSslSocket->flush();
 }
 
 void SocketThread::disconnected()
 {
-    setFinished();
+    emit finished();
 }
 
 void SocketThread::error(QAbstractSocket::SocketError err)
 {
     Q_UNUSED(err);
     fSslSocket->disconnect();
-    setFinished();
+    emit finished();
 }
