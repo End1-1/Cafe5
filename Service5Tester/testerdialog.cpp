@@ -38,6 +38,10 @@ void TesterDialog::on_btnSelectClientFile_clicked()
 
 void TesterDialog::on_btnClientLogin_clicked()
 {
+    for (SocketConnection *s: fSockets) {
+        s->deleteLater();
+    }
+    fSockets.clear();
     QFile f(ui->leClientsFile->text());
     if (f.open(QIODevice::ReadOnly)) {
         QByteArray b;
@@ -74,6 +78,6 @@ void TesterDialog::on_btnDriverRoute_clicked()
     for (SocketConnection *s: fSockets) {
         int fileIndex = (i++) % routes.count();
         emit driveRoute(s, dirName + "/" + routes.at(fileIndex));
-        QThread::sleep(10);
+        QThread::sleep(3);
     }
 }
