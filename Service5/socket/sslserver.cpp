@@ -68,7 +68,7 @@ void SslServer::incomingConnection(qintptr handle)
     //LogWriter::write(10, 1, "", "SslServer::incomingConnection ready");
 }
 
-void SslServer::acceptError(QAbstractSocket::SocketError err)
-{
-    qDebug() << "Accept error" << err;
-}
+//void SslServer::acceptError(QAbstractSocket::SocketError err)
+//{
+//    qDebug() << "Accept error" << err;
+//}

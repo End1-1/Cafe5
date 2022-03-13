@@ -1,16 +1,14 @@
 #include "rawmessage.h"
 
-RawMessage::RawMessage(SslSocket *s, const QByteArray &d) :
+RawMessage::RawMessage(SslSocket *s) :
     QObject(nullptr),
-    fSocket(s),
-    fData(d)
+    fSocket(s)
 {
     clear();
 }
 
 RawMessage::~RawMessage()
 {
-    qDebug() << metaObject()->className();
 }
 
 void RawMessage::setHeader(quint32 msgNum, quint32 msgId, quint16 msgType)
@@ -90,34 +88,34 @@ void RawMessage::putBytes(const char *data, quint32 size)
     increaseDataSize(size);
 }
 
-quint8 RawMessage::readUByte()
+quint8 RawMessage::readUByte(const QByteArray &d)
 {
     quint8 i;
-    memcpy(reinterpret_cast<char*>(&i), &fData.data()[fDataPosition], sizeof(quint8));
+    memcpy(reinterpret_cast<char*>(&i), &d.data()[fDataPosition], sizeof(quint8));
     fDataPosition += sizeof(quint8);
     return i;
 }
 
-quint32 RawMessage::readUInt()
+quint32 RawMessage::readUInt(const QByteArray &d)
 {
     quint32 i;
-    memcpy(reinterpret_cast<char*>(&i), &fData.data()[fDataPosition], sizeof(quint32));
+    memcpy(reinterpret_cast<char*>(&i), &d.data()[fDataPosition], sizeof(quint32));
     fDataPosition += sizeof(quint32);
     return i;
 }
 
-const QString RawMessage::readString()
+const QString RawMessage::readString(const QByteArray &d)
 {
-    quint32 sz = readUInt();
+    quint32 sz = readUInt(d);
     fDataPosition += sz;
-    return fData.mid(fDataPosition - sz, sz);
+    return d.mid(fDataPosition - sz, sz);
 }
 
-void RawMessage::readBytes(char *buf)
+void RawMessage::readBytes(char *buf, const QByteArray &d)
 {
-    quint32 sz = readUInt();
+    quint32 sz = readUInt(d);
     fDataPosition += sz;
-    memcpy(buf, &fData.data()[fDataPosition - sz], sz);
+    memcpy(buf, &d.data()[fDataPosition - sz], sz);
 }
 
 void RawMessage::clear()

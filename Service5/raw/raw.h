@@ -4,23 +4,29 @@
 #include "rawmessage.h"
 
 class SslSocket;
+class QMutex;
 
 class Raw : public RawMessage
 {
     Q_OBJECT
 public:
-    explicit Raw(SslSocket *s, const QByteArray &d);
+    explicit Raw(SslSocket *s);
     ~Raw();
+    static void init();
+    static void removeSocket(SslSocket *s);
 
 public slots:
-    virtual void run() = 0;    
+    virtual void run(const QByteArray &d) = 0;
 
-protected slots:
-    virtual void receiveReply(SslSocket *s, const QByteArray &d);
-
-signals:
-    void reply(QByteArray);
-    void finish();
+protected:
+    static QMutex *fMutexTokenUser;
+    static QMutex *fMutexInformMonitors;
+    static QHash<QString, int> fMapTokenUser;
+    static QHash<SslSocket*, QString> fMapSocketToken;
+    static QHash<QString, SslSocket*> fMapTokenSocket;
+    static QList<SslSocket*> fMonitors;
+    static void informMonitors(const QByteArray &d);
+    static const QString &tokenOfSocket(SslSocket *s);
 };
 
 #endif // RAW_H

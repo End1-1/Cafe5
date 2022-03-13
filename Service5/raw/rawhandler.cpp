@@ -16,7 +16,7 @@ RawHandler::RawHandler(SslSocket *socket, const QString &session) :
     QObject(),
     fSocket(socket)
 {
-
+    setProperty("session", session);
 }
 
 RawHandler::~RawHandler()
@@ -26,6 +26,9 @@ RawHandler::~RawHandler()
 
 void RawHandler::run(quint32 msgNum, quint32 msgId, qint16 msgType, const QByteArray &data)
 {
+//    if (msgType != MessageList::hello) {
+//        return;
+//    }
     fMsgNum = msgNum;
     fMsgId = msgId;
     fMsgType = msgType;
@@ -33,46 +36,37 @@ void RawHandler::run(quint32 msgNum, quint32 msgId, qint16 msgType, const QByteA
     Raw *r = nullptr;
     switch (fMsgType) {
     case MessageList::hello:
-        r = new RawHello(fSocket, data);
+        r = new RawHello(fSocket);
         break;
     case MessageList::coordinate:
-        r = new RawCoordinate(fSocket, data);
+        r = new RawCoordinate(fSocket);
         break;
     case MessageList::yandex_map_key:
-        r = new RawYandexKey(fSocket, data);
+        r = new RawYandexKey(fSocket);
         break;
     case MessageList::silent_auth:
-        r = new RawSilentAuth(fSocket, data);
+        r = new RawSilentAuth(fSocket);
         break;
     case MessageList::register_phone:
-        r = new RawRegisterPhone(fSocket, data);
+        r = new RawRegisterPhone(fSocket);
         break;
     case MessageList::register_sms:
-        r = new RawRegisterSMS(fSocket, data);
+        r = new RawRegisterSMS(fSocket);
         break;
     case MessageList::balance_history:
-        r = new RawBalanceHistory(fSocket, data);
+        r = new RawBalanceHistory(fSocket);
         break;
     case MessageList::monitor:
-        r = new RawMonitor(fSocket, data);
+        r = new RawMonitor(fSocket);
         break;
     default:
         LogWriter::write(LogWriterLevel::errors, property("session").toString(), QString("Unknown raw command received: %1").arg(msgType));
         fSocket->close();
         return;
     }
+    r->setProperty("session", property("session"));
+    r->run(data);
     r->setHeader(fMsgNum, fMsgId, fMsgType);
-    connect(r, &Raw::reply, this, &RawHandler::writeReply);
-    auto *t = new Thread(QString("RawHandler %1").arg(r->metaObject()->className()));
-    connect(t, &QThread::started, r, &Raw::run);
-    connect(t, &QThread::finished, t, &QThread::deleteLater);
-    connect(r, &Raw::finish, t, &Thread::quit);
-    r->moveToThread(t);
-    t->start();
-}
-
-void RawHandler::writeReply(QByteArray d)
-{
-    Raw::setHeader(d, fMsgNum, fMsgId, fMsgType);
-    emit writeToSocket(d);
+    emit writeToSocket(r->data());
+    r->deleteLater();
 }

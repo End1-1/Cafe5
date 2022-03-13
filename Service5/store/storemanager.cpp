@@ -108,8 +108,7 @@ int StoreManager::queryQty(const QStringList &sku, QMap<int, QMap<QString, doubl
                     "and s.f_goods in (%1) and s.f_store in(%2) "
                     "group by 1, 2 "
                     "having sum(s.f_qty*s.f_type)>0 ")
-            .arg(codes.join(","))
-            .arg(storelist);
+            .arg(codes.join(","), storelist);
 
     db.exec(sql);
     LogWriter::write(LogWriterLevel::verbose, "", sql);

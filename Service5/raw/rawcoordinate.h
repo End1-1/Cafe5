@@ -9,14 +9,12 @@ class RawCoordinate : public Raw
     Q_OBJECT
 
 public:
-    explicit RawCoordinate(SslSocket *s, const QByteArray &d);
+    explicit RawCoordinate(SslSocket *s);
     ~RawCoordinate();
 
 public slots:
-    virtual void run() override;
+    virtual void run(const QByteArray &d) override;
 
-signals:
-    void devicePosition(SslSocket*, const CoordinateData &);
 };
 
 #endif // RAWCOORDINATE_H

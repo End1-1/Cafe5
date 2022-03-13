@@ -19,9 +19,6 @@ private:
     quint32 fMsgId;
     quint16 fMsgType;
 
-private slots:
-    void writeReply(QByteArray d);
-
 signals:
     void writeToSocket(const QByteArray &);
 

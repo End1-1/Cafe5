@@ -7,14 +7,12 @@ class RawMonitor : public Raw
 {
     Q_OBJECT
 public:
-    RawMonitor(SslSocket *s, const QByteArray &d);
+    RawMonitor(SslSocket *s);
     ~RawMonitor();
 
 public slots:
-    virtual void run() override;
+    virtual void run(const QByteArray &d) override;
 
-signals:
-    void registerMonitor(SslSocket *);
 };
 
 #endif // RAWMONITOR_H

@@ -15,7 +15,7 @@ class SocketThread : public QObject
     Q_OBJECT
 
 public:
-    SocketThread(int handle, QSslCertificate cert, QSslKey key, QSsl::SslProtocol proto);
+    SocketThread(int handle, const QSslCertificate &cert, const QSslKey &key, QSsl::SslProtocol proto);
     ~SocketThread();
     SslSocket *fSslSocket;
 
@@ -28,7 +28,6 @@ private:
     QSsl::SslProtocol fSslProtocol;
 
     RawHandler *fRawHandler;
-    bool fFinished;
     QTimer *fTimeoutControl;
     QElapsedTimer fTimer;
     int fSocketDescriptor;
@@ -45,7 +44,6 @@ private:
     quint32 fContentLenght;
     quint16 fMessageListData;
     QString fBoundary;
-    void setFinished();
     void rawRequest();
     void httpRequest();
     HttpRequestMethod parseRequest(HttpRequestMethod &requestMethod, QString &httpVersion, QString &route);

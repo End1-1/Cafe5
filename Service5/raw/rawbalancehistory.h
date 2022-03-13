@@ -7,14 +7,14 @@ class RawBalanceHistory : public Raw
 {
     Q_OBJECT
 public:
-    RawBalanceHistory(SslSocket *s, const QByteArray &d);
+    RawBalanceHistory(SslSocket *s);
     ~RawBalanceHistory();
 
 public slots:
-    virtual void run() override;
+    virtual void run(const QByteArray &d) override;
 
-signals:
-    void balanceAmountTotal(SslSocket *s);
+private:
+    void balanceAmountTotal();
 };
 
 #endif // RAWBALANCEHISTORY_H

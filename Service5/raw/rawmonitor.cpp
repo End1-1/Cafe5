@@ -1,18 +1,19 @@
 #include "rawmonitor.h"
-#include "rawdataexchange.h"
+#include <QMutex>
 
-RawMonitor::RawMonitor(SslSocket *s, const QByteArray &d) :
-    Raw(s, d)
+RawMonitor::RawMonitor(SslSocket *s) :
+    Raw(s)
 {
-    connect(this, &RawMonitor::registerMonitor, RawDataExchange::instance(), &RawDataExchange::registerMonitor);
+
 }
 
 RawMonitor::~RawMonitor()
 {
-    disconnect(this, &RawMonitor::registerMonitor, RawDataExchange::instance(), &RawDataExchange::registerMonitor);
+    qDebug() << "~RawMonitor";
 }
 
-void RawMonitor::run()
+void RawMonitor::run(const QByteArray &d)
 {
-    emit registerMonitor(fSocket);
+    QMutexLocker ml(fMutexInformMonitors);
+    fMonitors.append(fSocket);
 }

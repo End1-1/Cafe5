@@ -1,22 +1,69 @@
 #include "raw.h"
-#include "rawdataexchange.h"
+#include "databaseconnectionmanager.h"
+#include "database.h"
+#include "logwriter.h"
+#include "messagelist.h"
+#include <QMutex>
 
-Raw::Raw(SslSocket *s, const QByteArray &d) :
-    RawMessage(s, d)
+QHash<QString, int> Raw::fMapTokenUser;
+QHash<SslSocket*, QString> Raw::fMapSocketToken;
+QHash<QString, SslSocket*> Raw::fMapTokenSocket;
+QList<SslSocket*> Raw::fMonitors;
+
+QMutex *Raw::fMutexTokenUser = nullptr;
+QMutex *Raw::fMutexInformMonitors = nullptr;
+
+Raw::Raw(SslSocket *s) :
+    RawMessage(s)
 {
-    connect(RawDataExchange::instance(), &RawDataExchange::socketData, this, &Raw::receiveReply);
+
 }
 
 Raw::~Raw()
 {
-    disconnect(RawDataExchange::instance(), &RawDataExchange::socketData, this, &Raw::receiveReply);
 }
 
-void Raw::receiveReply(SslSocket *s, const QByteArray &d)
+void Raw::informMonitors(const QByteArray &d)
 {
-    Q_UNUSED(d);
-    if (s == fSocket) {
-        emit reply(d);
-        emit finish();
+    QMutexLocker ml(fMutexInformMonitors);
+    for (SslSocket *s: qAsConst(fMonitors)) {
+        s->write(d);
     }
+}
+
+void Raw::init()
+{
+    fMutexInformMonitors = new QMutex();
+    fMutexTokenUser = new QMutex();
+    Database db;
+    if (DatabaseConnectionManager::openSystemDatabase(db)) {
+        db.exec("select * from users_devices");
+        while (db.next()) {
+            fMapTokenUser[db.stringValue("ftoken")] = db.integerValue("fuser");
+        }
+    } else {
+        LogWriter::write(LogWriterLevel::errors, "", db.lastDbError());
+    }
+}
+
+const QString &Raw::tokenOfSocket(SslSocket *s)
+{
+    return fMapSocketToken[s];
+}
+
+void Raw::removeSocket(SslSocket *s)
+{
+    QMutexLocker ml1(fMutexInformMonitors);
+    fMonitors.removeAll(s);
+    ml1.unlock();
+
+    QMutexLocker ml2(fMutexTokenUser);
+    fMapTokenSocket.remove(fMapSocketToken[s]);
+    fMapSocketToken.remove(s);
+    ml2.unlock();
+
+    RawMessage r(s);
+    r.setHeader(0, 0, MessageList::srv_connections_count);
+    r.putUInt(fMapTokenSocket.count());
+    informMonitors(r.data());
 }

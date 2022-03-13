@@ -139,7 +139,7 @@ bool Database::update(const QString &table, const QString &field, const QVariant
     fBindValues[":" + field] = value;
     QString sql = "update " + table + " set ";
     bool first = true;
-    for (QMap<QString, QVariant>::const_iterator it = fBindValues.begin(); it != fBindValues.end(); it++) {
+    for (QMap<QString, QVariant>::const_iterator it = fBindValues.constBegin(); it != fBindValues.constEnd(); it++) {
         if (first) {
             first = false;
         } else {
@@ -165,7 +165,7 @@ void Database::setBindValues(const QMap<QString, QVariant> &v)
 QMap<QString, QVariant> Database::getBindValues()
 {
     QMap<QString, QVariant> b;
-    for (QHash<QString, int>::const_iterator it = fColumnsNames.begin(); it != fColumnsNames.end(); it++) {
+    for (QHash<QString, int>::const_iterator it = fColumnsNames.constBegin(); it != fColumnsNames.constEnd(); it++) {
         b[":" + it.key()] = fQuery->value(fColumnsNames[it.key()]);
     }
     return b;

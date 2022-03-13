@@ -5,7 +5,8 @@
 #include "storemanager.h"
 #include "requestmanager.h"
 #include "shopmanager.h"
-#include "rawdataexchange.h"
+#include "raw.h"
+#include "structs.h"
 #include "monitor.h"
 #include "thread.h"
 #include <QFileInfo>
@@ -59,7 +60,7 @@ DWORD WINAPI ThreadProc(CONST LPVOID lpParam) {
         ShopManager::init(ConfigIni::value("shop/db"));
     }
     RequestManager::init();
-    RawDataExchange::init();
+    Raw::init();
     auto *server = new ServerThread(APPDIR);
     auto *thread = new Thread("ServerThread");
     thread->connect(thread, &QThread::started, server, &ServerThread::run);

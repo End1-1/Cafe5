@@ -7,14 +7,11 @@ class RawSilentAuth : public Raw
 {
     Q_OBJECT
 public:
-    RawSilentAuth(SslSocket *s, const QByteArray &d);
+    RawSilentAuth(SslSocket *s);
     ~RawSilentAuth();
 
 public slots:
-    virtual void run() override;
-
-signals:
-    void auth(SslSocket*, const QString&, const QString&);
+    virtual void run(const QByteArray &d) override;
 };
 
 #endif // RAWSILENTAUTH_H
