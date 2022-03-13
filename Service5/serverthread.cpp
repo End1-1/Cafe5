@@ -44,7 +44,7 @@ void ServerThread::newConnection(int socketDescriptor)
     auto *socketThread = new SocketThread(socketDescriptor, fSslLocalCertificate, fSslPrivateKey, fSslProtocol);
     connect(thread, &QThread::started, socketThread, &SocketThread::run);
     connect(thread, &QThread::finished, thread, &QThread::deleteLater);
-    connect(socketThread, &SocketThread::destroyed, thread, &Thread::quit);
+    connect(socketThread, &SocketThread::finished, thread, &Thread::quit);
     socketThread->moveToThread(thread);
     thread->start();
 }

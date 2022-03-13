@@ -11,6 +11,9 @@ struct CoordinateData {
     double datetime;
 };
 
-Q_DECLARE_METATYPE(CoordinateData)
+struct ConnectionStatus {
+    bool online;
+    CoordinateData lastCoordinate;
+};
 
 #endif // STRUCTS_H

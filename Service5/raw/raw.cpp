@@ -6,6 +6,7 @@
 #include <QMutex>
 
 QHash<QString, int> Raw::fMapTokenUser;
+QHash<QString, ConnectionStatus> Raw::fMapTokenConnectionStatus;
 QHash<SslSocket*, QString> Raw::fMapSocketToken;
 QHash<QString, SslSocket*> Raw::fMapTokenSocket;
 QList<SslSocket*> Raw::fMonitors;

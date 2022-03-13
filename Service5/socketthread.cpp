@@ -17,6 +17,7 @@ SocketThread::SocketThread(int handle, const QSslCertificate &cert, const QSslKe
 {
     fMessageNumber = 0;
     fPreviouseMessageNumber = 0;
+    connect(this, &SocketThread::finished, this, &SocketThread::deleteLater);
 }
 
 SocketThread::~SocketThread()

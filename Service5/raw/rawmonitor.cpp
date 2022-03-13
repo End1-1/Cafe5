@@ -4,7 +4,6 @@
 RawMonitor::RawMonitor(SslSocket *s) :
     Raw(s)
 {
-
 }
 
 RawMonitor::~RawMonitor()
