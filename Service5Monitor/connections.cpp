@@ -18,10 +18,15 @@ Connections::~Connections()
 
 void Connections::externalDataReceived(quint16 cmd, const QByteArray &data)
 {
-    RawMessage r(nullptr, data);
+    RawMessage r(nullptr);
     switch (cmd) {
     case MessageList::srv_connections_count:
-        ui->lbConnections->setText(QString::number(r.readUInt()));
+        quint32 user, count;
+        quint8 state;
+        r.readUInt(count, data);
+        r.readUInt(user, data);
+        r.readUByte(state, data);
+        ui->lbConnections->setText(QString::number(count));
         break;
     }
 }

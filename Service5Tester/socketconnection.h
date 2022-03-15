@@ -16,6 +16,7 @@ public slots:
     void run();
     void sendData(QByteArray &d);    
     void driverRoute(SocketConnection *s, const QString &filename);
+    void pauseDrive(SocketConnection *s, bool p);
 
 private:
     static SocketConnection *fInstance;

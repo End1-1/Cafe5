@@ -76,6 +76,17 @@ void SocketConnection::driverRoute(SocketConnection *s, const QString &filename)
     }
 }
 
+void SocketConnection::pauseDrive(SocketConnection *s, bool p)
+{
+    if (s == this) {
+        if (p) {
+            fRouteTimer->stop();
+        } else {
+            fRouteTimer->start(1000);
+        }
+    }
+}
+
 quint32 SocketConnection::getTcpPacketNumber()
 {
     QMutexLocker ml(&fMutex);
@@ -100,7 +111,7 @@ void SocketConnection::routeTimeout()
     }
     if (fRouteId < fRoute.count() - 1) {
         CoordinateData c = fRoute.at(++fRouteId);
-        RawMessage r(nullptr, QByteArray());
+        RawMessage r(nullptr);
         r.setHeader(0, 0, MessageList::coordinate);
         r.putDouble(c.latitude);
         r.putDouble(c.longitude);
@@ -123,7 +134,7 @@ void SocketConnection::encrypted()
     std::mt19937 gen(ms);
     std::uniform_int_distribution<> uid(300, 600);
     fRouteDisconnectTimeout = uid(gen);
-    RawMessage r(fSocket, QByteArray());
+    RawMessage r(fSocket);
     r.setHeader(0, 0, MessageList::hello);
     r.putString(fUuid);
     emit dataReady(r.data());

@@ -58,6 +58,7 @@ void TesterDialog::on_btnClientLogin_clicked()
             connect(t, &QThread::finished, t, &QThread::deleteLater);
             connect(t, &QThread::started, s, &SocketConnection::run);
             connect(this, &TesterDialog::driveRoute, s, &SocketConnection::driverRoute);
+            connect(this, &TesterDialog::pauseDrive, s, &SocketConnection::pauseDrive);
             s->moveToThread(t);
             t->start();
         } while (true);
@@ -88,5 +89,17 @@ void TesterDialog::on_btnClientsLogout_clicked()
         s->deleteLater();
     }
     fSockets.clear();
+}
+
+
+void TesterDialog::on_btnPauseDriving_clicked()
+{
+    QPushButton *b = static_cast<QPushButton*>(sender());
+    bool paused = !b->property("paused").toBool();
+    b->setProperty("paused", paused);
+    b->setText(paused ? "Resume driving" : "Pause driving");
+    for (auto *s: fSockets) {
+        emit pauseDrive(s, paused);
+    }
 }
 
