@@ -68,7 +68,7 @@ void SocketThread::rawRequest()
         memcpy(&fMessageListData, &fData.data()[pos], sizeof(fMessageListData));
         pos += sizeof(fMessageListData);
         memcpy(&fContentLenght, &fData.data()[pos], sizeof(fContentLenght));
-        pos += sizeof(fContentLenght);
+        //pos += sizeof(fContentLenght);
     } else {
         fTimeoutControl->stop();
         fTimeoutControl->start(3000);
@@ -359,7 +359,12 @@ void SocketThread::readyRead()
 
 void SocketThread::writeToSocket(const QByteArray &d)
 {
-    fSslSocket->write(d);
+    quint64 bw = fSslSocket->write(d);
+    if (bw != d.length()) {
+        LogWriter::write(LogWriterLevel::warning,
+                         property("session").toString(),
+                         QString("Socket write incomplete %1 of %2").arg(bw).arg(d.length()));
+    }
 }
 
 void SocketThread::disconnected()

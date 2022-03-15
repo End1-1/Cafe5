@@ -23,7 +23,6 @@ C5ReportWidget::C5ReportWidget(const QStringList &dbParams, QWidget *parent) :
         fModel->setFilter(-1, arg1);
         sumColumnsData();
     });
-    connect(this, SIGNAL(refreshed()), this, SLOT(completeRefresh()));
 }
 
 C5ReportWidget::~C5ReportWidget()

@@ -121,6 +121,9 @@ protected:
 
     virtual bool tblDoubleClicked(int row, int column, const QList<QVariant> &values);
 
+protected slots:
+    virtual void completeRefresh();
+
 private:
     Ui::C5Grid *ui;
 

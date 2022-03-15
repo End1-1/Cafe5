@@ -12,7 +12,7 @@ public:
     virtual QToolBar *toolBar();
 
 protected slots:
-    virtual void refreshData() override;
+    virtual void completeRefresh() override;
 };
 
 #endif // CR5MFGENERALREPORT_H

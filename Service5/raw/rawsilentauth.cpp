@@ -21,17 +21,17 @@ void RawSilentAuth::run(const QByteArray &d)
     readString(phone, d);
     readString(password, d);
     Database db;
-    quint8 reply = 0;
+    quint32 reply = 0;
     if (DatabaseConnectionManager::openSystemDatabase(db)) {
         db[":fphone"] = phone;
         db[":fpassword"] = QString(QCryptographicHash::hash(password.toLocal8Bit(), QCryptographicHash::Md5).toHex());
         if (db.exec("select fid from users_list where fphone=:fphone and fpassword=:fpassword")) {
             if (db.next()) {
-                reply = 1;
+                reply = db.integerValue("fid");
                 const QString &token = tokenOfSocket(fSocket);
-                fMapTokenUser[token] = db.integerValue("fid");
+                fMapTokenUser[token] = reply;
                 ConnectionStatus cs;
-                cs.user = db.integerValue("fid");
+                cs.user = reply;
                 cs.authorized = true;
                 cs.online = true;
                 CoordinateData cd;

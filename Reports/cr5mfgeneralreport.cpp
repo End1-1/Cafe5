@@ -74,9 +74,9 @@ QToolBar *CR5MFGeneralReport::toolBar()
     return fToolBar;
 }
 
-void CR5MFGeneralReport::refreshData()
+void CR5MFGeneralReport::completeRefresh()
 {
-    C5ReportWidget::refreshData();
+    C5ReportWidget::completeRefresh();
     int subtotalcol = fModel->indexForColumnName("f_workername");
     if (subtotalcol > -1) {
     QList<int> totals;

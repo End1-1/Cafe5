@@ -364,6 +364,11 @@ bool C5Grid::tblDoubleClicked(int row, int column, const QList<QVariant> &values
     return false;
 }
 
+void C5Grid::completeRefresh()
+{
+
+}
+
 void C5Grid::insertJoinTable(QStringList &joins, QMap<QString, QString> &joinsMap, const QString &table, const QString &mainTable)
 {
     QString j;
@@ -596,6 +601,7 @@ void C5Grid::print()
                     continue;
                 }
                 int s = fTableView->columnSpan(r, c) - 1;
+                p.setFontBold(fModel->data(r, c, Qt::FontRole).value<QFont>().bold());
                 if (c > 0) {
                     p.ltext(fModel->data(r, c, Qt::DisplayRole).toString(), (sumOfColumnsWidghtBefore(c) / scaleFactor) + 1);
                     p.line(sumOfColumnsWidghtBefore(c + s) / scaleFactor, p.fTop, sumOfColumnsWidghtBefore(c + s) / scaleFactor, p.fTop + (fTableView->rowHeight(r) / rowScaleFactor));
@@ -858,6 +864,7 @@ void C5Grid::refreshData()
     if (!ui->tblTotal->isVisible()) {
         ui->tblView->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     }
+    completeRefresh();
 }
 
 void C5Grid::on_tblView_clicked(const QModelIndex &index)

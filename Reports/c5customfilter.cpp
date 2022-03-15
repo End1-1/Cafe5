@@ -56,6 +56,8 @@ void C5CustomFilter::on_btnOK_clicked()
                 QString cond = r.mid(0, r.indexOf(";"));
                 cond.replace("~list", l->text());
                 fSql.replace("%" + r + "%", cond);
+            } else {
+                fSql.replace("%" + r + "%", "");
             }
         }
     }
@@ -110,7 +112,7 @@ void C5CustomFilter::on_lw_itemClicked(QListWidgetItem *item)
         } else if (type.contains("cache")) {
             C5LineEditWithSelector *l1 = new C5LineEditWithSelector();
             C5LineEditWithSelector *l2 = new C5LineEditWithSelector();
-            l1->setSelector(fDBParams, l2, type.mid(5, type.length() - 5).toInt());
+            l1->setSelector(fDBParams, l2, type.midRef(5, type.length() - 5).toInt());
             ui->gl->addWidget(l1, row, 1, 1, 1);
             ui->gl->addWidget(l2, row, 2, 1, 1);
             l1->setProperty("replace", s);

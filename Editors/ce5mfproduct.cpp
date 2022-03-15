@@ -206,10 +206,10 @@ void CE5MFProduct::on_btnPrint_clicked()
     C5Printing p;
     QList<qreal> points;
     QStringList vals;
-    p.setSceneParams(2700, 2000, QPrinter::Portrait);
+    p.setSceneParams(2700, 2000, QPrinter::Landscape);
     p.setFontSize(25);
     p.setFontBold(true);
-    p.ctext(QString("%1: %2").arg(tr("Product")).arg(ui->leName->text()));
+    p.ctext(QString("%1: %2").arg(tr("Product"), ui->leName->text()));
     p.br();
     points << 50 << 100 << 1000 << 250 << 250 << 250 << 250 << 250;
     vals << "NN" << tr("Process") << tr("Duration") << tr("Duration") << tr("7h goal") << tr("Goal price") << tr("Price");

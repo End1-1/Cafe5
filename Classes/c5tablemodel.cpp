@@ -174,6 +174,13 @@ QVariant C5TableModel::data(const QModelIndex &index, int role) const
             return fColorData[fProxyData.at(index.row())][index.column()];
         }
         return QVariant(QColor(Qt::white));
+    case Qt::FontRole: {
+        QFont fo = fTableView->font();
+        if (fCellFont.contains(index)) {
+            fo = fCellFont[index];
+        }
+        return fo;
+    }
     default:
         return QVariant();
     }
@@ -195,6 +202,9 @@ bool C5TableModel::setData(const QModelIndex &index, const QVariant &value, int 
         if (fTableView != nullptr) {
             fTableView->viewport()->update();
         }
+        break;
+    default:
+        QAbstractTableModel::setData(index, value, role);
         break;
     }
     return true;
@@ -375,6 +385,8 @@ void C5TableModel::sumForColumns(const QStringList &columns, QMap<QString, doubl
 
 void C5TableModel::insertSubTotals(int col, const QList<int> &totalCols)
 {
+    QFont f = fTableView->font();
+    f.setBold(true);
     if (totalCols.count() == 0) {
         return;
     }
@@ -402,6 +414,7 @@ void C5TableModel::insertSubTotals(int col, const QList<int> &totalCols)
                 insertRow(r - 1);
                 for (int c = 0; c < columnCount(); c++) {
                     setData(r, c, newrow[c]);
+                    fCellFont[createIndex(r, c)] = f;
                 }
                 subtotalSpans.append(r);
                 r++;
@@ -428,6 +441,7 @@ void C5TableModel::insertSubTotals(int col, const QList<int> &totalCols)
         insertRow(r - 1);
         for (int c = 0; c < columnCount(); c++) {
             setData(r, c, newrow[c]);
+            fCellFont[createIndex(r, c)] = f;
         }
         subtotalSpans.append(r);
     }
@@ -500,6 +514,7 @@ void C5TableModel::clearModel()
     fAddDataToUpdate.clear();
     fColorData.clear();
     fFilters.clear();
+    fCellFont.clear();
 }
 
 QVariant C5TableModel::dataDisplay(int row, int column) const

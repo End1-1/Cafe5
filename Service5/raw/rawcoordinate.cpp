@@ -28,6 +28,7 @@ void RawCoordinate::run(const QByteArray &d)
 
     QString token = fMapSocketToken[fSocket];
     int user = fMapTokenUser[token];
+    fMapTokenConnectionStatus[token].lastCoordinate = c;
     setHeader(0, 0, MessageList::srv_device_position);
     putUInt(user);
     putBytes(reinterpret_cast<const char*>(&c), sizeof(c));

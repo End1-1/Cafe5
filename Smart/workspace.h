@@ -71,6 +71,8 @@ private slots:
 
     void on_btnCostumer_clicked();
 
+    void on_btnPrintTaxZ_clicked();
+
 private:
     Ui::Workspace *ui;
 

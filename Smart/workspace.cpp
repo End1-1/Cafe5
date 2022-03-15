@@ -14,6 +14,7 @@
 #include "dishpackage.h"
 #include "c5printing.h"
 #include "touchdlgphonenumber.h"
+#include "printtaxn.h"
 #include "QRCodeGenerator.h"
 #include <QScrollBar>
 #include <QInputDialog>
@@ -1081,4 +1082,26 @@ void Workspace::setCustomerPhoneNumber(const QString &number)
 {
     ui->lbCostumerPhone->setText(number);
     ui->lbCostumerPhone->setVisible(number.isEmpty() == false);
+}
+
+void Workspace::on_btnPrintTaxZ_clicked()
+{
+    QDate date1, date2;
+    if (!Calendar::getDate2(date1, date2)) {
+        return;
+    }
+    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
+    QString jsnin, jsnout, err;
+    int result;
+    result = pt.printReport(date1, date2, report_z, jsnin, jsnout, err);
+    C5Database db(C5Config::dbParams());
+    db[":f_id"] = db.uuid();
+    db[":f_order"] = QString("Report %1").arg(report_z == report_x ? "X" : "Z");
+    db[":f_date"] = QDate::currentDate();
+    db[":f_time"] = QTime::currentTime();
+    db[":f_in"] = jsnin;
+    db[":f_out"] = jsnout;
+    db[":f_err"] = err;
+    db[":f_result"] = result;
+    db.insert("o_tax_log", false);
 }
