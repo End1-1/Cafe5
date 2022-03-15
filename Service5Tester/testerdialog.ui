@@ -21,22 +21,6 @@
        <string>Tab 1</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_3">
-       <item row="1" column="1">
-        <widget class="QLineEdit" name="leClientsFile"/>
-       </item>
-       <item row="4" column="1">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>392</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
        <item row="0" column="0" colspan="3">
         <widget class="QGroupBox" name="groupBox">
          <property name="title">
@@ -66,12 +50,49 @@
          </layout>
         </widget>
        </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>Clients</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLineEdit" name="leClientsFile"/>
+       </item>
        <item row="2" column="1">
         <widget class="QPushButton" name="btnClientLogin">
          <property name="text">
           <string>Login</string>
          </property>
         </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QPushButton" name="btnClientsLogout">
+         <property name="text">
+          <string>Logout</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QPushButton" name="btnDriverRoute">
+         <property name="text">
+          <string>Drive route</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>392</height>
+          </size>
+         </property>
+        </spacer>
        </item>
        <item row="1" column="2">
         <widget class="QPushButton" name="btnSelectClientFile">
@@ -80,17 +101,10 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_3">
+       <item row="5" column="1">
+        <widget class="QPushButton" name="btnPauseDriving">
          <property name="text">
-          <string>Clients</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QPushButton" name="btnDriverRoute">
-         <property name="text">
-          <string>Drive route</string>
+          <string>Pause driving</string>
          </property>
         </widget>
        </item>

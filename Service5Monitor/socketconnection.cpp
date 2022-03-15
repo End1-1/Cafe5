@@ -93,7 +93,7 @@ void SocketConnection::encrypted()
 {
     fTimer->stop();
     fTcpPacketNumber = 0;
-    RawMessage r(fSocket, QByteArray());
+    RawMessage r(fSocket);
     r.setHeader(0, 0, MessageList::hello);
     r.putString(fSocket->fUuid);
     emit dataReady(r.data());

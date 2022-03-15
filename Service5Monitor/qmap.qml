@@ -31,7 +31,7 @@ Item {
             delegate: Component {
                 MapQuickItem {
                     id: point
-                    property var user: 0
+                    property int user: 0
                        coordinate: QtPositioning.coordinate(latitude, longitude)
                        anchorPoint.x: image.width/2
                        anchorPoint.y: image.height/2
@@ -39,7 +39,7 @@ Item {
                        sourceItem: Column {
                            Image {
                                id: image;
-                               source: "car_up.png";
+                               source: imageFileName;
                                height: 30
                                width: 30
                            }
@@ -68,8 +68,8 @@ Item {
         markersModel.clear()
     }
 
-    function createMarker(lat, lon, azimuth, user) {
-        markersModel.append({ "latitude": lat, "longitude": lon, "azimuth": azimuth, "user": user})
+    function createMarker(lat, lon, azimuth, user, img) {
+        markersModel.append({ "latitude": lat, "longitude": lon, "azimuth": azimuth, "user": user, imageFileName: img})
         objectCount.text = markersModel.count
     }
 
@@ -83,7 +83,18 @@ Item {
             if (pp.user === user) {
                 pp.coordinate = QtPositioning.coordinate(lat, lon)
                 markersModel.remove(i)
-                createMarker(lat,lon,azimuth,user)
+                createMarker(lat,lon,azimuth,user,"car_up.png")
+                return
+            }
+        }
+    }
+
+    function updateUser(user, state) {
+        for (var i = 0; i < markersModel.count; i++) {
+            var pp = markersModel.get(i)
+            if (pp.user === user) {
+                createMarker(pp.latitude, pp.longitude, pp.rotation, user, state === 0 ? "car_up_off.png" : "car_up.png")
+                markersModel.remove(i)
                 return
             }
         }

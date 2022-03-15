@@ -21,16 +21,17 @@ public:
 
 private slots:
     void on_btnSelectClientFile_clicked();
-
     void on_btnClientLogin_clicked();
-
     void on_btnDriverRoute_clicked();
+    void on_btnClientsLogout_clicked();
+    void on_btnPauseDriving_clicked();
 
 private:
     Ui::TesterDialog *ui;
 
 signals:
     void driveRoute(SocketConnection*, const QString&);
+    void pauseDrive(SocketConnection*, bool);
 
 };
 #endif // TESTERDIALOG_H
