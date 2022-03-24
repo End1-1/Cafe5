@@ -771,3 +771,8 @@ INSERT INTO `o_sale_type` (`f_id`, `f_name`) VALUES ('3', 'Պատվեր');
 INSERT INTO `o_sale_type` (`f_id`, `f_name`) VALUES ('4', 'Վերադարձ');
 UPDATE `sys_cache_tables` SET `f_sql` = 'select t.f_id as `կոդ`, gg.f_name as `խումբ`, t.f_name as `անվանում`, u.f_name as `չմ`, t.f_scancode as `շտրիխ կոդ`, t.f_lastinputprice as `վերջին մուտքի գին`, t.f_complectout as `կոմպլեկտի ելքի քանակ`\r from c_goods t\r left join c_groups gg on gg.f_id=t.f_group \r left join c_units as u on u.f_id=t.f_unit ' WHERE (`f_name` = 'c_goods');
 UPDATE `sys_cache_tables` SET `f_sql` = 'select f_id as `կոդ`, f_name as `անվանում` from c_storages t' WHERE (`f_name` = 'c_storages');
+
+/*db - 68 */
+/*23.03.2022 */
+update s_app set f_version='68' where f_app='DB';
+alter table s_user add column f_teamlead integer after f_group;

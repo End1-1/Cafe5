@@ -53,5 +53,7 @@
         <file>stop.png</file>
         <file>phone-call.png</file>
         <file>letter-z.png</file>
+        <file>discard.png</file>
+        <file>return_receipt.png</file>
     </qresource>
 </RCC>

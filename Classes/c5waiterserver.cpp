@@ -385,7 +385,7 @@ void C5WaiterServer::reply(QJsonObject &o)
             if (!t) {
                 l.unload();
                 o["reply"] = 1;
-                o["msg"] = QString("translator %1 %2").arg(tr("entry point is missing in")).arg(s);
+                o["msg"] = QString("translator %1 %2").arg(tr("entry point is missing in"), s);
                 break;
             }
             QTranslator trans;

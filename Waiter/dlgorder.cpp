@@ -499,7 +499,7 @@ void DlgOrder::setButtonsState()
     bool btnPayment = true;
 
     QList<WOrder*> orders = worders();
-    for (WOrder *o: orders) {
+    for (WOrder *o: qAsConst(orders)) {
         for (int i = 0; i < o->fOrderDriver->dishesCount(); i++) {
             if (o->fOrderDriver->dishesValue("f_state", i).toInt() != DISH_STATE_OK) {
                 continue;
@@ -2608,7 +2608,8 @@ void DlgOrder::on_btnPaymentIdram_clicked()
             C5Message::error(r->errorString());
             return;
         }
-        QJsonDocument jdoc = QJsonDocument::fromJson(r->readAll());
+        QByteArray replyData = r->readAll();
+        QJsonDocument jdoc = QJsonDocument::fromJson(replyData);
         QJsonObject jo = jdoc.object();
         QJsonArray ja = jo["Result"].toArray();
         if (ja.count() > 0) {
@@ -2626,14 +2627,19 @@ void DlgOrder::on_btnPaymentIdram_clicked()
         C5LogToServerThread::remember(LOG_WAITER, fUser->fullName(), "", wo->fOrderDriver->currentOrderId(), "", "Idram request", QString(jdoc.toJson().simplified()), "");
         lineEditToHeader();
     });
-    QNetworkRequest nr = QNetworkRequest(QUrl("https://money.idram.am/api/History/Search"));
+    qDebug() << __c5config.getValue(param_idram_server);
+    QNetworkRequest nr = QNetworkRequest(QUrl(__c5config.getValue(param_idram_server)));
     nr.setRawHeader("_SessionId_", __c5config.getValue(param_idram_session_id).toLatin1()); //"3497ae22-8623-45be-84d9-f9f9671b0628");
     nr.setRawHeader("_EncMethod_", "NONE");
     nr.setRawHeader("Content-Type", "application/json");
     //nr->setRawHeader("Content-Length", QString::number(m_data.length()).toLatin1());
     nr.setRawHeader("Cache-Control", "no-cache");
     nr.setRawHeader("Accept", "*/*");
+    for (auto &s: nr.rawHeaderList()) {
+        qDebug() << s << nr.rawHeader(s);
+    }
     QString request = QString("{\"Detail\":\"%1\"}").arg(wo->fOrderDriver->headerValue("f_id").toString());
+    qDebug() << request;
     //QString request = QString("{\"Detail\":\"%1\"}").arg("229eb2c3-083f-4bf5-b410-8ced2b6450ce");
     na->post(nr, request.toLatin1());
     ui->btnReceipt->setEnabled(false);

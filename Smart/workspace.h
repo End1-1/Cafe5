@@ -73,6 +73,8 @@ private slots:
 
     void on_btnPrintTaxZ_clicked();
 
+    void on_btnCancelTax_clicked();
+
 private:
     Ui::Workspace *ui;
 

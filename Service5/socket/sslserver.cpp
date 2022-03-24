@@ -1,6 +1,7 @@
 #include "sslserver.h"
 #include "logwriter.h"
 #include "sslsocket.h"
+#include "configini.h"
 #include <QFile>
 
 SslServer::SslServer(QObject *parent) :
@@ -47,11 +48,7 @@ void SslServer::setSslProtocol(QSsl::SslProtocol p)
 
 void SslServer::startListen()
 {
-#ifdef QT_DEBUG
-    listen(QHostAddress::AnyIPv4, 10002);
-#else
-    listen(QHostAddress::AnyIPv4, 10002);
-#endif
+    listen(QHostAddress::AnyIPv4, ConfigIni::value("server/port").toInt());
 }
 
 void SslServer::incomingConnection(qintptr handle)

@@ -175,9 +175,12 @@ QVariant C5TableModel::data(const QModelIndex &index, int role) const
         }
         return QVariant(QColor(Qt::white));
     case Qt::FontRole: {
-        QFont fo = fTableView->font();
-        if (fCellFont.contains(index)) {
-            fo = fCellFont[index];
+        QFont fo;
+        if (fTableView) {
+            fo = fTableView->font();
+            if (fCellFont.contains(index)) {
+                fo = fCellFont[index];
+            }
         }
         return fo;
     }

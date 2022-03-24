@@ -335,34 +335,6 @@
     </message>
 </context>
 <context>
-    <name>C5LicenseDlg</name>
-    <message>
-        <location filename="../Cafe5/c5licensedlg.ui" line="14"/>
-        <source>License</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Cafe5/c5licensedlg.ui" line="20"/>
-        <source>Valid for</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Cafe5/c5licensedlg.ui" line="27"/>
-        <source>Crypt key</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Cafe5/c5licensedlg.ui" line="53"/>
-        <source>Save</source>
-        <translation type="unfinished">Պահպանել</translation>
-    </message>
-    <message>
-        <location filename="../Cafe5/c5licensedlg.ui" line="60"/>
-        <source>Cancel</source>
-        <translation type="unfinished">Հրաժարվել</translation>
-    </message>
-</context>
-<context>
     <name>C5Message</name>
     <message>
         <location filename="../Cafe5/c5message.ui" line="124"/>
@@ -1020,6 +992,19 @@
         <location filename="../Classes/c5storedraftwriter.cpp" line="1123"/>
         <source>This order used in next documents</source>
         <translation>Այս պետվերը գրանցված է հետևյալ փասթաթղթերում</translation>
+    </message>
+</context>
+<context>
+    <name>C5TableModel</name>
+    <message>
+        <location filename="../Classes/c5tablemodel.cpp" line="413"/>
+        <source>SUBTOTAL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5tablemodel.cpp" line="440"/>
+        <source>Subtotal</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2331,7 +2316,7 @@ OTHER</source>
         <translation>Հաստատեք ուտեստի նվերը</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2669"/>
+        <location filename="dlgorder.cpp" line="2675"/>
         <source>PayX</source>
         <translation></translation>
     </message>
@@ -3650,12 +3635,7 @@ STOPLIST-ից</translation>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="main.cpp" line="21"/>
-        <source>Applicatin error</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="main.cpp" line="43"/>
+        <location filename="main.cpp" line="37"/>
         <source>An instance of application already running</source>
         <translation>Ծրագիրը արդեն միացրած է</translation>
     </message>

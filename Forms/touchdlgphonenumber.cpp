@@ -120,6 +120,5 @@ void TouchDlgPhoneNumber::on_btnBackspace_clicked()
         t.remove(t.length() - 1, 1);
         break;
     }
-
     ui->lePhone->setText(t);
 }

@@ -29,6 +29,7 @@ INCLUDEPATH += ../../Controls
 
 SOURCES += \
     ../../Classes/notificationwidget.cpp \
+    ../../Service5/handlers/httpheader.cpp \
     dll.cpp \
     ../../Cafe5/c5database.cpp \
     ../../Cafe5/c5message.cpp \
@@ -40,6 +41,7 @@ SOURCES += \
 
 HEADERS += \
     ../../Classes/notificationwidget.h \
+    ../../Service5/handlers/httpheader.h \
     dll.h \
     ../../Cafe5/c5database.h \
     ../../Cafe5/c5message.h \

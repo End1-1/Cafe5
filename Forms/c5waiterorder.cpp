@@ -8,6 +8,9 @@
 #include "c5dishwidget.h"
 #include "c5mainwindow.h"
 #include "proxytablewidgetdatabase.h"
+#include "doubledatabase.h"
+#include "c5logtoserverthread.h"
+#include "dlgsetwaiterordercl.h"
 #include <QMenu>
 #include <QClipboard>
 
@@ -237,6 +240,7 @@ void C5WaiterOrder::removeOrder()
     C5WaiterOrderDoc::removeDocument(db, ui->leUuid->text());
     db.commit();
     __mainWindow->removeTab(this);
+    C5LogToServerThread::remember(LOG_WAITER, __user->fullName(), "", ui->leUuid->text(), "", "Order removed from cash", ui->leTax->text(), "");
     C5Message::info(tr("Removed"));
 }
 
@@ -341,6 +345,7 @@ void C5WaiterOrder::on_btnClearTax_clicked()
             db[":" + db.columnName(i)] = QVariant();
         }
         db.update("o_tax", "f_id", ui->leUuid->text());
+        C5LogToServerThread::remember(LOG_WAITER, __user->fullName(), "", ui->leUuid->text(), "", "Clear tax info", ui->leTax->text(), "");
         ui->leTax->clear();
     }
 }
@@ -361,4 +366,45 @@ void C5WaiterOrder::on_btnOpenTable_clicked()
     db[":f_id"] = ui->leUuid->text();
     db[":f_state"] = ORDER_STATE_OPEN;
     db.exec("update o_header set f_state=:f_state where f_id=:f_id");
+    C5LogToServerThread::remember(LOG_WAITER, __user->fullName(), "", ui->leUuid->text(), "", "Open order from cash", "", "");
+}
+
+void C5WaiterOrder::on_btnSetCL_clicked()
+{
+    if (__c5config.hotelDatabase().isEmpty()) {
+        true;
+    }
+    QString clcode, clname;
+    if (DlgSetWaiterOrderCL::getCL(fDBParams, clcode, clname)) {
+        ui->leCityLedger->setText(clcode);
+        C5Database db(fDBParams);
+        db[":f_code"] = clcode;
+        db[":f_name"] = clname;
+        db.update("o_pay_cl", "f_id", ui->leUuid->text());
+
+        DoubleDatabase fDD;
+        fDD.open(true, true);
+        fDD[":f_id"] = ui->leNumber->text();
+        fDD[":f_cityledger"] = clcode.toInt();
+        fDD.exec("update m_register set f_cityledger=:f_cityledger where f_id=:f_id");
+        C5Message::info(tr("Saved"));
+    }
+
+}
+
+void C5WaiterOrder::on_btnClearCL_clicked()
+{
+    if (C5Message::question(tr("Clear CL information?")) == QDialog::Accepted) {
+        C5Database db(fDBParams);
+        db[":f_code"] = "";
+        db[":f_name"] = "";
+        db.update("o_pay_cl", "f_id", ui->leUuid->text());
+
+        DoubleDatabase fDD;
+        fDD.open(true, true);
+        fDD[":f_id"] = ui->leNumber->text();
+        fDD[":f_cityledger"] = 0;
+        fDD.exec("update m_register set f_cityledger=:f_cityledger where f_id=:f_id");
+        C5Message::info(tr("Saved"));
+    }
 }

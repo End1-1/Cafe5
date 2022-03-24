@@ -3,3 +3,5 @@ rar a -df -ma5 -m5 -ep c:\Projects\Cafe5\db.cafe5.rar c:\Projects\Cafe5\db.cafe5
 git add .
 git commit
 git push
+
+pause

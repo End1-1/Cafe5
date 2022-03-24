@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>997</width>
+    <width>1013</width>
     <height>719</height>
    </rect>
   </property>
@@ -811,6 +811,32 @@ QLabel {color:green;}
                     <property name="icon">
                      <iconset resource="../resources/resources.qrc">
                       <normaloff>:/letter-z.png</normaloff>:/letter-z.png</iconset>
+                    </property>
+                    <property name="iconSize">
+                     <size>
+                      <width>32</width>
+                      <height>32</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="btnCancelTax">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="focusPolicy">
+                     <enum>Qt::NoFocus</enum>
+                    </property>
+                    <property name="text">
+                     <string/>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="../resources/resources.qrc">
+                      <normaloff>:/discard.png</normaloff>:/discard.png</iconset>
                     </property>
                     <property name="iconSize">
                      <size>

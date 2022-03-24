@@ -132,10 +132,16 @@ void SocketThread::httpRequest()
         return;
     }
     LogWriter::write(LogWriterLevel::verbose, property("session").toString(), route);
-    RequestHandler *rh = RequestHandler::route(property("session").toString(), QHostAddress(fSslSocket->peerAddress().toIPv4Address()).toString(), route, fData, fRequestBody, fContentType);
-    fSslSocket->write(rh->fResponse);
-    LogWriter::write(LogWriterLevel::verbose, property("session").toString(), rh->fResponse);
-    RequestManager::releaseHandler(rh);
+    QByteArray response;
+    RequestManager::handle(property("session").toString(),
+                           QHostAddress(fSslSocket->peerAddress().toIPv4Address()).toString(),
+                           route.remove(0,1),
+                           fData,
+                           response,
+                           fRequestBody,
+                           fContentType);
+    fSslSocket->write(response);
+    LogWriter::write(LogWriterLevel::verbose, property("session").toString(), response);
     fSslSocket->close();
 }
 
@@ -177,7 +183,6 @@ HttpRequestMethod SocketThread::parseRequest(HttpRequestMethod &requestMethod, Q
         if (s2 == -1) {
             return UNKNOWN_REQUEST_METHOD;
         } else {
-
             httpVersion = fData.mid(s1, s2 - s1);
         }
         bool headerEnd = false;
@@ -216,12 +221,13 @@ HttpRequestMethod SocketThread::parseRequest(HttpRequestMethod &requestMethod, Q
                 parseBody(route.mid(s1 + 1, route.length() - s1), s1 + 5);
                 route = route.mid(0, s1);
             }
+            fContentType = ContentType::TextHtml;
         } else if (requestMethod == POST) {
             if (!fHttpHeader.contains("content-type")) {
                 return UNKNOWN_REQUEST_METHOD;
             }
             QString contentType = header("content-type");
-            if (contentType.contains("multipart/form-data")) {
+            if (contentType.contains("multipart/form-data", Qt::CaseInsensitive)) {
                 fContentType = ContentType::MultipartFormData;
                 s1 = fData.indexOf("boundary=");
                 if (s1 == -1) {
@@ -256,7 +262,7 @@ HttpRequestMethod SocketThread::parseRequest(HttpRequestMethod &requestMethod, Q
                         bodyEnd = true;
                     }
                 } while (!bodyEnd);
-            } else if (contentType.contains("application/x-www-form-urlencoded")) {
+            } else if (contentType.contains("application/x-www-form-urlencoded", Qt::CaseInsensitive)) {
                 fContentType = ContentType::UrlEncoded;
                 s1 = fData.indexOf("\r\n\r\n");
                 if (s1 == -1) {
@@ -264,13 +270,15 @@ HttpRequestMethod SocketThread::parseRequest(HttpRequestMethod &requestMethod, Q
                 }
                 s1 += 4;
                 parseBody(fData.mid(s1, fData.length() - s1), s1);
-            } else if (contentType.contains("application/json")) {
+            } else if (contentType.contains("application/json", Qt::CaseInsensitive)) {
                 fContentType = ContentType::ApplilcationJson;
                 s1 = fData.indexOf("\r\n\r\n");
                 if (s1 == -1) {
                     return UNKNOWN_REQUEST_METHOD;
                 }
                 fRequestBody.insert("json", DataAddress(s1, fData.length() - 1, fData.length() - s1));
+            } else {
+                fContentType = ContentType::TextHtml;
             }
         }
     }

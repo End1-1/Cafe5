@@ -14,6 +14,8 @@
 #include "dishpackage.h"
 #include "c5printing.h"
 #include "touchdlgphonenumber.h"
+#include "touchentertaxreceiptnumber.h"
+#include "touchselecttaxreport.h"
 #include "printtaxn.h"
 #include "QRCodeGenerator.h"
 #include <QScrollBar>
@@ -1086,6 +1088,10 @@ void Workspace::setCustomerPhoneNumber(const QString &number)
 
 void Workspace::on_btnPrintTaxZ_clicked()
 {
+    int reporttype;
+    if (TouchSelectTaxReport::getReportType(reporttype) == false) {
+        return;
+    }
     QDate date1, date2;
     if (!Calendar::getDate2(date1, date2)) {
         return;
@@ -1093,10 +1099,10 @@ void Workspace::on_btnPrintTaxZ_clicked()
     PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
     QString jsnin, jsnout, err;
     int result;
-    result = pt.printReport(date1, date2, report_z, jsnin, jsnout, err);
+    result = pt.printReport(QDateTime(date1), QDateTime(date2), reporttype, jsnin, jsnout, err);
     C5Database db(C5Config::dbParams());
     db[":f_id"] = db.uuid();
-    db[":f_order"] = QString("Report %1").arg(report_z == report_x ? "X" : "Z");
+    db[":f_order"] = QString("Report %1").arg(reporttype == report_x ? "X" : "Z");
     db[":f_date"] = QDate::currentDate();
     db[":f_time"] = QTime::currentTime();
     db[":f_in"] = jsnin;
@@ -1104,4 +1110,46 @@ void Workspace::on_btnPrintTaxZ_clicked()
     db[":f_err"] = err;
     db[":f_result"] = result;
     db.insert("o_tax_log", false);
+}
+
+void Workspace::on_btnCancelTax_clicked()
+{
+    QString number;
+    if (TouchEnterTaxReceiptNumber::getTaxReceiptNumber(number)) {
+        C5Database db(C5Config::dbParams());
+        db[":f_receiptnumber"] = number;
+        db.exec("select f_id from o_tax where cast(f_receiptnumber as signed)=cast(:f_receiptnumber as signed)");
+        QString uuid = "--";
+        if (db.nextRow()) {
+            uuid = db.getString("f_id");
+        }
+        PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
+        QString jsnin, jsnout, err, crn;
+        int result;
+        result = pt.printTaxback(number, crn, jsnin, jsnout, err);
+
+        db[":f_id"] = db.uuid();
+        db[":f_order"] = uuid;
+        db[":f_date"] = QDate::currentDate();
+        db[":f_time"] = QTime::currentTime();
+        db[":f_in"] = jsnin;
+        db[":f_out"] = jsnout;
+        db[":f_err"] = err;
+        db[":f_result"] = result;
+        db.insert("o_tax_log", false);
+        if (result != pt_err_ok) {
+            QSqlQuery *q = new QSqlQuery(db.fDb);
+            pt.saveTimeResult(uuid, *q);
+            delete q;
+            C5Message::error(err);
+        } else {
+            if (uuid != "--") {
+                db[":f_fiscal"] = QVariant();
+                db[":f_receiptnumber"] = QVariant();
+                db[":f_time"] = QVariant();
+                db.update("o_tax", "f_id", uuid);
+            }
+            C5Message::info(tr("Complete"));
+        }
+    }
 }

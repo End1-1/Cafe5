@@ -1,6 +1,5 @@
 #include "c5mainwindow.h"
 #include "c5connection.h"
-#include "c5license.h"
 #include "c5systempreference.h"
 #include <QMessageBox>
 #include <QApplication>
@@ -23,11 +22,6 @@ int main(int argc, char *argv[])
 #endif
 
     QApplication a(argc, argv);
-    QString err;
-    if (!C5License::isOK(err)) {
-        QMessageBox::critical(0, QObject::tr("Application error"), err);
-        return 0;
-    }
 
     if (!C5SystemPreference::checkDecimalPointAndSeparator()) {
         return 0;

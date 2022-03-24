@@ -1,4 +1,4 @@
-QT       += core gui network sql printsupport
+QT       += core gui network sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -13,26 +13,18 @@ RC_FILE = res.rc
 SOURCES += \
     ../../NewTax/Src/printtax.cpp \
     ../../NewTax/Src/printtaxn.cpp \
-    configini.cpp \
-    database.cpp \
-    databaseconnectionmanager.cpp \
+    ../Classes/c5crypt.cpp \
+    c5license.cpp \
+    utils/configini.cpp \
+    utils/database.cpp \
+    utils/databaseconnectionmanager.cpp \
     datadriver/datadriver.cpp \
-    datadriver/dduser.cpp \
+    dlglicenses.cpp \
     firebase.cpp \
-    handlers/authentication.cpp \
-    handlers/chat.cpp \
-    handlers/confirmregistration.cpp \
-    handlers/forbidden.cpp \
-    handlers/jzstore.cpp \
-    handlers/notfound.cpp \
-    handlers/registration.cpp \
     handlers/requesthandler.cpp \
     handlers/requestmanager.cpp \
-    handlers/shoprequest.cpp \
-    handlers/storerequest.cpp \
-    handlers/tax.cpp \
-    httpheader.cpp \
-    jsonhandler.cpp \
+    handlers/httpheader.cpp \
+    utils/jsonhandler.cpp \
     main.cpp \
     monitor.cpp \
     raw/raw.cpp \
@@ -50,40 +42,27 @@ SOURCES += \
     serverthread.cpp \
     socket/sslserver.cpp \
     socket/sslsocket.cpp \
-    socketdata.cpp \
+    handlers/socketdata.cpp \
     socketthread.cpp \
-    store/shopmanager.cpp \
-    store/storemanager.cpp \
     thread.cpp \
     threadworker.cpp \
-    utils/c5printing.cpp \
-    utils/logwriter.cpp \
-    utils/printreceiptgroup.cpp
+    utils/logwriter.cpp
 
 HEADERS += \
     ../../NewTax/Src/printtax.h \
     ../../NewTax/Src/printtaxn.h \
-    configini.h \
-    database.h \
-    databaseconnectionmanager.h \
+    ../Classes/c5crypt.h \
+    c5license.h \
+    utils/configini.h \
+    utils/database.h \
+    utils/databaseconnectionmanager.h \
     datadriver/datadriver.h \
-    datadriver/dduser.h \
+    dlglicenses.h \
     firebase.h \
-    handlers/authentication.h \
-    handlers/chat.h \
-    handlers/confirmregistration.h \
-    handlers/forbidden.h \
-    handlers/jzstore.h \
-    handlers/notfound.h \
-    handlers/registration.h \
     handlers/requesthandler.h \
     handlers/requestmanager.h \
-    handlers/shoprequest.h \
-    handlers/storerequest.h \
-    handlers/tax.h \
-    headers/registrationstate.h \
-    httpheader.h \
-    jsonhandler.h \
+    handlers/httpheader.h \
+    utils/jsonhandler.h \
     monitor.h \
     raw/messagelist.h \
     raw/raw.h \
@@ -104,18 +83,15 @@ HEADERS += \
     serverthread.h \
     socket/sslserver.h \
     socket/sslsocket.h \
-    socketdata.h \
+    handlers/socketdata.h \
     socketthread.h \
-    store/shopmanager.h \
-    store/storemanager.h \
     thread.h \
     threadworker.h \
-    utils/c5printing.h \
     utils/logwriter.h \
-    utils/printreceiptgroup.h
 
 FORMS += \
     ../Cafe5/c5message.ui \
+    dlglicenses.ui \
     monitor.ui
 
 INCLUDEPATH += socket
@@ -125,7 +101,7 @@ INCLUDEPATH += headers
 INCLUDEPATH += store
 INCLUDEPATH += datadriver
 INCLUDEPATH += raw
-INCLUDEPATH += C:/Projects/NewTax/Src
+INCLUDEPATH += ../Classes
 INCLUDEPATH += C:/Soft/OpenSSL-Win64/include
 INCLUDEPATH += C:/Soft/OpenSSL-Win64/include/openssl
 
@@ -140,6 +116,8 @@ LIBS += -LC:/Soft/OpenSSL-Win64/lib
 LIBS += -lopenssl
 LIBS += advapi32.lib
 LIBS += -llibcrypto
+
+QMAKE_LFLAGS_WINDOWS += /MANIFESTUAC:"level='requireAdministrator'"
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -15,6 +15,7 @@ public slots:
 
 private:
     void balanceAmountTotal();
+    void balanceDetails(const QDateTime &d1, const QDateTime &d2);
 };
 
 #endif // RAWBALANCEHISTORY_H

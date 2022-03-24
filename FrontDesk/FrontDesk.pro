@@ -35,14 +35,13 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../../NewTax/Src/printtaxn.cpp \
     ../../NewTax/Src/printtaxn.cpp \
     ../Cafe5/c5double.cpp \
-    ../Cafe5/c5license.cpp \
-    ../Cafe5/c5licensedlg.cpp \
     ../Cafe5/c5replication.cpp \
     ../Cafe5/c5systempreference.cpp \
     ../Classes/c5crypt.cpp \
     ../Classes/c5document.cpp \
     ../Classes/c5filelogwriter.cpp \
     ../Classes/c5filterwidget.cpp \
+    ../Classes/c5logtoserverthread.cpp \
     ../Classes/c5random.cpp \
     ../Classes/c5storedraftwriter.cpp \
     ../Classes/c5threadobject.cpp \
@@ -95,7 +94,9 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Forms/c5storedoc.cpp \
     ../Forms/c5waiterorder.cpp \
     ../Forms/dlgdataonline.cpp \
+    ../Forms/dlgnewcl.cpp \
     ../Forms/dlgreservgoods.cpp \
+    ../Forms/dlgsetwaiterordercl.cpp \
     ../Reports/c5customfilter.cpp \
     ../Reports/cr5carvisits.cpp \
     ../Reports/cr5carvisitsfilter.cpp \
@@ -296,8 +297,6 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../../NewTax/Src/printtaxn.h \
     ../../NewTax/Src/printtaxn.h \
     ../Cafe5/c5double.h \
-    ../Cafe5/c5license.h \
-    ../Cafe5/c5licensedlg.h \
     ../Cafe5/c5replication.h \
     ../Cafe5/c5systempreference.h \
     ../Classes/barcode5.h \
@@ -306,6 +305,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Classes/c5document.h \
     ../Classes/c5filelogwriter.h \
     ../Classes/c5filterwidget.h \
+    ../Classes/c5logtoserverthread.h \
     ../Classes/c5random.h \
     ../Classes/c5storedraftwriter.h \
     ../Classes/c5threadobject.h \
@@ -360,7 +360,9 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Forms/c5storedoc.h \
     ../Forms/c5waiterorder.h \
     ../Forms/dlgdataonline.h \
+    ../Forms/dlgnewcl.h \
     ../Forms/dlgreservgoods.h \
+    ../Forms/dlgsetwaiterordercl.h \
     ../Reports/c5customfilter.h \
     ../Reports/cr5carvisits.h \
     ../Reports/cr5carvisitsfilter.h \
@@ -563,7 +565,6 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../../XLSX/src/zip.h
 
 FORMS += \
-    ../Cafe5/c5licensedlg.ui \
     ../Classes/calculator.ui \
     ../Classes/notificationwidget.ui \
     ../Controls/c5tablewithtotal.ui \
@@ -581,7 +582,9 @@ FORMS += \
     ../Forms/c5storedoc.ui \
     ../Forms/c5waiterorder.ui \
     ../Forms/dlgdataonline.ui \
+    ../Forms/dlgnewcl.ui \
     ../Forms/dlgreservgoods.ui \
+    ../Forms/dlgsetwaiterordercl.ui \
     ../Reports/c5customfilter.ui \
     ../Reports/cr5carvisitsfilter.ui \
     ../Reports/cr5cashdetailedfilter.ui \

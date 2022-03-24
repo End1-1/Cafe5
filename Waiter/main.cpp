@@ -1,6 +1,5 @@
 #include "c5translator.h"
 #include "c5connection.h"
-#include "c5license.h"
 #include "c5sockethandler.h"
 #include "datadriver.h"
 #include "dlgscreen.h"
@@ -16,11 +15,6 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    QString err;
-    if (!C5License::isOK(err)) {
-        QMessageBox::critical(0, QObject::tr("Applicatin error"), err);
-        return 0;
-    }
 #ifndef QT_DEBUG
     QStringList libPath;
     libPath << qApp->applicationDirPath();

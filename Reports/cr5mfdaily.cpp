@@ -56,7 +56,7 @@ void CR5MfDaily::loadDoc(const QDate &date)
     db.exec("select m.f_id, concat(u.f_last, ' ', u.f_first) as f_name, m.f_worker "
         "from mf_daily_workers m "
         "inner join s_user u on u.f_id=m.f_worker "
-        "where f_date=:f_date");
+        "where f_date=:f_date order by m.f_id ");
     while (db.nextRow()) {
         QListWidgetItem *item = new QListWidgetItem(ui->lstWorkers);
         item->setText(db.getString("f_name"));

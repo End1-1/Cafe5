@@ -1,5 +1,11 @@
 #include "c5crypt.h"
 #include "des.h"
+#include <QSettings>
+#include <QCryptographicHash>
+#include <Windows.h>
+#include <memory>
+#include <cstdio>
+#include <array>
 
 C5Crypt::C5Crypt()
 {
@@ -68,3 +74,100 @@ void C5Crypt::decryptData(const QByteArray &k, QByteArray &inData, QByteArray &o
     outData.append(out, inData.length());
     delete [] out;
 }
+
+void C5Crypt::ede3_cbc(QByteArray &in,
+                       QByteArray &out,
+                       const QString &key,
+                       bool encrypt)
+{
+    DES_key_schedule des_key1;
+    DES_key_schedule des_key2;
+    DES_key_schedule des_key3;
+
+    const_DES_cblock key_SSL1, key_SSL2, key_SSL3;
+    DES_cblock ivec;
+
+    if (in.length() % 8) {
+        quint8 remain = 8 - (in.length() % 8);
+        quint8 jsonFillCount = remain;
+        for (int i = 0; i < jsonFillCount; i++) {
+            in.append((char)jsonFillCount);
+        }
+    }
+    int in_data_len = in.length();
+
+    QByteArray hash256 = QCryptographicHash::hash(key.toLatin1(), QCryptographicHash::Sha256);
+    unsigned char *key_value = new unsigned char[24];
+    memcpy(key_value, hash256.mid(0, 24).data(), 24);
+
+   // The key as passed in is a 24 byte string containing 3 keys
+   // pick it apart and create the key schedules
+   memcpy(&key_SSL1, key_value, (size_t)8);
+   memcpy(&key_SSL2, key_value+8, (size_t)8);
+   memcpy(&key_SSL3, key_value+16, (size_t)8);
+   DES_set_key_unchecked(&key_SSL1, &des_key1);
+   DES_set_key_unchecked(&key_SSL2, &des_key2);
+   DES_set_key_unchecked(&key_SSL3, &des_key3);
+
+   unsigned char init_v[] = {0x01,0x02,0x03,0x04,0x05,0x06,0x02,0x01};
+   memcpy(ivec, init_v, sizeof(ivec));
+
+   // Encrypt or decrypt the data
+   int *out_data_len = new int();
+   unsigned char *out_data = new unsigned char[in_data_len];
+   if (encrypt) {
+       DES_ede3_cbc_encrypt((const unsigned char*)in.data(),
+               out_data,
+               in_data_len,
+               &des_key1,
+               &des_key2,
+               &des_key3,
+               &ivec,
+               DES_ENCRYPT);
+       *out_data_len = in_data_len;
+   } else {
+       DES_ede3_cbc_encrypt((const unsigned char*)in.data(),
+               out_data,
+               in_data_len,
+               &des_key1,
+               &des_key2,
+               &des_key3,
+               &ivec,
+               DES_DECRYPT);
+
+       *out_data_len = in_data_len;
+   }
+
+   out.append((char*)out_data, *out_data_len);
+   if ((int) out[*out_data_len - 1] < (int) 0x08) {
+       out.remove(out.length() - out[*out_data_len - 1], out[*out_data_len - 1]);
+   }
+   delete [] key_value;
+   delete [] out_data;
+   delete out_data_len;
+}
+
+const QString C5Crypt::driveKey()
+{
+    std::array<char, 128> buffer;
+    std::string result;
+    std::shared_ptr<FILE> pipe(_popen("wmic path win32_physicalmedia get SerialNumber", "r"), _pclose);
+    if (!pipe)  {
+        return "";
+    }
+    while (!feof(pipe.get())) {
+        if (fgets(buffer.data(), 128, pipe.get()) != NULL) {
+            result += buffer.data();
+        }
+    }
+    QString key = QString::fromStdString(result).replace("\r\n", "").replace(" ", "");
+    return key;
+}
+
+const QString C5Crypt::machineUuid()
+{
+    QSettings s("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Cryptography", QSettings::Registry64Format);
+    return s.value("MachineGuid").toString();
+}
+
+

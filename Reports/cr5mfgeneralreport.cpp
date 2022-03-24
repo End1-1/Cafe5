@@ -37,7 +37,7 @@ CR5MFGeneralReport::CR5MFGeneralReport(const QStringList &dbParams, QWidget *par
     fColumnsSum << "f_qty"
                 << "f_total";
 
-    fColumnsOrder << "concat(w.f_last, ' ', w.f_first)"
+    fColumnsOrder << "concat(w.f_last, ' ', w.f_first) as f_workername"
                   << "p.f_date";
 
 
@@ -56,7 +56,7 @@ CR5MFGeneralReport::CR5MFGeneralReport(const QStringList &dbParams, QWidget *par
     fColumnsVisible["pr.f_name as f_productname"] = true;
     fColumnsVisible["ac.f_name as f_processname"] = true;
     fColumnsVisible["sum(p.f_qty) as f_qty"] = true;
-    fColumnsVisible["p.f_price"] = false;
+    fColumnsVisible["p.f_price"] = true;
     fColumnsVisible["sum(p.f_qty*p.f_price) as f_total"] = true;
 }
 

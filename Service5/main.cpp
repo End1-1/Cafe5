@@ -2,9 +2,7 @@
 #include "serverthread.h"
 #include "databaseconnectionmanager.h"
 #include "configini.h"
-#include "storemanager.h"
 #include "requestmanager.h"
-#include "shopmanager.h"
 #include "raw.h"
 #include "structs.h"
 #include "monitor.h"
@@ -50,14 +48,7 @@ DWORD WINAPI ThreadProc(CONST LPVOID lpParam) {
     QTranslator t;
     t.load(":/Service5.qm");
     app.installTranslator(&t);
-    ConfigIni::init(APPDIR);
     DatabaseConnectionManager::init();
-    if (ConfigIni::isTrue("store/init")) {
-        StoreManager::init(ConfigIni::value("store/db"));
-    }
-    if (ConfigIni::isTrue("shop/init")) {
-        ShopManager::init(ConfigIni::value("shop/db"));
-    }
     RequestManager::init();
     Raw::init();
     auto *server = new ServerThread(APPDIR);
@@ -79,6 +70,7 @@ void __cdecl main(int argc, char *argv[])
     ARGC = argc;
     ARGV = argv;
     APPDIR = QFileInfo(QString(argv[0])).path() + "/";
+    ConfigIni::init(APPDIR);
     LogWriter::fCurrentLevel = 100;
     LogWriter::setFile(LogWriterLevel::verbose, QString("%1/%2/%3/Logs/%4_verbose.log").arg(QDir::tempPath()).arg(_APPLICATION_).arg(_MODULE_).arg(QDate::currentDate().toString("dd_MM_yyyy")));
     LogWriter::setFile(LogWriterLevel::warning, QString("%1/%2/%3/Logs/%4_warning.log").arg(QDir::tempPath()).arg(_APPLICATION_).arg(_MODULE_).arg(QDate::currentDate().toString("dd_MM_yyyy")));

@@ -309,34 +309,6 @@
     </message>
 </context>
 <context>
-    <name>C5LicenseDlg</name>
-    <message>
-        <location filename="../Cafe5/c5licensedlg.ui" line="14"/>
-        <source>License</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Cafe5/c5licensedlg.ui" line="20"/>
-        <source>Valid for</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Cafe5/c5licensedlg.ui" line="27"/>
-        <source>Crypt key</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Cafe5/c5licensedlg.ui" line="53"/>
-        <source>Save</source>
-        <translation type="unfinished">Պահպանել</translation>
-    </message>
-    <message>
-        <location filename="../Cafe5/c5licensedlg.ui" line="60"/>
-        <source>Cancel</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>C5Message</name>
     <message>
         <location filename="../Cafe5/c5message.ui" line="124"/>
@@ -940,6 +912,19 @@
     </message>
 </context>
 <context>
+    <name>C5TableModel</name>
+    <message>
+        <location filename="../Classes/c5tablemodel.cpp" line="413"/>
+        <source>SUBTOTAL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5tablemodel.cpp" line="440"/>
+        <source>Subtotal</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>C5User</name>
     <message>
         <location filename="../Classes/c5user.cpp" line="70"/>
@@ -1496,7 +1481,7 @@ MS Excel</source>
         <location filename="../../NewTax/Src/printtaxn.cpp" line="93"/>
         <location filename="../../NewTax/Src/printtaxn.cpp" line="341"/>
         <source>Connection error</source>
-        <translation type="unfinished"></translation>
+        <translation>Կապի սխալ</translation>
     </message>
     <message>
         <location filename="../../NewTax/Src/printtaxn.cpp" line="41"/>
@@ -1516,7 +1501,7 @@ MS Excel</source>
     <message>
         <location filename="../../NewTax/Src/printtaxn.cpp" line="339"/>
         <source>Tax error code</source>
-        <translation type="unfinished"></translation>
+        <translation>ՀԴՄ -ի սխալի կոդ</translation>
     </message>
 </context>
 <context>
@@ -1589,6 +1574,145 @@ MS Excel</source>
     </message>
 </context>
 <context>
+    <name>TouchDlgPhoneNumber</name>
+    <message>
+        <location filename="../Forms/touchdlgphonenumber.ui" line="19"/>
+        <source>Phone number</source>
+        <translation>Հեռախոսի համար</translation>
+    </message>
+    <message>
+        <location filename="../Forms/touchdlgphonenumber.ui" line="43"/>
+        <source>3</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../Forms/touchdlgphonenumber.ui" line="136"/>
+        <source>9</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../Forms/touchdlgphonenumber.ui" line="155"/>
+        <source>4</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../Forms/touchdlgphonenumber.ui" line="174"/>
+        <source>8</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../Forms/touchdlgphonenumber.ui" line="193"/>
+        <source>1</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../Forms/touchdlgphonenumber.ui" line="212"/>
+        <source>0</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../Forms/touchdlgphonenumber.ui" line="231"/>
+        <source>6</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../Forms/touchdlgphonenumber.ui" line="250"/>
+        <source>2</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../Forms/touchdlgphonenumber.ui" line="269"/>
+        <source>7</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../Forms/touchdlgphonenumber.ui" line="288"/>
+        <source>5</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>TouchEnterTaxReceiptNumber</name>
+    <message>
+        <location filename="../Forms/touchentertaxreceiptnumber.ui" line="19"/>
+        <source>Tax receipt number</source>
+        <translation>ՀԴՄ կտրոնի համար</translation>
+    </message>
+    <message>
+        <location filename="../Forms/touchentertaxreceiptnumber.ui" line="82"/>
+        <source>7</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../Forms/touchentertaxreceiptnumber.ui" line="101"/>
+        <source>8</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../Forms/touchentertaxreceiptnumber.ui" line="120"/>
+        <source>9</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../Forms/touchentertaxreceiptnumber.ui" line="139"/>
+        <source>4</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../Forms/touchentertaxreceiptnumber.ui" line="158"/>
+        <source>5</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../Forms/touchentertaxreceiptnumber.ui" line="177"/>
+        <source>6</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../Forms/touchentertaxreceiptnumber.ui" line="196"/>
+        <source>1</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../Forms/touchentertaxreceiptnumber.ui" line="215"/>
+        <source>2</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../Forms/touchentertaxreceiptnumber.ui" line="234"/>
+        <source>3</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../Forms/touchentertaxreceiptnumber.ui" line="282"/>
+        <source>0</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>TouchSelectTaxReport</name>
+    <message>
+        <location filename="../Forms/touchselecttaxreport.ui" line="14"/>
+        <source>Report type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Forms/touchselecttaxreport.ui" line="32"/>
+        <source>Print tax X report</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Forms/touchselecttaxreport.ui" line="61"/>
+        <source>Print tax Z report</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Forms/touchselecttaxreport.ui" line="90"/>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Workspace</name>
     <message>
         <location filename="workspace.ui" line="14"/>
@@ -1623,7 +1747,7 @@ MS Excel</source>
         <location filename="workspace.ui" line="554"/>
         <location filename="workspace.ui" line="559"/>
         <location filename="workspace.ui" line="564"/>
-        <location filename="workspace.ui" line="1229"/>
+        <location filename="workspace.ui" line="1307"/>
         <source>New Column</source>
         <translation></translation>
     </message>
@@ -1638,157 +1762,167 @@ MS Excel</source>
         <translation>Փաթեթներ</translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="958"/>
+        <location filename="workspace.ui" line="1036"/>
         <source>1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="1002"/>
+        <location filename="workspace.ui" line="1080"/>
         <source>2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="1046"/>
+        <location filename="workspace.ui" line="1124"/>
         <source>4</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="914"/>
+        <location filename="workspace.ui" line="992"/>
         <source>3</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="980"/>
+        <location filename="workspace.ui" line="1058"/>
         <source>+10</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="826"/>
+        <location filename="workspace.ui" line="904"/>
         <source>+37477019107&lt;br&gt;Supplier</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="1132"/>
+        <location filename="workspace.ui" line="1210"/>
         <source>+1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="936"/>
+        <location filename="workspace.ui" line="1014"/>
         <source>-1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="1024"/>
+        <location filename="workspace.ui" line="1102"/>
         <source>0.5</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="1154"/>
+        <location filename="workspace.ui" line="1232"/>
         <source>0.25</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="1297"/>
+        <location filename="workspace.ui" line="1325"/>
+        <source>Costumer phone</source>
+        <translation>Հաճախորդի հեռախոսի համար</translation>
+    </message>
+    <message>
+        <location filename="workspace.ui" line="1392"/>
         <source>0</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="1320"/>
-        <location filename="workspace.cpp" line="1021"/>
+        <location filename="workspace.ui" line="1415"/>
+        <location filename="workspace.cpp" line="1043"/>
         <source>Total</source>
         <translation>Ընդամենը</translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="1336"/>
+        <location filename="workspace.ui" line="1431"/>
         <source>Checkout</source>
         <translation>ՀԱՇԻՎ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="68"/>
+        <location filename="workspace.cpp" line="72"/>
         <source>ENTER</source>
         <translation>ՄՈՒՏՔ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="85"/>
+        <location filename="workspace.cpp" line="89"/>
         <source>All</source>
         <translation>Բոլորը</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="431"/>
+        <location filename="workspace.cpp" line="436"/>
         <source>Quantity of orders</source>
         <translation>Պատվերների քանակ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="617"/>
-        <location filename="workspace.cpp" line="682"/>
+        <location filename="workspace.cpp" line="635"/>
+        <location filename="workspace.cpp" line="700"/>
         <source>Receipt #</source>
         <translation>Պատվեր №</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="624"/>
+        <location filename="workspace.cpp" line="642"/>
         <source>Amount to paid</source>
         <translation>Ենթակա է վճարման</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="668"/>
-        <location filename="workspace.cpp" line="706"/>
+        <location filename="workspace.cpp" line="686"/>
+        <location filename="workspace.cpp" line="724"/>
         <source>Printed:</source>
         <translation>Տպված</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="988"/>
-        <location filename="workspace.cpp" line="1025"/>
+        <location filename="workspace.cpp" line="1010"/>
+        <location filename="workspace.cpp" line="1047"/>
         <source>Cash</source>
         <translation>Կանխիկ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="994"/>
-        <location filename="workspace.cpp" line="1030"/>
+        <location filename="workspace.cpp" line="1016"/>
+        <location filename="workspace.cpp" line="1052"/>
         <source>Card</source>
         <translation>Քարտ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1000"/>
-        <location filename="workspace.cpp" line="1035"/>
+        <location filename="workspace.cpp" line="1022"/>
+        <location filename="workspace.cpp" line="1057"/>
         <source>Idram</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1006"/>
-        <location filename="workspace.cpp" line="1040"/>
+        <location filename="workspace.cpp" line="1028"/>
+        <location filename="workspace.cpp" line="1062"/>
         <source>Other</source>
         <translation>Այլ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="168"/>
-        <location filename="workspace.cpp" line="756"/>
+        <location filename="workspace.cpp" line="1152"/>
+        <source>Complete</source>
+        <translation>Կատարված է</translation>
+    </message>
+    <message>
+        <location filename="workspace.cpp" line="172"/>
+        <location filename="workspace.cpp" line="778"/>
         <source>Confirm to close application</source>
         <translation>Փակել՞ ծրագիրը</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="784"/>
+        <location filename="workspace.cpp" line="806"/>
         <source>Enter qty</source>
         <translation>Մուտքագրեք քանակը</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="784"/>
+        <location filename="workspace.cpp" line="806"/>
         <source>Qty</source>
         <translation>Քանակ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="383"/>
-        <location filename="workspace.cpp" line="971"/>
+        <location filename="workspace.cpp" line="388"/>
+        <location filename="workspace.cpp" line="993"/>
         <source>End of day</source>
         <translation>Օրվա հասույթ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="435"/>
+        <location filename="workspace.cpp" line="440"/>
         <source>Total today</source>
         <translation>Ընդամենը</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="444"/>
-        <location filename="workspace.cpp" line="1047"/>
+        <location filename="workspace.cpp" line="449"/>
+        <location filename="workspace.cpp" line="1069"/>
         <source>Printed</source>
         <translation>Տպված</translation>
     </message>
@@ -1942,7 +2076,7 @@ MS Excel</source>
     </message>
     <message>
         <location filename="payment.cpp" line="236"/>
-        <location filename="payment.cpp" line="404"/>
+        <location filename="payment.cpp" line="412"/>
         <source>(F)</source>
         <translation>(Ֆ)</translation>
     </message>
@@ -2003,7 +2137,7 @@ MS Excel</source>
         <translation>Օրնկ․</translation>
     </message>
     <message>
-        <location filename="payment.cpp" line="478"/>
+        <location filename="payment.cpp" line="486"/>
         <source>Unpaid</source>
         <translation>Վճարված չէ</translation>
     </message>

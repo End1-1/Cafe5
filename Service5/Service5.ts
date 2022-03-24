@@ -15,138 +15,296 @@
     </message>
 </context>
 <context>
-    <name>Monitor</name>
+    <name>DlgLicenses</name>
     <message>
-        <location filename="monitor.ui" line="14"/>
-        <source>Monitor</source>
-        <translation></translation>
+        <location filename="dlglicenses.ui" line="14"/>
+        <source>Licenses</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="monitor.ui" line="36"/>
-        <source>Raw log</source>
-        <translation></translation>
+        <location filename="dlglicenses.ui" line="30"/>
+        <source>X</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="monitor.ui" line="58"/>
-        <source>I will be back</source>
-        <translation></translation>
+        <location filename="dlglicenses.ui" line="35"/>
+        <source>Number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="dlglicenses.ui" line="40"/>
+        <source>Date start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="dlglicenses.ui" line="45"/>
+        <source>Date end</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="dlglicenses.ui" line="50"/>
+        <source>Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="dlglicenses.ui" line="74"/>
+        <source>Activate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="dlglicenses.ui" line="81"/>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="dlglicenses.cpp" line="33"/>
+        <source>Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="dlglicenses.cpp" line="35"/>
+        <source>Demo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="dlglicenses.cpp" line="68"/>
+        <source>Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="dlglicenses.cpp" line="68"/>
+        <source>No license selected</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>PrintReceiptGroup</name>
+    <name>Monitor</name>
     <message>
-        <location filename="utils/printreceiptgroup.cpp" line="33"/>
-        <location filename="utils/printreceiptgroup.cpp" line="264"/>
-        <source>Return</source>
-        <translation>Հետ վերադարձ</translation>
+        <location filename="monitor.ui" line="14"/>
+        <source>Server configuration</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="utils/printreceiptgroup.cpp" line="132"/>
-        <location filename="utils/printreceiptgroup.cpp" line="370"/>
-        <source>Department</source>
-        <translation>Բաժին</translation>
+        <location filename="monitor.ui" line="26"/>
+        <source>MariaDB installation path</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="utils/printreceiptgroup.cpp" line="135"/>
-        <location filename="utils/printreceiptgroup.cpp" line="373"/>
-        <source>Tax number</source>
-        <translation>ՀՎՀՀ</translation>
+        <location filename="monitor.ui" line="39"/>
+        <source>...</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="utils/printreceiptgroup.cpp" line="138"/>
-        <location filename="utils/printreceiptgroup.cpp" line="376"/>
-        <source>Device number</source>
-        <translation>ԳՀ</translation>
+        <location filename="monitor.ui" line="62"/>
+        <source>Save</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="utils/printreceiptgroup.cpp" line="141"/>
-        <location filename="utils/printreceiptgroup.cpp" line="379"/>
-        <source>Serial</source>
-        <translation>ԱՀ</translation>
+        <location filename="monitor.ui" line="69"/>
+        <source>Main database</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="utils/printreceiptgroup.cpp" line="144"/>
-        <location filename="utils/printreceiptgroup.cpp" line="382"/>
-        <source>Fiscal</source>
-        <translation>Ֆիսկալ</translation>
+        <location filename="monitor.ui" line="75"/>
+        <source>Username</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="utils/printreceiptgroup.cpp" line="147"/>
-        <location filename="utils/printreceiptgroup.cpp" line="385"/>
-        <source>Receipt number</source>
-        <translation>ԿՀ</translation>
+        <location filename="monitor.ui" line="85"/>
+        <location filename="monitor.ui" line="232"/>
+        <source>Password</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="utils/printreceiptgroup.cpp" line="150"/>
-        <location filename="utils/printreceiptgroup.cpp" line="388"/>
-        <source>Date</source>
-        <translation>Ամսաթիվ</translation>
+        <location filename="monitor.ui" line="101"/>
+        <source>Schema</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="utils/printreceiptgroup.cpp" line="153"/>
-        <location filename="utils/printreceiptgroup.cpp" line="391"/>
-        <source>(F)</source>
-        <translation>(Ֆ)</translation>
+        <location filename="monitor.ui" line="108"/>
+        <source>Host</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="utils/printreceiptgroup.cpp" line="156"/>
-        <location filename="utils/printreceiptgroup.cpp" line="395"/>
-        <source>Buyer taxcode</source>
-        <translation>Գնորդի ՀՎՀՀ</translation>
+        <location filename="monitor.ui" line="115"/>
+        <source>Check connection</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="utils/printreceiptgroup.cpp" line="166"/>
-        <location filename="utils/printreceiptgroup.cpp" line="405"/>
-        <source>Class | Name | Qty | Price | Total</source>
-        <translation>Դաս Անվանում Քնկ Գին Ընդամենը</translation>
+        <location filename="monitor.ui" line="125"/>
+        <source>Databases</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="utils/printreceiptgroup.cpp" line="197"/>
-        <location filename="utils/printreceiptgroup.cpp" line="426"/>
-        <source>Need to pay</source>
-        <translation>Ենթակա է վճարման</translation>
+        <location filename="monitor.ui" line="131"/>
+        <location filename="monitor.ui" line="138"/>
+        <location filename="monitor.ui" line="166"/>
+        <location filename="monitor.cpp" line="69"/>
+        <location filename="monitor.cpp" line="78"/>
+        <location filename="monitor.cpp" line="87"/>
+        <source>Need to create</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="utils/printreceiptgroup.cpp" line="207"/>
-        <location filename="utils/printreceiptgroup.cpp" line="216"/>
-        <location filename="utils/printreceiptgroup.cpp" line="436"/>
-        <location filename="utils/printreceiptgroup.cpp" line="445"/>
-        <source>Payment, cash</source>
-        <translation>Կանխիկ</translation>
+        <location filename="monitor.ui" line="145"/>
+        <source>Log database</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="utils/printreceiptgroup.cpp" line="211"/>
-        <location filename="utils/printreceiptgroup.cpp" line="440"/>
-        <source>Change</source>
-        <translation>Մանր</translation>
+        <location filename="monitor.ui" line="152"/>
+        <source>Working database</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="utils/printreceiptgroup.cpp" line="222"/>
-        <location filename="utils/printreceiptgroup.cpp" line="462"/>
-        <source>Payment, card</source>
-        <translation>Անկանխիկ</translation>
+        <location filename="monitor.ui" line="159"/>
+        <source>Server database</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="utils/printreceiptgroup.cpp" line="230"/>
-        <location filename="utils/printreceiptgroup.cpp" line="476"/>
-        <source>Thank you for visit!</source>
-        <translation>Շնորհակալություն գնումների համար</translation>
+        <location filename="monitor.ui" line="173"/>
+        <source>Create databases</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="utils/printreceiptgroup.cpp" line="233"/>
-        <location filename="utils/printreceiptgroup.cpp" line="479"/>
-        <source>Printed</source>
-        <translation>Տպված</translation>
+        <location filename="monitor.ui" line="183"/>
+        <source>Server</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="utils/printreceiptgroup.cpp" line="451"/>
-        <source>Payment, idram</source>
-        <translation>Վաճարում idram</translation>
+        <location filename="monitor.ui" line="189"/>
+        <source>Server port</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="utils/printreceiptgroup.cpp" line="456"/>
-        <source>Payment, TellCell</source>
-        <translation>Վճարում TellCell</translation>
+        <location filename="monitor.ui" line="220"/>
+        <source>Registration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="monitor.ui" line="239"/>
+        <source>Register</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="monitor.ui" line="246"/>
+        <source>Email</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="monitor.ui" line="256"/>
+        <source>License</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="monitor.ui" line="262"/>
+        <source>End date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="monitor.ui" line="269"/>
+        <source>Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="monitor.ui" line="282"/>
+        <source>Server version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="monitor.ui" line="294"/>
+        <source>1.0.0.0</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="monitor.cpp" line="69"/>
+        <location filename="monitor.cpp" line="78"/>
+        <location filename="monitor.cpp" line="87"/>
+        <location filename="monitor.cpp" line="185"/>
+        <location filename="monitor.cpp" line="212"/>
+        <location filename="monitor.cpp" line="238"/>
+        <source>Created</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="monitor.cpp" line="135"/>
+        <location filename="monitor.cpp" line="137"/>
+        <source>Connection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="monitor.cpp" line="135"/>
+        <source>Connection successfull</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="monitor.cpp" line="137"/>
+        <source>Connection fail</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="monitor.cpp" line="144"/>
+        <location filename="monitor.cpp" line="182"/>
+        <location filename="monitor.cpp" line="187"/>
+        <location filename="monitor.cpp" line="209"/>
+        <location filename="monitor.cpp" line="214"/>
+        <location filename="monitor.cpp" line="235"/>
+        <location filename="monitor.cpp" line="240"/>
+        <location filename="monitor.cpp" line="243"/>
+        <location filename="monitor.cpp" line="295"/>
+        <location filename="monitor.cpp" line="300"/>
+        <location filename="monitor.cpp" line="324"/>
+        <location filename="monitor.cpp" line="329"/>
+        <location filename="monitor.cpp" line="335"/>
+        <location filename="monitor.cpp" line="340"/>
+        <location filename="monitor.cpp" line="344"/>
+        <source>Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="monitor.cpp" line="144"/>
+        <source>Please, select the MariaDB installtion path</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="monitor.cpp" line="187"/>
+        <source>Server database exists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="monitor.cpp" line="214"/>
+        <source>Log database exists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="monitor.cpp" line="240"/>
+        <source>Working database exists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="monitor.cpp" line="250"/>
+        <location filename="monitor.cpp" line="255"/>
+        <source>MariaDB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="monitor.cpp" line="255"/>
+        <source>The selected directory is not valid MariaDB path</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="monitor.cpp" line="335"/>
+        <source>Cannot open file to write license information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="monitor.cpp" line="358"/>
+        <source>Expiration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="monitor.cpp" line="359"/>
+        <source>License type</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -194,63 +352,24 @@
     </message>
 </context>
 <context>
-    <name>ShopRequest</name>
+    <name>RawBalanceHistory</name>
     <message>
-        <location filename="handlers/shoprequest.cpp" line="97"/>
-        <source>Delivery address</source>
-        <translation>Առաքման հասցե</translation>
+        <location filename="raw/rawbalancehistory.cpp" line="83"/>
+        <source>Starting balance</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="handlers/shoprequest.cpp" line="100"/>
-        <source>phone</source>
-        <translation>հեռ․</translation>
-    </message>
-    <message>
-        <location filename="handlers/shoprequest.cpp" line="175"/>
-        <source>Delivery</source>
-        <translation>Առաքում</translation>
-    </message>
-    <message>
-        <location filename="handlers/shoprequest.cpp" line="196"/>
-        <source>(F)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="handlers/shoprequest.cpp" line="465"/>
-        <source>Invalid document id</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="handlers/shoprequest.cpp" line="574"/>
-        <source>Not enough materials in the store</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="handlers/shoprequest.cpp" line="684"/>
-        <source>AUTOMATICALY (%1, %2)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="handlers/shoprequest.cpp" line="813"/>
-        <location filename="handlers/shoprequest.cpp" line="823"/>
-        <source>Moved to online store</source>
-        <translation>Տեղափոխված է առաքման պահեստ</translation>
+        <location filename="raw/rawbalancehistory.cpp" line="98"/>
+        <source>Ending balance</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>SocketThread</name>
     <message>
-        <location filename="socketthread.cpp" line="327"/>
+        <location filename="socketthread.cpp" line="338"/>
         <source>Connection timeout</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>Tax</name>
-    <message>
-        <location filename="handlers/tax.cpp" line="62"/>
-        <source>(F)</source>
-        <translation>(Ֆ)</translation>
     </message>
 </context>
 </TS>

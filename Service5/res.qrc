@@ -1,5 +1,8 @@
 <RCC>
     <qresource prefix="/">
         <file>Service5.qm</file>
+        <file>res/server5.sql</file>
+        <file>res/cafe5.sql</file>
+        <file>res/airlog.sql</file>
     </qresource>
 </RCC>

@@ -50,8 +50,6 @@ SOURCES += \
     ../../XLSX/src/xlsxwriter.cpp \
     ../Cafe5/c5cafecommon.cpp \
     ../Cafe5/c5double.cpp \
-    ../Cafe5/c5license.cpp \
-    ../Cafe5/c5licensedlg.cpp \
     ../Cafe5/c5logsystem.cpp \
     ../Cafe5/c5systempreference.cpp \
     ../Cafe5/calendar.cpp \
@@ -210,8 +208,6 @@ HEADERS += \
     ../../XLSX/src/zip.h \
     ../Cafe5/c5cafecommon.h \
     ../Cafe5/c5double.h \
-    ../Cafe5/c5license.h \
-    ../Cafe5/c5licensedlg.h \
     ../Cafe5/c5logsystem.h \
     ../Cafe5/c5systempreference.h \
     ../Cafe5/calendar.h \
@@ -359,7 +355,6 @@ HEADERS += \
     dlgsearchinmenu.h
 
 FORMS += \
-    ../Cafe5/c5licensedlg.ui \
     ../Cafe5/calendar.ui \
     ../Classes/c5gridgilter.ui \
     ../Classes/calculator.ui \
@@ -436,7 +431,7 @@ DISTFILES += \
 
 LIBS += -lVersion
 LIBS += -lwsock32
-LIBS += -LC:/Soft/OpenSSL-Win32/lib
+LIBS += -LC:/Soft/OpenSSL-Win64/lib
 LIBS += -lopenssl
 LIBS += -llibcrypto
 

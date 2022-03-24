@@ -9,6 +9,7 @@ class QTableView;
 
 class C5TableModel : public QAbstractTableModel
 {
+    Q_OBJECT
 public:
     C5TableModel(const QStringList &dbParams, QObject *parent = 0);
 

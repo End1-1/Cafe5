@@ -1,16 +1,12 @@
 #include "requestmanager.h"
-#include "authentication.h"
-#include "registration.h"
-#include "notfound.h"
-#include "forbidden.h"
-#include "confirmregistration.h"
-#include "shoprequest.h"
-#include "storerequest.h"
-#include "chat.h"
-#include "jzstore.h"
-#include "tax.h"
+#include "logwriter.h"
+#include "database.h"
 #include <QMutex>
 #include <QElapsedTimer>
+#include <QDir>
+#include <QApplication>
+#include <QLibrary>
+#include <QDebug>
 
 static QMutex fMutex;
 
@@ -24,81 +20,65 @@ RequestManager::RequestManager()
 void RequestManager::init()
 {
     fInstance = new RequestManager();
-    fInstance->fHandlers.insert("/register", QList<RequestHandler*>());
-    fInstance->fHandlers.insert("/confirmregistration", QList<RequestHandler*>());
-    fInstance->fHandlers.insert("/authentication", QList<RequestHandler*>());
-    fInstance->fHandlers.insert("/notfound", QList<RequestHandler*>());
-    fInstance->fHandlers.insert("/storerequest", QList<RequestHandler*>());
-    fInstance->fHandlers.insert("/shoprequest", QList<RequestHandler*>());
-    fInstance->fHandlers.insert("/jzstore", QList<RequestHandler*>());
-    fInstance->fHandlers.insert("/chat", QList<RequestHandler*>());
-    fInstance->fHandlers.insert("/printtax", QList<RequestHandler*>());
-}
-
-RequestHandler *RequestManager::getHandler(const QString &route)
-{
-    if (!fInstance->fHandlers.contains(route)) {
-        NotFound *rh = new NotFound(route);
-        return rh;
+    QDir dir(qApp->applicationDirPath() + "/handlers");
+    QStringList dll = dir.entryList(QStringList() << "*.dll", QDir::Files);
+    for (auto &s: dll) {
+        QLibrary *l = new QLibrary(qApp->applicationDirPath() + "/handlers/" + s);
+        if (!l->load()) {
+            l->deleteLater();
+            continue;
+        }
+        dllroutes dr = reinterpret_cast<dllroutes>(l->resolve("routes"));
+        if (!dr) {
+            l->deleteLater();
+            continue;
+        }
+        QStringList sl;
+        dr(sl);
+        if (sl.count() == 0) {
+            l->deleteLater();
+            continue;
+        }
+        for (const QString &r: sl) {
+            fInstance->fRouteDll[r] = s;
+            handle_route h = reinterpret_cast<handle_route>(l->resolve(r.toLatin1().data()));
+            fInstance->fRouteFunction.insert(r, h);
+        }
     }
-    return fInstance->findHandler(route);
+    qDebug() << fInstance->fRouteFunction;
 }
 
-void RequestManager::releaseHandler(RequestHandler *rh)
+handle_route RequestManager::getRouteHandler(const QString &route)
 {
-//    QMutexLocker ml(&fMutex);
-//    rh->setIdle(true);
-    delete rh;
+    if (fInstance->fRouteFunction.contains(route)) {
+        return fInstance->fRouteFunction[route];
+    }
+    return 0;
 }
 
-RequestHandler *RequestManager::findHandler(const QString &route)
+void RequestManager::handle(const QString &session, const QString &remoteHost, const QString &r, const QByteArray &indata, QByteArray &outdata, const QHash<QString, DataAddress> &dataMap, ContentType contentType)
 {
-//    QElapsedTimer t;
-//    t.start();
+    handle_route hr = getRouteHandler(r);
+    if (!hr) {
+        hr = getRouteHandler("notfound");
+        QByteArray ba = r.toUtf8();
+        hr(ba, outdata, dataMap, ContentType::TextHtml);
+        return;
+    }
+    QElapsedTimer et;
+    et.start();
+    hr(indata, outdata, dataMap, contentType);
 
-//    QMutexLocker ml(&fMutex);
-//    QList<RequestHandler*> &l = fHandlers[route];
-//    RequestHandler *result = nullptr;
-//    for (RequestHandler *r: l) {
-//        if (!result) {
-//            if (r->idle()) {
-//                r->setIdle(false);
-//                result = r;
-//            }
-//        } else {
-
-//        }
-//    }
-
-
-    RequestHandler *rh = createHandler(route);
-    //l.append(rh);
-    return rh;
-}
-
-RequestHandler *RequestManager::createHandler(const QString &route)
-{
-    RequestHandler *rh = nullptr;
-    if (route == "/authentication") {
-        rh = new Authentication();
-    } else if (route == "/register") {
-        rh = new Registration();
-    } else if (route == "/confirmregistration") {
-        rh = new ConfirmRegistration();
-    } else if (route == "/storerequest") {
-        rh = new StoreRequest();
-    } else if (route == "/shoprequest") {
-        rh = new ShopRequest();
-    } else if (route == "/notfound") {
-        rh = new NotFound(route);
-    } else if (route == "/jzstore") {
-        rh = new JZStore();
-    } else if (route == "/chat") {
-        rh = new Chat();
-    } else if (route == "/printtax") {
-        rh = new Tax();
+    int ms = et.elapsed();
+    Database db;
+    if (db.open("./config.ini")) {
+        db[":fdate"] = QDate::currentDate();
+        db[":ftime"] = QTime::currentTime();
+        db[":fhost"] = remoteHost;
+        db[":felapsed"] = ms;
+        db[":froute"] = r;
+        db.insert("system_requests");
     } else {
-        rh = new NotFound(route);
+        LogWriter::write(LogWriterLevel::errors, session, db.lastDbError());
     }
-    return rh;
 }

@@ -85,6 +85,7 @@
 #define param_shop_deny_qtychange 81
 #define param_shop_print_dontgroup 82
 #define param_debuge_mode 83
+#define param_idram_server 84
 
 #define FRONTDESK_WAITER 0
 #define FRONTDESK_SHOP 1

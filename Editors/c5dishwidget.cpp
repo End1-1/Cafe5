@@ -170,7 +170,7 @@ bool C5DishWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
         db[":f_dish"] = ui->leCode->getInteger();
         db[":f_price"] = ui->tblPricing->lineEdit(i, 3)->getDouble();
         db[":f_menu"] = ui->tblPricing->getInteger(i, 1);
-        db[":f_store"] = ui->tblPricing->comboBox(i, 4)->currentIndex() > -1 ? ui->tblPricing->comboBox(i, 4)->currentData() : "null";
+        db[":f_store"] = ui->tblPricing->comboBox(i, 4)->currentIndex() > -1 ? ui->tblPricing->comboBox(i, 4)->currentData() : QVariant();
         db[":f_print1"] = ui->tblPricing->comboBox(i, 5)->currentText();
         db[":f_print2"] = ui->tblPricing->comboBox(i, 6)->currentText();
         db[":f_state"] = ui->tblPricing->checkBox(i, 7)->isChecked() ? 1 : 0;

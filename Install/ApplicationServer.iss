@@ -25,7 +25,6 @@ SolidCompression=yes
 WizardStyle=modern
 
 [Files]
-
 Source: "C:\build\Install_Cafe5_x64\cert.pem"; DestDir: "{app}"; Flags: onlyifdoesntexist
 Source: "C:\build\Install_Cafe5_x64\key.pem"; DestDir: "{app}"; Flags: onlyifdoesntexist
 Source: "C:\build\Install_Cafe5_x64\Qt5Core.dll"; DestDir: "{app}"; Flags: onlyifdoesntexist

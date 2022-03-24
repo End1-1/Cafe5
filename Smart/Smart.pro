@@ -121,6 +121,9 @@ SOURCES += \
     ../DbData/dbtables.cpp \
     ../DbData/dbunit.cpp \
     ../DbData/dbusers.cpp \
+    ../Forms/touchdlgphonenumber.cpp \
+    ../Forms/touchentertaxreceiptnumber.cpp \
+    ../Forms/touchselecttaxreport.cpp \
     ../Shop/printreceipt.cpp \
     ../Shop/printreceiptgroup.cpp \
     ../Shop/selectprinters.cpp \
@@ -236,6 +239,9 @@ HEADERS += \
     ../DbData/dbtables.h \
     ../DbData/dbunit.h \
     ../DbData/dbusers.h \
+    ../Forms/touchdlgphonenumber.h \
+    ../Forms/touchentertaxreceiptnumber.h \
+    ../Forms/touchselecttaxreport.h \
     ../Service/servicecommands.h \
     ../Shop/printreceipt.h \
     ../Shop/printreceiptgroup.h \
@@ -271,6 +277,9 @@ FORMS += \
     ../Classes/dlgpassword.ui \
     ../Classes/notificationwidget.ui \
     ../Classes/rkeyboard.ui \
+    ../Forms/touchdlgphonenumber.ui \
+    ../Forms/touchentertaxreceiptnumber.ui \
+    ../Forms/touchselecttaxreport.ui \
     ../Shop/selectprinters.ui \
     payment.ui \
     supplier.ui \
@@ -289,6 +298,7 @@ INCLUDEPATH += c:/projects/cafe5/Classes
 INCLUDEPATH += c:/projects/cafe5/Controls
 INCLUDEPATH += c:/projects/cafe5/Service
 INCLUDEPATH += c:/projects/cafe5/DbData
+INCLUDEPATH += c:/projects/cafe5/Forms
 INCLUDEPATH += c:/Projects/NewTax/Src
 INCLUDEPATH += C:/Soft/OpenSSL-Win32/include
 INCLUDEPATH += C:/Soft/OpenSSL-Win32/include/openssl
