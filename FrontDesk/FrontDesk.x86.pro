@@ -34,8 +34,6 @@ DEFINES += FRONTDESK
 SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../../NewTax/Src/printtaxn.cpp \
     ../Cafe5/c5double.cpp \
-    ../Cafe5/c5license.cpp \
-    ../Cafe5/c5licensedlg.cpp \
     ../Cafe5/c5replication.cpp \
     ../Cafe5/c5systempreference.cpp \
     ../Classes/c5crypt.cpp \
@@ -283,13 +281,20 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../../XLSX/src/xlsxstyles.cpp \
     ../../XLSX/src/xlsxtheme.cpp \
     ../../XLSX/src/xlsxworkbook.cpp \
-    ../../XLSX/src/xlsxwriter.cpp
+    ../../XLSX/src/xlsxwriter.cpp \
+    ../Classes/c5logtoserverthread.cpp \
+    ../Reports/cr5debtstopartnerfilter.cpp \
+    ../Reports/cr5goodsreservations.cpp \
+    ../Reports/cr5goodsreservationsfilter.cpp \
+    ../Forms/dlgreservgoods.cpp \
+    ../Forms/dlgsetwaiterordercl.cpp \
+    ../Classes/dataonline.cpp \
+    ../Forms/dlgdataonline.cpp \
+    ../Forms/dlgnewcl.cpp
 
 HEADERS += ../Cafe5/c5cafecommon.h \
     ../../NewTax/Src/printtaxn.h \
     ../Cafe5/c5double.h \
-    ../Cafe5/c5license.h \
-    ../Cafe5/c5licensedlg.h \
     ../Cafe5/c5replication.h \
     ../Cafe5/c5systempreference.h \
     ../Classes/barcode5.h \
@@ -545,10 +550,18 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../../XLSX/src/xlsxtheme.h \
     ../../XLSX/src/xlsxworkbook.h \
     ../../XLSX/src/xlsxwriter.h \
-    ../../XLSX/src/zip.h
+    ../../XLSX/src/zip.h \
+    ../Classes/c5logtoserverthread.h \
+    ../Reports/cr5debtstopartnerfilter.h \
+    ../Reports/cr5goodsreservations.h \
+    ../Reports/cr5goodsreservationsfilter.h \
+    ../Forms/dlgreservgoods.h \
+    ../Forms/dlgsetwaiterordercl.h \
+    ../Classes/dataonline.h \
+    ../Forms/dlgdataonline.h \
+    ../Forms/dlgnewcl.h
 
 FORMS += \
-    ../Cafe5/c5licensedlg.ui \
     ../Classes/calculator.ui \
     ../Classes/notificationwidget.ui \
     ../Controls/c5tablewithtotal.ui \
@@ -656,7 +669,13 @@ FORMS += \
     c5toolbarwidget.ui \
     dlgchangeoutputstore.ui \
     dlgexportsaletoasoptions.ui \
-    dlgstoreutils.ui
+    dlgstoreutils.ui \
+    ../Reports/cr5debtstopartnerfilter.ui \
+    ../Reports/cr5goodsreservationsfilter.ui \
+    ../Forms/dlgreservgoods.ui \
+    ../Forms/dlgsetwaiterordercl.ui \
+    ../Forms/dlgdataonline.ui \
+    ../Forms/dlgnewcl.ui
 
 INCLUDEPATH += ../Cafe5
 INCLUDEPATH += ../Cache

@@ -40,12 +40,6 @@ int main(int argc, char *argv[])
         d.mkpath(d.homePath() + "/" + _APPLICATION_ + "/logs");
     }
     ls(QObject::tr("Application start"));
-    QString err;
-    if (!C5License::isOK(err)) {
-        ls(QObject::tr("License check failed"));
-        QMessageBox::critical(0, QObject::tr("Application error"), err);
-        return 0;
-    }
 
     a.setStyle(QStyleFactory::create("fusion"));
     QFile styleSheet("./styles.qss");

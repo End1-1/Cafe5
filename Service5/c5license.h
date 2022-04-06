@@ -23,7 +23,7 @@ public:
         QByteArray outData;
         C5Crypt c;
         c.ede3_cbc(src, outData, c.driveKey(), false);
-        QStringList licenseData = QString(outData).split(";", Qt::SkipEmptyParts);
+        QStringList licenseData = QString(outData).split(";", QString::SkipEmptyParts);
         if (licenseData.count() != 4) {
             return false;
         }

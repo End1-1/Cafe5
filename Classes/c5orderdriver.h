@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QMap>
+#include <QVariant>
 
 #define va(x) QVariant(x)
 

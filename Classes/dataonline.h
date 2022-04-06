@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QHash>
+#include <QVariant>
 
 #define dbo(t, f, i) DataOnline::instance(fDBParams)->value(t, f, i)
 #define dbo_int(t, f, i) dbo(t, f, i).toInteger()

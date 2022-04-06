@@ -4,6 +4,9 @@
 #include <QAbstractTableModel>
 #include <QSet>
 #include <QColor>
+#include <QHash>
+#include <QVariant>
+#include <QFont>
 
 class QTableView;
 

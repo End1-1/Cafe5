@@ -490,11 +490,11 @@ void Sales::printpreview()
 {
     QString reportAdditionalTitle = tr("Sales by group");
     QString fLabel = dbhall->name(__c5config.defaultHall()) + "," + dbstore->name(__c5config.defaultStore());
-    QFont font(font());
-    font.setPointSize(20);
+    QFont fo(font());
+    fo.setPointSize(20);
     C5Printing p;
     QSize paperSize(2000, 2800);
-    p.setFont(font);
+    p.setFont(fo);
     int page = p.currentPageIndex();
     int startFrom = 0;
     bool stopped = false;

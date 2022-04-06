@@ -42,8 +42,6 @@ SOURCES += \
     ../../XLSX/src/xlsxwriter.cpp \
     ../Cafe5/c5cafecommon.cpp \
     ../Cafe5/c5double.cpp \
-    ../Cafe5/c5license.cpp \
-    ../Cafe5/c5licensedlg.cpp \
     ../Cafe5/c5logsystem.cpp \
     ../Cafe5/c5replication.cpp \
     ../Cafe5/c5serverhandler.cpp \
@@ -184,8 +182,6 @@ HEADERS += \
     ../../XLSX/src/zip.h \
     ../Cafe5/c5cafecommon.h \
     ../Cafe5/c5double.h \
-    ../Cafe5/c5license.h \
-    ../Cafe5/c5licensedlg.h \
     ../Cafe5/c5logsystem.h \
     ../Cafe5/c5replication.h \
     ../Cafe5/c5serverhandler.h \
@@ -311,7 +307,6 @@ HEADERS += \
     ../Controls/c5checkbox.h
 
 FORMS += \
-    ../Cafe5/c5licensedlg.ui \
     ../Cafe5/calendar.ui \
     ../Cafe5/dlgexitbyversion.ui \
     ../Classes/c5gridgilter.ui \

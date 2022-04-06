@@ -324,14 +324,14 @@ void Working::addGoods(QString &code)
     if (!w) {
         return;
     }
-    if (code.at(0).toLower() == "?" ) {
-        if (code.at(1).toLower() == "c") {
+    if (code.at(0).toLower() == '?' ) {
+        if (code.at(1).toLower() == 'c') {
             code.remove(0, 2);
             w->fixCostumer(code);
             return;
         }
     }
-    if (code.at(0).toLower() == "/") {
+    if (code.at(0).toLower() == '/') {
         code.remove(0, 1);
         w->discountRow(code);
         return;
