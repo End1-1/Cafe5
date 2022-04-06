@@ -53,16 +53,18 @@ void CR5MfDaily::loadDoc(const QDate &date)
     ui->wt->clearTables();
     C5Database db(fDBParams);
     db[":f_date"] = date;
-    db.exec("select m.f_id, concat(u.f_last, ' ', u.f_first) as f_name, m.f_worker "
+    db.exec("select m.f_id, u.f_teamlead, concat(u.f_last, ' ', u.f_first) as f_name, m.f_worker "
         "from mf_daily_workers m "
         "inner join s_user u on u.f_id=m.f_worker "
         "where f_date=:f_date order by m.f_id ");
+    QSet<int> teamlead;
     while (db.nextRow()) {
         QListWidgetItem *item = new QListWidgetItem(ui->lstWorkers);
         item->setText(db.getString("f_name"));
         item->setData(Qt::UserRole, db.getInt("f_id"));
         item->setData(Qt::UserRole + 1, db.getInt("f_worker"));
         ui->lstWorkers->addItem(item);
+        teamlead.insert(db.getInt("f_teamlead"));
     }
     db[":f_date"] = date;
     QString sql = "select p.f_id, pr.f_name as f_productname, ac.f_name as f_processname, "
@@ -87,6 +89,11 @@ void CR5MfDaily::loadDoc(const QDate &date)
     }
     ui->lstWorkers->setCurrentRow(row);
     connect(ui->lstWorkers, SIGNAL(currentRowChanged(int)), this, SLOT(on_lstWorkers_currentRowChanged(int)));
+    ui->lstTeamlead->clear();
+    QListWidgetItem *litem = new QListWidgetItem(ui->lstTeamlead);
+    item->setText(tr("All"));
+    item->setData(Qt::UserRole, 0);
+    ui->lstTeamlead->addItem(litem);
 }
 
 void CR5MfDaily::addWorker()
@@ -229,4 +236,11 @@ void CR5MfDaily::on_leDate_returnPressed()
 {
     ui->lstWorkers->setCurrentRow(-1);
     loadDoc(ui->leDate->date());
+}
+
+void CR5MfDaily::on_lstTeamlead_itemClicked(QListWidgetItem *item)
+{
+    for (int i = 0; i < ui->lstWorkers->count(); i++) {
+        ui->lstWorkers->setRowHidden(i, item->data(Qt::UserRole).toInt() == ui->lstWorkers->item(i)->data(Qt::UserRole).toInt());
+    }
 }

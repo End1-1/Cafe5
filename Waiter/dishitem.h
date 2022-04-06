@@ -27,6 +27,12 @@ public:
 
     int index();
 
+    void setCheckMode(bool v);
+
+    void setChecked(bool v);
+
+    bool isChecked();
+
     void setReadyOnly(bool v);
 
 protected:
@@ -34,8 +40,6 @@ protected:
 
 private slots:
     void on_btnDish_clicked();
-
-    void on_btnReprint_clicked();
 
 private:
     Ui::DishItem *ui;

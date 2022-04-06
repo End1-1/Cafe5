@@ -66,6 +66,8 @@ private:
 
     int fView;
 
+    virtual void showEvent(QShowEvent *e) override;
+
     void filterHall(int hall, int staff);
 
     void colorizeHall();

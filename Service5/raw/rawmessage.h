@@ -25,6 +25,7 @@ public:
     void putString(const QString &v);
     void putBytes(const char *data, quint32 size);
     void readUByte(quint8 &i, const QByteArray &d);
+    void readUShort(quint16 &i, const QByteArray &d);
     void readUInt(quint32 &i, const QByteArray &d);
     void readDouble(double &v, const QByteArray &d);
     void readString(QString &s, const QByteArray &d);

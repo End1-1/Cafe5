@@ -11,10 +11,9 @@ CONFIG += c++11
 RC_FILE = res.rc
 
 SOURCES += \
-    ../../NewTax/Src/printtax.cpp \
-    ../../NewTax/Src/printtaxn.cpp \
     ../Classes/c5crypt.cpp \
     c5license.cpp \
+    raw/rawdllop.cpp \
     utils/configini.cpp \
     utils/database.cpp \
     utils/databaseconnectionmanager.cpp \
@@ -46,13 +45,13 @@ SOURCES += \
     socketthread.cpp \
     thread.cpp \
     threadworker.cpp \
-    utils/logwriter.cpp
+    utils/logwriter.cpp \
+    utils/os.cpp
 
 HEADERS += \
-    ../../NewTax/Src/printtax.h \
-    ../../NewTax/Src/printtaxn.h \
     ../Classes/c5crypt.h \
     c5license.h \
+    raw/rawdllop.h \
     utils/configini.h \
     utils/database.h \
     utils/databaseconnectionmanager.h \
@@ -88,6 +87,7 @@ HEADERS += \
     thread.h \
     threadworker.h \
     utils/logwriter.h \
+    utils/os.h
 
 FORMS += \
     ../Cafe5/c5message.ui \

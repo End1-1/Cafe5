@@ -59,18 +59,14 @@ private slots:
 
     void on_btnWorkersInOut_clicked();
 
-    void on_btnManagerToosl_clicked();
+    void on_btnManagerTools_clicked();
 
 private:
     Ui::DlgScreen *ui;
 
     QTcpServer fTcpServer;
 
-    int fMode;
-
     void tryExit();
-
-    void colorize(int mode);
 };
 
 #endif // DLGSCREEN_H

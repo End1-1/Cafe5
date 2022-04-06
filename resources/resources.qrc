@@ -55,5 +55,11 @@
         <file>letter-z.png</file>
         <file>discard.png</file>
         <file>return_receipt.png</file>
+        <file>arca.png</file>
+        <file>money.png</file>
+        <file>idram.png</file>
+        <file>fiscal.png</file>
+        <file>main-menu.png</file>
+        <file>receipt.png</file>
     </qresource>
 </RCC>

@@ -9,6 +9,7 @@ class WOrder;
 
 class C5OrderDriver;
 class DlgOrder;
+class DishItem;
 
 class WOrder : public QWidget
 {
@@ -21,7 +22,11 @@ public:
 
     void setDlg(DlgOrder *dlg);
 
-    void itemsToTable();
+    void updateDishes();
+
+    void checkAllItems(bool v);
+
+    QList<int> checkedItems();
 
     int addItem(int menuid, const QString &comment, double price = 0.0);
 
@@ -35,9 +40,9 @@ public:
 
     bool isSelected();
 
-    bool isReprintMode();
+    void setCheckMode(bool v);
 
-    void setReprintMode(bool v);
+    DishItem *dishWidget(int i);
 
     C5OrderDriver *fOrderDriver;
 
@@ -47,6 +52,8 @@ private:
     DlgOrder *fDlg;
 
     bool fSelected;
+
+    QList<DishItem*> fItems;
 
     void setChanges();
 

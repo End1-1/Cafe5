@@ -6,6 +6,7 @@
 #include "rawregisterphone.h"
 #include "rawregistersms.h"
 #include "rawbalancehistory.h"
+#include "rawdllop.h"
 #include "rawsilentauth.h"
 #include "rawmonitor.h"
 #include "rawcarnear.h"
@@ -62,6 +63,9 @@ void RawHandler::run(quint32 msgNum, quint32 msgId, qint16 msgType, const QByteA
         break;
     case MessageList::car_near:
         r = new RawCarNear(fSocket);
+        break;
+    case MessageList::dll_op:
+        r = new RawDllOp(fSocket);
         break;
     default:
         LogWriter::write(LogWriterLevel::errors, property("session").toString(), QString("Unknown raw command received: %1").arg(msgType));

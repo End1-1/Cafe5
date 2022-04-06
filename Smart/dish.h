@@ -17,6 +17,7 @@ struct Dish {
     double cost;
     int color;
     int package;
+    int quick;
     QString packageName;
     Dish() {
         id = 0;
@@ -26,6 +27,7 @@ struct Dish {
         qty = 1;
         color = -1;
         package = 0;
+        quick = 0;
     }
 };
 Q_DECLARE_METATYPE(Dish*)

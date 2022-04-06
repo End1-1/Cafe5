@@ -4,12 +4,12 @@
 <context>
     <name>C5Message</name>
     <message>
-        <location filename="../../Cafe5/c5message.ui" line="124"/>
+        <location filename="../../Cafe5/c5message.ui" line="127"/>
         <source>OK</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Cafe5/c5message.ui" line="137"/>
+        <location filename="../../Cafe5/c5message.ui" line="140"/>
         <source>Cancel</source>
         <translation></translation>
     </message>

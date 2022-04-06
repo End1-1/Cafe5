@@ -27,21 +27,13 @@ public:
     virtual void reject() override;
 
 private slots:
-    void setQty();
-
-    void changeQty();
-
     void removeDish();
 
     void on_tblPart2_itemClicked(QTableWidgetItem *item);
 
-    void on_tblDishes_itemClicked(QTableWidgetItem *item);
-
     void on_btnCheckout_clicked();
 
     void on_btnClearFilter_clicked();
-
-    void on_btnExit_clicked();
 
     void on_btnPartUp_clicked();
 
@@ -53,12 +45,6 @@ private slots:
 
     void on_btnAny_clicked();
 
-    void on_btnPrintReport_clicked();
-
-    void on_btnPrintReport2_clicked();
-
-    void on_btnSupplier_clicked();
-
     void on_btnShowPackages_clicked();
 
     void on_btnShowDishes_clicked();
@@ -67,13 +53,33 @@ private slots:
 
     void on_leReadCode_returnPressed();
 
-    void on_btnPrintByOrder_clicked();
-
     void on_btnCostumer_clicked();
 
-    void on_btnPrintTaxZ_clicked();
+    void on_tblDishes_cellClicked(int row, int column);
 
-    void on_btnCancelTax_clicked();
+    void on_btnP1_clicked();
+
+    void on_btnM1_clicked();
+
+    void on_btnP05_clicked();
+
+    void on_tblOrder_cellClicked(int row, int column);
+
+    void on_btnVoid_clicked();
+
+    void on_btnSetCash_clicked();
+
+    void on_btnSetCard_clicked();
+
+    void on_btnSetIdram_clicked();
+
+    void on_btnSetOther_clicked();
+
+    void on_btnReceived_clicked();
+
+    void on_leReceived_textChanged(const QString &arg1);
+
+    void on_btnAppMenu_clicked();
 
 private:
     Ui::Workspace *ui;
@@ -81,6 +87,8 @@ private:
     C5User *fUser;
 
     QList<Dish*> fDishes;
+
+    QString fOrderUuid;
 
     int fCustomer;
 
@@ -100,19 +108,21 @@ private:
 
     double fDiscountAmount;
 
+    void saveOrder();
+
+    bool printTax(double cardAmount);
+
+    bool printReceipt(bool printSecond);
+
+    void setQty(double qty, int mode);
+
     void setCustomerPhoneNumber(const QString &number);
-
-    bool currentDish(Dish &d);
-
-    void setCurrentDish(Dish &d);
 
     void filter();
 
     void countTotal();
 
     void resetOrder();
-
-    void printReport(const QDate &d1, const QDate &d2);
 
     void stretchTableColumns(QTableWidget *t);
 

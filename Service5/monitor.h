@@ -21,6 +21,9 @@ private slots:
     void on_btnCreateDatabases_clicked();
     void on_btnSetMariaDBInstallationPath_clicked();
     void on_btnRegister_clicked();
+    void on_btnStopServer_clicked();
+    void on_btnStartServer_clicked();
+    void on_btnRestartServer_clicked();
 
 private:
     Ui::Monitor *ui;

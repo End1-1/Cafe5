@@ -12,6 +12,7 @@ CE5User::CE5User(const QStringList &dbParams, QWidget *parent) :
     ui->leState->setSelector(dbParams, ui->leStateName, cache_users_states);
     ui->leGroup->setSelector(dbParams, ui->leGroupName, cache_users_groups);
     ui->leConfig->setSelector(dbParams, ui->leConfigName, cache_settings_names);
+    ui->leTeamLead->setSelector(dbParams, ui->leTeamLeadname, cache_users);
 }
 
 CE5User::~CE5User()

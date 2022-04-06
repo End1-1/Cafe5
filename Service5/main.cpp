@@ -72,9 +72,6 @@ void __cdecl main(int argc, char *argv[])
     APPDIR = QFileInfo(QString(argv[0])).path() + "/";
     ConfigIni::init(APPDIR);
     LogWriter::fCurrentLevel = 100;
-    LogWriter::setFile(LogWriterLevel::verbose, QString("%1/%2/%3/Logs/%4_verbose.log").arg(QDir::tempPath()).arg(_APPLICATION_).arg(_MODULE_).arg(QDate::currentDate().toString("dd_MM_yyyy")));
-    LogWriter::setFile(LogWriterLevel::warning, QString("%1/%2/%3/Logs/%4_warning.log").arg(QDir::tempPath()).arg(_APPLICATION_).arg(_MODULE_).arg(QDate::currentDate().toString("dd_MM_yyyy")));
-    LogWriter::setFile(LogWriterLevel::errors, QString("%1/%2/%3/Logs/%4_error.log").arg(QDir::tempPath()).arg(_APPLICATION_).arg(_MODULE_).arg(QDate::currentDate().toString("dd_MM_yyyy")));
     LogWriter::write(LogWriterLevel::verbose, "", "Service started");
 
     if (QString(argv[1]).toLocal8Bit() == "gui") {

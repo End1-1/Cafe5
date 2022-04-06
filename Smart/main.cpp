@@ -50,6 +50,10 @@ int main(int argc, char *argv[])
     }
     QFont f("Arial LatArm Unicode", 10);
     qApp->setFont(f);
+    QFile styleFile(qApp->applicationDirPath() + "/smartstyle.css");
+    if (styleFile.open(QIODevice::ReadOnly)) {
+        a.setStyleSheet(styleFile.readAll());
+    }
     QList<QByteArray> connectionParams;
     C5Connection::readParams(connectionParams);
     C5Config::fDBHost = connectionParams.at(0);

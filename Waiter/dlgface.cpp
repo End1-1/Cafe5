@@ -69,24 +69,6 @@ void DlgFace::setup()
 //    sh = createSocketHandler(SLOT(handleDishComment(QJsonObject)));
 //    sh->bind("cmd", sm_dishcomment);
 //    sh->send();
-
-    for (int id: dbhall->list()) {
-        if (fModeJustSelectTable) {
-            if (dbhall->booking(id)) {
-                continue;
-            }
-        }
-        QPushButton *btn = new QPushButton(dbhall->name(id));
-        btn->setMinimumSize(QSize(140, 60));
-        btn->setProperty("id", id);
-        connect(btn, &QPushButton::clicked, this, &DlgFace::hallClicked);
-        ui->vlHall->addWidget(btn);
-    }
-    filterHall(__c5config.defaultHall(), 0);
-    refreshTables();
-    if (!fModeJustSelectTable) {
-        C5LogToServerThread::remember(LOG_WAITER, "", "", "", "", "Program started", "", "");
-    }
 }
 
 bool DlgFace::getTable(int &tableId, int hall, C5User *user)
@@ -301,8 +283,13 @@ void DlgFace::filterHall(int hall, int staff)
         ui->sglHall->itemAt(0)->widget()->deleteLater();
         ui->sglHall->removeItem(ui->sglHall->itemAt(0));
     }
-    QRect scr = qApp->desktop()->screenGeometry();
-    int cc = scr.width() > 1024 ? 4 : 3;
+    QRect f = qApp->desktop()->screen()->geometry();
+    int sw = ui->shall->width() - 20;
+    int cc = (sw / 204) - 1;
+    int delta = sw - ((cc + 1) * 204);
+    delta /= cc;
+    int minWidth = 200 + delta;
+    qDebug() << sw;
     int col = 0;
     int row = 0;
     for (int id: dbtable->list()) {
@@ -324,6 +311,8 @@ void DlgFace::filterHall(int hall, int staff)
             ui->sglHall->addWidget(t, row, col++, 1, 1);
         } else {
             TableWidgetV1 *t = new TableWidgetV1();
+            t->setMinimumWidth(minWidth);
+            t->setMaximumWidth(minWidth);
             connect(t, &TableWidgetV1::clicked, this, &DlgFace::tableClicked);
             t->config(id);
             t->configOrder(dboheader->fTableOrder.contains(id) ? dboheader->fTableOrder[id] : "");
@@ -415,6 +404,31 @@ void DlgFace::on_btnViewHall_clicked()
 void DlgFace::on_btnViewWaiter_clicked()
 {
     setViewMode(view_mode_waiter);
+}
+
+void DlgFace::showEvent(QShowEvent *e)
+{
+    QWidget::showEvent(e);
+    if (e->spontaneous()) {
+        return;
+    }
+    for (int id: dbhall->list()) {
+        if (fModeJustSelectTable) {
+            if (dbhall->booking(id)) {
+                continue;
+            }
+        }
+        QPushButton *btn = new QPushButton(dbhall->name(id));
+        btn->setMinimumSize(QSize(140, 60));
+        btn->setProperty("id", id);
+        connect(btn, &QPushButton::clicked, this, &DlgFace::hallClicked);
+        ui->vlHall->addWidget(btn);
+    }
+    filterHall(__c5config.defaultHall(), 0);
+    refreshTables();
+    if (!fModeJustSelectTable) {
+        C5LogToServerThread::remember(LOG_WAITER, "", "", "", "", "Program started", "", "");
+    }
 }
 
 void DlgFace::filterStaffClicked()

@@ -10,11 +10,6 @@
 #include "dlgmanagertools.h"
 #include <QTimer>
 
-#define mode_hall 1
-#define mode_system 2
-#define mode_inout 3
-#define mode_manager_tools 4
-
 DlgScreen::DlgScreen() :
     C5Dialog(__c5config.dbParams()),
     ui(new Ui::DlgScreen)
@@ -22,7 +17,6 @@ DlgScreen::DlgScreen() :
     ui->setupUi(this);
     connect(&fTcpServer, SIGNAL(newConnection()), this, SLOT(newConnection()));
     fTcpServer.listen(QHostAddress::Any, 1000);
-    colorize(mode_hall);
 
     QTimer *t = new QTimer(this);
     connect(t, &QTimer::timeout, this, &DlgScreen::timerTimeout);
@@ -156,8 +150,7 @@ void DlgScreen::on_btnAccept_clicked()
 {
     QString pass = ui->lePassword->text().replace(";", "").replace("?", "");
     ui->lePassword->clear();
-    switch (fMode) {
-    case mode_hall: {
+    if (ui->btnHall->isChecked()) {
         C5User u(pass);
         if (!u.isValid()) {
             C5Message::error(u.error());
@@ -182,9 +175,7 @@ void DlgScreen::on_btnAccept_clicked()
         DlgFace d(&u);
         d.setup();
         d.exec();
-        break;
-    }
-    case mode_system: {
+    } else if (ui->btnSystem->isChecked()) {
         if (pass.isEmpty()) {
             DlgSystem d(C5Config::dbParams());
             if (!__c5config.dbParams().at(3).isEmpty()) {
@@ -198,9 +189,7 @@ void DlgScreen::on_btnAccept_clicked()
             return;
         }
         go<DlgSystem>(C5Config::dbParams());
-        break;
-    }
-    case mode_inout: {
+    } else if (ui->btnWorkersInOut->isChecked()) {
         C5User ua(0);
         if (!ua.authorize(pass)) {
             C5Message::error(ua.error());
@@ -222,9 +211,7 @@ void DlgScreen::on_btnAccept_clicked()
             }
             break;
         }
-        break;
-    }
-    case mode_manager_tools: {
+    } else if (ui->btnManagerTools->isChecked()) {
         C5User u(pass);
         if (!u.isValid()) {
             C5Message::error(u.error());
@@ -236,19 +223,12 @@ void DlgScreen::on_btnAccept_clicked()
         }
         DlgManagerTools d(&u);
         d.exec();
-        break;
-    }
     }
 }
 
 void DlgScreen::on_lePassword_returnPressed()
 {
     on_btnAccept_clicked();
-}
-
-void DlgScreen::on_btnHall_clicked()
-{
-    colorize(mode_hall);
 }
 
 void DlgScreen::tryExit()
@@ -258,30 +238,34 @@ void DlgScreen::tryExit()
     }
 }
 
-void DlgScreen::colorize(int mode)
+void DlgScreen::on_btnHall_clicked()
 {
-    fMode = mode;
-    ui->btnHall->setProperty("stylesheet_button_selected", fMode == mode_hall ? true : false);
-    ui->btnHall->style()->polish(ui->btnHall);
-    ui->btnSystem->setProperty("stylesheet_button_selected", fMode == mode_system ? true : false);
-    ui->btnSystem->style()->polish(ui->btnSystem);
-    ui->btnWorkersInOut->setProperty("stylesheet_button_selected", fMode == mode_inout ? true : false);
-    ui->btnWorkersInOut->style()->polish(ui->btnWorkersInOut);
-    ui->btnManagerToosl->setProperty("stylesheet_button_selected", fMode == mode_manager_tools ? true : false);
-    ui->btnManagerToosl->style()->polish(ui->btnManagerToosl);
-}
-
-void DlgScreen::on_btnSystem_clicked()
-{
-    colorize(mode_system);
+    ui->btnHall->setChecked(true);
+    ui->btnWorkersInOut->setChecked(false);
+    ui->btnManagerTools->setChecked(false);
+    ui->btnSystem->setChecked(false);
 }
 
 void DlgScreen::on_btnWorkersInOut_clicked()
 {
-    colorize(mode_inout);
+    ui->btnHall->setChecked(false);
+    ui->btnWorkersInOut->setChecked(true);
+    ui->btnManagerTools->setChecked(false);
+    ui->btnSystem->setChecked(false);
 }
 
-void DlgScreen::on_btnManagerToosl_clicked()
+void DlgScreen::on_btnManagerTools_clicked()
 {
-    colorize(mode_manager_tools);
+    ui->btnHall->setChecked(false);
+    ui->btnWorkersInOut->setChecked(false);
+    ui->btnManagerTools->setChecked(true);
+    ui->btnSystem->setChecked(false);
+}
+
+void DlgScreen::on_btnSystem_clicked()
+{
+    ui->btnHall->setChecked(false);
+    ui->btnWorkersInOut->setChecked(false);
+    ui->btnManagerTools->setChecked(false);
+    ui->btnSystem->setChecked(true);
 }

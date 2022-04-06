@@ -3,6 +3,7 @@
 #include <QDebug>
 
 ConfigIni *ConfigIni::fInstance = nullptr;
+QString ConfigIni::fAppPath;
 
 ConfigIni::ConfigIni()
 {
@@ -18,6 +19,7 @@ void ConfigIni::init(const QString &path)
 {
     fInstance = new ConfigIni();
     fInstance->fSettings = new QSettings(path + "/config.ini", QSettings::IniFormat);
+    fAppPath = path;
 }
 
 QString ConfigIni::value(const QString &key)

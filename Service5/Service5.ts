@@ -4,12 +4,12 @@
 <context>
     <name>C5Message</name>
     <message>
-        <location filename="../Cafe5/c5message.ui" line="124"/>
+        <location filename="../Cafe5/c5message.ui" line="127"/>
         <source>OK</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5message.ui" line="137"/>
+        <location filename="../Cafe5/c5message.ui" line="140"/>
         <source>Cancel</source>
         <translation>Հրաժարվել</translation>
     </message>
@@ -111,7 +111,7 @@
     </message>
     <message>
         <location filename="monitor.ui" line="85"/>
-        <location filename="monitor.ui" line="232"/>
+        <location filename="monitor.ui" line="259"/>
         <source>Password</source>
         <translation type="unfinished"></translation>
     </message>
@@ -139,9 +139,9 @@
         <location filename="monitor.ui" line="131"/>
         <location filename="monitor.ui" line="138"/>
         <location filename="monitor.ui" line="166"/>
-        <location filename="monitor.cpp" line="69"/>
-        <location filename="monitor.cpp" line="78"/>
-        <location filename="monitor.cpp" line="87"/>
+        <location filename="monitor.cpp" line="71"/>
+        <location filename="monitor.cpp" line="80"/>
+        <location filename="monitor.cpp" line="89"/>
         <source>Need to create</source>
         <translation type="unfinished"></translation>
     </message>
@@ -167,6 +167,11 @@
     </message>
     <message>
         <location filename="monitor.ui" line="183"/>
+        <location filename="monitor.cpp" line="380"/>
+        <location filename="monitor.cpp" line="399"/>
+        <location filename="monitor.cpp" line="401"/>
+        <location filename="monitor.cpp" line="430"/>
+        <location filename="monitor.cpp" line="432"/>
         <source>Server</source>
         <translation type="unfinished"></translation>
     </message>
@@ -176,179 +181,161 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="monitor.ui" line="220"/>
+        <location filename="monitor.ui" line="202"/>
+        <source>Stop server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="monitor.ui" line="209"/>
+        <source>Start server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="monitor.ui" line="216"/>
+        <source>Restart server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="monitor.ui" line="247"/>
         <source>Registration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="monitor.ui" line="239"/>
+        <location filename="monitor.ui" line="266"/>
         <source>Register</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="monitor.ui" line="246"/>
+        <location filename="monitor.ui" line="273"/>
         <source>Email</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="monitor.ui" line="256"/>
+        <location filename="monitor.ui" line="283"/>
         <source>License</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="monitor.ui" line="262"/>
+        <location filename="monitor.ui" line="289"/>
         <source>End date</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="monitor.ui" line="269"/>
+        <location filename="monitor.ui" line="296"/>
         <source>Type</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="monitor.ui" line="282"/>
+        <location filename="monitor.ui" line="309"/>
         <source>Server version</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="monitor.ui" line="294"/>
+        <location filename="monitor.ui" line="321"/>
         <source>1.0.0.0</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="monitor.cpp" line="69"/>
-        <location filename="monitor.cpp" line="78"/>
-        <location filename="monitor.cpp" line="87"/>
-        <location filename="monitor.cpp" line="185"/>
-        <location filename="monitor.cpp" line="212"/>
-        <location filename="monitor.cpp" line="238"/>
+        <location filename="monitor.cpp" line="71"/>
+        <location filename="monitor.cpp" line="80"/>
+        <location filename="monitor.cpp" line="89"/>
+        <location filename="monitor.cpp" line="187"/>
+        <location filename="monitor.cpp" line="214"/>
+        <location filename="monitor.cpp" line="240"/>
         <source>Created</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="monitor.cpp" line="135"/>
         <location filename="monitor.cpp" line="137"/>
+        <location filename="monitor.cpp" line="139"/>
         <source>Connection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="monitor.cpp" line="135"/>
+        <location filename="monitor.cpp" line="137"/>
         <source>Connection successfull</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="monitor.cpp" line="137"/>
+        <location filename="monitor.cpp" line="139"/>
         <source>Connection fail</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="monitor.cpp" line="144"/>
-        <location filename="monitor.cpp" line="182"/>
-        <location filename="monitor.cpp" line="187"/>
-        <location filename="monitor.cpp" line="209"/>
-        <location filename="monitor.cpp" line="214"/>
-        <location filename="monitor.cpp" line="235"/>
-        <location filename="monitor.cpp" line="240"/>
-        <location filename="monitor.cpp" line="243"/>
-        <location filename="monitor.cpp" line="295"/>
-        <location filename="monitor.cpp" line="300"/>
-        <location filename="monitor.cpp" line="324"/>
-        <location filename="monitor.cpp" line="329"/>
-        <location filename="monitor.cpp" line="335"/>
-        <location filename="monitor.cpp" line="340"/>
-        <location filename="monitor.cpp" line="344"/>
+        <location filename="monitor.cpp" line="146"/>
+        <location filename="monitor.cpp" line="184"/>
+        <location filename="monitor.cpp" line="189"/>
+        <location filename="monitor.cpp" line="211"/>
+        <location filename="monitor.cpp" line="216"/>
+        <location filename="monitor.cpp" line="237"/>
+        <location filename="monitor.cpp" line="242"/>
+        <location filename="monitor.cpp" line="245"/>
+        <location filename="monitor.cpp" line="297"/>
+        <location filename="monitor.cpp" line="302"/>
+        <location filename="monitor.cpp" line="326"/>
+        <location filename="monitor.cpp" line="331"/>
+        <location filename="monitor.cpp" line="337"/>
+        <location filename="monitor.cpp" line="342"/>
+        <location filename="monitor.cpp" line="346"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="monitor.cpp" line="144"/>
+        <location filename="monitor.cpp" line="146"/>
         <source>Please, select the MariaDB installtion path</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="monitor.cpp" line="187"/>
+        <location filename="monitor.cpp" line="189"/>
         <source>Server database exists</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="monitor.cpp" line="214"/>
+        <location filename="monitor.cpp" line="216"/>
         <source>Log database exists</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="monitor.cpp" line="240"/>
+        <location filename="monitor.cpp" line="242"/>
         <source>Working database exists</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="monitor.cpp" line="250"/>
-        <location filename="monitor.cpp" line="255"/>
+        <location filename="monitor.cpp" line="252"/>
+        <location filename="monitor.cpp" line="257"/>
         <source>MariaDB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="monitor.cpp" line="255"/>
+        <location filename="monitor.cpp" line="257"/>
         <source>The selected directory is not valid MariaDB path</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="monitor.cpp" line="335"/>
+        <location filename="monitor.cpp" line="337"/>
         <source>Cannot open file to write license information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="monitor.cpp" line="358"/>
+        <location filename="monitor.cpp" line="360"/>
         <source>Expiration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="monitor.cpp" line="359"/>
+        <location filename="monitor.cpp" line="361"/>
         <source>License type</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>PrintTax</name>
     <message>
-        <location filename="../../NewTax/Src/printtax.cpp" line="64"/>
-        <source>Socket read error</source>
-        <translation></translation>
+        <location filename="monitor.cpp" line="380"/>
+        <source>The server was stopped</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../NewTax/Src/printtax.cpp" line="72"/>
-        <source>Data read timeout</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>PrintTaxN</name>
-    <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="29"/>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="85"/>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="93"/>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="341"/>
-        <source>Connection error</source>
-        <translation>Կապի սխալ</translation>
-    </message>
-    <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="41"/>
-        <source>You should to setup cashier and pin before to use fiscal printer</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="85"/>
-        <source>Socket read error</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="93"/>
-        <source>Data read timeout</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="339"/>
-        <source>Tax error code</source>
-        <translation>ՀԴՄ սխոլի կոդ</translation>
+        <location filename="monitor.cpp" line="399"/>
+        <location filename="monitor.cpp" line="430"/>
+        <source>The server was started</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

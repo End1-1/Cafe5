@@ -18,10 +18,11 @@ DishItem::DishItem(C5OrderDriver *od, int index, QWidget *parent) :
     ui->wmodificators->setVisible(false);
     fFocus = false;
     fReadOnly = false;
+    ui->btnChecked->setVisible(false);
 
     QString name = dbdish->name(fOrder->dishesValue("f_dish", fIndex).toInt());
     if (od->dishesValue("f_fromtable", index).toInt() > 0) {
-        name = QString("(%1) %2").arg(dbtable->name(od->dishesValue("f_fromtable", index).toInt())).arg(name);
+        name = QString("(%1) %2").arg(dbtable->name(od->dishesValue("f_fromtable", index).toInt()), name);
     }
     ui->btnDish->setText(name);
     setChanges();
@@ -57,7 +58,7 @@ void DishItem::setChanges()
         ui->lbComment->setVisible(!ui->lbComment->text().isEmpty());
         ui->lbTotal->setText(float_str(fOrder->dishTotal2(fIndex), 2));
         if (fOrder->dishesValue("f_state", fIndex) == DISH_STATE_OK) {
-            ui->lbQty1->setProperty("state", fOrder->dishesValue("f_qty2", fIndex).toDouble() > 0.001 ? "1" : "");
+            ui->lbQty1->setProperty("state", fOrder->dishesValue("f_qty2", fIndex).toDouble() > 0.001 ? "1" : "0");
             ui->lbQty1->style()->polish(ui->lbQty1);
             QDateTime dt = fOrder->dishesValue("f_qty2", fIndex).toDouble() > 0.001 ?
                                 fOrder->dishesValue("f_printtime", fIndex).toDateTime() :
@@ -68,15 +69,13 @@ void DishItem::setChanges()
                            "<span style=\" font-size:6pt;\">%1</span></p>\n<p align=\"center\" "
                            "style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"> "
                            "<span style=\" font-size:8pt;\">%2</span></p></body></html>")
-                                                             .arg(dt.toString(FORMAT_DATE_TO_STR))
-                                                             .arg(dt.toString(FORMAT_TIME_TO_STR));
+                                                             .arg(dt.toString(FORMAT_DATE_TO_STR), dt.toString(FORMAT_TIME_TO_STR));
             ui->lbTimeOfDish->setText(fOrder->dishesValue("f_state", fIndex).toInt() == DISH_STATE_OK ? dd : "-");
-            ui->frame->setProperty("dish_focused", fFocus ? "1" : "2");
-            ui->frame->style()->polish(ui->frame);
-            ui->btnReprint->setVisible(property("reprint").toBool() && fOrder->dishesValue("f_qty2", fIndex).toDouble() > 0.001);
+            ui->orderDishFrame->setProperty("dish_focused", fFocus ? "1" : "2");
+            ui->orderDishFrame->style()->polish(ui->orderDishFrame);
         } else {
-            ui->frame->setProperty("state", "3");
-            ui->frame->style()->polish(ui->frame);
+            ui->orderDishFrame->setProperty("state", "3");
+            ui->orderDishFrame->style()->polish(ui->orderDishFrame);
             ui->lbTimeOfDish->setText(fOrder->dishesValue("f_removetime", fIndex).toDateTime().toString(FORMAT_TIME_TO_SHORT_STR));
             ui->lbComment->setProperty("state", "3");
             ui->lbQty1->setProperty("state", "3");
@@ -103,6 +102,25 @@ int DishItem::index()
     return fIndex;
 }
 
+void DishItem::setCheckMode(bool v)
+{
+    if (fOrder->dishesValue("f_state", fIndex).toInt() != DISH_STATE_OK) {
+        return;
+    }
+    ui->btnChecked->setVisible(v);
+    ui->btnChecked->setChecked(v ? false : ui->btnChecked->isChecked());
+}
+
+void DishItem::setChecked(bool v)
+{
+    ui->btnChecked->setChecked(v);
+}
+
+bool DishItem::isChecked()
+{
+    return ui->btnChecked->isChecked();
+}
+
 void DishItem::setReadyOnly(bool v)
 {
     fReadOnly = v;
@@ -120,13 +138,10 @@ bool DishItem::event(QEvent *event)
 
 void DishItem::on_btnDish_clicked()
 {
+    if (ui->btnChecked->isVisible()) {
+        return;
+    }
     fFocus = true;
     setChanges();
     emit focused(fIndex);
-}
-
-void DishItem::on_btnReprint_clicked()
-{
-    int reprint = fOrder->dishesValue("f_reprint", fIndex).toInt();
-    fOrder->setDishesValue("f_reprint", ui->btnReprint->isChecked() ? (abs(reprint) + 1) * -1 : abs(reprint), fIndex);
 }

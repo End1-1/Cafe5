@@ -80,6 +80,10 @@ void C5Crypt::ede3_cbc(QByteArray &in,
                        const QString &key,
                        bool encrypt)
 {
+    if (in.isEmpty()) {
+        out = "";
+        return;
+    }
     DES_key_schedule des_key1;
     DES_key_schedule des_key2;
     DES_key_schedule des_key3;

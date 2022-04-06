@@ -11,6 +11,7 @@ namespace MessageList {
     const short balance_history = 7;
     const short monitor = 8;
     const short car_near = 9;
+    const short dll_op = 10;
 
     const short srv_connections_count = 100;
     const short srv_device_position = 101;

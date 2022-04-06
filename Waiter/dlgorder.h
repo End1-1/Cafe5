@@ -68,6 +68,8 @@ private:
 
     bool load(int table);
 
+    void disableForCheckall(bool v);
+
     void buildMenu(int menuid, int part1, int part2);
 
     void logRecord(const QString &username, const QString &orderid, const QString &rec, const QString &action, const QString &value1, const QString &value2);
@@ -221,8 +223,6 @@ private slots:
 
     void on_btnDishPart2Up_clicked();
 
-    void on_btnReprint_clicked();
-
     void on_btnBillWithoutService_clicked();
 
     void on_btnFillCash_clicked();
@@ -235,8 +235,6 @@ private slots:
 
     void on_btnDishUp_clicked();
 
-    void on_btnPresent_clicked();
-
     void on_btnPreorder_clicked();
 
     void on_btnPaymentIdram_clicked();
@@ -248,6 +246,20 @@ private slots:
     void on_btnPayX_clicked();
 
     void on_btnFillIdram_clicked();
+
+    void on_btnCloseCheckAll_clicked();
+
+    void on_btnCheckAll_clicked();
+
+    void on_btnUncheckAll_clicked();
+
+    void on_btnReprintSelected_clicked();
+
+    void on_btnGroupSelect_clicked();
+
+    void on_btnRemoveSelected_clicked();
+
+    void on_btnSetPrecent_clicked();
 };
 
 #endif // DLGORDER_H

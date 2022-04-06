@@ -140,6 +140,7 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     fTags[ui->chDontGroupPrint->getTag()] = ui->chDontGroupPrint->isChecked() ? "1" : "0";
     fTags[ui->chDebugMode->getTag()] = ui->chDebugMode->isChecked() ? "1" : "0";
     fTags[ui->cbIdramServer->property("Tag").toInt()] = ui->cbIdramServer->currentText();
+    fTags[ui->chCloseTableAfterPrecheck->property("Tag").toInt()] = ui->chCloseTableAfterPrecheck->isChecked() ? "1" : "0";
     C5Database db(fDBParams);
     db[":f_settings"] = ui->leCode->getInteger();
     db.exec("delete from s_settings_values where f_settings=:f_settings");
@@ -169,6 +170,8 @@ void C5SettingsWidget::clearWidgetValue(QWidget *w)
         static_cast<QRadioButton*>(w)->setAutoExclusive(false);
         static_cast<QRadioButton*>(w)->setChecked(false);
         static_cast<QRadioButton*>(w)->setAutoExclusive(true);
+    } else if (!strcmp(w->metaObject()->className(), "QComboBox")) {
+        static_cast<QComboBox*>(w)->setCurrentIndex(-1);
     }
 }
 
@@ -182,6 +185,8 @@ void C5SettingsWidget::setWidgetValue(QWidget *w, const QString &value)
         static_cast<C5CheckBox*>(w)->setChecked(value == "1");
     } else if  (!strcmp(w->metaObject()->className(), "QRadioButton")) {
         static_cast<QRadioButton*>(w)->setChecked(value == "1");
+    } else if (!strcmp(w->metaObject()->className(), "QComboBox")) {
+        static_cast<QComboBox*>(w)->setCurrentText(value);
     }
 }
 
@@ -222,6 +227,11 @@ QWidget *C5SettingsWidget::widget(QWidget *parent, int tag)
             if (l->getTag() == tag) {
                 return l;
             }
+        } else if (!strcmp(o->metaObject()->className(), "QComboBox")) {
+           QComboBox *c = static_cast<QComboBox*>(o);
+           if (c->property("Tag").toInt() == tag) {
+               return c;
+           }
         } else if (!strcmp(o->metaObject()->className(), "C5ComboBox")) {
             C5ComboBox *l = static_cast<C5ComboBox*>(o);
             if (l->getTag() == tag) {

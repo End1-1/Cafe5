@@ -94,6 +94,12 @@ void RawMessage::readUByte(quint8 &i, const QByteArray &d)
     fDataPosition += sizeof(quint8);
 }
 
+void RawMessage::readUShort(quint16 &i, const QByteArray &d)
+{
+    memcpy(reinterpret_cast<char*>(&i), &d.data()[fDataPosition], sizeof(quint16));
+    fDataPosition += sizeof(quint16);
+}
+
 void RawMessage::readUInt(quint32 &i, const QByteArray &d)
 {
     memcpy(reinterpret_cast<char*>(&i), &d.data()[fDataPosition], sizeof(quint32));

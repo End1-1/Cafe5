@@ -4,14 +4,13 @@
 #define FORMAT_TIME_TO_STR "HH:mm:ss"
 #define FORMAT_DATETIME_TO_STR  "dd/MM/yyyy HH:mm:ss"
 
-QDate C5DateEditFirstDate = QDate::currentDate();
 QDate C5DateEditMinDate = QDate::fromString("01/01/1900", "dd/MM/yyyy");
 
 C5DateEdit::C5DateEdit(QWidget *parent) :
     C5LineEdit(parent)
 {
     setInputMask("00/00/0000");
-    setDate(C5DateEditFirstDate);
+    setDate(QDate::currentDate());
     connect(this, SIGNAL(textChanged(QString)), this, SLOT(newText(QString)));
     if (maximumWidth() == 0) {
         setMaximumWidth(100);
@@ -28,14 +27,14 @@ void C5DateEdit::setText(const QString &text)
         if (d.isValid() && d < C5DateEditMinDate && !fDoNoCheckMinDate) {
             d = C5DateEditMinDate;
         }
-        QLineEdit::setText(d.toString(FORMAT_DATE_TO_STR));
+        C5LineEdit::setText(d.toString(FORMAT_DATE_TO_STR));
     } else if (inputMask() == "00:00:00") {
         QTime t = QTime::fromString(text, FORMAT_TIME_TO_STR);
         if (t.isValid()) {
-            QLineEdit::setText(t.toString(FORMAT_TIME_TO_STR));
+            C5LineEdit::setText(t.toString(FORMAT_TIME_TO_STR));
         }
     } else {
-        QLineEdit::setText(text);
+        C5LineEdit::setText(text);
     }
 }
 

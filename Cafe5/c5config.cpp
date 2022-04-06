@@ -72,7 +72,7 @@ QString C5Config::taxDept()
 
 QString C5Config::taxUseExtPos()
 {
-    return getValue(param_tax_use_ext_pos);
+    return getValue(param_tax_use_ext_pos).toLower() = "true" ? "true" : "false";
 }
 
 QString C5Config::serviceFactor()

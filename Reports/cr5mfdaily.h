@@ -7,6 +7,8 @@ namespace Ui {
 class CR5MfDaily;
 }
 
+class QListWidgetItem;
+
 class CR5MfDaily : public C5Widget
 {
     Q_OBJECT
@@ -45,6 +47,8 @@ private slots:
     void on_lstWorkers_currentRowChanged(int currentRow);
 
     void on_leDate_returnPressed();
+
+    void on_lstTeamlead_itemClicked(QListWidgetItem *item);
 };
 
 #endif // CR5MFDAILY_H

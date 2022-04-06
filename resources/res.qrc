@@ -133,5 +133,8 @@
         <file>compress.png</file>
         <file>progressbar.gif</file>
         <file>bill.png</file>
+        <file>deletelist.png</file>
+        <file>unchecked.png</file>
+        <file>checkall.png</file>
     </qresource>
 </RCC>

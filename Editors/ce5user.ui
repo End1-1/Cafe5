@@ -7,13 +7,39 @@
     <x>0</x>
     <y>0</y>
     <width>546</width>
-    <height>204</height>
+    <height>235</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="3" column="2">
+    <widget class="C5LineEditWithSelector" name="leConfigName">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="FieldRef" stdset="0">
+      <string>f_configname</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <widget class="C5LineEditWithSelector" name="leStateName">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="FieldRef" stdset="0">
+      <string>f_statename</string>
+     </property>
+    </widget>
+   </item>
    <item row="0" column="0">
     <widget class="QLabel" name="label">
      <property name="text">
@@ -21,10 +47,79 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label_6">
+   <item row="2" column="2">
+    <widget class="C5LineEditWithSelector" name="leGroupName">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="FieldRef" stdset="0">
+      <string>f_groupname</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="0">
+    <widget class="QLabel" name="label_5">
      <property name="text">
-      <string>State</string>
+      <string>Login</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="1" colspan="2">
+    <widget class="C5LineEditWithSelector" name="leLogin">
+     <property name="Field" stdset="0">
+      <string>f_login</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_7">
+     <property name="text">
+      <string>Configuration</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1" colspan="2">
+    <widget class="C5LineEditWithSelector" name="lineEdit_5">
+     <property name="Field" stdset="0">
+      <string>f_first</string>
+     </property>
+     <property name="Check" stdset="0">
+      <string>empty=&quot;First name&quot;</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="C5LineEditWithSelector" name="leCode">
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="Field" stdset="0">
+      <string>f_id</string>
+     </property>
+     <property name="Primary" stdset="0">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="C5LineEditWithSelector" name="leConfig">
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="Field" stdset="0">
+      <string>f_config</string>
+     </property>
+     <property name="Type" stdset="0">
+      <string>1</string>
      </property>
     </widget>
    </item>
@@ -75,13 +170,6 @@
      </property>
     </widget>
    </item>
-   <item row="6" column="0">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>First name</string>
-     </property>
-    </widget>
-   </item>
    <item row="2" column="3">
     <widget class="QPushButton" name="btnNewGroup">
      <property name="minimumSize">
@@ -108,180 +196,17 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="2">
-    <widget class="C5LineEditWithSelector" name="leConfigName">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="FieldRef" stdset="0">
-      <string>f_configname</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="1" colspan="2">
-    <widget class="C5LineEditWithSelector" name="lineEdit_4">
-     <property name="Field" stdset="0">
-      <string>f_last</string>
-     </property>
-     <property name="Check" stdset="0">
-      <string>empty=&quot;Last name&quot;</string>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="0">
-    <widget class="QLabel" name="label_5">
-     <property name="text">
-      <string>Login</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1">
-    <widget class="C5LineEditWithSelector" name="leCode">
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="Field" stdset="0">
-      <string>f_id</string>
-     </property>
-     <property name="Primary" stdset="0">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="2">
-    <widget class="C5LineEditWithSelector" name="leGroupName">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="FieldRef" stdset="0">
-      <string>f_groupname</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1">
-    <widget class="C5LineEditWithSelector" name="leConfig">
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="Field" stdset="0">
-      <string>f_config</string>
-     </property>
-     <property name="Type" stdset="0">
-      <string>1</string>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="1" colspan="2">
-    <widget class="C5LineEditWithSelector" name="lineEdit_5">
-     <property name="Field" stdset="0">
-      <string>f_first</string>
-     </property>
-     <property name="Check" stdset="0">
-      <string>empty=&quot;First name&quot;</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Group</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="0">
+   <item row="6" column="0">
     <widget class="QLabel" name="label_3">
      <property name="text">
       <string>Last name</string>
      </property>
     </widget>
    </item>
-   <item row="7" column="1" colspan="2">
-    <widget class="C5LineEditWithSelector" name="leLogin">
-     <property name="Field" stdset="0">
-      <string>f_login</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <widget class="C5LineEditWithSelector" name="leState">
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="Field" stdset="0">
-      <string>f_state</string>
-     </property>
-     <property name="Type" stdset="0">
-      <string>1</string>
-     </property>
-     <property name="Check" stdset="0">
-      <string>empty=&quot;State&quot;</string>
-     </property>
-     <property name="First" stdset="0">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="label_7">
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_6">
      <property name="text">
-      <string>Configuration</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="2">
-    <widget class="C5LineEditWithSelector" name="leStateName">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="FieldRef" stdset="0">
-      <string>f_statename</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="4">
-    <widget class="QPushButton" name="btnLoadImage">
-     <property name="minimumSize">
-      <size>
-       <width>25</width>
-       <height>25</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>25</width>
-       <height>25</height>
-      </size>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="layoutDirection">
-      <enum>Qt::LeftToRight</enum>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="icon">
-      <iconset resource="../resources/res.qrc">
-       <normaloff>:/folder.png</normaloff>:/folder.png</iconset>
+      <string>State</string>
      </property>
     </widget>
    </item>
@@ -314,6 +239,117 @@
      </property>
     </widget>
    </item>
+   <item row="1" column="1">
+    <widget class="C5LineEditWithSelector" name="leState">
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="Field" stdset="0">
+      <string>f_state</string>
+     </property>
+     <property name="Type" stdset="0">
+      <string>1</string>
+     </property>
+     <property name="Check" stdset="0">
+      <string>empty=&quot;State&quot;</string>
+     </property>
+     <property name="First" stdset="0">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1" colspan="2">
+    <widget class="C5LineEditWithSelector" name="lineEdit_4">
+     <property name="Field" stdset="0">
+      <string>f_last</string>
+     </property>
+     <property name="Check" stdset="0">
+      <string>empty=&quot;Last name&quot;</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>First name</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Group</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_8">
+     <property name="text">
+      <string>Teamlead</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="C5LineEditWithSelector" name="leTeamLead">
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="Field" stdset="0">
+      <string>f_teamlead</string>
+     </property>
+     <property name="Type" stdset="0">
+      <string>1</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="2">
+    <widget class="C5LineEditWithSelector" name="leTeamLeadname">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="FieldRef" stdset="0">
+      <string>f_teamleadname</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="4">
+    <widget class="QPushButton" name="btnLoadImage">
+     <property name="minimumSize">
+      <size>
+       <width>25</width>
+       <height>25</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>25</width>
+       <height>25</height>
+      </size>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="layoutDirection">
+      <enum>Qt::LeftToRight</enum>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources/res.qrc">
+       <normaloff>:/folder.png</normaloff>:/folder.png</iconset>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -332,7 +368,6 @@
   <tabstop>lineEdit_5</tabstop>
   <tabstop>leLogin</tabstop>
   <tabstop>btnNewGroup</tabstop>
-  <tabstop>btnLoadImage</tabstop>
  </tabstops>
  <resources>
   <include location="../resources/res.qrc"/>

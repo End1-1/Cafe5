@@ -27,7 +27,7 @@ void DlgSplitOrder::configOrder(const QString &orderId)
         C5Message::error(ui->o1->fOrderDriver->error());
         return;
     }
-    ui->o1->itemsToTable();
+    ui->o1->updateDishes();
     ui->lbLeft->setText(dbtable->name(ui->o1->fOrderDriver->headerValue("f_table").toInt()));
     ui->lbRight->setText(tr("Select table"));
 }
@@ -44,7 +44,7 @@ void DlgSplitOrder::on_btnChoseTable_clicked()
             }
         } else {
             ui->o1->fOrderDriver->reloadOrder();
-            ui->o1->itemsToTable();
+            ui->o1->updateDishes();
         }
     }
     QString err;
@@ -77,7 +77,7 @@ void DlgSplitOrder::on_btnChoseTable_clicked()
         ui->o2->fOrderDriver->setCurrentOrderID(orders.at(0));
     }
     ui->o2->setDlg(nullptr);
-    ui->o2->itemsToTable();
+    ui->o2->updateDishes();
     ui->lbRight->setText(dbtable->name(ui->o2->fOrderDriver->headerValue("f_table").toInt()));
 }
 
@@ -137,8 +137,8 @@ bool DlgSplitOrder::moveItem(C5OrderDriver *or1, C5OrderDriver *or2, int row)
                       .arg(or1->headerValue("f_prefix").toString())
                       .arg(or1->headerValue("f_hallid").toInt()));
     or1->removeDish(row);
-    ui->o1->itemsToTable();
-    ui->o2->itemsToTable();
+    ui->o1->updateDishes();
+    ui->o2->updateDishes();
     return true;
 }
 

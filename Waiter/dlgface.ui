@@ -14,6 +14,21 @@
    <string>Cafe5</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <property name="spacing">
+    <number>2</number>
+   </property>
    <item row="1" column="1" rowspan="2">
     <widget class="QWidget" name="wstaff" native="true">
      <property name="minimumSize">
@@ -45,8 +60,14 @@
     <widget class="QFrame" name="frame">
      <property name="minimumSize">
       <size>
-       <width>0</width>
+       <width>140</width>
        <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>140</width>
+       <height>16777215</height>
       </size>
      </property>
      <property name="frameShape">
@@ -69,41 +90,11 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QLabel" name="lbStaff">
-        <property name="text">
-         <string>Staffname</string>
+       <layout class="QVBoxLayout" name="vlHall">
+        <property name="spacing">
+         <number>2</number>
         </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="lbTime">
-        <property name="text">
-         <string>00:00</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>Hall List</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <layout class="QVBoxLayout" name="vlHall"/>
-      </item>
-      <item>
-       <widget class="Line" name="line">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
+       </layout>
       </item>
       <item>
        <spacer name="verticalSpacer">
@@ -124,6 +115,9 @@
    <item row="2" column="0">
     <widget class="QWidget" name="wall" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="spacing">
+       <number>2</number>
+      </property>
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -154,7 +148,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="../resources/resources.qrc">
+         <iconset resource="../resources/res.qrc">
           <normaloff>:/cancel.png</normaloff>:/cancel.png</iconset>
         </property>
         <property name="iconSize">
@@ -289,6 +283,18 @@
          </property>
          <item row="0" column="0">
           <widget class="QScrollArea" name="shall">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="verticalScrollBarPolicy">
+            <enum>Qt::ScrollBarAlwaysOn</enum>
+           </property>
+           <property name="horizontalScrollBarPolicy">
+            <enum>Qt::ScrollBarAlwaysOff</enum>
+           </property>
            <property name="widgetResizable">
             <bool>true</bool>
            </property>
@@ -297,7 +303,7 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>888</width>
+              <width>811</width>
               <height>682</height>
              </rect>
             </property>
@@ -309,7 +315,7 @@
               <number>0</number>
              </property>
              <property name="topMargin">
-              <number>0</number>
+              <number>2</number>
              </property>
              <property name="rightMargin">
               <number>0</number>
@@ -330,11 +336,64 @@
      </layout>
     </widget>
    </item>
+   <item row="0" column="0" colspan="3">
+    <widget class="QWidget" name="widget" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <property name="spacing">
+       <number>2</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="lbTime">
+        <property name="text">
+         <string>00:00</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="lbStaff">
+        <property name="text">
+         <string>Staffname</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="../resources/resources.qrc"/>
   <include location="../resources/res.qrc"/>
  </resources>
  <connections/>

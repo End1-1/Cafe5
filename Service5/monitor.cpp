@@ -5,6 +5,7 @@
 #include "dlglicenses.h"
 #include "c5crypt.h"
 #include "c5license.h"
+#include "os.h"
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QJsonDocument>
@@ -19,6 +20,7 @@
 #include <QUrlQuery>
 #include <QSslSocket>
 #include <Windows.h>
+#include <QThread>
 
 Monitor::Monitor(QWidget *parent)
     : QDialog(parent),
@@ -355,8 +357,78 @@ void Monitor::readLicense()
     if (l.read(d, t)) {
         ui->grLicense->setVisible(true);
         ui->grRegistration->setVisible(false);
-        ui->lbLicenseDate->setText(QString("%1: %2").arg(tr("Expiration")).arg(d.toString("dd/MM/yyyy")));
+        ui->lbLicenseDate->setText(QString("%1: %2").arg(tr("Expiration"), d.toString("dd/MM/yyyy")));
         ui->lbLicenseType->setText(QString("%1: %2").arg(tr("License type"), t));
+        if (!d.isValid() || d < QDate::currentDate()) {
+            ui->lbLicenseDate->setStyleSheet("color: red");
+        }
     }
 }
 
+
+void Monitor::on_btnStopServer_clicked()
+{
+    bool stopped = false;
+    do {
+        QString r = OS::p("sc stop Breeze 2:64:256");
+        QThread::sleep(3);
+        if (r.contains("STOP_PENDING")) {
+            continue;
+        }
+        stopped = true;
+    } while (!stopped);
+    QMessageBox::information(this, tr("Server"), tr("The server was stopped"));
+}
+
+void Monitor::on_btnStartServer_clicked()
+{
+    QString r;
+    bool started = false;
+    do {
+        r = OS::p("sc start Breeze");
+        qDebug() << r;
+        QThread::sleep(3);
+        if (r.contains("START_PENDING")) {
+            continue;
+        }
+        started = true;
+    } while (!started);
+    r = OS::p("sc query Breeze");
+    qDebug() << r;
+    if (r.contains("RUNNING")) {
+        QMessageBox::information(this, tr("Server"), tr("The server was started"));
+    } else {
+        QMessageBox::information(this, tr("Server"), r);
+    }
+}
+
+void Monitor::on_btnRestartServer_clicked()
+{
+    QString r;
+    bool stopped = false;
+    do {
+        r = OS::p("sc stop Breeze 2:64:256");
+        if (r.contains("STOP_PENDING")) {
+            QThread::sleep(3);
+            continue;
+        }
+        stopped = true;
+    } while (!stopped);
+    bool started = false;
+    do {
+        r = OS::p("sc start Breeze");
+        qDebug() << r;
+        if (r.contains("START_PENDING")) {
+            QThread::sleep(3);
+            continue;
+        }
+        started = true;
+    } while (!started);
+    r = OS::p("sc query Breeze");
+    qDebug() << r;
+    if (r.contains("RUNNING")) {
+        QMessageBox::information(this, tr("Server"), tr("The server was started"));
+    } else {
+        QMessageBox::information(this, tr("Server"), r);
+    }
+}

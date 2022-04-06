@@ -48,8 +48,6 @@ SOURCES += \
     ../../XLSX/src/xlsxwriter.cpp \
     ../Cafe5/c5cafecommon.cpp \
     ../Cafe5/c5double.cpp \
-    ../Cafe5/c5license.cpp \
-    ../Cafe5/c5licensedlg.cpp \
     ../Cafe5/c5logsystem.cpp \
     ../Cafe5/c5serverhandler.cpp \
     ../Cafe5/c5systempreference.cpp \
@@ -89,6 +87,7 @@ SOURCES += \
     ../Classes/dlgpassword.cpp \
     ../Classes/doubledatabase.cpp \
     ../Classes/fileversion.cpp \
+    ../Classes/idram.cpp \
     ../Classes/notificationwidget.cpp \
     ../Classes/rkeyboard.cpp \
     ../Controls/c5checkbox.cpp \
@@ -121,18 +120,19 @@ SOURCES += \
     ../DbData/dbtables.cpp \
     ../DbData/dbunit.cpp \
     ../DbData/dbusers.cpp \
+    ../Forms/dlgqty.cpp \
     ../Forms/touchdlgphonenumber.cpp \
     ../Forms/touchentertaxreceiptnumber.cpp \
     ../Forms/touchselecttaxreport.cpp \
     ../Shop/printreceipt.cpp \
     ../Shop/printreceiptgroup.cpp \
     ../Shop/selectprinters.cpp \
-    dishitemdelegate.cpp \
+    change.cpp \
     dishpackage.cpp \
-    dishpartitemdelegate.cpp \
-    dishtableitemdelegate.cpp \
         main.cpp \
-    payment.cpp \
+    menudialog.cpp \
+    menudish.cpp \
+    orderdish.cpp \
     supplier.cpp \
         workspace.cpp \
     ../Cafe5/c5config.cpp \
@@ -165,8 +165,6 @@ HEADERS += \
     ../../XLSX/src/zip.h \
     ../Cafe5/c5cafecommon.h \
     ../Cafe5/c5double.h \
-    ../Cafe5/c5license.h \
-    ../Cafe5/c5licensedlg.h \
     ../Cafe5/c5logsystem.h \
     ../Cafe5/c5serverhandler.h \
     ../Cafe5/c5systempreference.h \
@@ -207,6 +205,7 @@ HEADERS += \
     ../Classes/dlgpassword.h \
     ../Classes/doubledatabase.h \
     ../Classes/fileversion.h \
+    ../Classes/idram.h \
     ../Classes/notificationwidget.h \
     ../Classes/rkeyboard.h \
     ../Controls/c5checkbox.h \
@@ -239,6 +238,7 @@ HEADERS += \
     ../DbData/dbtables.h \
     ../DbData/dbunit.h \
     ../DbData/dbusers.h \
+    ../Forms/dlgqty.h \
     ../Forms/touchdlgphonenumber.h \
     ../Forms/touchentertaxreceiptnumber.h \
     ../Forms/touchselecttaxreport.h \
@@ -246,12 +246,12 @@ HEADERS += \
     ../Shop/printreceipt.h \
     ../Shop/printreceiptgroup.h \
     ../Shop/selectprinters.h \
+    change.h \
     dish.h \
-    dishitemdelegate.h \
     dishpackage.h \
-    dishpartitemdelegate.h \
-    dishtableitemdelegate.h \
-    payment.h \
+    menudialog.h \
+    menudish.h \
+    orderdish.h \
     rc.h \
     res.rc \
     supplier.h \
@@ -268,7 +268,6 @@ HEADERS += \
     ../Classes/c5user.h
 
 FORMS += \
-    ../Cafe5/c5licensedlg.ui \
     ../Cafe5/calendar.ui \
     ../Cafe5/dlgexitbyversion.ui \
     ../Classes/c5gridgilter.ui \
@@ -277,11 +276,15 @@ FORMS += \
     ../Classes/dlgpassword.ui \
     ../Classes/notificationwidget.ui \
     ../Classes/rkeyboard.ui \
+    ../Forms/dlgqty.ui \
     ../Forms/touchdlgphonenumber.ui \
     ../Forms/touchentertaxreceiptnumber.ui \
     ../Forms/touchselecttaxreport.ui \
     ../Shop/selectprinters.ui \
-    payment.ui \
+    change.ui \
+    menudialog.ui \
+    menudish.ui \
+    orderdish.ui \
     supplier.ui \
         workspace.ui \
     ../Cafe5/c5connection.ui \

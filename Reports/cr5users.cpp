@@ -8,12 +8,15 @@ CR5Users::CR5Users(const QStringList &dbParams, QWidget *parent) :
 {
     fIcon = ":/users_groups.png";
     fLabel = tr("Users");
-    fSqlQuery = "select u.f_id, g.f_name as f_groupname, s.f_name as f_statename, u.f_login, u.f_first, u.f_last \
-                from s_user u \
-                left join s_user_group g on g.f_id=u.f_group \
-                left join s_user_state s on s.f_id=u.f_state ";
+    fSqlQuery = "select u.f_id, g.f_name as f_groupname, concat(t.f_last, ' ', t.f_first) as f_teamleadname, "
+                "s.f_name as f_statename, u.f_login, u.f_first, u.f_last "
+                "from s_user u "
+                "left join s_user_group g on g.f_id=u.f_group "
+                "left join s_user t on t.f_id=u.f_teamlead "
+                "left join s_user_state s on s.f_id=u.f_state ";
     fTranslation["f_id"] = tr("Code");
     fTranslation["f_groupname"] = tr("Group");
+    fTranslation["f_teamleadname"] = tr("Teamlead");
     fTranslation["f_statename"] = tr("State");
     fTranslation["f_login"] = tr("Username");
     fTranslation["f_first"] = tr("First name");

@@ -74,6 +74,7 @@ SOURCES += \
     ../Classes/checkforupdatethread.cpp \
     ../Classes/dlgpassword.cpp \
     ../Classes/doubledatabase.cpp \
+    ../Classes/idram.cpp \
     ../Classes/notificationwidget.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
     ../Controls/c5guicontrols.cpp \
@@ -104,6 +105,7 @@ SOURCES += \
     ../DbData/dbunit.cpp \
     ../DbData/dbusers.cpp \
     ../Forms/c5filtervalues.cpp \
+    ../Forms/dlgqty.cpp \
     ../Shop/printreceipt.cpp \
     ../Shop/printreceiptgroup.cpp \
     ../Shop/selectprinters.cpp \
@@ -119,7 +121,6 @@ SOURCES += \
     dlgmanagertools.cpp \
     dlgprecheckoptions.cpp \
     dlgpreorder.cpp \
-    dlgqty.cpp \
     dlgscreen.cpp \
     dlgshiftrotation.cpp \
     dlgsplitorder.cpp \
@@ -233,6 +234,7 @@ HEADERS += \
     ../Classes/checkforupdatethread.h \
     ../Classes/dlgpassword.h \
     ../Classes/doubledatabase.h \
+    ../Classes/idram.h \
     ../Classes/notificationwidget.h \
     ../Classes/proxytablewidgetdatabase.h \
     ../Controls/c5guicontrols.h \
@@ -263,6 +265,7 @@ HEADERS += \
     ../DbData/dbunit.h \
     ../DbData/dbusers.h \
     ../Forms/c5filtervalues.h \
+    ../Forms/dlgqty.h \
     ../Service/servicecommands.h \
     ../Shop/printreceipt.h \
     ../Shop/printreceiptgroup.h \
@@ -303,7 +306,6 @@ HEADERS += \
     ../Classes/c5printremovedservicethread.h \
     dlgprecheckoptions.h \
     dlgpreorder.h \
-    dlgqty.h \
     dlgscreen.h \
     dlgshiftrotation.h \
     dlgsplitorder.h \
@@ -361,6 +363,7 @@ FORMS += \
     ../Classes/dlgpassword.ui \
     ../Classes/notificationwidget.ui \
     ../Forms/c5filtervalues.ui \
+    ../Forms/dlgqty.ui \
     ../Shop/selectprinters.ui \
     dishitem.ui \
     dlgcarnumber.ui \
@@ -378,7 +381,6 @@ FORMS += \
     ../Classes/c5printpreview.ui \
     dlgprecheckoptions.ui \
     dlgpreorder.ui \
-    dlgqty.ui \
     dlgscreen.ui \
     dlgshiftrotation.ui \
     dlgsplitorder.ui \
@@ -417,8 +419,8 @@ INCLUDEPATH += ../Service
 INCLUDEPATH += ../DbData
 INCLUDEPATH += ../Shop
 INCLUDEPATH += C:/Projects/NewTax/Src
-INCLUDEPATH += C:/Soft/OpenSSL-Win32/include
-INCLUDEPATH += C:/Soft/OpenSSL-Win32/include/openssl
+INCLUDEPATH += C:/Soft/OpenSSL-Win64/include
+INCLUDEPATH += C:/Soft/OpenSSL-Win64/include/openssl
 INCLUDEPATH += C:/Projects/XLSX/src
 
 RESOURCES += \
