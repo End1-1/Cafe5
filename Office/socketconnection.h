@@ -10,13 +10,14 @@ class SocketConnection : public QObject
 public:
     explicit SocketConnection(QObject *parent = nullptr);
     ~SocketConnection();
+    quint32 getTcpPacketNumber();
     static void init(const QString &ip, int port, const QString &username, const QString &password);
     static void setConnectionParams(const QString &ip, int port, const QString &username, const QString &password);
     static SocketConnection *instance();
 
 public slots:
     void run();
-    void sendData(QByteArray &d);
+    void sendData(const QByteArray &d);
 
 private:
     static SocketConnection *fInstance;
@@ -28,11 +29,10 @@ private:
     QByteArray fData;
     quint32 fMessageNumber;
     quint32 fMessageId;
-    quint32 fMessageSize;
+    qint32 fMessageSize;
     quint16 fMessageCommand;
     SslSocket *fSocket;
     QTimer *fTimer;
-    quint32 getTcpPacketNumber();
 
 private slots:
     void timeout();

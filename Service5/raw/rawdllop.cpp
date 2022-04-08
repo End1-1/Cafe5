@@ -2,12 +2,17 @@
 #include "configini.h"
 #include <QLibrary>
 
-typedef void (*dllfunc)(const QByteArray &, RawMessage &);
+typedef bool (*dllfunc)(const QByteArray &, RawMessage &);
 
 RawDllOp::RawDllOp(SslSocket *s) :
     Raw(s)
 {
 
+}
+
+RawDllOp::~RawDllOp()
+{
+    qDebug() << "~RawDllOp";
 }
 
 void RawDllOp::run(const QByteArray &d)
@@ -16,7 +21,7 @@ void RawDllOp::run(const QByteArray &d)
     readString(dll, d);
     QLibrary l(ConfigIni::fAppPath + "/rawhandlers/" + dll + ".dll");
     if (l.load()) {
-        dllfunc f = (dllfunc) l.resolve("dllfunc");
+        dllfunc f = reinterpret_cast<dllfunc>(l.resolve("dllfunc"));
         if (f) {
             f(d, *this);
         } else {
@@ -25,4 +30,5 @@ void RawDllOp::run(const QByteArray &d)
     } else {
         putUByte(0);
     }
+    l.unload();
 }

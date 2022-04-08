@@ -170,8 +170,8 @@ const QString C5Crypt::driveKey()
 
 const QString C5Crypt::machineUuid()
 {
-    //QSettings s("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Cryptography", QSettings::Registry64Format);
-    QSettings s("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Cryptography");
+    QSettings s("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Cryptography", QSettings::Registry64Format);
+    //QSettings s("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Cryptography");
     return s.value("MachineGuid").toString();
 }
 

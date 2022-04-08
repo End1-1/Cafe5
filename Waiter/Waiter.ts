@@ -1636,28 +1636,28 @@ MS Excel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="dlgface.ui" line="165"/>
+        <location filename="dlgface.ui" line="171"/>
         <source>Schema of hall</source>
         <translation>Ընդհանուր տեսք</translation>
     </message>
     <message>
-        <location filename="dlgface.ui" line="178"/>
+        <location filename="dlgface.ui" line="184"/>
         <source>By waiters</source>
         <translation>Ըստ 
 մատուցողների</translation>
     </message>
     <message>
-        <location filename="dlgface.ui" line="210"/>
+        <location filename="dlgface.ui" line="216"/>
         <source>Lock</source>
         <translation>Ելք</translation>
     </message>
     <message>
-        <location filename="dlgface.ui" line="352"/>
+        <location filename="dlgface.ui" line="370"/>
         <source>Staffname</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="dlgface.ui" line="342"/>
+        <location filename="dlgface.ui" line="360"/>
         <source>00:00</source>
         <translation></translation>
     </message>

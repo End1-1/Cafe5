@@ -73,9 +73,8 @@ void SocketConnection::run()
     fTimer->start(1000);
 }
 
-void SocketConnection::sendData(QByteArray &d)
+void SocketConnection::sendData(const QByteArray &d)
 {
-    RawMessage::setPacketNumber(d, getTcpPacketNumber());
     fSocket->write(d);
     fSocket->flush();
 }
@@ -101,7 +100,7 @@ void SocketConnection::encrypted()
     fTimer->stop();
     fTcpPacketNumber = 0;
     RawMessage r(fSocket);
-    r.setHeader(0, 0, MessageList::hello);
+    r.setHeader(getTcpPacketNumber(), 0, MessageList::hello);
     r.putString(fSocket->fUuid);
     emit dataReady(r.data());
     emit connected();

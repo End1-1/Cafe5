@@ -12,6 +12,8 @@ CR5GoodsMovementFilter::CR5GoodsMovementFilter(const QStringList &dbParams, QWid
     ui->leGoods->setSelector(fDBParams, ui->leGoodsName, cache_goods, 1, 3).setMultiselection(true);
     ui->leStore->setSelector(fDBParams, ui->leStoreName, cache_goods_store).setMultiselection(true);
     ui->leReason->setSelector(fDBParams, ui->leReasonName, cache_store_reason).setMultiselection(true);
+    ui->leStoreIn->setSelector(fDBParams, ui->leStoreNameIn, cache_goods_store).setMultiselection(true);
+    ui->leStoreOut->setSelector(fDBParams, ui->leStoreNameOut, cache_goods_store).setMultiselection(true);
     ui->leInOut->setSelector(fDBParams, ui->leInOutName, cache_store_inout);
     ui->leDocState->setSelector(fDBParams, ui->leDocStateName, cache_doc_state);
 }
@@ -46,6 +48,8 @@ QString CR5GoodsMovementFilter::condition()
     if (!ui->leDocState->isEmpty()) {
         cond += " and a.f_state in (" + ui->leDocState->text() + ") ";
     }
+    in(cond, "ai.f_storein", ui->leStoreIn);
+    in(cond, "ai.f_storeout", ui->leStoreOut);
     return cond;
 }
 

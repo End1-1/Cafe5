@@ -35,7 +35,7 @@ QHash<QString, int> Working::fGoodsRows;
 QHash<QString, QString> Working::fMultiscancode;
 QMap<QString, double> Working::fUnitDefaultQty;
 QMap<int, Flag> Working::fFlags;
-static QSettings __s(QString("%1\\%2\\%3").arg(_ORGANIZATION_).arg(_APPLICATION_).arg(_MODULE_));
+static QSettings __s(QString("%1\\%2\\%3").arg(_ORGANIZATION_, _APPLICATION_, _MODULE_));
 
 Working::Working(C5User *user, QWidget *parent) :
     QWidget(parent),

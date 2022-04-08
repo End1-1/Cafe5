@@ -160,9 +160,7 @@ void C5FilterWidget::setFilterValue(const QString &key, const QVariant &value)
 void C5FilterWidget::setFixDate(bool v)
 {
     QSettings s(_ORGANIZATION_, QString("%1\\%2\\reportfilter\\%3")
-                .arg(_APPLICATION_)
-                .arg(_MODULE_)
-                .arg(metaObject()->className()));
+                .arg(_APPLICATION_, _MODULE_, metaObject()->className()));
     s.setValue("fixdate", v);
 }
 
@@ -171,9 +169,7 @@ QString C5FilterWidget::in(QString &cond, const QString &field, C5LineEditWithSe
     if (l->isEmpty()) {
         return cond;
     }
-    cond += QString (" and %1 in (%2)")
-            .arg(field)
-            .arg(l->text());
+    cond += QString (" and %1 in (%2)").arg(field, l->text());
     return cond;
 }
 

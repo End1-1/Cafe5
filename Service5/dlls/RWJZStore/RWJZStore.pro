@@ -14,12 +14,19 @@ CONFIG += c++11
 SOURCES += \
     ../../raw/rawmessage.cpp \
     ../../socket/sslsocket.cpp \
+    ../../utils/database.cpp \
+    ../../utils/logwriter.cpp \
     rwjzstore.cpp
 
 HEADERS += \
     ../../raw/rawmessage.h \
     ../../socket/sslsocket.h \
+    ../../utils/database.h \
+    ../../utils/logwriter.h \
     rwjzstore.h
+
+DEFINES += _APPLICATION_=\\\"Breeze\\\"
+DEFINES += _MODULE_=\\\"Service5_rwjzstore_dll\\\"
 
 # Default rules for deployment.
 unix {
@@ -29,3 +36,4 @@ unix {
 
 INCLUDEPATH += ../../raw
 INCLUDEPATH += ../../socket
+INCLUDEPATH += ../../utils

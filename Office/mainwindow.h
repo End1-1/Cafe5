@@ -32,6 +32,6 @@ private slots:
     void on_actionMovement_report_triggered();
 
 signals:
-    void dataReady(QByteArray &);
+    void dataReady(const QByteArray &);
 };
 #endif // MAINWINDOW_H

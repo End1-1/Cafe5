@@ -11,14 +11,14 @@ RawMessage::~RawMessage()
 {
 }
 
-void RawMessage::setHeader(quint32 msgNum, quint32 msgId, quint16 msgType)
+void RawMessage::setHeader(quint32 msgPacketNum, quint32 msgId, quint16 msgType)
 {
-    setHeader(fReply, msgNum, msgId, msgType);
+    setHeader(fReply, msgPacketNum, msgId, msgType);
 }
 
-void RawMessage::setHeader(QByteArray &d, quint32 msgNum, quint32 msgId, quint16 msgType)
+void RawMessage::setHeader(QByteArray &d, quint32 msgPacketNum, quint32 msgId, quint16 msgType)
 {
-    d.replace(3, 4, reinterpret_cast<const char*>(&msgNum), sizeof(msgNum));
+    d.replace(3, 4, reinterpret_cast<const char*>(&msgPacketNum), sizeof(msgPacketNum));
     d.replace(7, 4, reinterpret_cast<const char*>(&msgId), sizeof(msgId));
     d.replace(11, 2, reinterpret_cast<const char*>(&msgType), sizeof(msgType));
 }

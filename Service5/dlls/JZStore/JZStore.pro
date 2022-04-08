@@ -32,7 +32,7 @@ HEADERS += \
     ../../utils/logwriter.h \
     jzstore.h
 
-DEFINES += _APPLICATION_=\\\"Cafe5\\\"
+DEFINES += _APPLICATION_=\\\"Breeze\\\"
 DEFINES += _MODULE_=\\\"Service5_jzstore_dll\\\"
 
 TRANSLATIONS += \

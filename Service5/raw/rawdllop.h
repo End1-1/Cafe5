@@ -7,6 +7,7 @@ class RawDllOp: public Raw
 {
 public:
     RawDllOp(SslSocket *s);
+    ~RawDllOp();
 
 public slots:
     virtual void run(const QByteArray &d) override;

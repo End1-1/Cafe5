@@ -6,13 +6,13 @@
 #include "messagelist.h"
 #include <QMdiArea>
 #include <QPushButton>
+#include <QByteArray>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    qRegisterMetaType<QByteArray&>("QByteArray&");
     fConnectionStatusLabel = new QPushButton("", ui->statusbar);
     fConnectionStatusLabel->setMaximumSize(QSize(24, 24));
     fConnectionStatusLabel->setIconSize(QSize(20, 20));
@@ -26,7 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(SocketConnection::instance(), &SocketConnection::connected, this, &MainWindow::socketConnected);
     connect(SocketConnection::instance(), &SocketConnection::connectionLost, this, &MainWindow::socketDisconnected);
     connect(SocketConnection::instance(), &SocketConnection::externalDataReady, this, &MainWindow::socketDataReceived);
-    connect(this, SIGNAL(dataReady(QByteArray&)), SocketConnection::instance(), SLOT(sendData(QByteArray&)));
+    connect(this, &MainWindow::dataReady, SocketConnection::instance(), &SocketConnection::sendData);
     setCentralWidget(fMdiArea);
 }
 
@@ -62,7 +62,11 @@ void MainWindow::socketDataReceived(quint16 cmd, const QByteArray &d)
 void MainWindow::on_actionMovement_report_triggered()
 {
     RawMessage r(nullptr);
-    r.setHeader(0, 0, MessageList::dll_op);
+    r.setHeader(SocketConnection::instance()->getTcpPacketNumber(), 0, MessageList::dll_op);
     r.putString("rwjzstore");
+    r.putUShort(2022);
+    r.putUByte(3);
+    r.putUByte(2);
+    r.putUByte(2);
     emit dataReady(r.data());
 }

@@ -12,8 +12,8 @@ public:
     explicit RawMessage(SslSocket *s);
     ~RawMessage();
     inline SslSocket *socket() {return fSocket;}
-    void setHeader(quint32 msgNum, quint32 msgId, quint16 msgType);
-    static void setHeader(QByteArray &d, quint32 msgNum, quint32 msgId, quint16 msgType);
+    void setHeader(quint32 msgPacketNum, quint32 msgId, quint16 msgType);
+    static void setHeader(QByteArray &d, quint32 msgPacketNum, quint32 msgId, quint16 msgType);
     void setPacketNumber(quint32 n);
     static void setPacketNumber(QByteArray &d, quint32 n);
     QByteArray &data();

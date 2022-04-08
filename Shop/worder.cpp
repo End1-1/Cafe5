@@ -41,7 +41,7 @@ WOrder::WOrder(C5User *user, int saleType, QWidget *parent) :
     fWorking = static_cast<Working*>(parent);
     fDateOpen = QDate::currentDate();
     fTimeOpen = QTime::currentTime();
-    ui->tblGoods->setColumnWidths(ui->tblGoods->columnCount(), 0, 300, 80, 80, 80, 80, 80, 80, 0, 0, 0, 80, 30);
+    ui->tblGoods->setColumnWidths(ui->tblGoods->columnCount(), 0, 400, 80, 80, 80, 80, 0, 0, 0, 0, 0, 80, 00);
     fCostumerId = 0;
     fCardValue = 0;
     fCardMode = 0;
@@ -63,10 +63,10 @@ WOrder::WOrder(C5User *user, int saleType, QWidget *parent) :
     }
     ui->leAdvance->setValidator(new QDoubleValidator(0, 99999999, 2));
     connect(ui->leCard, &C5LineEdit::focusOut, [=](){
-        C5LogSystem::writeEvent(QString("%1: %2").arg(tr("Card value")).arg(ui->leCard->text()));
+        C5LogSystem::writeEvent(QString("%1: %2").arg(tr("Card value"), ui->leCard->text()));
     });
     connect(ui->leCash, &C5LineEdit::focusOut, [=](){
-        C5LogSystem::writeEvent(QString("%1: %2").arg(tr("Cash value")).arg(ui->leCard->text()));
+        C5LogSystem::writeEvent(QString("%1: %2").arg(tr("Cash value"), ui->leCard->text()));
     });
     ui->btnF1->setVisible(fWorking->fFlags.contains(1));
     ui->btnF2->setVisible(fWorking->fFlags.contains(2));
@@ -137,7 +137,7 @@ void WOrder::addGoodsToTable(int id)
     int row = ui->tblGoods->addEmptyRow();
     ui->tblGoods->item(row, 0)->setData(Qt::UserRole, QVariant::fromValue(id));
     ui->tblGoods->setInteger(row, 0, id);
-    ui->tblGoods->setString(row, 1, g.goodsName() + " " + g.scancode());
+    ui->tblGoods->setString(row, 1, g.goodsName());
     ui->tblGoods->setDouble(row, 2, g.unit()->defaultQty());
     ui->tblGoods->item(row, 2)->fDecimals = 3;
     ui->tblGoods->setString(row, 3, g.unit()->unitName());
