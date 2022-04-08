@@ -920,23 +920,23 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5shoporder.cpp" line="137"/>
+        <location filename="../Classes/c5shoporder.cpp" line="140"/>
         <source>(F)</source>
         <translation type="unfinished">(Ֆ)</translation>
     </message>
     <message>
-        <location filename="../Classes/c5shoporder.cpp" line="167"/>
+        <location filename="../Classes/c5shoporder.cpp" line="170"/>
         <source>Input before sale</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5shoporder.cpp" line="210"/>
+        <location filename="../Classes/c5shoporder.cpp" line="213"/>
         <source>Output of sale</source>
         <translation type="unfinished">Ելք ըստ վաճառքի</translation>
     </message>
     <message>
-        <location filename="../Classes/c5shoporder.cpp" line="319"/>
         <location filename="../Classes/c5shoporder.cpp" line="322"/>
+        <location filename="../Classes/c5shoporder.cpp" line="325"/>
         <source>Store input</source>
         <translation type="unfinished"></translation>
     </message>
