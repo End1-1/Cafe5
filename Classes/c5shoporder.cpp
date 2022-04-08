@@ -94,6 +94,9 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
         }
     }
 
+    if (C5Config::taxIP().isEmpty()) {
+        tax = false;
+    }
     if (tax) {
         PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
         pt.fPartnerTin = fPartnerName;

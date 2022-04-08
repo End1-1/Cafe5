@@ -141,6 +141,7 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     fTags[ui->chDebugMode->getTag()] = ui->chDebugMode->isChecked() ? "1" : "0";
     fTags[ui->cbIdramServer->property("Tag").toInt()] = ui->cbIdramServer->currentText();
     fTags[ui->chCloseTableAfterPrecheck->property("Tag").toInt()] = ui->chCloseTableAfterPrecheck->isChecked() ? "1" : "0";
+    fTags[ui->chDontCheckStoreQty->property("Tag").toInt()] = ui->chDontCheckStoreQty->isChecked() ? "1" : "0";
     C5Database db(fDBParams);
     db[":f_settings"] = ui->leCode->getInteger();
     db.exec("delete from s_settings_values where f_settings=:f_settings");

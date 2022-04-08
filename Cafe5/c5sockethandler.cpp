@@ -53,7 +53,7 @@ void C5SocketHandler::send()
         return;
     }
     QJsonObject jObj;
-    for (QMap<QString, QVariant>::const_iterator it = fBindValues.begin(); it != fBindValues.end(); it++) {
+    for (QMap<QString, QVariant>::const_iterator it = fBindValues.constBegin(); it != fBindValues.constEnd(); it++) {
         switch (it.value().type()) {
         case QVariant::Int:
             jObj[it.key()] = it.value().toInt();

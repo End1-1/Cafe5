@@ -103,7 +103,7 @@ void WOrder::focusCard()
 void WOrder::addGoods(int id)
 {
     DbGoods g(id);
-    if (!g.isService()) {
+    if (!g.isService() && __c5config.getValue(param_shop_dont_check_qty).toInt() == 0) {
         QString err;
         if (!checkQty(id, g.unit()->defaultQty(), err)) {
             C5Message::error(err);
@@ -276,7 +276,7 @@ bool WOrder::writeOrder()
         db[":f_window"] = fWorking->fTab->currentIndex();
         db.exec("update a_sale_temp set f_state=2, f_order=:f_order where f_station=:f_station and f_window=:f_window and f_state=0");
     }
-    C5LogSystem::writeEvent(QString("%1. %2:%3ms, %4:%5, %6").arg(tr("Order saved")).arg(tr("Elapsed")).arg(t.elapsed()).arg(tr("Order number")).arg(so.fHallId).arg(so.fHeader));
+    C5LogSystem::writeEvent(QString("%1. %2:%3ms, %4:%5, %6").arg(tr("Order saved"), tr("Elapsed"), QString::number(t.elapsed()), tr("Order number"), so.fHallId, so.fHeader));
     return w;
 }
 

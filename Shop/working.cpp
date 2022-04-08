@@ -383,7 +383,7 @@ void Working::newSale(int type)
     }
     ui->tab->addTab(w, QString("%1 #%2").arg(title).arg(ordersCount()));
     ui->tab->setCurrentIndex(ui->tab->count() - 1);
-    C5LogSystem::writeEvent(QString("%1 %2, #%3").arg(tr("New")).arg(title).arg(ui->tab->count()));
+    C5LogSystem::writeEvent(QString("%1 %2, #%3").arg(tr("New"), title).arg(ui->tab->count()));
 }
 
 int Working::ordersCount()

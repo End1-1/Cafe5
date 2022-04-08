@@ -152,6 +152,9 @@ int main(int argc, char *argv[])
     dlgsplash->exec();
     delete dlgsplash;
 
+    QFont fo = qApp->font();
+    fo.setPointSize(__c5config.getValue(param_fd_font_size).toInt());
+    qApp->setFont(fo);
     Working w(__user);
     w.setWindowTitle("");
     if (__c5config.defaultHall() > 0) {
