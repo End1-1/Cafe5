@@ -2,5 +2,8 @@
     <qresource prefix="/">
         <file>wifi_off.png</file>
         <file>wifi_on.png</file>
+        <file>logout2.png</file>
+        <file>login2.png</file>
+        <file>wifib.png</file>
     </qresource>
 </RCC>

@@ -17,7 +17,7 @@ public:
     static void removeSocket(SslSocket *s);
 
 public slots:
-    virtual void run(const QByteArray &d) = 0;
+    virtual int run(const QByteArray &d) = 0;
 
 protected:
     static QMutex *fMutexTokenUser;

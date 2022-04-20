@@ -27,6 +27,7 @@
 #include "dlglistofmenu.h"
 #include "dishitem.h"
 #include "datadriver.h"
+#include "change.h"
 #include "dlgcl.h"
 #include "idram.h"
 #include "dlgguests.h"
@@ -58,6 +59,8 @@ DlgOrder::DlgOrder(C5User *user) :
     fUser(user)
 {
     ui->setupUi(this);
+    ui->leReceived->clear();
+    ui->leChange->clear();
     fOpenDateTime = QDateTime::currentDateTime();
     fCarNumber = 0;
     ui->lbCar->setVisible(C5Config::carMode());
@@ -798,15 +801,15 @@ void DlgOrder::worderActivated()
 void DlgOrder::handlePrintService(const QJsonObject &obj)
 {
     sender()->deleteLater();
-    if (__c5config.getValue(param_waiter_closeorder_after_serviceprint).toInt() == 1) {
-        on_btnExit_clicked();
-        return;
-    }
     for (WOrder *o: worders()) {
         if (o->fOrderDriver->currentOrderId() == obj["order"].toString()) {
             o->fOrderDriver->reloadOrder();
             o->fOrderDriver->amountTotal();
         }
+    }
+    if (__c5config.getValue(param_waiter_closeorder_after_serviceprint).toInt() == 1) {
+        on_btnExit_clicked();
+        return;
     }
     itemsToTable();
 }
@@ -1788,6 +1791,13 @@ void DlgOrder::headerToLineEdit()
                             - ui->leIDRAM->getDouble()
                             - ui->lePayX->getDouble()
                             - ui->leOther->getDouble());
+    ui->leReceived->clear();
+    ui->leChange->clear();
+    if (wo->fOrderDriver->headerValue("f_cash").toDouble() > 0.01) {
+        wo->fOrderDriver->setHeader("f_change", wo->fOrderDriver->headerValue("f_cash").toDouble() - wo->fOrderDriver->headerValue("f_amounttotal").toDouble());
+        ui->leReceived->setDouble(wo->fOrderDriver->headerValue("f_cash").toDouble());
+        ui->leChange->setDouble(wo->fOrderDriver->headerValue("f_change").toDouble());
+    }
 }
 
 void DlgOrder::clearOther()
@@ -2817,5 +2827,18 @@ void DlgOrder::on_btnSetPrecent_clicked()
     itemsToTable();
     if (tmp != fUser) {
         delete tmp;
+    }
+}
+
+void DlgOrder::on_btnReceived_clicked()
+{
+    WOrder *wo = worder();
+    if (!wo) {
+        return;
+    }
+    double v = wo->fOrderDriver->headerValue("f_amounttotal").toDouble();
+    if (Change::getReceived(v)) {
+        wo->fOrderDriver->setHeader("f_cash", v);
+        headerToLineEdit();
     }
 }

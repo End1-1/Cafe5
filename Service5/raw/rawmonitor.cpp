@@ -11,8 +11,9 @@ RawMonitor::~RawMonitor()
     qDebug() << "~RawMonitor";
 }
 
-void RawMonitor::run(const QByteArray &d)
+int RawMonitor::run(const QByteArray &d)
 {
     QMutexLocker ml(fMutexInformMonitors);
     fMonitors.append(fSocket);
+    return 0;
 }

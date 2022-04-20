@@ -260,6 +260,7 @@ private slots:
     void on_btnRemoveSelected_clicked();
 
     void on_btnSetPrecent_clicked();
+    void on_btnReceived_clicked();
 };
 
 #endif // DLGORDER_H

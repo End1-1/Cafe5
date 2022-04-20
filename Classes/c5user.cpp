@@ -84,6 +84,7 @@ bool C5User::authByUsernamePass(const QString &username, const QString &pass)
 
 bool C5User::authByPinPass(const QString &pin, const QString &pass)
 {
+    fError.clear();
     fValid = false;
     C5Database db(__c5config.dbParams());
     db[":f_login"] = pin;

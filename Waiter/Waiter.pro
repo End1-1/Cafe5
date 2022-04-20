@@ -105,6 +105,7 @@ SOURCES += \
     ../DbData/dbunit.cpp \
     ../DbData/dbusers.cpp \
     ../Forms/c5filtervalues.cpp \
+    ../Forms/change.cpp \
     ../Forms/dlgqty.cpp \
     ../Shop/printreceipt.cpp \
     ../Shop/printreceiptgroup.cpp \
@@ -265,6 +266,7 @@ HEADERS += \
     ../DbData/dbunit.h \
     ../DbData/dbusers.h \
     ../Forms/c5filtervalues.h \
+    ../Forms/change.h \
     ../Forms/dlgqty.h \
     ../Service/servicecommands.h \
     ../Shop/printreceipt.h \
@@ -363,6 +365,7 @@ FORMS += \
     ../Classes/dlgpassword.ui \
     ../Classes/notificationwidget.ui \
     ../Forms/c5filtervalues.ui \
+    ../Forms/change.ui \
     ../Forms/dlgqty.ui \
     ../Shop/selectprinters.ui \
     dishitem.ui \

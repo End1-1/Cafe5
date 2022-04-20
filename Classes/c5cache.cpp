@@ -59,9 +59,8 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         fCacheQuery[cache_doc_type] = QString("select f_id as `%1`, f_name as `%2` from a_type")
                 .arg(tr("Code"))
                 .arg(tr("Name"));
-        fCacheQuery[cache_users] = QString("select f_id as `%1`, concat(f_last, ' ', f_first) as `%2` from s_user where f_state=1")
-                .arg(tr("Code"))
-                .arg(tr("Name"));
+        fCacheQuery[cache_users] = QString("select f_id as `%1`, concat(f_last, ' ', f_first) as `%2`, f_teamlead from s_user where f_state=1")
+                .arg(tr("Code"), tr("Name"), tr("Teamlead"));
         fCacheQuery[cache_waiter_printers] = QString("select f_id as `%1`, f_name as `%2` from d_printers")
                 .arg(tr("Code"))
                 .arg(tr("Name"));
@@ -195,7 +194,7 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         return;
     }
     QList<int> missingCache;
-    for (QMap<QString, int>::const_iterator it = fTableCache.begin(); it != fTableCache.end(); it++) {
+    for (QMap<QString, int>::const_iterator it = fTableCache.constBegin(); it != fTableCache.constEnd(); it++) {
         bool found = false;
         for (int  i = 0; i < db.rowCount(); i++) {
             if (db.getInt(i, "f_id") == it.value()) {

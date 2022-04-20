@@ -20,7 +20,7 @@ RawCarNear::RawCarNear(SslSocket *s) :
 
 }
 
-void RawCarNear::run(const QByteArray &d)
+int RawCarNear::run(const QByteArray &d)
 {
     quint32 radius;
     double latitude, longitude;
@@ -55,4 +55,6 @@ void RawCarNear::run(const QByteArray &d)
         putDouble(c.lastCoordinate.latitude);
         putDouble(c.lastCoordinate.longitude);
     }
+
+    return 0;
 }

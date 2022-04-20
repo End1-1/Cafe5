@@ -9,7 +9,7 @@ public:
     RawCarNear(SslSocket *s);
 
 public slots:
-    virtual void run(const QByteArray &d) override;
+    virtual int run(const QByteArray &d) override;
 };
 
 #endif // RAWCARNEAR_H

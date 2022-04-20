@@ -61,24 +61,28 @@ void RawMessage::putUShort(quint16 v)
     increaseDataSize(sizeof(quint16));
 }
 
-void RawMessage::putUInt(quint32 v)
+int RawMessage::putUInt(quint32 v)
 {
     fReply.append(reinterpret_cast<const char*>(&v), sizeof(quint32));
     increaseDataSize(sizeof(quint32));
+    return fReply.length() - sizeof(quint32);
 }
 
-void RawMessage::putDouble(double v)
+int RawMessage::putDouble(double v)
 {
     fReply.append(reinterpret_cast<const char*>(&v), sizeof(double));
     increaseDataSize(sizeof(double));
+    return fReply.length() - sizeof(double);
 }
 
-void RawMessage::putString(const QString &v)
+int RawMessage::putString(const QString &v)
 {
-    quint32 sz = v.toUtf8().length();
+    quint32 sz = v.toUtf8().length() + 1;
     putUInt(sz);
     fReply.append(v.toUtf8());
+    fReply.append('\0');
     increaseDataSize(sz);
+    return fReply.length() - sz - sizeof(quint32);
 }
 
 void RawMessage::putBytes(const char *data, quint32 size)
@@ -154,6 +158,11 @@ void RawMessage::clear()
     fReply.append('\x00');
     fReply.append('\x00');
     fDataPosition = 0;
+}
+
+void RawMessage::setPosition(int pos)
+{
+    fDataPosition = pos;
 }
 
 quint32 RawMessage::getDataSize()

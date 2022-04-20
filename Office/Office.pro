@@ -10,31 +10,37 @@ CONFIG += c++11
 
 SOURCES += \
     ../Classes/c5crypt.cpp \
+    ../Classes/config.cpp \
+    ../Classes/socketconnection.cpp \
+    ../Forms/dlgserversettings.cpp \
     ../Service5/raw/rawmessage.cpp \
     ../Service5/socket/sslsocket.cpp \
-    config.cpp \
-    dlgserversettings.cpp \
     main.cpp \
     mainwindow.cpp \
-    socketconnection.cpp \
-    socketwidget.cpp
+    socketwidget.cpp \
+    tablemodel.cpp \
+    tablewidget.cpp
 
 HEADERS += \
     ../Classes/c5crypt.h \
+    ../Classes/config.h \
+    ../Classes/socketconnection.h \
+    ../Forms/dlgserversettings.h \
     ../Service5/raw/messagelist.h \
     ../Service5/raw/rawmessage.h \
     ../Service5/socket/sslsocket.h \
-    config.h \
-    dlgserversettings.h \
     mainwindow.h \
-    socketconnection.h \
-    socketwidget.h
+    socketwidget.h \
+    tablemodel.h \
+    tablewidget.h
 
 FORMS += \
-    dlgserversettings.ui \
-    mainwindow.ui
+    ../Forms/dlgserversettings.ui \
+    mainwindow.ui \
+    tablewidget.ui
 
 INCLUDEPATH += ../Classes
+INCLUDEPATH += ../Forms
 INCLUDEPATH += ../Service5/raw
 INCLUDEPATH += ../Service5/socket
 INCLUDEPATH += C:/Soft/OpenSSL-Win64/include

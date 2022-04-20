@@ -131,6 +131,13 @@
        </widget>
       </item>
       <item>
+       <widget class="QLineEdit" name="leFilterWorker">
+        <property name="placeholderText">
+         <string>find employee</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QListWidget" name="lstWorkers">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -140,6 +147,9 @@
         </property>
         <property name="editTriggers">
          <set>QAbstractItemView::NoEditTriggers</set>
+        </property>
+        <property name="selectionBehavior">
+         <enum>QAbstractItemView::SelectRows</enum>
         </property>
        </widget>
       </item>

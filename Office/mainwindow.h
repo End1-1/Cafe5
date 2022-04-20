@@ -21,15 +21,20 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    QMdiArea *fMdiArea;
     QPushButton *fConnectionStatusLabel;
+    QPushButton *fLoginButton;
+    void addTabWidget(QWidget *w, const QIcon &icon, const QString &title);
 
 private slots:
     void socketConnected();
     void socketDisconnected();
     void connectionButtonClicked();
-    void socketDataReceived(quint16 cmd, const QByteArray &d);
+    void loginButtonClicked();
+    void socketDataReceived(quint16 cmd, QByteArray d);
     void on_actionMovement_report_triggered();
+    void on_tw_tabCloseRequested(int index);
+
+    void on_tw_currentChanged(int index);
 
 signals:
     void dataReady(const QByteArray &);

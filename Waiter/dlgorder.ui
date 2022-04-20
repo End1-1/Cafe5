@@ -339,7 +339,7 @@
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset resource="../resources/res.qrc">
+                  <iconset resource="../resources/resources.qrc">
                    <normaloff>:/recycle.png</normaloff>:/recycle.png</iconset>
                  </property>
                  <property name="iconSize">
@@ -374,7 +374,7 @@
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset resource="../resources/res.qrc">
+                  <iconset resource="../resources/resources.qrc">
                    <normaloff>:/bill.png</normaloff>:/bill.png</iconset>
                  </property>
                  <property name="iconSize">
@@ -696,7 +696,7 @@
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset resource="../resources/res.qrc">
+                  <iconset resource="../resources/resources.qrc">
                    <normaloff>:/cancel.png</normaloff>:/cancel.png</iconset>
                  </property>
                  <property name="iconSize">
@@ -926,7 +926,7 @@ background:#fff6e5;
                <string/>
               </property>
               <property name="icon">
-               <iconset resource="../resources/res.qrc">
+               <iconset resource="../resources/resources.qrc">
                 <normaloff>:/minus.png</normaloff>:/minus.png</iconset>
               </property>
               <property name="iconSize">
@@ -955,7 +955,7 @@ background:#fff6e5;
                <string/>
               </property>
               <property name="icon">
-               <iconset resource="../resources/res.qrc">
+               <iconset resource="../resources/resources.qrc">
                 <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
               </property>
               <property name="iconSize">
@@ -1287,6 +1287,19 @@ background:#fff6e5;
       <property name="spacing">
        <number>2</number>
       </property>
+      <item row="5" column="0">
+       <spacer name="verticalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
       <item row="0" column="0" colspan="3">
        <widget class="QWidget" name="wsetamount" native="true">
         <property name="minimumSize">
@@ -1504,7 +1517,7 @@ background:#fff6e5;
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/res.qrc">
+            <iconset resource="../resources/resources.qrc">
              <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
            </property>
            <property name="iconSize">
@@ -1597,7 +1610,7 @@ background:#fff6e5;
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/res.qrc">
+            <iconset resource="../resources/resources.qrc">
              <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
            </property>
            <property name="iconSize">
@@ -1627,7 +1640,7 @@ background:#fff6e5;
 OTHER</string>
            </property>
            <property name="icon">
-            <iconset resource="../resources/res.qrc">
+            <iconset resource="../resources/resources.qrc">
              <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
            </property>
            <property name="iconSize">
@@ -1857,7 +1870,7 @@ BANK</string>
 CARD</string>
            </property>
            <property name="icon">
-            <iconset resource="../resources/res.qrc">
+            <iconset resource="../resources/resources.qrc">
              <normaloff>:/credit-card.png</normaloff>:/credit-card.png</iconset>
            </property>
            <property name="iconSize">
@@ -1916,7 +1929,7 @@ CASH</string>
             <string>PAY X</string>
            </property>
            <property name="icon">
-            <iconset resource="../resources/res.qrc">
+            <iconset resource="../resources/resources.qrc">
              <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
            </property>
            <property name="iconSize">
@@ -1953,7 +1966,7 @@ CASH</string>
 IDRAM</string>
            </property>
            <property name="icon">
-            <iconset resource="../resources/res.qrc">
+            <iconset resource="../resources/resources.qrc">
              <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
            </property>
            <property name="iconSize">
@@ -1982,7 +1995,7 @@ IDRAM</string>
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/res.qrc">
+            <iconset resource="../resources/resources.qrc">
              <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
            </property>
            <property name="iconSize">
@@ -2018,7 +2031,7 @@ IDRAM</string>
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/res.qrc">
+            <iconset resource="../resources/resources.qrc">
              <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
            </property>
            <property name="iconSize">
@@ -2159,19 +2172,6 @@ IDRAM</string>
          </item>
         </layout>
        </widget>
-      </item>
-      <item row="4" column="0">
-       <spacer name="verticalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>40</height>
-         </size>
-        </property>
-       </spacer>
       </item>
       <item row="3" column="0" colspan="3">
        <widget class="QWidget" name="wPayOther" native="true">
@@ -2440,6 +2440,177 @@ IDRAM</string>
         </layout>
        </widget>
       </item>
+      <item row="4" column="0" colspan="3">
+       <widget class="QWidget" name="wchange" native="true">
+        <layout class="QHBoxLayout" name="horizontalLayout_12">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QGroupBox" name="groupBox_2">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>130</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="title">
+            <string>Received</string>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_10">
+            <property name="leftMargin">
+             <number>2</number>
+            </property>
+            <property name="topMargin">
+             <number>2</number>
+            </property>
+            <property name="rightMargin">
+             <number>2</number>
+            </property>
+            <property name="bottomMargin">
+             <number>8</number>
+            </property>
+            <item>
+             <widget class="C5LineEdit" name="leReceived">
+              <property name="font">
+               <font>
+                <pointsize>16</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="focusPolicy">
+               <enum>Qt::NoFocus</enum>
+              </property>
+              <property name="text">
+               <string>999999.99</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btnReceived">
+              <property name="minimumSize">
+               <size>
+                <width>32</width>
+                <height>32</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>32</width>
+                <height>32</height>
+               </size>
+              </property>
+              <property name="focusPolicy">
+               <enum>Qt::NoFocus</enum>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="../resources/resources.qrc">
+                <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>32</width>
+                <height>32</height>
+               </size>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="groupBox_3">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>130</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="title">
+            <string>Change</string>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_11">
+            <property name="leftMargin">
+             <number>2</number>
+            </property>
+            <property name="topMargin">
+             <number>2</number>
+            </property>
+            <property name="rightMargin">
+             <number>2</number>
+            </property>
+            <property name="bottomMargin">
+             <number>8</number>
+            </property>
+            <item>
+             <widget class="C5LineEdit" name="leChange">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>16</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="focusPolicy">
+               <enum>Qt::NoFocus</enum>
+              </property>
+              <property name="text">
+               <string>999999.99</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -2514,7 +2685,7 @@ IDRAM</string>
          <string>Comment</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/res.qrc">
+         <iconset resource="../resources/resources.qrc">
           <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
         </property>
         <property name="iconSize">
@@ -2601,7 +2772,7 @@ IDRAM</string>
          <string>Search</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/res.qrc">
+         <iconset resource="../resources/resources.qrc">
           <normaloff>:/search.png</normaloff>:/search.png</iconset>
         </property>
         <property name="iconSize">
@@ -3225,8 +3396,8 @@ QLabel {color:yellow;background:green;}
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../resources/res.qrc"/>
   <include location="../resources/resources.qrc"/>
+  <include location="../resources/res.qrc"/>
  </resources>
  <connections/>
 </ui>

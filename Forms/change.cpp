@@ -15,10 +15,9 @@ Change::Change() :
     fButtons.append(ui->btn5);
     fButtons.append(ui->btn6);
     fButtons.append(ui->btn7);
-    for (auto *b: fButtons) {
-        b->setText(float_str(str_float(b->text()), 2));
-        connect(b, &QPushButton::clicked, this, &Change::buttonClicked);
-    }
+    fButtons.append(ui->btn8);
+    fButtons.append(ui->btn9);
+    fButtons.append(ui->btn0);
 }
 
 Change::~Change()
@@ -30,6 +29,10 @@ bool Change::getReceived(double &v)
 {
     Change c;
     c.ui->leAmount->setDouble(v);
+    for (int i = 0; i < c.fButtons.count(); i++) {
+        QPushButton *b = c.fButtons.at(i);
+        connect(b, &QPushButton::clicked, &c, &Change::buttonClicked);
+    }
     if (c.exec() == QDialog::Accepted) {
         v = c.ui->leReceived->getDouble();
         return true;
@@ -40,7 +43,7 @@ bool Change::getReceived(double &v)
 void Change::buttonClicked()
 {
     QPushButton *b = static_cast<QPushButton*>(sender());
-    ui->leReceived->setText(b->text());
+    ui->leReceived->setText(ui->leReceived->text() + b->text());
 }
 
 void Change::on_leReceived_textChanged(const QString &arg1)

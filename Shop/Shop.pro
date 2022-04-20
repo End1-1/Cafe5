@@ -80,12 +80,14 @@ SOURCES += \
     ../Classes/c5witerconf.cpp \
     ../Classes/calculator.cpp \
     ../Classes/checkforupdatethread.cpp \
+    ../Classes/config.cpp \
     ../Classes/dataonline.cpp \
     ../Classes/doubledatabase.cpp \
     ../Classes/fileversion.cpp \
     ../Classes/notificationwidget.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
     ../Classes/rkeyboard.cpp \
+    ../Classes/socketconnection.cpp \
     ../Classes/threadsendmessage.cpp \
     ../Controls/c5graphicsview.cpp \
     ../Controls/c5guicontrols.cpp \
@@ -118,6 +120,9 @@ SOURCES += \
     ../Forms/c5printtaxanywhere.cpp \
     ../Forms/dlgdataonline.cpp \
     ../Forms/dlgreservgoods.cpp \
+    ../Forms/dlgserversettings.cpp \
+    ../Service5/raw/rawmessage.cpp \
+    ../Service5/socket/sslsocket.cpp \
     cashcollection.cpp \
     dlgdate.cpp \
     dlggoodslist.cpp \
@@ -222,6 +227,7 @@ HEADERS += \
     ../Classes/calculator.h \
     ../Classes/chatmessage.h \
     ../Classes/checkforupdatethread.h \
+    ../Classes/config.h \
     ../Classes/dataonline.h \
     ../Classes/doubledatabase.h \
     ../Classes/fileversion.h \
@@ -229,6 +235,7 @@ HEADERS += \
     ../Classes/notificationwidget.h \
     ../Classes/proxytablewidgetdatabase.h \
     ../Classes/rkeyboard.h \
+    ../Classes/socketconnection.h \
     ../Classes/threadsendmessage.h \
     ../Controls/c5graphicsview.h \
     ../Controls/c5guicontrols.h \
@@ -261,6 +268,9 @@ HEADERS += \
     ../Forms/c5printtaxanywhere.h \
     ../Forms/dlgdataonline.h \
     ../Forms/dlgreservgoods.h \
+    ../Forms/dlgserversettings.h \
+    ../Service5/raw/rawmessage.h \
+    ../Service5/socket/sslsocket.h \
     cashcollection.h \
     dlgdate.h \
     dlggoodslist.h \
@@ -318,6 +328,7 @@ FORMS += \
     ../Forms/c5printtaxanywhere.ui \
     ../Forms/dlgdataonline.ui \
     ../Forms/dlgreservgoods.ui \
+    ../Forms/dlgserversettings.ui \
     cashcollection.ui \
     dlgdate.ui \
     dlggoodslist.ui \
@@ -345,7 +356,7 @@ FORMS += \
     dqty.ui
 
 DEFINES += _DBDRIVER_=\\\"QMYSQL\\\"
-DEFINES += _ORGANIZATION_=\\\"Hotelicca\\\"
+DEFINES += _ORGANIZATION_=\\\"BreezeDevs\\\"
 DEFINES += _APPLICATION_=\\\"Shop\\\"
 DEFINES += _MODULE_=\\\"Shop\\\"
 DEFINES += SHOP
@@ -358,6 +369,8 @@ INCLUDEPATH += ../DbData
 INCLUDEPATH += ../Forms
 INCLUDEPATH += ../Service
 INCLUDEPATH += ../Service5
+INCLUDEPATH += ../Service5/raw
+INCLUDEPATH += ../Service5/socket
 INCLUDEPATH += ../RESOURCES
 INCLUDEPATH += ../../XLSX/Src
 INCLUDEPATH += C:/Projects/NewTax/Src
@@ -375,6 +388,9 @@ LIBS += -lwsock32
 LIBS += -LC:/Soft/OpenSSL-Win64/lib
 LIBS += -lopenssl
 LIBS += -llibcrypto
+
+DEFINES += _CRYPT_KEY_=\\\"shop2022!!!\\\"
+DEFINES += WAITER
 
 win32: QMAKE_CXXFLAGS_RELEASE -= -Zc:strictStrings
 win32: QMAKE_CFLAGS_RELEASE -= -Zc:strictStrings

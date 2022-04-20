@@ -27,11 +27,19 @@ public:
 
     QString fOrderUUID;
 
-    void changeIshmarColor(const QString &c);
+    void clearCode();
+
+    void keyMinus();
+
+    void keyPlus();
+
+    void keyAsterix();
 
     void focusCash();
 
     void focusCard();
+
+    void focusTaxpayerId();
 
     void addGoods(int id);
 
@@ -39,7 +47,7 @@ public:
 
     bool writeOrder();
 
-    bool writePreorder();
+    //bool writePreorder();
 
     void fixCostumer(const QString &code);
 
@@ -72,27 +80,23 @@ public:
     bool checkQty(int goods, double qty, QString &err);
 
 private slots:
-    void on_leCash_textChanged(const QString &arg1);
-
-    void on_leCard_textChanged(const QString &arg1);
-
     void imageLoaded(const QPixmap &img);
 
     void noImage();
 
-    void on_btnInfo_clicked();
-
-    void on_btnOpenOrder_clicked();
-
-    void on_btnSave_clicked();
-
-    void on_btnPrintTaxPrepaid_clicked();
-
     void on_btnRemove_clicked();
 
-    void on_leAdvance_textChanged(const QString &arg1);
+    void on_leCash_textChanged(const QString &arg1);
 
-    void on_btnPrintManualTax_clicked();
+    void on_leCode_textChanged(const QString &arg1);
+
+    void on_leCode_returnPressed();
+
+    void on_leCustomerTaxpayerId_returnPressed();
+
+    void on_leCard_textChanged(const QString &arg1);
+
+    void on_leAdvance_textChanged(const QString &arg1);
 
 private:
     Ui::WOrder *ui;

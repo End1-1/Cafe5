@@ -43,7 +43,7 @@ Monitor::Monitor(QWidget *parent)
     }
     if (ui->leMariaDBInstallationPath->text().isEmpty()) {
         QSettings s("HKEY_LOCAL_MACHINE\\SOFTWARE", QSettings::Registry64Format);
-        for (auto c: s.childGroups()) {
+        for (const auto &c: s.childGroups()) {
             if (c.contains("MariaDB", Qt::CaseInsensitive)) {
                 s.beginGroup(c);
                 ui->leMariaDBInstallationPath->setText(s.value("INSTALLDIR").toString());

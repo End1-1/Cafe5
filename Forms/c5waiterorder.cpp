@@ -113,6 +113,12 @@ void C5WaiterOrder::setOrder(const QString &id)
     if (db.nextRow()) {
         ui->leTax->setText(db.getString("f_receiptnumber"));
     }
+
+    db[":f_id"] = ui->leUuid->text();
+    db.exec("select * from o_pay_cl where f_id=:f_id");
+    if (db.nextRow()) {
+         ui->leCityLedger->setText(db.getString("f_code"));
+    }
 }
 
 bool C5WaiterOrder::allowChangeDatabase()

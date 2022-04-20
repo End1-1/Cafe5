@@ -11,6 +11,7 @@ class Working;
 class QTableWidgetItem;
 class QTabWidget;
 class C5User;
+class WOrder;
 
 struct IUser {
     int id;
@@ -57,9 +58,9 @@ private:
 
     C5User *fUser;
 
-    void loadStaff();
+    WOrder *worder();
 
-    void addGoods(QString &code);
+    void loadStaff();
 
     void newSale(int type);
 
@@ -74,6 +75,12 @@ private:
     void restoreSales();
 
 private slots:
+    void socketConnected();
+
+    void socketDisconnected();
+
+    void socketDataReceived(quint16 cmd, QByteArray d);
+
     void timeout();
 
     void uploadDataFinished();
@@ -82,7 +89,13 @@ private slots:
 
     void threadMessageData(int code, const QVariant &data);
 
-    void escape();
+    void shortcutEscape();
+
+    void shortcutMinus();
+
+    void shortcutPlus();
+
+    void shortcutAsterix();
 
     void shortcutF1();
 
@@ -114,35 +127,33 @@ private slots:
 
     void haveChanges(bool v);
 
-    void on_btnNewOrder_clicked();
-
-    void on_btnConnection_clicked();
-
-    void on_leCode_returnPressed();
-
-    void on_btnSaveOrder_clicked();
-
-    void on_btnExit_clicked();
-
-    void on_btnShowGoodsList_clicked();
-
-    void on_tblGoods_itemClicked(QTableWidgetItem *item);
-
-    void on_btnDuplicateReceipt_clicked();
-
-    void on_leCode_textChanged(const QString &arg1);
-
-    void on_btnNewWhosale_clicked();
-
-    void on_lePartner_returnPressed();
-
     void on_tab_tabCloseRequested(int index);
 
     void on_btnItemBack_clicked();
 
-    void on_btnStoreInput_clicked();
-
     void on_tab_currentChanged(int index);
+
+    void on_btnCloseApplication_clicked();
+
+    void on_btnServerSettings_clicked();
+
+    void on_btnWriteOrder_clicked();
+
+    void on_btnGoodsMovement_clicked();
+
+    void on_btnNewRetail_clicked();
+
+    void on_btnNewWhosale_clicked();
+
+    void on_btnGoodsList_clicked();
+
+    void on_btnSalesReport_clicked();
+
+    void on_btnDbConnection_clicked();
+
+    void on_btnHelp_clicked();
+
+    void on_btnManualTax_clicked();
 };
 
 #endif // WORKING_H

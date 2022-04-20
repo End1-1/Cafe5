@@ -341,6 +341,9 @@ QStringList C5Grid::dbParams()
 
 QString C5Grid::reportAdditionalTitle()
 {
+    if (fFilterWidget) {
+        return fFilterWidget->conditionText();
+    }
     return "";
 }
 
@@ -573,10 +576,12 @@ void C5Grid::print()
     }
     do {
         p.setFontBold(true);
-        p.ltext(QString("%1 %2")
-                .arg(fLabel)
-                .arg(reportAdditionalTitle()), 0);
+        p.ltext(fLabel, 0);
         p.br();
+        if (reportAdditionalTitle().isEmpty() == false) {
+            p.ltext(reportAdditionalTitle(), 0);
+            p.br();
+        }
         p.setFontBold(false);
         p.line(0, p.fTop, columnsWidth, p.fTop);
         for (int c = 0; c < fModel->columnCount(); c++) {

@@ -11,7 +11,7 @@ public:
     ~RawRegisterPhone();
 
 public slots:
-    virtual void run(const QByteArray &d) override;
+    virtual int run(const QByteArray &d) override;
 
 signals:
     void firebaseMessage(const QString &, const QString &);

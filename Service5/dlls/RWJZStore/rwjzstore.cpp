@@ -1,68 +1,76 @@
 #include "rwjzstore.h"
 #include "database.h"
 
-QMap<int, QMap<QString, QString> > fConnections;
-QMap<int, QString> fStorages;
-QMap<int, QMap<int, QString> > fAsStorageMap;
+class Config {
+public:
+    QMap<int, QMap<QString, QString> > fConnections;
+    QMap<int, QString> fStorages;
+    QMap<int, QMap<int, QString> > fAsStorageMap;
 
-void addConnection(int id, const QString &name, const QString &host, const QString &schema, const QString &username, const QString &password)
-{
-    QMap<QString, QString> c;
-    c["name"] = name;
-    c["host"] = host;
-    c["schema"] = schema;
-    c["username"] = username;
-    c["password"] = password;
-    fConnections[id] = c;
-}
+    Config() {
+        init();
+    }
 
-void putData(RawMessage &rm, const QVariant &value){
+    void addConnection(int id, const QString &name, const QString &host, const QString &schema, const QString &username, const QString &password)
+    {
+        QMap<QString, QString> c;
+        c["name"] = name;
+        c["host"] = host;
+        c["schema"] = schema;
+        c["username"] = username;
+        c["password"] = password;
+        fConnections[id] = c;
+    }
+
+    void init() {
+        if (fConnections.isEmpty()) {
+            addConnection(2, QString::fromUtf8("Օպերա"), "10.10.12.1", "cafe4", "SYSDBA", "Inter_OneStep");
+            addConnection(3, QString::fromUtf8("Թումանյան"), "10.10.5.1", "cafe4", "SYSDBA", "Inter_OneStep");
+            addConnection(4, QString::fromUtf8("Կոմիտաս"), "10.10.11.1", "cafe4", "SYSDBA", "Inter_OneStep");
+            addConnection(6, QString::fromUtf8("Աբովյան"), "10.10.13.1", "cafe4", "SYSDBA", "Inter_OneStep");
+            addConnection(7, QString::fromUtf8("Արմենիա"), "10.10.7.1", "cafe4", "SYSDBA", "Inter_OneStep");
+            addConnection(8, QString::fromUtf8("Երևան Մոլլ"), "10.10.14.1", "cafe4", "SYSDBA", "Inter_OneStep");
+
+            fStorages[2] = QString::fromUtf8("Բար");
+            fStorages[3] = QString::fromUtf8("Խոհանոց");
+            fStorages[4] = QString::fromUtf8("Սառնարան");
+
+            fAsStorageMap[2][2] = "022";
+            fAsStorageMap[2][3] = "023";
+            fAsStorageMap[2][4] = "025";
+            fAsStorageMap[3][2] = "031";
+            fAsStorageMap[3][3] = "032";
+            fAsStorageMap[3][4] = "033";
+            fAsStorageMap[4][2] = "041";
+            fAsStorageMap[4][3] = "042";
+            fAsStorageMap[4][4] = "043";
+            fAsStorageMap[6][2] = "061";
+            fAsStorageMap[6][3] = "062";
+            fAsStorageMap[6][4] = "063";
+            fAsStorageMap[7][2] = "071";
+            fAsStorageMap[8][2] = "081";
+            fAsStorageMap[8][3] = "082";
+            fAsStorageMap[8][4] = "083";
+        }
+    }
+};
+
+int putData(RawMessage &rm, const QVariant &value){
+    qDebug() << value;
     switch (value.type()) {
     case QVariant::Int:
-        rm.putUInt(value.toInt());
-        break;
+        return rm.putUInt(value.toInt());
     case QVariant::Double:
-        rm.putDouble(value.toDouble());
-        break;
+        return rm.putDouble(value.toDouble());
     case QVariant::String:
-        rm.putString(value.toString());
-        break;
+        return rm.putString(value.toString());
     default:
-        rm.putString(value.toString());
-        break;
+        return rm.putString(value.toString());
     }
 }
 
-void init() {
-    if (fConnections.isEmpty()) {
-        addConnection(2, QString::fromUtf8("Օպերա"), "10.10.12.1", "cafe4", "SYSDBA", "Inter_OneStep");
-        addConnection(3, QString::fromUtf8("Թումանյան"), "10.10.5.1", "cafe4", "SYSDBA", "Inter_OneStep");
-        addConnection(4, QString::fromUtf8("Կոմիտաս"), "10.10.11.1", "cafe4", "SYSDBA", "Inter_OneStep");
-        addConnection(6, QString::fromUtf8("Աբովյան"), "10.10.13.1", "cafe4", "SYSDBA", "Inter_OneStep");
-        addConnection(7, QString::fromUtf8("Արմենիա"), "10.10.7.1", "cafe4", "SYSDBA", "Inter_OneStep");
-        addConnection(8, QString::fromUtf8("Երևան Մոլլ"), "10.10.14.1", "cafe4", "SYSDBA", "Inter_OneStep");
-
-        fStorages[2] = QString::fromUtf8("Բար");
-        fStorages[3] = QString::fromUtf8("Խոհանոց");
-        fStorages[4] = QString::fromUtf8("Սառնարան");
-
-        fAsStorageMap[2][2] = "022";
-        fAsStorageMap[2][3] = "023";
-        fAsStorageMap[2][4] = "025";
-        fAsStorageMap[3][2] = "031";
-        fAsStorageMap[3][3] = "032";
-        fAsStorageMap[3][4] = "033";
-        fAsStorageMap[4][2] = "041";
-        fAsStorageMap[4][3] = "042";
-        fAsStorageMap[4][4] = "043";
-        fAsStorageMap[6][2] = "061";
-        fAsStorageMap[6][3] = "062";
-        fAsStorageMap[6][4] = "063";
-        fAsStorageMap[7][2] = "071";
-        fAsStorageMap[8][2] = "081";
-        fAsStorageMap[8][3] = "082";
-        fAsStorageMap[8][4] = "083";
-    }
+QString gr(const QString &v) {
+    return v;
 }
 
 bool dllfunc(const QByteArray &in, RawMessage &rm)
@@ -76,9 +84,9 @@ bool dllfunc(const QByteArray &in, RawMessage &rm)
     rm.readUByte(cafe, in);
     rm.readUByte(store, in);
 
-    init();
+    Config c;
 
-    QMap<QString, QString> &con = fConnections[cafe];
+    QMap<QString, QString> &con = c.fConnections[cafe];
     Database db("QIBASE");
     if (!db.open(con["host"], con["schema"], con["username"], con["password"])) {
         rm.putUByte(2);
@@ -123,7 +131,7 @@ bool dllfunc(const QByteArray &in, RawMessage &rm)
         rm.putString(mssqldb.lastDbError());
         return false;
     }
-    mssqldb[":store"] = fAsStorageMap[cafe][store];
+    mssqldb[":store"] = c.fAsStorageMap[cafe][store];
     mssqldb[":date1"] = d1;
     mssqldb[":date2"] = d2;
     if (!mssqldb.exec("select cast(t.fMTCODE as integer) as food, m.fDBCR as sign, sum(m.fQTY) as qty, sum(m.fCOSTSUMM) as amount "
@@ -210,15 +218,89 @@ bool dllfunc(const QByteArray &in, RawMessage &rm)
     for (auto i: removeList) {
         goods.remove(i);
     }
+
+    /*temp &*/
+//    while (goods.count() > 1) {
+//        goods.remove(goods.begin().key());
+//    }
+
+    quint32 rowCount = goods.count();
+    rm.putUByte(3); // answer : 3 = ok
+    rm.putUByte(8); //column count
+    rm.putUInt(rowCount); //row count
+
+    //column types
+    rm.putUByte(1);
     rm.putUByte(3);
-    for (QMap<int, QHash<QString, QVariant> >::const_iterator it = goods.constBegin(); it != goods.constEnd(); it++) {
-        putData(rm, it.value()["id"]);
-        putData(rm, it.value()["typename"]);
-        putData(rm, it.value()["foodname"]);
-        putData(rm, it.value()["qty_till"]);
-        putData(rm, it.value()["qty_in"]);
-        putData(rm, it.value()["qty_out"]);
-        putData(rm, it.value()["qty_out2"]);
+    rm.putUByte(3);
+    rm.putUByte(2);
+    rm.putUByte(2);
+    rm.putUByte(2);
+    rm.putUByte(2);
+    rm.putUByte(2);
+
+    //default widths
+    rm.putUShort(80);
+    rm.putUShort(100);
+    rm.putUShort(300);
+    rm.putUShort(80);
+    rm.putUShort(80);
+    rm.putUShort(80);
+    rm.putUShort(80);
+    rm.putUShort(80);
+
+    //header
+    rm.putString(gr("Goods code"));
+    rm.putString(gr("Group name"));
+    rm.putString(gr("Goods name"));
+    rm.putString(gr("Till"));
+    rm.putString(gr("Input"));
+    rm.putString(gr("Sale"));
+    rm.putString(gr("Output"));
+    rm.putString(gr("Remain"));
+
+    //columns that need totals
+    rm.putUByte(0);
+    rm.putUByte(0);
+    rm.putUByte(0);
+    rm.putUByte(1);
+    rm.putUByte(1);
+    rm.putUByte(1);
+    rm.putUByte(1);
+    rm.putUByte(1);
+
+    quint32 *matrix = new quint32[8 * rowCount];
+    int headeroffcet = 3 + (sizeof(quint32) * 3) + sizeof(quint16);
+
+    int row = 0;
+    for (QMap<int, QHash<QString, QVariant> >::iterator it = goods.begin(); it != goods.end(); it++) {
+        if (!it.value()["qty_till"].isValid()) {
+            it.value()["qty_till"] = 0.0;
+        }
+        if (!it.value()["qty_in"].isValid()) {
+            it.value()["qty_in"] = 0.0;
+        }
+        if (!it.value()["qty_out"].isValid()) {
+            it.value()["qty_out"] = 0.0;
+        }
+        if (!it.value()["qty_out2"].isValid()) {
+            it.value()["qty_out2"] = 0.0;
+        }
+        matrix[(row * 8) + 0] = putData(rm, it.value()["id"]) - headeroffcet;
+        matrix[(row * 8) + 1] = putData(rm, it.value()["typename"]) - headeroffcet;
+        matrix[(row * 8) + 2] = putData(rm, it.value()["foodname"])  - headeroffcet;
+        matrix[(row * 8) + 3] = putData(rm, it.value()["qty_till"]) - headeroffcet;
+        matrix[(row * 8) + 4] = putData(rm, it.value()["qty_in"]) - headeroffcet;
+        matrix[(row * 8) + 5] = putData(rm, it.value()["qty_out"]) - headeroffcet;
+        matrix[(row * 8) + 6] = putData(rm, it.value()["qty_out2"]) - headeroffcet;
+        matrix[(row * 8) + 7] = putData(rm, it.value()["qty_till"].toDouble()
+                + it.value()["qty_in"].toDouble()
+                - it.value()["qty_out"].toDouble()
+                - it.value()["qty_out2"].toDouble()) - headeroffcet;
+        row++;
     }
+    rm.putBytes(reinterpret_cast<const char*>(matrix), 8 * rowCount * sizeof(quint32));
+    delete [] matrix;
+
     return true;
 }

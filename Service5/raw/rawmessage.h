@@ -20,9 +20,9 @@ public:
     void clearData();
     void putUByte(quint8 v);
     void putUShort(quint16 v);
-    void putUInt(quint32 v);
-    void putDouble(double v);
-    void putString(const QString &v);
+    int putUInt(quint32 v);
+    int putDouble(double v);
+    int putString(const QString &v);
     void putBytes(const char *data, quint32 size);
     void readUByte(quint8 &i, const QByteArray &d);
     void readUShort(quint16 &i, const QByteArray &d);
@@ -31,6 +31,7 @@ public:
     void readString(QString &s, const QByteArray &d);
     void readBytes(char *buf, const QByteArray &d);
     void clear();
+    void setPosition(int pos);
 
 protected:
     SslSocket *fSocket;

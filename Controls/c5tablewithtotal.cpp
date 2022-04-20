@@ -1,6 +1,8 @@
 #include "c5tablewithtotal.h"
 #include "ui_c5tablewithtotal.h"
 #include "c5lineedit.h"
+#include "c5message.h"
+#include "xlsxall.h"
 #include <QScrollBar>
 #include <QDebug>
 
@@ -30,6 +32,7 @@ C5TableWithTotal &C5TableWithTotal::addColumn(const QString &name, int width, bo
     ui->tblMain->setColumnWidth(index, width);
     ui->tblTotal->setColumnCount(index + 1);
     ui->tblTotal->setColumnWidth(index, width);
+    ui->tblTotal->setString(0, index, "");
     return *this;
 }
 
@@ -45,6 +48,63 @@ C5TableWithTotal &C5TableWithTotal::countTotal(int index)
         }
     }
     return *this;
+}
+
+void C5TableWithTotal::exportToExcel()
+{
+    if (columnCount() == 0 || rowCount() == 0) {
+        C5Message::info(tr("Empty report!"));
+        return;
+    }
+    XlsxDocument d;
+    XlsxSheet *s = d.workbook()->addSheet("Sheet1");
+    /* HEADER */
+    QColor color = QColor::fromRgb(200, 200, 250);
+    QFont headerFont(qApp->font());
+    headerFont.setBold(true);
+    d.style()->addFont("header", headerFont);
+    d.style()->addBackgrounFill("header", color);
+    for (int i = 0; i < columnCount(); i++) {
+        s->addCell(1, i + 1, columnTitle(i), d.style()->styleNum("header"));
+        s->setColumnWidth(i + 1, columnWidth(i) / 7);
+    }
+
+    /* BODY */
+    QMap<int, QString> bgFill;
+    QFont bodyFont(qApp->font());
+    d.style()->addFont("body", bodyFont);
+    d.style()->addBackgrounFill("body", QColor(Qt::white));
+    bgFill[QColor(Qt::white).rgb()] = "body";
+    for (int j = 0; j < rowCount(); j++) {
+        for (int i = 0; i < columnCount(); i++) {
+            int bgColor = getData(j, i, Qt::BackgroundColorRole).value<QColor>().rgb();
+            bgColor = QColor::fromRgb(255, 255, 255).rgb();
+            if (!bgFill.contains(bgColor)) {
+                d.style()->addFont(QString::number(bgColor), bodyFont);
+                d.style()->addBackgrounFill(QString::number(bgColor), QColor::fromRgb(bgColor));
+                bgFill[bgColor] = QString::number(bgColor);
+            }
+            QString bgStyle = bgFill[bgColor];
+            s->addCell(j + 2, i + 1, getData(j, i, Qt::EditRole), d.style()->styleNum(bgStyle));
+        }
+    }
+
+    /* TOTALS ROWS */
+    QFont totalFont(qApp->font());
+    totalFont.setBold(true);
+    d.style()->addFont("footer", headerFont);
+    color = QColor::fromRgb(193, 206, 221);
+    d.style()->addBackgrounFill("footer", color);
+    for (int i = 0; i < columnCount(); i++) {
+        s->addCell(1 + rowCount() + 1, i + 1, totalStr(i), d.style()->styleNum("footer"));
+    }
+
+    QString err;
+    if (!d.save(err, true)) {
+        if (!err.isEmpty()) {
+            C5Message::error(err);
+        }
+    }
 }
 
 int C5TableWithTotal::addRow()
@@ -81,9 +141,19 @@ int C5TableWithTotal::columnCount()
     return ui->tblMain->columnCount();
 }
 
-QVariant C5TableWithTotal::getData(int row, int column) const
+QVariant C5TableWithTotal::getData(int row, int column, int role) const
 {
-    return ui->tblMain->getData(row, column);
+    return ui->tblMain->getData(row, column, role);
+}
+
+QString C5TableWithTotal::columnTitle(int column) const
+{
+    return ui->tblMain->horizontalHeaderItem(column)->data(Qt::DisplayRole).toString();
+}
+
+int C5TableWithTotal::columnWidth(int column)
+{
+    return ui->tblMain->columnWidth(column);
 }
 
 double C5TableWithTotal::total(int column)

@@ -80,7 +80,6 @@ void SocketThread::rawRequest()
         return;
     }
     fPreviouseMessageNumber = fMessageNumber;
-    fTimeoutControl->stop();
     if (fData.length() - headersize >= fContentLenght) {
         parseBody(fMessageListData, fData.mid(headersize, fContentLenght));
         fData.remove(0, headersize + fContentLenght);
@@ -287,7 +286,17 @@ HttpRequestMethod SocketThread::parseRequest(HttpRequestMethod &requestMethod, Q
 
 void SocketThread::parseBody(quint16 msgType, const QByteArray &data)
 {
-    fRawHandler->run(fPreviouseMessageNumber, fMessageId, msgType, data);
+    switch (fRawHandler->run(fPreviouseMessageNumber, fMessageId, msgType, data)) {
+    case 1:
+        fTimeoutControl->stop();
+        break;
+    case 2:
+        fTimeoutControl->stop();
+        fTimeoutControl->start(60000);
+        break;
+    default:
+        break;
+    }
 }
 
 void SocketThread::parseBody(const QString &request, int offset)

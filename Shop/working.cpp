@@ -17,17 +17,24 @@
 #include "c5logsystem.h"
 #include "storeinput.h"
 #include "selectstaff.h"
+#include "taxprint.h"
+#include "messagelist.h"
+#include "config.h"
 #include "threadcheckmessage.h"
 #include "chatmessage.h"
 #include "threadreadmessage.h"
 #include "selectprinters.h"
 #include "c5printing.h"
+#include "rawmessage.h"
 #include "c5tablewidget.h"
 #include "printreceiptgroup.h"
+#include "dlgserversettings.h"
+#include "socketconnection.h"
 #include <QShortcut>
 #include <QInputDialog>
 #include <QKeyEvent>
 #include <QTimer>
+#include <QMessageBox>
 #include <QProcess>
 #include <QSettings>
 
@@ -38,15 +45,19 @@ QMap<int, Flag> Working::fFlags;
 static QSettings __s(QString("%1\\%2\\%3").arg(_ORGANIZATION_, _APPLICATION_, _MODULE_));
 
 Working::Working(C5User *user, QWidget *parent) :
-    QWidget(parent),
+    QWidget(parent, Qt::FramelessWindowHint),
     ui(new Ui::Working)
 {
     ui->setupUi(this);
+    connect(SocketConnection::instance(), &SocketConnection::connected, this, &Working::socketConnected);
+    connect(SocketConnection::instance(), &SocketConnection::connectionLost, this, &Working::socketDisconnected);
+    connect(SocketConnection::instance(), &SocketConnection::externalDataReady, this, &Working::socketDataReceived);
     fUser = user;
     QShortcut *sF1 = new QShortcut(QKeySequence(Qt::Key_F1), this);
     QShortcut *sF2 = new QShortcut(QKeySequence(Qt::Key_F2), this);
     QShortcut *sF3 = new QShortcut(QKeySequence(Qt::Key_F3), this);
     QShortcut *sF4 = new QShortcut(QKeySequence(Qt::Key_F4), this);
+    QShortcut *sF5 = new QShortcut(QKeySequence(Qt::Key_F5), this);
     QShortcut *sF6 = new QShortcut(QKeySequence(Qt::Key_F6), this);
     QShortcut *sF7 = new QShortcut(QKeySequence(Qt::Key_F7), this);
     QShortcut *sF8 = new QShortcut(QKeySequence(Qt::Key_F8), this);
@@ -57,10 +68,14 @@ Working::Working(C5User *user, QWidget *parent) :
     QShortcut *sDown = new QShortcut(QKeySequence(Qt::Key_Down), this);
     QShortcut *sUp = new QShortcut(QKeySequence(Qt::Key_Up), this);
     QShortcut *sEsc = new QShortcut(QKeySequence(Qt::Key_Escape), this);
+    QShortcut *sMinus = new QShortcut(QKeySequence(Qt::Key_Minus), this);
+    QShortcut *sPlus = new QShortcut(QKeySequence(Qt::Key_Plus), this);
+    QShortcut *sAsterix = new QShortcut(QKeySequence(Qt::Key_Asterisk), this);
     connect(sF1, SIGNAL(activated()), this, SLOT(shortcutF1()));
     connect(sF2, SIGNAL(activated()), this, SLOT(shortcutF2()));
     connect(sF3, SIGNAL(activated()), this, SLOT(shortcutF3()));
     connect(sF4, SIGNAL(activated()), this, SLOT(shortcutF4()));
+    connect(sF5, SIGNAL(activated()), this, SLOT(shortcutF5()));
     connect(sF6, SIGNAL(activated()), this, SLOT(shortcurF6()));
     connect(sF7, SIGNAL(activated()), this, SLOT(shortcutF7()));
     connect(sF8, SIGNAL(activated()), this, SLOT(shortcutF8()));
@@ -70,12 +85,13 @@ Working::Working(C5User *user, QWidget *parent) :
     connect(sF12, SIGNAL(activated()), this, SLOT(shortcutF12()));
     connect(sDown, SIGNAL(activated()), this, SLOT(shortcutDown()));
     connect(sUp, SIGNAL(activated()), this, SLOT(shortcutUp()));
-    connect(sEsc, SIGNAL(activated()), this, SLOT(escape()));
+    connect(sEsc, SIGNAL(activated()), this, SLOT(shortcutEscape()));
+    connect(sMinus, SIGNAL(activated()), this, SLOT(shortcutMinus()));
+    connect(sPlus, SIGNAL(activated()), this, SLOT(shortcutPlus()));
+    connect(sAsterix, SIGNAL(activated()), this, SLOT(shortcutAsterix()));
 
-    ui->leCode->installEventFilter(this);
     ui->tab->installEventFilter(this);
-    ui->wGoods->setVisible(false);
-    ui->btnNewOrder->setVisible(!__c5config.shopDenyF1());
+    ui->btnNewRetail->setVisible(!__c5config.shopDenyF1());
     ui->btnNewWhosale->setVisible(!__c5config.shopDenyF2());
     fTimerCounter = 0;
     QTimer *timer = new QTimer();
@@ -111,35 +127,18 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
     if (event->type() == QEvent::KeyRelease) {
         auto *ke = static_cast<QKeyEvent*>(event);
         switch (ke->key()) {
-        case Qt::Key_Plus:
-            ui->leCode->clear();
-            w = static_cast<WOrder*>(ui->tab->currentWidget());
-            if (w) {
-                if (__c5config.getValue(param_shop_deny_qtychange).toInt() == 0) {
-                    w->changeQty();
-                }
-            }
+        case Qt::Key_Minus:
+            shortcutMinus();
             event->accept();
             return true;
-        case Qt::Key_Minus:
-            ui->leCode->clear();
-            w = static_cast<WOrder*>(ui->tab->currentWidget());
-            if (w) {
-                w->removeRow();
-            }
+        case Qt::Key_Plus:
+            shortcutPlus();
             event->accept();
             return true;
         case Qt::Key_Asterisk:
-            ui->leCode->clear();
-            w = static_cast<WOrder*>(ui->tab->currentWidget());
-            if (w) {
-                w->changePrice();
-            }
+            shortcutAsterix();
             event->accept();
             return true;
-        case Qt::Key_F5:
-            on_btnShowGoodsList_clicked();
-            break;
         case Qt::Key_S:
             if (ke->modifiers() & Qt::ControlModifier) {
                 SearchItems *si = new SearchItems(this);
@@ -167,7 +166,7 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
                             db[":f_timein"] = QTime::currentTime();
                             db.insert("s_salary_inout", false);
                             loadStaff();
-                            C5Message::info(QString("%1,<br>%2").arg(tr("Welcome")).arg(name));
+                            C5Message::info(QString("%1,<br>%2").arg(tr("Welcome"), name));
                         }
                     } else {
                         C5Message::error(ua.error());
@@ -290,6 +289,11 @@ Flag Working::flag(int id)
     }
 }
 
+WOrder *Working::worder()
+{
+    return static_cast<WOrder*>(ui->tab->currentWidget());
+}
+
 void Working::loadStaff()
 {
     fCurrentUsers.clear();
@@ -310,52 +314,6 @@ void Working::loadStaff()
         }
         u.photo = p;
         fCurrentUsers.append(u);
-    }
-}
-
-void Working::addGoods(QString &code)
-{
-    if (code.isEmpty()) {
-        return;
-    }
-    ui->leCode->clear();
-    ui->leCode->setFocus();
-    WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
-    if (!w) {
-        return;
-    }
-    if (code.at(0).toLower() == '?' ) {
-        if (code.at(1).toLower() == 'c') {
-            code.remove(0, 2);
-            w->fixCostumer(code);
-            return;
-        }
-    }
-    if (code.at(0).toLower() == '/') {
-        code.remove(0, 1);
-        w->discountRow(code);
-        return;
-    }
-    int id = dbgoods->idOfScancode(code);
-    if (id == 0) {
-        if (fMultiscancode.contains(code)) {
-            QString mcode = fMultiscancode[code];
-            id = dbgoods->idOfScancode(mcode);
-        }
-    }
-    if (id == 0) {
-        ls(tr("Invalid code entered: ") + code);
-        return;
-    }
-
-    switch (w->fSaleType) {
-    case SALE_RETAIL:
-    case SALE_WHOSALE:
-        w->addGoods(id);
-        break;
-    case SALE_PREORDER:
-        w->addGoodsToTable(id);
-        break;
     }
 }
 
@@ -427,7 +385,31 @@ void Working::restoreSales()
         w->countTotal();
     }
     if (fTab->count() == 0) {
-        on_btnNewOrder_clicked();
+        newSale(SALE_RETAIL);
+    }
+}
+
+void Working::socketConnected()
+{
+    ui->btnServerSettings->setIcon(QIcon(":/wifib.png"));
+}
+
+void Working::socketDisconnected()
+{
+    ui->btnServerSettings->setIcon(QIcon(":/wifi_off.png"));
+}
+
+void Working::socketDataReceived(quint16 cmd, QByteArray d)
+{
+    switch (cmd) {
+    case MessageList::silent_auth:
+        quint32 userid;
+        RawMessage r(nullptr);
+        r.readUInt(userid, d);
+        if (userid > 0) {
+            ui->btnServerSettings->setIcon(QIcon(":/wifi_on.png"));
+        }
+        break;
     }
 }
 
@@ -453,28 +435,6 @@ void Working::timeout()
 //            r->start(SLOT(downloadFromServer()));
 //        }
 
-    }
-//    if (fTimerCounter % 180 == 0) {
-//        getGoodsList();
-//    }
-    if (fHaveChanges) {
-        QString style = "background: green;";
-        switch (fTimerCounter % 4) {
-        case 1:
-            style = "background: red;";
-            break;
-        case 2:
-            style = "background: blue";
-            break;
-        case 3:
-            style = "back   ground: white;";
-            break;
-        }
-        WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
-        if (!w) {
-            return;
-        }
-        w->changeIshmarColor(style);
     }
 }
 
@@ -582,9 +542,24 @@ void Working::threadMessageData(int code, const QVariant &data)
     trm->start();
 }
 
-void Working::escape()
+void Working::shortcutEscape()
 {
-    ui->leCode->clear();
+    worder()->clearCode();
+}
+
+void Working::shortcutMinus()
+{
+    worder()->keyMinus();
+}
+
+void Working::shortcutPlus()
+{
+    worder()->keyPlus();
+}
+
+void Working::shortcutAsterix()
+{
+    worder()->keyAsterix();
 }
 
 void Working::shortcutF1()
@@ -623,17 +598,21 @@ void Working::shortcutF4()
 
 void Working::shortcutF5()
 {
-    on_btnShowGoodsList_clicked();
+    on_btnGoodsList_clicked();
 }
 
 void Working::shortcurF6()
 {
-    ui->lePartner->setFocus();
+    WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
+    if (!w) {
+        return;
+    }
+    w->focusTaxpayerId();
 }
 
 void Working::shortcutF7()
 {
-    ui->leCode->setFocus();
+
 }
 
 void Working::shortcutF8()
@@ -653,12 +632,12 @@ void Working::shortcutF10()
 
 void Working::shortcutF11()
 {
-    on_btnStoreInput_clicked();
+    on_btnGoodsMovement_clicked();
 }
 
 void Working::shortcutF12()
 {
-    on_btnSaveOrder_clicked();
+    on_btnWriteOrder_clicked();
 }
 
 void Working::shortcutDown()
@@ -686,52 +665,73 @@ void Working::haveChanges(bool v)
     }
 }
 
-void Working::on_btnNewOrder_clicked()
+void Working::on_tab_tabCloseRequested(int index)
 {
-    newSale(SALE_RETAIL);
-}
-
-void Working::on_btnConnection_clicked()
-{
-    if (C5Config::fDBPassword.length() > 0) {
-        QString password = QInputDialog::getText(this, tr("Password"), tr("Password"), QLineEdit::Password);
-        if (C5Config::fDBPassword != password) {
-            C5Message::error(tr("Access denied"));
+    C5Database db(__c5config.dbParams());
+    WOrder *w = static_cast<WOrder*>(ui->tab->widget(index));
+    if (w->rowCount() > 0) {
+        if (!fUser->check(cp_t5_remove_row_from_shop)) {
             return;
         }
+        db[":f_window"] = index;
+        db.exec("update a_sale_temp set f_state=1 where f_window=:f_window and f_state=0");
     }
-    const QStringList dbParams;
-    C5Connection *cnf = new C5Connection(dbParams);
-    cnf->exec();
-    delete cnf;
-}
-
-void Working::on_leCode_returnPressed()
-{
-    QString code = ui->leCode->text();
-    if (code.mid(0, 2) == "23") {
-        if (code.length() != 13) {
-            addGoods(code);
-            return;
-        }
-        QString code2 = QString("%1").arg(code.mid(2, 5).toInt());
-        QString qtyStr = code.mid(7,5);
-        addGoods(code2);
-        WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
-        if (!w) {
-            return;
-        }
-        int row = w->lastRow();
-        if (row < 0) {
-            return;
-        }
-        w->setQtyOfRow(row, qtyStr.toDouble() / 1000);
+    while (w->table()->rowCount() > 0) {
+        w->table()->setCurrentCell(0, 0);
+        w->removeRow();
+    }
+    ui->tab->removeTab(index);
+    w->deleteLater();
+    C5LogSystem::writeEvent(QString("%1 #%2").arg(tr("Window closed")).arg(index + 1));
+    if (ui->tab->count() == 0) {
+        newSale(SALE_RETAIL);
     } else {
-        addGoods(code);
+        db[":f_window"] = index;
+        db.exec("update a_sale_temp set f_window=f_window-1 where f_window>:f_window");
     }
 }
 
-void Working::on_btnSaveOrder_clicked()
+void Working::on_btnItemBack_clicked()
+{
+    if (!fUser->check(cp_t5_refund_goods)) {
+        return;
+    }
+    Sales::showSales(fUser);
+}
+
+void Working::on_tab_currentChanged(int index)
+{
+    C5LogSystem::writeEvent(QString("%1 #%2").arg(tr("Current window")).arg(index + 1));
+}
+
+void Working::on_btnCloseApplication_clicked()
+{
+    if (C5Message::question(tr("Confirm to close application")) == QDialog::Accepted) {
+        qApp->quit();
+    }
+}
+
+void Working::on_btnServerSettings_clicked()
+{
+    QString ip, username, password;
+    int port;
+    ServerConnection::getParams(ip, port, username, password);
+    if (password.isEmpty() == false) {
+        bool ok = false;
+        QString passwordInput = QInputDialog::getText(this, tr("Password"), "", QLineEdit::Password, "", &ok);
+        if (ok == false) {
+            return;
+        }
+        if (password != passwordInput) {
+            QMessageBox::critical(this, tr("Error"), tr("Invalid password"));
+            return;
+        }
+    }
+    DlgServerSettings d;
+    d.exec();
+}
+
+void Working::on_btnWriteOrder_clicked()
 {
     WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
     if (!w) {
@@ -774,11 +774,9 @@ void Working::on_btnSaveOrder_clicked()
     w->table()->setRowCount(0);
     ui->tab->removeTab(ui->tab->currentIndex());
     if (ui->tab->count() == 0) {
-        on_btnNewOrder_clicked();
+        newSale(SALE_RETAIL);
     }
     w->deleteLater();
-    ui->leCode->setFocus();
-    ui->lePartner->clear();
 
     if(__c5config.rdbReplica()) {
         auto *r = new C5Replication();
@@ -786,140 +784,7 @@ void Working::on_btnSaveOrder_clicked()
     }
 }
 
-void Working::on_btnExit_clicked()
-{
-    qApp->quit();
-}
-
-void Working::on_btnShowGoodsList_clicked()
-{
-    int id;
-    if (DlgGoodsList::getGoods(id)) {
-        WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
-        if (!w) {
-            return;
-        }
-        switch (w->fSaleType) {
-        case SALE_RETAIL:
-        case SALE_WHOSALE:
-            w->addGoods(id);
-            break;
-        case SALE_PREORDER:
-            w->addGoodsToTable(id);
-            break;
-        }
-    }
-    ui->leCode->setFocus();
-}
-
-void Working::on_tblGoods_itemClicked(QTableWidgetItem *item)
-{
-    if (!item) {
-        return;
-    }
-    QString code = item->data(Qt::UserRole).toString();
-    if (code.isEmpty()) {
-        return;
-    }
-    ui->leCode->setText(code);
-    on_leCode_returnPressed();
-}
-
-void Working::on_btnDuplicateReceipt_clicked()
-{
-    C5User *u = fUser;
-    if (!u->check(cp_t5_refund_goods)) {
-        QString password = QInputDialog::getText(this, tr("Password"), tr("Password"), QLineEdit::Password);
-        C5User *tmp = new C5User(password);
-        if (tmp->error().isEmpty()) {
-            u = tmp;
-        } else {
-            C5Message::error(tmp->error());
-            delete tmp;
-            return;
-        }
-    }
-    Sales::showSales(u);
-    if (u != fUser) {
-        delete u;
-    }
-}
-
-void Working::on_leCode_textChanged(const QString &arg1)
-{
-    if (arg1 == "+") {
-        return;
-    }
-    if (arg1 == "-") {
-        return;
-    }
-    if (arg1 == "*") {
-        return;
-    }
-}
-
-void Working::on_btnNewWhosale_clicked()
-{
-    newSale(SALE_WHOSALE);
-}
-
-void Working::on_lePartner_returnPressed()
-{
-    if (ui->lePartner->text().isEmpty()) {
-        return;
-    }
-    WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
-    if (!w) {
-        return;
-    }
-    C5Database db(__c5config.dbParams());
-    db[":f_taxcode"] = ui->lePartner->text();
-    db.exec("select f_id, f_taxname from c_partners where f_taxcode=:f_taxcode");
-    if (db.nextRow()) {
-        w->setPartner(ui->lePartner->text(), db.getInt("f_id"), db.getString(1));
-    } else {
-        db[":f_taxcode"] = ui->lePartner->text();
-        int pid = db.insert("c_partners");
-        w->setPartner(ui->lePartner->text(), pid, "");
-    }
-    ui->lePartner->clear();
-}
-
-void Working::on_tab_tabCloseRequested(int index)
-{
-    C5Database db(__c5config.dbParams());
-    WOrder *w = static_cast<WOrder*>(ui->tab->widget(index));
-    if (w->rowCount() > 0) {
-        if (!fUser->check(cp_t5_remove_row_from_shop)) {
-            return;
-        }
-        db[":f_window"] = index;
-        db.exec("update a_sale_temp set f_state=1 where f_window=:f_window and f_state=0");
-    }
-    while (w->table()->rowCount() > 0) {
-        w->table()->setCurrentCell(0, 0);
-        w->removeRow();
-    }
-    ui->tab->removeTab(index);
-    w->deleteLater();
-    C5LogSystem::writeEvent(QString("%1 #%2").arg(tr("Window closed")).arg(index + 1));
-    if (ui->tab->count() == 0) {
-        newSale(SALE_RETAIL);
-    } else {
-        db[":f_window"] = index;
-        db.exec("update a_sale_temp set f_window=f_window-1 where f_window>:f_window");
-    }
-}
-
-void Working::on_btnItemBack_clicked()
-{
-    if (!fUser->check(cp_t5_refund_goods)) {
-        return;
-    }
-    Sales::showSales(fUser);
-}
-
-void Working::on_btnStoreInput_clicked()
+void Working::on_btnGoodsMovement_clicked()
 {
     C5User *u = fUser;
     if (!u->check(cp_t5_refund_goods)) {
@@ -944,8 +809,95 @@ void Working::on_btnStoreInput_clicked()
     }
 }
 
-void Working::on_tab_currentChanged(int index)
+void Working::on_btnNewRetail_clicked()
 {
-    C5LogSystem::writeEvent(QString("%1 #%2").arg(tr("Current window")).arg(index + 1));
+    newSale(SALE_RETAIL);
 }
-\
+
+void Working::on_btnNewWhosale_clicked()
+{
+    newSale(SALE_WHOSALE);
+}
+
+void Working::on_btnGoodsList_clicked()
+{
+    int id;
+    if (DlgGoodsList::getGoods(id)) {
+        WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
+        if (!w) {
+            return;
+        }
+        switch (w->fSaleType) {
+        case SALE_RETAIL:
+        case SALE_WHOSALE:
+            w->addGoods(id);
+            break;
+        case SALE_PREORDER:
+            w->addGoodsToTable(id);
+            break;
+        }
+    }
+}
+
+void Working::on_btnSalesReport_clicked()
+{
+    C5User *u = fUser;
+    if (!u->check(cp_t5_refund_goods)) {
+        QString password = QInputDialog::getText(this, tr("Password"), tr("Password"), QLineEdit::Password);
+        C5User *tmp = new C5User(password);
+        if (tmp->error().isEmpty()) {
+            u = tmp;
+        } else {
+            C5Message::error(tmp->error());
+            delete tmp;
+            return;
+        }
+    }
+    Sales::showSales(u);
+    if (u != fUser) {
+        delete u;
+    }
+}
+
+void Working::on_btnDbConnection_clicked()
+{
+    if (C5Config::fDBPassword.length() > 0) {
+        QString password = QInputDialog::getText(this, tr("Password"), tr("Password"), QLineEdit::Password);
+        if (C5Config::fDBPassword != password) {
+            C5Message::error(tr("Access denied"));
+            return;
+        }
+    }
+    const QStringList dbParams;
+    C5Connection *cnf = new C5Connection(dbParams);
+    cnf->exec();
+    delete cnf;
+}
+
+void Working::on_btnHelp_clicked()
+{
+    QString info = QString("Ctrl+S: %1<br>"
+                            "Ctrl+I: %2<br>"
+                            "Ctrl+O: %3<br>"
+                            "Ctrl+T: %4<br>"
+                            "Ctrl+A: %5<br>"
+                            "Ctrl+H: %6<br>"
+                            "Ctrl+Z: %7<br>"
+                            "Ctrl+L: %8<br>")
+            .arg(tr("Search goods in the storages"),
+                 tr("Input staff at the work"),
+                 tr("Output staff from the work"),
+                 tr("Total today"),
+                 tr("Preorder"),
+                 tr("Show log"),
+                 tr("Open new store input document"),
+                 tr("List of workers at work"));
+    C5Message::info(info);
+}
+
+void Working::on_btnManualTax_clicked()
+{
+    TaxPrint *tp = new TaxPrint();
+    tp->exec();
+    tp->deleteLater();
+}

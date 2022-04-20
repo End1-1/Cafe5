@@ -88,6 +88,8 @@
 #define param_idram_server 84
 #define param_waiter_close_order_after_precheck 85
 #define param_shop_dont_check_qty 86
+#define param_vat 87
+#define param_shop_report_of_logged_staff 88
 
 #define FRONTDESK_WAITER 0
 #define FRONTDESK_SHOP 1

@@ -11,7 +11,7 @@ class RawHandler : public QObject
 public:
     explicit RawHandler(SslSocket *socket, const QString &session);
     ~RawHandler();
-    void run(quint32 msgNum, quint32 msgId, qint16 msgType, const QByteArray &data);
+    int run(quint32 msgNum, quint32 msgId, qint16 msgType, const QByteArray &data);
 
 private:
     SslSocket *fSocket;

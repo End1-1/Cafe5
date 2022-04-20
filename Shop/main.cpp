@@ -8,6 +8,8 @@
 #include "c5replication.h"
 #include "datadriver.h"
 #include "replicadialog.h"
+#include "config.h"
+#include "socketconnection.h"
 #include "settingsselection.h"
 #include "dlgsplashscreen.h"
 #include <QApplication>
@@ -74,12 +76,6 @@ int main(int argc, char *argv[])
         delete cnf;
     }
 
-    QFontDatabase::addApplicationFont(":/barcode.ttf");
-//    int id = QFontDatabase::addApplicationFont(":/ahuni.ttf");
-//    QString family = QFontDatabase::applicationFontFamilies(id).at(0);
-    QFont font(a.font());
-    a.setFont(font);
-
     QList<QByteArray> connectionParams;
     C5Connection::readParams(connectionParams);
     C5Config::fDBHost = connectionParams.at(0);
@@ -88,6 +84,16 @@ int main(int argc, char *argv[])
     C5Config::fDBPassword = connectionParams.at(3);
     C5Config::fSettingsName = connectionParams.at(4);
     C5Config::initParamsFromDb();
+
+    QFontDatabase::addApplicationFont(":/barcode.ttf");
+//    int id = QFontDatabase::addApplicationFont(":/ahuni.ttf");
+//    QString family = QFontDatabase::applicationFontFamilies(id).at(0);
+    QFile shopstyle(a.applicationDirPath() + "/shopstyle.qss");
+    if (shopstyle.exists()) {
+        if (shopstyle.open(QIODevice::ReadOnly)) {
+            a.setStyleSheet(shopstyle.readAll());
+        }
+    }
 
     QFile file(d.homePath() + "/" + _APPLICATION_ + "/lock.pid");
     file.remove();
@@ -152,9 +158,13 @@ int main(int argc, char *argv[])
     dlgsplash->exec();
     delete dlgsplash;
 
-    QFont fo = qApp->font();
-    fo.setPointSize(__c5config.getValue(param_fd_font_size).toInt());
-    qApp->setFont(fo);
+    QString ip;
+    int port;
+    QString username;
+    QString password;
+    ServerConnection::getParams(ip, port, username, password);
+    SocketConnection::init(ip, port, username, password);
+
     Working w(__user);
     w.setWindowTitle("");
     if (__c5config.defaultHall() > 0) {

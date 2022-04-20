@@ -46,6 +46,7 @@ Source: "C:\build\Install_Cafe5_x64\platforms\qminimal.dll"; DestDir: "{app}\pla
 Source: "C:\build\Install_Cafe5_x64\platforms\qwindows.dll"; DestDir: "{app}\platforms"; Flags: onlyifdoesntexist
 Source: "C:\build\Install_Cafe5_x64\vcredist\VC_redist.x64.exe"; DestDir: {tmp}; Flags: deleteafterinstall
 Source: "C:\build\Service5\release\Service5.exe"; DestDir: "{app}"; BeforeInstall: BeforeServiceInstall('Breeze'); AfterInstall: AfterServiceInstall('Breeze', 'Service5.exe');
+Source: "C:\build\Service5\dlls\standard\release\Standard.dll"; DestDir: "{app}\handlers";
 
 [Code]
 #include 'services_unicode.iss';

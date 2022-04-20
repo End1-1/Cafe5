@@ -18,6 +18,8 @@ public:
 
     virtual QString condition();
 
+    virtual QString conditionText();
+
 private:
     Ui::CR5MFGeneralReportFilter *ui;
 };

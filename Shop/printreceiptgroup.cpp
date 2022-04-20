@@ -178,6 +178,11 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
         p.rtext(dtax.getString("f_time"));
         p.br();
         p.ltext(tr("(F)"), 0);
+        if (__c5config.getValue(param_vat).toDouble() > 0.01) {
+            p.ltext(QString("%1 %2%").arg(tr("Including VAT"), float_str(__c5config.getValue(param_vat).toDouble() * 100, 2)), 0);
+            p.rtext(float_str(amountTotal * __c5config.getValue(param_vat).toDouble(), 2));
+            p.br();
+        }
     }
     if (!partnerName.isEmpty() || !partnerTaxcode.isEmpty()) {
         p.ltext(tr("Buyer taxcode"), 0);
@@ -187,10 +192,10 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
         p.br();
     }
     p.setFontBold(true);
-    p.ctext(QString("#%1%2").arg(pref).arg(hallid));
+    p.ctext(QString("#%1%2").arg(pref, hallid));
     p.br();
     if (returnFrom.count() > 0) {
-        p.ctext(QString("(%1 %2%3)").arg(tr("Return from")).arg(returnFrom["f_prefix"].toString()).arg(returnFrom["f_hallid"].toString()));
+        p.ctext(QString("(%1 %2%3)").arg(tr("Return from"), returnFrom["f_prefix"].toString(), returnFrom["f_hallid"].toString()));
         p.br();
     }
     p.setFontSize(20);
@@ -485,6 +490,11 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
         p.br();
         p.ltext(tr("(F)"), 0);
         p.br();
+        if (__c5config.getValue(param_vat).toDouble() > 0.01) {
+            p.ltext(QString("%1 %2%").arg(tr("Including VAT"), float_str(__c5config.getValue(param_vat).toDouble() * 100, 2)), 0);
+            p.rtext(float_str(amountTotal * __c5config.getValue(param_vat).toDouble(), 2));
+            p.br();
+        }
     }
 
     if (!partnerName.isEmpty() || !partnerTaxcode.isEmpty()) {
@@ -495,7 +505,7 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
         p.br();
     }
     p.setFontBold(true);
-    p.ctext(QString("#%1%2").arg(pref).arg(hallid));
+    p.ctext(QString("#%1%2").arg(pref, hallid));
     p.br();
     if (returnFrom.count() > 0) {
         p.ctext(QString("(%1 %2%3)").arg(tr("Return from")).arg(returnFrom["f_prefix"].toString()).arg(returnFrom["f_hallid"].toString()));

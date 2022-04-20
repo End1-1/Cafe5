@@ -136,5 +136,10 @@
         <file>deletelist.png</file>
         <file>unchecked.png</file>
         <file>checkall.png</file>
+        <file>wifi_off.png</file>
+        <file>wifi_on.png</file>
+        <file>whosale.png</file>
+        <file>goodslist.png</file>
+        <file>help.png</file>
     </qresource>
 </RCC>

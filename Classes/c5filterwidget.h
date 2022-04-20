@@ -15,6 +15,8 @@ public:
 
     virtual QString condition() = 0;
 
+    virtual QString conditionText();
+
     virtual void saveFilter(QWidget *parent);
 
     virtual void restoreFilter(QWidget *parent);

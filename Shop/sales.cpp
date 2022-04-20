@@ -259,6 +259,9 @@ void Sales::refreshTotal()
     if (!fUser->check(cp_t5_view_all_sales)) {
         sqlCond += " and length(ot.f_receiptnumber)>0 ";
     }
+    if (__c5config.getValue(param_shop_report_of_logged_staff).toInt() == 1){
+        sqlCond += QString(" and oh.f_staff=%1 ").arg(fUser->id());
+    }
     QString sql = QString("select '', oh.f_id, oh.f_saletype, u.f_login, os.f_name, concat(oh.f_prefix, oh.f_hallid) as f_number, ot.f_receiptnumber, "
             "oh.f_datecash, oh.f_timeclose, oh.f_amounttotal, concat(c.f_taxname, ' ', c.f_contact) as f_client "
             "from o_header oh "

@@ -33,7 +33,7 @@ public:
 
     void tableText(const QList<qreal> &points, const QStringList &vals, int rowHeight);
 
-    void ltext(const QString &text, qreal x);
+    void ltext(const QString &text, qreal x, qreal textWidth = -1);
 
     void ltext90(const QString &text, qreal x);
 
@@ -90,7 +90,7 @@ private:
 
     void setLineHeight();
 
-    void setTemptop(QGraphicsTextItem *item);
+    void setTemptop(QGraphicsTextItem *item, qreal textwidth);
 
     QJsonArray fJsonData;
 };

@@ -15,17 +15,17 @@ RawSilentAuth::~RawSilentAuth()
     qDebug() << "~RawSilentAuth";
 }
 
-void RawSilentAuth::run(const QByteArray &d)
+int RawSilentAuth::run(const QByteArray &d)
 {
-    QString phone, password;
-    readString(phone, d);
+    QString login, password;
+    readString(login, d);
     readString(password, d);
     Database db;
     quint32 reply = 0;
     if (DatabaseConnectionManager::openSystemDatabase(db)) {
-        db[":fphone"] = phone;
+        db[":flogin"] = login;
         db[":fpassword"] = QString(QCryptographicHash::hash(password.toLocal8Bit(), QCryptographicHash::Md5).toHex());
-        if (db.exec("select fid from users_list where fphone=:fphone and fpassword=:fpassword")) {
+        if (db.exec("select fid from users_list where (fphone=:flogin or femail=:flogin) and fpassword=:fpassword")) {
             if (db.next()) {
                 reply = db.integerValue("fid");
                 const QString &token = tokenOfSocket(fSocket);
@@ -51,10 +51,11 @@ void RawSilentAuth::run(const QByteArray &d)
                 informMonitors(r.data());
             }
         } else {
-            LogWriter::write(LogWriterLevel::errors, "RawSilenthAuth::balanceAmount", db.lastDbError());
+            LogWriter::write(LogWriterLevel::errors, "RawSilenthAuth::run", db.lastDbError());
         }
     } else {
-        LogWriter::write(LogWriterLevel::errors, "RawSilenthAuth::balanceAmount", db.lastDbError());
+        LogWriter::write(LogWriterLevel::errors, "RawSilenthAuth::run", db.lastDbError());
     }
     putUByte(reply);
+    return reply == 0 ? 0 : 1;
 }

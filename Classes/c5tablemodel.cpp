@@ -32,7 +32,7 @@ void C5TableModel::execQuery(const QString &query)
             }
             fProxyData << i;
         }
-        for (QHash<QString, int>::const_iterator it = fColumnNameIndex.begin(); it != fColumnNameIndex.end(); it++) {
+        for (QHash<QString, int>::const_iterator it = fColumnNameIndex.constBegin(); it != fColumnNameIndex.constEnd(); it++) {
             fColumnIndexName[it.value()] = it.key();
         }
         if (fCheckboxes) {

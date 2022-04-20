@@ -23,9 +23,11 @@ public:
 private:
     Ui::CR5MfDaily *ui;
 
-    void loadDoc(const QDate &date);
+    void loadDoc(const QDate &date, int worker, int teamlead);
 
 private slots:
+    void exportToExcel();
+
     void addWorker();
 
     void removeWorker();
@@ -49,6 +51,8 @@ private slots:
     void on_leDate_returnPressed();
 
     void on_lstTeamlead_itemClicked(QListWidgetItem *item);
+
+    void on_leFilterWorker_textChanged(const QString &arg1);
 };
 
 #endif // CR5MFDAILY_H

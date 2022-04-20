@@ -58,7 +58,9 @@ private slots:
     void on_btnClearTax_clicked();
 
     void on_btnOpenTable_clicked();
+
     void on_btnSetCL_clicked();
+
     void on_btnClearCL_clicked();
 };
 

@@ -64,7 +64,7 @@ public:
 
     bool findWidget(QWidget *w, int &row, int &column);
 
-    QVariant getData(int row, int column);
+    QVariant getData(int row, int column, int role = Qt::EditRole);
 
     void setData(int row, int column, const QVariant &value);
 

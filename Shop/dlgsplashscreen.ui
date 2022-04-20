@@ -19,6 +19,9 @@
      <property name="text">
       <string>Text</string>
      </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
     </widget>
    </item>
   </layout>

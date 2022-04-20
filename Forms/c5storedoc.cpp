@@ -1544,6 +1544,8 @@ void C5StoreDoc::saveDoc()
     if (__c5config.getRegValue("storedoc_storeinput").toBool()) {
         __c5config.setRegValue("storedoc_storeinput_id", ui->leStoreInput->getInteger());
     }
+    int cache_id = C5Cache::idForTable("c_goods");
+    C5Selector::resetCache(fDBParams, cache_id);
 }
 
 void C5StoreDoc::draftDoc()
@@ -1613,7 +1615,7 @@ void C5StoreDoc::printDoc()
         break;
     }
 
-    p.ctext(QString("%1 N%2").arg(docTypeText).arg(ui->leDocNum->text()));
+    p.ctext(QString("%1 N%2").arg(docTypeText, ui->leDocNum->text()));
     p.br();
     p.ctext(ui->leReasonName->text());
     p.br();
@@ -1742,7 +1744,7 @@ void C5StoreDoc::printDoc()
         goodsColName = tr("Output material");
     }
     points.clear();
-    points << 50 << 100 << 200 << 600 << 250 << 250 << 250 << 270;
+    points << 50 << 100 << 200 << 600 << 250 << 250 << 250 << 250;
     vals.clear();
     vals << tr("NN")
          << tr("Material code")
@@ -1774,10 +1776,12 @@ void C5StoreDoc::printDoc()
         }
         p.br(p.fLineHeight + 20);
     }
+
+    p.setFontBold(true);
     points.clear();
     points << 1200
            << 500
-           << 270;
+           << 250;
     vals.clear();
     vals << tr("Total amount");
     vals << ui->leTotal->text();
@@ -1803,6 +1807,7 @@ void C5StoreDoc::printDoc()
     }
     p.line(50, p.fTop, 700, p.fTop);
     p.line(1000, p.fTop, 1650, p.fTop);
+    p.setFontBold(false);
 
     C5PrintPreview pp(&p, fDBParams);
     pp.exec();

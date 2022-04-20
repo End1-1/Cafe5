@@ -269,6 +269,9 @@ void Workspace::countTotal()
         }
     }
     ui->leTotal->setDouble(total);
+    if (ui->leReceived->getDouble() > 0.01) {
+        ui->leChange->setDouble(ui->leReceived->getDouble() - ui->leTotal->getDouble());
+    }
 }
 
 void Workspace::resetOrder()

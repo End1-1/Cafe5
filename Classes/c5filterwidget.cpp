@@ -12,12 +12,15 @@ C5FilterWidget::C5FilterWidget(const QStringList &dbParams, QWidget *parent) :
     fFocusNextChild = false;
 }
 
+QString C5FilterWidget::conditionText()
+{
+    return "";
+}
+
 void C5FilterWidget::saveFilter(QWidget *parent)
 {
     QSettings s(_ORGANIZATION_, QString("%1\\%2\\reportfilter\\%3")
-                .arg(_APPLICATION_)
-                .arg(_MODULE_)
-                .arg(metaObject()->className()));
+                .arg(_APPLICATION_, _MODULE_, metaObject()->className()));
     QObjectList ol = parent->children();
     QVariant value;
     C5LineEditWithSelector *le;

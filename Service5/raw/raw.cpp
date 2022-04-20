@@ -17,7 +17,6 @@ QMutex *Raw::fMutexInformMonitors = nullptr;
 Raw::Raw(SslSocket *s) :
     RawMessage(s)
 {
-
 }
 
 Raw::~Raw()

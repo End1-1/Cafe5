@@ -120,6 +120,7 @@ SOURCES += \
     ../DbData/dbtables.cpp \
     ../DbData/dbunit.cpp \
     ../DbData/dbusers.cpp \
+    ../Forms/change.cpp \
     ../Forms/dlgqty.cpp \
     ../Forms/touchdlgphonenumber.cpp \
     ../Forms/touchentertaxreceiptnumber.cpp \
@@ -127,7 +128,6 @@ SOURCES += \
     ../Shop/printreceipt.cpp \
     ../Shop/printreceiptgroup.cpp \
     ../Shop/selectprinters.cpp \
-    change.cpp \
     dishpackage.cpp \
         main.cpp \
     menudialog.cpp \
@@ -238,6 +238,7 @@ HEADERS += \
     ../DbData/dbtables.h \
     ../DbData/dbunit.h \
     ../DbData/dbusers.h \
+    ../Forms/change.h \
     ../Forms/dlgqty.h \
     ../Forms/touchdlgphonenumber.h \
     ../Forms/touchentertaxreceiptnumber.h \
@@ -246,7 +247,6 @@ HEADERS += \
     ../Shop/printreceipt.h \
     ../Shop/printreceiptgroup.h \
     ../Shop/selectprinters.h \
-    change.h \
     dish.h \
     dishpackage.h \
     menudialog.h \
@@ -276,12 +276,12 @@ FORMS += \
     ../Classes/dlgpassword.ui \
     ../Classes/notificationwidget.ui \
     ../Classes/rkeyboard.ui \
+    ../Forms/change.ui \
     ../Forms/dlgqty.ui \
     ../Forms/touchdlgphonenumber.ui \
     ../Forms/touchentertaxreceiptnumber.ui \
     ../Forms/touchselecttaxreport.ui \
     ../Shop/selectprinters.ui \
-    change.ui \
     menudialog.ui \
     menudish.ui \
     orderdish.ui \

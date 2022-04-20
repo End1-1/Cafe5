@@ -1,6 +1,7 @@
 #include "dlgserversettings.h"
 #include "ui_dlgserversettings.h"
 #include "config.h"
+#include "socketconnection.h"
 #include <QMessageBox>
 
 DlgServerSettings::DlgServerSettings(QWidget *parent) :
@@ -35,6 +36,7 @@ void DlgServerSettings::on_btnSave_clicked()
         return;
     }
     ServerConnection::setParams(ui->leServerIP->text(), ui->leServerPort->text(), ui->leUsername->text(), ui->lePassword->text());
+    SocketConnection::init(ui->leServerIP->text(), ui->leServerPort->text().toInt(), ui->leUsername->text(), ui->lePassword->text());
     QMessageBox::information(this, windowTitle(), tr("Saved"));
     accept();
 }

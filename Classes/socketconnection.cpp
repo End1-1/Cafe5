@@ -27,7 +27,9 @@ SocketConnection::~SocketConnection()
 
 void SocketConnection::init(const QString &ip, int port, const QString &username, const QString &password)
 {
-    fInstance = new SocketConnection();
+    if (fInstance == nullptr) {
+        fInstance = new SocketConnection();
+    }
     fInstance->setConnectionParams(ip, port, username, password);
     auto *t = new QThread();
     connect(t, &QThread::finished, t, &QThread::deleteLater);
@@ -102,6 +104,11 @@ void SocketConnection::encrypted()
     RawMessage r(fSocket);
     r.setHeader(getTcpPacketNumber(), 0, MessageList::hello);
     r.putString(fSocket->fUuid);
+    emit dataReady(r.data());
+    r.clear();
+    r.setHeader(getTcpPacketNumber(), 0, MessageList::silent_auth);
+    r.putString(fHostUsername);
+    r.putString(fHostPassword);
     emit dataReady(r.data());
     emit connected();
 }

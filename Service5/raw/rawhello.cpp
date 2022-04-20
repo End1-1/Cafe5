@@ -13,12 +13,18 @@ RawHello::~RawHello()
     qDebug() << "~RawHello";
 }
 
-void RawHello::run(const QByteArray &d)
+int RawHello::run(const QByteArray &d)
 {
     QMutexLocker ml(fMutexTokenUser);
     QString firebaseToken;
     readString(firebaseToken, d);
+    int result = 0;
     if (fMapTokenUser.contains(firebaseToken)) {
+        if (fMapTokenUser[firebaseToken] > 0) {
+            result = 1;
+        } else {
+            result = 2;
+        }
     } else {
         Database db;
         if (DatabaseConnectionManager::openSystemDatabase(db)) {
@@ -26,6 +32,7 @@ void RawHello::run(const QByteArray &d)
             db[":fuser"] = 0;
             db.insert("users_devices");
             fMapTokenUser[firebaseToken] = 0;
+            result = 2;
         } else {
             LogWriter::write(LogWriterLevel::errors, "RawHello::registerFirebaseToken", db.lastDbError());
         }
@@ -33,9 +40,9 @@ void RawHello::run(const QByteArray &d)
     fMapTokenSocket[firebaseToken] = fSocket;
     fMapSocketToken[fSocket] = firebaseToken;
 
-
     setHeader(0, 0, MessageList::srv_connections_count);
     putUInt(fMapSocketToken.count());
     informMonitors(fReply);
     clear();
+    return result;
 }

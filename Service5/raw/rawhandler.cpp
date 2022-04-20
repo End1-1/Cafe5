@@ -13,6 +13,7 @@
 #include "sslsocket.h"
 #include "logwriter.h"
 #include "thread.h"
+#include "socketthread.h"
 
 RawHandler::RawHandler(SslSocket *socket, const QString &session) :
     QObject(),
@@ -26,7 +27,7 @@ RawHandler::~RawHandler()
     qDebug() << "~RawHandler()";
 }
 
-void RawHandler::run(quint32 msgNum, quint32 msgId, qint16 msgType, const QByteArray &data)
+int RawHandler::run(quint32 msgNum, quint32 msgId, qint16 msgType, const QByteArray &data)
 {
 //    if (msgType != MessageList::hello) {
 //        return;
@@ -70,11 +71,12 @@ void RawHandler::run(quint32 msgNum, quint32 msgId, qint16 msgType, const QByteA
     default:
         LogWriter::write(LogWriterLevel::errors, property("session").toString(), QString("Unknown raw command received: %1").arg(msgType));
         fSocket->close();
-        return;
+        return 0;
     }
     r->setProperty("session", property("session"));
-    r->run(data);
+    int result = r->run(data);
     r->setHeader(fMsgNum, fMsgId, fMsgType);
     emit writeToSocket(r->data());
     r->deleteLater();
+    return result;
 }

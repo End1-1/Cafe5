@@ -13,7 +13,7 @@ public:
     ~RawCoordinate();
 
 public slots:
-    virtual void run(const QByteArray &d) override;
+    virtual int run(const QByteArray &d) override;
 
 };
 

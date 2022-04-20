@@ -16,7 +16,7 @@ RawRegisterPhone::~RawRegisterPhone()
     qDebug() << "RawRegisterPhone";
 }
 
-void RawRegisterPhone::run(const QByteArray &d)
+int RawRegisterPhone::run(const QByteArray &d)
 {
     QString phone;
     readString(phone, d);
@@ -44,4 +44,5 @@ void RawRegisterPhone::run(const QByteArray &d)
     quint16 reply = 0;
     putUShort(reply);
     emit firebaseMessage(tokenOfSocket(fSocket), QString("Your confirmation code: %1").arg(confirmationCode));
+    return 0;
 }

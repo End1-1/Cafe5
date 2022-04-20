@@ -11,7 +11,7 @@ RawYandexKey::RawYandexKey(SslSocket *s) :
 
 }
 
-void RawYandexKey::run(const QByteArray &d)
+int RawYandexKey::run(const QByteArray &d)
 {
     quint8 cmd;
     readUByte(cmd, d);
@@ -36,7 +36,7 @@ void RawYandexKey::run(const QByteArray &d)
         QJsonDocument jdoc = QJsonDocument::fromJson(http->readAll(), &err);
         if (err.error != QJsonParseError::NoError) {
             putUByte(0);
-            return;
+            return 0;
         }
         QJsonObject jobj = jdoc.object();
         qDebug() << jobj;
@@ -57,11 +57,12 @@ void RawYandexKey::run(const QByteArray &d)
         QJsonDocument jdoc = QJsonDocument::fromJson(http->readAll(), &err);
         if (err.error != QJsonParseError::NoError) {
             putUByte(0);
-            return;
+            return 0;
         }
         QJsonObject jobj = jdoc.object();
         qDebug() << jobj;
         break;
     }
     }
+    return 0;
 }

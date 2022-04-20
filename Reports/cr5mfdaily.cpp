@@ -17,7 +17,7 @@ CR5MfDaily::CR5MfDaily(const QStringList &dbParams, QWidget *parent) :
     ui->wt->addColumn(tr("Price"), 80);
     ui->wt->addColumn(tr("Total"), 100, true);
 
-    loadDoc(ui->leDate->date());
+    loadDoc(ui->leDate->date(), 0, 0);
 }
 
 CR5MfDaily::~CR5MfDaily()
@@ -29,6 +29,7 @@ QToolBar *CR5MfDaily::toolBar()
 {
     if (!fToolBar) {
         QList<ToolBarButtons> btn;
+        btn << ToolBarButtons::tbExcel;
         createStandartToolbar(btn);
         fToolBar->addAction(QIcon(":/add-user.png"), tr("Add\nworker"), this, SLOT(addWorker()));
         fToolBar->addAction(QIcon(":/delete-user.png"), tr("Remove\nuser"), this, SLOT(removeWorker()));
@@ -40,34 +41,35 @@ QToolBar *CR5MfDaily::toolBar()
     return fToolBar;
 }
 
-void CR5MfDaily::loadDoc(const QDate &date)
+void CR5MfDaily::loadDoc(const QDate &date, int worker, int teamlead)
 {
     disconnect(ui->lstWorkers, SIGNAL(currentRowChanged(int)), this, SLOT(on_lstWorkers_currentRowChanged(int)));
-    QListWidgetItem *item = ui->lstWorkers->currentItem();
-    int worker = 0;
-    int row = ui->lstWorkers->currentRow();
-    if (item) {
-        worker = item->data(Qt::UserRole + 1).toInt();
-    }
     ui->lstWorkers->clear();
+    ui->lstTeamlead->clear();
     ui->wt->clearTables();
     C5Database db(fDBParams);
     db[":f_date"] = date;
-    db.exec("select m.f_id, u.f_teamlead, concat(u.f_last, ' ', u.f_first) as f_name, m.f_worker "
+    QString sql = "select m.f_id, u.f_teamlead, concat(u.f_last, ' ', u.f_first) as f_name, m.f_worker "
         "from mf_daily_workers m "
         "inner join s_user u on u.f_id=m.f_worker "
-        "where f_date=:f_date order by m.f_id ");
-    QSet<int> teamlead;
+        "where f_date=:f_date order by m.f_id ";
+    if (teamlead > 0) {
+        db[":f_teamlead"] = teamlead;
+        sql += " and u.f_teamlead=:f_teamlead ";
+    }
+    db.exec(sql);
+    QSet<int> teamleadlist;
     while (db.nextRow()) {
         QListWidgetItem *item = new QListWidgetItem(ui->lstWorkers);
         item->setText(db.getString("f_name"));
         item->setData(Qt::UserRole, db.getInt("f_id"));
         item->setData(Qt::UserRole + 1, db.getInt("f_worker"));
+        item->setData(Qt::UserRole + 2, db.getInt("f_teamlead"));
         ui->lstWorkers->addItem(item);
-        teamlead.insert(db.getInt("f_teamlead"));
+        teamleadlist.insert(db.getInt("f_teamlead"));
     }
     db[":f_date"] = date;
-    QString sql = "select p.f_id, pr.f_name as f_productname, ac.f_name as f_processname, "
+    sql = "select p.f_id, pr.f_name as f_productname, ac.f_name as f_processname, "
             "p.f_qty, p.f_price "
             "from mf_daily_process p "
             "inner join mf_actions_group pr on pr.f_id=p.f_product "
@@ -76,6 +78,10 @@ void CR5MfDaily::loadDoc(const QDate &date)
     if (worker > 0) {
         db[":f_worker"] = worker;
         sql += " and p.f_worker=:f_worker";
+    }
+    if (teamlead > 0) {
+        db[":f_teamlead"] = teamlead;
+        sql += " and p.f_worker in (select f_id from s_user where f_teamlead=:f_teamlead) ";
     }
     db.exec(sql);
     while (db.nextRow()) {
@@ -87,13 +93,42 @@ void CR5MfDaily::loadDoc(const QDate &date)
                 .setData(row, 4, db.getDouble("f_price"))
                 .setData(row, 5, db.getDouble("f_qty") * db.getDouble("f_price"));
     }
-    ui->lstWorkers->setCurrentRow(row);
+    if (worker > 0) {
+        for (int i = 0; i < ui->lstWorkers->count(); i++) {
+            if (ui->lstWorkers->item(i)->data(Qt::UserRole + 1).toInt() == worker) {
+                ui->lstWorkers->setCurrentRow(i);
+                break;
+            }
+        }
+    }
     connect(ui->lstWorkers, SIGNAL(currentRowChanged(int)), this, SLOT(on_lstWorkers_currentRowChanged(int)));
-    ui->lstTeamlead->clear();
     QListWidgetItem *litem = new QListWidgetItem(ui->lstTeamlead);
-    item->setText(tr("All"));
-    item->setData(Qt::UserRole, 0);
+    litem->setText(tr("All"));
+    litem->setData(Qt::UserRole, 0);
     ui->lstTeamlead->addItem(litem);
+    C5Cache *cache = C5Cache::cache(fDBParams, cache_users);
+    for (auto i: teamleadlist) {
+        if (i == 0) {
+            continue;
+        }
+        litem = new QListWidgetItem(ui->lstTeamlead);
+        litem->setText(cache->getValuesForId(i).at(1).toString());
+        litem->setData(Qt::UserRole, i);
+        ui->lstTeamlead->addItem(litem);
+    }
+    if (teamlead > 0) {
+        for (int i = 0; i < ui->lstTeamlead->count(); i++) {
+            if (ui->lstTeamlead->item(i)->data(Qt::UserRole).toInt() == teamlead) {
+                ui->lstTeamlead->setCurrentRow(i);
+                break;
+            }
+        }
+    }
+}
+
+void CR5MfDaily::exportToExcel()
+{
+    ui->wt->exportToExcel();
 }
 
 void CR5MfDaily::addWorker()
@@ -117,6 +152,7 @@ void CR5MfDaily::addWorker()
     item->setText(vals.at(2).toString());
     item->setData(Qt::UserRole, id);
     item->setData(Qt::UserRole + 1, vals.at(1));
+    item->setData(Qt::UserRole + 2, vals.at(2));
     ui->lstWorkers->addItem(item);
     ui->lstWorkers->setCurrentItem(item);
 }
@@ -137,7 +173,7 @@ void CR5MfDaily::removeWorker()
     db[":f_date"] = ui->leDate->date();
     db[":f_worker"] = item->data(Qt::UserRole + 1);
     db.exec("delete from mf_daily_process where f_date=:f_date and f_worker=:f_worker");
-    loadDoc(ui->leDate->date());
+    loadDoc(ui->leDate->date(), 0, 0);
 }
 
 void CR5MfDaily::addProcess()
@@ -190,18 +226,30 @@ void CR5MfDaily::removeProcess()
 void CR5MfDaily::saveWork()
 {
     C5Database db(fDBParams);
+    bool qtywarning = false;
     for (int i = 0; i < ui->wt->rowCount(); i++) {
         C5LineEdit *l = ui->wt->lineEdit(i, 3);
+        if (l->getDouble() < 0.001) {
+            qtywarning = true;
+            //l->setBgColor(QColor::fromRgb(250, 170, 170));
+            l->setBgColor(Qt::red);
+        } else {
+            l->setBgColor(Qt::white);
+        }
         db[":f_qty"] = l->getDouble();
         db.update("mf_daily_process", "f_id", ui->wt->getData(i, 0));
     }
-    C5Message::info(tr("Saved"));
+    if (qtywarning) {
+        C5Message::error(tr("Saved, but some of quantities equals to 0."));
+    } else {
+        C5Message::info(tr("Saved"));
+    }
 }
 
 void CR5MfDaily::selectAllWorkers()
 {
     ui->lstWorkers->setCurrentRow(-1);
-    loadDoc(ui->leDate->date());
+    loadDoc(ui->leDate->date(), 0, 0);
 }
 
 void CR5MfDaily::processQtyChanged(const QString &arg1)
@@ -216,31 +264,40 @@ void CR5MfDaily::on_btnDatePlus_clicked()
 {
     ui->leDate->setDate(ui->leDate->date().addDays(1));
     ui->lstWorkers->setCurrentRow(-1);
-    loadDoc(ui->leDate->date());
+    loadDoc(ui->leDate->date(), 0, 0);
 }
 
 void CR5MfDaily::on_btnDateMinus_clicked()
 {
     ui->leDate->setDate(ui->leDate->date().addDays(-1));
     ui->lstWorkers->setCurrentRow(-1);
-    loadDoc(ui->leDate->date());
+    loadDoc(ui->leDate->date(), 0, 0);
 }
 
 void CR5MfDaily::on_lstWorkers_currentRowChanged(int currentRow)
 {
     Q_UNUSED(currentRow);
-    loadDoc(ui->leDate->date());
+    int worker = 0;
+    if (currentRow > -1) {
+        worker = ui->lstWorkers->item(currentRow)->data(Qt::UserRole + 1).toInt();
+    }
+    loadDoc(ui->leDate->date(), worker, 0);
 }
 
 void CR5MfDaily::on_leDate_returnPressed()
 {
     ui->lstWorkers->setCurrentRow(-1);
-    loadDoc(ui->leDate->date());
+    loadDoc(ui->leDate->date(), 0, 0);
 }
 
 void CR5MfDaily::on_lstTeamlead_itemClicked(QListWidgetItem *item)
 {
+    loadDoc(ui->leDate->date(), 0, item->data(Qt::UserRole).toInt());
+}
+
+void CR5MfDaily::on_leFilterWorker_textChanged(const QString &arg1)
+{
     for (int i = 0; i < ui->lstWorkers->count(); i++) {
-        ui->lstWorkers->setRowHidden(i, item->data(Qt::UserRole).toInt() == ui->lstWorkers->item(i)->data(Qt::UserRole).toInt());
+        ui->lstWorkers->setRowHidden(i, ui->lstWorkers->item(i)->text().contains(arg1, Qt::CaseInsensitive) == false);
     }
 }

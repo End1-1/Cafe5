@@ -180,7 +180,7 @@ bool C5PrintReceiptThread::print()
         }
         QString name;
         if (!m["f_adgcode"].toString().isEmpty()) {
-            name += QString("%1: %2").arg(__translator.tt(tr("Class"))).arg(m["f_adgcode"].toString());
+            name += QString("%1: %2").arg(__translator.tt(tr("Class")), m["f_adgcode"].toString());
         }
         name += __translator.td(m["f_dish"].toInt());
         if (m["f_canservice"].toInt() == 0) {
@@ -200,10 +200,7 @@ bool C5PrintReceiptThread::print()
             if (dbdish->isHourlyPayment(m["f_dish"].toInt())) {
                 p.rtext(QString("%1 = %2").arg(m["f_comment"].toString()).arg(float_str(m["f_total"].toDouble(), 2)));
             } else {
-                p.rtext(QString("%1 x %2 = %3")
-                        .arg(float_str(m["f_qty2"].toDouble(), 2))
-                        .arg(float_str(m["f_price"].toDouble(), 2))
-                        .arg(totalStr));
+                p.rtext(QString("%1 x %2 = %3").arg(float_str(m["f_qty2"].toDouble(), 2), float_str(m["f_price"].toDouble(), 2), totalStr));
             }
         }
         if (dbdish->isExtra(m["f_dish"].toInt())) {
@@ -228,7 +225,7 @@ bool C5PrintReceiptThread::print()
         p.br(1);
     }
     if (fHeaderInfo["f_discountfactor"].toDouble() > 0.001) {
-        p.ltext(QString("%1 %2%").arg(__translator.tt(tr("Discount"))).arg(float_str(fHeaderInfo["f_discountfactor"].toDouble() * 100, 2)), 0);
+        p.ltext(QString("%1 %2%").arg(__translator.tt(tr("Discount")), float_str(fHeaderInfo["f_discountfactor"].toDouble() * 100, 2)), 0);
         p.rtext(float_str(fHeaderInfo["f_amountdiscount"].toDouble(), 2));
         p.br();
         p.br(1);
@@ -268,11 +265,11 @@ bool C5PrintReceiptThread::print()
     p.setFontSize(bs);
     p.setFontBold(false);
     if (noservice) {
-        p.ltext(QString("* - %1").arg("No service"), 0);
+        p.ltext(QString("* - %1").arg(__translator.tt(tr("No service"))), 0);
         p.br();
     }
     if (nodiscount) {
-        p.ltext(QString("** - %1").arg("No discount"), 0);
+        p.ltext(QString("** - %1").arg(__translator.tt(tr("No discount"))), 0);
         p.br();
     }
     p.br();
@@ -351,6 +348,14 @@ bool C5PrintReceiptThread::print()
         if (fHeaderInfo["f_amountpayx"].toDouble() > 0.001) {
             p.ltext(__translator.tt(tr("PayX")), 0);
             p.rtext(float_str(fHeaderInfo["f_amountpayx"].toDouble(), 2));
+            p.br();
+        }
+        if (fHeaderInfo["f_cash"].toDouble() > 0.01) {
+            p.ltext(__translator.tt(tr("Received cash")), 0);
+            p.rtext(float_str(fHeaderInfo["f_cash"].toDouble(), 2));
+            p.br();
+            p.ltext(__translator.tt(tr("Change")), 0);
+            p.rtext(float_str(fHeaderInfo["f_change"].toDouble(), 2));
             p.br();
         }
         p.br();

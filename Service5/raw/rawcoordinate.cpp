@@ -15,7 +15,7 @@ RawCoordinate::~RawCoordinate()
     qDebug() << "~RawCoordinate";
 }
 
-void RawCoordinate::run(const QByteArray &d)
+int RawCoordinate::run(const QByteArray &d)
 {
     CoordinateData c;
     memcpy(&c, d.data(), sizeof(c));
@@ -33,4 +33,5 @@ void RawCoordinate::run(const QByteArray &d)
     putUInt(user);
     putBytes(reinterpret_cast<const char*>(&c), sizeof(c));
     informMonitors(fReply);
+    return 0;
 }

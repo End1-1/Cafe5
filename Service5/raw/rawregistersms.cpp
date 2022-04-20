@@ -14,7 +14,7 @@ RawRegisterSMS::~RawRegisterSMS()
     qDebug() << "~RawRegisterSMS";
 }
 
-void RawRegisterSMS::run(const QByteArray &d)
+int RawRegisterSMS::run(const QByteArray &d)
 {
     QString sms;
     readString(sms, d);
@@ -40,7 +40,7 @@ void RawRegisterSMS::run(const QByteArray &d)
                     }
                 } else {
                     LogWriter::write(LogWriterLevel::errors, property("session").toString(), db.lastDbError());
-                    return;
+                    return 0;
                 }
 
                 db[":fgroup"] = 2; // CHECK WHAT THE FUCKING GROUPS
@@ -51,19 +51,19 @@ void RawRegisterSMS::run(const QByteArray &d)
                 if (id == 0) {
                     if (!db.insert("users_list", id)) {
                         LogWriter::write(LogWriterLevel::errors, property("session").toString(), db.lastDbError());
-                        return;
+                        return 0;
                     }
                 } else {
                     if (!db.update("users_list", "fid", id)) {
                         LogWriter::write(LogWriterLevel::errors, property("session").toString(), db.lastDbError());
-                        return;
+                        return 0;
                     }
                 }
                 db[":ftoken"] = token;
                 db[":fuser"] = id;
                 if (!db.exec("update users_devices set fuser=:fuser where ftoken=:ftoken")) {
                     LogWriter::write(LogWriterLevel::errors, property("session").toString(), db.lastDbError());
-                    return;
+                    return 0;
                 }
                 QMutexLocker ml(fMutexTokenUser);
                 fMapTokenUser[token] = id;
@@ -75,4 +75,5 @@ void RawRegisterSMS::run(const QByteArray &d)
     }
     clearData();
     putUShort(reply);
+    return 0;
 }

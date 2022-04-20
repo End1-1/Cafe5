@@ -135,10 +135,10 @@ bool C5TableWidget::findWidget(QWidget *w, int &row, int &column)
     return false;
 }
 
-QVariant C5TableWidget::getData(int row, int column)
+QVariant C5TableWidget::getData(int row, int column, int role)
 {
     C5TableWidgetItem *i = item(row, column);
-    return i->data(Qt::EditRole);
+    return i->data(role);
 }
 
 void C5TableWidget::setData(int row, int column, const QVariant &value)

@@ -23,6 +23,8 @@ public:
 
     C5TableWithTotal &countTotal(int index);
 
+    void exportToExcel();
+
     int addRow();
 
     void removeRow(int row);
@@ -33,7 +35,11 @@ public:
 
     int columnCount();
 
-    QVariant getData(int row, int column) const;
+    QVariant getData(int row, int column, int role = Qt::EditRole) const;
+
+    QString columnTitle(int column) const;
+
+    int columnWidth(int column);
 
     double total(int column);
 

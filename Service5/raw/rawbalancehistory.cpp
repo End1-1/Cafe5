@@ -20,7 +20,7 @@ RawBalanceHistory::~RawBalanceHistory()
     qDebug() << "RawBalanceHistory";
 }
 
-void RawBalanceHistory::run(const QByteArray &d)
+int RawBalanceHistory::run(const QByteArray &d)
 {
     quint8 h;
     readUByte(h, d);
@@ -35,6 +35,7 @@ void RawBalanceHistory::run(const QByteArray &d)
         balanceDetails(QDateTime::fromMSecsSinceEpoch(db1), QDateTime::fromMSecsSinceEpoch(db2));
         break;
     }
+    return 0;
 }
 
 void RawBalanceHistory::balanceAmountTotal()
