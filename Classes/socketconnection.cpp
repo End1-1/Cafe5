@@ -65,7 +65,7 @@ void SocketConnection::run()
     fTimer = new QTimer(this);
     connect(fTimer, &QTimer::timeout, this, &SocketConnection::timeout);
     connect(fSocket, &QSslSocket::readyRead, this, &SocketConnection::readyRead);
-    connect(fSocket, &QSslSocket::errorOccurred, this, &SocketConnection::errorOccurred);
+    //connect(fSocket, &QSslSocket::errorOccurred, this, &SocketConnection::errorOccurred);
     connect(fSocket, &QSslSocket::encrypted, this, &SocketConnection::encrypted);
     connect(fSocket, &QSslSocket::disconnected, this, &SocketConnection::disconnected);
     connect(this, &SocketConnection::dataReady, this, &SocketConnection::sendData);
@@ -128,7 +128,7 @@ void SocketConnection::readyRead()
 
     if (fData.isEmpty()) {
         fData = fSocket->read(3);
-        if (fData.compare(ba) != 0) {
+        if (memcmp(fData.data(), ba.data(), 3) != 0) {
             fSocket->disconnectFromHost();
         }
     }

@@ -342,12 +342,17 @@
 <context>
     <name>C5Message</name>
     <message>
-        <location filename="../Cafe5/c5message.ui" line="127"/>
+        <location filename="../Cafe5/c5message.ui" line="71"/>
+        <source>Message</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Cafe5/c5message.ui" line="124"/>
         <source>OK</source>
         <translation>Այո</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5message.ui" line="140"/>
+        <location filename="../Cafe5/c5message.ui" line="137"/>
         <source>Cancel</source>
         <translation>Հրաժարվել</translation>
     </message>
@@ -531,120 +536,120 @@
         <translation>Նվեր</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printreceiptthread.cpp" line="225"/>
+        <location filename="../Classes/c5printreceiptthread.cpp" line="222"/>
         <source>Service</source>
         <translation>Սպասարկում</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printreceiptthread.cpp" line="231"/>
+        <location filename="../Classes/c5printreceiptthread.cpp" line="228"/>
         <source>Discount</source>
         <translation>Զեղչ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printreceiptthread.cpp" line="244"/>
+        <location filename="../Classes/c5printreceiptthread.cpp" line="241"/>
         <source>Prepaid amount</source>
         <translation>Կանխավճար</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printreceiptthread.cpp" line="261"/>
+        <location filename="../Classes/c5printreceiptthread.cpp" line="258"/>
         <source>Refund</source>
         <translation>Հետ վերադարձ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printreceiptthread.cpp" line="271"/>
+        <location filename="../Classes/c5printreceiptthread.cpp" line="268"/>
         <source>No service</source>
         <translation>Սպասարկում չի հաշվարկվում</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printreceiptthread.cpp" line="275"/>
+        <location filename="../Classes/c5printreceiptthread.cpp" line="272"/>
         <source>No discount</source>
         <translation>Զեղչ չի կիրարվում</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printreceiptthread.cpp" line="347"/>
+        <location filename="../Classes/c5printreceiptthread.cpp" line="344"/>
         <source>Idram</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5printreceiptthread.cpp" line="352"/>
+        <location filename="../Classes/c5printreceiptthread.cpp" line="349"/>
         <source>PayX</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5printreceiptthread.cpp" line="357"/>
+        <location filename="../Classes/c5printreceiptthread.cpp" line="354"/>
         <source>Received cash</source>
         <translation>Առձերն</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printreceiptthread.cpp" line="360"/>
+        <location filename="../Classes/c5printreceiptthread.cpp" line="357"/>
         <source>Change</source>
         <translation>Մանր</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printreceiptthread.cpp" line="389"/>
+        <location filename="../Classes/c5printreceiptthread.cpp" line="386"/>
         <source>Debt</source>
         <translation>Պարտք</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printreceiptthread.cpp" line="407"/>
+        <location filename="../Classes/c5printreceiptthread.cpp" line="404"/>
         <source>Costumer</source>
         <translation>Հաճախորդ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printreceiptthread.cpp" line="422"/>
-        <location filename="../Classes/c5printreceiptthread.cpp" line="424"/>
+        <location filename="../Classes/c5printreceiptthread.cpp" line="419"/>
+        <location filename="../Classes/c5printreceiptthread.cpp" line="421"/>
         <source>Sample</source>
         <translation>Օրնկ․</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printreceiptthread.cpp" line="219"/>
+        <location filename="../Classes/c5printreceiptthread.cpp" line="216"/>
         <source>Total</source>
         <translation>Ընդամենը</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printreceiptthread.cpp" line="255"/>
+        <location filename="../Classes/c5printreceiptthread.cpp" line="252"/>
         <source>Need to pay</source>
         <translation>Ենթակա է վճարման</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printreceiptthread.cpp" line="332"/>
+        <location filename="../Classes/c5printreceiptthread.cpp" line="329"/>
         <source>Payment, cash</source>
         <translation>Վճարումը առնձերն</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printreceiptthread.cpp" line="337"/>
+        <location filename="../Classes/c5printreceiptthread.cpp" line="334"/>
         <source>Payment, card</source>
         <translation>Վճարումը անկանխիկ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printreceiptthread.cpp" line="342"/>
+        <location filename="../Classes/c5printreceiptthread.cpp" line="339"/>
         <source>Bank transfer</source>
         <translation>Փոխանցում բանկով</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printreceiptthread.cpp" line="370"/>
+        <location filename="../Classes/c5printreceiptthread.cpp" line="367"/>
         <source>Transfer to room</source>
         <translation>Կցել սենյակի հաշվին</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printreceiptthread.cpp" line="375"/>
-        <location filename="../Classes/c5printreceiptthread.cpp" line="392"/>
-        <location filename="../Classes/c5printreceiptthread.cpp" line="401"/>
+        <location filename="../Classes/c5printreceiptthread.cpp" line="372"/>
+        <location filename="../Classes/c5printreceiptthread.cpp" line="389"/>
+        <location filename="../Classes/c5printreceiptthread.cpp" line="398"/>
         <source>Signature</source>
         <translation>Ստորագրություն</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printreceiptthread.cpp" line="381"/>
+        <location filename="../Classes/c5printreceiptthread.cpp" line="378"/>
         <source>City ledger</source>
         <translation>Դեբիտորական պարտք</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printreceiptthread.cpp" line="398"/>
+        <location filename="../Classes/c5printreceiptthread.cpp" line="395"/>
         <source>Complimentary</source>
         <translation>Հյուրասիրություն</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printreceiptthread.cpp" line="419"/>
+        <location filename="../Classes/c5printreceiptthread.cpp" line="416"/>
         <source>Thank you for visit!</source>
         <translation>Շնորհակալություն այցելության համար</translation>
     </message>
@@ -912,7 +917,7 @@
 <context>
     <name>C5Printing</name>
     <message>
-        <location filename="../Classes/c5printing.cpp" line="323"/>
+        <location filename="../Classes/c5printing.cpp" line="330"/>
         <source>Failed send order to remote printer</source>
         <translation></translation>
     </message>
@@ -1044,34 +1049,34 @@
     <name>C5User</name>
     <message>
         <location filename="../Classes/c5user.cpp" line="70"/>
-        <location filename="../Classes/c5user.cpp" line="94"/>
+        <location filename="../Classes/c5user.cpp" line="95"/>
         <source>User is inactive</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../Classes/c5user.cpp" line="75"/>
-        <location filename="../Classes/c5user.cpp" line="99"/>
+        <location filename="../Classes/c5user.cpp" line="100"/>
         <source>Login failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5user.cpp" line="117"/>
+        <location filename="../Classes/c5user.cpp" line="118"/>
         <source>You have not permission</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5user.cpp" line="124"/>
+        <location filename="../Classes/c5user.cpp" line="125"/>
         <source>Cannot input without output</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5user.cpp" line="151"/>
+        <location filename="../Classes/c5user.cpp" line="152"/>
         <source>Cannot output without input</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5user.cpp" line="169"/>
-        <location filename="../Classes/c5user.cpp" line="217"/>
+        <location filename="../Classes/c5user.cpp" line="170"/>
+        <location filename="../Classes/c5user.cpp" line="218"/>
         <source>Access denied</source>
         <translation type="unfinished">Մուտքը արգելված է</translation>
     </message>
@@ -1432,64 +1437,79 @@ MS Excel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Forms/change.ui" line="29"/>
-        <source>5000</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../Forms/change.ui" line="45"/>
-        <source>1000</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../Forms/change.ui" line="61"/>
-        <source>50000</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../Forms/change.ui" line="77"/>
-        <source>10000</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../Forms/change.ui" line="93"/>
-        <source>2000</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../Forms/change.ui" line="109"/>
-        <source>15000</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../Forms/change.ui" line="125"/>
+        <location filename="../Forms/change.ui" line="295"/>
         <source>Cancel</source>
         <translation>Հրաժարվել</translation>
     </message>
     <message>
-        <location filename="../Forms/change.ui" line="141"/>
-        <source>20000</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../Forms/change.ui" line="157"/>
+        <location filename="../Forms/change.ui" line="263"/>
         <source>OK</source>
         <translation>Այո</translation>
     </message>
     <message>
-        <location filename="../Forms/change.ui" line="178"/>
+        <location filename="../Forms/change.ui" line="50"/>
         <source>Amount</source>
         <translation>Գումար</translation>
     </message>
     <message>
-        <location filename="../Forms/change.ui" line="205"/>
+        <location filename="../Forms/change.ui" line="29"/>
+        <source>7</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Forms/change.ui" line="77"/>
         <source>Received</source>
         <translation>Առձերն</translation>
     </message>
     <message>
-        <location filename="../Forms/change.ui" line="226"/>
+        <location filename="../Forms/change.ui" line="101"/>
         <source>Change</source>
         <translation>Մանր</translation>
+    </message>
+    <message>
+        <location filename="../Forms/change.ui" line="135"/>
+        <source>9</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Forms/change.ui" line="151"/>
+        <source>5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Forms/change.ui" line="167"/>
+        <source>6</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Forms/change.ui" line="183"/>
+        <source>8</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Forms/change.ui" line="199"/>
+        <source>1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Forms/change.ui" line="215"/>
+        <source>4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Forms/change.ui" line="231"/>
+        <source>3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Forms/change.ui" line="247"/>
+        <source>2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Forms/change.ui" line="279"/>
+        <source>0</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -33,6 +33,9 @@ WOrder::WOrder(C5User *user, int saleType, QWidget *parent) :
     ui(new Ui::WOrder)
 {
     ui->setupUi(this);
+    ui->lbAdvance->setVisible(false);
+    ui->leAdvance->setVisible(false);
+    ui->grFlags->setVisible(false);
     ui->tblGoods->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
     fSaleType = saleType;
     fPartner = 0;
@@ -46,15 +49,9 @@ WOrder::WOrder(C5User *user, int saleType, QWidget *parent) :
     fCardMode = 0;
     ui->lbDisc->setVisible(false);
     ui->leDisc->setVisible(false);
-    ui->lbCustomer->setVisible(false);
-    ui->leCustomer->setVisible(false);
     ui->leCard->setValidator(new QDoubleValidator(0, 1000000000, 2));
     ui->leCash->setValidator(new QDoubleValidator(0, 1000000000, 2));
     ui->leChange->setValidator(new QDoubleValidator(0, 1000000000, 2));
-    ui->lbPartner->setVisible(false);
-    ui->lePartner->setVisible(false);
-    ui->lbDept->setVisible(false);
-    ui->chDebt->setVisible(false);
     noImage();
     connect(ui->leCard, &C5LineEdit::focusOut, [this](){
         C5LogSystem::writeEvent(QString("%1: %2").arg(tr("Card value"), ui->leCard->text()));

@@ -4,7 +4,7 @@
 <context>
     <name>C5Printing</name>
     <message>
-        <location filename="../Classes/c5printing.cpp" line="323"/>
+        <location filename="../Classes/c5printing.cpp" line="330"/>
         <source>Failed send order to remote printer</source>
         <translation></translation>
     </message>

@@ -4,12 +4,17 @@
 <context>
     <name>C5Message</name>
     <message>
-        <location filename="../Cafe5/c5message.ui" line="127"/>
+        <location filename="../Cafe5/c5message.ui" line="71"/>
+        <source>Message</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Cafe5/c5message.ui" line="124"/>
         <source>OK</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5message.ui" line="140"/>
+        <location filename="../Cafe5/c5message.ui" line="137"/>
         <source>Cancel</source>
         <translation>Հրաժարվել</translation>
     </message>
@@ -341,12 +346,12 @@
 <context>
     <name>RawBalanceHistory</name>
     <message>
-        <location filename="raw/rawbalancehistory.cpp" line="83"/>
+        <location filename="raw/rawbalancehistory.cpp" line="84"/>
         <source>Starting balance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="raw/rawbalancehistory.cpp" line="98"/>
+        <location filename="raw/rawbalancehistory.cpp" line="99"/>
         <source>Ending balance</source>
         <translation type="unfinished"></translation>
     </message>
@@ -354,7 +359,7 @@
 <context>
     <name>SocketThread</name>
     <message>
-        <location filename="socketthread.cpp" line="338"/>
+        <location filename="socketthread.cpp" line="347"/>
         <source>Connection timeout</source>
         <translation type="unfinished"></translation>
     </message>

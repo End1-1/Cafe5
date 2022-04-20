@@ -90,6 +90,7 @@
 #define param_shop_dont_check_qty 86
 #define param_vat 87
 #define param_shop_report_of_logged_staff 88
+#define param_shop_hide_store_qty 89
 
 #define FRONTDESK_WAITER 0
 #define FRONTDESK_SHOP 1
