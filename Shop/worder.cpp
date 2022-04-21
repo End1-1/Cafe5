@@ -157,7 +157,8 @@ void WOrder::addGoodsToTable(int id)
     int row = ui->tblGoods->addEmptyRow();
     ui->tblGoods->item(row, 0)->setData(Qt::UserRole, QVariant::fromValue(id));
     ui->tblGoods->setInteger(row, 0, id);
-    ui->tblGoods->setString(row, 1, g.goodsName() + " " + g.scancode());
+    //ui->tblGoods->setString(row, 1, g.goodsName() + " " + g.scancode());
+    ui->tblGoods->setString(row, 1, g.goodsName());
     ui->tblGoods->setDouble(row, 2, g.unit()->defaultQty());
     ui->tblGoods->item(row, 2)->fDecimals = 3;
     ui->tblGoods->setString(row, 3, g.unit()->unitName());
