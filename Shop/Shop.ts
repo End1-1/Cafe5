@@ -3022,7 +3022,7 @@ reservation</source>
     <message>
         <location filename="worder.ui" line="279"/>
         <source>Cash in (F3)</source>
-        <translation>Առձեռն</translation>
+        <translation type="unfinished">Առձեռն (F3)</translation>
     </message>
     <message>
         <location filename="worder.ui" line="393"/>

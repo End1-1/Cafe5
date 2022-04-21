@@ -709,7 +709,7 @@ void WOrder::setQtyOfRow(int row, double qty)
     }
     double diffqty = qty - ui->tblGoods->getInteger(row, tr("Qty"));
 
-    if (!g.isService()) {
+    if (!g.isService() && __c5config.getValue(param_shop_dont_check_qty).toInt() == 0) {
         QString err;
         if (!checkQty(g.id(), diffqty, err)) {
             C5Message::error(err);
