@@ -545,9 +545,9 @@ void WOrder::removeRow()
     QString name = ui->tblGoods->getString(row, 1);
     double qty = ui->tblGoods->getDouble(row, 2);
     ui->tblGoods->removeRow(row);
-    ui->leCard->clear();
-    ui->leCash->clear();
-    ui->leChange->clear();
+    ui->leCard->setText("0");
+    ui->leCash->setText("0");
+    ui->leChange->setText("0");
     C5Database db(__c5config.dbParams());
     db[":f_window"] = fWorking->fTab->currentIndex();
     db[":f_state"] = 0;
@@ -793,6 +793,9 @@ void WOrder::on_leCash_textChanged(const QString &arg1)
     QString a = QString(arg1).replace(",", "");
     ui->leChange->setDouble(str_float(a) - ui->leTotal->getDouble());
     ui->leCash->setDouble(str_float(a));
+    if (arg1.toDouble() < 0.01) {
+        ui->leChange->setText("0");
+    }
     connect(ui->leCash, &C5LineEdit::textChanged, this, &WOrder::on_leCash_textChanged);
 }
 
