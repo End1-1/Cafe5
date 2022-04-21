@@ -1,6 +1,7 @@
 #include "c5user.h"
 #include "c5database.h"
 #include "c5config.h"
+#include "c5permissions.h"
 #include <QJsonArray>
 
 C5User::C5User(const QMap<QString, QVariant> &m) :
@@ -109,9 +110,6 @@ bool C5User::authByPinPass(const QString &pin, const QString &pass)
 
 bool C5User::check(int permission)
 {
-    if (group() == 1) {
-        return true;
-    }
     if(fPermissions.contains(QString::number(permission))) {
         return true;
     }
@@ -202,6 +200,7 @@ void C5User::getState()
 void C5User::getPermissions()
 {
     C5Database db(__c5config.dbParams());
+    C5Permissions::init(db, group());
     db[":f_group"] = group();
     db.exec("select f_key, f_value from s_user_access where f_group=:f_group and f_value=1");
     while (db.nextRow()) {

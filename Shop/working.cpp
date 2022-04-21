@@ -901,3 +901,8 @@ void Working::on_btnManualTax_clicked()
     tp->exec();
     tp->deleteLater();
 }
+
+void Working::on_btnMinimize_clicked()
+{
+    showMinimized();
+}

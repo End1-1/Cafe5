@@ -112,23 +112,22 @@ void CE5Goods::setId(int id)
         ui->tblMultiscancode->setString(r, 0, db.getString(0));
     }
     ui->chSameStoreId->setChecked(ui->leStoreId->getInteger() == ui->leCode->getInteger());
-    ui->chSameStoreId->clicked();
+    ui->chSameStoreId->click();
     countTotal();
 
     if (__user->check(cp_t6_goods_only_price_edit)) {
-        if (ui->leCode->getInteger() > 0) {
-            ui->tab_2->setEnabled(false);
-            ui->tab_3->setEnabled(false);
-            ui->tab_4->setEnabled(false);
-            ui->tab_5->setEnabled(false);
-            ui->leGroup->setEnabled(false);
-            ui->leClass1->setEnabled(false);
-            ui->leClass2->setEnabled(false);
-            ui->leClass3->setEnabled(false);
-            ui->leClass4->setEnabled(false);
-            ui->leName->setEnabled(false);
-            ui->leScanCode->setEnabled(false);
-        }
+        bool enabled = ui->leCode->getInteger() == 0;
+        ui->tab_2->setEnabled(enabled);
+        ui->tab_3->setEnabled(enabled);
+        ui->tab_4->setEnabled(enabled);
+        ui->tab_5->setEnabled(enabled);
+        ui->leGroup->setEnabled(enabled);
+        ui->leClass1->setEnabled(enabled);
+        ui->leClass2->setEnabled(enabled);
+        ui->leClass3->setEnabled(enabled);
+        ui->leClass4->setEnabled(enabled);
+        ui->leName->setEnabled(enabled);
+        ui->leScanCode->setEnabled(enabled);
     }
 }
 

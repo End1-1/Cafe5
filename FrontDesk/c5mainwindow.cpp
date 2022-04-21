@@ -927,7 +927,6 @@ void C5MainWindow::setDB(const QString &dbname)
     ui->lMenu->addWidget(l);
 
     C5Database dbpr(db.at(0),  db.at(1),  db.at(2),  db.at(3));
-    C5Permissions::init(dbpr, __user->group());
 
     if (addMainLevel(db.at(1), cp_t2_action, tr("Actions"), ":/edit.png", l)) {
         addTreeL3Item(l, cp_t2_store_input, tr("New store input"), ":/goods.png");

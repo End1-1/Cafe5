@@ -36,6 +36,12 @@ C5WaiterOrderDoc::C5WaiterOrderDoc(const QString &id, C5Database &db) :
     open(db);
 }
 
+C5WaiterOrderDoc::C5WaiterOrderDoc(const QString &id, C5Database &db, bool openlatter)
+{
+    fHeader["f_id"] = id;
+    fDb.dbParams() = db.dbParams();
+}
+
 C5WaiterOrderDoc::C5WaiterOrderDoc(C5Database &db, QJsonObject &jh, QJsonArray &jb) :
     C5WaiterOrderDoc()
 {
@@ -784,4 +790,15 @@ void C5WaiterOrderDoc::calculateSelfCost(C5Database &db)
     db[":f_servicefactor"] = 0;
     db[":f_amountservice"] = 0;
     db.update("o_header", where_id(fHeader["f_id"].toString()));
+}
+
+void C5WaiterOrderDoc::run()
+{
+    QString err;
+    if (fDb.open()) {
+        open(fDb);
+        makeOutputOfStore(fDb, err, DOC_STATE_SAVED);
+        fDb.close();
+    }
+    emit finished();
 }

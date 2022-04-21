@@ -479,7 +479,7 @@
        <widget class="C5LineEdit" name="leRetail">
         <property name="maximumSize">
          <size>
-          <width>100</width>
+          <width>200</width>
           <height>16777215</height>
          </size>
         </property>
@@ -502,7 +502,7 @@
        <widget class="C5LineEdit" name="leWhosale">
         <property name="maximumSize">
          <size>
-          <width>100</width>
+          <width>200</width>
           <height>16777215</height>
          </size>
         </property>
@@ -525,7 +525,7 @@
        <widget class="C5LineEdit" name="leTotal">
         <property name="maximumSize">
          <size>
-          <width>100</width>
+          <width>200</width>
           <height>16777215</height>
          </size>
         </property>

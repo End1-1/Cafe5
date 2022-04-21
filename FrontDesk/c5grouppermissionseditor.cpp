@@ -78,10 +78,6 @@ void C5GroupPermissionsEditor::on_lbGroup_clicked()
 void C5GroupPermissionsEditor::savePemissions()
 {
     C5Database db(fDBParams);
-    if (fGroupId == 1) {
-        C5Message::info(tr("Nothig was saved"));
-        return;
-    }
     db[":f_group"] = fGroupId;
     db.exec("delete from s_user_access where f_group=:f_group");
     for (QMap<int, C5CheckBox*>::const_iterator it = fCheckBoxes.begin(); it != fCheckBoxes.end(); it++) {

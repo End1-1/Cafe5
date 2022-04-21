@@ -81,6 +81,8 @@ private slots:
 
     void on_btnAppMenu_clicked();
 
+    void on_btnP05_2_clicked();
+
 private:
     Ui::Workspace *ui;
 

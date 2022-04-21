@@ -20,6 +20,7 @@
 #include "change.h"
 #include "menudialog.h"
 #include "QRCodeGenerator.h"
+#include "thread.h"
 #include <QScrollBar>
 #include <QInputDialog>
 #include <QScreen>
@@ -415,8 +416,15 @@ void Workspace::on_btnCheckout_clicked()
 
     }
 
-
     resetOrder();
+
+    auto *t = new Thread("C5WaiterOrderDoc");
+    C5WaiterOrderDoc *d = new C5WaiterOrderDoc(fOrderUuid, db, true);
+    connect(t, &QThread::started, d, &C5WaiterOrderDoc::run);
+    connect(d, &C5WaiterOrderDoc::finished, t, &QThread::quit);
+    connect(t, &QThread::finished, t, &QThread::deleteLater);
+    d->moveToThread(t);
+    t->start();
 }
 
 void Workspace::on_btnClearFilter_clicked()
@@ -1174,4 +1182,9 @@ void Workspace::on_btnAppMenu_clicked()
 {
     MenuDialog m;
     m.exec();
+}
+
+void Workspace::on_btnP05_2_clicked()
+{
+    setQty(0.25, 1);
 }

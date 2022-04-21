@@ -16,6 +16,8 @@ public:
 
     C5WaiterOrderDoc(const QString &id, C5Database &db);
 
+    C5WaiterOrderDoc(const QString &id, C5Database &db, bool openlatter);
+
     C5WaiterOrderDoc(C5Database &db, QJsonObject &jh, QJsonArray &jb);
 
     ~C5WaiterOrderDoc();
@@ -70,7 +72,12 @@ public:
 
     void calculateSelfCost(C5Database &db);
 
+public slots:
+    void run();
+
 private:
+
+    C5Database fDb;
 
     bool fSaved;
 
@@ -81,6 +88,9 @@ private:
     QString getHotelID(const QString &source, QString &err);
 
     bool correctHotelID(QString &id, QString &err);
+
+signals:
+    void finished();
 };
 
 #endif // C5WAITERORDERDOC_H

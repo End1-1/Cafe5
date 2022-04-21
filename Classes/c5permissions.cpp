@@ -117,7 +117,6 @@ void C5Permissions::init(C5Database &db, int group)
               << cp_t6_goods_images
               << cp_t6_qty_reminder
               << cp_t6_complectations
-              << cp_t6_goods_only_price_edit
 
               << cp_t7_other
               << cp_t7_credit_card
@@ -151,8 +150,19 @@ void C5Permissions::init(C5Database &db, int group)
               << cp_t10_general_report
                  ;
     if (group == 1) {
-        fPermissions[db.database()] = fTemplate;
-        return;
+        db[":f_group"] = 1;
+        db.exec("delete from s_user_access where f_group=:f_group");
+        QString sql = "insert into s_user_access (f_group, f_key, f_value) values ";
+        bool f = true;
+        for (auto i: fTemplate) {
+            if (f) {
+                f = false;
+            } else {
+                sql += ",";
+            }
+            sql += QString("(1, %1, 1)").arg(i);
+        }
+        db.exec(sql);
     }
     db[":f_group"] = group;
     db.exec("select f_key from s_user_access where f_group=:f_group");

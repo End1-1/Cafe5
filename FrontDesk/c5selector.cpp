@@ -46,6 +46,7 @@ bool C5Selector::getValue(const QStringList &dbParams, int cache, QList<QVariant
         c->fReset = false;
         c->refresh();
     }
+    c->fGrid->fTableView->resizeColumnsToContents();
     c->ui->leFilter->setFocus();
     bool result = c->exec() == QDialog::Accepted;
     values = c->fValues;

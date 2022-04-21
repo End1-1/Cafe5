@@ -141,5 +141,6 @@
         <file>whosale.png</file>
         <file>goodslist.png</file>
         <file>help.png</file>
+        <file>minimize.png</file>
     </qresource>
 </RCC>

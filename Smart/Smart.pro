@@ -80,6 +80,7 @@ SOURCES += \
     ../Classes/c5textdelegate.cpp \
     ../Classes/c5threadobject.cpp \
     ../Classes/c5translator.cpp \
+    ../Classes/c5waiterorderdoc.cpp \
     ../Classes/c5widget.cpp \
     ../Classes/c5witerconf.cpp \
     ../Classes/calculator.cpp \
@@ -90,6 +91,7 @@ SOURCES += \
     ../Classes/idram.cpp \
     ../Classes/notificationwidget.cpp \
     ../Classes/rkeyboard.cpp \
+    ../Classes/thread.cpp \
     ../Controls/c5checkbox.cpp \
     ../Controls/c5combobox.cpp \
     ../Controls/c5dateedit.cpp \
@@ -198,6 +200,7 @@ HEADERS += \
     ../Classes/c5textdelegate.h \
     ../Classes/c5threadobject.h \
     ../Classes/c5translator.h \
+    ../Classes/c5waiterorderdoc.h \
     ../Classes/c5widget.h \
     ../Classes/c5witerconf.h \
     ../Classes/calculator.h \
@@ -208,6 +211,7 @@ HEADERS += \
     ../Classes/idram.h \
     ../Classes/notificationwidget.h \
     ../Classes/rkeyboard.h \
+    ../Classes/thread.h \
     ../Controls/c5checkbox.h \
     ../Controls/c5combobox.h \
     ../Controls/c5dateedit.h \

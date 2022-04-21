@@ -27,7 +27,7 @@ DlgGoodsList::DlgGoodsList() :
         row++;
     }
     ui->leTotalRetail->setDouble(totalRetail);
-    ui->tbl->setColumnHidden(4, __c5config.getValue(param_shop_hide_store_qty).toInt() == 1);
+    ui->leTotalRetail->setVisible(!__c5config.getValue(param_shop_hide_store_qty).toInt() == 1);
     ui->tbl->setColumnHidden(6, __c5config.shopDenyF2());
     ui->leSearch->installEventFilter(this);
     ui->tbl->resizeColumnsToContents();
