@@ -10,6 +10,7 @@
 #include "barcode.h"
 #include "c5printpreview.h"
 #include "c5printing.h"
+#include "c5user.h"
 #include <QClipboard>
 #include <QFontDatabase>
 #include <QDateTime>
@@ -113,6 +114,22 @@ void CE5Goods::setId(int id)
     ui->chSameStoreId->setChecked(ui->leStoreId->getInteger() == ui->leCode->getInteger());
     ui->chSameStoreId->clicked();
     countTotal();
+
+    if (__user->check(cp_t6_goods_only_price_edit)) {
+        if (ui->leCode->getInteger() > 0) {
+            ui->tab_2->setEnabled(false);
+            ui->tab_3->setEnabled(false);
+            ui->tab_4->setEnabled(false);
+            ui->tab_5->setEnabled(false);
+            ui->leGroup->setEnabled(false);
+            ui->leClass1->setEnabled(false);
+            ui->leClass2->setEnabled(false);
+            ui->leClass3->setEnabled(false);
+            ui->leClass4->setEnabled(false);
+            ui->leName->setEnabled(false);
+            ui->leScanCode->setEnabled(false);
+        }
+    }
 }
 
 bool CE5Goods::save(QString &err, QList<QMap<QString, QVariant> > &data)

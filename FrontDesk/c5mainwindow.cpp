@@ -883,9 +883,11 @@ bool C5MainWindow::addMainLevel(const QString &db, int permission, const QString
 {
     if (__user->check(permission)) {
         QPushButton *b = new QPushButton(QIcon(icon), title);
+        b->setProperty("menu", "1");
         b->setProperty("cp", permission);
         connect(b, SIGNAL(clicked()), this, SLOT(on_btnMenuClick()));
         l = new QListWidget();
+        l->setProperty("menu", "1");
         connect(l, SIGNAL(clicked(QModelIndex)), this, SLOT(on_listWidgetItemClicked(QModelIndex)));
         l->setProperty("db", db);
         l->setProperty("cp", permission);
@@ -916,6 +918,7 @@ void C5MainWindow::setDB(const QString &dbname)
         delete li;
     }
     QPushButton *btn = new QPushButton(icon, dbname);
+    btn->setProperty("menu", "2");
     connect(btn, SIGNAL(clicked()), this, SLOT(on_btnChangeDB_clicked()));
     ui->lMenu->addWidget(btn);
     QListWidget *l = new QListWidget();
@@ -1026,8 +1029,8 @@ void C5MainWindow::setDB(const QString &dbname)
     }
 
     if (addMainLevel(db.at(1), cp_t1_preference, tr("Preferences"), ":/configure.png", l)) {
-        addTreeL3Item(l, cp_t1_usergroups, tr("Users groups"), ":/users_groups.png");
-        addTreeL3Item(l, cp_t1_users, tr("Users"), ":/users_groups.png");
+        addTreeL3Item(l, cp_t1_usergroups, tr("Positions of employees"), ":/users_groups.png");
+        addTreeL3Item(l, cp_t1_users, tr("Employees"), ":/users_groups.png");
         addTreeL3Item(l, cp_t1_databases, tr("Databases"), ":/database.png");
         addTreeL3Item(l, cp_t1_settigns, tr("Settings"), ":/configure.png");
         addTreeL3Item(l, cp_t7_translator, tr("Translator"), ":/translate.png");
@@ -1097,6 +1100,7 @@ void C5MainWindow::readFavoriteMenu()
         return;
     }
     QListWidget *l = fMenuLists.at(0);
+    l->setProperty("menu", "1");
     l->clear();
     QSettings ss(_ORGANIZATION_, _APPLICATION_+ QString("\\") + _MODULE_);
     QStringList keys = ss.allKeys();

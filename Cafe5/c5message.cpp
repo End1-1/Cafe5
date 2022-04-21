@@ -11,6 +11,9 @@ C5Message::C5Message(QWidget *parent) :
     ui(new Ui::C5Message)
 {
     ui->setupUi(this);
+#ifndef WAITER
+    ui->frame->setFrameShape(QFrame::NoFrame);
+#endif
 }
 
 C5Message::~C5Message()

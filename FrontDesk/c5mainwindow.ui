@@ -97,6 +97,9 @@
            </property>
            <item>
             <widget class="QScrollArea" name="scrollArea">
+             <property name="verticalScrollBarPolicy">
+              <enum>Qt::ScrollBarAlwaysOff</enum>
+             </property>
              <property name="horizontalScrollBarPolicy">
               <enum>Qt::ScrollBarAlwaysOff</enum>
              </property>
@@ -138,12 +141,21 @@
                    <property name="text">
                     <string>Database</string>
                    </property>
+                   <property name="menu" stdset="0">
+                    <string>1</string>
+                   </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QGroupBox" name="groupBox">
+                  <widget class="QGroupBox" name="grMenu">
                    <property name="title">
                     <string>GroupBox</string>
+                   </property>
+                   <property name="flat">
+                    <bool>false</bool>
+                   </property>
+                   <property name="checkable">
+                    <bool>false</bool>
                    </property>
                   </widget>
                  </item>

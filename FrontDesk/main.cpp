@@ -6,6 +6,7 @@
 #include <QTranslator>
 #include <QStyleFactory>
 #include <QFontDatabase>
+#include <QFile>
 #include <ctime>
 
 int main(int argc, char *argv[])
@@ -53,6 +54,13 @@ int main(int argc, char *argv[])
     QFont font(a.font());
     font.setPointSize(C5Config::fronDeskFontSize());
     a.setFont(font);
+
+    QFile style(a.applicationDirPath() + "/officestyle.qss");
+    if (style.exists()) {
+        if (style.open(QIODevice::ReadOnly)) {
+            a.setStyleSheet(style.readAll());
+        }
+    }
 
     srand(time(NULL));
     C5MainWindow w;
