@@ -793,7 +793,7 @@ void WOrder::on_leCash_textChanged(const QString &arg1)
     QString a = QString(arg1).replace(",", "");
     ui->leChange->setDouble(str_float(a) - ui->leTotal->getDouble());
     ui->leCash->setDouble(str_float(a));
-    if (arg1.toDouble() < 0.01) {
+    if (a.toDouble() < 0.01) {
         ui->leChange->setText("0");
     }
     connect(ui->leCash, &C5LineEdit::textChanged, this, &WOrder::on_leCash_textChanged);
