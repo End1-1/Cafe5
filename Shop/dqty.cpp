@@ -3,11 +3,12 @@
 #include <QDoubleValidator>
 
 DQty::DQty(QWidget *parent) :
-    QDialog(parent),
+    QDialog(parent, Qt::FramelessWindowHint),
     ui(new Ui::DQty)
 {
     ui->setupUi(this);
     ui->leQty->setValidator(new QDoubleValidator(0, 1000000000, 3));
+    adjustSize();
 }
 
 DQty::~DQty()
