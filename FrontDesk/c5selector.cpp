@@ -45,6 +45,7 @@ bool C5Selector::getValue(const QStringList &dbParams, int cache, QList<QVariant
     if (c->fReset) {
         c->fReset = false;
         c->refresh();
+        c->on_leFilter_textChanged(c->ui->leFilter->text());
     }
     c->fGrid->fTableView->resizeColumnsToContents();
     c->ui->leFilter->setFocus();

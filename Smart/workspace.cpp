@@ -656,6 +656,7 @@ void Workspace::on_btnVoid_clicked()
 {
     removeDish();
 }
+
 void Workspace::on_btnSetCash_clicked()
 {
     ui->btnSetCash->setChecked(true);

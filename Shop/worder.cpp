@@ -670,6 +670,7 @@ void WOrder::countTotal()
         break;
     }
     ui->leTotal->setDouble(total);
+    on_leCash_textChanged(ui->leCash->text());
     C5LogSystem::writeEvent(QString("%1: %3").arg(tr("Total amount")).arg(float_str(total, 2)));
 }
 

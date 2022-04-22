@@ -112,7 +112,7 @@ void CE5Goods::setId(int id)
         ui->tblMultiscancode->setString(r, 0, db.getString(0));
     }
     ui->chSameStoreId->setChecked(ui->leStoreId->getInteger() == ui->leCode->getInteger());
-    ui->chSameStoreId->click();
+    emit ui->chSameStoreId->clicked();
     countTotal();
 
     if (__user->check(cp_t6_goods_only_price_edit)) {
