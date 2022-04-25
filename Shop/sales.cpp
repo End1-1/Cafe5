@@ -349,7 +349,7 @@ void Sales::refreshItems()
         }
         row++;
     }
-    int acol = 11;
+    int acol = 12;
     ui->leTotal->setDouble(ui->tbl->sumOfColumn(acol));
     double retail = 0, whosale = 0;
     for (int i = 0; i < ui->tbl->rowCount(); i++) {
