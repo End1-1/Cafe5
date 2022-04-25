@@ -654,7 +654,7 @@ void WOrder::countTotal()
     }
     case CARD_TYPE_ACCUMULATIVE: {
         ui->leDisc->setText(float_str(discount, 2));
-        ui->lbDisc->setText(QString("%1 %%2").arg(tr("Discount")).arg(float_str(fCardValue * 100, 2)));
+        ui->lbDisc->setText(QString("%1 %%2").arg(tr("Discount"), float_str(fCardValue * 100, 2)));
         break;
     }
     case CARD_TYPE_COUNT_ORDER: {
@@ -662,7 +662,7 @@ void WOrder::countTotal()
         break;
     }
     case CARD_TYPE_MANUAL:
-        ui->lbDisc->setText(QString("%1").arg(tr("Discount")).arg(float_str(fCardValue, 2)));
+        ui->lbDisc->setText(QString("%1").arg(tr("Discount"), float_str(fCardValue, 2)));
         ui->leDisc->setText(float_str(fCardValue, 2));
         total -= fCardValue;
         break;
@@ -671,7 +671,7 @@ void WOrder::countTotal()
     }
     ui->leTotal->setDouble(total);
     on_leCash_textChanged(ui->leCash->text());
-    C5LogSystem::writeEvent(QString("%1: %3").arg(tr("Total amount")).arg(float_str(total, 2)));
+    C5LogSystem::writeEvent(QString("%1: %3").arg(tr("Total amount"), float_str(total, 2)));
 }
 
 bool WOrder::returnFalse(const QString &msg, C5Database &db)

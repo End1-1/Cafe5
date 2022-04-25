@@ -49,9 +49,16 @@ Working::Working(C5User *user, QWidget *parent) :
     ui(new Ui::Working)
 {
     ui->setupUi(this);
+    QString ip;
+    int port;
+    QString username;
+    QString password;
+    ServerConnection::getParams(ip, port, username, password);
+    SocketConnection::initInstance();
     connect(SocketConnection::instance(), &SocketConnection::connected, this, &Working::socketConnected);
     connect(SocketConnection::instance(), &SocketConnection::connectionLost, this, &Working::socketDisconnected);
     connect(SocketConnection::instance(), &SocketConnection::externalDataReady, this, &Working::socketDataReceived);
+    SocketConnection::startConnection(ip, port, username, password);
     fUser = user;
     QShortcut *sF1 = new QShortcut(QKeySequence(Qt::Key_F1), this);
     QShortcut *sF2 = new QShortcut(QKeySequence(Qt::Key_F2), this);
@@ -182,7 +189,7 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
                         "where io.f_dateout is null ");
                 QString users;
                 while (db.nextRow()) {
-                    users += QString("%1, %2<br>").arg(db.getString("f_login")).arg(db.getString("f_name"));
+                    users += QString("%1, %2<br>").arg(db.getString("f_login"), db.getString("f_name"));
                 }
                 C5Message::info(users);
             }
@@ -368,14 +375,16 @@ void Working::restoreSales()
     }
     db[":f_station"] = hostinfo + ": " + hostusername();
     db.exec("select * from a_sale_temp where f_state=0 and f_station=:f_station order by f_window, f_row");
+    QList<int> invalidWindows;
     while (db.nextRow()) {
         WOrder *w = static_cast<WOrder*>(ui->tab->widget(db.getInt("f_window")));
         if (!w) {
-            C5Message::error(tr("Program error: Working:restoreSales: detected invalid window"));
+            invalidWindows.append(db.getInt("f_window"));
+            //C5Message::error(tr("Program error: Working:restoreSales: detected invalid window"));
             continue;
         }
         QString err;
-        if (!w->checkQty(db.getInt("f_goodsid"), db.getDouble("f_qty"), err)) {
+        if (!w->checkQty(db.getInt("f_goodsid"), db.getDouble("f_qty"), err) && __c5config.getValue(param_shop_dont_check_qty).toInt() == 0) {
             continue;
         }
         int r = w->table()->addEmptyRow();
@@ -384,6 +393,11 @@ void Working::restoreSales()
         }
         w->countTotal();
     }
+    for (auto i: invalidWindows) {
+        db[":f_window"] = i;
+        db.exec("delete from a_sale_temp where f_window=:f_window");
+    }
+    db.exec("delete from a_sale_temp where f_state>0");
     if (fTab->count() == 0) {
         newSale(SALE_RETAIL);
     }

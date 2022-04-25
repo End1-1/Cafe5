@@ -8,8 +8,6 @@
 #include "c5replication.h"
 #include "datadriver.h"
 #include "replicadialog.h"
-#include "config.h"
-#include "socketconnection.h"
 #include "settingsselection.h"
 #include "dlgsplashscreen.h"
 #include <QApplication>
@@ -157,13 +155,6 @@ int main(int argc, char *argv[])
     auto *dlgsplash = new DlgSplashScreen();
     dlgsplash->exec();
     delete dlgsplash;
-
-    QString ip;
-    int port;
-    QString username;
-    QString password;
-    ServerConnection::getParams(ip, port, username, password);
-    SocketConnection::init(ip, port, username, password);
 
     Working w(__user);
     w.setWindowTitle("");

@@ -16,16 +16,11 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         fCacheQuery[cache_dish_part2] = QString("select p2.f_id `%1`, p2.f_name as `%2`, p1.f_name `%3` "
                                         "from d_part2 p2 "
                                         "left join d_part1 p1 on p1.f_id=p2.f_part ")
-                .arg(tr("Code"))
-                .arg(tr("Name"))
-                .arg(tr("Part"));
+                .arg(tr("Code"),tr("Name"),tr("Part"));
         fCacheQuery[cache_goods_unit] = QString("select f_id as `%1`, f_name as `%2`, f_fullname as `%3` from c_units")
-                .arg(tr("Code"))
-                .arg(tr("Name"))
-                .arg(tr("Full caption"));
+                .arg(tr("Code"),tr("Name"),tr("Full caption"));
         fCacheQuery[cache_goods_group] = QString("select f_id as `%1`, f_name as `%2` from c_groups")
-                .arg(tr("Code"))
-                .arg(tr("Name"));
+                .arg(tr("Code"),tr("Name"));
         fCacheQuery[cache_goods] = QString("select g.f_id as `%1`, gg.f_name as `%2`, concat(g.f_name, if(g.f_scancode is null, '', concat(' ', g.f_scancode))) as `%3`, u.f_name as `%4`, \
                                            g.f_scancode as `%5`, g.f_lastinputprice as `%6`, g.f_complectout as `%7` \
                                            from c_goods g \
@@ -41,8 +36,7 @@ C5Cache::C5Cache(const QStringList &dbParams) :
                 .arg(tr("Price"))
                 .arg(tr("Complect output"));
         fCacheQuery[cache_goods_store] = QString("select f_id as `%1`, f_name as `%2` from c_storages")
-                .arg(tr("Code"))
-                .arg(tr("Name"));
+                .arg(tr("Code"),tr("Name"));
         fCacheQuery[cache_goods_partners] = QString("select f_id as `%1`, f_taxname as `%2`, f_contact as `%3`, \
                                                     f_info as `%4`, f_phone `%5`, f_email as `%6` from c_partners ")
                                                     .arg(tr("Code"))
@@ -52,37 +46,26 @@ C5Cache::C5Cache(const QStringList &dbParams) :
                                                     .arg(tr("Phone"))
                                                     .arg(tr("Email"));
         fCacheQuery[cache_store_inout] = QString("select f_id as `%1`, f_name as `%2` from a_type_sign")
-                .arg(tr("Code"))
-                .arg(tr("Name"));
+                .arg(tr("Code"),tr("Name"));
         fCacheQuery[cache_doc_state] = QString("select f_id as `%1`, f_name as `%2` from a_state")
-                .arg(tr("Code"))
-                .arg(tr("Name"));
+                .arg(tr("Code"),tr("Name"));
         fCacheQuery[cache_doc_type] = QString("select f_id as `%1`, f_name as `%2` from a_type")
-                .arg(tr("Code"))
-                .arg(tr("Name"));
+                .arg(tr("Code"),tr("Name"));
         fCacheQuery[cache_users] = QString("select f_id as `%1`, concat(f_last, ' ', f_first) as `%2`, f_teamlead from s_user where f_state=1")
                 .arg(tr("Code"), tr("Name"), tr("Teamlead"));
         fCacheQuery[cache_waiter_printers] = QString("select f_id as `%1`, f_name as `%2` from d_printers")
-                .arg(tr("Code"))
-                .arg(tr("Name"));
+                .arg(tr("Code"),tr("Name"));
         fCacheQuery[cache_credit_card] = QString("select f_id as `%1`, f_name as `%2` from o_credit_card")
-                .arg(tr("Code"))
-                .arg(tr("Name"));
+                .arg(tr("Code"),tr("Name"));
         fCacheQuery[cache_dish_remove_reason] = QString("select f_id as `%1`, f_name as `%2` from o_dish_remove_reason")
-                .arg(tr("Code"))
-                .arg(tr("Name"));
+                .arg(tr("Code"),tr("Name"));
         fCacheQuery[cache_discount_client] = QString("select c.f_id as `%1`, c.f_contact as `%2`, "
                                                      "bc.f_govnumber as `%3`, c.f_info as `%4` "
                                                      "from c_partners c "
                                                      "left join b_car bc on bc.f_costumer=c.f_id ")
-                .arg(tr("Code"))
-                .arg(tr("Full name"))
-                .arg(tr("Gov. number"))
-                .arg(tr("Additional info"));
+                .arg(tr("Code"),tr("Full name"),tr("Gov. number"),tr("Additional info"));
         fCacheQuery[cache_s_db] = QString("select f_id as `%1`,  f_name as `%2`, f_description as `%3` from s_db")
-                .arg(tr("Code"))
-                .arg(tr("Name"))
-                .arg(tr("Description"));
+                .arg(tr("Code"),tr("Name"),tr("Description"));
         setCacheSimpleQuery(cache_settings_names, "s_settings_names");
         setCacheSimpleQuery(cache_hall_list, "h_halls");
         setCacheSimpleQuery(cache_dish_comments, "d_dish_comment");
@@ -315,7 +298,5 @@ void C5Cache::loadFromDatabase(const QString &query)
 void C5Cache::setCacheSimpleQuery(int cacheId, const QString &table)
 {
     fCacheQuery[cacheId] = QString("select f_id as `%1`, f_name as `%2` from %3 ")
-            .arg(tr("Code"))
-            .arg(tr("Name"))
-            .arg(table);
+            .arg(tr("Code"),tr("Name"),table);
 }

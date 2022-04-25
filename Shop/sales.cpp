@@ -73,9 +73,7 @@ bool Sales::printCheckWithTax(C5Database &db, const QString &id, QString &rseq)
     }
     if (__c5config.taxIP().toLower() == "http") {
         QString url = QString("GET /printtax?auth=up&a=get&user=%1&pass=%2&order=%3 HTTP/1.1\r\n\r\n")
-                .arg(__c5config.httpServerUsername())
-                .arg(__c5config.httpServerPassword())
-                .arg(id);
+                .arg(__c5config.httpServerUsername(),__c5config.httpServerPassword(),id);
         auto *s = new QSslSocket(0);
         //connect(s, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(err(QAbstractSocket::SocketError)));
         s->addCaCertificate(fSslCertificate);

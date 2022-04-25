@@ -11,7 +11,8 @@ public:
     explicit SocketConnection(QObject *parent = nullptr);
     ~SocketConnection();
     quint32 getTcpPacketNumber();
-    static void init(const QString &ip, int port, const QString &username, const QString &password);
+    static void initInstance();
+    static void startConnection(const QString &ip, int port, const QString &username, const QString &password);
     static void setConnectionParams(const QString &ip, int port, const QString &username, const QString &password);
     static SocketConnection *instance();
 

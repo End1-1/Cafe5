@@ -25,11 +25,9 @@ SocketConnection::~SocketConnection()
     fSocket->deleteLater();
 }
 
-void SocketConnection::init(const QString &ip, int port, const QString &username, const QString &password)
+void SocketConnection::startConnection(const QString &ip, int port, const QString &username, const QString &password)
 {
-    if (fInstance == nullptr) {
-        fInstance = new SocketConnection();
-    }
+    initInstance();
     fInstance->setConnectionParams(ip, port, username, password);
     auto *t = new QThread();
     connect(t, &QThread::finished, t, &QThread::deleteLater);
@@ -56,10 +54,7 @@ void SocketConnection::run()
 {
     QString certFileName = qApp->applicationDirPath() + "/" + "cert.pem";
     QFile file(certFileName);
-    if (!file.open(QIODevice::ReadOnly)) {
-        qDebug() << "Certificate file missing";
-        return;
-    }
+    Q_ASSERT(file.open(QIODevice::ReadOnly));
     QSslCertificate cert = QSslCertificate(file.readAll());
     fSocket = new SslSocket(this);
     fTimer = new QTimer(this);
@@ -85,6 +80,13 @@ quint32 SocketConnection::getTcpPacketNumber()
 {
     QMutexLocker ml(&fMutex);
     return ++fTcpPacketNumber;
+}
+
+void SocketConnection::initInstance()
+{
+    if (fInstance == nullptr) {
+        fInstance = new SocketConnection();
+    }
 }
 
 void SocketConnection::timeout()

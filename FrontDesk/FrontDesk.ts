@@ -416,22 +416,22 @@
     <message>
         <location filename="c5changepassword.ui" line="14"/>
         <source>Change password</source>
-        <translation>Գախտնաբառի փոփոխում</translation>
+        <translation>Գաղտնաբառի փոփոխում</translation>
     </message>
     <message>
         <location filename="c5changepassword.ui" line="26"/>
         <source>Old password</source>
-        <translation>Հին գախտնաբառ</translation>
+        <translation>Հին գաղտնաբառ</translation>
     </message>
     <message>
         <location filename="c5changepassword.ui" line="33"/>
         <source>New password</source>
-        <translation>Նոր գախտնաբառ</translation>
+        <translation>Նոր գաղտնաբառ</translation>
     </message>
     <message>
         <location filename="c5changepassword.ui" line="43"/>
         <source>Confirm password</source>
-        <translation>Կրկնել նոր գախտնաբառը</translation>
+        <translation>Կրկնել նոր գաղտնաբառը</translation>
     </message>
     <message>
         <location filename="c5changepassword.ui" line="66"/>
@@ -446,17 +446,17 @@
     <message>
         <location filename="c5changepassword.cpp" line="34"/>
         <source>Password does not match</source>
-        <translation>Նոր գախտնաբառը սխալ է մուտք արած</translation>
+        <translation>Նոր գաղտնաբառը սխալ է մուտք արած</translation>
     </message>
     <message>
         <location filename="c5changepassword.cpp" line="38"/>
         <source>Password cannot be empty</source>
-        <translation>Գախտնաբառը դատարկ է</translation>
+        <translation>Գաղտնաբառը դատարկ է</translation>
     </message>
     <message>
         <location filename="c5changepassword.cpp" line="46"/>
         <source>Old password doesnt match</source>
-        <translation>Հին գախտնաբառը սխալ է</translation>
+        <translation>Հին գաղտնաբառը սխալ է</translation>
     </message>
 </context>
 <context>
@@ -543,7 +543,7 @@
         <location filename="../Cafe5/c5connection.ui" line="54"/>
         <location filename="../Cafe5/c5connection.cpp" line="82"/>
         <source>Password</source>
-        <translation>Գախտնաբառ</translation>
+        <translation>Գաղտնաբառ</translation>
     </message>
     <message>
         <location filename="../Cafe5/c5connection.ui" line="33"/>
@@ -2299,7 +2299,7 @@
     <message>
         <location filename="c5login.ui" line="45"/>
         <source>Password</source>
-        <translation>Գախտնաբառ</translation>
+        <translation>Գաղտնաբառ</translation>
     </message>
     <message>
         <location filename="c5login.ui" line="75"/>
@@ -2379,7 +2379,7 @@
         <location filename="c5mainwindow.ui" line="308"/>
         <source>Change password</source>
         <translation>Փոխել
-գախտնաբառը</translation>
+գաղտնաբառը</translation>
     </message>
     <message>
         <location filename="c5mainwindow.ui" line="253"/>
@@ -2840,7 +2840,7 @@
     <message>
         <location filename="c5mainwindow.cpp" line="872"/>
         <source>Password changed</source>
-        <translation>Գախտնաբառը փոխված է</translation>
+        <translation>Գաղտնաբառը փոխված է</translation>
     </message>
 </context>
 <context>
@@ -2871,12 +2871,12 @@
     <message>
         <location filename="c5passwords.ui" line="14"/>
         <source>Chage password</source>
-        <translation>Փոխել գախտնաբառը</translation>
+        <translation>Փոխել գաղտնաբառը</translation>
     </message>
     <message>
         <location filename="c5passwords.ui" line="20"/>
         <source>Waiter password</source>
-        <translation>Մատուցողի գախտնաբառ</translation>
+        <translation>Մատուցողի գաղտնաբառ</translation>
     </message>
     <message>
         <location filename="c5passwords.ui" line="27"/>
@@ -2887,7 +2887,7 @@
     <message>
         <location filename="c5passwords.ui" line="41"/>
         <source>Front desk password</source>
-        <translation>Հիմնական գախտնաբառ</translation>
+        <translation>Հիմնական գաղտնաբառ</translation>
     </message>
     <message>
         <location filename="c5passwords.ui" line="64"/>
@@ -3414,7 +3414,7 @@
     <message>
         <location filename="c5serviceconfig.ui" line="40"/>
         <source>Service password</source>
-        <translation>Սերվերի գախտնաբար</translation>
+        <translation>Սերվերի գաղտնաբար</translation>
     </message>
     <message>
         <location filename="c5serviceconfig.ui" line="63"/>
@@ -3439,7 +3439,7 @@
     <message>
         <location filename="c5serviceconfig.ui" line="133"/>
         <source>Password</source>
-        <translation>Գախտնաբառ</translation>
+        <translation>Գաղտնաբառ</translation>
     </message>
     <message>
         <location filename="c5serviceconfig.ui" line="156"/>
@@ -3522,7 +3522,7 @@
     <message>
         <location filename="../Reports/c5settingswidget.ui" line="112"/>
         <source>Root DB password</source>
-        <translation>Արտաքին տվյալների պահոցի գախտնաբառ</translation>
+        <translation>Արտաքին տվյալների պահոցի գաղտնաբառ</translation>
     </message>
     <message>
         <location filename="../Reports/c5settingswidget.ui" line="198"/>
@@ -4034,7 +4034,7 @@
     <message>
         <location filename="../Reports/c5settingswidget.ui" line="1184"/>
         <source>Tax password</source>
-        <translation>ՀԴՄ, գախտնաբառ</translation>
+        <translation>ՀԴՄ, գաղտնաբառ</translation>
     </message>
     <message>
         <location filename="../Reports/c5settingswidget.h" line="19"/>
@@ -5689,7 +5689,7 @@ MS Excel</translation>
     <message>
         <location filename="../Editors/ce5databases.ui" line="116"/>
         <source>Password</source>
-        <translation>Գախտնաբառ</translation>
+        <translation>Գաղտնաբառ</translation>
     </message>
     <message>
         <location filename="../Editors/ce5databases.ui" line="123"/>
@@ -9524,7 +9524,7 @@ base on recipes</source>
     <message>
         <location filename="../Reports/cr5databases.cpp" line="29"/>
         <source>Password</source>
-        <translation>Գախտնաբառ</translation>
+        <translation>Գաղտնաբառ</translation>
     </message>
     <message>
         <location filename="../Reports/cr5databases.cpp" line="51"/>
@@ -14342,7 +14342,7 @@ settings</source>
         <source>Set
 passwords</source>
         <translation>Նշանակել
-գախտնաբառ</translation>
+գաղտնաբառ</translation>
     </message>
 </context>
 <context>

@@ -196,7 +196,7 @@
         <location filename="../Cafe5/c5connection.ui" line="54"/>
         <location filename="../Cafe5/c5connection.cpp" line="82"/>
         <source>Password</source>
-        <translation>Գախտնաբառ</translation>
+        <translation>Գաղտնաբառ</translation>
     </message>
     <message>
         <location filename="../Cafe5/c5connection.ui" line="33"/>
@@ -1482,7 +1482,7 @@ MS Excel</source>
     <message>
         <location filename="../Forms/dlgserversettings.ui" line="20"/>
         <source>Password</source>
-        <translation>Գախտնաբառ</translation>
+        <translation>Գաղտնաբառ</translation>
     </message>
     <message>
         <location filename="../Forms/dlgserversettings.ui" line="27"/>
@@ -1507,7 +1507,7 @@ MS Excel</source>
     <message>
         <location filename="../Forms/dlgserversettings.ui" line="87"/>
         <source>Confirm password</source>
-        <translation>Հաստատեք գախտնաբառը</translation>
+        <translation>Հաստատեք գաղտնաբառը</translation>
     </message>
     <message>
         <location filename="../Forms/dlgserversettings.ui" line="104"/>
@@ -1517,7 +1517,7 @@ MS Excel</source>
     <message>
         <location filename="../Forms/dlgserversettings.cpp" line="35"/>
         <source>Passwords did not match</source>
-        <translation>Գախտնաբառերը չեն համընկնում</translation>
+        <translation>Գաղտնաբառերը չեն համընկնում</translation>
     </message>
     <message>
         <location filename="../Forms/dlgserversettings.cpp" line="40"/>
@@ -1963,7 +1963,7 @@ MS Excel</source>
     <message>
         <location filename="main.cpp" line="66"/>
         <source>Password</source>
-        <translation>Գախտնաբառ</translation>
+        <translation>Գաղտնաբառ</translation>
     </message>
     <message>
         <location filename="main.cpp" line="68"/>
@@ -3022,7 +3022,7 @@ reservation</source>
     <message>
         <location filename="worder.ui" line="279"/>
         <source>Cash in (F3)</source>
-        <translation type="unfinished">Առձեռն (F3)</translation>
+        <translation>Առձեռն (F3)</translation>
     </message>
     <message>
         <location filename="worder.ui" line="393"/>
@@ -3198,7 +3198,7 @@ reservation</source>
     <message>
         <location filename="worder.cpp" line="533"/>
         <source>Password</source>
-        <translation>Գախտնաբառ</translation>
+        <translation>Գաղտնաբառ</translation>
     </message>
     <message>
         <location filename="worder.cpp" line="565"/>
@@ -3340,7 +3340,7 @@ reservation</source>
         <location filename="working.cpp" line="846"/>
         <location filename="working.cpp" line="865"/>
         <source>Password</source>
-        <translation>Գախտնաբառ</translation>
+        <translation>Գաղտնաբառ</translation>
     </message>
     <message>
         <location filename="working.cpp" line="867"/>
@@ -3413,7 +3413,7 @@ reservation</source>
     <message>
         <location filename="working.cpp" line="726"/>
         <source>Invalid password</source>
-        <translation>Գախտնաբառը սխալ է</translation>
+        <translation>Գաղտնաբառը սխալ է</translation>
     </message>
     <message>
         <location filename="working.cpp" line="745"/>
