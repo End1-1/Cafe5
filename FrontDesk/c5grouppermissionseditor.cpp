@@ -80,7 +80,7 @@ void C5GroupPermissionsEditor::savePemissions()
     C5Database db(fDBParams);
     db[":f_group"] = fGroupId;
     db.exec("delete from s_user_access where f_group=:f_group");
-    for (QMap<int, C5CheckBox*>::const_iterator it = fCheckBoxes.begin(); it != fCheckBoxes.end(); it++) {
+    for (QMap<int, C5CheckBox*>::const_iterator it = fCheckBoxes.constBegin(); it != fCheckBoxes.constEnd(); it++) {
         if (it.value()->isChecked()) {
             db[":f_group"] = fGroupId;
             db[":f_key"] = it.key();
