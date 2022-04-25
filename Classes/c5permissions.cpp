@@ -106,6 +106,7 @@ void C5Permissions::init(C5Database &db, int group)
               << cp_t5_edit_booking
               << cp_t5_pay_idram
               << cp_t5_pay_payx
+              << cp_t5_view_all_sales
 
               << cp_t6_storage
               << cp_t6_goods_menu
