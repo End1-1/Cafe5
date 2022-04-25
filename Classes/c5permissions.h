@@ -99,7 +99,9 @@
 #define cp_t5_edit_closed_order 533
 #define cp_t5_present 534
 #define cp_t5_edit_booking 535
-#define cp_t5_view_all_sales 536
+#define cp_t5_view_tax_and_no_sales 536
+#define cp_t5_view_sales_of_all_users 537
+
 
 #define cp_t5_pay_idram 537
 #define cp_t5_pay_payx 538

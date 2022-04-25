@@ -176,9 +176,9 @@
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>-180</y>
+            <y>0</y>
             <width>597</width>
-            <height>794</height>
+            <height>817</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -215,10 +215,20 @@
            <item>
             <widget class="C5CheckBox" name="checkBox_97">
              <property name="text">
-              <string>Show all sales</string>
+              <string>Show all sales (tax and all)</string>
              </property>
              <property name="Tag" stdset="0">
               <number>536</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="C5CheckBox" name="checkBox_106">
+             <property name="text">
+              <string>Show sales of all users</string>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>537</number>
              </property>
             </widget>
            </item>

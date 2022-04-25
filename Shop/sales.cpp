@@ -254,11 +254,13 @@ void Sales::refreshTotal()
     db[":f_end"] = ui->deEnd->date();
     db[":f_state"] = ORDER_STATE_CLOSE;
     QString sqlCond = userCond();
-    if (!fUser->check(cp_t5_view_all_sales)) {
+    if (!fUser->check(cp_t5_view_tax_and_no_sales)) {
         sqlCond += " and length(ot.f_receiptnumber)>0 ";
-        if (__c5config.getValue(param_shop_report_of_logged_staff).toInt() == 1){
+    }
+    if (!fUser->check(cp_t5_view_sales_of_all_users)) {
+        //if (__c5config.getValue(param_shop_report_of_logged_staff).toInt() == 1){
             sqlCond += QString(" and oh.f_staff=%1 ").arg(fUser->id());
-        }
+        //}
     }
     QString sql = QString("select '', oh.f_id, oh.f_saletype, u.f_login, os.f_name, concat(oh.f_prefix, oh.f_hallid) as f_number, ot.f_receiptnumber, "
             "oh.f_datecash, oh.f_timeclose, oh.f_amounttotal, concat(c.f_taxname, ' ', c.f_contact) as f_client "
@@ -321,11 +323,11 @@ void Sales::refreshItems()
     db[":f_end"] = ui->deEnd->date();
     db[":f_state"] = ORDER_STATE_CLOSE;
     QString sqlCond = userCond();
-    if (!fUser->check(cp_t5_view_all_sales)) {
+    if (!fUser->check(cp_t5_view_tax_and_no_sales)) {
         sqlCond += " and length(ot.f_receiptnumber)>0 ";
-        if (__c5config.getValue(param_shop_report_of_logged_staff).toInt() == 1){
-            sqlCond += QString(" and oh.f_staff=%1 ").arg(fUser->id());
-        }
+    }
+    if (!fUser->check(cp_t5_view_sales_of_all_users)) {
+        sqlCond += QString(" and oh.f_staff=%1 ").arg(fUser->id());
     }
     db.exec("select oh.f_id, oh.f_saletype, u.f_login, os.f_name, concat(oh.f_prefix, oh.f_hallid) as f_number, ot.f_receiptnumber, "
             "oh.f_datecash, oh.f_timeclose, g.f_scancode, g.f_name as f_goodsname, og.f_qty, og.f_price, og.f_total "
@@ -379,11 +381,11 @@ void Sales::refreshTotalItems()
     db[":f_end"] = ui->deEnd->date();
     db[":f_state"] = ORDER_STATE_CLOSE;
     QString sqlCond = userCond();
-    if (!fUser->check(cp_t5_view_all_sales)) {
+    if (!fUser->check(cp_t5_view_tax_and_no_sales)) {
         sqlCond += " and length(ot.f_receiptnumber)>0 ";
-        if (__c5config.getValue(param_shop_report_of_logged_staff).toInt() == 1){
-            sqlCond += QString(" and oh.f_staff=%1 ").arg(fUser->id());
-        }
+    }
+    if (!fUser->check(cp_t5_view_sales_of_all_users)) {
+        sqlCond += QString(" and oh.f_staff=%1 ").arg(fUser->id());
     }
     db.exec("select g.f_scancode, g.f_name as f_goodsname, sum(og.f_qty), sum(og.f_total) "
             "from o_goods og "
@@ -429,11 +431,11 @@ void Sales::refreshGroups()
     db[":f_end"] = ui->deEnd->date();
     db[":f_state"] = ORDER_STATE_CLOSE;
     QString sqlCond = userCond();
-    if (!fUser->check(cp_t5_view_all_sales)) {
+    if (!fUser->check(cp_t5_view_tax_and_no_sales)) {
         sqlCond += " and length(ot.f_receiptnumber)>0 ";
-        if (__c5config.getValue(param_shop_report_of_logged_staff).toInt() == 1){
-            sqlCond += QString(" and oh.f_staff=%1 ").arg(fUser->id());
-        }
+    }
+    if (!fUser->check(cp_t5_view_sales_of_all_users)) {
+        sqlCond += QString(" and oh.f_staff=%1 ").arg(fUser->id());
     }
     db.exec("select oh.f_datecash, h.f_name as f_hallname, gg.f_name as f_groupname, "
             "sum(og.f_qty * og.f_sign) as f_qty, sum(og.f_total*og.f_sign) as f_total "
