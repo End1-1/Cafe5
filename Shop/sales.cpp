@@ -851,3 +851,8 @@ void Sales::on_btnPrintTaxX_clicked()
 {
     printTaxReport(report_x);
 }
+
+void Sales::on_btnExit_clicked()
+{
+    reject();
+}

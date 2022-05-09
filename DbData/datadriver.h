@@ -23,6 +23,8 @@
 #include "dbmenupackages.h"
 #include "dbmenupackagelist.h"
 #include "dbstoredoctype.h"
+#include "dbdishcomments.h"
+#include "dbdishremovereason.h"
 #include <QStringList>
 
 #define dbuser DataDriver::fInstance->fDbUser
@@ -47,6 +49,8 @@
 #define dbbodystate DataDriver::fInstance->fDbBodyState
 #define dbmenupackage DataDriver::fInstance->fDbMenuPackage
 #define dbmenupackagelist DataDriver::fInstance->fDbMenuPackageList
+#define dbdishcomment DataDriver::fInstance->fDbDishComments
+#define dbdishremovereason DataDriver::fInstance->fDbDishRemoveReason
 
 class DataDriver
 {
@@ -96,6 +100,10 @@ public:
     DbMenuPackages *fDbMenuPackage;
 
     DbMenuPackageList *fDbMenuPackageList;
+
+    DbDishComments *fDbDishComments;
+
+    DbDishRemoveReason *fDbDishRemoveReason;
 
     static void init(const QStringList &dbParams);
 

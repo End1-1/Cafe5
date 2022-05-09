@@ -32,8 +32,8 @@ void PrintReceiptGroup::print(const QString &id, Database &db, int rw)
     if (db.doubleValue("f_amounttotal") < 0) {
         saletype = tr("Return");
     }
-    QString hallid = db.stringValue("f_hallid");
-    QString pref = db.stringValue("f_prefix");
+    QString hallid = db.string("f_hallid");
+    QString pref = db.string("f_prefix");
     int partner = db.integerValue("f_partner");
     double amountTotal = db.doubleValue("f_amounttotal");
     double amountCash = db.doubleValue("f_amountcash");
@@ -43,8 +43,8 @@ void PrintReceiptGroup::print(const QString &id, Database &db, int rw)
         db[":f_id"] = partner;
         db.exec("select * from c_partners where f_id=:f_id");
         if (db.next()) {
-            partnerTaxcode = db.stringValue("f_taxcode");
-            partnerName = db.stringValue("f_taxname");
+            partnerTaxcode = db.string("f_taxcode");
+            partnerName = db.string("f_taxname");
         }
     }
 
@@ -125,30 +125,30 @@ void PrintReceiptGroup::print(const QString &id, Database &db, int rw)
         p.setFontSize(20);
     }
     if (dtax.next()) {
-        p.ltext(dtax.stringValue("f_firmname"), 0);
+        p.ltext(dtax.string("f_firmname"), 0);
         p.br();
-        p.ltext(dtax.stringValue("f_address"), 0);
+        p.ltext(dtax.string("f_address"), 0);
         p.br();
         p.ltext(tr("Department"), 0);
-        p.rtext(dtax.stringValue("f_dept"));
+        p.rtext(dtax.string("f_dept"));
         p.br();
         p.ltext(tr("Tax number"), 0);
-        p.rtext(dtax.stringValue("f_hvhh"));
+        p.rtext(dtax.string("f_hvhh"));
         p.br();
         p.ltext(tr("Device number"), 0);
-        p.rtext(dtax.stringValue("f_devnum"));
+        p.rtext(dtax.string("f_devnum"));
         p.br();
         p.ltext(tr("Serial"), 0);
-        p.rtext(dtax.stringValue("f_serial"));
+        p.rtext(dtax.string("f_serial"));
         p.br();
         p.ltext(tr("Fiscal"), 0);
-        p.rtext(dtax.stringValue("f_fiscal"));
+        p.rtext(dtax.string("f_fiscal"));
         p.br();
         p.ltext(tr("Receipt number"), 0);
-        p.rtext(dtax.stringValue("f_receiptnumber"));
+        p.rtext(dtax.string("f_receiptnumber"));
         p.br();
         p.ltext(tr("Date"), 0);
-        p.rtext(dtax.stringValue("f_time"));
+        p.rtext(dtax.string("f_time"));
         p.br();
         p.ltext(tr("(F)"), 0);
     }
@@ -263,20 +263,20 @@ void PrintReceiptGroup::print2(const QString &id, Database &db, const QString &p
     if (db.doubleValue("f_amounttotal") < 0) {
         saletype = tr("Return");
     }
-    QString hallid = db.stringValue("f_hallid");
-    QString pref = db.stringValue("f_prefix");
+    QString hallid = db.string("f_hallid");
+    QString pref = db.string("f_prefix");
     int partner = db.integerValue("f_partner");
     double amountTotal = db.doubleValue("f_amounttotal");
     double amountCash = db.doubleValue("f_amountcash");
     double amountCard = db.doubleValue("f_amountcard");
-    QString comment = db.stringValue("f_comment");
+    QString comment = db.string("f_comment");
     QString partnerName, partnerTaxcode;
     if (partner > 0) {
         db[":f_id"] = partner;
         db.exec("select * from c_partners where f_id=:f_id");
         if (db.next()) {
-            partnerTaxcode = db.stringValue("f_taxcode");
-            partnerName = db.stringValue("f_taxname");
+            partnerTaxcode = db.string("f_taxcode");
+            partnerName = db.string("f_taxname");
         }
     }
 
@@ -363,30 +363,30 @@ void PrintReceiptGroup::print2(const QString &id, Database &db, const QString &p
     }
 
     if (dtax.next()) {
-        p.ltext(dtax.stringValue("f_firmname"), 0);
+        p.ltext(dtax.string("f_firmname"), 0);
         p.br();
-        p.ltext(dtax.stringValue("f_address"), 0);
+        p.ltext(dtax.string("f_address"), 0);
         p.br();
         p.ltext(tr("Department"), 0);
-        p.rtext(dtax.stringValue("f_dept"));
+        p.rtext(dtax.string("f_dept"));
         p.br();
         p.ltext(tr("Tax number"), 0);
-        p.rtext(dtax.stringValue("f_hvhh"));
+        p.rtext(dtax.string("f_hvhh"));
         p.br();
         p.ltext(tr("Device number"), 0);
-        p.rtext(dtax.stringValue("f_devnum"));
+        p.rtext(dtax.string("f_devnum"));
         p.br();
         p.ltext(tr("Serial"), 0);
-        p.rtext(dtax.stringValue("f_serial"));
+        p.rtext(dtax.string("f_serial"));
         p.br();
         p.ltext(tr("Fiscal"), 0);
-        p.rtext(dtax.stringValue("f_fiscal"));
+        p.rtext(dtax.string("f_fiscal"));
         p.br();
         p.ltext(tr("Receipt number"), 0);
-        p.rtext(dtax.stringValue("f_receiptnumber"));
+        p.rtext(dtax.string("f_receiptnumber"));
         p.br();
         p.ltext(tr("Date"), 0);
-        p.rtext(dtax.stringValue("f_time"));
+        p.rtext(dtax.string("f_time"));
         p.br();
         p.ltext(tr("(F)"), 0);
     }

@@ -79,8 +79,10 @@ C5Database::C5Database(const QString &host, const QString &db, const QString &us
 C5Database::~C5Database()
 {
     if (fQuery) {
+        fQuery->finish();
         delete fQuery;
     }
+    fDb.close();
     fDb = QSqlDatabase::addDatabase(_DBDRIVER_);
     QSqlDatabase::removeDatabase(fDbName);
 }

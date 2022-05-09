@@ -1,18 +1,18 @@
 #ifndef SEARCHITEMS_H
 #define SEARCHITEMS_H
 
-#include <QDialog>
+#include "c5dialog.h"
 
 namespace Ui {
 class SearchItems;
 }
 
-class SearchItems : public QDialog
+class SearchItems : public C5Dialog
 {
     Q_OBJECT
 
 public:
-    explicit SearchItems(QWidget *parent = nullptr);
+    explicit SearchItems();
     ~SearchItems();
 
 private slots:
@@ -27,6 +27,8 @@ private slots:
     void on_btnViewAllReservations_clicked();
 
     void on_btnEditReserve_clicked();
+
+    void on_btnExit_clicked();
 
 private:
     Ui::SearchItems *ui;

@@ -33,8 +33,8 @@ public:
     inline bool next() {return fQuery->next();}
     inline QVariant value(int column) const {return fQuery->value(column);}
     inline QVariant value(const QString &columnName) {return fQuery->value(fColumnsNames[columnName]);}
-    inline QString stringValue(const QString &columnName) {return value(columnName).toString(); }
-    inline int integerValue(const QString &columnName) {return value(columnName).toInt(); }
+    inline QString string(const QString &columnName) {return value(columnName).toString(); }
+    inline int integer(const QString &columnName) {return value(columnName).toInt(); }
     inline double doubleValue(const QString &columnName) {return value(columnName).toDouble(); }
     inline QDate dateValue(const QString &columnName) {return value(columnName).toDate(); }
     inline QDateTime dateTimeValue(const QString &columnName) {return value(columnName).toDateTime(); }

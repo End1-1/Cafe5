@@ -130,7 +130,6 @@ Working::~Working()
 
 bool Working::eventFilter(QObject *watched, QEvent *event)
 {
-    WOrder *w = nullptr;
     if (event->type() == QEvent::KeyRelease) {
         auto *ke = static_cast<QKeyEvent*>(event);
         switch (ke->key()) {
@@ -146,9 +145,15 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
             shortcutAsterix();
             event->accept();
             return true;
+        case Qt::Key_A:
+            if (ke->modifiers() & Qt::ControlModifier) {
+                newSale(SALE_PREORDER);
+            }
+            event->ignore();
+            break;
         case Qt::Key_S:
             if (ke->modifiers() & Qt::ControlModifier) {
-                SearchItems *si = new SearchItems(this);
+                SearchItems *si = new SearchItems();
                 si->exec();
                 si->deleteLater();
                 event->accept();
@@ -210,7 +215,7 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
                             db[":f_timeout"] = QTime::currentTime();
                             db.update("s_salary_inout", where_id(db.getInt("f_id")));
                             loadStaff();
-                            C5Message::info(QString("%1,<br>%2").arg(tr("Good bye")).arg(name));
+                            C5Message::info(QString("%1,<br>%2").arg(tr("Good bye"), name));
                         } else {
                             C5Message::error(tr("Cannot output without input"));
                         }
@@ -244,12 +249,6 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
                     info += QString("%1: %2<br>").arg(db.getString("f_staff"), float_str(db.getDouble("f_amounttotal"), 2));
                 }
                 C5Message::info(info);
-                event->accept();
-            }
-            break;
-        case Qt::Key_A:
-            if (ke->modifiers() & Qt::ControlModifier) {
-                newSale(SALE_PREORDER);
                 event->accept();
             }
             break;
@@ -919,4 +918,12 @@ void Working::on_btnManualTax_clicked()
 void Working::on_btnMinimize_clicked()
 {
     showMinimized();
+}
+
+void Working::on_btnClientConfigQR_clicked()
+{
+    WOrder *wo = static_cast<WOrder*>(ui->tab->currentWidget());
+    if (wo) {
+        wo->imageConfig();
+    }
 }

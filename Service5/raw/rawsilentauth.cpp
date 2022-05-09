@@ -27,7 +27,7 @@ int RawSilentAuth::run(const QByteArray &d)
         db[":fpassword"] = QString(QCryptographicHash::hash(password.toLocal8Bit(), QCryptographicHash::Md5).toHex());
         if (db.exec("select fid from users_list where (fphone=:flogin or femail=:flogin) and fpassword=:fpassword")) {
             if (db.next()) {
-                reply = db.integerValue("fid");
+                reply = db.integer("fid");
                 const QString &token = tokenOfSocket(fSocket);
                 fMapTokenUser[token] = reply;
                 ConnectionStatus cs;
@@ -56,6 +56,6 @@ int RawSilentAuth::run(const QByteArray &d)
     } else {
         LogWriter::write(LogWriterLevel::errors, "RawSilenthAuth::run", db.lastDbError());
     }
-    putUByte(reply);
+    putUInt(reply);
     return reply == 0 ? 0 : 1;
 }

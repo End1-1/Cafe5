@@ -124,3 +124,13 @@ void DlgGoodsList::on_leSearch_textChanged(const QString &arg1)
         ui->tbl->setRowHidden(r, hidden);
     }
 }
+
+void DlgGoodsList::on_btnExit_clicked()
+{
+    reject();
+}
+
+void DlgGoodsList::on_btnMinimize_clicked()
+{
+    showMinimized();
+}

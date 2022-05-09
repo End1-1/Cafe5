@@ -7,6 +7,7 @@ QString C5Menu::fMenuVersion;
 QMap<QString, QJsonObject> C5Menu::fPackages;
 QMap<int, QList<QJsonObject> > C5Menu::fPackagesList;
 QMap<int, double> C5Menu::fStopList;
+QStringList C5Menu::fDishComments;
 
 C5Menu::C5Menu()
 {
@@ -21,6 +22,8 @@ void C5Menu::refresh()
     dbdishpart1->refresh();
     dbdishpart2->refresh();
     dbdishspecial->refresh();
+    dbdishcomment->refresh();
+    dbdishremovereason->refresh();
     menu5->fMenuList.data.clear();
     for (int id: dbmenu->list()) {
         int dishid = dbmenu->dishid(id);

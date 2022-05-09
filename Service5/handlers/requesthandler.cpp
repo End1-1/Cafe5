@@ -25,18 +25,21 @@ bool RequestHandler::setResponse(int responseCode, const QString &data)
 
 bool RequestHandler::setInternalServerError(const QString &msg)
 {
+    LogWriter::write(LogWriterLevel::errors, "", msg);
     setResponse(HTTP_INTERNAL_SERVER_ERROR, msg);
     return false;
 }
 
 bool RequestHandler::setForbiddenError(const QString &msg)
 {
+    LogWriter::write(LogWriterLevel::errors, "", msg);
     setResponse(HTTP_FORBIDDEN, msg);
     return false;
 }
 
 bool RequestHandler::setDataValidationError(const QString &msg)
 {
+    LogWriter::write(LogWriterLevel::errors, "", msg);
     setResponse(HTTP_DATA_VALIDATION_ERROR, msg);
     return false;
 }

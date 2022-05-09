@@ -3,8 +3,6 @@
 #include "c5utils.h"
 
 QList<CreditCards> C5CafeCommon::fCreditCards;
-QStringList C5CafeCommon::fDishRemoveReason;
-QStringList C5CafeCommon::fDishComments;
 QMap<int, QMap<int, QString> > C5CafeCommon::fHallConfigs;
 
 C5CafeCommon::C5CafeCommon()

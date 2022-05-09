@@ -8,7 +8,7 @@ static QWidget *__mainWindow = nullptr;
 
 C5Dialog::C5Dialog(const QStringList &dbParams) :
 #ifdef WAITER
-    QDialog(__mainWindow, C5Config::isAppFullScreen() ? Qt::FramelessWindowHint : Qt::WindowFlags()),
+    QDialog(__mainWindow, Qt::FramelessWindowHint),
     fDBParams(dbParams)
 #else
     QDialog(__mainWindow),

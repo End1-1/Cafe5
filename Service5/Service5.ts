@@ -172,11 +172,11 @@
     </message>
     <message>
         <location filename="monitor.ui" line="183"/>
-        <location filename="monitor.cpp" line="380"/>
+        <location filename="monitor.cpp" line="378"/>
+        <location filename="monitor.cpp" line="397"/>
         <location filename="monitor.cpp" line="399"/>
-        <location filename="monitor.cpp" line="401"/>
+        <location filename="monitor.cpp" line="428"/>
         <location filename="monitor.cpp" line="430"/>
-        <location filename="monitor.cpp" line="432"/>
         <source>Server</source>
         <translation type="unfinished"></translation>
     </message>
@@ -245,8 +245,8 @@
         <location filename="monitor.cpp" line="80"/>
         <location filename="monitor.cpp" line="89"/>
         <location filename="monitor.cpp" line="187"/>
-        <location filename="monitor.cpp" line="214"/>
-        <location filename="monitor.cpp" line="240"/>
+        <location filename="monitor.cpp" line="213"/>
+        <location filename="monitor.cpp" line="238"/>
         <source>Created</source>
         <translation type="unfinished"></translation>
     </message>
@@ -270,18 +270,18 @@
         <location filename="monitor.cpp" line="146"/>
         <location filename="monitor.cpp" line="184"/>
         <location filename="monitor.cpp" line="189"/>
-        <location filename="monitor.cpp" line="211"/>
-        <location filename="monitor.cpp" line="216"/>
-        <location filename="monitor.cpp" line="237"/>
-        <location filename="monitor.cpp" line="242"/>
-        <location filename="monitor.cpp" line="245"/>
-        <location filename="monitor.cpp" line="297"/>
-        <location filename="monitor.cpp" line="302"/>
-        <location filename="monitor.cpp" line="326"/>
-        <location filename="monitor.cpp" line="331"/>
-        <location filename="monitor.cpp" line="337"/>
-        <location filename="monitor.cpp" line="342"/>
-        <location filename="monitor.cpp" line="346"/>
+        <location filename="monitor.cpp" line="210"/>
+        <location filename="monitor.cpp" line="215"/>
+        <location filename="monitor.cpp" line="235"/>
+        <location filename="monitor.cpp" line="240"/>
+        <location filename="monitor.cpp" line="243"/>
+        <location filename="monitor.cpp" line="295"/>
+        <location filename="monitor.cpp" line="300"/>
+        <location filename="monitor.cpp" line="324"/>
+        <location filename="monitor.cpp" line="329"/>
+        <location filename="monitor.cpp" line="335"/>
+        <location filename="monitor.cpp" line="340"/>
+        <location filename="monitor.cpp" line="344"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -296,49 +296,49 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="monitor.cpp" line="216"/>
+        <location filename="monitor.cpp" line="215"/>
         <source>Log database exists</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="monitor.cpp" line="242"/>
+        <location filename="monitor.cpp" line="240"/>
         <source>Working database exists</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="monitor.cpp" line="252"/>
-        <location filename="monitor.cpp" line="257"/>
+        <location filename="monitor.cpp" line="250"/>
+        <location filename="monitor.cpp" line="255"/>
         <source>MariaDB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="monitor.cpp" line="257"/>
+        <location filename="monitor.cpp" line="255"/>
         <source>The selected directory is not valid MariaDB path</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="monitor.cpp" line="337"/>
+        <location filename="monitor.cpp" line="335"/>
         <source>Cannot open file to write license information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="monitor.cpp" line="360"/>
+        <location filename="monitor.cpp" line="358"/>
         <source>Expiration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="monitor.cpp" line="361"/>
+        <location filename="monitor.cpp" line="359"/>
         <source>License type</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="monitor.cpp" line="380"/>
+        <location filename="monitor.cpp" line="378"/>
         <source>The server was stopped</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="monitor.cpp" line="399"/>
-        <location filename="monitor.cpp" line="430"/>
+        <location filename="monitor.cpp" line="397"/>
+        <location filename="monitor.cpp" line="428"/>
         <source>The server was started</source>
         <translation type="unfinished"></translation>
     </message>
@@ -359,7 +359,7 @@
 <context>
     <name>SocketThread</name>
     <message>
-        <location filename="socketthread.cpp" line="347"/>
+        <location filename="socketthread.cpp" line="350"/>
         <source>Connection timeout</source>
         <translation type="unfinished"></translation>
     </message>

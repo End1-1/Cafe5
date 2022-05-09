@@ -378,7 +378,7 @@ void C5WaiterOrder::on_btnOpenTable_clicked()
 void C5WaiterOrder::on_btnSetCL_clicked()
 {
     if (__c5config.hotelDatabase().isEmpty()) {
-        true;
+        return;
     }
     QString clcode, clname;
     if (DlgSetWaiterOrderCL::getCL(fDBParams, clcode, clname)) {
@@ -386,13 +386,19 @@ void C5WaiterOrder::on_btnSetCL_clicked()
         C5Database db(fDBParams);
         db[":f_code"] = clcode;
         db[":f_name"] = clname;
-        db.update("o_pay_cl", "f_id", ui->leUuid->text());
+        db.update("o_pay_cl", "f_id", ui->leUuid->text());    
 
         DoubleDatabase fDD;
         fDD.open(true, true);
         fDD[":f_id"] = ui->leNumber->text();
+        fDD[":f_paymentmode"] = 4;
+        fDD[":f_dc"] = "DEBIT";
+        fDD[":f_sign"] = -1;
         fDD[":f_cityledger"] = clcode.toInt();
-        fDD.exec("update m_register set f_cityledger=:f_cityledger where f_id=:f_id");
+        if (!fDD.exec("update m_register set f_cityledger=:f_cityledger, f_paymentmode=:f_paymentmode, f_dc=:f_dc, f_sign=:f_sign where f_id=:f_id")) {
+            C5Message::error(fDD.fLastError);
+            return;
+        }
         C5Message::info(tr("Saved"));
     }
 

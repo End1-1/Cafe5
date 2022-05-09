@@ -16,7 +16,9 @@ SOURCES += \
     ../../handlers/httpheader.cpp \
     ../../handlers/requesthandler.cpp \
     ../../handlers/socketdata.cpp \
+    ../../utils/commandline.cpp \
     ../../utils/database.cpp \
+    ../../utils/gtranslator.cpp \
     ../../utils/jsonhandler.cpp \
     ../../utils/logwriter.cpp \
     elinashop.cpp \
@@ -31,7 +33,9 @@ HEADERS += \
     ../../handlers/httpheader.h \
     ../../handlers/requesthandler.h \
     ../../handlers/socketdata.h \
+    ../../utils/commandline.h \
     ../../utils/database.h \
+    ../../utils/gtranslator.h \
     ../../utils/jsonhandler.h \
     ../../utils/logwriter.h \
     elinashop.h \

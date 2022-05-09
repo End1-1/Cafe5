@@ -16,7 +16,7 @@
 #define VM_STORE_ITEMS 3
 
 StoreInput::StoreInput(C5User *user, QWidget *parent) :
-    QDialog(parent),
+    C5Dialog(__c5config.dbParams()),
     ui(new Ui::StoreInput)
 {
     ui->setupUi(this);
@@ -183,6 +183,7 @@ void StoreInput::getList()
         ui->tbl->setString(r, 7, db.getString("f_saleprice"));
         ui->leTotal->setDouble(ui->leTotal->getDouble() + (db.getDouble("f_qty") * db.getDouble("f_saleprice")));
     }
+    ui->tbl->fitColumnsToWidth();
 }
 
 void StoreInput::history()
@@ -232,6 +233,7 @@ void StoreInput::history()
             }
         }
     }
+    ui->tbl->fitColumnsToWidth();
     ui->chAll->clicked(true);
 }
 
@@ -315,6 +317,7 @@ void StoreInput::storeByItems()
         ui->leTotal->setDouble(ui->leTotal->getDouble() + db.getDouble("f_totalsale"));
     }
     ui->chAll->clicked(true);
+    ui->tbl->fitColumnsToWidth();
 }
 
 void StoreInput::changeDate(int d)
@@ -433,4 +436,14 @@ void StoreInput::on_btnStoreGoods_clicked()
     disableMenuButtons(static_cast<QPushButton*>(sender()));
     fViewMode = VM_STORE_ITEMS;
     refresh();
+}
+
+void StoreInput::on_btnExit_clicked()
+{
+    accept();
+}
+
+void StoreInput::on_btnMinimize_clicked()
+{
+    showMinimized();
 }

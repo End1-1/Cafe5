@@ -26,11 +26,11 @@ bool DatabaseConnectionManager::init()
     }
     db.exec("select * from system_databases");
     while (db.next()) {
-        dc.name = db.stringValue("fname");
-        dc.host = db.stringValue("fhost");
-        dc.schema = db.stringValue("fschema");
-        dc.username = db.stringValue("fusername");
-        dc.password = db.stringValue("fpassword");
+        dc.name = db.string("fname");
+        dc.host = db.string("fhost");
+        dc.schema = db.string("fschema");
+        dc.username = db.string("fusername");
+        dc.password = db.string("fpassword");
         fDatabaseConnections.insert(dc.name, dc);
     }
     return true;

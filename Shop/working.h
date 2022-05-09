@@ -154,7 +154,10 @@ private slots:
     void on_btnHelp_clicked();
 
     void on_btnManualTax_clicked();
+
     void on_btnMinimize_clicked();
+
+    void on_btnClientConfigQR_clicked();
 };
 
 #endif // WORKING_H

@@ -17,7 +17,9 @@ void StoreManager::init(const QString &databaseName)
 {
     QElapsedTimer e;
     e.start();
-    fInstance = new StoreManager();
+    if (fInstance == nullptr) {
+        fInstance = new StoreManager();
+    }
     fInstance->fDatabaseName = databaseName;
     Database db;
     if (db.open(databaseName) == false) {
@@ -28,6 +30,13 @@ void StoreManager::init(const QString &databaseName)
         fInstance->fSkuCodeMap.insert(db.stringValue("f_scancode"), db.integerValue("f_id"));
         fInstance->fCodeSkuMap.insert(db.integerValue("f_id"), db.stringValue("f_scancode"));
         fInstance->fSkuNameMap.insert(db.stringValue("f_scancode"), db.stringValue("f_name"));
+    }
+}
+
+void StoreManager::release()
+{
+    if (fInstance) {
+        delete fInstance;
     }
 }
 

@@ -12,6 +12,7 @@ SOURCES += \
     ../Service5/raw/rawmessage.cpp \
     ../Service5/socket/sslserver.cpp \
     ../Service5/socket/sslsocket.cpp \
+    ../Service5/utils/configini.cpp \
     ../Service5/utils/logwriter.cpp \
     main.cpp \
     socketconnection.cpp \
@@ -24,6 +25,7 @@ HEADERS += \
     ../Service5/raw/structs.h \
     ../Service5/socket/sslserver.h \
     ../Service5/socket/sslsocket.h \
+    ../Service5/utils/configini.h \
     ../Service5/utils/debug.h \
     ../Service5/utils/logwriter.h \
     socketconnection.h \

@@ -1,6 +1,7 @@
 #include "requestmanager.h"
 #include "logwriter.h"
 #include "database.h"
+#include "commandline.h"
 #include <QMutex>
 #include <QElapsedTimer>
 #include <QDir>
@@ -70,8 +71,13 @@ void RequestManager::handle(const QString &session, const QString &remoteHost, c
     hr(indata, outdata, dataMap, contentType);
 
     int ms = et.elapsed();
+
+    CommandLine cl;
+    QString path;
+    cl.value("path", path);
+    QString configFile = path + "/config.ini";
     Database db;
-    if (db.open("./config.ini")) {
+    if (db.open(configFile)) {
         db[":fdate"] = QDate::currentDate();
         db[":ftime"] = QTime::currentTime();
         db[":fhost"] = remoteHost;

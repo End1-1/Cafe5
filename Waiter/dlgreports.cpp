@@ -21,6 +21,7 @@ DlgReports::DlgReports(const QStringList &dbParams, C5User *user) :
     ui->date1->setDate(QDate::currentDate());
     ui->date2->setDate(QDate::currentDate());
     fShiftId = 0;
+    fCurrentHall = 0;
     setLangIcon();
 }
 
@@ -259,7 +260,7 @@ void DlgReports::on_btnHall_clicked()
         return;
     }
     fCurrentHall = hall;
-    ui->btnHall->setText(dbhall->name(fCurrentHall));
+    ui->btnHall->setText(fCurrentHall == 0 ? tr("All") : dbhall->name(fCurrentHall));
 }
 
 void DlgReports::on_btnShift_clicked()

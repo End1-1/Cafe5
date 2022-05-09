@@ -49,10 +49,7 @@ void ThreadSendMessage::start()
             "Content-Disposition: form-data; name=\"message\"\r\n\r\n"
             "%4\r\n"
             "----hdhdhdjfjfjgkgk85858\r\n")
-            .arg(__c5config.httpServerUsername())
-            .arg(__c5config.httpServerPassword())
-            .arg(fRecipient)
-            .arg(fMessage);
+            .arg(__c5config.httpServerUsername(), __c5config.httpServerPassword(), QString::number(fRecipient), fMessage);
     url.replace("%content-length%", QString::number(body.toUtf8().length()));
     auto *s = new QSslSocket(this);
     //connect(s, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(err(QAbstractSocket::SocketError)));

@@ -8,6 +8,7 @@ class ShopManager
 public:
     ShopManager();
     static void init(const QString &databaseName);
+    static void release();
     static QString databaseName();
 
 private:

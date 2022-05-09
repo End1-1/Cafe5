@@ -8,6 +8,7 @@ namespace LogWriterLevel {
     const QString verbose = "verbose";
     const QString warning = "warning";
     const QString errors = "errors";
+    const QString special = "special";
 }
 
 class LogWriter

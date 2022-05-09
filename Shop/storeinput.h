@@ -1,7 +1,7 @@
 #ifndef STOREINPUT_H
 #define STOREINPUT_H
 
-#include <QDialog>
+#include "c5dialog.h"
 
 namespace Ui {
 class StoreInput;
@@ -9,7 +9,7 @@ class StoreInput;
 
 class C5User;
 
-class StoreInput : public QDialog
+class StoreInput : public C5Dialog
 {
     Q_OBJECT
 
@@ -42,6 +42,10 @@ private slots:
     void on_btnStore_clicked();
 
     void on_btnStoreGoods_clicked();
+
+    void on_btnExit_clicked();
+
+    void on_btnMinimize_clicked();
 
 private:
     Ui::StoreInput *ui;

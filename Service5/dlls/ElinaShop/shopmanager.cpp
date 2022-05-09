@@ -10,8 +10,17 @@ ShopManager::ShopManager()
 
 void ShopManager::init(const QString &databaseName)
 {
-    fInstance = new ShopManager();
+    if (fInstance == nullptr) {
+        fInstance = new ShopManager();
+    }
     fInstance->fDatabaseName = databaseName;
+}
+
+void ShopManager::release()
+{
+    if (fInstance) {
+        delete fInstance;
+    }
 }
 
 QString ShopManager::databaseName()

@@ -7,8 +7,8 @@
 #include "goodsreserve.h"
 #include <QDebug>
 
-SearchItems::SearchItems(QWidget *parent) :
-    QDialog(parent),
+SearchItems::SearchItems() :
+    C5Dialog(__c5config.dbParams()),
     ui(new Ui::SearchItems)
 {
     ui->setupUi(this);
@@ -157,4 +157,9 @@ void SearchItems::on_btnEditReserve_clicked()
     }
     DlgReservGoods rg(__c5config.dbParams(), reserveid);
     rg.exec();
+}
+
+void SearchItems::on_btnExit_clicked()
+{
+    reject();
 }

@@ -6,6 +6,7 @@
 #include "raw.h"
 #include "structs.h"
 #include "monitor.h"
+#include "sqlqueries.h"
 #include "thread.h"
 #include <QFileInfo>
 #include <QDir>
@@ -51,6 +52,10 @@ DWORD WINAPI ThreadProc(CONST LPVOID lpParam) {
     DatabaseConnectionManager::init();
     RequestManager::init();
     Raw::init();
+    Database db;
+    DatabaseConnectionManager::openSystemDatabase(db);
+    SqlQueries::init(db);
+    db.close();
     auto *server = new ServerThread(APPDIR);
     auto *thread = new Thread("ServerThread");
     thread->connect(thread, &QThread::started, server, &ServerThread::run);

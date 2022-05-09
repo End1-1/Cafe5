@@ -11,6 +11,7 @@ DlgListOfShifts::DlgListOfShifts(QWidget *parent) :
     item->setSizeHint(QSize(50, 50));
     item->setText(tr("All"));
     item->setData(Qt::UserRole, 0);
+    ui->lst->addItem(item);
     for (int id: dbshift->list()) {
         item = new QListWidgetItem(ui->lst);
         item->setSizeHint(QSize(50, 50));

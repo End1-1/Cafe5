@@ -355,7 +355,7 @@ void C5WaiterServer::reply(QJsonObject &o)
                         "left join o_tax ot on ot.f_id=oh.f_id "
                        "where oh.f_state=:f_state and oh.f_datecash between :f_datecash1 and :f_datecash2 ";
         }
-        if (!fIn["hall"].toString().isEmpty()) {
+        if (fIn["hall"].toString().toInt() > 0) {
             sqlQuery += QString(" and oh.f_hall=%1 ").arg(fIn["hall"].toString());
         }
         if (fIn["shift"].toString().toInt() > 0) {

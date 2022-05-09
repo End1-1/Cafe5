@@ -35,10 +35,6 @@ private slots:
 
     void handleCreditCards(const QJsonObject &obj);
 
-    void handleDishRemoveReason(const QJsonObject &obj);
-
-    void handleDishComment(const QJsonObject &obj);
-
     void handleVersion(const QJsonObject &obj);
 
     void on_btnExit_clicked();

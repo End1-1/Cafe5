@@ -19,6 +19,7 @@
 #include "c5utils.h"
 #include "c5storedraftwriter.h"
 #include "c5replication.h"
+#include "QRCodeGenerator.h"
 #include "threadcheckmessage.h"
 #include <QInputDialog>
 
@@ -52,6 +53,8 @@ WOrder::WOrder(C5User *user, int saleType, QWidget *parent) :
     ui->leCard->setValidator(new QDoubleValidator(0, 1000000000, 2));
     ui->leCash->setValidator(new QDoubleValidator(0, 1000000000, 2));
     ui->leChange->setValidator(new QDoubleValidator(0, 1000000000, 2));
+    ui->leAdvance->setValidator(new QDoubleValidator(0, 99999999, 2));
+    ui->lePreorderAdvance->setValidator(new QDoubleValidator(0, 99999999, 2));
     noImage();
     connect(ui->leCard, &C5LineEdit::focusOut, [this](){
         C5LogSystem::writeEvent(QString("%1: %2").arg(tr("Card value"), ui->leCard->text()));
@@ -69,6 +72,13 @@ WOrder::WOrder(C5User *user, int saleType, QWidget *parent) :
     ui->btnF3->setText(fWorking->flag(3).name);
     ui->btnF4->setText(fWorking->flag(4).name);
     ui->btnF5->setText(fWorking->flag(5).name);
+    ui->grPreorder->setVisible(fSaleType == SALE_PREORDER);
+    if (fSaleType == SALE_PREORDER) {
+        setStyleSheet("background:#bfffef");
+        ui->leAdvance->setVisible(true);
+        ui->lbAdvance->setVisible(true);
+        ui->leAdvance->setReadOnly(true);
+    }
 }
 
 WOrder::~WOrder()
@@ -120,6 +130,36 @@ void WOrder::focusTaxpayerId()
     ui->leCustomerTaxpayerId->setSelection(0, 1000);
 }
 
+void WOrder::imageConfig()
+{
+    int levelIndex = 1;
+    int versionIndex = 0;
+    bool bExtent = true;
+    int maskIndex = -1;
+    QString encodeString = __c5config.getValue(param_shop_config_mobile_client);
+
+    CQR_Encode qrEncode;
+    bool successfulEncoding = qrEncode.EncodeData(levelIndex, versionIndex, bExtent, maskIndex, encodeString.toUtf8().data() );
+    if (!successfulEncoding) {
+        //fLog.append("Cannot encode qr image");
+    }
+    int qrImageSize = qrEncode.m_nSymbleSize;
+    int encodeImageSize = qrImageSize + ( QR_MARGIN * 2 );
+    QImage encodeImage(encodeImageSize, encodeImageSize, QImage::Format_Mono);
+    encodeImage.fill(1);
+
+    for ( int i = 0; i < qrImageSize; i++ ) {
+        for ( int j = 0; j < qrImageSize; j++ ) {
+            if ( qrEncode.m_byModuleData[i][j] ) {
+                encodeImage.setPixel(i + QR_MARGIN, j + QR_MARGIN, 0);
+            }
+        }
+    }
+
+    QPixmap pix = QPixmap::fromImage(encodeImage).scaled(500, 500);
+    ui->lbGoodsImage->setPixmap(pix);
+}
+
 void WOrder::addGoods(int id)
 {
     DbGoods g(id);
@@ -157,8 +197,8 @@ void WOrder::addGoodsToTable(int id)
     int row = ui->tblGoods->addEmptyRow();
     ui->tblGoods->item(row, 0)->setData(Qt::UserRole, QVariant::fromValue(id));
     ui->tblGoods->setInteger(row, 0, id);
-    //ui->tblGoods->setString(row, 1, g.goodsName() + " " + g.scancode());
-    ui->tblGoods->setString(row, 1, g.goodsName());
+    ui->tblGoods->setString(row, 1, g.goodsName() + " " + g.scancode());
+    //ui->tblGoods->setString(row, 1, g.goodsName());
     ui->tblGoods->setDouble(row, 2, g.unit()->defaultQty());
     ui->tblGoods->item(row, 2)->fDecimals = 3;
     ui->tblGoods->setString(row, 3, g.unit()->unitName());
@@ -301,81 +341,83 @@ bool WOrder::writeOrder()
     return w;
 }
 
-//bool WOrder::writePreorder()
-//{
-//    if (ui->tblGoods->rowCount() == 0) {
-//        C5Message::error(tr("Empty order"));
-//        return false;
-//    }
-//    if (ui->leContactName->text().isEmpty()) {
-//        C5Message::error(tr("Customer name cannot be empty"));
-//        return false;
-//    }
-//    bool r = true;
-//    bool u = true;
-//    C5Database db(__c5config.dbParams());
-//    db.startTransaction();
-//    db[":f_contact"] = ui->leContactName->text();
-//    db.exec("select * from c_partners where f_contact=:f_contact and f_phone=:f_phone");
-//    if (db.nextRow()) {
-//        fPartner = db.getInt("f_id");
-//    } else {
-//        db[":f_contact"] = ui->leContactName->text();
-//        db[":f_phone"] = ui->leContactPhone->text();
-//        fPartner = db.insert("c_partners");
-//    }
-//    if (fPreorderUUID.isEmpty()) {
-//        u = false;
-//        fPreorderUUID = db.uuid_bin();
-//    }
-//    db[":f_id"] = fPreorderUUID;
-//    db[":f_state"] = 1;
-//    db[":f_datecreate"] = QDate::currentDate();
-//    db[":f_timecreate"] = QTime::currentTime();
-//    db[":f_staff"] = fUser->id();
-//    db[":f_datefor"] = ui->dePreorerDate->date();
-//    db[":f_timefor"] = ui->tmTime->time();
-//    db[":f_total"] = ui->leTotal->getDouble();
-//    db[":f_advance"] = ui->leAdvance->getDouble();
-//    db[":f_customer"] = fPartner;
-//    db[":f_info"] = ui->tePreorderInfo->toPlainText();
-//    if (u) {
-//        r = db.update("op_header", "f_id", fPreorderUUID);
-//    } else {
-//        r = db.insert("op_header", false);
-//    }
-//    if (!r) {
-//        db.rollback();
-//        C5Message::error(db.fLastError);
-//        return false;
-//    }
-//    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
-//        u = true;
-//        QByteArray bid = ui->tblGoods->getData(i, 8).toByteArray();
-//        if (bid.isEmpty()) {
-//            u = false;
-//            bid = db.uuid_bin();
-//        }
-//        db[":f_id"] = bid;
-//        db[":f_header"] = fPreorderUUID;
-//        db[":f_goods"] = ui->tblGoods->getInteger(i, 0);
-//        db[":f_qty"] = ui->tblGoods->getDouble(i, 2);
-//        db[":f_price"] = ui->tblGoods->getDouble(i, 4);
-//        if (u) {
-//            r = db.update("op_body", "f_id", bid);
-//        } else {
-//            r = db.insert("op_body", false);
-//        }
-//        if (!r) {
-//            db.rollback();
-//            C5Message::error(db.fLastError);
-//            return false;
-//        }
-//    }
-//    db.commit();
-//    C5Message::info(tr("Saved"));
-//    return r;
-//}
+bool WOrder::writePreorder()
+{
+    if (ui->tblGoods->rowCount() == 0) {
+        C5Message::error(tr("Empty order"));
+        return false;
+    }
+    if (ui->leContactName->text().isEmpty()) {
+        C5Message::error(tr("Customer name cannot be empty"));
+        return false;
+    }
+    bool r = true;
+    bool u = true;
+    C5Database db(__c5config.dbParams());
+    db.startTransaction();
+    db[":f_contact"] = ui->leContactName->text();
+    db.exec("select * from c_partners where f_contact=:f_contact and f_phone=:f_phone");
+    if (db.nextRow()) {
+        fPartner = db.getInt("f_id");
+    } else {
+        db[":f_contact"] = ui->leContactName->text();
+        db[":f_phone"] = ui->leContactPhone->text();
+        fPartner = db.insert("c_partners");
+    }
+    if (fPreorderUUID.isEmpty()) {
+        u = false;
+        fPreorderUUID = db.uuid_bin();
+    }
+    db[":f_id"] = fPreorderUUID;
+    db[":f_state"] = 1;
+    db[":f_datecreate"] = QDate::currentDate();
+    db[":f_timecreate"] = QTime::currentTime();
+    db[":f_staff"] = fUser->id();
+    db[":f_datefor"] = ui->dePreorerDate->date();
+    db[":f_timefor"] = ui->tmTime->time();
+    db[":f_total"] = ui->leTotal->getDouble();
+    db[":f_advance"] = ui->lePreorderAdvance->getDouble();
+    db[":f_customer"] = fPartner;
+    db[":f_info"] = ui->tePreorderInfo->text();
+    db[":f_advancetax"] = ui->lePreorderTax->getInteger();
+    db[":f_paymentmode"] = ui->rbCard->isChecked() ? 1 : 0;
+    if (u) {
+        r = db.update("op_header", "f_id", fPreorderUUID);
+    } else {
+        r = db.insert("op_header", false);
+    }
+    if (!r) {
+        db.rollback();
+        C5Message::error(db.fLastError);
+        return false;
+    }
+    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+        u = true;
+        QByteArray bid = ui->tblGoods->getData(i, 8).toByteArray();
+        if (bid.isEmpty()) {
+            u = false;
+            bid = db.uuid_bin();
+        }
+        db[":f_id"] = bid;
+        db[":f_header"] = fPreorderUUID;
+        db[":f_goods"] = ui->tblGoods->getInteger(i, 0);
+        db[":f_qty"] = ui->tblGoods->getDouble(i, 2);
+        db[":f_price"] = ui->tblGoods->getDouble(i, 4);
+        if (u) {
+            r = db.update("op_body", "f_id", bid);
+        } else {
+            r = db.insert("op_body", false);
+        }
+        if (!r) {
+            db.rollback();
+            C5Message::error(db.fLastError);
+            return false;
+        }
+    }
+    db.commit();
+    C5Message::info(tr("Saved"));
+    return r;
+}
 
 void WOrder::fixCostumer(const QString &code)
 {
@@ -420,7 +462,7 @@ void WOrder::fixCostumer(const QString &code)
     ui->lbDept->setVisible(true);
     ui->chDebt->setVisible(true);
     ui->leCustomer->setText(db.getString("f_firstname") + " " + db.getString("f_lastname"));
-    C5LogSystem::writeEvent(QString("%1: %2:%3").arg(tr("Fix costumer")).arg(code).arg(db.getString("f_firstname") + " " + db.getString("f_lastname")));
+    C5LogSystem::writeEvent(QString("%1: %2:%3").arg(tr("Fix costumer"), code, db.getString("f_firstname") + " " + db.getString("f_lastname")));
     countTotal();
 }
 
@@ -544,7 +586,6 @@ void WOrder::removeRow()
     QString code = ui->tblGoods->getString(row, 0);
     QString name = ui->tblGoods->getString(row, 1);
     double qty = ui->tblGoods->getDouble(row, 2);
-    ui->tblGoods->removeRow(row);
     ui->leCard->setText("0");
     ui->leCash->setText("0");
     ui->leChange->setText("0");
@@ -563,6 +604,13 @@ void WOrder::removeRow()
     db[":f_goods"] = code.toInt();
     db[":f_qty"] = qty;
     db.exec("update a_store_sale set f_qtyprogram=f_qtyprogram-:f_qty where f_store=:f_store and f_goods=:f_goods");
+    if (fSaleType == SALE_PREORDER) {
+        if (!ui->tblGoods->getData(row, 8).toByteArray().isEmpty()) {
+            db[":f_id"] = ui->tblGoods->getData(row, 8);
+            db.exec("delete from op_body where f_id=:f_id");
+        }
+    }
+    ui->tblGoods->removeRow(row);
     C5LogSystem::writeEvent(QString("%1 #%2 %3:%4 %5").arg(tr("Remove row")).arg(row).arg(code).arg(name).arg(float_str(qty, 2)));
     countTotal();
 }
@@ -672,6 +720,47 @@ void WOrder::countTotal()
     ui->leTotal->setDouble(total);
     on_leCash_textChanged(ui->leCash->text());
     C5LogSystem::writeEvent(QString("%1: %3").arg(tr("Total amount"), float_str(total, 2)));
+}
+
+void WOrder::openPreorder(const QByteArray &id)
+{
+    C5Database db(__c5config.dbParams());
+    db[":f_id"] = id;
+    db.exec("select * from op_header");
+    if (db.nextRow()) {
+        fPreorderUUID = id;
+        ui->dePreorerDate->setDate(db.getDate("f_datefor"));
+        ui->tmTime->setTime(db.getTime("f_timefor"));
+        ui->lePreorderAdvance->setDouble(db.getDouble("f_advance"));
+        ui->lePreorderTax->setInteger(db.getInt("f_advancetax"));
+        ui->tePreorderInfo->setText(db.getString("f_info"));
+        fPartner = db.getInt("f_customer");
+        ui->rbCard->setChecked(db.getInt("f_paymentmode") == 1);
+        ui->rbCash->setChecked(!ui->rbCard->isChecked());
+    } else {
+        C5Message::error(tr("Invalid preorder id"));
+        return;
+    }
+    if (fPartner > 0) {
+        db[":f_id"] = fPartner;
+        db.exec("select * from c_partners where f_id=:f_id");
+        if (db.nextRow()) {
+            ui->leContactName->setText(db.getString("f_contact"));
+            ui->leContactPhone->setText(db.getString("f_phone"));
+        }
+    }
+    db[":f_header"] = fPreorderUUID;
+    db.exec("select * from op_body where f_header=:f_header");
+    while (db.nextRow()) {
+        addGoods(db.getInt("f_goods"));
+        int row = ui->tblGoods->rowCount() - 1;
+        setQtyOfRow(row, db.getDouble("f_qty"));
+        ui->tblGoods->setDouble(row, 4, db.getDouble("f_price"));
+        ui->tblGoods->setDouble(row, 5, ui->tblGoods->getDouble(row, 2) * db.getDouble("f_price"));
+        ui->tblGoods->setData(row, 8, db.getValue("f_id"));
+    }
+    ui->leAdvance->setDouble(ui->lePreorderAdvance->getDouble());
+    countTotal();
 }
 
 bool WOrder::returnFalse(const QString &msg, C5Database &db)
@@ -874,7 +963,7 @@ void WOrder::on_leCode_returnPressed()
 
 void WOrder::on_leCustomerTaxpayerId_returnPressed()
 {
-    if (ui->lePartner->text().isEmpty()) {
+    if (ui->leCustomerTaxpayerId->text().isEmpty()) {
         return;
     }
     C5Database db(__c5config.dbParams());
@@ -892,11 +981,15 @@ void WOrder::on_leCustomerTaxpayerId_returnPressed()
 void WOrder::on_leCard_textChanged(const QString &arg1)
 {
     ui->leCard->disconnect();
+    double advance = 0;
+    if (fSaleType == SALE_PREORDER) {
+        advance = ui->leAdvance->getDouble();
+    }
     QString a = QString(arg1).replace(",", "");
     if (str_float(a) + str_float(ui->leAdvance->text()) > str_float(ui->leTotal->text())) {
-        ui->leAdvance->setText(0);
-        if (str_float(a) > str_float(ui->leTotal->text())) {
-            ui->leCard->setText(ui->leTotal->text());
+        ui->leAdvance->setDouble(advance);
+        if (str_float(a) > str_float(ui->leTotal->text()) + advance) {
+            ui->leCard->setDouble(ui->leTotal->getDouble() - advance);
         }
     } else {
         ui->leCard->setDouble(str_float(a));
@@ -917,4 +1010,91 @@ void WOrder::on_leAdvance_textChanged(const QString &arg1)
         ui->leAdvance->setDouble(str_float(a));
     }
     connect(ui->leAdvance, &C5LineEdit::textChanged, this, &WOrder::on_leAdvance_textChanged);
+}
+
+void WOrder::on_btnPrintAdvanceTax_clicked()
+{
+    if (ui->lePreorderTax->getInteger() > 0) {
+        C5Message::error(tr("Fiscal receipt already printed"));
+        return;
+    }
+    if (ui->lePreorderAdvance->getDouble() < 0.01) {
+        C5Message::info(tr("Cannot print zero advance"));
+        return;
+    }
+    if (!writePreorder()) {
+        C5Message::error(tr("Error writing preorder"));
+        return;
+    }
+    if (!ui->rbCard->isChecked() && !ui->rbCash->isChecked()) {
+        C5Message::error(tr("No payment mode is selected"));
+        return;
+    }
+    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
+    QString inJson, outJson, err, firm, hvhh, fiscal, number, sn, address, devnum, time;
+    int result = pt.printAdvanceJson(ui->lePreorderAdvance->getDouble(), ui->rbCard->isChecked() ? ui->lePreorderAdvance->getDouble() : 0, inJson, outJson, err);
+    C5Database db(__c5config.dbParams());
+    db[":f_id"] = db.uuid();
+    db[":f_order"] = fPreorderUUID;
+    db[":f_date"] = QDate::currentDate();
+    db[":f_time"] = QTime::currentTime();
+    db[":f_in"] = inJson;
+    db[":f_out"] = outJson;
+    db[":f_err"] = err;
+    db[":f_result"] = result;
+    db.insert("o_tax_log");
+    if (result != pt_err_ok) {
+        C5Message::error(err);
+#ifdef QT_DEBUG
+        result = pt_err_ok;
+        outJson = "{\"rseq\":77,\"crn\":\"63219817\",\"sn\":\"V98745506068\",\"tin\":\"01588771\",\"taxpayer\":\"«Ռոգա էնդ կոպիտա ՍՊԸ»\",\"address\":\"Արշակունյանց 34\",\"time\":1527853613000.0,\"fiscal\":\"98198105\",\"lottery\":\"00000000\",\"prize\":0,\"total\":1540.0,\"change\":0.0}";
+#else
+        return;
+#endif
+    }
+    pt.parseResponse(outJson, firm, hvhh, fiscal, number, sn, address, devnum, time);
+    ui->lePreorderTax->setText(number);
+    if (!writePreorder()) {
+        C5Message::error(tr("Error writing preorder"));
+        return;
+    }
+}
+
+void WOrder::on_btnSavePreorder_clicked()
+{
+    if (!writePreorder()){
+        return;
+    }
+}
+
+void WOrder::on_lePreorderAdvance_textChanged(const QString &arg1)
+{
+    if (arg1.toDouble() > ui->leTotal->getDouble()) {
+        ui->lePreorderAdvance->setDouble(ui->leTotal->getDouble());
+    }
+    ui->leAdvance->setText(ui->lePreorderAdvance->text());
+}
+
+void WOrder::on_btnRemovePreorder_clicked()
+{
+    if (fPreorderUUID.isEmpty()) {
+        return;
+    }
+    if (C5Message::question(tr("Confirm to remove preorder")) != QDialog::Accepted) {
+        return;
+    }
+    C5Database db(__c5config.dbParams());
+    db[":f_id"] = fPreorderUUID;
+    db.exec("update op_header set f_state=3 where f_id=:f_id");
+
+}
+
+void WOrder::on_btnOpenPreorder_clicked()
+{
+    Preorders p;
+    if (p.exec() == QDialog::Accepted) {
+        ui->tblGoods->clearContents();
+        ui->tblGoods->setRowCount(0);
+        openPreorder(p.fUUID);
+    }
 }

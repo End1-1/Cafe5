@@ -199,8 +199,7 @@ void Monitor::on_btnCreateDatabases_clicked()
         }
         if (dbempty) {
             QString cmd = QString("\"%1/bin/mysql\" -uroot -p%2 airlog")
-                    .arg(ui->leMariaDBInstallationPath->text())
-                    .arg(ui->leMainPassword->text());
+                    .arg(ui->leMariaDBInstallationPath->text(), ui->leMainPassword->text());
             QProcess p;
             p.setStandardInputFile(airlog);
             p.setStandardOutputFile(log);
@@ -225,8 +224,7 @@ void Monitor::on_btnCreateDatabases_clicked()
         }
         if (dbempty) {
             QString cmd = QString("\"%1/bin/mysql\" -uroot -p%2 cafe5")
-                    .arg(ui->leMariaDBInstallationPath->text())
-                    .arg(ui->leMainPassword->text());
+                    .arg(ui->leMariaDBInstallationPath->text(), ui->leMainPassword->text());
             QProcess p;
             p.setStandardInputFile(cafe5);
             p.setStandardOutputFile(log);

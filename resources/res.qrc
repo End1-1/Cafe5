@@ -142,5 +142,6 @@
         <file>goodslist.png</file>
         <file>help.png</file>
         <file>minimize.png</file>
+        <file>qr_code.png</file>
     </qresource>
 </RCC>

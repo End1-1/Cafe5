@@ -267,10 +267,10 @@ bool C5StoreDraftWriter::readAStoreDraft(const QString &id)
                  "left join c_goods g on g.f_id=d.f_goods "
                  "left join c_units u on u.f_id=g.f_unit "
                  "where d.f_document=:f_document order by d.f_row", fAStoreDraftData, fAStoreDraftDataMap)) {
-        if (fAStoreDraftData.count() == 0) {
-            fErrorMsg = tr("Empty store document");
-            return false;
-        }
+//        if (fAStoreDraftData.count() == 0) {
+//            fErrorMsg = tr("Empty store document");
+//            return false;
+//        }
         return true;
     } else {
         fErrorMsg = fDb.fLastError;
@@ -706,7 +706,7 @@ bool C5StoreDraftWriter::writeOHeader(QString &id, int hallid, const QString &pr
                                       const QDate &dateopen, const QDate &dateclose, const QDate &datecash,
                                       const QTime &timeopen, const QTime &timeclose,
                                       int staff, const QString &comment, int print,
-                                      double amountTotal, double amountCash, double amountCard, double amountBank, double amountOther,
+                                      double amountTotal, double amountCash, double amountCard, double amountPrepaid, double amountBank, double amountOther,
                                       double amountService, double amountDiscount, double serviceFactor, double discountFactor,
                                       int creditCardId, int otherId, int shift, int source, int saletype, int partner)
 {
@@ -732,6 +732,7 @@ bool C5StoreDraftWriter::writeOHeader(QString &id, int hallid, const QString &pr
     fDb[":f_amounttotal"] = amountTotal;
     fDb[":f_amountcash"] = amountCash;
     fDb[":f_amountcard"] = amountCard;
+    fDb[":f_amountprepaid"] = amountPrepaid;
     fDb[":f_amountbank"] = amountBank;
     fDb[":f_amountother"] = amountOther;
     fDb[":f_amountservice"] = amountService;
@@ -1028,7 +1029,7 @@ bool C5StoreDraftWriter::writeOutput(const QString &docId, QString &err)
     }
     if (err.isEmpty()) {
         QStringList outId;
-        for (QList<QMap<QString, QVariant> >::const_iterator it = queries.begin(); it != queries.end(); it++) {
+        for (QList<QMap<QString, QVariant> >::const_iterator it = queries.constBegin(); it != queries.constEnd(); it++) {
             QString newId = C5Database::uuid();
             outId << newId;
             fDb.setBindValues(*it);

@@ -39,7 +39,7 @@ void Raw::init()
     if (DatabaseConnectionManager::openSystemDatabase(db)) {
         db.exec("select * from users_devices");
         while (db.next()) {
-            fMapTokenUser[db.stringValue("ftoken")] = db.integerValue("fuser");
+            fMapTokenUser[db.string("ftoken")] = db.integer("fuser");
         }
     } else {
         LogWriter::write(LogWriterLevel::errors, "", db.lastDbError());

@@ -90,7 +90,7 @@ void RawBalanceHistory::balanceDetails(const QDateTime &d1, const QDateTime &d2)
     db.exec("select fdate, fcomment, famount*finout as famount from acc_balance where fdate between :fdate1 and :fdate2 order by fdate");
     while (db.next()) {
         br.date = db.dateTimeValue("fdate").toMSecsSinceEpoch();
-        br.comment = db.stringValue("fcomment");
+        br.comment = db.string("fcomment");
         br.amount = db.doubleValue("famount");
         data.append(br);
         finalamount += br.amount;

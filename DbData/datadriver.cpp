@@ -33,4 +33,6 @@ void DataDriver::init(const QStringList &dbParams)
     fInstance->fDbMenuPackage = new DbMenuPackages();
     fInstance->fDbMenuPackageList = new DbMenuPackageList();
     fInstance->fDbStoreDocType = new DbStoreDocType();
+    fInstance->fDbDishComments = new DbDishComments();
+    fInstance->fDbDishRemoveReason = new DbDishRemoveReason();
 }

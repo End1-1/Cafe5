@@ -5,6 +5,8 @@
 #include "stoplist.h"
 #include "dlgviewstoplist.h"
 #include "c5printing.h"
+#include "c5logtoserverthread.h"
+#include "c5user.h"
 
 DlgStopListOption::DlgStopListOption(DlgOrder *o) :
     C5Dialog(__c5config.dbParams()),
@@ -86,6 +88,7 @@ void DlgStopListOption::on_btnCancel_clicked()
 void DlgStopListOption::on_btnClearStopList_clicked()
 {
     if (C5Message::question(tr("Are sure to clear stoplist?")) == QDialog::Accepted) {
+        C5LogToServerThread::remember(LOG_WAITER, fDlgOrder->fUser->fullName(), "", "", "", "Stop list was removed", "", "");
         auto *sh = createSocketHandler(SLOT(handleStopList(QJsonObject)));
         sh->bind("cmd", sm_stoplist);
         sh->bind("state", sl_remove);

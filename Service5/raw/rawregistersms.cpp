@@ -28,15 +28,15 @@ int RawRegisterSMS::run(const QByteArray &d)
         db[":ftoken"] = token;
         if (db.exec("select * from users_registration where fstate=:fstate and fconfirmation_code=:fconfirmation_code and ftoken=:ftoken")) {
             if (db.next()) {
-                QString phone = db.stringValue("fphone");
-                db[":fid"] = db.integerValue("fid");
+                QString phone = db.string("fphone");
+                db[":fid"] = db.integer("fid");
                 db.exec("update users_registration set fstate=2 where fid=:fid");
 
                 int id = 0;
                 db[":fphone"] = phone;
                 if (db.exec("select * from users_list where fphone=:fphone")) {
                     if (db.next()) {
-                        id = db.integerValue("fid");
+                        id = db.integer("fid");
                     }
                 } else {
                     LogWriter::write(LogWriterLevel::errors, property("session").toString(), db.lastDbError());

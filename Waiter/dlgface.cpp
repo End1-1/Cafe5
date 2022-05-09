@@ -213,34 +213,6 @@ void DlgFace::handleCreditCards(const QJsonObject &obj)
     }
 }
 
-void DlgFace::handleDishRemoveReason(const QJsonObject &obj)
-{
-    sender()->deleteLater();
-    if (obj["reply"].toInt() == 0) {
-        C5Message::error(obj["msg"].toString());
-        return;
-    }
-    C5CafeCommon::fDishRemoveReason.clear();
-    QJsonArray jr = obj["reasons"].toArray();
-    for (int i = 0; i < jr.count(); i++) {
-        C5CafeCommon::fDishRemoveReason << jr.at(i).toObject()["f_name"].toString();
-    }
-}
-
-void DlgFace::handleDishComment(const QJsonObject &obj)
-{
-    sender()->deleteLater();
-    if (obj["reply"].toInt() == 0) {
-        C5Message::error(obj["msg"].toString());
-        return;
-    }
-    C5CafeCommon::fDishComments.clear();
-    QJsonArray ja = obj["comments"].toArray();
-    for (int i = 0; i < ja.count(); i++) {
-        C5CafeCommon::fDishComments << ja.at(i).toObject()["f_name"].toString();
-    }
-}
-
 void DlgFace::handleVersion(const QJsonObject &obj)
 {
     if (obj["reply"].toInt() != 0) {

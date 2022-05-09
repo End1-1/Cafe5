@@ -150,7 +150,7 @@ void DlgReturnItem::on_btnReturn_clicked()
                          QTime::currentTime(),
                          staff,
                          "", 1,
-                         returnAmount * -1, returnAmount * -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, SALE_RETURN, 0)) {
+                         returnAmount * -1, returnAmount * -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, SALE_RETURN, 0)) {
         C5Message::error(dw.fErrorMsg);
         db.rollback();
         return;

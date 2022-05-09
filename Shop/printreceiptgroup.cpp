@@ -129,7 +129,7 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
             "order by ad.f_row ")
             .arg(price1)
             .arg(__c5config.getValue(param_shop_print_dontgroup).toInt() == 0 ? "" : ",ad.f_id")
-            .arg(__c5config.getValue(param_shop_print_dontgroup).toInt() == 0 ? "" : ",4"));
+            .arg(__c5config.getValue(param_shop_print_dontgroup).toInt() == 0 ? "" : ",5"));
     while (db.nextRow()) {
         QList<QVariant> v;
         for (int i = 0; i < db.columnCount(); i++) {
@@ -404,7 +404,7 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
             .arg(price1)
             .arg(price2)
             .arg(__c5config.getValue(param_shop_print_dontgroup).toInt() == 0 ? "" : ",ad.f_id")
-            .arg(__c5config.getValue(param_shop_print_dontgroup).toInt() == 0 ? "" : ",4"));
+            .arg(__c5config.getValue(param_shop_print_dontgroup).toInt() == 0 ? "" : ",5"));
     QList<QList<QVariant> > data;
     while (db.nextRow()) {
         QList<QVariant> v;

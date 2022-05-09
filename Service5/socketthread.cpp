@@ -294,6 +294,9 @@ void SocketThread::parseBody(quint16 msgType, const QByteArray &data)
         fTimeoutControl->stop();
         fTimeoutControl->start(60000);
         break;
+    case 3:
+
+        break;
     default:
         break;
     }

@@ -1,18 +1,18 @@
 #ifndef PREORDERS_H
 #define PREORDERS_H
 
-#include <QDialog>
+#include "c5dialog.h"
 
 namespace Ui {
 class Preorders;
 }
 
-class Preorders : public QDialog
+class Preorders : public C5Dialog
 {
     Q_OBJECT
 
 public:
-    explicit Preorders(QWidget *parent = nullptr);
+    explicit Preorders();
 
     ~Preorders();
 
@@ -20,6 +20,8 @@ public:
 
 private slots:
     void on_btnView_clicked();
+
+    void on_btnExit_clicked();
 
 private:
     Ui::Preorders *ui;

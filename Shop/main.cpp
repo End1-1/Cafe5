@@ -93,13 +93,15 @@ int main(int argc, char *argv[])
         }
     }
 
-    QFile file(d.homePath() + "/" + _APPLICATION_ + "/lock.pid");
-    file.remove();
-    QLockFile lockFile(d.homePath() + "/" + _APPLICATION_ + "/lock.pid");
-    if (!lockFile.tryLock()) {
-        ls(QObject::tr("Application instance found, exiting"));
-        C5Message::error(QObject::tr("An instance of application already running"));
-        return -1;
+    if (args.contains("--multiple-copies") == false) {
+        QFile file(d.homePath() + "/" + _APPLICATION_ + "/lock.pid");
+        file.remove();
+        QLockFile lockFile(d.homePath() + "/" + _APPLICATION_ + "/lock.pid");
+        if (!lockFile.tryLock()) {
+            ls(QObject::tr("Application instance found, exiting"));
+            C5Message::error(QObject::tr("An instance of application already running"));
+            return -1;
+        }
     }
 
     C5Database db(C5Config::dbParams());
@@ -123,6 +125,10 @@ int main(int argc, char *argv[])
         pin.clear();
         user.clear();
     };
+
+//    if (QDate::currentDate() > QDate::fromString("01/10/2022", "dd/MM/yyyy")) {
+//        return 1;
+//    }
 
     db[":f_user"] = __user->id();
     db.exec("select sn.f_id, sn.f_name from s_settings_names sn where sn.f_id in (select f_settings from s_user_config where f_user=:f_user)");

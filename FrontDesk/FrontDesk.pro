@@ -58,9 +58,11 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../DbData/dbbodystate.cpp \
     ../DbData/dbcar.cpp \
     ../DbData/dbdata.cpp \
+    ../DbData/dbdishcomments.cpp \
     ../DbData/dbdishes.cpp \
     ../DbData/dbdishpart1.cpp \
     ../DbData/dbdishpart2.cpp \
+    ../DbData/dbdishremovereason.cpp \
     ../DbData/dbdishspecial.cpp \
     ../DbData/dbgoods.cpp \
     ../DbData/dbgoodsgroup.cpp \
@@ -324,9 +326,11 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../DbData/dbbodystate.h \
     ../DbData/dbcar.h \
     ../DbData/dbdata.h \
+    ../DbData/dbdishcomments.h \
     ../DbData/dbdishes.h \
     ../DbData/dbdishpart1.h \
     ../DbData/dbdishpart2.h \
+    ../DbData/dbdishremovereason.h \
     ../DbData/dbdishspecial.h \
     ../DbData/dbgoods.h \
     ../DbData/dbgoodsgroup.h \

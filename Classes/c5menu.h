@@ -120,6 +120,8 @@ public:
 
     QMap<int, int> fPart2Color;
 
+    static QStringList fDishComments;
+
     static QMap<QString, QString> fMenuNames;
 
     static QString fMenuVersion;

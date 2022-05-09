@@ -148,7 +148,7 @@ void ViewOrder::on_btnReturn_clicked()
                          QTime::currentTime(),
                          uid,
                          "", 1,
-                         returnAmount * -1, returnAmount * -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, fSaleType, fPartner)) {
+                         returnAmount * -1, returnAmount * -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, fSaleType, fPartner)) {
         return returnFalse(dw.fErrorMsg, &db);
     }
 

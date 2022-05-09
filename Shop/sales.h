@@ -57,6 +57,8 @@ private slots:
 
     void on_btnPrintTaxX_clicked();
 
+    void on_btnExit_clicked();
+
 private:
     Ui::Sales *ui;
 

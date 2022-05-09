@@ -41,13 +41,15 @@ public:
 
     void focusTaxpayerId();
 
+    void imageConfig();
+
     void addGoods(int id);
 
     void addGoodsToTable(int id);
 
     bool writeOrder();
 
-    //bool writePreorder();
+    bool writePreorder();
 
     void fixCostumer(const QString &code);
 
@@ -68,6 +70,8 @@ public:
     int lastRow();
 
     void countTotal();
+
+    void openPreorder(const QByteArray &id);
 
     void setDiscount(const QString &label, const QString &value);
 
@@ -98,6 +102,16 @@ private slots:
 
     void on_leAdvance_textChanged(const QString &arg1);
 
+    void on_btnPrintAdvanceTax_clicked();
+
+    void on_btnSavePreorder_clicked();
+
+    void on_lePreorderAdvance_textChanged(const QString &arg1);
+
+    void on_btnRemovePreorder_clicked();
+
+    void on_btnOpenPreorder_clicked();
+
 private:
     Ui::WOrder *ui;
 
@@ -118,8 +132,6 @@ private:
     double fCardValue;
 
     int fPartner;
-
-    int fPreorderTax;
 
     QByteArray fPreorderUUID;
 

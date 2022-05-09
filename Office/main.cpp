@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
     QString username;
     QString password;
     ServerConnection::getParams(ip, port, username, password);
-    SocketConnection::init(ip, port, username, password);
+    SocketConnection::startConnection(ip, port, username, password);
 
     MainWindow w;
     w.show();

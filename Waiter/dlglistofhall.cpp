@@ -10,14 +10,19 @@ DlgListOfHall::DlgListOfHall(QWidget *parent) :
     ui(new Ui::DlgListOfHall)
 {
     ui->setupUi(this);
+    QListWidgetItem *item = new QListWidgetItem(ui->lst);
+    item->setSizeHint(QSize(50, 50));
+    item->setText(tr("All"));
+    item->setData(Qt::UserRole, 0);
+    ui->lst->addItem(item);
     for (int id: dbhall->list()) {
-        QListWidgetItem *item = new QListWidgetItem(ui->lst);
+        item = new QListWidgetItem(ui->lst);
         item->setSizeHint(QSize(50, 50));
         item->setText(dbhall->name(id));
         item->setData(Qt::UserRole, id);
         ui->lst->addItem(item);
     }
-    QListWidgetItem *item = new QListWidgetItem(ui->lst);
+    item = new QListWidgetItem(ui->lst);
     item->setSizeHint(QSize(50, 50));
     item->setText("Cancel");
     item->setIcon(QIcon(":/cancel.png"));

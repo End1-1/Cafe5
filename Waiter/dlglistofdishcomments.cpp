@@ -2,6 +2,7 @@
 #include "ui_dlglistofdishcomments.h"
 #include "c5cafecommon.h"
 #include "c5config.h"
+#include "c5menu.h"
 
 DlgListOfDishComments::DlgListOfDishComments(QWidget *parent) :
     QDialog(parent, Qt::FramelessWindowHint),
@@ -11,11 +12,11 @@ DlgListOfDishComments::DlgListOfDishComments(QWidget *parent) :
     setWindowState(Qt::WindowFullScreen);
     int col = 0;
     int row = 0;
-    foreach (QString s, C5CafeCommon::fDishComments) {
+    foreach (int id, dbdishcomment->list()) {
         if (ui->tbl->rowCount() < row + 1) {
             ui->tbl->setRowCount(row + 1);
         }
-        ui->tbl->setString(row, col++, s);
+        ui->tbl->setString(row, col++, dbdishcomment->name(id));
         if (col == ui->tbl->columnCount()) {
             row++;
             col = 0;

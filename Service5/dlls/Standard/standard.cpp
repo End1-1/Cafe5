@@ -2,10 +2,15 @@
 #include "requesthandler.h"
 #include "jsonhandler.h"
 #include "database.h"
+#include "logwriter.h"
+#include "commandline.h"
+#include "gtranslator.h"
 #include <QJsonObject>
+#include <QSettings>
 #include <QJsonArray>
 #include <QRandomGenerator>
 #include <QUuid>
+#include <QDir>
 
 enum RegistrationState {rsNew = 1, rsConfirmed};
 
@@ -128,25 +133,34 @@ bool chat(const QByteArray &indata, QByteArray &outdata, const QHash<QString, Da
         }
     }
     if (err.isEmpty() == false) {
-        rh.setResponse(HTTP_DATA_VALIDATION_ERROR, err);
+        rh.setDataValidationError("Standard::Chat: " + err);
         return false;
     }
 
     //PROCESS
     JsonHandler jh;
     Database db;
-    if (!db.open("./config.ini")) {
-        jh["message"] = "Cannot connect to database";
+    QString configFile;
+    CommandLine cl;
+    if (!cl.value("--config", configFile)) {
+        jh["reply"] = 0;
+        jh["message"] = "Standard::Chat: No config file.";
+        rh.setForbiddenError(jh.toString());
+        return false;
+    }
+    if (!db.open(configFile)) {
+        jh["reply"] = 0;
+        jh["message"] = "Standard::Chat: cannot connect to database";
         return rh.setInternalServerError(jh.toString());
     }
-    db[":fphone"] = getData(indata, dataMap["user"]);
-    db[":femail"] = getData(indata, dataMap["user"]);
-    db[":fpassword"] = getData(indata, dataMap["pass"]);
-    db.exec("select uuid() as session, u.* from users_list u where (u.femail=:femail or u.fphone=:fphone) and u.fpassword=:fpassword");
+    db[":fphone"] = user;;
+    db[":femail"] = user;
+    db[":fpassword"] = password;
+    db.exec("select uuid() as session, u.* from users_list u where (u.femail=:femail or u.fphone=:fphone) and u.fpassword=md5(:fpassword)");
     if (db.next() == false) {
         jh["reply"] = 0;
         jh["message"] = "Authentication failed.";
-        rh.setResponse(HTTP_FORBIDDEN, jh.toString());
+        rh.setForbiddenError(jh.toString());
         return false;
     }
     int userid = db.integerValue("fid");

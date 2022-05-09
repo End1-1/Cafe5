@@ -14,10 +14,14 @@ LogWriter::LogWriter()
 
 void LogWriter::write(const QString &file, const QString &session, const QString &message)
 {
-    QMutexLocker ml(&fMutex);
 #ifdef QT_DEBUG
     qDebug() << QDateTime::currentDateTime().toString("dd/MM/yyyy HH:mm:ss ") << session << message;
+#else
+    if (file == LogWriterLevel::special) {
+        return;
+    }
 #endif;
+    QMutexLocker ml(&fMutex);
     writeToFile(file, session, message);
     if (file != LogWriterLevel::verbose) {
         writeToFile(LogWriterLevel::verbose, session, message);
@@ -26,7 +30,11 @@ void LogWriter::write(const QString &file, const QString &session, const QString
 
 void LogWriter::writeToFile(const QString &fileName, const QString &session, const QString &message)
 {
-    QFile file(QString("%1/%2/%3/Logs/%4_%5.log").arg(QDir::tempPath(), _APPLICATION_,_MODULE_, QDate::currentDate().toString("dd_MM_yyyy"), fileName));
+    QString fnpath = QString("%1/%2/%3/Logs").arg(QDir::tempPath(), _APPLICATION_,_MODULE_);
+    QString fn = fnpath + QString("/%4_%5.log").arg(QDate::currentDate().toString("dd_MM_yyyy"), fileName);
+    QDir().mkpath(QDir().absoluteFilePath(fnpath));
+    qDebug() << fn;
+    QFile file(fn);
     if (file.open(QIODevice::Append)) {
         file.write(QDateTime::currentDateTime().toString("dd/MM/yyyy HH:mm:ss ").toUtf8());
         if (!session.isEmpty()) {

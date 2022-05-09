@@ -1,6 +1,7 @@
 #include "rawdllop.h"
 #include "configini.h"
 #include "logwriter.h"
+#include "sqlqueries.h"
 #include <QLibrary>
 #include <QElapsedTimer>
 

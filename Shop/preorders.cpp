@@ -3,8 +3,8 @@
 #include "c5config.h"
 #include "ui_preorders.h"
 
-Preorders::Preorders(QWidget *parent) :
-    QDialog(parent),
+Preorders::Preorders() :
+    C5Dialog(__c5config.dbParams()),
     ui(new Ui::Preorders)
 {
     ui->setupUi(this);
@@ -48,4 +48,9 @@ void Preorders::on_btnView_clicked()
     }
     fUUID = ui->tbl->item(ml.at(0).row(), 0)->data(Qt::EditRole).toByteArray();
     accept();
+}
+
+void Preorders::on_btnExit_clicked()
+{
+    reject();
 }

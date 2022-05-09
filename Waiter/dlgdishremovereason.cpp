@@ -4,16 +4,17 @@
 #include "c5config.h"
 #include "c5utils.h"
 #include "c5message.h"
+#include "datadriver.h"
 
 DlgDishRemoveReason::DlgDishRemoveReason(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::DlgDishRemoveReason)
 {
     ui->setupUi(this);
-    foreach (QString s, C5CafeCommon::fDishRemoveReason) {
+    foreach (int id, dbdishremovereason->list()) {
         QListWidgetItem *item = new QListWidgetItem(ui->lst);
         item->setSizeHint(QSize(50, 50));
-        item->setText(s);
+        item->setText(dbdishremovereason->name(id));
         ui->lst->addItem(item);
     }
     QListWidgetItem *item = new QListWidgetItem(ui->lst);

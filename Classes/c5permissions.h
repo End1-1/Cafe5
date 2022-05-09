@@ -100,11 +100,9 @@
 #define cp_t5_present 534
 #define cp_t5_edit_booking 535
 #define cp_t5_view_tax_and_no_sales 536
-#define cp_t5_view_sales_of_all_users 537
-
-
 #define cp_t5_pay_idram 537
 #define cp_t5_pay_payx 538
+#define cp_t5_view_sales_of_all_users 539
 
 #define cp_t6_goods_menu 600
 #define cp_t6_units 601

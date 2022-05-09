@@ -4,12 +4,12 @@
 #include "storemanager.h"
 #include "shopmanager.h"
 #include "printreceiptgroup.h"
+#include "logwriter.h"
+#include "commandline.h"
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QSettings>
 #include <QApplication>
-
-static const QSettings s("shopini.ini", QSettings::IniFormat);
 
 void routes(QStringList &r)
 {
@@ -21,8 +21,13 @@ void routes(QStringList &r)
 bool shoprequest(const QByteArray &indata, QByteArray &outdata, const QHash<QString, DataAddress> &dataMap, const ContentType &contentType)
 {
     //VALIDATION
-    StoreManager::init(qApp->applicationDirPath() + "/handlers/shop.ini");
-    ShopManager::init(qApp->applicationDirPath() + "/handlers/shop.ini");
+    CommandLine cl;
+    QString path;
+    cl.value("path", path);
+    QString configFile = path + "/handlers/shop.ini";
+
+    StoreManager::init(configFile);
+    ShopManager::init(configFile);
     RequestHandler rh(outdata);
     rh.fContentType = contentType;
     QJsonObject fOrderJson;
@@ -31,18 +36,22 @@ bool shoprequest(const QByteArray &indata, QByteArray &outdata, const QHash<QStr
         if (!validateApplicationJson(rh, fOrderJson, indata, dataMap)) {
             return false;
         }
+        break;
     default:
         if (!validateMultipartFormData(rh, fOrderJson, indata, dataMap)) {
             return false;
         }
+        break;
     }
     //PROCESS
     JsonHandler jh;
     Database db;
-    if (!db.open("shop.ini")) {
+    if (!db.open(configFile)) {
+        LogWriter::write(LogWriterLevel::errors, "", QString("ElinaShop::shoprequest").arg(db.lastDbError()));
         jh["message"] = "Cannot connect to database";
         return rh.setInternalServerError(jh.toString());
     }
+    QSettings s(configFile, QSettings::IniFormat);
     int hall = s.value("shop/hall").toInt();
     int table = s.value("shop/table").toInt();
 
@@ -59,6 +68,7 @@ bool shoprequest(const QByteArray &indata, QByteArray &outdata, const QHash<QStr
         db.update("h_halls", "f_id", hall);
     } else {
         rh.setInternalServerError(db.lastDbError());
+        LogWriter::write(LogWriterLevel::errors, "", "ElinaShop::shoprequest. " + db.lastDbError());
         db.rollback();
         return false;
     }
@@ -131,6 +141,7 @@ bool shoprequest(const QByteArray &indata, QByteArray &outdata, const QHash<QStr
     db[":f_saletype"] = 1;
     db[":f_partner"] = 0;
     if (!db.insert("o_header")) {
+        LogWriter::write(LogWriterLevel::errors, "", "ElinaShop::requestshop." + db.lastDbError());
         rh.setInternalServerError(db.lastDbError());
         db.rollback();
         return false;
@@ -142,6 +153,7 @@ bool shoprequest(const QByteArray &indata, QByteArray &outdata, const QHash<QStr
     db[":f_4"] = 0;
     db[":f_5"] = 0;
     if (!db.insert("o_header_flags")) {
+        LogWriter::write(LogWriterLevel::errors, "", "ElinaShop::requestshop." + db.lastDbError());
         rh.setInternalServerError(db.lastDbError());
         db.rollback();
         return false;
@@ -155,6 +167,7 @@ bool shoprequest(const QByteArray &indata, QByteArray &outdata, const QHash<QStr
     db[":f_idram"] = amountIDram;
     db[":f_tellcell"] = amountTellCell;
     if (!db.insert("o_payment")) {
+        LogWriter::write(LogWriterLevel::errors, "", "ElinaShop::requestshop." + db.lastDbError());
         rh.setInternalServerError(db.lastDbError());
         db.rollback();
         return false;
@@ -212,6 +225,7 @@ bool shoprequest(const QByteArray &indata, QByteArray &outdata, const QHash<QStr
             db[":f_time"] = time;
             db.insert("o_tax");
         } else {
+            LogWriter::write(LogWriterLevel::warning, "", "ElinaShop::requestshop, taxprint." + err);
             jh["atention"] = err + "<br>" + jsonOut + "<br>" + jsonIn;
         }
     }
@@ -220,6 +234,7 @@ bool shoprequest(const QByteArray &indata, QByteArray &outdata, const QHash<QStr
     db[":f_id"] = s.value("shop/store").toInt();
     db.exec("select f_outcounter + 1  as f_counter from c_storages where f_id=:f_id for update");
     if (!db.next()) {
+        LogWriter::write(LogWriterLevel::errors, "", "ElinaShop::requestshop. Unknown store");
         rh.setInternalServerError("UNKNOWN STORE");
         db.rollback();
         return false;
@@ -272,7 +287,7 @@ bool shoprequest(const QByteArray &indata, QByteArray &outdata, const QHash<QStr
         db[":f_total"] = 0;
         db[":f_reason"] = 4;
         db[":f_base"] = goodsid;
-        db[":f_row"] = o["row"].toInt();
+        db[":f_row"] = o["row"].toInt() + 1;
         db[":f_comment"] = "";
         db.insert("a_store_draft");
 
@@ -365,6 +380,7 @@ bool shoprequest(const QByteArray &indata, QByteArray &outdata, const QHash<QStr
     if (!writeOutput(uuid, err, db)) {
         db.rollback();
         jh["store"] = err;
+        LogWriter::write(LogWriterLevel::errors, "", err);
     }else {
         jh["store"] = "ok";
     }
@@ -434,6 +450,7 @@ bool validateApplicationJson(RequestHandler &rh, QJsonObject &ord, const QByteAr
     if (!message.isEmpty()) {
         JsonHandler jh;
         jh["message"] = message;
+        LogWriter::write(LogWriterLevel::errors, "", "ElinaShop::validatejson." + jh.toString());
         return rh.setDataValidationError(jh.toString());
     }
     return true;
@@ -441,6 +458,12 @@ bool validateApplicationJson(RequestHandler &rh, QJsonObject &ord, const QByteAr
 
 bool writeMovement(const QString &orderid, int goods, double qty, int srcStore, Database &db)
 {
+    CommandLine cl;
+    QString path;
+    cl.value("path", path);
+    QString configFile = path + "/handlers/shop.ini";
+    QSettings s(configFile, QSettings::IniFormat);
+
     db.startTransaction();
     db[":f_id"] = srcStore;
     db.exec("select f_name from c_storages where f_id=:f_id ");
@@ -493,8 +516,8 @@ bool writeMovement(const QString &orderid, int goods, double qty, int srcStore, 
     db[":f_price"] = 0;
     db[":f_total"] = 0;
     db[":f_reason"] = 2;
-    db[":f_base"] = sid1;
-    db[":f_row"] = 1;
+    db[":f_base"] = "";
+    db[":f_row"] = 0;
     db[":f_comment"] = "";
     if (!db.insert("a_store_draft")) {
         db.rollback();
@@ -511,8 +534,8 @@ bool writeMovement(const QString &orderid, int goods, double qty, int srcStore, 
     db[":f_price"] = 0;
     db[":f_total"] = 0;
     db[":f_reason"] = 2;
-    db[":f_base"] = sid2;
-    db[":f_row"] = 1;
+    db[":f_base"] = sid1;
+    db[":f_row"] = 0;
     db[":f_comment"] = "";
     if (!db.insert("a_store_draft")) {
         db.rollback();
@@ -671,7 +694,7 @@ bool writeOutput(const QString &docId, QString &err, Database &db)
     }
     if (err.isEmpty()) {
         QStringList outId;
-        for (QList<QMap<QString, QVariant> >::const_iterator it = queries.begin(); it != queries.end(); it++) {
+        for (QList<QMap<QString, QVariant> >::const_iterator it = queries.constBegin(); it != queries.constEnd(); it++) {
             QString newId = QUuid::createUuid().toString().replace("{", "").replace("}", "");
             outId << newId;
             db.setBindValues(*it);
@@ -756,9 +779,15 @@ bool writeOutput(const QString &docId, QString &err, Database &db)
 
 void checkQty(QJsonObject &ord, const QString &orderid, Database &db)
 {
-    JsonHandler jh;
+    CommandLine cl;
+    QString path;
+    cl.value("path", path);
+    QString configFile = path + "/config.ini";
+    QSettings s(configFile, QSettings::IniFormat);
+
     Database dbsys;
-    if (!db.open("../config.ini")) {
+    if (!dbsys.open(configFile)) {
+        LogWriter::write(LogWriterLevel::errors, "", QString("ElinaShop::checkqty. %1").arg(db.lastDbError()));
         return;
     }
     QMap<QString ,double> qty;
@@ -824,14 +853,18 @@ void checkQty(QJsonObject &ord, const QString &orderid, Database &db)
             }
         }
     }
+    dbsys.close();
 }
 
 bool storerequest(const QByteArray &indata, QByteArray &outdata, const QHash<QString, DataAddress> &dataMap, const ContentType &contentType)
 {
     //VALIDATION
-    qDebug() << qApp->applicationDirPath();
-    StoreManager::init(qApp->applicationDirPath() + "/handlers/shop.ini");
-    ShopManager::init(qApp->applicationDirPath() + "/handlers/shop.ini");
+    CommandLine cl;
+    QString path;
+    cl.value("path", path);
+    QString configFile = path + "/handlers/shop.ini";
+    StoreManager::init(configFile);
+    ShopManager::init(configFile);
     RequestHandler rh(outdata);
     rh.fContentType = contentType;
     QStringList fGoods;
@@ -916,6 +949,7 @@ bool storerequest(const QByteArray &indata, QByteArray &outdata, const QHash<QSt
         jh["data"] = jaStore;
         jh["status"] = gl.count() == 0 ? "empty" : jh["status"].toString().isEmpty() ? "ok" : jh["status"].toString();
     }
+
     return rh.setResponse(HTTP_OK, jh.toString());
 }
 
@@ -974,9 +1008,16 @@ bool printtax(const QByteArray &indata, QByteArray &outdata, const QHash<QString
         return rh.setDataValidationError(err);
     }
 
+    CommandLine cl;
+    QString path;
+    cl.value("path", path);
+    QString configFile = path + "/handlers/shop.ini";
+    QSettings s(configFile, QSettings::IniFormat);
+
     Database db;
     JsonHandler jh;
-    if (!db.open("./shop.ini")) {
+    if (!db.open(configFile)) {
+        jh["message"] = db.lastDbError();
         return rh.setInternalServerError(jh.toString());
     }
     QString sn, firm, address, fiscal, hvhh, rseq, devnum, time;

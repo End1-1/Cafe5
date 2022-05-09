@@ -24,10 +24,6 @@ public:
 
     static QString creditCardName(int id);
 
-    static QStringList fDishRemoveReason;
-
-    static QStringList fDishComments;
-
     static QMap<int, QMap<int, QString> > fHallConfigs;
 
 };

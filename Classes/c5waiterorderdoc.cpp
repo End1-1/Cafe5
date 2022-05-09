@@ -131,8 +131,7 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &db, QString &err)
         return true;
     }
 
-    QString result = fHeader["f_prefix"].toString() + fHeader["f_hallid"].toString();
-    correctHotelID(result, err);
+    //correctHotelID(result, err);
     if (!err.isEmpty()) {
         return false;
     }
@@ -162,6 +161,17 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &db, QString &err)
         dc = "DEBIT";
         sign = -1;
     }
+    db[":f_id"] = fHeader["f_id"].toString();
+    db.exec("select * from o_pay_cl where f_id=:f_id");
+    if (db.nextRow()) {
+        if (db.getInt("f_code") > 0) {
+            clcode = db.getString("f_code");
+            clname = db.getString("f_name");
+            paymentMode = 4;
+            dc = "DEBIT";
+            sign = -1;
+        }
+    }
 
     if (fHeader["f_amountcard"].toString().toDouble() > 0.001) {
         paymentMode = 2;
@@ -173,6 +183,15 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &db, QString &err)
 
     fDD.open(true, doubleDatabase);
     fDD.startTransaction();
+    QString result = fHeader["f_prefix"].toString() + fHeader["f_hallid"].toString();
+    //REmove old
+    fDD[":f_header"] = result;
+    fDD.exec("delete from o_dish where f_header=:f_header");
+    fDD[":f_id"] = result;
+    fDD.exec("delete from o_header where f_id=:f_id");
+    fDD[":f_id"] = result;
+    fDD.exec("delete from m_register where f_id=:f_id");
+
     fDD[":f_id"] = item;
     fDD.exec("select f_en from f_invoice_item where f_id=:f_id");
     if (fDD.nextRow()) {

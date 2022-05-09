@@ -32,6 +32,10 @@ int main(int argc, char *argv[])
         __autologin_store.append(argv[i]);
     }
 
+//    if (QDate::currentDate() > QDate::fromString("01/10/2022", "dd/MM/yyyy")) {
+//        return 1;
+//    }
+
     QList<QByteArray> connectionParams;
     C5Connection::readParams(connectionParams);
     C5Config::fDBHost = connectionParams.at(0);

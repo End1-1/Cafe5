@@ -80,7 +80,7 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
     fHallId = QString("%1%2").arg(headerPrefix).arg( headerId);
     if (!dw.writeOHeader(fHeader, headerId, headerPrefix, ORDER_STATE_CLOSE, __c5config.defaultHall(),
                          __c5config.defaultTable(), fDateOpen, QDate::currentDate(), QDate::currentDate(), fTimeOpen,
-                         QTime::currentTime(), fUser->id(), "", 1, total, (total - card), card, 0, 0,
+                         QTime::currentTime(), fUser->id(), "", 1, total, (total - card), card, prepaid, 0, 0,
                          0, discount,  0, fCardValue, 0, 0, 1, 2, fSaleType, fPartnerCode)) {
         return returnFalse(dw.fErrorMsg, db);
     }

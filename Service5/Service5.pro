@@ -12,8 +12,10 @@ RC_FILE = res.rc
 
 SOURCES += \
     ../Classes/c5crypt.cpp \
+    ../Classes/thread.cpp \
     c5license.cpp \
     raw/rawdllop.cpp \
+    utils/commandline.cpp \
     utils/configini.cpp \
     utils/database.cpp \
     utils/databaseconnectionmanager.cpp \
@@ -43,15 +45,17 @@ SOURCES += \
     socket/sslsocket.cpp \
     handlers/socketdata.cpp \
     socketthread.cpp \
-    thread.cpp \
     threadworker.cpp \
     utils/logwriter.cpp \
-    utils/os.cpp
+    utils/os.cpp \
+    utils/sqlqueries.cpp
 
 HEADERS += \
     ../Classes/c5crypt.h \
+    ../Classes/thread.h \
     c5license.h \
     raw/rawdllop.h \
+    utils/commandline.h \
     utils/configini.h \
     utils/database.h \
     utils/databaseconnectionmanager.h \
@@ -84,10 +88,10 @@ HEADERS += \
     socket/sslsocket.h \
     handlers/socketdata.h \
     socketthread.h \
-    thread.h \
     threadworker.h \
     utils/logwriter.h \
-    utils/os.h
+    utils/os.h \
+    utils/sqlqueries.h
 
 FORMS += \
     ../Cafe5/c5message.ui \
