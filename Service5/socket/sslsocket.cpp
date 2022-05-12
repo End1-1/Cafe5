@@ -9,7 +9,4 @@ SslSocket::SslSocket(QObject *parent) :
 
 SslSocket::~SslSocket()
 {
-#ifdef QT_DEBUG
-    qDebug() << "~SslSocket";
-#endif
 }

@@ -3,7 +3,6 @@
 #include "logwriter.h"
 #include "sqlqueries.h"
 #include <QLibrary>
-#include <QElapsedTimer>
 
 typedef bool (*dllfunc)(const QByteArray &, RawMessage &);
 
@@ -20,8 +19,6 @@ RawDllOp::~RawDllOp()
 
 int RawDllOp::run(const QByteArray &d)
 {
-    QElapsedTimer et;
-    et.start();
     QString dll;
     readString(dll, d);
     QLibrary l(ConfigIni::fAppPath + "/rawhandlers/" + dll + ".dll");
@@ -36,6 +33,5 @@ int RawDllOp::run(const QByteArray &d)
         putUByte(0);
     }
     l.unload();
-    LogWriter::write(LogWriterLevel::verbose, "", QString("RawDllOp: %1 - %2").arg(dll).arg(et.elapsed()));
     return 0;
 }

@@ -782,7 +782,12 @@ update s_app set f_version='69' where f_app='DB';
 alter table o_header add column f_cash decimal(14,2), add column f_change decimal(14,2);
 
 /*  db - 70, 28.04.2022 */
+update s_app set f_version='70' where f_app='DB';
 ALTER TABLE `b_cards_discount` ADD INDEX `idx_bcardsdisc_client` (`f_client` ASC) ;
 alter table op_header add column f_paymentmode tinyint;
 CREATE TABLE SERVER5.queries  (fid INTEGER PRIMARY KEY AUTO_INCREMENT, fkey TINYTEXT, fquery TEXT);
 INSERT INTO SERVER5.queries (fkey, fquery) VALUES ('list_storages', 'select fid, fname from c_storages');
+
+/*  db - 71, 28.04.2022 */
+update s_app set f_version='71' where f_app='DB';
+alter table a_header_store add column f_mobilestore integer;

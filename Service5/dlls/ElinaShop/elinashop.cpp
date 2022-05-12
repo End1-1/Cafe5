@@ -62,9 +62,9 @@ bool shoprequest(const QByteArray &indata, QByteArray &outdata, const QHash<QStr
     db[":f_id"] = hall;
     db.exec("select f_counter + 1 as f_counter, f_prefix from h_halls where f_id=:f_id for update");
     if (db.next()) {
-        hallid = db.integerValue("f_counter");
-        prefix = db.stringValue("f_prefix");
-        db[":f_counter"] = db.integerValue("f_counter");
+        hallid = db.integer("f_counter");
+        prefix = db.string("f_prefix");
+        db[":f_counter"] = db.integer("f_counter");
         db.update("h_halls", "f_id", hall);
     } else {
         rh.setInternalServerError(db.lastDbError());
@@ -239,7 +239,7 @@ bool shoprequest(const QByteArray &indata, QByteArray &outdata, const QHash<QStr
         db.rollback();
         return false;
     }
-    int val = db.integerValue("f_counter");
+    int val = db.integer("f_counter");
     db[":f_id"] = s.value("shop/store").toInt();
     db[":val"] = val;
     db.exec("update c_storages set f_outcounter=:val where f_id=:f_id and f_outcounter <:val");
@@ -469,7 +469,7 @@ bool writeMovement(const QString &orderid, int goods, double qty, int srcStore, 
     db.exec("select f_name from c_storages where f_id=:f_id ");
     QString storename = "unknown";
     if (db.next()) {
-        storename = db.stringValue("f_name");
+        storename = db.string("f_name");
     }
     QString id = QUuid::createUuid().toString().replace("{", "").replace("}", "");
     db[":f_id"] = id;
@@ -571,11 +571,11 @@ bool writeOutput(const QString &docId, QString &err, Database &db)
     db.exec("select h.f_type, h.f_date, hh.f_storein, hh.f_storeout, hh.f_complectation, hh.f_complectationqty"
                " from a_header h inner join a_header_store hh on hh.f_id=h.f_id where h.f_id=:f_id");
     if (db.next()) {
-        date = db.dateValue("f_date");
-        storeIn = db.integerValue("f_storein");
-        storeOut = db.integerValue("f_storeout");
-        docType = db.integerValue("f_type");
-        complectCode = db.integerValue("f_complectation");
+        date = db.date("f_date");
+        storeIn = db.integer("f_storein");
+        storeOut = db.integer("f_storeout");
+        docType = db.integer("f_type");
+        complectCode = db.integer("f_complectation");
         complectQty = db.doubleValue("f_complectationqty");
     } else {
         err += QObject::tr("Invalid document id") + "<br>";
@@ -585,7 +585,7 @@ bool writeOutput(const QString &docId, QString &err, Database &db)
         db[":f_type"] = 1;
         db.exec("select f_id from a_store_draft where f_document=:f_document and f_type=:f_type");
         if (db.next()) {
-            complectId = db.stringValue(0);
+            complectId = db.string(0);
         }
     }
 
@@ -601,11 +601,11 @@ bool writeOutput(const QString &docId, QString &err, Database &db)
                "from a_store_draft s inner join c_goods g on g.f_id=s.f_goods "
                "where f_document=:f_document and f_type=-1");
     while (db.next()) {
-        recID.append(db.stringValue("f_id"));
-        baseID.append(db.stringValue("f_base"));
-        goodsID.append(db.stringValue("f_goods"));
-        goodsName.append(db.stringValue("f_name"));
-        reason = db.integerValue("f_reason");
+        recID.append(db.string("f_id"));
+        baseID.append(db.string("f_base"));
+        goodsID.append(db.string("f_goods"));
+        goodsName.append(db.string("f_name"));
+        reason = db.integer("f_reason");
         qtyList.append(db.doubleValue("f_qty"));
         priceList.append(db.doubleValue("f_price"));
         totalList.append(db.doubleValue("f_total"));
@@ -816,7 +816,7 @@ void checkQty(QJsonObject &ord, const QString &orderid, Database &db)
     QMap<int, int> usersStoreMap;
     dbsys.exec("select * from users_store");
     while (dbsys.next()) {
-        usersStoreMap[dbsys.integerValue("fid")] = dbsys.integerValue("fuser");
+        usersStoreMap[dbsys.integer("fid")] = dbsys.integer("fuser");
     }
     for (const QString &so: storeorder.split(",", QString::SkipEmptyParts)) {
         if (!out.contains(so.toInt())) {
@@ -921,7 +921,7 @@ bool storerequest(const QByteArray &indata, QByteArray &outdata, const QHash<QSt
         if (fGoods.count() > gl.count()) {
             jh["status"] = "partial";
         }
-        for (QMap<QString,double>::const_iterator it = gl.begin(); it != gl.end(); it++) {
+        for (QMap<QString,double>::const_iterator it = gl.constBegin(); it != gl.constEnd(); it++) {
             QJsonObject jo;
             jo["sku"] = it.key();
             jo["qty"] = it.value();
@@ -933,9 +933,9 @@ bool storerequest(const QByteArray &indata, QByteArray &outdata, const QHash<QSt
         QJsonArray jaStore;
         QMap<int, QMap<QString, double> > gl;
         StoreManager::queryQty(fGoods, gl);
-        for (QMap<int, QMap<QString,double> >::const_iterator it = gl.begin(); it != gl.end(); it++) {
+        for (QMap<int, QMap<QString,double> >::const_iterator it = gl.constBegin(); it != gl.constEnd(); it++) {
             QJsonArray jaGoods;
-            for (QMap<QString, double>::const_iterator it2 = it.value().begin(); it2 != it.value().end(); it2++) {
+            for (QMap<QString, double>::const_iterator it2 = it.value().constBegin(); it2 != it.value().constEnd(); it2++) {
                 QJsonObject jo;
                 jo["sku"] = it2.key();
                 jo["qty"] = it2.value();
@@ -1038,9 +1038,9 @@ bool printtax(const QByteArray &indata, QByteArray &outdata, const QHash<QString
     while(db.next()) {
         amountTotal += db.doubleValue("f_price") * db.doubleValue("f_qty");
         pt.addGoods(s.value("shop/taxdep").toString(), //dep
-                    db.stringValue("f_adgcode"), //adg
-                    db.stringValue("f_scancode"), //goods id
-                    db.stringValue("f_name"), //name
+                    db.string("f_adgcode"), //adg
+                    db.string("f_scancode"), //goods id
+                    db.string("f_name"), //name
                     db.doubleValue("f_price"), //price
                     db.doubleValue("f_qty"), //qty
                     0); //discount

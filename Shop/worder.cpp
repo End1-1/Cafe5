@@ -936,12 +936,12 @@ void WOrder::on_leCode_returnPressed()
     }
 
 
-    if (code.mid(0, 2) == "23") {
+    if (code.mid(0, 2) == "23" || code.mid(0, 2) == "22") {
         if (code.length() != 13) {
             addGoods(id);
             return;
         }
-        QString code2 = QString("%1").arg(code.mid(2, 5).toInt());
+        QString code2 = QString("%1").arg(code.midRef(2, 5).toInt());
         QString qtyStr = code.mid(7,5);
         int id2 = dbgoods->idOfScancode(code2);
         if (id2 > 0) {

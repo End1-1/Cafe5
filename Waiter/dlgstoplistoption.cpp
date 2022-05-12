@@ -50,31 +50,46 @@ void DlgStopListOption::handlePrintStopList(const QJsonObject &obj)
         if (C5Menu::fStopList.isEmpty()) {
             return;
         }
-        QFont font(qApp->font());
-        font.setPointSize(20);
-        C5Printing p;
-        p.setSceneParams(__c5config.getValue(param_print_paper_width).toInt(), 2800, QPrinter::Portrait);
-        p.setFont(font);
-        p.ctext(tr("STOPLIST"));
-        p.br();
-        p.ctext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
-        p.br();
-        p.br();
-        p.line();
-        p.br(2);
-        p.line();
-        p.br();
-        for (QMap<int, double>::const_iterator it = C5Menu::fStopList.begin(); it != C5Menu::fStopList.end(); it++) {
-            p.ltext(dbdish->name(it.key()), 0);
-            p.rtext(float_str(it.value(), 2));
+
+        QList<int> menu = dbmenu->list();
+        QMap<QString, QList<int> > printList;
+        for (int id: qAsConst(menu)) {
+            if (C5Menu::fStopList.contains(dbmenu->dishid(id))) {
+                printList[dbmenu->print1(id)].append(dbmenu->dishid(id));
+            }
+        }
+
+        for (QMap<QString, QList<int> >::const_iterator sq = printList.constBegin(); sq != printList.constEnd(); sq++) {
+            QFont font(qApp->font());
+            font.setPointSize(20);
+            C5Printing p;
+            p.setSceneParams(__c5config.getValue(param_print_paper_width).toInt(), 2800, QPrinter::Portrait);
+            p.setFont(font);
+            p.ctext(tr("STOPLIST"));
+            p.br();
+            p.ctext(sq.key());
+            p.br();
+            p.ctext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
+            p.br();
             p.br();
             p.line();
+            p.br(2);
+            p.line();
             p.br();
+            for (QMap<int, double>::const_iterator it = C5Menu::fStopList.constBegin(); it != C5Menu::fStopList.constEnd(); it++) {
+                if (sq.value().contains(it.key())) {
+                    p.ltext(dbdish->name(it.key()), 0);
+                    p.rtext(float_str(it.value(), 2));
+                    p.br();
+                    p.line();
+                    p.br();
+                }
+            }
+            p.br();
+            p.ltext(".", 0);
+            p.br();
+            p.print(__c5config.localReceiptPrinter(),  QPrinter::Custom);
         }
-        p.br();
-        p.ltext(".", 0);
-        p.br();
-        p.print(__c5config.localReceiptPrinter(),  QPrinter::Custom);
     } else {
         C5Message::error(obj["msg"].toString());
     }

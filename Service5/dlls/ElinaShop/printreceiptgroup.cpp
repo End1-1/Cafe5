@@ -34,7 +34,7 @@ void PrintReceiptGroup::print(const QString &id, Database &db, int rw)
     }
     QString hallid = db.string("f_hallid");
     QString pref = db.string("f_prefix");
-    int partner = db.integerValue("f_partner");
+    int partner = db.integer("f_partner");
     double amountTotal = db.doubleValue("f_amounttotal");
     double amountCash = db.doubleValue("f_amountcash");
     double amountCard = db.doubleValue("f_amountcard");
@@ -265,7 +265,7 @@ void PrintReceiptGroup::print2(const QString &id, Database &db, const QString &p
     }
     QString hallid = db.string("f_hallid");
     QString pref = db.string("f_prefix");
-    int partner = db.integerValue("f_partner");
+    int partner = db.integer("f_partner");
     double amountTotal = db.doubleValue("f_amounttotal");
     double amountCash = db.doubleValue("f_amountcash");
     double amountCard = db.doubleValue("f_amountcard");

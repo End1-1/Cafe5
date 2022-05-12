@@ -36,7 +36,7 @@ public:
     inline QString string(const QString &columnName) {return value(columnName).toString(); }
     inline int integer(const QString &columnName) {return value(columnName).toInt(); }
     inline double doubleValue(const QString &columnName) {return value(columnName).toDouble(); }
-    inline QDate dateValue(const QString &columnName) {return value(columnName).toDate(); }
+    inline QDate date(const QString &columnName) {return value(columnName).toDate(); }
     inline QDateTime dateTimeValue(const QString &columnName) {return value(columnName).toDateTime(); }
     QString uuid();
     void setBindValues(const QMap<QString, QVariant> &v);

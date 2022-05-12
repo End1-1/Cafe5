@@ -16,7 +16,6 @@ GTranslator::GTranslator()
         }
         f.close();
     }
-    fInstance = this;
 }
 
 QString GTranslator::translate(const QString &key) const
@@ -26,4 +25,12 @@ QString GTranslator::translate(const QString &key) const
     } else {
         return "translate_me_" + key;
     }
+}
+
+GTranslator *GTranslator::instance()
+{
+    if (!fInstance) {
+        fInstance = new GTranslator();
+    }
+    return fInstance;
 }

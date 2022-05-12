@@ -10,7 +10,7 @@ Thread::Thread(const QString &n) :
 
 Thread::~Thread()
 {
-    qDebug() << "~Thread()" << fName;
+    //qDebug() << "~Thread()" << fName;
 }
 
 void Thread::quit()

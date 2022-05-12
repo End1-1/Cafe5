@@ -21,6 +21,7 @@ SOURCES += \
     ../../utils/gtranslator.cpp \
     ../../utils/jsonhandler.cpp \
     ../../utils/logwriter.cpp \
+    ../../utils/storemovement.cpp \
     elinashop.cpp \
     printreceiptgroup.cpp \
     shopmanager.cpp \
@@ -38,6 +39,7 @@ HEADERS += \
     ../../utils/gtranslator.h \
     ../../utils/jsonhandler.h \
     ../../utils/logwriter.h \
+    ../../utils/storemovement.h \
     elinashop.h \
     printreceiptgroup.h \
     shopmanager.h \

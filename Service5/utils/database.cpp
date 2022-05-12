@@ -26,7 +26,7 @@ Database::Database(const QString &driverName)
     fDatabaseDriver = driverName;
     QMutexLocker ml(&fMutex);
     fDatabaseNumber = QString::number(++fDatabaseCounter);
-    LogWriter::write(LogWriterLevel::special, "", QString("DB constructor %1").arg(fDatabaseNumber));
+    //LogWriter::write(LogWriterLevel::special, "", QString("DB constructor %1").arg(fDatabaseNumber));
 }
 
 Database::~Database()
@@ -38,7 +38,7 @@ Database::~Database()
     fSqlDatabase.close();
     fSqlDatabase = QSqlDatabase::addDatabase(fDatabaseDriver);
     QSqlDatabase::removeDatabase(fDatabaseNumber);
-    LogWriter::write(LogWriterLevel::special, "", QString("DB destructor %1").arg(fDatabaseNumber));
+    //LogWriter::write(LogWriterLevel::special, "", QString("DB destructor %1").arg(fDatabaseNumber));
 }
 
 bool Database::open(const QString &configFile)

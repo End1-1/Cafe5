@@ -201,7 +201,11 @@ void CR5Goods::exportToScales()
     f.open(QIODevice::WriteOnly);
     f.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
     f.write("<NewDataSet>\r\n");
-    db.exec("select f_scancode, f_name, f_saleprice, f_wholenumber from c_goods where f_enabled=1 and length(f_scancode) between 1 and 5 ");
+    QString sql ="select f_scancode, f_name, f_saleprice, f_wholenumber from c_goods where f_enabled=1 and length(f_scancode) between 1 and 5 ";
+    if (static_cast<CR5GoodsFilter*>(fFilterWidget)->group().isEmpty() == false) {
+        sql += " and f_group=" + static_cast<CR5GoodsFilter*>(fFilterWidget)->group();
+    }
+    db.exec(sql);
     while (db.nextRow()) {
         f.write("<Report>\r\n");
         f.write(QString("<CodeSort>%1</CodeSort>").arg(db.getString(0)).toUtf8());

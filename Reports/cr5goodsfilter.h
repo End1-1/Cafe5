@@ -18,6 +18,8 @@ public:
 
     virtual QString condition();
 
+    QString group();
+
 private:
     Ui::CR5GoodsFilter *ui;
 

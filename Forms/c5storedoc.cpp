@@ -811,7 +811,7 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
         return true;
     }
 
-    if (ui->leDocNum->isEmpty()) {
+    if (ui->leDocNum->isEmpty() || (!ui->leDocNum->text().isEmpty() && ui->leDocNum->text().toInt() < 1)) {
         setUserId(true, 0);
         ui->leDocNum->setText(ui->leDocNum->placeholderText());
     } else {
@@ -985,7 +985,7 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
 
 void C5StoreDoc::setUserId(bool withUpdate, int value)
 {
-    if (!ui->leDocNum->text().isEmpty()) {
+    if (!ui->leDocNum->text().isEmpty() && ui->leDocNum->text().toInt() > 0) {
         return;
     }
     int storeId = 0;

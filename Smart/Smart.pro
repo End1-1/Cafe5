@@ -101,9 +101,11 @@ SOURCES += \
     ../DbData/dbbodystate.cpp \
     ../DbData/dbcar.cpp \
     ../DbData/dbdata.cpp \
+    ../DbData/dbdishcomments.cpp \
     ../DbData/dbdishes.cpp \
     ../DbData/dbdishpart1.cpp \
     ../DbData/dbdishpart2.cpp \
+    ../DbData/dbdishremovereason.cpp \
     ../DbData/dbdishspecial.cpp \
     ../DbData/dbgoods.cpp \
     ../DbData/dbgoodsgroup.cpp \
@@ -123,6 +125,7 @@ SOURCES += \
     ../DbData/dbunit.cpp \
     ../DbData/dbusers.cpp \
     ../Forms/change.cpp \
+    ../Forms/customerinfo.cpp \
     ../Forms/dlgqty.cpp \
     ../Forms/touchdlgphonenumber.cpp \
     ../Forms/touchentertaxreceiptnumber.cpp \
@@ -221,9 +224,11 @@ HEADERS += \
     ../DbData/dbbodystate.h \
     ../DbData/dbcar.h \
     ../DbData/dbdata.h \
+    ../DbData/dbdishcomments.h \
     ../DbData/dbdishes.h \
     ../DbData/dbdishpart1.h \
     ../DbData/dbdishpart2.h \
+    ../DbData/dbdishremovereason.h \
     ../DbData/dbdishspecial.h \
     ../DbData/dbgoods.h \
     ../DbData/dbgoodsgroup.h \
@@ -243,6 +248,7 @@ HEADERS += \
     ../DbData/dbunit.h \
     ../DbData/dbusers.h \
     ../Forms/change.h \
+    ../Forms/customerinfo.h \
     ../Forms/dlgqty.h \
     ../Forms/touchdlgphonenumber.h \
     ../Forms/touchentertaxreceiptnumber.h \
@@ -281,6 +287,7 @@ FORMS += \
     ../Classes/notificationwidget.ui \
     ../Classes/rkeyboard.ui \
     ../Forms/change.ui \
+    ../Forms/customerinfo.ui \
     ../Forms/dlgqty.ui \
     ../Forms/touchdlgphonenumber.ui \
     ../Forms/touchentertaxreceiptnumber.ui \

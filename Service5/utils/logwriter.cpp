@@ -33,7 +33,6 @@ void LogWriter::writeToFile(const QString &fileName, const QString &session, con
     QString fnpath = QString("%1/%2/%3/Logs").arg(QDir::tempPath(), _APPLICATION_,_MODULE_);
     QString fn = fnpath + QString("/%4_%5.log").arg(QDate::currentDate().toString("dd_MM_yyyy"), fileName);
     QDir().mkpath(QDir().absoluteFilePath(fnpath));
-    qDebug() << fn;
     QFile file(fn);
     if (file.open(QIODevice::Append)) {
         file.write(QDateTime::currentDateTime().toString("dd/MM/yyyy HH:mm:ss ").toUtf8());

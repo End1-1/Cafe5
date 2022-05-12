@@ -20,6 +20,7 @@
 #include "change.h"
 #include "menudialog.h"
 #include "QRCodeGenerator.h"
+#include "customerinfo.h"
 #include "thread.h"
 #include <QScrollBar>
 #include <QInputDialog>
@@ -586,9 +587,23 @@ void Workspace::on_leReadCode_returnPressed()
 
 void Workspace::on_btnCostumer_clicked()
 {
-    QString phone;
-    if (TouchDlgPhoneNumber::getPhoneNumber(phone)) {
-        setCustomerPhoneNumber(phone);
+//    QString phone;
+//    if (TouchDlgPhoneNumber::getPhoneNumber(phone)) {
+//        setCustomerPhoneNumber(phone);
+//    }
+    if (ui->lbCostumerPhone->isVisible()) {
+        if (C5Message::question(tr("Confirm to remove customer informaion")) == QDialog::Accepted) {
+            fCustomer = 0;
+            ui->lbCostumerPhone->setVisible(false);
+            return;
+        }
+    }
+    QString phone, address, name;
+    int id;
+    if (CustomerInfo::getCustomer(id, name, phone, address)) {
+        fCustomer = id;
+        ui->lbCostumerPhone->setText(QString("%1\r\n%2\r\n%3").arg(phone, name, address));
+        ui->lbCostumerPhone->setVisible(true);
     }
 }
 
@@ -808,11 +823,13 @@ void Workspace::saveOrder()
     }
     db.startTransaction();
     C5StoreDraftWriter dw(db);
-    if (!dw.writeOHeader(fOrderUuid, hallid.toInt(), prefix, ORDER_STATE_CLOSE,  __c5config.defaultHall(), fSupplierId,
+    if (!dw.writeOHeader(fOrderUuid,
+                         hallid.toInt(), prefix, ORDER_STATE_CLOSE,
+                         __c5config.defaultHall(), fSupplierId,
                          QDate::currentDate(), QDate::currentDate(), dateCash,
                          QTime::currentTime(), QTime::currentTime(),
                          fUser->id(), fPhone, 1,
-                         ui->leTotal->getDouble(), ui->leTotal->getDouble(), 0, 0, 0,
+                         ui->leTotal->getDouble(), ui->leTotal->getDouble(), 0, 0, 0, 0,
                          0, fDiscountAmount, 0, fDiscountValue,
                          0, 0, 1, 1, 1, fCustomer)) {
         C5Message::error(dw.fErrorMsg);
@@ -844,19 +861,7 @@ void Workspace::saveOrder()
 //            }
 
     }
-    if (ui->lbCostumerPhone->text().isEmpty() == false) {
-        int partner;
-        db[":f_phone"] = ui->lbCostumerPhone->text();
-        db.exec("select * from c_partners where f_phone=:f_phone");
-        if (db.nextRow()) {
-            partner = db.getInt("f_id");
-        } else {
-            db[":f_phone"] = ui->lbCostumerPhone->text();
-            partner = db.insert("c_partners");
-        }
-        db[":f_partner"] = partner;
-        db.update("o_header", "f_id", fOrderUuid);
-    }
+
 
 //    QString err;
 //    if (!dw.writeFromShopOutput(id, DOC_STATE_SAVED, err)) {
@@ -864,6 +869,10 @@ void Workspace::saveOrder()
 //        db.rollback();
 //        return;
 //    }
+
+    QString err;
+    C5WaiterOrderDoc doc(fOrderUuid, db);
+    doc.makeOutputOfStore(db, err, DOC_STATE_SAVED);
     db.commit();
 
     QSet<QString> prn;

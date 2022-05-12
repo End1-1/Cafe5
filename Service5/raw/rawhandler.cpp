@@ -36,6 +36,8 @@ int RawHandler::run(quint32 msgNum, quint32 msgId, qint16 msgType, const QByteAr
     fMsgId = msgId;
     fMsgType = msgType;
 
+    QElapsedTimer et;
+    et.start();
     Raw *r = nullptr;
     switch (fMsgType) {
     case MessageList::hello:
@@ -78,5 +80,6 @@ int RawHandler::run(quint32 msgNum, quint32 msgId, qint16 msgType, const QByteAr
     r->setHeader(fMsgNum, fMsgId, fMsgType);
     emit writeToSocket(r->data());
     r->deleteLater();
+    qDebug() << "MsgType" << fMsgType << "Time" << et.elapsed();
     return result;
 }

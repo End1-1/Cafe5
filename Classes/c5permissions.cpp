@@ -23,6 +23,8 @@ void C5Permissions::init(C5Database &db, int group)
               << cp_t1_login_to_manager
               << cp_t1_login_to_waiter
               << cp_t1_goods_pricing
+              << cp_t1_allow_change_cash_doc_date
+              << cp_t1_allow_change_store_doc_date
 
               << cp_t2_action
               << cp_t2_store_input

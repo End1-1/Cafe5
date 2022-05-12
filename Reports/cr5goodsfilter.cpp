@@ -59,6 +59,11 @@ QString CR5GoodsFilter::condition()
     return w;
 }
 
+QString CR5GoodsFilter::group()
+{
+    return ui->leGroup->text();
+}
+
 void CR5GoodsFilter::addCond(QString &w, const QString &cond)
 {
     if (w.isEmpty()) {

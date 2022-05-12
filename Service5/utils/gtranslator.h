@@ -3,13 +3,14 @@
 
 #include <QHash>
 
-#define gr(k) GTranslator::fInstance->translate(k)
+#define gr(k) GTranslator::instance()->translate(k)
 
 class GTranslator
 {
 public:
     GTranslator(); 
     QString translate(const QString &key) const;
+    static GTranslator *instance();
 
 private:
     QHash<QString, QString> fTranslations;

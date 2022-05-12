@@ -27,9 +27,9 @@ void StoreManager::init(const QString &databaseName)
     }
     db.exec("select f_id, f_name, f_scancode from c_goods");
     while (db.next()) {
-        fInstance->fSkuCodeMap.insert(db.stringValue("f_scancode"), db.integerValue("f_id"));
-        fInstance->fCodeSkuMap.insert(db.integerValue("f_id"), db.stringValue("f_scancode"));
-        fInstance->fSkuNameMap.insert(db.stringValue("f_scancode"), db.stringValue("f_name"));
+        fInstance->fSkuCodeMap.insert(db.string("f_scancode"), db.integer("f_id"));
+        fInstance->fCodeSkuMap.insert(db.integer("f_id"), db.string("f_scancode"));
+        fInstance->fSkuNameMap.insert(db.string("f_scancode"), db.string("f_name"));
     }
 }
 
@@ -73,7 +73,7 @@ int StoreManager::queryQty(int store, const QStringList &sku, QMap<QString, doub
     db.exec(sql);
     LogWriter::write(LogWriterLevel::verbose, "", sql);
     while (db.next()) {
-        out.insert(fInstance->fCodeSkuMap.value(db.integerValue("f_goods")), db.doubleValue("f_qty"));
+        out.insert(fInstance->fCodeSkuMap.value(db.integer("f_goods")), db.doubleValue("f_qty"));
     }
     sql = "select f_goods, sum(f_qty) as f_qty from a_store_reserve where f_state=1 and f_enddate>=current_date %store group by 1";
     if (store == 0) {
@@ -84,8 +84,8 @@ int StoreManager::queryQty(int store, const QStringList &sku, QMap<QString, doub
     }
     db.exec(sql);
     while (db.next()) {
-        if (out.contains(fInstance->fCodeSkuMap.value(db.integerValue("f_goods")))) {
-            out[fInstance->fCodeSkuMap.value(db.integerValue("f_goods"))] = out[fInstance->fCodeSkuMap.value(db.integerValue("f_goods"))] - db.doubleValue("f_qty");
+        if (out.contains(fInstance->fCodeSkuMap.value(db.integer("f_goods")))) {
+            out[fInstance->fCodeSkuMap.value(db.integer("f_goods"))] = out[fInstance->fCodeSkuMap.value(db.integer("f_goods"))] - db.doubleValue("f_qty");
         }
     }
     return out.count();
@@ -120,13 +120,13 @@ int StoreManager::queryQty(const QStringList &sku, QMap<int, QMap<QString, doubl
     db.exec(sql);
     LogWriter::write(LogWriterLevel::verbose, "", sql);
     while (db.next()) {
-        out[db.integerValue("f_store")].insert(fInstance->fCodeSkuMap.value(db.integerValue("f_goods")), db.doubleValue("f_qty"));
+        out[db.integer("f_store")].insert(fInstance->fCodeSkuMap.value(db.integer("f_goods")), db.doubleValue("f_qty"));
     }
     db.exec("select f_store, f_goods, sum(f_qty) as f_qty from a_store_reserve where f_state=1 and f_enddate>=current_date group by 1, 2");
     while (db.next()) {
-        if (out.contains(db.integerValue("f_store"))) {
-            if (out[db.integerValue("f_store")].contains(fInstance->fCodeSkuMap.value(db.integerValue("f_goods")))) {
-                out[db.integerValue("f_store")][fInstance->fCodeSkuMap.value(db.integerValue("f_goods"))] = out[db.integerValue("f_store")][fInstance->fCodeSkuMap.value(db.integerValue("f_goods"))] - db.doubleValue("f_qty");
+        if (out.contains(db.integer("f_store"))) {
+            if (out[db.integer("f_store")].contains(fInstance->fCodeSkuMap.value(db.integer("f_goods")))) {
+                out[db.integer("f_store")][fInstance->fCodeSkuMap.value(db.integer("f_goods"))] = out[db.integer("f_store")][fInstance->fCodeSkuMap.value(db.integer("f_goods"))] - db.doubleValue("f_qty");
             }
         }
     }

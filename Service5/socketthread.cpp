@@ -22,7 +22,7 @@ SocketThread::SocketThread(int handle, const QSslCertificate &cert, const QSslKe
 
 SocketThread::~SocketThread()
 {
-    qDebug() << "~SocketThread()";
+    //qDebug() << "~SocketThread()";
     Raw::removeSocket(fSslSocket);
     fSslSocket->disconnectFromHost();
     delete fSslSocket;

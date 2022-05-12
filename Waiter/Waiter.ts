@@ -979,47 +979,42 @@
         <translation>Ելք ըստ վաճառքի</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="211"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="213"/>
         <source>No hall with id</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="255"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="257"/>
         <source>Error in store document, partial data was lost</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="271"/>
-        <source>Empty store document</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="304"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="306"/>
         <source>Error in cash document, partial data was lost</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="314"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="316"/>
         <source>Empty cash document</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="398"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="400"/>
         <source>Document not exists</source>
         <translation>Փասթաթուղթը նշված համարով չկա</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="895"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="900"/>
         <source>Invalid document id</source>
         <translation>Փասթաթուղթը նշված համարով չկա</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="1024"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="1029"/>
         <source>Not enough materials in the store</source>
         <translation>Բաղասական քանակ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="1123"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="1128"/>
         <source>This order used in next documents</source>
         <translation>Այս պետվերը գրանցված է հետևյալ փասթաթղթերում</translation>
     </message>
@@ -1089,7 +1084,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterorderdoc.cpp" line="346"/>
+        <location filename="../Classes/c5waiterorderdoc.cpp" line="357"/>
         <source>Document saved</source>
         <translation>Պահեստի փասթաթուղթը պահպանված է</translation>
     </message>
@@ -1680,17 +1675,17 @@ MS Excel</source>
         <translation>Դուրգրումով</translation>
     </message>
     <message>
-        <location filename="dlgdishremovereason.cpp" line="21"/>
+        <location filename="dlgdishremovereason.cpp" line="22"/>
         <source>Other</source>
         <translation>Այլ</translation>
     </message>
     <message>
-        <location filename="dlgdishremovereason.cpp" line="53"/>
+        <location filename="dlgdishremovereason.cpp" line="54"/>
         <source>Reason is not selected</source>
         <translation>Պատճառը նշված չէ</translation>
     </message>
     <message>
-        <location filename="dlgdishremovereason.cpp" line="62"/>
+        <location filename="dlgdishremovereason.cpp" line="63"/>
         <source>Void or mistake must be selected</source>
         <translation>Հեռացման պատճառը պետք է նշել</translation>
     </message>
@@ -1867,7 +1862,7 @@ MS Excel</source>
     </message>
     <message>
         <location filename="dlglistofdishcomments.ui" line="27"/>
-        <location filename="dlglistofdishcomments.cpp" line="36"/>
+        <location filename="dlglistofdishcomments.cpp" line="37"/>
         <source>Comment for</source>
         <translation></translation>
     </message>
@@ -2548,62 +2543,62 @@ OTHER</source>
 <context>
     <name>DlgPassword</name>
     <message>
-        <location filename="../Classes/dlgpassword.ui" line="269"/>
+        <location filename="../Classes/dlgpassword.ui" line="283"/>
         <source>8</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/dlgpassword.ui" line="313"/>
+        <location filename="../Classes/dlgpassword.ui" line="327"/>
         <source>0</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/dlgpassword.ui" line="115"/>
+        <location filename="../Classes/dlgpassword.ui" line="129"/>
         <source>1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/dlgpassword.ui" line="137"/>
+        <location filename="../Classes/dlgpassword.ui" line="151"/>
         <source>2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/dlgpassword.ui" line="159"/>
+        <location filename="../Classes/dlgpassword.ui" line="173"/>
         <source>3</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/dlgpassword.ui" line="181"/>
+        <location filename="../Classes/dlgpassword.ui" line="195"/>
         <source>4</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/dlgpassword.ui" line="203"/>
+        <location filename="../Classes/dlgpassword.ui" line="217"/>
         <source>5</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/dlgpassword.ui" line="225"/>
+        <location filename="../Classes/dlgpassword.ui" line="239"/>
         <source>6</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/dlgpassword.ui" line="247"/>
+        <location filename="../Classes/dlgpassword.ui" line="261"/>
         <source>7</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/dlgpassword.ui" line="291"/>
+        <location filename="../Classes/dlgpassword.ui" line="305"/>
         <source>9</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/dlgpassword.ui" line="335"/>
+        <location filename="../Classes/dlgpassword.ui" line="349"/>
         <source>.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/dlgpassword.ui" line="51"/>
+        <location filename="../Classes/dlgpassword.ui" line="62"/>
         <source>TABLE</source>
         <translation>ՍԵՂԱՆ</translation>
     </message>
@@ -2772,87 +2767,87 @@ advance</source>
 <context>
     <name>DlgQty</name>
     <message>
-        <location filename="../Forms/dlgqty.ui" line="20"/>
+        <location filename="../Forms/dlgqty.ui" line="26"/>
         <source>Set quantity</source>
         <translation>Քանակ</translation>
     </message>
     <message>
-        <location filename="../Forms/dlgqty.ui" line="33"/>
+        <location filename="../Forms/dlgqty.ui" line="38"/>
         <source>TABLE</source>
         <translation>ՍԵՂԱՆ</translation>
     </message>
     <message>
-        <location filename="../Forms/dlgqty.ui" line="100"/>
+        <location filename="../Forms/dlgqty.ui" line="105"/>
         <source>1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Forms/dlgqty.ui" line="122"/>
+        <location filename="../Forms/dlgqty.ui" line="127"/>
         <source>2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Forms/dlgqty.ui" line="144"/>
+        <location filename="../Forms/dlgqty.ui" line="149"/>
         <source>3</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Forms/dlgqty.ui" line="166"/>
+        <location filename="../Forms/dlgqty.ui" line="171"/>
         <source>0.5</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Forms/dlgqty.ui" line="188"/>
+        <location filename="../Forms/dlgqty.ui" line="193"/>
         <source>4</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Forms/dlgqty.ui" line="210"/>
+        <location filename="../Forms/dlgqty.ui" line="215"/>
         <source>5</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Forms/dlgqty.ui" line="232"/>
+        <location filename="../Forms/dlgqty.ui" line="237"/>
         <source>6</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Forms/dlgqty.ui" line="254"/>
+        <location filename="../Forms/dlgqty.ui" line="259"/>
         <source>1.5</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Forms/dlgqty.ui" line="276"/>
+        <location filename="../Forms/dlgqty.ui" line="281"/>
         <source>7</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Forms/dlgqty.ui" line="298"/>
+        <location filename="../Forms/dlgqty.ui" line="303"/>
         <source>8</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Forms/dlgqty.ui" line="320"/>
+        <location filename="../Forms/dlgqty.ui" line="325"/>
         <source>9</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Forms/dlgqty.ui" line="342"/>
+        <location filename="../Forms/dlgqty.ui" line="347"/>
         <source>0.33</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Forms/dlgqty.ui" line="364"/>
+        <location filename="../Forms/dlgqty.ui" line="369"/>
         <source>,</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Forms/dlgqty.ui" line="386"/>
+        <location filename="../Forms/dlgqty.ui" line="391"/>
         <source>0</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Forms/dlgqty.ui" line="440"/>
+        <location filename="../Forms/dlgqty.ui" line="445"/>
         <source>0.25</source>
         <translation></translation>
     </message>
@@ -3363,27 +3358,27 @@ advance</source>
         <translation>Հրաժարվել</translation>
     </message>
     <message>
-        <location filename="dlgstoplistoption.cpp" line="16"/>
+        <location filename="dlgstoplistoption.cpp" line="18"/>
         <source>Stoplist editing finished</source>
         <translation>Խմբագրման ավարտ</translation>
     </message>
     <message>
-        <location filename="dlgstoplistoption.cpp" line="18"/>
+        <location filename="dlgstoplistoption.cpp" line="20"/>
         <source>Set stoplist</source>
         <translation>Նշանակել StopList</translation>
     </message>
     <message>
-        <location filename="dlgstoplistoption.cpp" line="32"/>
+        <location filename="dlgstoplistoption.cpp" line="34"/>
         <source>The stoplist was removed</source>
         <translation>StopList-ը հեռացված է</translation>
     </message>
     <message>
-        <location filename="dlgstoplistoption.cpp" line="56"/>
+        <location filename="dlgstoplistoption.cpp" line="68"/>
         <source>STOPLIST</source>
         <translation>STOPLIST</translation>
     </message>
     <message>
-        <location filename="dlgstoplistoption.cpp" line="88"/>
+        <location filename="dlgstoplistoption.cpp" line="105"/>
         <source>Are sure to clear stoplist?</source>
         <translation>Հաստատեք StopList-ի հեռացումը</translation>
     </message>

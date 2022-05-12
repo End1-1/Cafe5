@@ -65,7 +65,9 @@ bool C5StoreDraftWriter::writeFromShopOutput(const QString &doc, int state, QStr
             writeOGoods(i.recId, doc, i.bodyId, i.store, i.goodsId, i.goodsQty, i.goodsPrice, i.goodsTotal, i.tax, 1, i.row, drid, i.discountFactor, i.discountMode, 0, "", 0);
         }
         if (state == DOC_STATE_SAVED) {
-            if (!writeOutput(id, err)) {
+            if (writeOutput(id, err)) {
+                writeAHeader(id, userid, DOC_STATE_SAVED, DOC_TYPE_STORE_OUTPUT, operatorId, docDate, QDate::currentDate(), QTime::currentTime(), 0, 0, comment);
+            } else {
                 haveRelations(id, err, true);
                 writeAHeader(id, userid, DOC_STATE_DRAFT, DOC_TYPE_STORE_OUTPUT, operatorId, docDate, QDate::currentDate(), QTime::currentTime(), 0, 0, comment);
             }
@@ -702,13 +704,15 @@ bool C5StoreDraftWriter::writeOBodyToOGoods(const QString &id, const QString &he
     return true;
 }
 
-bool C5StoreDraftWriter::writeOHeader(QString &id, int hallid, const QString &prefix, int state, int hall, int table,
+bool C5StoreDraftWriter::writeOHeader(QString &id, int hallid, const QString &prefix,
+                                      int state, int hall, int table,
                                       const QDate &dateopen, const QDate &dateclose, const QDate &datecash,
                                       const QTime &timeopen, const QTime &timeclose,
                                       int staff, const QString &comment, int print,
                                       double amountTotal, double amountCash, double amountCard, double amountPrepaid, double amountBank, double amountOther,
                                       double amountService, double amountDiscount, double serviceFactor, double discountFactor,
-                                      int creditCardId, int otherId, int shift, int source, int saletype, int partner)
+                                      int creditCardId, int otherId,
+                                      int shift, int source, int saletype, int partner)
 {
     bool u = true;
     if (id.isEmpty()) {

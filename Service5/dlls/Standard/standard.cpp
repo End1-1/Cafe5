@@ -163,7 +163,7 @@ bool chat(const QByteArray &indata, QByteArray &outdata, const QHash<QString, Da
         rh.setForbiddenError(jh.toString());
         return false;
     }
-    int userid = db.integerValue("fid");
+    int userid = db.integer("fid");
     if (action == "get") {
         QJsonArray ja;
         db[":freceiver"] = userid;
@@ -172,12 +172,12 @@ bool chat(const QByteArray &indata, QByteArray &outdata, const QHash<QString, Da
         QStringList ids;
         while (db.next()) {
             QJsonObject jo;
-            jo["id"] = db.integerValue("fid");
+            jo["id"] = db.integer("fid");
             jo["msgdate"] = db.dateTimeValue("fdateserver").toString("dd/MM/yyyy HH:mm");
-            jo["sender"] = db.integerValue("fsender");
-            jo["message"] = db.stringValue("fmessage");
+            jo["sender"] = db.integer("fsender");
+            jo["message"] = db.string("fmessage");
             ja.append(jo);
-            ids.append(db.stringValue("fid"));
+            ids.append(db.string("fid"));
         }
         if (ids.count() > 0) {
             jh["messages"] = ja;
@@ -197,7 +197,7 @@ bool chat(const QByteArray &indata, QByteArray &outdata, const QHash<QString, Da
             if (!db.next()) {
                 return rh.setInternalServerError("No such user in the map");
             }
-            recipient = db.integerValue("fuser");
+            recipient = db.integer("fuser");
         }
         db[":fdateserver"] = QDateTime::currentDateTime();
         db[":fstate"] = 1;

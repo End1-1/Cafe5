@@ -16,8 +16,10 @@ SOURCES += \
     ../../socket/sslsocket.cpp \
     ../../utils/commandline.cpp \
     ../../utils/database.cpp \
+    ../../utils/gtranslator.cpp \
     ../../utils/logwriter.cpp \
     ../../utils/sqlqueries.cpp \
+    ../../utils/storemovement.cpp \
     ../../utils/tablerecord.cpp \
     rwshop.cpp
 
@@ -28,8 +30,10 @@ HEADERS += \
     ../../socket/sslsocket.h \
     ../../utils/commandline.h \
     ../../utils/database.h \
+    ../../utils/gtranslator.h \
     ../../utils/logwriter.h \
     ../../utils/sqlqueries.h \
+    ../../utils/storemovement.h \
     ../../utils/tablerecord.h \
     rwshop.h
 
