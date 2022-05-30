@@ -521,7 +521,7 @@ void DlgOrder::setButtonsState()
     bool btnPayment = true;
 
     QList<WOrder*> orders = worders();
-    for (WOrder *o: qAsConst(orders)) {
+    for (WOrder *o: orders) {
         for (int i = 0; i < o->fOrderDriver->dishesCount(); i++) {
             if (o->fOrderDriver->dishesValue("f_state", i).toInt() != DISH_STATE_OK) {
                 continue;

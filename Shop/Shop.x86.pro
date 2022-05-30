@@ -161,7 +161,14 @@ SOURCES += \
     ../Classes/c5cache.cpp \
     ../../NewTax/Src/printtaxn.cpp \
     dqty.cpp \
-    ../Controls/c5checkbox.cpp
+    ../Controls/c5checkbox.cpp \
+    ../Service5/raw/rawmessage.cpp \
+    ../Classes/config.cpp \
+    ../Forms/dlgserversettings.cpp \
+    ../Classes/socketconnection.cpp \
+    ../Service5/socket/sslsocket.cpp \
+    ../DbData/dbdishcomments.cpp \
+    ../DbData/dbdishremovereason.cpp
 
 HEADERS += \
     ../../XLSX/src/crs32.h \
@@ -304,7 +311,15 @@ HEADERS += \
     ../Classes/c5cache.h \
     ../../NewTax/Src/printtaxn.h \
     dqty.h \
-    ../Controls/c5checkbox.h
+    ../Controls/c5checkbox.h \
+    ../Service5/raw/messagelist.h \
+    ../Service5/raw/rawmessage.h \
+    ../Classes/config.h \
+    ../Forms/dlgserversettings.h \
+    ../Classes/socketconnection.h \
+    ../Service5/socket/sslsocket.h \
+    ../DbData/dbdishcomments.h \
+    ../DbData/dbdishremovereason.h
 
 FORMS += \
     ../Cafe5/calendar.ui \
@@ -342,13 +357,16 @@ FORMS += \
     worder.ui \
     ../Cafe5/c5connection.ui \
     ../Cafe5/c5message.ui \
-    dqty.ui
+    dqty.ui \
+    ../Forms/dlgserversettings.ui
 
 DEFINES += _DBDRIVER_=\\\"QMYSQL\\\"
 DEFINES += _ORGANIZATION_=\\\"Hotelicca\\\"
 DEFINES += _APPLICATION_=\\\"Shop\\\"
 DEFINES += _MODULE_=\\\"Shop\\\"
 DEFINES += SHOP
+DEFINES += _CRYPT_KEY_=\\\"shop2022!!!\\\"
+DEFINES += WAITER
 
 INCLUDEPATH += ../Cafe5
 INCLUDEPATH += ../Classes
@@ -358,6 +376,8 @@ INCLUDEPATH += ../DbData
 INCLUDEPATH += ../Forms
 INCLUDEPATH += ../Service
 INCLUDEPATH += ../Service5
+INCLUDEPATH += ../Service5/raw
+INCLUDEPATH += ../Service5/socket
 INCLUDEPATH += ../RESOURCES
 INCLUDEPATH += ../../XLSX/Src
 INCLUDEPATH += C:/Projects/NewTax/Src

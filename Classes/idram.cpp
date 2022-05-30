@@ -56,7 +56,7 @@ bool Idram::check(const QString &server, const QString &sessionid, const QString
     QJsonObject jo = jdoc.object();
     QJsonArray ja = jo["Result"].toArray();
     if (ja.count() > 0) {
-        QString DEBIT = ja.at(0)["DEBIT"].toString();
+        QString DEBIT = ja.at(0).toObject()["DEBIT"].toString();
         DEBIT.replace(",", "");
         amount = DEBIT.toDouble();
         return true;

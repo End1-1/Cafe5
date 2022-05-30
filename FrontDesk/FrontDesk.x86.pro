@@ -290,7 +290,9 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Forms/dlgsetwaiterordercl.cpp \
     ../Classes/dataonline.cpp \
     ../Forms/dlgdataonline.cpp \
-    ../Forms/dlgnewcl.cpp
+    ../Forms/dlgnewcl.cpp \
+    ../DbData/dbdishcomments.cpp \
+    ../DbData/dbdishremovereason.cpp
 
 HEADERS += ../Cafe5/c5cafecommon.h \
     ../../NewTax/Src/printtaxn.h \
@@ -559,7 +561,9 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Forms/dlgsetwaiterordercl.h \
     ../Classes/dataonline.h \
     ../Forms/dlgdataonline.h \
-    ../Forms/dlgnewcl.h
+    ../Forms/dlgnewcl.h \
+    ../DbData/dbdishcomments.h \
+    ../DbData/dbdishremovereason.h
 
 FORMS += \
     ../Classes/calculator.ui \

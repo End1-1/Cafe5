@@ -53,7 +53,7 @@ void DlgStopListOption::handlePrintStopList(const QJsonObject &obj)
 
         QList<int> menu = dbmenu->list();
         QMap<QString, QList<int> > printList;
-        for (int id: qAsConst(menu)) {
+        for (int id: menu) {
             if (C5Menu::fStopList.contains(dbmenu->dishid(id))) {
                 printList[dbmenu->print1(id)].append(dbmenu->dishid(id));
             }
