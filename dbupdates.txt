@@ -469,7 +469,7 @@ update s_app set f_version ='28' where f_app='DB';
 create table c_goods_option (f_id integer primary key , f_flaguncomplectfrom integer, f_uncomplectfromqty decimal(14,4));
 
 ALTER TABLE `c_goods_complectation` ADD INDEX `fk_goods_complectation_1_idx` (`f_base` ASC) , ADD INDEX `fk_goods_complectation_2_idx` (`f_goods` ASC) ;
-ALTER TABLE `c_goods_complectation` ADD CONSTRAINT `fk_goods_complectation_1`  FOREIGN KEY (`f_base`)  REFERENCES `cafe5`.`c_goods` (`f_id`)  ON DELETE NO ACTION  ON UPDATE NO ACTION,
+ALTER TABLE `c_goods_complectation` ADD CONSTRAINT `fk_goods_complectation_1`  FOREIGN KEY (`f_base`)  REFERENCES `c_goods` (`f_id`)  ON DELETE NO ACTION  ON UPDATE NO ACTION,
 ADD CONSTRAINT `fk_goods_complectation_2`  FOREIGN KEY (`f_goods`)  REFERENCES `c_goods` (`f_id`)  ON DELETE NO ACTION  ON UPDATE NO ACTION;
 
 /* db - 29 */
@@ -672,7 +672,7 @@ alter table a_store_reserve add column f_enddate date after f_time;
 update s_app set f_version='55' where f_app='DB';
 alter table c_goods add column f_storeinputbeforesale tinyint;
 create table a_store_sale (f_store integer, f_goods integer, f_qty decimal(14,3), f_qtyreserve decimal(14,3), f_qtyprogram decimal(14,3));
-ALTER TABLE `a_store_sale` ADD INDEX `idx_store_goods` (`f_goods` ASC, `f_store` ASC) VISIBLE;
+ALTER TABLE `a_store_sale` ADD INDEX `idx_store_goods` (`f_goods` ASC, `f_store` ASC) ;
 insert into a_store_reserve_state (f_id, f_name) values (4, 'Ժամկետնանց');
 create table airlog.sqllog (fid integer primary key auto_increment, fop tinyint, fsql text, felapsedtime integer, fcompname tinytext);
 ALTER TABLE `o_body_state` CHANGE COLUMN `f_id` `f_id` SMALLINT NOT NULL ;
