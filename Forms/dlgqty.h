@@ -51,9 +51,11 @@ private slots:
 
     void on_btn025_clicked();
 
-    void on_pushButton_11_clicked();
+    void on_leQty_returnPressed();
 
-    void on_pushButton_12_clicked();
+    void on_btnCancel_clicked();
+
+    void on_btnOk_clicked();
 
 private:
     Ui::DlgQty *ui;

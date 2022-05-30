@@ -31,6 +31,8 @@ private slots:
 
     void on_btnScalePath_clicked();
 
+    void on_btnTestScaleODBCString_clicked();
+
 private:
     Ui::C5SettingsWidget *ui;
 

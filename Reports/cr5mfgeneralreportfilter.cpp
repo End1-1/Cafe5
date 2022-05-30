@@ -8,7 +8,7 @@ CR5MFGeneralReportFilter::CR5MFGeneralReportFilter(const QStringList &dbParams, 
 {
     ui->setupUi(this);
     ui->leProduct->setSelector(dbParams, ui->leProducName, cache_mf_products);
-    ui->leProcess->setSelector(dbParams, ui->leProcess, cache_mf_actions);
+    ui->leProcess->setSelector(dbParams, ui->leProcessName, cache_mf_actions);
     ui->lePosition->setSelector(dbParams, ui->lePositionName, cache_users_groups);
     ui->leWorker->setSelector(dbParams, ui->leWorkerName, cache_users);
     ui->leTeamlead->setSelector(dbParams, ui->leTeamleadName, cache_users);

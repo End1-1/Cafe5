@@ -1,7 +1,7 @@
 #ifndef REPLICADIALOG_H
 #define REPLICADIALOG_H
 
-#include <QDialog>
+#include "c5dialog.h"
 
 namespace Ui {
 class ReplicaDialog;
@@ -9,12 +9,12 @@ class ReplicaDialog;
 
 class C5Replication;
 
-class ReplicaDialog : public QDialog
+class ReplicaDialog : public C5Dialog
 {
     Q_OBJECT
 
 public:
-    explicit ReplicaDialog(QWidget *parent = nullptr);
+    explicit ReplicaDialog();
 
     ~ReplicaDialog();
 

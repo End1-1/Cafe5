@@ -121,7 +121,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string>OK</string>
+            <string>A1</string>
            </property>
           </widget>
          </item>
@@ -134,7 +134,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string>Cancel</string>
+            <string>A2</string>
            </property>
           </widget>
          </item>

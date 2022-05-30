@@ -34,6 +34,7 @@ win32: QMAKE_CXXFLAGS -= -Zc:strictStrings
 SOURCES += \
     ../../NewTax/Src/printtaxn.cpp \
     ../../XLSX/src/xlsx.cpp \
+    ../../XLSX/src/xlsxborder.cpp \
     ../../XLSX/src/xlsxcell.cpp \
     ../../XLSX/src/xlsxcontenttype.cpp \
     ../../XLSX/src/xlsxdocpropsapp.cpp \
@@ -92,6 +93,7 @@ SOURCES += \
     ../Classes/notificationwidget.cpp \
     ../Classes/rkeyboard.cpp \
     ../Classes/thread.cpp \
+    ../Classes/threadsendmessage.cpp \
     ../Controls/c5checkbox.cpp \
     ../Controls/c5combobox.cpp \
     ../Controls/c5dateedit.cpp \
@@ -155,6 +157,7 @@ HEADERS += \
     ../../XLSX/src/crs32.h \
     ../../XLSX/src/xlsx.h \
     ../../XLSX/src/xlsxall.h \
+    ../../XLSX/src/xlsxborder.h \
     ../../XLSX/src/xlsxcell.h \
     ../../XLSX/src/xlsxcontenttype.h \
     ../../XLSX/src/xlsxdocpropsapp.h \
@@ -215,6 +218,7 @@ HEADERS += \
     ../Classes/notificationwidget.h \
     ../Classes/rkeyboard.h \
     ../Classes/thread.h \
+    ../Classes/threadsendmessage.h \
     ../Controls/c5checkbox.h \
     ../Controls/c5combobox.h \
     ../Controls/c5dateedit.h \

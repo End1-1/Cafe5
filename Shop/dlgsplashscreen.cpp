@@ -21,10 +21,8 @@ DlgSplashScreen::~DlgSplashScreen()
     delete ui;
 }
 
-void DlgSplashScreen::timeout()
+void DlgSplashScreen::updateData()
 {
-    sender()->deleteLater();
-    emit messageSignal(tr("Building store"));
     C5Database db1(__c5config.dbParams());
     C5Database db2(__c5config.dbParams());
     db1[":f_store"] = __c5config.defaultStore();
@@ -74,6 +72,13 @@ void DlgSplashScreen::timeout()
         db2.exec("update a_store_sale set f_qtyreserve=:f_qtyreserve where f_store=:f_store and f_goods=:f_goods");
     }
 
+}
+
+void DlgSplashScreen::timeout()
+{
+    sender()->deleteLater();
+    emit messageSignal(tr("Building store"));
+    updateData();
     emit messageSignal(tr("All done!"));
     accept();
 }

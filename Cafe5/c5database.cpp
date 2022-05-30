@@ -107,6 +107,11 @@ QVariant &C5Database::operator[](const QString &name)
     return fBindValues[name];
 }
 
+void C5Database::setDatabase(const QStringList &dbParam)
+{
+    setDatabase(dbParam.at(0), dbParam.at(1), dbParam.at(2), dbParam.at(3));
+}
+
 void C5Database::setDatabase(const QString &host, const QString &db, const QString &user, const QString &password)
 {
     configureDatabase(fDb, host, db, user, password);
@@ -389,7 +394,7 @@ int C5Database::insert(const QString &tableName, bool returnId)
         k += QString(it.key()).remove(0, 1);
         v += it.key();
     }
-    sql += QString("(%1) values (%2)").arg(k).arg(v);
+    sql += QString("(%1) values (%2)").arg(k, v);
     if (!exec(sql)) {
         return 0;
     }

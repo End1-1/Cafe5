@@ -45,7 +45,6 @@ WOrder::WOrder(C5User *user, int saleType, QWidget *parent) :
     fDateOpen = QDate::currentDate();
     fTimeOpen = QTime::currentTime();
     ui->tblGoods->setColumnWidths(ui->tblGoods->columnCount(), 0, 500, 80, 80, 120, 120, 0, 0, 0, 0, 0, 100, 00);
-    fCostumerId = 0;
     fCardValue = 0;
     fCardMode = 0;
     ui->lbDisc->setVisible(false);
@@ -246,6 +245,10 @@ bool WOrder::writeOrder()
     QElapsedTimer t;
     t.start();
 
+    if (ui->chDebt->isChecked() && fPartner == 0) {
+        C5Message::error(tr("Debt impossible on unknown partner"));
+        return false;
+    }
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
         if (ui->tblGoods->getDouble(i, 2) < 0.0001) {
             C5Message::error(tr("Invalid qty"));
@@ -294,14 +297,17 @@ bool WOrder::writeOrder()
         goods.append(g);
     }
     C5ShopOrder so(u);
-    so.setPayment(ui->leCash->getDouble(), ui->leChange->getDouble());
-    so.setPartner(fPartner, ui->lePartner->text());
-    so.setDiscount(fCostumerId, fCardId, fCardMode, fCardValue);
+    so.setPartner(fPartner, ui->leOrganization->text());
+    so.setPayment(ui->leCash->getDouble(), ui->leChange->getDouble(), ui->chDebt->isChecked());
+    so.setDiscount(fCardId, fCardMode, fCardValue);
     so.setParams(fDateOpen, fTimeOpen, fSaleType);
     C5LogSystem::writeEvent(QString("%1. %2:%3, %4:%5, %6:%7, %8:%9").arg(tr("Before write"), tr("Total"), ui->leTotal->text(), tr("Card"), ui->leCard->text(),tr("Advance"), 0, tr("Discount"), ui->leDisc->text()));
-    bool w = so.write(ui->leTotal->getDouble(), ui->leCard->getDouble(), 0, ui->leDisc->getDouble(), false, goods, fCardValue, fCardMode);
+    bool w = so.write(ui->leTotal->getDouble(), ui->leCard->getDouble(), 0, ui->leDisc->getDouble(),
+                      false, goods, fCardValue, fCardMode, ui->chIdram->isChecked());
     if (w) {
-        w = so.writeFlags(ui->btnF1->isChecked(), ui->btnF2->isChecked(), ui->btnF3->isChecked(), ui->btnF4->isChecked(), ui->btnF5->isChecked());
+        w = so.writeFlags(ui->btnF1->isChecked(), ui->btnF2->isChecked(),
+                          ui->btnF3->isChecked(), ui->btnF4->isChecked(),
+                          ui->btnF5->isChecked());
     }
     fOrderUUID = so.fHeader;
     C5Database db(__c5config.dbParams());
@@ -322,20 +328,19 @@ bool WOrder::writeOrder()
     }
     if (w) {
         if (ui->chDebt->isChecked()) {
-            if (fPartner > 0) {
-                db[":f_costumer"] = fPartner;
-                db[":f_order"] = so.fHeader;
-                db[":f_amount"] = ui->leTotal->getDouble() * -1;
-                db[":f_date"] = QDate::currentDate();
-                db[":f_govnumber"] = "";
-                db.insert("b_clients_debts", false);
-            }
+            db[":f_costumer"] = fPartner;
+            db[":f_order"] = so.fHeader;
+            db[":f_amount"] = ui->leTotal->getDouble() * -1;
+            db[":f_date"] = QDate::currentDate();
+            db[":f_govnumber"] = "";
+            db.insert("b_clients_debts", false);
         }
 
         db[":f_station"] = hostinfo + ": " + hostusername();
         db[":f_order"] = so.fHeader;
         db[":f_window"] = fWorking->fTab->currentIndex();
-        db.exec("update a_sale_temp set f_state=2, f_order=:f_order where f_station=:f_station and f_window=:f_window and f_state=0");
+        db.exec("update a_sale_temp set f_state=2, f_order=:f_order where f_station=:f_station "
+                "and f_window=:f_window and f_state=0");
     }
     C5LogSystem::writeEvent(QString("%1. %2:%3ms, %4:%5, %6").arg(tr("Order saved"), tr("Elapsed"), QString::number(t.elapsed()), tr("Order number"), so.fHallId, so.fHeader));
     return w;
@@ -431,11 +436,11 @@ void WOrder::fixCostumer(const QString &code)
         C5Message::error(tr("Cards was expired"));
         return;
     }
-    fCostumerId = db.getInt("f_client");
+    fPartner = db.getInt("f_client");
     fCardId = db.getInt("f_id");
     fCardMode = db.getInt("f_mode");
     fCardValue = db.getDouble("f_value");
-    db[":f_id"] = fCostumerId;
+    db[":f_id"] = fPartner;
     db.exec("select * from c_partners where f_id=:f_id");
     if (!db.nextRow()) {
         return;
@@ -444,7 +449,6 @@ void WOrder::fixCostumer(const QString &code)
         double v;
         if (!getDiscountValue(fCardMode, v)) {
             fCardId = 0;
-            fCostumerId = 0;
             fCardMode = 0;
             fCardValue = 0;
             return;
@@ -455,14 +459,9 @@ void WOrder::fixCostumer(const QString &code)
             fCardValue = v;
         }
     }
-    ui->leDisc->setVisible(true);
-    ui->leCustomer->setVisible(true);
-    ui->lbCustomer->setVisible(true);
-    ui->lbDisc->setVisible(true);
-    ui->lbDept->setVisible(true);
-    ui->chDebt->setVisible(true);
-    ui->leCustomer->setText(db.getString("f_firstname") + " " + db.getString("f_lastname"));
-    C5LogSystem::writeEvent(QString("%1: %2:%3").arg(tr("Fix costumer"), code, db.getString("f_firstname") + " " + db.getString("f_lastname")));
+    ui->leOrganization->setText(db.getString("f_taxinfo"));
+    ui->leContact->setText(db.getString("f_contact"));
+    C5LogSystem::writeEvent(QString("%1: %2:%3").arg(tr("Fix costumer"), code, db.getString("f_contact")));
     countTotal();
 }
 
@@ -650,20 +649,6 @@ void WOrder::setDiscount(const QString &label, const QString &value)
     countTotal();
 }
 
-void WOrder::setPartner(const QString &taxcode, int id, const QString &taxname)
-{
-    QString fullname = taxcode;
-    if (!taxname.isEmpty()) {
-        fullname += ", " + taxname;
-    }
-    ui->lePartner->setText(fullname);
-    fPartner = id;
-    ui->lbPartner->setVisible(true);
-    ui->lePartner->setVisible(true);
-    ui->lbDept->setVisible(true);
-    ui->chDebt->setVisible(true);
-}
-
 void WOrder::countTotal()
 {
     double total = 0;
@@ -809,7 +794,7 @@ void WOrder::setQtyOfRow(int row, double qty)
 
     ui->tblGoods->setDouble(row, 2, qty);
     ui->tblGoods->setDouble(row, 5, ui->tblGoods->getDouble(row, 4) * qty);
-    C5LogSystem::writeEvent(QString("%1 %2:%3 %4").arg(tr("Change qty")).arg(g.scancode()).arg(g.goodsName()).arg(float_str(qty, 2)));
+    C5LogSystem::writeEvent(QString("%1 %2:%3 %4").arg(tr("Change qty"), g.scancode(), g.goodsName(), float_str(qty, 2)));
     countTotal();
 }
 
@@ -826,7 +811,7 @@ bool WOrder::checkQty(int goods, double qty, QString &err)
     db[":f_store"] = __c5config.defaultStore();
     db[":f_goods"] = storegoods;
     db[":f_qty"] = qty;
-    if (!db.exec("select f_qty-:f_qty-f_qtyreserve-f_qtyprogram as f_qty from a_store_sale where f_store=:f_store and f_goods=:f_goods ")) {
+    if (!db.exec("select f_qty-f_qtyreserve-f_qtyprogram-:f_qty as f_qty from a_store_sale where f_store=:f_store and f_goods=:f_goods ")) {
         err = db.fLastError;
         return false;
     }
@@ -923,21 +908,20 @@ void WOrder::on_leCode_returnPressed()
         discountRow(code);
         return;
     }
-    int id = dbgoods->idOfScancode(code);
-    if (id == 0) {
-        if (fWorking->fMultiscancode.contains(code)) {
-            QString mcode = fWorking->fMultiscancode[code];
-            id = dbgoods->idOfScancode(mcode);
-        }
-    }
-    if (id == 0) {
-        ls(tr("Invalid code entered: ") + code);
-        return;
-    }
-
 
     if (code.mid(0, 2) == "23" || code.mid(0, 2) == "22") {
         if (code.length() != 13) {
+            int id = dbgoods->idOfScancode(code);
+            if (id == 0) {
+                if (fWorking->fMultiscancode.contains(code)) {
+                    QString mcode = fWorking->fMultiscancode[code];
+                    id = dbgoods->idOfScancode(mcode);
+                }
+            }
+            if (id == 0) {
+                ls(tr("Invalid code entered: ") + code);
+                return;
+            }
             addGoods(id);
             return;
         }
@@ -957,6 +941,17 @@ void WOrder::on_leCode_returnPressed()
         }
         setQtyOfRow(row, qtyStr.toDouble() / 1000);
     } else {
+        int id = dbgoods->idOfScancode(code);
+        if (id == 0) {
+            if (fWorking->fMultiscancode.contains(code)) {
+                QString mcode = fWorking->fMultiscancode[code];
+                id = dbgoods->idOfScancode(mcode);
+            }
+        }
+        if (id == 0) {
+            ls(tr("Invalid code entered: ") + code);
+            return;
+        }
         addGoods(id);
     }
 }
@@ -967,14 +962,12 @@ void WOrder::on_leCustomerTaxpayerId_returnPressed()
         return;
     }
     C5Database db(__c5config.dbParams());
-    db[":f_taxcode"] = ui->lePartner->text();
-    db.exec("select f_id, f_taxname from c_partners where f_taxcode=:f_taxcode");
+    db[":f_taxcode"] = ui->leCustomerTaxpayerId->text();
+    db.exec("select f_id, f_taxname, f_contact from c_partners where f_taxcode=:f_taxcode");
     if (db.nextRow()) {
-        setPartner(ui->lePartner->text(), db.getInt("f_id"), db.getString(1));
-    } else {
-        db[":f_taxcode"] = ui->lePartner->text();
-        int pid = db.insert("c_partners");
-        setPartner(ui->lePartner->text(), pid, "");
+        fPartner = db.getInt("f_id");
+        ui->leOrganization->setText(db.getString("f_taxname"));
+        ui->leContact->setText(db.getString("f_contact"));
     }
 }
 

@@ -1,7 +1,11 @@
 #include "c5storedraftwriter.h"
 #include "c5utils.h"
 #include "c5config.h"
+#include "chatmessage.h"
+#include "threadsendmessage.h"
 #include <QVariant>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QMap>
 
 C5StoreDraftWriter::C5StoreDraftWriter(C5Database &db) :
@@ -20,7 +24,7 @@ bool C5StoreDraftWriter::writeFromShopOutput(const QString &doc, int state, QStr
     }
     QDate docDate = fDb.getDate("f_datecash");
     int operatorId = fDb.getInt("f_staff");
-    QString comment = QString("%1 %2%3").arg(tr("Output of sale")).arg(fDb.getString("f_prefix")).arg(fDb.getString("f_hallid"));
+    QString comment = QString("%1 %2%3").arg(tr("Output of sale"), fDb.getString("f_prefix"), fDb.getString("f_hallid"));
 
     QSet<int> stores;
     QList<IGoods> items;
@@ -122,6 +126,13 @@ bool C5StoreDraftWriter::removeStoreDocument(C5Database &db, const QString &id, 
     if (!err.isEmpty()) {
         return false;
     }
+
+    db[":f_id"] = id;
+    db.exec("select f_storein, f_storeout from a_header_store where f_id=:f_id");
+    db.nextRow();
+    int storei = db.getInt(0);
+    int storeo = db.getInt(1);
+
     db[":f_document"] = id;
     db.exec("delete from a_store_draft where f_document=:f_document");
     db[":f_doc"] = id;
@@ -140,6 +151,8 @@ bool C5StoreDraftWriter::removeStoreDocument(C5Database &db, const QString &id, 
     }
     db[":f_document"] = id;
     db.exec("delete from a_store_dish_waste where f_document=:f_document");
+
+    writeASaleStore(storei, storeo);
     return err.isEmpty();
 }
 
@@ -531,6 +544,27 @@ QVariant C5StoreDraftWriter::value(int container, int row, const QString &key)
     return datarow.at(column);
 }
 
+void C5StoreDraftWriter::writeASaleStore(int storei, int storeo)
+{
+    if (__c5config.getValue(param_fd_update_a_temp_store).toInt() == 0) {
+        return;
+    }
+    QJsonObject jo;
+    jo["action"] = MSG_UPDATE_TEMP_STORE;
+    jo["storei"] = storei;
+    jo["storeo"] = storeo;
+    QJsonDocument jdoc(jo);
+    //connect(t, SIGNAL(result(QJsonObject)), this, SLOT(messageResult(QJsonObject)));
+    if (storei > 0) {
+        auto *t = new ThreadSendMessage();
+        t->send(storei, jdoc.toJson(QJsonDocument::Compact));
+    }
+    if (storeo > 0) {
+        auto *t = new ThreadSendMessage();
+        t->send(storeo, jdoc.toJson(QJsonDocument::Compact));
+    }
+}
+
 bool C5StoreDraftWriter::writeAStoreDraft(QString &id, const QString &docId, int store, int type, int goods,
                                           double qty, double price, double total, int reason, const QString &baseid, int rownum,
                                           const QString &comment)
@@ -709,7 +743,8 @@ bool C5StoreDraftWriter::writeOHeader(QString &id, int hallid, const QString &pr
                                       const QDate &dateopen, const QDate &dateclose, const QDate &datecash,
                                       const QTime &timeopen, const QTime &timeclose,
                                       int staff, const QString &comment, int print,
-                                      double amountTotal, double amountCash, double amountCard, double amountPrepaid, double amountBank, double amountOther,
+                                      double amountTotal, double amountCash, double amountCard, double amountPrepaid,
+                                      double amountBank, double amountOther, double amountIdram,
                                       double amountService, double amountDiscount, double serviceFactor, double discountFactor,
                                       int creditCardId, int otherId,
                                       int shift, int source, int saletype, int partner)
@@ -739,6 +774,7 @@ bool C5StoreDraftWriter::writeOHeader(QString &id, int hallid, const QString &pr
     fDb[":f_amountprepaid"] = amountPrepaid;
     fDb[":f_amountbank"] = amountBank;
     fDb[":f_amountother"] = amountOther;
+    fDb[":f_amountidram"] = amountIdram;
     fDb[":f_amountservice"] = amountService;
     fDb[":f_amountdiscount"] = amountDiscount;
     fDb[":f_servicefactor"] = serviceFactor;

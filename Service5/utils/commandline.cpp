@@ -9,8 +9,21 @@ CommandLine::CommandLine()
     fArgv["0"] = cll.at(0);
     QFileInfo fi(cll.at(0));
     fArgv["path"] = fi.absolutePath();
+
+    QStringList cll2;
     for (int i = 1; i < cll.count(); i++) {
-        QStringList opt = cll.at(i).split("=");
+        if (cll.at(i).mid(0, 2) == "--") {
+            cll2.append(cll.at(i));
+        } else {
+            if (cll2.count() == 0) {
+                continue;
+            }
+            cll2[cll2.count() - 1] += " " + cll.at(i);
+        }
+    }
+
+    for (int i = 0; i < cll2.count(); i++) {
+        QStringList opt = cll2.at(i).split("=");
         if (opt.count() == 1) {
             opt.append("");
         }

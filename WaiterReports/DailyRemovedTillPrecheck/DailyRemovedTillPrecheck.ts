@@ -63,5 +63,25 @@
         <source>Printed</source>
         <translation>Տպված</translation>
     </message>
+    <message>
+        <location filename="../../Cafe5/c5message.h" line="19"/>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cafe5/c5message.h" line="21"/>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cafe5/c5message.h" line="23"/>
+        <source>Yes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cafe5/c5message.h" line="23"/>
+        <source>No</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

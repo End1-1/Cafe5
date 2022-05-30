@@ -39,6 +39,9 @@ C5Grid::C5Grid(const QStringList &dbParams, QWidget *parent) :
     connect(s, SIGNAL(activated()), this, SLOT(ctrlEnter()));
     s = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Return), this);
     connect(s, SIGNAL(activated()), this, SLOT(ctrlEnter()));
+    fXlsxFitToPage = 0;
+    fXlsxPageOrientation = xls_page_orientation_portrait;
+    fXlsxPageSize = xls_page_size_a4;
 }
 
 C5Grid::~C5Grid()
@@ -186,6 +189,19 @@ void C5Grid::changeDatabase(const QStringList &dbParams)
 void C5Grid::setCheckboxes(bool v)
 {
     fCheckboxes = v;
+}
+
+void C5Grid::setSimpleQuery(const QString &sql)
+{
+    fSimpleQuery = true;
+    fSqlQuery = sql;
+    fOrderCondition.clear();
+    refreshData();
+    for (auto *a: fToolBar->actions()){
+        if (a->property("filter").toBool()) {
+            a->setVisible(false);
+        }
+    }
 }
 
 bool C5Grid::on_tblView_doubleClicked(const QModelIndex &index)
@@ -369,7 +385,7 @@ bool C5Grid::tblDoubleClicked(int row, int column, const QList<QVariant> &values
 
 void C5Grid::completeRefresh()
 {
-
+    fTableView->clearSpans();
 }
 
 void C5Grid::insertJoinTable(QStringList &joins, QMap<QString, QString> &joinsMap, const QString &table, const QString &mainTable)
@@ -697,12 +713,15 @@ void C5Grid::exportToExcel()
     }
     XlsxDocument d;
     XlsxSheet *s = d.workbook()->addSheet("Sheet1");
+    s->setupPage(fXlsxPageSize, fXlsxFitToPage, fXlsxPageOrientation);
     /* HEADER */
     QColor color = QColor::fromRgb(200, 200, 250);
     QFont headerFont(qApp->font());
     headerFont.setBold(true);
     d.style()->addFont("header", headerFont);
     d.style()->addBackgrounFill("header", color);
+    d.style()->addHAlignment("header", xls_alignment_center);
+    d.style()->addBorder("header", XlsxBorder());
     for (int i = 0; i < colCount; i++) {
         s->addCell(1, i + 1, fModel->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString(), d.style()->styleNum("header"));
         s->setColumnWidth(i + 1, fTableView->columnWidth(i) / 7);
@@ -710,20 +729,69 @@ void C5Grid::exportToExcel()
 
     /* BODY */
     QMap<int, QString> bgFill;
+    QMap<int, QString> bgFillb;
     QFont bodyFont(qApp->font());
     d.style()->addFont("body", bodyFont);
     d.style()->addBackgrounFill("body", QColor(Qt::white));
+    d.style()->addVAlignment("body", xls_alignment_center);
+    d.style()->addBorder("body", XlsxBorder());
     bgFill[QColor(Qt::white).rgb()] = "body";
+
+    bodyFont.setBold(true);
+    d.style()->addFont("body_b", bodyFont);
+    d.style()->addBackgrounFill("body_b", QColor(Qt::white));
+    d.style()->addVAlignment("body_b", xls_alignment_center);
+    d.style()->addBorder("body_b", XlsxBorder());
+    bgFillb[QColor(Qt::white).rgb()] = "body_b";
+
     for (int j = 0; j < rowCount; j++) {
         for (int i = 0; i < colCount; i++) {
             int bgColor = fModel->data(j, i, Qt::BackgroundColorRole).value<QColor>().rgb();
             if (!bgFill.contains(bgColor)) {
+                bodyFont.setBold(false);
                 d.style()->addFont(QString::number(bgColor), bodyFont);
                 d.style()->addBackgrounFill(QString::number(bgColor), QColor::fromRgb(bgColor));
                 bgFill[bgColor] = QString::number(bgColor);
             }
+            if (!bgFill.contains(bgColor)) {
+                bodyFont.setBold(true);
+                d.style()->addFont(QString::number(bgColor), bodyFont);
+                d.style()->addBackgrounFill(QString::number(bgColor), QColor::fromRgb(bgColor));
+                bgFillb[bgColor] = QString::number(bgColor);
+            }
             QString bgStyle = bgFill[bgColor];
+            if (fModel->data(j, i, Qt::FontRole).value<QFont>().bold()) {
+                bgStyle = bgFillb[bgColor];
+            }
             s->addCell(j + 2, i + 1, fModel->data(j, i, Qt::EditRole), d.style()->styleNum(bgStyle));
+        }
+    }
+
+    /* MERGE cells */
+    QMap<int, QList<int> > skiprow, skipcol;
+    for (int r = 0; r < rowCount; r++) {
+        for (int c = 0; c < colCount; c++) {
+            if (fTableView->columnSpan(r, c) > 1 || fTableView->rowSpan(r, c) > 1) {
+                int rs = -1, cs = -1;
+                if (fTableView->columnSpan(r, c) > 1 && skipcol[r].contains(c) == false) {
+                    cs = fTableView->columnSpan(r, c) - 1;
+                    for (int i = c + 1; i < c + cs + 1; i++) {
+                        skipcol[r].append(i);
+                    }
+                }
+                if (fTableView->rowSpan(r, c) > 1 && skiprow[c].contains(r) == false) {
+                    rs = fTableView->rowSpan(r, c) - 1;
+                    for (int i = r + 1; i < r + rs + 1; i++) {
+                        skiprow[c].append(i);
+                    }
+                }
+                if (rs == -1 && cs == -1) {
+                    continue;
+                }
+                rs = rs < 0 ? 0 : rs;
+                cs = cs < 0 ? 0 : cs;
+                s->setSpan(r + 2, c + 1, r + 2 + rs, c + 1 + cs);
+            }
         }
     }
 
@@ -732,8 +800,10 @@ void C5Grid::exportToExcel()
         QFont totalFont(qApp->font());
         totalFont.setBold(true);
         d.style()->addFont("footer", headerFont);
+        d.style()->addBorder("footer", XlsxBorder());
         color = QColor::fromRgb(193, 206, 221);
         d.style()->addBackgrounFill("footer", color);
+        //d.style()->addHAlignment("footer", xls_alignment_right);
         for (int i = 0; i < colCount; i++) {
             s->addCell(1 + fModel->rowCount() + 1, i + 1, ui->tblTotal->getData(0, i), d.style()->styleNum("footer"));
         }

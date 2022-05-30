@@ -67,6 +67,12 @@ QString CR5CommonSalesFilter::condition()
     if (ui->rbTaxNo->isChecked()) {
         result += " and (ot.f_receiptnumber=0 or ot.f_receiptnumber is null) ";
     }
+    if (ui->rbByuyerYes->isChecked()) {
+        result += " and oh.f_partner>0 ";
+    }
+    if (ui->rbBuyerNo->isChecked()) {
+        result += " and oh.f_partner=0 ";
+    }
     result += fFlags;
     if (ui->chptBank->isChecked() || ui->chptCard->isChecked() || ui->chptCash->isChecked() || ui->chptOther->isChecked()) {
         result += ui->chptCash->isChecked() ? " and oh.f_amountcash>0 " : " and oh.f_amountcash=0 ";

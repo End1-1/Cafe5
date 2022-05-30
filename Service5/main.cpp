@@ -79,7 +79,7 @@ void __cdecl main(int argc, char *argv[])
     LogWriter::fCurrentLevel = 100;
     LogWriter::write(LogWriterLevel::verbose, "", "Service started");
 
-    if (QString(argv[1]).toLocal8Bit() == "gui") {
+    if (QString(argv[1]).toLocal8Bit() == "--gui") {
         QApplication a(argc, argv);
         Monitor w;
         w.show();
@@ -87,12 +87,12 @@ void __cdecl main(int argc, char *argv[])
         return;
     }
 
-    if (QString(argv[1]).toLocal8Bit() == "install") {
+    if (QString(argv[1]).toLocal8Bit() == "--install") {
         SvcInstall();
         return;
     }
 
-    if (QString(argv[1]).toLower() == "run") {
+    if (QString(argv[1]).toLower() == "--run") {
         ThreadProc(NULL);
         return;
     }

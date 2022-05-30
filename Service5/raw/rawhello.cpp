@@ -19,6 +19,9 @@ int RawHello::run(const QByteArray &d)
     QString firebaseToken;
     readString(firebaseToken, d);
     int result = 0;
+    if (firebaseToken.isEmpty()) {
+        return result;
+    }
     if (fMapTokenUser.contains(firebaseToken)) {
         if (fMapTokenUser[firebaseToken] > 0) {
             result = 1;

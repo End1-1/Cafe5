@@ -357,7 +357,7 @@ void DlgOrder::buildMenu(int menuid, int part1, int part2)
         C5Message::error(tr("Menu is not defined"));
         return;
     }
-    ui->btnChangeMenu->setText(QString("%1\n%2").arg(tr("Menu")).arg(dbmenuname->name(menuid)));
+    ui->btnChangeMenu->setText(QString("%1\n%2").arg(tr("Menu"), dbmenuname->name(menuid)));
 
     fMenuID = menuid;
     fPart1 = part1;
@@ -2273,8 +2273,17 @@ void DlgOrder::on_btnTax_clicked()
 
 void DlgOrder::on_btnStopListMode_clicked()
 {
+    C5User *tmp = fUser;
+    if (tmp->check(cp_t5_stoplist) == false) {
+        if (!DlgPassword::getUserAndCheck(tr("Reprint service check"), tmp, cp_t5_stoplist)) {
+            return;
+        }
+    }
     DlgStopListOption d(this);
     d.exec();
+    if (tmp != fUser) {
+        delete tmp;
+    }
 }
 
 void DlgOrder::on_btnOrderComment_clicked()

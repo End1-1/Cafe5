@@ -36,6 +36,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     ../../XLSX/src/xlsx.cpp \
+    ../../XLSX/src/xlsxborder.cpp \
     ../../XLSX/src/xlsxcell.cpp \
     ../../XLSX/src/xlsxcontenttype.cpp \
     ../../XLSX/src/xlsxdocpropsapp.cpp \
@@ -77,6 +78,7 @@ SOURCES += \
     ../Classes/idram.cpp \
     ../Classes/notificationwidget.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
+    ../Classes/threadsendmessage.cpp \
     ../Controls/c5guicontrols.cpp \
     ../Controls/c5tablewidget.cpp \
     ../DbData/datadriver.cpp \
@@ -197,6 +199,7 @@ HEADERS += \
     ../../XLSX/src/crs32.h \
     ../../XLSX/src/xlsx.h \
     ../../XLSX/src/xlsxall.h \
+    ../../XLSX/src/xlsxborder.h \
     ../../XLSX/src/xlsxcell.h \
     ../../XLSX/src/xlsxcontenttype.h \
     ../../XLSX/src/xlsxdocpropsapp.h \
@@ -240,6 +243,7 @@ HEADERS += \
     ../Classes/idram.h \
     ../Classes/notificationwidget.h \
     ../Classes/proxytablewidgetdatabase.h \
+    ../Classes/threadsendmessage.h \
     ../Controls/c5guicontrols.h \
     ../Controls/c5tablewidget.h \
     ../DbData/datadriver.h \

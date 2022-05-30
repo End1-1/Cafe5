@@ -72,7 +72,8 @@ QString C5Config::taxDept()
 
 QString C5Config::taxUseExtPos()
 {
-    return getValue(param_tax_use_ext_pos).toLower() = "true" ? "true" : "false";
+    QString value = getValue(param_tax_use_ext_pos).toLower();
+    return  value;
 }
 
 QString C5Config::serviceFactor()
@@ -369,11 +370,14 @@ int C5Config::shopPrintVersion()
      * 0 - no print
      * 1 - v1
      * 2 - v2
+     * 3 - v3
      */
     if (getValue(param_shop_print_v1).toInt() == 1) {
         return 1;
     } else if (getValue(param_shop_print_v2).toInt() == 1) {
         return 2;
+    } else if (getValue(param_shop_print_v3).toInt() == 1) {
+        return 3;
     } else {
         return 0;
     }

@@ -6,15 +6,31 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>270</width>
-    <height>379</height>
+    <width>361</width>
+    <height>471</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="3" column="0">
+   <item row="1" column="0">
+    <widget class="QPushButton" name="btn1000">
+     <property name="minimumSize">
+      <size>
+       <width>80</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="text">
+      <string>1000</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
     <widget class="QPushButton" name="btn7">
      <property name="minimumSize">
       <size>
@@ -30,6 +46,182 @@
      </property>
     </widget>
    </item>
+   <item row="1" column="2">
+    <widget class="QPushButton" name="btn5000">
+     <property name="minimumSize">
+      <size>
+       <width>80</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="text">
+      <string>5000</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <widget class="QPushButton" name="btn8">
+     <property name="minimumSize">
+      <size>
+       <width>80</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="text">
+      <string>8</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="2">
+    <widget class="QPushButton" name="btn6">
+     <property name="minimumSize">
+      <size>
+       <width>80</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="text">
+      <string>6</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QPushButton" name="btn2">
+     <property name="minimumSize">
+      <size>
+       <width>80</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="text">
+      <string>2</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1">
+    <widget class="QPushButton" name="btn0">
+     <property name="minimumSize">
+      <size>
+       <width>80</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="text">
+      <string>0</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QPushButton" name="btn4">
+     <property name="minimumSize">
+      <size>
+       <width>80</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="text">
+      <string>4</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QPushButton" name="btn2000">
+     <property name="minimumSize">
+      <size>
+       <width>80</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="text">
+      <string>2000</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="2">
+    <widget class="QPushButton" name="btn3">
+     <property name="minimumSize">
+      <size>
+       <width>80</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="text">
+      <string>3</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="2">
+    <widget class="QPushButton" name="btn9">
+     <property name="minimumSize">
+      <size>
+       <width>80</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="text">
+      <string>9</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0">
+    <widget class="QPushButton" name="btnOK">
+     <property name="minimumSize">
+      <size>
+       <width>80</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="text">
+      <string>OK</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="2">
+    <widget class="QPushButton" name="btnCancel">
+     <property name="minimumSize">
+      <size>
+       <width>80</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="text">
+      <string>Cancel</string>
+     </property>
+    </widget>
+   </item>
    <item row="0" column="0" colspan="3">
     <widget class="QWidget" name="widget" native="true">
      <property name="minimumSize">
@@ -39,6 +231,12 @@
       </size>
      </property>
      <layout class="QFormLayout" name="formLayout">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
       <item row="0" column="0">
        <widget class="QLabel" name="label_3">
         <property name="font">
@@ -64,6 +262,9 @@
         <property name="readOnly">
          <bool>true</bool>
         </property>
+        <property name="bigfont" stdset="0">
+         <string>2</string>
+        </property>
        </widget>
       </item>
       <item row="1" column="0">
@@ -87,6 +288,9 @@
         </property>
         <property name="text">
          <string/>
+        </property>
+        <property name="bigfont" stdset="0">
+         <string>2</string>
         </property>
        </widget>
       </item>
@@ -115,28 +319,15 @@
         <property name="readOnly">
          <bool>true</bool>
         </property>
+        <property name="bigfont" stdset="0">
+         <string>2</string>
+        </property>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
-   <item row="3" column="2">
-    <widget class="QPushButton" name="btn9">
-     <property name="minimumSize">
-      <size>
-       <width>80</width>
-       <height>40</height>
-      </size>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="text">
-      <string>9</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1">
+   <item row="4" column="1">
     <widget class="QPushButton" name="btn5">
      <property name="minimumSize">
       <size>
@@ -152,39 +343,7 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="2">
-    <widget class="QPushButton" name="btn6">
-     <property name="minimumSize">
-      <size>
-       <width>80</width>
-       <height>40</height>
-      </size>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="text">
-      <string>6</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1">
-    <widget class="QPushButton" name="btn8">
-     <property name="minimumSize">
-      <size>
-       <width>80</width>
-       <height>40</height>
-      </size>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="text">
-      <string>8</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
+   <item row="3" column="0">
     <widget class="QPushButton" name="btn1">
      <property name="minimumSize">
       <size>
@@ -201,7 +360,7 @@
     </widget>
    </item>
    <item row="2" column="0">
-    <widget class="QPushButton" name="btn4">
+    <widget class="QPushButton" name="btn10000">
      <property name="minimumSize">
       <size>
        <width>80</width>
@@ -212,12 +371,12 @@
       <enum>Qt::NoFocus</enum>
      </property>
      <property name="text">
-      <string>4</string>
+      <string>10000</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="2">
-    <widget class="QPushButton" name="btn3">
+   <item row="2" column="1">
+    <widget class="QPushButton" name="btn15000">
      <property name="minimumSize">
       <size>
        <width>80</width>
@@ -228,12 +387,12 @@
       <enum>Qt::NoFocus</enum>
      </property>
      <property name="text">
-      <string>3</string>
+      <string>15000</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="1">
-    <widget class="QPushButton" name="btn2">
+   <item row="2" column="2">
+    <widget class="QPushButton" name="btn20000">
      <property name="minimumSize">
       <size>
        <width>80</width>
@@ -244,55 +403,7 @@
       <enum>Qt::NoFocus</enum>
      </property>
      <property name="text">
-      <string>2</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0">
-    <widget class="QPushButton" name="btnOK">
-     <property name="minimumSize">
-      <size>
-       <width>80</width>
-       <height>40</height>
-      </size>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="text">
-      <string>OK</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="1">
-    <widget class="QPushButton" name="btn0">
-     <property name="minimumSize">
-      <size>
-       <width>80</width>
-       <height>40</height>
-      </size>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="text">
-      <string>0</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="2">
-    <widget class="QPushButton" name="btnCancel">
-     <property name="minimumSize">
-      <size>
-       <width>80</width>
-       <height>40</height>
-      </size>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="text">
-      <string>Cancel</string>
+      <string>20000</string>
      </property>
     </widget>
    </item>

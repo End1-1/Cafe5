@@ -791,3 +791,11 @@ INSERT INTO SERVER5.queries (fkey, fquery) VALUES ('list_storages', 'select fid,
 /*  db - 71, 28.04.2022 */
 update s_app set f_version='71' where f_app='DB';
 alter table a_header_store add column f_mobilestore integer;
+
+/*  db - 72, 18.05.2022 */
+update s_app set f_version='72' where f_app='DB';
+alter table mf_daily_workers add column f_checked tinyint;
+
+/*  db - 73, 22.05.2022 */
+update s_app set f_version='73' where f_app='DB';
+alter table c_goods add column f_acc tinytext;

@@ -30,6 +30,10 @@ int main(int argc, char *argv[])
     QCoreApplication::setLibraryPaths(libPath);
 #endif
 
+//        if (QDate::currentDate() > QDate::fromString("01/10/2022", "dd/MM/yyyy")) {
+//            return 1;
+//        }
+
 
     QApplication a(argc, argv);
     QDir d;
@@ -126,9 +130,9 @@ int main(int argc, char *argv[])
         user.clear();
     };
 
-//    if (QDate::currentDate() > QDate::fromString("01/10/2022", "dd/MM/yyyy")) {
-//        return 1;
-//    }
+    if (QDate::currentDate() > QDate::fromString("01/10/2022", "dd/MM/yyyy")) {
+        return 1;
+    }
 
     db[":f_user"] = __user->id();
     db.exec("select sn.f_id, sn.f_name from s_settings_names sn where sn.f_id in (select f_settings from s_user_config where f_user=:f_user)");

@@ -221,7 +221,7 @@ void C5WaiterOrder::saveOrder()
 
 void C5WaiterOrder::removeOrder()
 {
-    if (C5Message::info(tr("Confirm to remove")) != QDialog::Accepted) {
+    if (C5Message::question(tr("Confirm to remove")) != QDialog::Accepted) {
         return;
     }
     C5Database db(fDBParams);

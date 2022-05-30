@@ -18,6 +18,13 @@ Change::Change() :
     fButtons.append(ui->btn8);
     fButtons.append(ui->btn9);
     fButtons.append(ui->btn0);
+
+    fButtons2.append(ui->btn1000);
+    fButtons2.append(ui->btn2000);
+    fButtons2.append(ui->btn5000);
+    fButtons2.append(ui->btn10000);
+    fButtons2.append(ui->btn15000);
+    fButtons2.append(ui->btn20000);
 }
 
 Change::~Change()
@@ -33,6 +40,11 @@ bool Change::getReceived(double &v)
         QPushButton *b = c.fButtons.at(i);
         connect(b, &QPushButton::clicked, &c, &Change::buttonClicked);
     }
+    for (int i = 0; i , i < c.fButtons2.count(); i++) {
+        QPushButton *b = c.fButtons2.at(i);
+        connect(b, &QPushButton::clicked, &c, &Change::buttonClicked2);
+    }
+    c.adjustSize();
     if (c.exec() == QDialog::Accepted) {
         v = c.ui->leReceived->getDouble();
         return true;
@@ -44,6 +56,11 @@ void Change::buttonClicked()
 {
     QPushButton *b = static_cast<QPushButton*>(sender());
     ui->leReceived->setText(ui->leReceived->text() + b->text());
+}
+
+void Change::buttonClicked2()
+{
+    ui->leReceived->setText(static_cast<QPushButton*>(sender())->text());
 }
 
 void Change::on_leReceived_textChanged(const QString &arg1)
@@ -59,4 +76,9 @@ void Change::on_btnCancel_clicked()
 void Change::on_btnOK_clicked()
 {
     accept();
+}
+
+void Change::on_leReceived_returnPressed()
+{
+    on_btnOK_clicked();
 }

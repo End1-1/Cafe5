@@ -10,11 +10,18 @@ DlgGoodsList::DlgGoodsList() :
     setWindowState(windowState() | Qt::WindowMaximized);
     C5Database db(__c5config.dbParams());
     db[":f_store"] = __c5config.defaultStore();
-    db.exec("select ss.f_goods, gg.f_name as f_groupname, g.f_scancode, g.f_name, ss.f_qty, g.f_saleprice, g.f_saleprice2 "
+    db.exec("select ss.f_goods, gg.f_name as f_groupname, g.f_scancode, g.f_name, "
+            "ss.f_qty, g.f_saleprice, g.f_saleprice2 "
             "from a_store_sale ss "
             "left join c_goods g on g.f_id=ss.f_goods "
             "left join c_groups gg on gg.f_id=g.f_group "
-            "where ss.f_store=:f_store ");
+            "where ss.f_store=:f_store "
+            "union "
+            "select g.f_id, gg.f_name as f_groupname, g.f_scancode, g.f_name, "
+            "0, g.f_saleprice, g.f_saleprice2 "
+            "from c_goods g "
+            "left join c_groups gg on gg.f_id=g.f_group "
+            "where g.f_service=1 and g.f_enabled=1 ");
     ui->tbl->setRowCount(db.rowCount());
     int row = 0;
     double totalRetail = 0, totalWholesale = 0;

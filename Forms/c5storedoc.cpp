@@ -16,6 +16,8 @@
 #include "calculator.h"
 #include "datadriver.h"
 #include "c5broadcasting.h"
+#include "chatmessage.h"
+#include "threadsendmessage.h"
 #include <QMenu>
 #include <QHash>
 #include <QClipboard>
@@ -1127,6 +1129,7 @@ void C5StoreDoc::writeDocumentWithState(int state)
     QString err;
     writeDocument(state, err);
     if (err.isEmpty()) {
+        writeAStoreSale(ui->leStoreInput->getInteger(), ui->leStoreOutput->getInteger());
         C5Message::info(tr("Saved"));
         if (fFlags.contains("outputservice")) {
             C5Database db(fDBParams);
@@ -1401,6 +1404,11 @@ void C5StoreDoc::addGoodsByCalculation(int goods, const QString &name, double qt
     ui->tblDishes->lineEdit(r, 3)->setDouble(qty);
 }
 
+void C5StoreDoc::writeAStoreSale(int storei, int storeo)
+{
+    C5StoreDraftWriter::writeASaleStore(storei, storeo);
+}
+
 void C5StoreDoc::lineEditKeyPressed(const QChar &key)
 {
     switch (key.toLatin1()) {
@@ -1550,7 +1558,6 @@ void C5StoreDoc::saveDoc()
 
 void C5StoreDoc::draftDoc()
 {
-
     writeDocumentWithState(DOC_STATE_DRAFT);
 }
 

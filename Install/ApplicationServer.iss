@@ -71,7 +71,7 @@ procedure AfterServiceInstall(SvcName, FileName: String);
 begin
   //If service is not installed, it needs to be installed now
   if not ServiceExists(SvcName) then begin
-    if SimpleCreateService(SvcName, 'Breeze', ExpandConstant('{app}')+'\' + FileName, SERVICE_AUTO_START, '', '', False, True) then begin
+    if SimpleCreateService(SvcName, 'Breeze', ExpandConstant('{app}')+'\' + FileName + ' --config=' + ExpandConstant('{app}') + '\config.ini', SERVICE_AUTO_START, '', '', False, True) then begin
       //Service successfully installed
       SimpleStartService(SvcName, True, True);
     end else begin
@@ -100,7 +100,7 @@ Name: "{group}\Monitor"; Filename: "{app}\Service5.exe"; Parameters: "gui";
 Name: "{group}\{cm:UninstallProgram,BreezeServer}"; Filename: "{uninstallexe}"
 
 [Run]
-Filename: {tmp}\VC_redist.x64.exe; Parameters: "/q /passive /Q:a /c:""msiexec /q /i vcredist.msi"""; StatusMsg: "Installing VC++ 2015-2019 x64 Redistributables..."
+Filename: {tmp}\VC_redist.x64.exe; Parameters: "/q /passive /norestart /Q:a /c:""msiexec /q /i vcredist.msi"""; StatusMsg: "Installing VC++ 2015-2019 x64 Redistributables..."
 
 [UninstallRun]
 Filename: {sys}\sc.exe; Parameters: "stop breeze" ; Flags: runhidden

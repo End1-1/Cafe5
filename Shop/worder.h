@@ -75,8 +75,6 @@ public:
 
     void setDiscount(const QString &label, const QString &value);
 
-    void setPartner(const QString &taxcode, int id, const QString &taxname);
-
     void setQtyOfRow(int row, double qty);
 
     C5TableWidget *table();
@@ -122,8 +120,6 @@ private:
     QTime fTimeOpen;
 
     Working *fWorking;
-
-    int fCostumerId;
 
     int fCardId;
 

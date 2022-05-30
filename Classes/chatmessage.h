@@ -3,5 +3,6 @@
 
 #define MSG_GOODS_RESERVE 1
 #define MSG_PRINT_TAX 2
+#define MSG_UPDATE_TEMP_STORE 3
 
 #endif // CHATMESSAGE_H

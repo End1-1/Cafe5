@@ -44,6 +44,7 @@ void C5SaleFromStoreOrder::loadOrder(const QString &id)
         ui->deDate->setDate(db.getDate("f_datecash"));
         ui->teTime->setText(db.getString("f_timeclose"));
         ui->leUserId->setText(db.getString("f_prefix") + db.getString("f_hallid"));
+        ui->leTotal->setDouble(db.getDouble("f_amounttotal"));
         ui->leTotalCash->setDouble(db.getDouble("f_amountcash"));
         ui->leTotalCard->setDouble(db.getDouble("f_amountcard"));
         ui->lePartner->setValue(db.getString("f_partner"));
@@ -113,8 +114,7 @@ void C5SaleFromStoreOrder::on_btnRemove_clicked()
         db.exec("delete from a_store_draft where f_document=:f_document");
         db[":f_id"] = s;
         db.exec("delete from a_header_store where f_id=:f_id");
-        db[":f_id"] = s;
-        db.exec("delete from a_header where f_id=:f_id");
+
     }
 
     storeHeader.clear();
@@ -136,6 +136,10 @@ void C5SaleFromStoreOrder::on_btnRemove_clicked()
     db.exec("delete from o_goods where f_header=:f_header");
     db[":f_id"] = ui->leID->text();
     db.exec("delete from o_header where f_id=:f_id");
+    db[":f_id"] = ui->leID->text();
+    db.exec("delete from a_header where f_id=:f_id");
+    db[":f_doc"] = ui->leID->text();
+    db.exec("delete from a_dc where f_doc=:f_doc");
 
     db.deleteFromTable("b_clients_debts", "f_order", ui->leID->text());
     db.commit();
@@ -223,8 +227,14 @@ void C5SaleFromStoreOrder::on_btnSave_clicked()
             db[":f_amount"] = ui->leTotalCash->getDouble() * -1;
             db.insert("b_clients_debts");
         }
+        db.deleteFromTable("a_dc", "f_doc", ui->leID->text());
+        db[":f_doc"] = ui->leID->text();
+        db[":f_dc"] = 1;
+        db[":f_amount"] = ui->leTotalCash->getDouble();
+        db.insert("a_dc", false);
     } else {
         db.deleteFromTable("b_clients_debts", "f_order", ui->leID->text());
+        db.deleteFromTable("a_dc", "f_doc", ui->leID->text());
     }
     db[":f_partner"] = ui->lePartner->getInteger();
     db[":f_staff"] = ui->leSeller->getInteger();

@@ -8,6 +8,8 @@
 #include "c5storedraftwriter.h"
 #include "c5cashdoc.h"
 #include "c5progressdialog.h"
+#include "c5waiterorder.h"
+#include "c5salefromstoreorder.h"
 #include <QMenu>
 
 CR5Documents::CR5Documents(const QStringList &dbParams, QWidget *parent) :
@@ -162,10 +164,37 @@ void CR5Documents::openDoc(QString id)
         }
         break;
     }
-    case DOC_TYPE_SALARY:
+    case DOC_TYPE_SALARY: {
         auto *sd = __mainWindow->createTab<C5SalaryDoc>(fDBParams);
         if (!sd->openDoc(id)) {
             __mainWindow->removeTab(sd);
+        }
+        break;
+    }
+    case DOC_TYPE_SALE_INPUT:
+        C5Database db(fDBParams);
+        db[":f_id"] = id;
+        db.exec("select f_source from o_header where f_id=:f_id");
+        if (db.nextRow()) {
+            switch (abs(db.getInt(0))) {
+            case 1: {
+                C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>(fDBParams);
+                wo->setOrder(id);
+                break;
+            }
+            case 2: {
+                C5SaleFromStoreOrder::openOrder(fDBParams, id);
+                break;
+            }
+            default: {
+                C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>(fDBParams);
+                wo->setOrder(id);
+                break;
+            }
+            }
+        } else {
+            C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>(fDBParams);
+            wo->setOrder(id);
         }
         break;
     }

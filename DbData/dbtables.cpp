@@ -36,8 +36,11 @@ bool DbTables::openTable(int table, QStringList &orders, QString &err)
     QDateTime lockTime = db.getDateTime("f_locktime");
     if (lockTime.isValid()) {
         if (lockTime.msecsTo(QDateTime::currentDateTime()) < 600000) {
-            if (db.getString("f_locksrc") != hostinfo) {
-                err = QObject::tr("Table already locked");
+            if (db.getString("f_locksrc").isEmpty() == false && db.getString("f_locksrc") != hostinfo) {
+                err = QObject::tr("Table already locked") + QString("<br>%1, %2 - %3")
+                        .arg(lockTime.toString())
+                        .arg(db.getString("f_locksrc"))
+                        .arg(hostinfo);
                 db.commit();
                 return false;
             }

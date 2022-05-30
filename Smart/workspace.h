@@ -83,6 +83,16 @@ private slots:
 
     void on_btnP05_2_clicked();
 
+    void on_btnP3_clicked();
+
+    void on_btnP4_clicked();
+
+    void on_btnP5_clicked();
+
+    void on_btnP10_clicked();
+
+    void on_btnReprintLastCheck_clicked();
+
 private:
     Ui::Workspace *ui;
 
@@ -91,6 +101,8 @@ private:
     QList<Dish*> fDishes;
 
     QString fOrderUuid;
+
+    QString fPreviouseUuid;
 
     int fCustomer;
 
@@ -112,9 +124,9 @@ private:
 
     void saveOrder();
 
-    bool printTax(double cardAmount);
+    bool printTax(double cardAmount, double idramAmount);
 
-    bool printReceipt(bool printSecond);
+    bool printReceipt(const QString &id, bool printSecond);
 
     void setQty(double qty, int mode);
 

@@ -107,6 +107,7 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     fTags[ui->chWaiterLoginAfterPayment->getTag()] = ui->chWaiterLoginAfterPayment->isChecked() ? "1" : "0";
     fTags[ui->rbPrintV1->property("tag").toInt()] = ui->rbPrintV1->isChecked() ? "1" : "0";
     fTags[ui->rbPrintV2->property("tag").toInt()] = ui->rbPrintV2->isChecked() ? "1" : "0";
+    fTags[ui->rbPrintV3->property("tag").toInt()] = ui->rbPrintV3->isChecked() ? "1" : "0";
     fTags[ui->leAutologinPin1->getTag()] = ui->leAutologinPin1->text();
     fTags[ui->leAutologinPin2->getTag()] = ui->leAutologinPin2->text();
     fTags[ui->chFixAutoenterInputDocPrice->getTag()] = ui->chFixAutoenterInputDocPrice->isChecked() ? "1" : "0";
@@ -146,6 +147,10 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     //fTags[ui->chReportOfOnlyLogged->getTag()] = ui->chReportOfOnlyLogged->isChecked() ? "1" : "0";
     fTags[ui->chHideShopQuantity->getTag()] = ui->chHideShopQuantity->isChecked() ? "1" : "0";
     fTags[ui->leShopMobileClentConfig->getTag()] = ui->leShopMobileClentConfig->text();
+    fTags[ui->leScaleRusBMODBC->getTag()] = ui->leScaleRusBMODBC->text();
+    fTags[ui->chNeverOfferTax->getTag()] = ui->chNeverOfferTax->isChecked() ? "1" : "0";
+    fTags[ui->chAutomaticallyStoreOutWaiter->getTag()] = ui->chAutomaticallyStoreOutWaiter->isChecked() ? "1" : "0";
+    fTags[ui->rbPrintVNoPrint->property("tag").toInt()] = ui->rbPrintVNoPrint->isChecked() ? "1" : "0";
     C5Database db(fDBParams);
     db[":f_settings"] = ui->leCode->getInteger();
     db.exec("delete from s_settings_values where f_settings=:f_settings");
@@ -279,5 +284,16 @@ void C5SettingsWidget::on_btnScalePath_clicked()
     QString path = QFileDialog::getExistingDirectory(this, "", "");
     if (!path.isEmpty()) {
         ui->leScalePath->setText(path);
+    }
+}
+
+void C5SettingsWidget::on_btnTestScaleODBCString_clicked()
+{
+    C5Database db("QODBC3");
+    db.setDatabase("", ui->leScaleRusBMODBC->text(), "", "");
+    if (db.open()) {
+        C5Message::error(tr("Connection successfull"));
+    } else {
+        C5Message::error(db.fLastError);
     }
 }

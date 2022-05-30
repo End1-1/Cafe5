@@ -170,6 +170,7 @@ void C5Permissions::init(C5Database &db, int group)
     }
     db[":f_group"] = group;
     db.exec("select f_key from s_user_access where f_group=:f_group");
+    fPermissions.clear();
     while (db.nextRow()) {
         fPermissions[db.database()] << db.getInt(0);
     }

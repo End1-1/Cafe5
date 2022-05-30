@@ -10,11 +10,52 @@
 #include <math.h>
 #include <QFile>
 
+QMap <QString, QString> l;
+
 CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
 {
     fIcon = ":/goods.png";
     fLabel = tr("Goods");
+
+    l["ա"]="a";
+    l["բ"]="b";
+    l["գ"]="g";
+    l["դ"]="d";
+    l["ե"]="e";
+    l["զ"]="z";
+    l["է"]="e";
+    l["ը"]="@";
+    l["թ"]="t";
+    l["ժ"]="zh";
+    l["ի"]="i";
+    l["լ"]="l";
+    l["խ"]="kh";
+    l["ծ"]="ts";
+    l["կ"]="k";
+    l["հ"]="h";
+    l["ձ"]="dz";
+    l["ղ"]="h";
+    l["ճ"]="tch";
+    l["մ"]="m";
+    l["յ"]="y";
+    l["ն"]="n";
+    l["շ"]="sh";
+    l["ո"]="o";
+    l["չ"]="ch";
+    l["պ"]="p";
+    l["ջ"]="j";
+    l["ռ"]="r";
+    l["ս"]="s";
+    l["վ"]="v";
+    l["տ"]="t";
+    l["ր"]="r";
+    l["ց"]="tc";
+    l["ւ"]="u";
+    l["փ"]="p";
+    l["ք"]="q";
+    l["օ"]="o";
+    l["ֆ"]="f";
 
     fSimpleQuery = false;
 
@@ -197,29 +238,76 @@ void CR5Goods::groupPrice()
 void CR5Goods::exportToScales()
 {
     C5Database db(fDBParams);
-    QFile f(__c5config.getValue(param_frontdesk_scale_dir) + "/export.xml");
-    f.open(QIODevice::WriteOnly);
-    f.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
-    f.write("<NewDataSet>\r\n");
     QString sql ="select f_scancode, f_name, f_saleprice, f_wholenumber from c_goods where f_enabled=1 and length(f_scancode) between 1 and 5 ";
     if (static_cast<CR5GoodsFilter*>(fFilterWidget)->group().isEmpty() == false) {
         sql += " and f_group=" + static_cast<CR5GoodsFilter*>(fFilterWidget)->group();
     }
     db.exec(sql);
-    while (db.nextRow()) {
-        f.write("<Report>\r\n");
-        f.write(QString("<CodeSort>%1</CodeSort>").arg(db.getString(0)).toUtf8());
-        f.write(QString("<Code>%1</Code>").arg(db.getString(0)).toUtf8());
-        f.write(QString("<GoodName>%1</GoodName>").arg(db.getString(1)).toUtf8());
-        f.write(QString("<PriceOut2>%1</PriceOut2>").arg(db.getDouble(2)).toUtf8());
-        if (db.getInt("f_wholenumber") > 0) {
-            f.write(QString("<IsPiece>1</IsPiece>").toUtf8());
+
+    if (__c5config.getValue(param_frontdesk_scale_dir).isEmpty() == false) {
+        QFile f(__c5config.getValue(param_frontdesk_scale_dir) + "/export.xml");
+        f.open(QIODevice::WriteOnly);
+        f.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
+        f.write("<NewDataSet>\r\n");
+        while (db.nextRow()) {
+            f.write("<Report>\r\n");
+            f.write(QString("<CodeSort>%1</CodeSort>").arg(db.getString(0)).toUtf8());
+            f.write(QString("<Code>%1</Code>").arg(db.getString(0)).toUtf8());
+            f.write(QString("<GoodName>%1</GoodName>").arg(db.getString(1)).toUtf8());
+            f.write(QString("<PriceOut2>%1</PriceOut2>").arg(db.getDouble(2)).toUtf8());
+            if (db.getInt("f_wholenumber") > 0) {
+                f.write(QString("<IsPiece>1</IsPiece>").toUtf8());
+            }
+            f.write("</Report>\r\n");
         }
-        f.write("</Report>\r\n");
+        f.write("</NewDataSet>");
+        f.close();
+        C5Message::info(tr("Done"));
     }
-    f.write("</NewDataSet>");
-    f.close();
-    C5Message::info(tr("Done"));
+    if (__c5config.getValue(param_fd_russian_scale1).isEmpty() == false) {
+        C5Database dbo("QODBC3");
+        dbo.setDatabase("", __c5config.getValue(param_fd_russian_scale1), "", "");
+        if (dbo.open()) {
+            while (db.nextRow()) {
+                QString name = db.getString("f_name").toLower();
+                name.replace("ու", "u");
+                for (QMap<QString, QString>::const_iterator it = l.constBegin(); it != l.constEnd(); it++) {
+                    name.replace(it.key(), it.value());
+                }
+                dbo[":PLU"] = db.getString("f_scancode").toInt();
+                dbo.exec("delete from Products where PLU=:PLU");
+                QString sql = QString("insert into Products (ID, PLU, Status, LabelNo, BarcodeNo, "
+                                        "Prefix, Price, Tare, Code, DuringDate, "
+                                        "[Group], Barcode, RVTName, "
+                                        "Type, LiteDuringDate) "
+                                        "values (%1, %2, %3, %4, %5, '%6', %7, %8, %9, %10, %11, %12, '%13', '%14', %15)")
+                        .arg(db.getString("f_scancode"), db.getString("f_scancode"), "0", "0", "0",
+                             "0", QString::number(db.getDouble("f_saleprice") / 100, 'f', 2), "0", "0", "0",
+                             "0", db.getString("f_scancode"), name,
+                             "вес.", "0");
+                dbo.exec(sql);
+//                dbo[":ID"] = db.getString("f_scancode").toInt();
+//                dbo[":PLU"] = db.getString("f_scancode").toInt();
+//                dbo[":Status"] = 0;
+//                dbo[":LabelNo"] = 0;
+//                dbo[":BarcodeNo"] = 0;
+//                dbo[":Prefix"] = "0";
+//                dbo[":Price"] = float_str(db.getDouble("f_saleprice"), 1);
+//                dbo[":Tare"] = 0;
+//                dbo[":Code"] = 0;
+//                dbo[":DuringDate"] = 0;
+//                dbo[":Group"] = 0;
+//                dbo[":Barcode"] = db.getString("f_scancode");
+//                dbo[":RVTName"] = "ANMME"; //db.getString("f_name");
+//                dbo[":Type"] = "ves."; //QString::fromUtf8("  ");
+//                dbo[":LiteDuringDate"] = 0;
+//                dbo.insert("Products", false);
+            }
+            C5Message::info(tr("Done"));
+        } else {
+            C5Message::error(dbo.fLastError);
+        }
+    }
 }
 
 void CR5Goods::deleteGoods()

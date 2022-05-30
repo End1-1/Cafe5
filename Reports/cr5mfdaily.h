@@ -53,6 +53,8 @@ private slots:
     void on_lstTeamlead_itemClicked(QListWidgetItem *item);
 
     void on_leFilterWorker_textChanged(const QString &arg1);
+
+    void on_lstWorkers_itemChanged(QListWidgetItem *item);
 };
 
 #endif // CR5MFDAILY_H

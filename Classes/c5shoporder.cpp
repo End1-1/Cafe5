@@ -15,10 +15,11 @@ C5ShopOrder::C5ShopOrder(C5User *user)
     fUser = user;
 }
 
-void C5ShopOrder::setPayment(double cash, double change)
+void C5ShopOrder::setPayment(double cash, double change, bool debt)
 {
     fCash = cash;
     fChange = change;
+    fDebt = debt;
 }
 
 void C5ShopOrder::setPartner(int partnerCode, const QString &partnerName)
@@ -27,9 +28,8 @@ void C5ShopOrder::setPartner(int partnerCode, const QString &partnerName)
     fPartnerName = partnerName;
 }
 
-void C5ShopOrder::setDiscount(int customer, int cardid, int cardmode, double cardvalue)
+void C5ShopOrder::setDiscount(int cardid, int cardmode, double cardvalue)
 {
-    fCustomerId = customer;
     fCardId = cardid;
     fCardMode = cardmode;
     fCardValue = cardvalue;
@@ -42,7 +42,7 @@ void C5ShopOrder::setParams(const QDate &dateOpen, const QTime &timeOpen, int sa
     fSaleType = saletype;
 }
 
-bool C5ShopOrder::write(double total, double card, double prepaid, double discount, bool tax, QList<IGoods> goods, double fDiscountFactor, int discmode)
+bool C5ShopOrder::write(double total, double card, double prepaid, double discount, bool tax, QList<IGoods> goods, double fDiscountFactor, int discmode, bool idram)
 {
     C5Database db(__c5config.dbParams());
     C5Database dblog(__c5config.dbParams());
@@ -80,15 +80,20 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
     fHallId = QString("%1%2").arg(headerPrefix).arg( headerId);
     if (!dw.writeOHeader(fHeader, headerId, headerPrefix, ORDER_STATE_CLOSE, __c5config.defaultHall(),
                          __c5config.defaultTable(), fDateOpen, QDate::currentDate(), QDate::currentDate(), fTimeOpen,
-                         QTime::currentTime(), fUser->id(), "", 1, total, (total - card), card, prepaid, 0, 0,
+                         QTime::currentTime(), fUser->id(), "", 1,
+                         total, (total - card), idram ? 0 : card, prepaid, 0, 0, idram ? card : 0,
                          0, discount,  0, fCardValue, 0, 0, 1, 2, fSaleType, fPartnerCode)) {
+        return returnFalse(dw.fErrorMsg, db);
+    }
+    if (!dw.writeAHeader(fHeader, fHallId, DOC_STATE_SAVED, DOC_TYPE_SALE_INPUT, fUser->id(), QDate::currentDate(),
+                         QDate::currentDate(), QTime::currentTime(), fPartnerCode, total, "")) {
         return returnFalse(dw.fErrorMsg, db);
     }
     if (!dw.writeOPayment(fHeader, fCash, fChange)) {
         return returnFalse(dw.fErrorMsg, db);
     }
     QString sn, firm, address, fiscal, hvhh, rseq, devnum, time;
-    if (fCustomerId > 0) {
+    if (fPartnerCode > 0) {
         if (!dw.writeBHistory(fHeader, fCardMode, fCardId, fCardValue, 0)) {
             return returnFalse(dw.fErrorMsg, db);
         }
@@ -98,7 +103,7 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
         tax = false;
     }
     if (tax) {
-        PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
+        PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), idram ? "true" : C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
         pt.fPartnerTin = fPartnerName;
         for (int i = 0; i < goods.count(); i++) {
             IGoods &g = goods[i];
@@ -210,7 +215,7 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
         }
     }
 
-    QString storeDocComment = QString("%1 %2%3").arg(tr("Output of sale")).arg(headerPrefix).arg(headerId);
+    QString storeDocComment = QString("%1 %2%3").arg(tr("Output of sale"), headerPrefix, QString::number(headerId));
     QString storeDocId;
     QString storedocUserNum;
     if (needStoreDoc) {
@@ -267,38 +272,45 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
         }
     }
 
-    double cash = total - card;
-    QString cashdocid, nocashdocid;
-    if (cash > 0) {
-        int counter = dw.counterAType(DOC_TYPE_CASH);
-        if (counter == 0) {
-            return returnFalse(dw.fErrorMsg, db);
+    if (fDebt) {
+        db[":f_doc"] = fHeader;
+        db[":f_dc"] = 1;
+        db[":f_amount"] = total;
+        db.insert("a_dc", false);
+    } else {
+        double cash = total - card;
+        QString cashdocid, nocashdocid;
+        if (cash > 0) {
+            int counter = dw.counterAType(DOC_TYPE_CASH);
+            if (counter == 0) {
+                return returnFalse(dw.fErrorMsg, db);
+            }
+            if (!dw.writeAHeader(cashdocid, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH, fUser->id(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, cash, __c5config.cashPrefix() + " " + headerPrefix + QString::number(headerId))) {
+                return returnFalse(dw.fErrorMsg, db);
+            }
+            if (!dw.writeAHeaderCash(cashdocid, __c5config.cashId(), 0, 1, "", fHeader)) {
+                return returnFalse(dw.fErrorMsg, db);
+            }
+            QString cashUUID;
+            if (!dw.writeECash(cashUUID, cashdocid, __c5config.cashId(), 1, __c5config.cashPrefix() + " " + headerPrefix + QString::number(headerId), cash, cashUUID, 1)) {
+                return returnFalse(dw.fErrorMsg, db);
+            }
         }
-        if (!dw.writeAHeader(cashdocid, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH, fUser->id(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, cash, __c5config.cashPrefix() + " " + headerPrefix + QString::number(headerId))) {
-            return returnFalse(dw.fErrorMsg, db);
-        }
-        if (!dw.writeAHeaderCash(cashdocid, __c5config.cashId(), 0, 1, "", fHeader)) {
-            return returnFalse(dw.fErrorMsg, db);
-        }
-        QString cashUUID;
-        if (!dw.writeECash(cashUUID, cashdocid, __c5config.cashId(), 1, __c5config.cashPrefix() + " " + headerPrefix + QString::number(headerId), cash, cashUUID, 1)) {
-            return returnFalse(dw.fErrorMsg, db);
-        }
-    }
-    if (card > 0) {
-        int counter = dw.counterAType(DOC_TYPE_CASH);
-        if (counter == 0) {
-            return returnFalse(dw.fErrorMsg, db);
-        }
-        if (!dw.writeAHeader(nocashdocid, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH, fUser->id(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, card, __c5config.nocashPrefix() + " " + headerPrefix + QString::number(headerId))) {
-            return returnFalse(dw.fErrorMsg, db);
-        }
-        if (!dw.writeAHeaderCash(nocashdocid, __c5config.nocashId(), 0, 1, "", fHeader)) {
-            return returnFalse(dw.fErrorMsg, db);
-        }
-        QString cashUUID;
-        if (!dw.writeECash(cashUUID, nocashdocid, __c5config.nocashId(), 1, __c5config.nocashPrefix() + " " + headerPrefix + QString::number(headerId), card, cashUUID, 1)) {
-            return returnFalse(dw.fErrorMsg, db);
+        if (card > 0) {
+            int counter = dw.counterAType(DOC_TYPE_CASH);
+            if (counter == 0) {
+                return returnFalse(dw.fErrorMsg, db);
+            }
+            if (!dw.writeAHeader(nocashdocid, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH, fUser->id(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, card, __c5config.nocashPrefix() + " " + headerPrefix + QString::number(headerId))) {
+                return returnFalse(dw.fErrorMsg, db);
+            }
+            if (!dw.writeAHeaderCash(nocashdocid, __c5config.nocashId(), 0, 1, "", fHeader)) {
+                return returnFalse(dw.fErrorMsg, db);
+            }
+            QString cashUUID;
+            if (!dw.writeECash(cashUUID, nocashdocid, __c5config.nocashId(), 1, __c5config.nocashPrefix() + " " + headerPrefix + QString::number(headerId), card, cashUUID, 1)) {
+                return returnFalse(dw.fErrorMsg, db);
+            }
         }
     }
 
@@ -405,6 +417,7 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
         }
     }
 
+    db.commit();
     if (!C5Config::localReceiptPrinter().isEmpty()) {
         PrintReceiptGroup p;
         switch (C5Config::shopPrintVersion()) {
@@ -423,11 +436,14 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
         case 2:
             p.print2(fHeader, db);
             break;
+        case 3:
+            p.print3(fHeader, db);
+            break;
         default:
             break;
         }
     }
-    db.commit();
+
     return true;
 }
 

@@ -39,7 +39,7 @@ C5WaiterOrderDoc::C5WaiterOrderDoc(const QString &id, C5Database &db) :
 C5WaiterOrderDoc::C5WaiterOrderDoc(const QString &id, C5Database &db, bool openlatter)
 {
     fHeader["f_id"] = id;
-    fDb.dbParams() = db.dbParams();
+    fDb.setDatabase(db.dbParams());
 }
 
 C5WaiterOrderDoc::C5WaiterOrderDoc(C5Database &db, QJsonObject &jh, QJsonArray &jb) :

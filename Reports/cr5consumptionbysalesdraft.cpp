@@ -187,8 +187,9 @@ void CR5ConsumptionBySalesDraft::buildQuery()
     /* get qty before */
     db[":f_store"] = f->store();
     db[":f_date"] = f->date1().addDays(-1);
-    db.exec("select s.f_goods, sum(s.f_qty*s.f_type) as f_qty, sum(s.f_qty*s.f_type*s.f_price) as f_pr "
+    db.exec("select s.f_goods, sum(s.f_qty*s.f_type) as f_qty, sum(s.f_qty*s.f_type*g.f_lastinputprice) as f_pr "
                 "from a_store_draft s "
+                "inner join c_goods g on g.f_id=s.f_goods "
                 "inner join a_header d on d.f_id=s.f_document "
                 "where s.f_store=:f_store and d.f_date<=:f_date "
                 "group by 1 ");
@@ -206,8 +207,9 @@ void CR5ConsumptionBySalesDraft::buildQuery()
     db[":f_date2"] = f->date2();
     db[":f_type"] = 1;
     db[":f_store"] = f->store();
-    db.exec("select s.f_goods, sum(s.f_qty), sum(s.f_total) "
+    db.exec("select s.f_goods, sum(s.f_qty), sum(s.f_qty*g.f_lastinputprice) "
             "from a_store_draft s "
+            "inner join c_goods g on g.f_id=s.f_goods "
             "left join a_header h on h.f_id=s.f_document "
             "where h.f_date between :f_date1 and :f_date2 and s.f_store=:f_store "
             "and s.f_type=:f_type "
@@ -231,8 +233,9 @@ void CR5ConsumptionBySalesDraft::buildQuery()
     db[":f_date2"] = f->date2();
     db[":f_type"] = DOC_TYPE_STORE_OUTPUT;
     db[":f_reason"] = DOC_REASON_SALE;
-    db.exec("select s.f_goods, sum(s.f_qty) as f_qty, sum(s.f_total) as f_total "
+    db.exec("select s.f_goods, sum(s.f_qty) as f_qty, sum(s.f_qty*g.f_lastinputprice) as f_total "
             "from a_store_draft s "
+            "inner join c_goods g on g.f_id=s.f_goods "
             "inner join a_header h on h.f_id=s.f_document "
             "where h.f_date between :f_date1 and :f_date2 and s.f_store=:f_store "
             "and s.f_reason=:f_reason and h.f_type=:f_type " + cond1 +
@@ -251,8 +254,9 @@ void CR5ConsumptionBySalesDraft::buildQuery()
     db[":f_date2"] = f->date2();
     db[":f_type"] = -1;
     db[":f_reason"] = DOC_REASON_SALE;
-    db.exec("select s.f_goods, sum(s.f_qty) as f_qty, sum(s.f_total) as f_total "
+    db.exec("select s.f_goods, sum(s.f_qty) as f_qty, sum(s.f_qty*g.f_lastinputprice) as f_total "
             "from a_store_draft s "
+            "inner join c_goods g on g.f_id=s.f_goods "
             "left join a_header h on h.f_id=s.f_document "
             "where h.f_date between :f_date1 and :f_date2 and s.f_store=:f_store "
             "and s.f_type=:f_type "
@@ -269,8 +273,9 @@ void CR5ConsumptionBySalesDraft::buildQuery()
     /* get store at the date end */
     db[":f_store"] = f->store();
     db[":f_date"] = f->date2();
-    db.exec("select s.f_goods, sum(s.f_qty*s.f_type) as f_qty, sum(s.f_total*s.f_type) as f_total "
+    db.exec("select s.f_goods, sum(s.f_qty*s.f_type) as f_qty, sum(s.f_qty*g.f_lastinputprice*s.f_type) as f_total "
                 "from a_store_draft s "
+                "inner join c_goods g on g.f_id=s.f_goods "
                 "inner join a_header d on d.f_id=s.f_document "
                 "where s.f_store=:f_store and d.f_date<=:f_date "
                 "group by 1 ");
@@ -287,7 +292,7 @@ void CR5ConsumptionBySalesDraft::buildQuery()
     db[":f_date"] = f->date2();
     db[":f_store"] = f->store();
     db[":f_type"] = DOC_TYPE_STORE_INVENTORY;
-    db.exec("select i.f_goods, g.f_name, sum(i.f_qty) as f_qty, sum(i.f_qty*i.f_price) as f_total "
+    db.exec("select i.f_goods, g.f_name, sum(i.f_qty) as f_qty, sum(i.f_qty*g.f_lastinputprice) as f_total "
             "from a_store_inventory i "
             "inner join a_header h on h.f_id=i.f_document "
             "inner join c_goods g on g.f_id=i.f_goods "
@@ -319,6 +324,7 @@ void CR5ConsumptionBySalesDraft::buildQuery()
     }
     setPriceVisible(2);
     restoreColumnsWidths();
+    sumColumnsData();
     emit refreshed();
 }
 

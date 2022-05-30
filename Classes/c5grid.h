@@ -54,6 +54,8 @@ public:
 
     virtual void setCheckboxes(bool v);
 
+    virtual void setSimpleQuery(const QString &sql);
+
     template<class T>
     T *filter() {
         return static_cast<T*>(fFilterWidget);
@@ -90,6 +92,12 @@ protected:
     QString fOrderCondition;
 
     C5FilterWidget *fFilterWidget;
+
+    int fXlsxPageSize;
+
+    QString fXlsxPageOrientation;
+
+    int fXlsxFitToPage;
 
     QWidget *widget();
 

@@ -13,15 +13,15 @@ class C5ShopOrder : public QObject
 public:
     C5ShopOrder(C5User *user);
 
-    void setPayment(double cash, double change);
+    void setPayment(double cash, double change, bool debt);
 
     void setPartner(int partnerCode, const QString &partnerName);
 
-    void setDiscount(int customer, int cardid, int cardmode, double cardvalue);
+    void setDiscount(int cardid, int cardmode, double cardvalue);
 
     void setParams(const QDate &dateOpen, const QTime &timeOpen, int saletype);
 
-    bool write(double total, double card, double prepaid, double discount, bool tax, QList<IGoods> goods, double fDiscountFactor, int discmode);
+    bool write(double total, double card, double prepaid, double discount, bool tax, QList<IGoods> goods, double fDiscountFactor, int discmode, bool idram);
 
     bool writeFlags(int f1, int f2, int f3, int f4, int f5);
 
@@ -42,8 +42,6 @@ private:
 
     QString fPartnerName;
 
-    int fCustomerId;
-
     int fCardId;
 
     int fCardMode;
@@ -55,6 +53,8 @@ private:
     double fChange;
 
     C5User *fUser;
+
+    bool fDebt;
 };
 
 #endif // C5SHOPORDER_H

@@ -99,7 +99,9 @@ bool Sales::printCheckWithTax(C5Database &db, const QString &id, QString &rseq)
     db.nextRow();
     double disc = db.getDouble("f_discountfactor");
     double card = db.getDouble("f_amountcard");
+    double idram = db.getDouble("f_idram");
     int partner = db.getInt("f_partner");
+    QString useExtPos = idram > 0.01 ? "true" : C5Config::taxUseExtPos();
     QString partnerHvhh;
     if (partner > 0) {
         db[":f_id"] = partner;
@@ -117,7 +119,7 @@ bool Sales::printCheckWithTax(C5Database &db, const QString &id, QString &rseq)
             "left join c_units gu on gu.f_id=g.f_unit "
             "left join c_groups t on t.f_id=g.f_group "
             "where og.f_header=:f_id");
-    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), 0);
+    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), useExtPos, C5Config::taxCashier(), C5Config::taxPin(), 0);
     pt.fPartnerTin = partnerHvhh;
     while (db.nextRow()) {
         pt.addGoods(db.getString("f_taxdept"), //dep

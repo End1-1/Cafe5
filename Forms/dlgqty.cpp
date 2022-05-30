@@ -123,12 +123,19 @@ void DlgQty::on_btn025_clicked()
     ui->leQty->setText("0.25");
 }
 
-void DlgQty::on_pushButton_11_clicked()
+void DlgQty::on_leQty_returnPressed()
+{
+    on_btnOk_clicked();
+}
+
+void DlgQty::on_btnCancel_clicked()
 {
     reject();
 }
 
-void DlgQty::on_pushButton_12_clicked()
+void DlgQty::on_btnOk_clicked()
 {
-    accept();
+    if (ui->leQty->getDouble() > 0.001) {
+        accept();
+    }
 }

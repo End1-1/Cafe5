@@ -11,6 +11,7 @@
 #include "loghistory.h"
 #include "dlggoodslist.h"
 #include "dlgpin.h"
+#include "dlgsplashscreen.h"
 #include "searchitems.h"
 #include "c5connection.h"
 #include "goodsreserve.h"
@@ -534,6 +535,11 @@ void Working::threadMessageData(int code, const QVariant &data)
                 }
                 break;
             }
+            case MSG_UPDATE_TEMP_STORE:
+                if (__c5config.getValue(param_fd_update_a_temp_store).toInt() == 1) {
+                    DlgSplashScreen().updateData();
+                }
+                return;
             default:
                 break;
             }
@@ -754,7 +760,7 @@ void Working::on_btnWriteOrder_clicked()
     if (!w->writeOrder()) {
         return;
     }
-    if (__c5config.getValue(param_no_tax).toInt() != 1) {
+    if (__c5config.getValue(param_no_tax).toInt() != 1 && __c5config.getValue(param_shop_never_tax).toInt() == 0) {
         if (C5Message::question(tr("Salute?")) == QDialog::Accepted) {
             QString rseq;
             C5Database db(C5Config::dbParams());
@@ -776,6 +782,9 @@ void Working::on_btnWriteOrder_clicked()
                     }
                     case 2:
                         p.print2(w->fOrderUUID, db);
+                        break;
+                    case 3:
+                        p.print3(w->fOrderUUID, db);
                         break;
                     default:
                         break;

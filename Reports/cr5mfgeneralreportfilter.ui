@@ -46,6 +46,9 @@
        <height>16777215</height>
       </size>
      </property>
+     <property name="FilterName" stdset="0">
+      <string>product</string>
+     </property>
     </widget>
    </item>
    <item row="5" column="1">
@@ -55,6 +58,9 @@
        <width>120</width>
        <height>16777215</height>
       </size>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>workerpos</string>
      </property>
     </widget>
    </item>
@@ -105,6 +111,9 @@
        <width>120</width>
        <height>16777215</height>
       </size>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>process</string>
      </property>
     </widget>
    </item>
@@ -167,6 +176,9 @@
        <height>16777215</height>
       </size>
      </property>
+     <property name="FilterName" stdset="0">
+      <string>worker</string>
+     </property>
     </widget>
    </item>
    <item row="4" column="0">
@@ -183,6 +195,9 @@
        <width>120</width>
        <height>16777215</height>
       </size>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>teamlead</string>
      </property>
     </widget>
    </item>

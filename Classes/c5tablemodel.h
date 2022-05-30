@@ -80,6 +80,8 @@ public:
 
     void insertSubTotals(int column, const QList<int> &totalCols);
 
+    void resetProxyData();
+
     QHash<QString, int> fColumnNameIndex;
 
     QHash<int, QString> fColumnIndexName;

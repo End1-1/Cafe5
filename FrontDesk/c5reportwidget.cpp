@@ -112,6 +112,7 @@ void C5ReportWidget::clearFilter()
 
 void C5ReportWidget::completeRefresh()
 {
+    C5Grid::completeRefresh();
     fModel->setFilter(-1, fFilterLineEdit->text());
     sumColumnsData();
 }

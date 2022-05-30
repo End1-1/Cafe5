@@ -63,7 +63,8 @@ QToolBar *C5Widget::createStandartToolbar(const QList<ToolBarButtons> &btn)
             fToolBar->addAction(QIcon(":/save.png"), tr("Save\nchanges"), this, SLOT(saveDataChanges()));
         }
         if (btn.contains(ToolBarButtons::tbFilter)) {
-            fToolBar->addAction(QIcon(":/filter_set.png"), tr("Search by\nparameters"), this, SLOT(setSearchParameters()));
+            auto *a = fToolBar->addAction(QIcon(":/filter_set.png"), tr("Search by\nparameters"), this, SLOT(setSearchParameters()));
+            a->setProperty("filter", true);
         }
         if (btn.contains(ToolBarButtons::tbClearFilter)) {
             fToolBar->addAction(QIcon(":/filter_clear.png"), tr("Clear\nfilter"), this, SLOT(clearFilter()));

@@ -338,6 +338,9 @@ void CE5Editor::getLineEdit(QObject *parent)
     QPlainTextEdit *pt = nullptr;
     QObjectList ol = parent->children();
     foreach (QObject *o, ol) {
+        if (o->property("nouse").toBool()) {
+            continue;
+        }
         if (o->children().count() > 0) {
             getLineEdit(o);
         }

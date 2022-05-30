@@ -18,14 +18,16 @@ public:
 
 private slots:
     void buttonClicked();
+    void buttonClicked2();
     void on_leReceived_textChanged(const QString &arg1);
     void on_btnCancel_clicked();
     void on_btnOK_clicked();
+    void on_leReceived_returnPressed();
 
 private:
     Ui::Change *ui;
-
     QList<QPushButton*> fButtons;
+    QList<QPushButton*> fButtons2;
 };
 
 #endif // CHANGE_H

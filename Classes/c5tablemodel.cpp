@@ -95,7 +95,7 @@ void C5TableModel::setExternalData(const QHash<QString, int> &columnNameIndex, c
     for (int i = 0, count = fRawData.count(); i < count; i++) {
         fProxyData << i;
     }
-    for (QHash<QString, int>::const_iterator it = fColumnNameIndex.begin(); it != fColumnNameIndex.end(); it++) {
+    for (QHash<QString, int>::const_iterator it = fColumnNameIndex.constBegin(); it != fColumnNameIndex.constEnd(); it++) {
         fColumnIndexName[it.value()] = it.key();
     }
     endResetModel();
@@ -403,7 +403,6 @@ void C5TableModel::insertSubTotals(int col, const QList<int> &totalCols)
     }
     QString currName;
     int r = 0;
-    QList<int> subtotalSpans;
     while (r < fProxyData.count()) {
         if (r == 0) {
             currName = data(r, col, Qt::EditRole).toString();
@@ -419,7 +418,6 @@ void C5TableModel::insertSubTotals(int col, const QList<int> &totalCols)
                     setData(r, c, newrow[c]);
                     fCellFont[createIndex(r, c)] = f;
                 }
-                subtotalSpans.append(r);
                 r++;
                 insertRow(r - 1);
                 fTableView->setSpan(r, 0, 1, columnCount());
@@ -446,11 +444,18 @@ void C5TableModel::insertSubTotals(int col, const QList<int> &totalCols)
             setData(r, c, newrow[c]);
             fCellFont[createIndex(r, c)] = f;
         }
-        subtotalSpans.append(r);
     }
-    for (int r: subtotalSpans) {
-        fTableView->setSpan(r, 0, 1, totalCols[0]);
+
+}
+
+void C5TableModel::resetProxyData()
+{
+    beginResetModel();
+    fProxyData.clear();
+    for (int i = 0, count = fRawData.count(); i < count; i++) {
+        fProxyData << i;
     }
+    endResetModel();
 }
 
 void C5TableModel::filterData()
@@ -463,7 +468,7 @@ void C5TableModel::filterData()
         columns.removeFirst();
     }
     QMap<int, QStringList> filter;
-    for (QMap<int, QString>::const_iterator it = fFilters.begin(); it != fFilters.end(); it++) {
+    for (QMap<int, QString>::const_iterator it = fFilters.constBegin(); it != fFilters.constEnd(); it++) {
         filter[it.key()] = it.value().split("|", QString::SkipEmptyParts);
         if (filter[it.key()].count() == 0) {
             filter.remove(it.key());

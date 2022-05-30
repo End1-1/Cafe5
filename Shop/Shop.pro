@@ -28,6 +28,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     ../../XLSX/src/xlsx.cpp \
+    ../../XLSX/src/xlsxborder.cpp \
     ../../XLSX/src/xlsxcell.cpp \
     ../../XLSX/src/xlsxcontenttype.cpp \
     ../../XLSX/src/xlsxdocpropsapp.cpp \
@@ -121,6 +122,7 @@ SOURCES += \
     ../DbData/dbusers.cpp \
     ../Forms/c5printtaxanywhere.cpp \
     ../Forms/dlgdataonline.cpp \
+    ../Forms/dlgqrcode.cpp \
     ../Forms/dlgreservgoods.cpp \
     ../Forms/dlgserversettings.cpp \
     ../Service5/raw/rawmessage.cpp \
@@ -174,6 +176,7 @@ HEADERS += \
     ../../XLSX/src/crs32.h \
     ../../XLSX/src/xlsx.h \
     ../../XLSX/src/xlsxall.h \
+    ../../XLSX/src/xlsxborder.h \
     ../../XLSX/src/xlsxcell.h \
     ../../XLSX/src/xlsxcontenttype.h \
     ../../XLSX/src/xlsxdocpropsapp.h \
@@ -271,6 +274,7 @@ HEADERS += \
     ../DbData/dbusers.h \
     ../Forms/c5printtaxanywhere.h \
     ../Forms/dlgdataonline.h \
+    ../Forms/dlgqrcode.h \
     ../Forms/dlgreservgoods.h \
     ../Forms/dlgserversettings.h \
     ../Service5/raw/rawmessage.h \
@@ -331,6 +335,7 @@ FORMS += \
     ../Controls/c5tablewithtotal.ui \
     ../Forms/c5printtaxanywhere.ui \
     ../Forms/dlgdataonline.ui \
+    ../Forms/dlgqrcode.ui \
     ../Forms/dlgreservgoods.ui \
     ../Forms/dlgserversettings.ui \
     cashcollection.ui \

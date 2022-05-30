@@ -45,6 +45,14 @@ private slots:
 
     void on_btnMoveRowDown_clicked();
 
+    void on_btnUpdatePrices_clicked();
+
+    void on_chUpdatePrice_clicked(bool checked);
+
+    void on_btnCopy_clicked();
+
+    void on_btnPaste_clicked();
+
 private:
     Ui::CE5MFProduct *ui;
 

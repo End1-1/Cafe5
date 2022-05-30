@@ -140,6 +140,28 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="btnCopy">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/copy.png</normaloff>:/copy.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnPaste">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/paste.png</normaloff>:/paste.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="btnPrint">
         <property name="text">
          <string/>
@@ -177,6 +199,9 @@
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Minimum</enum>
+        </property>
         <property name="sizeHint" stdset="0">
          <size>
           <width>711</width>
@@ -185,12 +210,66 @@
         </property>
        </spacer>
       </item>
+      <item>
+       <widget class="QCheckBox" name="chUpdatePrice">
+        <property name="text">
+         <string>Update prices</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="C5DateEdit" name="leDate1">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>150</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="nouse" stdset="0">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="C5DateEdit" name="leDate2">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>150</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="nouse" stdset="0">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnUpdatePrices">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Update</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>C5DateEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5dateedit.h</header>
+  </customwidget>
   <customwidget>
    <class>C5LineEditWithSelector</class>
    <extends>QLineEdit</extends>

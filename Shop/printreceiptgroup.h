@@ -14,6 +14,8 @@ public:
 
     void print2(const QString &id, C5Database &db);
 
+    void print3(const QString &id, C5Database &db);
+
 signals:
 
 public slots:

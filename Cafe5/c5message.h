@@ -16,11 +16,11 @@ public:
 
     ~C5Message();
 
-    static int error(const QString &errorStr);
+    static int error(const QString &errorStr, const QString &yes = QObject::tr("Close"), const QString &no = "");
 
-    static int info(const QString &infoStr);
+    static int info(const QString &infoStr, const QString &yes = QObject::tr("OK"), const QString &no = "");
 
-    static int question(const QString &questionStr);
+    static int question(const QString &questionStr, const QString &yes = QObject::tr("Yes"), const QString &no = QObject::tr("No"));
 
 private slots:
     void on_btnYes_clicked();
@@ -30,7 +30,7 @@ private slots:
 private:
     Ui::C5Message *ui;
 
-    static int showMessage(const QString &text, const QString &color);
+    static int showMessage(const QString &text, const QString &color, const QString &yes, const QString &no);
 };
 
 #endif // C5MESSAGE_H

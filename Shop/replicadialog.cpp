@@ -6,8 +6,8 @@
 #include "c5message.h"
 #include "c5replication.h"
 
-ReplicaDialog::ReplicaDialog(QWidget *parent) :
-    QDialog(parent),
+ReplicaDialog::ReplicaDialog() :
+    C5Dialog(__c5config.dbParams()),
     ui(new Ui::ReplicaDialog)
 {
     ui->setupUi(this);

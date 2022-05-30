@@ -63,6 +63,7 @@ void CR5DebtsToPartner::refreshData()
             fModel->removeRow(i);
         }
     }
+    fModel->resetProxyData();
 }
 
 bool CR5DebtsToPartner::tblDoubleClicked(int row, int column, const QList<QVariant> &vals)
@@ -76,19 +77,38 @@ bool CR5DebtsToPartner::tblDoubleClicked(int row, int column, const QList<QVaria
         auto *fc = static_cast<CR5DebtsToPartnerFilter*>(fFilterWidget);
         auto *d = __mainWindow->createTab<CR5Documents>(fDBParams);
         auto *f = d->filter<CR5DebtsToPartnerFilter>();
-        f->setFilterValue("supplier", vals.at(0));
-        f->setFilterValue("date1", fc->d1());
-        f->setFilterValue("date2", fc->d2());
+//        f->setFilterValue("supplier", vals.at(0));
+//        f->setFilterValue("date1", fc->d1());
+//        f->setFilterValue("date2", fc->d2());
+        int dc = 0;
         switch (column) {
         case 3:
-            f->setFilterValue("doctype", DOC_TYPE_CASH);
+            dc = 1;
             break;
         case 4:
-            f->setFilterValue("doctype", DOC_TYPE_STORE_INPUT);
+            dc = -1;
             break;
         }
+        QString sql = QString("select distinct(h.f_id) as f_id,h.f_userid as f_docnum, "
+                              "ds.f_name as f_statename,dt.f_name as f_typename,h.f_date,p.f_taxname, "
+                              "h.f_amount,h.f_comment,hs.f_invoice,u.f_login as f_operatorname, "
+                              "h.f_createdate,h.f_createtime "
+                              "from a_header h "
+                              "inner join a_dc on a_dc.f_doc=h.f_id and a_dc.f_dc=%1 "
+                              "left join a_state ds on ds.f_id=h.f_state "
+                              "left join a_type dt on dt.f_id=h.f_type "
+                              "left join c_partners p on p.f_id=h.f_partner "
+                              "left join a_header_store hs on hs.f_id=h.f_id "
+                              "left join s_user u on u.f_id=h.f_operator "
+                              "where h.f_date between '%2' and '%3' and h.f_state=1 "
+                              "and h.f_partner in (%4)  order by h.f_date, h.f_userid")
+                .arg(dc)
+                .arg(fc->d1().toString(FORMAT_DATE_TO_STR_MYSQL))
+                .arg(fc->d2().toString(FORMAT_DATE_TO_STR_MYSQL))
+                .arg(vals.at(0).toString());
 
-        d->buildQuery();
+
+        d->setSimpleQuery(sql);
     }
     return true;
 }
@@ -107,8 +127,8 @@ void CR5DebtsToPartner::pay()
     auto *cd = __mainWindow->createTab<C5CashDoc>(fDBParams);
     cd->setProperty("partner", fModel->data(r, 0, Qt::EditRole).toInt());
     connect(cd, SIGNAL(saved(QString)), this, SLOT(payed(QString)));
-    cd->setComment(QString("%1, %2").arg(tr("Payment for dept")).arg(fModel->data(r, 1, Qt::EditRole).toString()));
+    cd->setComment(QString("%1, %2").arg(tr("Payment for dept"), fModel->data(r, 1, Qt::EditRole).toString()));
     cd->setPartner(fModel->data(r, 0, Qt::EditRole).toInt());
-    cd->addRow(QString("%1, %2").arg(tr("Payment for dept")).arg(fModel->data(r, 1, Qt::EditRole).toString()), max);
+    cd->addRow(QString("%1, %2").arg(tr("Payment for dept"), fModel->data(r, 1, Qt::EditRole).toString()), max);
 }
 

@@ -13,7 +13,10 @@ class DlgSplashScreen : public C5Dialog
 
 public:
     explicit DlgSplashScreen();
+
     ~DlgSplashScreen();
+
+    void updateData();
 
 private:
     Ui::DlgSplashScreen *ui;

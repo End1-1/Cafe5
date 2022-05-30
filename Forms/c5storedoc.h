@@ -60,6 +60,8 @@ public:
 
     void setListenBroadcast(bool v);
 
+    static void writeAStoreSale(int storei, int storeo);
+
     virtual bool parseBroadcastMessage(int what, const QString &msg, QString &replystr) override;
 
     bool parseBroadcastSuggest(QJsonObject jobj, QString &replystr);

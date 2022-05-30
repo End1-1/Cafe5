@@ -103,21 +103,16 @@ C5Cache::C5Cache(const QStringList &dbParams) :
                 .arg(tr("Code"))
                 .arg(tr("Name"));
         fCacheQuery[cache_header_payment] = QString("select f_id as `%1`, f_name as `%2` from a_header_payment")
-                .arg(tr("Code"))
-                .arg(tr("Name"));;
+                .arg(tr("Code"), tr("Name"));
         fCacheQuery[cache_header_paid] = QString("select f_id as `%1`, f_name as `%2` from a_header_paid")
-                .arg(tr("Code"))
-                .arg(tr("Name"));
+                .arg(tr("Code"), tr("Name"));
         fCacheQuery[cache_goods_classes] = QString("select f_id as `%1`, f_name as `%2` from c_goods_classes")
-                .arg(tr("Code"))
-                .arg(tr("Name"));
+                .arg(tr("Code"), tr("Name"));
         fCacheQuery[cache_dish_menu_state] = QString("select f_id as `%1`, f_name as `%2` from d_dish_state")
-                .arg(tr("Code"))
-                .arg(tr("Name"));
+                .arg(tr("Code"), tr("Name"));
         setCacheSimpleQuery(cache_order_mark, "b_marks");
         fCacheQuery[cache_mf_actions] = QString("select f_id as `%1`, f_name as `%2` from mf_actions ")
-                .arg(tr("Code"))
-                .arg(tr("Name"));
+                .arg(tr("Code"), tr("Name"));
         fCacheQuery[cache_mf_process] = QString("select p.f_id as `%1`, p.f_rowid as `%2`, p.f_product as `%3`, gr.f_name as `%4`, "
                                                 "p.f_process as `%5`, ac.f_name as `%6`, "
                                                 "p.f_durationsec as `%7`, p.f_price as `%8` "
@@ -125,14 +120,7 @@ C5Cache::C5Cache(const QStringList &dbParams) :
                                                 "inner join mf_actions_group gr on gr.f_id=p.f_product "
                                                 "inner join mf_actions ac on ac.f_id=p.f_process "
                                                 "order by gr.f_name, p.f_rowid")
-                .arg(tr("Code"))
-                .arg(tr("Row"))
-                .arg(tr("Product code"))
-                .arg(tr("Product"))
-                .arg(tr("Process code"))
-                .arg(tr("Process"))
-                .arg(tr("Duration"))
-                .arg(tr("Price"));
+                .arg(tr("Code"), tr("Row"), tr("Product code"), tr("Product"), tr("Process code"), tr("Process"), tr("Duration"), tr("Price"));
         setCacheSimpleQuery(cache_mf_products, "mf_actions_group");
     }
     if (fTableCache.count() == 0) {

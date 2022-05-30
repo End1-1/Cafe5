@@ -358,7 +358,7 @@
        <widget class="QGroupBox" name="grCustomer">
         <property name="maximumSize">
          <size>
-          <width>350</width>
+          <width>400</width>
           <height>16777215</height>
          </size>
         </property>
@@ -398,7 +398,7 @@
           <widget class="C5LineEdit" name="leCustomerTaxpayerId">
            <property name="minimumSize">
             <size>
-             <width>130</width>
+             <width>200</width>
              <height>0</height>
             </size>
            </property>
@@ -437,15 +437,15 @@
             </font>
            </property>
            <property name="text">
-            <string>Partner</string>
+            <string>Organization</string>
            </property>
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="C5LineEdit" name="lePartner">
+          <widget class="C5LineEdit" name="leOrganization">
            <property name="minimumSize">
             <size>
-             <width>130</width>
+             <width>200</width>
              <height>0</height>
             </size>
            </property>
@@ -470,23 +470,29 @@
           </widget>
          </item>
          <item row="2" column="0">
-          <widget class="QLabel" name="lbCustomer">
+          <widget class="QLabel" name="lbPartner_3">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="font">
+            <font>
+             <weight>50</weight>
+             <bold>false</bold>
+            </font>
+           </property>
            <property name="text">
-            <string>Customer</string>
+            <string>Contact</string>
            </property>
           </widget>
          </item>
          <item row="2" column="1">
-          <widget class="C5LineEdit" name="leCustomer">
+          <widget class="C5LineEdit" name="leContact">
            <property name="minimumSize">
             <size>
-             <width>130</width>
+             <width>200</width>
              <height>0</height>
             </size>
            </property>
@@ -498,8 +504,8 @@
            </property>
            <property name="font">
             <font>
-             <weight>75</weight>
-             <bold>true</bold>
+             <weight>50</weight>
+             <bold>false</bold>
             </font>
            </property>
            <property name="focusPolicy">
@@ -532,6 +538,39 @@
          </item>
          <item row="3" column="1">
           <widget class="QCheckBox" name="chDebt">
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="lbDept_2">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>8</pointsize>
+             <weight>50</weight>
+             <bold>false</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>Idram</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QCheckBox" name="chIdram">
            <property name="focusPolicy">
             <enum>Qt::NoFocus</enum>
            </property>

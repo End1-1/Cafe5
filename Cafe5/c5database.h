@@ -39,6 +39,8 @@ public:
 
     QVariant &operator[](const QString &name);
 
+    void setDatabase(const QStringList &dbParam);
+
     void setDatabase(const QString &host, const QString &db, const QString &user, const QString &password);
 
     bool open();

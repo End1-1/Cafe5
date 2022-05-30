@@ -5,13 +5,20 @@
 #include "c5cache.h"
 #include "c5printing.h"
 #include "c5printpreview.h"
+#include <QClipboard>
 
 CE5MFProduct::CE5MFProduct(const QStringList &dbParams, QWidget *parent) :
     CE5Editor(dbParams, parent),
     ui(new Ui::CE5MFProduct)
 {
     ui->setupUi(this);
+#ifdef QT_DEBUG
+    int processcolwidth = 100;
+#else
+    int processcolwidth = 0;
+#endif
     ui->wt->addColumn(tr("Rownum"), 0)
+            .addColumn(tr("Process code"), processcolwidth)
             .addColumn(tr("Process"), 300)
             .addColumn(tr("Duration"), 80)
             .addColumn(tr("Duration, sec"), 80, true)
@@ -40,7 +47,7 @@ void CE5MFProduct::setId(int id)
     CE5Editor::setId(id);
     C5Database db(fDBParams);
     db[":f_product"] = id;
-    db.exec("select p.f_id, ac.f_name as f_processname, p.f_durationsec, p.f_goalprice, p.f_price "
+    db.exec("select p.f_id, p.f_process, ac.f_name as f_processname, p.f_durationsec, p.f_goalprice, p.f_price, p.f_process "
             "from mf_process p "
             "left join mf_actions ac on ac.f_id=p.f_process "
             "where p.f_product=:f_product "
@@ -48,12 +55,13 @@ void CE5MFProduct::setId(int id)
     while (db.nextRow()) {
         int row;
         ui->wt->setData(row, 0, db.getInt("f_id"), true)
-                .setData(row, 1, db.getString("f_processname"))
-                .setData(row, 2, durationStr(db.getInt("f_durationsec")))
-                .createLineEdit(row, 3, db.getInt("f_durationsec"), this, SLOT(durationChanged(QString)))
-                .setData(row, 4, db.getInt("f_durationsec") == 0 ? 0 : (3600 * 7) / db.getInt("f_durationsec"))
-                .createLineEdit(row, 5, db.getDouble("f_goalprice"), this, SLOT(goalPriceChanged(QString)))
-                .setData(row, 6, db.getDouble("f_price"));
+                .setData(row, 1, db.getInt("f_process"))
+                .setData(row, 2, db.getString("f_processname"))
+                .setData(row, 3, durationStr(db.getInt("f_durationsec")))
+                .createLineEdit(row, 4, db.getInt("f_durationsec"), this, SLOT(durationChanged(QString)))
+                .setData(row, 5, db.getInt("f_durationsec") == 0 ? 0 : (3600 * 7) / db.getInt("f_durationsec"))
+                .createLineEdit(row, 6, db.getDouble("f_goalprice"), this, SLOT(goalPriceChanged(QString)))
+                .setData(row, 7, db.getDouble("f_price"));
     }
     ui->wt->countTotal(-1);
 }
@@ -69,9 +77,9 @@ bool CE5MFProduct::save(QString &err, QList<QMap<QString, QVariant> > &data)
     if (CE5Editor::save(err, data)) {
         C5Database db(fDBParams);
         for (int i = 0; i < ui->wt->rowCount(); i++) {
-            db[":f_durationsec"] = ui->wt->getData(i, 3);
-            db[":f_goalprice"] = ui->wt->lineEdit(i, 5)->getDouble();
-            db[":f_price"] = ui->wt->getData(i, 6);
+            db[":f_durationsec"] = ui->wt->getData(i, 4);
+            db[":f_goalprice"] = ui->wt->lineEdit(i, 6)->getDouble();
+            db[":f_price"] = ui->wt->getData(i, 7);
             db[":f_rowid"] = i;
             db.update("mf_process", "f_id", ui->wt->getData(i, 0));
         }
@@ -90,13 +98,13 @@ void CE5MFProduct::durationChanged(const QString &arg1)
     int row = static_cast<C5LineEdit*>(sender())->property("row").toInt();
     int sec = arg1.toInt();
     if (sec > 0) {
-        ui->wt->setData(row, 2, durationStr(sec));
-        ui->wt->setData(row, 4, (3600 * 7) / sec);
-        ui->wt->setData(row, 6, ui->wt->getData(row, 4).toDouble() / sec);
+        ui->wt->setData(row, 3, durationStr(sec));
+        ui->wt->setData(row, 5, (3600 * 7) / sec);
+        ui->wt->setData(row, 7, ui->wt->getData(row, 5).toDouble() / sec);
     } else {
-        ui->wt->setData(row, 2, durationStr(sec));
-        ui->wt->setData(row, 4, 0);
-        ui->wt->setData(row, 6, 0);
+        ui->wt->setData(row, 3, durationStr(sec));
+        ui->wt->setData(row, 5, 0);
+        ui->wt->setData(row, 7, 0);
     }
     ui->wt->countTotal(-1);
 }
@@ -104,7 +112,7 @@ void CE5MFProduct::durationChanged(const QString &arg1)
 void CE5MFProduct::goalPriceChanged(const QString &arg1)
 {
     int row = static_cast<C5LineEdit*>(sender())->property("row").toInt();
-    ui->wt->setData(row, 6, str_float(arg1) / ui->wt->getData(row, 4).toInt());
+    ui->wt->setData(row, 7, str_float(arg1) / ui->wt->getData(row, 5).toInt());
 }
 
 QString CE5MFProduct::durationStr(int sec)
@@ -151,12 +159,13 @@ void CE5MFProduct::on_btnAdd_clicked()
     int id = db.insert("mf_process");
     int row;
     ui->wt->setData(row, 0, id, true)
-            .setData(row, 1, vals.at(2))
-            .setData(row, 2, durationStr(0))
-            .createLineEdit(row, 3, 0, this, SLOT(durationChanged(QString)))
-            .setData(row, 4, 0)
-            .createLineEdit(row, 5, 0, this, SLOT(goalPriceChanged(QString)))
-            .setData(row, 6, 0);
+            .setData(row, 1, vals.at(1))
+            .setData(row, 2, vals.at(2))
+            .setData(row, 3, durationStr(0))
+            .createLineEdit(row, 4, 0, this, SLOT(durationChanged(QString)))
+            .setData(row, 5, 0)
+            .createLineEdit(row, 6, 0, this, SLOT(goalPriceChanged(QString)))
+            .setData(row, 7, 0);
 }
 
 void CE5MFProduct::on_btnMinus_clicked()
@@ -165,7 +174,7 @@ void CE5MFProduct::on_btnMinus_clicked()
     if (r < 0) {
         return;
     }
-    if (C5Message::question(tr("Confirm to remove") + "<br>" + ui->wt->getData(r, 1).toString()) != QDialog::Accepted) {
+    if (C5Message::question(tr("Confirm to remove") + "<br>" + ui->wt->getData(r, 2).toString()) != QDialog::Accepted) {
         return;
     }
     if (ui->wt->getData(r, 0).toInt() > 0) {
@@ -191,12 +200,13 @@ void CE5MFProduct::on_btnNew_clicked()
         C5Database db(fDBParams);
         int row;
         ui->wt->setData(row, 0, data.at(0)["f_id"])
-                .setData(row,1, data.at(0)["f_name"])
-                .setData(row, 2, "")
-                .createLineEdit(row, 3, 0, this, SLOT(durationChanged(QString)))
-                .setData(row, 4, 0)
-                .createLineEdit(row, 5, 0, this, SLOT(goalPriceChanged(QString)))
-                .setData(row, 6, 0);
+                .setData(row, 1, data.at(0)["f_process"])
+                .setData(row, 2, data.at(0)["f_name"])
+                .setData(row, 3, "")
+                .createLineEdit(row, 4, 0, this, SLOT(durationChanged(QString)))
+                .setData(row, 5, 0)
+                .createLineEdit(row, 6, 0, this, SLOT(goalPriceChanged(QString)))
+                .setData(row, 7, 0);
     }
     delete e;
 }
@@ -220,7 +230,7 @@ void CE5MFProduct::on_btnPrint_clicked()
     for (int i = 0; i < ui->wt->rowCount(); i++) {
         vals.clear();
         vals << QString::number(i + 1);
-        for (int c = 1; c < ui->wt->columnCount(); c++) {
+        for (int c = 2; c < ui->wt->columnCount(); c++) {
             vals.append(ui->wt->getData(i, c).toString());
         }
         p.tableText(points, vals, p.fLineHeight + 20);
@@ -229,7 +239,7 @@ void CE5MFProduct::on_btnPrint_clicked()
 
     p.setFontBold(true);
     vals.clear();
-    vals << "" << "" << "" << ui->wt->totalStr(3) << "" << ui->wt->totalStr(5) << ui->wt->totalStr(6);
+    vals << "" << "" << "" << ui->wt->totalStr(4) << "" << ui->wt->totalStr(6) << ui->wt->totalStr(7);
     p.tableText(points, vals, p.fLineHeight + 20);
     p.br(p.fLineHeight + 20);
 
@@ -254,10 +264,10 @@ void CE5MFProduct::on_btnMoveRowUp_clicked()
     int row = ui->wt->currentRow();
     if (row > 0) {
         ui->wt->moveRowUp(row);
-        emit ui->wt->lineEdit(row, 3)->textChanged(ui->wt->lineEdit(row, 3)->text());
-        emit ui->wt->lineEdit(row, 5)->textChanged(ui->wt->lineEdit(row, 5)->text());
-        emit ui->wt->lineEdit(row - 1, 3)->textChanged(ui->wt->lineEdit(row - 1, 3)->text());
-        emit ui->wt->lineEdit(row - 1, 5)->textChanged(ui->wt->lineEdit(row - 1, 5)->text());
+        emit ui->wt->lineEdit(row, 4)->textChanged(ui->wt->lineEdit(row, 4)->text());
+        emit ui->wt->lineEdit(row, 6)->textChanged(ui->wt->lineEdit(row, 6)->text());
+        emit ui->wt->lineEdit(row - 1, 4)->textChanged(ui->wt->lineEdit(row - 1, 4)->text());
+        emit ui->wt->lineEdit(row - 1, 6)->textChanged(ui->wt->lineEdit(row - 1, 6)->text());
     }
 }
 
@@ -266,9 +276,74 @@ void CE5MFProduct::on_btnMoveRowDown_clicked()
     int row = ui->wt->currentRow();
     if (row < ui->wt->rowCount() - 1) {
         ui->wt->moveRowDown(row);
-        emit ui->wt->lineEdit(row, 3)->textChanged(ui->wt->lineEdit(row, 3)->text());
-        emit ui->wt->lineEdit(row, 5)->textChanged(ui->wt->lineEdit(row, 5)->text());
-        emit ui->wt->lineEdit(row + 1, 3)->textChanged(ui->wt->lineEdit(row + 1, 3)->text());
-        emit ui->wt->lineEdit(row + 1, 5)->textChanged(ui->wt->lineEdit(row + 1, 5)->text());
+        emit ui->wt->lineEdit(row, 4)->textChanged(ui->wt->lineEdit(row, 4)->text());
+        emit ui->wt->lineEdit(row, 6)->textChanged(ui->wt->lineEdit(row, 6)->text());
+        emit ui->wt->lineEdit(row + 1, 4)->textChanged(ui->wt->lineEdit(row + 1, 4)->text());
+        emit ui->wt->lineEdit(row + 1, 6)->textChanged(ui->wt->lineEdit(row + 1, 6)->text());
+    }
+}
+
+void CE5MFProduct::on_btnUpdatePrices_clicked()
+{
+    C5Database db(fDBParams);
+    for (int i = 0; i < ui->wt->rowCount(); i++) {
+        db[":f_product"] = ui->leCode->getInteger();
+        db[":f_process"] = ui->wt->getData(i, 1);
+        db[":f_price"] = ui->wt->getData(i, 7);
+        db[":f_date1"] = ui->leDate1->date();
+        db[":f_date2"] = ui->leDate2->date();
+        db.exec("update mf_daily_process set f_price=:f_price where f_product=:f_product and f_process=:f_process and f_date between :f_date1 and :f_date2");
+    }
+}
+
+void CE5MFProduct::on_chUpdatePrice_clicked(bool checked)
+{
+    ui->leDate1->setEnabled(checked);
+    ui->leDate2->setEnabled(checked);
+    ui->btnUpdatePrices->setEnabled(checked);
+}
+
+void CE5MFProduct::on_btnCopy_clicked()
+{
+    QString clipdata;
+    for (int r = 0; r < ui->wt->rowCount(); r++) {
+        for (int c = 0; c < ui->wt->columnCount(); c++) {
+            clipdata += ui->wt->getData(r, c, Qt::EditRole).toString() + "\t";
+        }
+        clipdata += "\r";
+    }
+    qApp->clipboard()->setText(clipdata);
+}
+
+void CE5MFProduct::on_btnPaste_clicked()
+{
+    QString clipdata = qApp->clipboard()->text();
+    QStringList rows = clipdata.split("\r", Qt::SkipEmptyParts);
+    C5Database db(fDBParams);
+    for (int i = 0; i < rows.count(); i++) {
+        QStringList cols = rows.at(i).split("\t", Qt::SkipEmptyParts);
+        if (cols.count() < 8) {
+            return;
+        }
+        db[":f_rowid"] = ui->wt->rowCount();
+        db[":f_product"] = ui->leCode->getInteger();
+        db[":f_process"] = cols.at(1);
+        db[":f_durationsec"] = cols.at(4);
+        db[":f_goalprice"] = cols.at(6).toDouble();
+        db[":f_price"] = cols.at(5).toDouble();
+        int id = db.insert("mf_process");
+        int row;
+        ui->wt->setData(row, 0, id, true)
+                .setData(row, 1, cols.at(1).toInt())
+                .setData(row, 2, cols.at(2))
+                .setData(row, 3, durationStr(cols.at(3).toInt()))
+                .createLineEdit(row, 4, cols.at(4), this, SLOT(durationChanged(QString)))
+                .setData(row, 5, cols.at(5).toDouble())
+                .createLineEdit(row, 6, cols.at(6), this, SLOT(goalPriceChanged(QString)))
+                .setData(row, 7, cols.at(7).toDouble());
+        ui->wt->lineEdit(row, 4)->setDouble(str_float(cols.at(4)));
+        emit ui->wt->lineEdit(row, 4)->textChanged(ui->wt->lineEdit(row, 4)->text());
+        ui->wt->lineEdit(row, 6)->setDouble(str_float(cols.at(6)));
+        emit ui->wt->lineEdit(row, 6)->textChanged(ui->wt->lineEdit(row, 6)->text());
     }
 }
