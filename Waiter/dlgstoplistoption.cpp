@@ -8,10 +8,11 @@
 #include "c5logtoserverthread.h"
 #include "c5user.h"
 
-DlgStopListOption::DlgStopListOption(DlgOrder *o) :
+DlgStopListOption::DlgStopListOption(DlgOrder *o, C5User *u) :
     C5Dialog(__c5config.dbParams()),
     ui(new Ui::DlgStopListOption),
-    fDlgOrder(o)
+    fDlgOrder(o),
+    fUser(u)
 {
     ui->setupUi(this);
     if (fDlgOrder->stoplistMode()) {
