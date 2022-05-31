@@ -127,7 +127,7 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &db, QString &err)
         item = db.getString("f_value").toInt();
     }
     if (item == 0) {
-        err = "Cannot retrieve invoice item for hotel";
+        err = "Cannot retrieve invoice item for hotel #1";
         return true;
     }
 
@@ -197,7 +197,7 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &db, QString &err)
     if (fDD.nextRow()) {
         itemName = fDD.getString(0);
     } else {
-        err = "Cannot retrieve invoice item for hotel";
+        err = "Cannot retrieve invoice item for hotel #2";
         fDD.rollback();
         return false;
     }

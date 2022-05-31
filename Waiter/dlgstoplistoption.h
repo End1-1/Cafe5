@@ -14,7 +14,7 @@ class DlgStopListOption : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgStopListOption(DlgOrder *o);
+    explicit DlgStopListOption(DlgOrder *o, C5User *u);
 
     ~DlgStopListOption();
 
@@ -37,6 +37,8 @@ private:
     Ui::DlgStopListOption *ui;
 
     DlgOrder *fDlgOrder;
+
+    C5User *fUser;
 };
 
 #endif // DLGSTOPLISTOPTION_H

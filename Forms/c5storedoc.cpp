@@ -1256,8 +1256,8 @@ void C5StoreDoc::loadGoodsInput()
                     "left join a_header d on d.f_id=s.f_document and d.f_date<=%2 "
                     "inner join c_groups gg on gg.f_id=g.f_group "
                     "inner join c_units u on u.f_id=g.f_unit "
-                    "group by 1, 2, 3, 4 "
-                    "having sum(s.f_qty*s.f_type) > 0.00001 ")
+                    "group by 1, 2, 3, 4 ")
+                    //"having sum(s.f_qty*s.f_type) > 0.00001 ")
             .arg(ui->leStoreInput->getInteger())
             .arg(ui->deDate->toMySQLDate()));
     while (db.nextRow()) {
