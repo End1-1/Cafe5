@@ -2851,3 +2851,8 @@ void DlgOrder::on_btnReceived_clicked()
         headerToLineEdit();
     }
 }
+
+void DlgOrder::on_btnSelfCost_clicked()
+{
+    setSelfcost();
+}
