@@ -2279,7 +2279,7 @@ void DlgOrder::on_btnStopListMode_clicked()
             return;
         }
     }
-    DlgStopListOption d(this);
+    DlgStopListOption d(this, tmp);
     d.exec();
     if (tmp != fUser) {
         delete tmp;
