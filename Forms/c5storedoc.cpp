@@ -1589,7 +1589,7 @@ void C5StoreDoc::createStoreInput()
         sd->ui->tblGoods->lineEdit(row, 5)->setDouble(ui->tblGoods->lineEdit(row, 5)->getDouble());
         sd->ui->tblGoods->setString(row, 6, ui->tblGoods->getString(row, 6));
         sd->ui->tblGoods->lineEdit(row, 7)->setDouble(prices1[ui->tblGoods->getInteger(row, 3)]);
-        sd->ui->tblGoods->lineEdit(row, 7)->textEdited(sd->ui->tblGoods->lineEdit(row, 7)->text());
+        emit sd->ui->tblGoods->lineEdit(row, 7)->textEdited(sd->ui->tblGoods->lineEdit(row, 7)->text());
     }
 }
 
@@ -1600,6 +1600,9 @@ void C5StoreDoc::printDoc()
         return;
     }
     C5Printing p;
+    QFont f(qApp->font());
+    C5Database().logEvent(f.family());
+    p.setFont(f);
     QList<qreal> points;
     QStringList vals;
     p.setSceneParams(2000, 2700, QPrinter::Portrait);

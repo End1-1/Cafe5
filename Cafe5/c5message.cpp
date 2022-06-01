@@ -23,20 +23,20 @@ C5Message::~C5Message()
 
 int C5Message::error(const QString &errorStr, const QString &yes, const QString &no)
 {
-    return showMessage(errorStr, "red", yes, no);
+    return showMessage(errorStr, 2, yes, no);
 }
 
 int C5Message::info(const QString &infoStr, const QString &yes, const QString &no)
 {
-    return showMessage(infoStr, "green", yes, no);
+    return showMessage(infoStr, 1, yes, no);
 }
 
 int C5Message::question(const QString &questionStr, const QString &yes, const QString &no)
 {
-    return showMessage(questionStr, "blue", yes, no);
+    return showMessage(questionStr, 3, yes, no);
 }
 
-int C5Message::showMessage(const QString &text, const QString &color, const QString &yes, const QString &no)
+int C5Message::showMessage(const QString &text, int tp, const QString &yes, const QString &no)
 {
     C5Message *c5 = new C5Message(__c5config.fParentWidget);
     c5->ui->btnYes->setText(yes);
@@ -44,13 +44,22 @@ int C5Message::showMessage(const QString &text, const QString &color, const QStr
     if (no.isEmpty()) {
         c5->ui->btnCancel->setVisible(false);
     }
-#ifdef FRONTDESK
-    c5->ui->label->setText(QString("<html><body><center><h4><font color=\"%1\">%2</font></h4></center></body></html>").arg(color, text));
-#else
+    QString img;
+    switch (tp) {
+    case 1:
+        img = "info";
+        break;
+    case 2:
+        img = "error";
+        break;
+    case 3:
+        img = "help";
+        break;
+    }
     c5->ui->btnYes->setMinimumHeight(50);
     c5->ui->btnCancel->setMinimumHeight(50);
-    c5->ui->label->setText(QString("<html><body><center><h4><font color=\"%1\">%2</font></h1></center></body></html>").arg(color, text));
-#endif
+    c5->ui->img->setPixmap(QPixmap(QString(":/%1.png").arg(img)));
+    c5->ui->label->setText(text);
     c5->adjustSize();
     int result = c5->exec();
     delete c5;

@@ -1132,26 +1132,28 @@ bool C5WaiterServer::printReceipt(QString &err, C5Database &db, bool isBill)
         }
     }
 
-    switch (printType) {
-    case 50: {
-        //TODO: remove from thread
-        C5PrintReceiptThread50mm *pr = new C5PrintReceiptThread50mm(C5Config::dbParams(), QJsonObject(), QJsonArray(), printerName, paperWidth);
-        pr->start();
-        break;
-    }
-    case 80: {
-        C5PrintReceiptThread pr(fIn["order"].toString(), headerInfo, bodyInfo, printerName, fIn["language"].toInt(), paperWidth);
-        pr.fBill = isBill;
-        pr.fIdram[param_idram_name] = C5Config::getValue(param_idram_name);
-        pr.fIdram[param_idram_id] = C5Config::getValue(param_idram_id);
-        pr.fIdram[param_idram_phone] = C5Config::getValue(param_idram_phone);
-        pr.fIdram[param_idram_tips] = C5Config::getValue(param_idram_tips);
-        pr.fIdram[param_idram_tips_wallet] = C5Config::getValue(param_idram_tips_wallet);
-        if (!pr.print()) {
-            err = pr.fError;
+    if (fIn["withoutprint"].toInt() == 0) {
+        switch (printType) {
+        case 50: {
+            //TODO: remove from thread
+            C5PrintReceiptThread50mm *pr = new C5PrintReceiptThread50mm(C5Config::dbParams(), QJsonObject(), QJsonArray(), printerName, paperWidth);
+            pr->start();
+            break;
         }
-        break;
-    }
+        case 80: {
+            C5PrintReceiptThread pr(fIn["order"].toString(), headerInfo, bodyInfo, printerName, fIn["language"].toInt(), paperWidth);
+            pr.fBill = isBill;
+            pr.fIdram[param_idram_name] = C5Config::getValue(param_idram_name);
+            pr.fIdram[param_idram_id] = C5Config::getValue(param_idram_id);
+            pr.fIdram[param_idram_phone] = C5Config::getValue(param_idram_phone);
+            pr.fIdram[param_idram_tips] = C5Config::getValue(param_idram_tips);
+            pr.fIdram[param_idram_tips_wallet] = C5Config::getValue(param_idram_tips_wallet);
+            if (!pr.print()) {
+                err = pr.fError;
+            }
+            break;
+        }
+        }
     }
 
     if (err.isEmpty()) {

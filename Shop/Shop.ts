@@ -322,13 +322,13 @@
     </message>
     <message>
         <location filename="../Cafe5/c5message.ui" line="124"/>
-        <source>OK</source>
-        <translation>Ընդունել</translation>
+        <source>A1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../Cafe5/c5message.ui" line="137"/>
-        <source>Cancel</source>
-        <translation>Հրաժարվել</translation>
+        <source>A2</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -764,7 +764,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterorderdoc.cpp" line="357"/>
+        <location filename="../Classes/c5waiterorderdoc.cpp" line="367"/>
         <source>Document saved</source>
         <translation type="unfinished"></translation>
     </message>

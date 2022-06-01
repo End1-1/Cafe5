@@ -30,7 +30,7 @@ private slots:
 private:
     Ui::C5Message *ui;
 
-    static int showMessage(const QString &text, const QString &color, const QString &yes, const QString &no);
+    static int showMessage(const QString &text, int tp, const QString &yes, const QString &no);
 };
 
 #endif // C5MESSAGE_H

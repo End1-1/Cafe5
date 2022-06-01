@@ -411,7 +411,7 @@ void Workspace::on_btnCheckout_clicked()
         return;
     }
     fPreviouseUuid = fOrderUuid;
-    if (__c5config.getValue(param_dont_print_receipt).toInt() == 0) {
+    if (__c5config.getValue(param_smart_dont_print_receipt).toInt() == 0) {
         if (printReceipt(fOrderUuid, true)) {
 
         }

@@ -116,6 +116,7 @@ SOURCES += \
     ../Shop/selectprinters.cpp \
     dishitem.cpp \
     dishitembutton.cpp \
+    dlgaskforprecheck.cpp \
     dlgcarnumber.cpp \
     dlgchosesplitorderoption.cpp \
     dlgguests.cpp \
@@ -283,6 +284,7 @@ HEADERS += \
     c5printreceiptthread50mm.h \
     dishitem.h \
     dishitembutton.h \
+    dlgaskforprecheck.h \
     dlgcarnumber.h \
     dlgchosesplitorderoption.h \
         dlgface.h \
@@ -377,6 +379,7 @@ FORMS += \
     ../Forms/dlgqty.ui \
     ../Shop/selectprinters.ui \
     dishitem.ui \
+    dlgaskforprecheck.ui \
     dlgcarnumber.ui \
     dlgchosesplitorderoption.ui \
         dlgface.ui \

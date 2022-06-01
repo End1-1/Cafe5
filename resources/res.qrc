@@ -143,5 +143,6 @@
         <file>help.png</file>
         <file>minimize.png</file>
         <file>qr_code.png</file>
+        <file>error.png</file>
     </qresource>
 </RCC>

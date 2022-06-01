@@ -993,7 +993,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterorderdoc.cpp" line="357"/>
+        <location filename="../Classes/c5waiterorderdoc.cpp" line="367"/>
         <source>Document saved</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1361,7 +1361,7 @@ MS Excel</source>
     <message>
         <location filename="../Cafe5/dlgexitbyversion.ui" line="79"/>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Փակել</translation>
     </message>
 </context>
 <context>

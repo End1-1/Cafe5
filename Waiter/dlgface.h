@@ -45,6 +45,8 @@ private slots:
 
     void on_btnViewWaiter_clicked();
 
+    void on_btnGuests_clicked();
+
 private:
     Ui::DlgFace *ui;
 

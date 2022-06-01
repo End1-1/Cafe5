@@ -10,13 +10,13 @@
     </message>
     <message>
         <location filename="../../Cafe5/c5message.ui" line="124"/>
-        <source>OK</source>
-        <translation>ԱՅՈ</translation>
+        <source>A1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../Cafe5/c5message.ui" line="137"/>
-        <source>Cancel</source>
-        <translation>Հրաժարվել</translation>
+        <source>A2</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

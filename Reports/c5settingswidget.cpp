@@ -151,6 +151,9 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     fTags[ui->chNeverOfferTax->getTag()] = ui->chNeverOfferTax->isChecked() ? "1" : "0";
     fTags[ui->chAutomaticallyStoreOutWaiter->getTag()] = ui->chAutomaticallyStoreOutWaiter->isChecked() ? "1" : "0";
     fTags[ui->rbPrintVNoPrint->property("tag").toInt()] = ui->rbPrintVNoPrint->isChecked() ? "1" : "0";
+    fTags[ui->fnApp->property("Tag").toInt()] = ui->fnApp->currentText();
+    fTags[ui->chAskForPrecheck->getTag()] = ui->chAskForPrecheck->isChecked() ? "1" : "0";
+    fTags[ui->chFinalReceiptQtySelect->getTag()] = ui->chFinalReceiptQtySelect->isChecked() ? "1" : "0";
     C5Database db(fDBParams);
     db[":f_settings"] = ui->leCode->getInteger();
     db.exec("delete from s_settings_values where f_settings=:f_settings");
@@ -182,6 +185,8 @@ void C5SettingsWidget::clearWidgetValue(QWidget *w)
         static_cast<QRadioButton*>(w)->setAutoExclusive(true);
     } else if (!strcmp(w->metaObject()->className(), "QComboBox")) {
         static_cast<QComboBox*>(w)->setCurrentIndex(-1);
+    } else if (!strcmp(w->metaObject()->className(), "QFontComboBox")) {
+        static_cast<QFontComboBox*>(w)->setCurrentIndex(-1);
     }
 }
 
@@ -197,6 +202,8 @@ void C5SettingsWidget::setWidgetValue(QWidget *w, const QString &value)
         static_cast<QRadioButton*>(w)->setChecked(value == "1");
     } else if (!strcmp(w->metaObject()->className(), "QComboBox")) {
         static_cast<QComboBox*>(w)->setCurrentText(value);
+    } else if (!strcmp(w->metaObject()->className(), "QFontComboBox")) {
+        static_cast<QFontComboBox*>(w)->setCurrentText(value);
     }
 }
 
@@ -255,6 +262,10 @@ QWidget *C5SettingsWidget::widget(QWidget *parent, int tag)
         } else if (!strcmp(o->metaObject()->className(), "QRadioButton")) {
             if (o->property("tag").toInt() == tag) {
                 return static_cast<QRadioButton*>(o);
+            }
+        } else if (!strcmp(o->metaObject()->className(), "QFontComboBox")) {
+            if (o->property("Tag").toInt() == tag) {
+                return static_cast<QFontComboBox*>(o);
             }
         } else if (o->children().count() > 0) {
             QWidget *w = widget(static_cast<QWidget*>(o), tag);
