@@ -97,7 +97,10 @@
 #define param_shop_never_tax 93
 #define param_fd_update_a_temp_store 94
 #define param_waiter_automatially_storeout 95
-#define param_dont_print_receipt 96
+#define param_waiter_ask_for_precheck 96
+#define param_app_font_family 97
+#define param_waiter_receipt_qty 98
+#define param_smart_dont_print_receipt 99
 
 #define FRONTDESK_WAITER 0
 #define FRONTDESK_SHOP 1

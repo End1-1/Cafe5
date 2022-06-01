@@ -35,6 +35,7 @@
 #include "qdishpart2button.h"
 #include "qdishbutton.h"
 #include "dlgstoplistoption.h"
+#include "dlgaskforprecheck.h"
 #include "dlgviewstoplist.h"
 #include "dlgtext.h"
 #include <QToolButton>
@@ -139,6 +140,21 @@ void DlgOrder::openTable(int table, C5User *user)
 
     if (d->load(table)) {
         d->exec();
+        if (!d->property("reprint").toString().isEmpty()) {
+            if (__c5config.getValue(param_waiter_receipt_qty).toInt() > 0 && user->check(cp_t5_multiple_receipt)) {
+                while (C5Message::question(tr("Print additional receipt for this order?")) == QDialog::Accepted) {
+                    C5SocketHandler *sh = d->createSocketHandler("");
+                    sh->bind("cmd", sm_printreceipt);
+                    sh->bind("staffid", QString::number(user->id()));
+                    sh->bind("staffname", user->fullName());
+                    sh->bind("f_receiptlanguage", QString::number(C5Config::getRegValue("receipt_language").toInt()));
+                    sh->bind("order", d->property("reprint").toString());
+                    sh->bind("printtax", false);
+                    sh->bind("receipt_printer", C5Config::fSettingsName);
+                    sh->send();
+                }
+            }
+        }
     }
     delete d;
 }
@@ -833,6 +849,7 @@ void DlgOrder::handleReceipt(const QJsonObject &obj)
                 }
                 removeWOrder(wo);
                 if (!worder()) {
+                    setProperty("reprint", obj["order"].toString());
                     accept();
                     return;
                 }
@@ -1504,6 +1521,10 @@ void DlgOrder::on_btnTotal_clicked()
     WOrder *wo = worder();
 
     if (wo->fOrderDriver->headerValue("f_precheck").toInt() < 1) {
+        int withoutprint = 0;
+        if (__c5config.getValue(param_waiter_ask_for_precheck).toInt() > 0) {
+            withoutprint = DlgAskForPrecheck::get();
+        }
         if (C5Config::carMode()) {
             if (wo->fOrderDriver->headerOptionsValue("f_car") == 0) {
                 C5Message::error(tr("Car model and costumer not specified"));
@@ -1535,6 +1556,7 @@ void DlgOrder::on_btnTotal_clicked()
         sh->bind("order", worder()->fOrderDriver->currentOrderId());
         sh->bind("language", C5Config::getRegValue("receipt_language").toInt());
         sh->bind("receipt_printer", C5Config::fSettingsName);
+        sh->bind("withoutprint", withoutprint);
         sh->send();
         C5LogToServerThread::remember(LOG_WAITER, fUser->fullName(), "", wo->fOrderDriver->currentOrderId(), "", "Precheck", float_str(wo->fOrderDriver->headerValue("f_amounttotal").toDouble(), 2), "");
     } else {

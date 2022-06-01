@@ -56,13 +56,17 @@ int main(int argc, char *argv[])
 //    int id = QFontDatabase::addApplicationFont(":/ahuni.ttf");
 //    QString family = QFontDatabase::applicationFontFamilies(id).at(0);
     QFont font(a.font());
-    font.setPointSize(C5Config::fronDeskFontSize());
+    font.setPointSize(__c5config.fronDeskFontSize());
+    font.setFamily(__c5config.getValue(param_app_font_family));
     a.setFont(font);
 
     QFile style(a.applicationDirPath() + "/officestyle.qss");
     if (style.exists()) {
         if (style.open(QIODevice::ReadOnly)) {
-            a.setStyleSheet(style.readAll());
+            QString s = style.readAll();
+            s.replace("%font-size%", __c5config.getValue(param_fd_font_size));
+            s.replace("%font-family%", __c5config.getValue(param_app_font_family));
+            a.setStyleSheet(s);
         }
     }
 

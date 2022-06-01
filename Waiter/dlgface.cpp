@@ -11,6 +11,7 @@
 #include "dlglistofhall.h"
 #include "tablewidgetv1.h"
 #include "tablewidgetv2.h"
+#include "dlgguest.h"
 #include "c5utils.h"
 #include "datadriver.h"
 #include "tablewidget.h"
@@ -51,6 +52,7 @@ DlgFace::DlgFace(C5User *user) :
     ui->lbTime->setText(QTime::currentTime().toString(FORMAT_TIME_TO_SHORT_STR));
     connect(&fTimer, SIGNAL(timeout()), this, SLOT(timeout()));
     fTimer.start(TIMER_TIMEOUT_INTERVAL);
+    ui->btnGuests->setVisible(user->check(cp_t5_pay_transfer_to_room));
 }
 
 DlgFace::~DlgFace()
@@ -407,4 +409,11 @@ void DlgFace::filterStaffClicked()
 {
     QPushButton *btn = static_cast<QPushButton*>(sender());
     filterHall(fCurrentHall, btn->property("id").toInt());
+}
+
+
+void DlgFace::on_btnGuests_clicked()
+{
+    QString res, inv, room, guest;
+    DlgGuest::getGuest(res, inv, room, guest);
 }

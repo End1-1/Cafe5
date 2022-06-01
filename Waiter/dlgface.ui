@@ -148,7 +148,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="../resources/res.qrc">
+         <iconset resource="../resources/resources.qrc">
           <normaloff>:/cancel.png</normaloff>:/cancel.png</iconset>
         </property>
         <property name="iconSize">
@@ -182,6 +182,19 @@
         </property>
         <property name="text">
          <string>By waiters</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnGuests">
+        <property name="minimumSize">
+         <size>
+          <width>140</width>
+          <height>60</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Guests</string>
         </property>
        </widget>
       </item>
@@ -394,6 +407,7 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
+  <include location="../resources/resources.qrc"/>
   <include location="../resources/res.qrc"/>
  </resources>
  <connections/>

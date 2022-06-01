@@ -26,7 +26,7 @@
       <enum>Qt::NoFocus</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>6</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -1375,7 +1375,7 @@
              <number>3</number>
             </property>
             <property name="tag" stdset="0">
-             <number>96</number>
+             <number>99</number>
             </property>
            </widget>
           </item>
