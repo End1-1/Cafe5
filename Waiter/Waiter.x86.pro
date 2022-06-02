@@ -193,7 +193,8 @@ SOURCES += \
     ../Classes/c5translator.cpp \
     ../Cafe5/dlgexitbyversion.cpp \
     ../Classes/fileversion.cpp \
-    dlgsearchinmenu.cpp
+    dlgsearchinmenu.cpp \
+    dlgaskforprecheck.cpp
 
 HEADERS += \
     ../../XLSX/src/crs32.h \
@@ -364,7 +365,8 @@ HEADERS += \
     c5printreceiptthread.h \
     ../Cafe5/dlgexitbyversion.h \
     ../Classes/fileversion.h \
-    dlgsearchinmenu.h
+    dlgsearchinmenu.h \
+    dlgaskforprecheck.h
 
 FORMS += \
     ../Cafe5/calendar.ui \
@@ -419,7 +421,8 @@ FORMS += \
     dlgcl.ui \
     dlgexitwithmessage.ui \
     ../Cafe5/dlgexitbyversion.ui \
-    dlgsearchinmenu.ui
+    dlgsearchinmenu.ui \
+    dlgaskforprecheck.ui
 
 INCLUDEPATH += ../Cafe5
 INCLUDEPATH += ../Classes
