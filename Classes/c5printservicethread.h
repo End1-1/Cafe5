@@ -17,6 +17,8 @@ public:
 
     QString fReprintList;
 
+    bool fUseAliases;
+
     bool fBooking;
 
 private:

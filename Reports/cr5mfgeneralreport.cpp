@@ -87,7 +87,7 @@ void CR5MFGeneralReport::completeRefresh()
         if (fModel->indexForColumnName("f_total") > -1) {
             totals.append(fModel->indexForColumnName("f_total"));
         }
-        fModel->insertSubTotals(subtotalcol, totals);
+        fModel->insertSubTotals(subtotalcol, totals, true, true);
     }
 
     QString name;
@@ -128,12 +128,12 @@ void CR5MFGeneralReport::completeRefresh()
         }
     }
 
-    subtotalcol = fModel->indexForColumnName("f_date");
-    if (subtotalcol > -1) {
-        QList<int> totals;
-        if (fModel->indexForColumnName("f_total") > -1) {
-            totals.append(fModel->indexForColumnName("f_total"));
-        }
-        fModel->insertSubTotals(subtotalcol, totals);
-    }
+//    subtotalcol = fModel->indexForColumnName("f_date");
+//    if (subtotalcol > -1) {
+//        QList<int> totals;
+//        if (fModel->indexForColumnName("f_total") > -1) {
+//            totals.append(fModel->indexForColumnName("f_total"));
+//        }
+//        fModel->insertSubTotals(subtotalcol, totals, false, false);
+//    }
 }

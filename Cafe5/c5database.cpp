@@ -1,4 +1,5 @@
 #include "C5Database.h"
+#include "c5config.h"
 #include <QMutexLocker>
 #include <QSqlQuery>
 #include <QSqlError>
@@ -621,9 +622,10 @@ bool C5Database::exec(const QString &sqlQuery, bool &isSelect)
 
     #ifdef QT_DEBUG
         logEvent(fDb.hostName() + " (" + QString::number(fTimerCount) + " ms):" + fDb.databaseName() + " " + lastQuery(fQuery));
-    #elif  LOGGING
-        logEvent(fDb.hostName() + " (" + QString::number(fTimerCount) + " ms):" + fDb.databaseName() + " " + lastQuery(fQuery));
     #endif
+    if (__c5config.getValue(param_debuge_mode).toInt() > 0) {
+        logEvent(fDb.hostName() + " (" + QString::number(fTimerCount) + " ms):" + fDb.databaseName() + " " + lastQuery(fQuery));
+    }
 
     isSelect = fQuery->isSelect();
     QString call = "call";

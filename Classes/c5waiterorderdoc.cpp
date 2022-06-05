@@ -133,11 +133,42 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &db, QString &err)
     db[":f_key"] = param_item_code_for_hotel;
     db.exec("select f_value from s_settings_values where f_settings=:f_settings and f_key=:f_key");
     if (db.nextRow()) {
-        qDebug() << db.getString("f_value");
         item = db.getString("f_value").toInt();
     }
     if (item == 0) {
         err = "Cannot retrieve invoice item for hotel #1";
+        return true;
+    }
+
+    bool no_hotel_invoice = false;
+    db[":f_settings"] = settings;
+    db[":f_key"] = param_hotel_noinvoice;
+    db.exec("select f_value from s_settings_values where f_settings=:f_settings and f_key=:f_key");
+    if (db.nextRow()) {
+        no_hotel_invoice = db.getString("f_value").toInt() > 0;
+    }
+
+    int hallid = 0;
+    db[":f_settings"] = settings;
+    db[":f_key"] = param_hotel_hall_id;
+    db.exec("select f_value from s_settings_values where f_settings=:f_settings and f_key=:f_key");
+    if (db.nextRow()) {
+        hallid = db.getString("f_value").toInt();
+    }
+    if (hallid == 0) {
+        err = "Hall id undefined";
+        return true;
+    }
+
+    int staffid = 0;
+    db[":f_settings"] = settings;
+    db[":f_key"] = param_hotel_user_Id;
+    db.exec("select f_value from s_settings_values where f_settings=:f_settings and f_key=:f_key");
+    if (db.nextRow()) {
+        staffid = db.getString("f_value").toInt();
+    }
+    if (staffid == 0) {
+        err = "Staff id undefined";
         return true;
     }
 
@@ -149,18 +180,26 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &db, QString &err)
     QString dc = "DEBET";
     int sign = -1;
 
+    QString paymentModeComment;
     QString room, res, inv, clcode, clname, guest;
-    if (fHeader["f_otherid"].toString().toInt() == PAYOTHER_TRANSFER_TO_ROOM) {
-        room = fHeader["f_other_room"].toString();
-        inv = fHeader["f_other_inv"].toString();
-        res = fHeader["f_other_res"].toString();
-        guest = fHeader["f_other_guest"].toString();
-        paymentMode = 5;
-        dc = "CREDIT";
-        sign = 1;
-    } else if (hInt("f_otherid") == PAYOTHER_COMPLIMENTARY) {
+    db[":f_id"] = fHeader["f_id"].toString();
+    db.exec("select * from o_pay_room where f_id=:f_id");
+    if (db.nextRow()) {
+        if (!db.getString("f_inv").isEmpty()) {
+            room = db.getString("f_room");
+            inv = db.getString("f_inv");
+            res = db.getString("f_res");
+            guest = db.getString("f_guest");
+            paymentModeComment = QString("%1, %2").arg(room, guest);
+            paymentMode = 5;
+            dc = "CREDIT";
+            sign = 1;
+        }
+    }
+
+    if (hInt("f_otherid") == PAYOTHER_COMPLIMENTARY) {
         paymentMode = 6;
-    } else if (hInt("f_otherid") == PAYOTHER_SELFCOST) {
+    } else if (hInt("f_otherid") == PAYOTHER_PRIMECOST) {
         paymentMode = 14;
     }
 
@@ -220,11 +259,11 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &db, QString &err)
     }
     fDD[":f_id"] = result;
     fDD[":f_source"] = "PS";
-    fDD[":f_res"] = __c5config.getValue(param_hotel_noinvoice).toInt() == 1 ? "" : res;
+    fDD[":f_res"] = no_hotel_invoice ? "" : res;
     fDD[":f_wdate"] = QDate::fromString(hString("f_datecash"), ("dd/MM/yyyy"));
     fDD[":f_rdate"] = QDate::currentDate();
     fDD[":f_time"] = QTime::currentTime();
-    fDD[":f_user"] = __c5config.getValue(param_hotel_user_Id).toInt();
+    fDD[":f_user"] = staffid;
     fDD[":f_room"] = hInt("f_otherid") == PAYOTHER_TRANSFER_TO_ROOM ? room : clcode;
     fDD[":f_guest"] = hInt("f_otherid") == PAYOTHER_TRANSFER_TO_ROOM ? guest : clname + ", " + hString("f_prefix") + hString("f_hallid");
     fDD[":f_itemCode"] = item;
@@ -242,7 +281,7 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &db, QString &err)
     fDD[":f_sign"] = sign;
     fDD[":f_doc"] = "";
     fDD[":f_rec"] = "";
-    fDD[":f_inv"] = __c5config.getValue(param_hotel_noinvoice).toInt() == 1 ? "" : inv;
+    fDD[":f_inv"] = no_hotel_invoice ? "" : inv;
     fDD[":f_vatmode"] = 1;
     fDD[":f_finance"] = 1;
     fDD[":f_remarks"] = "";
@@ -259,17 +298,17 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &db, QString &err)
 
     fDD[":f_id"] = result;
     fDD[":f_state"] = 2;
-    fDD[":f_hall"] = __c5config.getValue(param_hotel_hall_id).toInt();
+    fDD[":f_hall"] = hallid;
     fDD[":f_table"] = 1;
-    fDD[":f_staff"] = __c5config.getValue(param_hotel_user_Id).toInt();
+    fDD[":f_staff"] = staffid;
     fDD[":f_dateopen"] = QDateTime::fromString(hString("f_dateopen") + " " + hString("f_timeopen"), "dd/MM/yyyy HH:mm:ss");
     fDD[":f_dateclose"] = QDateTime::fromString(hString("f_dateclose") + " " + hString("f_timeclose"), "dd/MM/yyyy HH:mm:ss");
     fDD[":f_datecash"] = QDate::fromString(hString("f_datecash"), ("dd/MM/yyyy"));
     fDD[":f_comment"] = "";
-    fDD[":f_paymentModeComment"] = hInt("f_otherid") == PAYOTHER_TRANSFER_TO_ROOM ? QString("%1, %2").arg(room).arg(guest) : "";
+    fDD[":f_paymentModeComment"] = paymentModeComment;
     fDD[":f_paymentMode"] = paymentMode;
     fDD[":f_cityLedger"] = clcode.toInt();
-    fDD[":f_reservation"] = res;
+    fDD[":f_reservation"] = no_hotel_invoice ? "" : res;
     fDD[":f_complex"] = 0;
     fDD[":f_print"] = hInt("f_print");
     fDD[":f_tax"] = fTax["f_receiptnumber"].toString().toInt();
@@ -765,7 +804,7 @@ QString C5WaiterOrderDoc::getHotelID(const QString &source, QString &err) {
 
 void C5WaiterOrderDoc::calculateSelfCost(C5Database &db)
 {
-    /* this method used for assigning price from selfcost in metropol */
+    /* this method used for assigning price from prime cost in metropol */
     QMap<int, QMap<int, double> > goodsQty;
     QMap<int, double> price;
     db[":f_id"] = fHeader["f_id"].toString();
@@ -797,7 +836,7 @@ void C5WaiterOrderDoc::calculateSelfCost(C5Database &db)
         }
         double selfcost = 0;
         QMap<int, double> recipe = goodsQty[o["f_dish"].toString().toInt()];
-        for (QMap<int, double>::const_iterator it = recipe.begin(); it != recipe.end(); it++) {
+        for (QMap<int, double>::const_iterator it = recipe.constBegin(); it != recipe.constEnd(); it++) {
             selfcost += price[it.key()] * it.value();
         }
         o["f_price"] = QString::number(selfcost, 'f', 2);

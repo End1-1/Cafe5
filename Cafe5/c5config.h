@@ -101,6 +101,7 @@
 #define param_app_font_family 97
 #define param_waiter_receipt_qty 98
 #define param_smart_dont_print_receipt 99
+#define param_force_use_print_alias 100
 
 #define FRONTDESK_WAITER 0
 #define FRONTDESK_SHOP 1

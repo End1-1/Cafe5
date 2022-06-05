@@ -60,9 +60,10 @@ Source: "C:\build\Install_Cafe5_x64\imageformats\qjpeg.dll"; DestDir: "{app}\ima
 Source: "C:\build\Install_Cafe5_x64\platforms\qminimal.dll"; DestDir: "{app}\platforms"; Flags: onlyifdoesntexist
 Source: "C:\build\Install_Cafe5_x64\platforms\qwindows.dll"; DestDir: "{app}\platforms"; Flags: onlyifdoesntexist
 Source: "C:\build\Install_Cafe5_x64\vcredist\VC_redist.x64.exe"; DestDir: {tmp}; Flags: deleteafterinstall
-Source: "C:\build\Waiter_X64\debug\waiter.qss"; DestDir: "{app}"; Flags: ignoreversion;
 Source: "C:\build\Cafe5_X64\release\Office.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: office
+Source: "C:\build\Cafe5_X64\debug\officestyle.qss"; DestDir: "{app}"; Flags: ignoreversion; Components: office
 Source: "C:\build\Waiter_X64\release\Waiter.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: waiter
+Source: "C:\build\Waiter_X64\debug\waiter.qss"; DestDir: "{app}"; Flags: ignoreversion; 
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Tasks]

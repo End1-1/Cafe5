@@ -41,7 +41,7 @@ void C5PrintReceiptThread50mm::print()
     p.setFontBold(true);
     p.ctext(__translator.tt(tr("Receipt #")) + QString("%1%2").arg(fHeader["f_prefix"].toString()).arg(fHeader["f_hallid"].toString()));
     p.br();
-    if (fHeader["f_otherid"].toString().toInt() == PAYOTHER_SELFCOST) {
+    if (fHeader["f_otherid"].toString().toInt() == PAYOTHER_PRIMECOST) {
         p.setFontSize(22);
         p.setFontBold(true);
         p.ctext(__translator.tt(tr("Breakfast")));

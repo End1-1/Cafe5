@@ -273,6 +273,22 @@ void C5TableModel::insertRow(int row)
     for (int i = 0, count = fRawData.count(); i < count; i++) {
         fProxyData << i;
     }
+
+//    QHash<QModelIndex, QFont> tmp;
+//    for (QHash<QModelIndex, QFont>::iterator it = fCellFont.begin(); it != fCellFont.end();) {
+//        if (it.key().row() >= row) {
+////            fCellFont[createIndex(it.key().row() + 1, it.key().column())] = it.value();
+////            fCellFont[createIndex(it.key().row() - 1, it.key().column())] = it.value();
+//            tmp[createIndex(it.key().row() - 1, it.key().column())] = it.value();
+//            it = fCellFont.erase(it);
+//        } else {
+//            it++;
+//        }
+//    }
+
+//    for (QHash<QModelIndex, QFont>::iterator it = tmp.begin(); it != tmp.end(); it++) {
+//        fCellFont[it.key()] = it.value();
+//    }
     endInsertRows();
 }
 
@@ -386,7 +402,7 @@ void C5TableModel::sumForColumns(const QStringList &columns, QMap<QString, doubl
     }
 }
 
-void C5TableModel::insertSubTotals(int col, const QList<int> &totalCols)
+void C5TableModel::insertSubTotals(int col, const QList<int> &totalCols, bool title, bool insertempty)
 {
     QFont f = fTableView->font();
     f.setBold(true);
@@ -419,9 +435,11 @@ void C5TableModel::insertSubTotals(int col, const QList<int> &totalCols)
                     fCellFont[createIndex(r, c)] = f;
                 }
                 r++;
-                insertRow(r - 1);
-                fTableView->setSpan(r, 0, 1, columnCount());
-                r++;
+                if (insertempty) {
+                    insertRow(r - 1);
+                    fTableView->setSpan(r, 0, 1, columnCount());
+                    r++;
+                }
                 currName = data(r, col, Qt::EditRole).toString();
                 for (int i = 0; i < totalCols.count(); i++) {
                     totals[i] = 0.000;
@@ -435,7 +453,9 @@ void C5TableModel::insertSubTotals(int col, const QList<int> &totalCols)
     }
     if (r > 0) {
         QList<QVariant> newrow = emptyRow;
-        newrow[0] = tr("Subtotal") + " " + currName;
+        if (title) {
+            newrow[0] = tr("Subtotal") + " " + currName;
+        }
         for (int c = 0; c < totalCols.count(); c++) {
             newrow[totalCols.at(c)] = totals[c];
         }

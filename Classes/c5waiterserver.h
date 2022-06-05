@@ -35,7 +35,7 @@ private:
 
     int printTax(const QMap<QString, QVariant> &header, const QList<QMap<QString, QVariant> > &body, QString &err);
 
-    bool printReceipt(QString &err, C5Database &db, bool isBill);
+    bool printReceipt(QString &err, C5Database &db, bool isBill, bool alias);
 
     void remember(const QJsonObject &h);
 

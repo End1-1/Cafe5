@@ -1237,6 +1237,7 @@ void DlgOrder::on_btnPrintService_clicked()
         sh->bind("cmd", sm_printservice);
         sh->bind("order", o->fOrderDriver->currentOrderId());
         sh->bind("booking", dbhall->booking(o->fOrderDriver->headerValue("f_hall").toInt()));
+        sh->bind("alias", __c5config.getValue(param_force_use_print_alias).toInt());
         sh->send();
         logRecord(fUser->fullName(), o->fOrderDriver->headerValue("f_id").toString(), "", "Send to cooking", "", "");
     }
@@ -1557,6 +1558,7 @@ void DlgOrder::on_btnTotal_clicked()
         sh->bind("language", C5Config::getRegValue("receipt_language").toInt());
         sh->bind("receipt_printer", C5Config::fSettingsName);
         sh->bind("withoutprint", withoutprint);
+        sh->bind("alias", __c5config.getValue(param_force_use_print_alias).toInt());
         sh->send();
         C5LogToServerThread::remember(LOG_WAITER, fUser->fullName(), "", wo->fOrderDriver->currentOrderId(), "", "Precheck", float_str(wo->fOrderDriver->headerValue("f_amounttotal").toDouble(), 2), "");
     } else {
@@ -1872,13 +1874,19 @@ void DlgOrder::setRoomComment()
 
 void DlgOrder::setSelfcost()
 {
-    if (!worder()) {
+    WOrder *w = worder();
+    if (!w) {
         return;
     }
-    if (worder()->fOrderDriver->headerValue("f_otherid").toInt() == PAYOTHER_SELFCOST) {
+
+    w->fOrderDriver->setHeader("f_otherid", PAYOTHER_PRIMECOST);
+    if (w->fOrderDriver->headerValue("f_otherid").toInt() == PAYOTHER_PRIMECOST) {
         ui->leRoomComment->setVisible(true);
         ui->lbRoom->setVisible(true);
-        ui->leRoomComment->setText(tr("Selfcost"));
+        ui->leRoomComment->setText(tr("Prime cost"));
+    }
+    if (w->fOrderDriver->save() == false) {
+        C5Message::error(w->fOrderDriver->error());
     }
 }
 
@@ -2205,7 +2213,7 @@ void DlgOrder::on_btnReceipt_clicked()
         case PAYOTHER_COMPLIMENTARY:
             payMethods = "Complimentary";
             break;
-        case PAYOTHER_SELFCOST:
+        case PAYOTHER_PRIMECOST:
             payMethods = "Selfcost";
             break;
         default:
@@ -2225,6 +2233,7 @@ void DlgOrder::on_btnReceipt_clicked()
     sh->bind("language", C5Config::getRegValue("receipt_language").toInt());
     sh->bind("printtax", ui->btnTax->isChecked() ? 1 : 0);
     sh->bind("receipt_printer", C5Config::fSettingsName);
+    sh->bind("alias", __c5config.getValue(param_force_use_print_alias).toInt());
     sh->bind("close", 1);
     sh->send();
 }
@@ -2596,6 +2605,7 @@ void DlgOrder::on_btnPaymentIdram_clicked()
     QByteArray out;
     double v;
     if (Idram::check(__c5config.getValue(param_idram_server), __c5config.getValue(param_idram_session_id), wo->fOrderDriver->headerValue("f_id").toString(), v, out)) {
+//        if (Idram::check("https://www.ya.ru", __c5config.getValue(param_idram_session_id), wo->fOrderDriver->headerValue("f_id").toString(), v, out)) {
         ui->leIDRAM->setDouble(v);
         ui->leCash->setText("0");
         ui->leCard->setText("0");
@@ -2609,7 +2619,10 @@ void DlgOrder::on_btnPaymentIdram_clicked()
         }
         C5Message::error(err);
     }
-    C5LogToServerThread::remember(LOG_WAITER, fUser->fullName(), "", wo->fOrderDriver->currentOrderId(), "", "Idram request", QString(out), "");
+    C5LogToServerThread::remember(LOG_WAITER, fUser->fullName(), "",
+                                  wo->fOrderDriver->currentOrderId(), "",
+                                  "Idram request: " + __c5config.getValue(param_idram_server),
+                                  QString(out), "");
 }
 
 void DlgOrder::on_btnFillPayX_clicked()

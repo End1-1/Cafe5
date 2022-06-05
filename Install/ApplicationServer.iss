@@ -96,7 +96,7 @@ Name: "russian"; MessagesFile: "compiler:Languages\Russian.isl"
 [Icons]
 ;Name: "{autoprograms}\My Program"; Filename: "{app}\Service5.exe"
 ;Name: "{autodesktop}\My Program"; Filename: "{app}\Service5.exe"; Tasks: desktopicon
-Name: "{group}\Monitor"; Filename: "{app}\Service5.exe"; Parameters: "gui";
+Name: "{group}\Monitor"; Filename: "{app}\Service5.exe"; Parameters: "--gui";
 Name: "{group}\{cm:UninstallProgram,BreezeServer}"; Filename: "{uninstallexe}"
 
 [Run]

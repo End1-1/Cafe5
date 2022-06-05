@@ -114,7 +114,7 @@ bool C5PrintReceiptThread::print()
     p.setFontBold(true);
     p.ctext(__translator.tt(tr("Receipt #")) + QString("%1%2").arg(fHeaderInfo["f_prefix"].toString()).arg(fHeaderInfo["f_hallid"].toString()));
     p.br();
-    if (fHeaderInfo["f_otherid"].toInt() == PAYOTHER_SELFCOST) {
+    if (fHeaderInfo["f_otherid"].toInt() == PAYOTHER_PRIMECOST) {
         p.setFontSize(bs + 4);
         p.setFontBold(true);
         p.ctext(__translator.tt(tr("Breakfast")));

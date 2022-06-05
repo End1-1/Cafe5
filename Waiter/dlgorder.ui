@@ -2387,7 +2387,7 @@ IDRAM</string>
             </size>
            </property>
            <property name="text">
-            <string>BREAKFAST</string>
+            <string>PRIME COST</string>
            </property>
            <property name="icon">
             <iconset resource="../resources/resources.qrc">

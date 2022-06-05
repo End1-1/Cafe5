@@ -14,6 +14,7 @@ C5PrintServiceThread::C5PrintServiceThread(const QString &header, QObject *paren
 {
     fHeader = header;
     fBooking = false;
+    fUseAliases = false;
 }
 
 C5PrintServiceThread::~C5PrintServiceThread()
@@ -25,9 +26,11 @@ bool C5PrintServiceThread::run()
 {
     QSet<QString> fPrint1, fPrint2;
     C5Database db(__c5config.dbParams());
-    db.exec("select f_alias, f_printer from d_print_aliases");
-    while (db.nextRow()) {
-        fPrinterAliases[db.getString("f_alias")] = db.getString("f_printer");
+    if (fUseAliases) {
+        db.exec("select f_alias, f_printer from d_print_aliases");
+        while (db.nextRow()) {
+            fPrinterAliases[db.getString("f_alias")] = db.getString("f_printer");
+        }
     }
     db[":f_id"] = fHeader;
     db.exec("select * from o_header where f_id=:f_id");
@@ -114,6 +117,12 @@ bool C5PrintServiceThread::run()
 
 void C5PrintServiceThread::print(QString printer, const QString &side, bool reprint)
 {
+    C5Database().logEvent(QString::number(__c5config.receiptParepWidth()));
+    QString originalPrinter = printer;
+    if (fPrinterAliases.contains(printer)) {
+        printer = fPrinterAliases[printer];
+    }
+
     QFont font(qApp->font());
     font.setPointSize(20);
     C5Printing p;
@@ -222,11 +231,6 @@ void C5PrintServiceThread::print(QString printer, const QString &side, bool repr
     p.br();
     p.ltext(tr("Storage: ") + storages.toList().join(","), 0);
 
-    QString originalPrinter = printer;
-    if (fPrinterAliases.contains(printer)) {
-        printer = fPrinterAliases[printer];
-    }
-
     QString final = "OK";
     if (!p.print(printer, QPrinter::Custom)) {
         final = "FAIL";
@@ -255,7 +259,7 @@ void C5PrintServiceThread::print(QString printer, const QString &side, bool repr
     QFile f(fileName);
     if (f.open(QIODevice::WriteOnly)) {
         QJsonDocument jdoc(p.jsonData());
-        f.write(jdoc.toJson());
+        f.write(jdoc.toJson(QJsonDocument::Compact));
     }
     f.close();
 }

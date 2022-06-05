@@ -45,6 +45,7 @@ void C5WaiterServer::reply(QJsonObject &o)
 #ifdef QT_DEBUG
     qDebug() << fIn;
 #endif
+    //C5Database().logEvent(QJsonDocument(fIn).toJson(QJsonDocument::Compact));
     QMap<QString, QVariant> bv;
     int cmd = fIn["cmd"].toInt();
     o["cmd"] = cmd;
@@ -244,12 +245,13 @@ void C5WaiterServer::reply(QJsonObject &o)
         C5PrintServiceThread ps(fIn["order"].toString());
         ps.fReprintList = fIn["reprint"].toString();
         ps.fBooking = fIn["booking"].toInt() == 1;
+        ps.fUseAliases = fIn["alias"].toInt() > 0;
         ps.run();
         break;
     }
     case sm_printreceipt: {
         QString err;
-        bool r = printReceipt(err, srh.fDb, false);
+        bool r = printReceipt(err, srh.fDb, false, fIn["alias"].toInt() > 0);
         o["reply"] = r ? 1 : 0;
         o["msg"] = err;
         o["close"] = fIn["close"];
@@ -258,7 +260,7 @@ void C5WaiterServer::reply(QJsonObject &o)
     }
     case sm_bill: {
         QString err;
-        printReceipt(err, srh.fDb, true);
+        printReceipt(err, srh.fDb, true, fIn["alias"].toInt() > 0);
         o["reply"] = err.isEmpty() ? 1 : 0;
         o["msg"] = err;
         o["close"] = fIn["close"];
@@ -875,7 +877,7 @@ void C5WaiterServer::processCloseOrder(QJsonObject &o, C5Database &db)
             }
         }
 
-        if (orderstate == ORDER_STATE_CLOSE) {
+        if (orderstate == ORDER_STATE_CLOSE) {            
             if (jh["f_bonusid"].toString().toInt() > 0) {
                 db[":f_id"] = jh["f_id"].toString();
                 qDebug() << jh;
@@ -1019,8 +1021,19 @@ int C5WaiterServer::printTax(const QMap<QString, QVariant> &header, const QList<
     return result;
 }
 
-bool C5WaiterServer::printReceipt(QString &err, C5Database &db, bool isBill)
+bool C5WaiterServer::printReceipt(QString &err, C5Database &db, bool isBill, bool alias)
 {
+
+    if (fIn["close"].toInt() > 0) {
+        db[":f_id"] = fIn["order"].toString();
+        db.exec("select f_otherid from o_header where f_id=:f_id");
+        if (db.nextRow()) {
+            if (db.getInt("f_otherid") == PAYOTHER_PRIMECOST) {
+                C5WaiterOrderDoc w(fIn["order"].toString(), db);
+                w.calculateSelfCost(db);
+            }
+        }
+    }
     QMap<QString, QVariant> headerInfo;
     db[":f_id"] = fIn["order"].toString();
     if (!db.exec("select * from o_header where f_id=:f_id")) {
@@ -1091,12 +1104,7 @@ bool C5WaiterServer::printReceipt(QString &err, C5Database &db, bool isBill)
 //        }
 //    }
        //CHECK SELFCOST
-//    if (jh["f_otherid"].toString().toInt() == PAYOTHER_SELFCOST) {
-//        C5WaiterOrderDoc w(srh.fDb, jh, jb);
-//        w.calculateSelfCost(srh.fDb);
-//        jh = w.fHeader;
-//        jb = w.fItems;
-//    }
+
     // CHECKING FOR TAX CASH/CARD
     // PRINT RECEIPT
     // TODO: CHECK FOR DESTINATION PRINTER AND REDIRECT QUERY//        jh["f_idramid"] = C5Config::idramID();
@@ -1129,6 +1137,14 @@ bool C5WaiterServer::printReceipt(QString &err, C5Database &db, bool isBill)
             if (db.getString(0).toInt() == 1) {
                 printType = 50;
             }
+        }
+    }
+
+    if (alias) {
+        db[":f_alias"] = printerName;
+        db.exec("select * from d_print_aliases where f_alias=:f_alias");
+        if (db.nextRow()) {
+            printerName = db.getString("f_printer");
         }
     }
 

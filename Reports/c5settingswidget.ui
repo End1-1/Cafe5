@@ -1335,18 +1335,19 @@
        <string>Printing</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_7">
-       <item row="10" column="1">
-        <spacer name="verticalSpacer_7">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_69">
+         <property name="text">
+          <string>Static QR code text</string>
          </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>256</height>
-          </size>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="C5LineEdit" name="leStaticQRCode">
+         <property name="Tag" stdset="0">
+          <number>73</number>
          </property>
-        </spacer>
+        </widget>
        </item>
        <item row="8" column="0">
         <widget class="QGroupBox" name="groupBox">
@@ -1375,7 +1376,7 @@
              <number>3</number>
             </property>
             <property name="tag" stdset="0">
-             <number>96</number>
+             <number>99</number>
             </property>
            </widget>
           </item>
@@ -1412,37 +1413,10 @@
          </layout>
         </widget>
        </item>
-       <item row="3" column="1">
-        <widget class="C5CheckBox" name="chPrintDishOrder">
-         <property name="text">
-          <string/>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>62</number>
-         </property>
-        </widget>
-       </item>
        <item row="3" column="0">
         <widget class="QLabel" name="label_58">
          <property name="text">
           <string>Print dish timeorder</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1" colspan="2">
-        <widget class="C5LineEdit" name="leReceipPaperWidth">
-         <property name="Tag" stdset="0">
-          <number>61</number>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="1">
-        <widget class="C5CheckBox" name="chPrintScancodeWithName">
-         <property name="text">
-          <string/>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>60</number>
          </property>
         </widget>
        </item>
@@ -1484,17 +1458,34 @@
          </layout>
         </widget>
        </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label">
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_59">
          <property name="text">
-          <string>Receipt printer</string>
+          <string>Receipt paper width</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_69">
+       <item row="0" column="1" colspan="2">
+        <widget class="C5LineEdit" name="leLocalReceiptPrinter">
+         <property name="Tag" stdset="0">
+          <number>1</number>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1" colspan="2">
+        <widget class="C5LineEdit" name="leReceipPaperWidth">
+         <property name="Tag" stdset="0">
+          <number>61</number>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="C5CheckBox" name="chPrintScancodeWithName">
          <property name="text">
-          <string>Static QR code text</string>
+          <string/>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>60</number>
          </property>
         </widget>
        </item>
@@ -1536,10 +1527,33 @@
          </layout>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_59">
+       <item row="10" column="1">
+        <spacer name="verticalSpacer_7">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>256</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="3" column="1">
+        <widget class="C5CheckBox" name="chPrintDishOrder">
          <property name="text">
-          <string>Receipt paper width</string>
+          <string/>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>62</number>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Receipt printer</string>
          </property>
         </widget>
        </item>
@@ -1550,17 +1564,20 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="1" colspan="2">
-        <widget class="C5LineEdit" name="leLocalReceiptPrinter">
-         <property name="Tag" stdset="0">
-          <number>1</number>
+       <item row="6" column="0">
+        <widget class="QLabel" name="label_93">
+         <property name="text">
+          <string>Force use print alias</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="1">
-        <widget class="C5LineEdit" name="leStaticQRCode">
+       <item row="6" column="1">
+        <widget class="C5CheckBox" name="chForceUsePrintAlias">
+         <property name="text">
+          <string/>
+         </property>
          <property name="Tag" stdset="0">
-          <number>73</number>
+          <number>100</number>
          </property>
         </widget>
        </item>
@@ -1917,20 +1934,20 @@
   <tabstop>chAskForPrecheck</tabstop>
   <tabstop>chFinalReceiptQtySelect</tabstop>
   <tabstop>chCloseTableAfterPrecheck</tabstop>
-  <tabstop>chNoCashDoc</tabstop>
-  <tabstop>chNoScanCode</tabstop>
-  <tabstop>chFixAutoenterInputDocPrice</tabstop>
-  <tabstop>leOrderPrefix</tabstop>
+  <tabstop>leLocalReceiptPrinter</tabstop>
+  <tabstop>leReceipPaperWidth</tabstop>
+  <tabstop>leStaticQRCode</tabstop>
   <tabstop>chAutoCash</tabstop>
-  <tabstop>leCashId</tabstop>
-  <tabstop>leCashIdPrefix</tabstop>
-  <tabstop>leCardId</tabstop>
-  <tabstop>leCardIdPrefix</tabstop>
-  <tabstop>leReceiptFooterText</tabstop>
-  <tabstop>chAutoDateCash</tabstop>
-  <tabstop>leDateOfClose</tabstop>
-  <tabstop>leShift</tabstop>
-  <tabstop>leChangeWorkingDateTime</tabstop>
+  <tabstop>chPrintScancodeWithName</tabstop>
+  <tabstop>chForceUsePrintAlias</tabstop>
+  <tabstop>rbPrintVNoPrint</tabstop>
+  <tabstop>rbPrintV1</tabstop>
+  <tabstop>rbPrintV2</tabstop>
+  <tabstop>rbPrintV3</tabstop>
+  <tabstop>rbPrint50</tabstop>
+  <tabstop>rbPrint80</tabstop>
+  <tabstop>rbPrintLeft</tabstop>
+  <tabstop>rbPrintDown</tabstop>
   <tabstop>chHideShopQuantity</tabstop>
   <tabstop>leAutologinPin2</tabstop>
   <tabstop>leHttpIP</tabstop>
@@ -1938,7 +1955,7 @@
   <tabstop>leHttpUsername</tabstop>
   <tabstop>chDenyWhosale</tabstop>
   <tabstop>chDenyPriceChange</tabstop>
-  <tabstop>rbPrintDown</tabstop>
+  <tabstop>leChangeWorkingDateTime</tabstop>
   <tabstop>leInputDocNumDigits</tabstop>
   <tabstop>leMoveDocNumDigits</tabstop>
   <tabstop>leOutDocNumDigits</tabstop>
@@ -1962,16 +1979,16 @@
   <tabstop>leIdramTipsWallet</tabstop>
   <tabstop>leHttpPassword</tabstop>
   <tabstop>chAlwaysOfferTax</tabstop>
-  <tabstop>leLocalReceiptPrinter</tabstop>
-  <tabstop>leReceipPaperWidth</tabstop>
-  <tabstop>rbPrintV1</tabstop>
-  <tabstop>rbPrint50</tabstop>
-  <tabstop>rbPrintLeft</tabstop>
-  <tabstop>rbPrint80</tabstop>
-  <tabstop>chPrintScancodeWithName</tabstop>
-  <tabstop>rbPrintV2</tabstop>
+  <tabstop>chNoCashDoc</tabstop>
+  <tabstop>chNoScanCode</tabstop>
+  <tabstop>leCardId</tabstop>
+  <tabstop>chAutoDateCash</tabstop>
+  <tabstop>leShift</tabstop>
+  <tabstop>leDateOfClose</tabstop>
+  <tabstop>leOrderPrefix</tabstop>
+  <tabstop>leCardIdPrefix</tabstop>
   <tabstop>leInputDocCounter</tabstop>
-  <tabstop>leStaticQRCode</tabstop>
+  <tabstop>chFixAutoenterInputDocPrice</tabstop>
   <tabstop>chPrintDishOrder</tabstop>
   <tabstop>btnScalePath</tabstop>
   <tabstop>leTaxDept</tabstop>
@@ -1985,14 +2002,15 @@
   <tabstop>leShopMobileClentConfig</tabstop>
   <tabstop>leAutologinPin1</tabstop>
   <tabstop>btnTestScaleODBCString</tabstop>
-  <tabstop>rbPrintV3</tabstop>
+  <tabstop>leReceiptFooterText</tabstop>
   <tabstop>chNeverOfferTax</tabstop>
   <tabstop>chUpdateTempStorageForShop</tabstop>
   <tabstop>chAutomaticallyStoreOutWaiter</tabstop>
-  <tabstop>rbPrintVNoPrint</tabstop>
+  <tabstop>leCashIdPrefix</tabstop>
   <tabstop>chFixShopStaff</tabstop>
   <tabstop>leOutDocCounter</tabstop>
   <tabstop>leMoveDocCounter</tabstop>
+  <tabstop>leCashId</tabstop>
  </tabstops>
  <resources/>
  <connections/>

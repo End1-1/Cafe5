@@ -127,11 +127,14 @@ bool C5StoreDraftWriter::removeStoreDocument(C5Database &db, const QString &id, 
         return false;
     }
 
+    int storei = 0;
+    int storeo = 0;
     db[":f_id"] = id;
     db.exec("select f_storein, f_storeout from a_header_store where f_id=:f_id");
-    db.nextRow();
-    int storei = db.getInt(0);
-    int storeo = db.getInt(1);
+    if (db.nextRow()) {
+        storei = db.getInt(0);
+        storeo = db.getInt(1);
+    }
 
     db[":f_document"] = id;
     db.exec("delete from a_store_draft where f_document=:f_document");
