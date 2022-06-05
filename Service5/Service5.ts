@@ -4,17 +4,17 @@
 <context>
     <name>C5Message</name>
     <message>
-        <location filename="../Cafe5/c5message.ui" line="71"/>
-        <source>Message</source>
+        <location filename="../Cafe5/c5message.ui" line="140"/>
+        <source>msg</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5message.ui" line="124"/>
+        <location filename="../Cafe5/c5message.ui" line="193"/>
         <source>A1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5message.ui" line="137"/>
+        <location filename="../Cafe5/c5message.ui" line="206"/>
         <source>A2</source>
         <translation type="unfinished"></translation>
     </message>

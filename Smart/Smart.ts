@@ -316,17 +316,17 @@
 <context>
     <name>C5Message</name>
     <message>
-        <location filename="../Cafe5/c5message.ui" line="71"/>
-        <source>Message</source>
-        <translation></translation>
+        <location filename="../Cafe5/c5message.ui" line="140"/>
+        <source>msg</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5message.ui" line="124"/>
+        <location filename="../Cafe5/c5message.ui" line="193"/>
         <source>A1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5message.ui" line="137"/>
+        <location filename="../Cafe5/c5message.ui" line="206"/>
         <source>A2</source>
         <translation type="unfinished"></translation>
     </message>
@@ -820,62 +820,62 @@
 <context>
     <name>C5PrintServiceThread</name>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="126"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="135"/>
         <source>PREORDER</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="131"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="140"/>
         <source>Guests</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="142"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="151"/>
         <source>REPRINT</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="149"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="158"/>
         <source>New order</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="151"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="160"/>
         <source>Table</source>
         <translation type="unfinished">ՍԵՂԱՆ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="154"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="163"/>
         <source>Order no</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="157"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="166"/>
         <source>Date</source>
         <translation type="unfinished">Ամսաթիվ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="160"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="169"/>
         <source>Time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="163"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="172"/>
         <source>Staff</source>
         <translation type="unfinished">Սպասարկող</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="190"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="199"/>
         <source>Extra price</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="219"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="228"/>
         <source>Printer: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="223"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="232"/>
         <source>Storage: </source>
         <translation type="unfinished"></translation>
     </message>
@@ -896,42 +896,42 @@
         <translation>Ելք ըստ վաճառքի</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="226"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="229"/>
         <source>No hall with id</source>
         <translation>Նշված կոդով սրահը բացակայում է</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="270"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="273"/>
         <source>Error in store document, partial data was lost</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="319"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="322"/>
         <source>Error in cash document, partial data was lost</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="329"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="332"/>
         <source>Empty cash document</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="413"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="416"/>
         <source>Document not exists</source>
         <translation>Փաստաթուղթը գոյություն չունի</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="936"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="939"/>
         <source>Invalid document id</source>
         <translation>Սխալ փաստաթղթի համար</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="1065"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="1068"/>
         <source>Not enough materials in the store</source>
         <translation>Բացասական քանակ պահեստում</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="1164"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="1167"/>
         <source>This order used in next documents</source>
         <translation>Այս փաստաթուղթը օգտագործվում է հետևյալ պահեստի ելքերի մեջ</translation>
     </message>
@@ -939,12 +939,12 @@
 <context>
     <name>C5TableModel</name>
     <message>
-        <location filename="../Classes/c5tablemodel.cpp" line="412"/>
+        <location filename="../Classes/c5tablemodel.cpp" line="428"/>
         <source>SUBTOTAL</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5tablemodel.cpp" line="438"/>
+        <location filename="../Classes/c5tablemodel.cpp" line="457"/>
         <source>Subtotal</source>
         <translation type="unfinished"></translation>
     </message>
@@ -993,7 +993,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterorderdoc.cpp" line="367"/>
+        <location filename="../Classes/c5waiterorderdoc.cpp" line="406"/>
         <source>Document saved</source>
         <translation type="unfinished"></translation>
     </message>
