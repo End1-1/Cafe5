@@ -31,14 +31,14 @@ bool Idram::check(const QString &server, const QString &sessionid, const QString
     QSslSocket s;
     s.connectToHostEncrypted(host, 443);
     if (!s.waitForEncrypted(10000)) {
-        out = s.errorString().toLatin1();
+        out = s.errorString().toLatin1() + "\r\nWait for encrypted: " + host.toLatin1();
         return false;
     }
     s.waitForEncrypted();
     s.write(str.toLatin1());
     s.waitForBytesWritten();
     if (!s.waitForReadyRead(10000)) {
-        out = s.errorString().toLatin1();
+        out = s.errorString().toLatin1() + "\r\nWait for ready read: " + host.toLatin1();
         return false;
     }
     out = s.readAll();
@@ -51,7 +51,6 @@ bool Idram::check(const QString &server, const QString &sessionid, const QString
         datastart = chunkend + 2;
         datasize = dataend - datastart;//QString(replyData.mid(datastart, chunkend - datastart)).toInt(nullptr, 16);
     }
-    qDebug() << out.mid(datastart, datasize);
     QJsonDocument jdoc = QJsonDocument::fromJson(out.mid(datastart, datasize));
     QJsonObject jo = jdoc.object();
     QJsonArray ja = jo["Result"].toArray();

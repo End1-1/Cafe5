@@ -36,6 +36,9 @@
        <height>16777215</height>
       </size>
      </property>
+     <property name="FilterName" stdset="0">
+      <string>d2</string>
+     </property>
     </widget>
    </item>
    <item row="2" column="1">
@@ -71,6 +74,9 @@
        <width>120</width>
        <height>16777215</height>
       </size>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>d1</string>
      </property>
     </widget>
    </item>
@@ -211,18 +217,32 @@
      </property>
     </widget>
    </item>
+   <item row="0" column="2">
+    <widget class="QToolButton" name="btnFixDate">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources/res.qrc">
+       <normaloff>:/pushpin.png</normaloff>:/pushpin.png</iconset>
+     </property>
+     <property name="FixDate" stdset="0">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5DateEdit</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5dateedit.h</header>
-  </customwidget>
-  <customwidget>
    <class>C5LineEditWithSelector</class>
    <extends>QLineEdit</extends>
    <header location="global">c5lineeditwithselector.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5DateEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5dateedit.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
@@ -234,6 +254,8 @@
   <tabstop>lePosition</tabstop>
   <tabstop>leWorker</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../resources/res.qrc"/>
+ </resources>
  <connections/>
 </ui>

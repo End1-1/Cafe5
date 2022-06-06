@@ -2,6 +2,7 @@
 #include "cr5mfgeneralreportfilter.h"
 #include "c5tablemodel.h"
 #include "xlsxsheet.h"
+#include <QApplication>
 
 CR5MFGeneralReport::CR5MFGeneralReport(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
@@ -81,13 +82,23 @@ QToolBar *CR5MFGeneralReport::toolBar()
 void CR5MFGeneralReport::completeRefresh()
 {
     C5ReportWidget::completeRefresh();
-    int subtotalcol = fModel->indexForColumnName("f_workername");
+
+    int subtotalcol = fModel->indexForColumnName("f_date");
     if (subtotalcol > -1) {
         QList<int> totals;
         if (fModel->indexForColumnName("f_total") > -1) {
             totals.append(fModel->indexForColumnName("f_total"));
         }
-        fModel->insertSubTotals(subtotalcol, totals, true, true);
+        fModel->insertSubTotals(subtotalcol, totals, false, false);
+    }
+
+    subtotalcol = fModel->indexForColumnName("f_workername");
+    if (subtotalcol > -1) {
+        QList<int> totals;
+        if (fModel->indexForColumnName("f_total") > -1) {
+            totals.append(fModel->indexForColumnName("f_total"));
+        }
+        fModel->insertSubTotals(subtotalcol, totals, false, false);
     }
 
     QString name;
@@ -97,43 +108,71 @@ void CR5MFGeneralReport::completeRefresh()
             continue;
         }
         if (name.isEmpty()) {
-           fi = i;
+           fi = i == 0 ? i : i - 1;
            name = fModel->data(i, 0, Qt::EditRole).toString();
         }
         if (name != fModel->data(i, 0, Qt::EditRole).toString()) {
-            fTableView->setSpan(fi, 0, i - fi, 1);
-            name = fModel->data(i + 2, 0, Qt::EditRole).toString();
-            fTableView->setSpan(i, 0, 1, 6);
-            fTableView->setSpan(i + 1, 0, 1, 7);
-            fi = i + 2;
-            i ++;
+            fTableView->setSpan(fi, 0, i - fi - 2, 1);
+            name.clear();
         }
     }
 
     name.clear();
     fi = 0;
     for (int i = 0; i < fModel->rowCount(); i++) {
-        if (fModel->data(i, 0, Qt::EditRole).toString().isEmpty()) {
-            continue;
+        if (i == 0) {
+           name = fModel->data(i, 1, Qt::EditRole).toString();
+           continue;
         }
         if (name.isEmpty()) {
-           fi = i;
-           name = fModel->data(i, 1, Qt::EditRole).toString();
+            fi = i + 1;
+            if (!fModel->data(i + 1, 1, Qt::EditRole).toString().isEmpty()) {
+                name = fModel->data(i + 1, 1, Qt::EditRole).toString();
+            }
         }
-        if (name != fModel->data(i, 1, Qt::EditRole).toString()) {
-            fTableView->setSpan(fi, 1, i - fi, 1);
-            name = fModel->data(i + 2, 1, Qt::EditRole).toString();
-            fi = i + 2;
-            i ++;
+        if (i < fModel->rowCount() - 1) {
+            if (!name.isEmpty() && name != fModel->data(i + 1, 1, Qt::EditRole).toString()) {
+                qDebug() << name << fModel->data(i + 1, 1, Qt::EditRole).toString();
+                fTableView->setSpan(fi, 1, i - fi + 1, 1);
+                fi = i + 1;
+                name.clear();
+            }
+        }
+    }
+    if (fi > 0) {
+        fTableView->setSpan(fi, 1, fModel->rowCount() - 1 - fi - 1, 1);
+    }
+
+    for (int i = fModel->rowCount() - 2; i > 0; i--) {
+        if (fModel->data(i, 0, Qt::EditRole).toString().isEmpty() && fModel->data(i - 1, 1, Qt::EditRole).toString().isEmpty()) {
+            fModel->insertRow(i);
         }
     }
 
-//    subtotalcol = fModel->indexForColumnName("f_date");
-//    if (subtotalcol > -1) {
-//        QList<int> totals;
-//        if (fModel->indexForColumnName("f_total") > -1) {
-//            totals.append(fModel->indexForColumnName("f_total"));
-//        }
-//        fModel->insertSubTotals(subtotalcol, totals, false, false);
-//    }
+    QFont f(fTableView->font());
+    f.setBold(true);
+    for (int i = 0; i < fModel->rowCount(); i++) {
+        if (!fModel->data(i, 0, Qt::EditRole).toString().isEmpty()) {
+            name = fModel->data(i, 0, Qt::EditRole).toString();
+        }
+        if (fModel->data(i, 0, Qt::EditRole).toString().isEmpty()) {
+            fTableView->setSpan(i, 0, 1, 6);
+        }
+        if (fModel->data(i, 1, Qt::EditRole).toString().isEmpty()) {
+            fTableView->setSpan(i, 1, 1, 5);
+        }
+        if (fModel->data(i, 0, Qt::EditRole).toString().isEmpty()
+                && fModel->data(i, 6, Qt::EditRole).toString().isEmpty()) {
+            fTableView->setSpan(i, 0, 1, 7);
+        }
+        if (fModel->data(i, 0, Qt::EditRole).toString().isEmpty()) {
+            fModel->setData(i, 6, f, Qt::FontRole);
+            if (i > 0) {
+                if (fModel->data(i - 1, 0, Qt::EditRole).toString().isEmpty()) {
+                    fModel->setData(i, 0, QString("%1 %2").arg(tr("Total")).arg(name));
+                    fModel->setData(i, 0, f, Qt::FontRole);
+                }
+            }
+        }
+    }
 }

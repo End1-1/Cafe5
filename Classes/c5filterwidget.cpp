@@ -57,9 +57,7 @@ void C5FilterWidget::saveFilter(QWidget *parent)
 void C5FilterWidget::restoreFilter(QWidget *parent)
 {
     QSettings s(_ORGANIZATION_, QString("%1\\%2\\reportfilter\\%3")
-                .arg(_APPLICATION_)
-                .arg(_MODULE_)
-                .arg(metaObject()->className()));
+                .arg(_APPLICATION_, _MODULE_, metaObject()->className()));
     QObjectList ol = parent->children();
     QString filterName;
     QVariant value;

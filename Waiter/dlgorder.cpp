@@ -1879,14 +1879,10 @@ void DlgOrder::setSelfcost()
         return;
     }
 
-    w->fOrderDriver->setHeader("f_otherid", PAYOTHER_PRIMECOST);
     if (w->fOrderDriver->headerValue("f_otherid").toInt() == PAYOTHER_PRIMECOST) {
         ui->leRoomComment->setVisible(true);
         ui->lbRoom->setVisible(true);
         ui->leRoomComment->setText(tr("Prime cost"));
-    }
-    if (w->fOrderDriver->save() == false) {
-        C5Message::error(w->fOrderDriver->error());
     }
 }
 
@@ -2024,6 +2020,7 @@ void DlgOrder::on_btnPaymentCash_clicked()
     worder()->fOrderDriver->setHeader("f_amountother", 0);
     worder()->fOrderDriver->setHeader("f_amountpayx", 0);
     worder()->fOrderDriver->setHeader("f_amountidram", 0);
+    worder()->fOrderDriver->setHeader("f_otherid", 0);
     ui->leRemain->setDouble(0);
     clearOther();
     headerToLineEdit();
@@ -2040,6 +2037,7 @@ void DlgOrder::on_btnPaymentCard_clicked()
     worder()->fOrderDriver->setHeader("f_amountother", 0);
     worder()->fOrderDriver->setHeader("f_amountpayx", 0);
     worder()->fOrderDriver->setHeader("f_amountidram", 0);
+    worder()->fOrderDriver->setHeader("f_otherid", 0);
     ui->leRemain->setDouble(0);
     clearOther();
     headerToLineEdit();
@@ -2054,6 +2052,7 @@ void DlgOrder::on_btnPaymentBank_clicked()
     worder()->fOrderDriver->setHeader("f_amountbank", worder()->fOrderDriver->headerValue("f_amounttotal"));
     worder()->fOrderDriver->setHeader("f_amountprepaid", 0);
     worder()->fOrderDriver->setHeader("f_amountother", 0);
+    worder()->fOrderDriver->setHeader("f_otherid", 0);
     ui->leRemain->setDouble(0);
     clearOther();
     headerToLineEdit();
@@ -2068,6 +2067,7 @@ void DlgOrder::on_btnPrepayment_clicked()
     worder()->fOrderDriver->setHeader("f_amountbank", 0);
     worder()->fOrderDriver->setHeader("f_amountprepaid", worder()->fOrderDriver->headerValue("f_amounttotal"));
     worder()->fOrderDriver->setHeader("f_amountother", 0);
+    worder()->fOrderDriver->setHeader("f_otherid", 0);
     ui->leRemain->setDouble(0);
     clearOther();
     headerToLineEdit();
@@ -2611,6 +2611,7 @@ void DlgOrder::on_btnPaymentIdram_clicked()
         ui->leCard->setText("0");
         ui->leBank->setText("0");
         ui->leOther->setText("0");
+        worder()->fOrderDriver->setHeader("f_otherid", 0);
         lineEditToHeader();
     } else {
         QString err = out;
@@ -2663,6 +2664,7 @@ void DlgOrder::on_btnPayX_clicked()
     if (!wo) {
         return;
     }
+    worder()->fOrderDriver->setHeader("f_otherid", 0);
     ui->lePayX->setDouble(wo->fOrderDriver->headerValue("f_amounttotal").toDouble() - ui->leIDRAM->getDouble());
     ui->leCash->setDouble(0);
     ui->leCard->setDouble(0);
@@ -2889,5 +2891,13 @@ void DlgOrder::on_btnReceived_clicked()
 
 void DlgOrder::on_btnSelfCost_clicked()
 {
+    WOrder *w = worder();
+    if (!w) {
+        return;
+    }
+    w->fOrderDriver->setHeader("f_otherid", PAYOTHER_PRIMECOST);
     setSelfcost();
+    if (w->fOrderDriver->save() == false) {
+        C5Message::error(w->fOrderDriver->error());
+    }
 }

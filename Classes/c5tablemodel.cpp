@@ -177,9 +177,10 @@ QVariant C5TableModel::data(const QModelIndex &index, int role) const
     case Qt::FontRole: {
         QFont fo;
         if (fTableView) {
-            fo = fTableView->font();
             if (fCellFont.contains(index)) {
                 fo = fCellFont[index];
+            } else {
+                fo = fTableView->font();
             }
         }
         return fo;
@@ -205,6 +206,9 @@ bool C5TableModel::setData(const QModelIndex &index, const QVariant &value, int 
         if (fTableView != nullptr) {
             fTableView->viewport()->update();
         }
+        break;
+    case Qt::FontRole:
+        fCellFont[index] = value.value<QFont>();
         break;
     default:
         QAbstractTableModel::setData(index, value, role);
@@ -423,21 +427,26 @@ void C5TableModel::insertSubTotals(int col, const QList<int> &totalCols, bool ti
         if (r == 0) {
             currName = data(r, col, Qt::EditRole).toString();
         } else {
-            if (data(r, col, Qt::EditRole).toString().compare(currName) != 0) {
+            if (data(r, col, Qt::EditRole).toString().isEmpty()) {
+                r++;
+                continue;
+            }
+            if (!data(r, col, Qt::EditRole).toString().isEmpty()
+                    && data(r, col, Qt::EditRole).toString().compare(currName) != 0) {
                 QList<QVariant> newrow = emptyRow;
-                newrow[0] = tr("SUBTOTAL") + " " + currName;
+                //newrow[0] = tr("SUBTOTAL") + " " + currName;
                 for (int c = 0; c < totalCols.count(); c++) {
                     newrow[totalCols.at(c)] = totals[c];
                 }
                 insertRow(r - 1);
                 for (int c = 0; c < columnCount(); c++) {
                     setData(r, c, newrow[c]);
-                    fCellFont[createIndex(r, c)] = f;
+                    //fCellFont[createIndex(r, c)] = f;
                 }
                 r++;
                 if (insertempty) {
                     insertRow(r - 1);
-                    fTableView->setSpan(r, 0, 1, columnCount());
+                    //fTableView->setSpan(r, 0, 1, columnCount());
                     r++;
                 }
                 currName = data(r, col, Qt::EditRole).toString();
@@ -454,7 +463,7 @@ void C5TableModel::insertSubTotals(int col, const QList<int> &totalCols, bool ti
     if (r > 0) {
         QList<QVariant> newrow = emptyRow;
         if (title) {
-            newrow[0] = tr("Subtotal") + " " + currName;
+            //newrow[0] = tr("Subtotal") + " " + currName;
         }
         for (int c = 0; c < totalCols.count(); c++) {
             newrow[totalCols.at(c)] = totals[c];
@@ -462,7 +471,7 @@ void C5TableModel::insertSubTotals(int col, const QList<int> &totalCols, bool ti
         insertRow(r - 1);
         for (int c = 0; c < columnCount(); c++) {
             setData(r, c, newrow[c]);
-            fCellFont[createIndex(r, c)] = f;
+            //fCellFont[createIndex(r, c)] = f;
         }
     }
 
