@@ -27,7 +27,7 @@ QString CE5StoreReason::table()
 
 bool CE5StoreReason::checkData(QString &err)
 {
-    if (ui->leCode->getInteger() < 10) {
+    if (ui->leCode->getInteger() > 0 && ui->leCode->getInteger() < 10) {
         err += tr("This item is not editable") + "<br>";
         return false;
     }

@@ -32,6 +32,7 @@
 #include "c5selector.h"
 #include "cr5goodsmovement.h"
 #include "c5salarydoc.h"
+#include "c5reporttemplatedriver.h"
 #include "cr5creditcards.h"
 #include "cr5debtstopartner.h"
 #include "cr5dishpart1.h"
@@ -272,13 +273,13 @@ void C5MainWindow::on_actionLogin_triggered()
     if(lastdb.isEmpty()) {
         if (fDatabases.count() > 0) {
             if (!fDatabases.contains(lastdb)) {
-                QMap<QString, QStringList>::const_iterator it = fDatabases.begin();
+                QMap<QString, QStringList>::const_iterator it = fDatabases.constBegin();
                 lastdb = it.key();
             }
         }
     } else {
         if (!fDatabases.contains(lastdb) && fDatabases.count() > 0) {
-            QMap<QString, QStringList>::const_iterator it = fDatabases.begin();
+            QMap<QString, QStringList>::const_iterator it = fDatabases.constBegin();
             lastdb = it.key();
         }
     }
@@ -308,6 +309,7 @@ void C5MainWindow::on_actionLogin_triggered()
         }
         connect(&fUdpSocket, &QUdpSocket::readyRead, this, &C5MainWindow::datagramRead);
     }
+    C5ReportTemplateDriver::init(__user->group());
 }
 
 void C5MainWindow::updateTimeout()

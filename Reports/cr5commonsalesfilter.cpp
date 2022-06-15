@@ -80,6 +80,12 @@ QString CR5CommonSalesFilter::condition()
         result += ui->chptBank->isChecked() ? " and oh.f_amountbank>0 " : " and oh.f_amountbank=0 ";
         result += ui->chptOther->isChecked() ? " and oh.f_amountother>0 " : " and oh.f_amountother=0 ";
     }
+    if (ui->chptComplimentary->isChecked()) {
+        result += " and oh.f_amounttotal=0 ";
+    }
+    if (ui->checkBoxNotComplimentary->isChecked()) {
+        result += " and oh.f_amounttotal>0 ";
+    }
     return result;
 }
 
@@ -93,6 +99,16 @@ QDate CR5CommonSalesFilter::date2() const
     return ui->deEnd->date();
 }
 
+bool CR5CommonSalesFilter::complimentary()
+{
+    return ui->chptComplimentary->isChecked();
+}
+
+bool CR5CommonSalesFilter::notComplimentary()
+{
+    return ui->checkBoxNotComplimentary->isChecked();
+}
+
 void CR5CommonSalesFilter::on_btnFlags_clicked()
 {
     CR5SaleFlags f(fDBParams);
@@ -104,4 +120,22 @@ void CR5CommonSalesFilter::on_chUseClosingDateTime_clicked(bool checked)
 {
     ui->dt1->setEnabled(checked);
     ui->dt2->setEnabled(checked);
+}
+
+void CR5CommonSalesFilter::on_checkBoxNotComplimentary_clicked(bool checked)
+{
+    if (checked) {
+        if (ui->chptComplimentary->isChecked()) {
+            ui->chptComplimentary->setChecked(false);
+        }
+    }
+}
+
+void CR5CommonSalesFilter::on_chptComplimentary_clicked(bool checked)
+{
+    if (checked) {
+        if (ui->checkBoxNotComplimentary->isChecked()) {
+            ui->checkBoxNotComplimentary->setChecked(false);
+        }
+    }
 }

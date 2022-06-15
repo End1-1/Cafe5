@@ -44,6 +44,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Classes/c5filterwidget.cpp \
     ../Classes/c5logtoserverthread.cpp \
     ../Classes/c5random.cpp \
+    ../Classes/c5reporttemplatedriver.cpp \
     ../Classes/c5storedraftwriter.cpp \
     ../Classes/c5threadobject.cpp \
     ../Classes/c5user.cpp \
@@ -95,6 +96,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Forms/c5printtaxanywhere.cpp \
     ../Forms/c5salarydoc.cpp \
     ../Forms/c5storedoc.cpp \
+    ../Forms/c5storedocselectprinttemplate.cpp \
     ../Forms/c5waiterorder.cpp \
     ../Forms/dlgdataonline.cpp \
     ../Forms/dlgnewcl.cpp \
@@ -166,6 +168,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     c5daterange.cpp \
     c5dbresetoption.cpp \
     c5dishgroupaction.cpp \
+    c5dlgselectreporttemplate.cpp \
     c5goodsimage.cpp \
     c5goodspricing.cpp \
     c5inputdate.cpp \
@@ -311,6 +314,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Classes/c5filterwidget.h \
     ../Classes/c5logtoserverthread.h \
     ../Classes/c5random.h \
+    ../Classes/c5reporttemplatedriver.h \
     ../Classes/c5storedraftwriter.h \
     ../Classes/c5threadobject.h \
     ../Classes/c5user.h \
@@ -364,6 +368,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Forms/c5printtaxanywhere.h \
     ../Forms/c5salarydoc.h \
     ../Forms/c5storedoc.h \
+    ../Forms/c5storedocselectprinttemplate.h \
     ../Forms/c5waiterorder.h \
     ../Forms/dlgdataonline.h \
     ../Forms/dlgnewcl.h \
@@ -436,6 +441,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     c5daterange.h \
     c5dbresetoption.h \
     c5dishgroupaction.h \
+    c5dlgselectreporttemplate.h \
     c5goodsimage.h \
     c5goodspricing.h \
     c5inputdate.h \
@@ -586,6 +592,7 @@ FORMS += \
     ../Forms/c5printtaxanywhere.ui \
     ../Forms/c5salarydoc.ui \
     ../Forms/c5storedoc.ui \
+    ../Forms/c5storedocselectprinttemplate.ui \
     ../Forms/c5waiterorder.ui \
     ../Forms/dlgdataonline.ui \
     ../Forms/dlgnewcl.ui \
@@ -625,6 +632,7 @@ FORMS += \
     c5daterange.ui \
     c5dbresetoption.ui \
     c5dishgroupaction.ui \
+    c5dlgselectreporttemplate.ui \
     c5goodsimage.ui \
     c5goodspricing.ui \
     c5inputdate.ui \

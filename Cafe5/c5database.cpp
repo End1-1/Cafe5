@@ -526,6 +526,20 @@ bool C5Database::isReady()
 
 void C5Database::configureDatabase(QSqlDatabase &cn, const QString &host, const QString &db, const QString &user, const QString &password)
 {
+    QString h = host;
+    int port = 0;
+    if (cn.driverName() == "QIBASE") {
+        port = 3050;
+    } else if (cn.driverName() == "QMYSQL") {
+        port = 3306;
+    }
+    if (h.contains(":")) {
+        QString portstr = h.mid(h.indexOf(":") + 1, h.length() - h.indexOf(":"));
+        port = portstr.toInt();
+    }
+    if (port > 0) {
+        cn.setPort(port);
+    }
     cn.setHostName(host);
     cn.setDatabaseName(db);
     cn.setUserName(user);

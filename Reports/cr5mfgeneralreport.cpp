@@ -83,22 +83,29 @@ void CR5MFGeneralReport::completeRefresh()
 {
     C5ReportWidget::completeRefresh();
 
-    int subtotalcol = fModel->indexForColumnName("f_date");
-    if (subtotalcol > -1) {
+    int subtotalcol1 = fModel->indexForColumnName("f_workername");
+    int subtotalcol2 = fModel->indexForColumnName("f_date");
+    if (subtotalcol1 > -1 && subtotalcol2 > -1) {
         QList<int> totals;
+        QList<int> subtotalcols;
+        subtotalcols.append(subtotalcol1);
+        subtotalcols.append(subtotalcol2);
         if (fModel->indexForColumnName("f_total") > -1) {
             totals.append(fModel->indexForColumnName("f_total"));
         }
-        fModel->insertSubTotals(subtotalcol, totals, false, false);
+        fModel->insertSubTotals(subtotalcols, totals, false, false);
     }
 
-    subtotalcol = fModel->indexForColumnName("f_workername");
-    if (subtotalcol > -1) {
+
+    subtotalcol1 = fModel->indexForColumnName("f_workername");
+    if (subtotalcol1 > -1) {
         QList<int> totals;
+        QList<int> subtotalcols;
+        subtotalcols.append(subtotalcol1);
         if (fModel->indexForColumnName("f_total") > -1) {
             totals.append(fModel->indexForColumnName("f_total"));
         }
-        fModel->insertSubTotals(subtotalcol, totals, false, false);
+        fModel->insertSubTotals(subtotalcols, totals, false, false);
     }
 
     QString name;
@@ -108,13 +115,17 @@ void CR5MFGeneralReport::completeRefresh()
             continue;
         }
         if (name.isEmpty()) {
-           fi = i == 0 ? i : i - 1;
+           fi = i;
            name = fModel->data(i, 0, Qt::EditRole).toString();
         }
         if (name != fModel->data(i, 0, Qt::EditRole).toString()) {
-            fTableView->setSpan(fi, 0, i - fi - 2, 1);
-            name.clear();
+            fTableView->setSpan(fi, 0, i - fi - 1, 1);
+            name = fModel->data(i, 0, Qt::EditRole).toString();
+            fi = i;
         }
+    }
+    if (!name.isEmpty()) {
+        fTableView->setSpan(fi, 0, fModel->rowCount() - fi - 2, 1);
     }
 
     name.clear();
@@ -122,7 +133,6 @@ void CR5MFGeneralReport::completeRefresh()
     for (int i = 0; i < fModel->rowCount(); i++) {
         if (i == 0) {
            name = fModel->data(i, 1, Qt::EditRole).toString();
-           continue;
         }
         if (name.isEmpty()) {
             fi = i + 1;
@@ -144,7 +154,8 @@ void CR5MFGeneralReport::completeRefresh()
     }
 
     for (int i = fModel->rowCount() - 2; i > 0; i--) {
-        if (fModel->data(i, 0, Qt::EditRole).toString().isEmpty() && fModel->data(i - 1, 1, Qt::EditRole).toString().isEmpty()) {
+        if (fModel->data(i, 0, Qt::EditRole).toString().isEmpty()
+                && fModel->data(i - 1, 1, Qt::EditRole).toString().isEmpty()) {
             fModel->insertRow(i);
         }
     }

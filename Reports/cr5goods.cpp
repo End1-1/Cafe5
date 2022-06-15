@@ -81,6 +81,7 @@ CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
                    << "gg.f_lastinputprice"
                    << "g.f_chargevalue"
                    << "(gg.f_saleprice/gg.f_lastinputprice*100)-100 as f_realchargevalue"
+                   << "gg.f_acc"
                    << "gca.f_name as gname1"
                    << "gcb.f_name as gname2"
                    << "gcc.f_name as gname3"
@@ -99,6 +100,7 @@ CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
     fColumnsVisible["gg.f_lowlevel"] = true;
     fColumnsVisible["gg.f_lastinputprice"] = true;
     fColumnsVisible["g.f_chargevalue"] = false;
+    fColumnsVisible["gg.f_acc"] = true;
     fColumnsVisible["(gg.f_saleprice/gg.f_lastinputprice*100)-100 as f_realchargevalue"] = false;
     fColumnsVisible["gca.f_name as gname1"] = true;
     fColumnsVisible["gcb.f_name as gname2"] = true;
@@ -118,6 +120,7 @@ CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_lowlevel"] = tr("Low level");
     fTranslation["f_lastinputprice"] = tr("Last input price");
     fTranslation["f_chargevalue"] = tr("Charge value");
+    fTranslation["f_acc"] = tr("Account");
     fTranslation["f_realchargevalue"] = tr("Real charge value");
     fTranslation["gname1"] = tr("Class 1");
     fTranslation["gname2"] = tr("Class 2");

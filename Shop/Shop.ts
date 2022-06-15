@@ -321,12 +321,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5message.ui" line="193"/>
+        <location filename="../Cafe5/c5message.ui" line="196"/>
         <source>A1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5message.ui" line="206"/>
+        <location filename="../Cafe5/c5message.ui" line="209"/>
         <source>A2</source>
         <translation type="unfinished"></translation>
     </message>
@@ -579,7 +579,7 @@
 <context>
     <name>C5Printing</name>
     <message>
-        <location filename="../Classes/c5printing.cpp" line="330"/>
+        <location filename="../Classes/c5printing.cpp" line="344"/>
         <source>Failed send order to remote printer</source>
         <translation></translation>
     </message>
@@ -679,19 +679,6 @@
         <location filename="../Classes/c5storedraftwriter.cpp" line="1167"/>
         <source>This order used in next documents</source>
         <translation>Փասթաթուղթը օգտագործվում է հետևյալ փասթաթղթերում</translation>
-    </message>
-</context>
-<context>
-    <name>C5TableModel</name>
-    <message>
-        <location filename="../Classes/c5tablemodel.cpp" line="428"/>
-        <source>SUBTOTAL</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Classes/c5tablemodel.cpp" line="457"/>
-        <source>Subtotal</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

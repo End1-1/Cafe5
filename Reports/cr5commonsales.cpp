@@ -629,11 +629,19 @@ void CR5CommonSales::createStoreOutputAS()
     db[":date1"] = fFilter->date1();
     db[":date2"] = fFilter->date2();
     db[":ostate"] = ORDER_STATE_CLOSE;
-    db.exec("select ob.f_dish ,sum(ob.f_qty1) as f_qty "
+    QString sql = "select ob.f_dish ,sum(ob.f_qty1) as f_qty "
             "from o_body ob "
             "left join o_header oh on oh.f_id=ob.f_header  "
-            "where oh.f_datecash between :date1 and :date2 and oh.f_state=:ostate and ob.f_state in (1, 3) "
-            "group by ob.f_dish ");
+            "where oh.f_datecash between :date1 and :date2 and oh.f_state=:ostate and ob.f_state in (1, 3) %1 "
+            "group by ob.f_dish ";
+    if (fFilter->complimentary()) {
+        sql.replace("%1", " and oh.f_amounttotal=0 ");
+    } else if (fFilter->notComplimentary()) {
+        sql.replace("%1", " and oh.f_amounttotal<>0 ");
+    } else {
+        sql.replace("%1", "");
+    }
+    db.exec(sql);
     QMap<QString, double> dishesList;
     while (db.nextRow()) {
         dishesList[db.getString("f_dish")] = db.getDouble("f_qty");

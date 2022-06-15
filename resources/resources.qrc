@@ -61,5 +61,7 @@
         <file>fiscal.png</file>
         <file>main-menu.png</file>
         <file>receipt.png</file>
+        <file>error.png</file>
+        <file>help.png</file>
     </qresource>
 </RCC>

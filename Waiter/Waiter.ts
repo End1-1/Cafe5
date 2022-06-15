@@ -347,12 +347,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5message.ui" line="193"/>
+        <location filename="../Cafe5/c5message.ui" line="196"/>
         <source>A1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5message.ui" line="206"/>
+        <location filename="../Cafe5/c5message.ui" line="209"/>
         <source>A2</source>
         <translation type="unfinished"></translation>
     </message>
@@ -917,7 +917,7 @@
 <context>
     <name>C5Printing</name>
     <message>
-        <location filename="../Classes/c5printing.cpp" line="330"/>
+        <location filename="../Classes/c5printing.cpp" line="344"/>
         <source>Failed send order to remote printer</source>
         <translation></translation>
     </message>
@@ -1017,19 +1017,6 @@
         <location filename="../Classes/c5storedraftwriter.cpp" line="1167"/>
         <source>This order used in next documents</source>
         <translation>Այս պետվերը գրանցված է հետևյալ փասթաթղթերում</translation>
-    </message>
-</context>
-<context>
-    <name>C5TableModel</name>
-    <message>
-        <location filename="../Classes/c5tablemodel.cpp" line="428"/>
-        <source>SUBTOTAL</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Classes/c5tablemodel.cpp" line="457"/>
-        <source>Subtotal</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2350,7 +2337,7 @@ OTHER</source>
         <translation>Հնարավոր չէ ավելացնել նախահաշիվը տպելուց հետո</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="1886"/>
+        <location filename="dlgorder.cpp" line="1885"/>
         <source>Prime cost</source>
         <translation>Ինքնառժեք</translation>
     </message>
@@ -2402,7 +2389,7 @@ OTHER</source>
     </message>
     <message>
         <location filename="dlgorder.cpp" line="1048"/>
-        <location filename="dlgorder.cpp" line="2781"/>
+        <location filename="dlgorder.cpp" line="2783"/>
         <source>Void dish</source>
         <translation>Հեռացնել ուտեստը</translation>
     </message>
@@ -2477,18 +2464,18 @@ OTHER</source>
         <translation>Բոլոր եղանակներով նշված գումարները գերազանցում են պատվերի գումարը</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2618"/>
+        <location filename="dlgorder.cpp" line="2619"/>
         <source>Idram payment was not received</source>
         <translation>Idram վճարումը չի կատարվել</translation>
     </message>
     <message>
         <location filename="dlgorder.cpp" line="2309"/>
-        <location filename="dlgorder.cpp" line="2716"/>
+        <location filename="dlgorder.cpp" line="2718"/>
         <source>Reprint service check</source>
         <translation>Կրկնել կտրոնը պատրասման վայրում</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2792"/>
+        <location filename="dlgorder.cpp" line="2794"/>
         <source>Confirm to remove selected dishes</source>
         <translation>Հաստատեք նշված ուտեստների հեռացումը</translation>
     </message>
@@ -2498,17 +2485,17 @@ OTHER</source>
         <translation>Հաշվարկված է</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2847"/>
+        <location filename="dlgorder.cpp" line="2849"/>
         <source>Present dish</source>
         <translation>Ուտեստի նվեր</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2851"/>
+        <location filename="dlgorder.cpp" line="2853"/>
         <source>Are you sure to present selected dish?</source>
         <translation>Հաստատեք ուտեստի նվերը</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2654"/>
+        <location filename="dlgorder.cpp" line="2655"/>
         <source>PayX</source>
         <translation></translation>
     </message>
@@ -3912,7 +3899,7 @@ STOPLIST-ից</translation>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="main.cpp" line="37"/>
+        <location filename="main.cpp" line="41"/>
         <source>An instance of application already running</source>
         <translation>Ծրագիրը արդեն միացրած է</translation>
     </message>

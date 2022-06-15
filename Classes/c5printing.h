@@ -39,6 +39,8 @@ public:
 
     void ctext(const QString &text);
 
+    void ctextof(const QString &text, qreal x);
+
     void rtext(const QString text);
 
     void image(const QString &fileName, Qt::Alignment align);

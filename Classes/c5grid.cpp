@@ -383,6 +383,22 @@ bool C5Grid::tblDoubleClicked(int row, int column, const QList<QVariant> &values
     return false;
 }
 
+void C5Grid::executeSql(const QString &sql)
+{
+    fModel->execQuery(sql);
+    if (fSimpleQuery) {
+        for (int i = 0; i < fModel->columnCount(); i++) {
+            fColumnsVisible[fModel->fColumnIndexName[i]] = true;
+        }
+    }
+    restoreColumnsWidths();
+    sumColumnsData();
+    if (!ui->tblTotal->isVisible()) {
+        ui->tblView->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    }
+    completeRefresh();
+}
+
 void C5Grid::completeRefresh()
 {
     fTableView->clearSpans();
@@ -928,18 +944,7 @@ void C5Grid::refreshData()
         }
     }
     fModel->setCheckboxes(fCheckboxes);
-    fModel->execQuery(sqlQuery);
-    if (fSimpleQuery) {
-        for (int i = 0; i < fModel->columnCount(); i++) {
-            fColumnsVisible[fModel->fColumnIndexName[i]] = true;
-        }
-    }
-    restoreColumnsWidths();
-    sumColumnsData();
-    if (!ui->tblTotal->isVisible()) {
-        ui->tblView->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    }
-    completeRefresh();
+    executeSql(sqlQuery);
 }
 
 void C5Grid::on_tblView_clicked(const QModelIndex &index)

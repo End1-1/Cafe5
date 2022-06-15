@@ -39,6 +39,7 @@ int RawHandler::run(quint32 msgNum, quint32 msgId, qint16 msgType, const QByteAr
     QElapsedTimer et;
     et.start();
     Raw *r = nullptr;
+    LogWriter::write(LogWriterLevel::verbose, property("session").toString(), QString("New command: %1").arg(msgType));
     switch (fMsgType) {
     case MessageList::hello:
         r = new RawHello(fSocket);
@@ -80,6 +81,5 @@ int RawHandler::run(quint32 msgNum, quint32 msgId, qint16 msgType, const QByteAr
     r->setHeader(fMsgNum, fMsgId, fMsgType);
     emit writeToSocket(r->data());
     r->deleteLater();
-    qDebug() << "MsgType" << fMsgType << "Time" << et.elapsed();
     return result;
 }

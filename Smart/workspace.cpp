@@ -149,14 +149,16 @@ bool Workspace::login()
     }
     db[":f_menu"] = __c5config.defaultMenu();
     db.exec("select p.f_package, p.f_dish, d.f_name, p.f_price, dg.f_adgcode, "
-            "p.f_store, p.f_printer "
+            "p.f_store, p.f_printer, p.f_qty "
             "from d_package_list p "
             "inner join d_dish d on d.f_id=p.f_dish "
             "inner join d_package dp on dp.f_id=p.f_package "
             "inner join d_part2 dg on dg.f_id=d.f_part "
             "where dp.f_menu=:f_menu and dp.f_enabled=1 ");
     while (db.nextRow()) {
-        DishPackageDriver::fPackageDriver.addMember(db.getInt(0), db.getInt(1), db.getString(2), db.getDouble(3), db.getString(4), db.getInt(5), db.getString(6));
+        DishPackageDriver::fPackageDriver.addMember(db.getInt(0), db.getInt(1), db.getString(2),
+                                                    db.getDouble(3), db.getDouble(7),
+                                                    db.getString(4), db.getInt(5), db.getString(6));
     }
     db[":f_menu"] = __c5config.defaultMenu();
     db.exec("select f_id, f_name, f_price from d_package where f_menu=:f_menu and f_enabled=1");
@@ -531,17 +533,18 @@ void Workspace::on_btnShowDishes_clicked()
 void Workspace::on_lstCombo_itemClicked(QListWidgetItem *item)
 {
     const QList<DishPackageMember> &p = DishPackageDriver::fPackageDriver.fPackage[item->data(Qt::UserRole).toInt()];
-    int row = ui->tblOrder->rowCount();
-    ui->tblOrder->setRowCount(row + 1);
-    ui->tblOrder->setSpan(row, 0, 1, 2);
-    ui->tblOrder->setRowHeight(row, 30);
-    auto *packageItem = new QTableWidgetItem(item->text());
-    packageItem->setData(Qt::UserRole + 99, item->data(Qt::UserRole));
-    packageItem->setData(Qt::UserRole + 100, -1);
-    packageItem->setData(Qt::UserRole + 101, 1);
-    packageItem->setData(Qt::UserRole + 102, item->data(Qt::UserRole + 1));
-    ui->tblOrder->setItem(row, 0, packageItem);
-    for (const DishPackageMember &dm: p) {
+//    int row = ui->tblOrder->rowCount();
+//    ui->tblOrder->setRowCount(row + 1);
+//    ui->tblOrder->setSpan(row, 0, 1, 2);
+//    ui->tblOrder->setRowHeight(row, 30);
+//    auto *packageItem = new QTableWidgetItem(item->text());
+//    packageItem->setData(Qt::UserRole + 99, item->data(Qt::UserRole));
+//    packageItem->setData(Qt::UserRole + 100, -1);
+//    packageItem->setData(Qt::UserRole + 101, 1);
+//    packageItem->setData(Qt::UserRole + 102, item->data(Qt::UserRole + 1));
+//    ui->tblOrder->setItem(row, 0, packageItem);
+    for (const DishPackageMember &dm: p) {        
+
         Dish nd;
         nd.id = dm.fDish;
         nd.adgCode = dm.fAdgCode;
@@ -550,20 +553,27 @@ void Workspace::on_lstCombo_itemClicked(QListWidgetItem *item)
         nd.store = dm.fStore;
         nd.printer = dm.fPrinter;
         nd.package = dm.fPackage;
-        nd.packageName = item->data(Qt::DisplayRole).toString();
-        row = ui->tblOrder->rowCount();
+        nd.qty = dm.fQty;
+
+        int row = ui->tblOrder->rowCount();
         ui->tblOrder->setRowCount(row + 1);
-        ui->tblOrder->setItem(row, 0, new QTableWidgetItem(nd.name));
-        ui->tblOrder->item(row, 0)->setData(Qt::UserRole, qVariantFromValue(nd));
-        ui->tblOrder->item(row, 0)->setData(Qt::UserRole + 98, -1);
+        OrderDish *od = new OrderDish(nd);
+        ui->tblOrder->setCellWidget(row, 0, od);
+
+//        nd.packageName = item->data(Qt::DisplayRole).toString();
+//        row = ui->tblOrder->rowCount();
+//        ui->tblOrder->setRowCount(row + 1);
+//        ui->tblOrder->setItem(row, 0, new QTableWidgetItem(nd.name));
+//        ui->tblOrder->item(row, 0)->setData(Qt::UserRole, qVariantFromValue(nd));
+//        ui->tblOrder->item(row, 0)->setData(Qt::UserRole + 98, -1);
     }
-    row = ui->tblOrder->rowCount();
-    ui->tblOrder->setRowCount(row + 1);
-    ui->tblOrder->setSpan(row, 0, 1, 2);
-    ui->tblOrder->setRowHeight(row, 10);
-    packageItem = new QTableWidgetItem(item->text());
-    packageItem->setData(Qt::UserRole + 100, -2);
-    ui->tblOrder->setItem(row, 0, packageItem);
+//    row = ui->tblOrder->rowCount();
+//    ui->tblOrder->setRowCount(row + 1);
+//    ui->tblOrder->setSpan(row, 0, 1, 2);
+//    ui->tblOrder->setRowHeight(row, 10);
+//    packageItem = new QTableWidgetItem(item->text());
+//    packageItem->setData(Qt::UserRole + 100, -2);
+//    ui->tblOrder->setItem(row, 0, packageItem);
     countTotal();
 }
 
@@ -1098,7 +1108,7 @@ bool Workspace::printReceipt(const QString &id, bool printSecond)
             "from o_body b "
             "left join d_dish d on d.f_id=b.f_dish "
             "where b.f_header=:f_header and b.f_state=:f_state "
-            "order by b.f_package ");
+            "order by b.f_package, b.f_row ");
     int package = 0;
     while (dd.nextRow()) {
         if (dd.getInt("f_package") > 0) {

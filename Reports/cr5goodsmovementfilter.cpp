@@ -50,6 +50,7 @@ QString CR5GoodsMovementFilter::condition()
     }
     in(cond, "ai.f_storein", ui->leStoreIn);
     in(cond, "ai.f_storeout", ui->leStoreOut);
+    in(cond, "g.f_acc", ui->leAccount);
     return cond;
 }
 

@@ -9,6 +9,7 @@
 #include "c5cashdoc.h"
 #include "c5progressdialog.h"
 #include "c5waiterorder.h"
+#include "c5dlgselectreporttemplate.h"
 #include "c5salefromstoreorder.h"
 #include <QMenu>
 
@@ -17,8 +18,8 @@ CR5Documents::CR5Documents(const QStringList &dbParams, QWidget *parent) :
 {
     fIcon = ":/documents.png";
     fLabel = tr("Documents");
-    fSimpleQuery = false;
 
+    fSimpleQuery = false;
     fMainTable = "a_header h";
     fLeftJoinTables << "left join s_user u on u.f_id=h.f_operator [u]"
                     << "left join c_partners p on p.f_id=h.f_partner [p]"
@@ -74,6 +75,7 @@ CR5Documents::CR5Documents(const QStringList &dbParams, QWidget *parent) :
     restoreColumnsVisibility();
 
     fFilterWidget = new CR5DocumentsFilter(dbParams);
+    fFilter = static_cast<CR5DocumentsFilter*>(fFilterWidget);
 }
 
 QToolBar *CR5Documents::toolBar()
@@ -96,6 +98,9 @@ QToolBar *CR5Documents::toolBar()
         a = new QAction(QIcon(":/recycle.png"), tr("Remove"), this);
         connect(a, SIGNAL(triggered()), this, SLOT(removeDocs()));
         fToolBar->insertAction(fToolBar->actions().at(2), a);
+        a = new QAction(QIcon(":/template.png"), tr("Templates"), this);
+        connect(a, SIGNAL(triggered()), this, SLOT(templates()));
+        fToolBar->insertAction(fToolBar->actions().at(3), a);
     }
     return fToolBar;
 }
@@ -453,5 +458,16 @@ void CR5Documents::copySelectedDocs()
             }
         }
         openDoc(newDocId);
+    }
+}
+
+void CR5Documents::templates()
+{
+    C5DlgSelectReportTemplate d(1, fDBParams);
+    if (d.exec() == QDialog::Accepted) {
+        QString sql = d.fSelectedTemplate.sql;
+        sql.replace("%date1", fFilter->date1().toString(FORMAT_DATE_TO_STR_MYSQL));
+        sql.replace("%date2", fFilter->date2().toString(FORMAT_DATE_TO_STR_MYSQL));
+        executeSql(sql);
     }
 }

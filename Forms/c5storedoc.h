@@ -143,6 +143,10 @@ private:
 
     void addGoodsByCalculation(int goods, const QString &name, double qty);
 
+    void printV1();
+
+    void printV2();
+
 private slots:
     void lineEditKeyPressed(const QChar &key);
 
@@ -225,6 +229,8 @@ private slots:
     void inputOfService();
 
     void outputOfService();
+
+    void duplicateOutput();
 
     void on_btnAddDish_clicked();
 

@@ -22,10 +22,18 @@ public:
 
     QDate date2() const;
 
+    bool complimentary();
+
+    bool notComplimentary();
+
 private slots:
     void on_btnFlags_clicked();
 
     void on_chUseClosingDateTime_clicked(bool checked);
+
+    void on_checkBoxNotComplimentary_clicked(bool checked);
+
+    void on_chptComplimentary_clicked(bool checked);
 
 private:
     Ui::CR5CommonSalesFilter *ui;
