@@ -23,9 +23,9 @@ int main(int argc, char *argv[])
     QCoreApplication::setLibraryPaths(libPath);
 #endif
 
-    if (QDate::currentDate() > QDate::fromString("20/06/2022", "dd/MM/yyyy")) {
-        return 1;
-    }
+//    if (QDate::currentDate() > QDate::fromString("20/06/2022", "dd/MM/yyyy")) {
+//        return 1;
+//    }
 
     if (!C5SystemPreference::checkDecimalPointAndSeparator()) {
         return 0;

@@ -102,10 +102,10 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &db, QString &err)
     __dd1Username = db.dbParams().at(2);
     __dd1Password = db.dbParams().at(3);
 
-//    __dd2Host.clear();
-//    __dd2Database.clear();
-//    __dd2Username.clear();
-//    __dd2Password.clear();
+    __dd2Host.clear();
+    __dd2Database.clear();
+    __dd2Username.clear();
+    __dd2Password.clear();
 
     DoubleDatabase fDD;
     int settings = 0;
@@ -273,6 +273,8 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &db, QString &err)
     fDD[":f_amountVat"] = hDouble("f_amounttotal") - (hDouble("f_amounttotal") / 1.2);
     fDD[":f_amountUsd"] = 0;
     fDD[":f_fiscal"] = fTax["f_receiptnumber"].toString().toInt();
+    fDD[":f_fiscaldate"] = QDate::fromString(fTax["f_time"].toString(), "dd.MM.yyyy HH:mm:ss");
+    fDD[":f_fiscaltime"] = QTime::fromString(fTax["f_time"].toString(), "dd.MM.yyyy HH:mm:ss");
     fDD[":f_paymentMode"] = paymentMode;
     fDD[":f_creditCard"] = hInt("f_creditcardid");
     fDD[":f_cityLedger"] = clcode.toInt();
