@@ -281,10 +281,11 @@ void CR5Goods::exportToScales()
                                         "[Group], Barcode, RVTName, "
                                         "Type, LiteDuringDate) "
                                         "values (%1, %2, %3, %4, %5, '%6', %7, %8, %9, %10, %11, %12, '%13', '%14', %15)")
-                        .arg(db.getString("f_scancode"), db.getString("f_scancode"), "0", "0", "0",
-                             "0", QString::number(db.getDouble("f_saleprice") / 100, 'f', 2), "0", "0", "0",
-                             "0", db.getString("f_scancode"), name,
-                             "вес.", "0");
+                        .arg(db.getString("f_scancode"), db.getString("f_scancode"), QString("0"), QString("0"), QString("0"),
+                             QString("0"), QString::number(db.getDouble("f_saleprice") / 100, 'f', 2))
+                        .arg(QString("0"), QString("0"), QString("0"),
+                             QString("0"), db.getString("f_scancode"), name,
+                             QString::fromUtf8("вес."), QString("0"));
                 dbo.exec(sql);
 //                dbo[":ID"] = db.getString("f_scancode").toInt();
 //                dbo[":PLU"] = db.getString("f_scancode").toInt();

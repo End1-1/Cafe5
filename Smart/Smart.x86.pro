@@ -48,8 +48,6 @@ SOURCES += \
     ../../XLSX/src/xlsxwriter.cpp \
     ../Cafe5/c5cafecommon.cpp \
     ../Cafe5/c5double.cpp \
-    ../Cafe5/c5license.cpp \
-    ../Cafe5/c5licensedlg.cpp \
     ../Cafe5/c5logsystem.cpp \
     ../Cafe5/c5serverhandler.cpp \
     ../Cafe5/c5systempreference.cpp \
@@ -124,12 +122,8 @@ SOURCES += \
     ../Shop/printreceipt.cpp \
     ../Shop/printreceiptgroup.cpp \
     ../Shop/selectprinters.cpp \
-    dishitemdelegate.cpp \
     dishpackage.cpp \
-    dishpartitemdelegate.cpp \
-    dishtableitemdelegate.cpp \
         main.cpp \
-    payment.cpp \
     supplier.cpp \
         workspace.cpp \
     ../Cafe5/c5config.cpp \
@@ -141,7 +135,22 @@ SOURCES += \
     ../Cafe5/c5sockethandler.cpp \
     ../Controls/c5lineedit.cpp \
     ../Classes/c5user.cpp \
-    ../Forms/touchdlgphonenumber.cpp
+    ../Forms/touchdlgphonenumber.cpp \
+    ../../XLSX/src/xlsxborder.cpp \
+    ../Classes/threadsendmessage.cpp \
+    ../DbData/dbdishremovereason.cpp \
+    ../DbData/dbdishcomments.cpp \
+    menudialog.cpp \
+    orderdish.cpp \
+    menudish.cpp \
+    ../Classes/idram.cpp \
+    ../Forms/change.cpp \
+    ../Classes/thread.cpp \
+    ../Forms/dlgqty.cpp \
+    ../Forms/customerinfo.cpp \
+    ../Classes/c5waiterorderdoc.cpp \
+    ../Forms/touchentertaxreceiptnumber.cpp \
+    ../Forms/touchselecttaxreport.cpp
 
 HEADERS += \
     ../../NewTax/Src/printtaxn.h \
@@ -163,8 +172,6 @@ HEADERS += \
     ../../XLSX/src/zip.h \
     ../Cafe5/c5cafecommon.h \
     ../Cafe5/c5double.h \
-    ../Cafe5/c5license.h \
-    ../Cafe5/c5licensedlg.h \
     ../Cafe5/c5logsystem.h \
     ../Cafe5/c5serverhandler.h \
     ../Cafe5/c5systempreference.h \
@@ -242,11 +249,7 @@ HEADERS += \
     ../Shop/printreceiptgroup.h \
     ../Shop/selectprinters.h \
     dish.h \
-    dishitemdelegate.h \
     dishpackage.h \
-    dishpartitemdelegate.h \
-    dishtableitemdelegate.h \
-    payment.h \
     rc.h \
     res.rc \
     supplier.h \
@@ -261,10 +264,24 @@ HEADERS += \
     ../Cafe5/c5socketmessage.h \
     ../Controls/c5lineedit.h \
     ../Classes/c5user.h \
-    ../Forms/touchdlgphonenumber.h
+    ../Forms/touchdlgphonenumber.h \
+    ../../XLSX/src/xlsxborder.h \
+    ../Classes/threadsendmessage.h \
+    ../DbData/dbdishremovereason.h \
+    ../DbData/dbdishcomments.h \
+    menudialog.h \
+    orderdish.h \
+    menudish.h \
+    ../Classes/idram.h \
+    ../Forms/change.h \
+    ../Classes/thread.h \
+    ../Forms/dlgqty.h \
+    ../Forms/customerinfo.h \
+    ../Classes/c5waiterorderdoc.h \
+    ../Forms/touchentertaxreceiptnumber.h \
+    ../Forms/touchselecttaxreport.h
 
 FORMS += \
-    ../Cafe5/c5licensedlg.ui \
     ../Cafe5/calendar.ui \
     ../Cafe5/dlgexitbyversion.ui \
     ../Classes/c5gridgilter.ui \
@@ -274,12 +291,19 @@ FORMS += \
     ../Classes/notificationwidget.ui \
     ../Classes/rkeyboard.ui \
     ../Shop/selectprinters.ui \
-    payment.ui \
     supplier.ui \
         workspace.ui \
     ../Cafe5/c5connection.ui \
     ../Cafe5/c5message.ui \
-    ../Forms/touchdlgphonenumber.ui
+    ../Forms/touchdlgphonenumber.ui \
+    menudialog.ui \
+    orderdish.ui \
+    menudish.ui \
+    ../Forms/change.ui \
+    ../Forms/dlgqty.ui \
+    ../Forms/customerinfo.ui \
+    ../Forms/touchentertaxreceiptnumber.ui \
+    ../Forms/touchselecttaxreport.ui
 
 DEFINES += _DBDRIVER_=\\\"QMYSQL\\\"
 DEFINES += _ORGANIZATION_=\\\"Jazzve\\\"

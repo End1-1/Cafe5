@@ -292,7 +292,8 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Forms/dlgdataonline.cpp \
     ../Forms/dlgnewcl.cpp \
     ../DbData/dbdishcomments.cpp \
-    ../DbData/dbdishremovereason.cpp
+    ../DbData/dbdishremovereason.cpp \
+    ../../XLSX/src/xlsxborder.cpp
 
 HEADERS += ../Cafe5/c5cafecommon.h \
     ../../NewTax/Src/printtaxn.h \
@@ -563,7 +564,8 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Forms/dlgdataonline.h \
     ../Forms/dlgnewcl.h \
     ../DbData/dbdishcomments.h \
-    ../DbData/dbdishremovereason.h
+    ../DbData/dbdishremovereason.h \
+    ../../XLSX/src/xlsxborder.h
 
 FORMS += \
     ../Classes/calculator.ui \

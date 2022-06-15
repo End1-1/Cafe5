@@ -318,10 +318,10 @@ void CE5MFProduct::on_btnCopy_clicked()
 void CE5MFProduct::on_btnPaste_clicked()
 {
     QString clipdata = qApp->clipboard()->text();
-    QStringList rows = clipdata.split("\r", Qt::SkipEmptyParts);
+    QStringList rows = clipdata.split("\r", QString::SkipEmptyParts);
     C5Database db(fDBParams);
     for (int i = 0; i < rows.count(); i++) {
-        QStringList cols = rows.at(i).split("\t", Qt::SkipEmptyParts);
+        QStringList cols = rows.at(i).split("\t", QString::SkipEmptyParts);
         if (cols.count() < 8) {
             return;
         }
