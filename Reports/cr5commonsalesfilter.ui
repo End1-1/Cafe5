@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>493</width>
-    <height>496</height>
+    <width>567</width>
+    <height>522</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -101,29 +101,62 @@ datetime</string>
    </item>
    <item row="14" column="1" colspan="2">
     <widget class="QWidget" name="widget_3" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout_3">
-      <item>
-       <widget class="QCheckBox" name="chptCash">
-        <property name="text">
-         <string>Cash</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="chptCard">
-        <property name="text">
-         <string>Card</string>
-        </property>
-       </widget>
-      </item>
-      <item>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="2">
        <widget class="QCheckBox" name="chptBank">
         <property name="text">
          <string>Bank</string>
         </property>
        </widget>
       </item>
-      <item>
+      <item row="0" column="6">
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="chptCash">
+        <property name="text">
+         <string>Cash</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="5">
+       <widget class="QCheckBox" name="chptComplimentary">
+        <property name="text">
+         <string>Complimentary</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="5">
+       <widget class="QCheckBox" name="checkBoxNotComplimentary">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Not complimentary</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="chptCard">
+        <property name="text">
+         <string>Card</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
        <widget class="QCheckBox" name="chptOther">
         <property name="text">
          <string>Other</string>
@@ -514,14 +547,14 @@ datetime</string>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5DateEdit</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5dateedit.h</header>
-  </customwidget>
-  <customwidget>
    <class>C5LineEditWithSelector</class>
    <extends>QLineEdit</extends>
    <header location="global">c5lineeditwithselector.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5DateEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5dateedit.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
@@ -545,10 +578,8 @@ datetime</string>
   <tabstop>rbTaxAll</tabstop>
   <tabstop>rbTaxYes</tabstop>
   <tabstop>rbTaxNo</tabstop>
-  <tabstop>chptOther</tabstop>
   <tabstop>btnFlags</tabstop>
   <tabstop>chptCash</tabstop>
-  <tabstop>chptCard</tabstop>
   <tabstop>chptBank</tabstop>
  </tabstops>
  <resources>

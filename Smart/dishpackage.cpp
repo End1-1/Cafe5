@@ -9,12 +9,13 @@ DishPackageMember::DishPackageMember()
 
 }
 
-DishPackageMember::DishPackageMember(int package, int dish, const QString &name, double price, const QString &adgcode, int store, const QString &printer)
+DishPackageMember::DishPackageMember(int package, int dish, const QString &name, double price, double qty, const QString &adgcode, int store, const QString &printer)
 {
     fPackage = package;
     fDish = dish;
     fName = name;
     fPrice = price;
+    fQty = qty;
     fAdgCode = adgcode;
     fStore = store;
     fPrinter = printer;
@@ -25,12 +26,12 @@ DishPackageDriver::DishPackageDriver()
 
 }
 
-void DishPackageDriver::addMember(int package, int dish, const QString &name, double price, const QString &adgcode, int store, const QString &printer)
+void DishPackageDriver::addMember(int package, int dish, const QString &name, double price, double qty, const QString &adgcode, int store, const QString &printer)
 {
     if (!fPackage.contains(package)) {
         fPackage.insert(package, QList<DishPackageMember>());
     }
-    fPackage[package].append(DishPackageMember(package, dish, name, price, adgcode, store, printer));
+    fPackage[package].append(DishPackageMember(package, dish, name, price, qty, adgcode, store, printer));
 }
 
 int DishPackageDriver::itemHeight(int package, int width, const QString &text)
@@ -48,6 +49,7 @@ void DishMemberDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
 {
     painter->save();
     QFont font(painter->font());
+    font.setPointSize(12);
     const QList<DishPackageMember> &dl = DishPackageDriver::fPackageDriver.fPackage[index.data(Qt::UserRole).toInt()];
     QString name = "";
     for (const DishPackageMember &d: dl) {
@@ -72,7 +74,7 @@ void DishMemberDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
     textRect.adjust(0, height + 2, 0, 0);
     painter->drawText(textRect, float_str(index.data(Qt::UserRole + 1).toDouble(), 2), to);
     textRect.adjust(0, QFontMetrics(painter->font()).height() + 2, 0, 0);
-    font.setPointSize(font.pointSize() - 2);
+    font.setPointSize(8);
     font.setBold(false);
     painter->setFont(font);
     painter->drawText(textRect, name);

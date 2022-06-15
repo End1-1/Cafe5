@@ -129,6 +129,8 @@ protected:
 
     virtual bool tblDoubleClicked(int row, int column, const QList<QVariant> &values);
 
+    virtual void executeSql(const QString &sql);
+
 protected slots:
     virtual void completeRefresh();
 

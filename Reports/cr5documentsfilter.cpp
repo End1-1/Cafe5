@@ -47,3 +47,13 @@ QString CR5DocumentsFilter::condition()
     }
     return result;
 }
+
+QDate CR5DocumentsFilter::date1() const
+{
+    return ui->deStart->date();
+}
+
+QDate CR5DocumentsFilter::date2() const
+{
+    return ui->deEnd->date();
+}

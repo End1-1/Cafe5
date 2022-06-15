@@ -25,6 +25,10 @@ int main(int argc, char *argv[])
     QCoreApplication::setLibraryPaths(libPath);
 #endif
 
+//    if (QDate::currentDate() > QDate::fromString("01/10/2022", "dd/MM/yyyy")) {
+//        return 1;
+//    }
+
     if (!C5SystemPreference::checkDecimalPointAndSeparator()) {
         return 0;
     }
@@ -67,6 +71,8 @@ int main(int argc, char *argv[])
     font.setFamily("Arial LatArm Unicode");
     font.setPointSize(11);
     a.setFont(font);
+
+    //C5Message::info("{seq:1,paidAmount:0, paidAmountCard:1980, partialAmount:0, prePaymentAmount:0, useExtPOS:true, mode:2,  items:[{adgCode:56.10,dep:1,price:1800,productCode:1429,productName:DARGETT STOUT ,qty:1,totalPrice:1800,unit:հատ},{adgCode:5901,dep:1,price:180,productCode:001,productName:Սպասարկում 10%,qty:1,totalPrice:180,unit:հատ}]}");
 
     C5Database db(__c5config.dbParams());
     if (db.open()) {

@@ -3,6 +3,8 @@
 
 #include "c5reportwidget.h"
 
+class CR5DocumentsFilter;
+
 class CR5Documents : public C5ReportWidget
 {
     Q_OBJECT
@@ -23,6 +25,8 @@ protected slots:
     virtual void callEditor(const QString &id);
 
 private:
+    CR5DocumentsFilter *fFilter;
+
     void openDoc(QString id);
 
     int docType(QString id);
@@ -35,6 +39,8 @@ private slots:
     void removeDocs();
 
     void copySelectedDocs();
+
+    void templates();
 
 signals:
     void updateProgressValue(int);

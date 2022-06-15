@@ -15,12 +15,13 @@ class DishPackageMember
 {
 public:
     DishPackageMember();
-    DishPackageMember(int package, int dish, const QString &name, double price, const QString &adgcode, int store, const QString &printer);
+    DishPackageMember(int package, int dish, const QString &name, double price, double qty, const QString &adgcode, int store, const QString &printer);
     int fPackage;
     int fDish;
     QString fAdgCode;
     QString fName;
     double fPrice;
+    double fQty;
     int fStore;
     QString fPrinter;
 };
@@ -29,7 +30,7 @@ class DishPackageDriver
 {
 public:
     DishPackageDriver();
-    void addMember(int package, int dish, const QString &name, double price, const QString &adgcode, int store, const QString &printer);
+    void addMember(int package, int dish, const QString &name, double price, double qty, const QString &adgcode, int store, const QString &printer);
     QHash<int, QList<DishPackageMember> > fPackage;
     int itemHeight(int package, int width, const QString &text);
     static DishPackageDriver fPackageDriver;

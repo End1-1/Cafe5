@@ -9,12 +9,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Cafe5/c5message.ui" line="193"/>
+        <location filename="../../Cafe5/c5message.ui" line="196"/>
         <source>A1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Cafe5/c5message.ui" line="206"/>
+        <location filename="../../Cafe5/c5message.ui" line="209"/>
         <source>A2</source>
         <translation type="unfinished"></translation>
     </message>
@@ -22,7 +22,7 @@
 <context>
     <name>C5Printing</name>
     <message>
-        <location filename="../../Classes/c5printing.cpp" line="330"/>
+        <location filename="../../Classes/c5printing.cpp" line="344"/>
         <source>Failed send order to remote printer</source>
         <translation></translation>
     </message>

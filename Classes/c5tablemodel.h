@@ -78,7 +78,7 @@ public:
 
     void sumForColumns(const QStringList &columns, QMap<QString, double> &values);
 
-    void insertSubTotals(int column, const QList<int> &totalCols, bool title, bool insertempty);
+    void insertSubTotals(QList<int> cols, const QList<int> &totalCols, bool title, bool insertempty);
 
     void resetProxyData();
 
@@ -126,6 +126,10 @@ private:
     inline QVariant dataDisplay(int row, int column) const;
 
     void filterData();
+
+    bool isRowDataEmpty(int row, const QList<int> &cols);
+
+    QString subtotalRowData(int row, const QList<int> &cols);
 
 };
 

@@ -197,6 +197,20 @@ void C5Printing::ctext(const QString &text)
     fJsonData.append(o);
 }
 
+void C5Printing::ctextof(const QString &text, qreal x)
+{
+    QGraphicsTextItem *item = fCanvas->addText(text, fFont);
+    int textwidth = item->boundingRect().width() / 2;
+    item->moveBy(x - textwidth, fTop);
+    setTemptop(item, -1);
+
+    QJsonObject o;
+    o["cmd"] = "ctextof";
+    o["text"] = text;
+    o["x"] = x;
+    fJsonData.append(o);
+}
+
 void C5Printing::rtext(const QString text)
 {
     QGraphicsTextItem *item = fCanvas->addText(text, fFont);

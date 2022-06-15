@@ -406,7 +406,7 @@ void C5TableModel::sumForColumns(const QStringList &columns, QMap<QString, doubl
     }
 }
 
-void C5TableModel::insertSubTotals(int col, const QList<int> &totalCols, bool title, bool insertempty)
+void C5TableModel::insertSubTotals(QList<int> cols, const QList<int> &totalCols, bool title, bool insertempty)
 {
     QFont f = fTableView->font();
     f.setBold(true);
@@ -425,14 +425,14 @@ void C5TableModel::insertSubTotals(int col, const QList<int> &totalCols, bool ti
     int r = 0;
     while (r < fProxyData.count()) {
         if (r == 0) {
-            currName = data(r, col, Qt::EditRole).toString();
+            currName += subtotalRowData(r, cols);
         } else {
-            if (data(r, col, Qt::EditRole).toString().isEmpty()) {
+            if (isRowDataEmpty(r, cols)) {
                 r++;
                 continue;
             }
-            if (!data(r, col, Qt::EditRole).toString().isEmpty()
-                    && data(r, col, Qt::EditRole).toString().compare(currName) != 0) {
+            if (!isRowDataEmpty(r, cols)
+                    && subtotalRowData(r, cols).compare(currName) != 0) {
                 QList<QVariant> newrow = emptyRow;
                 //newrow[0] = tr("SUBTOTAL") + " " + currName;
                 for (int c = 0; c < totalCols.count(); c++) {
@@ -449,7 +449,7 @@ void C5TableModel::insertSubTotals(int col, const QList<int> &totalCols, bool ti
                     //fTableView->setSpan(r, 0, 1, columnCount());
                     r++;
                 }
-                currName = data(r, col, Qt::EditRole).toString();
+                currName = subtotalRowData(r, cols);
                 for (int i = 0; i < totalCols.count(); i++) {
                     totals[i] = 0.000;
                 }
@@ -539,6 +539,33 @@ void C5TableModel::filterData()
         }
     }
     endResetModel();
+}
+
+bool C5TableModel::isRowDataEmpty(int row, const QList<int> &cols)
+{
+    if (cols.count() == 0) {
+        for (int i = 0; i < columnCount(); i++) {
+            if (data(row, i, Qt::EditRole).toString().isEmpty() == false) {
+                return false;
+            }
+        }
+    } else {
+        for (int i = 0; i < cols.count(); i++) {
+            if (data(row, cols.at(i), Qt::EditRole).toString().isEmpty() == false) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+QString C5TableModel::subtotalRowData(int row, const QList<int> &cols)
+{
+    QString r;
+    for (int c: cols) {
+        r += data(row, c, Qt::EditRole).toString();
+    }
+    return r;
 }
 
 void C5TableModel::clearModel()

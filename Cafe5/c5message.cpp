@@ -56,8 +56,12 @@ int C5Message::showMessage(const QString &text, int tp, const QString &yes, cons
         img = "help";
         break;
     }
+#ifdef WAITER
     c5->ui->btnYes->setMinimumHeight(50);
     c5->ui->btnCancel->setMinimumHeight(50);
+    c5->ui->btnYes->setMinimumWidth(100);
+    c5->ui->btnCancel->setMinimumWidth(100);
+#endif
     c5->ui->img->setPixmap(QPixmap(QString(":/%1.png").arg(img)));
     c5->ui->label->setText(text);
     c5->adjustSize();

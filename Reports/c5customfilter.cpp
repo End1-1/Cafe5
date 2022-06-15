@@ -106,6 +106,8 @@ void C5CustomFilter::on_lw_itemClicked(QListWidgetItem *item)
         if (type == "date") {
             C5DateEdit *d = new C5DateEdit();
             d->setProperty("replace", s);
+            d->setProperty("FilterName", s);
+            d->setProperty("FixDate", true);
             d->setProperty("t", "date");
             ui->gl->addWidget(d, row, 1, 1, 2);
             fWidgets.append(d);
@@ -113,6 +115,7 @@ void C5CustomFilter::on_lw_itemClicked(QListWidgetItem *item)
             C5LineEditWithSelector *l1 = new C5LineEditWithSelector();
             C5LineEditWithSelector *l2 = new C5LineEditWithSelector();
             l1->setSelector(fDBParams, l2, type.midRef(5, type.length() - 5).toInt());
+            l1->setProperty("FilterName", s);
             ui->gl->addWidget(l1, row, 1, 1, 1);
             ui->gl->addWidget(l2, row, 2, 1, 1);
             l1->setProperty("replace", s);

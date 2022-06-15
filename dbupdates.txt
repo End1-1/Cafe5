@@ -799,3 +799,9 @@ alter table mf_daily_workers add column f_checked tinyint;
 /*  db - 73, 22.05.2022 */
 update s_app set f_version='73' where f_app='DB';
 alter table c_goods add column f_acc tinytext;
+
+/*  db - 74, 12.06.2022 */
+update s_app set f_version='74' where f_app='DB';
+create table s_report_template (f_id integer primary key auto_increment, f_group integer, f_name tinytext, f_sql text);
+create table s_report_template_params (f_id integer primary key auto_increment, f_report integer, f_param_type tinyint, f_param_name tinytext, f_replace_text tinytext);
+create table s_report_template_access (f_id integer primary key auto_increment, f_report integer, f_group integer);
