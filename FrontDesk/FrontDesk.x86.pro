@@ -293,7 +293,10 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Forms/dlgnewcl.cpp \
     ../DbData/dbdishcomments.cpp \
     ../DbData/dbdishremovereason.cpp \
-    ../../XLSX/src/xlsxborder.cpp
+    ../../XLSX/src/xlsxborder.cpp \
+    ../Forms/c5storedocselectprinttemplate.cpp \
+    ../Classes/c5reporttemplatedriver.cpp \
+    c5dlgselectreporttemplate.cpp
 
 HEADERS += ../Cafe5/c5cafecommon.h \
     ../../NewTax/Src/printtaxn.h \
@@ -565,7 +568,10 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Forms/dlgnewcl.h \
     ../DbData/dbdishcomments.h \
     ../DbData/dbdishremovereason.h \
-    ../../XLSX/src/xlsxborder.h
+    ../../XLSX/src/xlsxborder.h \
+    ../Forms/c5storedocselectprinttemplate.h \
+    ../Classes/c5reporttemplatedriver.h \
+    c5dlgselectreporttemplate.h
 
 FORMS += \
     ../Classes/calculator.ui \
@@ -681,7 +687,9 @@ FORMS += \
     ../Forms/dlgreservgoods.ui \
     ../Forms/dlgsetwaiterordercl.ui \
     ../Forms/dlgdataonline.ui \
-    ../Forms/dlgnewcl.ui
+    ../Forms/dlgnewcl.ui \
+    ../Forms/c5storedocselectprinttemplate.ui \
+    c5dlgselectreporttemplate.ui
 
 INCLUDEPATH += ../Cafe5
 INCLUDEPATH += ../Cache
