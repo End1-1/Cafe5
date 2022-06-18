@@ -132,6 +132,8 @@ bool DishItem::event(QEvent *event)
     case QEvent::MouseButtonRelease:
         ui->btnDish->click();
         break;
+    default:
+        break;
     }
     return QWidget::event(event);
 }
