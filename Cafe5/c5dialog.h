@@ -16,6 +16,8 @@ class C5Dialog : public QDialog
 public:
     C5Dialog(const QStringList &dbParams);
 
+    C5Dialog(const QStringList &dbParams, bool noparent);
+
     ~C5Dialog();
 
     static void setMainWindow(QWidget *widget);

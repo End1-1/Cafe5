@@ -9,6 +9,7 @@
 #define container_aheaderstore 4
 #define container_astoredraft 5
 #define container_astoredishwaste 6
+#define container_acalcprice 7
 
 struct IGoods {
     QString recId;
@@ -52,6 +53,8 @@ public:
     bool writeAHeader2ShopStore(const QString &id, int store, int accept);
 
     bool writeAStoreDraft(QString &id, const QString &docId, int store, int type, int goods, double qty, double price, double total, int reason, const QString &baseid, int rownum, const QString &comment);
+
+    bool writeACalcPrice(const QString &id, const QString &docId, double price2, double margin);
 
     bool writeAStoreInventory(QString &id, const QString &docId, int store, int goods, double qty, double price, double total);
 
@@ -138,6 +141,10 @@ private:
 
     QHash<QString, int> fECashDataMap;
 
+    QHash<QString, int> fACalcPriceDataMap;
+
+    QList<QList<QVariant> > fACalcPriceData;
+
     bool readAHeaderStore(const QString &id);
 
     bool readAStoreDraft(const QString &id);
@@ -147,6 +154,8 @@ private:
     bool readAHeaderCash(const QString &id);
 
     bool readECash(const QString &id);
+
+    bool readACalcPrice(const QString &id);
 
     bool returnResult(bool r, const QString &msg = "");
 

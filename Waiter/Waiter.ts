@@ -999,22 +999,22 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="416"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="430"/>
         <source>Document not exists</source>
         <translation>Փասթաթուղթը նշված համարով չկա</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="939"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="969"/>
         <source>Invalid document id</source>
         <translation>Փասթաթուղթը նշված համարով չկա</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="1068"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="1098"/>
         <source>Not enough materials in the store</source>
         <translation>Բաղասական քանակ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="1167"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="1197"/>
         <source>This order used in next documents</source>
         <translation>Այս պետվերը գրանցված է հետևյալ փասթաթղթերում</translation>
     </message>
@@ -1071,7 +1071,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterorderdoc.cpp" line="406"/>
+        <location filename="../Classes/c5waiterorderdoc.cpp" line="408"/>
         <source>Document saved</source>
         <translation>Պահեստի փասթաթուղթը պահպանված է</translation>
     </message>
@@ -3869,9 +3869,10 @@ STOPLIST-ից</translation>
     <name>PrintTaxN</name>
     <message>
         <location filename="../../NewTax/Src/printtaxn.cpp" line="29"/>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="85"/>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="93"/>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="341"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="87"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="95"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="354"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="393"/>
         <source>Connection error</source>
         <translation>Կապի սխալ</translation>
     </message>
@@ -3881,17 +3882,18 @@ STOPLIST-ից</translation>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="85"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="87"/>
         <source>Socket read error</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="93"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="95"/>
         <source>Data read timeout</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="339"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="352"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="391"/>
         <source>Tax error code</source>
         <translation>ՀԴՄ-ի սխալի կոդ</translation>
     </message>

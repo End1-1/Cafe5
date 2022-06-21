@@ -25,7 +25,7 @@
 #define VM_GROUPS 3
 
 Sales::Sales(C5User *user) :
-    C5Dialog(__c5config.dbParams()),
+    C5Dialog(__c5config.dbParams(), true),
     ui(new Ui::Sales)
 {
     ui->setupUi(this);

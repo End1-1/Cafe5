@@ -661,22 +661,22 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="416"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="430"/>
         <source>Document not exists</source>
         <translation>Փասթաթուղթը գոյություն չունի</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="939"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="969"/>
         <source>Invalid document id</source>
         <translation>Փասթաթուղթը գոյություն չունի</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="1068"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="1098"/>
         <source>Not enough materials in the store</source>
         <translation>Բացասական քանակ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="1167"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="1197"/>
         <source>This order used in next documents</source>
         <translation>Փասթաթուղթը օգտագործվում է հետևյալ փասթաթղթերում</translation>
     </message>
@@ -751,7 +751,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterorderdoc.cpp" line="406"/>
+        <location filename="../Classes/c5waiterorderdoc.cpp" line="408"/>
         <source>Document saved</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1989,9 +1989,10 @@ MS Excel</source>
     <name>PrintTaxN</name>
     <message>
         <location filename="../../NewTax/Src/printtaxn.cpp" line="29"/>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="85"/>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="93"/>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="341"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="87"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="95"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="354"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="393"/>
         <source>Connection error</source>
         <translation>Կապի սխալ</translation>
     </message>
@@ -2001,17 +2002,18 @@ MS Excel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="85"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="87"/>
         <source>Socket read error</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="93"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="95"/>
         <source>Data read timeout</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="339"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="352"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="391"/>
         <source>Tax error code</source>
         <translation>ՀԴՄ սխալի կոդ</translation>
     </message>
@@ -3508,7 +3510,7 @@ reservation</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="working.cpp" line="340"/>
+        <location filename="working.cpp" line="358"/>
         <source>Retail</source>
         <translation>Մանրածախ</translation>
     </message>
@@ -3534,128 +3536,128 @@ reservation</source>
     </message>
     <message>
         <location filename="working.cpp" line="248"/>
-        <location filename="working.cpp" line="912"/>
+        <location filename="working.cpp" line="915"/>
         <source>Total today</source>
         <translation>Ընդամենը այսօր</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="740"/>
-        <location filename="working.cpp" line="813"/>
-        <location filename="working.cpp" line="868"/>
-        <location filename="working.cpp" line="887"/>
+        <location filename="working.cpp" line="758"/>
+        <location filename="working.cpp" line="831"/>
+        <location filename="working.cpp" line="871"/>
+        <location filename="working.cpp" line="890"/>
         <source>Password</source>
         <translation>Գաղտնաբառ</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="889"/>
+        <location filename="working.cpp" line="892"/>
         <source>Access denied</source>
         <translation>Մուտքը արգելված է</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="343"/>
+        <location filename="working.cpp" line="361"/>
         <source>Whosale</source>
         <translation>Մեծածախ</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="346"/>
-        <location filename="working.cpp" line="913"/>
+        <location filename="working.cpp" line="364"/>
+        <location filename="working.cpp" line="916"/>
         <source>Preorder</source>
         <translation>Պատվեր</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="351"/>
+        <location filename="working.cpp" line="369"/>
         <source>New</source>
         <translation>Նոր գործարք</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="491"/>
+        <location filename="working.cpp" line="509"/>
         <source>Message date and time</source>
         <translation>Հաղորդագրության ստեղծման ամսաթիվ և ժամ</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="499"/>
-        <location filename="working.cpp" line="515"/>
+        <location filename="working.cpp" line="517"/>
+        <location filename="working.cpp" line="533"/>
         <source>Goods reserved</source>
         <translation>Ապրանքի ամրագրում</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="509"/>
-        <location filename="working.cpp" line="520"/>
+        <location filename="working.cpp" line="527"/>
+        <location filename="working.cpp" line="538"/>
         <source>End date</source>
         <translation>Վերջնաժամկետ</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="530"/>
+        <location filename="working.cpp" line="548"/>
         <source>Fiscal printed</source>
         <translation>Հդմ կտրոնը տպված է</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="534"/>
+        <location filename="working.cpp" line="552"/>
         <source>Fiscal not printed</source>
         <translation>Հդմ կտրոնը տպված չէ</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="557"/>
+        <location filename="working.cpp" line="575"/>
         <source>Printed</source>
         <translation>Տպված</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="728"/>
+        <location filename="working.cpp" line="746"/>
         <source>Confirm to close application</source>
         <translation>Հաստատեք ծրագրից դուրս գալը</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="745"/>
+        <location filename="working.cpp" line="763"/>
         <source>Error</source>
         <translation>Սխալ</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="745"/>
+        <location filename="working.cpp" line="763"/>
         <source>Invalid password</source>
         <translation>Գաղտնաբառը սխալ է</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="764"/>
+        <location filename="working.cpp" line="782"/>
         <source>Salute?</source>
         <translation>Հրավառություն՞</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="909"/>
+        <location filename="working.cpp" line="912"/>
         <source>Search goods in the storages</source>
         <translation>Փնտրել ապրանքը պեհեստներում</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="910"/>
+        <location filename="working.cpp" line="913"/>
         <source>Input staff at the work</source>
         <translation>Աշխատողի մուտք</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="911"/>
+        <location filename="working.cpp" line="914"/>
         <source>Output staff from the work</source>
         <translation>Աշխատողի ելք</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="914"/>
+        <location filename="working.cpp" line="917"/>
         <source>Show log</source>
         <translation>Դիտել պատմությունը</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="915"/>
+        <location filename="working.cpp" line="918"/>
         <source>Open new store input document</source>
         <translation>Բացել նոր պահեստի մուտքի փասթաթուղթ</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="916"/>
+        <location filename="working.cpp" line="919"/>
         <source>List of workers at work</source>
         <translation>Աշխատողների ցանկ սրահում</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="704"/>
+        <location filename="working.cpp" line="722"/>
         <source>Window closed</source>
         <translation>Պատուհանը փակվեց</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="723"/>
+        <location filename="working.cpp" line="741"/>
         <source>Current window</source>
         <translation>Ընդացիք պատուհան</translation>
     </message>

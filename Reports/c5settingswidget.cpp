@@ -155,6 +155,7 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     fTags[ui->chAskForPrecheck->getTag()] = ui->chAskForPrecheck->isChecked() ? "1" : "0";
     fTags[ui->chFinalReceiptQtySelect->getTag()] = ui->chFinalReceiptQtySelect->isChecked() ? "1" : "0";
     fTags[ui->chForceUsePrintAlias->getTag()] = ui->chForceUsePrintAlias->isChecked() ? "1" : "0";
+    fTags[ui->chCompactDishesInOrder->getTag()] = ui->chCompactDishesInOrder->isChecked() ? "1" : "0";
     C5Database db(fDBParams);
     db[":f_settings"] = ui->leCode->getInteger();
     db.exec("delete from s_settings_values where f_settings=:f_settings");

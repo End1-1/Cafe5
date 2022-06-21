@@ -102,6 +102,7 @@
 #define param_waiter_receipt_qty 98
 #define param_smart_dont_print_receipt 99
 #define param_force_use_print_alias 100
+#define param_zip_dish_in_order 101
 
 #define FRONTDESK_WAITER 0
 #define FRONTDESK_SHOP 1

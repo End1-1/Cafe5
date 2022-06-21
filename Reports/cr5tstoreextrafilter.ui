@@ -132,6 +132,23 @@
      </property>
     </widget>
    </item>
+   <item row="0" column="2">
+    <widget class="QToolButton" name="btnFixDate">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources/res.qrc">
+       <normaloff>:/pushpin.png</normaloff>:/pushpin.png</iconset>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="FixDate" stdset="0">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -156,6 +173,8 @@
   <tabstop>deEnd</tabstop>
   <tabstop>leStore</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../resources/res.qrc"/>
+ </resources>
  <connections/>
 </ui>

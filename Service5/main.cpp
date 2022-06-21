@@ -3,6 +3,7 @@
 #include "databaseconnectionmanager.h"
 #include "configini.h"
 #include "requestmanager.h"
+#include "pluginmanager.h"
 #include "raw.h"
 #include "structs.h"
 #include "monitor.h"
@@ -51,6 +52,7 @@ DWORD WINAPI ThreadProc(CONST LPVOID lpParam) {
     app.installTranslator(&t);
     DatabaseConnectionManager::init();
     RequestManager::init();
+    PluginManager::init(APPDIR + "config.ini");
     Raw::init();
     Database db;
     DatabaseConnectionManager::openSystemDatabase(db);

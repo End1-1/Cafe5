@@ -75,6 +75,8 @@ private slots:
 
     void on_tabWidget_currentChanged(int index);
 
+    void on_chSameAsInStore_clicked(bool checked);
+
 private:
     Ui::C5DishWidget *ui;
 

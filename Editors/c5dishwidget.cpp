@@ -620,7 +620,7 @@ void C5DishWidget::on_btnMultRecipe_clicked()
                 ui->tblRecipe->lineEdit(i, 3)->setDouble(ui->tblRecipe->lineEdit(i, 3)->getDouble() / ui->lePortionQty->getDouble());
             }
         }
-        ui->tblRecipe->lineEdit(i, 3)->textEdited(ui->tblRecipe->lineEdit(i, 3)->text());
+        emit ui->tblRecipe->lineEdit(i, 3)->textEdited(ui->tblRecipe->lineEdit(i, 3)->text());
     }
 }
 
@@ -643,5 +643,58 @@ void C5DishWidget::on_tabWidget_currentChanged(int index)
     case 3:
         loadImage();
         break;
+    }
+}
+
+void C5DishWidget::on_chSameAsInStore_clicked(bool checked)
+{
+    if (checked) {
+        if (ui->leBarcode->isEmpty()) {
+            ui->chSameAsInStore->setChecked(false);
+            C5Message::error(tr("No barcode defined."));
+            return;
+        }
+        if (ui->leName->isEmpty()) {
+            C5Message::error(tr("Name must be defined."));
+            return;
+        }
+        if (ui->lePart2->getInteger() == 0) {
+            C5Message::error(tr("Goods group must be defined"));
+            return;
+        }
+        C5Database db(fDBParams);
+        db[":f_scancode"] = ui->leBarcode->text();
+        db.exec("select * from c_goods where f_scancode=:f_scancode");
+        int goodsid;
+        QString goodsname = ui->leName->text();
+        if (db.nextRow()) {
+            goodsid = db.getInt("f_id");
+            goodsname = db.getString("f_name");
+        } else {
+            int groupid;
+            db[":f_name"] = ui->lePart2Name->text();
+            db.exec("select * from c_groups where f_name=:f_name");
+            if (db.nextRow()) {
+                groupid = db.getInt("f_id");
+            } else {
+                db[":f_name"] = ui->lePart2Name->text();
+                db[":f_chargevalue"] = 0;
+                groupid = db.insert("c_groups");
+            }
+            db[":f_group"] = groupid;
+            db[":f_unit"] = 1;
+            db[":f_name"] = ui->leName->text();
+            db[":f_service"] = 0;
+            db[":f_iscomplect"] = 0;
+            goodsid = db.insert("c_goods");
+            db[":f_storeid"] = goodsid;
+            db.update("c_goods", "f_id", goodsid);
+        }
+        int row = addRecipeRow();
+        ui->tblRecipe->setInteger(row, 0, 0);
+        ui->tblRecipe->setInteger(row, 1, goodsid);
+        ui->tblRecipe->setString(row, 2, goodsname);
+        ui->tblRecipe->setString(row, 6, C5Cache::cache(fDBParams, cache_goods_unit)->getValuesForId(1).at(2).toString());
+        ui->tblRecipe->lineEdit(row, 7)->setDouble(0);
     }
 }

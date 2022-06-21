@@ -27,6 +27,7 @@ public:
     bool insert(const QString &table, int &id);
     bool update(const QString &table);
     bool update(const QString &table, const QString &field, const QVariant &value);
+    bool deleteFromTable(const QString &table, const QString &field, const QVariant &value);
     inline int rowCount() {return fQuery->size();}
     inline int columnCount() {return fColumnsNames.count();}
     inline QString columnName(int index) {return fColumnsIndexes[index];}

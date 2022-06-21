@@ -916,22 +916,22 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="416"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="430"/>
         <source>Document not exists</source>
         <translation>Փաստաթուղթը գոյություն չունի</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="939"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="969"/>
         <source>Invalid document id</source>
         <translation>Սխալ փաստաթղթի համար</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="1068"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="1098"/>
         <source>Not enough materials in the store</source>
         <translation>Բացասական քանակ պահեստում</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="1167"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="1197"/>
         <source>This order used in next documents</source>
         <translation>Այս փաստաթուղթը օգտագործվում է հետևյալ պահեստի ելքերի մեջ</translation>
     </message>
@@ -980,7 +980,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterorderdoc.cpp" line="406"/>
+        <location filename="../Classes/c5waiterorderdoc.cpp" line="408"/>
         <source>Document saved</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1962,9 +1962,10 @@ MS Excel</source>
     <name>PrintTaxN</name>
     <message>
         <location filename="../../NewTax/Src/printtaxn.cpp" line="29"/>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="85"/>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="93"/>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="341"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="87"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="95"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="354"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="393"/>
         <source>Connection error</source>
         <translation>Կապի սխալ</translation>
     </message>
@@ -1974,17 +1975,18 @@ MS Excel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="85"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="87"/>
         <source>Socket read error</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="93"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="95"/>
         <source>Data read timeout</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="339"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="352"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="391"/>
         <source>Tax error code</source>
         <translation>ՀԴՄ -ի սխալի կոդ</translation>
     </message>
@@ -2246,7 +2248,7 @@ MS Excel</source>
     </message>
     <message>
         <location filename="workspace.ui" line="301"/>
-        <location filename="workspace.ui" line="1131"/>
+        <location filename="workspace.ui" line="1137"/>
         <source>New Column</source>
         <translation></translation>
     </message>
@@ -2286,39 +2288,39 @@ MS Excel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="1234"/>
+        <location filename="workspace.ui" line="1240"/>
         <source>Received</source>
         <translation>Առձերն</translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="1262"/>
-        <location filename="workspace.ui" line="1599"/>
+        <location filename="workspace.ui" line="1268"/>
+        <location filename="workspace.ui" line="1605"/>
         <source>999999.99</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="1271"/>
-        <location filename="workspace.ui" line="1608"/>
+        <location filename="workspace.ui" line="1277"/>
+        <location filename="workspace.ui" line="1614"/>
         <source>1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="1353"/>
+        <location filename="workspace.ui" line="1359"/>
         <source>99999999.99</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="1362"/>
+        <location filename="workspace.ui" line="1368"/>
         <source>2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="1565"/>
+        <location filename="workspace.ui" line="1571"/>
         <source>Change</source>
         <translation>Մանրը</translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="1715"/>
+        <location filename="workspace.ui" line="1721"/>
         <source>Write</source>
         <translation>Գրանցել</translation>
     </message>
@@ -2338,12 +2340,12 @@ MS Excel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="1159"/>
+        <location filename="workspace.ui" line="1165"/>
         <source>Costumer phone</source>
         <translation>Հաճախորդի հեռախոսի համար</translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="1322"/>
+        <location filename="workspace.ui" line="1328"/>
         <source>Total</source>
         <translation>Ընդամենը</translation>
     </message>
@@ -2507,22 +2509,22 @@ MS Excel</source>
         <translation>Օրնկ․</translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="1446"/>
+        <location filename="workspace.ui" line="1452"/>
         <source>Cash</source>
         <translation>Կանխիկ</translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="1478"/>
+        <location filename="workspace.ui" line="1484"/>
         <source>Card</source>
         <translation>Քարտ</translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="1507"/>
+        <location filename="workspace.ui" line="1513"/>
         <source>Idram</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="1536"/>
+        <location filename="workspace.ui" line="1542"/>
         <source>Other</source>
         <translation>Այլ</translation>
     </message>

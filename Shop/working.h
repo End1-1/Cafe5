@@ -53,6 +53,9 @@ public:
 
     Flag flag(int id);
 
+public slots:
+    void getGoods(int id);
+
 private:
     Ui::Working *ui;
 

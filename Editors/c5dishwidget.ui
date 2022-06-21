@@ -23,7 +23,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -42,6 +42,39 @@
           <string>Main</string>
          </property>
          <layout class="QGridLayout" name="gridLayout">
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_4">
+            <property name="text">
+             <string>Name</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="C5LineEditWithSelector" name="leCode">
+            <property name="maximumSize">
+             <size>
+              <width>100</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="Field" stdset="0">
+             <string>f_id</string>
+            </property>
+            <property name="Primary" stdset="0">
+             <bool>true</bool>
+            </property>
+            <property name="Manual" stdset="0">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_6">
+            <property name="text">
+             <string>Description</string>
+            </property>
+           </widget>
+          </item>
           <item row="3" column="1" colspan="4">
            <widget class="C5LineEditWithSelector" name="lineEdit_3">
             <property name="Field" stdset="0">
@@ -62,19 +95,6 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="3">
-           <widget class="C5LineEditWithSelector" name="lePart2Name">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
-            <property name="FieldRef" stdset="0">
-             <string>f_part2</string>
-            </property>
-           </widget>
-          </item>
           <item row="1" column="0">
            <widget class="QLabel" name="label_2">
             <property name="text">
@@ -82,10 +102,29 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_4">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_3">
             <property name="text">
-             <string>Name</string>
+             <string>Code</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="C5LineEditWithSelector" name="lePart1Name">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>200</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="FieldRef" stdset="0">
+             <string>f_part1</string>
             </property>
            </widget>
           </item>
@@ -111,39 +150,6 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
-           <widget class="C5LineEditWithSelector" name="leCode">
-            <property name="maximumSize">
-             <size>
-              <width>100</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="Field" stdset="0">
-             <string>f_id</string>
-            </property>
-            <property name="Primary" stdset="0">
-             <bool>true</bool>
-            </property>
-            <property name="Manual" stdset="0">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>Code</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_6">
-            <property name="text">
-             <string>Description</string>
-            </property>
-           </widget>
-          </item>
           <item row="1" column="5">
            <widget class="QPushButton" name="btnNewType">
             <property name="focusPolicy">
@@ -158,22 +164,30 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="2">
-           <widget class="C5LineEditWithSelector" name="lePart1Name">
+          <item row="1" column="3">
+           <widget class="C5LineEditWithSelector" name="lePart2Name">
             <property name="enabled">
              <bool>false</bool>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>200</width>
-              <height>16777215</height>
-             </size>
             </property>
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
             </property>
             <property name="FieldRef" stdset="0">
-             <string>f_part1</string>
+             <string>f_part2</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>Barcode</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1" colspan="2">
+           <widget class="C5LineEditWithSelector" name="leBarcode">
+            <property name="Field" stdset="0">
+             <string>f_barcode</string>
             </property>
            </widget>
           </item>
@@ -482,156 +496,6 @@
             </layout>
            </widget>
           </item>
-          <item row="0" column="0">
-           <widget class="QWidget" name="widget" native="true">
-            <layout class="QHBoxLayout" name="horizontalLayout">
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QPushButton" name="btnAddRecipe">
-               <property name="focusPolicy">
-                <enum>Qt::NoFocus</enum>
-               </property>
-               <property name="toolTip">
-                <string>Add goods (+)</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset resource="../resources/res.qrc">
-                 <normaloff>:/add.png</normaloff>:/add.png</iconset>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="btnNewGoods">
-               <property name="focusPolicy">
-                <enum>Qt::NoFocus</enum>
-               </property>
-               <property name="toolTip">
-                <string>New goods (Control + N)</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset resource="../resources/res.qrc">
-                 <normaloff>:/new.png</normaloff>:/new.png</iconset>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="btnRemoveRecipe">
-               <property name="focusPolicy">
-                <enum>Qt::NoFocus</enum>
-               </property>
-               <property name="toolTip">
-                <string>Remove selected row (-)</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset resource="../resources/res.qrc">
-                 <normaloff>:/remove.png</normaloff>:/remove.png</iconset>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="btnCopy">
-               <property name="focusPolicy">
-                <enum>Qt::NoFocus</enum>
-               </property>
-               <property name="toolTip">
-                <string>Copy recipe (Control + C)</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset resource="../resources/res.qrc">
-                 <normaloff>:/copy.png</normaloff>:/copy.png</iconset>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="btnPasteRecipt">
-               <property name="focusPolicy">
-                <enum>Qt::NoFocus</enum>
-               </property>
-               <property name="toolTip">
-                <string>Paste recipe (Control + P)</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset resource="../resources/res.qrc">
-                 <normaloff>:/paste.png</normaloff>:/paste.png</iconset>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="btnPrintRecipe">
-               <property name="focusPolicy">
-                <enum>Qt::NoFocus</enum>
-               </property>
-               <property name="toolTip">
-                <string>Print receipe (Control + P)</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset resource="../resources/res.qrc">
-                 <normaloff>:/print.png</normaloff>:/print.png</iconset>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="btnDivQty">
-               <property name="focusPolicy">
-                <enum>Qt::NoFocus</enum>
-               </property>
-               <property name="toolTip">
-                <string>Divide all quantites</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset resource="../resources/res.qrc">
-                 <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <spacer name="horizontalSpacer">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>584</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-            </layout>
-           </widget>
-          </item>
           <item row="1" column="0">
            <widget class="QFrame" name="frame">
             <property name="frameShape">
@@ -798,6 +662,166 @@
             </layout>
            </widget>
           </item>
+          <item row="0" column="0">
+           <widget class="QWidget" name="widget" native="true">
+            <layout class="QHBoxLayout" name="horizontalLayout">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QPushButton" name="btnAddRecipe">
+               <property name="focusPolicy">
+                <enum>Qt::NoFocus</enum>
+               </property>
+               <property name="toolTip">
+                <string>Add goods (+)</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="../resources/res.qrc">
+                 <normaloff>:/add.png</normaloff>:/add.png</iconset>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btnNewGoods">
+               <property name="focusPolicy">
+                <enum>Qt::NoFocus</enum>
+               </property>
+               <property name="toolTip">
+                <string>New goods (Control + N)</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="../resources/res.qrc">
+                 <normaloff>:/new.png</normaloff>:/new.png</iconset>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btnRemoveRecipe">
+               <property name="focusPolicy">
+                <enum>Qt::NoFocus</enum>
+               </property>
+               <property name="toolTip">
+                <string>Remove selected row (-)</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="../resources/res.qrc">
+                 <normaloff>:/remove.png</normaloff>:/remove.png</iconset>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btnCopy">
+               <property name="focusPolicy">
+                <enum>Qt::NoFocus</enum>
+               </property>
+               <property name="toolTip">
+                <string>Copy recipe (Control + C)</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="../resources/res.qrc">
+                 <normaloff>:/copy.png</normaloff>:/copy.png</iconset>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btnPasteRecipt">
+               <property name="focusPolicy">
+                <enum>Qt::NoFocus</enum>
+               </property>
+               <property name="toolTip">
+                <string>Paste recipe (Control + P)</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="../resources/res.qrc">
+                 <normaloff>:/paste.png</normaloff>:/paste.png</iconset>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btnPrintRecipe">
+               <property name="focusPolicy">
+                <enum>Qt::NoFocus</enum>
+               </property>
+               <property name="toolTip">
+                <string>Print receipe (Control + P)</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="../resources/res.qrc">
+                 <normaloff>:/print.png</normaloff>:/print.png</iconset>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btnDivQty">
+               <property name="focusPolicy">
+                <enum>Qt::NoFocus</enum>
+               </property>
+               <property name="toolTip">
+                <string>Divide all quantites</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="../resources/res.qrc">
+                 <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>584</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="C5CheckBox" name="chSameAsInStore">
+               <property name="text">
+                <string>Same as in store</string>
+               </property>
+               <property name="Field" stdset="0">
+                <string>f_samestore</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
@@ -941,14 +965,14 @@
    <header location="global">c5lineeditwithselector.h</header>
   </customwidget>
   <customwidget>
-   <class>C5TableWidget</class>
-   <extends>QTableWidget</extends>
-   <header location="global">c5tablewidget.h</header>
-  </customwidget>
-  <customwidget>
    <class>C5CheckBox</class>
    <extends>QCheckBox</extends>
    <header location="global">c5checkbox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5TableWidget</class>
+   <extends>QTableWidget</extends>
+   <header location="global">c5tablewidget.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

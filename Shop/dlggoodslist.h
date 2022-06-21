@@ -13,9 +13,8 @@ class DlgGoodsList : public C5Dialog
 
 public:
     explicit DlgGoodsList();
-    ~DlgGoodsList();
 
-    static bool getGoods(int &id);
+    ~DlgGoodsList();
 
 protected:
     virtual bool event(QEvent *event) override;
@@ -31,6 +30,9 @@ private:
     Ui::DlgGoodsList *ui;
 
     int fGoodsId;
+
+signals:
+    void getGoods(int &);
 };
 
 #endif // DLGGOODSLIST_H

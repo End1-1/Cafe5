@@ -125,7 +125,7 @@ private:
 
     int addGoodsRow();
 
-    void addGoods(int goods, const QString &name, double qty, const QString &unit, double price, double total, const QString &comment);
+    int addGoods(int goods, const QString &name, double qty, const QString &unit, double price, double total, const QString &comment);
 
     void setDocEnabled(bool v);
 
@@ -146,6 +146,12 @@ private:
     void printV1();
 
     void printV2();
+
+    double additionalCost();
+
+    double additionalCostForEveryGoods();
+
+    void calcPrice2(int row);
 
 private slots:
     void lineEditKeyPressed(const QChar &key);
@@ -187,6 +193,12 @@ private slots:
     void tblPriceChanged(const QString &arg1);
 
     void tblTotalChanged(const QString &arg1);
+
+    void tblCalcMarginPercentChanged(const QString &arg1);
+
+    void tblCalcMarginChanged(const QString &arg1);
+
+    void tblCalcFinalChanged(const QString &arg1);
 
     void tblAddChanged(const QString &arg1);
 
@@ -247,6 +259,10 @@ private slots:
     void on_btnFillRemote_clicked(bool checked);
 
     void on_btnAddPackages_clicked();
+
+    void on_btnSetMargin_clicked();
+
+    void on_btnSetAllMarginPercent_clicked();
 };
 
 #endif // C5STOREDOC_H

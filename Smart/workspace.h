@@ -93,12 +93,16 @@ private slots:
 
     void on_btnReprintLastCheck_clicked();
 
+    void on_leReadCode_textChanged(const QString &arg1);
+
 private:
     Ui::Workspace *ui;
 
     C5User *fUser;
 
     QList<Dish*> fDishes;
+
+    QHash<QString, Dish*> fDishesBarcode;
 
     QString fOrderUuid;
 
@@ -121,6 +125,8 @@ private:
     double fDiscountValue;
 
     double fDiscountAmount;
+
+    void addDishToOrder(Dish *d);
 
     void saveOrder();
 

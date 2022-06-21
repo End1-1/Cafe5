@@ -39,10 +39,6 @@ Workspace::Workspace(const QStringList &dbParams) :
     ui(new Ui::Workspace)
 {
     ui->setupUi(this);
-#ifndef QT_DEBUG
-    ui->leReadCode->setMaximumWidth(1);
-    ui->leReadCode->setMaximumHeight(1);
-#endif
     fTypeFilter = 0;
     QRect r = qApp->screens().at(0)->geometry();
     switch (r.width()) {
@@ -121,7 +117,7 @@ bool Workspace::login()
     }
     db[":f_menu"] = C5Config::defaultMenu();
     db.exec("SELECT d.f_id, d.f_part, d.f_name,  m.f_print1, m.f_store, m.f_price, p2.f_adgcode, d.f_color, \
-            d.f_netweight, d.f_cost, m.f_recent \
+            d.f_netweight, d.f_cost, m.f_recent, d.f_barcode \
             FROM d_menu m \
             left join d_dish d on d.f_id=m.f_dish \
             left join d_part2 p2 on p2.f_id=d.f_part \
@@ -140,7 +136,11 @@ bool Workspace::login()
         d->netWeight = db.getDouble("f_netweight");
         d->cost = db.getDouble("f_cost");
         d->quick = db.getInt("f_recent");
+        d->barcode = db.getString("f_barcode");
         fDishes.append(d);
+        if (d->barcode.isEmpty() == false) {
+            fDishesBarcode[d->barcode] = d;
+        }
     }
     db[":f_id"] = C5Config::defaultTable();
     db.exec("select f_name from h_tables where f_id=:f_id");
@@ -205,6 +205,8 @@ void Workspace::setQty(double qty, int mode)
     case 3:
         if (d.qty - qty > 0.1) {
             d.qty -= qty;
+        } else {
+            on_btnVoid_clicked();
         }
         break;
     }
@@ -579,8 +581,26 @@ void Workspace::on_lstCombo_itemClicked(QListWidgetItem *item)
 
 void Workspace::on_leReadCode_returnPressed()
 {
-    QString code = ui->leReadCode->text().replace("?", "").replace(";", "");
+    QString hya("էթփձջւևրչճԷԹՓՁՋՒևՐՉՃ");
+    QString num("12345678901234567890");
+    QString oldcode = ui->leReadCode->text();
     ui->leReadCode->clear();
+    QString newcode;
+
+    for (int i = 0; i < oldcode.length(); i++) {
+        if (hya.contains(oldcode.at(i))) {
+            newcode += num.at(hya.indexOf(oldcode.at(i)));
+        } else {
+            newcode += oldcode.at(i);
+        }
+    }
+
+    QString code = newcode.replace("?", "").replace(";", "");
+    if (fDishesBarcode.contains(code)) {
+        addDishToOrder(fDishesBarcode[code]);
+        return;
+    }
+
     C5Database db(fDBParams);
     db[":f_code"] = code;
     db.exec("select * from b_cards_discount where f_code=:f_code");
@@ -635,25 +655,7 @@ void Workspace::on_tblDishes_cellClicked(int row, int column)
     if (!d) {
         return;
     }
-    bool isnew = true;
-    for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
-        OrderDish *od = static_cast<OrderDish*>(ui->tblOrder->cellWidget(i, 0));
-        if (d->id == od->fDish.id) {
-            row = i;
-            od->fDish.qty++;
-            od->updateInfo();
-            isnew = false;
-            break;
-        }
-    }
-    if (isnew) {
-        row = ui->tblOrder->rowCount();
-        ui->tblOrder->setRowCount(row + 1);
-        OrderDish *od = new OrderDish(*d);
-        ui->tblOrder->setCellWidget(row, 0, od);
-    }
-    on_tblOrder_cellClicked(row, 0);
-    countTotal();
+    addDishToOrder(d);
 }
 
 void Workspace::on_btnP1_clicked()
@@ -1261,4 +1263,43 @@ void Workspace::on_btnReprintLastCheck_clicked()
         return;
     }
     printReceipt(fPreviouseUuid, false);
+}
+
+void Workspace::on_leReadCode_textChanged(const QString &arg1)
+{
+    if (arg1 == "+") {
+        ui->leReadCode->clear();
+        setQty(1, 2);
+        return;
+    }
+    if (arg1 == "-") {
+        ui->leReadCode->clear();
+        setQty(1, 3);
+    }
+}
+
+void Workspace::addDishToOrder(Dish *d)
+{
+    int row = 0;
+    bool isnew = true;
+    if (__c5config.getValue(param_zip_dish_in_order).toInt() == 1) {
+        for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
+            OrderDish *od = static_cast<OrderDish*>(ui->tblOrder->cellWidget(i, 0));
+            if (d->id == od->fDish.id) {
+                row = i;
+                od->fDish.qty++;
+                od->updateInfo();
+                isnew = false;
+                break;
+            }
+        }
+    }
+    if (isnew) {
+        row = ui->tblOrder->rowCount();
+        ui->tblOrder->setRowCount(row + 1);
+        OrderDish *od = new OrderDish(*d);
+        ui->tblOrder->setCellWidget(row, 0, od);
+    }
+    on_tblOrder_cellClicked(row, 0);
+    countTotal();
 }

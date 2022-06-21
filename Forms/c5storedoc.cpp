@@ -96,6 +96,7 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
     if (__c5config.getRegValue("storedoc_storeinput").toBool()) {
         ui->leStoreInput->setValue(__c5config.getRegValue("storedoc_storeinput_id").toInt());
     }
+    adjustSize();
 }
 
 C5StoreDoc::~C5StoreDoc()
@@ -176,6 +177,7 @@ bool C5StoreDoc::openDoc(QString id, QString &err)
         ui->tblGoods->lineEdit(row, 8)->setDouble(dw.value(container_astoredraft, i, "f_total").toDouble());
         ui->tblGoods->lineEdit(row, 9)->setText(dw.value(container_astoredraft, i, "f_comment").toString());
     }
+
     disconnect(ui->leComplectationName, SIGNAL(textChanged(QString)), this, SLOT(on_leComplectationName_textChanged(QString)));
     disconnect(ui->leComplectationQty, SIGNAL(textChanged(QString)), this, SLOT(on_leComplectationQty_textChanged(QString)));
     ui->leStoreInput->setValue(dw.value(container_aheaderstore, 0, "f_storein").toString());
@@ -234,6 +236,26 @@ bool C5StoreDoc::openDoc(QString id, QString &err)
     }
     setDocEnabled(fDocState == DOC_STATE_DRAFT);
     countTotal();
+
+    for (int i = 0; i < dw.rowCount(container_acalcprice); i++) {
+        int row = -1;
+        for (int s = 0; s < ui->tblGoods->rowCount(); s++) {
+            if (ui->tblGoods->getString(s, 0) == dw.value(container_acalcprice, i, "f_id").toString()) {
+                row = s;
+                break;
+            }
+        }
+        if (row < 0) {
+            continue;
+        }
+        ui->tblCalcPrice->setString(row, 0, dw.value(container_astoredraft, i, "f_goodsname").toString());
+        ui->tblCalcPrice->setDouble(row, 1, dw.value(container_astoredraft, i, "f_qty").toDouble());
+        ui->tblCalcPrice->setString(row, 2, dw.value(container_astoredraft, i, "f_unitname").toString());
+        ui->tblCalcPrice->setDouble(row, 3, dw.value(container_astoredraft, i, "f_price").toDouble());
+        ui->tblCalcPrice->setDouble(row, 4, dw.value(container_acalcprice, i, "f_price2").toDouble());
+        ui->tblCalcPrice->lineEdit(row, 6)->setDouble(dw.value(container_acalcprice, i, "f_margin").toDouble());
+        calcPrice2(row);
+    }
 
     if (fToolBar && fDocType == sdOutput) {
         fToolBar->addAction(QIcon(":/storeinput.png"), tr("Create store input"), this, SLOT(createStoreInput()));
@@ -326,9 +348,10 @@ void C5StoreDoc::setMode(C5StoreDoc::STORE_DOC sd)
     default:
         break;
     }
-    if (sd != DOC_TYPE_COMPLECTATION) {
+    if (sd != DOC_TYPE_COMPLECTATION && sd != DOC_TYPE_STORE_INPUT) {
         ui->tw->removeTab(1);
     }
+    ui->twCalcPrice->setVisible(sd == DOC_TYPE_STORE_INPUT);
     setGoodsPanelHidden(C5Config::getRegValue("showhidegoods").toBool());
 }
 
@@ -910,6 +933,14 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
                 db.insert("a_dc");
             }
         }
+        db.deleteFromTable("a_calc_price", "f_document", fInternalId);
+        for (int i = 0; i < ui->tblCalcPrice->rowCount(); i++) {
+            db[":f_id"] = ui->tblGoods->getString(i, 0);
+            db[":f_document"] = fInternalId;
+            db[":f_price2"] = ui->tblCalcPrice->getDouble(i, 4);
+            db[":f_margin"] = ui->tblCalcPrice->lineEdit(i, 6)->getDouble();
+            db.insert("a_calc_price", false);
+        }
     }
     if (!err.isEmpty()) {
         db.rollback();
@@ -1181,20 +1212,43 @@ int C5StoreDoc::addGoodsRow()
     connect(lqty, SIGNAL(textEdited(QString)), this, SLOT(tblQtyChanged(QString)));
     connect(lprice, SIGNAL(textEdited(QString)), this, SLOT(tblPriceChanged(QString)));
     connect(ltotal, SIGNAL(textEdited(QString)), this, SLOT(tblTotalChanged(QString)));
+
+    ui->tblCalcPrice->addEmptyRow();
+    C5LineEdit *l = ui->tblCalcPrice->createLineEdit(row, 5);
+    connect(l, &C5LineEdit::textEdited, this, &C5StoreDoc::tblCalcMarginPercentChanged);
+    l = ui->tblCalcPrice->createLineEdit(row, 6);
+    connect(l, &C5LineEdit::textEdited, this, &C5StoreDoc::tblCalcMarginChanged);
+    l = ui->tblCalcPrice->createLineEdit(row, 7);
+    connect(l, &C5LineEdit::textEdited, this, &C5StoreDoc::tblCalcFinalChanged);
+
     return row;
 }
 
-void C5StoreDoc::addGoods(int goods, const QString &name, double qty, const QString &unit, double price, double total, const QString &comment)
+int C5StoreDoc::addGoods(int goods, const QString &name, double qty, const QString &unit, double price, double total, const QString &comment)
 {
     int row = addGoodsRow();
     ui->tblGoods->setData(row, 3, goods);
     ui->tblGoods->setData(row, 4, name);
     ui->tblGoods->setData(row, 6, unit);
-    ui->tblGoods->lineEdit(row, 5)->setDouble(qty);
-    ui->tblGoods->lineEdit(row, 7)->setDouble(price);
-    ui->tblGoods->lineEdit(row, 8)->setDouble(total);
+    if (qty > 0) {
+        ui->tblGoods->lineEdit(row, 5)->setDouble(qty);
+    }
+    if (price > 0) {
+        ui->tblGoods->lineEdit(row, 7)->setDouble(price);
+        ui->tblGoods->lineEdit(row, 8)->setDouble(total);
+    }
     ui->tblGoods->lineEdit(row, 9)->setText(comment);
     ui->tblGoods->setCurrentCell(row, 0);
+
+    ui->tblCalcPrice->setString(row, 0, name);
+    if (qty > 0) {
+        ui->tblCalcPrice->setDouble(row, 1, qty);
+    }
+    ui->tblCalcPrice->setString(row, 2, unit);
+    if (price > 0) {
+        ui->tblCalcPrice->setDouble(row, 3, price);
+    }
+    return row;
 }
 
 void C5StoreDoc::setDocEnabled(bool v)
@@ -2033,6 +2087,35 @@ void C5StoreDoc::printV2()
     pp.exec();
 }
 
+double C5StoreDoc::additionalCost()
+{
+    double c = 0;
+    for (int i = 0; i < ui->tblAdd->rowCount(); i++) {
+        c+= ui->tblAdd->lineEdit(i, 2)->getDouble();
+    }
+    return c;
+}
+
+double C5StoreDoc::additionalCostForEveryGoods()
+{
+    if (ui->leTotalQty->getDouble() > 0) {
+        return additionalCost() / ui->leTotalQty->getDouble();
+    }
+    return 0;
+}
+
+void C5StoreDoc::calcPrice2(int row)
+{
+    double add = additionalCostForEveryGoods();
+    ui->tblCalcPrice->setDouble(row, 1, ui->tblGoods->lineEdit(row, 5)->getDouble());
+    ui->tblCalcPrice->setDouble(row, 3, ui->tblGoods->lineEdit(row, 7)->getDouble());
+    ui->tblCalcPrice->setDouble(row, 4, ui->tblCalcPrice->getDouble(row, 3) + add);
+    ui->tblCalcPrice->lineEdit(row, 7)->setDouble(ui->tblCalcPrice->getDouble(row, 4) + ui->tblCalcPrice->lineEdit(row, 6)->getDouble());
+    if (ui->tblCalcPrice->getDouble(row, 4)) {
+        ui->tblCalcPrice->lineEdit(row, 5)->setDouble(ui->tblCalcPrice->lineEdit(row, 6)->getDouble() / ui->tblCalcPrice->getDouble(row, 4) * 100);
+    }
+}
+
 void C5StoreDoc::writeAStoreSale(int storei, int storeo)
 {
     C5StoreDraftWriter::writeASaleStore(storei, storeo);
@@ -2123,10 +2206,7 @@ void C5StoreDoc::getInput()
         C5Message::error(tr("Could not add goods without code"));
         return;
     }
-    int row = addGoodsRow();
-    ui->tblGoods->setString(row, 3, vals.at(1).toString());
-    ui->tblGoods->setString(row, 4, vals.at(3).toString());
-    ui->tblGoods->setString(row, 6, vals.at(4).toString());
+    int row = addGoods(vals.at(1).toInt(), vals.at(3).toString(), -1, vals.at(4).toString(), -1, -1, "");
     if (__c5config.getValue(param_input_doc_fix_price).toInt() > 0) {
         ui->tblGoods->lineEdit(row, 7)->setDouble(vals.at(6).toDouble());
     }
@@ -2362,12 +2442,13 @@ void C5StoreDoc::tblQtyChanged(const QString &arg1)
     C5LineEdit *lprice = ui->tblGoods->lineEdit(row, col + 2);
     C5LineEdit *ltotal = ui->tblGoods->lineEdit(row, col + 3);
     ltotal->setDouble(lqty->getDouble() * lprice->getDouble());
+
     countTotal();
+    calcPrice2(row);
 }
 
 void C5StoreDoc::tblPriceChanged(const QString &arg1)
 {
-    Q_UNUSED(arg1);
     int row, col;
     if (!ui->tblGoods->findWidget(static_cast<QWidget*>(sender()), row, col)) {
         return;
@@ -2378,7 +2459,9 @@ void C5StoreDoc::tblPriceChanged(const QString &arg1)
     double d1 = lqty->getDouble();
     double d2 = lprice->getDouble();
     ltotal->setDouble(d1 * d2);
+
     countTotal();
+    calcPrice2(row);
 }
 
 void C5StoreDoc::tblTotalChanged(const QString &arg1)
@@ -2395,11 +2478,61 @@ void C5StoreDoc::tblTotalChanged(const QString &arg1)
         lprice->setDouble(ltotal->getDouble() / lqty->getDouble());
     }
     countTotal();
+    calcPrice2(row);
+}
+
+void C5StoreDoc::tblCalcMarginPercentChanged(const QString &arg1)
+{
+    Q_UNUSED(arg1);
+    int row, col;
+    if (!ui->tblCalcPrice->findWidget(static_cast<QWidget*>(sender()), row, col)) {
+        return;
+    }
+    C5LineEdit *lmarginPercent = ui->tblCalcPrice->lineEdit(row, 5);
+    C5LineEdit *lmargin = ui->tblCalcPrice->lineEdit(row, 6);
+    C5LineEdit *lfinal = ui->tblCalcPrice->lineEdit(row, 7);
+    lmargin->setDouble(ui->tblCalcPrice->getDouble(row, 4) * (lmarginPercent->getDouble() / 100));
+    lfinal->setDouble(lmargin->getDouble() + ui->tblCalcPrice->getDouble(row, 4));
+}
+
+void C5StoreDoc::tblCalcMarginChanged(const QString &arg1)
+{
+    Q_UNUSED(arg1);
+    int row, col;
+    if (!ui->tblCalcPrice->findWidget(static_cast<QWidget*>(sender()), row, col)) {
+        return;
+    }
+    C5LineEdit *lmarginPercent = ui->tblCalcPrice->lineEdit(row, 5);
+    C5LineEdit *lmargin = ui->tblCalcPrice->lineEdit(row, 6);
+    C5LineEdit *lfinal = ui->tblCalcPrice->lineEdit(row, 7);
+    if (ui->tblCalcPrice->getDouble(row, 4)) {
+        lmarginPercent->setDouble((lmargin->getDouble() / ui->tblCalcPrice->getDouble(row, 4)) * 100);
+    }
+    lfinal->setDouble(lmargin->getDouble() + ui->tblCalcPrice->getDouble(row, 4));
+}
+
+void C5StoreDoc::tblCalcFinalChanged(const QString &arg1)
+{
+    Q_UNUSED(arg1);
+    int row, col;
+    if (!ui->tblCalcPrice->findWidget(static_cast<QWidget*>(sender()), row, col)) {
+        return;
+    }
+    C5LineEdit *lmarginPercent = ui->tblCalcPrice->lineEdit(row, 5);
+    C5LineEdit *lmargin = ui->tblCalcPrice->lineEdit(row, 6);
+    C5LineEdit *lfinal = ui->tblCalcPrice->lineEdit(row, 7);
+    lmargin->setDouble(lfinal->getDouble() - ui->tblCalcPrice->getDouble(row, 4));
+    if (ui->tblCalcPrice->getDouble(row, 4)) {
+        lmarginPercent->setDouble((lmargin->getDouble() / ui->tblCalcPrice->getDouble(row, 4)) * 100);
+    }
 }
 
 void C5StoreDoc::tblAddChanged(const QString &arg1)
 {
     Q_UNUSED(arg1);
+    for (int i = 0; i < ui->tblCalcPrice->rowCount(); i++) {
+        calcPrice2(i);
+    }
     //countTotal();
 }
 
@@ -2428,6 +2561,7 @@ void C5StoreDoc::on_btnRemoveGoods_clicked()
         return;
     }
     ui->tblGoods->removeRow(row);
+    ui->tblCalcPrice->removeRow(row);
     if (ui->tblDishes->rowCount() > 0) {
         for (int i = 0; i < ui->tblDishes->rowCount(); i++) {
             QJsonArray ja = QJsonDocument::fromJson(ui->tblDishes->getString(i, 4).toUtf8()).array();
@@ -2613,6 +2747,10 @@ void C5StoreDoc::on_btnAddAdd_clicked()
     l = ui->tblAdd->createLineEdit(row, 2);
     l->setValidator(new QDoubleValidator());
     connect(l, SIGNAL(textEdited(QString)), this, SLOT(tblAddChanged(QString)));
+    countTotal();
+    for (int i =0; i < ui->tblCalcPrice->rowCount(); i++) {
+        calcPrice2(i);
+    }
 }
 
 void C5StoreDoc::on_btnRemoveAdd_clicked()
@@ -2626,6 +2764,9 @@ void C5StoreDoc::on_btnRemoveAdd_clicked()
     }
     ui->tblAdd->removeRow(row);
     countTotal();
+    for (int i =0; i < ui->tblCalcPrice->rowCount(); i++) {
+        calcPrice2(i);
+    }
 }
 
 void C5StoreDoc::on_btnInsertLast_clicked()
@@ -2854,5 +2995,21 @@ void C5StoreDoc::on_btnAddPackages_clicked()
     db.exec("select d.f_name, p.f_dish, p.f_qty from d_package_list p left join d_dish d on d.f_id=p.f_dish where f_package=:f_package");
     while (db.nextRow()) {
         addGoodsByCalculation(db.getInt("f_dish"), db.getString("f_name"), db.getDouble("f_qty") * qty);
+    }
+}
+
+void C5StoreDoc::on_btnSetMargin_clicked()
+{
+    for (int i = 0; i < ui->tblCalcPrice->rowCount(); i++) {
+        ui->tblCalcPrice->lineEdit(i, 6)->setDouble(ui->leAllMargin->getDouble());
+        calcPrice2(i);
+    }
+}
+
+void C5StoreDoc::on_btnSetAllMarginPercent_clicked()
+{
+    for (int i = 0; i < ui->tblCalcPrice->rowCount(); i++) {
+        ui->tblCalcPrice->lineEdit(i, 6)->setDouble(ui->tblCalcPrice->getDouble(i, 4) * (ui->leAllMarginPercent->getDouble() / 100));
+        calcPrice2(i);
     }
 }

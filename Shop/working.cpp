@@ -296,6 +296,24 @@ Flag Working::flag(int id)
     }
 }
 
+void Working::getGoods(int id)
+{
+    sender()->deleteLater();
+    WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
+    if (!w) {
+        return;
+    }
+    switch (w->fSaleType) {
+    case SALE_RETAIL:
+    case SALE_WHOSALE:
+        w->addGoods(id);
+        break;
+    case SALE_PREORDER:
+        w->addGoodsToTable(id);
+        break;
+    }
+}
+
 WOrder *Working::worder()
 {
     return static_cast<WOrder*>(ui->tab->currentWidget());
@@ -821,10 +839,8 @@ void Working::on_btnGoodsMovement_clicked()
         }
     }
 
-    StoreInput *si = new StoreInput(u, this);
+    StoreInput *si = new StoreInput(u);
     si->showMaximized();
-    si->exec();
-    si->deleteLater();
 
     if (u != fUser) {
         delete u;
@@ -843,22 +859,9 @@ void Working::on_btnNewWhosale_clicked()
 
 void Working::on_btnGoodsList_clicked()
 {
-    int id;
-    if (DlgGoodsList::getGoods(id)) {
-        WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
-        if (!w) {
-            return;
-        }
-        switch (w->fSaleType) {
-        case SALE_RETAIL:
-        case SALE_WHOSALE:
-            w->addGoods(id);
-            break;
-        case SALE_PREORDER:
-            w->addGoodsToTable(id);
-            break;
-        }
-    }
+    auto *dg = new DlgGoodsList();
+    connect(dg, &DlgGoodsList::getGoods, this, &Working::getGoods);
+    dg->showMaximized();
 }
 
 void Working::on_btnSalesReport_clicked()

@@ -172,6 +172,12 @@ bool Database::update(const QString &table, const QString &field, const QVariant
     return exec(sql);
 }
 
+bool Database::deleteFromTable(const QString &table, const QString &field, const QVariant &value)
+{
+    fBindValues[":" + field] = value;
+    return exec(QString("delete from %1 where %2=:%2").arg(table, field));
+}
+
 QString Database::uuid()
 {
     return QUuid::createUuid().toString().replace("{", "").replace("}", "");

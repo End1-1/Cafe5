@@ -14,7 +14,7 @@ class StoreInput : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit StoreInput(C5User *user, QWidget *parent = nullptr);
+    explicit StoreInput(C5User *user);
 
     ~StoreInput();
 

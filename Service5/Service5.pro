@@ -14,6 +14,7 @@ SOURCES += \
     ../Classes/c5crypt.cpp \
     ../Classes/thread.cpp \
     c5license.cpp \
+    pluginmanager.cpp \
     raw/rawdllop.cpp \
     utils/commandline.cpp \
     utils/configini.cpp \
@@ -54,6 +55,7 @@ HEADERS += \
     ../Classes/c5crypt.h \
     ../Classes/thread.h \
     c5license.h \
+    pluginmanager.h \
     raw/rawdllop.h \
     utils/commandline.h \
     utils/configini.h \

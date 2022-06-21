@@ -3,7 +3,7 @@
 #include <QKeyEvent>
 
 DlgGoodsList::DlgGoodsList() :
-    C5Dialog(__c5config.dbParams()),
+    C5Dialog(__c5config.dbParams(), true),
     ui(new Ui::DlgGoodsList)
 {
     ui->setupUi(this);
@@ -44,16 +44,6 @@ DlgGoodsList::DlgGoodsList() :
 DlgGoodsList::~DlgGoodsList()
 {
     delete ui;
-}
-
-bool DlgGoodsList::getGoods(int &id)
-{
-    DlgGoodsList g;
-    if (g.exec() == QDialog::Accepted) {
-        id = g.fGoodsId;
-        return true;
-    }
-    return false;
 }
 
 bool DlgGoodsList::event(QEvent *event)
@@ -101,6 +91,7 @@ bool DlgGoodsList::event(QEvent *event)
             int r = ui->tbl->currentRow();
             if (r > -1) {
                 fGoodsId = ui->tbl->getInteger(r, 0);
+                emit getGoods(fGoodsId);
                 accept();
             }
             break;

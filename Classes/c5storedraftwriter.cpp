@@ -339,6 +339,17 @@ bool C5StoreDraftWriter::readECash(const QString &id)
     }
 }
 
+bool C5StoreDraftWriter::readACalcPrice(const QString &id)
+{
+    fDb[":f_document"] = id;
+    if (fDb.exec("select * from a_calc_price where f_document=:f_document", fACalcPriceData, fACalcPriceDataMap)) {
+         return true;
+    } else {
+        fErrorMsg = fDb.fLastError;
+        return false;
+    }
+}
+
 bool C5StoreDraftWriter::returnResult(bool r, const QString &msg)
 {
     if (!r) {
@@ -392,6 +403,9 @@ bool C5StoreDraftWriter::readAHeader(const QString &id)
             result = readAHeaderStore(id);
             if (result) {
                 result = readAStoreDraft(id);
+            }
+            if (result) {
+                result = readACalcPrice(id);
             }
             break;
         case DOC_TYPE_CASH:
@@ -506,6 +520,9 @@ int C5StoreDraftWriter::rowCount(int container)
     case container_astoredishwaste:
         rc = fAStoreDishWaste.count();
         break;
+    case container_acalcprice:
+        rc = fACalcPriceData.count();
+        break;
     }
     Q_ASSERT(rc != -1);
     return rc;
@@ -539,6 +556,10 @@ QVariant C5StoreDraftWriter::value(int container, int row, const QString &key)
     case container_astoredishwaste:
         c = &fAStoreDishWaste;
         d = &fAStoreDishWasteDataMap;
+        break;
+    case container_acalcprice:
+        c = &fACalcPriceData;
+        d = &fACalcPriceDataMap;
         break;
     }
     Q_ASSERT(c);
@@ -598,6 +619,15 @@ bool C5StoreDraftWriter::writeAStoreDraft(QString &id, const QString &docId, int
     } else {
         return returnResult(fDb.insert("a_store_draft", false));
     }
+}
+
+bool C5StoreDraftWriter::writeACalcPrice(const QString &id, const QString &docId, double price2, double margin)
+{
+    fDb[":f_id"] = id;
+    fDb[":f_document"] = docId;
+    fDb[":f_price2"] = price2;
+    fDb[":f_margin"] = margin;
+    return returnResult(fDb.insert("a_calc_price", false));
 }
 
 bool C5StoreDraftWriter::writeAStoreInventory(QString &id, const QString &docId, int store, int goods, double qty, double price, double total)

@@ -805,3 +805,9 @@ update s_app set f_version='74' where f_app='DB';
 create table s_report_template (f_id integer primary key auto_increment, f_group integer, f_name tinytext, f_sql text);
 create table s_report_template_params (f_id integer primary key auto_increment, f_report integer, f_param_type tinyint, f_param_name tinytext, f_replace_text tinytext);
 create table s_report_template_access (f_id integer primary key auto_increment, f_report integer, f_group integer);
+create table a_calc_price (f_id char(36) primary key, f_document char(36), f_price2 decimal(14,2), f_margin decimal(14,2), f_final_price decimal(14,2));
+CREATE TABLE server5.plugins_options (fid INTEGER PRIMARY KEY AUTO_INCREMENT, fplugin TINYTEXT, fkey TINYTEXT, fvalue TINYTEXT);
+
+/*  db - 74, 12.06.2022 */
+update s_app set f_version='75' where f_app='DB';
+alter table d_dish add column f_samestore TINYINT, ADD column f_barcode tinytext;

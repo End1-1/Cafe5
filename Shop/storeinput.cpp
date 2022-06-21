@@ -15,8 +15,8 @@
 #define VM_STORE_GROUP 2
 #define VM_STORE_ITEMS 3
 
-StoreInput::StoreInput(C5User *user, QWidget *parent) :
-    C5Dialog(__c5config.dbParams()),
+StoreInput::StoreInput(C5User *user) :
+    C5Dialog(__c5config.dbParams(), true),
     ui(new Ui::StoreInput)
 {
     ui->setupUi(this);

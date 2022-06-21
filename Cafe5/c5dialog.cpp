@@ -23,6 +23,23 @@ C5Dialog::C5Dialog(const QStringList &dbParams) :
     }
 }
 
+C5Dialog::C5Dialog(const QStringList &dbParams, bool noparent) :
+    #ifdef WAITER
+        QDialog(noparent ? nullptr : __mainWindow, Qt::FramelessWindowHint),
+        fDBParams(dbParams)
+    #else
+        QDialog(__mainWindow),
+        fDBParams(dbParams)
+    #endif
+{
+#ifdef WAITER
+    setMaximumSize(qApp->desktop()->geometry().size());
+#endif
+    if (!noparent && __mainWindow == nullptr) {
+        __mainWindow = this;
+    }
+}
+
 C5Dialog::~C5Dialog()
 {
     if (__mainWindow == this) {

@@ -220,13 +220,13 @@ QLabel {color:green;}
               </property>
               <property name="minimumSize">
                <size>
-                <width>200</width>
+                <width>220</width>
                 <height>0</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>200</width>
+                <width>220</width>
                 <height>16777215</height>
                </size>
               </property>
@@ -253,13 +253,13 @@ QLabel {color:green;}
                 <widget class="QTableWidget" name="tblPart2">
                  <property name="minimumSize">
                   <size>
-                   <width>200</width>
+                   <width>0</width>
                    <height>0</height>
                   </size>
                  </property>
                  <property name="maximumSize">
                   <size>
-                   <width>200</width>
+                   <width>16777215</width>
                    <height>16777215</height>
                   </size>
                  </property>
@@ -267,7 +267,7 @@ QLabel {color:green;}
                   <enum>Qt::NoFocus</enum>
                  </property>
                  <property name="verticalScrollBarPolicy">
-                  <enum>Qt::ScrollBarAlwaysOff</enum>
+                  <enum>Qt::ScrollBarAlwaysOn</enum>
                  </property>
                  <property name="horizontalScrollBarPolicy">
                   <enum>Qt::ScrollBarAlwaysOff</enum>
@@ -309,7 +309,7 @@ QLabel {color:green;}
                   <enum>Qt::NoFocus</enum>
                  </property>
                  <property name="verticalScrollBarPolicy">
-                  <enum>Qt::ScrollBarAlwaysOff</enum>
+                  <enum>Qt::ScrollBarAlwaysOn</enum>
                  </property>
                  <property name="horizontalScrollBarPolicy">
                   <enum>Qt::ScrollBarAlwaysOff</enum>
@@ -709,13 +709,13 @@ QLabel {color:green;}
         </property>
         <property name="minimumSize">
          <size>
-          <width>300</width>
+          <width>0</width>
           <height>0</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>300</width>
+          <width>330</width>
           <height>16777215</height>
          </size>
         </property>
@@ -1048,6 +1048,12 @@ QLabel {color:green;}
          </item>
          <item>
           <widget class="QWidget" name="widgt" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="focusPolicy">
             <enum>Qt::NoFocus</enum>
            </property>
@@ -1070,20 +1076,20 @@ QLabel {color:green;}
             <item>
              <widget class="QTableWidget" name="tblOrder">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+               <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
               <property name="minimumSize">
                <size>
-                <width>300</width>
+                <width>0</width>
                 <height>0</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>300</width>
+                <width>16777215</width>
                 <height>16777215</height>
                </size>
               </property>
@@ -1091,7 +1097,7 @@ QLabel {color:green;}
                <enum>Qt::NoFocus</enum>
               </property>
               <property name="verticalScrollBarPolicy">
-               <enum>Qt::ScrollBarAlwaysOff</enum>
+               <enum>Qt::ScrollBarAlwaysOn</enum>
               </property>
               <property name="horizontalScrollBarPolicy">
                <enum>Qt::ScrollBarAlwaysOff</enum>
