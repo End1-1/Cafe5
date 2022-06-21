@@ -26,7 +26,7 @@
       <enum>Qt::NoFocus</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>6</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -1359,6 +1359,181 @@
          </property>
         </widget>
        </item>
+       <item row="7" column="0">
+        <widget class="QLabel" name="label_58">
+         <property name="text">
+          <string>Print dish timeorder</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QFontComboBox" name="fbServiceFont">
+         <property name="Tag" stdset="0">
+          <number>102</number>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Receipt printer</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="QFontComboBox" name="fbReceiptFont">
+         <property name="Tag" stdset="0">
+          <number>103</number>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_97">
+         <property name="text">
+          <string>Service print font size</string>
+         </property>
+        </widget>
+       </item>
+       <item row="12" column="1">
+        <widget class="QGroupBox" name="groupBox_3">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="title">
+          <string>Widthe of printer</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_4">
+          <item>
+           <widget class="QRadioButton" name="rbPrint50">
+            <property name="text">
+             <string>50mm</string>
+            </property>
+            <property name="tag" stdset="0">
+             <number>63</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="rbPrint80">
+            <property name="text">
+             <string>80mm</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+            <property name="tag" stdset="0">
+             <number>64</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="10" column="1">
+        <widget class="C5CheckBox" name="chForceUsePrintAlias">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>100</number>
+         </property>
+        </widget>
+       </item>
+       <item row="14" column="1">
+        <spacer name="verticalSpacer_7">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>256</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="7" column="1">
+        <widget class="C5CheckBox" name="chPrintDishOrder">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>62</number>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_95">
+         <property name="text">
+          <string>Service print font family</string>
+         </property>
+        </widget>
+       </item>
+       <item row="13" column="0">
+        <widget class="QGroupBox" name="groupBox_2">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="title">
+          <string>Printing goods qty side</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <item>
+           <widget class="QRadioButton" name="rbPrintLeft">
+            <property name="text">
+             <string>Left of name</string>
+            </property>
+            <property name="tag" stdset="0">
+             <number>58</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="rbPrintDown">
+            <property name="text">
+             <string>Down of name</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+            <property name="tag" stdset="0">
+             <number>59</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="0" column="1" colspan="2">
+        <widget class="C5LineEdit" name="leLocalReceiptPrinter">
+         <property name="Tag" stdset="0">
+          <number>1</number>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="1">
+        <widget class="C5CheckBox" name="chPrintScancodeWithName">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>60</number>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="0">
+        <widget class="QLabel" name="label_57">
+         <property name="text">
+          <string>Print scancode with name</string>
+         </property>
+        </widget>
+       </item>
        <item row="2" column="1">
         <widget class="C5LineEdit" name="leStaticQRCode">
          <property name="Tag" stdset="0">
@@ -1366,7 +1541,7 @@
          </property>
         </widget>
        </item>
-       <item row="8" column="0">
+       <item row="12" column="0">
         <widget class="QGroupBox" name="groupBox">
          <property name="minimumSize">
           <size>
@@ -1430,51 +1605,6 @@
          </layout>
         </widget>
        </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="label_58">
-         <property name="text">
-          <string>Print dish timeorder</string>
-         </property>
-        </widget>
-       </item>
-       <item row="9" column="0">
-        <widget class="QGroupBox" name="groupBox_2">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="title">
-          <string>Printing goods qty side</string>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout_3">
-          <item>
-           <widget class="QRadioButton" name="rbPrintLeft">
-            <property name="text">
-             <string>Left of name</string>
-            </property>
-            <property name="tag" stdset="0">
-             <number>58</number>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="rbPrintDown">
-            <property name="text">
-             <string>Down of name</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-            <property name="tag" stdset="0">
-             <number>59</number>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
        <item row="1" column="0">
         <widget class="QLabel" name="label_59">
          <property name="text">
@@ -1482,10 +1612,17 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="1" colspan="2">
-        <widget class="C5LineEdit" name="leLocalReceiptPrinter">
-         <property name="Tag" stdset="0">
-          <number>1</number>
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_96">
+         <property name="text">
+          <string>Receipt print font family</string>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="0">
+        <widget class="QLabel" name="label_93">
+         <property name="text">
+          <string>Force use print alias</string>
          </property>
         </widget>
        </item>
@@ -1496,105 +1633,24 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="1">
-        <widget class="C5CheckBox" name="chPrintScancodeWithName">
-         <property name="text">
-          <string/>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>60</number>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="1">
-        <widget class="QGroupBox" name="groupBox_3">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="title">
-          <string>Widthe of printer</string>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout_4">
-          <item>
-           <widget class="QRadioButton" name="rbPrint50">
-            <property name="text">
-             <string>50mm</string>
-            </property>
-            <property name="tag" stdset="0">
-             <number>63</number>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="rbPrint80">
-            <property name="text">
-             <string>80mm</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-            <property name="tag" stdset="0">
-             <number>64</number>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="10" column="1">
-        <spacer name="verticalSpacer_7">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>256</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="3" column="1">
-        <widget class="C5CheckBox" name="chPrintDishOrder">
-         <property name="text">
-          <string/>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>62</number>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>Receipt printer</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="label_57">
-         <property name="text">
-          <string>Print scancode with name</string>
-         </property>
-        </widget>
-       </item>
        <item row="6" column="0">
-        <widget class="QLabel" name="label_93">
+        <widget class="QLabel" name="label_98">
          <property name="text">
-          <string>Force use print alias</string>
+          <string>Receipt print font size</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="C5LineEdit" name="leServiceFontSize">
+         <property name="Tag" stdset="0">
+          <number>104</number>
          </property>
         </widget>
        </item>
        <item row="6" column="1">
-        <widget class="C5CheckBox" name="chForceUsePrintAlias">
-         <property name="text">
-          <string/>
-         </property>
+        <widget class="C5LineEdit" name="lereceiptFontSize">
          <property name="Tag" stdset="0">
-          <number>100</number>
+          <number>105</number>
          </property>
         </widget>
        </item>
@@ -1903,11 +1959,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5LineEdit</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5lineedit.h</header>
-  </customwidget>
-  <customwidget>
    <class>C5LineEditWithSelector</class>
    <extends>QLineEdit</extends>
    <header location="global">c5lineeditwithselector.h</header>
@@ -1916,6 +1967,11 @@
    <class>C5CheckBox</class>
    <extends>QCheckBox</extends>
    <header location="global">c5checkbox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5LineEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5lineedit.h</header>
   </customwidget>
   <customwidget>
    <class>C5ComboBox</class>

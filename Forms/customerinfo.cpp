@@ -35,6 +35,12 @@ void CustomerInfo::on_pushButton_2_clicked()
 void CustomerInfo::on_pushButton_clicked()
 {
     if (fCustomerId > 0) {
+        C5Database db(fDBParams);
+        db[":f_taxname"] = ui->lePhone->text() + " " + ui->leCustomer->text();
+        db[":f_contact"] = ui->leCustomer->text();
+        db[":f_phone"] = ui->lePhone->text();
+        db[":f_address"] = ui->leAddress->text();
+        db.update("c_partners", "f_id", fCustomerId);
         accept();
         return;
     }
@@ -54,7 +60,11 @@ void CustomerInfo::on_pushButton_clicked()
     db[":f_contact"] = ui->leCustomer->text();
     db[":f_phone"] = ui->lePhone->text();
     db[":f_address"] = ui->leAddress->text();
-    fCustomerId = db.insert("c_partners");
+    if (fCustomerId == 0) {
+        fCustomerId = db.insert("c_partners");
+    } else {
+        db.update("c_partnes", "f_id", fCustomerId);
+    }
     if (fCustomerId == 0) {
         C5Message::error(db.fLastError);
         return;

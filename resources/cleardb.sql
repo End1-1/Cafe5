@@ -80,12 +80,19 @@ delete from s_syncronize;
 delete from s_draft;
 delete from e_cash_names;
 delete from a_store_sale;
+delete from a_sale_temp;
+delete from a_store_dish_waste;
+delete from o_service_values;
+delete from s_custom_reports;
 
 delete from mf_daily_workers;
 delete from mf_daily_process;
 delete from mf_process;
 delete from mf_actions;
 delete from mf_actions_group;
+
+delete from s_log_store_price;
+delete from s_salary_inout;
 
 delete from c_storages;
 alter table a_store_sale auto_increment=0;
@@ -95,6 +102,11 @@ alter table s_login_session auto_increment=0;
 ALTER TABLE d_part1 AUTO_INCREMENT = 0 ;
 ALTER TABLE d_part2 AUTO_INCREMENT = 0 ;
 alter table c_goods_option auto_increment = 0;
+alter table a_sale_temp auto_increment = 0;
+alter table o_service_values auto_increment = 0;
+alter table s_custom_reports auto_increment = 0;
+alter table s_log_store_price auto_increment = 0;
+alter table s_salary_inout auto_increment = 0;
 
 ALTER TABLE s_syncronize AUTO_INCREMENT = 0 ;
 ALTER TABLE d_package AUTO_INCREMENT = 0 ;
@@ -139,4 +151,14 @@ alter table d_special auto_increment=0;
 ALTER TABLE c_storages AUTO_INCREMENT = 0 ;
 insert into d_printers (f_name) values ('');
 insert into s_db (f_id, f_name, f_description, f_host, f_db, f_user, f_password) values (1, 'DB Name', 'Db Description', '127.0.0.1', 'cafe5', 'root', 'root5');
+insert into s_db_access (f_db, f_user, f_permit) values (1, 1, 1);
 insert into c_units (f_id, f_name, f_fullname) values (1, 'Հատ', 'Հատ'), (2, 'Կգ', 'Կիլոգրամ'), (3, 'Լ', 'Լիտր');
+insert into s_settings_names (f_id, f_name) values (1, 'Main');
+insert into s_settings_names (f_id, f_name) values (2, 'Sale');
+insert into s_settings_values (f_settings, f_key, f_value) values (1, 97, 'Arial LatArm Unicode'), (1, 28, '12');
+insert into s_settings_values (f_settings, f_key, f_value) values (2, 97, 'Arial LatArm Unicode'), (2, 28, '12'),(2,10,'Ս'),(2,11,'1'),(2,12,'1'),(2,19,'1'),(2,26,'0'),(2,31,'1'),(2,32,'1'),(2,35,'2'),(2,36,'Կ'),(2,37,'Ա'),(2,38,'1'),(2,52,'1'),(2,56,'Շնարհակալություն այցելության համար'),(2,61,'650'),(2,64,'1');
+insert into e_cash_names (f_id, f_name) values (1, 'Կանխիկ'), (2, 'Անկանխիկ');
+insert into d_menu_names (f_id, f_name, f_datestart, f_dateend, f_comment, f_enabled) values (1, 'Ճաշացանկ', current_date(), date_add(current_date(), interval 10 YEAR), '', 1);
+insert into d_part1 (f_id, f_name) values (1, 'Բար'), (2, 'Խոհ․'), (3, 'Այլ');
+insert into h_halls (f_id, f_counter, f_name, f_prefix, f_settings, f_counterhall, f_booking) values (1, 1, 'Սրահ', 'Ս', 2, 1, 0);
+insert into c_storages (f_id, f_name) values (1, 'Պահեստ');

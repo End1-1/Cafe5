@@ -684,6 +684,7 @@ void C5DishWidget::on_chSameAsInStore_clicked(bool checked)
             db[":f_group"] = groupid;
             db[":f_unit"] = 1;
             db[":f_name"] = ui->leName->text();
+            db[":f_scancode"] = ui->leBarcode->text();
             db[":f_service"] = 0;
             db[":f_iscomplect"] = 0;
             goodsid = db.insert("c_goods");

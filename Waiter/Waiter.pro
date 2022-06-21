@@ -85,7 +85,6 @@ SOURCES += \
     ../DbData/dbbodystate.cpp \
     ../DbData/dbcar.cpp \
     ../DbData/dbdata.cpp \
-    ../DbData/dbdishcomments.cpp \
     ../DbData/dbdishes.cpp \
     ../DbData/dbdishpart1.cpp \
     ../DbData/dbdishpart2.cpp \
@@ -110,6 +109,7 @@ SOURCES += \
     ../DbData/dbusers.cpp \
     ../Forms/c5filtervalues.cpp \
     ../Forms/change.cpp \
+    ../Forms/dlglistofdishcomments.cpp \
     ../Forms/dlgqty.cpp \
     ../Shop/printreceipt.cpp \
     ../Shop/printreceiptgroup.cpp \
@@ -179,7 +179,6 @@ SOURCES += \
     dlgcreditcardlist.cpp \
     dlgdishremovereason.cpp \
     dlglistofhall.cpp \
-    dlglistofdishcomments.cpp \
     ../Classes/c5printjson.cpp \
     dlgreports.cpp \
     dlgreportslist.cpp \
@@ -251,7 +250,6 @@ HEADERS += \
     ../DbData/dbbodystate.h \
     ../DbData/dbcar.h \
     ../DbData/dbdata.h \
-    ../DbData/dbdishcomments.h \
     ../DbData/dbdishes.h \
     ../DbData/dbdishpart1.h \
     ../DbData/dbdishpart2.h \
@@ -276,6 +274,7 @@ HEADERS += \
     ../DbData/dbusers.h \
     ../Forms/c5filtervalues.h \
     ../Forms/change.h \
+    ../Forms/dlglistofdishcomments.h \
     ../Forms/dlgqty.h \
     ../Service/servicecommands.h \
     ../Shop/printreceipt.h \
@@ -350,7 +349,6 @@ HEADERS += \
     dlgcreditcardlist.h \
     dlgdishremovereason.h \
     dlglistofhall.h \
-    dlglistofdishcomments.h \
     ../Classes/c5printjson.h \
     dlgreports.h \
     dlgreportslist.h \
@@ -376,6 +374,7 @@ FORMS += \
     ../Classes/notificationwidget.ui \
     ../Forms/c5filtervalues.ui \
     ../Forms/change.ui \
+    ../Forms/dlglistofdishcomments.ui \
     ../Forms/dlgqty.ui \
     ../Shop/selectprinters.ui \
     dishitem.ui \
@@ -412,7 +411,6 @@ FORMS += \
     dlgcreditcardlist.ui \
     dlgdishremovereason.ui \
     dlglistofhall.ui \
-    dlglistofdishcomments.ui \
     dlgreports.ui \
     dlgreportslist.ui \
     dlglistofmenu.ui \

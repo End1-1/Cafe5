@@ -20,6 +20,7 @@
 #include "change.h"
 #include "menudialog.h"
 #include "QRCodeGenerator.h"
+#include "dlglistofdishcomments.h"
 #include "customerinfo.h"
 #include "thread.h"
 #include <QScrollBar>
@@ -864,6 +865,10 @@ void Workspace::saveOrder()
         return;
     }
 
+    if (fCustomer > 0) {
+        dw.writeOHeaderFlags(fOrderUuid, 1, 0, 0, 0, 0);
+    }
+
     for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
             Dish &d = static_cast<OrderDish*>(ui->tblOrder->cellWidget(i, 0))->fDish;
             int pid = 0;
@@ -908,34 +913,47 @@ void Workspace::saveOrder()
 
     for (const QString &s: prn) {
         QFont font(qApp->font());
-        font.setPointSize(24);
+        font.setFamily(__c5config.getValue(param_service_print_font_family));
+        int basesize = __c5config.getValue(param_service_print_font_size).toInt();
+        font.setPointSize(basesize);
         C5Printing p;
         p.setSceneParams(650, 2800, QPrinter::Portrait);
         p.setFont(font);
         p.setFontBold(true);
         p.ctext(tr("Receipt #") + QString("%1%2").arg(prefix, hallid));
         p.br();
-        p.setFontBold(false);
+        if (fCustomer > 0) {
+            p.ctext(QString("*%1*").arg(tr("Delivery")));
+            p.br();
+        }
+        //p.setFontBold(false);
         p.line(3);
         p.br(3);
         p.br();
         for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
             Dish &d = static_cast<OrderDish*>(ui->tblOrder->cellWidget(i, 0))->fDish;
             if (d.printer == s) {
-                p.setFontSize(24);
-                p.setFontBold(false);
+                p.setFontSize(basesize);
+                p.setFontBold(true);
                 p.ltext(d.name, 0);
-                p.setFontSize(32);
+                p.setFontSize(basesize + 8);
                 p.setFontBold(true);
                 p.rtext(float_str(d.qty, 2));
+                p.br();
+                if (d.modificator.isEmpty() == false) {
+                    p.setFontSize(basesize - 4);
+                    p.ltext(d.modificator, 0);
+                    p.br();
+                }
+                p.line();
                 p.br();
             }
         }
         p.br();
         p.line(3);
         p.br(3);
-        p.setFontSize(22);
-        p.setFontBold(false);
+        p.setFontSize(basesize - 4);
+       // p.setFontBold(false);
 
         p.ltext(QString("%1 %2").arg(tr("Printed:"), QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR)), 0);
         p.br();
@@ -1018,7 +1036,10 @@ bool Workspace::printReceipt(const QString &id, bool printSecond)
 {
     C5Database db(fDBParams);
     QFont font(qApp->font());
-    font.setPointSize(26);
+    font.setFamily(__c5config.getValue(param_receipt_print_font_family));
+    int basefont = __c5config.getValue(param_receipt_print_font_size).toInt();
+    font.setPointSize(basefont);
+    font.setBold(true);
     C5Printing p;
     p.setSceneParams(650, 2800, QPrinter::Portrait);
     p.setFont(font);
@@ -1058,7 +1079,7 @@ bool Workspace::printReceipt(const QString &id, bool printSecond)
     p.setFontBold(true);
     p.ctext(tr("Receipt #") + QString("%1%2").arg(db.getString("f_prefix")).arg(db.getString("f_hallid")));
     p.br();
-    p.setFontBold(false);
+    //p.setFontBold(false);
     if (db.getString("f_receiptnumber").length() > 0) {
         p.ltext(db.getString("f_firmname"), 0);
         p.br();
@@ -1098,7 +1119,7 @@ bool Workspace::printReceipt(const QString &id, bool printSecond)
     p.br(2);
     p.setFontBold(true);
     p.ctext(tr("Class | Name | Qty | Price | Total"));
-    p.setFontBold(false);
+    //p.setFontBold(false);
     p.br();
     p.line(3);
     p.br(3);
@@ -1122,7 +1143,7 @@ bool Workspace::printReceipt(const QString &id, bool printSecond)
                     package = 0;
                 }
                 p.setFontBold(true);
-                p.setFontSize(28);
+                p.setFontSize(basefont);
                 package = dd.getInt("f_package");
                 p.ltext(packages[package]["f_name"].toString(), 0);
                 p.br();
@@ -1131,8 +1152,8 @@ bool Workspace::printReceipt(const QString &id, bool printSecond)
                         .arg(packages[package]["f_price"].toDouble(), 2)
                         .arg(packages[package]["f_qty"].toDouble() * packages[package]["f_price"].toDouble()), 0);
                 p.br();
-                p.setFontBold(false);
-                p.setFontSize(26);
+                //p.setFontBold(false);
+                p.setFontSize(basefont);
             }
             p.ltext(QString("*** %1 %2, %3 x%4").arg(tr("Class:")).arg(dd.getString("f_adgcode")).arg(dd.getString("f_name")).arg(float_str(dd.getDouble("f_qty1"), 2)), 0);
             p.br();
@@ -1196,7 +1217,7 @@ bool Workspace::printReceipt(const QString &id, bool printSecond)
         p.br();
     }
 
-    p.setFontSize(20);
+    p.setFontSize(basefont - 2);
     p.setFontBold(true);
     p.br(p.fLineHeight * 3);
     p.ltext(__c5config.getValue(param_recipe_footer_text), 0);
@@ -1218,8 +1239,6 @@ bool Workspace::printReceipt(const QString &id, bool printSecond)
     db[":f_print"] = db.getInt("f_print") + 1;
     db.update("o_header", "f_id", id);
 
-
-    qDebug() << printSecond << __c5config.getValue(param_shop_print_v2);
     if (printSecond && __c5config.getValue(param_shop_print_v2) == "1") {
         printReceipt(id, false);
     }
@@ -1303,3 +1322,19 @@ void Workspace::addDishToOrder(Dish *d)
     on_tblOrder_cellClicked(row, 0);
     countTotal();
 }
+
+void Workspace::on_btnComment_clicked()
+{
+    int row = ui->tblOrder->currentRow();
+    if (row < 0) {
+        return;
+    }
+    OrderDish *od = static_cast<OrderDish*>(ui->tblOrder->cellWidget(row, 0));
+    Dish &d = od->fDish;
+    QString comment;
+    if (DlgListOfDishComments::getComment(d.name, comment)) {
+        d.modificator = comment;
+        od->updateInfo();
+    }
+}
+

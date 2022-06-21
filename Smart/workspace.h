@@ -95,6 +95,8 @@ private slots:
 
     void on_leReadCode_textChanged(const QString &arg1);
 
+    void on_btnComment_clicked();
+
 private:
     Ui::Workspace *ui;
 

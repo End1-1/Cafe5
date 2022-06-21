@@ -1,6 +1,7 @@
 #include "workspace.h"
 #include "c5config.h"
 #include "c5systempreference.h"
+#include "datadriver.h"
 #include <QFile>
 #include <QLockFile>
 #include "c5connection.h"
@@ -23,9 +24,9 @@ int main(int argc, char *argv[])
     QCoreApplication::setLibraryPaths(libPath);
 #endif
 
-//    if (QDate::currentDate() > QDate::fromString("20/06/2022", "dd/MM/yyyy")) {
-//        return 1;
-//    }
+    if (QDate::currentDate() > QDate::fromString("20/08/2022", "dd/MM/yyyy")) {
+        return 1;
+    }
 
     if (!C5SystemPreference::checkDecimalPointAndSeparator()) {
         return 0;
@@ -53,6 +54,7 @@ int main(int argc, char *argv[])
         delete c;
     }
     QFont f("Arial LatArm Unicode", 10);
+    //QFont f(__c5config.getValue(param_app_font_family), 10);
     qApp->setFont(f);
     QFile styleFile(qApp->applicationDirPath() + "/smartstyle.css");
     if (styleFile.open(QIODevice::ReadOnly)) {
@@ -68,6 +70,7 @@ int main(int argc, char *argv[])
     C5Config::fLastUsername = connectionParams.at(5);
     C5Config::fFullScreen = connectionParams.at(6);
     C5Config::initParamsFromDb();
+    DataDriver::init(C5Config::dbParams());
 
     QStringList dbParams;
     dbParams << C5Config::fDBHost

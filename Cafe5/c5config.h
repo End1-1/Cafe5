@@ -103,6 +103,10 @@
 #define param_smart_dont_print_receipt 99
 #define param_force_use_print_alias 100
 #define param_zip_dish_in_order 101
+#define param_service_print_font_family 102
+#define param_receipt_print_font_family 103
+#define param_service_print_font_size 104
+#define param_receipt_print_font_size 105
 
 #define FRONTDESK_WAITER 0
 #define FRONTDESK_SHOP 1

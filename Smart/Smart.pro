@@ -128,6 +128,7 @@ SOURCES += \
     ../DbData/dbusers.cpp \
     ../Forms/change.cpp \
     ../Forms/customerinfo.cpp \
+    ../Forms/dlglistofdishcomments.cpp \
     ../Forms/dlgqty.cpp \
     ../Forms/touchdlgphonenumber.cpp \
     ../Forms/touchentertaxreceiptnumber.cpp \
@@ -253,6 +254,7 @@ HEADERS += \
     ../DbData/dbusers.h \
     ../Forms/change.h \
     ../Forms/customerinfo.h \
+    ../Forms/dlglistofdishcomments.h \
     ../Forms/dlgqty.h \
     ../Forms/touchdlgphonenumber.h \
     ../Forms/touchentertaxreceiptnumber.h \
@@ -292,6 +294,7 @@ FORMS += \
     ../Classes/rkeyboard.ui \
     ../Forms/change.ui \
     ../Forms/customerinfo.ui \
+    ../Forms/dlglistofdishcomments.ui \
     ../Forms/dlgqty.ui \
     ../Forms/touchdlgphonenumber.ui \
     ../Forms/touchentertaxreceiptnumber.ui \
