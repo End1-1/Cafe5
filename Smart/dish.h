@@ -11,6 +11,7 @@ struct Dish {
     QString printer;
     QString adgCode;
     QString barcode;
+    QString modificator;
     int store;
     double price;
     double qty;

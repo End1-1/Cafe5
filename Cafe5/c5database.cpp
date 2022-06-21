@@ -536,11 +536,12 @@ void C5Database::configureDatabase(QSqlDatabase &cn, const QString &host, const 
     if (h.contains(":")) {
         QString portstr = h.mid(h.indexOf(":") + 1, h.length() - h.indexOf(":"));
         port = portstr.toInt();
+        h = h.mid(0, h.indexOf(":"));
     }
     if (port > 0) {
         cn.setPort(port);
     }
-    cn.setHostName(host);
+    cn.setHostName(h);
     cn.setDatabaseName(db);
     cn.setUserName(user);
     cn.setPassword(password);

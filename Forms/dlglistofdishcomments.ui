@@ -32,7 +32,7 @@
     </widget>
    </item>
    <item>
-    <widget class="C5TableWidget" name="tbl">
+    <widget class="QTableWidget" name="tbl">
      <property name="verticalScrollBarPolicy">
       <enum>Qt::ScrollBarAlwaysOff</enum>
      </property>
@@ -127,11 +127,6 @@
   </layout>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>C5TableWidget</class>
-   <extends>QTableWidget</extends>
-   <header location="global">c5tablewidget.h</header>
-  </customwidget>
   <customwidget>
    <class>RKeyboard</class>
    <extends>QWidget</extends>

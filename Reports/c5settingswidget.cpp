@@ -156,6 +156,10 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     fTags[ui->chFinalReceiptQtySelect->getTag()] = ui->chFinalReceiptQtySelect->isChecked() ? "1" : "0";
     fTags[ui->chForceUsePrintAlias->getTag()] = ui->chForceUsePrintAlias->isChecked() ? "1" : "0";
     fTags[ui->chCompactDishesInOrder->getTag()] = ui->chCompactDishesInOrder->isChecked() ? "1" : "0";
+    fTags[ui->fbServiceFont->property("Tag").toInt()] = ui->fbServiceFont->currentText();
+    fTags[ui->fbReceiptFont->property("Tag").toInt()] = ui->fbReceiptFont->currentText();
+    fTags[ui->leServiceFontSize->getTag()] = ui->leServiceFontSize->text();
+    fTags[ui->lereceiptFontSize->getTag()] = ui->lereceiptFontSize->text();
     C5Database db(fDBParams);
     db[":f_settings"] = ui->leCode->getInteger();
     db.exec("delete from s_settings_values where f_settings=:f_settings");

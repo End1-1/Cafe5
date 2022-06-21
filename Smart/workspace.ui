@@ -715,7 +715,7 @@ QLabel {color:green;}
         </property>
         <property name="maximumSize">
          <size>
-          <width>330</width>
+          <width>400</width>
           <height>16777215</height>
          </size>
         </property>
@@ -1000,7 +1000,7 @@ QLabel {color:green;}
              </widget>
             </item>
             <item row="1" column="4">
-             <widget class="QPushButton" name="btnReserve">
+             <widget class="QPushButton" name="btnComment">
               <property name="minimumSize">
                <size>
                 <width>50</width>
@@ -1018,6 +1018,16 @@ QLabel {color:green;}
               </property>
               <property name="text">
                <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="../resources/resources.qrc">
+                <normaloff>:/comment.png</normaloff>:/comment.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>32</width>
+                <height>32</height>
+               </size>
               </property>
              </widget>
             </item>
