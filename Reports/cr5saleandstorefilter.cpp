@@ -22,6 +22,15 @@ QString CR5SaleAndStoreFilter::condition()
     return "";
 }
 
+QString CR5SaleAndStoreFilter::filterText()
+{
+    QString s = QString("%1 %2 - %3").arg(tr("Date range"), ui->deStart->text(), ui->deEnd->text());
+    inFilterText(s, ui->leStoreName);
+    inFilterText(s, ui->leGroupName);
+    inFilterText(s, ui->leGoodsName);
+    return s;
+}
+
 const QDate CR5SaleAndStoreFilter::date1() const
 {
     return ui->deStart->date();

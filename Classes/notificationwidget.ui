@@ -72,7 +72,7 @@ border-radius: 40px;</string>
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="../resources/res.qrc">:/info.png</pixmap>
+         <pixmap resource="../resources/resources.qrc">:/info.png</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -193,7 +193,6 @@ color:rgb(255, 170, 0);</string>
  </widget>
  <resources>
   <include location="../resources/resources.qrc"/>
-  <include location="../resources/res.qrc"/>
  </resources>
  <connections/>
 </ui>

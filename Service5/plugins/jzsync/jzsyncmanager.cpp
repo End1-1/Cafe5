@@ -12,20 +12,31 @@ JzSyncManager::JzSyncManager(const QHash<QString, QString> &opt) :
 
 void JzSyncManager::start()
 {
-    auto *timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, &JzSyncManager::timeout);
-    timer->start(5000);
+    fTimer = new QTimer(this);
+    connect(fTimer, &QTimer::timeout, this, &JzSyncManager::timeout);
+    resumeTimer();
+}
+
+void JzSyncManager::resumeTimer()
+{
+#ifdef QT_DEBUG
+    fTimer->start(500);
+#else
+    fTimer->start(5000);
+#endif
 }
 
 void JzSyncManager::timeout()
 {
-    qDebug() << "TIMEOUT";
+    fTimer->stop();
     Database db("QIBASE");
     if (!db.open(fOptions["db_remote_host"], fOptions["db_remote_path"], fOptions["db_remote_user"], fOptions["db_remote_pass"])) {
+        resumeTimer();
         return;
     }
     Database db2("QIBASE");
     if (!db2.open(fOptions["db_local_host"], fOptions["db_local_path"], fOptions["db_local_user"], fOptions["db_local_pass"])) {
+        resumeTimer();
         return;
     }
     db[":fid"] = fOptions["last_id"].toInt();
@@ -62,18 +73,20 @@ void JzSyncManager::timeout()
                 LogWriter::write(LogWriterLevel::errors, "", QString("Record missing: %1 - %2").arg(tables.at(i), rec.at(i)));
             }
             break;
+        case 3:
             db[":id"] = rec.at(i);
             db.deleteFromTable(tables.at(i), "id", rec.at(i));
-        case 3:
             break;
         }
     }
     Database db3("QMYSQL");
     if (!db3.open(fOptions["server_db_config"])) {
+        resumeTimer();
         return;
     }
     db3[":fplugin"] = "jzsync";
     db3[":fkey"] = "last_id";
     db3[":fvalue"] = fOptions["last_id"];
     db3.exec("update plugins_options set fvalue=:fvalue where fplugin=:fplugin and fkey=:fkey");
+    resumeTimer();
 }

@@ -52,6 +52,24 @@ QString CR5SalesByDishesFilter::condition()
     return result;
 }
 
+QString CR5SalesByDishesFilter::filterText()
+{
+    QString s = QString("%1 %2 - %3").arg(tr("Date range"), ui->deStart->text(), ui->deEnd->text());
+    if (ui->chUseCloseDateTime->isChecked()) {
+        s = QString("%1 %2 - %3").arg(tr("Date range"), ui->dt1->text(), ui->dt2->text());
+    }
+    inFilterText(s, ui->leStateName);
+    inFilterText(s, ui->lePart1Name);
+    inFilterText(s, ui->lePart2Name);
+    inFilterText(s, ui->leStoreName);
+    if (ui->rbNoRecipt->isChecked()){
+        s += ", " + tr("No recipe");
+    } else if (ui->rbWithRecipe->isChecked()) {
+        s += ", " + tr("With recipe");
+    }
+    return s;
+}
+
 void CR5SalesByDishesFilter::on_chUseCloseDateTime_clicked(bool checked)
 {
     ui->dt1->setEnabled(checked);

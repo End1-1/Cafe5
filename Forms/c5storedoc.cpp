@@ -96,6 +96,8 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
     if (__c5config.getRegValue("storedoc_storeinput").toBool()) {
         ui->leStoreInput->setValue(__c5config.getRegValue("storedoc_storeinput_id").toInt());
     }
+
+    ui->tblCalcPrice->setColumnWidth(0, 300);
     adjustSize();
 }
 
@@ -248,14 +250,16 @@ bool C5StoreDoc::openDoc(QString id, QString &err)
         if (row < 0) {
             continue;
         }
-        ui->tblCalcPrice->setString(row, 0, dw.value(container_astoredraft, i, "f_goodsname").toString());
-        ui->tblCalcPrice->setDouble(row, 1, dw.value(container_astoredraft, i, "f_qty").toDouble());
-        ui->tblCalcPrice->setString(row, 2, dw.value(container_astoredraft, i, "f_unitname").toString());
-        ui->tblCalcPrice->setDouble(row, 3, dw.value(container_astoredraft, i, "f_price").toDouble());
+        qDebug() << i << row << dw.value(container_astoredraft, row, "f_goodsname").toString();
+        ui->tblCalcPrice->setString(row, 0, dw.value(container_astoredraft, row, "f_goodsname").toString());
+        ui->tblCalcPrice->setDouble(row, 1, dw.value(container_astoredraft, row, "f_qty").toDouble());
+        ui->tblCalcPrice->setString(row, 2, dw.value(container_astoredraft, row, "f_unitname").toString());
+        ui->tblCalcPrice->setDouble(row, 3, dw.value(container_astoredraft, row, "f_price").toDouble());
         ui->tblCalcPrice->setDouble(row, 4, dw.value(container_acalcprice, i, "f_price2").toDouble());
         ui->tblCalcPrice->lineEdit(row, 6)->setDouble(dw.value(container_acalcprice, i, "f_margin").toDouble());
         calcPrice2(row);
     }
+    calcTotalSale();
 
     if (fToolBar && fDocType == sdOutput) {
         fToolBar->addAction(QIcon(":/storeinput.png"), tr("Create store input"), this, SLOT(createStoreInput()));
@@ -275,7 +279,6 @@ void C5StoreDoc::setMode(C5StoreDoc::STORE_DOC sd)
     case DOC_TYPE_STORE_INPUT:
         ui->chPaid->setVisible(paymentVisible && true);
         if (fToolBar) {
-            fToolBar->addAction(QIcon(":/goods_store.png"), tr("Duplicate as output"), this, SLOT(outputOfService()));
             fToolBar->addAction(QIcon(":/goods_store.png"), tr("Input of service"), this, SLOT(inputOfService()));
             fToolBar->addAction(QIcon(":/goods_store.png"), tr("Output of service"), this, SLOT(outputOfService()));
         }
@@ -286,9 +289,6 @@ void C5StoreDoc::setMode(C5StoreDoc::STORE_DOC sd)
         ui->leCash->setVisible(false);
         ui->deCashDate->setVisible(false);
         ui->chWholeGroup->setVisible(true);
-        if (fToolBar) {
-            fToolBar->addAction(QIcon(":/goods_store.png"), tr("Duplicate as output"), this, SLOT(outputOfService()));
-        }
         break;
     case DOC_TYPE_STORE_OUTPUT:
         ui->lbCashDoc->setVisible(false);
@@ -351,7 +351,7 @@ void C5StoreDoc::setMode(C5StoreDoc::STORE_DOC sd)
     if (sd != DOC_TYPE_COMPLECTATION && sd != DOC_TYPE_STORE_INPUT) {
         ui->tw->removeTab(1);
     }
-    ui->twCalcPrice->setVisible(sd == DOC_TYPE_STORE_INPUT);
+    //ui->twCalcPrice->setVisible(sd == DOC_TYPE_STORE_INPUT);
     setGoodsPanelHidden(C5Config::getRegValue("showhidegoods").toBool());
 }
 
@@ -407,6 +407,7 @@ QToolBar *C5StoreDoc::toolBar()
         fToolBar->addAction(QIcon(":/print.png"), tr("Print"), this, SLOT(printDoc()));
         fToolBar->addAction(QIcon(":/show_list.png"), tr("Show/Hide\ngoods list"), this, SLOT(showHideGoodsList()));
         fToolBar->addAction(QIcon(":/barcode.png"), tr("Print\nbarcode"), this, SLOT(printBarcode()));
+        fToolBar->addAction(QIcon(":/goods_store.png"), tr("Duplicate as output"), this, SLOT(duplicateOutput()));
     }
     return fToolBar;
 }
@@ -1312,7 +1313,7 @@ void C5StoreDoc::loadGoodsInput()
                     "sum(s.f_qty*s.f_type) as f_qty, sum(s.f_total*s.f_type) as f_amount "
                     "from c_goods g "
                     "left join a_store s on s.f_goods=g.f_id and s.f_store=%1 "
-                    "left join a_header d on d.f_id=s.f_document and d.f_date<=%2 "
+                    "left join a_header d on d.f_id=s.f_document and d.f_date<=%2 and d.f_state=1 "
                     "inner join c_groups gg on gg.f_id=g.f_group "
                     "inner join c_units u on u.f_id=g.f_unit "
                     "group by 1, 2, 3, 4 ")
@@ -1655,8 +1656,8 @@ void C5StoreDoc::printV1()
 
     p.setFontBold(true);
     points.clear();
-    points << 1200
-           << 500
+    points << 950
+           << 750
            << 250;
     vals.clear();
     vals << tr("Total amount");
@@ -2116,6 +2117,15 @@ void C5StoreDoc::calcPrice2(int row)
     }
 }
 
+void C5StoreDoc::calcTotalSale()
+{
+    double total = 0;
+    for (int i = 0; i < ui->tblCalcPrice->rowCount(); i++) {
+        total += ui->tblCalcPrice->getDouble(i, 1) * ui->tblCalcPrice->lineEdit(i, 7)->getDouble();
+    }
+    ui->leTotalSale->setDouble(total);
+}
+
 void C5StoreDoc::writeAStoreSale(int storei, int storeo)
 {
     C5StoreDraftWriter::writeASaleStore(storei, storeo);
@@ -2164,6 +2174,8 @@ void C5StoreDoc::newDoc()
     ui->tblGoods->clearContents();
     ui->tblGoods->setRowCount(0);
     ui->tblDishes->clearContents();
+    ui->tblCalcPrice->clearContents();
+    ui->tblCalcPrice->setRowCount(0);
     ui->tblDishes->setRowCount(0);
     ui->leInvoiceNumber->clear();
     ui->leComplectationCode->setValue("");
@@ -2445,10 +2457,12 @@ void C5StoreDoc::tblQtyChanged(const QString &arg1)
 
     countTotal();
     calcPrice2(row);
+    calcTotalSale();
 }
 
 void C5StoreDoc::tblPriceChanged(const QString &arg1)
 {
+    Q_UNUSED(arg1);
     int row, col;
     if (!ui->tblGoods->findWidget(static_cast<QWidget*>(sender()), row, col)) {
         return;
@@ -2493,6 +2507,7 @@ void C5StoreDoc::tblCalcMarginPercentChanged(const QString &arg1)
     C5LineEdit *lfinal = ui->tblCalcPrice->lineEdit(row, 7);
     lmargin->setDouble(ui->tblCalcPrice->getDouble(row, 4) * (lmarginPercent->getDouble() / 100));
     lfinal->setDouble(lmargin->getDouble() + ui->tblCalcPrice->getDouble(row, 4));
+    calcTotalSale();
 }
 
 void C5StoreDoc::tblCalcMarginChanged(const QString &arg1)
@@ -2509,6 +2524,7 @@ void C5StoreDoc::tblCalcMarginChanged(const QString &arg1)
         lmarginPercent->setDouble((lmargin->getDouble() / ui->tblCalcPrice->getDouble(row, 4)) * 100);
     }
     lfinal->setDouble(lmargin->getDouble() + ui->tblCalcPrice->getDouble(row, 4));
+    calcTotalSale();
 }
 
 void C5StoreDoc::tblCalcFinalChanged(const QString &arg1)
@@ -2525,6 +2541,7 @@ void C5StoreDoc::tblCalcFinalChanged(const QString &arg1)
     if (ui->tblCalcPrice->getDouble(row, 4)) {
         lmarginPercent->setDouble((lmargin->getDouble() / ui->tblCalcPrice->getDouble(row, 4)) * 100);
     }
+    calcTotalSale();
 }
 
 void C5StoreDoc::tblAddChanged(const QString &arg1)
@@ -2533,6 +2550,7 @@ void C5StoreDoc::tblAddChanged(const QString &arg1)
     for (int i = 0; i < ui->tblCalcPrice->rowCount(); i++) {
         calcPrice2(i);
     }
+    calcTotalSale();
     //countTotal();
 }
 
@@ -3004,6 +3022,7 @@ void C5StoreDoc::on_btnSetMargin_clicked()
         ui->tblCalcPrice->lineEdit(i, 6)->setDouble(ui->leAllMargin->getDouble());
         calcPrice2(i);
     }
+    calcTotalSale();
 }
 
 void C5StoreDoc::on_btnSetAllMarginPercent_clicked()
@@ -3012,4 +3031,24 @@ void C5StoreDoc::on_btnSetAllMarginPercent_clicked()
         ui->tblCalcPrice->lineEdit(i, 6)->setDouble(ui->tblCalcPrice->getDouble(i, 4) * (ui->leAllMarginPercent->getDouble() / 100));
         calcPrice2(i);
     }
+    calcTotalSale();
+}
+
+void C5StoreDoc::on_leTotalSale_textChanged(const QString &arg1)
+{
+    ui->leProfit->setDouble(str_float(arg1) - ui->leTotal->getDouble());
+}
+
+void C5StoreDoc::on_btnAutoFillSalePrice_clicked()
+{
+    C5Database db(fDBParams);
+    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+        db[":f_id"] = ui->tblGoods->getInteger(i, 3);
+        db.exec("select f_saleprice from c_goods where f_id=:f_id");
+        if (db.nextRow()) {
+            ui->tblCalcPrice->lineEdit(i, 7)->setDouble(db.getDouble("f_saleprice"));
+            emit ui->tblCalcPrice->lineEdit(i, 7)->textEdited(ui->tblCalcPrice->lineEdit(i, 7)->text());
+        }
+    }
+    calcTotalSale();
 }

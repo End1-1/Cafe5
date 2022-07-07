@@ -42,3 +42,8 @@ QString CR5CarVisitsFilter::condition()
     }
     return where;
 }
+
+QString CR5CarVisitsFilter::filterText()
+{
+    return QString("%1 %1-%2").arg(tr("Date range"), ui->deStart->text(), ui->deEnd->text());
+}

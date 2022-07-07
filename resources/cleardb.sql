@@ -84,6 +84,8 @@ delete from a_sale_temp;
 delete from a_store_dish_waste;
 delete from o_service_values;
 delete from s_custom_reports;
+delete from s_report_template where f_id>0;
+delete from s_report_template_access where f_report>0;
 
 delete from mf_daily_workers;
 delete from mf_daily_process;
@@ -107,6 +109,10 @@ alter table o_service_values auto_increment = 0;
 alter table s_custom_reports auto_increment = 0;
 alter table s_log_store_price auto_increment = 0;
 alter table s_salary_inout auto_increment = 0;
+alter table s_user_group auto_increment = 1;
+alter table s_user auto_increment = 1;
+alter table s_report_template auto_increment = 0;
+alter table s_report_template_access = 0;
 
 ALTER TABLE s_syncronize AUTO_INCREMENT = 0 ;
 ALTER TABLE d_package AUTO_INCREMENT = 0 ;

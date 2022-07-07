@@ -15,6 +15,7 @@ public:
     explicit CR5UsersFilter(const QStringList &dbParams);
     ~CR5UsersFilter();
     virtual QString condition() override;
+    virtual QString filterText() override;
 
 private:
     Ui::CR5UsersFilter *ui;

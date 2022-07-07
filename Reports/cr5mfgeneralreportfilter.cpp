@@ -22,8 +22,7 @@ CR5MFGeneralReportFilter::~CR5MFGeneralReportFilter()
 QString CR5MFGeneralReportFilter::condition()
 {
     QString cond = QString(" p.f_date between '%1' and '%2' ")
-            .arg(ui->leStart->date().toString(FORMAT_DATE_TO_STR_MYSQL))
-            .arg(ui->leEnd->date().toString(FORMAT_DATE_TO_STR_MYSQL));
+            .arg(ui->leStart->date().toString(FORMAT_DATE_TO_STR_MYSQL), ui->leEnd->date().toString(FORMAT_DATE_TO_STR_MYSQL));
     in(cond, "p.f_product", ui->leProduct);
     in(cond, "p.f_process", ui->leProcess);
     in(cond, "p.f_worker", ui->leWorker);
@@ -35,8 +34,29 @@ QString CR5MFGeneralReportFilter::condition()
 QString CR5MFGeneralReportFilter::conditionText()
 {
     QString text;
+    text += QString("%1 %2 - %3").arg(tr("Date range"), ui->leStart->text(), ui->leEnd->text());
     if (!ui->leTeamlead->isEmpty()) {
         text += QString("%1: %2").arg(tr("Teamlead"), ui->leTeamleadName->text());
     }
     return text;
+}
+
+QString CR5MFGeneralReportFilter::d1ms() const
+{
+    return ui->leStart->date().toString(FORMAT_DATE_TO_STR_MYSQL);
+}
+
+QString CR5MFGeneralReportFilter::d2ms() const
+{
+    return ui->leEnd->date().toString(FORMAT_DATE_TO_STR_MYSQL);
+}
+
+QString CR5MFGeneralReportFilter::d1s() const
+{
+    return ui->leStart->text();
+}
+
+QString CR5MFGeneralReportFilter::d2s() const
+{
+    return ui->leEnd->text();
 }

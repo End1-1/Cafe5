@@ -16,6 +16,7 @@ CR5GoodsMovementFilter::CR5GoodsMovementFilter(const QStringList &dbParams, QWid
     ui->leStoreOut->setSelector(fDBParams, ui->leStoreNameOut, cache_goods_store).setMultiselection(true);
     ui->leInOut->setSelector(fDBParams, ui->leInOutName, cache_store_inout);
     ui->leDocState->setSelector(fDBParams, ui->leDocStateName, cache_doc_state);
+    ui->leSupplier->setSelector(fDBParams, ui->leSupplierName, cache_goods_partners);
 }
 
 CR5GoodsMovementFilter::~CR5GoodsMovementFilter()
@@ -51,7 +52,27 @@ QString CR5GoodsMovementFilter::condition()
     in(cond, "ai.f_storein", ui->leStoreIn);
     in(cond, "ai.f_storeout", ui->leStoreOut);
     in(cond, "g.f_acc", ui->leAccount);
+    in(cond, "a.f_partner", ui->leSupplier);
     return cond;
+}
+
+QString CR5GoodsMovementFilter::filterText()
+{
+    QString s = QString("%1 %2 - %3").arg(tr("Date range"), ui->deStart->text(), ui->deEnd->text());
+    inFilterText(s, ui->leDocTypeName);
+    inFilterText(s, ui->leDocStateName);
+    inFilterText(s, ui->leSupplierName);
+    inFilterText(s, ui->leReasonName);
+    inFilterText(s, ui->leInOutName);
+    inFilterText(s, ui->leStoreName);
+    inFilterText(s, ui->leStoreNameIn);
+    inFilterText(s, ui->leStoreNameOut);
+    inFilterText(s, ui->leGoodsName);
+    inFilterText(s, ui->leGroupName);
+    if (!ui->leAccount->isEmpty()) {
+        s += ", " + ui->leAccount->text();
+    }
+    return s;
 }
 
 void CR5GoodsMovementFilter::setDate(const QDate &d1, const QDate &d2)
@@ -89,4 +110,19 @@ void CR5GoodsMovementFilter::setInOut(int inout)
 {
     ui->leInOut->setValue(inout);
     saveFilter(this);
+}
+
+QString CR5GoodsMovementFilter::date1s() const
+{
+    return ui->deStart->toMySQLDate();
+}
+
+QString CR5GoodsMovementFilter::date2s() const
+{
+    return ui->deEnd->toMySQLDate();
+}
+
+QString CR5GoodsMovementFilter::partners() const
+{
+    return ui->leSupplier->text();
 }

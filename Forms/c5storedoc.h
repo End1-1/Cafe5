@@ -153,6 +153,8 @@ private:
 
     void calcPrice2(int row);
 
+    void calcTotalSale();
+
 private slots:
     void lineEditKeyPressed(const QChar &key);
 
@@ -263,6 +265,10 @@ private slots:
     void on_btnSetMargin_clicked();
 
     void on_btnSetAllMarginPercent_clicked();
+
+    void on_leTotalSale_textChanged(const QString &arg1);
+
+    void on_btnAutoFillSalePrice_clicked();
 };
 
 #endif // C5STOREDOC_H

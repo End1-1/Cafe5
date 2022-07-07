@@ -20,6 +20,13 @@ QString CR5CashDetailedFilter::condition()
     return "";
 }
 
+QString CR5CashDetailedFilter::filterText()
+{
+    QString s = QString("%1 %2 - %3").arg(tr("Date range"), ui->deStart->text(), ui->deEnd->text());
+    inFilterText(s, ui->leCashName);
+    return s;
+}
+
 QDate CR5CashDetailedFilter::date1() const
 {
     return ui->deStart->date();

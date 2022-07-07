@@ -4,7 +4,6 @@
 #include "dlgpassword.h"
 #include "c5waiterorderdoc.h"
 #include "menudish.h"
-#include "orderdish.h"
 #include "c5storedraftwriter.h"
 #include "calendar.h"
 #include "c5user.h"
@@ -15,6 +14,7 @@
 #include "touchentertaxreceiptnumber.h"
 #include "touchselecttaxreport.h"
 #include "printtaxn.h"
+#include "c5airlog.h"
 #include "dlgqty.h"
 #include "idram.h"
 #include "change.h"
@@ -22,6 +22,7 @@
 #include "QRCodeGenerator.h"
 #include "dlglistofdishcomments.h"
 #include "customerinfo.h"
+#include "dlgmemoryread.h"
 #include "thread.h"
 #include <QScrollBar>
 #include <QInputDialog>
@@ -33,6 +34,7 @@
 #include <QFile>
 
 QHash<QString, QString> fPrinterAliases;
+Workspace *Workspace::fWorkspace;
 
 
 Workspace::Workspace(const QStringList &dbParams) :
@@ -40,7 +42,7 @@ Workspace::Workspace(const QStringList &dbParams) :
     ui(new Ui::Workspace)
 {
     ui->setupUi(this);
-    fTypeFilter = 0;
+    fTypeFilter = -1;
     QRect r = qApp->screens().at(0)->geometry();
     switch (r.width()) {
     case 1280:
@@ -63,6 +65,11 @@ Workspace::Workspace(const QStringList &dbParams) :
        ui->leReadCode->setFocus();
     });
     t->start(1000);
+    ui->tblOrder->setColumnWidth(0, 165);
+    ui->tblOrder->setColumnWidth(1, 70);
+    ui->tblOrder->setColumnWidth(2, 70);
+    ui->tblOrder->setColumnWidth(3, 70);
+    fWorkspace = this;
 }
 
 Workspace::~Workspace()
@@ -80,8 +87,29 @@ bool Workspace::login()
         accept();
         return false;
     }
-    ui->lbStaffName->setText(fUser->fullName());
     C5Database db(fDBParams);
+    /* OPEN SESSION OR CONTINUE EXISTING */
+    db[":f_user"] = fUser->id();
+    db[":f_comp"] = hostinfo;
+    db.exec("select * from s_salary_inout where f_comp=:f_comp and f_dateout is null");
+    if (db.nextRow()) {
+        if (db.getInt("f_user") == fUser->id()) {
+            __c5config.setRegValue("session", db.getInt("f_id"));
+            C5Message::info(tr("Continue session"));
+        } else {
+            C5Message::error(tr("An open session exists on this station and must be closed first before used by another user"));
+            return false;
+        }
+    } else {
+        db[":f_user"] = fUser->id();
+        db[":f_datein"] = QDate::currentDate();
+        db[":f_timein"] = QTime::currentTime();
+        db[":f_comp"] = hostinfo;
+        __c5config.setRegValue("session", db.insert("s_salary_inout", true));
+    }
+
+    ui->lbStaffName->setText(fUser->fullName());
+
     db.exec("select * from d_print_aliases");
     while (db.nextRow()) {
         fPrinterAliases[db.getString("f_alias")] = db.getString("f_printer");
@@ -118,7 +146,7 @@ bool Workspace::login()
     }
     db[":f_menu"] = C5Config::defaultMenu();
     db.exec("SELECT d.f_id, d.f_part, d.f_name,  m.f_print1, m.f_store, m.f_price, p2.f_adgcode, d.f_color, \
-            d.f_netweight, d.f_cost, m.f_recent, d.f_barcode \
+            d.f_netweight, d.f_cost, m.f_recent, d.f_barcode, p2.f_name as f_groupname \
             FROM d_menu m \
             left join d_dish d on d.f_id=m.f_dish \
             left join d_part2 p2 on p2.f_id=d.f_part \
@@ -138,6 +166,7 @@ bool Workspace::login()
         d->cost = db.getDouble("f_cost");
         d->quick = db.getInt("f_recent");
         d->barcode = db.getString("f_barcode");
+        d->typeName = db.getString("f_groupname");
         fDishes.append(d);
         if (d->barcode.isEmpty() == false) {
             fDishesBarcode[d->barcode] = d;
@@ -173,9 +202,8 @@ bool Workspace::login()
         ui->lstCombo->setItemDelegate(new DishMemberDelegate());
     }
     ui->btnShowPackages->setVisible(ui->lstCombo->count() > 0);
-    filter();
+    filter("");
     stretchTableColumns(ui->tblDishes);
-    stretchTableColumns(ui->tblOrder);
     stretchTableColumns(ui->tblPart2);
     on_btnShowDishes_clicked();
     return true;
@@ -194,8 +222,8 @@ void Workspace::setQty(double qty, int mode)
     if (row < 0) {
         return;
     }
-    OrderDish *od = static_cast<OrderDish*>(ui->tblOrder->cellWidget(row, 0));
-    Dish &d = od->fDish;
+
+    Dish d = ui->tblOrder->item(row, 0)->data(Qt::UserRole).value<Dish>();
     switch (mode) {
     case 1:
         d.qty = qty;
@@ -205,13 +233,29 @@ void Workspace::setQty(double qty, int mode)
         break;
     case 3:
         if (d.qty - qty > 0.1) {
+            if (!fOrderUuid.isEmpty()) {
+                removeDish();
+                return;
+            }
             d.qty -= qty;
         } else {
             on_btnVoid_clicked();
+            return;
         }
         break;
     }
-    od->updateInfo();
+    if (!fOrderUuid.isEmpty()) {
+        fFlagEdited = 1;
+        C5Database db(fDBParams);
+        C5StoreDraftWriter dw(db);
+        if (!dw.writeOBody(d.obodyId, fOrderUuid, DISH_STATE_OK, d.id, d.qty, d.qty, d.price, (d.qty*d.price) - (d.qty*d.price*discountValue()), __c5config.serviceFactor().toDouble(), fDiscountValue, d.store, d.printer, "", d.modificator, 0, d.adgCode, 0, 0, 0)) {
+            C5Message::error(dw.fErrorMsg);
+            db.rollback();
+            return;
+        }
+    }
+    ui->tblOrder->item(row, 0)->setData(Qt::UserRole, qVariantFromValue(d));
+    updateInfo(row);
     countTotal();
 }
 
@@ -221,14 +265,23 @@ void Workspace::removeDish()
     if (row < 0) {
         return;
     }
+    Dish d = ui->tblOrder->item(row, 0)->data(Qt::UserRole).value<Dish>();
     ui->tblOrder->removeRow(row);
     if (row < ui->tblOrder->rowCount()) {
-        on_tblOrder_cellClicked(row, 0);
+        ui->tblOrder->setCurrentCell(row, 0);
+    }
+    if (!fOrderUuid.isEmpty()) {
+        fFlagEdited = 1;
+        C5Database db(fDBParams);
+        db[":f_id"] = d.obodyId;
+        db[":f_state"] = DISH_STATE_MISTAKE;
+        db.exec("update o_body set f_state=:f_state where f_id=:f_id");
+        C5Airlog::write(hostinfo, fUser->fullName(), 1, d.obodyId, fOrderUuid, "", tr("Remove dish"), d.name + " " + d.modificator, float_str(d.qty, 2));
     }
     countTotal();
 }
 
-void Workspace::filter()
+void Workspace::filter(const QString &name)
 {
     ui->tblDishes->clear();
     ui->tblDishes->setRowCount(0);
@@ -244,12 +297,18 @@ void Workspace::filter()
             if (d->typeId != fTypeFilter) {
                 continue;
             }
-        } else {
+        }
+        if (fTypeFilter == -1 && name.isEmpty()){
             if (d->quick == 0) {
                 continue;
             }
         }
-        MenuDish *m = new MenuDish(d);
+        if (!name.isEmpty()) {
+            if (!d->name.contains(name, Qt::CaseInsensitive)) {
+                continue;
+            }
+        }
+        MenuDish *m = new MenuDish(d, !name.isEmpty());
         if (d->color != -1) {
             m->setStyleSheet("background-color:" + QColor::fromRgb(d->color).name());
         }
@@ -266,7 +325,7 @@ void Workspace::countTotal()
 {
     double total = 0;
     for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
-        Dish &d = static_cast<OrderDish*>(ui->tblOrder->cellWidget(i, 0))->fDish;
+        Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
         total += d.price * d.qty;
     }
     if (fDiscountMode > 0) {
@@ -283,6 +342,10 @@ void Workspace::countTotal()
     if (ui->leReceived->getDouble() > 0.01) {
         ui->leChange->setDouble(ui->leReceived->getDouble() - ui->leTotal->getDouble());
     }
+    if (__c5config.getValue(param_tax_print_if_amount_less).toDouble() > 0) {
+        ui->btnFiscal->setChecked(__c5config.getValue(param_tax_print_if_amount_less).toDouble() > total);
+    }
+    ui->tblOrder->resizeRowsToContents();
 }
 
 void Workspace::resetOrder()
@@ -299,10 +362,11 @@ void Workspace::resetOrder()
     fDiscountMode = 0;
     fDiscountValue = 0;
     fDiscountId = 0;
+    fFlagEdited = 0;
     fSupplierId = __c5config.defaultTable();
     fSupplierName = "";
     fPhone = "";
-    ui->tblOrder->clear();
+    ui->tblOrder->clearContents();
     ui->tblOrder->setRowCount(0);
     ui->leTotal->setDouble(0);
     ui->leReceived->setDouble(0);
@@ -332,6 +396,22 @@ void Workspace::scrollTable(QTableWidget *t, int direction, int rows)
     t->verticalScrollBar()->setValue((t->verticalScrollBar()->value() + (t->verticalHeader()->defaultSectionSize() * rows)) * direction);
 }
 
+void Workspace::updateInfo(int row)
+{
+    Dish d = ui->tblOrder->item(row, 0)->data(Qt::UserRole).value<Dish>();
+    ui->tblOrder->item(row, 0)->setText(d.name + (d.modificator.isEmpty() ? "" : "\r\n" + d.modificator));
+    auto *item = new QTableWidgetItem(float_str(d.qty, 2));
+    item->setTextAlignment(Qt::AlignRight);
+    ui->tblOrder->setItem(row, 1, item);
+    item = new QTableWidgetItem(float_str(d.price, 2));
+    item->setTextAlignment(Qt::AlignRight);
+    ui->tblOrder->setItem(row, 2, item);
+    item = new QTableWidgetItem(float_str(d.price * d.qty, 2));
+    item->setTextAlignment(Qt::AlignRight);
+    ui->tblOrder->setItem(row, 3, item);
+    ui->tblOrder->resizeRowsToContents();
+}
+
 
 void Workspace::on_tblPart2_itemClicked(QTableWidgetItem *item)
 {
@@ -339,7 +419,7 @@ void Workspace::on_tblPart2_itemClicked(QTableWidgetItem *item)
         return;
     }
     fTypeFilter = item->data(Qt::UserRole).toInt();
-    filter();
+    filter("");
 }
 
 void Workspace::on_btnCheckout_clicked()
@@ -347,24 +427,31 @@ void Workspace::on_btnCheckout_clicked()
     if (ui->tblOrder->rowCount() == 0) {
         return;
     }
-    C5Database db(fDBParams);
-    if (fOrderUuid.isEmpty()) {
-        saveOrder();
+    if (__c5config.getValue(param_tax_print_if_amount_less).toDouble() > 0) {
+        if (__c5config.getValue(param_tax_print_if_amount_less).toDouble() > ui->leTotal->getDouble()) {
+            ui->btnFiscal->setChecked(true);
+        }
     }
+    if (ui->btnSetCard->isChecked()) {
+        ui->btnFiscal->setChecked(true);
+    }
+    C5Database db(fDBParams);
+    saveOrder();
+    C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Order saved"), "", "");
 
     if (ui->btnSetIdram->isChecked()) {
-        double amount;
-        QByteArray out;
-        if (!Idram::check(__c5config.getValue(param_idram_server),
-                          __c5config.getValue(param_idram_session_id),
-                          fOrderUuid, amount, out)) {
-            if (amount < 0) {
-                C5Message::error(tr("Idram payment was not received"));
-            } else {
-                C5Message::error(out);
-            }
-            return;
-        }
+//        double amount;
+//        QByteArray out;
+//        if (!Idram::check(__c5config.getValue(param_idram_server),
+//                          __c5config.getValue(param_idram_session_id),
+//                          fOrderUuid, amount, out)) {
+//            if (amount < 0) {
+//                C5Message::error(tr("Idram payment was not received"));
+//            } else {
+//                C5Message::error(out);
+//            }
+//            return;
+//        }
     }
 
     double cashAmount = 0, cardAmount = 0, idramAmount = 0, otherAmount = 0;
@@ -378,8 +465,14 @@ void Workspace::on_btnCheckout_clicked()
         otherAmount = ui->leTotal->getDouble();
     }
     if (ui->btnFiscal->isChecked() && !ui->btnSetOther->isChecked()) {
-        while (!printTax(cardAmount, idramAmount)) {
-            continue;
+        int result;
+        do {
+            result = printTax(cardAmount, idramAmount);
+        } while (result == 0);
+        if (result == 2) {
+            ui->tblDishes->setEnabled(true);
+            ui->wQty->setEnabled(true);
+            return;
         }
     }
 
@@ -394,30 +487,56 @@ void Workspace::on_btnCheckout_clicked()
     QString cashprefix = ui->btnSetCash->isChecked() ? __c5config.cashPrefix() : __c5config.nocashPrefix();
 
     C5StoreDraftWriter dw(db);
-    int counter = dw.counterAType(DOC_TYPE_CASH);
-    if (counter == 0) {
-        C5Message::error(dw.fErrorMsg);
-        return;
-    }
+    int counter;
     QString cashdoc;
+    QString cashUUID;
+
+    if (fFlagEdited == 0) {
+        counter = dw.counterAType(DOC_TYPE_CASH);
+        if (counter == 0) {
+            C5Message::error(dw.fErrorMsg);
+            return;
+        }
+    } else {
+        db[":f_oheader"] = fOrderUuid;
+        db.exec("select * from a_header_cash where f_oheader=:f_oheader");
+        if (db.nextRow()) {
+            cashdoc = db.getString("f_id");
+            db[":f_header"] = cashdoc;
+            db.exec("select f_id from e_cash where f_header=:f_header");
+            if (db.nextRow()) {
+                cashUUID = db.getString("f_id");
+            } else {
+                C5Message::error(tr("Application error. Cannot retrieve record of cash document."));
+                return;
+            }
+        } else {
+
+        }
+    }
+
     if (!dw.writeAHeader(cashdoc, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH,
                          fUser->id(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(),
                          0, ui->leTotal->getDouble(), cashprefix + " " + headerNum)) {
         C5Message::error(dw.fErrorMsg);
         return;
     }
-    if (!dw.writeAHeaderCash(cashdoc, cashid, 0, 1, "", fOrderUuid)) {
+    if (!dw.writeAHeaderCash(cashdoc, cashid, 0, 1, "", fOrderUuid, __c5config.getRegValue("session").toInt())) {
         C5Message::error(dw.fErrorMsg);
         return;
     }
-    QString cashUUID;
+
     if (!dw.writeECash(cashUUID, cashdoc, cashid, 1, cashprefix + " " + headerNum, ui->leTotal->getDouble(), cashUUID, 1)) {
         C5Message::error(dw.fErrorMsg);
         return;
     }
     fPreviouseUuid = fOrderUuid;
+    bool printsecond = __c5config.getValue(param_shop_print_v2) == "1";
+    if (cardAmount > 0.001 || idramAmount > 0.001) {
+        printsecond = true;
+    }
     if (__c5config.getValue(param_smart_dont_print_receipt).toInt() == 0) {
-        if (printReceipt(fOrderUuid, true)) {
+        if (printReceipt(fOrderUuid, printsecond)) {
 
         }
     }
@@ -438,7 +557,7 @@ void Workspace::on_btnCheckout_clicked()
 void Workspace::on_btnClearFilter_clicked()
 {
     fTypeFilter = 0;
-    filter();
+    filter("");
 }
 
 void Workspace::on_btnPartUp_clicked()
@@ -560,8 +679,12 @@ void Workspace::on_lstCombo_itemClicked(QListWidgetItem *item)
 
         int row = ui->tblOrder->rowCount();
         ui->tblOrder->setRowCount(row + 1);
-        OrderDish *od = new OrderDish(nd);
-        ui->tblOrder->setCellWidget(row, 0, od);
+        ui->tblOrder->setItem(row, 0, new QTableWidgetItem());
+        ui->tblOrder->setItem(row, 1, new QTableWidgetItem());
+        ui->tblOrder->setItem(row, 2, new QTableWidgetItem());
+        ui->tblOrder->setItem(row, 3, new QTableWidgetItem());
+        ui->tblOrder->item(row, 0)->setData(Qt::UserRole, qVariantFromValue(nd));
+        updateInfo(row);
 
 //        nd.packageName = item->data(Qt::DisplayRole).toString();
 //        row = ui->tblOrder->rowCount();
@@ -586,6 +709,9 @@ void Workspace::on_leReadCode_returnPressed()
     QString num("12345678901234567890");
     QString oldcode = ui->leReadCode->text();
     ui->leReadCode->clear();
+    if (oldcode == " " ) {
+
+    }
     QString newcode;
 
     for (int i = 0; i < oldcode.length(); i++) {
@@ -674,14 +800,6 @@ void Workspace::on_btnP05_clicked()
     setQty(0.5, 1);
 }
 
-void Workspace::on_tblOrder_cellClicked(int row, int column)
-{
-    ui->tblOrder->setCurrentCell(row, 0);
-    for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
-        static_cast<OrderDish*>(ui->tblOrder->cellWidget(i, column))->setSelected(row == i);
-    }
-}
-
 void Workspace::on_btnVoid_clicked()
 {
     removeDish();
@@ -701,91 +819,99 @@ void Workspace::on_btnSetCard_clicked()
     ui->btnSetCard->setChecked(true);
     ui->btnSetIdram->setChecked(false);
     ui->btnSetOther->setChecked(false);
+    ui->btnFiscal->setChecked(true);
 }
 
 void Workspace::on_btnSetIdram_clicked()
 {
-    if (ui->tblOrder->rowCount() == 0) {
-        on_btnSetCash_clicked();
-        C5Message::info(tr("Empty order"));
-        return;
-    }
-    if (fOrderUuid.isEmpty() && C5Message::question(tr("Order will saved, continue?")) != QDialog::Accepted) {
-        on_btnSetCash_clicked();
-        return;
-    }
-    if (fOrderUuid.isEmpty()) {
-        saveOrder();
-    }
     ui->btnSetCash->setChecked(false);
     ui->btnSetCard->setChecked(false);
     ui->btnSetIdram->setChecked(true);
     ui->btnSetOther->setChecked(false);
+    ui->btnFiscal->setChecked(true);
 
-    if (__c5config.getValue(param_idram_id).length() > 0 && !__c5config.localReceiptPrinter().isEmpty()) {
-        QFont font(qApp->font());
-        font.setPointSize(24);
-        C5Printing p;
-        p.setSceneParams(650, 2800, QPrinter::Portrait);
-        p.setFont(font);
-        p.setFontBold(true);
-        p.ctext(fOrderUuid);
-        p.br();
-        p.setFontBold(false);
-        p.line(3);
-        p.br(3);
-        p.br();
-        p.br();
-        p.ctext(tr("Amount to paid"));
-        p.br();
-        p.ctext(ui->leTotal->text());
-        p.br();
-        p.br();
-        p.ctext(QString::fromUtf8("Վճարեք Idram-ով"));
-        p.br();
 
-        int levelIndex = 1;
-        int versionIndex = 0;
-        bool bExtent = true;
-        int maskIndex = -1;
-        QString encodeString = QString("%1;%2;%3;%4|%5;%6;%7")
-                .arg(__c5config.getValue(param_idram_name))
-                .arg(__c5config.getValue(param_idram_id)) //IDram ID
-                .arg(str_float(ui->leTotal->text()))
-                .arg(fOrderUuid)
-                .arg(__c5config.getValue(param_idram_phone))
-                .arg(__c5config.getValue(param_idram_tips).toInt() == 1 ? "1" : "0")
-                .arg(__c5config.getValue(param_idram_tips).toInt() == 1 ? __c5config.getValue(param_idram_tips_wallet) : "");
+//    if (ui->tblOrder->rowCount() == 0) {
+//        on_btnSetCash_clicked();
+//        C5Message::info(tr("Empty order"));
+//        return;
+//    }
+//    if (fOrderUuid.isEmpty() && C5Message::question(tr("Order will saved, continue?")) != QDialog::Accepted) {
+//        on_btnSetCash_clicked();
+//        return;
+//    }
+//    if (fOrderUuid.isEmpty()) {
+//        saveOrder();
+//    }
+//    ui->btnSetCash->setChecked(false);
+//    ui->btnSetCard->setChecked(false);
+//    ui->btnSetIdram->setChecked(true);
+//    ui->btnSetOther->setChecked(false);
 
-        CQR_Encode qrEncode;
-        bool successfulEncoding = qrEncode.EncodeData( levelIndex, versionIndex, bExtent, maskIndex, encodeString.toUtf8().data() );
-        if (!successfulEncoding) {
-//            fLog.append("Cannot encode qr image");
-        }
-        int qrImageSize = qrEncode.m_nSymbleSize;
-        int encodeImageSize = qrImageSize + ( QR_MARGIN * 2 );
-        QImage encodeImage(encodeImageSize, encodeImageSize, QImage::Format_Mono);
-        encodeImage.fill(1);
+//    if (__c5config.getValue(param_idram_id).length() > 0 && !__c5config.localReceiptPrinter().isEmpty()) {
+//        QFont font(qApp->font());
+//        font.setPointSize(24);
+//        C5Printing p;
+//        p.setSceneParams(650, 2800, QPrinter::Portrait);
+//        p.setFont(font);
+//        p.setFontBold(true);
+//        p.ctext(fOrderUuid);
+//        p.br();
+//        p.setFontBold(false);
+//        p.line(3);
+//        p.br(3);
+//        p.br();
+//        p.br();
+//        p.ctext(tr("Amount to paid"));
+//        p.br();
+//        p.ctext(ui->leTotal->text());
+//        p.br();
+//        p.br();
+//        p.ctext(QString::fromUtf8("Վճարեք Idram-ով"));
+//        p.br();
 
-        for ( int i = 0; i < qrImageSize; i++ ) {
-            for ( int j = 0; j < qrImageSize; j++ ) {
-                if ( qrEncode.m_byModuleData[i][j] ) {
-                    encodeImage.setPixel(i + QR_MARGIN, j + QR_MARGIN, 0);
-                }
-            }
-        }
+//        int levelIndex = 1;
+//        int versionIndex = 0;
+//        bool bExtent = true;
+//        int maskIndex = -1;
+//        QString encodeString = QString("%1;%2;%3;%4|%5;%6;%7")
+//                .arg(__c5config.getValue(param_idram_name))
+//                .arg(__c5config.getValue(param_idram_id)) //IDram ID
+//                .arg(str_float(ui->leTotal->text()))
+//                .arg(fOrderUuid)
+//                .arg(__c5config.getValue(param_idram_phone))
+//                .arg(__c5config.getValue(param_idram_tips).toInt() == 1 ? "1" : "0")
+//                .arg(__c5config.getValue(param_idram_tips).toInt() == 1 ? __c5config.getValue(param_idram_tips_wallet) : "");
 
-        QPixmap pix = QPixmap::fromImage(encodeImage);
-        pix = pix.scaled(300, 300);
-        p.image(pix, Qt::AlignHCenter);
-        p.br();
-        /* End QRCode */
-        p.ltext(QString("%1 %2").arg(tr("Printed:")).arg(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR)), 0);
-        p.br();
-        p.ltext("_", 0);
-        p.br();
-        p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
-    }
+//        CQR_Encode qrEncode;
+//        bool successfulEncoding = qrEncode.EncodeData( levelIndex, versionIndex, bExtent, maskIndex, encodeString.toUtf8().data() );
+//        if (!successfulEncoding) {
+////            fLog.append("Cannot encode qr image");
+//        }
+//        int qrImageSize = qrEncode.m_nSymbleSize;
+//        int encodeImageSize = qrImageSize + ( QR_MARGIN * 2 );
+//        QImage encodeImage(encodeImageSize, encodeImageSize, QImage::Format_Mono);
+//        encodeImage.fill(1);
+
+//        for ( int i = 0; i < qrImageSize; i++ ) {
+//            for ( int j = 0; j < qrImageSize; j++ ) {
+//                if ( qrEncode.m_byModuleData[i][j] ) {
+//                    encodeImage.setPixel(i + QR_MARGIN, j + QR_MARGIN, 0);
+//                }
+//            }
+//        }
+
+//        QPixmap pix = QPixmap::fromImage(encodeImage);
+//        pix = pix.scaled(300, 300);
+//        p.image(pix, Qt::AlignHCenter);
+//        p.br();
+//        /* End QRCode */
+//        p.ltext(QString("%1 %2").arg(tr("Printed:")).arg(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR)), 0);
+//        p.br();
+//        p.ltext("_", 0);
+//        p.br();
+//        p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
+//    }
 }
 
 void Workspace::on_btnSetOther_clicked()
@@ -809,25 +935,37 @@ void Workspace::on_leReceived_textChanged(const QString &arg1)
     ui->leChange->setDouble(str_float(arg1) - ui->leTotal->getDouble());
 }
 
-void Workspace::saveOrder()
+bool Workspace::saveOrder()
 {
     QString prefix;
     QString hallid;
     C5Database db(fDBParams);
-    db[":f_id"] = C5Config::defaultHall();
-    db.exec("select f_counterhall from h_halls where f_id=:f_id");
-    if (db.nextRow()) {
-        int hid = db.getInt(0);
-        db[":f_id"] = hid;
-        db.exec("select f_counter + 1, f_prefix as f_counter from h_halls where f_id=:f_id for update");
+    if (fFlagEdited == 0) {
+        db[":f_id"] = C5Config::defaultHall();
+        db.exec("select f_counterhall from h_halls where f_id=:f_id");
         if (db.nextRow()) {
-            hallid = db.getString(0);
-            prefix = db.getString(1);
-            db[":f_counter"] = db.getInt(0);
-            db.update("h_halls", where_id(hid));
+            int hid = db.getInt(0);
+            db[":f_id"] = hid;
+            db.exec("select f_counter + 1, f_prefix as f_counter from h_halls where f_id=:f_id for update");
+            if (db.nextRow()) {
+                hallid = db.getString(0);
+                prefix = db.getString(1);
+                db[":f_counter"] = db.getInt(0);
+                db.update("h_halls", where_id(hid));
+            }
+        } else {
+            hallid = "[-]";
         }
     } else {
-        hallid = "[-]";
+        db[":f_id"] = fOrderUuid;
+        db.exec("select * from o_header where f_id=:f_id");
+        if (db.nextRow()) {
+            prefix = db.getString("f_prefix");
+            hallid = db.getString("f_hallid");
+        } else {
+            C5Message::error(tr("Unknown order id. Programm error. Contact to developer."));
+            return false;
+        }
     }
 
     QDate dateCash = QDate::currentDate();
@@ -862,30 +1000,24 @@ void Workspace::saveOrder()
                          0, 0, 1, 1, 1, fCustomer)) {
         C5Message::error(dw.fErrorMsg);
         db.rollback();
-        return;
+        return false;
     }
 
-    if (fCustomer > 0) {
-        dw.writeOHeaderFlags(fOrderUuid, 1, 0, 0, 0, 0);
-    }
+    //f_1 delivery
+    //f_2 edited
+    dw.writeOHeaderFlags(fOrderUuid, fCustomer == 0 ? 0 : 1, fFlagEdited, 0, 0, 0);
 
     for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
-            Dish &d = static_cast<OrderDish*>(ui->tblOrder->cellWidget(i, 0))->fDish;
+            Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
             int pid = 0;
-            QString bid;
-            double disc = 0;
-            switch (fDiscountMode) {
-            case CARD_TYPE_DISCOUNT:
-                disc = fDiscountValue;
-                break;
-            default:
-                break;
-            }
-            if (!dw.writeOBody(bid, fOrderUuid, DISH_STATE_OK, d.id, d.qty, d.qty, d.price, (d.qty*d.price) - (d.qty*d.price*disc), __c5config.serviceFactor().toDouble(), fDiscountValue, d.store, d.printer, "", "", 0, d.adgCode, 0, 0, pid)) {
+            double disc = discountValue();
+
+            if (!dw.writeOBody(d.obodyId, fOrderUuid, DISH_STATE_OK, d.id, d.qty, d.qty, d.price, (d.qty*d.price) - (d.qty*d.price*disc), __c5config.serviceFactor().toDouble(), fDiscountValue, d.store, d.printer, "", d.modificator, 0, d.adgCode, 0, 0, pid)) {
                 C5Message::error(dw.fErrorMsg);
                 db.rollback();
-                return;
+                return false;
             }
+            ui->tblOrder->item(i, 0)->setData(Qt::UserRole, qVariantFromValue(d));
 //            if (!dw.writeOBodyToOGoods(bid, id)) {
 //                C5Message::error(dw.fErrorMsg);
 //                db.rollback();
@@ -905,7 +1037,7 @@ void Workspace::saveOrder()
 
     QSet<QString> prn;
     for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
-        Dish &d = static_cast<OrderDish*>(ui->tblOrder->cellWidget(i, 0))->fDish;
+        Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
         if (d.printer.length() > 0) {
             prn.insert(d.printer);
         }
@@ -926,12 +1058,16 @@ void Workspace::saveOrder()
             p.ctext(QString("*%1*").arg(tr("Delivery")));
             p.br();
         }
+        if (fFlagEdited > 0) {
+            p.ctext(QString("*%1*").arg(tr("Edited")));
+            p.br();
+        }
         //p.setFontBold(false);
         p.line(3);
         p.br(3);
         p.br();
         for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
-            Dish &d = static_cast<OrderDish*>(ui->tblOrder->cellWidget(i, 0))->fDish;
+            Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
             if (d.printer == s) {
                 p.setFontSize(basesize);
                 p.setFontBold(true);
@@ -971,9 +1107,10 @@ void Workspace::saveOrder()
     }
     ui->tblDishes->setEnabled(false);
     ui->wQty->setEnabled(false);
+    return true;
 }
 
-bool Workspace::printTax(double cardAmount, double idramAmount)
+int Workspace::printTax(double cardAmount, double idramAmount)
 {
     C5Database db(fDBParams);
     db[":f_header"] = fOrderUuid;
@@ -985,7 +1122,7 @@ bool Workspace::printTax(double cardAmount, double idramAmount)
     QString useExtPos = C5Config::taxUseExtPos();
     if (idramAmount > 0.01) {
         cardAmount = idramAmount;
-        useExtPos = "true";
+        //useExtPos = "true";
     }
     PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), useExtPos, C5Config::taxCashier(), C5Config::taxPin(), this);
     while (db.nextRow()) {
@@ -1024,12 +1161,20 @@ bool Workspace::printTax(double cardAmount, double idramAmount)
         db[":f_fiscalmode"] = tr("(F)");
         db[":f_time"] = time;
         db.insert("o_tax", false);
-        return true;
+        return 1;
     }
-    if (C5Message::error(err, tr("Try again"), tr("Do not print")) == QDialog::Rejected) {
-        return true;
+    switch (C5Message::question(err, tr("Try again"), tr("Do not print"), tr("Return to editing"))) {
+    case QDialog::Rejected:
+        C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Fiscal fail, continue without fiscal"), "", "");
+        return 1;
+    case QDialog::Accepted:
+        C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Fiscal fail, try again"), "", "");
+        return 1;
+    case 2:
+        C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Return to edit"), "", "");
+        return 2;
     }
-    return false;
+    return 0;
 }
 
 bool Workspace::printReceipt(const QString &id, bool printSecond)
@@ -1077,7 +1222,7 @@ bool Workspace::printReceipt(const QString &id, bool printSecond)
         return false;
     }
     p.setFontBold(true);
-    p.ctext(tr("Receipt #") + QString("%1%2").arg(db.getString("f_prefix")).arg(db.getString("f_hallid")));
+    p.ctext(tr("Receipt #") + QString("%1%2").arg(db.getString("f_prefix"), db.getString("f_hallid")));
     p.br();
     //p.setFontBold(false);
     if (db.getString("f_receiptnumber").length() > 0) {
@@ -1127,7 +1272,7 @@ bool Workspace::printReceipt(const QString &id, bool printSecond)
     C5Database dd(fDBParams);
     dd[":f_header"] = id;
     dd[":f_state"] = DISH_STATE_OK;
-    dd.exec("select b.f_adgcode, b.f_dish, d.f_name, b.f_price, b.f_qty1, b.f_package "
+    dd.exec("select b.f_adgcode, b.f_dish, d.f_name, b.f_price, b.f_qty1, b.f_package, b.f_comment "
             "from o_body b "
             "left join d_dish d on d.f_id=b.f_dish "
             "where b.f_header=:f_header and b.f_state=:f_state "
@@ -1155,7 +1300,7 @@ bool Workspace::printReceipt(const QString &id, bool printSecond)
                 //p.setFontBold(false);
                 p.setFontSize(basefont);
             }
-            p.ltext(QString("*** %1 %2, %3 x%4").arg(tr("Class:")).arg(dd.getString("f_adgcode")).arg(dd.getString("f_name")).arg(float_str(dd.getDouble("f_qty1"), 2)), 0);
+            p.ltext(QString("*** %1 %2, %3 x%4").arg(tr("Class:"), dd.getString("f_adgcode"), dd.getString("f_name"), float_str(dd.getDouble("f_qty1"), 2)), 0);
             p.br();
         } else {
             if (package > 0) {
@@ -1167,7 +1312,13 @@ bool Workspace::printReceipt(const QString &id, bool printSecond)
             if (dd.getString(0).isEmpty()) {
                 p.ltext(QString("%3").arg(dd.getString("f_name")), 0);
             } else {
-                p.ltext(QString("%1 %2, %3").arg(tr("Class:")).arg(dd.getString("f_adgcode")).arg(dd.getString("f_name")), 0);
+                p.ltext(QString("%2, %3").arg(dd.getString("f_adgcode"), dd.getString("f_name")), 0);
+            }
+            if (__c5config.getValue(param_print_modificators_on_receipt).toInt() == 1) {
+                if (!dd.getString("f_comment").isEmpty()) {
+                    p.br();
+                    p.ltext(dd.getString("f_comment"), 0);
+                }
             }
             p.br();
             p.ltext(QString("%1 x %2 = %3").arg(float_str(dd.getDouble("f_qty1"), 2)).arg(dd.getDouble("f_price"), 2).arg(float_str(dd.getDouble("f_qty1") * dd.getDouble("f_price"), 2)), 0);
@@ -1225,7 +1376,7 @@ bool Workspace::printReceipt(const QString &id, bool printSecond)
     p.ltext(tr("Printed"), 0);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
     p.br();
-    p.ltext(QString("%1: %2").arg(tr("Sample")).arg(db.getInt("f_print")), 0);
+    p.ltext(QString("%1: %2").arg(tr("Sample")).arg(db.getInt("f_print") + 1), 0);
     p.br();
     p.br();
     p.br();
@@ -1239,7 +1390,7 @@ bool Workspace::printReceipt(const QString &id, bool printSecond)
     db[":f_print"] = db.getInt("f_print") + 1;
     db.update("o_header", "f_id", id);
 
-    if (printSecond && __c5config.getValue(param_shop_print_v2) == "1") {
+    if (printSecond) {
         printReceipt(id, false);
     }
     return true;
@@ -1247,8 +1398,11 @@ bool Workspace::printReceipt(const QString &id, bool printSecond)
 
 void Workspace::on_btnAppMenu_clicked()
 {
-    MenuDialog m;
+    MenuDialog m(fUser);
     m.exec();
+    if (fUser->property("session_close").toBool()) {
+        qApp->quit();
+    }
 }
 
 void Workspace::on_btnP05_2_clicked()
@@ -1286,6 +1440,18 @@ void Workspace::on_btnReprintLastCheck_clicked()
 
 void Workspace::on_leReadCode_textChanged(const QString &arg1)
 {
+    if (arg1 == " ") {
+        ui->leReadCode->clear();
+        if (ui->tblOrder->rowCount() == 0) {
+            return;
+        }
+        double v = ui->leTotal->getDouble();
+        if (Change::getReceived(v)) {
+            ui->leReceived->setDouble(v);
+            ui->btnCheckout->click();
+        }
+        return;
+    }
     if (arg1 == "+") {
         ui->leReadCode->clear();
         setQty(1, 2);
@@ -1294,20 +1460,33 @@ void Workspace::on_leReadCode_textChanged(const QString &arg1)
     if (arg1 == "-") {
         ui->leReadCode->clear();
         setQty(1, 3);
+        return;
+    }
+    if (!arg1.isEmpty()) {
+        if (arg1.at(0) == "." || arg1.at(0) == "․" || arg1.at(0) == ".") {
+            if (arg1.length() > 2) {
+                fTypeFilter = 0;
+                filter(QString(arg1).remove(0, 1));
+            }
+        }
     }
 }
 
 void Workspace::addDishToOrder(Dish *d)
 {
+    if (!fOrderUuid.isEmpty()) {
+        C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("New dish"), d->name, "");
+    }
     int row = 0;
     bool isnew = true;
     if (__c5config.getValue(param_zip_dish_in_order).toInt() == 1) {
         for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
-            OrderDish *od = static_cast<OrderDish*>(ui->tblOrder->cellWidget(i, 0));
-            if (d->id == od->fDish.id) {
+            Dish dd = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
+            if (d->id == dd.id) {
                 row = i;
-                od->fDish.qty++;
-                od->updateInfo();
+                dd.qty++;
+                ui->tblOrder->item(i, 0)->setData(Qt::UserRole, qVariantFromValue(dd));
+                updateInfo(row);
                 isnew = false;
                 break;
             }
@@ -1316,11 +1495,26 @@ void Workspace::addDishToOrder(Dish *d)
     if (isnew) {
         row = ui->tblOrder->rowCount();
         ui->tblOrder->setRowCount(row + 1);
-        OrderDish *od = new OrderDish(*d);
-        ui->tblOrder->setCellWidget(row, 0, od);
+        ui->tblOrder->setItem(row, 0, new QTableWidgetItem(""));
+        ui->tblOrder->setItem(row, 1, new QTableWidgetItem(""));
+        ui->tblOrder->setItem(row, 2, new QTableWidgetItem(""));
+        ui->tblOrder->setItem(row, 3, new QTableWidgetItem(""));
+        ui->tblOrder->item(row, 0)->setData(Qt::UserRole, qVariantFromValue(*d));
+        updateInfo(row);
     }
-    on_tblOrder_cellClicked(row, 0);
+    ui->tblOrder->setCurrentCell(row, 0);
     countTotal();
+}
+
+double Workspace::discountValue()
+{
+    switch (fDiscountMode) {
+    case CARD_TYPE_DISCOUNT:
+        return fDiscountValue;
+    default:
+        break;
+    }
+    return 0;
 }
 
 void Workspace::on_btnComment_clicked()
@@ -1329,12 +1523,75 @@ void Workspace::on_btnComment_clicked()
     if (row < 0) {
         return;
     }
-    OrderDish *od = static_cast<OrderDish*>(ui->tblOrder->cellWidget(row, 0));
-    Dish &d = od->fDish;
+    Dish d = ui->tblOrder->item(row, 0)->data(Qt::UserRole).value<Dish>();
     QString comment;
     if (DlgListOfDishComments::getComment(d.name, comment)) {
         d.modificator = comment;
-        od->updateInfo();
+        ui->tblOrder->item(row, 0)->setData(Qt::UserRole, qVariantFromValue(d));
+        updateInfo(row);
     }
 }
 
+void Workspace::on_btnMPlus_clicked()
+{
+    if (ui->tblOrder->rowCount() == 0) {
+        return;
+    }
+    C5Database db(fDBParams);
+    db.exec("select coalesce(max(f_window), 0)+1 from a_sale_temp");
+    db.nextRow();
+    int window = db.getInt(0);
+    for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
+        Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
+        db[":f_saletype"] = 0;
+        db[":f_row"] = i;
+        db[":f_window"] = window;
+        db[":f_goodsid"] = d.id;
+        db[":f_name"] = d.name;
+        db[":f_qty"] = d.qty;
+        db[":f_price"] = d.price;
+        db[":f_comment"] = d.modificator;
+        db[":f_printer"] = d.printer;
+        db[":f_store"] = d.store;
+        db[":f_customer"] = fCustomer;
+        db.insert("a_sale_temp", false);
+    }
+    resetOrder();
+}
+
+void Workspace::on_btnMRead_clicked()
+{
+    int window = DlgMemoryRead::getWindow();
+    if (window == 0) {
+        return;
+    }
+    C5Database db(fDBParams);
+    db[":f_window"] = window;
+    db.exec("select * from a_sale_temp where f_window=:f_window order by f_row");
+    while (db.nextRow()) {
+        Dish d;
+        d.id = db.getInt("f_goodsid");
+        d.name = db.getString("f_name");
+        d.qty = db.getDouble("f_qty");
+        d.price = db.getDouble("f_price");
+        d.modificator = db.getString("f_comment");
+        d.printer = db.getString("f_printer");
+        d.store = db.getInt("f_store");
+        fCustomer = db.getInt("f_customer");
+        addDishToOrder(&d);
+    }
+    db.deleteFromTable("a_sale_temp", "f_window", window);
+    if (fCustomer > 0) {
+        db[":f_id"] = fCustomer;
+        db.exec("select * from c_partners where f_id=:f_id");
+        if (db.nextRow()) {
+            ui->lbCostumerPhone->setText(QString("%1\r\n%2\r\n%3").arg(db.getString("f_phone"), db.getString("f_contact"), db.getString("f_address")));
+            ui->lbCostumerPhone->setVisible(true);
+        }
+    }
+}
+
+void Workspace::on_btnHistoryOrder_clicked()
+{
+    DlgMemoryRead::sessionHistory();
+}

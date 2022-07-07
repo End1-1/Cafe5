@@ -9,7 +9,7 @@
 #include "c5mainwindow.h"
 #include "proxytablewidgetdatabase.h"
 #include "doubledatabase.h"
-#include "c5logtoserverthread.h"
+#include "c5airlog.h"
 #include "dlgsetwaiterordercl.h"
 #include <QMenu>
 #include <QClipboard>
@@ -245,8 +245,8 @@ void C5WaiterOrder::removeOrder()
     db.exec("update o_header set f_state=:f_state where f_id=:f_id");
     C5WaiterOrderDoc::removeDocument(db, ui->leUuid->text());
     db.commit();
+    C5Airlog::write(hostinfo, __user->fullName(), LOG_WAITER, "", ui->leUuid->text(), "", tr("Order removed from cash"), ui->leTax->text(), "");
     __mainWindow->removeTab(this);
-    C5LogToServerThread::remember(LOG_WAITER, __user->fullName(), "", ui->leUuid->text(), "", "Order removed from cash", ui->leTax->text(), "");
     C5Message::info(tr("Removed"));
 }
 
@@ -351,7 +351,7 @@ void C5WaiterOrder::on_btnClearTax_clicked()
             db[":" + db.columnName(i)] = QVariant();
         }
         db.update("o_tax", "f_id", ui->leUuid->text());
-        C5LogToServerThread::remember(LOG_WAITER, __user->fullName(), "", ui->leUuid->text(), "", "Clear tax info", ui->leTax->text(), "");
+        C5Airlog::write(hostinfo, __user->fullName(), LOG_WAITER, "", ui->leUuid->text(), "", "Clear tax info", ui->leTax->text(), "");
         ui->leTax->clear();
     }
 }
@@ -372,7 +372,7 @@ void C5WaiterOrder::on_btnOpenTable_clicked()
     db[":f_id"] = ui->leUuid->text();
     db[":f_state"] = ORDER_STATE_OPEN;
     db.exec("update o_header set f_state=:f_state where f_id=:f_id");
-    C5LogToServerThread::remember(LOG_WAITER, __user->fullName(), "", ui->leUuid->text(), "", "Open order from cash", "", "");
+    C5Airlog::write(hostinfo, __user->fullName(), LOG_WAITER, "", ui->leUuid->text(), "", "Open order from cash", "", "");
 }
 
 void C5WaiterOrder::on_btnSetCL_clicked()

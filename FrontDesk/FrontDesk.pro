@@ -38,6 +38,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Cafe5/c5double.cpp \
     ../Cafe5/c5replication.cpp \
     ../Cafe5/c5systempreference.cpp \
+    ../Classes/c5airlog.cpp \
     ../Classes/c5crypt.cpp \
     ../Classes/c5document.cpp \
     ../Classes/c5filelogwriter.cpp \
@@ -125,6 +126,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Reports/cr5dishpackage.cpp \
     ../Reports/cr5draftoutputbyrecipe.cpp \
     ../Reports/cr5draftoutputbyrecipefilter.cpp \
+    ../Reports/cr5generalreportonlydate.cpp \
     ../Reports/cr5goodsclasses.cpp \
     ../Reports/cr5goodsfilter.cpp \
     ../Reports/cr5goodsimages.cpp \
@@ -307,6 +309,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Cafe5/c5replication.h \
     ../Cafe5/c5systempreference.h \
     ../Classes/barcode5.h \
+    ../Classes/c5airlog.h \
     ../Classes/c5broadcasting.h \
     ../Classes/c5crypt.h \
     ../Classes/c5document.h \
@@ -397,6 +400,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Reports/cr5dishpackage.h \
     ../Reports/cr5draftoutputbyrecipe.h \
     ../Reports/cr5draftoutputbyrecipefilter.h \
+    ../Reports/cr5generalreportonlydate.h \
     ../Reports/cr5goodsclasses.h \
     ../Reports/cr5goodsfilter.h \
     ../Reports/cr5goodsimages.h \

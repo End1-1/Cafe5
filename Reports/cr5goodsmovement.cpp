@@ -4,6 +4,7 @@
 #include "c5storedoc.h"
 #include "c5changedocinputprice.h"
 #include "c5tablemodel.h"
+#include "c5dlgselectreporttemplate.h"
 
 CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
@@ -25,7 +26,8 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
                     << "left join c_goods_classes gcb on gca.f_id=g.f_group2 [gcb]"
                     << "left join c_goods_classes gcc on gca.f_id=g.f_group3 [gcc]"
                     << "left join c_goods_classes gcd on gca.f_id=g.f_group4 [gcd]"
-                    << "left join a_header_store ai on ai.f_id=a.f_id [ai]";
+                    << "left join a_header_store ai on ai.f_id=a.f_id [ai]"
+                    << "left join c_partners p on p.f_id=a.f_partner [p]"
                        ;
 
     fColumnsFields << "s.f_document"
@@ -34,6 +36,7 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
                    << "a.f_date"
                    << "ass.f_name as f_statename"
                    << "a.f_userid"
+                   << "p.f_taxname"
                    << "ss.f_name as f_store"
                    << "st.f_name as f_type"
                    << "gg.f_name as f_group"
@@ -63,6 +66,7 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
                   << "a.f_date"
                   << "ass.f_name as f_statename"
                   << "a.f_userid"
+                  << "p.f_taxname"
                   << "st.f_name as f_type"
                   << "ss.f_name as f_store"
                   << "gg.f_name as f_group"
@@ -102,6 +106,7 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
     fTranslation["f_class2"] = tr("Class 2");
     fTranslation["f_class3"] = tr("Class 3");
     fTranslation["f_class4"] = tr("Class 4");
+    fTranslation["f_taxname"] = tr("Partner");
     fTranslation["f_storecomment"] = tr("Record comment");
     fTranslation["f_doccomment"] = tr("Document comment");
     fTranslation["f_saleprice"] = tr("Retail price");
@@ -130,6 +135,7 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
     fColumnsVisible["sum(s.f_qty) as f_qty"] = true;
     fColumnsVisible["u.f_name as f_unit"] = true;
     fColumnsVisible["s.f_price"] = true;
+    fColumnsVisible["p.f_taxname"] = false;
     fColumnsVisible["sum(s.f_total) as f_total"] = true;
     fColumnsVisible["gca.f_name as f_class1"] = false;
     fColumnsVisible["gcb.f_name as f_class2"] = false;
@@ -144,7 +150,7 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
 
     restoreColumnsVisibility();
     fFilterWidget = new CR5GoodsMovementFilter(fDBParams);
-    fGoodsFilter = static_cast<CR5GoodsMovementFilter*>(fFilterWidget);
+    fFilter = static_cast<CR5GoodsMovementFilter*>(fFilterWidget);
 }
 
 QToolBar *CR5GoodsMovement::toolBar()
@@ -157,39 +163,42 @@ QToolBar *CR5GoodsMovement::toolBar()
             << ToolBarButtons::tbExcel
             << ToolBarButtons::tbPrint;
         fToolBar = createStandartToolbar(btn);
-        fToolBar->addAction(QIcon(":/pricing.png"), tr("Change price"), this, SLOT(changePrice()));
+        auto *a = fToolBar->addAction(QIcon(":/pricing.png"), tr("Change price"), this, SLOT(changePrice()));
+        a = new QAction(QIcon(":/template.png"), tr("Templates"), this);
+        connect(a, SIGNAL(triggered()), this, SLOT(templates()));
+        fToolBar->insertAction(fToolBar->actions().at(3), a);
     }
     return fToolBar;
 }
 
 void CR5GoodsMovement::setDate(const QDate &d1, const QDate &d2)
 {
-    fGoodsFilter->setDate(d1, d2);
+    fFilter->setDate(d1, d2);
 }
 
 void CR5GoodsMovement::setDocType(const QString &docType)
 {
-    fGoodsFilter->setDocType(docType);
+    fFilter->setDocType(docType);
 }
 
 void CR5GoodsMovement::setStore(const QString &store)
 {
-    fGoodsFilter->setStore(store);
+    fFilter->setStore(store);
 }
 
 void CR5GoodsMovement::setGoods(const QString &goods)
 {
-    fGoodsFilter->setGoods(goods);
+    fFilter->setGoods(goods);
 }
 
 void CR5GoodsMovement::setReason(const QString &reason)
 {
-    fGoodsFilter->setReason(reason);
+    fFilter->setReason(reason);
 }
 
 void CR5GoodsMovement::setInOut(int inout)
 {
-    fGoodsFilter->setInOut(inout);
+    fFilter->setInOut(inout);
 }
 
 bool CR5GoodsMovement::tblDoubleClicked(int row, int column, const QList<QVariant> &values)
@@ -229,6 +238,24 @@ void CR5GoodsMovement::changePrice()
         return;
     }
     C5ChangeDocInputPrice::changePrice(fDBParams, fModel->data(rows.toList().at(0), fModel->indexForColumnName("f_storerec"), Qt::EditRole).toString());
+}
+
+void CR5GoodsMovement::templates()
+{
+    C5DlgSelectReportTemplate d(2, fDBParams);
+    if (d.exec() == QDialog::Accepted) {
+        QString sql = d.fSelectedTemplate.sql;
+        sql.replace("%date1", fFilter->date1s());
+        sql.replace("%date2", fFilter->date2s());
+        if (sql.contains("%partner")) {
+            if (fFilter->partners().isEmpty()) {
+                sql.replace("%partner", "");
+            } else {
+                sql.replace("%partner", QString("and a.f_partner in(%1)").arg(fFilter->partners()));
+            }
+        }
+        executeSql(sql);
+    }
 }
 
 void CR5GoodsMovement::restoreColumnsWidths()

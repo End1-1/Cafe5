@@ -14,46 +14,7 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="9" column="1">
-    <widget class="C5LineEditWithSelector" name="leGroup">
-     <property name="minimumSize">
-      <size>
-       <width>100</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="FilterName" stdset="0">
-      <string>matgroup</string>
-     </property>
-    </widget>
-   </item>
-   <item row="10" column="3">
-    <widget class="C5LineEdit" name="leGoodsName">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_6">
-     <property name="text">
-      <string>Document type</string>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="3">
+   <item row="8" column="3">
     <widget class="C5LineEdit" name="leStoreNameIn">
      <property name="enabled">
       <bool>true</bool>
@@ -66,24 +27,20 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="3">
-    <widget class="QToolButton" name="toolButton">
+   <item row="9" column="3">
+    <widget class="C5LineEdit" name="leStoreNameOut">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
      <property name="focusPolicy">
       <enum>Qt::NoFocus</enum>
      </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="icon">
-      <iconset resource="../resources/res.qrc">
-       <normaloff>:/pushpin.png</normaloff>:/pushpin.png</iconset>
-     </property>
-     <property name="FixDate" stdset="0">
+     <property name="readOnly">
       <bool>true</bool>
      </property>
     </widget>
    </item>
-   <item row="7" column="1">
+   <item row="8" column="1">
     <widget class="C5LineEditWithSelector" name="leStoreIn">
      <property name="minimumSize">
       <size>
@@ -102,146 +59,23 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label_2">
+   <item row="13" column="1">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>389</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="10" column="0">
+    <widget class="QLabel" name="label_7">
      <property name="text">
-      <string>End date</string>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="1">
-    <widget class="C5LineEditWithSelector" name="leStoreOut">
-     <property name="minimumSize">
-      <size>
-       <width>100</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="FilterName" stdset="0">
-      <string>storeout</string>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="0">
-    <widget class="QLabel" name="label_10">
-     <property name="text">
-      <string>Store, input</string>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="0">
-    <widget class="QLabel" name="label_11">
-     <property name="text">
-      <string>Store. output</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Start date</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="0">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>In/Out</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="1">
-    <widget class="C5LineEditWithSelector" name="leInOut">
-     <property name="minimumSize">
-      <size>
-       <width>100</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="FilterName" stdset="0">
-      <string>inout</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1">
-    <widget class="C5LineEditWithSelector" name="leDocState">
-     <property name="minimumSize">
-      <size>
-       <width>100</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="FilterName" stdset="0">
-      <string>docstate</string>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="1">
-    <widget class="C5LineEditWithSelector" name="leStore">
-     <property name="minimumSize">
-      <size>
-       <width>100</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="FilterName" stdset="0">
-      <string>store</string>
-     </property>
-    </widget>
-   </item>
-   <item row="10" column="1">
-    <widget class="C5LineEditWithSelector" name="leGoods">
-     <property name="minimumSize">
-      <size>
-       <width>100</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="FilterName" stdset="0">
-      <string>material</string>
-     </property>
-    </widget>
-   </item>
-   <item row="9" column="3">
-    <widget class="C5LineEdit" name="leGroupName">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
+      <string>Group of material</string>
      </property>
     </widget>
    </item>
@@ -264,33 +98,6 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="3">
-    <widget class="C5LineEdit" name="leInOutName">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="label_9">
-     <property name="text">
-      <string>Document state</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0">
-    <widget class="QLabel" name="label_8">
-     <property name="text">
-      <string>Reason</string>
-     </property>
-    </widget>
-   </item>
    <item row="2" column="1">
     <widget class="C5LineEditWithSelector" name="leDocType">
      <property name="minimumSize">
@@ -310,27 +117,100 @@
      </property>
     </widget>
    </item>
-   <item row="12" column="1">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>389</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="9" column="0">
-    <widget class="QLabel" name="label_7">
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>Group of material</string>
+      <string>End date</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="1">
+   <item row="3" column="1">
+    <widget class="C5LineEditWithSelector" name="leDocState">
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>docstate</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_6">
+     <property name="text">
+      <string>Document type</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="0">
+    <widget class="QLabel" name="label_10">
+     <property name="text">
+      <string>Store, input</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="3">
+    <widget class="C5LineEdit" name="leDocTypeName">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="0">
+    <widget class="QLabel" name="label_12">
+     <property name="text">
+      <string>Account</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="0">
+    <widget class="QLabel" name="label_11">
+     <property name="text">
+      <string>Store. output</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_8">
+     <property name="text">
+      <string>Reason</string>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="1">
+    <widget class="C5LineEditWithSelector" name="leAccount">
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>account</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
     <widget class="C5LineEditWithSelector" name="leReason">
      <property name="minimumSize">
       <size>
@@ -349,15 +229,200 @@
      </property>
     </widget>
    </item>
-   <item row="10" column="0">
+   <item row="11" column="1">
+    <widget class="C5LineEditWithSelector" name="leGoods">
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>material</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="1">
+    <widget class="C5LineEditWithSelector" name="leStoreOut">
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>storeout</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1">
+    <widget class="C5LineEditWithSelector" name="leStore">
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>store</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1">
+    <widget class="C5LineEditWithSelector" name="leInOut">
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>inout</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>In/Out</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Start date</string>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="0">
     <widget class="QLabel" name="label_5">
      <property name="text">
       <string>Material</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="3">
-    <widget class="C5LineEdit" name="leDocTypeName">
+   <item row="0" column="3">
+    <widget class="QToolButton" name="toolButton">
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources/res.qrc">
+       <normaloff>:/pushpin.png</normaloff>:/pushpin.png</iconset>
+     </property>
+     <property name="FixDate" stdset="0">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="3">
+    <widget class="C5LineEdit" name="leDocStateName">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="3">
+    <widget class="C5LineEdit" name="leStoreName">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="3">
+    <widget class="C5LineEdit" name="leReasonName">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="3">
+    <widget class="C5LineEdit" name="leGoodsName">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="1">
+    <widget class="C5LineEditWithSelector" name="leGroup">
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>matgroup</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Store</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="3">
+    <widget class="C5LineEdit" name="leInOutName">
      <property name="enabled">
       <bool>true</bool>
      </property>
@@ -388,28 +453,15 @@
      </property>
     </widget>
    </item>
-   <item row="6" column="3">
-    <widget class="C5LineEdit" name="leStoreName">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="0">
-    <widget class="QLabel" name="label_4">
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_9">
      <property name="text">
-      <string>Store</string>
+      <string>Document state</string>
      </property>
     </widget>
    </item>
-   <item row="8" column="3">
-    <widget class="C5LineEdit" name="leStoreNameOut">
+   <item row="10" column="3">
+    <widget class="C5LineEdit" name="leGroupName">
      <property name="enabled">
       <bool>true</bool>
      </property>
@@ -421,41 +473,15 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="3">
-    <widget class="C5LineEdit" name="leDocStateName">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="3">
-    <widget class="C5LineEdit" name="leReasonName">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="11" column="0">
-    <widget class="QLabel" name="label_12">
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_13">
      <property name="text">
-      <string>Account</string>
+      <string>Supplier</string>
      </property>
     </widget>
    </item>
-   <item row="11" column="1">
-    <widget class="C5LineEditWithSelector" name="leAccount">
+   <item row="4" column="1">
+    <widget class="C5LineEditWithSelector" name="leSupplier">
      <property name="minimumSize">
       <size>
        <width>100</width>
@@ -469,7 +495,20 @@
       </size>
      </property>
      <property name="FilterName" stdset="0">
-      <string>material</string>
+      <string>wsupplier</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="3">
+    <widget class="C5LineEdit" name="leSupplierName">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -477,9 +516,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5DateEdit</class>
+   <class>C5LineEdit</class>
    <extends>QLineEdit</extends>
-   <header location="global">c5dateedit.h</header>
+   <header location="global">c5lineedit.h</header>
   </customwidget>
   <customwidget>
    <class>C5LineEditWithSelector</class>
@@ -487,9 +526,9 @@
    <header location="global">c5lineeditwithselector.h</header>
   </customwidget>
   <customwidget>
-   <class>C5LineEdit</class>
+   <class>C5DateEdit</class>
    <extends>QLineEdit</extends>
-   <header location="global">c5lineedit.h</header>
+   <header location="global">c5dateedit.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
@@ -497,6 +536,7 @@
   <tabstop>deEnd</tabstop>
   <tabstop>leDocType</tabstop>
   <tabstop>leDocState</tabstop>
+  <tabstop>leSupplier</tabstop>
   <tabstop>leReason</tabstop>
   <tabstop>leInOut</tabstop>
   <tabstop>leStore</tabstop>
@@ -504,6 +544,7 @@
   <tabstop>leStoreOut</tabstop>
   <tabstop>leGroup</tabstop>
   <tabstop>leGoods</tabstop>
+  <tabstop>leAccount</tabstop>
  </tabstops>
  <resources>
   <include location="../resources/res.qrc"/>

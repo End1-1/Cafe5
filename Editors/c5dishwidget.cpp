@@ -484,9 +484,9 @@ void C5DishWidget::on_btnPrintRecipe_clicked()
         vals.clear();
         vals << ui->tblRecipe->getString(i, 2);
         vals << ui->tblRecipe->lineEdit(i, 3)->text();
-        vals << ui->tblRecipe->getString(i, 4);
-        vals << ui->tblRecipe->lineEdit(i, 5)->text();
-        vals << ui->tblRecipe->lineEdit(i, 6)->text();
+        vals << ui->tblRecipe->getString(i, 6);
+        vals << ui->tblRecipe->lineEdit(i, 7)->text();
+        vals << ui->tblRecipe->lineEdit(i, 8)->text();
         p.tableText(points, vals, 60);
         p.br(60);
     }

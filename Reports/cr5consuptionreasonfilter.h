@@ -18,6 +18,8 @@ public:
 
     virtual QString condition() override;
 
+    virtual QString filterText() override;
+
     void setDateFilter(const QDate &d1, const QDate &d2);
 
     void setStoreFilter(int store);

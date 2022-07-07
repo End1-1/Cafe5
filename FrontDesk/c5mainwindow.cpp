@@ -37,6 +37,7 @@
 #include "cr5debtstopartner.h"
 #include "cr5dishpart1.h"
 #include "c5toolbarwidget.h"
+#include "cr5generalreportonlydate.h"
 #include "cr5mfactions.h"
 #include "cr5mfdaily.h"
 #include "cr5preorders.h"
@@ -832,6 +833,9 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
     case cp_t10_general_report:
         createTab<CR5MFGeneralReport>(dbParams);
         break;
+    case cp_t10_general_report_only_date:
+        createTab<CR5GeneralReportOnlyDate>(dbParams);
+        break;
     default:
         break;
     }
@@ -1017,6 +1021,7 @@ void C5MainWindow::setDB(const QString &dbname)
         addTreeL3Item(l, cp_t10_action_list, tr("Action list"), ":/manufacturing.png");
         addTreeL3Item(l, cp_t10_daily, tr("Daily processes"), ":/manufacturing.png");
         addTreeL3Item(l, cp_t10_general_report, tr("General report"), ":/manufacturing.png");
+        addTreeL3Item(l, cp_t10_general_report_only_date, tr("General report only date"), ":/manufacturing.png");
     }
 
     if (addMainLevel(db.at(1), cp_t7_other, tr("Other"), ":/other.png", l)) {

@@ -18,6 +18,8 @@ public:
 
     virtual QString condition();
 
+    virtual QString filterText() override;
+
     int store();
 
     bool salesCounted();

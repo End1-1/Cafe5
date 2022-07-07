@@ -14,7 +14,7 @@ class MenuDish : public QWidget
     Q_OBJECT
 
 public:
-    explicit MenuDish(Dish *d);
+    explicit MenuDish(Dish *d, bool groupVisible);
     ~MenuDish();
     Dish *fDish;
 

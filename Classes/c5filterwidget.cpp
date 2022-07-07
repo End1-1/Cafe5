@@ -174,6 +174,18 @@ QString C5FilterWidget::in(QString &cond, const QString &field, C5LineEditWithSe
     return cond;
 }
 
+QString C5FilterWidget::inFilterText(QString &text, C5LineEdit *l)
+{
+    if (l->text().isEmpty()) {
+        return text;
+    }
+    if (!text.isEmpty()) {
+        text += ", ";
+    }
+    text += l->text();
+    return text;
+}
+
 QWidget *C5FilterWidget::getWidget(const QString &key, QWidget *parent)
 {
     QObjectList ol = parent->children();

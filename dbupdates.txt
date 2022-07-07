@@ -808,6 +808,15 @@ create table s_report_template_access (f_id integer primary key auto_increment, 
 create table a_calc_price (f_id char(36) primary key, f_document char(36), f_price2 decimal(14,2), f_margin decimal(14,2), f_final_price decimal(14,2));
 CREATE TABLE server5.plugins_options (fid INTEGER PRIMARY KEY AUTO_INCREMENT, fplugin TINYTEXT, fkey TINYTEXT, fvalue TINYTEXT);
 
-/*  db - 74, 12.06.2022 */
+/*  db - 75, 12.06.2022 */
 update s_app set f_version='75' where f_app='DB';
 alter table d_dish add column f_samestore TINYINT, ADD column f_barcode tinytext;
+alter table s_salary_inout add column f_comp tinytext;
+alter table a_header_cash add column f_session int;
+
+/*  db - 76, 29.06.2022 */
+update s_app set f_version='76' where f_app='DB';
+alter table a_sale_temp add column f_comment tinytext;
+alter table a_sale_temp add column f_printer tinytext;
+alter table a_sale_temp add column f_store int;
+alter table a_sale_temp add column f_customer int;

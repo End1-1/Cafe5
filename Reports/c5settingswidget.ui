@@ -26,34 +26,68 @@
       <enum>Qt::NoFocus</enum>
      </property>
      <property name="currentIndex">
-      <number>6</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
        <string>Main</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_3">
-       <item row="2" column="1">
-        <widget class="C5LineEditWithSelector" name="lineEdit_3">
-         <property name="Field" stdset="0">
-          <string>f_description</string>
-         </property>
-        </widget>
-       </item>
-       <item row="9" column="1">
-        <widget class="C5LineEdit" name="leRDBUser">
+       <item row="8" column="1">
+        <widget class="C5LineEdit" name="leRDBSchema">
          <property name="Tag" stdset="0">
-          <number>45</number>
+          <number>44</number>
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
-        <widget class="C5LineEditWithSelector" name="leCode">
-         <property name="Field" stdset="0">
-          <string>f_id</string>
+       <item row="10" column="0">
+        <widget class="QLabel" name="label_48">
+         <property name="text">
+          <string>Root DB password</string>
          </property>
-         <property name="Primary" stdset="0">
-          <bool>true</bool>
+        </widget>
+       </item>
+       <item row="6" column="1">
+        <widget class="C5CheckBox" name="chRDB">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>42</number>
+         </property>
+        </widget>
+       </item>
+       <item row="13" column="1">
+        <spacer name="verticalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>280</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="11" column="0">
+        <widget class="QLabel" name="label_79">
+         <property name="text">
+          <string>Debug mode</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="1">
+        <widget class="C5LineEdit" name="leRDBHost">
+         <property name="Tag" stdset="0">
+          <number>43</number>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_35">
+         <property name="text">
+          <string>Frontdesk mode</string>
          </property>
         </widget>
        </item>
@@ -64,10 +98,100 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="0">
-        <widget class="QLabel" name="label_44">
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_16">
          <property name="text">
-          <string>Transfer to root DB</string>
+          <string>Description</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QFontComboBox" name="fnApp">
+         <property name="Tag" stdset="0">
+          <number>97</number>
+         </property>
+        </widget>
+       </item>
+       <item row="11" column="1">
+        <widget class="C5CheckBox" name="chDebugMode">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>83</number>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_15">
+         <property name="text">
+          <string>Name</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="C5LineEditWithSelector" name="lineEdit_3">
+         <property name="Field" stdset="0">
+          <string>f_description</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0">
+        <widget class="QLabel" name="label_45">
+         <property name="text">
+          <string>Root DB host</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_32">
+         <property name="text">
+          <string>Applicatin font base size</string>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="1">
+        <widget class="C5LineEdit" name="leRDBUser">
+         <property name="Tag" stdset="0">
+          <number>45</number>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="0">
+        <widget class="QLabel" name="label_46">
+         <property name="text">
+          <string>Root DB schema</string>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="0">
+        <widget class="QLabel" name="label_47">
+         <property name="text">
+          <string>Root DB user</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_14">
+         <property name="text">
+          <string>Code</string>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="1">
+        <widget class="C5LineEdit" name="leRDBPassword">
+         <property name="Tag" stdset="0">
+          <number>46</number>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="C5LineEditWithSelector" name="leCode">
+         <property name="Field" stdset="0">
+          <string>f_id</string>
+         </property>
+         <property name="Primary" stdset="0">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -85,130 +209,6 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_14">
-         <property name="text">
-          <string>Code</string>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="0">
-        <widget class="QLabel" name="label_46">
-         <property name="text">
-          <string>Root DB schema</string>
-         </property>
-        </widget>
-       </item>
-       <item row="11" column="1">
-        <widget class="C5CheckBox" name="chDebugMode">
-         <property name="text">
-          <string/>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>83</number>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="1">
-        <widget class="C5LineEdit" name="leRDBHost">
-         <property name="Tag" stdset="0">
-          <number>43</number>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_15">
-         <property name="text">
-          <string>Name</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_16">
-         <property name="text">
-          <string>Description</string>
-         </property>
-        </widget>
-       </item>
-       <item row="9" column="0">
-        <widget class="QLabel" name="label_47">
-         <property name="text">
-          <string>Root DB user</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="label_35">
-         <property name="text">
-          <string>Frontdesk mode</string>
-         </property>
-        </widget>
-       </item>
-       <item row="10" column="0">
-        <widget class="QLabel" name="label_48">
-         <property name="text">
-          <string>Root DB password</string>
-         </property>
-        </widget>
-       </item>
-       <item row="12" column="1">
-        <spacer name="verticalSpacer_3">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>280</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="8" column="1">
-        <widget class="C5LineEdit" name="leRDBSchema">
-         <property name="Tag" stdset="0">
-          <number>44</number>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="0">
-        <widget class="QLabel" name="label_45">
-         <property name="text">
-          <string>Root DB host</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="1">
-        <widget class="C5CheckBox" name="chRDB">
-         <property name="text">
-          <string/>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>42</number>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="label_32">
-         <property name="text">
-          <string>Applicatin font base size</string>
-         </property>
-        </widget>
-       </item>
-       <item row="11" column="0">
-        <widget class="QLabel" name="label_79">
-         <property name="text">
-          <string>Debug mode</string>
-         </property>
-        </widget>
-       </item>
-       <item row="10" column="1">
-        <widget class="C5LineEdit" name="leRDBPassword">
-         <property name="Tag" stdset="0">
-          <number>46</number>
-         </property>
-        </widget>
-       </item>
        <item row="4" column="0">
         <widget class="QLabel" name="label_90">
          <property name="text">
@@ -216,10 +216,27 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="1">
-        <widget class="QFontComboBox" name="fnApp">
+       <item row="6" column="0">
+        <widget class="QLabel" name="label_44">
+         <property name="text">
+          <string>Transfer to root DB</string>
+         </property>
+        </widget>
+       </item>
+       <item row="12" column="0">
+        <widget class="QLabel" name="label_99">
+         <property name="text">
+          <string>System thouthand separator</string>
+         </property>
+        </widget>
+       </item>
+       <item row="12" column="1">
+        <widget class="C5LineEdit" name="leSystemThouthandSeparator">
+         <property name="maxLength">
+          <number>1</number>
+         </property>
          <property name="Tag" stdset="0">
-          <number>97</number>
+          <number>106</number>
          </property>
         </widget>
        </item>
@@ -1169,6 +1186,13 @@
        <string>Tax options</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_4">
+       <item row="7" column="2">
+        <widget class="C5LineEdit" name="leVAT">
+         <property name="Tag" stdset="0">
+          <number>87</number>
+         </property>
+        </widget>
+       </item>
        <item row="9" column="2">
         <widget class="C5CheckBox" name="chAlwaysOfferTax">
          <property name="text">
@@ -1179,10 +1203,101 @@
          </property>
         </widget>
        </item>
-       <item row="7" column="2">
-        <widget class="C5LineEdit" name="leVAT">
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_6">
+         <property name="text">
+          <string>Tax port</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="2">
+        <widget class="C5LineEdit" name="leCashierLogin">
          <property name="Tag" stdset="0">
-          <number>87</number>
+          <number>39</number>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="2">
+        <widget class="C5ComboBox" name="cbTaxUseExtPos">
+         <property name="Tag" stdset="0">
+          <number>15</number>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_41">
+         <property name="text">
+          <string>Cashier login</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="0">
+        <widget class="QLabel" name="label_74">
+         <property name="text">
+          <string>External tax</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_8">
+         <property name="text">
+          <string>Tax department</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0">
+        <widget class="QLabel" name="label_83">
+         <property name="text">
+          <string>VAT included</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="2">
+        <widget class="C5LineEdit" name="leTaxDept">
+         <property name="Tag" stdset="0">
+          <number>8</number>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>Tax IP</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2">
+        <widget class="C5LineEdit" name="leTaxPort">
+         <property name="Tag" stdset="0">
+          <number>6</number>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="0">
+        <widget class="QLabel" name="label_87">
+         <property name="text">
+          <string>Never offer tax</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_42">
+         <property name="text">
+          <string>Cashier pin</string>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="0">
+        <widget class="QLabel" name="label_31">
+         <property name="text">
+          <string>Always offer tax</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>Tax password</string>
          </property>
         </widget>
        </item>
@@ -1196,17 +1311,10 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_7">
+       <item row="6" column="0">
+        <widget class="QLabel" name="label_18">
          <property name="text">
-          <string>Tax password</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="2">
-        <widget class="C5ComboBox" name="cbTaxUseExtPos">
-         <property name="Tag" stdset="0">
-          <number>15</number>
+          <string>Tax use external POS</string>
          </property>
         </widget>
        </item>
@@ -1217,56 +1325,24 @@
          </property>
         </widget>
        </item>
-       <item row="8" column="0">
-        <widget class="QLabel" name="label_74">
-         <property name="text">
-          <string>External tax</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="2">
-        <widget class="C5LineEdit" name="leCashierLogin">
+       <item row="2" column="2">
+        <widget class="C5LineEdit" name="leTaxPassword">
          <property name="Tag" stdset="0">
-          <number>39</number>
+          <number>7</number>
          </property>
         </widget>
        </item>
-       <item row="6" column="0">
-        <widget class="QLabel" name="label_18">
+       <item row="10" column="2">
+        <widget class="C5CheckBox" name="chNeverOfferTax">
          <property name="text">
-          <string>Tax use external POS</string>
+          <string/>
          </property>
-        </widget>
-       </item>
-       <item row="0" column="2">
-        <widget class="C5LineEdit" name="leTaxIP">
          <property name="Tag" stdset="0">
-          <number>5</number>
+          <number>93</number>
          </property>
         </widget>
        </item>
-       <item row="9" column="0">
-        <widget class="QLabel" name="label_31">
-         <property name="text">
-          <string>Always offer tax</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_5">
-         <property name="text">
-          <string>Tax IP</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="2">
-        <widget class="C5LineEdit" name="leTaxDept">
-         <property name="Tag" stdset="0">
-          <number>8</number>
-         </property>
-        </widget>
-       </item>
-       <item row="11" column="2">
+       <item row="12" column="2">
         <spacer name="verticalSpacer_4">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -1279,69 +1355,24 @@
          </property>
         </spacer>
        </item>
-       <item row="7" column="0">
-        <widget class="QLabel" name="label_83">
-         <property name="text">
-          <string>VAT included</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="label_42">
-         <property name="text">
-          <string>Cashier pin</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="2">
-        <widget class="C5LineEdit" name="leTaxPort">
+       <item row="0" column="2">
+        <widget class="C5LineEdit" name="leTaxIP">
          <property name="Tag" stdset="0">
-          <number>6</number>
+          <number>5</number>
          </property>
         </widget>
        </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="label_8">
+       <item row="11" column="0">
+        <widget class="QLabel" name="label_100">
          <property name="text">
-          <string>Tax department</string>
+          <string>Always print if amount less then</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="label_41">
-         <property name="text">
-          <string>Cashier login</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="2">
-        <widget class="C5LineEdit" name="leTaxPassword">
+       <item row="11" column="2">
+        <widget class="C5LineEdit" name="leTaxAlwaysPrintIfAmountLess">
          <property name="Tag" stdset="0">
-          <number>7</number>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_6">
-         <property name="text">
-          <string>Tax port</string>
-         </property>
-        </widget>
-       </item>
-       <item row="10" column="0">
-        <widget class="QLabel" name="label_87">
-         <property name="text">
-          <string>Never offer tax</string>
-         </property>
-        </widget>
-       </item>
-       <item row="10" column="2">
-        <widget class="C5CheckBox" name="chNeverOfferTax">
-         <property name="text">
-          <string/>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>93</number>
+          <number>107</number>
          </property>
         </widget>
        </item>
@@ -1654,6 +1685,23 @@
          </property>
         </widget>
        </item>
+       <item row="11" column="0">
+        <widget class="QLabel" name="label_101">
+         <property name="text">
+          <string>Print modicators on receipt</string>
+         </property>
+        </widget>
+       </item>
+       <item row="11" column="1">
+        <widget class="C5CheckBox" name="chPrintModOnReceipt">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>108</number>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="tab_8">
@@ -1959,6 +2007,11 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>C5LineEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5lineedit.h</header>
+  </customwidget>
+  <customwidget>
    <class>C5LineEditWithSelector</class>
    <extends>QLineEdit</extends>
    <header location="global">c5lineeditwithselector.h</header>
@@ -1967,11 +2020,6 @@
    <class>C5CheckBox</class>
    <extends>QCheckBox</extends>
    <header location="global">c5checkbox.h</header>
-  </customwidget>
-  <customwidget>
-   <class>C5LineEdit</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5lineedit.h</header>
   </customwidget>
   <customwidget>
    <class>C5ComboBox</class>

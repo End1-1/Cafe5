@@ -28,10 +28,6 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    if (!C5SystemPreference::checkDecimalPointAndSeparator()) {
-        return 0;
-    }
-
     QDir d;
     QFile file(d.homePath() + "/" + _APPLICATION_ + "/lock.pid");
     file.remove();
@@ -71,6 +67,10 @@ int main(int argc, char *argv[])
     C5Config::fFullScreen = connectionParams.at(6);
     C5Config::initParamsFromDb();
     DataDriver::init(C5Config::dbParams());
+
+    if (!C5SystemPreference::checkDecimalPointAndSeparator()) {
+        return 0;
+    }
 
     QStringList dbParams;
     dbParams << C5Config::fDBHost

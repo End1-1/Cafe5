@@ -453,6 +453,7 @@ void WOrder::fixCostumer(const QString &code)
             fCardValue = 0;
             return;
         }
+        fCardValue = v;
         if (fCardMode == CARD_TYPE_DISCOUNT) {
             fCardValue = v / 100;
         } else {

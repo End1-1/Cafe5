@@ -327,6 +327,11 @@
     </message>
     <message>
         <location filename="../Cafe5/c5message.ui" line="209"/>
+        <source>A3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Cafe5/c5message.ui" line="222"/>
         <source>A2</source>
         <translation type="unfinished"></translation>
     </message>
@@ -666,17 +671,17 @@
         <translation>Փասթաթուղթը գոյություն չունի</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="969"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="975"/>
         <source>Invalid document id</source>
         <translation>Փասթաթուղթը գոյություն չունի</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="1098"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="1104"/>
         <source>Not enough materials in the store</source>
         <translation>Բացասական քանակ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="1197"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="1203"/>
         <source>This order used in next documents</source>
         <translation>Փասթաթուղթը օգտագործվում է հետևյալ փասթաթղթերում</translation>
     </message>
@@ -2991,7 +2996,7 @@ reservation</source>
     </message>
     <message>
         <location filename="worder.ui" line="86"/>
-        <location filename="worder.cpp" line="785"/>
+        <location filename="worder.cpp" line="786"/>
         <source>Qty</source>
         <translation>Քանակ</translation>
     </message>
@@ -3003,7 +3008,7 @@ reservation</source>
     <message>
         <location filename="worder.ui" line="96"/>
         <location filename="worder.cpp" line="194"/>
-        <location filename="worder.cpp" line="553"/>
+        <location filename="worder.cpp" line="554"/>
         <source>Price</source>
         <translation>Գին</translation>
     </message>
@@ -3211,11 +3216,11 @@ reservation</source>
         <location filename="worder.ui" line="131"/>
         <location filename="worder.ui" line="334"/>
         <location filename="worder.cpp" line="304"/>
-        <location filename="worder.cpp" line="539"/>
-        <location filename="worder.cpp" line="685"/>
-        <location filename="worder.cpp" line="690"/>
-        <location filename="worder.cpp" line="698"/>
-        <location filename="worder.cpp" line="775"/>
+        <location filename="worder.cpp" line="540"/>
+        <location filename="worder.cpp" line="686"/>
+        <location filename="worder.cpp" line="691"/>
+        <location filename="worder.cpp" line="699"/>
+        <location filename="worder.cpp" line="776"/>
         <source>Discount</source>
         <translation>Զեղչ</translation>
     </message>
@@ -3226,17 +3231,17 @@ reservation</source>
     </message>
     <message>
         <location filename="worder.cpp" line="436"/>
-        <location filename="worder.cpp" line="502"/>
+        <location filename="worder.cpp" line="503"/>
         <source>Cards was expired</source>
         <translation>Քարտի ժամկետը անցել է</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="766"/>
+        <location filename="worder.cpp" line="767"/>
         <source>Enter discount value</source>
         <translation>Մուտքագրեք զեղչի տոկոսը</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="478"/>
+        <location filename="worder.cpp" line="479"/>
         <source>Quantity</source>
         <translation>Քանակ</translation>
     </message>
@@ -3301,61 +3306,61 @@ reservation</source>
         <translation>Պահպանված է</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="464"/>
+        <location filename="worder.cpp" line="465"/>
         <source>Fix costumer</source>
         <translation>Հաճախորդ</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="475"/>
+        <location filename="worder.cpp" line="476"/>
         <source>Cannot change the quantity on selected row with manual discount mode</source>
         <translation>Քանակի փոփոխությունը հնարավոր չէ,
 եթե կիրարված է դումարի զեղչ տողի վրա</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="726"/>
+        <location filename="worder.cpp" line="727"/>
         <source>Invalid preorder id</source>
         <translation>Սխալ նախնական պատվերի համար</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="797"/>
+        <location filename="worder.cpp" line="798"/>
         <source>Change qty</source>
         <translation>Քանակի փոփոխություն</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="922"/>
-        <location filename="worder.cpp" line="934"/>
-        <location filename="worder.cpp" line="952"/>
+        <location filename="worder.cpp" line="923"/>
+        <location filename="worder.cpp" line="935"/>
+        <location filename="worder.cpp" line="953"/>
         <source>Invalid code entered: </source>
         <translation>Սխալ կոդի մուտք</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="1011"/>
+        <location filename="worder.cpp" line="1012"/>
         <source>Fiscal receipt already printed</source>
         <translation>Հդմ կտրոնը տպված է</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="1015"/>
+        <location filename="worder.cpp" line="1016"/>
         <source>Cannot print zero advance</source>
         <translation>Կանխավճարի գումարը պետք զրոից մեծ լինի</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="1019"/>
-        <location filename="worder.cpp" line="1051"/>
+        <location filename="worder.cpp" line="1020"/>
+        <location filename="worder.cpp" line="1052"/>
         <source>Error writing preorder</source>
         <translation>Նախնական պատվերի գրանցման սխալ</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="1023"/>
+        <location filename="worder.cpp" line="1024"/>
         <source>No payment mode is selected</source>
         <translation>Վճարման եղանակը նշված չէ</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="1076"/>
+        <location filename="worder.cpp" line="1077"/>
         <source>Confirm to remove preorder</source>
         <translation>Հաստատեք նախնական պատվերի հեռացումը</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="492"/>
+        <location filename="worder.cpp" line="493"/>
         <source>Discount already applied</source>
         <translation>Զեղչը արդեն կիրարված է</translation>
     </message>
@@ -3370,57 +3375,57 @@ reservation</source>
         <translation>Սխալ գին</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="525"/>
+        <location filename="worder.cpp" line="526"/>
         <source>Discount amount greater than total amount</source>
         <translation>Զեղչի գումարը գերազանցում է ապրանքի ընդհանուր գումարը</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="534"/>
+        <location filename="worder.cpp" line="535"/>
         <source>This discount mode is not supported</source>
         <translation>Այս զեղչի տեսակը այստեղ չի աշխատում</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="539"/>
+        <location filename="worder.cpp" line="540"/>
         <source>Discount type</source>
         <translation>Զեղչի տեսակ</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="539"/>
+        <location filename="worder.cpp" line="540"/>
         <source>Value</source>
         <translation>Առժեք</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="575"/>
+        <location filename="worder.cpp" line="576"/>
         <source>Password</source>
         <translation>Գաղտնաբառ</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="613"/>
+        <location filename="worder.cpp" line="614"/>
         <source>Remove row</source>
         <translation>Տողի հեռացում</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="707"/>
+        <location filename="worder.cpp" line="708"/>
         <source>Total amount</source>
         <translation>Ընդհանուր գումար</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="769"/>
+        <location filename="worder.cpp" line="770"/>
         <source>Enter discount amount</source>
         <translation>Մուտքագրեք զեղչի գումարի չափը</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="852"/>
+        <location filename="worder.cpp" line="853"/>
         <source>Cannot remove preorder that wasnt saved</source>
         <translation>Հնարավոր չէ հեռացնել առանց պահպանելու</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="855"/>
+        <location filename="worder.cpp" line="856"/>
         <source>Confirm to remove</source>
         <translation>Հաստատեք հեռացումը</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="826"/>
+        <location filename="worder.cpp" line="827"/>
         <source>Insufficient quantity</source>
         <translation>Անբավարար քանակ</translation>
     </message>
@@ -3430,7 +3435,7 @@ reservation</source>
         <translation>Պահպանեք նախնական պատվերը, կամ գրանցեք սովորական վաճառք</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="694"/>
+        <location filename="worder.cpp" line="695"/>
         <source>Visit counter</source>
         <translation>Այցելություն</translation>
     </message>

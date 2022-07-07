@@ -38,6 +38,13 @@ QString CR5CostumerDebtsFilter::condition()
     return cond;
 }
 
+QString CR5CostumerDebtsFilter::filterText()
+{
+    QString s = QString("%1 %2 - %3").arg(tr("Date range"), ui->deStart->text(), ui->deEnd->text());
+    inFilterText(s, ui->leCostumerName);
+    return s;
+}
+
 bool CR5CostumerDebtsFilter::isTotal()
 {
     return ui->chShowTotal->isChecked();

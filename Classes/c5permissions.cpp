@@ -152,6 +152,7 @@ void C5Permissions::init(C5Database &db, int group)
               << cp_t10_daily
               << cp_t10_product_list
               << cp_t10_general_report
+              << cp_t10_general_report_only_date
                  ;
     if (group == 1) {
         db[":f_group"] = 1;

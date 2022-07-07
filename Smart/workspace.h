@@ -26,6 +26,10 @@ public:
 
     virtual void reject() override;
 
+    static Workspace *fWorkspace;
+
+    bool printReceipt(const QString &id, bool printSecond);
+
 private slots:
     void removeDish();
 
@@ -63,8 +67,6 @@ private slots:
 
     void on_btnP05_clicked();
 
-    void on_tblOrder_cellClicked(int row, int column);
-
     void on_btnVoid_clicked();
 
     void on_btnSetCash_clicked();
@@ -97,6 +99,12 @@ private slots:
 
     void on_btnComment_clicked();
 
+    void on_btnMPlus_clicked();
+
+    void on_btnMRead_clicked();
+
+    void on_btnHistoryOrder_clicked();
+
 private:
     Ui::Workspace *ui;
 
@@ -116,6 +124,8 @@ private:
 
     int fSupplierId;
 
+    int fFlagEdited;
+
     QString fPhone;
 
     QString fSupplierName;
@@ -130,17 +140,17 @@ private:
 
     void addDishToOrder(Dish *d);
 
-    void saveOrder();
+    double discountValue();
 
-    bool printTax(double cardAmount, double idramAmount);
+    bool saveOrder();
 
-    bool printReceipt(const QString &id, bool printSecond);
+    int printTax(double cardAmount, double idramAmount);
 
     void setQty(double qty, int mode);
 
     void setCustomerPhoneNumber(const QString &number);
 
-    void filter();
+    void filter(const QString &name);
 
     void countTotal();
 
@@ -149,6 +159,8 @@ private:
     void stretchTableColumns(QTableWidget *t);
 
     void scrollTable(QTableWidget *t, int direction, int rows);
+
+    void updateInfo(int row);
 };
 
 #endif // WORKSPACE_H

@@ -146,6 +146,8 @@
 #define cp_t10_daily 1002
 #define cp_t10_product_list 1003
 #define cp_t10_general_report 1004
+#define cp_t10_general_report_only_date 1005
+
 
 
 class C5Permissions

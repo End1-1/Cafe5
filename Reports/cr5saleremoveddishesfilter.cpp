@@ -25,3 +25,10 @@ QString CR5SaleRemovedDishesFilter::condition()
     }
     return result;
 }
+
+QString CR5SaleRemovedDishesFilter::filterText()
+{
+    QString s = QString("%1 %2 - %3").arg(tr("Date range"), ui->deStart->text(), ui->deEnd->text());
+    inFilterText(s, ui->leStateName);
+    return s;
+}

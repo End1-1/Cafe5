@@ -38,6 +38,16 @@ QString CR5ConsuptionReasonFilter::condition()
     return cond;
 }
 
+QString CR5ConsuptionReasonFilter::filterText()
+{
+    QString s = QString("%1 %2 - %3").arg(tr("Date range"), ui->deStart->text(), ui->deEnd->text());
+    inFilterText(s, ui->leDishName);
+    inFilterText(s, ui->leDishPartName);
+    inFilterText(s, ui->leGoodsName);
+    inFilterText(s, ui->leStoreName);
+    return s;
+}
+
 void CR5ConsuptionReasonFilter::setDateFilter(const QDate &d1, const QDate &d2)
 {
     ui->deStart->setDate(d1);

@@ -20,6 +20,14 @@ public:
 
     virtual QString conditionText();
 
+    QString d1ms() const;
+
+    QString d2ms() const;
+
+    QString d1s() const;
+
+    QString d2s() const;
+
 private:
     Ui::CR5MFGeneralReportFilter *ui;
 };

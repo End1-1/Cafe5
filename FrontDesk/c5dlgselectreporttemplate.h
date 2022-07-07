@@ -4,6 +4,10 @@
 #include "c5dialog.h"
 #include "c5reporttemplatedriver.h"
 
+#define reporttemplate_documents 1
+#define reporttemplate_goodsmovement 2
+#define reporttemplate_commonsales 3
+
 namespace Ui {
 class C5DlgSelectReportTemplate;
 }

@@ -18,6 +18,8 @@ public:
 
     virtual QString condition() override;
 
+    virtual QString filterText() override;
+
     QDate date1() const;
 
     QDate date2() const;

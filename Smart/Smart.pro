@@ -55,6 +55,7 @@ SOURCES += \
     ../Cafe5/calendar.cpp \
     ../Cafe5/dlgexitbyversion.cpp \
     ../Classes/QRCodeGenerator.cpp \
+    ../Classes/c5airlog.cpp \
     ../Classes/c5cache.cpp \
     ../Classes/c5combodelegate.cpp \
     ../Classes/c5crypt.cpp \
@@ -128,6 +129,8 @@ SOURCES += \
     ../DbData/dbusers.cpp \
     ../Forms/change.cpp \
     ../Forms/customerinfo.cpp \
+    ../Forms/dlgcashinout.cpp \
+    ../Forms/dlgcashop.cpp \
     ../Forms/dlglistofdishcomments.cpp \
     ../Forms/dlgqty.cpp \
     ../Forms/touchdlgphonenumber.cpp \
@@ -137,10 +140,12 @@ SOURCES += \
     ../Shop/printreceiptgroup.cpp \
     ../Shop/selectprinters.cpp \
     dishpackage.cpp \
+    dlgmemoryread.cpp \
+    dlgsmartreports.cpp \
         main.cpp \
     menudialog.cpp \
     menudish.cpp \
-    orderdish.cpp \
+    sessionorders.cpp \
     supplier.cpp \
         workspace.cpp \
     ../Cafe5/c5config.cpp \
@@ -181,6 +186,7 @@ HEADERS += \
     ../Cafe5/dlgexitbyversion.h \
     ../Classes/QRCodeGenerator.h \
     ../Classes/barcode5.h \
+    ../Classes/c5airlog.h \
     ../Classes/c5cache.h \
     ../Classes/c5combodelegate.h \
     ../Classes/c5crypt.h \
@@ -254,6 +260,8 @@ HEADERS += \
     ../DbData/dbusers.h \
     ../Forms/change.h \
     ../Forms/customerinfo.h \
+    ../Forms/dlgcashinout.h \
+    ../Forms/dlgcashop.h \
     ../Forms/dlglistofdishcomments.h \
     ../Forms/dlgqty.h \
     ../Forms/touchdlgphonenumber.h \
@@ -265,11 +273,13 @@ HEADERS += \
     ../Shop/selectprinters.h \
     dish.h \
     dishpackage.h \
+    dlgmemoryread.h \
+    dlgsmartreports.h \
     menudialog.h \
     menudish.h \
-    orderdish.h \
     rc.h \
     res.rc \
+    sessionorders.h \
     supplier.h \
         workspace.h \
     ../Cafe5/c5config.h \
@@ -294,15 +304,19 @@ FORMS += \
     ../Classes/rkeyboard.ui \
     ../Forms/change.ui \
     ../Forms/customerinfo.ui \
+    ../Forms/dlgcashinout.ui \
+    ../Forms/dlgcashop.ui \
     ../Forms/dlglistofdishcomments.ui \
     ../Forms/dlgqty.ui \
     ../Forms/touchdlgphonenumber.ui \
     ../Forms/touchentertaxreceiptnumber.ui \
     ../Forms/touchselecttaxreport.ui \
     ../Shop/selectprinters.ui \
+    dlgmemoryread.ui \
+    dlgsmartreports.ui \
     menudialog.ui \
     menudish.ui \
-    orderdish.ui \
+    sessionorders.ui \
     supplier.ui \
         workspace.ui \
     ../Cafe5/c5connection.ui \

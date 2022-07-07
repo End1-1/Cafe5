@@ -57,6 +57,19 @@ QString CR5MaterialInStoreFilter::condition()
     return cond;
 }
 
+QString CR5MaterialInStoreFilter::filterText()
+{
+    QString s = QString("%1 %2").arg(tr("Date"), ui->deDate->text());
+    inFilterText(s, ui->leStoreName);
+    inFilterText(s, ui->leGroupname);
+    inFilterText(s, ui->leMaterialName);
+    inFilterText(s, ui->leUnitName);
+    if (ui->chShowDrafts->isChecked()) {
+        s += ", " + tr("Show drafts");
+    }
+    return s;
+}
+
 bool CR5MaterialInStoreFilter::showDrafts()
 {
     return ui->chShowDrafts->isChecked();

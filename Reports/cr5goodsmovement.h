@@ -32,10 +32,12 @@ protected:
     virtual bool tblDoubleClicked(int row, int column, const QList<QVariant> &values) override;
 
 private:
-    CR5GoodsMovementFilter *fGoodsFilter;
+    CR5GoodsMovementFilter *fFilter;
 
 private slots:
     void changePrice();
+
+    void templates();
 };
 
 #endif // CR5GOODSMOVEMENT_H

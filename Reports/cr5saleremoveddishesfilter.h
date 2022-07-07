@@ -18,6 +18,8 @@ public:
 
     virtual QString condition();
 
+    virtual QString filterText() override;
+
 private:
     Ui::CR5SaleRemovedDishesFilter *ui;
 };

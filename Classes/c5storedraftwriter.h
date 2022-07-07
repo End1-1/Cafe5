@@ -48,7 +48,7 @@ public:
 
     bool writeAHeaderStore(const QString &id, int userAccept, int userPass, const QString &invoice, const QDate &invoiceDate, int storeIn, int storeOut, int basedOnSale, const QString &cashUUID, int complectation, double complectationQty);
 
-    bool writeAHeaderCash(const QString &id, int cashin, int cashout, int related, const QString &storedoc, const QString &oheader);
+    bool writeAHeaderCash(const QString &id, int cashin, int cashout, int related, const QString &storedoc, const QString &oheader, int session);
 
     bool writeAHeader2ShopStore(const QString &id, int store, int accept);
 

@@ -15,7 +15,7 @@ C5DlgSelectReportTemplate::C5DlgSelectReportTemplate(int reportGroup, const QStr
         ui->lst->addItem(item);
     }
     TemplateDriver::Template t;
-    t.id = -1;
+    t.id = 0;
     QListWidgetItem *item = new QListWidgetItem(ui->lst);
     item->setData(Qt::UserRole, qVariantFromValue(t));
     item->setText(tr("Cancel"));
@@ -31,7 +31,7 @@ C5DlgSelectReportTemplate::~C5DlgSelectReportTemplate()
 void C5DlgSelectReportTemplate::on_lst_itemClicked(QListWidgetItem *item)
 {
     TemplateDriver::Template t = item->data(Qt::UserRole).value<TemplateDriver::Template>();
-    if (t.id < 0) {
+    if (t.id == 0) {
         reject();
         return;
     }

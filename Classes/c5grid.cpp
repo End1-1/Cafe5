@@ -589,7 +589,7 @@ void C5Grid::print()
     QFont font(qApp->font());
     font.setPointSize(20);
     C5Printing p;
-    QSize paperSize(2000, 2800);
+    QSize paperSize(1950, 2800);
     p.setFont(font);
     int page = p.currentPageIndex();
     int startFrom = 0;
@@ -601,7 +601,7 @@ void C5Grid::print()
         columnsWidth += fTableView->columnWidth(i);
     }
     columnsWidth /= scaleFactor;
-    if (columnsWidth > 2000) {
+    if (columnsWidth > 1950) {
         p.setSceneParams(paperSize.height(), paperSize.width(), QPrinter::Landscape);
     } else {
         p.setSceneParams(paperSize.width(), paperSize.height(), QPrinter::Portrait);
@@ -610,6 +610,11 @@ void C5Grid::print()
         p.setFontBold(true);
         p.ltext(fLabel, 0);
         p.br();
+        QString filterText = fFilterWidget->filterText();
+        if (!filterText.isEmpty()) {
+            p.ltext(filterText, 0);
+            p.br();
+        }
         if (reportAdditionalTitle().isEmpty() == false) {
             p.ltext(reportAdditionalTitle(), 0);
             p.br();

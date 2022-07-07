@@ -15,6 +15,10 @@ public:
 private:
     QHash<QString, QString> fOptions;
 
+    QTimer *fTimer;
+
+    void resumeTimer();
+
 private slots:
     void timeout();
 

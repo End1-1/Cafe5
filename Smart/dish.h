@@ -7,6 +7,7 @@
 struct Dish {
     int id;
     int typeId;
+    QString typeName;
     QString name;
     QString printer;
     QString adgCode;
@@ -21,6 +22,7 @@ struct Dish {
     int package;
     int quick;
     QString packageName;
+    QString obodyId;
     Dish() {
         id = 0;
         typeId = 0;

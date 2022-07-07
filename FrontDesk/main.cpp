@@ -24,17 +24,13 @@ int main(int argc, char *argv[])
 
     QApplication a(argc, argv);
 
-    if (!C5SystemPreference::checkDecimalPointAndSeparator()) {
-        return 0;
-    }
-
     for (int i = 1; i < argc; i++){
         __autologin_store.append(argv[i]);
     }
 
-    if (QDate::currentDate() > QDate::fromString("20/09/2022", "dd/MM/yyyy")) {
-        return 1;
-    }
+//    if (QDate::currentDate() > QDate::fromString("20/09/2022", "dd/MM/yyyy")) {
+//        return 1;
+//    }
 
     QList<QByteArray> connectionParams;
     C5Connection::readParams(connectionParams);
@@ -46,6 +42,10 @@ int main(int argc, char *argv[])
     C5Config::fLastUsername = connectionParams.at(5);
     C5Config::fFullScreen = connectionParams.at(6);
     C5Config::initParamsFromDb();
+
+    if (!C5SystemPreference::checkDecimalPointAndSeparator()) {
+        return 0;
+    }
 
     QTranslator t;
     t.load(":/lang/FrontDesk.qm");

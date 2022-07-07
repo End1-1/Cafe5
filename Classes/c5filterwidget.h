@@ -4,6 +4,7 @@
 #include "c5utils.h"
 #include "c5widget.h"
 
+class C5LineEdit;
 class C5LineEditWithSelector;
 
 class C5FilterWidget : public C5Widget
@@ -14,6 +15,8 @@ public:
     explicit C5FilterWidget(const QStringList &dbParams, QWidget *parent = nullptr);
 
     virtual QString condition() = 0;
+
+    virtual QString filterText() {return "";}
 
     virtual QString conditionText();
 
@@ -34,6 +37,8 @@ public slots:
 
 protected:
     QString in(QString &cond, const QString &field, C5LineEditWithSelector *l);
+
+    QString inFilterText(QString &text, C5LineEdit *l);
 
 private:
     QWidget *getWidget(const QString &key, QWidget *parent);

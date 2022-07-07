@@ -48,6 +48,16 @@ QString CR5DocumentsFilter::condition()
     return result;
 }
 
+QString CR5DocumentsFilter::filterText()
+{
+    QString s = QString("%1 %2 - %3").arg(tr("Date range"), ui->deStart->text(), ui->deEnd->text());
+    inFilterText(s, ui->leDocTypeName);
+    inFilterText(s, ui->leDocStateName);
+    inFilterText(s, ui->leOperatorName);
+    inFilterText(s, ui->leReasonName);
+    return s;
+}
+
 QDate CR5DocumentsFilter::date1() const
 {
     return ui->deStart->date();

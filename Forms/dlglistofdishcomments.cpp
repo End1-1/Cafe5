@@ -84,9 +84,8 @@ void DlgListOfDishComments::on_tbl_itemClicked(QTableWidgetItem *item)
     if (!item) {
         return;
     }
-    fResult = item->text();
-    if (fResult.isEmpty()) {
-        return;
+    if (ui->kbd->text().isEmpty() == false) {
+        ui->kbd->setText(ui->kbd->text() + ", ");
     }
-    accept();
+    ui->kbd->setText(ui->kbd->text() + item->text());
 }

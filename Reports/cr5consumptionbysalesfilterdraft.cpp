@@ -25,6 +25,14 @@ QString CR5ConsumptionBySalesFilterDraft::condition()
     return "";
 }
 
+QString CR5ConsumptionBySalesFilterDraft::filterText()
+{
+    QString s = QString("%1 %2 - %3").arg(tr("Date range"), ui->deStart->text(), ui->deEnd->text());
+    inFilterText(s, ui->leGroupName);
+    inFilterText(s, ui->leClassName1);
+    return s;
+}
+
 int CR5ConsumptionBySalesFilterDraft::store()
 {
     return ui->leStore->getInteger();

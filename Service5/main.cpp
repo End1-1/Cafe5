@@ -50,7 +50,9 @@ DWORD WINAPI ThreadProc(CONST LPVOID lpParam) {
     QTranslator t;
     t.load(":/Service5.qm");
     app.installTranslator(&t);
-    DatabaseConnectionManager::init();
+    do {
+        LogWriter::write(LogWriterLevel::verbose, "", "Try to initialize database manager");
+    } while (!DatabaseConnectionManager::init());
     RequestManager::init();
     PluginManager::init(APPDIR + "config.ini");
     Raw::init();

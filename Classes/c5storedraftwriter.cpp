@@ -471,7 +471,12 @@ bool C5StoreDraftWriter::writeAHeaderStore(const QString &id, int userAccept, in
     }
 }
 
-bool C5StoreDraftWriter::writeAHeaderCash(const QString &id, int cashin, int cashout, int related, const QString &storedoc, const QString &oheader)
+bool C5StoreDraftWriter::writeAHeaderCash(const QString &id,
+                                          int cashin, int cashout,
+                                          int related,
+                                          const QString &storedoc,
+                                          const QString &oheader,
+                                          int session)
 {
     bool u = false;
     fDb[":f_id"] = id;
@@ -483,6 +488,7 @@ bool C5StoreDraftWriter::writeAHeaderCash(const QString &id, int cashin, int cas
     fDb[":f_related"] = related;
     fDb[":f_storedoc"] = storedoc;
     fDb[":f_oheader"] = oheader;
+    fDb[":f_session"] = session;
     if (u) {
         return returnResult(fDb.update("a_header_cash", where_id(id)));
     } else {

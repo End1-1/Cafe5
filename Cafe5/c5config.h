@@ -107,6 +107,9 @@
 #define param_receipt_print_font_family 103
 #define param_service_print_font_size 104
 #define param_receipt_print_font_size 105
+#define param_system_thouthand_separator 106
+#define param_tax_print_if_amount_less 107
+#define param_print_modificators_on_receipt 108
 
 #define FRONTDESK_WAITER 0
 #define FRONTDESK_SHOP 1

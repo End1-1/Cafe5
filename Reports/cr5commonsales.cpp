@@ -6,6 +6,8 @@
 #include "c5salefromstoreorder.h"
 #include "c5waiterorderdoc.h"
 #include "dlgexportsaletoasoptions.h"
+#include "c5dlgselectreporttemplate.h"
+#include "c5gridgilter.h"
 #include <QDir>
 #include <QFile>
 #include <QDesktopServices>
@@ -168,6 +170,9 @@ QToolBar *CR5CommonSales::toolBar()
         fToolBar = createStandartToolbar(btn);
         fToolBar->addAction(QIcon(":/AS.png"), tr("Export to AS"), this, SLOT(exportToAS()));
         fToolBar->addAction(QIcon(":/AS.png"), tr("Create store output in AS"), this, SLOT(createStoreOutputAS()));
+        auto *a = new QAction(QIcon(":/template.png"), tr("Templates"), this);
+        connect(a, SIGNAL(triggered()), this, SLOT(templates()));
+        fToolBar->insertAction(fToolBar->actions().at(3), a);
     }
     return fToolBar;
 }
@@ -328,7 +333,7 @@ void CR5CommonSales::exportToAS()
         //TODO: check for single date, date range in simple mode is not allowed
         double total = 0, card = 0, service = 0;
         QDate date;
-        for (const QString id: idlist) {
+        for (const QString &id: idlist) {
             db[":f_id"] = id;
             db.exec("select f_receiptnumber from o_tax where f_id=:f_id");
             int rn = 0;
@@ -351,7 +356,7 @@ void CR5CommonSales::exportToAS()
             db.exec("select * from o_header where f_id=:f_id");
             db.nextRow();
             total += db.getDouble("f_amountcash");
-            card += db.getDouble("f_amountcard") + db.getDouble("f_amountidram");
+            card += db.getDouble("f_amountcard") + db.getDouble("f_amountidram") + db.getDouble("f_amountpayx");
             service += db.getDouble("f_amountservice");
             date= db.getDate("f_datecash");
         }
@@ -758,4 +763,22 @@ void CR5CommonSales::createStoreOutputAS()
     }
 
     C5Message::info(tr("Done"));
+}
+
+void CR5CommonSales::templates()
+{
+    C5DlgSelectReportTemplate d(reporttemplate_commonsales, fDBParams);
+    if (d.exec() == QDialog::Accepted) {
+        QString condition;
+        QHash<QString, bool> showColumns = fColumnsVisible;
+        fColumnsVisible.clear();
+        if (C5GridGilter::filter(fFilterWidget, condition, fColumnsVisible, fTranslation)) {
+            QString sql = d.fSelectedTemplate.sql;
+            sql.replace("%date1", fFilter->date1().toString(FORMAT_DATE_TO_STR_MYSQL));
+            sql.replace("%date2", fFilter->date2().toString(FORMAT_DATE_TO_STR_MYSQL));
+            executeSql(sql);
+            fTableView->resizeColumnsToContents();
+        }
+        fColumnsVisible = showColumns;
+    }
 }

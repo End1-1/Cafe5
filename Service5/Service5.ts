@@ -15,6 +15,11 @@
     </message>
     <message>
         <location filename="../Cafe5/c5message.ui" line="209"/>
+        <source>A3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Cafe5/c5message.ui" line="222"/>
         <source>A2</source>
         <translation type="unfinished"></translation>
     </message>

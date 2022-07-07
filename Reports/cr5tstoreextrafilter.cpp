@@ -20,6 +20,18 @@ QString CR5TStoreExtraFilter::condition()
     return "";
 }
 
+QString CR5TStoreExtraFilter::filterText()
+{
+    QString s = QString("%1 %2 - %3").arg(tr("Date range"), ui->deStart->text(), ui->deEnd->text());
+    inFilterText(s, ui->leStoreName);
+    if (ui->rbGoodsPrice->isChecked()) {
+        s += ", " + tr("Retail prices");
+    } else if (ui->rbStorePrice->isChecked()) {
+        s += ", " + tr("Input prices");
+    }
+    return s;
+}
+
 QDate CR5TStoreExtraFilter::dateStart()
 {
     return ui->deStart->date();

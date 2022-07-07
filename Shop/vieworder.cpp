@@ -218,7 +218,7 @@ void ViewOrder::on_btnReturn_clicked()
         QString purpose = tr("Return of sale") + " " + fSaleDoc;
         dw.writeAHeader(fCashUuid, fCashUserId, DOC_STATE_DRAFT, DOC_TYPE_CASH, uid, QDate::currentDate(),
                         QDate::currentDate(), QTime::currentTime(), 0, returnAmount, purpose);
-        dw.writeAHeaderCash(fCashUuid, 0, __c5config.cashId(), 1, storeDocId, "");
+        dw.writeAHeaderCash(fCashUuid, 0, __c5config.cashId(), 1, storeDocId, "", 0);
         dw.writeECash(fCashRowId, fCashUuid, __c5config.cashId(), -1, purpose, returnAmount, fCashRowId, 1);
         if (!dw.writeAHeaderStore(storeDocId, uid, uid, "", QDate(), __c5config.defaultStore(), 0, 1, fCashUuid, 0, 0)) {
             return returnFalse(dw.fErrorMsg, &db);
@@ -235,7 +235,7 @@ void ViewOrder::on_btnReturn_clicked()
         if (!dw.writeAHeader(cashdocid, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH, uid, QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, cashamount, tr("Return of") + " " + fSaleDoc)) {
             return returnFalse(dw.fErrorMsg, &db);
         }
-        if (!dw.writeAHeaderCash(cashdocid, 0, it.key(), 1, "", oheaderid)) {
+        if (!dw.writeAHeaderCash(cashdocid, 0, it.key(), 1, "", oheaderid, 0)) {
             return returnFalse(dw.fErrorMsg, &db);
         }
         QString cashUUID;

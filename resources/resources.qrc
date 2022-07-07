@@ -63,5 +63,9 @@
         <file>receipt.png</file>
         <file>error.png</file>
         <file>help.png</file>
+        <file>accounts.png</file>
+        <file>budget.png</file>
+        <file>info.png</file>
+        <file>folder.png</file>
     </qresource>
 </RCC>

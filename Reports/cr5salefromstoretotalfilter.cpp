@@ -20,6 +20,13 @@ QString CR5SaleFromStoreTotalFilter::condition()
     return "";
 }
 
+QString CR5SaleFromStoreTotalFilter::filterText()
+{
+    QString cond = QString("%1 %2-%3").arg(tr("Date range"), ui->deStart->text(), ui->deEnd->text());
+    inFilterText(cond, ui->leStoreName);
+    return cond;
+}
+
 int CR5SaleFromStoreTotalFilter::store()
 {
     return ui->leStore->getInteger();

@@ -4,14 +4,20 @@
 #include "touchentertaxreceiptnumber.h"
 #include "printtaxn.h"
 #include "calendar.h"
+#include "dlgcashinout.h"
 #include "c5printing.h"
+#include "c5user.h"
+#include "dlgcashop.h"
+#include "datadriver.h"
+#include "dlgsmartreports.h"
 #include <QFile>
 
-MenuDialog::MenuDialog() :
+MenuDialog::MenuDialog(C5User *u) :
     C5Dialog(__c5config.dbParams()),
     ui(new Ui::MenuDialog)
 {
     ui->setupUi(this);
+    fUser = u;
 }
 
 MenuDialog::~MenuDialog()
@@ -60,13 +66,17 @@ void MenuDialog::on_btnReturnFiscalReceipt_clicked()
     if (TouchEnterTaxReceiptNumber::getTaxReceiptNumber(number)) {
         C5Database db(C5Config::dbParams());
         db[":f_receiptnumber"] = number;
-        db.exec("select f_id from o_tax where cast(f_receiptnumber as signed)=cast(:f_receiptnumber as signed)");
+        db.exec("select * from o_tax where cast(f_receiptnumber as signed)=cast(:f_receiptnumber as signed)");
         QString uuid = "--";
+        QString jsnin, jsnout, err, crn;
         if (db.nextRow()) {
             uuid = db.getString("f_id");
+            crn = db.getString("f_devnum");
+        } else {
+            C5Message::error(tr("Fiscal number not found"));
+            return;
         }
         PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
-        QString jsnin, jsnout, err, crn;
         int result;
         result = pt.printTaxback(number, crn, jsnin, jsnout, err);
 
@@ -214,12 +224,49 @@ void MenuDialog::on_btnBack_clicked()
 void MenuDialog::on_btnPrintReport_clicked()
 {
     accept();
+    DlgSmartReports().exec();
+}
+
+void MenuDialog::on_btnCashin_clicked()
+{
+    accept();
+    DlgCashOp d(true, fUser);
+    d.exec();
+}
+
+void MenuDialog::on_btnCashout_clicked()
+{
+    accept();
+    DlgCashOp d(false, fUser);
+    d.exec();
+}
+
+void MenuDialog::on_btnCloseSession_clicked()
+{
+    accept();
+    if (DlgCashinOut::cashinout(fUser) == QDialog::Accepted) {
+        fUser->setProperty("session_close", true);
+    }
+}
+
+void MenuDialog::on_btnSessoinMoney_clicked()
+{
     QDate d1, d2;
     if (!Calendar::getDate2(d1, d2)) {
         return;
     }
+
+    QList<int> sessions;
+    C5Database db(fDBParams);
+    db[":f_date1"] = d1;
+    db[":f_date2"] = d2;
+    db.exec("select f_id from s_salary_inout where f_datein between :f_date1 and :f_date2 ");
+    while (db.nextRow()) {
+        sessions.append(db.getInt("f_id"));
+    }
     QFont font(qApp->font());
-    font.setPointSize(28);
+    font.setPointSize(__c5config.getValue(param_receipt_print_font_size).toInt());
+    font.setFamily(__c5config.getValue(param_receipt_print_font_family));
     C5Printing p;
     p.setSceneParams(650, 2800, QPrinter::Portrait);
     p.setFont(font);
@@ -229,69 +276,75 @@ void MenuDialog::on_btnPrintReport_clicked()
         p.br();
     }
     p.setFontBold(true);
-    p.ctext(tr("End of day"));
+    p.ctext(QString("%1").arg(tr("History of sessions")));
     p.br();
-    p.ctext(d1.toString(FORMAT_DATE_TO_STR));
-    p.br();
-    p.ctext("-");
-    p.br();
-    p.ctext(d2.toString(FORMAT_DATE_TO_STR));
-    p.br();
-    double total = 0;
 
-    C5Database dd(fDBParams);
-    dd[":f_datecash1"] = d1;
-    dd[":f_datecash2"] = d2;
-    dd[":f_stateh"] = ORDER_STATE_CLOSE;
-    dd.exec("select count(f_id) from o_header h "
-            "where h.f_state=:f_stateh  and h.f_datecash between :f_datecash1 and :f_datecash2 ");
-    dd.nextRow();
-    int totalQty = dd.getInt(0);
-    dd[":f_datecash1"] = d1;
-    dd[":f_datecash2"] = d2;
-    dd[":f_stateh"] = ORDER_STATE_CLOSE;
-    dd[":f_stated"] = DISH_STATE_OK;
-    dd.exec("select d.f_name, sum(b.f_qty1) as f_qty, b.f_price, sum(b.f_qty1*b.f_price) as f_total "
-            "from o_body b "
-            "inner join o_header h on h.f_id=b.f_header "
-            "left join d_dish d on d.f_id=b.f_dish "
-            "where h.f_state=:f_stateh and b.f_state=:f_stated and h.f_datecash between :f_datecash1 and :f_datecash2 "
-            "group by 1, 3 ");
-    p.setFontBold(false);
-    p.setFontSize(22);
-    while (dd.nextRow()) {
-        if (p.checkBr(p.fLineHeight + 2)) {
-            p.br();
-        }
-        total += dd.getDouble("f_total");
-        p.ltext(dd.getString("f_name"), 0);
+    for (int sid: sessions) {
+        db[":f_id"] = sid;
+        db.exec("select * from s_salary_inout where f_id=:f_id");
+        db.nextRow();
+        p.ctext(QString("%1 %2").arg(db.getDate("f_datein").toString(FORMAT_DATE_TO_STR), db.getTime("f_timein").toString(FORMAT_TIME_TO_SHORT_STR)));
         p.br();
-        p.ltext(QString("%1 X %2 = %3").arg(float_str(dd.getDouble("f_qty"), 2)).arg(dd.getDouble("f_price"), 2).arg(float_str(dd.getDouble("f_total"), 2)), 0);
+        p.ctext("-");
         p.br();
+        p.ctext(QString("%1 %2").arg(db.getDate("f_dateout").toString(FORMAT_DATE_TO_STR), db.getTime("f_timeout").toString(FORMAT_TIME_TO_SHORT_STR)));
+        p.br();
+        p.ctext(dbuser->fullName(db.getInt("f_user")));
+        p.br();
+
         p.line();
-        p.br(2);
-    }
-    p.line(4);
-    p.br(3);
-    p.setFontBold(true);
-    p.setFontSize(28);
-    p.br();
-    p.br();
-    p.ltext(tr("Quantity of orders"), 0);
-    p.rtext(QString::number(totalQty));
-    p.br();
-    p.br();
-    p.ltext(tr("Total today"), 0);
-    p.rtext(float_str(total, 2));
-    p.br();
-    p.br();
+        p.br();
 
-    p.line();
-    p.br();
+            double balance = 0;
+            db[":f_session"] = sid;
+            //db[":f_cash"] = __c5config.cashId();
+            db.exec("select sum(f_amount) as f_amount "
+                    "from e_cash e "
+                    "inner join a_header_cash hc on hc.f_id=e.f_header "
+                    "where length(hc.f_oheader)>0 and f_session=:f_session ");
+            db.nextRow();
+            balance += db.getDouble("f_amount");
+            p.ltext(tr("Input from sale"), 0);
+            p.rtext(float_str(db.getDouble("f_amount"), 2));
+            p.br();
+
+            db[":f_session"] = sid;
+            //db[":f_cash"] = __c5config.cashId();
+            db.exec("select f_amount, f_remarks "
+                    "from e_cash e "
+                    "inner join a_header_cash hc on hc.f_id=e.f_header "
+                    "where length(hc.f_oheader)=0 and f_session=:f_session and f_sign=1");
+            while (db.nextRow()) {
+                p.ltext(db.getString("f_remarks"), 0);
+                p.rtext(float_str(db.getDouble("f_amount"), 2));
+                p.br();
+                balance += db.getDouble("f_amount");
+            }
+
+            db[":f_session"] = sid;
+            //db[":f_cash"] = __c5config.cashId();
+            db.exec("select f_sign*f_amount as f_amount, f_remarks "
+                    "from e_cash e "
+                    "inner join a_header_cash hc on hc.f_id=e.f_header "
+                    "where length(hc.f_oheader)=0 and f_session=:f_session and f_sign=-1");
+            while (db.nextRow()) {
+                p.ltext(db.getString("f_remarks"), 0);
+                p.rtext(float_str(db.getDouble("f_amount"), 2));
+                p.br();
+                balance += db.getDouble("f_amount");
+            }
+            p.ltext(tr("Final balance"), 0);
+            p.rtext(float_str(balance, 2));
+            p.br();
+            p.line();
+            p.br();
+
+    }
 
     p.setFontSize(18);
     p.ltext(tr("Printed"), 0);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
     p.br();
     p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
+    accept();
 }

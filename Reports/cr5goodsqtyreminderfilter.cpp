@@ -27,3 +27,13 @@ QString CR5GoodsQtyReminderFilter::condition()
     in(cond, "g.f_unit", ui->leUnit);
     return cond;
 }
+
+QString CR5GoodsQtyReminderFilter::filterText()
+{
+    QString s;
+    inFilterText(s, ui->leStoreName);
+    inFilterText(s, ui->leMaterialName);
+    inFilterText(s, ui->leUnitName);
+    inFilterText(s, ui->leGroupname);
+    return s;
+}

@@ -353,6 +353,11 @@
     </message>
     <message>
         <location filename="../Cafe5/c5message.ui" line="209"/>
+        <source>A3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Cafe5/c5message.ui" line="222"/>
         <source>A2</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1004,17 +1009,17 @@
         <translation>Փասթաթուղթը նշված համարով չկա</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="969"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="975"/>
         <source>Invalid document id</source>
         <translation>Փասթաթուղթը նշված համարով չկա</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="1098"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="1104"/>
         <source>Not enough materials in the store</source>
         <translation>Բաղասական քանակ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="1197"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="1203"/>
         <source>This order used in next documents</source>
         <translation>Այս պետվերը գրանցված է հետևյալ փասթաթղթերում</translation>
     </message>
@@ -1899,23 +1904,23 @@ MS Excel</source>
 <context>
     <name>DlgListOfDishComments</name>
     <message>
-        <location filename="dlglistofdishcomments.ui" line="14"/>
+        <location filename="../Forms/dlglistofdishcomments.ui" line="14"/>
         <source>Dialog</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="dlglistofdishcomments.ui" line="27"/>
-        <location filename="dlglistofdishcomments.cpp" line="37"/>
+        <location filename="../Forms/dlglistofdishcomments.ui" line="27"/>
+        <location filename="../Forms/dlglistofdishcomments.cpp" line="37"/>
         <source>Comment for</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="dlglistofdishcomments.ui" line="62"/>
-        <location filename="dlglistofdishcomments.ui" line="67"/>
-        <location filename="dlglistofdishcomments.ui" line="72"/>
-        <location filename="dlglistofdishcomments.ui" line="77"/>
-        <location filename="dlglistofdishcomments.ui" line="82"/>
-        <location filename="dlglistofdishcomments.ui" line="87"/>
+        <location filename="../Forms/dlglistofdishcomments.ui" line="62"/>
+        <location filename="../Forms/dlglistofdishcomments.ui" line="67"/>
+        <location filename="../Forms/dlglistofdishcomments.ui" line="72"/>
+        <location filename="../Forms/dlglistofdishcomments.ui" line="77"/>
+        <location filename="../Forms/dlglistofdishcomments.ui" line="82"/>
+        <location filename="../Forms/dlglistofdishcomments.ui" line="87"/>
         <source>New Column</source>
         <translation></translation>
     </message>

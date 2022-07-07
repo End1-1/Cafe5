@@ -135,7 +135,7 @@ void C5GroupPermissionsEditor::getCheckBoxes(QWidget *parent)
 
 void C5GroupPermissionsEditor::setChecked(int start, int end, bool v)
 {
-    for (QMap<int, C5CheckBox*>::const_iterator it = fCheckBoxes.begin(); it != fCheckBoxes.end(); it++) {
+    for (QMap<int, C5CheckBox*>::const_iterator it = fCheckBoxes.constBegin(); it != fCheckBoxes.constEnd(); it++) {
         if (it.key() >= start && it.key() <= end) {
             it.value()->setChecked(v);
         }

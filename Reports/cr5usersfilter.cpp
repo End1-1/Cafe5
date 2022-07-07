@@ -27,3 +27,11 @@ QString CR5UsersFilter::condition()
     }
     return cond;
 }
+
+QString CR5UsersFilter::filterText()
+{
+    QString s;
+    inFilterText(s, ui->leStateName);
+    inFilterText(s, ui->leGroupName);
+    return s;
+}

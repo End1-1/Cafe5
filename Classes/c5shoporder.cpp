@@ -204,7 +204,7 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
         if (!dw.writeAHeader(wsbCashDoc, wsbCashUserId, DOC_STATE_SAVED, DOC_TYPE_CASH, fUser->id(), QDate::currentDate(),  QDate::currentDate(), QTime::currentTime(), 0, wsbTotal, wsbComment)) {
             return returnFalse(dw.fErrorMsg, db);
         }
-        if (!dw.writeAHeaderCash(wsbCashDoc, 0, __c5config.cashId(), 1, wsbDocId, "")) {
+        if (!dw.writeAHeaderCash(wsbCashDoc, 0, __c5config.cashId(), 1, wsbDocId, "",0)) {
             return returnFalse(dw.fErrorMsg, db);
         }
         if (!dw.writeECash(wsbCashRowId, wsbCashDoc, __c5config.cashId(), -1, wsbComment, wsbTotal, wsbCashRowId, 1)) {
@@ -288,7 +288,7 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
             if (!dw.writeAHeader(cashdocid, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH, fUser->id(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, cash, __c5config.cashPrefix() + " " + headerPrefix + QString::number(headerId))) {
                 return returnFalse(dw.fErrorMsg, db);
             }
-            if (!dw.writeAHeaderCash(cashdocid, __c5config.cashId(), 0, 1, "", fHeader)) {
+            if (!dw.writeAHeaderCash(cashdocid, __c5config.cashId(), 0, 1, "", fHeader, 0)) {
                 return returnFalse(dw.fErrorMsg, db);
             }
             QString cashUUID;
@@ -304,7 +304,7 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
             if (!dw.writeAHeader(nocashdocid, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH, fUser->id(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, card, __c5config.nocashPrefix() + " " + headerPrefix + QString::number(headerId))) {
                 return returnFalse(dw.fErrorMsg, db);
             }
-            if (!dw.writeAHeaderCash(nocashdocid, __c5config.nocashId(), 0, 1, "", fHeader)) {
+            if (!dw.writeAHeaderCash(nocashdocid, __c5config.nocashId(), 0, 1, "", fHeader, 0)) {
                 return returnFalse(dw.fErrorMsg, db);
             }
             QString cashUUID;
@@ -401,7 +401,7 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
                 if (!dw.writeAHeader(partnerCashDoc, QString::number(counter), DOC_STATE_DRAFT, DOC_TYPE_CASH, fUser->id(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), fPartnerCode, total, comment)) {
                     return returnFalse(dw.fErrorMsg, db);
                 }
-                if (!dw.writeAHeaderCash(partnerCashDoc, partnerCash, 0, 1, partnerCashDoc, "")) {
+                if (!dw.writeAHeaderCash(partnerCashDoc, partnerCash, 0, 1, partnerCashDoc, "", 0)) {
                     return returnFalse(dw.fErrorMsg, db);
                 }
                 QString cashUUID;

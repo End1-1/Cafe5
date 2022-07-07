@@ -77,7 +77,7 @@ void CashCollection::on_btnSave_clicked()
         C5Message::error(dw.fErrorMsg);
         return;
     }
-    if (!dw.writeAHeaderCash(cashdocid, 0, __c5config.cashId(), 0, "", "")) {
+    if (!dw.writeAHeaderCash(cashdocid, 0, __c5config.cashId(), 0, "", "", 0)) {
         db.rollback();
         C5Message::error(dw.fErrorMsg);
         return;

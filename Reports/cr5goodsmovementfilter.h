@@ -18,6 +18,8 @@ public:
 
     virtual QString condition();
 
+    virtual QString filterText();
+
     void setDate(const QDate &d1, const QDate &d2);
 
     void setDocType(const QString &docType);
@@ -29,6 +31,12 @@ public:
     void setReason(const QString &reason);
 
     void setInOut(int inout);
+
+    QString date1s() const;
+
+    QString date2s() const;
+
+    QString partners() const;
 
 private:
     Ui::CR5GoodsMovementFilter *ui;

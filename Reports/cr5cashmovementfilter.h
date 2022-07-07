@@ -18,6 +18,8 @@ public:
 
     virtual QString condition() override;
 
+    virtual QString filterText() override;
+
 private:
     Ui::CR5CashMovementFilter *ui;
 };

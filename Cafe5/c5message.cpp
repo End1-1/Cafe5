@@ -23,20 +23,20 @@ C5Message::~C5Message()
 
 int C5Message::error(const QString &errorStr, const QString &yes, const QString &no)
 {
-    return showMessage(errorStr, 2, yes, no);
+    return showMessage(errorStr, 2, yes, no, "");
 }
 
 int C5Message::info(const QString &infoStr, const QString &yes, const QString &no)
 {
-    return showMessage(infoStr, 1, yes, no);
+    return showMessage(infoStr, 1, yes, no, "");
 }
 
-int C5Message::question(const QString &questionStr, const QString &yes, const QString &no)
+int C5Message::question(const QString &questionStr, const QString &yes, const QString &no, const QString &a3)
 {
-    return showMessage(questionStr, 3, yes, no);
+    return showMessage(questionStr, 3, yes, no, a3);
 }
 
-int C5Message::showMessage(const QString &text, int tp, const QString &yes, const QString &no)
+int C5Message::showMessage(const QString &text, int tp, const QString &yes, const QString &no, const QString &a3)
 {
     C5Message *c5 = new C5Message(__c5config.fParentWidget);
     c5->ui->btnYes->setText(yes);
@@ -44,6 +44,8 @@ int C5Message::showMessage(const QString &text, int tp, const QString &yes, cons
     if (no.isEmpty()) {
         c5->ui->btnCancel->setVisible(false);
     }
+    c5->ui->btnA3->setVisible(!a3.isEmpty());
+    c5->ui->btnA3->setText(a3);
     QString img;
     switch (tp) {
     case 1:
@@ -78,4 +80,9 @@ void C5Message::on_btnYes_clicked()
 void C5Message::on_btnCancel_clicked()
 {
     reject();
+}
+
+void C5Message::on_btnA3_clicked()
+{
+    done(2);
 }

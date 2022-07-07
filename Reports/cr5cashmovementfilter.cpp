@@ -24,3 +24,10 @@ QString CR5CashMovementFilter::condition()
     }
     return w;
 }
+
+QString CR5CashMovementFilter::filterText()
+{
+    QString s = QString("%1 %2 - %3").arg(tr("Date range"), ui->deStart->text(), ui->deEnd->text());
+    inFilterText(s, ui->leCashName);
+    return s;
+}

@@ -20,17 +20,19 @@ public:
 
     static int info(const QString &infoStr, const QString &yes = QObject::tr("OK"), const QString &no = "");
 
-    static int question(const QString &questionStr, const QString &yes = QObject::tr("Yes"), const QString &no = QObject::tr("No"));
+    static int question(const QString &questionStr, const QString &yes = QObject::tr("Yes"), const QString &no = QObject::tr("No"), const QString &a3 = "");
 
 private slots:
     void on_btnYes_clicked();
 
     void on_btnCancel_clicked();
 
+    void on_btnA3_clicked();
+
 private:
     Ui::C5Message *ui;
 
-    static int showMessage(const QString &text, int tp, const QString &yes, const QString &no);
+    static int showMessage(const QString &text, int tp, const QString &yes, const QString &no, const QString &a3);
 };
 
 #endif // C5MESSAGE_H

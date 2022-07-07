@@ -65,7 +65,7 @@
         <location filename="../Classes/c5cache.cpp" line="115"/>
         <location filename="../Classes/c5cache.cpp" line="290"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Անվանում</translation>
     </message>
     <message>
         <location filename="../Classes/c5cache.cpp" line="19"/>
@@ -85,7 +85,7 @@
     <message>
         <location filename="../Classes/c5cache.cpp" line="35"/>
         <source>Unit</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Չափ․ մ․</translation>
     </message>
     <message>
         <location filename="../Classes/c5cache.cpp" line="36"/>
@@ -177,7 +177,7 @@
         <location filename="../Classes/c5cache.cpp" line="81"/>
         <location filename="../Classes/c5cache.cpp" line="123"/>
         <source>Price</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Գին</translation>
     </message>
     <message>
         <location filename="../Classes/c5cache.cpp" line="101"/>
@@ -327,6 +327,11 @@
     </message>
     <message>
         <location filename="../Cafe5/c5message.ui" line="209"/>
+        <source>A3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Cafe5/c5message.ui" line="222"/>
         <source>A2</source>
         <translation type="unfinished"></translation>
     </message>
@@ -921,17 +926,17 @@
         <translation>Փաստաթուղթը գոյություն չունի</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="969"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="975"/>
         <source>Invalid document id</source>
         <translation>Սխալ փաստաթղթի համար</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="1098"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="1104"/>
         <source>Not enough materials in the store</source>
         <translation>Բացասական քանակ պահեստում</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="1197"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="1203"/>
         <source>This order used in next documents</source>
         <translation>Այս փաստաթուղթը օգտագործվում է հետևյալ պահեստի ելքերի մեջ</translation>
     </message>
@@ -995,7 +1000,7 @@
     <message>
         <location filename="../Classes/c5widget.cpp" line="57"/>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Խմբագրել</translation>
     </message>
     <message>
         <location filename="../Classes/c5widget.cpp" line="60"/>
@@ -1193,17 +1198,17 @@ MS Excel</source>
     <message>
         <location filename="../Forms/change.ui" line="29"/>
         <source>1000</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Forms/change.ui" line="61"/>
         <source>5000</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Forms/change.ui" line="157"/>
         <source>2000</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Forms/change.ui" line="278"/>
@@ -1218,17 +1223,17 @@ MS Excel</source>
     <message>
         <location filename="../Forms/change.ui" line="374"/>
         <source>10000</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Forms/change.ui" line="390"/>
         <source>15000</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Forms/change.ui" line="406"/>
         <source>20000</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Forms/change.ui" line="189"/>
@@ -1312,20 +1317,139 @@ MS Excel</source>
         <translation>Հրաժարվել</translation>
     </message>
     <message>
-        <location filename="../Forms/customerinfo.cpp" line="43"/>
+        <location filename="../Forms/customerinfo.cpp" line="49"/>
         <source>Address must be defined</source>
         <translation>Հասցեն նշված չէ</translation>
     </message>
     <message>
-        <location filename="../Forms/customerinfo.cpp" line="46"/>
+        <location filename="../Forms/customerinfo.cpp" line="52"/>
         <source>Phone must defined</source>
         <translation>Հեռախոսը նշված չէ</translation>
     </message>
     <message>
-        <location filename="../Forms/customerinfo.cpp" line="75"/>
-        <location filename="../Forms/customerinfo.cpp" line="79"/>
+        <location filename="../Forms/customerinfo.cpp" line="85"/>
+        <location filename="../Forms/customerinfo.cpp" line="89"/>
         <source>Invalid phone number</source>
         <translation>Հեռախոսի համարի ֆորմատը սխալ է</translation>
+    </message>
+</context>
+<context>
+    <name>DlgCashOp</name>
+    <message>
+        <location filename="../Forms/dlgcashop.ui" line="14"/>
+        <source>Money in/out</source>
+        <translation>Գումարի մուտք/ելք</translation>
+    </message>
+    <message>
+        <location filename="../Forms/dlgcashop.ui" line="20"/>
+        <source>Amount</source>
+        <translation>Գումար</translation>
+    </message>
+    <message>
+        <location filename="../Forms/dlgcashop.ui" line="30"/>
+        <source>Purpose</source>
+        <translation>Նշանակություն</translation>
+    </message>
+    <message>
+        <location filename="../Forms/dlgcashop.ui" line="55"/>
+        <source>Save</source>
+        <translation>Պահպանել</translation>
+    </message>
+    <message>
+        <location filename="../Forms/dlgcashop.ui" line="62"/>
+        <source>Cancel</source>
+        <translation>Հրաժարվել</translation>
+    </message>
+    <message>
+        <location filename="../Forms/dlgcashop.ui" line="87"/>
+        <source>IN/OUT</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../Forms/dlgcashop.cpp" line="17"/>
+        <source>In</source>
+        <translation>Մուտք</translation>
+    </message>
+    <message>
+        <location filename="../Forms/dlgcashop.cpp" line="17"/>
+        <source>Out</source>
+        <translation>Ելք</translation>
+    </message>
+    <message>
+        <location filename="../Forms/dlgcashop.cpp" line="34"/>
+        <source>Amount cannot be zero</source>
+        <translation>Գումարը չի կարող լինի զրո</translation>
+    </message>
+    <message>
+        <location filename="../Forms/dlgcashop.cpp" line="38"/>
+        <source>Purpose must be defined</source>
+        <translation>Նպատակը պետք է նշել</translation>
+    </message>
+    <message>
+        <location filename="../Forms/dlgcashop.cpp" line="61"/>
+        <source>Saved</source>
+        <translation>Պահպանված է</translation>
+    </message>
+</context>
+<context>
+    <name>DlgCashinOut</name>
+    <message>
+        <location filename="../Forms/dlgcashinout.ui" line="14"/>
+        <source>Dialog</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../Forms/dlgcashinout.ui" line="42"/>
+        <location filename="../Forms/dlgcashinout.cpp" line="100"/>
+        <location filename="../Forms/dlgcashinout.cpp" line="109"/>
+        <location filename="../Forms/dlgcashinout.cpp" line="134"/>
+        <source>Close session</source>
+        <translation>Փակել սեսսիան</translation>
+    </message>
+    <message>
+        <location filename="../Forms/dlgcashinout.ui" line="49"/>
+        <source>Cancel</source>
+        <translation>Հրաժարվել</translation>
+    </message>
+    <message>
+        <location filename="../Forms/dlgcashinout.ui" line="82"/>
+        <source>Purpose</source>
+        <translation>Նպատակ</translation>
+    </message>
+    <message>
+        <location filename="../Forms/dlgcashinout.ui" line="87"/>
+        <source>Amount</source>
+        <translation>Գումար</translation>
+    </message>
+    <message>
+        <location filename="../Forms/dlgcashinout.ui" line="100"/>
+        <source>Current balance: 0</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../Forms/dlgcashinout.cpp" line="28"/>
+        <source>Input from sale</source>
+        <translation>Մուտք վաճառքից</translation>
+    </message>
+    <message>
+        <location filename="../Forms/dlgcashinout.cpp" line="58"/>
+        <source>Current balance</source>
+        <translation>Ընդացիկ բալանս</translation>
+    </message>
+    <message>
+        <location filename="../Forms/dlgcashinout.cpp" line="81"/>
+        <source>Incorrect balance</source>
+        <translation>Սխալ բալանս</translation>
+    </message>
+    <message>
+        <location filename="../Forms/dlgcashinout.cpp" line="84"/>
+        <source>Confirm to close session</source>
+        <translation>Հաստատեք սեսսիաի փակումը</translation>
+    </message>
+    <message>
+        <location filename="../Forms/dlgcashinout.cpp" line="160"/>
+        <source>Printed</source>
+        <translation>Տպված</translation>
     </message>
 </context>
 <context>
@@ -1333,22 +1457,100 @@ MS Excel</source>
     <message>
         <location filename="../Cafe5/dlgexitbyversion.ui" line="14"/>
         <source>Exit</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Cafe5/dlgexitbyversion.ui" line="36"/>
         <source>Message</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Cafe5/dlgexitbyversion.ui" line="53"/>
         <source>Time</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Cafe5/dlgexitbyversion.ui" line="79"/>
         <source>Close</source>
-        <translation type="unfinished">Փակել</translation>
+        <translation>Փակել</translation>
+    </message>
+</context>
+<context>
+    <name>DlgListOfDishComments</name>
+    <message>
+        <location filename="../Forms/dlglistofdishcomments.ui" line="14"/>
+        <source>Dialog</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../Forms/dlglistofdishcomments.ui" line="27"/>
+        <location filename="../Forms/dlglistofdishcomments.cpp" line="37"/>
+        <source>Comment for</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../Forms/dlglistofdishcomments.ui" line="62"/>
+        <location filename="../Forms/dlglistofdishcomments.ui" line="67"/>
+        <location filename="../Forms/dlglistofdishcomments.ui" line="72"/>
+        <location filename="../Forms/dlglistofdishcomments.ui" line="77"/>
+        <location filename="../Forms/dlglistofdishcomments.ui" line="82"/>
+        <location filename="../Forms/dlglistofdishcomments.ui" line="87"/>
+        <source>New Column</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>DlgMemoryRead</name>
+    <message>
+        <location filename="dlgmemoryread.ui" line="14"/>
+        <source>Orders in memory</source>
+        <translation>Պատվերներ հիշողության մեջ</translation>
+    </message>
+    <message>
+        <location filename="dlgmemoryread.ui" line="33"/>
+        <source>NN</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="dlgmemoryread.ui" line="38"/>
+        <location filename="dlgmemoryread.cpp" line="69"/>
+        <source>Amount</source>
+        <translation>Գումար</translation>
+    </message>
+    <message>
+        <location filename="dlgmemoryread.ui" line="68"/>
+        <source>Reprint</source>
+        <translation>Տպել հաշիվը կրկին</translation>
+    </message>
+    <message>
+        <location filename="dlgmemoryread.ui" line="81"/>
+        <source>Open</source>
+        <translation>Բացել</translation>
+    </message>
+    <message>
+        <location filename="dlgmemoryread.ui" line="94"/>
+        <source>Cancel</source>
+        <translation>Հրաժարվել</translation>
+    </message>
+    <message>
+        <location filename="dlgmemoryread.cpp" line="45"/>
+        <source>Nothing was selected</source>
+        <translation>Ոչինչ նշված չէ</translation>
+    </message>
+    <message>
+        <location filename="dlgmemoryread.cpp" line="66"/>
+        <source>Id</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="dlgmemoryread.cpp" line="67"/>
+        <source>Number</source>
+        <translation>Համար</translation>
+    </message>
+    <message>
+        <location filename="dlgmemoryread.cpp" line="68"/>
+        <source>Date</source>
+        <translation>Ամսաթիվ</translation>
     </message>
 </context>
 <context>
@@ -1509,6 +1711,129 @@ MS Excel</source>
     </message>
 </context>
 <context>
+    <name>DlgSmartReports</name>
+    <message>
+        <location filename="dlgsmartreports.ui" line="14"/>
+        <source>Reports</source>
+        <translation>Հաշվետվություններ</translation>
+    </message>
+    <message>
+        <location filename="dlgsmartreports.ui" line="17"/>
+        <location filename="dlgsmartreports.ui" line="35"/>
+        <location filename="dlgsmartreports.ui" line="42"/>
+        <location filename="dlgsmartreports.ui" line="52"/>
+        <location filename="dlgsmartreports.ui" line="59"/>
+        <location filename="dlgsmartreports.ui" line="69"/>
+        <location filename="dlgsmartreports.ui" line="82"/>
+        <location filename="dlgsmartreports.ui" line="92"/>
+        <location filename="dlgsmartreports.ui" line="105"/>
+        <location filename="dlgsmartreports.ui" line="115"/>
+        <source>1</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="dlgsmartreports.ui" line="32"/>
+        <source>Date start</source>
+        <translation>Ամսաթիվ, սկիզբ</translation>
+    </message>
+    <message>
+        <location filename="dlgsmartreports.ui" line="49"/>
+        <source>Date end</source>
+        <translation>Ամսաթիվ, վերջ</translation>
+    </message>
+    <message>
+        <location filename="dlgsmartreports.ui" line="66"/>
+        <source>Time start</source>
+        <translation>Ժամ, սկիզբ</translation>
+    </message>
+    <message>
+        <location filename="dlgsmartreports.ui" line="76"/>
+        <location filename="dlgsmartreports.ui" line="99"/>
+        <source>##:##</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="dlgsmartreports.ui" line="79"/>
+        <source>00:00</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="dlgsmartreports.ui" line="89"/>
+        <source>Time end</source>
+        <translation>Ժամ, վերջ</translation>
+    </message>
+    <message>
+        <location filename="dlgsmartreports.ui" line="102"/>
+        <source>23:59</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="dlgsmartreports.cpp" line="13"/>
+        <source>Sales by dishes</source>
+        <translation>Ուտեստների վաճառք</translation>
+    </message>
+    <message>
+        <location filename="dlgsmartreports.cpp" line="19"/>
+        <source>Sales by dishes with time</source>
+        <translation>Ուտեստների վաճառք (+ժամ)</translation>
+    </message>
+    <message>
+        <location filename="dlgsmartreports.cpp" line="25"/>
+        <source>Session orders</source>
+        <translation>Ընդացիկ սեսսիաի պատվերներ</translation>
+    </message>
+    <message>
+        <location filename="dlgsmartreports.cpp" line="31"/>
+        <source>Delivery</source>
+        <translation>Առաքում</translation>
+    </message>
+    <message>
+        <location filename="dlgsmartreports.cpp" line="37"/>
+        <source>Cancel</source>
+        <translation>Փակել</translation>
+    </message>
+    <message>
+        <location filename="dlgsmartreports.cpp" line="85"/>
+        <location filename="dlgsmartreports.cpp" line="166"/>
+        <source>End of day</source>
+        <translation>Օրվա հասույթ</translation>
+    </message>
+    <message>
+        <location filename="dlgsmartreports.cpp" line="133"/>
+        <location filename="dlgsmartreports.cpp" line="215"/>
+        <source>Quantity of orders</source>
+        <translation>Պատվերների քանակ</translation>
+    </message>
+    <message>
+        <location filename="dlgsmartreports.cpp" line="137"/>
+        <location filename="dlgsmartreports.cpp" line="219"/>
+        <source>Total today</source>
+        <translation>Ընդամենը</translation>
+    </message>
+    <message>
+        <location filename="dlgsmartreports.cpp" line="146"/>
+        <location filename="dlgsmartreports.cpp" line="228"/>
+        <location filename="dlgsmartreports.cpp" line="286"/>
+        <source>Printed</source>
+        <translation>Տպված</translation>
+    </message>
+    <message>
+        <location filename="dlgsmartreports.cpp" line="248"/>
+        <source>Delivery report</source>
+        <translation>Առաքման հաշվետվություն</translation>
+    </message>
+    <message>
+        <location filename="dlgsmartreports.cpp" line="274"/>
+        <source>Delivery total count</source>
+        <translation>Առաքման քանակ</translation>
+    </message>
+    <message>
+        <location filename="dlgsmartreports.cpp" line="277"/>
+        <source>Delivery total amount</source>
+        <translation>Առաքման գումար</translation>
+    </message>
+</context>
+<context>
     <name>MenuDialog</name>
     <message>
         <location filename="menudialog.ui" line="14"/>
@@ -1527,84 +1852,108 @@ MS Excel</source>
     </message>
     <message>
         <location filename="menudialog.ui" line="90"/>
+        <source>Session money movement</source>
+        <translation>Սեսսիաների պատմություն</translation>
+    </message>
+    <message>
+        <location filename="menudialog.ui" line="119"/>
         <source>Print sale by order</source>
         <translation>Հաշվետվություն ըստ պատվերների</translation>
     </message>
     <message>
-        <location filename="menudialog.ui" line="119"/>
+        <location filename="menudialog.ui" line="148"/>
         <source>Print fiscal report</source>
         <translation>Ֆիստկալ հաշվետվություն</translation>
     </message>
     <message>
-        <location filename="menudialog.ui" line="148"/>
+        <location filename="menudialog.ui" line="177"/>
         <source>Return fiscal receipt</source>
         <translation>ՀԴՄ կտրոնի հետվերադարձ</translation>
     </message>
     <message>
-        <location filename="menudialog.ui" line="177"/>
+        <location filename="menudialog.ui" line="206"/>
+        <source>+ Cash in</source>
+        <translation>+ Կանխիկի մուտք</translation>
+    </message>
+    <message>
+        <location filename="menudialog.ui" line="235"/>
+        <source>- Cash out</source>
+        <translation>- Կնախիկի ելք</translation>
+    </message>
+    <message>
+        <location filename="menudialog.ui" line="264"/>
+        <source>Close session</source>
+        <translation>Փակել սեսսիան</translation>
+    </message>
+    <message>
+        <location filename="menudialog.ui" line="293"/>
         <source>Close application</source>
         <translation>Փակել ծրագիրը</translation>
     </message>
     <message>
-        <location filename="menudialog.cpp" line="24"/>
+        <location filename="menudialog.cpp" line="30"/>
         <source>Confirm to close application</source>
         <translation>Փակել՞ ծրագիրը</translation>
     </message>
     <message>
-        <location filename="menudialog.cpp" line="94"/>
+        <location filename="menudialog.cpp" line="100"/>
         <source>Complete</source>
         <translation>Կատարված է</translation>
     </message>
     <message>
-        <location filename="menudialog.cpp" line="127"/>
-        <location filename="menudialog.cpp" line="232"/>
+        <location filename="menudialog.cpp" line="133"/>
         <source>End of day</source>
         <translation>Օրվա հասույթ</translation>
     </message>
     <message>
-        <location filename="menudialog.cpp" line="144"/>
-        <location filename="menudialog.cpp" line="181"/>
+        <location filename="menudialog.cpp" line="150"/>
+        <location filename="menudialog.cpp" line="187"/>
         <source>Cash</source>
         <translation>Կանխիկ</translation>
     </message>
     <message>
-        <location filename="menudialog.cpp" line="150"/>
-        <location filename="menudialog.cpp" line="186"/>
+        <location filename="menudialog.cpp" line="156"/>
+        <location filename="menudialog.cpp" line="192"/>
         <source>Card</source>
         <translation>Քարտ</translation>
     </message>
     <message>
-        <location filename="menudialog.cpp" line="156"/>
-        <location filename="menudialog.cpp" line="191"/>
+        <location filename="menudialog.cpp" line="162"/>
+        <location filename="menudialog.cpp" line="197"/>
         <source>Idram</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="menudialog.cpp" line="162"/>
-        <location filename="menudialog.cpp" line="196"/>
+        <location filename="menudialog.cpp" line="168"/>
+        <location filename="menudialog.cpp" line="202"/>
         <source>Other</source>
         <translation>Այլ</translation>
     </message>
     <message>
-        <location filename="menudialog.cpp" line="177"/>
+        <location filename="menudialog.cpp" line="183"/>
         <source>Total</source>
         <translation>Ընդամենը</translation>
     </message>
     <message>
-        <location filename="menudialog.cpp" line="203"/>
-        <location filename="menudialog.cpp" line="293"/>
+        <location filename="menudialog.cpp" line="209"/>
+        <location filename="menudialog.cpp" line="341"/>
         <source>Printed</source>
         <translation>Տպված</translation>
     </message>
     <message>
-        <location filename="menudialog.cpp" line="280"/>
-        <source>Quantity of orders</source>
-        <translation>Պատվերների քանակ</translation>
+        <location filename="menudialog.cpp" line="275"/>
+        <source>History of sessions</source>
+        <translation>Սեսսիաների պատմություն</translation>
     </message>
     <message>
-        <location filename="menudialog.cpp" line="284"/>
-        <source>Total today</source>
-        <translation>Ընդամենը</translation>
+        <location filename="menudialog.cpp" line="303"/>
+        <source>Input from sale</source>
+        <translation>Մուտք վաճառքից</translation>
+    </message>
+    <message>
+        <location filename="menudialog.cpp" line="332"/>
+        <source>Final balance</source>
+        <translation>Վերջնական բալանս</translation>
     </message>
 </context>
 <context>
@@ -1622,34 +1971,6 @@ MS Excel</source>
     <message>
         <location filename="../Classes/notificationwidget.ui" line="179"/>
         <source>The message!</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>OrderDish</name>
-    <message>
-        <location filename="orderdish.ui" line="14"/>
-        <source>Form</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="orderdish.ui" line="61"/>
-        <source>Dish name</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="orderdish.ui" line="89"/>
-        <source>1100</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="orderdish.ui" line="113"/>
-        <source>2200</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="orderdish.ui" line="137"/>
-        <source>2</source>
         <translation></translation>
     </message>
 </context>
@@ -1905,57 +2226,57 @@ MS Excel</source>
     <message>
         <location filename="../Shop/printreceiptgroup.cpp" line="748"/>
         <source>Order</source>
-        <translation type="unfinished"></translation>
+        <translation>Պատվեր</translation>
     </message>
     <message>
         <location filename="../Shop/printreceiptgroup.cpp" line="763"/>
         <source>NN</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Shop/printreceiptgroup.cpp" line="764"/>
         <source>Code</source>
-        <translation type="unfinished"></translation>
+        <translation>Կոդ</translation>
     </message>
     <message>
         <location filename="../Shop/printreceiptgroup.cpp" line="765"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Անվանում</translation>
     </message>
     <message>
         <location filename="../Shop/printreceiptgroup.cpp" line="766"/>
         <source>Qty</source>
-        <translation type="unfinished"></translation>
+        <translation>Քնկ</translation>
     </message>
     <message>
         <location filename="../Shop/printreceiptgroup.cpp" line="767"/>
         <source>Unit</source>
-        <translation type="unfinished"></translation>
+        <translation>Չափ․ մ․</translation>
     </message>
     <message>
         <location filename="../Shop/printreceiptgroup.cpp" line="768"/>
         <source>Price</source>
-        <translation type="unfinished"></translation>
+        <translation>Գին</translation>
     </message>
     <message>
         <location filename="../Shop/printreceiptgroup.cpp" line="769"/>
         <source>Total</source>
-        <translation type="unfinished">Ընդամենը</translation>
+        <translation>Ընդամենը</translation>
     </message>
     <message>
         <location filename="../Shop/printreceiptgroup.cpp" line="794"/>
         <source>Payment</source>
-        <translation type="unfinished"></translation>
+        <translation>Վճարումը</translation>
     </message>
     <message>
         <location filename="../Shop/printreceiptgroup.cpp" line="796"/>
         <source>debt</source>
-        <translation type="unfinished"></translation>
+        <translation>պարտք</translation>
     </message>
     <message>
         <location filename="../Shop/printreceiptgroup.cpp" line="805"/>
         <source>Cash</source>
-        <translation type="unfinished">Կանխիկ</translation>
+        <translation>Կանխիկ</translation>
     </message>
 </context>
 <context>
@@ -1994,7 +2315,7 @@ MS Excel</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="main.cpp" line="39"/>
+        <location filename="main.cpp" line="36"/>
         <source>An instance of application already running</source>
         <translation></translation>
     </message>
@@ -2029,27 +2350,27 @@ MS Excel</source>
     <message>
         <location filename="../Classes/rkeyboard.ui" line="20"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Classes/rkeyboard.ui" line="366"/>
         <source>Tab</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Classes/rkeyboard.ui" line="619"/>
         <source>Clear</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Classes/rkeyboard.ui" line="651"/>
         <source>CAPS</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Classes/rkeyboard.ui" line="1298"/>
         <source>Space</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2078,6 +2399,49 @@ MS Excel</source>
         <location filename="../Shop/selectprinters.ui" line="68"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SessionOrders</name>
+    <message>
+        <location filename="sessionorders.ui" line="14"/>
+        <source>Session orders</source>
+        <translation>Ընդացիկ սեսսիաի պատվերներ</translation>
+    </message>
+    <message>
+        <location filename="sessionorders.ui" line="33"/>
+        <source>UUID</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="sessionorders.ui" line="38"/>
+        <source>Number</source>
+        <translation>Համար</translation>
+    </message>
+    <message>
+        <location filename="sessionorders.ui" line="43"/>
+        <source>Date</source>
+        <translation>Ամսաթիվ</translation>
+    </message>
+    <message>
+        <location filename="sessionorders.ui" line="48"/>
+        <source>Amount</source>
+        <translation>Գումար</translation>
+    </message>
+    <message>
+        <location filename="sessionorders.ui" line="53"/>
+        <source>Fiscal</source>
+        <translation>Ֆիսկալ</translation>
+    </message>
+    <message>
+        <location filename="sessionorders.ui" line="67"/>
+        <source>Close</source>
+        <translation>Փակել</translation>
+    </message>
+    <message>
+        <location filename="sessionorders.ui" line="80"/>
+        <source>Edit</source>
+        <translation>Խմբագրել</translation>
     </message>
 </context>
 <context>
@@ -2248,7 +2612,6 @@ MS Excel</source>
     </message>
     <message>
         <location filename="workspace.ui" line="301"/>
-        <location filename="workspace.ui" line="1137"/>
         <source>New Column</source>
         <translation></translation>
     </message>
@@ -2263,278 +2626,364 @@ MS Excel</source>
         <translation>Փաթեթներ</translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="802"/>
+        <location filename="workspace.ui" line="900"/>
         <source>0.25</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="846"/>
+        <location filename="workspace.ui" line="988"/>
         <source>4</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="890"/>
+        <location filename="workspace.ui" line="922"/>
         <source>3</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="976"/>
+        <location filename="workspace.ui" line="966"/>
         <source>5</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="998"/>
+        <location filename="workspace.ui" line="944"/>
         <source>+10</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="1240"/>
+        <location filename="workspace.ui" line="802"/>
+        <source>MR</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="workspace.ui" line="1074"/>
+        <source>M+</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="workspace.ui" line="1198"/>
+        <source>Name</source>
+        <translation>Անվանում</translation>
+    </message>
+    <message>
+        <location filename="workspace.ui" line="1203"/>
+        <source>Qty</source>
+        <translation>Քնկ</translation>
+    </message>
+    <message>
+        <location filename="workspace.ui" line="1208"/>
+        <source>Price</source>
+        <translation>Գին</translation>
+    </message>
+    <message>
+        <location filename="workspace.ui" line="1316"/>
         <source>Received</source>
         <translation>Առձերն</translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="1268"/>
-        <location filename="workspace.ui" line="1605"/>
+        <location filename="workspace.ui" line="1344"/>
+        <location filename="workspace.ui" line="1681"/>
         <source>999999.99</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="1277"/>
-        <location filename="workspace.ui" line="1614"/>
+        <location filename="workspace.ui" line="1353"/>
+        <location filename="workspace.ui" line="1690"/>
         <source>1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="1359"/>
+        <location filename="workspace.ui" line="1435"/>
         <source>99999999.99</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="1368"/>
+        <location filename="workspace.ui" line="1444"/>
         <source>2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="1571"/>
+        <location filename="workspace.ui" line="1647"/>
         <source>Change</source>
         <translation>Մանրը</translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="1721"/>
+        <location filename="workspace.ui" line="1797"/>
         <source>Write</source>
         <translation>Գրանցել</translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="780"/>
+        <location filename="workspace.ui" line="878"/>
         <source>+1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="824"/>
+        <location filename="workspace.ui" line="780"/>
         <source>-1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="868"/>
+        <location filename="workspace.ui" line="856"/>
         <source>0.5</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="1165"/>
+        <location filename="workspace.ui" line="1241"/>
         <source>Costumer phone</source>
         <translation>Հաճախորդի հեռախոսի համար</translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="1328"/>
+        <location filename="workspace.ui" line="1213"/>
+        <location filename="workspace.ui" line="1404"/>
         <source>Total</source>
         <translation>Ընդամենը</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="82"/>
+        <location filename="workspace.cpp" line="86"/>
         <source>ENTER</source>
         <translation>ՄՈՒՏՔ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="914"/>
-        <location filename="workspace.cpp" line="1057"/>
+        <location filename="workspace.cpp" line="1044"/>
+        <location filename="workspace.cpp" line="1214"/>
         <source>Receipt #</source>
         <translation>Պատվեր №</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="736"/>
+        <location filename="workspace.cpp" line="854"/>
         <source>Amount to paid</source>
         <translation>Ենթակա է վճարման</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="99"/>
+        <location filename="workspace.cpp" line="98"/>
+        <source>Continue session</source>
+        <translation>Աշխատանքային սեսսիան շարունակվում է</translation>
+    </message>
+    <message>
+        <location filename="workspace.cpp" line="100"/>
+        <source>An open session exists on this station and must be closed first before used by another user</source>
+        <translation>Պետք է փակել ընդացիկ սեսսիան, նոր աշխատող գրանցելուց առաջ</translation>
+    </message>
+    <message>
+        <location filename="workspace.cpp" line="124"/>
         <source>POPULAR</source>
         <translation>Արագ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="359"/>
+        <location filename="workspace.cpp" line="449"/>
         <source>Idram payment was not received</source>
         <translation>Idram վճարումը չի հաջողվել</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="607"/>
+        <location filename="workspace.cpp" line="510"/>
+        <source>Application error. Cannot retrieve record of cash document.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="workspace.cpp" line="750"/>
         <source>Confirm to remove customer informaion</source>
         <translation>Հաստատեք հաճախորդի մասին տեղեկության հեռացումը</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="707"/>
+        <location filename="workspace.cpp" line="825"/>
         <source>Empty order</source>
         <translation>Դատարկ պատվեր</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="710"/>
+        <location filename="workspace.cpp" line="828"/>
         <source>Order will saved, continue?</source>
         <translation>Պատվերը գրանցվելու է, շարունակել՞</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="780"/>
-        <location filename="workspace.cpp" line="938"/>
+        <location filename="workspace.cpp" line="898"/>
+        <location filename="workspace.cpp" line="1083"/>
         <source>Printed:</source>
         <translation>Տպված</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1004"/>
-        <location filename="workspace.cpp" line="1086"/>
+        <location filename="workspace.cpp" line="955"/>
+        <source>Unknown order id. Programm error. Contact to developer.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="workspace.cpp" line="1051"/>
+        <source>Edited</source>
+        <translation>Խմբագրված</translation>
+    </message>
+    <message>
+        <location filename="workspace.cpp" line="1150"/>
+        <location filename="workspace.cpp" line="1243"/>
         <source>(F)</source>
         <translation>(Ֆ)</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1009"/>
+        <location filename="workspace.cpp" line="1155"/>
         <source>Try again</source>
         <translation>Փորձել կրկին</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1009"/>
+        <location filename="workspace.cpp" line="1155"/>
         <source>Do not print</source>
         <translation>Չտպել</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1053"/>
+        <location filename="workspace.cpp" line="1155"/>
+        <source>Return to editing</source>
+        <translation>Խմբագրել</translation>
+    </message>
+    <message>
+        <location filename="workspace.cpp" line="1157"/>
+        <source>Fiscal fail, continue without fiscal</source>
+        <translation>ՀԴՄ չի տպվել, շարունակել առանձ ՀԴՄ</translation>
+    </message>
+    <message>
+        <location filename="workspace.cpp" line="1160"/>
+        <source>Fiscal fail, try again</source>
+        <translation>ՀԴՄ չի տպվել, փորձել կրկին</translation>
+    </message>
+    <message>
+        <location filename="workspace.cpp" line="1163"/>
+        <source>Return to edit</source>
+        <translation>Շարունակել խմբագրել</translation>
+    </message>
+    <message>
+        <location filename="workspace.cpp" line="1210"/>
         <source>Invalid order number</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1065"/>
+        <location filename="workspace.cpp" line="1222"/>
         <source>Department</source>
         <translation>Բաժին</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1068"/>
+        <location filename="workspace.cpp" line="1225"/>
         <source>Tax number</source>
         <translation>ՀԴՄ կտրոնի համար</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1071"/>
+        <location filename="workspace.cpp" line="1228"/>
         <source>Device number</source>
         <translation>ԳՀ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1074"/>
+        <location filename="workspace.cpp" line="1231"/>
         <source>Serial</source>
         <translation>ԱՀ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1077"/>
+        <location filename="workspace.cpp" line="1234"/>
         <source>Fiscal</source>
         <translation>Ֆիսկալ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1080"/>
+        <location filename="workspace.cpp" line="1237"/>
         <source>Receipt number</source>
         <translation>ԿՀ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1083"/>
+        <location filename="workspace.cpp" line="1240"/>
         <source>Date</source>
         <translation>Ամսաթիվ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1089"/>
+        <location filename="workspace.cpp" line="1246"/>
         <source>Cashier</source>
         <translation>Գանձապահ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1092"/>
+        <location filename="workspace.cpp" line="1467"/>
+        <source>New dish</source>
+        <translation>Նոր ուտեստ</translation>
+    </message>
+    <message>
+        <location filename="workspace.cpp" line="1047"/>
+        <location filename="workspace.cpp" line="1249"/>
         <source>Delivery</source>
         <translation>Առաքում</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1098"/>
+        <location filename="workspace.cpp" line="279"/>
+        <source>Remove dish</source>
+        <translation>Հեռացնել ուտեստը</translation>
+    </message>
+    <message>
+        <location filename="workspace.cpp" line="440"/>
+        <source>Order saved</source>
+        <translation>Պահպանված է</translation>
+    </message>
+    <message>
+        <location filename="workspace.cpp" line="1255"/>
         <source>Class | Name | Qty | Price | Total</source>
         <translation>Դաս՝ | Անվանում | Քնկ | Գին | Ընդամենը</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1135"/>
-        <location filename="workspace.cpp" line="1147"/>
+        <location filename="workspace.cpp" line="1292"/>
         <source>Class:</source>
         <translation>Դաս</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1159"/>
+        <location filename="workspace.cpp" line="1322"/>
         <source>Need to pay</source>
         <translation>Ենթակա է վճարման</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1168"/>
+        <location filename="workspace.cpp" line="1331"/>
         <source>Payment, cash</source>
         <translation>Կանխիկ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1172"/>
+        <location filename="workspace.cpp" line="1335"/>
         <source>Payment, card</source>
         <translation>Անկանխիկ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1176"/>
+        <location filename="workspace.cpp" line="1339"/>
         <source>Payment, Idram</source>
         <translation>Վճարում, Idram</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1180"/>
+        <location filename="workspace.cpp" line="1343"/>
         <source>Payment, other</source>
         <translation>Վճարում, այլ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1187"/>
+        <location filename="workspace.cpp" line="1350"/>
         <source>Customer</source>
         <translation>Հաճախորդ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1205"/>
+        <location filename="workspace.cpp" line="1368"/>
         <source>Sample</source>
         <translation>Օրնկ․</translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="1452"/>
+        <location filename="workspace.ui" line="1528"/>
         <source>Cash</source>
         <translation>Կանխիկ</translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="1484"/>
+        <location filename="workspace.ui" line="1560"/>
         <source>Card</source>
         <translation>Քարտ</translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="1513"/>
+        <location filename="workspace.ui" line="1589"/>
         <source>Idram</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.ui" line="1542"/>
+        <location filename="workspace.ui" line="1618"/>
         <source>Other</source>
         <translation>Այլ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="185"/>
+        <location filename="workspace.cpp" line="214"/>
         <source>Confirm to close application</source>
         <translation>Փակել՞ ծրագիրը</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1202"/>
+        <location filename="workspace.cpp" line="1365"/>
         <source>Printed</source>
         <translation>Տպված</translation>
     </message>
@@ -2552,7 +3001,12 @@ MS Excel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="menudish.ui" line="140"/>
+        <location filename="menudish.ui" line="81"/>
+        <source>Dish group name</source>
+        <translation>Ուտեստի խումբ</translation>
+    </message>
+    <message>
+        <location filename="menudish.ui" line="164"/>
         <source>Սպնեխուրո,տոմատով,եգիպտացորենով</source>
         <translation></translation>
     </message>

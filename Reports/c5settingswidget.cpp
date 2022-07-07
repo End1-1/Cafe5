@@ -160,15 +160,23 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     fTags[ui->fbReceiptFont->property("Tag").toInt()] = ui->fbReceiptFont->currentText();
     fTags[ui->leServiceFontSize->getTag()] = ui->leServiceFontSize->text();
     fTags[ui->lereceiptFontSize->getTag()] = ui->lereceiptFontSize->text();
+    fTags[ui->leSystemThouthandSeparator->getTag()] = ui->leSystemThouthandSeparator->text();
+    fTags[ui->leTaxAlwaysPrintIfAmountLess->getTag()] = ui->leTaxAlwaysPrintIfAmountLess->text();
+    fTags[ui->chPrintModOnReceipt->getTag()] = ui->chPrintModOnReceipt->isChecked() ? "1" : "0";
     C5Database db(fDBParams);
     db[":f_settings"] = ui->leCode->getInteger();
     db.exec("delete from s_settings_values where f_settings=:f_settings");
+    QString sql = "insert into s_settings_values (f_settings, f_key, f_value) values ";
+    bool first = true;
     for (QMap<int, QString>::const_iterator it = fTags.constBegin(); it != fTags.constEnd(); it++) {
-        db[":f_settings"] = ui->leCode->getInteger();
-        db[":f_key"] = it.key();
-        db[":f_value"] = it.value();
-        db.insert("s_settings_values", false);
+        if (first) {
+            first = false;
+        } else {
+            sql += ",";
+        }
+        sql += QString("(%1, %2, '%3')").arg(ui->leCode->text(), QString::number(it.key()), it.value());
     }
+    db.exec(sql);
     db[":f_counter"] = ui->leInputDocCounter->getInteger();
     db.update("a_type", where_id(DOC_TYPE_STORE_INPUT));
     db[":f_counter"] = ui->leOutDocCounter->getInteger();

@@ -28,6 +28,8 @@ private slots:
 
     void createStoreOutputAS();
 
+    void templates();
+
 private:
     CR5CommonSalesFilter *fFilter;
 };
