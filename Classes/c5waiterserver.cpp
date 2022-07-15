@@ -914,7 +914,8 @@ void C5WaiterServer::processCloseOrder(QJsonObject &o, C5Database &db)
                                          settings[param_autocash_prefix] + " " + headerPrefix + QString::number(headerId))) {
                         err = dw.fErrorMsg;
                     }
-                    if (!dw.writeAHeaderCash(cashdocid, settings[param_cash_id].toInt(), 0, 1, "", jh["f_id"].toString())) {
+                    if (!dw.writeAHeaderCash(cashdocid, settings[param_cash_id].toInt(),
+                                             0, 1, "", jh["f_id"].toString(), 0)) {
                         err = dw.fErrorMsg;
                     }
                     QString cashUUID;
@@ -935,7 +936,8 @@ void C5WaiterServer::processCloseOrder(QJsonObject &o, C5Database &db)
                                          settings[param_autonocash_prefix] + " " + headerPrefix + QString::number(headerId))) {
                         err = dw.fErrorMsg;
                     }
-                    if (!dw.writeAHeaderCash(nocashdocid, settings[param_nocash_id].toInt(), 0, 1, "", jh["f_id"].toString())) {
+                    if (!dw.writeAHeaderCash(nocashdocid, settings[param_nocash_id].toInt(),
+                                             0, 1, "", jh["f_id"].toString(), 0)) {
                         err = dw.fErrorMsg;
                     }
                     QString cashUUID;

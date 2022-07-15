@@ -55,7 +55,7 @@ DlgCashinOut::DlgCashinOut(C5User *u) :
         ui->tbl->setItem(r, 1, new QTableWidgetItem(float_str(db.getDouble("f_amount"), 2)));
         balance += db.getDouble("f_amount");
     }
-    ui->lbBalance->setText(QString("%1 %2").arg(tr("Current balance"), float_str(balance, 2)));
+    ui->lbBalance->setText(float_str(balance, 2));
     fBalance = balance;
 }
 
@@ -157,14 +157,12 @@ void DlgCashinOut::on_btnCloseSession_clicked()
     p.line();
     p.br();
 
-    for (int i = 0 ; i < ui->tbl->rowCount(); i++) {
-        p.ltext(ui->tbl->item(i, 0)->text(), 0);
-        p.rtext(ui->tbl->item(i, 1)->text());
-        p.br();
-        p.line();
-        p.br();
-    }
-
+    p.ltext(ui->tbl->item(0, 0)->text(), 0);
+    p.rtext(ui->tbl->item(0, 1)->text());
+    p.br();
+    p.br();
+    p.ltext(tr("Including:"), 0);
+    p.br();
     if (cash > 0.001) {
         p.ltext(tr("Cash"), 0);
         p.rtext(float_str(cash, 2));
@@ -179,9 +177,28 @@ void DlgCashinOut::on_btnCloseSession_clicked()
         p.rtext(float_str(idram, 2));
         p.br();
     }
-
     p.br();
-    p.ctext(ui->lbBalance->text());
+    p.line();
+    p.br();
+
+    p.ltext(tr("Other transactions"), 0);
+    p.br();
+    p.br();
+    for (int i = 1 ; i < ui->tbl->rowCount(); i++) {
+        cash += str_float(ui->tbl->item(i, 1)->text());
+        p.ltext(ui->tbl->item(i, 0)->text(), 0);
+        p.rtext(ui->tbl->item(i, 1)->text());
+        p.br();
+    }
+    p.line();
+    p.br();
+    p.br();
+    p.ltext(tr("Total balance"), 0);
+    p.rtext(ui->lbBalance->text());
+    p.br();
+    p.ltext(tr("Avaiable cash"), 0);
+    p.rtext(float_str(cash, 2));
+    p.br();
     p.br();
 
     p.setFontSize(18);

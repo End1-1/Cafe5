@@ -532,7 +532,7 @@ void Workspace::on_btnCheckout_clicked()
     }
     fPreviouseUuid = fOrderUuid;
     bool printsecond = __c5config.getValue(param_shop_print_v2) == "1";
-    if (cardAmount > 0.001 || idramAmount > 0.001) {
+    if (idramAmount > 0.001) {
         printsecond = true;
     }
     if (__c5config.getValue(param_smart_dont_print_receipt).toInt() == 0) {
@@ -1169,7 +1169,7 @@ int Workspace::printTax(double cardAmount, double idramAmount)
         return 1;
     case QDialog::Accepted:
         C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Fiscal fail, try again"), "", "");
-        return 1;
+        return 0;
     case 2:
         C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Return to edit"), "", "");
         return 2;

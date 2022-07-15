@@ -20,7 +20,7 @@ void JzSyncManager::start()
 void JzSyncManager::resumeTimer()
 {
 #ifdef QT_DEBUG
-    fTimer->start(500);
+    fTimer->start(11500);
 #else
     fTimer->start(5000);
 #endif
