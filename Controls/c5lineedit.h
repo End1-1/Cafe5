@@ -72,6 +72,8 @@ signals:
 
     void keyPressed(const QChar &key);
 
+    void doubleClicked();
+
 };
 
 C5LineEdit *isLineEdit(QObject *o);

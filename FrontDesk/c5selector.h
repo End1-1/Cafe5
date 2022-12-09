@@ -22,6 +22,8 @@ public:
 
     static bool getValue(const QStringList &dbParams, int cache, QList<QVariant> &values);
 
+    static bool getValue(const QStringList &dbParams, const QString &query, QList<QVariant> &values);
+
     static bool getValueOfColumn(const QStringList &dbParams, int cache, QList<QVariant> &values, int column);
 
     static bool getMultipleValues(const QStringList &dbParams, int cache, QList<QList<QVariant> > &values);

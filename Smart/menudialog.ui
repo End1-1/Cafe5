@@ -44,6 +44,35 @@
     </widget>
    </item>
    <item>
+    <widget class="QPushButton" name="btnCustomerDisplay">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>50</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>50</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>Customer display</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources/resources.qrc">
+       <normaloff>:/tv.png</normaloff>:/tv.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>32</width>
+       <height>32</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QPushButton" name="btnPrintReport">
      <property name="minimumSize">
       <size>

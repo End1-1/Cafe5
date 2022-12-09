@@ -27,6 +27,8 @@
 #define cp_t2_store_complectation 207
 #define cp_t2_store_decomplectation 208
 #define cp_t2_goods_reservations 209
+#define cp_t2_reatail_trade 210
+#define cp_t2_whosale_trade 211
 
 #define cp_t3_reports 300
 #define cp_t3_sales_common 301
@@ -136,6 +138,10 @@
 #define cp_t8_costumer_debts 805
 #define cp_t8_costumer_debts_pay 806
 #define cp_t8_cash_movement 807
+#define cp_t8_currency 808
+#define cp_t8_edit_currency 809
+#define cp_t8_currency_cross_rate 810
+#define cp_t8_currency_cross_rate_history 811
 
 #define cp_t9_salary 900
 #define cp_t9_salary_doc 901
@@ -147,6 +153,10 @@
 #define cp_t10_product_list 1003
 #define cp_t10_general_report 1004
 #define cp_t10_general_report_only_date 1005
+#define cp_t10_workshops 1006
+#define cp_t10_actions_stages 1007
+#define cp_t10_active_tasks 1008
+#define cp_t10_create_task 1009
 
 
 

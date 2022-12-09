@@ -21,13 +21,25 @@ public:
 private slots:
     void on_btnReturn_clicked();
 
-    void on_pushButton_2_clicked();
-
-    void on_btnRetryUpload_clicked();
-
-    void on_btnSave_clicked();
-
     void on_btnTaxReturn_clicked();
+
+    void on_btnClose_clicked();
+
+    void on_btnEditDate_clicked();
+
+    void on_btnCopyUUID_clicked();
+
+    void on_btnEditDeliveryMan_clicked();
+
+    void on_btnEditSaler_clicked();
+
+    void on_btnEditBuyer_clicked();
+
+    void on_btnPrintReceipt_clicked();
+
+    void on_btnPrintFiscal_clicked();
+
+    bool printCheckWithTax(C5Database &db, const QString &id, QString &rseq);
 
 private:
     Ui::ViewOrder *ui;

@@ -19,11 +19,15 @@
 #include "cr5goodsclasses.h"
 #include "c5translatorform.h"
 #include "cr5mfgeneralreport.h"
+#include "c5saledoc.h"
 #include "cr5saleremoveddishes.h"
 #include "cr5goodsreservations.h"
 #include "c5broadcasting.h"
 #include "cr5goodsqtyreminder.h"
 #include "cr5cashmovement.h"
+#include "cr5currencies.h"
+#include "cr5currencycrossrate.h"
+#include "cr5currencycrossratehistory.h"
 #include "c5costumerdebtpayment.h"
 #include "cr5cashnames.h"
 #include "cr5dish.h"
@@ -41,6 +45,7 @@
 #include "cr5mfactions.h"
 #include "cr5mfdaily.h"
 #include "cr5preorders.h"
+#include "cr5currencyratehistory.h"
 #include "c5dishselfcostgenprice.h"
 #include "cr5custom.h"
 #include "cr5salefromstoretotal.h"
@@ -73,6 +78,9 @@
 #include "cr5goodsunit.h"
 #include "c5datasynchronize.h"
 #include "cr5menunames.h"
+#include "cr5mfactionstage.h"
+#include "cr5mfactivetasks.h"
+#include "cr5mfworkshops.h"
 #include "cr5tables.h"
 #include "cr5hall.h"
 #include "cr5materialsinstore.h"
@@ -653,6 +661,16 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
     case cp_t2_goods_reservations:
         createTab<CR5GoodsReservations>(dbParams);
         break;
+    case cp_t2_reatail_trade: {
+        auto *retaildoc = createTab<C5SaleDoc>(dbParams);
+        retaildoc->setMode(1);
+        break;
+    }
+    case cp_t2_whosale_trade: {
+        auto *whosaledoc = createTab<C5SaleDoc>(dbParams);
+        whosaledoc->setMode(2);
+        break;
+    }
     case cp_t3_sales_common:
         createTab<CR5CommonSales>(dbParams);
         break;
@@ -815,6 +833,18 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
     case cp_t8_cash_movement:
         createTab<CR5CashMovement>(dbParams);
         break;
+    case cp_t8_currency:
+        createTab<CR5Currencies>(dbParams);
+        break;
+    case cp_t8_edit_currency:
+        createTab<CR5CurrencyRateHistory>(dbParams);
+        break;
+    case cp_t8_currency_cross_rate:
+        createTab<CR5CurrencyCrossRate>(dbParams);
+        break;
+    case cp_t8_currency_cross_rate_history:
+        createTab<CR5CurrencyCrossRateHistory>(dbParams);
+        break;
     case cp_t9_salary_doc:
         createTab<C5SalaryDoc>(dbParams);
         break;
@@ -835,6 +865,15 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
         break;
     case cp_t10_general_report_only_date:
         createTab<CR5GeneralReportOnlyDate>(dbParams);
+        break;
+    case cp_t10_actions_stages:
+        createTab<CR5MFActionStage>(dbParams);
+        break;
+    case cp_t10_workshops:
+        createTab<CR5MFWorkshops>(dbParams);
+        break;
+    case cp_t10_active_tasks:
+        createTab<CR5MFActiveTasks>(dbParams);
         break;
     default:
         break;
@@ -945,6 +984,8 @@ void C5MainWindow::setDB(const QString &dbname)
             addTreeL3Item(l, cp_t2_calculate_self_cost, tr("Calculate dishes self cost"), ":/menu.png");
         }
         addTreeL3Item(l, cp_t2_goods_reservations, tr("Goods reservations"), ":/calendar.png");
+        addTreeL3Item(l, cp_t2_reatail_trade, tr("New retail traid"), ":/trading.png");
+        addTreeL3Item(l, cp_t2_whosale_trade, tr("New whosale traid"), ":/trading.png");
     }
 
     if (addMainLevel(db.at(1), cp_t3_reports, tr("Reports"), ":/reports.png", l)) {
@@ -983,6 +1024,10 @@ void C5MainWindow::setDB(const QString &dbname)
         addTreeL3Item(l, cp_t8_costumer_debts_pay, tr("New payment for costumer debt"), ":/cash.png");
         addTreeL3Item(l, cp_t8_costumer_debts, tr("Costumers debts report"), ":/cash.png");
         addTreeL3Item(l, cp_t8_cash_names, tr("Cash names"), ":/cash.png");
+        addTreeL3Item(l, cp_t8_currency, tr("Currency"), ":/cash.png");
+        addTreeL3Item(l, cp_t8_edit_currency, tr("Currency rates"), ":/cash.png");
+        addTreeL3Item(l, cp_t8_currency_cross_rate, tr("Currency cross rates"), ":/cash.png");
+        addTreeL3Item(l, cp_t8_currency_cross_rate_history, tr("Currency cross rates history"), ":/cash.png");
     }
 
     if (addMainLevel(db.at(1), cp_t9_salary, tr("Salary"), ":/employee.png", l)) {
@@ -1017,11 +1062,15 @@ void C5MainWindow::setDB(const QString &dbname)
     }
 
     if (addMainLevel(db.at(1), cp_t10_manufacture, tr("Manufacture"), ":/manufacturing.png", l)) {
+        addTreeL3Item(l, cp_t10_active_tasks, tr("Active tasks"), ":/manufacturing.png");
+        addTreeL3Item(l, cp_t10_workshops, tr("Workshops"), ":/manufacturing.png");
+        addTreeL3Item(l, cp_t10_actions_stages, tr("Action stages"), ":/manufacturing.png");
         addTreeL3Item(l, cp_t10_product_list, tr("Products"), ":/manufacturing.png");
         addTreeL3Item(l, cp_t10_action_list, tr("Action list"), ":/manufacturing.png");
         addTreeL3Item(l, cp_t10_daily, tr("Daily processes"), ":/manufacturing.png");
         addTreeL3Item(l, cp_t10_general_report, tr("General report"), ":/manufacturing.png");
         addTreeL3Item(l, cp_t10_general_report_only_date, tr("General report only date"), ":/manufacturing.png");
+        addTreeL3Item(l, cp_t10_actions_stages, tr("Action stages"), ":/manufacturing.png");
     }
 
     if (addMainLevel(db.at(1), cp_t7_other, tr("Other"), ":/other.png", l)) {

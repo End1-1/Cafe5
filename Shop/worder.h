@@ -11,7 +11,7 @@ class WOrder;
 }
 
 class Working;
-class C5TableWidget;
+class C5ClearTableWidget;
 class C5User;
 
 class WOrder : public QWidget
@@ -43,13 +43,11 @@ public:
 
     void imageConfig();
 
-    void addGoods(int id);
+    bool addGoods(int id);
 
     void addGoodsToTable(int id);
 
     bool writeOrder();
-
-    bool writePreorder();
 
     void fixCostumer(const QString &code);
 
@@ -71,13 +69,15 @@ public:
 
     void countTotal();
 
+    int currency();
+
     void openPreorder(const QByteArray &id);
 
     void setDiscount(const QString &label, const QString &value);
 
-    void setQtyOfRow(int row, double qty);
+    bool setQtyOfRow(int row, double qty);
 
-    C5TableWidget *table();
+    C5ClearTableWidget *table();
 
     bool checkQty(int goods, double qty, QString &err);
 
@@ -100,15 +100,7 @@ private slots:
 
     void on_leAdvance_textChanged(const QString &arg1);
 
-    void on_btnPrintAdvanceTax_clicked();
-
-    void on_btnSavePreorder_clicked();
-
-    void on_lePreorderAdvance_textChanged(const QString &arg1);
-
-    void on_btnRemovePreorder_clicked();
-
-    void on_btnOpenPreorder_clicked();
+    void on_cbCurrency_currentIndexChanged(int index);
 
 private:
     Ui::WOrder *ui;

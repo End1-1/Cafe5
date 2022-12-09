@@ -22,7 +22,7 @@ class C5StoreDoc : public C5Document
     Q_OBJECT
 
 public:
-    enum STORE_DOC {sdInput = 1, sdOutput, sdMovement, sdInventory, sdCash, sdComplectation, sdDeComplectation};
+    enum STORE_DOC {sdInput = 1, sdOutput, sdMovement, sdInventory, sdCash, sdComplectation, sdSalary, sdDeComplectation};
 
     explicit C5StoreDoc(const QStringList &dbParams, QWidget *parent = nullptr);
 

@@ -1,0 +1,15 @@
+sq_store_check_qty>>select sn.f_name as `Պահեստ`, g.f_name as `Ապրանք`, sum(s.f_qty*s.f_type) as `Քանակ`,
+gp.f_price1 as `Մանր․ գին`, gp.f_price2 as `Մեծ․ գին`
+from a_store s 
+left join c_goods g on g.f_id=s.f_goods 
+left join c_goods_prices gp on gp.f_goods=s.f_goods 
+left join c_storages sn on sn.f_id=s.f_store 
+where s.f_goods=:f_goods and gp.f_currency=:f_currency
+group by 1
+having sum(s.f_qty*s.f_type) > 0
+
+==========
+sq_data_currency_list>>select f_id, f_name from e_currency order by 1
+
+==========
+sq_data_currency_crossrate_list>> select f_id, f_currency1, f_currency2, f_rate from e_currency_cross_rate

@@ -80,8 +80,8 @@ bool Database::rollback()
 bool Database::exec(const QString &query)
 {
     if (!fQuery->prepare(query)) {
-        LogWriter::write(LogWriterLevel::errors, "", fQuery->lastError().databaseText());
-        LogWriter::write(LogWriterLevel::errors, "", lastQuery());
+        LogWriter::write(LogWriterLevel::errors, fSqlDatabase.databaseName(), fQuery->lastError().databaseText());
+        LogWriter::write(LogWriterLevel::errors, fSqlDatabase.databaseName(), lastQuery());
         return false;
     }
     QStringList keys = fBindValues.keys();
@@ -90,11 +90,11 @@ bool Database::exec(const QString &query)
     }
     fBindValues.clear();
     if (!fQuery->exec()) {
-        LogWriter::write(LogWriterLevel::errors, "", fQuery->lastError().databaseText());
-        LogWriter::write(LogWriterLevel::errors, "", lastQuery());
+        LogWriter::write(LogWriterLevel::errors, fSqlDatabase.databaseName(), fQuery->lastError().databaseText());
+        LogWriter::write(LogWriterLevel::errors, fSqlDatabase.databaseName(), lastQuery());
         return false;
     }
-    LogWriter::write(LogWriterLevel::verbose, "", lastQuery());
+    LogWriter::write(LogWriterLevel::verbose, fSqlDatabase.databaseName(), lastQuery());
     bool isSelect = fQuery->isSelect();
     if (isSelect) {
         //fQuery->first();
@@ -105,6 +105,7 @@ bool Database::exec(const QString &query)
             fColumnsIndexes[i] = rec.fieldName(i).toLower();
         }
     }
+    LogWriter::write(LogWriterLevel::verbose, "", fSqlDatabase.databaseName() + QString(" Affected rows %1").arg(fQuery->numRowsAffected()));
     return true;
 }
 
@@ -253,5 +254,22 @@ QString Database::lastDbError() const
         return fQuery->lastError().databaseText();
     } else {
         return fSqlDatabase.lastError().databaseText();
+    }
+}
+
+int Database::genFBID(const QString &name)
+{
+    if (exec("select gen_id(" + name + ",1) as fid from rdb$database")) {
+        if (next()) {
+            return integer("fid");
+        }
+    }
+    return 0;
+}
+
+void Database::rowToMap(QMap<QString, QVariant> &map)
+{
+    for (int i = 0; i < columnCount(); i++) {
+        map[columnName(i)] = value(i);
     }
 }

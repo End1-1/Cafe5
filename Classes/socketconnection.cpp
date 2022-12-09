@@ -147,7 +147,7 @@ void SocketConnection::readyRead()
         memcpy(&fMessageSize, &fData.data()[pos], sizeof(fMessageSize));
 
         if (fData.length() - headersize >= fMessageSize) {
-            emit externalDataReady(fMessageCommand, fData.mid(headersize, fMessageSize));
+            emit externalDataReady(fMessageCommand, fMessageId, fData.mid(headersize, fMessageSize));
             fData.remove(0, headersize + fMessageSize);
         } else {
             break;

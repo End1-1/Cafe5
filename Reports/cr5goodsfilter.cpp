@@ -13,6 +13,7 @@ CR5GoodsFilter::CR5GoodsFilter(const QStringList &dbParams, QWidget *parent) :
     ui->leClass2->setSelector(dbParams, ui->leClass2Name, cache_goods_classes);
     ui->leClass3->setSelector(dbParams, ui->leClass3Name, cache_goods_classes);
     ui->leClass4->setSelector(dbParams, ui->leClass4Name, cache_goods_classes);
+    ui->leCurr->setSelector(dbParams, ui->leCurrName, cache_currency);
 }
 
 CR5GoodsFilter::~CR5GoodsFilter()
@@ -53,6 +54,7 @@ QString CR5GoodsFilter::condition()
     if (ui->rbActiveNo->isChecked()) {
         addCond(w, "gg.f_enabled=0 ");
     }
+    in(w, "gpr.f_currency", ui->leCurr);
     if (!w.isEmpty()) {
         " where " + w;
     }

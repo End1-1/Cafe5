@@ -3,6 +3,7 @@
 
 #include "c5dialog.h"
 #include "dish.h"
+#include <QMap>
 
 namespace Ui {
 class Workspace;
@@ -12,6 +13,7 @@ class QTableWidgetItem;
 class QTableWidget;
 class QListWidgetItem;
 class C5User;
+class WCustomerDisplay;
 
 class Workspace : public C5Dialog
 {
@@ -28,10 +30,12 @@ public:
 
     static Workspace *fWorkspace;
 
-    bool printReceipt(const QString &id, bool printSecond);
+    bool printReceipt(const QString &id, bool printSecond, bool precheck);
+
+    void showCustomerDisplay();
 
 private slots:
-    void removeDish();
+    void removeDish(int rownum, const QString &packageuuid);
 
     void on_tblPart2_itemClicked(QTableWidgetItem *item);
 
@@ -99,11 +103,17 @@ private slots:
 
     void on_btnComment_clicked();
 
-    void on_btnMPlus_clicked();
-
     void on_btnMRead_clicked();
 
     void on_btnHistoryOrder_clicked();
+
+    void on_btnDiscount_clicked();
+
+    void on_btnSetCardExternal_clicked();
+
+    void on_tblTables_itemClicked(QTableWidgetItem *item);
+
+    void on_btnSaveAndPrecheck_clicked();
 
 private:
     Ui::Workspace *ui;
@@ -118,11 +128,13 @@ private:
 
     QString fPreviouseUuid;
 
+    QMap<QString, QMap<QString, QVariant> > fAutoDiscounts;
+
+    int fTable;
+
     int fCustomer;
 
     int fTypeFilter;
-
-    int fSupplierId;
 
     int fFlagEdited;
 
@@ -138,15 +150,17 @@ private:
 
     double fDiscountAmount;
 
+    WCustomerDisplay *fCustomerDisplay;
+
     void addDishToOrder(Dish *d);
 
     double discountValue();
 
-    bool saveOrder();
+    bool saveOrder(int state);
 
     int printTax(double cardAmount, double idramAmount);
 
-    void setQty(double qty, int mode);
+    void setQty(double qty, int mode, int rownum, const QString &packageuuid);
 
     void setCustomerPhoneNumber(const QString &number);
 

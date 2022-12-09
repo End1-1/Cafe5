@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setLibraryPaths(libPath);
 #endif
 
-    if (QDate::currentDate() > QDate::fromString("20/08/2022", "dd/MM/yyyy")) {
+    if (QDate::currentDate() > QDate::fromString("28/02/2023", "dd/MM/yyyy")) {
         return 1;
     }
 
@@ -79,6 +79,12 @@ int main(int argc, char *argv[])
              << C5Config::fDBPassword;
     Workspace w(dbParams);
     C5Config::fParentWidget = &w;
+#ifdef QT_DEBUG
+    C5Database::LOGGING = true;
+#endif
+    if (C5Config::getValue(param_debuge_mode).toInt() > 0) {
+        C5Database::LOGGING = true;
+    }
     w.showFullScreen();
     a.processEvents();
     if (!w.login()) {

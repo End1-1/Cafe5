@@ -183,6 +183,8 @@ public:
 
     QHash<QString, int> fNameColumnMap;
 
+    static bool LOGGING;
+
 private:
     bool fIsReady;
 

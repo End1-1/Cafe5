@@ -23,7 +23,7 @@ C5StoreBarcode::~C5StoreBarcode()
     delete ui;
 }
 
-void C5StoreBarcode::addRow(const QString &name, const QString &barcode, int qty)
+void C5StoreBarcode::addRow(const QString &name, const QString &barcode, int qty, int curr)
 {
     if (qty == 0) {
         return;
@@ -36,11 +36,14 @@ void C5StoreBarcode::addRow(const QString &name, const QString &barcode, int qty
     ui->tbl->createCheckbox(row, 3)->setChecked(true);
     C5Database db(fDBParams);
     db[":f_scancode"] = barcode;
-    db.exec("select c.*, c1.f_name as f_class1name from c_goods c "
+    db[":f_currency"] = curr;
+    db.exec("select c.*, c1.f_name as f_class1name, gpr.f_price1 "
+            "from c_goods c "
             "left join c_goods_classes c1 on c1.f_id=c.f_group1 "
-            "where f_scancode=:f_scancode");
+            "left join c_goods_prices gpr on gpr.f_goods=c.f_id "
+            "where f_scancode=:f_scancode and gpr.f_currency=:f_currency");
     if (db.nextRow()) {
-        ui->tbl->setDouble(row, 4, db.getDouble("f_saleprice"));
+        ui->tbl->setDouble(row, 4, db.getDouble("f_price1"));
         ui->tbl->setString(row, 5, db.getString("f_description"));
         ui->tbl->setString(row, 6, db.getString("f_class1name"));
     } else {
@@ -58,19 +61,20 @@ QToolBar *C5StoreBarcode::toolBar()
         fToolBar->addAction(QIcon(":/print_description.png"), tr("Print\nscancodes"), this, SLOT(print()));
         fToolBar->addAction(QIcon(":/print_description.png"), tr("Print\ndescriptions"), this, SLOT(printDescriptions()));
         fToolBar->addAction(QIcon(":/show_list.png"), tr("Set list"), this, SLOT(setList()));
+        fToolBar->addAction(QIcon(":/show_list.png"), tr("1"), this, SLOT(setQtyToOne()));
     }
     return fToolBar;
 }
 
 //SAMO XANUT VERSION
-bool C5StoreBarcode::printOneBarcode(const QString &code, const QString &price, const QString &class1, QPrintDialog &pd)
+bool C5StoreBarcode::printOneBarcode(const QString &code, const QString &price, const QString &class1, const QString &name, QPrintDialog &pd)
 {
     QPrinter printer(QPrinter::HighResolution);
     printer.setPrinterName(pd.printer()->printerName());
     printer.setOrientation(pd.printer()->orientation());
     QSizeF szf = printer.pageSizeMM();
     szf = pd.printer()->pageSizeMM();
-    szf.setWidth(300);
+    //szf.setWidth(400);
 //    szf.setHeight(20);
     printer.setPageSizeMM(szf);
 //    printer.setResolution(pd.printer()->resolution());
@@ -78,9 +82,8 @@ bool C5StoreBarcode::printOneBarcode(const QString &code, const QString &price, 
     ps = pd.printer()->pageSize();
     printer.setPageSize(ps);
     QPainter p(&printer);
-    BarcodeEan13 b;
-    bool r = b.EncodeEan13(code.toLatin1().data());
-    Barcode bb;
+    Barcode93 b;
+    bool r = b.Encode93(code.toLatin1().data());
     qDebug() << r;
     QFont f("Arial", 25, QFont::Normal);
     p.setFont(f);
@@ -89,12 +92,12 @@ bool C5StoreBarcode::printOneBarcode(const QString &code, const QString &price, 
     f.setPointSize(8);
     f.setBold(true);
     p.setFont(f);
-    b.DrawBarcode(p, 100, 40, 100, 100, plen);
-    p.drawText(110, 120, code + QString::number(bb.ean13CheckSum(code)));
+    p.drawText(10, 30, name);
+    b.DrawBarcode(p, 100, 60, 100, 100, plen);
+    p.drawText(100, 145, code);
     f.setPointSize(10);
     p.setFont(f);
-    p.drawText(110, 150, price + " AMD");
-    p.drawText(160, 35, class1);
+    p.drawText(10, 175, QString("%1: %2").arg(tr("Price"), price));
 
     return printer.printerState() != QPrinter::Error;
 }
@@ -234,7 +237,7 @@ void C5StoreBarcode::print()
             if (bc.isEan13(code)) {
                 code = code.left(code.length() - 1);
             }
-            printOneBarcode(code, ui->tbl->getString(i, 4), ui->tbl->getString(i, 6), pd);
+            printOneBarcode(code, ui->tbl->getString(i, 4) + " " + fCurrencyName, ui->tbl->getString(i, 6), ui->tbl->getString(i, 0), pd);
             //printOneBarcode(code, pd);
             ui->tbl->checkBox(i, 3)->setChecked(false);
         }
@@ -284,8 +287,15 @@ void C5StoreBarcode::setList()
         for (int i = 0; i < ui->tbl->rowCount(); i++) {
             ui->tbl->checkBox(i, 3)->setChecked(false);
         }
-        for (int i = r1 - 1; i < r2; i++) {
+        for (int i = r1; i < r2; i++) {
             ui->tbl->checkBox(i, 3)->setChecked(true);
         }
+    }
+}
+
+void C5StoreBarcode::setQtyToOne()
+{
+    for (int i = 0; i < ui->tbl->rowCount(); i++) {
+        ui->tbl->lineEdit(i, 2)->setInteger(1);
     }
 }

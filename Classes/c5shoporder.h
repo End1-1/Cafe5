@@ -13,7 +13,7 @@ class C5ShopOrder : public QObject
 public:
     C5ShopOrder(C5User *user);
 
-    void setPayment(double cash, double change, bool debt);
+    void setPayment(double cash, double change, bool debt, int currency);
 
     void setPartner(int partnerCode, const QString &partnerName);
 
@@ -39,6 +39,8 @@ private:
     int fSaleType;
 
     int fPartnerCode;
+
+    int fCurrency;
 
     QString fPartnerName;
 

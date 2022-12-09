@@ -99,7 +99,11 @@ void CE5Editor::setId(int id)
             if (!found) {
                 foreach (C5ComboBox *cb, fCombos) {
                     if (cb->property("Field").toString() == colName) {
-                        cb->setCurrentText(db.getString(i));
+                        if (cb->property("ItemData").toBool()) {
+                            cb->setCurrentIndex(cb->findData(db.getString(i)));
+                        } else {
+                            cb->setCurrentText(db.getString(i));
+                        }
                         found = true;
                         break;
                     }
@@ -198,6 +202,9 @@ bool CE5Editor::save(QString &err, QList<QMap<QString, QVariant> > &data)
         if (cb->currentData().toInt() == 0) {
             db[":" + cb->property("Field").toString()] = cb->currentText();
             row[cb->property("Field").toString()] = cb->currentText();
+        } else {
+            db[":" + cb->property("Field").toString()] = cb->currentData();
+            row[cb->property("Field").toString()] = cb->currentData();
         }
     }
     foreach (QPlainTextEdit *pt, fPlainText) {
@@ -347,6 +354,10 @@ void CE5Editor::getLineEdit(QObject *parent)
         le = dynamic_cast<C5LineEditWithSelector*>(o);
         if (le) {
             QVariant dataType = le->property("Type");
+            int decimalPlaces = 3;
+            if (le->property("DecimalPlaces").isValid()) {
+                decimalPlaces = le->property("DecimalPlaces").toInt();
+            }
             if (dataType != QVariant::Invalid) {
                 switch (dataType.toInt()) {
                 case 0:
@@ -355,13 +366,13 @@ void CE5Editor::getLineEdit(QObject *parent)
                     le->setValidator(new QIntValidator());
                     break;
                 case 2:
-                    le->setValidator(new QDoubleValidator(0, 99999999999, 3));
+                    le->setValidator(new QDoubleValidator(0, 99999999999, decimalPlaces));
                     break;
                 case 3:
-                    le->setValidator(new QDoubleValidator(-99999999, 999999999, 3));
+                    le->setValidator(new QDoubleValidator(-99999999, 999999999, decimalPlaces));
                     break;
                 case 4:
-                    le->setValidator(new QDoubleValidator(-1, 999999999, 3));
+                    le->setValidator(new QDoubleValidator(-1, 999999999, decimalPlaces));
                     break;
                 }
             }

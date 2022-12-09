@@ -47,7 +47,7 @@ signals:
     void connected();
     void connectionLost();
     void dataReady(QByteArray &);
-    void externalDataReady(quint16, QByteArray);
+    void externalDataReady(quint16, quint32, QByteArray);
 };
 
 #endif // SOCKETCONNECTION_H

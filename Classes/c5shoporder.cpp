@@ -15,11 +15,12 @@ C5ShopOrder::C5ShopOrder(C5User *user)
     fUser = user;
 }
 
-void C5ShopOrder::setPayment(double cash, double change, bool debt)
+void C5ShopOrder::setPayment(double cash, double change, bool debt, int currency)
 {
     fCash = cash;
     fChange = change;
     fDebt = debt;
+    fCurrency = currency;
 }
 
 void C5ShopOrder::setPartner(int partnerCode, const QString &partnerName)
@@ -83,6 +84,9 @@ bool C5ShopOrder::write(double total, double card, double prepaid, double discou
                          QTime::currentTime(), fUser->id(), "", 1,
                          total, (total - card), idram ? 0 : card, prepaid, 0, 0, idram ? card : 0,
                          0, discount,  0, fCardValue, 0, 0, 1, 2, fSaleType, fPartnerCode)) {
+        return returnFalse(dw.fErrorMsg, db);
+    }
+    if (!dw.writeOHeaderOptions(fHeader, 0, 0, 0, fCurrency)) {
         return returnFalse(dw.fErrorMsg, db);
     }
     if (!dw.writeAHeader(fHeader, fHallId, DOC_STATE_SAVED, DOC_TYPE_SALE_INPUT, fUser->id(), QDate::currentDate(),

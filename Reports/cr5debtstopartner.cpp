@@ -15,9 +15,9 @@ CR5DebtsToPartner::CR5DebtsToPartner(const QStringList &dbParams, QWidget *paren
     setProperty("query", "select p.f_id, p.f_taxname, b1.f_amount as f_initial, db.f_amount as f_db, cr.f_amount as f_cr,  "
                 "coalesce(b1.f_amount, 0) + coalesce(db.f_amount, 0) - coalesce(cr.f_amount, 0) as f_final "
                 "from c_partners p "
-                "left join (select h.f_partner, sum(dc.f_dc*dc.f_amount) as f_amount from a_dc dc inner join a_header h on h.f_id=dc.f_doc where h.f_date<'%d1' and h.f_state=1 group by 1) b1 on b1.f_partner=p.f_id "
-                "left join (select h.f_partner, sum(dc.f_amount) as f_amount from a_dc dc inner join a_header h on h.f_id=dc.f_doc where dc.f_dc=1 and h.f_state=1 and h.f_date between '%d1' and '%d2' group by 1) db on db.f_partner=p.f_id "
-                "left join (select h.f_partner, sum(dc.f_amount) as f_amount from a_dc dc inner join a_header h on h.f_id=dc.f_doc where dc.f_dc=-1 and h.f_state=1 and h.f_date between '%d1' and '%d2' group by 1) cr on cr.f_partner=p.f_id ");
+                "left join (select h.f_partner, sum(dc.f_dc*dc.f_amount) as f_amount from a_dc dc inner join a_header h on h.f_id=dc.f_doc where h.f_date<'%d1' and dc.f_currency=%curr and h.f_state=1 group by 1) b1 on b1.f_partner=p.f_id "
+                "left join (select h.f_partner, sum(dc.f_amount) as f_amount from a_dc dc inner join a_header h on h.f_id=dc.f_doc where dc.f_dc=1 and dc.f_currency=%curr and h.f_state=1 and h.f_date between '%d1' and '%d2' group by 1) db on db.f_partner=p.f_id "
+                "left join (select h.f_partner, sum(dc.f_amount) as f_amount from a_dc dc inner join a_header h on h.f_id=dc.f_doc where dc.f_dc=-1 and dc.f_currency=%curr and h.f_state=1 and h.f_date between '%d1' and '%d2' group by 1) cr on cr.f_partner=p.f_id ");
     fTranslation["f_id"] = tr("Code");
     fTranslation["f_taxname"] = tr("Partner");
     fTranslation["f_initial"] = tr("Initial");
@@ -46,9 +46,15 @@ QToolBar *CR5DebtsToPartner::toolBar()
 void CR5DebtsToPartner::buildQuery()
 {
     auto *f = static_cast<CR5DebtsToPartnerFilter*>(fFilterWidget);
+    if (f->currency().isEmpty()) {
+        C5Message::error(tr("Please, set the currency"));
+        setSearchParameters();
+        return;
+    }
     fSqlQuery = property("query").toString()
             .replace("%d1", f->d1().toString(FORMAT_DATE_TO_STR_MYSQL))
-            .replace("%d2", f->d2().toString(FORMAT_DATE_TO_STR_MYSQL));
+            .replace("%d2", f->d2().toString(FORMAT_DATE_TO_STR_MYSQL))
+            .replace("%curr", f->currency());
     C5ReportWidget::buildQuery();
 }
 

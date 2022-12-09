@@ -6,31 +6,18 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>374</width>
-    <height>64</height>
+    <width>417</width>
+    <height>173</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QFormLayout" name="formLayout">
+  <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
     <widget class="QLabel" name="label">
      <property name="text">
       <string>Code</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1">
-    <widget class="C5LineEditWithSelector" name="lineEdit">
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-     <property name="Field" stdset="0">
-      <string>f_id</string>
-     </property>
-     <property name="Primary" stdset="0">
-      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -41,10 +28,56 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="1">
+   <item row="2" column="1">
+    <widget class="C5LineEditWithSelector" name="leStage">
+     <property name="maximumSize">
+      <size>
+       <width>80</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="Field" stdset="0">
+      <string>f_state</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Stage</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="2">
+    <widget class="C5LineEditWithSelector" name="leStageName">
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+     <property name="Field" stdset="0">
+      <string>f_stagename</string>
+     </property>
+     <property name="FieldRef" stdset="0">
+      <string>f_statename</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1" colspan="2">
     <widget class="C5LineEditWithSelector" name="lineEdit_2">
      <property name="Field" stdset="0">
       <string>f_name</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1" colspan="2">
+    <widget class="C5LineEditWithSelector" name="lineEdit">
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+     <property name="Field" stdset="0">
+      <string>f_id</string>
+     </property>
+     <property name="Primary" stdset="0">
+      <bool>true</bool>
      </property>
     </widget>
    </item>

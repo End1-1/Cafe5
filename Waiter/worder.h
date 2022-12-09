@@ -62,6 +62,8 @@ private slots:
 
     void on_btnActivate_clicked();
 
+    void on_btnEditGuestName_clicked();
+
 signals:
     void activated();
 };

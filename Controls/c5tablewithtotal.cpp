@@ -1,10 +1,12 @@
 #include "c5tablewithtotal.h"
 #include "ui_c5tablewithtotal.h"
 #include "c5lineedit.h"
+#include "c5lineeditwithselector.h"
 #include "c5message.h"
 #include "xlsxall.h"
 #include <QScrollBar>
 #include <QDebug>
+#include <QElapsedTimer>
 
 C5TableWithTotal::C5TableWithTotal(QWidget *parent) :
     QWidget(parent),
@@ -107,6 +109,23 @@ void C5TableWithTotal::exportToExcel()
     }
 }
 
+void C5TableWithTotal::setRowColor(int row, const QColor &c)
+{
+    for (int i = 0; i < ui->tblMain->columnCount(); i++) {
+        ui->tblMain->item(row, i)->setBackgroundColor(c);
+    }
+}
+
+void C5TableWithTotal::setItemData(int row, int column, int role, const QVariant &d)
+{
+    ui->tblMain->item(row, column)->setData(role, d);
+}
+
+const QVariant C5TableWithTotal::itemData(int row, int column, int role) const
+{
+    return ui->tblMain->item(row, column)->data(role);
+}
+
 int C5TableWithTotal::addRow()
 {
     int r = ui->tblMain->addEmptyRow();
@@ -166,21 +185,30 @@ QString C5TableWithTotal::totalStr(int column)
     return ui->tblTotal->getString(0, column);
 }
 
+void C5TableWithTotal::setRowCount(int count)
+{
+    ui->tblMain->setRowCount(count);
+    for (int r = 0; r < count; r++) {
+        for (int c = 0; c < ui->tblMain->columnCount(); c++) {
+            ui->tblMain->setItem(r, c, new C5TableWidgetItem());
+        }
+    }
+}
+
 C5TableWithTotal &C5TableWithTotal::setData(int &row, int column, const QVariant &data, bool newrow)
 {
     if (newrow) {
         row = addRow();
     }
     ui->tblMain->setData(row, column, data);
-    if (fSumColumns[column]) {
-        ui->tblTotal->setDouble(0, column, ui->tblMain->sumOfColumn(column));
-    }
     return *this;
 }
 
 C5TableWithTotal &C5TableWithTotal::createLineEdit(int &row, int column, const QVariant &data, QObject *obj, const char *slot, bool newrow)
 {
-    setData(row, column, data, newrow);
+    if (newrow) {
+        ui->tblMain->addEmptyRow();
+    }
     ui->tblMain->createLineEdit(row, column)->setData(data);
     if (slot) {
         connect(ui->tblMain->lineEdit(row, column), SIGNAL(textChanged(QString)), obj, slot);
@@ -188,9 +216,50 @@ C5TableWithTotal &C5TableWithTotal::createLineEdit(int &row, int column, const Q
     return *this;
 }
 
+C5TableWithTotal &C5TableWithTotal::createLineEditDblClick(int &row, int column, QObject *obj, const char *slot, bool newrow)
+{
+    setData(row, column, QVariant(), newrow);
+    ui->tblMain->createLineEditWithSelector(row, column, nullptr, nullptr)->setData("");
+    if (slot) {
+        connect(ui->tblMain->lineEditWithSelector(row, column), SIGNAL(doubleClicked()), obj, slot);
+    }
+    return *this;
+}
+
+void C5TableWithTotal::sumColumns()
+{
+    for (QMap<int, bool>::const_iterator it = fSumColumns.constBegin(); it != fSumColumns.constEnd(); it++) {
+        if (it.value()) {
+            ui->tblTotal->setDouble(0, it.key(), ui->tblMain->sumOfColumn(it.key()));
+        }
+    }
+    QStringList l;
+    l.append(QString::number(ui->tblMain->rowCount()));
+    ui->tblTotal->setVerticalHeaderLabels(l);
+}
+
 C5LineEdit *C5TableWithTotal::lineEdit(int row, int column)
 {
     return ui->tblMain->lineEdit(row, column);
+}
+
+void C5TableWithTotal::setWidget(int row, int column, QWidget *w)
+{
+    ui->tblMain->setCellWidget(row, column, w);
+}
+
+bool C5TableWithTotal::findWidget(int &row, int &column, QWidget *w)
+{
+    for (int r = 0; r < ui->tblMain->rowCount(); r++) {
+        for (int c = 0; c < ui->tblMain->columnCount(); c++) {
+            if (w == ui->tblMain->cellWidget(r, c)) {
+                row = r;
+                column = c;
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 void C5TableWithTotal::clearTables()
@@ -223,7 +292,6 @@ void C5TableWithTotal::moveRowDown(int row)
 void C5TableWithTotal::replaceRows(int row1, int row2)
 {
     for (int i = 0; i < ui->tblMain->columnCount(); i++) {
-        qDebug() << ui->tblMain->getData(row1, i) << ui->tblMain->getData(row2, i);
         QVariant t;
         if (ui->tblMain->cellWidget(row1, i)) {
             if (dynamic_cast<C5LineEdit*>(ui->tblMain->cellWidget(row1, i))) {
@@ -236,7 +304,6 @@ void C5TableWithTotal::replaceRows(int row1, int row2)
         t = ui->tblMain->getData(row1, i);
         ui->tblMain->setData(row1, i, ui->tblMain->getData(row2, i));
         ui->tblMain->setData(row2, i, t);
-        qDebug() << ui->tblMain->getData(row1, i) << ui->tblMain->getData(row2, i);
     }
 }
 

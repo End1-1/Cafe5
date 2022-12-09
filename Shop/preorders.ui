@@ -50,6 +50,13 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="btnRemove">
+        <property name="text">
+         <string>Remove</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="btnExit">
         <property name="text">
          <string/>
@@ -64,7 +71,7 @@
     </widget>
    </item>
    <item>
-    <widget class="C5TableWidget" name="tbl">
+    <widget class="C5ClearTableWidget" name="tbl">
      <property name="focusPolicy">
       <enum>Qt::ClickFocus</enum>
      </property>
@@ -222,14 +229,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5TableWidget</class>
-   <extends>QTableWidget</extends>
-   <header location="global">c5tablewidget.h</header>
-  </customwidget>
-  <customwidget>
    <class>C5LineEdit</class>
    <extends>QLineEdit</extends>
    <header location="global">c5lineedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5ClearTableWidget</class>
+   <extends>QTableWidget</extends>
+   <header location="global">c5cleartablewidget.h</header>
   </customwidget>
  </customwidgets>
  <resources>

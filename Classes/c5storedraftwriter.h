@@ -64,13 +64,15 @@ public:
 
     bool writeECash(QString &id, const QString &header, int cash, int sign, const QString &purpose, double amount, QString &base, int rownum);
 
-    bool writeOBody(QString &id, const QString &header, int state, int dish, double qty1, double qty2, double price, double total, double service, double discount, int store, const QString &print1, const QString &print2, const QString &comment, int remind, const QString &adgcode, int removereason, int timeorder, int package);
+    bool writeOBody(QString &id, const QString &header, int state, int dish, double qty1, double qty2, double price, double total, double service, double discount, int store, const QString &print1, const QString &print2, const QString &comment, int remind, const QString &adgcode, int removereason, int timeorder, int package, int row, const QDateTime &appendTime);
 
     bool writeOBodyToOGoods(const QString &id, const QString &headerid);
 
     bool writeOHeader(QString &id, int hallid, const QString &prefix, int state, int hall, int table, const QDate &dateopen, const QDate &dateclose, const QDate &datecash, const QTime &timeopen, const QTime &timeclose, int staff, const QString &comment, int print, double amountTotal, double amountCash, double amountCard, double amountPrepaid, double amountBank, double amountOther, double amountIdram, double amountService, double amountDiscount, double serviceFactor, double discountFactor, int creditCardId, int otherId, int shift, int source, int saletype, int partner);
 
     bool writeOHeaderFlags(const QString &id, int f1, int f2, int f3, int f4, int f5);
+
+    bool writeOHeaderOptions(const QString &id, int guest, int splitted, int deliveryman, int currency);
 
     bool writeOPayment(const QString &id, double cash, double change);
 

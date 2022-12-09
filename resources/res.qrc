@@ -145,5 +145,6 @@
         <file>qr_code.png</file>
         <file>error.png</file>
         <file>template.png</file>
+        <file>trading.png</file>
     </qresource>
 </RCC>

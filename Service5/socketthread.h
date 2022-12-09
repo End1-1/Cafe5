@@ -31,6 +31,7 @@ private:
     QTimer *fTimeoutControl;
     QElapsedTimer fTimer;
     int fSocketDescriptor;
+    bool fDoNotRemovePluginSocket;
     quint32 fPreviouseMessageNumber;
     quint32 fMessageNumber;
     quint32 fMessageId;

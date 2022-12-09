@@ -23,7 +23,8 @@ void json(C5Database &db, const QJsonObject &params, QJsonArray &jarr)
             "sum(oh.f_amountcash) as f_amountcash, sum(oh.f_amountcard) as f_amountcard, "
             "sum(oh.f_amountbank) as f_amountbank, sum(oh.f_amountother) as f_amountother, "
             "sum(oh.f_amountidram) as f_amountidram,  "
-            "sum(oh.f_amountpayx) as f_amountpayx  "
+            "sum(oh.f_amountpayx) as f_amountpayx,  "
+            "sum(oh.f_hotel) as f_hotel "
             "from o_header oh "
             "where oh.f_state=:f_state1 "
             "and oh.f_datecash between :f_datecash1 and :f_datecash2 ");
@@ -57,7 +58,8 @@ void json(C5Database &db, const QJsonObject &params, QJsonArray &jarr)
             "sum(oh.f_amountcash) as f_amountcash, sum(oh.f_amountcard) as f_amountcard, "
             "sum(oh.f_amountbank) as f_amountbank, sum(oh.f_amountother) as f_amountother, "
             "sum(oh.f_amountidram) as f_amountidram,  "
-            "sum(oh.f_amountpayx) as f_amountpayx  "
+            "sum(oh.f_amountpayx) as f_amountpayx, "
+            "sum(oh.f_hotel) as f_hotel "
             "from o_header oh "
             "left join s_user u on u.f_id=oh.f_staff "
             "where oh.f_state=:f_state1 "
@@ -121,6 +123,11 @@ void json(C5Database &db, const QJsonObject &params, QJsonArray &jarr)
         p.rtext(float_str(rtotal["f_amountother"].toDouble(), 2));
         p.br();
     }
+    if (rtotal["f_hotel"].toDouble() > 0.001) {
+        p.ltext(QObject::tr("Hotel"), 5);
+        p.rtext(float_str(rtotal["f_hotel"].toDouble(), 2));
+        p.br();
+    }
 
     p.br();
     p.br();
@@ -161,6 +168,11 @@ void json(C5Database &db, const QJsonObject &params, QJsonArray &jarr)
         if (m["f_amountother"].toDouble() > 0.001) {
             p.ltext(QObject::tr("Other"), 5);
             p.rtext(float_str(m["f_amountother"].toDouble(), 2));
+            p.br();
+        }
+        if (m["f_hotel"].toDouble() > 0.001) {
+            p.ltext(QObject::tr("Hotel"), 5);
+            p.rtext(float_str(m["f_hotel"].toDouble(), 2));
             p.br();
         }
         p.line();

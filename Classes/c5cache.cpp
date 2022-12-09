@@ -122,6 +122,29 @@ C5Cache::C5Cache(const QStringList &dbParams) :
                                                 "order by gr.f_name, p.f_rowid")
                 .arg(tr("Code"), tr("Row"), tr("Product code"), tr("Product"), tr("Process code"), tr("Process"), tr("Duration"), tr("Price"));
         setCacheSimpleQuery(cache_mf_products, "mf_actions_group");
+        setCacheSimpleQuery(cache_mf_action_stage, "mf_actions_state");
+        setCacheSimpleQuery(cache_mf_workshop, "mf_stage");
+        fCacheQuery[cache_mf_active_task] = "select t.f_id, t.f_datecreate, p.f_name "
+                                            "from mf_tasks t "
+                                            "left join mf_actions_group p on p.f_id=t.f_product "
+                                            "where t.f_state=1 ";
+        setCacheSimpleQuery(cache_mf_task_state, "mf_tasks_state");
+        fCacheQuery[cache_currency] = QString("select f_id as `%1`, f_name as `%2`, f_rate as `%3`, f_symbol as `%4` from e_currency ")
+                .arg(tr("Code"), tr("Name"), tr("Rate"), tr("Symbol"));
+        fCacheQuery[cache_currency_cross_rate] = QString("select cr.f_id as `%1`, cr.f_currency1 as `%2`, c1.f_name as `%3`, "
+                    "cr.f_currency2 as `%4`, c2.f_name as `%5`, cr.f_rate as `%6` "
+                    "from e_currency_cross_rate cr "
+                    "left join e_currency c1 on c1.f_id=cr.f_currency1 "
+                    "left join e_currency c2 on c2.f_id=cr.f_currency2 ")
+                .arg(tr("Code"), tr("Currency code1"), tr("Currency name 1"),
+                     tr("Currency code 2"), tr("Currency name 2"), tr("Rate"));
+        fCacheQuery[cache_currency_cross_rate_history] = QString("select cr.f_id as `%1`, cr.f_date as `%2`, cr.f_currency1 as `%3`, c1.f_name as `%4`, "
+                    "cr.f_currency2 as `%5`, c2.f_name as `%6`, cr.f_rate as `%7` "
+                    "from e_currency_cross_rate_history cr "
+                    "left join e_currency c1 on c1.f_id=cr.f_currency1 "
+                    "left join e_currency c2 on c2.f_id=cr.f_currency2 ")
+                .arg(tr("Code"), tr("Currency code1"), tr("Currency name 1"),
+                     tr("Currency code 2"), tr("Currency name 2"), tr("Rate"));
     }
     if (fTableCache.count() == 0) {
         fTableCache["c_partners"] = cache_goods_partners;
@@ -159,6 +182,14 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         fTableCache["mf_actions"] = cache_mf_actions;
         fTableCache["mf_process"] = cache_mf_process;
         fTableCache["mf_actions_group"] = cache_mf_products;
+        fTableCache["mf_stage"] = cache_mf_workshop;
+        fTableCache["mf_actions_state"] = cache_mf_action_stage;
+        fTableCache["mf_tasks"] = cache_mf_active_task;
+        fTableCache["mf_tasks_state"] = cache_mf_task_state;
+        fTableCache["e_currency"] = cache_currency;
+        fTableCache["e_currency_rate_history"] = cache_currency_rate;
+        fTableCache["e_currency_cross_rate"] = cache_currency_cross_rate;
+        fTableCache["e_currency_cross_rate_history"] = cache_currency_cross_rate_history;
     }
     fVersion = 0;
     C5Database db(dbParams);
@@ -236,6 +267,9 @@ C5Cache *C5Cache::cache(const QStringList &dbParams, int cacheId)
     }
     if (cache->fCacheData.count() == 0) {
         QString query = fCacheQuery[cacheId];
+        if (query.isEmpty()) {
+            query = "select 0";
+        }
         cache->loadFromDatabase(query);
     } else {
         C5Database db(cache->fDBParams);

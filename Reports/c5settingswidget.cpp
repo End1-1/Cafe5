@@ -13,6 +13,7 @@ C5SettingsWidget::C5SettingsWidget(const QStringList &dbParams, QWidget *parent)
     ui->cbTaxUseExtPos->addItem(tr("No"), "false");
     ui->cbFronDeskMode->addItem(tr("Waiter"), 0);
     ui->cbFronDeskMode->addItem(tr("Shop"), 1);
+    ui->cbDefaultCurrency->setDBValues(dbParams, "select f_id, f_name from e_currency");
 }
 
 C5SettingsWidget::~C5SettingsWidget()
@@ -163,6 +164,13 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     fTags[ui->leSystemThouthandSeparator->getTag()] = ui->leSystemThouthandSeparator->text();
     fTags[ui->leTaxAlwaysPrintIfAmountLess->getTag()] = ui->leTaxAlwaysPrintIfAmountLess->text();
     fTags[ui->chPrintModOnReceipt->getTag()] = ui->chPrintModOnReceipt->isChecked() ? "1" : "0";
+    fTags[ui->chDontCloseEmtpyOrder->getTag()] = ui->chDontCloseEmtpyOrder->isChecked() ? "1" : "0";
+    fTags[ui->chDontPrintFinalReceipt->getTag()] = ui->chDontPrintFinalReceipt->isChecked() ? "1" : "0";
+    fTags[ui->leAutochargeDishAfterSessionClose->getTag()] = ui->leAutochargeDishAfterSessionClose->text();
+    fTags[ui->chViewOnChart->getTag()] = ui->chViewOnChart->isChecked() ? "1" : "0";
+    fTags[ui->chChoosePos->getTag()] = ui->chChoosePos->isChecked() ? "1" : "0";
+    fTags[ui->leMobileAppConStr->getTag()] = ui->leMobileAppConStr->text();
+    fTags[ui->cbDefaultCurrency->getTag()] = ui->cbDefaultCurrency->currentData().toString();
     C5Database db(fDBParams);
     db[":f_settings"] = ui->leCode->getInteger();
     db.exec("delete from s_settings_values where f_settings=:f_settings");

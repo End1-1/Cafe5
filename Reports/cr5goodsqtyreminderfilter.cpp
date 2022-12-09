@@ -20,7 +20,7 @@ CR5GoodsQtyReminderFilter::~CR5GoodsQtyReminderFilter()
 
 QString CR5GoodsQtyReminderFilter::condition()
 {
-    QString cond;
+    QString cond = " ";
     in(cond, "a.f_store", ui->leStore);
     in(cond, "g.f_group", ui->leGroup);
     in(cond, "g.f_id", ui->leMaterial);

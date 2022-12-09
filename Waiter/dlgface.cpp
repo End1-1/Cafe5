@@ -19,6 +19,7 @@
 #include "c5halltabledelegate.h"
 #include "fileversion.h"
 #include "c5cafecommon.h"
+#include "dlgreservation.h"
 #include "c5logtoserverthread.h"
 #include <QPushButton>
 #include <QCloseEvent>
@@ -43,6 +44,7 @@ DlgFace::DlgFace(C5User *user) :
     } else {
         setWindowState(Qt::WindowFullScreen);
     }
+    timeout();
     ui->lbStaff->setText(user->fullName());
     ui->btnCancel->setVisible(false);
     fModeJustSelectTable = false;
@@ -107,6 +109,10 @@ void DlgFace::timeout()
             }
         }
     }
+    db[":f_key"] = param_waiter_hall_chart;
+    db[":f_value"] = "1";
+    db.exec("select * from s_settings_values where f_key=:f_key and f_value=:f_value");
+    ui->btnChart->setVisible(db.nextRow());
     refreshTables();
 
     C5SocketHandler *sh = createSocketHandler(SLOT(handleVersion(QJsonObject)));
@@ -416,4 +422,9 @@ void DlgFace::on_btnGuests_clicked()
 {
     QString res, inv, room, guest;
     DlgGuest::getGuest(res, inv, room, guest);
+}
+
+void DlgFace::on_btnChart_clicked()
+{
+    DlgReservation(fUser).exec();
 }

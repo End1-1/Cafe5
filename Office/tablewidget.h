@@ -18,7 +18,7 @@ public:
     ~TableWidget();
 
 public slots:
-    virtual void externalDataReceived(quint16 cmd, const QByteArray &data);
+    virtual void externalDataReceived(quint16 cmd, quint32 messageId, const QByteArray &data) override;
 
 private:
     Ui::TableWidget *ui;

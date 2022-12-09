@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>tr_am.txt</file>
+        <file>sq.txt</file>
+    </qresource>
+</RCC>

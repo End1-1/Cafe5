@@ -16,6 +16,8 @@ SOURCES += \
     c5license.cpp \
     pluginmanager.cpp \
     raw/rawdllop.cpp \
+    raw/rawplugin.cpp \
+    raw/rawpluginobject.cpp \
     utils/commandline.cpp \
     utils/configini.cpp \
     utils/database.cpp \
@@ -57,6 +59,8 @@ HEADERS += \
     c5license.h \
     pluginmanager.h \
     raw/rawdllop.h \
+    raw/rawplugin.h \
+    raw/rawpluginobject.h \
     utils/commandline.h \
     utils/configini.h \
     utils/database.h \

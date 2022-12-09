@@ -67,7 +67,7 @@ void C5FilterWidget::restoreFilter(QWidget *parent)
     QToolButton *tb = nullptr;
     foreach (QObject *o, ol) {
         if (o->children().count() > 0) {
-            saveFilter(static_cast<QWidget*>(o));
+            restoreFilter(static_cast<QWidget*>(o));
         }
         if ((le = isLineEditWithSelector(o))) {
             filterName = le->property("FilterName").toString();
@@ -170,7 +170,11 @@ QString C5FilterWidget::in(QString &cond, const QString &field, C5LineEditWithSe
     if (l->isEmpty()) {
         return cond;
     }
-    cond += QString (" and %1 in (%2)").arg(field, l->text());
+    if (cond.isEmpty()) {
+        cond += QString (" %1 in (%2)").arg(field, l->text());
+    } else {
+        cond += QString (" and %1 in (%2)").arg(field, l->text());
+    }
     return cond;
 }
 

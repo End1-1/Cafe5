@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>860</width>
-    <height>541</height>
+    <height>639</height>
    </rect>
   </property>
   <property name="font">
@@ -19,8 +19,40 @@
    <string>Preorder</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="4" column="6">
-    <widget class="QTimeEdit" name="timeEdit">
+   <item row="3" column="7">
+    <widget class="QToolButton" name="btnEditCLCode">
+     <property name="text">
+      <string>...</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources/resources.qrc">
+       <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>32</width>
+       <height>32</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="0">
+    <widget class="QLabel" name="label_6">
+     <property name="font">
+      <font>
+       <pointsize>22</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Prepayment card</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1" colspan="6">
+    <widget class="C5LineEdit" name="leTable"/>
+   </item>
+   <item row="5" column="2">
+    <widget class="QDateEdit" name="leDate">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
        <horstretch>0</horstretch>
@@ -35,54 +67,31 @@
      <property name="styleSheet">
       <string notr="true">QTimeEdit::up-arrow {width: 0;} QTimeEdit::up-button {width: 0;}QTimeEdit::down-button {width: 0;}</string>
      </property>
-     <property name="displayFormat">
-      <string>HH:mm</string>
-     </property>
      <property name="calendarPopup">
-      <bool>false</bool>
-     </property>
-     <property name="currentSectionIndex">
-      <number>0</number>
+      <bool>true</bool>
      </property>
     </widget>
    </item>
-   <item row="7" column="3">
-    <widget class="QToolButton" name="btnGuestUp">
-     <property name="text">
-      <string>...</string>
-     </property>
-     <property name="icon">
-      <iconset resource="../resources/resources.qrc">
-       <normaloff>:/up.png</normaloff>:/up.png</iconset>
-     </property>
-     <property name="iconSize">
-      <size>
-       <width>32</width>
-       <height>32</height>
-      </size>
-     </property>
-    </widget>
-   </item>
-   <item row="9" column="0">
-    <widget class="QLabel" name="label_6">
+   <item row="5" column="0">
+    <widget class="QLabel" name="label">
      <property name="font">
       <font>
        <pointsize>22</pointsize>
       </font>
      </property>
      <property name="text">
-      <string>Prepayment card</string>
+      <string>Date</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="1">
-    <widget class="QToolButton" name="btnDateDown">
+   <item row="11" column="3">
+    <widget class="QToolButton" name="btnEditPayX">
      <property name="text">
       <string>...</string>
      </property>
      <property name="icon">
       <iconset resource="../resources/resources.qrc">
-       <normaloff>:/down.png</normaloff>:/down.png</iconset>
+       <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
      </property>
      <property name="iconSize">
       <size>
@@ -92,7 +101,40 @@
      </property>
     </widget>
    </item>
-   <item row="11" column="0" colspan="8">
+   <item row="8" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="font">
+      <font>
+       <pointsize>22</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Guests count</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0">
+    <widget class="QLabel" name="lbCheckout">
+     <property name="font">
+      <font>
+       <pointsize>22</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Date checkout</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="1" colspan="2">
+    <widget class="C5LineEdit" name="leCash">
+     <property name="font">
+      <font>
+       <pointsize>22</pointsize>
+      </font>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="0" colspan="8">
     <widget class="QWidget" name="widget" native="true">
      <property name="font">
       <font>
@@ -117,6 +159,30 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnCheckin">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>22</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Checkin</string>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QPushButton" name="btnCancelReserve">
@@ -188,7 +254,7 @@ advance</string>
          </font>
         </property>
         <property name="text">
-         <string>OK</string>
+         <string>Save</string>
         </property>
        </widget>
       </item>
@@ -237,35 +303,14 @@ advance</string>
      </layout>
     </widget>
    </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_9">
-     <property name="font">
-      <font>
-       <pointsize>22</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>CityLedger code</string>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="1" colspan="2">
-    <widget class="C5LineEdit" name="leCash">
-     <property name="font">
-      <font>
-       <pointsize>22</pointsize>
-      </font>
-     </property>
-    </widget>
-   </item>
-   <item row="10" column="3">
-    <widget class="QToolButton" name="btnEditPayX">
+   <item row="6" column="7">
+    <widget class="QToolButton" name="btnDaysUp">
      <property name="text">
       <string>...</string>
      </property>
      <property name="icon">
       <iconset resource="../resources/resources.qrc">
-       <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
+       <normaloff>:/up.png</normaloff>:/up.png</iconset>
      </property>
      <property name="iconSize">
       <size>
@@ -275,29 +320,32 @@ advance</string>
      </property>
     </widget>
    </item>
-   <item row="10" column="1" colspan="2">
-    <widget class="C5LineEdit" name="lePayX">
-     <property name="font">
-      <font>
-       <pointsize>22</pointsize>
-      </font>
-     </property>
-    </widget>
-   </item>
    <item row="4" column="0">
-    <widget class="QLabel" name="label">
+    <widget class="QLabel" name="label_7">
      <property name="font">
       <font>
        <pointsize>22</pointsize>
       </font>
      </property>
      <property name="text">
-      <string>Date</string>
+      <string>Guest</string>
      </property>
     </widget>
    </item>
-   <item row="7" column="1">
-    <widget class="QToolButton" name="btnGuestDown">
+   <item row="0" column="0" colspan="6">
+    <widget class="QLabel" name="lbPreorder">
+     <property name="font">
+      <font>
+       <pointsize>22</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>PREORDER</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <widget class="QToolButton" name="btnDateDown">
      <property name="text">
       <string>...</string>
      </property>
@@ -313,106 +361,8 @@ advance</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="label_7">
-     <property name="font">
-      <font>
-       <pointsize>22</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Guest</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="7">
-    <widget class="QToolButton" name="btnEditCLCode">
-     <property name="text">
-      <string>...</string>
-     </property>
-     <property name="icon">
-      <iconset resource="../resources/resources.qrc">
-       <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
-     </property>
-     <property name="iconSize">
-      <size>
-       <width>32</width>
-       <height>32</height>
-      </size>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="7">
-    <widget class="QToolButton" name="btnEditGuestname">
-     <property name="text">
-      <string>...</string>
-     </property>
-     <property name="icon">
-      <iconset resource="../resources/resources.qrc">
-       <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
-     </property>
-     <property name="iconSize">
-      <size>
-       <width>32</width>
-       <height>32</height>
-      </size>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="3">
-    <widget class="QToolButton" name="btnEditCash">
-     <property name="text">
-      <string>...</string>
-     </property>
-     <property name="icon">
-      <iconset resource="../resources/resources.qrc">
-       <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
-     </property>
-     <property name="iconSize">
-      <size>
-       <width>32</width>
-       <height>32</height>
-      </size>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1" colspan="6">
-    <widget class="C5LineEdit" name="leCityLedger"/>
-   </item>
-   <item row="9" column="3">
-    <widget class="QToolButton" name="btnEditCard">
-     <property name="text">
-      <string>...</string>
-     </property>
-     <property name="icon">
-      <iconset resource="../resources/resources.qrc">
-       <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
-     </property>
-     <property name="iconSize">
-      <size>
-       <width>32</width>
-       <height>32</height>
-      </size>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label_10">
-     <property name="font">
-      <font>
-       <pointsize>22</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Table</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1" colspan="6">
-    <widget class="C5LineEdit" name="leGuestName"/>
-   </item>
-   <item row="4" column="3">
-    <widget class="QToolButton" name="btnDateUp">
+   <item row="6" column="3">
+    <widget class="QToolButton" name="btnCheckoutUp">
      <property name="text">
       <string>...</string>
      </property>
@@ -428,7 +378,7 @@ advance</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="4">
+   <item row="5" column="4">
     <widget class="QLabel" name="label_2">
      <property name="font">
       <font>
@@ -440,48 +390,19 @@ advance</string>
      </property>
     </widget>
    </item>
-   <item row="7" column="0">
-    <widget class="QLabel" name="label_4">
+   <item row="1" column="0">
+    <widget class="QLabel" name="lbTable">
      <property name="font">
       <font>
        <pointsize>22</pointsize>
       </font>
      </property>
      <property name="text">
-      <string>Guests count</string>
+      <string>Table</string>
      </property>
     </widget>
    </item>
-   <item row="8" column="0">
-    <widget class="QLabel" name="label_5">
-     <property name="font">
-      <font>
-       <pointsize>22</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Prepayment cash</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="7">
-    <widget class="QToolButton" name="btnTimeUp">
-     <property name="text">
-      <string>...</string>
-     </property>
-     <property name="icon">
-      <iconset resource="../resources/resources.qrc">
-       <normaloff>:/up.png</normaloff>:/up.png</iconset>
-     </property>
-     <property name="iconSize">
-      <size>
-       <width>32</width>
-       <height>32</height>
-      </size>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="5">
+   <item row="5" column="5">
     <widget class="QToolButton" name="btnTimeDown">
      <property name="text">
       <string>...</string>
@@ -498,7 +419,266 @@ advance</string>
      </property>
     </widget>
    </item>
-   <item row="7" column="2">
+   <item row="6" column="5">
+    <widget class="QToolButton" name="btnDaysDown">
+     <property name="text">
+      <string>...</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources/resources.qrc">
+       <normaloff>:/down.png</normaloff>:/down.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>32</width>
+       <height>32</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="6">
+    <widget class="QTimeEdit" name="timeEdit">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>22</pointsize>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QTimeEdit::up-arrow {width: 0;} QTimeEdit::up-button {width: 0;}QTimeEdit::down-button {width: 0;}</string>
+     </property>
+     <property name="displayFormat">
+      <string>HH:mm</string>
+     </property>
+     <property name="calendarPopup">
+      <bool>false</bool>
+     </property>
+     <property name="currentSectionIndex">
+      <number>0</number>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="3">
+    <widget class="QToolButton" name="btnDateUp">
+     <property name="text">
+      <string>...</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources/resources.qrc">
+       <normaloff>:/up.png</normaloff>:/up.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>32</width>
+       <height>32</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_9">
+     <property name="font">
+      <font>
+       <pointsize>22</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>CityLedger code</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="0">
+    <widget class="QLabel" name="label_5">
+     <property name="font">
+      <font>
+       <pointsize>22</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Prepayment cash</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1" colspan="6">
+    <widget class="C5LineEdit" name="leGuestName"/>
+   </item>
+   <item row="10" column="3">
+    <widget class="QToolButton" name="btnEditCard">
+     <property name="text">
+      <string>...</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources/resources.qrc">
+       <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>32</width>
+       <height>32</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="7">
+    <widget class="QToolButton" name="btnTimeUp">
+     <property name="text">
+      <string>...</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources/resources.qrc">
+       <normaloff>:/up.png</normaloff>:/up.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>32</width>
+       <height>32</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="7">
+    <widget class="QToolButton" name="btnEditGuestname">
+     <property name="text">
+      <string>...</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources/resources.qrc">
+       <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>32</width>
+       <height>32</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="7">
+    <widget class="QToolButton" name="btnSelectTable">
+     <property name="text">
+      <string>...</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources/resources.qrc">
+       <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>32</width>
+       <height>32</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1">
+    <widget class="QToolButton" name="btnCheckDown">
+     <property name="text">
+      <string>...</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources/resources.qrc">
+       <normaloff>:/down.png</normaloff>:/down.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>32</width>
+       <height>32</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="1" colspan="2">
+    <widget class="C5LineEdit" name="lePayX">
+     <property name="font">
+      <font>
+       <pointsize>22</pointsize>
+      </font>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="4">
+    <widget class="QLabel" name="lbDays">
+     <property name="font">
+      <font>
+       <pointsize>22</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Days</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="1" colspan="2">
+    <widget class="C5LineEdit" name="leCard">
+     <property name="font">
+      <font>
+       <pointsize>22</pointsize>
+      </font>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="6">
+    <widget class="QSpinBox" name="leDays">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>22</pointsize>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
+     <property name="showGroupSeparator" stdset="0">
+      <bool>false</bool>
+     </property>
+     <property name="suffix">
+      <string/>
+     </property>
+     <property name="prefix">
+      <string/>
+     </property>
+     <property name="minimum">
+      <number>0</number>
+     </property>
+     <property name="maximum">
+      <number>999</number>
+     </property>
+     <property name="value">
+      <number>1</number>
+     </property>
+     <property name="displayIntegerBase">
+      <number>10</number>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="3">
+    <widget class="QToolButton" name="btnEditCash">
+     <property name="text">
+      <string>...</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources/resources.qrc">
+       <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>32</width>
+       <height>32</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="2">
     <widget class="QSpinBox" name="leGuest">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -537,41 +717,8 @@ advance</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="0" colspan="6">
-    <widget class="QLabel" name="label_3">
-     <property name="font">
-      <font>
-       <pointsize>22</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>PREORDER</string>
-     </property>
-    </widget>
-   </item>
-   <item row="9" column="1" colspan="2">
-    <widget class="C5LineEdit" name="leCard">
-     <property name="font">
-      <font>
-       <pointsize>22</pointsize>
-      </font>
-     </property>
-    </widget>
-   </item>
-   <item row="10" column="0">
-    <widget class="QLabel" name="label_8">
-     <property name="font">
-      <font>
-       <pointsize>22</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Prepayment PayX</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="2">
-    <widget class="QDateEdit" name="leDate">
+   <item row="6" column="2">
+    <widget class="QDateEdit" name="leDateCheckout">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
        <horstretch>0</horstretch>
@@ -591,11 +738,72 @@ advance</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="1" colspan="6">
-    <widget class="C5LineEdit" name="leTable"/>
+   <item row="8" column="1">
+    <widget class="QToolButton" name="btnGuestDown">
+     <property name="text">
+      <string>...</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources/resources.qrc">
+       <normaloff>:/down.png</normaloff>:/down.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>32</width>
+       <height>32</height>
+      </size>
+     </property>
+    </widget>
    </item>
-   <item row="1" column="7">
-    <widget class="QToolButton" name="btnSelectTable">
+   <item row="8" column="3">
+    <widget class="QToolButton" name="btnGuestUp">
+     <property name="text">
+      <string>...</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources/resources.qrc">
+       <normaloff>:/up.png</normaloff>:/up.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>32</width>
+       <height>32</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="0">
+    <widget class="QLabel" name="label_8">
+     <property name="font">
+      <font>
+       <pointsize>22</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Prepayment PayX</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1" colspan="6">
+    <widget class="C5LineEdit" name="leCityLedger"/>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="lbRoomRate">
+     <property name="font">
+      <font>
+       <pointsize>22</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Room rate</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1" colspan="6">
+    <widget class="C5LineEdit" name="leRoomRate"/>
+   </item>
+   <item row="2" column="7">
+    <widget class="QToolButton" name="btnEditRate">
      <property name="text">
       <string>...</string>
      </property>

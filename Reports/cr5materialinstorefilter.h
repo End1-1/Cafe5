@@ -22,6 +22,10 @@ public:
 
     bool showDrafts();
 
+    QString currency() const;
+
+    QString currencyName() const;
+
 private:
     Ui::CR5MaterialInStoreFilter *ui;
 };

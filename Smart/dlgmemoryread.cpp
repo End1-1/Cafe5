@@ -108,6 +108,6 @@ void DlgMemoryRead::on_btnReprint_clicked()
     if (row < 0) {
         return;
     }
-    Workspace::fWorkspace->printReceipt(ui->tblMemory->item(row, 0)->text(), false);
+    Workspace::fWorkspace->printReceipt(ui->tblMemory->item(row, 0)->text(), false, false);
     accept();
 }

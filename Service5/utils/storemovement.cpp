@@ -1,4 +1,5 @@
 #include "storemovement.h"
+#include <QDebug>
 
 bool writeOutput(const QString &docId, QString &err, Database &db)
 {
@@ -41,7 +42,9 @@ bool writeOutput(const QString &docId, QString &err, Database &db)
     QList<double> priceList;
     QList<double> totalList;
     db[":f_document"] = docId;
-    db.exec("select s.f_id, s.f_goods, s.f_store, s.f_qty, s.f_price, s.f_total, concat(g.f_name, if(g.f_scancode is null, '', concat(' ', g.f_scancode))) as f_name, s.f_base, s.f_reason "
+    db.exec("select s.f_id, s.f_goods, s.f_store, s.f_qty, s.f_price, s.f_total, "
+            "concat(g.f_name, if(g.f_scancode is null, '', concat(' ', g.f_scancode))) as f_name, "
+            "s.f_base, s.f_reason, s.f_comment "
                "from a_store_draft s inner join c_goods g on g.f_id=s.f_goods "
                "where f_document=:f_document and f_type=-1");
     while (db.next()) {
@@ -59,9 +62,10 @@ bool writeOutput(const QString &docId, QString &err, Database &db)
     db[":f_store"] = storeOut;
     db[":f_date"] = date;
     if (!db.exec(QString("select s.f_id, s.f_goods, sum(s.f_qty*s.f_type) as f_qty, s.f_price, s.f_total*s.f_type, "
-                         "s.f_document, s.f_base, d.f_date "
+                         "s.f_document, s.f_base, d.f_date, sd.f_comment "
                            "from a_store s "
                            "inner join a_header d on d.f_id=s.f_document "
+                         "left join a_store_draft sd on s.f_draft=sd.f_id "
                            "where s.f_goods in (%1) and s.f_store=:f_store and d.f_date<=:f_date "
                            "group by s.f_base "
                            "having sum(s.f_qty*s.f_type)>0 "
@@ -78,6 +82,7 @@ bool writeOutput(const QString &docId, QString &err, Database &db)
         storeData.append(v);
     }
     QList<QMap<QString, QVariant> > queries;
+    QList<QMap<QString, QVariant> > draftcomment;
     for (int i = 0; i < goodsID.count(); i++) {
         double qty = qtyList.at(i);
         totalList[i] = 0;
@@ -98,6 +103,9 @@ bool writeOutput(const QString &docId, QString &err, Database &db)
                         newrec[":f_basedoc"] = storeData.at(j)["f_document"];
                         newrec[":f_reason"] = reason;
                         newrec[":f_draft"] = recID.at(i);
+                        if (!storeData.at(j)["f_comment"].toString().isEmpty()) {
+                            draftcomment.append({{recID.at(i), storeData.at(j)["f_comment"].toString()}});
+                        }
                         queries << newrec;
                         amount += storeData.at(j)["f_price"].toDouble() * qty;
                         totalList[i] = totalList[i] + (storeData.at(j)["f_price"].toDouble() * qty);
@@ -116,6 +124,9 @@ bool writeOutput(const QString &docId, QString &err, Database &db)
                         newrec[":f_basedoc"] = storeData.at(j)["f_document"];
                         newrec[":f_reason"] = reason;
                         newrec[":f_draft"] = recID.at(i);
+                        if (!storeData.at(j)["f_comment"].toString().isEmpty()) {
+                            draftcomment.append({{recID.at(i), storeData.at(j)["f_comment"].toString()}});
+                        }
                         queries << newrec;
                         totalList[i] = totalList[i] + (storeData.at(j)["f_qty"].toDouble() * storeData.at(j)["f_price"].toDouble());
                         priceList[i] = totalList[i] / qtyList.at(i);
@@ -133,7 +144,7 @@ bool writeOutput(const QString &docId, QString &err, Database &db)
             if (err.isEmpty()) {
                 err += QObject::tr("Not enough materials in the store") + "<br>";
             }
-            err += QString("%1 - %2").arg(goodsName.at(i)).arg(qty) + "<br>";
+            err += QString("%1 - %2 (%3)").arg(goodsName.at(i)).arg(qty).arg(QString::number(storeOut)) + "<br>";
         }
     }
     if (err.isEmpty()) {
@@ -215,6 +226,12 @@ bool writeOutput(const QString &docId, QString &err, Database &db)
             db[":f_price"] = amount / complectQty;
             db[":f_total"] = amount;
             db.exec("update a_store_draft set f_price=:f_price, f_total=:f_total where f_type=:f_type and f_document=:f_document");
+        }
+        for (const QMap<QString, QVariant> &m: draftcomment) {
+            for (QMap<QString, QVariant>::const_iterator it = m.constBegin(); it != m.constEnd(); it++) {
+                db[":f_comment"] = it.value();
+                db.update("a_store_draft", "f_id", it.key());
+            }
         }
     }
 

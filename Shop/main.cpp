@@ -9,6 +9,7 @@
 #include "datadriver.h"
 #include "replicadialog.h"
 #include "settingsselection.h"
+#include "c5systempreference.h"
 #include "dlgsplashscreen.h"
 #include <QApplication>
 #include <QMessageBox>
@@ -30,7 +31,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setLibraryPaths(libPath);
 #endif
 
-//        if (QDate::currentDate() > QDate::fromString("01/10/2022", "dd/MM/yyyy")) {
+//        if (QDate::currentDate() > QDate::fromString("01/12/2022", "dd/MM/yyyy")) {
 //            return 1;
 //        }
 
@@ -87,6 +88,10 @@ int main(int argc, char *argv[])
     C5Config::fSettingsName = connectionParams.at(4);
     C5Config::initParamsFromDb();
 
+    if (!C5SystemPreference::checkDecimalPointAndSeparator()) {
+        return 0;
+    }
+
     QFontDatabase::addApplicationFont(":/barcode.ttf");
 //    int id = QFontDatabase::addApplicationFont(":/ahuni.ttf");
 //    QString family = QFontDatabase::applicationFontFamilies(id).at(0);
@@ -129,10 +134,6 @@ int main(int argc, char *argv[])
         pin.clear();
         user.clear();
     };
-
-    if (QDate::currentDate() > QDate::fromString("01/10/2022", "dd/MM/yyyy")) {
-        return 1;
-    }
 
     db[":f_user"] = __user->id();
     db.exec("select sn.f_id, sn.f_name from s_settings_names sn where sn.f_id in (select f_settings from s_user_config where f_user=:f_user)");

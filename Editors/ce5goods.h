@@ -35,6 +35,8 @@ public:
 private slots:
     void printCard();
 
+    void priceEdited(const QString &arg1);
+
     void tblQtyChanged(const QString &arg1);
 
     void tblPriceChanged(const QString &arg1);
@@ -48,6 +50,8 @@ private slots:
     void newScancode();
 
     void removeScancode();
+
+    void genScancode();
 
     void tblMultiscancodeContextMenu(const QPoint &p);
 
@@ -89,6 +93,14 @@ private slots:
 
     void on_leUnitName_textChanged(const QString &arg1);
 
+    void on_btnPrintBarcode_clicked();
+
+    void on_leCostPrice_textEdited(const QString &arg1);
+
+    void on_leMargin_textEdited(const QString &arg1);
+
+    void on_leMargin2_textEdited(const QString &arg1);
+
 private:
     Ui::CE5Goods *ui;
 
@@ -98,13 +110,19 @@ private:
 
     QSet<QString> fStrings;
 
+    bool fScancodeGenerated;
+
     Barcode *fBarcode;
 
     QStringList fScancodeRemove;
 
     QStringList fScancodeAppend;
 
+    QMap<QString, double> fCrossRate;
+
     void setComplectFlag();
+
+    void countSalePrice(int r, double margin);
 };
 
 #endif // CE5GOODS_H

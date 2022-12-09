@@ -893,7 +893,9 @@ void C5WaiterServer::processCloseOrder(QJsonObject &o, C5Database &db)
             }
             C5WaiterOrderDoc w(db, jh, jb);
             w.transferToHotel(db, err);
-            w.makeOutputOfStore(db, err, DOC_STATE_SAVED);
+            if (settings[param_waiter_automatially_storeout].toInt() > 0) {
+                w.makeOutputOfStore(db, err, DOC_STATE_SAVED);
+            }
 
             C5StoreDraftWriter dw(db);
             if (settings[param_autoinput_salecash].toInt() == 1) {
@@ -1150,7 +1152,7 @@ bool C5WaiterServer::printReceipt(QString &err, C5Database &db, bool isBill, boo
         }
     }
 
-    if (fIn["withoutprint"].toInt() == 0) {
+    if (fIn["withoutprint"].toInt() == 0 && fIn["nofinalreceipt"].toInt() == 0) {
         switch (printType) {
         case 50: {
             //TODO: remove from thread

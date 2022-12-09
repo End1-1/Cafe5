@@ -23,6 +23,8 @@ private slots:
 
     void on_btnExit_clicked();
 
+    void on_btnRemove_clicked();
+
 private:
     Ui::Preorders *ui;
 };

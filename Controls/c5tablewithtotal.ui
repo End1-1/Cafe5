@@ -30,7 +30,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="C5TableWidget" name="tblMain">
+    <widget class="C5TableWidgetWithSelector" name="tblMain">
      <property name="styleSheet">
       <string notr="true">border-top:1px solid #D8D8D8;
 border-left:1px solid #D8D8D8;
@@ -85,6 +85,11 @@ border-bottom: 1px solid #D8D8D8;</string>
    <class>C5TableWidget</class>
    <extends>QTableWidget</extends>
    <header location="global">c5tablewidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5TableWidgetWithSelector</class>
+   <extends>QTableWidget</extends>
+   <header location="global">c5tablewidgetwithselector.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -81,7 +81,7 @@ void MainWindow::loginButtonClicked()
 
 }
 
-void MainWindow::socketDataReceived(quint16 cmd, QByteArray d)
+void MainWindow::socketDataReceived(quint16 cmd, quint32 messageId, QByteArray d)
 {
     switch (cmd) {
     case MessageList::silent_auth:

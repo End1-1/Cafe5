@@ -27,6 +27,8 @@ public:
     virtual bool save(QString &err, QList<QMap<QString, QVariant> > &data);
 
 private slots:
+    void startPriceUpdateOnRow();
+
     void durationChanged(const QString &arg1);
 
     void goalPriceChanged(const QString &arg1);
@@ -52,6 +54,8 @@ private slots:
     void on_btnCopy_clicked();
 
     void on_btnPaste_clicked();
+
+    void on_btnExportExcel_clicked();
 
 private:
     Ui::CE5MFProduct *ui;

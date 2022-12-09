@@ -218,7 +218,7 @@ void DlgOrder::accept()
     for (int i = 0; i < ui->vs->count(); i++) {
         WOrder *wo = dynamic_cast<WOrder*>(ui->vs->itemAt(i)->widget());
         if (wo) {
-            if (wo->fOrderDriver->isEmpty()) {
+            if (wo->fOrderDriver->isEmpty() && __c5config.getValue(param_waiter_donotclose_empty_order).toInt() == 0) {
                 wo->fOrderDriver->setCloseHeader();
             }
             for (int i = 0; i < wo->fOrderDriver->dishesCount(); i++) {
@@ -309,6 +309,11 @@ bool DlgOrder::load(int table)
     ui->lbVisit->clear();
     ui->lbVisit->setVisible(false);
     if (orders.count() == 0) {
+        if (__c5config.getValue(param_waiter_donotclose_empty_order).toInt() == 1) {
+            if (C5Message::question(tr("Open new order?")) != QDialog::Accepted) {
+                return false;
+            }
+        }
         QString newid;
         WOrder *wo = new WOrder();
         connect(wo, &WOrder::activated, this, &DlgOrder::worderActivated);
@@ -535,6 +540,7 @@ void DlgOrder::setButtonsState()
 {
     bool btnSendToCooking = false;
     bool btnPayment = true;
+    bool orderEmpty = true;
 
     QList<WOrder*> orders = worders();
     for (WOrder *o: orders) {
@@ -542,13 +548,14 @@ void DlgOrder::setButtonsState()
             if (o->fOrderDriver->dishesValue("f_state", i).toInt() != DISH_STATE_OK) {
                 continue;
             }
+            orderEmpty = false;
             if (o->fOrderDriver->dishesValue("f_qty1", i).toDouble() > o->fOrderDriver->dishesValue("f_qty2", i).toDouble()) {
                 btnSendToCooking = true;
             }
         }
     }
 
-    if (btnSendToCooking) {
+    if (btnSendToCooking || orderEmpty) {
         btnPayment = false;
     }
 
@@ -1522,12 +1529,21 @@ void DlgOrder::on_btnTotal_clicked()
     WOrder *wo = worder();
 
     if (wo->fOrderDriver->headerValue("f_precheck").toInt() < 1) {
+        auto *tmp = fUser;
+        if (!tmp->check(cp_t5_print_precheck)) {
+            if (!DlgPassword::getUserAndCheck(tr("Print precheck"), tmp, cp_t5_print_precheck)) {
+                return;
+            }
+        }
         int withoutprint = 0;
         if (__c5config.getValue(param_waiter_ask_for_precheck).toInt() > 0) {
             withoutprint = DlgAskForPrecheck::get();
         }
         if (C5Config::carMode()) {
             if (wo->fOrderDriver->headerOptionsValue("f_car") == 0) {
+                if (tmp != fUser) {
+                    delete tmp;
+                }
                 C5Message::error(tr("Car model and costumer not specified"));
                 return;
             }
@@ -1544,6 +1560,9 @@ void DlgOrder::on_btnTotal_clicked()
             empty = false;
         }
         if (empty) {
+            if (tmp != fUser) {
+                delete tmp;
+            }
             C5Message::error(tr("Order is incomplete"));
             return;
         }
@@ -1560,7 +1579,10 @@ void DlgOrder::on_btnTotal_clicked()
         sh->bind("withoutprint", withoutprint);
         sh->bind("alias", __c5config.getValue(param_force_use_print_alias).toInt());
         sh->send();
-        C5LogToServerThread::remember(LOG_WAITER, fUser->fullName(), "", wo->fOrderDriver->currentOrderId(), "", "Precheck", float_str(wo->fOrderDriver->headerValue("f_amounttotal").toDouble(), 2), "");
+        C5LogToServerThread::remember(LOG_WAITER, tmp->fullName(), "", wo->fOrderDriver->currentOrderId(), "", "Precheck", float_str(wo->fOrderDriver->headerValue("f_amounttotal").toDouble(), 2), "");
+        if (tmp != fUser) {
+            delete tmp;
+        }
     } else {
         int o = DlgPrecheckOptions::precheck();
         C5User *tmp = fUser;
@@ -1584,7 +1606,7 @@ void DlgOrder::on_btnTotal_clicked()
             break;
         }
         case PRECHECK_REPEAT:
-            if (!tmp->check(cp_t5_print_precheck)) {
+            if (!tmp->check(cp_t5_repeat_precheck)) {
                 if (!DlgPassword::getUserAndCheck(tr("Repeat precheck"), tmp, cp_t5_print_precheck)) {
                     return;
                 }
@@ -1777,7 +1799,7 @@ void DlgOrder::headerToLineEdit()
     ui->leCard->setDouble(wo->fOrderDriver->headerValue("f_amountcard").toDouble());
     ui->leBank->setDouble(wo->fOrderDriver->headerValue("f_amountbank").toDouble());
     ui->lePrepaid->setDouble(wo->fOrderDriver->headerValue("f_amountprepaid").toDouble());
-    ui->leOther->setDouble(wo->fOrderDriver->headerValue("f_amountother").toDouble());
+    ui->leOther->setDouble(wo->fOrderDriver->headerValue("f_amountother").toDouble() + wo->fOrderDriver->headerValue("f_hotel").toDouble());
     ui->leIDRAM->setDouble(wo->fOrderDriver->headerValue("f_amountidram").toDouble());
     ui->lePayX->setDouble(wo->fOrderDriver->headerValue("f_amountpayx").toDouble());
     if (wo->fOrderDriver->preorder("f_prepaidcash").toDouble() > 0) {
@@ -1866,8 +1888,7 @@ void DlgOrder::setRoomComment()
         ui->leRoomComment->setVisible(v);
         ui->lbRoom->setVisible(v);
         if (v) {
-            ui->leRoomComment->setText(wo->fOrderDriver->payRoomValue("f_room").toString()
-                                       + ", " + wo->fOrderDriver->payRoomValue("f_guest").toString());
+            ui->leRoomComment->setText(wo->fOrderDriver->payRoomValue("f_room").toString() + ", " + wo->fOrderDriver->payRoomValue("f_guest").toString());
         }
     }
 }
@@ -2020,6 +2041,7 @@ void DlgOrder::on_btnPaymentCash_clicked()
     worder()->fOrderDriver->setHeader("f_amountother", 0);
     worder()->fOrderDriver->setHeader("f_amountpayx", 0);
     worder()->fOrderDriver->setHeader("f_amountidram", 0);
+    worder()->fOrderDriver->setHeader("f_hotel", 0);
     worder()->fOrderDriver->setHeader("f_otherid", 0);
     ui->leRemain->setDouble(0);
     clearOther();
@@ -2037,6 +2059,7 @@ void DlgOrder::on_btnPaymentCard_clicked()
     worder()->fOrderDriver->setHeader("f_amountother", 0);
     worder()->fOrderDriver->setHeader("f_amountpayx", 0);
     worder()->fOrderDriver->setHeader("f_amountidram", 0);
+    worder()->fOrderDriver->setHeader("f_hotel", 0);
     worder()->fOrderDriver->setHeader("f_otherid", 0);
     ui->leRemain->setDouble(0);
     clearOther();
@@ -2053,6 +2076,7 @@ void DlgOrder::on_btnPaymentBank_clicked()
     worder()->fOrderDriver->setHeader("f_amountprepaid", 0);
     worder()->fOrderDriver->setHeader("f_amountother", 0);
     worder()->fOrderDriver->setHeader("f_otherid", 0);
+    worder()->fOrderDriver->setHeader("f_hotel", 0);
     ui->leRemain->setDouble(0);
     clearOther();
     headerToLineEdit();
@@ -2068,6 +2092,7 @@ void DlgOrder::on_btnPrepayment_clicked()
     worder()->fOrderDriver->setHeader("f_amountprepaid", worder()->fOrderDriver->headerValue("f_amounttotal"));
     worder()->fOrderDriver->setHeader("f_amountother", 0);
     worder()->fOrderDriver->setHeader("f_otherid", 0);
+    worder()->fOrderDriver->setHeader("f_hotel", 0);
     ui->leRemain->setDouble(0);
     clearOther();
     headerToLineEdit();
@@ -2081,6 +2106,7 @@ void DlgOrder::on_btnPaymentOther_clicked()
     worder()->fOrderDriver->setHeader("f_amountcard", 0);
     worder()->fOrderDriver->setHeader("f_amountbank", 0);
     worder()->fOrderDriver->setHeader("f_amountprepaid", 0);
+    worder()->fOrderDriver->setHeader("f_hotel", 0);
     worder()->fOrderDriver->setHeader("f_amountother", worder()->fOrderDriver->headerValue("f_amounttotal"));
     ui->leRemain->setDouble(0);
     headerToLineEdit();
@@ -2129,6 +2155,8 @@ void DlgOrder::on_btnPayTransferToRoom_clicked()
                 C5Message::error(wo->fOrderDriver->error());
                 return;
             }
+            wo->fOrderDriver->setHeader("f_amountother", 0);
+            wo->fOrderDriver->setHeader("f_hotel", wo->fOrderDriver->amountTotal());
             setRoomComment();
         }
     }
@@ -2161,6 +2189,7 @@ void DlgOrder::on_btnReceipt_clicked()
             + wo->fOrderDriver->headerValue("f_amountprepaid").toDouble()
             + wo->fOrderDriver->headerValue("f_amountbank").toDouble()
             + wo->fOrderDriver->headerValue("f_amountidram").toDouble()
+            + wo->fOrderDriver->headerValue("f_hotel").toDouble()
             + wo->fOrderDriver->headerValue("f_amountpayx").toDouble() < wo->fOrderDriver->headerValue("f_amounttotal").toDouble()) {
         C5Message::error(tr("Check the all payment methods"));
         return;
@@ -2168,6 +2197,7 @@ void DlgOrder::on_btnReceipt_clicked()
     double a = wo->fOrderDriver->headerValue("f_amountcash").toDouble()
             + wo->fOrderDriver->headerValue("f_amountcard").toDouble()
             + wo->fOrderDriver->headerValue("f_amountother").toDouble()
+            + wo->fOrderDriver->headerValue("f_hotel").toDouble()
             + wo->fOrderDriver->headerValue("f_amountprepaid").toDouble()
             + wo->fOrderDriver->headerValue("f_amountbank").toDouble()
             + wo->fOrderDriver->headerValue("f_amountidram").toDouble()
@@ -2222,7 +2252,7 @@ void DlgOrder::on_btnReceipt_clicked()
         }
         amounts = float_str(wo->fOrderDriver->headerValue("f_amountother").toDouble(), 2);
     }
-    amounts += ui->btnTax->isChecked() ? " Tax: yes" : " Tax: no";
+    amounts += ui->btnTax->isChecked() ? " Fiscal: yes" : " Fiscal: no";
     C5LogToServerThread::remember(LOG_WAITER, tmp->fullName(), "", wo->fOrderDriver->currentOrderId(), "", "Receipt", payMethods, amounts);
 
     C5SocketHandler *sh = createSocketHandler(SLOT(handleReceipt(QJsonObject)));
@@ -2235,6 +2265,7 @@ void DlgOrder::on_btnReceipt_clicked()
     sh->bind("receipt_printer", C5Config::fSettingsName);
     sh->bind("alias", __c5config.getValue(param_force_use_print_alias).toInt());
     sh->bind("close", 1);
+    sh->bind("nofinalreceipt", __c5config.getValue(param_waiter_dontprint_final_receipt).toInt());
     sh->send();
 }
 

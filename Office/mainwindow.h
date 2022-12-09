@@ -30,10 +30,9 @@ private slots:
     void socketDisconnected();
     void connectionButtonClicked();
     void loginButtonClicked();
-    void socketDataReceived(quint16 cmd, QByteArray d);
+    void socketDataReceived(quint16 cmd, quint32 messageId, QByteArray d);
     void on_actionMovement_report_triggered();
     void on_tw_tabCloseRequested(int index);
-
     void on_tw_currentChanged(int index);
 
 signals:

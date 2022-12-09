@@ -320,7 +320,10 @@ void C5TableModel::removeRow(int row, const QModelIndex &parent)
 {
     beginRemoveRows(parent, row, row);
     fRawData.removeAt(fProxyData.at(row));
-    fProxyData.removeAt(row);
+    fProxyData.clear();
+    for (int i = 0, count = fRawData.count(); i < count; i++) {
+        fProxyData << i;
+    }
     endRemoveRows();
 }
 

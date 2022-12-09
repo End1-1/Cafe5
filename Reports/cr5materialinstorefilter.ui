@@ -14,17 +14,40 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="5" column="0">
-    <widget class="QLabel" name="label_9">
+   <item row="10" column="2">
+    <widget class="C5CheckBox" name="chShowDrafts">
      <property name="text">
-      <string>Class 1</string>
+      <string/>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>showdrafts</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="label_3">
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_10">
      <property name="text">
-      <string>Material</string>
+      <string>Unit</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="2">
+    <widget class="C5LineEditWithSelector" name="leClass1">
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>class1</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Material group</string>
      </property>
     </widget>
    </item>
@@ -41,7 +64,123 @@
      </property>
     </widget>
    </item>
+   <item row="7" column="2">
+    <widget class="C5LineEditWithSelector" name="leClass2">
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>class2</string>
+     </property>
+    </widget>
+   </item>
    <item row="7" column="3">
+    <widget class="C5LineEditWithSelector" name="leClass2Name">
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <widget class="C5LineEditWithSelector" name="leStore">
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>store</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="2">
+    <widget class="C5LineEditWithSelector" name="leGroup">
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>group</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="2">
+    <widget class="C5LineEditWithSelector" name="leUnit">
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>unit</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0">
+    <widget class="QLabel" name="label_9">
+     <property name="text">
+      <string>Class 1</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="3">
+    <widget class="C5LineEditWithSelector" name="leClass1Name">
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Date</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="3">
     <widget class="C5LineEditWithSelector" name="leClass3Name">
      <property name="maximumSize">
       <size>
@@ -71,24 +210,10 @@
      </property>
     </widget>
    </item>
-   <item row="7" column="0">
-    <widget class="QLabel" name="label_7">
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_3">
      <property name="text">
-      <string>Class 3</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>Material group</string>
-     </property>
-    </widget>
-   </item>
-   <item row="9" column="0">
-    <widget class="QLabel" name="label_5">
-     <property name="text">
-      <string>Show drafts</string>
+      <string>Material</string>
      </property>
     </widget>
    </item>
@@ -99,21 +224,8 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="3">
-    <widget class="C5LineEdit" name="leStoreName">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="3">
-    <widget class="C5LineEditWithSelector" name="leClass1Name">
+   <item row="9" column="3">
+    <widget class="C5LineEditWithSelector" name="leClass4Name">
      <property name="maximumSize">
       <size>
        <width>16777215</width>
@@ -128,38 +240,21 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Date</string>
+   <item row="4" column="3">
+    <widget class="C5LineEdit" name="leUnitName">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
    <item row="9" column="2">
-    <widget class="C5CheckBox" name="chShowDrafts">
-     <property name="text">
-      <string/>
-     </property>
-     <property name="FilterName" stdset="0">
-      <string>showdrafts</string>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="0">
-    <widget class="QLabel" name="label_6">
-     <property name="text">
-      <string>Class 2</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="2">
-    <widget class="C5DateEdit" name="deDate">
-     <property name="minimumSize">
-      <size>
-       <width>100</width>
-       <height>0</height>
-      </size>
-     </property>
+    <widget class="C5LineEditWithSelector" name="leClass4">
      <property name="maximumSize">
       <size>
        <width>100</width>
@@ -167,7 +262,41 @@
       </size>
      </property>
      <property name="FilterName" stdset="0">
-      <string>date</string>
+      <string>class4</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0">
+    <widget class="QLabel" name="label_6">
+     <property name="text">
+      <string>Class 2</string>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="1">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>345</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="8" column="0">
+    <widget class="QLabel" name="label_7">
+     <property name="text">
+      <string>Class 3</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="0">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>Show drafts</string>
      </property>
     </widget>
    </item>
@@ -190,93 +319,6 @@
      </property>
     </widget>
    </item>
-   <item row="6" column="3">
-    <widget class="C5LineEditWithSelector" name="leClass2Name">
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="2">
-    <widget class="C5LineEditWithSelector" name="leClass4">
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="FilterName" stdset="0">
-      <string>class4</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="2">
-    <widget class="C5LineEditWithSelector" name="leStore">
-     <property name="minimumSize">
-      <size>
-       <width>100</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="FilterName" stdset="0">
-      <string>store</string>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="0">
-    <widget class="QLabel" name="label_8">
-     <property name="text">
-      <string>Class 4</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="2">
-    <widget class="C5LineEditWithSelector" name="leGroup">
-     <property name="minimumSize">
-      <size>
-       <width>100</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="FilterName" stdset="0">
-      <string>group</string>
-     </property>
-    </widget>
-   </item>
-   <item row="10" column="1">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>345</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
    <item row="3" column="3">
     <widget class="C5LineEdit" name="leMaterialName">
      <property name="enabled">
@@ -290,7 +332,20 @@
      </property>
     </widget>
    </item>
-   <item row="7" column="2">
+   <item row="1" column="3">
+    <widget class="C5LineEdit" name="leStoreName">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="2">
     <widget class="C5LineEditWithSelector" name="leClass3">
      <property name="maximumSize">
       <size>
@@ -303,57 +358,15 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="2">
-    <widget class="C5LineEditWithSelector" name="leClass1">
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="FilterName" stdset="0">
-      <string>class1</string>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="2">
-    <widget class="C5LineEditWithSelector" name="leClass2">
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="FilterName" stdset="0">
-      <string>class2</string>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="3">
-    <widget class="C5LineEditWithSelector" name="leClass4Name">
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0">
-    <widget class="QLabel" name="label_10">
+   <item row="9" column="0">
+    <widget class="QLabel" name="label_8">
      <property name="text">
-      <string>Unit</string>
+      <string>Class 4</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="2">
-    <widget class="C5LineEditWithSelector" name="leUnit">
+   <item row="0" column="2">
+    <widget class="C5DateEdit" name="deDate">
      <property name="minimumSize">
       <size>
        <width>100</width>
@@ -367,12 +380,38 @@
       </size>
      </property>
      <property name="FilterName" stdset="0">
-      <string>unit</string>
+      <string>date</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="3">
-    <widget class="C5LineEdit" name="leUnitName">
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_11">
+     <property name="text">
+      <string>Currency</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="2">
+    <widget class="C5LineEditWithSelector" name="leCurrency">
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>currency</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="3">
+    <widget class="C5LineEdit" name="leCurrencyName">
      <property name="enabled">
       <bool>true</bool>
      </property>
@@ -413,11 +452,14 @@
   <tabstop>leStore</tabstop>
   <tabstop>leGroup</tabstop>
   <tabstop>leMaterial</tabstop>
+  <tabstop>leUnit</tabstop>
+  <tabstop>leCurrency</tabstop>
   <tabstop>leClass1</tabstop>
   <tabstop>leClass2</tabstop>
   <tabstop>leClass3</tabstop>
   <tabstop>leClass4</tabstop>
   <tabstop>chShowDrafts</tabstop>
+  <tabstop>toolButton</tabstop>
  </tabstops>
  <resources>
   <include location="../resources/res.qrc"/>

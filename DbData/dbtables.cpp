@@ -38,9 +38,7 @@ bool DbTables::openTable(int table, QStringList &orders, QString &err)
         if (lockTime.msecsTo(QDateTime::currentDateTime()) < 600000) {
             if (db.getString("f_locksrc").isEmpty() == false && db.getString("f_locksrc") != hostinfo) {
                 err = QObject::tr("Table already locked") + QString("<br>%1, %2 - %3")
-                        .arg(lockTime.toString())
-                        .arg(db.getString("f_locksrc"))
-                        .arg(hostinfo);
+                        .arg(lockTime.toString(), db.getString("f_locksrc"), hostinfo);
                 db.commit();
                 return false;
             }
@@ -51,11 +49,11 @@ bool DbTables::openTable(int table, QStringList &orders, QString &err)
     db.update("h_tables", "f_id", table);
     db.commit();
 
-    db[":f_state1"] = ORDER_STATE_OPEN;
-    db[":f_state2"] = ORDER_STATE_PREORDER_EMPTY;
+    db[":f_state1"] = ORDER_STATE_PREORDER_EMPTY;
     db[":f_state3"] = ORDER_STATE_PREORDER_WITH_ORDER;
+    db[":f_state2"] = ORDER_STATE_OPEN;
     db[":f_table"] = table;
-    db.exec("select o.f_id from o_header o where o.f_table=:f_table and (o.f_state=:f_state1 or o.f_state=:f_state2 or f_state=:f_state3)");
+    db.exec("select o.f_id from o_header o where o.f_table=:f_table and (o.f_state=:f_state1 or o.f_state=:f_state2 or o.f_state=:f_state3) ");
     while (db.nextRow()) {
         orders.append(db.getString("f_id"));
     }

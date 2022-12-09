@@ -53,6 +53,7 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
                    << "sum(oh.f_amountother) as f_amountother"
                    << "sum(oh.f_amountidram) as f_amountidram"
                    << "sum(oh.f_amountpayx) as f_amountpayx"
+                   << "sum(oh.f_hotel) as f_hotel"
                    << "oh.f_amountservice"
                    << "oh.f_amountdiscount"
                    << "oh.f_comment"
@@ -87,6 +88,7 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
                 << "f_amountpayx"
                 << "f_amountservice"
                 << "f_amountdiscount"
+                << "f_hotel"
                 << "f_count"
                       ;
 
@@ -123,6 +125,7 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_amountdiscount"] = tr("Discount");
     fTranslation["f_comment"] = tr("Comment");
     fTranslation["f_count"] = tr("Count");
+    fTranslation["f_hotel"] = tr("Hotel");
 
     fColumnsVisible["concat(oh.f_prefix, oh.f_hallid) as f_prefix"] = true;
     fColumnsVisible["oh.f_id"] = true;
@@ -145,6 +148,7 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
     fColumnsVisible["sum(oh.f_amountother) as f_amountother"] = true;
     fColumnsVisible["sum(oh.f_amountidram) as f_amountidram"] = true;
     fColumnsVisible["sum(oh.f_amountpayx) as f_amountpayx"] = true;
+    fColumnsVisible["sum(oh.f_hotel) as f_hotel"] = true;
     fColumnsVisible["oh.f_amountservice"] = false;
     fColumnsVisible["oh.f_amountdiscount"] = false;
     fColumnsVisible["oh.f_comment"] = false;

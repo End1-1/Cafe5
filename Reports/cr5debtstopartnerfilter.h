@@ -22,6 +22,8 @@ public:
 
     QDate d2() const;
 
+    QString currency() const;
+
 private:
     Ui::CR5DebtsToPartnerFilter *ui;
 };

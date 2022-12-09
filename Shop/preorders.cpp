@@ -54,3 +54,18 @@ void Preorders::on_btnExit_clicked()
 {
     reject();
 }
+void Preorders::on_btnRemove_clicked()
+{
+    QModelIndexList ml = ui->tbl->selectionModel()->selectedRows();
+    if (ml.count() == 0) {
+        return;
+    }
+    fUUID = ui->tbl->item(ml.at(0).row(), 0)->data(Qt::EditRole).toByteArray();
+    if (C5Message::question(tr("Confirm to remove preorder")) != QDialog::Accepted) {
+        return;
+    }
+    C5Database db(__c5config.dbParams());
+    db[":f_id"] = fUUID;
+    db.exec("update op_header set f_state=3 where f_id=:f_id");
+    ui->tbl->removeRow(ml.at(0).row());
+}

@@ -18,6 +18,7 @@ SOURCES += \
     ../../utils/database.cpp \
     ../../utils/gtranslator.cpp \
     ../../utils/logwriter.cpp \
+    ../../utils/networktable.cpp \
     ../../utils/tablerecord.cpp \
     rwjz.cpp
 
@@ -28,6 +29,7 @@ HEADERS += \
     ../../utils/database.h \
     ../../utils/gtranslator.h \
     ../../utils/logwriter.h \
+    ../../utils/networktable.h \
     ../../utils/tablerecord.h \
     rwjz.h
 

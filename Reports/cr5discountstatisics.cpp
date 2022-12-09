@@ -14,7 +14,7 @@ CR5DiscountStatisics::CR5DiscountStatisics(const QStringList &dbParams, QWidget 
     fMainTable = "b_history bh";
     fLeftJoinTables << "left join b_cards_discount bd on bd.f_id=bh.f_card [bd]"
                     << "left join b_card_types dt on dt.f_id=bd.f_mode [dt]"
-                    << "left join o_header oh on oh.f_id=bh.f_order [oh]"
+                    << "left join o_header oh on oh.f_id=bh.f_id [oh]"
                     << "left join c_partners bc on bc.f_id=bd.f_client [bc]"
                        ;
 

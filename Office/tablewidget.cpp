@@ -32,7 +32,7 @@ TableWidget::~TableWidget()
     delete ui;
 }
 
-void TableWidget::externalDataReceived(quint16 cmd, const QByteArray &data)
+void TableWidget::externalDataReceived(quint16 cmd, quint32 messageId, const QByteArray &data)
 {
     fTableModel->setSourceData(data);
     QStringList footer;

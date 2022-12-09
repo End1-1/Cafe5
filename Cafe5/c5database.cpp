@@ -11,15 +11,29 @@
 #include <QDebug>
 #include <QUuid>
 #include <QSqlField>
+#include <QException>
 
 #ifndef _NOAPP_
 #include <QMessageBox>
 #endif
 
 int C5Database::fCounter = 0;
+bool C5Database::LOGGING = false;
 QStringList C5Database::fDbParamsForUuid;
 
 static QMutex fMutex;
+
+class SqlException : public QException {
+public:
+    SqlException(const QString &w) throw () {
+        fWhat = w;
+    }
+    virtual char const *what() const override {
+        return fWhat.toUtf8().data();
+    }
+private:
+    QString fWhat;
+};
 
 C5Database::C5Database() :
     QObject()
@@ -223,11 +237,9 @@ bool C5Database::exec(const QString &sqlQuery, QMap<QString, QList<QVariant> > &
         return false;
     }
 
-#ifdef QT_DEBUG
-    logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + lastQuery(fQuery));
-#elif LOGGING
-    logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + lastQuery(fQuery));
-#endif
+    if (LOGGING) {
+        logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + lastQuery(fQuery));
+    }
 
     fBindValues.clear();
     if (isSelect) {
@@ -258,11 +270,11 @@ bool C5Database::execDirect(const QString &sqlQuery)
         logEvent(sqlQuery);
         return false;
     }
-#ifdef QT_DEBUG
-    logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + lastQuery(fQuery));
-#elif LOGGING
-    logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + lastQuery(fQuery));
-#endif
+
+    if (LOGGING) {
+        logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + lastQuery(fQuery));
+    }
+
     return true;
 }
 
@@ -614,6 +626,7 @@ bool C5Database::exec(const QString &sqlQuery, bool &isSelect)
         fLastError = fQuery->lastError().databaseText();
         logEvent(fDb.hostName() + " (" + QString::number(fTimerCount) + " ms):" + fDb.databaseName() + " " + fLastError);
         logEvent(fDb.hostName() + " (" + QString::number(fTimerCount) + " ms):" + fDb.databaseName() + " " + sqlQuery);
+        throw SqlException(fLastError);
         return false;
     }
     for (QMap<QString, QVariant>::iterator it = fBindValues.begin(); it != fBindValues.end(); it++) {
@@ -629,6 +642,7 @@ bool C5Database::exec(const QString &sqlQuery, bool &isSelect)
         fLastError = fQuery->lastError().databaseText();
         logEvent(fDb.hostName() + " (" + QString::number(fTimerCount) + " ms):" + fDb.databaseName() + " " + fLastError);
         logEvent(fDb.hostName() + " (" + QString::number(fTimerCount) + " ms):" + fDb.databaseName() + " " + lastQuery(fQuery));
+        throw SqlException(fLastError);
         return false;
     }
     fTimerCount = fTimer.elapsed();

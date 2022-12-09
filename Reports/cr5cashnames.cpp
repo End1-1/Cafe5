@@ -6,9 +6,13 @@ CR5CashNames::CR5CashNames(const QStringList &dbParams, QWidget *parent) :
 {
     fIcon = ":/cash.png";
     fLabel = tr("Cash names");
-    fSqlQuery = "select f_id, f_name from e_cash_names";
+    fSqlQuery = "select c.f_id, c.f_name, c.f_currency, cr.f_name  as f_currencyname "
+                "from e_cash_names c "
+                "left join e_currency cr on cr.f_id=c.f_currency";
     fTranslation["f_id"] = tr("Code");
     fTranslation["f_name"] = tr("Name");
+    fTranslation["f_currency"] = tr("Currency code");
+    fTranslation["f_currencyname"] = tr("Currency");
     fEditor = new C5CashName(dbParams);
 }
 

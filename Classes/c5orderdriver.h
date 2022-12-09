@@ -1,6 +1,7 @@
 #ifndef C5ORDERDRIVER_H
 #define C5ORDERDRIVER_H
 
+#include "c5database.h"
 #include <QObject>
 #include <QMap>
 #include <QVariant>
@@ -66,6 +67,10 @@ public:
 
     QVariant clValue(const QString &key);
 
+    QVariant headerHotel(const QString &key);
+
+    C5OrderDriver &setHeaderHotel(const QString &key, const QVariant &value);
+
     const QMap<QString, QVariant> &dish(int index) const;
 
     bool addDish(int menuid, const QString &comment, double price = 0.0);
@@ -107,15 +112,17 @@ private:
 
     QMap<QString, QVariant> fPayCL;
 
+    QMap<QString, QVariant> fHeaderHotel;
+
     QList<QMap<QString, QVariant> >  fDishes;
 
     QMap<QString, QMap<QString, QVariant> > fTableData;
 
     QMap<QString, QMap<QString, QVariant> > fDishesTableData;
 
-    bool fetchTableData(const QString &sql, QMap<QString, QVariant> &data);
+    bool fetchTableData(C5Database &db, const QString &sql, QMap<QString, QVariant> &data);
 
-    bool fetchDishesData(const QString &header, const QString &id);
+    bool fetchDishesData(C5Database &db, const QString &header, const QString &id);
 
     void clearOrder();
 

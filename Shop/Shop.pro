@@ -46,6 +46,7 @@ SOURCES += \
     ../Cafe5/c5logsystem.cpp \
     ../Cafe5/c5replication.cpp \
     ../Cafe5/c5serverhandler.cpp \
+    ../Cafe5/c5systempreference.cpp \
     ../Cafe5/calendar.cpp \
     ../Cafe5/dlgexitbyversion.cpp \
     ../Classes/QRCodeGenerator.cpp \
@@ -90,9 +91,9 @@ SOURCES += \
     ../Classes/rkeyboard.cpp \
     ../Classes/socketconnection.cpp \
     ../Classes/threadsendmessage.cpp \
+    ../Controls/c5cleartablewidget.cpp \
     ../Controls/c5graphicsview.cpp \
     ../Controls/c5guicontrols.cpp \
-    ../Controls/c5tablewithtotal.cpp \
     ../DbData/datadriver.cpp \
     ../DbData/dbbodystate.cpp \
     ../DbData/dbcar.cpp \
@@ -129,6 +130,7 @@ SOURCES += \
     ../Service5/socket/sslsocket.cpp \
     cashcollection.cpp \
     dlgdate.cpp \
+    dlggetidname.cpp \
     dlggoodslist.cpp \
     dlgpin.cpp \
     dlgreturnitem.cpp \
@@ -164,7 +166,6 @@ SOURCES += \
     ../Cafe5/c5dialog.cpp \
     ../Cafe5/c5sockethandler.cpp \
     ../Controls/c5lineedit.cpp \
-    ../Controls/c5tablewidget.cpp \
     ../Controls/c5combobox.cpp \
     ../Controls/c5dateedit.cpp \
     ../Classes/c5cache.cpp \
@@ -195,6 +196,7 @@ HEADERS += \
     ../Cafe5/c5logsystem.h \
     ../Cafe5/c5replication.h \
     ../Cafe5/c5serverhandler.h \
+    ../Cafe5/c5systempreference.h \
     ../Cafe5/calendar.h \
     ../Cafe5/dlgexitbyversion.h \
     ../Classes/QRCodeGenerator.h \
@@ -242,9 +244,9 @@ HEADERS += \
     ../Classes/rkeyboard.h \
     ../Classes/socketconnection.h \
     ../Classes/threadsendmessage.h \
+    ../Controls/c5cleartablewidget.h \
     ../Controls/c5graphicsview.h \
     ../Controls/c5guicontrols.h \
-    ../Controls/c5tablewithtotal.h \
     ../DbData/datadriver.h \
     ../DbData/dbbodystate.h \
     ../DbData/dbcar.h \
@@ -281,6 +283,7 @@ HEADERS += \
     ../Service5/socket/sslsocket.h \
     cashcollection.h \
     dlgdate.h \
+    dlggetidname.h \
     dlggoodslist.h \
     dlgpin.h \
     dlgreturnitem.h \
@@ -316,7 +319,6 @@ HEADERS += \
     ../Cafe5/c5sockethandler.h \
     ../Cafe5/c5socketmessage.h \
     ../Controls/c5lineedit.h \
-    ../Controls/c5tablewidget.h \
     ../Controls/c5combobox.h \
     ../Controls/c5dateedit.h \
     ../Classes/c5cache.h \
@@ -340,6 +342,7 @@ FORMS += \
     ../Forms/dlgserversettings.ui \
     cashcollection.ui \
     dlgdate.ui \
+    dlggetidname.ui \
     dlggoodslist.ui \
     dlgpin.ui \
     dlgreturnitem.ui \

@@ -139,7 +139,7 @@
     </widget>
    </item>
    <item row="3" column="0" colspan="6">
-    <widget class="C5TableWidget" name="tblOrder">
+    <widget class="C5ClearTableWidget" name="tblOrder">
      <property name="maximumSize">
       <size>
        <width>16777215</width>
@@ -193,7 +193,7 @@
     </widget>
    </item>
    <item row="5" column="0" colspan="6">
-    <widget class="C5TableWidget" name="tblBody">
+    <widget class="C5ClearTableWidget" name="tblBody">
      <property name="editTriggers">
       <set>QAbstractItemView::NoEditTriggers</set>
      </property>
@@ -266,9 +266,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5TableWidget</class>
+   <class>C5ClearTableWidget</class>
    <extends>QTableWidget</extends>
-   <header location="global">c5tablewidget.h</header>
+   <header location="global">c5cleartablewidget.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

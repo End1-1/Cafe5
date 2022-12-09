@@ -161,12 +161,22 @@ void C5DishWidget::selectorCallback(int row, const QList<QVariant> &values)
 
 bool C5DishWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
 {
+    for (int i = 0; i < ui->tblPricing->rowCount(); i++) {
+        if (ui->tblPricing->checkBox(i, 7)->isChecked() && ui->tblPricing->comboBox(i, 4)->currentIndex() < 0) {
+            err += tr("Storage is not defined in menu.<br>");
+            return false;
+        }
+    }
     bool result = CE5Editor::save(err, data);
     if (!result) {
         return false;
     }
     C5Database db(fDBParams);
     for (int i = 0; i < ui->tblPricing->rowCount(); i++) {
+        if (ui->tblPricing->checkBox(i, 7)->isChecked() && ui->tblPricing->comboBox(i, 4)->currentIndex() < 0) {
+            err += tr("Storage is not defined in menu.<br>");
+            return false;
+        }
         db[":f_dish"] = ui->leCode->getInteger();
         db[":f_price"] = ui->tblPricing->lineEdit(i, 3)->getDouble();
         db[":f_menu"] = ui->tblPricing->getInteger(i, 1);

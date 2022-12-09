@@ -108,7 +108,7 @@
     </widget>
    </item>
    <item>
-    <widget class="C5TableWidget" name="tbl">
+    <widget class="C5ClearTableWidget" name="tbl">
      <column>
       <property name="text">
        <string>Code</string>
@@ -205,12 +205,12 @@
   <customwidget>
    <class>C5LineEdit</class>
    <extends>QLineEdit</extends>
-   <header>c5lineedit.h</header>
+   <header location="global">c5lineedit.h</header>
   </customwidget>
   <customwidget>
-   <class>C5TableWidget</class>
+   <class>C5ClearTableWidget</class>
    <extends>QTableWidget</extends>
-   <header location="global">c5tablewidget.h</header>
+   <header location="global">c5cleartablewidget.h</header>
   </customwidget>
  </customwidgets>
  <resources>

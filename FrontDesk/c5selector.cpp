@@ -20,6 +20,7 @@ C5Selector::C5Selector(const QStringList &dbParams) :
     connect(fGrid->fTableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(selectionChanged(QItemSelection,QItemSelection)));
     fReset = true;
     fSearchColumn = -1;
+    fCache = 0;
 }
 
 C5Selector::~C5Selector()
@@ -51,6 +52,25 @@ bool C5Selector::getValue(const QStringList &dbParams, int cache, QList<QVariant
     c->ui->leFilter->setFocus();
     bool result = c->exec() == QDialog::Accepted;
     values = c->fValues;
+    return result;
+}
+
+bool C5Selector::getValue(const QStringList &dbParams, const QString &query, QList<QVariant> &values)
+{
+    C5Selector *c = new C5Selector(dbParams);
+    c->fQuery = query;
+
+    c->fSearchColumn = -1;
+    c->fMultipleSelection = false;
+    c->fGrid->fModel->setSingleCheckBoxSelection(true);
+
+        c->refresh();
+
+    c->fGrid->fTableView->resizeColumnsToContents();
+    c->ui->leFilter->setFocus();
+    bool result = c->exec() == QDialog::Accepted;
+    values = c->fValues;
+    c->deleteLater();
     return result;
 }
 
@@ -189,7 +209,9 @@ void C5Selector::on_btnRefreshCache_clicked()
 
 void C5Selector::refresh()
 {
-    C5Cache::cache(fDBParams, fCache)->refresh();
+    if (fCache > 0) {
+        C5Cache::cache(fDBParams, fCache)->refresh();
+    }
     fGrid->setCheckboxes(true);
     fGrid->fModel->setSingleCheckBoxSelection(!fMultipleSelection);
     fGrid->buildQuery(fQuery);

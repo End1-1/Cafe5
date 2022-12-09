@@ -25,14 +25,6 @@
     </message>
 </context>
 <context>
-    <name>C5Printing</name>
-    <message>
-        <location filename="../../Classes/c5printing.cpp" line="344"/>
-        <source>Failed send order to remote printer</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>NotificationWidget</name>
     <message>
         <location filename="../../Classes/notificationwidget.ui" line="23"/>

@@ -3,6 +3,7 @@
 #include "requestmanager.h"
 #include "logwriter.h"
 #include "rawhandler.h"
+#include "pluginmanager.h"
 #include "raw.h"
 #include <QHostAddress>
 #include <QApplication>
@@ -17,15 +18,19 @@ SocketThread::SocketThread(int handle, const QSslCertificate &cert, const QSslKe
 {
     fMessageNumber = 0;
     fPreviouseMessageNumber = 0;
+    fDoNotRemovePluginSocket = false;
     connect(this, &SocketThread::finished, this, &SocketThread::deleteLater);
 }
 
 SocketThread::~SocketThread()
 {
-    //qDebug() << "~SocketThread()";
-    Raw::removeSocket(fSslSocket);
-    fSslSocket->disconnectFromHost();
-    delete fSslSocket;
+    if (fDoNotRemovePluginSocket) {
+        PluginManager::fInstance->removeSocket(fSslSocket);
+    } else {
+        Raw::removeSocket(fSslSocket);
+        fSslSocket->disconnectFromHost();
+        delete fSslSocket;
+    }
     delete fTimeoutControl;
     delete fRawHandler;
 }
@@ -76,8 +81,8 @@ void SocketThread::rawRequest()
     }
     if (fPreviouseMessageNumber + 1 != fMessageNumber) {
         LogWriter::write(LogWriterLevel::errors, property("session").toString(), QString("Packet message number error, previous: %1, current: %2").arg(fPreviouseMessageNumber).arg(fMessageNumber));
-        fSslSocket->close();
-        return;
+//        fSslSocket->close();
+//        return;
     }
     fPreviouseMessageNumber = fMessageNumber;
     if (fData.length() - headersize >= fContentLenght) {
@@ -295,7 +300,7 @@ void SocketThread::parseBody(quint16 msgType, const QByteArray &data)
         fTimeoutControl->start(60000);
         break;
     case 3:
-
+        fDoNotRemovePluginSocket = true;
         break;
     default:
         break;

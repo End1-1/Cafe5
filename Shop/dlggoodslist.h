@@ -12,7 +12,7 @@ class DlgGoodsList : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgGoodsList();
+    explicit DlgGoodsList(int currency);
 
     ~DlgGoodsList();
 

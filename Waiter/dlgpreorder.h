@@ -20,6 +20,8 @@ public:
 
     explicit DlgPreorder(C5OrderDriver *w, C5User *user, const QStringList &dbParams);
 
+    DlgPreorder &setHotelMode(bool v);
+
     ~DlgPreorder();
 
 private slots:
@@ -55,12 +57,30 @@ private slots:
 
     void on_btnSelectTable_clicked();
 
+    void on_leDateCheckout_dateChanged(const QDate &date);
+
+    void on_leDate_dateChanged(const QDate &date);
+
+    void on_leDays_valueChanged(int arg1);
+
+    void on_btnCheckDown_clicked();
+
+    void on_btnCheckoutUp_clicked();
+
+    void on_btnEditRate_clicked();
+
+    void on_btnCheckin_clicked();
+
 private:
     Ui::DlgPreorder *ui;
 
     C5OrderDriver *fOrder;
 
     C5User *fUser;
+
+    bool fHotelMode;
+
+    int fGuestCode;
 };
 
 #endif // DLGPREORDER_H

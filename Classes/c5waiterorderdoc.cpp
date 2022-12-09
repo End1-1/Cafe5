@@ -92,7 +92,6 @@ void C5WaiterOrderDoc::sendToServer(C5SocketHandler *sh)
 
 bool C5WaiterOrderDoc::transferToHotel(C5Database &db, QString &err)
 {
-    qDebug() << fHeader;
     if (fHeader["f_state"].toString().toInt() != ORDER_STATE_CLOSE) {
         err = tr("Order state is not closed");
         return false;
@@ -102,10 +101,10 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &db, QString &err)
     __dd1Username = db.dbParams().at(2);
     __dd1Password = db.dbParams().at(3);
 
-    __dd2Host.clear();
-    __dd2Database.clear();
-    __dd2Username.clear();
-    __dd2Password.clear();
+//    __dd2Host.clear();
+//    __dd2Database.clear();
+//    __dd2Username.clear();
+//    __dd2Password.clear();
 
     DoubleDatabase fDD;
     int settings = 0;

@@ -47,6 +47,11 @@ void CR5MaterialsInStore::refreshData()
 
 void CR5MaterialsInStore::prepareDrafts()
 {
+    if (fFilter->currency().isEmpty()) {
+        C5Message::error(tr("Set currency"));
+        setSearchParameters();
+        return;
+    }
     fMainTable = "a_store_draft s";
     fLeftJoinTables.clear();
     fColumnsFields.clear();
@@ -65,6 +70,7 @@ void CR5MaterialsInStore::prepareDrafts()
                     << "left join c_goods_classes gcb on gca.f_id=g.f_group2 [gcb]"
                     << "left join c_goods_classes gcc on gca.f_id=g.f_group3 [gcc]"
                     << "left join c_goods_classes gcd on gca.f_id=g.f_group4 [gcd]"
+                    << "LEFT JOin c_goods_prices gpr on gpr.f_goods=g.f_id [gpr]"
                        ;
 
     fColumnsFields << "g.f_id as f_code"
@@ -81,10 +87,10 @@ void CR5MaterialsInStore::prepareDrafts()
                    << "g.f_lastinputprice"
                    << "sum(g.f_lastinputprice*s.f_type*s.f_qty) as f_total"
                    << "g.f_lowlevel"
-                   << "g.f_saleprice"
-                   << "sum(s.f_qty*s.f_type)*g.f_saleprice as f_totalsale"
-                   << "g.f_saleprice2"
-                   << "sum(s.f_qty*s.f_type)*g.f_saleprice2 as f_totalsale2"
+                   << "gpr.f_price1"
+                   << "sum(s.f_qty*s.f_type)*gpr.f_price1 as f_totalsale"
+                   << "g.f_price2"
+                   << "sum(s.f_qty*s.f_type)*gpr.f_price2 as f_totalsale2"
                       ;
 
     fColumnsGroup << "g.f_id as f_code"
@@ -94,8 +100,8 @@ void CR5MaterialsInStore::prepareDrafts()
                    << "u.f_name as f_unit"
                    << "g.f_name as f_goods"
                    << "g.f_lowlevel"
-                   << "g.f_saleprice"
-                   << "g.f_saleprice2"
+                   << "gpr.f_price1"
+                   << "gpr.f_price2"
                    << "gca.f_name as f_class1"
                    << "gcb.f_name as f_class2"
                    << "gcc.f_name as f_class3"
@@ -121,9 +127,9 @@ void CR5MaterialsInStore::prepareDrafts()
     fTranslation["f_lastinputprice"] = tr("Price");
     fTranslation["f_total"] = tr("Amount");
     fTranslation["f_lowlevel"] = tr("Warning");
-    fTranslation["f_saleprice"] = tr("Retail price");
+    fTranslation["f_price1"] = tr("Retail price");
     fTranslation["f_totalsale"] = tr("Retail amount");
-    fTranslation["f_saleprice2"] = tr("Whosale price");
+    fTranslation["f_price2"] = tr("Whosale price");
     fTranslation["f_totalsale2"] = tr("Whosale amount");
     fTranslation["f_class1"] = tr("Class 1");
     fTranslation["f_class2"] = tr("Class 2");
@@ -140,10 +146,10 @@ void CR5MaterialsInStore::prepareDrafts()
     fColumnsVisible["g.f_lastinputprice"] = true;
     fColumnsVisible["sum(g.f_lastinputprice*s.f_type*s.f_qty) as f_total"] = true;
     fColumnsVisible["g.f_lowlevel"] = true;
-    fColumnsVisible["g.f_saleprice"] = false;
-    fColumnsVisible["sum(s.f_qty*s.f_type)*g.f_saleprice as f_totalsale"] = false;
-    fColumnsVisible["g.f_saleprice2"] = false;
-    fColumnsVisible["sum(s.f_qty*s.f_type)*g.f_saleprice2 as f_totalsale2"] = false;
+    fColumnsVisible["gpr.f_price1"] = false;
+    fColumnsVisible["sum(s.f_qty*s.f_type)*gpr.f_price1 as f_totalsale"] = false;
+    fColumnsVisible["gpr.f_price2"] = false;
+    fColumnsVisible["sum(s.f_qty*s.f_type)*gpr.f_price2 as f_totalsale2"] = false;
     fColumnsVisible["gca.f_name as f_class1"] = false;
     fColumnsVisible["gcb.f_name as f_class2"] = false;
     fColumnsVisible["gcc.f_name as f_class3"] = false;
@@ -153,6 +159,12 @@ void CR5MaterialsInStore::prepareDrafts()
 
 void CR5MaterialsInStore::prepareNoDrafts()
 {
+    if (fFilter->currency().isEmpty()) {
+        C5Message::error(tr("Set currency"));
+        setSearchParameters();
+        return;
+    }
+
     fMainTable = "a_store s";
     fLeftJoinTables.clear();
     fColumnsFields.clear();
@@ -167,6 +179,7 @@ void CR5MaterialsInStore::prepareNoDrafts()
                     << "left join c_units u on u.f_id=g.f_unit [u]"
                     << "inner join c_groups gg on gg.f_id=g.f_group [gg]"
                     << "left join c_goods g on g.f_id=s.f_goods [g]"
+                    << "left join c_goods_prices gpr on gpr.f_goods=g.f_id [gpr]"
                     << "left join c_goods_classes gca on gca.f_id=g.f_group1 [gca]"
                     << "left join c_goods_classes gcb on gca.f_id=g.f_group2 [gcb]"
                     << "left join c_goods_classes gcc on gca.f_id=g.f_group3 [gcc]"
@@ -187,10 +200,10 @@ void CR5MaterialsInStore::prepareNoDrafts()
                    << "s.f_price"
                    << "sum(s.f_total*s.f_type) as f_total"
                    << "g.f_lowlevel"
-                   << "g.f_saleprice"
-                   << "sum(s.f_qty*s.f_type)*g.f_saleprice as f_totalsale"
-                   << "g.f_saleprice2"
-                   << "sum(s.f_qty*s.f_type)*g.f_saleprice2 as f_totalsale2"
+                   << "gpr.f_price1"
+                   << "sum(s.f_qty*s.f_type)*gpr.f_price1 as f_totalsale"
+                   << "gpr.f_price2"
+                   << "sum(s.f_qty*s.f_type)*gpr.f_price2 as f_totalsale2"
                       ;
 
     fColumnsGroup << "g.f_id as f_code"
@@ -200,8 +213,8 @@ void CR5MaterialsInStore::prepareNoDrafts()
                    << "u.f_name as f_unit"
                    << "g.f_name as f_goods"
                    << "g.f_lowlevel"
-                   << "g.f_saleprice"
-                   << "g.f_saleprice2"
+                   << "gpr.f_price1"
+                   << "gpr.f_price2"
                    << "gca.f_name as f_class1"
                    << "gcb.f_name as f_class2"
                    << "gcc.f_name as f_class3"
@@ -226,9 +239,9 @@ void CR5MaterialsInStore::prepareNoDrafts()
     fTranslation["f_price"] = tr("Price");
     fTranslation["f_total"] = tr("Amount");
     fTranslation["f_lowlevel"] = tr("Warning");
-    fTranslation["f_saleprice"] = tr("Retail price");
+    fTranslation["f_price1"] = tr("Retail price");
     fTranslation["f_totalsale"] = tr("Retail amount");
-    fTranslation["f_saleprice2"] = tr("Whosale price");
+    fTranslation["f_price2"] = tr("Whosale price");
     fTranslation["f_totalsale2"] = tr("Whosale amount");
     fTranslation["f_class1"] = tr("Class 1");
     fTranslation["f_class2"] = tr("Class 2");
@@ -246,9 +259,9 @@ void CR5MaterialsInStore::prepareNoDrafts()
     fColumnsVisible["s.f_price"] = true;
     fColumnsVisible["sum(s.f_total*s.f_type) as f_total"] = true;
     fColumnsVisible["g.f_lowlevel"] = true;
-    fColumnsVisible["g.f_saleprice"] = false;
+    fColumnsVisible["gpr.f_price1"] = false;
     fColumnsVisible["sum(s.f_qty*s.f_type)*g.f_saleprice as f_totalsale"] = false;
-    fColumnsVisible["g.f_saleprice2"] = false;
+    fColumnsVisible["gpr.f_price2"] = false;
     fColumnsVisible["sum(s.f_qty*s.f_type)*g.f_saleprice2 as f_totalsale2"] = false;
     fColumnsVisible["gca.f_name as f_class1"] = false;
     fColumnsVisible["gcb.f_name as f_class2"] = false;
@@ -275,11 +288,17 @@ void CR5MaterialsInStore::setColors()
 
 void CR5MaterialsInStore::printBarcode()
 {
+    C5Database db(fDBParams);
+    db[":f_id"] = fFilter->currency();
+    db.exec("select f_symbol from e_currency where f_id=:f_id");
+    db.nextRow();
+    QString s = db.getString("f_symbol");
     C5StoreBarcode *b = __mainWindow->createTab<C5StoreBarcode>(fDBParams);
+    b->fCurrencyName = s;
     for (int i = 0; i < fModel->rowCount(); i++) {
         b->addRow(fModel->data(i, fModel->indexForColumnName("f_goods"), Qt::EditRole).toString(),
                   fModel->data(i, fModel->indexForColumnName("f_scancode"), Qt::EditRole).toString(),
-                  fModel->data(i, fModel->indexForColumnName("f_qty"), Qt::EditRole).toInt());
+                  fModel->data(i, fModel->indexForColumnName("f_qty"), Qt::EditRole).toInt(), fFilter->currency().toInt());
     }
 }
 

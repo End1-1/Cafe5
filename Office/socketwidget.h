@@ -11,7 +11,7 @@ public:
 
 
 protected slots:
-    virtual void externalDataReceived(quint16 cmd, const QByteArray &data) = 0;
+    virtual void externalDataReceived(quint16 cmd, quint32 messageId, const QByteArray &data) = 0;
     virtual void connectionLost();
 
 signals:

@@ -309,7 +309,7 @@ void PrintReceiptGroup::print2(const QString &id, Database &db, const QString &p
             "left join c_groups t1 on t1.f_id=g.f_group "
             "left join c_groups t2 on t2.f_id=g2.f_group "
             "where oh.f_id=:f_header and g2.f_unit=10 "
-            "group by 1, 3 ").arg(price1).arg(price2));
+            "group by 1, 3 ").arg(price1, price2));
     QList<QList<QVariant> > data;
     while (db.next()) {
         QList<QVariant> v;
@@ -333,13 +333,14 @@ void PrintReceiptGroup::print2(const QString &id, Database &db, const QString &p
     //if (__c5config.value(param_print_scancode_with_name).toInt() == 1) {
         goodsNameField = "concat(g.f_name, ' ', g.f_scancode) as f_goods";
    // }
-    db.exec(QString("select %1, sum(ad.f_qty) as f_qty, %2,  sum(%2*ad.f_qty) as f_total "
+    db.exec(QString("select %1, sum(ad.f_qty) as f_qty, %2,  sum(%2*ad.f_qty) as f_total, sd.f_comment "
             "from o_goods ad "
+            "left join a_store_draft sd on sd.f_id=ad.f_storerec "
             "left join c_goods g on g.f_id=ad.f_goods "
             "inner join o_header oh on oh.f_id=ad.f_header "
             "left join c_groups t1 on t1.f_id=g.f_group "
             "where oh.f_id=:f_header and g.f_unit<>10 "
-            "group by 1, 3 ").arg(goodsNameField).arg(price1));
+            "group by 1, 3 ").arg(goodsNameField, price1));
     while (db.next()) {
         QList<QVariant> v;
         for (int i = 0; i < db.columnCount(); i++) {
@@ -399,7 +400,7 @@ void PrintReceiptGroup::print2(const QString &id, Database &db, const QString &p
         p.br();
     }
     p.setFontBold(true);
-    p.ctext(QString("#%1%2").arg(pref).arg(hallid));
+    p.ctext(QString("#%1%2").arg(pref, hallid));
     p.br();
     p.setFontSize(20);
     p.ctext(tr("Class | Name | Qty | Price | Total"));
@@ -415,6 +416,9 @@ void PrintReceiptGroup::print2(const QString &id, Database &db, const QString &p
                 .arg(data.at(i).at(2).toDouble(), 2)
                 .arg(float_str(data.at(i).at(3).toDouble(), 2)), 0);
         p.br();
+        if (!data.at(i).at(4).toString().isEmpty()) {
+            p.ltext(data.at(i).at(4).toString(), 0);
+        }
         p.br();
         p.line();
         p.br(2);

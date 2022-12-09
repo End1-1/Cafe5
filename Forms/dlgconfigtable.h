@@ -1,0 +1,22 @@
+#ifndef DLGCONFIGTABLE_H
+#define DLGCONFIGTABLE_H
+
+#include "c5dialog.h"
+
+namespace Ui {
+class DlgConfigTable;
+}
+
+class DlgConfigTable : public C5Dialog
+{
+    Q_OBJECT
+
+public:
+    explicit DlgConfigTable(const QStringList &dbParams);
+    ~DlgConfigTable();
+
+private:
+    Ui::DlgConfigTable *ui;
+};
+
+#endif // DLGCONFIGTABLE_H

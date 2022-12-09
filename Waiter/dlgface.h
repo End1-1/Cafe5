@@ -47,6 +47,8 @@ private slots:
 
     void on_btnGuests_clicked();
 
+    void on_btnChart_clicked();
+
 private:
     Ui::DlgFace *ui;
 

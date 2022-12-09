@@ -22,7 +22,7 @@ public:
     QSsl::SslProtocol fSslProtocol;
 
 public slots:
-    void startListen();
+    bool startListen();
 
 protected:
     virtual void incomingConnection(qintptr handle) override final;

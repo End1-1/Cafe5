@@ -27,7 +27,7 @@ QString CR5StoreDocumentsFilter::condition()
         result += " and h.f_type in (" + ui->leType->text() + ") ";
     }
     if (!ui->lePayment->isEmpty()) {
-        result += " and h.f_payment in (" + ui->lePaymentName->text() + ") ";
+        result += " and h.f_payment in (" + ui->lePayment->text() + ") ";
     }
     if (ui->rbpNo->isChecked()) {
         result += " and h.f_paid<h.f_amount ";

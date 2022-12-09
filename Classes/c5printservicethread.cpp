@@ -4,6 +4,7 @@
 #include "c5config.h"
 #include "c5utils.h"
 #include "c5database.h"
+#include "c5logsystem.h"
 #include <QApplication>
 #include <QJsonDocument>
 #include <QFile>
@@ -119,9 +120,6 @@ void C5PrintServiceThread::print(QString printer, const QString &side, bool repr
 {
     C5Database().logEvent(QString::number(__c5config.receiptParepWidth()));
     QString originalPrinter = printer;
-    if (fPrinterAliases.contains(printer)) {
-        printer = fPrinterAliases[printer];
-    }
 
     QFont font(qApp->font());
     font.setPointSize(20);
@@ -161,7 +159,7 @@ void C5PrintServiceThread::print(QString printer, const QString &side, bool repr
     p.rtext(dbtable->name(fHeaderData["f_table"].toInt()));
     p.br();
     p.ltext(tr("Order no"), 0);
-    p.rtext(QString("%1%2").arg(fHeaderData["f_prefix"].toString()).arg(fHeaderData["f_hallid"].toString()));
+    p.rtext(QString("%1%2").arg(fHeaderData["f_prefix"].toString(), fHeaderData["f_hallid"].toString()));
     p.br();
     p.ltext(tr("Date"), 0);
     p.rtext(QDate::currentDate().toString(FORMAT_DATE_TO_STR));
@@ -179,12 +177,18 @@ void C5PrintServiceThread::print(QString printer, const QString &side, bool repr
     QSet<QString> storages;
     for (int i = 0; i < fBodyData.count(); i++) {
         const QMap<QString, QVariant> &o = fBodyData.at(i);
-        if (o[side].toString() != printer) {
-            continue;
-        }
+
+        C5LogSystem::writeEvent(QString("try to print %1 %2 %3 %4")
+                                .arg(dbdish->name(o["f_dish"].toInt()), printer, side, o[side].toString()));
+
+            if (o[side].toString() != printer) {
+                C5LogSystem::writeEvent(QString("not print case 3 %1 %2 %3 %4").arg(dbdish->name(o["f_dish"].toInt()), printer, side, o[side].toString()));
+                continue;
+            }
+
         storages << dbstore->name(o["f_store"].toInt());
         if (__c5config.getValue(param_print_dish_timeorder).toInt() == 1) {
-            p.ltext(QString("[%1] %2").arg(o["f_timeorder"].toString()).arg(dbdish->name(o["f_dish"].toInt())), 0);
+            p.ltext(QString("[%1] %2").arg(o["f_timeorder"].toString(), dbdish->name(o["f_dish"].toInt())), 0);
         } else {
             p.ltext(QString("%1").arg(dbdish->name(o["f_dish"].toInt())), 0);
         }
@@ -231,6 +235,9 @@ void C5PrintServiceThread::print(QString printer, const QString &side, bool repr
     p.br();
     p.ltext(tr("Storage: ") + storages.toList().join(","), 0);
 
+    if (fPrinterAliases.contains(printer)) {
+        printer = fPrinterAliases[printer];
+    }
     QString final = "OK";
     if (!p.print(printer, QPrinter::Custom)) {
         final = "FAIL";

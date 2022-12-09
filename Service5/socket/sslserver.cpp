@@ -46,9 +46,9 @@ void SslServer::setSslProtocol(QSsl::SslProtocol p)
     fSslProtocol = p;
 }
 
-void SslServer::startListen()
+bool SslServer::startListen()
 {
-    listen(QHostAddress::AnyIPv4, ConfigIni::value("server/port").toInt());
+    return listen(QHostAddress::AnyIPv4, ConfigIni::value("server/port").toInt());
 }
 
 void SslServer::incomingConnection(qintptr handle)

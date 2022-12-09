@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>CE5CurrencyCrossRate</class>
+ <widget class="QWidget" name="CE5CurrencyCrossRate">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>565</width>
+    <height>116</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Code</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="C5LineEditWithSelector" name="leCode">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+     <property name="Primary" stdset="0">
+      <bool>true</bool>
+     </property>
+     <property name="Field" stdset="0">
+      <string>f_id</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Base currency</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="C5LineEditWithSelector" name="leBaseCurr">
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="Field" stdset="0">
+      <string>f_currency1</string>
+     </property>
+     <property name="First" stdset="0">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <widget class="C5LineEditWithSelector" name="leBaseCurrName">
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+     <property name="FieldRef" stdset="0">
+      <string>f_currname1</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Dependened currency</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="C5LineEditWithSelector" name="leDepCurr">
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="Field" stdset="0">
+      <string>f_currency2</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="2">
+    <widget class="C5LineEditWithSelector" name="leDepCurrName">
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+     <property name="FieldRef" stdset="0">
+      <string>f_currname2</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Rate</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="C5LineEditWithSelector" name="leRate">
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="Field" stdset="0">
+      <string>f_rate</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>C5LineEditWithSelector</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5lineeditwithselector.h</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>leBaseCurr</tabstop>
+  <tabstop>leDepCurr</tabstop>
+  <tabstop>leRate</tabstop>
+  <tabstop>leBaseCurrName</tabstop>
+  <tabstop>leDepCurrName</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

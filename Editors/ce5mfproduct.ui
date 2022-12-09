@@ -173,6 +173,17 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="btnExportExcel">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/excel.png</normaloff>:/excel.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="btnMoveRowUp">
         <property name="text">
          <string/>
@@ -271,15 +282,15 @@
    <header location="global">c5dateedit.h</header>
   </customwidget>
   <customwidget>
-   <class>C5LineEditWithSelector</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5lineeditwithselector.h</header>
-  </customwidget>
-  <customwidget>
    <class>C5TableWithTotal</class>
    <extends>QWidget</extends>
    <header location="global">c5tablewithtotal.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>C5LineEditWithSelector</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5lineeditwithselector.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

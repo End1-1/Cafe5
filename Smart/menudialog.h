@@ -8,13 +8,14 @@ class MenuDialog;
 }
 
 class C5User;
+class Workspace;
 
 class MenuDialog : public C5Dialog
 {
     Q_OBJECT
 
 public:
-    explicit MenuDialog(C5User *u);
+    explicit MenuDialog(Workspace *w, C5User *u);
     ~MenuDialog();
 
 private slots:
@@ -38,10 +39,14 @@ private slots:
 
     void on_btnSessoinMoney_clicked();
 
+    void on_btnCustomerDisplay_clicked();
+
 private:
     Ui::MenuDialog *ui;
 
     C5User *fUser;
+
+    Workspace *fWorkspace;
 };
 
 #endif // MENUDIALOG_H

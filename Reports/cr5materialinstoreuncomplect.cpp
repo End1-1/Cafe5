@@ -99,7 +99,8 @@ void CR5MaterialInStoreUncomplect::buildQuery()
     "inner join c_units u on u.f_id=g.f_unit "
     "inner join a_header h on h.f_id=s.f_document  "
     "where  h.f_date<='%1'  and h.f_state=1 and gu.f_unit in(%2) %3 "
-    "group by 1, gc.f_goods,g.f_id,ss.f_name,gg.f_name,g.f_name,u.f_name having sum(s.f_qty*s.f_type) <> 0 "
+    "group by 1, gc.f_goods,g.f_id,ss.f_name,gg.f_name,g.f_name,u.f_name, gc.f_base "
+"having sum(s.f_qty*s.f_type) <> 0 "
 
     ") k %4 "
     )

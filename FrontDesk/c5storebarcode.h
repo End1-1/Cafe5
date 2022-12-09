@@ -17,14 +17,16 @@ public:
 
     ~C5StoreBarcode();
 
-    void addRow(const QString &name, const QString &barcode, int qty);
+    QString fCurrencyName;
+
+    void addRow(const QString &name, const QString &barcode, int qty, int curr);
 
     virtual QToolBar *toolBar() override;
 
+    static bool printOneBarcode(const QString &code, const QString &price, const QString &class1, const QString &name, QPrintDialog &pd);
+
 private:
     Ui::C5StoreBarcode *ui;
-
-    bool printOneBarcode(const QString &code, const QString &price, const QString &class1, QPrintDialog &pd);
 
     //bool printOneBarcode(const QString &code, QPrintDialog &pd);
 
@@ -34,6 +36,8 @@ private slots:
     void printDescriptions();
 
     void setList();
+
+    void setQtyToOne();
 
 };
 

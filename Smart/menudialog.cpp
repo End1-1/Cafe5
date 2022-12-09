@@ -10,14 +10,21 @@
 #include "dlgcashop.h"
 #include "datadriver.h"
 #include "dlgsmartreports.h"
+#include "sessionshistory.h"
+#include "workspace.h"
 #include <QFile>
+#include <QDesktopWidget>
 
-MenuDialog::MenuDialog(C5User *u) :
+MenuDialog::MenuDialog(Workspace *w, C5User *u) :
     C5Dialog(__c5config.dbParams()),
-    ui(new Ui::MenuDialog)
+    ui(new Ui::MenuDialog),
+    fWorkspace(w)
 {
     ui->setupUi(this);
     fUser = u;
+    if (qApp->desktop()->screenCount() < 2) {
+        ui->btnCustomerDisplay->setEnabled(false);
+    }
 }
 
 MenuDialog::~MenuDialog()
@@ -251,100 +258,16 @@ void MenuDialog::on_btnCloseSession_clicked()
 
 void MenuDialog::on_btnSessoinMoney_clicked()
 {
+    accept();
     QDate d1, d2;
     if (!Calendar::getDate2(d1, d2)) {
         return;
     }
+    SessionsHistory(d1, d2).exec();
+}
 
-    QList<int> sessions;
-    C5Database db(fDBParams);
-    db[":f_date1"] = d1;
-    db[":f_date2"] = d2;
-    db.exec("select f_id from s_salary_inout where f_datein between :f_date1 and :f_date2 ");
-    while (db.nextRow()) {
-        sessions.append(db.getInt("f_id"));
-    }
-    QFont font(qApp->font());
-    font.setPointSize(__c5config.getValue(param_receipt_print_font_size).toInt());
-    font.setFamily(__c5config.getValue(param_receipt_print_font_family));
-    C5Printing p;
-    p.setSceneParams(650, 2800, QPrinter::Portrait);
-    p.setFont(font);
-
-    if (QFile::exists("./logo_receipt.png")) {
-        p.image("./logo_receipt.png", Qt::AlignHCenter);
-        p.br();
-    }
-    p.setFontBold(true);
-    p.ctext(QString("%1").arg(tr("History of sessions")));
-    p.br();
-
-    for (int sid: sessions) {
-        db[":f_id"] = sid;
-        db.exec("select * from s_salary_inout where f_id=:f_id");
-        db.nextRow();
-        p.ctext(QString("%1 %2").arg(db.getDate("f_datein").toString(FORMAT_DATE_TO_STR), db.getTime("f_timein").toString(FORMAT_TIME_TO_SHORT_STR)));
-        p.br();
-        p.ctext("-");
-        p.br();
-        p.ctext(QString("%1 %2").arg(db.getDate("f_dateout").toString(FORMAT_DATE_TO_STR), db.getTime("f_timeout").toString(FORMAT_TIME_TO_SHORT_STR)));
-        p.br();
-        p.ctext(dbuser->fullName(db.getInt("f_user")));
-        p.br();
-
-        p.line();
-        p.br();
-
-            double balance = 0;
-            db[":f_session"] = sid;
-            //db[":f_cash"] = __c5config.cashId();
-            db.exec("select sum(f_amount) as f_amount "
-                    "from e_cash e "
-                    "inner join a_header_cash hc on hc.f_id=e.f_header "
-                    "where length(hc.f_oheader)>0 and f_session=:f_session ");
-            db.nextRow();
-            balance += db.getDouble("f_amount");
-            p.ltext(tr("Input from sale"), 0);
-            p.rtext(float_str(db.getDouble("f_amount"), 2));
-            p.br();
-
-            db[":f_session"] = sid;
-            //db[":f_cash"] = __c5config.cashId();
-            db.exec("select f_amount, f_remarks "
-                    "from e_cash e "
-                    "inner join a_header_cash hc on hc.f_id=e.f_header "
-                    "where length(hc.f_oheader)=0 and f_session=:f_session and f_sign=1");
-            while (db.nextRow()) {
-                p.ltext(db.getString("f_remarks"), 0);
-                p.rtext(float_str(db.getDouble("f_amount"), 2));
-                p.br();
-                balance += db.getDouble("f_amount");
-            }
-
-            db[":f_session"] = sid;
-            //db[":f_cash"] = __c5config.cashId();
-            db.exec("select f_sign*f_amount as f_amount, f_remarks "
-                    "from e_cash e "
-                    "inner join a_header_cash hc on hc.f_id=e.f_header "
-                    "where length(hc.f_oheader)=0 and f_session=:f_session and f_sign=-1");
-            while (db.nextRow()) {
-                p.ltext(db.getString("f_remarks"), 0);
-                p.rtext(float_str(db.getDouble("f_amount"), 2));
-                p.br();
-                balance += db.getDouble("f_amount");
-            }
-            p.ltext(tr("Final balance"), 0);
-            p.rtext(float_str(balance, 2));
-            p.br();
-            p.line();
-            p.br();
-
-    }
-
-    p.setFontSize(18);
-    p.ltext(tr("Printed"), 0);
-    p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
-    p.br();
-    p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
+void MenuDialog::on_btnCustomerDisplay_clicked()
+{
     accept();
+    fWorkspace->showCustomerDisplay();
 }

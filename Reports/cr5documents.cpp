@@ -268,7 +268,6 @@ void CR5Documents::saveDocs()
                     fModel->setData(row, fModel->indexForColumnName("f_amount"), 0);
                     complete++;
                 } else {
-                    qDebug() << e;
                     err += e;
                 }
             } else {

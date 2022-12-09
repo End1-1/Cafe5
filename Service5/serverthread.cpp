@@ -4,6 +4,7 @@
 #include "socketthread.h"
 #include "logwriter.h"
 #include "thread.h"
+#include "configini.h"
 
 ServerThread::ServerThread(const QString &configPath) :
     ThreadWorker(),
@@ -33,7 +34,11 @@ void ServerThread::run()
     fSslLocalCertificate = fSslServer->fSslLocalCertificate;
     fSslPrivateKey = fSslServer->fSslPrivateKey;
     fSslProtocol = fSslServer->fSslProtocol;
-    fSslServer->startListen();
+    if (!fSslServer->startListen()) {
+        LogWriter::write(LogWriterLevel::errors, "", "Cannot listen port: " + QString::number(ConfigIni::value("server/port").toInt()));
+        exit(1);
+        return;
+    }
     LogWriter::write(LogWriterLevel::verbose, "", fSslServer->errorString());
     connect(fSslServer, &SslServer::connectionRequest, this, &ServerThread::newConnection);
 }

@@ -99,6 +99,13 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
 
     ui->tblCalcPrice->setColumnWidth(0, 300);
     adjustSize();
+    C5Database db(dbParams);
+    db.open();
+    db.exec("select * from e_currency order by f_id");
+    while (db.nextRow()) {
+        ui->cbCurrency->addItem(db.getString("f_name"), db.getInt("f_id"));
+    }
+    ui->cbCurrency->setCurrentIndex(0);
 }
 
 C5StoreDoc::~C5StoreDoc()
@@ -125,6 +132,7 @@ bool C5StoreDoc::openDoc(QString id, QString &err)
     ui->lePartner->setValue(dw.value(container_aheader, 0, "f_partner").toInt());
     ui->leComment->setText(dw.value(container_aheader, 0, "f_comment").toString());
     ui->leTotal->setDouble(dw.value(container_aheader, 0, "f_amount").toDouble());
+    ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(dw.value(container_aheader, 0, "f_currency").toInt()));
     setMode(static_cast<STORE_DOC>(fDocType));
     for (int i = 0; i < dw.rowCount(container_astoredishwaste); i++) {
         int row = ui->tblDishes->addEmptyRow();
@@ -300,6 +308,9 @@ void C5StoreDoc::setMode(C5StoreDoc::STORE_DOC sd)
     case DOC_TYPE_COMPLECTATION:
         ui->grComplectation->setVisible(true);
         break;
+    case DOC_TYPE_DECOMPLECTATION:
+        ui->grComplectation->setVisible(true);
+        break;
     }
 
     switch (sd) {
@@ -345,6 +356,17 @@ void C5StoreDoc::setMode(C5StoreDoc::STORE_DOC sd)
         ui->lbPartner->setVisible(false);
         ui->btnNewPartner->setVisible(false);
         ui->leReason->setValue(DOC_REASON_COMPLECTATION);
+    case sdDeComplectation:
+        ui->lePartner->setVisible(false);
+        ui->lePartnerName->setVisible(false);
+        ui->leInvoiceNumber->setVisible(false);
+        ui->deInvoiceDate->setVisible(false);
+        ui->lbInvoiceDate->setVisible(false);
+        ui->lbInvoiceNumber->setVisible(false);
+        ui->lbPartner->setVisible(false);
+        ui->btnNewPartner->setVisible(false);
+        ui->leReason->setValue(DOC_REASON_DECOMPLECTATION);
+        break;
     default:
         break;
     }
@@ -863,6 +885,7 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
                          ui->lePartner->getInteger(), ui->leTotal->getDouble(), ui->leComment->text())) {
         err += db.fLastError + "<br>";
     }
+    dw.updateField("a_header", "f_currency", ui->cbCurrency->currentData(), "f_id", fInternalId);
     if (!dw.writeAHeaderStore(fInternalId, ui->leAccepted->getInteger(), ui->lePassed->getInteger(), ui->leInvoiceNumber->text(), ui->deInvoiceDate->date(),
                               ui->leStoreInput->getInteger(), ui->leStoreOutput->getInteger(), fBasedOnSale, fCashDocUuid, ui->leComplectationCode->getInteger(),
                               ui->leComplectationQty->getDouble())) {
@@ -898,7 +921,7 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
         QString outid = ui->tblGoods->getString(i, 1);
         if (ui->leStoreInput->getInteger() > 0) {
             if (fDocType == DOC_TYPE_STORE_INPUT
-                    || fDocType == DOC_TYPE_STORE_MOVE) {
+                    || fDocType == DOC_TYPE_STORE_MOVE || fDocType == DOC_TYPE_DECOMPLECTATION) {
                 if (!dw.writeAStoreDraft(inid, fInternalId, ui->leStoreInput->getInteger(), 1, ui->tblGoods->getInteger(i, 3),
                                          ui->tblGoods->lineEdit(i, 5)->getDouble(), ui->tblGoods->lineEdit(i, 7)->getDouble(), ui->tblGoods->lineEdit(i, 8)->getDouble(),
                                          ui->leReason->getInteger(), "", i, ui->tblGoods->lineEdit(i, 9)->text())) {
@@ -930,6 +953,7 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
             if (ui->lePartner->getInteger() > 0) {
                 db[":f_doc"] = fInternalId;
                 db[":f_dc"] = -1;
+                db[":f_currency"] = ui->cbCurrency->currentData();
                 db[":f_amount"] = ui->leTotal->getDouble();
                 db.insert("a_dc");
             }
@@ -960,6 +984,9 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
             dw.writeOutput(fInternalId, err);
             break;
         case DOC_TYPE_COMPLECTATION:
+            dw.writeOutput(fInternalId, err);
+            break;
+        case DOC_TYPE_DECOMPLECTATION:
             dw.writeOutput(fInternalId, err);
             break;
         }
@@ -2341,7 +2368,7 @@ void C5StoreDoc::printBarcode()
         db[":f_id"] = ui->tblGoods->getInteger(i, 3);
         db.exec("select f_name, f_scancode from c_goods where f_id=:f_id");
         if (db.nextRow()) {
-            b->addRow(db.getString("f_name"), db.getString("f_scancode"), ui->tblGoods->lineEdit(i, 5)->getInteger());
+            b->addRow(db.getString("f_name"), db.getString("f_scancode"), ui->tblGoods->lineEdit(i, 5)->getInteger(), ui->cbCurrency->currentData().toInt());
         }
     }
 }

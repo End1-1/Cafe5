@@ -722,7 +722,7 @@ bool C5StoreDraftWriter::writeECash(QString &id, const QString &header, int cash
 
 bool C5StoreDraftWriter::writeOBody(QString &id, const QString &header, int state, int dish, double qty1, double qty2, double price, double total, double service, double discount,
                                     int store, const QString &print1, const QString &print2, const QString &comment, int remind, const QString &adgcode,
-                                    int removereason, int timeorder, int package)
+                                    int removereason, int timeorder, int package, int row, const QDateTime &appendTime)
 {
     bool u = false;
     if (id.isEmpty()) {
@@ -749,9 +749,11 @@ bool C5StoreDraftWriter::writeOBody(QString &id, const QString &header, int stat
     fDb[":f_removereason"] = removereason;
     fDb[":f_timeorder"] = timeorder;
     fDb[":f_package"] = package;
+    fDb[":f_row"] = row;
     if (u) {
         return returnResult(fDb.update("o_body", where_id(id)));
     } else {
+        fDb[":f_appendtime"] = appendTime;
         return returnResult(fDb.insert("o_body", false));
     }
 }
@@ -836,6 +838,8 @@ bool C5StoreDraftWriter::writeOHeader(QString &id, int hallid, const QString &pr
             fDb[":f_4"] = 0;
             fDb[":f_5"] = 0;
             b = b && returnResult(fDb.insert("o_header_flags", false));
+            fDb[":f_id"] = id;
+            b = b && returnResult(fDb.insert("o_header_options", false));
         }
         return b;
     }
@@ -849,6 +853,15 @@ bool C5StoreDraftWriter::writeOHeaderFlags(const QString &id, int f1, int f2, in
     fDb[":f_4"] = f4;
     fDb[":f_5"] = f5;
     return returnResult(fDb.update("o_header_flags", "f_id", id));
+}
+
+bool C5StoreDraftWriter::writeOHeaderOptions(const QString &id, int guest, int splitted, int deliveryman, int currency)
+{
+    fDb[":f_guests"] = guest;
+    fDb[":f_splitted"] = splitted;
+    fDb[":f_deliveryman"] = deliveryman;
+    fDb[":f_currency"] = currency;
+    return returnResult(fDb.update("o_header_options", "f_id", id));
 }
 
 bool C5StoreDraftWriter::writeOPayment(const QString &id, double cash, double change)

@@ -11,6 +11,7 @@
 #include "c5printpreview.h"
 #include "c5printing.h"
 #include "c5user.h"
+#include "c5storebarcode.h"
 #include <QClipboard>
 #include <QFontDatabase>
 #include <QDateTime>
@@ -56,7 +57,38 @@ CE5Goods::CE5Goods(const QStringList &dbParams, QWidget *parent) :
     fBarcode = new Barcode();
     ui->lbScancodeType->setVisible(false);
     ui->btnPinLast->setChecked(__c5config.getRegValue("last_goods_editor").toBool());
+    ui->leCostPrice->fDecimalPlaces = 4;
     connect(ui->tblMultiscancode, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(tblMultiscancodeContextMenu(QPoint)));
+    QStringList l;
+    l.append(tr("Retail"));
+    l.append(tr("Whosale"));
+    ui->tblPricing->setVerticalHeaderLabels(l);
+    db.exec("select * from e_currency order by f_id");
+    QStringList colLabels;
+    while (db.nextRow()) {
+        int c = ui->tblPricing->columnCount();
+        ui->tblPricing->setColumnCount(c + 1);
+        colLabels.append(db.getString("f_name"));
+        ui->tblPricing->createLineEdit(0, c)->setValidator(new QDoubleValidator(0, 99999999, 4));
+        ui->tblPricing->createLineEdit(1, c)->setValidator(new QDoubleValidator(0, 99999999, 4));
+        ui->tblPricing->lineEdit(0, c)->fDecimalPlaces = 7;
+        ui->tblPricing->lineEdit(1, c)->fDecimalPlaces = 7;
+        ui->tblPricing->lineEdit(0, c)->setProperty("c", db.getInt("f_id"));
+        ui->tblPricing->lineEdit(1, c)->setProperty("c", db.getInt("f_id"));
+        connect(ui->tblPricing->lineEdit(0, c), &C5LineEdit::textEdited, this, &CE5Goods::priceEdited);
+        connect(ui->tblPricing->lineEdit(1, c), &C5LineEdit::textEdited, this, &CE5Goods::priceEdited);
+    }
+    ui->tblPricing->setHorizontalHeaderLabels(colLabels);
+    ui->tblPricing->fitColumnsToWidth();
+    ui->cbCurrency->setDBValues(dbParams, "select f_id, f_name from e_currency");
+    int basecurrecny = __c5config.getValue(param_default_currency).toInt();
+    ui->cbCurrency->setIndexForValue(basecurrecny);
+    connect(ui->leScanCode, &C5LineEditWithSelector::doubleClicked, this, &CE5Goods::genScancode);
+    fScancodeGenerated = false;
+    db.exec("select * from e_currency_cross_rate");
+    while (db.nextRow()) {
+        fCrossRate[QString("%1-%2").arg(db.getString("f_currency1"), db.getString("f_currency2"))] = db.getDouble("f_rate");
+    }
 }
 
 CE5Goods::~CE5Goods()
@@ -129,6 +161,21 @@ void CE5Goods::setId(int id)
         ui->leName->setEnabled(enabled);
         ui->leScanCode->setEnabled(enabled);
     }
+
+    db[":f_goods"] = ui->leCode->getInteger();
+    db.exec("select * from c_goods_prices where f_goods=:f_goods");
+    while (db.nextRow()) {
+        for (int j = 0; j < ui->tblPricing->columnCount(); j++) {
+            if (ui->tblPricing->lineEdit(0, j)->property("c").toInt() == db.getInt("f_currency")) {
+                ui->tblPricing->lineEdit(0, j)->setDouble(db.getDouble("f_price1"));
+                ui->tblPricing->lineEdit(1, j)->setDouble(db.getDouble("f_price2"));
+                break;
+            }
+        }
+    }
+    if (ui->cbCurrency->currentData().toInt() == 0) {
+        ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(__c5config.getValue(param_default_currency)));
+    }
 }
 
 bool CE5Goods::save(QString &err, QList<QMap<QString, QVariant> > &data)
@@ -186,6 +233,23 @@ bool CE5Goods::save(QString &err, QList<QMap<QString, QVariant> > &data)
     }
     fScancodeAppend.clear();
     fScancodeRemove.clear();
+
+    db[":f_goods"] = ui->leCode->getInteger();
+    db.exec("delete from c_goods_prices where f_goods=:f_goods");
+    for (int j = 0; j < ui->tblPricing->columnCount(); j++) {
+        db[":f_goods"] = ui->leCode->getInteger();
+        db[":f_price1"] = ui->tblPricing->lineEdit(0, j)->getDouble();
+        db[":f_price2"] = ui->tblPricing->lineEdit(1, j)->getDouble();
+        db[":f_currency"] = ui->tblPricing->lineEdit(0, j)->property("c");
+        db.insert("c_goods_prices");
+    }
+
+    if (fScancodeGenerated) {
+        db[":f_counter"] = ui->leScanCode->text().left(7).toInt();
+        db.exec("update c_goods_scancode_counter set f_counter=:f_counter where f_counter<:f_counter");
+        fScancodeGenerated = false;
+    }
+
     return true;
 }
 
@@ -217,6 +281,15 @@ void CE5Goods::clear()
     ui->tblMultiscancode->setRowCount(0);
     fScancodeAppend.clear();
     fScancodeRemove.clear();
+    for (int i = 0; i < ui->tblPricing->rowCount(); i++) {
+        for (int c = 0; c < ui->tblPricing->columnCount(); c++) {
+            ui->tblPricing->lineEdit(i, c)->clear();
+        }
+    }
+    fScancodeGenerated = false;
+    if (ui->cbCurrency->currentData().toInt() == 0) {
+        ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(__c5config.getValue(param_default_currency)));
+    }
 }
 
 QPushButton *CE5Goods::b1()
@@ -243,9 +316,27 @@ void CE5Goods::printCard()
     p.ltext(tr("Goods group")  + ": " + ui->leGroupName->text(), 5);
     p.rtext(tr("Internal code") + ": " + ui->leCode->text());
     p.br();
-    p.ltext(tr("Retail price")  + ": " + ui->leRetailPrice->text(), 5);
-    p.rtext(tr("Whosale price") + ": " + ui->leWhosalePrice->text());
+    points << 5 << 300;
+    for (int i = 0; i < ui->tblPricing->columnCount(); i++) {
+        points << 300;
+    }
+    vals << tr("Retail price");
+    for (int i = 0; i < ui->tblPricing->columnCount(); i++) {
+        vals << ui->tblPricing->lineEdit(0, i)->text();
+    }
+    p.tableText(points, vals, p.fLineHeight);
+    p.br(p.fLineHeight + 20);
+    vals.clear();
+    vals << tr("Whosale price");
+    for (int i = 0; i < ui->tblPricing->columnCount(); i++) {
+        vals << ui->tblPricing->lineEdit(1, i)->text();
+    }
+    p.tableText(points, vals, p.fLineHeight);
+    p.br(p.fLineHeight + 20);
     p.br();
+
+    points.clear();
+    vals.clear();
     if (ui->tblGoods->rowCount() > 0) {
         p.br();
         p.ctext(tr("Complecation"));
@@ -273,6 +364,34 @@ void CE5Goods::printCard()
     pp.raise();  // for MacOS
     pp.activateWindow();
     pp.exec();
+}
+
+void CE5Goods::priceEdited(const QString &arg1)
+{
+    C5LineEdit *e = static_cast<C5LineEdit*>(sender());
+    int r, c;
+    if (!ui->tblPricing->findWidget(e, r, c)) {
+        return;
+    }
+    C5LineEditWithSelector *l;
+    switch (r) {
+    case 0:
+        l = ui->leMargin;
+        break;
+    case 1:
+        l = ui->leMargin2;
+        break;
+    }
+    int basecurrency = e->property("c").toInt();
+    for (int i = 0; i < ui->tblPricing->columnCount(); i++) {
+        if (ui->tblPricing->lineEdit(r, i) == e) {
+            l->setDouble(((str_float(arg1) / ui->leCostPrice->getDouble()) - 1) * 100);
+            continue;
+        }
+        QString crossrate = QString("%1-%2").arg(QString::number(basecurrency), ui->tblPricing->lineEdit(r, i)->property("c").toString());
+        double rate = fCrossRate[crossrate];
+        ui->tblPricing->lineEdit(r, i)->setDouble(str_float(arg1) * rate);
+    }
 }
 
 void CE5Goods::tblQtyChanged(const QString &arg1)
@@ -416,6 +535,21 @@ void CE5Goods::removeScancode()
     ui->tblMultiscancode->removeRow(r);
 }
 
+void CE5Goods::genScancode()
+{
+    if (!ui->leScanCode->isEmpty()) {
+        C5Message::error(tr("Scancode field must be empty"));
+        return;
+    }
+    C5Database db(fDBParams);
+    db.exec("select * from c_goods_scancode_counter");
+    db.nextRow();
+    ui->leScanCode->setText(QString("%1").arg(db.getInt("f_counter") + 1, db.getInt("f_digitsnumber"), 10, QChar('0')));
+//    int checksum = fBarcode->ean8CheckSum(ui->leScanCode->text());
+//    ui->leScanCode->setText(QString("%1%2").arg(ui->leScanCode->text(), QString::number(checksum)));
+    fScancodeGenerated = true;
+}
+
 void CE5Goods::tblMultiscancodeContextMenu(const QPoint &p)
 {
     QMenu m;
@@ -484,8 +618,8 @@ int CE5Goods::addGoodsRow()
     lqty->fDecimalPlaces = 4;
     ui->tblGoods->setItem(row, 4, new QTableWidgetItem());
     C5LineEdit *lprice = ui->tblGoods->createLineEdit(row, 5);
-    lprice->setValidator(new QDoubleValidator(0, 100000000, 3));
-    lprice->fDecimalPlaces = 3;
+    lprice->setValidator(new QDoubleValidator(0, 100000000, 4));
+    lprice->fDecimalPlaces = 4;
     C5LineEdit *ltotal = ui->tblGoods->createLineEdit(row, 6);
     ltotal->setValidator(new QDoubleValidator(0, 100000000, 2));
     connect(lqty, SIGNAL(textEdited(QString)), this, SLOT(tblQtyChanged(QString)));
@@ -509,6 +643,20 @@ void CE5Goods::setComplectFlag()
     ui->leIsComplect->setInteger(ui->tblGoods->rowCount() == 0 ? 0 : 1);
     if (ui->leComplectOutputQty->getDouble() < 0.001) {
         ui->leComplectOutputQty->setDouble(1);
+    }
+}
+
+void CE5Goods::countSalePrice(int r, double margin)
+{
+    int basecurrency = ui->cbCurrency->currentData().toInt();
+    for (int c = 0; c < ui->tblPricing->columnCount(); c++) {
+        if (ui->tblPricing->lineEdit(r, c)->property("c").toInt() == basecurrency) {
+            ui->tblPricing->lineEdit(r, c)->setDouble(((margin / 100) * ui->leCostPrice->getDouble()) + ui->leCostPrice->getDouble());
+        } else {
+            QString crossrate = QString("%1-%2").arg(QString::number(basecurrency), ui->tblPricing->lineEdit(r, c)->property("c").toString());
+            double rate = fCrossRate[crossrate];
+            ui->tblPricing->lineEdit(r, c)->setDouble((((margin / 100) * ui->leCostPrice->getDouble()) + ui->leCostPrice->getDouble()) * rate);
+        }
     }
 }
 
@@ -628,7 +776,7 @@ void CE5Goods::on_lbImage_customContextMenuRequested(const QPoint &pos)
 void CE5Goods::on_tabWidget_currentChanged(int index)
 {
     switch (index) {
-    case 2: {
+    case 3: {
         C5Database db(fDBParams);
         db[":f_id"] = ui->leCode->getInteger();
         db.exec("select * from c_goods_images where f_id=:f_id");
@@ -647,6 +795,10 @@ void CE5Goods::on_leScanCode_textChanged(const QString &arg1)
     if (fBarcode->isEan13(arg1)) {
         ui->lbScancodeType->setVisible(true);
         ui->lbScancodeType->setText("EAN13");
+        ui->btnSetControlSum->setVisible(false);
+    } else if (fBarcode->isEan13(arg1)) {
+        ui->lbScancodeType->setVisible(true);
+        ui->lbScancodeType->setText("EAN8");
         ui->btnSetControlSum->setVisible(false);
     } else {
         ui->lbScancodeType->setVisible(false);
@@ -680,4 +832,29 @@ void CE5Goods::on_chSameStoreId_clicked()
 void CE5Goods::on_leUnitName_textChanged(const QString &arg1)
 {
     ui->lbOutputUnit->setText(arg1);
+}
+
+void CE5Goods::on_btnPrintBarcode_clicked()
+{
+    QPrintDialog pd(this);
+    if (pd.exec() == QDialog::Accepted) {
+        C5StoreBarcode::printOneBarcode(ui->leScanCode->text(), ui->tblPricing->lineEdit(0, 0)->text(), "", ui->leName->text(), pd);
+    }
+}
+
+void CE5Goods::on_leCostPrice_textEdited(const QString &arg1)
+{
+    Q_UNUSED(arg1);
+    countSalePrice(0, str_float(ui->leMargin->text()));
+    countSalePrice(1, str_float(ui->leMargin2->text()));
+}
+
+void CE5Goods::on_leMargin_textEdited(const QString &arg1)
+{
+    countSalePrice(0, str_float(arg1));
+}
+
+void CE5Goods::on_leMargin2_textEdited(const QString &arg1)
+{
+    countSalePrice(1, str_float(arg1));
 }

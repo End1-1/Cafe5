@@ -10,6 +10,7 @@
 #include "rawsilentauth.h"
 #include "rawmonitor.h"
 #include "rawcarnear.h"
+#include "rawplugin.h"
 #include "sslsocket.h"
 #include "logwriter.h"
 #include "thread.h"
@@ -71,15 +72,20 @@ int RawHandler::run(quint32 msgNum, quint32 msgId, qint16 msgType, const QByteAr
     case MessageList::dll_op:
         r = new RawDllOp(fSocket);
         break;
+    case MessageList::dll_plugin:
+        r = new RawPlugin(fSocket);
+        break;
     default:
         LogWriter::write(LogWriterLevel::errors, property("session").toString(), QString("Unknown raw command received: %1").arg(msgType));
         fSocket->close();
         return 0;
     }
     r->setProperty("session", property("session"));
-    int result = r->run(data);
     r->setHeader(fMsgNum, fMsgId, fMsgType);
-    emit writeToSocket(r->data());
-    r->deleteLater();
+    int result = r->run(data);
+    if (result != 3) {
+        emit writeToSocket(r->data());
+        r->deleteLater();
+    }
     return result;
 }

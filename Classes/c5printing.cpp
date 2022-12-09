@@ -1,5 +1,4 @@
 #include "c5printing.h"
-#include "notificationwidget.h"
 #include <QPainter>
 #include <QGraphicsItem>
 #include <QDebug>
@@ -315,39 +314,40 @@ QPrinter::Orientation C5Printing::orientation(int index)
 bool C5Printing::print(const QString &printername, QPrinter::PageSize pageSize, bool rotate90)
 {
     if (printername.contains("print://", Qt::CaseInsensitive)) {
-        QRegExp re("(print:\\/\\/)(.*):(\\d*)\\/(.*)", Qt::CaseInsensitive);
-        re.indexIn(printername);
-        if (re.captureCount() > 0) {
-            QStringList l = re.capturedTexts();
-            QString addr = l.at(2);
-            QString prt = l.at(3);
-            QString prn = l.at(4);
-            QJsonObject jobj;
-            jobj["data"] = fJsonData;
-            jobj["cmd"] = 1;
-            jobj["printer"] = prn;
-            jobj["pagesize"] = pageSize;
-            QJsonDocument jdoc(jobj);
-            QTcpSocket ts;
-            ts.connectToHost(addr, prt.toInt());
-            if (ts.waitForConnected(5000)) {
-                QByteArray out = jdoc.toJson();
-                int datasize = out.length();
-                ts.write(reinterpret_cast<const char *>(&datasize), sizeof(datasize));
-                int cmd = 1;
-                ts.write(reinterpret_cast<const char *>(&cmd), sizeof(cmd));
-                ts.write(out, out.length());
-                ts.waitForBytesWritten();
-                ts.waitForReadyRead(60000);
-                ts.disconnectFromHost();
-            } else {
-                NotificationWidget::showMessage(tr("Failed send order to remote printer"), 1);
-            }
-        }
-        return true;
+//        QRegExp re("(print:\\/\\/)(.*):(\\d*)\\/(.*)", Qt::CaseInsensitive);
+//        re.indexIn(printername);
+//        if (re.captureCount() > 0) {
+//            QStringList l = re.capturedTexts();
+//            QString addr = l.at(2);
+//            QString prt = l.at(3);
+//            QString prn = l.at(4);
+//            QJsonObject jobj;
+//            jobj["data"] = fJsonData;
+//            jobj["cmd"] = 1;
+//            jobj["printer"] = prn;
+//            jobj["pagesize"] = pageSize;
+//            QJsonDocument jdoc(jobj);
+//            QTcpSocket ts;
+//            ts.connectToHost(addr, prt.toInt());
+//            if (ts.waitForConnected(5000)) {
+//                QByteArray out = jdoc.toJson();
+//                int datasize = out.length();
+//                ts.write(reinterpret_cast<const char *>(&datasize), sizeof(datasize));
+//                int cmd = 1;
+//                ts.write(reinterpret_cast<const char *>(&cmd), sizeof(cmd));
+//                ts.write(out, out.length());
+//                ts.waitForBytesWritten();
+//                ts.waitForReadyRead(60000);
+//                ts.disconnectFromHost();
+//            } else {
+//                NotificationWidget::showMessage(tr("Failed send order to remote printer"), 1);
+//            }
+//        }
+//        return true;
     }
     QPrinterInfo pi;
     if (!pi.availablePrinterNames().contains(printername, Qt::CaseInsensitive)) {
+        fErrorString = QString("%1 not exists in the system").arg(printername);
         return false;
     }
     if (fCanvasList.count() > 0) {
@@ -370,6 +370,7 @@ bool C5Printing::print(const QString &printername, QPrinter::PageSize pageSize, 
             fCanvasList.at(i)->render(&painter);
         }
         if (printer.printerState() == QPrinter::Error) {
+            fErrorString = QString("Not printed");
             return false;
         }
     }

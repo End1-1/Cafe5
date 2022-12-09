@@ -2,14 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="hy_AM">
 <context>
-    <name>C5Printing</name>
-    <message>
-        <location filename="../Classes/c5printing.cpp" line="344"/>
-        <source>Failed send order to remote printer</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>C5ReportsUpload</name>
     <message>
         <location filename="c5reportsupload.ui" line="14"/>

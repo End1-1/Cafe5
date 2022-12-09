@@ -3,6 +3,7 @@
 
 DbOHeader::DbOHeader() :
     DbData("o_header", "f_state=1 or f_state=5 or f_state=6")
+    //DbData("o_header", "f_state=1")
 {
 
 }

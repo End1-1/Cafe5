@@ -130,7 +130,7 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="C5TableWidget" name="tbl">
+       <widget class="C5ClearTableWidget" name="tbl">
         <property name="editTriggers">
          <set>QAbstractItemView::NoEditTriggers</set>
         </property>
@@ -193,7 +193,7 @@
        </widget>
       </item>
       <item>
-       <widget class="C5TableWidget" name="tblReserve">
+       <widget class="C5ClearTableWidget" name="tblReserve">
         <property name="editTriggers">
          <set>QAbstractItemView::NoEditTriggers</set>
         </property>
@@ -443,14 +443,14 @@ reservation</string>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5TableWidget</class>
-   <extends>QTableWidget</extends>
-   <header location="global">c5tablewidget.h</header>
-  </customwidget>
-  <customwidget>
    <class>C5LineEdit</class>
    <extends>QLineEdit</extends>
    <header location="global">c5lineedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5ClearTableWidget</class>
+   <extends>QTableWidget</extends>
+   <header location="global">c5cleartablewidget.h</header>
   </customwidget>
  </customwidgets>
  <resources>

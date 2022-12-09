@@ -32,7 +32,10 @@
         <location filename="../../Classes/c5cache.cpp" line="112"/>
         <location filename="../../Classes/c5cache.cpp" line="115"/>
         <location filename="../../Classes/c5cache.cpp" line="123"/>
-        <location filename="../../Classes/c5cache.cpp" line="290"/>
+        <location filename="../../Classes/c5cache.cpp" line="133"/>
+        <location filename="../../Classes/c5cache.cpp" line="139"/>
+        <location filename="../../Classes/c5cache.cpp" line="146"/>
+        <location filename="../../Classes/c5cache.cpp" line="324"/>
         <source>Code</source>
         <translation>Կոդ</translation>
     </message>
@@ -63,7 +66,8 @@
         <location filename="../../Classes/c5cache.cpp" line="110"/>
         <location filename="../../Classes/c5cache.cpp" line="112"/>
         <location filename="../../Classes/c5cache.cpp" line="115"/>
-        <location filename="../../Classes/c5cache.cpp" line="290"/>
+        <location filename="../../Classes/c5cache.cpp" line="133"/>
+        <location filename="../../Classes/c5cache.cpp" line="324"/>
         <source>Name</source>
         <translation>Անվանում</translation>
     </message>
@@ -173,6 +177,42 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../../Classes/c5cache.cpp" line="133"/>
+        <location filename="../../Classes/c5cache.cpp" line="140"/>
+        <location filename="../../Classes/c5cache.cpp" line="147"/>
+        <source>Rate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Classes/c5cache.cpp" line="133"/>
+        <source>Symbol</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Classes/c5cache.cpp" line="139"/>
+        <location filename="../../Classes/c5cache.cpp" line="146"/>
+        <source>Currency code1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Classes/c5cache.cpp" line="139"/>
+        <location filename="../../Classes/c5cache.cpp" line="146"/>
+        <source>Currency name 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Classes/c5cache.cpp" line="140"/>
+        <location filename="../../Classes/c5cache.cpp" line="147"/>
+        <source>Currency code 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Classes/c5cache.cpp" line="140"/>
+        <location filename="../../Classes/c5cache.cpp" line="147"/>
+        <source>Currency name 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../../Classes/c5cache.cpp" line="37"/>
         <location filename="../../Classes/c5cache.cpp" line="81"/>
         <location filename="../../Classes/c5cache.cpp" line="123"/>
@@ -206,14 +246,6 @@
         <location filename="../../Cafe5/c5message.ui" line="222"/>
         <source>A2</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>C5Printing</name>
-    <message>
-        <location filename="../../Classes/c5printing.cpp" line="344"/>
-        <source>Failed send order to remote printer</source>
-        <translation></translation>
     </message>
 </context>
 <context>

@@ -104,7 +104,7 @@ void DlgSmartReports::reportCommonDishes()
     dd[":f_datecash2"] = ui->leDateEnd->date();
     dd[":f_stateh"] = ORDER_STATE_CLOSE;
     dd[":f_stated"] = DISH_STATE_OK;
-    dd.exec("select d.f_name, sum(b.f_qty1) as f_qty, b.f_price, sum(b.f_qty1*b.f_price) as f_total "
+    dd.exec("select d.f_name, sum(b.f_qty1) as f_qty, b.f_price, sum(b.f_total) as f_total "
             "from o_body b "
             "inner join o_header h on h.f_id=b.f_header "
             "left join d_dish d on d.f_id=b.f_dish "
@@ -185,7 +185,7 @@ void DlgSmartReports::reportCommonDishesWithTime()
     dd[":f_date2"] = QDateTime::fromString(ui->leDateEnd->text() + " " + ui->leTimeEnd->text(), "dd/MM/yyyy HH:mm");
     dd[":f_stateh"] = ORDER_STATE_CLOSE;
     dd[":f_stated"] = DISH_STATE_OK;
-    dd.exec("select d.f_name, sum(b.f_qty1) as f_qty, b.f_price, sum(b.f_qty1*b.f_price) as f_total "
+    dd.exec("select d.f_name, sum(b.f_qty1) as f_qty, b.f_price, sum(b.f_total) as f_total "
             "from o_body b "
             "inner join o_header h on h.f_id=b.f_header "
             "left join d_dish d on d.f_id=b.f_dish "

@@ -10,7 +10,11 @@ public:
 
     int ean13CheckSum(const QString &code);
 
+    int ean8CheckSum(const QString &code);
+
     bool isEan13(const QString &code);
+
+    bool isEan8(const QString &code);
 
 };
 

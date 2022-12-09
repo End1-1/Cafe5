@@ -47,6 +47,14 @@
 #define cache_mf_actions 42
 #define cache_mf_process 43
 #define cache_mf_products 44
+#define cache_mf_workshop 45
+#define cache_mf_action_stage 46
+#define cache_mf_active_task 47
+#define cache_mf_task_state 48
+#define cache_currency 49
+#define cache_currency_rate 50
+#define cache_currency_cross_rate 51
+#define cache_currency_cross_rate_history 52
 
 class C5Cache : public QObject
 {

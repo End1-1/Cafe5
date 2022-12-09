@@ -6,6 +6,7 @@
 #include "c5utils.h"
 #include "dishitem.h"
 #include "dlgorder.h"
+#include "dlgguestinfo.h"
 #include "dlgqty.h"
 #include <QJsonObject>
 
@@ -205,4 +206,13 @@ QPoint WOrder::focused(int index)
 void WOrder::on_btnActivate_clicked()
 {
     emit activated();
+}
+
+void WOrder::on_btnEditGuestName_clicked()
+{
+    DlgGuestInfo gi;
+    gi.exec();
+    if (gi.fCode > 0) {
+
+    }
 }

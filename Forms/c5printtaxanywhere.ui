@@ -15,7 +15,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="C5TableWidget" name="tbl">
+    <widget class="C5ClearTableWidget" name="tbl">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
        <horstretch>0</horstretch>
@@ -103,9 +103,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5TableWidget</class>
+   <class>C5ClearTableWidget</class>
    <extends>QTableWidget</extends>
-   <header location="global">c5tablewidget.h</header>
+   <header location="global">c5cleartablewidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

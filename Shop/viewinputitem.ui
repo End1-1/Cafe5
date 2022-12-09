@@ -15,7 +15,7 @@
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
-    <widget class="C5TableWidget" name="tbl">
+    <widget class="C5ClearTableWidget" name="tbl">
      <column>
       <property name="text">
        <string>UUID</string>
@@ -47,9 +47,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5TableWidget</class>
+   <class>C5ClearTableWidget</class>
    <extends>QTableWidget</extends>
-   <header location="global">c5tablewidget.h</header>
+   <header location="global">c5cleartablewidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

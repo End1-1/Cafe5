@@ -94,7 +94,6 @@ bool C5StoreInventory::allowChangeDatabase()
 void C5StoreInventory::keyShortcut()
 {
     QString s = static_cast<QShortcut*>(sender())->key().toString();
-    qDebug() << s;
     keyPressed(s.at(s.length() - 1));
 }
 

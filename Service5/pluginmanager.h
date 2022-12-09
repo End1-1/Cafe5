@@ -2,6 +2,10 @@
 #define PLUGINMANAGER_H
 
 #include <QObject>
+#include "rawmessage.h"
+
+typedef int (*pluginhandler) (RawMessage *rm, const QByteArray &in);
+typedef int (*removesocketfromplugin) (SslSocket *s);
 
 class PluginManager : public QObject
 {
@@ -11,8 +15,17 @@ public:
 
     static void init(const QString &configFileName);
 
-private:
     static PluginManager *fInstance;
+
+    int runHandler(const QString &pluginuuid, RawMessage *m, const QByteArray &in);
+
+    void removeSocket(SslSocket *s);
+
+private:
+
+    QHash<QString, pluginhandler> fPluginHandlers;
+
+    QHash<QString, removesocketfromplugin> fPluginGarbage;
 
 signals:
 

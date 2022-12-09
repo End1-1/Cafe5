@@ -82,7 +82,7 @@ private slots:
 
     void socketDisconnected();
 
-    void socketDataReceived(quint16 cmd, QByteArray d);
+    void socketDataReceived(quint16 cmd, quint32 messageId, QByteArray d);
 
     void timeout();
 

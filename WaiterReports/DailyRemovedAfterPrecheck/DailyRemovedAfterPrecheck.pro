@@ -31,7 +31,6 @@ SOURCES += \
     ../../Classes/notificationwidget.cpp \
     dll.cpp \
     ../../Cafe5/c5database.cpp \
-    ../../Cafe5/c5message.cpp \
     ../../Cafe5/c5config.cpp \
     ../../Cafe5/c5utils.cpp \
     ../../Classes/c5printing.cpp \
@@ -42,7 +41,6 @@ HEADERS += \
     ../../Classes/notificationwidget.h \
     dll.h \
     ../../Cafe5/c5database.h \
-    ../../Cafe5/c5message.h \
     ../../Cafe5/c5config.h \
     ../../Cafe5/c5utils.h \
     ../../Classes/c5printing.h \
@@ -50,7 +48,6 @@ HEADERS += \
     ../../Controls/c5lineedit.h
 
 FORMS += \
-    ../../Cafe5/c5message.ui \
     ../../Classes/notificationwidget.ui
 
 RESOURCES += \

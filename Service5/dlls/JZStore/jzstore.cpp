@@ -117,7 +117,7 @@ bool requestGoodsGroups(RequestHandler &rh, const QByteArray &data, const QHash<
         for (int i = 0; i < db.columnCount(); i++) {
             r[db.columnName(i).toUpper()] = db.value(i);
         }
-        goods[db.integerValue("id")] = r;
+        goods[db.integer("id")] = r;
     }
     QString goodsArray;
     for (QMap<int, JsonHandler>::const_iterator it = goods.constBegin(); it != goods.constEnd(); it++) {
@@ -152,7 +152,7 @@ bool requestStore(RequestHandler &rh, const QByteArray &data, const QHash<QStrin
         for (int i = 0; i < db.columnCount(); i++) {
             r[db.columnName(i).toUpper()] = db.value(i);
         }
-        goods[db.integerValue("id")] = r;
+        goods[db.integer("id")] = r;
     }
     int month = getData(data, dataMap["month"]).toInt() + 1;
     QList<int> years;
@@ -175,7 +175,7 @@ bool requestStore(RequestHandler &rh, const QByteArray &data, const QHash<QStrin
         return rh.setInternalServerError(db.lastDbError());
     }
     while (db.next()) {
-        JsonHandler &j = goods[db.integerValue("goods_id")];
+        JsonHandler &j = goods[db.integer("goods_id")];
         j["QTY_TILL"] = db.doubleValue("qty");
         j["AMOUNT_TILL"] = db.doubleValue("amount");
     }
@@ -197,15 +197,15 @@ bool requestStore(RequestHandler &rh, const QByteArray &data, const QHash<QStrin
     }
     QStringList foodNotInDb;
     while (mssqldb.next()) {
-        if (!goods.contains(mssqldb.integerValue("food"))) {
-            if (!foodNotInDb.contains(mssqldb.stringValue("food"))) {
-                foodNotInDb.append(mssqldb.stringValue("food"));
+        if (!goods.contains(mssqldb.integer("food"))) {
+            if (!foodNotInDb.contains(mssqldb.string("food"))) {
+                foodNotInDb.append(mssqldb.string("food"));
             }
             continue;
         }
-        JsonHandler &j = goods[mssqldb.integerValue("food")];
-        j["QTY_IN"] = j["QTY_IN"].toDouble() + (mssqldb.doubleValue("qty") * (mssqldb.integerValue("sign") == 0 ? -1 : 1));
-        j["AMOUNT_IN"] = j["AMOUNT_IN"].toDouble() + (mssqldb.doubleValue("amount") * (mssqldb.integerValue("sign") == 0 ? -1 : 1));
+        JsonHandler &j = goods[mssqldb.integer("food")];
+        j["QTY_IN"] = j["QTY_IN"].toDouble() + (mssqldb.doubleValue("qty") * (mssqldb.integer("sign") == 0 ? -1 : 1));
+        j["AMOUNT_IN"] = j["AMOUNT_IN"].toDouble() + (mssqldb.doubleValue("amount") * (mssqldb.integer("sign") == 0 ? -1 : 1));
     }
     if (foodNotInDb.count() > 0) {
         return rh.setInternalServerError(QString("Goods not in database: %1").arg(foodNotInDb.join(",")));
@@ -225,7 +225,7 @@ bool requestStore(RequestHandler &rh, const QByteArray &data, const QHash<QStrin
         return rh.setInternalServerError(db.lastDbError());
     }
     while (db.next()) {
-        JsonHandler &j = goods[db.integerValue("goods_id")];
+        JsonHandler &j = goods[db.integer("goods_id")];
         j["QTY_OUT"] = db.doubleValue("qty");
         j["AMOUNT_OUT"] = db.doubleValue("amount");
     }
@@ -246,7 +246,7 @@ bool requestStore(RequestHandler &rh, const QByteArray &data, const QHash<QStrin
         return rh.setInternalServerError(db.lastDbError());
     }
     while (db.next()) {
-        JsonHandler &j = goods[db.integerValue("goods_id")];
+        JsonHandler &j = goods[db.integer("goods_id")];
         j["QTY_OUT2"] = db.doubleValue("qty");
         j["AMOUNT_OUT2"] = db.doubleValue("amount");
     }

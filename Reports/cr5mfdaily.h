@@ -25,7 +25,11 @@ private:
 
     void loadDoc(const QDate &date, int worker, int teamlead);
 
+    void refreshTasks();
+
 private slots:
+    void processTaskDbClick();
+
     void exportToExcel();
 
     void addWorker();
@@ -54,7 +58,9 @@ private slots:
 
     void on_leFilterWorker_textChanged(const QString &arg1);
 
-    void on_lstWorkers_itemChanged(QListWidgetItem *item);
+    void on_lstWorkers_itemClicked(QListWidgetItem *item);
+
+    void on_btnRefreshTask_clicked();
 };
 
 #endif // CR5MFDAILY_H

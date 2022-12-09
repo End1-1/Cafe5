@@ -25,6 +25,12 @@ public:
 
     void exportToExcel();
 
+    void setRowColor(int row, const QColor &c);
+
+    void setItemData(int row, int column, int role, const QVariant &d);
+
+    const QVariant itemData(int row, int column, int role) const;
+
     int addRow();
 
     void removeRow(int row);
@@ -45,11 +51,21 @@ public:
 
     QString totalStr(int column);
 
+    void setRowCount(int count);
+
     C5TableWithTotal &setData(int &row, int column, const QVariant &data, bool newrow = false);
 
     C5TableWithTotal &createLineEdit(int &row, int column, const QVariant &data, QObject *obj = nullptr, const char *slot = nullptr, bool newrow = false);
 
+    C5TableWithTotal &createLineEditDblClick(int &row, int column, QObject *obj = nullptr, const char *slot = nullptr, bool newrow = false);
+
+    void sumColumns();
+
     C5LineEdit *lineEdit(int row, int column);
+
+    void setWidget(int row, int column, QWidget *w);
+
+    bool findWidget(int &row, int &column, QWidget *w);
 
     void clearTables();
 

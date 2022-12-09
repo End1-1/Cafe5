@@ -56,8 +56,6 @@ signals:
 
     void multiDone(const QList<QList<QVariant> > &values);
 
-    void doubleClicked();
-
 };
 
 C5LineEditWithSelector *isLineEditWithSelector(QObject *o);

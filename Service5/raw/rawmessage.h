@@ -13,6 +13,7 @@ public:
     ~RawMessage();
     inline SslSocket *socket() {return fSocket;}
     void setHeader(quint32 msgPacketNum, quint32 msgId, quint16 msgType);
+    QByteArray header() const;
     static void setHeader(QByteArray &d, quint32 msgPacketNum, quint32 msgId, quint16 msgType);
     void setPacketNumber(quint32 n);
     static void setPacketNumber(QByteArray &d, quint32 n);
@@ -31,17 +32,20 @@ public:
     void readString(QString &s, const QByteArray &d);
     void readBytes(char *buf, const QByteArray &d);
     void clear();
+    void clear(const QByteArray &header);
+    int getPosition();
     void setPosition(int pos);
+    void writeToSocket();
+    quint32 fDataPosition;
+    QByteArray fReply;
 
 protected:
     SslSocket *fSocket;
-    QByteArray fReply;
     void setDataSize(quint32 sz);
 
 private:
     quint32 getDataSize();
     void increaseDataSize(quint32 sz);
-    quint32 fDataPosition;
 
 };
 

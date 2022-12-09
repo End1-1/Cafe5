@@ -146,12 +146,6 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
             shortcutAsterix();
             event->accept();
             return true;
-        case Qt::Key_A:
-            if (ke->modifiers() & Qt::ControlModifier) {
-                newSale(SALE_PREORDER);
-            }
-            event->ignore();
-            break;
         case Qt::Key_S:
             if (ke->modifiers() & Qt::ControlModifier) {
                 SearchItems *si = new SearchItems();
@@ -303,15 +297,7 @@ void Working::getGoods(int id)
     if (!w) {
         return;
     }
-    switch (w->fSaleType) {
-    case SALE_RETAIL:
-    case SALE_WHOSALE:
-        w->addGoods(id);
-        break;
-    case SALE_PREORDER:
-        w->addGoodsToTable(id);
-        break;
-    }
+    w->addGoods(id);
 }
 
 WOrder *Working::worder()
@@ -359,9 +345,6 @@ void Working::newSale(int type)
         break;
     case SALE_WHOSALE:
         title = tr("Whosale");
-        break;
-    case SALE_PREORDER:
-        title = tr("Preorder");
         break;
     }
     ui->tab->addTab(w, QString("%1 #%2").arg(title).arg(ordersCount()));
@@ -431,7 +414,7 @@ void Working::socketDisconnected()
     ui->btnServerSettings->setIcon(QIcon(":/wifi_off.png"));
 }
 
-void Working::socketDataReceived(quint16 cmd, QByteArray d)
+void Working::socketDataReceived(quint16 cmd, quint32 messageId, QByteArray d)
 {
     switch (cmd) {
     case MessageList::silent_auth:
@@ -859,7 +842,7 @@ void Working::on_btnNewWhosale_clicked()
 
 void Working::on_btnGoodsList_clicked()
 {
-    auto *dg = new DlgGoodsList();
+    auto *dg = new DlgGoodsList(worder()->currency());
     connect(dg, &DlgGoodsList::getGoods, this, &Working::getGoods);
     dg->showMaximized();
 }

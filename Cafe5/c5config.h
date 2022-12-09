@@ -110,13 +110,20 @@
 #define param_system_thouthand_separator 106
 #define param_tax_print_if_amount_less 107
 #define param_print_modificators_on_receipt 108
+#define param_waiter_donotclose_empty_order 109
+#define param_waiter_dontprint_final_receipt 110
+#define param_waiter_dish_after_day_change 111
+#define param_waiter_hall_chart 112
+#define param_choose_external_pos 113
+#define param_mobile_app_connection 114
+#define param_shop_scalecode 115
+#define param_default_currency 116
 
 #define FRONTDESK_WAITER 0
 #define FRONTDESK_SHOP 1
 
 #define SALE_RETAIL 1
 #define SALE_WHOSALE 2
-#define SALE_PREORDER 3
 #define SALE_RETURN 4
 
 class C5User;

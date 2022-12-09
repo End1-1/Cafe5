@@ -11,28 +11,54 @@
 #include "c5storedraftwriter.h"
 #include "printreceipt.h"
 #include "printtaxn.h"
+#include "printreceiptgroup.h"
+#include "c5printtaxanywhere.h"
+#include "selectprinters.h"
+#include "dlggetidname.h"
+#include <QClipboard>
+#include "dlgdate.h"
+#include "sslsocket.h"
 
 ViewOrder::ViewOrder(const QString &order) :
     C5Dialog(__c5config.dbParams()),
     ui(new Ui::ViewOrder)
 {
     ui->setupUi(this);
-    ui->btnSave->setVisible(__user->check(cp_t5_change_date_of_sale));
     fUuid = order;
     ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 30, 300, 100, 100, 100, 0, 200);
     C5Database db(__c5config.replicaDbParams());
     db[":f_id"] = order;
-    db.exec("select * from o_header where f_id=:f_id");
+    db.exec("select o.*, concat(' ', u.f_last, u.f_first) as f_saler, "
+            "concat_ws(' ', p.f_taxcode, p.f_taxname, p.f_contact, p.f_phone) as f_buyer "
+            "from o_header o "
+            "left join s_user u on u.f_id=o.f_staff "
+            "left join c_partners p on p.f_id=o.f_partner "
+            "where o.f_id=:f_id");
     if (db.nextRow()) {
-        ui->lbOrderNum->setText(QString("%1%2").arg(db.getString("f_prefix")).arg(db.getInt("f_hallid")));
+        ui->leOrderNum->setText(QString("%1%2").arg(db.getString("f_prefix")).arg(db.getInt("f_hallid")));
         ui->leAmount->setDouble(db.getDouble("f_amounttotal"));
         fSaleType = db.getInt("f_saletype");
         fPartner = db.getInt("f_partner");
         fSaleDoc = QString("%1%2, %3").arg(db.getString("f_prefix")).arg(db.getString("f_hallid")).arg(db.getDate("f_datecash").toString(FORMAT_DATE_TO_STR));
         ui->leDate->setDate(db.getDate("f_datecash"));
+        ui->leTime->setText(db.getTime("f_timeclose").toString("HH:mm"));
+        ui->leUUID->setText(db.getString("f_id"));
+        ui->leCash->setDouble(db.getDouble("f_amountcash"));
+        ui->leCard->setDouble(db.getDouble("f_amountcard"));
+        ui->leIdram->setDouble(db.getDouble("f_amountidram"));
+        ui->leSaler->setText(db.getString("f_saler"));
+        ui->leBuyer->setText(db.getString("f_buyer"));
     } else {
         C5Message::error(tr("Document is not exists"));
         return;
+    }
+    db[":f_id"] = order;
+    db.exec("select concat(' ', u.f_last, u.f_first) as f_deliveryman "
+            "from o_header_options o "
+            "left join s_user u on u.f_id=o.f_deliveryman "
+            "where o.f_id=:f_id");
+    if (db.nextRow()) {
+        ui->leDeliveryMan->setText(db.getString("f_deliveryman"));
     }
     db[":f_header"] = order;
     db.exec("select b.f_id, g.f_name, g.f_id as f_goodsid, b.f_qty, b.f_price, b.f_total, f_scancode,  "
@@ -56,15 +82,11 @@ ViewOrder::ViewOrder(const QString &order) :
             ui->tbl->checkBox(r, 1)->setEnabled(false);
         }
         ui->leTaxNumber->setText(db.getString("f_tax"));
+        ui->btnPrintFiscal->setVisible(ui->leTaxNumber->getInteger() == 0);
+        ui->btnTaxReturn->setVisible(!ui->btnPrintFiscal->isVisible());
     }
     if (ui->leAmount->getDouble() < 0) {
         ui->btnReturn->setVisible(false);
-    }
-    if (__c5config.rdbReplica()) {
-        db.exec("select * from o_header");
-        ui->btnRetryUpload->setVisible(db.nextRow());
-    } else {
-        ui->btnRetryUpload->setVisible(false);
     }
 }
 
@@ -202,7 +224,7 @@ void ViewOrder::on_btnReturn_clicked()
         if (!dw.updateField("o_goods", "f_returnfrom", ogoodsid, "f_id", ui->tbl->getString(i, 0))) {
             return returnFalse(dw.fErrorMsg, &db);
         }
-        if (!dw.updateField("o_header", "f_comment", QString("%1 %2").arg(tr("Return from")).arg(ui->lbOrderNum->text()), "f_id", oheaderid)) {
+        if (!dw.updateField("o_header", "f_comment", QString("%1 %2").arg(tr("Return from")).arg(ui->leOrderNum->text()), "f_id", oheaderid)) {
             return returnFalse(dw.fErrorMsg, &db);
         }
         ui->tbl->setInteger(i, 9, 1);
@@ -263,34 +285,11 @@ void ViewOrder::on_btnReturn_clicked()
     C5Message::info(tr("Return completed"));
 }
 
-void ViewOrder::on_pushButton_2_clicked()
-{
-    reject();
-}
-
 void ViewOrder::returnFalse(const QString &msg, C5Database *db)
 {
     C5Message::error(msg);
     db->rollback();
     db->close();
-}
-
-void ViewOrder::on_btnRetryUpload_clicked()
-{
-    C5Replication r;
-    if (r.uploadToServer()) {
-        ui->btnRetryUpload->setVisible(false);
-    } else {
-        C5Message::error(tr("Cannot upload data"));
-    }
-}
-
-void ViewOrder::on_btnSave_clicked()
-{
-    C5Database db(__c5config.dbParams());
-    db[":f_datecash"] = ui->leDate->date();
-    db.update("o_header", "f_id", fUuid);
-    C5Message::info(tr("Saved"));
 }
 
 void ViewOrder::on_btnTaxReturn_clicked()
@@ -322,4 +321,239 @@ void ViewOrder::on_btnTaxReturn_clicked()
         db.update("o_tax", "f_id", fUuid);
         C5Message::info(tr("Taxback complete"));
     }
+}
+
+void ViewOrder::on_btnClose_clicked()
+{
+    accept();
+}
+
+void ViewOrder::on_btnEditDate_clicked()
+{
+    QDate d;
+    if (DlgDate::getDate(d)) {
+        if (C5Message::question(tr("Confirm to change date")) != QDialog::Accepted) {
+            return;
+        }
+        C5Database db(fDBParams);
+        db[":f_datecash"] = d;
+        if (db.update("o_header", "f_id", ui->leUUID->text())) {
+            ui->leDate->setDate(d);
+        }
+    }
+}
+
+void ViewOrder::on_btnCopyUUID_clicked()
+{
+    qApp->clipboard()->setText(ui->leUUID->text());
+}
+
+void ViewOrder::on_btnEditDeliveryMan_clicked()
+{
+    QString id, name;
+    if (DlgGetIDName::get(__c5config.dbParams(), id, name, idname_users_fullname, this) == false) {
+        return;
+    }
+    if (C5Message::question(tr("Confirm to change the deliveryman")) != QDialog::Accepted) {
+        return;
+    }
+    C5Database db(fDBParams);
+    db[":f_deliveryman"] = id;
+    if (db.update("o_header_options", "f_id", ui->leUUID->text())) {
+        ui->leDeliveryMan->setText(name);
+    }
+}
+
+void ViewOrder::on_btnEditSaler_clicked()
+{
+    QString id, name;
+    if (DlgGetIDName::get(__c5config.dbParams(), id, name, idname_users_fullname, this) == false) {
+        return;
+    }
+    if (C5Message::question(tr("Confirm to change the saler")) != QDialog::Accepted) {
+        return;
+    }
+    C5Database db(fDBParams);
+    db[":f_staff"] = id;
+    if (db.update("o_header", "f_id", ui->leUUID->text())) {
+        ui->leSaler->setText(name);
+    }
+}
+
+void ViewOrder::on_btnEditBuyer_clicked()
+{
+    QString id, name;
+    if (DlgGetIDName::get(__c5config.dbParams(), id, name, idname_partners_full, this) == false) {
+        return;
+    }
+    if (C5Message::question(tr("Confirm to change the buyer")) != QDialog::Accepted) {
+        return;
+    }
+    C5Database db(fDBParams);
+    db[":f_partner"] = id;
+    if (db.update("o_header", "f_id", ui->leUUID->text())) {
+        ui->leBuyer->setText(name);
+    }
+}
+
+void ViewOrder::on_btnPrintReceipt_clicked()
+{
+    if (!C5Config::localReceiptPrinter().isEmpty()) {
+        C5Database db(C5Config::replicaDbParams());
+        PrintReceiptGroup p;
+        switch (C5Config::shopPrintVersion()) {
+        case 1: {
+            bool p1, p2;
+            if (SelectPrinters::selectPrinters(p1, p2)) {
+                if (p1) {
+                    p.print(ui->leUUID->text(), db, 1);
+                }
+                if (p2) {
+                    p.print(ui->leUUID->text(), db, 2);
+                }
+            }
+            break;
+        }
+        case 2:
+            p.print2(ui->leUUID->text(), db);
+            break;
+        default:
+            break;
+        }
+    }
+}
+
+void ViewOrder::on_btnPrintFiscal_clicked()
+{
+    if (C5Message::question(tr("Confirm to print fiscal")) != QDialog::Accepted) {
+        return;
+    }
+    QString rseq;
+    if (__c5config.taxPort() == 0) {
+        C5PrintTaxAnywhere p(__c5config.replicaDbParams(), ui->leUUID->text());
+        if (p.exec() == QDialog::Accepted) {
+            rseq = p.fReceiptNumber;
+            ui->leTaxNumber->setText(rseq);
+        }
+        on_btnPrintReceipt_clicked();
+    } else {
+        C5Database db(__c5config.replicaDbParams());
+        if (printCheckWithTax(db, ui->leUUID->text(), rseq)) {
+            ui->leTaxNumber->setText(rseq);
+        }
+    }
+}
+
+bool ViewOrder::printCheckWithTax(C5Database &db, const QString &id, QString &rseq)
+{
+    bool resultb = true;
+    db[":f_id"] = id;
+    db.exec("select * from o_tax where f_id=:f_id");
+    if (db.nextRow()) {
+        if (db.getInt("f_receiptnumber") > 0) {
+            C5Message::error(tr("Cannot print tax twice"));
+            return resultb;
+        }
+    }
+    if (__c5config.taxIP().toLower() == "http") {
+        QString url = QString("GET /printtax?auth=up&a=get&user=%1&pass=%2&order=%3 HTTP/1.1\r\n\r\n")
+                .arg(__c5config.httpServerUsername(),__c5config.httpServerPassword(),id);
+        auto *s = new QSslSocket(0);
+        //connect(s, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(err(QAbstractSocket::SocketError)));
+        s->addCaCertificate(fSslCertificate);
+        s->setPeerVerifyMode(QSslSocket::VerifyNone);
+        s->connectToHostEncrypted(__c5config.httpServerIP(), __c5config.httpServerPort());
+        if (s->waitForEncrypted(5000)) {
+            s->write(url.toUtf8());
+            if (s->waitForBytesWritten()) {
+                s->waitForReadyRead();
+                QByteArray d = s->readAll();
+                C5Message::info(d);
+            } else {
+                resultb = false;
+                C5Message::error(s->errorString());
+            }
+            s->close();
+        }
+        s->deleteLater();
+        return resultb;
+    }
+    db[":f_id"] = id;
+    db.exec("select * from o_header where f_id=:f_id");
+    db.nextRow();
+    double card = db.getDouble("f_amountcard");
+    double idram = db.getDouble("f_idram");
+    int partner = db.getInt("f_partner");
+    QString useExtPos = idram > 0.01 ? "true" : C5Config::taxUseExtPos();
+    QString partnerHvhh;
+    if (partner > 0) {
+        db[":f_id"] = partner;
+        db.exec("select f_taxcode from c_partners where f_id=:f_id");
+        if (db.nextRow()) {
+            partnerHvhh = db.getString(0);
+        }
+    }
+    db[":f_id"] = id;
+    db.exec("select og.f_id, og.f_goods, g.f_name, og.f_qty, gu.f_name as f_unitname, og.f_price, og.f_total,"
+            "t.f_taxdept, t.f_adgcode, "
+            "og.f_store "
+            "from o_goods og "
+            "left join c_goods g on g.f_id=og.f_goods "
+            "left join c_units gu on gu.f_id=g.f_unit "
+            "left join c_groups t on t.f_id=g.f_group "
+            "where og.f_header=:f_id");
+    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), useExtPos, C5Config::taxCashier(), C5Config::taxPin(), 0);
+    pt.fPartnerTin = partnerHvhh;
+    while (db.nextRow()) {
+        pt.addGoods(db.getString("f_taxdept"), //dep
+                    db.getString("f_adgcode"), //adg
+                    db.getString("f_goods"), //goods id
+                    db.getString("f_name"), //name
+                    db.getDouble("f_price"), //price
+                    db.getDouble("f_qty"), //qty
+                    db.getDouble("f_discountfactor") * 100); //discount
+    }
+    QString jsonIn, jsonOut, err;
+    QString sn, firm, address, fiscal, hvhh, devnum, time;
+    int result = 0;
+    result = pt.makeJsonAndPrint(card, 0, jsonIn, jsonOut, err);
+
+    db[":f_id"] = db.uuid();
+    db[":f_order"] = id;
+    db[":f_date"] = QDate::currentDate();
+    db[":f_time"] = QTime::currentTime();
+    db[":f_in"] = jsonIn;
+    db[":f_out"] = jsonOut;
+    db[":f_err"] = err;
+    db[":f_result"] = result;
+    db.insert("o_tax_log", false);
+    QSqlQuery *q = new QSqlQuery(db.fDb);
+    if (result == pt_err_ok) {
+        PrintTaxN::parseResponse(jsonOut, firm, hvhh, fiscal, rseq, sn, address, devnum, time);
+        db[":f_id"] = id;
+        db.exec("delete from o_tax where f_id=:f_id");
+        db[":f_id"] = id;
+        db[":f_dept"] = C5Config::taxDept();
+        db[":f_firmname"] = firm;
+        db[":f_address"] = address;
+        db[":f_devnum"] = devnum;
+        db[":f_serial"] = sn;
+        db[":f_fiscal"] = fiscal;
+        db[":f_receiptnumber"] = rseq;
+        db[":f_hvhh"] = hvhh;
+        db[":f_fiscalmode"] = tr("(F)");
+        db[":f_time"] = time;
+        db.insert("o_tax", false);
+        pt.saveTimeResult(id, *q);
+        db[":f_tax"] = rseq.toInt();
+        db.update("o_goods", "f_header", id);
+        delete q;
+        C5Message::info(tr("Printed"));
+    } else {
+        resultb = false;
+        pt.saveTimeResult("Not saved - " + id, *q);
+        delete q;
+        C5Message::error(err + "<br>" + jsonOut + "<br>" + jsonIn);
+    }
+    return resultb;
 }

@@ -148,7 +148,6 @@ void C5LineEdit::keyPressEvent(QKeyEvent *e)
             return;
         }
     }
-    qDebug() << e->key();
     QLineEdit::keyPressEvent(e);
 }
 

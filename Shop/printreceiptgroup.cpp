@@ -2,6 +2,7 @@
 #include "c5printing.h"
 #include "c5config.h"
 #include "c5utils.h"
+#include "c5logsystem.h"
 #include "QRCodeGenerator.h"
 #include <QApplication>
 
@@ -13,6 +14,7 @@ PrintReceiptGroup::PrintReceiptGroup(QObject *parent) :
 
 void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
 {
+    C5LogSystem::writeEvent("print started");
     double cash = 0;
     double change = 0;
     db[":f_id"] = id;
@@ -66,6 +68,7 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
         }
     }
 
+    C5LogSystem::writeEvent("before pricee");
     QString price1, price2;
     switch (rw) {
     case 1:
@@ -139,6 +142,7 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
         amountTotal += db.getDouble("f_total");
     }
 
+    C5LogSystem::writeEvent("Before font");
     QFont font(qApp->font());
     font.setPointSize(20);
     C5Printing p;
@@ -204,6 +208,8 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
     p.br();
     p.line(3);
     p.br(3);
+
+    C5LogSystem::writeEvent("row 212 ");
     for (int i = 0; i < data.count(); i++) {
         if (__c5config.getValue(param_shop_print_goods_qty_side_down).toInt() == 1) {
             p.ltext(QString("%1").arg(data.at(i).at(0).toString()), 0);
@@ -314,6 +320,7 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
 
 void PrintReceiptGroup::print2(const QString &id, C5Database &db)
 {
+    C5LogSystem::writeEvent("Print2 started");
     QMap<QString, QVariant> returnFrom;
     double cash = 0;
     double change = 0;
@@ -334,7 +341,10 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
 
     db[":f_id"] = id;
     db.exec("select * from o_header where f_id=:f_id");
-    db.nextRow();
+    if (!db.nextRow()) {
+        C5LogSystem::writeEvent("Remove log: header failed for: " + id);
+        return;
+    }
     QString saletype;
     if (db.getDouble("f_amounttotal") < 0) {
         saletype = tr("Return");

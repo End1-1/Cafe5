@@ -820,3 +820,148 @@ alter table a_sale_temp add column f_comment tinytext;
 alter table a_sale_temp add column f_printer tinytext;
 alter table a_sale_temp add column f_store int;
 alter table a_sale_temp add column f_customer int;
+
+/*  db - 77, 19.07.2022 */
+update s_app set f_version='77' where f_app='DB';
+create table o_header_hotel (f_id char(36) primary key, f_guestcount tinyint, f_guest integer, f_checkin date, f_checkout date, f_roomrate decimal(14,2));
+create table o_header_hotel_date (f_id integer primary key auto_increment, f_header char(36), f_date date, f_1 tinyint, f_2 tinyint);
+
+/*  db - 78, 13.07.2022 */
+update s_app set f_version='77' where f_app='DB';
+ALTER TABLE d_dish ADD COLUMN f_adgt VARCHAR(8);
+
+/*  db - 79, 31.07.2022 */
+update s_app set f_version='79' where f_app='DB';
+CREATE TABLE `mf_daily_process` (
+	`f_id` INT(11) NOT NULL AUTO_INCREMENT,
+	`f_date` DATE NULL DEFAULT NULL,
+	`f_worker` INT(11) NULL DEFAULT NULL,
+	`f_product` INT(11) NULL DEFAULT NULL,
+	`f_process` INT(11) NULL DEFAULT NULL,
+	`f_qty` INT(11) NULL DEFAULT NULL,
+	`f_price` DECIMAL(14,2) NULL DEFAULT NULL,
+	`f_taskid` INT(11) NULL DEFAULT NULL,
+	PRIMARY KEY (`f_id`) USING BTREE,
+	INDEX `idx_mfdailyprocess_date` (`f_date`) USING BTREE,
+	INDEX `idx_mfdailyprocess_worker` (`f_worker`) USING BTREE
+)
+COLLATE='utf8mb3_general_ci'
+ENGINE=InnoDB
+AUTO_INCREMENT=22
+;
+CREATE TABLE `mf_actions` (
+	`f_id` INT(11) NOT NULL AUTO_INCREMENT,
+	`f_name` TINYTEXT NULL DEFAULT NULL COLLATE 'utf8mb3_general_ci',
+	`f_state` INT(11) NULL DEFAULT NULL,
+	PRIMARY KEY (`f_id`) USING BTREE
+)
+COLLATE='utf8mb3_general_ci'
+ENGINE=InnoDB
+AUTO_INCREMENT=1
+;
+
+select * from s_appCREATE TABLE `mf_tasks_state` (
+  `f_id` int(11) NOT NULL AUTO_INCREMENT,
+  `f_name` tinytext DEFAULT NULL,
+  PRIMARY KEY (`f_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb3;
+
+
+
+create table mf_tasks (f_id integer primary key auto_increment, f_datecreate date, f_timecreate time, f_user integer, f_product integer, f_qty decimal(14,2));
+alter table mf_tasks add column f_state tinyint after f_id;
+alter table mf_tasks add column f_ready decimal(9,3);
+alter table mf_tasks add column f_step integer;
+create table mf_stage (f_id integer primary key auto_increment, f_name tinytext);
+create table mf_task_stage (f_id integer primary key auto_increment, f_task integer, f_date date, f_time time, f_stage integer);
+alter table mf_tasks drop column f_step, add column f_stage integer;
+alter table mf_tasks add column f_workshop integer;
+create table mf_task_workshop (f_id integer primary key auto_increment, f_task integer, f_date date, f_time time, f_workshop integer);
+create table files (f_id integer primary key auto_increment, f_table tinytext, f_rec integer, f_storetype tinyint, f_filename varchar(1024), f_filebytes longblob); 
+
+/*  db - 80, 01.09.2022 */
+update s_app set f_version='80' where f_app='DB';
+alter table mf_tasks add column f_out decimal(14,3) after f_ready , add column f_notes text;
+alter table mf_daily_process add column f_laststep tinyint;
+create table mf_tasks_output (f_id integer primary key auto_increment, f_task integer, f_date date, f_qty decimal(14,3));
+
+/*  db - 81, 08.09.2022 */
+update s_app set f_version='81' where f_app='DB';
+alter table o_Header add column f_hotel decimal(14,2);
+create table mf_tasks_state (f_id integer primary key auto_increment, f_name tinytext);
+insert into mf_tasks_state (f_id, f_name) values  (1, 'Ընդացիկ'), (2, 'Ավարտված'), (3, 'Չեղարկված');
+
+/*  db - 82, 11.11.2022 */
+update s_app set f_version='82' where f_app='DB';
+alter table o_body add f_row smallint;
+INSERT INTO `b_card_types` (`f_id`, `f_name`) VALUES ('6', 'Զեղչ հատուկ ապրանքների վրա');
+alter table d_dish add column f_specialdiscount decimal(6,3);
+
+/*  db - 83, 12.11.2022 */
+update s_app set f_version='83' where f_app='DB';
+create table e_currency (f_id integer primary key auto_increment, f_name tinytext, f_rate decimal(14,3));
+insert into e_currency (f_id, f_name, f_rate) values (1, 'AMD', 1), (2, 'USD', 390), (3, 'EUR', 380);
+CREATE table e_currency_rate_history (f_id integer primary key, f_date date, f_currency integer, f_rate decimal(14,3));
+
+/*  db - 84, 17.11.2022 */
+update s_app set f_version='84' where f_app='DB';
+alter table e_cash_names add column f_currency integer;
+alter table e_currency add column f_symbol varchar(2);
+update e_currency set f_symbol='֏' where f_id='1';
+update e_currency set f_symbol='$' where f_id='2';
+update e_currency set f_symbol='€' where f_id='3';
+alter table a_header add f_currency integer;
+create table c_goods_prices (f_id integer primary key auto_increment, f_goods integer, f_currency integer, f_price1 decimal(14,2), f_price2 decimal(14,2));
+
+/*  db - 85, 17.11.2022 */
+update s_app set f_version='85' where f_app='DB';
+alter table c_goods add column f_price_margin decimal(14,3);
+create table c_goods_scancode_counter (f_id integer primary key auto_increment, f_digitsnumber tinyint, f_counter integer);
+insert into c_goods_scancode_counter (f_digitsnumber, f_counter) values (7, 0);
+ALTER TABLE `e_currency_rate_history`CHANGE COLUMN `f_id` `f_id` INT(11) NOT NULL AUTO_INCREMENT FIRST;
+alter table c_goods add column f_base_currency tinyint;
+create table e_currency_cross_rate (f_id integer primary key auto_increment, f_currency1 integer, f_currency2 integer, f_rate decimal(14,3));
+create table e_currency_cross_rate_history (f_id integer primary key auto_increment, f_date date, f_currency1 integer, f_currency2 integer, f_rate decimal(14,3));
+
+/*  db - 86, 17.11.2022 */
+update s_app set f_version='86' where f_app='DB';
+alter table o_header_options add column f_deliveryman integer;
+
+/*  db - 87, 17.11.2022 */
+update s_app set f_version='87' where f_app='DB';
+alter table s_user add column f_passhash tinytext, add column f_firebase_token tinytext;
+
+/*  db - 88, 17.11.2022 */
+update s_app set f_version='88' where f_app='DB';
+alter table a_dc add column f_currency integer after f_id;
+alter table o_header_options add column f_currency integer;
+
+/* db - 89, 30.11.2022 */
+DROP TABLE a_dc;                                                                                                                              
+create table a_dc (f_id char(36), f_currency INT, f_debit varchar(12), f_credit varchar(12), f_doc char(36), f_dc tinyint, f_amount decimal(14,2));
+ALTER TABLE `a_dc` ADD INDEX `id_adc_dc` (`f_dc` ASC) ;                                                                                       
+ALTER TABLE `a_dc` ADD INDEX `fk_adc_doc_idx` (`f_doc` ASC);                                                                                  
+ALTER TABLE `a_dc` ADD CONSTRAINT `fk_adc_doc` FOREIGN KEY (`f_doc`) REFERENCES `a_header` (`f_id`)  ON DELETE NO ACTION  ON UPDATE NO ACTION;
+ALTER TABLE `e_currency_rate_history` CHANGE COLUMN `f_rate` `f_rate` DECIMAL(14,4) NULL DEFAULT NULL AFTER `f_currency`;
+ALTER TABLE `e_currency_cross_rate_history` CHANGE COLUMN `f_rate` `f_rate` DECIMAL(14,4) NULL DEFAULT NULL AFTER `f_currency2`;
+insert into a_reason (f_id, f_name) values (10, 'Ապակոմպլեկտավորում');
+
+/* db - 90, 01.12.2022 */
+update s_app set f_version='90' where f_app='DB';
+ALTER TABLE c_goods ADD COLUMN f_price_margin2 DECIMAL(14,2);
+ALTER TABLE `c_goods_prices` CHANGE COLUMN `f_price1` `f_price1` DECIMAL(14,4) NULL DEFAULT NULL AFTER `f_currency`, CHANGE COLUMN `f_price2` `f_price2` DECIMAL(14,4) NULL DEFAULT NULL AFTER `f_price1`;
+alter table c_goods change f_lastinputprice f_lastinputprice decimal(14,4);
+
+/* db - 91, 06.12.2022 */
+update s_app set f_version='91' where f_app='DB';
+ALTER TABLE `c_goods_prices` ADD CONSTRAINT `fk_goods_price_goods` FOREIGN KEY (`f_goods`) REFERENCES `c_goods` (`f_id`) ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE `c_goods_prices` ADD CONSTRAINT `fk_goods_price_currency` FOREIGN KEY (`f_currency`) REFERENCES `e_currency` (`f_id`) ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE `a_header` ADD INDEX `f_currency` (`f_currency`) USING BTREE;
+ALTER TABLE c_goods_prices CHANGE f_price1 f_price1 DECIMAL(16,7), CHANGE f_price2 f_price2 DECIMAL(17,7);
+ALTER TABLE c_goods CHANGE f_lastinputprice f_lastinputprice DECIMAL(16,7);
+ALTER TABLE e_currency_cross_rate CHANGE f_rate f_rate DECIMAL(16,7);
+ALTER TABLE e_currency_cross_rate_history CHANGE f_rate f_rate DECIMAL(16,7);
+
+/* db - 92, 06.12.2022 */
+update s_app set f_version='92' where f_app='DB';
+alter table c_goods add column f_adg tinytext;

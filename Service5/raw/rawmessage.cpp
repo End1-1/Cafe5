@@ -16,6 +16,11 @@ void RawMessage::setHeader(quint32 msgPacketNum, quint32 msgId, quint16 msgType)
     setHeader(fReply, msgPacketNum, msgId, msgType);
 }
 
+QByteArray RawMessage::header() const
+{
+    return fReply.mid(0, 17);
+}
+
 void RawMessage::setHeader(QByteArray &d, quint32 msgPacketNum, quint32 msgId, quint16 msgType)
 {
     d.replace(3, 4, reinterpret_cast<const char*>(&msgPacketNum), sizeof(msgPacketNum));
@@ -121,7 +126,8 @@ void RawMessage::readString(QString &s, const QByteArray &d)
     quint32 sz;
     readUInt(sz, d);
     fDataPosition += sz;
-    s = d.mid(fDataPosition - sz, sz);
+    s = QString::fromUtf8(d.mid(fDataPosition - sz, sz));
+    qDebug() << s;
 }
 
 void RawMessage::readBytes(char *buf, const QByteArray &d)
@@ -160,9 +166,25 @@ void RawMessage::clear()
     fDataPosition = 0;
 }
 
+void RawMessage::clear(const QByteArray &header)
+{
+    fReply.clear();
+    fReply.append(header);;
+}
+
+int RawMessage::getPosition()
+{
+    return fDataPosition;
+}
+
 void RawMessage::setPosition(int pos)
 {
     fDataPosition = pos;
+}
+
+void RawMessage::writeToSocket()
+{
+    fSocket->write(data());
 }
 
 quint32 RawMessage::getDataSize()

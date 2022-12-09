@@ -287,6 +287,9 @@
         <property name="enabled">
          <bool>true</bool>
         </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
         <property name="readOnly">
          <bool>true</bool>
         </property>
@@ -521,6 +524,16 @@
              </size>
             </property>
            </spacer>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_18">
+            <property name="text">
+             <string>Currency</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="cbCurrency"/>
           </item>
           <item>
            <widget class="QCheckBox" name="chWholeGroup">
@@ -1651,11 +1664,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5LineEdit</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5lineedit.h</header>
-  </customwidget>
-  <customwidget>
    <class>C5LineEditWithSelector</class>
    <extends>QLineEdit</extends>
    <header location="global">c5lineeditwithselector.h</header>
@@ -1669,6 +1677,11 @@
    <class>C5TableWidget</class>
    <extends>QTableWidget</extends>
    <header location="global">c5tablewidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5LineEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5lineedit.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

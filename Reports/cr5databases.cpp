@@ -143,6 +143,10 @@ void CR5Databases::backupDatabase()
 
 void CR5Databases::resetDatabase()
 {
+    if (!fTableView->currentIndex().isValid()) {
+        C5Message::info(tr("Nothing was selected"));
+        return;
+    }
     QList<QVariant> values = fModel->getRowValues(fTableView->currentIndex().row());
     if (values.at(0).toString().isEmpty()) {
         return;
@@ -159,11 +163,14 @@ void CR5Databases::resetDatabase()
         if (dr->saleAndBuy()) {
             db.exec("delete from op_body");
             db.exec("delete from op_header");
+            db.exec("delete from a_calc_price");
+            db.exec("delete from a_dc");
             db.exec("delete from a_complectation_additions");
             db.exec("delete from a_header_shop2partner");
             db.exec("delete from a_header_shop2partneraccept");
             db.exec("delete from a_store");
             db.exec("delete from a_store_draft");
+            db.exec("delete from a_sale_temp");
             db.exec("delete from e_cash");
             db.exec("delete from a_header_store");
             db.exec("delete from a_header_cash");
@@ -178,6 +185,8 @@ void CR5Databases::resetDatabase()
             db.exec("delete from o_goods");
             db.exec("delete from o_body");
             db.exec("delete from o_preorder");
+            db.exec("delete from o_header_hotel");
+            db.exec("delete from o_header_hotel_date");
             db.exec("delete from o_header_options");
             db.exec("delete from o_header_flags");
             db.exec("delete from o_header");

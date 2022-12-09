@@ -7,7 +7,7 @@
 #include <QStringList>
 #include <QJsonObject>
 
-bool writeOutput(const QString &docId, QString &err, Database &db);
+//bool writeOutput(const QString &docId, QString &err, Database &db);
 bool writeMovement(const QString &orderid, int goods, double qty, int srcStore, Database &db);
 void checkQty(QJsonObject &ord, const QString &orderid, Database &db);
 bool validateMultipartFormData(RequestHandler &rh, QJsonObject &ord, const QByteArray &data, const QHash<QString, DataAddress> &dataMap);

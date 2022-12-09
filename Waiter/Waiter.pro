@@ -79,6 +79,7 @@ SOURCES += \
     ../Classes/notificationwidget.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
     ../Classes/threadsendmessage.cpp \
+    ../Controls/c5cleartablewidget.cpp \
     ../Controls/c5guicontrols.cpp \
     ../Controls/c5tablewidget.cpp \
     ../DbData/datadriver.cpp \
@@ -110,6 +111,7 @@ SOURCES += \
     ../DbData/dbusers.cpp \
     ../Forms/c5filtervalues.cpp \
     ../Forms/change.cpp \
+    ../Forms/dlgguestinfo.cpp \
     ../Forms/dlglistofdishcomments.cpp \
     ../Forms/dlgqty.cpp \
     ../Shop/printreceipt.cpp \
@@ -128,6 +130,7 @@ SOURCES += \
     dlgmanagertools.cpp \
     dlgprecheckoptions.cpp \
     dlgpreorder.cpp \
+    dlgreservation.cpp \
     dlgscreen.cpp \
     dlgshiftrotation.cpp \
     dlgsplitorder.cpp \
@@ -245,6 +248,7 @@ HEADERS += \
     ../Classes/notificationwidget.h \
     ../Classes/proxytablewidgetdatabase.h \
     ../Classes/threadsendmessage.h \
+    ../Controls/c5cleartablewidget.h \
     ../Controls/c5guicontrols.h \
     ../Controls/c5tablewidget.h \
     ../DbData/datadriver.h \
@@ -276,6 +280,7 @@ HEADERS += \
     ../DbData/dbusers.h \
     ../Forms/c5filtervalues.h \
     ../Forms/change.h \
+    ../Forms/dlgguestinfo.h \
     ../Forms/dlglistofdishcomments.h \
     ../Forms/dlgqty.h \
     ../Service/servicecommands.h \
@@ -319,6 +324,7 @@ HEADERS += \
     ../Classes/c5printremovedservicethread.h \
     dlgprecheckoptions.h \
     dlgpreorder.h \
+    dlgreservation.h \
     dlgscreen.h \
     dlgshiftrotation.h \
     dlgsplitorder.h \
@@ -376,6 +382,7 @@ FORMS += \
     ../Classes/notificationwidget.ui \
     ../Forms/c5filtervalues.ui \
     ../Forms/change.ui \
+    ../Forms/dlgguestinfo.ui \
     ../Forms/dlglistofdishcomments.ui \
     ../Forms/dlgqty.ui \
     ../Shop/selectprinters.ui \
@@ -396,6 +403,7 @@ FORMS += \
     ../Classes/c5printpreview.ui \
     dlgprecheckoptions.ui \
     dlgpreorder.ui \
+    dlgreservation.ui \
     dlgscreen.ui \
     dlgshiftrotation.ui \
     dlgsplitorder.ui \

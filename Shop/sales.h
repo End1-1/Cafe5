@@ -29,8 +29,6 @@ private slots:
 
     void on_btnDateRight_clicked();
 
-    void on_btnPrint_clicked();
-
     void on_btnItemBack_clicked();
 
     void on_btnRefresh_clicked();
@@ -41,8 +39,6 @@ private slots:
 
     void on_btnTotalByItems_clicked();
 
-    void on_btnPrintTax_clicked();
-
     void on_btnRetryUpload_clicked();
 
     void on_btnCashColletion_clicked();
@@ -51,13 +47,15 @@ private slots:
 
     void on_btnGroups_clicked();
 
-    void on_btnChangeDate_clicked();
-
     void on_btnPrintTaxZ_clicked();
 
     void on_btnPrintTaxX_clicked();
 
     void on_btnExit_clicked();
+
+    void on_btnViewOrder_clicked();
+
+    void on_btnChangeDate_clicked();
 
 private:
     Ui::Sales *ui;

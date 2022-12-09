@@ -146,7 +146,9 @@ SOURCES += \
     menudialog.cpp \
     menudish.cpp \
     sessionorders.cpp \
+    sessionshistory.cpp \
     supplier.cpp \
+    wcustomerdisplay.cpp \
         workspace.cpp \
     ../Cafe5/c5config.cpp \
     ../Cafe5/c5connection.cpp \
@@ -280,7 +282,9 @@ HEADERS += \
     rc.h \
     res.rc \
     sessionorders.h \
+    sessionshistory.h \
     supplier.h \
+    wcustomerdisplay.h \
         workspace.h \
     ../Cafe5/c5config.h \
     ../Cafe5/c5connection.h \
@@ -317,7 +321,9 @@ FORMS += \
     menudialog.ui \
     menudish.ui \
     sessionorders.ui \
+    sessionshistory.ui \
     supplier.ui \
+    wcustomerdisplay.ui \
         workspace.ui \
     ../Cafe5/c5connection.ui \
     ../Cafe5/c5message.ui

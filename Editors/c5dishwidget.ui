@@ -42,89 +42,10 @@
           <string>Main</string>
          </property>
          <layout class="QGridLayout" name="gridLayout">
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_4">
-            <property name="text">
-             <string>Name</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="C5LineEditWithSelector" name="leCode">
-            <property name="maximumSize">
-             <size>
-              <width>100</width>
-              <height>16777215</height>
-             </size>
-            </property>
+          <item row="5" column="1" colspan="2">
+           <widget class="C5LineEditWithSelector" name="leAdgt">
             <property name="Field" stdset="0">
-             <string>f_id</string>
-            </property>
-            <property name="Primary" stdset="0">
-             <bool>true</bool>
-            </property>
-            <property name="Manual" stdset="0">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_6">
-            <property name="text">
-             <string>Description</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1" colspan="4">
-           <widget class="C5LineEditWithSelector" name="lineEdit_3">
-            <property name="Field" stdset="0">
-             <string>f_comment</string>
-            </property>
-            <property name="Type" stdset="0">
-             <string>0</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1" colspan="4">
-           <widget class="C5LineEditWithSelector" name="leName">
-            <property name="Field" stdset="0">
-             <string>f_name</string>
-            </property>
-            <property name="Type" stdset="0">
-             <string>0</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_2">
-            <property name="text">
-             <string>Type</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>Code</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2">
-           <widget class="C5LineEditWithSelector" name="lePart1Name">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>200</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
-            <property name="FieldRef" stdset="0">
-             <string>f_part1</string>
+             <string>f_adgt</string>
             </property>
            </widget>
           </item>
@@ -147,6 +68,49 @@
             </property>
             <property name="Check" stdset="0">
              <string>empty=&quot;Type&quot;</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>Type</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1" colspan="2">
+           <widget class="C5LineEditWithSelector" name="leBarcode">
+            <property name="Field" stdset="0">
+             <string>f_barcode</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1" colspan="4">
+           <widget class="C5LineEditWithSelector" name="leName">
+            <property name="Field" stdset="0">
+             <string>f_name</string>
+            </property>
+            <property name="Type" stdset="0">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="C5LineEditWithSelector" name="lePart1Name">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>200</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="FieldRef" stdset="0">
+             <string>f_part1</string>
             </property>
            </widget>
           </item>
@@ -177,6 +141,56 @@
             </property>
            </widget>
           </item>
+          <item row="3" column="1" colspan="4">
+           <widget class="C5LineEditWithSelector" name="lineEdit_3">
+            <property name="Field" stdset="0">
+             <string>f_comment</string>
+            </property>
+            <property name="Type" stdset="0">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="label_8">
+            <property name="text">
+             <string>Adgt</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_6">
+            <property name="text">
+             <string>Description</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>Code</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="C5LineEditWithSelector" name="leCode">
+            <property name="maximumSize">
+             <size>
+              <width>100</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="Field" stdset="0">
+             <string>f_id</string>
+            </property>
+            <property name="Primary" stdset="0">
+             <bool>true</bool>
+            </property>
+            <property name="Manual" stdset="0">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
           <item row="4" column="0">
            <widget class="QLabel" name="label">
             <property name="text">
@@ -184,10 +198,10 @@
             </property>
            </widget>
           </item>
-          <item row="4" column="1" colspan="2">
-           <widget class="C5LineEditWithSelector" name="leBarcode">
-            <property name="Field" stdset="0">
-             <string>f_barcode</string>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_4">
+            <property name="text">
+             <string>Name</string>
             </property>
            </widget>
           </item>
@@ -282,7 +296,7 @@
           <string>Additional</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_3">
-          <item row="3" column="0" colspan="2">
+          <item row="4" column="0" colspan="2">
            <widget class="C5CheckBox" name="checkBox_2">
             <property name="text">
              <string>Append service fee</string>
@@ -292,10 +306,63 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_5">
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_7">
             <property name="text">
-             <string>Queue</string>
+             <string>Color</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_10">
+            <property name="text">
+             <string>Hourly payment</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0">
+           <widget class="C5CheckBox" name="checkBox_3">
+            <property name="text">
+             <string>Reminder</string>
+            </property>
+            <property name="Field" stdset="0">
+             <string>f_remind</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0" colspan="2">
+           <widget class="C5CheckBox" name="checkBox">
+            <property name="text">
+             <string>Can discount</string>
+            </property>
+            <property name="Field" stdset="0">
+             <string>f_discount</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="0">
+           <widget class="C5CheckBox" name="checkBox_4">
+            <property name="text">
+             <string>Extra</string>
+            </property>
+            <property name="Field" stdset="0">
+             <string>f_extra</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="C5LineEditWithSelector" name="leHourlyPayment">
+            <property name="maximumSize">
+             <size>
+              <width>50</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="Field" stdset="0">
+             <string>f_hourlypayment</string>
+            </property>
+            <property name="Type" stdset="0">
+             <number>1</number>
             </property>
            </widget>
           </item>
@@ -321,27 +388,10 @@
             </property>
            </widget>
           </item>
-          <item row="5" column="0">
-           <widget class="C5CheckBox" name="checkBox_3">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_5">
             <property name="text">
-             <string>Reminder</string>
-            </property>
-            <property name="Field" stdset="0">
-             <string>f_remind</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_10">
-            <property name="text">
-             <string>Hourly payment</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_7">
-            <property name="text">
-             <string>Color</string>
+             <string>Queue</string>
             </property>
            </widget>
           </item>
@@ -361,18 +411,15 @@
             </property>
            </widget>
           </item>
-          <item row="4" column="0" colspan="2">
-           <widget class="C5CheckBox" name="checkBox">
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_11">
             <property name="text">
-             <string>Can discount</string>
-            </property>
-            <property name="Field" stdset="0">
-             <string>f_discount</string>
+             <string>Special dicount</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
-           <widget class="C5LineEditWithSelector" name="leHourlyPayment">
+          <item row="3" column="1">
+           <widget class="C5LineEditWithSelector" name="leQueue_2">
             <property name="maximumSize">
              <size>
               <width>50</width>
@@ -380,20 +427,10 @@
              </size>
             </property>
             <property name="Field" stdset="0">
-             <string>f_hourlypayment</string>
+             <string>f_specialdiscount</string>
             </property>
             <property name="Type" stdset="0">
-             <number>1</number>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="0">
-           <widget class="C5CheckBox" name="checkBox_4">
-            <property name="text">
-             <string>Extra</string>
-            </property>
-            <property name="Field" stdset="0">
-             <string>f_extra</string>
+             <string>1</string>
             </property>
            </widget>
           </item>
@@ -965,14 +1002,14 @@
    <header location="global">c5lineeditwithselector.h</header>
   </customwidget>
   <customwidget>
-   <class>C5CheckBox</class>
-   <extends>QCheckBox</extends>
-   <header location="global">c5checkbox.h</header>
-  </customwidget>
-  <customwidget>
    <class>C5TableWidget</class>
    <extends>QTableWidget</extends>
    <header location="global">c5tablewidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5CheckBox</class>
+   <extends>QCheckBox</extends>
+   <header location="global">c5checkbox.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

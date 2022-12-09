@@ -48,6 +48,11 @@ bool DbDishes::canDiscount(int id)
     return get(id, "f_discount").toInt() > 0;
 }
 
+double DbDishes::specialDiscount(int id)
+{
+    return get(id, "f_specialdiscount").toDouble();
+}
+
 int DbDishes::group(int id)
 {
     return get(id, "f_part").toInt();

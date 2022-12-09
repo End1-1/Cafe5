@@ -66,7 +66,9 @@ CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
                     << "left join c_goods_classes gcb on gcb.f_id=gg.f_group2 [gcb]"
                     << "left join c_goods_classes gcc on gcc.f_id=gg.f_group3 [gcc]"
                     << "left join c_goods_classes gcd on gcd.f_id=gg.f_group4 [gcd]"
+                    << "left join c_goods_prices gpr on gpr.f_goods=gg.f_id [gpr]"
                     << "left join c_units u on u.f_id=gg.f_unit [u]"
+                    << "left join e_currency cr on cr.f_id=gpr.f_currency [cr]"
                        ;
 
     fColumnsFields << "gg.f_id"
@@ -75,12 +77,13 @@ CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
                    << "u.f_name as f_unitname"
                    << "gg.f_name"
                    << "gg.f_scancode"
-                   << "gg.f_saleprice"
-                   << "gg.f_saleprice2"
+                   << "gpr.f_price1"
+                   << "gpr.f_price2"
+                   << "cr.f_symbol as f_currencyname"
                    << "gg.f_lowlevel"
                    << "gg.f_lastinputprice"
                    << "g.f_chargevalue"
-                   << "(gg.f_saleprice/gg.f_lastinputprice*100)-100 as f_realchargevalue"
+                   << "(ggpr.f_price1/gg.f_lastinputprice*100)-100 as f_realchargevalue"
                    << "gg.f_acc"
                    << "gca.f_name as gname1"
                    << "gcb.f_name as gname2"
@@ -95,13 +98,14 @@ CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
     fColumnsVisible["g.f_name as f_groupname"] = true;
     fColumnsVisible["u.f_name as f_unitname"] = true;
     fColumnsVisible["gg.f_name"] = true;
-    fColumnsVisible["gg.f_saleprice"] = true;
-    fColumnsVisible["gg.f_saleprice2"] = true;
+    fColumnsVisible["gpr.f_price1"] = true;
+    fColumnsVisible["gpr.f_price2"] = true;
+    fColumnsVisible["cr.f_symbol as f_currencyname"] = true;
     fColumnsVisible["gg.f_lowlevel"] = true;
     fColumnsVisible["gg.f_lastinputprice"] = true;
     fColumnsVisible["g.f_chargevalue"] = false;
     fColumnsVisible["gg.f_acc"] = true;
-    fColumnsVisible["(gg.f_saleprice/gg.f_lastinputprice*100)-100 as f_realchargevalue"] = false;
+    fColumnsVisible["(gpr.f_price1/gg.f_lastinputprice*100)-100 as f_realchargevalue"] = false;
     fColumnsVisible["gca.f_name as gname1"] = true;
     fColumnsVisible["gcb.f_name as gname2"] = true;
     fColumnsVisible["gcc.f_name as gname3"] = true;
@@ -115,8 +119,9 @@ CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_groupname"] = tr("Group");
     fTranslation["f_unitname"] = tr("Unit");
     fTranslation["f_name"] = tr("Name");
-    fTranslation["f_saleprice"] = tr("Retail price");
-    fTranslation["f_saleprice2"] = tr("Wholesale price");
+    fTranslation["f_price1"] = tr("Retail price");
+    fTranslation["f_price2"] = tr("Wholesale price");
+    fTranslation["f_currencyname"] = tr("Currency");
     fTranslation["f_lowlevel"] = tr("Low level");
     fTranslation["f_lastinputprice"] = tr("Last input price");
     fTranslation["f_chargevalue"] = tr("Charge value");
@@ -322,8 +327,8 @@ void CR5Goods::deleteGoods()
         return;
     }
     if (C5Message::question(QString("%1<br>%2")
-                            .arg(tr("Confirm to remove"))
-                            .arg(fModel->data(row, fModel->indexForColumnName("f_name"), Qt::EditRole).toString())) != QDialog::Accepted) {
+                            .arg(tr("Confirm to remove"),
+                                 fModel->data(row, fModel->indexForColumnName("f_name"), Qt::EditRole).toString())) != QDialog::Accepted) {
         return;
     }
     C5Database db(fDBParams);
@@ -334,12 +339,12 @@ void CR5Goods::deleteGoods()
         err.append("<br>" + tr("Used in recipes"));
     }
     db[":f_goods"] = id;
-    db.exec("select * from c_goods_complectation where f_goods=:f_goods");
+    db.exec("select * from c_goods_complectation where f_goods=:f_goods or f_base=:f_goods");
     if (db.nextRow()) {
         err.append("<br>" + tr("Used in complectation"));
     }
     db[":f_goods"] = id;
-    db.exec("select from a_store_draft where f_goods=:f_goods");
+    db.exec("select * from a_store_draft where f_goods=:f_goods");
     if (db.nextRow()) {
         err.append("<br>" + tr("Used in store documents"));
     }
@@ -355,6 +360,7 @@ void CR5Goods::deleteGoods()
     db[":f_id"] = id;
     if (db.exec("delete from c_goods where f_id=:f_id")) {
         removeRow(row);
+        //refreshData();
     } else {
         C5Message::error(db.fLastError);
     }

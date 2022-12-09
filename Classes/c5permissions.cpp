@@ -36,6 +36,8 @@ void C5Permissions::init(C5Database &db, int group)
               << cp_t2_store_complectation
               << cp_t2_store_decomplectation
               << cp_t2_goods_reservations
+              << cp_t2_reatail_trade
+              << cp_t2_whosale_trade
 
               << cp_t3_reports
               << cp_t3_sales_common
@@ -142,6 +144,10 @@ void C5Permissions::init(C5Database &db, int group)
               << cp_t8_costumer_debts
               << cp_t8_costumer_debts_pay
               << cp_t8_cash_movement
+              << cp_t8_currency
+              << cp_t8_edit_currency
+              << cp_t8_currency_cross_rate
+              << cp_t8_currency_cross_rate_history
 
               << cp_t9_salary
               << cp_t9_salary_doc
@@ -153,6 +159,10 @@ void C5Permissions::init(C5Database &db, int group)
               << cp_t10_product_list
               << cp_t10_general_report
               << cp_t10_general_report_only_date
+              << cp_t10_actions_stages
+              << cp_t10_workshops
+              << cp_t10_active_tasks
+              << cp_t10_create_task
                  ;
     if (group == 1) {
         db[":f_group"] = 1;

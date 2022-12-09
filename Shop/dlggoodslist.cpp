@@ -2,7 +2,7 @@
 #include "ui_dlggoodslist.h"
 #include <QKeyEvent>
 
-DlgGoodsList::DlgGoodsList() :
+DlgGoodsList::DlgGoodsList(int currency) :
     C5Dialog(__c5config.dbParams(), true),
     ui(new Ui::DlgGoodsList)
 {
@@ -10,18 +10,21 @@ DlgGoodsList::DlgGoodsList() :
     setWindowState(windowState() | Qt::WindowMaximized);
     C5Database db(__c5config.dbParams());
     db[":f_store"] = __c5config.defaultStore();
+    db[":f_currency"] = currency;
     db.exec("select ss.f_goods, gg.f_name as f_groupname, g.f_scancode, g.f_name, "
-            "ss.f_qty, g.f_saleprice, g.f_saleprice2 "
+            "ss.f_qty, gp.f_price1, gp.f_price2 "
             "from a_store_sale ss "
             "left join c_goods g on g.f_id=ss.f_goods "
             "left join c_groups gg on gg.f_id=g.f_group "
-            "where ss.f_store=:f_store "
+            "left join c_goods_prices gp on gp.f_goods=ss.f_goods "
+            "where g.f_enabled=1 and ss.f_store=:f_store and gp.f_currency=:f_currency "
             "union "
             "select g.f_id, gg.f_name as f_groupname, g.f_scancode, g.f_name, "
             "0, g.f_saleprice, g.f_saleprice2 "
             "from c_goods g "
             "left join c_groups gg on gg.f_id=g.f_group "
-            "where g.f_service=1 and g.f_enabled=1 ");
+            "left join c_goods_prices gp on gp.f_goods=g.f_id "
+            "where g.f_service=1 and g.f_enabled=1  and gp.f_currency=:f_currency ");
     ui->tbl->setRowCount(db.rowCount());
     int row = 0;
     double totalRetail = 0, totalWholesale = 0;
@@ -29,8 +32,8 @@ DlgGoodsList::DlgGoodsList() :
         for (int c = 0; c < db.columnCount(); c++) {
             ui->tbl->setData(row, c, db.getValue(c));
         }
-        totalRetail += db.getDouble("f_saleprice") * db.getDouble("f_qty");
-        totalWholesale += db.getDouble("f_saleprice2") * db.getDouble("f_qty");
+        totalRetail += db.getDouble("f_price1") * db.getDouble("f_qty");
+        totalWholesale += db.getDouble("f_price2") * db.getDouble("f_qty");
         row++;
     }
     ui->leTotalRetail->setDouble(totalRetail);

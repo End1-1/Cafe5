@@ -28,8 +28,8 @@ QString CR5CommonSalesFilter::condition()
     QString result;
     if (ui->chUseClosingDateTime->isChecked()) {
         result = QString(" cast(concat(oh.f_dateclose, ' ', oh.f_timeclose) as datetime) between '%1' and '%2'")
-                .arg(ui->dt1->dateTime().toString(FORMAT_DATETIME_TO_STR_MYSQL))
-                .arg(ui->dt2->dateTime().toString(FORMAT_DATETIME_TO_STR_MYSQL));
+                .arg(ui->dt1->dateTime().toString(FORMAT_DATETIME_TO_STR_MYSQL),
+                     ui->dt2->dateTime().toString(FORMAT_DATETIME_TO_STR_MYSQL));
     } else {
         if (ui->chDoNotUseCashDate->isChecked()) {
             result = " oh.f_datecash is null ";
@@ -74,11 +74,15 @@ QString CR5CommonSalesFilter::condition()
         result += " and oh.f_partner=0 ";
     }
     result += fFlags;
-    if (ui->chptBank->isChecked() || ui->chptCard->isChecked() || ui->chptCash->isChecked() || ui->chptOther->isChecked()) {
+    if (ui->chptBank->isChecked() || ui->chptCard->isChecked()
+            || ui->chptCash->isChecked()
+            || ui->chptOther->isChecked()
+            || ui->chptHotel->isChecked() ) {
         result += ui->chptCash->isChecked() ? " and oh.f_amountcash>0 " : " and oh.f_amountcash=0 ";
         result += ui->chptCard->isChecked() ? " and oh.f_amountcard>0 " : " and oh.f_amountcard=0 ";
         result += ui->chptBank->isChecked() ? " and oh.f_amountbank>0 " : " and oh.f_amountbank=0 ";
         result += ui->chptOther->isChecked() ? " and oh.f_amountother>0 " : " and oh.f_amountother=0 ";
+        result += ui->chptHotel->isChecked() ? " and oh.f_hotel>0 " : " and oh.f_hotel=0 ";
     }
     if (ui->chptComplimentary->isChecked()) {
         result += " and oh.f_amounttotal=0 ";

@@ -75,6 +75,8 @@ public:
 
     bool fNoNewPage;
 
+    QString fErrorString;
+
 private:
     qreal fTempTop;
 

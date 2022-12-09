@@ -24,6 +24,8 @@ public:
 
     bool canDiscount(int id);
 
+    double specialDiscount(int id);
+
     int group(int id);
 
     bool isExtra(int id);

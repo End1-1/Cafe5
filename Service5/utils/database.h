@@ -38,6 +38,7 @@ public:
     inline int integer(const QString &columnName) {return value(columnName).toInt(); }
     inline double doubleValue(const QString &columnName) {return value(columnName).toDouble(); }
     inline QDate date(const QString &columnName) {return value(columnName).toDate(); }
+    inline QTime time(const QString &columnName) {return value(columnName).toTime(); }
     inline QDateTime dateTimeValue(const QString &columnName) {return value(columnName).toDateTime(); }
     QString uuid();
     void setBindValues(const QMap<QString, QVariant> &v);
@@ -49,6 +50,9 @@ public:
     const QString lastQuery();
     QString lastDbError() const;
     QString fDatabaseNumber;
+
+    int genFBID(const QString &name);
+    void rowToMap(QMap<QString, QVariant> &map);
 
 private:
     static int fDatabaseCounter;

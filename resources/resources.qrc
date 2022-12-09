@@ -67,5 +67,6 @@
         <file>budget.png</file>
         <file>info.png</file>
         <file>folder.png</file>
+        <file>tv.png</file>
     </qresource>
 </RCC>

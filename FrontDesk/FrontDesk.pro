@@ -38,6 +38,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Cafe5/c5double.cpp \
     ../Cafe5/c5replication.cpp \
     ../Cafe5/c5systempreference.cpp \
+    ../Classes/QRCodeGenerator.cpp \
     ../Classes/c5airlog.cpp \
     ../Classes/c5crypt.cpp \
     ../Classes/c5document.cpp \
@@ -55,6 +56,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Classes/notificationwidget.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
     ../Classes/threadsendmessage.cpp \
+    ../Controls/c5cleartablewidget.cpp \
     ../Controls/c5guicontrols.cpp \
     ../Controls/c5tablewithtotal.cpp \
     ../DbData/datadriver.cpp \
@@ -85,24 +87,34 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../DbData/dbunit.cpp \
     ../DbData/dbusers.cpp \
     ../Editors/c5cashname.cpp \
+    ../Editors/ce5currency.cpp \
+    ../Editors/ce5currencycrossrate.cpp \
+    ../Editors/ce5currencycrossraterecord.cpp \
+    ../Editors/ce5currencyrate.cpp \
     ../Editors/ce5dishpackage.cpp \
     ../Editors/ce5goodsbarcodelabelview.cpp \
     ../Editors/ce5goodsclass.cpp \
     ../Editors/ce5mfprocess.cpp \
+    ../Editors/ce5mfprocessstage.cpp \
     ../Editors/ce5mfproduct.cpp \
+    ../Editors/ce5mftask.cpp \
+    ../Editors/ce5mfworkshop.cpp \
     ../Editors/ce5ordermark.cpp \
     ../Editors/ce5packagelist.cpp \
     ../Editors/ce5storereason.cpp \
     ../Forms/c5filtervalues.cpp \
     ../Forms/c5printtaxanywhere.cpp \
     ../Forms/c5salarydoc.cpp \
+    ../Forms/c5saledoc.cpp \
     ../Forms/c5storedoc.cpp \
     ../Forms/c5storedocselectprinttemplate.cpp \
     ../Forms/c5waiterorder.cpp \
+    ../Forms/dlgconfigtable.cpp \
     ../Forms/dlgdataonline.cpp \
     ../Forms/dlgnewcl.cpp \
     ../Forms/dlgreservgoods.cpp \
     ../Forms/dlgsetwaiterordercl.cpp \
+    ../Forms/mfprocessproductpriceupdate.cpp \
     ../Reports/c5customfilter.cpp \
     ../Reports/cr5carvisits.cpp \
     ../Reports/cr5carvisitsfilter.cpp \
@@ -118,6 +130,12 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Reports/cr5consuptionreasonfilter.cpp \
     ../Reports/cr5costumerdebts.cpp \
     ../Reports/cr5costumerdebtsfilter.cpp \
+    ../Reports/cr5currencies.cpp \
+    ../Reports/cr5currencycrossrate.cpp \
+    ../Reports/cr5currencycrossratehistory.cpp \
+    ../Reports/cr5currencycrossratehistoryfilter.cpp \
+    ../Reports/cr5currencyratehistory.cpp \
+    ../Reports/cr5currencyratehistoryfilter.cpp \
     ../Reports/cr5custom.cpp \
     ../Reports/cr5debtstopartner.cpp \
     ../Reports/cr5debtstopartnerfilter.cpp \
@@ -141,10 +159,13 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Reports/cr5menureview.cpp \
     ../Reports/cr5menureviewfilter.cpp \
     ../Reports/cr5mfactions.cpp \
+    ../Reports/cr5mfactionstage.cpp \
+    ../Reports/cr5mfactivetasks.cpp \
     ../Reports/cr5mfdaily.cpp \
     ../Reports/cr5mfgeneralreport.cpp \
     ../Reports/cr5mfgeneralreportfilter.cpp \
     ../Reports/cr5mfproduct.cpp \
+    ../Reports/cr5mfworkshops.cpp \
     ../Reports/cr5ordermarks.cpp \
     ../Reports/cr5preorders.cpp \
     ../Reports/cr5printers.cpp \
@@ -178,6 +199,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     c5serviceconfig.cpp \
     c5storebarcode.cpp \
     c5storebarcodelist.cpp \
+    c5tablewidgetwithselector.cpp \
     dlgchangeoutputstore.cpp \
     dlgexportsaletoasoptions.cpp \
     dlgstoreutils.cpp \
@@ -308,6 +330,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Cafe5/c5double.h \
     ../Cafe5/c5replication.h \
     ../Cafe5/c5systempreference.h \
+    ../Classes/QRCodeGenerator.h \
     ../Classes/barcode5.h \
     ../Classes/c5airlog.h \
     ../Classes/c5broadcasting.h \
@@ -329,6 +352,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Classes/notificationwidget.h \
     ../Classes/proxytablewidgetdatabase.h \
     ../Classes/threadsendmessage.h \
+    ../Controls/c5cleartablewidget.h \
     ../Controls/c5guicontrols.h \
     ../Controls/c5tablewithtotal.h \
     ../DbData/datadriver.h \
@@ -359,24 +383,34 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../DbData/dbunit.h \
     ../DbData/dbusers.h \
     ../Editors/c5cashname.h \
+    ../Editors/ce5currency.h \
+    ../Editors/ce5currencycrossrate.h \
+    ../Editors/ce5currencycrossraterecord.h \
+    ../Editors/ce5currencyrate.h \
     ../Editors/ce5dishpackage.h \
     ../Editors/ce5goodsbarcodelabelview.h \
     ../Editors/ce5goodsclass.h \
     ../Editors/ce5mfprocess.h \
+    ../Editors/ce5mfprocessstage.h \
     ../Editors/ce5mfproduct.h \
+    ../Editors/ce5mftask.h \
+    ../Editors/ce5mfworkshop.h \
     ../Editors/ce5ordermark.h \
     ../Editors/ce5packagelist.h \
     ../Editors/ce5storereason.h \
     ../Forms/c5filtervalues.h \
     ../Forms/c5printtaxanywhere.h \
     ../Forms/c5salarydoc.h \
+    ../Forms/c5saledoc.h \
     ../Forms/c5storedoc.h \
     ../Forms/c5storedocselectprinttemplate.h \
     ../Forms/c5waiterorder.h \
+    ../Forms/dlgconfigtable.h \
     ../Forms/dlgdataonline.h \
     ../Forms/dlgnewcl.h \
     ../Forms/dlgreservgoods.h \
     ../Forms/dlgsetwaiterordercl.h \
+    ../Forms/mfprocessproductpriceupdate.h \
     ../Reports/c5customfilter.h \
     ../Reports/cr5carvisits.h \
     ../Reports/cr5carvisitsfilter.h \
@@ -392,6 +426,12 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Reports/cr5consuptionreasonfilter.h \
     ../Reports/cr5costumerdebts.h \
     ../Reports/cr5costumerdebtsfilter.h \
+    ../Reports/cr5currencies.h \
+    ../Reports/cr5currencycrossrate.h \
+    ../Reports/cr5currencycrossratehistory.h \
+    ../Reports/cr5currencycrossratehistoryfilter.h \
+    ../Reports/cr5currencyratehistory.h \
+    ../Reports/cr5currencyratehistoryfilter.h \
     ../Reports/cr5custom.h \
     ../Reports/cr5debtstopartner.h \
     ../Reports/cr5debtstopartnerfilter.h \
@@ -415,10 +455,13 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Reports/cr5menureview.h \
     ../Reports/cr5menureviewfilter.h \
     ../Reports/cr5mfactions.h \
+    ../Reports/cr5mfactionstage.h \
+    ../Reports/cr5mfactivetasks.h \
     ../Reports/cr5mfdaily.h \
     ../Reports/cr5mfgeneralreport.h \
     ../Reports/cr5mfgeneralreportfilter.h \
     ../Reports/cr5mfproduct.h \
+    ../Reports/cr5mfworkshops.h \
     ../Reports/cr5ordermarks.h \
     ../Reports/cr5preorders.h \
     ../Reports/cr5printers.h \
@@ -513,6 +556,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Reports/cr5documentsfilter.h \
     ../Reports/cr5consumptionbysales.h \
     ../Reports/cr5consumptionbysalesfilter.h \
+    c5tablewidgetwithselector.h \
     dlgchangeoutputstore.h \
     dlgexportsaletoasoptions.h \
     dlgstoreutils.h \
@@ -585,23 +629,33 @@ FORMS += \
     ../Classes/notificationwidget.ui \
     ../Controls/c5tablewithtotal.ui \
     ../Editors/c5cashname.ui \
+    ../Editors/ce5currency.ui \
+    ../Editors/ce5currencycrossrate.ui \
+    ../Editors/ce5currencycrossraterecord.ui \
+    ../Editors/ce5currencyrate.ui \
     ../Editors/ce5dishpackage.ui \
     ../Editors/ce5goodsclass.ui \
     ../Editors/ce5mfprocess.ui \
+    ../Editors/ce5mfprocessstage.ui \
     ../Editors/ce5mfproduct.ui \
+    ../Editors/ce5mftask.ui \
+    ../Editors/ce5mfworkshop.ui \
     ../Editors/ce5ordermark.ui \
     ../Editors/ce5packagelist.ui \
     ../Editors/ce5storereason.ui \
     ../Forms/c5filtervalues.ui \
     ../Forms/c5printtaxanywhere.ui \
     ../Forms/c5salarydoc.ui \
+    ../Forms/c5saledoc.ui \
     ../Forms/c5storedoc.ui \
     ../Forms/c5storedocselectprinttemplate.ui \
     ../Forms/c5waiterorder.ui \
+    ../Forms/dlgconfigtable.ui \
     ../Forms/dlgdataonline.ui \
     ../Forms/dlgnewcl.ui \
     ../Forms/dlgreservgoods.ui \
     ../Forms/dlgsetwaiterordercl.ui \
+    ../Forms/mfprocessproductpriceupdate.ui \
     ../Reports/c5customfilter.ui \
     ../Reports/cr5carvisitsfilter.ui \
     ../Reports/cr5cashdetailedfilter.ui \
@@ -609,6 +663,8 @@ FORMS += \
     ../Reports/cr5consumptionbysalesfilterdraft.ui \
     ../Reports/cr5consuptionreasonfilter.ui \
     ../Reports/cr5costumerdebtsfilter.ui \
+    ../Reports/cr5currencycrossratehistoryfilter.ui \
+    ../Reports/cr5currencyratehistoryfilter.ui \
     ../Reports/cr5debtstopartnerfilter.ui \
     ../Reports/cr5discountstatisticsfilter.ui \
     ../Reports/cr5draftoutputbyrecipefilter.ui \

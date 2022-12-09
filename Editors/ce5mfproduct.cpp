@@ -5,6 +5,8 @@
 #include "c5cache.h"
 #include "c5printing.h"
 #include "c5printpreview.h"
+#include "mfprocessproductpriceupdate.h"
+#include "xlsxall.h"
 #include <QClipboard>
 
 CE5MFProduct::CE5MFProduct(const QStringList &dbParams, QWidget *parent) :
@@ -24,7 +26,8 @@ CE5MFProduct::CE5MFProduct(const QStringList &dbParams, QWidget *parent) :
             .addColumn(tr("Duration, sec"), 80, true)
             .addColumn(tr("7h goal"), 80, true)
             .addColumn(tr("Goal price"), 80, true)
-            .addColumn(tr("Price"), 80, true);
+            .addColumn(tr("Price"), 80, true)
+            .addColumn(tr("Update price"), 400, true);
 }
 
 CE5MFProduct::~CE5MFProduct()
@@ -62,6 +65,9 @@ void CE5MFProduct::setId(int id)
                 .setData(row, 5, db.getInt("f_durationsec") == 0 ? 0 : (3600 * 7) / db.getInt("f_durationsec"))
                 .createLineEdit(row, 6, db.getDouble("f_goalprice"), this, SLOT(goalPriceChanged(QString)))
                 .setData(row, 7, db.getDouble("f_price"));
+        auto *pu = new MFProcessProductPriceUpdate();
+        connect(pu, &MFProcessProductPriceUpdate::startUpdate, this, &CE5MFProduct::startPriceUpdateOnRow);
+        ui->wt->setWidget(row, 8, pu);
     }
     ui->wt->countTotal(-1);
 }
@@ -91,6 +97,23 @@ bool CE5MFProduct::save(QString &err, QList<QMap<QString, QVariant> > &data)
         return false;
     }
     return true;
+}
+
+void CE5MFProduct::startPriceUpdateOnRow()
+{
+    int row, column;
+    auto *pu = static_cast<MFProcessProductPriceUpdate*>(sender());
+    if (ui->wt->findWidget(row, column, pu) == false) {
+        return;
+    }
+    C5Database db(fDBParams);
+    db[":f_product"] = ui->leCode->getInteger();
+    db[":f_process"] = ui->wt->getData(row, 1);
+    db[":f_price"] = ui->wt->getData(row, 7);
+    db[":f_date1"] = pu->date1();
+    db[":f_date2"] = pu->date2();
+    db.exec("update mf_daily_process set f_price=:f_price where f_product=:f_product and f_process=:f_process and f_date between :f_date1 and :f_date2");
+    C5Message::info(tr("Done."));
 }
 
 void CE5MFProduct::durationChanged(const QString &arg1)
@@ -216,12 +239,12 @@ void CE5MFProduct::on_btnPrint_clicked()
     C5Printing p;
     QList<qreal> points;
     QStringList vals;
-    p.setSceneParams(2700, 2000, QPrinter::Landscape);
+    p.setSceneParams(2000, 2700, QPrinter::Portrait);
     p.setFontSize(25);
     p.setFontBold(true);
     p.ctext(QString("%1: %2").arg(tr("Product"), ui->leName->text()));
     p.br();
-    points << 50 << 100 << 1000 << 250 << 250 << 250 << 250 << 250;
+    points << 50 << 100 << 500 << 250 << 250 << 250 << 250 << 250;
     vals << "NN" << tr("Process") << tr("Duration") << tr("Duration") << tr("7h goal") << tr("Goal price") << tr("Price");
     p.tableText(points, vals, p.fLineHeight + 20);
     p.br(p.fLineHeight + 20);
@@ -294,6 +317,7 @@ void CE5MFProduct::on_btnUpdatePrices_clicked()
         db[":f_date2"] = ui->leDate2->date();
         db.exec("update mf_daily_process set f_price=:f_price where f_product=:f_product and f_process=:f_process and f_date between :f_date1 and :f_date2");
     }
+    C5Message::info(tr("Done."));
 }
 
 void CE5MFProduct::on_chUpdatePrice_clicked(bool checked)
@@ -345,5 +369,97 @@ void CE5MFProduct::on_btnPaste_clicked()
         emit ui->wt->lineEdit(row, 4)->textChanged(ui->wt->lineEdit(row, 4)->text());
         ui->wt->lineEdit(row, 6)->setDouble(str_float(cols.at(6)));
         emit ui->wt->lineEdit(row, 6)->textChanged(ui->wt->lineEdit(row, 6)->text());
+    }
+}
+
+void CE5MFProduct::on_btnExportExcel_clicked()
+{
+    int colCount = 8;
+    int rowCount = ui->wt->rowCount();
+    if (colCount == 0 || rowCount == 0) {
+        C5Message::info(tr("Empty report!"));
+        return;
+    }
+    XlsxDocument d;
+    XlsxSheet *s = d.workbook()->addSheet("Sheet1");
+    int fXlsxPageSize = xls_page_size_a4;
+    int fXlsxFitToPage = 0;
+    QString fXlsxPageOrientation = xls_page_orientation_portrait;
+    s->setupPage(fXlsxPageSize, fXlsxFitToPage, fXlsxPageOrientation);
+    /* HEADER */
+    QColor color = QColor::fromRgb(200, 200, 250);
+    QFont headerFont(qApp->font());
+    headerFont.setBold(true);
+    d.style()->addFont("header", headerFont);
+    d.style()->addBackgrounFill("header", color);
+    d.style()->addHAlignment("header", xls_alignment_center);
+    d.style()->addBorder("header", XlsxBorder());
+    for (int i = 0; i < colCount; i++) {
+        s->addCell(1, i + 1, ui->wt->columnTitle(i), d.style()->styleNum("header"));
+        s->setColumnWidth(i + 1, ui->wt->columnWidth(i) / 7);
+    }
+
+    /* BODY */
+    QMap<int, QString> bgFill;
+    QMap<int, QString> bgFillb;
+    QFont bodyFont(qApp->font());
+    d.style()->addFont("body", bodyFont);
+    d.style()->addBackgrounFill("body", QColor(Qt::white));
+    d.style()->addVAlignment("body", xls_alignment_center);
+    d.style()->addBorder("body", XlsxBorder());
+    bgFill[QColor(Qt::white).rgb()] = "body";
+
+    bodyFont.setBold(true);
+    d.style()->addFont("body_b", bodyFont);
+    d.style()->addBackgrounFill("body_b", QColor(Qt::white));
+    d.style()->addVAlignment("body_b", xls_alignment_center);
+    d.style()->addBorder("body_b", XlsxBorder());
+    bgFillb[QColor(Qt::white).rgb()] = "body_b";
+
+    for (int j = 0; j < rowCount; j++) {
+        for (int i = 0; i < colCount; i++) {
+            int bgColor = QColor(Qt::white).rgb();
+            if (!bgFill.contains(bgColor)) {
+                bodyFont.setBold(false);
+                d.style()->addFont(QString::number(bgColor), bodyFont);
+                d.style()->addBackgrounFill(QString::number(bgColor), QColor::fromRgb(bgColor));
+                bgFill[bgColor] = QString::number(bgColor);
+            }
+            if (!bgFill.contains(bgColor)) {
+                bodyFont.setBold(true);
+                d.style()->addFont(QString::number(bgColor), bodyFont);
+                d.style()->addBackgrounFill(QString::number(bgColor), QColor::fromRgb(bgColor));
+                bgFillb[bgColor] = QString::number(bgColor);
+            }
+            QString bgStyle = bgFill[bgColor];
+            if (ui->wt->lineEdit(j, i) == nullptr) {
+                s->addCell(j + 2, i + 1, ui->wt->getData(j, i, Qt::EditRole), d.style()->styleNum(bgStyle));
+            } else {
+                s->addCell(j + 2, i + 1, ui->wt->lineEdit(j, i)->text(), d.style()->styleNum(bgStyle));
+            }
+        }
+    }
+
+    /* TOTALS ROWS */
+    QFont totalFont(qApp->font());
+    totalFont.setBold(true);
+    d.style()->addFont("footer", headerFont);
+    d.style()->addBorder("footer", XlsxBorder());
+    color = QColor::fromRgb(193, 206, 221);
+    d.style()->addBackgrounFill("footer", color);
+    //d.style()->addHAlignment("footer", xls_alignment_right);
+
+    s->addCell(1 + ui->wt->rowCount() + 1, 4 + 1, ui->wt->total(4), d.style()->styleNum("footer"));
+    s->addCell(1 + ui->wt->rowCount() + 1, 5 + 1, ui->wt->total(5), d.style()->styleNum("footer"));
+    s->addCell(1 + ui->wt->rowCount() + 1, 6 + 1, ui->wt->total(6), d.style()->styleNum("footer"));
+    s->addCell(1 + ui->wt->rowCount() + 1, 7 + 1, ui->wt->total(7), d.style()->styleNum("footer"));
+
+
+
+    QString err;
+    if (!d.save(err, true)) {
+        if (!err.isEmpty()) {
+            C5Message::error(err);
+        }
     }
 }

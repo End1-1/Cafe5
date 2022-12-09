@@ -2,37 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="hy_AM">
 <context>
-    <name>C5Message</name>
-    <message>
-        <location filename="../../Cafe5/c5message.ui" line="140"/>
-        <source>msg</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../Cafe5/c5message.ui" line="196"/>
-        <source>A1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../Cafe5/c5message.ui" line="209"/>
-        <source>A3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../Cafe5/c5message.ui" line="222"/>
-        <source>A2</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>C5Printing</name>
-    <message>
-        <location filename="../../Classes/c5printing.cpp" line="344"/>
-        <source>Failed send order to remote printer</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>NotificationWidget</name>
     <message>
         <location filename="../../Classes/notificationwidget.ui" line="23"/>
@@ -71,26 +40,6 @@
         <location filename="dll.cpp" line="86"/>
         <source>Printed</source>
         <translation>Տպված</translation>
-    </message>
-    <message>
-        <location filename="../../Cafe5/c5message.h" line="19"/>
-        <source>Close</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../Cafe5/c5message.h" line="21"/>
-        <source>OK</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../Cafe5/c5message.h" line="23"/>
-        <source>Yes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../Cafe5/c5message.h" line="23"/>
-        <source>No</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
