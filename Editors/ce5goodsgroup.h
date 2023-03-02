@@ -20,6 +20,9 @@ public:
 
     virtual QString table() {return "c_groups"; }
 
+private slots:
+    void on_btnSetStoreReminderQty_clicked();
+
 private:
     Ui::CE5GoodsGroup *ui;
 };

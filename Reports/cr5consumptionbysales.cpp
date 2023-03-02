@@ -12,6 +12,7 @@
 #include "c5storedraftwriter.h"
 #include "c5storedoc.h"
 #include "cr5goodsmovement.h"
+#include "dlgsemireadyinout.h"
 #include <QInputDialog>
 
 static const int col_goodsid = 0;
@@ -113,6 +114,10 @@ QToolBar *CR5ConsumptionBySales::toolBar()
         auto *h = new QAction(QIcon(":/update_prices.png"), tr("Update prices\nof inventorization"), this);
         connect(h, SIGNAL(triggered(bool)), this, SLOT(updateInventorizatinPrices()));
         fToolBar->addAction(h);
+
+        auto *i = new QAction(QIcon(":/goods.png"), tr("Semiready\nin/out"), this);
+        connect(i, SIGNAL(triggered(bool)), this, SLOT(semireadyInOut()));
+        fToolBar->addAction(i);
     }
     return fToolBar;
 }
@@ -340,7 +345,7 @@ void CR5ConsumptionBySales::refreshData()
     buildQuery();
 }
 
-QString CR5ConsumptionBySales::documentForInventory()
+QString CR5ConsumptionBySales::documentForInventory(int store)
 {
     QString result;
     CR5ConsumptionBySalesFilter *f = static_cast<CR5ConsumptionBySalesFilter*>(fFilterWidget);
@@ -351,7 +356,8 @@ QString CR5ConsumptionBySales::documentForInventory()
     while (db.nextRow()) {
         C5Database db2(fDBParams);
         db2[":f_document"] = db.getString(0);
-        db2.exec("select * from a_store_inventory where f_document=:f_document");
+        db2[":f_store"] = store;
+        db2.exec("select * from a_store_inventory where f_document=:f_document and f_store=:f_store");
         if (db2.nextRow()) {
             if (!result.isEmpty()) {
                 result += ",";
@@ -361,7 +367,10 @@ QString CR5ConsumptionBySales::documentForInventory()
     }
     if (result.isEmpty()) {
         C5StoreDraftWriter dw(db);
-        dw.writeAHeader(result, QString::number(dw.counterAType(DOC_TYPE_STORE_INVENTORY)), DOC_STATE_SAVED, DOC_TYPE_STORE_INVENTORY, __user->id(), f->date2(), QDate::currentDate(), QTime::currentTime(), 0, 0, tr("Created automaticaly"));
+        dw.writeAHeader(result, QString::number(dw.counterAType(DOC_TYPE_STORE_INVENTORY)), DOC_STATE_SAVED,
+                        DOC_TYPE_STORE_INVENTORY, __user->id(), f->date2(), QDate::currentDate(), QTime::currentTime(), 0, 0,
+                        tr("Created automaticaly"), __c5config.getValue(param_default_currency).toInt());
+        result = QString("'%1'").arg(result);
     }
     return result;
 }
@@ -427,7 +436,7 @@ bool CR5ConsumptionBySales::tblDoubleClicked(int row, int column, const QList<QV
         if (!ok) {
             return true;
         }
-        docid = documentForInventory();
+        docid = documentForInventory(fFilter->store());
         db[":f_goods"] = values.at(0);
         db.exec(QString("delete from a_store_inventory where f_document in (%1) and f_goods=:f_goods").arg(docid));
         QString id;
@@ -595,6 +604,80 @@ void CR5ConsumptionBySales::updateInventorizatinPrices()
     refreshData();
 }
 
+void CR5ConsumptionBySales::semireadyInOut()
+{
+    DlgSemireadyInOut d(fDBParams, this);
+    if (d.exec()) {
+        C5Database db(fDBParams);
+        for (int i = 0; i < d.rowCount(); i++) {
+            bool found = false;
+            for (int j = 0; j < fModel->rowCount(); j++) {
+                if (fModel->data(j, col_goodsid, Qt::EditRole).toInt() == d.goodsId(i)) {
+                    found = true;
+                    double qty = fModel->data(j, col_qtyinv, Qt::EditRole).toDouble();
+                    if (qty + d.goodsQty(i) < 0.0001) {
+                        C5Message::error(tr("Invalid qty for") + "<br>" + d.goodsName(i));
+                        return;
+                    }
+                }
+            }
+            if (!found && d.goodsQty(i) < 0.001) {
+                C5Message::error(tr("Invalid qty for") + "<br>" + d.goodsName(i));
+                return;
+            }
+        }
+        for (int i = 0; i < d.rowCount(); i++) {
+            bool found = false;
+            for (int j = 0; j < fModel->rowCount(); j++) {
+                if (fModel->data(j, col_goodsid, Qt::EditRole).toInt() == d.goodsId(i)) {
+                    found = true;
+                    QString docid = documentForInventory(fFilter->store());
+                    db[":f_goods"] = d.goodsId(i);
+                    double qty = fModel->data(j, col_qtyinv, Qt::EditRole).toDouble();
+                    qty += d.goodsQty(i);
+                    db.exec(QString("delete from a_store_inventory where f_document in (%1) and f_goods=:f_goods").arg(docid));
+                    QString id;
+                    QString dd = docid.split(",", QString::SkipEmptyParts).at(0);
+                    C5StoreDraftWriter dw(db);
+                    dw.writeAStoreInventory(id, dd.replace("'", ""), fFilter->store(), d.goodsId(i), qty, 0, 0);
+                    fModel->setData(j, col_qtyinv, qty);
+                    countRowQty(j);
+                    break;
+                }
+            }
+            if (!found) {
+                db[":f_id"] = d.goodsId(i);
+                db.exec("select g.f_id, gn.f_name as f_groupname, g.f_name, g.f_scancode, "
+                        "gu.f_name as f_unitname "
+                        "from c_goods g "
+                        "left join c_groups gn on gn.f_id=g.f_group "
+                        "left join c_units gu on gu.f_id=g.f_unit "
+                        "where g.f_id=:f_id");
+                db.nextRow();
+                QList<QVariant> row;
+                    row << db.getInt("f_id")
+                        << db.getString("f_groupname")
+                        << db.getString("f_name")
+                        << db.getString("f_scancode")
+                        << 0
+                        << 0
+                        << 0
+                        << 0
+                        << 0
+                        << 0
+                        << d.goodsQty(i)
+                        << 0
+                        << db.getString("f_unitname");
+                    fModel->insertRow(fModel->rowCount());
+                    for (int k = 0; k < row.count(); k++) {
+                        fModel->setData(fModel->rowCount() - 1, k, row.at(k));
+                    }
+                    countRowQty(fModel->rowCount() - 1);
+            }
+        }
+    }
+}
+
 C5StoreDoc *CR5ConsumptionBySales::writeDocs(int doctype, int reason, const QList<IGoods> &data, const QString &comment)
 {
     C5Database db(fDBParams);
@@ -619,17 +702,18 @@ C5StoreDoc *CR5ConsumptionBySales::writeDocs(int doctype, int reason, const QLis
     QString documentId;
     QString cashid, cashrowid;
     dw.writeAHeader(documentId, dw.storeDocNum(doctype, store, true, 0), DOC_STATE_DRAFT, doctype, __user->id(), docDate,
-                    QDate::currentDate(), QTime::currentTime(), 0, 0, comment);
+                    QDate::currentDate(), QTime::currentTime(), 0, 0, comment, __c5config.getValue(param_default_currency).toInt());
     if (storein > 0) {
         C5Document c5doc(fDBParams);
         QString purpose = tr("Store input, correction") + QDate::currentDate().toString(FORMAT_DATE_TO_STR);
         QString cashUserId = QString("%1").arg(c5doc.genNumber(DOC_TYPE_CASH), C5Config::docNumDigitsInput(), 10, QChar('0'));
         dw.writeAHeader(cashid, cashUserId, DOC_STATE_DRAFT, DOC_TYPE_CASH, __user->id(), QDate::currentDate(),
-                        QDate::currentDate(), QTime::currentTime(), 0, 0, purpose);
+                        QDate::currentDate(), QTime::currentTime(), 0, 0, purpose,
+                        __c5config.getValue(param_default_currency).toInt());
         dw.writeAHeaderCash(cashid, 0, 0, 1, documentId, "", 0);
         dw.writeECash(cashrowid, cashid, 0, -1, purpose, 0, cashrowid, 1);
     }
-    dw.writeAHeaderStore(documentId, __user->id(), __user->id(), "", QDate(), storein, storeout, 0, cashid, 0, 0);
+    dw.writeAHeaderStore(documentId, __user->id(), __user->id(), "", QDate(), storein, storeout, 0, cashid, 0, 0, "");
     int rownum = 1;
     foreach (const IGoods &g, data) {
         QString sdid;

@@ -14,6 +14,7 @@ CR5DocumentsFilter::CR5DocumentsFilter(const QStringList &dbParams, QWidget *par
     ui->leReason->setSelector(dbParams, ui->leReasonName, cache_store_reason);
     ui->lePayment->setSelector(dbParams, ui->lePaymentName, cache_header_payment);
     ui->lePaid->setSelector(dbParams, ui->lePaidName, cache_header_paid);
+    ui->leCurrency->setSelector(dbParams, ui->leCurrencyName, cache_currency);
 }
 
 CR5DocumentsFilter::~CR5DocumentsFilter()
@@ -40,10 +41,13 @@ QString CR5DocumentsFilter::condition()
         result += " and sa.f_reason in (" + ui->leReason->text() + ") ";
     }
     if (!ui->lePayment->isEmpty()) {
-        result += " and h.f_payment in (" + ui->lePaymentName->text() + ") ";
+        result += " and h.f_payment in (" + ui->lePayment->text() + ") ";
     }
     if (!ui->lePaid->isEmpty()) {
         result += " and h.f_paid in (" + QString::number(ui->lePaid->getInteger() - 1) + ") ";
+    }
+    if (!ui->leCurrency->isEmpty()) {
+        result += " and h.f_currency in (" + ui->leCurrency->text() + ") ";
     }
     return result;
 }

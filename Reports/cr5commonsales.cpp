@@ -53,6 +53,7 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
                    << "sum(oh.f_amountother) as f_amountother"
                    << "sum(oh.f_amountidram) as f_amountidram"
                    << "sum(oh.f_amountpayx) as f_amountpayx"
+                   << "sum(oh.f_amountprepaid) as f_amountprepaid"
                    << "sum(oh.f_hotel) as f_hotel"
                    << "oh.f_amountservice"
                    << "oh.f_amountdiscount"
@@ -88,6 +89,7 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
                 << "f_amountpayx"
                 << "f_amountservice"
                 << "f_amountdiscount"
+                << "f_amountprepaid"
                 << "f_hotel"
                 << "f_count"
                       ;
@@ -119,6 +121,7 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_amountcard"] = tr("Card");
     fTranslation["f_amountbank"] = tr("Bank");
     fTranslation["f_amountother"] = tr("Other");
+    fTranslation["f_amountprepaid"] = tr("Prepaid");
     fTranslation["f_amountidram"] = tr("Idram");
     fTranslation["f_amountpayx"] = tr("PayX");
     fTranslation["f_amountservice"] = tr("Service");
@@ -144,10 +147,11 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
     fColumnsVisible["sum(oh.f_amounttotal) as f_amounttotal"] = true;
     fColumnsVisible["sum(oh.f_amountcash) as f_amountcash"] = true;
     fColumnsVisible["sum(oh.f_amountcard) as f_amountcard"] = true;
-    fColumnsVisible["sum(oh.f_amountbank) as f_amountbank"] = true;
+    fColumnsVisible["sum(oh.f_amountbank) as f_amountbank"] = false;
     fColumnsVisible["sum(oh.f_amountother) as f_amountother"] = true;
-    fColumnsVisible["sum(oh.f_amountidram) as f_amountidram"] = true;
-    fColumnsVisible["sum(oh.f_amountpayx) as f_amountpayx"] = true;
+    fColumnsVisible["sum(oh.f_amountidram) as f_amountidram"] = false;
+    fColumnsVisible["sum(oh.f_amountpayx) as f_amountpayx"] = false;
+    fColumnsVisible["sum(oh.f_amountprepaid) as f_amountprepaid"] = false;
     fColumnsVisible["sum(oh.f_hotel) as f_hotel"] = true;
     fColumnsVisible["oh.f_amountservice"] = false;
     fColumnsVisible["oh.f_amountdiscount"] = false;

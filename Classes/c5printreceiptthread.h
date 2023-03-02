@@ -5,16 +5,15 @@
 #include <QObject>
 #include <QVariant>
 
-class C5PrintReceiptThread : public QObject
+class C5PrintReceiptThread
 {
-    Q_OBJECT
 
 public:
-    C5PrintReceiptThread(const QString &header, const QMap<QString, QVariant> &headerInfo, const QList<QMap<QString, QVariant> > &bodyinfo, const QString &printer, int language, int paperWidth, QObject *parent = nullptr);
+    C5PrintReceiptThread(const QString &header, const QMap<QString, QVariant> &headerInfo, const QList<QMap<QString, QVariant> > &bodyinfo, const QString &printer, int language, int paperWidth);
 
     bool fBill;
 
-    bool print();
+    bool print(const QStringList &dbParams);
 
     QString fError;
 

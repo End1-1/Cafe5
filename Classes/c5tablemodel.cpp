@@ -409,6 +409,17 @@ void C5TableModel::sumForColumns(const QStringList &columns, QMap<QString, doubl
     }
 }
 
+void C5TableModel::sumForColumnsIndexes(const QList<int> &columns, QMap<int, double> &values)
+{
+    for (int idx: columns) {
+        double total = 0;
+        for (int i = 0, count = fProxyData.count(); i < count; i++) {
+            total += fRawData.at(fProxyData.at(i)).at(idx).toDouble();
+        }
+        values[idx] = total;
+    }
+}
+
 void C5TableModel::insertSubTotals(QList<int> cols, const QList<int> &totalCols, bool title, bool insertempty)
 {
     QFont f = fTableView->font();

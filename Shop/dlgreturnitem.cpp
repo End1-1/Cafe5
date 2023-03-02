@@ -165,7 +165,8 @@ void DlgReturnItem::on_btnReturn_clicked()
         storeDocId;
         storedocUserNum = dw.storeDocNum(DOC_TYPE_STORE_INPUT, __c5config.defaultStore(), true, 0);
         if (!dw.writeAHeader(storeDocId, storedocUserNum, DOC_STATE_DRAFT, DOC_TYPE_STORE_INPUT,
-                             staff, QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, 0, storeDocComment)) {
+                             staff, QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, 0,
+                             storeDocComment, __c5config.getValue(param_default_currency).toInt())) {
             C5Message::error(dw.fErrorMsg);
             db.rollback();
             return;
@@ -235,10 +236,10 @@ void DlgReturnItem::on_btnReturn_clicked()
         QString fCashUserId = QString("%1").arg(dw.counterAType(DOC_TYPE_CASH), C5Config::docNumDigitsInput(), 10, QChar('0'));
         QString purpose = tr("Return of sale") + " " + saledoc;
         dw.writeAHeader(fCashUuid, fCashUserId, DOC_STATE_DRAFT, DOC_TYPE_CASH, staff, QDate::currentDate(),
-                        QDate::currentDate(), QTime::currentTime(), 0, returnAmount, purpose);
+                        QDate::currentDate(), QTime::currentTime(), 0, returnAmount, purpose, __c5config.getValue(param_default_currency).toInt());
         dw.writeAHeaderCash(fCashUuid, 0, __c5config.cashId(), 1, storeDocId, "", 0);
         dw.writeECash(fCashRowId, fCashUuid, __c5config.cashId(), -1, purpose, returnAmount, fCashRowId, 1);
-        if (!dw.writeAHeaderStore(storeDocId, staff, staff, "", QDate(), __c5config.defaultStore(), 0, 1, fCashUuid, 0, 0)) {
+        if (!dw.writeAHeaderStore(storeDocId, staff, staff, "", QDate(), __c5config.defaultStore(), 0, 1, fCashUuid, 0, 0, oheaderid)) {
             C5Message::error(dw.fErrorMsg);
             db.rollback();
             return;
@@ -254,7 +255,9 @@ void DlgReturnItem::on_btnReturn_clicked()
             db.rollback();
             return;
         }
-        if (!dw.writeAHeader(cashdocid, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH, staff, QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, cashamount, tr("Return of") + " " + saledoc)) {
+        if (!dw.writeAHeader(cashdocid, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH, staff, QDate::currentDate(),
+                             QDate::currentDate(), QTime::currentTime(), 0, cashamount, tr("Return of") + " " + saledoc,
+                             __c5config.getValue(param_default_currency).toInt())) {
             C5Message::error(dw.fErrorMsg);
             db.rollback();
             return;
@@ -275,7 +278,8 @@ void DlgReturnItem::on_btnReturn_clicked()
     QString err;
     if (haveStore) {
         if (dw.writeInput(storeDocId, err)) {
-            if (!dw.writeAHeader(storeDocId, storedocUserNum, DOC_STATE_SAVED, DOC_TYPE_STORE_INPUT, staff, QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, 0, storeDocComment)) {
+            if (!dw.writeAHeader(storeDocId, storedocUserNum, DOC_STATE_SAVED, DOC_TYPE_STORE_INPUT, staff, QDate::currentDate(),
+                                 QDate::currentDate(), QTime::currentTime(), 0, 0, storeDocComment, __c5config.getValue(param_default_currency).toInt())) {
                 C5Message::error(dw.fErrorMsg);
                 db.rollback();
                 return;

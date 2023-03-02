@@ -5,6 +5,7 @@
 #include "store.h"
 #include "datadriver.h"
 #include "logwriter.h"
+#include "traiding.h"
 #include <QDebug>
 #include <QThread>
 
@@ -66,6 +67,27 @@ void ShopConnection::handleData(RawMessage *m, const QByteArray &in)
         break;
     case op_data_currency_crossrate_list:
         data_list(rm, dbw, "sq_data_currency_crossrate_list");
+        break;
+    case op_get_goods_list:
+        data_list(rm, dbw, "sq_data_goods_list");
+        break;
+    case op_goods_prices:
+        data_list(rm, dbw, "sq_data_goods_prices");
+        break;
+    case op_create_empty_sale:
+        create_empty_draft(rm, dbw, in, fUserId);
+        break;
+    case op_open_sale_draft_document:
+        open_draft_header(rm, dbw, in);
+        break;
+    case op_show_drafts_sale_list:
+        get_drafts_headers(rm, dbw, in, fUserId);
+        break;
+    case op_add_goods_to_draft:
+        add_goods_to_draft(rm, dbw, in, fUserId);
+        break;
+    case op_open_sale_draft_body:
+        open_draft_body(rm, dbw, in);
         break;
     default:
         rm.putUByte(0);

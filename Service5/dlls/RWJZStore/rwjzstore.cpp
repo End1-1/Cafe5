@@ -75,6 +75,8 @@ QString gr(const QString &v) {
 
 bool dllfunc(const QByteArray &in, RawMessage &rm)
 {
+    qDebug() << "STart read dllfunc";
+
     quint16 year;
     quint8 month;
     quint8 cafe;
@@ -83,6 +85,8 @@ bool dllfunc(const QByteArray &in, RawMessage &rm)
     rm.readUByte(month, in);
     rm.readUByte(cafe, in);
     rm.readUByte(store, in);
+
+    qDebug() << "Data" << year << month << cafe << store;
 
     Config c;
 
@@ -100,28 +104,30 @@ bool dllfunc(const QByteArray &in, RawMessage &rm)
             "order by f.name ");
     while (db.next()) {
         QHash<QString, QVariant> r;
+        qDebug() << "columns count of #1" << db.columnCount();
         for (int i = 0; i < db.columnCount(); i++) {
             r[db.columnName(i).toLower()] = db.value(i);
         }
-        goods[db.integerValue("id")] = r;
+        goods[db.integer("id")] = r;
     }
+    qDebug() << goods;
     QDate d1 = QDate::fromString(QString("%1/%2/%3").arg(1, 2, 10, QChar('0')).arg(month, 2, 10, QChar('0')).arg(year), "dd/MM/yyyy");
     QDate d2 = QDate::fromString(QString("%1/%2/%3").arg(d1.daysInMonth(), 2, 10, QChar('0')).arg(month, 2, 10, QChar('0')).arg(year), "dd/MM/yyyy");
     db[":date"] = d1.addDays(-1);
     db[":store_id"] = store;
     db[":action_id"] = 7;
     if (!db.exec("select sd.goods_id, sum(sd.qty) as qty, sum(sd.amount) as amount "
-                                 "from st_documents st, st_draft sd "
-                                 "where st.id=sd.doc_id "
-                                 "and st.doc_date = :date and st.store_input=:store_id "
-                                 "and st.action_id=:action_id "
-                                 "group by 1")) {
+                 "from st_documents st, st_draft sd "
+                 "where st.id=sd.doc_id "
+                 "and st.doc_date = :date and st.store_input=:store_id "
+                 "and st.action_id=:action_id "
+                 "group by 1")) {
         rm.putUByte(2);
         rm.putString(db.lastDbError());
         return false;
     }
     while (db.next()) {
-        QHash<QString, QVariant> &j = goods[db.integerValue("goods_id")];
+        QHash<QString, QVariant> &j = goods[db.integer("goods_id")];
         j["qty_till"] = db.doubleValue("qty");
         j["amount_till"] = db.doubleValue("amount");
     }
@@ -147,15 +153,15 @@ bool dllfunc(const QByteArray &in, RawMessage &rm)
     }
     QStringList foodNotInDb;
     while (mssqldb.next()) {
-        if (!goods.contains(mssqldb.integerValue("food"))) {
-            if (!foodNotInDb.contains(mssqldb.stringValue("food"))) {
-                foodNotInDb.append(mssqldb.stringValue("food"));
+        if (!goods.contains(mssqldb.integer("food"))) {
+            if (!foodNotInDb.contains(mssqldb.string("food"))) {
+                foodNotInDb.append(mssqldb.string("food"));
             }
             continue;
         }
-        QHash<QString, QVariant> &j = goods[mssqldb.integerValue("food")];
-        j["qty_in"] = j["qty_in"].toDouble() + (mssqldb.doubleValue("qty") * (mssqldb.integerValue("sign") == 0 ? -1 : 1));
-        j["amount_in"] = j["amount_in"].toDouble() + (mssqldb.doubleValue("amount") * (mssqldb.integerValue("sign") == 0 ? -1 : 1));
+        QHash<QString, QVariant> &j = goods[mssqldb.integer("food")];
+        j["qty_in"] = j["qty_in"].toDouble() + (mssqldb.doubleValue("qty") * (mssqldb.integer("sign") == 0 ? -1 : 1));
+        j["amount_in"] = j["amount_in"].toDouble() + (mssqldb.doubleValue("amount") * (mssqldb.integer("sign") == 0 ? -1 : 1));
     }
     if (foodNotInDb.count() > 0) {
         rm.putUByte(2);
@@ -179,7 +185,7 @@ bool dllfunc(const QByteArray &in, RawMessage &rm)
         return false;
     }
     while (db.next()) {
-        QHash<QString, QVariant> &j = goods[db.integerValue("goods_id")];
+        QHash<QString, QVariant> &j = goods[db.integer("goods_id")];
         j["qty_out"] = db.doubleValue("qty");
         j["amount_out"] = db.doubleValue("amount");
     }
@@ -202,7 +208,7 @@ bool dllfunc(const QByteArray &in, RawMessage &rm)
         return false;
     }
     while (db.next()) {
-        QHash<QString, QVariant> &j = goods[db.integerValue("goods_id")];
+        QHash<QString, QVariant> &j = goods[db.integer("goods_id")];
         j["qty_out2"] = db.doubleValue("qty");
         j["amount_out2"] = db.doubleValue("amount");
     }

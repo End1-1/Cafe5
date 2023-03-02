@@ -20,7 +20,7 @@
       <enum>QTabWidget::West</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
@@ -543,26 +543,6 @@
        <string>Goods</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_4">
-       <item row="1" column="0">
-        <widget class="C5CheckBox" name="checkBox_12">
-         <property name="text">
-          <string>Units</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>601</number>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="C5CheckBox" name="chGoods">
-         <property name="text">
-          <string>All items</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>600</number>
-         </property>
-        </widget>
-       </item>
        <item row="3" column="0">
         <widget class="C5CheckBox" name="checkBox_14">
          <property name="text">
@@ -583,16 +563,6 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="0">
-        <widget class="C5CheckBox" name="checkBox_17">
-         <property name="text">
-          <string>Storages</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>605</number>
-         </property>
-        </widget>
-       </item>
        <item row="5" column="0">
         <widget class="C5CheckBox" name="checkBox_15">
          <property name="text">
@@ -602,6 +572,19 @@
           <number>604</number>
          </property>
         </widget>
+       </item>
+       <item row="11" column="1">
+        <spacer name="verticalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>498</height>
+          </size>
+         </property>
+        </spacer>
        </item>
        <item row="10" column="0">
         <widget class="C5CheckBox" name="checkBox_213">
@@ -623,29 +606,6 @@
          </property>
         </widget>
        </item>
-       <item row="11" column="1">
-        <spacer name="verticalSpacer_4">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>498</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="2" column="0">
-        <widget class="C5CheckBox" name="checkBox_13">
-         <property name="text">
-          <string>Groups</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>602</number>
-         </property>
-        </widget>
-       </item>
        <item row="8" column="0">
         <widget class="C5CheckBox" name="checkBox_65">
          <property name="text">
@@ -656,6 +616,26 @@
          </property>
         </widget>
        </item>
+       <item row="1" column="0">
+        <widget class="C5CheckBox" name="checkBox_12">
+         <property name="text">
+          <string>Units</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>601</number>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0">
+        <widget class="C5CheckBox" name="checkBox_17">
+         <property name="text">
+          <string>Storages</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>605</number>
+         </property>
+        </widget>
+       </item>
        <item row="4" column="0">
         <widget class="C5CheckBox" name="checkBox_105">
          <property name="text">
@@ -663,6 +643,26 @@
          </property>
          <property name="Tag" stdset="0">
           <number>611</number>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="C5CheckBox" name="chGoods">
+         <property name="text">
+          <string>All items</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>600</number>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="C5CheckBox" name="checkBox_13">
+         <property name="text">
+          <string>Groups</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>602</number>
          </property>
         </widget>
        </item>
@@ -1394,6 +1394,16 @@
         </widget>
        </item>
        <item>
+        <widget class="C5CheckBox" name="checkBox_114">
+         <property name="text">
+          <string>Breeze service</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>110</number>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -1584,14 +1594,14 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>tw</tabstop>
-  <tabstop>chOtherAllItems</tabstop>
-  <tabstop>checkBox_38</tabstop>
-  <tabstop>checkBox_28</tabstop>
-  <tabstop>checkBox_33</tabstop>
-  <tabstop>checkBox_34</tabstop>
-  <tabstop>chDisch</tabstop>
-  <tabstop>checkBox_32</tabstop>
+  <tabstop>chPreferences</tabstop>
+  <tabstop>checkBox_35</tabstop>
+  <tabstop>checkBox_36</tabstop>
+  <tabstop>checkBox</tabstop>
+  <tabstop>checkBox_2</tabstop>
+  <tabstop>checkBox_3</tabstop>
+  <tabstop>checkBox_8</tabstop>
+  <tabstop>checkBox_114</tabstop>
   <tabstop>checkBox_37</tabstop>
   <tabstop>checkBox_53</tabstop>
   <tabstop>checkBox_149</tabstop>
@@ -1683,13 +1693,13 @@
   <tabstop>checkBox_81</tabstop>
   <tabstop>checkBox_87</tabstop>
   <tabstop>checkBox_94</tabstop>
-  <tabstop>chPreferences</tabstop>
-  <tabstop>checkBox_35</tabstop>
-  <tabstop>checkBox_36</tabstop>
-  <tabstop>checkBox</tabstop>
-  <tabstop>checkBox_2</tabstop>
-  <tabstop>checkBox_3</tabstop>
-  <tabstop>checkBox_8</tabstop>
+  <tabstop>tw</tabstop>
+  <tabstop>chOtherAllItems</tabstop>
+  <tabstop>checkBox_38</tabstop>
+  <tabstop>checkBox_28</tabstop>
+  <tabstop>checkBox_33</tabstop>
+  <tabstop>checkBox_34</tabstop>
+  <tabstop>chDisch</tabstop>
   <tabstop>chGoods</tabstop>
   <tabstop>checkBox_80</tabstop>
   <tabstop>lbGroup</tabstop>
@@ -1714,6 +1724,11 @@
   <tabstop>checkBox_107</tabstop>
   <tabstop>checkBox_108</tabstop>
   <tabstop>checkBox_109</tabstop>
+  <tabstop>checkBox_112</tabstop>
+  <tabstop>checkBox_113</tabstop>
+  <tabstop>checkBox_111</tabstop>
+  <tabstop>checkBox_110</tabstop>
+  <tabstop>checkBox_32</tabstop>
  </tabstops>
  <resources/>
  <connections/>

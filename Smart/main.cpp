@@ -24,9 +24,9 @@ int main(int argc, char *argv[])
     QCoreApplication::setLibraryPaths(libPath);
 #endif
 
-    if (QDate::currentDate() > QDate::fromString("28/02/2023", "dd/MM/yyyy")) {
-        return 1;
-    }
+//    if (QDate::currentDate() > QDate::fromString("28/02/2023", "dd/MM/yyyy")) {
+//        return 1;
+//    }
 
     QDir d;
     QFile file(d.homePath() + "/" + _APPLICATION_ + "/lock.pid");

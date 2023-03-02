@@ -155,12 +155,13 @@ void StoreInput::getList()
     ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 30, 100, 0, 300, 140, 100, 100);
     C5Database db(__c5config.replicaDbParams());
     db[":f_store"] = __c5config.defaultStore();
-    if (!db.exec("select ad.f_id, spa.f_id as f_acc, ah.f_date, g.f_name, g.f_scancode, ad.f_qty, g.f_saleprice "
+    if (!db.exec("select ad.f_id, spa.f_id as f_acc, ah.f_date, g.f_name, g.f_scancode, ad.f_qty, gpr.f_price1 "
                 "from a_store_draft ad "
                 "left join a_header_shop2partneraccept spa on spa.f_id=ad.f_id "
                 "inner join c_goods g on g.f_id=ad.f_goods "
                 "inner join a_header ah on ah.f_id=ad.f_document "
                 "inner join a_header_shop2partner sp on sp.f_id=ah.f_id "
+                 "left join c_goods_prices gpr on gpr.f_goods=g.f_id "
                  "where sp.f_store=:f_store and sp.f_accept=0 "
                  "order by g.f_scancode ")) {
         C5Message::error(db.fLastError);
@@ -180,8 +181,8 @@ void StoreInput::getList()
         ui->tbl->setString(r, 4, db.getString("f_name"));
         ui->tbl->setString(r, 5, db.getString("f_scancode"));
         ui->tbl->setString(r, 6, db.getString("f_qty"));
-        ui->tbl->setString(r, 7, db.getString("f_saleprice"));
-        ui->leTotal->setDouble(ui->leTotal->getDouble() + (db.getDouble("f_qty") * db.getDouble("f_saleprice")));
+        ui->tbl->setString(r, 7, db.getString("f_price1"));
+        ui->leTotal->setDouble(ui->leTotal->getDouble() + (db.getDouble("f_qty") * db.getDouble("f_price1")));
     }
     ui->tbl->fitColumnsToWidth();
 }
@@ -203,10 +204,11 @@ void StoreInput::history()
     db[":f_date2"] = ui->deEnd->date();
     db[":f_type"] = 1;
     db[":f_state"] = DOC_STATE_SAVED;
-    if (!db.exec("select ad.f_id, '', ah.f_date, g.f_name, g.f_scancode, ad.f_qty, g.f_saleprice, "
+    if (!db.exec("select ad.f_id, '', ah.f_date, g.f_name, g.f_scancode, ad.f_qty, gpr.f_price1, "
             "spa.f_id as f_spa "
             "from a_store_draft ad "
             "inner join c_goods g on g.f_id=ad.f_goods "
+             "left join c_goods_prices gpr on gpr.f_goods=g.f_id "
             "inner join a_header ah on ah.f_id=ad.f_document "
             "left join a_header_shop2partneraccept spa on spa.f_id=ad.f_id "
             "where ad.f_store=:f_store and ah.f_date between :f_date1 and :f_date2 and ad.f_type=1 "
@@ -225,8 +227,8 @@ void StoreInput::history()
         ui->tbl->setString(r, 4, db.getString("f_name"));
         ui->tbl->setString(r, 5, db.getString("f_scancode"));
         ui->tbl->setString(r, 6, db.getString("f_qty"));
-        ui->tbl->setString(r, 7, db.getString("f_saleprice"));
-        ui->leTotal->setDouble(ui->leTotal->getDouble() + (db.getDouble("f_qty") * db.getDouble("f_saleprice")));
+        ui->tbl->setString(r, 7, db.getString("f_price1"));
+        ui->leTotal->setDouble(ui->leTotal->getDouble() + (db.getDouble("f_qty") * db.getDouble("f_price1")));
         if (db.getString("f_id") == db.getString("f_spa")) {
             for (int i = 0; i < ui->tbl->columnCount(); i++) {
                 ui->tbl->item(r, i)->setData(Qt::BackgroundColorRole, QColor(Qt::magenta));
@@ -253,9 +255,10 @@ void StoreInput::storeByGroup()
     db[":f_store"] = __c5config.defaultStore();
     db[":f_date"] = QDate::currentDate();
     if (!db.exec("select gg.f_name as f_group,sum(s.f_qty*s.f_type) as f_qty, "
-            "sum(s.f_qty*s.f_type)*g.f_saleprice as f_totalsale "
+            "sum(s.f_qty*s.f_type)*gpr.f_price1 as f_totalsale "
             "from a_store s "
             "inner join c_goods g on g.f_id=s.f_goods "
+            "left join c_goods_prices gpr on gpr.f_goods=g.f_id "
             "inner join c_groups gg on gg.f_id=g.f_group "
             "inner join a_header h on h.f_id=s.f_document  "
             "where h.f_date<=:f_date and h.f_state=1  and s.f_store=:f_store  "
@@ -293,9 +296,10 @@ void StoreInput::storeByItems()
     db[":f_store"] = __c5config.defaultStore();
     db[":f_date"] = QDate::currentDate();
     if (!db.exec("select gg.f_name as f_group, g.f_name, g.f_scancode, sum(s.f_qty*s.f_type) as f_qty, "
-            "sum(s.f_qty*s.f_type)*g.f_saleprice as f_totalsale "
+            "sum(s.f_qty*s.f_type)*gpr.f_price1 as f_totalsale "
             "from a_store s "
             "inner join c_goods g on g.f_id=s.f_goods "
+            "left join c_goods_prices gpr on gpr.f_goods=g.f_id "
             "inner join c_groups gg on gg.f_id=g.f_group "
             "inner join a_header h on h.f_id=s.f_document  "
             "where h.f_date<=:f_date and h.f_state=1 and s.f_store=:f_store  "

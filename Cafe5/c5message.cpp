@@ -1,6 +1,7 @@
 #include "c5message.h"
 #include "ui_c5message.h"
 #include "c5config.h"
+#include <QClipboard>
 
 C5Message::C5Message(QWidget *parent) :
 #ifdef WAITER
@@ -14,6 +15,7 @@ C5Message::C5Message(QWidget *parent) :
 #ifndef WAITER
     ui->frame->setFrameShape(QFrame::NoFrame);
 #endif
+    ui->btnCopy->setVisible(false);
 }
 
 C5Message::~C5Message()
@@ -53,6 +55,7 @@ int C5Message::showMessage(const QString &text, int tp, const QString &yes, cons
         break;
     case 2:
         img = "error";
+        c5->ui->btnCopy->setVisible(true);
         break;
     case 3:
         img = "help";
@@ -85,4 +88,9 @@ void C5Message::on_btnCancel_clicked()
 void C5Message::on_btnA3_clicked()
 {
     done(2);
+}
+
+void C5Message::on_btnCopy_clicked()
+{
+    qApp->clipboard()->setText(ui->label->text());
 }

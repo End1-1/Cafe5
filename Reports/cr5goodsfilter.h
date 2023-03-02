@@ -18,6 +18,8 @@ public:
 
     virtual QString condition();
 
+    int currency();
+
     QString group();
 
 private:

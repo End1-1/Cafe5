@@ -13,6 +13,7 @@ void loadPart1(RawMessage &rm, Database &db, const QByteArray &in)
         nt.execSQL("select id, name from me_group_types");
         break;
     case version2:
+        nt.execSQL("select f_id, f_name from d_part1");
         break;
     case version3:
         nt.execSQL("select f_id, f_en from r_dish_part");
@@ -43,6 +44,13 @@ void loadPart2(RawMessage &rm, Database &db, const QByteArray &in)
                    "order by dt.name "  );
         break;
     case version2:
+        nt.execSQL("select distinct(p2.f_id), p2.f_parent, p2.f_part, "
+                   "-16777216 as f_textcolor, -1 as f_bgcolor, p2.f_name, 1 "
+                    "from d_part2 p2 "
+                    "inner join d_dish d on d.f_part=p2.f_id "
+                    "inner join d_menu m on m.f_dish=d.f_id "
+                    "where m.f_state=1 "
+                    "order by p2.f_name ");
         break;
     case version3:
         nt.execSQL("select distinct(dt.f_id), 0 as f_parentid, dt.f_part, dt.f_textcolor, dt.f_bgcolor, dt.f_en, dt.f_queue "
@@ -72,6 +80,10 @@ void loadDishes(RawMessage &rm, Database &db, const QByteArray &in)
                     "where id in (select distinct(dish_id) from me_dishes_menu where state_id=1) ");
         break;
     case version2:
+        nt.execSQL("select distinct(d.f_id), d.f_part, d.f_color as f_bgcolor, -16777216 as f_textcolor, "
+                    "d.f_name, d.f_queue, m.f_recent "
+                    "from d_dish d "
+                    "inner join d_menu m on m.f_dish=d.f_id and m.f_state=1 ");
         break;
     case version3:
         nt.execSQL("select f_id, f_type, f_bgcolor, f_textcolor, f_en, f_queue, 0 as quick_list from r_dish "
@@ -102,6 +114,12 @@ void loadDishMenu(RawMessage &rm, Database &db, const QByteArray &in)
                     "order by d.queue ");
         break;
     case version2:
+        nt.execSQL("select m.f_menu, d.f_part, m.f_dish, m.f_price, m.f_store, m.f_print1, "
+                    "m.f_print2 "
+                    "from d_menu m "
+                    "inner join d_dish d on d.f_id=m.f_dish "
+                    "where m.f_state=1 "
+                    "order by d.f_queue");
         break;
     case version3:
         nt.execSQL("select m.f_menu, d.f_type, m.f_dish, m.f_price, m.f_store, m.f_print1, "
@@ -130,9 +148,30 @@ void getDishComment(RawMessage &rm, Database &db, const QByteArray &in)
         nt.execSQL("select id, forid, name from me_dishes_comment ");
         break;
     case version2:
+        nt.execSQL("select f_id, f_dish, f_comment "
+                    "from d_special "
+                    "union "
+                    "select f_id, 0, f_name "
+                    "from d_dish_comment ");
         break;
     case version3:
         nt.execSQL("select 1, 0, '-' ");
+        break;
+    }
+}
+
+void loadMenuNames(RawMessage &rm, Database &db, const QByteArray &in)
+{
+    quint8 version;
+    NetworkTable nt(rm, db);
+    rm.readUByte(version, in);
+    switch (version) {
+    case version1:
+        nt.execSQL("select id, name from me_menus");
+        break;
+    case version2:
+        break;
+    case version3:
         break;
     }
 }

@@ -69,14 +69,14 @@
           <widget class="QPushButton" name="btnNewRetail">
            <property name="minimumSize">
             <size>
-             <width>26</width>
-             <height>26</height>
+             <width>36</width>
+             <height>36</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>26</width>
-             <height>26</height>
+             <width>36</width>
+             <height>36</height>
             </size>
            </property>
            <property name="focusPolicy">
@@ -94,8 +94,8 @@
            </property>
            <property name="iconSize">
             <size>
-             <width>20</width>
-             <height>20</height>
+             <width>30</width>
+             <height>30</height>
             </size>
            </property>
           </widget>
@@ -104,14 +104,14 @@
           <widget class="QPushButton" name="btnNewWhosale">
            <property name="minimumSize">
             <size>
-             <width>26</width>
-             <height>26</height>
+             <width>36</width>
+             <height>36</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>26</width>
-             <height>26</height>
+             <width>36</width>
+             <height>36</height>
             </size>
            </property>
            <property name="focusPolicy">
@@ -129,8 +129,8 @@
            </property>
            <property name="iconSize">
             <size>
-             <width>20</width>
-             <height>20</height>
+             <width>30</width>
+             <height>30</height>
             </size>
            </property>
           </widget>
@@ -139,14 +139,14 @@
           <widget class="QPushButton" name="btnGoodsList">
            <property name="minimumSize">
             <size>
-             <width>26</width>
-             <height>26</height>
+             <width>36</width>
+             <height>36</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>26</width>
-             <height>26</height>
+             <width>36</width>
+             <height>36</height>
             </size>
            </property>
            <property name="focusPolicy">
@@ -164,8 +164,43 @@
            </property>
            <property name="iconSize">
             <size>
-             <width>20</width>
-             <height>20</height>
+             <width>30</width>
+             <height>30</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnOpenDraft">
+           <property name="minimumSize">
+            <size>
+             <width>36</width>
+             <height>36</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>36</width>
+             <height>36</height>
+            </size>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
+           <property name="toolTip">
+            <string>Open draft</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources/res.qrc">
+             <normaloff>:/draft.png</normaloff>:/draft.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>30</width>
+             <height>30</height>
             </size>
            </property>
           </widget>
@@ -174,14 +209,14 @@
           <widget class="QPushButton" name="btnWriteOrder">
            <property name="minimumSize">
             <size>
-             <width>26</width>
-             <height>26</height>
+             <width>36</width>
+             <height>36</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>26</width>
-             <height>26</height>
+             <width>36</width>
+             <height>36</height>
             </size>
            </property>
            <property name="focusPolicy">
@@ -199,8 +234,8 @@
            </property>
            <property name="iconSize">
             <size>
-             <width>20</width>
-             <height>20</height>
+             <width>30</width>
+             <height>30</height>
             </size>
            </property>
           </widget>
@@ -209,14 +244,14 @@
           <widget class="QPushButton" name="btnManualTax">
            <property name="minimumSize">
             <size>
-             <width>26</width>
-             <height>26</height>
+             <width>36</width>
+             <height>36</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>26</width>
-             <height>26</height>
+             <width>36</width>
+             <height>36</height>
             </size>
            </property>
            <property name="focusPolicy">
@@ -234,8 +269,8 @@
            </property>
            <property name="iconSize">
             <size>
-             <width>20</width>
-             <height>20</height>
+             <width>30</width>
+             <height>30</height>
             </size>
            </property>
           </widget>
@@ -257,14 +292,14 @@
           <widget class="QPushButton" name="btnHelp">
            <property name="minimumSize">
             <size>
-             <width>26</width>
-             <height>26</height>
+             <width>36</width>
+             <height>36</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>26</width>
-             <height>26</height>
+             <width>36</width>
+             <height>36</height>
             </size>
            </property>
            <property name="focusPolicy">
@@ -282,8 +317,116 @@
            </property>
            <property name="iconSize">
             <size>
-             <width>20</width>
-             <height>20</height>
+             <width>30</width>
+             <height>30</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnPreorder">
+           <property name="minimumSize">
+            <size>
+             <width>36</width>
+             <height>36</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>36</width>
+             <height>36</height>
+            </size>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
+           <property name="toolTip">
+            <string>Help</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources/res.qrc">
+             <normaloff>:/preorder.png</normaloff>:/preorder.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>30</width>
+             <height>30</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnCostumerDisplay">
+           <property name="minimumSize">
+            <size>
+             <width>36</width>
+             <height>36</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>36</width>
+             <height>36</height>
+            </size>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
+           <property name="toolTip">
+            <string>Costumer display</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources/res.qrc">
+             <normaloff>:/monitor.png</normaloff>:/monitor.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>30</width>
+             <height>30</height>
+            </size>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnGiftCard">
+           <property name="minimumSize">
+            <size>
+             <width>36</width>
+             <height>36</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>36</width>
+             <height>36</height>
+            </size>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
+           <property name="toolTip">
+            <string>Gift card</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources/res.qrc">
+             <normaloff>:/present.png</normaloff>:/present.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>30</width>
+             <height>30</height>
             </size>
            </property>
           </widget>
@@ -292,14 +435,14 @@
           <widget class="QPushButton" name="btnSalesReport">
            <property name="minimumSize">
             <size>
-             <width>26</width>
-             <height>26</height>
+             <width>36</width>
+             <height>36</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>26</width>
-             <height>26</height>
+             <width>36</width>
+             <height>36</height>
             </size>
            </property>
            <property name="focusPolicy">
@@ -317,8 +460,8 @@
            </property>
            <property name="iconSize">
             <size>
-             <width>20</width>
-             <height>20</height>
+             <width>30</width>
+             <height>30</height>
             </size>
            </property>
           </widget>
@@ -327,14 +470,14 @@
           <widget class="QPushButton" name="btnGoodsMovement">
            <property name="minimumSize">
             <size>
-             <width>26</width>
-             <height>26</height>
+             <width>36</width>
+             <height>36</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>26</width>
-             <height>26</height>
+             <width>36</width>
+             <height>36</height>
             </size>
            </property>
            <property name="focusPolicy">
@@ -352,8 +495,8 @@
            </property>
            <property name="iconSize">
             <size>
-             <width>20</width>
-             <height>20</height>
+             <width>30</width>
+             <height>30</height>
             </size>
            </property>
           </widget>
@@ -362,14 +505,14 @@
           <widget class="QPushButton" name="btnDbConnection">
            <property name="minimumSize">
             <size>
-             <width>26</width>
-             <height>26</height>
+             <width>36</width>
+             <height>36</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>26</width>
-             <height>26</height>
+             <width>36</width>
+             <height>36</height>
             </size>
            </property>
            <property name="focusPolicy">
@@ -387,8 +530,8 @@
            </property>
            <property name="iconSize">
             <size>
-             <width>20</width>
-             <height>20</height>
+             <width>30</width>
+             <height>30</height>
             </size>
            </property>
           </widget>
@@ -397,14 +540,14 @@
           <widget class="QPushButton" name="btnClientConfigQR">
            <property name="minimumSize">
             <size>
-             <width>26</width>
-             <height>26</height>
+             <width>36</width>
+             <height>36</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>26</width>
-             <height>26</height>
+             <width>36</width>
+             <height>36</height>
             </size>
            </property>
            <property name="focusPolicy">
@@ -422,8 +565,8 @@
            </property>
            <property name="iconSize">
             <size>
-             <width>20</width>
-             <height>20</height>
+             <width>30</width>
+             <height>30</height>
             </size>
            </property>
           </widget>
@@ -432,14 +575,14 @@
           <widget class="QPushButton" name="btnServerSettings">
            <property name="minimumSize">
             <size>
-             <width>26</width>
-             <height>26</height>
+             <width>36</width>
+             <height>36</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>26</width>
-             <height>26</height>
+             <width>36</width>
+             <height>36</height>
             </size>
            </property>
            <property name="focusPolicy">
@@ -457,8 +600,8 @@
            </property>
            <property name="iconSize">
             <size>
-             <width>20</width>
-             <height>20</height>
+             <width>30</width>
+             <height>30</height>
             </size>
            </property>
           </widget>
@@ -467,14 +610,14 @@
           <widget class="QPushButton" name="btnMinimize">
            <property name="minimumSize">
             <size>
-             <width>26</width>
-             <height>26</height>
+             <width>36</width>
+             <height>36</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>26</width>
-             <height>26</height>
+             <width>36</width>
+             <height>36</height>
             </size>
            </property>
            <property name="focusPolicy">
@@ -492,8 +635,8 @@
            </property>
            <property name="iconSize">
             <size>
-             <width>20</width>
-             <height>20</height>
+             <width>30</width>
+             <height>30</height>
             </size>
            </property>
           </widget>
@@ -502,14 +645,14 @@
           <widget class="QPushButton" name="btnCloseApplication">
            <property name="minimumSize">
             <size>
-             <width>26</width>
-             <height>26</height>
+             <width>36</width>
+             <height>36</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>26</width>
-             <height>26</height>
+             <width>36</width>
+             <height>36</height>
             </size>
            </property>
            <property name="focusPolicy">
@@ -527,8 +670,8 @@
            </property>
            <property name="iconSize">
             <size>
-             <width>20</width>
-             <height>20</height>
+             <width>30</width>
+             <height>30</height>
             </size>
            </property>
           </widget>

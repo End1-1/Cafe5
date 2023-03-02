@@ -52,6 +52,7 @@ int main(int argc, char *argv[])
     } else {
         C5Dialog::go<C5Connection>(C5Config::dbParams());
     }
+    C5Database::LOGGING = C5Config::getValue(param_debuge_mode).toInt() == 1;
 
     if (!C5SystemPreference::checkDecimalPointAndSeparator()) {
         return 0;

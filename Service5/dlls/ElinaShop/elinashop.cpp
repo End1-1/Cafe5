@@ -19,382 +19,382 @@ void routes(QStringList &r)
     r.append("printtax");
 }
 
-bool shoprequest(const QByteArray &indata, QByteArray &outdata, const QHash<QString, DataAddress> &dataMap, const ContentType &contentType)
-{
-    //VALIDATION
-    CommandLine cl;
-    QString path;
-    cl.value("path", path);
-    QString configFile = path + "/handlers/shop.ini";
+//bool shoprequest_old(const QByteArray &indata, QByteArray &outdata, const QHash<QString, DataAddress> &dataMap, const ContentType &contentType)
+//{
+//    //VALIDATION
+//    CommandLine cl;
+//    QString path;
+//    cl.value("path", path);
+//    QString configFile = path + "/handlers/shop.ini";
 
-    StoreManager::init(configFile);
-    ShopManager::init(configFile);
-    RequestHandler rh(outdata);
-    rh.fContentType = contentType;
-    QJsonObject fOrderJson;
-    switch (contentType) {
-    case ContentType::ApplilcationJson:
-        if (!validateApplicationJson(rh, fOrderJson, indata, dataMap)) {
-            return false;
-        }
-        break;
-    default:
-        if (!validateMultipartFormData(rh, fOrderJson, indata, dataMap)) {
-            return false;
-        }
-        break;
-    }
-    //PROCESS
-    JsonHandler jh;
-    Database db;
-    if (!db.open(configFile)) {
-        LogWriter::write(LogWriterLevel::errors, "", QString("ElinaShop::shoprequest").arg(db.lastDbError()));
-        jh["message"] = "Cannot connect to database";
-        return rh.setInternalServerError(jh.toString());
-    }
-    QSettings s(configFile, QSettings::IniFormat);
-    int hall = s.value("shop/hall").toInt();
-    int table = s.value("shop/table").toInt();
+//    StoreManager::init(configFile);
+//    ShopManager::init(configFile);
+//    RequestHandler rh(outdata);
+//    rh.fContentType = contentType;
+//    QJsonObject fOrderJson;
+//    switch (contentType) {
+//    case ContentType::ApplilcationJson:
+//        if (!validateApplicationJson(rh, fOrderJson, indata, dataMap)) {
+//            return false;
+//        }
+//        break;
+//    default:
+//        if (!validateMultipartFormData(rh, fOrderJson, indata, dataMap)) {
+//            return false;
+//        }
+//        break;
+//    }
+//    //PROCESS
+//    JsonHandler jh;
+//    Database db;
+//    if (!db.open(configFile)) {
+//        LogWriter::write(LogWriterLevel::errors, "", QString("ElinaShop::shoprequest").arg(db.lastDbError()));
+//        jh["message"] = "Cannot connect to database";
+//        return rh.setInternalServerError(jh.toString());
+//    }
+//    QSettings s(configFile, QSettings::IniFormat);
+//    int hall = s.value("shop/hall").toInt();
+//    int table = s.value("shop/table").toInt();
 
-    /* ORDER ID */
-    QString prefix;
-    int hallid;
-    db.startTransaction();
-    db[":f_id"] = hall;
-    db.exec("select f_counter + 1 as f_counter, f_prefix from h_halls where f_id=:f_id for update");
-    if (db.next()) {
-        hallid = db.integer("f_counter");
-        prefix = db.string("f_prefix");
-        db[":f_counter"] = db.integer("f_counter");
-        db.update("h_halls", "f_id", hall);
-    } else {
-        rh.setInternalServerError(db.lastDbError());
-        LogWriter::write(LogWriterLevel::errors, "", "ElinaShop::shoprequest. " + db.lastDbError());
-        db.rollback();
-        return false;
-    }
-    db.commit();
+//    /* ORDER ID */
+//    QString prefix;
+//    int hallid;
+//    db.startTransaction();
+//    db[":f_id"] = hall;
+//    db.exec("select f_counter + 1 as f_counter, f_prefix from h_halls where f_id=:f_id for update");
+//    if (db.next()) {
+//        hallid = db.integer("f_counter");
+//        prefix = db.string("f_prefix");
+//        db[":f_counter"] = db.integer("f_counter");
+//        db.update("h_halls", "f_id", hall);
+//    } else {
+//        rh.setInternalServerError(db.lastDbError());
+//        LogWriter::write(LogWriterLevel::errors, "", "ElinaShop::shoprequest. " + db.lastDbError());
+//        db.rollback();
+//        return false;
+//    }
+//    db.commit();
 
-    double amountTotal = 0;
-    //Check for multiple quantity and separate one by one
-    QJsonArray ja = fOrderJson["items"].toArray();
-    for (int i = 0; i < ja.count(); i++) {
-        QJsonObject o = fOrderJson["items"].toArray().at(i).toObject();
-        while (o["qty"].toDouble() > 1) {
-            o["qty"] = o["qty"].toDouble() - 1;
-            ja[i] = o;
-            QJsonObject oc = o;
-            oc["qty"] = 1;
-            oc["row"] = ja.count();
-            ja.append(oc);
-        }
-    }
-    fOrderJson["items"] = ja;
-    qDebug() << fOrderJson;
-    for (int i = 0; i < fOrderJson["items"].toArray().count(); i++) {
-        QJsonObject o = fOrderJson["items"].toArray().at(i).toObject();
-        amountTotal += o["price"].toDouble() * o["qty"].toDouble();
-    }
-    if (fOrderJson["delivery"].toDouble() > 0) {
-        amountTotal += fOrderJson["delivery"].toDouble();
-    }
+//    double amountTotal = 0;
+//    //Check for multiple quantity and separate one by one
+//    QJsonArray ja = fOrderJson["items"].toArray();
+//    for (int i = 0; i < ja.count(); i++) {
+//        QJsonObject o = fOrderJson["items"].toArray().at(i).toObject();
+//        while (o["qty"].toDouble() > 1) {
+//            o["qty"] = o["qty"].toDouble() - 1;
+//            ja[i] = o;
+//            QJsonObject oc = o;
+//            oc["qty"] = 1;
+//            oc["row"] = ja.count();
+//            ja.append(oc);
+//        }
+//    }
+//    fOrderJson["items"] = ja;
+//    qDebug() << fOrderJson;
+//    for (int i = 0; i < fOrderJson["items"].toArray().count(); i++) {
+//        QJsonObject o = fOrderJson["items"].toArray().at(i).toObject();
+//        amountTotal += o["price"].toDouble() * o["qty"].toDouble();
+//    }
+//    if (fOrderJson["delivery"].toDouble() > 0) {
+//        amountTotal += fOrderJson["delivery"].toDouble();
+//    }
 
-    int otherid = 0;
-    double amountCash = fOrderJson["payment_type"].toInt() == 1 ? amountTotal : 0;
-    double amountCard = fOrderJson["payment_type"].toInt() == 2 ? amountTotal : 0;
-    double amountOther = fOrderJson["payment_type"].toInt() > 4 ? amountTotal : 0;
-    double amountIDram = fOrderJson["payment_type"].toInt() == 6 ? amountTotal : 0;
-    double amountTellCell = fOrderJson["payment_type"].toInt() == 7 ? amountTotal : 0;
-    db.startTransaction();
-    /* O_HEADER */
-    QString uuid = db.uuid();
-    db[":f_id"] = uuid;
-    db[":f_hallid"] = hallid;
-    db[":f_prefix"] = prefix;
-    db[":f_state"] = 2;
-    db[":f_hall"] = hall;
-    db[":f_table"] = table;
-    db[":f_dateopen"] = QDate::currentDate();
-    db[":f_dateclose"] = QDate::currentDate();
-    db[":f_datecash"] = QDate::currentDate();
-    db[":f_timeopen"] = QTime::currentTime();
-    db[":f_timeclose"] = QTime::currentTime();
-    db[":f_staff"] = 1;
-    db[":f_comment"] = QObject::tr("Delivery address") + ": "
-            + fOrderJson["address"].toObject()["city"].toString()
-            + ", " + fOrderJson["address"].toObject()["address"].toString()
-            + ", " + QObject::tr("phone") + ": "
-            + fOrderJson["address"].toObject()["phone"].toString();
-    db[":f_print"] = 0;
-    db[":f_amounttotal"] = amountTotal;
-    db[":f_amountcash"] = amountCash;
-    db[":f_amountcard"] = amountCard;
-    db[":f_amountbank"] = 0;
-    db[":f_amountother"] = amountOther;
-    db[":f_amountservice"] = 0;
-    db[":f_amountdiscount"] = 0;
-    db[":f_servicefactor"] = 0;
-    db[":f_discountfactor"] = 0;
-    db[":f_creditcardid"] = 0;
-    db[":f_otherid"] = 0;
-    db[":f_shift"] = 1;
-    db[":f_source"] = 2;
-    db[":f_saletype"] = 1;
-    db[":f_partner"] = 0;
-    if (!db.insert("o_header")) {
-        LogWriter::write(LogWriterLevel::errors, "", "ElinaShop::requestshop." + db.lastDbError());
-        rh.setInternalServerError(db.lastDbError());
-        db.rollback();
-        return false;
-    }
-    db[":f_id"] = uuid;
-    db[":f_1"] = 0;
-    db[":f_2"] = 0;
-    db[":f_3"] = 0;
-    db[":f_4"] = 0;
-    db[":f_5"] = 0;
-    if (!db.insert("o_header_flags")) {
-        LogWriter::write(LogWriterLevel::errors, "", "ElinaShop::requestshop." + db.lastDbError());
-        rh.setInternalServerError(db.lastDbError());
-        db.rollback();
-        return false;
-    }
-    /* o_header_options */
-    db[":f_id"] = uuid;
-    db.insert("o_header_options");
+//    int otherid = 0;
+//    double amountCash = fOrderJson["payment_type"].toInt() == 1 ? amountTotal : 0;
+//    double amountCard = fOrderJson["payment_type"].toInt() == 2 ? amountTotal : 0;
+//    double amountOther = fOrderJson["payment_type"].toInt() > 4 ? amountTotal : 0;
+//    double amountIDram = fOrderJson["payment_type"].toInt() == 6 ? amountTotal : 0;
+//    double amountTellCell = fOrderJson["payment_type"].toInt() == 7 ? amountTotal : 0;
+//    db.startTransaction();
+//    /* O_draft_sale */
+//    QString uuid = db.uuid();
+//    db[":f_id"] = uuid;
+//    db[":f_hallid"] = hallid;
+//    db[":f_prefix"] = prefix;
+//    db[":f_state"] = 2;
+//    db[":f_hall"] = hall;
+//    db[":f_table"] = table;
+//    db[":f_dateopen"] = QDate::currentDate();
+//    db[":f_dateclose"] = QDate::currentDate();
+//    db[":f_datecash"] = QDate::currentDate();
+//    db[":f_timeopen"] = QTime::currentTime();
+//    db[":f_timeclose"] = QTime::currentTime();
+//    db[":f_staff"] = 1;
+//    db[":f_comment"] = QObject::tr("Delivery address") + ": "
+//            + fOrderJson["address"].toObject()["city"].toString()
+//            + ", " + fOrderJson["address"].toObject()["address"].toString()
+//            + ", " + QObject::tr("phone") + ": "
+//            + fOrderJson["address"].toObject()["phone"].toString();
+//    db[":f_print"] = 0;
+//    db[":f_amounttotal"] = amountTotal;
+//    db[":f_amountcash"] = amountCash;
+//    db[":f_amountcard"] = amountCard;
+//    db[":f_amountbank"] = 0;
+//    db[":f_amountother"] = amountOther;
+//    db[":f_amountservice"] = 0;
+//    db[":f_amountdiscount"] = 0;
+//    db[":f_servicefactor"] = 0;
+//    db[":f_discountfactor"] = 0;
+//    db[":f_creditcardid"] = 0;
+//    db[":f_otherid"] = 0;
+//    db[":f_shift"] = 1;
+//    db[":f_source"] = 2;
+//    db[":f_saletype"] = 1;
+//    db[":f_partner"] = 0;
+//    if (!db.insert("o_header")) {
+//        LogWriter::write(LogWriterLevel::errors, "", "ElinaShop::requestshop." + db.lastDbError());
+//        rh.setInternalServerError(db.lastDbError());
+//        db.rollback();
+//        return false;
+//    }
+//    db[":f_id"] = uuid;
+//    db[":f_1"] = 0;
+//    db[":f_2"] = 0;
+//    db[":f_3"] = 0;
+//    db[":f_4"] = 0;
+//    db[":f_5"] = 0;
+//    if (!db.insert("o_header_flags")) {
+//        LogWriter::write(LogWriterLevel::errors, "", "ElinaShop::requestshop." + db.lastDbError());
+//        rh.setInternalServerError(db.lastDbError());
+//        db.rollback();
+//        return false;
+//    }
+//    /* o_header_options */
+//    db[":f_id"] = uuid;
+//    db.insert("o_header_options");
 
-    db[":f_id"] = uuid;
-    db[":f_cash"] = amountCash;
-    db[":f_card"] = amountCard;
-    db[":f_prepaid"] = 0;
-    db[":f_change"] = 0;
-    db[":f_idram"] = amountIDram;
-    db[":f_tellcell"] = amountTellCell;
-    if (!db.insert("o_payment")) {
-        LogWriter::write(LogWriterLevel::errors, "", "ElinaShop::requestshop." + db.lastDbError());
-        rh.setInternalServerError(db.lastDbError());
-        db.rollback();
-        return false;
-    }
+//    db[":f_id"] = uuid;
+//    db[":f_cash"] = amountCash;
+//    db[":f_card"] = amountCard;
+//    db[":f_prepaid"] = 0;
+//    db[":f_change"] = 0;
+//    db[":f_idram"] = amountIDram;
+//    db[":f_tellcell"] = amountTellCell;
+//    if (!db.insert("o_payment")) {
+//        LogWriter::write(LogWriterLevel::errors, "", "ElinaShop::requestshop." + db.lastDbError());
+//        rh.setInternalServerError(db.lastDbError());
+//        db.rollback();
+//        return false;
+//    }
 
-    /* PRINT TAX */
-    QString err, rseq;
-    if (s.value("shop/taxport").toInt() > 0) {
-        QString sn, firm, address, fiscal, hvhh, devnum, time;
-        PrintTaxN pt(s.value("shop/taxip").toString(),
-                     s.value("shop/taxport").toInt(),
-                     s.value("shop/taxpass").toString(),
-                     s.value("shop/taxextpos").toString(),
-                     s.value("shop/taxcashier").toString(),
-                     s.value("shop/taxpin").toString(),
-                     nullptr);
-        for (int i = 0; i < fOrderJson["items"].toArray().count(); i++) {
-            QJsonObject o = fOrderJson["items"].toArray().at(i).toObject();
-            amountTotal += o["price"].toDouble() * o["qty"].toDouble();
-            pt.addGoods(s.value("shop/taxdep").toString(), //dep
-                        "6204", //adg
-                        QString::number(StoreManager::codeOfSku(o["sku"].toString())), //goods id
-                        StoreManager::nameOfSku(o["sku"].toString()), //name
-                        o["price"].toDouble(), //price
-                        o["qty"].toDouble(), //qty
-                        0); //discount
-        }
-        if (fOrderJson["delivery"].toDouble() > 0) {
-            amountTotal += fOrderJson["delivery"].toDouble();
-            pt.addGoods(s.value("shop/taxdep").toString(), //dep
-                        "6204", //adg
-                        s.value("shop/delivery").toString(), //goods id
-                        QObject::tr("Delivery"), //name
-                        fOrderJson["delivery"].toDouble(), //price
-                        1, //qty
-                        0); //discount
-        }
-        QString jsonIn, jsonOut;
-        int result = 0;
-        result = pt.makeJsonAndPrint(amountCard, 0, jsonIn, jsonOut, err);
-        if (result == pt_err_ok) {
-            PrintTaxN::parseResponse(jsonOut, firm, hvhh, fiscal, rseq, sn, address, devnum, time);
-            db[":f_id"] = uuid;
-            db.exec("delete from o_tax where f_id=:f_id");
-            db[":f_id"] = uuid;
-            db[":f_dept"] = s.value("shop/taxdep");
-            db[":f_firmname"] = firm;
-            db[":f_address"] = address;
-            db[":f_devnum"] = devnum;
-            db[":f_serial"] = sn;
-            db[":f_fiscal"] = fiscal;
-            db[":f_receiptnumber"] = rseq;
-            db[":f_hvhh"] = hvhh;
-            db[":f_fiscalmode"] = QObject::tr("(F)");
-            db[":f_time"] = time;
-            db.insert("o_tax");
-        } else {
-            LogWriter::write(LogWriterLevel::warning, "", "ElinaShop::requestshop, taxprint." + err);
-            jh["atention"] = err + "<br>" + jsonOut + "<br>" + jsonIn;
-        }
-    }
+//    /* PRINT TAX */
+//    QString err, rseq;
+//    if (s.value("shop/taxport").toInt() > 0) {
+//        QString sn, firm, address, fiscal, hvhh, devnum, time;
+//        PrintTaxN pt(s.value("shop/taxip").toString(),
+//                     s.value("shop/taxport").toInt(),
+//                     s.value("shop/taxpass").toString(),
+//                     s.value("shop/taxextpos").toString(),
+//                     s.value("shop/taxcashier").toString(),
+//                     s.value("shop/taxpin").toString(),
+//                     nullptr);
+//        for (int i = 0; i < fOrderJson["items"].toArray().count(); i++) {
+//            QJsonObject o = fOrderJson["items"].toArray().at(i).toObject();
+//            amountTotal += o["price"].toDouble() * o["qty"].toDouble();
+//            pt.addGoods(s.value("shop/taxdep").toString(), //dep
+//                        "6204", //adg
+//                        QString::number(StoreManager::codeOfSku(o["sku"].toString())), //goods id
+//                        StoreManager::nameOfSku(o["sku"].toString()), //name
+//                        o["price"].toDouble(), //price
+//                        o["qty"].toDouble(), //qty
+//                        0); //discount
+//        }
+//        if (fOrderJson["delivery"].toDouble() > 0) {
+//            amountTotal += fOrderJson["delivery"].toDouble();
+//            pt.addGoods(s.value("shop/taxdep").toString(), //dep
+//                        "6204", //adg
+//                        s.value("shop/delivery").toString(), //goods id
+//                        QObject::tr("Delivery"), //name
+//                        fOrderJson["delivery"].toDouble(), //price
+//                        1, //qty
+//                        0); //discount
+//        }
+//        QString jsonIn, jsonOut;
+//        int result = 0;
+//        result = pt.makeJsonAndPrint(amountCard, 0, jsonIn, jsonOut, err);
+//        if (result == pt_err_ok) {
+//            PrintTaxN::parseResponse(jsonOut, firm, hvhh, fiscal, rseq, sn, address, devnum, time);
+//            db[":f_id"] = uuid;
+//            db.exec("delete from o_tax where f_id=:f_id");
+//            db[":f_id"] = uuid;
+//            db[":f_dept"] = s.value("shop/taxdep");
+//            db[":f_firmname"] = firm;
+//            db[":f_address"] = address;
+//            db[":f_devnum"] = devnum;
+//            db[":f_serial"] = sn;
+//            db[":f_fiscal"] = fiscal;
+//            db[":f_receiptnumber"] = rseq;
+//            db[":f_hvhh"] = hvhh;
+//            db[":f_fiscalmode"] = QObject::tr("(F)");
+//            db[":f_time"] = time;
+//            db.insert("o_tax");
+//        } else {
+//            LogWriter::write(LogWriterLevel::warning, "", "ElinaShop::requestshop, taxprint." + err);
+//            jh["atention"] = err + "<br>" + jsonOut + "<br>" + jsonIn;
+//        }
+//    }
 
-    /* A_HEADER of store */
-    db[":f_id"] = s.value("shop/store").toInt();
-    db.exec("select f_outcounter + 1  as f_counter from c_storages where f_id=:f_id for update");
-    if (!db.next()) {
-        LogWriter::write(LogWriterLevel::errors, "", "ElinaShop::requestshop. Unknown store");
-        rh.setInternalServerError("UNKNOWN STORE");
-        db.rollback();
-        return false;
-    }
-    int val = db.integer("f_counter");
-    db[":f_id"] = s.value("shop/store").toInt();
-    db[":val"] = val;
-    db.exec("update c_storages set f_outcounter=:val where f_id=:f_id and f_outcounter <:val");
+//    /* A_HEADER of store */
+//    db[":f_id"] = s.value("shop/store").toInt();
+//    db.exec("select f_outcounter + 1  as f_counter from c_storages where f_id=:f_id for update");
+//    if (!db.next()) {
+//        LogWriter::write(LogWriterLevel::errors, "", "ElinaShop::requestshop. Unknown store");
+//        rh.setInternalServerError("UNKNOWN STORE");
+//        db.rollback();
+//        return false;
+//    }
+//    int val = db.integer("f_counter");
+//    db[":f_id"] = s.value("shop/store").toInt();
+//    db[":val"] = val;
+//    db.exec("update c_storages set f_outcounter=:val where f_id=:f_id and f_outcounter <:val");
 
-    db[":f_id"] = uuid;
-    db[":f_userid"] = val;
-    db[":f_state"] = 1;
-    db[":f_type"] = 2;
-    db[":f_operator"] = 1;
-    db[":f_date"] = QDate::currentDate();
-    db[":f_createdate"] = QDate::currentDate();
-    db[":f_createtime"] = QTime::currentTime();
-    db[":f_partner"] = 0;
-    db[":f_amount"] = 0;
-    db[":f_comment"] = "output of " + prefix + QString::number(hallid);
-    db[":f_payment"] = 1;
-    db[":f_paid"] = 0;
-    db.insert("a_header");
+//    db[":f_id"] = uuid;
+//    db[":f_userid"] = val;
+//    db[":f_state"] = 1;
+//    db[":f_type"] = 2;
+//    db[":f_operator"] = 1;
+//    db[":f_date"] = QDate::currentDate();
+//    db[":f_createdate"] = QDate::currentDate();
+//    db[":f_createtime"] = QTime::currentTime();
+//    db[":f_partner"] = 0;
+//    db[":f_amount"] = 0;
+//    db[":f_comment"] = "output of " + prefix + QString::number(hallid);
+//    db[":f_payment"] = 1;
+//    db[":f_paid"] = 0;
+//    db.insert("a_header");
 
-    db[":f_id"] = uuid;
-    db[":f_useraccept"] = 1;
-    db[":f_userpass"] = 1;
-    db[":f_invoice"] = "";
-    db[":f_invoicedate"] = QVariant();
-    db[":f_storein"] = 0;
-    db[":f_storeout"] = s.value("shop/store").toInt();
-    db[":f_baseonsale"] = 1;
-    db[":f_cashuuid"] = "";
-    db[":f_complectation"] = 0;
-    db[":f_complectationqty"] = 0;
-    db.insert("a_header_store");
+//    db[":f_id"] = uuid;
+//    db[":f_useraccept"] = 1;
+//    db[":f_userpass"] = 1;
+//    db[":f_invoice"] = "";
+//    db[":f_invoicedate"] = QVariant();
+//    db[":f_storein"] = 0;
+//    db[":f_storeout"] = s.value("shop/store").toInt();
+//    db[":f_baseonsale"] = 1;
+//    db[":f_cashuuid"] = "";
+//    db[":f_complectation"] = 0;
+//    db[":f_complectationqty"] = 0;
+//    db.insert("a_header_store");
 
-    /* A_STORE_DRAFT, O_GOODS */
-    for (int i = 0; i < fOrderJson["items"].toArray().count(); i++) {
-        QJsonObject o = fOrderJson["items"].toArray().at(i).toObject();
-        QString goodsid = db.uuid();
+//    /* A_STORE_DRAFT, O_GOODS */
+//    for (int i = 0; i < fOrderJson["items"].toArray().count(); i++) {
+//        QJsonObject o = fOrderJson["items"].toArray().at(i).toObject();
+//        QString goodsid = db.uuid();
 
-        db[":f_id"] = goodsid;
-        db[":f_document"] = uuid;
-        db[":f_store"] = s.value("shop/store").toInt();
-        db[":f_type"] = -1;
-        db[":f_goods"] = StoreManager::codeOfSku(o["sku"].toString());
-        db[":f_qty"] = o["qty"].toDouble();
-        db[":f_price"] = 0;
-        db[":f_total"] = 0;
-        db[":f_reason"] = 4;
-        db[":f_base"] = goodsid;
-        db[":f_row"] = o["row"].toInt() + 1;
-        db[":f_comment"] = "";
-        db.insert("a_store_draft");
+//        db[":f_id"] = goodsid;
+//        db[":f_document"] = uuid;
+//        db[":f_store"] = s.value("shop/store").toInt();
+//        db[":f_type"] = -1;
+//        db[":f_goods"] = StoreManager::codeOfSku(o["sku"].toString());
+//        db[":f_qty"] = o["qty"].toDouble();
+//        db[":f_price"] = 0;
+//        db[":f_total"] = 0;
+//        db[":f_reason"] = 4;
+//        db[":f_base"] = goodsid;
+//        db[":f_row"] = o["row"].toInt() + 1;
+//        db[":f_comment"] = "";
+//        db.insert("a_store_draft");
 
-        db[":f_id"] = goodsid;
-        db[":f_header"] = uuid;
-        db[":f_body"] = goodsid;
-        db[":f_store"] = s.value("shop/store").toInt();
-        db[":f_goods"] = StoreManager::codeOfSku(o["sku"].toString());
-        db[":f_qty"] = o["qty"].toDouble();
-        db[":f_price"] = o["price"].toDouble();
-        db[":f_total"] = o["qty"].toDouble() * o["price"].toDouble();
-        db[":f_tax"] = rseq;
-        db[":f_sign"] = 1;
-        db[":f_row"] = o["row"].toInt();
-        db[":f_storerec"] = goodsid;
-        db[":f_discountfactor"] = 0;
-        db[":f_discountmode"] = 0;
-        db[":f_discountamount"] = 0;
-        db[":f_return"] = 0;
-        db.insert("o_goods");
-    }
+//        db[":f_id"] = goodsid;
+//        db[":f_header"] = uuid;
+//        db[":f_body"] = goodsid;
+//        db[":f_store"] = s.value("shop/store").toInt();
+//        db[":f_goods"] = StoreManager::codeOfSku(o["sku"].toString());
+//        db[":f_qty"] = o["qty"].toDouble();
+//        db[":f_price"] = o["price"].toDouble();
+//        db[":f_total"] = o["qty"].toDouble() * o["price"].toDouble();
+//        db[":f_tax"] = rseq;
+//        db[":f_sign"] = 1;
+//        db[":f_row"] = o["row"].toInt();
+//        db[":f_storerec"] = goodsid;
+//        db[":f_discountfactor"] = 0;
+//        db[":f_discountmode"] = 0;
+//        db[":f_discountamount"] = 0;
+//        db[":f_return"] = 0;
+//        db.insert("o_goods");
+//    }
 
-    if (fOrderJson["delivery"].toDouble() > 0) {
-        QString goodsid = db.uuid();
-        db[":f_id"] = goodsid;
-        db[":f_header"] = uuid;
-        db[":f_body"] = goodsid;
-        db[":f_store"] = s.value("shop/store").toInt();
-        db[":f_goods"] = s.value("shop/delivery").toInt();
-        db[":f_qty"] = 1;
-        db[":f_price"] = fOrderJson["delivery"].toDouble();
-        db[":f_total"] = fOrderJson["delivery"].toDouble();
-        db[":f_tax"] = rseq;
-        db[":f_sign"] = 1;
-        db[":f_row"] = 100;
-        db[":f_storerec"] = goodsid;
-        db[":f_discountfactor"] = 0;
-        db[":f_discountmode"] = 0;
-        db[":f_discountamount"] = 0;
-        db[":f_return"] = 0;
-        db.insert("o_goods");
-    }
+//    if (fOrderJson["delivery"].toDouble() > 0) {
+//        QString goodsid = db.uuid();
+//        db[":f_id"] = goodsid;
+//        db[":f_header"] = uuid;
+//        db[":f_body"] = goodsid;
+//        db[":f_store"] = s.value("shop/store").toInt();
+//        db[":f_goods"] = s.value("shop/delivery").toInt();
+//        db[":f_qty"] = 1;
+//        db[":f_price"] = fOrderJson["delivery"].toDouble();
+//        db[":f_total"] = fOrderJson["delivery"].toDouble();
+//        db[":f_tax"] = rseq;
+//        db[":f_sign"] = 1;
+//        db[":f_row"] = 100;
+//        db[":f_storerec"] = goodsid;
+//        db[":f_discountfactor"] = 0;
+//        db[":f_discountmode"] = 0;
+//        db[":f_discountamount"] = 0;
+//        db[":f_return"] = 0;
+//        db.insert("o_goods");
+//    }
 
-    /* A_HEADER of cash */
-    QString cashuuid = db.uuid();
-    db[":f_id"] = cashuuid;
-    db[":f_userid"] = val;
-    db[":f_state"] = 1;
-    db[":f_type"] = 5;
-    db[":f_operator"] = 1;
-    db[":f_date"] = QDate::currentDate();
-    db[":f_createdate"] = QDate::currentDate();
-    db[":f_createtime"] = QTime::currentTime();
-    db[":f_partner"] = 0;
-    db[":f_amount"] = 0;
-    db[":f_comment"] = "output of " + prefix + QString::number(hallid);
-    db[":f_payment"] = 1;
-    db[":f_paid"] = 0;
-    db.insert("a_header");
+//    /* A_HEADER of cash */
+//    QString cashuuid = db.uuid();
+//    db[":f_id"] = cashuuid;
+//    db[":f_userid"] = val;
+//    db[":f_state"] = 1;
+//    db[":f_type"] = 5;
+//    db[":f_operator"] = 1;
+//    db[":f_date"] = QDate::currentDate();
+//    db[":f_createdate"] = QDate::currentDate();
+//    db[":f_createtime"] = QTime::currentTime();
+//    db[":f_partner"] = 0;
+//    db[":f_amount"] = 0;
+//    db[":f_comment"] = "output of " + prefix + QString::number(hallid);
+//    db[":f_payment"] = 1;
+//    db[":f_paid"] = 0;
+//    db.insert("a_header");
 
-    int cash = fOrderJson["payment_type"].toInt() == 1 ? s.value("shop/cashcash").toInt() : s.value("shop/cashcard").toInt();
-    db[":f_id"] = cashuuid;
-    db[":f_cashin"] = cash;
-    db[":f_cashout"] = 0;
-    db[":f_related"] = 0;
-    db[":f_storedoc"] = "";
-    db[":f_oheader"] = uuid;
-    db.insert("a_header_cash");
+//    int cash = fOrderJson["payment_type"].toInt() == 1 ? s.value("shop/cashcash").toInt() : s.value("shop/cashcard").toInt();
+//    db[":f_id"] = cashuuid;
+//    db[":f_cashin"] = cash;
+//    db[":f_cashout"] = 0;
+//    db[":f_related"] = 0;
+//    db[":f_storedoc"] = "";
+//    db[":f_oheader"] = uuid;
+//    db.insert("a_header_cash");
 
-    db[":f_id"] = cashuuid;
-    db[":f_header"] = cashuuid;
-    db[":f_cash"] = cash;
-    db[":f_sign"] = 1;
-    db[":f_remarks"] = "input of sale";
-    db[":f_amount"] = amountTotal;
-    db[":f_base"] = cashuuid;
-    db[":f_row"] = 1;
-    db.insert("e_cash");
+//    db[":f_id"] = cashuuid;
+//    db[":f_header"] = cashuuid;
+//    db[":f_cash"] = cash;
+//    db[":f_sign"] = 1;
+//    db[":f_remarks"] = "input of sale";
+//    db[":f_amount"] = amountTotal;
+//    db[":f_base"] = cashuuid;
+//    db[":f_row"] = 1;
+//    db.insert("e_cash");
 
-    jh["status"] = "OK";
-    jh["uuid"] = uuid;
-    jh["order_id"] = QString("%1%2").arg(prefix).arg(hallid);
-    jh["before_store_error"] = err;
-    db.commit();
+//    jh["status"] = "OK";
+//    jh["uuid"] = uuid;
+//    jh["order_id"] = QString("%1%2").arg(prefix).arg(hallid);
+//    jh["before_store_error"] = err;
+//    db.commit();
 
-    checkQty(fOrderJson, QString("%1%2").arg(prefix).arg(hallid), db);
+//    checkQty(fOrderJson, QString("%1%2").arg(prefix).arg(hallid), db);
 
-    db.startTransaction();
-    err = "";
-    if (!writeOutput(uuid, err, db)) {
-        db.rollback();
-        jh["store"] = err;
-        LogWriter::write(LogWriterLevel::errors, "", err);
-    }else {
-        jh["store"] = "ok";
-    }
+//    db.startTransaction();
+//    err = "";
+//    if (!writeOutput(uuid, err, db)) {
+//        db.rollback();
+//        jh["store"] = err;
+//        LogWriter::write(LogWriterLevel::errors, "", err);
+//    }else {
+//        jh["store"] = "ok";
+//    }
 
-    db.commit();
+//    db.commit();
 
-    PrintReceiptGroup p;
-    p.print2(uuid, db, s.value("shop/printer").toString());
-    return rh.setResponse(HTTP_OK, jh.toString());
-}
+//    PrintReceiptGroup p;
+//    p.print2(uuid, db, s.value("shop/printer").toString());
+//    return rh.setResponse(HTTP_OK, jh.toString());
+//}
 
 bool validateMultipartFormData(RequestHandler &rh, QJsonObject &ord, const QByteArray &data, const QHash<QString, DataAddress> &dataMap)
 {
@@ -1079,5 +1079,133 @@ bool printtax(const QByteArray &indata, QByteArray &outdata, const QHash<QString
         return rh.setInternalServerError("<br>" + err + "<br>" + jsonIn);
     }
     jh["rseq"] = rseq;
+    return rh.setResponse(HTTP_OK, jh.toString());
+}
+
+bool shoprequest(const QByteArray &indata, QByteArray &outdata, const QHash<QString, DataAddress> &dataMap, const ContentType &contentType)
+{
+    //VALIDATION
+    CommandLine cl;
+    QString path;
+    cl.value("path", path);
+    QString configFile = path + "/handlers/shop.ini";
+
+    StoreManager::init(configFile);
+    ShopManager::init(configFile);
+    RequestHandler rh(outdata);
+    rh.fContentType = contentType;
+    QJsonObject fOrderJson;
+    switch (contentType) {
+    case ContentType::ApplilcationJson:
+        if (!validateApplicationJson(rh, fOrderJson, indata, dataMap)) {
+            return false;
+        }
+        break;
+    default:
+        if (!validateMultipartFormData(rh, fOrderJson, indata, dataMap)) {
+            return false;
+        }
+        break;
+    }
+    //PROCESS
+    JsonHandler jh;
+    Database db;
+    if (!db.open(configFile)) {
+        LogWriter::write(LogWriterLevel::errors, "", QString("ElinaShop::shoprequest").arg(db.lastDbError()));
+        jh["message"] = "Cannot connect to database";
+        return rh.setInternalServerError(jh.toString());
+    }
+    QSettings s(configFile, QSettings::IniFormat);
+
+
+    double amountTotal = 0;
+    //Check for multiple quantity and separate one by one
+    QJsonArray ja = fOrderJson["items"].toArray();
+    for (int i = 0; i < ja.count(); i++) {
+        QJsonObject o = fOrderJson["items"].toArray().at(i).toObject();
+        while (o["qty"].toDouble() > 1) {
+            o["qty"] = o["qty"].toDouble() - 1;
+            ja[i] = o;
+            QJsonObject oc = o;
+            oc["qty"] = 1;
+            oc["row"] = ja.count();
+            ja.append(oc);
+        }
+    }
+    fOrderJson["items"] = ja;
+    qDebug() << fOrderJson;
+    for (int i = 0; i < fOrderJson["items"].toArray().count(); i++) {
+        QJsonObject o = fOrderJson["items"].toArray().at(i).toObject();
+        amountTotal += o["price"].toDouble() * o["qty"].toDouble();
+    }
+    if (fOrderJson["delivery"].toDouble() > 0) {
+        amountTotal += fOrderJson["delivery"].toDouble();
+    }
+
+    double amountCash = fOrderJson["payment_type"].toInt() == 1 ? amountTotal : 0;
+    double amountCard = fOrderJson["payment_type"].toInt() == 2 ? amountTotal : 0;
+    double amountOther = fOrderJson["payment_type"].toInt() > 4 ? amountTotal : 0;
+    double amountIDram = fOrderJson["payment_type"].toInt() == 6 ? amountTotal : 0;
+    double amountTellCell = fOrderJson["payment_type"].toInt() == 7 ? amountTotal : 0;
+    db.startTransaction();
+    /* O_draft_sale */
+    QString uuid = db.uuid();
+    db[":f_id"] = uuid;
+    db[":f_state"] = 1;
+    db[":f_date"] = QDate::currentDate();
+    db[":f_time"] = QTime::currentTime();
+    db[":f_staff"] = 1;
+    db[":f_amount"] = amountTotal;
+    db[":f_payment"] = fOrderJson["payment_type"].toInt();
+    db[":f_comment"] = QObject::tr("Delivery address") + ": "
+            + fOrderJson["address"].toObject()["city"].toString()
+            + ", " + fOrderJson["address"].toObject()["address"].toString()
+            + ", " + QObject::tr("phone") + ": "
+            + fOrderJson["address"].toObject()["phone"].toString();
+    if (!db.insert("o_draft_sale")) {
+        LogWriter::write(LogWriterLevel::errors, "", "ElinaShop::requestshop." + db.lastDbError());
+        rh.setInternalServerError(db.lastDbError());
+        db.rollback();
+        return false;
+    }
+
+
+    /* A_STORE_DRAFT, O_GOODS */
+    for (int i = 0; i < fOrderJson["items"].toArray().count(); i++) {
+        QJsonObject o = fOrderJson["items"].toArray().at(i).toObject();
+        QString goodsid = db.uuid();
+        db[":f_id"] = goodsid;
+        db[":f_header"] = uuid;
+        db[":f_state"] = 1;
+        db[":f_dateappend"] = QDate::currentDate();
+        db[":f_timeappend"] = QTime::currentTime();
+        db[":f_goods"] = StoreManager::codeOfSku(o["sku"].toString());
+        db[":f_qty"] = o["qty"].toDouble();
+        db[":f_price"] = o["price"].toDouble();
+        db[":f_userappend"] = 1;
+        db.insert("o_draft_sale_body");
+    }
+
+    if (fOrderJson["delivery"].toDouble() > 0) {
+        QString goodsid = db.uuid();
+        db[":f_id"] = goodsid;
+        db[":f_header"] = uuid;
+        db[":f_state"] = 1;
+        db[":f_dateappend"] = QDate::currentDate();
+        db[":f_timeappend"] = QTime::currentTime();
+        db[":f_goods"] = s.value("shop/delivery").toInt();
+        db[":f_qty"] = 1;
+        db[":f_price"] = fOrderJson["delivery"].toDouble();
+        db[":f_userappend"] = 1;
+        db.insert("o_draft_sale_body");
+    }
+    db.commit();
+
+
+    jh["status"] = "OK";
+    jh["uuid"] = uuid;
+    jh["order_id"] = uuid;
+    jh["before_store_error"] = "";
+
     return rh.setResponse(HTTP_OK, jh.toString());
 }

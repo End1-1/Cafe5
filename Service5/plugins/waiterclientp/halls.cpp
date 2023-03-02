@@ -14,6 +14,10 @@ void loadHalls(RawMessage &rm, Database &db, const QByteArray &in)
         taskdesc.execSQL("select id, name, menu_id, service_value from h_hall");
         break;
     case version2:
+        taskdesc.execSQL("SELECT h.f_id, h.f_name, s1.f_value AS f_menu, s2.f_value AS f_service "
+                        "FROM h_halls h "
+                        "LEFT JOIN s_settings_values s1 ON s1.f_settings=h.f_settings AND s1.f_key=9 "
+                        "LEFT JOIN s_settings_values s2 ON s2.f_settings=h.f_settings AND s2.f_key=2 ");
         break;
     case version3:
         taskdesc.execSQL("select f_id, f_name, f_defaultmenu, f_servicevalue from r_hall");
@@ -41,6 +45,10 @@ void loadTables(RawMessage &rm, Database &db, const QByteArray &in)
                         "ORDER BY t.hall_id, t.queue ");
         break;
     case version2:
+        taskdesc.execSQL("select t.f_id, t.f_hall, coalesce(o.f_state, 0) as f_state, t.f_name, coalesce(o.f_id, '') as f_orderid "
+                       "from h_tables t "
+                        "left join o_header o on o.f_table=t.f_id and o.f_state=1 "
+                        "order by t.f_hall, t.f_id");
         break;
     case version3:
         taskdesc.execSQL("SELECT t.f_id, t.f_hall, coalesce(o.f_state, 0) AS f_state, t.f_name, coalesce(o.f_id, '') as f_orderid "
@@ -68,6 +76,7 @@ void loadCarsModels(RawMessage &rm, Database &db, const QByteArray &in)
         taskdesc.execSQL("select 1 as id, 'car' as name from rdb$database");
         break;
     case version2:
+        taskdesc.execSQL("select 1 as f_id, 'car' as f_name");
         break;
     case version3:
         taskdesc.execSQL("select f_id, f_model from d_car_model order by f_model ");

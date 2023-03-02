@@ -184,7 +184,8 @@ void RawMessage::setPosition(int pos)
 
 void RawMessage::writeToSocket()
 {
-    fSocket->write(data());
+    qDebug() << "Data size" << data().size() << "bytes";
+    qDebug() << "Socket write" << fSocket->write(data()) << "bytes";
 }
 
 quint32 RawMessage::getDataSize()

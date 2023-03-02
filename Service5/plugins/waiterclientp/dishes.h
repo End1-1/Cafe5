@@ -4,6 +4,7 @@
 #include "rawmessage.h"
 #include "database.h"
 
+void loadMenuNames(RawMessage &rm, Database &db, const QByteArray &in);
 void loadPart1(RawMessage &rm, Database &db, const QByteArray &in);
 void loadPart2(RawMessage &rm, Database &db, const QByteArray &in);
 void loadDishes(RawMessage &rm, Database &db, const QByteArray &in);

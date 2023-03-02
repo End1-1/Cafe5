@@ -13,19 +13,26 @@ class WOrder;
 class Working;
 class C5ClearTableWidget;
 class C5User;
+class WCustomerDisplay;
 
 class WOrder : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit WOrder(C5User *user, int saleType, QWidget *parent = nullptr);
+    explicit WOrder(C5User *user, int saleType, WCustomerDisplay *customerDisplay, QWidget *parent = nullptr);
 
     ~WOrder();
 
     int fSaleType;
 
     QString fOrderUUID;
+
+    QString fDraftSale;
+
+    void updateCustomerDisplay(WCustomerDisplay *cd);
+
+    void setPrepaid(double p);
 
     void clearCode();
 
@@ -45,7 +52,7 @@ public:
 
     bool addGoods(int id);
 
-    void addGoodsToTable(int id);
+    int addGoodsToTable(int id);
 
     bool writeOrder();
 
@@ -53,9 +60,13 @@ public:
 
     void changeQty();
 
+    void changeQty(double qty);
+
     void discountRow(const QString &code);
 
     void changePrice();
+
+    void changePrice(double price);
 
     int rowCount();
 
@@ -68,8 +79,6 @@ public:
     int lastRow();
 
     void countTotal();
-
-    int currency();
 
     void openPreorder(const QByteArray &id);
 
@@ -100,8 +109,6 @@ private slots:
 
     void on_leAdvance_textChanged(const QString &arg1);
 
-    void on_cbCurrency_currentIndexChanged(int index);
-
 private:
     Ui::WOrder *ui;
 
@@ -112,6 +119,10 @@ private:
     QTime fTimeOpen;
 
     Working *fWorking;
+
+    WCustomerDisplay *fCustomerDisplay;
+
+    int fGiftCard;
 
     int fCardId;
 

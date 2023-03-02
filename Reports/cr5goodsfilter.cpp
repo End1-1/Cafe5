@@ -61,6 +61,11 @@ QString CR5GoodsFilter::condition()
     return w;
 }
 
+int CR5GoodsFilter::currency()
+{
+    return ui->leCurr->getInteger();
+}
+
 QString CR5GoodsFilter::group()
 {
     return ui->leGroup->text();

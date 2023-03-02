@@ -70,10 +70,10 @@ void C5LineEditWithSelector::setValue(const QString &id)
     }
     if (!fMultiselection) {
         if (fWidget && row > -1) {
-            fWidget->selectorCallback(0, c->getRow(row));
+            fWidget->selectorCallback(fCache, c->getRow(row));
         }
         if (fDialog && row > -1) {
-            fDialog->selectorCallback(0, c->getRow(row));
+            fDialog->selectorCallback(fCache, c->getRow(row));
         }
     }
 }

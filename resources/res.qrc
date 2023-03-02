@@ -146,5 +146,7 @@
         <file>error.png</file>
         <file>template.png</file>
         <file>trading.png</file>
+        <file>monitor.png</file>
+        <file>preorder.png</file>
     </qresource>
 </RCC>

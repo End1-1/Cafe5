@@ -57,6 +57,7 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
     double amountTotal = db.getDouble("f_amounttotal");
     double amountCash = db.getDouble("f_amountcash");
     double amountCard = db.getDouble("f_amountcard");
+    double amountPrepaid = db.getDouble("f_amountprepaid");
     QString comment = db.getString("f_comment");
     QString partnerName, partnerTaxcode;
     if (partner > 0) {
@@ -73,11 +74,11 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
     switch (rw) {
     case 1:
         price1 = "ad.f_price";
-        price2 = "g.f_saleprice2";
+        price2 = "gpr.f_price2";
         break;
     case 2:
-        price1 = "g.f_saleprice";
-        price2 = "g.f_saleprice";
+        price1 = "gpr.f_price1";
+        price2 = "gpr.f_price1";
         break;
     }
 
@@ -93,6 +94,7 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
             "left join c_goods_complectation gc on gc.f_base=ad.f_goods "
             "left join c_goods g on g.f_id=gc.f_goods "
             "left join c_goods g2 on g2.f_id=ad.f_goods "
+            "left join c_goods_prices gpr on gpr.f_goods=g.f_id "
             "inner join o_header oh on oh.f_id=ad.f_header "
             "left join c_groups t1 on t1.f_id=g.f_group "
             "left join c_groups t2 on t2.f_id=g2.f_group "
@@ -118,7 +120,7 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
         price1 = "ad.f_price";
         break;
     case 2:
-        price1 = "g.f_saleprice";
+        price1 = "gpr.f_price1";
         break;
     }
     db[":f_header"] = id;
@@ -127,6 +129,7 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
             "left join c_goods g on g.f_id=ad.f_goods "
             "inner join o_header oh on oh.f_id=ad.f_header "
             "left join c_groups t1 on t1.f_id=g.f_group "
+            "left join c_goods_prices gpr on gpr.f_goods=g.f_id "
             "where oh.f_id=:f_header and g.f_unit<>10 "
             "group by 1, 3 %4 "
             "order by ad.f_row ")
@@ -265,6 +268,11 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
         p.rtext(float_str(amountCard, 2));
         p.br();
     }
+    if (amountPrepaid > 0.001) {
+        p.ltext(tr("Prepaid used"), 0);
+        p.rtext(float_str(amountPrepaid, 2));
+        p.br();
+    }
 
     if (!comment.isEmpty()) {
         p.br();
@@ -363,6 +371,8 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
             db.nextRow();
         }
     }
+    QMap<QString, QVariant> header;
+    db.rowToMap(header);
     QString hallid = db.getString("f_hallid");
     QString pref = db.getString("f_prefix");
     int partner = db.getInt("f_partner");
@@ -385,11 +395,11 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
     switch (rw) {
     case 1:
         price1 = "ad.f_price";
-        price2 = "g.f_saleprice2";
+        price2 = "gpr1.f_price2";
         break;
     case 2:
-        price1 = "g.f_saleprice";
-        price2 = "g.f_saleprice";
+        price1 = "gpr1.f_price1";
+        price2 = "gpr1.f_price1";
         break;
     }
 
@@ -408,6 +418,8 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
             "inner join o_header oh on oh.f_id=ad.f_header "
             "left join c_groups t1 on t1.f_id=g.f_group "
             "left join c_groups t2 on t2.f_id=g2.f_group "
+            "left join c_goods_prices gpr1 on gpr1.f_goods=g.f_id "
+            "left join c_goods_prices gpr2 on gpr2.f_goods=g2.f_id "
             "where oh.f_id=:f_header and g2.f_unit=10 "
             "group by 1, 3 %4 "
             "order by ad.f_row ")
@@ -430,7 +442,7 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
         price1 = "ad.f_price";
         break;
     case 2:
-        price1 = "g.f_saleprice";
+        price1 = "gpr1.f_price1";
         break;
     }
     db[":f_header"] = id;
@@ -448,8 +460,8 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
             "order by ad.f_row ")
             .arg(goodsNameField)
             .arg(price1)
-            .arg(__c5config.getValue(param_shop_print_dontgroup).toInt() == 0 ? "" : ",ad.f_id")
-            .arg(__c5config.getValue(param_shop_print_dontgroup).toInt() == 0 ? "" : ",5"));
+            .arg(__c5config.getValue(param_shop_print_dontgroup).toInt() == 0 ? ",ad.f_discountamount" : ",ad.f_discountamount,ad.f_id")
+            .arg(__c5config.getValue(param_shop_print_dontgroup).toInt() == 0 ? ",5" : ",5,6"));
     while (db.nextRow()) {
         QList<QVariant> v;
         for (int i = 0; i < db.columnCount(); i++) {
@@ -463,6 +475,10 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
     font.setPointSize(20);
     C5Printing p;
     p.setSceneParams(600, 2800, QPrinter::Portrait);
+    p.image("./logo_receipt.png", Qt::AlignHCenter);
+    p.br();
+    p.br();
+    p.br();
     p.setFont(font);
     p.br(2);
     if (!saletype.isEmpty()) {
@@ -535,6 +551,10 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
                 .arg(data.at(i).at(2).toDouble(), 2)
                 .arg(float_str(data.at(i).at(3).toDouble(), 2)), 0);
         p.br();
+        if (data.at(i).at(4).toDouble() > 0.001) {
+            p.ltext(QString("%1%2 %3").arg(tr("Discount"), tr(":"), float_str(data.at(i).at(4).toDouble(), 2)), 0);
+            p.br();
+        }
         p.br();
         p.line();
         p.br(2);
@@ -581,6 +601,11 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
     if (tellcell > 0.001){
         p.ltext(tr("Payment, TellCell"), 0);
         p.rtext(float_str(tellcell, 2));
+        p.br();
+    }
+    if (header["f_amountdiscount"].toDouble() > 0.001) {
+        p.ltext(tr("Discount"), 0);
+        p.rtext(float_str(header["f_amountdiscount"].toDouble(), 2));
         p.br();
     }
 

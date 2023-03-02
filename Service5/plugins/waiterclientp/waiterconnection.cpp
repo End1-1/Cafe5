@@ -91,7 +91,7 @@ void WaiterConnection::handleData(RawMessage *m, const QByteArray &in)
         }
         break;
     case op_unlock_table:
-        unlockTable(rm, dbw, in, fSocket->fUuid);
+        unlockTable(rm, dbw, in, fSocket->fUuid, this);
         break;
     case op_car_list:
         loadCarsModels(rm, dbw, in);
@@ -133,6 +133,9 @@ void WaiterConnection::handleData(RawMessage *m, const QByteArray &in)
         break;
     case op_print_bill:
         printBill(rm, dbw, in, fUserId);
+        break;
+    case op_get_menu_list:
+        loadMenuNames(rm, dbw, in);
         break;
     default:
         rm.putUByte(0);

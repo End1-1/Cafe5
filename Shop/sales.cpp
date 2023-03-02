@@ -107,6 +107,7 @@ bool Sales::printCheckWithTax(C5Database &db, const QString &id, QString &rseq)
     db.exec("select * from o_header where f_id=:f_id");
     db.nextRow();
     double card = db.getDouble("f_amountcard");
+    double prepaid = db.getDouble("f_amountprepaid");
     double idram = db.getDouble("f_idram");
     int partner = db.getInt("f_partner");
     QString useExtPos = idram > 0.01 ? "true" : C5Config::taxUseExtPos();
@@ -141,7 +142,7 @@ bool Sales::printCheckWithTax(C5Database &db, const QString &id, QString &rseq)
     QString jsonIn, jsonOut, err;
     QString sn, firm, address, fiscal, hvhh, devnum, time;
     int result = 0;
-    result = pt.makeJsonAndPrint(card, 0, jsonIn, jsonOut, err);
+    result = pt.makeJsonAndPrint(card, prepaid, jsonIn, jsonOut, err);
 
     db[":f_id"] = db.uuid();
     db[":f_order"] = id;
@@ -257,9 +258,10 @@ void Sales::refreshTotal()
     h.append(tr("Amount"));
     h.append(tr("Customer"));
     h.append(tr("Deliverman"));
+    h.append(tr("Address"));
     ui->tbl->setColumnCount(h.count());
     ui->tbl->setHorizontalHeaderLabels(h);
-    ui->tbl->setColumnWidths(ui->tbl->columnCount(), 40, 0, 0, 80, 120, 120, 100, 120, 120, 150, 300, 300);
+    ui->tbl->setColumnWidths(ui->tbl->columnCount(), 40, 0, 0, 80, 120, 120, 100, 120, 120, 150, 100, 100, 300);
     C5Database db(__c5config.replicaDbParams());
     db[":f_hall"] = ui->cbHall->currentData();
     db[":f_start"] = ui->deStart->date();
@@ -275,7 +277,8 @@ void Sales::refreshTotal()
         //}
     }
     QString sql = QString("select '', oh.f_id, oh.f_saletype, u.f_login, os.f_name, concat(oh.f_prefix, oh.f_hallid) as f_number, ot.f_receiptnumber, "
-            "oh.f_datecash, oh.f_timeclose, oh.f_amounttotal, concat(c.f_taxname, ' ', c.f_contact) as f_client, concat_ws(' ', dm.f_last, dm.f_first) as f_deliverman "
+            "oh.f_datecash, oh.f_timeclose, oh.f_amounttotal, concat(c.f_taxname, ' ', c.f_contact) as f_client, concat_ws(' ', dm.f_last, dm.f_first) as f_deliverman, "
+            "oh.f_comment "
             "from o_header oh "
             "left join o_header_options oo on oo.f_id=oh.f_id "
             "left join b_history h on h.f_id=oh.f_id "

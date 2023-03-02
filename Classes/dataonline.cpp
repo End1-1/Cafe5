@@ -1,5 +1,6 @@
 #include "dataonline.h"
 #include "c5database.h"
+#include "logwriter.h"
 
 QHash<QString, DataOnline*> DataOnline::fInstances;
 
@@ -23,6 +24,7 @@ DataOnline::DataOnline(const QStringList &dbParams) :
 
 QVariant DataOnline::value(const QString &table, const QString &field, int id)
 {
+
     Q_ASSERT(fTableQueries.contains(table));
     bool needupdate = false;
     if (!fIdRow.contains(table)) {

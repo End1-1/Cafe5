@@ -41,7 +41,7 @@ void SocketThread::run()
     setProperty("session", QUuid::createUuid().toString());
     fTimeoutControl = new QTimer();
     connect(fTimeoutControl, &QTimer::timeout, this, &SocketThread::timeoutControl);
-    fTimeoutControl->start(3000);
+    fTimeoutControl->start(5000);
 
     fSslSocket = new SslSocket();
     fSslSocket->setProperty("session", property("session"));

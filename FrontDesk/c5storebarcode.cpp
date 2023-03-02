@@ -5,6 +5,7 @@
 #include "c5storebarcodelist.h"
 #include "c5lineedit.h"
 #include "c5checkbox.h"
+#include "dlgselectcurrency.h"
 #include <QPainter>
 #include <QDebug>
 
@@ -57,6 +58,7 @@ QToolBar *C5StoreBarcode::toolBar()
 {
     if (!fToolBar) {
         QList<ToolBarButtons> btn;
+        btn << tbFilter;
         createStandartToolbar(btn);
         fToolBar->addAction(QIcon(":/print_description.png"), tr("Print\nscancodes"), this, SLOT(print()));
         fToolBar->addAction(QIcon(":/print_description.png"), tr("Print\ndescriptions"), this, SLOT(printDescriptions()));
@@ -85,21 +87,50 @@ bool C5StoreBarcode::printOneBarcode(const QString &code, const QString &price, 
     Barcode93 b;
     bool r = b.Encode93(code.toLatin1().data());
     qDebug() << r;
-    QFont f("Arial", 25, QFont::Normal);
+    QFont f(__c5config.getValue(param_app_font_family), 25, QFont::Normal);
     p.setFont(f);
     qreal plen = 2;
 
+    QTextOption to;
+    to.setWrapMode(QTextOption::WordWrap);
     f.setPointSize(8);
     f.setBold(true);
     p.setFont(f);
-    p.drawText(10, 30, name);
-    b.DrawBarcode(p, 100, 60, 100, 100, plen);
-    p.drawText(100, 145, code);
+    p.drawText(QRectF(0, 0, 350, 80), name, to);
+    b.DrawBarcode(p, 100, 85, 120, 130, plen);
+    p.drawText(250, 185, code);
     f.setPointSize(10);
     p.setFont(f);
-    p.drawText(10, 175, QString("%1: %2").arg(tr("Price"), price));
+    p.drawText(5, 185, QString("%1: %2").arg(tr("Price"), price));
 
     return printer.printerState() != QPrinter::Error;
+}
+
+void C5StoreBarcode::setSearchParameters()
+{
+    int id;
+    QString name;
+    if (DlgSelectCurrency::getCurrency(fDBParams, id, name, this) == false) {
+        return;
+    }
+    C5Database db(fDBParams);
+    db[":f_currency"] = id;
+    db.exec("select g.f_scancode, gpr.f_price1 "
+            "from c_goods_prices gpr "
+            "left join c_goods g on g.f_id=gpr.f_goods "
+            "where gpr.f_currency=:f_currency");
+    QMap<QString, double> prices;
+    while (db.nextRow()) {
+        prices[db.getString("f_scancode")] = db.getDouble("f_price1");
+    }
+    for (int i = 0; i < ui->tbl->rowCount(); i++) {
+        double price = prices[ui->tbl->getString(i, 1)];
+        ui->tbl->setDouble(i, 4, price);
+    }
+    db[":f_id"] = id;
+    db.exec("select * from e_currency where f_id=:f_id");
+    db.nextRow();
+    fCurrencyName = db.getString("f_symbol");
 }
 
 

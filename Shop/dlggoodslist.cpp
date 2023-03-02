@@ -20,9 +20,10 @@ DlgGoodsList::DlgGoodsList(int currency) :
             "where g.f_enabled=1 and ss.f_store=:f_store and gp.f_currency=:f_currency "
             "union "
             "select g.f_id, gg.f_name as f_groupname, g.f_scancode, g.f_name, "
-            "0, g.f_saleprice, g.f_saleprice2 "
+            "0, gpr.f_price1, gpr.f_price2 "
             "from c_goods g "
             "left join c_groups gg on gg.f_id=g.f_group "
+            "left join c_goods_prices gpr on gpr.f_goods=g.f_id "
             "left join c_goods_prices gp on gp.f_goods=g.f_id "
             "where g.f_service=1 and g.f_enabled=1  and gp.f_currency=:f_currency ");
     ui->tbl->setRowCount(db.rowCount());

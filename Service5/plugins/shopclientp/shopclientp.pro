@@ -28,6 +28,7 @@ SOURCES += \
     shopconnection.cpp \
     sqdriver.cpp \
     store.cpp \
+    traiding.cpp \
     translator.cpp
 
 HEADERS += \
@@ -49,6 +50,7 @@ HEADERS += \
     shopconnection.h \
     sqdriver.h \
     store.h \
+    traiding.h \
     translator.h
 
 DEFINES += _DBDRIVER_=\\\"QMYSQL\\\"

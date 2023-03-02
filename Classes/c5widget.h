@@ -43,6 +43,8 @@ public:
 
     virtual bool parseBroadcastMessage(int what, const QString &msg, QString &replystr);
 
+    virtual bool reportHandler(const QString &handleId, const QVariant &data);
+
     QString fWindowUuid;
 
 protected:

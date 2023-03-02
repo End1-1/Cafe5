@@ -217,7 +217,10 @@ bool Workspace::login()
         d->specialDiscount = db.getDouble("f_specialdiscount") / 100;
         fDishes.append(d);
         if (d->barcode.isEmpty() == false) {
-            fDishesBarcode[d->barcode] = d;
+            QStringList barcodes = d->barcode.split(",", Qt::SkipEmptyParts);
+            for (const QString &b: barcodes) {
+                fDishesBarcode[b] = d;
+            }
         }
     }
     db[":f_id"] = C5Config::defaultTable();
@@ -518,6 +521,9 @@ void Workspace::countTotal()
         }
     }
     ui->leTotal->setDouble(total);
+    if (ui->btnSetCard->isChecked()) {
+        ui->leCard->setDouble(ui->leTotal->getDouble());
+    }
     if (ui->leReceived->getDouble() > 0.01) {
         ui->leChange->setDouble(ui->leReceived->getDouble() - ui->leTotal->getDouble());
     }
@@ -539,6 +545,7 @@ void Workspace::resetOrder()
         d.discount = 0;
         d.specialDiscount = 0;
     }
+    ui->leCard->clear();
     ui->tblDishes->setEnabled(true);
     ui->wQty->setEnabled(true);
     fOrderUuid.clear();
@@ -663,6 +670,7 @@ void Workspace::on_btnCheckout_clicked()
     } else {
         otherAmount = ui->leTotal->getDouble();
     }
+    cardAmount = ui->leCard->getDouble();
     if (ui->btnFiscal->isChecked() && !ui->btnSetOther->isChecked()) {
         int result;
         do {
@@ -716,7 +724,7 @@ void Workspace::on_btnCheckout_clicked()
 
     if (!dw.writeAHeader(cashdoc, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH,
                          fUser->id(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(),
-                         0, ui->leTotal->getDouble(), cashprefix + " " + headerNum)) {
+                         0, ui->leTotal->getDouble(), cashprefix + " " + headerNum, __c5config.getValue(param_default_currency).toInt())) {
         C5Message::error(dw.fErrorMsg);
         return;
     }
@@ -732,7 +740,7 @@ void Workspace::on_btnCheckout_clicked()
     fPreviouseUuid = fOrderUuid;
     bool printsecond = __c5config.getValue(param_shop_print_v2) == "1";
     if (idramAmount > 0.001) {
-        printsecond = true;
+        //printsecond = true;
     }
     if (__c5config.getValue(param_smart_dont_print_receipt).toInt() == 0) {
         if (printReceipt(fOrderUuid, printsecond, false)) {
@@ -923,6 +931,15 @@ void Workspace::on_leReadCode_returnPressed()
             newcode += oldcode.at(i);
         }
     }
+    if (newcode.isEmpty()) {
+        return;
+    }
+    if (newcode.at(0) == "c") {
+        double cardvalue = str_float(newcode.right(newcode.length() - 1));
+        if (cardvalue <= ui->leTotal->getDouble()) {
+            ui->leCard->setDouble(cardvalue);
+        }
+    }
 
     QString code = newcode.replace("?", "").replace(";", "");
     if (fDishesBarcode.contains(code)) {
@@ -1026,6 +1043,7 @@ void Workspace::on_btnSetCash_clicked()
     ui->btnSetIdram->setChecked(false);
     ui->btnSetOther->setChecked(false);
     ui->btnSetCardExternal->setChecked(false);
+    ui->leCard->clear();
 }
 
 void Workspace::on_btnSetCard_clicked()
@@ -1036,6 +1054,7 @@ void Workspace::on_btnSetCard_clicked()
     ui->btnSetIdram->setChecked(false);
     ui->btnSetOther->setChecked(false);
     ui->btnFiscal->setChecked(true);
+    ui->leCard->setDouble(ui->leTotal->getDouble());
 }
 
 void Workspace::on_btnSetIdram_clicked()
@@ -1046,6 +1065,7 @@ void Workspace::on_btnSetIdram_clicked()
     ui->btnSetOther->setChecked(false);
     ui->btnSetCardExternal->setChecked(false);
     ui->btnFiscal->setChecked(true);
+    ui->leCard->clear();
 
 
 //    if (ui->tblOrder->rowCount() == 0) {
@@ -1138,6 +1158,7 @@ void Workspace::on_btnSetOther_clicked()
     ui->btnSetIdram->setChecked(false);
     ui->btnSetOther->setChecked(true);
     ui->btnSetCardExternal->setChecked(false);
+    ui->leCard->clear();
 }
 
 void Workspace::on_btnReceived_clicked()
@@ -1196,9 +1217,9 @@ bool Workspace::saveOrder(int state)
 
     double cashAmount = 0, cardAmount = 0, idramAmount = 0, otherAmount = 0;
     if (ui->btnSetCash->isChecked()) {
-        cashAmount = ui->leTotal->getDouble();
-    } else if (ui->btnSetCard->isChecked()) {
-        cardAmount = ui->leTotal->getDouble();
+        cashAmount = ui->leTotal->getDouble() - ui->leCard->getDouble();
+    } else if (ui->btnSetCard->isChecked() || ui->btnSetCardExternal->isChecked()) {
+        cardAmount = ui->leCard->getDouble();
     } else if (ui->btnSetIdram->isChecked()) {
         idramAmount = ui->leTotal->getDouble();
     } else {
@@ -1412,12 +1433,15 @@ int Workspace::printTax(double cardAmount, double idramAmount)
     QString useExtPos = C5Config::taxUseExtPos();
     if (idramAmount > 0.01) {
         cardAmount = idramAmount;
-        //useExtPos = "true";
+        useExtPos = "false";
     }
     if (ui->btnSetCardExternal->isChecked()) {
         useExtPos = "true";
     }
-    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), useExtPos, C5Config::taxCashier(), C5Config::taxPin(), this);
+    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(),
+                 C5Config::taxPassword(), useExtPos,
+                 C5Config::taxCashier(),
+                 C5Config::taxPin(), this);
     while (db.nextRow()) {
         if (db.getDouble("f_price") < 0.01) {
             continue;
@@ -1894,19 +1918,6 @@ void Workspace::on_btnHistoryOrder_clicked()
     DlgMemoryRead::sessionHistory();
 }
 
-void Workspace::on_btnDiscount_clicked()
-{
-    int row = ui->tblOrder->currentRow();
-    if (row < 0) {
-        return;
-    }
-    Dish d = ui->tblOrder->item(row, 0)->data(Qt::UserRole).value<Dish>();
-    d.discount = 1;
-    ui->tblOrder->item(row, 0)->setData(Qt::UserRole, qVariantFromValue(d));
-    updateInfo(row);
-    countTotal();
-}
-
 void Workspace::on_btnSetCardExternal_clicked()
 {
     ui->btnSetCash->setChecked(false);
@@ -1947,11 +1958,12 @@ void Workspace::on_tblTables_itemClicked(QTableWidgetItem *item)
         fOrderUuid = db.getString("f_id");
         fCustomer = db.getInt("f_partner");
         db[":f_header"] = fOrderUuid;
+        db[":f_state"] = DISH_STATE_OK;
         db.exec("select b.f_dish, b.f_adgcode, d.f_name, b.f_qty1, b.f_qty2, b.f_price, b.f_comment, "
                 "b.f_print1, b.f_store "
                 "from o_body b "
                 "left join d_dish d on d.f_id=b.f_dish "
-                "where b.f_header=:f_header "
+                "where b.f_header=:f_header AND b.f_state=:f_state "
                 "order by b.f_row ");
         while (db.nextRow()) {
             Dish d;
@@ -1994,4 +2006,13 @@ void Workspace::on_btnSaveAndPrecheck_clicked()
         fFlagEdited = true;
     }
     printReceipt(fOrderUuid, false, true);
+}
+
+void Workspace::on_leCard_textChanged(const QString &arg1)
+{
+    if (str_float(arg1) > 0) {
+        if (!ui->btnFiscal->isChecked()) {
+            ui->btnFiscal->setChecked(true);
+        }
+    }
 }

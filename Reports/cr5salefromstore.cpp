@@ -24,6 +24,7 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
                     << "left join c_goods gg on gg.f_id=og.f_goods [gg]"
                     << "left join c_groups gr on gr.f_id=gg.f_group [gr]"
                     << "left join c_units gu on gu.f_id=gg.f_unit [gu]"
+                    << "left join c_goods_prices gpr on gpr.f_goods=gg.f_id [gpr]"
                     << "left join c_partners cp on cp.f_id=gg.f_supplier [cp]"
                     << "left join c_partners cpb on cpb.f_id=oh.f_partner [cpb]"
                     << "left join c_goods_classes gca on gca.f_id=gg.f_group1 [gca]"
@@ -52,14 +53,15 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
                    << "cpb.f_taxname as f_buyer"
                    << "cpb.f_taxcode as f_buyertaxcode"
                    << "og.f_discountfactor*100 as f_discountfactor"
-                   << "gg.f_saleprice"
-                   << "gg.f_saleprice2"
-                   << "sum(gg.f_saleprice*og.f_qty) as f_totalsaleprice"
-                   << "sum(gg.f_saleprice2*og.f_qty) as f_totalsaleprice2"
+                   << "gpr.f_price1"
+                   << "gpr.f_price2"
+                   << "sum(gpr.f_price1*og.f_qty) as f_totalsaleprice"
+                   << "sum(gpr.f_price2*og.f_qty) as f_totalsaleprice2"
                    << "sum(og.f_discountamount) as f_discamount"
                    << "sum(og.f_qty*og.f_sign) as f_qty"
                    << "sum(og.f_total*og.f_sign) as f_total"
                    << "sum(ad.f_total*og.f_sign) as f_selfcost"
+                   << "sum((og.f_qty*og.f_sign) - (ad.f_total*og.f_sign*-1)) as f_profit"
                       ;
 
     fColumnsGroup << "oh.f_id as f_header"
@@ -80,18 +82,17 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
                    << "gcc.f_name as gname3"
                    << "gcd.f_name as gname4"
                    << "og.f_discountfactor*100 as f_discountfactor"
-                   << "gg.f_saleprice"
-                   << "gg.f_saleprice2"
+                   << "gpr.f_price1"
+                   << "gpr.f_price2"
                       ;
 
     fColumnsSum << "f_qty"
                 << "f_total"
                 << "f_selfcost"
                 << "f_discamount"
-                << "gg.f_saleprice"
-                << "gg.f_saleprice2"
                 << "f_totalsaleprice"
                 << "f_totalsaleprice2"
+                << "f_profit"
                       ;
 
     fTranslation["f_header"] = tr("UUID");
@@ -117,10 +118,11 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
     fTranslation["f_buyertaxcode"] = tr("Buyer taxcode");
     fTranslation["f_discountfactor"] = tr("Discount factor");
     fTranslation["f_discamount"] = tr("Discount amount");
-    fTranslation["f_saleprice"] = tr("Sale price");
-    fTranslation["f_saleprice2"] = tr("Whosale price");
+    fTranslation["f_price1"] = tr("Sale price");
+    fTranslation["f_price2"] = tr("Whosale price");
     fTranslation["f_totalsaleprice"] = tr("Total of retail price");
     fTranslation["f_totalsaleprice2"] = tr("Total of whosale price");
+    fTranslation["f_profit"] = tr("Profit");
 
     fColumnsVisible["oh.f_id as f_header"] = true;
     fColumnsVisible["ot.f_receiptnumber"] = true;
@@ -144,10 +146,11 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
     fColumnsVisible["cpb.f_taxcode as f_buyertaxcode"] = false;
     fColumnsVisible["og.f_discountfactor*100 as f_discountfactor"] = false;
     fColumnsVisible["sum(og.f_discountamount) as f_discamount"] = false;
-    fColumnsVisible["gg.f_saleprice"] = false;
-    fColumnsVisible["gg.f_saleprice2"] = false;
-    fColumnsVisible["sum(gg.f_saleprice*og.f_qty) as f_totalsaleprice"] = false;
-    fColumnsVisible["sum(gg.f_saleprice2*og.f_qty) as f_totalsaleprice2"] = false;
+    fColumnsVisible["gpr.f_price1"] = false;
+    fColumnsVisible["gpr.f_price2"] = false;
+    fColumnsVisible["sum(gpr.f_price1*og.f_qty) as f_totalsaleprice"] = false;
+    fColumnsVisible["sum(gpr.f_price2*og.f_qty) as f_totalsaleprice2"] = false;
+    fColumnsVisible["sum(og.f_qty*og.f_sign) - sum(ad.f_total*og.f_sign*-1) as f_profit"] = false;
 
     restoreColumnsVisibility();
     fFilterWidget = new CR5SaleFromStoreFilter(fDBParams);

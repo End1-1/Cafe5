@@ -27,6 +27,7 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
                     << "left join c_goods_classes gcc on gca.f_id=g.f_group3 [gcc]"
                     << "left join c_goods_classes gcd on gca.f_id=g.f_group4 [gcd]"
                     << "left join a_header_store ai on ai.f_id=a.f_id [ai]"
+                    << "Left join c_goods_prices gpr on gpr.f_goods=g.f_id [gpr]"
                     << "left join c_partners p on p.f_id=a.f_partner [p]"
                        ;
 
@@ -52,10 +53,10 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
                    << "u.f_name as f_unit"
                    << "s.f_price"
                    << "sum(s.f_total) as f_total"
-                   << "g.f_saleprice"
-                   << "sum(g.f_saleprice*s.f_qty) as f_salepricetotal"
-                   << "g.f_saleprice2"
-                   << "sum(g.f_saleprice2*s.f_qty) as f_salepricetotal2"
+                   << "gpr.f_price1"
+                   << "sum(gpr.f_price1*s.f_qty) as f_salepricetotal"
+                   << "gpr.f_price2"
+                   << "sum(gpr.f_price2*s.f_qty) as f_salepricetotal2"
                    << "a.f_comment"
                       ;
 
@@ -78,8 +79,8 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
                   << "gcd.f_name as f_class4"
                   << "s.f_comment as f_storecomment"
                   << "a.f_comment as f_doccomment"
-                  << "g.f_saleprice"
-                  << "g.f_saleprice2"
+                  << "gpr.f_price1"
+                  << "gpr.f_price2"
                   << "s.f_price"
                   << "u.f_name as f_unit"
                   << "g.f_name as f_goods"
@@ -130,8 +131,8 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
     fColumnsVisible["gg.f_name as f_group"] = true;
     fColumnsVisible["g.f_name as f_goods"] = true;
     fColumnsVisible["g.f_scancode"] = true;
-    fColumnsVisible["g.f_saleprice"] = true;
-    fColumnsVisible["g.f_saleprice2"] = false;
+    fColumnsVisible["gpr.f_price1"] = true;
+    fColumnsVisible["gpr.f_price2"] = false;
     fColumnsVisible["sum(s.f_qty) as f_qty"] = true;
     fColumnsVisible["u.f_name as f_unit"] = true;
     fColumnsVisible["s.f_price"] = true;
@@ -143,8 +144,8 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
     fColumnsVisible["gcd.f_name as f_class4"] = false;
     fColumnsVisible["s.f_comment as f_storecomment"] = false;
     fColumnsVisible["a.f_comment as f_doccomment"] = false;
-    fColumnsVisible["sum(g.f_saleprice*s.f_qty) as f_salepricetotal"] = true;
-    fColumnsVisible["sum(g.f_saleprice2*s.f_qty) as f_salepricetotal2"] = false;
+    fColumnsVisible["sum(gpr.f_price1*s.f_qty) as f_salepricetotal"] = true;
+    fColumnsVisible["sum(gpr.f_price2*s.f_qty) as f_salepricetotal2"] = false;
     fColumnsVisible["f_comment"] = true;
     fColumnsVisible["ass.f_name as f_statename"] = true;
 

@@ -160,6 +160,8 @@ private slots:
 
     void focusNextChildren();
 
+    void exportToExcel();
+
     void newDoc();
 
     void getInput();
@@ -245,6 +247,8 @@ private slots:
     void outputOfService();
 
     void duplicateOutput();
+
+    void duplicateAsInput();
 
     void on_btnAddDish_clicked();
 

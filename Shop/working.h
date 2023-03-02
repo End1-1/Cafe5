@@ -26,6 +26,8 @@ struct Flag {
     QString name;
 };
 
+class WCustomerDisplay;
+
 class Working : public QWidget
 {
     Q_OBJECT
@@ -34,6 +36,8 @@ public:
     explicit Working(C5User *user, QWidget *parent = nullptr);
 
     ~Working();
+
+    WOrder *worder();
 
     bool eventFilter(QObject *watched, QEvent *event);
 
@@ -61,7 +65,7 @@ private:
 
     C5User *fUser;
 
-    WOrder *worder();
+    WCustomerDisplay *fCustomerDisplay;
 
     void loadStaff();
 
@@ -161,6 +165,12 @@ private slots:
     void on_btnMinimize_clicked();
 
     void on_btnClientConfigQR_clicked();
+
+    void on_btnGiftCard_clicked();
+
+    void on_btnCostumerDisplay_clicked(bool checked);
+    void on_btnPreorder_clicked();
+    void on_btnOpenDraft_clicked();
 };
 
 #endif // WORKING_H

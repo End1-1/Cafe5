@@ -22,6 +22,8 @@ public:
 
     bool showDrafts();
 
+    bool showZero();
+
     QString currency() const;
 
     QString currencyName() const;

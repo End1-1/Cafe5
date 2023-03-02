@@ -16,6 +16,7 @@
 #define cp_t1_allow_change_cash_doc_date 107
 #define cp_t1_allow_change_store_doc_date 108
 #define cp_t1_goods_pricing 109
+#define cp_t1_breeze 110
 
 #define cp_t2_action 200
 #define cp_t2_store_input 201

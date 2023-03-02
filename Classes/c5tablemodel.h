@@ -78,6 +78,8 @@ public:
 
     void sumForColumns(const QStringList &columns, QMap<QString, double> &values);
 
+    void sumForColumnsIndexes(const QList<int> &columns, QMap<int, double> &values);
+
     void insertSubTotals(QList<int> cols, const QList<int> &totalCols, bool title, bool insertempty);
 
     void resetProxyData();

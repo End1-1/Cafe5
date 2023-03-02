@@ -32,7 +32,11 @@
     </widget>
    </item>
    <item row="1" column="1">
-    <widget class="QSpinBox" name="sb2"/>
+    <widget class="QSpinBox" name="sb2">
+     <property name="maximum">
+      <number>1000</number>
+     </property>
+    </widget>
    </item>
    <item row="2" column="0" colspan="2">
     <widget class="QWidget" name="widget" native="true">

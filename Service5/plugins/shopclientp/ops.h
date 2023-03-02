@@ -9,6 +9,13 @@
 #define op_check_qty 3
 #define op_data_currency_list 4
 #define op_data_currency_crossrate_list 5
+#define op_get_goods_list 6
+#define op_goods_prices 7
+#define op_create_empty_sale 8
+#define op_open_sale_draft_document 9
+#define op_show_drafts_sale_list 10
+#define op_add_goods_to_draft 11
+#define op_open_sale_draft_body 12
 
 #define version1 1 //jazzve
 #define version2 2 //cafe5

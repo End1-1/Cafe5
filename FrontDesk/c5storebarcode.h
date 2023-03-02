@@ -31,6 +31,8 @@ private:
     //bool printOneBarcode(const QString &code, QPrintDialog &pd);
 
 private slots:
+    virtual void setSearchParameters();
+
     void print();
 
     void printDescriptions();

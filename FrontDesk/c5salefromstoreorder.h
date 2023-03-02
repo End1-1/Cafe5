@@ -27,6 +27,8 @@ private slots:
 
     void on_btnCopyUUID_clicked();
 
+    void on_btnPrintA4_clicked();
+
 private:
     Ui::C5SaleFromStoreOrder *ui;
 

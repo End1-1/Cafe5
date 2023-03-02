@@ -647,9 +647,9 @@ bool C5Database::exec(const QString &sqlQuery, bool &isSelect)
     }
     fTimerCount = fTimer.elapsed();
 
-    //#define LOGGING 1
+#define LOGGING
 
-    #ifdef QT_DEBUG
+    #ifdef LOGGING
         logEvent(fDb.hostName() + " (" + QString::number(fTimerCount) + " ms):" + fDb.databaseName() + " " + lastQuery(fQuery));
     #endif
     if (__c5config.getValue(param_debuge_mode).toInt() > 0) {

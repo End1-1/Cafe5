@@ -20,6 +20,8 @@ C5CashDoc::C5CashDoc(const QStringList &dbParams, QWidget *parent) :
     ui->leDocNum->setPlaceholderText(QString("%1").arg(genNumber(DOC_TYPE_CASH), C5Config::docNumDigitsInput(), 10, QChar('0')));
     ui->leInput->setSelector(dbParams, ui->leInputName, cache_cash_names);
     ui->leOutput->setSelector(dbParams, ui->leOutputName, cache_cash_names);
+    ui->leInput->setCallbackWidget(this);
+    ui->leOutput->setCallbackWidget(this);
     ui->lePartner->setSelector(dbParams, ui->lePartnerName, cache_goods_partners);
     ui->lbStoreDoc->setEnabled(false);
     ui->leStoreDoc->setEnabled(false);
@@ -31,6 +33,12 @@ C5CashDoc::C5CashDoc(const QStringList &dbParams, QWidget *parent) :
     fActionFromSale = nullptr;
     fActionDraft = nullptr;
     fActionSave = nullptr;
+    C5Database db(dbParams);
+    db.open();
+    db.exec("select * from e_currency order by f_id");
+    while (db.nextRow()) {
+        ui->cbCurrency->addItem(db.getString("f_name"), db.getInt("f_id"));
+    }
 }
 
 C5CashDoc::~C5CashDoc()
@@ -126,6 +134,7 @@ bool C5CashDoc::openDoc(const QString &uuid)
     ui->leRemarks->setText(dw.value(container_aheader, 0, "f_comment").toString());
     fStoreUuid = dw.value(container_aheadercash, 0, "f_storedoc").toString();
     ui->lePartner->setValue(dw.value(container_aheader, 0, "f_partner").toString());
+    ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(dw.value(container_aheader, 0, "f_currency")));
     for (int i = 0; i < dw.rowCount(container_ecash); i++) {
         int row = -1;
         for (int j = 0; j < ui->tbl->rowCount(); j++) {
@@ -187,6 +196,20 @@ void C5CashDoc::setStoreDoc(const QString &uuid)
         ui->lbStoreDoc->setEnabled(true);
         ui->leStoreDoc->setEnabled(true);
         ui->btnOpenStoreDoc->setEnabled(true);
+    }
+}
+
+void C5CashDoc::selectorCallback(int row, const QList<QVariant> &values)
+{
+    C5LineEditWithSelector *l = static_cast<C5LineEditWithSelector*>(sender());
+    if (row == cache_cash_names) {
+        if (l == ui->leInput) {
+
+
+
+        } else {
+
+        }
     }
 }
 
@@ -279,7 +302,7 @@ void C5CashDoc::save(bool fromrelation)
         ui->leDocNum->setInteger(genNumber(DOC_TYPE_CASH));
         updateGenNumber(ui->leDocNum->getInteger(), DOC_TYPE_CASH);
     }
-    dw.writeAHeader(fUuid, ui->leDocNum->text(), DOC_STATE_SAVED, DOC_TYPE_CASH, __user->id(), ui->deDate->date(), QDate::currentDate(), QTime::currentTime(), ui->lePartner->getInteger(), ui->leTotal->getDouble(), ui->leRemarks->text());
+    dw.writeAHeader(fUuid, ui->leDocNum->text(), DOC_STATE_SAVED, DOC_TYPE_CASH, __user->id(), ui->deDate->date(), QDate::currentDate(), QTime::currentTime(), ui->lePartner->getInteger(), ui->leTotal->getDouble(), ui->leRemarks->text(), ui->cbCurrency->currentData().toInt());
     dw.writeAHeaderCash(fUuid, ui->leInput->getInteger(), ui->leOutput->getInteger(), fRelation, fStoreUuid, "", 0);
     for (int i = 0; i < ui->tbl->rowCount(); i++) {
         QString idin = ui->tbl->getString(i, 0);
@@ -301,12 +324,14 @@ void C5CashDoc::save(bool fromrelation)
         if (ui->leOutput->getInteger() > 0) {
             db[":f_doc"] = fUuid;
             db[":f_dc"] = 1;
+            db[":f_currency"] = ui->cbCurrency->currentData();
             db[":f_amount"] = ui->leTotal->getDouble();
             db.insert("a_dc");
         }
         if (ui->leInput->getInteger() > 0) {
             db[":f_doc"] = fUuid;
             db[":f_dc"] = -1;
+            db[":f_currency"] = ui->cbCurrency->currentData();
             db[":f_amount"] = ui->leTotal->getDouble();
             db.insert("a_dc");
         }

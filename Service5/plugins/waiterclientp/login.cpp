@@ -88,8 +88,28 @@ int loginPasswordHash(RawMessage &rm, Database &db, const QByteArray &in, QStrin
         }
         break;
     case version2:
-        rm.putUByte(0);
-        rm.putString(ntr("Not implemented", ntr_am));
+        if (db.exec("select f_id, concat_ws(' ', f_last, f_first) as f_fullname from s_user where f_passhash=:f_passhash") == false) {
+            rm.putUByte(0);
+            rm.putString(db.lastDbError());
+            return 0;
+        }
+        if (db.next()) {
+            rm.putUByte(1);
+            username = db.string("f_fullname");
+            userid = db.integer("f_id");
+            db[":f_id"] = db.integer("f_id");
+            db[":f_firebase_token"] = firebaseToken;
+            if (!db.update("s_user", "f_id", userid)) {
+                rm.putUByte(0);
+                rm.putString(db.lastDbError());
+                return 0;
+            }
+            return userid;
+        } else {
+            rm.putUByte(0);
+            rm.putString(ntr("Invalid pin", ntr_am));
+            return 0;
+        }
         break;
     case version3:
         if (db.exec("select f_id, concat(f_lastname, ' ', f_firstname) as fullname from users where f_passhash=:f_passhash") == false) {
@@ -146,9 +166,29 @@ int loginPin(RawMessage &rm, Database &db, const QByteArray &in, QString &userna
         }
         break;
     case version2:
-        rm.putUByte(0);
-        rm.putString(ntr("Not implemented", ntr_am));
-        return 0;
+        db[":f_altpassword"] = QString::fromLatin1(QCryptographicHash::hash(pin.toUtf8(), QCryptographicHash::Md5).toHex());
+        if (db.exec("select f_id, concat_ws(' ', f_last, f_first) as f_fullname from s_user where f_altpassword=:f_altpassword") == false) {
+            rm.putUByte(0);
+            rm.putString(db.lastDbError());
+            return 0;
+        }
+        if (db.next()) {
+            passhash = db.uuid();
+            username = db.string("f_fullname");
+            userid = db.integer("f_id");
+            db[":f_passhash"] = passhash;
+            db[":f_firebase_token"] = firebaseToken;
+            if (db.update("s_user", "f_id", userid) == false) {
+                rm.putUByte(0);
+                rm.putString(db.lastDbError());
+                return 0;
+            }
+        } else {
+            rm.putUByte(0);
+            rm.putString(ntr("Invalid pin", ntr_am));
+            return 0;
+        }
+        break;
     case version3:
         if (db.exec("select f_id, concat(f_lastname, ' ', f_firstname) as fullname from users where f_altpassword=md5(:f_pin)") == false) {
             rm.putUByte(0);

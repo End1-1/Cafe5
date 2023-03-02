@@ -119,7 +119,7 @@ void CE5Editor::setId(int id)
                 }
             }
         }
-        for (C5LineEditWithSelector *l: fLines) {
+        for (C5LineEditWithSelector *l: qAsConst(fLines)) {
             l->fixValue();
         }
     } else {

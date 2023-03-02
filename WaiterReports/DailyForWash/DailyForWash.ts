@@ -247,6 +247,11 @@
         <source>A2</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../../Cafe5/c5message.ui" line="235"/>
+        <source>Copy</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>NotificationWidget</name>

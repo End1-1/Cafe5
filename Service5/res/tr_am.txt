@@ -46,3 +46,4 @@ Time=Ժամ
 Printer=Տպիչ
 This order is not editable=Պատվերը հմբագրման ենթակա չէ
 Invalid scancode=Անհայտ բարկոդ
+Invalid pin=Սխալ պին կոդ

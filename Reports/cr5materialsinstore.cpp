@@ -71,6 +71,7 @@ void CR5MaterialsInStore::prepareDrafts()
                     << "left join c_goods_classes gcc on gca.f_id=g.f_group3 [gcc]"
                     << "left join c_goods_classes gcd on gca.f_id=g.f_group4 [gcd]"
                     << "LEFT JOin c_goods_prices gpr on gpr.f_goods=g.f_id [gpr]"
+                    << "left join partners p on p.f_id=h.f_partner [p]"
                        ;
 
     fColumnsFields << "g.f_id as f_code"
@@ -82,6 +83,7 @@ void CR5MaterialsInStore::prepareDrafts()
                    << "gcb.f_name as f_class2"
                    << "gcc.f_name as f_class3"
                    << "gcd.f_name as f_class4"
+                   << "p.f_taxname"
                    << "sum(s.f_qty*s.f_type) as f_qty"
                    << "u.f_name as f_unit"
                    << "g.f_lastinputprice"
@@ -106,6 +108,7 @@ void CR5MaterialsInStore::prepareDrafts()
                    << "gcb.f_name as f_class2"
                    << "gcc.f_name as f_class3"
                    << "gcd.f_name as f_class4"
+                   << "p.f_taxname"
                    << "g.f_scancode"
                       ;
 
@@ -120,6 +123,7 @@ void CR5MaterialsInStore::prepareDrafts()
     fTranslation["f_code"] = tr("Code");
     fTranslation["f_storage"] = tr("Storage");
     fTranslation["f_group"] = tr("Group");
+    fTranslation["f_taxname"] = tr("Partner");
     fTranslation["f_goods"] = tr("Goods");
     fTranslation["f_scancode"] = tr("Scancode");
     fTranslation["f_qty"] = tr("Qty");
@@ -154,6 +158,7 @@ void CR5MaterialsInStore::prepareDrafts()
     fColumnsVisible["gcb.f_name as f_class2"] = false;
     fColumnsVisible["gcc.f_name as f_class3"] = false;
     fColumnsVisible["gcd.f_name as f_class4"] = false;
+    fColumnsVisible["p.f_taxname"] = false;
     restoreColumnsVisibility();
 }
 
@@ -181,9 +186,9 @@ void CR5MaterialsInStore::prepareNoDrafts()
                     << "left join c_goods g on g.f_id=s.f_goods [g]"
                     << "left join c_goods_prices gpr on gpr.f_goods=g.f_id [gpr]"
                     << "left join c_goods_classes gca on gca.f_id=g.f_group1 [gca]"
-                    << "left join c_goods_classes gcb on gca.f_id=g.f_group2 [gcb]"
-                    << "left join c_goods_classes gcc on gca.f_id=g.f_group3 [gcc]"
-                    << "left join c_goods_classes gcd on gca.f_id=g.f_group4 [gcd]"
+                    << "left join c_goods_classes gcb on gcb.f_id=g.f_group2 [gcb]"
+                    << "left join c_goods_classes gcc on gcc.f_id=g.f_group3 [gcc]"
+                    << "left join c_goods_classes gcd on gcd.f_id=g.f_group4 [gcd]"
                        ;
 
     fColumnsFields << "g.f_id as f_code"
@@ -227,7 +232,11 @@ void CR5MaterialsInStore::prepareNoDrafts()
                 << "f_totalsale2"
                       ;
 
-    fHavindCondition = " having sum(s.f_qty*s.f_type) <> 0 ";
+    if (fFilter->showZero()) {
+
+    } else {
+        fHavindCondition = " having sum(s.f_qty*s.f_type) <> 0 ";
+    }
 
     fTranslation["f_code"] = tr("Code");
     fTranslation["f_storage"] = tr("Storage");
@@ -260,9 +269,9 @@ void CR5MaterialsInStore::prepareNoDrafts()
     fColumnsVisible["sum(s.f_total*s.f_type) as f_total"] = true;
     fColumnsVisible["g.f_lowlevel"] = true;
     fColumnsVisible["gpr.f_price1"] = false;
-    fColumnsVisible["sum(s.f_qty*s.f_type)*g.f_saleprice as f_totalsale"] = false;
+    fColumnsVisible["sum(s.f_qty*s.f_type)*gpr.f_price1 as f_totalsale"] = false;
     fColumnsVisible["gpr.f_price2"] = false;
-    fColumnsVisible["sum(s.f_qty*s.f_type)*g.f_saleprice2 as f_totalsale2"] = false;
+    fColumnsVisible["sum(s.f_qty*s.f_type)*gpr.f_price2 as f_totalsale2"] = false;
     fColumnsVisible["gca.f_name as f_class1"] = false;
     fColumnsVisible["gcb.f_name as f_class2"] = false;
     fColumnsVisible["gcc.f_name as f_class3"] = false;

@@ -26,6 +26,8 @@ void ThreadCheckMessage::run()
         emit data(2, s->readAll());
         s->close();
         emit finished();
+    } else {
+        emit threadError(1, s->errorString());
     }
     s->deleteLater();
 }

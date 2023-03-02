@@ -6,6 +6,7 @@
 #include "messagelist.h"
 #include "printtaxn.h"
 #include "c5printing.h"
+#include "printbill.h"
 #include <QFont>
 #include <QPrinter>
 
@@ -72,8 +73,45 @@ void openTable(RawMessage &rm, Database &db, const QByteArray &in, WaiterConnect
         }
         break;
     case version2:
-        rm.putUByte(0);
-        rm.putString(ntr("Not implemented", ntr_am));
+        if (db.exec("select f_locksrc from h_tables where f_id=:f_id") == false) {
+            rm.putUByte(0);
+            rm.putString(db.lastDbError());
+            return;
+        }
+        if (db.next()) {
+            if (db.string("lock_host").isEmpty() == false) {
+                if (db.string("f_locksrc") != sessionid) {
+                    rm.putUByte(0);
+                    rm.putString(ntr("Table already editing by other user", ntr_am));
+                    return;
+                }
+            }
+            db[":f_locksrc"] = sessionid;
+            db[":f_id"] = tableid;
+            db[":f_locktime"] = QDateTime::currentDateTime();
+            if (db.exec("update h_tables set f_locksrc=:f_locksrc, f_locktime=:f_locktime where f_id=:f_id") == false) {
+                rm.putUByte(0);
+                rm.putString(db.lastDbError());
+                return;
+            }
+            db[":f_table"] = tableid;
+            if (db.exec("select o.f_id, concat_ws(' ', u.f_last, u.f_first) as staff "
+                        "from o_header o "
+                        "left join s_user u on u.f_id=o.f_staff "
+                        "where o.f_table=:f_table and o.f_state=1") == false) {
+                rm.putUByte(0);
+                rm.putString(db.lastDbError());
+                return;
+            }
+            if (db.next()) {
+                orderid = db.string("id");
+                owner = db.string("staff");
+            }
+        } else {
+            rm.putUByte(0);
+            rm.putString(ntr("Wrong table id", ntr_am));
+            return;
+        }
         break;
     case version3:
         if (db.exec("select f_lockhost from r_table where f_id=:f_id") == false) {
@@ -122,7 +160,7 @@ void openTable(RawMessage &rm, Database &db, const QByteArray &in, WaiterConnect
     wc->fProtocolVersion = version;
 }
 
-void unlockTable(RawMessage &rm, Database &db, const QByteArray &in, const QString &session)
+void unlockTable(RawMessage &rm, Database &db, const QByteArray &in, const QString &session, WaiterConnection *wc)
 {
     quint8 version;
     quint32 tableid;
@@ -157,13 +195,31 @@ void unlockTable(RawMessage &rm, Database &db, const QByteArray &in, const QStri
             db.exec("update h_table set lock_host='', lock_time=0 where lock_host=:f_lockhost");
         } else {
             rm.putUByte(0);
-            rm.putString(ntr("Username or password incorrect", ntr_am));
+            rm.putString(db.lastDbError());
             return;
         }
         break;
     case version2:
-        rm.putUByte(0);
-        rm.putString(ntr("Not implemented", ntr_am));
+        if (db.exec("select f_locksrc from h_tables where f_id=:f_id") == false) {
+            rm.putUByte(0);
+            rm.putString(db.lastDbError());
+            return;
+        }
+        if (db.next()) {
+            if (db.string("f_locksrc").isEmpty() == false) {
+                if (db.string("f_locksrc").toLower() != sessionid.toLower()) {
+                    rm.putUByte(0);
+                    rm.putString(ntr("You cannot unlock host thats not locked by you", ntr_am));
+                    return;
+                }
+            }
+            db[":f_locksrc"] = sessionid;
+            db.exec("update h_tables set f_locksrc='', f_locktime=null where f_locksrc=:f_locksrc");
+        } else {
+            rm.putUByte(0);
+            rm.putString(db.lastDbError());
+            return;
+        }
         break;
     case version3:
         if (db.exec("select f_lockhost from r_table where f_id=:f_id") == false) {
@@ -190,6 +246,14 @@ void unlockTable(RawMessage &rm, Database &db, const QByteArray &in, const QStri
     }
 
     rm.putUByte(1);
+
+    RawMessage r(nullptr);
+    r.setHeader(0, 0, MessageList::dll_plugin);
+    r.putUInt(op_update_tables);
+    r.putUByte(1);
+    r.putUInt(tableid);
+    r.putString("");
+    wc->sendToAllClients(r.data());
 }
 
 void createHeaderOfOrder(RawMessage &rm, Database &db, const QByteArray &in, int userid)
@@ -228,12 +292,11 @@ void createHeaderOfOrder(RawMessage &rm, Database &db, const QByteArray &in, int
                 return;
             }
             orderid = QString("%1%2").arg(db.string("order_prefix"), QString::number(new_id));
-            int branch = db.integer("f_branch");
+            //int branch = db.integer("f_branch");
             double service_value = db.doubleValue("service_value");
 
             db[":id"] = orderid;
             db[":state_id"] = 1;
-            db[":f_branch"] = branch;
             db[":table_id"] = tableid;
             db[":date_open"] = QDateTime::currentDateTime();
             db[":staff_id"] = userid;
@@ -251,7 +314,8 @@ void createHeaderOfOrder(RawMessage &rm, Database &db, const QByteArray &in, int
         }
         break;
     case 2:
-        break;
+        createHeaderOfOrderV2(rm, db, in, userid, tableid);
+        return;
     case 3:
 
         break;
@@ -387,8 +451,15 @@ void openOrder(RawMessage &rm, Database &db, const QByteArray &in, int userid)
                         "where order_id=:f_header and state_id=1 ");
         break;
     }
-    case version2:
+    case version2: {
+        NetworkTable ntdishes(rm, db);
+        db[":f_header"] = orderid;
+        ntdishes.execSQL("select f_id, f_dish, f_qty1, f_qty2, f_price,"
+                        "f_service, f_discount, f_store, f_print1, f_print2, f_comment "
+                        "from o_body "
+                        "where f_header=:f_header and f_state=1 ");
         break;
+    }
     case version3: {
         NetworkTable ntdishes(rm, db);
         ntdishes.execSQL("select f_id, f_dish, f_qty, f_qtyprint, f_price,"
@@ -449,6 +520,7 @@ void forceUnlockTable(Database &db, const QString &sessionid, int version)
     case 1:
         break;
     case 2:
+
         break;
     case 3:
         db[":f_lockhost"] = sessionid;
@@ -541,9 +613,68 @@ void addDishToOrder(RawMessage &rm, Database &db, const QByteArray &in, int user
         rm.putString(comment);
         break;
     }
-    case 2:
+    case 2: {
+        db[":f_id"] = orderid;
+        if (db.exec("select * from o_header where f_id=:f_id") == false) {
+            rm.putUByte(0);
+            rm.putString(tr_am("Empty order id"));
+            return;
+        }
+        if (!db.next()) {
+            rm.putUByte(0);
+            rm.putString(tr_am("Invalid order id"));
+            return;
+        }
+//        if (db.integer("f_print") > 0) {
+//            rm.putUByte(0);
+//            rm.putString(tr_am("This order is not editable"));
+//            return;
+//        }
+        svcvalue = db.doubleValue("f_servicefactor");
+        svcamount = price * (svcamount / 100);
+        QString id = db.uuid();
+        db[":f_id"] = id;
+        db[":f_header"] = orderid;
+        db[":f_state"] = 1;
+        db[":f_dish"] = dishid;
+        db[":f_qty1"] = 1;
+        db[":f_qty2"] = 0;
+        db[":f_price"] = price;
+        db[":f_total"] = price;
+        db[":f_appenduser"] = userid;
+        db[":f_store"] = storeid;
+        db[":f_print1"] = print1;
+        db[":f_print2"] = print2;
+        db[":f_comment"] = comment;
+        db[":f_canservice"] = 1;
+        db[":f_candiscount"] = 1;
+        db[":f_service"] = svcvalue;
+        db[":f_discount"] = dctvalue;
+        db[":f_remind"] = 0;
+        db[":f_removereason"] = "";
+        if (db.insert("o_body") == false) {
+            rm.putUByte(0);
+            rm.putString(db.lastDbError());
+            return;
+        }
+        if (!countOrder2(rm, db, orderid)){
+            return;
+        }
+        rm.putUByte(1);
+        rm.putString(id);
+        rm.putUInt(dishid);
+        rm.putDouble(1);
+        rm.putDouble(0);
+        rm.putDouble(price);
+        rm.putDouble(svcvalue);
+        rm.putDouble(dctvalue);
+        rm.putUInt(storeid);
+        rm.putString(print1);
+        rm.putString(print2);
+        rm.putString(comment);
         break;
-    case 3:
+    }
+    case 3: {
         db[":f_id"] = orderid;
         if (db.exec("select * from o_header where f_id=:f_id") == false) {
             rm.putUByte(0);
@@ -599,6 +730,12 @@ void addDishToOrder(RawMessage &rm, Database &db, const QByteArray &in, int user
             rm.putString(db.lastDbError());
             return;
         }
+
+        db[":f_header"] = orderid.toInt();
+        db[":f_state"] = 1;
+        db.exec("update o_header set f_total=(select sum(f_total) from o_dish where f_header=:f_header and f_state=:f_state) where f_id=:f_header");
+
+
         rm.putUByte(1);
         rm.putString(QString::number(id));
         rm.putUInt(dishid);
@@ -613,12 +750,13 @@ void addDishToOrder(RawMessage &rm, Database &db, const QByteArray &in, int user
         rm.putString(comment);
         break;
     }
+    }
 }
 
 void removeDishFromOrder(RawMessage &rm, Database &db, const QByteArray &in, int userid)
 {
     quint8 version;
-    QString recid;
+    QString recid, orderid;
     rm.readUByte(version, in);
     rm.readString(recid, in);
 
@@ -646,6 +784,30 @@ void removeDishFromOrder(RawMessage &rm, Database &db, const QByteArray &in, int
         db.exec("update o_dishes set state_id=:f_state where id=:f_id");
         break;
     case 2:
+        db[":f_id"] = recid;
+        if (db.exec("select * from o_body where f_id=:f_id") == false) {
+            rm.putUByte(0);
+            rm.putString(db.lastDbError());
+            return;
+        }
+        if (!db.next()) {
+            rm.putUByte(0);
+            rm.putString(tr_am("Record not exists"));
+            return;
+        }
+        if (db.doubleValue("f_qty2") > 0.001) {
+            //check right for remove from order
+            rm.putUByte(0);
+            rm.putString(tr_am("Need raise your rights"));
+            return;
+        }
+        db[":f_id"] = recid;
+        db[":f_state"] = 0;
+        db[":f_removeuser"] = userid;
+        if (db.exec("update o_body set f_state=:f_state, f_removeuser=:f_removeuser, f_removetime=current_timestamp() where f_id=:f_id") == false) {
+            rm.putUByte(0);
+            rm.putString(db.lastDbError());
+        }
         break;
     case 3:
         db[":f_id"] = recid.toInt();
@@ -665,9 +827,14 @@ void removeDishFromOrder(RawMessage &rm, Database &db, const QByteArray &in, int
             rm.putString(tr_am("Need raise your rights"));
             return;
         }
+        orderid = db.string("f_header");
         db[":f_id"] = recid.toInt();
         db[":f_state"] = 2;
         db.exec("update o_dish set f_state=:f_state where f_id=:f_id");
+
+        db[":f_header"] = orderid.toInt();
+        db[":f_state"] = 1;
+        db.exec("update o_header set f_total=(select sum(f_total) from o_dish where f_header=:f_header and f_state=:f_state) where f_id=:f_header");
         break;
     }
     rm.putUByte(1);
@@ -729,6 +896,44 @@ void modifyDishOrder(RawMessage &rm, Database &db, const QByteArray &in, int use
         }
         break;
     case 2:
+        db[":f_id"] = recid;
+        db.exec("select * from o_body where f_id=:f_id");
+        if (db.next()) {
+            price = db.doubleValue("f_price");
+            total = qty * price;
+            orderid = db.string("f_header");
+        } else {
+            rm.putUByte(0);
+            rm.putString(tr_am("Invalid record id"));
+            return;
+        }
+        db[":f_id"] = orderid;
+        if (db.exec("select * from o_header where f_id=:f_id") == false) {
+            rm.putUByte(0);
+            rm.putString(db.lastDbError());
+            return;
+        }
+        if (db.next() == false) {
+            rm.putUByte(0);
+            rm.putString(tr_am("Invalid order id"));
+            return;
+        }
+//        if (db.integer("f_qty2") > 0) {
+//            rm.putUByte(0);
+//            rm.putString(tr_am("This order is not editable"));
+//            return;
+//        }
+        db[":f_qty1"] = qty;
+        db[":f_total"] = total;
+        db[":f_comment"] = comment;
+        if (db.update("o_body", "f_id", recid) == false) {
+            rm.putUByte(0);
+            rm.putString(db.lastDbError());
+            return;
+        }
+        if (!countOrder2(rm, db, orderid)) {
+            return;
+        }
         break;
     case 3:
         db[":f_id"] = recid;
@@ -750,6 +955,10 @@ void modifyDishOrder(RawMessage &rm, Database &db, const QByteArray &in, int use
             rm.putString(db.lastDbError());
             return;
         }
+
+        db[":f_header"] = orderid.toInt();
+        db[":f_state"] = 1;
+        db.exec("update o_header set f_total=(select sum(f_total) from o_dish where f_header=:f_header and f_state=:f_state) where f_id=:f_header");
         break;
     }
     rm.putUByte(1);
@@ -789,7 +998,7 @@ void printService(RawMessage &rm, Database &db, const QByteArray &in, WaiterConn
         order["current_staff"] = w->fUserName;
 
         db[":f_header"] = orderid;
-        if (db.exec("select od.*, od.comments as comment, d.name as dishname, st.name as storename "
+        if (db.exec("select od.*,  od.comments as comment, d.name as dishname, st.name as storename "
                     "from o_dishes od "
                     "left join me_dishes d on d.id=od.dish_id "
                     "left join st_storages st on st.id=od.store_id "
@@ -867,9 +1076,110 @@ void printService(RawMessage &rm, Database &db, const QByteArray &in, WaiterConn
         break;
     }
     case 2:
-        rm.putUByte(0);
-        rm.putString("Print service not implemented");
-        break;
+    {
+            QMap<QString, QVariant> order;
+            db[":f_id"] = orderid;
+            if (db.exec("select o.f_id, concat(o.f_prefix, o.f_hallid) as id, o.f_state as state, o.f_table, t.f_name as tablename, h.f_name as hallname, "
+                        "o.f_currentstaff "
+                        "from o_header o "
+                        "left join h_tables t on t.f_id=o.f_table "
+                        "left join h_halls h on h.f_id=t.f_hall "
+                        "where o.f_id=:f_id ") == false) {
+                rm.putUByte(0);
+                rm.putString(db.lastDbError());
+                return;
+            }
+            if (db.next() == false) {
+                rm.putUByte(0);
+                rm.putString(tr_am("Invalid order id"));
+                return;
+            }
+            db.rowToMap(order);
+            order["current_staff"] = w->fUserName;
+
+            db[":f_header"] = orderid;
+            if (db.exec("select od.*, od.f_comment as comment, od.f_qty1 as qty, d.f_name as dishname, st.f_name as storename "
+                        "from o_body od "
+                        "left join d_dish d on d.f_id=od.f_dish "
+                        "left join c_storages st on st.f_id=od.f_store "
+                        "where od.f_header=:f_header and od.f_state=1 and od.f_qty2<od.f_qty1") == false) {
+                rm.putUByte(0);
+                rm.putString(db.lastDbError());
+                return;
+            }
+            QList<QMap<QString, QVariant> > dishes;
+            while (db.next()) {
+                QMap<QString, QVariant> d;
+                for (int i = 0; i < db.columnCount(); i++) {
+                    d[db.columnName(i)] = db.value(i);
+                }
+                dishes.append(d);
+            }
+
+            if (dishes.empty()) {
+                rm.putUByte(0);
+                rm.putString(tr_am("Nothing to print"));
+                return;
+            }
+
+            QMap<QString, QList<int> > printers;
+            for (int i = 0; i < dishes.count(); i++) {
+                QMap<QString, QVariant> &d = dishes[i];
+                if (d["f_print1"].toString().contains("mobile", Qt::CaseInsensitive)) {
+//                    QStringList rd = d["f_print1"].toString().split(":", Qt::SkipEmptyParts);
+//                    QString reminder = rd.at(1);
+//                    db[":record_id"] = d["id"];
+//                    db[":state_Id"] = 0;
+//                    db[":date_register"] = QDateTime::currentDateTime();
+//                    db[":staff_id"] = d["last_user"];
+//                    db[":table_id"] = order["table_id"];
+//                    db[":dish_id"] = d["dish_id"];
+//                    db[":qty"] = d["qty"];
+//                    db[":reminder_id"] = reminder.toInt();
+//                    db.insert("o_dishes_reminder");
+                } else if (d["f_print1"].toString().contains("printer", Qt::CaseInsensitive)) {
+                    QStringList rd = d["f_print1"].toString().split(":", Qt::SkipEmptyParts);
+                    QString printer = rd.at(1);
+                    printers[printer + ":" + d["storename"].toString() + ":1"].append(i);
+                } else if (!d["f_print1"].toString().isEmpty()) {
+                    printers[d["f_print1"].toString() + ":" + d["storename"].toString() + ":1"].append(i);
+                }
+                if (d["f_print2"].toString() != d["f_print1"].toString()) {
+                    if (d["f_print2"].toString().contains("mobile", Qt::CaseInsensitive)) {
+//                        QStringList rd = d["print1"].toString().split(":", Qt::SkipEmptyParts);
+//                        QString reminder = rd.at(1);
+//                        db[":record_id"] = d["id"];
+//                        db[":state_Id"] = 0;
+//                        db[":date_register"] = QDateTime::currentDateTime();
+//                        db[":staff_id"] = d["last_user"];
+//                        db[":table_id"] = order["table_id"];
+//                        db[":dish_id"] = d["dish_id"];
+//                        db[":qty"] = d["qty"];
+//                        db[":reminder_id"] = reminder.toInt();
+//                        db.insert("o_dishes_reminder");
+                    } else if (d["f_print2"].toString().contains("printer", Qt::CaseInsensitive)) {
+                        QStringList rd = d["print2"].toString().split(":", Qt::SkipEmptyParts);
+                        QString printer = rd.at(1);
+                        printers[printer + ":" + d["storename"].toString() + ":2"].append(i);
+                    } else if (!d["f_print2"].toString().isEmpty()) {
+                        printers[d["f_print2"].toString() + ":" + d["storename"].toString() + ":2"].append(i);
+                    }
+                }
+            }
+
+            if (!printServiceOnPrinter(order, printers, dishes)) {
+                return;
+            }
+
+            db[":f_header"] = orderid;
+            db[":f_printuser"] = w->fUserId;
+            if (db.exec("update o_body set f_qty2=f_qty1, f_printtime=current_timestamp, f_printuser=:f_printuser where f_header=:f_header and f_state=1") == false) {
+                rm.putUByte(0);
+                rm.putString(db.lastDbError());
+                return;
+            }
+            break;
+        }
     case 3:
         db[":f_header"] = orderid.toInt();
         if (db.exec("update o_dish set f_qtyprint=f_qty where f_header=:f_header and f_state=1") == false) {
@@ -933,9 +1243,8 @@ void printBill(RawMessage &rm, Database &db, const QByteArray &in, int userid)
         printBill1(rm, db, orderid);
         break;
     case 2:
-        rm.putUByte(0);
-        rm.putString("Print bill not implemented");
-        return;
+        printBill2(rm, db, orderid);
+        break;
     case 3:
         rm.putUByte(0);
         rm.putString("Print bill not implemented");
@@ -1345,12 +1654,12 @@ bool printServiceOnPrinter(const QMap<QString, QVariant> &order, const QMap<QStr
                 || fBooking) {
             p.setFontSize(32);
             p.setFontBold(true);
-            p.ctext(tr_am("PREORDER"));
+            p.ctext("ՆԱԽԱԽԱՏՎԵՐ");
             p.br();
             p.ltext(order["datefor"].toDate().toString(FORMAT_DATE_TO_STR), 0);
             p.rtext(order["timefor"].toTime().toString(FORMAT_TIME_TO_STR));
             p.br();
-            p.ltext(tr_am("Guests"), 0);
+            p.ltext(tr_am("Հյուրեր"), 0);
             p.rtext(order["guests"].toString());
             p.br();
             p.br();
@@ -1361,7 +1670,7 @@ bool printServiceOnPrinter(const QMap<QString, QVariant> &order, const QMap<QStr
         if (order["reprint"].toInt() != 0) {
             p.setFontSize(34);
             p.setFontBold(true);
-            p.ctext(tr_am("REPRINT"));
+            p.ctext("ԿՐԿՆՈՒԹՅՈՒՆ");
             p.br();
             p.br();
         }
@@ -1369,22 +1678,22 @@ bool printServiceOnPrinter(const QMap<QString, QVariant> &order, const QMap<QStr
         p.setFontBold(false);
         p.setFontSize(26);
         p.br();
-        p.ctext(tr_am("New order"));
+        p.ctext("ՆՈՐ ՊԱՏՎԵՐ");
         p.br();
-        p.ltext(tr_am("Table"), 0);
+        p.ltext("ՍԵՂԱՆ", 0);
         p.rtext(QString("%1/%2").arg(order["hallname"].toString(), order["tablename"].toString()));
         p.br();
         p.setFontSize(22);
-        p.ltext(tr_am("Order"), 0);
+        p.ltext(tr_am("ՊԱՏՎԵՐ"), 0);
         p.rtext(order["id"].toString());
         p.br();
-        p.ltext(tr_am("Date"), 0);
+        p.ltext("ԱՄՍԱԹԻՎ", 0);
         p.rtext(QDate::currentDate().toString(FORMAT_DATE_TO_STR));
         p.br();
-        p.ltext(tr_am("Time"), 0);
+        p.ltext("ԺԱՄ", 0);
         p.rtext(QTime::currentTime().toString(FORMAT_TIME_TO_STR));
         p.br();
-        p.ltext(tr_am("Staff"), 0);
+        p.ltext("ՍՊԱՍԱՐԿՈՂ", 0);
         p.rtext(order["current_staff"].toString());
         p.br(p.fLineHeight + 2);
         p.line(0, p.fTop, p.fNormalWidth, p.fTop);
@@ -1447,4 +1756,145 @@ void readyDishes(RawMessage &rm, Database &db, const QByteArray &in)
     QString orderid;
     rm.readUByte(version, in);
     rm.readString(orderid, in);
+}
+
+void createHeaderOfOrderV2(RawMessage &rm, Database &db, const QByteArray &in, int userid, int tableid)
+{
+    QString orderid = db.uuid();
+    db.startTransaction();
+    db[":f_id"] = tableid;
+    db.exec("select f_hall from h_tables where f_id=:f_id");
+    if (db.next() == false) {
+        rm.putUByte(0);
+        rm.putString("Invalid table id");
+        return;
+    }
+    int hall = db.integer("f_hall");
+    db[":f_id"] = hall;
+    db.exec("select f_id, f_prefix, f_counter + 1 as f_counter from h_halls where f_id=(select f_counterhall from h_halls where f_id=:f_id limit 1) for update");
+    if (!db.next()) {
+        db.rollback();
+        rm.putUByte(0);
+        rm.putString(db.lastDbError());
+        return;
+    }
+    int hallid = db.integer("f_counter");
+    QString prefix = db.integer("f_prefix");
+    db[":f_counter"] = hallid;
+    db.update("h_halls", "f_id", db.integer("f_id"));
+    db.commit();
+
+    db.startTransaction();
+    db[":f_id"] = orderid;
+    db.insert("o_header");
+    db[":f_id"] = orderid;
+    db.insert("o_header_options");
+    db[":f_id"] = orderid;
+    db.insert("o_tax");
+    db[":f_id"] = orderid;
+    db.insert("o_pay_cl");
+    db[":f_id"] = orderid;
+    db.insert("o_pay_room");
+    db[":f_id"] = orderid;
+    db.insert("o_header_flags");
+    db[":f_id"] = orderid;
+    db.insert("o_payment");
+    db[":f_id"] = orderid;
+    db.insert("o_preorder");
+    db[":f_id"] = orderid;
+    db[":f_checkin"] = QDate::currentDate();
+    db[":f_checkout"] = QDate::currentDate();
+    db.insert("o_header_hotel");
+    db[":f_header"] = orderid;
+    db[":f_date"] = QDate::currentDate();
+    db[":f_1"] = 0;
+    db[":f_2"] = 1;
+    db.insert("o_Header_hotel_date");
+
+    db[":f_id"] = hall;
+    db.exec("SELECT h.f_id, h.f_name, s1.f_value AS f_menu, s2.f_value AS f_service "
+                            "FROM h_halls h "
+                            "LEFT JOIN s_settings_values s1 ON s1.f_settings=h.f_settings AND s1.f_key=9 "
+                            "LEFT JOIN s_settings_values s2 ON s2.f_settings=h.f_settings AND s2.f_key=2 "
+                            "where h.f_id=:f_id");
+    if (db.next() == false) {
+        db.rollback();
+        rm.putUByte(0);
+        rm.putString("No hall with id: " + QString::number(hallid));
+        return;
+    }
+    double serviceFactor = db.doubleValue("f_service");
+
+    db[":f_staff"] = userid;
+    db[":f_table"] = tableid;
+    db[":f_prefix"] = prefix;
+    db[":f_hallid"] = hallid;
+    db[":f_dateopen"] = QDate::currentDate();
+    db[":f_timeopen"] = QTime::currentTime();
+    db[":f_currentstaff"] = userid;
+    db[":f_state"] = 1; //ORDER_STATE_OPEN
+    db[":f_precheck"] = 0;
+    db[":f_print"] = 0;
+    db[":f_guests" ]= 1;
+    db[":f_comment"] = "";
+    db[":f_hall"] = hall;
+    db[":f_amounttotal"] = 0;
+    db[":f_amountcash"] = 0;
+    db[":f_amountcard"] = 0;
+    db[":f_amountbank"] = 0;
+    db[":f_amountother"] = 0;
+    db[":f_amountservice"] = 0;
+    db[":f_amountdiscount"] = 0;
+    db[":f_servicefactor"] = serviceFactor;
+    db[":f_discountfactor"] = 0;
+    db.update("o_header", "f_id", orderid);
+    db.commit();
+
+    quint8 neworder = 1;
+    rm.putUByte(1);
+    rm.putUByte(neworder);
+    rm.putString(orderid);
+}
+
+bool countOrder2(RawMessage &rm, Database &db, const QString &orderid)
+{
+    db[":f_header"] = orderid;
+    db[":f_state"] = 1;
+    if (db.exec("select * from o_body where f_header=:f_header and f_state=:f_state") == false) {
+        rm.putUByte(0);
+        rm.putString(db.lastDbError());
+        return false;
+    }
+    double total = 0, total_service = 0, total_disc = 0;
+    while (db.next()) {
+        double t = db.doubleValue("f_qty1") * db.doubleValue("f_price");
+        double ts = t * db.doubleValue("f_service");
+        t += ts;
+        double td = t * db.doubleValue("f_discount");
+        t -= td;
+        total += t;
+        total_service += ts;
+        total_disc += td;
+    }
+    db[":f_amounttotal"] = total;
+    db[":f_amountservice"] = total_service;
+    db[":f_amountdiscount"] = total_disc;
+    if (db.update("o_header", "f_id", orderid) == false) {
+        rm.putUByte(0);
+        rm.putString(db.lastDbError());
+        return false;
+    }
+    return true;
+}
+
+bool printBill2(RawMessage &rm, Database &db, const QString &orderid)
+{
+    QString err;
+    PrintBill pb;
+    if (!pb.printBill2(&db, false, orderid, "local", 0, err)) {
+        rm.putUByte(0);
+        rm.putString(err);
+        return false;
+    }
+    return true;
 }

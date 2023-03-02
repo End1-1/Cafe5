@@ -29,7 +29,7 @@ private:
 
     QHash<QString, int> fColumnNameIndex;
 
-    QString documentForInventory();
+    QString documentForInventory(int store);
 
     C5User *fUser;
 
@@ -47,6 +47,8 @@ private slots:
     void changeOutputStore();
 
     void updateInventorizatinPrices();
+
+    void semireadyInOut();
 
     C5StoreDoc *writeDocs(int doctype, int reason, const QList<IGoods> &data, const QString &comment);
 

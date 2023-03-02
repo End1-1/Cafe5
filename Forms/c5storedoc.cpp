@@ -19,6 +19,7 @@
 #include "chatmessage.h"
 #include "c5storedocselectprinttemplate.h"
 #include "threadsendmessage.h"
+#include "xlsxall.h"
 #include <QMenu>
 #include <QHash>
 #include <QClipboard>
@@ -105,7 +106,7 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
     while (db.nextRow()) {
         ui->cbCurrency->addItem(db.getString("f_name"), db.getInt("f_id"));
     }
-    ui->cbCurrency->setCurrentIndex(0);
+    ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(__c5config.getValue(param_default_currency).toInt()));
 }
 
 C5StoreDoc::~C5StoreDoc()
@@ -427,9 +428,11 @@ QToolBar *C5StoreDoc::toolBar()
         fToolBar->addAction(QIcon(":/new.png"), tr("New\ndocument"), this, SLOT(newDoc()));
         fToolBar->addAction(QIcon(":/recycle.png"), tr("Remove"), this, SLOT(removeDocument()));
         fToolBar->addAction(QIcon(":/print.png"), tr("Print"), this, SLOT(printDoc()));
+        fToolBar->addAction(QIcon(":/excel.png"), tr("Export\nto Excel"),  this, SLOT(exportToExcel()));
         fToolBar->addAction(QIcon(":/show_list.png"), tr("Show/Hide\ngoods list"), this, SLOT(showHideGoodsList()));
         fToolBar->addAction(QIcon(":/barcode.png"), tr("Print\nbarcode"), this, SLOT(printBarcode()));
         fToolBar->addAction(QIcon(":/goods_store.png"), tr("Duplicate as output"), this, SLOT(duplicateOutput()));
+        fToolBar->addAction(QIcon(":/goods_store.png"), tr("Duplicate as input"), this, SLOT(duplicateAsInput()));
     }
     return fToolBar;
 }
@@ -864,6 +867,7 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
         return true;
     }
 
+
     if (ui->leDocNum->isEmpty() || (!ui->leDocNum->text().isEmpty() && ui->leDocNum->text().toInt() < 1)) {
         setUserId(true, 0);
         ui->leDocNum->setText(ui->leDocNum->placeholderText());
@@ -882,13 +886,13 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
 
     dw.clearAStoreDraft(fInternalId);
     if (!dw.writeAHeader(fInternalId, ui->leDocNum->text(), fDocState, fDocType, __user->id(), ui->deDate->date(), QDate::currentDate(), QTime::currentTime(),
-                         ui->lePartner->getInteger(), ui->leTotal->getDouble(), ui->leComment->text())) {
+                         ui->lePartner->getInteger(), ui->leTotal->getDouble(), ui->leComment->text(), ui->cbCurrency->currentData().toInt())) {
         err += db.fLastError + "<br>";
     }
     dw.updateField("a_header", "f_currency", ui->cbCurrency->currentData(), "f_id", fInternalId);
     if (!dw.writeAHeaderStore(fInternalId, ui->leAccepted->getInteger(), ui->lePassed->getInteger(), ui->leInvoiceNumber->text(), ui->deInvoiceDate->date(),
                               ui->leStoreInput->getInteger(), ui->leStoreOutput->getInteger(), fBasedOnSale, fCashDocUuid, ui->leComplectationCode->getInteger(),
-                              ui->leComplectationQty->getDouble())) {
+                              ui->leComplectationQty->getDouble(), "")) {
         err += db.fLastError + "<br>";
     }
     //TODO: complectation store document
@@ -967,6 +971,7 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
             db.insert("a_calc_price", false);
         }
     }
+
     if (!err.isEmpty()) {
         db.rollback();
         return false;
@@ -995,6 +1000,25 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
         db.rollback();
         return false;
     }
+
+//    if (fDocType == DOC_TYPE_STORE_INPUT) {
+//        if (DOC_STATE_DRAFT == state) {
+//            db[":f_id"] = fInternalId;
+//            db.exec("delete from a_header_shop2partner where f_id=:f_id");
+//            db[":f_document"] = fInternalId;
+//            db.exec("delete from a_header_shop2partneraccept where f_id in (select f_id from a_store_draft where f_document=:f_document)");
+//        } else {
+//            db[":f_id"] = fInternalId;
+//            db.exec("select * from a_header_shop2partner where f_id=:f_id");
+//            if (db.nextRow() == false) {
+//                db[":f_id"] = fInternalId;
+//                db[":f_accept"] = 0;
+//                db[":f_store"] = ui->leStoreInput->getInteger();
+//                db.insert("a_header_shop2partner");
+//            }
+//        }
+//    }
+
     db[":f_document"] = fInternalId;
     db.exec("select f_id, f_price, f_total, f_type from a_store_draft where f_document=:f_document ");
     QList<IGoods> gl;
@@ -1017,7 +1041,7 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
 
     countTotal();
     if (!dw.writeAHeader(fInternalId, ui->leDocNum->text(), state, fDocType, __user->id(), ui->deDate->date(), QDate::currentDate(), QTime::currentTime(),
-                         ui->lePartner->getInteger(), ui->leTotal->getDouble(), ui->leComment->text())) {
+                         ui->lePartner->getInteger(), ui->leTotal->getDouble(), ui->leComment->text(), ui->cbCurrency->currentData().toInt())) {
         err += db.fLastError + "<br>";
     }
     if (fDocType == DOC_TYPE_COMPLECTATION) {
@@ -2183,6 +2207,223 @@ void C5StoreDoc::focusNextChildren()
     focusNextChild();
 }
 
+void C5StoreDoc::exportToExcel()
+{
+    QString docTypeText;
+    switch (fDocType) {
+    case DOC_TYPE_STORE_INPUT:
+        docTypeText = tr("Store input");
+        break;
+    case DOC_TYPE_STORE_OUTPUT:
+        docTypeText = tr("Store output");
+        break;
+    case DOC_TYPE_STORE_MOVE:
+        docTypeText = tr("Store movement");
+        break;
+    case DOC_TYPE_COMPLECTATION:
+        docTypeText = tr("Store complectation");
+        break;
+    }
+    QString storeInName, storeOutName;
+    if (ui->leStoreInput->getInteger() > 0) {
+        storeInName = ui->leStoreInputName->text();
+    }
+    if (ui->leStoreOutput->getInteger() > 0) {
+        storeOutName = ui->leStoreOutputName->text();
+    }
+    int fXlsxFitToPage = 0;
+    QString fXlsxPageOrientation = xls_page_orientation_portrait;
+    int fXlsxPageSize = xls_page_size_a4;
+
+    XlsxDocument d;
+    XlsxSheet *s = d.workbook()->addSheet("Sheet1");
+    s->setupPage(fXlsxPageSize, fXlsxFitToPage, fXlsxPageOrientation);
+    /* HEADER */
+    QColor color = Qt::white;
+    QFont headerFont(qApp->font());
+    d.style()->addFont("header", headerFont);
+    d.style()->addBackgrounFill("header", color);
+    d.style()->addHAlignment("header", xls_alignment_center);
+    d.style()->addBorder("header", XlsxBorder());
+
+
+    s->setColumnWidth(1, 10);
+    s->setColumnWidth(2, 15);
+    s->setColumnWidth(3, 50);
+    s->setColumnWidth(4, 20);
+    s->setColumnWidth(5, 20);
+    s->setColumnWidth(6, 20);
+    s->setColumnWidth(7, 20);
+
+    int col = 1, row = 1;
+    s->addCell(row, col, QString("%1 N%2").arg(docTypeText, ui->leDocNum->text()),
+                                           d.style()->styleNum("header"));
+
+    row++;
+    s->addCell(row, col, QString("%1 %2").arg(tr("Reason"), ui->leReasonName->text()),
+                                           d.style()->styleNum("header"));
+    row++;
+
+    if (!ui->leComment->isEmpty()) {
+        s->addCell(row, col, ui->leComment->text(), d.style()->styleNum("header"));
+        row++;
+    }
+
+    QList<int> cols;
+    QStringList vals;
+    col = 1;
+    cols << col++;
+    vals << tr("Date");
+    if (!storeInName.isEmpty()) {
+        vals << tr("Store, input");
+        cols << col++;
+    }
+    if (!storeOutName.isEmpty()) {
+        vals << tr("Store, output");
+        cols << col++;
+    }
+    for (int i = 0; i < cols.count(); i++) {
+        s->addCell(row, cols.at(i), vals.at(i), d.style()->styleNum("header"));
+    }
+    row++;
+
+    vals.clear();
+    vals << ui->deDate->text();
+    if (!storeInName.isEmpty()) {
+        vals << ui->leStoreInputName->text();
+    }
+    if (!storeOutName.isEmpty()) {
+        vals << ui->leStoreOutputName->text();
+    }
+    for (int i = 0; i < cols.count(); i++) {
+        s->addCell(row, cols.at(i), vals.at(i), d.style()->styleNum("header"));
+    }
+    row += 2;
+
+    cols.clear();
+    for (int i = 0; i < 7; i++) {
+        cols << i + 1;
+    }
+    vals.clear();
+    vals << tr("NN")
+         << tr("Material code")
+         << tr("Goods")
+         << tr("Qty")
+         << tr("Unit")
+         << tr("Price")
+         << tr("Total");
+    for (int i = 0; i < cols.count(); i++) {
+        s->addCell(row, cols.at(i), vals.at(i), d.style()->styleNum("header"));
+    }
+    row++;
+    QMap<int, QString> bgFill;
+    QMap<int, QString> bgFillb;
+    QFont bodyFont(qApp->font());
+    d.style()->addFont("body", bodyFont);
+    d.style()->addBackgrounFill("body", QColor(Qt::white));
+    d.style()->addVAlignment("body", xls_alignment_center);
+    d.style()->addBorder("body", XlsxBorder());
+    bgFill[QColor(Qt::white).rgb()] = "body";
+    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+        vals.clear();
+        vals << QString::number(i + 1);
+        vals << ui->tblGoods->getString(i, 3);
+        vals << ui->tblGoods->getString(i, 4);
+        vals << QString::number(str_float(ui->tblGoods->lineEdit(i, 5)->text()));
+        vals << ui->tblGoods->getString(i, 6);
+        vals << QString::number(str_float(ui->tblGoods->lineEdit(i, 7)->text()));
+        vals << QString::number(str_float(ui->tblGoods->lineEdit(i, 8)->text()));
+        for (int i = 0; i < cols.count(); i++) {
+            s->addCell(row, cols.at(i), vals.at(i), d.style()->styleNum("body"));
+        }
+        row++;
+    }
+
+    cols.clear();
+    cols << 5 << 6 << 7;
+    vals.clear();
+    vals << tr("Total amount");
+    vals << QString::number(str_float(ui->leTotal->text()));
+    vals << ui->cbCurrency->currentText();
+    for (int i = 0; i < cols.count(); i++) {
+        s->addCell(row, cols.at(i), vals.at(i), d.style()->styleNum("header"));
+    }
+    row++;
+
+
+    col = 1;
+    s->setSpan(1, col, 1, col + 5);
+    s->setSpan(2, col, 2, col + 5);
+    s->setSpan(3, col, 3, col + 5);
+    s->setSpan(4, col, 4, col + 5);
+
+
+
+
+    QString err;
+    if (!d.save(err, true)) {
+        if (!err.isEmpty()) {
+            C5Message::error(err);
+        }
+    }
+
+
+//    if (fDocType == DOC_TYPE_COMPLECTATION) {
+//        points.clear();
+//        points << 50 << 100 << 800 << 250;
+//        vals.clear();
+//        vals.append(tr("NN"));
+//        vals.append(tr("Other charges"));
+//        vals.append(tr("Amount"));
+//        p.setFontBold(true);
+//        p.tableText(points, vals, p.fLineHeight + 20);
+//        p.br(p.fLineHeight + 20);
+//        for (int i = 0; i < ui->tblAdd->rowCount(); i++) {
+//            vals.clear();
+//            vals.append(QString::number(i + 1));
+//            vals.append(ui->tblAdd->getString(i, 1));
+//            vals.append(float_str(ui->tblAdd->lineEdit(i, 2)->getDouble(), 2));
+//            p.setFontBold(false);
+//            p.tableText(points, vals, p.fLineHeight + 20);
+//            p.br(p.fLineHeight + 20);
+//        }
+//        p.br();
+
+//        points.clear();
+//        points << 50 << 100 << 200 << 600 << 250 << 250 << 250;
+//        vals.clear();
+//        vals.append(tr("NN"));
+//        vals.append(tr("Code"));
+//        vals.append(tr("Input material"));
+//        vals.append(tr("Qty"));
+//        vals.append(tr("Price"));
+//        vals.append(tr("Amount"));
+//        p.setFontBold(true);
+//        p.tableText(points, vals, p.fLineHeight + 20);
+//        p.br(p.fLineHeight + 20);
+//        vals.clear();
+//        vals.append("1");
+//        vals.append(ui->leComplectationCode->text());
+//        vals.append(ui->leComplectationName->text());
+//        vals.append(ui->leComplectationQty->text());
+//        vals.append(float_str(ui->leTotal->getDouble() / ui->leComplectationQty->getDouble(), 2));
+//        vals.append(ui->leTotal->text());
+//        p.setFontBold(false);
+//        p.tableText(points, vals, p.fLineHeight + 20);
+//        p.br(p.fLineHeight + 20);
+//    }
+
+//    QString goodsColName = tr("Goods");
+//    if (fDocType == DOC_TYPE_COMPLECTATION) {
+//        goodsColName = tr("Output material");
+//    }
+
+
+
+
+
+}
+
 void C5StoreDoc::newDoc()
 {
     if (fDocState != DOC_STATE_SAVED && ui->tblGoods->rowCount() > 0) {
@@ -2590,6 +2831,7 @@ void C5StoreDoc::on_btnAddGoods_clicked()
     case DOC_TYPE_STORE_OUTPUT:
     case DOC_TYPE_STORE_MOVE:
     case DOC_TYPE_COMPLECTATION:
+    case DOC_TYPE_DECOMPLECTATION:
         getOutput();
         break;
     }
@@ -2931,6 +3173,27 @@ void C5StoreDoc::duplicateOutput()
     sd->setMode(sdOutput);
     sd->setStore(0, ui->leStoreInput->getInteger());
     sd->setReason(DOC_REASON_OUT);
+    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+        sd->addGoods(ui->tblGoods->getInteger(i, 3),
+                     ui->tblGoods->getString(i, 4),
+                     ui->tblGoods->lineEdit(i, 5)->getDouble(),
+                     ui->tblGoods->getString(i, 6),
+                     ui->tblGoods->lineEdit(i, 7)->getDouble(),
+                     ui->tblGoods->lineEdit(i, 8)->getDouble(),
+                     ui->tblGoods->lineEdit(i, 9)->text());
+    }
+}
+
+void C5StoreDoc::duplicateAsInput()
+{
+    if (fDocState != DOC_STATE_SAVED) {
+        C5Message::error(tr("Document must be saved"));
+        return;
+    }
+    auto *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);
+    sd->setMode(sdInput);
+    sd->setStore(0, ui->leStoreInput->getInteger());
+    sd->setReason(DOC_REASON_INPUT);
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
         sd->addGoods(ui->tblGoods->getInteger(i, 3),
                      ui->tblGoods->getString(i, 4),

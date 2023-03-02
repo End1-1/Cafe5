@@ -29,6 +29,8 @@ private slots:
 
     void on_btnA3_clicked();
 
+    void on_btnCopy_clicked();
+
 private:
     Ui::C5Message *ui;
 

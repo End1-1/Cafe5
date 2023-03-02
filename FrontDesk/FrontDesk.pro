@@ -45,6 +45,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Classes/c5filelogwriter.cpp \
     ../Classes/c5filterwidget.cpp \
     ../Classes/c5logtoserverthread.cpp \
+    ../Classes/c5printrecipta4.cpp \
     ../Classes/c5random.cpp \
     ../Classes/c5reporttemplatedriver.cpp \
     ../Classes/c5storedraftwriter.cpp \
@@ -113,9 +114,12 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Forms/dlgdataonline.cpp \
     ../Forms/dlgnewcl.cpp \
     ../Forms/dlgreservgoods.cpp \
+    ../Forms/dlgselectcurrency.cpp \
+    ../Forms/dlgsemireadyinout.cpp \
     ../Forms/dlgsetwaiterordercl.cpp \
     ../Forms/mfprocessproductpriceupdate.cpp \
     ../Reports/c5customfilter.cpp \
+    ../Reports/cr5breezeservice.cpp \
     ../Reports/cr5carvisits.cpp \
     ../Reports/cr5carvisitsfilter.cpp \
     ../Reports/cr5cashdetailed.cpp \
@@ -169,6 +173,8 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Reports/cr5ordermarks.cpp \
     ../Reports/cr5preorders.cpp \
     ../Reports/cr5printers.cpp \
+    ../Reports/cr5reports.cpp \
+    ../Reports/cr5reportsfilter.cpp \
     ../Reports/cr5salarybyworkers.cpp \
     ../Reports/cr5salarybyworkersfilter.cpp \
     ../Reports/cr5saleandstorefilter.cpp \
@@ -339,6 +345,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Classes/c5filelogwriter.h \
     ../Classes/c5filterwidget.h \
     ../Classes/c5logtoserverthread.h \
+    ../Classes/c5printrecipta4.h \
     ../Classes/c5random.h \
     ../Classes/c5reporttemplatedriver.h \
     ../Classes/c5storedraftwriter.h \
@@ -409,9 +416,12 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Forms/dlgdataonline.h \
     ../Forms/dlgnewcl.h \
     ../Forms/dlgreservgoods.h \
+    ../Forms/dlgselectcurrency.h \
+    ../Forms/dlgsemireadyinout.h \
     ../Forms/dlgsetwaiterordercl.h \
     ../Forms/mfprocessproductpriceupdate.h \
     ../Reports/c5customfilter.h \
+    ../Reports/cr5breezeservice.h \
     ../Reports/cr5carvisits.h \
     ../Reports/cr5carvisitsfilter.h \
     ../Reports/cr5cashdetailed.h \
@@ -465,6 +475,8 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Reports/cr5ordermarks.h \
     ../Reports/cr5preorders.h \
     ../Reports/cr5printers.h \
+    ../Reports/cr5reports.h \
+    ../Reports/cr5reportsfilter.h \
     ../Reports/cr5salarybyworkers.h \
     ../Reports/cr5salarybyworkersfilter.h \
     ../Reports/cr5saleandstorefilter.h \
@@ -654,9 +666,12 @@ FORMS += \
     ../Forms/dlgdataonline.ui \
     ../Forms/dlgnewcl.ui \
     ../Forms/dlgreservgoods.ui \
+    ../Forms/dlgselectcurrency.ui \
+    ../Forms/dlgsemireadyinout.ui \
     ../Forms/dlgsetwaiterordercl.ui \
     ../Forms/mfprocessproductpriceupdate.ui \
     ../Reports/c5customfilter.ui \
+    ../Reports/cr5breezeservice.ui \
     ../Reports/cr5carvisitsfilter.ui \
     ../Reports/cr5cashdetailedfilter.ui \
     ../Reports/cr5cashmovementfilter.ui \
@@ -677,6 +692,7 @@ FORMS += \
     ../Reports/cr5menureviewfilter.ui \
     ../Reports/cr5mfdaily.ui \
     ../Reports/cr5mfgeneralreportfilter.ui \
+    ../Reports/cr5reportsfilter.ui \
     ../Reports/cr5salarybyworkersfilter.ui \
     ../Reports/cr5saleandstorefilter.ui \
     ../Reports/cr5saleflags.ui \

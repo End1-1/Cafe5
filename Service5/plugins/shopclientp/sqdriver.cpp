@@ -12,6 +12,7 @@ SQDriver::SQDriver()
         QFile f(":/sq.txt");
         if (f.open(QIODevice::ReadOnly)){
             QString src(f.readAll());
+            qDebug() << src;
             QStringList srclist = src.split("==========");
             for(const QString &s: qAsConst(srclist)) {
                 QStringList bl = s.split(">>");

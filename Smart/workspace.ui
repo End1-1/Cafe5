@@ -1105,38 +1105,6 @@ QLabel {color:green;}
               </property>
              </widget>
             </item>
-            <item row="1" column="4">
-             <widget class="QPushButton" name="btnDiscount">
-              <property name="minimumSize">
-               <size>
-                <width>50</width>
-                <height>50</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>50</width>
-                <height>50</height>
-               </size>
-              </property>
-              <property name="focusPolicy">
-               <enum>Qt::NoFocus</enum>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset resource="../resources/resources.qrc">
-                <normaloff>:/discount.png</normaloff>:/discount.png</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>32</width>
-                <height>32</height>
-               </size>
-              </property>
-             </widget>
-            </item>
             <item row="1" column="5">
              <widget class="QPushButton" name="btnHistoryOrder">
               <property name="minimumSize">
@@ -1497,7 +1465,7 @@ QLabel {color:green;}
                  <property name="title">
                   <string>Total</string>
                  </property>
-                 <layout class="QHBoxLayout" name="horizontalLayout_9">
+                 <layout class="QGridLayout" name="gridLayout_3">
                   <property name="leftMargin">
                    <number>0</number>
                   </property>
@@ -1510,8 +1478,8 @@ QLabel {color:green;}
                   <property name="bottomMargin">
                    <number>2</number>
                   </property>
-                  <item>
-                   <widget class="C5LineEdit" name="leTotal">
+                  <item row="1" column="1">
+                   <widget class="C5LineEdit" name="leCard">
                     <property name="font">
                      <font>
                       <pointsize>26</pointsize>
@@ -1520,7 +1488,7 @@ QLabel {color:green;}
                      </font>
                     </property>
                     <property name="focusPolicy">
-                     <enum>Qt::NoFocus</enum>
+                     <enum>Qt::ClickFocus</enum>
                     </property>
                     <property name="styleSheet">
                      <string notr="true">color:red;</string>
@@ -1539,7 +1507,7 @@ QLabel {color:green;}
                     </property>
                    </widget>
                   </item>
-                  <item>
+                  <item row="1" column="2">
                    <widget class="QPushButton" name="btnFiscal">
                     <property name="minimumSize">
                      <size>
@@ -1571,6 +1539,42 @@ QLabel {color:green;}
                     </property>
                     <property name="checkable">
                      <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="C5LineEdit" name="leTotal">
+                    <property name="font">
+                     <font>
+                      <pointsize>26</pointsize>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                     </font>
+                    </property>
+                    <property name="focusPolicy">
+                     <enum>Qt::NoFocus</enum>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">color:red;</string>
+                    </property>
+                    <property name="text">
+                     <string>99999999.99</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                    </property>
+                    <property name="readOnly">
+                     <bool>true</bool>
+                    </property>
+                    <property name="bigfont" stdset="0">
+                     <string>2</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QLabel" name="label">
+                    <property name="text">
+                     <string>Քարտ</string>
                     </property>
                    </widget>
                   </item>

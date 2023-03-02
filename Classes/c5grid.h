@@ -81,6 +81,8 @@ protected:
 
     QStringList fColumnsSum;
 
+    QList<int> fColumnsSumIndex;
+
     QStringList fColumnsOrder;
 
     QString fWhereCondition;

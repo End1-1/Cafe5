@@ -74,7 +74,9 @@ void C5Grid::buildQuery()
     QMap<QString, QString> leftJoinTablesMap;
     QStringList groupFields;
     if (fSimpleQuery) {
-
+        if (fSqlQuery.isEmpty()) {
+            return;
+        }
     } else {
         fSqlQuery = "select ";
         bool first = true;
@@ -274,15 +276,24 @@ void C5Grid::removeWithId(int id, int row)
 
 void C5Grid::sumColumnsData()
 {
-    if (fColumnsSum.count() == 0) {
+    if (fColumnsSum.count() == 0 && fColumnsSumIndex.count() == 0) {
         return;
     }
-    QMap<QString, double> values;
-    fModel->sumForColumns(fColumnsSum, values);
-    for (QMap<QString, double>::const_iterator it = values.begin(); it != values.end(); it++) {
-        int idx = fModel->indexForColumnName(it.key());
-        double value = it.value();
-        ui->tblTotal->setData(0, idx, value);
+    if (fColumnsSum.count() > 0) {
+        QMap<QString, double> values;
+        fModel->sumForColumns(fColumnsSum, values);
+        for (QMap<QString, double>::const_iterator it = values.begin(); it != values.end(); it++) {
+            int idx = fModel->indexForColumnName(it.key());
+            double value = it.value();
+            ui->tblTotal->setData(0, idx, value);
+        }
+    }
+    if (fColumnsSumIndex.count() > 0) {
+        QMap<int, double> values;
+        fModel->sumForColumnsIndexes(fColumnsSumIndex, values);
+        for (int idx: fColumnsSumIndex) {
+            ui->tblTotal->setData(0, idx, values[idx]);
+        }
     }
     QStringList vheader;
     vheader << QString::number(fModel->rowCount());
@@ -610,7 +621,10 @@ void C5Grid::print()
         p.setFontBold(true);
         p.ltext(fLabel, 0);
         p.br();
-        QString filterText = fFilterWidget->filterText();
+        QString filterText;
+        if (fFilterWidget) {
+            filterText = fFilterWidget->filterText();
+        }
         if (!filterText.isEmpty()) {
             p.ltext(filterText, 0);
             p.br();

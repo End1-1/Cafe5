@@ -114,6 +114,7 @@ SOURCES += \
     ../Forms/dlgguestinfo.cpp \
     ../Forms/dlglistofdishcomments.cpp \
     ../Forms/dlgqty.cpp \
+    ../Service/logwriter.cpp \
     ../Shop/printreceipt.cpp \
     ../Shop/printreceiptgroup.cpp \
     ../Shop/selectprinters.cpp \
@@ -283,6 +284,7 @@ HEADERS += \
     ../Forms/dlgguestinfo.h \
     ../Forms/dlglistofdishcomments.h \
     ../Forms/dlgqty.h \
+    ../Service/logwriter.h \
     ../Service/servicecommands.h \
     ../Shop/printreceipt.h \
     ../Shop/printreceiptgroup.h \

@@ -41,16 +41,17 @@ void SearchItems::on_btnSearch_clicked()
     db[":f_store"] = __c5config.defaultStore();
     db[":f_reservestate"] = GR_RESERVED;
     db.exec("select ss.f_name as f_storename,g.f_name as f_goodname,g.f_scancode, "
-            "u.f_name as f_unit,g.f_saleprice,g.f_saleprice2, sum(s.f_qty*s.f_type) as f_qty, "
+            "u.f_name as f_unit,gpr.f_price1,gpr.f_price2, sum(s.f_qty*s.f_type) as f_qty, "
             "coalesce(rs.f_qty, 0) as f_reserveqty, s.f_store, s.f_goods "
             "from a_store s "
             "inner join c_storages ss on ss.f_id=s.f_store "
             "inner join c_goods g on g.f_id=s.f_goods "
             "inner join c_units u on u.f_id=g.f_unit "
             "inner join a_header h on h.f_id=s.f_document  "
+            "left join c_goods_prices gpr on gpr.f_goods=g.f_id "
             "left join (select f_goods, f_store, sum(f_qty) as f_qty from a_store_reserve where f_state=:f_reservestate and f_goods=:f_goods group by 1, 2) rs on rs.f_goods=s.f_goods and rs.f_store=s.f_store "
             "where  h.f_date<=:f_date and s.f_goods=:f_goods "
-            "group by ss.f_name,g.f_name,u.f_name,g.f_saleprice,g.f_saleprice2 "
+            "group by ss.f_name,g.f_name,u.f_name,gpr.f_price1,gpr.f_price2 "
             "having sum(s.f_qty*s.f_type) > 0");
     while (db.nextRow()) {
         int r = ui->tbl->addEmptyRow();

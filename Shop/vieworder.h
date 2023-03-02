@@ -41,6 +41,8 @@ private slots:
 
     bool printCheckWithTax(C5Database &db, const QString &id, QString &rseq);
 
+    void on_btnPrintReceiptA4_clicked();
+
 private:
     Ui::ViewOrder *ui;
 

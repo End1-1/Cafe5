@@ -2151,14 +2151,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5LineEditWithSelector</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5lineeditwithselector.h</header>
-  </customwidget>
-  <customwidget>
    <class>C5LineEdit</class>
    <extends>QLineEdit</extends>
    <header location="global">c5lineedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5ComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">c5combobox.h</header>
   </customwidget>
   <customwidget>
    <class>C5CheckBox</class>
@@ -2166,9 +2166,9 @@
    <header location="global">c5checkbox.h</header>
   </customwidget>
   <customwidget>
-   <class>C5ComboBox</class>
-   <extends>QComboBox</extends>
-   <header location="global">c5combobox.h</header>
+   <class>C5LineEditWithSelector</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5lineeditwithselector.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
@@ -2291,124 +2291,6 @@
   <tabstop>btnScalePath</tabstop>
   <tabstop>leScaleRusBMODBC</tabstop>
   <tabstop>btnTestScaleODBCString</tabstop>
-  <tabstop>fnApp_2</tabstop>
-  <tabstop>chDebugMode_2</tabstop>
-  <tabstop>chRDB_2</tabstop>
-  <tabstop>lineEdit_4</tabstop>
-  <tabstop>leRDBHost_2</tabstop>
-  <tabstop>leRDBPassword_2</tabstop>
-  <tabstop>leFDFontSize_2</tabstop>
-  <tabstop>leRDBUser_2</tabstop>
-  <tabstop>leCode_2</tabstop>
-  <tabstop>leRDBSchema_2</tabstop>
-  <tabstop>leSystemThouthandSeparator_2</tabstop>
-  <tabstop>lineEdit_5</tabstop>
-  <tabstop>cbFronDeskMode_2</tabstop>
-  <tabstop>leMobileAppConStr_2</tabstop>
-  <tabstop>leOutDocNumDigits_2</tabstop>
-  <tabstop>chNoScanCode_2</tabstop>
-  <tabstop>cbDefaultStore_2</tabstop>
-  <tabstop>chFixAutoenterInputDocPrice_2</tabstop>
-  <tabstop>leMoveDocNumDigits_2</tabstop>
-  <tabstop>leOutDocCounter_2</tabstop>
-  <tabstop>chUpdateTempStorageForShop_2</tabstop>
-  <tabstop>chNoCashDoc_2</tabstop>
-  <tabstop>leMoveDocCounter_2</tabstop>
-  <tabstop>leInputDocCounter_2</tabstop>
-  <tabstop>leInputDocNumDigits_2</tabstop>
-  <tabstop>chAutomaticallyStoreOutWaiter_2</tabstop>
-  <tabstop>leOrderPrefix_2</tabstop>
-  <tabstop>chAutoCash_2</tabstop>
-  <tabstop>leCashId_2</tabstop>
-  <tabstop>leCardIdPrefix_2</tabstop>
-  <tabstop>leCashIdPrefix_2</tabstop>
-  <tabstop>leDateOfClose_2</tabstop>
-  <tabstop>chAutoDateCash_2</tabstop>
-  <tabstop>leCardId_2</tabstop>
-  <tabstop>leReceiptFooterText_2</tabstop>
-  <tabstop>leChangeWorkingDateTime_2</tabstop>
-  <tabstop>leShift_2</tabstop>
-  <tabstop>leAutochargeDishAfterSessionClose_2</tabstop>
-  <tabstop>leHallIdForHotel_2</tabstop>
-  <tabstop>chCloseTableAfterPrecheck_2</tabstop>
-  <tabstop>chWaiterLoginAfterPayment_2</tabstop>
-  <tabstop>chAskForPrecheck_2</tabstop>
-  <tabstop>chCarMode_2</tabstop>
-  <tabstop>leHall_2</tabstop>
-  <tabstop>leTable_2</tabstop>
-  <tabstop>leServiceFactor_2</tabstop>
-  <tabstop>chCompactDishesInOrder_2</tabstop>
-  <tabstop>chNoInvoiceRecordForHotel_2</tabstop>
-  <tabstop>leItemCodeForHotel_2</tabstop>
-  <tabstop>leUserIdForHotelVoucher_2</tabstop>
-  <tabstop>leHotelDatabase_2</tabstop>
-  <tabstop>chDontCloseEmtpyOrder_2</tabstop>
-  <tabstop>cbMenu_2</tabstop>
-  <tabstop>chCloseTablefterServicePrint_2</tabstop>
-  <tabstop>chFinalReceiptQtySelect_2</tabstop>
-  <tabstop>chViewOnChart_2</tabstop>
-  <tabstop>chDenyPriceChange_2</tabstop>
-  <tabstop>chEnterShopPin_2</tabstop>
-  <tabstop>leAutologinPin2_2</tabstop>
-  <tabstop>chFixShopStaff_2</tabstop>
-  <tabstop>chHideShopQuantity_2</tabstop>
-  <tabstop>chDenyReatail_2</tabstop>
-  <tabstop>chDenyWhosale_2</tabstop>
-  <tabstop>chDontCheckStoreQty_2</tabstop>
-  <tabstop>leAutologinPin1_2</tabstop>
-  <tabstop>chDenyQtychange_2</tabstop>
-  <tabstop>chDontGroupPrint_2</tabstop>
-  <tabstop>leShopMobileClentConfig_2</tabstop>
-  <tabstop>chNeverOfferTax_2</tabstop>
-  <tabstop>chExternalTax_2</tabstop>
-  <tabstop>chAlwaysOfferTax_2</tabstop>
-  <tabstop>leTaxIP_2</tabstop>
-  <tabstop>leTaxPort_2</tabstop>
-  <tabstop>leCashierPin_2</tabstop>
-  <tabstop>leCashierLogin_2</tabstop>
-  <tabstop>leVAT_2</tabstop>
-  <tabstop>leTaxAlwaysPrintIfAmountLess_2</tabstop>
-  <tabstop>leTaxPassword_2</tabstop>
-  <tabstop>leTaxDept_2</tabstop>
-  <tabstop>cbTaxUseExtPos_2</tabstop>
-  <tabstop>chChoosePos_2</tabstop>
-  <tabstop>lereceiptFontSize_2</tabstop>
-  <tabstop>fbReceiptFont_2</tabstop>
-  <tabstop>rbPrintLeft_2</tabstop>
-  <tabstop>rbPrintDown_2</tabstop>
-  <tabstop>rbPrint50_2</tabstop>
-  <tabstop>rbPrint80_2</tabstop>
-  <tabstop>leLocalReceiptPrinter_2</tabstop>
-  <tabstop>chPrintDishOrder_2</tabstop>
-  <tabstop>leServiceFontSize_2</tabstop>
-  <tabstop>chPrintModOnReceipt_2</tabstop>
-  <tabstop>leStaticQRCode_2</tabstop>
-  <tabstop>chForceUsePrintAlias_2</tabstop>
-  <tabstop>fbServiceFont_2</tabstop>
-  <tabstop>rbPrintVNoPrint_2</tabstop>
-  <tabstop>rbPrintV1_2</tabstop>
-  <tabstop>rbPrintV2_2</tabstop>
-  <tabstop>rbPrintV3_2</tabstop>
-  <tabstop>leReceipPaperWidth_2</tabstop>
-  <tabstop>chPrintScancodeWithName_2</tabstop>
-  <tabstop>chDontPrintFinalReceipt_2</tabstop>
-  <tabstop>leHttpIP_2</tabstop>
-  <tabstop>leHttpPort_2</tabstop>
-  <tabstop>leHttpUsername_2</tabstop>
-  <tabstop>leHttpPassword_2</tabstop>
-  <tabstop>cbIdramServer_2</tabstop>
-  <tabstop>leIdramName_2</tabstop>
-  <tabstop>leIDRAMID_2</tabstop>
-  <tabstop>leIdramSessionId_2</tabstop>
-  <tabstop>leIDRAMPhone_2</tabstop>
-  <tabstop>chIdramTips_2</tabstop>
-  <tabstop>leIdramTipsWallet_2</tabstop>
-  <tabstop>leASConnectionString_2</tabstop>
-  <tabstop>btnTestAsConnection_2</tabstop>
-  <tabstop>leScalePath_2</tabstop>
-  <tabstop>btnScalePath_2</tabstop>
-  <tabstop>leScaleRusBMODBC_2</tabstop>
-  <tabstop>btnTestScaleODBCString_2</tabstop>
   <tabstop>scrollArea</tabstop>
  </tabstops>
  <resources/>

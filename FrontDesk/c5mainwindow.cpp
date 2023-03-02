@@ -18,6 +18,8 @@
 #include "cr5documents.h"
 #include "cr5goodsclasses.h"
 #include "c5translatorform.h"
+#include "cr5breezeservice.h"
+#include "cr5reports.h"
 #include "cr5mfgeneralreport.h"
 #include "c5saledoc.h"
 #include "cr5saleremoveddishes.h"
@@ -480,8 +482,10 @@ void C5MainWindow::enableMenu(bool v)
 
 void C5MainWindow::addTreeL3Item(QListWidget *l, int permission, const QString &text, const QString &icon)
 {
-    if (!__user->check(permission)) {
-        return;
+    if (permission > 0) {
+        if (!__user->check(permission)) {
+            return;
+        }
     }
     QListWidgetItem *item = new QListWidgetItem(l);
     item->setData(Qt::UserRole, permission);
@@ -610,7 +614,8 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
     QListWidget *l = static_cast<QListWidget*>(sender());
     QStringList dbParams = fDatabases[__c5config.getRegValue("lastdb").toString()];
     QListWidgetItem *item = l->item(index.row());
-    switch (item->data(Qt::UserRole).toInt()) {
+    int permission = item->data(Qt::UserRole).toInt();
+    switch (permission) {
     case cp_t1_usergroups:
         createTab<CR5UsersGroups>(dbParams);
         break;
@@ -622,6 +627,9 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
         break;
     case cp_t1_settigns:
         createTab<CR5Settings>(dbParams);
+        break;
+    case cp_t1_breeze:
+        createTab<CR5BreezeService>(dbParams);
         break;
     case cp_t2_store_input: {
         C5StoreDoc *sd = createTab<C5StoreDoc>(dbParams);
@@ -876,6 +884,11 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
         createTab<CR5MFActiveTasks>(dbParams);
         break;
     default:
+        if (permission < 0) {
+            auto *reports = createTab<CR5Reports>(dbParams);
+            reports->setReport(permission * -1);
+            fTab->setTabText(fTab->count() - 1, reports->label());
+        }
         break;
     }
 }
@@ -974,6 +987,7 @@ void C5MainWindow::setDB(const QString &dbname)
     C5Database dbpr(db.at(0),  db.at(1),  db.at(2),  db.at(3));
 
     if (addMainLevel(db.at(1), cp_t2_action, tr("Actions"), ":/edit.png", l)) {
+        l->setProperty("reportlevel", 1);
         addTreeL3Item(l, cp_t2_store_input, tr("New store input"), ":/goods.png");
         addTreeL3Item(l, cp_t2_store_output, tr("New store output"), ":/goods.png");
         addTreeL3Item(l, cp_t2_store_move, tr("New store movement"), ":/goods.png");
@@ -989,6 +1003,7 @@ void C5MainWindow::setDB(const QString &dbname)
     }
 
     if (addMainLevel(db.at(1), cp_t3_reports, tr("Reports"), ":/reports.png", l)) {
+        l->setProperty("reportlevel", 2);
         addTreeL3Item(l, cp_t3_documents, tr("Documents"), ":/documents.png");
         addTreeL3Item(l, cp_t3_documents_store, tr("Documents in the store"), ":/documents.png");
         addTreeL3Item(l, cp_t3_store, tr("Storage"), ":/goods.png");
@@ -1018,6 +1033,7 @@ void C5MainWindow::setDB(const QString &dbname)
     }
 
     if (addMainLevel(db.at(1), cp_t8_cash, tr("Cash"), ":/reports.png", l)) {
+        l->setProperty("reportlevel", 3);
         addTreeL3Item(l, cp_t8_cash_doc, tr("New cash document"), ":/cash.png");
         addTreeL3Item(l, cp_t8_cash_detailed_report, tr("Cash detailed report"), ":/cash.png");
         addTreeL3Item(l, cp_t8_cash_movement, tr("Movement in the cash"), ":/cash.png");
@@ -1031,12 +1047,14 @@ void C5MainWindow::setDB(const QString &dbname)
     }
 
     if (addMainLevel(db.at(1), cp_t9_salary, tr("Salary"), ":/employee.png", l)) {
+        l->setProperty("reportlevel", 4);
         addTreeL3Item(l, cp_t9_salary_doc, tr("New salary document"), ":/employee.png");
         addTreeL3Item(l, cp_t9_report, tr("Salary by workers"), ":/employee.png");
     }
 
     if (__c5config.frontDeskMode() == FRONTDESK_WAITER) {
         if (addMainLevel(db.at(1), cp_t4_menu, tr("Menu"), ":/menu.png", l)) {
+            l->setProperty("reportlevel", 5);
             addTreeL3Item(l, cp_t4_part1, tr("Dish depts"), ":/menu.png");
             addTreeL3Item(l, cp_t4_part2, tr("Types of dishes"), ":/menu.png");
             addTreeL3Item(l, cp_t4_dishes, tr("Dishes list"), ":/menu.png");
@@ -1050,6 +1068,7 @@ void C5MainWindow::setDB(const QString &dbname)
     }
 
     if (addMainLevel(db.at(1), cp_t6_goods_menu, tr("Goods"), ":/goods.png", l)) {
+        l->setProperty("reportlevel", 6);
         addTreeL3Item(l, cp_t6_storage, tr("Storages"), ":/goods.png");
         addTreeL3Item(l, cp_t6_groups, tr("Groups of goods"), ":/goods.png");
         addTreeL3Item(l, cp_t6_goods, tr("Goods"), ":/goods.png");
@@ -1062,6 +1081,7 @@ void C5MainWindow::setDB(const QString &dbname)
     }
 
     if (addMainLevel(db.at(1), cp_t10_manufacture, tr("Manufacture"), ":/manufacturing.png", l)) {
+        l->setProperty("reportlevel", 7);
         addTreeL3Item(l, cp_t10_active_tasks, tr("Active tasks"), ":/manufacturing.png");
         addTreeL3Item(l, cp_t10_workshops, tr("Workshops"), ":/manufacturing.png");
         addTreeL3Item(l, cp_t10_actions_stages, tr("Action stages"), ":/manufacturing.png");
@@ -1074,6 +1094,7 @@ void C5MainWindow::setDB(const QString &dbname)
     }
 
     if (addMainLevel(db.at(1), cp_t7_other, tr("Other"), ":/other.png", l)) {
+        l->setProperty("reportlevel", 8);
         addTreeL3Item(l, cp_t7_partners, tr("Partners"), ":/partners.png");
         addTreeL3Item(l, cp_t7_halls, tr("Halls"), ":/hall.png");
         addTreeL3Item(l, cp_t7_tables, tr("Tables"), ":/table.png");
@@ -1084,11 +1105,29 @@ void C5MainWindow::setDB(const QString &dbname)
     }
 
     if (addMainLevel(db.at(1), cp_t1_preference, tr("Preferences"), ":/configure.png", l)) {
+        l->setProperty("reportlevel", 9);
         addTreeL3Item(l, cp_t1_usergroups, tr("Positions of employees"), ":/users_groups.png");
         addTreeL3Item(l, cp_t1_users, tr("Employees"), ":/users_groups.png");
         addTreeL3Item(l, cp_t1_databases, tr("Databases"), ":/database.png");
         addTreeL3Item(l, cp_t1_settigns, tr("Settings"), ":/configure.png");
         addTreeL3Item(l, cp_t7_translator, tr("Translator"), ":/translate.png");
+        addTreeL3Item(l, cp_t1_breeze, tr("Breeze service"), ":/configure.png");
+    }
+
+    C5Database dbb(db.at(0),  db.at(1),  db.at(2),  db.at(3));
+    dbb[":f_group"] = __user->group();
+    dbb.exec("select r.f_id, rg.f_level, r.f_name as f_reportname "
+            "from reports r "
+            "inner join reports_group rg on rg.f_id=r.f_group "
+            "inner join reports_permissions ra on ra.f_report=r.f_id "
+            "where ra.f_access=1 and ra.f_group=:f_group ");
+    while (dbb.nextRow()) {
+        int reportlevel = dbb.getInt("f_level");
+        for (QListWidget *lw: qAsConst(fMenuLists)) {
+            if (lw->property("reportlevel").toInt() == reportlevel) {
+                addTreeL3Item(lw, -1 * dbb.getInt("f_id"), dbb.getString("f_reportname"), ":/documents.png");
+            }
+        }
     }
 
     readFavoriteMenu();

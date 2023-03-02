@@ -53,6 +53,7 @@ public:
 
     int genFBID(const QString &name);
     void rowToMap(QMap<QString, QVariant> &map);
+    QStringList params();
 
 private:
     static int fDatabaseCounter;

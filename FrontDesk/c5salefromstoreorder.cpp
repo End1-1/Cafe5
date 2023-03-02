@@ -5,6 +5,7 @@
 #include "printtaxn.h"
 #include "c5printtaxanywhere.h"
 #include "c5cache.h"
+#include "c5printrecipta4.h"
 #include <QMenu>
 #include <QClipboard>
 
@@ -140,6 +141,17 @@ void C5SaleFromStoreOrder::on_btnRemove_clicked()
     db.exec("delete from a_header where f_id=:f_id");
     db[":f_doc"] = ui->leID->text();
     db.exec("delete from a_dc where f_doc=:f_doc");
+    db[":f_trsale"] = ui->leID->text();
+    db.exec("select * from b_gift_card_history where f_trsale=:f_trsale");
+    if (db.nextRow()) {
+        if (db.getDouble("f_amount") > 0) {
+            db[":f_id"] = db.getInt("f_card");
+            db[":f_datesaled"] = QVariant();
+            db.exec("update b_gift_card set f_datesaled=:f_datesaled where f_id=:f_id");
+        }
+    }
+    db[":f_trsale"] = ui->leID->text();
+    db.exec("delete from b_gift_card_history where f_trsale=:f_trsale");
 
     db.deleteFromTable("b_clients_debts", "f_order", ui->leID->text());
     db.commit();
@@ -209,6 +221,14 @@ void C5SaleFromStoreOrder::on_btnPrintTax_clicked()
 
 void C5SaleFromStoreOrder::on_btnSave_clicked()
 {
+    QString err;
+    if (!ui->deDate->date().isValid()) {
+        err += tr("Date is not valid");
+    }
+    if (!err.isEmpty()) {
+        C5Message::error(err);
+        return;
+    }
     C5Database db(fDBParams);
     if (ui->chDebt->isChecked()) {
         if (ui->lePartner->getInteger() == 0) {
@@ -238,6 +258,7 @@ void C5SaleFromStoreOrder::on_btnSave_clicked()
     }
     db[":f_partner"] = ui->lePartner->getInteger();
     db[":f_staff"] = ui->leSeller->getInteger();
+    db[":f_datecash"] = ui->deDate->date();
     db.update("o_header", where_id(ui->leID->text()));
 
     C5Message::info(tr("Saved"));
@@ -246,4 +267,13 @@ void C5SaleFromStoreOrder::on_btnSave_clicked()
 void C5SaleFromStoreOrder::on_btnCopyUUID_clicked()
 {
     qApp->clipboard()->setText(ui->leUUID->text());
+}
+
+void C5SaleFromStoreOrder::on_btnPrintA4_clicked()
+{
+    C5PrintReciptA4 p(fDBParams, ui->leUUID->text(), this);
+    QString err;
+    if (!p.print(err)) {
+        C5Message::error(err);
+    }
 }

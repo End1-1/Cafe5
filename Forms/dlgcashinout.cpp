@@ -128,7 +128,7 @@ void DlgCashinOut::on_btnCloseSession_clicked()
         QString cashdoc;
         if (!dw.writeAHeader(cashdoc, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH,
                              fUser->id(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(),
-                             0, cashbalance, tr("Close session"))) {
+                             0, cashbalance, tr("Close session"), __c5config.getValue(param_default_currency).toInt())) {
             C5Message::error(dw.fErrorMsg);
             return;
         }
@@ -154,7 +154,7 @@ void DlgCashinOut::on_btnCloseSession_clicked()
         QString cashdoc;
         if (!dw.writeAHeader(cashdoc, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH,
                              fUser->id(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(),
-                             0, card, tr("Close session"))) {
+                             0, card, tr("Close session"), __c5config.getValue(param_default_currency).toInt())) {
             C5Message::error(dw.fErrorMsg);
             return;
         }
@@ -176,7 +176,7 @@ void DlgCashinOut::on_btnCloseSession_clicked()
         QString cashdoc;
         if (!dw.writeAHeader(cashdoc, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH,
                              fUser->id(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(),
-                             0, card, tr("Close session"))) {
+                             0, card, tr("Close session"), __c5config.getValue(param_default_currency).toInt())) {
             C5Message::error(dw.fErrorMsg);
             return;
         }

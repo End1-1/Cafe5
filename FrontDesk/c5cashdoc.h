@@ -38,6 +38,8 @@ public:
 
     void setStoreDoc(const QString &uuid);
 
+    virtual void selectorCallback(int row, const QList<QVariant> &values);
+
     QString uuid() const;
 
     QDate date() const;

@@ -147,3 +147,8 @@ bool C5Widget::parseBroadcastMessage(int what, const QString &msg, QString &repl
     Q_UNUSED(replystr);
     return true;
 }
+
+bool C5Widget::reportHandler(const QString &handleId, const QVariant &data)
+{
+    return true;
+}

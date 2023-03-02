@@ -107,13 +107,13 @@ private slots:
 
     void on_btnHistoryOrder_clicked();
 
-    void on_btnDiscount_clicked();
-
     void on_btnSetCardExternal_clicked();
 
     void on_tblTables_itemClicked(QTableWidgetItem *item);
 
     void on_btnSaveAndPrecheck_clicked();
+
+    void on_leCard_textChanged(const QString &arg1);
 
 private:
     Ui::Workspace *ui;

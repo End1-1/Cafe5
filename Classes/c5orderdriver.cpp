@@ -79,7 +79,7 @@ bool C5OrderDriver::newOrder(int userid, QString &id, int tableId)
     setHeader("f_amountother", 0);
     setHeader("f_amountservice", 0);
     setHeader("f_amountdiscount", 0);
-    setHeader("f_servicefactor", __c5config.serviceFactor());
+    setHeader("f_servicefactor", __c5config.serviceFactor().toDouble());
     setHeader("f_discountfactor", 0);
     if (!save()) {
         return false;
@@ -99,7 +99,9 @@ bool C5OrderDriver::closeOrder()
         QString err;
         C5Database db(__c5config.dbParams());
         C5WaiterOrderDoc doc(currentOrderId(), db);
-        doc.makeOutputOfStore(db, err, DOC_STATE_SAVED);
+        if (__c5config.getValue(param_waiter_automatially_storeout).toInt() > 0) {
+            doc.makeOutputOfStore(db, err, DOC_STATE_SAVED);
+        }
         if (__c5config.hotelDatabase().length() > 0) {
             if (!doc.transferToHotel(db, err)) {
                 fLastError = err;

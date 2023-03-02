@@ -913,7 +913,7 @@ void C5WaiterServer::processCloseOrder(QJsonObject &o, C5Database &db)
                     if (!dw.writeAHeader(cashdocid, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH,
                                          jh["f_currentstaff"].toString().toInt(), dateCash, QDate::currentDate(),
                                          QTime::currentTime(), 0, jh["f_amountcash"].toString().toDouble(),
-                                         settings[param_autocash_prefix] + " " + headerPrefix + QString::number(headerId))) {
+                                         settings[param_autocash_prefix] + " " + headerPrefix + QString::number(headerId), 1)) {
                         err = dw.fErrorMsg;
                     }
                     if (!dw.writeAHeaderCash(cashdocid, settings[param_cash_id].toInt(),
@@ -935,7 +935,7 @@ void C5WaiterServer::processCloseOrder(QJsonObject &o, C5Database &db)
                     if (!dw.writeAHeader(nocashdocid, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH,
                                          jh["f_currentstaff"].toString().toInt(), dateCash, QDate::currentDate(),
                                          QTime::currentTime(), 0, jh["f_amountcard"].toString().toDouble(),
-                                         settings[param_autonocash_prefix] + " " + headerPrefix + QString::number(headerId))) {
+                                         settings[param_autonocash_prefix] + " " + headerPrefix + QString::number(headerId), 1)) {
                         err = dw.fErrorMsg;
                     }
                     if (!dw.writeAHeaderCash(nocashdocid, settings[param_nocash_id].toInt(),
@@ -1040,7 +1040,13 @@ bool C5WaiterServer::printReceipt(QString &err, C5Database &db, bool isBill, boo
     }
     QMap<QString, QVariant> headerInfo;
     db[":f_id"] = fIn["order"].toString();
-    if (!db.exec("select * from o_header where f_id=:f_id")) {
+    if (!db.exec("select o.*, concat_ws(' ', u.f_last, u.f_first) as f_currentstaffname,"
+                 "t.f_name as f_tablename, h.f_name as f_hallname "
+                 "from o_header o "
+                 "left join h_tables t on t.f_id=o.f_table "
+                 "left join h_halls h on h.f_id=o.f_hall "
+                 "left join s_user u on u.f_id=o.f_currentstaff "
+                 "where o.f_id=:f_id")) {
         err = db.fLastError;
         return false;
     }
@@ -1052,11 +1058,14 @@ bool C5WaiterServer::printReceipt(QString &err, C5Database &db, bool isBill, boo
 
     QList<QMap<QString, QVariant> > bodyInfo;
     db[":f_header"] = fIn["order"].toString();
-    if (!db.exec("select f_state, f_dish, f_price, f_canservice, f_candiscount, f_discount, sum(f_qty1) as f_qty1, sum(f_qty2) as f_qty2, "
-                 "sum(f_total) as f_total, f_adgcode, f_comment "
-                 "from o_body "
+    if (!db.exec("select f_state, f_dish, f_price, f_canservice, f_candiscount, ob.f_discount, "
+                 "d.f_name as f_dishname, d.f_adgt, d.f_hourlypayment, d.f_extra, "
+                 "sum(f_qty1) as f_qty1, sum(f_qty2) as f_qty2, "
+                 "sum(f_total) as f_total, f_adgcode, ob.f_comment "
+                 "from o_body ob "
+                 "left join d_dish d on d.f_id=ob.f_dish "
                  "where f_header=:f_header "
-                 "group by f_dish, f_state, f_price, f_discount ")) {
+                 "group by f_dish, f_state, f_price, ob.f_discount ")) {
         err = db.fLastError;
         return false;
     }
@@ -1168,7 +1177,7 @@ bool C5WaiterServer::printReceipt(QString &err, C5Database &db, bool isBill, boo
             pr.fIdram[param_idram_phone] = C5Config::getValue(param_idram_phone);
             pr.fIdram[param_idram_tips] = C5Config::getValue(param_idram_tips);
             pr.fIdram[param_idram_tips_wallet] = C5Config::getValue(param_idram_tips_wallet);
-            if (!pr.print()) {
+            if (!pr.print(db.dbParams())) {
                 err = pr.fError;
             }
             break;

@@ -118,6 +118,13 @@ void CE5Goods::setId(int id)
 {
     CE5Editor::setId(id);
     C5Database db(fDBParams);
+    /* scancode */
+    if (id > 0) {
+        db[":f_id"] = id;
+        db.exec("select f_scancode from c_goods where f_id=:f_id");
+        db.nextRow();
+        ui->leScanCode->setText(db.getString("f_scancode"));
+    }
     /* Complectation */
     db[":f_base"] = id;
     db.exec("select c.f_id, c.f_goods, concat(g.f_name, if(g.f_scancode is null, '', concat(' ', g.f_scancode))) as f_goodsname, c.f_qty, u.f_name as f_unitname, "
@@ -200,6 +207,21 @@ bool CE5Goods::save(QString &err, QList<QMap<QString, QVariant> > &data)
         return false;
     }
     C5Database db(fDBParams);
+    if (ui->leScanCode->text().length() > 0) {
+        db[":f_id"] = ui->leCode->getInteger();
+        db[":f_scancode"] = ui->leScanCode->text();
+        db.exec("select * from c_goods where f_scancode=:f_scancode and f_id<>:f_id");
+        if (db.nextRow()) {
+            err += tr("Duplicate barecode");
+            return false;
+        }
+        db[":f_scancode"] = ui->leScanCode->text();
+        db.update("c_goods", "f_id", ui->leCode->getInteger());
+    } else {
+        db[":f_scancode"] = QVariant();
+        db.update("c_goods", "f_id", ui->leCode->getInteger());
+    }
+
     if (ui->chSameStoreId->isChecked()) {
         if (ui->leStoreId->getInteger() == 0) {
             ui->leStoreId->setInteger(ui->leCode->getInteger());
@@ -222,7 +244,7 @@ bool CE5Goods::save(QString &err, QList<QMap<QString, QVariant> > &data)
     fStrings.insert(ui->leName->text());
     static_cast<QStringListModel*>(ui->leName->completer()->model())->setStringList(fStrings.values());
 
-    for (const QString &s: fScancodeAppend) {
+    for (const QString &s: qAsConst(fScancodeAppend)) {
         db[":f_id"] = s;
         db[":f_goods"] = ui->leCode->getInteger();
         db.insert("c_goods_multiscancode", false);
@@ -385,7 +407,12 @@ void CE5Goods::priceEdited(const QString &arg1)
     int basecurrency = e->property("c").toInt();
     for (int i = 0; i < ui->tblPricing->columnCount(); i++) {
         if (ui->tblPricing->lineEdit(r, i) == e) {
-            l->setDouble(((str_float(arg1) / ui->leCostPrice->getDouble()) - 1) * 100);
+            double costprice = ui->leCostPrice->getDouble();
+            if (basecurrency != ui->cbCurrency->currentData().toInt()) {
+                QString mcrossrate = QString("%1-%2").arg(ui->cbCurrency->currentData().toString(), QString::number(basecurrency));
+                costprice *= fCrossRate[mcrossrate];
+            }
+            l->setDouble(((str_float(arg1) / costprice) - 1) * 100);
             continue;
         }
         QString crossrate = QString("%1-%2").arg(QString::number(basecurrency), ui->tblPricing->lineEdit(r, i)->property("c").toString());

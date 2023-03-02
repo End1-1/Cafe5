@@ -965,3 +965,83 @@ ALTER TABLE e_currency_cross_rate_history CHANGE f_rate f_rate DECIMAL(16,7);
 /* db - 92, 06.12.2022 */
 update s_app set f_version='92' where f_app='DB';
 alter table c_goods add column f_adg tinytext;
+
+/* db - 93, 06.12.2022 */
+update s_app set f_version='93' where f_app='DB';
+ALTER TABLE `d_dish` CHANGE COLUMN `f_barcode` `f_barcode` TEXT NULL COLLATE 'utf8mb3_general_ci' AFTER `f_samestore`;
+
+/* db - 94, 12.12.2022 */
+update s_app set f_version='94' where f_app='DB';
+create table o_draft_sale (f_id char(36) primary key, f_state tinyint, f_date date, f_time time, f_staff integer, f_amount decimal(14,2));
+create table o_draft_sale_body (f_id char(36) primary key, f_header char(36), f_state tinyint, f_dateappend date, f_timeappend time, f_goods integer, f_qty decimal(14,3), f_price decimal(14,3), f_dateremoved date, f_timeremoved time, f_userappend integer, f_userremove integer);
+
+/* db - 95, 15.12.2022 */
+update s_app set f_version='95' where f_app='DB';
+create table b_gift_card (f_id integer primary key auto_increment, f_code varchar(36), f_costumer integer, f_dateregistered date, f_datesaled date);
+create table b_gift_card_history (f_id integer primary key auto_increment, f_card integer, f_amount decimal(14,2));
+create table b_gift_card_sale_options (f_id integer primary key auto_increment, f_value tinytext);
+INSERT INTO `b_gift_card_sale_options` (`f_value`) VALUES ('10000,20000,30000,40000,50000');
+alter table b_gift_card_history add f_trsale varchar(36) after f_card;
+
+/* db - 96, 19.12.2022 */
+update s_app set f_version='96' where f_app='DB';
+create table reports (f_id integer primary key auto_increment, f_group integer, f_name tinytext);
+create table reports_queries (f_id integer primary key auto_increment, f_report integer, f_query text);
+create table reports_group (f_id integer primary key auto_increment, f_name tinytext);
+create table reports_permissions (f_id integer primary key auto_increment, f_group integer, f_report integer, f_access tinyint);
+alter table reports add column f_query text;
+drop table reports_queries;
+alter table reports_group add column f_level int after f_id;
+alter table reports add column f_sumcolumn_indexes tinytext;
+
+/* db - 97, 04.01.2023 */
+update s_app set f_version='97' where f_app='DB';
+alter table s_user add column f_firebase_token tinytext;
+alter table s_user add column f_passhash tinytext;
+INSERT INTO b_card_types (f_id, f_name) VALUES (7, 'Միանվագ զեղչ');
+alter table b_cards_discount add column f_createdby integer;
+
+/* db - 98, 04.01.2023 */
+update s_app set f_version='98' where f_app='DB';
+alter table o_draft_sale add column f_comment text;
+alter table reports add column f_handler tinytext;
+insert into reports (f_id, f_group, f_name, f_query, f_handler) values (2, 1, 'Սևագիր վաճառքմեր', 'SELECT f_id as `Կոդ`, f_date as `Ամսաթիվ`, f_time as `Ժամ`, f_amount as `Գումար`, f_comment as `Մեկնաբանություն` FROM o_draft_sale
+WHERE f_state=1', '39617ca7-8fa4-11ed-8ad3-1078d2d2b808');
+insert into reports_group (f_name, f_level) values ('Վաճառք', 2);
+insert into reports_permissions (f_group, f_report, f_access) values (1, 2, 1);
+alter table o_draft_sale_body add column f_store int after f_state;
+
+/* db - 99, 04.01.2023 */
+update s_app set f_version='99' where f_app='DB';
+alter table reports add f_deletehandler text;
+alter table reports add f_filterhandler text;
+alter table o_draft_sale add column f_payment tinyint;
+alter table a_header_store add column f_saleuuid tinytext;
+ALTER TABLE `a_header_store`ADD INDEX `idx_saleuuid` (`f_saleuuid`);
+
+/* db - 100, 04.01.2023 */
+update s_app set f_version='100' where f_app='DB';
+create table reports_handler (f_id varchar(36) primary key, f_query text); 
+
+/* db - 101, 04.01.2023 */
+update s_app set f_version='101' where f_app='DB';
+alter table o_body add column f_appenduser integer after f_fromtable;
+alter table o_Body add column f_printuser integer after f_printtime;
+
+/* db - 102, 04.01.2023 */
+update s_app set f_version='102' where f_app='DB';
+alter table s_translator add f_am text;
+update s_translator set f_am=f_text;
+alter table s_translator drop column f_text;
+
+/* db - 103, 12.02.2023 */
+update s_app set f_version='103' where f_app='DB';
+create table p_preorder_state (f_id tinyint primary key auto_increment, f_name tinytext);
+insert into p_preorder_state (f_id, f_name) values (1, 'Ընթացիկ'), (2, 'Կատարված'), (3, 'Չեղարկված');
+create table p_preorder_header (f_id char(36) primary key, f_state tinyint, f_datecreated date, f_timecreated  time, f_datefor date, f_customer text, f_phone tinytext, f_prepaid decimal(14,2), f_prepaidfiscal int);
+create table p_preorder_body (f_id char(36) primary key, f_goods integer, f_qty decimal(14,2), f_price decimal(14,2));
+
+/* db - 104, 12.02.2023 */
+update s_app set f_version='104' where f_app='DB';
+alter table p_preorder_header drop column f_prepaid, add column f_prepaidcash decimal(14,3), add column f_prepaidcard decimal(14,2);
+alter table p_preorder_body add f_header char(36) after f_id;

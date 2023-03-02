@@ -119,6 +119,10 @@ void DlgReservGoods::on_btnSave_clicked()
 
 void DlgReservGoods::on_btnCancelReserve_clicked()
 {
+    //    if (fStore != 23) {
+    //        C5Message::error("No-no-no!");
+    //        return;
+    //    }
     setState(GR_REMOVED);
 }
 
@@ -180,6 +184,10 @@ void DlgReservGoods::insertReserve(const QStringList &dbparams)
 
 void DlgReservGoods::on_btnCompleteReserve_clicked()
 {
+//    if (fStore != 23) {
+//        C5Message::error("No-no-no!");
+//        return;
+//    }
     setState(GR_COMPLETED);
 }
 

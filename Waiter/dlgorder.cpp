@@ -675,8 +675,8 @@ void DlgOrder::removeWOrder(WOrder *wo)
 //        visit = db.getInt(0);
 //        client = db.getInt(1);
 //    } else {
-////        o["reply"] = 0;
-////        o["msg"] = tr("Invalide card code");
+//        o["reply"] = 0;
+//        o["msg"] = tr("Invalide card code");
 //        return;
 //    }
 //    db[":f_code"] = "auto_" + govnumber;

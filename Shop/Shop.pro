@@ -65,6 +65,7 @@ SOURCES += \
     ../Classes/c5printing.cpp \
     ../Classes/c5printjson.cpp \
     ../Classes/c5printpreview.cpp \
+    ../Classes/c5printrecipta4.cpp \
     ../Classes/c5printremovedservicethread.cpp \
     ../Classes/c5printservicethread.cpp \
     ../Classes/c5random.cpp \
@@ -128,11 +129,15 @@ SOURCES += \
     ../Forms/dlgserversettings.cpp \
     ../Service5/raw/rawmessage.cpp \
     ../Service5/socket/sslsocket.cpp \
+    c5tempsale.cpp \
     cashcollection.cpp \
     dlgdate.cpp \
     dlggetidname.cpp \
+    dlggiftcardsale.cpp \
     dlggoodslist.cpp \
     dlgpin.cpp \
+    dlgpreorder.cpp \
+    dlgpreorderitem.cpp \
     dlgreturnitem.cpp \
     dlgsplashscreen.cpp \
     goodsreturnreason.cpp \
@@ -156,6 +161,7 @@ SOURCES += \
     userphoto.cpp \
     viewinputitem.cpp \
     vieworder.cpp \
+    wcustomerdisplay.cpp \
         working.cpp \
     worder.cpp \
     ../Cafe5/c5config.cpp \
@@ -216,6 +222,7 @@ HEADERS += \
     ../Classes/c5printing.h \
     ../Classes/c5printjson.h \
     ../Classes/c5printpreview.h \
+    ../Classes/c5printrecipta4.h \
     ../Classes/c5printremovedservicethread.h \
     ../Classes/c5printservicethread.h \
     ../Classes/c5random.h \
@@ -281,11 +288,15 @@ HEADERS += \
     ../Forms/dlgserversettings.h \
     ../Service5/raw/rawmessage.h \
     ../Service5/socket/sslsocket.h \
+    c5tempsale.h \
     cashcollection.h \
     dlgdate.h \
     dlggetidname.h \
+    dlggiftcardsale.h \
     dlggoodslist.h \
     dlgpin.h \
+    dlgpreorder.h \
+    dlgpreorderitem.h \
     dlgreturnitem.h \
     dlgsplashscreen.h \
     goodsreturnreason.h \
@@ -308,6 +319,7 @@ HEADERS += \
     userphoto.h \
     viewinputitem.h \
     vieworder.h \
+    wcustomerdisplay.h \
         working.h \
     worder.h \
     ../Cafe5/c5config.h \
@@ -340,11 +352,15 @@ FORMS += \
     ../Forms/dlgqrcode.ui \
     ../Forms/dlgreservgoods.ui \
     ../Forms/dlgserversettings.ui \
+    c5tempsale.ui \
     cashcollection.ui \
     dlgdate.ui \
     dlggetidname.ui \
+    dlggiftcardsale.ui \
     dlggoodslist.ui \
     dlgpin.ui \
+    dlgpreorder.ui \
+    dlgpreorderitem.ui \
     dlgreturnitem.ui \
     dlgsplashscreen.ui \
     goodsreturnreason.ui \
@@ -361,6 +377,7 @@ FORMS += \
     userphoto.ui \
     viewinputitem.ui \
     vieworder.ui \
+    wcustomerdisplay.ui \
         working.ui \
     worder.ui \
     ../Cafe5/c5connection.ui \

@@ -55,8 +55,8 @@ bool C5StoreDraftWriter::writeFromShopOutput(const QString &doc, int state, QStr
         int rownum = 1;
         QString id;
         QString userid = storeDocNum(DOC_TYPE_STORE_OUTPUT, store, true, 0);
-        writeAHeader(id, userid, DOC_STATE_DRAFT, DOC_TYPE_STORE_OUTPUT, operatorId, docDate, QDate::currentDate(), QTime::currentTime(), 0, 0, comment);
-        writeAHeaderStore(id, operatorId, operatorId, "", QDate(), 0, store, 1, "", 0, 0);
+        writeAHeader(id, userid, DOC_STATE_DRAFT, DOC_TYPE_STORE_OUTPUT, operatorId, docDate, QDate::currentDate(), QTime::currentTime(), 0, 0, comment, __c5config.getValue(param_default_currency).toInt());
+        writeAHeaderStore(id, operatorId, operatorId, "", QDate(), 0, store, 1, "", 0, 0, doc);
         for (IGoods i: items) {
             if (i.store != store) {
                 continue;
@@ -70,10 +70,10 @@ bool C5StoreDraftWriter::writeFromShopOutput(const QString &doc, int state, QStr
         }
         if (state == DOC_STATE_SAVED) {
             if (writeOutput(id, err)) {
-                writeAHeader(id, userid, DOC_STATE_SAVED, DOC_TYPE_STORE_OUTPUT, operatorId, docDate, QDate::currentDate(), QTime::currentTime(), 0, 0, comment);
+                writeAHeader(id, userid, DOC_STATE_SAVED, DOC_TYPE_STORE_OUTPUT, operatorId, docDate, QDate::currentDate(), QTime::currentTime(), 0, 0, comment, __c5config.getValue(param_default_currency).toInt());
             } else {
                 haveRelations(id, err, true);
-                writeAHeader(id, userid, DOC_STATE_DRAFT, DOC_TYPE_STORE_OUTPUT, operatorId, docDate, QDate::currentDate(), QTime::currentTime(), 0, 0, comment);
+                writeAHeader(id, userid, DOC_STATE_DRAFT, DOC_TYPE_STORE_OUTPUT, operatorId, docDate, QDate::currentDate(), QTime::currentTime(), 0, 0, comment, __c5config.getValue(param_default_currency).toInt());
             }
         }
     }
@@ -364,7 +364,8 @@ bool C5StoreDraftWriter::returnResult(bool r, const QString &msg)
 
 bool C5StoreDraftWriter::writeAHeader(QString &id, const QString &userid, int state, int type, int op,
                                       const QDate &docDate, const QDate &dateCreate,
-                                     const QTime &timeCreate, int partner, double amount, const QString &comment)
+                                     const QTime &timeCreate, int partner, double amount,
+                                      const QString &comment, int currency)
 {
     bool u = true;
     if (id.isEmpty()) {
@@ -385,6 +386,7 @@ bool C5StoreDraftWriter::writeAHeader(QString &id, const QString &userid, int st
     fDb[":f_partner"] = partner;
     fDb[":f_amount"] = amount;
     fDb[":f_comment"] = comment;
+    fDb[":f_currency"] = currency;
     if (u) {
         return returnResult(fDb.update("a_header", where_id(id)));
     } else {
@@ -447,7 +449,7 @@ bool C5StoreDraftWriter::writeAHeaderPartial(QString &id, const QString &userid,
 
 bool C5StoreDraftWriter::writeAHeaderStore(const QString &id, int userAccept, int userPass, const QString &invoice, const QDate &invoiceDate,
                                            int storeIn, int storeOut, int basedOnSale, const QString &cashUUID, int complectation,
-                                           double complectationQty)
+                                           double complectationQty, const QString &saleuuid)
 {
     bool u = false;
     fDb[":f_id"] = id;
@@ -464,6 +466,7 @@ bool C5StoreDraftWriter::writeAHeaderStore(const QString &id, int userAccept, in
     fDb[":f_cashuuid"] = cashUUID;
     fDb[":f_complectation"] = complectation;
     fDb[":f_complectationqty"] = complectationQty;
+    fDb[":f_saleuuid"] = saleuuid;
     if (u) {
         return returnResult(fDb.update("a_header_store", where_id(id)));
     } else {
@@ -986,6 +989,7 @@ bool C5StoreDraftWriter::writeOutput(const QString &docId, QString &err)
         complectQty = fDb.getDouble("f_complectationqty");
     } else {
         err += tr("Invalid document id") + "<br>";
+        return false;
     }
     if (complectCode > 0) {
         fDb[":f_document"] = docId;

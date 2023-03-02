@@ -16,6 +16,7 @@ CR5MaterialInStoreFilter::CR5MaterialInStoreFilter(const QStringList &dbParams, 
     ui->leClass3->setSelector(fDBParams, ui->leClass3Name, cache_goods_classes).setMultiselection(true);
     ui->leClass4->setSelector(fDBParams, ui->leClass4Name, cache_goods_classes).setMultiselection(true);
     ui->leCurrency->setSelector(fDBParams, ui->leCurrencyName, cache_currency);
+    ui->lePartner->setSelector(fDBParams, ui->lePartnerName, cache_goods_partners);
     restoreFilter(this);
 }
 
@@ -58,6 +59,7 @@ QString CR5MaterialInStoreFilter::condition()
     }
     in(cond, "h.f_currency", ui->leCurrency);
     in(cond, "gpr.f_currency", ui->leCurrency);
+    in(cond, "h.f_partner", ui->lePartner);
     return cond;
 }
 
@@ -77,6 +79,11 @@ QString CR5MaterialInStoreFilter::filterText()
 bool CR5MaterialInStoreFilter::showDrafts()
 {
     return ui->chShowDrafts->isChecked();
+}
+
+bool CR5MaterialInStoreFilter::showZero()
+{
+    return ui->chShowZeroes->isChecked();
 }
 
 QString CR5MaterialInStoreFilter::currency() const

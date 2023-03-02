@@ -3,6 +3,8 @@
 
 #include "c5reportwidget.h"
 
+class CR5GoodsFilter;
+
 class CR5Goods : public C5ReportWidget
 {
     Q_OBJECT
@@ -15,6 +17,9 @@ public:
 public slots:
     virtual bool on_tblView_doubleClicked(const QModelIndex &index);
 
+private:
+    CR5GoodsFilter *fFilter;
+
 private slots:
     void pricing();
 
@@ -23,6 +28,8 @@ private slots:
     void exportToScales();
 
     void deleteGoods();
+
+    void printBarCodes();
 };
 
 #endif // CR5GOODS_H

@@ -13,6 +13,7 @@
 #include "dlgpin.h"
 #include "dlgsplashscreen.h"
 #include "searchitems.h"
+#include "wcustomerdisplay.h"
 #include "c5connection.h"
 #include "goodsreserve.h"
 #include "c5logsystem.h"
@@ -26,11 +27,14 @@
 #include "threadreadmessage.h"
 #include "selectprinters.h"
 #include "c5printing.h"
+#include "dlggiftcardsale.h"
 #include "rawmessage.h"
 #include "c5tablewidget.h"
 #include "printreceiptgroup.h"
+#include "dlgpreorder.h"
 #include "dlgserversettings.h"
 #include "socketconnection.h"
+#include "c5tempsale.h"
 #include <QShortcut>
 #include <QInputDialog>
 #include <QKeyEvent>
@@ -38,6 +42,7 @@
 #include <QMessageBox>
 #include <QProcess>
 #include <QSettings>
+#include <QDesktopWidget>
 
 QHash<QString, int> Working::fGoodsRows;
 QHash<QString, QString> Working::fMultiscancode;
@@ -52,6 +57,7 @@ Working::Working(C5User *user, QWidget *parent) :
     ui->setupUi(this);
     QString ip;
     int port;
+    fCustomerDisplay = nullptr;
     QString username;
     QString password;
     ServerConnection::getParams(ip, port, username, password);
@@ -119,6 +125,11 @@ Working::Working(C5User *user, QWidget *parent) :
     fMultiscancode.clear();
     while (db.nextRow()) {
         fMultiscancode[db.getString(0)] = db.getString(1);
+    }
+
+    QSettings s(_ORGANIZATION_, _APPLICATION_+ QString("\\") + _MODULE_);
+    if (s.value("customerdisplay").toBool()) {
+        ui->btnCostumerDisplay->click();
     }
 
     restoreSales();
@@ -330,7 +341,7 @@ void Working::loadStaff()
 
 void Working::newSale(int type)
 {
-    WOrder *w = new WOrder(fUser, type, this);
+    WOrder *w = new WOrder(fUser, type, fCustomerDisplay, this);
     QObjectList ol = w->children();
     for (QObject *o: ol) {
         auto wd = dynamic_cast<QWidget*>(o);
@@ -541,6 +552,31 @@ void Working::threadMessageData(int code, const QVariant &data)
                     DlgSplashScreen().updateData();
                 }
                 return;
+            case MSG_PRINT_RECEIPT: {
+                QString orderid = jjm["usermessage"].toString();
+                PrintReceiptGroup p;
+                C5Database db(__c5config.replicaDbParams());
+                switch (C5Config::shopPrintVersion()) {
+                case 1: {
+                    bool p1, p2;
+                    if (SelectPrinters::selectPrinters(p1, p2)) {
+                        if (p1) {
+                            p.print(orderid, db, 1);
+                        }
+                        if (p2) {
+                            p.print(orderid, db, 2);
+                        }
+                    }
+                    break;
+                }
+                case 2:
+                    p.print2(orderid, db);
+                    break;
+                default:
+                    break;
+                }
+                break;
+            }
             default:
                 break;
             }
@@ -721,6 +757,10 @@ void Working::on_btnItemBack_clicked()
 
 void Working::on_tab_currentChanged(int index)
 {
+    auto *wo = worder();
+    if (wo) {
+        wo->updateCustomerDisplay(fCustomerDisplay);
+    }
     C5LogSystem::writeEvent(QString("%1 #%2").arg(tr("Current window")).arg(index + 1));
 }
 
@@ -842,7 +882,7 @@ void Working::on_btnNewWhosale_clicked()
 
 void Working::on_btnGoodsList_clicked()
 {
-    auto *dg = new DlgGoodsList(worder()->currency());
+    auto *dg = new DlgGoodsList(C5Config::getValue(param_default_currency).toInt());
     connect(dg, &DlgGoodsList::getGoods, this, &Working::getGoods);
     dg->showMaximized();
 }
@@ -920,5 +960,59 @@ void Working::on_btnClientConfigQR_clicked()
     WOrder *wo = static_cast<WOrder*>(ui->tab->currentWidget());
     if (wo) {
         wo->imageConfig();
+    }
+}
+
+void Working::on_btnGiftCard_clicked()
+{
+    WOrder *wo = static_cast<WOrder*>(ui->tab->currentWidget());
+    if (wo->rowCount() > 0) {
+        C5Message::error(tr("The gift card must saled separately"));
+        return;
+    }
+    DlgGiftCardSale d(__c5config.replicaDbParams());
+    if (d.exec() == QDialog::Accepted) {
+        int row = wo->addGoodsToTable(d.fGiftGoodsId);
+        wo->changePrice(d.fGiftPrice);
+        wo->fSaleType = -1;
+    }
+}
+
+void Working::on_btnCostumerDisplay_clicked(bool checked)
+{
+    QSettings s(_ORGANIZATION_, _APPLICATION_+ QString("\\") + _MODULE_);
+    if (fCustomerDisplay) {
+        s.setValue("customerdisplay", false);
+        fCustomerDisplay->deleteLater();
+        fCustomerDisplay = nullptr;
+    } else {
+        s.setValue("customerdisplay", true);
+        fCustomerDisplay = new WCustomerDisplay();
+        if (qApp->desktop()->screenCount() > 1) {
+            fCustomerDisplay->move(qApp->desktop()->screenGeometry(1).x(), qApp->desktop()->screenGeometry(1).y());
+            fCustomerDisplay->showMaximized();
+            fCustomerDisplay->showFullScreen();
+        } else {
+            fCustomerDisplay->showFullScreen();
+        }
+    }
+    auto *wo = worder();
+    if (wo) {
+        wo->updateCustomerDisplay(fCustomerDisplay);
+    }
+}
+
+void Working::on_btnPreorder_clicked()
+{
+    if (DlgPreorder(this).exec() == QDialog::Accepted) {
+
+    }
+}
+
+void Working::on_btnOpenDraft_clicked()
+{
+    C5TempSale t;
+    if (t.exec() == QDialog::Accepted) {
+        t.openDraft(worder());
     }
 }

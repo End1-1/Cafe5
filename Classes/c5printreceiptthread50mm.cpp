@@ -31,7 +31,8 @@ void C5PrintReceiptThread50mm::print()
     __translator.initTranslator(fDbParams);
     __translator.setLanguage(fHeader["f_receiptlanguage"].toString().toInt());
     QFont font(qApp->font());
-    font.setPointSize(19);
+    int basesize = 22;
+    font.setPointSize(basesize);
     C5Printing p;
     p.setSceneParams(fPaperWidth, 2800, QPrinter::Portrait);
     p.setFont(font);
@@ -42,12 +43,12 @@ void C5PrintReceiptThread50mm::print()
     p.ctext(__translator.tt(tr("Receipt #")) + QString("%1%2").arg(fHeader["f_prefix"].toString()).arg(fHeader["f_hallid"].toString()));
     p.br();
     if (fHeader["f_otherid"].toString().toInt() == PAYOTHER_PRIMECOST) {
-        p.setFontSize(22);
+        p.setFontSize(basesize + 2);
         p.setFontBold(true);
         p.ctext(__translator.tt(tr("Breakfast")));
         p.br();
         p.br(4);
-        p.setFontSize(19);
+        p.setFontSize(basesize);
         p.setFontBold(false);
     }
     p.setFontBold(false);
@@ -209,7 +210,7 @@ void C5PrintReceiptThread50mm::print()
         p.br();
     }
 
-    p.setFontSize(22);
+    p.setFontSize(basesize + 2);
     if (!fHeader["f_other_room"].toString().isEmpty()) {
         p.br();
         p.ctext(__translator.tt(tr("Transfer to room")));
@@ -238,7 +239,7 @@ void C5PrintReceiptThread50mm::print()
         p.br(p.fLineHeight * 2);
     }
 
-    p.setFontSize(19);
+    p.setFontSize(basesize);
     p.setFontBold(true);
     p.ltext(__translator.tt(tr("Thank you for visit!")), 0);
     p.br();

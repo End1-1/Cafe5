@@ -92,6 +92,7 @@ void DlgDataOnline::refresh()
     fTableModel->setCheckboxes(true);
     fTableModel->setSingleCheckBoxSelection(!fMultipleSelection);
     fTableModel->execQuery(fQuery);
+    ui->tableView->resizeColumnsToContents();
     ui->tableView->setColumnWidth(0, 25);
 }
 

@@ -7,6 +7,7 @@
 #include "cr5goodsfilter.h"
 #include "c5changepriceofgroup.h"
 #include "c5goodspricing.h"
+#include "c5storebarcode.h"
 #include <math.h>
 #include <QFile>
 
@@ -138,6 +139,7 @@ CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
     restoreColumnsVisibility();
     fEditor = new CE5Goods(dbParams);
     fFilterWidget = new CR5GoodsFilter(dbParams);
+    fFilter = static_cast<CR5GoodsFilter*>(fFilterWidget);
 }
 
 QToolBar *CR5Goods::toolBar()
@@ -157,6 +159,7 @@ QToolBar *CR5Goods::toolBar()
             fToolBar->addAction(QIcon(":/dress.png"), tr("Group price"), this, SLOT(groupPrice()));
             fToolBar->addAction(QIcon(":/scales.png"), tr("Scales"), this, SLOT(exportToScales()));
             fToolBar->addAction(QIcon(":/delete.png"), tr("Remove"), this, SLOT(deleteGoods()));
+            fToolBar->addAction(QIcon(":/barcode.png"), tr("Print\nbarcode"), this, SLOT(printBarCodes()));
     }
     return fToolBar;
 }
@@ -239,6 +242,17 @@ void CR5Goods::groupPrice()
         C5Database db(dbParams());
         QString query = "update c_goods set " + p1 + (p1.length() > 0 && p2.length() > 0? "," : "") + p2 + " where f_id in (" + codes + ")";
         db.exec(query);
+        if (price1 > 0.0001) {
+            p1 = " f_price1=" + QString::number(price1, 'f', 2);
+        }
+        if (price2 > 0.0001) {
+            p2 = " f_price2=" + QString::number(price2, 'f', 2);
+        }
+        query = "update c_goods_prices set "
+                + p1 + (p1.length() > 0 && p2.length() > 0? "," : "")
+                + p2
+                + " where f_currency=1 and f_goods in (" + codes + ")";
+        db.exec(query);
         C5Message::tr("Done");
     }
 }
@@ -295,22 +309,6 @@ void CR5Goods::exportToScales()
                              QString("0"), db.getString("f_scancode"), name,
                              QString::fromUtf8("вес."), QString("0"));
                 dbo.exec(sql);
-//                dbo[":ID"] = db.getString("f_scancode").toInt();
-//                dbo[":PLU"] = db.getString("f_scancode").toInt();
-//                dbo[":Status"] = 0;
-//                dbo[":LabelNo"] = 0;
-//                dbo[":BarcodeNo"] = 0;
-//                dbo[":Prefix"] = "0";
-//                dbo[":Price"] = float_str(db.getDouble("f_saleprice"), 1);
-//                dbo[":Tare"] = 0;
-//                dbo[":Code"] = 0;
-//                dbo[":DuringDate"] = 0;
-//                dbo[":Group"] = 0;
-//                dbo[":Barcode"] = db.getString("f_scancode");
-//                dbo[":RVTName"] = "ANMME"; //db.getString("f_name");
-//                dbo[":Type"] = "ves."; //QString::fromUtf8("  ");
-//                dbo[":LiteDuringDate"] = 0;
-//                dbo.insert("Products", false);
             }
             C5Message::info(tr("Done"));
         } else {
@@ -363,5 +361,21 @@ void CR5Goods::deleteGoods()
         //refreshData();
     } else {
         C5Message::error(db.fLastError);
+    }
+}
+
+void CR5Goods::printBarCodes()
+{
+    C5Database db(fDBParams);
+    db[":f_id"] = fFilter->currency();
+    db.exec("select f_symbol from e_currency where f_id=:f_id");
+    db.nextRow();
+    QString s = db.getString("f_symbol");
+    C5StoreBarcode *b = __mainWindow->createTab<C5StoreBarcode>(fDBParams);
+    b->fCurrencyName = s;
+    for (int i = 0; i < fModel->rowCount(); i++) {
+        b->addRow(fModel->data(i, fModel->indexForColumnName("f_goods"), Qt::EditRole).toString(),
+                  fModel->data(i, fModel->indexForColumnName("f_scancode"), Qt::EditRole).toString(),
+                  1, fFilter->currency());
     }
 }

@@ -31,6 +31,15 @@ CashCollection::CashCollection() :
     if (db.nextRow()) {
         ui->leAmountCard->setDouble(db.getDouble("f_amount"));
     }
+    db[":f_datecash"] = QDate::currentDate();
+    db[":f_state"] = ORDER_STATE_CLOSE;
+    db[":f_hall"] = __c5config.defaultHall();
+    db.exec("select sum(f_amountprepaid) as f_amountprepaid "
+            "from o_header h "
+            "where h.f_datecash=:f_datecash and h.f_state=:f_state ");
+    if (db.nextRow()) {
+        ui->leAmountPrepaid->setDouble(db.getDouble("f_amountprepaid"));
+    }
 }
 
 CashCollection::~CashCollection()
@@ -72,7 +81,7 @@ void CashCollection::on_btnSave_clicked()
     QString cashdocid;
     if (!dw.writeAHeader(cashdocid, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH, __user->id(),
                          QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, ui->leAmount->getDouble(),
-                         ui->lePurpose->text())) {
+                         ui->lePurpose->text(), __c5config.getValue(param_default_currency).toInt())) {
         db.rollback();
         C5Message::error(dw.fErrorMsg);
         return;
