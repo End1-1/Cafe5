@@ -24,9 +24,10 @@ INNER JOIN c_goods g ON g.f_id=gp.f_goods
 WHERE g.f_enabled=1 and gp.f_currency=1
 
 ==========
-sq_data_sales_drafts_headers>> select dr.f_id, dr.f_date as `Ամսաթիվ`, dr.f_time as `Ժամ`, dr.f_amount as `Գումար`
-from o_draft_sale dr
-where dr.f_staff=:f_staff and dr.f_state=1
+sq_data_sales_drafts_headers>> select dr.f_id, dr.f_date as `Ամսաթիվ`, dr.f_time as `Ժամ`, p.f_taxname as `Գործընկեր`, dr.f_amount as `Գումար` "
+"from o_draft_sale dr "
+"left join c_partners p on p.f_id=dr.f_partner "
+"where dr.f_staff=:f_staff and dr.f_state=1
 
 ==========
 sq_data_open_draft_body>>

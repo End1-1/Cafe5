@@ -52,7 +52,7 @@ void C5Permissions::init(C5Database &db, int group)
               << cp_t3_sale_dishes
               << cp_t3_sale_from_store_total
               << cp_t3_discount_statistics
-              << cp_t3_debts_to_partners
+              << cp_t3_debts
               << cp_t3_consuption_reason
               << cp_t3_car_visits
               << cp_t3_preorders
@@ -136,14 +136,14 @@ void C5Permissions::init(C5Database &db, int group)
               << cp_t7_store_reason
               << cp_t7_partners
               << cp_t7_order_marks
+              << cp_t7_route
+              << cp_t7_route_exec
 
               << cp_t8_cash
               << cp_t8_cash_doc
               << cp_t8_cash_common_report
               << cp_t8_cash_detailed_report
               << cp_t8_cash_names
-              << cp_t8_costumer_debts
-              << cp_t8_costumer_debts_pay
               << cp_t8_cash_movement
               << cp_t8_currency
               << cp_t8_edit_currency

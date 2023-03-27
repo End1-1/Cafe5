@@ -25,7 +25,11 @@ void C5TableModel::execQuery(const QString &query)
     beginResetModel();
     clearModel();
     C5Database db(fDBParams);
-    if (db.exec(query, fRawData, fColumnNameIndex)) {
+    QStringList queries = query.split(";", Qt::SkipEmptyParts);
+    for (int i = 0; i < queries.count() - 1; i++) {
+        db.exec(queries.at(i));
+    }
+    if (db.exec(queries.last(), fRawData, fColumnNameIndex)) {
         for (int i = 0, count = fRawData.count(); i < count; i++) {
             if (fCheckboxes) {
                 fRawData[i].insert(0, QVariant());

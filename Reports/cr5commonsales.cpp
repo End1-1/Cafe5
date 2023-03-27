@@ -25,6 +25,7 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
                     << "left join h_tables ht on ht.f_id=oh.f_table [ht]"
                     << "left join o_header_flags ohf on ohf.f_id=oh.f_id [ohf]"
                     << "left join s_user w on w.f_id=oh.f_staff [w]"
+                    << "left join s_user ww on ww.f_id=oh.f_cashier [ww]"
                     << "left join o_state os on os.f_id=oh.f_state [os]"
                     << "left join o_tax ot on ot.f_id=oh.f_id [ot]"
                     << "left join c_partners cpb on cpb.f_id=oh.f_partner [cpb]"
@@ -37,6 +38,7 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
                    << "dayofweek(oh.f_datecash) as f_dayofweek"
                    << "hl.f_name as f_hallname"
                    << "ht.f_name as f_tablename"
+                   << "concat_ws(' ', w.f_last, w.f_first) as f_cashier"
                    << "concat(w.f_last, ' ', w.f_first) as f_staff"
                    << "oh.f_dateopen"
                    << "oh.f_timeopen"
@@ -52,7 +54,9 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
                    << "sum(oh.f_amountbank) as f_amountbank"
                    << "sum(oh.f_amountother) as f_amountother"
                    << "sum(oh.f_amountidram) as f_amountidram"
+                   << "sum(oh.f_amounttelcell) as f_amounttelcell"
                    << "sum(oh.f_amountpayx) as f_amountpayx"
+                   << "sum(oh.f_amountdebt) as f_amountdebt"
                    << "sum(oh.f_amountprepaid) as f_amountprepaid"
                    << "sum(oh.f_hotel) as f_hotel"
                    << "oh.f_amountservice"
@@ -76,6 +80,7 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
                    << "oh.f_amountdiscount"
                    << "cpb.f_taxname as f_buyer"
                    << "cpb.f_taxcode as f_buyertaxcode"
+                   << "concat_ws(' ', w.f_last, w.f_first) as f_cashier"
                    << "concat(w.f_last, ' ', w.f_first) as f_staff"
                    << "oh.f_comment"
                       ;
@@ -88,8 +93,10 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
                 << "f_amountidram"
                 << "f_amountpayx"
                 << "f_amountservice"
+                << "f_amounttelcell"
                 << "f_amountdiscount"
                 << "f_amountprepaid"
+                << "f_amountdebt"
                 << "f_hotel"
                 << "f_count"
                       ;
@@ -99,6 +106,7 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
 
     fTranslation["f_prefix"] = tr("Head");
     fTranslation["f_id"] = tr("Code");
+    fTranslation["f_cashier"] = tr("Cashier");
     fTranslation["f_staff"] = tr("Staff");
     fTranslation["f_statename"] = tr("State");
     fTranslation["f_dateopen"] = tr("Open date");
@@ -108,6 +116,8 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_datecash"] = tr("Date, cash");
     fTranslation["f_dayofweek"] = tr("Day of week");
     fTranslation["f_hallname"] = tr("Hall");
+    fTranslation["f_amountdebt"] = tr("Debt");
+    fTranslation["f_amounttelcell"] = tr("Telcell");
     fTranslation["f_buyer"] = tr("Buyer");
     fTranslation["f_receiptnumber"] = tr("Tax");
     fTranslation["f_buyertaxcode"] = tr("Buyer taxcode");
@@ -141,8 +151,11 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
     fColumnsVisible["oh.f_dateclose"] = false;
     fColumnsVisible["oh.f_timeopen"] = false;
     fColumnsVisible["oh.f_timeclose"] = false;
+    fColumnsVisible["sum(oh.f_amountdebt) as f_amountdebt"] = false;
+    fColumnsVisible["sum(oh.f_amounttelcell) as f_amounttelcell"] = false;
     fColumnsVisible["cpb.f_taxname as f_buyer"] = false;
     fColumnsVisible["cpb.f_taxcode as f_buyertaxcode"] = false;
+    fColumnsVisible["concat_ws(' ', w.f_last, w.f_first) as f_cashier"] = false;
     fColumnsVisible["concat(w.f_last, ' ', w.f_first) as f_staff"] = false;
     fColumnsVisible["sum(oh.f_amounttotal) as f_amounttotal"] = true;
     fColumnsVisible["sum(oh.f_amountcash) as f_amountcash"] = true;
@@ -778,7 +791,7 @@ void CR5CommonSales::templates()
     C5DlgSelectReportTemplate d(reporttemplate_commonsales, fDBParams);
     if (d.exec() == QDialog::Accepted) {
         QString condition;
-        QHash<QString, bool> showColumns = fColumnsVisible;
+        QMap<QString, bool> showColumns = fColumnsVisible;
         fColumnsVisible.clear();
         if (C5GridGilter::filter(fFilterWidget, condition, fColumnsVisible, fTranslation)) {
             QString sql = d.fSelectedTemplate.sql;

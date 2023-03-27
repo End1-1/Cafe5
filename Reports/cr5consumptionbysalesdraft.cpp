@@ -14,7 +14,7 @@
 #include "c5storedoc.h"
 #include <QInputDialog>
 
-static const int col_goodsid = 0;
+static const int col_goods = 0;
 static const int col_goodsgroup = 1;
 static const int col_goodsname = 2;
 static const int col_goodscode = 3;
@@ -39,7 +39,7 @@ CR5ConsumptionBySalesDraft::CR5ConsumptionBySalesDraft(const QStringList &dbPara
     fIcon = ":/goods.png";
     fLabel = tr("Consumption of goods base on sales, draft");
 
-    fColumnNameIndex["f_goodsid"] = col_goodsid;
+    fColumnNameIndex["f_goods"] = col_goods;
     fColumnNameIndex["f_goodsgroup"] = col_goodsgroup;
     fColumnNameIndex["f_goodsname"] = col_goodsname;
     fColumnNameIndex["f_goodscode"] = col_goodscode;
@@ -73,7 +73,7 @@ CR5ConsumptionBySalesDraft::CR5ConsumptionBySalesDraft(const QStringList &dbPara
                 << "f_qtydiff"
                 << "f_prdiff";
 
-    fTranslation["f_goodsid"] = tr("Goods code");
+    fTranslation["f_goods"] = tr("Goods code");
     fTranslation["f_goodsgroup"] = tr("Group");
     fTranslation["f_goodsname"] = tr("Goods name");
     fTranslation["f_goodscode"] = tr("Scancode");
@@ -354,7 +354,7 @@ QString CR5ConsumptionBySalesDraft::documentForInventory()
     }
     if (result.isEmpty()) {
         C5StoreDraftWriter dw(db);
-        dw.writeAHeader(result, QString::number(dw.counterAType(DOC_TYPE_STORE_INVENTORY)), DOC_STATE_SAVED, DOC_TYPE_STORE_INVENTORY, __user->id(), f->date2(), QDate::currentDate(), QTime::currentTime(), 0, 0, tr("Created automaticaly"), __c5config.getValue(param_default_currency).toInt());
+        dw.writeAHeader(result, QString::number(dw.counterAType(DOC_TYPE_STORE_INVENTORY)), DOC_STATE_SAVED, DOC_TYPE_STORE_INVENTORY, __user->id(), f->date2(), QDate::currentDate(), QTime::currentTime(), 0, 0, tr("Created automaticaly"), 0, __c5config.getValue(param_default_currency).toInt());
     }
     return result;
 }
@@ -371,7 +371,7 @@ void CR5ConsumptionBySalesDraft::countRowQty(int row)
 
 void CR5ConsumptionBySalesDraft::setPriceVisible(int mode)
 {
-    fColumnsVisible["f_goodsid"] = true;
+    fColumnsVisible["f_goods"] = true;
     fColumnsVisible["f_goodsgroup"] = true;
     fColumnsVisible["f_goodsname"] = true;
     fColumnsVisible["f_goodscode"] = false;
@@ -474,40 +474,38 @@ void CR5ConsumptionBySalesDraft::makeOutput(bool v)
             qty = rows[i][col_qtydiff].toDouble();
         }
         if (qty > 0.0001) {
-            goodsOver[rows[i][col_goodsid].toInt()] = qty;
+            goodsOver[rows[i][col_goods].toInt()] = qty;
         }
         if (qty  < -0.0001) {
-            goodsLost[rows[i][col_goodsid].toInt()] = qty * -1;
+            goodsLost[rows[i][col_goods].toInt()] = qty * -1;
         }
     }
     if (goodsSale.count() > 0) {
-        QList<IGoods> gl;
+        QList<OGoods> gl;
         for (QMap<int, double>::const_iterator it = goodsSale.begin(); it != goodsSale.end(); it++) {
-            IGoods g;
-            g.goodsId = it.key();
-            g.goodsQty = it.value();
+            OGoods g;
+            g.goods = it.key();
+            g.qty = it.value();
             gl.append(g);
         }
         writeDocs(DOC_TYPE_STORE_OUTPUT, DOC_REASON_SALE, gl, tr("Sale"));
     }
     if (goodsLost.count() > 0) {
-        QList<IGoods> gl;
+        QList<OGoods> gl;
         for (QMap<int, double>::const_iterator it = goodsLost.constBegin(); it != goodsLost.constEnd(); it++) {
-            IGoods g;
-            g.goodsId = it.key();
-            g.goodsQty = it.value();
-            g.goodsPrice = 0;
-            g.goodsTotal = 0;
+            OGoods g;
+            g.goods = it.key();
+            g.qty = it.value();
             gl.append(g);
         }
         writeDocs(DOC_TYPE_STORE_OUTPUT, DOC_REASON_LOST, gl, tr("Lost"));
     }
     if (goodsOver.count() > 0) {
-        QList<IGoods> gl;
+        QList<OGoods> gl;
         for (QMap<int, double>::const_iterator it = goodsOver.begin(); it != goodsOver.end(); it++) {
-            IGoods g;
-            g.goodsId = it.key();
-            g.goodsQty = it.value();
+            OGoods g;
+            g.goods = it.key();
+            g.qty = it.value();
             gl.append(g);
         }
         C5StoreDoc *sd = writeDocs(DOC_TYPE_STORE_INPUT, DOC_REASON_OVER, gl, tr("Over"));
@@ -525,15 +523,15 @@ void CR5ConsumptionBySalesDraft::salesOutput(bool v)
     for (int i = 0; i < rows.count(); i++) {
         double qty = rows[i][col_qtysale].toDouble();
         if (qty > 0.0001) {
-            goodsSale[rows[i][col_goodsid].toInt()] = qty;
+            goodsSale[rows[i][col_goods].toInt()] = qty;
         }
     }
     if (goodsSale.count() > 0) {
-        QList<IGoods> gl;
+        QList<OGoods> gl;
         for (QMap<int, double>::const_iterator it = goodsSale.begin(); it != goodsSale.end(); it++) {
-            IGoods g;
-            g.goodsId = it.key();
-            g.goodsQty = it.value();
+            OGoods g;
+            g.goods = it.key();
+            g.qty = it.value();
             gl.append(g);
         }
         writeDocs(DOC_TYPE_STORE_OUTPUT, DOC_REASON_SALE, gl, tr("Sale"));
@@ -585,7 +583,7 @@ void CR5ConsumptionBySalesDraft::changeOutputStore()
     delete d;
 }
 
-C5StoreDoc *CR5ConsumptionBySalesDraft::writeDocs(int doctype, int reason, const QList<IGoods> &data, const QString &comment)
+C5StoreDoc *CR5ConsumptionBySalesDraft::writeDocs(int doctype, int reason, const QList<OGoods> &data, const QString &comment)
 {
     C5Database db(fDBParams);
     C5StoreDraftWriter dw(db);
@@ -609,21 +607,21 @@ C5StoreDoc *CR5ConsumptionBySalesDraft::writeDocs(int doctype, int reason, const
     QString documentId;
     QString cashid, cashrowid;
     dw.writeAHeader(documentId, dw.storeDocNum(doctype, store, true, 0), DOC_STATE_DRAFT, doctype, __user->id(), docDate,
-                    QDate::currentDate(), QTime::currentTime(), 0, 0, comment, __c5config.getValue(param_default_currency).toInt());
+                    QDate::currentDate(), QTime::currentTime(), 0, 0, comment, 0, __c5config.getValue(param_default_currency).toInt());
     if (storein > 0) {
         C5Document c5doc(fDBParams);
         QString purpose = tr("Store input, correction") + QDate::currentDate().toString(FORMAT_DATE_TO_STR);
         QString cashUserId = QString("%1").arg(c5doc.genNumber(DOC_TYPE_CASH), C5Config::docNumDigitsInput(), 10, QChar('0'));
         dw.writeAHeader(cashid, cashUserId, DOC_STATE_DRAFT, DOC_TYPE_CASH, __user->id(), QDate::currentDate(),
-                        QDate::currentDate(), QTime::currentTime(), 0, 0, purpose, __c5config.getValue(param_default_currency).toInt());
+                        QDate::currentDate(), QTime::currentTime(), 0, 0, purpose, 0, __c5config.getValue(param_default_currency).toInt());
         dw.writeAHeaderCash(cashid, 0, 0, 1, documentId, "", 0);
         dw.writeECash(cashrowid, cashid, 0, -1, purpose, 0, cashrowid, 1);
     }
     dw.writeAHeaderStore(documentId, __user->id(), __user->id(), "", QDate(), storein, storeout, 0, cashid, 0, 0, "");
     int rownum = 1;
-    foreach (const IGoods &g, data) {
+    foreach (const OGoods &g, data) {
         QString sdid;
-        dw.writeAStoreDraft(sdid, documentId, store, sdtype, g.goodsId, g.goodsQty, g.goodsPrice, g.goodsPrice * g.goodsQty, reason, "", rownum++, "");
+        dw.writeAStoreDraft(sdid, documentId, store, sdtype, g.goods, g.qty, g.price, g.price * g.qty, reason, "", rownum++, "");
     }
     //= dw.writeDraft(docDate, doctype, store, reason, data, comment);
     auto *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);

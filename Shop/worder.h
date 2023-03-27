@@ -2,6 +2,10 @@
 #define WORDER_H
 
 #include "c5database.h"
+#include "c5dbrecord.h"
+#include "bhistory.h"
+#include "oheader.h"
+#include "ogoods.h"
 #include <QWidget>
 #include <QDate>
 #include <QTime>
@@ -24,15 +28,13 @@ public:
 
     ~WOrder();
 
-    int fSaleType;
-
-    QString fOrderUUID;
-
     QString fDraftSale;
 
-    void updateCustomerDisplay(WCustomerDisplay *cd);
+    OHeader fOHeader;
 
-    void setPrepaid(double p);
+    void setPrepaidAmount(double amountPrepaid);
+
+    void updateCustomerDisplay(WCustomerDisplay *cd);
 
     void clearCode();
 
@@ -41,10 +43,6 @@ public:
     void keyPlus();
 
     void keyAsterix();
-
-    void focusCash();
-
-    void focusCard();
 
     void focusTaxpayerId();
 
@@ -80,11 +78,11 @@ public:
 
     void countTotal();
 
-    void openPreorder(const QByteArray &id);
-
     void setDiscount(const QString &label, const QString &value);
 
     bool setQtyOfRow(int row, double qty);
+
+    bool setPriceOfRow(int row, double price);
 
     C5ClearTableWidget *table();
 
@@ -97,26 +95,18 @@ private slots:
 
     void on_btnRemove_clicked();
 
-    void on_leCash_textChanged(const QString &arg1);
-
     void on_leCode_textChanged(const QString &arg1);
 
     void on_leCode_returnPressed();
 
     void on_leCustomerTaxpayerId_returnPressed();
 
-    void on_leCard_textChanged(const QString &arg1);
-
-    void on_leAdvance_textChanged(const QString &arg1);
+    void on_btnSearchPartner_clicked();
 
 private:
     Ui::WOrder *ui;
 
     C5User *fUser;
-
-    QDate fDateOpen;
-
-    QTime fTimeOpen;
 
     Working *fWorking;
 
@@ -124,13 +114,9 @@ private:
 
     int fGiftCard;
 
-    int fCardId;
+    BHistory fBHistory;
 
-    int fCardMode;
-
-    double fCardValue;
-
-    int fPartner;
+    QVector<OGoods> fOGoods;
 
     QByteArray fPreorderUUID;
 

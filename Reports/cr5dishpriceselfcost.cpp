@@ -39,11 +39,13 @@ void CR5DishPriceSelfCost::buildQuery()
 void CR5DishPriceSelfCost::buildQueryV1()
 {
     fTableView->clearSpans();
-    fSqlQuery = "select d.f_id, p2.f_name as f_part, d.f_name, sum(r.f_qty*r.f_price) as f_selfcost "
+    fSqlQuery = "select d.f_id, p2.f_name as f_part, d.f_name, scf.f_selfcost "
                 "from d_recipes r "
                 "left join d_dish d on d.f_id=r.f_dish "
                 "left join d_part2 p2 on p2.f_id=d.f_part "
                 "left join d_menu m on m.f_dish=d.f_id "
+                "left join (select rr.f_dish, sum(rr.f_qty*gg.f_lastinputprice) as f_selfcost from d_recipes rr "
+                "left join c_goods gg on gg.f_id=rr.f_goods group by 1) scf on scf.f_dish=r.f_dish "
                 "where d.f_id>0 ";
     switch (fFilter->menuState()) {
     case 0:
@@ -119,7 +121,7 @@ void CR5DishPriceSelfCost::buildQueryV2()
     fModel->insertColumn(7, tr("Price"));
     fModel->insertColumn(8, tr("Cost"));
     C5Database db(fDBParams);
-    QString query = "select r.f_goods, g.f_name, r.f_qty, u.f_name, r.f_price, r.f_price*r.f_qty, r.f_dish "
+    QString query = "select r.f_goods, g.f_name, r.f_qty, u.f_name, g.f_lastinputprice, g.f_lastinputprice*r.f_qty, r.f_dish "
             "from d_recipes r "
             "left join c_goods g on g.f_id=r.f_goods "
             "left join c_units u on u.f_id=g.f_unit "

@@ -15,7 +15,11 @@ public:
     explicit CR5ReportsFilter(const QStringList &dbParams, QWidget *parent = nullptr);
     ~CR5ReportsFilter();
 
+    void setFields(const QStringList &cache);
+
     virtual QString condition() override;
+
+    QString replacement();
 
     QString d1();
 
@@ -23,6 +27,8 @@ public:
 
 private:
     Ui::CR5ReportsFilter *ui;
+
+    QMap<int, C5LineEditWithSelector*> fCache;
 };
 
 #endif // CR5REPORTSFILTER_H

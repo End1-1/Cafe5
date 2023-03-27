@@ -44,7 +44,7 @@ double C5LineEdit::getDouble()
 {
     QString t = text();
     t.replace(mLocale.groupSeparator(), "");
-    double d = mLocale.toDouble(text());
+    double d = mLocale.toDouble(t);
     return d;
 }
 

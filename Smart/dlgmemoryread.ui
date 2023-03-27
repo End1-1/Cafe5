@@ -57,6 +57,19 @@
        </spacer>
       </item>
       <item>
+       <widget class="QPushButton" name="btnOpen_2">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>50</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Last 24 hourse</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="btnReprint">
         <property name="minimumSize">
          <size>

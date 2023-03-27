@@ -1,4 +1,3 @@
-delete from a_dc;
 delete from a_header_cash;
 delete from a_header_store;
 delete from a_complectation_additions;

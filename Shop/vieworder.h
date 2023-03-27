@@ -2,19 +2,21 @@
 #define VIEWORDER_H
 
 #include "c5dialog.h"
+#include "oheader.h"
 
 namespace Ui {
 class ViewOrder;
 }
 
 class C5Database;
+class Working;
 
 class ViewOrder : public C5Dialog
 {
     Q_OBJECT
 
 public:
-    explicit ViewOrder(const QString &order);
+    explicit ViewOrder(Working *w, const QString &order);
 
     ~ViewOrder();
 
@@ -43,16 +45,18 @@ private slots:
 
     void on_btnPrintReceiptA4_clicked();
 
+    void on_btnMakeDraft_clicked();
+
 private:
     Ui::ViewOrder *ui;
 
-    int fSaleType;
-
-    int fPartner;
+    OHeader fOHeader;
 
     QString fSaleDoc;
 
     QString fUuid;
+
+    Working *fWorking;
 
     void returnFalse(const QString &msg, C5Database *db);
 };

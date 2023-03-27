@@ -94,12 +94,20 @@ void createQrDiscount(RawMessage &rm, Database &db, const QByteArray &in, Waiter
     rm.readUByte(protocol, in);
     rm.readString(phone, in);
     qDebug() << "Create QrDiscount" << phone;
+
+    db[":f_phone"] = phone;
+    db.exec("select * from c_partners where f_phone=:f_phone");
+    if (db.next() == false) {
+        rm.putUByte(0);
+        rm.putString(ntr("Please, contact system administrator", ntr_am));
+        return;
+    }
     QString qr = db.uuid();
     db[":f_mode"] = 7;
     db[":f_value"] = 0.1;
     db[":f_code"] = qr;
     db[":f_client"] = 1;
-    db[":f_createdby"] = w->fUserId;
+    db[":f_createdby"] = db.integer("f_id");
     db[":f_datestart"] = QDate::currentDate();
     db[":f_dateend"] = QDate::currentDate().addDays(365);
     db[":f_active"] = 1;
@@ -171,6 +179,25 @@ void checkBonuses(RawMessage &rm, Database &db, const QByteArray &in, WaiterConn
     QString phone;
     rm.readString(phone, in);
     qDebug() << "Check bonuses" << phone;
-    rm.putUByte(0);
-    rm.putString(ntr("Phone is not registered", ntr_am));
+
+    db[":f_phone"] = phone;
+    db.exec("select * from c_partners where f_phone=:f_phone");
+    if (db.next() == false) {
+        rm.putUByte(0);
+        rm.putString(ntr("Please, contact system administrator", ntr_am));
+        return;
+    }
+    db[":f_createdby"] = db.integer("f_id");
+    db.exec("select sum(oh.f_amounttotal/1000) "
+            "from b_history bh "
+            "left join b_cards_discount bc on bc.f_id=bh.f_card "
+            "left join o_header oh on oh.f_id=bh.f_id "
+            "where bc.f_createdby=:f_createdby ");
+    db.next();
+    int bonus = db.integer(0);
+    rm.putUByte(bonus);
+    return;
+
+//    rm.putUByte(0);
+//    rm.putString(ntr("Phone is not registered", ntr_am));
 }

@@ -164,7 +164,6 @@ void CR5Databases::resetDatabase()
             db.exec("delete from op_body");
             db.exec("delete from op_header");
             db.exec("delete from a_calc_price");
-            db.exec("delete from a_dc");
             db.exec("delete from a_complectation_additions");
             db.exec("delete from a_header_shop2partner");
             db.exec("delete from a_header_shop2partneraccept");

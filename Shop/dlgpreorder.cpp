@@ -235,6 +235,6 @@ void DlgPreorder::on_btnCreateSale_clicked()
         fWorking->worder()->changeQty(str_float(ui->tgoods->item(i, 4)->text()));
         fWorking->worder()->changePrice(str_float(ui->tgoods->item(i, 5)->text()));
     }
-    fWorking->worder()->setPrepaid(ui->lePrepaidCart->getDouble() + ui->lePrepaidCash->getDouble());
+    fWorking->worder()->setPrepaidAmount(ui->lePrepaidCart->getDouble() + ui->lePrepaidCash->getDouble());
     accept();
 }

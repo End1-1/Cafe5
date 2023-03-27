@@ -13,16 +13,21 @@
 #include "printtaxn.h"
 #include "printreceiptgroup.h"
 #include "c5printtaxanywhere.h"
+#include "worder.h"
 #include "selectprinters.h"
+#include "removeshopsale.h"
 #include "dlggetidname.h"
 #include <QClipboard>
 #include "c5printrecipta4.h"
 #include "dlgdate.h"
+#include "working.h"
 #include "sslsocket.h"
+#include "ogoods.h"
 
-ViewOrder::ViewOrder(const QString &order) :
+ViewOrder::ViewOrder(Working *w, const QString &order) :
     C5Dialog(__c5config.dbParams()),
-    ui(new Ui::ViewOrder)
+    ui(new Ui::ViewOrder),
+    fWorking(w)
 {
     ui->setupUi(this);
     fUuid = order;
@@ -38,8 +43,8 @@ ViewOrder::ViewOrder(const QString &order) :
     if (db.nextRow()) {
         ui->leOrderNum->setText(QString("%1%2").arg(db.getString("f_prefix")).arg(db.getInt("f_hallid")));
         ui->leAmount->setDouble(db.getDouble("f_amounttotal"));
-        fSaleType = db.getInt("f_saletype");
-        fPartner = db.getInt("f_partner");
+        fOHeader.saleType = db.getInt("f_saletype");
+        fOHeader.partner = db.getInt("f_partner");
         fSaleDoc = QString("%1%2, %3").arg(db.getString("f_prefix")).arg(db.getString("f_hallid")).arg(db.getDate("f_datecash").toString(FORMAT_DATE_TO_STR));
         ui->leDate->setDate(db.getDate("f_datecash"));
         ui->leTime->setText(db.getTime("f_timeclose").toString("HH:mm"));
@@ -155,24 +160,23 @@ void ViewOrder::on_btnReturn_clicked()
         return;
     }
 
-    QString headerPrefix;
-    int headerId;
-    if (!dw.hallId(headerPrefix, headerId, __c5config.defaultHall())) {
+    QString err;
+    OHeader oheader;
+    if (!dw.hallId(oheader.prefix, oheader.hallId, __c5config.defaultHall())) {
         return returnFalse(dw.fErrorMsg, &db);
     }
-    QString oheaderid;
-    if (!dw.writeOHeader(oheaderid, headerId, headerPrefix, ORDER_STATE_CLOSE,
-                         __c5config.defaultHall(),
-                         __c5config.defaultTable(),
-                         QDate::currentDate(),
-                         QDate::currentDate(),
-                         QDate::currentDate(),
-                         QTime::currentTime(),
-                         QTime::currentTime(),
-                         uid,
-                         "", 1,
-                         returnAmount * -1, returnAmount * -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, fSaleType, fPartner)) {
-        return returnFalse(dw.fErrorMsg, &db);
+    oheader.state = ORDER_STATE_CLOSE;
+    oheader.cashier = __user->id();
+    oheader.hall = __c5config.defaultHall();
+    oheader.table = __c5config.defaultTable();
+    oheader.staff = uid;
+    oheader.amountTotal = returnAmount * -1;
+    oheader.amountCash = returnAmount * -1;
+    oheader.saleType = SALE_RETURN;
+    oheader.partner = fOHeader.partner;
+    oheader.source = 2;
+    if (!oheader.write(db, err)) {
+        return returnFalse(err, &db);
     }
 
     QString storeDocComment;
@@ -184,7 +188,7 @@ void ViewOrder::on_btnReturn_clicked()
         storedocUserNum = dw.storeDocNum(DOC_TYPE_STORE_INPUT, __c5config.defaultStore(), true, 0);
         if (!dw.writeAHeader(storeDocId, storedocUserNum, DOC_STATE_DRAFT, DOC_TYPE_STORE_INPUT,
                              uid, QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, 0,
-                             storeDocComment, __c5config.getValue(param_default_currency).toInt())) {
+                             storeDocComment, 1, __c5config.getValue(param_default_currency).toInt())) {
             return returnFalse(dw.fErrorMsg, &db);
         }
     }
@@ -215,10 +219,21 @@ void ViewOrder::on_btnReturn_clicked()
                 return returnFalse(dw.fErrorMsg, &db);
             }
         }
-        if (!dw.writeOGoods(ogoodsid, oheaderid, "", __c5config.defaultStore(), ui->tbl->getInteger(i, 6), ui->tbl->getDouble(i, 3),
-                            ui->tbl->getDouble(i, 4),  ui->tbl->getDouble(i, 5), ui->leTaxNumber->getInteger(), -1, i + 1,
-                            adraftid, 0, 0, reason, ui->tbl->getString(i, 0), 0)) {
-            return returnFalse(dw.fErrorMsg, &db);
+        OGoods g;
+        g.header = oheader.id;
+        g.store = __c5config.defaultStore();
+        g.goods = ui->tbl->getInteger(i, 6);
+        g.qty = ui->tbl->getDouble(i, 3);
+        g.price = ui->tbl->getDouble(i, 4);
+        g.total = g.qty * g.price;
+        g.tax = ui->leTaxNumber->getInteger();
+        g.sign = -1;
+        g.row = i + 1;
+        g.storeRec = adraftid;
+        g.return_ = reason;
+        g.returnFrom =  ui->tbl->getString(i, 0);
+        if (!g.write(db, err)) {
+            return returnFalse(err, &db);
         }
         if (!dw.updateField("o_goods", "f_return", reason, "f_id", ui->tbl->getString(i, 0))) {
             return returnFalse(dw.fErrorMsg, &db);
@@ -226,7 +241,7 @@ void ViewOrder::on_btnReturn_clicked()
         if (!dw.updateField("o_goods", "f_returnfrom", ogoodsid, "f_id", ui->tbl->getString(i, 0))) {
             return returnFalse(dw.fErrorMsg, &db);
         }
-        if (!dw.updateField("o_header", "f_comment", QString("%1 %2").arg(tr("Return from")).arg(ui->leOrderNum->text()), "f_id", oheaderid)) {
+        if (!dw.updateField("o_header", "f_comment", QString("%1 %2").arg(tr("Return from")).arg(ui->leOrderNum->text()), "f_id", oheader.id)) {
             return returnFalse(dw.fErrorMsg, &db);
         }
         ui->tbl->setInteger(i, 9, 1);
@@ -241,10 +256,11 @@ void ViewOrder::on_btnReturn_clicked()
         QString fCashUserId = QString("%1").arg(dw.counterAType(DOC_TYPE_CASH), C5Config::docNumDigitsInput(), 10, QChar('0'));
         QString purpose = tr("Return of sale") + " " + fSaleDoc;
         dw.writeAHeader(fCashUuid, fCashUserId, DOC_STATE_DRAFT, DOC_TYPE_CASH, uid, QDate::currentDate(),
-                        QDate::currentDate(), QTime::currentTime(), 0, returnAmount, purpose, __c5config.getValue(param_default_currency).toInt());
-        dw.writeAHeaderCash(fCashUuid, 0, __c5config.cashId(), 1, storeDocId, "", __c5config.getValue(param_default_currency).toInt());
+                        QDate::currentDate(), QTime::currentTime(), 0, returnAmount, purpose,
+                        1, __c5config.getValue(param_default_currency).toInt());
+        dw.writeAHeaderCash(fCashUuid, 0, __c5config.cashId(), 1, storeDocId, "", 0);
         dw.writeECash(fCashRowId, fCashUuid, __c5config.cashId(), -1, purpose, returnAmount, fCashRowId, 1);
-        if (!dw.writeAHeaderStore(storeDocId, uid, uid, "", QDate(), __c5config.defaultStore(), 0, 1, fCashUuid, 0, 0, oheaderid)) {
+        if (!dw.writeAHeaderStore(storeDocId, uid, uid, "", QDate(), __c5config.defaultStore(), 0, 1, fCashUuid, 0, 0, oheader.id)) {
             return returnFalse(dw.fErrorMsg, &db);
         }
     }
@@ -257,10 +273,11 @@ void ViewOrder::on_btnReturn_clicked()
             return returnFalse(dw.fErrorMsg, &db);
         }
         if (!dw.writeAHeader(cashdocid, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH, uid, QDate::currentDate(),
-                             QDate::currentDate(), QTime::currentTime(), 0, cashamount, tr("Return of") + " " + fSaleDoc, __c5config.getValue(param_default_currency).toInt())) {
+                             QDate::currentDate(), QTime::currentTime(), 0, cashamount, tr("Return of") + " " + fSaleDoc,
+                             1, __c5config.getValue(param_default_currency).toInt())) {
             return returnFalse(dw.fErrorMsg, &db);
         }
-        if (!dw.writeAHeaderCash(cashdocid, 0, it.key(), 1, "", oheaderid, 0)) {
+        if (!dw.writeAHeaderCash(cashdocid, 0, it.key(), 1, "", oheader.id, 0)) {
             return returnFalse(dw.fErrorMsg, &db);
         }
         QString cashUUID;
@@ -269,11 +286,12 @@ void ViewOrder::on_btnReturn_clicked()
         }
     }
 
-    QString err;
+
     if (haveStore) {
         if (dw.writeInput(storeDocId, err)) {
             if (!dw.writeAHeader(storeDocId, storedocUserNum, DOC_STATE_SAVED, DOC_TYPE_STORE_INPUT, uid, QDate::currentDate(),
-                                 QDate::currentDate(), QTime::currentTime(), 0, 0, storeDocComment, __c5config.getValue(param_default_currency).toInt())) {
+                                 QDate::currentDate(), QTime::currentTime(), 0, 0, storeDocComment,
+                                 0, __c5config.getValue(param_default_currency).toInt())) {
                 return returnFalse(dw.fErrorMsg, &db);
             }
             dw.writeTotalStoreAmount(storeDocId);
@@ -282,7 +300,7 @@ void ViewOrder::on_btnReturn_clicked()
 
     if (!C5Config::localReceiptPrinter().isEmpty()) {
         PrintReceipt p;
-        p.print(oheaderid, db);
+        p.print(oheader.id, db);
     }
 
     db.commit();
@@ -298,12 +316,20 @@ void ViewOrder::returnFalse(const QString &msg, C5Database *db)
 
 void ViewOrder::on_btnTaxReturn_clicked()
 {
+    C5Database db(__c5config.replicaDbParams());
+    db[":f_id"] = ui->leUUID->text();
+    db.exec("select * from o_tax where f_id=:f_id");
+    if (!db.nextRow()) {
+        C5Message::error(tr("No fiscal exists for this order"));
+        return;
+    }
+    QString crn = db.getString("f_devnum");
+    QString rseq = ui->leTaxNumber->text();
     PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
     QString jsnin, jsnout, err;
     int result;
-    QString crn, rseq = ui->leTaxNumber->text();
     result = pt.printTaxback(rseq, crn, jsnin, jsnout, err);
-    C5Database db(__c5config.dbParams());
+
     db[":f_id"] = db.uuid();
     db[":f_order"] = fUuid;
     db[":f_date"] = QDate::currentDate();
@@ -569,4 +595,31 @@ void ViewOrder::on_btnPrintReceiptA4_clicked()
     if (!p.print(err)) {
         C5Message::error(err);
     }
+}
+
+void ViewOrder::on_btnMakeDraft_clicked()
+{
+//    if (ui->leTaxNumber->getInteger() > 0) {
+//        C5Message::error(tr("Cannot make draft with fiscal number"));
+//        return;
+//    }
+    if (C5Message::question(tr("Confirm to make draft")) != QDialog::Accepted) {
+        return;
+    }
+    WOrder *wo = fWorking->newSale(SALE_RETAIL);
+    for (int i = 0; i < ui->tbl->rowCount(); i++) {
+        int r = wo->addGoodsToTable(ui->tbl->getInteger(i, 6));
+        if (r < 0) {
+            return;
+        }
+        wo->setQtyOfRow(r, ui->tbl->getDouble(i, 3));
+        wo->setPriceOfRow(r, ui->tbl->getDouble(i, 4));
+    }
+
+    RemoveShopSale r(__c5config.replicaDbParams());
+    if (r.remove(ui->leUUID->text())) {
+        fWorking->setActiveWidget(wo);
+        close();
+    }
+
 }

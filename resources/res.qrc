@@ -148,5 +148,6 @@
         <file>trading.png</file>
         <file>monitor.png</file>
         <file>preorder.png</file>
+        <file>route.png</file>
     </qresource>
 </RCC>

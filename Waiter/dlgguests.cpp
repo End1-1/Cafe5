@@ -6,10 +6,11 @@
 
 DlgGuests::DlgGuests(const QStringList &dbParams, C5OrderDriver *order) :
     C5Dialog(dbParams),
-    fOrder(order),
-    ui(new Ui::DlgGuests)
+    ui(new Ui::DlgGuests),
+    fOrder(order)
 {
-
+    ui->setupUi(this);
+    ui->spGuest->setValue(order->headerOptionsValue("f_guests").toInt());
 }
 
 DlgGuests::~DlgGuests()
@@ -25,6 +26,9 @@ void DlgGuests::on_btnGuestUp_clicked()
 
 void DlgGuests::on_btnGuestDown_clicked()
 {
+    if (ui->spGuest->value() < 2) {
+        return;
+    }
     ui->spGuest->setValue(ui->spGuest->value() - 1);
     fOrder->setHeaderOption("f_guests", ui->spGuest->value());
 }
@@ -32,4 +36,8 @@ void DlgGuests::on_btnGuestDown_clicked()
 void DlgGuests::on_btnSplitOrder_clicked()
 {
 
+}
+void DlgGuests::on_btnClose_clicked()
+{
+    accept();
 }

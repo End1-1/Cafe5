@@ -16,7 +16,7 @@ C5GridGilter::~C5GridGilter()
     delete ui;
 }
 
-bool C5GridGilter::filter(C5FilterWidget *filterWidget, QString &condition, QHash<QString, bool> &showColumns, QHash<QString, QString> &colTranslation)
+bool C5GridGilter::filter(C5FilterWidget *filterWidget, QString &condition, QMap<QString, bool> &showColumns, QHash<QString, QString> &colTranslation)
 {
     C5GridGilter *gf = new C5GridGilter();
     filterWidget->restoreFilter(filterWidget);
@@ -34,10 +34,9 @@ bool C5GridGilter::filter(C5FilterWidget *filterWidget, QString &condition, QHas
         }
     }
     QListWidget *lv = gf->ui->lvColumns;
-    for (QHash<QString, bool>::const_iterator it = showColumns.begin(); it != showColumns.end(); it++) {
-        QListWidgetItem *item = new QListWidgetItem(lv);
-        item->setData(Qt::UserRole, it.key());
-
+    QStringList keys;
+    QMap<QString, QString> keyvalue;
+    for (QMap<QString, bool>::const_iterator it = showColumns.constBegin(); it != showColumns.constEnd(); it++) {
         QString s = it.key();
         int pos = s.indexOf(" as");
         if (pos > -1) {
@@ -46,9 +45,20 @@ bool C5GridGilter::filter(C5FilterWidget *filterWidget, QString &condition, QHas
             pos = s.indexOf(".");
             s = s.mid(pos + 1, s.length() - pos);
         }
+        keys.append(s);
+        keyvalue[s] = it.key();
+    }
+    qSort(keys.begin(), keys.end());
 
-        QCheckBox *c = new QCheckBox(colTranslation[s]);
-        c->setChecked(it.value());
+    QStringList trans = colTranslation.values();
+    qSort(trans.begin(), trans.end());
+    for (const QString &tt: trans) {
+        auto s = colTranslation.key(tt);
+        QListWidgetItem *item = new QListWidgetItem(lv);
+        item->setData(Qt::UserRole, keyvalue[s]);
+
+        QCheckBox *c = new QCheckBox(colTranslation[s].replace("\n", " ").replace("\r", " "));
+        c->setChecked(showColumns[keyvalue[s]]);
         lv->setItemWidget(item, c);
     }
     bool result = gf->exec() == QDialog::Accepted;

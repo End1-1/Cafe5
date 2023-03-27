@@ -41,6 +41,17 @@ void CR5Reports::setReport(int id)
     fFilterHandler = db.getString("f_filterhandler");
     fQuery = db.getString("f_query");
     fLabel = db.getString("f_name");
+
+    QStringList sumColumns = db.getString("f_sumcolumn_indexes").split(",", Qt::SkipEmptyParts);
+    for (const QString &s: qAsConst(sumColumns)) {
+        fColumnsSumIndex.append(s.toInt());
+    }
+
+    db[":f_id"] = fFilterHandler;
+    db.exec("select * from reports_handler where f_id=:f_id");
+    if (db.nextRow()) {
+        fFilter->setFields(db.getString("f_query").split(",", Qt::SkipEmptyParts));
+    }
     if (!fDeleteHandler.isEmpty()) {
         db[":f_id"] = fDeleteHandler;
         db.exec("select * from reports_handler where f_id=:f_id");
@@ -52,18 +63,15 @@ void CR5Reports::setReport(int id)
         }
         //connect(a, &QAction::triggered, this, &CR5Reports::removeHandler);
     }
-    QStringList sumColumns = db.getString("f_sumcolumn_indexes").split(",", Qt::SkipEmptyParts);
-    for (const QString &s: qAsConst(sumColumns)) {
-        fColumnsSumIndex.append(s.toInt());
-    }
     fFilter->restoreFilter(this);
-    fSqlQuery = fQuery;
-    fSqlQuery.replace("%date1", fFilter->d1()).replace("%date2", fFilter->d2());
     buildQuery();
 }
 
 void CR5Reports::buildQuery()
 {
+    fSqlQuery = fQuery;
+    fSqlQuery.replace("%date1", fFilter->d1()).replace("%date2", fFilter->d2());
+    fSqlQuery.replace("%filter", fFilter->replacement());
     C5ReportWidget::buildQuery();
 }
 

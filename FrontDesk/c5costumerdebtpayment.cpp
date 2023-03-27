@@ -2,18 +2,23 @@
 #include "ui_c5costumerdebtpayment.h"
 #include "c5cache.h"
 #include "c5cashdoc.h"
+#include "bclientdebts.h"
+#include "c5user.h"
 #include <QDoubleValidator>
 
-C5CostumerDebtPayment::C5CostumerDebtPayment(const QStringList &dbParams) :
+C5CostumerDebtPayment::C5CostumerDebtPayment(int type, const QStringList &dbParams) :
     C5Dialog(dbParams),
     ui(new Ui::C5CostumerDebtPayment)
 {
     ui->setupUi(this);
     ui->leAmount->setValidator(new QDoubleValidator(-999999999, 999999999, 2));
-    ui->leCostumer->setSelector(dbParams, ui->leCostumerName, cache_discount_client);
+    ui->leCostumer->setSelector(dbParams, ui->leCostumerName, cache_goods_partners);
     ui->leCostumer->setCallbackDialog(this);
     ui->leCash->setSelector(dbParams, ui->leCashName, cache_cash_names);
+    ui->leCash->setCallbackDialog(this);
     connect(ui->leCostumer, SIGNAL(done(QList<QVariant>)), this, SLOT(selectorDone(QList<QVariant>)));
+    fBClientDebt.source = type;
+    ui->leType->setText(type == BCLIENTDEBTS_SOURCE_SALE ? tr("Customer payment") : tr("Partner payment"));
 }
 
 C5CostumerDebtPayment::~C5CostumerDebtPayment()
@@ -25,38 +30,37 @@ void C5CostumerDebtPayment::setId(int id)
 {
     C5Database db(fDBParams);
     db[":f_id"] = id;
-    db.exec("select f_id, f_date, f_costumer, f_cash, f_amount, f_govnumber from b_clients_debts where f_id=:f_id");
-    if (db.nextRow()) {
-        ui->leCode->setInteger(id);
-        ui->deDate->setDate(db.getDate("f_date"));
-        ui->leCostumer->setValue(db.getInt("f_costumer"));
-        ui->leAmount->setDouble(db.getDouble("f_amount"));
-        ui->leGovnumber->setText(db.getString("f_govnumber"));
-        ui->btnRemove->setEnabled(true);
-        C5CashDoc *doc = new C5CashDoc(fDBParams);
-        if (doc->openDoc(db.getString("f_cash"))) {
-            ui->leCash->setValue(doc->inputCash());
-        }
-        delete doc;
-    } else {
-        C5Message::error(tr("Document not exists"));
-    }
+    db.exec("select f_id, f_date, f_costumer, f_cash, abs(f_amount) as f_amount, f_govnumber from b_clients_debts where f_id=:f_id");
+    fBClientDebt.getRecord(db);
+    db[":f_id"] = fBClientDebt.cash;
+    db.exec("select * from a_header where f_id=:f_id");
+    fAHeader.getRecord(db);
+    db[":f_header"] = fBClientDebt.cash;
+    db.exec("select * from e_cash where f_header=:f_header");
+    fECash.getRecord(db);
+
+    ui->leCode->setInteger(fBClientDebt.id);
+    ui->deDate->setDate(fBClientDebt.date);
+    ui->leType->setText(fBClientDebt.source == 1 ? tr("Customer debt payment") : tr("Partner debt payment"));
+    ui->leCash->setValue(fECash.cash);
+    ui->leCostumer->setValue(fBClientDebt.costumer);
+    ui->leAmount->setDouble(fBClientDebt.amount);
+    ui->leCurrency->setText(fBClientDebt.currencyName(db));
 }
 
 void C5CostumerDebtPayment::selectorCallback(int row, const QList<QVariant> &values)
 {
-    Q_UNUSED(row);
-    if (values.count() > 0) {
-        //ui->leGovnumber->setText(values.at(2).toString());
-        //fSelectedGovNumber = values.at(2).toString();
-    }
-}
-
-void C5CostumerDebtPayment::selectorDone(const QList<QVariant> &values)
-{
-    if (values.count() > 0) {
-        ui->leGovnumber->setText(values.at(3).toString());
-        fSelectedGovNumber = values.at(3).toString();
+    qDebug() << values;
+    switch (row){
+    case cache_cash_names:
+        if (values.isEmpty()) {
+            ui->leCurrency->clear();
+        } else {
+            C5Database db(fDBParams);
+            fBClientDebt.currency = values.at(2).toInt();
+            ui->leCurrency->setText(fBClientDebt.currencyName(db));
+        }
+        break;
     }
 }
 
@@ -75,45 +79,37 @@ void C5CostumerDebtPayment::on_btnOK_clicked()
         C5Message::error(tr("Cash must be defined"));
         return;
     }
-//    if (ui->leAmount->getDouble() < 0.001) {
-//        C5Message::error(tr("Amount must be greater then 0"));
-//        return;
-//    }
+
+    QString err;
     C5Database db(fDBParams);
-    db[":f_date"] = ui->deDate->date();
-    db[":f_costumer"] = ui->leCostumer->getInteger();
-    db[":f_amount"] = ui->leAmount->getDouble();
-    db[":f_govnumber"] = ui->leGovnumber->text();
-    if (ui->leCode->getInteger() == 0) {
-        ui->leCode->setInteger(db.insert("b_clients_debts"));
+    fBClientDebt.date = ui->deDate->date();
+    fBClientDebt.costumer = ui->leCostumer->getInteger();
+    fBClientDebt.cash = ui->leCash->getInteger();
+    fBClientDebt.amount = ui->leAmount->getDouble();
+    if (fBClientDebt.id == 0) {
         if (ui->leAmount->getDouble() > 0) {
             C5CashDoc *doc = new C5CashDoc(fDBParams);
             doc->setRelation(true);
             doc->setCashInput(ui->leCash->getInteger());
             doc->setDate(ui->deDate->date());
-            doc->setComment(tr("Dept payment") + ", " + ui->leCostumerName->text() + " " + ui->leGovnumber->text());
-            doc->addRow(tr("Dept payment") + ", " + ui->leCostumerName->text()  + " " + ui->leGovnumber->text(), ui->leAmount->getDouble());
+            doc->setComment(tr("Dept payment") + ", " + ui->leCostumerName->text());
+            doc->addRow(tr("Dept payment") + ", " + ui->leCostumerName->text(), ui->leAmount->getDouble());
             doc->save(true);
-            db[":f_cash"] = doc->uuid();
+            fBClientDebt.cash = doc->uuid();
             delete doc;
         }
-        db[":f_id"] = ui->leCode->getInteger();
-        db.exec("update b_clients_debts set f_cash=:f_cash where f_id=:f_id");
     } else {
-        db.update("b_clients_debts", where_id(ui->leCode->getInteger()));
-        db[":f_id"] = ui->leCode->getInteger();
-        db.exec("select f_cash from b_clients_debts where f_id=:f_id");
-        if (db.nextRow() && ui->leAmount->getDouble() > 0) {
-            C5CashDoc *doc = new C5CashDoc(fDBParams);
-            if (doc->openDoc(db.getString("f_cash"))) {
-                doc->setDate(ui->deDate->date());
-                doc->setComment(tr("Dept payment") + ", " + ui->leCostumerName->text());
-                doc->updateRow(0, tr("Dept payment") + ", " + ui->leCostumerName->text(), ui->leAmount->getDouble());
-                doc->save(true);
-            }
-            delete doc;
+        C5CashDoc *doc = new C5CashDoc(fDBParams);
+        if (doc->openDoc(fBClientDebt.cash)) {
+            doc->setDate(ui->deDate->date());
+            doc->setComment(tr("Dept payment") + ", " + ui->leCostumerName->text());
+            doc->updateRow(0, tr("Dept payment") + ", " + ui->leCostumerName->text(), ui->leAmount->getDouble());
+            doc->save(true);
         }
+        delete doc;
     }
+    fBClientDebt.write(db, err);
+    ui->leCode->setInteger(fBClientDebt.id);
     ui->btnRemove->setEnabled(true);
     C5Message::info(tr("Saved"));
 }

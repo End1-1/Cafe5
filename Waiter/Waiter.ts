@@ -23,19 +23,19 @@
         <location filename="../Classes/c5cache.cpp" line="83"/>
         <location filename="../Classes/c5cache.cpp" line="86"/>
         <location filename="../Classes/c5cache.cpp" line="90"/>
-        <location filename="../Classes/c5cache.cpp" line="93"/>
-        <location filename="../Classes/c5cache.cpp" line="99"/>
-        <location filename="../Classes/c5cache.cpp" line="103"/>
-        <location filename="../Classes/c5cache.cpp" line="106"/>
-        <location filename="../Classes/c5cache.cpp" line="108"/>
-        <location filename="../Classes/c5cache.cpp" line="110"/>
-        <location filename="../Classes/c5cache.cpp" line="112"/>
-        <location filename="../Classes/c5cache.cpp" line="115"/>
-        <location filename="../Classes/c5cache.cpp" line="123"/>
-        <location filename="../Classes/c5cache.cpp" line="133"/>
-        <location filename="../Classes/c5cache.cpp" line="139"/>
-        <location filename="../Classes/c5cache.cpp" line="146"/>
-        <location filename="../Classes/c5cache.cpp" line="324"/>
+        <location filename="../Classes/c5cache.cpp" line="94"/>
+        <location filename="../Classes/c5cache.cpp" line="100"/>
+        <location filename="../Classes/c5cache.cpp" line="104"/>
+        <location filename="../Classes/c5cache.cpp" line="107"/>
+        <location filename="../Classes/c5cache.cpp" line="109"/>
+        <location filename="../Classes/c5cache.cpp" line="111"/>
+        <location filename="../Classes/c5cache.cpp" line="113"/>
+        <location filename="../Classes/c5cache.cpp" line="116"/>
+        <location filename="../Classes/c5cache.cpp" line="124"/>
+        <location filename="../Classes/c5cache.cpp" line="134"/>
+        <location filename="../Classes/c5cache.cpp" line="140"/>
+        <location filename="../Classes/c5cache.cpp" line="147"/>
+        <location filename="../Classes/c5cache.cpp" line="325"/>
         <source>Code</source>
         <translation>Կոդ</translation>
     </message>
@@ -63,16 +63,16 @@
         <location filename="../Classes/c5cache.cpp" line="84"/>
         <location filename="../Classes/c5cache.cpp" line="87"/>
         <location filename="../Classes/c5cache.cpp" line="91"/>
-        <location filename="../Classes/c5cache.cpp" line="94"/>
-        <location filename="../Classes/c5cache.cpp" line="100"/>
-        <location filename="../Classes/c5cache.cpp" line="104"/>
-        <location filename="../Classes/c5cache.cpp" line="106"/>
-        <location filename="../Classes/c5cache.cpp" line="108"/>
-        <location filename="../Classes/c5cache.cpp" line="110"/>
-        <location filename="../Classes/c5cache.cpp" line="112"/>
-        <location filename="../Classes/c5cache.cpp" line="115"/>
-        <location filename="../Classes/c5cache.cpp" line="133"/>
-        <location filename="../Classes/c5cache.cpp" line="324"/>
+        <location filename="../Classes/c5cache.cpp" line="95"/>
+        <location filename="../Classes/c5cache.cpp" line="101"/>
+        <location filename="../Classes/c5cache.cpp" line="105"/>
+        <location filename="../Classes/c5cache.cpp" line="107"/>
+        <location filename="../Classes/c5cache.cpp" line="109"/>
+        <location filename="../Classes/c5cache.cpp" line="111"/>
+        <location filename="../Classes/c5cache.cpp" line="113"/>
+        <location filename="../Classes/c5cache.cpp" line="116"/>
+        <location filename="../Classes/c5cache.cpp" line="134"/>
+        <location filename="../Classes/c5cache.cpp" line="325"/>
         <source>Name</source>
         <translation>Անվանում</translation>
     </message>
@@ -147,80 +147,85 @@
         <translation>Նկարագրություն</translation>
     </message>
     <message>
-        <location filename="../Classes/c5cache.cpp" line="123"/>
+        <location filename="../Classes/c5cache.cpp" line="92"/>
+        <source>Currency code</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Classes/c5cache.cpp" line="124"/>
         <source>Row</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5cache.cpp" line="123"/>
+        <location filename="../Classes/c5cache.cpp" line="124"/>
         <source>Product code</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5cache.cpp" line="123"/>
+        <location filename="../Classes/c5cache.cpp" line="124"/>
         <source>Product</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5cache.cpp" line="123"/>
+        <location filename="../Classes/c5cache.cpp" line="124"/>
         <source>Process code</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5cache.cpp" line="123"/>
+        <location filename="../Classes/c5cache.cpp" line="124"/>
         <source>Process</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5cache.cpp" line="123"/>
+        <location filename="../Classes/c5cache.cpp" line="124"/>
         <source>Duration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5cache.cpp" line="133"/>
-        <location filename="../Classes/c5cache.cpp" line="140"/>
-        <location filename="../Classes/c5cache.cpp" line="147"/>
+        <location filename="../Classes/c5cache.cpp" line="134"/>
+        <location filename="../Classes/c5cache.cpp" line="141"/>
+        <location filename="../Classes/c5cache.cpp" line="148"/>
         <source>Rate</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5cache.cpp" line="133"/>
+        <location filename="../Classes/c5cache.cpp" line="134"/>
         <source>Symbol</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5cache.cpp" line="139"/>
-        <location filename="../Classes/c5cache.cpp" line="146"/>
+        <location filename="../Classes/c5cache.cpp" line="140"/>
+        <location filename="../Classes/c5cache.cpp" line="147"/>
         <source>Currency code1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5cache.cpp" line="139"/>
-        <location filename="../Classes/c5cache.cpp" line="146"/>
+        <location filename="../Classes/c5cache.cpp" line="140"/>
+        <location filename="../Classes/c5cache.cpp" line="147"/>
         <source>Currency name 1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5cache.cpp" line="140"/>
-        <location filename="../Classes/c5cache.cpp" line="147"/>
+        <location filename="../Classes/c5cache.cpp" line="141"/>
+        <location filename="../Classes/c5cache.cpp" line="148"/>
         <source>Currency code 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5cache.cpp" line="140"/>
-        <location filename="../Classes/c5cache.cpp" line="147"/>
+        <location filename="../Classes/c5cache.cpp" line="141"/>
+        <location filename="../Classes/c5cache.cpp" line="148"/>
         <source>Currency name 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../Classes/c5cache.cpp" line="37"/>
         <location filename="../Classes/c5cache.cpp" line="81"/>
-        <location filename="../Classes/c5cache.cpp" line="123"/>
+        <location filename="../Classes/c5cache.cpp" line="124"/>
         <source>Price</source>
         <translation>Գին</translation>
     </message>
     <message>
-        <location filename="../Classes/c5cache.cpp" line="101"/>
+        <location filename="../Classes/c5cache.cpp" line="102"/>
         <source>Type</source>
         <translation>Տեսակ</translation>
     </message>
@@ -769,76 +774,65 @@
 <context>
     <name>C5ShopOrder</name>
     <message>
-        <location filename="../Classes/c5shoporder.cpp" line="54"/>
-        <source>Negative amount</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Classes/c5shoporder.cpp" line="64"/>
+        <location filename="../Classes/c5shoporder.cpp" line="33"/>
         <source>Empty order</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5shoporder.cpp" line="68"/>
+        <location filename="../Classes/c5shoporder.cpp" line="37"/>
         <source>Cashdesk for cash not defined</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5shoporder.cpp" line="71"/>
+        <location filename="../Classes/c5shoporder.cpp" line="40"/>
         <source>Cashdesk for card not defined</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5shoporder.cpp" line="73"/>
+        <location filename="../Classes/c5shoporder.cpp" line="42"/>
         <source>Write order?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5shoporder.cpp" line="154"/>
+        <location filename="../Classes/c5shoporder.cpp" line="112"/>
         <source>(F)</source>
         <translation type="unfinished">(Ֆ)</translation>
     </message>
     <message>
-        <location filename="../Classes/c5shoporder.cpp" line="184"/>
-        <source>Input before sale</source>
+        <location filename="../Classes/c5shoporder.cpp" line="357"/>
+        <source>Input of sale</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5shoporder.cpp" line="229"/>
+        <location filename="../Classes/c5shoporder.cpp" line="132"/>
         <source>Output of sale</source>
         <translation type="unfinished">Ելք ըստ վաճառքի</translation>
-    </message>
-    <message>
-        <location filename="../Classes/c5shoporder.cpp" line="355"/>
-        <location filename="../Classes/c5shoporder.cpp" line="360"/>
-        <source>Store input</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>C5StoreDraftWriter</name>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="27"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="28"/>
         <source>Output of sale</source>
         <translation>Ելք ըստ վաճառքի</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="229"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="228"/>
         <source>No hall with id</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="273"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="272"/>
         <source>Error in store document, partial data was lost</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="322"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="321"/>
         <source>Error in cash document, partial data was lost</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="332"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="331"/>
         <source>Empty cash document</source>
         <translation></translation>
     </message>
@@ -848,17 +842,17 @@
         <translation>Փասթաթուղթը նշված համարով չկա</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="991"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="869"/>
         <source>Invalid document id</source>
         <translation>Փասթաթուղթը նշված համարով չկա</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="1121"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="999"/>
         <source>Not enough materials in the store</source>
         <translation>Բաղասական քանակ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="1220"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="1098"/>
         <source>This order used in next documents</source>
         <translation>Այս պետվերը գրանցված է հետևյալ փասթաթղթերում</translation>
     </message>
@@ -1734,19 +1728,19 @@ MS Excel</source>
 <context>
     <name>DlgGuests</name>
     <message>
-        <location filename="dlgguests.ui" line="14"/>
+        <location filename="dlgguests.ui" line="20"/>
         <source>Cafe5</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="dlgguests.ui" line="50"/>
+        <location filename="dlgguests.ui" line="35"/>
         <source>Guest count</source>
         <translation>Հյուրերի քանակ</translation>
     </message>
     <message>
-        <location filename="dlgguests.ui" line="128"/>
-        <source>Split order</source>
-        <translation>Բաշխել պատվերը</translation>
+        <location filename="dlgguests.ui" line="138"/>
+        <source>CLOSE</source>
+        <translation>Փակել</translation>
     </message>
 </context>
 <context>
@@ -1948,7 +1942,7 @@ MS Excel</source>
 հաշվին</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2602"/>
+        <location filename="dlgorder.cpp" line="2601"/>
         <source>Preorder</source>
         <translation>Ամրագրում</translation>
     </message>
@@ -1956,7 +1950,7 @@ MS Excel</source>
         <location filename="dlgorder.ui" line="2714"/>
         <location filename="dlgorder.cpp" line="176"/>
         <location filename="dlgorder.cpp" line="301"/>
-        <location filename="dlgorder.cpp" line="1431"/>
+        <location filename="dlgorder.cpp" line="1430"/>
         <source>Staff</source>
         <translation>Սպասարկող</translation>
     </message>
@@ -1967,7 +1961,7 @@ MS Excel</source>
     </message>
     <message>
         <location filename="dlgorder.ui" line="2685"/>
-        <location filename="dlgorder.cpp" line="584"/>
+        <location filename="dlgorder.cpp" line="585"/>
         <source>Comment</source>
         <translation>Լրացուցիչ</translation>
     </message>
@@ -2015,22 +2009,27 @@ MS Excel</source>
     </message>
     <message>
         <location filename="dlgorder.ui" line="2903"/>
-        <location filename="dlgorder.cpp" line="1283"/>
+        <location filename="dlgorder.cpp" line="1282"/>
         <source>Move items</source>
         <translation>Տեղափոխություն</translation>
     </message>
     <message>
         <location filename="dlgorder.ui" line="3356"/>
+        <source>Guest count</source>
+        <translation>Հյուրերի քանակ</translation>
+    </message>
+    <message>
+        <location filename="dlgorder.ui" line="3369"/>
         <source>Amount of order</source>
         <translation>Պատվերի գումար</translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="3369"/>
+        <location filename="dlgorder.ui" line="3382"/>
         <source>Service 0% 0</source>
         <translation>Սպասարկում 0% 0</translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="3382"/>
+        <location filename="dlgorder.ui" line="3395"/>
         <source>Discount 0% 0</source>
         <translation>Զեղչ {0% 0?}</translation>
     </message>
@@ -2206,33 +2205,33 @@ OTHER</source>
         <translation>Սեղան</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="953"/>
+        <location filename="dlgorder.cpp" line="954"/>
         <source>Cannot add new dish if precheck was printed</source>
         <translation>Հնարավոր չէ ավելացնել նախահաշիվը տպելուց հետո</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="1906"/>
+        <location filename="dlgorder.cpp" line="1905"/>
         <source>Prime cost</source>
         <translation>Ինքնառժեք</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2355"/>
+        <location filename="dlgorder.cpp" line="2354"/>
         <source>Order comment</source>
         <translation>Պատվերի մեկնաբանություն</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2430"/>
-        <location filename="dlgorder.cpp" line="2471"/>
+        <location filename="dlgorder.cpp" line="2429"/>
+        <location filename="dlgorder.cpp" line="2470"/>
         <source>Use removal tool</source>
         <translation>Օգտագործեք հեռացման կոճակը</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2441"/>
+        <location filename="dlgorder.cpp" line="2440"/>
         <source>Do you want to remove this item</source>
         <translation>Համուզված էք՞</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2481"/>
+        <location filename="dlgorder.cpp" line="2480"/>
         <source>This is hourly payment item</source>
         <translation>Սա ժամավարձով է</translation>
     </message>
@@ -2262,186 +2261,191 @@ OTHER</source>
         <translation>Հատուկ պատվերի գինը պետք է նշված լինի</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="960"/>
+        <location filename="dlgorder.cpp" line="581"/>
+        <source>Guests count</source>
+        <translation>Հյուրերի քանակ</translation>
+    </message>
+    <message>
+        <location filename="dlgorder.cpp" line="961"/>
         <source>Cannot add special dish to stoplist</source>
         <translation>Հատուկ պատվերը հնարավոր չէ ավելացնել stoplist</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="1055"/>
-        <location filename="dlgorder.cpp" line="2814"/>
+        <location filename="dlgorder.cpp" line="1056"/>
+        <location filename="dlgorder.cpp" line="2813"/>
         <source>Void dish</source>
         <translation>Հեռացնել ուտեստը</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="1167"/>
+        <location filename="dlgorder.cpp" line="1168"/>
         <source>Change menu</source>
         <translation>Փոխել ճաշացանկը</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="1265"/>
+        <location filename="dlgorder.cpp" line="1264"/>
         <source>Split guests</source>
         <translation>Ավելցնել հյուր</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="1330"/>
+        <location filename="dlgorder.cpp" line="1329"/>
         <source>Move table</source>
         <translation>ՏԵղափոխել սեղան</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="1408"/>
+        <location filename="dlgorder.cpp" line="1407"/>
         <source>Change staff of order</source>
         <translation>Փոխել պատվերի սպասարկողին</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="1413"/>
+        <location filename="dlgorder.cpp" line="1412"/>
         <source>Change staff</source>
         <translation>Փոխել պատվերի սպասարկողին</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="1413"/>
+        <location filename="dlgorder.cpp" line="1412"/>
         <source>Staff password</source>
         <translation>Սպասարկողի գախտնաբառ</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="1456"/>
+        <location filename="dlgorder.cpp" line="1455"/>
         <source>Remove discount</source>
         <translation>Հեռացնել զեղչը</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="1534"/>
+        <location filename="dlgorder.cpp" line="1533"/>
         <source>Print precheck</source>
         <translation>Տպել նախահաշիվը</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="1592"/>
+        <location filename="dlgorder.cpp" line="1591"/>
         <source>Cancel precheck</source>
         <translation>Չեղարկել նախահաշիվը</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="1610"/>
+        <location filename="dlgorder.cpp" line="1609"/>
         <source>Repeat precheck</source>
         <translation>Կրկնել նախահաշիվ</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="1879"/>
+        <location filename="dlgorder.cpp" line="1878"/>
         <source>Complimentary</source>
         <translation>Հյուրասիրություն</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2173"/>
+        <location filename="dlgorder.cpp" line="2172"/>
         <source>Print receipt</source>
         <translation>Տպել հաշիվը</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2182"/>
+        <location filename="dlgorder.cpp" line="2181"/>
         <source>Other method is not selected</source>
         <translation>Այլ եղանակը նշված չէ</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2194"/>
+        <location filename="dlgorder.cpp" line="2193"/>
         <source>Check the all payment methods</source>
         <translation>Վճարումը ամբողջական չէ</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2206"/>
+        <location filename="dlgorder.cpp" line="2205"/>
         <source>Total amount of payments methods greater than total amount</source>
         <translation>Բոլոր եղանակներով նշված գումարները գերազանցում են պատվերի գումարը</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2650"/>
+        <location filename="dlgorder.cpp" line="2649"/>
         <source>Idram payment was not received</source>
         <translation>Idram վճարումը չի կատարվել</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2340"/>
-        <location filename="dlgorder.cpp" line="2749"/>
+        <location filename="dlgorder.cpp" line="2339"/>
+        <location filename="dlgorder.cpp" line="2748"/>
         <source>Reprint service check</source>
         <translation>Կրկնել կտրոնը պատրասման վայրում</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2825"/>
+        <location filename="dlgorder.cpp" line="2824"/>
         <source>Confirm to remove selected dishes</source>
         <translation>Հաստատեք նշված ուտեստների հեռացումը</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2527"/>
+        <location filename="dlgorder.cpp" line="2526"/>
         <source>Counted</source>
         <translation>Հաշվարկված է</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2880"/>
+        <location filename="dlgorder.cpp" line="2879"/>
         <source>Present dish</source>
         <translation>Ուտեստի նվեր</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2884"/>
+        <location filename="dlgorder.cpp" line="2883"/>
         <source>Are you sure to present selected dish?</source>
         <translation>Հաստատեք ուտեստի նվերը</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2686"/>
+        <location filename="dlgorder.cpp" line="2685"/>
         <source>PayX</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2177"/>
-        <location filename="dlgorder.cpp" line="2274"/>
+        <location filename="dlgorder.cpp" line="2176"/>
+        <location filename="dlgorder.cpp" line="2273"/>
         <source>Confirm to close order</source>
         <translation>Հաստատեք պատվերի փակումը</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2297"/>
+        <location filename="dlgorder.cpp" line="2296"/>
         <source>Change service value</source>
         <translation>Փոխել սպասարկման տոկոսը</translation>
     </message>
     <message>
         <location filename="dlgorder.cpp" line="569"/>
-        <location filename="dlgorder.cpp" line="591"/>
-        <location filename="dlgorder.cpp" line="608"/>
+        <location filename="dlgorder.cpp" line="592"/>
+        <location filename="dlgorder.cpp" line="609"/>
         <source>Bill</source>
         <translation>Նախահաշիվ</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="1144"/>
-        <location filename="dlgorder.cpp" line="2377"/>
-        <location filename="dlgorder.cpp" line="2426"/>
-        <location filename="dlgorder.cpp" line="2467"/>
+        <location filename="dlgorder.cpp" line="1145"/>
+        <location filename="dlgorder.cpp" line="2376"/>
+        <location filename="dlgorder.cpp" line="2425"/>
+        <location filename="dlgorder.cpp" line="2466"/>
         <source>Cannot add comment to hourly payment</source>
         <translation>Ժամավարձին հնարավոր չէ ավելցնել մեկնաբանություն</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="1148"/>
+        <location filename="dlgorder.cpp" line="1149"/>
         <source>Cannot add comment to dish that already printed</source>
         <translation>Հնրարավոր չէ ավելացնել մեկնաբանություն արդեն տպված հաշվի վրա</translation>
     </message>
     <message>
         <location filename="dlgorder.ui" line="2076"/>
-        <location filename="dlgorder.cpp" line="1473"/>
+        <location filename="dlgorder.cpp" line="1472"/>
         <source>Card</source>
         <translation>Քարտ</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="1473"/>
+        <location filename="dlgorder.cpp" line="1472"/>
         <source>Card code</source>
         <translation>Մուտքագրեք քարտը</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="1481"/>
+        <location filename="dlgorder.cpp" line="1480"/>
         <source>Card code is empty</source>
         <translation>Քարտի կոդը դատարկ է</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="1489"/>
+        <location filename="dlgorder.cpp" line="1488"/>
         <source>Bonus system alreay exists for this order</source>
         <translation>Զեղչը արդեն կիրարված է</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="1522"/>
+        <location filename="dlgorder.cpp" line="1521"/>
         <source>Cannot find card</source>
         <translation>Այդպիսի քարտ գոյություն չունի</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="1596"/>
+        <location filename="dlgorder.cpp" line="1595"/>
         <source>Confirm to cancel bill</source>
         <translation>Հաստատեք նաշնական հաշվի չեղարկելը</translation>
     </message>
@@ -2451,24 +2455,24 @@ OTHER</source>
         <translation>Պատվերը բացել է </translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="1340"/>
+        <location filename="dlgorder.cpp" line="1339"/>
         <source>Same table</source>
         <translation>Նույն սեղանն է</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="1547"/>
+        <location filename="dlgorder.cpp" line="1546"/>
         <source>Car model and costumer not specified</source>
         <translation>Մեքենաի մոդելը և հաճախորդի տվյալները նշված չէն</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="1557"/>
-        <location filename="dlgorder.cpp" line="1566"/>
+        <location filename="dlgorder.cpp" line="1556"/>
+        <location filename="dlgorder.cpp" line="1565"/>
         <source>Order is incomplete</source>
         <translation>Պատվերը անավարտ է</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="1035"/>
-        <location filename="dlgorder.cpp" line="1073"/>
+        <location filename="dlgorder.cpp" line="1036"/>
+        <location filename="dlgorder.cpp" line="1074"/>
         <source>Confirm to remove</source>
         <translation>Հաստատեք հեռացումը</translation>
     </message>
@@ -3805,7 +3809,7 @@ STOPLIST-ից</translation>
     <message>
         <location filename="../Shop/printreceiptgroup.cpp" line="272"/>
         <source>Prepaid used</source>
-        <translation type="unfinished"></translation>
+        <translation>Կանխավճարի օգրտագործում</translation>
     </message>
     <message>
         <location filename="../Shop/printreceiptgroup.cpp" line="319"/>
@@ -3825,12 +3829,12 @@ STOPLIST-ից</translation>
         <location filename="../Shop/printreceiptgroup.cpp" line="555"/>
         <location filename="../Shop/printreceiptgroup.cpp" line="607"/>
         <source>Discount</source>
-        <translation type="unfinished">Զեղչ</translation>
+        <translation>Զեղչ</translation>
     </message>
     <message>
         <location filename="../Shop/printreceiptgroup.cpp" line="555"/>
         <source>:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Shop/printreceiptgroup.cpp" line="597"/>

@@ -14,8 +14,6 @@ public:
 
     virtual QToolBar *toolBar();
 
-    virtual int newRow() override;
-
     virtual void buildQuery() override;
 
 protected:
@@ -25,6 +23,11 @@ protected:
 
 private:
     CR5CostumerDebtsFilter *fFilter;
+
+private slots:
+    void newCustomerPayment();
+
+    void newPartnerPayment();
 
 };
 

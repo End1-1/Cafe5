@@ -3,6 +3,8 @@
 #include "c5mainwindow.h"
 #include "c5storedraftwriter.h"
 #include "printtaxn.h"
+#include "xlsxall.h"
+#include "removeshopsale.h"
 #include "c5printtaxanywhere.h"
 #include "c5cache.h"
 #include "c5printrecipta4.h"
@@ -90,72 +92,8 @@ void C5SaleFromStoreOrder::on_btnRemove_clicked()
     if (C5Message::question(tr("Confirm to remove")) != QDialog::Accepted) {
         return;
     }
-    C5Database db(fDBParams);
-    db.startTransaction();
-    QStringList storeRec;
-    db[":f_header"] = ui->leID->text();
-    db.exec("select f_storerec from o_goods where f_header=:f_header");
-    while (db.nextRow()) {
-        storeRec.append(db.getString(0));
-    }
-    QSet<QString> storeHeader;
-    foreach (const QString &s, storeRec) {
-        db[":f_id"] = s;
-        db.exec("select f_document from a_store_draft where f_id=:f_id");
-        if (db.nextRow()) {
-            storeHeader.insert(db.getString(0));
-        }
-    }
-    C5StoreDraftWriter dw(db);
-    foreach (const QString &s, storeHeader) {
-        if (!dw.outputRollback(db, s)) {
-
-        }
-        db[":f_document"] = s;
-        db.exec("delete from a_store_draft where f_document=:f_document");
-        db[":f_id"] = s;
-        db.exec("delete from a_header_store where f_id=:f_id");
-
-    }
-
-    storeHeader.clear();
-    db[":f_oheader"] = ui->leID->text();
-    db.exec("select f_id from a_header_cash where f_oheader=:f_oheader");
-    if (db.nextRow()) {
-        storeHeader.insert(db.getString(0));
-    }
-    foreach (const QString &s, storeHeader) {
-        db[":f_header"] = s;
-        db.exec("delete from e_cash where f_header=:f_header");
-        db[":f_id"] = s;
-        db.exec("delete from a_header_cash where f_id=:f_id");
-        db[":f_id"] = s;
-        db.exec("delete from a_header where f_id=:f_id");
-    }
-
-    db[":f_header"] = ui->leID->text();
-    db.exec("delete from o_goods where f_header=:f_header");
-    db[":f_id"] = ui->leID->text();
-    db.exec("delete from o_header where f_id=:f_id");
-    db[":f_id"] = ui->leID->text();
-    db.exec("delete from a_header where f_id=:f_id");
-    db[":f_doc"] = ui->leID->text();
-    db.exec("delete from a_dc where f_doc=:f_doc");
-    db[":f_trsale"] = ui->leID->text();
-    db.exec("select * from b_gift_card_history where f_trsale=:f_trsale");
-    if (db.nextRow()) {
-        if (db.getDouble("f_amount") > 0) {
-            db[":f_id"] = db.getInt("f_card");
-            db[":f_datesaled"] = QVariant();
-            db.exec("update b_gift_card set f_datesaled=:f_datesaled where f_id=:f_id");
-        }
-    }
-    db[":f_trsale"] = ui->leID->text();
-    db.exec("delete from b_gift_card_history where f_trsale=:f_trsale");
-
-    db.deleteFromTable("b_clients_debts", "f_order", ui->leID->text());
-    db.commit();
-    ui->btnRemove->setVisible(false);
+    RemoveShopSale r(fDBParams, this);
+    r.remove(ui->leUUID->text());
     C5Message::info(tr("Removal complete"));
 }
 
@@ -236,10 +174,10 @@ void C5SaleFromStoreOrder::on_btnSave_clicked()
             return;
         }
         db[":f_order"] = ui->leID->text();
-        db.exec("select * from b_clients_debt where f_order=:f_header");
+        db.exec("select * from b_clients_debts where f_order=:f_order");
         if (db.nextRow()) {
             db[":f_costumer"] = ui->lePartner->getInteger();
-            db.update("b_clients_debts", "f_header", ui->leID->text());
+            db.update("b_clients_debts", "f_order", ui->leID->text());
         } else {
             db[":f_order"] = ui->leID->text();
             db[":f_costumer"] = ui->lePartner->getInteger();
@@ -276,4 +214,128 @@ void C5SaleFromStoreOrder::on_btnPrintA4_clicked()
     if (!p.print(err)) {
         C5Message::error(err);
     }
+}
+
+void C5SaleFromStoreOrder::on_btnExportToExcel_clicked()
+{
+    int fXlsxFitToPage = 0;
+    QString fXlsxPageOrientation = xls_page_orientation_portrait;
+    int fXlsxPageSize = xls_page_size_a4;
+
+    XlsxDocument d;
+    XlsxSheet *s = d.workbook()->addSheet("Sheet1");
+    s->setupPage(fXlsxPageSize, fXlsxFitToPage, fXlsxPageOrientation);
+    /* HEADER */
+    QColor color = Qt::white;
+    QFont headerFont(qApp->font());
+    d.style()->addFont("header", headerFont);
+    d.style()->addBackgrounFill("header", color);
+    d.style()->addHAlignment("header", xls_alignment_center);
+    d.style()->addBorder("header", XlsxBorder());
+
+
+    s->setColumnWidth(1, 10);
+    s->setColumnWidth(2, 15);
+    s->setColumnWidth(3, 50);
+    s->setColumnWidth(4, 20);
+    s->setColumnWidth(5, 20);
+    s->setColumnWidth(6, 20);
+    s->setColumnWidth(7, 20);
+
+    int col = 1, row = 1;
+    s->addCell(row, col, QString("%1 N%2").arg(tr("Order"), ui->leUserId->text()),
+                                           d.style()->styleNum("header"));
+
+    row++;
+
+    if (!ui->lePartnerName->isEmpty()) {
+        s->addCell(row, col, tr("Buyer") + " " + ui->lePartnerName->text(), d.style()->styleNum("header"));
+        row++;
+    }
+
+    QList<int> cols;
+    QStringList vals;
+    col = 1;
+    cols << col++;
+    vals << tr("Date");
+    for (int i = 0; i < cols.count(); i++) {
+        s->addCell(row, cols.at(i), vals.at(i), d.style()->styleNum("header"));
+    }
+    row++;
+
+    vals.clear();
+    vals << ui->deDate->text() + " " + ui->teTime->text();
+    for (int i = 0; i < cols.count(); i++) {
+        s->addCell(row, cols.at(i), vals.at(i), d.style()->styleNum("header"));
+    }
+    row += 2;
+
+    cols.clear();
+    for (int i = 0; i < 7; i++) {
+        cols << i + 1;
+    }
+    vals.clear();
+    vals << tr("NN")
+         << tr("Material code")
+         << tr("Goods")
+         << tr("Qty")
+         << tr("Unit")
+         << tr("Price")
+         << tr("Total");
+    for (int i = 0; i < cols.count(); i++) {
+        s->addCell(row, cols.at(i), vals.at(i), d.style()->styleNum("header"));
+    }
+    row++;
+    QMap<int, QString> bgFill;
+    QMap<int, QString> bgFillb;
+    QFont bodyFont(qApp->font());
+    d.style()->addFont("body", bodyFont);
+    d.style()->addBackgrounFill("body", QColor(Qt::white));
+    d.style()->addVAlignment("body", xls_alignment_center);
+    d.style()->addBorder("body", XlsxBorder());
+    bgFill[QColor(Qt::white).rgb()] = "body";
+    for (int i = 0; i < ui->tblData->rowCount(); i++) {
+        vals.clear();
+        vals << QString::number(i + 1);
+        vals << ui->tblData->getString(i, 1);
+        vals << ui->tblData->getString(i, 2);
+        vals << ui->tblData->getString(i, 3);
+        vals << ui->tblData->getString(i, 4);
+        vals << ui->tblData->getString(i, 5);
+        vals << ui->tblData->getString(i, 6);
+        for (int i = 0; i < cols.count(); i++) {
+            s->addCell(row, cols.at(i), vals.at(i), d.style()->styleNum("body"));
+        }
+        row++;
+    }
+
+    cols.clear();
+    cols << 6 << 7;
+    vals.clear();
+    vals << tr("Total amount");
+    vals << QString::number(str_float(ui->leTotal->text()));
+    for (int i = 0; i < cols.count(); i++) {
+        s->addCell(row, cols.at(i), vals.at(i), d.style()->styleNum("header"));
+    }
+    row++;
+
+
+    col = 1;
+    s->setSpan(1, col, 1, col + 5);
+    s->setSpan(2, col, 2, col + 5);
+    s->setSpan(3, col, 3, col + 5);
+    s->setSpan(4, col, 4, col + 5);
+
+
+
+
+    QString err;
+    if (!d.save(err, true)) {
+        if (!err.isEmpty()) {
+            C5Message::error(err);
+        }
+    }
+
+
+
 }

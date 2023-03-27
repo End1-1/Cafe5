@@ -26,6 +26,8 @@ private slots:
 
     void on_btnReprint_clicked();
 
+    void on_btnOpen_2_clicked();
+
 private:
     Ui::DlgMemoryRead *ui;
     int fResult;

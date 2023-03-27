@@ -1045,3 +1045,28 @@ create table p_preorder_body (f_id char(36) primary key, f_goods integer, f_qty 
 update s_app set f_version='104' where f_app='DB';
 alter table p_preorder_header drop column f_prepaid, add column f_prepaidcash decimal(14,3), add column f_prepaidcard decimal(14,2);
 alter table p_preorder_body add f_header char(36) after f_id;
+
+/* db - 105, 03.03.2023 */
+update s_app set f_version='105' where f_app='DB';
+ALTER TABLE `c_goods_prices` ADD CONSTRAINT `fk_goods_id` FOREIGN KEY (`f_goods`) REFERENCES `c_goods` (`f_id`) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+/* db - 106, 03.03.2023 */
+update s_app set f_version='106' where f_app='DB';
+create table c_goods_predefined_list (f_id integer primary key auto_increment, f_list integer, f_goods integer);
+
+/* db - 107, 03.03.2023 */
+update s_app set f_version='107' where f_app='DB';
+alter table o_draft_sale add column f_partner integer, add column f_debt tinyint;
+alter table o_draft_sale add column f_discount decimal(3,3);
+
+/* db - 108, 03.03.2023 */
+update s_app set f_version='108' where f_app='DB';
+alter table o_draft_sale change column f_debt f_debt integer, change column f_payment f_payment integer;
+create table o_route (f_id integer primary key auto_increment, f_partner integer, f_date integer);
+create table o_route_exec (f_id integer primary key auto_increment, f_partner integer, f_date date, f_action integer);
+alter table o_route add column f_driver integer;
+alter table o_route_exec add column f_driver integer;
+drop table o_route;
+create table o_route (f_id integer primary key auto_increment, f_partner integer, f_1 integer, f_2 integer, f_3 integer, f_4 integer, f_5 integer, f_6 integer, f_7 integer);
+alter table o_draft_sale_body add column f_back decimal(14,2) after f_qty;
+alter table o_route_exec add column f_action_comment TEXT, ADD column f_action_datetime timestamp;

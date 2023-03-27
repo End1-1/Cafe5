@@ -60,11 +60,6 @@ C5Cache::C5Cache(const QStringList &dbParams) :
                 .arg(tr("Code"),tr("Name"));
         fCacheQuery[cache_dish_remove_reason] = QString("select f_id as `%1`, f_name as `%2` from o_dish_remove_reason")
                 .arg(tr("Code"),tr("Name"));
-        fCacheQuery[cache_discount_client] = QString("select c.f_id as `%1`, c.f_contact as `%2`, "
-                                                     "bc.f_govnumber as `%3`, c.f_info as `%4` "
-                                                     "from c_partners c "
-                                                     "left join b_car bc on bc.f_costumer=c.f_id ")
-                .arg(tr("Code"),tr("Full name"),tr("Gov. number"),tr("Additional info"));
         fCacheQuery[cache_s_db] = QString("select f_id as `%1`,  f_name as `%2`, f_description as `%3` from s_db")
                 .arg(tr("Code"),tr("Name"),tr("Description"));
         setCacheSimpleQuery(cache_settings_names, "s_settings_names");
@@ -86,9 +81,10 @@ C5Cache::C5Cache(const QStringList &dbParams) :
                 .arg(tr("Code"))
                 .arg(tr("Name"));
         fCacheQuery[cache_goods_waste] = "";
-        fCacheQuery[cache_cash_names] = QString("select f_id as `%1`, f_name as `%2` from e_cash_names")
+        fCacheQuery[cache_cash_names] = QString("select f_id as `%1`, f_name as `%2`, f_currency as `%3` from e_cash_names")
                 .arg(tr("Code"))
-                .arg(tr("Name"));
+                .arg(tr("Name"))
+                .arg(tr("Currency code"));
         fCacheQuery[cache_store_reason] = QString("select f_id as `%1`, f_name as `%2` from a_reason")
                 .arg(tr("Code"))
                 .arg(tr("Name"));

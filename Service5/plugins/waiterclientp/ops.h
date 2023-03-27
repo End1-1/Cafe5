@@ -30,6 +30,7 @@
 #define op_print_bill 24
 #define op_ready_dishes 25
 #define op_get_menu_list 26
+#define op_scandiscount 27
 
 #define version1 1 //jazzve
 #define version2 2 //cafe5

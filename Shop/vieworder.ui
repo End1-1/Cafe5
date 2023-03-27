@@ -599,6 +599,13 @@
         </property>
        </widget>
       </item>
+      <item row="2" column="2">
+       <widget class="QPushButton" name="btnMakeDraft">
+        <property name="text">
+         <string>Make draft</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>

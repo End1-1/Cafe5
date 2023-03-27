@@ -89,6 +89,7 @@ SOURCES += \
     ../Classes/fileversion.cpp \
     ../Classes/notificationwidget.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
+    ../Classes/removeshopsale.cpp \
     ../Classes/rkeyboard.cpp \
     ../Classes/socketconnection.cpp \
     ../Classes/threadsendmessage.cpp \
@@ -98,6 +99,7 @@ SOURCES += \
     ../DbData/datadriver.cpp \
     ../DbData/dbbodystate.cpp \
     ../DbData/dbcar.cpp \
+    ../DbData/dbcurrency.cpp \
     ../DbData/dbdata.cpp \
     ../DbData/dbdishcomments.cpp \
     ../DbData/dbdishes.cpp \
@@ -124,11 +126,20 @@ SOURCES += \
     ../DbData/dbusers.cpp \
     ../Forms/c5printtaxanywhere.cpp \
     ../Forms/dlgdataonline.cpp \
+    ../Forms/dlgpaymentchoose.cpp \
     ../Forms/dlgqrcode.cpp \
     ../Forms/dlgreservgoods.cpp \
     ../Forms/dlgserversettings.cpp \
     ../Service5/raw/rawmessage.cpp \
     ../Service5/socket/sslsocket.cpp \
+    ../TableRecord/aheader.cpp \
+    ../TableRecord/bclientdebts.cpp \
+    ../TableRecord/bhistory.cpp \
+    ../TableRecord/c5dbrecord.cpp \
+    ../TableRecord/cpartners.cpp \
+    ../TableRecord/ecash.cpp \
+    ../TableRecord/ogoods.cpp \
+    ../TableRecord/oheader.cpp \
     c5tempsale.cpp \
     cashcollection.cpp \
     dlgdate.cpp \
@@ -139,6 +150,7 @@ SOURCES += \
     dlgpreorder.cpp \
     dlgpreorderitem.cpp \
     dlgreturnitem.cpp \
+    dlgsearchpartner.cpp \
     dlgsplashscreen.cpp \
     goodsreturnreason.cpp \
     imageloader.cpp \
@@ -248,6 +260,7 @@ HEADERS += \
     ../Classes/goodsreserve.h \
     ../Classes/notificationwidget.h \
     ../Classes/proxytablewidgetdatabase.h \
+    ../Classes/removeshopsale.h \
     ../Classes/rkeyboard.h \
     ../Classes/socketconnection.h \
     ../Classes/threadsendmessage.h \
@@ -257,6 +270,7 @@ HEADERS += \
     ../DbData/datadriver.h \
     ../DbData/dbbodystate.h \
     ../DbData/dbcar.h \
+    ../DbData/dbcurrency.h \
     ../DbData/dbdata.h \
     ../DbData/dbdishcomments.h \
     ../DbData/dbdishes.h \
@@ -283,11 +297,20 @@ HEADERS += \
     ../DbData/dbusers.h \
     ../Forms/c5printtaxanywhere.h \
     ../Forms/dlgdataonline.h \
+    ../Forms/dlgpaymentchoose.h \
     ../Forms/dlgqrcode.h \
     ../Forms/dlgreservgoods.h \
     ../Forms/dlgserversettings.h \
     ../Service5/raw/rawmessage.h \
     ../Service5/socket/sslsocket.h \
+    ../TableRecord/aheader.h \
+    ../TableRecord/bclientdebts.h \
+    ../TableRecord/bhistory.h \
+    ../TableRecord/c5dbrecord.h \
+    ../TableRecord/cpartners.h \
+    ../TableRecord/ecash.h \
+    ../TableRecord/ogoods.h \
+    ../TableRecord/oheader.h \
     c5tempsale.h \
     cashcollection.h \
     dlgdate.h \
@@ -298,6 +321,7 @@ HEADERS += \
     dlgpreorder.h \
     dlgpreorderitem.h \
     dlgreturnitem.h \
+    dlgsearchpartner.h \
     dlgsplashscreen.h \
     goodsreturnreason.h \
     imageloader.h \
@@ -349,6 +373,7 @@ FORMS += \
     ../Controls/c5tablewithtotal.ui \
     ../Forms/c5printtaxanywhere.ui \
     ../Forms/dlgdataonline.ui \
+    ../Forms/dlgpaymentchoose.ui \
     ../Forms/dlgqrcode.ui \
     ../Forms/dlgreservgoods.ui \
     ../Forms/dlgserversettings.ui \
@@ -362,6 +387,7 @@ FORMS += \
     dlgpreorder.ui \
     dlgpreorderitem.ui \
     dlgreturnitem.ui \
+    dlgsearchpartner.ui \
     dlgsplashscreen.ui \
     goodsreturnreason.ui \
     loghistory.ui \
@@ -391,6 +417,7 @@ DEFINES += _MODULE_=\\\"Shop\\\"
 DEFINES += SHOP
 
 INCLUDEPATH += ../Cafe5
+INCLUDEPATH += ../TableRecord
 INCLUDEPATH += ../Classes
 INCLUDEPATH += ../Cache
 INCLUDEPATH += ../Controls

@@ -81,9 +81,9 @@ void init() {
         fStorages[3] = QString::fromUtf8("Խոհանոց");
         fStorages[4] = QString::fromUtf8("Սառնարան");
 
-        fAsStorageMap[2][2] = "022";
-        fAsStorageMap[2][3] = "023";
-        fAsStorageMap[2][4] = "025";
+        fAsStorageMap[2][2] = "001";
+        fAsStorageMap[2][3] = "002";
+        fAsStorageMap[2][4] = "003";
         fAsStorageMap[3][2] = "031";
         fAsStorageMap[3][3] = "032";
         fAsStorageMap[3][4] = "033";
@@ -143,6 +143,13 @@ bool requestStore(RequestHandler &rh, const QByteArray &data, const QHash<QStrin
     if (!db.open(con["host"], con["schema"], con["username"], con["password"])) {
         return rh.setInternalServerError(db.lastDbError());
     }
+    db.exec("select * from sys_as_conn");
+    QString mssql_conn, dbname;
+    if (db.next()) {
+        dbname = db.string("database");
+        mssql_conn = QString("%1;DATABASE=%2").arg(db.string("conn_str"), db.string("database"));
+        qDebug() << "CONNECTION" << mssql_conn;
+    }
     db.exec("select f.id, t.name as typename, f.name as foodname "
             "from food_names f "
             "left join food_groups t on t.id=f.group_id "
@@ -181,19 +188,19 @@ bool requestStore(RequestHandler &rh, const QByteArray &data, const QHash<QStrin
         j["AMOUNT_TILL"] = db.doubleValue("amount");
     }
     Database mssqldb("QODBC3");
-    if (!mssqldb.open("10.1.0.4,1433", "Driver={SQL Server Native Client 11.0};Server=10.1.0.4,1433;DATABASE=Jazzve", "sa", "SaSa111")) {
+    if (!mssqldb.open("10.1.0.4,1433", mssql_conn, "sa", "SaSa111")) {
         return rh.setInternalServerError(mssqldb.lastDbError());
     }
     mssqldb[":store"] = fAsStorageMap[cafe][store];
     mssqldb[":date1"] = d1;
     mssqldb[":date2"] = d2;
-    if (!mssqldb.exec("select cast(t.fMTCODE as integer) as food, m.fDBCR as sign, sum(m.fQTY) as qty, sum(m.fCOSTSUMM) as amount "
-                "from Jazzve.dbo.MTHI m, Jazzve.dbo.MATERIALS t , Jazzve.dbo.DOCUMENTS d "
+    if (!mssqldb.exec(QString("select cast(t.fMTCODE as integer) as food, m.fDBCR as sign, sum(m.fQTY) as qty, sum(m.fCOSTSUMM) as amount "
+                "from %1.dbo.MTHI m, %1.dbo.MATERIALS t , %1.dbo.DOCUMENTS d "
                 "where m.fMTID=t.fMTID and d.fISN=m.fBASE and d.fDOCTYPE in (6, 7, 8, 17) "
                 "and d.fDATE between :date1 and :date2 and m.fSTORAGE=:store "
                 "and (t.fMTCODE NOT LIKE '1-%' and t.fMTCODE NOT LIKE '2-%') "
                 "group by cast(t.fMTCODE as integer), m.fDBCR "
-                "order by 1")) {
+                "order by 1").arg(dbname))) {
         return rh.setInternalServerError(mssqldb.lastDbError());
     }
     QStringList foodNotInDb;

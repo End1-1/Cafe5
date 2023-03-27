@@ -97,6 +97,8 @@ public:
 
     int insert(const QString &tableName, bool returnId = true);
 
+    bool insert(const QString &tableName, int &id);
+
     bool replaceInto(const QString &tableName);
 
     bool insertId(const QString &tableName, const QVariant &id);

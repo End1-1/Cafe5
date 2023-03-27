@@ -1615,15 +1615,15 @@
   <tabstop>leSupplier</tabstop>
   <tabstop>leGroup</tabstop>
   <tabstop>leUnit</tabstop>
+  <tabstop>leLowLevel</tabstop>
   <tabstop>leName</tabstop>
   <tabstop>leScanCode</tabstop>
   <tabstop>leCostPrice</tabstop>
   <tabstop>leMargin</tabstop>
   <tabstop>leMargin2</tabstop>
   <tabstop>cbCurrency</tabstop>
+  <tabstop>leAdg</tabstop>
   <tabstop>tblPricing</tabstop>
-  <tabstop>leClass4</tabstop>
-  <tabstop>leLowLevel_2</tabstop>
   <tabstop>lineEdit_8</tabstop>
   <tabstop>tblMultiscancode</tabstop>
   <tabstop>chOnlyWholeNumber</tabstop>
@@ -1636,6 +1636,8 @@
   <tabstop>plainTextEdit</tabstop>
   <tabstop>leClass3</tabstop>
   <tabstop>leClass1</tabstop>
+  <tabstop>leClass4</tabstop>
+  <tabstop>leLowLevel_2</tabstop>
  </tabstops>
  <resources>
   <include location="../resources/res.qrc"/>

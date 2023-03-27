@@ -25,6 +25,7 @@
 #include "dbstoredoctype.h"
 #include "dbdishcomments.h"
 #include "dbdishremovereason.h"
+#include "dbcurrency.h"
 #include <QStringList>
 
 #define dbuser DataDriver::fInstance->fDbUser
@@ -51,6 +52,7 @@
 #define dbmenupackagelist DataDriver::fInstance->fDbMenuPackageList
 #define dbdishcomment DataDriver::fInstance->fDbDishComments
 #define dbdishremovereason DataDriver::fInstance->fDbDishRemoveReason
+#define dbcurrency DataDriver::fInstance->fDbCurrency
 
 class DataDriver
 {
@@ -104,6 +106,8 @@ public:
     DbDishComments *fDbDishComments;
 
     DbDishRemoveReason *fDbDishRemoveReason;
+
+    DbCurrency *fDbCurrency;
 
     static void init(const QStringList &dbParams);
 

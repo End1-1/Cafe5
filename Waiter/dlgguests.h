@@ -25,6 +25,8 @@ private slots:
 
     void on_btnSplitOrder_clicked();
 
+    void on_btnClose_clicked();
+
 private:
     Ui::DlgGuests *ui;
 

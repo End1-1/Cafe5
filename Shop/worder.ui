@@ -46,7 +46,7 @@
     </widget>
    </item>
    <item>
-    <widget class="C5ClearTableWidget" name="tblGoods">
+    <widget class="C5ClearTableWidget" name="tblData">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
        <horstretch>0</horstretch>
@@ -73,7 +73,7 @@
      </property>
      <column>
       <property name="text">
-       <string>Goods code</string>
+       <string>Barcode</string>
       </property>
      </column>
      <column>
@@ -99,31 +99,6 @@
      <column>
       <property name="text">
        <string>Total</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>TaxDept</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>AdgCode</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Table rec</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Unit code</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Service</string>
       </property>
      </column>
      <column>
@@ -221,113 +196,6 @@
           </widget>
          </item>
          <item row="1" column="0">
-          <widget class="QLabel" name="label_5">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Card (F4)</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="C5LineEdit" name="leCard">
-           <property name="focusPolicy">
-            <enum>Qt::StrongFocus</enum>
-           </property>
-           <property name="text">
-            <string>0</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="lbAdvance">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Advance (F7)</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="C5LineEdit" name="leAdvance">
-           <property name="focusPolicy">
-            <enum>Qt::StrongFocus</enum>
-           </property>
-           <property name="text">
-            <string>0</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="label_3">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Cash in (F3)</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="1">
-          <widget class="C5LineEdit" name="leCash">
-           <property name="focusPolicy">
-            <enum>Qt::StrongFocus</enum>
-           </property>
-           <property name="text">
-            <string>0</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="0">
-          <widget class="QLabel" name="label_4">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Change</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="1">
-          <widget class="C5LineEdit" name="leChange">
-           <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
-           </property>
-           <property name="text">
-            <string>0</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-           <property name="readOnly">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="0">
           <widget class="QLabel" name="lbDisc">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
@@ -340,7 +208,7 @@
            </property>
           </widget>
          </item>
-         <item row="5" column="1">
+         <item row="1" column="1">
           <widget class="C5LineEdit" name="leDisc">
            <property name="focusPolicy">
             <enum>Qt::NoFocus</enum>
@@ -370,10 +238,7 @@
         <property name="title">
          <string>Customer</string>
         </property>
-        <layout class="QFormLayout" name="formLayout_3">
-         <property name="horizontalSpacing">
-          <number>2</number>
-         </property>
+        <layout class="QGridLayout" name="gridLayout">
          <property name="leftMargin">
           <number>2</number>
          </property>
@@ -386,20 +251,48 @@
          <property name="bottomMargin">
           <number>2</number>
          </property>
-         <item row="0" column="0">
-          <widget class="QLabel" name="lbCustomer_2">
+         <property name="horizontalSpacing">
+          <number>2</number>
+         </property>
+         <item row="3" column="0">
+          <widget class="QLabel" name="lbPartner_3">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="font">
+            <font>
+             <weight>50</weight>
+             <bold>false</bold>
+            </font>
+           </property>
            <property name="text">
-            <string>Customer taxpayer id (F6)</string>
+            <string>Contact</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
+         <item row="2" column="0">
+          <widget class="QLabel" name="lbPartner">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <weight>50</weight>
+             <bold>false</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>Organization</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1" colspan="2">
           <widget class="C5LineEdit" name="leCustomerTaxpayerId">
            <property name="minimumSize">
             <size>
@@ -427,73 +320,14 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="lbPartner">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="font">
-            <font>
-             <weight>50</weight>
-             <bold>false</bold>
-            </font>
-           </property>
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_6">
            <property name="text">
-            <string>Organization</string>
+            <string>Gift card balance</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
-          <widget class="C5LineEdit" name="leOrganization">
-           <property name="minimumSize">
-            <size>
-             <width>200</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="font">
-            <font>
-             <weight>50</weight>
-             <bold>false</bold>
-            </font>
-           </property>
-           <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
-           </property>
-           <property name="readOnly">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="lbPartner_3">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="font">
-            <font>
-             <weight>50</weight>
-             <bold>false</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>Contact</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
+         <item row="3" column="1" colspan="2">
           <widget class="C5LineEdit" name="leContact">
            <property name="minimumSize">
             <size>
@@ -521,90 +355,75 @@
            </property>
           </widget>
          </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="lbDept">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="font">
-            <font>
-             <pointsize>8</pointsize>
-             <weight>50</weight>
-             <bold>false</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>Debt</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="1">
-          <widget class="QCheckBox" name="chDebt">
-           <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
-           </property>
-           <property name="layoutDirection">
-            <enum>Qt::LeftToRight</enum>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="0">
-          <widget class="QLabel" name="lbDept_2">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="font">
-            <font>
-             <pointsize>8</pointsize>
-             <weight>50</weight>
-             <bold>false</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>Idram</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="1">
-          <widget class="QCheckBox" name="chIdram">
-           <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
-           </property>
-           <property name="layoutDirection">
-            <enum>Qt::LeftToRight</enum>
-           </property>
-           <property name="text">
-            <string/>
+         <item row="5" column="1" colspan="2">
+          <widget class="C5LineEdit" name="leGiftCardAmount">
+           <property name="readOnly">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
          <item row="5" column="0">
-          <widget class="QLabel" name="label_6">
-           <property name="text">
-            <string>Gift card balance</string>
-           </property>
-          </widget>
-         </item>
-         <item row="6" column="0">
           <widget class="QLabel" name="lbGiftCard">
            <property name="text">
             <string>*****</string>
            </property>
           </widget>
          </item>
-         <item row="6" column="1">
-          <widget class="C5LineEdit" name="leGiftCardAmount">
+         <item row="0" column="0">
+          <widget class="QLabel" name="lbCustomer_2">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Customer taxpayer id (F6)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1" colspan="2">
+          <widget class="C5LineEdit" name="leOrganization">
+           <property name="minimumSize">
+            <size>
+             <width>200</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <weight>50</weight>
+             <bold>false</bold>
+            </font>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
            <property name="readOnly">
             <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="3">
+          <widget class="QPushButton" name="btnSearchPartner">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources/res.qrc">
+             <normaloff>:/search.png</normaloff>:/search.png</iconset>
            </property>
           </widget>
          </item>
@@ -844,15 +663,14 @@
  </customwidgets>
  <tabstops>
   <tabstop>leCode</tabstop>
-  <tabstop>leCard</tabstop>
-  <tabstop>leAdvance</tabstop>
-  <tabstop>leCash</tabstop>
   <tabstop>btnF4</tabstop>
   <tabstop>btnF5</tabstop>
   <tabstop>btnF1</tabstop>
   <tabstop>btnF2</tabstop>
   <tabstop>btnF3</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../resources/res.qrc"/>
+ </resources>
  <connections/>
 </ui>

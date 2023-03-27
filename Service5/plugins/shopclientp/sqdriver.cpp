@@ -15,6 +15,7 @@ SQDriver::SQDriver()
             qDebug() << src;
             QStringList srclist = src.split("==========");
             for(const QString &s: qAsConst(srclist)) {
+                qDebug() << s;
                 QStringList bl = s.split(">>");
                 if (bl.count() >= 2) {
                     fListOfQueries[bl[0].replace("\n", "").replace("\r", "")] = bl.at(1);

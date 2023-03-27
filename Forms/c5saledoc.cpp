@@ -276,14 +276,14 @@ void C5SaleDoc::saveDataChanges()
             }
             if (outStoreDocId.isEmpty()) {
                 dw.writeAHeader(outStoreDocId, outStoredocUserNum, DOC_STATE_DRAFT, DOC_TYPE_STORE_OUTPUT, __user->id(), QDate::currentDate(),
-                                     QDate::currentDate(), QTime::currentTime(), 0, 0, outStoreDocComment, ui->cbCurrency->currentData().toInt());
+                                     QDate::currentDate(), QTime::currentTime(), 0, 0, outStoreDocComment, 0, ui->cbCurrency->currentData().toInt());
                 dw.writeAHeaderStore(outStoreDocId, __user->id(), __user->id(), "", QDate(), 0,
                                      ui->tblGoods->comboBox(i, col_store)->currentData().toInt(),
                                      1, "", 0, 0, uuid);
                 outDocIds.append(outStoreDocId);
 
                 dw.writeAHeader(inStoreDocId, inStoredocUserNum, DOC_STATE_DRAFT, DOC_TYPE_STORE_INPUT, __user->id(), QDate::currentDate(),
-                                     QDate::currentDate(), QTime::currentTime(), 0, 0, inStoreDocComment, ui->cbCurrency->currentData().toInt());
+                                     QDate::currentDate(), QTime::currentTime(), 0, 0, inStoreDocComment, 0, ui->cbCurrency->currentData().toInt());
                 dw.writeAHeaderStore(inStoreDocId, __user->id(), __user->id(), "", QDate(),
                                      ui->cbStorage->currentData().toInt(), 0,
                                      1, "", 0, 0, uuid);
@@ -343,7 +343,7 @@ void C5SaleDoc::saveDataChanges()
     QString storedocUserNum;
     storedocUserNum = dw.storeDocNum(DOC_TYPE_STORE_OUTPUT, ui->cbStorage->currentData().toInt(), true, 0);
     dw.writeAHeader(storeDocId, storedocUserNum, DOC_STATE_DRAFT, DOC_TYPE_STORE_OUTPUT, __user->id(), QDate::currentDate(),
-                         QDate::currentDate(), QTime::currentTime(), 0, 0, storeDocComment, ui->cbCurrency->currentData().toInt());
+                         QDate::currentDate(), QTime::currentTime(), 0, 0, storeDocComment, 0, ui->cbCurrency->currentData().toInt());
     dw.writeAHeaderStore(storeDocId, __user->id(), __user->id(), "", QDate(), 0,
                          ui->cbStorage->currentData().toInt(),
                          1, "", 0, 0, uuid);
@@ -531,6 +531,7 @@ bool C5SaleDoc::openDraft(const QString &id)
     ui->leTime->setText(db.getTime("f_time").toString(FORMAT_TIME_TO_STR));
     ui->leComment->setText(db.getString("f_comment"));
     ui->leUuid->setText(db.getString("f_id"));
+    ui->cbStorage->setCurrentIndex(ui->cbStorage->findData(db.getInt("f_store")));
     QString priceField = "f_price1";
     db[":f_header"] = id;
     db[":f_state"] = 1;
@@ -541,7 +542,7 @@ bool C5SaleDoc::openDraft(const QString &id)
             "left join c_goods_prices gpr on gpr.f_goods=g.f_id "
             "left join c_units gu on gu.f_id=g.f_unit "
             "where dsb.f_header=:f_header and gpr.f_currency=:f_currency "
-            "and dsb.f_state=:f_state ").arg(priceField));
+            "and dsb.f_state=:f_state and dsb.f_qty>0 ").arg(priceField));
     while (db.nextRow()) {
         addGoods(db.getInt("f_store"), db.getInt("f_id"), db.getString("f_scancode"), db.getString("f_name"),
                  db.getString("f_unitname"), db.getDouble("f_qty"), db.getDouble("f_price"));
@@ -558,9 +559,9 @@ bool C5SaleDoc::openDraft(const QString &id)
 //    case 3:
 //        //other
 //        break;
-//    case 6:
-//        //idram
-//        break;
+    case 6:
+        ui->leCard->setDouble(ui->leGrandTotal->getDouble());
+        break;
     case 7:
         ui->leDebt->setDouble(ui->leGrandTotal->getDouble());
         break;

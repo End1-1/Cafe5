@@ -7,9 +7,9 @@ static const int LANG_AM = 0;
 static const int LANG_EN = 1;
 static const int LANG_RU = 2;
 
-#define ntr_am "am"
-#define ntr_ru "ru"
-#define ntr_en "en"
+#define ntr_am 0
+#define ntr_ru 1
+#define ntr_en 2
 #define ntr(x, a) C5Translator::translate(x, a)
 #define tr_am(x) ntr(x, ntr_am)
 
@@ -18,21 +18,33 @@ class C5Translator : public QObject
 public:
     C5Translator();
 
-    void initTranslator(const QStringList &dbParams);
+    static void initTranslator(const QStringList &dbParams);
 
     void setLanguage(int language);
 
-    QString tt(const QString &value);
+    static QString tt(const QString &value);
 
-    QString td(int id) const;
+    static QString td(int id);
 
-    static QString translate(const QString &str, const QString &lang = "am");
+    static QString translate(const QString &str, int lang);
 
 private:
 
     QStringList fDbParams;
 
     int fLanguage;
+
+    QMap<QString, QString> fAm;
+
+    QMap<QString, QString> fEn;
+
+    QMap<QString, QString> fRu;
+
+    QMap<int, QString> fAmDish;
+
+    QMap<int, QString> fEnDish;
+
+    QMap<int, QString> fRuDish;
 
     QString AM(const QString &value);
 

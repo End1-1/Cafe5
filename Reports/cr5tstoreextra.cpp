@@ -249,7 +249,7 @@ QString CR5TStoreExtra::documentForInventory()
     }
     if (result.isEmpty()) {
         C5StoreDraftWriter dw(db);
-        dw.writeAHeader(result, QString::number(dw.counterAType(DOC_TYPE_STORE_INVENTORY)), DOC_STATE_SAVED, DOC_TYPE_STORE_INVENTORY, __user->id(), f->dateEnd(), QDate::currentDate(), QTime::currentTime(), 0, 0, tr("Created automaticaly"), __c5config.getValue(param_default_currency).toInt());
+        dw.writeAHeader(result, QString::number(dw.counterAType(DOC_TYPE_STORE_INVENTORY)), DOC_STATE_SAVED, DOC_TYPE_STORE_INVENTORY, __user->id(), f->dateEnd(), QDate::currentDate(), QTime::currentTime(), 0, 0, tr("Created automaticaly"),0, __c5config.getValue(param_default_currency).toInt());
         result = "'" + result + "'";
     }
     return result;

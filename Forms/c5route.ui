@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>C5Route</class>
+ <widget class="QWidget" name="C5Route">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>836</width>
+    <height>692</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QWidget" name="widget" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="C5LineEdit" name="leFilter">
+        <property name="maximumSize">
+         <size>
+          <width>200</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>filter</string>
+        </property>
+        <property name="placeholderText">
+         <string>filter</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="C5TableWidget" name="tbl">
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <column>
+      <property name="text">
+       <string>Route id</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>PartnerId</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Address</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Taxcode</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Taxname</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>I</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>II</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>III</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>IV</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>V</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>VI</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>VII</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>C5LineEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5lineedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5TableWidget</class>
+   <extends>QTableWidget</extends>
+   <header location="global">c5tablewidget.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

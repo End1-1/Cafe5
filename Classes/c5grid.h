@@ -75,7 +75,7 @@ protected:
 
     QStringList fColumnsFields;
 
-    QHash<QString, bool> fColumnsVisible;
+    QMap<QString, bool> fColumnsVisible;
 
     QStringList fColumnsGroup;
 

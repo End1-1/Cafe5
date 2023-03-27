@@ -43,7 +43,7 @@
 #define cp_t3_sale_dishes 309
 #define cp_t3_sale_from_store_total 310
 #define cp_t3_discount_statistics 311
-#define cp_t3_debts_to_partners 312
+#define cp_t3_debts 312
 #define cp_t3_consuption_reason 313
 #define cp_t3_car_visits 314
 #define cp_t3_preorders 315
@@ -130,14 +130,14 @@
 #define cp_t7_store_reason 708
 #define cp_t7_partners 709
 #define cp_t7_order_marks 710
+#define cp_t7_route 711
+#define cp_t7_route_exec 712
 
 #define cp_t8_cash 800
 #define cp_t8_cash_doc 801
 #define cp_t8_cash_common_report 802
 #define cp_t8_cash_detailed_report 803
 #define cp_t8_cash_names 804
-#define cp_t8_costumer_debts 805
-#define cp_t8_costumer_debts_pay 806
 #define cp_t8_cash_movement 807
 #define cp_t8_currency 808
 #define cp_t8_edit_currency 809

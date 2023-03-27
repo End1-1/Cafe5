@@ -52,6 +52,8 @@ void WaiterConnection::handleData(RawMessage *m, const QByteArray &in)
         return;
     }
 
+    C5Translator::initTranslator(dbw.params());
+
     switch (op) {
     case op_login:
         fUserId = loginUsernamePassword(rm, dbw, in, fUserName);
@@ -136,6 +138,9 @@ void WaiterConnection::handleData(RawMessage *m, const QByteArray &in)
         break;
     case op_get_menu_list:
         loadMenuNames(rm, dbw, in);
+        break;
+    case op_scandiscount:
+        processScanDiscount(rm, dbw, in);
         break;
     default:
         rm.putUByte(0);

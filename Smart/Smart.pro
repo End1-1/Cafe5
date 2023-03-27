@@ -139,6 +139,14 @@ SOURCES += \
     ../Shop/printreceipt.cpp \
     ../Shop/printreceiptgroup.cpp \
     ../Shop/selectprinters.cpp \
+    ../TableRecord/aheader.cpp \
+    ../TableRecord/bclientdebts.cpp \
+    ../TableRecord/bhistory.cpp \
+    ../TableRecord/c5dbrecord.cpp \
+    ../TableRecord/cpartners.cpp \
+    ../TableRecord/ecash.cpp \
+    ../TableRecord/ogoods.cpp \
+    ../TableRecord/oheader.cpp \
     dishpackage.cpp \
     dlgmemoryread.cpp \
     dlgsmartreports.cpp \
@@ -273,6 +281,14 @@ HEADERS += \
     ../Shop/printreceipt.h \
     ../Shop/printreceiptgroup.h \
     ../Shop/selectprinters.h \
+    ../TableRecord/aheader.h \
+    ../TableRecord/bclientdebts.h \
+    ../TableRecord/bhistory.h \
+    ../TableRecord/c5dbrecord.h \
+    ../TableRecord/cpartners.h \
+    ../TableRecord/ecash.h \
+    ../TableRecord/ogoods.h \
+    ../TableRecord/oheader.h \
     dish.h \
     dishpackage.h \
     dlgmemoryread.h \
@@ -338,6 +354,7 @@ INCLUDEPATH += c:/projects/cafe5/Cafe5
 INCLUDEPATH += c:/projects/cafe5/Classes
 INCLUDEPATH += c:/projects/cafe5/Controls
 INCLUDEPATH += c:/projects/cafe5/Service
+INCLUDEPATH += c:/projects/cafe5/TableRecord
 INCLUDEPATH += c:/projects/cafe5/DbData
 INCLUDEPATH += c:/projects/cafe5/Forms
 INCLUDEPATH += c:/Projects/NewTax/Src

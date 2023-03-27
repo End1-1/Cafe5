@@ -17,6 +17,7 @@ void openOrder(RawMessage &rm, Database &db, const QByteArray &in, int userid);
 void addDishToOrder(RawMessage &rm, Database &db, const QByteArray &in, int userid);
 void removeDishFromOrder(RawMessage &rm, Database &db, const QByteArray &in, int userid);
 void modifyDishOrder(RawMessage &rm, Database &db, const QByteArray &in, int userid);
+void processScanDiscount(RawMessage &rm, Database &db, const QByteArray &in);
 void printService(RawMessage &rm, Database &db, const QByteArray &in, WaiterConnection *w);
 bool printServiceOnPrinter(const QMap<QString, QVariant> &order, const QMap<QString, QList<int> > &dishesToPrint, const QList<QMap<QString, QVariant> > &dishes);
 bool countOrder1(RawMessage &rm, Database &db, const QString &orderid);

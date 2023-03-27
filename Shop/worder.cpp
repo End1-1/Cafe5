@@ -13,7 +13,9 @@
 #include "printreceipt.h"
 #include "selectstaff.h"
 #include "c5shoporder.h"
+#include "dlgsearchpartner.h"
 #include "working.h"
+#include "dlgpaymentchoose.h"
 #include "c5user.h"
 #include "datadriver.h"
 #include "wcustomerdisplay.h"
@@ -25,44 +27,42 @@
 #include "threadcheckmessage.h"
 #include <QInputDialog>
 
+#define col_bacode 0
+#define col_name 1
 #define col_qty 2
+#define col_unit 3
 #define col_price 4
 #define col_total 5
-#define col_discount_value 11
-#define col_discount_mode 12
-#define col_discount_factor 13
+#define col_discamount 6
+#define col_discmode 7
+#define col_discvalue 8
 
 WOrder::WOrder(C5User *user, int saleType, WCustomerDisplay *customerDisplay, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::WOrder)
 {
     ui->setupUi(this);
+    fOHeader.state = ORDER_STATE_CLOSE;
+    fOHeader.hall = __c5config.defaultHall();
+    fOHeader.table = __c5config.defaultTable();
+    fOHeader.cashier = user->id();
+    fOHeader.staff = user->id(),
+    fOHeader.comment = "";
+    fOHeader.source = 2;
+    fOHeader.print = 1;
+    fOHeader.saleType = saleType;
+    fOHeader.currency = __c5config.getValue(param_default_currency).toInt();
+
     ui->grFlags->setVisible(false);
-    ui->tblGoods->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
-    fSaleType = saleType;
     fCustomerDisplay = customerDisplay;
-    fPartner = 0;
     fUser = user;
     fGiftCard = 0;
     fWorking = static_cast<Working*>(parent);
-    fDateOpen = QDate::currentDate();
-    fTimeOpen = QTime::currentTime();
-    ui->tblGoods->setColumnWidths(ui->tblGoods->columnCount(), 0, 500, 80, 80, 120, 120, 0, 0, 0, 0, 0, 100, 0, 0);
-    fCardValue = 0;
-    fCardMode = 0;
     ui->lbDisc->setVisible(false);
     ui->leDisc->setVisible(false);
-    ui->leCard->setValidator(new QDoubleValidator(0, 1000000000, 2));
-    ui->leCash->setValidator(new QDoubleValidator(0, 1000000000, 2));
-    ui->leChange->setValidator(new QDoubleValidator(0, 1000000000, 2));
-    ui->leAdvance->setValidator(new QDoubleValidator(0, 99999999, 2));
+
     noImage();
-    connect(ui->leCard, &C5LineEdit::focusOut, [this](){
-        C5LogSystem::writeEvent(QString("%1: %2").arg(tr("Card value"), ui->leCard->text()));
-    });
-    connect(ui->leCash, &C5LineEdit::focusOut, [this](){
-        C5LogSystem::writeEvent(QString("%1: %2").arg(tr("Cash value"), ui->leCard->text()));
-    });
+
     ui->btnF1->setVisible(fWorking->fFlags.contains(1));
     ui->btnF2->setVisible(fWorking->fFlags.contains(2));
     ui->btnF3->setVisible(fWorking->fFlags.contains(3));
@@ -73,6 +73,16 @@ WOrder::WOrder(C5User *user, int saleType, WCustomerDisplay *customerDisplay, QW
     ui->btnF3->setText(fWorking->flag(3).name);
     ui->btnF4->setText(fWorking->flag(4).name);
     ui->btnF5->setText(fWorking->flag(5).name);
+
+    ui->tblData->setColumnWidth(col_bacode, 120);
+    ui->tblData->setColumnWidth(col_name, 300);
+    ui->tblData->setColumnWidth(col_qty, 100);
+    ui->tblData->setColumnWidth(col_unit, 100);
+    ui->tblData->setColumnWidth(col_price, 100);
+    ui->tblData->setColumnWidth(col_total, 100);
+    ui->tblData->setColumnWidth(col_discamount, 100);
+    ui->tblData->setColumnWidth(col_discmode, 200);
+    ui->tblData->setColumnWidth(col_discvalue, 120);
 }
 
 WOrder::~WOrder()
@@ -80,25 +90,22 @@ WOrder::~WOrder()
     delete ui;
 }
 
+void WOrder::setPrepaidAmount(double amountPrepaid)
+{
+    fOHeader.amountPrepaid = amountPrepaid;
+}
+
 void WOrder::updateCustomerDisplay(WCustomerDisplay *cd)
 {
     fCustomerDisplay = cd;
     if (fCustomerDisplay) {
         fCustomerDisplay->clear();
-        for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
-            fCustomerDisplay->addRow(ui->tblGoods->getString(i, 1),
-                                     float_str(ui->tblGoods->getDouble(i, 2), 2),
-                                     float_str(ui->tblGoods->getDouble(i, 4), 2),
-                                     float_str(ui->tblGoods->getDouble(i, 5), 2),
-                                     float_str(ui->tblGoods->getDouble(i, col_discount_value), 2));
+        for (int i = 0; i < fOGoods.count(); i++) {
+            const OGoods &g = fOGoods.at(i);
+            fCustomerDisplay->addRow(g._goodsName, float_str(g.qty, 2), float_str(g.price, 2), float_str(g.total, 2), float_str(g.discountAmount, 2));
         }
         fCustomerDisplay->setTotal(ui->leTotal->text());
     }
-}
-
-void WOrder::setPrepaid(double p)
-{
-    ui->leAdvance->setDouble(p);
 }
 
 void WOrder::clearCode()
@@ -125,18 +132,6 @@ void WOrder::keyAsterix()
 {
     clearCode();
     changePrice();
-}
-
-void WOrder::focusCash()
-{
-    ui->leCash->setFocus();
-    ui->leCash->setSelection(0, 1000);
-}
-
-void WOrder::focusCard()
-{
-    ui->leCard->setFocus();
-    ui->leCard->setSelection(0, 1000);
 }
 
 void WOrder::focusTaxpayerId()
@@ -177,8 +172,8 @@ void WOrder::imageConfig()
 
 bool WOrder::addGoods(int id)
 {
-    if (fSaleType == -1) {
-        if (ui->tblGoods->rowCount() > 0) {
+    if (fOHeader.saleType == -1) {
+        if (fOGoods.count() > 0) {
             C5Message::error(tr("Cannot add goods in prepaid mode"));
             return false;
         }
@@ -213,7 +208,7 @@ int WOrder::addGoodsToTable(int id)
 
     DbGoods g(id);
     double price = 0;
-    switch (fSaleType) {
+    switch (fOHeader.saleType) {
     case SALE_RETAIL:
         price = db.getDouble("f_price1");
         break;
@@ -228,29 +223,30 @@ int WOrder::addGoodsToTable(int id)
        .arg(g.goodsName())
        .arg(tr("Price"))
        .arg(price));
-    int row = ui->tblGoods->addEmptyRow();
-    ui->tblGoods->item(row, 0)->setData(Qt::UserRole, QVariant::fromValue(id));
-    ui->tblGoods->setInteger(row, 0, id);
-    ui->tblGoods->setString(row, 1, g.goodsName() + " " + g.scancode());
-    //ui->tblGoods->setString(row, 1, g.goodsName());
-    ui->tblGoods->setDouble(row, 2, g.unit()->defaultQty());
-    ui->tblGoods->item(row, 2)->fDecimals = 3;
-    ui->tblGoods->setString(row, 3, g.unit()->unitName());
-    ui->tblGoods->setDouble(row, 4, price);
-    ui->tblGoods->setDouble(row, 5, g.unit()->defaultQty() * price);
-    ui->tblGoods->setString(row, 6, g.group()->taxDept());
-    ui->tblGoods->setString(row, 7, g.group()->adgt());
-    ui->tblGoods->setString(row, 8, "");
-    ui->tblGoods->setInteger(row, 9, g.unit()->id());
-    ui->tblGoods->setInteger(row, 10, g.isService() ? 1 : 0);
-    ui->tblGoods->setDouble(row, col_discount_value, 0);
-    ui->tblGoods->setInteger(row, col_discount_mode, fCardMode);
-    ui->tblGoods->setDouble(row, col_discount_factor, fCardValue);
-    ui->tblGoods->setCurrentItem(ui->tblGoods->item(row, 0));
+
+    int row = ui->tblData->addEmptyRow();
+    OGoods og;
+    og._goodsName = g.goodsName();
+    og._unitName = g.unit()->unitName();
+    og._barcode = g.scancode();
+    og.header = fOHeader.id;
+    og.goods = id;
+    og.taxDept = g.group()->taxDept();
+    og.adgCode = g.group()->adgt();
+    og.isService = g.isService();
+    og.qty = g.unit()->defaultQty();
+    og.price = price;
+    og.store = __c5config.defaultStore();
+    og.total = og.qty * og.price;
+    og.discountFactor = fBHistory.value;
+    og.discountMode = fBHistory.type;
+    og.discountAmount = 0;
+    fOGoods.append(og);
+    ui->tblData->setCurrentCell(row, 0);
     countTotal();
 
     db[":f_station"] = hostinfo + ": " + hostusername();
-    db[":f_saletype"] = fSaleType;
+    db[":f_saletype"] = fOHeader.saleType;
     db[":f_window"] = fWorking->fTab->currentIndex();
     db[":f_row"] = row;
     db[":f_state"] = 0;
@@ -278,19 +274,35 @@ int WOrder::addGoodsToTable(int id)
 
 bool WOrder::writeOrder()
 {
+    if (fOHeader.amountCash < 0.001
+            && fOHeader.amountCard < 0.001
+            && fOHeader.amountBank < 0.001
+            && fOHeader.amountIdram < 0.001
+            && fOHeader.amountTelcell < 0.001
+            && fOHeader.amountPayX < 0.001
+            && fOHeader.amountPrepaid < 0.001) {
+        fOHeader.amountCash = fOHeader.amountTotal;
+    }
+    if (!DlgPaymentChoose::getValues(fOHeader.amountTotal, fOHeader.amountCash, fOHeader.amountCard, fOHeader.amountIdram,
+                                     fOHeader.amountTelcell, fOHeader.amountBank, fOHeader.amountPrepaid, fOHeader.amountDebt,
+                                     fOHeader.amountCashIn, fOHeader.amountChange, fOHeader._printFiscal)) {
+        return false;
+    }
+
     QElapsedTimer t;
     t.start();
 
-    if (ui->chDebt->isChecked() && fPartner == 0) {
+    if ((fOHeader.amountDebt > 0.001 || fOHeader.amountBank > 0.001) && fOHeader.partner == 0) {
         C5Message::error(tr("Debt impossible on unknown partner"));
         return false;
     }
-    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
-        if (ui->tblGoods->getDouble(i, 2) < 0.0001) {
+    for (int i = 0; i < fOGoods.count(); i++) {
+        const OGoods &g = fOGoods.at(i);
+        if (g.qty < 0.0001) {
             C5Message::error(tr("Invalid qty"));
             return false;
         }
-        if (ui->tblGoods->getDouble(i, 4) < 0) {
+        if (g.price < 0) {
             C5Message::error(tr("Invalid price"));
             return false;
         }
@@ -306,50 +318,23 @@ bool WOrder::writeOrder()
             u = ss.fUser;
         } while (!u->isValid());
     }
-    QList<IGoods> goods;
-    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
-        IGoods g;
-        DbGoods gt(ui->tblGoods->getInteger(i, 0));
-        g.taxDept = ui->tblGoods->getString(i, 6);
-        g.taxAdg = ui->tblGoods->getString(i, 7);
-        g.goodsId = ui->tblGoods->getString(i, 0).toInt();
-        g.goodsName = ui->tblGoods->getString(i, 1);
-        g.goodsPrice = ui->tblGoods->getDouble(i, 4);
-        g.goodsQty = ui->tblGoods->getDouble(i, 2);
-        g.goodsTotal = ui->tblGoods->getDouble(i, 5);
-        g.unitId = ui->tblGoods->getInteger(i, 9);
-        g.isService = ui->tblGoods->getInteger(i, 10) == 1;
-        g.discountFactor = ui->tblGoods->item(i, col_discount_value)->data(Qt::UserRole).toDouble();
-        g.discountMode = ui->tblGoods->item(i, col_discount_mode)->data(Qt::UserRole).toInt();
-        g.storeId = __c5config.defaultStore();
-        g.writeStoreDocBeforeOutput = gt.writeStoreInputBeforeSale();
-        g.lastInputPrice = gt.lastInputPrice();
-        goods.append(g);
-    }
-    C5ShopOrder so(u);
-    so.setPartner(fPartner, ui->leOrganization->text());
-    so.setPayment(ui->leCash->getDouble(), ui->leChange->getDouble(), ui->chDebt->isChecked(), C5Config::getValue(param_default_currency).toInt());
-    so.setDiscount(fCardId, fCardMode, fCardValue);
-    so.setParams(fDateOpen, fTimeOpen, fSaleType);
-    so.fWriteAdvance = fSaleType == -1;
-    C5LogSystem::writeEvent(QString("%1. %2:%3, %4:%5, %6:%7, %8:%9").arg(tr("Before write"), tr("Total"), ui->leTotal->text(), tr("Card"), ui->leCard->text(),tr("Advance"), 0, tr("Discount"), ui->leDisc->text()));
-    bool w = so.write(ui->leTotal->getDouble(), ui->leCard->getDouble(), ui->leAdvance->getDouble(), ui->leDisc->getDouble(),
-                      fSaleType == -1, goods, fCardValue, fCardMode, ui->chIdram->isChecked(), __c5config.getValue(param_default_currency).toInt());
+    C5ShopOrder so(fOHeader, fBHistory, fOGoods);
+    so.fWriteAdvance = fOHeader.saleType == -1;
+    bool w = so.write();
     if (w) {
         w = so.writeFlags(ui->btnF1->isChecked(), ui->btnF2->isChecked(),
                           ui->btnF3->isChecked(), ui->btnF4->isChecked(),
                           ui->btnF5->isChecked());
     }
-    fOrderUUID = so.fHeader;
     C5Database db(__c5config.dbParams());
     if (w) {
-        foreach (const IGoods &g, goods) {
+        foreach (const OGoods &g, fOGoods) {
             if (g.isService) {
                 continue;
             }
             db[":f_store"] = __c5config.defaultStore();
-            db[":f_goods"] = g.goodsId;
-            db[":f_qty"] = g.goodsQty;
+            db[":f_goods"] = g.goods;
+            db[":f_qty"] = g.qty;
             db.exec("update a_store_sale set f_qty=f_qty-:f_qty, f_qtyprogram=f_qtyprogram-:f_qty where f_store=:f_store and f_goods=:f_goods");
         }
         if (!fPreorderUUID.isEmpty()) {
@@ -358,24 +343,15 @@ bool WOrder::writeOrder()
         }
     }
     if (w) {
-        if (ui->chDebt->isChecked()) {
-            db[":f_costumer"] = fPartner;
-            db[":f_order"] = so.fHeader;
-            db[":f_amount"] = ui->leTotal->getDouble() * -1;
-            db[":f_date"] = QDate::currentDate();
-            db[":f_govnumber"] = "";
-            db.insert("b_clients_debts", false);
-        }
-
         db[":f_station"] = hostinfo + ": " + hostusername();
-        db[":f_order"] = so.fHeader;
+        db[":f_order"] = fOHeader.id;
         db[":f_window"] = fWorking->fTab->currentIndex();
         db.exec("update a_sale_temp set f_state=2, f_order=:f_order where f_station=:f_station "
                 "and f_window=:f_window and f_state=0");
     }
-    if (w && fSaleType == -1) {
+    if (w && fOHeader.saleType == -1) {
         C5Database dbr(__c5config.replicaDbParams());
-        dbr[":f_id"] = ui->tblGoods->getInteger(0, 0);
+        dbr[":f_id"] = fOGoods.at(0).goods;
         dbr.exec("select f_scancode from c_goods where f_id=:f_id");
         if (dbr.nextRow()) {
             QString cardcode = "2211" +  dbr.getString("f_scancode");
@@ -387,18 +363,29 @@ bool WOrder::writeOrder()
                 dbr[":f_datesaled"] = QDate::currentDate();
                 dbr.exec("update b_gift_card set f_datesaled=:f_datesaled where f_code=:f_code");
                 dbr[":f_card"] = giftid;
-                dbr[":f_trsale"] = so.fHeader;
+                dbr[":f_trsale"] = fOHeader.id;
                 dbr[":f_amount"] = ui->leTotal->getDouble();
                 dbr.insert("b_gift_card_history");
             }
         }
     }
     if (w && fGiftCard > 0) {
-        if (ui->leAdvance->getDouble() > 0.001) {
-            C5Database dbr(__c5config.replicaDbParams());
+        C5Database dbr(__c5config.replicaDbParams());
+        if (fOHeader.amountPrepaid > 0.001) {
             dbr[":f_card"] = fGiftCard;
-            dbr[":f_trsale"] = so.fHeader;
-            dbr[":f_amount"] = -1 * ui->leAdvance->getDouble();
+            dbr[":f_trsale"] = fOHeader.id;
+            dbr[":f_amount"] = -1 * fOHeader.amountPrepaid;
+            dbr.insert("b_gift_card_history");
+        } else {
+            dbr[":f_id"] = fGiftCard;
+            dbr.exec("select f_code from b_gift_card where f_id=:f_id");
+            dbr.nextRow();
+            dbr[":f_code"] = dbr.getString("f_code");
+            dbr.exec("select f_value from b_cards_discount where f_code=:f_code");
+            dbr.nextRow();
+            dbr[":f_card"] = fGiftCard;
+            dbr[":f_trsale"] = fOHeader.id;
+            dbr[":f_amount"] = ui->leTotal->getDouble() * dbr.getDouble("f_value");
             dbr.insert("b_gift_card_history");
         }
     }
@@ -416,7 +403,7 @@ bool WOrder::writeOrder()
 //        }
 //    }
 
-    C5LogSystem::writeEvent(QString("%1. %2:%3ms, %4:%5, %6").arg(tr("Order saved"), tr("Elapsed"), QString::number(t.elapsed()), tr("Order number"), so.fHallId, so.fHeader));
+    C5LogSystem::writeEvent(QString("%1. %2:%3ms, %4:%5, %6").arg(tr("Order saved"), tr("Elapsed"), QString::number(t.elapsed()), tr("Order number"), fOHeader.humanId(), fOHeader.id));
     return w;
 }
 
@@ -432,33 +419,34 @@ void WOrder::fixCostumer(const QString &code)
         C5Message::error(tr("Cards was expired"));
         return;
     }
-    fPartner = db.getInt("f_client");
-    fCardId = db.getInt("f_id");
-    fCardMode = db.getInt("f_mode");
-    fCardValue = db.getDouble("f_value");
-    db[":f_id"] = fPartner;
+    fOHeader.partner = db.getInt("f_client");
+    fBHistory.card = db.getInt("f_id");
+    fBHistory.type = db.getInt("f_mode");
+    fBHistory.value = db.getDouble("f_value");
+    db[":f_id"] = fOHeader.partner;
     db.exec("select * from c_partners where f_id=:f_id");
     if (!db.nextRow()) {
         return;
     }
-    if (fCardValue < 0) {
+    if (fBHistory.value < 0) {
         double v;
-        if (!getDiscountValue(fCardMode, v)) {
-            fCardId = 0;
-            fCardMode = 0;
-            fCardValue = 0;
+        if (!getDiscountValue(fBHistory.type, v)) {
+            fBHistory.card = 0;
+            fBHistory.value = 0;
+            fBHistory.data = 0;
             return;
         }
-        fCardValue = v;
-        if (fCardMode == CARD_TYPE_DISCOUNT) {
-            fCardValue = v / 100;
+        fBHistory.value = v;
+        if (fBHistory.type == CARD_TYPE_DISCOUNT) {
+            fBHistory.value = v / 100;
         } else {
-            fCardValue = v;
+            fBHistory.value = v;
         }
     }
-    for (int i = 0; i < ui->tblGoods->rowCount() ; i++ ) {
-        ui->tblGoods->setInteger(i, col_discount_mode, fCardMode);
-        ui->tblGoods->setDouble(i, col_discount_factor, fCardValue);
+    for (int i = 0; i < fOGoods.count(); i++ ) {
+        OGoods &g = fOGoods[i];
+        g.discountMode = fBHistory.type;
+        g.discountFactor = fBHistory.value;
     }
     ui->leOrganization->setText(db.getString("f_taxinfo"));
     ui->leContact->setText(db.getString("f_contact"));
@@ -468,11 +456,11 @@ void WOrder::fixCostumer(const QString &code)
 
 void WOrder::changeQty()
 {
-    int row = ui->tblGoods->currentRow();
+    int row = ui->tblData->currentRow();
     if (row < 0) {
         return;
     }
-    if (ui->tblGoods->item(row, col_discount_mode)->data(Qt::UserRole).toInt() == CARD_TYPE_MANUAL) {
+    if (fOGoods.at(row).discountMode == CARD_TYPE_MANUAL) {
         C5Message::error(tr("Cannot change the quantity on selected row with manual discount mode"));
         return;
     }
@@ -485,11 +473,11 @@ void WOrder::changeQty()
 
 void WOrder::changeQty(double qty)
 {
-    int row = ui->tblGoods->currentRow();
+    int row = ui->tblData->currentRow();
     if (row < 0) {
         return;
     }
-    if (ui->tblGoods->item(row, col_discount_mode)->data(Qt::UserRole).toInt() == CARD_TYPE_MANUAL) {
+    if (fOGoods.at(row).discountMode == CARD_TYPE_MANUAL) {
         C5Message::error(tr("Cannot change the quantity on selected row with manual discount mode"));
         return;
     }
@@ -501,11 +489,12 @@ void WOrder::changeQty(double qty)
 
 void WOrder::discountRow(const QString &code)
 {
-    int row = ui->tblGoods->currentRow();
+    int row = ui->tblData->currentRow();
     if (row < 0) {
         return;
     }
-    if (ui->tblGoods->getDouble(row, col_discount_value) > 0.001) {
+    OGoods &g = fOGoods[row];
+    if (g.discountFactor > 0.001) {
         C5Message::error(tr("Discount already applied"));
         return;
     }
@@ -530,40 +519,36 @@ void WOrder::discountRow(const QString &code)
         }
     }
 
+    g.discountMode = discType;
     switch (discType) {
     case CARD_TYPE_DISCOUNT:
-        ui->tblGoods->setDouble(row, col_discount_value, v * 100);
-        ui->tblGoods->setInteger(row, col_discount_mode, discType);
-        ui->tblGoods->setDouble(row, col_price, ui->tblGoods->getDouble(row, col_price) - (ui->tblGoods->getDouble(row, col_price) * v));
-        ui->tblGoods->setDouble(row, col_total, ui->tblGoods->getDouble(row, col_qty) * ui->tblGoods->getDouble(row, col_price));
+        g.discountFactor = v;
+        g.discountMode = discType;
         break;
     case CARD_TYPE_MANUAL:
-        if (v > ui->tblGoods->getDouble(row, col_total)) {
+        if (v > g.total) {
             C5Message::error(tr("Discount amount greater than total amount"));
             return;
         }
-        ui->tblGoods->setDouble(row, col_total, ui->tblGoods->getDouble(row, col_total) - v);
-        ui->tblGoods->setDouble(row, col_price, ui->tblGoods->getDouble(row, col_total) / ui->tblGoods->getDouble(row, col_qty));
-        ui->tblGoods->setDouble(row, col_discount_value, v);
-        ui->tblGoods->setString(row, col_discount_mode, "$");
+        g.discountFactor = v;
+        g.discountAmount = v;
         break;
     default:
         C5Message::error(tr("This discount mode is not supported"));
         return;
     }
-    ui->tblGoods->item(row, col_discount_value)->setData(Qt::UserRole, v);
-    ui->tblGoods->item(row, col_discount_mode)->setData(Qt::UserRole, discType);
     C5LogSystem::writeEvent(QString("%1: %2:%3, %4:%5").arg(tr("Discount")).arg(tr("Discount type")).arg(discType).arg(tr("Value")).arg(v));
     countTotal();
 }
 
 void WOrder::changePrice()
 {
-    int row = ui->tblGoods->currentRow();
+    int row = ui->tblData->currentRow();
     if (row < 0) {
         return;
     }
-    double currentPrice = ui->tblGoods->getDouble(row, 4);
+    OGoods &g = fOGoods[row];
+    double currentPrice = g.price;
     if (__c5config.shopDenyPriceChange() && !(currentPrice <0)) {
         return;
     }
@@ -571,30 +556,28 @@ void WOrder::changePrice()
     if (price < 0.001) {
         return;
     }
-    ui->tblGoods->setDouble(row, 4, price);
-    ui->tblGoods->setDouble(row, 5, ui->tblGoods->getDouble(row, 2) * price);
+    g.price = price;
     countTotal();
 }
 
 void WOrder::changePrice(double price)
 {
-    int row = ui->tblGoods->currentRow();
+    int row = ui->tblData->currentRow();
     if (row < 0) {
         return;
     }
-    ui->tblGoods->setDouble(row, 4, price);
-    ui->tblGoods->setDouble(row, 5, ui->tblGoods->getDouble(row, 2) * price);
+    fOGoods[row].price = price;
     countTotal();
 }
 
 int WOrder::rowCount()
 {
-    return ui->tblGoods->rowCount();
+    return fOGoods.count();
 }
 
 void WOrder::removeRow()
 {
-    int row = ui->tblGoods->currentRow();
+    int row = ui->tblData->currentRow();
     if (row < 0) {
         return;
     }
@@ -610,12 +593,9 @@ void WOrder::removeRow()
             return;
         }
     }
-    QString code = ui->tblGoods->getString(row, 0);
-    QString name = ui->tblGoods->getString(row, 1);
-    double qty = ui->tblGoods->getDouble(row, 2);
-    ui->leCard->setText("0");
-    ui->leCash->setText("0");
-    ui->leChange->setText("0");
+    OGoods &g = fOGoods[row];
+    QString code = g.goods;
+    QString name = g._goodsName;
     C5Database db(__c5config.dbParams());
     db[":f_window"] = fWorking->fTab->currentIndex();
     db[":f_state"] = 0;
@@ -629,32 +609,33 @@ void WOrder::removeRow()
     db.exec("update a_sale_temp set f_row=f_row-1 where f_station=:f_station and f_row>:f_row and f_state=:f_state and f_window=:f_window");
     db[":f_store"] = __c5config.defaultStore();
     db[":f_goods"] = code.toInt();
-    db[":f_qty"] = qty;
+    db[":f_qty"] = g.qty;
     db.exec("update a_store_sale set f_qtyprogram=f_qtyprogram-:f_qty where f_store=:f_store and f_goods=:f_goods");
-    ui->tblGoods->removeRow(row);
-    C5LogSystem::writeEvent(QString("%1 #%2 %3:%4 %5").arg(tr("Remove row")).arg(row).arg(code).arg(name).arg(float_str(qty, 2)));
+    C5LogSystem::writeEvent(QString("%1 #%2 %3:%4 %5").arg(tr("Remove row")).arg(row).arg(code).arg(name).arg(float_str(g.qty, 2)));
+    fOGoods.remove(row);
+    ui->tblData->setRowCount(fOGoods.count());
     countTotal();
 }
 
 void WOrder::nextRow()
 {
-    int row = ui->tblGoods->currentRow();
-    if (row + 1 < ui->tblGoods->rowCount()) {
-        ui->tblGoods->setCurrentItem(ui->tblGoods->item(row + 1, 0));
+    int row = ui->tblData->currentRow();
+    if (row + 1 < ui->tblData->rowCount()) {
+        ui->tblData->setCurrentItem(ui->tblData->item(row + 1, 0));
     }
 }
 
 void WOrder::prevRow()
 {
-    int row = ui->tblGoods->currentRow();
+    int row = ui->tblData->currentRow();
     if (row - 1 > -1) {
-        ui->tblGoods->setCurrentItem(ui->tblGoods->item(row - 1, 0));
+        ui->tblData->setCurrentItem(ui->tblData->item(row - 1, 0));
     }
 }
 
 int WOrder::lastRow()
 {
-    return ui->tblGoods->rowCount() - 1;
+    return ui->tblData->rowCount() - 1;
 }
 
 void WOrder::setDiscount(const QString &label, const QString &value)
@@ -673,62 +654,22 @@ void WOrder::setDiscount(const QString &label, const QString &value)
 
 void WOrder::countTotal()
 {
-    double total = 0;
-    double discount = 0;
-    double disc = 0;
-    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
-        double amount = ui->tblGoods->getDouble(i, 5);
-        switch (fCardMode) {
-        case CARD_TYPE_DISCOUNT:
-            disc = amount * ui->tblGoods->getDouble(i, col_discount_factor);
-            ui->tblGoods->setDouble(i, col_discount_value, disc);
-            discount += disc;
-            total += amount - disc;
-            break;
-        case CARD_TYPE_ACCUMULATIVE:
-            disc = amount * ui->tblGoods->getDouble(i, col_discount_factor);
-            discount += disc;
-            total += amount;
-            break;
-        case CARD_TYPE_COUNT_ORDER:
-            total += amount;
-            break;
-        case CARD_TYPE_MANUAL:
-            total += amount;
-            disc = ui->tblGoods->getDouble(i, col_discount_factor);
-            break;
-        default:
-            total += ui->tblGoods->getDouble(i, 5);
-            break;
-        }
+    fOHeader.countAmount(fOGoods, fBHistory);
+    ui->leTotal->setDouble(fOHeader.amountTotal);
+    ui->leDisc->setDouble(fOHeader.amountDiscount);
+    for (int i = 0; i < fOGoods.count(); i++) {
+        const OGoods &og = fOGoods.at(i);
+        ui->tblData->setData(i, col_bacode, og._barcode);
+        ui->tblData->setData(i, col_name, og._goodsName);
+        ui->tblData->setData(i, col_qty, og.qty);
+        ui->tblData->setData(i, col_price, og.price);
+        ui->tblData->setData(i, col_unit, og._unitName);
+        ui->tblData->setData(i, col_total, og.total);
+        ui->tblData->setData(i, col_discamount, og.discountAmount);
+        ui->tblData->setData(i, col_discvalue, og.discountFactor);
+        ui->tblData->setData(i, col_discmode, og.discountMode);
     }
-    switch (fCardMode) {
-    case CARD_TYPE_DISCOUNT: {
-        ui->leDisc->setText(float_str(discount, 2));
-        ui->lbDisc->setText(QString("%1 %2%").arg(tr("Discount")).arg(float_str(fCardValue * 100, 2)));
-        break;
-    }
-    case CARD_TYPE_ACCUMULATIVE: {
-        ui->leDisc->setText(float_str(discount, 2));
-        ui->lbDisc->setText(QString("%1 %%2").arg(tr("Discount"), float_str(fCardValue * 100, 2)));
-        break;
-    }
-    case CARD_TYPE_COUNT_ORDER: {
-        ui->lbDisc->setText(QString("%1").arg(tr("Visit counter")));
-        break;
-    }
-    case CARD_TYPE_MANUAL:
-        ui->lbDisc->setText(QString("%1").arg(tr("Discount"), float_str(fCardValue, 2)));
-        ui->leDisc->setText(float_str(fCardValue, 2));
-        total -= fCardValue;
-        break;
-    default:
-        break;
-    }
-    ui->leTotal->setDouble(total);
-    on_leCash_textChanged(ui->leCash->text());
-    C5LogSystem::writeEvent(QString("%1: %3").arg(tr("Total amount"), float_str(total, 2)));
-
+    ui->leTotal->setDouble(fOHeader.amountTotal);
     updateCustomerDisplay(fCustomerDisplay);
 }
 
@@ -762,30 +703,35 @@ bool WOrder::getDiscountValue(int discountType, double &v)
 
 bool WOrder::setQtyOfRow(int row, double qty)
 {
-    DbGoods g(ui->tblGoods->getInteger(row, 0));
+    OGoods &og = fOGoods[row];
+    DbGoods g(og.goods);
     if (g.acceptIntegerQty()) {
         qty = trunc(qty);
     }
-    double diffqty = qty - ui->tblGoods->getInteger(row, tr("Qty"));
-
-    if (!g.isService() && __c5config.getValue(param_shop_dont_check_qty).toInt() == 0) {
+    double diffqty = qty - og.qty;
+    if (og.isService == 0  && __c5config.getValue(param_shop_dont_check_qty).toInt() == 0) {
         QString err;
         if (!checkQty(g.id(), diffqty, err)) {
-            C5Message::error(ui->tblGoods->item(row, 1)->text() + " \r\n" + err);
+            C5Message::error(og._goodsName + " \r\n" + err);
             return false;
         }
     }
-
-    ui->tblGoods->setDouble(row, 2, qty);
-    ui->tblGoods->setDouble(row, 5, ui->tblGoods->getDouble(row, 4) * qty);
+    og.qty = qty;
     C5LogSystem::writeEvent(QString("%1 %2:%3 %4").arg(tr("Change qty"), g.scancode(), g.goodsName(), float_str(qty, 2)));
+    countTotal();
+    return true;
+}
+
+bool WOrder::setPriceOfRow(int row, double price)
+{
+    fOGoods[row].price = price;
     countTotal();
     return true;
 }
 
 C5ClearTableWidget *WOrder::table()
 {
-    return ui->tblGoods;
+    return ui->tblData;
 }
 
 bool WOrder::checkQty(int goods, double qty, QString &err)
@@ -847,18 +793,6 @@ void WOrder::on_btnRemove_clicked()
     fWorking->fTab->removeTab(fWorking->fTab->currentIndex());
 }
 
-void WOrder::on_leCash_textChanged(const QString &arg1)
-{
-    ui->leCash->disconnect();
-    QString a = QString(arg1).replace(",", "");
-    ui->leChange->setDouble(str_float(a) - ui->leTotal->getDouble());
-    ui->leCash->setDouble(str_float(a));
-    if (a.toDouble() < 0.01) {
-        ui->leChange->setText("0");
-    }
-    connect(ui->leCash, &C5LineEdit::textChanged, this, &WOrder::on_leCash_textChanged);
-}
-
 void WOrder::on_leCode_textChanged(const QString &arg1)
 {
     if (arg1 == "+") {
@@ -885,16 +819,28 @@ void WOrder::on_leCode_returnPressed()
     if (code.at(0).toLower() == '?' && code.length() > 2 ) {
         if (code.at(1).toLower() == 'c') {
             if (code.at(2) == 'c') {
-                for (int i = 0; i <ui->tblGoods->rowCount(); i++) {
-                    ui->tblGoods->setDouble(i, col_discount_value, 0);
-                    ui->tblGoods->setDouble(i, col_discount_mode, 0);
-                    ui->tblGoods->setDouble(i, col_discount_factor, 0);
-                    fCardId = 0;
-                    fCardMode = 0;
-                    fCardValue = 0;
+                for (int i = 0; i < fOGoods.count(); i++) {
+                    OGoods &og = fOGoods[i];
+                    og.discountAmount = 0;
+                    og.discountFactor = 0;
+                    og.discountMode = 0;
+                    fBHistory.card = 0;
+                    fBHistory.type = 0;
+                    fBHistory.value = 0;
                     countTotal();
+                }
+                return;
+            } else if (code.at(2) == 't') {
+                int r = ui->tblData->currentRow();
+                if (r < 0) {
                     return;
                 }
+                OGoods &og = fOGoods[r];
+                og.discountAmount = 0;
+                og.discountFactor = 0;
+                og.discountMode = 0;
+                countTotal();
+                return;
             } else {
                 code.remove(0, 2);
                 fixCostumer(code);
@@ -914,7 +860,7 @@ void WOrder::on_leCode_returnPressed()
     db.exec("select c.f_id, c.f_code, sum(h.f_amount) as f_amount "
             "from b_gift_card_history h "
             "inner join b_gift_card c on c.f_id=h.f_card "
-            "where c.f_code=:f_code and c.f_datesaled>'2022-01-01'");
+            "where c.f_code=:f_code ");
     if (db.nextRow()) {
         fGiftCard = db.getInt("f_id");
         if (fGiftCard > 0) {
@@ -985,47 +931,20 @@ void WOrder::on_leCustomerTaxpayerId_returnPressed()
     db[":f_taxcode"] = ui->leCustomerTaxpayerId->text();
     db.exec("select f_id, f_taxname, f_contact from c_partners where f_taxcode=:f_taxcode");
     if (db.nextRow()) {
-        fPartner = db.getInt("f_id");
+        fOHeader.partner = db.getInt("f_id");
         ui->leOrganization->setText(db.getString("f_taxname"));
         ui->leContact->setText(db.getString("f_contact"));
     } else {
         db[":f_taxcode"] = ui->leCustomerTaxpayerId->text();
-        fPartner = db.insert("c_partners");
+        fOHeader.partner = db.insert("c_partners");
     }
 }
 
-void WOrder::on_leCard_textChanged(const QString &arg1)
+void WOrder::on_btnSearchPartner_clicked()
 {
-    ui->leCard->disconnect();
-    double advance = 0;
-    QString a = QString(arg1).replace(",", "");
-    if (str_float(a) + str_float(ui->leAdvance->text()) > str_float(ui->leTotal->text())) {
-        ui->leAdvance->setDouble(advance);
-        if (str_float(a) > str_float(ui->leTotal->text()) + advance) {
-            ui->leCard->setDouble(ui->leTotal->getDouble() - advance);
-        }
-    } else {
-        ui->leCard->setDouble(str_float(a));
+    DlgSearchPartner d;
+    if (d.exec() == QDialog::Accepted) {
+        ui->leCustomerTaxpayerId->setText(d.result);
+        on_leCustomerTaxpayerId_returnPressed();
     }
-    connect(ui->leCard, &C5LineEdit::textChanged, this, &WOrder::on_leCard_textChanged);
-}
-
-void WOrder::on_leAdvance_textChanged(const QString &arg1)
-{
-    ui->leAdvance->disconnect();
-    QString a = QString(arg1).replace(",", "").replace(" ", "");
-    if (fGiftCard) {
-        if (str_float(a) > ui->leGiftCardAmount->getDouble()) {
-            ui->leAdvance->setText(ui->leGiftCardAmount->text());
-        }
-    }
-    if (str_float(a) + str_float(ui->leCard->text()) + str_float(ui->leAdvance->text()) > str_float(ui->leTotal->text())) {
-        ui->leCard->setText(0);
-        if (str_float(a) > str_float(ui->leTotal->text())) {
-            ui->leAdvance->setText(ui->leTotal->text());
-        }
-    } else{
-        ui->leAdvance->setDouble(str_float(a));
-    }
-    connect(ui->leAdvance, &C5LineEdit::textChanged, this, &WOrder::on_leAdvance_textChanged);
 }

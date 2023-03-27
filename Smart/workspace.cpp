@@ -197,7 +197,7 @@ bool Workspace::login()
             left join d_dish d on d.f_id=m.f_dish \
             left join d_part2 p2 on p2.f_id=d.f_part \
             where m.f_menu=:f_menu and m.f_state=1 \
-            order by d.f_queue ");
+            order by d.f_queue, d.f_name ");
     while (db.nextRow()) {
         Dish *d = new Dish();
         d->id = db.getInt(0);
@@ -633,7 +633,7 @@ void Workspace::on_btnCheckout_clicked()
         return;
     }
 
-    if (ui->btnSetCard->isChecked()) {
+    if (ui->btnSetCard->isChecked() || ui->btnSetCardExternal->isChecked()) {
         ui->btnFiscal->setChecked(true);
     }
     if (__c5config.getValue(param_tax_print_if_amount_less).toInt() > 0) {
@@ -724,7 +724,7 @@ void Workspace::on_btnCheckout_clicked()
 
     if (!dw.writeAHeader(cashdoc, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH,
                          fUser->id(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(),
-                         0, ui->leTotal->getDouble(), cashprefix + " " + headerNum, __c5config.getValue(param_default_currency).toInt())) {
+                         0, ui->leTotal->getDouble(), cashprefix + " " + headerNum, 1, __c5config.getValue(param_default_currency).toInt())) {
         C5Message::error(dw.fErrorMsg);
         return;
     }
@@ -1878,6 +1878,9 @@ void Workspace::addDishToOrder(Dish *d)
     }
     ui->tblOrder->setCurrentCell(row, 0);
     countTotal();
+    if (ui->btnSetCard->isChecked() || ui->btnSetCardExternal->isChecked()) {
+        ui->leCard->setDouble(ui->leTotal->getDouble());
+    }
 }
 
 double Workspace::discountValue()
@@ -1926,6 +1929,7 @@ void Workspace::on_btnSetCardExternal_clicked()
     ui->btnSetIdram->setChecked(false);
     ui->btnSetOther->setChecked(false);
     ui->btnFiscal->setChecked(true);
+    ui->leCard->setDouble(ui->leTotal->getDouble());
 }
 
 

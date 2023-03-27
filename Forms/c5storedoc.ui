@@ -47,13 +47,6 @@
       <property name="spacing">
        <number>2</number>
       </property>
-      <item row="3" column="0">
-       <widget class="QLabel" name="lbStoreOutput">
-        <property name="text">
-         <string>Store output</string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="4">
        <spacer name="horizontalSpacer">
         <property name="orientation">
@@ -67,13 +60,6 @@
         </property>
        </spacer>
       </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>Date</string>
-        </property>
-       </widget>
-      </item>
       <item row="8" column="0">
        <widget class="QLabel" name="label_8">
         <property name="text">
@@ -81,149 +67,10 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="2">
-       <widget class="QLabel" name="lbInvoiceNumber">
-        <property name="text">
-         <string>Invoice number</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="C5LineEditWithSelector" name="leStoreOutput">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>100</width>
-          <height>16777215</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="2" colspan="2">
-       <widget class="C5LineEdit" name="leStoreOutputName">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::NoFocus</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="2" colspan="2">
-       <widget class="C5LineEdit" name="leReasonName">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::NoFocus</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Number</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="3">
-       <widget class="C5LineEditWithSelector" name="leDocNum"/>
-      </item>
-      <item row="2" column="4">
-       <widget class="QPushButton" name="btnRememberStoreIn">
-        <property name="minimumSize">
-         <size>
-          <width>22</width>
-          <height>22</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>15</width>
-          <height>22</height>
-         </size>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset resource="../resources/res.qrc">
-          <normaloff>:/pushpin.png</normaloff>:/pushpin.png</iconset>
-        </property>
-        <property name="checkable">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="8" column="1" colspan="3">
-       <widget class="C5LineEdit" name="leComment"/>
-      </item>
-      <item row="7" column="1">
-       <widget class="C5LineEditWithSelector" name="leReason">
-        <property name="maximumSize">
-         <size>
-          <width>100</width>
-          <height>16777215</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="lbInvoiceDate">
-        <property name="text">
-         <string>Invoice date</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="C5DateEdit" name="deInvoiceDate">
-        <property name="maximumSize">
-         <size>
-          <width>100</width>
-          <height>16777215</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="C5DateEdit" name="deDate">
-        <property name="maximumSize">
-         <size>
-          <width>100</width>
-          <height>16777215</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="3">
-       <widget class="C5LineEdit" name="leInvoiceNumber"/>
-      </item>
-      <item row="2" column="2" colspan="2">
-       <widget class="C5LineEdit" name="leStoreInputName">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::NoFocus</enum>
-        </property>
-       </widget>
-      </item>
       <item row="2" column="0">
        <widget class="QLabel" name="lbStoreInput">
         <property name="text">
          <string>Store, input</string>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="0">
-       <widget class="QLabel" name="label_4">
-        <property name="text">
-         <string>Reason</string>
         </property>
        </widget>
       </item>
@@ -253,6 +100,169 @@
           <normaloff>:/copy.png</normaloff>:/copy.png</iconset>
         </property>
        </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="C5DateEdit" name="deDate">
+        <property name="maximumSize">
+         <size>
+          <width>100</width>
+          <height>16777215</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="1" colspan="3">
+       <widget class="C5LineEdit" name="leComment"/>
+      </item>
+      <item row="2" column="4">
+       <widget class="QPushButton" name="btnRememberStoreIn">
+        <property name="minimumSize">
+         <size>
+          <width>22</width>
+          <height>22</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>15</width>
+          <height>22</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/pushpin.png</normaloff>:/pushpin.png</iconset>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QLabel" name="lbInvoiceNumber">
+        <property name="text">
+         <string>Invoice number</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Reason</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="C5DateEdit" name="deInvoiceDate">
+        <property name="maximumSize">
+         <size>
+          <width>100</width>
+          <height>16777215</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="lbStoreOutput">
+        <property name="text">
+         <string>Store output</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="C5LineEdit" name="leInvoiceNumber"/>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Date</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="2" colspan="2">
+       <widget class="C5LineEdit" name="leReasonName">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Number</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="2" colspan="2">
+       <widget class="C5LineEdit" name="leStoreOutputName">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="C5LineEditWithSelector" name="leStoreOutput">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>100</width>
+          <height>16777215</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="lbInvoiceDate">
+        <property name="text">
+         <string>Invoice date</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="C5LineEditWithSelector" name="leDocNum"/>
+      </item>
+      <item row="7" column="1">
+       <widget class="C5LineEditWithSelector" name="leReason">
+        <property name="maximumSize">
+         <size>
+          <width>100</width>
+          <height>16777215</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2" colspan="2">
+       <widget class="C5LineEdit" name="leStoreInputName">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="0">
+       <widget class="QLabel" name="label_18">
+        <property name="text">
+         <string>Currency</string>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="1">
+       <widget class="QComboBox" name="cbCurrency"/>
       </item>
      </layout>
     </widget>
@@ -524,16 +534,6 @@
              </size>
             </property>
            </spacer>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_18">
-            <property name="text">
-             <string>Currency</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QComboBox" name="cbCurrency"/>
           </item>
           <item>
            <widget class="QCheckBox" name="chWholeGroup">
@@ -1664,14 +1664,14 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>C5LineEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5lineedit.h</header>
+  </customwidget>
+  <customwidget>
    <class>C5LineEditWithSelector</class>
    <extends>QLineEdit</extends>
    <header location="global">c5lineeditwithselector.h</header>
-  </customwidget>
-  <customwidget>
-   <class>C5DateEdit</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5dateedit.h</header>
   </customwidget>
   <customwidget>
    <class>C5TableWidget</class>
@@ -1679,9 +1679,9 @@
    <header location="global">c5tablewidget.h</header>
   </customwidget>
   <customwidget>
-   <class>C5LineEdit</class>
+   <class>C5DateEdit</class>
    <extends>QLineEdit</extends>
-   <header location="global">c5lineedit.h</header>
+   <header location="global">c5dateedit.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

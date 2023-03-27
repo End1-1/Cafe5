@@ -18,7 +18,7 @@ public:
 
     ~C5GridGilter();
 
-    static bool filter(C5FilterWidget *filterWidget, QString &condition, QHash<QString, bool> &showColumns, QHash<QString, QString> &colTranslation);
+    static bool filter(C5FilterWidget *filterWidget, QString &condition, QMap<QString, bool> &showColumns, QHash<QString, QString> &colTranslation);
 
 protected:
     virtual void keyControlPlusEnter() override;

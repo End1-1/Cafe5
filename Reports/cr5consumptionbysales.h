@@ -3,6 +3,7 @@
 
 #include "c5storedraftwriter.h"
 #include "c5reportwidget.h"
+#include "ogoods.h"
 
 class CR5ConsumptionBySalesFilter;
 class C5StoreDoc;
@@ -50,7 +51,7 @@ private slots:
 
     void semireadyInOut();
 
-    C5StoreDoc *writeDocs(int doctype, int reason, const QList<IGoods> &data, const QString &comment);
+    C5StoreDoc *writeDocs(int doctype, int reason, const QList<OGoods> &data, const QString &comment);
 
 signals:
     void updateProgressValue(int);

@@ -111,3 +111,24 @@ void DlgMemoryRead::on_btnReprint_clicked()
     Workspace::fWorkspace->printReceipt(ui->tblMemory->item(row, 0)->text(), false, false);
     accept();
 }
+
+void DlgMemoryRead::on_btnOpen_2_clicked()
+{
+    QString sql ("SELECT h.f_id, concat(h.f_prefix, h.f_hallid) as f_hallid, "
+                    "date_format(cast(concat(f_dateclose, ' ', f_timeclose) as datetime),'%d/%c/%Y %H:%i' ) as f_date, h.f_amounttotal "
+                    "from o_header h "
+                    "where cast(concat(f_dateclose, ' ', f_timeclose) as datetime)>date_sub(current_timestamp(), interval 24 hour) "
+                    "order by f_dateclose desc, f_timeclose desc ");
+    C5Database db(fDBParams);
+    db[":f_session"] = __c5config.getRegValue("session");
+    db.exec(sql);
+    ui->tblMemory->setRowCount(0);
+    while (db.nextRow()) {
+        int r = ui->tblMemory->rowCount();
+        ui->tblMemory->setRowCount(r + 1);
+        ui->tblMemory->setItem(r, 0, new QTableWidgetItem(db.getString("f_id")));
+        ui->tblMemory->setItem(r, 1, new QTableWidgetItem(db.getString("f_hallid")));
+        ui->tblMemory->setItem(r, 2, new QTableWidgetItem(db.getString("f_date")));
+        ui->tblMemory->setItem(r, 3, new QTableWidgetItem(float_str(db.getDouble("f_amounttotal"), 2)));
+    }
+}

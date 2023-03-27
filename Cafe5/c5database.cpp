@@ -420,6 +420,12 @@ int C5Database::insert(const QString &tableName, bool returnId)
     }
 }
 
+bool C5Database::insert(const QString &tableName, int &id)
+{
+    id = insert(tableName, true);
+    return id > 0;
+}
+
 bool C5Database::replaceInto(const QString &tableName)
 {
     QString sql = "replace into " + tableName + " values ( ";

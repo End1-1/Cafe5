@@ -22,6 +22,12 @@ public:
 
     bool isTotal();
 
+    QString date1();
+
+    QString date2();
+
+    bool debtMode();
+
 private:
     Ui::CR5CostumerDebtsFilter *ui;
 };

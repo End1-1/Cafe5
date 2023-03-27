@@ -24,6 +24,7 @@ C5PrintReceiptThread::C5PrintReceiptThread(const QString &header, const QMap<QSt
 bool C5PrintReceiptThread::print(const QStringList &dbParams)
 {
     int bs = 24;
+    C5Translator::initTranslator(dbParams);
     C5Translator __translator;
     __translator.initTranslator(dbParams);
     __translator.setLanguage(fLanguage);

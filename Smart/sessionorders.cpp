@@ -22,8 +22,9 @@ void SessionOrders::loadOrders()
 {
     C5Database db(fDBParams);
     db[":f_session"] = __c5config.getRegValue("session").toInt();
-    db.exec("SELECT o.f_id, CONCAT(f_prefix, f_hallid) as f_number, cast(CONCAT(o.f_dateclose, ' ', f_timeclose) as datetime) as f_date, o.f_amounttotal, "
-            "ot.f_receiptnumber"
+    db.exec("SELECT o.f_id, CONCAT(f_prefix, f_hallid) as f_number, "
+            "cast(CONCAT(o.f_dateclose, ' ', f_timeclose) as datetime) as f_date, o.f_amounttotal, "
+            "ot.f_receiptnumber "
             "FROM o_header o "
             "LEFT JOIN a_header_cash c ON c.f_oheader=o.f_id "
             "left join o_tax ot on ot.f_id=o.f_id "

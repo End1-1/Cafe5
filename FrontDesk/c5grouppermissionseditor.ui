@@ -20,7 +20,7 @@
       <enum>QTabWidget::West</enum>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
@@ -1300,6 +1300,26 @@
          </property>
          <property name="Tag" stdset="0">
           <number>710</number>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="C5CheckBox" name="checkBox_150">
+         <property name="text">
+          <string>Route</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>711</number>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="C5CheckBox" name="checkBox_151">
+         <property name="text">
+          <string>Route exec</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>712</number>
          </property>
         </widget>
        </item>

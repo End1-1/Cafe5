@@ -15,28 +15,57 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="3" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Costumer</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
     <widget class="QLabel" name="label_5">
      <property name="text">
       <string>Cash</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label_4">
+   <item row="1" column="0">
+    <widget class="QLabel" name="label">
      <property name="text">
-      <string>Code</string>
+      <string>Date</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="C5LineEdit" name="leCode">
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
    <item row="5" column="1">
     <widget class="C5LineEdit" name="leAmount">
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="C5LineEditWithSelector" name="leCostumer">
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="C5LineEditWithSelector" name="leCash">
      <property name="maximumSize">
       <size>
        <width>100</width>
@@ -55,20 +84,44 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label">
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_3">
      <property name="text">
-      <string>Date</string>
+      <string>Amount</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="1">
-    <widget class="C5LineEditWithSelector" name="leCash">
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
+   <item row="4" column="2">
+    <widget class="C5LineEditWithSelector" name="leCostumerName">
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Code</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="2">
+    <widget class="C5LineEditWithSelector" name="leCashName">
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Costumer</string>
      </property>
     </widget>
    </item>
@@ -128,73 +181,36 @@
      </layout>
     </widget>
    </item>
-   <item row="3" column="2">
-    <widget class="C5LineEditWithSelector" name="leCostumerName">
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="0">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>Amount</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1">
-    <widget class="C5LineEditWithSelector" name="leCostumer">
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1">
-    <widget class="C5LineEdit" name="leCode">
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="2">
-    <widget class="C5LineEditWithSelector" name="leCashName">
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0">
+   <item row="2" column="0">
     <widget class="QLabel" name="label_6">
      <property name="text">
-      <string>Gov number</string>
+      <string>Type</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="1">
-    <widget class="C5LineEditWithSelector" name="leGovnumber">
+   <item row="2" column="1" colspan="2">
+    <widget class="C5LineEditWithSelector" name="leType">
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="2">
+    <widget class="C5LineEdit" name="leCurrency">
      <property name="maximumSize">
       <size>
        <width>100</width>
        <height>16777215</height>
       </size>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -222,11 +238,10 @@
   <tabstop>leCash</tabstop>
   <tabstop>leCostumer</tabstop>
   <tabstop>leAmount</tabstop>
+  <tabstop>leCurrency</tabstop>
   <tabstop>btnOK</tabstop>
   <tabstop>btnRemove</tabstop>
   <tabstop>btnCancel</tabstop>
-  <tabstop>leCostumerName</tabstop>
-  <tabstop>leCashName</tabstop>
  </tabstops>
  <resources/>
  <connections/>

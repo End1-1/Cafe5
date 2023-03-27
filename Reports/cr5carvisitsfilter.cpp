@@ -7,7 +7,7 @@ CR5CarVisitsFilter::CR5CarVisitsFilter(const QStringList &dbParams, QWidget *par
     ui(new Ui::CR5CarVisitsFilter)
 {
     ui->setupUi(this);
-    ui->leCostumer->setSelector(dbParams, ui->leCostumerName, cache_discount_client);
+    ui->leCostumer->setSelector(dbParams, ui->leCostumerName, cache_goods_partners);
 }
 
 CR5CarVisitsFilter::~CR5CarVisitsFilter()

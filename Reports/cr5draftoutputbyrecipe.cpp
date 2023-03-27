@@ -5,6 +5,7 @@
 #include "c5storedoc.h"
 #include "c5mainwindow.h"
 #include "c5user.h"
+#include "ogoods.h"
 
 CR5DraftOutputByRecipe::CR5DraftOutputByRecipe(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
@@ -114,11 +115,11 @@ void CR5DraftOutputByRecipe::dateForward()
 
 void CR5DraftOutputByRecipe::createStoreOutput()
 {
-    QList<IGoods> goodsSale;
+    QList<OGoods> goodsSale;
     for (int i = 0; i < fModel->rowCount(); i++) {
-        IGoods g;
-        g.goodsId = fModel->data(i, fModel->indexForColumnName("f_goods"), Qt::EditRole).toInt();
-        g.goodsQty = fModel->data(i, fModel->indexForColumnName("f_storeqty"), Qt::EditRole).toDouble();
+        OGoods g;
+        g.goods = fModel->data(i, fModel->indexForColumnName("f_goods"), Qt::EditRole).toInt();
+        g.qty = fModel->data(i, fModel->indexForColumnName("f_storeqty"), Qt::EditRole).toDouble();
         goodsSale.append(g);
     }
     if (goodsSale.count() > 0) {
@@ -131,13 +132,13 @@ void CR5DraftOutputByRecipe::createStoreOutput()
                 .arg(fFilter->date1().toString(FORMAT_DATE_TO_STR))
                 .arg(fFilter->date2().toString(FORMAT_DATE_TO_STR));
         dw.writeAHeader(documentId, dw.storeDocNum(DOC_TYPE_STORE_OUTPUT, fFilter->store(), true, 0), DOC_STATE_DRAFT, DOC_TYPE_STORE_OUTPUT, __user->id(), fFilter->date2(),
-                        QDate::currentDate(), QTime::currentTime(), 0, 0, comment, __c5config.getValue(param_default_currency).toInt());
+                        QDate::currentDate(), QTime::currentTime(), 0, 0, comment, 0, __c5config.getValue(param_default_currency).toInt());
 
         dw.writeAHeaderStore(documentId, __user->id(), __user->id(), "", QDate(), 0, fFilter->store(), 0, cashid, 0, 0, "");
         int rownum = 1;
-        foreach (const IGoods &g, goodsSale) {
+        foreach (const OGoods &g, goodsSale) {
             QString sdid;
-            dw.writeAStoreDraft(sdid, documentId, fFilter->store(), -1, g.goodsId, g.goodsQty, g.goodsPrice, g.goodsPrice * g.goodsQty, DOC_REASON_SALE, "", rownum++, "");
+            dw.writeAStoreDraft(sdid, documentId, fFilter->store(), -1, g.goods, g.qty, g.price, g.price * g.qty, DOC_REASON_SALE, "", rownum++, "");
         }
         //= dw.writeDraft(docDate, doctype, store, reason, data, comment);
         auto *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);

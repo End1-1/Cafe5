@@ -89,6 +89,21 @@ void ShopConnection::handleData(RawMessage *m, const QByteArray &in)
     case op_open_sale_draft_body:
         open_draft_body(rm, dbw, in);
         break;
+    case op_udpdate_draft_header:
+        update_draft_header(rm, dbw, in);
+        break;
+    case op_json_partners_list:
+    case op_json_predefined_goods:
+    case op_json_debts:
+    case op_json_storagenames:
+    case op_json_stock:
+    case op_json_sales_history:
+    case op_json_route:
+    case op_json_route_update:
+    case op_json_stock_all:
+    case op_json_partner_debt:
+        getJsonOfQuery(rm, dbw, in, op, fUserId);
+        break;
     default:
         rm.putUByte(0);
         rm.putString(QString("Not implemented: %1").arg(op));

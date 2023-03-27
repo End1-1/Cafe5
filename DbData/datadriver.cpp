@@ -35,4 +35,5 @@ void DataDriver::init(const QStringList &dbParams)
     fInstance->fDbStoreDocType = new DbStoreDocType();
     fInstance->fDbDishComments = new DbDishComments();
     fInstance->fDbDishRemoveReason = new DbDishRemoveReason();
+    fInstance->fDbCurrency = new DbCurrency();
 }

@@ -44,7 +44,7 @@ void DlgCashOp::on_btnSave_clicked()
     QString cashdoc;
     if (!dw.writeAHeader(cashdoc, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH,
                          fUser->id(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(),
-                         0, ui->leAmount->getDouble(), ui->lePurpose->text(), __c5config.getValue(param_default_currency).toInt())) {
+                         0, ui->leAmount->getDouble(), ui->lePurpose->text(),1, __c5config.getValue(param_default_currency).toInt())) {
         C5Message::error(dw.fErrorMsg);
         return;
     }

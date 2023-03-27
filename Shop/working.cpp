@@ -292,6 +292,16 @@ void Working::decQty(int id, double qty)
     db.exec("update a_store_sale set f_qty=f_qty+:f_qty where f_goods=:f_goods and f_store=:f_store");
 }
 
+void Working::setActiveWidget(WOrder *w)
+{
+    for (int i = 0; i < ui->tab->count(); i++) {
+        if (w == ui->tab->widget(i)){
+            ui->tab->setCurrentIndex(i);
+            return;
+        }
+    }
+}
+
 Flag Working::flag(int id)
 {
     if (fFlags.contains(id)) {
@@ -339,7 +349,7 @@ void Working::loadStaff()
     }
 }
 
-void Working::newSale(int type)
+WOrder *Working::newSale(int type)
 {
     WOrder *w = new WOrder(fUser, type, fCustomerDisplay, this);
     QObjectList ol = w->children();
@@ -361,6 +371,7 @@ void Working::newSale(int type)
     ui->tab->addTab(w, QString("%1 #%2").arg(title).arg(ordersCount()));
     ui->tab->setCurrentIndex(ui->tab->count() - 1);
     C5LogSystem::writeEvent(QString("%1 %2, #%3").arg(tr("New"), title).arg(ui->tab->count()));
+    return w;
 }
 
 int Working::ordersCount()
@@ -399,10 +410,9 @@ void Working::restoreSales()
         if (!w->checkQty(db.getInt("f_goodsid"), db.getDouble("f_qty"), err) && __c5config.getValue(param_shop_dont_check_qty).toInt() == 0) {
             continue;
         }
-        int r = w->table()->addEmptyRow();
-        for (int i = 7; i < db.columnCount(); i++) {
-            w->table()->setData(r, i - 7, db.getValue(i));
-        }
+        w->fOHeader.saleType = db.getInt("f_saletype");
+        w->addGoods(db.getInt("f_goodsid"));
+        w->setQtyOfRow(w->rowCount() - 1, db.getDouble("f_qty"));
         w->countTotal();
     }
     for (auto i: invalidWindows) {
@@ -634,24 +644,6 @@ void Working::shortcutF2()
     newSale(SALE_WHOSALE);
 }
 
-void Working::shortcutF3()
-{
-    WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
-    if (!w) {
-        return;
-    }
-    w->focusCash();
-}
-
-void Working::shortcutF4()
-{
-    WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
-    if (!w) {
-        return;
-    }
-    w->focusCard();
-}
-
 void Working::shortcutF5()
 {
     on_btnGoodsList_clicked();
@@ -752,7 +744,7 @@ void Working::on_btnItemBack_clicked()
     if (!fUser->check(cp_t5_refund_goods)) {
         return;
     }
-    Sales::showSales(fUser);
+    Sales::showSales(this, fUser);
 }
 
 void Working::on_tab_currentChanged(int index)
@@ -802,34 +794,34 @@ void Working::on_btnWriteOrder_clicked()
         return;
     }
     if (__c5config.getValue(param_no_tax).toInt() != 1 && __c5config.getValue(param_shop_never_tax).toInt() == 0) {
-        if (C5Message::question(tr("Salute?")) == QDialog::Accepted) {
+        if (w->fOHeader._printFiscal) {
             QString rseq;
             C5Database db(C5Config::dbParams());
-            if (Sales::printCheckWithTax(db, w->fOrderUUID, rseq)) {
+            if (Sales::printCheckWithTax(db, w->fOHeader.id, rseq)) {
                 if (!C5Config::localReceiptPrinter().isEmpty()) {
-                    PrintReceiptGroup p;
-                    switch (C5Config::shopPrintVersion()) {
-                    case 1: {
-                        bool p1, p2;
-                        if (SelectPrinters::selectPrinters(p1, p2)) {
-                            if (p1) {
-                                p.print(w->fOrderUUID, db, 1);
-                            }
-                            if (p2) {
-                                p.print(w->fOrderUUID, db, 2);
-                            }
-                        }
-                        break;
-                    }
-                    case 2:
-                        p.print2(w->fOrderUUID, db);
-                        break;
-                    case 3:
-                        p.print3(w->fOrderUUID, db);
-                        break;
-                    default:
-                        break;
-                    }
+//                    PrintReceiptGroup p;
+//                    switch (C5Config::shopPrintVersion()) {
+//                    case 1: {
+//                        bool p1, p2;
+//                        if (SelectPrinters::selectPrinters(p1, p2)) {
+//                            if (p1) {
+//                                p.print(w->fOrderUUID, db, 1);
+//                            }
+//                            if (p2) {
+//                                p.print(w->fOrderUUID, db, 2);
+//                            }
+//                        }
+//                        break;
+//                    }
+//                    case 2:
+//                        p.print2(w->fOrderUUID, db);
+//                        break;
+//                    case 3:
+//                        p.print3(w->fOrderUUID, db);
+//                        break;
+//                    default:
+//                        break;
+//                    }
                 }
             }
         }
@@ -901,7 +893,7 @@ void Working::on_btnSalesReport_clicked()
             return;
         }
     }
-    Sales::showSales(u);
+    Sales::showSales(this, u);
     if (u != fUser) {
         delete u;
     }
@@ -974,7 +966,7 @@ void Working::on_btnGiftCard_clicked()
     if (d.exec() == QDialog::Accepted) {
         int row = wo->addGoodsToTable(d.fGiftGoodsId);
         wo->changePrice(d.fGiftPrice);
-        wo->fSaleType = -1;
+        wo->fOHeader.saleType = -1;
     }
 }
 

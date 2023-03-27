@@ -39,9 +39,13 @@ public:
 
     WOrder *worder();
 
+    WOrder *newSale(int type);
+
     bool eventFilter(QObject *watched, QEvent *event);
 
     void decQty(int id, double qty);
+
+    void setActiveWidget(WOrder *w);
 
     static QMap<int, Flag> fFlags;
 
@@ -68,8 +72,6 @@ private:
     WCustomerDisplay *fCustomerDisplay;
 
     void loadStaff();
-
-    void newSale(int type);
 
     int ordersCount();
 
@@ -107,10 +109,6 @@ private slots:
     void shortcutF1();
 
     void shortcutF2();
-
-    void shortcutF3();
-
-    void shortcutF4();
 
     void shortcutF5();
 

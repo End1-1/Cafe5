@@ -61,9 +61,10 @@ Sales::~Sales()
     delete ui;
 }
 
-void Sales::showSales(C5User *u)
+void Sales::showSales(Working *w, C5User *u)
 {
     Sales *s = new Sales(u);
+    s->fWorking = w;
     s->showMaximized();
     s->exec();
     delete s;
@@ -836,7 +837,7 @@ void Sales::on_btnViewOrder_clicked()
     if (ml.count() == 0) {
         return;
     }
-    ViewOrder(ui->tbl->getString(ml.at(0).row(), 1)).exec();
+    ViewOrder(fWorking, ui->tbl->getString(ml.at(0).row(), 1)).exec();
 }
 
 void Sales::on_btnChangeDate_clicked()

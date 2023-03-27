@@ -27,7 +27,7 @@ QString CR5SaleFromStoreFilter::condition()
 {
     QString w = " oh.f_datecash between " + ui->deStart->toMySQLDate() + " and " + ui->deEnd->toMySQLDate() + " ";
     if (!ui->leSupplier->isEmpty()) {
-        w += " and gg.f_supplier in (" + ui->leSupplier->text() + ") " ;
+        w += " and ah.f_partner in (" + ui->leSupplier->text() + ") " ;
     }
     if (!ui->leHall->isEmpty()) {
         w += " and oh.f_hall in (" + ui->leHall->text() + ") ";

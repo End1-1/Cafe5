@@ -29,6 +29,8 @@ private slots:
 
     void on_btnPrintA4_clicked();
 
+    void on_btnExportToExcel_clicked();
+
 private:
     Ui::C5SaleFromStoreOrder *ui;
 

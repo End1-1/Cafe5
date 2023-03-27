@@ -170,6 +170,7 @@ void loadMenuNames(RawMessage &rm, Database &db, const QByteArray &in)
         nt.execSQL("select id, name from me_menus");
         break;
     case version2:
+        nt.execSQL("select f_id, f_name from d_menu_names");
         break;
     case version3:
         break;

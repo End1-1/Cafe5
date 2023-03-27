@@ -2,6 +2,7 @@
 #define C5STOREDRAFTWRITER_H
 
 #include "c5database.h"
+#include "c5dbrecord.h"
 
 #define container_ecash 1
 #define container_aheader 2
@@ -11,30 +12,6 @@
 #define container_astoredishwaste 6
 #define container_acalcprice 7
 
-struct IGoods {
-    QString recId;
-    QString bodyId;
-    int goodsId;
-    int tax;
-    int row;
-    QString goodsName;
-    double goodsQty;
-    double goodsPrice;
-    double goodsTotal;
-    double discountFactor;
-    double lastInputPrice;
-    int discountMode;
-    int store;
-    int unitId;
-    bool changed;
-    QString taxDept;
-    QString taxAdg;
-    bool isService;
-    bool writeStoreDocBeforeOutput;
-    int storeId;
-    IGoods() {changed = false; }
-};
-
 class C5StoreDraftWriter : QObject
 {
     Q_OBJECT
@@ -42,7 +19,7 @@ class C5StoreDraftWriter : QObject
 public:
     C5StoreDraftWriter(C5Database &db);
 
-    bool writeAHeader(QString &id, const QString &userid, int state, int type, int op, const QDate &docDate, const QDate &dateCreate, const QTime &timeCreate, int partner, double amount, const QString &comment, int currency);
+    bool writeAHeader(QString &id, const QString &userid, int state, int type, int op, const QDate &docDate, const QDate &dateCreate, const QTime &timeCreate, int partner, double amount, const QString &comment, int paid, int currency);
 
     bool writeAHeaderPartial(QString &id, const QString &userid, int op, const QDate &dateCreate, const QTime &timeCreate, int partner, const QString &comment);
 
@@ -60,23 +37,15 @@ public:
 
     bool writeAStoreDishWaste(QString &id, const QString &docId, int dish, double qty, const QString &data);
 
-    bool writeBHistory(const QString &id, int type, int card, double value, double data);
-
     bool writeECash(QString &id, const QString &header, int cash, int sign, const QString &purpose, double amount, QString &base, int rownum);
 
     bool writeOBody(QString &id, const QString &header, int state, int dish, double qty1, double qty2, double price, double total, double service, double discount, int store, const QString &print1, const QString &print2, const QString &comment, int remind, const QString &adgcode, int removereason, int timeorder, int package, int row, const QDateTime &appendTime);
 
     bool writeOBodyToOGoods(const QString &id, const QString &headerid);
 
-    bool writeOHeader(QString &id, int hallid, const QString &prefix, int state, int hall, int table, const QDate &dateopen, const QDate &dateclose, const QDate &datecash, const QTime &timeopen, const QTime &timeclose, int staff, const QString &comment, int print, double amountTotal, double amountCash, double amountCard, double amountPrepaid, double amountBank, double amountOther, double amountIdram, double amountService, double amountDiscount, double serviceFactor, double discountFactor, int creditCardId, int otherId, int shift, int source, int saletype, int partner);
-
     bool writeOHeaderFlags(const QString &id, int f1, int f2, int f3, int f4, int f5);
 
     bool writeOHeaderOptions(const QString &id, int guest, int splitted, int deliveryman, int currency);
-
-    bool writeOPayment(const QString &id, double cash, double change);
-
-    bool writeOGoods(QString &id, const QString &header, const QString &body, int store, int goods, double qty, double price, double total, int tax, int sign, int row, const QString &storerec, double discount, int discountMode, int returnMode, const QString &returnFrom, double discFactor);
 
     bool writeOPackage(int &id, const QString &header, int package, double qty, double price);
 

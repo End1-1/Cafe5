@@ -2,6 +2,7 @@
 #define C5STOREDOC_H
 
 #include "c5document.h"
+#include "ogoods.h"
 #include <QLabel>
 
 namespace Ui {
@@ -161,6 +162,8 @@ private slots:
     void focusNextChildren();
 
     void exportToExcel();
+
+    void dirtyEdit();
 
     void newDoc();
 

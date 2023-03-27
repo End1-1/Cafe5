@@ -1898,3 +1898,83 @@ bool printBill2(RawMessage &rm, Database &db, const QString &orderid)
     }
     return true;
 }
+
+void processScanDiscount(RawMessage &rm, Database &db, const QByteArray &in)
+{
+    quint8 version;
+    QString orderid, cardcode;
+
+    rm.readUByte(version, in);
+    rm.readString(orderid, in);
+    rm.readString(cardcode, in);
+
+    int cardmode = 0;
+    double cardvalue = 0;
+    int cardid = 0;
+    switch (version) {
+    case 2:
+        db[":f_code"] = cardcode;
+        if (db.exec("select * from b_cards_discount where f_code=:f_code") == false) {
+            rm.putUByte(0);
+            rm.putString(db.lastDbError());
+            return;
+        }
+        if (!db.next()) {
+            rm.putUByte(0);
+            rm.putString(ntr("Unknown card code", ntr_am));
+            return;
+        }
+        if (db.integer("f_active") == 0) {
+            rm.putUByte(0);
+            rm.putString(ntr("Card is not active", ntr_am));
+            return;
+        }
+        if (db.date("f_dateend") < QDate::currentDate()) {
+            rm.putUByte(0);
+            rm.putString(ntr("Card expired", ntr_am));
+            return;
+        }
+        cardid = db.integer("f_id");
+        cardmode = db.integer("f_mode");
+        cardvalue = db.doubleValue("f_value");
+
+        db[":f_id"] = orderid;
+        if (db.exec("select * from o_header where f_id=:f_id") == false) {
+            rm.putUByte(0);
+            rm.putString(db.lastDbError());
+            return;
+        }
+        if (db.doubleValue("f_discountfactor") > 0.001) {
+            rm.putUByte(0);
+            rm.putString(ntr("Discount already applied", ntr_am));
+            return;
+        }
+        db.startTransaction();
+        db[":f_discountfactor"] = cardvalue;
+        if (db.update("o_header", "f_id", orderid) == false){
+            rm.putUByte(0);
+            rm.putString(db.lastDbError());
+            return;
+        }
+        db[":f_id"] = cardid;
+        db[":f_state"] = 0;
+        if (db.exec("update b_cards_discount set f_active=0 where f_id=:f_id") == false) {
+            rm.putUByte(0);
+            rm.putString(db.lastDbError());
+            return;
+        }
+        db[":f_id"] = orderid;
+        db[":f_card"] = cardid;
+        db[":f_type"] = cardmode;
+        db[":f_value"] = cardvalue;
+        if (db.insert("b_history") == false) {
+            rm.putUByte(0);
+            rm.putString(db.lastDbError());
+            return;
+        }
+        db.commit();
+        rm.putUByte(1);
+        rm.putString(ntr("Thank you, discount applied", ntr_am));
+        return;
+    }
+}

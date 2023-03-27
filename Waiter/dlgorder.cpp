@@ -578,6 +578,7 @@ void DlgOrder::setButtonsState()
     if (!wo) {
         return;
     }
+    ui->btnSit->setText(QString("%1: %2").arg(tr("Guests count"), wo->fOrderDriver->headerOptionsValue("f_guests").toString()));
     headerToLineEdit();
 
     QString orderComment = wo->fOrderDriver->headerValue("f_comment").toString().isEmpty() ?
@@ -1252,9 +1253,7 @@ void DlgOrder::on_btnPrintService_clicked()
 
 void DlgOrder::on_btnSit_clicked()
 {
-    auto *d = new DlgGuests(fDBParams, worder()->fOrderDriver);
-    d->exec();
-    delete d;
+    DlgGuests(fDBParams, worder()->fOrderDriver).exec();
     itemsToTable();
 }
 

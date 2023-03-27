@@ -28,6 +28,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     ../../XLSX/src/xlsx.cpp \
+    ../../XLSX/src/xlsxborder.cpp \
     ../../XLSX/src/xlsxcell.cpp \
     ../../XLSX/src/xlsxcontenttype.cpp \
     ../../XLSX/src/xlsxdocpropsapp.cpp \
@@ -45,6 +46,7 @@ SOURCES += \
     ../Cafe5/c5logsystem.cpp \
     ../Cafe5/c5replication.cpp \
     ../Cafe5/c5serverhandler.cpp \
+    ../Cafe5/c5systempreference.cpp \
     ../Cafe5/calendar.cpp \
     ../Cafe5/dlgexitbyversion.cpp \
     ../Classes/QRCodeGenerator.cpp \
@@ -63,6 +65,7 @@ SOURCES += \
     ../Classes/c5printing.cpp \
     ../Classes/c5printjson.cpp \
     ../Classes/c5printpreview.cpp \
+    ../Classes/c5printrecipta4.cpp \
     ../Classes/c5printremovedservicethread.cpp \
     ../Classes/c5printservicethread.cpp \
     ../Classes/c5random.cpp \
@@ -80,23 +83,28 @@ SOURCES += \
     ../Classes/c5witerconf.cpp \
     ../Classes/calculator.cpp \
     ../Classes/checkforupdatethread.cpp \
+    ../Classes/config.cpp \
     ../Classes/dataonline.cpp \
     ../Classes/doubledatabase.cpp \
     ../Classes/fileversion.cpp \
     ../Classes/notificationwidget.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
+    ../Classes/removeshopsale.cpp \
     ../Classes/rkeyboard.cpp \
+    ../Classes/socketconnection.cpp \
     ../Classes/threadsendmessage.cpp \
+    ../Controls/c5cleartablewidget.cpp \
     ../Controls/c5graphicsview.cpp \
     ../Controls/c5guicontrols.cpp \
-    ../Controls/c5tablewithtotal.cpp \
     ../DbData/datadriver.cpp \
     ../DbData/dbbodystate.cpp \
     ../DbData/dbcar.cpp \
     ../DbData/dbdata.cpp \
+    ../DbData/dbdishcomments.cpp \
     ../DbData/dbdishes.cpp \
     ../DbData/dbdishpart1.cpp \
     ../DbData/dbdishpart2.cpp \
+    ../DbData/dbdishremovereason.cpp \
     ../DbData/dbdishspecial.cpp \
     ../DbData/dbgoods.cpp \
     ../DbData/dbgoodsgroup.cpp \
@@ -117,12 +125,22 @@ SOURCES += \
     ../DbData/dbusers.cpp \
     ../Forms/c5printtaxanywhere.cpp \
     ../Forms/dlgdataonline.cpp \
+    ../Forms/dlgqrcode.cpp \
     ../Forms/dlgreservgoods.cpp \
+    ../Forms/dlgserversettings.cpp \
+    ../Service5/raw/rawmessage.cpp \
+    ../Service5/socket/sslsocket.cpp \
+    c5tempsale.cpp \
     cashcollection.cpp \
     dlgdate.cpp \
+    dlggetidname.cpp \
+    dlggiftcardsale.cpp \
     dlggoodslist.cpp \
     dlgpin.cpp \
+    dlgpreorder.cpp \
+    dlgpreorderitem.cpp \
     dlgreturnitem.cpp \
+    dlgsearchpartner.cpp \
     dlgsplashscreen.cpp \
     goodsreturnreason.cpp \
     imageloader.cpp \
@@ -145,6 +163,7 @@ SOURCES += \
     userphoto.cpp \
     viewinputitem.cpp \
     vieworder.cpp \
+    wcustomerdisplay.cpp \
         working.cpp \
     worder.cpp \
     ../Cafe5/c5config.cpp \
@@ -155,25 +174,18 @@ SOURCES += \
     ../Cafe5/c5dialog.cpp \
     ../Cafe5/c5sockethandler.cpp \
     ../Controls/c5lineedit.cpp \
-    ../Controls/c5tablewidget.cpp \
     ../Controls/c5combobox.cpp \
     ../Controls/c5dateedit.cpp \
     ../Classes/c5cache.cpp \
     ../../NewTax/Src/printtaxn.cpp \
     dqty.cpp \
-    ../Controls/c5checkbox.cpp \
-    ../Service5/raw/rawmessage.cpp \
-    ../Classes/config.cpp \
-    ../Forms/dlgserversettings.cpp \
-    ../Classes/socketconnection.cpp \
-    ../Service5/socket/sslsocket.cpp \
-    ../DbData/dbdishcomments.cpp \
-    ../DbData/dbdishremovereason.cpp
+    ../Controls/c5checkbox.cpp
 
 HEADERS += \
     ../../XLSX/src/crs32.h \
     ../../XLSX/src/xlsx.h \
     ../../XLSX/src/xlsxall.h \
+    ../../XLSX/src/xlsxborder.h \
     ../../XLSX/src/xlsxcell.h \
     ../../XLSX/src/xlsxcontenttype.h \
     ../../XLSX/src/xlsxdocpropsapp.h \
@@ -192,6 +204,7 @@ HEADERS += \
     ../Cafe5/c5logsystem.h \
     ../Cafe5/c5replication.h \
     ../Cafe5/c5serverhandler.h \
+    ../Cafe5/c5systempreference.h \
     ../Cafe5/calendar.h \
     ../Cafe5/dlgexitbyversion.h \
     ../Classes/QRCodeGenerator.h \
@@ -211,6 +224,7 @@ HEADERS += \
     ../Classes/c5printing.h \
     ../Classes/c5printjson.h \
     ../Classes/c5printpreview.h \
+    ../Classes/c5printrecipta4.h \
     ../Classes/c5printremovedservicethread.h \
     ../Classes/c5printservicethread.h \
     ../Classes/c5random.h \
@@ -229,24 +243,29 @@ HEADERS += \
     ../Classes/calculator.h \
     ../Classes/chatmessage.h \
     ../Classes/checkforupdatethread.h \
+    ../Classes/config.h \
     ../Classes/dataonline.h \
     ../Classes/doubledatabase.h \
     ../Classes/fileversion.h \
     ../Classes/goodsreserve.h \
     ../Classes/notificationwidget.h \
     ../Classes/proxytablewidgetdatabase.h \
+    ../Classes/removeshopsale.h \
     ../Classes/rkeyboard.h \
+    ../Classes/socketconnection.h \
     ../Classes/threadsendmessage.h \
+    ../Controls/c5cleartablewidget.h \
     ../Controls/c5graphicsview.h \
     ../Controls/c5guicontrols.h \
-    ../Controls/c5tablewithtotal.h \
     ../DbData/datadriver.h \
     ../DbData/dbbodystate.h \
     ../DbData/dbcar.h \
     ../DbData/dbdata.h \
+    ../DbData/dbdishcomments.h \
     ../DbData/dbdishes.h \
     ../DbData/dbdishpart1.h \
     ../DbData/dbdishpart2.h \
+    ../DbData/dbdishremovereason.h \
     ../DbData/dbdishspecial.h \
     ../DbData/dbgoods.h \
     ../DbData/dbgoodsgroup.h \
@@ -267,12 +286,22 @@ HEADERS += \
     ../DbData/dbusers.h \
     ../Forms/c5printtaxanywhere.h \
     ../Forms/dlgdataonline.h \
+    ../Forms/dlgqrcode.h \
     ../Forms/dlgreservgoods.h \
+    ../Forms/dlgserversettings.h \
+    ../Service5/raw/rawmessage.h \
+    ../Service5/socket/sslsocket.h \
+    c5tempsale.h \
     cashcollection.h \
     dlgdate.h \
+    dlggetidname.h \
+    dlggiftcardsale.h \
     dlggoodslist.h \
     dlgpin.h \
+    dlgpreorder.h \
+    dlgpreorderitem.h \
     dlgreturnitem.h \
+    dlgsearchpartner.h \
     dlgsplashscreen.h \
     goodsreturnreason.h \
     imageloader.h \
@@ -294,6 +323,7 @@ HEADERS += \
     userphoto.h \
     viewinputitem.h \
     vieworder.h \
+    wcustomerdisplay.h \
         working.h \
     worder.h \
     ../Cafe5/c5config.h \
@@ -305,21 +335,12 @@ HEADERS += \
     ../Cafe5/c5sockethandler.h \
     ../Cafe5/c5socketmessage.h \
     ../Controls/c5lineedit.h \
-    ../Controls/c5tablewidget.h \
     ../Controls/c5combobox.h \
     ../Controls/c5dateedit.h \
     ../Classes/c5cache.h \
     ../../NewTax/Src/printtaxn.h \
     dqty.h \
-    ../Controls/c5checkbox.h \
-    ../Service5/raw/messagelist.h \
-    ../Service5/raw/rawmessage.h \
-    ../Classes/config.h \
-    ../Forms/dlgserversettings.h \
-    ../Classes/socketconnection.h \
-    ../Service5/socket/sslsocket.h \
-    ../DbData/dbdishcomments.h \
-    ../DbData/dbdishremovereason.h
+    ../Controls/c5checkbox.h
 
 FORMS += \
     ../Cafe5/calendar.ui \
@@ -332,12 +353,20 @@ FORMS += \
     ../Controls/c5tablewithtotal.ui \
     ../Forms/c5printtaxanywhere.ui \
     ../Forms/dlgdataonline.ui \
+    ../Forms/dlgqrcode.ui \
     ../Forms/dlgreservgoods.ui \
+    ../Forms/dlgserversettings.ui \
+    c5tempsale.ui \
     cashcollection.ui \
     dlgdate.ui \
+    dlggetidname.ui \
+    dlggiftcardsale.ui \
     dlggoodslist.ui \
     dlgpin.ui \
+    dlgpreorder.ui \
+    dlgpreorderitem.ui \
     dlgreturnitem.ui \
+    dlgsearchpartner.ui \
     dlgsplashscreen.ui \
     goodsreturnreason.ui \
     loghistory.ui \
@@ -353,12 +382,12 @@ FORMS += \
     userphoto.ui \
     viewinputitem.ui \
     vieworder.ui \
+    wcustomerdisplay.ui \
         working.ui \
     worder.ui \
     ../Cafe5/c5connection.ui \
     ../Cafe5/c5message.ui \
-    dqty.ui \
-    ../Forms/dlgserversettings.ui
+    dqty.ui
 
 DEFINES += _DBDRIVER_=\\\"QMYSQL\\\"
 DEFINES += _ORGANIZATION_=\\\"Hotelicca\\\"

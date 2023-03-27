@@ -339,7 +339,7 @@
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset resource="../resources/resources.qrc">
+                  <iconset resource="../resources/res.qrc">
                    <normaloff>:/recycle.png</normaloff>:/recycle.png</iconset>
                  </property>
                  <property name="iconSize">
@@ -374,7 +374,7 @@
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset resource="../resources/resources.qrc">
+                  <iconset resource="../resources/res.qrc">
                    <normaloff>:/bill.png</normaloff>:/bill.png</iconset>
                  </property>
                  <property name="iconSize">
@@ -696,7 +696,7 @@
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset resource="../resources/resources.qrc">
+                  <iconset resource="../resources/res.qrc">
                    <normaloff>:/cancel.png</normaloff>:/cancel.png</iconset>
                  </property>
                  <property name="iconSize">
@@ -926,7 +926,7 @@ background:#fff6e5;
                <string/>
               </property>
               <property name="icon">
-               <iconset resource="../resources/resources.qrc">
+               <iconset resource="../resources/res.qrc">
                 <normaloff>:/minus.png</normaloff>:/minus.png</iconset>
               </property>
               <property name="iconSize">
@@ -955,7 +955,7 @@ background:#fff6e5;
                <string/>
               </property>
               <property name="icon">
-               <iconset resource="../resources/resources.qrc">
+               <iconset resource="../resources/res.qrc">
                 <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
               </property>
               <property name="iconSize">
@@ -1517,7 +1517,7 @@ background:#fff6e5;
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/resources.qrc">
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
            </property>
            <property name="iconSize">
@@ -1610,7 +1610,7 @@ background:#fff6e5;
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/resources.qrc">
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
            </property>
            <property name="iconSize">
@@ -1640,7 +1640,7 @@ background:#fff6e5;
 OTHER</string>
            </property>
            <property name="icon">
-            <iconset resource="../resources/resources.qrc">
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
            </property>
            <property name="iconSize">
@@ -1870,7 +1870,7 @@ BANK</string>
 CARD</string>
            </property>
            <property name="icon">
-            <iconset resource="../resources/resources.qrc">
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/credit-card.png</normaloff>:/credit-card.png</iconset>
            </property>
            <property name="iconSize">
@@ -1929,7 +1929,7 @@ CASH</string>
             <string>PAY X</string>
            </property>
            <property name="icon">
-            <iconset resource="../resources/resources.qrc">
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
            </property>
            <property name="iconSize">
@@ -1966,7 +1966,7 @@ CASH</string>
 IDRAM</string>
            </property>
            <property name="icon">
-            <iconset resource="../resources/resources.qrc">
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
            </property>
            <property name="iconSize">
@@ -1995,7 +1995,7 @@ IDRAM</string>
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/resources.qrc">
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
            </property>
            <property name="iconSize">
@@ -2031,7 +2031,7 @@ IDRAM</string>
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/resources.qrc">
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
            </property>
            <property name="iconSize">
@@ -2529,7 +2529,7 @@ IDRAM</string>
                <string/>
               </property>
               <property name="icon">
-               <iconset resource="../resources/resources.qrc">
+               <iconset resource="../resources/res.qrc">
                 <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
               </property>
               <property name="iconSize">
@@ -2685,7 +2685,7 @@ IDRAM</string>
          <string>Comment</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/resources.qrc">
+         <iconset resource="../resources/res.qrc">
           <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
         </property>
         <property name="iconSize">
@@ -2772,7 +2772,7 @@ IDRAM</string>
          <string>Search</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/resources.qrc">
+         <iconset resource="../resources/res.qrc">
           <normaloff>:/search.png</normaloff>:/search.png</iconset>
         </property>
         <property name="iconSize">
@@ -3345,6 +3345,19 @@ QLabel {color:yellow;background:green;}
        </spacer>
       </item>
       <item>
+       <widget class="QPushButton" name="btnSit">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Guest count</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="btnBillWithoutService">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
@@ -3396,8 +3409,8 @@ QLabel {color:yellow;background:green;}
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../resources/resources.qrc"/>
   <include location="../resources/res.qrc"/>
+  <include location="../resources/resources.qrc"/>
  </resources>
  <connections/>
 </ui>

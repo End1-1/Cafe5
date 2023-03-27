@@ -16,6 +16,18 @@
 #define op_show_drafts_sale_list 10
 #define op_add_goods_to_draft 11
 #define op_open_sale_draft_body 12
+#define op_udpdate_draft_header 13
+
+#define op_json_partners_list 100
+#define op_json_predefined_goods 101
+#define op_json_debts 102
+#define op_json_storagenames 103
+#define op_json_stock 104
+#define op_json_sales_history 105
+#define op_json_route 106
+#define op_json_route_update 107
+#define op_json_stock_all 108
+#define op_json_partner_debt 109
 
 #define version1 1 //jazzve
 #define version2 2 //cafe5

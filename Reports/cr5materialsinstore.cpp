@@ -47,11 +47,6 @@ void CR5MaterialsInStore::refreshData()
 
 void CR5MaterialsInStore::prepareDrafts()
 {
-    if (fFilter->currency().isEmpty()) {
-        C5Message::error(tr("Set currency"));
-        setSearchParameters();
-        return;
-    }
     fMainTable = "a_store_draft s";
     fLeftJoinTables.clear();
     fColumnsFields.clear();
@@ -91,7 +86,7 @@ void CR5MaterialsInStore::prepareDrafts()
                    << "g.f_lowlevel"
                    << "gpr.f_price1"
                    << "sum(s.f_qty*s.f_type)*gpr.f_price1 as f_totalsale"
-                   << "g.f_price2"
+                   << "gpr.f_price2"
                    << "sum(s.f_qty*s.f_type)*gpr.f_price2 as f_totalsale2"
                       ;
 
@@ -118,7 +113,11 @@ void CR5MaterialsInStore::prepareDrafts()
                 << "f_totalsale2"
                       ;
 
-    fHavindCondition = " having sum(s.f_qty*s.f_type) <> 0 ";
+    if (fFilter->showZero()) {
+        fHavindCondition = "";
+    } else {
+        fHavindCondition = " having sum(s.f_qty*s.f_type) <> 0 ";
+    }
 
     fTranslation["f_code"] = tr("Code");
     fTranslation["f_storage"] = tr("Storage");
@@ -164,12 +163,6 @@ void CR5MaterialsInStore::prepareDrafts()
 
 void CR5MaterialsInStore::prepareNoDrafts()
 {
-    if (fFilter->currency().isEmpty()) {
-        C5Message::error(tr("Set currency"));
-        setSearchParameters();
-        return;
-    }
-
     fMainTable = "a_store s";
     fLeftJoinTables.clear();
     fColumnsFields.clear();
@@ -189,6 +182,8 @@ void CR5MaterialsInStore::prepareNoDrafts()
                     << "left join c_goods_classes gcb on gcb.f_id=g.f_group2 [gcb]"
                     << "left join c_goods_classes gcc on gcc.f_id=g.f_group3 [gcc]"
                     << "left join c_goods_classes gcd on gcd.f_id=g.f_group4 [gcd]"
+                    << "LEFT JOin c_goods_prices gpr on gpr.f_goods=g.f_id [gpr]"
+                    << "left join partners p on p.f_id=h.f_partner [p]"
                        ;
 
     fColumnsFields << "g.f_id as f_code"
@@ -233,7 +228,7 @@ void CR5MaterialsInStore::prepareNoDrafts()
                       ;
 
     if (fFilter->showZero()) {
-
+        fHavindCondition = "";
     } else {
         fHavindCondition = " having sum(s.f_qty*s.f_type) <> 0 ";
     }
@@ -256,6 +251,7 @@ void CR5MaterialsInStore::prepareNoDrafts()
     fTranslation["f_class2"] = tr("Class 2");
     fTranslation["f_class3"] = tr("Class 3");
     fTranslation["f_class4"] = tr("Class 4");
+    fTranslation["f_taxname"] = tr("Partner");
 
 
     fColumnsVisible["g.f_id as f_code"] = true;
@@ -276,6 +272,7 @@ void CR5MaterialsInStore::prepareNoDrafts()
     fColumnsVisible["gcb.f_name as f_class2"] = false;
     fColumnsVisible["gcc.f_name as f_class3"] = false;
     fColumnsVisible["gcd.f_name as f_class4"] = false;
+    fColumnsVisible["p.f_taxname"] = false;
     restoreColumnsVisibility();
 }
 

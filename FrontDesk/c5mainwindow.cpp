@@ -21,6 +21,7 @@
 #include "cr5breezeservice.h"
 #include "cr5reports.h"
 #include "cr5mfgeneralreport.h"
+#include "cr5routereport.h"
 #include "c5saledoc.h"
 #include "cr5saleremoveddishes.h"
 #include "cr5goodsreservations.h"
@@ -40,7 +41,6 @@
 #include "c5salarydoc.h"
 #include "c5reporttemplatedriver.h"
 #include "cr5creditcards.h"
-#include "cr5debtstopartner.h"
 #include "cr5dishpart1.h"
 #include "c5toolbarwidget.h"
 #include "cr5generalreportonlydate.h"
@@ -70,6 +70,7 @@
 #include "cr5menureview.h"
 #include "cr5mfproduct.h"
 #include "cr5databases.h"
+#include "cr5routedaily.h"
 #include "cr5consuptionreason.h"
 #include "cr5storereason.h"
 #include "cr5salarybyworkers.h"
@@ -87,6 +88,7 @@
 #include "cr5hall.h"
 #include "cr5materialsinstore.h"
 #include "c5changepassword.h"
+#include "c5route.h"
 #include "cr5dishremovereason.h"
 #include "cr5goods.h"
 #include "c5user.h"
@@ -700,6 +702,9 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
     case cp_t3_store_sale:
         createTab<CR5SaleFromStore>(dbParams);
         break;
+    case cp_t3_debts:
+        createTab<CR5CostumerDebts>(dbParams);
+        break;
     case cp_t3_car_visits:
         createTab<CR5CarVisits>(dbParams);
         break;
@@ -714,9 +719,6 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
         break;
     case cp_t3_discount_statistics:
         createTab<CR5DiscountStatisics>(dbParams);
-        break;
-    case cp_t3_debts_to_partners:
-        createTab<CR5DebtsToPartner>(dbParams);
         break;
     case cp_t3_consuption_reason:
         createTab<CR5ConsuptionReason>(dbParams);
@@ -820,23 +822,20 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
     case cp_t7_order_marks:
         createTab<CR5OrderMarks>(dbParams);
         break;
+    case cp_t7_route:
+        createTab<C5Route>(dbParams);
+        break;
+    case cp_t7_route_exec:
+        createTab<CR5RouteDaily>(dbParams);
+        break;
     case cp_t8_cash_names:
         createTab<CR5CashNames>(dbParams);
         break;
     case cp_t8_cash_doc:
         createTab<C5CashDoc>(dbParams);
         break;
-    case cp_t8_costumer_debts_pay: {
-        auto *cp = new C5CostumerDebtPayment(dbParams);
-        cp->exec();
-        delete cp;
-        break;
-    }
     case cp_t8_cash_detailed_report:
         createTab<CR5CashDetailed>(dbParams);
-        break;
-    case cp_t8_costumer_debts:
-        createTab<CR5CostumerDebts>(dbParams);
         break;
     case cp_t8_cash_movement:
         createTab<CR5CashMovement>(dbParams);
@@ -1008,6 +1007,7 @@ void C5MainWindow::setDB(const QString &dbname)
         addTreeL3Item(l, cp_t3_documents_store, tr("Documents in the store"), ":/documents.png");
         addTreeL3Item(l, cp_t3_store, tr("Storage"), ":/goods.png");
         addTreeL3Item(l, cp_t3_store_movement, tr("Storages movements"), ":/goods.png");
+        addTreeL3Item(l, cp_t3_debts, tr("Debts"), ":/cash.png");
         addTreeL3Item(l, cp_t3_move_uncomplected, tr("Storage movement, uncomplected"), ":/goods.png");
         addTreeL3Item(l, cp_t3_storage_uncomplected, tr("Storage uncomplected"), ":/goods.png");
         addTreeL3Item(l, cp_t3_sale_from_store_total, tr("Detailed movement in the storage"), ":/graph.png");
@@ -1026,7 +1026,6 @@ void C5MainWindow::setDB(const QString &dbname)
             addTreeL3Item(l, cp_t3_car_visits, tr("Car visits"), ":/car.png");
         }
         addTreeL3Item(l, cp_t3_store_sale, tr("Sales by goods"), ":/graph.png");
-        addTreeL3Item(l, cp_t3_debts_to_partners, tr("Debts to partners"), ":/contract.png");
         addTreeL3Item(l, cp_t3_discount_statistics, tr("Discount statistics"), ":/discount.png");
         addTreeL3Item(l, cp_t3_preorders, tr("Preorders"), ":/customers.png");
         addTreeL3Item(l, cp_t3_custom_reports, tr("Custom reports"), ":/constructor.png");
@@ -1037,8 +1036,6 @@ void C5MainWindow::setDB(const QString &dbname)
         addTreeL3Item(l, cp_t8_cash_doc, tr("New cash document"), ":/cash.png");
         addTreeL3Item(l, cp_t8_cash_detailed_report, tr("Cash detailed report"), ":/cash.png");
         addTreeL3Item(l, cp_t8_cash_movement, tr("Movement in the cash"), ":/cash.png");
-        addTreeL3Item(l, cp_t8_costumer_debts_pay, tr("New payment for costumer debt"), ":/cash.png");
-        addTreeL3Item(l, cp_t8_costumer_debts, tr("Costumers debts report"), ":/cash.png");
         addTreeL3Item(l, cp_t8_cash_names, tr("Cash names"), ":/cash.png");
         addTreeL3Item(l, cp_t8_currency, tr("Currency"), ":/cash.png");
         addTreeL3Item(l, cp_t8_edit_currency, tr("Currency rates"), ":/cash.png");
@@ -1102,6 +1099,8 @@ void C5MainWindow::setDB(const QString &dbname)
         addTreeL3Item(l, cp_t7_discount_system, tr("Discount system"), ":/discount.png");
         addTreeL3Item(l, cp_t7_store_reason, tr("Store reason"), ":/documents.png");
         addTreeL3Item(l, cp_t7_order_marks, tr("Order marks"), ":/flag.png");
+        addTreeL3Item(l, cp_t7_route, tr("Route"), ":/route.png");
+        addTreeL3Item(l, cp_t7_route_exec, tr("Route report"), ":/route.png");
     }
 
     if (addMainLevel(db.at(1), cp_t1_preference, tr("Preferences"), ":/configure.png", l)) {

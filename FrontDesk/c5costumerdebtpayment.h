@@ -2,6 +2,9 @@
 #define C5COSTUMERDEBTPAYMENT_H
 
 #include "c5dialog.h"
+#include "bclientdebts.h"
+#include "aheader.h"
+#include "ecash.h"
 
 namespace Ui {
 class C5CostumerDebtPayment;
@@ -12,7 +15,7 @@ class C5CostumerDebtPayment : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit C5CostumerDebtPayment(const QStringList &dbParams);
+    explicit C5CostumerDebtPayment(int type, const QStringList &dbParams);
 
     ~C5CostumerDebtPayment();
 
@@ -21,8 +24,6 @@ public:
     virtual void selectorCallback(int row, const QList<QVariant> &values) override;
 
 private slots:
-    void selectorDone(const QList<QVariant> &values);
-
     void on_btnCancel_clicked();
 
     void on_btnOK_clicked();
@@ -32,7 +33,11 @@ private slots:
 private:
     Ui::C5CostumerDebtPayment *ui;
 
-    QString fSelectedGovNumber;
+    BClientDebts fBClientDebt;
+
+    AHeader fAHeader;
+
+    ECash fECash;
 };
 
 #endif // C5COSTUMERDEBTPAYMENT_H

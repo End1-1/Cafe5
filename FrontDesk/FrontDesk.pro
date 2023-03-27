@@ -56,6 +56,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Classes/doubledatabase.cpp \
     ../Classes/notificationwidget.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
+    ../Classes/removeshopsale.cpp \
     ../Classes/threadsendmessage.cpp \
     ../Controls/c5cleartablewidget.cpp \
     ../Controls/c5guicontrols.cpp \
@@ -63,6 +64,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../DbData/datadriver.cpp \
     ../DbData/dbbodystate.cpp \
     ../DbData/dbcar.cpp \
+    ../DbData/dbcurrency.cpp \
     ../DbData/dbdata.cpp \
     ../DbData/dbdishcomments.cpp \
     ../DbData/dbdishes.cpp \
@@ -105,13 +107,17 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Editors/ce5storereason.cpp \
     ../Forms/c5filtervalues.cpp \
     ../Forms/c5printtaxanywhere.cpp \
+    ../Forms/c5route.cpp \
     ../Forms/c5salarydoc.cpp \
     ../Forms/c5saledoc.cpp \
     ../Forms/c5storedoc.cpp \
     ../Forms/c5storedocselectprinttemplate.cpp \
     ../Forms/c5waiterorder.cpp \
+    ../Forms/cr5routereport.cpp \
     ../Forms/dlgconfigtable.cpp \
     ../Forms/dlgdataonline.cpp \
+    ../Forms/dlgdirtystoredoc.cpp \
+    ../Forms/dlgdriverroutedate.cpp \
     ../Forms/dlgnewcl.cpp \
     ../Forms/dlgreservgoods.cpp \
     ../Forms/dlgselectcurrency.cpp \
@@ -141,8 +147,6 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Reports/cr5currencyratehistory.cpp \
     ../Reports/cr5currencyratehistoryfilter.cpp \
     ../Reports/cr5custom.cpp \
-    ../Reports/cr5debtstopartner.cpp \
-    ../Reports/cr5debtstopartnerfilter.cpp \
     ../Reports/cr5discountstatisics.cpp \
     ../Reports/cr5discountstatisticsfilter.cpp \
     ../Reports/cr5dishpackage.cpp \
@@ -175,6 +179,8 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Reports/cr5printers.cpp \
     ../Reports/cr5reports.cpp \
     ../Reports/cr5reportsfilter.cpp \
+    ../Reports/cr5routedaily.cpp \
+    ../Reports/cr5routedailyfilter.cpp \
     ../Reports/cr5salarybyworkers.cpp \
     ../Reports/cr5salarybyworkersfilter.cpp \
     ../Reports/cr5saleandstorefilter.cpp \
@@ -188,6 +194,14 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Reports/cr5salesbydishesfilter.cpp \
     ../Reports/cr5storereason.cpp \
     ../Reports/cr5usersfilter.cpp \
+    ../TableRecord/aheader.cpp \
+    ../TableRecord/bclientdebts.cpp \
+    ../TableRecord/bhistory.cpp \
+    ../TableRecord/c5dbrecord.cpp \
+    ../TableRecord/cpartners.cpp \
+    ../TableRecord/ecash.cpp \
+    ../TableRecord/ogoods.cpp \
+    ../TableRecord/oheader.cpp \
     barcode.cpp \
     c5cashdoc.cpp \
     c5changedocinputprice.cpp \
@@ -358,6 +372,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Classes/goodsreserve.h \
     ../Classes/notificationwidget.h \
     ../Classes/proxytablewidgetdatabase.h \
+    ../Classes/removeshopsale.h \
     ../Classes/threadsendmessage.h \
     ../Controls/c5cleartablewidget.h \
     ../Controls/c5guicontrols.h \
@@ -365,6 +380,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../DbData/datadriver.h \
     ../DbData/dbbodystate.h \
     ../DbData/dbcar.h \
+    ../DbData/dbcurrency.h \
     ../DbData/dbdata.h \
     ../DbData/dbdishcomments.h \
     ../DbData/dbdishes.h \
@@ -407,13 +423,17 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Editors/ce5storereason.h \
     ../Forms/c5filtervalues.h \
     ../Forms/c5printtaxanywhere.h \
+    ../Forms/c5route.h \
     ../Forms/c5salarydoc.h \
     ../Forms/c5saledoc.h \
     ../Forms/c5storedoc.h \
     ../Forms/c5storedocselectprinttemplate.h \
     ../Forms/c5waiterorder.h \
+    ../Forms/cr5routereport.h \
     ../Forms/dlgconfigtable.h \
     ../Forms/dlgdataonline.h \
+    ../Forms/dlgdirtystoredoc.h \
+    ../Forms/dlgdriverroutedate.h \
     ../Forms/dlgnewcl.h \
     ../Forms/dlgreservgoods.h \
     ../Forms/dlgselectcurrency.h \
@@ -443,8 +463,6 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Reports/cr5currencyratehistory.h \
     ../Reports/cr5currencyratehistoryfilter.h \
     ../Reports/cr5custom.h \
-    ../Reports/cr5debtstopartner.h \
-    ../Reports/cr5debtstopartnerfilter.h \
     ../Reports/cr5discountstatisics.h \
     ../Reports/cr5discountstatisticsfilter.h \
     ../Reports/cr5dishpackage.h \
@@ -477,6 +495,8 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Reports/cr5printers.h \
     ../Reports/cr5reports.h \
     ../Reports/cr5reportsfilter.h \
+    ../Reports/cr5routedaily.h \
+    ../Reports/cr5routedailyfilter.h \
     ../Reports/cr5salarybyworkers.h \
     ../Reports/cr5salarybyworkersfilter.h \
     ../Reports/cr5saleandstorefilter.h \
@@ -491,6 +511,14 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Reports/cr5storereason.h \
     ../Reports/cr5usersfilter.h \
     ../Service/servicecommands.h \
+    ../TableRecord/aheader.h \
+    ../TableRecord/bclientdebts.h \
+    ../TableRecord/bhistory.h \
+    ../TableRecord/c5dbrecord.h \
+    ../TableRecord/cpartners.h \
+    ../TableRecord/ecash.h \
+    ../TableRecord/ogoods.h \
+    ../TableRecord/oheader.h \
     barcode.h \
     c5cashdoc.h \
     c5changedocinputprice.h \
@@ -657,13 +685,17 @@ FORMS += \
     ../Editors/ce5storereason.ui \
     ../Forms/c5filtervalues.ui \
     ../Forms/c5printtaxanywhere.ui \
+    ../Forms/c5route.ui \
     ../Forms/c5salarydoc.ui \
     ../Forms/c5saledoc.ui \
     ../Forms/c5storedoc.ui \
     ../Forms/c5storedocselectprinttemplate.ui \
     ../Forms/c5waiterorder.ui \
+    ../Forms/cr5routereport.ui \
     ../Forms/dlgconfigtable.ui \
     ../Forms/dlgdataonline.ui \
+    ../Forms/dlgdirtystoredoc.ui \
+    ../Forms/dlgdriverroutedate.ui \
     ../Forms/dlgnewcl.ui \
     ../Forms/dlgreservgoods.ui \
     ../Forms/dlgselectcurrency.ui \
@@ -680,7 +712,6 @@ FORMS += \
     ../Reports/cr5costumerdebtsfilter.ui \
     ../Reports/cr5currencycrossratehistoryfilter.ui \
     ../Reports/cr5currencyratehistoryfilter.ui \
-    ../Reports/cr5debtstopartnerfilter.ui \
     ../Reports/cr5discountstatisticsfilter.ui \
     ../Reports/cr5draftoutputbyrecipefilter.ui \
     ../Reports/cr5goodsfilter.ui \
@@ -693,6 +724,7 @@ FORMS += \
     ../Reports/cr5mfdaily.ui \
     ../Reports/cr5mfgeneralreportfilter.ui \
     ../Reports/cr5reportsfilter.ui \
+    ../Reports/cr5routedailyfilter.ui \
     ../Reports/cr5salarybyworkersfilter.ui \
     ../Reports/cr5saleandstorefilter.ui \
     ../Reports/cr5saleflags.ui \
@@ -776,6 +808,7 @@ INCLUDEPATH += ../Classes
 INCLUDEPATH += ../Reports
 INCLUDEPATH += ../Controls
 INCLUDEPATH += ../Editors
+INCLUDEPATH += ../TableRecord
 INCLUDEPATH += ../DbData
 INCLUDEPATH += ../Waiter
 INCLUDEPATH += ../RESOURCES
