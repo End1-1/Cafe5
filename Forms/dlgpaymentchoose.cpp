@@ -78,6 +78,22 @@ void DlgPaymentChoose::clearAll(QLineEdit *le)
     le->setText(ui->leTotal->text());
 }
 
+void DlgPaymentChoose::countChange()
+{
+    double diff = ui->leCashIn->getDouble()
+            - ui->leCash->getDouble()
+            + ui->leCard->getDouble()
+            + ui->leIdram->getDouble()
+            + ui->leTelcell->getDouble()
+            + ui->leDebt->getDouble()
+            + ui->leBankTransfer->getDouble()
+            + ui->lePrepaid->getDouble();
+    if (diff > ui->leCashIn->getDouble()) {
+        diff = ui->leCashIn->getDouble();
+    }
+    ui->leChange->setDouble(diff > 0.001 ? diff : 0);
+}
+
 void DlgPaymentChoose::on_btnCard_clicked()
 {
     clearAll(ui->leCard);
@@ -105,13 +121,7 @@ void DlgPaymentChoose::on_btnDebt_clicked()
 
 void DlgPaymentChoose::on_leCashIn_textChanged(const QString &arg1)
 {
-    double diff = ui->leCashIn->getDouble()
-            - ui->leCash->getDouble()
-            - ui->leCard->getDouble()
-            - ui->leIdram->getDouble()
-            - ui->leTelcell->getDouble()
-            - ui->lePrepaid->getDouble();
-    ui->leChange->setDouble(diff > 0.001 ? diff : 0);
+    countChange();
 }
 
 void DlgPaymentChoose::on_btnBankTransfer_clicked()
@@ -127,9 +137,45 @@ void DlgPaymentChoose::on_btnPay_clicked()
             + ui->leIdram->getDouble()
             + ui->leTelcell->getDouble()
             + ui->leBankTransfer->getDouble()
+            + ui->lePrepaid->getDouble()
             + ui->leDebt->getDouble();
     if (value > ui->leTotal->getDouble() || value < ui->leTotal->getDouble()) {
         return;
     }
     accept();
+}
+
+void DlgPaymentChoose::on_leCash_textChanged(const QString &arg1)
+{
+    countChange();
+}
+
+void DlgPaymentChoose::on_leCard_textChanged(const QString &arg1)
+{
+    countChange();
+}
+
+void DlgPaymentChoose::on_leBankTransfer_textChanged(const QString &arg1)
+{
+    countChange();
+}
+
+void DlgPaymentChoose::on_leIdram_textChanged(const QString &arg1)
+{
+    countChange();
+}
+
+void DlgPaymentChoose::on_leTelcell_textChanged(const QString &arg1)
+{
+    countChange();
+}
+
+void DlgPaymentChoose::on_lePrepaid_textChanged(const QString &arg1)
+{
+    countChange();
+}
+
+void DlgPaymentChoose::on_leDebt_textChanged(const QString &arg1)
+{
+    countChange();
 }

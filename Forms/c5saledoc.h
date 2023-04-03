@@ -2,6 +2,9 @@
 #define C5SALEDOC_H
 
 #include "c5widget.h"
+#include "cpartners.h"
+#include "odraftsale.h"
+#include "odraftsalebody.h"
 #include <QJsonObject>
 
 namespace Ui {
@@ -25,6 +28,8 @@ public:
     virtual QToolBar *toolBar() override;
 
 private slots:
+    void printSale();
+    void createInvoiceAS();
     void messageResult(QJsonObject jo);
     void saveDataChanges();
     void uuidDoubleClicked();
@@ -37,9 +42,13 @@ private slots:
     void on_btnEditGoods_clicked();
     void on_btnNewGoods_clicked();
     void on_cbHall_currentIndexChanged(int index);
+    void on_btnSearchTaxpayer_clicked();
 
 private:
     Ui::C5SaleDoc *ui;
+    CPartners fPartner;
+    ODraftSale fDraftSale;
+    ODraftSaleBody fDraftSaleBody;
     int fMode;
     QAction *fActionSave;
     void addGoods(int goodsId, C5Database &db);

@@ -48,7 +48,7 @@ bool C5ShopOrder::write()
     if (!fOHeader.write(db, err)) {
         return returnFalse(err, db);
     }
-    if (!dw.writeOHeaderOptions(fOHeader.id, 0, 0, 0, fOHeader.currency)) {
+    if (!dw.writeOHeaderOptions(fOHeader._id(), 0, 0, 0, fOHeader.currency)) {
         return returnFalse(dw.fErrorMsg, db);
     }
 
@@ -109,10 +109,10 @@ bool C5ShopOrder::write()
             dblog[":f_fiscalmode"] = tr("(F)");
             dblog[":f_time"] = time;
             dblog.insert("o_tax", false);
-            pt.saveTimeResult(fOHeader.id, *q);
+            pt.saveTimeResult(fOHeader._id(), *q);
             delete q;
         } else {
-            pt.saveTimeResult("Not saved - " + fOHeader.id, *q);
+            pt.saveTimeResult("Not saved - " + fOHeader._id(), *q);
             delete q;
             return returnFalse(err + "<br>" + jsonOut + "<br>" + jsonIn, db);
         }
@@ -136,14 +136,14 @@ bool C5ShopOrder::write()
                              QDate::currentDate(), QTime::currentTime(), 0, 0, storeDocComment, 0, fOHeader.currency)) {
             return returnFalse(dw.fErrorMsg, db);
         }
-        if (!dw.writeAHeaderStore(storeDocId, fOHeader.staff, fOHeader.staff, "", QDate(), 0, __c5config.defaultStore(), 1, "", 0, 0, fOHeader.id)) {
+        if (!dw.writeAHeaderStore(storeDocId, fOHeader.staff, fOHeader.staff, "", QDate(), 0, __c5config.defaultStore(), 1, "", 0, 0, fOHeader._id())) {
             return returnFalse(dw.fErrorMsg, db);
         }
     }
 
     for (int i = 0; i < fOGoods.count(); i++) {
         OGoods &g = fOGoods[i];
-        g.header = fOHeader.id;
+        g.header = fOHeader._id();
         if (!g.isService) {
             if (!dw.writeAStoreDraft(g.storeRec, storeDocId, __c5config.defaultStore(), -1, g.goods, g.qty,
                                      0, 0, DOC_REASON_SALE, g.storeRec, i + 1, "")) {
@@ -175,7 +175,7 @@ bool C5ShopOrder::write()
         b.source = BCLIENTDEBTS_SOURCE_SALE;
         b.date = fOHeader.dateCash;
         b.costumer = fOHeader.partner;
-        b.order = fOHeader.id;
+        b.order = fOHeader._id();
         b.amount = -1 * fOHeader.amountBank;
         b.currency = fOHeader.currency;
         b.write(db, err);
@@ -185,7 +185,7 @@ bool C5ShopOrder::write()
         b.source = BCLIENTDEBTS_SOURCE_SALE;
         b.date = fOHeader.dateCash;
         b.costumer = fOHeader.partner;
-        b.order = fOHeader.id;
+        b.order = fOHeader._id();
         b.amount = -1 * fOHeader.amountDebt;
         b.currency = fOHeader.currency;
         b.write(db, err);
@@ -302,19 +302,19 @@ bool C5ShopOrder::write()
             bool p1, p2;
             if (SelectPrinters::selectPrinters(p1, p2)) {
                 if (p1) {
-                    p.print(fOHeader.id, db, 1);
+                    p.print(fOHeader._id(), db, 1);
                 }
                 if (p2) {
-                    p.print(fOHeader.id, db, 2);
+                    p.print(fOHeader._id(), db, 2);
                 }
             }
             break;
         }
         case 2:
-            p.print2(fOHeader.id, db);
+            p.print2(fOHeader._id(), db);
             break;
         case 3:
-            p.print3(fOHeader.id, db);
+            p.print3(fOHeader._id(), db);
             break;
         default:
             break;
@@ -328,7 +328,7 @@ bool C5ShopOrder::writeFlags(int f1, int f2, int f3, int f4, int f5)
 {
     C5Database db(__c5config.dbParams());
     C5StoreDraftWriter dw(db);
-    return dw.writeOHeaderFlags(fOHeader.id, f1, f2, f3, f4, f5);
+    return dw.writeOHeaderFlags(fOHeader._id(), f1, f2, f3, f4, f5);
 }
 
 bool C5ShopOrder::returnFalse(const QString &msg, C5Database &db)

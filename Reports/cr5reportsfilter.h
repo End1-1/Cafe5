@@ -29,6 +29,8 @@ private:
     Ui::CR5ReportsFilter *ui;
 
     QMap<int, C5LineEditWithSelector*> fCache;
+
+    void addFilterField(const QString &title, const QString &data, int row);
 };
 
 #endif // CR5REPORTSFILTER_H

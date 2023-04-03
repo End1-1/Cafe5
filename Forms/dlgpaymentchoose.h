@@ -41,10 +41,26 @@ private slots:
 
     void on_btnPay_clicked();
 
+    void on_leCash_textChanged(const QString &arg1);
+
+    void on_leCard_textChanged(const QString &arg1);
+
+    void on_leBankTransfer_textChanged(const QString &arg1);
+
+    void on_leIdram_textChanged(const QString &arg1);
+
+    void on_leTelcell_textChanged(const QString &arg1);
+
+    void on_lePrepaid_textChanged(const QString &arg1);
+
+    void on_leDebt_textChanged(const QString &arg1);
+
 private:
     Ui::DlgPaymentChoose *ui;
 
     void clearAll(QLineEdit *le);
+
+    void countChange();
 };
 
 #endif // DLGPAYMENTCHOOSE_H

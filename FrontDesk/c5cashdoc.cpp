@@ -235,6 +235,12 @@ int C5CashDoc::outputCash()
 bool C5CashDoc::removeDoc(const QStringList &dbParams, const QString &uuid)
 {
     C5Database db(dbParams);
+    removeDoc(db, uuid);
+    return true;
+}
+
+bool C5CashDoc::removeDoc(C5Database &db, const QString &uuid)
+{
     db[":f_cash"] = uuid;
     db.exec("delete from b_clients_debts where f_cash=:f_cash");
     db[":f_header"] = uuid;
@@ -321,6 +327,7 @@ void C5CashDoc::save(bool fromrelation)
     db.exec("delete from b_clients_debts where f_cash=:f_cash");
     if (ui->lePartner->getInteger() > 0) {
         BClientDebts bcd;
+        bcd.source = fDebtSource;
         bcd.date = ui->deDate->date();
         bcd.amount = ui->leTotal->getDouble();
         bcd.costumer = ui->lePartner->getInteger();

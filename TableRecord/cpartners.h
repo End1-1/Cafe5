@@ -6,7 +6,8 @@
 class CPartners : public TableRecord
 {
 public:
-    int id;
+    int state = 0;
+    int group = 0;
     QString taxCode;
     QString taxName;
     QString contact;
@@ -14,9 +15,11 @@ public:
     QString info;
     QString phone;
     QString address;
+    QString legalAddress;
 
     virtual CPartners &queryRecordOfId(C5Database &db, const QVariant &id) override;
     virtual bool getRecord(C5Database &db) override;
+    virtual void bind(C5Database &db) override;
     virtual bool write(C5Database &db, QString &err) override;
 };
 

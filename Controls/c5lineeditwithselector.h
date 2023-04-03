@@ -27,6 +27,8 @@ public:
 
     void setValue(int id);
 
+    QString text();
+
     int cacheId();
 
 protected:

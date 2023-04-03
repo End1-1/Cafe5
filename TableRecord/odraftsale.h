@@ -1,27 +1,26 @@
-#ifndef AHEADER_H
-#define AHEADER_H
+#ifndef ODRAFTSALE_H
+#define ODRAFTSALE_H
 
 #include "c5dbrecord.h"
 
-class AHeader : public TableRecord
+class ODraftSale : public TableRecord
 {
 public:
     QString id;
-    QString userId;
     int state = 0;
-    int type = 0;
-    int operator_ = 0;
+    int saleType = 0;
     QDate date;
-    QDate dateCreate;
-    QTime timeCreate;
+    QTime time;
+    int payment = 0;
+    int staff = 0;
     int partner = 0;
     double amount = 0.0;
+    double discount = 0.0;
     QString comment;
-    int currency = 0;
 
     virtual bool getRecord(C5Database &db) override;
     virtual void bind(C5Database &db) override;
     virtual bool write(C5Database &db, QString &err) override;
 };
 
-#endif // AHEADER_H
+#endif // ODRAFTSALE_H

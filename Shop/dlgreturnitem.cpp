@@ -197,7 +197,7 @@ void DlgReturnItem::on_btnReturn_clicked()
             }
         }
         OGoods g;
-        g.header = oheader.id;
+        g.header = oheader._id();
         g.goods = ui->tblBody->getInteger(i, 8);
         g.qty = ui->tblBody->getDouble(i, 4);
         g.price = ui->tblBody->getDouble(i, 6);
@@ -238,7 +238,7 @@ void DlgReturnItem::on_btnReturn_clicked()
                         QDate::currentDate(), QTime::currentTime(), 0, returnAmount, purpose, 1, __c5config.getValue(param_default_currency).toInt());
         dw.writeAHeaderCash(fCashUuid, 0, __c5config.cashId(), 1, storeDocId, "", 0);
         dw.writeECash(fCashRowId, fCashUuid, __c5config.cashId(), -1, purpose, returnAmount, fCashRowId, 1);
-        if (!dw.writeAHeaderStore(storeDocId, oheader.staff, oheader.staff, "", QDate(), __c5config.defaultStore(), 0, 1, fCashUuid, 0, 0, oheader.id)) {
+        if (!dw.writeAHeaderStore(storeDocId, oheader.staff, oheader.staff, "", QDate(), __c5config.defaultStore(), 0, 1, fCashUuid, 0, 0, oheader._id())) {
             C5Message::error(dw.fErrorMsg);
             db.rollback();
             return;
@@ -261,7 +261,7 @@ void DlgReturnItem::on_btnReturn_clicked()
             db.rollback();
             return;
         }
-        if (!dw.writeAHeaderCash(cashdocid, 0, it.key(), 1, "", oheader.id, 0)) {
+        if (!dw.writeAHeaderCash(cashdocid, 0, it.key(), 1, "", oheader._id(), 0)) {
             C5Message::error(dw.fErrorMsg);
             db.rollback();
             return;
@@ -289,7 +289,7 @@ void DlgReturnItem::on_btnReturn_clicked()
 
     if (!C5Config::localReceiptPrinter().isEmpty()) {
         PrintReceipt p;
-        p.print(oheader.id, db);
+        p.print(oheader._id(), db);
     }
 
     db.commit();

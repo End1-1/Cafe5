@@ -200,6 +200,8 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../TableRecord/c5dbrecord.cpp \
     ../TableRecord/cpartners.cpp \
     ../TableRecord/ecash.cpp \
+    ../TableRecord/odraftsale.cpp \
+    ../TableRecord/odraftsalebody.cpp \
     ../TableRecord/ogoods.cpp \
     ../TableRecord/oheader.cpp \
     barcode.cpp \
@@ -517,6 +519,8 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../TableRecord/c5dbrecord.h \
     ../TableRecord/cpartners.h \
     ../TableRecord/ecash.h \
+    ../TableRecord/odraftsale.h \
+    ../TableRecord/odraftsalebody.h \
     ../TableRecord/ogoods.h \
     ../TableRecord/oheader.h \
     barcode.h \

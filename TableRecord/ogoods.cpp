@@ -1,12 +1,7 @@
 #include "ogoods.h"
 
-bool OGoods::write(C5Database &db, QString &err)
+void OGoods::bind(C5Database &db)
 {
-    bool u = true;
-    if (id.isEmpty()) {
-        id = db.uuid();
-        u = false;
-    }
     db[":f_id"] = id;
     db[":f_header"] = header;
     db[":f_body"] = body;
@@ -28,6 +23,16 @@ bool OGoods::write(C5Database &db, QString &err)
     db[":f_return"] = return_;
     db[":f_returnfrom"] = returnFrom;
     db[":f_isservice"] = isService;
+}
+
+bool OGoods::write(C5Database &db, QString &err)
+{
+    bool u = true;
+    if (id.isEmpty()) {
+        id = db.uuid();
+        u = false;
+    }
+    bind(db);
     if (u) {
         return getWriteResult(db, db.update("o_goods", where_id(id)), err);
     } else {

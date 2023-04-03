@@ -52,7 +52,8 @@ void CR5MaterialInStoreUncomplect::buildQuery()
     switch (fFilter->viewMode()) {
     case 0:
         group = "group by f_code, f_storage, f_group, f_goods, f_scancode ";
-        fields = "f_code, f_storage, f_group, f_goods, f_scancode,sum(f_qty) as f_qty, f_unit, sum(f_total) as f_total,sum(f_totalsale) as f_totalsale,sum(f_totalsale2) as f_totalsale2 ";
+        fields = "f_code, f_storage, f_group, f_goods, f_scancode,sum(f_qty) as f_qty, f_unit, "
+                "sum(f_total) as f_total,sum(f_totalsale) as f_totalsale,sum(f_totalsale2) as f_totalsale2 ";
         break;
     case 1:
         group = "group by f_storage, f_group ";

@@ -653,14 +653,14 @@ bool C5Database::exec(const QString &sqlQuery, bool &isSelect)
     }
     fTimerCount = fTimer.elapsed();
 
-#define LOGGING
-
-    #ifdef LOGGING
-        logEvent(fDb.hostName() + " (" + QString::number(fTimerCount) + " ms):" + fDb.databaseName() + " " + lastQuery(fQuery));
-    #endif
+#ifdef QT_DEBUG
+    logEvent(fDb.hostName() + " (" + QString::number(fTimerCount) + " ms):" + fDb.databaseName() + " " + lastQuery(fQuery));
+#else
     if (__c5config.getValue(param_debuge_mode).toInt() > 0) {
         logEvent(fDb.hostName() + " (" + QString::number(fTimerCount) + " ms):" + fDb.databaseName() + " " + lastQuery(fQuery));
     }
+#endif
+
 
     isSelect = fQuery->isSelect();
     QString call = "call";

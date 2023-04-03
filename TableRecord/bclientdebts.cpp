@@ -24,13 +24,8 @@ bool BClientDebts::getRecord(C5Database &db)
     currency = db.getInt("f_currency");
 }
 
-bool BClientDebts::write(C5Database &db, QString &err)
+void BClientDebts::bind(C5Database &db)
 {
-    Q_ASSERT(source > 0);
-    bool u = true;
-    if (id == 0) {
-        u = false;
-    }
     db[":f_id"] = id;
     db[":f_source"] = source;
     db[":f_date"] = date;
@@ -40,6 +35,16 @@ bool BClientDebts::write(C5Database &db, QString &err)
     db[":f_storedoc"] = store;
     db[":f_amount"] = amount;
     db[":f_currency"] = currency;
+}
+
+bool BClientDebts::write(C5Database &db, QString &err)
+{
+    Q_ASSERT(source > 0);
+    bool u = true;
+    if (id == 0) {
+        u = false;
+    }
+    bind(db);
     if (u) {
         return getWriteResult(db, db.update("b_clients_debts", "f_id", id), err);
     } else {

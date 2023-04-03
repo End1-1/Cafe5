@@ -6,6 +6,7 @@
 #include "bhistory.h"
 #include "oheader.h"
 #include "ogoods.h"
+#include "odraftsale.h"
 #include <QWidget>
 #include <QDate>
 #include <QTime>
@@ -28,7 +29,7 @@ public:
 
     ~WOrder();
 
-    QString fDraftSale;
+    ODraftSale fDraftSale;
 
     OHeader fOHeader;
 
@@ -50,7 +51,7 @@ public:
 
     bool addGoods(int id);
 
-    int addGoodsToTable(int id);
+    int addGoodsToTable(int id, bool checkQtyOfStore, const QString &draftid);
 
     bool writeOrder();
 
@@ -86,7 +87,7 @@ public:
 
     C5ClearTableWidget *table();
 
-    bool checkQty(int goods, double qty, QString &err);
+    bool checkQty(int goods, double qty, bool updateStock, QString &err);
 
 private slots:
     void imageLoaded(const QPixmap &img);
@@ -109,6 +110,8 @@ private:
     C5User *fUser;
 
     Working *fWorking;
+
+
 
     WCustomerDisplay *fCustomerDisplay;
 

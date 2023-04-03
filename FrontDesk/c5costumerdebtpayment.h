@@ -19,7 +19,7 @@ public:
 
     ~C5CostumerDebtPayment();
 
-    void setId(int id);
+    void setId(const QString &id);
 
     virtual void selectorCallback(int row, const QList<QVariant> &values) override;
 

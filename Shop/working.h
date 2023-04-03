@@ -47,6 +47,10 @@ public:
 
     void setActiveWidget(WOrder *w);
 
+    bool findDraft(const QString &draftid);
+
+    static Working *working();
+
     static QMap<int, Flag> fFlags;
 
     static QHash<QString, int> fGoodsRows;
@@ -67,6 +71,8 @@ public slots:
 private:
     Ui::Working *ui;
 
+    static Working *fInstance;
+
     C5User *fUser;
 
     WCustomerDisplay *fCustomerDisplay;
@@ -81,9 +87,8 @@ private:
 
     bool fUpFinished;
 
-    void restoreSales();
-
 private slots:
+
     void socketConnected();
 
     void socketDisconnected();

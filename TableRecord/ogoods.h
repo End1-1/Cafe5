@@ -31,6 +31,7 @@ public:
     QString _barcode;
     QString _unitName;
 
+    virtual void bind(C5Database &db) override;
     virtual bool write(C5Database &db, QString &err) override;
     virtual bool getRecord(C5Database &db) override;
 

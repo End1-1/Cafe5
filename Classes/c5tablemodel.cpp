@@ -22,6 +22,8 @@ void C5TableModel::translate(const QHash<QString, QString> &t)
 
 void C5TableModel::execQuery(const QString &query)
 {
+    QElapsedTimer timer;
+    timer.start();
     beginResetModel();
     clearModel();
     C5Database db(fDBParams);
@@ -53,6 +55,7 @@ void C5TableModel::execQuery(const QString &query)
 
     }
     endResetModel();
+    qDebug() << "Data loaded in " << timer.elapsed() << "ms";
 }
 
 void C5TableModel::setCheckboxes(bool v)

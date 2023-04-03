@@ -116,6 +116,11 @@
        <string>Discount factor</string>
       </property>
      </column>
+     <column>
+      <property name="text">
+       <string>Stock</string>
+      </property>
+     </column>
     </widget>
    </item>
    <item>

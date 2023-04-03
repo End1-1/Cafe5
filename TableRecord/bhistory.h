@@ -12,6 +12,8 @@ public:
     double value = 0.0;
     double data = 0.0;
     BHistory();
+
+    virtual void bind(C5Database &db) override;
     virtual bool write(C5Database &db, QString &err) override;
 };
 

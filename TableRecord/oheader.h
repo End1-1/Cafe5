@@ -7,7 +7,6 @@
 
 class OHeader: public TableRecord {
 public:
-    QString id;
     int hallId;
     QString prefix;
     int state;
@@ -52,6 +51,8 @@ public:
     bool _printFiscal = false;
 
     OHeader();
+    virtual void bind(C5Database &db) override;
+    virtual bool getRecord(C5Database &db) override;
     virtual bool write(C5Database &db, QString &err) override;
     QString humanId();
     bool hasIdram();

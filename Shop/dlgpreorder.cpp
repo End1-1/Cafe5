@@ -231,7 +231,7 @@ void DlgPreorder::on_btnCreateSale_clicked()
         return;
     }
     for (int i = 0; i < ui->tgoods->rowCount(); i++) {
-        fWorking->worder()->addGoodsToTable(ui->tgoods->item(i, 1)->data(Qt::EditRole).toInt());
+        fWorking->worder()->addGoodsToTable(ui->tgoods->item(i, 1)->data(Qt::EditRole).toInt(), true, "");
         fWorking->worder()->changeQty(str_float(ui->tgoods->item(i, 4)->text()));
         fWorking->worder()->changePrice(str_float(ui->tgoods->item(i, 5)->text()));
     }

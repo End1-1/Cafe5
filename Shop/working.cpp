@@ -48,6 +48,7 @@ QHash<QString, int> Working::fGoodsRows;
 QHash<QString, QString> Working::fMultiscancode;
 QMap<QString, double> Working::fUnitDefaultQty;
 QMap<int, Flag> Working::fFlags;
+Working *Working::fInstance = nullptr;
 static QSettings __s(QString("%1\\%2\\%3").arg(_ORGANIZATION_, _APPLICATION_, _MODULE_));
 
 Working::Working(C5User *user, QWidget *parent) :
@@ -55,6 +56,7 @@ Working::Working(C5User *user, QWidget *parent) :
     ui(new Ui::Working)
 {
     ui->setupUi(this);
+    fInstance = this;
     QString ip;
     int port;
     fCustomerDisplay = nullptr;
@@ -131,8 +133,7 @@ Working::Working(C5User *user, QWidget *parent) :
     if (s.value("customerdisplay").toBool()) {
         ui->btnCostumerDisplay->click();
     }
-
-    restoreSales();
+    newSale(SALE_RETAIL);
 }
 
 Working::~Working()
@@ -302,6 +303,23 @@ void Working::setActiveWidget(WOrder *w)
     }
 }
 
+bool Working::findDraft(const QString &draftid)
+{
+    for (int i = 0; i < ui->tab->count(); i++) {
+        WOrder *wo = static_cast<WOrder*>(ui->tab->widget(i));
+        if (wo->fDraftSale.id == draftid) {
+            ui->tab->setCurrentIndex(i);
+            return true;
+        }
+    }
+    return false;
+}
+
+Working *Working::working()
+{
+    return fInstance;
+}
+
 Flag Working::flag(int id)
 {
     if (fFlags.contains(id)) {
@@ -385,43 +403,6 @@ int Working::ordersCount()
         return db.getInt(0) + ui->tab->count();
     } else {
         return ui->tab->count();
-    }
-}
-
-void Working::restoreSales()
-{
-    C5Database db(__c5config.dbParams());
-    db[":f_station"] = hostinfo + ": " + hostusername();
-    db.exec("select distinct(f_window), f_saletype from a_sale_temp where f_state=0 and f_station=:f_station");
-    while (db.nextRow()) {
-        newSale(db.getInt(1));
-    }
-    db[":f_station"] = hostinfo + ": " + hostusername();
-    db.exec("select * from a_sale_temp where f_state=0 and f_station=:f_station order by f_window, f_row");
-    QList<int> invalidWindows;
-    while (db.nextRow()) {
-        WOrder *w = static_cast<WOrder*>(ui->tab->widget(db.getInt("f_window")));
-        if (!w) {
-            invalidWindows.append(db.getInt("f_window"));
-            //C5Message::error(tr("Program error: Working:restoreSales: detected invalid window"));
-            continue;
-        }
-        QString err;
-        if (!w->checkQty(db.getInt("f_goodsid"), db.getDouble("f_qty"), err) && __c5config.getValue(param_shop_dont_check_qty).toInt() == 0) {
-            continue;
-        }
-        w->fOHeader.saleType = db.getInt("f_saletype");
-        w->addGoods(db.getInt("f_goodsid"));
-        w->setQtyOfRow(w->rowCount() - 1, db.getDouble("f_qty"));
-        w->countTotal();
-    }
-    for (auto i: invalidWindows) {
-        db[":f_window"] = i;
-        db.exec("delete from a_sale_temp where f_window=:f_window");
-    }
-    db.exec("delete from a_sale_temp where f_state>0");
-    if (fTab->count() == 0) {
-        newSale(SALE_RETAIL);
     }
 }
 
@@ -715,27 +696,19 @@ void Working::haveChanges(bool v)
 
 void Working::on_tab_tabCloseRequested(int index)
 {
+    QString err;
     C5Database db(__c5config.dbParams());
     WOrder *w = static_cast<WOrder*>(ui->tab->widget(index));
-    if (w->rowCount() > 0) {
-        if (!fUser->check(cp_t5_remove_row_from_shop)) {
-            return;
+    if (!w->fDraftSale.id.isEmpty()) {
+        if (w->rowCount() == 0) {
+            w->fDraftSale.state = 3;
+            w->fDraftSale.write(db, err);
         }
-        db[":f_window"] = index;
-        db.exec("update a_sale_temp set f_state=1 where f_window=:f_window and f_state=0");
-    }
-    while (w->table()->rowCount() > 0) {
-        w->table()->setCurrentCell(0, 0);
-        w->removeRow();
     }
     ui->tab->removeTab(index);
     w->deleteLater();
-    C5LogSystem::writeEvent(QString("%1 #%2").arg(tr("Window closed")).arg(index + 1));
     if (ui->tab->count() == 0) {
         newSale(SALE_RETAIL);
-    } else {
-        db[":f_window"] = index;
-        db.exec("update a_sale_temp set f_window=f_window-1 where f_window>:f_window");
     }
 }
 
@@ -797,7 +770,7 @@ void Working::on_btnWriteOrder_clicked()
         if (w->fOHeader._printFiscal) {
             QString rseq;
             C5Database db(C5Config::dbParams());
-            if (Sales::printCheckWithTax(db, w->fOHeader.id, rseq)) {
+            if (Sales::printCheckWithTax(db, w->fOHeader._id(), rseq)) {
                 if (!C5Config::localReceiptPrinter().isEmpty()) {
 //                    PrintReceiptGroup p;
 //                    switch (C5Config::shopPrintVersion()) {
@@ -964,7 +937,7 @@ void Working::on_btnGiftCard_clicked()
     }
     DlgGiftCardSale d(__c5config.replicaDbParams());
     if (d.exec() == QDialog::Accepted) {
-        int row = wo->addGoodsToTable(d.fGiftGoodsId);
+        int row = wo->addGoodsToTable(d.fGiftGoodsId, true, "");
         wo->changePrice(d.fGiftPrice);
         wo->fOHeader.saleType = -1;
     }
@@ -1005,6 +978,6 @@ void Working::on_btnOpenDraft_clicked()
 {
     C5TempSale t;
     if (t.exec() == QDialog::Accepted) {
-        t.openDraft(worder());
+        t.openDraft();
     }
 }

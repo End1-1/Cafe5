@@ -17,7 +17,7 @@ class C5TempSale : public C5Dialog
 public:
     explicit C5TempSale();
     ~C5TempSale();
-    void openDraft(WOrder *o);
+    void openDraft();
 
 private slots:
     void on_tbl_itemDoubleClicked(QTableWidgetItem *item);

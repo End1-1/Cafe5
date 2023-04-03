@@ -26,11 +26,11 @@ C5CostumerDebtPayment::~C5CostumerDebtPayment()
     delete ui;
 }
 
-void C5CostumerDebtPayment::setId(int id)
+void C5CostumerDebtPayment::setId(const QString &id)
 {
     C5Database db(fDBParams);
-    db[":f_id"] = id;
-    db.exec("select f_id, f_date, f_costumer, f_cash, abs(f_amount) as f_amount, f_govnumber from b_clients_debts where f_id=:f_id");
+    db[":f_cash"] = id;
+    db.exec("select * from b_clients_debts where f_cash=:f_cash");
     fBClientDebt.getRecord(db);
     db[":f_id"] = fBClientDebt.cash;
     db.exec("select * from a_header where f_id=:f_id");
@@ -46,6 +46,7 @@ void C5CostumerDebtPayment::setId(int id)
     ui->leCostumer->setValue(fBClientDebt.costumer);
     ui->leAmount->setDouble(fBClientDebt.amount);
     ui->leCurrency->setText(fBClientDebt.currencyName(db));
+    ui->btnRemove->setEnabled(true);
 }
 
 void C5CostumerDebtPayment::selectorCallback(int row, const QList<QVariant> &values)
@@ -84,13 +85,21 @@ void C5CostumerDebtPayment::on_btnOK_clicked()
     C5Database db(fDBParams);
     fBClientDebt.date = ui->deDate->date();
     fBClientDebt.costumer = ui->leCostumer->getInteger();
-    fBClientDebt.cash = ui->leCash->getInteger();
     fBClientDebt.amount = ui->leAmount->getDouble();
     if (fBClientDebt.id == 0) {
         if (ui->leAmount->getDouble() > 0) {
             C5CashDoc *doc = new C5CashDoc(fDBParams);
             doc->setRelation(true);
-            doc->setCashInput(ui->leCash->getInteger());
+            doc->setPartner(fBClientDebt.costumer);
+            switch (fBClientDebt.source) {
+            case BCLIENTDEBTS_SOURCE_INPUT:
+                doc->setCashOutput(ui->leCash->getInteger());
+                break;
+            case BCLIENTDEBTS_SOURCE_SALE:
+                doc->setCashInput(ui->leCash->getInteger());
+                break;
+            }
+
             doc->setDate(ui->deDate->date());
             doc->setComment(tr("Dept payment") + ", " + ui->leCostumerName->text());
             doc->addRow(tr("Dept payment") + ", " + ui->leCostumerName->text(), ui->leAmount->getDouble());
@@ -108,10 +117,11 @@ void C5CostumerDebtPayment::on_btnOK_clicked()
         }
         delete doc;
     }
-    fBClientDebt.write(db, err);
+    //fBClientDebt.write(db, err);
     ui->leCode->setInteger(fBClientDebt.id);
     ui->btnRemove->setEnabled(true);
     C5Message::info(tr("Saved"));
+    accept();
 }
 
 void C5CostumerDebtPayment::on_btnRemove_clicked()
@@ -127,7 +137,7 @@ void C5CostumerDebtPayment::on_btnRemove_clicked()
     db[":f_id"] = ui->leCode->getInteger();
     db.exec("delete from b_clients_debts where f_id=:f_id");
     C5CashDoc *doc = new C5CashDoc(fDBParams);
-    if (doc->removeDoc(fDBParams, fcash)) {
+    if (doc->removeDoc(db, fcash)) {
         db.commit();
     } else {
         db.rollback();

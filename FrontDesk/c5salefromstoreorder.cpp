@@ -183,16 +183,12 @@ void C5SaleFromStoreOrder::on_btnSave_clicked()
             db[":f_costumer"] = ui->lePartner->getInteger();
             db[":f_date"] = ui->deDate->date();
             db[":f_amount"] = ui->leTotalCash->getDouble() * -1;
+            db[":f_currency"] = 1;
+            db[":f_source"] = 1;
             db.insert("b_clients_debts");
         }
-        db.deleteFromTable("a_dc", "f_doc", ui->leID->text());
-        db[":f_doc"] = ui->leID->text();
-        db[":f_dc"] = 1;
-        db[":f_amount"] = ui->leTotalCash->getDouble();
-        db.insert("a_dc", false);
     } else {
         db.deleteFromTable("b_clients_debts", "f_order", ui->leID->text());
-        db.deleteFromTable("a_dc", "f_doc", ui->leID->text());
     }
     db[":f_partner"] = ui->lePartner->getInteger();
     db[":f_staff"] = ui->leSeller->getInteger();

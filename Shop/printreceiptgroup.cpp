@@ -3,6 +3,8 @@
 #include "c5config.h"
 #include "c5utils.h"
 #include "c5logsystem.h"
+#include "oheader.h"
+#include "cpartners.h"
 #include "QRCodeGenerator.h"
 #include <QApplication>
 
@@ -18,7 +20,7 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
     double cash = 0;
     double change = 0;
     db[":f_id"] = id;
-    db.exec("select f_cash, f_change from o_payment where f_id=:f_id");
+    db.exec("select * from o_header where f_id=:f_id");
     if (db.nextRow()) {
         cash = db.getDouble("f_cash");
         change = db.getDouble("f_change");
@@ -330,17 +332,11 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
 {
     C5LogSystem::writeEvent("Print2 started");
     QMap<QString, QVariant> returnFrom;
-    double cash = 0;
-    double change = 0;
-    double idram = 0;
-    double tellcell = 0;
+    OHeader oh;
     db[":f_id"] = id;
-    db.exec("select * from o_payment where f_id=:f_id");
-    if (db.nextRow()) {
-        cash = db.getDouble("f_cash");
-        change = db.getDouble("f_change");
-        idram = db.getDouble("f_idram");
-        tellcell = db.getDouble("f_tellcell");
+    db.exec("select * from o_header where f_id=:f_id");
+    if (!oh.getRecord(db)) {
+        throw std::exception(QString("No order for %1").arg(id).toStdString().data());
     }
 
     C5Database dtax(db);
@@ -354,7 +350,7 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
         return;
     }
     QString saletype;
-    if (db.getDouble("f_amounttotal") < 0) {
+    if (oh.amountTotal < 0) {
         saletype = tr("Return");
         db[":f_header"] = id;
         db.exec("select f_returnfrom from o_goods where f_header=:f_header");
@@ -371,22 +367,12 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
             db.nextRow();
         }
     }
-    QMap<QString, QVariant> header;
-    db.rowToMap(header);
-    QString hallid = db.getString("f_hallid");
-    QString pref = db.getString("f_prefix");
-    int partner = db.getInt("f_partner");
-    double amountTotal = db.getDouble("f_amounttotal");
-    double amountCash = db.getDouble("f_amountcash");
-    double amountCard = db.getDouble("f_amountcard");
-    QString comment = db.getString("f_comment");
-    QString partnerName, partnerTaxcode;
-    if (partner > 0) {
-        db[":f_id"] = partner;
+    CPartners partner;
+    if (oh.partner > 0) {
+        db[":f_id"] = oh.partner;
         db.exec("select * from c_partners where f_id=:f_id");
-        if (db.nextRow()) {
-            partnerTaxcode = db.getString("f_taxcode");
-            partnerName = db.getString("f_taxname");
+        if (!partner.getRecord(db)) {
+            throw std::exception(QString("No partner with %1 code").arg(oh.partner).toStdString().data());
         }
     }
 
@@ -518,20 +504,20 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
         p.br();
         if (__c5config.getValue(param_vat).toDouble() > 0.01) {
             p.ltext(QString("%1 %2%").arg(tr("Including VAT"), float_str(__c5config.getValue(param_vat).toDouble() * 100, 2)), 0);
-            p.rtext(float_str(amountTotal * __c5config.getValue(param_vat).toDouble(), 2));
+            p.rtext(float_str(oh.amountTotal * __c5config.getValue(param_vat).toDouble(), 2));
             p.br();
         }
     }
 
-    if (!partnerName.isEmpty() || !partnerTaxcode.isEmpty()) {
+    if (partner.id.toInt() > 0) {
         p.ltext(tr("Buyer taxcode"), 0);
-        p.rtext(partnerTaxcode);
+        p.rtext(partner.taxCode);
         p.br();
-        p.ltext(partnerName, 0);
+        p.ltext(partner.taxName, 0);
         p.br();
     }
     p.setFontBold(true);
-    p.ctext(QString("#%1%2").arg(pref, hallid));
+    p.ctext(QString("#%1").arg(oh.humanId()));
     p.br();
     if (returnFrom.count() > 0) {
         p.ctext(QString("(%1 %2%3)").arg(tr("Return from")).arg(returnFrom["f_prefix"].toString()).arg(returnFrom["f_hallid"].toString()));
@@ -571,47 +557,63 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
     p.line();
     p.br();
 
-    if (amountCash > 0.001) {
-        if (cash > 0.001) {
-            p.ltext(tr("Payment, cash"), 0);
-            p.rtext(float_str(cash, 2));
+    if (oh.amountCash > 0.001) {
+        p.ltext(tr("Payment, cash"), 0);
+        p.rtext(float_str(oh.amountCash, 2));
+        p.br();
+        if (oh.amountCashIn > 0.001) {
+            p.ltext(tr("Cash in"), 0);
+            p.rtext(float_str(oh.amountCashIn, 2));
             p.br();
-            if (change > 0.001) {
+            if (oh.amountChange > 0.001) {
                 p.ltext(tr("Change"), 0);
-                p.rtext(float_str(-1 * change, 2));
+                p.rtext(float_str(-1 * oh.amountChange, 2));
                 p.br();
             }
         } else {
-            p.ltext(tr("Payment, cash"), 0);
-            p.rtext(float_str(amountTotal, 2));
-            p.br();
+
         }
     }
-    if (amountCard > 0.001) {
+    if (oh.amountCard > 0.001) {
         p.ltext(tr("Payment, card"), 0);
-        p.rtext(float_str(amountCard, 2));
+        p.rtext(float_str(oh.amountCard, 2));
         p.br();
     }
 
-    if (idram > 0.001) {
+    if (oh.amountIdram > 0.001) {
         p.ltext(tr("Payment, idram"), 0);
-        p.rtext(float_str(idram, 2));
+        p.rtext(float_str(oh.amountIdram , 2));
         p.br();
     }
-    if (tellcell > 0.001){
+    if (oh.amountTelcell > 0.001){
         p.ltext(tr("Payment, TellCell"), 0);
-        p.rtext(float_str(tellcell, 2));
+        p.rtext(float_str(oh.amountTelcell, 2));
         p.br();
     }
-    if (header["f_amountdiscount"].toDouble() > 0.001) {
+    if (oh.amountDiscount > 0.001) {
         p.ltext(tr("Discount"), 0);
-        p.rtext(float_str(header["f_amountdiscount"].toDouble(), 2));
+        p.rtext(float_str(oh.amountDiscount, 2));
+        p.br();
+    }
+    if (oh.amountPrepaid > 0.001) {
+        p.ltext(tr("Prepaid"), 0);
+        p.rtext(float_str(oh.amountPrepaid, 2));
+        p.br();
+    }
+    if (oh.amountBank > 0.001) {
+        p.ltext(tr("Bank transfer"), 2);
+        p.rtext(float_str(oh.amountBank, 2));
+        p.br();
+    }
+    if (oh.amountDebt > 0.001) {
+        p.ltext(tr("Debt"), 2);
+        p.rtext(float_str(oh.amountDebt, 2));
         p.br();
     }
 
-    if (!comment.isEmpty()) {
+    if (!oh.comment.isEmpty()) {
         p.br();
-        p.ltext(comment, 0);
+        p.ltext(oh.comment, 0);
         p.br();
     }
 

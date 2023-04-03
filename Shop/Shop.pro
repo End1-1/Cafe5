@@ -138,8 +138,11 @@ SOURCES += \
     ../TableRecord/c5dbrecord.cpp \
     ../TableRecord/cpartners.cpp \
     ../TableRecord/ecash.cpp \
+    ../TableRecord/odraftsale.cpp \
+    ../TableRecord/odraftsalebody.cpp \
     ../TableRecord/ogoods.cpp \
     ../TableRecord/oheader.cpp \
+    ../TableRecord/otax.cpp \
     c5tempsale.cpp \
     cashcollection.cpp \
     dlgdate.cpp \
@@ -309,8 +312,11 @@ HEADERS += \
     ../TableRecord/c5dbrecord.h \
     ../TableRecord/cpartners.h \
     ../TableRecord/ecash.h \
+    ../TableRecord/odraftsale.h \
+    ../TableRecord/odraftsalebody.h \
     ../TableRecord/ogoods.h \
     ../TableRecord/oheader.h \
+    ../TableRecord/otax.h \
     c5tempsale.h \
     cashcollection.h \
     dlgdate.h \

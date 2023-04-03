@@ -52,6 +52,9 @@ ViewOrder::ViewOrder(Working *w, const QString &order) :
         ui->leCash->setDouble(db.getDouble("f_amountcash"));
         ui->leCard->setDouble(db.getDouble("f_amountcard"));
         ui->leIdram->setDouble(db.getDouble("f_amountidram"));
+        ui->leDebt->setDouble(db.getDouble("f_amountdebt"));
+        ui->leBank->setDouble(db.getDouble("f_amountbank"));
+        ui->leTelcell->setDouble(db.getDouble("f_amounttelcell"));
         ui->leSaler->setText(db.getString("f_saler"));
         ui->leBuyer->setText(db.getString("f_buyer"));
     } else {
@@ -68,7 +71,7 @@ ViewOrder::ViewOrder(Working *w, const QString &order) :
     }
     db[":f_header"] = order;
     db.exec("select b.f_id, g.f_name, g.f_id as f_goodsid, b.f_qty, b.f_price, b.f_total, f_scancode,  "
-            "g.f_service, b.f_return, b.f_tax "
+            "g.f_service, b.f_return, b.f_tax, b.f_store "
             "from o_goods b "
             "inner join c_goods g on g.f_id=b.f_goods "
             "where b.f_header=:f_header");
@@ -84,6 +87,7 @@ ViewOrder::ViewOrder(Working *w, const QString &order) :
         ui->tbl->setString(r, 7, db.getString("f_scancode"));
         ui->tbl->setString(r, 8, db.getString("f_service"));
         ui->tbl->setInteger(r, 9, db.getInt("f_return"));
+        ui->tbl->setInteger(r, 10, db.getInt("f_store"));
         if (db.getInt("f_return") > 0 || db.getDouble("f_price") < 0) {
             ui->tbl->checkBox(r, 1)->setEnabled(false);
         }
@@ -220,7 +224,7 @@ void ViewOrder::on_btnReturn_clicked()
             }
         }
         OGoods g;
-        g.header = oheader.id;
+        g.header = oheader._id();
         g.store = __c5config.defaultStore();
         g.goods = ui->tbl->getInteger(i, 6);
         g.qty = ui->tbl->getDouble(i, 3);
@@ -260,7 +264,7 @@ void ViewOrder::on_btnReturn_clicked()
                         1, __c5config.getValue(param_default_currency).toInt());
         dw.writeAHeaderCash(fCashUuid, 0, __c5config.cashId(), 1, storeDocId, "", 0);
         dw.writeECash(fCashRowId, fCashUuid, __c5config.cashId(), -1, purpose, returnAmount, fCashRowId, 1);
-        if (!dw.writeAHeaderStore(storeDocId, uid, uid, "", QDate(), __c5config.defaultStore(), 0, 1, fCashUuid, 0, 0, oheader.id)) {
+        if (!dw.writeAHeaderStore(storeDocId, uid, uid, "", QDate(), __c5config.defaultStore(), 0, 1, fCashUuid, 0, 0, oheader._id())) {
             return returnFalse(dw.fErrorMsg, &db);
         }
     }
@@ -277,7 +281,7 @@ void ViewOrder::on_btnReturn_clicked()
                              1, __c5config.getValue(param_default_currency).toInt())) {
             return returnFalse(dw.fErrorMsg, &db);
         }
-        if (!dw.writeAHeaderCash(cashdocid, 0, it.key(), 1, "", oheader.id, 0)) {
+        if (!dw.writeAHeaderCash(cashdocid, 0, it.key(), 1, "", oheader._id(), 0)) {
             return returnFalse(dw.fErrorMsg, &db);
         }
         QString cashUUID;
@@ -300,7 +304,7 @@ void ViewOrder::on_btnReturn_clicked()
 
     if (!C5Config::localReceiptPrinter().isEmpty()) {
         PrintReceipt p;
-        p.print(oheader.id, db);
+        p.print(oheader._id(), db);
     }
 
     db.commit();
@@ -606,12 +610,18 @@ void ViewOrder::on_btnMakeDraft_clicked()
     if (C5Message::question(tr("Confirm to make draft")) != QDialog::Accepted) {
         return;
     }
+    C5Database db(__c5config.dbParams());
     WOrder *wo = fWorking->newSale(SALE_RETAIL);
     for (int i = 0; i < ui->tbl->rowCount(); i++) {
-        int r = wo->addGoodsToTable(ui->tbl->getInteger(i, 6));
+        int goods = ui->tbl->getInteger(i, 6);
+        int r = wo->addGoodsToTable(goods, true, "");
         if (r < 0) {
             return;
         }
+        db[":f_store"] = ui->tbl->getInteger(i, 10);
+        db[":f_goods"] = goods;
+        db[":f_qty"] = ui->tbl->getDouble(i, 3);
+        db.exec("update a_store_sale set f_qty=f_qty+:f_qty where f_store=:f_store and f_goods=:f_goods");
         wo->setQtyOfRow(r, ui->tbl->getDouble(i, 3));
         wo->setPriceOfRow(r, ui->tbl->getDouble(i, 4));
     }

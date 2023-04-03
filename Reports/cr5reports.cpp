@@ -70,9 +70,17 @@ void CR5Reports::setReport(int id)
 void CR5Reports::buildQuery()
 {
     fSqlQuery = fQuery;
+    fSqlQuery.replace("\r\n", " ");
     fSqlQuery.replace("%date1", fFilter->d1()).replace("%date2", fFilter->d2());
     fSqlQuery.replace("%filter", fFilter->replacement());
     C5ReportWidget::buildQuery();
+    if (fColumnsFields.contains("color")) {
+        int col = fColumnsFields.indexOf("color");
+        for (int i = 0; i < fModel->rowCount(); i++) {
+            fModel->setRowColor(i,  fModel->data(i, col, Qt::EditRole).toInt() == 0 ? Qt::white : Qt::red);
+        }
+        fTableView->setColumnWidth(col, 0);
+    }
 }
 
 bool CR5Reports::tblDoubleClicked(int row, int column, const QList<QVariant> &values)

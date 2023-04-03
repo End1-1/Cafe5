@@ -17,5 +17,6 @@ extern "C" Q_DECL_EXPORT bool shoprequest(const QByteArray &indata, QByteArray &
 //extern "C" Q_DECL_EXPORT bool shoprequest_old(const QByteArray &indata, QByteArray &outdata, const QHash<QString, DataAddress> &dataMap, const ContentType &contentType);
 extern "C" Q_DECL_EXPORT bool storerequest(const QByteArray &indata, QByteArray &outdata, const QHash<QString, DataAddress> &dataMap, const ContentType &contentType);
 extern "C" Q_DECL_EXPORT bool printtax(const QByteArray &indata, QByteArray &outdata, const QHash<QString, DataAddress> &dataMap, const ContentType &contentType);
+extern "C" Q_DECL_EXPORT bool stock(const QByteArray &indata, QByteArray &outdata, const QHash<QString, DataAddress> &dataMap, const ContentType &contentType);
 
 #endif // ELINASHOP_H

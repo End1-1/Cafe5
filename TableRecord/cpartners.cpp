@@ -14,6 +14,8 @@ bool CPartners::getRecord(C5Database &db)
         return false;
     }
     id = db.getInt("f_id");
+    state = db.getInt("f_state");
+    group = db.getInt("f_group");
     taxCode = db.getString("f_taxcode");
     taxName = db.getString("f_taxname");
     contact = db.getString("f_contact");
@@ -21,11 +23,14 @@ bool CPartners::getRecord(C5Database &db)
     phone = db.getString("f_phone");
     email = db.getString("f_email");
     address = db.getString("f_address");
+    legalAddress = db.getString("f_legaladdress");
     return true;
 }
 
-bool CPartners::write(C5Database &db, QString &err)
+void CPartners::bind(C5Database &db)
 {
+    db[":f_state"] = state;
+    db[":f_group"] = group;
     db[":f_taxcode"] = taxCode;
     db[":f_taxname"] = taxName;
     db[":f_contact"] = contact;
@@ -33,9 +38,15 @@ bool CPartners::write(C5Database &db, QString &err)
     db[":f_phone"] = phone;
     db[":f_email"] = email;
     db[":f_address"] = address;
-    if (id == 0) {
-        return getWriteResult(db, db.insert("c_partners", id), err);
+    db[":f_legaladdress"] = legalAddress;
+}
+
+bool CPartners::write(C5Database &db, QString &err)
+{
+    bind(db);
+    if (id.toInt() == 0) {
+        return insertWithId(db, "c_partners", err);
     } else {
-        return getWriteResult(db, db.update("c_partners", "f_id", id), err);
+        return update(db, "c_partners", err);
     }
 }

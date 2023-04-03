@@ -5,6 +5,7 @@
 #include "c5salefromstoreorder.h"
 #include "c5waiterorder.h"
 #include "c5mainwindow.h"
+#include "c5storedoc.h"
 
 CR5CostumerDebts::CR5CostumerDebts(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
@@ -37,6 +38,8 @@ CR5CostumerDebts::CR5CostumerDebts(const QStringList &dbParams, QWidget *parent)
     fTranslation["f_usd"] = tr("USD");
     fTranslation["f_currency"] = tr("Currency");
     fTranslation["f_taxname"] = tr("Taxname");
+    fTranslation["f_amountbank"] = tr("Bank transfer");
+    fTranslation["f_amountdebt"] = tr("Cash debt");
 
 
     restoreColumnsVisibility();
@@ -118,10 +121,11 @@ void CR5CostumerDebts::buildQuery()
             emit refreshed();
         }  else {
             fSimpleQuery = true;
-            fSqlQuery = "SELECT cd.f_id, cd.f_date, p.f_taxname, cd.f_order, cd.f_cash, cd.f_storedoc, cd.f_amount, c.f_name as f_currency "
+            fSqlQuery = "SELECT cd.f_id, cd.f_date, p.f_taxname, cd.f_order, cd.f_cash, cd.f_storedoc, cd.f_amount, c.f_name as f_currency, oh.f_amountbank, oh.f_amountdebt "
                         "FROM b_clients_debts cd "
                         "LEFT JOIN c_partners p ON p.f_id=cd.f_costumer "
-                        "LEFT JOIN e_currency c ON c.f_id=cd.f_currency ";
+                        "LEFT JOIN e_currency c ON c.f_id=cd.f_currency "
+                        "left join o_header oh on oh.f_id=cd.f_order ";
             fSqlQuery += fFilter->condition();
             fModel->translate(fTranslation);
             C5ReportWidget::buildQuery();
@@ -157,32 +161,38 @@ bool CR5CostumerDebts::tblDoubleClicked(int row, int column, const QList<QVarian
     if (vals.empty()) {
         return true;
     }
-    if (!fColumnsVisible["cd.f_order"] || !fColumnsVisible["cd.f_id"]) {
-        C5Message::error(tr("Column UUID and Row must be included in the report"));
-        return true;
-    }
-    if (!vals.at(0).toString().isEmpty()) {
-        C5Database db(fDBParams);
-        db[":f_id"] = vals.at(0).toString();
-        db.exec("select f_source from o_header where f_id=:f_id");
-        if (db.nextRow()) {
-            switch (abs(db.getInt(0))) {
-            case 1: {
-                C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>(fDBParams);
-                wo->setOrder(vals.at(0).toString());
-                break;
+
+    if (!vals.at(3).toString().isEmpty()) {
+        if (!vals.at(3).toString().isEmpty()) {
+            C5Database db(fDBParams);
+            db[":f_id"] = vals.at(3).toString();
+            db.exec("select f_source from o_header where f_id=:f_id");
+            if (db.nextRow()) {
+                switch (abs(db.getInt(0))) {
+                case 1: {
+                    C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>(fDBParams);
+                    wo->setOrder(vals.at(3).toString());
+                    break;
+                }
+                case 2: {
+                    C5SaleFromStoreOrder::openOrder(fDBParams, vals.at(3).toString());
+                    break;
+                }
+                }
             }
-            case 2: {
-                C5SaleFromStoreOrder::openOrder(fDBParams, vals.at(0).toString());
-                break;
-            }
-            }
+            return true;
         }
-        return true;
-    }
-    if (!vals.at(1).toString().isEmpty()) {
+    } else if (!vals.at(4).toString().isEmpty()) {
         C5CostumerDebtPayment d(0, fDBParams);
-        d.setId(vals.at(1).toInt());
+        d.setId(vals.at(4).toString());
+        d.exec();
+    } else if(!vals.at(5).toString().isEmpty()) {
+        C5StoreDoc *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);
+        QString err;
+        sd->openDoc(vals.at(5).toString(), err);
+        if (!err.isEmpty()) {
+            C5Message::error(err);
+        }
     }
     return true;
 }

@@ -105,6 +105,9 @@
           <height>0</height>
          </size>
         </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item row="0" column="0">
@@ -130,13 +133,6 @@
         </property>
         <property name="readOnly">
          <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="7">
-       <widget class="QLabel" name="label_13">
-        <property name="text">
-         <string>Barcode</string>
         </property>
        </widget>
       </item>
@@ -193,22 +189,6 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="9">
-       <widget class="C5LineEdit" name="leCmd">
-        <property name="minimumSize">
-         <size>
-          <width>150</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>16777215</height>
-         </size>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="7">
        <widget class="QLabel" name="label_14">
         <property name="text">
@@ -256,6 +236,9 @@
           <height>16777215</height>
          </size>
         </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item row="1" column="2">
@@ -284,23 +267,6 @@
         </property>
         <property name="readOnly">
          <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="6">
-       <widget class="QPushButton" name="btnSearchTaxpayer_2">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset resource="../resources/res.qrc">
-          <normaloff>:/search.png</normaloff>:/search.png</iconset>
         </property>
        </widget>
       </item>
@@ -434,6 +400,29 @@
        </widget>
       </item>
       <item>
+       <widget class="QLabel" name="label_13">
+        <property name="text">
+         <string>Barcode</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="C5LineEdit" name="leCmd">
+        <property name="minimumSize">
+         <size>
+          <width>150</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>200</width>
+          <height>16777215</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="horizontalSpacer_3">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -547,11 +536,15 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <item row="2" column="3">
-       <widget class="C5LineEdit" name="leChange"/>
-      </item>
-      <item row="1" column="1">
-       <widget class="C5LineEdit" name="leCash"/>
+      <item row="3" column="1">
+       <widget class="C5LineEdit" name="lePrepaid">
+        <property name="maximumSize">
+         <size>
+          <width>150</width>
+          <height>16777215</height>
+         </size>
+        </property>
+       </widget>
       </item>
       <item row="2" column="2">
        <widget class="QLabel" name="label_11">
@@ -560,10 +553,13 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="label_12">
-        <property name="text">
-         <string>Debt</string>
+      <item row="4" column="1">
+       <widget class="C5LineEdit" name="leBankTransfer">
+        <property name="maximumSize">
+         <size>
+          <width>150</width>
+          <height>16777215</height>
+         </size>
         </property>
        </widget>
       </item>
@@ -580,36 +576,40 @@
         </property>
        </spacer>
       </item>
-      <item row="2" column="1">
-       <widget class="C5LineEdit" name="leCard"/>
-      </item>
-      <item row="4" column="3">
-       <widget class="C5LineEdit" name="leGrandTotal"/>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_9">
-        <property name="text">
-         <string>Card amount</string>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="3">
-       <widget class="C5LineEdit" name="leCountCash"/>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_8">
-        <property name="text">
-         <string>Cash amount</string>
+       <widget class="C5LineEdit" name="leCountCash">
+        <property name="maximumSize">
+         <size>
+          <width>150</width>
+          <height>16777215</height>
+         </size>
         </property>
        </widget>
       </item>
-      <item row="4" column="1">
-       <widget class="C5LineEdit" name="leDebt"/>
-      </item>
-      <item row="4" column="2">
-       <widget class="QLabel" name="label_7">
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_20">
         <property name="text">
-         <string>Grand total</string>
+         <string>Bank transfer</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="C5LineEdit" name="leDebt">
+        <property name="maximumSize">
+         <size>
+          <width>150</width>
+          <height>16777215</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="C5LineEdit" name="leCard">
+        <property name="maximumSize">
+         <size>
+          <width>150</width>
+          <height>16777215</height>
+         </size>
         </property>
        </widget>
       </item>
@@ -627,8 +627,63 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="1">
-       <widget class="C5LineEdit" name="lePrepaid"/>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_9">
+        <property name="text">
+         <string>Card amount</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_8">
+        <property name="text">
+         <string>Cash amount</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0">
+       <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string>Grand total</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="3">
+       <widget class="C5LineEdit" name="leChange">
+        <property name="maximumSize">
+         <size>
+          <width>150</width>
+          <height>16777215</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="C5LineEdit" name="leCash">
+        <property name="maximumSize">
+         <size>
+          <width>150</width>
+          <height>16777215</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_12">
+        <property name="text">
+         <string>Debt</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="C5LineEdit" name="leGrandTotal">
+        <property name="maximumSize">
+         <size>
+          <width>150</width>
+          <height>16777215</height>
+         </size>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -636,11 +691,6 @@
   </layout>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>C5DateEdit</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5dateedit.h</header>
-  </customwidget>
   <customwidget>
    <class>C5LineEdit</class>
    <extends>QLineEdit</extends>
@@ -652,13 +702,17 @@
    <header location="global">c5tablewidget.h</header>
   </customwidget>
   <customwidget>
+   <class>C5DateEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5dateedit.h</header>
+  </customwidget>
+  <customwidget>
    <class>C5ComboBox</class>
    <extends>QComboBox</extends>
    <header location="global">c5combobox.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>leCmd</tabstop>
   <tabstop>leTime</tabstop>
   <tabstop>leDocnumber</tabstop>
   <tabstop>leUuid</tabstop>
@@ -670,7 +724,6 @@
   <tabstop>cbCashDesk</tabstop>
   <tabstop>cbStorage</tabstop>
   <tabstop>leDate</tabstop>
-  <tabstop>btnSearchTaxpayer_2</tabstop>
   <tabstop>leComment</tabstop>
   <tabstop>tblGoods</tabstop>
   <tabstop>leCash</tabstop>
@@ -679,7 +732,6 @@
   <tabstop>leDebt</tabstop>
   <tabstop>leCountCash</tabstop>
   <tabstop>leChange</tabstop>
-  <tabstop>leGrandTotal</tabstop>
  </tabstops>
  <resources>
   <include location="../resources/res.qrc"/>

@@ -20,6 +20,7 @@
 #include "datadriver.h"
 #include "wcustomerdisplay.h"
 #include "c5utils.h"
+#include "odraftsalebody.h"
 #include "c5printrecipta4.h"
 #include "c5storedraftwriter.h"
 #include "c5replication.h"
@@ -36,12 +37,18 @@
 #define col_discamount 6
 #define col_discmode 7
 #define col_discvalue 8
+#define col_stock 9
 
 WOrder::WOrder(C5User *user, int saleType, WCustomerDisplay *customerDisplay, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::WOrder)
 {
     ui->setupUi(this);
+    fDraftSale.saleType = saleType;
+    fDraftSale.state = 1;
+    fDraftSale.date = QDate::currentDate();
+    fDraftSale.time = QTime::currentTime();
+    fDraftSale.staff = user->id();
     fOHeader.state = ORDER_STATE_CLOSE;
     fOHeader.hall = __c5config.defaultHall();
     fOHeader.table = __c5config.defaultTable();
@@ -83,6 +90,7 @@ WOrder::WOrder(C5User *user, int saleType, WCustomerDisplay *customerDisplay, QW
     ui->tblData->setColumnWidth(col_discamount, 100);
     ui->tblData->setColumnWidth(col_discmode, 200);
     ui->tblData->setColumnWidth(col_discvalue, 120);
+    ui->tblData->setColumnWidth(col_stock, 100);
 }
 
 WOrder::~WOrder()
@@ -181,7 +189,7 @@ bool WOrder::addGoods(int id)
     DbGoods g(id);
     if (!g.isService() && __c5config.getValue(param_shop_dont_check_qty).toInt() == 0) {
         QString err;
-        if (!checkQty(id, g.unit()->defaultQty(), err)) {
+        if (!checkQty(id, g.unit()->defaultQty(), true, err)) {
             C5Database db(__c5config.dbParams());
             db[":f_id"] = id;
             db.exec("select f_name from c_goods where f_id=:f_id");
@@ -190,11 +198,11 @@ bool WOrder::addGoods(int id)
             return false;
         }
     }
-    addGoodsToTable(id);
+    addGoodsToTable(id, false, "");
     return true;
 }
 
-int WOrder::addGoodsToTable(int id)
+int WOrder::addGoodsToTable(int id, bool checkQtyOfStore, const QString &draftid)
 {
     C5Database db(C5Config::dbParams());
     db[":f_goods"] = id;
@@ -229,7 +237,7 @@ int WOrder::addGoodsToTable(int id)
     og._goodsName = g.goodsName();
     og._unitName = g.unit()->unitName();
     og._barcode = g.scancode();
-    og.header = fOHeader.id;
+    og.header = fOHeader._id();
     og.goods = id;
     og.taxDept = g.group()->taxDept();
     og.adgCode = g.group()->adgt();
@@ -243,27 +251,46 @@ int WOrder::addGoodsToTable(int id)
     og.discountAmount = 0;
     fOGoods.append(og);
     ui->tblData->setCurrentCell(row, 0);
+    if (checkQtyOfStore) {
+        ui->tblData->item(row, 0)->setData(Qt::UserRole + 100, 1);
+    }
+    db[":f_goods"] = og.goods;
+    db[":f_store"] = __c5config.defaultStore();
+    db.exec("select f_qty-f_qtyreserve-f_qtyprogram from a_store_sale where f_goods=:f_goods and f_store=:f_store");
+    if (db.nextRow()) {
+        ui->tblData->setDouble(row, col_stock, db.getDouble(0) + 1);
+    }
     countTotal();
 
-    db[":f_station"] = hostinfo + ": " + hostusername();
-    db[":f_saletype"] = fOHeader.saleType;
-    db[":f_window"] = fWorking->fTab->currentIndex();
-    db[":f_row"] = row;
-    db[":f_state"] = 0;
-    db[":f_goodsid"] = g.id();
-    db[":f_name"] = g.goodsName() + " " + g.scancode();
-    db[":f_qty"] = g.unit()->defaultQty();
-    db[":f_unit"] = g.unit()->unitName();
-    db[":f_price"] = price;
-    db[":f_total"] = g.unit()->defaultQty() * price;
-    db[":f_taxdept"] = g.group()->taxDept();
-    db[":f_adgcode"] = g.group()->adgt();
-    db[":f_tablerec"] = 0;
-    db[":f_unitcode"] = g.unit()->id();
-    db[":f_service"] = g.isService();
-    db[":f_discountvalue"] = 0;
-    db[":f_discountmode"] = "";
-    db.insert("a_sale_temp");
+    QString err;
+    if (fDraftSale.id.isEmpty()) {
+        fDraftSale.id = db.uuid();
+        fDraftSale.staff = fUser->id();
+        fDraftSale.state = 1;
+        fDraftSale.date = QDate::currentDate();
+        fDraftSale.time = QTime::currentTime();
+        fDraftSale.payment = 1;
+        fDraftSale.partner = fOHeader.partner;
+        fDraftSale.amount = fOHeader.amountTotal;
+        fDraftSale.comment = "";
+        fDraftSale.write(db, err);
+    }
+
+    if (draftid.isEmpty()) {
+        ODraftSaleBody sb;
+        sb.id = og.id;
+        sb.header = fDraftSale.id;
+        sb.state = 1;
+        sb.store = __c5config.defaultStore();
+        sb.dateAppend = QDate::currentDate();
+        sb.timeAppend = QTime::currentTime();
+        sb.goods = og.goods;
+        sb.qty = og.qty;
+        sb.price = og.price;
+        sb.write(db, err);
+        const_cast<QString&>(draftid) = sb.id;
+    }
+    ui->tblData->item(row, 0)->setData(Qt::UserRole + 101, draftid);
 
     ImageLoader *il = new ImageLoader(g.scancode(), this);
     connect(il, SIGNAL(imageLoaded(QPixmap)), this, SLOT(imageLoaded(QPixmap)));
@@ -342,13 +369,6 @@ bool WOrder::writeOrder()
             db.update("op_header", "f_id", fPreorderUUID);
         }
     }
-    if (w) {
-        db[":f_station"] = hostinfo + ": " + hostusername();
-        db[":f_order"] = fOHeader.id;
-        db[":f_window"] = fWorking->fTab->currentIndex();
-        db.exec("update a_sale_temp set f_state=2, f_order=:f_order where f_station=:f_station "
-                "and f_window=:f_window and f_state=0");
-    }
     if (w && fOHeader.saleType == -1) {
         C5Database dbr(__c5config.replicaDbParams());
         dbr[":f_id"] = fOGoods.at(0).goods;
@@ -390,8 +410,8 @@ bool WOrder::writeOrder()
         }
     }
 
-    if (fDraftSale.isEmpty() == false) {
-        db[":f_id"] = fDraftSale;
+    if (!fDraftSale.id.isEmpty()) {
+        db[":f_id"] = fDraftSale.id;
         db.exec("update o_draft_sale set f_state=3 where f_id=:f_id");
     }
 
@@ -403,7 +423,8 @@ bool WOrder::writeOrder()
 //        }
 //    }
 
-    C5LogSystem::writeEvent(QString("%1. %2:%3ms, %4:%5, %6").arg(tr("Order saved"), tr("Elapsed"), QString::number(t.elapsed()), tr("Order number"), fOHeader.humanId(), fOHeader.id));
+    C5LogSystem::writeEvent(QString("%1. %2:%3ms, %4:%5, %6")
+                            .arg(tr("Order saved"), tr("Elapsed"), QString::number(t.elapsed()), tr("Order number"), fOHeader.humanId(), fOHeader._id()));
     return w;
 }
 
@@ -557,6 +578,10 @@ void WOrder::changePrice()
         return;
     }
     g.price = price;
+    C5Database db(__c5config.dbParams());
+    db[":f_id"] = ui->tblData->item(row, 0)->data(Qt::UserRole + 101);
+    db[":f_price"] = g.price;
+    db.exec("update o_draft_sale_body set f_price=:f_price where f_id=:f_id");
     countTotal();
 }
 
@@ -567,6 +592,10 @@ void WOrder::changePrice(double price)
         return;
     }
     fOGoods[row].price = price;
+    C5Database db(__c5config.dbParams());
+    db[":f_id"] = ui->tblData->item(row, 0)->data(Qt::UserRole + 101);
+    db[":f_price"] = price;
+    db.exec("update o_draft_sale_body set f_price=:f_price where f_id=:f_id");
     countTotal();
 }
 
@@ -597,16 +626,9 @@ void WOrder::removeRow()
     QString code = g.goods;
     QString name = g._goodsName;
     C5Database db(__c5config.dbParams());
-    db[":f_window"] = fWorking->fTab->currentIndex();
-    db[":f_state"] = 0;
-    db[":f_row"] = row;
-    db[":f_station"] = hostinfo + ": " + hostusername();
-    db.exec("update a_sale_temp set f_state=1 where f_station=:f_station and f_state=:f_state and f_window=:f_window and f_row=:f_row");
-    db[":f_window"] = fWorking->fTab->currentIndex();
-    db[":f_state"] = 0;
-    db[":f_row"] = row;
-    db[":f_station"] = hostinfo + ": " + hostusername();
-    db.exec("update a_sale_temp set f_row=f_row-1 where f_station=:f_station and f_row>:f_row and f_state=:f_state and f_window=:f_window");
+    db[":f_id"] = ui->tblData->item(row, 0)->data(Qt::UserRole + 1);
+    db[":f_state"] = 2;
+    db.exec("update o_draft_sale_body set f_state=:f_state where f_id=:f_id");
     db[":f_store"] = __c5config.defaultStore();
     db[":f_goods"] = code.toInt();
     db[":f_qty"] = g.qty;
@@ -668,8 +690,20 @@ void WOrder::countTotal()
         ui->tblData->setData(i, col_discamount, og.discountAmount);
         ui->tblData->setData(i, col_discvalue, og.discountFactor);
         ui->tblData->setData(i, col_discmode, og.discountMode);
+        if (ui->tblData->item(i, 0)->data(Qt::UserRole + 100).toInt() == 1) {
+            QString err;
+            if (!checkQty(og.goods, og.qty, false, err)) {
+                for (int c = 0; c < ui->tblData->columnCount(); c++) {
+                    ui->tblData->item(i, c)->setBackgroundColor(Qt::red);
+                }
+            }
+        }
     }
     ui->leTotal->setDouble(fOHeader.amountTotal);
+    C5Database db(__c5config.dbParams());
+    QString err;
+    fDraftSale.amount = fOHeader.amountTotal;
+    fDraftSale.write(db, err);
     updateCustomerDisplay(fCustomerDisplay);
 }
 
@@ -711,12 +745,16 @@ bool WOrder::setQtyOfRow(int row, double qty)
     double diffqty = qty - og.qty;
     if (og.isService == 0  && __c5config.getValue(param_shop_dont_check_qty).toInt() == 0) {
         QString err;
-        if (!checkQty(g.id(), diffqty, err)) {
+        if (!checkQty(g.id(), diffqty, true, err)) {
             C5Message::error(og._goodsName + " \r\n" + err);
             return false;
         }
     }
     og.qty = qty;
+    C5Database db(__c5config.dbParams());
+    db[":f_id"] = ui->tblData->item(row, 0)->data(Qt::UserRole + 101);
+    db[":f_qty"] = og.qty;
+    db.exec("update o_draft_sale_body set f_qty=:f_qty where f_id=:f_id");
     C5LogSystem::writeEvent(QString("%1 %2:%3 %4").arg(tr("Change qty"), g.scancode(), g.goodsName(), float_str(qty, 2)));
     countTotal();
     return true;
@@ -734,7 +772,7 @@ C5ClearTableWidget *WOrder::table()
     return ui->tblData;
 }
 
-bool WOrder::checkQty(int goods, double qty, QString &err)
+bool WOrder::checkQty(int goods, double qty, bool updateStock, QString &err)
 {
     DbGoods gd(goods);
     int storegoods = gd.storeGoods();
@@ -758,10 +796,12 @@ bool WOrder::checkQty(int goods, double qty, QString &err)
         return false;
     }
 
-    db[":f_qty"] = qty;
-    db[":f_store"] = __c5config.defaultStore();
-    db[":f_goods"] = storegoods;
-    db.exec("update a_store_sale set f_qtyprogram=f_qtyprogram+:f_qty where f_store=:f_store and f_goods=:f_goods");
+    if (updateStock) {
+        db[":f_qty"] = qty;
+        db[":f_store"] = __c5config.defaultStore();
+        db[":f_goods"] = storegoods;
+        db.exec("update a_store_sale set f_qtyprogram=f_qtyprogram+:f_qty where f_store=:f_store and f_goods=:f_goods");
+    }
 
     return true;
 }

@@ -15,6 +15,8 @@ public:
     QString base;
     int row;
 
+    virtual bool getRecord(C5Database &db) override;
+    virtual void bind(C5Database &db) override;
     virtual bool write(C5Database &db, QString &err) override;
 };
 

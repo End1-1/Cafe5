@@ -83,6 +83,40 @@ void C5LineEditWithSelector::setValue(int id)
     setValue(QString::number(id));
 }
 
+QString C5LineEditWithSelector::text()
+{
+    QString allowedChar("0123456789,");
+    QString t = C5LineEdit::text().trimmed();
+    if (fCache > 0) {
+        for (int i = t.length() - 1; i > -1; i--) {
+            if (!allowedChar.contains(t.at(i))) {
+                t.remove(i, 1);
+            }
+        }
+    }
+    int i = t.length() - 1;
+    while (i > 0) {
+        if (t.at(i) == ",") {
+            if (t.at(i - 1) == ",") {
+                t.remove(i, 1);
+            }
+        }
+        i--;
+    }
+    if (t.length() > 0) {
+        if (t.at(0) == ",") {
+            t.remove(0, 1);
+        }
+    }
+    if (t.length() > 0) {
+        if (t.at(t.length() - 1) == ",") {
+            t.remove(t.length() - 1, 1);
+        }
+    }
+    setValue(t);
+    return t;
+}
+
 int C5LineEditWithSelector::cacheId()
 {
     return fCache;

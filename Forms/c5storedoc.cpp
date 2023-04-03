@@ -861,20 +861,6 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
             db[":f_cashuuid"] = fCashDocUuid;
             db.update("a_header_store", "f_id", fInternalId);
         }
-        db[":f_storedoc"] = fInternalId;
-        db.exec("delete from b_clients_debts where f_storedoc=:f_storedoc");
-        if (state == DOC_STATE_SAVED) {
-            if (ui->lePartner->getInteger() > 0 && !ui->chPaid->isChecked()) {
-                BClientDebts bcd;
-                bcd.date = ui->deDate->date();
-                bcd.source = BCLIENTDEBTS_SOURCE_INPUT;
-                bcd.amount = ui->leTotal->getDouble() * -1;
-                bcd.currency = ui->cbCurrency->currentData().toInt();
-                bcd.store = fInternalId;
-                bcd.costumer = ui->lePartner->getInteger();
-                bcd.write(db, err);
-            }
-        }
     }
 
     dw.updateField("a_store_draft", "f_reason", ui->leReason->getInteger(), "f_document", fInternalId);

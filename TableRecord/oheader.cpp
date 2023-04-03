@@ -46,13 +46,8 @@ OHeader::OHeader()
     currency = 0;
 }
 
-bool OHeader::write(C5Database &db, QString &err)
+void OHeader::bind(C5Database &db)
 {
-    bool u = true;
-    if (id.isEmpty()) {
-        u = false;
-        id = db.uuid();
-    }
     db[":f_id"] = id;
     db[":f_hallid"] = hallId;
     db[":f_prefix"] = prefix;
@@ -75,6 +70,8 @@ bool OHeader::write(C5Database &db, QString &err)
     db[":f_amountbank"] = amountBank;
     db[":f_amountother"] = amountOther;
     db[":f_amountidram"] = amountIdram;
+    db[":f_amounttelcell"] = amountTelcell;
+    db[":f_amountpayx"] = amountPayX;
     db[":f_amountservice"] = amountService;
     db[":f_amountdiscount"] = amountDiscount;
     db[":f_servicefactor"] = serviceFactor;
@@ -90,10 +87,70 @@ bool OHeader::write(C5Database &db, QString &err)
     db[":f_guests"] = guests;
     db[":f_precheck"] = precheck;
     db[":f_currency"] = currency;
+    db[":f_cash"] = amountCashIn;
+    db[":f_change"] = amountChange;
+}
+
+bool OHeader::getRecord(C5Database &db)
+{
+    if (!db.nextRow()) {
+        return false;
+    }
+    id = db.getValue("f_id");
+    hallId = db.getInt("f_hallid");
+    prefix = db.getString("f_prefix");
+    state = db.getInt("f_state");
+    hall = db.getInt("f_hall");
+    table = db.getInt("f_table");
+    dateOpen = db.getDate("f_dateopen");
+    dateClose = db.getDate("f_dateclose");
+    timeOpen = db.getTime("f_timeopen");
+    timeClose = db.getTime("f_timeclose");
+    dateCash = db.getDate("f_datecash");
+    cashier = db.getInt("f_cashier");
+    staff = db.getInt("f_staff");
+    comment = db.getString("f_comment");
+    print = db.getInt("f_print");
+    amountTotal = db.getDouble("f_amounttotal");
+    amountCash = db.getDouble("f_amountcash");
+    amountCard = db.getDouble("f_amountcard");
+    amountBank = db.getDouble("f_amountbank");
+    amountCashIn = db.getDouble("f_cash");
+    amountChange = db.getDouble("f_change");
+    amountOther = db.getDouble("f_amountother");
+    amountIdram = db.getDouble("f_amountidram");
+    amountTelcell = db.getDouble("f_amounttelcell");
+    amountPayX = db.getDouble("f_amountpayx");
+    amountPrepaid = db.getDouble("f_amountprepaid");
+    amountDebt = db.getDouble("f_amountdebt");
+    amountService = db.getDouble("f_amountservice");
+    amountDiscount = db.getDouble("f_amountdiscount");
+    serviceFactor = db.getDouble("f_servicefactor");
+    discountFactor = db.getDouble("f_discountfactor");
+    bankCard = db.getInt("f_creditcardid");
+    shift = db.getInt("f_shift");
+    source = db.getInt("f_source");
+    saleType = db.getInt("f_saletype");
+    partner = db.getInt("f_partner");
+    currentStaff = db.getInt("f_currentstaff");
+    guests = db.getInt("f_guests");
+    precheck = db.getInt("f_precheck");
+    currency = db.getInt("f_currency");
+    return true;
+}
+
+bool OHeader::write(C5Database &db, QString &err)
+{
+    bool u = true;
+    if (id.toString().isEmpty()) {
+        u = false;
+        id = db.uuid();
+    }
+    bind(db);
     if (u) {
-        return getWriteResult(db, db.update("o_header", where_id(id)), err);
+        return update(db, "o_header", err);
     } else {
-        bool b = getWriteResult(db, db.insert("o_header", false), err);
+        bool b = insert(db, "o_header", err);
         if (b) {
             db[":f_id"] = id;
             db[":f_1"] = 0;

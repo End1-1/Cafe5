@@ -17,6 +17,7 @@ void routes(QStringList &r)
     r.append("storerequest");
     r.append("shoprequest");
     r.append("printtax");
+    r.append("stock");
 }
 
 //bool shoprequest_old(const QByteArray &indata, QByteArray &outdata, const QHash<QString, DataAddress> &dataMap, const ContentType &contentType)
@@ -1208,4 +1209,46 @@ bool shoprequest(const QByteArray &indata, QByteArray &outdata, const QHash<QStr
     jh["before_store_error"] = "";
 
     return rh.setResponse(HTTP_OK, jh.toString());
+}
+
+bool stock(const QByteArray &indata, QByteArray &outdata, const QHash<QString, DataAddress> &dataMap, const ContentType &contentType)
+{
+    CommandLine cl;
+    QString path;
+    cl.value("path", path);
+    JsonHandler jh;
+    Database db;
+    RequestHandler rh(outdata);
+    QString configFile = path + "/handlers/shop.ini";
+    if (!db.open(configFile)) {
+        LogWriter::write(LogWriterLevel::errors, "", QString("ElinaShop::shoprequest").arg(db.lastDbError()));
+        jh["message"] = "Cannot connect to database";
+        return rh.setInternalServerError(jh.toString());
+    }
+    QString barcode = QString(getData(indata, dataMap["p"]));
+
+    db[":f_scancode"] = barcode;
+    db.exec("select ss.f_name as f_storage,gg.f_name as f_group,g.f_name as f_goods,sum(s.f_qty*s.f_type) as f_qty,"
+            "u.f_name as f_unit "
+            "from a_store s "
+            "inner join c_storages ss on ss.f_id=s.f_store "
+            "left join c_goods g on g.f_id=s.f_goods "
+            "inner join c_groups gg on gg.f_id=g.f_group "
+            "left join c_units u on u.f_id=g.f_unit "
+            "inner join a_header h on h.f_id=s.f_document  "
+            "where h.f_state=1  and g.f_scancode=:f_scancode "
+            "group by ss.f_name,gg.f_name,g.f_name,u.f_name having sum(s.f_qty*s.f_type) <> 0 "
+            "order by 1, 2, 3 ");
+    QJsonArray ja;
+    while (db.next()) {
+        QJsonObject jo;
+        jo["store"] = db.string("f_storage");
+        jo["group"] = db.string("f_group");
+        jo["name"] = db.string("f_goods");
+        jo["qty"] = db.string("f_qty");
+        jo["unit"] = db.string("f_unit");
+        ja.append(jo);
+    }
+
+    return rh.setResponse(HTTP_OK, QJsonDocument(ja).toJson(QJsonDocument::Compact));
 }

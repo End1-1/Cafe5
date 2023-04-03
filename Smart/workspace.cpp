@@ -16,6 +16,7 @@
 #include "printtaxn.h"
 #include "c5airlog.h"
 #include "dlgqty.h"
+#include "oheader.h"
 #include "idram.h"
 #include "change.h"
 #include "menudialog.h"
@@ -1228,6 +1229,7 @@ bool Workspace::saveOrder(int state)
 
     db.startTransaction();
     C5StoreDraftWriter dw(db);
+    OHeader oheader;
     if (!dw.writeOHeader(fOrderUuid,
                          hallid.toInt(), prefix, state,
                          __c5config.defaultHall(), fTable,

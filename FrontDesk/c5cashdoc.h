@@ -48,7 +48,11 @@ public:
 
     int outputCash();
 
+    int fDebtSource;
+
     static bool removeDoc(const QStringList &dbParams, const QString &uuid);
+
+    static bool removeDoc(C5Database &db, const QString &uuid);
 
 public slots:
     void save(bool fromrelation = false);

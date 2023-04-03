@@ -1,6 +1,9 @@
 #include "c5tempsale.h"
 #include "ui_c5tempsale.h"
 #include "worder.h"
+#include "working.h"
+#include "odraftsale.h"
+#include "odraftsalebody.h"
 #include <QTableWidgetItem>
 
 C5TempSale::C5TempSale() :
@@ -16,19 +19,28 @@ C5TempSale::~C5TempSale()
     delete ui;
 }
 
-void C5TempSale::openDraft(WOrder *o)
+void C5TempSale::openDraft()
 {
     int r = ui->tbl->currentRow();
     if (r < 0) {
         return;
     }
-    o->fDraftSale = ui->tbl->item(r, 0)->text();
+    QString draftId = ui->tbl->item(r, 0)->text();
+    if (Working::working()->findDraft(draftId)) {
+        return;
+    }
     C5Database db(__c5config.replicaDbParams());
-    db[":f_header"] = o->fDraftSale;
+    db[":f_id"] = draftId;
+    db.exec("select * from o_draft_sale where f_id=:f_id");
+    ODraftSale ds;
+    ds.getRecord(db);
+    WOrder *wo = Working::working()->newSale(ds.saleType);
+    wo->fDraftSale.id = ds.id;
+    db[":f_header"] = wo->fDraftSale.id;
     db.exec("select * from o_draft_sale_body where f_header=:f_header and f_state=1");
     while (db.nextRow()) {
-        o->addGoods(db.getInt("f_goods"));
-        o->changeQty(db.getDouble("f_qty"));
+        wo->addGoodsToTable(db.getInt("f_goods"), true, db.getString("f_id"));
+        wo->changeQty(db.getDouble("f_qty"));
     }
 }
 

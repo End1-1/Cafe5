@@ -6,6 +6,7 @@
 #include "c5selector.h"
 #include "c5checkbox.h"
 #include "c5user.h"
+#include "c5printrecipta4.h"
 #include "ce5goods.h"
 #include "c5storedraftwriter.h"
 #include "threadsendmessage.h"
@@ -74,8 +75,25 @@ QToolBar *C5SaleDoc::toolBar()
     if (!fToolBar) {
         createToolBar();
         fActionSave = fToolBar->addAction(QIcon(":/save.png"), tr("Save"), this, SLOT(saveDataChanges()));
+        fToolBar->addAction(QIcon(":/AS.png"), tr("Export to AS"), this, SLOT(createInvoiceAS()));
+        fToolBar->addAction(QIcon(":/print.png"), tr("Print"), this, SLOT(printSale()));
     }
     return fToolBar;
+}
+
+void C5SaleDoc::printSale()
+{
+    C5PrintReciptA4 p(fDBParams, ui->leUuid->text(), this);
+    QString err;
+    p.print(err);
+    if (!err.isEmpty()) {
+        C5Message::error(err);
+    }
+}
+
+void C5SaleDoc::createInvoiceAS()
+{
+    C5Message::error(tr("ArmSoft not configured"));
 }
 
 void C5SaleDoc::messageResult(QJsonObject jo)
@@ -113,6 +131,7 @@ void C5SaleDoc::saveDataChanges()
             + ui->leCard->getDouble()
             + ui->lePrepaid->getDouble()
             + ui->leDebt->getDouble()
+            + ui->leBankTransfer->getDouble()
             < ui->leGrandTotal->getDouble()) {
         err += tr("Incomplete payment") + "<br>";
     }
@@ -167,7 +186,7 @@ void C5SaleDoc::saveDataChanges()
     db[":f_shift"] = 1;
     db[":f_source"] = 2;
     db[":f_saletype"] = fMode;
-    db[":f_partner"] = ui->leTaxpayerId->property("id");
+    db[":f_partner"] = fPartner.id ;
     db[":f_currentstaff"] = 0;
     db[":f_guests"] = 0;
     db[":f_precheck"] = 0;
@@ -517,21 +536,20 @@ bool C5SaleDoc::openDraft(const QString &id)
     C5Database db(fDBParams);
     db[":f_id"] = id;
     db.exec("select * from o_draft_sale where f_id=:f_id");
-    if (db.nextRow() == false) {
+    if (!fDraftSale.getRecord(db)) {
         C5Message::error(tr("Invalid draft document id"));
         return false;
     }
-    if (db.getInt("f_state") != 1) {
+    if (fDraftSale.state != 1) {
         C5Message::error(tr("This draft not editable"));
         return false;
     }
-    int payment = db.getInt("f_payment");
+    fPartner.queryRecordOfId(db, fDraftSale.partner);
 
-    ui->leDate->setDate(db.getDate("f_date"));
-    ui->leTime->setText(db.getTime("f_time").toString(FORMAT_TIME_TO_STR));
-    ui->leComment->setText(db.getString("f_comment"));
-    ui->leUuid->setText(db.getString("f_id"));
-    ui->cbStorage->setCurrentIndex(ui->cbStorage->findData(db.getInt("f_store")));
+    ui->leDate->setDate(fDraftSale.date);
+    ui->leTime->setText(fDraftSale.time.toString(FORMAT_TIME_TO_STR));
+    ui->leComment->setText(fDraftSale.comment);
+    ui->leUuid->setText(fDraftSale.id);
     QString priceField = "f_price1";
     db[":f_header"] = id;
     db[":f_state"] = 1;
@@ -549,7 +567,7 @@ bool C5SaleDoc::openDraft(const QString &id)
     }
     fOpenedFromDraft = true;
 
-    switch (payment) {
+    switch (fDraftSale.payment) {
     case 1:
         ui->leCash->setDouble(ui->leGrandTotal->getDouble());
         break;
@@ -586,7 +604,7 @@ void C5SaleDoc::on_btnAddGoods_clicked()
 
 void C5SaleDoc::on_btnRemoveGoods_clicked()
 {
-    for (int i = ui->tblGoods->rowCount(); i > -1; i--) {
+    for (int i = ui->tblGoods->rowCount() - 1; i > -1; i--) {
         if (ui->tblGoods->checkBox(i, col_checkbox)->isChecked()) {
             ui->tblGoods->removeRow(i);
         }
@@ -644,4 +662,19 @@ void C5SaleDoc::on_cbHall_currentIndexChanged(int index)
     if (ui->cbHall->itemData(index).toInt() == __c5config.getValue(param_default_hall).toInt()) {
         ui->cbCashDesk->setCurrentIndex(ui->cbCashDesk->findData(__c5config.getValue(param_default_table).toInt()));
     }
+}
+
+void C5SaleDoc::on_btnSearchTaxpayer_clicked()
+{
+    QList<QVariant> values;
+    if (!C5Selector::getValue(fDBParams, cache_goods_partners, values)) {
+        return;
+    }
+    if (values.count() == 0) {
+        return;
+    }
+    C5Database db(fDBParams);
+    fPartner.queryRecordOfId(db, values.at(0));
+    ui->leTaxpayerName->setText(fPartner.taxName);
+    ui->leTaxpayerId->setText(fPartner.taxCode);
 }

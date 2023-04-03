@@ -39,6 +39,9 @@
      <property name="text">
       <string>999999999</string>
      </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
     </widget>
    </item>
    <item row="10" column="0" colspan="3">
@@ -486,23 +489,15 @@ background:blue;
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>leTotal</tabstop>
   <tabstop>leCash</tabstop>
   <tabstop>leCard</tabstop>
+  <tabstop>leBankTransfer</tabstop>
   <tabstop>leIdram</tabstop>
   <tabstop>leTelcell</tabstop>
   <tabstop>lePrepaid</tabstop>
   <tabstop>leDebt</tabstop>
   <tabstop>leCashIn</tabstop>
   <tabstop>leChange</tabstop>
-  <tabstop>btnIdram</tabstop>
-  <tabstop>btnTelcell</tabstop>
-  <tabstop>btnDebt</tabstop>
-  <tabstop>btnPrepaid</tabstop>
-  <tabstop>btnChange</tabstop>
-  <tabstop>btnCashin</tabstop>
-  <tabstop>btnCard</tabstop>
-  <tabstop>btnCash</tabstop>
   <tabstop>btnPay</tabstop>
   <tabstop>btnBack</tabstop>
   <tabstop>btnFiscal</tabstop>

@@ -357,7 +357,7 @@ QString CR5ConsumptionBySales::documentForInventory(int store)
         C5Database db2(fDBParams);
         db2[":f_document"] = db.getString(0);
         db2[":f_store"] = store;
-        db2.exec("select * from a_store_inventory where f_document=:f_document and f_store=:f_store");
+        db2.exec("select * from a_store_inventory where f_document=:f_document and f_store=:f_store limit 1");
         if (db2.nextRow()) {
             if (!result.isEmpty()) {
                 result += ",";
