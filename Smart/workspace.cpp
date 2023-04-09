@@ -373,13 +373,23 @@ void Workspace::removeDish(int rownum, const QString &packageuuid)
     if (row < 0) {
         return;
     }
+    C5Database db(fDBParams);
     Dish d = ui->tblOrder->item(row, 0)->data(Qt::UserRole).value<Dish>();
     QString uuid = packageuuid;
     if (uuid.isEmpty()) {
         uuid = ui->tblOrder->item(row, 0)->data(Qt::UserRole + 1).toString();
     }
     if (d.qty2 > 0.01) {
-        C5Message::error(tr("Not editable"));
+        if (C5Message::question(tr("Confirm to remove printed row")) != QDialog::Accepted) {
+            return;
+        }
+        db[":f_state"] = DISH_STATE_VOID;
+        db.update("o_body", "f_id", d.obodyId);
+        ui->tblOrder->removeRow(row);
+        if (row < ui->tblOrder->rowCount()) {
+            ui->tblOrder->setCurrentCell(row, 0);
+        }
+        countTotal();
         return;
     }
     ui->tblOrder->removeRow(row);
@@ -388,7 +398,7 @@ void Workspace::removeDish(int rownum, const QString &packageuuid)
     }
     if (!fOrderUuid.isEmpty()) {
         fFlagEdited = 1;
-        C5Database db(fDBParams);
+
         db[":f_id"] = d.obodyId;
         db[":f_state"] = DISH_STATE_MISTAKE;
         db.exec("update o_body set f_state=:f_state where f_id=:f_id");
@@ -1230,19 +1240,48 @@ bool Workspace::saveOrder(int state)
     db.startTransaction();
     C5StoreDraftWriter dw(db);
     OHeader oheader;
-    if (!dw.writeOHeader(fOrderUuid,
-                         hallid.toInt(), prefix, state,
-                         __c5config.defaultHall(), fTable,
-                         QDate::currentDate(), QDate::currentDate(), dateCash,
-                         QTime::currentTime(), QTime::currentTime(),
-                         fUser->id(), fPhone, 0,
-                         ui->leTotal->getDouble(), cashAmount, cardAmount, 0, 0, otherAmount, idramAmount,
-                         0, fDiscountAmount, 0, fDiscountValue,
-                         0, 0, 1, 1, 1, fCustomer)) {
-        C5Message::error(dw.fErrorMsg);
+    oheader.id = fOrderUuid;
+    oheader.hallId = hallid.toInt();
+    oheader.prefix = prefix;
+    oheader.state = state;
+    oheader.hall = __c5config.defaultHall();
+    oheader.table = fTable;
+    oheader.dateOpen = QDate::currentDate();
+    oheader.dateClose = QDate::currentDate();
+    oheader.dateCash = dateCash;
+    oheader.timeOpen = QTime::currentTime();
+    oheader.timeClose = QTime::currentTime();
+    oheader.staff = fUser->id();
+    oheader.cashier = fUser->id();
+    oheader.comment = fPhone;
+    oheader.amountTotal = ui->leTotal->getDouble();
+    oheader.amountCash = cashAmount;
+    oheader.amountCard = cardAmount;
+    oheader.amountOther = otherAmount;
+    oheader.amountIdram = idramAmount;
+    oheader.amountDiscount = fDiscountAmount;
+    oheader.discountFactor = fDiscountValue;
+    oheader.partner = fCustomer;
+    QString err;
+    if (!oheader.write(db, err)) {
         db.rollback();
+        C5Message::error(err);
         return false;
     }
+    fOrderUuid = oheader.id.toString();
+//    if (!dw.writeOHeader(fOrderUuid,
+//                         hallid.toInt(), prefix, state,
+//                         __c5config.defaultHall(), fTable,
+//                         QDate::currentDate(), QDate::currentDate(), dateCash,
+//                         QTime::currentTime(), QTime::currentTime(),
+//                         fUser->id(), fPhone, 0,
+//                         ui->leTotal->getDouble(), cashAmount, cardAmount, 0, 0, otherAmount, idramAmount,
+//                         0, fDiscountAmount, 0, fDiscountValue,
+//                         0, 0, 1, 1, 1, fCustomer)) {
+//        C5Message::error(dw.fErrorMsg);
+//        db.rollback();
+//        return false;
+//    }
 
     //f_1 delivery
     //f_2 edited
@@ -1966,7 +2005,7 @@ void Workspace::on_tblTables_itemClicked(QTableWidgetItem *item)
         db[":f_header"] = fOrderUuid;
         db[":f_state"] = DISH_STATE_OK;
         db.exec("select b.f_dish, b.f_adgcode, d.f_name, b.f_qty1, b.f_qty2, b.f_price, b.f_comment, "
-                "b.f_print1, b.f_store "
+                "b.f_print1, b.f_store, b.f_id "
                 "from o_body b "
                 "left join d_dish d on d.f_id=b.f_dish "
                 "where b.f_header=:f_header AND b.f_state=:f_state "

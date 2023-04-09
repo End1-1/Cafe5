@@ -14,19 +14,6 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="3" column="2">
-    <widget class="C5LineEditWithSelector" name="leSupplier">
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="FilterName" stdset="0">
-      <string>partner</string>
-     </property>
-    </widget>
-   </item>
    <item row="8" column="3">
     <widget class="C5LineEditWithSelector" name="leClass3Name">
      <property name="maximumSize">
@@ -130,22 +117,6 @@
      </property>
      <property name="FilterName" stdset="0">
       <string>group</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="3">
-    <widget class="C5LineEditWithSelector" name="leSupplierName">
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -290,13 +261,6 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>Partner</string>
-     </property>
-    </widget>
-   </item>
    <item row="10" column="0">
     <widget class="QLabel" name="label_9">
      <property name="text">
@@ -310,19 +274,6 @@
       <string>Goods type</string>
      </property>
     </widget>
-   </item>
-   <item row="3" column="4">
-    <spacer name="horizontalSpacer">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>157</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
    </item>
    <item row="0" column="2">
     <widget class="C5DateEdit" name="deStart">
@@ -542,6 +493,19 @@
      </property>
     </widget>
    </item>
+   <item row="2" column="4">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>157</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -560,7 +524,6 @@
   <tabstop>deStart</tabstop>
   <tabstop>deEnd</tabstop>
   <tabstop>leHall</tabstop>
-  <tabstop>leSupplier</tabstop>
   <tabstop>leBuyer</tabstop>
   <tabstop>leGroup</tabstop>
   <tabstop>leClass1</tabstop>

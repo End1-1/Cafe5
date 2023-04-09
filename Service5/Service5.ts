@@ -369,7 +369,7 @@
 <context>
     <name>SocketThread</name>
     <message>
-        <location filename="socketthread.cpp" line="355"/>
+        <location filename="socketthread.cpp" line="361"/>
         <source>Connection timeout</source>
         <translation type="unfinished"></translation>
     </message>

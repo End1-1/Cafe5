@@ -44,7 +44,6 @@
         <location filename="../../Classes/c5cache.cpp" line="23"/>
         <location filename="../../Classes/c5cache.cpp" line="34"/>
         <location filename="../../Classes/c5cache.cpp" line="40"/>
-        <location filename="../../Classes/c5cache.cpp" line="44"/>
         <location filename="../../Classes/c5cache.cpp" line="50"/>
         <location filename="../../Classes/c5cache.cpp" line="52"/>
         <location filename="../../Classes/c5cache.cpp" line="54"/>
@@ -98,6 +97,11 @@
     <message>
         <location filename="../../Classes/c5cache.cpp" line="38"/>
         <source>Complect output</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Classes/c5cache.cpp" line="44"/>
+        <source>Legal name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

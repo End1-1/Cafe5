@@ -3,6 +3,7 @@
 #include "barcode.h"
 #include "barcode5.h"
 #include "c5storebarcodelist.h"
+#include "QRCodeGenerator.h"
 #include "c5lineedit.h"
 #include "c5checkbox.h"
 #include "dlgselectcurrency.h"
@@ -47,10 +48,12 @@ void C5StoreBarcode::addRow(const QString &name, const QString &barcode, int qty
         ui->tbl->setDouble(row, 4, db.getDouble("f_price1"));
         ui->tbl->setString(row, 5, db.getString("f_description"));
         ui->tbl->setString(row, 6, db.getString("f_class1name"));
+        ui->tbl->setString(row, 7, db.getString("f_weblink"));
     } else {
         ui->tbl->setDouble(row, 4, 0);
         ui->tbl->setString(row, 5, "");
         ui->tbl->setString(row, 6, "");
+        ui->tbl->setString(row, 7, "");
     }
 }
 
@@ -61,6 +64,7 @@ QToolBar *C5StoreBarcode::toolBar()
         btn << tbFilter;
         createStandartToolbar(btn);
         fToolBar->addAction(QIcon(":/print_description.png"), tr("Print\nscancodes"), this, SLOT(print()));
+        fToolBar->addAction(QIcon(":/print_description.png"), tr("Print\nscancodes 2"), this, SLOT(print2()));
         fToolBar->addAction(QIcon(":/print_description.png"), tr("Print\ndescriptions"), this, SLOT(printDescriptions()));
         fToolBar->addAction(QIcon(":/show_list.png"), tr("Set list"), this, SLOT(setList()));
         fToolBar->addAction(QIcon(":/show_list.png"), tr("1"), this, SLOT(setQtyToOne()));
@@ -102,6 +106,89 @@ bool C5StoreBarcode::printOneBarcode(const QString &code, const QString &price, 
     f.setPointSize(10);
     p.setFont(f);
     p.drawText(5, 185, QString("%1: %2").arg(tr("Price"), price));
+
+    return printer.printerState() != QPrinter::Error;
+}
+
+bool C5StoreBarcode::printOneBarcode2(const QString &code, const QString &price, const QString &link, const QString &name, QPrintDialog &pd)
+{
+    int levelIndex = 1;
+    int versionIndex = 0;
+    bool bExtent = true;
+    int maskIndex = -1;
+
+    CQR_Encode qrEncode;
+    bool successfulEncoding = qrEncode.EncodeData(levelIndex, versionIndex, bExtent, maskIndex, link.toUtf8().data() );
+    if (!successfulEncoding) {
+        //fLog.append("Cannot encode qr image");
+    }
+    int qrImageSize = qrEncode.m_nSymbleSize;
+    int encodeImageSize = qrImageSize + ( QR_MARGIN * 2 );
+    QImage encodeImage(encodeImageSize, encodeImageSize, QImage::Format_Mono);
+    encodeImage.fill(1);
+
+    for ( int i = 0; i < qrImageSize; i++ ) {
+        for ( int j = 0; j < qrImageSize; j++ ) {
+            if ( qrEncode.m_byModuleData[i][j] ) {
+                encodeImage.setPixel(i + QR_MARGIN, j + QR_MARGIN, 0);
+            }
+        }
+    }
+
+    QPixmap pix = QPixmap::fromImage(encodeImage);
+    pix = pix.scaled(150, 150);
+
+    QPrinter printer(QPrinter::HighResolution);
+    printer.setPrinterName(pd.printer()->printerName());
+    printer.setOrientation(pd.printer()->orientation());
+    QSizeF szf = printer.pageSizeMM();
+    szf = pd.printer()->pageSizeMM();
+    //szf.setWidth(400);
+//    szf.setHeight(20);
+    printer.setPageSizeMM(szf);
+//    printer.setResolution(pd.printer()->resolution());
+    QPrinter::PageSize ps = printer.pageSize();
+    ps = pd.printer()->pageSize();
+    printer.setPageSize(ps);
+    QPainter p(&printer);
+    p.translate(350, -200);
+    p.rotate(-90);
+    p.drawRect(0, 0, 1000, 1000);
+    Barcode93 b;
+    bool r = b.Encode93(code.toLatin1().data());
+    qDebug() << r;
+    QFont f(__c5config.getValue(param_app_font_family), 25, QFont::Normal);
+    p.setFont(f);
+    qreal plen = 2;
+
+    QTextOption to;
+    to.setWrapMode(QTextOption::WordWrap);
+    f.setPointSize(8);
+    f.setBold(true);
+    p.setFont(f);
+    p.drawImage(QRectF(70, 0, 150, 150), encodeImage);
+
+    QStringList sizes = QString("34,36,38,40,42").split(",");
+    for (int i = 0; i < sizes.length(); i++) {
+        if (code.mid(0, 2) == sizes.at(i)) {
+            p.setBrush(Qt::black);
+            p.setPen(Qt::white);
+        } else {
+            p.setBrush(Qt::white);
+            p.setPen(Qt::black);
+        }
+        p.fillRect((i * 30) + 40, 150, 30, 30, code.mid(0, 2) == sizes.at(i) ? Qt::black : Qt::white);
+        p.drawText(QPoint((i * 30) + 40, 170), sizes.at(i));
+    }
+    b.DrawBarcode(p, 100, 220, 300, 300, plen);
+    QString code2 = code.mid(0, 2) + "x";
+    code2 += code.mid(2, 3) + "x";
+    code2 += code.mid(5, 2) + "x";
+    code2 += code.mid(7, 3);
+    p.drawText(150, 320, code2);
+    f.setPointSize(10);
+    p.setFont(f);
+    p.drawText(5, 350, QString("%1: %2 AMD").arg(tr("Price"), price));
 
     return printer.printerState() != QPrinter::Error;
 }
@@ -269,6 +356,31 @@ void C5StoreBarcode::print()
                 code = code.left(code.length() - 1);
             }
             printOneBarcode(code, ui->tbl->getString(i, 4) + " " + fCurrencyName, ui->tbl->getString(i, 6), ui->tbl->getString(i, 0), pd);
+            //printOneBarcode(code, pd);
+            ui->tbl->checkBox(i, 3)->setChecked(false);
+        }
+    }
+}
+
+void C5StoreBarcode::print2()
+{
+    QPrintDialog pd;
+    if (pd.exec() == QDialog::Accepted) {
+
+    } else {
+        return;
+    }
+    for (int i = 0; i < ui->tbl->rowCount(); i++) {
+        if (!ui->tbl->checkBox(i, 3)->isChecked()) {
+            continue;
+        }
+        Barcode bc;
+        for (int j = 0; j < ui->tbl->lineEdit(i, 2)->getInteger(); j++) {
+            QString code = ui->tbl->getString(i, 1);
+            if (bc.isEan13(code)) {
+                code = code.left(code.length() - 1);
+            }
+            printOneBarcode2(code, ui->tbl->getString(i, 4) + " " + fCurrencyName, ui->tbl->getString(i, 7), ui->tbl->getString(i, 0), pd);
             //printOneBarcode(code, pd);
             ui->tbl->checkBox(i, 3)->setChecked(false);
         }

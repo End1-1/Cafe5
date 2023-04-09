@@ -223,6 +223,9 @@ int WOrder::addGoodsToTable(int id, bool checkQtyOfStore, const QString &draftid
     case SALE_WHOSALE:
         price = db.getDouble("f_price2");
         break;
+    default:
+        price = db.getDouble("f_price1");
+        break;
     }
     ls(QString("%1: %2, %3: %4, %5: %6")
        .arg(tr("New goods with code"))

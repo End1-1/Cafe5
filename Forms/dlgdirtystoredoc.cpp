@@ -146,8 +146,6 @@ void DlgDirtyStoreDoc::correctDocumentAmount()
     double total = db.getDouble(0);
     db[":f_amount"] = total;
     db.update("a_header", "f_id", fUuid);
-    db[":f_credit"] = total;
-    db.update("a_dc", "f_doc", fUuid);
     db[":f_storedoc"] = fUuid;
     db.exec("select f_id from a_header_cash where f_storedoc=:f_storedoc");
     if (db.nextRow()) {

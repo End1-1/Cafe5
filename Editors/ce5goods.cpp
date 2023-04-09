@@ -89,6 +89,14 @@ CE5Goods::CE5Goods(const QStringList &dbParams, QWidget *parent) :
     while (db.nextRow()) {
         fCrossRate[QString("%1-%2").arg(db.getString("f_currency1"), db.getString("f_currency2"))] = db.getDouble("f_rate");
     }
+    db.exec("select f_id, f_name from as_list");
+    while (db.nextRow()) {
+        int r = ui->tblAs->rowCount();
+        ui->tblAs->setRowCount(r + 1);
+        ui->tblAs->setInteger(r, 0, db.getInt("f_id"));
+        ui->tblAs->setString(r, 1, db.getString("f_name"));
+        ui->tblAs->createLineEdit(r, 2);
+    }
 }
 
 CE5Goods::~CE5Goods()
@@ -183,6 +191,21 @@ void CE5Goods::setId(int id)
     if (ui->cbCurrency->currentData().toInt() == 0) {
         ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(__c5config.getValue(param_default_currency)));
     }
+    db[":f_id"] = ui->leCode->getInteger();
+    db.exec("select f_asdbid, f_ascode from as_convert where f_table='c_goods' and f_tableid=:f_id");
+    while (db.nextRow()) {
+        int asrow = -1;
+        for (int i = 0; i < ui->tblAs->rowCount(); i++) {
+            if (ui->tblAs->getInteger(i, 0) == db.getInt("f_asdbid")) {
+                asrow = i;
+                break;
+            }
+        }
+        if (asrow < 0) {
+            throw std::exception(QString("The database id (%1) not exists. Check database structure.").arg(asrow).toLocal8Bit().data());
+        }
+        ui->tblAs->lineEdit(asrow, 2)->setText(db.getString("f_ascode"));
+    }
 }
 
 bool CE5Goods::save(QString &err, QList<QMap<QString, QVariant> > &data)
@@ -272,6 +295,17 @@ bool CE5Goods::save(QString &err, QList<QMap<QString, QVariant> > &data)
         fScancodeGenerated = false;
     }
 
+    db[":f_table"] = "c_goods";
+    db[":f_tableid"] = ui->leCode->getInteger();
+    db.exec("delete from as_convert where f_table=:f_table and f_tableid=:f_tableid");
+    for (int i = 0; i < ui->tblAs->rowCount(); i++) {
+        db[":f_asdbid"] = ui->tblAs->getInteger(i, 0);
+        db[":f_table"] = "c_goods";
+        db[":f_tableid"] = ui->leCode->getInteger();
+        db[":f_ascode"] = ui->tblAs->lineEdit(i, 2)->text();
+        db.insert("as_convert");
+    }
+
     return true;
 }
 
@@ -311,6 +345,9 @@ void CE5Goods::clear()
     fScancodeGenerated = false;
     if (ui->cbCurrency->currentData().toInt() == 0) {
         ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(__c5config.getValue(param_default_currency)));
+    }
+    for (int i = 0; i < ui->tblAs->rowCount(); i++) {
+        ui->tblAs->lineEdit(i, 2)->clear();
     }
 }
 

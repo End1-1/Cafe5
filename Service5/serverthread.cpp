@@ -5,6 +5,7 @@
 #include "logwriter.h"
 #include "thread.h"
 #include "configini.h"
+#include <QSslConfiguration>
 
 ServerThread::ServerThread(const QString &configPath) :
     ThreadWorker(),
@@ -20,6 +21,7 @@ ServerThread::~ServerThread()
 void ServerThread::run()
 {
     LogWriter::write(LogWriterLevel::verbose, "", "SSL version: " + QSslSocket::sslLibraryBuildVersionString());
+    LogWriter::write(LogWriterLevel::verbose, "", "SSL support: " + QSslSocket::supportsSsl() ? "YES" : "NO");
     QString certFileName = fConfigPath + "cert.pem";
     QString keyFileName = fConfigPath + "key.pem";
     fSslServer = new SslServer();
@@ -53,3 +55,4 @@ void ServerThread::newConnection(int socketDescriptor)
     socketThread->moveToThread(thread);
     thread->start();
 }
+

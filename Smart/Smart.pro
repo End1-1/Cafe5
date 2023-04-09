@@ -103,6 +103,7 @@ SOURCES += \
     ../DbData/datadriver.cpp \
     ../DbData/dbbodystate.cpp \
     ../DbData/dbcar.cpp \
+    ../DbData/dbcurrency.cpp \
     ../DbData/dbdata.cpp \
     ../DbData/dbdishcomments.cpp \
     ../DbData/dbdishes.cpp \
@@ -244,6 +245,7 @@ HEADERS += \
     ../DbData/datadriver.h \
     ../DbData/dbbodystate.h \
     ../DbData/dbcar.h \
+    ../DbData/dbcurrency.h \
     ../DbData/dbdata.h \
     ../DbData/dbdishcomments.h \
     ../DbData/dbdishes.h \

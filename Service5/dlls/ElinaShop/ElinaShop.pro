@@ -71,3 +71,6 @@ DEFINES += _MODULE_=\\\"Service5_elinashop_dll\\\"
 
 FORMS += \
     ../../../Classes/notificationwidget.ui
+
+SUBDIRS += \
+    ../RWJZStore/RWJZStore.pro

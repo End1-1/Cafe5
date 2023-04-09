@@ -20,6 +20,14 @@ public:
 
     virtual QString table();
 
+    virtual void setId(int id) override;
+
+    virtual bool save(QString &err, QList<QMap<QString, QVariant> > &data) override;
+
+    virtual void clear() override;
+
+    virtual bool checkData(QString &err) override;
+
 private:
     Ui::CE5Partner *ui;
 };

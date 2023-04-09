@@ -18,6 +18,7 @@
 #include "cr5documents.h"
 #include "cr5goodsclasses.h"
 #include "c5translatorform.h"
+#include "c5goodsspecialprices.h"
 #include "cr5breezeservice.h"
 #include "cr5reports.h"
 #include "cr5mfgeneralreport.h"
@@ -780,6 +781,9 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
     case cp_t6_goods:
         createTab<CR5Goods>(dbParams);
         break;
+    case cp_t6_goods_special_prices:
+        createTab<C5GoodsSpecialPrices>(dbParams);
+        break;
     case cp_t6_waste:
         createTab<CR5GoodsWaste>(dbParams);
         break;
@@ -1075,6 +1079,7 @@ void C5MainWindow::setDB(const QString &dbname)
         addTreeL3Item(l, cp_t6_goods_images, tr("Images"), ":/images.png");
         addTreeL3Item(l, cp_t6_qty_reminder, tr("Quantity reminder"), ":/goods.png");
         addTreeL3Item(l, cp_t6_complectations, tr("Complectations"), ":/goods.png");
+        addTreeL3Item(l, cp_t6_goods_special_prices, tr("Special prices"), ":/goods.png");
     }
 
     if (addMainLevel(db.at(1), cp_t10_manufacture, tr("Manufacture"), ":/manufacturing.png", l)) {

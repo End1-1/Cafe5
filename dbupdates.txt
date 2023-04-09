@@ -1069,4 +1069,76 @@ alter table o_route_exec add column f_driver integer;
 drop table o_route;
 create table o_route (f_id integer primary key auto_increment, f_partner integer, f_1 integer, f_2 integer, f_3 integer, f_4 integer, f_5 integer, f_6 integer, f_7 integer);
 alter table o_draft_sale_body add column f_back decimal(14,2) after f_qty;
-alter table o_route_exec add column f_action_comment TEXT, ADD column f_action_datetime timestamp;
+alter table o_route_exec add column f_action_comment TEXT, ADD column f_action_datetime timestamp null default null;
+alter table o_route_exec add column f_saleuuid char(36);
+alter table o_header change column f_amountIdram f_amountIdram decimal(14,2) after f_amountBank, change column f_amountPayX f_amountPayX decimal(14,2) after f_amountIdram, add column f_telcell decimal(14,2) after f_amountIdram, add column f_amountDebt decimal(14,2) after f_amountIdram;
+alter table o_header change column f_telcell f_amountTelcell decimal(14,2) after f_amountIdram;
+alter table o_header add column f_cashier int after f_timeclose;
+alter table o_header add column f_currency int;
+alter table o_goods add column f_adgcode tinytext after f_taxdept;
+alter table o_goods add column f_isservice integer;
+alter table o_goods add column f_amountAccumulate decimal(14,2);
+alter table b_clients_debts drop column f_header, add column f_currency int not null;
+drop table a_dc;
+alter table b_clients_debts add column f_source tinyint;
+
+/* db - 109, 28.03.2023 */
+update s_app set f_version='109' where f_app='DB';
+drop table a_sale_temp;
+alter table o_draft_sale add column f_saletype integer after f_state;
+alter table c_partners add column f_state TINYINT default 1 after f_id , add column f_group integer after f_state, add column f_legaladdress text after f_address;
+create table c_partners_state (f_id tinyint primary key auto_increment, f_name text);
+create table c_partners_group (f_id integer primary key auto_increment, f_name text);
+insert into c_partners_state (F_id, f_name) values (1, 'Գործող');
+insert into c_partners_group (f_id, f_name) values (1, 'Հիմնական');
+update c_partners set f_state=1, f_group = 1;
+alter table c_partners add column f_ascode tinytext;
+alter table c_goods add column f_ascode tinytext;
+
+/* db - 110, 04.04.2023 */
+update s_app set f_version='110' where f_app='DB';
+create table as_list (f_id integer primary key auto_increment, f_name tinytext, f_connectionstring text);
+create table as_tables (f_id integer primary key, f_name tinytext);
+create table as_convert (f_id integer primary key auto_increment, f_table integer, f_tableid integer, f_ascode tinytext);
+drop table as_tables;
+alter table as_convert change column f_table f_table varchar(32);
+alter table as_convert add column f_asdbid integer after f_id;
+alter table c_partners drop column f_ascode;
+alter table c_partners add column f_category int after f_id;
+alter table c_partners add column f_name tinytext after f_taxname;
+create table c_partners_category (f_id integer primary key auto_increment, f_name tinytext);
+insert into c_partners_category (f_name) values ('Հիմնական');
+
+/* db - 111, 05.04.2023 */
+update s_app set f_version='111' where f_app='DB';
+create table mgapp_devices (f_id integer primary key auto_increment, f_fcmtoken tinytext, f_apikey char(36));
+alter table o_route add f_driver integer after f_id;
+create table c_goods_special_prices (f_id integer primary key auto_increment, f_partner integer, f_goods integer, f_price decimal(14,2));
+alter table mgapp_devices add column f_devicename tinytext after f_Id;
+alter table c_partners add column f_permanent_discount decimal(5,2);
+ALTER TABLE `c_partners`
+	CHANGE COLUMN `f_category` `f_category` INT(11) NULL DEFAULT '1' AFTER `f_id`,
+	CHANGE COLUMN `f_group` `f_group` INT(11) NULL DEFAULT '1' AFTER `f_state`,
+	CHANGE COLUMN `f_taxname` `f_taxname` VARCHAR(128) NULL DEFAULT '' COLLATE 'utf8mb3_general_ci' AFTER `f_group`,
+	CHANGE COLUMN `f_name` `f_name` TINYTEXT NULL DEFAULT '' COLLATE 'utf8mb3_general_ci' AFTER `f_taxname`,
+	CHANGE COLUMN `f_taxcode` `f_taxcode` VARCHAR(45) NULL DEFAULT '' COLLATE 'utf8mb3_general_ci' AFTER `f_name`,
+	CHANGE COLUMN `f_contact` `f_contact` VARCHAR(255) NULL DEFAULT '' COLLATE 'utf8mb3_general_ci' AFTER `f_taxcode`,
+	CHANGE COLUMN `f_info` `f_info` VARCHAR(256) NULL DEFAULT '' COLLATE 'utf8mb3_general_ci' AFTER `f_contact`,
+	CHANGE COLUMN `f_phone` `f_phone` VARCHAR(255) NULL DEFAULT '' COLLATE 'utf8mb3_general_ci' AFTER `f_info`,
+	CHANGE COLUMN `f_email` `f_email` VARCHAR(255) NULL DEFAULT '' COLLATE 'utf8mb3_general_ci' AFTER `f_phone`,
+	CHANGE COLUMN `f_address` `f_address` TINYTEXT NULL DEFAULT '' COLLATE 'utf8mb3_general_ci' AFTER `f_email`,
+	CHANGE COLUMN `f_legaladdress` `f_legaladdress` TEXT NULL DEFAULT '' COLLATE 'utf8mb3_general_ci' AFTER `f_address`;
+	UPDATE c_partners SET f_phone='' WHERE f_phone IS NULL;
+UPDATE c_partners SET f_permanent_discount=0 WHERE f_permanent_discount IS NULL;
+ALTER TABLE `c_partners`	CHANGE COLUMN `f_permanent_discount` `f_permanent_discount` DECIMAL(5,2) NULL DEFAULT '0' AFTER `f_cash`;
+UPDATE c_partners SET f_phone='' WHERE f_phone IS NULL;
+UPDATE c_partners SET f_permanent_discount=0 WHERE f_permanent_discount IS NULL;
+alter table c_partners add column f_price_polytic integer default 1;
+alter table c_partners drop column f_price_polytic, add column f_price_politic integer default 1;
+
+/* db - 112, 08.04.2023 */
+update s_app set f_version='112' where f_app='DB';
+create table c_goods_size (f_id integer primary key auto_increment, f_name tinytext);
+create table c_goods_sizes (f_id integer primary key auto_increment, f_size integer, f_name varchar(8));
+alter table c_goods_option add column f_size_standart integer;
+alter table c_goods add column f_weblink tinytext;

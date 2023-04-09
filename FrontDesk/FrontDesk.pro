@@ -25,6 +25,9 @@ DEFINES += _APPLICATION_=\\\"Cafe5\\\"
 DEFINES += _MODULE_=\\\"FRONTDESK\\\"
 DEFINES += FRONTDESK
 
+DEFINES += Q_COMPILER_INITIALIZER_LISTS
+CONFIG += c++11
+
 # You can also make your code fail to compile if you use deprecated APIs.
 # In order to do so, uncomment the following line.
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
@@ -59,8 +62,10 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Classes/removeshopsale.cpp \
     ../Classes/threadsendmessage.cpp \
     ../Controls/c5cleartablewidget.cpp \
+    ../Controls/c5combotable.cpp \
     ../Controls/c5guicontrols.cpp \
     ../Controls/c5tablewithtotal.cpp \
+    ../Controls/combosearchview.cpp \
     ../DbData/datadriver.cpp \
     ../DbData/dbbodystate.cpp \
     ../DbData/dbcar.cpp \
@@ -106,6 +111,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Editors/ce5packagelist.cpp \
     ../Editors/ce5storereason.cpp \
     ../Forms/c5filtervalues.cpp \
+    ../Forms/c5goodsspecialprices.cpp \
     ../Forms/c5printtaxanywhere.cpp \
     ../Forms/c5route.cpp \
     ../Forms/c5salarydoc.cpp \
@@ -377,8 +383,10 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Classes/removeshopsale.h \
     ../Classes/threadsendmessage.h \
     ../Controls/c5cleartablewidget.h \
+    ../Controls/c5combotable.h \
     ../Controls/c5guicontrols.h \
     ../Controls/c5tablewithtotal.h \
+    ../Controls/combosearchview.h \
     ../DbData/datadriver.h \
     ../DbData/dbbodystate.h \
     ../DbData/dbcar.h \
@@ -424,6 +432,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Editors/ce5packagelist.h \
     ../Editors/ce5storereason.h \
     ../Forms/c5filtervalues.h \
+    ../Forms/c5goodsspecialprices.h \
     ../Forms/c5printtaxanywhere.h \
     ../Forms/c5route.h \
     ../Forms/c5salarydoc.h \
@@ -672,6 +681,7 @@ FORMS += \
     ../Classes/calculator.ui \
     ../Classes/notificationwidget.ui \
     ../Controls/c5tablewithtotal.ui \
+    ../Controls/combosearchview.ui \
     ../Editors/c5cashname.ui \
     ../Editors/ce5currency.ui \
     ../Editors/ce5currencycrossrate.ui \
@@ -688,6 +698,7 @@ FORMS += \
     ../Editors/ce5packagelist.ui \
     ../Editors/ce5storereason.ui \
     ../Forms/c5filtervalues.ui \
+    ../Forms/c5goodsspecialprices.ui \
     ../Forms/c5printtaxanywhere.ui \
     ../Forms/c5route.ui \
     ../Forms/c5salarydoc.ui \

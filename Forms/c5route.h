@@ -16,10 +16,21 @@ public:
     ~C5Route();
     virtual QToolBar *toolBar() override;
 
+private:
+    void loadPartners();
+
 private slots:
+    void setSearchParameters();
+
     void on_leFilter_textChanged(const QString &arg1);
 
     void saveDataChanges();
+
+    void on_tbl_doubleClicked(const QModelIndex &index);
+
+    void on_cbPartnerStatus_currentIndexChanged(int index);
+
+    void on_cbDriver_currentIndexChanged(int index);
 
 private:
     Ui::C5Route *ui;

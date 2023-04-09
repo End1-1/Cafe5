@@ -45,11 +45,16 @@ void SocketThread::run()
 
     fSslSocket = new SslSocket();
     fSslSocket->setProperty("session", property("session"));
-    fSslSocket->setSocketDescriptor(fSocketDescriptor);
+    qDebug() << "set socket description" << fSslSocket->setSocketDescriptor(fSocketDescriptor);
     fSslSocket->setLocalCertificate(fSslLocalCertificate);
+    fSslSocket->setPeerVerifyMode(QSslSocket::VerifyNone);
     fSslSocket->setPrivateKey(fSslPrivateKey);
     fSslSocket->setProtocol(fSslProtocol);
     fSslSocket->startServerEncryption();
+    qDebug() << fSslSocket->isEncrypted() << fSslSocket->errorString();
+    if (!fSslSocket->waitForEncrypted()) {
+        qDebug() <<fSslSocket->errorString();
+    }
     fRawHandler = new RawHandler(fSslSocket, property("session").toString());
     connect(fRawHandler, &RawHandler::writeToSocket, this, &SocketThread::writeToSocket);
     fTimer.start();
@@ -96,13 +101,14 @@ void SocketThread::rawRequest()
 
 void SocketThread::httpRequest()
 {
+    qDebug() << fData;
     if (fContentLenght > 0) {
         if (fData.length() < fContentLenght + fHeaderLength) {
             return;
         }
     } else {
         if (QString(fData.mid(0, 4).toUpper()) == "POST") {
-            if (!fData.contains("Content-Length")) {
+            if (!fData.contains("Content-Length") && !fData.contains("content-length")) {
                 return;
             }
         } else if (QString(fData.mid(0, 3).toUpper()) == "GET") {

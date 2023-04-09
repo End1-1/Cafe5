@@ -81,7 +81,6 @@ delete from s_syncronize;
 delete from s_draft;
 delete from e_cash_names;
 delete from a_store_sale;
-delete from a_sale_temp;
 delete from a_store_dish_waste;
 delete from o_service_values;
 delete from s_custom_reports;

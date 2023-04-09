@@ -8,16 +8,27 @@ CR5GoodsPartners::CR5GoodsPartners(const QStringList &dbParams, QWidget *parent)
 {
     fIcon = ":/goods.png";
     fLabel = tr("Partners");
-    fSqlQuery = "select * from c_partners ";
+    fSqlQuery = "select p.f_id, c.f_name as f_category, s.f_name as f_state, g.f_name as f_group, "
+                "p.f_name, p.f_taxname, p.f_taxcode, p.f_contact, p.f_phone, p.f_email, "
+                "p.f_address, p.f_legaladdress, p.f_info "
+                "from c_partners p "
+                "left join c_partners_category c on c.f_id=p.f_category "
+                "left join c_partners_state s on s.f_id=p.f_state "
+                "left join c_partners_group g on g.f_id=p.f_group ";
 
     fTranslation["f_id"] = tr("Code");
-    fTranslation["f_taxname"] = tr("Name");
+    fTranslation["f_category"] = tr("Category");
+    fTranslation["f_state"] = tr("State");
+    fTranslation["f_group"] = tr("Group");
+    fTranslation["f_name"] = tr("Name");
+    fTranslation["f_taxname"] = tr("Legal name");
     fTranslation["f_taxcode"] = tr("Taxpayer id");
     fTranslation["f_contact"] = tr("Contact");
     fTranslation["f_info"] = tr("Info");
     fTranslation["f_phone"] = tr("Phone");
     fTranslation["f_email"] = tr("Email");
     fTranslation["f_address"] = tr("Address");
+    fTranslation["f_legaladdress"] = tr("Legal address");
 
     fEditor = new CE5Partner(fDBParams);
 }
