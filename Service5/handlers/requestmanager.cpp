@@ -7,7 +7,6 @@
 #include <QDir>
 #include <QApplication>
 #include <QLibrary>
-#include <QDebug>
 
 static QMutex fMutex;
 
@@ -46,7 +45,6 @@ void RequestManager::init()
             fInstance->fRouteFunction.insert(r, h);
         }
     }
-    qDebug() << fInstance->fRouteFunction;
 }
 
 handle_route RequestManager::getRouteHandler(const QString &route)
@@ -83,6 +81,8 @@ void RequestManager::handle(const QString &session, const QString &remoteHost, c
         db[":fhost"] = remoteHost;
         db[":felapsed"] = ms;
         db[":froute"] = r;
+        db[":frequest"] = QString::fromUtf8(indata);
+        db[":fresponse"] = QString::fromUtf8(outdata);
         db.insert("system_requests");
     } else {
         LogWriter::write(LogWriterLevel::errors, session, db.lastDbError());

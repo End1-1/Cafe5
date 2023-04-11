@@ -52,7 +52,7 @@ void C5Route::loadPartners()
         for (int i = 0; i < db.columnCount(); i++) {
             ui->tbl->setString(r, i + 1, db.getString(i));
         }
-        for (int i = 6; i < ui->tbl->columnCount(); i++) {
+        for (int i = 6; i < 13; i++) {
             ui->tbl->setItem(r, i, new C5TableWidgetItem());
             ui->tbl->item(r, i)->setCheckState(Qt::Unchecked);
         }
@@ -61,6 +61,9 @@ void C5Route::loadPartners()
     db[":f_driver"] = ui->cbDriver->currentData().toInt();
     db.exec("select * from o_route where f_driver=:f_driver");
     while (db.nextRow()) {
+        if (!rowParner.contains(db.getInt("f_partner"))) {
+            continue;
+        }
         int r = rowParner[db.getInt("f_partner")];
         ui->tbl->item(r, 6)->setCheckState(db.getInt("f_1") == 1 ? Qt::Checked : Qt::Unchecked);
         ui->tbl->item(r, 7)->setCheckState(db.getInt("f_2") == 1 ? Qt::Checked : Qt::Unchecked);
@@ -69,6 +72,14 @@ void C5Route::loadPartners()
         ui->tbl->item(r, 10)->setCheckState(db.getInt("f_5") == 1 ? Qt::Checked : Qt::Unchecked);
         ui->tbl->item(r, 11)->setCheckState(db.getInt("f_6") == 1 ? Qt::Checked : Qt::Unchecked);
         ui->tbl->item(r, 12)->setCheckState(db.getInt("f_7") == 1 ? Qt::Checked : Qt::Unchecked);
+        ui->tbl->item(r, 13)->setData(Qt::EditRole, db.getInt("f_q1"));
+        ui->tbl->item(r, 14)->setData(Qt::EditRole, db.getInt("f_q2"));
+        ui->tbl->item(r, 15)->setData(Qt::EditRole, db.getInt("f_q3"));
+        ui->tbl->item(r, 16)->setData(Qt::EditRole, db.getInt("f_q4"));
+        ui->tbl->item(r, 17)->setData(Qt::EditRole, db.getInt("f_q5"));
+        ui->tbl->item(r, 18)->setData(Qt::EditRole, db.getInt("f_q6"));
+        ui->tbl->item(r, 19)->setData(Qt::EditRole, db.getInt("f_q7"));
+
     }
 }
 
@@ -98,7 +109,8 @@ void C5Route::saveDataChanges()
         if (!sql.isEmpty()) {
             sql += ",";
         }
-        sql += QString("(%1, %2, %3, %4, %5, %6, %7, %8, %9)")
+        sql += QString("(%1, %2, %3, %4, %5, %6, %7, %8, %9, "
+                        "%10, %11, %12, %13, %14, %15, %16)")
                 .arg(ui->cbDriver->currentData().toString(),
                     ui->tbl->getString(i, 1),
                      ui->tbl->item(i, 6)->checkState() == Qt::Checked ? "1" : "0",
@@ -107,10 +119,18 @@ void C5Route::saveDataChanges()
                      ui->tbl->item(i, 9)->checkState() == Qt::Checked ? "1" : "0",
                      ui->tbl->item(i, 10)->checkState() == Qt::Checked ? "1" : "0",
                      ui->tbl->item(i, 11)->checkState() == Qt::Checked ? "1" : "0",
-                     ui->tbl->item(i, 12)->checkState() == Qt::Checked ? "1" : "0");
+                     ui->tbl->item(i, 12)->checkState() == Qt::Checked ? "1" : "0",
+                     QString::number(ui->tbl->item(i, 13)->data(Qt::EditRole).toString().toInt()),
+                     QString::number(ui->tbl->item(i, 14)->data(Qt::EditRole).toString().toInt()),
+                     QString::number(ui->tbl->item(i, 15)->data(Qt::EditRole).toString().toInt()),
+                     QString::number(ui->tbl->item(i, 16)->data(Qt::EditRole).toString().toInt()),
+                     QString::number(ui->tbl->item(i, 17)->data(Qt::EditRole).toString().toInt()),
+                     QString::number(ui->tbl->item(i, 18)->data(Qt::EditRole).toString().toInt()),
+                     QString::number(ui->tbl->item(i, 19)->data(Qt::EditRole).toString().toInt())
+                     );
     }
     if (!sql.isEmpty()) {
-    sql = QString("insert into o_route (f_driver, f_partner, f_1, f_2, f_3, f_4, f_5, f_6, f_7) values %1")
+    sql = QString("insert into o_route (f_driver, f_partner, f_1, f_2, f_3, f_4, f_5, f_6, f_7, f_q1, f_q2, f_q3, f_q4, f_q5, f_q6, f_q7) values %1")
             .arg(sql);
     }
     C5Database db(fDBParams);
@@ -166,4 +186,9 @@ void C5Route::on_cbDriver_currentIndexChanged(int index)
     if (ui->cbDriver->currentData().toInt() > 0) {
         loadPartners();
     }
+}
+
+void C5Route::on_tbl_cellChanged(int row, int column)
+{
+    ui->tbl->setEditTriggers(column > 12 ? QTableWidget::EditTrigger::AllEditTriggers : QTableWidget::EditTrigger::NoEditTriggers);
 }

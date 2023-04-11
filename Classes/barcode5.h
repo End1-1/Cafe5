@@ -111,7 +111,7 @@ public:
 
         BYTE bBar;
         int i1,iNum1;
-        int iY;
+        qreal iY;
 
         for(i0 = 0; i0 < iNum0; i0++)
         {
@@ -122,15 +122,82 @@ public:
             {
                 if(bBar) {
                     pr.setPen(pBar);
+                    pr.fillRect(QRectF(iX, iY0, iPenW, iY), Qt::black);
                 } else {
                     pr.setPen(pSpace);
+                    pr.fillRect(QRectF(iX, iY0, iPenW, iY), Qt::white);
                 }
-                pr.drawLine(iX, iY0, iX, iY);
-                iX += (iPenW * 1);
+                //pr.drawLine(iX, iY0, iX, iY);
+                iX += (iPenW * 1.00);
             }
             pb++;
         }
     }
+
+    void DrawBarcodeGS(QGraphicsScene &pr, qreal iX, qreal iY0, qreal iY10, qreal iY11, qreal iPenW) {
+        QPen pBar(Qt::black);
+        pBar.setWidthF(iPenW);
+        QPen pSpace(Qt::white);
+        pSpace.setWidthF(iPenW);
+
+        BYTE*pb=ia_Buf;
+        int i0,iNum0=i_LenBuf;
+
+        BYTE bBar;
+        int i1,iNum1;
+        qreal iY;
+
+        for(i0 = 0; i0 < iNum0; i0++)
+        {
+            bBar	= *pb & 0x01;
+            iNum1	= (*pb & 0x02) ? i_Ratio : 1;
+            iY		= (*pb & 0x04) ? iY11 : iY10;
+            for(i1 = 0; i1 < iNum1; i1++)
+            {
+                if(bBar) {
+                    pr.addRect(QRectF(iX, iY0, iPenW, iY), pBar);
+                } else {
+                    pr.addRect(QRectF(iX, iY0, iPenW, iY), pSpace);
+                }
+                iX += (iPenW * 1.00);
+            }
+            pb++;
+        }
+    }
+
+    void DrawBarcodeVert(QPainter &pr, qreal iX, qreal iY0, qreal iY10, qreal iPenW) {
+        QPen pBar(Qt::black);
+        pBar.setWidthF(iPenW);
+        QPen pSpace(Qt::white);
+        pSpace.setWidthF(iPenW);
+
+        BYTE*pb=ia_Buf;
+        int i0,iNum0=i_LenBuf;
+
+        BYTE bBar;
+        int i1,iNum1;
+        int iY;
+
+        for(i0 = 0; i0 < iNum0; i0++)
+        {
+            bBar	= *pb & 0x01;
+            iNum1	= (*pb & 0x02) ? i_Ratio : 1;
+            iY		= (*pb & 0x04) ? iY10 : iY10;
+            for(i1 = 0; i1 < iNum1; i1++)
+            {
+                if(bBar) {
+                    pr.setPen(pBar);
+                } else {
+                    pr.setPen(pSpace);
+                }
+                //pr.drawLine(iX, iY0, iX, iY);
+                pr.drawLine(QPointF(iX, iY0), QPointF(iY, iY0));
+                iY0 += (iPenW * 1);
+            }
+            pb++;
+        }
+    }
+
 
     void DrawBarcode(C5Printing &pr, qreal iX, qreal iY0, qreal iY10, qreal iY11) {
         qreal iPenW = 4;
@@ -161,6 +228,38 @@ public:
 //				::MoveToEx(hDC,iX,iY0,0);
 //				::LineTo(hDC,iX,iY);
                 iX += (iPenW * 1);
+            }
+            pb++;
+        }
+    }
+
+    void DrawBarcode_v1(QPainter *p,int iX,int iY0,int iY10,int iY11, const int iPenW)
+    {
+        QPen penBar(Qt::black, iPenW);
+        QPen penSpace(Qt::white, iPenW);
+        QPen pen;
+
+        BYTE*pb=ia_Buf;
+        int i0,iNum0=i_LenBuf;
+
+        BYTE bBar;
+        int i1,iNum1;
+        int iY;
+        for(i0=0;i0<iNum0;i0++)
+        {
+            bBar	=*pb&0x01;
+            iNum1	=(*pb&0x02)?i_Ratio:1;
+            iY		=(*pb&0x04)?iY11:iY10;
+            for(i1=0;i1<iNum1;i1++)
+            {
+                if(bBar){
+                    pen = penBar;
+                } else {
+                    pen = penSpace;
+                }
+
+                p->drawLine(QPointF(iX, iY0), QPointF(iX, iY));
+                iX+=iPenW;
             }
             pb++;
         }

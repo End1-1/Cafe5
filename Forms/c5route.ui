@@ -110,7 +110,7 @@
       <enum>QAbstractItemView::SingleSelection</enum>
      </property>
      <property name="selectionBehavior">
-      <enum>QAbstractItemView::SelectRows</enum>
+      <enum>QAbstractItemView::SelectItems</enum>
      </property>
      <column>
       <property name="text">
@@ -175,6 +175,41 @@
      <column>
       <property name="text">
        <string>VII</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>N-I</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>N-2</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>N-3</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>N-4</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>N-5</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>N-6</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>N-7</string>
       </property>
      </column>
     </widget>

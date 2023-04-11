@@ -104,6 +104,7 @@
 #include <QSpacerItem>
 #include <QListWidget>
 #include <QPropertyAnimation>
+//#include <QtMultimedia/QMediaPlayer>
 #include <QToolButton>
 #include <QParallelAnimationGroup>
 
@@ -334,6 +335,26 @@ void C5MainWindow::updateTimeout()
     ut->fDbParams = C5Config::dbParams();
     connect(ut, SIGNAL(checked(bool, int, QString)), this, SLOT(updateChecked(bool, int, QString)));
     ut->start();
+    if (__user && __user->id() > 0) {
+        C5Database db(ut->fDbParams);
+        db.exec("select f_id from o_draft_sale where f_id not in (select f_header from o_draft_sound) and f_saletype<3 ");
+//        QMediaPlayer *player = new QMediaPlayer;
+//        if (db.rowCount() > 0) {
+//            player->setMedia(QUrl(":/icq.mp3"));
+//            player->setVolume(50);
+//            player->play();
+//        }
+        while (db.nextRow()) {
+            C5Message::info(tr("New order!") + " " + db.getString("f_id"));
+            //player->stop();
+            C5Database db2(db);
+            db2[":f_header"] = db.getString("f_id");
+            db2[":f_timeconfirmed"] = QDateTime::currentDateTime();
+            db2.insert("O_draft_sound", false);
+        }
+        //player->deleteLater();
+    }
+    fUpdateTimer.start(10000);
 }
 
 void C5MainWindow::datagramRead()

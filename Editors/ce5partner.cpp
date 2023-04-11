@@ -24,6 +24,7 @@ CE5Partner::CE5Partner(const QStringList &dbParams, QWidget *parent) :
     ui->cbGroup->setDBValues(fDBParams, "select f_id, f_name from c_partners_group");
     ui->cbState->setDBValues(fDBParams, "select f_id, f_name from c_partners_state");
     ui->cbCategory->setDBValues(fDBParams, "select f_id, f_name from c_partners_category");
+    ui->cbSaleType->setDBValues(fDBParams, "select f_id, f_name from O_sale_type where f_id in (1,2)");
 }
 
 CE5Partner::~CE5Partner()

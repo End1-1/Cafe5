@@ -4,7 +4,6 @@
 #include <QSqlRecord>
 #include <QSettings>
 #include <QUuid>
-#include <QDebug>
 
 QMutex Database::fMutex;
 int Database::fDatabaseCounter = 0;
@@ -98,16 +97,12 @@ bool Database::exec(const QString &query)
     LogWriter::write(LogWriterLevel::verbose, fSqlDatabase.databaseName(), lastQuery());
     bool isSelect = fQuery->isSelect();
     if (isSelect) {
-        //fQuery->first();
         fColumnsNames.clear();
-        qDebug() << "Fetch columns " ;
-        qDebug() << fQuery->record().count();
         QSqlRecord rec = fQuery->record();
         for (int i = 0; i < rec.count(); i++) {
             fColumnsNames[rec.fieldName(i).toLower()] = i;
             fColumnsIndexes[i] = rec.fieldName(i).toLower();
         }
-        qDebug() << "End of fetch columns";
     }
     LogWriter::write(LogWriterLevel::verbose, "", fSqlDatabase.databaseName() + QString(" Affected rows %1").arg(fQuery->numRowsAffected()));
     return true;

@@ -149,5 +149,6 @@
         <file>monitor.png</file>
         <file>preorder.png</file>
         <file>route.png</file>
+        <file>icq.mp3</file>
     </qresource>
 </RCC>

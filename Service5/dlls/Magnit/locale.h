@@ -7,6 +7,7 @@ static const char* lkInvalidAPIKey = "Invalid server API key";
 static const char* lkUnknownProtocol = "Unknown protocol";
 static const char* lkDeviceNotRegistered = "Device doesn't registered";
 static const char* lkInvalidPin = "Invalid pin";
+static const char* lkInvalidHash = "Invalid password hash";
 
 #define lk(v) Locale::getStringOf(const QString &key)
 

@@ -20,7 +20,7 @@
       <enum>Qt::NoFocus</enum>
      </property>
      <property name="currentIndex">
-      <number>4</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -1457,61 +1457,12 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="1">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
        <item row="0" column="0">
         <widget class="QLabel" name="label_7">
          <property name="text">
           <string>Only whole number</string>
          </property>
         </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="C5LineEditWithSelector" name="leStoreId">
-         <property name="maximumSize">
-          <size>
-           <width>100</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="Field" stdset="0">
-          <string>f_storeid</string>
-         </property>
-         <property name="Type" stdset="0">
-          <number>1</number>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_6">
-         <property name="text">
-          <string>Store output goods</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="3">
-        <spacer name="horizontalSpacer">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
        </item>
        <item row="2" column="2">
         <widget class="C5LineEditWithSelector" name="leStoreIdName">
@@ -1533,16 +1484,59 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
-        <widget class="C5CheckBox" name="chOnlyWholeNumber">
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_13">
          <property name="text">
-          <string/>
+          <string>Web link</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_6">
+         <property name="text">
+          <string>Store output goods</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="4" column="3">
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="2" column="1">
+        <widget class="C5LineEditWithSelector" name="leStoreId">
+         <property name="maximumSize">
+          <size>
+           <width>100</width>
+           <height>16777215</height>
+          </size>
          </property>
          <property name="Field" stdset="0">
-          <string>f_wholenumber</string>
+          <string>f_storeid</string>
          </property>
-         <property name="Default" stdset="0">
-          <number>0</number>
+         <property name="Type" stdset="0">
+          <number>1</number>
          </property>
         </widget>
        </item>
@@ -1560,10 +1554,16 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="label_13">
+       <item row="0" column="1">
+        <widget class="C5CheckBox" name="chOnlyWholeNumber">
          <property name="text">
-          <string>Web link</string>
+          <string/>
+         </property>
+         <property name="Field" stdset="0">
+          <string>f_wholenumber</string>
+         </property>
+         <property name="Default" stdset="0">
+          <number>0</number>
          </property>
         </widget>
        </item>
@@ -1573,10 +1573,33 @@
           <enum>Qt::NoFocus</enum>
          </property>
          <property name="readOnly">
-          <bool>true</bool>
+          <bool>false</bool>
          </property>
          <property name="Field" stdset="0">
           <string>f_weblink</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_14">
+         <property name="text">
+          <string>Queue in list</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="C5LineEditWithSelector" name="leStoreId_2">
+         <property name="maximumSize">
+          <size>
+           <width>100</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="Field" stdset="0">
+          <string>f_queue</string>
+         </property>
+         <property name="Type" stdset="0">
+          <number>1</number>
          </property>
         </widget>
        </item>

@@ -4,6 +4,7 @@
 #include "logwriter.h"
 #include "rawhandler.h"
 #include "pluginmanager.h"
+#include "firebase.h"
 #include "raw.h"
 #include <QHostAddress>
 #include <QApplication>
@@ -63,7 +64,11 @@ void SocketThread::run()
     connect(fSslSocket, SIGNAL(readyRead()), this, SLOT(readyRead()));
     connect(fSslSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(error(QAbstractSocket::SocketError)));
     connect(fSslSocket, SIGNAL(disconnected()), this, SLOT(disconnected()));
-    LogWriter::write(LogWriterLevel::verbose, property("session").toString(), QString("New connection from %1:%2").arg(QHostAddress(fSslSocket->peerAddress().toIPv4Address()).toString()).arg(fSslSocket->peerPort()));
+    LogWriter::write(LogWriterLevel::verbose, property("session").toString(),
+                     QString("New connection from %1:%2")
+                     .arg(QHostAddress(fSslSocket->peerAddress().toIPv4Address()).toString())
+                     .arg(fSslSocket->peerPort()));
+
 }
 
 void SocketThread::rawRequest()

@@ -15,7 +15,7 @@ LogWriter::LogWriter()
 void LogWriter::write(const QString &file, const QString &session, const QString &message)
 {
 #ifdef QT_DEBUG
-    qDebug() << QDateTime::currentDateTime().toString("dd/MM/yyyy HH:mm:ss ") << session << message;
+    qDebug() << QDateTime::currentDateTime().toString("dd/MM/yyyy HH:mm:ss ") << session << message.left(1000);
 #else
     if (file == LogWriterLevel::special) {
         return;

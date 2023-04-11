@@ -32,6 +32,8 @@ private slots:
 
     void on_cbDriver_currentIndexChanged(int index);
 
+    void on_tbl_cellChanged(int row, int column);
+
 private:
     Ui::C5Route *ui;
 };

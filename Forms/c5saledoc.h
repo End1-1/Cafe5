@@ -30,6 +30,7 @@ public:
 private slots:
     void printSale();
     void createInvoiceAS();
+    void createRetailAS();
     void messageResult(QJsonObject jo);
     void saveDataChanges();
     void uuidDoubleClicked();

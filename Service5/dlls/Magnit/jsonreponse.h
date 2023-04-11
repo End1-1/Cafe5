@@ -16,15 +16,22 @@ private:
     QJsonObject &fJsonOut;
 
     int fDeviceId;
+    int fUserId;
 
+    bool dbFail();
     void dbToArray(Database &db, QJsonArray &ja);
     bool checkAPIandFCMToken();
     void registerDevice();
     void login();
-    void downloadData();
+    bool downloadData();
     void checkHashOfPass();
-    void stock();
+    bool stock();
     void saveOrder();
+    void preordersList();
+    void preorderDetails();
+    void getDebts();
+    bool orderList();
+    bool getRoute();
 };
 
 #endif // JSONREPONSE_H

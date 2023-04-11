@@ -75,7 +75,8 @@ QToolBar *C5SaleDoc::toolBar()
     if (!fToolBar) {
         createToolBar();
         fActionSave = fToolBar->addAction(QIcon(":/save.png"), tr("Save"), this, SLOT(saveDataChanges()));
-        fToolBar->addAction(QIcon(":/AS.png"), tr("Export to AS"), this, SLOT(createInvoiceAS()));
+        fToolBar->addAction(QIcon(":/AS.png"), tr("Export to AS\r\n invoice"), this, SLOT(createInvoiceAS()));
+        fToolBar->addAction(QIcon(":/AS.png"), tr("Export to AS\r\n retail"), this, SLOT(createRetailAS()));
         fToolBar->addAction(QIcon(":/print.png"), tr("Print"), this, SLOT(printSale()));
     }
     return fToolBar;
@@ -92,6 +93,11 @@ void C5SaleDoc::printSale()
 }
 
 void C5SaleDoc::createInvoiceAS()
+{
+    C5Message::error(tr("ArmSoft not configured"));
+}
+
+void C5SaleDoc::createRetailAS()
 {
     C5Message::error(tr("ArmSoft not configured"));
 }
@@ -175,10 +181,11 @@ void C5SaleDoc::saveDataChanges()
     db[":f_amountcash"] = ui->leCash->getDouble();
     db[":f_amountcard"] = ui->leCard->getDouble();
     db[":f_amountprepaid"] = ui->lePrepaid->getDouble();
-    db[":f_amountbank"] = 0;
+    db[":f_amountbank"] = ui->leBankTransfer->getDouble();
     db[":f_amountother"] = 0;
     db[":f_amountservice"] = 0;
     db[":f_amountdiscount"] = 0;
+    db[":f_amountdebt"] = ui->leDebt->getDouble();
     db[":f_servicefactor"] = 0;
     db[":f_discountfactor"] = 0;
     db[":f_creditcardid"] = 0;
@@ -262,7 +269,7 @@ void C5SaleDoc::saveDataChanges()
 
     if (fOpenedFromDraft) {
         db[":f_id"] = uuid;
-        db[":f_state"] = 3;
+        db[":f_state"] = 2;
         db.exec("update o_draft_sale set f_state=:f_state where f_id=:f_id");
     }
 
@@ -388,6 +395,18 @@ void C5SaleDoc::saveDataChanges()
     ui->leUuid->setText(uuid);
     ui->leDocnumber->setText(QString("%1%2").arg(prefix, QString::number(hallid)));
     fOpenedFromDraft = false;
+
+    db[":f_order"] = ui->leUuid->text();
+    db.exec("delete from b_clients_debts where f_order=:f_order");
+    if (fPartner.id.toInt() > 0) {
+        db[":f_costumer"] = fPartner.id;
+        db[":f_order"] = ui->leUuid->text();
+        db[":f_amount"] = ui->leGrandTotal->getDouble();
+        db[":f_date"] = ui->leDate->date();
+        db[":f_currency"] = 1;
+        db[":f_source"] = 1;
+        db.insert("b_clients_debts", false);
+    }
 
     if (isnew) {
         for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
@@ -545,6 +564,8 @@ bool C5SaleDoc::openDraft(const QString &id)
         return false;
     }
     fPartner.queryRecordOfId(db, fDraftSale.partner);
+    ui->leTaxpayerName->setText(fPartner.taxName);
+    ui->leTaxpayerId->setText(fPartner.taxCode);
 
     ui->leDate->setDate(fDraftSale.date);
     ui->leTime->setText(fDraftSale.time.toString(FORMAT_TIME_TO_STR));
@@ -574,9 +595,9 @@ bool C5SaleDoc::openDraft(const QString &id)
     case 2:
         ui->leCard->setDouble(ui->leGrandTotal->getDouble());
         break;
-//    case 3:
-//        //other
-//        break;
+    case 3:
+        ui->leBankTransfer->setDouble(ui->leGrandTotal->getDouble());
+        break;
     case 6:
         ui->leCard->setDouble(ui->leGrandTotal->getDouble());
         break;
@@ -678,3 +699,4 @@ void C5SaleDoc::on_btnSearchTaxpayer_clicked()
     ui->leTaxpayerName->setText(fPartner.taxName);
     ui->leTaxpayerId->setText(fPartner.taxCode);
 }
+

@@ -49,9 +49,9 @@ void Firebase::sendMessage(const QString &token, const QString &msg)
     jo["notification"] = joNotification;
     jo["data"] = joData;
     QByteArray requestData = QJsonDocument(jo).toJson(QJsonDocument::Compact);
-    QUrl url("https://fcm.googleapis.com/fcm/send");
+    QUrl url("https://fcm.googleapis.com/v1/projects/myproject-b5ae1/messages:send");
     QNetworkRequest request(url);
-    request.setRawHeader("Authorization", "key=AAAAZgyWwkI:APA91bG25x4KforbCz1OELojUItqEzr237p_6y3Z0BP5WP4DTGARrg4umKhJQLc1uVXbiVVdoPFru66S-YyskzisolRLUmYDdIUUFDg0fkgT0eVwmWE6XukybJJ_gsgziEI_p1XlX-5W");
+    request.setRawHeader("Authorization", "Bearer AIzaSyBhPq9j-KVryNw-T3evesRW35MG43qKdbo");
     request.setRawHeader("Content-Type", "application/json");
     fNetworkAccessManager->post(request, requestData);
 }
