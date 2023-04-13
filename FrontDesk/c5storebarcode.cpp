@@ -171,16 +171,17 @@ bool C5StoreBarcode::printOneBarcode2(const QString &code, const QString &price,
 
 
     QGraphicsScene gs;
+    gs.setSceneRect(0, 0, 400.0, 550.0);
     Barcode128 b;
-    qreal plen = 2;
+    qreal plen = 3;
     bool r = b.Encode128C(code.toLatin1().data());
     //b.DrawBarcode(painter, 20, 190, 300, 300, plen);
-    b.DrawBarcodeGS(gs, 20, 290, 300, 300, plen);
+    b.DrawBarcodeGS(gs, 50, 280, 150, 150, plen);
 
     QFont font = painter.font();
     font.setPointSize(font.pointSize() + 8);
     painter.setFont(font);
-    painter.drawImage(QRectF(75, 0, 150, 150), encodeImage);
+    painter.drawImage(QRectF(80, 0, 150, 150), encodeImage);
     QStringList sizes = QString("34,36,38,40,42").split(",");
 
     for (int i = 0; i < sizes.length(); i++) {
@@ -201,29 +202,9 @@ bool C5StoreBarcode::printOneBarcode2(const QString &code, const QString &price,
     font.setBold(false);
     painter.setFont(font);
 
-
-//    QSize size;
-//    QRect rc;
-//    int w, h, x, y;
-//    x=px.width();
-//    y=px.height();
-//    size=px.size();
-
-//    rc= QRect(0, 0, 550, 400);
-//    w=rc.width();
-//    h=rc.height();
-
-//    rc.setWidth(h);
-//    rc.setHeight(w);
-
-//    QPixmap rotatePixmap(size*2);
-//    QPainter p(&rotatePixmap);
-//    p.translate(rotatePixmap.size().width()/2,   rotatePixmap.size().height()/2);
-//    p.rotate(90);
-//    p.translate(-rotatePixmap.size().width()/2, -rotatePixmap.size().height()/2);
-//    p.drawPixmap(y,x, px);
-//    p.end();
-//    px=rotatePixmap.copy(0, 2*y-x, y, x);
+    QString code2 = QString("%1x%2x%3x%4").arg(code.mid(0, 2), code.mid(2, 3), code.mid(5, 2), code.mid(7, code.length() - 7));
+    painter.drawText(QPointF(50, 380), code2);
+    painter.drawText(QPointF(90, 420), price);
 
 
     QPainter pp(&printer);
