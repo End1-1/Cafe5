@@ -72,7 +72,7 @@ void RequestManager::handle(const QString &session, const QString &remoteHost, c
 
     CommandLine cl;
     QString path;
-    cl.value("path", path);
+    cl.value("dllpath", path);
     QString configFile = path + "/config.ini";
     Database db;
     if (db.open(configFile)) {

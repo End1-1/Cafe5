@@ -18,6 +18,8 @@ public:
 
     static bool dateRange(QDate &d1, QDate &d2);
 
+    static bool date(QDate &d);
+
 private slots:
     void on_btnCancel_clicked();
 

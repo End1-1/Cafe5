@@ -81,13 +81,7 @@ void DlgPaymentChoose::clearAll(QLineEdit *le)
 void DlgPaymentChoose::countChange()
 {
     double diff = ui->leCashIn->getDouble()
-            - ui->leCash->getDouble()
-            + ui->leCard->getDouble()
-            + ui->leIdram->getDouble()
-            + ui->leTelcell->getDouble()
-            + ui->leDebt->getDouble()
-            + ui->leBankTransfer->getDouble()
-            + ui->lePrepaid->getDouble();
+            - ui->leCash->getDouble();
     if (diff > ui->leCashIn->getDouble()) {
         diff = ui->leCashIn->getDouble();
     }

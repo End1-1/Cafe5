@@ -2,6 +2,8 @@
 #include <QFileInfo>
 #include <Windows.h>
 
+EXTERN_C IMAGE_DOS_HEADER __ImageBase;
+
 CommandLine::CommandLine()
 {
     QString cl = QString::fromWCharArray(GetCommandLine());
@@ -29,6 +31,12 @@ CommandLine::CommandLine()
         }
         fArgv[opt.at(0).toLower()] = opt.at(1);
     }
+
+    TCHAR   DllPath[MAX_PATH] = {0};
+    GetModuleFileName((HINSTANCE)&__ImageBase, DllPath, _countof(DllPath));
+        QFileInfo dllfi(QString::fromStdWString(DllPath));
+        fArgv["dllpath"] = dllfi.absolutePath();
+
 }
 
 bool CommandLine::value(const QString &k, QString &v)

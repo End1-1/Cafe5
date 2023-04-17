@@ -11,7 +11,7 @@ C5Route::C5Route(const QStringList &dbParams, QWidget *parent) :
     ui->setupUi(this);
     fLabel = tr("Route");
     fIcon = ":/route.png";
-    ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 0, 200, 300, 300, 100, 40, 40, 40, 40, 40, 40, 40);
+    ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 0, 80, 200, 300, 300, 100, 40, 40, 40, 40, 40, 40, 40);
     ui->cbDriver->disconnect(this, SLOT(on_cbDriver_currentIndexChanged(int)));
     ui->cbPartnerStatus->disconnect(this, SLOT(on_cbPartnerStatus_currentIndexChanged(int)));
     ui->cbPartnerStatus->setDBValues(fDBParams, "select f_id, f_name from c_partners_state", 0);
@@ -41,20 +41,44 @@ void C5Route::loadPartners()
     ui->tbl->clearContents();
     ui->tbl->setRowCount(0);
     C5Database db(fDBParams);
-    QString where = " where f_id>0 ";
+    db.exec("select f_rounds from o_route_round where f_id=1");
+    db.nextRow();
+    int round = db.getInt(0);
+    ui->tbl->setColumnCount(7 + (round * 8));
+    for (int r = 1; r < round + 1; r++) {
+        for (int w = 1; w < 9; w++) {
+            int c = 6 + ((r - 1) * 8) + w;
+            qDebug() << c;
+            if (w < 8) {
+                ui->tbl->setHorizontalHeaderItem(c, new QTableWidgetItem(QString("%1-%2").arg(r).arg(w)));
+            } else {
+                ui->tbl->setHorizontalHeaderItem(c, new QTableWidgetItem(QString("Q%1").arg(r)));
+            }
+        }
+    }
+    for (int i = 7; i < ui->tbl->columnCount(); i++) {
+        ui->tbl->setColumnWidth(i, 30);
+    }
+    QString where = " where p.f_id>0 ";
     if (ui->cbPartnerStatus->currentData().toInt() > 0) {
         where += " and f_state=" + ui->cbPartnerStatus->currentData().toString();
     }
-    db.exec(QString("select f_id, f_name, f_address, f_taxcode, f_taxname from c_partners %1 order by 2").arg(where));
+    db.exec(QString("select p.f_id, ps.f_name, p.f_name,  p.f_address, p.f_taxcode, p.f_taxname "
+                    "from c_partners p "
+                    "left join c_partners_state ps on ps.f_id=p.f_state "
+                    "%1 order by 2").arg(where));
     QMap<int, int> rowParner;
     while (db.nextRow()) {
         int r = ui->tbl->addEmptyRow();
         for (int i = 0; i < db.columnCount(); i++) {
             ui->tbl->setString(r, i + 1, db.getString(i));
         }
-        for (int i = 6; i < 13; i++) {
-            ui->tbl->setItem(r, i, new C5TableWidgetItem());
-            ui->tbl->item(r, i)->setCheckState(Qt::Unchecked);
+        for (int ro = 0; ro < round; ro++) {
+            for (int i = 7; i < 14; i++) {
+                int c = i + (ro * 8);
+                ui->tbl->setItem(r, c, new C5TableWidgetItem());
+                ui->tbl->item(r, c)->setCheckState(Qt::Unchecked);
+            }
         }
         rowParner[db.getInt(0)] = r;
     }
@@ -65,20 +89,15 @@ void C5Route::loadPartners()
             continue;
         }
         int r = rowParner[db.getInt("f_partner")];
-        ui->tbl->item(r, 6)->setCheckState(db.getInt("f_1") == 1 ? Qt::Checked : Qt::Unchecked);
-        ui->tbl->item(r, 7)->setCheckState(db.getInt("f_2") == 1 ? Qt::Checked : Qt::Unchecked);
-        ui->tbl->item(r, 8)->setCheckState(db.getInt("f_3") == 1 ? Qt::Checked : Qt::Unchecked);
-        ui->tbl->item(r, 9)->setCheckState(db.getInt("f_4") == 1 ? Qt::Checked : Qt::Unchecked);
-        ui->tbl->item(r, 10)->setCheckState(db.getInt("f_5") == 1 ? Qt::Checked : Qt::Unchecked);
-        ui->tbl->item(r, 11)->setCheckState(db.getInt("f_6") == 1 ? Qt::Checked : Qt::Unchecked);
-        ui->tbl->item(r, 12)->setCheckState(db.getInt("f_7") == 1 ? Qt::Checked : Qt::Unchecked);
-        ui->tbl->item(r, 13)->setData(Qt::EditRole, db.getInt("f_q1"));
-        ui->tbl->item(r, 14)->setData(Qt::EditRole, db.getInt("f_q2"));
-        ui->tbl->item(r, 15)->setData(Qt::EditRole, db.getInt("f_q3"));
-        ui->tbl->item(r, 16)->setData(Qt::EditRole, db.getInt("f_q4"));
-        ui->tbl->item(r, 17)->setData(Qt::EditRole, db.getInt("f_q5"));
-        ui->tbl->item(r, 18)->setData(Qt::EditRole, db.getInt("f_q6"));
-        ui->tbl->item(r, 19)->setData(Qt::EditRole, db.getInt("f_q7"));
+        int coloffcet = (db.getInt("f_round") - 1) * 8;
+        ui->tbl->item(r, 7 + coloffcet)->setCheckState(db.getInt("f_1") == 1 ? Qt::Checked : Qt::Unchecked);
+        ui->tbl->item(r, 8 + coloffcet)->setCheckState(db.getInt("f_2") == 1 ? Qt::Checked : Qt::Unchecked);
+        ui->tbl->item(r, 9 + coloffcet)->setCheckState(db.getInt("f_3") == 1 ? Qt::Checked : Qt::Unchecked);
+        ui->tbl->item(r, 10 + coloffcet)->setCheckState(db.getInt("f_4") == 1 ? Qt::Checked : Qt::Unchecked);
+        ui->tbl->item(r, 11 + coloffcet)->setCheckState(db.getInt("f_5") == 1 ? Qt::Checked : Qt::Unchecked);
+        ui->tbl->item(r, 12 + coloffcet)->setCheckState(db.getInt("f_6") == 1 ? Qt::Checked : Qt::Unchecked);
+        ui->tbl->item(r, 13 + coloffcet)->setCheckState(db.getInt("f_7") == 1 ? Qt::Checked : Qt::Unchecked);
+        ui->tbl->item(r, 14 + coloffcet)->setData(Qt::EditRole, db.getInt("f_q"));
 
     }
 }
@@ -104,36 +123,37 @@ void C5Route::on_leFilter_textChanged(const QString &arg1)
 
 void C5Route::saveDataChanges()
 {
+    C5Database db(fDBParams);
+    db.exec("select * from o_route_round where f_Id=1");
+    db.nextRow();
+    int round = db.getInt("f_rounds");
     QString sql;
     for (int i = 0; i < ui->tbl->rowCount(); i++) {
-        if (!sql.isEmpty()) {
-            sql += ",";
+        for (int r = 0; r < round; r++) {
+            if (!sql.isEmpty()) {
+                sql += ",";
+            }
+            int coloffcet = r * 8;
+            sql += QString("(%1, %2, %3, %4, %5, %6, %7, %8, %9, "
+                            "%10, %11)")
+                    .arg(QString::number(r + 1),
+                         ui->cbDriver->currentData().toString(),
+                        ui->tbl->getString(i, 1),
+                         ui->tbl->item(i, 7 + coloffcet)->checkState() == Qt::Checked ? "1" : "0",
+                         ui->tbl->item(i, 8 + coloffcet)->checkState() == Qt::Checked ? "1" : "0",
+                         ui->tbl->item(i, 9 + coloffcet)->checkState() == Qt::Checked ? "1" : "0",
+                         ui->tbl->item(i, 10 + coloffcet)->checkState() == Qt::Checked ? "1" : "0",
+                         ui->tbl->item(i, 11 + coloffcet)->checkState() == Qt::Checked ? "1" : "0",
+                         ui->tbl->item(i, 12 + coloffcet)->checkState() == Qt::Checked ? "1" : "0",
+                         ui->tbl->item(i, 13 + coloffcet)->checkState() == Qt::Checked ? "1" : "0",
+                         QString::number(ui->tbl->item(i, 14 + coloffcet)->data(Qt::EditRole).toString().toInt())
+                         );
         }
-        sql += QString("(%1, %2, %3, %4, %5, %6, %7, %8, %9, "
-                        "%10, %11, %12, %13, %14, %15, %16)")
-                .arg(ui->cbDriver->currentData().toString(),
-                    ui->tbl->getString(i, 1),
-                     ui->tbl->item(i, 6)->checkState() == Qt::Checked ? "1" : "0",
-                     ui->tbl->item(i, 7)->checkState() == Qt::Checked ? "1" : "0",
-                     ui->tbl->item(i, 8)->checkState() == Qt::Checked ? "1" : "0",
-                     ui->tbl->item(i, 9)->checkState() == Qt::Checked ? "1" : "0",
-                     ui->tbl->item(i, 10)->checkState() == Qt::Checked ? "1" : "0",
-                     ui->tbl->item(i, 11)->checkState() == Qt::Checked ? "1" : "0",
-                     ui->tbl->item(i, 12)->checkState() == Qt::Checked ? "1" : "0",
-                     QString::number(ui->tbl->item(i, 13)->data(Qt::EditRole).toString().toInt()),
-                     QString::number(ui->tbl->item(i, 14)->data(Qt::EditRole).toString().toInt()),
-                     QString::number(ui->tbl->item(i, 15)->data(Qt::EditRole).toString().toInt()),
-                     QString::number(ui->tbl->item(i, 16)->data(Qt::EditRole).toString().toInt()),
-                     QString::number(ui->tbl->item(i, 17)->data(Qt::EditRole).toString().toInt()),
-                     QString::number(ui->tbl->item(i, 18)->data(Qt::EditRole).toString().toInt()),
-                     QString::number(ui->tbl->item(i, 19)->data(Qt::EditRole).toString().toInt())
-                     );
     }
     if (!sql.isEmpty()) {
-    sql = QString("insert into o_route (f_driver, f_partner, f_1, f_2, f_3, f_4, f_5, f_6, f_7, f_q1, f_q2, f_q3, f_q4, f_q5, f_q6, f_q7) values %1")
+    sql = QString("insert into o_route (f_round, f_driver, f_partner, f_1, f_2, f_3, f_4, f_5, f_6, f_7, f_q) values %1")
             .arg(sql);
     }
-    C5Database db(fDBParams);
     db.startTransaction();
     QString where = " where f_driver=" + ui->cbDriver->currentData().toString();
     if (ui->cbPartnerStatus->currentData().toInt() > 0) {
@@ -163,32 +183,115 @@ void C5Route::on_tbl_doubleClicked(const QModelIndex &index)
     delete e;
 }
 
-void C5Route::on_cbPartnerStatus_currentIndexChanged(int index)
+void C5Route::on_btnGo_clicked()
 {
-    if (ui->tbl->rowCount() > 0) {
-        if (C5Message::question(tr("Save before change?")) == QDialog::Accepted) {
-            saveDataChanges();
-        }
-    }
-    if (ui->cbDriver->currentData().toInt() > 0) {
-        loadPartners();
-    }
-
+    loadPartners();
 }
 
-void C5Route::on_cbDriver_currentIndexChanged(int index)
+void C5Route::on_tbl_itemSelectionChanged()
 {
-    if (ui->tbl->rowCount() > 0) {
-        if (C5Message::question(tr("Save before change?")) == QDialog::Accepted) {
-            saveDataChanges();
+    int column = -1;
+    QModelIndexList mil = ui->tbl->selectionModel()->selectedIndexes();
+    if (mil.count() > 0) {
+        column = mil.at(0).column();
+        if (column == ui->tbl->currentColumn()){
+            if (column > 6) {
+                column -= 7;
+                column = column % 7;
+            }
+            ui->tbl->setEditTriggers(column == 0 ? QTableWidget::EditTrigger::AllEditTriggers : QTableWidget::EditTrigger::NoEditTriggers);
         }
-    }
-    if (ui->cbDriver->currentData().toInt() > 0) {
-        loadPartners();
     }
 }
 
-void C5Route::on_tbl_cellChanged(int row, int column)
+void C5Route::on_cI_clicked()
 {
-    ui->tbl->setEditTriggers(column > 12 ? QTableWidget::EditTrigger::AllEditTriggers : QTableWidget::EditTrigger::NoEditTriggers);
+    filterRows();
+}
+
+void C5Route::on_cII_clicked()
+{
+    filterRows();
+}
+
+void C5Route::on_cIII_clicked()
+{
+    filterRows();
+}
+
+void C5Route::on_cIV_clicked()
+{
+    filterRows();
+}
+
+void C5Route::on_cV_clicked()
+{
+    filterRows();
+}
+
+void C5Route::on_cVI_clicked()
+{
+    filterRows();
+}
+
+void C5Route::on_cVII_clicked()
+{
+    filterRows();
+}
+
+void C5Route::filterRows()
+{
+    for (int i = 0; i < ui->tbl->rowCount(); i++) {
+        bool h = true;
+        bool s = false;
+        for (int c = 7; c < ui->tbl->columnCount(); c += 8) {
+        if (ui->cI->isChecked()) {
+            s = true;
+            if (ui->tbl->item(i, c)->checkState() == Qt::Checked) {
+                h = false;
+            }
+        }
+        if (ui->cII->isChecked()) {
+            s = true;
+            if (ui->tbl->item(i, c + 1)->checkState() == Qt::Checked) {
+                h = false;
+            }
+        }
+        if (ui->cIII->isChecked()) {
+            s = true;
+            if (ui->tbl->item(i, c + 2)->checkState() == Qt::Checked) {
+                h = false;
+            }
+        }
+        if (ui->cIV->isChecked()) {
+            s = true;
+            if (ui->tbl->item(i, c + 3)->checkState() == Qt::Checked) {
+                h = false;
+            }
+        }
+        if (ui->cV->isChecked()) {
+            s = true;
+            if (ui->tbl->item(i, c + 4)->checkState() == Qt::Checked) {
+                h = false;
+            }
+        }
+        if (ui->cVI->isChecked()) {
+            s = true;
+            if (ui->tbl->item(i, c + 5)->checkState() == Qt::Checked) {
+                h = false;
+            }
+        }
+        if (ui->cVII->isChecked()) {
+            s = true;
+            if (ui->tbl->item(i, c + 6)->checkState() == Qt::Checked) {
+                h = false;
+            }
+        }
+        }
+        if (s) {
+            ui->tbl->setRowHidden(i, h);
+        } else {
+            ui->tbl->setRowHidden(i, false);
+        }
+    }
 }

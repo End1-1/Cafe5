@@ -81,8 +81,8 @@ WOrder::WOrder(C5User *user, int saleType, WCustomerDisplay *customerDisplay, QW
     ui->btnF4->setText(fWorking->flag(4).name);
     ui->btnF5->setText(fWorking->flag(5).name);
 
-    ui->tblData->setColumnWidth(col_bacode, 120);
-    ui->tblData->setColumnWidth(col_name, 300);
+    ui->tblData->setColumnWidth(col_bacode, 0);
+    ui->tblData->setColumnWidth(col_name, 400);
     ui->tblData->setColumnWidth(col_qty, 100);
     ui->tblData->setColumnWidth(col_unit, 100);
     ui->tblData->setColumnWidth(col_price, 100);

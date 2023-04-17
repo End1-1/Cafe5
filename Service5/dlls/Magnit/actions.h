@@ -12,6 +12,8 @@
 #define hqDebt 9
 #define hqRoute 10
 #define hqPreorderStock 11
+#define hqOpenOrder 12
+#define hqRemoveOrderRow 13
 
 #define pkOk "ok"
 #define pkMessage "message"

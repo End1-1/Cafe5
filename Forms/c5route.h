@@ -28,14 +28,27 @@ private slots:
 
     void on_tbl_doubleClicked(const QModelIndex &index);
 
-    void on_cbPartnerStatus_currentIndexChanged(int index);
+    void on_btnGo_clicked();
 
-    void on_cbDriver_currentIndexChanged(int index);
+    void on_tbl_itemSelectionChanged();
 
-    void on_tbl_cellChanged(int row, int column);
+    void on_cI_clicked();
+
+    void on_cII_clicked();
+
+    void on_cIII_clicked();
+
+    void on_cIV_clicked();
+
+    void on_cV_clicked();
+
+    void on_cVI_clicked();
+
+    void on_cVII_clicked();
 
 private:
     Ui::C5Route *ui;
+    void filterRows();
 };
 
 #endif // C5ROUTE_H

@@ -28,6 +28,7 @@ public:
     virtual QToolBar *toolBar() override;
 
 private slots:
+    void amountDoubleClicked();
     void printSale();
     void createInvoiceAS();
     void createRetailAS();
@@ -45,6 +46,10 @@ private slots:
     void on_cbHall_currentIndexChanged(int index);
     void on_btnSearchTaxpayer_clicked();
 
+    void on_btnRemoveDelivery_clicked();
+
+    void on_btnDelivery_clicked();
+
 private:
     Ui::C5SaleDoc *ui;
     CPartners fPartner;
@@ -52,8 +57,8 @@ private:
     ODraftSaleBody fDraftSaleBody;
     int fMode;
     QAction *fActionSave;
-    void addGoods(int goodsId, C5Database &db);
-    void addGoods(int store, int goodsId, const QString &barcode, const QString &name, const QString &unitname, double qty, double price);
+    int addGoods(int goodsId, C5Database &db);
+    int addGoods(int store, int goodsId, const QString &barcode, const QString &name, const QString &unitname, double qty, double price);
     void countGrandTotal();
     bool openDraft(const QString &id);
     bool fOpenedFromDraft;

@@ -10,6 +10,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QFile>
 
 void routes(QStringList &r)
 {
@@ -20,11 +21,17 @@ bool magnit(const QByteArray &indata, QByteArray &outdata, const QHash<QString, 
 {
     CommandLine cl;
     QString path;
-    cl.value("path", path);
+    cl.value("dllpath", path);
     Database db;
     JsonHandler jh;
     RequestHandler rh(outdata);
-    QString configFile = path + "/handlers/magnit.ini";
+    QString configFile = path + "/magnit.ini";
+    LogWriter::write(LogWriterLevel::errors, "", QString("Using config file: %1").arg(configFile));
+    if (!QFile::exists(configFile)) {
+        LogWriter::write(LogWriterLevel::errors, "", QString("Magnit config path not exists: %1").arg(configFile));
+        jh["message"] = "Server not configured";
+        return rh.setInternalServerError(jh.toString());
+    }
     if (!db.open(configFile)) {
         LogWriter::write(LogWriterLevel::errors, "", QString("ElinaShop::shoprequest").arg(db.lastDbError()));
         jh["message"] = "Cannot connect to database";

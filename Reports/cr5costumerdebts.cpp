@@ -16,6 +16,8 @@ CR5CostumerDebts::CR5CostumerDebts(const QStringList &dbParams, QWidget *parent)
     fColumnsSum << "f_amount";
     fColumnsSum << "f_amd";
     fColumnsSum << "f_usd";
+    fColumnsSum << "f_amountbank";
+    fColumnsSum << "f_amountdebt";
 
     fTranslation["f_order"] = tr("Sale document");
     fTranslation["f_storedoc"] = tr("Store document");

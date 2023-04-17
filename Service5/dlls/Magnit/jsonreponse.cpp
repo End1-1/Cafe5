@@ -50,6 +50,12 @@ void JsonReponse::getResponse()
     case hqPreorderStock:
         orderList();
         break;
+    case hqOpenOrder:
+        openOrder();
+        break;
+    case hqRemoveOrderRow:
+        removeOrderRow();
+        break;
     default:
         fJsonOut["ok"] = 0;
         fJsonOut["message"] = QString("%1 %2").arg(lkUnknownProtocol, fJsonIn["pkAction"].toString());
@@ -63,6 +69,20 @@ bool JsonReponse::dbFail()
     fJsonOut[pkOk] = 0;
     fJsonOut[pkMessage] = fDb.lastDbError();
     return false;
+}
+
+bool JsonReponse::error(const QString &err)
+{
+    fJsonOut = QJsonObject();
+    fJsonOut[pkOk] = 0;
+    fJsonOut[pkMessage] = err;
+    return false;
+}
+
+bool JsonReponse::ok()
+{
+    fJsonOut[pkOk] = 1;
+    return true;
 }
 
 void JsonReponse::dbToArray(Database &db, QJsonArray &ja)
@@ -268,9 +288,10 @@ bool JsonReponse::stock()
     return true;
 }
 
-void JsonReponse::saveOrder()
+bool JsonReponse::saveOrder()
 {
     QMap<QString, QVariant> sale;
+    sale[":f_id"] = fJsonIn["orderid"].toString();
     sale[":f_staff"] = fUserId;
     sale[":f_partner"] = fJsonIn["partner"]["id"].toInt();
     sale[":f_date"] = QDate::currentDate();
@@ -279,6 +300,7 @@ void JsonReponse::saveOrder()
     sale[":f_payment"] = fJsonIn["paymenttype"].toInt();
     sale[":f_saletype"] = fJsonIn["partner"]["pricepolitic"].toInt();
     sale[":f_discount"] = fJsonIn["partner"]["discount"].toDouble() / 100;
+    sale[":f_comment"] = fJsonIn["comment"].toString();
 
     QList<QMap<QString, QVariant> > saleBody;
 
@@ -291,58 +313,73 @@ void JsonReponse::saveOrder()
     sale[":f_payment"] = fJsonIn["paymenttype"].toInt();
     back[":f_saletype"] = 3;
     back[":f_discount"] = fJsonIn["partner"]["discount"].toDouble() / 100;
+    back[":f_comment"] = fJsonIn["comment"].toString();
 
     QList<QMap<QString, QVariant> > backBody;
 
     QJsonArray ja = fJsonIn["goods"].toArray();
     for (int i = 0; i < ja.size(); i++) {
         QJsonObject o = ja.at(i).toObject();
-        if (o["qtySale"].toDouble() > 0.001) {
+        if (o["qtysale"].toDouble() > 0.001) {
             QMap<QString, QVariant> sq;
+            sq[":f_id"] = o["dbuuid"].toString();
             sq[":f_goods"] = o["id"].toInt();
-            sq[":f_qty"] = o["qtySale"].toDouble();
+            sq[":f_qty"] = o["qtysale"].toDouble();
             sq[":f_state"] = 1;
             sq[":f_store"] = fJsonIn["storage"].toInt();
             sq[":f_price"] = o["price"].toDouble();
             saleBody.append(sq);
-            sale[":f_amount"] = sale[":f_amount"].toDouble() + (o["qtySale"].toDouble() * o["price"].toDouble());
+            sale[":f_amount"] = sale[":f_amount"].toDouble() + (o["qtysale"].toDouble() * o["price"].toDouble());
         }
-        if (o["qtyBack"].toDouble() > 0.001) {
+        if (o["qtyback"].toDouble() > 0.001) {
             QMap<QString, QVariant> sq;
             sq[":f_goods"] = o["id"].toInt();
-            sq[":f_qty"] = o["qtyBack"].toDouble();
+            sq[":f_qty"] = o["qtyback"].toDouble();
             sq[":f_state"] = 1;
             sq[":f_store"] = fJsonIn["storage"].toInt();;
             sq[":f_price"] = o["price"].toDouble();
             backBody.append(sq);
-            back[":f_amount"] = back[":f_amount"].toDouble() + (o["qtyBack"].toDouble() * o["price"].toDouble());
+            back[":f_amount"] = back[":f_amount"].toDouble() + (o["qtyback"].toDouble() * o["price"].toDouble());
         }
-        qDebug() << o;
     }
 
     fDb.startTransaction();
     if (!saleBody.isEmpty()) {
-        sale[":f_id"] = fDb.uuid();
+        bool u = !sale[":f_id"].toString().isEmpty();
+        if (!u) {
+            sale[":f_id"] = fDb.uuid();
+        }
         for (QMap<QString, QVariant>::const_iterator it = sale.constBegin(); it != sale.constEnd(); it++) {
             fDb[it.key()] = it.value();
         }
-        if (!fDb.insert("o_draft_sale")) {
-            fJsonOut[pkOk] = 0;
-            fJsonOut[pkMessage] = fDb.lastDbError();
-            fDb.rollback();
-            return;
+        if (u) {
+            if (!fDb.update("o_draft_sale", "f_id", sale[":f_id"])) {
+                return dbFail();
+            }
+        } else {
+            if (!fDb.insert("o_draft_sale")) {
+                fDb.rollback();
+                return dbFail();
+            }
         }
         for (QMap<QString, QVariant> &l: saleBody) {
+            u = !l[":f_id"].toString().isEmpty();
+            if (!u) {
+                l[":f_id"] = fDb.uuid();
+            }
             l[":f_header"] = sale[":f_id"];
-            l[":f_id"] = fDb.uuid();
             for (QMap<QString, QVariant>::const_iterator lt = l.constBegin(); lt != l.constEnd(); lt++) {
                 fDb[lt.key()] = lt.value();
             }
-            if (!fDb.insert("o_draft_sale_body")) {
-                fJsonOut[pkOk] = 0;
-                fJsonOut[pkMessage] = fDb.lastDbError();
-                fDb.rollback();
-                return;
+            if (u) {
+                if (!fDb.update("o_draft_sale_body", "f_id", l[":f_id"])) {
+                    return dbFail();
+                }
+            } else {
+                if (!fDb.insert("o_draft_sale_body")) {
+                    fDb.rollback();
+                    return dbFail();
+                }
             }
         }
     }
@@ -354,10 +391,8 @@ void JsonReponse::saveOrder()
         }
 
         if (!fDb.insert("o_draft_sale")) {
-            fJsonOut[pkOk] = 0;
-            fJsonOut[pkMessage] = fDb.lastDbError();
             fDb.rollback();
-            return;
+            return dbFail();
         }
         for (QMap<QString, QVariant> &l: backBody) {
             l[":f_header"] = back[":_id"];
@@ -366,17 +401,13 @@ void JsonReponse::saveOrder()
                 fDb[lt.key()] = lt.value();
             }
             if (!fDb.insert("o_draft_sale_body")) {
-                fJsonOut[pkOk] = 0;
-                fJsonOut[pkMessage] = fDb.lastDbError();
                 fDb.rollback();
-                return;
+                return dbFail();
             }
         }
     }
 
     fDb.commit();
-    qDebug() << saleBody ;
-    qDebug() << backBody;
     fJsonOut[pkOk] = 1;
 }
 
@@ -482,18 +513,26 @@ bool JsonReponse::orderList()
 bool JsonReponse::getRoute()
 {
     QDate date = QDate::fromString(fJsonIn[pkDate].toString(), "dd/MM/yyyy");
-    int day = date.dayOfWeek();
-    if (day == 0){
-        day = QDate::currentDate().dayOfWeek();
+    if (!date.isValid()) {
+        date = QDate::currentDate();
     }
+    int day = date.dayOfWeek();
+    fDb.exec("select f_started, f_rounds from o_route_round");
+    fDb.next();
+    QDate started = fDb.date("f_started");
+    int rounds = fDb.integer("f_rounds");
+    int dayOfRound = (started.daysTo(QDate::currentDate()) % (7 * rounds));
+    int round = dayOfRound / rounds;
+    round++;
     fDb[":f_driver"] = fUserId;
+    fDb[":f_round"] = round;
     if (!fDb.exec(QString("select r.f_partner as partnerid, p.f_name as partnername, p.f_address as address, cast(count(o.f_id) as signed) as orders "
                   "from o_route r  "
                   "left join o_draft_sale o on o.f_partner=r.f_partner "
                   "left join c_partners p on p.f_id=r.f_partner "
-                  "where f_%1=1 and f_driver=:f_driver "
+                  "where f_%1=1 and f_driver=:f_driver and f_round=:f_round "
                   "group by 1 "
-                  "order by f_q%1").arg(day))) {
+                  "order by f_q").arg(day))) {
         return dbFail();
     }
     QJsonArray ja;
@@ -501,4 +540,66 @@ bool JsonReponse::getRoute()
     fJsonOut[pkOk] = 1;
     fJsonOut[pkData] = ja;
     return true;
+}
+
+bool JsonReponse::openOrder()
+{
+    QString orderId = fJsonIn["id"].toString();
+    fDb[":f_id"] = orderId;
+    if (!fDb.exec("select o.f_partner, o.f_comment as comment, o.f_payment as paymenttype "
+                  "from o_draft_sale o where f_id=:f_id")) {
+        return dbFail();
+    }
+    QJsonArray ja;
+    dbToArray(fDb, ja);
+    if (ja.count() == 0) {
+        return error(lkInvalidOrderId);
+    }
+    QJsonObject jorder = ja.at(0).toObject();
+    fJsonOut["order"] = jorder;
+    fDb[":f_header"] = orderId;
+    fDb[":f_state"] = 1;
+    if (!fDb.exec("select dg.f_id as dbuuid, dg.f_id as intuuid, dg.f_goods as id, gr.f_name as groupname, g.f_name as goodsname, "
+                  "dg.f_price as price, dg.f_qty as qtySale, 0 as qtyBack, dg.f_store as storage, 0 as price1, 0 as price2 "
+                  "from o_draft_sale_body dg "
+                  "left join c_goods g on g.f_id=dg.f_goods "
+                  "left join c_groups gr on gr.f_id=g.f_group "
+                  "where dg.f_header=:f_header and dg.f_state=:f_state")) {
+        return dbFail();
+    }
+    ja = QJsonArray();
+    dbToArray(fDb, ja);
+    fJsonOut["goods"] = ja;
+
+    fDb[":f_id"] = jorder["f_partner"].toInt();
+    if (!fDb.exec("select pc.f_name as category, pg.f_name as `group`, ps.f_name as status, p.f_id as id, p.f_name as name, "
+            "p.f_address as address, p.f_taxname as taxName, p.f_taxcode as taxCode, p.f_contact as contact, "
+            "p.f_phone as phonenumber, p.f_permanent_discount as discount, p.f_price_politic as pricepolitic "
+            "from c_partners p "
+            "left join c_partners_state ps on ps.f_id=p.f_state "
+            "left join c_partners_group pg on pg.f_id=p.f_group "
+            "left join c_partners_category pc on pc.f_id=p.f_category "
+            "where p.f_id=:f_id")) {
+        return dbFail();
+    }
+    ja = QJsonArray();
+    dbToArray(fDb, ja);
+    if (ja.count() == 0) {
+
+    } else {
+        fJsonOut["partner"] = ja.at(0).toObject();
+    }
+    fJsonOut[pkOk] = 1;
+}
+
+bool JsonReponse::removeOrderRow()
+{
+    fDb[":f_state"] = 2;
+    fDb[":f_userremove"] = fUserId;
+    fDb[":f_dateremoved"] = QDate::currentDate();
+    fDb[":f_timeremoved"] = QTime::currentTime();
+    if (!fDb.update("o_draft_sale_body", "f_id", fJsonIn["dbuuid"].toString())) {
+        return dbFail();
+    }
+    return ok();
 }

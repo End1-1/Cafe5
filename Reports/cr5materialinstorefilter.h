@@ -24,6 +24,8 @@ public:
 
     bool showZero();
 
+    QString unit();
+
     QString currency() const;
 
     QString currencyName() const;

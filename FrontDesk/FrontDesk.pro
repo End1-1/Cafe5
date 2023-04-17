@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network printsupport sql
+QT       += core gui network printsupport sql multimedia
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -25,7 +25,6 @@ DEFINES += _APPLICATION_=\\\"Cafe5\\\"
 DEFINES += _MODULE_=\\\"FRONTDESK\\\"
 DEFINES += FRONTDESK
 
-DEFINES += Q_COMPILER_INITIALIZER_LISTS
 CONFIG += c++11
 
 # You can also make your code fail to compile if you use deprecated APIs.

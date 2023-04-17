@@ -19,6 +19,8 @@ private:
     int fUserId;
 
     bool dbFail();
+    bool error(const QString &err);
+    bool ok();
     void dbToArray(Database &db, QJsonArray &ja);
     bool checkAPIandFCMToken();
     void registerDevice();
@@ -26,12 +28,14 @@ private:
     bool downloadData();
     void checkHashOfPass();
     bool stock();
-    void saveOrder();
+    bool saveOrder();
     void preordersList();
     void preorderDetails();
     void getDebts();
     bool orderList();
     bool getRoute();
+    bool openOrder();
+    bool removeOrderRow();
 };
 
 #endif // JSONREPONSE_H

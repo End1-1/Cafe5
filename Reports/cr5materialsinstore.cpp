@@ -302,9 +302,22 @@ void CR5MaterialsInStore::printBarcode()
     C5StoreBarcode *b = __mainWindow->createTab<C5StoreBarcode>(fDBParams);
     b->fCurrencyName = s;
     for (int i = 0; i < fModel->rowCount(); i++) {
-        b->addRow(fModel->data(i, fModel->indexForColumnName("f_goods"), Qt::EditRole).toString(),
-                  fModel->data(i, fModel->indexForColumnName("f_scancode"), Qt::EditRole).toString(),
-                  fModel->data(i, fModel->indexForColumnName("f_qty"), Qt::EditRole).toInt(), fFilter->currency().toInt());
+        if (fFilter->unit().isEmpty()) {
+            b->addRow(fModel->data(i, fModel->indexForColumnName("f_goods"), Qt::EditRole).toString(),
+                      fModel->data(i, fModel->indexForColumnName("f_scancode"), Qt::EditRole).toString(),
+                      fModel->data(i, fModel->indexForColumnName("f_qty"), Qt::EditRole).toInt(), fFilter->currency().toInt());
+        } else if (fFilter->unit() == "10") {
+            db[":f_qty"] = fModel->data(i, fModel->indexForColumnName("f_qty"), Qt::EditRole);
+            db[":f_base"] = fModel->data(i, fModel->indexForColumnName("f_code"), Qt::EditRole);
+            db.exec("select g.f_name, g.f_id, g.f_scancode, c.f_qty*:f_qty as f_qty from c_goods_complectation c "
+                "left join c_goods g on g.f_id=c.f_goods "
+                "where c.f_base=:f_base ");
+            while (db.nextRow()) {
+                b->addRow(db.getString("f_name"),
+                          db.getString("f_scancode"),
+                          db.getDouble("f_qty"), fFilter->currency().toInt());
+            }
+        }
     }
 }
 

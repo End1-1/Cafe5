@@ -3,6 +3,7 @@
 #include "c5selector.h"
 #include "c5cache.h"
 #include "c5lineedit.h"
+#include <QTableWidgetItem>
 
 C5GoodsSpecialPrices::C5GoodsSpecialPrices(const QStringList &dbParams, QWidget *parent) :
     C5Widget(dbParams, parent),
@@ -11,12 +12,18 @@ C5GoodsSpecialPrices::C5GoodsSpecialPrices(const QStringList &dbParams, QWidget 
 {
     ui->setupUi(this);
     C5Database db(fDBParams);
-    db.exec("select f_id, f_name, f_address, f_taxname from c_partners");
-    while (db.nextRow()) {
-        ui->cbPartner->addItem(QString("%1, %2, %3")
-                               .arg(db.getString("f_name"), db.getString("f_address"), db.getString("f_taxname")), db.getInt("f_id"));
-    }
     ui->tbl->setColumnWidths(7, 0, 200, 200, 100, 100, 100);
+    ui->tblp->setColumnWidths(4, 0, 100, 200, 300);
+    ui->tblp->setMinimumWidth(620);
+    db.exec("select f_id, f_taxcode, f_name, f_address from c_partners order by 3, 4");
+    ui->tblp->setRowCount(db.rowCount());
+    int r = 0;
+    while (db.nextRow()) {
+        for (int i = 0; i < db.columnCount(); i++) {
+            ui->tblp->setItem(r, i, new C5TableWidgetItem(db.getValue(i).toString()));
+        }
+        r++;
+    }
 }
 
 C5GoodsSpecialPrices::~C5GoodsSpecialPrices()
@@ -34,18 +41,7 @@ QToolBar *C5GoodsSpecialPrices::toolBar()
     return fToolBar;
 }
 
-void C5GoodsSpecialPrices::on_cbPartner_currentIndexChanged(int index)
-{
-    if (fPartner > 0) {
-        if (C5Message::question(tr("Save before change?")) == QDialog::Accepted) {
-            saveDataChanges();
-        }
-    }
-    fPartner = ui->cbPartner->currentData().toInt();
-    getPrices();
-}
-
-void C5GoodsSpecialPrices::calcPercent(const QString &arg1)
+void C5GoodsSpecialPrices::calcPercent1(const QString &arg1)
 {
     C5LineEdit *l = static_cast<C5LineEdit*>(sender());
     int r, c;
@@ -53,6 +49,16 @@ void C5GoodsSpecialPrices::calcPercent(const QString &arg1)
         return;
     }
     ui->tbl->setDouble(r, 6, ((l->getDouble() * 100) / ui->tbl->getDouble(r, 3) - 100));
+}
+
+void C5GoodsSpecialPrices::calcPercent2(const QString &arg1)
+{
+    C5LineEdit *l = static_cast<C5LineEdit*>(sender());
+    int r, c;
+    if (!ui->tbl->findWidget(l, r, c)) {
+        return;
+    }
+    ui->tbl->setDouble(r, 7, ((l->getDouble() * 100) / ui->tbl->getDouble(r, 4) - 100));
 }
 
 void C5GoodsSpecialPrices::saveDataChanges()
@@ -73,6 +79,7 @@ void C5GoodsSpecialPrices::saveDataChanges()
         }
     }
     db.commit();
+    C5Message::info(tr("Saved"));
 }
 
 void C5GoodsSpecialPrices::getPrices()
@@ -90,7 +97,7 @@ void C5GoodsSpecialPrices::getPrices()
             "left join c_groups gr on gr.f_id=g.f_group "
             "left join c_goods_prices gp on gp.f_goods=g.f_id "
             "left join c_goods_special_prices sp on sp.f_goods=g.f_id and sp.f_partner=:f_partner "
-            "where gp.f_currency=1 ");
+            "where gp.f_currency=1 order by 2, 3");
     ui->tbl->setRowCount(db.rowCount());
     int r = 0;
     while (db.nextRow()) {
@@ -101,8 +108,63 @@ void C5GoodsSpecialPrices::getPrices()
         ui->tbl->setDouble(r, 4, db.getDouble("f_price2"));
         C5LineEdit *l = ui->tbl->createLineEdit(r, 5);
         l->setValidator(new QDoubleValidator(0, 99999999999, 2));
-        connect(l, &C5LineEdit::textChanged, this, &C5GoodsSpecialPrices::calcPercent);
+        connect(l, &C5LineEdit::textChanged, this, &C5GoodsSpecialPrices::calcPercent1);
         l->setDouble(db.getDouble("f_price"));
         r++;
     }
+    filterGoods();
+}
+
+void C5GoodsSpecialPrices::filterGoods()
+{
+    for (int i = 0; i < ui->tbl->rowCount(); i++) {
+        bool h = false;
+        if (!ui->leGoodsFilter->isEmpty()) {
+            if (!ui->tbl->getString(i, 2).contains(ui->leGoodsFilter->text(), Qt::CaseInsensitive)) {
+                h = true;
+            }
+        }
+        if (!ui->leGroupFilter->isEmpty() && !h) {
+            if (!ui->tbl->getString(i, 2).contains(ui->leGroupFilter->text(), Qt::CaseInsensitive)) {
+                h = true;
+            }
+        }
+        ui->tbl->setRowHidden(i, h);
+    }
+}
+
+void C5GoodsSpecialPrices::on_tblp_itemActivated(QTableWidgetItem *item)
+{
+
+}
+
+void C5GoodsSpecialPrices::on_tblp_itemClicked(QTableWidgetItem *item)
+{
+    saveDataChanges();
+    fPartner = ui->tblp->item(item->row(), 0)->data(Qt::EditRole).toInt();
+    getPrices();
+}
+
+void C5GoodsSpecialPrices::on_lePartnerFilter_textChanged(const QString &arg1)
+{
+    for (int i = 0; i < ui->tblp->rowCount(); i++) {
+        bool h = true;
+        for (int c = 1; c< ui->tblp->columnCount(); c++) {
+            if (ui->tblp->getString(i, c).contains(arg1, Qt::CaseInsensitive)) {
+                h = false;
+                break;
+            }
+        }
+        ui->tblp->setRowHidden(i, h);
+    }
+}
+
+void C5GoodsSpecialPrices::on_leGoodsFilter_textChanged(const QString &arg1)
+{
+    filterGoods();
+}
+
+void C5GoodsSpecialPrices::on_leGroupFilter_textChanged(const QString &arg1)
+{
+    filterGoods();
 }

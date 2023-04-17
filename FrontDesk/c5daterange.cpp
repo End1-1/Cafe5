@@ -23,6 +23,18 @@ bool C5DateRange::dateRange(QDate &d1, QDate &d2)
     return result;
 }
 
+bool C5DateRange::date(QDate &d)
+{
+    auto *a = new C5DateRange(QStringList());
+    a->ui->deEnd->setVisible(false);
+    a->ui->label_2->setVisible(false);
+    a->adjustSize();
+    bool result = a->exec() == QDialog::Accepted;
+    d = a->ui->deStart->date();
+    a->deleteLater();
+    return result;
+}
+
 void C5DateRange::on_btnCancel_clicked()
 {
     reject();

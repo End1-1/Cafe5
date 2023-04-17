@@ -52,7 +52,6 @@ void SocketThread::run()
     fSslSocket->setPrivateKey(fSslPrivateKey);
     fSslSocket->setProtocol(fSslProtocol);
     fSslSocket->startServerEncryption();
-    qDebug() << fSslSocket->isEncrypted() << fSslSocket->errorString();
     if (!fSslSocket->waitForEncrypted()) {
         qDebug() <<fSslSocket->errorString();
     }
@@ -362,8 +361,8 @@ QString SocketThread::data(const DataAddress &da) const
 
 void SocketThread::timeoutControl()
 {
-    fSslSocket->close();
-    LogWriter::write(LogWriterLevel::errors, property("session").toString(), tr("Connection timeout"));
+    LogWriter::write(LogWriterLevel::errors, property("session").toString(), QString("%1 %2").arg(tr("Connection timeout"), QHostAddress(fSslSocket->peerAddress().toIPv4Address()).toString()));
+    emit finished();
 }
 
 void SocketThread::readyRead()

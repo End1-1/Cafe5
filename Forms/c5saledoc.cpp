@@ -10,6 +10,7 @@
 #include "ce5goods.h"
 #include "c5storedraftwriter.h"
 #include "threadsendmessage.h"
+#include "c5daterange.h"
 #include <QClipboard>
 
 #define col_uuid 0
@@ -40,8 +41,14 @@ C5SaleDoc::C5SaleDoc(const QStringList &dbParams, QWidget *parent) :
     ui->cbHall->setDBValues(dbParams, "select f_id, f_name from h_halls order by 2");
     ui->cbHall->setCurrentIndex(ui->cbHall->findData(__c5config.getValue(param_default_hall).toInt()));
     ui->cbStorage->setCurrentIndex(ui->cbStorage->findData(__c5config.getValue(param_default_store).toInt()));
+    ui->cbCashDesk->setCurrentIndex(ui->cbCashDesk->findData(__c5config.getValue(param_default_table).toInt()));
     fOpenedFromDraft = false;
     connect(ui->leUuid, &C5LineEdit::doubleClicked, this, &C5SaleDoc::uuidDoubleClicked);
+    connect(ui->leBankTransfer, &C5LineEdit::doubleClicked, this, &C5SaleDoc::amountDoubleClicked);
+    connect(ui->leCash, &C5LineEdit::doubleClicked, this, &C5SaleDoc::amountDoubleClicked);
+    connect(ui->leCard, &C5LineEdit::doubleClicked, this, &C5SaleDoc::amountDoubleClicked);
+    connect(ui->lePrepaid, &C5LineEdit::doubleClicked, this, &C5SaleDoc::amountDoubleClicked);
+    connect(ui->leBankTransfer, &C5LineEdit::doubleClicked, this, &C5SaleDoc::amountDoubleClicked);
 }
 
 C5SaleDoc::~C5SaleDoc()
@@ -80,6 +87,16 @@ QToolBar *C5SaleDoc::toolBar()
         fToolBar->addAction(QIcon(":/print.png"), tr("Print"), this, SLOT(printSale()));
     }
     return fToolBar;
+}
+
+void C5SaleDoc::amountDoubleClicked()
+{
+    ui->leCash->clear();
+    ui->leCard->clear();
+    ui->leBankTransfer->clear();
+    ui->leDebt->clear();
+    ui->lePrepaid->clear();
+    static_cast<C5LineEdit*>(sender())->setDouble(ui->leGrandTotal->getDouble());
 }
 
 void C5SaleDoc::printSale()
@@ -459,7 +476,6 @@ void C5SaleDoc::on_QtyTextChanged(const QString &arg1)
     int r, c;
     if (ui->tblGoods->findWidget(l, r, c)) {
         ui->tblGoods->lineEdit(r, col_amount)->setDouble(str_float(arg1) * ui->tblGoods->lineEdit(r, col_price)->getDouble());
-        ui->tblGoods->setDouble(r, col_grandtotal, ui->tblGoods->lineEdit(r, col_amount)->getDouble());
         countGrandTotal();
     }
 }
@@ -489,7 +505,7 @@ void C5SaleDoc::on_leCmd_returnPressed()
     }
 }
 
-void C5SaleDoc::addGoods(int goodsId, C5Database &db)
+int C5SaleDoc::addGoods(int goodsId, C5Database &db)
 {
     QString priceField;
     switch (fMode) {
@@ -508,13 +524,13 @@ void C5SaleDoc::addGoods(int goodsId, C5Database &db)
             "left join c_units gu on gu.f_id=g.f_unit "
             "where g.f_id=:f_id and gpr.f_currency=:f_currency").arg(priceField));
     if (db.nextRow()) {
-        addGoods(ui->cbStorage->currentData().toInt(), goodsId, db.getString("f_scancode"), db.getString("f_name"), db.getString("f_unitname"), 0, db.getDouble("f_price"));
+        return addGoods(ui->cbStorage->currentData().toInt(), goodsId, db.getString("f_scancode"), db.getString("f_name"), db.getString("f_unitname"), 0, db.getDouble("f_price"));
     } else {
         C5Message::error(tr("Invalid goods id"));
     }
 }
 
-void C5SaleDoc::addGoods(int store, int goodsId, const QString &barcode, const QString &name, const QString &unitname, double qty, double price)
+int C5SaleDoc::addGoods(int store, int goodsId, const QString &barcode, const QString &name, const QString &unitname, double qty, double price)
 {
     int r = ui->tblGoods->addEmptyRow();
     ui->tblGoods->setString(r, col_uuid, "");
@@ -539,12 +555,14 @@ void C5SaleDoc::addGoods(int store, int goodsId, const QString &barcode, const Q
     }
     cs->setCurrentIndex(cs->findData(store));
     countGrandTotal();
+    return r;
 }
 
 void C5SaleDoc::countGrandTotal()
 {
     double total = 0;
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+        ui->tblGoods->setDouble(i, col_grandtotal, ui->tblGoods->lineEdit(i, col_amount)->getDouble());
         total += ui->tblGoods->getDouble(i, col_grandtotal);
     }
     ui->leGrandTotal->setDouble(total);
@@ -575,7 +593,7 @@ bool C5SaleDoc::openDraft(const QString &id)
     db[":f_header"] = id;
     db[":f_state"] = 1;
     db[":f_currency"] = ui->cbCurrency->currentData();
-    db.exec(QString("select dsb.f_store, dsb.f_qty, g.*, gu.f_name as f_unitname, gpr.%1 as f_price "
+    db.exec(QString("select dsb.f_store, dsb.f_qty, g.*, gu.f_name as f_unitname, dsb.f_price "
             "from o_draft_sale_body dsb "
             "left join c_goods g on g.f_id=dsb.f_goods "
             "left join c_goods_prices gpr on gpr.f_goods=g.f_id "
@@ -695,8 +713,21 @@ void C5SaleDoc::on_btnSearchTaxpayer_clicked()
         return;
     }
     C5Database db(fDBParams);
-    fPartner.queryRecordOfId(db, values.at(0));
+    fPartner.queryRecordOfId(db, values.at(1));
     ui->leTaxpayerName->setText(fPartner.taxName);
     ui->leTaxpayerId->setText(fPartner.taxCode);
 }
 
+
+void C5SaleDoc::on_btnRemoveDelivery_clicked()
+{
+    ui->leDelivery->clear();
+}
+
+void C5SaleDoc::on_btnDelivery_clicked()
+{
+    QDate d;
+    if (C5DateRange::date(d)) {
+        ui->leDelivery->setText(d.toString(FORMAT_DATE_TO_STR));
+    }
+}

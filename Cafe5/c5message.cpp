@@ -2,6 +2,8 @@
 #include "ui_c5message.h"
 #include "c5config.h"
 #include <QClipboard>
+#include <QTimer>
+#include <QSound>
 
 C5Message::C5Message(QWidget *parent) :
 #ifdef WAITER
@@ -16,6 +18,10 @@ C5Message::C5Message(QWidget *parent) :
     ui->frame->setFrameShape(QFrame::NoFrame);
 #endif
     ui->btnCopy->setVisible(false);
+
+    auto *timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, &C5Message::timeout);
+    timer->start(3000);
 }
 
 C5Message::~C5Message()
@@ -28,9 +34,9 @@ int C5Message::error(const QString &errorStr, const QString &yes, const QString 
     return showMessage(errorStr, 2, yes, no, "");
 }
 
-int C5Message::info(const QString &infoStr, const QString &yes, const QString &no)
+int C5Message::info(const QString &infoStr, const QString &yes, const QString &no, bool playSound)
 {
-    return showMessage(infoStr, 1, yes, no, "");
+    return showMessage(infoStr, 1, yes, no, "", playSound);
 }
 
 int C5Message::question(const QString &questionStr, const QString &yes, const QString &no, const QString &a3)
@@ -38,9 +44,17 @@ int C5Message::question(const QString &questionStr, const QString &yes, const QS
     return showMessage(questionStr, 3, yes, no, a3);
 }
 
-int C5Message::showMessage(const QString &text, int tp, const QString &yes, const QString &no, const QString &a3)
+void C5Message::timeout()
+{
+    if (fPlaySound) {
+        QSound::play(":/icq.wav");
+    }
+}
+
+int C5Message::showMessage(const QString &text, int tp, const QString &yes, const QString &no, const QString &a3, bool playsound)
 {
     C5Message *c5 = new C5Message(__c5config.fParentWidget);
+    c5->fPlaySound = playsound;
     c5->ui->btnYes->setText(yes);
     c5->ui->btnCancel->setText(no);
     if (no.isEmpty()) {

@@ -86,6 +86,11 @@ bool CR5MaterialInStoreFilter::showZero()
     return ui->chShowZeroes->isChecked();
 }
 
+QString CR5MaterialInStoreFilter::unit()
+{
+    return ui->leUnit->text();
+}
+
 QString CR5MaterialInStoreFilter::currency() const
 {
     return ui->leCurrency->text();

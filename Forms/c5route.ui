@@ -92,6 +92,85 @@
         </property>
        </spacer>
       </item>
+      <item>
+       <widget class="QPushButton" name="btnGo">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/right-arrow.png</normaloff>:/right-arrow.png</iconset>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="widget_2" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QCheckBox" name="cI">
+        <property name="text">
+         <string>I</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="cII">
+        <property name="text">
+         <string>II</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="cIII">
+        <property name="text">
+         <string>III</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="cIV">
+        <property name="text">
+         <string>IV</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="cV">
+        <property name="text">
+         <string>V</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="cVI">
+        <property name="text">
+         <string>VI</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="cVII">
+        <property name="text">
+         <string>VII</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>530</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
      </layout>
     </widget>
    </item>
@@ -124,6 +203,11 @@
      </column>
      <column>
       <property name="text">
+       <string>Partner status</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
        <string>Name</string>
       </property>
      </column>
@@ -142,90 +226,20 @@
        <string>Taxname</string>
       </property>
      </column>
-     <column>
-      <property name="text">
-       <string>I</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>II</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>III</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>IV</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>V</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>VI</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>VII</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>N-I</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>N-2</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>N-3</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>N-4</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>N-5</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>N-6</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>N-7</string>
-      </property>
-     </column>
     </widget>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5TableWidget</class>
-   <extends>QTableWidget</extends>
-   <header location="global">c5tablewidget.h</header>
-  </customwidget>
-  <customwidget>
    <class>C5LineEdit</class>
    <extends>QLineEdit</extends>
    <header location="global">c5lineedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5TableWidget</class>
+   <extends>QTableWidget</extends>
+   <header location="global">c5tablewidget.h</header>
   </customwidget>
   <customwidget>
    <class>C5ComboBox</class>
@@ -233,6 +247,8 @@
    <header location="global">c5combobox.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../resources/res.qrc"/>
+ </resources>
  <connections/>
 </ui>

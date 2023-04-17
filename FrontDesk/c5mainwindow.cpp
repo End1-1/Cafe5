@@ -104,7 +104,7 @@
 #include <QSpacerItem>
 #include <QListWidget>
 #include <QPropertyAnimation>
-//#include <QtMultimedia/QMediaPlayer>
+#include <QSound>
 #include <QToolButton>
 #include <QParallelAnimationGroup>
 
@@ -157,7 +157,11 @@ C5MainWindow::C5MainWindow(QWidget *parent) :
     ui->actionLogout->setVisible(false);
     ui->actionChange_password->setVisible(false);
     connect(&fUpdateTimer, SIGNAL(timeout()), this, SLOT(updateTimeout()));
-    fUpdateTimer.start(10000);
+#ifdef QT_DEBUG
+    fUpdateTimer.start(2000);
+#else
+ //   fUpdateTimer.start(10000);
+#endif
     ui->wMenu->resize(C5Config::getRegValue("twdbsize", 300).toInt(), 0);
 }
 
@@ -338,15 +342,8 @@ void C5MainWindow::updateTimeout()
     if (__user && __user->id() > 0) {
         C5Database db(ut->fDbParams);
         db.exec("select f_id from o_draft_sale where f_id not in (select f_header from o_draft_sound) and f_saletype<3 ");
-//        QMediaPlayer *player = new QMediaPlayer;
-//        if (db.rowCount() > 0) {
-//            player->setMedia(QUrl(":/icq.mp3"));
-//            player->setVolume(50);
-//            player->play();
-//        }
         while (db.nextRow()) {
-            C5Message::info(tr("New order!") + " " + db.getString("f_id"));
-            //player->stop();
+            C5Message::info(tr("New order!") + " " + db.getString("f_id"), tr("OK"), "", true);
             C5Database db2(db);
             db2[":f_header"] = db.getString("f_id");
             db2[":f_timeconfirmed"] = QDateTime::currentDateTime();
