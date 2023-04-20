@@ -30,6 +30,8 @@ private slots:
     void deleteGoods();
 
     void printBarCodes();
+
+    void armSoftMap();
 };
 
 #endif // CR5GOODS_H

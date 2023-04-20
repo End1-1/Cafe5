@@ -11,6 +11,9 @@ public:
     CR5GoodsPartners(const QStringList &dbParams, QWidget *parent = nullptr);
 
     virtual QToolBar *toolBar();
+
+public slots:
+    void armSoftMap();
 };
 
 #endif // CR5GOODSPARTNERS_H

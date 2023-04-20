@@ -60,6 +60,8 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
     ../Classes/removeshopsale.cpp \
     ../Classes/threadsendmessage.cpp \
+    ../Configs/breezeconfig.cpp \
+    ../Configs/config.cpp \
     ../Controls/c5cleartablewidget.cpp \
     ../Controls/c5combotable.cpp \
     ../Controls/c5guicontrols.cpp \
@@ -109,6 +111,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Editors/ce5ordermark.cpp \
     ../Editors/ce5packagelist.cpp \
     ../Editors/ce5storereason.cpp \
+    ../Forms/armsoftexportoptions.cpp \
     ../Forms/c5filtervalues.cpp \
     ../Forms/c5goodsspecialprices.cpp \
     ../Forms/c5printtaxanywhere.cpp \
@@ -123,12 +126,16 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Forms/dlgdataonline.cpp \
     ../Forms/dlgdirtystoredoc.cpp \
     ../Forms/dlgdriverroutedate.cpp \
+    ../Forms/dlglist.cpp \
     ../Forms/dlgnewcl.cpp \
     ../Forms/dlgreservgoods.cpp \
     ../Forms/dlgselectcurrency.cpp \
     ../Forms/dlgsemireadyinout.cpp \
     ../Forms/dlgsetwaiterordercl.cpp \
+    ../Forms/goodsasmap.cpp \
+    ../Forms/httpquerydialog.cpp \
     ../Forms/mfprocessproductpriceupdate.cpp \
+    ../Forms/partnersasmap.cpp \
     ../Reports/c5customfilter.cpp \
     ../Reports/cr5breezeservice.cpp \
     ../Reports/cr5carvisits.cpp \
@@ -381,6 +388,8 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Classes/proxytablewidgetdatabase.h \
     ../Classes/removeshopsale.h \
     ../Classes/threadsendmessage.h \
+    ../Configs/breezeconfig.h \
+    ../Configs/config.h \
     ../Controls/c5cleartablewidget.h \
     ../Controls/c5combotable.h \
     ../Controls/c5guicontrols.h \
@@ -430,6 +439,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Editors/ce5ordermark.h \
     ../Editors/ce5packagelist.h \
     ../Editors/ce5storereason.h \
+    ../Forms/armsoftexportoptions.h \
     ../Forms/c5filtervalues.h \
     ../Forms/c5goodsspecialprices.h \
     ../Forms/c5printtaxanywhere.h \
@@ -444,12 +454,16 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Forms/dlgdataonline.h \
     ../Forms/dlgdirtystoredoc.h \
     ../Forms/dlgdriverroutedate.h \
+    ../Forms/dlglist.h \
     ../Forms/dlgnewcl.h \
     ../Forms/dlgreservgoods.h \
     ../Forms/dlgselectcurrency.h \
     ../Forms/dlgsemireadyinout.h \
     ../Forms/dlgsetwaiterordercl.h \
+    ../Forms/goodsasmap.h \
+    ../Forms/httpquerydialog.h \
     ../Forms/mfprocessproductpriceupdate.h \
+    ../Forms/partnersasmap.h \
     ../Reports/c5customfilter.h \
     ../Reports/cr5breezeservice.h \
     ../Reports/cr5carvisits.h \
@@ -696,6 +710,7 @@ FORMS += \
     ../Editors/ce5ordermark.ui \
     ../Editors/ce5packagelist.ui \
     ../Editors/ce5storereason.ui \
+    ../Forms/armsoftexportoptions.ui \
     ../Forms/c5filtervalues.ui \
     ../Forms/c5goodsspecialprices.ui \
     ../Forms/c5printtaxanywhere.ui \
@@ -710,12 +725,16 @@ FORMS += \
     ../Forms/dlgdataonline.ui \
     ../Forms/dlgdirtystoredoc.ui \
     ../Forms/dlgdriverroutedate.ui \
+    ../Forms/dlglist.ui \
     ../Forms/dlgnewcl.ui \
     ../Forms/dlgreservgoods.ui \
     ../Forms/dlgselectcurrency.ui \
     ../Forms/dlgsemireadyinout.ui \
     ../Forms/dlgsetwaiterordercl.ui \
+    ../Forms/goodsasmap.ui \
+    ../Forms/httpquerydialog.ui \
     ../Forms/mfprocessproductpriceupdate.ui \
+    ../Forms/partnersasmap.ui \
     ../Reports/c5customfilter.ui \
     ../Reports/cr5breezeservice.ui \
     ../Reports/cr5carvisitsfilter.ui \
@@ -828,6 +847,7 @@ INCLUDEPATH += ../Waiter
 INCLUDEPATH += ../RESOURCES
 INCLUDEPATH += ../Service
 INCLUDEPATH += ../Forms
+INCLUDEPATH += ../Configs
 INCLUDEPATH += /projects/xlsx/src
 INCLUDEPATH += /Projects/NewTax/Src
 INCLUDEPATH += /Soft/OpenSSL-Win64/include

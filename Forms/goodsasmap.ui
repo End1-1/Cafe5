@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>GoodsAsMap</class>
+ <widget class="QWidget" name="GoodsAsMap">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1039</width>
+    <height>621</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout">
+   <item>
+    <widget class="C5TableWidget" name="tbl">
+     <column>
+      <property name="text">
+       <string>ID</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Group</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Name</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>C5TableWidget</class>
+   <extends>QTableWidget</extends>
+   <header location="global">c5tablewidget.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

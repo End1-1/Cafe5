@@ -36,6 +36,8 @@ private:
     bool getRoute();
     bool openOrder();
     bool removeOrderRow();
+    bool exportToAS();
+    bool getDriversList();
 };
 
 #endif // JSONREPONSE_H

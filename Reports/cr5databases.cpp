@@ -169,7 +169,9 @@ void CR5Databases::resetDatabase()
             db.exec("delete from a_header_shop2partneraccept");
             db.exec("delete from a_store");
             db.exec("delete from a_store_draft");
-            db.exec("delete from a_sale_temp");
+            db.exec("delete from o_draft_sale_body");
+            db.exec("delete from o_draft_sale");
+            db.exec("delete from o_draft_sound");
             db.exec("delete from e_cash");
             db.exec("delete from a_header_store");
             db.exec("delete from a_header_cash");

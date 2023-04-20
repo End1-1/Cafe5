@@ -7,6 +7,7 @@
 #include "cr5goodsfilter.h"
 #include "c5changepriceofgroup.h"
 #include "c5goodspricing.h"
+#include "goodsasmap.h"
 #include "c5storebarcode.h"
 #include <math.h>
 #include <QFile>
@@ -160,6 +161,7 @@ QToolBar *CR5Goods::toolBar()
             fToolBar->addAction(QIcon(":/scales.png"), tr("Scales"), this, SLOT(exportToScales()));
             fToolBar->addAction(QIcon(":/delete.png"), tr("Remove"), this, SLOT(deleteGoods()));
             fToolBar->addAction(QIcon(":/barcode.png"), tr("Print\nbarcode"), this, SLOT(printBarCodes()));
+            fToolBar->addAction(QIcon(":/AS.png"), tr("ArmSoft map"), this, SLOT(armSoftMap()));
     }
     return fToolBar;
 }
@@ -378,4 +380,9 @@ void CR5Goods::printBarCodes()
                   fModel->data(i, fModel->indexForColumnName("f_scancode"), Qt::EditRole).toString(),
                   1, fFilter->currency());
     }
+}
+
+void CR5Goods::armSoftMap()
+{
+    __mainWindow->createTab<GoodsAsMap>(fDBParams);
 }

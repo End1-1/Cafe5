@@ -2,6 +2,8 @@
 #include "c5cache.h"
 #include "c5editor.h"
 #include "ce5partner.h"
+#include "partnersasmap.h"
+#include "c5mainwindow.h"
 
 CR5GoodsPartners::CR5GoodsPartners(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
@@ -46,6 +48,12 @@ QToolBar *CR5GoodsPartners::toolBar()
             << ToolBarButtons::tbExcel
             << ToolBarButtons::tbPrint;
             createStandartToolbar(btn);
+             fToolBar->addAction(QIcon(":/AS.png"), tr("ArmSoft map"), this, SLOT(armSoftMap()));
     }
     return fToolBar;
+}
+
+void CR5GoodsPartners::armSoftMap()
+{
+    __mainWindow->createTab<PartnersAsMap>(fDBParams);
 }

@@ -62,6 +62,11 @@ bool Database::open(const QString &host, const QString &schema, const QString &u
     return true;
 }
 
+bool Database::open(const QJsonObject &o)
+{
+    return open(o["host"].toString(), o["schema"].toString(), o["username"].toString(), o["password"].toString());
+}
+
 bool Database::startTransaction()
 {
     return fSqlDatabase.transaction();

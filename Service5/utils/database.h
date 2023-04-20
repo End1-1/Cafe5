@@ -7,6 +7,7 @@
 #include <QVariant>
 #include <QSqlError>
 #include <QDateTime>
+#include <QJsonObject>
 
 class Database
 {
@@ -18,6 +19,7 @@ public:
     QSqlDatabase fSqlDatabase;
     bool open(const QString &configFile);
     bool open(const QString &host, const QString &schema, const QString &username, const QString &password);
+    bool open(const QJsonObject &o);
     bool startTransaction();
     bool commit();
     bool rollback();

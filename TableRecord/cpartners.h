@@ -6,8 +6,12 @@
 class CPartners : public TableRecord
 {
 public:
+    int category = 0;
+    QString categoryName;
     int state = 0;
+    QString stateName;
     int group = 0;
+    QString groupName;
     QString taxCode;
     QString taxName;
     QString contact;

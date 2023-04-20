@@ -19,6 +19,7 @@ SOURCES += \
     ../../utils/database.cpp \
     ../../utils/jsonhandler.cpp \
     ../../utils/logwriter.cpp \
+    armsoft.cpp \
     jsonreponse.cpp \
     locale.cpp \
     magnit.cpp
@@ -33,6 +34,7 @@ HEADERS += \
     ../../utils/jsonhandler.h \
     ../../utils/logwriter.h \
     actions.h \
+    armsoft.h \
     jsonreponse.h \
     locale.h \
     magnit.h

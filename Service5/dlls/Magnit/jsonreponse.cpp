@@ -1,6 +1,8 @@
 #include "jsonreponse.h"
 #include "actions.h"
 #include "locale.h"
+#include "armsoft.h"
+
 JsonReponse::JsonReponse(Database &db, const QJsonObject &ji, QJsonObject &jo) :
     fDb(db),
     fJsonIn(ji),
@@ -55,6 +57,12 @@ void JsonReponse::getResponse()
         break;
     case hqRemoveOrderRow:
         removeOrderRow();
+        break;
+    case hqExportToAS:
+        exportToAS();
+        break;
+    case hqDriverList:
+        getDriversList();
         break;
     default:
         fJsonOut["ok"] = 0;
@@ -125,6 +133,20 @@ bool JsonReponse::checkAPIandFCMToken()
         return false;
     }
     fDeviceId = fDb.integer("f_id");
+    //If pass hash not exists, use username and password to authenticate
+    if (fJsonIn[pkAction].toInt() != hqLogin && fJsonIn[pkAction].toInt() != hqRegisterDevice && fJsonIn.contains(pkUsername)) {
+        fDb[":f_login"] = fJsonIn[pkUsername].toString();
+        fDb[":f_password"] = fJsonIn[pkPassword].toString();
+        fDb.exec("select * from s_user where f_login=:f_login and f_password=md5(:f_password)");
+        if (!fDb.next()) {
+            fJsonOut["ok"] = 0;
+            fJsonOut["message"] = lkInvalidCredentials;
+            return false;
+        }
+        fUserId = fDb.integer("f_id");
+        return true;
+    }
+    //user password hash
     if (fJsonIn[pkAction].toInt() != hqLogin && fJsonIn[pkAction].toInt() != hqRegisterDevice) {
         fDb[":f_passhash"] = fJsonIn[pkPassHash].toString();
         fDb.exec("select * from s_user where f_passhash=:f_passhash");
@@ -516,15 +538,20 @@ bool JsonReponse::getRoute()
     if (!date.isValid()) {
         date = QDate::currentDate();
     }
+    int driver = fJsonIn[pkDriver].toInt();
+    if (driver == 0) {
+        driver = fUserId;
+    }
     int day = date.dayOfWeek();
     fDb.exec("select f_started, f_rounds from o_route_round");
     fDb.next();
     QDate started = fDb.date("f_started");
     int rounds = fDb.integer("f_rounds");
-    int dayOfRound = (started.daysTo(QDate::currentDate()) % (7 * rounds));
-    int round = dayOfRound / rounds;
+    int daysAfter = started.daysTo(date);
+    int dayOfRound = (daysAfter % (7 * rounds));
+    int round = dayOfRound / 7;
     round++;
-    fDb[":f_driver"] = fUserId;
+    fDb[":f_driver"] = driver;
     fDb[":f_round"] = round;
     if (!fDb.exec(QString("select r.f_partner as partnerid, p.f_name as partnername, p.f_address as address, cast(count(o.f_id) as signed) as orders "
                   "from o_route r  "
@@ -602,4 +629,28 @@ bool JsonReponse::removeOrderRow()
         return dbFail();
     }
     return ok();
+}
+
+bool JsonReponse::exportToAS()
+{
+    QString err;
+    ArmSoft a(fJsonIn);
+    if (!a.exportToAS(fJsonIn["draftid"].toString(), err)) {
+        return error(err);
+    }
+    return true;
+}
+
+bool JsonReponse::getDriversList()
+{
+    if (!fDb.exec("select distinct(u.f_id) as id, concat_ws(' ', u.f_last, u.f_first) as name "
+            "from o_route r "
+            "left join s_user u on u.f_id=r.f_driver ")) {
+        return dbFail();
+    }
+    QJsonArray ja;
+    dbToArray(fDb, ja);
+    fJsonOut[pkOk] = 1;
+    fJsonOut[pkData] = ja;
+    return true;
 }

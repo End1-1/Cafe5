@@ -9,6 +9,7 @@ static const char* lkDeviceNotRegistered = "Device doesn't registered";
 static const char* lkInvalidPin = "Invalid pin";
 static const char* lkInvalidHash = "Invalid password hash";
 static const char* lkInvalidOrderId = "Invalid order id";
+static const char* lkInvalidCredentials = "Invalid credentials";
 
 #define lk(v) Locale::getStringOf(const QString &key)
 

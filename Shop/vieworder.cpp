@@ -620,8 +620,20 @@ void ViewOrder::on_btnMakeDraft_clicked()
         }
         db[":f_store"] = ui->tbl->getInteger(i, 10);
         db[":f_goods"] = goods;
-        db[":f_qty"] = ui->tbl->getDouble(i, 3);
-        db.exec("update a_store_sale set f_qty=f_qty+:f_qty where f_store=:f_store and f_goods=:f_goods");
+        db.exec("select * from a_store_sale where f_store=:f_store and f_goods=:f_goods");
+        if (db.nextRow()) {
+            db[":f_store"] = ui->tbl->getInteger(i, 10);
+            db[":f_goods"] = goods;
+            db[":f_qty"] = ui->tbl->getDouble(i, 3);
+            db.exec("update a_store_sale set f_qty=f_qty+:f_qty where f_store=:f_store and f_goods=:f_goods");
+        } else {
+            db[":f_store"] = ui->tbl->getInteger(i, 10);
+            db[":f_goods"] = goods;
+            db[":f_qty"] = ui->tbl->getDouble(i, 3);
+            db[":f_qtyreserve"] = 0;
+            db[":f_qtyprogram"] = 0;
+            db.insert("a_store_sale", false);
+        }
         wo->setQtyOfRow(r, ui->tbl->getDouble(i, 3));
         wo->setPriceOfRow(r, ui->tbl->getDouble(i, 4));
     }

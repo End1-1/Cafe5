@@ -11,6 +11,11 @@
 #include "c5storedraftwriter.h"
 #include "threadsendmessage.h"
 #include "c5daterange.h"
+#include "breezeconfig.h"
+#include "armsoftexportoptions.h"
+#include "dlglist.h"
+#include "httpquerydialog.h"
+#include "ce5partner.h"
 #include <QClipboard>
 
 #define col_uuid 0
@@ -111,12 +116,12 @@ void C5SaleDoc::printSale()
 
 void C5SaleDoc::createInvoiceAS()
 {
-    C5Message::error(tr("ArmSoft not configured"));
+    exportToAs(5);
 }
 
 void C5SaleDoc::createRetailAS()
 {
-    C5Message::error(tr("ArmSoft not configured"));
+    exportToAs(20);
 }
 
 void C5SaleDoc::messageResult(QJsonObject jo)
@@ -581,9 +586,17 @@ bool C5SaleDoc::openDraft(const QString &id)
         C5Message::error(tr("This draft not editable"));
         return false;
     }
+    switch (db.getInt("f_saletype")) {
+    case 1:
+        ui->leSaleType->setText(tr("Retail"));
+        break;
+    case 2:
+        ui->leSaleType->setText(tr("Whosale"));
+        break;
+    }
+
     fPartner.queryRecordOfId(db, fDraftSale.partner);
-    ui->leTaxpayerName->setText(fPartner.taxName);
-    ui->leTaxpayerId->setText(fPartner.taxCode);
+    setPartner();
 
     ui->leDate->setDate(fDraftSale.date);
     ui->leTime->setText(fDraftSale.time.toString(FORMAT_TIME_TO_STR));
@@ -625,6 +638,63 @@ bool C5SaleDoc::openDraft(const QString &id)
     }
 
     return true;
+}
+
+void C5SaleDoc::setPartner()
+{
+    ui->leTaxpayerName->setText(QString("%1, %2, %3").arg(fPartner.categoryName, fPartner.groupName, fPartner.taxName));
+    ui->leTaxpayerId->setText(fPartner.taxCode);
+}
+
+void C5SaleDoc::exportToAs(int doctype)
+{
+    C5Database db(fDBParams);
+    db.exec("select * from as_list");
+    if (db.rowCount() == 0) {
+        C5Message::error(tr("ArmSoft is not configure"));
+        return;
+    }
+    int dbid;
+    QString connStr;
+    if (db.rowCount() > 0) {
+        QStringList dbNames;
+        while (db.nextRow()) {
+            dbNames.append(db.getString("f_name"));
+        }
+        int index = DlgList::indexOfList(tr("Armsoft database"), fDBParams, dbNames);
+        if (index < 0) {
+            return;
+        }
+        dbid = db.getInt(index, "f_id");
+        connStr = db.getString(index, "f_connectionstring");
+    } else {
+        dbid = db.getInt(0, "f_id");
+        connStr = db.getString(0, "f_connectionstring");
+    }
+
+    BreezeConfig *b = Config::construct<BreezeConfig>(fDBParams, 1);
+    QJsonObject jo;
+    jo["pkServerAPIKey"] = b->apiKey;
+    jo["pkFcmToken"] = "0123456789";
+    jo["pkUsername"] = b->username;
+    jo["pkPassword"] = b->password;
+    jo["pkAction"] = 14;
+    jo["asconnectionstring"] = connStr;
+    jo["asdbid"] = dbid;
+    jo["draftid"] = ui->leUuid->text();
+    jo["doctype"] = doctype;
+    jo["lesexpenseacc"] = __c5config.getRegValue("lesexpenseacc", "").toString();
+    jo["lesincomeacc"] = __c5config.getRegValue("lesincomeacc", "").toString();
+    jo["lemexpenseacc"] = __c5config.getRegValue("lesexpenseacc", "").toString();
+    jo["lemincomeacc"] = __c5config.getRegValue("lesincomeacc", "").toString();
+    QJsonObject jdb;
+    jdb["host"] = fDBParams.at(0);
+    jdb["schema"] = fDBParams.at(1);
+    jdb["username"] = fDBParams.at(2);
+    jdb["password"] = fDBParams.at(3);
+    jo["database"] = jdb;
+    HttpQueryDialog *qd = new HttpQueryDialog(fDBParams, QString("https://%1:%2/magnit").arg(b->ipAddress, QString::number(b->port)), jo, this);
+    qd->exec();
 }
 
 void C5SaleDoc::on_btnAddGoods_clicked()
@@ -730,4 +800,30 @@ void C5SaleDoc::on_btnDelivery_clicked()
     if (C5DateRange::date(d)) {
         ui->leDelivery->setText(d.toString(FORMAT_DATE_TO_STR));
     }
+}
+
+void C5SaleDoc::on_btnEditPartner_clicked()
+{
+    if (fPartner.id.toInt() > 0) {
+        CE5Partner *ep = new CE5Partner(fDBParams);
+        C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
+        ep->setId(fPartner.id.toInt());
+        QList<QMap<QString, QVariant> > data;
+        if(e->getResult(data)) {
+            if (data.at(0)["f_id"].toInt() == 0) {
+                C5Message::error(tr("Cannot change partner without code"));
+                return;
+            }
+            C5Database db(fDBParams);
+            fPartner.queryRecordOfId(db, fPartner.id);
+            setPartner();
+        }
+        delete e;
+    }
+}
+
+void C5SaleDoc::on_btnEditAccounts_clicked()
+{
+    ArmSoftExportOptions d(fDBParams);
+    d.exec();
 }

@@ -3,7 +3,12 @@
 CPartners &CPartners::queryRecordOfId(C5Database &db, const QVariant &id)
 {
     db[":f_id"] = id;
-    db.exec("select * from c_partners where f_id=:f_id");
+    db.exec("select p.*, pc.f_name as f_categoryname, ps.f_name as f_statename, pg.f_name as f_groupname "
+            "from c_partners p "
+            "left join c_partners_state ps on ps.f_id=p.f_state "
+            "left join c_partners_group pg on pg.f_id=p.f_group "
+            "left join c_partners_category pc on pc.f_id=p.f_category "
+            "where p.f_id=:f_id");
     getRecord(db);
     return *this;
 }
@@ -14,8 +19,12 @@ bool CPartners::getRecord(C5Database &db)
         return false;
     }
     id = db.getInt("f_id");
+    category= db.getInt("f_category");
+    categoryName = db.getString("f_categoryname");
     state = db.getInt("f_state");
+    stateName = db.getString("f_statename");
     group = db.getInt("f_group");
+    groupName = db.getString("f_groupname");
     taxCode = db.getString("f_taxcode");
     taxName = db.getString("f_taxname");
     contact = db.getString("f_contact");

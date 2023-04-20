@@ -45,10 +45,11 @@ private slots:
     void on_btnNewGoods_clicked();
     void on_cbHall_currentIndexChanged(int index);
     void on_btnSearchTaxpayer_clicked();
-
     void on_btnRemoveDelivery_clicked();
-
     void on_btnDelivery_clicked();
+    void on_btnEditPartner_clicked();
+
+    void on_btnEditAccounts_clicked();
 
 private:
     Ui::C5SaleDoc *ui;
@@ -61,6 +62,8 @@ private:
     int addGoods(int store, int goodsId, const QString &barcode, const QString &name, const QString &unitname, double qty, double price);
     void countGrandTotal();
     bool openDraft(const QString &id);
+    void setPartner();
+    void exportToAs(int doctype);
     bool fOpenedFromDraft;
     QMap<int, QString> fListOfStorages;
 };

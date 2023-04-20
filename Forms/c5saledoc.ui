@@ -60,86 +60,10 @@
        <number>0</number>
       </property>
       <item row="2" column="3">
-       <widget class="C5ComboBox" name="cbHall"/>
-      </item>
-      <item row="2" column="2">
-       <widget class="QLabel" name="label_17">
-        <property name="text">
-         <string>Hall</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="4">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Number</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="8">
-       <widget class="C5LineEdit" name="leUuid">
-        <property name="minimumSize">
-         <size>
-          <width>300</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="toolTip">
-         <string>Double click to copy to the clipboard</string>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="4">
-       <widget class="QLabel" name="label_18">
-        <property name="text">
-         <string>Cash desk</string>
-        </property>
-       </widget>
+       <widget class="C5ComboBox" name="cbCashDesk"/>
       </item>
       <item row="1" column="7">
-       <widget class="QLabel" name="label_14">
-        <property name="text">
-         <string>Currency</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="9">
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="1" column="1">
-       <widget class="C5LineEdit" name="leTaxpayerId">
-        <property name="minimumSize">
-         <size>
-          <width>150</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>150</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="9">
-       <widget class="QPushButton" name="btnDelivery">
+       <widget class="QPushButton" name="btnEditPartner">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -155,21 +79,31 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="7">
-       <widget class="QLabel" name="label_4">
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_17">
         <property name="text">
-         <string>UUID</string>
+         <string>Hall</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="7">
-       <widget class="QLabel" name="label_21">
+      <item row="1" column="2">
+       <widget class="QLabel" name="label_6">
         <property name="text">
-         <string>Delivery</string>
+         <string>Taxpayer name</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="10">
+      <item row="2" column="5">
+       <widget class="C5ComboBox" name="cbStorage"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Taxpayer id</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="13">
        <widget class="QPushButton" name="btnRemoveDelivery">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -186,28 +120,21 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="2">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Time</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1" colspan="5">
-       <widget class="C5LineEdit" name="leComment">
+      <item row="1" column="3" colspan="3">
+       <widget class="C5LineEdit" name="leTaxpayerName">
         <property name="minimumSize">
          <size>
-          <width>150</width>
+          <width>300</width>
           <height>0</height>
          </size>
         </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>16777215</height>
-         </size>
+        <property name="readOnly">
+         <bool>true</bool>
         </property>
        </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="C5ComboBox" name="cbHall"/>
       </item>
       <item row="0" column="5">
        <widget class="C5LineEdit" name="leDocnumber">
@@ -228,28 +155,18 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="8">
-       <widget class="C5ComboBox" name="cbCurrency"/>
-      </item>
-      <item row="2" column="5">
-       <widget class="C5ComboBox" name="cbCashDesk"/>
-      </item>
-      <item row="2" column="8">
-       <widget class="C5ComboBox" name="cbStorage"/>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="label_16">
-        <property name="text">
-         <string>Comment</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="3" colspan="3">
-       <widget class="C5LineEdit" name="leTaxpayerName">
+      <item row="1" column="1">
+       <widget class="C5LineEdit" name="leTaxpayerId">
         <property name="minimumSize">
          <size>
-          <width>300</width>
+          <width>150</width>
           <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>150</width>
+          <height>16777215</height>
          </size>
         </property>
         <property name="readOnly">
@@ -257,10 +174,17 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_5">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
         <property name="text">
-         <string>Taxpayer id</string>
+         <string>Date</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="8">
+       <widget class="QLabel" name="label_14">
+        <property name="text">
+         <string>Currency</string>
         </property>
        </widget>
       </item>
@@ -277,34 +201,24 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="2">
-       <widget class="QLabel" name="label_6">
+      <item row="3" column="8">
+       <widget class="QLabel" name="label_21">
         <property name="text">
-         <string>Taxpayer name</string>
+         <string>Delivery</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="6">
-       <widget class="QPushButton" name="btnSearchTaxpayer">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
+      <item row="0" column="8">
+       <widget class="QLabel" name="label_4">
         <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset resource="../resources/res.qrc">
-          <normaloff>:/search.png</normaloff>:/search.png</iconset>
+         <string>UUID</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label">
+      <item row="0" column="4">
+       <widget class="QLabel" name="label_3">
         <property name="text">
-         <string>Date</string>
+         <string>Number</string>
         </property>
        </widget>
       </item>
@@ -327,17 +241,151 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="8">
+      <item row="0" column="6">
+       <widget class="QPushButton" name="btnEditAccounts">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/configure.png</normaloff>:/configure.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Time</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QLabel" name="label_18">
+        <property name="text">
+         <string>Cash desk</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="6">
+       <widget class="QPushButton" name="btnSearchTaxpayer">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/search.png</normaloff>:/search.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="12">
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="3" column="12">
+       <widget class="QPushButton" name="btnDelivery">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1" colspan="5">
+       <widget class="C5LineEdit" name="leComment">
+        <property name="minimumSize">
+         <size>
+          <width>150</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="4">
+       <widget class="QLabel" name="label_15">
+        <property name="text">
+         <string>Store</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_16">
+        <property name="text">
+         <string>Comment</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="9">
+       <widget class="C5LineEdit" name="leUuid">
+        <property name="minimumSize">
+         <size>
+          <width>250</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>Double click to copy to the clipboard</string>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="9">
+       <widget class="C5ComboBox" name="cbCurrency"/>
+      </item>
+      <item row="3" column="9">
        <widget class="C5LineEdit" name="leDelivery">
         <property name="readOnly">
          <bool>true</bool>
         </property>
        </widget>
       </item>
-      <item row="2" column="7">
-       <widget class="QLabel" name="label_15">
+      <item row="1" column="8">
+       <widget class="QLabel" name="label_22">
         <property name="text">
-         <string>Store</string>
+         <string>Sale type</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="9">
+       <widget class="C5LineEdit" name="leSaleType">
+        <property name="readOnly">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -766,14 +814,9 @@
  <tabstops>
   <tabstop>leTime</tabstop>
   <tabstop>leDocnumber</tabstop>
-  <tabstop>leUuid</tabstop>
   <tabstop>leTaxpayerId</tabstop>
   <tabstop>leTaxpayerName</tabstop>
   <tabstop>btnSearchTaxpayer</tabstop>
-  <tabstop>cbCurrency</tabstop>
-  <tabstop>cbHall</tabstop>
-  <tabstop>cbCashDesk</tabstop>
-  <tabstop>cbStorage</tabstop>
   <tabstop>leDate</tabstop>
   <tabstop>leComment</tabstop>
   <tabstop>tblGoods</tabstop>

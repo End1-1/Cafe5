@@ -14,6 +14,8 @@
 #define hqPreorderStock 11
 #define hqOpenOrder 12
 #define hqRemoveOrderRow 13
+#define hqExportToAS 14
+#define hqDriverList 15
 
 #define pkOk "ok"
 #define pkMessage "message"
@@ -22,6 +24,10 @@
 #define pkPassHash "pkPassHash"
 #define pkData "pkData"
 #define pkGroup "pkGroup"
+#define pkDate "pkDate"
+#define pkDriver "pkDriver"
+#define pkUsername "pkUsername"
+#define pkPassword "pkPassword"
 #define pkDate "pkDate"
 
 #endif // ACTIONS_H
