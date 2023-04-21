@@ -4132,22 +4132,22 @@
         <translation>ՀԾ տվյալների պահոց</translation>
     </message>
     <message>
-        <location filename="../Forms/c5saledoc.cpp" line="707"/>
+        <location filename="../Forms/c5saledoc.cpp" line="708"/>
         <source>Could not add goods without code</source>
         <translation>Արանց կոդ ապրանք ավելացնել հնարավոր չէ</translation>
     </message>
     <message>
-        <location filename="../Forms/c5saledoc.cpp" line="739"/>
+        <location filename="../Forms/c5saledoc.cpp" line="740"/>
         <source>Cannot change goods without code</source>
         <translation>Արանց կոդ ապրանք ավելացնել հնարավոր չէ</translation>
     </message>
     <message>
-        <location filename="../Forms/c5saledoc.cpp" line="757"/>
+        <location filename="../Forms/c5saledoc.cpp" line="758"/>
         <source>Cannot add goods without code</source>
         <translation>Արանձ կոդ ապրանք ավելացնել հնարավոր չէ</translation>
     </message>
     <message>
-        <location filename="../Forms/c5saledoc.cpp" line="814"/>
+        <location filename="../Forms/c5saledoc.cpp" line="815"/>
         <source>Cannot change partner without code</source>
         <translation></translation>
     </message>
@@ -9364,178 +9364,189 @@ MS Excel</translation>
         <translation>Հիմնական</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5partner.ui" line="128"/>
+        <location filename="../Editors/ce5partner.ui" line="291"/>
         <source>f_state</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5partner.ui" line="230"/>
+        <location filename="../Editors/ce5partner.ui" line="50"/>
         <source>Sale type</source>
         <translation>Վաճառքի տեսակ</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5partner.ui" line="267"/>
-        <location filename="../Editors/ce5partner.ui" line="332"/>
+        <location filename="../Editors/ce5partner.ui" line="131"/>
+        <location filename="../Editors/ce5partner.ui" line="349"/>
         <source>Code</source>
         <translation>Համար</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5partner.ui" line="177"/>
+        <location filename="../Editors/ce5partner.ui" line="144"/>
         <source>f_id</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5partner.ui" line="50"/>
+        <location filename="../Editors/ce5partner.ui" line="157"/>
         <source>Group</source>
         <translation>Խումբ</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5partner.ui" line="193"/>
+        <location filename="../Editors/ce5partner.ui" line="278"/>
         <source>f_group</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5partner.ui" line="118"/>
+        <location filename="../Editors/ce5partner.ui" line="43"/>
         <source>State</source>
         <translation>Վիճակ</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5partner.ui" line="43"/>
+        <location filename="../Editors/ce5partner.ui" line="67"/>
         <source>Taxname</source>
-        <translation>Անվանում</translation>
+        <translation>Հարկային անվանում</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5partner.ui" line="57"/>
+        <location filename="../Editors/ce5partner.ui" line="187"/>
         <source>Category</source>
         <translation>Կատեգորիա</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5partner.ui" line="101"/>
+        <location filename="../Editors/ce5partner.ui" line="167"/>
         <source>f_category</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5partner.ui" line="111"/>
+        <location filename="../Editors/ce5partner.ui" line="74"/>
         <source>Name</source>
         <translation>Անվանում</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5partner.ui" line="36"/>
+        <location filename="../Editors/ce5partner.ui" line="234"/>
         <source>f_name</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5partner.ui" line="291"/>
+        <location filename="../Editors/ce5partner.ui" line="301"/>
         <source>Permanent discount</source>
         <translation>Մշտական զեղչ</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5partner.ui" line="298"/>
+        <location filename="../Editors/ce5partner.ui" line="241"/>
         <source>f_permanent_discount</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5partner.ui" line="301"/>
+        <location filename="../Editors/ce5partner.ui" line="244"/>
         <source>2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5partner.ui" line="309"/>
+        <location filename="../Editors/ce5partner.ui" line="308"/>
+        <source>Legal Address</source>
+        <translation>Իրավաբանական հասցե</translation>
+    </message>
+    <message>
+        <location filename="../Editors/ce5partner.ui" line="315"/>
+        <source>f_legaladdress</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../Editors/ce5partner.ui" line="326"/>
         <source>ArmSoft</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5partner.ui" line="322"/>
+        <location filename="../Editors/ce5partner.ui" line="339"/>
         <source>ID</source>
         <translation>Կոդ</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5partner.ui" line="327"/>
+        <location filename="../Editors/ce5partner.ui" line="344"/>
         <source>Database</source>
         <translation>Տվյալների պահոց</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5partner.ui" line="155"/>
+        <location filename="../Editors/ce5partner.ui" line="194"/>
         <source>f_taxname</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5partner.ui" line="158"/>
+        <location filename="../Editors/ce5partner.ui" line="197"/>
         <source>empty=Taxname</source>
         <translation>empty=&quot;Անվանում&quot;</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5partner.ui" line="223"/>
+        <location filename="../Editors/ce5partner.ui" line="91"/>
         <source>Address</source>
         <translation>Հասցե</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5partner.ui" line="88"/>
+        <location filename="../Editors/ce5partner.ui" line="217"/>
         <source>f_address</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5partner.ui" line="64"/>
+        <location filename="../Editors/ce5partner.ui" line="258"/>
         <source>Contact</source>
         <translation>Կոնտակտ</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5partner.ui" line="274"/>
+        <location filename="../Editors/ce5partner.ui" line="265"/>
         <source>f_contact</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5partner.ui" line="74"/>
-        <location filename="../Editors/ce5partner.ui" line="91"/>
-        <location filename="../Editors/ce5partner.ui" line="141"/>
-        <location filename="../Editors/ce5partner.ui" line="216"/>
-        <location filename="../Editors/ce5partner.ui" line="247"/>
-        <location filename="../Editors/ce5partner.ui" line="277"/>
+        <location filename="../Editors/ce5partner.ui" line="60"/>
+        <location filename="../Editors/ce5partner.ui" line="84"/>
+        <location filename="../Editors/ce5partner.ui" line="114"/>
+        <location filename="../Editors/ce5partner.ui" line="180"/>
+        <location filename="../Editors/ce5partner.ui" line="220"/>
+        <location filename="../Editors/ce5partner.ui" line="268"/>
+        <location filename="../Editors/ce5partner.ui" line="318"/>
         <source>0</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5partner.ui" line="237"/>
+        <location filename="../Editors/ce5partner.ui" line="36"/>
         <source>Info</source>
         <translation>Տեղեկություն</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5partner.ui" line="71"/>
+        <location filename="../Editors/ce5partner.ui" line="111"/>
         <source>f_info</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5partner.ui" line="284"/>
+        <location filename="../Editors/ce5partner.ui" line="210"/>
         <source>Phone</source>
         <translation>Հեռախոս</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5partner.ui" line="244"/>
+        <location filename="../Editors/ce5partner.ui" line="57"/>
         <source>f_phone</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5partner.ui" line="81"/>
+        <location filename="../Editors/ce5partner.ui" line="251"/>
         <source>Email</source>
         <translation>Էլեկտրոնային հասցե</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5partner.ui" line="138"/>
+        <location filename="../Editors/ce5partner.ui" line="81"/>
         <source>f_email</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5partner.ui" line="148"/>
+        <location filename="../Editors/ce5partner.ui" line="227"/>
         <source>Taxpayer id</source>
         <translation>ՀՎՀՀ</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5partner.ui" line="206"/>
+        <location filename="../Editors/ce5partner.ui" line="124"/>
         <source>f_price_politic</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Editors/ce5partner.ui" line="213"/>
+        <location filename="../Editors/ce5partner.ui" line="177"/>
         <source>f_taxcode</source>
         <translation></translation>
     </message>

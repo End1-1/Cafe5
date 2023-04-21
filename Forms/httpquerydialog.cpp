@@ -2,6 +2,8 @@
 #include "ui_httpquerydialog.h"
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QJsonObject>
+#include <QJsonDocument>
 #include <QTimer>
 
 
@@ -50,11 +52,14 @@ void HttpQueryDialog::sendRequest()
     QObject::connect(reply, &QNetworkReply::finished, [=](){
         if(reply->error() == QNetworkReply::NoError){
             QString contents = QString::fromUtf8(reply->readAll());
-            ui->label->setText(contents);
-            accept();
-            deleteLater();
-        }
-        else{
+            QJsonObject jo = QJsonDocument::fromJson(contents.toUtf8()).object();
+            if (jo["ok"].toInt() == 1) {
+                ui->label->setText(contents);
+                accept();
+            } else {
+                ui->label->setText(contents);
+            }
+        } else {
             QString err = reply->errorString();
             ui->label->setText(err);
         }

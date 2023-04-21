@@ -58,6 +58,8 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
     ../Classes/removeshopsale.cpp \
     ../Classes/threadsendmessage.cpp \
+    ../Configs/breezeconfig.cpp \
+    ../Configs/config.cpp \
     ../Controls/c5cleartablewidget.cpp \
     ../Controls/c5guicontrols.cpp \
     ../Controls/c5tablewithtotal.cpp \
@@ -389,6 +391,8 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Classes/proxytablewidgetdatabase.h \
     ../Classes/removeshopsale.h \
     ../Classes/threadsendmessage.h \
+    ../Configs/breezeconfig.h \
+    ../Configs/config.h \
     ../Controls/c5cleartablewidget.h \
     ../Controls/c5guicontrols.h \
     ../Controls/c5tablewithtotal.h \
@@ -857,6 +861,7 @@ INCLUDEPATH += ../RESOURCES
 INCLUDEPATH += ../Service
 INCLUDEPATH += ../Service5\raw
 INCLUDEPATH += ../Forms
+INCLUDEPATH += ../Configs
 INCLUDEPATH += /projects/xlsx/src
 INCLUDEPATH += /Projects/NewTax/Src
 INCLUDEPATH += /Soft/OpenSSL-Win32/include

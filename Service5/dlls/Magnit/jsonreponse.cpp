@@ -638,6 +638,7 @@ bool JsonReponse::exportToAS()
     if (!a.exportToAS(fJsonIn["draftid"].toString(), err)) {
         return error(err);
     }
+    fJsonOut[pkOk] = 1;
     return true;
 }
 

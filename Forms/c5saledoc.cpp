@@ -695,6 +695,7 @@ void C5SaleDoc::exportToAs(int doctype)
     jo["database"] = jdb;
     HttpQueryDialog *qd = new HttpQueryDialog(fDBParams, QString("https://%1:%2/magnit").arg(b->ipAddress, QString::number(b->port)), jo, this);
     qd->exec();
+    qd->deleteLater();
 }
 
 void C5SaleDoc::on_btnAddGoods_clicked()

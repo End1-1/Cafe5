@@ -41,12 +41,14 @@ bool ArmSoft::exportToAS(const QString &orderUuid, QString &err)
     QDate docDate = db.date("f_date");
     QString docid = db.uuid();
     int partner = db.integer("f_partner");
+    int doctype = db.integer("f_saletype") == 1 ? 20 : 5; //20 - retail, 5 - invoice
     db[":f_asdbid"] = fData["asdbid"].toInt();
     db[":f_table"] = "c_partners";
     db[":f_tableid"] = partner;
     db.exec("select * from as_convert where f_asdbid=:f_asdbid and f_table=:f_table and f_tableid=:f_tableid");
+    int aspartner = 0;
     if (db.next()) {
-        partner = db.integer("f_ascode");
+        aspartner = db.integer("f_ascode");
         if (partner == 0) {
             err = tr("No partner code exists for ArmSoft");
             return false;
@@ -60,6 +62,8 @@ bool ArmSoft::exportToAS(const QString &orderUuid, QString &err)
     db.next();
     int pricepolitic = db.integer("f_price_politic");
     QString partnerAddress = db.string("f_address");
+    QString partnerLegalAddress = db.string("f_legaladdress");
+    QString partnerTaxCode = db.string("f_taxcode");
 
     db[":f_header"] = orderUuid;
     db[":f_asdbid"] = fData["asdbid"].toInt();
@@ -73,7 +77,7 @@ bool ArmSoft::exportToAS(const QString &orderUuid, QString &err)
             "left join as_convert a on a.f_tableid=g.f_id and a.f_table='c_goods' and a.f_asdbid=:f_asdbid "
             "left join as_convert a2 on a2.f_tableid=ds.f_store and a2.f_table='c_storages' and a2.f_asdbid=:f_asdbid "
             "where ds.f_header=:f_header and ds.f_state=1 ");
-    double total = 0;
+    double total = 0, vatamount = 0;
     QList<QMap<QString, QVariant> > items;
     while (db.next()) {
         if (db.string("f_ascode").isEmpty()) {
@@ -84,13 +88,15 @@ bool ArmSoft::exportToAS(const QString &orderUuid, QString &err)
         tmp["f_goods"] = db.integer("f_goods");
         tmp["f_name"] = db.string("f_name");
         tmp["f_qty"] = db.doubleValue("f_qty");
-        tmp["f_initprice"] = db.doubleValue("f_initprice");
-        tmp["f_price"] = db.doubleValue("f_price");
+        tmp["f_initprice"] = doctype == 5 ? db.doubleValue("f_initprice") / 1.2 : db.doubleValue("f_initprice");
+        tmp["f_price"] = doctype == 5 ? db.doubleValue("f_price") / 1.2 : db.doubleValue("f_price");
         tmp["f_discount"] = ((db.doubleValue("f_initprice") - db.doubleValue("f_price")) * 100) / db.doubleValue("f_initprice");
         tmp["f_service"] = db.integer("f_service");
         tmp["f_store"] = db.string("f_asstore");
         items.append(tmp);
-        total += db.doubleValue("f_price") * db.doubleValue("f_discount");
+        double ltotal = tmp["f_qty"].toDouble() * tmp["f_price"].toDouble();
+        total += ltotal + (doctype == 5 ? (ltotal * 0.2) : 0);
+        vatamount += doctype == 5 ? ltotal * 0.2 : ltotal * 0.1667 ;
     }
     if (!err.isEmpty()) {
         return false;
@@ -123,19 +129,23 @@ bool ArmSoft::exportToAS(const QString &orderUuid, QString &err)
     q.bindValue(":fSUMM", total);
     q.bindValue(":fCOMMENT", partnerAddress);
     q.bindValue(":fBODY", QString("\r\nPREPAYMENTACC:5231\r\nVATACC:5243\r\nSUMMVAT:%2\r\nBUYERACC:2211\r\n"
-                "CUREXCHNG:1.0000\r\nCOURSECOUNT:1.0000\r\nBUYCHACCPOST:Գլխավոր հաշվապահ \r\nMAXROWID:%1\r\n")
+                "CUREXCHNG:1.0000\r\nCOURSECOUNT:1.0000\r\nBUYCHACCPOST:Գլխավոր հաշվապահ \r\nMAXROWID:%1\r\n"
+                "BUYTAXCODE:%3\r\nBUYADDRESS:%4\r\nBUYBUSADDRESS:%5\r\nPOISN:00000000-0000-0000-0000-000000000000\r\nINVOICESTATES:0\r\n")
             .arg(items.count())
-            .arg(total));
-    q.bindValue(":fPARTNAME", partnersMap[partner]["fcaption"]); // set to kamar
+            .arg(vatamount)
+                .arg(partnerTaxCode)
+                .arg(partnerLegalAddress)
+                .arg(partnerAddress));
+    q.bindValue(":fPARTNAME", partnersMap[aspartner]["fcaption"]); // set to kamar
     q.bindValue(":fUSERID", 0);
-    q.bindValue(":fPARTID", partnersMap[partner]["fpartid"]);
+    q.bindValue(":fPARTID", partnersMap[aspartner]["fpartid"]);
     q.bindValue(":fCRPARTID", -1);
     q.bindValue(":fMTID", -1);
     q.bindValue(":fINVN", "");
     q.bindValue(":fENTRYSTATE", 0);
     q.bindValue(":fEMPLIDRESPIN", -1);
     q.bindValue(":fEMPLIDRESPOUT", -1);
-    q.bindValue(":fVATTYPE", fData["doctype"].toInt() == 20 ? "1" : "2");
+    q.bindValue(":fVATTYPE", doctype == 5 ? "1" : "5");
     q.bindValue(":fSPEC", "                    00"); // <--- Tax receipt id
 //        if (card > 0.001) {
 //            dbas[":fBODY"] = dbas[":fBODY"].toString() +
@@ -165,11 +175,11 @@ bool ArmSoft::exportToAS(const QString &orderUuid, QString &err)
         q.bindValue(":fUNITBRIEF", unitsMap[servicesMap[(*bi)["f_ascode"].toString()]["funit"].toString()]);
         q.bindValue(":fSTORAGE", (*bi)["f_store"]);
         q.bindValue(":fQUANTITY", 1);
-        q.bindValue(":fINITPRICE", (*bi)["f_initprice"]);
+        q.bindValue(":fINITPRICE",(*bi)["f_initprice"]);
         q.bindValue(":fDISCOUNT", (*bi)["f_discount"]);
         q.bindValue(":fPRICE", (*bi)["f_price"]);
         q.bindValue(":fSUMMA", (*bi)["f_qty"].toDouble() * (*bi)["f_price"].toDouble());
-        q.bindValue(":fSUMMA1", 0);
+        q.bindValue(":fSUMMA1", (*bi)["f_qty"].toDouble() * (*bi)["f_price"].toDouble());
         q.bindValue(":fENVFEEPERCENT", 0);
         q.bindValue(":fENVFEESUMMA", 0);
         q.bindValue(":fVAT", 1);
@@ -178,6 +188,7 @@ bool ArmSoft::exportToAS(const QString &orderUuid, QString &err)
         q.bindValue(":fACCINCOME", (*bi)["f_service"].toInt() == 1 ? fData["lesincomeacc"].toString() : fData["lemincomeacc"].toString());
         q.bindValue(":fPARTYMETHOD", 0);
         q.bindValue(":fROWID", rowid++);
+        qDebug() << q.boundValues();
         if (q.exec() == false) {
             dbas.rollback();
             err = q.lastError().databaseText()
