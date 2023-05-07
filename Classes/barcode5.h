@@ -134,6 +134,33 @@ public:
         }
     }
 
+    qreal DrawBarcodeGSLength(qreal iX, qreal iY11, qreal iPenW) {
+        BYTE*pb=ia_Buf;
+        int i0,iNum0=i_LenBuf;
+
+        BYTE bBar;
+        int i1,iNum1;
+        qreal iY;
+
+        for(i0 = 0; i0 < iNum0; i0++)
+        {
+            bBar	= *pb & 0x01;
+            iNum1	= (*pb & 0x02) ? i_Ratio : 1;
+            iY		= (*pb & 0x04) ? iY11 : iY11;
+            for(i1 = 0; i1 < iNum1; i1++)
+            {
+                if(bBar) {
+                    //pr.addRect(QRectF(iX, iY0, iPenW, iY), pBar);
+                } else {
+                    //pr.addRect(QRectF(iX, iY0, iPenW, iY), pSpace);
+                }
+                iX += (iPenW * 1.00);
+            }
+            pb++;
+        }
+        return iX;
+    }
+
     void DrawBarcodeGS(QGraphicsScene &pr, qreal iX, qreal iY0, qreal iY10, qreal iY11, qreal iPenW) {
         QPen pBar(Qt::black);
         pBar.setWidthF(iPenW);

@@ -178,7 +178,8 @@ bool C5StoreBarcode::printOneBarcode2(const QString &code, const QString &price,
     qreal plen = 3;
     bool r = b.Encode128C(code.toLatin1().data());
     //b.DrawBarcode(painter, 20, 190, 300, 300, plen);
-    b.DrawBarcodeGS(gs, 50, 280, 150, 150, plen);
+    qDebug() << b.DrawBarcodeGSLength(0, 150, plen);
+    b.DrawBarcodeGS(gs, 200 - (b.DrawBarcodeGSLength(0, 150, plen) / 2), 280, 150, 150, plen);
 
     QFont font = painter.font();
     font.setPointSize(font.pointSize() + 8);
@@ -192,10 +193,8 @@ bool C5StoreBarcode::printOneBarcode2(const QString &code, const QString &price,
 
     QStringList sizess = sizes.toList();
     qSort(sizess.begin(), sizess.end());
-    int shift = (6 - sizess.length()) * 15;
-    if (sizess.length() == 3) {
-        shift += 10;
-    }
+    int shift = 170 - ((sizess.length() * 65) / 2);
+
     for (int i = 0; i < sizess.length(); i++) {
         painter.fillRect((i * 50) + 15 + shift, 150, 40, 40, code.mid(0, 2) == sizess.at(i) ? Qt::black : Qt::white);
         if (code.mid(0, 2) == sizess.at(i)) {
@@ -214,9 +213,11 @@ bool C5StoreBarcode::printOneBarcode2(const QString &code, const QString &price,
     font.setBold(false);
     painter.setFont(font);
 
+    QFontMetrics mf(painter.font());
     QString code2 = QString("%1x%2x%3x%4").arg(code.mid(0, 2), code.mid(2, 3), code.mid(5, 2), code.mid(7, code.length() - 7));
-    painter.drawText(QPointF(50, 380), code2);
-    painter.drawText(QPointF(90, 420), price);
+    qDebug() <<  mf.width(code2) << mf.width(price);
+    painter.drawText(QPointF(140 - (mf.width(code2) / 2), 380), code2);
+    painter.drawText(QPointF(140 - (mf.width(price) / 2), 420), price);
 
 
     QPainter pp(&printer);
