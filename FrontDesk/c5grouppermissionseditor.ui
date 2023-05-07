@@ -27,27 +27,7 @@
        <string>Actions</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_5">
-       <item row="7" column="0">
-        <widget class="C5CheckBox" name="checkBox_11">
-         <property name="text">
-          <string>Calculate dishes self cost</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>206</number>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="C5CheckBox" name="checkBox_21">
-         <property name="text">
-          <string>Store output</string>
-         </property>
-         <property name="Tag" stdset="0">
-          <number>202</number>
-         </property>
-        </widget>
-       </item>
-       <item row="12" column="1">
+       <item row="14" column="1">
         <spacer name="verticalSpacer_5">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -60,23 +40,23 @@
          </property>
         </spacer>
        </item>
-       <item row="8" column="0">
-        <widget class="C5CheckBox" name="checkBox_66">
+       <item row="0" column="0">
+        <widget class="C5CheckBox" name="chActions">
          <property name="text">
-          <string>Allow change cash document date</string>
+          <string>All actions</string>
          </property>
          <property name="Tag" stdset="0">
-          <number>107</number>
+          <number>200</number>
          </property>
         </widget>
        </item>
-       <item row="4" column="0">
-        <widget class="C5CheckBox" name="checkBox_24">
+       <item row="10" column="0">
+        <widget class="C5CheckBox" name="checkBox_69">
          <property name="text">
-          <string>Store inventory</string>
+          <string>Goods pricing</string>
          </property>
          <property name="Tag" stdset="0">
-          <number>204</number>
+          <number>109</number>
          </property>
         </widget>
        </item>
@@ -100,6 +80,16 @@
          </property>
         </widget>
        </item>
+       <item row="2" column="0">
+        <widget class="C5CheckBox" name="checkBox_21">
+         <property name="text">
+          <string>Store output</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>202</number>
+         </property>
+        </widget>
+       </item>
        <item row="9" column="0">
         <widget class="C5CheckBox" name="checkBox_67">
          <property name="text">
@@ -110,33 +100,33 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="0">
-        <widget class="C5CheckBox" name="checkBox_26">
+       <item row="11" column="0">
+        <widget class="C5CheckBox" name="checkBox_104">
          <property name="text">
-          <string>Count store output of sales</string>
+          <string>Goods reservatoins</string>
          </property>
          <property name="Tag" stdset="0">
-          <number>205</number>
+          <number>209</number>
          </property>
         </widget>
        </item>
-       <item row="0" column="0">
-        <widget class="C5CheckBox" name="chActions">
+       <item row="12" column="0">
+        <widget class="C5CheckBox" name="chRetailSale">
          <property name="text">
-          <string>All actions</string>
+          <string>Retail sale</string>
          </property>
          <property name="Tag" stdset="0">
-          <number>200</number>
+          <number>210</number>
          </property>
         </widget>
        </item>
-       <item row="10" column="0">
-        <widget class="C5CheckBox" name="checkBox_69">
+       <item row="8" column="0">
+        <widget class="C5CheckBox" name="checkBox_66">
          <property name="text">
-          <string>Goods pricing</string>
+          <string>Allow change cash document date</string>
          </property>
          <property name="Tag" stdset="0">
-          <number>109</number>
+          <number>107</number>
          </property>
         </widget>
        </item>
@@ -150,13 +140,43 @@
          </property>
         </widget>
        </item>
-       <item row="11" column="0">
-        <widget class="C5CheckBox" name="checkBox_104">
+       <item row="6" column="0">
+        <widget class="C5CheckBox" name="checkBox_26">
          <property name="text">
-          <string>Goods reservatoins</string>
+          <string>Count store output of sales</string>
          </property>
          <property name="Tag" stdset="0">
-          <number>209</number>
+          <number>205</number>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="C5CheckBox" name="checkBox_24">
+         <property name="text">
+          <string>Store inventory</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>204</number>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0">
+        <widget class="C5CheckBox" name="checkBox_11">
+         <property name="text">
+          <string>Calculate dishes self cost</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>206</number>
+         </property>
+        </widget>
+       </item>
+       <item row="13" column="0">
+        <widget class="C5CheckBox" name="chWhosale">
+         <property name="text">
+          <string>Whosale sale</string>
+         </property>
+         <property name="Tag" stdset="0">
+          <number>211</number>
          </property>
         </widget>
        </item>

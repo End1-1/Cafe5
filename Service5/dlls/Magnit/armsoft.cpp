@@ -127,15 +127,15 @@ bool ArmSoft::exportToAS(const QString &orderUuid, QString &err)
     q.bindValue(":fDOCNUM", "");
     q.bindValue(":fCUR", "AMD");
     q.bindValue(":fSUMM", total);
-    q.bindValue(":fCOMMENT", partnerAddress);
+    q.bindValue(":fCOMMENT", partnersMap[aspartner]["fbusinessaddress"]);
     q.bindValue(":fBODY", QString("\r\nPREPAYMENTACC:5231\r\nVATACC:5243\r\nSUMMVAT:%2\r\nBUYERACC:2211\r\n"
                 "CUREXCHNG:1.0000\r\nCOURSECOUNT:1.0000\r\nBUYCHACCPOST:Գլխավոր հաշվապահ \r\nMAXROWID:%1\r\n"
                 "BUYTAXCODE:%3\r\nBUYADDRESS:%4\r\nBUYBUSADDRESS:%5\r\nPOISN:00000000-0000-0000-0000-000000000000\r\nINVOICESTATES:0\r\n")
             .arg(items.count())
             .arg(vatamount)
-                .arg(partnerTaxCode)
-                .arg(partnerLegalAddress)
-                .arg(partnerAddress));
+                .arg(partnersMap[aspartner]["ftaxcode"].toString())
+                .arg(partnersMap[aspartner]["faddress"].toString())
+                .arg(partnersMap[aspartner]["fbusinessaddress"].toString()));
     q.bindValue(":fPARTNAME", partnersMap[aspartner]["fcaption"]); // set to kamar
     q.bindValue(":fUSERID", 0);
     q.bindValue(":fPARTID", partnersMap[aspartner]["fpartid"]);
@@ -174,7 +174,7 @@ bool ArmSoft::exportToAS(const QString &orderUuid, QString &err)
         q.bindValue(":fITEMNAME", (*bi)["f_name"]);
         q.bindValue(":fUNITBRIEF", unitsMap[servicesMap[(*bi)["f_ascode"].toString()]["funit"].toString()]);
         q.bindValue(":fSTORAGE", (*bi)["f_store"]);
-        q.bindValue(":fQUANTITY", 1);
+        q.bindValue(":fQUANTITY", (*bi)["f_qty"]);
         q.bindValue(":fINITPRICE",(*bi)["f_initprice"]);
         q.bindValue(":fDISCOUNT", (*bi)["f_discount"]);
         q.bindValue(":fPRICE", (*bi)["f_price"]);
@@ -242,7 +242,7 @@ bool ArmSoft::getIndexes(QString &err, QSqlDatabase &dbas)
     }
     fields.clear();
 
-    q.exec("select fPARTID, fPARTCODE, fCAPTION, fFULLCAPTION from PARTNERS");
+    q.exec("select fPARTID, fPARTCODE, fCAPTION, fFULLCAPTION, fADDRESS, fBUSINESSADDRESS, fTAXCODE from PARTNERS");
     r = q.record();
     for (int i = 0; i < r.count(); i++) {
         fields.append(r.fieldName(i).toLower());

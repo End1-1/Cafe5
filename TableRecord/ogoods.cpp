@@ -28,13 +28,13 @@ void OGoods::bind(C5Database &db)
 bool OGoods::write(C5Database &db, QString &err)
 {
     bool u = true;
-    if (id.isEmpty()) {
+    if (id.toString().isEmpty()) {
         id = db.uuid();
         u = false;
     }
     bind(db);
     if (u) {
-        return getWriteResult(db, db.update("o_goods", where_id(id)), err);
+        return getWriteResult(db, db.update("o_goods", where_id(id.toString())), err);
     } else {
         return getWriteResult(db, db.insert("o_goods", false), err);
     }
@@ -45,4 +45,23 @@ bool OGoods::getRecord(C5Database &db)
     if (!db.nextRow()) {
         return false;
     }
+    id = db.getString("f_id");
+    header = db.getString("f_header");
+    body = db.getString("f_body");
+    store = db.getInt("f_store");
+    goods = db.getInt("f_goods");
+    qty = db.getDouble("f_qty");
+    price = db.getDouble("f_price");
+    total = qty * price;
+    tax = db.getInt("f_tax");
+    sign = db.getInt("f_sign");
+    discountFactor = db.getDouble("f_discountfactor");
+    discountMode = db.getInt("f_discountmode");
+    taxDept = db.getString("f_taxdept");
+    adgCode = db.getString("f_adgcode");
+    return_ = db.getInt("f_return");
+    returnFrom = db.getString("f_returnfrom");
+    isService = db.getInt("f_isservice");
+    storeRec = db.getString("f_storerec");
+    return true;
 }

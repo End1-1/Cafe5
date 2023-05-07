@@ -19,7 +19,7 @@ public:
 
     QString fCurrencyName;
 
-    void addRow(const QString &name, const QString &barcode, int qty, int curr);
+    void addRow(const QString &name, const QString &barcode, int qty, int curr, const QString &sizes);
 
     virtual QToolBar *toolBar() override;
 
@@ -27,7 +27,7 @@ public:
 
     static bool printOneBarcode(const QString &code, QPrintDialog &pd);
 
-    static bool printOneBarcode2(const QString &code, const QString &price, QString link, const QString &name, QPrintDialog &pd);
+    static bool printOneBarcode2(const QString &code, const QString &price, QString link, const QString &name, const QString &sizeList, QPrintDialog &pd);
 
 private:
     Ui::C5StoreBarcode *ui;

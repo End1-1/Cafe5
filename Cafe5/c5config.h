@@ -33,7 +33,6 @@
 #define param_tax_print_always_offer 27
 #define param_fd_font_size 28
 #define param_recipe_widht 29
-#define param_car_mode 30
 #define param_date_cash_shift 31
 #define param_cash_id 32
 #define param_frondesk_mode 33
@@ -118,6 +117,7 @@
 #define param_mobile_app_connection 114
 #define param_shop_scalecode 115
 #define param_default_currency 116
+#define param_rest_qty_before_add_dish 117
 
 #define FRONTDESK_WAITER 0
 #define FRONTDESK_SHOP 1
@@ -228,8 +228,6 @@ public:
     static int fronDeskFontSize();
 
     static bool alwaysOfferTaxPrint();
-
-    static bool carMode();
 
     static bool autoCashInput();
 

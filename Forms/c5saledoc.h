@@ -37,7 +37,7 @@ private slots:
     void uuidDoubleClicked();
     void on_PriceTextChanged(const QString &arg1);
     void on_QtyTextChanged(const QString &arg1);
-    void on_TotalTextChanged(const QString &arg1);
+    void on_discountValueChanged(const QString &arg1);
     void on_leCmd_returnPressed();
     void on_btnAddGoods_clicked();
     void on_btnRemoveGoods_clicked();
@@ -48,8 +48,9 @@ private slots:
     void on_btnRemoveDelivery_clicked();
     void on_btnDelivery_clicked();
     void on_btnEditPartner_clicked();
-
     void on_btnEditAccounts_clicked();
+
+    void on_leCash_textChanged(const QString &arg1);
 
 private:
     Ui::C5SaleDoc *ui;
@@ -66,6 +67,7 @@ private:
     void exportToAs(int doctype);
     bool fOpenedFromDraft;
     QMap<int, QString> fListOfStorages;
+    QMap<int, double> fSpecialPrices;
 };
 
 #endif // C5SALEDOC_H

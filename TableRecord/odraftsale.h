@@ -17,6 +17,7 @@ public:
     double amount = 0.0;
     double discount = 0.0;
     QString comment;
+    QDate deliveryDate;
 
     virtual bool getRecord(C5Database &db) override;
     virtual void bind(C5Database &db) override;

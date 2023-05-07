@@ -45,7 +45,6 @@
 #define cp_t3_discount_statistics 311
 #define cp_t3_debts 312
 #define cp_t3_consuption_reason 313
-#define cp_t3_car_visits 314
 #define cp_t3_preorders 315
 #define cp_t3_sale_effectiveness 316
 #define cp_t3_storage_uncomplected 317

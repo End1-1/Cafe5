@@ -141,6 +141,7 @@ C5Cache::C5Cache(const QStringList &dbParams) :
                     "left join e_currency c2 on c2.f_id=cr.f_currency2 ")
                 .arg(tr("Code"), tr("Currency code1"), tr("Currency name 1"),
                      tr("Currency code 2"), tr("Currency name 2"), tr("Rate"));
+        setCacheSimpleQuery(cache_draft_sale_state, "o_draft_sale_state");
     }
     if (fTableCache.count() == 0) {
         fTableCache["c_partners"] = cache_goods_partners;
@@ -186,6 +187,7 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         fTableCache["e_currency_rate_history"] = cache_currency_rate;
         fTableCache["e_currency_cross_rate"] = cache_currency_cross_rate;
         fTableCache["e_currency_cross_rate_history"] = cache_currency_cross_rate_history;
+        fTableCache["o_draft_sale_state"] = cache_draft_sale_state;
     }
     fVersion = 0;
     C5Database db(dbParams);

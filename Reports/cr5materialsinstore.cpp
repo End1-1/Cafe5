@@ -305,7 +305,7 @@ void CR5MaterialsInStore::printBarcode()
         if (fFilter->unit().isEmpty()) {
             b->addRow(fModel->data(i, fModel->indexForColumnName("f_goods"), Qt::EditRole).toString(),
                       fModel->data(i, fModel->indexForColumnName("f_scancode"), Qt::EditRole).toString(),
-                      fModel->data(i, fModel->indexForColumnName("f_qty"), Qt::EditRole).toInt(), fFilter->currency().toInt());
+                      fModel->data(i, fModel->indexForColumnName("f_qty"), Qt::EditRole).toInt(), fFilter->currency().toInt(), "");
         } else if (fFilter->unit() == "10") {
             db[":f_qty"] = fModel->data(i, fModel->indexForColumnName("f_qty"), Qt::EditRole);
             db[":f_base"] = fModel->data(i, fModel->indexForColumnName("f_code"), Qt::EditRole);
@@ -315,7 +315,8 @@ void CR5MaterialsInStore::printBarcode()
             while (db.nextRow()) {
                 b->addRow(db.getString("f_name"),
                           db.getString("f_scancode"),
-                          db.getDouble("f_qty"), fFilter->currency().toInt());
+                          db.getDouble("f_qty"), fFilter->currency().toInt(),
+                          fModel->data(i, fModel->indexForColumnName("f_group"), Qt::EditRole).toString());
             }
         }
     }

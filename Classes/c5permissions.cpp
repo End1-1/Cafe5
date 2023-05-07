@@ -54,7 +54,6 @@ void C5Permissions::init(C5Database &db, int group)
               << cp_t3_discount_statistics
               << cp_t3_debts
               << cp_t3_consuption_reason
-              << cp_t3_car_visits
               << cp_t3_preorders
               << cp_t3_sale_effectiveness
               << cp_t3_storage_uncomplected

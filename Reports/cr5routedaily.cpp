@@ -27,6 +27,7 @@ QToolBar *CR5RouteDaily::toolBar()
     if (!fToolBar) {
         QList<ToolBarButtons> btn;
         btn << ToolBarButtons::tbNew;
+        btn << ToolBarButtons::tbRefresh;
         btn << ToolBarButtons::tbFilter;
         btn << ToolBarButtons::tbClearFilter;
         btn << ToolBarButtons::tbExcel;

@@ -34,7 +34,7 @@
         <location filename="../Classes/c5cache.cpp" line="129"/>
         <location filename="../Classes/c5cache.cpp" line="135"/>
         <location filename="../Classes/c5cache.cpp" line="142"/>
-        <location filename="../Classes/c5cache.cpp" line="320"/>
+        <location filename="../Classes/c5cache.cpp" line="322"/>
         <source>Code</source>
         <translation></translation>
     </message>
@@ -65,7 +65,7 @@
         <location filename="../Classes/c5cache.cpp" line="108"/>
         <location filename="../Classes/c5cache.cpp" line="111"/>
         <location filename="../Classes/c5cache.cpp" line="129"/>
-        <location filename="../Classes/c5cache.cpp" line="320"/>
+        <location filename="../Classes/c5cache.cpp" line="322"/>
         <source>Name</source>
         <translation type="unfinished">Անվանում</translation>
     </message>
@@ -725,42 +725,42 @@
         <translation>Ելք ըստ վաճառքի</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="228"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="227"/>
         <source>No hall with id</source>
         <translation>Նշված կոդով սրահը բացակայում է</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="272"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="271"/>
         <source>Error in store document, partial data was lost</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="321"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="320"/>
         <source>Error in cash document, partial data was lost</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="331"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="330"/>
         <source>Empty cash document</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="432"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="431"/>
         <source>Document not exists</source>
         <translation>Փաստաթուղթը գոյություն չունի</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="869"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="868"/>
         <source>Invalid document id</source>
         <translation>Սխալ փաստաթղթի համար</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="999"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="998"/>
         <source>Not enough materials in the store</source>
         <translation>Բացասական քանակ պահեստում</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="1098"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="1097"/>
         <source>This order used in next documents</source>
         <translation>Այս փաստաթուղթը օգտագործվում է հետևյալ պահեստի ելքերի մեջ</translation>
     </message>

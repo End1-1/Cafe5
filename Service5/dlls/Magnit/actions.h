@@ -16,6 +16,8 @@
 #define hqRemoveOrderRow 13
 #define hqExportToAS 14
 #define hqDriverList 15
+#define hqVisit 16
+#define hqCompleteDelivery 17
 
 #define pkOk "ok"
 #define pkMessage "message"

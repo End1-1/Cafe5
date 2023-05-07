@@ -5,7 +5,6 @@
 
 class OGoods: public TableRecord {
 public:
-    QString id;
     QString header;
     QString body;
     int store = 0;

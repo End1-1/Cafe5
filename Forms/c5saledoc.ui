@@ -357,6 +357,9 @@
           <height>0</height>
          </size>
         </property>
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
+        </property>
         <property name="toolTip">
          <string>Double click to copy to the clipboard</string>
         </property>
@@ -384,6 +387,9 @@
       </item>
       <item row="1" column="9">
        <widget class="C5LineEdit" name="leSaleType">
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
+        </property>
         <property name="readOnly">
          <bool>true</bool>
         </property>
@@ -586,17 +592,7 @@
      </column>
      <column>
       <property name="text">
-       <string>Total</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Discount type</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Discount value</string>
+       <string>Discount</string>
       </property>
      </column>
      <column>
@@ -633,7 +629,7 @@
        <number>0</number>
       </property>
       <item row="3" column="1">
-       <widget class="C5LineEdit" name="lePrepaid">
+       <widget class="C5LineEditWithSelector" name="lePrepaid">
         <property name="maximumSize">
          <size>
           <width>150</width>
@@ -650,7 +646,7 @@
        </widget>
       </item>
       <item row="4" column="1">
-       <widget class="C5LineEdit" name="leBankTransfer">
+       <widget class="C5LineEditWithSelector" name="leBankTransfer">
         <property name="maximumSize">
          <size>
           <width>150</width>
@@ -690,7 +686,7 @@
        </widget>
       </item>
       <item row="5" column="1">
-       <widget class="C5LineEdit" name="leDebt">
+       <widget class="C5LineEditWithSelector" name="leDebt">
         <property name="maximumSize">
          <size>
           <width>150</width>
@@ -700,7 +696,7 @@
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="C5LineEdit" name="leCard">
+       <widget class="C5LineEditWithSelector" name="leCard">
         <property name="maximumSize">
          <size>
           <width>150</width>
@@ -755,7 +751,7 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="C5LineEdit" name="leCash">
+       <widget class="C5LineEditWithSelector" name="leCash">
         <property name="maximumSize">
          <size>
           <width>150</width>
@@ -772,7 +768,7 @@
        </widget>
       </item>
       <item row="6" column="1">
-       <widget class="C5LineEdit" name="leGrandTotal">
+       <widget class="C5LineEditWithSelector" name="leGrandTotal">
         <property name="maximumSize">
          <size>
           <width>150</width>
@@ -796,6 +792,11 @@
    <header location="global">c5lineedit.h</header>
   </customwidget>
   <customwidget>
+   <class>C5ComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">c5combobox.h</header>
+  </customwidget>
+  <customwidget>
    <class>C5TableWidget</class>
    <extends>QTableWidget</extends>
    <header location="global">c5tablewidget.h</header>
@@ -806,26 +807,40 @@
    <header location="global">c5dateedit.h</header>
   </customwidget>
   <customwidget>
-   <class>C5ComboBox</class>
-   <extends>QComboBox</extends>
-   <header location="global">c5combobox.h</header>
+   <class>C5LineEditWithSelector</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5lineeditwithselector.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>leTime</tabstop>
   <tabstop>leDocnumber</tabstop>
+  <tabstop>leDate</tabstop>
+  <tabstop>leTime</tabstop>
+  <tabstop>leUuid</tabstop>
   <tabstop>leTaxpayerId</tabstop>
   <tabstop>leTaxpayerName</tabstop>
   <tabstop>btnSearchTaxpayer</tabstop>
-  <tabstop>leDate</tabstop>
+  <tabstop>btnEditPartner</tabstop>
+  <tabstop>leSaleType</tabstop>
+  <tabstop>cbCurrency</tabstop>
+  <tabstop>cbHall</tabstop>
+  <tabstop>cbCashDesk</tabstop>
+  <tabstop>cbStorage</tabstop>
   <tabstop>leComment</tabstop>
+  <tabstop>leDelivery</tabstop>
+  <tabstop>leCmd</tabstop>
   <tabstop>tblGoods</tabstop>
   <tabstop>leCash</tabstop>
   <tabstop>leCard</tabstop>
   <tabstop>lePrepaid</tabstop>
+  <tabstop>leBankTransfer</tabstop>
   <tabstop>leDebt</tabstop>
+  <tabstop>leGrandTotal</tabstop>
   <tabstop>leCountCash</tabstop>
+  <tabstop>btnRemoveDelivery</tabstop>
   <tabstop>leChange</tabstop>
+  <tabstop>btnDelivery</tabstop>
+  <tabstop>btnEditAccounts</tabstop>
  </tabstops>
  <resources>
   <include location="../resources/res.qrc"/>

@@ -624,14 +624,20 @@ QString C5Database::lastQuery(QSqlQuery *q)
 
 bool C5Database::exec(const QString &sqlQuery, bool &isSelect)
 {
+    QString sql = sqlQuery;
+    sql = sql.replace("\r\n", " ");
+    sql = sql.trimmed();
+    if (sql.isEmpty()) {
+        return true;
+    }
     fTimer.restart();
     if (!open()) {
         return false;
     }
-    if (!fQuery->prepare(sqlQuery)) {
+    if (!fQuery->prepare(sql)) {
         fLastError = fQuery->lastError().databaseText();
         logEvent(fDb.hostName() + " (" + QString::number(fTimerCount) + " ms):" + fDb.databaseName() + " " + fLastError);
-        logEvent(fDb.hostName() + " (" + QString::number(fTimerCount) + " ms):" + fDb.databaseName() + " " + sqlQuery);
+        logEvent(fDb.hostName() + " (" + QString::number(fTimerCount) + " ms):" + fDb.databaseName() + " " + sql);
         throw SqlException(fLastError);
         return false;
     }
@@ -665,7 +671,7 @@ bool C5Database::exec(const QString &sqlQuery, bool &isSelect)
     isSelect = fQuery->isSelect();
     QString call = "call";
     if (!isSelect) {
-        isSelect = sqlQuery.midRef(0, 4).compare(QStringRef(&call), Qt::CaseInsensitive) == 0;
+        isSelect = sql.midRef(0, 4).compare(QStringRef(&call), Qt::CaseInsensitive) == 0;
     }
     return true;
 }

@@ -20,7 +20,7 @@
       <enum>Qt::NoFocus</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -1364,6 +1364,16 @@
               <widget class="QWidget" name="widget_5" native="true">
                <layout class="QHBoxLayout" name="horizontalLayout_3">
                 <item>
+                 <widget class="C5CheckBox" name="chComponentExit">
+                  <property name="text">
+                   <string>Component exit</string>
+                  </property>
+                  <property name="Field" stdset="0">
+                   <string>f_component_exit</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
                  <spacer name="horizontalSpacer_3">
                   <property name="orientation">
                    <enum>Qt::Horizontal</enum>
@@ -1680,16 +1690,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5LineEditWithSelector</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5lineeditwithselector.h</header>
-  </customwidget>
-  <customwidget>
-   <class>C5CheckBox</class>
-   <extends>QCheckBox</extends>
-   <header location="global">c5checkbox.h</header>
-  </customwidget>
-  <customwidget>
    <class>C5TableWidget</class>
    <extends>QTableWidget</extends>
    <header location="global">c5tablewidget.h</header>
@@ -1698,6 +1698,16 @@
    <class>C5LineEdit</class>
    <extends>QLineEdit</extends>
    <header location="global">c5lineedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5LineEditWithSelector</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5lineeditwithselector.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5CheckBox</class>
+   <extends>QCheckBox</extends>
+   <header location="global">c5checkbox.h</header>
   </customwidget>
   <customwidget>
    <class>C5ComboBox</class>

@@ -54,6 +54,7 @@
 #define cache_currency_rate 50
 #define cache_currency_cross_rate 51
 #define cache_currency_cross_rate_history 52
+#define cache_draft_sale_state 53
 
 class C5Cache : public QObject
 {

@@ -25,10 +25,12 @@ bool C5PrintReciptA4::print(QString &err)
 
     db[":f_id"] = fOrderUUID;
     db.exec("select concat(o.f_prefix, o.f_hallid) as f_ordernumber, ost.f_name as f_saletypename, "
-            "o.f_amounttotal, o.f_amountcash, o.f_amountcard, o.f_amountother, o.f_datecash "
+            "o.f_amounttotal, o.f_amountcash, o.f_amountcard, o.f_amountother, o.f_datecash, "
+            "p.f_taxcode, p.f_taxname, p.f_address "
             "from o_header o "
             "left join o_sale_type ost on ost.f_id=o.f_saletype "
             "left join s_user u on u.f_id=o.f_staff "
+            "left join c_partners p on p.f_id=o.f_partner "
             "where o.f_id=:f_id ");
     QMap<QString, QVariant> header;
     if (db.nextRow()) {
@@ -41,7 +43,7 @@ bool C5PrintReciptA4::print(QString &err)
     QList<QMap<QString, QVariant> > body;
     db[":f_header"] = fOrderUUID;
     db.exec("select g.f_scancode, g.f_name as f_goodsname, ob.f_qty, ob.f_price, ob.f_total, "
-            "s.f_name as f_storename, gu.f_name as f_unitname "
+            "s.f_name as f_storename, gu.f_name as f_unitname, ob.f_discountfactor * 100 as f_discountfactor "
             "from o_goods ob "
             "left join c_goods g on g.f_id=ob.f_goods "
             "left join c_storages s on s.f_id=ob.f_store "
@@ -68,21 +70,19 @@ bool C5PrintReciptA4::print(QString &err)
     p.br();
     p.setFontBold(true);
     points.clear();
-    points << 50 << 200;
+    points << 50 << 200 << 500 << 1200;
     vals << tr("Date");
-    if (!store.isEmpty()) {
-        vals << tr("Store, output");
-        points << 500;
-    }
+    vals << tr("Store, output");
+    vals << tr("Buyer");
 
     p.tableText(points, vals, p.fLineHeight + 20);
     p.br(p.fLineHeight + 20);
     p.setFontBold(false);
     vals.clear();
     vals << header["f_datecash"].toDate().toString("dd/MM/yyyy");
-    if (!store.isEmpty()) {
-        vals << store;
-    }
+    vals << store;
+    vals << QString("%1, %2 %3, %4 %5").arg(header["f_taxname"].toString(), tr("Taxpayer code"), header["f_taxcode"].toString(),
+            tr("Address"), header["f_address"].toString());
     p.tableText(points, vals, p.fLineHeight + 20);
     p.br(p.fLineHeight + 20);
     p.br(p.fLineHeight + 20);
@@ -91,14 +91,6 @@ bool C5PrintReciptA4::print(QString &err)
     vals.clear();
     p.setFontBold(true);
     points << 50;
-//    if (ui->lePartner->getInteger() > 0) {
-//        vals << tr("Supplier");
-//        points << 1000;
-//    }
-//    if (!ui->leInvoiceNumber->isEmpty()) {
-//        vals << tr("Purchase document");
-//        points << 800;
-//    }
     p.tableText(points, vals, p.fLineHeight + 20);
     p.br(p.fLineHeight + 20);
 
@@ -106,14 +98,6 @@ bool C5PrintReciptA4::print(QString &err)
     points.clear();
     vals.clear();
     points << 50;
-//    if (ui->lePartner->getInteger() > 0) {
-//        vals << ui->lePartnerName->text();
-//        points << 1000;
-//    }
-//    if (!ui->leInvoiceNumber->isEmpty()) {
-//        vals << ui->leInvoiceNumber->text() + " /    " + ui->deInvoiceDate->text();
-//        points << 800;
-//    }
     p.tableText(points, vals, p.fLineHeight + 20);
     p.br();
     p.br();
@@ -124,7 +108,7 @@ bool C5PrintReciptA4::print(QString &err)
     QString goodsColName = tr("Goods");
 
     points.clear();
-    points << 50 << 100 << 250 << 600 << 250 << 250 << 250 << 250;
+    points << 50 << 100 << 250 << 600 << 150 << 200 << 200 << 100 << 200;
     vals.clear();
     vals << tr("NN")
          << tr("Material code")
@@ -132,6 +116,7 @@ bool C5PrintReciptA4::print(QString &err)
          << tr("Qty")
          << tr("Unit")
          << tr("Price")
+         << tr("Discount")
          << tr("Total");
     p.setFontBold(true);
     p.tableText(points, vals, p.fLineHeight + 20);
@@ -150,6 +135,7 @@ bool C5PrintReciptA4::print(QString &err)
         vals << float_str(m["f_qty"].toDouble(), 2);
         vals << m["f_unitname"].toString();
         vals << float_str(m["f_price"].toDouble(), 2);
+        vals << float_str(m["f_discountfactor"].toDouble(), 2) + "%";
         vals << float_str(m["f_total"].toDouble(), 2);
         p.tableText(points, vals, p.fLineHeight + 20);
         if (p.checkBr(p.fLineHeight + 20)) {
@@ -161,8 +147,8 @@ bool C5PrintReciptA4::print(QString &err)
     p.setFontBold(true);
     points.clear();
     points << 1000
-           << 750
-           << 250;
+           << 650
+           << 200;
     vals.clear();
     vals << tr("Total amount");
     vals << float_str(header["f_amounttotal"].toDouble(), 2);
@@ -171,9 +157,9 @@ bool C5PrintReciptA4::print(QString &err)
     p.br(p.fLineHeight + 20);
     p.br(p.fLineHeight + 20);
 
-        p.ltext(tr("Passed"), 50);
-        p.ltext(tr("Accepted"), 1000);
-        p.br(p.fLineHeight + 20);
+    p.ltext(tr("Passed"), 50);
+    p.ltext(tr("Accepted"), 1000);
+    p.br(p.fLineHeight + 20);
 
 
     p.line(50, p.fTop, 700, p.fTop);

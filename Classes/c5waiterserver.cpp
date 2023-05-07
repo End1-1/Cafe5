@@ -58,18 +58,18 @@ void C5WaiterServer::reply(QJsonObject &o)
         QJsonArray jTables;
         srh.getJsonFromQuery(QString("select t.f_id, t.f_hall, t.f_name, t.f_lock, t.f_lockSrc, \
                             h.f_id as f_header, concat(u.f_last, ' ', left(u.f_first, 1), '.') as f_staffName, \
-                            h.f_amountTotal as f_amount, h.f_print, bc.f_govnumber, \
-                            date_format(h.f_dateOpen, '%d.%m.%Y') as f_dateOpen, h.f_timeOpen, \
-                            t.f_special_config \
-                            from h_tables t \
-                            left join o_header h on h.f_table=t.f_id and h.f_state=1 \
-                            left join o_header_options o on o.f_id=h.f_id \
-                            left join b_car bc on bc.f_id=o.f_car \
-                            left join s_user u on u.f_id=h.f_staff  %1 \
-                            order by f_id")
+                                     h.f_amountTotal as f_amount, h.f_print, bc.f_govnumber, \
+                                     date_format(h.f_dateOpen, '%d.%m.%Y') as f_dateOpen, h.f_timeOpen, \
+                                     t.f_special_config \
+                                     from h_tables t \
+                                     left join o_header h on h.f_table=t.f_id and h.f_state=1 \
+                left join o_header_options o on o.f_id=h.f_id \
+                left join b_car bc on bc.f_id=o.f_car \
+                left join s_user u on u.f_id=h.f_staff  %1 \
+                order by f_id")
                 .arg(hallFilter.isEmpty() ? "" : " where t.f_hall in (" + hallFilter + ") "), jTables);
-        //srh.getJsonFromQuery("select f_id, f_hall, f_name, f_lock, f_lockSrc from h_tables order by f_id", jTables);
-        QJsonArray jShift;
+                //srh.getJsonFromQuery("select f_id, f_hall, f_name, f_lock, f_lockSrc from h_tables order by f_id", jTables);
+                QJsonArray jShift;
         srh.getJsonFromQuery("select f_id, f_name from s_salary_shift", jShift);
         o["reply"] = 1;
         o["halls"] = jHall;
@@ -171,19 +171,19 @@ void C5WaiterServer::reply(QJsonObject &o)
         srh.fDb[":f_name"] = fIn["settings_name"].toString();
         srh.fDb.exec("select * from s_settings_names where f_name=:f_name");
         if (srh.fDb.nextRow()) {
-           int settingsId = srh.fDb.getInt("f_id");
-           srh.fDb[":f_settings"] = settingsId;
-           srh.fDb.exec("select f_key, f_value from s_settings_values where f_settings=:f_settings");
-           while (srh.fDb.nextRow()) {
-               jConf[srh.fDb.getString(0)] = srh.fDb.getString(1);
-           }
-           srh.fDb[":f_id"] = jConf[QString::number(param_default_menu)].toString();
-           srh.fDb.exec("select f_name from d_menu_names where f_id=:f_id");
-           if (srh.fDb.nextRow()) {
-               jConf[QString::number(param_default_menu_name)] = srh.fDb.getString(0);
-           } else {
-               jConf[QString::number(param_default_menu_name)] = "NO MENU DEFINED";
-           }
+            int settingsId = srh.fDb.getInt("f_id");
+            srh.fDb[":f_settings"] = settingsId;
+            srh.fDb.exec("select f_key, f_value from s_settings_values where f_settings=:f_settings");
+            while (srh.fDb.nextRow()) {
+                jConf[srh.fDb.getString(0)] = srh.fDb.getString(1);
+            }
+            srh.fDb[":f_id"] = jConf[QString::number(param_default_menu)].toString();
+            srh.fDb.exec("select f_name from d_menu_names where f_id=:f_id");
+            if (srh.fDb.nextRow()) {
+                jConf[QString::number(param_default_menu_name)] = srh.fDb.getString(0);
+            } else {
+                jConf[QString::number(param_default_menu_name)] = "NO MENU DEFINED";
+            }
         } else {
             o["reply"] = 0;
             o["msg"] = tr("Invalid settings name");
@@ -313,7 +313,7 @@ void C5WaiterServer::reply(QJsonObject &o)
         } else {
 
         }
-        if (fIn["handlevisit"].toInt() == 1) {            
+        if (fIn["handlevisit"].toInt() == 1) {
             o["handlevisit"] = 1;
             o["code"] = fIn["code"].toString();
         }
@@ -334,20 +334,8 @@ void C5WaiterServer::reply(QJsonObject &o)
         bv[":f_datecash2"] = QDate::fromString(fIn["date2"].toString(), FORMAT_DATE_TO_STR_MYSQL);
         bv[":f_state"] = ORDER_STATE_CLOSE;
         QString sqlQuery;
-        if (__c5config.carMode()) {
-            sqlQuery = "select oh.f_id, concat(oh.f_prefix, oh.f_hallid) as f_order, date_format(oh.f_datecash, '%d.%m.%Y') as f_datecash, oh.f_timeclose, "
-                           "h.f_name as f_hall, t.f_name as f_table, concat(u.f_last, ' ', u.f_first) as f_staff,"
-                           "oh.f_amounttotal, bc.f_govnumber, ot.f_receiptnumber "
-                           "from o_header oh "
-                            "left join o_header_options o on o.f_id=oh.f_id "
-                           "left join h_halls h on h.f_id=oh.f_hall "
-                           "left join h_tables t on t.f_id=oh.f_table "
-                            "left join o_tax ot on ot.f_id=oh.f_id "
-                           "left join s_user u on u.f_id=oh.f_staff "
-                            "left join b_car bc on bc.f_id=o.f_car "
-                           "where oh.f_state=:f_state and oh.f_datecash between :f_datecash1 and :f_datecash2 ";
-        } else {
-            sqlQuery = "select oh.f_id, concat(oh.f_prefix, oh.f_hallid) as f_order, date_format(oh.f_datecash, '%d.%m.%Y') as f_datecash, oh.f_timeclose, "
+
+        sqlQuery = "select oh.f_id, concat(oh.f_prefix, oh.f_hallid) as f_order, date_format(oh.f_datecash, '%d.%m.%Y') as f_datecash, oh.f_timeclose, "
                        "h.f_name as f_hall, t.f_name as f_table, concat(u.f_last, ' ', u.f_first) as f_staff,"
                        "oh.f_amounttotal, ot.f_receiptnumber "
                        "from o_header oh "
@@ -356,7 +344,7 @@ void C5WaiterServer::reply(QJsonObject &o)
                        "left join s_user u on u.f_id=oh.f_staff "
                         "left join o_tax ot on ot.f_id=oh.f_id "
                        "where oh.f_state=:f_state and oh.f_datecash between :f_datecash1 and :f_datecash2 ";
-        }
+
         if (fIn["hall"].toString().toInt() > 0) {
             sqlQuery += QString(" and oh.f_hall=%1 ").arg(fIn["hall"].toString());
         }
@@ -819,12 +807,12 @@ void C5WaiterServer::processCloseOrder(QJsonObject &o, C5Database &db)
     int dateShift = settings[param_date_cash_shift].toInt();
     bool isAuto = settings[param_date_cash_auto].toInt() > 0;
     if (isAuto) {
-       QTime t = QTime::fromString(settings[param_working_date_change_time], "HH:mm:ss");
-       if (t.isValid()) {
-           if (QTime::currentTime() < t) {
-               dateCash = dateCash.addDays(-1);
-           }
-       }
+        QTime t = QTime::fromString(settings[param_working_date_change_time], "HH:mm:ss");
+        if (t.isValid()) {
+            if (QTime::currentTime() < t) {
+                dateCash = dateCash.addDays(-1);
+            }
+        }
     } else {
         dateCash = QDate::fromString(settings[param_date_cash], FORMAT_DATE_TO_STR_MYSQL);
         if (!dateCash.isValid()) {
@@ -877,7 +865,7 @@ void C5WaiterServer::processCloseOrder(QJsonObject &o, C5Database &db)
             }
         }
 
-        if (orderstate == ORDER_STATE_CLOSE) {            
+        if (orderstate == ORDER_STATE_CLOSE) {
             if (jh["f_bonusid"].toString().toInt() > 0) {
                 db[":f_id"] = jh["f_id"].toString();
                 qDebug() << jh;
@@ -913,7 +901,7 @@ void C5WaiterServer::processCloseOrder(QJsonObject &o, C5Database &db)
                     if (!dw.writeAHeader(cashdocid, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH,
                                          jh["f_currentstaff"].toString().toInt(), dateCash, QDate::currentDate(),
                                          QTime::currentTime(), 0, jh["f_amountcash"].toString().toDouble(),
-                                         settings[param_autocash_prefix] + " " + headerPrefix + QString::number(headerId), 1)) {
+                                         settings[param_autocash_prefix] + " " + headerPrefix + QString::number(headerId), 1, 1)) {
                         err = dw.fErrorMsg;
                     }
                     if (!dw.writeAHeaderCash(cashdocid, settings[param_cash_id].toInt(),
@@ -935,7 +923,7 @@ void C5WaiterServer::processCloseOrder(QJsonObject &o, C5Database &db)
                     if (!dw.writeAHeader(nocashdocid, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH,
                                          jh["f_currentstaff"].toString().toInt(), dateCash, QDate::currentDate(),
                                          QTime::currentTime(), 0, jh["f_amountcard"].toString().toDouble(),
-                                         settings[param_autonocash_prefix] + " " + headerPrefix + QString::number(headerId), 1)) {
+                                         settings[param_autonocash_prefix] + " " + headerPrefix + QString::number(headerId), 1, 1)) {
                         err = dw.fErrorMsg;
                     }
                     if (!dw.writeAHeaderCash(nocashdocid, settings[param_nocash_id].toInt(),
@@ -969,7 +957,7 @@ int C5WaiterServer::printTax(const QMap<QString, QVariant> &header, const QList<
             continue;
         }
         pt.addGoods(C5Config::taxDept(),
-                dbdishpart2->adgcode(dbdish->part2(m["f_dish"].toInt())),
+                    dbdishpart2->adgcode(dbdish->part2(m["f_dish"].toInt())),
                 m["f_dish"].toString(),
                 dbdish->name(m["f_dish"].toInt()),
                 m["f_price"].toDouble(),
@@ -981,7 +969,7 @@ int C5WaiterServer::printTax(const QMap<QString, QVariant> &header, const QList<
                     "5901",
                     "001",
                     QString("%1 %2%").arg(tr("Service")).arg(float_str(header["f_servicefactor"].toDouble()*100, 2)),
-                    header["f_amountservice"].toDouble(), 1.0, 0);
+                header["f_amountservice"].toDouble(), 1.0, 0);
     }
     QString jsonIn, jsonOut;
     int result = 0;
@@ -1099,29 +1087,29 @@ bool C5WaiterServer::printReceipt(QString &err, C5Database &db, bool isBill, boo
 #endif
 
     // CHECKING FOR RECEIPT PRINT COUNT
-//    if (jh["f_print"].toString().toInt() > 0) {
-//        if (!checkPermission(jh["f_currentstaff"].toString().toInt(), cp_t5_multiple_receipt, srh.fDb)) {
-//            err = tr("You cannot print more then 1 copies of receipt");
-//            return false;
-//        }
-//    }
+    //    if (jh["f_print"].toString().toInt() > 0) {
+    //        if (!checkPermission(jh["f_currentstaff"].toString().toInt(), cp_t5_multiple_receipt, srh.fDb)) {
+    //            err = tr("You cannot print more then 1 copies of receipt");
+    //            return false;
+    //        }
+    //    }
     // CHECKING ALL ITEMS THAT WAS PRINTED
-//    for (int i = 0; i < jb.count(); i++) {
-//        QJsonObject jo = jb[i].toObject();
-//        if (jo["f_state"].toString().toInt() != DISH_STATE_OK) {
-//            continue;
-//        }
-//        if (jo["f_qty1"].toString() != jo["f_qty2"].toString()) {
-//            err += tr("All service must be complited");
-//            break;
-//        }
-//    }
-       //CHECK SELFCOST
+    //    for (int i = 0; i < jb.count(); i++) {
+    //        QJsonObject jo = jb[i].toObject();
+    //        if (jo["f_state"].toString().toInt() != DISH_STATE_OK) {
+    //            continue;
+    //        }
+    //        if (jo["f_qty1"].toString() != jo["f_qty2"].toString()) {
+    //            err += tr("All service must be complited");
+    //            break;
+    //        }
+    //    }
+    //CHECK SELFCOST
 
     // CHECKING FOR TAX CASH/CARD
     // PRINT RECEIPT
     // TODO: CHECK FOR DESTINATION PRINTER AND REDIRECT QUERY//        jh["f_idramid"] = C5Config::idramID();
-//        jh["f_idramphone"] = C5Config::idramPhone();
+    //        jh["f_idramphone"] = C5Config::idramPhone();
 
     QString printerName = "local";
     int paperWidth = 500, printType = 80;
@@ -1613,8 +1601,8 @@ void C5WaiterServer::processTaxReport(QJsonObject &o)
     QString jsnin, jsnout, err;
     int result;
     result = pt.printReport(QDateTime::fromString(fIn["d1"].toString(), FORMAT_DATE_TO_STR),
-                            QDateTime::fromString(fIn["d2"].toString(), FORMAT_DATE_TO_STR),
-                            fIn["type"].toInt(), jsnin, jsnout, err);
+            QDateTime::fromString(fIn["d2"].toString(), FORMAT_DATE_TO_STR),
+            fIn["type"].toInt(), jsnin, jsnout, err);
     C5Database db(C5Config::dbParams());
     db[":f_id"] = db.uuid();
     db[":f_order"] = QString("Report %1").arg(fIn["type"].toInt() == report_x ? "X" : "Z");

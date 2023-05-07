@@ -654,7 +654,9 @@ void CE5Goods::on_btnAddGoods_clicked()
     ui->tblGoods->setString(row, 1, vals.at(1).toString());
     ui->tblGoods->setString(row, 2, vals.at(3).toString());
     ui->tblGoods->setString(row, 4, vals.at(4).toString());
+    ui->tblGoods->lineEdit(row, 5)->setDouble(vals.at(6).toDouble());
     ui->tblGoods->lineEdit(row, 3)->setFocus();
+    setComplectFlag();
 }
 
 void CE5Goods::on_btnRemoveGoods_clicked()
@@ -667,6 +669,7 @@ void CE5Goods::on_btnRemoveGoods_clicked()
         return;
     }
     ui->tblGoods->removeRow(row);
+    setComplectFlag();
     countTotal();
 }
 
@@ -737,6 +740,7 @@ void CE5Goods::on_btnNewGoods_clicked()
         ui->tblGoods->lineEdit(row, 3)->setFocus();
     }
     delete e;
+    setComplectFlag();
 }
 
 void CE5Goods::on_btnNewPartner_clicked()
@@ -827,6 +831,7 @@ void CE5Goods::on_btnPaste_clicked()
         ui->tblGoods->lineEdit(row, 5)->setText(cols.at(4));
         ui->tblGoods->lineEdit(row, 6)->setText(cols.at(5));
     }
+    setComplectFlag();
 }
 
 void CE5Goods::on_lbImage_customContextMenuRequested(const QPoint &pos)

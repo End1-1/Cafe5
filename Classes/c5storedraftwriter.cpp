@@ -30,8 +30,7 @@ bool C5StoreDraftWriter::writeFromShopOutput(const QString &doc, int state, QStr
     QSet<int> stores;
     QList<OGoods> items;
     fDb[":f_header"] = doc;
-    fDb.exec("select f_id, f_store, f_goods, f_qty, f_body, f_tax, f_row, f_discountfactor, f_discountmode, f_price "
-             "from o_goods where f_header=:f_header and f_sign=1");
+    fDb.exec("select * from o_goods where f_header=:f_header and f_sign=1");
     bool fetch = false;
     do {
         OGoods g;
@@ -58,7 +57,7 @@ bool C5StoreDraftWriter::writeFromShopOutput(const QString &doc, int state, QStr
                 continue;
             }
             QString drid;
-            if (!writeAStoreDraft(drid, id, store, -1, i.goods, i.qty, i.price, i.price * i.qty, DOC_REASON_SALE, i.id, rownum++, "")) {
+            if (!writeAStoreDraft(drid, id, store, -1, i.goods, i.qty, i.price, i.price * i.qty, DOC_REASON_SALE, i.id.toString(), rownum++, "")) {
                 err += fDb.fLastError;
                 return returnResult(false, err);
             }

@@ -724,9 +724,6 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
     case cp_t3_debts:
         createTab<CR5CostumerDebts>(dbParams);
         break;
-    case cp_t3_car_visits:
-        createTab<CR5CarVisits>(dbParams);
-        break;
     case cp_t3_sale_removed_dishes:
         createTab<CR5SaleRemovedDishes>(dbParams);
         break;
@@ -1043,9 +1040,6 @@ void C5MainWindow::setDB(const QString &dbname)
         if (__c5config.frontDeskMode() == FRONTDESK_WAITER) {
             addTreeL3Item(l, cp_t3_sale_dishes, tr("Sales, dishes"), ":/graph.png");
             addTreeL3Item(l, cp_t3_sale_removed_dishes, tr("Sales, removed dishes"), ":/delete.png");
-        }
-        if (__c5config.carMode()) {
-            addTreeL3Item(l, cp_t3_car_visits, tr("Car visits"), ":/car.png");
         }
         addTreeL3Item(l, cp_t3_store_sale, tr("Sales by goods"), ":/graph.png");
         addTreeL3Item(l, cp_t3_discount_statistics, tr("Discount statistics"), ":/discount.png");

@@ -887,6 +887,8 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
 
             }
         }
+        db[":f_storedoc"] = fInternalId;
+        db.exec("delete from b_clients_debts where f_storedoc=:f_storedoc");
     }
 
     dw.clearAStoreDraft(fInternalId);
@@ -2634,7 +2636,8 @@ void C5StoreDoc::printBarcode()
         db[":f_id"] = ui->tblGoods->getInteger(i, 3);
         db.exec("select f_name, f_scancode from c_goods where f_id=:f_id");
         if (db.nextRow()) {
-            b->addRow(db.getString("f_name"), db.getString("f_scancode"), ui->tblGoods->lineEdit(i, 5)->getInteger(), ui->cbCurrency->currentData().toInt());
+            b->addRow(db.getString("f_name"), db.getString("f_scancode"), ui->tblGoods->lineEdit(i, 5)->getInteger(),
+                      ui->cbCurrency->currentData().toInt(), "");
         }
     }
 }
@@ -2844,7 +2847,7 @@ void C5StoreDoc::tblAddChanged(const QString &arg1)
         calcPrice2(i);
     }
     calcTotalSale();
-    //countTotal();
+    countTotal();
 }
 
 void C5StoreDoc::on_btnAddGoods_clicked()

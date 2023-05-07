@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network printsupport sql
+QT       += core gui network printsupport sql multimedia
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -85,6 +85,7 @@ SOURCES += \
     ../DbData/datadriver.cpp \
     ../DbData/dbbodystate.cpp \
     ../DbData/dbcar.cpp \
+    ../DbData/dbcurrency.cpp \
     ../DbData/dbdata.cpp \
     ../DbData/dbdishcomments.cpp \
     ../DbData/dbdishes.cpp \
@@ -111,6 +112,7 @@ SOURCES += \
     ../DbData/dbusers.cpp \
     ../Forms/c5filtervalues.cpp \
     ../Forms/change.cpp \
+    ../Forms/customerinfo.cpp \
     ../Forms/dlgguestinfo.cpp \
     ../Forms/dlglistofdishcomments.cpp \
     ../Forms/dlgqty.cpp \
@@ -118,6 +120,17 @@ SOURCES += \
     ../Shop/printreceipt.cpp \
     ../Shop/printreceiptgroup.cpp \
     ../Shop/selectprinters.cpp \
+    ../TableRecord/aheader.cpp \
+    ../TableRecord/bclientdebts.cpp \
+    ../TableRecord/bhistory.cpp \
+    ../TableRecord/c5dbrecord.cpp \
+    ../TableRecord/cpartners.cpp \
+    ../TableRecord/ecash.cpp \
+    ../TableRecord/odraftsale.cpp \
+    ../TableRecord/odraftsalebody.cpp \
+    ../TableRecord/ogoods.cpp \
+    ../TableRecord/oheader.cpp \
+    ../TableRecord/otax.cpp \
     dishitem.cpp \
     dishitembutton.cpp \
     dlgaskforprecheck.cpp \
@@ -255,6 +268,7 @@ HEADERS += \
     ../DbData/datadriver.h \
     ../DbData/dbbodystate.h \
     ../DbData/dbcar.h \
+    ../DbData/dbcurrency.h \
     ../DbData/dbdata.h \
     ../DbData/dbdishcomments.h \
     ../DbData/dbdishes.h \
@@ -281,6 +295,7 @@ HEADERS += \
     ../DbData/dbusers.h \
     ../Forms/c5filtervalues.h \
     ../Forms/change.h \
+    ../Forms/customerinfo.h \
     ../Forms/dlgguestinfo.h \
     ../Forms/dlglistofdishcomments.h \
     ../Forms/dlgqty.h \
@@ -289,6 +304,17 @@ HEADERS += \
     ../Shop/printreceipt.h \
     ../Shop/printreceiptgroup.h \
     ../Shop/selectprinters.h \
+    ../TableRecord/aheader.h \
+    ../TableRecord/bclientdebts.h \
+    ../TableRecord/bhistory.h \
+    ../TableRecord/c5dbrecord.h \
+    ../TableRecord/cpartners.h \
+    ../TableRecord/ecash.h \
+    ../TableRecord/odraftsale.h \
+    ../TableRecord/odraftsalebody.h \
+    ../TableRecord/ogoods.h \
+    ../TableRecord/oheader.h \
+    ../TableRecord/otax.h \
     c5printreceiptthread50mm.h \
     dishitem.h \
     dishitembutton.h \
@@ -384,6 +410,7 @@ FORMS += \
     ../Classes/notificationwidget.ui \
     ../Forms/c5filtervalues.ui \
     ../Forms/change.ui \
+    ../Forms/customerinfo.ui \
     ../Forms/dlgguestinfo.ui \
     ../Forms/dlglistofdishcomments.ui \
     ../Forms/dlgqty.ui \
@@ -442,6 +469,7 @@ INCLUDEPATH += ../Forms
 INCLUDEPATH += ../Service
 INCLUDEPATH += ../DbData
 INCLUDEPATH += ../Shop
+INCLUDEPATH += ../TableRecord
 INCLUDEPATH += C:/Projects/NewTax/Src
 INCLUDEPATH += C:/Soft/OpenSSL-Win64/include
 INCLUDEPATH += C:/Soft/OpenSSL-Win64/include/openssl

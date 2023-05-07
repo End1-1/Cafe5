@@ -158,7 +158,8 @@ background:blue;
 }</string>
         </property>
         <property name="text">
-         <string>Fiscal</string>
+         <string>Fiscal
+(F12)</string>
         </property>
         <property name="checkable">
          <bool>true</bool>

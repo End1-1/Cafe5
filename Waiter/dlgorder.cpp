@@ -12,6 +12,7 @@
 #include "dlgqty.h"
 #include "c5logtoserverthread.h"
 #include "dlglistofdishcomments.h"
+#include "customerinfo.h"
 #include "dlglistdishspecial.h"
 #include "dlgreceiptlanguage.h"
 #include "stoplist.h"
@@ -27,6 +28,7 @@
 #include "dlglistofmenu.h"
 #include "dishitem.h"
 #include "datadriver.h"
+#include "cpartners.h"
 #include "change.h"
 #include "dlgcl.h"
 #include "idram.h"
@@ -64,8 +66,6 @@ DlgOrder::DlgOrder(C5User *user) :
     ui->leChange->clear();
     fOpenDateTime = QDateTime::currentDateTime();
     fCarNumber = 0;
-    ui->lbCar->setVisible(C5Config::carMode());
-    ui->btnCar->setVisible(C5Config::carMode());
     ui->lbVisit->setVisible(false);
     ui->lbStaff->setText(user->fullName());
     ui->wqtypaneldown->setVisible(false);
@@ -161,14 +161,8 @@ void DlgOrder::openTable(int table, C5User *user)
 
 void DlgOrder::openTableById(const QString &id, C5User *user)
 {
-//    if (hall.count() > 0) {
-//        C5Config::setServiceFactor(C5CafeCommon::fHallConfigs[hall["f_settings"].toString().toInt()][param_service_factor]);
-//        QString menuName = C5Menu::fMenuNames[C5CafeCommon::fHallConfigs[hall["f_settings"].toString().toInt()][param_default_menu]];
-//        C5Config::setValue(param_default_menu_name, menuName);
-//    }
+
     DlgOrder *d = new DlgOrder(user);
-    d->ui->lbCar->setVisible(C5Config::carMode());
-    d->ui->btnCar->setVisible(C5Config::carMode());
     d->setWindowState(Qt::WindowFullScreen);
     QFont f(qApp->font());
     f.setBold(true);
@@ -197,8 +191,6 @@ void DlgOrder::openTableById(const QString &id, C5User *user)
     if (dbtable->specialConfig(d->fTable) > 0) {
         C5Config::setValues(C5CafeCommon::fHallConfigs[dbtable->specialConfig(d->fTable)]);
     }
-    d->ui->lbCar->setVisible(C5Config::carMode());
-    d->ui->btnCar->setVisible(C5Config::carMode());
 
     d->ui->btnTable->setText(tr("Table") + ": " + dbtable->name(d->fTable));
     if (wo->fOrderDriver->headerOptionsValue("f_car").toInt() > 0) {
@@ -292,8 +284,6 @@ bool DlgOrder::load(int table)
     sh->send();
 
     fTable = table;
-    ui->lbCar->setVisible(C5Config::carMode());
-    ui->btnCar->setVisible(C5Config::carMode());
     fMenuID = C5Config::defaultMenu();
     buildMenu(fMenuID, 0, 0);
     on_btnRecent_clicked();
@@ -305,7 +295,6 @@ bool DlgOrder::load(int table)
         ui->vs->removeItem(ui->vs->itemAt(0));
     }
 
-    ui->lbCar->clear();
     ui->lbVisit->clear();
     ui->lbVisit->setVisible(false);
     if (orders.count() == 0) {
@@ -335,8 +324,6 @@ bool DlgOrder::load(int table)
             wo->fOrderDriver->setCurrentOrderID(oid);
             wo->setDlg(this);
             ui->vs->insertWidget(ui->vs->count() - 1, wo);
-            ui->lbCar->setVisible(C5Config::carMode());
-            ui->btnCar->setVisible(C5Config::carMode());
             ui->btnTable->setText(tr("Table") + ": " + dbtable->name(table));
             if (wo->fOrderDriver->headerOptionsValue("f_car").toInt() > 0) {
                 //setCar(worder()->fOrderDriver->carValue("f_car").toInt());
@@ -353,7 +340,6 @@ bool DlgOrder::load(int table)
     bool isbooking = dbhall->booking(dbtable->hall(table));
     if (isbooking) {
         ui->wPreorder->setVisible(isbooking);
-        ui->btnSplitGuest->setEnabled(!isbooking);
     }
     return true;
 }
@@ -415,11 +401,8 @@ void DlgOrder::buildMenu(int menuid, int part1, int part2)
         QDishPart2Button *btn = new QDishPart2Button();
         connect(btn, &QDishPart2Button::clicked, this, &DlgOrder::dishPart2Clicked);
         btn->setText(dbdishpart2->name(d2.fId));
+        btn->setProperty("bgcolor", dbdishpart2->color(d2.fId));
         btn->setProperty("id", d2.fId);
-        QPalette pal = btn->palette();
-        //TODO: color of part2
-        //pal.setColor(QPalette::Base, QColor::fromRgb(menu->fPart2Color[d2.fId]));
-        btn->setPalette(pal);
         ui->glDishPart2->addWidget(btn, row, col++, 1, 1);
         if (col == colCount) {
             col = 0;
@@ -476,6 +459,10 @@ void DlgOrder::addDishToOrder(int menuid)
 
     ui->scrollArea->verticalScrollBar()->setValue(ui->scrollArea->verticalScrollBar()->maximum() + 100);
     setButtonsState();
+
+    if (__c5config.getValue(param_rest_qty_before_add_dish).toInt() == 1) {
+        on_btnAnyqty_clicked();
+    }
 }
 
 void DlgOrder::itemsToTable()
@@ -613,11 +600,19 @@ void DlgOrder::setButtonsState()
     }
     ui->btnTotal->style()->polish(ui->btnTotal);
 
+    if (wo->fOrderDriver->headerValue("f_partner").toInt() > 0) {
+        CPartners p;
+        C5Database db(__c5config.dbParams());
+        db[":f_id"] = wo->fOrderDriver->headerValue("f_partner");
+        db.exec("select * from c_partners where f_id=:f_id");
+        p.getRecord(db);
+        ui->btnDelivery->setText(QString("%1, %2, %3").arg(p.phone, p.taxName, p.address));
+    }
+
     ui->btnTotal->setEnabled(btnPayment
                              || wo->fOrderDriver->headerValue("f_state").toInt() == ORDER_STATE_PREORDER_EMPTY
                              || wo->fOrderDriver->headerValue("f_state").toInt() == ORDER_STATE_PREORDER_WITH_ORDER);
 
-    ui->btnSplitGuest->setEnabled(wo->fOrderDriver->headerValue("f_state").toInt() != ORDER_STATE_PREORDER_EMPTY && wo->fOrderDriver->headerValue("f_state").toInt() != ORDER_STATE_PREORDER_WITH_ORDER);
     ui->wleft->setVisible(wo->fOrderDriver->headerValue("f_precheck").toInt() < 1);
     ui->wdish->setVisible(wo->fOrderDriver->headerValue("f_precheck").toInt() < 1);
 }
@@ -999,7 +994,7 @@ void DlgOrder::dishPart2Clicked()
 void DlgOrder::dishClicked()
 {
     if (!worder()) {
-        on_btnSplitGuest_clicked();
+
     }
     QDishButton *btn = static_cast<QDishButton*>(sender());
     processMenuID(btn->property("id").toInt());
@@ -1185,20 +1180,6 @@ void DlgOrder::on_btnSearchInMenu_clicked()
     delete d;
 }
 
-void DlgOrder::on_btnCar_clicked()
-{
-    //TODO: set acr
-//    if (worder()->fOrderDriver->hDouble("f_discountfactor") > 0.001) {
-//        C5Message::info(tr("You should not change the car, becouse discount was applied"));
-//        return;
-//    }
-//    int num;
-//    if (!DlgCarNumber::getNumber(num)) {
-//        return;
-//    }
-//    setCar(num);
-}
-
 void DlgOrder::on_btnPackage_clicked()
 {
     WOrder *wo = worder();
@@ -1255,24 +1236,6 @@ void DlgOrder::on_btnSit_clicked()
 {
     DlgGuests(fDBParams, worder()->fOrderDriver).exec();
     itemsToTable();
-}
-
-void DlgOrder::on_btnSplitGuest_clicked()
-{
-    C5User *tmp = fUser;
-    if (!tmp->check(cp_t5_splitguest)) {
-        if (!DlgPassword::getUserAndCheck(tr("Split guests"), tmp, cp_t5_splitguest)) {
-            return;
-        }
-    }
-    QString newid;
-    WOrder *wo = new WOrder();
-    connect(wo, &WOrder::activated, this, &DlgOrder::worderActivated);
-    wo->fOrderDriver->newOrder(fUser->id(), newid, fTable);
-    wo->setDlg(this);
-    wo->setFocus();
-    ui->vs->insertWidget(ui->vs->count() - 1, wo);
-    logRecord(tmp->fullName(), worder()->fOrderDriver->headerValue("f_id").toString(), "", "New order, split guest", dbtable->name(fTable), "");
 }
 
 void DlgOrder::on_btnMovement_clicked()
@@ -1538,15 +1501,7 @@ void DlgOrder::on_btnTotal_clicked()
         if (__c5config.getValue(param_waiter_ask_for_precheck).toInt() > 0) {
             withoutprint = DlgAskForPrecheck::get();
         }
-        if (C5Config::carMode()) {
-            if (wo->fOrderDriver->headerOptionsValue("f_car") == 0) {
-                if (tmp != fUser) {
-                    delete tmp;
-                }
-                C5Message::error(tr("Car model and costumer not specified"));
-                return;
-            }
-        }
+
         bool empty = true;
         for (int i = 0; i < wo->fOrderDriver->dishesCount(); i++) {
             if (wo->fOrderDriver->dishesValue("f_state", i).toInt() != DISH_STATE_OK) {
@@ -1956,10 +1911,16 @@ bool DlgOrder::buildDishes(int part2, const QList<DPart2> &dpart2)
         if (d2.fId == part2) {
             QRect scr = qApp->desktop()->screenGeometry();
             int dcolCount = scr.width() > 1024 ? 3 : 2;
+            if (dcolCount == 3) {
+                ui->wdish->setMinimumSize(QSize(750, 0));
+            }
+            adjustSize();
+            ui->wdish->adjustSize();
             int dcol = 0;
             int drow = 0;
             for (int i = 0; i < d2.data1.count(); i++) {
                 QDishPart2Button *btn = new QDishPart2Button();
+                btn->setProperty("bgcolor", dbdishpart2->color(d2.fId));
                 btn->setProperty("id", d2.data1.at(i).fId);
                 btn->setText(dbdishpart2->name(d2.data1.at(i).fId));
                 connect(btn, &QDishPart2Button::clicked, this, &DlgOrder::dishPartClicked);
@@ -2114,28 +2075,14 @@ void DlgOrder::on_btnPaymentOther_clicked()
 
 void DlgOrder::on_btnPayCityLedger_clicked()
 {
-    if (C5Config::carMode()) {
-        C5Database db(C5Config::dbParams());
-        db[":f_id"] = worder()->fOrderDriver->headerOptionsValue("f_id");
-        db.exec("select bc.f_id, concat(c.f_name, ', ', bc.f_govnumber, ', ', trim(cl.f_contact)) as f_name "
-                "from b_car bc "
-                "left join c_partners cl on cl.f_id=bc.f_costumer "
-                "left join s_car c on c.f_id=bc.f_car "
-                "where bc.f_id=:f_id");
-        if (db.nextRow()) {
-            worder()->fOrderDriver->setHeader("f_otherid", PAYOTHER_DEBT);
-            worder()->fOrderDriver->setCL(db.getString("f_id"), db.getString("f_name"));
-            setCLComment();
-        }
 
-    } else {
         QString clCode, clName;
         if (DlgCL::getCL(clCode, clName)) {
             worder()->fOrderDriver->setHeader("f_otherid", PAYOTHER_CL);
             worder()->fOrderDriver->setCL(clCode, clName);
             setCLComment();
         }
-    }
+
 }
 
 void DlgOrder::on_btnPayComplimentary_clicked()
@@ -2930,4 +2877,22 @@ void DlgOrder::on_btnSelfCost_clicked()
     if (w->fOrderDriver->save() == false) {
         C5Message::error(w->fOrderDriver->error());
     }
+}
+
+void DlgOrder::on_btnDelivery_clicked()
+{
+    WOrder *w = worder();
+    if (!w) {
+        return;
+    }
+    QString phone, address, name;
+    int id;
+    if (CustomerInfo::getCustomer(id, name, phone, address)) {
+        w->fOrderDriver->setHeader("f_partner", id);
+        ui->btnDelivery->setText(QString("%1, %2, %3").arg(phone, name, address));
+    }
+}
+void DlgOrder::on_btnCalcIdram_clicked()
+{
+    calcAmount(ui->leIDRAM);
 }

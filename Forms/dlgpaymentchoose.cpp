@@ -1,6 +1,7 @@
 #include "dlgpaymentchoose.h"
 #include "ui_dlgpaymentchoose.h"
 #include <QDoubleValidator>
+#include <QShortcut>
 
 DlgPaymentChoose::DlgPaymentChoose(const QStringList &dbParams) :
     C5Dialog(dbParams),
@@ -16,6 +17,7 @@ DlgPaymentChoose::DlgPaymentChoose(const QStringList &dbParams) :
     ui->leCashIn->setValidator(new QDoubleValidator(0, 1000000000, 2));
     ui->leChange->setValidator(new QDoubleValidator(0, 1000000000, 2));
     ui->lePrepaid->setValidator(new QDoubleValidator(0, 1000000000, 2));
+    QShortcut *s = new QShortcut(QKeySequence(Qt::Key_F12), this, SLOT(checkFiscal()));
     adjustSize();
 
 }
@@ -54,6 +56,11 @@ bool DlgPaymentChoose::getValues(double total, double &cash, double &card, doubl
         return true;
     }
     return false;
+}
+
+void DlgPaymentChoose::checkFiscal()
+{
+    ui->btnFiscal->setChecked(!ui->btnFiscal->isChecked());
 }
 
 void DlgPaymentChoose::on_btnBack_clicked()
@@ -172,4 +179,49 @@ void DlgPaymentChoose::on_lePrepaid_textChanged(const QString &arg1)
 void DlgPaymentChoose::on_leDebt_textChanged(const QString &arg1)
 {
     countChange();
+}
+
+void DlgPaymentChoose::on_leCash_returnPressed()
+{
+    focusNextChild();
+}
+
+void DlgPaymentChoose::on_leCard_returnPressed()
+{
+    focusNextChild();
+}
+
+void DlgPaymentChoose::on_leBankTransfer_returnPressed()
+{
+    focusNextChild();
+}
+
+void DlgPaymentChoose::on_leIdram_returnPressed()
+{
+    focusNextChild();
+}
+
+void DlgPaymentChoose::on_leTelcell_returnPressed()
+{
+    focusNextChild();
+}
+
+void DlgPaymentChoose::on_lePrepaid_returnPressed()
+{
+    focusNextChild();
+}
+
+void DlgPaymentChoose::on_leDebt_returnPressed()
+{
+    focusNextChild();
+}
+
+void DlgPaymentChoose::on_leCashIn_returnPressed()
+{
+    focusNextChild();
+}
+
+void DlgPaymentChoose::on_leChange_returnPressed()
+{
+    focusNextChild();
 }

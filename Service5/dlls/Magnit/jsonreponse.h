@@ -38,6 +38,8 @@ private:
     bool removeOrderRow();
     bool exportToAS();
     bool getDriversList();
+    bool visit();
+    bool completeDelivery();
 };
 
 #endif // JSONREPONSE_H

@@ -12,6 +12,8 @@ public:
 
     int parentid(int id);
 
+    int color(int id);
+
     QString adgcode(int id);
 };
 

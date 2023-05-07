@@ -414,6 +414,7 @@ bool C5WaiterOrderDoc::makeOutputOfStore(C5Database &db, QString &err, int store
         db[":f_qty"] = t.qtyGoods;
         db.exec("update a_store_draft set f_qty=f_qty-:f_qty where f_id=:f_id");
     }
+    //NONE COMPONNENTS EXIT (W/O COMPLECTATION)
     db[":f_header"] = fHeader["f_id"].toString();
     db.exec("delete from o_goods where f_header=:f_header");
     db[":f_header"] = fHeader["f_id"].toString();
@@ -423,7 +424,7 @@ bool C5WaiterOrderDoc::makeOutputOfStore(C5Database &db, QString &err, int store
              "g.f_lastinputprice, b.f_store "
              "from o_body b "
              "inner join d_recipes r on r.f_dish=b.f_dish "
-             "inner join c_goods g on g.f_id=r.f_goods "
+             "inner join c_goods g on g.f_id=r.f_goods and f_component_exit=0 "
              "where b.f_header=:f_header and (b.f_state=:f_state1 or b.f_state=:f_state2) ");
     goods.clear();
     while (db.nextRow()) {
@@ -435,6 +436,29 @@ bool C5WaiterOrderDoc::makeOutputOfStore(C5Database &db, QString &err, int store
         t.price = db.getDouble("f_lastinputprice");
         goods.append(t);
     }
+    //COMPONENT EXIT WITH COMPLECTATON
+    db[":f_header"] = fHeader["f_id"].toString();
+    db.exec("delete from o_goods where f_header=:f_header");
+    db[":f_header"] = fHeader["f_id"].toString();
+    db[":f_state1"] = DISH_STATE_OK;
+    db[":f_state2"] = DISH_STATE_VOID;
+    db.exec("select b.f_id, gc.f_goods, ((gc.f_qty/g.f_complectout) * r.f_qty)*b.f_qty1 as f_totalqty, gc.f_qty, "
+             "g.f_lastinputprice, b.f_store "
+             "from o_body b "
+             "inner join d_recipes r on r.f_dish=b.f_dish "
+             "inner join c_goods_complectation gc on gc.f_base=r.f_goods "
+             "inner join c_goods g on g.f_id=r.f_goods and f_component_exit=1 "
+             "where b.f_header=:f_header and (b.f_state=:f_state1 or b.f_state=:f_state2) ");
+    while (db.nextRow()) {
+        tmpg t;
+        t.recId = db.getString("f_id");
+        t.goodsId = db.getInt("f_goods");
+        t.qtyGoods = db.getDouble("f_totalqty");
+        t.store = db.getInt("f_store");
+        t.price = db.getDouble("f_lastinputprice");
+        goods.append(t);
+    }
+    //WRITE RESULT OF RECIPE
     int row = 1;
     foreach (const tmpg &t, goods) {
         db[":f_id"] = db.uuid();

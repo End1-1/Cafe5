@@ -10,10 +10,19 @@
     <height>775</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>2</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="windowTitle">
    <string>Cafe5</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_7">
+   <property name="sizeConstraint">
+    <enum>QLayout::SetMaximumSize</enum>
+   </property>
    <property name="leftMargin">
     <number>0</number>
    </property>
@@ -33,7 +42,7 @@
     <widget class="QWidget" name="widget" native="true">
      <property name="minimumSize">
       <size>
-       <width>380</width>
+       <width>0</width>
        <height>0</height>
       </size>
      </property>
@@ -60,7 +69,7 @@
         </property>
         <property name="maximumSize">
          <size>
-          <width>380</width>
+          <width>16777215</width>
           <height>16777215</height>
          </size>
         </property>
@@ -403,35 +412,6 @@
                   </size>
                  </property>
                 </spacer>
-               </item>
-               <item>
-                <widget class="QPushButton" name="btnSplitGuest">
-                 <property name="minimumSize">
-                  <size>
-                   <width>50</width>
-                   <height>50</height>
-                  </size>
-                 </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>50</width>
-                   <height>50</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string/>
-                 </property>
-                 <property name="icon">
-                  <iconset resource="../resources/res.qrc">
-                   <normaloff>:/addguest.png</normaloff>:/addguest.png</iconset>
-                 </property>
-                 <property name="iconSize">
-                  <size>
-                   <width>32</width>
-                   <height>32</height>
-                  </size>
-                 </property>
-                </widget>
                </item>
               </layout>
              </widget>
@@ -779,7 +759,7 @@ background:#fff6e5;
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>380</width>
+              <width>376</width>
               <height>548</height>
              </rect>
             </property>
@@ -1020,20 +1000,20 @@ background:#fff6e5;
    <item row="1" column="3">
     <widget class="QWidget" name="wleft" native="true">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
        <horstretch>2</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
      <property name="minimumSize">
       <size>
-       <width>200</width>
+       <width>250</width>
        <height>0</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
-       <width>200</width>
+       <width>16777215</width>
        <height>16777215</height>
       </size>
      </property>
@@ -1099,7 +1079,7 @@ background:#fff6e5;
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>198</width>
+           <width>248</width>
            <height>676</height>
           </rect>
          </property>
@@ -1123,11 +1103,14 @@ background:#fff6e5;
            <widget class="QWidget" name="wdishpart2" native="true">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>0</horstretch>
+              <horstretch>2</horstretch>
               <verstretch>2</verstretch>
              </sizepolicy>
             </property>
             <layout class="QGridLayout" name="glDishPart2">
+             <property name="sizeConstraint">
+              <enum>QLayout::SetMaximumSize</enum>
+             </property>
              <property name="leftMargin">
               <number>0</number>
              </property>
@@ -1255,19 +1238,19 @@ background:#fff6e5;
     <widget class="QWidget" name="wpayment" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-       <horstretch>2</horstretch>
+       <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
      <property name="minimumSize">
       <size>
-       <width>402</width>
+       <width>0</width>
        <height>0</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
-       <width>402</width>
+       <width>16777215</width>
        <height>16777215</height>
       </size>
      </property>
@@ -2141,7 +2124,7 @@ IDRAM</string>
            </property>
           </widget>
          </item>
-         <item row="4" column="2">
+         <item row="4" column="3">
           <widget class="QPushButton" name="btnFillIdram">
            <property name="minimumSize">
             <size>
@@ -2161,6 +2144,35 @@ IDRAM</string>
            <property name="icon">
             <iconset resource="../resources/res.qrc">
              <normaloff>:/fill.png</normaloff>:/fill.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>32</width>
+             <height>32</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="2">
+          <widget class="QPushButton" name="btnCalcIdram">
+           <property name="minimumSize">
+            <size>
+             <width>50</width>
+             <height>50</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>50</width>
+             <height>50</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources/res.qrc">
+             <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -2784,47 +2796,6 @@ IDRAM</string>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="btnCar">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>50</height>
-         </size>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::NoFocus</enum>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QPushButton:checked{background-color: rgb(0, 150, 0);font-weight:bold; }</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset resource="../resources/res.qrc">
-          <normaloff>:/car.png</normaloff>:/car.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>32</width>
-          <height>32</height>
-         </size>
-        </property>
-        <property name="checkable">
-         <bool>false</bool>
-        </property>
-        <property name="checked">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QPushButton" name="btnPackage">
         <property name="minimumSize">
          <size>
@@ -3067,6 +3038,18 @@ LANGUAGE</string>
    </item>
    <item row="1" column="5">
     <widget class="QWidget" name="wdish" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>1</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>250</width>
+       <height>0</height>
+      </size>
+     </property>
      <layout class="QVBoxLayout" name="verticalLayout_5">
       <property name="spacing">
        <number>2</number>
@@ -3093,7 +3076,7 @@ LANGUAGE</string>
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>304</width>
+           <width>248</width>
            <height>696</height>
           </rect>
          </property>
@@ -3120,7 +3103,7 @@ LANGUAGE</string>
             </property>
             <property name="minimumSize">
              <size>
-              <width>250</width>
+              <width>0</width>
               <height>0</height>
              </size>
             </property>
@@ -3302,21 +3285,6 @@ LANGUAGE</string>
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="lbCar">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QLabel:disabled {color:gray;}
-QLabel {color:green;}
-</string>
-        </property>
-        <property name="text">
-         <string>[Car]</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QLabel" name="lbVisit">
         <property name="enabled">
          <bool>false</bool>
@@ -3343,6 +3311,19 @@ QLabel {color:yellow;background:green;}
          </size>
         </property>
        </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnDelivery">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Delivery</string>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QPushButton" name="btnSit">

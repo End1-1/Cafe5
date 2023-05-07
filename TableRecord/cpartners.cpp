@@ -33,6 +33,8 @@ bool CPartners::getRecord(C5Database &db)
     email = db.getString("f_email");
     address = db.getString("f_address");
     legalAddress = db.getString("f_legaladdress");
+    permanentDiscount = db.getDouble("f_permanent_discount");
+    pricePolitic = db.getInt("f_price_politic");
     return true;
 }
 
@@ -48,6 +50,8 @@ void CPartners::bind(C5Database &db)
     db[":f_email"] = email;
     db[":f_address"] = address;
     db[":f_legaladdress"] = legalAddress;
+    db[":f_permanent_discount"] = permanentDiscount;
+    db[":f_price_politic"] = pricePolitic;
 }
 
 bool CPartners::write(C5Database &db, QString &err)

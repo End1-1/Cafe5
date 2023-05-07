@@ -378,7 +378,7 @@ void CR5Goods::printBarCodes()
     for (int i = 0; i < fModel->rowCount(); i++) {
         b->addRow(fModel->data(i, fModel->indexForColumnName("f_goods"), Qt::EditRole).toString(),
                   fModel->data(i, fModel->indexForColumnName("f_scancode"), Qt::EditRole).toString(),
-                  1, fFilter->currency());
+                  1, fFilter->currency(), "");
     }
 }
 

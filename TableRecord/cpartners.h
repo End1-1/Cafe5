@@ -20,6 +20,8 @@ public:
     QString phone;
     QString address;
     QString legalAddress;
+    int pricePolitic = 0;
+    double permanentDiscount = 0.0;
 
     virtual CPartners &queryRecordOfId(C5Database &db, const QVariant &id) override;
     virtual bool getRecord(C5Database &db) override;

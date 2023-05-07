@@ -21,6 +21,8 @@ public:
 
 private slots:
 
+    void checkFiscal();
+
     void on_btnBack_clicked();
 
     void on_btnCash_clicked();
@@ -54,6 +56,24 @@ private slots:
     void on_lePrepaid_textChanged(const QString &arg1);
 
     void on_leDebt_textChanged(const QString &arg1);
+
+    void on_leCash_returnPressed();
+
+    void on_leCard_returnPressed();
+
+    void on_leBankTransfer_returnPressed();
+
+    void on_leIdram_returnPressed();
+
+    void on_leTelcell_returnPressed();
+
+    void on_lePrepaid_returnPressed();
+
+    void on_leDebt_returnPressed();
+
+    void on_leCashIn_returnPressed();
+
+    void on_leChange_returnPressed();
 
 private:
     Ui::DlgPaymentChoose *ui;

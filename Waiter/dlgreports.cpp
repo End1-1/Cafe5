@@ -90,9 +90,6 @@ void DlgReports::handleDailyCommon(const QJsonObject &obj)
         ui->tbl->setString(r, 5, o["f_table"].toString());
         ui->tbl->setString(r, 6, o["f_staff"].toString());
         ui->tbl->setString(r, 7, float_str(o["f_amounttotal"].toString().toDouble(), 2));
-        if (__c5config.carMode()) {
-            ui->tbl->setString(r, 8, o["f_govnumber"].toString());
-        }
         ui->tbl->setString(r, 8, o["f_receiptnumber"].toString());
         total += o["f_amounttotal"].toString().toDouble();
     }

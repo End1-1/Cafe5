@@ -27,18 +27,16 @@
 #define col_qty 6
 #define col_unit 7
 #define col_price 8
-#define col_amount 9
-#define col_discount_type 10
-#define col_discount_value 11
-#define col_discount_amount 12
-#define col_grandtotal 13
+#define col_discount_value 9
+#define col_discount_amount 10
+#define col_grandtotal 11
 
 C5SaleDoc::C5SaleDoc(const QStringList &dbParams, QWidget *parent) :
     C5Widget(dbParams, parent),
     ui(new Ui::C5SaleDoc)
 {
     ui->setupUi(this);
-    ui->tblGoods->setColumnWidths(ui->tblGoods->columnCount(), 0, 50, 0, 150, 200, 300, 80, 80, 80, 80, 0, 0, 0, 0);
+    ui->tblGoods->setColumnWidths(ui->tblGoods->columnCount(), 0, 50, 0, 150, 200, 300, 80, 80, 80, 80, 80, 80);
     ui->cbCurrency->setDBValues(dbParams, "select f_id, f_name from e_currency");
     ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(__c5config.getValue(param_default_currency)));
     ui->cbStorage->setDBValues(dbParams, "select f_id, f_name from c_storages order by 2");
@@ -53,6 +51,7 @@ C5SaleDoc::C5SaleDoc(const QStringList &dbParams, QWidget *parent) :
     connect(ui->leCash, &C5LineEdit::doubleClicked, this, &C5SaleDoc::amountDoubleClicked);
     connect(ui->leCard, &C5LineEdit::doubleClicked, this, &C5SaleDoc::amountDoubleClicked);
     connect(ui->lePrepaid, &C5LineEdit::doubleClicked, this, &C5SaleDoc::amountDoubleClicked);
+    connect(ui->leDebt, &C5LineEdit::doubleClicked, this, &C5SaleDoc::amountDoubleClicked);
     connect(ui->leBankTransfer, &C5LineEdit::doubleClicked, this, &C5SaleDoc::amountDoubleClicked);
 }
 
@@ -66,8 +65,10 @@ void C5SaleDoc::setMode(int mode)
     fMode = mode;
     switch (fMode) {
     case 1:
+        ui->leSaleType->setText(tr("Retail"));
         break;
     case 2:
+        ui->leSaleType->setText(tr("Whosale"));
         break;
     }
 }
@@ -163,6 +164,14 @@ void C5SaleDoc::saveDataChanges()
             < ui->leGrandTotal->getDouble()) {
         err += tr("Incomplete payment") + "<br>";
     }
+    if (ui->leCash->getDouble()
+            + ui->leCard->getDouble()
+            + ui->lePrepaid->getDouble()
+            + ui->leDebt->getDouble()
+            + ui->leBankTransfer->getDouble()
+            > ui->leGrandTotal->getDouble()) {
+        err += tr("Incomplete payment") + "<br>";
+    }
     if (err.isEmpty() == false) {
         C5Message::error(err);
         return;
@@ -249,9 +258,9 @@ void C5SaleDoc::saveDataChanges()
         db[":f_sign"] = 1;
         db[":f_taxdept"] = "";
         db[":f_row"] = i;
-        db[":f_discountfactor"] = 0;
+        db[":f_discountfactor"] = ui->tblGoods->lineEdit(i, col_discount_value)->getDouble() / 100;
         db[":f_discountmode"] = 0;
-        db[":f_discountamount"] = 0;
+        db[":f_discountamount"] = ui->tblGoods->lineEdit(i, col_discount_amount)->getDouble();
         db[":f_return"] = 0;
         db[":f_returnfrom"] = "";
         QString guuid;
@@ -324,14 +333,14 @@ void C5SaleDoc::saveDataChanges()
             }
             if (outStoreDocId.isEmpty()) {
                 dw.writeAHeader(outStoreDocId, outStoredocUserNum, DOC_STATE_DRAFT, DOC_TYPE_STORE_OUTPUT, __user->id(), QDate::currentDate(),
-                                     QDate::currentDate(), QTime::currentTime(), 0, 0, outStoreDocComment, 0, ui->cbCurrency->currentData().toInt());
+                                QDate::currentDate(), QTime::currentTime(), 0, 0, outStoreDocComment, 0, ui->cbCurrency->currentData().toInt());
                 dw.writeAHeaderStore(outStoreDocId, __user->id(), __user->id(), "", QDate(), 0,
                                      ui->tblGoods->comboBox(i, col_store)->currentData().toInt(),
                                      1, "", 0, 0, uuid);
                 outDocIds.append(outStoreDocId);
 
                 dw.writeAHeader(inStoreDocId, inStoredocUserNum, DOC_STATE_DRAFT, DOC_TYPE_STORE_INPUT, __user->id(), QDate::currentDate(),
-                                     QDate::currentDate(), QTime::currentTime(), 0, 0, inStoreDocComment, 0, ui->cbCurrency->currentData().toInt());
+                                QDate::currentDate(), QTime::currentTime(), 0, 0, inStoreDocComment, 0, ui->cbCurrency->currentData().toInt());
                 dw.writeAHeaderStore(inStoreDocId, __user->id(), __user->id(), "", QDate(),
                                      ui->cbStorage->currentData().toInt(), 0,
                                      1, "", 0, 0, uuid);
@@ -391,7 +400,7 @@ void C5SaleDoc::saveDataChanges()
     QString storedocUserNum;
     storedocUserNum = dw.storeDocNum(DOC_TYPE_STORE_OUTPUT, ui->cbStorage->currentData().toInt(), true, 0);
     dw.writeAHeader(storeDocId, storedocUserNum, DOC_STATE_DRAFT, DOC_TYPE_STORE_OUTPUT, __user->id(), QDate::currentDate(),
-                         QDate::currentDate(), QTime::currentTime(), 0, 0, storeDocComment, 0, ui->cbCurrency->currentData().toInt());
+                    QDate::currentDate(), QTime::currentTime(), 0, 0, storeDocComment, 0, ui->cbCurrency->currentData().toInt());
     dw.writeAHeaderStore(storeDocId, __user->id(), __user->id(), "", QDate(), 0,
                          ui->cbStorage->currentData().toInt(),
                          1, "", 0, 0, uuid);
@@ -467,34 +476,20 @@ void C5SaleDoc::uuidDoubleClicked()
 
 void C5SaleDoc::on_PriceTextChanged(const QString &arg1)
 {
-    C5LineEdit *l = static_cast<C5LineEdit*>(sender());
-    int r, c;
-    if (ui->tblGoods->findWidget(l, r, c)) {
-        ui->tblGoods->lineEdit(r, col_amount)->setDouble(str_float(arg1) * ui->tblGoods->lineEdit(r, col_qty)->getDouble());
-        countGrandTotal();
-    }
+    Q_UNUSED(arg1);
+    countGrandTotal();
 }
 
 void C5SaleDoc::on_QtyTextChanged(const QString &arg1)
 {
-    C5LineEdit *l = static_cast<C5LineEdit*>(sender());
-    int r, c;
-    if (ui->tblGoods->findWidget(l, r, c)) {
-        ui->tblGoods->lineEdit(r, col_amount)->setDouble(str_float(arg1) * ui->tblGoods->lineEdit(r, col_price)->getDouble());
-        countGrandTotal();
-    }
+    Q_UNUSED(arg1);
+    countGrandTotal();
 }
 
-void C5SaleDoc::on_TotalTextChanged(const QString &arg1)
+void C5SaleDoc::on_discountValueChanged(const QString &arg1)
 {
-    C5LineEdit *l = static_cast<C5LineEdit*>(sender());
-    int r, c;
-    if (ui->tblGoods->findWidget(l, r, c)) {
-        if (ui->tblGoods->lineEdit(r, col_qty)->getDouble() > 0.0001) {
-            ui->tblGoods->lineEdit(r, col_price)->setDouble(str_float(arg1) / ui->tblGoods->lineEdit(r, col_qty)->getDouble());
-            countGrandTotal();
-        }
-    }
+    Q_UNUSED(arg1);
+    countGrandTotal();
 }
 
 void C5SaleDoc::on_leCmd_returnPressed()
@@ -529,7 +524,8 @@ int C5SaleDoc::addGoods(int goodsId, C5Database &db)
             "left join c_units gu on gu.f_id=g.f_unit "
             "where g.f_id=:f_id and gpr.f_currency=:f_currency").arg(priceField));
     if (db.nextRow()) {
-        return addGoods(ui->cbStorage->currentData().toInt(), goodsId, db.getString("f_scancode"), db.getString("f_name"), db.getString("f_unitname"), 0, db.getDouble("f_price"));
+        return addGoods(ui->cbStorage->currentData().toInt(), goodsId, db.getString("f_scancode"), db.getString("f_name"),
+                        db.getString("f_unitname"), 0, db.getDouble("f_price"));
     } else {
         C5Message::error(tr("Invalid goods id"));
     }
@@ -544,33 +540,48 @@ int C5SaleDoc::addGoods(int store, int goodsId, const QString &barcode, const QS
     C5ComboBox *cs = ui->tblGoods->createComboBox(r, col_store);
     ui->tblGoods->setString(r, col_barcode, barcode);
     ui->tblGoods->setString(r, col_name, name);
-    ui->tblGoods->createLineEdit(r, col_qty)->setDouble(qty);
+    C5LineEdit *l = ui->tblGoods->createLineEdit(r, col_qty);
+    l->setValidator(new QDoubleValidator(0, 999999999, 3));
+    l->setDouble(qty);
     ui->tblGoods->setString(r, col_unit, unitname);
     ui->tblGoods->createLineEdit(r, col_price)->setDouble(price);
-    ui->tblGoods->createLineEdit(r, col_amount)->setDouble(price*qty);
-    ui->tblGoods->setString(r, col_discount_type, "");
-    ui->tblGoods->setString(r, col_discount_value, "");
-    ui->tblGoods->setDouble(r, col_discount_amount, 0);
-    ui->tblGoods->setDouble(r, col_grandtotal, qty * price);
+    l = ui->tblGoods->createLineEdit(r, col_discount_value);
+    l->setValidator(new QDoubleValidator(0, 999999999, 3));
+    l->setDouble(fPartner.permanentDiscount);
+    l = ui->tblGoods->createLineEdit(r, col_discount_amount);
+    l->setValidator(new QDoubleValidator(0, 999999999, 3));
+    l->setReadOnly(true);
+    l = ui->tblGoods->createLineEdit(r, col_grandtotal);
+    l->setValidator(new QDoubleValidator(0, 999999999, 3));
+    l->setDouble(qty * price);
+    l->setReadOnly(true);
     connect(ui->tblGoods->lineEdit(r, col_qty), &C5LineEdit::textEdited, this, &C5SaleDoc::on_QtyTextChanged);
     connect(ui->tblGoods->lineEdit(r, col_price), &C5LineEdit::textEdited, this, &C5SaleDoc::on_PriceTextChanged);
-    connect(ui->tblGoods->lineEdit(r, col_amount), &C5LineEdit::textEdited, this, &C5SaleDoc::on_TotalTextChanged);
+    connect(ui->tblGoods->lineEdit(r, col_discount_value), &C5LineEdit::textEdited, this, &C5SaleDoc::on_discountValueChanged);
     for (int i = 0; i < ui->cbStorage->count(); i++) {
         cs->addItem(ui->cbStorage->itemText(i), ui->cbStorage->itemData(i));
     }
     cs->setCurrentIndex(cs->findData(store));
+    if (fSpecialPrices.contains(goodsId)) {
+        ui->tblGoods->lineEdit(r, col_price)->setDouble(fSpecialPrices[goodsId]);
+        ui->tblGoods->lineEdit(r, col_discount_value)->setDouble(0);
+    }
     countGrandTotal();
     return r;
 }
 
 void C5SaleDoc::countGrandTotal()
 {
-    double total = 0;
+    double grandTotal = 0;
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
-        ui->tblGoods->setDouble(i, col_grandtotal, ui->tblGoods->lineEdit(i, col_amount)->getDouble());
-        total += ui->tblGoods->getDouble(i, col_grandtotal);
+        double total = ui->tblGoods->lineEdit(i, col_qty)->getDouble() * ui->tblGoods->lineEdit(i, col_price)->getDouble();
+        double disc = total * (ui->tblGoods->lineEdit(i, col_discount_value)->getDouble() / 100);
+        ui->tblGoods->lineEdit(i, col_discount_amount)->setDouble(disc);
+        total -= disc;
+        ui->tblGoods->lineEdit(i, col_grandtotal)->setDouble(total);
+        grandTotal += total;
     }
-    ui->leGrandTotal->setDouble(total);
+    ui->leGrandTotal->setDouble(grandTotal);
 }
 
 bool C5SaleDoc::openDraft(const QString &id)
@@ -602,6 +613,7 @@ bool C5SaleDoc::openDraft(const QString &id)
     ui->leTime->setText(fDraftSale.time.toString(FORMAT_TIME_TO_STR));
     ui->leComment->setText(fDraftSale.comment);
     ui->leUuid->setText(fDraftSale.id);
+    ui->leDelivery->setText(fDraftSale.deliveryDate.toString(FORMAT_DATE_TO_STR));
     QString priceField = "f_price1";
     db[":f_header"] = id;
     db[":f_state"] = 1;
@@ -644,6 +656,24 @@ void C5SaleDoc::setPartner()
 {
     ui->leTaxpayerName->setText(QString("%1, %2, %3").arg(fPartner.categoryName, fPartner.groupName, fPartner.taxName));
     ui->leTaxpayerId->setText(fPartner.taxCode);
+    setMode(fPartner.pricePolitic);
+    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+        ui->tblGoods->lineEdit(i, col_discount_value)->setDouble(fPartner.permanentDiscount);
+    }
+    fSpecialPrices.clear();
+    C5Database db(fDBParams);
+    db[":f_partner"] = fPartner.id;
+    db.exec("select f_goods, f_price from c_goods_special_prices where f_partner=:f_partner");
+    while (db.nextRow()) {
+        fSpecialPrices[db.getInt("f_goods")] = db.getDouble("f_price");
+    }
+    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+        if (fSpecialPrices.contains(ui->tblGoods->getInteger(i, col_goods_code))) {
+            ui->tblGoods->lineEdit(i, col_price)->setDouble(fSpecialPrices[ui->tblGoods->getInteger(i, col_goods_code)]);
+            ui->tblGoods->lineEdit(i, col_discount_value)->setDouble(0);
+        }
+    }
+    countGrandTotal();
 }
 
 void C5SaleDoc::exportToAs(int doctype)
@@ -685,8 +715,8 @@ void C5SaleDoc::exportToAs(int doctype)
     jo["doctype"] = doctype;
     jo["lesexpenseacc"] = __c5config.getRegValue("lesexpenseacc", "").toString();
     jo["lesincomeacc"] = __c5config.getRegValue("lesincomeacc", "").toString();
-    jo["lemexpenseacc"] = __c5config.getRegValue("lesexpenseacc", "").toString();
-    jo["lemincomeacc"] = __c5config.getRegValue("lesincomeacc", "").toString();
+    jo["lemexpenseacc"] = __c5config.getRegValue("lemexpenseacc", "").toString();
+    jo["lemincomeacc"] = __c5config.getRegValue("lemincomeacc", "").toString();
     QJsonObject jdb;
     jdb["host"] = fDBParams.at(0);
     jdb["schema"] = fDBParams.at(1);
@@ -785,8 +815,7 @@ void C5SaleDoc::on_btnSearchTaxpayer_clicked()
     }
     C5Database db(fDBParams);
     fPartner.queryRecordOfId(db, values.at(1));
-    ui->leTaxpayerName->setText(fPartner.taxName);
-    ui->leTaxpayerId->setText(fPartner.taxCode);
+    setPartner();
 }
 
 
@@ -800,6 +829,7 @@ void C5SaleDoc::on_btnDelivery_clicked()
     QDate d;
     if (C5DateRange::date(d)) {
         ui->leDelivery->setText(d.toString(FORMAT_DATE_TO_STR));
+        fDraftSale.deliveryDate = d;
     }
 }
 
@@ -827,4 +857,12 @@ void C5SaleDoc::on_btnEditAccounts_clicked()
 {
     ArmSoftExportOptions d(fDBParams);
     d.exec();
+}
+
+void C5SaleDoc::on_leCash_textChanged(const QString &arg1)
+{
+    Q_UNUSED(arg1);
+    if (ui->leCash->getDouble() > ui->leGrandTotal->getDouble()){
+        ui->leCash->setDouble(ui->leGrandTotal->getDouble());
+    }
 }

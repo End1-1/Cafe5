@@ -126,6 +126,9 @@ void CR5Reports::removeHandler(bool checked)
     if (mil.isEmpty()) {
         return;
     }
+    if (C5Message::question(tr("Confirm to remove selected objects")) != QDialog::Accepted) {
+        return;
+    }
     QSet<int> rowsSet;
     for (const QModelIndex &ml: mil) {
         rowsSet.insert(ml.row());

@@ -74,6 +74,8 @@ void DlgDirtyStoreDoc::on_btnEdit_clicked()
         }
     });
     l = ui->tbl->createLineEdit(r, 6);
+    l->fDecimalPlaces = 4;
+    l->setValidator(new QDoubleValidator(0, 999999999,4));
     l->setDouble(ui->tbl->getDouble(r, 6));
     connect(l, &C5LineEdit::textChanged, this, [this](){
         int row, col;

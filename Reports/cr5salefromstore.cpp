@@ -85,11 +85,9 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
 
     fColumnsSum << "f_qty"
                 << "f_total"
-                << "f_selfcost"
                 << "f_discamount"
                 << "f_totalsaleprice"
                 << "f_totalsaleprice2"
-                << "f_profit"
                       ;
 
     fTranslation["f_header"] = tr("UUID");

@@ -38,6 +38,10 @@ void CR5ReportsFilter::setFields(const QStringList &cache)
             addFilterField(tr("Goods group"), c, r);
             r++;
             break;
+        case cache_draft_sale_state:
+            addFilterField(tr("State"), c, r);
+            r++;
+            break;
         }
     }
 }
@@ -57,6 +61,7 @@ QString CR5ReportsFilter::replacement()
             case cache_goods_group:
             case cache_goods_store:
             case cache_currency:
+            case cache_draft_sale_state:
                 in(cond, it.value()->property("fieldname").toString(), it.value());
                 break;
             }
