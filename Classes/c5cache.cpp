@@ -38,9 +38,11 @@ C5Cache::C5Cache(const QStringList &dbParams) :
                 .arg(tr("Complect output"));
         fCacheQuery[cache_goods_store] = QString("select f_id as `%1`, f_name as `%2` from c_storages")
                 .arg(tr("Code"),tr("Name"));
-        fCacheQuery[cache_goods_partners] = QString("select f_id as `%1`, f_taxname as `%2`, f_contact as `%3`, \
+        fCacheQuery[cache_goods_partners] = QString("select f_id as `%1`, f_name as ``, f_address as ``, f_taxname as `%2`, f_contact as `%3`, \
                                                     f_info as `%4`, f_phone `%5`, f_email as `%6` from c_partners ")
                                                     .arg(tr("Code"))
+                                                    .arg(tr("Name"))
+                                                    .arg(tr("Address"))
                                                     .arg(tr("Legal name"))
                                                     .arg(tr("Contact"))
                                                     .arg(tr("Info"))

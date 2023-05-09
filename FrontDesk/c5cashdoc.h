@@ -55,7 +55,7 @@ public:
     static bool removeDoc(C5Database &db, const QString &uuid);
 
 public slots:
-    void save(bool fromrelation = false);
+    void save(bool writedebt, bool fromrelation = false);
 
 private slots:
     void amountChanged(const QString &arg1);

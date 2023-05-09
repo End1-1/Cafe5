@@ -328,6 +328,9 @@ void C5Grid::restoreColumnsWidths()
     for (int i = 0; i < ui->tblTotal->columnCount(); i++) {
         ui->tblTotal->setItem(0, i, new C5TableWidgetItem());
         QString colName = fModel->nameForColumnIndex(i);
+        if (colName.isEmpty()) {
+            continue;
+        }
         QString fullColName = colName;
         for (QMap<QString, bool>::const_iterator it = fColumnsVisible.begin(); it != fColumnsVisible.end(); it++) {
             QString c = it.key().toLower();

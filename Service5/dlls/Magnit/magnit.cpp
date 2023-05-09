@@ -26,7 +26,6 @@ bool magnit(const QByteArray &indata, QByteArray &outdata, const QHash<QString, 
     JsonHandler jh;
     RequestHandler rh(outdata);
     QString configFile = path + "/magnit.ini";
-    LogWriter::write(LogWriterLevel::errors, "", QString("Using config file: %1").arg(configFile));
     if (!QFile::exists(configFile)) {
         LogWriter::write(LogWriterLevel::errors, "", QString("Magnit config path not exists: %1").arg(configFile));
         jh["message"] = "Server not configured";

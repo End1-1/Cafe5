@@ -109,7 +109,6 @@ bool Database::exec(const QString &query)
             fColumnsIndexes[i] = rec.fieldName(i).toLower();
         }
     }
-    LogWriter::write(LogWriterLevel::verbose, "", fSqlDatabase.databaseName() + QString(" Affected rows %1").arg(fQuery->numRowsAffected()));
     return true;
 }
 

@@ -856,10 +856,24 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
             cd.setCashOutput(ui->leCash->getInteger());
             cd.setComment(purpose);
             cd.setPartner(ui->lePartner->getInteger());
-            cd.save();
+            cd.save(false);
             fCashDocUuid = cd.uuid();
             db[":f_cashuuid"] = fCashDocUuid;
             db.update("a_header_store", "f_id", fInternalId);
+        }
+        db[":f_storedoc"] = fInternalId;
+        db.exec("delete from b_clients_debts where f_storedoc=:f_storedoc");
+        if (state == DOC_STATE_SAVED) {
+            if (ui->lePartner->getInteger() > 0 && !ui->chPaid->isChecked()) {
+                BClientDebts bcd;
+                bcd.date = ui->deDate->date();
+                bcd.source = BCLIENTDEBTS_SOURCE_INPUT;
+                bcd.amount = ui->leTotal->getDouble() * -1;
+                bcd.currency = ui->cbCurrency->currentData().toInt();
+                bcd.store = fInternalId;
+                bcd.costumer = ui->lePartner->getInteger();
+                bcd.write(db, err);
+            }
         }
     }
 
@@ -960,20 +974,6 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
     }
 
     if (fDocType == DOC_TYPE_STORE_INPUT) {
-        db[":f_doc"] = fInternalId;
-        db.exec("delete from b_clients_debts where f_storedoc=:f_storedoc");
-        if (state == DOC_STATE_SAVED) {
-            if (ui->lePartner->getInteger() > 0 && !ui->chPaid->isChecked()) {
-                BClientDebts bcd;
-                bcd.date = ui->deDate->date();
-                bcd.source = BCLIENTDEBTS_SOURCE_INPUT;
-                bcd.amount = ui->leTotal->getDouble() * -1;
-                bcd.currency = ui->cbCurrency->currentData().toInt();
-                bcd.store = fInternalId;
-                bcd.costumer = ui->lePartner->getInteger();
-                bcd.write(db, err);
-            }
-        }
         db.deleteFromTable("a_calc_price", "f_document", fInternalId);
         for (int i = 0; i < ui->tblCalcPrice->rowCount(); i++) {
             db[":f_id"] = ui->tblGoods->getString(i, 0);

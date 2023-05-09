@@ -281,7 +281,7 @@ void C5CashDoc::draft()
     }
 }
 
-void C5CashDoc::save(bool fromrelation)
+void C5CashDoc::save(bool writedebt, bool fromrelation)
 {
     if (fRelation && !fromrelation) {
         C5Message::info(tr("The document cannot be edited directly"));
@@ -325,7 +325,7 @@ void C5CashDoc::save(bool fromrelation)
     }    
     db[":f_cash"] = fUuid;
     db.exec("delete from b_clients_debts where f_cash=:f_cash");
-    if (ui->lePartner->getInteger() > 0) {
+    if (writedebt && ui->lePartner->getInteger() > 0) {
         BClientDebts bcd;
         bcd.source = fDebtSource;
         bcd.date = ui->deDate->date();
