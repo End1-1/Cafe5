@@ -96,19 +96,21 @@ void DlgSmartReports::reportCommonDishes()
     dd[":f_datecash1"] = ui->leDateStart->date();
     dd[":f_datecash2"] = ui->leDateEnd->date();
     dd[":f_stateh"] = ORDER_STATE_CLOSE;
+    dd[":f_hall"] = __c5config.getValue(param_default_hall).toInt();
     dd.exec("select count(f_id) from o_header h "
-            "where h.f_state=:f_stateh  and h.f_datecash between :f_datecash1 and :f_datecash2 ");
+            "where h.f_state=:f_stateh and h.f_hall=:f_hall and h.f_datecash between :f_datecash1 and :f_datecash2 ");
     dd.nextRow();
     int totalQty = dd.getInt(0);
     dd[":f_datecash1"] = ui->leDateStart->date();
     dd[":f_datecash2"] = ui->leDateEnd->date();
     dd[":f_stateh"] = ORDER_STATE_CLOSE;
     dd[":f_stated"] = DISH_STATE_OK;
+    dd[":f_hall"] = __c5config.getValue(param_default_hall).toInt();
     dd.exec("select d.f_name, sum(b.f_qty1) as f_qty, b.f_price, sum(b.f_total) as f_total "
             "from o_body b "
             "inner join o_header h on h.f_id=b.f_header "
             "left join d_dish d on d.f_id=b.f_dish "
-            "where h.f_state=:f_stateh and b.f_state=:f_stated and h.f_datecash between :f_datecash1 and :f_datecash2 "
+            "where h.f_state=:f_stateh and b.f_state=:f_stated and h.f_hall=:f_hall and h.f_datecash between :f_datecash1 and :f_datecash2 "
             "group by 1, 3 ");
     p.setFontBold(false);
     p.setFontSize(22);

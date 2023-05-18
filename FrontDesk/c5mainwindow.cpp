@@ -160,7 +160,7 @@ C5MainWindow::C5MainWindow(QWidget *parent) :
 #ifdef QT_DEBUG
     fUpdateTimer.start(2000);
 #else
- //   fUpdateTimer.start(10000);
+    fUpdateTimer.start(10000);
 #endif
     ui->wMenu->resize(C5Config::getRegValue("twdbsize", 300).toInt(), 0);
 }
@@ -334,13 +334,8 @@ void C5MainWindow::on_actionLogin_triggered()
 void C5MainWindow::updateTimeout()
 {
     fUpdateTimer.stop();
-    CheckForUpdateThread *ut = new CheckForUpdateThread(this);
-    ut->fApplication = _MODULE_;
-    ut->fDbParams = C5Config::dbParams();
-    connect(ut, SIGNAL(checked(bool, int, QString)), this, SLOT(updateChecked(bool, int, QString)));
-    ut->start();
-    if (__user && __user->id() > 0) {
-        C5Database db(ut->fDbParams);
+    if (__user && __user->id() == 77) {
+        C5Database db(C5Config::dbParams());
         db.exec("select f_id from o_draft_sale where f_id not in (select f_header from o_draft_sound) and f_saletype<3 ");
         while (db.nextRow()) {
             C5Message::info(tr("New order!") + " " + db.getString("f_id"), tr("OK"), "", true);

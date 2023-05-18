@@ -1908,14 +1908,11 @@ bool DlgOrder::buildDishes(int part2, const QList<DPart2> &dpart2)
             }
         }
        // C5Message::info(QString("%1-%2").arg(part2).arg(d2.fId));
+        QRect scr = qApp->desktop()->screenGeometry();
         if (d2.fId == part2) {
-            QRect scr = qApp->desktop()->screenGeometry();
+
             int dcolCount = scr.width() > 1024 ? 3 : 2;
-            if (dcolCount == 3) {
-                ui->wdish->setMinimumSize(QSize(750, 0));
-            }
-            adjustSize();
-            ui->wdish->adjustSize();
+
             int dcol = 0;
             int drow = 0;
             for (int i = 0; i < d2.data1.count(); i++) {
@@ -1932,7 +1929,8 @@ bool DlgOrder::buildDishes(int part2, const QList<DPart2> &dpart2)
             }
 
             for (int i = 0; i < d2.data2.data.count(); i++) {
-                QDishButton *btn = new QDishButton();
+                int w = (ui->wdishes->width() - 10)  / (scr.width() > 1024 ? 3 : 2 );
+                QDishButton *btn = new QDishButton(w);
                 btn->setProperty("id", d2.data2.data.at(i));
                 connect(btn, &QDishButton::clicked, this, &DlgOrder::dishClicked);
                 ui->grDish->addWidget(btn, drow, dcol++, 1, 1);
@@ -1960,7 +1958,9 @@ bool DlgOrder::fetchDishes(const DPart2 &part2, bool recent, int colcount, int &
                 continue;
             }
         }
-        QDishButton *btn = new QDishButton();
+        QRect scr = qApp->desktop()->screenGeometry();
+        int w = ui->wdishes->width()  / (scr.width() > 1024 ? 3 : 2 );
+        QDishButton *btn = new QDishButton(w);
         btn->setProperty("id", part2.data2.data.at(i));
         connect(btn, &QDishButton::clicked, this, &DlgOrder::dishClicked);
         ui->grDish->addWidget(btn, row, col++, 1, 1);

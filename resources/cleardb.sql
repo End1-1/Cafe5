@@ -73,7 +73,7 @@ delete from h_halls;
 delete from c_partners;
 delete from c_partners_group where f_id>1;
 delete from c_partners_category where f_id>1;
-delete from c_partnes_state where f_id>2;
+delete from c_partners_state where f_id>2;
 update c_partners_group set f_name='Հիմնական';
 update c_partners_category set f_name ='Հիմնական';
 update c_partners_state set f_name='Գործող' where f_id=1;

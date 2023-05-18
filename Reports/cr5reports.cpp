@@ -2,6 +2,7 @@
 #include "c5tablemodel.h"
 #include "c5tablewidget.h"
 #include "c5mainwindow.h"
+#include "c5storedoc.h"
 #include "c5saledoc.h"
 #include "cr5reportsfilter.h"
 
@@ -94,10 +95,22 @@ bool CR5Reports::tblDoubleClicked(int row, int column, const QList<QVariant> &va
         return true;
     }
     if (fHandlerUuid == REPORT_HANDLER_SALE_DOC_OPEN_DRAFT) {
-        auto *retaildoc = __mainWindow->createTab<C5SaleDoc>(fDBParams);
-        retaildoc->setMode(1);
-        if (!retaildoc->reportHandler(REPORT_HANDLER_SALE_DOC_OPEN_DRAFT, values.at(0))) {
+        C5Database db(fDBParams);
+        db[":f_id"] = values.at(0);
+        db.exec("select * from o_draft_sale where f_id=:f_id");
+        db.nextRow();
+        int type = db.getInt("f_saletype");
+        if (type == 3) {
+            auto *storedoc = __mainWindow->createTab<C5StoreDoc>(fDBParams);
+            storedoc->setMode(C5StoreDoc::sdInput);
+            storedoc->openDraft(values.at(0).toString());
 
+        } else {
+        auto *retaildoc = __mainWindow->createTab<C5SaleDoc>(fDBParams);
+            retaildoc->setMode(1);
+            if (!retaildoc->reportHandler(REPORT_HANDLER_SALE_DOC_OPEN_DRAFT, values.at(0))) {
+
+            }
         }
     }
     return true;

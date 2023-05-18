@@ -6,6 +6,7 @@ CE5Storage::CE5Storage(const QStringList &dbParams, QWidget *parent) :
     ui(new Ui::CE5Storage)
 {
     ui->setupUi(this);
+    ui->cbState->setDBValues(dbParams, "select f_id, f_name from c_storages_state ");
 }
 
 CE5Storage::~CE5Storage()

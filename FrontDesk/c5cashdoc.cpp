@@ -283,7 +283,7 @@ void C5CashDoc::draft()
 
 void C5CashDoc::save(bool writedebt, bool fromrelation)
 {
-    if (fRelation && !fromrelation) {
+    if (fRelation && !fromrelation && !writedebt) {
         C5Message::info(tr("The document cannot be edited directly"));
         return;
     }

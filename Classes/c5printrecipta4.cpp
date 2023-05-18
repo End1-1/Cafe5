@@ -26,8 +26,9 @@ bool C5PrintReciptA4::print(QString &err)
     db[":f_id"] = fOrderUUID;
     db.exec("select concat(o.f_prefix, o.f_hallid) as f_ordernumber, ost.f_name as f_saletypename, "
             "o.f_amounttotal, o.f_amountcash, o.f_amountcard, o.f_amountother, o.f_datecash, "
-            "p.f_taxcode, p.f_taxname, p.f_address "
+            "p.f_taxcode, p.f_taxname, p.f_address, ds.f_datefor, concat_ws(' ', u.f_last, u.f_first) as f_staff "
             "from o_header o "
+            "left join o_draft_sale ds on ds.f_id=o.f_id "
             "left join o_sale_type ost on ost.f_id=o.f_saletype "
             "left join s_user u on u.f_id=o.f_staff "
             "left join c_partners p on p.f_id=o.f_partner "
@@ -72,7 +73,7 @@ bool C5PrintReciptA4::print(QString &err)
     points.clear();
     points << 50 << 200 << 500 << 1200;
     vals << tr("Date");
-    vals << tr("Store, output");
+    vals << tr("Delivery date");
     vals << tr("Buyer");
 
     p.tableText(points, vals, p.fLineHeight + 20);
@@ -80,12 +81,22 @@ bool C5PrintReciptA4::print(QString &err)
     p.setFontBold(false);
     vals.clear();
     vals << header["f_datecash"].toDate().toString("dd/MM/yyyy");
-    vals << store;
+    vals << header["f_datefor"].toDate().toString("dd/MM/yyyy");;
     vals << QString("%1, %2 %3, %4 %5").arg(header["f_taxname"].toString(), tr("Taxpayer code"), header["f_taxcode"].toString(),
             tr("Address"), header["f_address"].toString());
     p.tableText(points, vals, p.fLineHeight + 20);
     p.br(p.fLineHeight + 20);
+
+    //SALER
+    points.clear();
+    points << 50 << 200 << 1700;
+    vals.clear();
+    vals << tr("Saler");
+    vals << QString::fromUtf8("ԱԶ Հրաչ Աճեմյան, ՀՎՀՀ՝ 35136541");
+    p.tableText(points, vals, p.fLineHeight + 20);
     p.br(p.fLineHeight + 20);
+    p.br(p.fLineHeight + 20);
+
 
     points.clear();
     vals.clear();
@@ -160,6 +171,7 @@ bool C5PrintReciptA4::print(QString &err)
     p.ltext(tr("Passed"), 50);
     p.ltext(tr("Accepted"), 1000);
     p.br(p.fLineHeight + 20);
+    p.ltext(header["f_staff"].toString(), 50);
 
 
     p.line(50, p.fTop, 700, p.fTop);

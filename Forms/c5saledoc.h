@@ -49,8 +49,8 @@ private slots:
     void on_btnDelivery_clicked();
     void on_btnEditPartner_clicked();
     void on_btnEditAccounts_clicked();
-
     void on_leCash_textChanged(const QString &arg1);
+    void on_btnDeliveryMan_clicked();
 
 private:
     Ui::C5SaleDoc *ui;
@@ -60,10 +60,11 @@ private:
     int fMode;
     QAction *fActionSave;
     int addGoods(int goodsId, C5Database &db);
-    int addGoods(int store, int goodsId, const QString &barcode, const QString &name, const QString &unitname, double qty, double price);
+    int addGoods(int store, int goodsId, const QString &barcode, const QString &name, const QString &unitname, double qty, double price, int isService);
     void countGrandTotal();
     bool openDraft(const QString &id);
     void setPartner();
+    void setDeliveryMan();
     void exportToAs(int doctype);
     bool fOpenedFromDraft;
     QMap<int, QString> fListOfStorages;

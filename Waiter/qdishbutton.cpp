@@ -5,11 +5,11 @@
 #include <QPaintEvent>
 #include <QStyleOptionButton>
 
-QDishButton::QDishButton(QWidget *parent) :
+QDishButton::QDishButton(int minWidth, QWidget *parent) :
     QPushButton(parent)
 {
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-    setMinimumSize(QSize(120, 60));
+    setMinimumSize(QSize(minWidth, 60));
     setMaximumHeight(60);
 }
 

@@ -16,6 +16,7 @@ bool ODraftSale::getRecord(C5Database &db)
     comment = db.getString("f_comment");
     payment = db.getInt("f_payment");
     deliveryDate = db.getDate("f_datefor");
+    cashier = db.getInt("f_cashier");
     return true;
 }
 
@@ -34,6 +35,7 @@ void ODraftSale::bind(C5Database &db)
     db[":f_comment"] = comment;
     db[":f_payment"] = payment;
     db[":f_datefor"] = deliveryDate;
+    db[":f_cashier"] = cashier;
 }
 
 bool ODraftSale::write(C5Database &db, QString &err)

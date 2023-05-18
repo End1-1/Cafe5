@@ -7,43 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>503</width>
-    <height>218</height>
+    <height>215</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Paid for debt</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="3" column="0">
-    <widget class="QLabel" name="label_5">
-     <property name="text">
-      <string>Cash</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Date</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1">
-    <widget class="C5LineEdit" name="leCode">
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
    <item row="5" column="1">
     <widget class="C5LineEdit" name="leAmount">
      <property name="maximumSize">
@@ -64,16 +34,6 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="1">
-    <widget class="C5LineEditWithSelector" name="leCash">
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
-     </property>
-    </widget>
-   </item>
    <item row="1" column="1">
     <widget class="C5DateEdit" name="deDate">
      <property name="maximumSize">
@@ -84,10 +44,17 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="0">
-    <widget class="QLabel" name="label_3">
+   <item row="1" column="0">
+    <widget class="QLabel" name="label">
      <property name="text">
-      <string>Amount</string>
+      <string>Date</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Costumer</string>
      </property>
     </widget>
    </item>
@@ -101,27 +68,20 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label_4">
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_6">
      <property name="text">
-      <string>Code</string>
+      <string>Type</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="2">
-    <widget class="C5LineEditWithSelector" name="leCashName">
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Costumer</string>
+   <item row="3" column="1">
+    <widget class="C5LineEditWithSelector" name="leCash">
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
      </property>
     </widget>
    </item>
@@ -181,15 +141,18 @@
      </layout>
     </widget>
    </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_6">
-     <property name="text">
-      <string>Type</string>
+   <item row="2" column="1" colspan="2">
+    <widget class="C5LineEditWithSelector" name="leType">
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
-   <item row="2" column="1" colspan="2">
-    <widget class="C5LineEditWithSelector" name="leType">
+   <item row="3" column="2">
+    <widget class="C5LineEditWithSelector" name="leCashName">
      <property name="focusPolicy">
       <enum>Qt::NoFocus</enum>
      </property>
@@ -211,6 +174,43 @@
      </property>
      <property name="readOnly">
       <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Amount</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>Cash</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="C5LineEdit" name="leCode">
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Code</string>
      </property>
     </widget>
    </item>

@@ -205,7 +205,8 @@ bool JsonReponse::downloadData()
     QJsonArray ja;
     fDb[":f_enabled"] = 1;
     if (!fDb.exec("select g.f_id as `id`, gr.f_name as `groupName`, g.f_name as `goodsName`, "
-                  "gp.f_price1 as `price1`, gp.f_price2 as `price2`  "
+                  "gp.f_price1 as `price1`, gp.f_price2 as `price2`, 0 as specialflag, "
+                  "g.f_lowlevel as qtystop  "
                   "from c_goods g "
                   "left join c_groups gr on gr.f_id=g.f_group "
                   "left join c_goods_prices gp on gp.f_goods=g.f_id "
@@ -247,12 +248,21 @@ bool JsonReponse::downloadData()
     dbToArray(fDb, ja);
     fJsonOut["specialprices"] = ja;
 
-    if (!fDb.exec("select f_id as id, f_name as name from c_storages")) {
+    if (!fDb.exec("select f_id as id, f_name as name from c_storages where f_state=1 ")) {
         return dbFail();
     }
     ja = QJsonArray();
     dbToArray(fDb, ja);
     fJsonOut["storages"] = ja;
+
+    if (!fDb.exec("select distinct(u.f_id) as id, concat_ws(' ', u.f_last, u.f_first) as name "
+                  "from o_route_drivers r "
+                  "left join s_user u on u.f_id=r.f_user ")) {
+        return dbFail();
+    }
+    ja = QJsonArray();
+    dbToArray(fDb, ja);
+    fJsonOut["drivers"] = ja;
 
     fDb[":f_id"] = fUserId;
     if (!fDb.exec("select f_config from s_user where f_id=:f_id")) {
@@ -297,8 +307,9 @@ bool JsonReponse::stock()
     QString sql = "select s.f_goods as goodsid, gr.f_name as groupname, g.f_name as goodsname, sum(s.f_qty*s.f_type) as qty "
             "from a_store s "
             "left join c_goods g on g.f_id=s.f_goods "
-            "left join c_groups gr on gr.f_id=g.f_group ";
-    QString where = "where g.f_enabled=1 ";
+            "left join c_groups gr on gr.f_id=g.f_group "
+            "left join c_storages st on st.f_id=s.f_store ";
+    QString where = "where g.f_enabled=1 and st.f_state=1 ";
     if (stock > 0) {
         where += QString(" and s.f_store=%1 ").arg(stock);
     }
@@ -322,7 +333,8 @@ bool JsonReponse::saveOrder()
 {
     QMap<QString, QVariant> sale;
     sale[":f_id"] = fJsonIn["orderid"].toString();
-    sale[":f_staff"] = fUserId;
+    sale[":f_staff"] = fJsonIn["executor"].toInt();
+    sale[":f_cashier"] = fUserId;
     sale[":f_partner"] = fJsonIn["partner"]["id"].toInt();
     sale[":f_date"] = QDate::currentDate();
     sale[":f_time"] = QTime::currentTime();
@@ -337,10 +349,11 @@ bool JsonReponse::saveOrder()
 
     QMap<QString, QVariant> back;
     back[":f_staff"] = fUserId;
+    back[":f_cashier"] = fUserId;
     back[":f_partner"] = fJsonIn["partner"]["id"].toInt();
     back[":f_date"] = QDate::currentDate();
     back[":f_time"] = QTime::currentTime();
-    back[":f_state"] = 1;
+    back[":f_state"] = 5;
     sale[":f_payment"] = fJsonIn["paymenttype"].toInt();
     back[":f_saletype"] = 3;
     back[":f_discount"] = fJsonIn["partner"]["discount"].toDouble() / 100;
@@ -359,6 +372,8 @@ bool JsonReponse::saveOrder()
             sq[":f_state"] = 1;
             sq[":f_store"] = fJsonIn["storage"].toInt();
             sq[":f_price"] = o["price"].toDouble();
+            sq[":f_discount"] = o["discount"].toDouble();
+            sq[":f_special_price"] = o["specialflag"].toInt();
             saleBody.append(sq);
             sale[":f_amount"] = sale[":f_amount"].toDouble() + (o["qtysale"].toDouble() * o["price"].toDouble());
         }
@@ -437,7 +452,7 @@ bool JsonReponse::saveOrder()
             return dbFail();
         }
         for (QMap<QString, QVariant> &l: backBody) {
-            l[":f_header"] = back[":_id"];
+            l[":f_header"] = back[":f_id"];
             l[":f_id"] = fDb.uuid();
             for (QMap<QString, QVariant>::const_iterator lt = l.constBegin(); lt != l.constEnd(); lt++) {
                 fDb[lt.key()] = lt.value();
@@ -601,12 +616,12 @@ bool JsonReponse::getRoute()
     if (!fDb.exec(QString("select r.f_partner as partnerid, p.f_name as partnername, p.f_address as address, cast(count(o.f_id) as signed) as orders, "
                           "coalesce(re.f_action, 0) as `action` "
                           "from o_route r  "
-                          "left join o_draft_sale o on o.f_partner=r.f_partner "
-                          "left join o_route_exec re on re.f_partner=r.f_partner  "
+                          "left join o_draft_sale o on o.f_partner=r.f_partner and o.f_datefor=:f_datefor "
+                          "left join o_route_exec re on re.f_partner=r.f_partner and re.f_date=:f_datefor "
                           "left join c_partners p on p.f_id=r.f_partner "
-                          "where (r.f_%1=1 and r.f_driver=:f_driver and r.f_round=:f_round) or (o.f_datefor=:f_datefor and o.f_state=2) "
+                          "where (r.f_%1=1 and r.f_driver=:f_driver and r.f_round=:f_round) or (weekday(o.f_datefor)=%2 and o.f_state=2)  "
                           "group by 1, 5 "
-                          "order by f_q").arg(day))) {
+                          "order by f_q").arg(day).arg(day - 1))) {
         return dbFail();
     }
     QJsonArray ja;

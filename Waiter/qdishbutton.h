@@ -6,7 +6,7 @@
 class QDishButton : public QPushButton
 {
 public:
-    QDishButton(QWidget *parent = nullptr);
+    QDishButton(int minWidth, QWidget *parent = nullptr);
 
 protected:
     virtual void paintEvent(QPaintEvent *pe) override;

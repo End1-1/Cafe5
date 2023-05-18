@@ -901,6 +901,11 @@ bool C5StoreDraftWriter::writeOutput(const QString &docId, QString &err)
         totalList.append(fDb.getDouble("f_total"));
     }
 
+    if (goodsID.isEmpty()) {
+        err = tr("Emtpy document");
+        return false;
+    }
+
     QList<QMap<QString, QVariant> > storeData;
     fDb[":f_store"] = storeOut;
 //    fDb[":f_date"] = date;

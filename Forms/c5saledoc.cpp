@@ -30,13 +30,14 @@
 #define col_discount_value 9
 #define col_discount_amount 10
 #define col_grandtotal 11
+#define col_type 12
 
 C5SaleDoc::C5SaleDoc(const QStringList &dbParams, QWidget *parent) :
     C5Widget(dbParams, parent),
     ui(new Ui::C5SaleDoc)
 {
     ui->setupUi(this);
-    ui->tblGoods->setColumnWidths(ui->tblGoods->columnCount(), 0, 50, 0, 150, 200, 300, 80, 80, 80, 80, 80, 80);
+    ui->tblGoods->setColumnWidths(ui->tblGoods->columnCount(), 0, 50, 0, 150, 200, 300, 80, 80, 80, 80, 80, 80, 0);
     ui->cbCurrency->setDBValues(dbParams, "select f_id, f_name from e_currency");
     ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(__c5config.getValue(param_default_currency)));
     ui->cbStorage->setDBValues(dbParams, "select f_id, f_name from c_storages order by 2");
@@ -205,7 +206,8 @@ void C5SaleDoc::saveDataChanges()
     db[":f_dateclose"] = QDate::currentDate();
     db[":f_timeclose"] = QTime::currentTime();
     db[":f_datecash"] = ui->leDate->date();
-    db[":f_staff"] = __user->id();
+    db[":f_cashier"] = __user->id();
+    db[":f_staff"] = fDraftSale.staff;
     db[":f_comment"] = ui->leComment->text();
     db[":f_print"] = 0;
     db[":f_amounttotal"] = ui->leGrandTotal->getDouble();
@@ -298,19 +300,31 @@ void C5SaleDoc::saveDataChanges()
         db.update("o_header_flags", "f_id", uuid);
     }
 
-    if (fOpenedFromDraft) {
+    //if (fOpenedFromDraft) {
+    db[":f_id"] = uuid;
+    db.exec("select * from o_draft_sale where f_id=:f_id");
+    if (!db.nextRow()) {
         db[":f_id"] = uuid;
-        db[":f_state"] = 2;
-        db.exec("update o_draft_sale set f_state=:f_state where f_id=:f_id");
+        db[":f_datefor"] = QDate::fromString("dd/MM/yyyy", ui->leDelivery->text());
+        db.exec("INSERT INTO o_draft_sale (f_id, f_date, f_time, f_partner, f_saletype, f_state, f_STAFF, f_cashier, f_amount,  f_datefor) "
+                "SELECT f_id, f_datecash, current_time(), f_partner, f_saletype, 2, f_staff, f_cashier, f_amounttotal, :f_datefor FROM o_header o "
+                "WHERE o.f_id=:f_id");
     }
+        db[":f_state"] = 2;
+        db[":f_datefor"] = QDate::fromString(ui->leDelivery->text(), FORMAT_DATE_TO_STR);
+        db.update("o_draft_sale", "f_id", uuid);
+    //}
 
     QSet<int> usedStores;
     QStringList outDocIds;
     QStringList inDocsIds;
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
-        if (ui->tblGoods->comboBox(i, col_store)->currentData().toInt() == ui->cbStorage->currentData().toInt()) {
+        if (ui->tblGoods->getInteger(i, col_type) == 1) {
             continue;
         }
+//        if (ui->tblGoods->comboBox(i, col_store)->currentData().toInt() == ui->cbStorage->currentData().toInt()) {
+//            continue;
+//        }
         usedStores.insert(ui->tblGoods->comboBox(i, col_store)->itemData(i).toInt());
     }
 
@@ -328,6 +342,9 @@ void C5SaleDoc::saveDataChanges()
         QString inStoredocUserNum;
         inStoredocUserNum = dw.storeDocNum(DOC_TYPE_STORE_OUTPUT, store, true, 0);
         for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+            if (ui->tblGoods->getInteger(i, col_type) == 1) {
+                continue;
+            }
             if (ui->tblGoods->comboBox(i, col_store)->itemData(i).toInt() != store) {
                 continue;
             }
@@ -394,32 +411,32 @@ void C5SaleDoc::saveDataChanges()
     //END OF OUTPUT FOR OTHER STORAGES
 
 
-    //OUTPUT OF STORAGE
-    QString storeDocComment = QString("%1 %2%3").arg(tr("Output of sale"), prefix, QString::number(hallid));
-    QString storeDocId;
-    QString storedocUserNum;
-    storedocUserNum = dw.storeDocNum(DOC_TYPE_STORE_OUTPUT, ui->cbStorage->currentData().toInt(), true, 0);
-    dw.writeAHeader(storeDocId, storedocUserNum, DOC_STATE_DRAFT, DOC_TYPE_STORE_OUTPUT, __user->id(), QDate::currentDate(),
-                    QDate::currentDate(), QTime::currentTime(), 0, 0, storeDocComment, 0, ui->cbCurrency->currentData().toInt());
-    dw.writeAHeaderStore(storeDocId, __user->id(), __user->id(), "", QDate(), 0,
-                         ui->cbStorage->currentData().toInt(),
-                         1, "", 0, 0, uuid);
-    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
-        QString draftid;
-        dw.writeAStoreDraft(draftid, storeDocId,
-                            ui->cbStorage->currentData().toInt(), -1,
-                            ui->tblGoods->getInteger(i, col_goods_code), ui->tblGoods->lineEdit(i, col_qty)->getDouble(),
-                            0, 0, DOC_REASON_SALE, draftid, i + 1, "");
-        db[":f_storerec"] = draftid;
-        db.update("o_goods", "f_id", ui->tblGoods->getString(i, col_uuid));
-    }
-    if (!dw.writeOutput(storeDocId, err)) {
-        db.rollback();
-        C5Message::error(err + "#3");
-        return;
-    }
-    dw.updateField("a_header", "f_state", DOC_STATE_SAVED, "f_id", storeDocId);
-    //END OUTPUT OF STORAGE
+//    //OUTPUT OF STORAGE
+//    QString storeDocComment = QString("%1 %2%3").arg(tr("Output of sale"), prefix, QString::number(hallid));
+//    QString storeDocId;
+//    QString storedocUserNum;
+//    storedocUserNum = dw.storeDocNum(DOC_TYPE_STORE_OUTPUT, ui->cbStorage->currentData().toInt(), true, 0);
+//    dw.writeAHeader(storeDocId, storedocUserNum, DOC_STATE_DRAFT, DOC_TYPE_STORE_OUTPUT, __user->id(), QDate::currentDate(),
+//                    QDate::currentDate(), QTime::currentTime(), 0, 0, storeDocComment, 0, ui->cbCurrency->currentData().toInt());
+//    dw.writeAHeaderStore(storeDocId, __user->id(), __user->id(), "", QDate(), 0,
+//                         ui->cbStorage->currentData().toInt(),
+//                         1, "", 0, 0, uuid);
+//    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+//        QString draftid;
+//        dw.writeAStoreDraft(draftid, storeDocId,
+//                            ui->cbStorage->currentData().toInt(), -1,
+//                            ui->tblGoods->getInteger(i, col_goods_code), ui->tblGoods->lineEdit(i, col_qty)->getDouble(),
+//                            0, 0, DOC_REASON_SALE, draftid, i + 1, "");
+//        db[":f_storerec"] = draftid;
+//        db.update("o_goods", "f_id", ui->tblGoods->getString(i, col_uuid));
+//    }
+//    if (!dw.writeOutput(storeDocId, err)) {
+//        db.rollback();
+//        C5Message::error(err + "#3");
+//        return;
+//    }
+//    dw.updateField("a_header", "f_state", DOC_STATE_SAVED, "f_id", storeDocId);
+//    //END OUTPUT OF STORAGE
 
     db.commit();
 
@@ -432,7 +449,7 @@ void C5SaleDoc::saveDataChanges()
     if (fPartner.id.toInt() > 0) {
         db[":f_costumer"] = fPartner.id;
         db[":f_order"] = ui->leUuid->text();
-        db[":f_amount"] = ui->leGrandTotal->getDouble();
+        db[":f_amount"] = -1 * ui->leGrandTotal->getDouble();
         db[":f_date"] = ui->leDate->date();
         db[":f_currency"] = 1;
         db[":f_source"] = 1;
@@ -525,13 +542,13 @@ int C5SaleDoc::addGoods(int goodsId, C5Database &db)
             "where g.f_id=:f_id and gpr.f_currency=:f_currency").arg(priceField));
     if (db.nextRow()) {
         return addGoods(ui->cbStorage->currentData().toInt(), goodsId, db.getString("f_scancode"), db.getString("f_name"),
-                        db.getString("f_unitname"), 0, db.getDouble("f_price"));
+                        db.getString("f_unitname"), 0, db.getDouble("f_price"), db.getInt("f_service"));
     } else {
         C5Message::error(tr("Invalid goods id"));
     }
 }
 
-int C5SaleDoc::addGoods(int store, int goodsId, const QString &barcode, const QString &name, const QString &unitname, double qty, double price)
+int C5SaleDoc::addGoods(int store, int goodsId, const QString &barcode, const QString &name, const QString &unitname, double qty, double price, int isService)
 {
     int r = ui->tblGoods->addEmptyRow();
     ui->tblGoods->setString(r, col_uuid, "");
@@ -566,6 +583,7 @@ int C5SaleDoc::addGoods(int store, int goodsId, const QString &barcode, const QS
         ui->tblGoods->lineEdit(r, col_price)->setDouble(fSpecialPrices[goodsId]);
         ui->tblGoods->lineEdit(r, col_discount_value)->setDouble(0);
     }
+    ui->tblGoods->setInteger(r, col_type, isService);
     countGrandTotal();
     return r;
 }
@@ -593,10 +611,10 @@ bool C5SaleDoc::openDraft(const QString &id)
         C5Message::error(tr("Invalid draft document id"));
         return false;
     }
-    if (fDraftSale.state != 1) {
-        C5Message::error(tr("This draft not editable"));
-        return false;
-    }
+//    if (fDraftSale.state != 1) {
+//        C5Message::error(tr("This draft not editable"));
+//        return false;
+//    }
     switch (db.getInt("f_saletype")) {
     case 1:
         ui->leSaleType->setText(tr("Retail"));
@@ -604,6 +622,10 @@ bool C5SaleDoc::openDraft(const QString &id)
     case 2:
         ui->leSaleType->setText(tr("Whosale"));
         break;
+    }
+
+    if (db.getInt("f_state") > 1) {
+        fToolBar->actions().at(0)->setEnabled(false);
     }
 
     fPartner.queryRecordOfId(db, fDraftSale.partner);
@@ -614,6 +636,7 @@ bool C5SaleDoc::openDraft(const QString &id)
     ui->leComment->setText(fDraftSale.comment);
     ui->leUuid->setText(fDraftSale.id);
     ui->leDelivery->setText(fDraftSale.deliveryDate.toString(FORMAT_DATE_TO_STR));
+    setDeliveryMan();
     QString priceField = "f_price1";
     db[":f_header"] = id;
     db[":f_state"] = 1;
@@ -627,7 +650,7 @@ bool C5SaleDoc::openDraft(const QString &id)
             "and dsb.f_state=:f_state and dsb.f_qty>0 ").arg(priceField));
     while (db.nextRow()) {
         addGoods(db.getInt("f_store"), db.getInt("f_id"), db.getString("f_scancode"), db.getString("f_name"),
-                 db.getString("f_unitname"), db.getDouble("f_qty"), db.getDouble("f_price"));
+                 db.getString("f_unitname"), db.getDouble("f_qty"), db.getDouble("f_price"), 0);
     }
     fOpenedFromDraft = true;
 
@@ -674,6 +697,18 @@ void C5SaleDoc::setPartner()
         }
     }
     countGrandTotal();
+}
+
+void C5SaleDoc::setDeliveryMan()
+{
+    ui->leDeluveryMan->clear();
+    if (fDraftSale.staff > 0) {
+        C5Database db(fDBParams);
+        db[":f_id"] = fDraftSale.staff;
+        db.exec("select concat_ws(' ', f_last, f_first) as f_fullname from s_user where f_id=:f_id");
+        db.nextRow();
+        ui->leDeluveryMan->setText(db.getString("f_fullname"));
+    }
 }
 
 void C5SaleDoc::exportToAs(int doctype)
@@ -865,4 +900,12 @@ void C5SaleDoc::on_leCash_textChanged(const QString &arg1)
     if (ui->leCash->getDouble() > ui->leGrandTotal->getDouble()){
         ui->leCash->setDouble(ui->leGrandTotal->getDouble());
     }
+}
+
+void C5SaleDoc::on_btnDeliveryMan_clicked()
+{
+    QList<QVariant> vals;
+    C5Selector::getValue(fDBParams, cache_users, vals);
+    fDraftSale.staff = vals.at(1).toInt();
+    setDeliveryMan();
 }

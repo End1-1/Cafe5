@@ -63,13 +63,11 @@ bool ArmSoft::exportToAS(const QString &orderUuid, QString &err)
 
     db[":f_header"] = orderUuid;
     db[":f_asdbid"] = fData["asdbid"].toInt();
-    db[":f_pp"] = pricepolitic;
-    db.exec("SELECT ds.f_goods, a.f_ascode, g.f_name, ds.f_price, ds.f_qty, "
-            "if (:f_pp=1, gp.f_price1, gp.f_price2) as f_initprice, 0 as f_discount, "
+    db.exec("SELECT ds.f_goods, a.f_ascode, g.f_name, ds.f_price - (ds.f_price * ds.f_discountfactor) as f_price, ds.f_qty, "
+            "ds.f_price as f_initprice, ds.f_discountfactor as f_discount, "
             "g.f_service, a2.f_ascode as f_asstore "
             "FROM o_goods ds "
             "LEFT JOIN c_goods g ON g.f_id=ds.f_goods "
-            "LEFT JOIN c_goods_prices gp ON gp.f_goods=g.f_id AND gp.f_currency=1 "
             "left join as_convert a on a.f_tableid=g.f_id and a.f_table='c_goods' and a.f_asdbid=:f_asdbid "
             "left join as_convert a2 on a2.f_tableid=ds.f_store and a2.f_table='c_storages' and a2.f_asdbid=:f_asdbid "
             "where ds.f_header=:f_header  ");
@@ -86,7 +84,7 @@ bool ArmSoft::exportToAS(const QString &orderUuid, QString &err)
         tmp["f_qty"] = db.doubleValue("f_qty");
         tmp["f_initprice"] = doctype == 5 ? db.doubleValue("f_initprice") / 1.2 : db.doubleValue("f_initprice");
         tmp["f_price"] = doctype == 5 ? db.doubleValue("f_price") / 1.2 : db.doubleValue("f_price");
-        tmp["f_discount"] = ((db.doubleValue("f_initprice") - db.doubleValue("f_price")) * 100) / db.doubleValue("f_initprice");
+        tmp["f_discount"] = db.doubleValue("f_discount") * 100;
         tmp["f_service"] = db.integer("f_service");
         tmp["f_store"] = db.string("f_asstore");
         items.append(tmp);
@@ -110,7 +108,7 @@ bool ArmSoft::exportToAS(const QString &orderUuid, QString &err)
     dbas[":fDOCNUM"] = "";
     dbas[":fCUR"] = "AMD";
     dbas[":fSUMM"] = total;
-    dbas[":fCOMMENT"] = partnersMap[aspartner]["fbusinessaddress"].isValid() ? partnersMap[aspartner]["fbusinessaddress"] : "";
+    dbas[":fCOMMENT"] = partnerAddress;
     dbas[":fBODY"] = QString("\r\nPREPAYMENTACC:5231\r\nVATACC:5243\r\nSUMMVAT:%2\r\nBUYERACC:2211\r\n"
                 "CUREXCHNG:1.0000\r\nCOURSECOUNT:1.0000\r\nBUYCHACCPOST:Գլխավոր հաշվապահ \r\nMAXROWID:%1\r\n"
                 "BUYTAXCODE:%3\r\nBUYADDRESS:%4\r\nBUYBUSADDRESS:%5\r\nPOISN:00000000-0000-0000-0000-000000000000\r\nINVOICESTATES:0\r\n")
@@ -118,7 +116,7 @@ bool ArmSoft::exportToAS(const QString &orderUuid, QString &err)
             .arg(vatamount)
                 .arg(partnersMap[aspartner]["ftaxcode"].toString())
                 .arg(partnersMap[aspartner]["faddress"].toString())
-                .arg(partnersMap[aspartner]["fbusinessaddress"].toString());
+                .arg(partnerAddress);
     dbas[":fPARTNAME"] = partnersMap[aspartner]["fcaption"].isValid() ? partnersMap[aspartner]["fcaption"] : ""; // set to kamar
     dbas[":fUSERID"] = 0;
     dbas[":fPARTID"] = partnersMap[aspartner]["fpartid"];

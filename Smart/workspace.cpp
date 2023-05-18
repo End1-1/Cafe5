@@ -1621,7 +1621,7 @@ bool Workspace::printReceipt(const QString &id, bool printSecond, bool precheck)
     p.ltext(tr("Cashier"), 0);
     p.rtext(db.getString("f_staff"));
     p.br();
-    p.ltext(tr("Delivery"), 0);
+    p.ltext(tr("Table"), 0);
     p.rtext(db.getString("f_tablename"));
     p.br();
     p.line(3);

@@ -14,40 +14,46 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="3" column="0">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>Output counter</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="2">
-    <widget class="C5LineEditWithSelector" name="lineEdit_4">
-     <property name="Type" stdset="0">
-      <number>1</number>
-     </property>
-     <property name="Field" stdset="0">
-      <string>f_outcounter</string>
-     </property>
-     <property name="Default" stdset="0">
-      <string>0</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="0">
-    <widget class="QLabel" name="label_6">
-     <property name="text">
-      <string>Complectation counter</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="2">
+   <item row="6" column="2">
     <widget class="C5LineEditWithSelector" name="lineEdit_6">
      <property name="Type" stdset="0">
       <number>1</number>
      </property>
      <property name="Field" stdset="0">
       <string>f_complectcounter</string>
+     </property>
+     <property name="Default" stdset="0">
+      <string>0</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="2">
+    <widget class="C5LineEditWithSelector" name="lineEdit_5">
+     <property name="Type" stdset="0">
+      <number>1</number>
+     </property>
+     <property name="Field" stdset="0">
+      <string>f_movecounter</string>
+     </property>
+     <property name="Default" stdset="0">
+      <string>0</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Code</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="2">
+    <widget class="C5LineEditWithSelector" name="lineEdit_3">
+     <property name="Type" stdset="0">
+      <number>1</number>
+     </property>
+     <property name="Field" stdset="0">
+      <string>f_inputcounter</string>
      </property>
      <property name="Default" stdset="0">
       <string>0</string>
@@ -67,47 +73,6 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="0">
-    <widget class="QLabel" name="label_5">
-     <property name="text">
-      <string>Movement counter</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Name</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>Input counter</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Code</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="2">
-    <widget class="C5LineEditWithSelector" name="lineEdit_3">
-     <property name="Type" stdset="0">
-      <number>1</number>
-     </property>
-     <property name="Field" stdset="0">
-      <string>f_inputcounter</string>
-     </property>
-     <property name="Default" stdset="0">
-      <string>0</string>
-     </property>
-    </widget>
-   </item>
    <item row="1" column="2">
     <widget class="C5LineEditWithSelector" name="lineEdit_2">
      <property name="Field" stdset="0">
@@ -124,36 +89,65 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="2">
-    <widget class="C5LineEditWithSelector" name="lineEdit_5">
-     <property name="Type" stdset="0">
-      <number>1</number>
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>Movement counter</string>
      </property>
-     <property name="Field" stdset="0">
-      <string>f_movecounter</string>
-     </property>
-     <property name="Default" stdset="0">
-      <string>0</string>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Name</string>
      </property>
     </widget>
    </item>
    <item row="6" column="0">
-    <widget class="QLabel" name="label_7">
+    <widget class="QLabel" name="label_6">
      <property name="text">
-      <string>TextLabel</string>
+      <string>Complectation counter</string>
      </property>
     </widget>
    </item>
-   <item row="6" column="2">
-    <widget class="C5LineEditWithSelector" name="lineEdit_7">
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Output counter</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="2">
+    <widget class="C5LineEditWithSelector" name="lineEdit_4">
      <property name="Type" stdset="0">
       <number>1</number>
      </property>
      <property name="Field" stdset="0">
-      <string>f_partner</string>
+      <string>f_outcounter</string>
      </property>
      <property name="Default" stdset="0">
       <string>0</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Input counter</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_7">
+     <property name="text">
+      <string>State</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="2">
+    <widget class="C5ComboBox" name="cbState">
+     <property name="Field" stdset="0">
+      <string>f_state</string>
      </property>
     </widget>
    </item>
@@ -164,6 +158,11 @@
    <class>C5LineEditWithSelector</class>
    <extends>QLineEdit</extends>
    <header location="global">c5lineeditwithselector.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5ComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">c5combobox.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

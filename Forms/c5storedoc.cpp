@@ -778,6 +778,30 @@ bool C5StoreDoc::parseBroadcastAmount(QJsonObject jobj, QString &replystr)
     return true;
 }
 
+bool C5StoreDoc::openDraft(const QString &id)
+{
+    C5Database db(fDBParams);
+    db[":f_id"] = id;
+    db.exec("select * from o_draft_sale where f_id=:f_id");
+    db.nextRow();
+    ui->deDate->setDate(db.getDate("f_date"));
+    ui->leReason->setValue(DOC_REASON_SALE_RETURN);
+    ui->lePartner->setValue(db.getInt("f_partner"));
+    ui->leComment->setText(tr("Back from") + " " + ui->lePartnerName->text());
+
+    db[":f_header"] = id;
+    db.exec("select b.f_goods, g.f_name as f_goodsname, b.f_qty, u.f_name as f_unitname, b.f_store "
+            "from o_draft_sale_body b "
+            "left join c_goods g on g.f_id=b.f_goods "
+            "left join c_units u on u.f_id=g.f_unit "
+            "where b.f_header=:f_header");
+    while (db.nextRow()) {
+        ui->leStoreInput->setValue(db.getInt("f_store"));
+        int row = addGoods(db.getInt("f_goods"), db.getString("f_goodsname"), db.getDouble("f_qty"), db.getString("f_unitname"), 0, 0, "");
+    }
+    return true;
+}
+
 bool C5StoreDoc::eventFilter(QObject *o, QEvent *e)
 {
     if (o == ui->tblGoodsGroup->viewport() && fGroupTableCellMove) {

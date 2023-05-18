@@ -1013,7 +1013,7 @@ background:#fff6e5;
      </property>
      <property name="maximumSize">
       <size>
-       <width>16777215</width>
+       <width>250</width>
        <height>16777215</height>
       </size>
      </property>
@@ -1106,6 +1106,12 @@ background:#fff6e5;
               <horstretch>2</horstretch>
               <verstretch>2</verstretch>
              </sizepolicy>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>16777215</height>
+             </size>
             </property>
             <layout class="QGridLayout" name="glDishPart2">
              <property name="sizeConstraint">

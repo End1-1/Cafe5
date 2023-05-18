@@ -75,6 +75,8 @@ public:
 
     bool parseBroadcastAmount(QJsonObject jobj, QString &replystr);
 
+    bool openDraft(const QString &id);
+
 public slots:
     void saveDoc();
     
