@@ -1,4 +1,4 @@
-QT += sql gui core widgets network printsupport
+QT += sql gui core widgets network printsupport multimedia
 
 CONFIG += dll
 

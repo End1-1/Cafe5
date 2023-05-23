@@ -532,7 +532,7 @@ void Workspace::countTotal()
         }
     }
     ui->leTotal->setDouble(total);
-    if (ui->btnSetCard->isChecked()) {
+    if (ui->btnSetCard->isChecked() || ui->btnSetCardExternal->isChecked()) {
         ui->leCard->setDouble(ui->leTotal->getDouble());
     }
     if (ui->leReceived->getDouble() > 0.01) {

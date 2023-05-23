@@ -3,6 +3,10 @@
 #include "c5mainwindow.h"
 #include "c5storedraftwriter.h"
 #include "printtaxn.h"
+#include "breezeconfig.h"
+#include "../Forms/dlglist.h"
+#include "httpquerydialog.h"
+#include "ce5partner.h"
 #include "xlsxall.h"
 #include "removeshopsale.h"
 #include "c5printtaxanywhere.h"
@@ -20,6 +24,7 @@ C5SaleFromStoreOrder::C5SaleFromStoreOrder(const QStringList &dbParams) :
     ui->leID->setVisible(false);
     ui->lePartner->setSelector(dbParams, ui->lePartnerName, cache_goods_partners);
     ui->leSeller->setSelector(dbParams, ui->leSellerName, cache_users);
+    ui->leHall->setSelector(dbParams, ui->leHallName, cache_halls);
     //ui->btnRemove->setVisible(pr(fDBParams, cp_t5_refund_goods));
 }
 
@@ -51,6 +56,7 @@ void C5SaleFromStoreOrder::loadOrder(const QString &id)
         ui->leTotalCash->setDouble(db.getDouble("f_amountcash"));
         ui->leTotalCard->setDouble(db.getDouble("f_amountcard"));
         ui->lePartner->setValue(db.getString("f_partner"));
+        ui->leHall->setValue(db.getInt("f_hall"));
         ui->btnRemove->setVisible(db.getInt("f_source") > 0);
         ui->leSeller->setValue(db.getInt("f_staff"));
     } else {
@@ -85,6 +91,63 @@ void C5SaleFromStoreOrder::loadOrder(const QString &id)
     db[":f_id"] = id;
     db.exec("select * from o_tax where f_id=:f_id");
     ui->btnPrintTax->setVisible(!db.nextRow());
+}
+
+void C5SaleFromStoreOrder::exportToAS(int doctype)
+{
+    C5Database db(fDBParams);
+    db.exec("select * from as_list");
+    if (db.rowCount() == 0) {
+        C5Message::error(tr("ArmSoft is not configure"));
+        return;
+    }
+    int dbid;
+    int index = 0;
+    QString connStr;
+    if (db.rowCount() > 0) {
+        QStringList dbNames;
+        while (db.nextRow()) {
+            dbNames.append(db.getString("f_name"));
+        }
+        index = DlgList::indexOfList(tr("Armsoft database"), fDBParams, dbNames);
+        if (index < 0) {
+            return;
+        }
+        dbid = db.getInt(index, "f_id");
+        connStr = db.getString(index, "f_connectionstring");
+    } else {
+        dbid = db.getInt(0, "f_id");
+        connStr = db.getString(0, "f_connectionstring");
+    }
+
+    BreezeConfig *b = Config::construct<BreezeConfig>(fDBParams, 1);
+    QJsonObject jo;
+    jo["pkServerAPIKey"] = b->apiKey;
+    jo["pkFcmToken"] = "0123456789";
+    jo["pkUsername"] = b->username;
+    jo["pkPassword"] = b->password;
+    jo["pkAction"] = 14;
+    jo["asconnectionstring"] = connStr;
+    jo["asdbid"] = dbid;
+    jo["draftid"] = ui->leUUID->text();
+    jo["doctype"] = doctype;
+    jo["lesexpenseacc"] = __c5config.getRegValue("lesexpenseacc", "").toString();
+    jo["lesincomeacc"] = __c5config.getRegValue("lesincomeacc", "").toString();
+    jo["lemexpenseacc"] = __c5config.getRegValue("lemexpenseacc", "").toString();
+    jo["lemincomeacc"] = __c5config.getRegValue("lemincomeacc", "").toString();
+    QJsonObject jdb;
+    jdb["host"] = fDBParams.at(0);
+    jdb["schema"] = fDBParams.at(1);
+    jdb["username"] = fDBParams.at(2);
+    jdb["password"] = fDBParams.at(3);
+    jo["database"] = jdb;
+    jo["vatpercent"] = index == 0 ? (doctype == 5 ? 0.2 : 0.1667) : 0;
+    jo["vattype"] = index == 0 ? (doctype == 5 ? "1" : "5") : "3";
+    jo["pricewithoutvat"] =index == 0 ? (doctype == 5 ? 1.2 : 1) : 1;
+    jo["withvat"] = index == 0 ? (doctype == 5 ? 0.2 : 0) : 0;
+    HttpQueryDialog *qd = new HttpQueryDialog(fDBParams, QString("https://%1:%2/magnit").arg(b->ipAddress, QString::number(b->port)), jo, this);
+    qd->exec();
+    qd->deleteLater();
 }
 
 void C5SaleFromStoreOrder::on_btnRemove_clicked()
@@ -193,6 +256,7 @@ void C5SaleFromStoreOrder::on_btnSave_clicked()
     db[":f_partner"] = ui->lePartner->getInteger();
     db[":f_staff"] = ui->leSeller->getInteger();
     db[":f_datecash"] = ui->deDate->date();
+    db[":f_hall"] = ui->leHall->getInteger();
     db.update("o_header", where_id(ui->leID->text()));
 
     C5Message::info(tr("Saved"));
@@ -334,4 +398,14 @@ void C5SaleFromStoreOrder::on_btnExportToExcel_clicked()
 
 
 
+}
+
+void C5SaleFromStoreOrder::on_btnPrintA4_3_clicked()
+{
+    exportToAS(20);
+}
+
+void C5SaleFromStoreOrder::on_btnPrintA4_2_clicked()
+{
+    exportToAS(5);
 }

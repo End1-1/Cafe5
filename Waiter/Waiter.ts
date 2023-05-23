@@ -1959,22 +1959,22 @@ MS Excel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="3280"/>
+        <location filename="dlgorder.ui" line="3286"/>
         <source>Staff name</source>
         <translation>Աշխատող</translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="3298"/>
+        <location filename="dlgorder.ui" line="3304"/>
         <source>[Visit]</source>
         <translation>Այց</translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="2668"/>
+        <location filename="dlgorder.ui" line="2674"/>
         <source>Change table</source>
         <translation>Փոխել սեղանը</translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="2373"/>
+        <location filename="dlgorder.ui" line="2379"/>
         <source>TRANSFER TO ROOM</source>
         <translation>Կցել սենյակի
 հաշվին</translation>
@@ -1985,7 +1985,7 @@ MS Excel</source>
         <translation>Ամրագրում</translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="2726"/>
+        <location filename="dlgorder.ui" line="2732"/>
         <location filename="dlgorder.cpp" line="170"/>
         <location filename="dlgorder.cpp" line="291"/>
         <location filename="dlgorder.cpp" line="1393"/>
@@ -1993,98 +1993,98 @@ MS Excel</source>
         <translation>Սպասարկող</translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="3270"/>
+        <location filename="dlgorder.ui" line="3276"/>
         <source>00:00</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="2697"/>
+        <location filename="dlgorder.ui" line="2703"/>
         <location filename="dlgorder.cpp" line="572"/>
         <source>Comment</source>
         <translation>Լրացուցիչ</translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="2402"/>
+        <location filename="dlgorder.ui" line="2408"/>
         <source>PRIME COST</source>
         <translation>ԻՆՔՆԱՌԺԵՔ</translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="2485"/>
+        <location filename="dlgorder.ui" line="2491"/>
         <source>Received</source>
         <translation>Առձերն</translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="2513"/>
-        <location filename="dlgorder.ui" line="2610"/>
+        <location filename="dlgorder.ui" line="2519"/>
+        <location filename="dlgorder.ui" line="2616"/>
         <source>999999.99</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="2576"/>
+        <location filename="dlgorder.ui" line="2582"/>
         <source>Change</source>
         <translation>Մանր</translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="2755"/>
+        <location filename="dlgorder.ui" line="2761"/>
         <location filename="dlgorder.cpp" line="367"/>
         <source>Menu</source>
         <translation>Ճաշացանկ</translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="2784"/>
+        <location filename="dlgorder.ui" line="2790"/>
         <source>Search</source>
         <translation>Փնտրել</translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="2813"/>
+        <location filename="dlgorder.ui" line="2819"/>
         <source>Package</source>
         <translation>Փաթեթ</translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="2842"/>
+        <location filename="dlgorder.ui" line="2848"/>
         <source>Stop list</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="2874"/>
+        <location filename="dlgorder.ui" line="2880"/>
         <location filename="dlgorder.cpp" line="1245"/>
         <source>Move items</source>
         <translation>Տեղափոխություն</translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="3324"/>
+        <location filename="dlgorder.ui" line="3330"/>
         <source>Delivery</source>
         <translation>Առաքում</translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="3337"/>
+        <location filename="dlgorder.ui" line="3343"/>
         <source>Guest count</source>
         <translation>Հյուրերի քանակ</translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="3350"/>
+        <location filename="dlgorder.ui" line="3356"/>
         <source>Amount of order</source>
         <translation>Պատվերի գումար</translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="3363"/>
+        <location filename="dlgorder.ui" line="3369"/>
         <source>Service 0% 0</source>
         <translation>Սպասարկում 0% 0</translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="3376"/>
+        <location filename="dlgorder.ui" line="3382"/>
         <source>Discount 0% 0</source>
         <translation>Զեղչ {0% 0?}</translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="2937"/>
+        <location filename="dlgorder.ui" line="2943"/>
         <source>Bill
 150000</source>
         <translation>Նախահաշիվ
 0</translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="2973"/>
+        <location filename="dlgorder.ui" line="2979"/>
         <source>RECEIPT
 LANGUAGE</source>
         <translation>Հաշիվը
@@ -2106,119 +2106,119 @@ LANGUAGE</source>
         <translation>Տպել</translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="1912"/>
+        <location filename="dlgorder.ui" line="1918"/>
         <source>PAY X</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="1948"/>
+        <location filename="dlgorder.ui" line="1954"/>
         <source>PAYMENT
 IDRAM</source>
         <translation>Idram</translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="1995"/>
+        <location filename="dlgorder.ui" line="2001"/>
         <source>Remain</source>
         <translation>Մնացորդ</translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="1420"/>
+        <location filename="dlgorder.ui" line="1426"/>
         <source>Tax receipt</source>
         <translation>ՀԴՄ կտրոն</translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="2261"/>
+        <location filename="dlgorder.ui" line="2267"/>
         <source>TAX</source>
         <translation>ՀԴՄ</translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="2299"/>
+        <location filename="dlgorder.ui" line="2305"/>
         <source>CLOSE ORDER</source>
         <translation>ՓԱԿԵԼ ՊԱՏՎԵՐԸ</translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="2344"/>
+        <location filename="dlgorder.ui" line="2350"/>
         <source>COMPLIMENTARY</source>
         <translation>Հյուրասիրություն</translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="2431"/>
+        <location filename="dlgorder.ui" line="2437"/>
         <source>CITY LEDGER</source>
         <translation>Պարտք</translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="1929"/>
+        <location filename="dlgorder.ui" line="1935"/>
         <source>Room</source>
         <translation>Համար</translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="1751"/>
+        <location filename="dlgorder.ui" line="1757"/>
         <source>PREPAYMENT</source>
         <translation>Կանխավճար</translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="1366"/>
-        <location filename="dlgorder.ui" line="1401"/>
-        <location filename="dlgorder.ui" line="1562"/>
-        <location filename="dlgorder.ui" line="1685"/>
-        <location filename="dlgorder.ui" line="1720"/>
-        <location filename="dlgorder.ui" line="1814"/>
-        <location filename="dlgorder.ui" line="2047"/>
-        <location filename="dlgorder.ui" line="2082"/>
+        <location filename="dlgorder.ui" line="1372"/>
+        <location filename="dlgorder.ui" line="1407"/>
+        <location filename="dlgorder.ui" line="1568"/>
+        <location filename="dlgorder.ui" line="1691"/>
+        <location filename="dlgorder.ui" line="1726"/>
+        <location filename="dlgorder.ui" line="1820"/>
+        <location filename="dlgorder.ui" line="2053"/>
+        <location filename="dlgorder.ui" line="2088"/>
         <source>0</source>
         <translation></translation>
     </message>
     <message>
         <location filename="dlgorder.ui" line="144"/>
-        <location filename="dlgorder.ui" line="1574"/>
+        <location filename="dlgorder.ui" line="1580"/>
         <source>Prepaid</source>
         <translation>Կանխավճար</translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="1852"/>
+        <location filename="dlgorder.ui" line="1858"/>
         <source>PAYMENT
 CARD</source>
         <translation>Բանկի քարտ</translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="1413"/>
-        <location filename="dlgorder.ui" line="1732"/>
-        <location filename="dlgorder.ui" line="1826"/>
-        <location filename="dlgorder.ui" line="2094"/>
+        <location filename="dlgorder.ui" line="1419"/>
+        <location filename="dlgorder.ui" line="1738"/>
+        <location filename="dlgorder.ui" line="1832"/>
+        <location filename="dlgorder.ui" line="2100"/>
         <source>Other</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="1780"/>
+        <location filename="dlgorder.ui" line="1786"/>
         <source>PAYMENT
 BANK</source>
         <translation>Փոխանցում</translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="1697"/>
+        <location filename="dlgorder.ui" line="1703"/>
         <source>Bank</source>
         <translation>Փոխանցում բանկով</translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="1882"/>
+        <location filename="dlgorder.ui" line="1888"/>
         <source>PAYMENT
 CASH</source>
         <translation>Կանխիկ</translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="1622"/>
+        <location filename="dlgorder.ui" line="1628"/>
         <source>PAYMENT
 OTHER</source>
         <translation>Այլ վճարման
 եղանակ</translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="1378"/>
+        <location filename="dlgorder.ui" line="1384"/>
         <source>Cash</source>
         <translation>Կանխիկ</translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="3022"/>
+        <location filename="dlgorder.ui" line="3028"/>
         <source>Back</source>
         <translation>Հետ</translation>
     </message>
@@ -2234,7 +2234,7 @@ OTHER</source>
         <translation>Ժամավարձը արդեն ավելացված է</translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="1481"/>
+        <location filename="dlgorder.ui" line="1487"/>
         <location filename="dlgorder.cpp" line="486"/>
         <source>Discount</source>
         <translation>Զեղչ</translation>
@@ -2457,7 +2457,7 @@ OTHER</source>
         <translation>Հնրարավոր չէ ավելացնել մեկնաբանություն արդեն տպված հաշվի վրա</translation>
     </message>
     <message>
-        <location filename="dlgorder.ui" line="2059"/>
+        <location filename="dlgorder.ui" line="2065"/>
         <location filename="dlgorder.cpp" line="1435"/>
         <source>Card</source>
         <translation>Քարտ</translation>

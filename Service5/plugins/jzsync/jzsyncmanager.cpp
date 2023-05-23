@@ -74,8 +74,8 @@ void JzSyncManager::timeout()
             }
             break;
         case 3:
-            db[":id"] = rec.at(i);
-            db.deleteFromTable(tables.at(i), "id", rec.at(i));
+            db2[":id"] = rec.at(i);
+            db2.deleteFromTable(tables.at(i), "id", rec.at(i));
             break;
         }
     }

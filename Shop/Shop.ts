@@ -517,57 +517,57 @@
         <translation type="unfinished">Վաճառող</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printrecipta4.cpp" line="119"/>
+        <location filename="../Classes/c5printrecipta4.cpp" line="120"/>
         <source>Goods</source>
         <translation>Ապրանքի անվանում</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printrecipta4.cpp" line="124"/>
+        <location filename="../Classes/c5printrecipta4.cpp" line="125"/>
         <source>NN</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5printrecipta4.cpp" line="125"/>
+        <location filename="../Classes/c5printrecipta4.cpp" line="126"/>
         <source>Material code</source>
         <translation>Կոդ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printrecipta4.cpp" line="127"/>
+        <location filename="../Classes/c5printrecipta4.cpp" line="128"/>
         <source>Qty</source>
         <translation>Քանակ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printrecipta4.cpp" line="128"/>
+        <location filename="../Classes/c5printrecipta4.cpp" line="129"/>
         <source>Unit</source>
         <translation>ՉՄ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printrecipta4.cpp" line="129"/>
+        <location filename="../Classes/c5printrecipta4.cpp" line="130"/>
         <source>Price</source>
         <translation>Գին</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printrecipta4.cpp" line="130"/>
+        <location filename="../Classes/c5printrecipta4.cpp" line="131"/>
         <source>Discount</source>
         <translation type="unfinished">Զեղչ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printrecipta4.cpp" line="131"/>
+        <location filename="../Classes/c5printrecipta4.cpp" line="132"/>
         <source>Total</source>
         <translation>Ընդամենը</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printrecipta4.cpp" line="164"/>
+        <location filename="../Classes/c5printrecipta4.cpp" line="165"/>
         <source>Total amount</source>
         <translation>Ընդհանուր գումար</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printrecipta4.cpp" line="171"/>
+        <location filename="../Classes/c5printrecipta4.cpp" line="172"/>
         <source>Passed</source>
         <translation>Հանձնեց</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printrecipta4.cpp" line="172"/>
+        <location filename="../Classes/c5printrecipta4.cpp" line="173"/>
         <source>Accepted</source>
         <translation>Ընդունեց</translation>
     </message>

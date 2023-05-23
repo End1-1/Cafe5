@@ -41,7 +41,7 @@ void ODraftSaleBody::bind(C5Database &db)
 
 bool ODraftSaleBody::write(C5Database &db, QString &err)
 {
-    bool n = id.isEmpty();
+    bool n = id.toString().isEmpty();
     if (n) {
         id = db.uuid();
     }

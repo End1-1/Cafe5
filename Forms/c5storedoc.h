@@ -77,6 +77,8 @@ public:
 
     bool openDraft(const QString &id);
 
+    void setReasonPartnerName();
+
 public slots:
     void saveDoc();
     
@@ -278,6 +280,7 @@ private slots:
     void on_leTotalSale_textChanged(const QString &arg1);
 
     void on_btnAutoFillSalePrice_clicked();
+    void on_leReason_textChanged(const QString &arg1);
 };
 
 #endif // C5STOREDOC_H

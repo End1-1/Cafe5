@@ -1133,8 +1133,8 @@ UPDATE c_partners SET f_permanent_discount=0 WHERE f_permanent_discount IS NULL;
 ALTER TABLE `c_partners`	CHANGE COLUMN `f_permanent_discount` `f_permanent_discount` DECIMAL(5,2) NULL DEFAULT '0' AFTER `f_cash`;
 UPDATE c_partners SET f_phone='' WHERE f_phone IS NULL;
 UPDATE c_partners SET f_permanent_discount=0 WHERE f_permanent_discount IS NULL;
-alter table c_partners add column f_price_polytic integer default 1;
-alter table c_partners drop column f_price_polytic, add column f_price_politic integer default 1;
+alter table c_partners add column f_price_polyitic integer default 1;
+alter table c_partners drop column f_price_politic, add column f_price_politic integer default 1;
 
 /* db - 112, 08.04.2023 */
 update s_app set f_version='112' where f_app='DB';
@@ -1142,3 +1142,45 @@ create table c_goods_size (f_id integer primary key auto_increment, f_name tinyt
 create table c_goods_sizes (f_id integer primary key auto_increment, f_size integer, f_name varchar(8));
 alter table c_goods_option add column f_size_standart integer;
 alter table c_goods add column f_weblink tinytext;
+
+/* db - 113, 08.04.2023 */
+update s_app set f_version='113' where f_app='DB';
+create table o_draft_sound (f_id integer primary key auto_increment, f_header char(36), f_timeconfirmed timestamp);
+alter table o_draft_sale add column f_datefor date;
+update c_partners set f_phone='' where f_phone is null;
+alter table c_goods add f_queue integer;
+alter table o_route add column f_q1 integer, add column f_q2 integer,add column f_q3 integer,add column f_q4 integer,add column f_q5 integer,add column f_q6 integer,add column f_q7 integer;
+create table o_route_round (f_id integer primary key auto_increment, f_name tinytext, f_rounds tinyint, f_started date);
+alter table o_route drop column f_q1, drop column f_q2, drop column f_q3, drop column f_q4, drop column f_q5, drop column f_q6, drop column f_q7 , add column f_q integer;
+alter table o_route add column f_round integer;
+
+/* db - 114, 18.04.2023 */
+update s_app set f_version='114' where f_app='DB';
+create table sys_configs (f_id integer primary key auto_increment, f_type integer, f_data json);
+create table sys_configs_types (f_id integer primary key, f_name tinytext);
+
+/* db - 115 , 27.04.2023 */
+update s_app set f_version='115' where f_app='DB';
+create table o_draft_sale_state (f_id tinyint, f_name tinytext);
+insert into o_draft_sale_state (f_id, f_name) values (1, 'Ընդունված'), (2, 'Առաքման ենթակա'), (3, 'Կատարված'), (4, 'Չեղարկված');
+
+
+/* db - 116 , 27.04.2023 */
+update s_app set f_version='116' where f_app='DB';
+alter table c_goods add column f_component_exit tinyint default 0;
+
+
+/* db - 117 , 13.05.2023 */
+update s_app set f_version='117' where f_app='DB';
+alter table o_draft_sale_body add column f_discount decimal(5,2), add column f_special_price tinyint;
+alter table e_currency add f_short tinytext;
+create table c_storages_state (f_id tinyint primary key, f_name tinytext);
+alter table c_storages add column f_state tinyint default 1;
+insert into  c_storages_state (f_id, f_name) values ('1', 'Գործող'), (2, 'Փակ');
+create table o_route_drivers (f_id integer primary key auto_increment, f_user integer);
+alter table o_draft_sale add column f_cashier integer;
+insert into  o_draft_sale_state (f_id, f_name) values (5, 'Հետ վերադարձ');
+
+/* db - 118 , 19.05.2023 */
+update s_app set f_version='118' where f_app='DB';
+INSERT INTO `a_reason` (`f_id`, `f_name`) VALUES (11, 'Հետվերադարձ գործընկերոջից');

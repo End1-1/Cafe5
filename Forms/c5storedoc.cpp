@@ -109,6 +109,8 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
         ui->cbCurrency->addItem(db.getString("f_name"), db.getInt("f_id"));
     }
     ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(__c5config.getValue(param_default_currency).toInt()));
+    ui->leReasonPartner->setSelector(fDBParams, ui->leReasonPartnerName, cache_goods_partners);
+    setReasonPartnerName();
 }
 
 C5StoreDoc::~C5StoreDoc()
@@ -133,6 +135,7 @@ bool C5StoreDoc::openDoc(QString id, QString &err)
     fDocType = dw.value(container_aheader, 0, "f_type").toInt();
     fDocState = dw.value(container_aheader, 0, "f_state").toInt();
     ui->lePartner->setValue(dw.value(container_aheader, 0, "f_partner").toInt());
+    ui->leReasonPartner->setValue(dw.value(container_aheader, 0, "f_partner").toInt());
     ui->leComment->setText(dw.value(container_aheader, 0, "f_comment").toString());
     ui->leTotal->setDouble(dw.value(container_aheader, 0, "f_amount").toDouble());
     ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(dw.value(container_aheader, 0, "f_currency").toInt()));
@@ -802,6 +805,14 @@ bool C5StoreDoc::openDraft(const QString &id)
     return true;
 }
 
+void C5StoreDoc::setReasonPartnerName()
+{
+    qDebug() << ui->leReason->getInteger();
+    ui->lbReasonPartner->setVisible(ui->leReason->getInteger() == 11);
+    ui->leReasonPartner->setVisible(ui->leReason->getInteger() == 11);
+    ui->leReasonPartnerName->setVisible(ui->leReason->getInteger() == 11);
+}
+
 bool C5StoreDoc::eventFilter(QObject *o, QEvent *e)
 {
     if (o == ui->tblGoodsGroup->viewport() && fGroupTableCellMove) {
@@ -864,42 +875,7 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
     C5StoreDraftWriter dw(db);
     db.startTransaction();
 
-    /*write cash doc */
-    if (fDocType == DOC_TYPE_STORE_INPUT) {
-        db[":f_id"] = fCashDocUuid;
-        db.exec("select * from a_header where f_id=:f_id");
-        if (db.nextRow()) {
-            C5CashDoc::removeDoc(fDBParams, fCashDocUuid);
-        }
-        fCashDocUuid.clear();
-        if (ui->chPaid->isChecked() && state == DOC_STATE_SAVED) {
-            C5CashDoc cd(fDBParams);
-            QString purpose = tr("Store input") + " #" + ui->leDocNum->text() + ", " + ui->deDate->text();
-            cd.addRow(purpose, ui->leTotal->getDouble());
-            cd.setDate(ui->deCashDate->date());
-            cd.setCashOutput(ui->leCash->getInteger());
-            cd.setComment(purpose);
-            cd.setPartner(ui->lePartner->getInteger());
-            cd.save(false);
-            fCashDocUuid = cd.uuid();
-            db[":f_cashuuid"] = fCashDocUuid;
-            db.update("a_header_store", "f_id", fInternalId);
-        }
-        db[":f_storedoc"] = fInternalId;
-        db.exec("delete from b_clients_debts where f_storedoc=:f_storedoc");
-        if (state == DOC_STATE_SAVED) {
-            if (ui->lePartner->getInteger() > 0 && !ui->chPaid->isChecked()) {
-                BClientDebts bcd;
-                bcd.date = ui->deDate->date();
-                bcd.source = BCLIENTDEBTS_SOURCE_INPUT;
-                bcd.amount = ui->leTotal->getDouble() * -1;
-                bcd.currency = ui->cbCurrency->currentData().toInt();
-                bcd.store = fInternalId;
-                bcd.costumer = ui->lePartner->getInteger();
-                bcd.write(db, err);
-            }
-        }
-    }
+
 
     dw.updateField("a_store_draft", "f_reason", ui->leReason->getInteger(), "f_document", fInternalId);
     dw.updateField("a_store", "f_reason", ui->leReason->getInteger(), "f_document", fInternalId);
@@ -1005,6 +981,56 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
             db[":f_price2"] = ui->tblCalcPrice->getDouble(i, 4);
             db[":f_margin"] = ui->tblCalcPrice->lineEdit(i, 6)->getDouble();
             db.insert("a_calc_price", false);
+        }
+    }
+
+    /*write cash doc */
+    if (fDocType == DOC_TYPE_STORE_INPUT) {
+        db[":f_id"] = fCashDocUuid;
+        db.exec("select * from a_header where f_id=:f_id");
+        if (db.nextRow()) {
+            C5CashDoc::removeDoc(fDBParams, fCashDocUuid);
+        }
+        fCashDocUuid.clear();
+        if (ui->chPaid->isChecked() && state == DOC_STATE_SAVED) {
+            C5CashDoc cd(fDBParams);
+            QString purpose = tr("Store input") + " #" + ui->leDocNum->text() + ", " + ui->deDate->text();
+            cd.addRow(purpose, ui->leTotal->getDouble());
+            cd.setDate(ui->deCashDate->date());
+            cd.setCashOutput(ui->leCash->getInteger());
+            cd.setComment(purpose);
+            cd.setPartner(ui->lePartner->getInteger());
+            cd.save(false);
+            fCashDocUuid = cd.uuid();
+            db[":f_cashuuid"] = fCashDocUuid;
+            db.update("a_header_store", "f_id", fInternalId);
+        }
+        db[":f_storedoc"] = fInternalId;
+        db.exec("delete from b_clients_debts where f_storedoc=:f_storedoc");
+        if (state == DOC_STATE_SAVED) {
+            if (ui->leReason->getInteger() == DOC_REASON_BACK_FROM_PARTNER) {
+                if (ui->leReasonPartner->getInteger() > 0) {
+                    BClientDebts bcd;
+                    bcd.date = ui->deDate->date();
+                    bcd.source = BCLIENTDEBTS_SOURCE_SALE;
+                    bcd.amount = ui->leTotal->getDouble();
+                    bcd.currency = ui->cbCurrency->currentData().toInt();
+                    bcd.store = fInternalId;
+                    bcd.costumer = ui->leReasonPartner->getInteger();
+                    bcd.write(db, err);
+                }
+            } else {
+                if (ui->lePartner->getInteger() > 0 && !ui->chPaid->isChecked()) {
+                    BClientDebts bcd;
+                    bcd.date = ui->deDate->date();
+                    bcd.source = BCLIENTDEBTS_SOURCE_INPUT;
+                    bcd.amount = ui->leTotal->getDouble() * -1;
+                    bcd.currency = ui->cbCurrency->currentData().toInt();
+                    bcd.store = fInternalId;
+                    bcd.costumer = ui->lePartner->getInteger();
+                    bcd.write(db, err);
+                }
+            }
         }
     }
 
@@ -2487,6 +2513,7 @@ void C5StoreDoc::newDoc()
     fDocState = DOC_STATE_DRAFT;
     ui->leDocNum->clear();
     ui->lePartner->setValue(0);
+    ui->leReasonPartner->setValue(0);
     ui->leComment->clear();
     ui->leStoreInput->setValue(0);
     ui->leStoreOutput->setValue(0);
@@ -3393,4 +3420,9 @@ void C5StoreDoc::on_btnAutoFillSalePrice_clicked()
         }
     }
     calcTotalSale();
+}
+
+void C5StoreDoc::on_leReason_textChanged(const QString &arg1)
+{
+    setReasonPartnerName();
 }

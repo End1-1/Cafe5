@@ -42,6 +42,7 @@ CR5CostumerDebts::CR5CostumerDebts(const QStringList &dbParams, QWidget *parent)
     fTranslation["f_taxname"] = tr("Taxname");
     fTranslation["f_amountbank"] = tr("Bank transfer");
     fTranslation["f_amountdebt"] = tr("Cash debt");
+    fTranslation["f_hall"] = tr("Hall");
 
 
     restoreColumnsVisibility();
@@ -123,11 +124,13 @@ void CR5CostumerDebts::buildQuery()
             emit refreshed();
         }  else {
             fSimpleQuery = true;
-            fSqlQuery = "SELECT cd.f_id, cd.f_date, p.f_taxname, cd.f_order, cd.f_cash, cd.f_storedoc, cd.f_amount, c.f_name as f_currency, oh.f_amountbank, oh.f_amountdebt "
+            fSqlQuery = "SELECT cd.f_id, cd.f_date, p.f_taxname, cd.f_order, cd.f_cash, cd.f_storedoc, "
+                        "cd.f_amount, c.f_name as f_currency, oh.f_amountbank, oh.f_amountdebt , h.f_name as f_hall "
                         "FROM b_clients_debts cd "
                         "LEFT JOIN c_partners p ON p.f_id=cd.f_costumer "
                         "LEFT JOIN e_currency c ON c.f_id=cd.f_currency "
-                        "left join o_header oh on oh.f_id=cd.f_order ";
+                        "left join o_header oh on oh.f_id=cd.f_order "
+                        "LEFT join h_halls h on h.f_id=oh.f_hall ";
             fSqlQuery += fFilter->condition();
             fModel->translate(fTranslation);
             C5ReportWidget::buildQuery();

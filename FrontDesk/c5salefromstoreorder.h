@@ -31,10 +31,16 @@ private slots:
 
     void on_btnExportToExcel_clicked();
 
+    void on_btnPrintA4_3_clicked();
+
+    void on_btnPrintA4_2_clicked();
+
 private:
     Ui::C5SaleFromStoreOrder *ui;
 
     void loadOrder(const QString &id);
+
+    void exportToAS(int doctype);
 };
 
 #endif // C5SALEFROMSTOREORDER_H

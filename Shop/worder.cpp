@@ -291,7 +291,7 @@ int WOrder::addGoodsToTable(int id, bool checkQtyOfStore, const QString &draftid
         sb.qty = og.qty;
         sb.price = og.price;
         sb.write(db, err);
-        const_cast<QString&>(draftid) = sb.id;
+        const_cast<QString&>(draftid) = sb.id.toString();
     }
     ui->tblData->item(row, 0)->setData(Qt::UserRole + 101, draftid);
 

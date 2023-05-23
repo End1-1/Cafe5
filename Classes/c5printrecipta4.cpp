@@ -92,7 +92,8 @@ bool C5PrintReciptA4::print(QString &err)
     points << 50 << 200 << 1700;
     vals.clear();
     vals << tr("Saler");
-    vals << QString::fromUtf8("ԱԶ Հրաչ Աճեմյան, ՀՎՀՀ՝ 35136541");
+    //vals << QString::fromUtf8("ԱԶ Հրաչ Աջեմյան, ՀՎՀՀ՝ 35136541");
+    vals << QString::fromUtf8("");
     p.tableText(points, vals, p.fLineHeight + 20);
     p.br(p.fLineHeight + 20);
     p.br(p.fLineHeight + 20);

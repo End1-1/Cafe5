@@ -251,7 +251,7 @@ void C5SaleDoc::saveDataChanges()
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
         db[":f_header"]  = uuid;
         db[":f_body"] = 0;
-        db[":f_store"] = ui->cbStorage->currentData();
+        db[":f_store"] = ui->tblGoods->comboBox(i, col_store)->currentData();
         db[":f_goods"] = ui->tblGoods->getInteger(i, col_goods_code);
         db[":f_qty"] = ui->tblGoods->lineEdit(i, col_qty)->getDouble();
         db[":f_price"] = ui->tblGoods->lineEdit(i, col_price)->getDouble();
@@ -317,7 +317,6 @@ void C5SaleDoc::saveDataChanges()
 
     QSet<int> usedStores;
     QStringList outDocIds;
-    QStringList inDocsIds;
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
         if (ui->tblGoods->getInteger(i, col_type) == 1) {
             continue;
@@ -332,15 +331,12 @@ void C5SaleDoc::saveDataChanges()
     QMap<QString, QString> outInPrices;
     C5StoreDraftWriter dw(db);
     for (int store: usedStores) {
-        QString outStoreDocComment = QString("%1 %2%3").arg(tr("Movement of sale"), prefix, QString::number(hallid));
+        QString outStoreDocComment = QString("%1 %2%3").arg(tr("Output of sale"), prefix, QString::number(hallid));
         QString outStoreDocId;
         QString outStoredocUserNum;
         outStoredocUserNum = dw.storeDocNum(DOC_TYPE_STORE_OUTPUT, store, true, 0);
 
-        QString inStoreDocComment = QString("%1 %2%3, %4").arg(tr("Input for of sale"), prefix, QString::number(hallid), outStoredocUserNum);
-        QString inStoreDocId;
-        QString inStoredocUserNum;
-        inStoredocUserNum = dw.storeDocNum(DOC_TYPE_STORE_OUTPUT, store, true, 0);
+
         for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
             if (ui->tblGoods->getInteger(i, col_type) == 1) {
                 continue;
@@ -355,24 +351,14 @@ void C5SaleDoc::saveDataChanges()
                                      ui->tblGoods->comboBox(i, col_store)->currentData().toInt(),
                                      1, "", 0, 0, uuid);
                 outDocIds.append(outStoreDocId);
-
-                dw.writeAHeader(inStoreDocId, inStoredocUserNum, DOC_STATE_DRAFT, DOC_TYPE_STORE_INPUT, __user->id(), QDate::currentDate(),
-                                QDate::currentDate(), QTime::currentTime(), 0, 0, inStoreDocComment, 0, ui->cbCurrency->currentData().toInt());
-                dw.writeAHeaderStore(inStoreDocId, __user->id(), __user->id(), "", QDate(),
-                                     ui->cbStorage->currentData().toInt(), 0,
-                                     1, "", 0, 0, uuid);
-                inDocsIds.append(inStoreDocId);
             }
-            QString outDraftid, inDraftId;
+            QString outDraftid;
             dw.writeAStoreDraft(outDraftid, outStoreDocId,
                                 ui->tblGoods->comboBox(i, col_store)->currentData().toInt(), -1,
                                 ui->tblGoods->getInteger(i, col_goods_code), ui->tblGoods->lineEdit(i, col_qty)->getDouble(),
                                 0, 0, DOC_REASON_SALE, outDraftid, i + 1, "");
-            dw.writeAStoreDraft(inDraftId, inStoreDocId,
-                                ui->cbStorage->currentData().toInt(), 1,
-                                ui->tblGoods->getInteger(i, col_goods_code), ui->tblGoods->lineEdit(i, col_qty)->getDouble(),
-                                0, 0, DOC_REASON_SALE, inDraftId, i + 1, ui->tblGoods->comboBox(i, col_store)->currentText());
-            outInPrices[inDraftId] = outDraftid;
+            db[":f_storerec"] = outDraftid;
+            db.update("o_goods", "f_id", ui->tblGoods->getString(i, col_uuid));
         }
     }
 
@@ -398,16 +384,16 @@ void C5SaleDoc::saveDataChanges()
             return;
         }
     }
-    for (const QString &id: inDocsIds) {
-        //WRITE OTHER OUTPUT
-        if (!dw.writeInput(id, err)) {
-            db.rollback();
-            C5Message::error(err + "#2");
-            return;
-        }
+//    for (const QString &id: inDocsIds) {
+//        //WRITE OTHER OUTPUT
+//        if (!dw.writeInput(id, err)) {
+//            db.rollback();
+//            C5Message::error(err + "#2");
+//            return;
+//        }
 
-        dw.updateField("a_header", "f_state", DOC_STATE_SAVED, "f_id", id);
-    }
+//        dw.updateField("a_header", "f_state", DOC_STATE_SAVED, "f_id", id);
+//    }
     //END OF OUTPUT FOR OTHER STORAGES
 
 
@@ -545,6 +531,7 @@ int C5SaleDoc::addGoods(int goodsId, C5Database &db)
                         db.getString("f_unitname"), 0, db.getDouble("f_price"), db.getInt("f_service"));
     } else {
         C5Message::error(tr("Invalid goods id"));
+        return false;
     }
 }
 
@@ -720,13 +707,14 @@ void C5SaleDoc::exportToAs(int doctype)
         return;
     }
     int dbid;
+    int index = 0;
     QString connStr;
     if (db.rowCount() > 0) {
         QStringList dbNames;
         while (db.nextRow()) {
             dbNames.append(db.getString("f_name"));
         }
-        int index = DlgList::indexOfList(tr("Armsoft database"), fDBParams, dbNames);
+        index = DlgList::indexOfList(tr("Armsoft database"), fDBParams, dbNames);
         if (index < 0) {
             return;
         }
@@ -758,6 +746,10 @@ void C5SaleDoc::exportToAs(int doctype)
     jdb["username"] = fDBParams.at(2);
     jdb["password"] = fDBParams.at(3);
     jo["database"] = jdb;
+    jo["vatpercent"] = index == 0 ? (doctype == 5 ? 0.2 : 0.1667) : 0;
+    jo["vattype"] = index == 0 ? (doctype == 5 ? "1" : "5") : "3";
+    jo["pricewithoutvat"] =index == 0 ? (doctype == 5 ? 1.2 : 1) : 1;
+    jo["withvat"] = index == 0 ? (doctype == 5 ? 0.2 : 0) : 0;
     HttpQueryDialog *qd = new HttpQueryDialog(fDBParams, QString("https://%1:%2/magnit").arg(b->ipAddress, QString::number(b->port)), jo, this);
     qd->exec();
     qd->deleteLater();

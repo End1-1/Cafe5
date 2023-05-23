@@ -10,6 +10,7 @@ class JsonReponse
 public:
     JsonReponse(Database &db, const QJsonObject &ji, QJsonObject &jo);
     void getResponse();
+
 private:
     Database &fDb;
     const QJsonObject &fJsonIn;

@@ -6,7 +6,6 @@
 class ODraftSaleBody : public TableRecord
 {
 public:
-    QString id;
     QString header;
     int state = 0;
     int store = 0;

@@ -36,7 +36,8 @@ bool RemoveShopSale::remove(const QString &id)
         db.exec("delete from a_store_draft where f_document=:f_document");
         db[":f_id"] = s;
         db.exec("delete from a_header_store where f_id=:f_id");
-
+        db[":f_id"] = s;
+        db.exec("delete from a_header where f_id=:f_id");
     }
 
     storeHeader.clear();

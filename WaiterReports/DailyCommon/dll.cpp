@@ -59,7 +59,8 @@ void json(C5Database &db, const QJsonObject &params, QJsonArray &jarr)
             "sum(oh.f_amountbank) as f_amountbank, sum(oh.f_amountother) as f_amountother, "
             "sum(oh.f_amountidram) as f_amountidram,  "
             "sum(oh.f_amountpayx) as f_amountpayx, "
-            "sum(oh.f_hotel) as f_hotel "
+            "sum(oh.f_hotel) as f_hotel, "
+            "sum(oh.f_amountservice) as f_service "
             "from o_header oh "
             "left join s_user u on u.f_id=oh.f_staff "
             "where oh.f_state=:f_state1 "
@@ -173,6 +174,11 @@ void json(C5Database &db, const QJsonObject &params, QJsonArray &jarr)
         if (m["f_hotel"].toDouble() > 0.001) {
             p.ltext(QObject::tr("Hotel"), 5);
             p.rtext(float_str(m["f_hotel"].toDouble(), 2));
+            p.br();
+        }
+        if (m["f_service"].toDouble() > 0.001) {
+            p.ltext(QObject::tr("Service"), 5);
+            p.rtext(float_str(m["f_service"].toDouble(), 2));
             p.br();
         }
         p.line();

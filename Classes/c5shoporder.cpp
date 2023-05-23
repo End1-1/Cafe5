@@ -66,7 +66,9 @@ bool C5ShopOrder::write()
         PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), fOHeader.hasIdram() ? "true" : C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
         QString jsonIn, jsonOut, err;
         int result = 0;
-        pt.fPartnerTin = CPartners().queryRecordOfId(db, fOHeader.id).taxCode;
+        if (fOHeader.partner > 0) {
+            pt.fPartnerTin = CPartners().queryRecordOfId(db, fOHeader.partner).taxCode;
+        }
         if (!fWriteAdvance) {
             for (int i = 0; i < fOGoods.count(); i++) {
                 OGoods &g = fOGoods[i];
