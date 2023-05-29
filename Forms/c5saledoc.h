@@ -26,6 +26,7 @@ public:
     void setMode(int mode);
     virtual bool reportHandler(const QString &handleId, const QVariant &data);
     virtual QToolBar *toolBar() override;
+    bool openDoc(const QString &uuid);
 
 private slots:
     void amountDoubleClicked();
@@ -34,6 +35,8 @@ private slots:
     void createRetailAS();
     void messageResult(QJsonObject jo);
     void saveDataChanges();
+    void saveAsDraft();
+    void saveCopy();
     void uuidDoubleClicked();
     void on_PriceTextChanged(const QString &arg1);
     void on_QtyTextChanged(const QString &arg1);
@@ -59,11 +62,14 @@ private:
     ODraftSaleBody fDraftSaleBody;
     int fMode;
     QAction *fActionSave;
+    QAction *fActionDraft;
+    QAction *fActionCopy;
     int addGoods(int goodsId, C5Database &db);
-    int addGoods(int store, int goodsId, const QString &barcode, const QString &name, const QString &unitname, double qty, double price, int isService);
+    int addGoods(int store, int goodsId, const QString &barcode, const QString &name, const QString &unitname, double qty, double price, double discount, int isService);
     void countGrandTotal();
     bool openDraft(const QString &id);
     void setPartner();
+    void setPartner(const CPartners &p);
     void setDeliveryMan();
     void exportToAs(int doctype);
     bool fOpenedFromDraft;

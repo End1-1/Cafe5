@@ -344,6 +344,7 @@ bool JsonReponse::saveOrder()
     sale[":f_discount"] = fJsonIn["partner"]["discount"].toDouble() / 100;
     sale[":f_comment"] = fJsonIn["comment"].toString();
     sale[":f_datefor"] = QDate::fromString(fJsonIn["deliverydate"].toString(), "dd/MM/yyyy");
+    sale[":f_flag"] = fJsonIn["mark"].toInt();
 
     QList<QMap<QString, QVariant> > saleBody;
 

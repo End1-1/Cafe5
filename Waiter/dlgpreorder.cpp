@@ -335,3 +335,8 @@ void DlgPreorder::on_btnCheckin_clicked()
         accept();
     }
 }
+
+void DlgPreorder::on_btnPrintPrepaymentTax_clicked()
+{
+
+}

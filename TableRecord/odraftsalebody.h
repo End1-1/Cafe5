@@ -15,6 +15,7 @@ public:
     double qty = 0.0;
     double back = 0.0;
     double price = 0.0;
+    double discount = 0.0;
     QDate dateRemoved;
     QTime timeRemoved;
     int userAppend = 0;

@@ -18,6 +18,7 @@ bool ODraftSaleBody::getRecord(C5Database &db)
     timeRemoved = db.getTime("f_timeremoved");
     userAppend = db.getInt("f_userappend");
     userRemove = db.getInt("f_userremove");
+    discount = db.getDouble("f_discount");
     return true;
 }
 
@@ -37,6 +38,7 @@ void ODraftSaleBody::bind(C5Database &db)
     db[":f_timeRemoved"] = timeRemoved;
     db[":f_userAppend"] = userAppend;
     db[":f_userRemove"] = userRemove;
+    db[":f_discount"]= discount;
 }
 
 bool ODraftSaleBody::write(C5Database &db, QString &err)

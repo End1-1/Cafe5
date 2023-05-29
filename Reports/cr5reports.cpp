@@ -107,15 +107,11 @@ bool CR5Reports::tblDoubleClicked(int row, int column, const QList<QVariant> &va
             storedoc->openDraft(values.at(0).toString());
 
         } else {
-            if (db.getInt("f_state") == 1) {
                 auto *retaildoc = __mainWindow->createTab<C5SaleDoc>(fDBParams);
                 retaildoc->setMode(1);
                 if (!retaildoc->reportHandler(REPORT_HANDLER_SALE_DOC_OPEN_DRAFT, values.at(0))) {
 
                 }
-            } else {
-                C5SaleFromStoreOrder::openOrder(fDBParams, values.at(0).toString());
-            }
         }
     }
     return true;

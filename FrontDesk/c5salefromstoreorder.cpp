@@ -156,7 +156,10 @@ void C5SaleFromStoreOrder::on_btnRemove_clicked()
         return;
     }
     RemoveShopSale r(fDBParams, this);
-    r.remove(ui->leUUID->text());
+    C5Database db(fDBParams);
+    db.startTransaction();
+    r.remove(db, ui->leUUID->text());
+    db.commit();
     C5Message::info(tr("Removal complete"));
 }
 

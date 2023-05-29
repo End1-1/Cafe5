@@ -391,7 +391,7 @@
 <context>
     <name>C5OrderDriver</name>
     <message>
-        <location filename="../Classes/c5orderdriver.cpp" line="121"/>
+        <location filename="../Classes/c5orderdriver.cpp" line="169"/>
         <source>Empty order id</source>
         <translation>Դատարկ համար</translation>
     </message>
@@ -744,17 +744,17 @@
         <translation>Անկանխիկի դրամարկղը նշանակված չէ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5shoporder.cpp" line="109"/>
+        <location filename="../Classes/c5shoporder.cpp" line="111"/>
         <source>(F)</source>
         <translation>(Ֆ)</translation>
     </message>
     <message>
-        <location filename="../Classes/c5shoporder.cpp" line="354"/>
+        <location filename="../Classes/c5shoporder.cpp" line="356"/>
         <source>Input of sale</source>
         <translation>Մուտք վաճառքից</translation>
     </message>
     <message>
-        <location filename="../Classes/c5shoporder.cpp" line="130"/>
+        <location filename="../Classes/c5shoporder.cpp" line="132"/>
         <source>Output of sale</source>
         <translation>Ելք ըստ վաճառքի</translation>
     </message>

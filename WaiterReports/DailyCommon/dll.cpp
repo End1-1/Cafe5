@@ -76,7 +76,7 @@ void json(C5Database &db, const QJsonObject &params, QJsonArray &jarr)
     qDebug() << "Paper width" << params["paper_width"];
     //p.setSceneParams(550, 2700, QPrinter::Portrait);
     p.setSceneParams(params["paper_width"].toInt(), 2700, QPrinter::Portrait);
-    QFont font("Arial LatArm Unicode", 20);
+    QFont font("Arial LatArm Unicode", 30);
     p.setFont(font);
     p.ctext(QObject::tr("Daily, general"));
     p.br();
@@ -181,6 +181,7 @@ void json(C5Database &db, const QJsonObject &params, QJsonArray &jarr)
             p.rtext(float_str(m["f_service"].toDouble(), 2));
             p.br();
         }
+        p.setFontSize(20);
         p.line();
         p.br();
     }

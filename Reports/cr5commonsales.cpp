@@ -3,7 +3,7 @@
 #include "c5tablemodel.h"
 #include "c5waiterorder.h"
 #include "c5mainwindow.h"
-#include "c5salefromstoreorder.h"
+#include "c5saledoc.h"
 #include "c5waiterorderdoc.h"
 #include "dlgexportsaletoasoptions.h"
 #include "c5dlgselectreporttemplate.h"
@@ -235,7 +235,9 @@ bool CR5CommonSales::tblDoubleClicked(int row, int column, const QList<QVariant>
             break;
         }
         case 2: {
-            C5SaleFromStoreOrder::openOrder(fDBParams, values.at(fModel->fColumnNameIndex["f_id"]).toString());
+            auto *doc = __mainWindow->createTab<C5SaleDoc>(fDBParams);
+            doc->openDoc(values.at(fModel->fColumnNameIndex["f_id"]).toString());
+            //C5SaleFromStoreOrder::openOrder(fDBParams, values.at(fModel->fColumnNameIndex["f_id"]).toString());
             break;
         }
         default: {

@@ -79,6 +79,8 @@ SOURCES += \
     ../Classes/notificationwidget.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
     ../Classes/threadsendmessage.cpp \
+    ../Configs/cashboxconfig.cpp \
+    ../Configs/config.cpp \
     ../Controls/c5cleartablewidget.cpp \
     ../Controls/c5guicontrols.cpp \
     ../Controls/c5tablewidget.cpp \
@@ -262,6 +264,8 @@ HEADERS += \
     ../Classes/notificationwidget.h \
     ../Classes/proxytablewidgetdatabase.h \
     ../Classes/threadsendmessage.h \
+    ../Configs/cashboxconfig.h \
+    ../Configs/config.h \
     ../Controls/c5cleartablewidget.h \
     ../Controls/c5guicontrols.h \
     ../Controls/c5tablewidget.h \
@@ -469,6 +473,7 @@ INCLUDEPATH += ../Forms
 INCLUDEPATH += ../Service
 INCLUDEPATH += ../DbData
 INCLUDEPATH += ../Shop
+INCLUDEPATH += ../Configs
 INCLUDEPATH += ../TableRecord
 INCLUDEPATH += C:/Projects/NewTax/Src
 INCLUDEPATH += C:/Soft/OpenSSL-Win64/include

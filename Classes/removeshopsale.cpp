@@ -9,10 +9,8 @@ RemoveShopSale::RemoveShopSale(const QStringList dbParams, QObject *parent) : QO
 
 }
 
-bool RemoveShopSale::remove(const QString &id)
+bool RemoveShopSale::remove(C5Database &db, const QString &id)
 {
-    C5Database db(fDbParams);
-    db.startTransaction();
     QStringList storeRec;
     db[":f_header"] = id;
     db.exec("select f_storerec from o_goods where f_header=:f_header");
@@ -55,13 +53,9 @@ bool RemoveShopSale::remove(const QString &id)
         db.exec("delete from a_header where f_id=:f_id");
     }
 
+
     db[":f_order"] = id;
     db.exec("delete from b_clients_debts where f_order=:f_order");
-    db[":f_header"] = id;
-    db.exec("delete from o_goods where f_header=:f_header");
-    db[":f_id"] = id;
-    db.exec("delete from o_header where f_id=:f_id");
-    db[":f_id"] = id;
     db.exec("delete from a_header where f_id=:f_id");
     db[":f_trsale"] = id;
     db.exec("select * from b_gift_card_history where f_trsale=:f_trsale");
@@ -76,7 +70,13 @@ bool RemoveShopSale::remove(const QString &id)
     db.exec("delete from b_gift_card_history where f_trsale=:f_trsale");
 
     db.deleteFromTable("b_clients_debts", "f_order", id);
-    db.commit();
+
+    db[":f_header"] = id;
+    db.exec("delete from o_goods where f_header=:f_header");
+    db[":f_id"] = id;
+    db.exec("delete from o_header where f_id=:f_id");
+    db[":f_id"] = id;
+
     return true;
 
 }

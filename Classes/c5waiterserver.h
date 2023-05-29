@@ -3,6 +3,7 @@
 
 #include "c5database.h"
 #include "c5serverhandler.h"
+#include "c5storedraftwriter.h"
 #include <QObject>
 #include <QJsonObject>
 
@@ -62,6 +63,8 @@ private:
     void processReturnTaxReceipt(QJsonObject &o);
 
     void processTaxReport(QJsonObject &o);
+
+    void writeCashDoc(C5StoreDraftWriter &dw, const QString &uuid, const QString id, QString &err, double amount, int staff, int cashboxid, QDate dateCash);
 
     QTcpSocket *fSocket;
 };

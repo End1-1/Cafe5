@@ -127,13 +127,6 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="tw1lbName">
-        <property name="text">
-         <string>A1</string>
-        </property>
-       </widget>
-      </item>
       <item row="2" column="0" colspan="3">
        <widget class="QLabel" name="tw1lbStaff">
         <property name="text">
@@ -145,6 +138,13 @@
        <widget class="QLabel" name="lbComment">
         <property name="text">
          <string>Comment</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="4">
+       <widget class="QLabel" name="tw1lbName">
+        <property name="text">
+         <string>A1</string>
         </property>
        </widget>
       </item>

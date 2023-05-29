@@ -156,7 +156,11 @@ bool C5PrintReceiptThread::print(const QStringList &dbParams)
     }
     p.br(1);
     p.ltext(__translator.tt("Table"), 0);
+    p.setFontSize(bs + 20);
+    p.setFontBold(true);
     p.rtext(QString("%1/%2").arg(fHeaderInfo["f_hallname"].toString(), fHeaderInfo["f_tablename"].toString()));
+    p.setFontSize(bs);
+    p.setFontBold(false);
     p.br();
     p.ltext(__translator.tt("Printed"), 0);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));

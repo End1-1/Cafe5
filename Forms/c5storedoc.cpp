@@ -984,56 +984,6 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
         }
     }
 
-    /*write cash doc */
-    if (fDocType == DOC_TYPE_STORE_INPUT) {
-        db[":f_id"] = fCashDocUuid;
-        db.exec("select * from a_header where f_id=:f_id");
-        if (db.nextRow()) {
-            C5CashDoc::removeDoc(fDBParams, fCashDocUuid);
-        }
-        fCashDocUuid.clear();
-        if (ui->chPaid->isChecked() && state == DOC_STATE_SAVED) {
-            C5CashDoc cd(fDBParams);
-            QString purpose = tr("Store input") + " #" + ui->leDocNum->text() + ", " + ui->deDate->text();
-            cd.addRow(purpose, ui->leTotal->getDouble());
-            cd.setDate(ui->deCashDate->date());
-            cd.setCashOutput(ui->leCash->getInteger());
-            cd.setComment(purpose);
-            cd.setPartner(ui->lePartner->getInteger());
-            cd.save(false);
-            fCashDocUuid = cd.uuid();
-            db[":f_cashuuid"] = fCashDocUuid;
-            db.update("a_header_store", "f_id", fInternalId);
-        }
-        db[":f_storedoc"] = fInternalId;
-        db.exec("delete from b_clients_debts where f_storedoc=:f_storedoc");
-        if (state == DOC_STATE_SAVED) {
-            if (ui->leReason->getInteger() == DOC_REASON_BACK_FROM_PARTNER) {
-                if (ui->leReasonPartner->getInteger() > 0) {
-                    BClientDebts bcd;
-                    bcd.date = ui->deDate->date();
-                    bcd.source = BCLIENTDEBTS_SOURCE_SALE;
-                    bcd.amount = ui->leTotal->getDouble();
-                    bcd.currency = ui->cbCurrency->currentData().toInt();
-                    bcd.store = fInternalId;
-                    bcd.costumer = ui->leReasonPartner->getInteger();
-                    bcd.write(db, err);
-                }
-            } else {
-                if (ui->lePartner->getInteger() > 0 && !ui->chPaid->isChecked()) {
-                    BClientDebts bcd;
-                    bcd.date = ui->deDate->date();
-                    bcd.source = BCLIENTDEBTS_SOURCE_INPUT;
-                    bcd.amount = ui->leTotal->getDouble() * -1;
-                    bcd.currency = ui->cbCurrency->currentData().toInt();
-                    bcd.store = fInternalId;
-                    bcd.costumer = ui->lePartner->getInteger();
-                    bcd.write(db, err);
-                }
-            }
-        }
-    }
-
     if (!err.isEmpty()) {
         db.rollback();
         return false;
@@ -1116,6 +1066,57 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
 
     fDocState = state;
     db.commit();
+
+    /*write cash doc */
+    if (fDocType == DOC_TYPE_STORE_INPUT) {
+        db[":f_id"] = fCashDocUuid;
+        db.exec("select * from a_header where f_id=:f_id");
+        if (db.nextRow()) {
+            C5CashDoc::removeDoc(fDBParams, fCashDocUuid);
+        }
+        fCashDocUuid.clear();
+        if (ui->chPaid->isChecked() && state == DOC_STATE_SAVED) {
+            C5CashDoc cd(fDBParams);
+            QString purpose = tr("Store input") + " #" + ui->leDocNum->text() + ", " + ui->deDate->text();
+            cd.addRow(purpose, ui->leTotal->getDouble());
+            cd.setDate(ui->deCashDate->date());
+            cd.setCashOutput(ui->leCash->getInteger());
+            cd.setComment(purpose);
+            cd.setPartner(ui->lePartner->getInteger());
+            cd.save(false);
+            fCashDocUuid = cd.uuid();
+            db[":f_cashuuid"] = fCashDocUuid;
+            db.update("a_header_store", "f_id", fInternalId);
+        }
+        db[":f_storedoc"] = fInternalId;
+        db.exec("delete from b_clients_debts where f_storedoc=:f_storedoc");
+        if (state == DOC_STATE_SAVED) {
+            if (ui->leReason->getInteger() == DOC_REASON_BACK_FROM_PARTNER) {
+                if (ui->leReasonPartner->getInteger() > 0) {
+                    BClientDebts bcd;
+                    bcd.date = ui->deDate->date();
+                    bcd.source = BCLIENTDEBTS_SOURCE_SALE;
+                    bcd.amount = ui->leTotal->getDouble();
+                    bcd.currency = ui->cbCurrency->currentData().toInt();
+                    bcd.store = fInternalId;
+                    bcd.costumer = ui->leReasonPartner->getInteger();
+                    bcd.write(db, err);
+                }
+            } else {
+                if (ui->lePartner->getInteger() > 0 && !ui->chPaid->isChecked()) {
+                    BClientDebts bcd;
+                    bcd.date = ui->deDate->date();
+                    bcd.source = BCLIENTDEBTS_SOURCE_INPUT;
+                    bcd.amount = ui->leTotal->getDouble() * -1;
+                    bcd.currency = ui->cbCurrency->currentData().toInt();
+                    bcd.store = fInternalId;
+                    bcd.costumer = ui->lePartner->getInteger();
+                    bcd.write(db, err);
+                }
+            }
+        }
+    }
+
     if (ui->tblAdd->rowCount() > 0){
         db[":f_name"] = "last_store_additions";
         db.exec("select * from s_draft where f_name=:f_name");

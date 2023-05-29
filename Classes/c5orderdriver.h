@@ -2,6 +2,7 @@
 #define C5ORDERDRIVER_H
 
 #include "c5database.h"
+#include "c5storedraftwriter.h"
 #include <QObject>
 #include <QMap>
 #include <QVariant>
@@ -127,6 +128,8 @@ private:
     void clearOrder();
 
     void dateCash(QDate &d, int &dateShift);
+
+    void writeCashDoc(C5StoreDraftWriter &dw, const QString &uuid, const QString id, QString &err, double amount, int staff, int cashboxid, QDate dateCash);
 };
 
 #endif // C5ORDERDRIVER_H

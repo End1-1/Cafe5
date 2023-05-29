@@ -4,6 +4,7 @@
 #include "datadriver.h"
 #include "c5config.h"
 #include "c5waiterorderdoc.h"
+#include "cashboxconfig.h"
 #include <QJsonObject>
 
 C5OrderDriver::C5OrderDriver(const QStringList &dbParams) :
@@ -108,7 +109,54 @@ bool C5OrderDriver::closeOrder()
                 return false;
             }
         }
-    }
+
+        C5StoreDraftWriter dw(db);
+        auto *cbc = Config::construct<CashboxConfig>(db.dbParams(), 2);
+
+            QString headerPrefix;
+            int headerId;
+            QDate dateCash = headerValue("f_datecash").toDate();
+            if (!dw.hallId(headerPrefix, headerId, headerValue("f_hall").toInt())) {
+                err = dw.fErrorMsg;
+            }
+            if (headerValue("f_amountcash").toDouble() > 0.0001) {
+               writeCashDoc(dw, headerValue("f_id").toString(), QString("%1%2").arg(headerPrefix, QString::number(headerId)),err,
+                       headerValue("f_amountcash").toDouble(), headerValue("f_currentstaff").toInt(),
+                       cbc->cash1, dateCash);
+            }
+            if (headerValue("f_amountcard").toDouble() > 0.0001) {
+                writeCashDoc(dw, headerValue("f_id").toString(), QString("%1%2").arg(headerPrefix, QString::number(headerId)),err,
+                        headerValue("f_amountcard").toDouble(), headerValue("f_currentstaff").toInt(),
+                        cbc->cash2, dateCash);
+
+            }
+            if (headerValue("f_amountbank").toDouble() > 0.0001) {
+                writeCashDoc(dw, headerValue("f_id").toString(), QString("%1%2").arg(headerPrefix, QString::number(headerId)),err,
+                        headerValue("f_amountbank").toDouble(), headerValue("f_currentstaff").toInt(),
+                        cbc->cash3, dateCash);
+
+            }
+            if (headerValue("f_amountprepaid").toDouble() > 0.0001) {
+                writeCashDoc(dw, headerValue("f_id").toString(), QString("%1%2").arg(headerPrefix, QString::number(headerId)),err,
+                        headerValue("f_amountprepaid").toDouble(), headerValue("f_currentstaff").toInt(),
+                        cbc->cash4, dateCash);
+
+            }
+            if (headerValue("f_amountidram").toDouble() > 0.0001) {
+                writeCashDoc(dw, headerValue("f_id").toString(), QString("%1%2").arg(headerPrefix, QString::number(headerId)),err,
+                        headerValue("f_amountidram").toDouble(), headerValue("f_currentstaff").toInt(),
+                        cbc->cash5, dateCash);
+
+            }
+            if (headerValue("f_amountpayx").toDouble() > 0.0001) {
+                writeCashDoc(dw, headerValue("f_id").toString(), QString("%1%2").arg(headerPrefix, QString::number(headerId)),err,
+                        headerValue("f_amountpayx").toDouble(), headerValue("f_currentstaff").toInt(),
+                        cbc->cash6, dateCash);
+
+            }
+        }
+
+
     clearOrder();
     return true;
 }
@@ -784,7 +832,7 @@ void C5OrderDriver::clearOrder()
     fCurrentOrderId.clear();
 }
 
-void C5OrderDriver::dateCash(QDate &d, int &dateShift)
+void C5OrderDriver::   dateCash(QDate &d, int &dateShift)
 {
     d = QDate::currentDate();
     dateShift = 1;
@@ -799,5 +847,26 @@ void C5OrderDriver::dateCash(QDate &d, int &dateShift)
     } else {
         d = QDate::fromString(__c5config.dateCash(), FORMAT_DATE_TO_STR_MYSQL);
         dateShift = __c5config.dateShift();
+    }
+}
+
+void C5OrderDriver::writeCashDoc(C5StoreDraftWriter &dw, const QString &uuid, const QString id, QString &err, double amount, int staff, int cashboxid, QDate dateCash)
+{
+    QString cashdocid;
+    if (!dw.writeAHeader(cashdocid, id, DOC_STATE_SAVED, DOC_TYPE_CASH,
+                         staff, dateCash, QDate::currentDate(),
+                         QTime::currentTime(), 0, amount,
+                         id, 1, 1)) {
+        err = dw.fErrorMsg;
+    }
+    if (!dw.writeAHeaderCash(cashdocid, cashboxid,
+                             0, 1, "", uuid, 0)) {
+        err = dw.fErrorMsg;
+    }
+    QString cashUUID;
+    if (!dw.writeECash(cashUUID, cashdocid, cashboxid, 1,
+                       id,
+                       amount, cashUUID, 1)) {
+        err = dw.fErrorMsg;
     }
 }

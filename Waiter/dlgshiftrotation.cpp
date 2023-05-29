@@ -3,6 +3,7 @@
 #include "datadriver.h"
 #include "c5storedraftwriter.h"
 #include "c5user.h"
+#include "dlgexitwithmessage.h"
 
 DlgShiftRotation::DlgShiftRotation(C5User *user) :
     C5Dialog(__c5config.dbParams()),
@@ -37,11 +38,11 @@ void DlgShiftRotation::on_btnNextDate_clicked()
 
 void DlgShiftRotation::on_btnPrevDate_clicked()
 {
-    QDate datecash = QDate::fromString(__c5config.getValue(param_date_cash), FORMAT_DATE_TO_STR_MYSQL);
-    if (ui->de->date().addDays(-1) < datecash){
-        C5Message::error(tr("Closing session not allowed in past"));
-        return;
-    }
+//    QDate datecash = QDate::fromString(__c5config.getValue(param_date_cash), FORMAT_DATE_TO_STR_MYSQL);
+//    if (ui->de->date().addDays(-1) < datecash){
+//        C5Message::error(tr("Closing session not allowed in past"));
+//        return;
+//    }
     ui->de->setDate(ui->de->date().addDays(-1));
 }
 
@@ -66,14 +67,14 @@ void DlgShiftRotation::on_btnChange_clicked()
         return;
     }
     //Check checkout reservation
-    db[":f_checkout"] = date;
-    db.exec("select o.f_id, ohh.f_id from o_header_hotel ohh "
-            "left join o_header o on o.f_id=ohh.f_id "
-            "where o.f_state in (1) and ohh.f_checkout=:f_checkout");
-    if (db.nextRow()) {
-        C5Message::error(tr("An order exists with end on current date"));
-        return;
-    }
+//    db[":f_checkout"] = date;
+//    db.exec("select o.f_id, ohh.f_id from o_header_hotel ohh "
+//            "left join o_header o on o.f_id=ohh.f_id "
+//            "where o.f_state in (1) and ohh.f_checkout=:f_checkout");
+//    if (db.nextRow()) {
+//        C5Message::error(tr("An order exists with end on current date"));
+//        return;
+//    }
     db[":f_state"] = ORDER_STATE_OPEN;
     db.exec("select o.f_id, o.f_hall, h.f_settings, ohh.f_roomrate "
             "from o_header o "
@@ -107,7 +108,7 @@ void DlgShiftRotation::on_btnChange_clicked()
     db[":f_value"] = ui->cb->currentData().toString();
     db[":f_key"] = param_date_cash_shift;
     db.exec("update s_settings_values set f_value=:f_value where f_key=:f_key");
-    C5Message::info(tr("Session was changed"));
+    DlgExitWithMessage::openDialog(tr("Session was changed"));
 }
 
 void DlgShiftRotation::on_btnCancel_clicked()

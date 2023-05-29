@@ -264,6 +264,8 @@ private slots:
     void on_btnDelivery_clicked();
 
     void on_btnCalcIdram_clicked();
+    void on_btnFillBank_clicked();
+    void on_btnCashout_clicked();
 };
 
 #endif // DLGORDER_H

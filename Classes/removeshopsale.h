@@ -1,6 +1,7 @@
 #ifndef REMOVESHOPSALE_H
 #define REMOVESHOPSALE_H
 
+#include "c5database.h"
 #include <QObject>
 
 class RemoveShopSale : public QObject
@@ -9,7 +10,7 @@ class RemoveShopSale : public QObject
 public:
     explicit RemoveShopSale(const QStringList dbParams, QObject *parent = nullptr);
 
-    bool remove(const QString &id);
+    bool remove(C5Database &db, const QString &id);
 
 private:
     QStringList fDbParams;

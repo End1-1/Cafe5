@@ -357,6 +357,8 @@ void CR5Goods::deleteGoods()
         C5Message::error(tr("Cannot remove ") + err);
         return;
     }
+    db[":f_goods"] = id;
+    db.exec("delete from c_goods_prices where f_goods=:f_goods");
     db[":f_id"] = id;
     if (db.exec("delete from c_goods where f_id=:f_id")) {
         removeRow(row);

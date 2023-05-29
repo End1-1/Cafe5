@@ -4,7 +4,7 @@
 #include "c5tablemodel.h"
 #include "c5mainwindow.h"
 #include "c5storedoc.h"
-#include "c5salefromstoreorder.h"
+#include "c5saledoc.h"
 #include <QJsonObject>
 #include <QJsonDocument>
 
@@ -183,6 +183,8 @@ bool CR5SaleFromStore::tblDoubleClicked(int row, int column, const QList<QVarian
     if (values.count() == 0) {
         return true;
     }
-    C5SaleFromStoreOrder::openOrder(fDBParams, values.at(fModel->indexForColumnName("f_header")).toString());
+    auto *doc = __mainWindow->createTab<C5SaleDoc>(fDBParams);
+    doc->openDoc(values.at(fModel->indexForColumnName("f_header")).toString());
+
     return true;
 }

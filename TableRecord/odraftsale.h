@@ -6,19 +6,18 @@
 class ODraftSale : public TableRecord
 {
 public:
-    QString id;
     int state = 0;
     int saleType = 0;
     QDate date;
     QTime time;
     int payment = 0;
     int staff = 0;
+    int cashier = 0;
     int partner = 0;
     double amount = 0.0;
     double discount = 0.0;
     QString comment;
     QDate deliveryDate;
-    int cashier = 0;
 
     virtual bool getRecord(C5Database &db) override;
     virtual void bind(C5Database &db) override;

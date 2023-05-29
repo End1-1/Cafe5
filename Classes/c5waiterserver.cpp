@@ -15,6 +15,7 @@
 #include "notificationwidget.h"
 #include "c5jsondb.h"
 #include "stoplist.h"
+#include "cashboxconfig.h"
 #include "c5logsystem.h"
 #include <QDebug>
 #include <QJsonArray>
@@ -886,56 +887,47 @@ void C5WaiterServer::processCloseOrder(QJsonObject &o, C5Database &db)
             }
 
             C5StoreDraftWriter dw(db);
+            auto *cbc = Config::construct<CashboxConfig>(db.dbParams(), 2);
             if (settings[param_autoinput_salecash].toInt() == 1) {
                 QString headerPrefix;
                 int headerId;
                 if (!dw.hallId(headerPrefix, headerId, jh["f_hall"].toString().toInt())) {
                     err = dw.fErrorMsg;
                 }
-                QString cashdocid, nocashdocid;
                 if (jh["f_amountcash"].toString().toDouble() > 0.0001) {
-                    int counter = dw.counterAType(DOC_TYPE_CASH);
-                    if (counter == 0) {
-                        err = dw.fErrorMsg;;
-                    }
-                    if (!dw.writeAHeader(cashdocid, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH,
-                                         jh["f_currentstaff"].toString().toInt(), dateCash, QDate::currentDate(),
-                                         QTime::currentTime(), 0, jh["f_amountcash"].toString().toDouble(),
-                                         settings[param_autocash_prefix] + " " + headerPrefix + QString::number(headerId), 1, 1)) {
-                        err = dw.fErrorMsg;
-                    }
-                    if (!dw.writeAHeaderCash(cashdocid, settings[param_cash_id].toInt(),
-                                             0, 1, "", jh["f_id"].toString(), 0)) {
-                        err = dw.fErrorMsg;
-                    }
-                    QString cashUUID;
-                    if (!dw.writeECash(cashUUID, cashdocid, settings[param_cash_id].toInt(), 1,
-                                       settings[param_autocash_prefix] + " " + headerPrefix + QString::number(headerId),
-                                       jh["f_amountcash"].toString().toDouble(), cashUUID, 1)) {
-                        err = dw.fErrorMsg;
-                    }
+                   writeCashDoc(dw, jh["f_id"].toString(), QString("%1%2").arg(headerPrefix, headerId),err,
+                           jh["f_amountcash"].toString().toDouble(), jh["f_currentstaff"].toString().toInt(),
+                           cbc->cash1, dateCash);
                 }
                 if (jh["f_amountcard"].toString().toDouble() > 0.0001) {
-                    int counter = dw.counterAType(DOC_TYPE_CASH);
-                    if (counter == 0) {
-                        err = dw.fErrorMsg;
-                    }
-                    if (!dw.writeAHeader(nocashdocid, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH,
-                                         jh["f_currentstaff"].toString().toInt(), dateCash, QDate::currentDate(),
-                                         QTime::currentTime(), 0, jh["f_amountcard"].toString().toDouble(),
-                                         settings[param_autonocash_prefix] + " " + headerPrefix + QString::number(headerId), 1, 1)) {
-                        err = dw.fErrorMsg;
-                    }
-                    if (!dw.writeAHeaderCash(nocashdocid, settings[param_nocash_id].toInt(),
-                                             0, 1, "", jh["f_id"].toString(), 0)) {
-                        err = dw.fErrorMsg;
-                    }
-                    QString cashUUID;
-                    if (!dw.writeECash(cashUUID, nocashdocid, settings[param_nocash_id].toInt(), 1,
-                                       settings[param_autonocash_prefix] + " " + headerPrefix + QString::number(headerId),
-                                       jh["f_amountcard"].toString().toDouble(), cashUUID, 1)) {
-                        err = dw.fErrorMsg;
-                    }
+                    writeCashDoc(dw, jh["f_id"].toString(), QString("%1%2").arg(headerPrefix, headerId),err,
+                            jh["f_amountcard"].toString().toDouble(), jh["f_currentstaff"].toString().toInt(),
+                            cbc->cash2, dateCash);
+
+                }
+                if (jh["f_amountbank"].toString().toDouble() > 0.0001) {
+                    writeCashDoc(dw, jh["f_id"].toString(), QString("%1%2").arg(headerPrefix, headerId),err,
+                            jh["f_amountbank"].toString().toDouble(), jh["f_currentstaff"].toString().toInt(),
+                            cbc->cash2, dateCash);
+
+                }
+                if (jh["f_amountprepaid"].toString().toDouble() > 0.0001) {
+                    writeCashDoc(dw, jh["f_id"].toString(), QString("%1%2").arg(headerPrefix, headerId),err,
+                            jh["f_amountprepaid"].toString().toDouble(), jh["f_currentstaff"].toString().toInt(),
+                            cbc->cash2, dateCash);
+
+                }
+                if (jh["f_amountidram"].toString().toDouble() > 0.0001) {
+                    writeCashDoc(dw, jh["f_id"].toString(), QString("%1%2").arg(headerPrefix, headerId),err,
+                            jh["f_amountidram"].toString().toDouble(), jh["f_currentstaff"].toString().toInt(),
+                            cbc->cash2, dateCash);
+
+                }
+                if (jh["f_amountpayx"].toString().toDouble() > 0.0001) {
+                    writeCashDoc(dw, jh["f_id"].toString(), QString("%1%2").arg(headerPrefix, headerId),err,
+                            jh["f_amountpayx"].toString().toDouble(), jh["f_currentstaff"].toString().toInt(),
+                            cbc->cash2, dateCash);
+
                 }
             }
         } else {
@@ -1613,4 +1605,25 @@ void C5WaiterServer::processTaxReport(QJsonObject &o)
     db[":f_err"] = err;
     db[":f_result"] = result;
     db.insert("o_tax_log", false);
+}
+
+void C5WaiterServer::writeCashDoc(C5StoreDraftWriter &dw, const QString &uuid, const QString id, QString &err, double amount, int staff, int cashboxid, QDate dateCash)
+{
+    QString cashdocid;
+    if (!dw.writeAHeader(cashdocid, id, DOC_STATE_SAVED, DOC_TYPE_CASH,
+                         staff, dateCash, QDate::currentDate(),
+                         QTime::currentTime(), 0, amount,
+                         id, 1, 1)) {
+        err = dw.fErrorMsg;
+    }
+    if (!dw.writeAHeaderCash(cashdocid, cashboxid,
+                             0, 1, "", uuid, 0)) {
+        err = dw.fErrorMsg;
+    }
+    QString cashUUID;
+    if (!dw.writeECash(cashUUID, cashdocid, cashboxid, 1,
+                       id,
+                       amount, cashUUID, 1)) {
+        err = dw.fErrorMsg;
+    }
 }

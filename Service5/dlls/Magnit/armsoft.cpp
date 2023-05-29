@@ -44,19 +44,18 @@ bool ArmSoft::exportToAS(const QString &orderUuid, QString &err)
     db[":f_tableid"] = partner;
     db.exec("select * from as_convert where f_asdbid=:f_asdbid and f_table=:f_table and f_tableid=:f_tableid");
     int aspartner = 0;
-    if (doctype == 2 && !fData["asconnectionstring"].toString().contains("TIEL")) {
-    if (db.next()) {
-        aspartner = db.integer("f_ascode");
-        if (partner == 0) {
+
+        if (db.next()) {
+            if (db.string("f_ascode").isEmpty()) {
+                err = tr("No partner code exists for ArmSoft");
+                return false;
+            }
+            aspartner = db.integer("f_ascode");
+        } else {
             err = tr("No partner code exists for ArmSoft");
             return false;
         }
-    } else {
-        err = tr("No partner code exists for ArmSoft");
-        return false;
-    } } else {
-        aspartner = 0;
-    }
+
     db[":f_id"] = partner;
     db.exec("select * from c_partners where f_id=:f_id");
     db.next();
