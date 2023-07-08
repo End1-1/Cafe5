@@ -18,6 +18,7 @@
 #define hqDriverList 15
 #define hqVisit 16
 #define hqCompleteDelivery 17
+#define hqGoodsPartners 18
 
 #define pkOk "ok"
 #define pkMessage "message"
@@ -31,5 +32,6 @@
 #define pkUsername "pkUsername"
 #define pkPassword "pkPassword"
 #define pkDate "pkDate"
+#define pkPartner "pkPartner"
 
 #endif // ACTIONS_H

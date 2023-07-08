@@ -42,7 +42,7 @@ QString CR5MenuReviewFilter::condition()
         cond += " and m.f_dish in (select f_dish from d_recipes where f_goods in (" + ui->leGoods->text() + ")) ";
     }
     if (ui->chNoRecipe->isChecked()) {
-        cond += " and d.f_recipeqty=0 ";
+        cond += " and m.f_dish not in (select f_dish from d_recipes where f_qty>0) ";
     }
     return cond;
 }

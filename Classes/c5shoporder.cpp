@@ -13,6 +13,7 @@
 #include "bclientdebts.h"
 #include "aheader.h"
 #include "c5user.h"
+#include "outputofheader.h"
 
 C5ShopOrder::C5ShopOrder(OHeader &oheader, BHistory &bhistory, QVector<OGoods> &ogoods) :
     fOHeader(oheader),
@@ -63,7 +64,8 @@ bool C5ShopOrder::write()
         fOHeader._printFiscal = false;
     }
     if (fOHeader._printFiscal) {
-        PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), fOHeader.hasIdram() ? "true" : C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
+        PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(),
+                     fOHeader.hasIdram() ? "true" : C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
         QString jsonIn, jsonOut, err;
         int result = 0;
         if (fOHeader.partner > 0) {
@@ -80,7 +82,7 @@ bool C5ShopOrder::write()
                             g.qty, //qty
                             fBHistory.value * 100); //discount
             }
-            result = pt.makeJsonAndPrint(fOHeader.amountCard, fOHeader.amountPrepaid, jsonIn, jsonOut, err);
+            result = pt.makeJsonAndPrint(fOHeader.amountCard + fOHeader.amountIdram + fOHeader.amountTelcell, fOHeader.amountPrepaid, jsonIn, jsonOut, err);
         } else {
             result = pt.printAdvanceJson(fOHeader.amountCash, fOHeader.amountCard, jsonIn, jsonOut, err);
         }
@@ -194,107 +196,12 @@ bool C5ShopOrder::write()
     }
 
 
-    /* THIS TO DO FOR ELINA STORE SALE , THAT NEEDED BLOCK TO ITEM CONVERT AND MAKE ORDER INPUT DOCUMENT
-     *
-    if (fPartnerCode > 0 && needStoreDoc) {
-        db[":f_id"] = fPartnerCode;
-        db.exec("select f_store, f_cash from c_partners where f_id=:f_id");
-        if (db.nextRow()) {
-            if (db.getInt(0) > 0) {
-                int partnerStore = db.getInt(0);
-                int partnerCash = db.getInt(1);
-                QString comment = QString("%1 %2, %3%4").arg(tr("Store input"), fPartnerName, headerPrefix, QString::number(headerId));
-                QString pstoredoc;
-                storedocUserNum = dw.storeDocNum(DOC_TYPE_STORE_INPUT, partnerStore, true, 0);
-                if (!dw.writeAHeader(pstoredoc, storedocUserNum, DOC_STATE_DRAFT, DOC_TYPE_STORE_INPUT, fUser->id(),
-                                     QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, 0,
-                                     tr("Store input") + " " + fPartnerName, 0, currencyid)) {
-                    return returnFalse(dw.fErrorMsg, db);
-                }
-                if (!dw.writeAHeaderStore(pstoredoc, fUser->id(), fUser->id(), "", QDate(), partnerStore, 0, 0, "", 0, 0, fHeader)) {
-                    return returnFalse(dw.fErrorMsg, db);
-                }
-                // DO NOT UNCOMPLECT THE GOODS WITH UNIT ID THAT EQUAL TO 10
-                QString goodsComplect;
-                foreach (const IGoods &g, goods) {
-                    if (g.unitId == 10) {
-                        if (!goodsComplect.isEmpty()) {
-                            goodsComplect += ",";
-                        }
-                        goodsComplect += QString::number(g.goodsId);
-                    }
-                }
 
-                QList<IGoods> ingoods;
-                if (!goodsComplect.isEmpty()) {
-                    db[":f_document"] = storeDocId;
-                    db.exec("select if (gc.f_base is null, ad.f_goods, gc.f_goods) as f_goods, "
-                            "if(gc.f_base is null, ad.f_qty, gc.f_qty*ad.f_qty) as f_qty, "
-                            "if(gc.f_base is null, ad.f_price, gpr.f_price2) as f_price, "
-                            "if(gc.f_base is null, ad.f_price*ad.f_qty, gpr.f_price2*(gc.f_qty*ad.f_qty)) as f_total "
-                            "from a_store_draft ad "
-                            "left join c_goods_complectation gc on gc.f_base=ad.f_goods "
-                            "left join c_goods g on g.f_id=gc.f_goods "
-                            "left join c_goods_prices gpr on gpr.f_goods=g.f_id "
-                            "where f_document=:f_document and ad.f_goods in (" + goodsComplect + ") ");
-                    while (db.nextRow()) {
-                        IGoods g;
-                        g.goodsId = db.getInt("f_goods");
-                        g.goodsQty = db.getDouble("f_qty");
-                        g.goodsPrice = db.getDouble("f_price");
-                        g.goodsTotal = db.getDouble("f_total");
-                        ingoods.append(g);
-                    }
-                }
-
-                if (goodsComplect.isEmpty()) {
-                    goodsComplect = "0";
-                }
-                db[":f_document"] = storeDocId;
-                db.exec("select ad.f_goods, ad.f_qty, ad.f_price, ad.f_price*ad.f_qty as f_total "
-                          "from a_store_draft ad "
-                          "where f_document=:f_document and ad.f_goods not in (" + goodsComplect + ") ");
-                while (db.nextRow()) {
-                    IGoods g;
-                    g.goodsId = db.getInt("f_goods");
-                    g.goodsQty = db.getDouble("f_qty");
-                    g.goodsPrice = db.getDouble("f_price");
-                    g.goodsTotal = db.getDouble("f_total");
-                    ingoods.append(g);
-                }
-
-                for (int i = 0; i < ingoods.count(); i++) {
-                    IGoods &g = ingoods[i];
-                    QString adraftid;
-                    if (!dw.writeAStoreDraft(adraftid, pstoredoc, partnerStore, 1, g.goodsId, g.goodsQty, g.goodsPrice, g.goodsTotal, DOC_REASON_INPUT, adraftid, i + 1, "")) {
-                        return returnFalse(dw.fErrorMsg, db);
-                    }
-                }
-
-                int counter = dw.counterAType(DOC_TYPE_CASH);
-                QString partnerCashDoc;
-                if (!dw.writeAHeader(partnerCashDoc, QString::number(counter), DOC_STATE_DRAFT, DOC_TYPE_CASH, fUser->id(),
-                                     QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), fPartnerCode, total,
-                                     comment, 0, currencyid)) {
-                    return returnFalse(dw.fErrorMsg, db);
-                }
-                if (!dw.writeAHeaderCash(partnerCashDoc, partnerCash, 0, 1, partnerCashDoc, "", 0)) {
-                    return returnFalse(dw.fErrorMsg, db);
-                }
-                QString cashUUID;
-                if (!dw.writeECash(cashUUID, partnerCashDoc, partnerCash, -1, comment, total, cashUUID, 1)) {
-                    return returnFalse(dw.fErrorMsg, db);
-                }
-                if (!dw.writeAHeaderStore(pstoredoc, fUser->id(), fUser->id(), "", QDate(), partnerStore, 0, 0, partnerCashDoc, 0, 0, fHeader)) {
-                    return returnFalse(dw.fErrorMsg, db);
-                }
-
-                dw.writeAHeader2ShopStore(pstoredoc, partnerStore, 0);
-            }
-        }
+    if (fOHeader.partner > 0 && needStoreDoc) {
+        OutputOfHeader ooh;
+        ooh.make(db, fOHeader._id());
     }
-    END OF SECTION. DONT FORGET!
-    */
+
 
     db.commit();
     if (!C5Config::localReceiptPrinter().isEmpty()) {
@@ -360,6 +267,13 @@ bool C5ShopOrder::writeCash(C5Database &db, double value, int cash)
     aheader.amount = value;
     aheader.currency = fOHeader.currency;
     aheader.write(db, err);
+
+    db[":f_id"] = aheader.id;
+    db[":f_cashin"] = cash;
+    db[":f_cashout"] = 0;
+    db[":f_oheader"] = fOHeader.id;
+    db[":f_related"] = 1;
+    db.insert("a_header_cash", false);
 
     ECash ecash;
     ecash.header = aheader.id;

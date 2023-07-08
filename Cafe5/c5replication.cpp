@@ -91,9 +91,10 @@ void C5Replication::downloadDataFromServer(const QStringList &src, const QString
     dr.exec("select s.f_id, s.f_table, s.f_recid, s.f_op "
             "from s_syncronize s "
             "inner join s_syncronize_in si on si.f_table=s.f_table "
-            "where s.f_id>:f_id");
+            "where s.f_id>:f_id order by s.f_id ");
     while (dr.nextRow()) {
         emit progress(QString("%1 started").arg(dr.getString("f_table")));
+        //dr.logEvent(QString("id %1 table %2 rec %3").arg(dr.getString("f_id"), dr.getString("f_table"), dr.getString("f_recid")));
         hc = true;
         switch (dr.getInt("f_op")) {
         case 1:

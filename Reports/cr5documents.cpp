@@ -169,13 +169,6 @@ void CR5Documents::openDoc(QString id)
         }
         break;
     }
-    case DOC_TYPE_SALARY: {
-        auto *sd = __mainWindow->createTab<C5SalaryDoc>(fDBParams);
-        if (!sd->openDoc(id)) {
-            __mainWindow->removeTab(sd);
-        }
-        break;
-    }
     case DOC_TYPE_SALE_INPUT:
         C5Database db(fDBParams);
         db[":f_id"] = id;
@@ -388,13 +381,6 @@ void CR5Documents::removeDocs()
             break;
         case DOC_TYPE_CASH:
             if (C5CashDoc::removeDoc(fDBParams, id)) {
-                fModel->removeRow(r);
-            } else {
-                return;
-            }
-            break;
-        case DOC_TYPE_SALARY:
-            if (C5SalaryDoc::removeDocument(fDBParams, id)) {
                 fModel->removeRow(r);
             } else {
                 return;

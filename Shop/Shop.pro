@@ -88,11 +88,15 @@ SOURCES += \
     ../Classes/doubledatabase.cpp \
     ../Classes/fileversion.cpp \
     ../Classes/notificationwidget.cpp \
+    ../Classes/outputofheader.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
     ../Classes/removeshopsale.cpp \
     ../Classes/rkeyboard.cpp \
     ../Classes/socketconnection.cpp \
     ../Classes/threadsendmessage.cpp \
+    ../Configs/breezeconfig.cpp \
+    ../Configs/cashboxconfig.cpp \
+    ../Configs/configs.cpp \
     ../Controls/c5cleartablewidget.cpp \
     ../Controls/c5graphicsview.cpp \
     ../Controls/c5guicontrols.cpp \
@@ -118,7 +122,6 @@ SOURCES += \
     ../DbData/dbopreorder.cpp \
     ../DbData/dbpartner.cpp \
     ../DbData/dbservicevalues.cpp \
-    ../DbData/dbshift.cpp \
     ../DbData/dbstore.cpp \
     ../DbData/dbstoredoctype.cpp \
     ../DbData/dbtables.cpp \
@@ -262,11 +265,15 @@ HEADERS += \
     ../Classes/fileversion.h \
     ../Classes/goodsreserve.h \
     ../Classes/notificationwidget.h \
+    ../Classes/outputofheader.h \
     ../Classes/proxytablewidgetdatabase.h \
     ../Classes/removeshopsale.h \
     ../Classes/rkeyboard.h \
     ../Classes/socketconnection.h \
     ../Classes/threadsendmessage.h \
+    ../Configs/breezeconfig.h \
+    ../Configs/cashboxconfig.h \
+    ../Configs/configs.h \
     ../Controls/c5cleartablewidget.h \
     ../Controls/c5graphicsview.h \
     ../Controls/c5guicontrols.h \
@@ -429,6 +436,7 @@ INCLUDEPATH += ../Cache
 INCLUDEPATH += ../Controls
 INCLUDEPATH += ../DbData
 INCLUDEPATH += ../Forms
+INCLUDEPATH += ../Configs
 INCLUDEPATH += ../Service
 INCLUDEPATH += ../Service5
 INCLUDEPATH += ../Service5/raw

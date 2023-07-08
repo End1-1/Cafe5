@@ -20,7 +20,7 @@
       <enum>Qt::NoFocus</enum>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -314,13 +314,6 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="2">
-        <widget class="QLabel" name="label_12">
-         <property name="text">
-          <string>ArmSoft code</string>
-         </property>
-        </widget>
-       </item>
        <item row="6" column="9">
         <widget class="QPushButton" name="btnNewUnit">
          <property name="minimumSize">
@@ -363,45 +356,6 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="C5LineEditWithSelector" name="leArmsoftCode">
-            <property name="minimumSize">
-             <size>
-              <width>100</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>100</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="Field" stdset="0">
-             <string>f_ascode</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QToolButton" name="btnPinLast">
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset resource="../resources/res.qrc">
-              <normaloff>:/pushpin.png</normaloff>:/pushpin.png</iconset>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
-            <property name="checked">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
            <spacer name="horizontalSpacer_4">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -413,6 +367,25 @@
              </size>
             </property>
            </spacer>
+          </item>
+          <item>
+           <widget class="C5CheckBox" name="chService_2">
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="layoutDirection">
+             <enum>Qt::RightToLeft</enum>
+            </property>
+            <property name="text">
+             <string>No price modificator</string>
+            </property>
+            <property name="Field" stdset="0">
+             <string>f_nospecial_price</string>
+            </property>
+            <property name="Default" stdset="0">
+             <string>0</string>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="C5CheckBox" name="chService">
@@ -546,6 +519,9 @@
         <widget class="C5LineEditWithSelector" name="leScanCode">
          <property name="maxLength">
           <number>32</number>
+         </property>
+         <property name="allowall" stdset="0">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -707,6 +683,55 @@
         <widget class="QLabel" name="lbLastinputprice">
          <property name="text">
           <string>Cost price</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="2">
+        <widget class="QLabel" name="lbLowLevel_3">
+         <property name="text">
+          <string>Box quantity</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="3">
+        <widget class="C5LineEditWithSelector" name="leLowLevel_3">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>100</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="Field" stdset="0">
+          <string>f_qtybox</string>
+         </property>
+         <property name="Type" stdset="0">
+          <number>1</number>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <widget class="QToolButton" name="btnPinLast">
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="../resources/res.qrc">
+           <normaloff>:/pushpin.png</normaloff>:/pushpin.png</iconset>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -1690,9 +1715,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5TableWidget</class>
-   <extends>QTableWidget</extends>
-   <header location="global">c5tablewidget.h</header>
+   <class>C5LineEditWithSelector</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5lineeditwithselector.h</header>
   </customwidget>
   <customwidget>
    <class>C5LineEdit</class>
@@ -1700,19 +1725,19 @@
    <header location="global">c5lineedit.h</header>
   </customwidget>
   <customwidget>
-   <class>C5LineEditWithSelector</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5lineeditwithselector.h</header>
-  </customwidget>
-  <customwidget>
-   <class>C5CheckBox</class>
-   <extends>QCheckBox</extends>
-   <header location="global">c5checkbox.h</header>
+   <class>C5TableWidget</class>
+   <extends>QTableWidget</extends>
+   <header location="global">c5tablewidget.h</header>
   </customwidget>
   <customwidget>
    <class>C5ComboBox</class>
    <extends>QComboBox</extends>
    <header location="global">c5combobox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5CheckBox</class>
+   <extends>QCheckBox</extends>
+   <header location="global">c5checkbox.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
@@ -1721,15 +1746,15 @@
   <tabstop>leGroup</tabstop>
   <tabstop>leUnit</tabstop>
   <tabstop>leLowLevel</tabstop>
+  <tabstop>leLowLevel_3</tabstop>
   <tabstop>leName</tabstop>
   <tabstop>leScanCode</tabstop>
   <tabstop>leCostPrice</tabstop>
   <tabstop>leMargin</tabstop>
-  <tabstop>leMargin2</tabstop>
   <tabstop>cbCurrency</tabstop>
   <tabstop>leAdg</tabstop>
+  <tabstop>leMargin2</tabstop>
   <tabstop>tblPricing</tabstop>
-  <tabstop>lineEdit_8</tabstop>
   <tabstop>tblMultiscancode</tabstop>
   <tabstop>chOnlyWholeNumber</tabstop>
   <tabstop>leStoreId</tabstop>
@@ -1743,6 +1768,10 @@
   <tabstop>leClass1</tabstop>
   <tabstop>leClass4</tabstop>
   <tabstop>leLowLevel_2</tabstop>
+  <tabstop>chComponentExit</tabstop>
+  <tabstop>leStoreId_2</tabstop>
+  <tabstop>tblAs</tabstop>
+  <tabstop>lineEdit_8</tabstop>
  </tabstops>
  <resources>
   <include location="../resources/res.qrc"/>

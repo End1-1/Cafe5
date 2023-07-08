@@ -1,8 +1,8 @@
-#include "config.h"
+#include "configs.h"
 #include "c5database.h"
 #include <QJsonDocument>
 
-Config::Config(const QStringList &dbParams, int id) :
+Configs::Configs(const QStringList &dbParams, int id) :
     fDbParams(dbParams),
     fId(id)
 {

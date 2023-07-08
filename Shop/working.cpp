@@ -699,7 +699,7 @@ void Working::on_tab_tabCloseRequested(int index)
     QString err;
     C5Database db(__c5config.dbParams());
     WOrder *w = static_cast<WOrder*>(ui->tab->widget(index));
-    if (!w->fDraftSale.id.isEmpty()) {
+    if (!w->fDraftSale.id.toString().isEmpty()) {
         if (w->rowCount() == 0) {
             w->fDraftSale.state = 3;
             w->fDraftSale.write(db, err);

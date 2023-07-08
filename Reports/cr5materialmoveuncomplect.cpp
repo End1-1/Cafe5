@@ -65,8 +65,8 @@ void CR5MaterialMoveUncomplect::buildQuery()
 
     "select 'A', dt.f_name as f_doctype, st.f_name as f_action, g.f_id as f_code,ss.f_name as f_storage,gg.f_name as f_group,g.f_name as f_goods, "
     "g.f_scancode,s.f_qty as f_qty, "
-    "u.f_name as f_unit, s.f_total as f_total, s.f_qty*g.f_saleprice as f_totalsale, "
-    "s.f_qty*g.f_saleprice2 as f_totalsale2  "
+    "u.f_name as f_unit, s.f_total as f_total, s.f_qty*gpr.f_price1 as f_totalsale, "
+    "s.f_qty*gpr.f_price2 as f_totalsale2  "
     "from a_store s "
     "inner join c_goods g on g.f_id=s.f_goods "
     "inner join c_storages ss on ss.f_id=s.f_store "
@@ -75,14 +75,15 @@ void CR5MaterialMoveUncomplect::buildQuery()
     "inner join a_header h on h.f_id=s.f_document  "
     "left join a_type_sign st on st.f_id=s.f_type "
     "left join a_type dt on dt.f_id=h.f_type "
+    "left join c_goods_prices gpr on gpr.f_goods=g.f_id "
     " %1  "
 
     "union all "
 
     "select 'B', dt.f_name as f_doctype, st.f_name as f_action, gc.f_goods as f_code,ss.f_name as f_storage,gg.f_name as f_group,g.f_name as f_goods, "
     "g.f_scancode,s.f_qty*gc.f_qty as f_qty, "
-    "u.f_name as f_unit,s.f_qty*gc.f_qty*g.f_lastinputprice as f_total,s.f_qty*gc.f_qty*g.f_saleprice as f_totalsale, "
-    "s.f_qty*gc.f_qty*g.f_saleprice2 as f_totalsale2  "
+    "u.f_name as f_unit,s.f_qty*gc.f_qty*g.f_lastinputprice as f_total,s.f_qty*gc.f_qty*gpr.f_price1 as f_totalsale, "
+    "s.f_qty*gc.f_qty*gpr.f_price2 as f_totalsale2  "
     "from a_store s  "
     "inner join c_goods_complectation gc on gc.f_base=s.f_goods "
     "inner join c_goods g on g.f_id=gc.f_goods "
@@ -93,6 +94,7 @@ void CR5MaterialMoveUncomplect::buildQuery()
     "inner join a_header h on h.f_id=s.f_document  "
     "left join a_type_sign st on st.f_id=s.f_type "
     "left join a_type dt on dt.f_id=h.f_type "
+    "left join c_goods_prices gpr on gpr.f_goods=g.f_id "
     " %1 and gu.f_unit in(%2)  "
 
     ") k "

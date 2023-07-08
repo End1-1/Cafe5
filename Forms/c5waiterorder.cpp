@@ -202,6 +202,11 @@ void C5WaiterOrder::showStore()
             "inner join c_goods g on g.f_id=r.f_goods and r.f_goods=o.f_goods "
             "where b.f_header=:f_header and (b.f_state=:f_state1 or b.f_state=:f_state2)");
     ProxyTableWidgetDatabase::fillTableWidgetRowFromDatabase(&db, ui->tblStore);
+    double t = 0;
+    for (int i = 0; i < ui->tblStore->rowCount(); i++) {
+        t += ui->tblStore->getDouble(i, 8);
+    }
+    ui->leSelfCost->setDouble(t);
 }
 
 void C5WaiterOrder::saveOrder()

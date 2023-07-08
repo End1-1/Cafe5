@@ -213,9 +213,6 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="1" colspan="5">
-    <widget class="QLineEdit" name="leRemarks"/>
-   </item>
    <item row="0" column="2">
     <widget class="QLabel" name="label_6">
      <property name="text">
@@ -321,6 +318,13 @@
      </property>
     </widget>
    </item>
+   <item row="5" column="1" colspan="5">
+    <widget class="QComboBox" name="cbComment">
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -335,14 +339,14 @@
    <header location="global">c5lineeditwithselector.h</header>
   </customwidget>
   <customwidget>
-   <class>C5TableWidget</class>
-   <extends>QTableWidget</extends>
-   <header location="global">c5tablewidget.h</header>
-  </customwidget>
-  <customwidget>
    <class>C5DateEdit</class>
    <extends>QLineEdit</extends>
    <header location="global">c5dateedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5TableWidget</class>
+   <extends>QTableWidget</extends>
+   <header location="global">c5tablewidget.h</header>
   </customwidget>
  </customwidgets>
  <resources>

@@ -40,6 +40,7 @@ bool C5PrintReceiptThread::print(const QStringList &dbParams)
     QMap<QString, QVariant> roominfo;
     QMap<QString, QVariant> preorder;
     QMap<QString, QVariant> carinfo;
+    QMap<QString, QVariant> giftcardinfo;
 
     C5Database db(dbParams);
     db[":f_id"] = fHeader;
@@ -63,6 +64,15 @@ bool C5PrintReceiptThread::print(const QStringList &dbParams)
         return false;
     }
     db.rowToMap(preorder);
+
+    QMap<QString, QVariant> guestInfo;
+    if (fHeaderInfo["f_partner"].toInt() > 0) {
+        db[":f_id"] = fHeaderInfo["f_partner"];
+        db.exec("select * from c_partners where f_id=:f_id");
+        if (db.nextRow()) {
+            db.rowToMap(guestInfo);
+        }
+    }
 
     db[":f_id"] = fHeader;
     if (!db.exec("select * from o_tax where f_id=:f_id")) {
@@ -106,6 +116,14 @@ bool C5PrintReceiptThread::print(const QStringList &dbParams)
         db.rowToMap(carinfo);
     }
 
+    db[":f_trsale"] = fHeader;
+    db.exec("select h.f_value, i.f_amount from b_gift_card_history i "
+            "left join b_history h on h.f_id=i.f_trsale "
+            "where h.f_id=:f_trsale");
+    if (db.nextRow()) {
+        db.rowToMap(giftcardinfo);
+    }
+
     if (fBill) {
         p.image("./logo_bill.png", Qt::AlignHCenter);
     } else {
@@ -119,6 +137,16 @@ bool C5PrintReceiptThread::print(const QStringList &dbParams)
         p.setFontSize(bs + 4);
         p.setFontBold(true);
         p.ctext(__translator.tt("Breakfast"));
+        p.br();
+        p.br(4);
+        p.setFontSize(bs);
+        p.setFontBold(false);
+    }
+    if (fHeaderInfo["f_state"].toInt() == ORDER_STATE_PREORDER_EMPTY
+            || fHeaderInfo["f_state"].toInt() == ORDER_STATE_PREORDER_WITH_ORDER) {
+        p.setFontSize(bs + 4);
+        p.setFontBold(true);
+        p.ctext(__translator.tt("Preorder"));
         p.br();
         p.br(4);
         p.setFontSize(bs);
@@ -156,7 +184,7 @@ bool C5PrintReceiptThread::print(const QStringList &dbParams)
     }
     p.br(1);
     p.ltext(__translator.tt("Table"), 0);
-    p.setFontSize(bs + 20);
+    p.setFontSize(bs);
     p.setFontBold(true);
     p.rtext(QString("%1/%2").arg(fHeaderInfo["f_hallname"].toString(), fHeaderInfo["f_tablename"].toString()));
     p.setFontSize(bs);
@@ -171,23 +199,33 @@ bool C5PrintReceiptThread::print(const QStringList &dbParams)
     p.br(2);
     p.line();
     p.br(2);
-    p.ctext(__translator.tt("Class | Name | Qty | Price | Total"));
-    p.br();
     p.br(4);
     p.line();
     p.br(1);
 
+    double needtopay = fHeaderInfo["f_amounttotal"].toDouble();
     bool noservice = false, nodiscount = false;
+    p.setFontBold(true);
+    p.setFontSize(bs - 4);
+    p.ltext(__translator.tt("Name"), 0);
+    p.ltext(__translator.tt("Qty"), 350);
+    p.ltext(__translator.tt("Price"), 430);
+    p.rtext(__translator.tt("Amount"));
+    p.br();
+    p.br(2);
+    p.line();
+    p.br(1);
     for (int i = 0; i < fBodyInfo.count(); i++) {
-        const QMap<QString, QVariant> &m = fBodyInfo.at(i);
+        QMap<QString, QVariant> &m = fBodyInfo[i];
         if (m["f_state"].toInt() != DISH_STATE_OK) {
             continue;
         }
         QString name;
         if (!m["f_adgcode"].toString().isEmpty()) {
-            name += QString("%1: %2").arg(__translator.tt("Class"), m["f_adgcode"].toString());
+            p.ltext(QString("%1: %2").arg(__translator.tt("Class"), m["f_adgcode"].toString()), 0);
+            p.br();
         }
-        name += __translator.td(m["f_dish"].toInt());
+        name = __translator.td(m["f_dish"].toInt());
         if (m["f_canservice"].toInt() == 0) {
             noservice = true;
             name += "*";
@@ -196,16 +234,26 @@ bool C5PrintReceiptThread::print(const QStringList &dbParams)
             nodiscount = true;
             name += "**";
         }
-        p.ltext(name, 0);
-        p.br();
+        p.ltext(name, 0, 350);
+
+        if (fHeaderInfo["f_state"].toInt() == ORDER_STATE_PREORDER_EMPTY
+                || fHeaderInfo["f_state"].toInt() == ORDER_STATE_PREORDER_WITH_ORDER) {
+            m["f_qty2"] = m["f_qty1"];
+            m["f_total"] = m["f_qty1"].toDouble() * (m["f_price"].toDouble() + (m["f_price"].toDouble() * fHeaderInfo["f_servicefactor"].toDouble()));
+            needtopay += m["f_total"].toDouble();
+        }
+
         QString totalStr = m["f_total"].toDouble() > 0.001 ? float_str(m["f_total"].toDouble(), 2) : __translator.tt("Present");
         if (str_float(totalStr) < 0.001) {
             p.rtext(totalStr);
         } else {
             if (m["f_hourlypayment"].toInt() > 0) {
-                p.rtext(QString("%1 = %2").arg(m["f_comment"].toString()).arg(float_str(m["f_total"].toDouble(), 2)));
+                p.ltext(float_str(m["f_qty2"].toDouble(), 2), 350, 100);
+                p.rtext(float_str(m["f_total"].toDouble(), 2));
             } else {
-                p.rtext(QString("%1 x %2 = %3").arg(float_str(m["f_qty2"].toDouble(), 2), float_str(m["f_price"].toDouble(), 2), totalStr));
+                p.ltext(float_str(m["f_qty2"].toDouble(), 2), 350, 100);
+                p.ltext(float_str(m["f_price"].toDouble(), 2), 430, 100);
+                p.rtext(totalStr);
             }
         }
         if (m["f_extra"].toInt() > 0) {
@@ -237,10 +285,15 @@ bool C5PrintReceiptThread::print(const QStringList &dbParams)
         p.br(1);
     }
 
+    if (giftcardinfo.count() > 0) {
+        p.ltext(QString("%1 %2%").arg(__translator.tt("Accumulate"), float_str(giftcardinfo["f_value"].toDouble(), 2)), 0);
+        p.rtext(float_str(giftcardinfo["f_amount"].toDouble(), 2));
+        p.br();
+    }
+
     double prepaid = preorder["f_prepaidcash"].toDouble()
             + preorder["f_prepaidcard"].toDouble()
             + preorder["f_prepaidpayx"].toDouble();
-    double needtopay = fHeaderInfo["f_amounttotal"].toDouble();
     if (prepaid > 0){
         p.setFontSize(bs + 4);
         p.setFontBold(true);
@@ -252,7 +305,13 @@ bool C5PrintReceiptThread::print(const QStringList &dbParams)
         p.br();
     }
 
-    p.setFontSize(bs + 2);
+    p.br();
+    p.line();
+    p.br(2);
+    p.line();
+    p.br();
+
+    p.setFontSize(bs + 4);
     if (needtopay > 0.01) {
         p.setFontSize(bs + 4);
         p.setFontBold(true);
@@ -269,8 +328,8 @@ bool C5PrintReceiptThread::print(const QStringList &dbParams)
     p.br();
     p.br();
     p.line();
-    p.setFontSize(bs);
-    p.setFontBold(false);
+    p.setFontBold(true);
+    p.setFontSize(bs - 4);
     if (noservice) {
         p.ltext(QString("* - %1").arg(__translator.tt("No service")), 0);
         p.br();
@@ -407,17 +466,16 @@ bool C5PrintReceiptThread::print(const QStringList &dbParams)
         p.br(p.fLineHeight * 2);
     }
 
-//    if (options["f_car"].toInt() > 0) {
-//        p.br();
-//        p.ltext(tr("Costumer"), 0);
-//        p.br();
-//        p.ltext(dbpartner->contact(carinfo["f_costumer"].toInt()), 0);
-//        p.br();
-//        p.ltext(dbcar->name(carinfo["f_car"].toInt()), 0);
-//        p.br();
-//        p.ltext(carinfo["f_govnumber"].toString(), 0);
-//        p.br(p.fLineHeight * 2);
-//    }
+    if (!guestInfo.isEmpty()) {
+        p.ctext(__translator.tt("Customer"));
+        p.br();
+        p.ctext(guestInfo["f_phone"].toString());
+        p.br();
+        p.ctext(guestInfo["f_contact"].toString());
+        p.br();
+        p.ctext(guestInfo["f_address"].toString());
+        p.br();
+    }
 
     p.setFontSize(bs);
     p.setFontBold(true);

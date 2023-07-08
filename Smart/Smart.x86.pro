@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network printsupport sql
+QT       += core gui network printsupport sql multimedia
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -54,6 +54,7 @@ SOURCES += \
     ../Cafe5/calendar.cpp \
     ../Cafe5/dlgexitbyversion.cpp \
     ../Classes/QRCodeGenerator.cpp \
+    ../Classes/c5airlog.cpp \
     ../Classes/c5cache.cpp \
     ../Classes/c5combodelegate.cpp \
     ../Classes/c5crypt.cpp \
@@ -97,6 +98,7 @@ SOURCES += \
     ../DbData/datadriver.cpp \
     ../DbData/dbbodystate.cpp \
     ../DbData/dbcar.cpp \
+    ../DbData/dbcurrency.cpp \
     ../DbData/dbdata.cpp \
     ../DbData/dbdishes.cpp \
     ../DbData/dbdishpart1.cpp \
@@ -113,18 +115,36 @@ SOURCES += \
     ../DbData/dbopreorder.cpp \
     ../DbData/dbpartner.cpp \
     ../DbData/dbservicevalues.cpp \
-    ../DbData/dbshift.cpp \
     ../DbData/dbstore.cpp \
     ../DbData/dbstoredoctype.cpp \
     ../DbData/dbtables.cpp \
     ../DbData/dbunit.cpp \
     ../DbData/dbusers.cpp \
+    ../Forms/dlgcashinout.cpp \
+    ../Forms/dlgcashop.cpp \
+    ../Forms/dlglistofdishcomments.cpp \
     ../Shop/printreceipt.cpp \
     ../Shop/printreceiptgroup.cpp \
     ../Shop/selectprinters.cpp \
+    ../TableRecord/aheader.cpp \
+    ../TableRecord/bclientdebts.cpp \
+    ../TableRecord/bhistory.cpp \
+    ../TableRecord/c5dbrecord.cpp \
+    ../TableRecord/cpartners.cpp \
+    ../TableRecord/ecash.cpp \
+    ../TableRecord/odraftsale.cpp \
+    ../TableRecord/odraftsalebody.cpp \
+    ../TableRecord/ogoods.cpp \
+    ../TableRecord/oheader.cpp \
+    ../TableRecord/otax.cpp \
     dishpackage.cpp \
+    dlgmemoryread.cpp \
+    dlgsmartreports.cpp \
         main.cpp \
+    sessionorders.cpp \
+    sessionshistory.cpp \
     supplier.cpp \
+    wcustomerdisplay.cpp \
         workspace.cpp \
     ../Cafe5/c5config.cpp \
     ../Cafe5/c5connection.cpp \
@@ -141,7 +161,6 @@ SOURCES += \
     ../DbData/dbdishremovereason.cpp \
     ../DbData/dbdishcomments.cpp \
     menudialog.cpp \
-    orderdish.cpp \
     menudish.cpp \
     ../Classes/idram.cpp \
     ../Forms/change.cpp \
@@ -179,6 +198,7 @@ HEADERS += \
     ../Cafe5/dlgexitbyversion.h \
     ../Classes/QRCodeGenerator.h \
     ../Classes/barcode5.h \
+    ../Classes/c5airlog.h \
     ../Classes/c5cache.h \
     ../Classes/c5combodelegate.h \
     ../Classes/c5crypt.h \
@@ -222,6 +242,7 @@ HEADERS += \
     ../DbData/datadriver.h \
     ../DbData/dbbodystate.h \
     ../DbData/dbcar.h \
+    ../DbData/dbcurrency.h \
     ../DbData/dbdata.h \
     ../DbData/dbdishes.h \
     ../DbData/dbdishpart1.h \
@@ -238,21 +259,39 @@ HEADERS += \
     ../DbData/dbopreorder.h \
     ../DbData/dbpartner.h \
     ../DbData/dbservicevalues.h \
-    ../DbData/dbshift.h \
     ../DbData/dbstore.h \
     ../DbData/dbstoredoctype.h \
     ../DbData/dbtables.h \
     ../DbData/dbunit.h \
     ../DbData/dbusers.h \
+    ../Forms/dlgcashinout.h \
+    ../Forms/dlgcashop.h \
+    ../Forms/dlglistofdishcomments.h \
     ../Service/servicecommands.h \
     ../Shop/printreceipt.h \
     ../Shop/printreceiptgroup.h \
     ../Shop/selectprinters.h \
+    ../TableRecord/aheader.h \
+    ../TableRecord/bclientdebts.h \
+    ../TableRecord/bhistory.h \
+    ../TableRecord/c5dbrecord.h \
+    ../TableRecord/cpartners.h \
+    ../TableRecord/ecash.h \
+    ../TableRecord/odraftsale.h \
+    ../TableRecord/odraftsalebody.h \
+    ../TableRecord/ogoods.h \
+    ../TableRecord/oheader.h \
+    ../TableRecord/otax.h \
     dish.h \
     dishpackage.h \
+    dlgmemoryread.h \
+    dlgsmartreports.h \
     rc.h \
     res.rc \
+    sessionorders.h \
+    sessionshistory.h \
     supplier.h \
+    wcustomerdisplay.h \
         workspace.h \
     ../Cafe5/c5config.h \
     ../Cafe5/c5connection.h \
@@ -270,7 +309,6 @@ HEADERS += \
     ../DbData/dbdishremovereason.h \
     ../DbData/dbdishcomments.h \
     menudialog.h \
-    orderdish.h \
     menudish.h \
     ../Classes/idram.h \
     ../Forms/change.h \
@@ -290,14 +328,21 @@ FORMS += \
     ../Classes/dlgpassword.ui \
     ../Classes/notificationwidget.ui \
     ../Classes/rkeyboard.ui \
+    ../Forms/dlgcashinout.ui \
+    ../Forms/dlgcashop.ui \
+    ../Forms/dlglistofdishcomments.ui \
     ../Shop/selectprinters.ui \
+    dlgmemoryread.ui \
+    dlgsmartreports.ui \
+    sessionorders.ui \
+    sessionshistory.ui \
     supplier.ui \
+    wcustomerdisplay.ui \
         workspace.ui \
     ../Cafe5/c5connection.ui \
     ../Cafe5/c5message.ui \
     ../Forms/touchdlgphonenumber.ui \
     menudialog.ui \
-    orderdish.ui \
     menudish.ui \
     ../Forms/change.ui \
     ../Forms/dlgqty.ui \
@@ -318,6 +363,7 @@ INCLUDEPATH += c:/projects/cafe5/Service
 INCLUDEPATH += c:/projects/cafe5/DbData
 INCLUDEPATH += c:/projects/cafe5/Forms
 INCLUDEPATH += c:/Projects/NewTax/Src
+INCLUDEPATH += c:/projects/cafe5/TableRecord
 INCLUDEPATH += C:/Soft/OpenSSL-Win32/include
 INCLUDEPATH += C:/Soft/OpenSSL-Win32/include/openssl
 INCLUDEPATH += /projects/xlsx/src

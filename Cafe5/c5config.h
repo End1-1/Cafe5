@@ -118,6 +118,7 @@
 #define param_shop_scalecode 115
 #define param_default_currency 116
 #define param_rest_qty_before_add_dish 117
+#define param_auto_discount 118
 
 #define FRONTDESK_WAITER 0
 #define FRONTDESK_SHOP 1

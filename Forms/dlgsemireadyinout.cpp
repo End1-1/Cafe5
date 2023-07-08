@@ -17,6 +17,16 @@ DlgSemireadyInOut::~DlgSemireadyInOut()
     delete ui;
 }
 
+int DlgSemireadyInOut::dishId()
+{
+    return ui->leGoods->property("f_base").toInt();
+}
+
+double DlgSemireadyInOut::dishQty()
+{
+    return ui->leQty->getDouble();
+}
+
 int DlgSemireadyInOut::rowCount()
 {
     return ui->tbl->rowCount();
@@ -34,7 +44,7 @@ QString DlgSemireadyInOut::goodsName(int r)
 
 double DlgSemireadyInOut::goodsQty(int r)
 {
-    return ui->tbl->getDouble(r, 2) * (ui->rbIncrease->isChecked() ? 1 : -1);
+    return ui->tbl->getDouble(r, 2);
 }
 
 void DlgSemireadyInOut::on_btnSelectGoods_clicked()
@@ -56,6 +66,7 @@ void DlgSemireadyInOut::on_btnSelectGoods_clicked()
             "from c_goods_complectation gc "
             "left join c_goods g on g.f_id=gc.f_goods "
             "where gc.f_base=:f_base ");
+    ui->leGoods->setProperty("f_base", vals.at(1));
     while (db.nextRow()) {
         int r = ui->tbl->addEmptyRow();
         ui->tbl->setInteger(r, 0, db.getInt("f_goods"));

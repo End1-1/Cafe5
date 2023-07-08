@@ -57,11 +57,12 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Classes/dataonline.cpp \
     ../Classes/doubledatabase.cpp \
     ../Classes/notificationwidget.cpp \
+    ../Classes/outputofheader.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
     ../Classes/removeshopsale.cpp \
     ../Classes/threadsendmessage.cpp \
     ../Configs/breezeconfig.cpp \
-    ../Configs/config.cpp \
+    ../Configs/configs.cpp \
     ../Controls/c5cleartablewidget.cpp \
     ../Controls/c5combotable.cpp \
     ../Controls/c5guicontrols.cpp \
@@ -89,7 +90,6 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../DbData/dbopreorder.cpp \
     ../DbData/dbpartner.cpp \
     ../DbData/dbservicevalues.cpp \
-    ../DbData/dbshift.cpp \
     ../DbData/dbstore.cpp \
     ../DbData/dbstoredoctype.cpp \
     ../DbData/dbtables.cpp \
@@ -117,7 +117,9 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Forms/c5printtaxanywhere.cpp \
     ../Forms/c5route.cpp \
     ../Forms/c5salarydoc.cpp \
+    ../Forms/c5salarypayment.cpp \
     ../Forms/c5saledoc.cpp \
+    ../Forms/c5srofinventory.cpp \
     ../Forms/c5storedoc.cpp \
     ../Forms/c5storedocselectprinttemplate.cpp \
     ../Forms/c5waiterorder.cpp \
@@ -385,11 +387,12 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Classes/doubledatabase.h \
     ../Classes/goodsreserve.h \
     ../Classes/notificationwidget.h \
+    ../Classes/outputofheader.h \
     ../Classes/proxytablewidgetdatabase.h \
     ../Classes/removeshopsale.h \
     ../Classes/threadsendmessage.h \
     ../Configs/breezeconfig.h \
-    ../Configs/config.h \
+    ../Configs/configs.h \
     ../Controls/c5cleartablewidget.h \
     ../Controls/c5combotable.h \
     ../Controls/c5guicontrols.h \
@@ -417,7 +420,6 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../DbData/dbopreorder.h \
     ../DbData/dbpartner.h \
     ../DbData/dbservicevalues.h \
-    ../DbData/dbshift.h \
     ../DbData/dbstore.h \
     ../DbData/dbstoredoctype.h \
     ../DbData/dbtables.h \
@@ -445,7 +447,9 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Forms/c5printtaxanywhere.h \
     ../Forms/c5route.h \
     ../Forms/c5salarydoc.h \
+    ../Forms/c5salarypayment.h \
     ../Forms/c5saledoc.h \
+    ../Forms/c5srofinventory.h \
     ../Forms/c5storedoc.h \
     ../Forms/c5storedocselectprinttemplate.h \
     ../Forms/c5waiterorder.h \
@@ -716,7 +720,9 @@ FORMS += \
     ../Forms/c5printtaxanywhere.ui \
     ../Forms/c5route.ui \
     ../Forms/c5salarydoc.ui \
+    ../Forms/c5salarypayment.ui \
     ../Forms/c5saledoc.ui \
+    ../Forms/c5srofinventory.ui \
     ../Forms/c5storedoc.ui \
     ../Forms/c5storedocselectprinttemplate.ui \
     ../Forms/c5waiterorder.ui \

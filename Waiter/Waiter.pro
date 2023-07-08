@@ -77,10 +77,11 @@ SOURCES += \
     ../Classes/doubledatabase.cpp \
     ../Classes/idram.cpp \
     ../Classes/notificationwidget.cpp \
+    ../Classes/outputofheader.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
     ../Classes/threadsendmessage.cpp \
     ../Configs/cashboxconfig.cpp \
-    ../Configs/config.cpp \
+    ../Configs/configs.cpp \
     ../Controls/c5cleartablewidget.cpp \
     ../Controls/c5guicontrols.cpp \
     ../Controls/c5tablewidget.cpp \
@@ -106,7 +107,6 @@ SOURCES += \
     ../DbData/dbopreorder.cpp \
     ../DbData/dbpartner.cpp \
     ../DbData/dbservicevalues.cpp \
-    ../DbData/dbshift.cpp \
     ../DbData/dbstore.cpp \
     ../DbData/dbstoredoctype.cpp \
     ../DbData/dbtables.cpp \
@@ -137,12 +137,12 @@ SOURCES += \
     dishitembutton.cpp \
     dlgaskforprecheck.cpp \
     dlgcarnumber.cpp \
+    dlgcashbuttonopions.cpp \
     dlgchosesplitorderoption.cpp \
     dlgguests.cpp \
     dlglist.cpp \
     dlglistdishspecial.cpp \
     dlglistofpackages.cpp \
-    dlglistofshifts.cpp \
     dlgmanagertools.cpp \
     dlgprecheckoptions.cpp \
     dlgpreorder.cpp \
@@ -262,10 +262,11 @@ HEADERS += \
     ../Classes/doubledatabase.h \
     ../Classes/idram.h \
     ../Classes/notificationwidget.h \
+    ../Classes/outputofheader.h \
     ../Classes/proxytablewidgetdatabase.h \
     ../Classes/threadsendmessage.h \
     ../Configs/cashboxconfig.h \
-    ../Configs/config.h \
+    ../Configs/configs.h \
     ../Controls/c5cleartablewidget.h \
     ../Controls/c5guicontrols.h \
     ../Controls/c5tablewidget.h \
@@ -291,7 +292,6 @@ HEADERS += \
     ../DbData/dbopreorder.h \
     ../DbData/dbpartner.h \
     ../DbData/dbservicevalues.h \
-    ../DbData/dbshift.h \
     ../DbData/dbstore.h \
     ../DbData/dbstoredoctype.h \
     ../DbData/dbtables.h \
@@ -324,6 +324,7 @@ HEADERS += \
     dishitembutton.h \
     dlgaskforprecheck.h \
     dlgcarnumber.h \
+    dlgcashbuttonopions.h \
     dlgchosesplitorderoption.h \
         dlgface.h \
     ../Cafe5/c5database.h \
@@ -339,7 +340,6 @@ HEADERS += \
     dlglist.h \
     dlglistdishspecial.h \
     dlglistofpackages.h \
-    dlglistofshifts.h \
     dlgmanagertools.h \
     dlgorder.h \
     ../Classes/c5user.h \
@@ -422,6 +422,7 @@ FORMS += \
     dishitem.ui \
     dlgaskforprecheck.ui \
     dlgcarnumber.ui \
+    dlgcashbuttonopions.ui \
     dlgchosesplitorderoption.ui \
         dlgface.ui \
     ../Cafe5/c5connection.ui \
@@ -430,7 +431,6 @@ FORMS += \
     dlglist.ui \
     dlglistdishspecial.ui \
     dlglistofpackages.ui \
-    dlglistofshifts.ui \
     dlgmanagertools.ui \
     dlgorder.ui \
     ../Classes/c5printpreview.ui \

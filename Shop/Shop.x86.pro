@@ -93,6 +93,8 @@ SOURCES += \
     ../Classes/rkeyboard.cpp \
     ../Classes/socketconnection.cpp \
     ../Classes/threadsendmessage.cpp \
+    ../Configs/cashboxconfig.cpp \
+    ../Configs/configs.cpp \
     ../Controls/c5cleartablewidget.cpp \
     ../Controls/c5graphicsview.cpp \
     ../Controls/c5guicontrols.cpp \
@@ -267,6 +269,8 @@ HEADERS += \
     ../Classes/rkeyboard.h \
     ../Classes/socketconnection.h \
     ../Classes/threadsendmessage.h \
+    ../Configs/cashboxconfig.h \
+    ../Configs/configs.h \
     ../Controls/c5cleartablewidget.h \
     ../Controls/c5graphicsview.h \
     ../Controls/c5guicontrols.h \
@@ -435,6 +439,7 @@ INCLUDEPATH += ../Service5
 INCLUDEPATH += ../TableRecord
 INCLUDEPATH += ../Service5/raw
 INCLUDEPATH += ../Service5/socket
+INCLUDEPATH += ../Configs
 INCLUDEPATH += ../RESOURCES
 INCLUDEPATH += ../../XLSX/Src
 INCLUDEPATH += C:/Projects/NewTax/Src

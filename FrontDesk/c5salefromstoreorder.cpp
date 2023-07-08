@@ -120,7 +120,7 @@ void C5SaleFromStoreOrder::exportToAS(int doctype)
         connStr = db.getString(0, "f_connectionstring");
     }
 
-    BreezeConfig *b = Config::construct<BreezeConfig>(fDBParams, 1);
+    BreezeConfig *b = Configs::construct<BreezeConfig>(fDBParams, 1);
     QJsonObject jo;
     jo["pkServerAPIKey"] = b->apiKey;
     jo["pkFcmToken"] = "0123456789";

@@ -24,6 +24,8 @@ protected:
 
     void restoreColumnsWidths() override;
 
+    virtual void sumColumnsData() override;
+
 protected slots:
     virtual int newRow() override;
 

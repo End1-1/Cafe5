@@ -41,6 +41,7 @@ private:
     bool getDriversList();
     bool visit();
     bool completeDelivery();
+    bool goodsPartners();
 };
 
 #endif // JSONREPONSE_H

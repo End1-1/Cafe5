@@ -27,9 +27,8 @@ C5CashDoc::C5CashDoc(const QStringList &dbParams, QWidget *parent) :
     ui->lbStoreDoc->setEnabled(false);
     ui->leStoreDoc->setEnabled(false);
     ui->btnOpenStoreDoc->setEnabled(false);
-    if (__user->check(cp_t1_allow_change_cash_doc_date)) {
-        ui->deDate->setEnabled(false);
-    }
+        ui->deDate->setEnabled(__user->check(cp_t1_allow_change_cash_doc_date));
+
     fRelation = false;
     fActionFromSale = nullptr;
     fActionDraft = nullptr;
@@ -54,7 +53,7 @@ QToolBar *C5CashDoc::toolBar()
 {
     if (!fToolBar) {
         C5Widget::toolBar();
-        fActionSave = fToolBar->addAction(QIcon(":/save.png"), tr("Save"), this, SLOT(save()));
+        fActionSave = fToolBar->addAction(QIcon(":/save.png"), tr("Save"), this, SLOT(saveDoc()));
         fToolBar->addAction(QIcon(":/delete.png"), tr("Remove"), this, SLOT(removeDoc()));
         fActionDraft = fToolBar->addAction(QIcon(":/draft.png"), tr("Draft"), this, SLOT(draft()));
         fActionFromSale = fToolBar->addAction(QIcon(":/cash.png"), tr("Input from sale"), this, SLOT(inputFromSale()));
@@ -89,7 +88,17 @@ void C5CashDoc::setDate(const QDate &d)
 
 void C5CashDoc::setComment(const QString &t)
 {
-    ui->leRemarks->setText(t);
+    ui->cbComment->setCurrentText(t);
+}
+
+void C5CashDoc::loadSuggest()
+{
+    C5Database db(fDBParams);
+    db.exec("select * from e_cash_suggest order by f_name");
+    while (db.nextRow()) {
+        ui->cbComment->addItem(db.getString("f_name"));
+    }
+    ui->cbComment->setCurrentIndex(-1);
 }
 
 void C5CashDoc::addRow(const QString &t, double a)
@@ -132,7 +141,7 @@ bool C5CashDoc::openDoc(const QString &uuid)
     fRelation = dw.value(container_aheadercash, 0, "f_related").toInt();
     ui->leInput->setValue(dw.value(container_aheadercash, 0, "f_cashin").toString());
     ui->leOutput->setValue(dw.value(container_aheadercash, 0, "f_cashout").toString());
-    ui->leRemarks->setText(dw.value(container_aheader, 0, "f_comment").toString());
+    ui->cbComment->setCurrentText(dw.value(container_aheader, 0, "f_comment").toString());
     fStoreUuid = dw.value(container_aheadercash, 0, "f_storedoc").toString();
     ui->lePartner->setValue(dw.value(container_aheader, 0, "f_partner").toString());
     ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(dw.value(container_aheader, 0, "f_currency")));
@@ -176,7 +185,7 @@ bool C5CashDoc::openDoc(const QString &uuid)
         ui->leInput->setEnabled(false);
         ui->leOutput->setEnabled(false);
         ui->tbl->setEnabled(false);
-        ui->leRemarks->setEnabled(false);
+        ui->cbComment->setEnabled(false);
         ui->lePartner->setEnabled(false);
     }
     return true;
@@ -251,6 +260,8 @@ bool C5CashDoc::removeDoc(C5Database &db, const QString &uuid)
     db.exec("delete from a_header_cash where f_id=:f_id");
     db[":f_cashuuid"] = uuid;
     db.exec("update a_header_store set f_cashuuid='' where f_cashuuid=:f_cashuuid");
+    db[":f_cashdoc"] = uuid;
+    db.exec("delete from s_salary_payment where f_cashdoc=:f_cashdoc");
     return true;
 }
 
@@ -276,16 +287,16 @@ void C5CashDoc::draft()
         ui->leInput->setEnabled(true);
         ui->leOutput->setEnabled(true);
         ui->tbl->setEnabled(true);
-        ui->leRemarks->setEnabled(true);
+        ui->cbComment->setEnabled(true);
         ui->lePartner->setEnabled(true);
     }
 }
 
-void C5CashDoc::save(bool writedebt, bool fromrelation)
+bool C5CashDoc::save(bool writedebt, bool fromrelation)
 {
     if (fRelation && !fromrelation && !writedebt) {
         C5Message::info(tr("The document cannot be edited directly"));
-        return;
+        return false;
     }
     QString err;
     if (ui->leInput->getInteger() == 0 && ui->leOutput->getInteger() == 0) {
@@ -299,7 +310,7 @@ void C5CashDoc::save(bool writedebt, bool fromrelation)
     }
     if (!err.isEmpty()) {
         C5Message::error(err);
-        return;
+        return false;
     }
     C5Database db(fDBParams);
     C5StoreDraftWriter dw(db);
@@ -307,7 +318,9 @@ void C5CashDoc::save(bool writedebt, bool fromrelation)
         ui->leDocNum->setInteger(genNumber(DOC_TYPE_CASH));
         updateGenNumber(ui->leDocNum->getInteger(), DOC_TYPE_CASH);
     }
-    dw.writeAHeader(fUuid, ui->leDocNum->text(), DOC_STATE_SAVED, DOC_TYPE_CASH, __user->id(), ui->deDate->date(), QDate::currentDate(), QTime::currentTime(), ui->lePartner->getInteger(), ui->leTotal->getDouble(), ui->leRemarks->text(), 1, ui->cbCurrency->currentData().toInt());
+    dw.writeAHeader(fUuid, ui->leDocNum->text(), DOC_STATE_SAVED, DOC_TYPE_CASH, __user->id(), ui->deDate->date(),
+                    QDate::currentDate(), QTime::currentTime(), ui->lePartner->getInteger(), ui->leTotal->getDouble(),
+                    ui->cbComment->currentText(), 1, ui->cbCurrency->currentData().toInt());
     dw.writeAHeaderCash(fUuid, ui->leInput->getInteger(), ui->leOutput->getInteger(), fRelation, fStoreUuid, "", 0);
     for (int i = 0; i < ui->tbl->rowCount(); i++) {
         QString idin = ui->tbl->getString(i, 0);
@@ -332,6 +345,7 @@ void C5CashDoc::save(bool writedebt, bool fromrelation)
         bcd.amount = ui->leTotal->getDouble();
         bcd.costumer = ui->lePartner->getInteger();
         bcd.cash = fUuid;
+        bcd.flag = fDebtFlag;
         bcd.currency = ui->cbCurrency->currentData().toInt();
         if (ui->leOutput->getInteger() > 0) {
             bcd.source = BCLIENTDEBTS_SOURCE_INPUT;
@@ -346,12 +360,30 @@ void C5CashDoc::save(bool writedebt, bool fromrelation)
         db.exec("delete from e_cash where f_base=:f_base");
     }
     fRemovedRows.clear();
-    C5Message::info(tr("Saved"));
+    if (!fNoSavedMessage) {
+        C5Message::info(tr("Saved"));
+    }
     if (fActionDraft) {
         fActionDraft->setEnabled(true);
     }
     setProperty("amount", ui->leTotal->getDouble());
     emit saved(fUuid);
+    return true;
+}
+
+void C5CashDoc::saveDoc()
+{
+    if (save(true, false)) {
+        if (ui->cbComment->currentText().isEmpty() == false) {
+            C5Database db(fDBParams);
+            db[":f_comment"] = ui->cbComment->currentText().toLower();
+            db.exec("select * from e_cash_suggest where lower(f_name)=:f_comment");
+            if (db.nextRow() == false) {
+                db[":f_name"]  = ui->cbComment->currentText();
+                db.insert("e_cash_suggest", false);
+            }
+        }
+    }
 }
 
 void C5CashDoc::removeDoc()
@@ -383,7 +415,7 @@ void C5CashDoc::inputFromSale()
         db[":f_shift"] = shift;
         db.exec("select sum(f_amountcash) from o_header where f_datecash=:f_date and f_state=:f_state and f_shift=:f_shift");
         if (db.nextRow()) {
-            ui->leRemarks->setText(QString("%1 %2, %3").arg(tr("Input from sale")).arg(d.toString(FORMAT_DATE_TO_STR)).arg(shiftname));
+            ui->cbComment->setCurrentText(QString("%1 %2, %3").arg(tr("Input from sale")).arg(d.toString(FORMAT_DATE_TO_STR)).arg(shiftname));
             int row = ui->tbl->addEmptyRow();
             ui->tbl->createLineEdit(row, 2)->setText(QString("%1 %2, %3").arg(tr("Input from sale")).arg(d.toString(FORMAT_DATE_TO_STR)).arg(shiftname));
             ui->tbl->createLineEdit(row, 3)->setDouble(db.getDouble("f_amount"));

@@ -147,6 +147,7 @@
 #define cp_t9_salary 900
 #define cp_t9_salary_doc 901
 #define cp_t9_report 902
+#define cp_t9_payment 903
 
 #define cp_t10_manufacture 1000
 #define cp_t10_action_list 1001

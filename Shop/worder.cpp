@@ -266,7 +266,7 @@ int WOrder::addGoodsToTable(int id, bool checkQtyOfStore, const QString &draftid
     countTotal();
 
     QString err;
-    if (fDraftSale.id.isEmpty()) {
+    if (fDraftSale.id.toString().isEmpty()) {
         fDraftSale.id = db.uuid();
         fDraftSale.staff = fUser->id();
         fDraftSale.state = 1;
@@ -282,7 +282,7 @@ int WOrder::addGoodsToTable(int id, bool checkQtyOfStore, const QString &draftid
     if (draftid.isEmpty()) {
         ODraftSaleBody sb;
         sb.id = og.id;
-        sb.header = fDraftSale.id;
+        sb.header = fDraftSale.id.toString();
         sb.state = 1;
         sb.store = __c5config.defaultStore();
         sb.dateAppend = QDate::currentDate();
@@ -349,6 +349,7 @@ bool WOrder::writeOrder()
         } while (!u->isValid());
     }
     C5ShopOrder so(fOHeader, fBHistory, fOGoods);
+    fOHeader.staff = u->id();
     so.fWriteAdvance = fOHeader.saleType == -1;
     bool w = so.write();
     if (w) {
@@ -392,6 +393,7 @@ bool WOrder::writeOrder()
             }
         }
     }
+
     if (w && fGiftCard > 0) {
         C5Database dbr(__c5config.replicaDbParams());
         if (fOHeader.amountPrepaid > 0.001) {
@@ -413,7 +415,7 @@ bool WOrder::writeOrder()
         }
     }
 
-    if (!fDraftSale.id.isEmpty()) {
+    if (!fDraftSale.id.toString().isEmpty()) {
         db[":f_id"] = fDraftSale.id;
         db.exec("update o_draft_sale set f_state=3 where f_id=:f_id");
     }

@@ -30,6 +30,8 @@ public:
 
     void setComment(const QString &t);
 
+    void loadSuggest();
+
     void addRow(const QString &t, double a);
 
     void updateRow(int row, const QString &t, double a);
@@ -48,14 +50,22 @@ public:
 
     int outputCash();
 
+    QString fUuid;
+
     int fDebtSource;
+
+    int fDebtFlag = 0;
+
+    bool fNoSavedMessage = false;
 
     static bool removeDoc(const QStringList &dbParams, const QString &uuid);
 
     static bool removeDoc(C5Database &db, const QString &uuid);
 
+    bool save(bool writedebt, bool fromrelation = false);
+
 public slots:
-    void save(bool writedebt, bool fromrelation = false);
+    void saveDoc();
 
 private slots:
     void amountChanged(const QString &arg1);
@@ -74,8 +84,6 @@ private slots:
 
 private:
     Ui::C5CashDoc *ui;
-
-    QString fUuid;
     
     QString fStoreUuid;
 

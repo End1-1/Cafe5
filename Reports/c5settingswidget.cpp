@@ -173,6 +173,7 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     fTags[ui->cbDefaultCurrency->getTag()] = ui->cbDefaultCurrency->currentData().toString();
     fTags[ui->chUpdateTempStorageForShop->getTag()] = ui->chUpdateTempStorageForShop->isChecked() ? "1" : "0";
     fTags[ui->chAppendQuantityBefore->getTag()] = ui->chAppendQuantityBefore->isChecked() ? "1" : "0";
+    fTags[ui->leAutoDiscount->getTag()] = ui->leAutoDiscount->text();
     C5Database db(fDBParams);
     db[":f_settings"] = ui->leCode->getInteger();
     db.exec("delete from s_settings_values where f_settings=:f_settings");

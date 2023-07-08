@@ -1,13 +1,13 @@
-#ifndef CONFIG_H
-#define CONFIG_H
+#ifndef CONFIGS_H
+#define CONFIGS_H
 
 #include <QStringList>
 #include <QJsonObject>
 
-class Config
+class Configs
 {
 public:
-    Config(const QStringList &dbParams, int id);
+    Configs(const QStringList &dbParams, int id);
     virtual void readValues() = 0;
 
     template<class T>
@@ -25,4 +25,4 @@ private:
     int fId;
 };
 
-#endif // CONFIG_H
+#endif // CONFIGS_H

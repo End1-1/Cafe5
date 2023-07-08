@@ -188,9 +188,9 @@ void DlgPassword::on_pushButton_12_clicked()
         return;
     }
     if (ui->lePassword->echoMode() == QLineEdit::Password) {
-        ui->lePassword->clear();
         if (!fUser->authorize(pwd)) {
-            C5Message::error(fUser->error());
+            ui->lePassword->clear();
+            C5Message::error(fUser->error());            
             return;
         }
         accept();

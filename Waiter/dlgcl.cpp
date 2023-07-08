@@ -7,13 +7,23 @@ DlgCL::DlgCL(const QStringList &dbParams) :
 {
     ui->setupUi(this);
     QStringList dbp(C5Config::dbParams());
-    dbp[1] = C5Config::hotelDatabase();
-    C5Database db(dbp);
-    db.exec("select f_id, f_name from f_city_ledger order by 2");
-    while (db.nextRow()) {
-        int row = ui->tblGuest->addEmptyRow();
-        ui->tblGuest->setString(row, 0, db.getString(0));
-        ui->tblGuest->setString(row, 1, db.getString(1));
+    if (C5Config::hotelDatabase().isEmpty()) {
+        C5Database db(__c5config.dbParams());
+        db.exec("select f_id, f_name, f_phone from c_partners order by f_name");
+        while (db.nextRow()) {
+            int row = ui->tblGuest->addEmptyRow();
+            ui->tblGuest->setString(row, 0, db.getString(0));
+            ui->tblGuest->setString(row, 1, db.getString(1));
+        }
+    } else {
+        dbp[1] = C5Config::hotelDatabase();
+        C5Database db(dbp);
+        db.exec("select f_id, f_name from f_city_ledger order by 2");
+        while (db.nextRow()) {
+            int row = ui->tblGuest->addEmptyRow();
+            ui->tblGuest->setString(row, 0, db.getString(0));
+            ui->tblGuest->setString(row, 1, db.getString(1));
+        }
     }
 
     connect(ui->kbd, SIGNAL(textChanged(QString)), this, SLOT(searchCL(QString)));

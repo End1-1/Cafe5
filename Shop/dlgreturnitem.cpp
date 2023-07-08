@@ -37,8 +37,10 @@ void DlgReturnItem::on_btnSearchReceiptNumber_clicked()
                     "inner join h_halls h on h.f_id=o.f_hall "
                     "left join o_tax t on t.f_id=o.f_id "
                     "left join s_user u on u.f_id=o.f_staff "
-                    "where concat(o.f_prefix, o.f_hallid)='%1' "
-                    "order by 2 ").arg(ui->leReceiptNumber->text())) ;
+                    "where concat(o.f_prefix, o.f_hallid)='%1' and o.f_hall in (%2, 10) "
+                    "order by 2 ").arg(ui->leReceiptNumber->text())
+            .arg(__c5config.defaultHall())
+            ) ;
     while (db.nextRow()) {
         int r = ui->tblOrder->addEmptyRow();
         for (int i = 0; i < db.columnCount(); i++) {
@@ -83,7 +85,7 @@ void DlgReturnItem::on_btnSearchTax_clicked()
                     "inner join h_halls h on h.f_id=o.f_hall "
                     "left join o_tax t on t.f_id=o.f_id "
                     "left join s_user u on u.f_id=o.f_staff "
-                    "where t.f_receiptnumber=%1 "
+                    "where t.f_receiptnumber='%1' "
                     "order by 2 ").arg(ui->leReceiptNumber->text()));
     while (db.nextRow()) {
         int r = ui->tblOrder->addEmptyRow();
@@ -139,6 +141,7 @@ void DlgReturnItem::on_btnReturn_clicked()
     oheader.amountTotal = returnAmount * -1;
     oheader.amountCash = returnAmount * -1;
     oheader.saleType = SALE_RETURN;
+    oheader.hall = __c5config.defaultHall();
     if (!dw.hallId(oheader.prefix, oheader.hallId, __c5config.defaultHall())) {
         C5Message::error(dw.fErrorMsg);
         db.rollback();
@@ -170,7 +173,6 @@ void DlgReturnItem::on_btnReturn_clicked()
 
     for (int j = 0; j < rows.count(); j++) {
         int i = rows.at(j);
-        QString ogoodsid;
         QString adraftid;
         double price = 0;
         db[":f_id"] = ui->tblBody->getString(i, 0);
@@ -205,6 +207,7 @@ void DlgReturnItem::on_btnReturn_clicked()
         g.sign = -1;
         g.row = i + 1;
         g.storeRec = adraftid;
+        g.returnFrom = ui->tblBody->getString(i, 0);
         g.tax = ui->tblOrder->getInteger(ui->tblOrder->currentRow(), 4);
         if (!g.write(db, err)) {
             C5Message::error(err);
@@ -216,7 +219,7 @@ void DlgReturnItem::on_btnReturn_clicked()
             db.rollback();
             return;
         }
-        if (!dw.updateField("o_goods", "f_returnfrom", ogoodsid, "f_id", ui->tblBody->getString(i, 0))) {
+        if (!dw.updateField("o_goods", "f_returnfrom", g.id, "f_id", ui->tblBody->getString(i, 0))) {
             C5Message::error(dw.fErrorMsg);
             db.rollback();
             return;

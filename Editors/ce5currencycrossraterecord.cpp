@@ -42,4 +42,5 @@ bool CE5CurrencyCrossRateRecord::save(QString &err, QList<QMap<QString, QVariant
         db[":f_rate"] = ui->leRate->getDouble();
         db.exec("update e_currency_cross_rate set f_rate=:f_rate where f_currency1=:f_currency1 and f_currency2=:f_currency2");
     }
+    return true;
 }

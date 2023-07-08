@@ -1,9 +1,9 @@
 #ifndef CASHBOXCONFIG_H
 #define CASHBOXCONFIG_H
 
-#include "config.h"
+#include "configs.h"
 
-class CashboxConfig : public Config
+class CashboxConfig : public Configs
 {
 public:
     CashboxConfig(const QStringList &dbParams, int id);

@@ -61,13 +61,9 @@ private slots:
 
     void on_leDishComment_returnPressed();
 
-    void on_btnDivQty_clicked();
-
     void on_btnCopy_clicked();
 
     void on_btnPasteRecipt_clicked();
-
-    void on_btnMultRecipe_clicked();
 
     void on_leName_textChanged(const QString &arg1);
 
@@ -76,6 +72,8 @@ private slots:
     void on_tabWidget_currentChanged(int index);
 
     void on_chSameAsInStore_clicked(bool checked);
+
+    void on_btnAddDishRecipe_clicked();
 
 private:
     Ui::C5DishWidget *ui;

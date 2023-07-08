@@ -55,11 +55,13 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Classes/dataonline.cpp \
     ../Classes/doubledatabase.cpp \
     ../Classes/notificationwidget.cpp \
+    ../Classes/outputofheader.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
     ../Classes/removeshopsale.cpp \
     ../Classes/threadsendmessage.cpp \
     ../Configs/breezeconfig.cpp \
-    ../Configs/config.cpp \
+    ../Configs/cashboxconfig.cpp \
+    ../Configs/configs.cpp \
     ../Controls/c5cleartablewidget.cpp \
     ../Controls/c5guicontrols.cpp \
     ../Controls/c5tablewithtotal.cpp \
@@ -85,7 +87,6 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../DbData/dbopreorder.cpp \
     ../DbData/dbpartner.cpp \
     ../DbData/dbservicevalues.cpp \
-    ../DbData/dbshift.cpp \
     ../DbData/dbstore.cpp \
     ../DbData/dbstoredoctype.cpp \
     ../DbData/dbtables.cpp \
@@ -107,11 +108,13 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Editors/ce5ordermark.cpp \
     ../Editors/ce5packagelist.cpp \
     ../Editors/ce5storereason.cpp \
+    ../Forms/armsoftexportoptions.cpp \
     ../Forms/c5filtervalues.cpp \
     ../Forms/c5goodsspecialprices.cpp \
     ../Forms/c5printtaxanywhere.cpp \
     ../Forms/c5route.cpp \
     ../Forms/c5salarydoc.cpp \
+    ../Forms/c5salarypayment.cpp \
     ../Forms/c5saledoc.cpp \
     ../Forms/c5storedoc.cpp \
     ../Forms/c5storedocselectprinttemplate.cpp \
@@ -126,6 +129,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Forms/dlgdirtystoredoc.cpp \
     ../Forms/dlgdriverroutedate.cpp \
     ../Forms/dlgguestinfo.cpp \
+    ../Forms/dlglist.cpp \
     ../Forms/dlgnewcl.cpp \
     ../Forms/dlgpaymentchoose.cpp \
     ../Forms/dlgqrcode.cpp \
@@ -134,7 +138,10 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Forms/dlgselectcurrency.cpp \
     ../Forms/dlgsemireadyinout.cpp \
     ../Forms/dlgsetwaiterordercl.cpp \
+    ../Forms/goodsasmap.cpp \
+    ../Forms/httpquerydialog.cpp \
     ../Forms/mfprocessproductpriceupdate.cpp \
+    ../Forms/partnersasmap.cpp \
     ../Forms/touchdlgphonenumber.cpp \
     ../Forms/touchentertaxreceiptnumber.cpp \
     ../Forms/touchselecttaxreport.cpp \
@@ -388,11 +395,13 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Classes/doubledatabase.h \
     ../Classes/goodsreserve.h \
     ../Classes/notificationwidget.h \
+    ../Classes/outputofheader.h \
     ../Classes/proxytablewidgetdatabase.h \
     ../Classes/removeshopsale.h \
     ../Classes/threadsendmessage.h \
     ../Configs/breezeconfig.h \
-    ../Configs/config.h \
+    ../Configs/cashboxconfig.h \
+    ../Configs/configs.h \
     ../Controls/c5cleartablewidget.h \
     ../Controls/c5guicontrols.h \
     ../Controls/c5tablewithtotal.h \
@@ -418,7 +427,6 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../DbData/dbopreorder.h \
     ../DbData/dbpartner.h \
     ../DbData/dbservicevalues.h \
-    ../DbData/dbshift.h \
     ../DbData/dbstore.h \
     ../DbData/dbstoredoctype.h \
     ../DbData/dbtables.h \
@@ -440,11 +448,13 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Editors/ce5ordermark.h \
     ../Editors/ce5packagelist.h \
     ../Editors/ce5storereason.h \
+    ../Forms/armsoftexportoptions.h \
     ../Forms/c5filtervalues.h \
     ../Forms/c5goodsspecialprices.h \
     ../Forms/c5printtaxanywhere.h \
     ../Forms/c5route.h \
     ../Forms/c5salarydoc.h \
+    ../Forms/c5salarypayment.h \
     ../Forms/c5saledoc.h \
     ../Forms/c5storedoc.h \
     ../Forms/c5storedocselectprinttemplate.h \
@@ -459,6 +469,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Forms/dlgdirtystoredoc.h \
     ../Forms/dlgdriverroutedate.h \
     ../Forms/dlgguestinfo.h \
+    ../Forms/dlglist.h \
     ../Forms/dlgnewcl.h \
     ../Forms/dlgpaymentchoose.h \
     ../Forms/dlgqrcode.h \
@@ -467,7 +478,10 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Forms/dlgselectcurrency.h \
     ../Forms/dlgsemireadyinout.h \
     ../Forms/dlgsetwaiterordercl.h \
+    ../Forms/goodsasmap.h \
+    ../Forms/httpquerydialog.h \
     ../Forms/mfprocessproductpriceupdate.h \
+    ../Forms/partnersasmap.h \
     ../Forms/touchdlgphonenumber.h \
     ../Forms/touchentertaxreceiptnumber.h \
     ../Forms/touchselecttaxreport.h \
@@ -717,11 +731,13 @@ FORMS += \
     ../Editors/ce5ordermark.ui \
     ../Editors/ce5packagelist.ui \
     ../Editors/ce5storereason.ui \
+    ../Forms/armsoftexportoptions.ui \
     ../Forms/c5filtervalues.ui \
     ../Forms/c5goodsspecialprices.ui \
     ../Forms/c5printtaxanywhere.ui \
     ../Forms/c5route.ui \
     ../Forms/c5salarydoc.ui \
+    ../Forms/c5salarypayment.ui \
     ../Forms/c5saledoc.ui \
     ../Forms/c5storedoc.ui \
     ../Forms/c5storedocselectprinttemplate.ui \
@@ -736,6 +752,7 @@ FORMS += \
     ../Forms/dlgdirtystoredoc.ui \
     ../Forms/dlgdriverroutedate.ui \
     ../Forms/dlgguestinfo.ui \
+    ../Forms/dlglist.ui \
     ../Forms/dlgnewcl.ui \
     ../Forms/dlgpaymentchoose.ui \
     ../Forms/dlgqrcode.ui \
@@ -744,7 +761,10 @@ FORMS += \
     ../Forms/dlgselectcurrency.ui \
     ../Forms/dlgsemireadyinout.ui \
     ../Forms/dlgsetwaiterordercl.ui \
+    ../Forms/goodsasmap.ui \
+    ../Forms/httpquerydialog.ui \
     ../Forms/mfprocessproductpriceupdate.ui \
+    ../Forms/partnersasmap.ui \
     ../Forms/touchdlgphonenumber.ui \
     ../Forms/touchentertaxreceiptnumber.ui \
     ../Forms/touchselecttaxreport.ui \

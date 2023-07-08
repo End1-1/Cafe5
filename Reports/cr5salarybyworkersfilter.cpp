@@ -7,7 +7,7 @@ CR5SalaryByWorkersFilter::CR5SalaryByWorkersFilter(const QStringList &dbParams, 
     ui(new Ui::CR5SalaryByWorkersFilter)
 {
     ui->setupUi(this);
-    ui->leShift->setSelector(dbParams, ui->leShiftName, cache_salary_shift);
+    ui->lePosition->setSelector(dbParams, ui->lePositionName, cache_users_groups);
     ui->leEmployee->setSelector(dbParams, ui->leEmployeeName, cache_users);
 }
 
@@ -18,13 +18,18 @@ CR5SalaryByWorkersFilter::~CR5SalaryByWorkersFilter()
 
 QString CR5SalaryByWorkersFilter::condition()
 {
-    QString result = QString(" h.f_date between '%1' and '%2' ").arg(ui->deStart->date().toString(FORMAT_DATE_TO_STR_MYSQL))
+    return "";
+}
+
+QString CR5SalaryByWorkersFilter::replaceFitler()
+{
+    QString result = QString("where sp.f_date between '%1' and '%2' ").arg(ui->deStart->date().toString(FORMAT_DATE_TO_STR_MYSQL))
             .arg(ui->deEnd->date().toString(FORMAT_DATE_TO_STR_MYSQL));
     if (!ui->leEmployee->isEmpty()) {
-        result += " and sb.f_user in (" + ui->leEmployee->text() + ") ";
+        result += " and sp.f_worker in (" + ui->leEmployee->text() + ") ";
     }
-    if (!ui->leShift->isEmpty()) {
-        result += " and so.f_shift in (" + ui->leShift->text() + ") ";
+    if (!ui->lePosition->isEmpty()) {
+        result += " and sp.f_position in (" + ui->lePosition->text() + ") ";
     }
     return result;
 }

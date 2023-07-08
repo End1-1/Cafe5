@@ -30,26 +30,10 @@
        <string>Main</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="14" column="1">
-        <widget class="C5LineEditWithSelector" name="lineEdit_10">
-         <property name="Field" stdset="0">
-          <string>f_permanent_discount</string>
-         </property>
-         <property name="Type" stdset="0">
-          <string>2</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="C5ComboBox" name="cbState">
-         <property name="editable">
-          <bool>true</bool>
-         </property>
-         <property name="Field" stdset="0">
-          <string>f_state</string>
-         </property>
-         <property name="ItemData" stdset="0">
-          <bool>true</bool>
+       <item row="12" column="0">
+        <widget class="QLabel" name="label_15">
+         <property name="text">
+          <string>Legal Address</string>
          </property>
         </widget>
        </item>
@@ -60,50 +44,6 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="label_10">
-         <property name="text">
-          <string>Group</string>
-         </property>
-        </widget>
-       </item>
-       <item row="12" column="1">
-        <widget class="C5LineEditWithSelector" name="lineEdit_11">
-         <property name="Field" stdset="0">
-          <string>f_legaladdress</string>
-         </property>
-         <property name="Type" stdset="0">
-          <string>0</string>
-         </property>
-        </widget>
-       </item>
-       <item row="10" column="1">
-        <widget class="C5LineEditWithSelector" name="lineEdit_6">
-         <property name="Field" stdset="0">
-          <string>f_email</string>
-         </property>
-         <property name="Type" stdset="0">
-          <string>0</string>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="1">
-        <widget class="C5LineEditWithSelector" name="lineEdit_3">
-         <property name="Field" stdset="0">
-          <string>f_contact</string>
-         </property>
-         <property name="Type" stdset="0">
-          <string>0</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>Code</string>
-         </property>
-        </widget>
-       </item>
        <item row="9" column="1">
         <widget class="C5LineEditWithSelector" name="lineEdit_5">
          <property name="Field" stdset="0">
@@ -111,27 +51,6 @@
          </property>
          <property name="Type" stdset="0">
           <string>0</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_11">
-         <property name="text">
-          <string>Category</string>
-         </property>
-        </widget>
-       </item>
-       <item row="14" column="0">
-        <widget class="QLabel" name="label_14">
-         <property name="text">
-          <string>Permanent discount</string>
-         </property>
-        </widget>
-       </item>
-       <item row="12" column="0">
-        <widget class="QLabel" name="label_15">
-         <property name="text">
-          <string>Legal Address</string>
          </property>
         </widget>
        </item>
@@ -155,6 +74,25 @@
          </property>
         </widget>
        </item>
+       <item row="0" column="1">
+        <widget class="C5LineEditWithSelector" name="leCode">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+         <property name="Field" stdset="0">
+          <string>f_id</string>
+         </property>
+         <property name="Primary" stdset="0">
+          <bool>true</bool>
+         </property>
+         <property name="Manual" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
        <item row="13" column="0">
         <widget class="QLabel" name="label_13">
          <property name="text">
@@ -162,30 +100,13 @@
          </property>
         </widget>
        </item>
-       <item row="13" column="1">
-        <widget class="C5ComboBox" name="cbSaleType">
-         <property name="ItemData" stdset="0">
-          <bool>true</bool>
-         </property>
+       <item row="11" column="1">
+        <widget class="C5LineEditWithSelector" name="lineEdit_8">
          <property name="Field" stdset="0">
-          <string>f_price_politic</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="1">
-        <widget class="C5LineEditWithSelector" name="lineEdit_7">
-         <property name="Field" stdset="0">
-          <string>f_taxcode</string>
+          <string>f_address</string>
          </property>
          <property name="Type" stdset="0">
           <string>0</string>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="0">
-        <widget class="QLabel" name="label_3">
-         <property name="text">
-          <string>Contact</string>
          </property>
         </widget>
        </item>
@@ -196,10 +117,10 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_9">
+       <item row="6" column="0">
+        <widget class="QLabel" name="label_12">
          <property name="text">
-          <string>State</string>
+          <string>Name</string>
          </property>
         </widget>
        </item>
@@ -216,24 +137,10 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="0">
-        <widget class="QLabel" name="label_12">
-         <property name="text">
-          <string>Name</string>
-         </property>
-        </widget>
-       </item>
-       <item row="9" column="0">
-        <widget class="QLabel" name="label_5">
-         <property name="text">
-          <string>Phone</string>
-         </property>
-        </widget>
-       </item>
-       <item row="11" column="1">
-        <widget class="C5LineEditWithSelector" name="lineEdit_8">
+       <item row="10" column="1">
+        <widget class="C5LineEditWithSelector" name="lineEdit_6">
          <property name="Field" stdset="0">
-          <string>f_address</string>
+          <string>f_email</string>
          </property>
          <property name="Type" stdset="0">
           <string>0</string>
@@ -263,22 +170,91 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
-        <widget class="C5LineEditWithSelector" name="leCode">
-         <property name="enabled">
-          <bool>true</bool>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Code</string>
          </property>
-         <property name="readOnly">
+        </widget>
+       </item>
+       <item row="12" column="1">
+        <widget class="C5LineEditWithSelector" name="lineEdit_11">
+         <property name="Field" stdset="0">
+          <string>f_legaladdress</string>
+         </property>
+         <property name="Type" stdset="0">
+          <string>0</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0">
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>Contact</string>
+         </property>
+        </widget>
+       </item>
+       <item row="14" column="1">
+        <widget class="C5LineEditWithSelector" name="lineEdit_10">
+         <property name="Field" stdset="0">
+          <string>f_permanent_discount</string>
+         </property>
+         <property name="Type" stdset="0">
+          <string>2</string>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="0">
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>Phone</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="C5LineEditWithSelector" name="lineEdit_7">
+         <property name="Field" stdset="0">
+          <string>f_taxcode</string>
+         </property>
+         <property name="Type" stdset="0">
+          <string>0</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_10">
+         <property name="text">
+          <string>Group</string>
+         </property>
+        </widget>
+       </item>
+       <item row="15" column="1">
+        <widget class="C5ComboBox" name="cbManager">
+         <property name="ItemData" stdset="0">
           <bool>true</bool>
          </property>
          <property name="Field" stdset="0">
-          <string>f_id</string>
+          <string>f_manager</string>
          </property>
-         <property name="Primary" stdset="0">
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="C5ComboBox" name="cbState">
+         <property name="editable">
           <bool>true</bool>
          </property>
-         <property name="Manual" stdset="0">
+         <property name="Field" stdset="0">
+          <string>f_state</string>
+         </property>
+         <property name="ItemData" stdset="0">
           <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_9">
+         <property name="text">
+          <string>State</string>
          </property>
         </widget>
        </item>
@@ -292,17 +268,51 @@
          </property>
         </widget>
        </item>
-       <item row="11" column="0">
-        <widget class="QLabel" name="label_8">
-         <property name="text">
-          <string>Address</string>
-         </property>
-        </widget>
-       </item>
        <item row="6" column="1">
         <widget class="C5LineEditWithSelector" name="lineEdit_9">
          <property name="Field" stdset="0">
           <string>f_name</string>
+         </property>
+        </widget>
+       </item>
+       <item row="14" column="0">
+        <widget class="QLabel" name="label_14">
+         <property name="text">
+          <string>Permanent discount</string>
+         </property>
+        </widget>
+       </item>
+       <item row="13" column="1">
+        <widget class="C5ComboBox" name="cbSaleType">
+         <property name="ItemData" stdset="0">
+          <bool>true</bool>
+         </property>
+         <property name="Field" stdset="0">
+          <string>f_price_politic</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="1">
+        <widget class="C5LineEditWithSelector" name="lineEdit_3">
+         <property name="Field" stdset="0">
+          <string>f_contact</string>
+         </property>
+         <property name="Type" stdset="0">
+          <string>0</string>
+         </property>
+        </widget>
+       </item>
+       <item row="15" column="0">
+        <widget class="QLabel" name="label_16">
+         <property name="text">
+          <string>Manager</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_11">
+         <property name="text">
+          <string>Category</string>
          </property>
         </widget>
        </item>
@@ -319,20 +329,21 @@
          </property>
         </widget>
        </item>
-       <item row="15" column="0">
-        <widget class="QLabel" name="label_16">
+       <item row="11" column="0">
+        <widget class="QLabel" name="label_8">
          <property name="text">
-          <string>Manager</string>
+          <string>Address</string>
          </property>
         </widget>
        </item>
-       <item row="15" column="1">
-        <widget class="C5ComboBox" name="cbManager">
-         <property name="ItemData" stdset="0">
-          <bool>true</bool>
+       <item row="15" column="2">
+        <widget class="QToolButton" name="btnClearManager">
+         <property name="text">
+          <string/>
          </property>
-         <property name="Field" stdset="0">
-          <string>f_manager</string>
+         <property name="icon">
+          <iconset resource="../resources/res.qrc">
+           <normaloff>:/cancel.png</normaloff>:/cancel.png</iconset>
          </property>
         </widget>
        </item>
@@ -407,6 +418,8 @@
   <tabstop>tblAs</tabstop>
   <tabstop>tabWidget</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../resources/res.qrc"/>
+ </resources>
  <connections/>
 </ui>

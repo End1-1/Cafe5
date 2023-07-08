@@ -1474,7 +1474,7 @@ int Workspace::printTax(double cardAmount, double idramAmount)
     QString useExtPos = C5Config::taxUseExtPos();
     if (idramAmount > 0.01) {
         cardAmount = idramAmount;
-        useExtPos = "false";
+        useExtPos = "true";
     }
     if (ui->btnSetCardExternal->isChecked()) {
         useExtPos = "true";

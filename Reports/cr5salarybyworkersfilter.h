@@ -18,6 +18,8 @@ public:
 
     virtual QString condition();
 
+    QString replaceFitler();
+
 private:
     Ui::CR5SalaryByWorkersFilter *ui;
 };

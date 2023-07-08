@@ -68,13 +68,12 @@ private slots:
 
     void on_btnHall_clicked();
 
-    void on_btnShift_clicked();
-
     void on_btnReturnTaxReceipt_clicked();
 
     void on_btnPrintTaxX_clicked();
 
     void on_btnPrintTaxZ_clicked();
+    void on_btnCashobx_clicked();
 };
 
 #endif // DLGREPORTS_H

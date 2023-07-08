@@ -24,6 +24,7 @@
 #include "cr5mfgeneralreport.h"
 #include "cr5routereport.h"
 #include "c5saledoc.h"
+#include "c5salarypayment.h"
 #include "cr5saleremoveddishes.h"
 #include "cr5goodsreservations.h"
 #include "c5broadcasting.h"
@@ -334,7 +335,7 @@ void C5MainWindow::on_actionLogin_triggered()
 void C5MainWindow::updateTimeout()
 {
     fUpdateTimer.stop();
-    if (__user && __user->id() == 77) {
+    if (__user && (__user->id() == 77 || __user->id() == 81)) {
         C5Database db(C5Config::dbParams());
         db.exec("select f_id from o_draft_sale where f_id not in (select f_header from o_draft_sound) and f_saletype<3 ");
         while (db.nextRow()) {
@@ -846,7 +847,7 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
         createTab<CR5CashNames>(dbParams);
         break;
     case cp_t8_cash_doc:
-        createTab<C5CashDoc>(dbParams);
+        createTab<C5CashDoc>(dbParams)->loadSuggest();
         break;
     case cp_t8_cash_detailed_report:
         createTab<CR5CashDetailed>(dbParams);
@@ -871,6 +872,9 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
         break;
     case cp_t9_report:
         createTab<CR5SalaryByWorkers>(dbParams);
+        break;
+    case cp_t9_payment:
+        createTab<C5SalaryPayment>(dbParams);
         break;
     case cp_t10_action_list:
         createTab<CR5MfActions>(dbParams);
@@ -1057,7 +1061,8 @@ void C5MainWindow::setDB(const QString &dbname)
     if (addMainLevel(db.at(1), cp_t9_salary, tr("Salary"), ":/employee.png", l)) {
         l->setProperty("reportlevel", 4);
         addTreeL3Item(l, cp_t9_salary_doc, tr("New salary document"), ":/employee.png");
-        addTreeL3Item(l, cp_t9_report, tr("Salary by workers"), ":/employee.png");
+        addTreeL3Item(l, cp_t9_report, tr("History"), ":/employee.png");
+        addTreeL3Item(l, cp_t9_payment, tr("Payments"), ":/employee.png");
     }
 
     if (__c5config.frontDeskMode() == FRONTDESK_WAITER) {

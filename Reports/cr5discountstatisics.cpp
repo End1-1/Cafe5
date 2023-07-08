@@ -22,6 +22,7 @@ CR5DiscountStatisics::CR5DiscountStatisics(const QStringList &dbParams, QWidget 
                    << "concat(oh.f_prefix, oh.f_hallid) as f_prefix"
                    << "oh.f_datecash"
                    << "dt.f_name as dtname"
+                   << "bd.f_code"
                    << "bc.f_contact"
                    << "bd.f_value"
                    << "sum(bh.f_data) as f_data"
@@ -47,6 +48,7 @@ CR5DiscountStatisics::CR5DiscountStatisics(const QStringList &dbParams, QWidget 
     fTranslation["f_datecash"] = tr("Date, cash");
     fTranslation["f_value"] = tr("Value");
     fTranslation["dtname"] = tr("Mode");
+    fTranslation["f_code"] = tr("Code");
     fTranslation["f_data"] = tr("Discount");
     fTranslation["f_amounttotal"] = tr("Total");
 
@@ -54,6 +56,7 @@ CR5DiscountStatisics::CR5DiscountStatisics(const QStringList &dbParams, QWidget 
     fColumnsVisible["oh.f_id"] = true;
     fColumnsVisible["oh.f_datecash"] = true;
     fColumnsVisible["dt.f_name as dtname"] = true;
+    fColumnsVisible["bd.f_code"] = true;
     fColumnsVisible["bc.f_contact"] = true;
     fColumnsVisible["bd.f_value"] = true;
     fColumnsVisible["sum(bh.f_data) as f_data"] = true;

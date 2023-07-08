@@ -20,6 +20,12 @@ public:
 
     virtual QString table() {return "s_user_group";}
 
+    virtual void clear();
+
+    virtual void setId(int id);
+
+    virtual bool save(QString &err, QList<QMap<QString, QVariant> > &data);
+
 private:
     Ui::CE5UserGroup *ui;
 };

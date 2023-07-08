@@ -639,7 +639,7 @@ void ViewOrder::on_btnMakeDraft_clicked()
     }
 
     RemoveShopSale r(__c5config.replicaDbParams());
-    if (r.remove(ui->leUUID->text())) {
+    if (r.remove(db, ui->leUUID->text())) {
         fWorking->setActiveWidget(wo);
         close();
     }

@@ -8,6 +8,7 @@ CR5CashMovementFilter::CR5CashMovementFilter(const QStringList &dbParams, QWidge
 {
     ui->setupUi(this);
     ui->leCash->setSelector(dbParams, ui->leCashName, cache_cash_names).setMultiselection(true);
+    ui->leHall->setSelector(dbParams, ui->leHallname, cache_halls);
 }
 
 CR5CashMovementFilter::~CR5CashMovementFilter()
@@ -21,6 +22,9 @@ QString CR5CashMovementFilter::condition()
     w += QString(" and h.f_date between %1 and %2 ").arg(ui->deStart->toMySQLDate()).arg(ui->deEnd->toMySQLDate());
     if (!ui->leCash->isEmpty()) {
         w += " and ec.f_cash in (" + ui->leCash->text() + ") ";
+    }
+    if (ui->leHall->isEmpty() == false) {
+        w += " and cd.f_flag in (" + ui->leHall->text() + ") ";
     }
     return w;
 }

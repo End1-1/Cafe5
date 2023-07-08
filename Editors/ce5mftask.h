@@ -27,6 +27,8 @@ public:
 
 private:
     Ui::CE5MFTask *ui;
+
+    void setOptions();
 };
 
 #endif // CE5MFTASK_H

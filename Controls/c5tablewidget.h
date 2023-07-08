@@ -24,6 +24,11 @@ public:
         return l;
     }
 
+    template<class T>
+    T *getWidget(int row, int column) {
+        return static_cast<T*>(cellWidget(row, column));
+    }
+
     C5ComboBox *createComboBox(int row, int column);
 
     C5ComboBox *comboBox(int row, int column);

@@ -34,9 +34,16 @@ DlgSmartReports::DlgSmartReports() :
     ui->list->addItem(item);
 
     item = new QListWidgetItem(ui->list);
+    item->setText(tr("Total sale"));
+    item->setTextAlignment(Qt::AlignCenter);
+    item->setData(Qt::UserRole, 5);
+    ui->list->addItem(item);
+
+    item = new QListWidgetItem(ui->list);
     item->setText(tr("Cancel"));
     item->setTextAlignment(Qt::AlignCenter);
     ui->list->addItem(item);
+
 }
 
 DlgSmartReports::~DlgSmartReports()
@@ -64,6 +71,9 @@ void DlgSmartReports::on_list_itemClicked(QListWidgetItem *item)
         break;
     case 4:
         printDeliveryReport();
+        break;
+    case 5:
+        printTotalReport();
         break;
     }
 }
@@ -289,4 +299,89 @@ void DlgSmartReports::printDeliveryReport()
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
     p.br();
     p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
+}
+
+void DlgSmartReports::printTotalReport()
+{
+    accept();
+    QFont font(qApp->font());
+    font.setPointSize(28);
+    C5Printing p;
+    p.setSceneParams(650, 2800, QPrinter::Portrait);
+    p.setFont(font);
+
+    if (QFile::exists("./logo_receipt.png")) {
+        p.image("./logo_receipt.png", Qt::AlignHCenter);
+        p.br();
+    }
+    p.setFontBold(true);
+    p.ctext(tr("Total report"));
+    p.br();
+    p.ctext(ui->leDateStart->text() + " " + ui->leTimeStart->text());
+    p.br();
+    p.ctext("-");
+    p.br();
+    p.ctext(ui->leDateEnd->text() + " " + ui->leTimeEnd->text());
+    p.br();
+
+    QString sql ("SELECT date_format(f_datecash, '%d/%m/%Y' ) as f_datecash, sum(h.f_amounttotal) as f_amounttotal, "
+                "sum(f_amountcash) as f_amountcash, sum(f_amountcard) as f_amountcard "
+                "from o_header h "
+                "where h.f_state=:f_state and f_datecash between :f_date1 and :f_date2 "
+                "group by 1 ");
+    C5Database db(fDBParams);
+    db[":f_date1"] = ui->leDateStart->date();
+    db[":f_date2"] = ui->leDateEnd->date();
+    db[":f_state"] = ORDER_STATE_CLOSE;
+    db.exec(sql);
+    while (db.nextRow()) {
+        p.setFontBold(false);
+        p.setFontSize(22);
+        p.ctext(db.getDate("f_datecash").toString(FORMAT_DATE_TO_STR));
+        p.br();
+        p.ltext(tr("Total"), 0);
+        p.rtext(float_str(db.getDouble("f_amounttotal"), 0));
+        p.br();
+
+        p.ltext(tr("Cash"), 0);
+        p.rtext(float_str(db.getDouble("f_amountcash"), 0));
+        p.br();
+
+        p.ltext(tr("Card"), 0);
+        p.rtext(float_str(db.getDouble("f_amountcard"), 0));
+        p.br();
+        p.line();
+        p.br();
+
+    }
+    p.br();
+
+    p.line();
+    p.br();
+
+    p.setFontSize(18);
+    p.ltext(tr("Printed"), 0);
+    p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
+    p.br();
+    p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
+}
+
+void DlgSmartReports::on_btnStartBack_clicked()
+{
+    ui->leDateStart->setDate(ui->leDateStart->date().addDays(-1));
+}
+
+void DlgSmartReports::on_btnStartForward_clicked()
+{
+    ui->leDateStart->setDate(ui->leDateStart->date().addDays(1));
+}
+
+void DlgSmartReports::on_btnEndBack_clicked()
+{
+    ui->leDateEnd->setDate(ui->leDateEnd->date().addDays(-1));
+}
+
+void DlgSmartReports::on_btnEndForward_clicked()
+{
+    ui->leDateEnd->setDate(ui->leDateEnd->date().addDays(1));
 }

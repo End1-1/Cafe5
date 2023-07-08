@@ -122,12 +122,12 @@
    <item row="2" column="0">
     <widget class="QLabel" name="label_4">
      <property name="text">
-      <string>Shift</string>
+      <string>Position</string>
      </property>
     </widget>
    </item>
    <item row="2" column="1">
-    <widget class="C5LineEditWithSelector" name="leShift">
+    <widget class="C5LineEditWithSelector" name="lePosition">
      <property name="maximumSize">
       <size>
        <width>100</width>
@@ -140,7 +140,7 @@
     </widget>
    </item>
    <item row="2" column="2">
-    <widget class="C5LineEditWithSelector" name="leShiftName">
+    <widget class="C5LineEditWithSelector" name="lePositionName">
      <property name="readOnly">
       <bool>true</bool>
      </property>

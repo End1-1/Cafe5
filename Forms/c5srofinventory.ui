@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>C5SrOfInventory</class>
+ <widget class="QDialog" name="C5SrOfInventory">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>821</width>
+    <height>634</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>S/R quantities</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QToolButton" name="btnDelete">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources/res.qrc">
+       <normaloff>:/cancel.png</normaloff>:/cancel.png</iconset>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="C5TableWidget" name="tbl">
+     <column>
+      <property name="text">
+       <string>ID</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Rec id</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>SR id</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>SR name</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>SR qty</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Goods id</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Goods name</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Goods qty</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>C5TableWidget</class>
+   <extends>QTableWidget</extends>
+   <header location="global">c5tablewidget.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../resources/res.qrc"/>
+ </resources>
+ <connections/>
+</ui>

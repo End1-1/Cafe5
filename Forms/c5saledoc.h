@@ -31,12 +31,16 @@ public:
 private slots:
     void amountDoubleClicked();
     void printSale();
+    void fiscale();
     void createInvoiceAS();
     void createRetailAS();
+    void makeStoreOutput();
+    void exportToExcel();
     void messageResult(QJsonObject jo);
     void saveDataChanges();
     void saveAsDraft();
     void saveCopy();
+    void removeDoc();
     void uuidDoubleClicked();
     void on_PriceTextChanged(const QString &arg1);
     void on_QtyTextChanged(const QString &arg1);
@@ -64,6 +68,8 @@ private:
     QAction *fActionSave;
     QAction *fActionDraft;
     QAction *fActionCopy;
+    QAction *fRemoveAction;
+    QAction *fPrintTax;
     int addGoods(int goodsId, C5Database &db);
     int addGoods(int store, int goodsId, const QString &barcode, const QString &name, const QString &unitname, double qty, double price, double discount, int isService);
     void countGrandTotal();

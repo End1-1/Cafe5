@@ -282,6 +282,19 @@ bool C5StoreDoc::openDoc(QString id, QString &err)
     return true;
 }
 
+void C5StoreDoc::correctDebt()
+{
+    double amount = ui->leTotal->getDouble() * -1;
+    C5Database db(fDBParams);
+    C5StoreDraftWriter dw(db);
+
+    if (fDocState == DOC_STATE_SAVED) {
+        if (ui->lePartner->getInteger() > 0){
+            dw.updateField("b_clients_debts", "f_amount", amount, "f_storedoc", fInternalId);
+        }
+    }
+}
+
 void C5StoreDoc::setMode(C5StoreDoc::STORE_DOC sd)
 {
     ui->chPaid->setVisible(false);
@@ -875,17 +888,21 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
     C5StoreDraftWriter dw(db);
     db.startTransaction();
 
-
-
     dw.updateField("a_store_draft", "f_reason", ui->leReason->getInteger(), "f_document", fInternalId);
     dw.updateField("a_store", "f_reason", ui->leReason->getInteger(), "f_document", fInternalId);
     if (state == fDocState && state == DOC_STATE_SAVED) {
         dw.writeAHeaderPartial(fInternalId, ui->leDocNum->text(), __user->id(), QDate::currentDate(), QTime::currentTime(),
                                  ui->lePartner->getInteger(),ui->leComment->text());
+        dw.updateField("a_header", "f_currency", ui->cbCurrency->currentData(), "f_id", fInternalId);
+        if (ui->chPaid->isChecked()) {
+
+        } else {
+
+        }
+        dw.updateField("b_clients_debts", "f_currency",ui->cbCurrency->currentData(), "f_storedoc", fInternalId);
         db.commit();
         return true;
     }
-
 
     if (ui->leDocNum->isEmpty() || (!ui->leDocNum->text().isEmpty() && ui->leDocNum->text().toInt() < 1)) {
         setUserId(true, 0);
@@ -1077,7 +1094,7 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
         fCashDocUuid.clear();
         if (ui->chPaid->isChecked() && state == DOC_STATE_SAVED) {
             C5CashDoc cd(fDBParams);
-            QString purpose = tr("Store input") + " #" + ui->leDocNum->text() + ", " + ui->deDate->text();
+            QString purpose = tr("Purchase of goods");
             cd.addRow(purpose, ui->leTotal->getDouble());
             cd.setDate(ui->deCashDate->date());
             cd.setCashOutput(ui->leCash->getInteger());
@@ -1092,6 +1109,10 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
         db.exec("delete from b_clients_debts where f_storedoc=:f_storedoc");
         if (state == DOC_STATE_SAVED) {
             if (ui->leReason->getInteger() == DOC_REASON_BACK_FROM_PARTNER) {
+                db[":f_id"] = ui->leStoreInput->getInteger();
+                db.exec("select f_hall from c_storages where f_id=:f_id");
+                db.nextRow();
+                int flag = db.getInt("f_hall");
                 if (ui->leReasonPartner->getInteger() > 0) {
                     BClientDebts bcd;
                     bcd.date = ui->deDate->date();
@@ -1100,6 +1121,7 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
                     bcd.currency = ui->cbCurrency->currentData().toInt();
                     bcd.store = fInternalId;
                     bcd.costumer = ui->leReasonPartner->getInteger();
+                    bcd.flag = flag;
                     bcd.write(db, err);
                 }
             } else {
@@ -2495,6 +2517,7 @@ void C5StoreDoc::dirtyEdit()
     QString err;
     auto *doc =__mainWindow->createTab<C5StoreDoc>(fDBParams);
     if (!doc->openDoc(fInternalId, err)) {
+        doc->correctDebt();
         __mainWindow->removeTab(doc);
         C5Message::error(err);
         return;

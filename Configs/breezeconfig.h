@@ -1,10 +1,10 @@
 #ifndef BREEZECONFIG_H
 #define BREEZECONFIG_H
 
-#include "config.h"
+#include "configs.h"
 
 
-class BreezeConfig : public Config
+class BreezeConfig : public Configs
 {
 public:
     QString ipAddress;

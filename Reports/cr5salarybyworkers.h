@@ -3,6 +3,8 @@
 
 #include "c5reportwidget.h"
 
+class CR5SalaryByWorkersFilter;
+
 class CR5SalaryByWorkers : public C5ReportWidget
 {
     Q_OBJECT
@@ -14,8 +16,15 @@ public:
 
     virtual QToolBar *toolBar();
 
+    virtual void buildQuery() override;
+
 protected:
     virtual bool tblDoubleClicked(int row, int column, const QList<QVariant> &vals);
+
+private:
+    QString fQuery;
+
+    CR5SalaryByWorkersFilter *fFilter;
 
 };
 

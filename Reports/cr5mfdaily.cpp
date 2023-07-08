@@ -60,9 +60,9 @@ void CR5MfDaily::loadDoc(const QDate &date, int worker, int teamlead)
     litem->setText(tr("All"));
     litem->setData(Qt::UserRole, 0);
     ui->lstTeamlead->addItem(litem);
-    C5Cache *cache = C5Cache::cache(fDBParams, cache_users);
     db[":f_date"] = date;
-    QString sql = "select distinct(u.f_teamlead) as f_teamlead "
+    QString sql = "select distinct(u.f_teamlead) as f_teamlead ,"
+        "concat_ws(' ', u.f_last, u.f_first) as f_name "
         "from mf_daily_workers m "
         "inner join s_user u on u.f_id=m.f_worker "
         "where f_date=:f_date ";
@@ -72,7 +72,7 @@ void CR5MfDaily::loadDoc(const QDate &date, int worker, int teamlead)
             continue;
         }
         litem = new QListWidgetItem(ui->lstTeamlead);
-        litem->setText(cache->getValuesForId(db.getInt(0)).at(1).toString());
+        litem->setText(db.getString(1));
         litem->setData(Qt::UserRole, db.getInt(0));
         ui->lstTeamlead->addItem(litem);
     }
@@ -306,6 +306,14 @@ void CR5MfDaily::addProcess()
     db[":f_laststep"] = last ? 1 : 0;
     int rowid = db.insert("mf_daily_process");
 
+    db[":f_product"] = vals.at(3);
+    db[":f_process"] = vals.at(5);
+    db[":f_taskid"] = taskid;
+    db.exec("select sum(f_qty) from mf_daily_process where f_product=:f_product "
+            "and f_process=:f_process and f_taskid=:f_taskid");
+    db.nextRow();
+    double done = db.getDouble(0);
+
     db[":f_stage"] = vals.at(9);
     db[":f_id"] = taskid;
     db.exec("update mf_tasks set f_stage=:f_stage where f_id=:f_id");
@@ -321,6 +329,7 @@ void CR5MfDaily::addProcess()
     ui->wt->lineEdit(row, 3)->setValidator(new QDoubleValidator(0, 9999999, 2));
     ui->wt->setData(row, 6, taskid);
     ui->wt->lineEdit(row, 6)->setText(date.toString("dd/MM/yyyy"));
+    ui->wt->setData(row, 7, done);
     ui->wt->setData(row, 8, max);
     ui->wt->setData(row, 9, vals.at(5));
     ui->wt->setData(row, 10, 0);

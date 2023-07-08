@@ -63,23 +63,6 @@
         </property>
        </spacer>
       </item>
-      <item>
-       <widget class="QRadioButton" name="rbIncrease">
-        <property name="text">
-         <string>Increase</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="rbIncrease_2">
-        <property name="text">
-         <string>Decrease</string>
-        </property>
-       </widget>
-      </item>
      </layout>
     </widget>
    </item>

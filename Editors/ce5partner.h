@@ -28,6 +28,9 @@ public:
 
     virtual bool checkData(QString &err) override;
 
+private slots:
+    void on_btnClearManager_clicked();
+
 private:
     Ui::CE5Partner *ui;
 };

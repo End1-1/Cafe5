@@ -17,39 +17,40 @@
    <item>
     <widget class="QWidget" name="widget" native="true">
      <layout class="QGridLayout" name="gridLayout">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <item row="0" column="3">
+       <widget class="QToolButton" name="toolButton_2">
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/right-arrow.png</normaloff>:/right-arrow.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QToolButton" name="toolButton">
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/left-arrow.png</normaloff>:/left-arrow.png</iconset>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="0">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>Document number</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2">
-       <widget class="C5LineEdit" name="leDocnumber">
-        <property name="maximumSize">
-         <size>
-          <width>100</width>
-          <height>16777215</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="0">
-       <widget class="QLabel" name="label_6">
-        <property name="text">
-         <string>Remarks</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
        <widget class="QLabel" name="label_2">
         <property name="text">
          <string>Date</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="2">
-       <widget class="C5DateEdit" name="deCashDate">
+      <item row="0" column="2">
+       <widget class="C5DateEdit" name="deDate">
         <property name="maximumSize">
          <size>
           <width>100</width>
@@ -58,14 +59,7 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Cash document date</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="4">
+      <item row="0" column="4">
        <spacer name="horizontalSpacer_3">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -77,80 +71,6 @@
          </size>
         </property>
        </spacer>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_7">
-        <property name="text">
-         <string>Shifts</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="2">
-       <widget class="C5LineEditWithSelector" name="leCash">
-        <property name="maximumSize">
-         <size>
-          <width>100</width>
-          <height>16777215</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="label_4">
-        <property name="text">
-         <string>Cash output</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="3">
-       <widget class="QLineEdit" name="leCashName">
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2">
-       <widget class="C5DateEdit" name="deDate">
-        <property name="maximumSize">
-         <size>
-          <width>100</width>
-          <height>16777215</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="2" colspan="3">
-       <widget class="C5LineEdit" name="leRemarks"/>
-      </item>
-      <item row="2" column="3">
-       <widget class="QLineEdit" name="leShiftName">
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="2">
-       <widget class="C5LineEditWithSelector" name="leShift">
-        <property name="maximumSize">
-         <size>
-          <width>100</width>
-          <height>16777215</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="3">
-       <widget class="QLineEdit" name="lePaid">
-        <property name="font">
-         <font>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
       </item>
      </layout>
     </widget>
@@ -249,6 +169,26 @@
        <string>Amount</string>
       </property>
      </column>
+     <column>
+      <property name="text">
+       <string>Date in</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Time in</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Date out</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Time out</string>
+      </property>
+     </column>
     </widget>
    </item>
    <item>
@@ -294,32 +234,23 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>C5LineEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5lineedit.h</header>
+  </customwidget>
+  <customwidget>
    <class>C5DateEdit</class>
    <extends>QLineEdit</extends>
    <header location="global">c5dateedit.h</header>
-  </customwidget>
-  <customwidget>
-   <class>C5LineEditWithSelector</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5lineeditwithselector.h</header>
   </customwidget>
   <customwidget>
    <class>C5TableWidgetWithSelector</class>
    <extends>QTableWidget</extends>
    <header location="global">c5tablewidgetwithselector.h</header>
   </customwidget>
-  <customwidget>
-   <class>C5LineEdit</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5lineedit.h</header>
-  </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>leDocnumber</tabstop>
   <tabstop>deDate</tabstop>
-  <tabstop>deCashDate</tabstop>
-  <tabstop>leCash</tabstop>
-  <tabstop>leCashName</tabstop>
   <tabstop>btnAddEmployee</tabstop>
   <tabstop>btnRemoveEmploye</tabstop>
   <tabstop>tbl</tabstop>

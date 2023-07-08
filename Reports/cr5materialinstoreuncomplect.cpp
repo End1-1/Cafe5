@@ -57,7 +57,8 @@ void CR5MaterialInStoreUncomplect::buildQuery()
         break;
     case 1:
         group = "group by f_storage, f_group ";
-        fields = "f_storage, f_group, sum(f_qty) as f_qty, sum(f_total) as f_total,sum(f_totalsale) as f_totalsale,sum(f_totalsale2) as f_totalsale2 ";
+        fields = "f_storage, f_group, sum(f_qty) as f_qty,  "
+                "sum(f_total) as f_total, sum(f_totalsale) as f_totalsale,sum(f_totalsale2) as f_totalsale2 ";
         break;
     }
 
@@ -75,13 +76,14 @@ void CR5MaterialInStoreUncomplect::buildQuery()
 
     "select 'A', g.f_id as f_code,ss.f_name as f_storage,gg.f_name as f_group,g.f_name as f_goods, "
     "g.f_scancode,sum(s.f_qty*s.f_type) as f_qty, "
-    "u.f_name as f_unit,sum(s.f_total*s.f_type) as f_total,sum(s.f_qty*s.f_type)*g.f_saleprice as f_totalsale, "
-    "sum(s.f_qty*s.f_type)*g.f_saleprice2 as f_totalsale2  "
+    "u.f_name as f_unit,sum(s.f_total*s.f_type) as f_total,sum(s.f_qty*s.f_type)*gpr.f_price1 as f_totalsale, "
+    "sum(s.f_qty*s.f_type)*gpr.f_price2 as f_totalsale2  "
     "from a_store s "
     "inner join c_goods g on g.f_id=s.f_goods "
     "inner join c_storages ss on ss.f_id=s.f_store "
     "inner join c_groups gg on gg.f_id=g.f_group "
     "inner join c_units u on u.f_id=g.f_unit and u.f_id not in(%2) "
+    "left join c_goods_prices gpr on gpr.f_goods=g.f_id and gpr.f_currency=1 "
     "inner join a_header h on h.f_id=s.f_document  where  h.f_date<='%1'  and h.f_state=1  %3 "
     "group by 1, g.f_id,ss.f_name,gg.f_name,g.f_name,u.f_name having sum(s.f_qty*s.f_type) <> 0 "
 
@@ -89,12 +91,14 @@ void CR5MaterialInStoreUncomplect::buildQuery()
 
     "select 'B', gc.f_goods as f_code,ss.f_name as f_storage,gg.f_name as f_group,g.f_name as f_goods, "
     "g.f_scancode,sum(s.f_qty*s.f_type)*gc.f_qty as f_qty, "
-    "u.f_name as f_unit,sum(((s.f_qty*s.f_type)*gc.f_qty)*g.f_lastinputprice*s.f_type) as f_total,sum((s.f_qty*s.f_type)*gc.f_qty)*g.f_saleprice as f_totalsale, "
-    "sum((s.f_qty*s.f_type)*gc.f_qty)*g.f_saleprice2 as f_totalsale2  "
+    "u.f_name as f_unit,sum(((s.f_qty*s.f_type)*gc.f_qty)*g.f_lastinputprice*s.f_type) as f_total, "
+    "sum((s.f_qty*s.f_type)*gc.f_qty)*gpr.f_price1 as f_totalsale, "
+    "sum((s.f_qty*s.f_type)*gc.f_qty)*gpr.f_price2 as f_totalsale2  "
     "from a_store s  "
     "inner join c_goods_complectation gc on gc.f_base=s.f_goods "
     "inner join c_goods g on g.f_id=gc.f_goods "
     "inner join c_goods gu on gu.f_id=s.f_goods "
+    "left join c_goods_prices gpr on gpr.f_goods=g.f_id and gpr.f_currency=1 "
     "inner join c_storages ss on ss.f_id=s.f_store "
     "inner join c_groups gg on gg.f_id=g.f_group  "
     "inner join c_units u on u.f_id=g.f_unit "

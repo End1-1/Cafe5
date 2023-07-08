@@ -151,6 +151,7 @@ int main(int argc, char *argv[])
 
 
     if (__c5config.rdbReplica()) {
+        __c5config.initParamsFromDb();
         auto *r = new C5Replication();
         r->uploadToServer();
         delete r;

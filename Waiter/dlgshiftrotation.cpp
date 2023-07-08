@@ -15,10 +15,6 @@ DlgShiftRotation::DlgShiftRotation(C5User *user) :
     if (!ui->de->date().isValid()) {
         ui->de->setDate(QDate::currentDate());
     }
-    for (int id: dbshift->list()) {
-        ui->cb->addItem(dbshift->name(id), id);
-    }
-    ui->cb->setCurrentIndex(ui->cb->findData(__c5config.dateShift()));
 }
 
 DlgShiftRotation::~DlgShiftRotation()
@@ -104,9 +100,6 @@ void DlgShiftRotation::on_btnChange_clicked()
 
     db[":f_value"] = ui->de->date().toString(FORMAT_DATE_TO_STR_MYSQL);
     db[":f_key"] = param_date_cash;
-    db.exec("update s_settings_values set f_value=:f_value where f_key=:f_key");
-    db[":f_value"] = ui->cb->currentData().toString();
-    db[":f_key"] = param_date_cash_shift;
     db.exec("update s_settings_values set f_value=:f_value where f_key=:f_key");
     DlgExitWithMessage::openDialog(tr("Session was changed"));
 }

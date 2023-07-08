@@ -67,7 +67,7 @@ void Sales::showSales(Working *w, C5User *u)
     s->fWorking = w;
     s->showMaximized();
     s->exec();
-    delete s;
+     delete s;
 }
 
 bool Sales::printCheckWithTax(C5Database &db, const QString &id, QString &rseq)

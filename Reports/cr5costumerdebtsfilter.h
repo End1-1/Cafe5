@@ -20,11 +20,15 @@ public:
 
     virtual QString filterText() override;
 
-    bool isTotal();
+    int viewMode();
 
     QString date1();
 
     QString date2();
+
+    QString manager();
+
+    QString flag();
 
     bool debtMode();
 

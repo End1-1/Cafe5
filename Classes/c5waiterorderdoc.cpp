@@ -548,6 +548,10 @@ void C5WaiterOrderDoc::removeDocument(C5Database &db, const QString &id)
         db.deleteFromTable("a_header_cash", cashid);
         db.deleteFromTable("a_header", cashid);
     }
+    db[":f_id"] = id;
+    db.exec("delete from b_history where f_id=:f_id");
+    db[":f_trsale"] = id;
+    db.exec("delete from b_gift_card_history where f_trsale=:f_trsale");
     db[":f_header"] = id;
     db.exec("select ah.f_id as f_header, og.f_id as f_goods "
             "from a_header ah "

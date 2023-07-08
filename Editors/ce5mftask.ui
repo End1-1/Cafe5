@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>468</width>
-    <height>304</height>
+    <height>317</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -36,29 +36,69 @@
        <string>Main info</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="5" column="1">
-        <widget class="C5LineEditWithSelector" name="leProduct">
-         <property name="Field" stdset="0">
-          <string>f_product</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="C5LineEditWithSelector" name="leWorkshop">
-         <property name="Field" stdset="0">
-          <string>f_workshop</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="label_5">
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_2">
          <property name="text">
-          <string>Product</string>
+          <string>Date create</string>
          </property>
         </widget>
        </item>
-       <item row="5" column="2">
-        <widget class="C5LineEditWithSelector" name="leProductName">
+       <item row="8" column="0">
+        <widget class="QLabel" name="label_8">
+         <property name="text">
+          <string>Out</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="C5DateEdit" name="leDateCreate">
+         <property name="Field" stdset="0">
+          <string>f_datecreate</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="C5LineEditWithSelector" name="leCode">
+         <property name="Field" stdset="0">
+          <string>f_id</string>
+         </property>
+         <property name="Primary" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="2">
+        <widget class="QTimeEdit" name="teCreate">
+         <property name="focusPolicy">
+          <enum>Qt::ClickFocus</enum>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+         <property name="calendarPopup">
+          <bool>false</bool>
+         </property>
+         <property name="Field" stdset="0">
+          <string>f_timecreate</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0">
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>Ready</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>Stage</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="2">
+        <widget class="C5LineEditWithSelector" name="leWorkshowName">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
            <horstretch>1</horstretch>
@@ -72,35 +112,61 @@
           <bool>true</bool>
          </property>
          <property name="FieldRef" stdset="0">
-          <string>f_productname</string>
+          <string>f_workshopname</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="1">
-        <widget class="C5DateEdit" name="leDateCreate">
+       <item row="1" column="2">
+        <widget class="C5LineEditWithSelector" name="leStateName">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>1</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+         <property name="FieldRef" stdset="0">
+          <string>f_statename</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="1">
+        <widget class="C5LineEditWithSelector" name="lineEdit_11">
          <property name="Field" stdset="0">
-          <string>f_datecreate</string>
+          <string>f_out</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="label_3">
-         <property name="text">
-          <string>Workshop</string>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="0">
-        <widget class="QLabel" name="label_7">
-         <property name="text">
-          <string>Ready</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="1">
-        <widget class="C5LineEditWithSelector" name="leStage">
+       <item row="6" column="1">
+        <widget class="C5LineEditWithSelector" name="lineEdit_9">
          <property name="Field" stdset="0">
-          <string>f_stage</string>
+          <string>f_qty</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Code</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="C5LineEditWithSelector" name="leState">
+         <property name="Field" stdset="0">
+          <string>f_state</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0">
+        <widget class="QLabel" name="label_6">
+         <property name="text">
+          <string>Quantity</string>
          </property>
         </widget>
        </item>
@@ -136,69 +202,45 @@
          </property>
         </spacer>
        </item>
-       <item row="0" column="1">
-        <widget class="C5LineEditWithSelector" name="leCode">
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>Workshop</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="C5LineEditWithSelector" name="leStage">
          <property name="Field" stdset="0">
-          <string>f_id</string>
-         </property>
-         <property name="Primary" stdset="0">
-          <bool>true</bool>
+          <string>f_stage</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="2">
-        <widget class="C5LineEditWithSelector" name="leWorkshowName">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-           <horstretch>1</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
-         </property>
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-         <property name="FieldRef" stdset="0">
-          <string>f_workshopname</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="0">
-        <widget class="QLabel" name="label_6">
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_5">
          <property name="text">
-          <string>Quantity</string>
+          <string>Product</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="2">
-        <widget class="QTimeEdit" name="teCreate">
-         <property name="focusPolicy">
-          <enum>Qt::ClickFocus</enum>
-         </property>
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-         <property name="calendarPopup">
-          <bool>false</bool>
-         </property>
+       <item row="3" column="1">
+        <widget class="C5LineEditWithSelector" name="leWorkshop">
          <property name="Field" stdset="0">
-          <string>f_timecreate</string>
+          <string>f_workshop</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="label_4">
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_9">
          <property name="text">
-          <string>Stage</string>
+          <string>State</string>
          </property>
         </widget>
        </item>
-       <item row="8" column="0">
-        <widget class="QLabel" name="label_8">
-         <property name="text">
-          <string>Out</string>
+       <item row="5" column="1">
+        <widget class="C5LineEditWithSelector" name="leProduct">
+         <property name="Field" stdset="0">
+          <string>f_product</string>
          </property>
         </widget>
        </item>
@@ -209,43 +251,8 @@
          </property>
         </widget>
        </item>
-       <item row="8" column="1">
-        <widget class="C5LineEditWithSelector" name="lineEdit_11">
-         <property name="Field" stdset="0">
-          <string>f_out</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>Code</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_2">
-         <property name="text">
-          <string>Date create</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="1">
-        <widget class="C5LineEditWithSelector" name="lineEdit_9">
-         <property name="Field" stdset="0">
-          <string>f_qty</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="C5LineEditWithSelector" name="leState">
-         <property name="Field" stdset="0">
-          <string>f_state</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="2">
-        <widget class="C5LineEditWithSelector" name="leStateName">
+       <item row="5" column="2">
+        <widget class="C5LineEditWithSelector" name="leProductName">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
            <horstretch>1</horstretch>
@@ -259,14 +266,7 @@
           <bool>true</bool>
          </property>
          <property name="FieldRef" stdset="0">
-          <string>f_statename</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_9">
-         <property name="text">
-          <string>State</string>
+          <string>f_productname</string>
          </property>
         </widget>
        </item>
@@ -305,14 +305,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5DateEdit</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5dateedit.h</header>
-  </customwidget>
-  <customwidget>
    <class>C5LineEditWithSelector</class>
    <extends>QLineEdit</extends>
    <header location="global">c5lineeditwithselector.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5DateEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5dateedit.h</header>
   </customwidget>
   <customwidget>
    <class>C5TableWidget</class>

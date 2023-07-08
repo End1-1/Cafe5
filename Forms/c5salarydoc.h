@@ -16,40 +16,35 @@ public:
 
     ~C5SalaryDoc();
 
-    bool openDoc(const QString &id);
+    bool openDoc(const QDate &date);
 
     virtual QToolBar *toolBar() override;
-
-    static bool removeDocument(const QStringList &dbParams, const QString &uuid);
 
 public slots:
     void save();
 
 private slots:
-    void countSalary();
 
     void getEmployesInOutList();
-
-    void countAmounts(const QString &arg1);
-
-    void createCashDocument();
-
-    void removeDoc(bool showmessage = true);
 
     void on_btnAddEmployee_clicked();
 
     void on_btnRemoveEmploye_clicked();
 
+    void on_toolButton_clicked();
+
+    void on_toolButton_2_clicked();
+
+    void on_deDate_returnPressed();
+
 private:
     Ui::C5SalaryDoc *ui;
 
-    QString fUUID;
-
-    QString fCashUUID;
-
     int newRow();
 
-    void setPaid();
+    void countSalary();
+
+    double salaryOfPosition(C5Database &db, int pos, int worker);
 };
 
 #endif // C5SALARYDOC_H

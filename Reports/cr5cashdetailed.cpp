@@ -6,6 +6,15 @@
 #include "c5mainwindow.h"
 #include "c5cashdoc.h"
 
+static const int col_header = 0;
+static const int col_date = 1;
+static const int col_remark = 2;
+static const int col_detail = 3;
+static const int col_debit = 5;
+static const int col_credit = 4;
+static const int col_balance = 6;
+
+
 CR5CashDetailed::CR5CashDetailed(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
 {
@@ -13,15 +22,17 @@ CR5CashDetailed::CR5CashDetailed(const QStringList &dbParams, QWidget *parent) :
     fLabel = tr("Cash movement");
     fFilterWidget = new CR5CashDetailedFilter(dbParams);
     fFilter = static_cast<CR5CashDetailedFilter*>(fFilterWidget);
-    fColumnNameIndex["f_header"] = 0;
-    fColumnNameIndex["f_date"] = 1;
-    fColumnNameIndex["f_remarks"] = 2;
-    fColumnNameIndex["f_debit"] = 3;
-    fColumnNameIndex["f_credit"] = 4;
-    fColumnNameIndex["f_balance"] = 5;
+    fColumnNameIndex["f_header"] = col_header;
+    fColumnNameIndex["f_date"] = col_date;
+    fColumnNameIndex["f_remarks"] = col_remark;
+    fColumnNameIndex["f_detail"] = col_detail;
+    fColumnNameIndex["f_debit"] = col_credit;
+    fColumnNameIndex["f_credit"] = col_debit;
+    fColumnNameIndex["f_balance"] = col_balance;
     fTranslation["f_header"] = tr("UUID");
     fTranslation["f_date"] = tr("Date");
-    fTranslation["f_remarks"] = tr("Remarks");
+    fTranslation["f_remarks"] = tr("Purpose");
+    fTranslation["f_detail"] = tr("Comment");
     fTranslation["f_debit"] = tr("Debit");
     fTranslation["f_credit"] = tr("Credit");
     fTranslation["f_balance"] = tr("Balance");
@@ -70,10 +81,11 @@ void CR5CashDetailed::buildQuery()
         }
     }
     QList<QVariant> er;
-    er << QVariant() << QVariant() << QVariant() << QVariant() << QVariant() << QVariant();
+    er << QVariant() << QVariant() << QVariant() << QVariant() << QVariant() << QVariant() << QVariant();
     QList<QList<QVariant> > &rows = fModel->fRawData;
     rows.clear();
-    QString query = QString("select '' as f_header, '%1' as f_date, '%2' as f_remarks, c.f_sign, sum(c.f_amount*c.f_sign) as f_amount "
+    QString query = QString("select '' as f_header, '%1' as f_date, '%2' as f_remarks, "
+                            "c.f_sign, sum(c.f_amount*c.f_sign) as f_amount "
                             "from e_cash c "
                             "inner join a_header h on h.f_id=c.f_header and h.f_type=:f_type "
                             "where f_cash=:f_cash and h.f_date<'%1' and h.f_state=:f_state ")
@@ -88,18 +100,19 @@ void CR5CashDetailed::buildQuery()
         int r;
         rows.append(er);
         r = rows.count() - 1;
-        rows[r][0] = db.getString("f_header");
-        rows[r][1] = db.getDate("f_date");
-        rows[r][2] = db.getString("f_remarks");
+        rows[r][col_header] = db.getString("f_header");
+        rows[r][col_date] = db.getDate("f_date");
+        rows[r][col_remark] = db.getString("f_remarks");
+        rows[r][col_detail] = "";
         if (db.getDouble("f_amount") > 0.001) {
-            rows[r][3] = db.getDouble("f_amount");
-            rows[r][4] = 0;
+            rows[r][col_credit] = db.getDouble("f_amount");
+            rows[r][col_debit] = 0;
         } else {
-            rows[r][3] = 0;
-            rows[r][4] = abs(db.getDouble("f_amount"));
+            rows[r][col_credit] = 0;
+            rows[r][col_debit] = abs(db.getDouble("f_amount"));
         }
     }
-    query = "select c.f_header, h.f_date, c.f_remarks, c.f_sign, c.f_amount "
+    query = "select c.f_header, h.f_date, h.f_comment, c.f_remarks, c.f_sign, c.f_amount "
                                 "from e_cash c "
                                 "inner join a_header h on h.f_id=c.f_header and h.f_type=:f_type "
                                 "where f_cash=:f_cash and h.f_date between :f_date1 and :f_date2 "
@@ -115,15 +128,16 @@ void CR5CashDetailed::buildQuery()
         int r;
         rows.append(er);
         r = rows.count() - 1;
-        rows[r][0] = db.getString("f_header");
-        rows[r][1] = db.getDate("f_date");
-        rows[r][2] = db.getString("f_remarks");
+        rows[r][col_header] = db.getString("f_header");
+        rows[r][col_date] = db.getDate("f_date");
+        rows[r][col_remark] = db.getString("f_comment");
+        rows[r][col_detail] = db.getString("f_remarks");
         if (db.getInt("f_sign") == 1) {
-            rows[r][3] = db.getDouble("f_amount");
-            rows[r][4] = 0;
+            rows[r][col_credit] = db.getDouble("f_amount");
+            rows[r][col_debit] = 0;
         } else {
-            rows[r][3] = 0;
-            rows[r][4] = abs(db.getDouble("f_amount"));
+            rows[r][col_credit] = 0;
+            rows[r][col_debit] = abs(db.getDouble("f_amount"));
         }
     }
     fModel->setExternalData(fColumnNameIndex, fTranslation);
@@ -143,9 +157,14 @@ void CR5CashDetailed::restoreColumnsWidths()
     fTableView->setColumnWidth(0, 0);
 }
 
+void CR5CashDetailed::sumColumnsData()
+{
+    sum();
+}
+
 int CR5CashDetailed::newRow()
 {
-    __mainWindow->createTab<C5CashDoc>(fDBParams);
+    __mainWindow->createTab<C5CashDoc>(fDBParams)->loadSuggest();
     return 0;
 }
 
@@ -155,16 +174,16 @@ void CR5CashDetailed::sum()
     double credit = 0;
     double total = 0;
     for (int i = 0; i < fModel->rowCount(); i++) {
-        debit += fModel->fRawData[i][3].toDouble();
-        credit += fModel->fRawData[i][4].toDouble();
-        total = total + fModel->fRawData[i][3].toDouble() - fModel->fRawData[i][4].toDouble();
-        fModel->setData(i, 5, total);
+        debit += fModel->data(i, col_credit, Qt::EditRole).toDouble();
+        credit += fModel->data(i, col_debit, Qt::EditRole).toDouble();
+        total = total + fModel->data(i, col_credit, Qt::EditRole).toDouble() - fModel->data(i, col_debit, Qt::EditRole).toDouble();
+        fModel->setData(i, col_balance, total);
     }
     QStringList vheader;
     vheader << QString::number(fModel->rowCount());
     fTableTotal->setVerticalHeaderLabels(vheader);
-    fTableTotal->setDouble(0, 3, debit);
-    fTableTotal->setDouble(0, 4, credit);
-    fTableTotal->setDouble(0, 5, total);
+    fTableTotal->setDouble(0, col_credit, debit);
+    fTableTotal->setDouble(0, col_debit, credit);
+    fTableTotal->setDouble(0, col_balance, total);
     fTableTotal->setVisible(true);
 }

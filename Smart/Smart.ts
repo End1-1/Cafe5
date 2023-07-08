@@ -663,62 +663,62 @@
 <context>
     <name>C5PrintServiceThread</name>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="133"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="134"/>
         <source>PREORDER</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="138"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="139"/>
         <source>Guests</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="149"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="150"/>
         <source>REPRINT</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="156"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="157"/>
         <source>New order</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="158"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="159"/>
         <source>Table</source>
         <translation type="unfinished">ՍԵՂԱՆ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="161"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="164"/>
         <source>Order no</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="164"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="167"/>
         <source>Date</source>
         <translation type="unfinished">Ամսաթիվ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="167"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="170"/>
         <source>Time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="170"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="173"/>
         <source>Staff</source>
         <translation type="unfinished">Սպասարկող</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="203"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="206"/>
         <source>Extra price</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="232"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="235"/>
         <source>Printer: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="236"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="239"/>
         <source>Storage: </source>
         <translation type="unfinished"></translation>
     </message>
@@ -1681,48 +1681,74 @@ MS Excel</source>
     </message>
     <message>
         <location filename="dlgsmartreports.cpp" line="37"/>
+        <source>Total sale</source>
+        <translation>Ընդհանուր վաճարք</translation>
+    </message>
+    <message>
+        <location filename="dlgsmartreports.cpp" line="43"/>
         <source>Cancel</source>
         <translation>Փակել</translation>
     </message>
     <message>
-        <location filename="dlgsmartreports.cpp" line="85"/>
-        <location filename="dlgsmartreports.cpp" line="168"/>
+        <location filename="dlgsmartreports.cpp" line="95"/>
+        <location filename="dlgsmartreports.cpp" line="178"/>
         <source>End of day</source>
         <translation>Օրվա հասույթ</translation>
     </message>
     <message>
-        <location filename="dlgsmartreports.cpp" line="135"/>
-        <location filename="dlgsmartreports.cpp" line="217"/>
+        <location filename="dlgsmartreports.cpp" line="145"/>
+        <location filename="dlgsmartreports.cpp" line="227"/>
         <source>Quantity of orders</source>
         <translation>Պատվերների քանակ</translation>
     </message>
     <message>
-        <location filename="dlgsmartreports.cpp" line="139"/>
-        <location filename="dlgsmartreports.cpp" line="221"/>
+        <location filename="dlgsmartreports.cpp" line="149"/>
+        <location filename="dlgsmartreports.cpp" line="231"/>
         <source>Total today</source>
         <translation>Ընդամենը</translation>
     </message>
     <message>
-        <location filename="dlgsmartreports.cpp" line="148"/>
-        <location filename="dlgsmartreports.cpp" line="230"/>
-        <location filename="dlgsmartreports.cpp" line="288"/>
+        <location filename="dlgsmartreports.cpp" line="158"/>
+        <location filename="dlgsmartreports.cpp" line="240"/>
+        <location filename="dlgsmartreports.cpp" line="298"/>
+        <location filename="dlgsmartreports.cpp" line="362"/>
         <source>Printed</source>
         <translation>Տպված</translation>
     </message>
     <message>
-        <location filename="dlgsmartreports.cpp" line="250"/>
+        <location filename="dlgsmartreports.cpp" line="260"/>
         <source>Delivery report</source>
         <translation>Առաքման հաշվետվություն</translation>
     </message>
     <message>
-        <location filename="dlgsmartreports.cpp" line="276"/>
+        <location filename="dlgsmartreports.cpp" line="286"/>
         <source>Delivery total count</source>
         <translation>Առաքման քանակ</translation>
     </message>
     <message>
-        <location filename="dlgsmartreports.cpp" line="279"/>
+        <location filename="dlgsmartreports.cpp" line="289"/>
         <source>Delivery total amount</source>
         <translation>Առաքման գումար</translation>
+    </message>
+    <message>
+        <location filename="dlgsmartreports.cpp" line="318"/>
+        <source>Total report</source>
+        <translation>Ընդհանուր հասույթ</translation>
+    </message>
+    <message>
+        <location filename="dlgsmartreports.cpp" line="341"/>
+        <source>Total</source>
+        <translation>Ընդամենը</translation>
+    </message>
+    <message>
+        <location filename="dlgsmartreports.cpp" line="345"/>
+        <source>Cash</source>
+        <translation>Կանխիկ</translation>
+    </message>
+    <message>
+        <location filename="dlgsmartreports.cpp" line="349"/>
+        <source>Card</source>
+        <translation>Քարտ</translation>
     </message>
 </context>
 <context>

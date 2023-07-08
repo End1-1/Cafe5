@@ -12,6 +12,7 @@ CR5CashMovement::CR5CashMovement(const QStringList &dbParams, QWidget *parent) :
     fMainTable = "e_cash ec";
     fLeftJoinTables << "left join a_header h on h.f_id=ec.f_header [h]"
                     << "left join e_cash_names cn on cn.f_id=ec.f_cash [cn]"
+                    << "left join b_clients_debts cd on cd.f_cash=h.f_id [cd]"
                        ;
 
     fColumnsFields << "h.f_id"

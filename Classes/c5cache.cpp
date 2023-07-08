@@ -144,6 +144,9 @@ C5Cache::C5Cache(const QStringList &dbParams) :
                 .arg(tr("Code"), tr("Currency code1"), tr("Currency name 1"),
                      tr("Currency code 2"), tr("Currency name 2"), tr("Rate"));
         setCacheSimpleQuery(cache_draft_sale_state, "o_draft_sale_state");
+        setCacheSimpleQuery(cache_partner_category, "c_partners_category");
+        setCacheSimpleQuery(cache_partner_group, "c_partners_group");
+        setCacheSimpleQuery(cache_partner_state, "c_partners_state");
     }
     if (fTableCache.count() == 0) {
         fTableCache["c_partners"] = cache_goods_partners;
@@ -190,6 +193,9 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         fTableCache["e_currency_cross_rate"] = cache_currency_cross_rate;
         fTableCache["e_currency_cross_rate_history"] = cache_currency_cross_rate_history;
         fTableCache["o_draft_sale_state"] = cache_draft_sale_state;
+        fTableCache["c_partners_category"] = cache_partner_category;
+        fTableCache["c_partners_group"] = cache_partner_group;
+        fTableCache["c_partners_state"] = cache_partner_state;
     }
     fVersion = 0;
     C5Database db(dbParams);

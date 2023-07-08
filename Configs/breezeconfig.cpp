@@ -2,7 +2,7 @@
 #include "c5database.h"
 
 BreezeConfig::BreezeConfig(const QStringList &dbParams, int id) :
-    Config(dbParams, 1)
+    Configs(dbParams, 1)
 {
 
 }

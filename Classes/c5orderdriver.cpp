@@ -1,11 +1,17 @@
 #include "c5orderdriver.h"
 #include "c5utils.h"
 #include "c5cafecommon.h"
+#include "bclientdebts.h"
 #include "datadriver.h"
 #include "c5config.h"
 #include "c5waiterorderdoc.h"
 #include "cashboxconfig.h"
+#include "c5message.h"
 #include <QJsonObject>
+#include <QDateTime>
+#include <QLibrary>
+
+typedef double (*totalOfHourly)(const QDateTime &date, QString &str);
 
 C5OrderDriver::C5OrderDriver(const QStringList &dbParams) :
     fDbParams(dbParams)
@@ -111,50 +117,61 @@ bool C5OrderDriver::closeOrder()
         }
 
         C5StoreDraftWriter dw(db);
-        auto *cbc = Config::construct<CashboxConfig>(db.dbParams(), 2);
+        auto *cbc = Configs::construct<CashboxConfig>(db.dbParams(), 2);
 
-            QString headerPrefix;
-            int headerId;
-            QDate dateCash = headerValue("f_datecash").toDate();
-            if (!dw.hallId(headerPrefix, headerId, headerValue("f_hall").toInt())) {
-                err = dw.fErrorMsg;
-            }
-            if (headerValue("f_amountcash").toDouble() > 0.0001) {
-               writeCashDoc(dw, headerValue("f_id").toString(), QString("%1%2").arg(headerPrefix, QString::number(headerId)),err,
-                       headerValue("f_amountcash").toDouble(), headerValue("f_currentstaff").toInt(),
-                       cbc->cash1, dateCash);
-            }
-            if (headerValue("f_amountcard").toDouble() > 0.0001) {
-                writeCashDoc(dw, headerValue("f_id").toString(), QString("%1%2").arg(headerPrefix, QString::number(headerId)),err,
-                        headerValue("f_amountcard").toDouble(), headerValue("f_currentstaff").toInt(),
-                        cbc->cash2, dateCash);
-
-            }
-            if (headerValue("f_amountbank").toDouble() > 0.0001) {
-                writeCashDoc(dw, headerValue("f_id").toString(), QString("%1%2").arg(headerPrefix, QString::number(headerId)),err,
-                        headerValue("f_amountbank").toDouble(), headerValue("f_currentstaff").toInt(),
-                        cbc->cash3, dateCash);
-
-            }
-            if (headerValue("f_amountprepaid").toDouble() > 0.0001) {
-                writeCashDoc(dw, headerValue("f_id").toString(), QString("%1%2").arg(headerPrefix, QString::number(headerId)),err,
-                        headerValue("f_amountprepaid").toDouble(), headerValue("f_currentstaff").toInt(),
-                        cbc->cash4, dateCash);
-
-            }
-            if (headerValue("f_amountidram").toDouble() > 0.0001) {
-                writeCashDoc(dw, headerValue("f_id").toString(), QString("%1%2").arg(headerPrefix, QString::number(headerId)),err,
-                        headerValue("f_amountidram").toDouble(), headerValue("f_currentstaff").toInt(),
-                        cbc->cash5, dateCash);
-
-            }
-            if (headerValue("f_amountpayx").toDouble() > 0.0001) {
-                writeCashDoc(dw, headerValue("f_id").toString(), QString("%1%2").arg(headerPrefix, QString::number(headerId)),err,
-                        headerValue("f_amountpayx").toDouble(), headerValue("f_currentstaff").toInt(),
-                        cbc->cash6, dateCash);
-
-            }
+        QString headerPrefix;
+        int headerId;
+        QDate dateCash = headerValue("f_datecash").toDate();
+        if (!dw.hallId(headerPrefix, headerId, headerValue("f_hall").toInt())) {
+            err = dw.fErrorMsg;
         }
+        if (headerValue("f_amountcash").toDouble() > 0.0001) {
+           writeCashDoc(dw, headerValue("f_id").toString(), QString("%1%2").arg(headerPrefix, QString::number(headerId)),err,
+                   headerValue("f_amountcash").toDouble(), headerValue("f_currentstaff").toInt(),
+                   cbc->cash1, dateCash);
+        }
+        if (headerValue("f_amountcard").toDouble() > 0.0001) {
+            writeCashDoc(dw, headerValue("f_id").toString(), QString("%1%2").arg(headerPrefix, QString::number(headerId)),err,
+                    headerValue("f_amountcard").toDouble(), headerValue("f_currentstaff").toInt(),
+                    cbc->cash2, dateCash);
+
+        }
+        if (headerValue("f_amountbank").toDouble() > 0.0001) {
+            writeCashDoc(dw, headerValue("f_id").toString(), QString("%1%2").arg(headerPrefix, QString::number(headerId)),err,
+                    headerValue("f_amountbank").toDouble(), headerValue("f_currentstaff").toInt(),
+                    cbc->cash3, dateCash);
+
+        }
+        if (headerValue("f_amountprepaid").toDouble() > 0.0001) {
+            writeCashDoc(dw, headerValue("f_id").toString(), QString("%1%2").arg(headerPrefix, QString::number(headerId)),err,
+                    headerValue("f_amountprepaid").toDouble(), headerValue("f_currentstaff").toInt(),
+                    cbc->cash4, dateCash);
+
+        }
+        if (headerValue("f_amountidram").toDouble() > 0.0001) {
+            writeCashDoc(dw, headerValue("f_id").toString(), QString("%1%2").arg(headerPrefix, QString::number(headerId)),err,
+                    headerValue("f_amountidram").toDouble(), headerValue("f_currentstaff").toInt(),
+                    cbc->cash5, dateCash);
+
+        }
+        if (headerValue("f_amountpayx").toDouble() > 0.0001) {
+            writeCashDoc(dw, headerValue("f_id").toString(), QString("%1%2").arg(headerPrefix, QString::number(headerId)),err,
+                    headerValue("f_amountpayx").toDouble(), headerValue("f_currentstaff").toInt(),
+                    cbc->cash6, dateCash);
+
+        }
+
+        if (clValue("f_code").toInt() > 0) {
+            BClientDebts b;
+            b.source = BCLIENTDEBTS_SOURCE_SALE;
+            b.date = headerValue("f_datecash").toDate();
+            b.costumer = clValue("f_code").toInt();
+            b.order = headerValue("f_id").toString();
+            b.amount = -1 * headerValue("f_amountother").toDouble();
+            b.currency = 1;
+            b.write(db, err);
+        }
+    }
 
 
     clearOrder();
@@ -286,6 +303,7 @@ bool C5OrderDriver::save()
             return false;
         }
     }
+
     db.commit();
     fTableData.clear();
     fDishesTableData.clear();
@@ -340,6 +358,11 @@ bool C5OrderDriver::isEmpty()
 
 double C5OrderDriver::amountTotal()
 {
+    totalOfHourly t = nullptr;
+    QLibrary l("hourlypay.dll");
+    if (l.load()) {
+        t = reinterpret_cast<totalOfHourly>(l.resolve("total"));
+    }
     double total = 0;
     double totalService = 0;
     double totalDiscount = 0;
@@ -350,6 +373,15 @@ double C5OrderDriver::amountTotal()
             continue;
         }
         if (dbdish->isHourlyPayment(dishesValue("f_dish", i).toInt())) {
+            QString s;
+            QString dt = headerValue("f_dateopen").toDate().toString("dd/MM/yyyy") + " " + headerValue("f_timeopen").toTime().toString("HH:mm:ss");
+            if (t) {
+                setDishesValue("f_price",  t(QDateTime::fromString(dt, "dd/MM/yyyy HH:mm:ss"), s), i);
+                setDishesValue("f_total",  t(QDateTime::fromString(dt, "dd/MM/yyyy HH:mm:ss"), s), i);
+                setDishesValue("f_comment", s, i);
+            }  else {
+                C5Message::error("Could not load hourlypay.dll");
+            }
             total += dishesValue("f_total", i).toDouble();
             continue;
         }
@@ -810,6 +842,7 @@ void C5OrderDriver::setCloseHeader()
             state = ORDER_STATE_MOVED;
         }
     }
+
     QDate datecash;
     int dateshift;
     dateCash(datecash, dateshift);
@@ -832,7 +865,7 @@ void C5OrderDriver::clearOrder()
     fCurrentOrderId.clear();
 }
 
-void C5OrderDriver::   dateCash(QDate &d, int &dateShift)
+void C5OrderDriver::dateCash(QDate &d, int &dateShift)
 {
     d = QDate::currentDate();
     dateShift = 1;
@@ -856,7 +889,7 @@ void C5OrderDriver::writeCashDoc(C5StoreDraftWriter &dw, const QString &uuid, co
     if (!dw.writeAHeader(cashdocid, id, DOC_STATE_SAVED, DOC_TYPE_CASH,
                          staff, dateCash, QDate::currentDate(),
                          QTime::currentTime(), 0, amount,
-                         id, 1, 1)) {
+                         tr("Revenue"), 1, 1)) {
         err = dw.fErrorMsg;
     }
     if (!dw.writeAHeaderCash(cashdocid, cashboxid,

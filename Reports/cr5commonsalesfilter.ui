@@ -36,13 +36,6 @@
        <string>Main</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_3">
-       <item row="6" column="0">
-        <widget class="QLabel" name="label_4">
-         <property name="text">
-          <string>Hall</string>
-         </property>
-        </widget>
-       </item>
        <item row="8" column="2">
         <widget class="C5LineEditWithSelector" name="leStaffName">
          <property name="focusPolicy">
@@ -53,145 +46,14 @@
          </property>
         </widget>
        </item>
-       <item row="10" column="1">
-        <widget class="C5LineEditWithSelector" name="leBuyer">
-         <property name="maximumSize">
-          <size>
-           <width>150</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="FilterName" stdset="0">
-          <string>buyer</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="2">
-        <spacer name="horizontalSpacer">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>384</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="0" column="2">
-        <widget class="QToolButton" name="toolButton">
-         <property name="focusPolicy">
-          <enum>Qt::ClickFocus</enum>
-         </property>
+       <item row="6" column="0">
+        <widget class="QLabel" name="label_4">
          <property name="text">
-          <string/>
-         </property>
-         <property name="icon">
-          <iconset resource="../resources/res.qrc">
-           <normaloff>:/pushpin.png</normaloff>:/pushpin.png</iconset>
-         </property>
-         <property name="FixDate" stdset="0">
-          <bool>true</bool>
+          <string>Hall</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
-        <widget class="C5DateEdit" name="deEnd">
-         <property name="maximumSize">
-          <size>
-           <width>150</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="FilterName" stdset="0">
-          <string>date2</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>Start date</string>
-         </property>
-        </widget>
-       </item>
-       <item row="9" column="2">
-        <widget class="C5LineEditWithSelector" name="leShiftName">
-         <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
-         </property>
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="9" column="0">
-        <widget class="QLabel" name="label_7">
-         <property name="text">
-          <string>Shift</string>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="1">
-        <widget class="C5LineEditWithSelector" name="leTable">
-         <property name="maximumSize">
-          <size>
-           <width>150</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="FilterName" stdset="0">
-          <string>table</string>
-         </property>
-        </widget>
-       </item>
-       <item row="12" column="0">
-        <widget class="QPushButton" name="btnFlags">
-         <property name="text">
-          <string>Flags</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_2">
-         <property name="text">
-          <string>End date</string>
-         </property>
-        </widget>
-       </item>
-       <item row="10" column="2">
-        <widget class="C5LineEditWithSelector" name="leBuyerName">
-         <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
-         </property>
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="label_3">
-         <property name="text">
-          <string>State</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1" colspan="2">
-        <widget class="QCheckBox" name="chDoNotUseCashDate">
-         <property name="text">
-          <string>Date cash is null</string>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="0">
-        <widget class="QLabel" name="label_6">
-         <property name="text">
-          <string>Staff</string>
-         </property>
-        </widget>
-       </item>
-       <item row="11" column="1" colspan="2">
+       <item row="10" column="1" colspan="2">
         <widget class="QWidget" name="widget" native="true">
          <property name="minimumSize">
           <size>
@@ -227,6 +89,90 @@
          </layout>
         </widget>
        </item>
+       <item row="5" column="2">
+        <widget class="C5LineEditWithSelector" name="leStateName">
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <widget class="QToolButton" name="toolButton">
+         <property name="focusPolicy">
+          <enum>Qt::ClickFocus</enum>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="../resources/res.qrc">
+           <normaloff>:/pushpin.png</normaloff>:/pushpin.png</iconset>
+         </property>
+         <property name="FixDate" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="2">
+        <widget class="C5LineEditWithSelector" name="leBuyerName">
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="2">
+        <widget class="C5LineEditWithSelector" name="leHallName">
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1">
+        <widget class="C5LineEditWithSelector" name="leHall">
+         <property name="maximumSize">
+          <size>
+           <width>150</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="FilterName" stdset="0">
+          <string>hall</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="C5DateEdit" name="deStart">
+         <property name="maximumSize">
+          <size>
+           <width>150</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="FilterName" stdset="0">
+          <string>date1</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0" rowspan="2">
+        <widget class="QCheckBox" name="chUseClosingDateTime">
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
+         <property name="text">
+          <string>Use closing
+datetime</string>
+         </property>
+        </widget>
+       </item>
        <item row="3" column="1">
         <widget class="QDateTimeEdit" name="dt1">
          <property name="enabled">
@@ -246,24 +192,7 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="2">
-        <widget class="C5LineEditWithSelector" name="leHallName">
-         <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
-         </property>
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="0">
-        <widget class="QLabel" name="label_5">
-         <property name="text">
-          <string>Table</string>
-         </property>
-        </widget>
-       </item>
-       <item row="13" column="0">
+       <item row="12" column="0">
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -276,66 +205,38 @@
          </property>
         </spacer>
        </item>
-       <item row="0" column="1">
-        <widget class="C5DateEdit" name="deStart">
-         <property name="maximumSize">
-          <size>
-           <width>150</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="FilterName" stdset="0">
-          <string>date1</string>
+       <item row="11" column="0">
+        <widget class="QPushButton" name="btnFlags">
+         <property name="text">
+          <string>Flags</string>
          </property>
         </widget>
        </item>
        <item row="10" column="0">
-        <widget class="QLabel" name="label_9">
-         <property name="text">
-          <string>Buyer</string>
-         </property>
-        </widget>
-       </item>
-       <item row="11" column="0">
         <widget class="QLabel" name="label_8">
          <property name="text">
           <string>Returned item</string>
          </property>
         </widget>
        </item>
-       <item row="8" column="1">
-        <widget class="C5LineEditWithSelector" name="leStaff">
-         <property name="maximumSize">
-          <size>
-           <width>150</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="FilterName" stdset="0">
-          <string>staff</string>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>End date</string>
          </property>
         </widget>
        </item>
-       <item row="6" column="1">
-        <widget class="C5LineEditWithSelector" name="leHall">
-         <property name="maximumSize">
-          <size>
-           <width>150</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="FilterName" stdset="0">
-          <string>hall</string>
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>State</string>
          </property>
         </widget>
        </item>
-       <item row="7" column="2">
-        <widget class="C5LineEditWithSelector" name="leTableName">
-         <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
-         </property>
-         <property name="readOnly">
-          <bool>true</bool>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Start date</string>
          </property>
         </widget>
        </item>
@@ -352,19 +253,29 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="0" rowspan="2">
-        <widget class="QCheckBox" name="chUseClosingDateTime">
-         <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
-         </property>
+       <item row="8" column="0">
+        <widget class="QLabel" name="label_6">
          <property name="text">
-          <string>Use closing
-datetime</string>
+          <string>Staff</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1" colspan="2">
+        <widget class="QCheckBox" name="chDoNotUseCashDate">
+         <property name="text">
+          <string>Date cash is null</string>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="0">
+        <widget class="QLabel" name="label_9">
+         <property name="text">
+          <string>Buyer</string>
          </property>
         </widget>
        </item>
        <item row="9" column="1">
-        <widget class="C5LineEditWithSelector" name="leShift">
+        <widget class="C5LineEditWithSelector" name="leBuyer">
          <property name="maximumSize">
           <size>
            <width>150</width>
@@ -372,17 +283,7 @@ datetime</string>
           </size>
          </property>
          <property name="FilterName" stdset="0">
-          <string>shift</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="2">
-        <widget class="C5LineEditWithSelector" name="leStateName">
-         <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
-         </property>
-         <property name="readOnly">
-          <bool>true</bool>
+          <string>buyer</string>
          </property>
         </widget>
        </item>
@@ -402,6 +303,75 @@ datetime</string>
          </property>
          <property name="calendarPopup">
           <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2">
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>384</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="7" column="2">
+        <widget class="C5LineEditWithSelector" name="leTableName">
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="1">
+        <widget class="C5LineEditWithSelector" name="leTable">
+         <property name="maximumSize">
+          <size>
+           <width>150</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="FilterName" stdset="0">
+          <string>table</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="1">
+        <widget class="C5LineEditWithSelector" name="leStaff">
+         <property name="maximumSize">
+          <size>
+           <width>150</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="FilterName" stdset="0">
+          <string>staff</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="C5DateEdit" name="deEnd">
+         <property name="maximumSize">
+          <size>
+           <width>150</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="FilterName" stdset="0">
+          <string>date2</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0">
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>Table</string>
          </property>
         </widget>
        </item>
@@ -620,7 +590,6 @@ datetime</string>
   <tabstop>leHall</tabstop>
   <tabstop>leTable</tabstop>
   <tabstop>leStaff</tabstop>
-  <tabstop>leShift</tabstop>
   <tabstop>leBuyer</tabstop>
   <tabstop>rbRIAll</tabstop>
   <tabstop>rbRIYes</tabstop>

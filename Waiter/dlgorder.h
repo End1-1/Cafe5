@@ -78,10 +78,6 @@ private:
 
     void removeWOrder(WOrder *wo);
 
-    //void setCar(int num);
-
-    void countHourlyPayment(WOrder *order);
-
     void restoreStoplistQty(int dish, double qty);
 
     void setLangIcon();
@@ -109,6 +105,8 @@ private:
     bool buildDishes(int part2, const QList<DPart2> &dpart2);
 
     bool fetchDishes(const DPart2 &part2, bool recent, int colcount, int &col, int &row);
+
+    void discountOrder(C5User *u, const QString &code);
 
 private slots:
     void timeout();

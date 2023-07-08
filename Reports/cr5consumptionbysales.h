@@ -36,6 +36,8 @@ private:
 
     void countRowQty(int row);
 
+    void writeInvQty(C5Database &db, double qty, int row, int column, int goods, bool checkSR = true);
+
 private slots:
     void makeOutput(bool v);
 

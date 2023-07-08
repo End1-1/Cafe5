@@ -19,6 +19,8 @@ public:
     bool openTable(int table, QStringList &orders, QString &err);
 
     bool closeTable(int id, QString &err);
+
+    int hourlyId(int id);
 };
 
 #endif // DBTABLES_H

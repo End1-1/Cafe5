@@ -842,7 +842,7 @@
             <string notr="true">background:red</string>
            </property>
            <property name="text">
-            <string>Նմուշ</string>
+            <string/>
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>

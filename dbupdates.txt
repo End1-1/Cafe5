@@ -1120,14 +1120,14 @@ ALTER TABLE `c_partners`
 	CHANGE COLUMN `f_category` `f_category` INT(11) NULL DEFAULT '1' AFTER `f_id`,
 	CHANGE COLUMN `f_group` `f_group` INT(11) NULL DEFAULT '1' AFTER `f_state`,
 	CHANGE COLUMN `f_taxname` `f_taxname` VARCHAR(128) NULL DEFAULT '' COLLATE 'utf8mb3_general_ci' AFTER `f_group`,
-	CHANGE COLUMN `f_name` `f_name` TINYTEXT NULL DEFAULT '' COLLATE 'utf8mb3_general_ci' AFTER `f_taxname`,
+	CHANGE COLUMN `f_name` `f_name` VARCHAR(255) NULL DEFAULT '' COLLATE 'utf8mb3_general_ci' AFTER `f_taxname`,
 	CHANGE COLUMN `f_taxcode` `f_taxcode` VARCHAR(45) NULL DEFAULT '' COLLATE 'utf8mb3_general_ci' AFTER `f_name`,
 	CHANGE COLUMN `f_contact` `f_contact` VARCHAR(255) NULL DEFAULT '' COLLATE 'utf8mb3_general_ci' AFTER `f_taxcode`,
 	CHANGE COLUMN `f_info` `f_info` VARCHAR(256) NULL DEFAULT '' COLLATE 'utf8mb3_general_ci' AFTER `f_contact`,
 	CHANGE COLUMN `f_phone` `f_phone` VARCHAR(255) NULL DEFAULT '' COLLATE 'utf8mb3_general_ci' AFTER `f_info`,
 	CHANGE COLUMN `f_email` `f_email` VARCHAR(255) NULL DEFAULT '' COLLATE 'utf8mb3_general_ci' AFTER `f_phone`,
-	CHANGE COLUMN `f_address` `f_address` TINYTEXT NULL DEFAULT '' COLLATE 'utf8mb3_general_ci' AFTER `f_email`,
-	CHANGE COLUMN `f_legaladdress` `f_legaladdress` TEXT NULL DEFAULT '' COLLATE 'utf8mb3_general_ci' AFTER `f_address`;
+	CHANGE COLUMN `f_address` `f_address` VARCHAR(255) NULL DEFAULT '' COLLATE 'utf8mb3_general_ci' AFTER `f_email`,
+	CHANGE COLUMN `f_legaladdress` `f_legaladdress` VARCHAR(255) NULL DEFAULT '' COLLATE 'utf8mb3_general_ci' AFTER `f_address`;
 	UPDATE c_partners SET f_phone='' WHERE f_phone IS NULL;
 UPDATE c_partners SET f_permanent_discount=0 WHERE f_permanent_discount IS NULL;
 ALTER TABLE `c_partners`	CHANGE COLUMN `f_permanent_discount` `f_permanent_discount` DECIMAL(5,2) NULL DEFAULT '0' AFTER `f_cash`;
@@ -1184,3 +1184,131 @@ insert into  o_draft_sale_state (f_id, f_name) values (5, 'Հետ վերադար
 /* db - 118 , 19.05.2023 */
 update s_app set f_version='118' where f_app='DB';
 INSERT INTO `a_reason` (`f_id`, `f_name`) VALUES (11, 'Հետվերադարձ գործընկերոջից');
+
+
+/* db - 119 , 19.05.2023 */
+update s_app set f_version='119' where f_app='DB';
+alter table o_draft_sale add column f_flag integer;
+
+/* db - 120 , 29.05.2023 */
+update s_app set f_version='120' where f_app='DB';
+alter table c_partners add column f_manager integer;
+
+/* db - 121 , 05.06.2023 */
+update s_app set f_version='121' where f_app='DB';
+alter table b_clients_debts add column f_flag integer;
+
+
+/* db - 122 , 05.06.2023 */
+update s_app set f_version='122' where f_app='DB';
+alter table c_storages add column f_hall integer;
+
+/* db - 123 , 17.06.2023 */
+update s_app set f_version='123' where f_app='DB';
+drop table s_salary_account;
+drop table s_salary_body;
+drop table s_salary_options;
+drop table s_salary_shift;
+drop table s_salary_shift_time;
+CREATE TABLE s_salary_attendance (f_id INTEGER PRIMARY KEY AUTO_INCREMENT, f_date DATE, f_worker INTEGER, f_position INTEGER, f_amount decimal);
+alter table d_part2 add column f_salary_percent decimal(5, 2);
+alter table d_part2 add f_position integer;
+alter table s_salary_attendance add  column f_indate date, add column f_intime time, add column f_outdate date, add column f_outtime time;
+alter table s_user_group add column f_starttime time, add column f_duration int;
+create table s_salary_rules (f_id integer primary key auto_increment, f_fixed decimal, f_min decimal, f_max decimal, f_dep integer, f_store integer, f_total decimal);
+alter table s_salary_rules add column f_position integer after f_id;
+create table s_salary_payment (f_id integer primary key,  f_date date, f_cashdoc char(36), f_worker integer, f_amount decimal);
+alter table s_salary_rules drop column f_store;
+ALTER TABLE `s_salary_payment` CHANGE COLUMN `f_id` `f_id` INT(11) NOT NULL AUTO_INCREMENT FIRST;
+alter table s_salary_payment add column f_position integer after f_cashdoc;
+alter table s_salary_payment drop column f_position;
+alter table s_salary_rules add column f_owntotal decimal (5,2);
+
+/* db - 124, 22.06.2023 */
+update s_app set f_version='124' where f_app='DB'; 
+INSERT INTO s_translator (f_en, f_am, f_ru) VALUES ('Customer', 'Հաճախորդ', 'Клиент');
+INSERT INTO s_translator (f_en, f_am, f_ru) VALUES ('List of names', 'Անվանացանկ', 'Список наименований');
+INSERT INTO s_translator (f_en, f_am, f_ru) VALUES ('Name', 'Անվանում', 'Наименование');
+INSERT INTO s_translator (f_en, f_am, f_ru) VALUES ('Qty', 'Քնկ', 'Кол-во');
+INSERT INTO s_translator (f_en, f_am, f_ru) VALUES ('Price', 'Գին', 'Цена');
+INSERT INTO s_translator (f_en, f_am, f_ru) VALUES ('Amount', 'Գումար', 'Сумма');
+
+/* db - 125, 22.06.2023 */
+update s_app set f_version='125' where f_app='DB'; 
+create table c_goods_partner (f_id integer primary key auto_increment, f_partner integer, f_goods integer);
+INSERT INTO s_translator (f_en, f_am, f_ru) VALUES ('Accumulate', 'Կուտակում', 'Накопление');
+DELETE FROM s_translator;
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('(F)', '(F)', '(Ֆ)');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Accumulate', 'Накопление', 'Կուտակում');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Amount', 'Сумма', 'Գումար');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Bank transfer', 'Банк. перевод', 'Փոխանցում');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Breakfast', 'Завтрак', 'Նախաճաշ');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('City Ledger', 'Должник', 'Դեբիտորական պարտք');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Class', 'Клас', 'Դաս');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Class | Name | Qty | Price | Total', 'Класс | Наименование | Колво | Цена | Итого', 'Դաս | Անվանում | Քանակ | Գին | Ընդամենը');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Complimentary', 'Подарок', 'Հյուրասիրություն');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Customer', 'Клиент', 'Հաճախորդ');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Date', 'Дата', 'Ամսաթիվ');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Department', 'Отдел', 'Բաժին');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Device number', 'Номер машины', 'Սարքի համար');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Discount', 'Скидка', 'Զեղչ');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Fiscal', 'Фискальный номер', 'Ֆիսկալ');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Idram', '', NULL);
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('List of names', 'Список наименований', 'Անվանացանկ');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Name', 'Наименование', 'Անվանում');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Need to pay', 'К оплате', 'Ենթակա է վճարման');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('No discount', 'Без скидки', 'Զեղչ չկա');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('No service', 'Без обслуживания', 'Սպասարկում չկա');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Pay by IDRAM', 'Оплата  через IDRAM', 'Վճարում IDRAM-ով');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Payment, card', 'Оплата картой', 'Վճարումը անկանխիկ');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Payment, cash', 'Оплата наличными', 'Վճարումը առնձերն');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Preorder', 'Заказ', 'Նախնական պատվեր');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Present', 'Угощение', 'Հյուրասիրություն');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Price', 'Цена', 'Գին');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Printed', 'Распечатано', 'Տպված');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Qty', 'Кол-во', 'Քնկ');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Receipt #', 'Счёт №', 'Հաշիվ №');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Refund', 'Возврат средств', 'Վերադարձ');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Sample', 'Вариант', 'Օրինակ');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Serial', 'Серийный номер', 'Սերիալ');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Service', 'Обслуживание', 'Սպասարկում');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Service fee included', 'Обслуживание', 'Այդ թվում սպասարկում');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Signature', 'Подпись', 'Ստորագրություն');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Staff', 'Обслужил', 'Սպասարկող');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Table', 'Стол', 'Սեղան');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Tax number', 'Код налог.', 'ՀՎՀՀ');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Tax TIN', 'Tax TIN', 'ՀՎՀՀ');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Thank For Your Visit', 'Спасибо за визит', 'Շնորհակալություն այցելության համար');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Total', 'Итого', 'Ընդամենը');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Transfer to room', 'Перевести на счёт номера', 'Կցել սենյակի հաշվին');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('ԱՀ', '', 'ԱՀ');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Բաժին', 'Отдел', 'Բաժին');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('ԳՀ', '-', 'ԳՀ');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('ԿՀ', 'НЧ', 'ԿՀ');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Ֆիսկալ', 'Фискальный', 'Ֆիսկալ');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Receipt number', 'ԿՀ', 'НЧ');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Time', 'Ժամ', 'Время');
+ALTER TABLE `s_translator` ADD UNIQUE INDEX `Индекс 1` (`f_en`(100));
+ALTER TABLE `c_goods_partner` ADD INDEX `Индекс 2` (`f_partner`);
+
+
+/* db - 126, 22.06.2023 */
+update s_app set f_version='126' where f_app='DB';
+create table a_header_sr (f_id integer primary key auto_increment, f_rec char(36), f_dish integer, f_goods integer, f_dish_qty decimal(12,3), f_goods_qty decimal(12,3));
+alter table a_header_sr add column f_date date after f_id;
+alter table a_header_sr add column f_store int after f_date;
+
+/* db - 127, 22.06.2023 */
+update s_app set f_version='127' where f_app='DB';
+create table e_cash_suggest(f_id integer primary key auto_increment, f_name tinytext);
+alter table c_goods add column f_nospecial_price integer;
+
+/* db - 128, 04.07.2023 */
+update s_app set f_version='128' where f_app='DB';
+alter table h_tables add column f_hourly integer;
+alter table a_header add column f_sessionid char(36);
+
+/* db - 129, 08.07.2023 */
+update s_app set f_version='129' where f_app='DB';
+alter table c_goods add column f_qtybox decimal;
+create table a_store_valid (f_id char(36) primary key, f_date date);

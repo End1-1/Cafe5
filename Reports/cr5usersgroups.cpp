@@ -8,9 +8,11 @@ CR5UsersGroups::CR5UsersGroups(const QStringList &dbParams, QWidget *parent) :
 {
     fIcon = ":/users_groups.png";
     fLabel = tr("Users groups");
-    fSqlQuery = "select f_id, f_name from s_user_group";
+    fSqlQuery = "select f_id, f_name, f_starttime, f_duration from s_user_group";
     fTranslation["f_id"] = tr("Code");
     fTranslation["f_name"] = tr("Name");
+    fTranslation["f_starttime"] = tr("Start time");
+    fTranslation["f_duration"] = tr("Duration");
     fEditor = new CE5UserGroup(dbParams);
 }
 

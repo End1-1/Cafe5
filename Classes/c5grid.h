@@ -117,7 +117,7 @@ protected:
 
     virtual void removeWithId(int id, int row);
 
-    void sumColumnsData();
+    virtual void sumColumnsData();
 
     virtual void restoreColumnsVisibility();
 

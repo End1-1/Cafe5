@@ -85,7 +85,10 @@ void C5LineEditWithSelector::setValue(int id)
 
 QString C5LineEditWithSelector::text()
 {
-    QString allowedChar("0123456789,");
+    if (property("allowall").toBool()) {
+        return C5LineEdit::text();
+    }
+    QString allowedChar("-0123456789,");
     QString t = C5LineEdit::text().trimmed();
     if (fCache > 0) {
         for (int i = t.length() - 1; i > -1; i--) {
@@ -96,6 +99,9 @@ QString C5LineEditWithSelector::text()
     }
     int i = t.length() - 1;
     while (i > 0) {
+        if (t.at(i) == "-") {
+            t.remove(i, 1);
+        }
         if (t.at(i) == ",") {
             if (t.at(i - 1) == ",") {
                 t.remove(i, 1);
@@ -148,12 +154,6 @@ void C5LineEditWithSelector::mouseDoubleClickEvent(QMouseEvent *e)
         if (fNameLineEdit) {
             fNameLineEdit->setText(textName);
         }
-//        if (fWidget && values.count() > 0) {
-//            fWidget->selectorCallback(0, values);
-//        }
-//        if (fDialog && values.count() > 0) {
-//            fDialog->selectorCallback(0, values);
-//        }
         emit multiDone(values);
     } else {
         QList<QVariant> values;

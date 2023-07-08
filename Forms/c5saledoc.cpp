@@ -15,9 +15,13 @@
 #include "breezeconfig.h"
 #include "armsoftexportoptions.h"
 #include "dlglist.h"
+#include "c5printtaxanywhere.h"
+#include "xlsxall.h"
 #include "httpquerydialog.h"
 #include "c5mainwindow.h"
 #include "ce5partner.h"
+#include "outputofheader.h"
+#include "printtaxn.h"
 #include "oheader.h"
 #include <QClipboard>
 
@@ -96,9 +100,13 @@ QToolBar *C5SaleDoc::toolBar()
         fActionSave = fToolBar->addAction(QIcon(":/save.png"), tr("Save"), this, SLOT(saveDataChanges()));
         fActionDraft = fToolBar->addAction(QIcon(":/draft.png"), tr("Draft"), this, SLOT(saveAsDraft()));
         fActionCopy = fToolBar->addAction(QIcon(":/copy.png"), tr("Copy"), this, SLOT(saveCopy()));
+        fRemoveAction  = fToolBar->addAction(QIcon(":/delete.png"), tr("Remove"), this, SLOT(removeDoc()));
+        fToolBar->addAction(QIcon(":/print.png"), tr("Make store output"), this, SLOT(makeStoreOutput()));
         fToolBar->addAction(QIcon(":/AS.png"), tr("Export to AS\r\n invoice"), this, SLOT(createInvoiceAS()));
         fToolBar->addAction(QIcon(":/AS.png"), tr("Export to AS\r\n retail"), this, SLOT(createRetailAS()));
         fToolBar->addAction(QIcon(":/print.png"), tr("Print"), this, SLOT(printSale()));
+        fPrintTax = fToolBar->addAction(QIcon(":/fiscal.png"), tr("Fiscal"), this, SLOT(fiscale()));
+        fToolBar->addAction(QIcon(":/excel.png"), tr("Export to Excel"), this, SLOT(exportToExcel()));
     }
     return fToolBar;
 }
@@ -127,16 +135,10 @@ bool C5SaleDoc::openDoc(const QString &uuid)
         C5Message::error(tr("Invalid draft document id"));
         return false;
     }
+    ui->cbHall->setCurrentIndex(ui->cbHall->findData(o.hall));
+    ui->cbCashDesk->setCurrentIndex(ui->cbCashDesk->findData(o.table));
 
-    ui->leSaleType->setProperty("id", db.getInt("f_saletype"));
-    switch (db.getInt("f_saletype")) {
-    case 1:
-        ui->leSaleType->setText(tr("Retail"));
-        break;
-    case 2:
-        ui->leSaleType->setText(tr("Whosale"));
-        break;
-    }
+    setMode(db.getInt("f_saletype"));
     ui->flag->setVisible(db.getInt("f_flag") == 1);
 
     if (db.getInt("f_state") > 1) {
@@ -202,6 +204,73 @@ void C5SaleDoc::printSale()
     }
 }
 
+void C5SaleDoc::fiscale()
+{
+//    auto *d = new C5PrintTaxAnywhere(fDBParams, ui->leUuid->text());
+//    d->exec();
+//    d->deleteLater();
+//    return;
+    C5Database db(fDBParams);
+    db[":f_header"] = ui->leUuid->text();
+    db.exec("select gr.f_adgcode, og.f_goods, gn.f_name, og.f_price, og.f_qty, og.f_discountfactor*100 as f_discount "
+            "from o_goods og "
+            "left join c_goods gn on gn.f_id=og.f_goods "
+            "left join c_groups gr on gr.f_id=gn.f_group "
+            "where og.f_header=:f_header");
+    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
+    while (db.nextRow()) {
+        pt.addGoods("1", //dep
+                    db.getString("f_adgcode"), //adg
+                    db.getString("f_goods"), //goods id
+                    db.getString("f_name"), //name
+                    db.getDouble("f_qty"), //price
+                    db.getDouble("f_price"), //qty
+                    db.getDouble("f_discount")); //discount
+    }
+    QString jsonIn, jsonOut, err;
+    QString sn, firm, address, fiscal, hvhh, rseq, devnum, time;
+    int result = 0;
+    result = pt.makeJsonAndPrint(ui->leCard->getDouble()
+                                 + ui->leDebt->getDouble()
+                                 + ui->leBankTransfer->getDouble(), 0, jsonIn, jsonOut, err);
+
+    db[":f_id"] = db.uuid();
+    db[":f_order"] = ui->leUuid->text();
+    db[":f_date"] = QDate::currentDate();
+    db[":f_time"] = QTime::currentTime();
+    db[":f_in"] = jsonIn;
+    db[":f_out"] = jsonOut;
+    db[":f_err"] = err;
+    db[":f_result"] = result;
+    db.insert("o_tax_log", false);
+    QSqlQuery *q = new QSqlQuery(db.fDb);
+    if (result == pt_err_ok) {
+        PrintTaxN::parseResponse(jsonOut, firm, hvhh, fiscal, rseq, sn, address, devnum, time);
+        db[":f_id"] = ui->leUuid->text();
+        db.exec("delete from o_tax where f_id=:f_id");
+        db[":f_id"] = ui->leUuid->text();
+        db[":f_dept"] = C5Config::taxDept();
+        db[":f_firmname"] = firm;
+        db[":f_address"] = address;
+        db[":f_devnum"] = devnum;
+        db[":f_serial"] = sn;
+        db[":f_fiscal"] = fiscal;
+        db[":f_receiptnumber"] = rseq;
+        db[":f_hvhh"] = hvhh;
+        db[":f_fiscalmode"] = tr("(F)");
+        db[":f_time"] = time;
+        db.insert("o_tax", false);
+        pt.saveTimeResult(ui->leUuid->text(), *q);
+        delete q;
+        fPrintTax->setVisible(false);
+        C5Message::info(tr("Printed"));
+    } else {
+        pt.saveTimeResult("Not saved - " + ui->leUuid->text(), *q);
+        delete q;
+        C5Message::error(err + "<br>" + jsonOut + "<br>" + jsonIn);
+    }
+}
+
 void C5SaleDoc::createInvoiceAS()
 {
     exportToAs(5);
@@ -210,6 +279,135 @@ void C5SaleDoc::createInvoiceAS()
 void C5SaleDoc::createRetailAS()
 {
     exportToAs(20);
+}
+
+void C5SaleDoc::makeStoreOutput()
+{
+    C5Database db(fDBParams);
+    OutputOfHeader ooh;
+    ooh.make(db, ui->leUuid->text());
+}
+
+void C5SaleDoc::exportToExcel()
+{
+    int fXlsxFitToPage = 0;
+    QString fXlsxPageOrientation = xls_page_orientation_portrait;
+    int fXlsxPageSize = xls_page_size_a4;
+
+    XlsxDocument d;
+    XlsxSheet *s = d.workbook()->addSheet("Sheet1");
+    s->setupPage(fXlsxPageSize, fXlsxFitToPage, fXlsxPageOrientation);
+    /* HEADER */
+    QColor color = Qt::white;
+    QFont headerFont(qApp->font());
+    d.style()->addFont("header", headerFont);
+    d.style()->addBackgrounFill("header", color);
+    d.style()->addHAlignment("header", xls_alignment_center);
+    d.style()->addBorder("header", XlsxBorder());
+
+
+    s->setColumnWidth(1, 10);
+    s->setColumnWidth(2, 15);
+    s->setColumnWidth(3, 50);
+    s->setColumnWidth(4, 20);
+    s->setColumnWidth(5, 20);
+    s->setColumnWidth(6, 20);
+    s->setColumnWidth(7, 20);
+
+    int col = 1, row = 1;
+    s->addCell(row, col, QString("%1 N%2").arg(tr("Order"), ui->leDocnumber->text()),
+                                           d.style()->styleNum("header"));
+
+    row++;
+
+    if (!ui->leTaxpayerName->isEmpty()) {
+        s->addCell(row, col, tr("Buyer") + " " + ui->leTaxpayerName->text(), d.style()->styleNum("header"));
+        row++;
+    }
+
+    QList<int> cols;
+    QStringList vals;
+    col = 1;
+    cols << col++;
+    vals << tr("Date");
+    for (int i = 0; i < cols.count(); i++) {
+        s->addCell(row, cols.at(i), vals.at(i), d.style()->styleNum("header"));
+    }
+    row++;
+
+    vals.clear();
+    vals << ui->leDate->text() + " " + ui->leTime->text();
+    for (int i = 0; i < cols.count(); i++) {
+        s->addCell(row, cols.at(i), vals.at(i), d.style()->styleNum("header"));
+    }
+    row += 2;
+
+    cols.clear();
+    for (int i = 0; i < 7; i++) {
+        cols << i + 1;
+    }
+    vals.clear();
+    vals << tr("NN")
+         << tr("Material code")
+         << tr("Goods")
+         << tr("Qty")
+         << tr("Unit")
+         << tr("Price")
+         << tr("Total");
+    for (int i = 0; i < cols.count(); i++) {
+        s->addCell(row, cols.at(i), vals.at(i), d.style()->styleNum("header"));
+    }
+    row++;
+    QMap<int, QString> bgFill;
+    QMap<int, QString> bgFillb;
+    QFont bodyFont(qApp->font());
+    d.style()->addFont("body", bodyFont);
+    d.style()->addBackgrounFill("body", QColor(Qt::white));
+    d.style()->addVAlignment("body", xls_alignment_center);
+    d.style()->addBorder("body", XlsxBorder());
+    bgFill[QColor(Qt::white).rgb()] = "body";
+    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+        vals.clear();
+        vals << QString::number(i + 1);
+        vals << ui->tblGoods->getString(i, 4);
+        vals << ui->tblGoods->getString(i, 5);
+        vals << ui->tblGoods->lineEdit(i, 6)->text();
+        vals << ui->tblGoods->getString(i, 7);
+        vals << ui->tblGoods->lineEdit(i, 8)->text();
+        vals << ui->tblGoods->lineEdit(i, 9)->text();
+        for (int i = 0; i < cols.count(); i++) {
+            s->addCell(row, cols.at(i), vals.at(i), d.style()->styleNum("body"));
+        }
+        row++;
+    }
+
+    cols.clear();
+    cols << 6 << 7;
+    vals.clear();
+    vals << tr("Total amount");
+    vals << QString::number(str_float(ui->leGrandTotal->text()));
+    for (int i = 0; i < cols.count(); i++) {
+        s->addCell(row, cols.at(i), vals.at(i), d.style()->styleNum("header"));
+    }
+    row++;
+
+
+    col = 1;
+    s->setSpan(1, col, 1, col + 5);
+    s->setSpan(2, col, 2, col + 5);
+    s->setSpan(3, col, 3, col + 5);
+    s->setSpan(4, col, 4, col + 5);
+
+
+
+
+    QString err;
+    if (!d.save(err, true)) {
+        if (!err.isEmpty()) {
+            C5Message::error(err);
+        }
+    }
+
 }
 
 void C5SaleDoc::messageResult(QJsonObject jo)
@@ -413,7 +611,7 @@ void C5SaleDoc::saveDataChanges()
 //        if (ui->tblGoods->comboBox(i, col_store)->currentData().toInt() == ui->cbStorage->currentData().toInt()) {
 //            continue;
 //        }
-        usedStores.insert(ui->tblGoods->comboBox(i, col_store)->itemData(i).toInt());
+        usedStores.insert(ui->tblGoods->comboBox(i, col_store)->currentData().toInt());
     }
 
     //Output of storage not equal to current storage
@@ -430,7 +628,7 @@ void C5SaleDoc::saveDataChanges()
             if (ui->tblGoods->getInteger(i, col_type) == 1) {
                 continue;
             }
-            if (ui->tblGoods->comboBox(i, col_store)->itemData(i).toInt() != store) {
+            if (ui->tblGoods->comboBox(i, col_store)->currentData().toInt() != store) {
                 continue;
             }
             if (outStoreDocId.isEmpty()) {
@@ -528,6 +726,7 @@ void C5SaleDoc::saveDataChanges()
         db[":f_date"] = ui->leDate->date();
         db[":f_currency"] = 1;
         db[":f_source"] = 1;
+        db[":f_flag"] = ui->cbHall->currentData();
         db.insert("b_clients_debts", false);
     }
 
@@ -768,7 +967,7 @@ void C5SaleDoc::setPartner()
     fSpecialPrices.clear();
     C5Database db(fDBParams);
     db[":f_partner"] = fPartner.id;
-    db.exec("select f_goods, f_price from c_goods_special_prices where f_partner=:f_partner");
+    db.exec("select f_goods, f_price from c_goods_special_prices where f_partner=:f_partner and f_goods not in (select f_id from c_goods where f_nospecial_price=1)");
     while (db.nextRow()) {
         fSpecialPrices[db.getInt("f_goods")] = db.getDouble("f_price");
     }
@@ -785,7 +984,7 @@ void C5SaleDoc::setPartner(const CPartners &p)
 {
     ui->leTaxpayerName->setText(QString("%1, %2, %3").arg(fPartner.categoryName, fPartner.groupName, fPartner.taxName));
     ui->leTaxpayerId->setText(fPartner.taxCode);
-    setMode(fPartner.pricePolitic);
+    //setMode(fPartner.pricePolitic);
 }
 
 void C5SaleDoc::setDeliveryMan()
@@ -827,7 +1026,7 @@ void C5SaleDoc::exportToAs(int doctype)
         connStr = db.getString(0, "f_connectionstring");
     }
 
-    BreezeConfig *b = Config::construct<BreezeConfig>(fDBParams, 1);
+    BreezeConfig *b = Configs::construct<BreezeConfig>(fDBParams, 1);
     QJsonObject jo;
     jo["pkServerAPIKey"] = b->apiKey;
     jo["pkFcmToken"] = "0123456789";
@@ -1116,4 +1315,18 @@ void C5SaleDoc::saveCopy()
     db.commit();
    auto *doc = __mainWindow->createTab<C5SaleDoc>(fDBParams);
    doc->openDraft(fDraftSale.id.toString());
+}
+
+void C5SaleDoc::removeDoc()
+{
+    if (C5Message::question(tr("Confirm to remove document")) != QDialog::Accepted) {
+        return;
+    }
+    C5Database db(fDBParams);
+    db.startTransaction();
+    RemoveShopSale rs(fDBParams);
+    rs.remove(db, ui->leUuid->text());
+    db.commit();
+    C5Message::info(tr("Removed"));
+    __mainWindow->removeTab(this);
 }

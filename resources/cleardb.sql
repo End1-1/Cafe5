@@ -94,6 +94,9 @@ delete from o_service_values;
 delete from s_custom_reports;
 delete from s_report_template where f_id>0;
 delete from s_report_template_access where f_report>0;
+delete from b_gift_card;
+delete from b_gift_card_history;
+delete from b_gift_card_sale_options;
 
 delete from mf_daily_workers;
 delete from mf_daily_process;
@@ -125,6 +128,9 @@ alter table s_user_group auto_increment = 1;
 alter table s_user auto_increment = 1;
 alter table s_report_template auto_increment = 0;
 alter table s_report_template_access auto_increment = 0;
+alter table b_gift_card auto_increment = 0;
+alter table b_gift_card_history auto_increment = 0;
+alter table b_gift_card_sale_options auto_increment = 0;
 
 ALTER TABLE s_syncronize AUTO_INCREMENT = 0 ;
 ALTER TABLE d_package AUTO_INCREMENT = 0 ;

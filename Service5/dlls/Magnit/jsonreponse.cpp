@@ -70,6 +70,9 @@ void JsonReponse::getResponse()
     case hqCompleteDelivery:
         completeDelivery();
         break;
+    case hqGoodsPartners:
+        goodsPartners();
+        break;
     default:
         fJsonOut["ok"] = 0;
         fJsonOut["message"] = QString("%1 %2").arg(lkUnknownProtocol, fJsonIn["pkAction"].toString());
@@ -206,7 +209,7 @@ bool JsonReponse::downloadData()
     fDb[":f_enabled"] = 1;
     if (!fDb.exec("select g.f_id as `id`, gr.f_name as `groupName`, g.f_name as `goodsName`, "
                   "gp.f_price1 as `price1`, gp.f_price2 as `price2`, 0 as specialflag, "
-                  "g.f_lowlevel as qtystop  "
+                  "g.f_lowlevel as qtystop, g.f_nospecial_price as nospecialprice  "
                   "from c_goods g "
                   "left join c_groups gr on gr.f_id=g.f_group "
                   "left join c_goods_prices gp on gp.f_goods=g.f_id "
@@ -263,6 +266,13 @@ bool JsonReponse::downloadData()
     ja = QJsonArray();
     dbToArray(fDb, ja);
     fJsonOut["drivers"] = ja;
+
+    if (!fDb.exec("select f_partner as partner, f_goods as goods from c_goods_partner")) {
+        return dbFail();
+    }
+    ja = QJsonArray();
+    dbToArray(fDb, ja);
+    fJsonOut["partnersgoods"] = ja;
 
     fDb[":f_id"] = fUserId;
     if (!fDb.exec("select f_config from s_user where f_id=:f_id")) {
@@ -440,6 +450,27 @@ bool JsonReponse::saveOrder()
                 }
             }
         }
+
+        fDb[":f_partner"] = fJsonIn["partner"]["id"].toInt();
+        fDb.exec("select f_goods from c_goods_partner where f_partner=:f_partner");
+        QSet<int> oldgoods;
+        QSet<int> newgoods;
+        while (fDb.next()) {
+            oldgoods.insert(fDb.integer("f_goods"));
+        }
+        for (int i = 0; i < ja.size(); i++) {
+            QJsonObject o = ja.at(i).toObject();
+            if (o["qtysale"].toDouble() > 0.001) {
+                if (!oldgoods.contains(o["id"].toInt())) {
+                    newgoods.insert(o["id"].toInt());
+                }
+            }
+        }
+        foreach (int goodsid, newgoods) {
+            fDb[":f_partner"] = fJsonIn["partner"]["id"].toInt();
+            fDb[":f_goods"] = goodsid;
+            fDb.insert("c_goods_partner");
+        }
     }
 
     if (!backBody.isEmpty()) {
@@ -488,10 +519,10 @@ void JsonReponse::preordersList()
     }
     switch (state) {
     case 1:
-        where += " and o.f_date=:f_datefor";
+        where += " and o.f_datefor=:f_datefor";
         break;
     case 2:
-        where += " and o.f_datefor=:f_datefor";
+        //where += " and o.f_datefor=:f_datefor";
         break;
     default:
         where += " and o.f_datefor=:f_datefor";
@@ -499,12 +530,12 @@ void JsonReponse::preordersList()
     }
 
     fDb[":f_datefor"] = date;
-    if (!fDb.exec(QString("select o.f_id as `id`, date_format(o.f_date, '%d/%m/%Y')as `date`, "
+    if (!fDb.exec(QString("select o.f_id as `id`, date_format(o.f_datefor, '%d/%m/%Y')as `date`, "
                           "p.f_name as `partnername`, p.f_address as `address`, o.f_amount as `amount`, "
                           "o.f_payment as payment, o.f_state as state "
                           "from o_draft_sale o "
                           "left join c_partners p on p.f_id=o.f_partner %1 "
-                          "order by o.f_date ").arg(where))) {
+                          "order by o.f_datefor ").arg(where))) {
         fJsonOut[pkOk] = 0;
         fJsonOut[pkMessage] = fDb.lastDbError();
         fDb.rollback();
@@ -614,15 +645,22 @@ bool JsonReponse::getRoute()
     fDb[":f_driver"] = driver;
     fDb[":f_round"] = round;
     fDb[":f_datefor"] = date;
-    if (!fDb.exec(QString("select r.f_partner as partnerid, p.f_name as partnername, p.f_address as address, cast(count(o.f_id) as signed) as orders, "
-                          "coalesce(re.f_action, 0) as `action` "
-                          "from o_route r  "
+    QString where = "";
+    if (fJsonIn[pkPartner].toInt() > 0) {
+        where = "and p.f_id=" + QString::number(fJsonIn[pkPartner].toInt());
+    }
+    if (!fDb.exec(QString("select distinct(r.f_partner) as partnerid, p.f_name as partnername, p.f_address as address, "
+                          "cast(count(o.f_id) as signed) as orders, "
+                          "coalesce(re.f_action, '') as `action`, o.f_id as deliveryid "
+                          "from c_partners p  "
+                          "left join o_route r on p.f_id=r.f_partner "
                           "left join o_draft_sale o on o.f_partner=r.f_partner and o.f_datefor=:f_datefor "
-                          "left join o_route_exec re on re.f_partner=r.f_partner and re.f_date=:f_datefor "
-                          "left join c_partners p on p.f_id=r.f_partner "
-                          "where (r.f_%1=1 and r.f_driver=:f_driver and r.f_round=:f_round) or (weekday(o.f_datefor)=%2 and o.f_state=2)  "
-                          "group by 1, 5 "
-                          "order by f_q").arg(day).arg(day - 1))) {
+                          "left join (select f_partner, group_concat(f_action) as f_action "
+                            "from o_route_exec where f_date=:f_datefor group by 1) re on re.f_partner=r.f_partner "
+                          "where ((r.f_%1=1 and r.f_driver=:f_driver and r.f_round=:f_round) "
+                          "or (weekday(o.f_datefor)=%2 and o.f_state=2)) or (length(re.f_action) > 0) %3 "
+                          "group by 1, 5, 6 "
+                          "order by f_q ").arg(day).arg(day - 1).arg(where))) {
         return dbFail();
     }
     QJsonArray ja;
@@ -759,7 +797,7 @@ bool JsonReponse::completeDelivery()
     }
 
     fDb[":f_partner"] = fDb.integer("f_partner");
-    fDb[":f_action"] = 2;
+    fDb[":f_action"] = 4;
     fDb[":f_date"] = QDate::currentDate();
     fDb[":f_driver"] = fUserId;
     fDb[":f_action_datetime"] = QDateTime::currentDateTime();
@@ -770,4 +808,16 @@ bool JsonReponse::completeDelivery()
     }
 
     return ok();
+}
+
+bool JsonReponse::goodsPartners()
+{
+    if (!fDb.exec("select f_partner, f_goods from c_goods_partners")) {
+        return dbFail();
+    }
+    QJsonArray ja;
+    dbToArray(fDb, ja);
+    fJsonOut[pkOk] = 1;
+    fJsonOut[pkData] = ja;
+    return true;
 }

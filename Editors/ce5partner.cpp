@@ -105,3 +105,15 @@ bool CE5Partner::checkData(QString &err)
     }
     return err.isEmpty();
 }
+
+void CE5Partner::on_btnClearManager_clicked()
+{
+    if (ui->leCode->getInteger() == 0) {
+        return;
+    }
+    C5Database db(fDBParams);
+    db[":f_id"] = ui->leCode->getInteger();
+    db[":f_manager"] = 0;
+    db.exec("update c_partners set f_manager=:f_manager where f_id=:f_id");
+    ui->cbManager->setCurrentIndex(-1);
+}

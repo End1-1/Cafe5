@@ -297,56 +297,12 @@
          </property>
          <layout class="QGridLayout" name="gridLayout_3">
           <item row="4" column="0" colspan="2">
-           <widget class="C5CheckBox" name="checkBox_2">
+           <widget class="C5CheckBox" name="chServiceFee">
             <property name="text">
              <string>Append service fee</string>
             </property>
             <property name="Field" stdset="0">
              <string>f_service</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_7">
-            <property name="text">
-             <string>Color</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_10">
-            <property name="text">
-             <string>Hourly payment</string>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="0">
-           <widget class="C5CheckBox" name="checkBox_3">
-            <property name="text">
-             <string>Reminder</string>
-            </property>
-            <property name="Field" stdset="0">
-             <string>f_remind</string>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="0" colspan="2">
-           <widget class="C5CheckBox" name="checkBox">
-            <property name="text">
-             <string>Can discount</string>
-            </property>
-            <property name="Field" stdset="0">
-             <string>f_discount</string>
-            </property>
-           </widget>
-          </item>
-          <item row="7" column="0">
-           <widget class="C5CheckBox" name="checkBox_4">
-            <property name="text">
-             <string>Extra</string>
-            </property>
-            <property name="Field" stdset="0">
-             <string>f_extra</string>
             </property>
            </widget>
           </item>
@@ -363,6 +319,96 @@
             </property>
             <property name="Type" stdset="0">
              <number>1</number>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0">
+           <widget class="C5CheckBox" name="checkBox_3">
+            <property name="text">
+             <string>Reminder</string>
+            </property>
+            <property name="Field" stdset="0">
+             <string>f_remind</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="C5LineEditWithSelector" name="leQueue_2">
+            <property name="maximumSize">
+             <size>
+              <width>50</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="Field" stdset="0">
+             <string>f_specialdiscount</string>
+            </property>
+            <property name="Type" stdset="0">
+             <string>1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_5">
+            <property name="text">
+             <string>Queue</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_10">
+            <property name="text">
+             <string>Hourly payment</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_7">
+            <property name="text">
+             <string>Color</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0" colspan="2">
+           <widget class="C5CheckBox" name="chDiscount">
+            <property name="text">
+             <string>Can discount</string>
+            </property>
+            <property name="Field" stdset="0">
+             <string>f_discount</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_11">
+            <property name="text">
+             <string>Special dicount</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="C5LineEditWithSelector" name="leQueue">
+            <property name="maximumSize">
+             <size>
+              <width>50</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="Field" stdset="0">
+             <string>f_queue</string>
+            </property>
+            <property name="Type" stdset="0">
+             <string>1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="0">
+           <widget class="C5CheckBox" name="checkBox_4">
+            <property name="text">
+             <string>Extra</string>
+            </property>
+            <property name="Field" stdset="0">
+             <string>f_extra</string>
             </property>
            </widget>
           </item>
@@ -385,52 +431,6 @@
             </property>
             <property name="SetColor" stdset="0">
              <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_5">
-            <property name="text">
-             <string>Queue</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="C5LineEditWithSelector" name="leQueue">
-            <property name="maximumSize">
-             <size>
-              <width>50</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="Field" stdset="0">
-             <string>f_queue</string>
-            </property>
-            <property name="Type" stdset="0">
-             <string>1</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_11">
-            <property name="text">
-             <string>Special dicount</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="C5LineEditWithSelector" name="leQueue_2">
-            <property name="maximumSize">
-             <size>
-              <width>50</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="Field" stdset="0">
-             <string>f_specialdiscount</string>
-            </property>
-            <property name="Type" stdset="0">
-             <string>1</string>
             </property>
            </widget>
           </item>
@@ -466,6 +466,26 @@
               <number>0</number>
              </property>
              <item>
+              <widget class="QLabel" name="label_9">
+               <property name="text">
+                <string>Ready dish weight</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="C5LineEditWithSelector" name="leReadyWeight">
+               <property name="maximumSize">
+                <size>
+                 <width>100</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="Field" stdset="0">
+                <string>f_netweight</string>
+               </property>
+              </widget>
+             </item>
+             <item>
               <spacer name="horizontalSpacer_2">
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
@@ -477,58 +497,6 @@
                 </size>
                </property>
               </spacer>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_9">
-               <property name="text">
-                <string>One portion qty</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="btnMultRecipe">
-               <property name="focusPolicy">
-                <enum>Qt::NoFocus</enum>
-               </property>
-               <property name="toolTip">
-                <string>Multiple recipe quantity</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset resource="../resources/res.qrc">
-                 <normaloff>:/order.png</normaloff>:/order.png</iconset>
-               </property>
-               <property name="mult" stdset="0">
-                <bool>false</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="C5LineEditWithSelector" name="lePortionQty">
-               <property name="enabled">
-                <bool>true</bool>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>100</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="focusPolicy">
-                <enum>Qt::ClickFocus</enum>
-               </property>
-               <property name="readOnly">
-                <bool>false</bool>
-               </property>
-               <property name="Field" stdset="0">
-                <string>f_recipeqty</string>
-               </property>
-               <property name="Type" stdset="0">
-                <number>2</number>
-               </property>
-              </widget>
              </item>
             </layout>
            </widget>
@@ -592,16 +560,6 @@
                <column>
                 <property name="text">
                  <string>Qty</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>Weight netto</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>Weight brutto</string>
                 </property>
                </column>
                <column>
@@ -732,6 +690,23 @@
               </widget>
              </item>
              <item>
+              <widget class="QPushButton" name="btnAddDishRecipe">
+               <property name="focusPolicy">
+                <enum>Qt::NoFocus</enum>
+               </property>
+               <property name="toolTip">
+                <string>Add goods (+)</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="../resources/res.qrc">
+                 <normaloff>:/add_work.png</normaloff>:/add_work.png</iconset>
+               </property>
+              </widget>
+             </item>
+             <item>
               <widget class="QPushButton" name="btnNewGoods">
                <property name="focusPolicy">
                 <enum>Qt::NoFocus</enum>
@@ -813,23 +788,6 @@
                <property name="icon">
                 <iconset resource="../resources/res.qrc">
                  <normaloff>:/print.png</normaloff>:/print.png</iconset>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="btnDivQty">
-               <property name="focusPolicy">
-                <enum>Qt::NoFocus</enum>
-               </property>
-               <property name="toolTip">
-                <string>Divide all quantites</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset resource="../resources/res.qrc">
-                 <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
                </property>
               </widget>
              </item>
@@ -1020,8 +978,8 @@
   <tabstop>leQueue</tabstop>
   <tabstop>leColor</tabstop>
   <tabstop>leHourlyPayment</tabstop>
-  <tabstop>checkBox_2</tabstop>
-  <tabstop>checkBox</tabstop>
+  <tabstop>chServiceFee</tabstop>
+  <tabstop>chDiscount</tabstop>
   <tabstop>checkBox_3</tabstop>
   <tabstop>tblPricing</tabstop>
   <tabstop>leDishComment</tabstop>

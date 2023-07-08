@@ -11,6 +11,7 @@ CE5DishPart2::CE5DishPart2(const QStringList &dbParams, QWidget *parent) :
     ui->setupUi(this);
     ui->leDept->setSelector(dbParams, ui->leDeptName, cache_dish_part1);
     ui->leParent->setSelector(dbParams, ui->leParentName, cache_dish_part2);
+    ui->lePosition->setSelector(dbParams, ui->lePositionName, cache_users_groups);
     connect(ui->leColor, SIGNAL(doubleClicked()), this, SLOT(selectColor()));
 }
 

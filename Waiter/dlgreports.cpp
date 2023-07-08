@@ -6,10 +6,11 @@
 #include "c5cafecommon.h"
 #include "c5user.h"
 #include "datadriver.h"
-#include "dlglistofshifts.h"
 #include "dlgreceiptlanguage.h"
 #include "dlglistofhall.h"
 #include "printtaxn.h"
+#include "c5printing.h"
+#include "dlgcashbuttonopions.h"
 
 DlgReports::DlgReports(const QStringList &dbParams, C5User *user) :
     C5Dialog(dbParams),
@@ -45,7 +46,7 @@ void DlgReports::getDailyCommon(const QDate &date1, const QDate &date2)
     sh->bind("date1", date1.toString(FORMAT_DATE_TO_STR_MYSQL));
     sh->bind("date2", date2.toString(FORMAT_DATE_TO_STR_MYSQL));
     sh->bind("hall", QString::number(fCurrentHall));
-    sh->bind("shift", QString::number(fShiftId));
+    sh->bind("opened", QString::number(ui->btnOpened->isChecked()));
     sh->bind("cash", QString::number(__c5config.cashId()));
     sh->send();
 }
@@ -260,13 +261,6 @@ void DlgReports::on_btnHall_clicked()
     ui->btnHall->setText(fCurrentHall == 0 ? tr("All") : dbhall->name(fCurrentHall));
 }
 
-void DlgReports::on_btnShift_clicked()
-{
-    if (DlgListOfShifts::getShift(fShiftId, fShiftName)) {
-        ui->btnShift->setText(fShiftName);
-    }
-}
-
 void DlgReports::on_btnReturnTaxReceipt_clicked()
 {
     QModelIndexList l = ui->tbl->selectionModel()->selectedRows();
@@ -300,3 +294,124 @@ void DlgReports::on_btnPrintTaxZ_clicked()
     sh->send();
 }
 
+
+void DlgReports::on_btnCashobx_clicked()
+{
+   bool closecash = false;
+   switch (DlgCashButtonOpions::getOptions()) {
+   case 0:
+       return;
+   case 1:
+       closecash = true;
+       break;
+   case 2:
+       break;
+   }
+
+   C5Database db(__c5config.dbParams());
+   db.exec("SELECT 'եկամուտ', 'title', 0 "
+            "UNION "
+
+            "SELECT en.f_name AS f_cashname, ah.f_comment, sum(e.f_amount) "
+            "FROM e_cash e "
+            "LEFT JOIN e_cash_names en ON en.f_id=e.f_cash "
+            "LEFT join a_header ah ON ah.f_id=e.f_header "
+            "WHERE e.f_sign=1 and ah.f_sessionid IS NULL "
+            "GROUP BY 1, 2 "
+
+            "UNION "
+            "SELECT 'ծախսեր', 'title', 0 "
+            "union "
+
+            "SELECT en.f_name AS f_cashname, ah.f_comment,  sum(e.f_amount*-1) "
+            "FROM e_cash e "
+            "LEFT JOIN e_cash_names en ON en.f_id=e.f_cash "
+            "LEFT join a_header ah ON ah.f_id=e.f_header "
+            "WHERE e.f_sign=-1 and ah.f_sessionid IS NULL "
+            "GROUP BY 1, 2 "
+
+            "UNION "
+            "SELECT 'վերջնահաշվարկ', 'title', 0 "
+            "union "
+
+            "SELECT en.f_name AS f_cashname, '',  sum(e.f_amount*e.f_sign) "
+            "FROM e_cash e "
+            "LEFT JOIN e_cash_names en ON en.f_id=e.f_cash "
+            "LEFT join a_header ah ON ah.f_id=e.f_header "
+            "WHERE ah.f_sessionid IS NULL "
+            "GROUP BY 1");
+
+   int bs = 22;
+   QFont font(qApp->font());
+   font.setPointSize(bs);
+   C5Printing p;
+   p.setSceneParams(700, 2600, QPrinter::Portrait);
+   p.setFont(font);
+   p.image("./logo_receipt.png", Qt::AlignHCenter);
+   p.br();
+   p.setFontSize(bs + 2);
+   p.setFontBold(true);
+   p.ctext(QDate::currentDate().toString(FORMAT_DATE_TO_STR));
+   p.br();
+   if (closecash) {
+       p.setFontSize(bs + 4);
+       p.setFontBold(true);
+       p.ctext(tr("Cash closing"));
+       p.br();
+   }
+   double total = -1000000000;
+   while (db.nextRow()) {
+    if (db.getString(1) == "title") {
+
+        if (total > -1000000000) {
+            p.setFontSize(bs + 2);
+            p.setFontBold(true);
+            p.ltext(tr("Total"), 0);
+            p.rtext(float_str(total, 2));
+            p.br();
+            p.line();
+            p.br();
+            p.line();
+            p.br();
+            p.line();
+            p.br(2);
+            p.br(2);
+        }
+        total = 0;
+        p.setFontSize(bs + 2);
+        p.setFontBold(true);
+        p.ctext(db.getString(0));
+        p.br();
+        p.line();
+        p.br();
+        continue;
+    }
+    p.setFontSize(bs);
+    p.setFontBold(false);
+    total += db.getDouble(2);
+    p.ltext(db.getString(0), 0);
+    p.rtext(float_str(db.getDouble(2), 2));
+    p.br();
+   }
+   if (total  -1000000000) {
+       p.setFontSize(bs + 2);
+       p.setFontBold(true);
+       p.ltext(tr("Total"), 0);
+       p.rtext(float_str(total, 2));
+       p.br();
+       p.line();
+       p.br();
+       p.line();
+       p.br();
+       p.line();
+       p.br(2);
+       p.br(2);
+   }
+   p.setFontSize(bs - 4);
+   p.setFontBold(false);
+   p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
+
+   if (closecash) {
+       db.exec("update a_header set f_sessionid=uuid() where f_sessionid is null");
+   }
+}

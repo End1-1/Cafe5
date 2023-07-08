@@ -73,3 +73,8 @@ bool DbTables::closeTable(int id, QString &err)
     }
     return true;
 }
+
+int DbTables::hourlyId(int id)
+{
+    return get(id, "f_hourly").toInt();
+}

@@ -20,6 +20,14 @@ public:
 private slots:
     void on_list_itemClicked(QListWidgetItem *item);
 
+    void on_btnStartBack_clicked();
+
+    void on_btnStartForward_clicked();
+
+    void on_btnEndBack_clicked();
+
+    void on_btnEndForward_clicked();
+
 private:
     Ui::DlgSmartReports *ui;
 
@@ -28,6 +36,8 @@ private:
     void reportCommonDishesWithTime();
 
     void printDeliveryReport();
+
+    void printTotalReport();
 };
 
 #endif // DLGSMARTREPORTS_H

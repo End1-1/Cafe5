@@ -8,11 +8,12 @@ CR5DishPart2::CR5DishPart2(const QStringList &dbParams, QWidget *parent) :
 {
     fIcon = ":/menu.png";
     fLabel = tr("Types of dishes");
-    fSqlQuery = "select t.f_id, p.f_name as part_name, p2.f_name as f_parentname, t.f_name, t.f_adgCode, \
-                t.f_queue, t.f_color \
-                from d_part2 t \
-                left join d_part1 p on p.f_id=t.f_part \
-                left join d_part2 p2 on p2.f_id=t.f_parent ";
+    fSqlQuery = "select t.f_id, p.f_name as part_name, p2.f_name as f_parentname, t.f_name, t.f_adgCode, "
+                "t.f_queue, t.f_salary_percent, g.f_name as f_positionname, t.f_color "
+                "from d_part2 t "
+                "left join d_part1 p on p.f_id=t.f_part "
+                "left join d_part2 p2 on p2.f_id=t.f_parent "
+                "left join s_user_group g on g.f_id=t.f_position ";
     fTranslation["f_id"] = tr("Code");
     fTranslation["part_name"] = tr("Dept name");
     fTranslation["f_name"] = tr("Name");
@@ -20,6 +21,8 @@ CR5DishPart2::CR5DishPart2(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_queue"] = tr("Queue");
     fTranslation["f_color"] = tr("Color");
     fTranslation["f_parentname"] = tr("Parent");
+    fTranslation["f_salary_percent"] = tr("Salary");
+    fTranslation["f_positionname"] = tr("Position");
     fEditor = new CE5DishPart2(dbParams);
 }
 

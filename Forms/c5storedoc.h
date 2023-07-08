@@ -31,6 +31,8 @@ public:
 
     bool openDoc(QString id, QString &err);
 
+    void correctDebt();
+
     void setMode(STORE_DOC sd);
 
     void setLastInputPrices();

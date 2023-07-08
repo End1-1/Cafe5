@@ -153,6 +153,7 @@ void C5Permissions::init(C5Database &db, int group)
               << cp_t9_salary
               << cp_t9_salary_doc
               << cp_t9_report
+              << cp_t9_payment
 
               << cp_t10_manufacture
               << cp_t10_action_list

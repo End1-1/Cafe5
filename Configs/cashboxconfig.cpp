@@ -1,7 +1,7 @@
 #include "cashboxconfig.h"
 
 CashboxConfig::CashboxConfig(const QStringList &dbParams, int id) :
-    Config(dbParams, id)
+    Configs(dbParams, id)
 {
 
 }

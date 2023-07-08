@@ -154,6 +154,9 @@ void DlgPaymentChoose::on_leCash_textChanged(const QString &arg1)
 void DlgPaymentChoose::on_leCard_textChanged(const QString &arg1)
 {
     countChange();
+    if (str_float(arg1) > 0.001) {
+        ui->btnFiscal->setChecked(true);
+    }
 }
 
 void DlgPaymentChoose::on_leBankTransfer_textChanged(const QString &arg1)
@@ -164,11 +167,17 @@ void DlgPaymentChoose::on_leBankTransfer_textChanged(const QString &arg1)
 void DlgPaymentChoose::on_leIdram_textChanged(const QString &arg1)
 {
     countChange();
+    if (str_float(arg1) > 0.001) {
+        ui->btnFiscal->setChecked(true);
+    }
 }
 
 void DlgPaymentChoose::on_leTelcell_textChanged(const QString &arg1)
 {
     countChange();
+    if (str_float(arg1) > 0.001) {
+        ui->btnFiscal->setChecked(true);
+    }
 }
 
 void DlgPaymentChoose::on_lePrepaid_textChanged(const QString &arg1)

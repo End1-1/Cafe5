@@ -331,8 +331,10 @@ void C5WaiterServer::reply(QJsonObject &o)
     }
     case sm_dailycommon: {
         QJsonArray ja;
-        bv[":f_datecash1"] = QDate::fromString(fIn["date1"].toString(), FORMAT_DATE_TO_STR_MYSQL);
-        bv[":f_datecash2"] = QDate::fromString(fIn["date2"].toString(), FORMAT_DATE_TO_STR_MYSQL);
+        QDate d1 = QDate::fromString(fIn["date1"].toString(), FORMAT_DATE_TO_STR_MYSQL);
+        QDate d2 = QDate::fromString(fIn["date2"].toString(), FORMAT_DATE_TO_STR_MYSQL);
+        bv[":f_datecash1"] = d1;
+        bv[":f_datecash2"] = d2;
         bv[":f_state"] = ORDER_STATE_CLOSE;
         QString sqlQuery;
 
@@ -344,7 +346,10 @@ void C5WaiterServer::reply(QJsonObject &o)
                        "left join h_tables t on t.f_id=oh.f_table "
                        "left join s_user u on u.f_id=oh.f_staff "
                         "left join o_tax ot on ot.f_id=oh.f_id "
-                       "where oh.f_state=:f_state and oh.f_datecash between :f_datecash1 and :f_datecash2 ";
+                       "where (oh.f_state=:f_state and oh.f_datecash between :f_datecash1 and :f_datecash2) ";
+        if (fIn["opened"].toString().toInt() > 0) {
+            sqlQuery += " or (oh.f_state=1) ";
+        }
 
         if (fIn["hall"].toString().toInt() > 0) {
             sqlQuery += QString(" and oh.f_hall=%1 ").arg(fIn["hall"].toString());
@@ -887,7 +892,7 @@ void C5WaiterServer::processCloseOrder(QJsonObject &o, C5Database &db)
             }
 
             C5StoreDraftWriter dw(db);
-            auto *cbc = Config::construct<CashboxConfig>(db.dbParams(), 2);
+            auto *cbc = Configs::construct<CashboxConfig>(db.dbParams(), 2);
             if (settings[param_autoinput_salecash].toInt() == 1) {
                 QString headerPrefix;
                 int headerId;
@@ -1036,6 +1041,8 @@ bool C5WaiterServer::printReceipt(QString &err, C5Database &db, bool isBill, boo
     }
     db.rowToMap(headerInfo);
 
+
+
     QList<QMap<QString, QVariant> > bodyInfo;
     db[":f_header"] = fIn["order"].toString();
     if (!db.exec("select f_state, f_dish, f_price, f_canservice, f_candiscount, ob.f_discount, "
@@ -1150,7 +1157,8 @@ bool C5WaiterServer::printReceipt(QString &err, C5Database &db, bool isBill, boo
             break;
         }
         case 80: {
-            C5PrintReceiptThread pr(fIn["order"].toString(), headerInfo, bodyInfo, printerName, fIn["language"].toInt(), paperWidth);
+            C5PrintReceiptThread pr(fIn["order"].toString(), headerInfo, bodyInfo,
+                    printerName, fIn["language"].toInt(), paperWidth);
             pr.fBill = isBill;
             pr.fIdram[param_idram_name] = C5Config::getValue(param_idram_name);
             pr.fIdram[param_idram_id] = C5Config::getValue(param_idram_id);

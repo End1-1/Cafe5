@@ -12,7 +12,6 @@ CR5CommonSalesFilter::CR5CommonSalesFilter(const QStringList &dbParams, QWidget 
     ui->leHall->setSelector(dbParams, ui->leHallName, cache_halls).setMultiselection(true);
     ui->leTable->setSelector(dbParams, ui->leTableName, cache_tables).setMultiselection(true);
     ui->leStaff->setSelector(dbParams, ui->leStaffName, cache_users).setMultiselection(true);
-    ui->leShift->setSelector(dbParams, ui->leShiftName, cache_salary_shift).setMultiselection(true);
     ui->leBuyer->setSelector(dbParams, ui->leBuyerName, cache_goods_partners).setMultiselection(true);
     ui->dt1->setDateTime(QDateTime::fromString(QDate::currentDate().toString("dd.MM.yyyy") + " 00:00", "dd.MM.yyyy HH:mm"));
     ui->dt2->setDateTime(QDateTime::fromString(QDate::currentDate().addDays(1).toString("dd.MM.yyyy") + " 00:00", "dd.MM.yyyy HH:mm"));
@@ -48,9 +47,6 @@ QString CR5CommonSalesFilter::condition()
     }
     if (!ui->leStaff->isEmpty()) {
         result += " and oh.f_staff in (" + ui->leStaff->text() + ") ";
-    }
-    if (!ui->leShift->isEmpty()) {
-        result += " and oh.f_shift in (" + ui->leShift->text() + ") ";
     }
     if (ui->rbRIYes->isChecked()) {
         result += " and oh.f_amounttotal<0 ";

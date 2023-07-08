@@ -15,6 +15,7 @@ C5CostumerDebtPayment::C5CostumerDebtPayment(int type, const QStringList &dbPara
     ui->leCostumer->setSelector(dbParams, ui->leCostumerName, cache_goods_partners);
     ui->leCostumer->setCallbackDialog(this);
     ui->leCash->setSelector(dbParams, ui->leCashName, cache_cash_names);
+    ui->leHall->setSelector(dbParams, ui->leHallName, cache_halls);
     ui->leCash->setCallbackDialog(this);
     connect(ui->leCostumer, SIGNAL(done(QList<QVariant>)), this, SLOT(selectorDone(QList<QVariant>)));
     fBClientDebt.source = type;
@@ -43,6 +44,7 @@ void C5CostumerDebtPayment::setId(const QString &id)
     ui->deDate->setDate(fBClientDebt.date);
     ui->leType->setText(fBClientDebt.source == 1 ? tr("Customer debt payment") : tr("Partner debt payment"));
     ui->leCash->setValue(fECash.cash);
+    ui->leHall->setValue(fBClientDebt.flag);
     ui->leCostumer->setValue(fBClientDebt.costumer);
     ui->leAmount->setDouble(fBClientDebt.amount);
     ui->leCurrency->setText(fBClientDebt.currencyName(db));
@@ -86,23 +88,26 @@ void C5CostumerDebtPayment::on_btnOK_clicked()
     fBClientDebt.date = ui->deDate->date();
     fBClientDebt.costumer = ui->leCostumer->getInteger();
     fBClientDebt.amount = ui->leAmount->getDouble();
+    fBClientDebt.flag = ui->leHall->getInteger();
     if (fBClientDebt.id == 0) {
         if (ui->leAmount->getDouble() > 0) {
             C5CashDoc *doc = new C5CashDoc(fDBParams);
+            doc->fDebtFlag = fBClientDebt.flag;
             doc->setRelation(true);
             doc->setPartner(fBClientDebt.costumer);
             switch (fBClientDebt.source) {
             case BCLIENTDEBTS_SOURCE_INPUT:
                 doc->setCashOutput(ui->leCash->getInteger());
+                doc->setComment(tr("Partner dept payment"));
                 break;
             case BCLIENTDEBTS_SOURCE_SALE:
                 doc->setCashInput(ui->leCash->getInteger());
+                doc->setComment(tr("Customer dept payment"));
                 break;
             }
 
-            doc->setDate(ui->deDate->date());
-            doc->setComment(tr("Dept payment") + ", " + ui->leCostumerName->text());
-            doc->addRow(tr("Dept payment") + ", " + ui->leCostumerName->text(), ui->leAmount->getDouble());
+            doc->setDate(ui->deDate->date());            
+            doc->addRow(ui->leCostumerName->text(), ui->leAmount->getDouble());
             doc->save(true);
             fBClientDebt.cash = doc->uuid();
             delete doc;
@@ -111,8 +116,16 @@ void C5CostumerDebtPayment::on_btnOK_clicked()
         C5CashDoc *doc = new C5CashDoc(fDBParams);
         if (doc->openDoc(fBClientDebt.cash)) {
             doc->setDate(ui->deDate->date());
-            doc->setComment(tr("Dept payment") + ", " + ui->leCostumerName->text());
-            doc->updateRow(0, tr("Dept payment") + ", " + ui->leCostumerName->text(), ui->leAmount->getDouble());
+            switch (fBClientDebt.source) {
+            case BCLIENTDEBTS_SOURCE_INPUT:
+                doc->setComment(tr("Partner dept payment"));
+                break;
+            case BCLIENTDEBTS_SOURCE_SALE:
+                doc->setComment(tr("Customer dept payment"));
+                break;
+            }
+            doc->updateRow(0, ui->leCostumerName->text(), ui->leAmount->getDouble());
+            doc->fDebtFlag = fBClientDebt.flag;
             doc->save(true);
         }
         delete doc;

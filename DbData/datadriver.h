@@ -16,7 +16,6 @@
 #include "dbgoods.h"
 #include "dbmenuname.h"
 #include "dbdishpart2.h"
-#include "dbshift.h"
 #include "dbmenu.h"
 #include "dbdishspecial.h"
 #include "dbbodystate.h"
@@ -94,8 +93,6 @@ public:
     DbMenu *fDbMenu;
 
     DbDishSpecial *fDbDishSpecial;
-
-    DbShift *fDbShift;
 
     DbBodyState *fDbBodyState;
 

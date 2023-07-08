@@ -76,6 +76,10 @@ bool RemoveShopSale::remove(C5Database &db, const QString &id)
     db[":f_id"] = id;
     db.exec("delete from o_header where f_id=:f_id");
     db[":f_id"] = id;
+    db.exec("delete from o_header_flags where f_id=:f_id");
+    db[":f_id"] = id;
+    db.exec("delete from o_header_options where f_id=:f_id");
+    db[":f_id"] = id;
 
     return true;
 

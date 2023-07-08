@@ -47,7 +47,8 @@ bool C5PrintServiceThread::run()
     db[":f_state"] = DISH_STATE_OK;
     db.exec("select * from o_body b "
             "where b.f_header=:f_header and b.f_state=:f_state "
-            "and (length(f_print1)>0 or length(f_print2)>0) and b.f_qty2=0 ");
+            "and (length(f_print1)>0 or length(f_print2)>0) and b.f_qty2=0 "
+            "order by b.f_appendtime ");
     while (db.nextRow()) {
         QMap<QString, QVariant> m;
         db.rowToMap(m);
@@ -156,8 +157,10 @@ void C5PrintServiceThread::print(QString printer, const QString &side, bool repr
     p.ctext(tr("New order"));
     p.br();
     p.ltext(tr("Table"), 0);
+    p.setFontSize(28);
     p.rtext(dbtable->name(fHeaderData["f_table"].toInt()));
     p.br();
+    p.setFontSize(20);
     p.ltext(tr("Order no"), 0);
     p.rtext(QString("%1%2").arg(fHeaderData["f_prefix"].toString(), fHeaderData["f_hallid"].toString()));
     p.br();

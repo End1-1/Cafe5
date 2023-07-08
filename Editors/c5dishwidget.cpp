@@ -25,8 +25,8 @@ C5DishWidget::C5DishWidget(const QStringList &dbParams, QWidget *parent) :
     ui->lePart2->setSelector(dbParams, ui->lePart2Name, cache_dish_part2);
     ui->lePart2->setCallbackWidget(this);
     ui->tblPricing->setColumnWidths(9, 0, 0, 100, 80, 100, 100, 100, 30, 30);
-    ui->tblRecipe->setColumnWidths(10, 0, 0, 200, 80, 80, 80, 80, 80, 80);
-    ui->tblRecipeTotal->setColumnWidths(10, 0, 0, 200, 80, 80, 80, 80, 80, 80);
+    ui->tblRecipe->setColumnWidths(7, 0, 0, 200, 80, 80, 80);
+    ui->tblRecipeTotal->setColumnWidths(7, 0, 0, 200, 80, 80, 80);
     connect(ui->tblRecipe->horizontalHeader(), SIGNAL(sectionResized(int,int,int)), this, SLOT(recipeHeaderResized(int,int,int)));
     connect(ui->tblRecipeTotal->horizontalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(tableRecipeScroll(int)));
     C5Database db(dbParams);
@@ -48,7 +48,6 @@ C5DishWidget::C5DishWidget(const QStringList &dbParams, QWidget *parent) :
         row++;
     }
     ui->tblRecipe->setColumnDecimals(3, 4);
-    ui->lePortionQty->setValidator(new QDoubleValidator(0, 14, 2));
     connect(ui->leColor, SIGNAL(doubleClicked()), this, SLOT(setColor()));
     installEventFilter(this);
 }
@@ -89,6 +88,15 @@ void C5DishWidget::clear()
     ui->leDishComment->clear();
     ui->leQueue->setText("999");
     ui->lbImage->setText(tr("Image, right click to begin"));
+
+    ui->lePart2->setInteger(__c5config.getRegValue("dishw_part2").toInt());
+    ui->chServiceFee->setChecked(__c5config.getRegValue("dishw_service").toBool());
+    ui->chDiscount->setChecked(__c5config.getRegValue("dishw_discount").toBool());
+    ui->tblPricing->comboBox(0, 4)->setCurrentIndex(__c5config.getRegValue("dishw_mstore").toInt());
+    ui->tblPricing->comboBox(0, 5)->setCurrentIndex(__c5config.getRegValue("dishw_print1").toInt());
+    ui->tblPricing->comboBox(0, 6)->setCurrentIndex(__c5config.getRegValue("dishw_print2").toInt());
+    ui->tblPricing->checkBox(0, 7)->setChecked(__c5config.getRegValue("dishw_inmenu").toBool());
+
 }
 
 void C5DishWidget::setDish(int id)
@@ -130,11 +138,11 @@ void C5DishWidget::setDish(int id)
         l->fDecimalPlaces = 5;
         l->setDouble(db.getDouble("f_qty"));
         connect(l, SIGNAL(textEdited(QString)), this, SLOT(recipeQtyPriceChanged(QString)));
-        ui->tblRecipe->setString(row, 6, db.getString("f_unit"));
-        C5LineEdit *le = ui->tblRecipe->createLineEdit(row, 7);
+        ui->tblRecipe->setString(row, 4, db.getString("f_unit"));
+        C5LineEdit *le = ui->tblRecipe->createLineEdit(row, 5);
         connect(le, SIGNAL(textEdited(QString)), this, SLOT(recipeQtyPriceChanged(QString)));
         le->setDouble(db.getDouble("f_price"));
-        le = ui->tblRecipe->createLineEdit(row, 8);
+        le = ui->tblRecipe->createLineEdit(row, 6);
         le->setDouble(db.getDouble("f_total"));
         connect(le, SIGNAL(textEdited(QString)), this, SLOT(recipeQtyPriceChanged(QString)));
         row++;
@@ -161,6 +169,13 @@ void C5DishWidget::selectorCallback(int row, const QList<QVariant> &values)
 
 bool C5DishWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
 {
+    __c5config.setRegValue("dishw_part2", ui->lePart2->getInteger());
+    __c5config.setRegValue("dishw_service", ui->chServiceFee->isChecked());
+    __c5config.setRegValue("dishw_discount", ui->chDiscount->isChecked());
+    __c5config.setRegValue("dishw_mstore", ui->tblPricing->comboBox(0, 4)->currentIndex());
+    __c5config.setRegValue("dishw_print1", ui->tblPricing->comboBox(0, 5)->currentIndex());
+    __c5config.setRegValue("dishw_print2", ui->tblPricing->comboBox(0, 6)->currentIndex());
+    __c5config.setRegValue("dishw_inmenu", ui->tblPricing->checkBox(0, 7)->isChecked());
     for (int i = 0; i < ui->tblPricing->rowCount(); i++) {
         if (ui->tblPricing->checkBox(i, 7)->isChecked() && ui->tblPricing->comboBox(i, 4)->currentIndex() < 0) {
             err += tr("Storage is not defined in menu.<br>");
@@ -201,7 +216,7 @@ bool C5DishWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
         db[":f_dish"] = ui->leCode->getInteger();
         db[":f_goods"] = ui->tblRecipe->getInteger(i, 1);
         db[":f_qty"] = ui->tblRecipe->lineEdit(i, 3)->getDouble();
-        db[":f_price"] = ui->tblRecipe->lineEdit(i, 7)->getDouble();
+        db[":f_price"] = ui->tblRecipe->lineEdit(i, 5)->getDouble();
         if (ui->tblRecipe->getInteger(i, 0) == 0) {
             ui->tblRecipe->setInteger(i, 0, db.insert("d_recipes"));
         } else {
@@ -216,8 +231,8 @@ bool C5DishWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
         db.insert("d_special", false);
     }
     db[":f_recipeqty"] = ui->tblRecipeTotal->getDouble(0, 3);
-    db[":f_netweight"] = ui->tblRecipeTotal->getDouble(0, 4);
-    db[":f_cost"] = ui->tblRecipeTotal->getDouble(0, 8);
+    db[":f_netweight"] = ui->leReadyWeight->getDouble();
+    db[":f_cost"] = ui->tblRecipeTotal->getDouble(0, 6);
     db.update("d_dish", "f_id", ui->leCode->text());
 
     db[":f_app"] = "menu";
@@ -292,8 +307,8 @@ void C5DishWidget::on_btnAddRecipe_clicked()
     ui->tblRecipe->setInteger(row, 0, 0);
     ui->tblRecipe->setInteger(row, 1, values.at(1).toInt());
     ui->tblRecipe->setString(row, 2, values.at(3).toString());
-    ui->tblRecipe->setString(row, 6, values.at(4).toString());
-    ui->tblRecipe->lineEdit(row, 7)->setDouble(values.at(6).toDouble());
+    ui->tblRecipe->setString(row, 4, values.at(4).toString());
+    ui->tblRecipe->lineEdit(row, 5)->setDouble(values.at(6).toDouble());
 }
 
 void C5DishWidget::on_btnRemoveRecipe_clicked()
@@ -380,17 +395,13 @@ void C5DishWidget::tableRecipeScroll(int value)
 
 void C5DishWidget::countTotalSelfCost()
 {
-    double total = 0, totalWeight = 0, totalNetto = 0, totalBrutto = 0;
+    double total = 0, totalWeight = 0;
     for (int i = 0; i < ui->tblRecipe->rowCount(); i++) {
         totalWeight += ui->tblRecipe->lineEdit(i, 3)->getDouble();
-        totalNetto += ui->tblRecipe->getDouble(i, 4);
-        totalBrutto += ui->tblRecipe->getDouble(i, 5);
-        total += ui->tblRecipe->lineEdit(i, 8)->getDouble();
+        total += ui->tblRecipe->lineEdit(i, 6)->getDouble();
     }
     ui->tblRecipeTotal->setDouble(0, 3, totalWeight);
-    ui->tblRecipeTotal->setDouble(0, 4, totalNetto);
-    ui->tblRecipeTotal->setDouble(0, 5, totalBrutto);
-    ui->tblRecipeTotal->setDouble(0, 8, total);
+    ui->tblRecipeTotal->setDouble(0, 6, total);
 }
 
 int C5DishWidget::addRecipeRow()
@@ -403,11 +414,11 @@ int C5DishWidget::addRecipeRow()
     l->clear();
     l->setFocus();
     connect(l, SIGNAL(textEdited(QString)), this, SLOT(recipeQtyPriceChanged(QString)));
-    l = ui->tblRecipe->createLineEdit(row, 7);
+    l = ui->tblRecipe->createLineEdit(row, 5);
     l->installEventFilter(this);
     l->setDouble(0);
     connect(l, SIGNAL(textEdited(QString)), this, SLOT(recipeQtyPriceChanged(QString)));
-    l = ui->tblRecipe->createLineEdit(row, 8);
+    l = ui->tblRecipe->createLineEdit(row, 6);
     l->setDouble(0);
     l->installEventFilter(this);
     connect(l, SIGNAL(textEdited(QString)), this, SLOT(recipeQtyPriceChanged(QString)));
@@ -450,16 +461,16 @@ void C5DishWidget::recipeQtyPriceChanged(const QString &arg)
     ui->tblRecipe->findWidget(l, row, col);
     switch (l->property("column").toInt()) {
     case 3:
-        ui->tblRecipe->lineEdit(row, 8)->setDouble(ui->tblRecipe->lineEdit(row, 7)->getDouble() * l->getDouble());
+        ui->tblRecipe->lineEdit(row, 6)->setDouble(ui->tblRecipe->lineEdit(row, 5)->getDouble() * l->getDouble());
         break;
-    case 7:
-        ui->tblRecipe->lineEdit(row, 8)->setDouble(ui->tblRecipe->lineEdit(row, 3)->getDouble() * l->getDouble());
+    case 5:
+        ui->tblRecipe->lineEdit(row, 6)->setDouble(ui->tblRecipe->lineEdit(row, 3)->getDouble() * l->getDouble());
         break;
-    case 8:
+    case 6:
         if (ui->tblRecipe->lineEdit(row, 3)->getDouble() > 0.0001) {
-            ui->tblRecipe->lineEdit(row, 7)->setDouble(l->getDouble() / ui->tblRecipe->lineEdit(row, 3)->getDouble());
+            ui->tblRecipe->lineEdit(row, 5)->setDouble(l->getDouble() / ui->tblRecipe->lineEdit(row, 3)->getDouble());
         } else {
-            ui->tblRecipe->lineEdit(row, 7)->setDouble(0);
+            ui->tblRecipe->lineEdit(row, 5)->setDouble(0);
         }
         break;
     }
@@ -494,9 +505,9 @@ void C5DishWidget::on_btnPrintRecipe_clicked()
         vals.clear();
         vals << ui->tblRecipe->getString(i, 2);
         vals << ui->tblRecipe->lineEdit(i, 3)->text();
-        vals << ui->tblRecipe->getString(i, 6);
-        vals << ui->tblRecipe->lineEdit(i, 7)->text();
-        vals << ui->tblRecipe->lineEdit(i, 8)->text();
+        vals << ui->tblRecipe->getString(i, 4);
+        vals << ui->tblRecipe->lineEdit(i, 5)->text();
+        vals << ui->tblRecipe->lineEdit(i, 6)->text();
         p.tableText(points, vals, 60);
         p.br(60);
     }
@@ -519,24 +530,16 @@ void C5DishWidget::on_btnNewGoods_clicked()
     C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
     QList<QMap<QString, QVariant> > data;
     if(e->getResult(data)) {
-        int row = ui->tblRecipe->addEmptyRow();
-        C5LineEdit *l = ui->tblRecipe->createLineEdit(row, 3);
-        l->setValidator(new QDoubleValidator(0, 100000, 4));
-        l->clear();
-        l->setFocus();
-        connect(l, SIGNAL(textEdited(QString)), this, SLOT(recipeQtyPriceChanged(QString)));
+        int row = addRecipeRow();
+
         ui->tblRecipe->setInteger(row, 0, 0);
         ui->tblRecipe->setInteger(row, 1, data.at(0)["f_id"].toInt());
         ui->tblRecipe->setString(row, 2, data.at(0)["f_name"].toString());
         ui->tblRecipe->setString(row, 6, data.at(0)["f_unitname"].toString());
-        l = ui->tblRecipe->createLineEdit(row, 7);
-        l->setDouble(0);
-        connect(l, SIGNAL(textEdited(QString)), this, SLOT(recipeQtyPriceChanged(QString)));
-        l = ui->tblRecipe->createLineEdit(row, 8);
-        l->setDouble(0);
-        connect(l, SIGNAL(textEdited(QString)), this, SLOT(recipeQtyPriceChanged(QString)));
+
     }
     delete e;
+
 }
 
 void C5DishWidget::on_btnRemoveComment_clicked()
@@ -566,21 +569,6 @@ void C5DishWidget::on_leDishComment_returnPressed()
     on_btnAddComment_clicked();
 }
 
-void C5DishWidget::on_btnDivQty_clicked()
-{
-    bool ok;
-    double d = QInputDialog::getDouble(this, tr("Divider"), "", ui->lePortionQty->getDouble(), 0, 99999, 3, &ok);
-    if (!ok) {
-        return;
-    }
-    if (d > 0.00001) {
-        for (int i = 0; i < ui->tblRecipe->rowCount(); i++) {
-            ui->tblRecipe->lineEdit(i, 3)->setDouble(ui->tblRecipe->lineEdit(i, 3)->getDouble() / d);
-            ui->tblRecipe->lineEdit(i, 3)->textEdited(ui->tblRecipe->lineEdit(i, 3)->text());
-        }
-    }
-}
-
 void C5DishWidget::on_btnCopy_clicked()
 {
     QString t;
@@ -591,9 +579,6 @@ void C5DishWidget::on_btnCopy_clicked()
         t += ui->tblRecipe->getString(r, 4) + "\t";
         t += ui->tblRecipe->lineEdit(r, 5)->text() + "\t";
         t += ui->tblRecipe->lineEdit(r, 6)->text() + "\t";
-        t += ui->tblRecipe->getString(r, 7) + "\t";
-        t += ui->tblRecipe->getString(r, 8) + "\t";
-        t += ui->tblRecipe->getString(r, 9) + "\t";
         t += "\r\n";
     }
     qApp->clipboard()->setText(t);
@@ -604,6 +589,10 @@ void C5DishWidget::on_btnPasteRecipt_clicked()
     QStringList s = qApp->clipboard()->text().split("\r\n", QString::SkipEmptyParts);
     for (const QString &l: s) {
         QStringList c = l.split("\t", QString::SkipEmptyParts);
+        if (c.count() < 6) {
+            C5Message::error(tr("No recipe in clipboard"));
+            return;
+        }
         int r = addRecipeRow();
         ui->tblRecipe->setString(r, 1, c.at(0));
         ui->tblRecipe->setString(r, 2, c.at(1));
@@ -611,27 +600,8 @@ void C5DishWidget::on_btnPasteRecipt_clicked()
         ui->tblRecipe->setString(r, 4, c.at(3));
         ui->tblRecipe->lineEdit(r, 5)->setText(c.at(4));
         ui->tblRecipe->lineEdit(r, 6)->setText(c.at(5));
-        ui->tblRecipe->setString(r, 7, c.at(6));
-        ui->tblRecipe->setString(r, 8, c.at(7));
-        ui->tblRecipe->setString(r, 9, c.at(8));
     }
     countTotalSelfCost();
-}
-
-void C5DishWidget::on_btnMultRecipe_clicked()
-{
-    bool mult = !ui->btnMultRecipe->property("mult").toBool();
-    ui->btnMultRecipe->setProperty("mult", mult);
-    for (int i = 0; i < ui->tblRecipe->rowCount(); i++) {
-        if (mult) {
-            ui->tblRecipe->lineEdit(i, 3)->setDouble(ui->tblRecipe->lineEdit(i, 3)->getDouble() * ui->lePortionQty->getDouble());
-        } else {
-            if (ui->lePortionQty->getDouble() > 0.00001) {
-                ui->tblRecipe->lineEdit(i, 3)->setDouble(ui->tblRecipe->lineEdit(i, 3)->getDouble() / ui->lePortionQty->getDouble());
-            }
-        }
-        emit ui->tblRecipe->lineEdit(i, 3)->textEdited(ui->tblRecipe->lineEdit(i, 3)->text());
-    }
 }
 
 void C5DishWidget::on_leName_textChanged(const QString &arg1)
@@ -707,5 +677,51 @@ void C5DishWidget::on_chSameAsInStore_clicked(bool checked)
         ui->tblRecipe->setString(row, 2, goodsname);
         ui->tblRecipe->setString(row, 6, C5Cache::cache(fDBParams, cache_goods_unit)->getValuesForId(1).at(2).toString());
         ui->tblRecipe->lineEdit(row, 7)->setDouble(0);
+    }
+}
+
+void C5DishWidget::on_btnAddDishRecipe_clicked()
+{
+    QList<QVariant> vals;
+    if (!C5Selector::getValueOfColumn(fDBParams, cache_dish, vals, 3)) {
+        return;
+    }
+    if (vals.at(1).toInt() == 0) {
+        C5Message::error(tr("Could not add goods without code"));
+        return;
+    }
+    bool ok = false;
+    double q = QInputDialog::getDouble(this, tr("Qty"), QString(vals.at(2).toString()), 0, 0, 999, 2, &ok);
+    if (!ok) {
+        return;
+    }
+    int row = 0;
+    C5Database db(fDBParams);
+    db[":f_dish"] = vals.at(1);
+    db[":f_qty"] = q;
+    db.exec("select r.f_id, r.f_goods, g.f_name, r.f_qty*:f_qty as f_qty, u.f_name as f_unit, g.f_lastinputprice as f_price, "
+            "r.f_qty*g.f_lastinputprice as f_total "
+            "from d_recipes r "
+            "left join c_goods g on g.f_id=r.f_goods "
+            "left join c_units u on u.f_id=g.f_unit "
+            "where r.f_dish=:f_dish");
+    while (db.nextRow()) {
+        row = ui->tblRecipe->addEmptyRow();
+        ui->tblRecipe->setInteger(row, 0, db.getInt("f_id"));
+        ui->tblRecipe->setInteger(row, 1, db.getInt("f_goods"));
+        ui->tblRecipe->setString(row, 2, db.getString("f_name"));
+        C5LineEdit *l = ui->tblRecipe->createLineEdit(row, 3);
+        l->setValidator(new QDoubleValidator(0, 100000, 5));
+        l->fDecimalPlaces = 5;
+        l->setDouble(db.getDouble("f_qty"));
+        connect(l, SIGNAL(textEdited(QString)), this, SLOT(recipeQtyPriceChanged(QString)));
+        ui->tblRecipe->setString(row, 4, db.getString("f_unit"));
+        C5LineEdit *le = ui->tblRecipe->createLineEdit(row, 5);
+        connect(le, SIGNAL(textEdited(QString)), this, SLOT(recipeQtyPriceChanged(QString)));
+        le->setDouble(db.getDouble("f_price"));
+        le = ui->tblRecipe->createLineEdit(row, 6);
+        le->setDouble(db.getDouble("f_total"));
+        connect(le, SIGNAL(textEdited(QString)), this, SLOT(recipeQtyPriceChanged(QString)));
+        row++;
     }
 }

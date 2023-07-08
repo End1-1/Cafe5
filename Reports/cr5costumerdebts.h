@@ -29,6 +29,8 @@ private slots:
 
     void newPartnerPayment();
 
+    void queryDebt3();
+
 };
 
 #endif // CR5COSTUMERDEBTS_H
