@@ -67,6 +67,7 @@ void CR5MaterialsInStore::prepareDrafts()
                     << "left join c_goods_classes gcd on gca.f_id=g.f_group4 [gcd]"
                     << "LEFT JOin c_goods_prices gpr on gpr.f_goods=g.f_id [gpr]"
                     << "left join partners p on p.f_id=h.f_partner [p]"
+                    << "left join a_store_valid v on v.f_id=s.f_id [v]"
                        ;
 
     fColumnsFields << "g.f_id as f_code"
@@ -105,6 +106,7 @@ void CR5MaterialsInStore::prepareDrafts()
                    << "gcd.f_name as f_class4"
                    << "p.f_taxname"
                    << "g.f_scancode"
+                   << "v.f_date as f_validdate"
                       ;
 
     fColumnsSum << "f_qty"
@@ -138,6 +140,7 @@ void CR5MaterialsInStore::prepareDrafts()
     fTranslation["f_class2"] = tr("Class 2");
     fTranslation["f_class3"] = tr("Class 3");
     fTranslation["f_class4"] = tr("Class 4");
+    fTranslation["f_validdate"] = tr("Valid date");
 
     fColumnsVisible["g.f_id as f_code"] = true;
     fColumnsVisible["ss.f_name as f_storage"] = true;
@@ -158,6 +161,7 @@ void CR5MaterialsInStore::prepareDrafts()
     fColumnsVisible["gcc.f_name as f_class3"] = false;
     fColumnsVisible["gcd.f_name as f_class4"] = false;
     fColumnsVisible["p.f_taxname"] = false;
+    fColumnsVisible["v.f_date as f_validdate"] = false;
     restoreColumnsVisibility();
 }
 
@@ -184,6 +188,7 @@ void CR5MaterialsInStore::prepareNoDrafts()
                     << "left join c_goods_classes gcd on gcd.f_id=g.f_group4 [gcd]"
                     << "LEFT JOin c_goods_prices gpr on gpr.f_goods=g.f_id [gpr]"
                     << "left join partners p on p.f_id=h.f_partner [p]"
+                    << "left join a_store_valid v on v.f_id=s.f_id [v]"
                        ;
 
     fColumnsFields << "g.f_id as f_code"
@@ -195,6 +200,7 @@ void CR5MaterialsInStore::prepareNoDrafts()
                    << "gcb.f_name as f_class2"
                    << "gcc.f_name as f_class3"
                    << "gcd.f_name as f_class4"
+                   << "v.f_date as f_validdate"
                    << "sum(s.f_qty*s.f_type) as f_qty"
                    << "u.f_name as f_unit"
                    << "s.f_price"
@@ -219,6 +225,7 @@ void CR5MaterialsInStore::prepareNoDrafts()
                    << "gcb.f_name as f_class2"
                    << "gcc.f_name as f_class3"
                    << "gcd.f_name as f_class4"
+                    << "v.f_date as f_validdate"
                       ;
 
     fColumnsSum << "f_qty"
@@ -252,7 +259,7 @@ void CR5MaterialsInStore::prepareNoDrafts()
     fTranslation["f_class3"] = tr("Class 3");
     fTranslation["f_class4"] = tr("Class 4");
     fTranslation["f_taxname"] = tr("Partner");
-
+    fTranslation["f_validdate"] = tr("Valid date");
 
     fColumnsVisible["g.f_id as f_code"] = true;
     fColumnsVisible["ss.f_name as f_storage"] = true;
@@ -273,6 +280,7 @@ void CR5MaterialsInStore::prepareNoDrafts()
     fColumnsVisible["gcc.f_name as f_class3"] = false;
     fColumnsVisible["gcd.f_name as f_class4"] = false;
     fColumnsVisible["p.f_taxname"] = false;
+    fColumnsVisible["v.f_date as f_validdate"] = true;
     restoreColumnsVisibility();
 }
 

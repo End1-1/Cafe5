@@ -34,14 +34,14 @@
         <location filename="../Classes/c5cache.cpp" line="131"/>
         <location filename="../Classes/c5cache.cpp" line="137"/>
         <location filename="../Classes/c5cache.cpp" line="144"/>
-        <location filename="../Classes/c5cache.cpp" line="324"/>
+        <location filename="../Classes/c5cache.cpp" line="330"/>
         <source>Code</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../Classes/c5cache.cpp" line="33"/>
         <source>Group</source>
-        <translation></translation>
+        <translation>Խումբ</translation>
     </message>
     <message>
         <location filename="../Classes/c5cache.cpp" line="19"/>
@@ -71,7 +71,7 @@
         <location filename="../Classes/c5cache.cpp" line="110"/>
         <location filename="../Classes/c5cache.cpp" line="113"/>
         <location filename="../Classes/c5cache.cpp" line="131"/>
-        <location filename="../Classes/c5cache.cpp" line="324"/>
+        <location filename="../Classes/c5cache.cpp" line="330"/>
         <source>Name</source>
         <translation></translation>
     </message>
@@ -749,17 +749,17 @@
         <translation>Անկանխիկի դրամարկղը նշանակված չէ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5shoporder.cpp" line="113"/>
+        <location filename="../Classes/c5shoporder.cpp" line="118"/>
         <source>(F)</source>
         <translation>(Ֆ)</translation>
     </message>
     <message>
-        <location filename="../Classes/c5shoporder.cpp" line="263"/>
+        <location filename="../Classes/c5shoporder.cpp" line="268"/>
         <source>Input of sale</source>
         <translation>Մուտք վաճառքից</translation>
     </message>
     <message>
-        <location filename="../Classes/c5shoporder.cpp" line="134"/>
+        <location filename="../Classes/c5shoporder.cpp" line="139"/>
         <source>Output of sale</source>
         <translation>Ելք ըստ վաճառքի</translation>
     </message>
@@ -782,37 +782,37 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="320"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="322"/>
         <source>Error in cash document, partial data was lost</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="330"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="332"/>
         <source>Empty cash document</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="431"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="433"/>
         <source>Document not exists</source>
         <translation>Փասթաթուղթը գոյություն չունի</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="868"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="870"/>
         <source>Invalid document id</source>
         <translation>Փասթաթուղթը գոյություն չունի</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="905"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="907"/>
         <source>Emtpy document</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="1003"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="1005"/>
         <source>Not enough materials in the store</source>
         <translation>Բացասական քանակ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="1102"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="1104"/>
         <source>This order used in next documents</source>
         <translation>Փասթաթուղթը օգտագործվում է հետևյալ փասթաթղթերում</translation>
     </message>
@@ -1377,7 +1377,8 @@ MS Excel</source>
         <location filename="../Forms/dlgpaymentchoose.ui" line="161"/>
         <source>Fiscal
 (F12)</source>
-        <translation type="unfinished"></translation>
+        <translation>Ֆիսկալ
+(F12)</translation>
     </message>
     <message>
         <location filename="../Forms/dlgpaymentchoose.ui" line="204"/>
@@ -2131,6 +2132,29 @@ MS Excel</source>
     </message>
 </context>
 <context>
+    <name>DlgShowColumns</name>
+    <message>
+        <location filename="dlgshowcolumns.ui" line="14"/>
+        <source>Dialog</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="dlgshowcolumns.ui" line="20"/>
+        <source>Group</source>
+        <translation>Խումբ</translation>
+    </message>
+    <message>
+        <location filename="dlgshowcolumns.ui" line="27"/>
+        <source>Unit</source>
+        <translation>Չափման միավոր</translation>
+    </message>
+    <message>
+        <location filename="dlgshowcolumns.ui" line="34"/>
+        <source>Box</source>
+        <translation>Տուփ</translation>
+    </message>
+</context>
+<context>
     <name>DlgSplashScreen</name>
     <message>
         <location filename="dlgsplashscreen.ui" line="14"/>
@@ -2228,7 +2252,7 @@ MS Excel</source>
         <location filename="../Classes/outputofheader.cpp" line="51"/>
         <location filename="../Classes/outputofheader.cpp" line="56"/>
         <source>Store input</source>
-        <translation type="unfinished">Պահեստի մուտք</translation>
+        <translation>Պահեստի մուտք</translation>
     </message>
 </context>
 <context>
@@ -2422,85 +2446,85 @@ MS Excel</source>
     <message>
         <location filename="printreceiptgroup.cpp" line="40"/>
         <location filename="printreceiptgroup.cpp" line="354"/>
-        <location filename="printreceiptgroup.cpp" line="690"/>
+        <location filename="printreceiptgroup.cpp" line="685"/>
         <source>Return</source>
         <translation>Հետ վերադարձ</translation>
     </message>
     <message>
         <location filename="printreceiptgroup.cpp" line="168"/>
         <location filename="printreceiptgroup.cpp" line="482"/>
-        <location filename="printreceiptgroup.cpp" line="749"/>
+        <location filename="printreceiptgroup.cpp" line="744"/>
         <source>Department</source>
         <translation>Բաժին</translation>
     </message>
     <message>
         <location filename="printreceiptgroup.cpp" line="171"/>
         <location filename="printreceiptgroup.cpp" line="485"/>
-        <location filename="printreceiptgroup.cpp" line="752"/>
+        <location filename="printreceiptgroup.cpp" line="747"/>
         <source>Tax number</source>
         <translation>ՀՎՀՀ</translation>
     </message>
     <message>
         <location filename="printreceiptgroup.cpp" line="174"/>
         <location filename="printreceiptgroup.cpp" line="488"/>
-        <location filename="printreceiptgroup.cpp" line="755"/>
+        <location filename="printreceiptgroup.cpp" line="750"/>
         <source>Device number</source>
         <translation>ԳՀ</translation>
     </message>
     <message>
         <location filename="printreceiptgroup.cpp" line="177"/>
         <location filename="printreceiptgroup.cpp" line="491"/>
-        <location filename="printreceiptgroup.cpp" line="758"/>
+        <location filename="printreceiptgroup.cpp" line="753"/>
         <source>Serial</source>
         <translation>ԱՀ</translation>
     </message>
     <message>
         <location filename="printreceiptgroup.cpp" line="180"/>
         <location filename="printreceiptgroup.cpp" line="494"/>
-        <location filename="printreceiptgroup.cpp" line="761"/>
+        <location filename="printreceiptgroup.cpp" line="756"/>
         <source>Fiscal</source>
         <translation>Ֆիսկալ</translation>
     </message>
     <message>
         <location filename="printreceiptgroup.cpp" line="183"/>
         <location filename="printreceiptgroup.cpp" line="497"/>
-        <location filename="printreceiptgroup.cpp" line="764"/>
+        <location filename="printreceiptgroup.cpp" line="759"/>
         <source>Receipt number</source>
         <translation>ԿՀ</translation>
     </message>
     <message>
         <location filename="printreceiptgroup.cpp" line="186"/>
         <location filename="printreceiptgroup.cpp" line="500"/>
-        <location filename="printreceiptgroup.cpp" line="767"/>
-        <location filename="printreceiptgroup.cpp" line="786"/>
+        <location filename="printreceiptgroup.cpp" line="762"/>
+        <location filename="printreceiptgroup.cpp" line="781"/>
         <source>Date</source>
         <translation>Ամսաթիվ</translation>
     </message>
     <message>
         <location filename="printreceiptgroup.cpp" line="189"/>
         <location filename="printreceiptgroup.cpp" line="503"/>
-        <location filename="printreceiptgroup.cpp" line="770"/>
+        <location filename="printreceiptgroup.cpp" line="765"/>
         <source>(F)</source>
         <translation>(Ֆ)</translation>
     </message>
     <message>
         <location filename="printreceiptgroup.cpp" line="191"/>
         <location filename="printreceiptgroup.cpp" line="506"/>
-        <location filename="printreceiptgroup.cpp" line="772"/>
+        <location filename="printreceiptgroup.cpp" line="767"/>
         <source>Including VAT</source>
         <translation>ԱԱՀ այդ թվում</translation>
     </message>
     <message>
         <location filename="printreceiptgroup.cpp" line="197"/>
         <location filename="printreceiptgroup.cpp" line="513"/>
-        <location filename="printreceiptgroup.cpp" line="778"/>
+        <location filename="printreceiptgroup.cpp" line="773"/>
         <source>Buyer taxcode</source>
         <translation>Գնորդի ՀՎՀՀ</translation>
     </message>
     <message>
         <location filename="printreceiptgroup.cpp" line="207"/>
         <location filename="printreceiptgroup.cpp" line="523"/>
-        <location filename="printreceiptgroup.cpp" line="789"/>
+        <location filename="printreceiptgroup.cpp" line="784"/>
         <source>Return from</source>
         <translation>Վերադարձի կտրոն</translation>
     </message>
@@ -2520,21 +2544,21 @@ MS Excel</source>
         <location filename="printreceiptgroup.cpp" line="254"/>
         <location filename="printreceiptgroup.cpp" line="263"/>
         <location filename="printreceiptgroup.cpp" line="561"/>
-        <location filename="printreceiptgroup.cpp" line="838"/>
+        <location filename="printreceiptgroup.cpp" line="833"/>
         <source>Payment, cash</source>
         <translation>Կանխիկ</translation>
     </message>
     <message>
         <location filename="printreceiptgroup.cpp" line="258"/>
         <location filename="printreceiptgroup.cpp" line="569"/>
-        <location filename="printreceiptgroup.cpp" line="846"/>
+        <location filename="printreceiptgroup.cpp" line="841"/>
         <source>Change</source>
         <translation>Մանրի վերադարձ</translation>
     </message>
     <message>
         <location filename="printreceiptgroup.cpp" line="269"/>
         <location filename="printreceiptgroup.cpp" line="578"/>
-        <location filename="printreceiptgroup.cpp" line="854"/>
+        <location filename="printreceiptgroup.cpp" line="849"/>
         <source>Payment, card</source>
         <translation>Անկանխիկ</translation>
     </message>
@@ -2546,14 +2570,14 @@ MS Excel</source>
     <message>
         <location filename="printreceiptgroup.cpp" line="321"/>
         <location filename="printreceiptgroup.cpp" line="656"/>
-        <location filename="printreceiptgroup.cpp" line="901"/>
+        <location filename="printreceiptgroup.cpp" line="896"/>
         <source>Thank you for visit!</source>
         <translation>Շնորհակալություն այցելության համար</translation>
     </message>
     <message>
         <location filename="printreceiptgroup.cpp" line="324"/>
         <location filename="printreceiptgroup.cpp" line="659"/>
-        <location filename="printreceiptgroup.cpp" line="904"/>
+        <location filename="printreceiptgroup.cpp" line="899"/>
         <source>Printed</source>
         <translation>Տպված</translation>
     </message>
@@ -2599,57 +2623,52 @@ MS Excel</source>
         <translation>Պարտք</translation>
     </message>
     <message>
-        <location filename="printreceiptgroup.cpp" line="785"/>
+        <location filename="printreceiptgroup.cpp" line="780"/>
         <source>Order</source>
         <translation>Հաշիվ</translation>
     </message>
     <message>
-        <location filename="printreceiptgroup.cpp" line="800"/>
+        <location filename="printreceiptgroup.cpp" line="795"/>
         <source>NN</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="printreceiptgroup.cpp" line="801"/>
+        <location filename="printreceiptgroup.cpp" line="796"/>
         <source>Code</source>
         <translation>Կոդ</translation>
     </message>
     <message>
-        <location filename="printreceiptgroup.cpp" line="802"/>
+        <location filename="printreceiptgroup.cpp" line="797"/>
         <source>Name</source>
         <translation>Անվանում</translation>
     </message>
     <message>
-        <location filename="printreceiptgroup.cpp" line="803"/>
+        <location filename="printreceiptgroup.cpp" line="798"/>
         <source>Qty</source>
         <translation>Քանակ</translation>
     </message>
     <message>
-        <location filename="printreceiptgroup.cpp" line="804"/>
+        <location filename="printreceiptgroup.cpp" line="799"/>
         <source>Unit</source>
         <translation>Չ․Մ․</translation>
     </message>
     <message>
-        <location filename="printreceiptgroup.cpp" line="805"/>
+        <location filename="printreceiptgroup.cpp" line="800"/>
         <source>Price</source>
         <translation>Գին</translation>
     </message>
     <message>
-        <location filename="printreceiptgroup.cpp" line="806"/>
+        <location filename="printreceiptgroup.cpp" line="801"/>
         <source>Total</source>
         <translation>Ընդամենը</translation>
     </message>
     <message>
-        <location filename="printreceiptgroup.cpp" line="831"/>
+        <location filename="printreceiptgroup.cpp" line="826"/>
         <source>Payment</source>
         <translation>Վճարում</translation>
     </message>
     <message>
-        <location filename="printreceiptgroup.cpp" line="833"/>
-        <source>debt</source>
-        <translation>պարտք</translation>
-    </message>
-    <message>
-        <location filename="printreceiptgroup.cpp" line="842"/>
+        <location filename="printreceiptgroup.cpp" line="837"/>
         <source>Cash</source>
         <translation>Կանխիկ</translation>
     </message>
@@ -3837,74 +3856,85 @@ reservation</source>
     </message>
     <message>
         <location filename="worder.ui" line="81"/>
+        <source>Group</source>
+        <translation>Խումբ</translation>
+    </message>
+    <message>
+        <location filename="worder.ui" line="86"/>
         <source>Goods name</source>
         <translation>Ապրանքի անվանում</translation>
     </message>
     <message>
-        <location filename="worder.ui" line="86"/>
+        <location filename="worder.ui" line="91"/>
         <source>Qty</source>
         <translation>Քանակ</translation>
     </message>
     <message>
-        <location filename="worder.ui" line="91"/>
+        <location filename="worder.ui" line="96"/>
+        <location filename="worder.cpp" line="679"/>
+        <source>Box</source>
+        <translation>Տուփ</translation>
+    </message>
+    <message>
+        <location filename="worder.ui" line="101"/>
         <source>Unit</source>
         <translation>Չափ․մ․</translation>
     </message>
     <message>
-        <location filename="worder.ui" line="96"/>
-        <location filename="worder.cpp" line="235"/>
+        <location filename="worder.ui" line="106"/>
+        <location filename="worder.cpp" line="232"/>
         <location filename="worder.cpp" line="580"/>
         <source>Price</source>
         <translation>Գին</translation>
     </message>
     <message>
-        <location filename="worder.ui" line="121"/>
+        <location filename="worder.ui" line="131"/>
         <source>Stock</source>
         <translation>Պահեստ</translation>
     </message>
     <message>
-        <location filename="worder.ui" line="484"/>
+        <location filename="worder.ui" line="494"/>
         <source>F1</source>
         <translation> Նոր պատվեր
 (F1)</translation>
     </message>
     <message>
-        <location filename="worder.ui" line="509"/>
+        <location filename="worder.ui" line="519"/>
         <source>F2</source>
         <translation> Նոր պատվեր
 (F2)</translation>
     </message>
     <message>
-        <location filename="worder.ui" line="534"/>
+        <location filename="worder.ui" line="544"/>
         <source>F3</source>
         <translation> Նոր պատվեր
 (F3)</translation>
     </message>
     <message>
-        <location filename="worder.ui" line="559"/>
+        <location filename="worder.ui" line="569"/>
         <source>F4</source>
         <translation> Նոր պատվեր
 (F4)</translation>
     </message>
     <message>
-        <location filename="worder.ui" line="584"/>
+        <location filename="worder.ui" line="594"/>
         <source>F5</source>
         <translation> Նոր պատվեր
 (F5)</translation>
     </message>
     <message>
-        <location filename="worder.ui" line="615"/>
+        <location filename="worder.ui" line="625"/>
         <source>Goods Image</source>
         <translation>Ապրանքի նկար</translation>
     </message>
     <message>
-        <location filename="worder.ui" line="639"/>
+        <location filename="worder.ui" line="649"/>
         <source>Image</source>
         <translation>Նկար</translation>
     </message>
     <message>
-        <location filename="worder.ui" line="101"/>
-        <location filename="worder.ui" line="177"/>
+        <location filename="worder.ui" line="111"/>
+        <location filename="worder.ui" line="187"/>
         <source>Total</source>
         <translation>Ընդամենը</translation>
     </message>
@@ -3914,66 +3944,66 @@ reservation</source>
         <translation>Ապրանքի կոդ (F7)</translation>
     </message>
     <message>
-        <location filename="worder.ui" line="111"/>
+        <location filename="worder.ui" line="121"/>
         <source>Discount mode</source>
         <translation>ԶՏ</translation>
     </message>
     <message>
-        <location filename="worder.ui" line="116"/>
+        <location filename="worder.ui" line="126"/>
         <source>Discount factor</source>
         <translation>Զեղչի առժեք</translation>
     </message>
     <message>
-        <location filename="worder.ui" line="153"/>
+        <location filename="worder.ui" line="163"/>
         <source>Payment</source>
         <translation>Վճարում</translation>
     </message>
     <message>
-        <location filename="worder.ui" line="386"/>
+        <location filename="worder.ui" line="396"/>
         <source>Customer taxpayer id (F6)</source>
         <translation>Գնորդի ՀՎՀՀ</translation>
     </message>
     <message>
-        <location filename="worder.ui" line="296"/>
+        <location filename="worder.ui" line="306"/>
         <source>Organization</source>
         <translation>Կազմակերպություն</translation>
     </message>
     <message>
-        <location filename="worder.ui" line="331"/>
+        <location filename="worder.ui" line="341"/>
         <source>Gift card balance</source>
         <translation>Նվեր քարտի բալանս</translation>
     </message>
     <message>
-        <location filename="worder.ui" line="277"/>
+        <location filename="worder.ui" line="287"/>
         <source>Contact</source>
         <translation>Կոնտակտ</translation>
     </message>
     <message>
-        <location filename="worder.ui" line="373"/>
+        <location filename="worder.ui" line="383"/>
         <source>*****</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="worder.ui" line="454"/>
+        <location filename="worder.ui" line="464"/>
         <source>Flags</source>
         <translation>Նշումներ</translation>
     </message>
     <message>
-        <location filename="worder.ui" line="193"/>
-        <location filename="worder.ui" line="222"/>
+        <location filename="worder.ui" line="203"/>
+        <location filename="worder.ui" line="232"/>
         <source>0</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="worder.ui" line="244"/>
+        <location filename="worder.ui" line="254"/>
         <source>Customer</source>
         <translation>Հաճախորդ</translation>
     </message>
     <message>
-        <location filename="worder.ui" line="106"/>
-        <location filename="worder.ui" line="212"/>
+        <location filename="worder.ui" line="116"/>
+        <location filename="worder.ui" line="222"/>
         <location filename="worder.cpp" line="565"/>
-        <location filename="worder.cpp" line="738"/>
+        <location filename="worder.cpp" line="760"/>
         <source>Discount</source>
         <translation>Զեղչ</translation>
     </message>
@@ -3984,7 +4014,7 @@ reservation</source>
         <translation>Քարտի ժամկետը անցել է</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="729"/>
+        <location filename="worder.cpp" line="751"/>
         <source>Enter discount value</source>
         <translation>Մուտքագրեք զեղչի տոկոսը</translation>
     </message>
@@ -3994,22 +4024,22 @@ reservation</source>
         <translation>Քանակ</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="185"/>
+        <location filename="worder.cpp" line="182"/>
         <source>Cannot add goods in prepaid mode</source>
         <translation>Ավելացնել հնարաով չէ կանխավճարի դեպքում</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="231"/>
+        <location filename="worder.cpp" line="228"/>
         <source>New goods with code</source>
         <translation>Նոր ապրանք</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="233"/>
+        <location filename="worder.cpp" line="230"/>
         <source>name</source>
         <translation>անվանում</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="326"/>
+        <location filename="worder.cpp" line="325"/>
         <source>Debt impossible on unknown partner</source>
         <translation>Պարտքը նշելու դեպքում գործընկերը պարտադիր պետք է նշվի</translation>
     </message>
@@ -4036,19 +4066,20 @@ reservation</source>
     <message>
         <location filename="worder.cpp" line="489"/>
         <location filename="worder.cpp" line="506"/>
+        <location filename="worder.cpp" line="676"/>
         <source>Cannot change the quantity on selected row with manual discount mode</source>
         <translation>Քանակի փոփոխությունը հնարավոր չէ,
 եթե կիրարված է դումարի զեղչ տողի վրա</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="762"/>
+        <location filename="worder.cpp" line="784"/>
         <source>Change qty</source>
         <translation>Քանակի փոփոխություն</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="929"/>
-        <location filename="worder.cpp" line="941"/>
-        <location filename="worder.cpp" line="962"/>
+        <location filename="worder.cpp" line="955"/>
+        <location filename="worder.cpp" line="967"/>
+        <location filename="worder.cpp" line="988"/>
         <source>Invalid code entered: </source>
         <translation>Սխալ կոդի մուտք</translation>
     </message>
@@ -4058,17 +4089,17 @@ reservation</source>
         <translation>Զեղչը արդեն կիրարված է</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="332"/>
+        <location filename="worder.cpp" line="331"/>
         <source>Invalid qty</source>
         <translation>Սխալ քանակ</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="212"/>
+        <location filename="worder.cpp" line="209"/>
         <source>Goods prices undefined</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="336"/>
+        <location filename="worder.cpp" line="335"/>
         <source>Invalid price</source>
         <translation>Սխալ գին</translation>
     </message>
@@ -4103,22 +4134,22 @@ reservation</source>
         <translation>Տողի հեռացում</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="732"/>
+        <location filename="worder.cpp" line="754"/>
         <source>Enter discount amount</source>
         <translation>Մուտքագրեք զեղչի գումարի չափը</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="827"/>
+        <location filename="worder.cpp" line="849"/>
         <source>Cannot remove preorder that wasnt saved</source>
         <translation>Հնարավոր չէ հեռացնել առանց պահպանելու</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="830"/>
+        <location filename="worder.cpp" line="852"/>
         <source>Confirm to remove</source>
         <translation>Հաստատեք հեռացումը</translation>
     </message>
     <message>
-        <location filename="worder.cpp" line="799"/>
+        <location filename="worder.cpp" line="821"/>
         <source>Insufficient quantity</source>
         <translation>Անբավարար քանակ</translation>
     </message>
@@ -4189,173 +4220,174 @@ reservation</source>
     <message>
         <location filename="working.ui" line="522"/>
         <location filename="working.ui" line="557"/>
+        <location filename="working.ui" line="592"/>
         <source>Database connection</source>
         <translation>Տվյալների պահոցի կարգավորում</translation>
     </message>
     <message>
-        <location filename="working.ui" line="592"/>
+        <location filename="working.ui" line="627"/>
         <source>Server connection</source>
         <translation>Սերվերի կապի կարգավորումներ</translation>
     </message>
     <message>
-        <location filename="working.ui" line="627"/>
         <location filename="working.ui" line="662"/>
+        <location filename="working.ui" line="697"/>
         <source>Close application</source>
         <translation>Փակել ծրագիրը</translation>
     </message>
     <message>
-        <location filename="working.ui" line="698"/>
+        <location filename="working.ui" line="733"/>
         <source>newPreorder</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="working.ui" line="701"/>
+        <location filename="working.ui" line="736"/>
         <source>Ctrl+A</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="working.cpp" line="383"/>
+        <location filename="working.cpp" line="386"/>
         <source>Retail</source>
         <translation>Մանրածախ</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="181"/>
+        <location filename="working.cpp" line="184"/>
         <source>Cannot input without output</source>
         <translation>Կրկին մուտքը հնարավոր չէ։</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="188"/>
+        <location filename="working.cpp" line="191"/>
         <source>Welcome</source>
         <translation>Բարի գալուստ</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="225"/>
+        <location filename="working.cpp" line="228"/>
         <source>Good bye</source>
         <translation>Ցտեսություն</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="227"/>
+        <location filename="working.cpp" line="230"/>
         <source>Cannot output without input</source>
         <translation>Կրկին ելքը հնարավոր չէ։</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="254"/>
-        <location filename="working.cpp" line="903"/>
+        <location filename="working.cpp" line="257"/>
+        <location filename="working.cpp" line="914"/>
         <source>Total today</source>
         <translation>Ընդամենը այսօր</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="746"/>
-        <location filename="working.cpp" line="819"/>
-        <location filename="working.cpp" line="859"/>
-        <location filename="working.cpp" line="878"/>
+        <location filename="working.cpp" line="757"/>
+        <location filename="working.cpp" line="830"/>
+        <location filename="working.cpp" line="870"/>
+        <location filename="working.cpp" line="889"/>
         <source>Password</source>
         <translation>Գաղտնաբառ</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="880"/>
+        <location filename="working.cpp" line="891"/>
         <source>Access denied</source>
         <translation>Մուտքը արգելված է</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="386"/>
+        <location filename="working.cpp" line="389"/>
         <source>Whosale</source>
         <translation>Մեծածախ</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="904"/>
+        <location filename="working.cpp" line="915"/>
         <source>Preorder</source>
         <translation>Պատվեր</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="391"/>
+        <location filename="working.cpp" line="394"/>
         <source>New</source>
         <translation>Նոր գործարք</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="494"/>
+        <location filename="working.cpp" line="497"/>
         <source>Message date and time</source>
         <translation>Հաղորդագրության ստեղծման ամսաթիվ և ժամ</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="502"/>
-        <location filename="working.cpp" line="518"/>
+        <location filename="working.cpp" line="505"/>
+        <location filename="working.cpp" line="521"/>
         <source>Goods reserved</source>
         <translation>Ապրանքի ամրագրում</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="512"/>
-        <location filename="working.cpp" line="523"/>
+        <location filename="working.cpp" line="515"/>
+        <location filename="working.cpp" line="526"/>
         <source>End date</source>
         <translation>Վերջնաժամկետ</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="533"/>
+        <location filename="working.cpp" line="536"/>
         <source>Fiscal printed</source>
         <translation>Հդմ կտրոնը տպված է</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="537"/>
+        <location filename="working.cpp" line="540"/>
         <source>Fiscal not printed</source>
         <translation>Հդմ կտրոնը տպված չէ</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="585"/>
+        <location filename="working.cpp" line="588"/>
         <source>Printed</source>
         <translation>Տպված</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="734"/>
+        <location filename="working.cpp" line="745"/>
         <source>Confirm to close application</source>
         <translation>Հաստատեք ծրագրից դուրս գալը</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="751"/>
+        <location filename="working.cpp" line="762"/>
         <source>Error</source>
         <translation>Սխալ</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="751"/>
+        <location filename="working.cpp" line="762"/>
         <source>Invalid password</source>
         <translation>Գաղտնաբառը սխալ է</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="900"/>
+        <location filename="working.cpp" line="911"/>
         <source>Search goods in the storages</source>
         <translation>Փնտրել ապրանքը պեհեստներում</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="901"/>
+        <location filename="working.cpp" line="912"/>
         <source>Input staff at the work</source>
         <translation>Աշխատողի մուտք</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="902"/>
+        <location filename="working.cpp" line="913"/>
         <source>Output staff from the work</source>
         <translation>Աշխատողի ելք</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="905"/>
+        <location filename="working.cpp" line="916"/>
         <source>Show log</source>
         <translation>Դիտել պատմությունը</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="906"/>
+        <location filename="working.cpp" line="917"/>
         <source>Open new store input document</source>
         <translation>Բացել նոր պահեստի մուտքի փասթաթուղթ</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="907"/>
+        <location filename="working.cpp" line="918"/>
         <source>List of workers at work</source>
         <translation>Աշխատողների ցանկ սրահում</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="935"/>
+        <location filename="working.cpp" line="946"/>
         <source>The gift card must saled separately</source>
         <translation>Նվեր քարտը պետք է վաճառվի արանձին</translation>
     </message>
     <message>
-        <location filename="working.cpp" line="729"/>
+        <location filename="working.cpp" line="740"/>
         <source>Current window</source>
         <translation>Ընդացիք պատուհան</translation>
     </message>

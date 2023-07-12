@@ -57,7 +57,7 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
 #else
     ui->tblDishes->setColumnWidths(ui->tblDishes->columnCount(), 0, 0, 400, 80, 0);
 #endif
-    ui->tblGoods->setColumnWidths(ui->tblGoods->columnCount(), 0, 0, 0, 0, 400, 80, 80, 80, 80, 300);
+    ui->tblGoods->setColumnWidths(ui->tblGoods->columnCount(), 0, 0, 0, 0, 400, 80, 80, 80, 80, 80, 300);
     ui->tblGoodsStore->setColumnWidths(7, 0, 0, 200, 70, 50, 50, 70);
     ui->btnNewPartner->setVisible(__user->check(cp_t7_partners));
     ui->btnNewGoods->setVisible(__user->check(cp_t6_goods));
@@ -191,7 +191,8 @@ bool C5StoreDoc::openDoc(QString id, QString &err)
         ui->tblGoods->setString(row, 6, dw.value(container_astoredraft, i, "f_unitname").toString());
         ui->tblGoods->lineEdit(row, 7)->setDouble(dw.value(container_astoredraft, i, "f_price").toDouble());
         ui->tblGoods->lineEdit(row, 8)->setDouble(dw.value(container_astoredraft, i, "f_total").toDouble());
-        ui->tblGoods->lineEdit(row, 9)->setText(dw.value(container_astoredraft, i, "f_comment").toString());
+        ui->tblGoods->getWidget<C5DateEdit>(row, 9)->setDate(dw.value(container_astoredraft, i, "f_validdate").toDate());
+        ui->tblGoods->lineEdit(row, 10)->setText(dw.value(container_astoredraft, i, "f_comment").toString());
     }
 
     disconnect(ui->leComplectationName, SIGNAL(textChanged(QString)), this, SLOT(on_leComplectationName_textChanged(QString)));
@@ -968,7 +969,7 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
                     || fDocType == DOC_TYPE_STORE_MOVE || fDocType == DOC_TYPE_DECOMPLECTATION) {
                 if (!dw.writeAStoreDraft(inid, fInternalId, ui->leStoreInput->getInteger(), 1, ui->tblGoods->getInteger(i, 3),
                                          ui->tblGoods->lineEdit(i, 5)->getDouble(), ui->tblGoods->lineEdit(i, 7)->getDouble(), ui->tblGoods->lineEdit(i, 8)->getDouble(),
-                                         ui->leReason->getInteger(), "", i, ui->tblGoods->lineEdit(i, 9)->text())) {
+                                         ui->leReason->getInteger(), "", i, ui->tblGoods->lineEdit(i, 10)->text())) {
                     err += db.fLastError + "<br>";
                 }
                 if (fDocType == DOC_TYPE_STORE_INPUT) {
@@ -998,6 +999,14 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
             db[":f_price2"] = ui->tblCalcPrice->getDouble(i, 4);
             db[":f_margin"] = ui->tblCalcPrice->lineEdit(i, 6)->getDouble();
             db.insert("a_calc_price", false);
+        }
+        db[":f_document"] = fInternalId;
+        db.exec("delete from a_store_valid where f_document=:f_document");
+        for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+            db[":f_id"] = ui->tblGoods->getString(i, 0);
+            db[":f_document"] = fInternalId;
+            db[":f_date"] = ui->tblGoods->getWidget<C5DateEdit>(i, 9)->date();
+            db.insert("a_store_valid", false);
         }
     }
 
@@ -1346,7 +1355,8 @@ int C5StoreDoc::addGoodsRow()
     ltotal->addEventKeys("+-*");
     connect(ltotal, SIGNAL(keyPressed(QChar)), this, SLOT(lineEditKeyPressed(QChar)));
     connect(ltotal, SIGNAL(returnPressed()), this, SLOT(focusNextChildren()));
-    ui->tblGoods->createLineEdit(row, 9);
+    ui->tblGoods->createWidget<C5DateEdit>(row, 9);
+    ui->tblGoods->createLineEdit(row, 10);
 
     connect(lqty, SIGNAL(textEdited(QString)), this, SLOT(tblQtyChanged(QString)));
     connect(lprice, SIGNAL(textEdited(QString)), this, SLOT(tblPriceChanged(QString)));
@@ -1359,6 +1369,8 @@ int C5StoreDoc::addGoodsRow()
     connect(l, &C5LineEdit::textEdited, this, &C5StoreDoc::tblCalcMarginChanged);
     l = ui->tblCalcPrice->createLineEdit(row, 7);
     connect(l, &C5LineEdit::textEdited, this, &C5StoreDoc::tblCalcFinalChanged);
+
+
 
     return row;
 }

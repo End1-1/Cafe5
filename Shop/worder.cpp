@@ -27,17 +27,9 @@
 #include "QRCodeGenerator.h"
 #include "threadcheckmessage.h"
 #include <QInputDialog>
+#include <QSettings>
 
-#define col_bacode 0
-#define col_name 1
-#define col_qty 2
-#define col_unit 3
-#define col_price 4
-#define col_total 5
-#define col_discamount 6
-#define col_discmode 7
-#define col_discvalue 8
-#define col_stock 9
+static QSettings s(_ORGANIZATION_, _APPLICATION_+ QString("\\") + _MODULE_);
 
 WOrder::WOrder(C5User *user, int saleType, WCustomerDisplay *customerDisplay, QWidget *parent) :
     QWidget(parent),
@@ -82,6 +74,7 @@ WOrder::WOrder(C5User *user, int saleType, WCustomerDisplay *customerDisplay, QW
     ui->btnF5->setText(fWorking->flag(5).name);
 
     ui->tblData->setColumnWidth(col_bacode, 150);
+    ui->tblData->setColumnWidth(col_group, 150);
     ui->tblData->setColumnWidth(col_name, 400);
     ui->tblData->setColumnWidth(col_qty, 100);
     ui->tblData->setColumnWidth(col_unit, 100);
@@ -91,6 +84,10 @@ WOrder::WOrder(C5User *user, int saleType, WCustomerDisplay *customerDisplay, QW
     ui->tblData->setColumnWidth(col_discmode, 30);
     ui->tblData->setColumnWidth(col_discvalue, 120);
     ui->tblData->setColumnWidth(col_stock, 100);
+
+    ui->tblData->setColumnHidden(col_group, !s.value("col" + QString::number(col_group)).toBool());
+    ui->tblData->setColumnHidden(col_unit, !s.value("col" + QString::number(col_unit)).toBool());
+    ui->tblData->setColumnHidden(col_qtybox, !s.value("col" + QString::number(col_qtybox)).toBool());
 }
 
 WOrder::~WOrder()
@@ -237,9 +234,11 @@ int WOrder::addGoodsToTable(int id, bool checkQtyOfStore, const QString &draftid
 
     int row = ui->tblData->addEmptyRow();
     OGoods og;
+    og._groupName = g.group()->groupName();
     og._goodsName = g.goodsName();
     og._unitName = g.unit()->unitName();
     og._barcode = g.scancode();
+    og._qtybox = g.qtyBox();
     og.header = fOHeader._id();
     og.goods = id;
     og.taxDept = g.group()->taxDept();
@@ -665,6 +664,26 @@ int WOrder::lastRow()
     return ui->tblData->rowCount() - 1;
 }
 
+void WOrder::comma()
+{
+    clearCode();
+    if (__c5config.getValue(param_shop_deny_qtychange).toInt() == 0) {
+        int row = ui->tblData->currentRow();
+        if (row < 0) {
+            return;
+        }
+        if (fOGoods.at(row).discountMode == CARD_TYPE_MANUAL) {
+            C5Message::error(tr("Cannot change the quantity on selected row with manual discount mode"));
+            return;
+        }
+        double qty = DQty::getQty(tr("Box"), this);
+        if (qty < 0.001) {
+            return;
+        }
+        setQtyOfRow(row, qty * fOGoods.at(row)._qtybox);
+    }
+}
+
 void WOrder::setDiscount(const QString &label, const QString &value)
 {
     if (label.isEmpty()) {
@@ -687,8 +706,10 @@ void WOrder::countTotal()
     for (int i = 0; i < fOGoods.count(); i++) {
         const OGoods &og = fOGoods.at(i);
         ui->tblData->setData(i, col_bacode, og._barcode);
+        ui->tblData->setData(i, col_group, og._groupName);
         ui->tblData->setData(i, col_name, og._goodsName);
         ui->tblData->setData(i, col_qty, og.qty);
+        ui->tblData->setData(i, col_qtybox, og.qty / og._qtybox);
         ui->tblData->setData(i, col_price, og.price);
         ui->tblData->setData(i, col_unit, og._unitName);
         ui->tblData->setData(i, col_total, og.total);
@@ -847,6 +868,10 @@ void WOrder::on_leCode_textChanged(const QString &arg1)
         return;
     }
     if (arg1 == "*") {
+        return;
+    }
+    if (arg1 == ".") {
+        comma();
         return;
     }
 }

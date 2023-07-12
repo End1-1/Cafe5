@@ -278,10 +278,12 @@ bool C5StoreDraftWriter::readAStoreDraft(const QString &id)
     fDb[":f_document"] = id;
     if (fDb.exec("select d.f_id, d.f_goods, "
                  "concat(g.f_name, if(g.f_scancode is null, '', concat(' ', g.f_scancode))) as f_goodsname, "
-                 "d.f_qty, u.f_name as f_unitname, d.f_price, d.f_total, d.f_reason, d.f_type, d.f_base, d.f_comment "
+                 "d.f_qty, u.f_name as f_unitname, d.f_price, d.f_total, d.f_reason, d.f_type, d.f_base, d.f_comment, "
+                 "v.f_date as f_validdate "
                  "from a_store_draft d "
                  "left join c_goods g on g.f_id=d.f_goods "
                  "left join c_units u on u.f_id=g.f_unit "
+                 "left join a_store_valid v on v.f_id=d.f_id "
                  "where d.f_document=:f_document order by d.f_row", fAStoreDraftData, fAStoreDraftDataMap)) {
 //        if (fAStoreDraftData.count() == 0) {
 //            fErrorMsg = tr("Empty store document");

@@ -83,8 +83,6 @@ delete from d_special;
 delete from d_package;
 delete from d_package_list;
 delete from d_stoplist;
-delete from s_salary_body;
-delete from s_salary_options;
 delete from s_syncronize;
 delete from s_draft;
 delete from e_cash_names;
@@ -105,7 +103,6 @@ delete from mf_actions;
 delete from mf_actions_group;
 
 delete from s_log_store_price;
-delete from s_salary_inout;
 
 delete from c_storages;
 alter table a_store_sale auto_increment=0;
@@ -123,7 +120,6 @@ alter table c_goods_option auto_increment = 0;
 alter table o_service_values auto_increment = 0;
 alter table s_custom_reports auto_increment = 0;
 alter table s_log_store_price auto_increment = 0;
-alter table s_salary_inout auto_increment = 0;
 alter table s_user_group auto_increment = 1;
 alter table s_user auto_increment = 1;
 alter table s_report_template auto_increment = 0;

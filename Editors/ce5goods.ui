@@ -694,7 +694,7 @@
         </widget>
        </item>
        <item row="7" column="3">
-        <widget class="C5LineEditWithSelector" name="leLowLevel_3">
+        <widget class="C5LineEditWithSelector" name="leQtyBox">
          <property name="minimumSize">
           <size>
            <width>100</width>
@@ -1746,7 +1746,7 @@
   <tabstop>leGroup</tabstop>
   <tabstop>leUnit</tabstop>
   <tabstop>leLowLevel</tabstop>
-  <tabstop>leLowLevel_3</tabstop>
+  <tabstop>leQtyBox</tabstop>
   <tabstop>leName</tabstop>
   <tabstop>leScanCode</tabstop>
   <tabstop>leCostPrice</tabstop>

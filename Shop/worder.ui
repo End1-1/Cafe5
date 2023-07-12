@@ -78,12 +78,22 @@
      </column>
      <column>
       <property name="text">
+       <string>Group</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
        <string>Goods name</string>
       </property>
      </column>
      <column>
       <property name="text">
        <string>Qty</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Box</string>
       </property>
      </column>
      <column>

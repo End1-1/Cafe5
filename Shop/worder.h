@@ -11,6 +11,19 @@
 #include <QDate>
 #include <QTime>
 
+#define col_bacode 0
+#define col_group 1
+#define col_name 2
+#define col_qty 3
+#define col_qtybox 4
+#define col_unit 5
+#define col_price 6
+#define col_total 7
+#define col_discamount 8
+#define col_discmode 9
+#define col_discvalue 10
+#define col_stock 11
+
 namespace Ui {
 class WOrder;
 }
@@ -77,6 +90,8 @@ public:
 
     int lastRow();
 
+    void comma();
+
     void countTotal();
 
     void setDiscount(const QString &label, const QString &value);
@@ -110,8 +125,6 @@ private:
     C5User *fUser;
 
     Working *fWorking;
-
-
 
     WCustomerDisplay *fCustomerDisplay;
 

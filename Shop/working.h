@@ -135,6 +135,8 @@ private slots:
 
     void shortcutUp();
 
+    void shortcutComma();
+
     void haveChanges(bool v);
 
     void on_tab_tabCloseRequested(int index);
@@ -174,6 +176,7 @@ private slots:
     void on_btnCostumerDisplay_clicked(bool checked);
     void on_btnPreorder_clicked();
     void on_btnOpenDraft_clicked();
+    void on_btnColumns_clicked();
 };
 
 #endif // WORKING_H

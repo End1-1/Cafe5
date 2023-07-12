@@ -218,6 +218,9 @@ bool CE5Goods::save(QString &err, QList<QMap<QString, QVariant> > &data)
             err += tr("Goods code for store output cannot be undefined") + "<br>";
         }
     }
+    if (ui->leQtyBox->getDouble() < 1) {
+        ui->leQtyBox->setDouble(1);
+    }
     if (!err.isEmpty()) {
         return false;
     }

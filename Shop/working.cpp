@@ -34,6 +34,7 @@
 #include "dlgpreorder.h"
 #include "dlgserversettings.h"
 #include "socketconnection.h"
+#include "dlgshowcolumns.h"
 #include "c5tempsale.h"
 #include <QShortcut>
 #include <QInputDialog>
@@ -87,6 +88,7 @@ Working::Working(C5User *user, QWidget *parent) :
     QShortcut *sMinus = new QShortcut(QKeySequence(Qt::Key_Minus), this);
     QShortcut *sPlus = new QShortcut(QKeySequence(Qt::Key_Plus), this);
     QShortcut *sAsterix = new QShortcut(QKeySequence(Qt::Key_Asterisk), this);
+    QShortcut *keyNumpadDot = new QShortcut(QKeySequence(Qt::Key_Comma), this);
     connect(sF1, SIGNAL(activated()), this, SLOT(shortcutF1()));
     connect(sF2, SIGNAL(activated()), this, SLOT(shortcutF2()));
     connect(sF3, SIGNAL(activated()), this, SLOT(shortcutF3()));
@@ -105,6 +107,7 @@ Working::Working(C5User *user, QWidget *parent) :
     connect(sMinus, SIGNAL(activated()), this, SLOT(shortcutMinus()));
     connect(sPlus, SIGNAL(activated()), this, SLOT(shortcutPlus()));
     connect(sAsterix, SIGNAL(activated()), this, SLOT(shortcutAsterix()));
+    connect(keyNumpadDot, SIGNAL(activated()), this, SLOT(shortcutComma()));
 
     ui->tab->installEventFilter(this);
     ui->btnNewRetail->setVisible(!__c5config.shopDenyF1());
@@ -687,6 +690,14 @@ void Working::shortcutUp()
     w->prevRow();
 }
 
+void Working::shortcutComma()
+{
+    WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
+    if (w) {
+        w->comma();
+    }
+}
+
 void Working::haveChanges(bool v)
 {
     if (!fHaveChanges) {
@@ -980,4 +991,9 @@ void Working::on_btnOpenDraft_clicked()
     if (t.exec() == QDialog::Accepted) {
         t.openDraft();
     }
+}
+
+void Working::on_btnColumns_clicked()
+{
+     DlgShowColumns().exec();
 }

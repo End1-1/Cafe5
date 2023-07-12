@@ -13,6 +13,8 @@ public:
     QString adgt();
 
     QString taxDept();
+
+    QString groupName();
 };
 
 #endif // DBGOODSGROUP_H

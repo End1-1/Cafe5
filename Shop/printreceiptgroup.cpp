@@ -677,12 +677,7 @@ void PrintReceiptGroup::print3(const QString &id, C5Database &db)
         db.rowToMap(otax);
     }
 
-    bool debt = false;
-    db[":f_doc"] = id;
-    db.exec("select f_dc from a_dc where f_doc=:f_doc");
-    if (db.nextRow()) {
-        debt = db.getInt("f_dc") == 1;
-    }
+
 
     QString saletype;
     QMap<QString, QVariant> returnFrom;
@@ -829,9 +824,9 @@ void PrintReceiptGroup::print3(const QString &id, C5Database &db)
     p.setFontBold(true);
 
     QString pay = tr("Payment");
-    if (debt) {
-        pay += ", " + tr("debt");
-    }
+//    if (debt) {
+//        pay += ", " + tr("debt");
+//    }
     p.ltext(pay, 0);
     p.br();
     if (oheader["f_amountcash"].toDouble() > 0.001) {

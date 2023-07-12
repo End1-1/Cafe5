@@ -60,6 +60,11 @@ bool C5ShopOrder::write()
         }
     }
 
+    for (int i = 0; i < fOGoods.count(); i++) {
+        OGoods &g = fOGoods[i];
+        g.price = g.total / g.qty;
+    }
+
     if (C5Config::taxIP().isEmpty()) {
         fOHeader._printFiscal = false;
     }

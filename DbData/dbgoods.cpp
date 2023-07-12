@@ -75,6 +75,11 @@ double DbGoods::whosalePrice()
     return dbgoods->get(fId, "f_saleprice2").toDouble();
 }
 
+double DbGoods::qtyBox()
+{
+    return dbgoods->get(fId, "f_qtybox").toDouble();
+}
+
 double DbGoods::lastInputPrice()
 {
     return dbgoods->get(fId, "f_lastinputprice").toDouble();

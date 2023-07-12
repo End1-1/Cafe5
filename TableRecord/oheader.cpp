@@ -182,7 +182,7 @@ void OHeader::countAmount(QVector<OGoods> &goods, BHistory &bhistory)
     amountDiscount = 0;
     for (int i = 0; i < goods.count(); i++) {
         OGoods &g = goods[i];
-        g.total = g.qty  * g.price;
+        g.total = (g.qty / g._qtybox)  * g.price;
         amountTotal += g.total;
         switch (g.discountMode) {
         case CARD_TYPE_DISCOUNT:

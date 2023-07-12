@@ -26,9 +26,11 @@ public:
     QString returnFrom;
     int isService = 0;
 
+    QString _groupName;
     QString _goodsName;
     QString _barcode;
     QString _unitName;
+    double _qtybox = 0.0;
 
     virtual void bind(C5Database &db) override;
     virtual bool write(C5Database &db, QString &err) override;

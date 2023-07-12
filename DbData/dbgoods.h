@@ -35,6 +35,8 @@ public:
 
     double whosalePrice();
 
+    double qtyBox();
+
     double lastInputPrice();
 
     bool writeStoreInputBeforeSale();

@@ -21,3 +21,8 @@ QString DbGoodsGroup::taxDept()
 {
     return dbgoodsgroup->get(fId, "f_taxdept").toString();
 }
+
+QString DbGoodsGroup::groupName()
+{
+    return dbgoodsgroup->get(fId, "f_name").toString();
+}

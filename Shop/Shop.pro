@@ -157,6 +157,7 @@ SOURCES += \
     dlgpreorderitem.cpp \
     dlgreturnitem.cpp \
     dlgsearchpartner.cpp \
+    dlgshowcolumns.cpp \
     dlgsplashscreen.cpp \
     goodsreturnreason.cpp \
     imageloader.cpp \
@@ -335,6 +336,7 @@ HEADERS += \
     dlgpreorderitem.h \
     dlgreturnitem.h \
     dlgsearchpartner.h \
+    dlgshowcolumns.h \
     dlgsplashscreen.h \
     goodsreturnreason.h \
     imageloader.h \
@@ -401,6 +403,7 @@ FORMS += \
     dlgpreorderitem.ui \
     dlgreturnitem.ui \
     dlgsearchpartner.ui \
+    dlgshowcolumns.ui \
     dlgsplashscreen.ui \
     goodsreturnreason.ui \
     loghistory.ui \
