@@ -23,6 +23,8 @@ private slots:
 
     void on_btnCloseCash_clicked();
 
+    void on_btnViewReport_clicked();
+
 private:
     Ui::DlgCashButtonOpions *ui;
 };

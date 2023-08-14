@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
         __autologin_store.append(argv[i]);
     }
 
-//    if (QDate::currentDate() > QDate::fromString("20/05/2023", "dd/MM/yyyy")) {
+//    if (QDate::currentDate() > QDate::fromString("15/08/2023", "dd/MM/yyyy")) {
 //        return 1;
 //    }
 

@@ -58,8 +58,10 @@ void CustomerInfo::on_pushButton_clicked()
     C5Database db(fDBParams);
     db[":f_taxname"] = ui->lePhone->text() + " " + ui->leCustomer->text();
     db[":f_contact"] = ui->leCustomer->text();
+    db[":f_name"] = ui->leCustomer->text();
     db[":f_phone"] = ui->lePhone->text();
     db[":f_address"] = ui->leAddress->text();
+    db[":f_category"] = 2;
     if (fCustomerId == 0) {
         fCustomerId = db.insert("c_partners");
     } else {

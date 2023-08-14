@@ -11,6 +11,9 @@
 #include "printtaxn.h"
 #include "c5printing.h"
 #include "dlgcashbuttonopions.h"
+#include "c5cashdoc.h"
+#include "dlgviewcashreport.h"
+#include "qinputdialog.h"
 
 DlgReports::DlgReports(const QStringList &dbParams, C5User *user) :
     C5Dialog(dbParams),
@@ -298,13 +301,18 @@ void DlgReports::on_btnPrintTaxZ_clicked()
 void DlgReports::on_btnCashobx_clicked()
 {
    bool closecash = false;
+   bool printreport = false;
    switch (DlgCashButtonOpions::getOptions()) {
    case 0:
        return;
    case 1:
-       closecash = true;
        break;
    case 2:
+       printreport = true;
+       break;
+   case 3:
+       printreport = true;
+       closecash = true;
        break;
    }
 
@@ -341,77 +349,167 @@ void DlgReports::on_btnCashobx_clicked()
             "WHERE ah.f_sessionid IS NULL "
             "GROUP BY 1");
 
-   int bs = 22;
-   QFont font(qApp->font());
-   font.setPointSize(bs);
-   C5Printing p;
-   p.setSceneParams(700, 2600, QPrinter::Portrait);
-   p.setFont(font);
-   p.image("./logo_receipt.png", Qt::AlignHCenter);
-   p.br();
-   p.setFontSize(bs + 2);
-   p.setFontBold(true);
-   p.ctext(QDate::currentDate().toString(FORMAT_DATE_TO_STR));
-   p.br();
-   if (closecash) {
-       p.setFontSize(bs + 4);
-       p.setFontBold(true);
-       p.ctext(tr("Cash closing"));
-       p.br();
-   }
-   double total = -1000000000;
-   while (db.nextRow()) {
-    if (db.getString(1) == "title") {
-
-        if (total > -1000000000) {
-            p.setFontSize(bs + 2);
-            p.setFontBold(true);
-            p.ltext(tr("Total"), 0);
-            p.rtext(float_str(total, 2));
-            p.br();
-            p.line();
-            p.br();
-            p.line();
-            p.br();
-            p.line();
-            p.br(2);
-            p.br(2);
+   if (!printreport) {
+       DlgViewCashReport d;
+       double total = -1000000000;
+       while (db.nextRow()) {
+        if (db.getString(1) == "title") {
+            if (total > -1000000000) {
+                d.addTotal(total);
+            }
+            total = 0;
+            d.addTitle(db.getString(0));
+            continue;
         }
-        total = 0;
-        p.setFontSize(bs + 2);
-        p.setFontBold(true);
-        p.ctext(db.getString(0));
-        p.br();
-        p.line();
-        p.br();
-        continue;
-    }
-    p.setFontSize(bs);
-    p.setFontBold(false);
-    total += db.getDouble(2);
-    p.ltext(db.getString(0), 0);
-    p.rtext(float_str(db.getDouble(2), 2));
-    p.br();
+        d.addRow(db.getString(0) + " " + db.getString(1), db.getDouble(2));
+        total += db.getDouble(2);
+       }
+       if (total > -1000000000) {
+           d.addTotal(total);
+       }
+       if (d.exec() == QDialog::Accepted) {
+           printreport = true;
+           db.first();
+       } else {
+        return;
+       }
    }
-   if (total  -1000000000) {
+
+   if (printreport) {
+       int bs = 22;
+       QFont font(qApp->font());
+       font.setPointSize(bs);
+       C5Printing p;
+       p.setSceneParams(700, 2600, QPrinter::Portrait);
+       p.setFont(font);
+       p.image("./logo_receipt.png", Qt::AlignHCenter);
+       p.br();
        p.setFontSize(bs + 2);
        p.setFontBold(true);
-       p.ltext(tr("Total"), 0);
-       p.rtext(float_str(total, 2));
+       p.ctext(QDate::currentDate().toString(FORMAT_DATE_TO_STR));
        p.br();
-       p.line();
+       if (closecash) {
+           p.setFontSize(bs + 4);
+           p.setFontBold(true);
+           p.ctext(tr("Cash closing"));
+           p.br();
+       }
+       double total = -1000000000;
+       while (db.nextRow()) {
+        if (db.getString(1) == "title") {
+            if (total > -1000000000) {
+                p.setFontSize(bs + 2);
+                p.setFontBold(true);
+                p.ltext(tr("Total"), 0);
+                p.rtext(float_str(total, 2));
+                p.br();
+                p.line();
+                p.br();
+                p.line();
+                p.br();
+                p.line();
+                p.br(2);
+                p.br(2);
+            }
+            total = 0;
+            p.setFontSize(bs + 2);
+            p.setFontBold(true);
+            p.ctext(db.getString(0));
+            p.br();
+            p.line();
+            p.br();
+            continue;
+        }
+        p.setFontSize(bs);
+        p.setFontBold(false);
+        total += db.getDouble(2);
+        p.ltext(db.getString(0) + " " + db.getString(1), 0);
+        p.rtext(float_str(db.getDouble(2), 2));
+        p.br();
+       }
+       if (total > -1000000000) {
+           p.setFontSize(bs + 2);
+           p.setFontBold(true);
+           p.ltext(tr("Total"), 0);
+           p.rtext(float_str(total, 2));
+           p.br();
+           p.line();
+           p.br();
+           p.line();
+           p.br();
+           p.line();
+           p.br(2);
+           p.br(2);
+       }
+       p.setFontSize(bs - 4);
+       p.ltext(tr("Printed"), 0);
+       p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
        p.br();
-       p.line();
-       p.br();
-       p.line();
-       p.br(2);
-       p.br(2);
+       p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
    }
-   p.setFontSize(bs - 4);
-   p.setFontBold(false);
-   p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
 
    if (closecash) {
-       db.exec("update a_header set f_sessionid=uuid() where f_sessionid is null");
+       db[":f_sessionid"] = QDateTime::currentDateTime().toString("dd/MM/yyyy HH:mm:ss");
+       db.exec("update a_header set f_sessionid=:f_sessionid where f_sessionid is null");
    }
+}
+
+void DlgReports::on_btnCashInput_clicked()
+{
+    bool ok;
+    double cash = QInputDialog::getDouble(this, tr("Cash input"), "", 0, 0, 999999999, 0, &ok);
+    if (!ok || cash < 0.001) {
+        return;
+    }
+    C5Database db(__c5config.dbParams());
+
+    C5CashDoc *doc = new C5CashDoc(__c5config.dbParams());
+    doc->setRelation(true);
+    doc->setCashOutput(__c5config.cashId());
+    doc->setDate(QDate::currentDate());
+    doc->addRow(tr("Change output"), cash);
+    doc->save(true);
+
+    db[":f_id"] = doc->uuid();
+    db.exec("update a_header set f_sessionid=uuid() where f_Id=:f_id");
+
+    C5CashDoc *d2 = new C5CashDoc(__c5config.dbParams());
+    d2->setRelation(true);
+    d2->setCashInput(__c5config.cashId());
+    d2->setDate(QDate::currentDate());
+    d2->addRow(tr("Change input"), cash);
+    d2->save(true);
+
+    int bs = 22;
+    QFont font(qApp->font());
+    font.setPointSize(bs);
+    C5Printing p;
+    p.setSceneParams(700, 2600, QPrinter::Portrait);
+    p.setFont(font);
+    p.image("./logo_receipt.png", Qt::AlignHCenter);
+    p.br();
+    p.setFontSize(bs + 2);
+    p.setFontBold(true);
+    p.ctext(QDate::currentDate().toString(FORMAT_DATE_TO_STR));
+    p.br();
+
+        p.setFontSize(bs + 4);
+        p.setFontBold(true);
+        p.ctext(tr("Change input"));
+        p.br();
+
+
+     p.setFontSize(bs);
+     p.setFontBold(false);
+     p.ctext(float_str(cash, 2));
+     p.br();
+
+     p.setFontSize(bs - 4);
+     p.ltext(tr("Printed"), 0);
+     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
+     p.br();
+
+    p.setFontSize(bs - 4);
+    p.setFontBold(false);
+    p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
 }

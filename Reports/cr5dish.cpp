@@ -3,7 +3,9 @@
 #include "c5mainwindow.h"
 #include "c5tablemodel.h"
 #include "cr5menutranslator.h"
+#include "dlgprintrecipesoptions.h"
 #include <QAbstractScrollArea>
+#include <QPrintDialog>
 
 CR5Dish::CR5Dish(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
@@ -45,6 +47,9 @@ QToolBar *CR5Dish::toolBar()
         fToolBar->addAction(QIcon(":/delete.png"), tr("Remove"), this, SLOT(deleteDish()));
         auto *g = new QAction(QIcon(":/goodsback.png"), tr("Output to AS"), this);
         connect(g, SIGNAL(triggered(bool)), this, SLOT(asoutput(bool)));
+        fToolBar->addAction(g);
+        g = new QAction(QIcon(":/print.png"), tr("Print recipes"), this);
+        connect(g, SIGNAL(triggered(bool)), this, SLOT(printRecipes(bool)));
         fToolBar->addAction(g);
     }
     return fToolBar;
@@ -111,4 +116,38 @@ void CR5Dish::deleteDish()
     db.exec("delete from d_dish where f_id=:f_id");
     fModel->removeRow(row);
     C5Message::info(tr("Deleted"));
+}
+
+void CR5Dish::printRecipes(bool v)
+{
+    C5DishWidget *w = static_cast<C5DishWidget*>(fEditor);
+    bool showprice = false;
+    switch (DlgPrintRecipesOptions(fDBParams).exec()){
+    case 1:
+        showprice = true;
+        break;
+    case 2:
+        showprice = false;
+        break;
+    default:
+        return;
+    }
+    QPrintDialog pd(this);
+    if (pd.exec() != QDialog::Accepted) {
+        return;
+    }
+    C5Printing p;
+    QFont font(font());
+    font.setPointSize(20);
+    QSize paperSize(2000, 2800);
+    p.setSceneParams(paperSize.width(), paperSize.height(), QPrinter::Portrait);
+    p.setFont(font);
+    for (int i = 0; i < fModel->rowCount(); i++) {
+        if (i > 0) {
+            p.newPage();
+        }
+        w->setId(fModel->data(i, fModel->fColumnNameIndex[tr("Code")], Qt::EditRole).toInt());
+        w->printPreview(p, showprice);
+    }
+    p.print(pd.printer()->printerName(), QPrinter::A4);
 }

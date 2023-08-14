@@ -36,7 +36,6 @@ void SearchItems::on_btnSearch_clicked()
     ui->tbl->setColumnHidden(5, __c5config.shopDenyF2());
     C5Database db(__c5config.replicaDbParams());
     int goods = dbgoods->idOfScancode(ui->leCode->text());
-    db[":f_date"] = QDate::currentDate();
     db[":f_goods"] = goods;
     db[":f_store"] = __c5config.defaultStore();
     db[":f_reservestate"] = GR_RESERVED;
@@ -50,7 +49,7 @@ void SearchItems::on_btnSearch_clicked()
             "inner join a_header h on h.f_id=s.f_document  "
             "left join c_goods_prices gpr on gpr.f_goods=g.f_id "
             "left join (select f_goods, f_store, sum(f_qty) as f_qty from a_store_reserve where f_state=:f_reservestate and f_goods=:f_goods group by 1, 2) rs on rs.f_goods=s.f_goods and rs.f_store=s.f_store "
-            "where  h.f_date<=:f_date and s.f_goods=:f_goods "
+            "where s.f_goods=:f_goods "
             "group by ss.f_name,g.f_name,u.f_name,gpr.f_price1,gpr.f_price2 "
             "having sum(s.f_qty*s.f_type) > 0");
     while (db.nextRow()) {

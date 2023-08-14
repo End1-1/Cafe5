@@ -33,6 +33,20 @@ C5Printing::~C5Printing()
     }
 }
 
+void C5Printing::newPage()
+{
+    fTop = 0;
+    QPrinter::Orientation o = fCanvasOrientation[fCanvas];
+    fCanvas = new QGraphicsScene();
+    fCanvasList.append(fCanvas);
+    setSceneParams(fNormalWidth, fNormalHeight, o);
+    fCurrentPageIndex++;
+
+    QJsonObject ob;
+    ob["cmd"] = "newpage";
+    fJsonData.append(ob);
+}
+
 void C5Printing::setSceneParams(qreal width, qreal height, QPrinter::Orientation orientation)
 {
     fNormalHeight = height;

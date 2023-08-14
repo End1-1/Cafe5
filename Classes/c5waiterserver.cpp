@@ -966,14 +966,14 @@ int C5WaiterServer::printTax(const QMap<QString, QVariant> &header, const QList<
                     "5901",
                     "001",
                     QString("%1 %2%").arg(tr("Service")).arg(float_str(header["f_servicefactor"].toDouble()*100, 2)),
-                header["f_amountservice"].toDouble(), 1.0, header["f_discountfactor"].toDouble() * 100);
+                header["f_amountservice"].toDouble(), 1.0, 0);
     }
     QString jsonIn, jsonOut;
     int result = 0;
     double cardamount = header["f_amountcard"].toDouble()
             + header["f_amountidram"].toDouble()
             + header["f_amountpayx"].toDouble();
-    result = pt.makeJsonAndPrint(cardamount, 0, jsonIn, jsonOut, err);
+    result = pt.makeJsonAndPrint(cardamount, header["f_amountprepaid"].toDouble(), jsonIn, jsonOut, err);
     db[":f_id"] = db.uuid();
     db[":f_order"] = header["f_id"].toString();
     db[":f_date"] = QDate::currentDate();

@@ -47,7 +47,7 @@ bool CE5UserGroup::save(QString &err, QList<QMap<QString, QVariant> > &data)
     }
     C5Database db(fDBParams);
     db[":f_position"] = ui->leCode->getInteger();
-    db.exec("delete from s_salary_rules where f_id=:f_id");
+    db.exec("delete from s_salary_rules where f_position=:f_position");
     db[":f_position"] = ui->leCode->getInteger();
     db[":f_fixed"] = ui->leFixed->getDouble();
     db[":f_min"] = ui->leMin->getDouble();

@@ -47,6 +47,7 @@ public:
     int guests;
     int precheck;
     int currency;
+    QString taxpayerTin;
 
     bool _printFiscal = false;
 

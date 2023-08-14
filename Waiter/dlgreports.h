@@ -74,6 +74,7 @@ private slots:
 
     void on_btnPrintTaxZ_clicked();
     void on_btnCashobx_clicked();
+    void on_btnCashInput_clicked();
 };
 
 #endif // DLGREPORTS_H

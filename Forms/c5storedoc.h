@@ -61,21 +61,7 @@ public:
 
     virtual void hotKey(const QString &key);
 
-    void setListenBroadcast(bool v);
-
     static void writeAStoreSale(int storei, int storeo);
-
-    virtual bool parseBroadcastMessage(int what, const QString &msg, QString &replystr) override;
-
-    bool parseBroadcastSuggest(QJsonObject jobj, QString &replystr);
-
-    bool parseBroadcastAddGoods(QJsonObject jobj, QString &replystr);
-
-    bool parseBroadcastQty(QJsonObject jobj, QString &replystr);
-
-    bool parseBroadcastPrice(QJsonObject jobj, QString &replystr);
-
-    bool parseBroadcastAmount(QJsonObject jobj, QString &replystr);
 
     bool openDraft(const QString &id);
 

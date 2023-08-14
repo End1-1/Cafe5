@@ -11,6 +11,7 @@
 #include "c5waiterorder.h"
 #include "c5dlgselectreporttemplate.h"
 #include "c5salefromstoreorder.h"
+#include "storeinputdocument.h"
 #include <QMenu>
 
 CR5Documents::CR5Documents(const QStringList &dbParams, QWidget *parent) :
@@ -144,7 +145,21 @@ void CR5Documents::openDoc(QString id)
 {
     QString err;
     switch (docType(id)) {
-    case DOC_TYPE_STORE_INPUT:
+    case DOC_TYPE_STORE_INPUT: {
+#ifdef NEWVERSION
+        auto *si = __mainWindow->createTab<StoreInputDocument>(fDBParams);
+        if (!si->openDoc(id)) {
+            __mainWindow->removeTab(si);
+        }
+#else
+        auto *sa = __mainWindow->createTab<C5StoreDoc>(fDBParams);
+        if (!sa->openDoc(id, err)) {
+            __mainWindow->removeTab(sa);
+            C5Message::error(err);
+        }
+#endif
+        break;
+    }
     case DOC_TYPE_STORE_OUTPUT:
     case DOC_TYPE_STORE_MOVE:
     case DOC_TYPE_COMPLECTATION: {

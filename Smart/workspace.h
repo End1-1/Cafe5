@@ -35,6 +35,10 @@ public:
     void showCustomerDisplay();
 
 private slots:
+    void focusTaxIn();
+
+    void focusLineIn();
+
     void removeDish(int rownum, const QString &packageuuid);
 
     void on_tblPart2_itemClicked(QTableWidgetItem *item);
@@ -115,6 +119,10 @@ private slots:
 
     void on_leCard_textChanged(const QString &arg1);
 
+    void on_leTaxpayerId_textEdited(const QString &arg1);
+
+    void on_btnSetTaxpayer_clicked();
+
 private:
     Ui::Workspace *ui;
 
@@ -131,6 +139,8 @@ private:
     QMap<QString, QMap<QString, QVariant> > fAutoDiscounts;
 
     int fTable;
+
+    QTimer *fTimer;
 
     int fCustomer;
 

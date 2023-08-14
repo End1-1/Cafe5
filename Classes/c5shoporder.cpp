@@ -200,8 +200,6 @@ bool C5ShopOrder::write()
         b.write(db, err);
     }
 
-
-
     if (fOHeader.partner > 0 && needStoreDoc) {
         OutputOfHeader ooh;
         ooh.make(db, fOHeader._id());

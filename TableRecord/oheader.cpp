@@ -89,6 +89,7 @@ void OHeader::bind(C5Database &db)
     db[":f_currency"] = currency;
     db[":f_cash"] = amountCashIn;
     db[":f_change"] = amountChange;
+    db[":f_taxpayertin"] = taxpayerTin;
 }
 
 bool OHeader::getRecord(C5Database &db)
@@ -136,6 +137,7 @@ bool OHeader::getRecord(C5Database &db)
     guests = db.getInt("f_guests");
     precheck = db.getInt("f_precheck");
     currency = db.getInt("f_currency");
+    taxpayerTin = db.getString("f_taxpayertin");
     return true;
 }
 

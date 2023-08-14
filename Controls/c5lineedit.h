@@ -57,6 +57,8 @@ protected:
 
     void focusOutEvent(QFocusEvent *event);
 
+    void focusInEvent(QFocusEvent *event);
+
 private:
     int fTag;
 
@@ -69,6 +71,8 @@ private slots:
 
 signals:
     void focusOut();
+
+    void focusIn();
 
     void keyPressed(const QChar &key);
 

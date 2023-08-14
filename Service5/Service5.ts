@@ -354,14 +354,27 @@
     </message>
 </context>
 <context>
+    <name>QObject</name>
+    <message>
+        <location filename="../Service5Working/utils/storemovement.cpp" line="26"/>
+        <source>Invalid document id</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Service5Working/utils/storemovement.cpp" line="145"/>
+        <source>Not enough materials in the store</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>RawBalanceHistory</name>
     <message>
-        <location filename="raw/rawbalancehistory.cpp" line="84"/>
+        <location filename="../Service5Working/raw/rawbalancehistory.cpp" line="84"/>
         <source>Starting balance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="raw/rawbalancehistory.cpp" line="99"/>
+        <location filename="../Service5Working/raw/rawbalancehistory.cpp" line="99"/>
         <source>Ending balance</source>
         <translation type="unfinished"></translation>
     </message>
@@ -369,7 +382,7 @@
 <context>
     <name>SocketThread</name>
     <message>
-        <location filename="socketthread.cpp" line="364"/>
+        <location filename="socketthread.cpp" line="363"/>
         <source>Connection timeout</source>
         <translation type="unfinished"></translation>
     </message>

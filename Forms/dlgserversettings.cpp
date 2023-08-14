@@ -1,6 +1,6 @@
 #include "dlgserversettings.h"
 #include "ui_dlgserversettings.h"
-#include "config.h"
+#include "serverconnection.h"
 #include "socketconnection.h"
 #include <QMessageBox>
 

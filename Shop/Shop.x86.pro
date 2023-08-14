@@ -88,6 +88,7 @@ SOURCES += \
     ../Classes/doubledatabase.cpp \
     ../Classes/fileversion.cpp \
     ../Classes/notificationwidget.cpp \
+    ../Classes/outputofheader.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
     ../Classes/removeshopsale.cpp \
     ../Classes/rkeyboard.cpp \
@@ -120,7 +121,6 @@ SOURCES += \
     ../DbData/dbopreorder.cpp \
     ../DbData/dbpartner.cpp \
     ../DbData/dbservicevalues.cpp \
-    ../DbData/dbshift.cpp \
     ../DbData/dbstore.cpp \
     ../DbData/dbstoredoctype.cpp \
     ../DbData/dbtables.cpp \
@@ -156,6 +156,7 @@ SOURCES += \
     dlgpreorderitem.cpp \
     dlgreturnitem.cpp \
     dlgsearchpartner.cpp \
+    dlgshowcolumns.cpp \
     dlgsplashscreen.cpp \
     goodsreturnreason.cpp \
     imageloader.cpp \
@@ -264,6 +265,7 @@ HEADERS += \
     ../Classes/fileversion.h \
     ../Classes/goodsreserve.h \
     ../Classes/notificationwidget.h \
+    ../Classes/outputofheader.h \
     ../Classes/proxytablewidgetdatabase.h \
     ../Classes/removeshopsale.h \
     ../Classes/rkeyboard.h \
@@ -296,7 +298,6 @@ HEADERS += \
     ../DbData/dbopreorder.h \
     ../DbData/dbpartner.h \
     ../DbData/dbservicevalues.h \
-    ../DbData/dbshift.h \
     ../DbData/dbstore.h \
     ../DbData/dbstoredoctype.h \
     ../DbData/dbtables.h \
@@ -332,6 +333,7 @@ HEADERS += \
     dlgpreorderitem.h \
     dlgreturnitem.h \
     dlgsearchpartner.h \
+    dlgshowcolumns.h \
     dlgsplashscreen.h \
     goodsreturnreason.h \
     imageloader.h \
@@ -398,6 +400,7 @@ FORMS += \
     dlgpreorderitem.ui \
     dlgreturnitem.ui \
     dlgsearchpartner.ui \
+    dlgshowcolumns.ui \
     dlgsplashscreen.ui \
     goodsreturnreason.ui \
     loghistory.ui \

@@ -297,6 +297,45 @@ bool C5DishWidget::event(QEvent *e)
     return CE5Editor::event(e);
 }
 
+void C5DishWidget::printPreview(C5Printing &p, bool showPrice)
+{
+
+    //int page = p.currentPageIndex();
+    p.setFontBold(true);
+    p.ctext(tr("Recipe") + " " + ui->leName->text());
+    p.br();
+    QList<qreal> points;
+    QStringList vals;
+    points << 0 << 600 << 300 << 300 << 300 << 300 ;
+    vals.clear();
+    vals << tr("Goods");
+    vals << tr("Qty");
+    vals << tr("Unit");
+    vals << tr("Price");
+    vals << tr("Cost");
+    p.tableText(points, vals, 60);
+    p.br(60);
+    p.setFontBold(false);
+    for (int i = 0; i < ui->tblRecipe->rowCount(); i++) {
+        vals.clear();
+        vals << ui->tblRecipe->getString(i, 2);
+        vals << ui->tblRecipe->lineEdit(i, 3)->text();
+        vals << ui->tblRecipe->getString(i, 4);
+        vals << (showPrice ? ui->tblRecipe->lineEdit(i, 5)->text() : "0");
+        vals << (showPrice ? ui->tblRecipe->lineEdit(i, 6)->text() : "0");
+        p.tableText(points, vals, 60);
+        p.br(60);
+    }
+    if (ui->tblRecipe->rowCount() > 0) {
+        vals.clear();
+        points.clear();
+        points << 0 << 1500 << 300;
+        vals << tr("Total") << (showPrice ? ui->tblRecipeTotal->getString(0, 6) : "0");
+        p.tableText(points, vals, 60);
+        p.br(60);
+    }
+}
+
 void C5DishWidget::on_btnAddRecipe_clicked()
 {
     QList<QVariant> values;
@@ -479,46 +518,13 @@ void C5DishWidget::recipeQtyPriceChanged(const QString &arg)
 
 void C5DishWidget::on_btnPrintRecipe_clicked()
 {
+    C5Printing p;
     QFont font(qApp->font());
     font.setPointSize(20);
-    C5Printing p;
     QSize paperSize(2000, 2800);
     p.setSceneParams(paperSize.width(), paperSize.height(), QPrinter::Portrait);
     p.setFont(font);
-    //int page = p.currentPageIndex();
-    p.setFontBold(true);
-    p.ctext(tr("Recipe") + " " + ui->leName->text());
-    p.br();
-    QList<qreal> points;
-    QStringList vals;
-    points << 0 << 600 << 300 << 300 << 300 << 300 ;
-    vals.clear();
-    vals << tr("Goods");
-    vals << tr("Qty");
-    vals << tr("Unit");
-    vals << tr("Price");
-    vals << tr("Cost");
-    p.tableText(points, vals, 60);
-    p.br(60);
-    p.setFontBold(false);
-    for (int i = 0; i < ui->tblRecipe->rowCount(); i++) {
-        vals.clear();
-        vals << ui->tblRecipe->getString(i, 2);
-        vals << ui->tblRecipe->lineEdit(i, 3)->text();
-        vals << ui->tblRecipe->getString(i, 4);
-        vals << ui->tblRecipe->lineEdit(i, 5)->text();
-        vals << ui->tblRecipe->lineEdit(i, 6)->text();
-        p.tableText(points, vals, 60);
-        p.br(60);
-    }
-    if (ui->tblRecipe->rowCount() > 0) {
-        vals.clear();
-        points.clear();
-        points << 0 << 1500 << 300;
-        vals << tr("Total") << ui->tblRecipeTotal->getString(0, 8);
-        p.tableText(points, vals, 60);
-        p.br(60);
-    }
+    printPreview(p, true);
 
     C5PrintPreview pp(&p, fDBParams);
     pp.exec();

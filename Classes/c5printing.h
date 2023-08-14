@@ -15,6 +15,8 @@ public:
 
     ~C5Printing();
 
+    void newPage();
+
     void setSceneParams(qreal width, qreal height, QPrinter::Orientation orientation);
 
     void setFont(const QFont &font);

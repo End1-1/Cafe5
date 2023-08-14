@@ -14,7 +14,7 @@
 #include "c5daterange.h"
 #include "breezeconfig.h"
 #include "armsoftexportoptions.h"
-#include "dlglist.h"
+#include "dlglist2.h"
 #include "c5printtaxanywhere.h"
 #include "xlsxall.h"
 #include "httpquerydialog.h"
@@ -653,6 +653,9 @@ void C5SaleDoc::saveDataChanges()
         //WRITE OTHER OUTPUT
         if (!dw.writeOutput(id, err)) {
             db.rollback();
+            for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+                ui->tblGoods->setString(i, col_uuid, "");
+            }
             C5Message::error(err + "#1");
             return;
         }
@@ -1015,7 +1018,7 @@ void C5SaleDoc::exportToAs(int doctype)
         while (db.nextRow()) {
             dbNames.append(db.getString("f_name"));
         }
-        index = DlgList::indexOfList(tr("Armsoft database"), fDBParams, dbNames);
+        index = DlgList2::indexOfList(tr("Armsoft database"), fDBParams, dbNames);
         if (index < 0) {
             return;
         }

@@ -1,7 +1,7 @@
 #include "dlgguests.h"
 #include "ui_dlgguests.h"
 #include "c5orderdriver.h"
-#include "worder.h"
+#include "worderw.h"
 #include "wguestorder.h"
 
 DlgGuests::DlgGuests(const QStringList &dbParams, C5OrderDriver *order) :

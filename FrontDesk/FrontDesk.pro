@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network printsupport sql multimedia
+QT += core gui network printsupport sql multimedia
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -24,6 +24,8 @@ DEFINES += _ORGANIZATION_=\\\"Jazzve\\\"
 DEFINES += _APPLICATION_=\\\"Cafe5\\\"
 DEFINES += _MODULE_=\\\"FRONTDESK\\\"
 DEFINES += FRONTDESK
+
+#DEFINES += NEWVERSION
 
 CONFIG += c++11
 
@@ -112,32 +114,80 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Editors/ce5packagelist.cpp \
     ../Editors/ce5storereason.cpp \
     ../Forms/armsoftexportoptions.cpp \
+    ../Forms/barcode.cpp \
+    ../Forms/c5cashdoc.cpp \
+    ../Forms/c5changedocinputprice.cpp \
+    ../Forms/c5changepassword.cpp \
+    ../Forms/c5changepriceofgroup.cpp \
+    ../Forms/c5checkdatabase.cpp \
+    ../Forms/c5costumerdebtpayment.cpp \
+    ../Forms/c5datasynchronize.cpp \
+    ../Forms/c5daterange.cpp \
+    ../Forms/c5dbresetoption.cpp \
+    ../Forms/c5dbuseraccess.cpp \
+    ../Forms/c5dishgroupaction.cpp \
+    ../Forms/c5dishselfcostgenprice.cpp \
+    ../Forms/c5dlgselectreporttemplate.cpp \
     ../Forms/c5filtervalues.cpp \
+    ../Forms/c5goodsimage.cpp \
+    ../Forms/c5goodspricing.cpp \
     ../Forms/c5goodsspecialprices.cpp \
+    ../Forms/c5grouppermissionseditor.cpp \
+    ../Forms/c5inputdate.cpp \
+    ../Forms/c5login.cpp \
+    ../Forms/c5mainwindow.cpp \
+    ../Forms/c5passwords.cpp \
     ../Forms/c5printtaxanywhere.cpp \
+    ../Forms/c5progressdialog.cpp \
+    ../Forms/c5reportwidget.cpp \
     ../Forms/c5route.cpp \
     ../Forms/c5salarydoc.cpp \
     ../Forms/c5salarypayment.cpp \
     ../Forms/c5saledoc.cpp \
+    ../Forms/c5salefromstoreorder.cpp \
+    ../Forms/c5selector.cpp \
+    ../Forms/c5serviceconfig.cpp \
     ../Forms/c5srofinventory.cpp \
+    ../Forms/c5storebarcode.cpp \
+    ../Forms/c5storebarcodelist.cpp \
     ../Forms/c5storedoc.cpp \
     ../Forms/c5storedocselectprinttemplate.cpp \
+    ../Forms/c5storeinventory.cpp \
+    ../Forms/c5tablewidgetwithselector.cpp \
+    ../Forms/c5toolbarwidget.cpp \
+    ../Forms/c5translatorform.cpp \
     ../Forms/c5waiterorder.cpp \
+    ../Forms/change.cpp \
     ../Forms/cr5routereport.cpp \
+    ../Forms/customerinfo.cpp \
+    ../Forms/dlgcashinout.cpp \
+    ../Forms/dlgcashop.cpp \
+    ../Forms/dlgchangeoutputstore.cpp \
     ../Forms/dlgconfigtable.cpp \
     ../Forms/dlgdataonline.cpp \
     ../Forms/dlgdirtystoredoc.cpp \
     ../Forms/dlgdriverroutedate.cpp \
-    ../Forms/dlglist.cpp \
+    ../Forms/dlgexportsaletoasoptions.cpp \
+    ../Forms/dlgguestinfo.cpp \
+    ../Forms/dlglist2.cpp \
     ../Forms/dlgnewcl.cpp \
+    ../Forms/dlgpaymentchoose.cpp \
+    ../Forms/dlgprintrecipesoptions.cpp \
+    ../Forms/dlgqrcode.cpp \
+    ../Forms/dlgqty.cpp \
     ../Forms/dlgreservgoods.cpp \
     ../Forms/dlgselectcurrency.cpp \
     ../Forms/dlgsemireadyinout.cpp \
     ../Forms/dlgsetwaiterordercl.cpp \
+    ../Forms/dlgstoreutils.cpp \
     ../Forms/goodsasmap.cpp \
     ../Forms/httpquerydialog.cpp \
     ../Forms/mfprocessproductpriceupdate.cpp \
     ../Forms/partnersasmap.cpp \
+    ../Forms/storeinputdocument.cpp \
+    ../Forms/touchdlgphonenumber.cpp \
+    ../Forms/touchentertaxreceiptnumber.cpp \
+    ../Forms/touchselecttaxreport.cpp \
     ../Reports/c5customfilter.cpp \
     ../Reports/cr5breezeservice.cpp \
     ../Reports/cr5carvisits.cpp \
@@ -218,29 +268,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../TableRecord/odraftsalebody.cpp \
     ../TableRecord/ogoods.cpp \
     ../TableRecord/oheader.cpp \
-    barcode.cpp \
-    c5cashdoc.cpp \
-    c5changedocinputprice.cpp \
-    c5changepriceofgroup.cpp \
-    c5checkdatabase.cpp \
-    c5costumerdebtpayment.cpp \
-    c5daterange.cpp \
-    c5dbresetoption.cpp \
-    c5dishgroupaction.cpp \
-    c5dlgselectreporttemplate.cpp \
-    c5goodsimage.cpp \
-    c5goodspricing.cpp \
-    c5inputdate.cpp \
-    c5progressdialog.cpp \
-    c5serviceconfig.cpp \
-    c5storebarcode.cpp \
-    c5storebarcodelist.cpp \
-    c5tablewidgetwithselector.cpp \
-    dlgchangeoutputstore.cpp \
-    dlgexportsaletoasoptions.cpp \
-    dlgstoreutils.cpp \
         main.cpp \
-        c5mainwindow.cpp \
     ../Cafe5/c5config.cpp \
     ../Cafe5/c5connection.cpp \
     ../Cafe5/c5database.cpp \
@@ -248,9 +276,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Cafe5/c5message.cpp \
     ../Cafe5/c5utils.cpp \
     ../Cafe5/c5sockethandler.cpp \
-    c5login.cpp \
     ../Classes/c5permissions.cpp \
-    c5reportwidget.cpp \
     ../Classes/c5grid.cpp \
     ../Reports/cr5usersgroups.cpp \
     ../Reports/cr5users.cpp \
@@ -265,9 +291,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Classes/c5gridgilter.cpp \
     ../Reports/cr5commonsalesfilter.cpp \
     ../Controls/c5dateedit.cpp \
-    c5passwords.cpp \
     ../Classes/c5widget.cpp \
-    c5grouppermissionseditor.cpp \
     ../Controls/c5checkbox.cpp \
     ../Reports/cr5databases.cpp \
     ../Reports/cr5dishpart1.cpp \
@@ -279,7 +303,6 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Reports/cr5goodsgroup.cpp \
     ../Reports/cr5goods.cpp \
     ../Reports/cr5goodswaste.cpp \
-    c5selector.cpp \
     ../Controls/c5lineeditwithselector.cpp \
     ../Reports/cr5goodsstorages.cpp \
     ../Reports/cr5goodspartners.cpp \
@@ -292,7 +315,6 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Classes/c5printpreview.cpp \
     ../Classes/c5printing.cpp \
     ../Controls/c5graphicsview.cpp \
-    c5storeinventory.cpp \
     ../Reports/cr5tstoreextra.cpp \
     ../Reports/cr5tstoreextrafilter.cpp \
     ../Reports/cr5menunames.cpp \
@@ -324,24 +346,17 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Reports/cr5dishcomment.cpp \
     ../Reports/cr5salefromstore.cpp \
     ../Reports/cr5salefromstorefilter.cpp \
-    c5salefromstoreorder.cpp \
-    c5datasynchronize.cpp \
     ../Editors/ce5databases.cpp \
     ../Reports/cr5hall.cpp \
     ../Editors/ce5halls.cpp \
     ../Reports/cr5tables.cpp \
     ../Editors/ce5table.cpp \
     ../Editors/ce5createtablesforhall.cpp \
-    c5dbuseraccess.cpp \
     ../Reports/cr5menutranslator.cpp \
-    c5changepassword.cpp \
     ../Reports/cr5dishpriceselfcost.cpp \
-    c5dishselfcostgenprice.cpp \
     ../Reports/cr5dishpriceselfcostfilter.cpp \
     ../Reports/cr5storedocuments.cpp \
     ../Reports/cr5storedocumentsfilter.cpp \
-    c5translatorform.cpp \
-    c5toolbarwidget.cpp \
     ../Classes/checkforupdatethread.cpp \
     ../Classes/fileversion.cpp \
     ../Classes/c5waiterorderdoc.cpp \
@@ -369,7 +384,6 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Classes/QRCodeGenerator.h \
     ../Classes/barcode5.h \
     ../Classes/c5airlog.h \
-    ../Classes/c5broadcasting.h \
     ../Classes/c5crypt.h \
     ../Classes/c5document.h \
     ../Classes/c5filelogwriter.h \
@@ -442,32 +456,80 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Editors/ce5packagelist.h \
     ../Editors/ce5storereason.h \
     ../Forms/armsoftexportoptions.h \
+    ../Forms/barcode.h \
+    ../Forms/c5cashdoc.h \
+    ../Forms/c5changedocinputprice.h \
+    ../Forms/c5changepassword.h \
+    ../Forms/c5changepriceofgroup.h \
+    ../Forms/c5checkdatabase.h \
+    ../Forms/c5costumerdebtpayment.h \
+    ../Forms/c5datasynchronize.h \
+    ../Forms/c5daterange.h \
+    ../Forms/c5dbresetoption.h \
+    ../Forms/c5dbuseraccess.h \
+    ../Forms/c5dishgroupaction.h \
+    ../Forms/c5dishselfcostgenprice.h \
+    ../Forms/c5dlgselectreporttemplate.h \
     ../Forms/c5filtervalues.h \
+    ../Forms/c5goodsimage.h \
+    ../Forms/c5goodspricing.h \
     ../Forms/c5goodsspecialprices.h \
+    ../Forms/c5grouppermissionseditor.h \
+    ../Forms/c5inputdate.h \
+    ../Forms/c5login.h \
+    ../Forms/c5mainwindow.h \
+    ../Forms/c5passwords.h \
     ../Forms/c5printtaxanywhere.h \
+    ../Forms/c5progressdialog.h \
+    ../Forms/c5reportwidget.h \
     ../Forms/c5route.h \
     ../Forms/c5salarydoc.h \
     ../Forms/c5salarypayment.h \
     ../Forms/c5saledoc.h \
+    ../Forms/c5salefromstoreorder.h \
+    ../Forms/c5selector.h \
+    ../Forms/c5serviceconfig.h \
     ../Forms/c5srofinventory.h \
+    ../Forms/c5storebarcode.h \
+    ../Forms/c5storebarcodelist.h \
     ../Forms/c5storedoc.h \
     ../Forms/c5storedocselectprinttemplate.h \
+    ../Forms/c5storeinventory.h \
+    ../Forms/c5tablewidgetwithselector.h \
+    ../Forms/c5toolbarwidget.h \
+    ../Forms/c5translatorform.h \
     ../Forms/c5waiterorder.h \
+    ../Forms/change.h \
     ../Forms/cr5routereport.h \
+    ../Forms/customerinfo.h \
+    ../Forms/dlgcashinout.h \
+    ../Forms/dlgcashop.h \
+    ../Forms/dlgchangeoutputstore.h \
     ../Forms/dlgconfigtable.h \
     ../Forms/dlgdataonline.h \
     ../Forms/dlgdirtystoredoc.h \
     ../Forms/dlgdriverroutedate.h \
-    ../Forms/dlglist.h \
+    ../Forms/dlgexportsaletoasoptions.h \
+    ../Forms/dlgguestinfo.h \
+    ../Forms/dlglist2.h \
     ../Forms/dlgnewcl.h \
+    ../Forms/dlgpaymentchoose.h \
+    ../Forms/dlgprintrecipesoptions.h \
+    ../Forms/dlgqrcode.h \
+    ../Forms/dlgqty.h \
     ../Forms/dlgreservgoods.h \
     ../Forms/dlgselectcurrency.h \
     ../Forms/dlgsemireadyinout.h \
     ../Forms/dlgsetwaiterordercl.h \
+    ../Forms/dlgstoreutils.h \
     ../Forms/goodsasmap.h \
     ../Forms/httpquerydialog.h \
     ../Forms/mfprocessproductpriceupdate.h \
     ../Forms/partnersasmap.h \
+    ../Forms/storeinputdocument.h \
+    ../Forms/touchdlgphonenumber.h \
+    ../Forms/touchentertaxreceiptnumber.h \
+    ../Forms/touchselecttaxreport.h \
     ../Reports/c5customfilter.h \
     ../Reports/cr5breezeservice.h \
     ../Reports/cr5carvisits.h \
@@ -549,20 +611,6 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../TableRecord/odraftsalebody.h \
     ../TableRecord/ogoods.h \
     ../TableRecord/oheader.h \
-    barcode.h \
-    c5cashdoc.h \
-    c5changedocinputprice.h \
-    c5changepriceofgroup.h \
-    c5checkdatabase.h \
-    c5costumerdebtpayment.h \
-    c5daterange.h \
-    c5dbresetoption.h \
-    c5dishgroupaction.h \
-    c5dlgselectreporttemplate.h \
-    c5goodsimage.h \
-    c5goodspricing.h \
-    c5inputdate.h \
-        c5mainwindow.h \
     ../Cafe5/c5config.h \
     ../Cafe5/c5connection.h \
     ../Cafe5/c5database.h \
@@ -570,10 +618,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Cafe5/c5message.h \
     ../Cafe5/c5utils.h \
     ../Cafe5/c5sockethandler.h \
-    c5login.h \
     ../Classes/c5permissions.h \
-    c5progressdialog.h \
-    c5reportwidget.h \
     ../Classes/c5grid.h \
     ../Reports/cr5usersgroups.h \
     ../Reports/cr5users.h \
@@ -588,9 +633,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Classes/c5gridgilter.h \
     ../Reports/cr5commonsalesfilter.h \
     ../Controls/c5dateedit.h \
-    c5passwords.h \
     ../Classes/c5widget.h \
-    c5grouppermissionseditor.h \
     ../Controls/c5checkbox.h \
     ../Reports/cr5databases.h \
     ../Reports/cr5dishpart1.h \
@@ -602,11 +645,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Reports/cr5goodsgroup.h \
     ../Reports/cr5goods.h \
     ../Reports/cr5goodswaste.h \
-    c5selector.h \
     ../Controls/c5lineeditwithselector.h \
-    c5serviceconfig.h \
-    c5storebarcode.h \
-    c5storebarcodelist.h \
     ../Reports/cr5goodsstorages.h \
     ../Reports/cr5goodspartners.h \
     ../Controls/c5tablewidget.h \
@@ -618,7 +657,6 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Classes/c5printpreview.h \
     ../Classes/c5printing.h \
     ../Controls/c5graphicsview.h \
-    c5storeinventory.h \
     ../Reports/cr5tstoreextra.h \
     ../Reports/cr5tstoreextrafilter.h \
     ../Reports/cr5menunames.h \
@@ -626,10 +664,6 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Reports/cr5documentsfilter.h \
     ../Reports/cr5consumptionbysales.h \
     ../Reports/cr5consumptionbysalesfilter.h \
-    c5tablewidgetwithselector.h \
-    dlgchangeoutputstore.h \
-    dlgexportsaletoasoptions.h \
-    dlgstoreutils.h \
     rc.h \
     res.rc \
     ../Editors/ce5partner.h \
@@ -656,24 +690,17 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Reports/cr5dishcomment.h \
     ../Reports/cr5salefromstore.h \
     ../Reports/cr5salefromstorefilter.h \
-    c5salefromstoreorder.h \
-    c5datasynchronize.h \
     ../Editors/ce5databases.h \
     ../Reports/cr5hall.h \
     ../Editors/ce5halls.h \
     ../Reports/cr5tables.h \
     ../Editors/ce5table.h \
     ../Editors/ce5createtablesforhall.h \
-    c5dbuseraccess.h \
     ../Reports/cr5menutranslator.h \
-    c5changepassword.h \
     ../Reports/cr5dishpriceselfcost.h \
-    c5dishselfcostgenprice.h \
     ../Reports/cr5dishpriceselfcostfilter.h \
     ../Reports/cr5storedocuments.h \
     ../Reports/cr5storedocumentsfilter.h \
-    c5translatorform.h \
-    c5toolbarwidget.h \
     ../Classes/checkforupdatethread.h \
     ../Classes/fileversion.h \
     ../Classes/c5waiterorderdoc.h \
@@ -715,32 +742,77 @@ FORMS += \
     ../Editors/ce5packagelist.ui \
     ../Editors/ce5storereason.ui \
     ../Forms/armsoftexportoptions.ui \
+    ../Forms/c5cashdoc.ui \
+    ../Forms/c5changedocinputprice.ui \
+    ../Forms/c5changepassword.ui \
+    ../Forms/c5changepriceofgroup.ui \
+    ../Forms/c5checkdatabase.ui \
+    ../Forms/c5costumerdebtpayment.ui \
+    ../Forms/c5datasynchronize.ui \
+    ../Forms/c5daterange.ui \
+    ../Forms/c5dbresetoption.ui \
+    ../Forms/c5dbuseraccess.ui \
+    ../Forms/c5dishgroupaction.ui \
+    ../Forms/c5dishselfcostgenprice.ui \
+    ../Forms/c5dlgselectreporttemplate.ui \
     ../Forms/c5filtervalues.ui \
+    ../Forms/c5goodsimage.ui \
+    ../Forms/c5goodspricing.ui \
     ../Forms/c5goodsspecialprices.ui \
+    ../Forms/c5grouppermissionseditor.ui \
+    ../Forms/c5inputdate.ui \
+    ../Forms/c5login.ui \
+    ../Forms/c5mainwindow.ui \
+    ../Forms/c5passwords.ui \
     ../Forms/c5printtaxanywhere.ui \
+    ../Forms/c5progressdialog.ui \
     ../Forms/c5route.ui \
     ../Forms/c5salarydoc.ui \
     ../Forms/c5salarypayment.ui \
     ../Forms/c5saledoc.ui \
+    ../Forms/c5salefromstoreorder.ui \
+    ../Forms/c5selector.ui \
+    ../Forms/c5serviceconfig.ui \
     ../Forms/c5srofinventory.ui \
+    ../Forms/c5storebarcode.ui \
+    ../Forms/c5storebarcodelist.ui \
     ../Forms/c5storedoc.ui \
     ../Forms/c5storedocselectprinttemplate.ui \
+    ../Forms/c5storeinventory.ui \
+    ../Forms/c5toolbarwidget.ui \
+    ../Forms/c5translatorform.ui \
     ../Forms/c5waiterorder.ui \
+    ../Forms/change.ui \
     ../Forms/cr5routereport.ui \
+    ../Forms/customerinfo.ui \
+    ../Forms/dlgcashinout.ui \
+    ../Forms/dlgcashop.ui \
+    ../Forms/dlgchangeoutputstore.ui \
     ../Forms/dlgconfigtable.ui \
     ../Forms/dlgdataonline.ui \
     ../Forms/dlgdirtystoredoc.ui \
     ../Forms/dlgdriverroutedate.ui \
-    ../Forms/dlglist.ui \
+    ../Forms/dlgexportsaletoasoptions.ui \
+    ../Forms/dlgguestinfo.ui \
+    ../Forms/dlglist2.ui \
     ../Forms/dlgnewcl.ui \
+    ../Forms/dlgpaymentchoose.ui \
+    ../Forms/dlgprintrecipesoptions.ui \
+    ../Forms/dlgqrcode.ui \
+    ../Forms/dlgqty.ui \
     ../Forms/dlgreservgoods.ui \
     ../Forms/dlgselectcurrency.ui \
     ../Forms/dlgsemireadyinout.ui \
     ../Forms/dlgsetwaiterordercl.ui \
+    ../Forms/dlgstoreutils.ui \
     ../Forms/goodsasmap.ui \
     ../Forms/httpquerydialog.ui \
     ../Forms/mfprocessproductpriceupdate.ui \
     ../Forms/partnersasmap.ui \
+    ../Forms/storeinputdocument.ui \
+    ../Forms/touchdlgphonenumber.ui \
+    ../Forms/touchentertaxreceiptnumber.ui \
+    ../Forms/touchselecttaxreport.ui \
     ../Reports/c5customfilter.ui \
     ../Reports/cr5breezeservice.ui \
     ../Reports/cr5carvisitsfilter.ui \
@@ -771,37 +843,15 @@ FORMS += \
     ../Reports/cr5saleremoveddishesfilter.ui \
     ../Reports/cr5salesbydishesfilter.ui \
     ../Reports/cr5usersfilter.ui \
-    c5cashdoc.ui \
-    c5changedocinputprice.ui \
-    c5changepriceofgroup.ui \
-    c5checkdatabase.ui \
-    c5costumerdebtpayment.ui \
-    c5daterange.ui \
-    c5dbresetoption.ui \
-    c5dishgroupaction.ui \
-    c5dlgselectreporttemplate.ui \
-    c5goodsimage.ui \
-    c5goodspricing.ui \
-    c5inputdate.ui \
-        c5mainwindow.ui \
     ../Cafe5/c5connection.ui \
     ../Cafe5/c5message.ui \
-    c5login.ui \
     ../Classes/c5grid.ui \
     ../Classes/c5gridgilter.ui \
     ../Reports/cr5commonsalesfilter.ui \
-    c5passwords.ui \
-    c5grouppermissionseditor.ui \
     ../Reports/c5settingswidget.ui \
-    c5progressdialog.ui \
-    c5selector.ui \
-    c5serviceconfig.ui \
-    c5storebarcode.ui \
-    c5storebarcodelist.ui \
     ../Reports/cr5materialinstorefilter.ui \
     ../Reports/cr5goodsmovementfilter.ui \
     ../Classes/c5printpreview.ui \
-    c5storeinventory.ui \
     ../Reports/cr5tstoreextrafilter.ui \
     ../Reports/cr5documentsfilter.ui \
     ../Reports/cr5consumptionbysalesfilter.ui \
@@ -823,23 +873,13 @@ FORMS += \
     ../Editors/ce5discountcard.ui \
     ../Editors/ce5dishcomment.ui \
     ../Reports/cr5salefromstorefilter.ui \
-    c5salefromstoreorder.ui \
-    c5datasynchronize.ui \
     ../Editors/ce5databases.ui \
     ../Editors/ce5halls.ui \
     ../Editors/ce5table.ui \
     ../Editors/ce5createtablesforhall.ui \
-    c5dbuseraccess.ui \
     ../Reports/cr5menutranslator.ui \
-    c5changepassword.ui \
-    c5dishselfcostgenprice.ui \
     ../Reports/cr5dishpriceselfcostfilter.ui \
     ../Reports/cr5storedocumentsfilter.ui \
-    c5translatorform.ui \
-    c5toolbarwidget.ui \
-    dlgchangeoutputstore.ui \
-    dlgexportsaletoasoptions.ui \
-    dlgstoreutils.ui
 
 INCLUDEPATH += ../Cafe5
 INCLUDEPATH += ../Cache

@@ -466,6 +466,7 @@ void Working::uploadDataFinished()
 void Working::threadMessageError(int code, const QString &message)
 {
     qDebug() << code << message;
+    C5LogSystem::writeEvent(message);
 }
 
 void Working::threadMessageData(int code, const QVariant &data)

@@ -23,10 +23,12 @@ C5Cache::C5Cache(const QStringList &dbParams) :
                 .arg(tr("Code"),tr("Name"));
         //fCacheQuery[cache_goods] = QString("select g.f_id as `%1`, gg.f_name as `%2`, concat(g.f_name, if(g.f_scancode is null, '', concat(' ', g.f_scancode))) as `%3`, u.f_name as `%4`,
         fCacheQuery[cache_goods] = QString("select g.f_id as `%1`, gg.f_name as `%2`, g.f_name as `%3`, u.f_name as `%4`, \
-                                           g.f_scancode as `%5`, g.f_lastinputprice as `%6`, g.f_complectout as `%7` \
+                                           g.f_scancode as `%5`, g.f_lastinputprice as `%6`, g.f_complectout as `%7`, g.f_qtybox as `%8`, \
+                                           gpr.f_price1 as `%9`, gpr.f_price2 as `%10` \
                                            from c_goods g \
                                            left join c_groups gg on gg.f_id=g.f_group \
                                            left join c_units as u on u.f_id=g.f_unit \
+                                           left join c_goods_prices gpr on gpr.f_goods=g.f_id and gpr.f_currency=1 \
                                            order by 3 ")
 
                 .arg(tr("Code"))
@@ -35,7 +37,10 @@ C5Cache::C5Cache(const QStringList &dbParams) :
                 .arg(tr("Unit"))
                 .arg(tr("Scancode"))
                 .arg(tr("Price"))
-                .arg(tr("Complect output"));
+                .arg(tr("Complect output"))
+                .arg(tr("Qty in box"))
+                .arg(tr("Retail price"))
+                .arg(tr("Whosale price"));
         fCacheQuery[cache_goods_store] = QString("select f_id as `%1`, f_name as `%2` from c_storages")
                 .arg(tr("Code"),tr("Name"));
         fCacheQuery[cache_goods_partners] = QString("select f_id as `%1`, f_name as ``, f_address as ``, f_taxname as `%2`, f_contact as `%3`, \

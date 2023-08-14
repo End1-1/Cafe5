@@ -168,6 +168,12 @@ void C5LineEdit::focusOutEvent(QFocusEvent *event)
     emit focusOut();
 }
 
+void C5LineEdit::focusInEvent(QFocusEvent *event)
+{
+    QLineEdit::focusInEvent(event);
+    emit focusIn();
+}
+
 void C5LineEdit::editText(const QString &arg)
 {
     int cursPos = cursorPosition();

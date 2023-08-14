@@ -31,6 +31,8 @@ private slots:
     void translator();
 
     void deleteDish();
+
+    void printRecipes(bool v);
 };
 
 #endif // CR5DISH_H

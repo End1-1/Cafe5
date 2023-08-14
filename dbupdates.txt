@@ -1314,3 +1314,4 @@ alter table c_goods add column f_qtybox decimal;
 create table a_store_valid (f_id char(36) primary key, f_date date);
 alter table a_store_valid add column f_document char(36) after f_id;
 ALTER TABLE `a_store_valid` ADD INDEX `idx_valid_doc` (`f_document`);
+update c_goods set f_qtybox=1;

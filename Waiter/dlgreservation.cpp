@@ -1,6 +1,6 @@
 #include "dlgreservation.h"
 #include "ui_dlgreservation.h"
-#include "dlgpreorder.h"
+#include "dlgpreorderw.h"
 #include "c5orderdriver.h"
 #include "c5logtoserverthread.h"
 #include "c5user.h"

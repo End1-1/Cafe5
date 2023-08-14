@@ -21,11 +21,11 @@
 #include "dlglist.h"
 #include "dlglistofpackages.h"
 #include "dlgsplitorder.h"
-#include "dlgpreorder.h"
+#include "dlgpreorderw.h"
 #include "cashboxconfig.h"
 #include "dlgprecheckoptions.h"
 #include "dlgcarnumber.h"
-#include "worder.h"
+#include "worderw.h"
 #include "dlglistofmenu.h"
 #include "dishitem.h"
 #include "datadriver.h"
@@ -116,6 +116,16 @@ DlgOrder::DlgOrder(C5User *user) :
     fMenuID = C5Config::defaultMenu();
     fPart1 = 0;
     fStoplistMode = false;
+
+    connect(ui->scrollAreaDish->verticalScrollBar(), &QScrollBar::valueChanged, this, [this](int value){
+        for (QObject *o: ui->scrollAreaWidgetContentsDish->children()) {
+            QWidget *w = dynamic_cast<QWidget*>(o);
+            if (w) {
+                w->repaint();
+            }
+        }
+        ui->scrollAreaDish->viewport()->update();
+    });
 }
 
 DlgOrder::~DlgOrder()
@@ -2454,6 +2464,7 @@ void DlgOrder::on_btnDishDown_clicked()
             w->repaint();
         }
     }
+    ui->scrollAreaDish->viewport()->update();
 }
 
 void DlgOrder::on_btnDishUp_clicked()
@@ -2465,6 +2476,7 @@ void DlgOrder::on_btnDishUp_clicked()
             w->repaint();
         }
     }
+    ui->scrollAreaDish->viewport()->update();
 }
 
 void DlgOrder::on_btnPreorder_clicked()
@@ -2875,7 +2887,7 @@ void DlgOrder::on_btnCashout_clicked()
 
     QString purpose = tr("") + " #"
             + wo->fOrderDriver->headerValue("f_prefix").toString()
-            + wo->fOrderDriver->headerValue("f_hallid").toString() + comment;
+            + wo->fOrderDriver->headerValue("f_hallid").toString() + " " + comment;
 
     C5Database db(__c5config.dbParams());
     C5StoreDraftWriter dw(db);

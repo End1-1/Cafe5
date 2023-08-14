@@ -35,5 +35,10 @@ void DlgCashButtonOpions::on_btnCloseCash_clicked()
         done(0);
         return;
     }
+    done(3);
+}
+
+void DlgCashButtonOpions::on_btnViewReport_clicked()
+{
     done(1);
 }

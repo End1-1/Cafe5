@@ -89,11 +89,11 @@ Workspace::Workspace(const QStringList &dbParams) :
     }
     ui->tblTables->setItemDelegate(new TableItemDelegate());
     resetOrder();
-    QTimer *t = new QTimer(this);
-    connect(t, &QTimer::timeout, this, [=]() {
+    fTimer = new QTimer(this);
+    connect(fTimer, &QTimer::timeout, this, [=]() {
        ui->leReadCode->setFocus();
     });
-    t->start(1000);
+    fTimer->start(1000);
     ui->tblOrder->setColumnWidth(0, 165);
     ui->tblOrder->setColumnWidth(1, 70);
     ui->tblOrder->setColumnWidth(2, 70);
@@ -562,6 +562,7 @@ void Workspace::resetOrder()
     fOrderUuid.clear();
     ui->leInfo->setVisible(false);
     ui->wDiscount->setVisible(false);
+    ui->leTaxpayerId->clear();
     fSupplierName = "";
     fCustomer = 0;
     fDiscountAmount = 0;
@@ -593,6 +594,7 @@ void Workspace::resetOrder()
         }
     }
     ui->tblTables->viewport()->update();
+    ui->leReadCode->setFocus();
 }
 
 void Workspace::stretchTableColumns(QTableWidget *t)
@@ -640,6 +642,12 @@ void Workspace::on_tblPart2_itemClicked(QTableWidgetItem *item)
 
 void Workspace::on_btnCheckout_clicked()
 {
+    if (ui->leTaxpayerId->text().isEmpty() == false) {
+        if (ui->leTaxpayerId->text().length()< 8) {
+            C5Message::error(tr("Invalid taxpayer id"));
+            return;
+        }
+    }
     if (ui->tblOrder->rowCount() == 0) {
         return;
     }
@@ -1262,6 +1270,7 @@ bool Workspace::saveOrder(int state)
     oheader.amountDiscount = fDiscountAmount;
     oheader.discountFactor = fDiscountValue;
     oheader.partner = fCustomer;
+    oheader.taxpayerTin = ui->leTaxpayerId->text();
     QString err;
     if (!oheader.write(db, err)) {
         db.rollback();
@@ -1483,6 +1492,9 @@ int Workspace::printTax(double cardAmount, double idramAmount)
                  C5Config::taxPassword(), useExtPos,
                  C5Config::taxCashier(),
                  C5Config::taxPin(), this);
+    if (ui->leTaxpayerId->text().isEmpty() == false) {
+        pt.fPartnerTin = ui->leTaxpayerId->text();
+    }
     while (db.nextRow()) {
         if (db.getDouble("f_price") < 0.01) {
             continue;
@@ -1574,7 +1586,7 @@ bool Workspace::printReceipt(const QString &id, bool printSecond, bool precheck)
     db.exec("select o.f_prefix, o.f_hallid, t.f_firmname, t.f_address, t.f_dept, t.f_hvhh, t.f_devnum, "
             "t.f_serial, t.f_fiscal, t.f_receiptnumber, t.f_time as f_taxtime, concat(left(u.f_first, 1), '. ', u.f_last) as f_staff, "
             "o.f_amountcash, o.f_amountcard, o.f_amountidram, o.f_amountother, o.f_amounttotal, o.f_print, o.f_comment, ht.f_name as f_tablename, "
-            "p.f_contact, p.f_phone, p.f_address "
+            "p.f_contact, p.f_phone, p.f_address, o.f_taxpayertin "
             "from o_header o "
             "left join o_tax t on t.f_id=o.f_id "
             "left join s_user u on u.f_id=o.f_staff "
@@ -1615,6 +1627,11 @@ bool Workspace::printReceipt(const QString &id, bool printSecond, bool precheck)
         p.ltext(tr("Date"), 0);
         p.rtext(db.getString("f_taxtime"));
         p.br();
+        if (db.getString("f_taxpayertin").isEmpty() == false) {
+            p.ltext(tr("Taxpayer tin"), 0);
+            p.rtext(db.getString("f_taxpayertin"));
+            p.br();
+        }
         p.ltext(tr("(F)"), 0);
         p.br();
     }
@@ -1800,6 +1817,16 @@ void Workspace::showCustomerDisplay()
             fCustomerDisplay->showFullScreen();
         }
     }
+}
+
+void Workspace::focusTaxIn()
+{
+    fTimer->stop();
+}
+
+void Workspace::focusLineIn()
+{
+    fTimer->start(1000);
 }
 
 void Workspace::on_btnAppMenu_clicked()
@@ -2059,5 +2086,24 @@ void Workspace::on_leCard_textChanged(const QString &arg1)
         if (!ui->btnFiscal->isChecked()) {
             ui->btnFiscal->setChecked(true);
         }
+    }
+}
+
+void Workspace::on_leTaxpayerId_textEdited(const QString &arg1)
+{
+    if (arg1.length() > 0) {
+        ui->btnFiscal->setChecked(true);
+    }
+}
+
+void Workspace::on_btnSetTaxpayer_clicked()
+{
+    bool ok = false;
+    QString tp = QInputDialog::getText(this, tr("Taxpayer ID"), "", QLineEdit::Normal, "", &ok );
+    if (ok) {
+        ui->leTaxpayerId->setText(tp);
+    }
+    if (tp.length() > 0) {
+        ui->btnFiscal->setChecked(true);
     }
 }

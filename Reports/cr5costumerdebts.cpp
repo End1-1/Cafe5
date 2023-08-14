@@ -185,7 +185,7 @@ bool CR5CostumerDebts::tblDoubleClicked(int row, int column, const QList<QVarian
 {
     Q_UNUSED(row);
     Q_UNUSED(column);
-    if (fFilter->viewMode()) {
+    if (fFilter->viewMode() != 1) {
         return true;
     }
     if (vals.empty()) {

@@ -13,11 +13,37 @@ RC_FILE = res.rc
 SOURCES += \
     ../Classes/c5crypt.cpp \
     ../Classes/thread.cpp \
+    ../Service5Working/raw/raw.cpp \
+    ../Service5Working/raw/rawbalancehistory.cpp \
+    ../Service5Working/raw/rawcarnear.cpp \
+    ../Service5Working/raw/rawcoordinate.cpp \
+    ../Service5Working/raw/rawdllop.cpp \
+    ../Service5Working/raw/rawhandler.cpp \
+    ../Service5Working/raw/rawhello.cpp \
+    ../Service5Working/raw/rawmessage.cpp \
+    ../Service5Working/raw/rawmonitor.cpp \
+    ../Service5Working/raw/rawplugin.cpp \
+    ../Service5Working/raw/rawpluginobject.cpp \
+    ../Service5Working/raw/rawregisterphone.cpp \
+    ../Service5Working/raw/rawregistersms.cpp \
+    ../Service5Working/raw/rawsilentauth.cpp \
+    ../Service5Working/raw/rawyandexkey.cpp \
+    ../Service5Working/socket/sslserver.cpp \
+    ../Service5Working/socket/sslsocket.cpp \
+    ../Service5Working/utils/commandline.cpp \
+    ../Service5Working/utils/configini.cpp \
+    ../Service5Working/utils/database.cpp \
+    ../Service5Working/utils/databaseconnectionmanager.cpp \
+    ../Service5Working/utils/gtranslator.cpp \
+    ../Service5Working/utils/jsonhandler.cpp \
+    ../Service5Working/utils/logwriter.cpp \
+    ../Service5Working/utils/networktable.cpp \
+    ../Service5Working/utils/os.cpp \
+    ../Service5Working/utils/sqlqueries.cpp \
+    ../Service5Working/utils/storemovement.cpp \
+    ../Service5Working/utils/tablerecord.cpp \
     c5license.cpp \
     pluginmanager.cpp \
-    raw/rawdllop.cpp \
-    raw/rawplugin.cpp \
-    raw/rawpluginobject.cpp \
     utils/commandline.cpp \
     utils/configini.cpp \
     utils/database.cpp \
@@ -31,18 +57,6 @@ SOURCES += \
     utils/jsonhandler.cpp \
     main.cpp \
     monitor.cpp \
-    raw/raw.cpp \
-    raw/rawbalancehistory.cpp \
-    raw/rawcarnear.cpp \
-    raw/rawcoordinate.cpp \
-    raw/rawhandler.cpp \
-    raw/rawhello.cpp \
-    raw/rawmessage.cpp \
-    raw/rawmonitor.cpp \
-    raw/rawregisterphone.cpp \
-    raw/rawregistersms.cpp \
-    raw/rawsilentauth.cpp \
-    raw/rawyandexkey.cpp \
     serverthread.cpp \
     socket/sslserver.cpp \
     socket/sslsocket.cpp \
@@ -56,11 +70,39 @@ SOURCES += \
 HEADERS += \
     ../Classes/c5crypt.h \
     ../Classes/thread.h \
+    ../Service5Working/raw/messagelist.h \
+    ../Service5Working/raw/raw.h \
+    ../Service5Working/raw/rawbalancehistory.h \
+    ../Service5Working/raw/rawcarnear.h \
+    ../Service5Working/raw/rawcoordinate.h \
+    ../Service5Working/raw/rawdllop.h \
+    ../Service5Working/raw/rawhandler.h \
+    ../Service5Working/raw/rawhello.h \
+    ../Service5Working/raw/rawmessage.h \
+    ../Service5Working/raw/rawmonitor.h \
+    ../Service5Working/raw/rawplugin.h \
+    ../Service5Working/raw/rawpluginobject.h \
+    ../Service5Working/raw/rawregisterphone.h \
+    ../Service5Working/raw/rawregistersms.h \
+    ../Service5Working/raw/rawsilentauth.h \
+    ../Service5Working/raw/rawyandexkey.h \
+    ../Service5Working/raw/structs.h \
+    ../Service5Working/socket/sslserver.h \
+    ../Service5Working/socket/sslsocket.h \
+    ../Service5Working/utils/commandline.h \
+    ../Service5Working/utils/configini.h \
+    ../Service5Working/utils/database.h \
+    ../Service5Working/utils/databaseconnectionmanager.h \
+    ../Service5Working/utils/gtranslator.h \
+    ../Service5Working/utils/jsonhandler.h \
+    ../Service5Working/utils/logwriter.h \
+    ../Service5Working/utils/networktable.h \
+    ../Service5Working/utils/os.h \
+    ../Service5Working/utils/sqlqueries.h \
+    ../Service5Working/utils/storemovement.h \
+    ../Service5Working/utils/tablerecord.h \
     c5license.h \
     pluginmanager.h \
-    raw/rawdllop.h \
-    raw/rawplugin.h \
-    raw/rawpluginobject.h \
     utils/commandline.h \
     utils/configini.h \
     utils/database.h \
@@ -73,20 +115,6 @@ HEADERS += \
     handlers/httpheader.h \
     utils/jsonhandler.h \
     monitor.h \
-    raw/messagelist.h \
-    raw/raw.h \
-    raw/rawbalancehistory.h \
-    raw/rawcarnear.h \
-    raw/rawcoordinate.h \
-    raw/rawhandler.h \
-    raw/rawhello.h \
-    raw/rawmessage.h \
-    raw/rawmonitor.h \
-    raw/rawregisterphone.h \
-    raw/rawregistersms.h \
-    raw/rawsilentauth.h \
-    raw/rawyandexkey.h \
-    raw/structs.h \
     rc.h \
     res.rc \
     serverthread.h \
@@ -104,13 +132,13 @@ FORMS += \
     dlglicenses.ui \
     monitor.ui
 
-INCLUDEPATH += socket
-INCLUDEPATH += utils
 INCLUDEPATH += handlers
 INCLUDEPATH += headers
 INCLUDEPATH += store
 INCLUDEPATH += datadriver
-INCLUDEPATH += raw
+INCLUDEPATH += ../Service5Working/raw
+INCLUDEPATH += ../Service5Working/utils
+INCLUDEPATH += ../Service5Working/socket
 INCLUDEPATH += ../Classes
 INCLUDEPATH += C:/Soft/OpenSSL-Win64/include
 INCLUDEPATH += C:/Soft/OpenSSL-Win64/include/openssl

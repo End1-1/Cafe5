@@ -2,6 +2,7 @@
 #define C5DISHWIDGET_H
 
 #include "ce5editor.h"
+#include "c5printing.h"
 
 namespace Ui {
 class C5DishWidget;
@@ -31,6 +32,8 @@ public:
     virtual bool save(QString &err, QList<QMap<QString, QVariant> > &data);
 
     bool event(QEvent *e) override;
+
+    void printPreview(C5Printing &p, bool showPrice);
 
 private slots:
     void on_btnAddRecipe_clicked();

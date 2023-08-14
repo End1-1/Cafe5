@@ -52,9 +52,9 @@ void SocketThread::run()
     fSslSocket->setPrivateKey(fSslPrivateKey);
     fSslSocket->setProtocol(fSslProtocol);
     fSslSocket->startServerEncryption();
-    if (!fSslSocket->waitForEncrypted()) {
-        qDebug() <<fSslSocket->errorString();
-    }
+//    if (!fSslSocket->waitForEncrypted()) {
+//        qDebug() <<fSslSocket->errorString();
+//    }
     fRawHandler = new RawHandler(fSslSocket, property("session").toString());
     connect(fRawHandler, &RawHandler::writeToSocket, this, &SocketThread::writeToSocket);
     fTimer.start();
@@ -105,7 +105,6 @@ void SocketThread::rawRequest()
 
 void SocketThread::httpRequest()
 {
-    qDebug() << fData;
     if (fContentLenght > 0) {
         if (fData.length() < fContentLenght + fHeaderLength) {
             return;
@@ -374,6 +373,7 @@ void SocketThread::readyRead()
     ba.append(0x15);
 
     if (fData.isEmpty()) {
+        LogWriter::write(LogWriterLevel::warning, "empty dayta", QString(fData));
         fData = fSslSocket->read(3);
         if (fData.compare(ba) == 0) {
             fSocketType = RawData;
@@ -382,6 +382,7 @@ void SocketThread::readyRead()
         }
     }
     fData.append(fSslSocket->readAll());
+    LogWriter::write(LogWriterLevel::warning, fSocketType == RawData ? "raw" : "hjttp", QString(fData));
     switch (fSocketType) {
     case RawData:
         rawRequest();

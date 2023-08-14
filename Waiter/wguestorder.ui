@@ -69,7 +69,7 @@
   <customwidget>
    <class>WOrder</class>
    <extends>QWidget</extends>
-   <header location="global">worder.h</header>
+   <header>worderw.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

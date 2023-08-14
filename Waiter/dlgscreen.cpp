@@ -221,6 +221,7 @@ void DlgScreen::on_btnAccept_clicked()
             C5Message::error(tr("You have not permission to enter the manager tools"));
             return;
         }
+        __user = &u;
         DlgManagerTools d(&u);
         d.exec();
     }

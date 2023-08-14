@@ -44,6 +44,8 @@ void C5PrintJson::run()
             p.line(jo["x1"].toDouble(), jo["y1"].toDouble(), jo["x2"].toDouble(), jo["y2"].toDouble(), jo["width"].toInt());
         } else if (jo["cmd"].toString() == "line2") {
             p.line(jo["width"].toInt());
+        } else if (jo["cmd"].toString() == "newpage") {
+            p.newPage();
         }
     }
 }
