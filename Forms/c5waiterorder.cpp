@@ -9,6 +9,7 @@
 #include "c5mainwindow.h"
 #include "proxytablewidgetdatabase.h"
 #include "doubledatabase.h"
+#include "c5cashdoc.h"
 #include "c5airlog.h"
 #include "dlgsetwaiterordercl.h"
 #include <QMenu>
@@ -374,6 +375,14 @@ void C5WaiterOrder::on_btnOpenTable_clicked()
         C5Message::error(tr("An opened order exists on table, cannot continue"));
         return;
     }
+    db[":f_oheader"] = ui->leUuid->text();
+    db.exec("select f_id from a_header_Cash where f_oheader=:f_oheader");
+    while (db.nextRow()) {
+        C5CashDoc ::removeDoc(fDBParams, db.getString("f_id"));
+    }
+    db[":f_order"] = ui->leUuid->text();
+    db.exec("delete from b_clients_debts where f_order=:f_order");
+
     db[":f_id"] = ui->leUuid->text();
     db[":f_state"] = ORDER_STATE_OPEN;
     db.exec("update o_header set f_state=:f_state where f_id=:f_id");

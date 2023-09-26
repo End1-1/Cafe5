@@ -28,7 +28,14 @@ private:
     void changeQty();
     void removeWork();
     void removeWorker();
-
+    void workDetails();
+    void workDetailsList();
+    void workDetailsUpdate();
+    void workDetailsDone();
+    void workDetailsDoneUpdate();
+    void removeWorkDetails();
+    void workDetailsUndone();
 };
 
 #endif // QUERYJSONRESPONSE_H
+

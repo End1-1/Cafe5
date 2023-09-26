@@ -29,6 +29,8 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
                     << "left join o_state os on os.f_id=oh.f_state [os]"
                     << "left join o_tax ot on ot.f_id=oh.f_id [ot]"
                     << "left join c_partners cpb on cpb.f_id=oh.f_partner [cpb]"
+                    << "left join a_header_cash ahc on ahc.f_oheader=oh.f_id [ahc]"
+                    << "left join e_cash ec on ec.f_header=ahc.f_id and ec.f_sign=-1 [ec]"
                        ;
 
     fColumnsFields << "concat(oh.f_prefix, oh.f_hallid) as f_prefix" 
@@ -59,6 +61,7 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
                    << "sum(oh.f_amountdebt) as f_amountdebt"
                    << "sum(oh.f_amountprepaid) as f_amountprepaid"
                    << "sum(oh.f_hotel) as f_hotel"
+                   << "sum(ec.f_amount) as f_amountout"
                    << "oh.f_amountservice"
                    << "oh.f_amountdiscount"
                    << "oh.f_comment"
@@ -99,6 +102,7 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
                 << "f_amountdebt"
                 << "f_hotel"
                 << "f_count"
+                << "f_amountout"
                       ;
 
     fColumnsOrder << "oh.f_datecash"
@@ -139,6 +143,7 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_comment"] = tr("Comment");
     fTranslation["f_count"] = tr("Count");
     fTranslation["f_hotel"] = tr("Hotel");
+    fTranslation["f_amountout"] = tr("Out");
 
     fColumnsVisible["concat(oh.f_prefix, oh.f_hallid) as f_prefix"] = true;
     fColumnsVisible["oh.f_id"] = true;
@@ -171,6 +176,7 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
     fColumnsVisible["oh.f_comment"] = false;
     fColumnsVisible["count(oh.f_id) as f_count"] = false;
     fColumnsVisible["ot.f_receiptnumber"] = false;
+    fColumnsVisible["sum(ec.f_amount) as f_amountout"] = false;
 
     restoreColumnsVisibility();
 

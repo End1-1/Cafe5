@@ -1041,8 +1041,6 @@ bool C5WaiterServer::printReceipt(QString &err, C5Database &db, bool isBill, boo
     }
     db.rowToMap(headerInfo);
 
-
-
     QList<QMap<QString, QVariant> > bodyInfo;
     db[":f_header"] = fIn["order"].toString();
     if (!db.exec("select f_state, f_dish, f_price, f_canservice, f_candiscount, ob.f_discount, "
@@ -1052,7 +1050,8 @@ bool C5WaiterServer::printReceipt(QString &err, C5Database &db, bool isBill, boo
                  "from o_body ob "
                  "left join d_dish d on d.f_id=ob.f_dish "
                  "where f_header=:f_header "
-                 "group by f_dish, f_state, f_price, ob.f_discount ")) {
+                 "group by f_dish, f_state, f_price, ob.f_discount "
+                 "order by ob.f_row ")) {
         err = db.fLastError;
         return false;
     }

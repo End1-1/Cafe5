@@ -50,9 +50,11 @@ SOURCES += \
     ../Cafe5/calendar.cpp \
     ../Cafe5/dlgexitbyversion.cpp \
     ../Classes/QRCodeGenerator.cpp \
+    ../Classes/c5airlog.cpp \
     ../Classes/c5combodelegate.cpp \
     ../Classes/c5crypt.cpp \
     ../Classes/c5datedelegate.cpp \
+    ../Classes/c5document.cpp \
     ../Classes/c5filelogwriter.cpp \
     ../Classes/c5gridgilter.cpp \
     ../Classes/c5halltabledelegate.cpp \
@@ -65,10 +67,13 @@ SOURCES += \
     ../Classes/c5printing.cpp \
     ../Classes/c5printjson.cpp \
     ../Classes/c5printpreview.cpp \
+    ../Classes/c5printreceiptthread.cpp \
+    ../Classes/c5printreceiptthread50mm.cpp \
     ../Classes/c5printrecipta4.cpp \
     ../Classes/c5printremovedservicethread.cpp \
     ../Classes/c5printservicethread.cpp \
     ../Classes/c5random.cpp \
+    ../Classes/c5reporttemplatedriver.cpp \
     ../Classes/c5shoporder.cpp \
     ../Classes/c5storedraftwriter.cpp \
     ../Classes/c5tablemodel.cpp \
@@ -83,16 +88,19 @@ SOURCES += \
     ../Classes/c5witerconf.cpp \
     ../Classes/calculator.cpp \
     ../Classes/checkforupdatethread.cpp \
-    ../Classes/config.cpp \
     ../Classes/dataonline.cpp \
+    ../Classes/dlgpassword.cpp \
     ../Classes/doubledatabase.cpp \
     ../Classes/fileversion.cpp \
+    ../Classes/idram.cpp \
     ../Classes/notificationwidget.cpp \
     ../Classes/outputofheader.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
     ../Classes/removeshopsale.cpp \
     ../Classes/rkeyboard.cpp \
+    ../Classes/serverconnection.cpp \
     ../Classes/socketconnection.cpp \
+    ../Classes/thread.cpp \
     ../Classes/threadsendmessage.cpp \
     ../Configs/breezeconfig.cpp \
     ../Configs/cashboxconfig.cpp \
@@ -133,8 +141,52 @@ SOURCES += \
     ../Forms/dlgqrcode.cpp \
     ../Forms/dlgreservgoods.cpp \
     ../Forms/dlgserversettings.cpp \
-    ../Service5/raw/rawmessage.cpp \
+    ../Printing/printreceipt.cpp \
+    ../Printing/printreceiptgroup.cpp \
+    ../Printing/selectprinters.cpp \
+    ../Service5/handlers/httpheader.cpp \
+    ../Service5/handlers/requesthandler.cpp \
+    ../Service5/handlers/requestmanager.cpp \
+    ../Service5/handlers/socketdata.cpp \
     ../Service5/socket/sslsocket.cpp \
+    ../Service5/utils/commandline.cpp \
+    ../Service5/utils/configini.cpp \
+    ../Service5/utils/database.cpp \
+    ../Service5/utils/databaseconnectionmanager.cpp \
+    ../Service5/utils/gtranslator.cpp \
+    ../Service5/utils/jsonhandler.cpp \
+    ../Service5/utils/logwriter.cpp \
+    ../Service5/utils/networktable.cpp \
+    ../Service5/utils/os.cpp \
+    ../Service5/utils/sqlqueries.cpp \
+    ../Service5/utils/storemovement.cpp \
+    ../Service5/utils/tablerecord.cpp \
+    ../Service5Working/raw/raw.cpp \
+    ../Service5Working/raw/rawbalancehistory.cpp \
+    ../Service5Working/raw/rawcarnear.cpp \
+    ../Service5Working/raw/rawcoordinate.cpp \
+    ../Service5Working/raw/rawdllop.cpp \
+    ../Service5Working/raw/rawhello.cpp \
+    ../Service5Working/raw/rawmessage.cpp \
+    ../Service5Working/raw/rawmonitor.cpp \
+    ../Service5Working/raw/rawpluginobject.cpp \
+    ../Service5Working/raw/rawregistersms.cpp \
+    ../Service5Working/raw/rawsilentauth.cpp \
+    ../Service5Working/raw/rawyandexkey.cpp \
+    ../Service5Working/socket/sslserver.cpp \
+    ../Service5Working/socket/sslsocket.cpp \
+    ../Service5Working/utils/commandline.cpp \
+    ../Service5Working/utils/configini.cpp \
+    ../Service5Working/utils/database.cpp \
+    ../Service5Working/utils/databaseconnectionmanager.cpp \
+    ../Service5Working/utils/gtranslator.cpp \
+    ../Service5Working/utils/jsonhandler.cpp \
+    ../Service5Working/utils/logwriter.cpp \
+    ../Service5Working/utils/networktable.cpp \
+    ../Service5Working/utils/os.cpp \
+    ../Service5Working/utils/sqlqueries.cpp \
+    ../Service5Working/utils/storemovement.cpp \
+    ../Service5Working/utils/tablerecord.cpp \
     ../TableRecord/aheader.cpp \
     ../TableRecord/bclientdebts.cpp \
     ../TableRecord/bhistory.cpp \
@@ -163,13 +215,9 @@ SOURCES += \
     imageloader.cpp \
     loghistory.cpp \
         main.cpp \
-    preorders.cpp \
-    printreceipt.cpp \
-    printreceiptgroup.cpp \
     replicadialog.cpp \
     sales.cpp \
     searchitems.cpp \
-    selectprinters.cpp \
     selectstaff.cpp \
     settingsselection.cpp \
     storeinput.cpp \
@@ -226,9 +274,11 @@ HEADERS += \
     ../Cafe5/dlgexitbyversion.h \
     ../Classes/QRCodeGenerator.h \
     ../Classes/barcode5.h \
+    ../Classes/c5airlog.h \
     ../Classes/c5combodelegate.h \
     ../Classes/c5crypt.h \
     ../Classes/c5datedelegate.h \
+    ../Classes/c5document.h \
     ../Classes/c5filelogwriter.h \
     ../Classes/c5gridgilter.h \
     ../Classes/c5halltabledelegate.h \
@@ -241,10 +291,13 @@ HEADERS += \
     ../Classes/c5printing.h \
     ../Classes/c5printjson.h \
     ../Classes/c5printpreview.h \
+    ../Classes/c5printreceiptthread.h \
+    ../Classes/c5printreceiptthread50mm.h \
     ../Classes/c5printrecipta4.h \
     ../Classes/c5printremovedservicethread.h \
     ../Classes/c5printservicethread.h \
     ../Classes/c5random.h \
+    ../Classes/c5reporttemplatedriver.h \
     ../Classes/c5shoporder.h \
     ../Classes/c5storedraftwriter.h \
     ../Classes/c5tablemodel.h \
@@ -262,15 +315,19 @@ HEADERS += \
     ../Classes/checkforupdatethread.h \
     ../Classes/config.h \
     ../Classes/dataonline.h \
+    ../Classes/dlgpassword.h \
     ../Classes/doubledatabase.h \
     ../Classes/fileversion.h \
     ../Classes/goodsreserve.h \
+    ../Classes/idram.h \
     ../Classes/notificationwidget.h \
     ../Classes/outputofheader.h \
     ../Classes/proxytablewidgetdatabase.h \
     ../Classes/removeshopsale.h \
     ../Classes/rkeyboard.h \
+    ../Classes/serverconnection.h \
     ../Classes/socketconnection.h \
+    ../Classes/thread.h \
     ../Classes/threadsendmessage.h \
     ../Configs/breezeconfig.h \
     ../Configs/cashboxconfig.h \
@@ -312,8 +369,54 @@ HEADERS += \
     ../Forms/dlgqrcode.h \
     ../Forms/dlgreservgoods.h \
     ../Forms/dlgserversettings.h \
-    ../Service5/raw/rawmessage.h \
+    ../Printing/printreceipt.h \
+    ../Printing/printreceiptgroup.h \
+    ../Printing/selectprinters.h \
+    ../Service5/handlers/httpheader.h \
+    ../Service5/handlers/requesthandler.h \
+    ../Service5/handlers/requestmanager.h \
+    ../Service5/handlers/socketdata.h \
     ../Service5/socket/sslsocket.h \
+    ../Service5/utils/commandline.h \
+    ../Service5/utils/configini.h \
+    ../Service5/utils/database.h \
+    ../Service5/utils/databaseconnectionmanager.h \
+    ../Service5/utils/gtranslator.h \
+    ../Service5/utils/jsonhandler.h \
+    ../Service5/utils/logwriter.h \
+    ../Service5/utils/networktable.h \
+    ../Service5/utils/os.h \
+    ../Service5/utils/sqlqueries.h \
+    ../Service5/utils/storemovement.h \
+    ../Service5/utils/tablerecord.h \
+    ../Service5Working/raw/messagelist.h \
+    ../Service5Working/raw/raw.h \
+    ../Service5Working/raw/rawbalancehistory.h \
+    ../Service5Working/raw/rawcarnear.h \
+    ../Service5Working/raw/rawcoordinate.h \
+    ../Service5Working/raw/rawdllop.h \
+    ../Service5Working/raw/rawhello.h \
+    ../Service5Working/raw/rawmessage.h \
+    ../Service5Working/raw/rawmonitor.h \
+    ../Service5Working/raw/rawpluginobject.h \
+    ../Service5Working/raw/rawregistersms.h \
+    ../Service5Working/raw/rawsilentauth.h \
+    ../Service5Working/raw/rawyandexkey.h \
+    ../Service5Working/raw/structs.h \
+    ../Service5Working/socket/sslserver.h \
+    ../Service5Working/socket/sslsocket.h \
+    ../Service5Working/utils/commandline.h \
+    ../Service5Working/utils/configini.h \
+    ../Service5Working/utils/database.h \
+    ../Service5Working/utils/databaseconnectionmanager.h \
+    ../Service5Working/utils/gtranslator.h \
+    ../Service5Working/utils/jsonhandler.h \
+    ../Service5Working/utils/logwriter.h \
+    ../Service5Working/utils/networktable.h \
+    ../Service5Working/utils/os.h \
+    ../Service5Working/utils/sqlqueries.h \
+    ../Service5Working/utils/storemovement.h \
+    ../Service5Working/utils/tablerecord.h \
     ../TableRecord/aheader.h \
     ../TableRecord/bclientdebts.h \
     ../TableRecord/bhistory.h \
@@ -341,13 +444,9 @@ HEADERS += \
     goodsreturnreason.h \
     imageloader.h \
     loghistory.h \
-    preorders.h \
-    printreceipt.h \
-    printreceiptgroup.h \
     replicadialog.h \
     sales.h \
     searchitems.h \
-    selectprinters.h \
     selectstaff.h \
     settingsselection.h \
     storeinput.h \
@@ -383,6 +482,7 @@ FORMS += \
     ../Classes/c5gridgilter.ui \
     ../Classes/c5printpreview.ui \
     ../Classes/calculator.ui \
+    ../Classes/dlgpassword.ui \
     ../Classes/notificationwidget.ui \
     ../Classes/rkeyboard.ui \
     ../Controls/c5tablewithtotal.ui \
@@ -392,6 +492,7 @@ FORMS += \
     ../Forms/dlgqrcode.ui \
     ../Forms/dlgreservgoods.ui \
     ../Forms/dlgserversettings.ui \
+    ../Printing/selectprinters.ui \
     c5tempsale.ui \
     cashcollection.ui \
     dlgdate.ui \
@@ -407,11 +508,9 @@ FORMS += \
     dlgsplashscreen.ui \
     goodsreturnreason.ui \
     loghistory.ui \
-    preorders.ui \
     replicadialog.ui \
     sales.ui \
     searchitems.ui \
-    selectprinters.ui \
     selectstaff.ui \
     settingsselection.ui \
     storeinput.ui \
@@ -441,9 +540,13 @@ INCLUDEPATH += ../DbData
 INCLUDEPATH += ../Forms
 INCLUDEPATH += ../Configs
 INCLUDEPATH += ../Service
+INCLUDEPATH += ../Printing
 INCLUDEPATH += ../Service5
 INCLUDEPATH += ../Service5/raw
+INCLUDEPATH += ../Service5Working/raw
 INCLUDEPATH += ../Service5/socket
+INCLUDEPATH += ../Service5/utils
+INCLUDEPATH += ../Service5/handlers
 INCLUDEPATH += ../RESOURCES
 INCLUDEPATH += ../../XLSX/Src
 INCLUDEPATH += C:/Projects/NewTax/Src

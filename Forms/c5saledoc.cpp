@@ -178,7 +178,14 @@ bool C5SaleDoc::openDoc(const QString &uuid)
     fActionSave->setEnabled(false);
     fActionDraft->setEnabled(true);
     fActionCopy->setEnabled(true);
-    ui->tblGoods->setEnabled(false);
+    for (int r = 0; r < ui->tblGoods->rowCount(); r++) {
+        for (int c = 0; c < ui->tblGoods->columnCount(); c++) {
+            QWidget *w = ui->tblGoods->cellWidget(r, c);
+            if (w) {
+                w->setEnabled(false);
+            }
+        }
+    }
     ui->wtoolbar->setEnabled(false);
     ui->paymentFrame->setEnabled(false);
     return true;
@@ -1052,7 +1059,7 @@ void C5SaleDoc::exportToAs(int doctype)
     jo["database"] = jdb;
     jo["vatpercent"] = index == 0 ? (doctype == 5 ? 0.2 : 0.1667) : 0;
     jo["vattype"] = index == 0 ? (doctype == 5 ? "1" : "5") : "3";
-    jo["pricewithoutvat"] =index == 0 ? (doctype == 5 ? 1.2 : 1) : 1;
+    jo["pricewithoutvat"] = index == 0 ? (doctype == 5 ? 1.2 : 1) : 1;
     jo["withvat"] = index == 0 ? (doctype == 5 ? 0.2 : 0) : 0;
     HttpQueryDialog *qd = new HttpQueryDialog(fDBParams, QString("https://%1:%2/magnit").arg(b->ipAddress, QString::number(b->port)), jo, this);
     qd->exec();
@@ -1266,7 +1273,14 @@ void C5SaleDoc::saveAsDraft()
     fActionDraft->setEnabled(false);
     fActionCopy->setEnabled(false);
     ui->wtoolbar->setEnabled(true);
-    ui->tblGoods->setEnabled(true);
+    for (int r = 0; r < ui->tblGoods->rowCount(); r++) {
+        for (int c = 0; c < ui->tblGoods->columnCount(); c++) {
+            QWidget *w = ui->tblGoods->cellWidget(r, c);
+            if (w) {
+                w->setEnabled(true);
+            }
+        }
+    }
     ui->paymentFrame->setEnabled(true);
     fOpenedFromDraft = true;
     fDraftSale.staff = ui->leDelivery->property("id").toInt();

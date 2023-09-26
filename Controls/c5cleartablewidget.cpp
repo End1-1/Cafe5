@@ -95,6 +95,9 @@ bool C5ClearTableWidget::findWidget(QWidget *w, int &row, int &column)
 QVariant C5ClearTableWidget::getData(int row, int column, int role)
 {
     C5TableWidgetItem *i = item(row, column);
+    if (!i) {
+        i = new C5TableWidgetItem();
+    }
     return i->data(role);
 }
 

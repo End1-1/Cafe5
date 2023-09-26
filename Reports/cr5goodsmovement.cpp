@@ -5,6 +5,7 @@
 #include "c5changedocinputprice.h"
 #include "c5tablemodel.h"
 #include "c5dlgselectreporttemplate.h"
+#include "storeinputdocument.h"
 
 CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
@@ -210,12 +211,19 @@ bool CR5GoodsMovement::tblDoubleClicked(int row, int column, const QList<QVarian
         C5Message::info(tr("Document id column must be included in the report"));
         return true;
     }
+#ifdef NEWVERSION
+        auto *si = __mainWindow->createTab<StoreInputDocument>(fDBParams);
+        if (!si->openDoc(values.at(fModel->indexForColumnName("f_document")).toString())) {
+            __mainWindow->removeTab(si);
+        }
+#else
     C5StoreDoc *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);
     QString e;
     if (!sd->openDoc(values.at(fModel->indexForColumnName("f_document")).toString(), e)) {
         __mainWindow->removeTab(sd);
         C5Message::error(e);
     }
+#endif
     return true;
 }
 

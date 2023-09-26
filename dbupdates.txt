@@ -1286,7 +1286,7 @@ INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Բաժին', 'От�
 INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('ԳՀ', '-', 'ԳՀ');
 INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('ԿՀ', 'НЧ', 'ԿՀ');
 INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Ֆիսկալ', 'Фискальный', 'Ֆիսկալ');
-INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Receipt number', 'ԿՀ', 'НЧ');
+INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Receipt number', 'НЧ', 'ԿՀ' );
 INSERT INTO `s_translator` (`f_en`, `f_ru`, `f_am`) VALUES ('Time', 'Ժամ', 'Время');
 ALTER TABLE `s_translator` ADD UNIQUE INDEX `Индекс 1` (`f_en`(100));
 ALTER TABLE `c_goods_partner` ADD INDEX `Индекс 2` (`f_partner`);
@@ -1315,3 +1315,20 @@ create table a_store_valid (f_id char(36) primary key, f_date date);
 alter table a_store_valid add column f_document char(36) after f_id;
 ALTER TABLE `a_store_valid` ADD INDEX `idx_valid_doc` (`f_document`);
 update c_goods set f_qtybox=1;
+ALTER TABLE o_header ADD COLUMN f_taxpayertin TINYTEXT;
+
+
+/* db - 130, 05.09.2023 */
+update s_app set f_version='130' where f_app='DB';
+create table mf_process_details (f_id integer primary key auto_increment, f_process integer, f_color tinytext, f_36 integer, f_38 integer, f_40 integer, f_42 integer, f_44 integer, f_46 integer);
+alter table mf_process_details add column f_48 integer, add column f_50 integer, add column f_52 integer, add column f_36p integer, add column f_38p integer, add column f_40p integer, add column f_42p integer, add column f_44p integer, add column f_46p integer, add column f_48p integer, add column f_50p integer, add column f_52p integer;
+alter table mf_process_details add column f_product integer after f_id;
+alter table mf_process_details rename f_product to f_task;
+create table mf_process_details_done (f_id integer primary key auto_increment, f_taskid integer, f_processid integer, f_36d integer,f_38d integer, f_40d integer, f_42d integer, f_44d integer, f_46d integer,  f_48d integer,  f_50d integer,  f_52d integer);
+alter table mf_process_details_done add column f_color tinytext after f_processid;
+alter table mf_process_details add column f_34 integer after f_color, add column f_34p integer after f_52;
+alter table mf_process_details_done add column f_34d after f_color;
+
+/* db - 131, 05.09.2023 */
+update s_app set f_version='131' where f_app='DB';
+alter table mf_process_details drop column f_34,drop column f_36,drop column f_38,drop column f_40,drop column f_42,drop column f_44,drop column f_46,drop column f_48,drop column f_50,drop column f_52;

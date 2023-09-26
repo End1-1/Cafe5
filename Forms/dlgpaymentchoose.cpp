@@ -58,6 +58,11 @@ bool DlgPaymentChoose::getValues(double total, double &cash, double &card, doubl
     return false;
 }
 
+void DlgPaymentChoose::keyEnter()
+{
+    on_btnPay_clicked();
+}
+
 void DlgPaymentChoose::checkFiscal()
 {
     ui->btnFiscal->setChecked(!ui->btnFiscal->isChecked());
@@ -141,6 +146,7 @@ void DlgPaymentChoose::on_btnPay_clicked()
             + ui->lePrepaid->getDouble()
             + ui->leDebt->getDouble();
     if (value > ui->leTotal->getDouble() || value < ui->leTotal->getDouble()) {
+        C5Message::error(tr("Check amounts"));
         return;
     }
     accept();

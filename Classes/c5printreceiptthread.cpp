@@ -8,6 +8,7 @@
 #include "c5config.h"
 #include "c5logsystem.h"
 #include <QApplication>
+#include <QSettings>
 
 C5PrintReceiptThread::C5PrintReceiptThread(const QString &header, const QMap<QString, QVariant> &headerInfo, const QList<QMap<QString, QVariant> > &bodyinfo, const QString &printer, int language, int paperWidth)
 {
@@ -23,7 +24,8 @@ C5PrintReceiptThread::C5PrintReceiptThread(const QString &header, const QMap<QSt
 
 bool C5PrintReceiptThread::print(const QStringList &dbParams)
 {
-    int bs = 24;
+    QSettings _ls(qApp->applicationDirPath() + "/ls.inf", QSettings::IniFormat);
+    int bs = _ls.value("receipt/fontsize", 24).toInt();
     C5Translator::initTranslator(dbParams);
     C5Translator __translator;
     __translator.initTranslator(dbParams);
@@ -123,6 +125,14 @@ bool C5PrintReceiptThread::print(const QStringList &dbParams)
     if (db.nextRow()) {
         db.rowToMap(giftcardinfo);
     }
+    db[":f_trsale"] = fHeader;
+    db.exec("select c.f_code, concat(p.f_contact) as f_costumer, sum(h.f_amount) as f_totalamount  "
+            "from b_gift_card_history h "
+            "left join b_cards_discount c on c.f_id=h.f_card "
+            "left join c_partners p on p.f_id=c.f_client "
+            "where h.f_card in (select f_card from b_gift_card_history where f_trsale=:f_trsale)");
+    db.nextRow();
+    db.rowToMap(giftcardinfo);
 
     if (fBill) {
         p.image("./logo_bill.png", Qt::AlignHCenter);
@@ -239,8 +249,14 @@ bool C5PrintReceiptThread::print(const QStringList &dbParams)
         if (fHeaderInfo["f_state"].toInt() == ORDER_STATE_PREORDER_EMPTY
                 || fHeaderInfo["f_state"].toInt() == ORDER_STATE_PREORDER_WITH_ORDER) {
             m["f_qty2"] = m["f_qty1"];
-            m["f_total"] = m["f_qty1"].toDouble() * (m["f_price"].toDouble() + (m["f_price"].toDouble() * fHeaderInfo["f_servicefactor"].toDouble()));
-            needtopay += m["f_total"].toDouble();
+            m["f_total"] = m["f_qty1"].toDouble() * m["f_price"].toDouble();
+            double srvAmount = 0;
+            if (m["f_canservice"].toInt() != 0) {
+                srvAmount = (m["f_total"].toDouble() * fHeaderInfo["f_servicefactor"].toDouble());
+            }
+            needtopay += m["f_total"].toDouble() + srvAmount;
+            fHeaderInfo["f_amountservice"] = fHeaderInfo["f_amountservice"].toDouble() + srvAmount;
+            fHeaderInfo["f_amounttotal"] = needtopay;
         }
 
         QString totalStr = m["f_total"].toDouble() > 0.001 ? float_str(m["f_total"].toDouble(), 2) : __translator.tt("Present");
@@ -268,7 +284,14 @@ bool C5PrintReceiptThread::print(const QStringList &dbParams)
 
     p.br();
     p.ltext(__translator.tt("Total"), 0);
-    p.rtext(float_str(fHeaderInfo["f_amounttotal"].toDouble() + fHeaderInfo["f_amountdiscount"].toDouble() - fHeaderInfo["f_amountservice"].toDouble(), 2));
+    double printTotal = fHeaderInfo["f_amounttotal"].toDouble()
+            + fHeaderInfo["f_amountdiscount"].toDouble()
+            - fHeaderInfo["f_amountservice"].toDouble();
+    if (_ls.value("ls/roundtotal").toInt() == 1) {
+        printTotal = trunc(printTotal / 10);
+        printTotal *= 10;
+    }
+    p.rtext(float_str(printTotal, 2));
     p.br();
     p.br(1);
 
@@ -285,9 +308,16 @@ bool C5PrintReceiptThread::print(const QStringList &dbParams)
         p.br(1);
     }
 
+    //CARDINFO
     if (giftcardinfo.count() > 0) {
-        p.ltext(QString("%1 %2%").arg(__translator.tt("Accumulate"), float_str(giftcardinfo["f_value"].toDouble(), 2)), 0);
-        p.rtext(float_str(giftcardinfo["f_amount"].toDouble(), 2));
+        p.ltext(QString("%1 %2% (%3)").arg(__translator.tt("Accumulate"),
+                                           float_str(giftcardinfo["f_value"].toDouble(), 2),
+                float_str(giftcardinfo["f_amount"].toDouble(), 2)), 0);
+        p.rtext(float_str(giftcardinfo["f_totalamount"].toDouble(), 2));
+        p.br();
+//        p.ltext(QString("%1 %2").arg(__translator.tt("Card"), giftcardinfo["f_code"].toString()), 0);
+//        p.br();
+        p.ltext(giftcardinfo["f_costumer"].toString(), 0);
         p.br();
     }
 
@@ -312,6 +342,10 @@ bool C5PrintReceiptThread::print(const QStringList &dbParams)
     p.br();
 
     p.setFontSize(bs + 4);
+    if (_ls.value("ls/roundtotal").toInt() > 0) {
+        needtopay = trunc(needtopay / _ls.value("ls/roundtotal").toInt());
+        needtopay *= _ls.value("ls/roundtotal").toInt();
+    }
     if (needtopay > 0.01) {
         p.setFontSize(bs + 4);
         p.setFontBold(true);
@@ -392,8 +426,13 @@ bool C5PrintReceiptThread::print(const QStringList &dbParams)
 
     if (!fBill) {
         if (fHeaderInfo["f_amountcash"].toDouble() > 0.001) {
+            double vp = fHeaderInfo["f_amountcash"].toDouble();
+            if (_ls.value("ls/roundtotal").toInt() == 1) {
+                vp = trunc(vp / 10);
+                vp *= 10;
+            }
             p.ltext(__translator.tt("Payment, cash"), 0);
-            p.rtext(float_str(fHeaderInfo["f_amountcash"].toDouble(), 2));
+            p.rtext(float_str(vp, 2));
             p.br();
         }
         if (fHeaderInfo["f_amountcard"].toDouble() > 0.001) {

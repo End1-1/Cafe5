@@ -246,7 +246,7 @@ void CR5CostumerDebts::queryDebt3()
         "    dm ON dm.f_costumer=d.fpartnerid SET d.fdebt=dm.famount; "
         "UPDATE debt3 d INNER JOIN (SELECT f_costumer, SUM(f_amount) AS famount fROM b_clients_debts WHERE f_amount>0 and f_date between '%d1%' and '%d2%' %flag% GROUP BY 1) "
         "    dm ON dm.f_costumer=d.fpartnerid SET d.fpayment=dm.famount; "
-        "UPDATE debt3 d INNER JOIN (SELECT f_costumer, SUM(f_amount) AS famount fROM b_clients_debts WHERE f_id>0 %flag% GROUP BY 1) "
+        "UPDATE debt3 d INNER JOIN (SELECT f_costumer, SUM(f_amount) AS famount fROM b_clients_debts WHERE f_id>0 %flag% and f_date<='%d2%' GROUP BY 1) "
         "    dm ON dm.f_costumer=d.fpartnerid SET d.fdiff=dm.famount;	 "
         "delete from debt3 where fdebt=0 and fpayment=0 and fdiff=0;"
         "SELECT * FROM debt3;";

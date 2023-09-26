@@ -19,6 +19,7 @@
 #define hqVisit 16
 #define hqCompleteDelivery 17
 #define hqGoodsPartners 18
+#define hqSaleHistory 19
 
 #define pkOk "ok"
 #define pkMessage "message"

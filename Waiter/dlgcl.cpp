@@ -1,5 +1,6 @@
 #include "dlgcl.h"
 #include "ui_dlgcl.h"
+#include <QSettings>
 
 DlgCL::DlgCL(const QStringList &dbParams) :
     C5Dialog(dbParams),
@@ -7,9 +8,14 @@ DlgCL::DlgCL(const QStringList &dbParams) :
 {
     ui->setupUi(this);
     QStringList dbp(C5Config::dbParams());
+    QSettings _ls(qApp->applicationDirPath() + "/ls.inf", QSettings::IniFormat);
     if (C5Config::hotelDatabase().isEmpty()) {
+        QString where;
+        if (_ls.value("ls/customer_group_id").toInt() > 0) {
+            where = QString("where f_category=%1").arg(_ls.value("ls/customer_group_id").toInt());
+        }
         C5Database db(__c5config.dbParams());
-        db.exec("select f_id, f_name, f_phone from c_partners order by f_name");
+        db.exec(QString("select f_id, concat_ws(' ',f_name, f_phone, f_address) as f_info from c_partners %1 order by f_name").arg(where));
         while (db.nextRow()) {
             int row = ui->tblGuest->addEmptyRow();
             ui->tblGuest->setString(row, 0, db.getString(0));

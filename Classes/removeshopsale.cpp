@@ -56,7 +56,8 @@ bool RemoveShopSale::remove(C5Database &db, const QString &id)
 
     db[":f_order"] = id;
     db.exec("delete from b_clients_debts where f_order=:f_order");
-    db.exec("delete from a_header where f_id=:f_id");
+//    db[":f_order"] = id;
+//    db.exec("delete from a_header where f_id=:f_id");
     db[":f_trsale"] = id;
     db.exec("select * from b_gift_card_history where f_trsale=:f_trsale");
     if (db.nextRow()) {

@@ -1,6 +1,5 @@
 #include "dataonline.h"
 #include "c5database.h"
-#include "logwriter.h"
 
 QHash<QString, DataOnline*> DataOnline::fInstances;
 

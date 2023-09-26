@@ -204,6 +204,17 @@
        </widget>
       </item>
       <item>
+       <widget class="QToolButton" name="btnEditGoods">
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="horizontalSpacer_2">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -216,11 +227,33 @@
         </property>
        </spacer>
       </item>
+      <item>
+       <widget class="QLineEdit" name="leScancode">
+        <property name="minimumSize">
+         <size>
+          <width>200</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="readOnly">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
    <item>
     <widget class="C5TableWidget" name="tbl">
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::SingleSelection</enum>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
      <column>
       <property name="text">
        <string>X</string>
@@ -273,7 +306,7 @@
      </column>
      <column>
       <property name="text">
-       <string>Price</string>
+       <string>Selfcost</string>
       </property>
      </column>
      <column>
@@ -289,6 +322,11 @@
      <column>
       <property name="text">
        <string>Sale price</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Valid</string>
       </property>
      </column>
     </widget>
@@ -348,14 +386,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5DateEdit</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5dateedit.h</header>
-  </customwidget>
-  <customwidget>
    <class>C5LineEditWithSelector</class>
    <extends>QLineEdit</extends>
    <header location="global">c5lineeditwithselector.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5DateEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5dateedit.h</header>
   </customwidget>
   <customwidget>
    <class>C5TableWidget</class>

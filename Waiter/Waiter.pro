@@ -788,6 +788,7 @@ HEADERS += \
     ../Service5Working/socket/sslserver.h \
     ../Service5Working/socket/sslsocket.h \
     ../Service5Working/utils/configini.h \
+    ../Service5Working/utils/servicecommands.h \
     ../TableRecord/aheader.h \
     ../TableRecord/bclientdebts.h \
     ../TableRecord/bhistory.h \

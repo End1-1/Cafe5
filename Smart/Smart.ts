@@ -1177,8 +1177,8 @@ MS Excel</source>
         <translation>Հեռախոսը նշված չէ</translation>
     </message>
     <message>
-        <location filename="../Forms/customerinfo.cpp" line="86"/>
-        <location filename="../Forms/customerinfo.cpp" line="90"/>
+        <location filename="../Forms/customerinfo.cpp" line="87"/>
+        <location filename="../Forms/customerinfo.cpp" line="91"/>
         <source>Invalid phone number</source>
         <translation>Հեռախոսի համարի ֆորմատը սխալ է</translation>
     </message>

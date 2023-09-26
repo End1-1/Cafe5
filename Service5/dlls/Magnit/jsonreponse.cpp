@@ -73,6 +73,9 @@ void JsonReponse::getResponse()
     case hqGoodsPartners:
         goodsPartners();
         break;
+    case hqSaleHistory:
+        saleHistory();
+        break;
     default:
         fJsonOut["ok"] = 0;
         fJsonOut["message"] = QString("%1 %2").arg(lkUnknownProtocol, fJsonIn["pkAction"].toString());
@@ -820,4 +823,32 @@ bool JsonReponse::goodsPartners()
     fJsonOut[pkOk] = 1;
     fJsonOut[pkData] = ja;
     return true;
+}
+
+bool JsonReponse::saleHistory()
+{
+    QDate d1 = QDate::fromString(fJsonIn["pkDate1"].toString(), "dd/MM/yyyy");
+    QDate d2 = QDate::fromString(fJsonIn["pkDate2"].toString(), "dd/MM/yyyy");
+    int reportType = fJsonIn["pkReportType"].toInt();
+    QJsonObject reply;
+    switch (reportType) {
+    case 1:
+        fDb[":f_datecash1"] = d1;
+        fDb[":f_datecash2"] = d2;
+        if (fDb.exec("select h.f_name as f_hallname, sum(o.f_amounttotal) as f_amounttotal, "
+                     "count(o.f_id) as f_ordercount, sum(o.f_amountcash) as f_amountcash "
+                     "from o_header o "
+                     "left join h_halls h on h.f_id=o.f_hall "
+                     "where o.f_datecash between :f_datecash1 and :f_datecash2 "
+                     "group by 1") == false) {
+            return dbFail();
+        }
+        QJsonArray ja;
+        dbToArray(fDb, ja);
+        reply["total"] = ja;
+        break;
+    }
+
+    fJsonOut[pkData] = reply;
+    return ok();
 }

@@ -12,7 +12,7 @@ RC_FILE = res.rc
 
 TARGET = Office
 TEMPLATE = app
-
+#
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
@@ -25,7 +25,7 @@ DEFINES += _APPLICATION_=\\\"Cafe5\\\"
 DEFINES += _MODULE_=\\\"FRONTDESK\\\"
 DEFINES += FRONTDESK
 
-#DEFINES += NEWVERSION
+DEFINES += NEWVERSION
 
 CONFIG += c++11
 

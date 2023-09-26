@@ -46,6 +46,7 @@ bool C5ShopOrder::write()
         return returnFalse(dw.fErrorMsg, db);
     }
 
+    fOHeader.id = "";
     if (!fOHeader.write(db, err)) {
         return returnFalse(err, db);
     }
@@ -130,6 +131,7 @@ bool C5ShopOrder::write()
     bool needStoreDoc = false;
     for (int i = 0; i < fOGoods.count(); i++) {
         OGoods &g = fOGoods[i];
+        g.header = fOHeader._id();
         g.tax = rseq.toInt();
         if (!g.isService) {
             needStoreDoc = true;

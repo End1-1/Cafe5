@@ -100,11 +100,17 @@ void C5Dialog::keyPressEvent(QKeyEvent *e)
             keyAlterPlusEnter();
         } else {
             focusNextChild();
+            keyEnter();
         }
         e->ignore();
         return;
     }
     QDialog::keyPressEvent(e);
+}
+
+void C5Dialog::keyEnter()
+{
+
 }
 
 void C5Dialog::keyControlPlusEnter()

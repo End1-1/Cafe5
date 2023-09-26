@@ -358,6 +358,9 @@ bool C5OrderDriver::isEmpty()
 
 double C5OrderDriver::amountTotal()
 {
+    if (headerValue("f_precheck").toInt() > 0) {
+        return headerValue("f_amounttotal").toDouble();
+    }
     totalOfHourly t = nullptr;
     QLibrary l("hourlypay.dll");
     if (l.load()) {

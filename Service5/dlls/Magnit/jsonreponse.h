@@ -42,6 +42,7 @@ private:
     bool visit();
     bool completeDelivery();
     bool goodsPartners();
+    bool saleHistory();
 };
 
 #endif // JSONREPONSE_H

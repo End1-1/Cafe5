@@ -19,7 +19,24 @@ SOURCES += \
     ../../../Classes/c5printing.cpp \
     ../../../Classes/c5printreceiptthread.cpp \
     ../../../Classes/c5translator.cpp \
-    ../../raw/rawmessage.cpp \
+    ../../../Server5/socketthread.cpp \
+    ../../../Service5Working/raw/raw.cpp \
+    ../../../Service5Working/raw/rawbalancehistory.cpp \
+    ../../../Service5Working/raw/rawcarnear.cpp \
+    ../../../Service5Working/raw/rawcoordinate.cpp \
+    ../../../Service5Working/raw/rawdllop.cpp \
+    ../../../Service5Working/raw/rawhandler.cpp \
+    ../../../Service5Working/raw/rawhello.cpp \
+    ../../../Service5Working/raw/rawmessage.cpp \
+    ../../../Service5Working/raw/rawmonitor.cpp \
+    ../../../Service5Working/raw/rawplugin.cpp \
+    ../../../Service5Working/raw/rawpluginobject.cpp \
+    ../../../Service5Working/raw/rawregisterphone.cpp \
+    ../../../Service5Working/raw/rawregistersms.cpp \
+    ../../../Service5Working/raw/rawsilentauth.cpp \
+    ../../../Service5Working/raw/rawyandexkey.cpp \
+    ../../firebase.cpp \
+    ../../pluginmanager.cpp \
     ../../socket/sslsocket.cpp \
     ../../utils/configini.cpp \
     ../../utils/database.cpp \
@@ -47,7 +64,26 @@ HEADERS += \
     ../../../Classes/c5printing.h \
     ../../../Classes/c5printreceiptthread.h \
     ../../../Classes/c5translator.h \
-    ../../raw/rawmessage.h \
+    ../../../Server5/socketthread.h \
+    ../../../Service5Working/raw/messagelist.h \
+    ../../../Service5Working/raw/raw.h \
+    ../../../Service5Working/raw/rawbalancehistory.h \
+    ../../../Service5Working/raw/rawcarnear.h \
+    ../../../Service5Working/raw/rawcoordinate.h \
+    ../../../Service5Working/raw/rawdllop.h \
+    ../../../Service5Working/raw/rawhandler.h \
+    ../../../Service5Working/raw/rawhello.h \
+    ../../../Service5Working/raw/rawmessage.h \
+    ../../../Service5Working/raw/rawmonitor.h \
+    ../../../Service5Working/raw/rawplugin.h \
+    ../../../Service5Working/raw/rawpluginobject.h \
+    ../../../Service5Working/raw/rawregisterphone.h \
+    ../../../Service5Working/raw/rawregistersms.h \
+    ../../../Service5Working/raw/rawsilentauth.h \
+    ../../../Service5Working/raw/rawyandexkey.h \
+    ../../../Service5Working/raw/structs.h \
+    ../../firebase.h \
+    ../../pluginmanager.h \
     ../../socket/sslsocket.h \
     ../../utils/configini.h \
     ../../utils/database.h \
@@ -71,11 +107,13 @@ DEFINES += _ORGANIZATION_=\\\"BreezeDevs\\\"
 DEFINES += _MODULE_=\\\"Service5_waiterclientp_dll\\\"
 DEFINES += _NOAPP_
 
-INCLUDEPATH += ../../raw
 INCLUDEPATH += ../../socket
 INCLUDEPATH += ../../utils
 INCLUDEPATH += ../../../Classes
 INCLUDEPATH += ../../../Cafe5
+INCLUDEPATH += ../../../Service5Working/raw
+INCLUDEPATH += ../../../Server5
+INCLUDEPATH += ../../../Service5
 
 INCLUDEPATH += C:/Projects/NewTax/Src
 INCLUDEPATH += C:/Soft/OpenSSL-Win64/include

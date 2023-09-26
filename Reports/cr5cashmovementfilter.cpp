@@ -9,6 +9,7 @@ CR5CashMovementFilter::CR5CashMovementFilter(const QStringList &dbParams, QWidge
     ui->setupUi(this);
     ui->leCash->setSelector(dbParams, ui->leCashName, cache_cash_names).setMultiselection(true);
     ui->leHall->setSelector(dbParams, ui->leHallname, cache_halls);
+    ui->leManager->setSelector(dbParams, ui->leManagerName, cache_users);
 }
 
 CR5CashMovementFilter::~CR5CashMovementFilter()
@@ -25,6 +26,9 @@ QString CR5CashMovementFilter::condition()
     }
     if (ui->leHall->isEmpty() == false) {
         w += " and cd.f_flag in (" + ui->leHall->text() + ") ";
+    }
+    if (ui->leManager->isEmpty() == false) {
+        w += " and p.f_manager in (" + ui->leManager->text() + ") ";
     }
     return w;
 }

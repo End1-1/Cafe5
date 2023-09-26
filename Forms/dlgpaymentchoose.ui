@@ -92,7 +92,7 @@
          </font>
         </property>
         <property name="text">
-         <string>Pay</string>
+         <string>Pay (Enter)</string>
         </property>
        </widget>
       </item>
@@ -116,7 +116,7 @@
          </font>
         </property>
         <property name="text">
-         <string>Back</string>
+         <string>Back (Esc)</string>
         </property>
        </widget>
       </item>

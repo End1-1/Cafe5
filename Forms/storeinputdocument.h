@@ -27,7 +27,12 @@ private slots:
     void on_toolButton_clicked();
     void saveDoc();
     bool draftDoc();
+    void removeDocument();
     void on_btnSetPartner_clicked();
+
+    void on_leScancode_returnPressed();
+
+    void on_btnEditGoods_clicked();
 
 private:
     QAction *fSave;
@@ -36,6 +41,7 @@ private:
     void countTotal();
     int newEmptyRow();
     void connectSlotSignal(int row);
+    void disconnectSlotSignal(int row);
 };
 
 #endif // STOREINPUTDOCUMENT_H

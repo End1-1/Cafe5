@@ -260,8 +260,6 @@ bool C5CashDoc::removeDoc(C5Database &db, const QString &uuid)
     db.exec("delete from a_header_cash where f_id=:f_id");
     db[":f_cashuuid"] = uuid;
     db.exec("update a_header_store set f_cashuuid='' where f_cashuuid=:f_cashuuid");
-    db[":f_cashdoc"] = uuid;
-    db.exec("delete from s_salary_payment where f_cashdoc=:f_cashdoc");
     return true;
 }
 

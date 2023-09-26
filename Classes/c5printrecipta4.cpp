@@ -92,7 +92,7 @@ bool C5PrintReciptA4::print(QString &err)
     points << 50 << 200 << 1700;
     vals.clear();
     vals << tr("Saler");
-    vals << QString::fromUtf8("ԱԶ Հրաչ Աջեմյան, ՀՎՀՀ՝ 35136541");
+    vals << QString::fromUtf8("\"Հրաչ Աջեմյան\" ԱԶ, ՀՎՀՀ՝ 35136541");
     //vals << QString::fromUtf8("");
     p.tableText(points, vals, p.fLineHeight + 20);
     p.br(p.fLineHeight + 20);
@@ -120,7 +120,7 @@ bool C5PrintReciptA4::print(QString &err)
     QString goodsColName = tr("Goods");
 
     points.clear();
-    points << 50 << 100 << 250 << 600 << 150 << 200 << 200 << 100 << 200;
+    points << 50 << 100 << 250 << 850 << 100 << 100 << 200 << 100 << 200;
     vals.clear();
     vals << tr("NN")
          << tr("Material code")
@@ -158,8 +158,8 @@ bool C5PrintReciptA4::print(QString &err)
 
     p.setFontBold(true);
     points.clear();
-    points << 1000
-           << 650
+    points << 1250
+           << 500
            << 200;
     vals.clear();
     vals << tr("Total amount");

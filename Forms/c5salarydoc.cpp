@@ -192,7 +192,7 @@ double C5SalaryDoc::salaryOfPosition(C5Database &db, int pos, int worker)
 {
     db[":f_date"] = ui->deDate->date();
     db[":f_position"] = pos;
-    db.exec("select count(f_id) from s_salary_attendance where f_position=:f_position");
+    db.exec("select count(f_id) from s_salary_attendance where f_position=:f_position and f_date=:f_date");
     db.nextRow();
     int posCount = db.getInt(0);
     db[":f_worker"] = worker;
@@ -249,8 +249,8 @@ double C5SalaryDoc::salaryOfPosition(C5Database &db, int pos, int worker)
     total += dep + totalVal + own;
     total /= posCount;
     total += fixed;
-    total = total < min && min > 0.001 ? min : total;
-    total = total > max && max > 0.001 ? max : total;
+    total = (total < min) && (min > 0.001) ? min : total;
+    total = (total > max) && (max > 0.001) ? max : total;
     return total;
 }
 

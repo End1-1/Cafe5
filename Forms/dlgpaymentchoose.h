@@ -19,6 +19,8 @@ public:
     static bool getValues(double total, double &cash, double &card, double &idram, double &telcell, double &bank,
                           double &prepaid, double &debt, double &cashin, double &change, bool &fiscal);
 
+    virtual void keyEnter() override;
+
 private slots:
 
     void checkFiscal();

@@ -199,6 +199,7 @@ void C5User::getState()
 
 void C5User::getPermissions()
 {
+    fPermissions.clear();
     C5Database db(__c5config.dbParams());
     C5Permissions::init(db, group());
     db[":f_group"] = group();

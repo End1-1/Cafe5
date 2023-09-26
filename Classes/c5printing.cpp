@@ -226,11 +226,16 @@ void C5Printing::ctextof(const QString &text, qreal x)
 
 void C5Printing::rtext(const QString text)
 {
+//    QGraphicsTextItem *item = fCanvas->addText(text, fFont);
+//    QTextOption op;
+//    op.setAlignment(Qt::AlignRight);
+//    item->document()->setDefaultTextOption(op);
+//    item->moveBy(0, fTop);
+//    setTemptop(item, -1);
+
     QGraphicsTextItem *item = fCanvas->addText(text, fFont);
-    QTextOption op;
-    op.setAlignment(Qt::AlignRight);
-    item->document()->setDefaultTextOption(op);
-    item->moveBy(0, fTop);
+    int textwidth = item->boundingRect().width() + 25;
+    item->moveBy(fNormalWidth - textwidth, fTop);
     setTemptop(item, -1);
 
     QJsonObject o;

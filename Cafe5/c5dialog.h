@@ -48,6 +48,8 @@ protected:
 
     virtual void keyPressEvent(QKeyEvent *e);
 
+    virtual void keyEnter();
+
     virtual void keyControlPlusEnter();
 
     virtual void keyAlterPlusEnter();

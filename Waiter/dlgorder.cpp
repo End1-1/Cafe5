@@ -50,6 +50,7 @@
 #include <QPainter>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QSettings>
 #include <QSslSocket>
 
 #define PART2_COL_WIDTH 150
@@ -111,6 +112,10 @@ DlgOrder::DlgOrder(C5User *user) :
     if (__c5config.getValue(param_tax_print_always_offer).toInt() == 1) {
         ui->btnTax->setChecked(true);
         ui->btnTax->setEnabled(false);
+    }
+    QSettings _ls(qApp->applicationDirPath() + "/ls.inf", QSettings::IniFormat);
+    if (_ls.value("ls/notax").toInt() == 1) {
+        ui->btnTax->setChecked(false);
     }
 
     fMenuID = C5Config::defaultMenu();
@@ -489,11 +494,11 @@ void DlgOrder::itemsToTable()
         o->updateDishes();
     }
     WOrder *wo = worder();
+    wo->fOrderDriver->amountTotal();
     setButtonsState();
     if (!wo) {
         return;
     }
-    wo->fOrderDriver->amountTotal();
     ui->btnService->setText(QString("%1 %2%: %3")
                             .arg(tr("Service amount"))
                             .arg(worder()->fOrderDriver->headerValue("f_servicefactor").toDouble() * 100)
@@ -2200,13 +2205,19 @@ void DlgOrder::on_btnService_clicked()
 
 void DlgOrder::on_btnTax_clicked()
 {
+    QSettings _ls(qApp->applicationDirPath() + "/ls.inf", QSettings::IniFormat);
+    bool taxforce = _ls.value("ls/forcetax").toInt() == 1;
+    bool notax = _ls.value("ls/notax").toInt() == 1;
     if (ui->leOther->getDouble() > 0.001) {
         ui->btnTax->setChecked(false);
     }
     if (ui->leCard->getDouble()> 0.001) {
-        ui->btnTax->setChecked(true);
+        ui->btnTax->setChecked(true && !taxforce);
     }
     if (ui->lePrepaid->getDouble() > 0.001) {
+        ui->btnTax->setChecked(true && !taxforce);
+    }
+    if (notax) {
         ui->btnTax->setChecked(false);
     }
     C5Config::setRegValue("btn_tax_state", ui->btnTax->isChecked() ? 1 : 2);
@@ -2890,13 +2901,23 @@ void DlgOrder::on_btnCashout_clicked()
             + wo->fOrderDriver->headerValue("f_hallid").toString() + " " + comment;
 
     C5Database db(__c5config.dbParams());
-    C5StoreDraftWriter dw(db);
+    db[":f_oheader"] = wo->fOrderDriver->headerValue("f_id");
+    db.exec("select e.f_id as f_idout, a.f_id "
+            "from a_header_cash a "
+            "left join e_cash e on e.f_header=a.f_id "
+            "where f_oheader=:f_oheader");
     QString cashUUID;
+    QString idout;
+    if (db.nextRow()) {
+        cashUUID = db.getString("f_id");
+        idout = db.getString("f_idout");
+    }
+    C5StoreDraftWriter dw(db);
     dw.writeAHeader(cashUUID, tr("Delivery"), DOC_STATE_SAVED, DOC_TYPE_CASH,
                     wo->fOrderDriver->headerValue("f_currentstaff").toInt(),
                     QDate::currentDate(), QDate::currentDate(), QTime::currentTime(),0, max, purpose, 1, 1);
     dw.writeAHeaderCash(cashUUID, 0, 1, 0, "", wo->fOrderDriver->headerValue("f_id").toString(), 0);
-    QString idout;
+
     dw.writeECash(idout, cashUUID, 1, -1, purpose, max, idout, 1);
 
     C5Message::info(purpose);

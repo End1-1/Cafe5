@@ -6,6 +6,7 @@
 #include "messagelist.h"
 #include "printtaxn.h"
 #include "c5printing.h"
+#include "logwriter.h"
 #include "printbill.h"
 #include <QFont>
 #include <QPrinter>
@@ -1039,12 +1040,16 @@ void printService(RawMessage &rm, Database &db, const QByteArray &in, WaiterConn
                 db.insert("o_dishes_reminder");
             } else if (d["print1"].toString().contains("printer", Qt::CaseInsensitive)) {
                 QStringList rd = d["print1"].toString().split(":", Qt::SkipEmptyParts);
-                QString printer = rd.at(1);
+                QString printer = rd.length() > 1 ? rd.at(1) : d["print1"].toString();
                 printers[printer + ":" + d["storename"].toString() + ":1"].append(i);
+            } else {
+                LogWriter::write(LogWriterLevel::errors, "printer 1", d["dish_id"].toString());
+                printers[d["print1"].toString() + ":" + d["storename"].toString() + ":1"].append(i);
             }
+
             if (d["print2"].toString() != d["print1"].toString()) {
                 if (d["print2"].toString().contains("mobile", Qt::CaseInsensitive)) {
-                    QStringList rd = d["print1"].toString().split(":", Qt::SkipEmptyParts);
+                    QStringList rd = d["print2"].toString().split(":", Qt::SkipEmptyParts);
                     QString reminder = rd.at(1);
                     db[":record_id"] = d["id"];
                     db[":state_Id"] = 0;
@@ -1057,12 +1062,16 @@ void printService(RawMessage &rm, Database &db, const QByteArray &in, WaiterConn
                     db.insert("o_dishes_reminder");
                 } else if (d["print2"].toString().contains("printer", Qt::CaseInsensitive)) {
                     QStringList rd = d["print2"].toString().split(":", Qt::SkipEmptyParts);
-                    QString printer = rd.at(1);
+                    QString printer = rd.length() > 1 ? rd.at(1) : d["print2"].toString();
                     printers[printer + ":" + d["storename"].toString() + ":2"].append(i);
+                } else {
+                    LogWriter::write(LogWriterLevel::errors, "printer 2", d["dish_id"].toString());
+                    printers[d["print2"].toString() + ":" + d["storename"].toString() + ":2"].append(i);
                 }
             }
         }
 
+        LogWriter::write(LogWriterLevel::errors, "printer", "before print on printer");
         if (!printServiceOnPrinter(order, printers, dishes)) {
             return;
         }
@@ -1122,6 +1131,7 @@ void printService(RawMessage &rm, Database &db, const QByteArray &in, WaiterConn
                 return;
             }
 
+            LogWriter::write(LogWriterLevel::errors, "printer v2", "before parse dishes on printers");
             QMap<QString, QList<int> > printers;
             for (int i = 0; i < dishes.count(); i++) {
                 QMap<QString, QVariant> &d = dishes[i];
@@ -1137,7 +1147,7 @@ void printService(RawMessage &rm, Database &db, const QByteArray &in, WaiterConn
 //                    db[":qty"] = d["qty"];
 //                    db[":reminder_id"] = reminder.toInt();
 //                    db.insert("o_dishes_reminder");
-                } else if (d["f_print1"].toString().contains("printer", Qt::CaseInsensitive)) {
+                } else if (d["f_print1"].toString().contains("printer:", Qt::CaseInsensitive)) {
                     QStringList rd = d["f_print1"].toString().split(":", Qt::SkipEmptyParts);
                     QString printer = rd.at(1);
                     printers[printer + ":" + d["storename"].toString() + ":1"].append(i);
@@ -1157,7 +1167,7 @@ void printService(RawMessage &rm, Database &db, const QByteArray &in, WaiterConn
 //                        db[":qty"] = d["qty"];
 //                        db[":reminder_id"] = reminder.toInt();
 //                        db.insert("o_dishes_reminder");
-                    } else if (d["f_print2"].toString().contains("printer", Qt::CaseInsensitive)) {
+                    } else if (d["f_print2"].toString().contains("printer:", Qt::CaseInsensitive)) {
                         QStringList rd = d["print2"].toString().split(":", Qt::SkipEmptyParts);
                         QString printer = rd.at(1);
                         printers[printer + ":" + d["storename"].toString() + ":2"].append(i);
@@ -1167,6 +1177,7 @@ void printService(RawMessage &rm, Database &db, const QByteArray &in, WaiterConn
                 }
             }
 
+            LogWriter::write(LogWriterLevel::errors, "printer v2", "before send to printer");
             if (!printServiceOnPrinter(order, printers, dishes)) {
                 return;
             }
@@ -1638,6 +1649,9 @@ bool printServiceOnPrinter(const QMap<QString, QVariant> &order, const QMap<QStr
 {
     for (QMap<QString, QList<int> >::const_iterator pi = dishesToPrint.constBegin(); pi != dishesToPrint.constEnd(); pi++) {
         QStringList printerstore = pi.key().split(":", Qt::SkipEmptyParts);
+        if (printerstore.length() < 3) {
+            continue;
+        }
         QString printer = printerstore.at(0);
         QString store = printerstore.at(1);
         QString side = printerstore.at(2);

@@ -60,7 +60,7 @@ CE5Goods::CE5Goods(const QStringList &dbParams, QWidget *parent) :
     ui->leCostPrice->fDecimalPlaces = 4;
     connect(ui->tblMultiscancode, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(tblMultiscancodeContextMenu(QPoint)));
     QStringList l;
-    l.append(tr("Retail"));
+    l.append(tr("Sale price"));
     l.append(tr("Whosale"));
     ui->tblPricing->setVerticalHeaderLabels(l);
     db.exec("select * from e_currency order by f_id");
@@ -229,10 +229,16 @@ bool CE5Goods::save(QString &err, QList<QMap<QString, QVariant> > &data)
             ui->leStoreId->setInteger(ui->leCode->getInteger());
         }
     }
+    bool isNew = ui->leCode->getInteger() == 0;
     if (!CE5Editor::save(err, data)) {
         return false;
     }
     C5Database db(fDBParams);
+    if (isNew) {
+        db[":f_id"] = ui->leCode->getInteger();
+        db.insert("c_goods_option", false);
+    }
+
     if (ui->leScanCode->text().length() > 0) {
         db[":f_id"] = ui->leCode->getInteger();
         db[":f_scancode"] = ui->leScanCode->text();
@@ -308,6 +314,9 @@ bool CE5Goods::save(QString &err, QList<QMap<QString, QVariant> > &data)
         db[":f_ascode"] = ui->tblAs->lineEdit(i, 2)->text();
         db.insert("as_convert");
     }
+
+    data[0]["f_saleprice1"] =ui->tblPricing->lineEdit(0, 0)->getDouble();
+    data[0]["f_saleprice2"] =ui->tblPricing->lineEdit(1, 0)->getDouble();
 
     return true;
 }

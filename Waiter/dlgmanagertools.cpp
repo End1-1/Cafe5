@@ -6,6 +6,7 @@
 #include "dlgpassword.h"
 #include "datadriver.h"
 #include "dlgstafflist.h"
+#include <QSettings>
 
 DlgManagerTools::DlgManagerTools(C5User *u) :
     C5Dialog(__c5config.dbParams()),
@@ -14,6 +15,17 @@ DlgManagerTools::DlgManagerTools(C5User *u) :
     ui->setupUi(this);
     setWindowState(Qt::WindowFullScreen);
     fUser = u;
+
+    QSettings _ls(qApp->applicationDirPath() + "/ls.inf", QSettings::IniFormat);
+    if (_ls.value("mt/session", 0).toInt() > 0) {
+        ui->btnChangeSession->setEnabled(_ls.value("mt/session", -1).toInt() == __user->id());
+    }
+    if (_ls.value("mt/mypass", 0).toInt() > 0) {
+        ui->btnChangeMyPassword->setEnabled(_ls.value("mt/mypass", -1).toInt() == __user->id());
+    }
+    if (_ls.value("mt/staffpass", 0).toInt() > 0) {
+        ui->btnChangeStaffPassword->setEnabled(_ls.value("mt/staffpass", -1).toInt() == __user->id());
+    }
 }
 
 DlgManagerTools::~DlgManagerTools()

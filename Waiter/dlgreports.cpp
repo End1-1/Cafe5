@@ -14,6 +14,7 @@
 #include "c5cashdoc.h"
 #include "dlgviewcashreport.h"
 #include "qinputdialog.h"
+#include <QSettings>
 
 DlgReports::DlgReports(const QStringList &dbParams, C5User *user) :
     C5Dialog(dbParams),
@@ -317,10 +318,10 @@ void DlgReports::on_btnCashobx_clicked()
    }
 
    C5Database db(__c5config.dbParams());
-   db.exec("SELECT 'եկամուտ', 'title', 0 "
+   db.exec("SELECT 'Մուտք', 'title', 0, '' "
             "UNION "
 
-            "SELECT en.f_name AS f_cashname, ah.f_comment, sum(e.f_amount) "
+            "SELECT en.f_name AS f_cashname, ah.f_comment, sum(e.f_amount), '' "
             "FROM e_cash e "
             "LEFT JOIN e_cash_names en ON en.f_id=e.f_cash "
             "LEFT join a_header ah ON ah.f_id=e.f_header "
@@ -328,21 +329,23 @@ void DlgReports::on_btnCashobx_clicked()
             "GROUP BY 1, 2 "
 
             "UNION "
-            "SELECT 'ծախսեր', 'title', 0 "
+            "SELECT 'Ելք', 'title', 0, '' "
             "union "
 
-            "SELECT en.f_name AS f_cashname, ah.f_comment,  sum(e.f_amount*-1) "
+            "SELECT en.f_name AS f_cashname, concat_ws(' ',ah.f_comment, p.f_name) as f_comment,  sum(e.f_amount*-1), "
+            "e.f_id "
             "FROM e_cash e "
             "LEFT JOIN e_cash_names en ON en.f_id=e.f_cash "
             "LEFT join a_header ah ON ah.f_id=e.f_header "
+            "left join c_partners p on p.f_id=ah.f_partner "
             "WHERE e.f_sign=-1 and ah.f_sessionid IS NULL "
-            "GROUP BY 1, 2 "
+            "GROUP BY 1, 2, 4 "
 
             "UNION "
-            "SELECT 'վերջնահաշվարկ', 'title', 0 "
+            "SELECT 'վերջնահաշվարկ', 'title', 0, '' "
             "union "
 
-            "SELECT en.f_name AS f_cashname, '',  sum(e.f_amount*e.f_sign) "
+            "SELECT en.f_name AS f_cashname, '',  sum(e.f_amount*e.f_sign), '' "
             "FROM e_cash e "
             "LEFT JOIN e_cash_names en ON en.f_id=e.f_cash "
             "LEFT join a_header ah ON ah.f_id=e.f_header "
@@ -380,7 +383,7 @@ void DlgReports::on_btnCashobx_clicked()
        QFont font(qApp->font());
        font.setPointSize(bs);
        C5Printing p;
-       p.setSceneParams(700, 2600, QPrinter::Portrait);
+       p.setSceneParams(650, 2600, QPrinter::Portrait);
        p.setFont(font);
        p.image("./logo_receipt.png", Qt::AlignHCenter);
        p.br();
@@ -400,7 +403,7 @@ void DlgReports::on_btnCashobx_clicked()
             if (total > -1000000000) {
                 p.setFontSize(bs + 2);
                 p.setFontBold(true);
-                p.ltext(tr("Total"), 0);
+                p.ltext(tr("Total"), 0, 490);
                 p.rtext(float_str(total, 2));
                 p.br();
                 p.line();
@@ -423,14 +426,14 @@ void DlgReports::on_btnCashobx_clicked()
         p.setFontSize(bs);
         p.setFontBold(false);
         total += db.getDouble(2);
-        p.ltext(db.getString(0) + " " + db.getString(1), 0);
+        p.ltext(db.getString(0) + " " + db.getString(1), 0, 490);
         p.rtext(float_str(db.getDouble(2), 2));
         p.br();
        }
        if (total > -1000000000) {
            p.setFontSize(bs + 2);
            p.setFontBold(true);
-           p.ltext(tr("Total"), 0);
+           p.ltext(tr("Total"), 0, 490);
            p.rtext(float_str(total, 2));
            p.br();
            p.line();
