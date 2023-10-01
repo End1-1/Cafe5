@@ -49,7 +49,7 @@ void C5Translator::initTranslator(const QStringList &dbParams)
 
 void C5Translator::setLanguage(int language)
 {
-    fLanguage = language;
+    fInstance->fLanguage = language;
 }
 
 QString C5Translator::tt(const QString &value)

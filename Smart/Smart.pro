@@ -136,9 +136,7 @@ SOURCES += \
     ../Forms/touchdlgphonenumber.cpp \
     ../Forms/touchentertaxreceiptnumber.cpp \
     ../Forms/touchselecttaxreport.cpp \
-    ../Shop/printreceipt.cpp \
-    ../Shop/printreceiptgroup.cpp \
-    ../Shop/selectprinters.cpp \
+    ../Service5Working/utils/logwriter.cpp \
     ../TableRecord/aheader.cpp \
     ../TableRecord/bclientdebts.cpp \
     ../TableRecord/bhistory.cpp \
@@ -278,9 +276,7 @@ HEADERS += \
     ../Forms/touchentertaxreceiptnumber.h \
     ../Forms/touchselecttaxreport.h \
     ../Service/servicecommands.h \
-    ../Shop/printreceipt.h \
-    ../Shop/printreceiptgroup.h \
-    ../Shop/selectprinters.h \
+    ../Service5Working/utils/logwriter.h \
     ../TableRecord/aheader.h \
     ../TableRecord/bclientdebts.h \
     ../TableRecord/bhistory.h \
@@ -331,7 +327,6 @@ FORMS += \
     ../Forms/touchdlgphonenumber.ui \
     ../Forms/touchentertaxreceiptnumber.ui \
     ../Forms/touchselecttaxreport.ui \
-    ../Shop/selectprinters.ui \
     dlgmemoryread.ui \
     dlgsmartreports.ui \
     menudialog.ui \
@@ -355,6 +350,7 @@ INCLUDEPATH += c:/projects/cafe5/Classes
 INCLUDEPATH += c:/projects/cafe5/Controls
 INCLUDEPATH += c:/projects/cafe5/Service
 INCLUDEPATH += c:/projects/cafe5/TableRecord
+INCLUDEPATH += c:/projects/cafe5/service5working/utils
 INCLUDEPATH += c:/projects/cafe5/DbData
 INCLUDEPATH += c:/projects/cafe5/Forms
 INCLUDEPATH += c:/Projects/NewTax/Src

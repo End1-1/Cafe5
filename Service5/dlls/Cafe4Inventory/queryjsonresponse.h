@@ -18,11 +18,21 @@ private:
     void dbToArray(QJsonArray &ja, Database &db);
     QSettings &fSettings;
 
+    QString fbDb();
+    void returnQueryResult(const QString &queryName);
+
     void getCafeList();
     void getStoreList();
     void getBaseItems();
     void getAmtStorageList();
-
+    void getAsStorageList();
+    void getStorageItems();
+    void openInventoryDoc();
+    void updateInventoryDocItem();
+    void getGoodsQrAndWeight();
+    void getGoodsNames();
+    void saveGoodsQrName();
+    void getConfig();
 };
 
 #endif // QUERYJSONRESPONSE_H

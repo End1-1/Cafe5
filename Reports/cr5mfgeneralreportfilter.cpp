@@ -12,6 +12,7 @@ CR5MFGeneralReportFilter::CR5MFGeneralReportFilter(const QStringList &dbParams, 
     ui->lePosition->setSelector(dbParams, ui->lePositionName, cache_users_groups);
     ui->leWorker->setSelector(dbParams, ui->leWorkerName, cache_users);
     ui->leTeamlead->setSelector(dbParams, ui->leTeamleadName, cache_users);
+    ui->leWorkerState->setSelector(dbParams, ui->leWorkerStateName, cache_users_states);
 }
 
 CR5MFGeneralReportFilter::~CR5MFGeneralReportFilter()
@@ -28,6 +29,7 @@ QString CR5MFGeneralReportFilter::condition()
     in(cond, "p.f_worker", ui->leWorker);
     in(cond, "w.f_group", ui->lePosition);
     in(cond, "w.f_teamlead", ui->leTeamlead);
+    in(cond, "w.f_state", ui->leWorkerState);
     return cond;
 }
 
@@ -37,6 +39,9 @@ QString CR5MFGeneralReportFilter::conditionText()
     text += QString("%1 %2 - %3").arg(tr("Date range"), ui->leStart->text(), ui->leEnd->text());
     if (!ui->leTeamlead->isEmpty()) {
         text += QString("%1: %2").arg(tr("Teamlead"), ui->leTeamleadName->text());
+    }
+    if (!ui->leWorkerState->isEmpty()) {
+        text += " ";
     }
     return text;
 }

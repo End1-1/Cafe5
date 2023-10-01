@@ -2527,42 +2527,45 @@ void DlgOrder::on_btnPaymentIdram_clicked()
     auto *wo = worder();
     if (!wo) {
         return;
-    }worder()->fOrderDriver->setHeader("f_amountcash", 0);
-    worder()->fOrderDriver->setHeader("f_amountcard", 0);
-    worder()->fOrderDriver->setHeader("f_amountbank", 0);
-    worder()->fOrderDriver->setHeader("f_amountprepaid", 0);
-    worder()->fOrderDriver->setHeader("f_amountother", 0);
-    worder()->fOrderDriver->setHeader("f_amountpayx", 0);
-    worder()->fOrderDriver->setHeader("f_amountidram", worder()->fOrderDriver->headerValue("f_amounttotal"));
-    worder()->fOrderDriver->setHeader("f_hotel", 0);
-    worder()->fOrderDriver->setHeader("f_otherid", 0);
-    ui->leRemain->setDouble(0);
-    clearOther();
-    headerToLineEdit();
-    setButtonsState();
-    return ;
+    }
 
     QByteArray out;
     double v;
-//    if (Idram::check(__c5config.getValue(param_idram_server), __c5config.getValue(param_idram_session_id), wo->fOrderDriver->headerValue("f_id").toString(), v, out)) {
-//        ui->leIDRAM->setDouble(v);
+    if (Idram::check(__c5config.getValue(param_idram_server), __c5config.getValue(param_idram_session_id), wo->fOrderDriver->headerValue("f_id").toString(), v, out)) {
+        ui->leIDRAM->setDouble(v);
 //        ui->leCash->setText("0");
 //        ui->leCard->setText("0");
 //        ui->leBank->setText("0");
 //        ui->leOther->setText("0");
-//        worder()->fOrderDriver->setHeader("f_otherid", 0);
-//        lineEditToHeader();
-//    } else {
-//        QString err = out;
-//        if (v < 0) {
-//            err = tr("Idram payment was not received");
-//        }
-//        C5Message::error(err);
-//    }
-//    C5LogToServerThread::remember(LOG_WAITER, fUser->fullName(), "",
-//                                  wo->fOrderDriver->currentOrderId(), "",
-//                                  "Idram request: " + __c5config.getValue(param_idram_server),
-//                                  QString(out), "");
+
+        worder()->fOrderDriver->setHeader("f_amountcash", 0);
+        worder()->fOrderDriver->setHeader("f_amountcard", 0);
+        worder()->fOrderDriver->setHeader("f_amountbank", 0);
+        worder()->fOrderDriver->setHeader("f_amountprepaid", 0);
+        worder()->fOrderDriver->setHeader("f_amountother", 0);
+        worder()->fOrderDriver->setHeader("f_amountpayx", 0);
+        worder()->fOrderDriver->setHeader("f_amountidram", v);
+        worder()->fOrderDriver->setHeader("f_hotel", 0);
+        worder()->fOrderDriver->setHeader("f_otherid", 0);
+        ui->leRemain->setDouble(worder()->fOrderDriver->headerValue("f_amounttotal").toDouble() - v);
+        clearOther();
+        headerToLineEdit();
+        setButtonsState();
+        return ;
+
+        worder()->fOrderDriver->setHeader("f_otherid", 0);
+        lineEditToHeader();
+    } else {
+        QString err = out;
+        if (v < 0) {
+            err = tr("Idram payment was not received");
+        }
+        C5Message::error(err);
+    }
+    C5LogToServerThread::remember(LOG_WAITER, fUser->fullName(), "",
+                                  wo->fOrderDriver->currentOrderId(), "",
+                                  "Idram request: " + __c5config.getValue(param_idram_server),
+                                  QString(out), "");
 }
 
 void DlgOrder::on_btnFillPayX_clicked()

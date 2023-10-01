@@ -349,6 +349,8 @@ bool WOrder::writeOrder()
     }
     C5ShopOrder so(fOHeader, fBHistory, fOGoods);
     fOHeader.staff = u->id();
+    fOHeader.dateClose = QDate::currentDate();
+    fOHeader.timeClose = QTime::currentTime();
     so.fWriteAdvance = fOHeader.saleType == -1;
     bool w = so.write();
     if (w) {
