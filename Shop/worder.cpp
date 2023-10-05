@@ -718,6 +718,17 @@ void WOrder::countTotal()
         ui->tblData->setData(i, col_discamount, og.discountAmount);
         ui->tblData->setData(i, col_discvalue, og.discountFactor);
         ui->tblData->setData(i, col_discmode, og.discountMode);
+        QPushButton *btn = static_cast<QPushButton*>(ui->tblData->cellWidget(i, col_qr));
+        if (btn == nullptr ){
+            btn = new QPushButton();
+        }
+        if (og.emarks.isEmpty()) {
+            btn->setIcon(QPixmap(""));
+        } else {
+            btn->setIcon(QPixmap(":/qr_code.png").scaled(30, 30));
+        }
+        connect(btn, &QPushButton::clicked, this, &WOrder::readEmarks);
+        ui->tblData->setCellWidget(i, col_qr, btn);
         if (ui->tblData->item(i, 0)->data(Qt::UserRole + 100).toInt() == 1) {
             QString err;
             if (!checkQty(og.goods, og.qty, false, err)) {
@@ -838,6 +849,21 @@ void WOrder::imageLoaded(const QPixmap &img)
 {
     ui->lbGoodsImage->setPixmap(img.scaled(ui->lbGoodsImage->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
     //ui->wimage->setVisible(true);
+}
+
+void WOrder::readEmarks()
+{
+    int row = ui->tblData->currentRow();
+    if (row < 0) {
+        return;
+    }
+    bool ok = false;
+    QString qr = QInputDialog::getText(this, tr("Emark"), tr("Emark"), QLineEdit::Normal, fOGoods[row].emarks, &ok);
+    if (!ok) {
+        return;
+    }
+    fOGoods[row].emarks = qr;
+    countTotal();
 }
 
 void WOrder::noImage()

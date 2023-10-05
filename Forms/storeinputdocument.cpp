@@ -359,8 +359,10 @@ bool StoreInputDocument::openDoc(const QString &id)
 
     db[":f_id"] = ui->lePartner->property("f_id");
     db.exec("select * from c_partners where f_id=:f_id");
+    if (db.nextRow()) {
     db.nextRow();
     ui->lePartner->setText(db.getString("f_name"));
+    }
 }
 
 bool StoreInputDocument::draftDoc()

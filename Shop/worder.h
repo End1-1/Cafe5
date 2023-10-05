@@ -23,6 +23,7 @@
 #define col_discmode 9
 #define col_discvalue 10
 #define col_stock 11
+#define col_qr 12
 
 namespace Ui {
 class WOrder;
@@ -106,6 +107,8 @@ public:
 
 private slots:
     void imageLoaded(const QPixmap &img);
+
+    void readEmarks();
 
     void noImage();
 

@@ -94,10 +94,11 @@ Workspace::Workspace(const QStringList &dbParams) :
        ui->leReadCode->setFocus();
     });
     fTimer->start(1000);
-    ui->tblOrder->setColumnWidth(0, 165);
+    ui->tblOrder->setColumnWidth(0, 135);
     ui->tblOrder->setColumnWidth(1, 70);
     ui->tblOrder->setColumnWidth(2, 70);
     ui->tblOrder->setColumnWidth(3, 70);
+    ui->tblOrder->setColumnWidth(4, 30);
     ui->btnSetCardExternal->setVisible(__c5config.getValue(param_choose_external_pos).toInt() == 1);
     fWorkspace = this;
     fCustomerDisplay = nullptr;
@@ -343,7 +344,8 @@ void Workspace::setQty(double qty, int mode, int rownum, const QString &packageu
         C5StoreDraftWriter dw(db);
         if (!dw.writeOBody(d.obodyId, fOrderUuid, DISH_STATE_OK, d.id, d.qty, d.qty, d.price,
                            (d.qty*d.price) - (d.qty*d.price*discountValue()), __c5config.serviceFactor().toDouble(),
-                           fDiscountValue, d.store, d.printer, "", d.modificator, 0, d.adgCode, 0, 0, 0, row, QDateTime::currentDateTime())) {
+                           fDiscountValue, d.store, d.printer, "", d.modificator, 0, d.adgCode, 0, 0, 0, row, QDateTime::currentDateTime(),
+                           d.f_emarks)) {
             C5Message::error(dw.fErrorMsg);
             db.rollback();
             return;
@@ -627,6 +629,14 @@ void Workspace::updateInfo(int row)
     item = new QTableWidgetItem(float_str((d.price - (d.price * d.discount)) * d.qty, 2));
     item->setTextAlignment(Qt::AlignRight);
     ui->tblOrder->setItem(row, 3, item);
+    if (d.f_emarks.isEmpty()) {
+        ui->tblOrder->removeCellWidget(row, 4);
+    } else {
+        QPixmap p(":/qrcode.png");
+        auto *l = new QLabel();
+        l->setPixmap(p.scaled(QSize(25, 25)));
+        ui->tblOrder->setCellWidget(row, 4, l);
+    }
     ui->tblOrder->resizeRowsToContents();
 }
 
@@ -1303,7 +1313,8 @@ bool Workspace::saveOrder(int state)
 
             if (!dw.writeOBody(d.obodyId, fOrderUuid, DISH_STATE_OK, d.id, d.qty, d.qty, d.price,
                                (d.qty*d.price) - (d.qty*d.price*d.discount), __c5config.serviceFactor().toDouble(),
-                               d.discount, d.store, d.printer, "", d.modificator, 0, d.adgCode, 0, 0, pid, i, QDateTime::currentDateTime())) {
+                               d.discount, d.store, d.printer, "", d.modificator, 0, d.adgCode, 0, 0, pid, i, QDateTime::currentDateTime(),
+                               d.f_emarks)) {
                 C5Message::error(dw.fErrorMsg);
                 db.rollback();
                 return false;
@@ -1476,7 +1487,7 @@ int Workspace::printTax(double cardAmount, double idramAmount)
     C5Database db(fDBParams);
     db[":f_header"] = fOrderUuid;
     db[":f_state"] = DISH_STATE_OK;
-    db.exec("select b.f_adgcode, b.f_dish, d.f_name, b.f_price, b.f_discount, b.f_qty1 "
+    db.exec("select b.f_adgcode, b.f_dish, d.f_name, b.f_price, b.f_discount, b.f_qty1, b.f_emarks "
             "from o_body b "
             "left join d_dish d on d.f_id=b.f_dish "
             "where b.f_header=:f_header and b.f_state=:f_state");
@@ -1498,6 +1509,9 @@ int Workspace::printTax(double cardAmount, double idramAmount)
     while (db.nextRow()) {
         if (db.getDouble("f_price") < 0.01) {
             continue;
+        }
+        if (!db.getString("f_emarks").isEmpty()) {
+            pt.fEmarks.append(db.getString("f_emarks"));
         }
         pt.addGoods(C5Config::taxDept(),
                     db.getString("f_adgcode"), db.getString("f_dish"),
@@ -2032,7 +2046,7 @@ void Workspace::on_tblTables_itemClicked(QTableWidgetItem *item)
         db[":f_header"] = fOrderUuid;
         db[":f_state"] = DISH_STATE_OK;
         db.exec("select b.f_dish, b.f_adgcode, d.f_name, b.f_qty1, b.f_qty2, b.f_price, b.f_comment, "
-                "b.f_print1, b.f_store, b.f_id "
+                "b.f_print1, b.f_store, b.f_id, b.f_emarks "
                 "from o_body b "
                 "left join d_dish d on d.f_id=b.f_dish "
                 "where b.f_header=:f_header AND b.f_state=:f_state "
@@ -2049,6 +2063,7 @@ void Workspace::on_tblTables_itemClicked(QTableWidgetItem *item)
             d.modificator = db.getString("f_comment");
             d.printer = db.getString("f_print1");
             d.store = db.getInt("f_store");
+            d.f_emarks = db.getString("f_emarks");
             addDishToOrder(&d);
         }
 
@@ -2106,4 +2121,24 @@ void Workspace::on_btnSetTaxpayer_clicked()
     if (tp.length() > 0) {
         ui->btnFiscal->setChecked(true);
     }
+}
+
+void Workspace::on_btnEmarks_clicked()
+{
+    int row = -1;
+    if (row < 0) {
+        row = ui->tblOrder->currentRow();
+    }
+    if (row < 0) {
+        return;
+    }
+    Dish d = ui->tblOrder->item(row, 0)->data(Qt::UserRole).value<Dish>();
+    bool ok = false;
+    QString qr = QInputDialog::getText(this, tr("Emark"), tr("Emark"), QLineEdit::Normal, d.f_emarks, &ok);
+    if (!ok) {
+        return;
+    }
+    d.f_emarks = qr;
+    ui->tblOrder->item(row, 0)->setData(Qt::UserRole, qVariantFromValue(d));
+    updateInfo(row);
 }

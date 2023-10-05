@@ -31,6 +31,9 @@ bool C5PrintReceiptThread::print(const QStringList &dbParams)
     __translator.initTranslator(dbParams);
     __translator.setLanguage(fLanguage);
     QFont font(qApp->font());
+    if (fLanguage == LANG_RU) {
+        font.setFamily("Ariac");
+    }
     font.setPointSize(bs);
     C5Printing p;
     p.setSceneParams(fPaperWidth, 2600, QPrinter::Portrait);
@@ -218,8 +221,8 @@ bool C5PrintReceiptThread::print(const QStringList &dbParams)
     p.setFontBold(true);
     p.setFontSize(bs - 4);
     p.ltext(__translator.tt("Name"), 0);
-    p.ltext(__translator.tt("Qty"), 350);
-    p.ltext(__translator.tt("Price"), 430);
+    p.ltext(__translator.tt("Qty"), 330);
+    p.ltext(__translator.tt("Price"), 410);
     p.rtext(__translator.tt("Amount"));
     p.br();
     p.br(2);
@@ -244,7 +247,7 @@ bool C5PrintReceiptThread::print(const QStringList &dbParams)
             nodiscount = true;
             name += "**";
         }
-        p.ltext(name, 0, 350);
+        p.ltext(name, 0, 330);
 
         if (fHeaderInfo["f_state"].toInt() == ORDER_STATE_PREORDER_EMPTY
                 || fHeaderInfo["f_state"].toInt() == ORDER_STATE_PREORDER_WITH_ORDER) {
@@ -264,11 +267,11 @@ bool C5PrintReceiptThread::print(const QStringList &dbParams)
             p.rtext(totalStr);
         } else {
             if (m["f_hourlypayment"].toInt() > 0) {
-                p.ltext(float_str(m["f_qty2"].toDouble(), 2), 350, 100);
+                p.ltext(float_str(m["f_qty2"].toDouble(), 2), 330, 100);
                 p.rtext(float_str(m["f_total"].toDouble(), 2));
             } else {
-                p.ltext(float_str(m["f_qty2"].toDouble(), 2), 350, 100);
-                p.ltext(float_str(m["f_price"].toDouble(), 2), 430, 100);
+                p.ltext(float_str(m["f_qty2"].toDouble(), 2), 330, 100);
+                p.ltext(float_str(m["f_price"].toDouble(), 2), 410, 100);
                 p.rtext(totalStr);
             }
         }

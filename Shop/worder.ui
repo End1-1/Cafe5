@@ -131,6 +131,11 @@
        <string>Stock</string>
       </property>
      </column>
+     <column>
+      <property name="text">
+       <string>QR</string>
+      </property>
+     </column>
     </widget>
    </item>
    <item>
@@ -329,6 +334,9 @@
            </property>
            <property name="focusPolicy">
             <enum>Qt::StrongFocus</enum>
+           </property>
+           <property name="maxLength">
+            <number>16</number>
            </property>
            <property name="readOnly">
             <bool>false</bool>

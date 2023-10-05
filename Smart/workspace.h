@@ -123,6 +123,8 @@ private slots:
 
     void on_btnSetTaxpayer_clicked();
 
+    void on_btnEmarks_clicked();
+
 private:
     Ui::Workspace *ui;
 

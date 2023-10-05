@@ -27,6 +27,7 @@ struct Dish {
     int quick;
     QString packageName;
     QString obodyId;
+    QString f_emarks;
     Dish() {
         id = 0;
         typeId = 0;

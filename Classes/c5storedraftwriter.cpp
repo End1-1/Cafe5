@@ -709,7 +709,7 @@ bool C5StoreDraftWriter::writeECash(QString &id, const QString &header, int cash
 
 bool C5StoreDraftWriter::writeOBody(QString &id, const QString &header, int state, int dish, double qty1, double qty2, double price, double total, double service, double discount,
                                     int store, const QString &print1, const QString &print2, const QString &comment, int remind, const QString &adgcode,
-                                    int removereason, int timeorder, int package, int row, const QDateTime &appendTime)
+                                    int removereason, int timeorder, int package, int row, const QDateTime &appendTime, const QString &emarks)
 {
     bool u = false;
     if (id.isEmpty()) {
@@ -737,6 +737,7 @@ bool C5StoreDraftWriter::writeOBody(QString &id, const QString &header, int stat
     fDb[":f_timeorder"] = timeorder;
     fDb[":f_package"] = package;
     fDb[":f_row"] = row;
+    fDb[":f_emarks"] = emarks;
     if (u) {
         return returnResult(fDb.update("o_body", where_id(id)));
     } else {

@@ -80,6 +80,9 @@ bool C5ShopOrder::write()
         if (!fWriteAdvance) {
             for (int i = 0; i < fOGoods.count(); i++) {
                 OGoods &g = fOGoods[i];
+                if (g.emarks.isEmpty() == false) {
+                    pt.fEmarks.append(g.emarks);
+                }
                 pt.addGoods(g.taxDept, //dep
                             g.adgCode, //adg
                             QString::number(g.goods), //goods id

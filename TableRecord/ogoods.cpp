@@ -23,6 +23,7 @@ void OGoods::bind(C5Database &db)
     db[":f_return"] = return_;
     db[":f_returnfrom"] = returnFrom;
     db[":f_isservice"] = isService;
+    db[":f_emarks"] = emarks;
 }
 
 bool OGoods::write(C5Database &db, QString &err)
@@ -63,5 +64,6 @@ bool OGoods::getRecord(C5Database &db)
     returnFrom = db.getString("f_returnfrom");
     isService = db.getInt("f_isservice");
     storeRec = db.getString("f_storerec");
+    emarks = db.getString("f_emarks");
     return true;
 }
