@@ -66,7 +66,7 @@ void CR5MaterialsInStore::prepareDrafts()
                     << "left join c_goods_classes gcc on gca.f_id=g.f_group3 [gcc]"
                     << "left join c_goods_classes gcd on gca.f_id=g.f_group4 [gcd]"
                     << "LEFT JOin c_goods_prices gpr on gpr.f_goods=g.f_id [gpr]"
-                    << "left join partners p on p.f_id=h.f_partner [p]"
+                    << "left join c_partners p on p.f_id=h.f_partner [p]"
                     << "left join a_store_valid v on v.f_id=s.f_id [v]"
                        ;
 

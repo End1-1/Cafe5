@@ -31,6 +31,7 @@ StoreInputDocument::StoreInputDocument(const QStringList &dbParams, QWidget *par
 {
     ui->setupUi(this);
     ui->tbl->setColumnWidths(ui->tbl->columnCount(), 30, 0, 0, 120, 120, 250, 80, 80, 0, 0, 80, 80, 80, 80, 80);
+    C5Cache::cache(fDBParams, cache_goods)->refresh();
 }
 
 StoreInputDocument::~StoreInputDocument()
@@ -162,37 +163,8 @@ void StoreInputDocument::on_btnAddRow_clicked()
         C5Message::error(tr("Could not add goods without code"));
         return;
     }
-    int row = newEmptyRow();
-    ui->tbl->setInteger(row, col_goodsid, vals.at(1).toInt());
-    ui->tbl->setString(row, col_scancode, vals.at(5).toString());
-    ui->tbl->setString(row, col_group, vals.at(2).toString());
-    ui->tbl->setString(row, col_name, vals.at(3).toString());
-    ui->tbl->setString(row, col_unit, vals.at(4).toString());
-    ui->tbl->setDouble(row, col_qtyinbox, vals.at(8).toDouble());
-    ui->tbl->setDouble(row, col_saleprice, vals.at(9).toDouble());
-    ui->tbl->lineEdit(row, col_price)->setPlaceholderText(float_str(vals.at(6).toDouble(), 2));
-    ui->tbl->lineEdit(row, col_qty)->setFocus();
-    connectSlotSignal(row);
-
-    C5Database db(fDBParams);
-    if (ui->leStore->property("f_id").toInt() > 0) {
-        db[":f_store"] = ui->leStore->property("f_id");
-        db[":f_goods"] = vals.at(1);
-        db.exec("select sum(f_qty*f_type) as f_qty from a_store where f_store=:f_store and f_goods=:f_goods");
-        if (db.nextRow()) {
-            ui->tbl->setDouble(row,  col_stock, db.getDouble("f_qty"));
-        }
-    }
-
-    db[":f_id"] = vals.at(1).toInt();
-    db.exec("select f_lastvaliddate from c_goods_option where f_id=:f_id");
-    if (db.nextRow()) {
-        QDate date = db.getDate(0);
-        if (!date.isValid()) {
-            date = QDate::currentDate();
-        }
-        static_cast<C5DateEdit*>(ui->tbl->cellWidget(row, col_valid))->setDate(date);
-    }
+    ui->leScancode->setText(vals.at(5).toString());
+    on_leScancode_returnPressed();
 }
 
 void StoreInputDocument::on_toolButton_clicked()
@@ -301,9 +273,13 @@ void StoreInputDocument::saveDoc()
 
         db[":f_lastvaliddate"] = static_cast<C5DateEdit*>(ui->tbl->cellWidget(i, col_valid))->date();
         db.update("c_goods_option", "f_id", ui->tbl->getInteger(i, col_goodsid));
+
+        db[":f_lastinputprice"] = ui->tbl->getDouble(i, col_price);
+        db.update("c_goods", "f_id", ui->tbl->getInteger(i, col_goodsid));
     }
     db.commit();
     fSave->setEnabled(false);
+    C5Cache::cache(fDBParams, cache_goods)->refresh();
 }
 
 bool StoreInputDocument::openDoc(const QString &id)
@@ -458,6 +434,16 @@ void StoreInputDocument::on_leScancode_returnPressed()
             if (db.nextRow()) {
                 ui->tbl->setDouble(row,  col_stock, db.getDouble("f_qty"));
             }
+        }
+
+        db[":f_id"] = id;
+        db.exec("select f_lastvaliddate from c_goods_option where f_id=:f_id");
+        if (db.nextRow()) {
+            QDate date = db.getDate(0);
+            if (!date.isValid()) {
+                date = QDate::currentDate();
+            }
+            static_cast<C5DateEdit*>(ui->tbl->cellWidget(row, col_valid))->setDate(date);
         }
     }
 

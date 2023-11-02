@@ -539,7 +539,7 @@ bool ViewOrder::printCheckWithTax(C5Database &db, const QString &id, QString &rs
     PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), useExtPos, C5Config::taxCashier(), C5Config::taxPin(), 0);
     pt.fPartnerTin = partnerHvhh;
     while (db.nextRow()) {
-        pt.addGoods(db.getString("f_taxdept"), //dep
+        pt.addGoods(db.getString("f_taxdept").toInt(), //dep
                     db.getString("f_adgcode"), //adg
                     db.getString("f_goods"), //goods id
                     db.getString("f_name"), //name

@@ -33,6 +33,8 @@ private:
     void getGoodsNames();
     void saveGoodsQrName();
     void getConfig();
+    void getAragamash();
+    void getAllTogether();
 };
 
 #endif // QUERYJSONRESPONSE_H

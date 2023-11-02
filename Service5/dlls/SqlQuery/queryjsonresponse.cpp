@@ -160,6 +160,9 @@ void QueryJsonResponse::listOfWorks()
     if (fJsonIn["f_task"].toInt() > 0) {
         where += QString(" and t.f_id=%1").arg(fJsonIn["f_task"].toInt());
     }
+    if (fJsonIn["f_teamlead"].toInt() > 0){
+        where += QString(" and t.f_responsible=%1").arg(fJsonIn["f_teamlead"].toInt());
+    }
     fDb[":f_date"] = QDate::fromString(fJsonIn["f_date"].toString(), "dd/MM/yyyy");
     fDb[":f_worker"] = fJsonIn["f_worker"].toInt();
     if (!fDb.exec(QString("select p.f_id, pr.f_name as f_productname, ac.f_name as f_processname, "
@@ -231,11 +234,15 @@ void QueryJsonResponse::addWorkToTask()
 
 void QueryJsonResponse::employesOfDay()
 {
+    QString where;
+    if (fJsonIn["f_teamlead"].toInt() > 0) {
+        where += QString("and u.f_teamlead=%1").arg(fJsonIn["f_teamlead"].toInt());
+    }
     fDb[":f_date"] = QDate::fromString(fJsonIn["f_date"].toString(), "dd/MM/yyyy");
     fDb.exec("select m.f_worker as f_id, u.f_teamlead, concat(u.f_last, ' ', u.f_first) as f_name "
         "from mf_daily_workers m "
         "inner join s_user u on u.f_id=m.f_worker "
-        "where f_date=:f_date ");
+        "where f_date=:f_date " + where);
     QJsonArray ja;
     dbToArray(ja);
     fJsonOut["kData"] = ja;

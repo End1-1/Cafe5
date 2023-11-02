@@ -551,6 +551,7 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
     case cp_t2_store_input: {
 #ifdef NEWVERSION
         createTab<StoreInputDocument>(dbParams);
+
 #else
         C5StoreDoc *sd = createTab<C5StoreDoc>(dbParams);
         sd->setMode(C5StoreDoc::sdInput);

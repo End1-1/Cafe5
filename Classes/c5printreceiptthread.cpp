@@ -209,6 +209,11 @@ bool C5PrintReceiptThread::print(const QStringList &dbParams)
     p.ltext(__translator.tt("Staff"), 0);
     p.rtext(fHeaderInfo["f_currentstaffname"].toString());
     p.br();
+    if (options["f_guests"].toInt() > 0) {
+        p.ltext(__translator.tt("Guests"), 0);
+        p.rtext(options["f_guests"].toString());
+        p.br();
+    }
     p.br(2);
     p.line();
     p.br(2);

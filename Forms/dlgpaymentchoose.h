@@ -17,6 +17,7 @@ public:
     explicit DlgPaymentChoose(const QStringList &dbParams);
     ~DlgPaymentChoose();
     static bool getValues(double total, double &cash, double &card, double &idram, double &telcell, double &bank,
+                          double &credit,
                           double &prepaid, double &debt, double &cashin, double &change, bool &fiscal);
 
     virtual void keyEnter() override;
@@ -76,6 +77,10 @@ private slots:
     void on_leCashIn_returnPressed();
 
     void on_leChange_returnPressed();
+
+    void on_btnCredit_clicked();
+
+    void on_leCredit_returnPressed();
 
 private:
     Ui::DlgPaymentChoose *ui;

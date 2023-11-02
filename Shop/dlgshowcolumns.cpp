@@ -39,3 +39,15 @@ void DlgShowColumns::on_btnClose_clicked()
 {
     accept();
 }
+
+void DlgShowColumns::on_chDiscount_clicked(bool checked)
+{
+    s.setValue("col" + QString::number(col_discamount), checked);
+    s.setValue("col" + QString::number(col_discmode), checked);
+    s.setValue("col" + QString::number(col_discvalue), checked);
+}
+
+void DlgShowColumns::on_chEmarks_clicked(bool checked)
+{
+    s.setValue("col" + QString::number(col_qr), checked);
+}

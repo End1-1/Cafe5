@@ -414,9 +414,9 @@ bool C5WaiterOrderDoc::makeOutputOfStore(C5Database &db, QString &err, int store
         db[":f_qty"] = t.qtyGoods;
         db.exec("update a_store_draft set f_qty=f_qty-:f_qty where f_id=:f_id");
     }
-    //NONE COMPONNENTS EXIT (W/O COMPLECTATION)
     db[":f_header"] = fHeader["f_id"].toString();
     db.exec("delete from o_goods where f_header=:f_header");
+    //NONE COMPONNENTS EXIT (W/O COMPLECTATION)
     db[":f_header"] = fHeader["f_id"].toString();
     db[":f_state1"] = DISH_STATE_OK;
     db[":f_state2"] = DISH_STATE_VOID;
@@ -436,9 +436,8 @@ bool C5WaiterOrderDoc::makeOutputOfStore(C5Database &db, QString &err, int store
         t.price = db.getDouble("f_lastinputprice");
         goods.append(t);
     }
+
     //COMPONENT EXIT WITH COMPLECTATON
-    db[":f_header"] = fHeader["f_id"].toString();
-    db.exec("delete from o_goods where f_header=:f_header");
     db[":f_header"] = fHeader["f_id"].toString();
     db[":f_state1"] = DISH_STATE_OK;
     db[":f_state2"] = DISH_STATE_VOID;

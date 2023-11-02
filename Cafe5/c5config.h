@@ -119,6 +119,8 @@
 #define param_default_currency 116
 #define param_rest_qty_before_add_dish 117
 #define param_auto_discount 118
+#define param_waiter_delivery_costumer_category 119
+#define param_waiter_debt_costumer_category 120
 
 #define FRONTDESK_WAITER 0
 #define FRONTDESK_SHOP 1

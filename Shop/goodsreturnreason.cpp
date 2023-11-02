@@ -21,6 +21,7 @@ GoodsReturnReason::GoodsReturnReason() :
     item->setData(Qt::UserRole, 0);
     item->setSizeHint(QSize(100, 50));
     ui->lst->addItem(item);
+    fReason = 0;
 }
 
 GoodsReturnReason::~GoodsReturnReason()

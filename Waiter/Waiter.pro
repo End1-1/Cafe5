@@ -150,6 +150,7 @@ SOURCES += \
     ../Editors/ce5goodsbarcodelabelview.cpp \
     ../Editors/ce5goodsclass.cpp \
     ../Editors/ce5goodsgroup.cpp \
+    ../Editors/ce5goodsmodel.cpp \
     ../Editors/ce5goodsunit.cpp \
     ../Editors/ce5goodswaste.cpp \
     ../Editors/ce5halls.cpp \
@@ -576,6 +577,7 @@ HEADERS += \
     ../Editors/ce5goodsbarcodelabelview.h \
     ../Editors/ce5goodsclass.h \
     ../Editors/ce5goodsgroup.h \
+    ../Editors/ce5goodsmodel.h \
     ../Editors/ce5goodsunit.h \
     ../Editors/ce5goodswaste.h \
     ../Editors/ce5halls.h \
@@ -915,6 +917,7 @@ FORMS += \
     ../Editors/ce5goods.ui \
     ../Editors/ce5goodsclass.ui \
     ../Editors/ce5goodsgroup.ui \
+    ../Editors/ce5goodsmodel.ui \
     ../Editors/ce5goodsunit.ui \
     ../Editors/ce5goodswaste.ui \
     ../Editors/ce5halls.ui \

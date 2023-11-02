@@ -24,6 +24,10 @@ private slots:
 
     void on_btnClose_clicked();
 
+    void on_chDiscount_clicked(bool checked);
+
+    void on_chEmarks_clicked(bool checked);
+
 private:
     Ui::DlgShowColumns *ui;
 };

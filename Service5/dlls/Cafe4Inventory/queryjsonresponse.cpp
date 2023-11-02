@@ -13,6 +13,8 @@
 #define rGetGoodsNames 10
 #define rSaveGoodsQrName 11
 #define rGetConfig 12
+#define rGetAragamash 13
+#define rGetAllTogether 14
 
 QueryJsonResponse::QueryJsonResponse(QSettings &s, const QJsonObject &ji, QJsonObject &jo) :
     fSettings(s),
@@ -63,6 +65,12 @@ void QueryJsonResponse::getResponse()
         break;
     case rGetConfig:
         getConfig();
+        break;
+    case rGetAragamash:
+        getAragamash();
+        break;
+    case rGetAllTogether:
+        getAllTogether();
         break;
     default:        
         fJsonOut["kData"] = "Unknown query";
@@ -435,6 +443,39 @@ void QueryJsonResponse::getConfig()
     }
     fSettings.endGroup();
     fJsonOut["kData"] = ja;
+}
+
+void QueryJsonResponse::getAragamash()
+{
+    fSettings.beginGroup("asjazzve");
+    Database db("QODBC3");
+    if (!db.open(fSettings.value("host").toString(),
+                 fSettings.value("db").toString(),
+                 fSettings.value("user").toString(),
+                 fSettings.value("password").toString())) {
+        fJsonOut["kData"] = db.lastDbError();
+        fJsonOut["kStatus"] = 4;
+        return;
+    }
+    fSettings.endGroup();
+    QString query = fSettings.value("query/aragamashitem").toString();
+    QString where;
+    if (fJsonIn["item"].toString().isEmpty() == false) {
+        where += QString(" and M.fMTCODE='%1'").arg(fJsonIn["item"].toString());
+    }
+    if (fJsonIn["store"].toString().isEmpty() == false){
+        where += QString(" and H.fFADEPARTMENT='%1'").arg(fJsonIn["store"].toString());
+    }
+    query.replace("%where%", where);
+    db.exec(query);
+    QJsonArray ja;
+    dbToArray(ja, db);
+    fJsonOut["kData"] = ja;
+}
+
+void QueryJsonResponse::getAllTogether()
+{
+
 }
 
 

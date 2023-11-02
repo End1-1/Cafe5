@@ -132,14 +132,23 @@ void SocketThread::httpRequest()
         break;
     case POST:
         break;
+    case OPTIONS:
+        fSslSocket->write(QString("HTTP/1.1 204 No content\r\n"
+                                  "Allow: OPTIONS, GET, HEAD, POST\r\n"
+                                  "Access-Control-Allow-Origin: *\r\n"
+                                  "Access-Control-Allow-Methods: POST, GET, OPTIONS\r\n"
+                                  "Access-Control-Allow-Headers: access-control-allow-origin, X-PINGOTHER, Content-Type, Content-Length\r\n"
+                                  "\r\n").toUtf8());
+        fSslSocket->close();
+        return;
     case UNSUPPORTED:
         fSslSocket->write(QString("HTTP/1.1 405 Method not allowed\r\n\r\n<html><H1>HTTP %1 Method not allowed</H1></html>").arg(fMethodString).toUtf8());
         fSslSocket->close();
-        break;
+        return;
     case UNKNOWN_REQUEST_METHOD:
         fSslSocket->write(QString("HTTP/1.1 501 Not Implemented\r\n\r\n<html><H1>Not Implemented</H1></html>").toUtf8());
         fSslSocket->close();
-        break;
+        return;
     case INCOMPLETE:
         LogWriter::write(LogWriterLevel::errors, property("session").toString(), QString("Error in request. %1").arg(QString(fData)));
         return;
@@ -164,6 +173,7 @@ HttpRequestMethod SocketThread::parseRequest(HttpRequestMethod &requestMethod, Q
     QStringList methodsPatters;
     methodsPatters.append("GET");
     methodsPatters.append("POST");
+    methodsPatters.append("OPTIONS");
     for (const QString &m: methodsPatters) {
         QString cmp = fData.mid(0, m.length()).toUpper();
         if (cmp == m) {
@@ -172,6 +182,8 @@ HttpRequestMethod SocketThread::parseRequest(HttpRequestMethod &requestMethod, Q
                 requestMethod = GET;
             } else if (cmp == "POST") {
                 requestMethod = POST;
+            } else if (cmp == "OPTIONS") {
+                requestMethod = OPTIONS;
             } else {
                 requestMethod = UNSUPPORTED;
             }
@@ -382,7 +394,7 @@ void SocketThread::readyRead()
         }
     }
     fData.append(fSslSocket->readAll());
-    LogWriter::write(LogWriterLevel::warning, fSocketType == RawData ? "raw" : "hjttp", QString(fData));
+    LogWriter::write(LogWriterLevel::warning, fSocketType == RawData ? "raw" : "http", QString(fData));
     switch (fSocketType) {
     case RawData:
         rawRequest();

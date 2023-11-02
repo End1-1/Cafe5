@@ -83,10 +83,7 @@ Workspace::Workspace(const QStringList &dbParams) :
         ui->tblDishes->setColumnCount(r.width() / 300);
         break;
     }
-    if (__c5config.getValue(param_tax_print_always_offer).toInt() != 0) {
-        ui->btnFiscal->setEnabled(false);
-        ui->btnFiscal->setChecked(true);
-    }
+    configFiscalButton();
     ui->tblTables->setItemDelegate(new TableItemDelegate());
     resetOrder();
     fTimer = new QTimer(this);
@@ -672,6 +669,7 @@ void Workspace::on_btnCheckout_clicked()
     }
     C5Database db(fDBParams);
     saveOrder(ORDER_STATE_CLOSE);
+    printService();
     C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Order saved"), "", "");
 
     if (ui->btnSetIdram->isChecked()) {
@@ -751,21 +749,23 @@ void Workspace::on_btnCheckout_clicked()
         }
     }
 
-    if (!dw.writeAHeader(cashdoc, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH,
-                         fUser->id(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(),
-                         0, ui->leTotal->getDouble(), cashprefix + " " + headerNum, 1, __c5config.getValue(param_default_currency).toInt())) {
-        C5Message::error(dw.fErrorMsg);
-        return;
-    }
-    if (!dw.writeAHeaderCash(cashdoc, cashid, 0, 1, "", fOrderUuid, __c5config.getRegValue("session").toInt())) {
-        C5Message::error(dw.fErrorMsg);
-        return;
+    if (otherAmount < 0.01) {
+        if (!dw.writeAHeader(cashdoc, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH,
+                             fUser->id(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(),
+                             0, ui->leTotal->getDouble(), cashprefix + " " + headerNum, 1, __c5config.getValue(param_default_currency).toInt())) {
+            C5Message::error(dw.fErrorMsg);
+            return;
+        }
+        if (!dw.writeAHeaderCash(cashdoc, cashid, 0, 1, "", fOrderUuid, __c5config.getRegValue("session").toInt())) {
+            C5Message::error(dw.fErrorMsg);
+            return;
+        }
+        if (!dw.writeECash(cashUUID, cashdoc, cashid, 1, cashprefix + " " + headerNum, ui->leTotal->getDouble(), cashUUID, 1)) {
+            C5Message::error(dw.fErrorMsg);
+            return;
+        }
     }
 
-    if (!dw.writeECash(cashUUID, cashdoc, cashid, 1, cashprefix + " " + headerNum, ui->leTotal->getDouble(), cashUUID, 1)) {
-        C5Message::error(dw.fErrorMsg);
-        return;
-    }
     fPreviouseUuid = fOrderUuid;
     bool printsecond = __c5config.getValue(param_shop_print_v2) == "1";
     if (idramAmount > 0.001) {
@@ -1073,6 +1073,7 @@ void Workspace::on_btnSetCash_clicked()
     ui->btnSetOther->setChecked(false);
     ui->btnSetCardExternal->setChecked(false);
     ui->leCard->clear();
+    configFiscalButton();
 }
 
 void Workspace::on_btnSetCard_clicked()
@@ -1188,6 +1189,7 @@ void Workspace::on_btnSetOther_clicked()
     ui->btnSetOther->setChecked(true);
     ui->btnSetCardExternal->setChecked(false);
     ui->leCard->clear();
+    ui->btnFiscal->setChecked(false);
 }
 
 void Workspace::on_btnReceived_clicked()
@@ -1208,7 +1210,7 @@ bool Workspace::saveOrder(int state)
     QString prefix;
     QString hallid;
     C5Database db(fDBParams);
-    if (fFlagEdited == 0) {
+    if (fOrderUuid.isEmpty()) {
         db[":f_id"] = C5Config::defaultHall();
         db.exec("select f_counterhall from h_halls where f_id=:f_id");
         if (db.nextRow()) {
@@ -1310,22 +1312,15 @@ bool Workspace::saveOrder(int state)
             Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
             int pid = 0;
             double disc = discountValue();
-
-            if (!dw.writeOBody(d.obodyId, fOrderUuid, DISH_STATE_OK, d.id, d.qty, d.qty, d.price,
+            if (!dw.writeOBody(d.obodyId, fOrderUuid, DISH_STATE_OK, d.id, d.qty, d.qty2, d.price,
                                (d.qty*d.price) - (d.qty*d.price*d.discount), __c5config.serviceFactor().toDouble(),
-                               d.discount, d.store, d.printer, "", d.modificator, 0, d.adgCode, 0, 0, pid, i, QDateTime::currentDateTime(),
-                               d.f_emarks)) {
+                               d.discount, d.store, d.printer, "", d.modificator, 0, d.adgCode, 0, 0, pid, i,
+                               QDateTime::currentDateTime(), d.f_emarks)) {
                 C5Message::error(dw.fErrorMsg);
                 db.rollback();
                 return false;
             }
             ui->tblOrder->item(i, 0)->setData(Qt::UserRole, qVariantFromValue(d));
-//            if (!dw.writeOBodyToOGoods(bid, id)) {
-//                C5Message::error(dw.fErrorMsg);
-//                db.rollback();
-//                return;
-//            }
-
     }
 
 
@@ -1337,145 +1332,7 @@ bool Workspace::saveOrder(int state)
 //    }
     db.commit();
 
-    QSet<QString> prn;
-    for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
-        Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
-        if (d.printer.length() > 0 && d.qty2 < 0.01) {
-            prn.insert(d.printer);
-        }
-    }
 
-    for (const QString &s: prn) {
-        QFont font(qApp->font());
-        font.setFamily(__c5config.getValue(param_service_print_font_family));
-        int basesize = __c5config.getValue(param_service_print_font_size).toInt();
-        font.setPointSize(basesize);
-        C5Printing p;
-        p.setSceneParams(650, 2800, QPrinter::Portrait);
-        p.setFont(font);
-        p.setFontBold(true);
-        p.ctext(tr("Receipt #") + QString("%1%2").arg(prefix, hallid));
-        p.br();
-        p.ctext(s);
-        p.br();
-        if (fCustomer > 0) {
-            p.ctext(QString("*%1*").arg(tr("Delivery")));
-            p.br();
-        }
-        if (fFlagEdited > 0) {
-            p.ctext(QString("*%1*").arg(tr("Edited")));
-            p.br();
-        }
-        //p.setFontBold(false);
-        p.line(3);
-        p.br(3);
-        p.br();
-        for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
-            Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
-            if (d.printer == s && d.qty2 < 0.01) {
-                p.setFontSize(basesize);
-                p.setFontBold(true);
-                p.ltext(d.name, 0);
-                p.setFontSize(basesize + 8);
-                p.setFontBold(true);
-                p.rtext(float_str(d.qty, 2));
-                p.br();
-                if (d.modificator.isEmpty() == false) {
-                    p.setFontSize(basesize - 4);
-                    p.ltext(d.modificator, 0);
-                    p.br();
-                }
-                p.line();
-                p.br();
-            }
-        }
-        p.setFontSize(basesize - 4);
-       // p.setFontBold(false);
-
-        p.ltext(QString("%1 %2").arg(tr("Printed:"), QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR)), 0);
-        p.br();
-        p.br();
-        p.ltext("_", 0);
-        p.br();
-        QString finalPrinter = s;
-        if (fPrinterAliases.contains(s)) {
-            finalPrinter = fPrinterAliases[s];
-        }
-        p.print(finalPrinter, QPrinter::Custom);
-    }
-
-    prn.clear();
-    for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
-        Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
-        if (d.printer2.length() > 0 && d.qty2 < 0.01) {
-            prn.insert(d.printer2);
-        }
-    }
-
-    for (const QString &s: prn) {
-        QFont font(qApp->font());
-        font.setFamily(__c5config.getValue(param_service_print_font_family));
-        int basesize = __c5config.getValue(param_service_print_font_size).toInt();
-        font.setPointSize(basesize);
-        C5Printing p;
-        p.setSceneParams(650, 2800, QPrinter::Portrait);
-        p.setFont(font);
-        p.setFontBold(true);
-        p.ctext(tr("Receipt #") + QString("%1%2").arg(prefix, hallid));
-        p.br();
-        p.ctext(s);
-        p.br();
-        if (fCustomer > 0) {
-            p.ctext(QString("*%1*").arg(tr("Delivery")));
-            p.br();
-        }
-        if (fFlagEdited > 0) {
-            p.ctext(QString("*%1*").arg(tr("Edited")));
-            p.br();
-        }
-        //p.setFontBold(false);
-        p.line(3);
-        p.br(3);
-        p.br();
-        for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
-            Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
-            if (d.printer2 == s) {
-                p.setFontSize(basesize);
-                p.setFontBold(true);
-                p.ltext(d.name, 0);
-                p.setFontSize(basesize + 8);
-                p.setFontBold(true);
-                p.rtext(float_str(d.qty, 2));
-                p.br();
-                if (d.modificator.isEmpty() == false) {
-                    p.setFontSize(basesize - 4);
-                    p.ltext(d.modificator, 0);
-                    p.br();
-                }
-                p.line();
-                p.br();
-            }
-        }
-        p.setFontSize(basesize - 4);
-       // p.setFontBold(false);
-
-        p.ltext(QString("%1 %2").arg(tr("Printed:"), QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR)), 0);
-        p.br();
-        p.br();
-        p.ltext("_", 0);
-        p.br();
-        QString finalPrinter = s;
-        if (fPrinterAliases.contains(s)) {
-            finalPrinter = fPrinterAliases[s];
-        }
-        p.print(finalPrinter, QPrinter::Custom);
-    }
-
-    for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
-        Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
-        d.qty2 = d.qty;
-        ui->tblOrder->item(i, 0)->setData(Qt::UserRole, qVariantFromValue(d));
-    }
 
 //    ui->tblDishes->setEnabled(false);
 //    ui->wQty->setEnabled(false);
@@ -1513,7 +1370,7 @@ int Workspace::printTax(double cardAmount, double idramAmount)
         if (!db.getString("f_emarks").isEmpty()) {
             pt.fEmarks.append(db.getString("f_emarks"));
         }
-        pt.addGoods(C5Config::taxDept(),
+        pt.addGoods(C5Config::taxDept().toInt(),
                     db.getString("f_adgcode"), db.getString("f_dish"),
                     db.getString("f_name"), db.getDouble("f_price"),
                     db.getDouble("f_qty1"), db.getDouble("f_discount") * 100);
@@ -1813,6 +1670,175 @@ bool Workspace::printReceipt(const QString &id, bool printSecond, bool precheck)
     return true;
 }
 
+void Workspace::printService()
+{
+    QSet<QString> prn;
+    for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
+        Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
+        if (d.printer.length() > 0 && d.qty2 < 0.01) {
+            prn.insert(d.printer);
+        }
+    }
+
+    C5Database db(fDBParams);
+    db[":f_id"] = fOrderUuid;
+    db.exec("select o.f_prefix, o.f_hallid, t.f_firmname, t.f_address, t.f_dept, t.f_hvhh, t.f_devnum, "
+            "t.f_serial, t.f_fiscal, t.f_receiptnumber, t.f_time as f_taxtime, concat(left(u.f_first, 1), '. ', u.f_last) as f_staff, "
+            "o.f_amountcash, o.f_amountcard, o.f_amountidram, o.f_amountother, o.f_amounttotal, o.f_print, o.f_comment, ht.f_name as f_tablename, "
+            "p.f_contact, p.f_phone, p.f_address, o.f_taxpayertin "
+            "from o_header o "
+            "left join o_tax t on t.f_id=o.f_id "
+            "left join s_user u on u.f_id=o.f_staff "
+            "left join h_tables ht on ht.f_id=o.f_table "
+            "left join c_partners p on p.f_id=o.f_partner "
+            "where o.f_id=:f_id");
+    db.nextRow();
+
+    for (const QString &s: prn) {
+        QFont font(qApp->font());
+        font.setFamily(__c5config.getValue(param_service_print_font_family));
+        int basesize = __c5config.getValue(param_service_print_font_size).toInt();
+        font.setPointSize(basesize);
+        C5Printing p;
+        p.setSceneParams(650, 2800, QPrinter::Portrait);
+        p.setFont(font);
+        p.setFontBold(true);
+        p.ctext(tr("Receipt #") + QString("%1%2").arg(db.getString("f_prefix"), db.getString("f_hallid")));
+        p.br();
+        p.ctext(s);
+        p.br();
+        if (fCustomer > 0) {
+            p.ctext(QString("*%1*").arg(tr("Delivery")));
+            p.br();
+        }
+        if (fFlagEdited > 0) {
+            p.ctext(QString("*%1*").arg(tr("Edited")));
+            p.br();
+        }
+        //p.setFontBold(false);
+        p.line(3);
+        p.br(3);
+        p.br();
+        for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
+            Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
+            if (d.printer == s && d.qty2 < 0.01) {
+                p.setFontSize(basesize);
+                p.setFontBold(true);
+                p.ltext(d.name, 0);
+                p.setFontSize(basesize + 8);
+                p.setFontBold(true);
+                p.rtext(float_str(d.qty, 2));
+                p.br();
+                if (d.modificator.isEmpty() == false) {
+                    p.setFontSize(basesize - 4);
+                    p.ltext(d.modificator, 0);
+                    p.br();
+                }
+                p.line();
+                p.br();
+            }
+        }
+        p.setFontSize(basesize - 4);
+       // p.setFontBold(false);
+
+        p.ltext(QString("%1 %2").arg(tr("Printed:"), QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR)), 0);
+        p.br();
+        p.br();
+        p.ltext("_", 0);
+        p.br();
+        QString finalPrinter = s;
+        if (fPrinterAliases.contains(s)) {
+            finalPrinter = fPrinterAliases[s];
+        }
+        p.print(finalPrinter, QPrinter::Custom);
+    }
+
+    prn.clear();
+    for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
+        Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
+        if (d.printer2.length() > 0 && d.qty2 < 0.01) {
+            prn.insert(d.printer2);
+        }
+    }
+
+    for (const QString &s: prn) {
+        QFont font(qApp->font());
+        font.setFamily(__c5config.getValue(param_service_print_font_family));
+        int basesize = __c5config.getValue(param_service_print_font_size).toInt();
+        font.setPointSize(basesize);
+        C5Printing p;
+        p.setSceneParams(650, 2800, QPrinter::Portrait);
+        p.setFont(font);
+        p.setFontBold(true);
+        p.ctext(tr("Receipt #") + QString("%1%2").arg(db.getString("f_prefix"), db.getString("f_hallid")));
+        p.br();
+        p.ctext(s);
+        p.br();
+        if (fCustomer > 0) {
+            p.ctext(QString("*%1*").arg(tr("Delivery")));
+            p.br();
+        }
+        if (fFlagEdited > 0) {
+            p.ctext(QString("*%1*").arg(tr("Edited")));
+            p.br();
+        }
+        //p.setFontBold(false);
+        p.line(3);
+        p.br(3);
+        p.br();
+        for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
+            Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
+            if (d.printer2 == s) {
+                p.setFontSize(basesize);
+                p.setFontBold(true);
+                p.ltext(d.name, 0);
+                p.setFontSize(basesize + 8);
+                p.setFontBold(true);
+                p.rtext(float_str(d.qty, 2));
+                p.br();
+                if (d.modificator.isEmpty() == false) {
+                    p.setFontSize(basesize - 4);
+                    p.ltext(d.modificator, 0);
+                    p.br();
+                }
+                p.line();
+                p.br();
+            }
+        }
+        p.setFontSize(basesize - 4);
+       // p.setFontBold(false);
+
+        p.ltext(QString("%1 %2").arg(tr("Printed:"), QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR)), 0);
+        p.br();
+        p.br();
+        p.ltext("_", 0);
+        p.br();
+        QString finalPrinter = s;
+        if (fPrinterAliases.contains(s)) {
+            finalPrinter = fPrinterAliases[s];
+        }
+        p.print(finalPrinter, QPrinter::Custom);
+    }
+
+    C5StoreDraftWriter dw(db);
+    for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
+        Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
+        d.qty2 = d.qty;
+        ui->tblOrder->item(i, 0)->setData(Qt::UserRole, qVariantFromValue(d));
+        int pid = 0;
+        double disc = discountValue();
+        if (!dw.writeOBody(d.obodyId, fOrderUuid, DISH_STATE_OK, d.id, d.qty, d.qty2, d.price,
+                           (d.qty*d.price) - (d.qty*d.price*d.discount), __c5config.serviceFactor().toDouble(),
+                           d.discount, d.store, d.printer, "", d.modificator, 0, d.adgCode, 0, 0, pid, i, QDateTime::currentDateTime(),
+                           d.f_emarks)) {
+            C5Message::error(dw.fErrorMsg);
+            db.rollback();
+            return;
+        }
+        ui->tblOrder->item(i, 0)->setData(Qt::UserRole, qVariantFromValue(d));
+    }
+}
+
 void Workspace::showCustomerDisplay()
 {
     QSettings s(_ORGANIZATION_, _APPLICATION_+ QString("\\") + _MODULE_);
@@ -2075,7 +2101,7 @@ void Workspace::on_tblTables_itemClicked(QTableWidgetItem *item)
                 ui->lbCostumerPhone->setVisible(true);
             }
         }
-        fFlagEdited = true;
+        fFlagEdited = 1;
         C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Open order"), QString::number(fTable),  "");
     } else {
 
@@ -2090,7 +2116,7 @@ void Workspace::on_btnSaveAndPrecheck_clicked()
     }
     C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Save order and print precheck"), QString::number(fTable),  "");
     if (saveOrder(ORDER_STATE_OPEN)) {
-        fFlagEdited = true;
+        fFlagEdited = 1;
     }
     printReceipt(fOrderUuid, false, true);
 }
@@ -2138,7 +2164,57 @@ void Workspace::on_btnEmarks_clicked()
     if (!ok) {
         return;
     }
-    d.f_emarks = qr;
+
+    QString hya("էթփձջւևրչճԷԹՓՁՋՒևՐՉՃ"
+                "քոեռտըւիօպխծ"
+                "ասդֆգհյկլ;՛շ"
+                "զղցվբնմ,․/"
+                "ՔՈԵՌՏԸՒԻՕՊԽԾ"
+                "ԱՍԴՖԳՀՅԿԼ;՛Շ"
+                "ԶՂՑՎԲՆՄ,․/");
+    QString num("12345678901234567890"
+                "QWERTYUIOP[]"
+                "ASDFGHJKL;'\""
+                "ZXCVBNM,./"
+                "QWERTYUIOP[]"
+                "ASDFGHJKL;'\""
+                "ZXCVBNM,./");
+    QString oldcode = qr;
+    QString newcode;
+
+    for (int i = 0; i < oldcode.length(); i++) {
+        if (hya.contains(oldcode.at(i))) {
+            newcode += num.at(hya.indexOf(oldcode.at(i)));
+        } else {
+            newcode += oldcode.at(i);
+        }
+    }
+
+    d.f_emarks = newcode;
     ui->tblOrder->item(row, 0)->setData(Qt::UserRole, qVariantFromValue(d));
     updateInfo(row);
+}
+
+void Workspace::on_printOrder_clicked()
+{
+    saveOrder(ORDER_STATE_OPEN);
+    printService();
+}
+
+
+void Workspace::on_btnFiscal_clicked(bool checked)
+{
+    if (checked) {
+        if (ui->btnSetOther->isChecked()) {
+            ui->btnFiscal->setChecked(false);
+        }
+    }
+}
+
+void Workspace::configFiscalButton()
+{
+    if (__c5config.getValue(param_tax_print_always_offer).toInt() != 0) {
+        ui->btnFiscal->setEnabled(false);
+        ui->btnFiscal->setChecked(true);
+    }
 }

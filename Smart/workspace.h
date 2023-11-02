@@ -32,6 +32,8 @@ public:
 
     bool printReceipt(const QString &id, bool printSecond, bool precheck);
 
+    void printService();
+
     void showCustomerDisplay();
 
 private slots:
@@ -125,6 +127,10 @@ private slots:
 
     void on_btnEmarks_clicked();
 
+    void on_printOrder_clicked();
+
+    void on_btnFiscal_clicked(bool checked);
+
 private:
     Ui::Workspace *ui;
 
@@ -163,6 +169,8 @@ private:
     double fDiscountAmount;
 
     WCustomerDisplay *fCustomerDisplay;
+
+    void configFiscalButton();
 
     void addDishToOrder(Dish *d);
 

@@ -953,7 +953,7 @@ int C5WaiterServer::printTax(const QMap<QString, QVariant> &header, const QList<
         if (m["f_state"].toInt() != DISH_STATE_OK) {
             continue;
         }
-        pt.addGoods(C5Config::taxDept(),
+        pt.addGoods(C5Config::taxDept().toInt(),
                     dbdishpart2->adgcode(dbdish->part2(m["f_dish"].toInt())),
                 m["f_dish"].toString(),
                 dbdish->name(m["f_dish"].toInt()),
@@ -962,7 +962,7 @@ int C5WaiterServer::printTax(const QMap<QString, QVariant> &header, const QList<
                 m["f_discount"].toDouble() * 100);
     }
     if (header["f_amountservice"] > 0.001) {
-        pt.addGoods(C5Config::taxDept(),
+        pt.addGoods(C5Config::taxDept().toInt(),
                     "5901",
                     "001",
                     QString("%1 %2%").arg(tr("Service")).arg(float_str(header["f_servicefactor"].toDouble()*100, 2)),

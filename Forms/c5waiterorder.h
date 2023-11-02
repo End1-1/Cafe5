@@ -62,6 +62,8 @@ private slots:
     void on_btnSetCL_clicked();
 
     void on_btnClearCL_clicked();
+    void on_rbDraft_clicked(bool checked);
+    void on_rbWrited_clicked(bool checked);
 };
 
 #endif // C5WAITERORDER_H

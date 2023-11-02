@@ -71,11 +71,13 @@ CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
                     << "left join c_goods_prices gpr on gpr.f_goods=gg.f_id [gpr]"
                     << "left join c_units u on u.f_id=gg.f_unit [u]"
                     << "left join e_currency cr on cr.f_id=gpr.f_currency [cr]"
+                    << "left join c_goods_model cm on cm.f_id=gg.f_model [cm]"
                        ;
 
     fColumnsFields << "gg.f_id"
                    << "cp.f_taxname"
                    << "g.f_name as f_groupname"
+                   << "cm.f_name as f_modelname"
                    << "u.f_name as f_unitname"
                    << "gg.f_name"
                    << "gg.f_scancode"
@@ -98,6 +100,7 @@ CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
     fColumnsVisible["gg.f_id"] = true;
     fColumnsVisible["cp.f_taxname"] = true;
     fColumnsVisible["g.f_name as f_groupname"] = true;
+    fColumnsVisible["cm.f_name as f_modelname"] = true;
     fColumnsVisible["u.f_name as f_unitname"] = true;
     fColumnsVisible["gg.f_name"] = true;
     fColumnsVisible["gpr.f_price1"] = true;
@@ -119,6 +122,7 @@ CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_id"] = tr("Code");
     fTranslation["f_taxname"] = tr("Supplier");
     fTranslation["f_groupname"] = tr("Group");
+    fTranslation["f_modelname"] = tr("Model");
     fTranslation["f_unitname"] = tr("Unit");
     fTranslation["f_name"] = tr("Name");
     fTranslation["f_price1"] = tr("Retail price");

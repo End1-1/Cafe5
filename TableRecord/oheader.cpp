@@ -25,6 +25,7 @@ OHeader::OHeader()
     amountTelcell = 0;
     amountPrepaid = 0;
     amountBank = 0;
+    amountCredit = 0;
     amountDebt = 0;
     amountHotel = 0;
     amountPayX = 0.0;
@@ -68,6 +69,7 @@ void OHeader::bind(C5Database &db)
     db[":f_amountcard"] = amountCard;
     db[":f_amountprepaid"] = amountPrepaid;
     db[":f_amountbank"] = amountBank;
+    db[":f_amountcredit"] = amountCredit;
     db[":f_amountother"] = amountOther;
     db[":f_amountidram"] = amountIdram;
     db[":f_amounttelcell"] = amountTelcell;
@@ -116,6 +118,7 @@ bool OHeader::getRecord(C5Database &db)
     amountCash = db.getDouble("f_amountcash");
     amountCard = db.getDouble("f_amountcard");
     amountBank = db.getDouble("f_amountbank");
+    amountCredit = db.getDouble("f_amountcredit");
     amountCashIn = db.getDouble("f_cash");
     amountChange = db.getDouble("f_change");
     amountOther = db.getDouble("f_amountother");

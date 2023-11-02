@@ -1198,7 +1198,6 @@ alter table c_partners add column f_manager integer;
 update s_app set f_version='121' where f_app='DB';
 alter table b_clients_debts add column f_flag integer;
 
-
 /* db - 122 , 05.06.2023 */
 update s_app set f_version='122' where f_app='DB';
 alter table c_storages add column f_hall integer;
@@ -1315,20 +1314,46 @@ create table a_store_valid (f_id char(36) primary key, f_date date);
 alter table a_store_valid add column f_document char(36) after f_id;
 ALTER TABLE `a_store_valid` ADD INDEX `idx_valid_doc` (`f_document`);
 update c_goods set f_qtybox=1;
-ALTER TABLE o_header ADD COLUMN f_taxpayertin TINYTEXT;
 
 
 /* db - 130, 05.09.2023 */
 update s_app set f_version='130' where f_app='DB';
+ALTER TABLE o_header ADD COLUMN f_taxpayertin TINYTEXT;
 create table mf_process_details (f_id integer primary key auto_increment, f_process integer, f_color tinytext, f_36 integer, f_38 integer, f_40 integer, f_42 integer, f_44 integer, f_46 integer);
 alter table mf_process_details add column f_48 integer, add column f_50 integer, add column f_52 integer, add column f_36p integer, add column f_38p integer, add column f_40p integer, add column f_42p integer, add column f_44p integer, add column f_46p integer, add column f_48p integer, add column f_50p integer, add column f_52p integer;
 alter table mf_process_details add column f_product integer after f_id;
-alter table mf_process_details rename f_product to f_task;
+alter table mf_process_details rename column f_product to f_task;
 create table mf_process_details_done (f_id integer primary key auto_increment, f_taskid integer, f_processid integer, f_36d integer,f_38d integer, f_40d integer, f_42d integer, f_44d integer, f_46d integer,  f_48d integer,  f_50d integer,  f_52d integer);
 alter table mf_process_details_done add column f_color tinytext after f_processid;
 alter table mf_process_details add column f_34 integer after f_color, add column f_34p integer after f_52;
-alter table mf_process_details_done add column f_34d after f_color;
+alter table mf_process_details_done add column f_34d integer after f_color;
 
 /* db - 131, 05.09.2023 */
 update s_app set f_version='131' where f_app='DB';
 alter table mf_process_details drop column f_34,drop column f_36,drop column f_38,drop column f_40,drop column f_42,drop column f_44,drop column f_46,drop column f_48,drop column f_50,drop column f_52;
+alter table c_goods_option add f_lastvaliddate date;
+insert into c_goods_option (f_id) select f_id from c_goods where f_id not in (select f_id from c_goods_option);
+
+/* db - 132, 05.09.2023 */
+update s_app set f_version='132' where f_app='DB';
+alter table o_body add column  f_emarks tinytext;
+alter table o_goods add column f_emarks tinytext;
+
+/*db - 133, 09.10.2023*/
+update s_app set f_version='133' where f_app='DB';
+ALTER TABLE `c_groups` CHANGE COLUMN `f_name` `f_name` TINYTEXT NULL COLLATE 'utf8mb3_general_ci' AFTER `f_id`;
+create table c_goods_model (f_id integer primary key auto_increment, f_name tinytext);
+alter table c_goods add column f_model integer after f_group;
+
+/*db - 134, 09.10.2023*/
+update s_app set f_version='134' where f_app='DB';
+alter table mf_tasks add column f_responsible int after f_workshop;
+
+/*db - 135, 20.10.2023*/
+update s_app set f_version='135' where f_app='DB';
+alter table o_Header add column f_amountcredit decimal after f_amountbank;
+
+/*db - 136, 24.10.2023*/
+update s_app set f_version='136' where f_app='DB';
+create table remotedb_sql (f_id integer primary key auto_increment, f_name tinytext, f_sql text);
+ALTER TABLE `s_login_session` CHANGE COLUMN `f_session` `f_session` CHAR(36) NULL DEFAULT NULL AFTER `f_id`;

@@ -28,6 +28,8 @@ QString HttpHeader::toString() const
     str.append("\r\n");
     str.append(QString("Content-Type: application/json;charset=UTF-8"));
     str.append("\r\n");
+    str.append(QString("Access-Control-Allow-Origin: *"));
+    str.append("\r\n");
     str.append(QString("Content-Length: %1").arg(fContentLength));
     if (!fLocation.isEmpty()) {
         str.append("\r\n");

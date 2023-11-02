@@ -20,6 +20,10 @@ public:
 
     virtual QString filterText() override;
 
+    QString sourceCond();
+
+    QString flagCond();
+
     int viewMode();
 
     QString date1();

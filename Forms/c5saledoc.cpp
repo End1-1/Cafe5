@@ -226,7 +226,7 @@ void C5SaleDoc::fiscale()
             "where og.f_header=:f_header");
     PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
     while (db.nextRow()) {
-        pt.addGoods("1", //dep
+        pt.addGoods(1, //dep
                     db.getString("f_adgcode"), //adg
                     db.getString("f_goods"), //goods id
                     db.getString("f_name"), //name

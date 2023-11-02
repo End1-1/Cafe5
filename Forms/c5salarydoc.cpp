@@ -136,6 +136,12 @@ void C5SalaryDoc::on_btnAddEmployee_clicked()
             "inner join s_user_group g on g.f_id=u.f_group "
             "where u.f_id=:f_id");
     if (db.nextRow()) {
+        for (int i = 0; i < ui->tbl->rowCount(); i++) {
+            if (ui->tbl->getInteger(i, 3) == vals.at(1).toInt()) {
+                C5Message::error(tr("This employee already in list"));
+                return;
+            }
+        }
         int row = newRow();
         ui->tbl->lineEditWithSelector(row, 1)->setValue(db.getInt(0));
         ui->tbl->setInteger(row, 3, vals.at(1).toInt());
@@ -182,7 +188,11 @@ void C5SalaryDoc::countSalary()
     db[":f_date"] = ui->deDate->date();
     db.exec("delete from s_salary_payment where f_date=:f_date");
     for (int i = 0; i < ui->tbl->rowCount(); i++) {
-        ui->tbl->lineEdit(i, 5)->setDouble(salaryOfPosition(db, ui->tbl->getInteger(i, 1), ui->tbl->getInteger(i, 3)));
+        double amount = salaryOfPosition(db, ui->tbl->getInteger(i, 1), ui->tbl->getInteger(i, 3));
+        if (amount < 0) {
+            amount = ui->tbl->lineEdit(i, 5)->getDouble();
+        }
+        ui->tbl->lineEdit(i, 5)->setDouble(amount);
         db[":f_amount"] = ui->tbl->lineEdit(i, 5)->getDouble();
         db.update("s_salary_attendance", "f_id", ui->tbl->getInteger(i, 0));
     }
@@ -215,12 +225,15 @@ double C5SalaryDoc::salaryOfPosition(C5Database &db, int pos, int worker)
     double own = db.getDouble("f_owntotal") / 100;
     int dep = db.getInt("f_dep");
     double totalVal = db.getDouble("f_total");
+    if (fixed < 0) {
+        return -1;
+    }
     if (dep > 0) {
         db[":f_printtime1"] = QDateTime::fromString(date1.toString("dd/MM/yyyy") + " " + time1.toString("HH:mm:ss"), "dd/MM/yyyy HH:mm:ss");
         db[":f_printtime2"] = QDateTime::fromString(date2.toString("dd/MM/yyyy") + " " + time2.toString("HH:mm:ss"), "dd/MM/yyyy HH:mm:ss");
         db[":f_state"] = 1;
         db[":f_position"] = pos;
-        db.exec("select sum(b.f_total) * (p2.f_salary_percent / 100) from o_body b "
+        db.exec("select sum(b.f_total * (p2.f_salary_percent / 100)) from o_body b "
                 "left join d_dish d on d.f_id=b.f_dish "
                 "left join d_part2 p2 on p2.f_id=d.f_part "
                 "where b.f_state=:f_state and p2.f_position=:f_position "

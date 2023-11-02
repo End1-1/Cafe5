@@ -134,7 +134,9 @@ bool C5StoreDoc::openDoc(QString id, QString &err)
     fDocType = dw.value(container_aheader, 0, "f_type").toInt();
     fDocState = dw.value(container_aheader, 0, "f_state").toInt();
     ui->lePartner->setValue(dw.value(container_aheader, 0, "f_partner").toInt());
-    ui->leReasonPartner->setValue(dw.value(container_aheader, 0, "f_partner").toInt());
+    if (dw.rowCount(container_bclient_debts) > 0) {
+        ui->leReasonPartner->setValue(dw.value(container_bclient_debts, 0, "f_costumer").toInt());
+    }
     ui->leComment->setText(dw.value(container_aheader, 0, "f_comment").toString());
     ui->leTotal->setDouble(dw.value(container_aheader, 0, "f_amount").toDouble());
     ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(dw.value(container_aheader, 0, "f_currency").toInt()));
@@ -2893,7 +2895,11 @@ void C5StoreDoc::on_btnNewGoods_clicked()
 
 void C5StoreDoc::on_leScancode_returnPressed()
 {
-    addByScancode(ui->leScancode->text(), "", "");
+    QString qty  = ui->chLeaveFocusOnBarcode->isChecked() ? "1" : "";
+    addByScancode(ui->leScancode->text(), qty, "");
+    if (ui->chLeaveFocusOnBarcode->isChecked()) {
+        ui->leScancode->setFocus();
+    }
 }
 
 TableCell::TableCell(QWidget *parent, QTableWidgetItem *item) :

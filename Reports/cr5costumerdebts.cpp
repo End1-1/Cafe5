@@ -14,11 +14,15 @@ CR5CostumerDebts::CR5CostumerDebts(const QStringList &dbParams, QWidget *parent)
     fLabel = tr("Customers debts");
 
     fColumnsSum << "f_amount";
+    fColumnsSum << "f_amountmin";
+    fColumnsSum << "f_amountplu";
     fColumnsSum << "f_amd";
     fColumnsSum << "f_usd";
     fColumnsSum << "f_amountbank";
     fColumnsSum << "f_amountdebt";
     fColumnsSum << "fdebt";
+    fColumnsSum << "fbefore";
+    fColumnsSum << "frefund";
     fColumnsSum << "fpayment";
     fColumnsSum << "fdiff";
 
@@ -31,6 +35,11 @@ CR5CostumerDebts::CR5CostumerDebts(const QStringList &dbParams, QWidget *parent)
     fTranslation["f_date"] = tr("Date");
     fTranslation["f_ordernum"] = tr("Order");
     fTranslation["f_amount"] = tr("Amount");
+    fTranslation["fbefore"] = tr("Before");
+    fTranslation["frefund"] = tr("Refund");
+    fTranslation["f_amountmin"] = tr("Debt");
+    fTranslation["f_amountplu"] = tr("Payment");
+    fTranslation["f_amounttot"] = tr("Balance");
     fTranslation["f_govnumber"] = tr("Gov. number");
     fTranslation["fid"] = tr("ID");
     fTranslation["fpartner"] = tr("Partner");
@@ -148,9 +157,22 @@ void CR5CostumerDebts::buildQuery()
         }  else if (fFilter->viewMode() == 1) {
             fSimpleQuery = true;
             fSqlQuery = "SELECT cd.f_id, cd.f_date, p.f_taxname, cd.f_order, cd.f_cash, cd.f_storedoc, "
-                        "cd.f_amount, c.f_name as f_currency, oh.f_amountbank, oh.f_amountdebt, "
+                        "cd.f_amount, bm.f_amountmin, bp.f_amountplu, bt.f_amounttot, "
+                        "c.f_name as f_currency, oh.f_amountbank, oh.f_amountdebt, "
                         "h.f_name as f_hall "
                         "FROM b_clients_debts cd "
+                        "left join (select cd.f_id, f_amount as f_amountmin from b_clients_debts cd "
+                        "left join c_partners p on p.f_id=cd.f_costumer "
+                            + fFilter->condition() + " and cd.f_amount<0 "
+                            + ") bm on bm.f_id=cd.f_id "
+                        "left join (select cd.f_id, f_amount as f_amountplu from b_clients_debts cd "
+                        "left join c_partners p on p.f_id=cd.f_costumer "
+                            + fFilter->condition() + " and cd.f_amount>0 "
+                            + ") bp on bp.f_id=cd.f_id "
+                        "left join (select f_costumer, sum(f_amount) as f_amounttot from b_clients_debts cd "
+                        "left join c_partners p on p.f_id=cd.f_costumer "
+                            "where 1=1 " + fFilter->sourceCond() + fFilter->flagCond()
+                            + " group by 1) bt on bt.f_costumer=cd.f_costumer "
                         "LEFT JOIN c_partners p ON p.f_id=cd.f_costumer "
                         "LEFT JOIN e_currency c ON c.f_id=cd.f_currency "
                         "left join o_header oh on oh.f_id=cd.f_order "
@@ -239,16 +261,31 @@ void CR5CostumerDebts::newPartnerPayment()
 
 void CR5CostumerDebts::queryDebt3()
 {
-    QString sql = "CREATE TEMPORARY TABLE debt3 (fpartnerid INTEGER, fpartnername TINYTEXT, faddress TINYTEXT, fdebt DECIMAL, fpayment DECIMAL, fdiff decimal); "
+    QString sql = "CREATE TEMPORARY TABLE debt3 (fpartnerid INTEGER, fpartnername TINYTEXT, faddress TINYTEXT, "
+        "fbefore decimal, fdebt DECIMAL, fpayment DECIMAL, frefund decimal, fdiff decimal); "
         "INSERT INTO debt3 (fpartnerid, fpartnername, faddress, fdebt, fpayment, fdiff) "
         "SELECT f_id, f_address, f_taxname, 0, 0, 0 FROM c_partners %manager%; "
+        "update debt3 d inner join (select f_costumer, sum(f_amount) as famount from b_clients_debts where f_date<'%d1%' %flag% group by 1) "
+            "dm on dm.f_costumer=d.fpartnerid set d.fbefore=dm.famount; "
         "UPDATE debt3 d INNER JOIN (SELECT f_costumer, SUM(f_amount) AS famount fROM b_clients_debts WHERE f_amount<0 and f_date between '%d1%' and '%d2%' %flag% GROUP BY 1) "
         "    dm ON dm.f_costumer=d.fpartnerid SET d.fdebt=dm.famount; "
-        "UPDATE debt3 d INNER JOIN (SELECT f_costumer, SUM(f_amount) AS famount fROM b_clients_debts WHERE f_amount>0 and f_date between '%d1%' and '%d2%' %flag% GROUP BY 1) "
+
+        //payment
+        "UPDATE debt3 d INNER JOIN (SELECT f_costumer, SUM(f_amount) AS famount "
+        "    fROM b_clients_debts WHERE f_amount>0 and f_storedoc is null and f_date between '%d1%' and '%d2%' %flag% GROUP BY 1) "
         "    dm ON dm.f_costumer=d.fpartnerid SET d.fpayment=dm.famount; "
-        "UPDATE debt3 d INNER JOIN (SELECT f_costumer, SUM(f_amount) AS famount fROM b_clients_debts WHERE f_id>0 %flag% and f_date<='%d2%' GROUP BY 1) "
+
+        //refund
+        "UPDATE debt3 d INNER JOIN (SELECT f_costumer, SUM(f_amount) AS famount "
+        "    fROM b_clients_debts WHERE f_amount>0 and f_storedoc is not null and f_date between '%d1%' and '%d2%' %flag% GROUP BY 1) "
+        "    dm ON dm.f_costumer=d.fpartnerid SET d.frefund=dm.famount; "
+
+        "UPDATE debt3 d INNER JOIN (SELECT f_costumer, SUM(f_amount) AS famount "
+        "fROM b_clients_debts WHERE f_id>0 %flag% and f_date<='%d2%' GROUP BY 1) "
         "    dm ON dm.f_costumer=d.fpartnerid SET d.fdiff=dm.famount;	 "
-        "delete from debt3 where fdebt=0 and fpayment=0 and fdiff=0;"
+
+        //clean unused rows
+        "delete from debt3 where fdebt=0 and fpayment=0 and fdiff=0 and frefund=0 and fbefore=0;"
         "SELECT * FROM debt3;";
     sql.replace("%d1%", fFilter->date1()).replace("%d2%", fFilter->date2());
     if (fFilter->manager().isEmpty()) {

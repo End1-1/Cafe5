@@ -576,6 +576,13 @@
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QCheckBox" name="chLeaveFocusOnBarcode">
+            <property name="text">
+             <string>Leave focus</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>

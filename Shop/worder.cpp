@@ -17,6 +17,7 @@
 #include "working.h"
 #include "dlgpaymentchoose.h"
 #include "c5user.h"
+#include "c5cache.h"
 #include "datadriver.h"
 #include "wcustomerdisplay.h"
 #include "c5utils.h"
@@ -84,10 +85,15 @@ WOrder::WOrder(C5User *user, int saleType, WCustomerDisplay *customerDisplay, QW
     ui->tblData->setColumnWidth(col_discmode, 30);
     ui->tblData->setColumnWidth(col_discvalue, 120);
     ui->tblData->setColumnWidth(col_stock, 100);
+    ui->tblData->setColumnWidth(col_qr, 50);
 
     ui->tblData->setColumnHidden(col_group, !s.value("col" + QString::number(col_group)).toBool());
     ui->tblData->setColumnHidden(col_unit, !s.value("col" + QString::number(col_unit)).toBool());
     ui->tblData->setColumnHidden(col_qtybox, !s.value("col" + QString::number(col_qtybox)).toBool());
+    ui->tblData->setColumnHidden(col_discamount, !s.value("col" + QString::number(col_discmode)).toBool());
+    ui->tblData->setColumnHidden(col_discmode, !s.value("col" + QString::number(col_discmode)).toBool());
+    ui->tblData->setColumnHidden(col_discvalue, !s.value("col" + QString::number(col_discvalue)).toBool());
+    ui->tblData->setColumnHidden(col_qr, !s.value("col" + QString::number(col_qr)).toBool());
 }
 
 WOrder::~WOrder()
@@ -186,7 +192,7 @@ bool WOrder::addGoods(int id)
     DbGoods g(id);
     if (!g.isService() && __c5config.getValue(param_shop_dont_check_qty).toInt() == 0) {
         QString err;
-        if (!checkQty(id, g.unit()->defaultQty(), true, err)) {
+        if (!checkQty(id, g.unit()->defaultQty() / g.qtyBox() , 0, true, err)) {
             C5Database db(__c5config.dbParams());
             db[":f_id"] = id;
             db.exec("select f_name from c_goods where f_id=:f_id");
@@ -260,7 +266,7 @@ int WOrder::addGoodsToTable(int id, bool checkQtyOfStore, const QString &draftid
     db[":f_store"] = __c5config.defaultStore();
     db.exec("select f_qty-f_qtyreserve-f_qtyprogram from a_store_sale where f_goods=:f_goods and f_store=:f_store");
     if (db.nextRow()) {
-        ui->tblData->setDouble(row, col_stock, db.getDouble(0) + 1);
+        ui->tblData->setDouble(row, col_stock, db.getDouble(0) + (og.qty / og._qtybox));
     }
     countTotal();
 
@@ -306,6 +312,7 @@ bool WOrder::writeOrder()
     if (fOHeader.amountCash < 0.001
             && fOHeader.amountCard < 0.001
             && fOHeader.amountBank < 0.001
+            && fOHeader.amountCredit < 0.001
             && fOHeader.amountIdram < 0.001
             && fOHeader.amountTelcell < 0.001
             && fOHeader.amountPayX < 0.001
@@ -313,7 +320,8 @@ bool WOrder::writeOrder()
         fOHeader.amountCash = fOHeader.amountTotal;
     }
     if (!DlgPaymentChoose::getValues(fOHeader.amountTotal, fOHeader.amountCash, fOHeader.amountCard, fOHeader.amountIdram,
-                                     fOHeader.amountTelcell, fOHeader.amountBank, fOHeader.amountPrepaid, fOHeader.amountDebt,
+                                     fOHeader.amountTelcell, fOHeader.amountBank, fOHeader.amountCredit,
+                                     fOHeader.amountPrepaid, fOHeader.amountDebt,
                                      fOHeader.amountCashIn, fOHeader.amountChange, fOHeader._printFiscal)) {
         return false;
     }
@@ -366,7 +374,7 @@ bool WOrder::writeOrder()
             }
             db[":f_store"] = __c5config.defaultStore();
             db[":f_goods"] = g.goods;
-            db[":f_qty"] = g.qty;
+            db[":f_qty"] = g.qty / g._qtybox;
             db.exec("update a_store_sale set f_qty=f_qty-:f_qty, f_qtyprogram=f_qtyprogram-:f_qty where f_store=:f_store and f_goods=:f_goods");
         }
         if (!fPreorderUUID.isEmpty()) {
@@ -629,16 +637,16 @@ void WOrder::removeRow()
         }
     }
     OGoods &g = fOGoods[row];
-    QString code = g.goods;
+    int code = g.goods;
     QString name = g._goodsName;
     C5Database db(__c5config.dbParams());
     db[":f_id"] = ui->tblData->item(row, 0)->data(Qt::UserRole + 1);
     db[":f_state"] = 2;
     db.exec("update o_draft_sale_body set f_state=:f_state where f_id=:f_id");
     db[":f_store"] = __c5config.defaultStore();
-    db[":f_goods"] = code.toInt();
-    db[":f_qty"] = g.qty;
-    db.exec("update a_store_sale set f_qtyprogram=f_qtyprogram-:f_qty where f_store=:f_store and f_goods=:f_goods");
+    db[":f_goods"] = code;
+    db[":f_qty"] = g.qty / g._qtybox;
+    db.exec("update a_store_sale set f_qtyprogram=f_qtyprogram-(:f_qty) where f_store=:f_store and f_goods=:f_goods");
     C5LogSystem::writeEvent(QString("%1 #%2 %3:%4 %5").arg(tr("Remove row")).arg(row).arg(code).arg(name).arg(float_str(g.qty, 2)));
     fOGoods.remove(row);
     ui->tblData->setRowCount(fOGoods.count());
@@ -731,7 +739,7 @@ void WOrder::countTotal()
         ui->tblData->setCellWidget(i, col_qr, btn);
         if (ui->tblData->item(i, 0)->data(Qt::UserRole + 100).toInt() == 1) {
             QString err;
-            if (!checkQty(og.goods, og.qty, false, err)) {
+            if (!checkQty(og.goods, og.qty / og._qtybox, 0, false, err)) {
                 for (int c = 0; c < ui->tblData->columnCount(); c++) {
                     ui->tblData->item(i, c)->setBackgroundColor(Qt::red);
                 }
@@ -777,14 +785,15 @@ bool WOrder::getDiscountValue(int discountType, double &v)
 bool WOrder::setQtyOfRow(int row, double qty)
 {
     OGoods &og = fOGoods[row];
+    double oldQty = og.qty;
     DbGoods g(og.goods);
     if (g.acceptIntegerQty()) {
         qty = trunc(qty);
     }
-    double diffqty = qty - og.qty;
+    double diffqty = (qty / og._qtybox) - (og.qty / og._qtybox);
     if (og.isService == 0  && __c5config.getValue(param_shop_dont_check_qty).toInt() == 0) {
         QString err;
-        if (!checkQty(g.id(), diffqty, true, err)) {
+        if (!checkQty(g.id(), diffqty, oldQty, true, err)) {
             C5Message::error(og._goodsName + " \r\n" + err);
             return false;
         }
@@ -792,7 +801,7 @@ bool WOrder::setQtyOfRow(int row, double qty)
     og.qty = qty;
     C5Database db(__c5config.dbParams());
     db[":f_id"] = ui->tblData->item(row, 0)->data(Qt::UserRole + 101);
-    db[":f_qty"] = og.qty;
+    db[":f_qty"] = og.qty / og._qtybox;
     db.exec("update o_draft_sale_body set f_qty=:f_qty where f_id=:f_id");
     C5LogSystem::writeEvent(QString("%1 %2:%3 %4").arg(tr("Change qty"), g.scancode(), g.goodsName(), float_str(qty, 2)));
     countTotal();
@@ -811,7 +820,7 @@ C5ClearTableWidget *WOrder::table()
     return ui->tblData;
 }
 
-bool WOrder::checkQty(int goods, double qty, bool updateStock, QString &err)
+bool WOrder::checkQty(int goods, double qty, double oldqty, bool updateStock, QString &err)
 {
     DbGoods gd(goods);
     int storegoods = gd.storeGoods();
@@ -819,7 +828,7 @@ bool WOrder::checkQty(int goods, double qty, bool updateStock, QString &err)
     db[":f_store"] = __c5config.defaultStore();
     db[":f_goods"] = storegoods;
     db[":f_qty"] = qty;
-    if (!db.exec("select f_qty-f_qtyreserve-f_qtyprogram-:f_qty as f_qty from a_store_sale where f_store=:f_store and f_goods=:f_goods ")) {
+    if (!db.exec("select f_qty-f_qtyreserve-f_qtyprogram-(:f_qty) as f_qty from a_store_sale where f_store=:f_store and f_goods=:f_goods ")) {
         err = db.fLastError;
         return false;
     }
@@ -836,10 +845,14 @@ bool WOrder::checkQty(int goods, double qty, bool updateStock, QString &err)
     }
 
     if (updateStock) {
-        db[":f_qty"] = qty;
+        db[":f_qty"] = oldqty;
         db[":f_store"] = __c5config.defaultStore();
         db[":f_goods"] = storegoods;
-        db.exec("update a_store_sale set f_qtyprogram=f_qtyprogram+:f_qty where f_store=:f_store and f_goods=:f_goods");
+        db.exec("update a_store_sale set f_qtyprogram=f_qtyprogram-(:f_qty) where f_store=:f_store and f_goods=:f_goods");
+        db[":f_qty"] = qty + oldqty;
+        db[":f_store"] = __c5config.defaultStore();
+        db[":f_goods"] = storegoods;
+        db.exec("update a_store_sale set f_qtyprogram=f_qtyprogram+(:f_qty) where f_store=:f_store and f_goods=:f_goods");
     }
 
     return true;

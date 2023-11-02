@@ -105,6 +105,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Editors/ce5dishpackage.cpp \
     ../Editors/ce5goodsbarcodelabelview.cpp \
     ../Editors/ce5goodsclass.cpp \
+    ../Editors/ce5goodsmodel.cpp \
     ../Editors/ce5mfprocess.cpp \
     ../Editors/ce5mfprocessstage.cpp \
     ../Editors/ce5mfproduct.cpp \
@@ -447,6 +448,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Editors/ce5dishpackage.h \
     ../Editors/ce5goodsbarcodelabelview.h \
     ../Editors/ce5goodsclass.h \
+    ../Editors/ce5goodsmodel.h \
     ../Editors/ce5mfprocess.h \
     ../Editors/ce5mfprocessstage.h \
     ../Editors/ce5mfproduct.h \
@@ -600,7 +602,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Reports/cr5salesbydishesfilter.h \
     ../Reports/cr5storereason.h \
     ../Reports/cr5usersfilter.h \
-    ../Service/servicecommands.h \
+    ../Service5Working/utils/servicecommands.h \
     ../TableRecord/aheader.h \
     ../TableRecord/bclientdebts.h \
     ../TableRecord/bhistory.h \
@@ -733,6 +735,7 @@ FORMS += \
     ../Editors/ce5currencyrate.ui \
     ../Editors/ce5dishpackage.ui \
     ../Editors/ce5goodsclass.ui \
+    ../Editors/ce5goodsmodel.ui \
     ../Editors/ce5mfprocess.ui \
     ../Editors/ce5mfprocessstage.ui \
     ../Editors/ce5mfproduct.ui \
@@ -879,7 +882,7 @@ FORMS += \
     ../Editors/ce5createtablesforhall.ui \
     ../Reports/cr5menutranslator.ui \
     ../Reports/cr5dishpriceselfcostfilter.ui \
-    ../Reports/cr5storedocumentsfilter.ui \
+    ../Reports/cr5storedocumentsfilter.ui
 
 INCLUDEPATH += ../Cafe5
 INCLUDEPATH += ../Cache
@@ -892,6 +895,7 @@ INCLUDEPATH += ../DbData
 INCLUDEPATH += ../Waiter
 INCLUDEPATH += ../RESOURCES
 INCLUDEPATH += ../Service
+INCLUDEPATH += ../Service5Working/utils
 INCLUDEPATH += ../Forms
 INCLUDEPATH += ../Configs
 INCLUDEPATH += /projects/xlsx/src

@@ -350,6 +350,17 @@ bool C5StoreDraftWriter::readACalcPrice(const QString &id)
     }
 }
 
+bool C5StoreDraftWriter::readBClientDebtsRefund(const QString &id)
+{
+    fDb[":f_storedoc"] = id;
+    if (fDb.exec("select * from b_clients_debts where f_storedoc=:f_storedoc", fBClientsDebtsData, fBClientsDebtsDataMap)) {
+        return true;
+    } else {
+        fErrorMsg = fDb.fLastError;
+        return false;
+    }
+}
+
 bool C5StoreDraftWriter::returnResult(bool r, const QString &msg)
 {
     if (!r) {
@@ -409,6 +420,9 @@ bool C5StoreDraftWriter::readAHeader(const QString &id)
             }
             if (result) {
                 result = readACalcPrice(id);
+            }
+            if (result) {
+                result = readBClientDebtsRefund(id);
             }
             break;
         case DOC_TYPE_CASH:
@@ -533,6 +547,9 @@ int C5StoreDraftWriter::rowCount(int container)
     case container_acalcprice:
         rc = fACalcPriceData.count();
         break;
+    case container_bclient_debts:
+        rc = fBClientsDebtsData.count();
+        break;
     }
     Q_ASSERT(rc != -1);
     return rc;
@@ -570,6 +587,10 @@ QVariant C5StoreDraftWriter::value(int container, int row, const QString &key)
     case container_acalcprice:
         c = &fACalcPriceData;
         d = &fACalcPriceDataMap;
+        break;
+    case container_bclient_debts:
+        c = &fBClientsDebtsData;
+        d = &fBClientsDebtsDataMap;
         break;
     }
     Q_ASSERT(c);

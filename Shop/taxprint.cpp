@@ -98,7 +98,7 @@ void TaxPrint::on_btnPrint_clicked()
     pt.fPartnerTin = ui->leTaxpayerPin->text();
     for (int i = 0; i < ui->tbl->rowCount(); i++) {
         DbGoods gg(ui->tbl->getInteger(i, 0));
-        pt.addGoods(gg.group()->taxDept(), //dep
+        pt.addGoods(gg.group()->taxDept().toInt(), //dep
                     gg.group()->adgt(), //adg
                     gg.scancode(), //goods id
                     gg.goodsName(), //name

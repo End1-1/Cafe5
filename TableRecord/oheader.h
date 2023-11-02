@@ -26,6 +26,7 @@ public:
     double amountCard;
     double amountPrepaid;
     double amountBank;
+    double amountCredit;
     double amountIdram;
     double amountTelcell;
     double amountPayX;

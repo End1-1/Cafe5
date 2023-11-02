@@ -103,7 +103,7 @@ public:
 
     C5ClearTableWidget *table();
 
-    bool checkQty(int goods, double qty, bool updateStock, QString &err);
+    bool checkQty(int goods, double qty, double oldqty, bool updateStock, QString &err);
 
 private slots:
     void imageLoaded(const QPixmap &img);

@@ -24,6 +24,8 @@ C5WaiterOrder::C5WaiterOrder(const QStringList &dbParams, QWidget *parent) :
     fIcon = ":/order.png";
     ui->tblLog->setColumnWidths(ui->tblLog->columnCount(), 100, 80, 200, 200, 200, 200);
     ui->tblStore->setColumnWidths(ui->tblStore->columnCount(), 80, 300, 200, 300, 80, 80, 80, 80);
+    ui->rbDraft->setChecked(__c5config.getRegValue("sale_selfcost_mode").toBool());
+    ui->rbWrited->setChecked(!__c5config.getRegValue("sale_selfcost_mode").toBool());
 }
 
 C5WaiterOrder::~C5WaiterOrder()
@@ -191,17 +193,18 @@ void C5WaiterOrder::showStore()
     db[":f_header"] = ui->leUuid->text();
     db[":f_state1"] = DISH_STATE_OK;
     db[":f_state2"] = DISH_STATE_VOID;
-    db.exec("select sn.f_name as f_dishstatename, d.f_name as f_dishname, st.f_name as f_storename, "
-            "g.f_name as f_goodsname, b.f_qty1, r.f_qty, o.f_qty as f_outputqty, o.f_price, "
-            "o.f_qty*o.f_price as f_total "
+    QString priceField = ui->rbDraft->isChecked() ? "g.f_lastinputprice" : "o.f_price";
+    db.exec(QString("select sn.f_name as f_dishstatename, d.f_name as f_dishname, st.f_name as f_storename, "
+            "g.f_name as f_goodsname, b.f_qty1, o.f_qty / b.f_qty1 as f_qty, o.f_qty as f_outputqty, %1, "
+            "o.f_qty*%1 as f_total "
             "from o_goods o "
             "inner join o_body b on b.f_id=o.f_body "
             "inner join o_body_state sn on sn.f_id=b.f_state "
             "inner join d_dish d on d.f_id=b.f_dish "
             "inner join c_storages st on st.f_id=o.f_store "
-            "inner join d_recipes r on r.f_dish=b.f_dish "
-            "inner join c_goods g on g.f_id=r.f_goods and r.f_goods=o.f_goods "
-            "where b.f_header=:f_header and (b.f_state=:f_state1 or b.f_state=:f_state2)");
+            "inner join c_goods g on g.f_id=o.f_goods "
+            "where b.f_header=:f_header and (b.f_state=:f_state1 or b.f_state=:f_state2) "
+).arg(priceField));
     ProxyTableWidgetDatabase::fillTableWidgetRowFromDatabase(&db, ui->tblStore);
     double t = 0;
     for (int i = 0; i < ui->tblStore->rowCount(); i++) {
@@ -433,4 +436,16 @@ void C5WaiterOrder::on_btnClearCL_clicked()
         fDD.exec("update m_register set f_cityledger=:f_cityledger where f_id=:f_id");
         C5Message::info(tr("Saved"));
     }
+}
+
+void C5WaiterOrder::on_rbDraft_clicked(bool checked)
+{
+    __c5config.setRegValue("sale_selfcost_mode", checked);
+    showStore();
+}
+
+void C5WaiterOrder::on_rbWrited_clicked(bool checked)
+{
+    __c5config.setRegValue("sale_selfcost_mode", !checked);
+    showStore();
 }

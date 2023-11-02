@@ -11,6 +11,7 @@
 #define container_astoredraft 5
 #define container_astoredishwaste 6
 #define container_acalcprice 7
+#define container_bclient_debts 8
 
 class C5StoreDraftWriter : QObject
 {
@@ -116,6 +117,10 @@ private:
 
     QList<QList<QVariant> > fACalcPriceData;
 
+    QHash<QString, int> fBClientsDebtsDataMap;
+
+    QList<QList<QVariant> > fBClientsDebtsData;
+
     bool readAHeaderStore(const QString &id);
 
     bool readAStoreDraft(const QString &id);
@@ -127,6 +132,8 @@ private:
     bool readECash(const QString &id);
 
     bool readACalcPrice(const QString &id);
+
+    bool readBClientDebtsRefund(const QString &id);
 
     bool returnResult(bool r, const QString &msg = "");
 

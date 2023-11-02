@@ -95,7 +95,7 @@ void DlgShiftRotation::on_btnChange_clicked()
         dw.writeOBody(id, db.getString("f_id"), DISH_STATE_OK, dishid,
                       1, 1, db.getDouble("f_roomrate"), db.getDouble("f_roomrate"), 0, 0, 1, "", "",
                       date.toString(FORMAT_DATE_TO_STR), 0, dbdishpart2->adgcode(dbdish->group(dishid)),
-                      0, 0, 0, row++, QDateTime::currentDateTime());
+                      0, 0, 0, row++, QDateTime::currentDateTime(), "");
     }
 
     db[":f_value"] = ui->de->date().toString(FORMAT_DATE_TO_STR_MYSQL);

@@ -63,7 +63,7 @@ bool C5ShopOrder::write()
 
     for (int i = 0; i < fOGoods.count(); i++) {
         OGoods &g = fOGoods[i];
-        g.price = g.total / g.qty;
+        g.price = g.total / (g.qty / g._qtybox);
     }
 
     if (C5Config::taxIP().isEmpty()) {
@@ -83,12 +83,12 @@ bool C5ShopOrder::write()
                 if (g.emarks.isEmpty() == false) {
                     pt.fEmarks.append(g.emarks);
                 }
-                pt.addGoods(g.taxDept, //dep
+                pt.addGoods(g.taxDept.toInt(), //dep
                             g.adgCode, //adg
                             QString::number(g.goods), //goods id
                             g._goodsName, //name
                             g.price, //price
-                            g.qty, //qty
+                            g.qty / g._qtybox, //qty
                             fBHistory.value * 100); //discount
             }
             result = pt.makeJsonAndPrint(fOHeader.amountCard + fOHeader.amountIdram + fOHeader.amountTelcell, fOHeader.amountPrepaid, jsonIn, jsonOut, err);
@@ -146,7 +146,8 @@ bool C5ShopOrder::write()
     QString storedocUserNum;
     if (needStoreDoc) {
         storedocUserNum = dw.storeDocNum(DOC_TYPE_STORE_OUTPUT, __c5config.defaultStore(), true, 0);
-        if (!dw.writeAHeader(storeDocId, storedocUserNum, DOC_STATE_DRAFT, DOC_TYPE_STORE_OUTPUT, fOHeader.staff, QDate::currentDate(),
+        if (!dw.writeAHeader(storeDocId, storedocUserNum, DOC_STATE_DRAFT, DOC_TYPE_STORE_OUTPUT, fOHeader.staff,
+                             QDate::currentDate(),
                              QDate::currentDate(), QTime::currentTime(), 0, 0, storeDocComment, 0, fOHeader.currency)) {
             return returnFalse(dw.fErrorMsg, db);
         }
@@ -159,7 +160,7 @@ bool C5ShopOrder::write()
         OGoods &g = fOGoods[i];
         g.header = fOHeader._id();
         if (!g.isService) {
-            if (!dw.writeAStoreDraft(g.storeRec, storeDocId, __c5config.defaultStore(), -1, g.goods, g.qty,
+            if (!dw.writeAStoreDraft(g.storeRec, storeDocId, __c5config.defaultStore(), -1, g.goods, g.qty / g._qtybox,
                                      0, 0, DOC_REASON_SALE, g.storeRec, i + 1, "")) {
                 return returnFalse(dw.fErrorMsg, db);
             }
@@ -173,7 +174,8 @@ bool C5ShopOrder::write()
     if (needStoreDoc) {
         if (dw.writeOutput(storeDocId, err)) {
             if (!dw.writeAHeader(storeDocId, storedocUserNum, DOC_STATE_SAVED, DOC_TYPE_STORE_OUTPUT, fOHeader.staff,
-                                 QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, 0, storeDocComment, 0, fOHeader.currency)) {
+                                 QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, 0, storeDocComment,
+                                 0, fOHeader.currency)) {
                 return returnFalse(dw.fErrorMsg, db);
             }
             dw.writeTotalStoreAmount(storeDocId);

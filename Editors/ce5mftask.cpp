@@ -12,6 +12,7 @@ CE5MFTask::CE5MFTask(const QStringList &dbParams) :
     ui->leWorkshop->setSelector(dbParams, ui->leWorkshowName, cache_mf_workshop);
     ui->leStage->setSelector(dbParams, ui->leStageName, cache_mf_action_stage);
     ui->leProduct->setSelector(dbParams, ui->leProductName, cache_mf_products);
+    ui->leResponsible->setSelector(dbParams, ui->leResponsibleName, cache_users);
 }
 
 CE5MFTask::~CE5MFTask()

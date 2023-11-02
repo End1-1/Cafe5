@@ -36,6 +36,20 @@
     </widget>
    </item>
    <item>
+    <widget class="QCheckBox" name="chDiscount">
+     <property name="text">
+      <string>Discount</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="chEmarks">
+     <property name="text">
+      <string>Emarks</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>

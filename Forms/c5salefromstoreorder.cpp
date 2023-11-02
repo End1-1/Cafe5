@@ -173,7 +173,7 @@ void C5SaleFromStoreOrder::on_btnPrintTax_clicked()
     C5Database db(fDBParams);
     PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
     for (int i = 0; i < ui->tblData->rowCount(); i++) {
-        pt.addGoods(ui->tblData->getString(i, 8), //dep
+        pt.addGoods(ui->tblData->getString(i, 8).toInt(), //dep
                     ui->tblData->getString(i, 9), //adg
                     ui->tblData->getString(i, 1), //goods id
                     ui->tblData->getString(i, 2), //name

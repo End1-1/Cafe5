@@ -53,6 +53,24 @@ QString CR5CostumerDebtsFilter::filterText()
     return s;
 }
 
+QString CR5CostumerDebtsFilter::sourceCond()
+{
+    return QString(" and cd.f_source=%1 ").arg(ui->rbDebtsToPartner->isChecked() ? BCLIENTDEBTS_SOURCE_INPUT : BCLIENTDEBTS_SOURCE_SALE);
+}
+
+QString CR5CostumerDebtsFilter::flagCond()
+{
+    if (ui->rbDebtsofCustomer->isChecked()) {
+        if (!ui->leHall->text().isEmpty()) {
+            return QString(" and cd.f_flag in (%1) ").arg(ui->leHall->text());
+        }
+        if (!ui->leManager->text().isEmpty()) {
+            return QString(" and p.f_manager in (%1)").arg(ui->leManager->text());
+        }
+    }
+    return "";
+}
+
 int CR5CostumerDebtsFilter::viewMode()
 {
     if (ui->rbTransaction->isChecked()) {

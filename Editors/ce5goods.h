@@ -101,6 +101,8 @@ private slots:
 
     void on_leMargin2_textEdited(const QString &arg1);
 
+    void on_btnNewModel_clicked();
+
 private:
     Ui::CE5Goods *ui;
 
