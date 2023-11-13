@@ -100,7 +100,7 @@ bool Database::exec(const QString &query)
         return false;
     }
     LogWriter::write(LogWriterLevel::verbose, fSqlDatabase.databaseName(), lastQuery());
-    bool isSelect = fQuery->isSelect();
+    bool isSelect = fQuery->isSelect() || query.contains("call", Qt::CaseInsensitive);
     if (isSelect) {
         fColumnsNames.clear();
         QSqlRecord rec = fQuery->record();

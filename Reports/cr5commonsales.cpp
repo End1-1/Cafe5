@@ -7,6 +7,7 @@
 #include "c5waiterorderdoc.h"
 #include "dlgexportsaletoasoptions.h"
 #include "c5dlgselectreporttemplate.h"
+#include "c5salefromstoreorder.h"
 #include "c5gridgilter.h"
 #include <QDir>
 #include <QFile>
@@ -46,7 +47,7 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
                    << "oh.f_timeopen"
                    << "oh.f_dateclose"
                    << "oh.f_timeclose"
-                   << "cpb.f_taxname as f_buyer"
+                   << "concat_ws(', ', cpb.f_name, cpb.f_taxname, cpb.f_address) as f_buyer"
                    << "cpb.f_taxcode as f_buyertaxcode"
                    << "count(oh.f_id) as f_count"
                    << "ot.f_receiptnumber"
@@ -82,7 +83,7 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
                    << "oh.f_timeclose"
                    << "oh.f_amountservice"
                    << "oh.f_amountdiscount"
-                   << "cpb.f_taxname as f_buyer"
+                   << "concat_ws(', ', cpb.f_name, cpb.f_taxname, cpb.f_address) as f_buyer"
                    << "cpb.f_taxcode as f_buyertaxcode"
                    << "concat_ws(' ', w.f_last, w.f_first) as f_cashier"
                    << "concat(w.f_last, ' ', w.f_first) as f_staff"
@@ -161,7 +162,7 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
     fColumnsVisible["oh.f_timeclose"] = false;
     fColumnsVisible["sum(oh.f_amountdebt) as f_amountdebt"] = false;
     fColumnsVisible["sum(oh.f_amounttelcell) as f_amounttelcell"] = false;
-    fColumnsVisible["cpb.f_taxname as f_buyer"] = false;
+    fColumnsVisible["concat_ws(', ', cpb.f_name, cpb.f_taxname, cpb.f_address) as f_buyer"] = false;
     fColumnsVisible["cpb.f_taxcode as f_buyertaxcode"] = false;
     fColumnsVisible["concat_ws(' ', w.f_last, w.f_first) as f_cashier"] = false;
     fColumnsVisible["concat(w.f_last, ' ', w.f_first) as f_staff"] = false;
@@ -236,12 +237,16 @@ bool CR5CommonSales::tblDoubleClicked(int row, int column, const QList<QVariant>
     }
     C5Database db(fDBParams);
     db[":f_id"] = values.at(fModel->fColumnNameIndex["f_id"]).toString();
-    db.exec("select f_source from o_header where f_id=:f_id");
+    db.exec("select * from o_header where f_id=:f_id");
     if (db.nextRow()) {
-        switch (abs(db.getInt(0))) {
+        switch (abs(db.getInt("f_source"))) {
         case 1: {
-            C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>(fDBParams);
-            wo->setOrder(values.at(fModel->fColumnNameIndex["f_id"]).toString());
+            if (db.getDouble("f_amounttotal") > 0) {
+                C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>(fDBParams);
+                wo->setOrder(values.at(fModel->fColumnNameIndex["f_id"]).toString());
+            } else {
+                C5SaleFromStoreOrder::openOrder(fDBParams, values.at(fModel->fColumnNameIndex["f_id"]).toString());
+            }
             break;
         }
         case 2: {

@@ -49,7 +49,7 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
                    << "gcb.f_name as gname2"
                    << "gcc.f_name as gname3"
                    << "gcd.f_name as gname4"
-                   << "cpb.f_taxname as f_buyer"
+                   << "concat_ws(', ', cpb.f_name, cpb.f_taxname, cpb.f_address) as f_buyer"
                    << "cpb.f_taxcode as f_buyertaxcode"
                    << "og.f_discountfactor*100 as f_discountfactor"
                    << "og.f_price"
@@ -74,7 +74,7 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
                    << "gg.f_scancode"
                    << "gr.f_name as f_goodsgroup"
                    << "gu.f_name as f_goodsunit"
-                   << "cpb.f_taxname as f_buyer"
+                   << "concat_ws(', ', cpb.f_name, cpb.f_taxname, cpb.f_address) as f_buyer"
                    << "cpb.f_taxcode as f_buyertaxcode"
                    << "gca.f_name as gname1"
                    << "gcb.f_name as gname2"
@@ -141,7 +141,7 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
     fColumnsVisible["gcc.f_name as gname3"] = true;
     fColumnsVisible["gcd.f_name as gname4"] = true;
     fColumnsVisible["hl.f_name as f_hallname"] = true;
-    fColumnsVisible["cpb.f_taxname as f_buyer"] = false;
+    fColumnsVisible["concat_ws(', ', cpb.f_name, cpb.f_taxname, cpb.f_address) as f_buyer"] = false;
     fColumnsVisible["cpb.f_taxcode as f_buyertaxcode"] = false;
     fColumnsVisible["og.f_discountfactor*100 as f_discountfactor"] = false;
     fColumnsVisible["sum(og.f_discountamount) as f_discamount"] = false;

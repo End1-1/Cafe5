@@ -381,7 +381,6 @@ bool C5StoreDraftWriter::writeAHeader(QString &id, const QString &userid, int st
     bool u = true;
     if (id.isEmpty()) {
         id = fDb.uuid();
-        u = false;
     }
     fDb[":f_id"] = id;
     fDb.exec("select f_id from a_header where f_id=:f_id");

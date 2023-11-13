@@ -63,7 +63,7 @@ public:
 
     static void writeAStoreSale(int storei, int storeo);
 
-    bool openDraft(const QString &id);
+    bool openDraft(const QString &id, QString &err);
 
     void setReasonPartnerName();
 

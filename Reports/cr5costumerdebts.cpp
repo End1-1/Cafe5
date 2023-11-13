@@ -285,7 +285,8 @@ void CR5CostumerDebts::queryDebt3()
         "    dm ON dm.f_costumer=d.fpartnerid SET d.fdiff=dm.famount;	 "
 
         //clean unused rows
-        "delete from debt3 where fdebt=0 and fpayment=0 and fdiff=0 and frefund=0 and fbefore=0;"
+        "delete from debt3 where coalesce(fdebt, 0)=0 and coalesce(fpayment, 0)=0 "
+        "and coalesce(fdiff, 0)=0 and coalesce(frefund,0)=0 and coalesce(fbefore,0)=0;"
         "SELECT * FROM debt3;";
     sql.replace("%d1%", fFilter->date1()).replace("%d2%", fFilter->date2());
     if (fFilter->manager().isEmpty()) {

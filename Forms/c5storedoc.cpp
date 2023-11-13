@@ -628,14 +628,20 @@ void C5StoreDoc::hotKey(const QString &key)
     }
 }
 
-bool C5StoreDoc::openDraft(const QString &id)
+bool C5StoreDoc::openDraft(const QString &id, QString &err)
 {
     C5Database db(fDBParams);
+    db[":f_id"] = id;
+    db.exec("select * from a_header where f_id=:f_id");
+    if (db.nextRow()) {
+        return openDoc(id, err);
+    }
+    fInternalId = id;
     db[":f_id"] = id;
     db.exec("select * from o_draft_sale where f_id=:f_id");
     db.nextRow();
     ui->deDate->setDate(db.getDate("f_date"));
-    ui->leReason->setValue(DOC_REASON_SALE_RETURN);
+    ui->leReason->setValue(DOC_REASON_BACK_FROM_PARTNER);
     ui->lePartner->setValue(db.getInt("f_partner"));
     ui->leComment->setText(tr("Back from") + " " + ui->lePartnerName->text());
 
@@ -655,9 +661,9 @@ bool C5StoreDoc::openDraft(const QString &id)
 void C5StoreDoc::setReasonPartnerName()
 {
     qDebug() << ui->leReason->getInteger();
-    ui->lbReasonPartner->setVisible(ui->leReason->getInteger() == 11);
-    ui->leReasonPartner->setVisible(ui->leReason->getInteger() == 11);
-    ui->leReasonPartnerName->setVisible(ui->leReason->getInteger() == 11);
+    ui->lbReasonPartner->setVisible(ui->leReason->getInteger() == DOC_REASON_BACK_FROM_PARTNER);
+    ui->leReasonPartner->setVisible(ui->leReason->getInteger() == DOC_REASON_BACK_FROM_PARTNER);
+    ui->leReasonPartnerName->setVisible(ui->leReason->getInteger() == DOC_REASON_BACK_FROM_PARTNER);
 }
 
 bool C5StoreDoc::eventFilter(QObject *o, QEvent *e)
@@ -1145,11 +1151,17 @@ void C5StoreDoc::writeDocumentWithState(int state)
 {
     QString err;
     writeDocument(state, err);
+    C5Database db(fDBParams);
     if (err.isEmpty()) {
+        if (property("fromdraft").toString().isEmpty() == false) {
+            db[":f_id"] = fInternalId;
+            db[":f_state"] = 6;
+            db.exec("update o_draft_sale set f_state=:f_state where f_id=:f_id");
+        }
         writeAStoreSale(ui->leStoreInput->getInteger(), ui->leStoreOutput->getInteger());
         C5Message::info(tr("Saved"));
         if (fFlags.contains("outputservice")) {
-            C5Database db(fDBParams);
+
             for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
                 QString goodsid = ui->tblGoods->lineEdit(i, 9)->text().right(36);
                 db[":f_storerec"] = ui->tblGoods->getString(i, 1);

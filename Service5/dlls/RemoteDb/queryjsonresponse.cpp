@@ -1,5 +1,6 @@
 #include "queryjsonresponse.h"
 #include <QJsonArray>
+#include <QJsonDocument>
 
 QueryJsonResponse::QueryJsonResponse(Database &db, const QJsonObject &ji, QJsonObject &jo) :
     fDb(db),
@@ -14,50 +15,58 @@ void QueryJsonResponse::getResponse()
     fJsonOut["kStatus"] = 1;
     fJsonOut["kData"] = "";
 
-    if (fJsonIn["queries"].toArray().isEmpty()) {
+    if (fJsonIn["call"].toString().isEmpty()) {
         fJsonOut["kStatus"] = 4;
         fJsonOut["kData"] = "Unknown query";
         return;
     }
 
     fDb.startTransaction();
-    for (int i = 0; i < fJsonIn["queries"].toArray().size(); i++) {
-        const QJsonObject &jo = fJsonIn["queries"][i].toObject();
-        fDb[":f_name"] = jo["name"].toString();
-        fDb.exec("select * from remotedb_sql where f_name=:f_name");
-        if (fDb.next() == false) {
-            fDb.rollback();
-            fJsonOut["kData"] = QString("Unknown query with name '%1'").arg(jo["name"].toString());
+    if (fJsonIn["format"].toInt() == 1 || fJsonIn["format"].toInt() == 2) {
+        if (!fDb.exec(QString("call %1('%2')").arg(fJsonIn["call"].toString(),
+                                                 QJsonDocument(fJsonIn["params"].toObject()).toJson(QJsonDocument::Compact)))) {
             fJsonOut["kStatus"] = 4;
+            fJsonOut["kData"] = fDb.lastDbError();
+            fDb.rollback();
             return;
         }
-        QStringList query = fDb.string("f_sql").split(";", Qt::SkipEmptyParts);
-        for (const QString &q: query) {
-            for (int j = 0; j < jo["params"].toArray().size(); j++) {
-                const QJsonObject &keyValue = jo["params"][j].toObject();
-                for (const QString &key: keyValue.keys()) {
-                    switch (keyValue[key].type()) {
-                    case QJsonValue::Double:
-                        fDb[":" + key] = keyValue[key].toDouble();
-                        break;
-                    default:
-                        fDb[":" + key] = keyValue[key].toString();
-                        break;
-                    }
-                }
-            }
-            if (fDb.exec(q) == false) {
-                fJsonOut["kData"] = fDb.lastDbError();
+        if (!fDb.exec("select * from ret")) {
+            fJsonOut["kStatus"] = 4;
+            fJsonOut["kData"] = fDb.lastDbError();
+            fDb.rollback();
+            return;
+        }
+        if (fJsonIn["format"].toInt() == 1) {
+            if (!fDb.next()) {
                 fJsonOut["kStatus"] = 4;
+                fJsonOut["kData"] = "Missing database records";
                 fDb.rollback();
                 return;
             }
+            fJsonOut = QJsonDocument::fromJson(fDb.string(0).toUtf8()).object();
+        } else {
+            QJsonArray ja;
+            dbToArray(ja);
+            fJsonOut["kData"] = ja;
         }
+    } else if (fJsonIn["format"].toInt() == 3) {
+        if (!fDb.exec(QString("select %1('%2')").arg(fJsonIn["call"].toString(),
+                                                   QJsonDocument(fJsonIn["params"].toObject()).toJson(QJsonDocument::Compact)))) {
+            fJsonOut["kStatus"] = 4;
+            fJsonOut["kData"] = fDb.lastDbError();
+            fDb.rollback();
+            return;
+        }
+        if (!fDb.next()) {
+            fJsonOut["kStatus"] = 4;
+            fJsonOut["kData"] = "Missing database records";
+            fDb.rollback();
+            return;
+        }
+        qDebug() << fDb.string(0);
+        fJsonOut = QJsonDocument::fromJson(fDb.string(0).toUtf8()).object();
     }
-    QJsonArray ja;
-    dbToArray(ja);
     fDb.commit();
-    fJsonOut["kData"] = ja;
 }
 
 void QueryJsonResponse::dbToArray(QJsonArray &ja)

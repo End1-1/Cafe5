@@ -162,6 +162,8 @@ private:
 
     int fDiscountId;
 
+    int fDiscountCard;
+
     int fDiscountMode;
 
     double fDiscountValue;

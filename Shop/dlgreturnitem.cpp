@@ -224,7 +224,7 @@ void DlgReturnItem::on_btnReturn_clicked()
             db.rollback();
             return;
         }
-        if (!dw.updateField("o_header", "f_comment", QString("%1 %2").arg(tr("Return from")).arg(saledoc), "f_id", oheader.id)) {
+        if (!dw.updateField("o_header", "f_comment", QString("%1 %2").arg(tr("Return from"), saledoc), "f_id", oheader.id)) {
             C5Message::error(dw.fErrorMsg);
             db.rollback();
             return;

@@ -184,7 +184,9 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
                         if (db.nextRow()) {
                             C5Message::error(tr("Cannot input without output"));
                         } else {
+                            db[":f_id"] = db.uuid();
                             db[":f_user"] = ua.id();
+                            db[":f_hall"] = __c5config.getValue(param_default_hall).toInt();
                             db[":f_datein"] = QDate::currentDate();
                             db[":f_timein"] = QTime::currentTime();
                             db.insert("s_salary_inout", false);
@@ -224,7 +226,7 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
                             db[":f_user"] = ua.id();
                             db[":f_dateout"] = QDate::currentDate();
                             db[":f_timeout"] = QTime::currentTime();
-                            db.update("s_salary_inout", where_id(db.getInt("f_id")));
+                            db.update("s_salary_inout", where_id(db.getString("f_id")));
                             loadStaff();
                             C5Message::info(QString("%1,<br>%2").arg(tr("Good bye"), name));
                         } else {

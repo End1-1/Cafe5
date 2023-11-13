@@ -507,8 +507,8 @@ void Workspace::countTotal()
         Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
         switch (fDiscountMode) {
         case CARD_TYPE_DISCOUNT:
-            total += (d.price - (d.price * d.discount)) * d.qty;
-            fDiscountAmount += (d.price * d.discount) * d.qty;
+            total += (d.price - (d.price * fDiscountValue)) * d.qty;
+            fDiscountAmount += (d.price * fDiscountValue) * d.qty;
             break;
         case CARD_TYPE_SPECIAL_DISHES:
             total += (d.price - (d.price * d.discount)) * d.qty;
@@ -984,6 +984,7 @@ void Workspace::on_leReadCode_returnPressed()
             C5Message::error(tr("Discount already exists"));
             return;
         }
+        fDiscountCard = db.getInt("f_id");
         fDiscountMode = db.getInt("f_mode");
         fDiscountValue = db.getDouble("f_value");
         switch (fDiscountMode) {
@@ -1289,6 +1290,19 @@ bool Workspace::saveOrder(int state)
         C5Message::error(err);
         return false;
     }
+
+    BHistory bh;
+    bh.id = oheader._id();
+    bh.card = fDiscountCard;
+    bh.type = fDiscountMode;
+    bh.value = fDiscountValue;
+    bh.data = fDiscountAmount;
+    if (!bh.write(db, err)) {
+        db.rollback();
+        C5Message::error(err);
+        return false;
+    }
+
     fOrderUuid = oheader.id.toString();
 //    if (!dw.writeOHeader(fOrderUuid,
 //                         hallid.toInt(), prefix, state,
@@ -1313,7 +1327,7 @@ bool Workspace::saveOrder(int state)
             int pid = 0;
             double disc = discountValue();
             if (!dw.writeOBody(d.obodyId, fOrderUuid, DISH_STATE_OK, d.id, d.qty, d.qty2, d.price,
-                               (d.qty*d.price) - (d.qty*d.price*d.discount), __c5config.serviceFactor().toDouble(),
+                               (d.qty*d.price) - (d.qty*d.price*disc), __c5config.serviceFactor().toDouble(),
                                d.discount, d.store, d.printer, "", d.modificator, 0, d.adgCode, 0, 0, pid, i,
                                QDateTime::currentDateTime(), d.f_emarks)) {
                 C5Message::error(dw.fErrorMsg);
@@ -1370,10 +1384,28 @@ int Workspace::printTax(double cardAmount, double idramAmount)
         if (!db.getString("f_emarks").isEmpty()) {
             pt.fEmarks.append(db.getString("f_emarks"));
         }
-        pt.addGoods(C5Config::taxDept().toInt(),
-                    db.getString("f_adgcode"), db.getString("f_dish"),
-                    db.getString("f_name"), db.getDouble("f_price"),
-                    db.getDouble("f_qty1"), db.getDouble("f_discount") * 100);
+        switch (fDiscountMode) {
+        case CARD_TYPE_DISCOUNT:
+            pt.addGoods(C5Config::taxDept().toInt(),
+                        db.getString("f_adgcode"), db.getString("f_dish"),
+                        db.getString("f_name"), db.getDouble("f_price"),
+                        db.getDouble("f_qty1"), fDiscountValue * 100);
+            break;
+        case CARD_TYPE_SPECIAL_DISHES:
+            pt.addGoods(C5Config::taxDept().toInt(),
+                        db.getString("f_adgcode"), db.getString("f_dish"),
+                        db.getString("f_name"), db.getDouble("f_price"),
+                        db.getDouble("f_qty1"), db.getDouble("f_discount") * 100);
+            break;
+        default:
+            pt.addGoods(C5Config::taxDept().toInt(),
+                        db.getString("f_adgcode"), db.getString("f_dish"),
+                        db.getString("f_name"), db.getDouble("f_price"),
+                        db.getDouble("f_qty1"), db.getDouble("f_discount") * 100);
+            break;
+        }
+
+
     }
     QString jsonIn, jsonOut, err;
     int result = 0;
@@ -1453,10 +1485,17 @@ bool Workspace::printReceipt(const QString &id, bool printSecond, bool precheck)
         }
         packages[db.getInt("f_id")] = p;
     }
+
+    BHistory bh;
+    bh.id = id;
+    bh.getRecord(db);
+
     db[":f_id"] = id;
     db.exec("select o.f_prefix, o.f_hallid, t.f_firmname, t.f_address, t.f_dept, t.f_hvhh, t.f_devnum, "
-            "t.f_serial, t.f_fiscal, t.f_receiptnumber, t.f_time as f_taxtime, concat(left(u.f_first, 1), '. ', u.f_last) as f_staff, "
-            "o.f_amountcash, o.f_amountcard, o.f_amountidram, o.f_amountother, o.f_amounttotal, o.f_print, o.f_comment, ht.f_name as f_tablename, "
+            "t.f_serial, t.f_fiscal, t.f_receiptnumber, t.f_time as f_taxtime, "
+            "concat(left(u.f_first, 1), '. ', u.f_last) as f_staff, "
+            "o.f_amountcash, o.f_amountcard, o.f_amountidram, o.f_amountother, o.f_amounttotal, o.f_print, "
+            "o.f_comment, ht.f_name as f_tablename, "
             "p.f_contact, p.f_phone, p.f_address, o.f_taxpayertin "
             "from o_header o "
             "left join o_tax t on t.f_id=o.f_id "
@@ -1525,14 +1564,17 @@ bool Workspace::printReceipt(const QString &id, bool printSecond, bool precheck)
     C5Database dd(fDBParams);
     dd[":f_header"] = id;
     dd[":f_state"] = DISH_STATE_OK;
-    dd.exec("select b.f_adgcode, b.f_dish, d.f_name, b.f_price - (b.f_price * b.f_discount) as f_price, b.f_qty1, "
+    dd.exec("select b.f_adgcode, b.f_dish, d.f_name, b.f_price as f_clearprice, "
+            "b.f_price - (b.f_price * b.f_discount) as f_price, b.f_qty1, "
             "b.f_package, b.f_comment, b.f_discount "
             "from o_body b "
             "left join d_dish d on d.f_id=b.f_dish "
             "where b.f_header=:f_header and b.f_state=:f_state "
             "order by b.f_package, b.f_row ");
     int package = 0;
+    double clearTotal = 0;
     while (dd.nextRow()) {
+        clearTotal += dd.getDouble("f_qty1") * dd.getDouble("f_clearPrice");
         if (dd.getInt("f_package") > 0) {
             if (package != dd.getInt("f_package")) {
                 if (package > 0) {
@@ -1600,6 +1642,14 @@ bool Workspace::printReceipt(const QString &id, bool printSecond, bool precheck)
     p.line(4);
     p.br(3);
     p.setFontBold(true);
+    if (bh.card > 0) {
+        p.ltext(QString("%1").arg(tr("Total")), 0);
+        p.rtext(float_str(clearTotal, 2));
+        p.br();
+        p.ltext(QString("%1 %2%").arg(tr("Discount"), float_str(bh.value * 100, 2)), 0);
+        p.rtext(float_str(bh.data, 2));
+        p.br();
+    }
     p.ltext(tr("Need to pay"), 0);
     p.rtext(float_str(db.getDouble("f_amounttotal"), 2));
     p.br();
@@ -2069,6 +2119,14 @@ void Workspace::on_tblTables_itemClicked(QTableWidgetItem *item)
         ui->tblTables->setItem(item->row(), item->column(), item);
         fOrderUuid = db.getString("f_id");
         fCustomer = db.getInt("f_partner");
+        BHistory bh;
+        bh.id = fOrderUuid;
+        if (bh.getRecord(db)) {
+            fDiscountMode = bh.type;
+            fDiscountCard = bh.card;
+            fDiscountValue = bh.value;
+        }
+
         db[":f_header"] = fOrderUuid;
         db[":f_state"] = DISH_STATE_OK;
         db.exec("select b.f_dish, b.f_adgcode, d.f_name, b.f_qty1, b.f_qty2, b.f_price, b.f_comment, "

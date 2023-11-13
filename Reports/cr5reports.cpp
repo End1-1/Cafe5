@@ -102,9 +102,15 @@ bool CR5Reports::tblDoubleClicked(int row, int column, const QList<QVariant> &va
         db.nextRow();
         int type = db.getInt("f_saletype");
         if (type == 3) {
+            QString err;
             auto *storedoc = __mainWindow->createTab<C5StoreDoc>(fDBParams);
+            storedoc->setProperty("fromdraft", values.at(0).toString());
             storedoc->setMode(C5StoreDoc::sdInput);
-            storedoc->openDraft(values.at(0).toString());
+            if (!storedoc->openDraft(values.at(0).toString(), err))  {
+                C5Message::error(err);
+                return false;
+            }
+
 
         } else {
                 auto *retaildoc = __mainWindow->createTab<C5SaleDoc>(fDBParams);
