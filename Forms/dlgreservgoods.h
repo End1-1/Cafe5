@@ -37,6 +37,8 @@ private slots:
 
     void on_btnStore_clicked();
 
+    void on_btnPrintFiscal_clicked();
+
 private:
     Ui::DlgReservGoods *ui;
 

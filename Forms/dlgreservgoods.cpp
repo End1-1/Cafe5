@@ -8,6 +8,11 @@
 #include "dataonline.h"
 #include "dlgdataonline.h"
 #include "c5config.h"
+#include "printtaxn.h"
+#if(!defined FRONTDESK && !defined WAITER)
+#include "worder.h"
+#include "working.h"
+#endif
 #include <QJsonDocument>
 #include <QJsonObject>
 
@@ -50,6 +55,10 @@ DlgReservGoods::DlgReservGoods(const QStringList &dbParams, int id) :
     ui->btnCancelReserve->setVisible(db.getInt("f_state") == GR_RESERVED);
     ui->btnCompleteReserve->setVisible(db.getInt("f_state") == GR_RESERVED);
     ui->leReservedQty->setReadOnly(true);
+    ui->lePrepaid->setDouble(db.getDouble("f_prepaid"));
+    ui->lePrepaidCard->setDouble(db.getDouble("f_prepaidcard"));
+    ui->leFiscal->setInteger(db.getInt("f_fiscal"));
+    ui->btnPrintFiscal->setEnabled(ui->leFiscal->getInteger() == 0);
 }
 
 DlgReservGoods::DlgReservGoods(const QStringList &dbParams) :
@@ -71,6 +80,8 @@ void DlgReservGoods::messageResult(const QJsonObject &jo)
     sender()->deleteLater();
     if (jo["status"].toInt() > 0) {
         C5Message::error(jo["data"].toString());
+    } else {
+
     }
 }
 
@@ -134,6 +145,12 @@ void DlgReservGoods::setState(int state)
     }
     ui->btnCancelReserve->setVisible(false);
     ui->btnCompleteReserve->setVisible(false);
+#if(!defined FRONTDESK && !defined WAITER)
+    WOrder *wo = Working::working()->newSale(SALE_RETAIL);
+    wo->addGoods(fGoods);
+    wo->setQtyOfRow(0, ui->leReservedQty->getDouble());
+    wo->fOHeader.amountPrepaid = ui->lePrepaid->getDouble() + ui->lePrepaidCard->getDouble();
+#endif
 }
 
 void DlgReservGoods::updateState(const QStringList &dbparams, int state)
@@ -168,6 +185,9 @@ void DlgReservGoods::insertReserve(const QStringList &dbparams)
     db[":f_message"] = ui->leMessage->text();
     db[":f_source"] = __c5config.defaultStore();
     db[":f_enddate"] = ui->leEndDay->date();
+    db[":f_prepaid"] = ui->lePrepaid->getDouble();
+    db[":f_prepaidcard"] = ui->lePrepaidCard->getDouble();
+    db[":f_fiscal"] = ui->leFiscal->getInteger();
     if (ui->leCode->isEmpty()) {
         db[":f_date"] = QDate::currentDate();
         db[":f_time"] = QTime::currentTime();
@@ -180,6 +200,7 @@ void DlgReservGoods::insertReserve(const QStringList &dbparams)
     } else {
         db.update("a_store_reserve", "f_id", ui->leCode->getInteger());
     }
+    ui->btnPrintFiscal->setEnabled(ui->leFiscal->getInteger() == 0);
 }
 
 void DlgReservGoods::on_btnCompleteReserve_clicked()
@@ -240,5 +261,21 @@ void DlgReservGoods::getAvailableGoods()
         if (db.nextRow()) {
             ui->leTotalQty->setDouble(ui->leTotalQty->getDouble() - db.getDouble(0));
         }
+    }
+}
+
+void DlgReservGoods::on_btnPrintFiscal_clicked()
+{
+    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(),
+                 C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
+    QString jsonIn, jsonOut, err;
+    int result = 0;
+    if (pt.printAdvanceJson(ui->lePrepaid->getDouble(), ui->lePrepaidCard->getDouble(), jsonIn, jsonOut, err) != pt_err_ok) {
+        C5Message::error(err);
+    } else {
+        QString firm, hvhh, fiscal, number, sn, address, devnum, time;
+        pt.parseResponse(jsonOut, firm, hvhh, fiscal, number, sn, address, devnum, time);
+        ui->leFiscal->setText(number);
+        on_btnSave_clicked();
     }
 }

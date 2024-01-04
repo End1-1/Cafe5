@@ -63,6 +63,8 @@ public:
 
     bool execDirect(const QString &sqlQuery);
 
+    bool execNetwork(const QString &sqlQuery);
+
     static QString uuid();
 
     QByteArray uuid_bin();
@@ -187,6 +189,8 @@ public:
 
     static bool LOGGING;
 
+    QSqlQuery *fQuery;
+
 private:
     bool fIsReady;
 
@@ -207,8 +211,6 @@ private:
     bool exec(const QString &sqlQuery, bool &isSelect);
 
     static QStringList fDbParamsForUuid;
-
-    QSqlQuery *fQuery;
 
 };
 

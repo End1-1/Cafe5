@@ -10,12 +10,14 @@
 #include <QApplication>
 #include <QUuid>
 
-SocketThread::SocketThread(int handle, const QSslCertificate &cert, const QSslKey &key, QSsl::SslProtocol proto) :
+SocketThread::SocketThread(int handle, const QSslCertificate &cert, const QSslKey &key, QSsl::SslProtocol proto, const QList<QSslCertificate> chain) :
     QObject(),
     fSocketDescriptor(handle),
     fSslLocalCertificate(cert),
     fSslPrivateKey(key),
-    fSslProtocol(proto)
+    fSslProtocol(proto),
+    fSslChain(chain),
+    fRawHandler(0)
 {
     fMessageNumber = 0;
     fPreviouseMessageNumber = 0;
@@ -33,7 +35,8 @@ SocketThread::~SocketThread()
         delete fSslSocket;
     }
     delete fTimeoutControl;
-    delete fRawHandler;
+    if (fRawHandler)
+        delete fRawHandler;
 }
 
 void SocketThread::run()
@@ -42,18 +45,21 @@ void SocketThread::run()
     setProperty("session", QUuid::createUuid().toString());
     fTimeoutControl = new QTimer();
     connect(fTimeoutControl, &QTimer::timeout, this, &SocketThread::timeoutControl);
-    fTimeoutControl->start(5000);
+    fTimeoutControl->start(10000);
 
     fSslSocket = new SslSocket();
+    fSslSocket->setSocketDescriptor(fSocketDescriptor);
     fSslSocket->setProperty("session", property("session"));
-    qDebug() << "set socket description" << fSslSocket->setSocketDescriptor(fSocketDescriptor);
-    fSslSocket->setLocalCertificate(fSslLocalCertificate);
     fSslSocket->setPeerVerifyMode(QSslSocket::VerifyNone);
+    fSslSocket->setLocalCertificate(fSslLocalCertificate);
     fSslSocket->setPrivateKey(fSslPrivateKey);
     fSslSocket->setProtocol(fSslProtocol);
+    fSslSocket->setLocalCertificateChain(fSslChain);
     fSslSocket->startServerEncryption();
 //    if (!fSslSocket->waitForEncrypted()) {
-//        qDebug() <<fSslSocket->errorString();
+//        LogWriter::write(LogWriterLevel::errors, "!fSslSocket->waitForEncrypted()", fSslSocket->errorString());
+//        emit finished();
+//        return;
 //    }
     fRawHandler = new RawHandler(fSslSocket, property("session").toString());
     connect(fRawHandler, &RawHandler::writeToSocket, this, &SocketThread::writeToSocket);
@@ -63,6 +69,7 @@ void SocketThread::run()
     connect(fSslSocket, SIGNAL(readyRead()), this, SLOT(readyRead()));
     connect(fSslSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(error(QAbstractSocket::SocketError)));
     connect(fSslSocket, SIGNAL(disconnected()), this, SLOT(disconnected()));
+
     LogWriter::write(LogWriterLevel::verbose, property("session").toString(),
                      QString("New connection from %1:%2")
                      .arg(QHostAddress(fSslSocket->peerAddress().toIPv4Address()).toString())
@@ -385,11 +392,18 @@ void SocketThread::readyRead()
     ba.append(0x15);
 
     if (fData.isEmpty()) {
-        LogWriter::write(LogWriterLevel::warning, "empty dayta", QString(fData));
+        LogWriter::write(LogWriterLevel::warning, "", "Start reading from socket");
         fData = fSslSocket->read(3);
+        if (fData.length() == 0) {
+            LogWriter::write(LogWriterLevel::errors, "", "Could not determain connection type");
+            emit finished();
+            return;
+        }
         if (fData.compare(ba) == 0) {
+            LogWriter::write(LogWriterLevel::verbose, "", "Connection type raw data");
             fSocketType = RawData;
         } else {
+            LogWriter::write(LogWriterLevel::verbose, "", "Connection type http request");
             fSocketType = HttpRequest;
         }
     }

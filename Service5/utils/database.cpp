@@ -286,3 +286,25 @@ QStringList Database::params()
     p.append(fSqlDatabase.password());
     return p;
 }
+
+QJsonObject Database::columnsData()
+{
+    QJsonObject jr;
+    QJsonArray ja;
+    for (QHash<QString, int>::const_iterator it = fColumnsNames.constBegin(); it != fColumnsNames.constEnd(); it++) {
+        QJsonObject jv;
+        jv["name"] = it.key();
+        jv["value"] = it.value();
+        ja.append(jv);
+    }
+    jr["column_name_index"] = ja;
+    ja = QJsonArray();
+    for (QHash<int, QString>::const_iterator it = fColumnsIndexes.constBegin(); it != fColumnsIndexes.constEnd(); it++) {
+        QJsonObject jv;
+        jv["name"] = it.key();
+        jv["value"] = it.value();
+        ja.append(jv);
+    }
+    jr["column_index_name"] = ja;
+    return jr;
+}

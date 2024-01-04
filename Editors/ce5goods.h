@@ -103,6 +103,8 @@ private slots:
 
     void on_btnNewModel_clicked();
 
+    void on_leScanCode_returnPressed();
+
 private:
     Ui::CE5Goods *ui;
 

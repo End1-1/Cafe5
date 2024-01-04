@@ -14,7 +14,7 @@ DataOnline::DataOnline(const QStringList &dbParams) :
             fColumnNames.insert(db.getString("f_name"), QHash<QString, int>());
             fTableQueries[db.getString("f_name")] = db.getString("f_sql");
         }
-        for (const QString &table: fColumnNames.keys()                   ) {
+        for (const QString &table: fColumnNames.keys()) {
             db.exec(fTableQueries[table] + " where t.f_id=-1");
             fColumnNames[table] = db.fNameColumnMap;
         }
@@ -23,7 +23,6 @@ DataOnline::DataOnline(const QStringList &dbParams) :
 
 QVariant DataOnline::value(const QString &table, const QString &field, int id)
 {
-
     Q_ASSERT(fTableQueries.contains(table));
     bool needupdate = false;
     if (!fIdRow.contains(table)) {

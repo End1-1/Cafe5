@@ -15,7 +15,7 @@ class SocketThread : public QObject
     Q_OBJECT
 
 public:
-    SocketThread(int handle, const QSslCertificate &cert, const QSslKey &key, QSsl::SslProtocol proto);
+    SocketThread(int handle, const QSslCertificate &cert, const QSslKey &key, QSsl::SslProtocol proto, const QList<QSslCertificate> chain);
     ~SocketThread();
     SslSocket *fSslSocket;
 
@@ -26,6 +26,7 @@ private:
     QSslCertificate fSslLocalCertificate;
     QSslKey fSslPrivateKey;
     QSsl::SslProtocol fSslProtocol;
+    QList<QSslCertificate> fSslChain;
 
     RawHandler *fRawHandler;
     QTimer *fTimeoutControl;

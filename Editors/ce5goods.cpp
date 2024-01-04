@@ -13,6 +13,7 @@
 #include "ce5goodsmodel.h"
 #include "c5user.h"
 #include "c5storebarcode.h"
+#include "c5replacecharacter.h"
 #include <QClipboard>
 #include <QFontDatabase>
 #include <QDateTime>
@@ -42,7 +43,7 @@ CE5Goods::CE5Goods(const QStringList &dbParams, QWidget *parent) :
     ui->leClass3->setSelector(dbParams, ui->leClassName3, cache_goods_classes);
     ui->leClass4->setSelector(dbParams, ui->leClassName4, cache_goods_classes);
     ui->leStoreId->setSelector(dbParams, ui->leStoreIdName, cache_goods, 1, 3);
-    ui->leModel->setSelector(dbParams, ui->leModelName, cache_goods_model);
+
 #ifndef QT_DEBUG
     ui->leIsComplect->setVisible(false);
 #endif
@@ -100,7 +101,7 @@ CE5Goods::CE5Goods(const QStringList &dbParams, QWidget *parent) :
         ui->tblAs->setString(r, 1, db.getString("f_name"));
         ui->tblAs->createLineEdit(r, 2);
     }
-    ui->leModel->setValue(1);
+
 }
 
 CE5Goods::~CE5Goods()
@@ -211,12 +212,11 @@ void CE5Goods::setId(int id)
         ui->tblAs->lineEdit(asrow, 2)->setText(db.getString("f_ascode"));
     }
 
-    ui->leModel->setValue(1);
+
 }
 
 bool CE5Goods::save(QString &err, QList<QMap<QString, QVariant> > &data)
 {
-    ui->leModel->setValue(1);
     fLastGroup = ui->leGroup->getInteger();
     fLastUnit = ui->leUnit->getInteger();
 
@@ -953,7 +953,12 @@ void CE5Goods::on_btnNewModel_clicked()
     C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
     QList<QMap<QString, QVariant> > data;
     if(e->getResult(data)) {
-        ui->leModel->setValue(data.at(0)["f_id"].toString());
+
     }
     delete e;
+}
+
+void CE5Goods::on_leScanCode_returnPressed()
+{
+    ui->leScanCode->setText(C5ReplaceCharacter::replace(ui->leScanCode->text()));
 }

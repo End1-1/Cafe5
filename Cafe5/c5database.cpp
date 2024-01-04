@@ -12,6 +12,13 @@
 #include <QUuid>
 #include <QSqlField>
 #include <QException>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <QThread>
+#include <QApplication>
 
 #ifndef _NOAPP_
 #include <QMessageBox>
@@ -134,6 +141,9 @@ void C5Database::setDatabase(const QString &host, const QString &db, const QStri
 
 bool C5Database::open()
 {
+#ifdef NETWORKDB
+    return true;
+#endif
     fLastError = "";
     bool isOpened = true;
     if (!fDb.isOpen()) {
@@ -153,6 +163,9 @@ bool C5Database::open()
 
 bool C5Database::startTransaction()
 {
+#ifdef NETWORKDB
+    return true;
+#endif
     if (!open()) {
         return false;
     }
@@ -161,11 +174,17 @@ bool C5Database::startTransaction()
 
 bool C5Database::commit()
 {
+#ifdef NETWORKDB
+    return true;
+#endif
     return fQuery->exec("commit");
 }
 
 void C5Database::rollback()
 {
+#ifdef NETWORKDB
+    return;
+#endif
     fQuery->exec("rollback");
 }
 
@@ -201,6 +220,16 @@ bool C5Database::exec(const QString &sqlQuery, QList<QList<QVariant> > &dbrows, 
 {
     bool isSelect = true;
     bool result = true;
+#ifdef NETWORKDB
+    if(execNetwork(sqlQuery)) {
+        dbrows = fDbRows;
+        columns = fNameColumnMap;
+        return true;
+    } else {
+        return false;
+    }
+#endif
+
     if (!exec(sqlQuery, isSelect)) {
         fBindValues.clear();
         return false;
@@ -231,6 +260,9 @@ bool C5Database::exec(const QString &sqlQuery, QMap<QString, QList<QVariant> > &
 {
     bool isSelect = true;
     bool result = true;
+#ifdef NETWORKDB
+    return execNetwork(sqlQuery);
+#endif
 
     if (!exec(sqlQuery, isSelect)) {
         fBindValues.clear();
@@ -264,17 +296,135 @@ bool C5Database::exec(const QString &sqlQuery, QMap<QString, QList<QVariant> > &
 
 bool C5Database::execDirect(const QString &sqlQuery)
 {
+#ifdef NETWORKDB
+    return execNetwork(sqlQuery);
+#endif
+    if (!open())  {
+        return false;
+    }
     if (!fQuery->exec(sqlQuery)) {
         fLastError = fQuery->lastError().databaseText();
         logEvent(fLastError);
         logEvent(sqlQuery);
         return false;
     }
-
+#ifdef QT_DEBUG
+    logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + lastQuery(fQuery));
+#else
     if (LOGGING) {
         logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + lastQuery(fQuery));
     }
+#endif
 
+    return true;
+}
+
+bool C5Database::execNetwork(const QString &sqlQuery)
+{
+    QElapsedTimer t;
+    t.start();
+    QString sql = sqlQuery;
+    QMapIterator<QString, QVariant> it(fBindValues);
+    while (it.hasNext()) {
+        it.next();
+        QVariant value = it.value();
+        if(!it.value().isValid()) {
+            value = "null";
+        } else {
+            switch (it.value().type()) {
+            case QVariant::String:
+                value = QString("'%1'").arg(value.toString().replace("'", "''"));
+                break;
+            case QVariant::Date:
+                value = QString("'%1'").arg(value.toDate().toString("yyyy-MM-dd"));
+                break;
+            case QVariant::DateTime:
+                value = QString("'%1'").arg(value.toDateTime().toString("yyyy-MM-dd HH:mm:ss"));
+                break;
+            case QVariant::Double:
+                value = QString("%1").arg(value.toDouble());
+                break;
+            case QVariant::Int:
+                value = QString("%1").arg(value.toInt());
+                break;
+            case QVariant::Time:
+                value = QString("'%1'").arg(value.toTime().toString("HH:mm:ss"));
+                break;
+            case QVariant::ByteArray:
+                value = QString("'%1'").arg(QString(value.toByteArray().toHex()));
+                break;
+            default:
+                break;
+            }
+        }
+        sql.replace(QRegExp(it.key() + "\\b"), value.toString());
+    }
+    fBindValues.clear();
+
+    QNetworkAccessManager m;
+    QNetworkRequest rq(QString("https://%1:10002/vipclient").arg(fDb.hostName()));
+    rq.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    QSslConfiguration sslConf = rq.sslConfiguration();
+    sslConf.setPeerVerifyMode(QSslSocket::VerifyNone);
+    sslConf.setProtocol(QSsl::AnyProtocol);
+    rq.setSslConfiguration(sslConf);
+    QJsonObject jo;
+    jo["query"] = 3;
+    jo["sql"] = sql;
+    auto *r = m.post(rq, QJsonDocument(jo).toJson());
+    while (!r->isFinished()) {
+        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+        QThread::msleep(100);
+    }
+    if (r->error() != QNetworkReply::NoError) {
+        qDebug() << r->errorString();
+        return false;
+    }
+    jo = QJsonDocument::fromJson(r->readAll()).object();
+    if (jo["status"].toInt() == 0) {
+        return false;
+    }
+    jo = jo["data"].toObject();
+    QJsonArray ja = jo["columns"].toObject()["column_index_name"].toArray();
+    ja = jo["columns"].toObject()["column_name_index"].toArray();
+    QJsonObject jtype = jo["types"].toObject();
+    fNameColumnMap.clear();
+    for (int i = 0; i < ja.size(); i++) {
+        const QJsonObject &jc = ja[i].toObject();
+        fNameColumnMap[jc["name"].toString()] = jc["value"].toInt();
+    }
+    ja = jo["data"].toArray();
+    fDbRows.clear();
+    for (int i = 0; i < ja.size(); i++) {
+        QList<QVariant> r;
+        QJsonArray jar = ja[i].toArray();
+        for (int j = 0; j < jar.size(); j++) {
+            switch (jtype[QString::number(j)].toInt()) {
+            case QVariant::Int:
+                r.append(jar[j].toInt());
+                break;
+            case QVariant::Double:
+                r.append(jar[j].toDouble());
+                break;
+            case QVariant::Date:
+                r.append(QDate::fromString(jar[j].toString()));
+                break;
+            case QVariant::Time:
+                r.append(QTime::fromString(jar[j].toString()));
+                break;
+            case QVariant::DateTime:
+                r.append(QDateTime::fromString(jar[j].toString()));
+                break;
+            default:
+                r.append(jar[j].toString());
+                break;
+            }
+
+        }
+        fDbRows.append(r);
+    }
+    fCursorPos = -1;
+    qDebug() << "Elapsed" << t.elapsed() << sql;
     return true;
 }
 
@@ -472,7 +622,7 @@ QString C5Database::columnName(int index)
 QMap<QString, QVariant> C5Database::getBindValues()
 {
     QMap<QString, QVariant> b;
-    for (QHash<QString, int>::const_iterator it = fNameColumnMap.begin(); it != fNameColumnMap.end(); it++) {
+    for (QHash<QString, int>::const_iterator it = fNameColumnMap.constBegin(); it != fNameColumnMap.constEnd(); it++) {
         b[":" + it.key()] = getValue(fCursorPos, it.key());
     }
     return b;

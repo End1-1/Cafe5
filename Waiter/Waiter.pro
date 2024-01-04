@@ -71,6 +71,7 @@ SOURCES += \
     ../Classes/c5printreceiptthread50mm.cpp \
     ../Classes/c5printrecipta4.cpp \
     ../Classes/c5random.cpp \
+    ../Classes/c5replacecharacter.cpp \
     ../Classes/c5reporttemplatedriver.cpp \
     ../Classes/c5shoporder.cpp \
     ../Classes/c5storedraftwriter.cpp \
@@ -496,6 +497,7 @@ HEADERS += \
     ../Classes/c5printreceiptthread50mm.h \
     ../Classes/c5printrecipta4.h \
     ../Classes/c5random.h \
+    ../Classes/c5replacecharacter.h \
     ../Classes/c5reporttemplatedriver.h \
     ../Classes/c5shoporder.h \
     ../Classes/c5storedraftwriter.h \

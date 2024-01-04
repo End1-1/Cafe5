@@ -63,9 +63,7 @@ bool C5Selector::getValue(const QStringList &dbParams, const QString &query, QLi
     c->fSearchColumn = -1;
     c->fMultipleSelection = false;
     c->fGrid->fModel->setSingleCheckBoxSelection(true);
-
-        c->refresh();
-
+    c->refresh();
     c->fGrid->fTableView->resizeColumnsToContents();
     c->ui->leFilter->setFocus();
     bool result = c->exec() == QDialog::Accepted;

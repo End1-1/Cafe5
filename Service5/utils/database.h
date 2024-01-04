@@ -8,6 +8,7 @@
 #include <QSqlError>
 #include <QDateTime>
 #include <QJsonObject>
+#include <QJsonArray>
 
 class Database
 {
@@ -59,6 +60,7 @@ public:
     int genFBID(const QString &name);
     void rowToMap(QMap<QString, QVariant> &map);
     QStringList params();
+    QJsonObject columnsData();
 
 private:
     static int fDatabaseCounter;

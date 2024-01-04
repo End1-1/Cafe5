@@ -10,7 +10,6 @@
 #define container_aheaderstore 4
 #define container_astoredraft 5
 #define container_astoredishwaste 6
-#define container_acalcprice 7
 #define container_bclient_debts 8
 
 class C5StoreDraftWriter : QObject
@@ -26,7 +25,7 @@ public:
 
     bool writeAHeaderStore(const QString &id, int userAccept, int userPass, const QString &invoice, const QDate &invoiceDate, int storeIn, int storeOut, int basedOnSale, const QString &cashUUID, int complectation, double complectationQty, const QString &saleuuid);
 
-    bool writeAHeaderCash(const QString &id, int cashin, int cashout, int related, const QString &storedoc, const QString &oheader, int session);
+    bool writeAHeaderCash(const QString &id, int cashin, int cashout, int related, const QString &storedoc, const QString &oheader, QString session);
 
     bool writeAHeader2ShopStore(const QString &id, int store, int accept);
 
@@ -113,10 +112,6 @@ private:
 
     QHash<QString, int> fECashDataMap;
 
-    QHash<QString, int> fACalcPriceDataMap;
-
-    QList<QList<QVariant> > fACalcPriceData;
-
     QHash<QString, int> fBClientsDebtsDataMap;
 
     QList<QList<QVariant> > fBClientsDebtsData;
@@ -130,8 +125,6 @@ private:
     bool readAHeaderCash(const QString &id);
 
     bool readECash(const QString &id);
-
-    bool readACalcPrice(const QString &id);
 
     bool readBClientDebtsRefund(const QString &id);
 

@@ -23,6 +23,7 @@ private:
     QSslCertificate fSslLocalCertificate;
     QSslKey fSslPrivateKey;
     QSsl::SslProtocol fSslProtocol;
+    QList<QSslCertificate> fSslChain;
 
 private slots:
     void newConnection(int socketDescriptor);

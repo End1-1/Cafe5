@@ -147,7 +147,7 @@ void CR5Documents::openDoc(QString id)
     switch (docType(id)) {
     case DOC_TYPE_STORE_INPUT: {
 #ifdef NEWVERSION
-        auto *si = __mainWindow->createTab<StoreInputDocument>(fDBParams);
+        aauto *si = __mainWindow->createTab<StoreInputDocument>(fDBParams);
         if (!si->openDoc(id)) {
             __mainWindow->removeTab(si);
         }

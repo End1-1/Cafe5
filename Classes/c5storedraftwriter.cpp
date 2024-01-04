@@ -339,17 +339,6 @@ bool C5StoreDraftWriter::readECash(const QString &id)
     }
 }
 
-bool C5StoreDraftWriter::readACalcPrice(const QString &id)
-{
-    fDb[":f_document"] = id;
-    if (fDb.exec("select * from a_calc_price where f_document=:f_document", fACalcPriceData, fACalcPriceDataMap)) {
-         return true;
-    } else {
-        fErrorMsg = fDb.fLastError;
-        return false;
-    }
-}
-
 bool C5StoreDraftWriter::readBClientDebtsRefund(const QString &id)
 {
     fDb[":f_storedoc"] = id;
@@ -417,9 +406,7 @@ bool C5StoreDraftWriter::readAHeader(const QString &id)
             if (result) {
                 result = readAStoreDraft(id);
             }
-            if (result) {
-                result = readACalcPrice(id);
-            }
+
             if (result) {
                 result = readBClientDebtsRefund(id);
             }
@@ -493,7 +480,7 @@ bool C5StoreDraftWriter::writeAHeaderCash(const QString &id,
                                           int related,
                                           const QString &storedoc,
                                           const QString &oheader,
-                                          int session)
+                                          QString session)
 {
     bool u = false;
     fDb[":f_id"] = id;
@@ -543,9 +530,6 @@ int C5StoreDraftWriter::rowCount(int container)
     case container_astoredishwaste:
         rc = fAStoreDishWaste.count();
         break;
-    case container_acalcprice:
-        rc = fACalcPriceData.count();
-        break;
     case container_bclient_debts:
         rc = fBClientsDebtsData.count();
         break;
@@ -582,10 +566,6 @@ QVariant C5StoreDraftWriter::value(int container, int row, const QString &key)
     case container_astoredishwaste:
         c = &fAStoreDishWaste;
         d = &fAStoreDishWasteDataMap;
-        break;
-    case container_acalcprice:
-        c = &fACalcPriceData;
-        d = &fACalcPriceDataMap;
         break;
     case container_bclient_debts:
         c = &fBClientsDebtsData;

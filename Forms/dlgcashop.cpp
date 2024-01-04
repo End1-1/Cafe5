@@ -49,7 +49,7 @@ void DlgCashOp::on_btnSave_clicked()
         return;
     }
     if (!dw.writeAHeaderCash(cashdoc, fSign ? __c5config.cashId() : 0, fSign ? 0 : __c5config.cashId(),
-                             0, "", "", __c5config.getRegValue("session").toInt())) {
+                             0, "", "", __c5config.getRegValue("session").toString())) {
         C5Message::error(dw.fErrorMsg);
         return;
     }

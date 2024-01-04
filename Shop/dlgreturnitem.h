@@ -24,6 +24,10 @@ private slots:
 
     void on_btnReturn_clicked();
 
+    void on_btnReturnCash_clicked();
+
+    void on_btnReturnCard_clicked();
+
 private:
     Ui::DlgReturnItem *ui;
 };

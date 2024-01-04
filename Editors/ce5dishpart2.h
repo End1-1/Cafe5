@@ -22,6 +22,10 @@ public:
 
     virtual bool checkData(QString &err) override;
 
+    virtual void setId(int id) override;
+
+    virtual void clear() override;
+
 private:
     Ui::CE5DishPart2 *ui;
 
@@ -29,6 +33,12 @@ private slots:
     void selectColor();
 
     void on_btnNewPart_clicked();
+
+    void on_lbImg_customContextMenuRequested(const QPoint &pos);
+
+    void uploadImage();
+
+    void removeImage();
 };
 
 #endif // CE5DISHPART2_H

@@ -11,7 +11,7 @@ public:
     StoreManager();
     static void init(const QString &databaseName);
     static void release();
-    static int queryQty(int store, const QStringList &sku, QMap<QString, double> &out);
+    static int queryQty(int store, const QStringList &sku, QJsonArray &out);
     static int queryQty(const QStringList &sku, QMap<int, QMap<QString, double> > &out);
     static int codeOfSku(const QString &sku);
     static QString nameOfSku(const QString &sku);

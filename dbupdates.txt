@@ -1334,7 +1334,7 @@ alter table mf_process_details drop column f_34,drop column f_36,drop column f_3
 alter table c_goods_option add f_lastvaliddate date;
 insert into c_goods_option (f_id) select f_id from c_goods where f_id not in (select f_id from c_goods_option);
 
-/* db - 132, 05.09.2023 */
+/* db - 132, 05.09.2023 */wesasfdsdf
 update s_app set f_version='132' where f_app='DB';
 alter table o_body add column  f_emarks tinytext;
 alter table o_goods add column f_emarks tinytext;
@@ -1357,3 +1357,34 @@ alter table o_Header add column f_amountcredit decimal after f_amountbank;
 update s_app set f_version='136' where f_app='DB';
 create table remotedb_sql (f_id integer primary key auto_increment, f_name tinytext, f_sql text);
 ALTER TABLE `s_login_session` CHANGE COLUMN `f_session` `f_session` CHAR(36) NULL DEFAULT NULL AFTER `f_id`;
+alter table s_salary_inout change column f_id f_id char(36);
+UPDATE s_salary_inout SET f_id=UUID();
+alter table s_salary_inout add column f_hall integer;
+insert into o_draft_sale_state (f_id, f_name) values (6, 'Գրանցված հետվերադարձ');
+
+/*db - 137, 24.10.2023*/
+update s_app set f_version='137' where f_app='DB';
+alter table o_preorder add column f_guest INT, ADD column f_comment tinytext, add column f_feedback tinytext;
+alter table remotedb_sql add column f_type int after f_id;
+
+/*db - 138, 24.10.2023*/
+update s_app set f_version='138' where f_app='DB';
+CREATE TABLE d_dish_set (f_id INTEGER PRIMARY KEY AUTO_INCREMENT, f_dish INTEGER, f_part INTEGER, f_qty DECIMAL(12,2));
+alter table d_part2 add column f_qr tinyint;
+alter table a_header_cash change column f_session f_session char(36);
+
+/*db - 139, 13.12.2023*/
+update s_app set f_version='139' where f_app='DB';
+ALTER TABLE a_store_reserve ADD COLUMN f_prepaid DECIMAL(12,2), ADD COLUMN f_fiscal int;
+alter table a_store_reserve add column f_prepaidcard decimal(12,2) after f_prepaid;
+
+/*db - 140, 22.12.2023*/
+update s_app set f_version='140' where f_app='DB';
+create table s_images (f_id char(36) primary key, f_data mediumtext);
+alter table d_part2 add f_image char(36) DEFAULT uuid();
+update d_part2 set f_image=uuid();
+alter table d_dish add column f_image char(36);
+update d_dish set f_image=uuid();
+alter table d_dish add column f_cookingtime int;
+update d_dish set f_cookingtime=0;
+create table o_body_process( f_id char(36) primary key, f_append timestamp default null, f_print timestamp default null, f_begin timestamp default null, f_end timestamp default null);

@@ -37,6 +37,7 @@ bool BHistory::write(C5Database &db, QString &err)
     if (u) {
         return getWriteResult(db, db.update("b_history", where_id(id)), err);
     } else {
+        db[":f_id"] = db.uuid();
         return getWriteResult(db, db.insert("b_history", false), err);
     }
 }

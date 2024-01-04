@@ -29,7 +29,7 @@ public:
     template<typename T>
     T *createTab(const QStringList &dbParams) {
         T *t = new T(dbParams);
-        fTab->addTab(t, t->icon(), QString("[%1] %2").arg(dbParams.at(5)).arg(t->label()));
+        fTab->addTab(t, t->icon(), QString("%1").arg(t->label()));
         fTab->setCurrentIndex(fTab->count() - 1);
         t->postProcess();
         return t;
@@ -71,8 +71,6 @@ private slots:
 
     void on_btnHideMenu_clicked();
 
-    void on_btnChangeDB_clicked();
-
     void on_btnMenuClick();
 
     void on_btnFavoriteClicked();
@@ -81,8 +79,6 @@ private:
     Ui::C5MainWindow *ui;
 
     QList<QListWidget*> fMenuLists;
-
-    QMap<QString, QStringList> fDatabases;
 
     QLabel *fStatusLabel;
 
@@ -106,7 +102,7 @@ private:
 
     bool addMainLevel(const QString &db, int permission, const QString &title, const QString &icon, QListWidget *&l);
 
-    void setDB(const QString &dbname);
+    void setDB();
 
     void enableMenu(bool v);
 
@@ -117,8 +113,6 @@ private:
     QString itemIconName(int permission);
 
     void removeFromFavorite(int permission);
-
-    void autoLogin();
 };
 
 extern C5MainWindow *__mainWindow;

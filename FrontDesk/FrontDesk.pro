@@ -24,6 +24,7 @@ DEFINES += _ORGANIZATION_=\\\"Jazzve\\\"
 DEFINES += _APPLICATION_=\\\"Cafe5\\\"
 DEFINES += _MODULE_=\\\"FRONTDESK\\\"
 DEFINES += FRONTDESK
+#DEFINES += NETWORKDB
 
 #DEFINES += NEWVERSION
 
@@ -51,6 +52,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Classes/c5logtoserverthread.cpp \
     ../Classes/c5printrecipta4.cpp \
     ../Classes/c5random.cpp \
+    ../Classes/c5replacecharacter.cpp \
     ../Classes/c5reporttemplatedriver.cpp \
     ../Classes/c5storedraftwriter.cpp \
     ../Classes/c5threadobject.cpp \
@@ -392,6 +394,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Classes/c5logtoserverthread.h \
     ../Classes/c5printrecipta4.h \
     ../Classes/c5random.h \
+    ../Classes/c5replacecharacter.h \
     ../Classes/c5reporttemplatedriver.h \
     ../Classes/c5storedraftwriter.h \
     ../Classes/c5threadobject.h \

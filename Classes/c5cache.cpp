@@ -204,33 +204,6 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         fTableCache["c_partners_state"] = cache_partner_state;
         fTableCache["c_goods_model"] = cache_goods_model;
     }
-    fVersion = 0;
-    C5Database db(dbParams);
-    db.startTransaction();
-    if (!db.exec("select f_id from s_cache for update")) {
-        return;
-    }
-    QList<int> missingCache;
-    for (QMap<QString, int>::const_iterator it = fTableCache.constBegin(); it != fTableCache.constEnd(); it++) {
-        bool found = false;
-        for (int  i = 0; i < db.rowCount(); i++) {
-            if (db.getInt(i, "f_id") == it.value()) {
-                found = true;
-                break;
-            }
-        }
-        if (!found) {
-            missingCache << it.value();
-        }
-    }
-    foreach (int k, missingCache) {
-        db[":f_id"] = k;
-        db[":f_version"] = 0;
-        if (!db.insert("s_cache", false)) {
-            break;
-        }
-    }
-    db.commit();
 }
 
 QList<QVariant> C5Cache::getJoinedColumn(const QString &columnName)
@@ -284,16 +257,6 @@ C5Cache *C5Cache::cache(const QStringList &dbParams, int cacheId)
             query = "select 0";
         }
         cache->loadFromDatabase(query);
-    } else {
-        C5Database db(cache->fDBParams);
-        db[":f_id"] = cache->fId;
-        db.exec("select f_version from s_cache where f_id=:f_id");
-        if (db.nextRow()) {
-            if (cache->fVersion != db.getInt(0)) {
-                QString query = fCacheQuery[cacheId];
-                cache->loadFromDatabase(query);
-            }
-        }
     }
     return cache;
 }
@@ -323,11 +286,6 @@ void C5Cache::loadFromDatabase(const QString &query)
     db.exec(query, fCacheData, fCacheColumns[fId]);
     for (int i = 0; i < fCacheData.count(); i++) {
         fCacheIdRow[fCacheData[i][0].toInt()] = i;
-    }
-    db[":f_id"] = fId;
-    db.exec("select f_version from s_cache where f_id=:f_id");
-    if (db.nextRow()) {
-        fVersion = db.getInt(0);
     }
 }
 

@@ -15,6 +15,7 @@
 #include "c5shoporder.h"
 #include "dlgsearchpartner.h"
 #include "working.h"
+#include "c5replacecharacter.h"
 #include "dlgpaymentchoose.h"
 #include "c5user.h"
 #include "c5cache.h"
@@ -906,6 +907,7 @@ void WOrder::on_leCode_textChanged(const QString &arg1)
         return;
     }
     if (arg1 == "-") {
+        keyMinus();
         return;
     }
     if (arg1 == "*") {
@@ -919,7 +921,7 @@ void WOrder::on_leCode_textChanged(const QString &arg1)
 
 void WOrder::on_leCode_returnPressed()
 {
-    QString code = ui->leCode->text();
+    QString code = C5ReplaceCharacter::replace(ui->leCode->text());
     if (code.isEmpty()) {
         return;
     }

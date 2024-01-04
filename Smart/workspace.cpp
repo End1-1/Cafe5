@@ -135,7 +135,7 @@ bool Workspace::login()
     db.exec("select * from s_salary_inout where f_comp=:f_comp and f_dateout is null");
     if (db.nextRow()) {
         if (db.getInt("f_user") == fUser->id()) {
-            __c5config.setRegValue("session", db.getInt("f_id"));
+            __c5config.setRegValue("session", db.getString("f_id"));
             C5Message::info(tr("Continue session"));
         } else {
             db[":f_id"] = db.getInt("f_user");
@@ -145,11 +145,14 @@ bool Workspace::login()
             return false;
         }
     } else {
+        QString uuid = db.uuid();
+        db[":f_id"] = uuid;
         db[":f_user"] = fUser->id();
         db[":f_datein"] = QDate::currentDate();
         db[":f_timein"] = QTime::currentTime();
         db[":f_comp"] = hostinfo;
-        __c5config.setRegValue("session", db.insert("s_salary_inout", true));
+        db.insert("s_salary_inout", false);
+        __c5config.setRegValue("session", uuid);
     }
 
     ui->lbStaffName->setText(fUser->fullName());
@@ -191,7 +194,7 @@ bool Workspace::login()
     db[":f_menu"] = C5Config::defaultMenu();
     db.exec("SELECT d.f_id, d.f_part, d.f_name,  m.f_print1, m.f_store, m.f_price, p2.f_adgcode, d.f_color, \
             d.f_netweight, d.f_cost, m.f_recent, d.f_barcode, p2.f_name as f_groupname, d.f_adgt, d.f_specialdiscount, \
-            m.f_print2 \
+            m.f_print2, p2.f_qr \
             FROM d_menu m \
             left join d_dish d on d.f_id=m.f_dish \
             left join d_part2 p2 on p2.f_id=d.f_part \
@@ -214,6 +217,7 @@ bool Workspace::login()
         d->barcode = db.getString("f_barcode");
         d->typeName = db.getString("f_groupname");
         d->specialDiscount = db.getDouble("f_specialdiscount") / 100;
+        d->qrRequired = db.getInt("f_qr");
         fDishes.append(d);
         if (d->barcode.isEmpty() == false) {
             QStringList barcodes = d->barcode.split(",", Qt::SkipEmptyParts);
@@ -756,7 +760,7 @@ void Workspace::on_btnCheckout_clicked()
             C5Message::error(dw.fErrorMsg);
             return;
         }
-        if (!dw.writeAHeaderCash(cashdoc, cashid, 0, 1, "", fOrderUuid, __c5config.getRegValue("session").toInt())) {
+        if (!dw.writeAHeaderCash(cashdoc, cashid, 0, 1, "", fOrderUuid, __c5config.getRegValue("session").toString())) {
             C5Message::error(dw.fErrorMsg);
             return;
         }
@@ -2039,6 +2043,9 @@ void Workspace::addDishToOrder(Dish *d)
     if (ui->btnSetCard->isChecked() || ui->btnSetCardExternal->isChecked()) {
         ui->leCard->setDouble(ui->leTotal->getDouble());
     }
+    if (d->qrRequired > 0) {
+        on_btnEmarks_clicked();
+    }
 }
 
 double Workspace::discountValue()
@@ -2223,19 +2230,29 @@ void Workspace::on_btnEmarks_clicked()
         return;
     }
 
-    QString hya("էթփձջւևրչճԷԹՓՁՋՒևՐՉՃ"
-                "քոեռտըւիօպխծ"
-                "ասդֆգհյկլ;՛շ"
+    QString hya("էթփձջւևրչճ-ժ"
+                "քոեռտըւիօպխծշ"
+                "ասդֆգհյկլ;՛"
                 "զղցվբնմ,․/"
-                "ՔՈԵՌՏԸՒԻՕՊԽԾ"
-                "ԱՍԴՖԳՀՅԿԼ;՛Շ"
+                "ԷԹՓՁՋՒևՐՉՃ-Ժ"
+                "ՔՈԵՌՏԸՒԻՕՊԽծՇ"
+                "ԱՍԴՖԳՀՅԿԼ;՛"
                 "ԶՂՑՎԲՆՄ,․/");
-    QString num("12345678901234567890"
-                "QWERTYUIOP[]"
-                "ASDFGHJKL;'\""
+    QString ru("1234567890-="
+                "йцукенгшщзхъ\\"
+                "фывапролджэ"
+                "ячсмитьбю."
+                "1234567890_+"
+                "ЙЦУКЕНГШЩЗХЪ/"
+                "ФЫВАПРОЛДЖЭ"
+                "ЯЧСМИТЬБЮ,");
+    QString num("1234567890-="
+                "QWERTYUIOP[]\\"
+                "ASDFGHJKL;՛"
                 "ZXCVBNM,./"
-                "QWERTYUIOP[]"
-                "ASDFGHJKL;'\""
+                "1234567890_+"
+                "QWERTYUIOP[]/"
+                "ASDFGHJKL;'"
                 "ZXCVBNM,./");
     QString oldcode = qr;
     QString newcode;
@@ -2243,6 +2260,15 @@ void Workspace::on_btnEmarks_clicked()
     for (int i = 0; i < oldcode.length(); i++) {
         if (hya.contains(oldcode.at(i))) {
             newcode += num.at(hya.indexOf(oldcode.at(i)));
+        } else {
+            newcode += oldcode.at(i);
+        }
+    }
+    oldcode = newcode;
+    newcode.clear();
+    for (int i = 0; i < oldcode.length(); i++) {
+        if (ru.contains(oldcode.at(i))) {
+            newcode += num.at(ru.indexOf(oldcode.at(i)));
         } else {
             newcode += oldcode.at(i);
         }

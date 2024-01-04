@@ -166,6 +166,7 @@ bool requestStore(RequestHandler &rh, const QByteArray &data, const QHash<QStrin
     years.append(2021);
     years.append(2022);
     years.append(2023);
+    years.append(2024);
     int year = getData(data, dataMap["year"]).toInt();
     year = years.at(year);
     QDate d = QDate::currentDate();

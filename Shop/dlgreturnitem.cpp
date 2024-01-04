@@ -37,7 +37,7 @@ void DlgReturnItem::on_btnSearchReceiptNumber_clicked()
                     "inner join h_halls h on h.f_id=o.f_hall "
                     "left join o_tax t on t.f_id=o.f_id "
                     "left join s_user u on u.f_id=o.f_staff "
-                    "where concat(o.f_prefix, o.f_hallid)='%1' and o.f_hall in (%2, 10) "
+                    "where concat(o.f_prefix, o.f_hallid)='%1' and o.f_hall in (%2, 10,2,3,4,5,6,7,8,9) "
                     "order by 2 ").arg(ui->leReceiptNumber->text())
             .arg(__c5config.defaultHall())
             ) ;
@@ -248,9 +248,9 @@ void DlgReturnItem::on_btnReturn_clicked()
         }
     }
 
-    for (QMap<int, double>::const_iterator it = cashmap.constBegin(); it != cashmap.constEnd(); it++) {
+    int cashid = ui->btnReturnCash->isChecked() ? __c5config.cashId() : __c5config.nocashId();
         QString cashdocid;
-        double cashamount = cashmap.count() == 1 ? returnAmount : it.value();
+        double cashamount = returnAmount;
         int counter = dw.counterAType(DOC_TYPE_CASH);
         if (counter == 0) {
             C5Message::error(dw.fErrorMsg);
@@ -264,18 +264,18 @@ void DlgReturnItem::on_btnReturn_clicked()
             db.rollback();
             return;
         }
-        if (!dw.writeAHeaderCash(cashdocid, 0, it.key(), 1, "", oheader._id(), 0)) {
+        if (!dw.writeAHeaderCash(cashdocid, 0, cashid, 1, "", oheader._id(), 0)) {
             C5Message::error(dw.fErrorMsg);
             db.rollback();
             return;
         }
         QString cashUUID;
-        if (!dw.writeECash(cashUUID, cashdocid, it.key(), -1, saledoc, cashamount, cashUUID, 1)) {
+        if (!dw.writeECash(cashUUID, cashdocid, cashid, -1, saledoc, cashamount, cashUUID, 1)) {
             C5Message::error(dw.fErrorMsg);
             db.rollback();
             return;
         }
-    }
+
 
     if (haveStore) {
         if (dw.writeInput(storeDocId, err)) {
@@ -297,4 +297,16 @@ void DlgReturnItem::on_btnReturn_clicked()
 
     db.commit();
     C5Message::info(tr("Return completed"));
+}
+
+void DlgReturnItem::on_btnReturnCash_clicked()
+{
+    ui->btnReturnCash->setChecked(true);
+    ui->btnReturnCard->setChecked(false);
+}
+
+void DlgReturnItem::on_btnReturnCard_clicked()
+{
+    ui->btnReturnCash->setChecked(false);
+    ui->btnReturnCard->setChecked(true);
 }

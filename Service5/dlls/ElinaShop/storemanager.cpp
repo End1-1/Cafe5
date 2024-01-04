@@ -40,7 +40,7 @@ void StoreManager::release()
     }
 }
 
-int StoreManager::queryQty(int store, const QStringList &sku, QMap<QString, double> &out)
+int StoreManager::queryQty(int store, const QStringList &sku, QJsonArray &out)
 {
     Database db;
     if (db.open(fInstance->fDatabaseName) == false) {
@@ -56,9 +56,10 @@ int StoreManager::queryQty(int store, const QStringList &sku, QMap<QString, doub
     if (codes.empty()) {
         return -1;
     }
-    QString sql = QString("select  s.f_goods, sum(s.f_qty*s.f_type) as f_qty "
+    QString sql = QString("select  s.f_goods, gp.f_price1, sum(s.f_qty*s.f_type) as f_qty "
                     "from a_store s "
                     "inner join a_header h on h.f_id=s.f_document "
+                    "left join c_goods_price gp on gp.f_goods=s.f_goods and gp.f_currency = 1 "
                     "where h.f_date<=current_date() %store "
                     "and s.f_goods in (%1) "
                     "group by 1 "

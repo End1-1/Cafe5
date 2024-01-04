@@ -32,6 +32,9 @@ void ServerThread::run()
     if (!fSslServer->setSslPrivateKey(keyFileName)) {
         LogWriter::write(LogWriterLevel::errors, "", QString("%1 private key is not instaled").arg(keyFileName));
     }
+    fSslChain = QSslCertificate::fromPath(fConfigPath + "fullchain.pem", QSsl::Pem);
+
+
     fSslServer->setSslProtocol(QSsl::TlsV1_2OrLater);
     fSslLocalCertificate = fSslServer->fSslLocalCertificate;
     fSslPrivateKey = fSslServer->fSslPrivateKey;
@@ -41,14 +44,13 @@ void ServerThread::run()
         exit(1);
         return;
     }
-    LogWriter::write(LogWriterLevel::verbose, "", fSslServer->errorString());
     connect(fSslServer, &SslServer::connectionRequest, this, &ServerThread::newConnection);
 }
 
 void ServerThread::newConnection(int socketDescriptor)
 {
     auto *thread = new Thread("SocketThread");
-    auto *socketThread = new SocketThread(socketDescriptor, fSslLocalCertificate, fSslPrivateKey, fSslProtocol);
+    auto *socketThread = new SocketThread(socketDescriptor, fSslLocalCertificate, fSslPrivateKey, fSslProtocol, fSslChain);
     connect(thread, &QThread::started, socketThread, &SocketThread::run);
     connect(thread, &QThread::finished, thread, &QThread::deleteLater);
     connect(socketThread, &SocketThread::finished, thread, &Thread::quit);

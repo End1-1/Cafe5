@@ -25,6 +25,7 @@ struct Dish {
     int color;
     int package;
     int quick;
+    int qrRequired = 0;
     QString packageName;
     QString obodyId;
     QString f_emarks;

@@ -97,6 +97,8 @@ void C5DishWidget::clear()
     ui->tblPricing->comboBox(0, 6)->setCurrentIndex(__c5config.getRegValue("dishw_print2").toInt());
     ui->tblPricing->checkBox(0, 7)->setChecked(__c5config.getRegValue("dishw_inmenu").toBool());
 
+    ui->tblSet->setRowCount(0);
+    ui->leImageUUID->setText(C5Database::uuid());
 }
 
 void C5DishWidget::setDish(int id)
@@ -158,6 +160,20 @@ void C5DishWidget::setDish(int id)
 
     if (ui->tabWidget->currentIndex() == 3) {
         loadImage();
+    }
+
+    db[":f_dish"] = ui->leCode->getInteger();
+    db.exec("select ds.f_part, d.f_name, ds.f_qty  "
+            "from d_dish_set ds "
+            "left join d_dish d on d.f_id=ds.f_part "
+            "where ds.f_dish=:f_dish");
+    while (db.nextRow()) {
+        int r = ui->tblSet->addEmptyRow();
+        ui->tblSet->setInteger(r, 0, db.getInt("f_part"));
+        ui->tblSet->setString(r, 1, db.getString("f_name"));
+        C5LineEdit *l = ui->tblSet->createLineEdit(r, 2);
+        l->setValidator(new QDoubleValidator(0, 999, 2));
+        l->setDouble(db.getDouble("f_qty"));
     }
 }
 
@@ -245,6 +261,15 @@ bool C5DishWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
         db[":f_app"] = "menu";
         db[":f_version"] = "1";
         db.insert("s_app", false);
+    }
+
+    db[":f_dish"] = ui->leCode->getInteger();
+    db.exec("delete from d_dish_set where f_dish=:f_dish");
+    for (int i = 0; i < ui->tblSet->rowCount(); i++) {
+        db[":f_dish"] = ui->leCode->getInteger();
+        db[":f_part"] = ui->tblSet->getInteger(i, 0);
+        db[":f_qty"] = ui->tblSet->lineEdit(i, 2)->getDouble();
+        db.insert("d_dish_set", false);
     }
     return true;
 }
@@ -402,11 +427,11 @@ void C5DishWidget::uploadImage()
     } while (ba.size() > 100000);
 
     C5Database db(fDBParams);
-    db[":f_id"] = ui->leCode->getInteger();
-    db.exec("delete from d_image where f_id=:f_id");
-    db[":f_id"] = ui->leCode->getInteger();
-    db[":f_image"] = ba;
-    db.exec("insert into d_image (f_id, f_image) values (:f_id, :f_image)");
+    db[":f_id"] = ui->leImageUUID->text();
+    db.exec("delete from s_images where f_id=:f_id");
+    db[":f_id"] = ui->leImageUUID->text();
+    db[":f_image"] = ba.toBase64();
+    db.exec("insert into s_images (f_id, f_data) values (:f_id, :f_image)");
 
 }
 
@@ -416,8 +441,8 @@ void C5DishWidget::removeImage()
         return;
     }
     C5Database db(fDBParams);
-    db[":f_id"] = ui->leCode->getInteger();
-    db.exec("delete from d_image where f_id=:f_id");
+    db[":f_id"] = ui->leImageUUID->text();
+    db.exec("delete from s_images where f_id=:f_id");
     ui->lbImage->setText(tr("Image"));
 }
 
@@ -471,11 +496,11 @@ int C5DishWidget::addRecipeRow()
 void C5DishWidget::loadImage()
 {
     C5Database db(fDBParams);
-    db[":f_id"] = ui->leCode->getInteger();
-    db.exec("select * from d_image where f_id=:f_id");
+    db[":f_id"] = ui->leImageUUID->text();
+    db.exec("select * from s_images where f_id=:f_id");
     if (db.nextRow()) {
         QPixmap p;
-        if (p.loadFromData(db.getValue("f_image").toByteArray())) {
+        if (p.loadFromData(QByteArray::fromBase64(db.getString("f_data").toLatin1()))) {
             ui->lbImage->setPixmap(p.scaled(ui->lbImage->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
         }
     }
@@ -729,5 +754,25 @@ void C5DishWidget::on_btnAddDishRecipe_clicked()
         le->setDouble(db.getDouble("f_total"));
         connect(le, SIGNAL(textEdited(QString)), this, SLOT(recipeQtyPriceChanged(QString)));
         row++;
+    }
+}
+
+void C5DishWidget::on_btnAddToSet_clicked()
+{
+    QList<QVariant> vals;
+    if (!C5Selector::getValue(fDBParams, cache_dish, vals)) {
+        return;
+    }
+    int r = ui->tblSet->addEmptyRow();
+    ui->tblSet->setData(r, 0, vals.at(1));
+    ui->tblSet->setData(r, 1, vals.at(2));
+    ui->tblSet->createLineEdit(r, 2)->setValidator(new QDoubleValidator(0, 999, 2));
+}
+
+void C5DishWidget::on_btnRemoveFromSet_clicked()
+{
+    int row = ui->tblSet->currentRow();
+    if (row > -1) {
+        ui->tblSet->removeRow(row);
     }
 }

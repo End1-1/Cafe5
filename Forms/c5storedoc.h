@@ -144,10 +144,6 @@ private:
 
     double additionalCostForEveryGoods();
 
-    void calcPrice2(int row);
-
-    void calcTotalSale();
-
 private slots:
     void lineEditKeyPressed(const QChar &key);
 
@@ -193,14 +189,6 @@ private slots:
 
     void tblTotalChanged(const QString &arg1);
 
-    void tblCalcMarginPercentChanged(const QString &arg1);
-
-    void tblCalcMarginChanged(const QString &arg1);
-
-    void tblCalcFinalChanged(const QString &arg1);
-
-    void tblAddChanged(const QString &arg1);
-
     void on_btnAddGoods_clicked();
 
     void on_btnRemoveGoods_clicked();
@@ -231,8 +219,6 @@ private slots:
 
     void on_btnRemoveAdd_clicked();
 
-    void on_btnInsertLast_clicked();
-
     void on_btnEditGoods_clicked();
 
     void on_btnCalculator_clicked();
@@ -261,14 +247,8 @@ private slots:
 
     void on_btnAddPackages_clicked();
 
-    void on_btnSetMargin_clicked();
-
-    void on_btnSetAllMarginPercent_clicked();
-
-    void on_leTotalSale_textChanged(const QString &arg1);
-
-    void on_btnAutoFillSalePrice_clicked();
     void on_leReason_textChanged(const QString &arg1);
+    void on_btnChangePartner_clicked();
 };
 
 #endif // C5STOREDOC_H

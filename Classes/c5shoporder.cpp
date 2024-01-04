@@ -87,8 +87,8 @@ bool C5ShopOrder::write()
                             g.adgCode, //adg
                             QString::number(g.goods), //goods id
                             g._goodsName, //name
-                            g.price, //price
-                            g.qty / g._qtybox, //qty
+                            g.price / g._qtybox, //price
+                            g.qty, //qty
                             fBHistory.value * 100); //discount
             }
             result = pt.makeJsonAndPrint(fOHeader.amountCard + fOHeader.amountIdram + fOHeader.amountTelcell, fOHeader.amountPrepaid, jsonIn, jsonOut, err);
@@ -166,6 +166,7 @@ bool C5ShopOrder::write()
             }
         }
 
+        g.qty = g.qty / g._qtybox;
         if (!g.write(db, err)) {
             return returnFalse(err, db);
         }

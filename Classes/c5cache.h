@@ -115,8 +115,6 @@ private:
 
     int fId;
 
-    int fVersion;
-
     QStringList fDBParams;
 
     void setCacheSimpleQuery(int cacheId, const QString &table);

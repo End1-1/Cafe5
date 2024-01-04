@@ -86,7 +86,7 @@ Working::Working(C5User *user, QWidget *parent) :
     QShortcut *sDown = new QShortcut(QKeySequence(Qt::Key_Down), this);
     QShortcut *sUp = new QShortcut(QKeySequence(Qt::Key_Up), this);
     QShortcut *sEsc = new QShortcut(QKeySequence(Qt::Key_Escape), this);
-    QShortcut *sMinus = new QShortcut(QKeySequence(Qt::Key_Minus), this);
+    QShortcut *sMinus = new QShortcut(QKeySequence(Qt::Key_Delete), this);
     QShortcut *sPlus = new QShortcut(QKeySequence(Qt::Key_Plus), this);
     QShortcut *sAsterix = new QShortcut(QKeySequence(Qt::Key_Asterisk), this);
     QShortcut *keyNumpadDot = new QShortcut(QKeySequence(Qt::Key_Comma), this);
@@ -150,7 +150,7 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
     if (event->type() == QEvent::KeyRelease) {
         auto *ke = static_cast<QKeyEvent*>(event);
         switch (ke->key()) {
-        case Qt::Key_Minus:
+        case Qt::Key_Delete:
             shortcutMinus();
             event->accept();
             return true;
@@ -354,11 +354,12 @@ void Working::loadStaff()
 {
     fCurrentUsers.clear();
     C5Database db(__c5config.dbParams());
+    db[":f_hall"] = __c5config.defaultHall();
     db.exec("select u.f_id, u.f_group, concat(u.f_last, ' ' , u.f_first) as f_name, p.f_data "
             "from s_salary_inout s "
             "inner join s_user u on u.f_id=s.f_user "
             "left join s_user_photo p on p.f_id=u.f_id "
-            "where s.f_dateout is null");
+            "where s.f_dateout is null and s.f_hall=:f_hall");
     while (db.nextRow()) {
         IUser u;
         u.id = db.getInt("f_id");

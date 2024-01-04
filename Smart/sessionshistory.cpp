@@ -41,13 +41,13 @@ SessionsHistory::~SessionsHistory()
 
 void SessionsHistory::on_btnPrintReport_clicked()
 {
-    QList<int> sessions;
+    QStringList sessions;
     C5Database db(fDBParams);
     db[":f_date1"] = fDate1;
     db[":f_date2"] = fDate2;
     db.exec("select f_id from s_salary_inout where f_datein between :f_date1 and :f_date2 ");
     while (db.nextRow()) {
-        sessions.append(db.getInt("f_id"));
+        sessions.append(db.getString("f_id"));
     }
     QFont font(qApp->font());
     font.setPointSize(__c5config.getValue(param_receipt_print_font_size).toInt());
@@ -64,7 +64,7 @@ void SessionsHistory::on_btnPrintReport_clicked()
     p.ctext(QString("%1").arg(tr("History of sessions")));
     p.br();
 
-    for (int sid: sessions) {
+    for (const QString &sid: sessions) {
         db[":f_id"] = sid;
         db.exec("select * from s_salary_inout where f_id=:f_id");
         db.nextRow();
@@ -144,7 +144,7 @@ void SessionsHistory::on_btnPrintSession_clicked()
     if (r < 0) {
         return;
     }
-    int session = ui->tbl->item(r, 0)->text().toInt();
+    QString session = ui->tbl->item(r, 0)->text();
 
     C5Database db(__c5config.dbParams());
     db[":f_id"] = session;

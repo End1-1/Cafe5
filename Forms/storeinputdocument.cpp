@@ -5,6 +5,7 @@
 #include "c5cache.h"
 #include "c5user.h"
 #include "c5storedraftwriter.h"
+#include "c5replacecharacter.h"
 #include "c5mainwindow.h"
 #include "c5storedoc.h"
 #include "ce5goods.h"
@@ -402,15 +403,15 @@ void StoreInputDocument::on_btnSetPartner_clicked()
 void StoreInputDocument::on_leScancode_returnPressed()
 {
     C5Database db(fDBParams);
-    QString code = ui->leScancode->text();
-    db[":f_scancode"] = code;
+    QString code =  C5ReplaceCharacter::replace(ui->leScancode->text());
+    db[":f_scancode"] = code.toLower();
     db.exec("select gg.f_scancode, gg.f_id, gg.f_name as f_name, gu.f_name as f_unitname, gg.f_saleprice, "
             "gr.f_taxdept, gr.f_adgcode, gg.f_lastinputprice, gr.f_name as f_groupname, gg.f_qtybox, gpr.f_price1 "
             "from c_goods gg  "
             "left join c_groups gr on gr.f_id=gg.f_group "
             "left join c_units gu on gu.f_id=gg.f_unit "
             "left join c_goods_prices gpr on gpr.f_goods=gg.f_id and gpr.f_currency=1 "
-            "where gg.f_scancode=:f_scancode");
+            "where gg.f_scancode=lower(:f_scancode)");
     ui->leScancode->clear();
     if (db.nextRow()) {
         int row = newEmptyRow();

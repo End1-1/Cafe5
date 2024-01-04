@@ -279,44 +279,12 @@ void C5MainWindow::on_actionLogin_triggered()
     db[":f_user"] = __user->id();
     db.exec("select f_name, f_description, f_host, f_db, f_user, f_password, f_main from s_db "
             "where f_id in (select f_db from s_db_access where f_user=:f_user and f_permit=1)");
-
-    while (db.nextRow()) {
-        QStringList dbl;
-        for (int i = 2; i < db.columnCount(); i++) {
-            dbl.append(db.getString(i));
-        }
-        dbl.append(db.getString("f_description"));
-        fDatabases[db.getString("f_description")] = dbl;
+    if (!db.nextRow()) {
+        C5Message::info(tr("No access to this database"));
+        return;
     }
-
-    QString lastdb = __c5config.getRegValue("lastdb").toString();
-    if(lastdb.isEmpty()) {
-        if (fDatabases.count() > 0) {
-            if (!fDatabases.contains(lastdb)) {
-                QMap<QString, QStringList>::const_iterator it = fDatabases.constBegin();
-                lastdb = it.key();
-            }
-        }
-    } else {
-        if (!fDatabases.contains(lastdb) && fDatabases.count() > 0) {
-            QMap<QString, QStringList>::const_iterator it = fDatabases.constBegin();
-            lastdb = it.key();
-        }
-    }
-
-    QStringList dbParams = fDatabases[__c5config.getRegValue("lastdb").toString()];
-    if (dbParams.count() > 3) {
-        C5Config::fDBHost = dbParams.at(0);
-        C5Config::fDBPath = dbParams.at(1);
-        C5Config::fDBUser = dbParams.at(2);
-        C5Config::fDBPassword = dbParams.at(3);
-        C5Config::initParamsFromDb();
-    }
-
-    if (!lastdb.isEmpty()) {
-        setDB(lastdb);
-    }
-
+    C5Config::initParamsFromDb();
+    setDB();
     enableMenu(true);
     ui->actionHome->setEnabled(true);
     ui->actionLogin->setVisible(false);
@@ -392,9 +360,7 @@ void C5MainWindow::enableMenu(bool v)
         }
     }
     fLogin = v;
-    if (v) {
-        autoLogin();
-    }
+
 }
 
 void C5MainWindow::addTreeL3Item(QListWidget *l, int permission, const QString &text, const QString &icon)
@@ -498,38 +464,10 @@ void C5MainWindow::removeFromFavorite(int permission)
     }
 }
 
-void C5MainWindow::autoLogin()
-{
-    int doctype = 0;
-    int storein = 0;
-    if (__autologin_store.count() > 0) {
-        for (const QString &s: __autologin_store) {
-            if (s.contains("--newdoc:")) {
-                doctype = s.mid(s.indexOf(":") + 1, s.length() - s.indexOf(":")).toInt();
-            }
-            if (s.contains("--storein:")) {
-                storein = s.mid(s.indexOf(":") + 1, s.length() - s.indexOf(":")).toInt();
-            }
-        }
-    }
-    __autologin_store.clear();
-    QStringList dbParams = fDatabases[__c5config.getRegValue("lastdb").toString()];
-    switch (doctype) {
-    case DOC_TYPE_STORE_INPUT: {
-        auto *doc = createTab<C5StoreDoc>(dbParams);
-        doc->setMode(C5StoreDoc::sdInput);
-        doc->setStore(storein, 0);
-        break;
-    }
-    default:
-        break;
-    }
-}
-
 void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
 {
     QListWidget *l = static_cast<QListWidget*>(sender());
-    QStringList dbParams = fDatabases[__c5config.getRegValue("lastdb").toString()];
+    QStringList dbParams = __c5config.dbParams();
     QListWidgetItem *item = l->item(index.row());
     int permission = item->data(Qt::UserRole).toInt();
     switch (permission) {
@@ -845,8 +783,7 @@ void C5MainWindow::on_actionLogout_triggered()
 void C5MainWindow::on_actionChange_password_triggered()
 {
     QString password;
-    QStringList dbparams = fDatabases[__c5config.getRegValue("lastdb").toString()];
-    if (!C5ChangePassword::changePassword(dbparams, password)) {
+    if (!C5ChangePassword::changePassword(__c5config.dbParams(), password)) {
         return;
     }
     C5Message::info(tr("Password changed"));
@@ -881,15 +818,9 @@ bool C5MainWindow::addMainLevel(const QString &db, int permission, const QString
     return false;
 }
 
-void C5MainWindow::setDB(const QString &dbname)
+void C5MainWindow::setDB()
 {
-    __c5config.setRegValue("lastdb", dbname);
-    QStringList db = fDatabases[dbname];
-    if (db.count() == 0) {
-        C5Message::info(tr("No access to this database"));
-        return;
-    }
-    QIcon icon = db.at(4).toInt() == 0 ? QIcon(":/database.png") : QIcon(":/database_main.png");
+    QIcon icon = QIcon(":/database_main.png");
     qDeleteAll(fMenuLists);
     fMenuLists.clear();
     QLayoutItem *li;
@@ -897,16 +828,16 @@ void C5MainWindow::setDB(const QString &dbname)
         li->widget()->deleteLater();
         delete li;
     }
-    QPushButton *btn = new QPushButton(icon, dbname);
+    QPushButton *btn = new QPushButton(icon, "");
     btn->setProperty("menu", "2");
-    connect(btn, SIGNAL(clicked()), this, SLOT(on_btnChangeDB_clicked()));
+    //connect(btn, SIGNAL(clicked()), this, SLOT(on_btnChangeDB_clicked()));
     ui->lMenu->addWidget(btn);
     QListWidget *l = new QListWidget();
     connect(l, SIGNAL(clicked(QModelIndex)), this, SLOT(on_listWidgetItemClicked(QModelIndex)));
     fMenuLists.append(l);
     ui->lMenu->addWidget(l);
 
-    C5Database dbpr(db.at(0),  db.at(1),  db.at(2),  db.at(3));
+    QStringList db = __c5config.dbParams();
 
     if (addMainLevel(db.at(1), cp_t2_action, tr("Actions"), ":/edit.png", l)) {
         l->setProperty("reportlevel", 1);
@@ -1067,15 +998,6 @@ void C5MainWindow::on_btnHideMenu_clicked()
     ui->wMenu->setVisible(!ui->wMenu->isVisible());
     ui->btnHideMenu->setText(ui->wMenu->isVisible() ? "<" : ">");
     C5Config::setRegValue("menupanel", ui->wMenu->isVisible());
-}
-
-void C5MainWindow::on_btnChangeDB_clicked()
-{
-    QList<QVariant> values;
-    if (!C5Selector::getValue(mainDbParams, cache_s_db, values)) {
-        return;
-    }
-    setDB(values.at(2).toString());
 }
 
 void C5MainWindow::on_btnMenuClick()

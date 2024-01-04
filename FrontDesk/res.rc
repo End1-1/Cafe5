@@ -17,7 +17,7 @@ BEGIN
             VALUE "FileDescription", "Storehouse\0"
             VALUE "FileVersion", _FILE_VERSION_STR
             VALUE "InternalName", "Storehouse\0"
-            VALUE "LegalCopyright", "(C)2017-2023, Kudryashov Vasili\0"
+            VALUE "LegalCopyright", "(C)2017-2024, Kudryashov Vasili\0"
             VALUE "OriginalFilename", "Storehouse.exe\0"
             VALUE "Email", "end1_1@yahoo.com\0"
             VALUE "ProductName", "Storehouse\0"

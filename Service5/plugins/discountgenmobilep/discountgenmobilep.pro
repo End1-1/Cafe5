@@ -13,7 +13,7 @@ SOURCES += \
     ../../../../NewTax/Src/printtaxn.cpp \
     ../../../Classes/QRCodeGenerator.cpp \
     ../../../Classes/c5printing.cpp \
-    ../../raw/rawmessage.cpp \
+    ../../../Service5Working/raw/rawmessage.cpp \
     ../../socket/sslsocket.cpp \
     ../../utils/configini.cpp \
     ../../utils/database.cpp \
@@ -32,7 +32,7 @@ HEADERS += \
     ../../../../NewTax/Src/printtaxn.h \
     ../../../Classes/QRCodeGenerator.h \
     ../../../Classes/c5printing.h \
-    ../../raw/rawmessage.h \
+    ../../../Service5Working/raw/rawmessage.h \
     ../../socket/sslsocket.h \
     ../../utils/configini.h \
     ../../utils/database.h \
@@ -54,6 +54,7 @@ INCLUDEPATH += ../../raw
 INCLUDEPATH += ../../socket
 INCLUDEPATH += ../../utils
 INCLUDEPATH += ../../../Classes
+INCLUDEPATH += ../../../Service5Working/raw
 
 INCLUDEPATH += C:/Projects/NewTax/Src
 INCLUDEPATH += C:/Soft/OpenSSL-Win64/include

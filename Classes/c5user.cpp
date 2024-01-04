@@ -67,7 +67,7 @@ bool C5User::authByUsernamePass(const QString &username, const QString &pass)
     db[":f_password"] = pass;
     db.exec("select * from s_user where f_login=:f_login and f_password=md5(:f_password)");
     if (db.nextRow()) {
-        if (db.getInt(2) == 2){
+        if (db.getInt("f_state") == 2){
             fError = tr("User is inactive");
         } else {
             db.rowToMap(fUserData);

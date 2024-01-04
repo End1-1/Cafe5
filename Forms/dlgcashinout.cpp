@@ -132,7 +132,7 @@ void DlgCashinOut::on_btnCloseSession_clicked()
             C5Message::error(dw.fErrorMsg);
             return;
         }
-        if (!dw.writeAHeaderCash(cashdoc, 0, __c5config.cashId(), 0, "", "", __c5config.getRegValue("session").toInt())) {
+        if (!dw.writeAHeaderCash(cashdoc, 0, __c5config.cashId(), 0, "", "", __c5config.getRegValue("session").toString())) {
             C5Message::error(dw.fErrorMsg);
             return;
         }
@@ -158,7 +158,7 @@ void DlgCashinOut::on_btnCloseSession_clicked()
             C5Message::error(dw.fErrorMsg);
             return;
         }
-        if (!dw.writeAHeaderCash(cashdoc, 0, __c5config.cashId(), 0, "", "", __c5config.getRegValue("session").toInt())) {
+        if (!dw.writeAHeaderCash(cashdoc, 0, __c5config.cashId(), 0, "", "", __c5config.getRegValue("session").toString())) {
             C5Message::error(dw.fErrorMsg);
             return;
         }
@@ -180,7 +180,7 @@ void DlgCashinOut::on_btnCloseSession_clicked()
             C5Message::error(dw.fErrorMsg);
             return;
         }
-        if (!dw.writeAHeaderCash(cashdoc, 0, __c5config.cashId(), 0, "", "", __c5config.getRegValue("session").toInt())) {
+        if (!dw.writeAHeaderCash(cashdoc, 0, __c5config.cashId(), 0, "", "", __c5config.getRegValue("session").toString())) {
             C5Message::error(dw.fErrorMsg);
             return;
         }

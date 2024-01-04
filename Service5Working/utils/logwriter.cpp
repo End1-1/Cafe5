@@ -26,6 +26,7 @@ void LogWriter::write(const QString &file, const QString &session, const QString
     if (file != LogWriterLevel::verbose) {
         writeToFile(LogWriterLevel::verbose, session, message);
     }
+    ml.unlock();
 }
 
 void LogWriter::writeToFile(const QString &fileName, const QString &session, const QString &message)

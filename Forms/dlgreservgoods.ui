@@ -7,41 +7,17 @@
     <x>0</x>
     <y>0</y>
     <width>420</width>
-    <height>293</height>
+    <height>373</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Goods reservation</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="QLabel" name="label_7">
+   <item row="3" column="2">
+    <widget class="QToolButton" name="btnGoods">
      <property name="text">
-      <string>Reserve number</string>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="0">
-    <widget class="QLabel" name="label_6">
-     <property name="text">
-      <string>Message</string>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="0">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>Available qty</string>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="1">
-    <widget class="C5LineEdit" name="leReservedQty"/>
-   </item>
-   <item row="3" column="1">
-    <widget class="C5LineEdit" name="leName">
-     <property name="readOnly">
-      <bool>true</bool>
+      <string>...</string>
      </property>
     </widget>
    </item>
@@ -52,6 +28,33 @@
      </property>
     </widget>
    </item>
+   <item row="10" column="0">
+    <widget class="QLabel" name="label_11">
+     <property name="text">
+      <string>ՀԴՄ Կ/Տ</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="2">
+    <widget class="QToolButton" name="btnPrintFiscal">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>...</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources/res.qrc">
+       <normaloff>:/print.png</normaloff>:/print.png</iconset>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1">
+    <widget class="C5LineEdit" name="leReservedQty"/>
+   </item>
+   <item row="8" column="1">
+    <widget class="C5LineEdit" name="lePrepaid"/>
+   </item>
    <item row="3" column="0">
     <widget class="QLabel" name="label">
      <property name="text">
@@ -59,14 +62,94 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label_8">
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_9">
      <property name="text">
-      <string>Reserve date</string>
+      <string>Day of end</string>
      </property>
     </widget>
    </item>
-   <item row="9" column="0" colspan="2">
+   <item row="8" column="0">
+    <widget class="QLabel" name="label_10">
+     <property name="text">
+      <string>Կանխիկ</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_7">
+     <property name="text">
+      <string>Reserve number</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Store</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Available qty</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="2">
+    <widget class="QToolButton" name="btnStore">
+     <property name="text">
+      <string>...</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="C5LineEdit" name="leScancode">
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="C5LineEdit" name="leName">
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Scancode</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="C5DateEdit" name="leEndDay">
+     <property name="readOnly">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <widget class="C5LineEdit" name="leStore">
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="C5LineEdit" name="leCode">
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="0" colspan="2">
     <widget class="QWidget" name="widget" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
@@ -126,6 +209,23 @@
      </layout>
     </widget>
    </item>
+   <item row="11" column="1">
+    <widget class="C5LineEdit" name="leMessage"/>
+   </item>
+   <item row="6" column="1">
+    <widget class="C5LineEdit" name="leTotalQty">
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_8">
+     <property name="text">
+      <string>Reserve date</string>
+     </property>
+    </widget>
+   </item>
    <item row="1" column="1">
     <widget class="C5DateEdit" name="leDate">
      <property name="focusPolicy">
@@ -136,81 +236,29 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="0">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>Store</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="1">
-    <widget class="C5LineEdit" name="leStore">
+   <item row="10" column="1">
+    <widget class="C5LineEdit" name="leFiscal">
      <property name="readOnly">
       <bool>true</bool>
      </property>
     </widget>
    </item>
-   <item row="0" column="1">
-    <widget class="C5LineEdit" name="leCode">
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_9">
+   <item row="11" column="0">
+    <widget class="QLabel" name="label_6">
      <property name="text">
-      <string>Day of end</string>
+      <string>Message</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="1">
-    <widget class="C5LineEdit" name="leScancode">
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="1">
-    <widget class="C5LineEdit" name="leMessage"/>
-   </item>
-   <item row="6" column="1">
-    <widget class="C5LineEdit" name="leTotalQty">
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1">
-    <widget class="C5DateEdit" name="leEndDay">
-     <property name="readOnly">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0">
-    <widget class="QLabel" name="label_2">
+   <item row="9" column="0">
+    <widget class="QLabel" name="label_12">
      <property name="text">
-      <string>Scancode</string>
+      <string>Անկանխիկ</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="2">
-    <widget class="QToolButton" name="btnGoods">
-     <property name="text">
-      <string>...</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="2">
-    <widget class="QToolButton" name="btnStore">
-     <property name="text">
-      <string>...</string>
-     </property>
-    </widget>
+   <item row="9" column="1">
+    <widget class="C5LineEdit" name="lePrepaidCard"/>
    </item>
   </layout>
  </widget>
@@ -241,6 +289,8 @@
   <tabstop>btnCompleteReserve</tabstop>
   <tabstop>btnClose</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../resources/res.qrc"/>
+ </resources>
  <connections/>
 </ui>

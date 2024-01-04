@@ -23,11 +23,6 @@ int main(int argc, char *argv[])
 #endif
 
     QApplication a(argc, argv);
-
-    for (int i = 1; i < argc; i++){
-        __autologin_store.append(argv[i]);
-    }
-
 //    if (QDate::currentDate() > QDate::fromString("15/08/2023", "dd/MM/yyyy")) {
 //        return 1;
 //    }

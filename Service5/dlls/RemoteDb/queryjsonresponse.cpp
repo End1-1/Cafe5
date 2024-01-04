@@ -1,6 +1,7 @@
 #include "queryjsonresponse.h"
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <QSqlRecord>
 
 QueryJsonResponse::QueryJsonResponse(Database &db, const QJsonObject &ji, QJsonObject &jo) :
     fDb(db),
@@ -14,6 +15,68 @@ void QueryJsonResponse::getResponse()
 {
     fJsonOut["kStatus"] = 1;
     fJsonOut["kData"] = "";
+
+    if (fJsonIn.contains("sqlselect")) {
+        if (!fDb.exec(fJsonIn["sqlselect"].toString())) {
+            fJsonOut["kStatus"] = 4;
+            fJsonOut["kData"] = fDb.lastDbError();
+            fDb.rollback();
+            return;
+        }
+        QSqlRecord r = fDb.fQuery->record();
+        QJsonObject jFields;
+        QJsonArray jData;
+        for (int i = 0; i < r.count(); i++) {
+            jFields[r.fieldName(i)] = i;
+            jFields[QString::number(i)] = r.fieldName(i);
+        }
+        while (fDb.next()) {
+            QJsonArray jrow;
+            for (int i = 0; i < fDb.columnCount(); i++) {
+                switch (fDb.value(i).type()) {
+                case QVariant::Double:
+                    jrow.append(fDb.value(i).toDouble());
+                    break;
+                case QVariant::Int:
+                    jrow.append(fDb.value(i).toInt());
+                    break;
+                case QVariant::Date:
+                    jrow.append(fDb.value(i).toDate().toString("dd/MM/yyyy"));
+                    break;
+                case QVariant::Time:
+                    jrow.append(fDb.value(i).toTime().toString("HH:mm:ss"));
+                    break;
+                case QVariant::DateTime:
+                    jrow.append(fDb.value(i).toDateTime().toString("dd/MM/yyyy HH:mm:ss"));
+                    break;
+                default:
+                    jrow.append(fDb.value(i).toString());
+                    break;
+                }
+            }
+            jData.append(jrow);
+        }
+        QJsonObject jt;
+        jt["table"] = jFields;
+        jt["data"] = jData;
+        fJsonOut["kData"] = jt;
+        return;
+    }
+
+    if (fJsonIn.contains("sqllist")) {
+        QStringList sqlList = fJsonIn["sql"].toString().split(";", Qt::SkipEmptyParts);
+        fDb.startTransaction();
+        for (const QString &s: qAsConst(sqlList)) {
+            if (!fDb.exec(s)) {
+                fJsonOut["kStatus"] = 4;
+                fJsonOut["kData"] = fDb.lastDbError();
+                fDb.rollback();
+                return;
+            }
+        }
+        fDb.commit();
+        return;
+    }
 
     if (fJsonIn["call"].toString().isEmpty()) {
         fJsonOut["kStatus"] = 4;

@@ -839,7 +839,8 @@ void Sales::on_btnViewOrder_clicked()
     if (ml.count() == 0) {
         return;
     }
-    ViewOrder(fWorking, ui->tbl->getString(ml.at(0).row(), 1)).exec();
+    int col = fViewMode == VM_TOTAL ? 1 : 0;
+    ViewOrder(fWorking, ui->tbl->getString(ml.at(0).row(), col)).exec();
 }
 
 void Sales::on_btnChangeDate_clicked()

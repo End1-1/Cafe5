@@ -175,7 +175,8 @@ void ViewOrder::on_btnReturn_clicked()
     oheader.table = __c5config.defaultTable();
     oheader.staff = uid;
     oheader.amountTotal = returnAmount * -1;
-    oheader.amountCash = returnAmount * -1;
+    oheader.amountCash = ui->leCash->getDouble() > 0.1 ? returnAmount * -1 : 0;
+    oheader.amountCard = ui->leCard->getDouble() > 0.1 ? returnAmount * -1 : 0;
     oheader.saleType = SALE_RETURN;
     oheader.partner = fOHeader.partner;
     oheader.source = 2;

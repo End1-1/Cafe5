@@ -78,6 +78,10 @@ private slots:
 
     void on_btnAddDishRecipe_clicked();
 
+    void on_btnAddToSet_clicked();
+
+    void on_btnRemoveFromSet_clicked();
+
 private:
     Ui::C5DishWidget *ui;
 

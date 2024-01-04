@@ -51,7 +51,19 @@ void SearchItems::on_btnSearch_clicked()
             "left join (select f_goods, f_store, sum(f_qty) as f_qty from a_store_reserve where f_state=:f_reservestate and f_goods=:f_goods group by 1, 2) rs on rs.f_goods=s.f_goods and rs.f_store=s.f_store "
             "where s.f_goods=:f_goods "
             "group by ss.f_name,g.f_name,u.f_name,gpr.f_price1,gpr.f_price2 "
-            "having sum(s.f_qty*s.f_type) > 0");
+            "having sum(s.f_qty*s.f_type) > 0 "
+            "union "
+            "select '-', g.f_name as f_goodname,g.f_scancode, "
+            "u.f_name as f_unit,gpr.f_price1,gpr.f_price2, 99999 as f_qty, "
+            "coalesce(rs.f_qty, 0) as f_reserveqty, 1, g.f_id as f_goods "
+            "from c_goods g "
+            "inner join c_units u on u.f_id=g.f_unit "
+            "left join c_goods_prices gpr on gpr.f_goods=g.f_id "
+            "left join (select f_goods, f_store, sum(f_qty) as f_qty "
+                "from a_store_reserve where f_state=:f_reservestate and f_goods=:f_goods group by 1, 2) "
+                "rs on rs.f_goods=g.f_id and rs.f_store=1 "
+            "where g.f_id=:f_goods and g.f_service=1 "
+        );
     while (db.nextRow()) {
         int r = ui->tbl->addEmptyRow();
         for (int i = 0; i < db.columnCount(); i++) {
