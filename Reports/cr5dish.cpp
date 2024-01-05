@@ -137,7 +137,7 @@ void CR5Dish::printRecipes(bool v)
         return;
     }
     C5Printing p;
-    QFont font(font());
+    QFont font(this->font());
     font.setPointSize(20);
     QSize paperSize(2000, 2800);
     p.setSceneParams(paperSize.width(), paperSize.height(), QPrinter::Portrait);

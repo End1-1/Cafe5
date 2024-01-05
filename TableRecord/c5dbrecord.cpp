@@ -1,14 +1,15 @@
 #include "c5dbrecord.h"
 #include <QException>
+#include <stdexcept>
 
 bool TableRecord::getRecord(C5Database &db)
 {
-    throw std::exception("getRecord() not implemented");
+    throw std::runtime_error("getRecord() not implemented");
 }
 
 TableRecord &TableRecord::queryRecordOfId(C5Database &db, const QVariant &id)
 {
-    throw std::exception("queryRecord(C5Database &db, const QVariant &id) not implemented");
+    throw std::runtime_error("queryRecord(C5Database &db, const QVariant &id) not implemented");
 }
 
 bool TableRecord::getWriteResult(C5Database &db, bool result, QString &err)

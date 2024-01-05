@@ -24,6 +24,7 @@
 #include <QStringListModel>
 #include <QInputDialog>
 #include <QPaintEngine>
+#include <stdexcept>
 
 static int fLastGroup = 0;
 static int fLastUnit = 0;
@@ -207,7 +208,7 @@ void CE5Goods::setId(int id)
             }
         }
         if (asrow < 0) {
-            throw std::exception(QString("The database id (%1) not exists. Check database structure.").arg(asrow).toLocal8Bit().data());
+            throw std::runtime_error(QString("The database id (%1) not exists. Check database structure.").arg(asrow).toLocal8Bit().data());
         }
         ui->tblAs->lineEdit(asrow, 2)->setText(db.getString("f_ascode"));
     }

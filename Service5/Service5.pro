@@ -116,7 +116,6 @@ HEADERS += \
     utils/jsonhandler.h \
     monitor.h \
     rc.h \
-    res.rc \
     serverthread.h \
     socket/sslserver.h \
     socket/sslsocket.h \
@@ -163,5 +162,3 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-RESOURCES += \
-    res.qrc

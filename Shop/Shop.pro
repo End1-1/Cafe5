@@ -552,8 +552,8 @@ INCLUDEPATH += ../Service5/handlers
 INCLUDEPATH += ../RESOURCES
 INCLUDEPATH += ../../XLSX/Src
 INCLUDEPATH += C:/Projects/NewTax/Src
-INCLUDEPATH += C:/Soft/OpenSSL-Win32/include
-INCLUDEPATH += C:/Soft/OpenSSL-Win32/include/openssl
+INCLUDEPATH += C:/Soft/OpenSSL-Win64/include
+INCLUDEPATH += C:/Soft/OpenSSL-Win64/include/openssl
 
 ICON = bag.ico
 

@@ -45,7 +45,7 @@ Sales::Sales(C5User *user) :
         ui->btnRetryUpload->setVisible(false);
     }
     db[":f_id"] = __c5config.defaultHall();
-    db.exec("select * from h_Halls where f_id=:f_id");
+    db.exec("select * from h_halls where f_id=:f_id");
     if (db.nextRow()) {
         ui->cbHall->addItem(db.getString("f_name"), __c5config.defaultHall());
     }

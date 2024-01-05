@@ -1,6 +1,7 @@
 #include "ce5partner.h"
 #include "ui_ce5partner.h"
 #include <QCompleter>
+#include <stdexcept>
 
 CE5Partner::CE5Partner(const QStringList &dbParams, QWidget *parent) :
     CE5Editor(dbParams, parent),
@@ -58,7 +59,7 @@ void CE5Partner::setId(int id)
             }
         }
         if (asrow < 0) {
-            throw std::exception(QString("The database id (%1) not exists. Check database structure.").arg(asrow).toLocal8Bit().data());
+            throw std::runtime_error(QString("The database id (%1) not exists. Check database structure.").arg(asrow).toLocal8Bit().data());
         }
         ui->tblAs->lineEdit(asrow, 2)->setText(db.getString("f_ascode"));
     }

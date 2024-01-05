@@ -62,9 +62,14 @@ void RequestManager::handle(const QString &session, const QString &remoteHost, c
     handle_route hr = getRouteHandler(r);
     if (!hr) {
         hr = getRouteHandler("notfound");
-        QByteArray ba = r.toUtf8();
-        hr(ba, outdata, dataMap, ContentType::TextHtml);
-        return;
+        if (hr) {
+            QByteArray ba = r.toUtf8();
+            hr(ba, outdata, dataMap, ContentType::TextHtml);
+            return;
+        } else {
+            outdata = "SERVER NOT CONFIGURE";
+            return;
+        }
     }
     QElapsedTimer et;
     et.start();

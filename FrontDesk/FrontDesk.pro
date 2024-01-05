@@ -19,7 +19,7 @@ TEMPLATE = app
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
 
-DEFINES += _DBDRIVER_=\\\"QMYSQL\\\"
+DEFINES += _DBDRIVER_=\\\"QMARIADB\\\"
 DEFINES += _ORGANIZATION_=\\\"Jazzve\\\"
 DEFINES += _APPLICATION_=\\\"Cafe5\\\"
 DEFINES += _MODULE_=\\\"FRONTDESK\\\"
@@ -37,6 +37,7 @@ CONFIG += c++11
 
 
 SOURCES += ../Cafe5/c5cafecommon.cpp \
+    ../../../Soft/OpenSSL-Win64/include/openssl/applink.c \
     ../../NewTax/Src/printtaxn.cpp \
     ../../NewTax/Src/printtaxn.cpp \
     ../../XLSX/src/xlsxborder.cpp \
@@ -378,6 +379,112 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../../XLSX/src/xlsxwriter.cpp
 
 HEADERS += ../Cafe5/c5cafecommon.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/__DECC_INCLUDE_EPILOGUE.H \
+    ../../../Soft/OpenSSL-Win64/include/openssl/__DECC_INCLUDE_PROLOGUE.H \
+    ../../../Soft/OpenSSL-Win64/include/openssl/aes.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/asn1.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/asn1_mac.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/asn1err.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/asn1t.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/async.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/asyncerr.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/bio.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/bioerr.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/blowfish.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/bn.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/bnerr.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/buffer.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/buffererr.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/camellia.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/cast.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/cmac.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/cms.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/cmserr.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/comp.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/comperr.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/conf.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/conf_api.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/conferr.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/crypto.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/cryptoerr.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/ct.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/cterr.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/des.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/dh.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/dherr.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/dsa.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/dsaerr.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/dtls1.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/e_os2.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/ebcdic.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/ec.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/ecdh.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/ecdsa.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/ecerr.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/engine.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/engineerr.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/err.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/evp.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/evperr.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/hmac.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/idea.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/kdf.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/kdferr.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/lhash.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/md2.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/md4.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/md5.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/mdc2.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/modes.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/obj_mac.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/objects.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/objectserr.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/ocsp.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/ocsperr.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/opensslconf.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/opensslv.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/ossl_typ.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/pem.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/pem2.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/pemerr.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/pkcs12.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/pkcs12err.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/pkcs7.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/pkcs7err.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/rand.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/rand_drbg.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/randerr.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/rc2.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/rc4.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/rc5.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/ripemd.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/rsa.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/rsaerr.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/safestack.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/seed.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/sha.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/srp.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/srtp.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/ssl.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/ssl2.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/ssl3.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/sslerr.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/stack.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/store.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/storeerr.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/symhacks.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/tls1.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/ts.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/tserr.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/txt_db.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/ui.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/uierr.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/whrlpool.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/x509.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/x509_vfy.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/x509err.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/x509v3.h \
+    ../../../Soft/OpenSSL-Win64/include/openssl/x509v3err.h \
     ../../NewTax/Src/printtaxn.h \
     ../../NewTax/Src/printtaxn.h \
     ../../XLSX/src/xlsxborder.h \
@@ -901,7 +1008,7 @@ INCLUDEPATH += ../Service
 INCLUDEPATH += ../Service5Working/utils
 INCLUDEPATH += ../Forms
 INCLUDEPATH += ../Configs
-INCLUDEPATH += /projects/xlsx/src
+INCLUDEPATH += /projects/Xlsx/src
 INCLUDEPATH += /Projects/NewTax/Src
 INCLUDEPATH += /Soft/OpenSSL-Win64/include
 INCLUDEPATH += /Soft/OpenSSL-Win64/include/openssl

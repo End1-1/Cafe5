@@ -161,9 +161,8 @@ void CR5Databases::resetDatabase()
     if (dr->exec() == QDialog::Accepted) {
         C5Database db(p);
         if (dr->saleAndBuy()) {
-            db.exec("delete from op_body");
+            db.exec("delete from op_body where f_id='1'");
             db.exec("delete from op_header");
-            db.exec("delete from a_calc_price");
             db.exec("delete from a_complectation_additions");
             db.exec("delete from a_header_shop2partner");
             db.exec("delete from a_header_shop2partneraccept");

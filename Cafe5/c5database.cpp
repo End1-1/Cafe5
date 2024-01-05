@@ -19,6 +19,7 @@
 #include <QJsonDocument>
 #include <QThread>
 #include <QApplication>
+#include <QTextCodec>
 
 #ifndef _NOAPP_
 #include <QMessageBox>
@@ -35,7 +36,7 @@ public:
     SqlException(const QString &w) throw () {
         fWhat = w;
     }
-    virtual char const *what() const override {
+    virtual const char* what() const noexcept override {
         return fWhat.toUtf8().data();
     }
 private:
@@ -694,11 +695,12 @@ bool C5Database::isReady()
 
 void C5Database::configureDatabase(QSqlDatabase &cn, const QString &host, const QString &db, const QString &user, const QString &password)
 {
+    QTextCodec::setCodecForLocale(QTextCodec::codecForName("utf8") );
     QString h = host;
     int port = 0;
     if (cn.driverName() == "QIBASE") {
         port = 3050;
-    } else if (cn.driverName() == "QMYSQL") {
+    } else if (cn.driverName() == "QMARIADB") {
         port = 3306;
     }
     if (h.contains(":")) {
