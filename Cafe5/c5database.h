@@ -6,6 +6,7 @@
 #include <QVariant>
 #include <QDate>
 #include <QElapsedTimer>
+#include <QJsonObject>
 
 #define where_id(id) QString("where f_id='%1'").arg(id)
 
@@ -22,6 +23,8 @@ public:
     C5Database(const QStringList &dbParams);
 
     C5Database(C5Database &db);
+
+    C5Database(const QJsonObject &params);
 
     C5Database(const QString &host, const QString &db, const QString &user, const QString &password);
 

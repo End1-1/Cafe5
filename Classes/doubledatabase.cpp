@@ -11,8 +11,6 @@
 #include <QSqlDriver>
 #include <QSqlField>
 
-#define _DBDRIVER_ "QMYSQL"
-
 int DoubleDatabase::fCounter = 0;
 bool DoubleDatabase::fDoNotUse2 = false;
 bool logEnabled = false;

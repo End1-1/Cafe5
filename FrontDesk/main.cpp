@@ -1,6 +1,7 @@
 #include "c5mainwindow.h"
 #include "c5connection.h"
 #include "c5systempreference.h"
+#include "c5login.h"
 #include <QMessageBox>
 #include <QApplication>
 #include <QTranslator>
@@ -28,15 +29,12 @@ int main(int argc, char *argv[])
 //    }
 
     QList<QByteArray> connectionParams;
-    C5Connection::readParams(connectionParams);
-    C5Config::fDBHost = connectionParams.at(0);
-    C5Config::fDBPath = connectionParams.at(1);
-    C5Config::fDBUser = connectionParams.at(2);
-    C5Config::fDBPassword = connectionParams.at(3);
-    C5Config::fSettingsName = connectionParams.at(4);
-    C5Config::fLastUsername = connectionParams.at(5);
-    C5Config::fFullScreen = connectionParams.at(6);
-    C5Config::initParamsFromDb();
+    C5Login l;
+    if (l.exec() == QDialog::Accepted) {
+        C5Config::initParamsFromDb();
+    } else {
+        return 0;
+    }
 
     if (!C5SystemPreference::checkDecimalPointAndSeparator()) {
         return 0;

@@ -112,7 +112,7 @@
                 <x>0</x>
                 <y>0</y>
                 <width>400</width>
-                <height>464</height>
+                <height>460</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -236,7 +236,6 @@
    </attribute>
    <addaction name="actionConnection"/>
    <addaction name="actionChange_password"/>
-   <addaction name="actionLogin"/>
    <addaction name="actionLogout"/>
    <addaction name="actionHome"/>
   </widget>
@@ -251,18 +250,6 @@
    </property>
    <property name="toolTip">
     <string>Connection settings</string>
-   </property>
-  </action>
-  <action name="actionLogin">
-   <property name="icon">
-    <iconset resource="../resources/res.qrc">
-     <normaloff>:/lock.png</normaloff>:/lock.png</iconset>
-   </property>
-   <property name="text">
-    <string>Login</string>
-   </property>
-   <property name="toolTip">
-    <string>Login</string>
    </property>
   </action>
   <action name="actionClose_application">

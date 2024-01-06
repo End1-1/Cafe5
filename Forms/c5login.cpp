@@ -1,35 +1,15 @@
 #include "c5login.h"
 #include "ui_c5login.h"
-#include "c5connection.h"
 #include "c5user.h"
+#include "c5dlgconnections.h"
+#include <QSettings>
 
-C5Login::C5Login(const QStringList &dbParams) :
-    C5Dialog(dbParams),
+C5Login::C5Login() :
+    C5Dialog(QStringList()),
     ui(new Ui::C5Login)
 {
     ui->setupUi(this);
-    C5Database db(dbParams);
-    db.exec("select f_login from s_user where f_id in (select f_user from s_db_access where f_permit=1)");
-    while (db.nextRow()) {
-        ui->leUsername->addItem(db.getString(0));
-    }
-    ui->leUsername->setCurrentIndex(-1);
-
-    if (C5Config::fLastUsername.length() > 0) {
-        ui->leUsername->setCurrentText(C5Config::fLastUsername);
-        ui->lePassword->setFocus();
-    }
-    if (__autologin_store.contains("--autologin")) {
-        for (const QString &s: __autologin_store) {
-            if (s.contains("--user:")) {
-                ui->leUsername->setCurrentText(s.mid(s.indexOf(":") + 1, s.length() - s.indexOf(":")));
-            } else if (s.contains("--password:")) {
-                ui->lePassword->setText(s.mid(s.indexOf(":") + 1, s.length() - s.indexOf(":")));
-            }
-        }
-        on_btnOk_clicked();
-    }
-
+    readServers();
 }
 
 C5Login::~C5Login()
@@ -67,9 +47,61 @@ void C5Login::on_btnOk_clicked()
         return;
     }
 
-    C5Config::fLastUsername = ui->leUsername->currentText();
-    C5Connection::writeParams();
+    int index = ui->cbDatabases->currentIndex();
+    const QJsonObject &js = fServers.at(index).toObject();
+    js["lastusername"] = ui->leUsername->currentText();
+    fServers[index] = js;
+    QSettings s(_ORGANIZATION_, _APPLICATION_+ QString("\\") + _MODULE_);
+    s.setValue("servers", QJsonDocument(fServers).toJson());
 
     accept();
+}
+
+
+void C5Login::on_cbDatabases_currentIndexChanged(int index)
+{
+    for (int i = 0; i < fServers.count(); i++) {
+        const QJsonObject &js = fServers.at(i).toObject();
+        js["current"] = i == index;
+        fServers[i] = js;
+    }
+
+    const QJsonObject &js = fServers.at(index).toObject();
+    C5Config::fDBHost = js["host"].toString();
+    C5Config::fDBPath = js["database"].toString();
+    C5Config::fDBUser = js["username"].toString();
+    C5Config::fDBPassword = js["password"].toString();
+    C5Config::fSettingsName = js["settings"].toString();
+    C5Config::fLastUsername = js["lastusername"].toString();
+    C5Config::fFullScreen = js["fullscreen"].toBool();
+
+    C5Database db(js);
+    db.exec("select f_login from s_user where f_id in (select f_user from s_db_access where f_permit=1)");
+    while (db.nextRow()) {
+        ui->leUsername->addItem(db.getString(0));
+    }
+    ui->leUsername->setCurrentIndex(-1);
+    if (js["lastusername"].toString().length() > 0) {
+        ui->leUsername->setCurrentText(js["lastusername"].toString());
+        ui->lePassword->setFocus();
+    }
+}
+
+void C5Login::readServers()
+{
+    QSettings s(_ORGANIZATION_, _APPLICATION_+ QString("\\") + _MODULE_);
+    fServers = QJsonDocument::fromJson(s.value("servers", "[]").toByteArray()).array();
+    ui->cbDatabases->clear();
+    for (int i = 0; i < fServers.count(); i++) {
+        const QJsonObject &js = fServers.at(i).toObject();
+        ui->cbDatabases->addItem(js["name"].toString());
+    }
+}
+
+
+void C5Login::on_btnEditConnections_clicked()
+{
+    C5DlgConnections().exec();
+    readServers();
 }
 

@@ -1388,3 +1388,10 @@ update d_dish set f_image=uuid();
 alter table d_dish add column f_cookingtime int;
 update d_dish set f_cookingtime=0;
 create table o_body_process( f_id char(36) primary key, f_append timestamp default null, f_print timestamp default null, f_begin timestamp default null, f_end timestamp default null);
+
+/*db - 141, 03.01.2024*/
+update s_app set f_version='141' where f_app='DB';
+alter table a_header add f_body json;
+drop table a_calc_price;
+drop table s_draft;
+create table a_result (f_id int primary key  auto_increment, f_timestamp timestamp, f_session char(36), f_document char(36), f_result longtext);

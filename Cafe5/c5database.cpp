@@ -86,6 +86,12 @@ C5Database::C5Database(C5Database &db) :
                       db.fDb.password());
 }
 
+C5Database::C5Database(const QJsonObject &params) :
+    C5Database()
+{
+    configureDatabase(fDb, params["host"].toString(), params["database"].toString(), params["username"].toString(), params["password"].toString());
+}
+
 C5Database::C5Database(const QString &host, const QString &db, const QString &user, const QString &password) :
     C5Database()
 {

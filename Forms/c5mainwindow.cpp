@@ -2,7 +2,6 @@
 #include "ui_c5mainwindow.h"
 #include "c5message.h"
 #include "c5connection.h"
-#include "c5login.h"
 #include "c5cashdoc.h"
 #include "cr5cashdetailed.h"
 #include "c5permissions.h"
@@ -38,6 +37,7 @@
 #include "cr5dish.h"
 #include "cr5settings.h"
 #include "cr5complectations.h"
+#include "c5dlgconnections.h"
 #include "c5selector.h"
 #include "cr5goodsmovement.h"
 #include "c5salarydoc.h"
@@ -111,8 +111,6 @@
 
 C5MainWindow *__mainWindow;
 QStringList mainDbParams;
-QString fUdpBroadcastSession;
-const quint32 DATAGRAM_PORT = 3390;
 
 C5MainWindow::C5MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -164,6 +162,14 @@ C5MainWindow::C5MainWindow(QWidget *parent) :
     fUpdateTimer.start(10000);
 #endif
     ui->wMenu->resize(C5Config::getRegValue("twdbsize", 300).toInt(), 0);
+
+    setDB();
+    enableMenu(true);
+    ui->actionHome->setEnabled(true);
+    ui->actionLogout->setVisible(true);
+    ui->actionChange_password->setVisible(true);
+
+    C5ReportTemplateDriver::init(__user->group());
 }
 
 C5MainWindow::~C5MainWindow()
@@ -264,14 +270,12 @@ void C5MainWindow::currentTabChange(int index)
 
 void C5MainWindow::on_actionConnection_triggered()
 {
-    C5Connection::go<C5Connection>(C5Config::dbParams());
+    C5DlgConnections().exec();
 }
 
 void C5MainWindow::on_actionLogin_triggered()
 {
-    if (!C5Connection::go<C5Login>(C5Config::dbParams())) {
-        return;
-    }
+
     showMaximized();
     fStatusLabel->setText(__user->fullName());
 
@@ -283,15 +287,6 @@ void C5MainWindow::on_actionLogin_triggered()
         C5Message::info(tr("No access to this database"));
         return;
     }
-    C5Config::initParamsFromDb();
-    setDB();
-    enableMenu(true);
-    ui->actionHome->setEnabled(true);
-    ui->actionLogin->setVisible(false);
-    ui->actionLogout->setVisible(true);
-    ui->actionChange_password->setVisible(true);
-
-    C5ReportTemplateDriver::init(__user->group());
 }
 
 void C5MainWindow::updateTimeout()
@@ -775,7 +770,6 @@ void C5MainWindow::on_actionLogout_triggered()
         delete li;
     }
     fMenuLists.clear();
-    ui->actionLogin->setVisible(true);
     ui->actionLogout->setVisible(false);
     ui->actionChange_password->setVisible(false);
 }

@@ -527,7 +527,7 @@ FORMS += \
     ../Cafe5/c5message.ui \
     dqty.ui
 
-DEFINES += _DBDRIVER_=\\\"QMYSQL\\\"
+DEFINES += _DBDRIVER_=\\\"QMARIADB\\\"
 DEFINES += _ORGANIZATION_=\\\"BreezeDevs\\\"
 DEFINES += _APPLICATION_=\\\"Shop\\\"
 DEFINES += _MODULE_=\\\"Shop\\\"

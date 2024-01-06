@@ -82,6 +82,7 @@ int CR5CostumerDebtsFilter::viewMode()
     if (ui->rbTAccount->isChecked()) {
         return 3;
     }
+    return 1;
 }
 
 QString CR5CostumerDebtsFilter::date1()
