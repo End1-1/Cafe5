@@ -142,7 +142,7 @@ INCLUDEPATH += ../Classes
 INCLUDEPATH += C:/Soft/OpenSSL-Win64/include
 INCLUDEPATH += C:/Soft/OpenSSL-Win64/include/openssl
 
-DEFINES += _DBDRIVER_=\\\"QMYSQL\\\"
+DEFINES += _DBDRIVER_=\\\"QMARIADB\\\"
 DEFINES += _ORGANIZATION_=\\\"BreezeDevs\\\"
 DEFINES += _APPLICATION_=\\\"Cafe5\\\"
 DEFINES += _MODULE_=\\\"Service5\\\"

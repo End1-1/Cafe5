@@ -369,7 +369,8 @@ bool C5Database::execNetwork(const QString &sqlQuery)
     fBindValues.clear();
 
     QNetworkAccessManager m;
-    QNetworkRequest rq(QString("https://%1:10002/vipclient").arg(fDb.hostName()));
+    QString host = QString("https://%1:10002/vipclient").arg(fDb.hostName());
+    QNetworkRequest rq(host);
     rq.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     QSslConfiguration sslConf = rq.sslConfiguration();
     sslConf.setPeerVerifyMode(QSslSocket::VerifyNone);
@@ -393,33 +394,38 @@ bool C5Database::execNetwork(const QString &sqlQuery)
     }
     jo = jo["data"].toObject();
     QJsonArray ja = jo["columns"].toObject()["column_index_name"].toArray();
-    ja = jo["columns"].toObject()["column_name_index"].toArray();
-    QJsonObject jtype = jo["types"].toObject();
     fNameColumnMap.clear();
     for (int i = 0; i < ja.size(); i++) {
         const QJsonObject &jc = ja[i].toObject();
         fNameColumnMap[jc["name"].toString()] = jc["value"].toInt();
     }
+    ja = jo["columns"].toObject()["column_name_index"].toArray();
+    QJsonArray jtype = jo["types"].toArray();
+    // fNameColumnMap.clear();
+    // for (int i = 0; i < ja.size(); i++) {
+    //     const QJsonObject &jc = ja[i].toObject();
+    //     fNameColumnMap[jc["name"].toString()] = jc["value"].toInt();
+    // }
     ja = jo["data"].toArray();
     fDbRows.clear();
     for (int i = 0; i < ja.size(); i++) {
         QList<QVariant> r;
         QJsonArray jar = ja[i].toArray();
         for (int j = 0; j < jar.size(); j++) {
-            switch (jtype[QString::number(j)].toInt()) {
-            case QVariant::Int:
+            switch (jtype[j].toInt()) {
+            case 3:
                 r.append(jar[j].toInt());
                 break;
-            case QVariant::Double:
+            case 246:
                 r.append(jar[j].toDouble());
                 break;
-            case QVariant::Date:
+            case 10:
                 r.append(QDate::fromString(jar[j].toString()));
                 break;
-            case QVariant::Time:
+            case 11:
                 r.append(QTime::fromString(jar[j].toString()));
                 break;
-            case QVariant::DateTime:
+            case 7:
                 r.append(QDateTime::fromString(jar[j].toString()));
                 break;
             default:

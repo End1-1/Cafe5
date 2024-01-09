@@ -19,7 +19,7 @@ TEMPLATE = app
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
 
-DEFINES += _DBDRIVER_=\\\"QMYSQL\\\"
+DEFINES += _DBDRIVER_=\\\"QMARIADB\\\"
 DEFINES += _ORGANIZATION_=\\\"Jazzve\\\"
 DEFINES += _APPLICATION_=\\\"Cafe5\\\"
 DEFINES += _MODULE_=\\\"FRONTDESK\\\"
@@ -271,6 +271,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../TableRecord/odraftsalebody.cpp \
     ../TableRecord/ogoods.cpp \
     ../TableRecord/oheader.cpp \
+    c5dlgconnections.cpp \
         main.cpp \
     ../Cafe5/c5config.cpp \
     ../Cafe5/c5connection.cpp \
@@ -669,6 +670,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Reports/cr5documentsfilter.h \
     ../Reports/cr5consumptionbysales.h \
     ../Reports/cr5consumptionbysalesfilter.h \
+    c5dlgconnections.h \
     rc.h \
     res.rc \
     ../Editors/ce5partner.h \
@@ -885,7 +887,8 @@ FORMS += \
     ../Editors/ce5createtablesforhall.ui \
     ../Reports/cr5menutranslator.ui \
     ../Reports/cr5dishpriceselfcostfilter.ui \
-    ../Reports/cr5storedocumentsfilter.ui
+    ../Reports/cr5storedocumentsfilter.ui \
+    c5dlgconnections.ui
 
 INCLUDEPATH += ../Cafe5
 INCLUDEPATH += ../Cache

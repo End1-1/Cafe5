@@ -25,16 +25,14 @@ bool vipclient(const QByteArray &indata, QByteArray &outdata, const QHash<QStrin
     JsonHandler jh;
     RequestHandler rh(outdata);
 #ifdef ELINA
-#ifdef QT_DEBUG
-    QString dbname = "store";
-#else
-    QString dbname = "elina";
-#endif
-    if (!db.open("18.159.205.66", dbname, "root", "root5")) {
-        LogWriter::write(LogWriterLevel::errors, "", QString("sqlquery::sqlquery").arg(db.lastDbError()));
-        jh["message"] = "Cannot connect to database";
-        return rh.setInternalServerError(jh.toString());
+    if (contentType != ContentType::ApplilcationJson) {
+        return rh.setDataValidationError("Accept content type: Applilcation/Json");
     }
+    QJsonObject jo = QJsonDocument::fromJson(getData(indata, dataMap["json"])).object();
+    QJsonObject jresponse;
+    QueryJsonResponse(db, jo, jresponse).getResponse();
+
+    return rh.setResponse(HTTP_OK, QJsonDocument(jresponse).toJson(QJsonDocument::Compact));
 #else
     QString configFile = path + "/remotedb.ini";
     if (!QFile::exists(configFile)) {
@@ -47,7 +45,6 @@ bool vipclient(const QByteArray &indata, QByteArray &outdata, const QHash<QStrin
         jh["message"] = "Cannot connect to database";
         return rh.setInternalServerError(jh.toString());
     }
-#endif
     if (contentType != ContentType::ApplilcationJson) {
         return rh.setDataValidationError("Accept content type: Applilcation/Json");
     }
@@ -56,4 +53,5 @@ bool vipclient(const QByteArray &indata, QByteArray &outdata, const QHash<QStrin
     QueryJsonResponse(db, jo, jresponse).getResponse();
 
     return rh.setResponse(HTTP_OK, QJsonDocument(jresponse).toJson(QJsonDocument::Compact));
+#endif
 }

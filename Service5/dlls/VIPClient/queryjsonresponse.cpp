@@ -128,7 +128,9 @@ bool QueryJsonResponse::createOrder()
 
 bool QueryJsonResponse::dbQuery()
 {
-    //return networkRedirect(fJsonIn["sql"].toString());
+#ifdef ELINA
+    return networkRedirect(fJsonIn["sql"].toString());
+#endif
     QElapsedTimer t;
     t.start();
     if (!fDb.exec(fJsonIn["sql"].toString())) {
@@ -194,7 +196,9 @@ bool QueryJsonResponse::dbQuery()
 
 bool QueryJsonResponse::networkRedirect(const QString &sql)
 {
-    QString server = QString("https://%1/info.php").arg("3.142.126.191");
+    QElapsedTimer t;
+    t.start();
+    QString server = QString("https://%1/info.php").arg("aws.elina.am");
     QEventLoop loop;
     QNetworkAccessManager m;
     QNetworkRequest rq(server);
@@ -211,9 +215,7 @@ bool QueryJsonResponse::networkRedirect(const QString &sql)
     auto *r = m.post(rq, QJsonDocument(jo).toJson());
     r->connect(r, SIGNAL(finished()), &loop, SLOT(quit()));
     loop.exec();
-
     if (r->error() != QNetworkReply::NoError) {
-
         return dbFail(r->errorString());
     }
     fJsonOut = QJsonDocument::fromJson(r->readAll()).object();
@@ -233,6 +235,7 @@ bool QueryJsonResponse::networkRedirect(const QString &sql)
     }
     fJsonOut["data"].toObject()["types"] = ja;
     r->deleteLater();
+    qDebug() << t.elapsed() << sql;
     return true;
 }
 

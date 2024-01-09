@@ -28,7 +28,6 @@ int main(int argc, char *argv[])
 //        return 1;
 //    }
 
-    QList<QByteArray> connectionParams;
     C5Login l;
     if (l.exec() == QDialog::Accepted) {
         C5Config::initParamsFromDb();

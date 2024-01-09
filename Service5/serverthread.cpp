@@ -21,7 +21,7 @@ ServerThread::~ServerThread()
 void ServerThread::run()
 {
     LogWriter::write(LogWriterLevel::verbose, "", "SSL version: " + QSslSocket::sslLibraryBuildVersionString());
-    LogWriter::write(LogWriterLevel::verbose, "", "SSL support: " + QSslSocket::supportsSsl() ? "YES" : "NO");
+    LogWriter::write(LogWriterLevel::verbose, "", "SSL support: " + QString((QSslSocket::supportsSsl() ? "YES" : "NO")));
     QString certFileName = fConfigPath + "cert.pem";
     QString keyFileName = fConfigPath + "key.pem";
     fSslServer = new SslServer();
