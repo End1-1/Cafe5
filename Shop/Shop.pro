@@ -44,7 +44,6 @@ SOURCES += \
     ../Cafe5/c5cafecommon.cpp \
     ../Cafe5/c5double.cpp \
     ../Cafe5/c5logsystem.cpp \
-    ../Cafe5/c5replication.cpp \
     ../Cafe5/c5serverhandler.cpp \
     ../Cafe5/c5systempreference.cpp \
     ../Cafe5/calendar.cpp \
@@ -206,8 +205,6 @@ SOURCES += \
     dlggiftcardsale.cpp \
     dlggoodslist.cpp \
     dlgpin.cpp \
-    dlgpreorder.cpp \
-    dlgpreorderitem.cpp \
     dlgreturnitem.cpp \
     dlgsearchpartner.cpp \
     dlgshowcolumns.cpp \
@@ -216,7 +213,6 @@ SOURCES += \
     imageloader.cpp \
     loghistory.cpp \
         main.cpp \
-    replicadialog.cpp \
     sales.cpp \
     searchitems.cpp \
     selectstaff.cpp \
@@ -268,7 +264,6 @@ HEADERS += \
     ../Cafe5/c5cafecommon.h \
     ../Cafe5/c5double.h \
     ../Cafe5/c5logsystem.h \
-    ../Cafe5/c5replication.h \
     ../Cafe5/c5serverhandler.h \
     ../Cafe5/c5systempreference.h \
     ../Cafe5/calendar.h \
@@ -437,8 +432,6 @@ HEADERS += \
     dlggiftcardsale.h \
     dlggoodslist.h \
     dlgpin.h \
-    dlgpreorder.h \
-    dlgpreorderitem.h \
     dlgreturnitem.h \
     dlgsearchpartner.h \
     dlgshowcolumns.h \
@@ -446,7 +439,6 @@ HEADERS += \
     goodsreturnreason.h \
     imageloader.h \
     loghistory.h \
-    replicadialog.h \
     sales.h \
     searchitems.h \
     selectstaff.h \
@@ -502,15 +494,12 @@ FORMS += \
     dlggiftcardsale.ui \
     dlggoodslist.ui \
     dlgpin.ui \
-    dlgpreorder.ui \
-    dlgpreorderitem.ui \
     dlgreturnitem.ui \
     dlgsearchpartner.ui \
     dlgshowcolumns.ui \
     dlgsplashscreen.ui \
     goodsreturnreason.ui \
     loghistory.ui \
-    replicadialog.ui \
     sales.ui \
     searchitems.ui \
     selectstaff.ui \

@@ -4,7 +4,6 @@
 #include "printreceiptgroup.h"
 #include "c5database.h"
 #include "selectprinters.h"
-#include "c5replication.h"
 #include "c5utils.h"
 #include "c5message.h"
 #include "printtaxn.h"
@@ -72,6 +71,8 @@ void Sales::showSales(Working *w, C5User *u)
 
 bool Sales::printCheckWithTax(C5Database &db, const QString &id, QString &rseq)
 {
+    QElapsedTimer et;
+    et.start();
     bool resultb = true;
     db[":f_id"] = id;
     db.exec("select * from o_tax where f_id=:f_id");
@@ -141,46 +142,22 @@ bool Sales::printCheckWithTax(C5Database &db, const QString &id, QString &rseq)
                     db.getDouble("f_discountfactor") * 100); //discount
     }
     QString jsonIn, jsonOut, err;
-    QString sn, firm, address, fiscal, hvhh, devnum, time;
     int result = 0;
     result = pt.makeJsonAndPrint(card, prepaid, jsonIn, jsonOut, err);
 
-    db[":f_id"] = db.uuid();
-    db[":f_order"] = id;
-    db[":f_date"] = QDate::currentDate();
-    db[":f_time"] = QTime::currentTime();
-    db[":f_in"] = jsonIn;
-    db[":f_out"] = jsonOut;
-    db[":f_err"] = err;
-    db[":f_result"] = result;
-    db.insert("o_tax_log", false);
-    QSqlQuery *q = new QSqlQuery(db.fDb);
+    QJsonObject jtax;
+    jtax["f_order"] = id;
+    jtax["f_elapsed"] = et.elapsed();
+    jtax["f_in"] = jsonIn;
+    jtax["f_out"] = jsonOut;
+    jtax["f_err"] = err;
+    jtax["f_result"] = result;
+    jtax["f_state"] = result == pt_err_ok ? 1 : 0;
+    db.exec(QString("call sf_create_shop_tax('%1')").arg(QString(QJsonDocument(jtax).toJson(QJsonDocument::Compact))));
     if (result == pt_err_ok) {
-        PrintTaxN::parseResponse(jsonOut, firm, hvhh, fiscal, rseq, sn, address, devnum, time);
-        db[":f_id"] = id;
-        db.exec("delete from o_tax where f_id=:f_id");
-        db[":f_id"] = id;
-        db[":f_dept"] = C5Config::taxDept();
-        db[":f_firmname"] = firm;
-        db[":f_address"] = address;
-        db[":f_devnum"] = devnum;
-        db[":f_serial"] = sn;
-        db[":f_fiscal"] = fiscal;
-        db[":f_receiptnumber"] = rseq;
-        db[":f_hvhh"] = hvhh;
-        db[":f_fiscalmode"] = tr("(F)");
-        db[":f_time"] = time;
-        db.insert("o_tax", false);
-        pt.saveTimeResult(id, *q);
-        db[":f_tax"] = rseq.toInt();
-        db.update("o_goods", "f_header", id);
-        delete q;
         C5Message::info(tr("Printed"));
     } else {
-        resultb = false;
-        pt.saveTimeResult("Not saved - " + id, *q);
-        delete q;
-        C5Message::error(err + "<br>" + jsonOut + "<br>" + jsonIn);
+        C5Message::error(err);
     }
     return resultb;
 }
@@ -773,16 +750,6 @@ void Sales::on_btnTotalByItems_clicked()
     ui->btnItemBack->setEnabled(false);
     fViewMode = VM_TOTAL_ITEMS;
     refresh();
-}
-
-void Sales::on_btnRetryUpload_clicked()
-{
-    C5Replication r;
-    if (r.uploadToServer()) {
-        ui->btnRetryUpload->setVisible(false);
-    } else {
-        C5Message::error(tr("Cannot upload data"));
-    }
 }
 
 void Sales::on_btnCashColletion_clicked()

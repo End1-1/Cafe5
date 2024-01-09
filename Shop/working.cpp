@@ -5,7 +5,6 @@
 #include "datadriver.h"
 #include "printtaxn.h"
 #include "sales.h"
-#include "c5replication.h"
 #include "c5config.h"
 #include "c5user.h"
 #include "loghistory.h"
@@ -14,14 +13,11 @@
 #include "dlgsplashscreen.h"
 #include "searchitems.h"
 #include "wcustomerdisplay.h"
-#include "c5connection.h"
 #include "goodsreserve.h"
 #include "c5logsystem.h"
 #include "storeinput.h"
-#include "selectstaff.h"
 #include "taxprint.h"
 #include "messagelist.h"
-//#include "config.h"
 #include "threadcheckmessage.h"
 #include "chatmessage.h"
 #include "threadreadmessage.h"
@@ -31,7 +27,6 @@
 #include "rawmessage.h"
 #include "c5tablewidget.h"
 #include "printreceiptgroup.h"
-#include "dlgpreorder.h"
 #include "dlgserversettings.h"
 #include "serverconnection.h"
 #include "socketconnection.h"
@@ -782,50 +777,13 @@ void Working::on_btnWriteOrder_clicked()
     if (!w->writeOrder()) {
         return;
     }
-    if (__c5config.getValue(param_no_tax).toInt() != 1 && __c5config.getValue(param_shop_never_tax).toInt() == 0) {
-        if (w->fOHeader._printFiscal) {
-            QString rseq;
-            C5Database db(C5Config::dbParams());
-            if (Sales::printCheckWithTax(db, w->fOHeader._id(), rseq)) {
-                if (!C5Config::localReceiptPrinter().isEmpty()) {
-//                    PrintReceiptGroup p;
-//                    switch (C5Config::shopPrintVersion()) {
-//                    case 1: {
-//                        bool p1, p2;
-//                        if (SelectPrinters::selectPrinters(p1, p2)) {
-//                            if (p1) {
-//                                p.print(w->fOrderUUID, db, 1);
-//                            }
-//                            if (p2) {
-//                                p.print(w->fOrderUUID, db, 2);
-//                            }
-//                        }
-//                        break;
-//                    }
-//                    case 2:
-//                        p.print2(w->fOrderUUID, db);
-//                        break;
-//                    case 3:
-//                        p.print3(w->fOrderUUID, db);
-//                        break;
-//                    default:
-//                        break;
-//                    }
-                }
-            }
-        }
-    }
+
     w->table()->setRowCount(0);
     ui->tab->removeTab(ui->tab->currentIndex());
     if (ui->tab->count() == 0) {
         newSale(SALE_RETAIL);
     }
     w->deleteLater();
-
-    if(__c5config.rdbReplica()) {
-        auto *r = new C5Replication();
-        r->start(SLOT(uploadToServer()));
-    }
 }
 
 void Working::on_btnGoodsMovement_clicked()
@@ -886,21 +844,6 @@ void Working::on_btnSalesReport_clicked()
     if (u != fUser) {
         delete u;
     }
-}
-
-void Working::on_btnDbConnection_clicked()
-{
-    if (C5Config::fDBPassword.length() > 0) {
-        QString password = QInputDialog::getText(this, tr("Password"), tr("Password"), QLineEdit::Password);
-        if (C5Config::fDBPassword != password) {
-            C5Message::error(tr("Access denied"));
-            return;
-        }
-    }
-    const QStringList dbParams;
-    C5Connection *cnf = new C5Connection(dbParams);
-    cnf->exec();
-    delete cnf;
 }
 
 void Working::on_btnHelp_clicked()
@@ -980,13 +923,6 @@ void Working::on_btnCostumerDisplay_clicked(bool checked)
     auto *wo = worder();
     if (wo) {
         wo->updateCustomerDisplay(fCustomerDisplay);
-    }
-}
-
-void Working::on_btnPreorder_clicked()
-{
-    if (DlgPreorder(this).exec() == QDialog::Accepted) {
-
     }
 }
 

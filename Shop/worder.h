@@ -112,8 +112,6 @@ private slots:
 
     void noImage();
 
-    void on_btnRemove_clicked();
-
     void on_leCode_textChanged(const QString &arg1);
 
     void on_leCode_returnPressed();
@@ -136,8 +134,6 @@ private:
     BHistory fBHistory;
 
     QVector<OGoods> fOGoods;
-
-    QByteArray fPreorderUUID;
 
     bool returnFalse(const QString &msg, C5Database &db);
 

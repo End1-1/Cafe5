@@ -269,13 +269,11 @@ void DlgReservGoods::on_btnPrintFiscal_clicked()
     PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(),
                  C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
     QString jsonIn, jsonOut, err;
-    int result = 0;
     if (pt.printAdvanceJson(ui->lePrepaid->getDouble(), ui->lePrepaidCard->getDouble(), jsonIn, jsonOut, err) != pt_err_ok) {
         C5Message::error(err);
     } else {
-        QString firm, hvhh, fiscal, number, sn, address, devnum, time;
-        pt.parseResponse(jsonOut, firm, hvhh, fiscal, number, sn, address, devnum, time);
-        ui->leFiscal->setText(number);
+        QJsonObject jdoc = QJsonDocument::fromJson(jsonOut.toUtf8()).object();
+        ui->leFiscal->setText(jdoc["rseq"].toString());
         on_btnSave_clicked();
     }
 }

@@ -141,4 +141,5 @@ bool OutputOfHeader::make(C5Database &db, const QString &id)
             dw.writeAHeader2ShopStore(pstoredoc, partnerStore, 0);
         }
     }
+    return true;
 }

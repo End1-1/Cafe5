@@ -9,8 +9,8 @@
 
 C5Connection::C5Connection(const QJsonObject &params) :
     C5Dialog(QStringList()),
-    ui(new Ui::C5Connection),
-    fParams(params)
+    fParams(params),
+    ui(new Ui::C5Connection)
 {
     ui->setupUi(this);
     ui->leName->setText(params["name"].toString());

@@ -5,9 +5,7 @@
 #include "dlgpin.h"
 #include "c5logsystem.h"
 #include "c5user.h"
-#include "c5replication.h"
 #include "datadriver.h"
-#include "replicadialog.h"
 #include "settingsselection.h"
 #include "c5systempreference.h"
 #include "dlgsplashscreen.h"
@@ -19,7 +17,10 @@
 #include <QDir>
 #include <QTranslator>
 #include <QStyleFactory>
-
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QSettings>
 int main(int argc, char *argv[])
 {
 #ifndef QT_DEBUG
@@ -61,31 +62,22 @@ int main(int argc, char *argv[])
     for (int i = 0; i < argc; i++) {
         args << argv[i];
     }
-    if (args.contains("--config")) {
-        QList<QByteArray> connectionParams;
-        C5Connection::readParams(connectionParams);
-        if (connectionParams.count() > 3) {
-            if (connectionParams[3].length() > 0) {
-                QString password = QInputDialog::getText(nullptr, QObject::tr("Password"), QObject::tr("Password"), QLineEdit::Password);
-                if (connectionParams[3] != password) {
-                    C5Message::error(QObject::tr("Access denied"));
-                    return 0;
-                }
-            }
+
+    QSettings ss(_ORGANIZATION_, _APPLICATION_+ QString("\\") + _MODULE_);
+    QJsonObject js = QJsonDocument::fromJson(ss.value("server", "{}").toByteArray()).object();
+    if (args.contains("--config") || js.isEmpty()) {
+        C5Connection l(js);
+        if (l.exec() == QDialog::Accepted) {
+            js = l.fParams;
+            ss.setValue("server", QJsonDocument(js).toJson(QJsonDocument::Compact));
         }
-        const QStringList dbParams;
-        C5Connection *cnf = new C5Connection(dbParams);
-        cnf->exec();
-        delete cnf;
     }
 
-    QList<QByteArray> connectionParams;
-    C5Connection::readParams(connectionParams);
-    C5Config::fDBHost = connectionParams.at(0);
-    C5Config::fDBPath = connectionParams.at(1);
-    C5Config::fDBUser = connectionParams.at(2);
-    C5Config::fDBPassword = connectionParams.at(3);
-    C5Config::fSettingsName = connectionParams.at(4);
+    C5Config::fDBHost = js["host"].toString();
+    C5Config::fDBPath = js["database"].toString();
+    C5Config::fDBUser = js["username"].toString();
+    C5Config::fDBPassword = js["password"].toString();
+    C5Config::fSettingsName = js["settings"].toString();
     C5Config::initParamsFromDb();
 
     if (!C5SystemPreference::checkDecimalPointAndSeparator()) {
@@ -148,19 +140,6 @@ int main(int argc, char *argv[])
         }
     }
     s->deleteLater();
-
-
-    if (__c5config.rdbReplica()) {
-        __c5config.initParamsFromDb();
-        auto *r = new C5Replication();
-        r->uploadToServer();
-        delete r;
-
-        auto *rp = new ReplicaDialog();
-        rp->exec();
-        delete rp;
-        __c5config.initParamsFromDb();
-    }
 
     DataDriver::init(__c5config.dbParams());
 

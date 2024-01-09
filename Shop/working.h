@@ -161,8 +161,6 @@ private slots:
 
     void on_btnSalesReport_clicked();
 
-    void on_btnDbConnection_clicked();
-
     void on_btnHelp_clicked();
 
     void on_btnManualTax_clicked();
@@ -174,7 +172,7 @@ private slots:
     void on_btnGiftCard_clicked();
 
     void on_btnCostumerDisplay_clicked(bool checked);
-    void on_btnPreorder_clicked();
+
     void on_btnOpenDraft_clicked();
     void on_btnColumns_clicked();
 };

@@ -1,4 +1,5 @@
 #include "worder.h"
+#include "outputofheader.h"
 #include "ui_worder.h"
 #include "c5database.h"
 #include "c5config.h"
@@ -8,26 +9,22 @@
 #include "c5message.h"
 #include "c5permissions.h"
 #include "c5printing.h"
-#include "preorders.h"
 #include "c5logsystem.h"
+#include "printreceiptgroup.h"
 #include "printreceipt.h"
 #include "selectstaff.h"
 #include "c5shoporder.h"
 #include "dlgsearchpartner.h"
 #include "working.h"
 #include "c5replacecharacter.h"
+#include "selectprinters.h"
 #include "dlgpaymentchoose.h"
 #include "c5user.h"
-#include "c5cache.h"
 #include "datadriver.h"
 #include "wcustomerdisplay.h"
 #include "c5utils.h"
 #include "odraftsalebody.h"
-#include "c5printrecipta4.h"
-#include "c5storedraftwriter.h"
-#include "c5replication.h"
 #include "QRCodeGenerator.h"
-#include "threadcheckmessage.h"
 #include <QInputDialog>
 #include <QSettings>
 
@@ -43,6 +40,7 @@ WOrder::WOrder(C5User *user, int saleType, WCustomerDisplay *customerDisplay, QW
     fDraftSale.date = QDate::currentDate();
     fDraftSale.time = QTime::currentTime();
     fDraftSale.staff = user->id();
+    fOHeader.id = C5Database::uuid();
     fOHeader.state = ORDER_STATE_CLOSE;
     fOHeader.hall = __c5config.defaultHall();
     fOHeader.table = __c5config.defaultTable();
@@ -310,6 +308,18 @@ int WOrder::addGoodsToTable(int id, bool checkQtyOfStore, const QString &draftid
 
 bool WOrder::writeOrder()
 {
+    if (fOGoods.count() == 0) {
+        C5Message::error(tr("Empty order"));
+        return false;
+    }
+    if (__c5config.cashId() == 0) {
+        C5Message::error(tr("Cashdesk for cash not defined"));
+        return false;
+    }
+    if (__c5config.nocashId() == 0) {
+        C5Message::error(tr("Cashdesk for card not defined"));
+        return false;
+    }
     if (fOHeader.amountCash < 0.001
             && fOHeader.amountCard < 0.001
             && fOHeader.amountBank < 0.001
@@ -349,80 +359,194 @@ bool WOrder::writeOrder()
     C5User *u = fUser;
     SelectStaff ss(fWorking);
     if (__c5config.shopDifferentStaff() && fWorking->fCurrentUsers.count() > 0) {
-        do {
-            if (ss.exec() == QDialog::Rejected) {
-                break;
-            }
-            u = ss.fUser;
-        } while (!u->isValid());
+        if (ss.exec() == QDialog::Rejected) {
+            return false;
+        }
+        u = ss.fUser;
+        if (!u->isValid()) {
+            return false;
+        }
     }
-    C5ShopOrder so(fOHeader, fBHistory, fOGoods);
-    fOHeader.staff = u->id();
-    fOHeader.dateClose = QDate::currentDate();
-    fOHeader.timeClose = QTime::currentTime();
-    so.fWriteAdvance = fOHeader.saleType == -1;
-    bool w = so.write();
-    if (w) {
-        w = so.writeFlags(ui->btnF1->isChecked(), ui->btnF2->isChecked(),
-                          ui->btnF3->isChecked(), ui->btnF4->isChecked(),
-                          ui->btnF5->isChecked());
+    QJsonObject jdoc;
+    jdoc["session"] = C5Database::uuid();
+    jdoc["giftcard"] = fGiftCard;
+    QJsonObject jh;
+    jh["f_id"] = fOHeader._id();
+    jh["f_hallid"] = fOHeader.hallId;
+    jh["f_prefix"] = fOHeader.prefix;
+    jh["f_state"] = ORDER_STATE_CLOSE;
+    jh["f_hall"] = fOHeader.hall;
+    jh["f_table"] = fOHeader.table;
+    jh["f_dateopen"] = fOHeader.dateOpen.toString(FORMAT_DATE_TO_STR_MYSQL);
+    jh["f_dateclose"] = QDate::currentDate().toString(FORMAT_DATE_TO_STR_MYSQL);
+    jh["f_datecash"] = QDate::currentDate().toString(FORMAT_DATE_TO_STR_MYSQL);
+    jh["f_timeopen"] = fOHeader.timeOpen.toString(FORMAT_TIME_TO_STR);
+    jh["f_timeclose"] = QTime::currentTime().toString(FORMAT_TIME_TO_STR);
+    jh["f_cashier"] = fOHeader.cashier;
+    jh["f_staff"] = u->id();
+    jh["f_comment"] = fOHeader.comment;
+    jh["f_print"] = fOHeader.print;
+    jh["f_amounttotal"] = fOHeader.amountTotal;
+    jh["f_amountcash"] = fOHeader.amountCash;
+    jh["f_amountcard"] = fOHeader.amountCard;
+    jh["f_amountprepaid"] = fOHeader.amountPrepaid;
+    jh["f_amountbank"] = fOHeader.amountBank;
+    jh["f_amountcredit"] = fOHeader.amountCredit;
+    jh["f_amountidram"] = fOHeader.amountIdram;
+    jh["f_amounttelcell"] = fOHeader.amountTelcell;
+    jh["f_amountdebt"] = fOHeader.amountDebt;
+    jh["f_amountpayx"] = fOHeader.amountPayX;
+    jh["f_amountother"] = fOHeader.amountOther;
+    jh["f_amountservice"] = fOHeader.amountService;
+    jh["f_amountdiscount"] = fOHeader.amountDiscount;
+    jh["f_servicefactor"] = fOHeader.serviceFactor;
+    jh["f_discountfactor"] = fOHeader.discountFactor;
+    jh["f_source"] = fOHeader.source;
+    jh["f_saletype"] = fOHeader.saleType;
+    jh["f_partner"] = fOHeader.partner;
+    jh["f_currency"] = fOHeader.currency;
+    jh["f_taxpayertin"] = fOHeader.taxpayerTin;
+    jdoc["header"] = jh;
+    QJsonArray jg;
+    for (int i = 0; i < fOGoods.count(); i++) {
+        OGoods &g = fOGoods[i];
+        g.price = g.total / (g.qty / g._qtybox);
+        g.qty /= g._qtybox;
+        QJsonObject jt;
+        jt["f_id"] = C5Database::uuid();
+        jt["f_header"] = jh["f_id"];
+        jt["f_store"] = g.store;
+        jt["f_goods"] = g.goods;
+        jt["f_qty"] = g.qty;
+        jt["f_price"] = g.price;
+        jt["f_total"] = g.total;
+        jt["f_tax"] = g.tax;
+        jt["f_sign"] = g.sign;
+        jt["f_taxdebt"] = g.taxDept;
+        jt["f_adgcode"] = g.adgCode;
+        jt["f_row"] = g.row;
+        jt["f_storerec"] = g.storeRec;
+        jt["f_discountfactor"] = g.discountFactor;
+        jt["f_discountmode"] = g.discountMode;
+        jt["f_discountamount"] = g.discountAmount;
+        jt["f_return"] = g.return_;
+        jt["f_returnfrom"] = g.returnFrom;
+        jt["f_isservice"] = g.isService;
+        jt["f_amountaccumulate"] = g.accumulateAmount;
+        jt["f_emarks"] = g.emarks;
+        jg.append(jt);
     }
+    jdoc["goods"] = jg;
+    QJsonObject jhistory;
+    jhistory["f_card"] = fBHistory.card;
+    jhistory["f_data"] = fBHistory.data;
+    jhistory["f_type"] = fBHistory.type;
+    jdoc["history"] = jhistory;
+
     C5Database db(__c5config.dbParams());
-    if (w) {
-        foreach (const OGoods &g, fOGoods) {
-            if (g.isService) {
-                continue;
-            }
-            db[":f_store"] = __c5config.defaultStore();
-            db[":f_goods"] = g.goods;
-            db[":f_qty"] = g.qty / g._qtybox;
-            db.exec("update a_store_sale set f_qty=f_qty-:f_qty, f_qtyprogram=f_qtyprogram-:f_qty where f_store=:f_store and f_goods=:f_goods");
-        }
-        if (!fPreorderUUID.isEmpty()) {
-            db[":f_state"] = 2;
-            db.update("op_header", "f_id", fPreorderUUID);
-        }
+    if (!db.exec(QString("call sf_create_shop_order('%1')").arg(QString(QJsonDocument(jdoc).toJson(QJsonDocument::Compact))))) {
+        C5Message::error(db.fLastError);
+        return false;
     }
-    if (w && fOHeader.saleType == -1) {
-        C5Database dbr(__c5config.replicaDbParams());
-        dbr[":f_id"] = fOGoods.at(0).goods;
-        dbr.exec("select f_scancode from c_goods where f_id=:f_id");
-        if (dbr.nextRow()) {
-            QString cardcode = "2211" +  dbr.getString("f_scancode");
-            dbr[":f_code"] = cardcode;
-            dbr.exec("select * from b_gift_card where f_code=:f_code");
-            if (dbr.nextRow()) {
-                int giftid = dbr.getInt("f_id");
-                dbr[":f_code"] = cardcode;
-                dbr[":f_datesaled"] = QDate::currentDate();
-                dbr.exec("update b_gift_card set f_datesaled=:f_datesaled where f_code=:f_code");
-                dbr[":f_card"] = giftid;
-                dbr[":f_trsale"] = fOHeader.id;
-                dbr[":f_amount"] = ui->leTotal->getDouble();
-                dbr.insert("b_gift_card_history");
+    db[":f_session"] = jdoc["session"].toString();
+    if (!db.exec("select f_result from a_result where f_session=:f_session")) {
+        C5Message::error(db.fLastError);
+        return false;
+    }
+    if (!db.nextRow()) {
+        C5Message::error("Program error. Cannot get result of session");
+        return false;
+    }
+    QJsonObject jr = QJsonDocument::fromJson(db.getString("f_result").toUtf8()).object();
+    if (jr["status"].toInt() != 1) {
+        C5Message::error(jr["message"].toString());
+        return false;
+    }
+
+
+    if (C5Config::taxIP().isEmpty()) {
+        fOHeader._printFiscal = false;
+    }
+    if (fOHeader._printFiscal) {
+        QElapsedTimer et;
+        et.restart();
+        PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(),
+                     fOHeader.hasIdram() ? "true" : C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
+        QString jsonIn, jsonOut, err;
+        int result = 0;
+        if (fOHeader.partner > 0) {
+            pt.fPartnerTin = fOHeader.taxpayerTin;
+        }
+        if (fOHeader.saleType != -1) {
+            for (int i = 0; i < fOGoods.count(); i++) {
+                OGoods &g = fOGoods[i];
+                if (g.emarks.isEmpty() == false) {
+                    pt.fEmarks.append(g.emarks);
+                }
+                pt.addGoods(g.taxDept.toInt(), //dep
+                            g.adgCode, //adg
+                            QString::number(g.goods), //goods id
+                            g._goodsName, //name
+                            g.price / g._qtybox, //price
+                            g.qty, //qty
+                            fBHistory.value * 100); //discount
             }
+            result = pt.makeJsonAndPrint(fOHeader.amountCard + fOHeader.amountIdram + fOHeader.amountTelcell, fOHeader.amountPrepaid, jsonIn, jsonOut, err);
+        } else {
+            result = pt.printAdvanceJson(fOHeader.amountCash, fOHeader.amountCard, jsonIn, jsonOut, err);
+        }
+
+        QJsonObject jtax;
+        jtax["f_order"] = fOHeader._id();
+        jtax["f_elapsed"] = et.elapsed();
+        jtax["f_in"] = jsonIn;
+        jtax["f_out"] = jsonOut;
+        jtax["f_err"] = err;
+        jtax["f_result"] = result;
+        jtax["f_state"] = result == pt_err_ok ? 1 : 0;
+        db.exec(QString("call sf_create_shop_tax('%1')").arg(QString(QJsonDocument(jtax).toJson(QJsonDocument::Compact))));
+        if (result != pt_err_ok) {
+            C5Message::error(err);
+            db[":f_id"] = fOHeader.id;
         }
     }
 
-    if (w && fGiftCard > 0) {
-        C5Database dbr(__c5config.replicaDbParams());
-        if (fOHeader.amountPrepaid > 0.001) {
-            dbr[":f_card"] = fGiftCard;
-            dbr[":f_trsale"] = fOHeader.id;
-            dbr[":f_amount"] = -1 * fOHeader.amountPrepaid;
-            dbr.insert("b_gift_card_history");
-        } else {
-            dbr[":f_id"] = fGiftCard;
-            dbr.exec("select f_code from b_gift_card where f_id=:f_id");
-            dbr.nextRow();
-            dbr[":f_code"] = dbr.getString("f_code");
-            dbr.exec("select f_value from b_cards_discount where f_code=:f_code");
-            dbr.nextRow();
-            dbr[":f_card"] = fGiftCard;
-            dbr[":f_trsale"] = fOHeader.id;
-            dbr[":f_amount"] = ui->leTotal->getDouble() * dbr.getDouble("f_value");
-            dbr.insert("b_gift_card_history");
+    if (!C5Config::localReceiptPrinter().isEmpty()) {
+        PrintReceiptGroup p;
+        switch (C5Config::shopPrintVersion()) {
+        case 1: {
+            bool p1, p2;
+            if (SelectPrinters::selectPrinters(p1, p2)) {
+                if (p1) {
+                    p.print(fOHeader._id(), db, 1);
+                }
+                if (p2) {
+                    p.print(fOHeader._id(), db, 2);
+                }
+            }
+            break;
         }
+        case 2:
+            p.print2(fOHeader._id(), db);
+            break;
+        case 3:
+            p.print3(fOHeader._id(), db);
+            break;
+        default:
+            break;
+        }
+    }
+
+//    bool w = so.write();
+//    if (w) {
+//        w = so.writeFlags(ui->btnF1->isChecked(), ui->btnF2->isChecked(),
+//                          ui->btnF3->isChecked(), ui->btnF4->isChecked(),
+//                          ui->btnF5->isChecked());
+//    }
+
+    if (fOHeader.partner > 0) {
+        OutputOfHeader ooh;
+        ooh.make(db, fOHeader._id());
     }
 
     if (!fDraftSale.id.toString().isEmpty()) {
@@ -430,17 +554,9 @@ bool WOrder::writeOrder()
         db.exec("update o_draft_sale set f_state=3 where f_id=:f_id");
     }
 
-//    if (C5Message::question(tr("Print?")) == QDialog::Accepted) {
-//        C5PrintReciptA4 p(__c5config.dbParams(), fOrderUUID, this);
-//        QString err;
-//        if (p.print(err)) {
-
-//        }
-//    }
-
     C5LogSystem::writeEvent(QString("%1. %2:%3ms, %4:%5, %6")
                             .arg(tr("Order saved"), tr("Elapsed"), QString::number(t.elapsed()), tr("Order number"), fOHeader.humanId(), fOHeader._id()));
-    return w;
+    return true;
 }
 
 void WOrder::fixCostumer(const QString &code)
@@ -883,22 +999,6 @@ void WOrder::readEmarks()
 void WOrder::noImage()
 {
     //ui->wimage->setVisible(false);
-}
-
-void WOrder::on_btnRemove_clicked()
-{
-    if (fPreorderUUID.isEmpty()) {
-        C5Message::error(tr("Cannot remove preorder that wasnt saved"));
-        return;
-    }
-    if (C5Message::question(tr("Confirm to remove")) != QDialog::Accepted) {
-        return;
-    }
-    C5Database db(__c5config.replicaDbParams());
-    db[":f_state"] = 3;
-    db.update("op_header", "f_id", fPreorderUUID);
-    fWorking->fTab->currentWidget()->deleteLater();
-    fWorking->fTab->removeTab(fWorking->fTab->currentIndex());
 }
 
 void WOrder::on_leCode_textChanged(const QString &arg1)

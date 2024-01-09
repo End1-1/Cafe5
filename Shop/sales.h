@@ -40,8 +40,6 @@ private slots:
 
     void on_btnTotalByItems_clicked();
 
-    void on_btnRetryUpload_clicked();
-
     void on_btnCashColletion_clicked();
 
     void on_leFilter_textChanged(const QString &arg1);
