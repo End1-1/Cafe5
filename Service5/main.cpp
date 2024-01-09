@@ -5,7 +5,6 @@
 #include "requestmanager.h"
 #include "pluginmanager.h"
 #include "raw.h"
-#include "structs.h"
 #include "monitor.h"
 #include "sqlqueries.h"
 #include "thread.h"
@@ -74,7 +73,7 @@ DWORD WINAPI ThreadProc(CONST LPVOID lpParam) {
 }
 
 
-void __cdecl main(int argc, char *argv[])
+int __cdecl main(int argc, char *argv[])
 {
     ARGC = argc;
     ARGV = argv;
@@ -88,17 +87,17 @@ void __cdecl main(int argc, char *argv[])
         Monitor w;
         w.show();
         a.exec();
-        return;
+        return 0;
     }
 
     if (QString(argv[1]).toLocal8Bit() == "--install") {
         SvcInstall();
-        return;
+        return 0;
     }
 
     if (QString(argv[1]).toLower() == "--run") {
         ThreadProc(NULL);
-        return;
+        return 0;
     }
 
     // TO_DO: Add any additional services for the process to this table.
@@ -113,6 +112,7 @@ void __cdecl main(int argc, char *argv[])
         LogWriter::write(LogWriterLevel::errors, "", QString("Service could not started. %1").arg(GetLastError()));
         SvcReportEvent((LPWSTR)TEXT("StartServiceCtrlDispatcher"));
     }
+    return 0;
 }
 
 VOID SvcInstall()
