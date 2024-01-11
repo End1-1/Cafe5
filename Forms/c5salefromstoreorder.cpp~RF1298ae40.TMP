@@ -289,6 +289,7 @@ void C5SaleFromStoreOrder::on_btnExportToExcel_clicked()
     int col = 1, row = 1;
     s->addCell(row, col, QString("%1 N%2").arg(tr("Order"), ui->leUserId->text()),
                                            d.style()->styleNum("header"));
+
     row++;
 
     if (!ui->lePartnerName->isEmpty()) {
@@ -361,6 +362,7 @@ void C5SaleFromStoreOrder::on_btnExportToExcel_clicked()
         s->addCell(row, cols.at(i), vals.at(i), d.style()->styleNum("header"));
     }
     row++;
+
 
     col = 1;
     s->setSpan(1, col, 1, col + 5);

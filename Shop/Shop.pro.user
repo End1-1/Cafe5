@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 11.0.3, 2024-01-09T13:49:54. -->
+<!-- Written by QtCreator 11.0.3, 2024-01-12T00:12:29. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -240,6 +240,7 @@
     <value type="bool" key="PE.EnvironmentAspect.PrintOnRun">false</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:C:/projects/Cafe5/Shop/Shop.pro</value>
     <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">C:/projects/Cafe5/Shop/Shop.pro</value>
+    <value type="QString" key="RunConfiguration.Arguments">--config</value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
     <value type="bool" key="RunConfiguration.UseLibrarySearchPath">true</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>

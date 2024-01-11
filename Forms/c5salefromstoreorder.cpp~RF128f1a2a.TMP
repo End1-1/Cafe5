@@ -201,7 +201,6 @@ void C5SaleFromStoreOrder::on_btnPrintTax_clicked()
         if (result != pt_err_ok) {
             C5Message::error(err);
         }
-    }
 }
 
 void C5SaleFromStoreOrder::on_btnSave_clicked()
@@ -289,6 +288,7 @@ void C5SaleFromStoreOrder::on_btnExportToExcel_clicked()
     int col = 1, row = 1;
     s->addCell(row, col, QString("%1 N%2").arg(tr("Order"), ui->leUserId->text()),
                                            d.style()->styleNum("header"));
+
     row++;
 
     if (!ui->lePartnerName->isEmpty()) {
@@ -362,11 +362,15 @@ void C5SaleFromStoreOrder::on_btnExportToExcel_clicked()
     }
     row++;
 
+
     col = 1;
     s->setSpan(1, col, 1, col + 5);
     s->setSpan(2, col, 2, col + 5);
     s->setSpan(3, col, 3, col + 5);
     s->setSpan(4, col, 4, col + 5);
+
+
+
 
     QString err;
     if (!d.save(err, true)) {
@@ -374,6 +378,8 @@ void C5SaleFromStoreOrder::on_btnExportToExcel_clicked()
             C5Message::error(err);
         }
     }
+
+
 
 }
 

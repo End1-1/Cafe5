@@ -11,6 +11,9 @@ DlgSplashScreen::DlgSplashScreen() :
     setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
     ui->lbText->setText(tr("Prepare to work"));
     connect(this, &DlgSplashScreen::messageSignal, this, &DlgSplashScreen::message);
+    auto *timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, &DlgSplashScreen::timeout);
+    timer->start(1000);
 }
 
 DlgSplashScreen::~DlgSplashScreen()
@@ -69,6 +72,15 @@ void DlgSplashScreen::updateData()
         db2.exec("update a_store_sale set f_qtyreserve=:f_qtyreserve where f_store=:f_store and f_goods=:f_goods");
     }
 
+}
+
+void DlgSplashScreen::timeout()
+{
+    sender()->deleteLater();
+    emit messageSignal(tr("Building store"));
+    updateData();
+    emit messageSignal(tr("All done!"));
+    accept();
 }
 
 void DlgSplashScreen::message(const QString &text)

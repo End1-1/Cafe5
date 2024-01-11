@@ -22,6 +22,8 @@ private:
     Ui::DlgSplashScreen *ui;
 
 private slots:
+    void timeout();
+
     void message(const QString &text);
 
 signals:

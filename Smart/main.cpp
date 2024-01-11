@@ -6,6 +6,7 @@
 #include <QLockFile>
 #include "c5connection.h"
 #include <QApplication>
+#include <QSettings>
 #include <QTranslator>
 #include <QDir>
 
@@ -44,10 +45,14 @@ int main(int argc, char *argv[])
     for (int i = 0; i < argc; i++) {
         args << argv[i];
     }
+    QSettings ss(_ORGANIZATION_, _APPLICATION_+ QString("\\") + _MODULE_);
+    QJsonObject js = QJsonDocument::fromJson(ss.value("server", "{}").toByteArray()).object();
     if (args.contains("--config")) {
-        C5Connection *c = new C5Connection(QStringList());
-        c->exec();
-        delete c;
+        C5Connection c(js);
+        if (c.exec() == QDialog::Accepted) {
+            js = c.fParams;
+            ss.setValue("server", QJsonDocument(js).toJson(QJsonDocument::Compact));
+        }
     }
     QFont f("Arial LatArm Unicode", 10);
     //QFont f(__c5config.getValue(param_app_font_family), 10);
@@ -56,28 +61,19 @@ int main(int argc, char *argv[])
     if (styleFile.open(QIODevice::ReadOnly)) {
         a.setStyleSheet(styleFile.readAll());
     }
-    QList<QByteArray> connectionParams;
-    C5Connection::readParams(connectionParams);
-    C5Config::fDBHost = connectionParams.at(0);
-    C5Config::fDBPath = connectionParams.at(1);
-    C5Config::fDBUser = connectionParams.at(2);
-    C5Config::fDBPassword = connectionParams.at(3);
-    C5Config::fSettingsName = connectionParams.at(4);
-    C5Config::fLastUsername = connectionParams.at(5);
-    C5Config::fFullScreen = connectionParams.at(6);
+    C5Config::fDBHost = js["host"].toString();
+    C5Config::fDBPath = js["database"].toString();
+    C5Config::fDBUser = js["username"].toString();
+    C5Config::fDBPassword = js["password"].toString();
+    C5Config::fSettingsName = js["settings"].toString();
+    C5Config::fFullScreen = true;
     C5Config::initParamsFromDb();
     DataDriver::init(C5Config::dbParams());
 
     if (!C5SystemPreference::checkDecimalPointAndSeparator()) {
         return 0;
     }
-
-    QStringList dbParams;
-    dbParams << C5Config::fDBHost
-             << C5Config::fDBPath
-             << C5Config::fDBUser
-             << C5Config::fDBPassword;
-    Workspace w(dbParams);
+    Workspace w(C5Config::dbParams());
     C5Config::fParentWidget = &w;
 #ifdef QT_DEBUG
     C5Database::LOGGING = true;

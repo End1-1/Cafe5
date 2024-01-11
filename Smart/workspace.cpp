@@ -120,10 +120,6 @@ Workspace::~Workspace()
 
 bool Workspace::login()
 {
-    if (fDBParams.count() == 0) {
-        go<C5Connection>(fDBParams);
-        return false;
-    }
     if (!DlgPassword::getUser(tr("ENTER"), fUser)) {
         accept();
         return false;
@@ -1359,6 +1355,8 @@ bool Workspace::saveOrder(int state)
 
 int Workspace::printTax(double cardAmount, double idramAmount)
 {
+    QElapsedTimer et;
+    et.start();
     C5Database db(fDBParams);
     db[":f_header"] = fOrderUuid;
     db[":f_state"] = DISH_STATE_OK;
@@ -1414,50 +1412,31 @@ int Workspace::printTax(double cardAmount, double idramAmount)
     QString jsonIn, jsonOut, err;
     int result = 0;
     result = pt.makeJsonAndPrint(cardAmount, 0, jsonIn, jsonOut, err);
-    db[":f_id"] = db.uuid();
-    db[":f_order"] = fOrderUuid;
-    db[":f_date"] = QDate::currentDate();
-    db[":f_time"] = QTime::currentTime();
-    db[":f_in"] = jsonIn;
-    db[":f_out"] = jsonOut;
-    db[":f_err"] = err;
-    db[":f_result"] = result;
-    db.insert("o_tax_log", false);
-    if (__c5config.getValue(param_debuge_mode).toInt() == 1) {
-        QSqlQuery q(db.fDb);
-        pt.saveTimeResult(fOrderUuid, q);
+
+    QJsonObject jtax;
+    jtax["f_order"] = fOrderUuid;
+    jtax["f_elapsed"] = et.elapsed();
+    jtax["f_in"] = jsonIn;
+    jtax["f_out"] = jsonOut;
+    jtax["f_err"] = err;
+    jtax["f_result"] = result;
+    jtax["f_state"] = result == pt_err_ok ? 1 : 0;
+    db.exec(QString("call sf_create_shop_tax('%1')").arg(QString(QJsonDocument(jtax).toJson(QJsonDocument::Compact))));
+    if (result != pt_err_ok) {
+        switch (C5Message::question(err, tr("Try again"), tr("Do not print fiscal"), tr("Return to editing"))) {
+        case QDialog::Rejected:
+            C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Fiscal fail, continue without fiscal"), "", "");
+            return 1;
+        case QDialog::Accepted:
+            C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Fiscal fail, try again"), "", "");
+            return 0;
+        case 2:
+            C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Return to edit"), "", "");
+            return 2;
+        }
     }
-    if (result == pt_err_ok) {
-        QString sn, firm, address, fiscal, hvhh, rseq, devnum, time;
-        PrintTaxN::parseResponse(jsonOut, firm, hvhh, fiscal, rseq, sn, address, devnum, time);
-        db[":f_id"] = fOrderUuid;
-        db.exec("delete from o_tax where f_id=:f_id");
-        db[":f_id"] = fOrderUuid;
-        db[":f_dept"] = C5Config::taxDept();
-        db[":f_firmname"] = firm;
-        db[":f_address"] = address;
-        db[":f_devnum"] = devnum;
-        db[":f_serial"] = sn;
-        db[":f_fiscal"] = fiscal;
-        db[":f_receiptnumber"] = rseq;
-        db[":f_hvhh"] = hvhh;
-        db[":f_fiscalmode"] = tr("(F)");
-        db[":f_time"] = time;
-        db.insert("o_tax", false);
-        return 1;
-    }
-    switch (C5Message::question(err, tr("Try again"), tr("Do not print fiscal"), tr("Return to editing"))) {
-    case QDialog::Rejected:
-        C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Fiscal fail, continue without fiscal"), "", "");
-        return 1;
-    case QDialog::Accepted:
-        C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Fiscal fail, try again"), "", "");
-        return 0;
-    case 2:
-        C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Return to edit"), "", "");
-        return 2;
-    }
-    return 0;
+
+    return -1;
 }
 
 bool Workspace::printReceipt(const QString &id, bool printSecond, bool precheck)

@@ -107,9 +107,6 @@ C5Database::C5Database(const QString &host, const QString &db, const QString &us
 
 C5Database::~C5Database()
 {
-#ifdef NETWORKDB
-    return;
-#endif
     if (fQuery) {
         fQuery->finish();
         delete fQuery;
@@ -372,7 +369,7 @@ bool C5Database::execNetwork(const QString &sqlQuery)
     fBindValues.clear();
 
     QNetworkAccessManager m;
-    QString host = QString("https://%1:10002/vipclient").arg(__c5config.fDBHost);
+    QString host = QString("https://%1:10002/vipclient").arg(fDb.hostName());
     QNetworkRequest rq(host);
     rq.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     QSslConfiguration sslConf = rq.sslConfiguration();
@@ -391,9 +388,7 @@ bool C5Database::execNetwork(const QString &sqlQuery)
         qDebug() << r->errorString();
         return false;
     }
-    QByteArray ba = r->readAll();
-    qDebug() << t.elapsed();
-    jo = QJsonDocument::fromJson(ba).object();
+    jo = QJsonDocument::fromJson(r->readAll()).object();
     if (jo["status"].toInt() == 0) {
         return false;
     }
@@ -687,9 +682,6 @@ void C5Database::setValue(int row, const QString &columnName, const QVariant &va
 
 void C5Database::init()
 {
-#ifdef NETWORKDB
-    return;
-#endif
     fIsReady = false;
     if (QSqlDatabase::drivers().count() == 0) {
         return;

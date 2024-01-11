@@ -214,7 +214,7 @@ void DlgCashinOut::on_btnCloseSession_clicked()
         p.br();
     }
     p.setFontBold(true);
-    p.ctext(QString("%1 %2").arg(tr("Close session"), __c5config.getRegValue("session").toString()));
+    p.ctext(QString("%1 %2").arg(tr("Close session"), QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR)));
     p.br();
     p.ctext(fUser->fullName());
     p.br();

@@ -38,14 +38,6 @@ int main(int argc, char *argv[])
 
 
     QApplication a(argc, argv);
-
-    QTranslator t;
-    t.load(":/lang/Shop.qm");
-    a.installTranslator(&t);
-
-    auto *dlgsplash = new DlgSplashScreen();
-    dlgsplash->show();
-    dlgsplash->updateData();
     QDir d;
     if (!d.exists(d.homePath() + "/" + _APPLICATION_)) {
         d.mkpath(d.homePath() + "/" + _APPLICATION_);
@@ -61,6 +53,10 @@ int main(int argc, char *argv[])
         styleSheet.open(QIODevice::ReadOnly);
         a.setStyleSheet(styleSheet.readAll());
     }
+
+    QTranslator t;
+    t.load(":/lang/Shop.qm");
+    a.installTranslator(&t);
 
     QStringList args;
     for (int i = 0; i < argc; i++) {
@@ -147,6 +143,10 @@ int main(int argc, char *argv[])
 
     DataDriver::init(__c5config.dbParams());
 
+    auto *dlgsplash = new DlgSplashScreen();
+    dlgsplash->exec();
+    delete dlgsplash;
+
     Working w(__user);
     w.setWindowTitle("");
     if (__c5config.defaultHall() > 0) {
@@ -160,7 +160,6 @@ int main(int argc, char *argv[])
     }
     __c5config.setRegValue("windowtitle", w.windowTitle());
     __c5config.fParentWidget = &w;
-    delete dlgsplash;
     C5Dialog::setMainWindow(&w);
     w.showMaximized();
 

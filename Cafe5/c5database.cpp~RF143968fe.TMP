@@ -391,9 +391,7 @@ bool C5Database::execNetwork(const QString &sqlQuery)
         qDebug() << r->errorString();
         return false;
     }
-    QByteArray ba = r->readAll();
-    qDebug() << t.elapsed();
-    jo = QJsonDocument::fromJson(ba).object();
+    jo = QJsonDocument::fromJson(r->readAll()).object();
     if (jo["status"].toInt() == 0) {
         return false;
     }

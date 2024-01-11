@@ -226,6 +226,8 @@ void C5SaleDoc::fiscale()
 //    d->exec();
 //    d->deleteLater();
 //    return;
+    QElapsedTimer t;
+    t.start();
     C5Database db(fDBParams);
     db[":f_header"] = ui->leUuid->text();
     db.exec("select gr.f_adgcode, og.f_goods, gn.f_name, og.f_price, og.f_qty, og.f_discountfactor*100 as f_discount "
@@ -251,40 +253,17 @@ void C5SaleDoc::fiscale()
                                  + ui->leDebt->getDouble()
                                  + ui->leBankTransfer->getDouble(), 0, jsonIn, jsonOut, err);
 
-    db[":f_id"] = db.uuid();
-    db[":f_order"] = ui->leUuid->text();
-    db[":f_date"] = QDate::currentDate();
-    db[":f_time"] = QTime::currentTime();
-    db[":f_in"] = jsonIn;
-    db[":f_out"] = jsonOut;
-    db[":f_err"] = err;
-    db[":f_result"] = result;
-    db.insert("o_tax_log", false);
-    QSqlQuery *q = new QSqlQuery(db.fDb);
-    if (result == pt_err_ok) {
-        PrintTaxN::parseResponse(jsonOut, firm, hvhh, fiscal, rseq, sn, address, devnum, time);
-        db[":f_id"] = ui->leUuid->text();
-        db.exec("delete from o_tax where f_id=:f_id");
-        db[":f_id"] = ui->leUuid->text();
-        db[":f_dept"] = C5Config::taxDept();
-        db[":f_firmname"] = firm;
-        db[":f_address"] = address;
-        db[":f_devnum"] = devnum;
-        db[":f_serial"] = sn;
-        db[":f_fiscal"] = fiscal;
-        db[":f_receiptnumber"] = rseq;
-        db[":f_hvhh"] = hvhh;
-        db[":f_fiscalmode"] = tr("(F)");
-        db[":f_time"] = time;
-        db.insert("o_tax", false);
-        pt.saveTimeResult(ui->leUuid->text(), *q);
-        delete q;
-        fPrintTax->setVisible(false);
-        C5Message::info(tr("Printed"));
-    } else {
-        pt.saveTimeResult("Not saved - " + ui->leUuid->text(), *q);
-        delete q;
-        C5Message::error(err + "<br>" + jsonOut + "<br>" + jsonIn);
+    QJsonObject jtax;
+    jtax["f_order"] = ui->leUuid->text();
+    jtax["f_elapsed"] = t.elapsed();
+    jtax["f_in"] = jsonIn;
+    jtax["f_out"] = jsonOut;
+    jtax["f_err"] = err;
+    jtax["f_result"] = result;
+    jtax["f_state"] = result == pt_err_ok ? 1 : 0;
+    db.exec(QString("call sf_create_shop_tax('%1')").arg(QString(QJsonDocument(jtax).toJson(QJsonDocument::Compact))));
+    if (result != pt_err_ok) {
+        C5Message::error(err);;
     }
 }
 

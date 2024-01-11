@@ -372,7 +372,7 @@ bool C5Database::execNetwork(const QString &sqlQuery)
     fBindValues.clear();
 
     QNetworkAccessManager m;
-    QString host = QString("https://%1:10002/vipclient").arg(__c5config.fDBHost);
+    QString host = QString("https://%1:10002/vipclient").arg(fDb.hostName());
     QNetworkRequest rq(host);
     rq.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     QSslConfiguration sslConf = rq.sslConfiguration();
@@ -391,9 +391,7 @@ bool C5Database::execNetwork(const QString &sqlQuery)
         qDebug() << r->errorString();
         return false;
     }
-    QByteArray ba = r->readAll();
-    qDebug() << t.elapsed();
-    jo = QJsonDocument::fromJson(ba).object();
+    jo = QJsonDocument::fromJson(r->readAll()).object();
     if (jo["status"].toInt() == 0) {
         return false;
     }

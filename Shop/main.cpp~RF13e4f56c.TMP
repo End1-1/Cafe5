@@ -38,13 +38,7 @@ int main(int argc, char *argv[])
 
 
     QApplication a(argc, argv);
-
-    QTranslator t;
-    t.load(":/lang/Shop.qm");
-    a.installTranslator(&t);
-
     auto *dlgsplash = new DlgSplashScreen();
-    dlgsplash->show();
     dlgsplash->updateData();
     QDir d;
     if (!d.exists(d.homePath() + "/" + _APPLICATION_)) {
@@ -61,6 +55,10 @@ int main(int argc, char *argv[])
         styleSheet.open(QIODevice::ReadOnly);
         a.setStyleSheet(styleSheet.readAll());
     }
+
+    QTranslator t;
+    t.load(":/lang/Shop.qm");
+    a.installTranslator(&t);
 
     QStringList args;
     for (int i = 0; i < argc; i++) {
