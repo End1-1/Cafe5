@@ -47,6 +47,7 @@ INCLUDEPATH += C:/Projects/Cafe5/Service5/utils
 
 DEFINES += _APPLICATION_=\\\"VIPClient\\\"
 DEFINES += _MODULE_=\\\"Service5_vipclient_dll\\\"
+DEFINES += _DBDRIVER_=\\\"QMARIADB\\\"
 
 # Default rules for deployment.
 unix {

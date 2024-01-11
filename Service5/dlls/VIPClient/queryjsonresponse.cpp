@@ -1,4 +1,5 @@
 #include "queryjsonresponse.h"
+#include "logwriter.h"
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QSqlRecord>
@@ -204,10 +205,10 @@ bool QueryJsonResponse::networkRedirect(const QString &sql)
     QNetworkRequest rq(server);
     rq.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     m.setProxy(QNetworkProxy::NoProxy);
-    QSslConfiguration sslConf = rq.sslConfiguration();
-    sslConf.setPeerVerifyMode(QSslSocket::VerifyNone);
-    sslConf.setProtocol(QSsl::AnyProtocol);
-    rq.setSslConfiguration(sslConf);
+    // QSslConfiguration sslConf = rq.sslConfiguration();
+    // sslConf.setPeerVerifyMode(QSslSocket::VerifyNone);
+    // sslConf.setProtocol(QSsl::AnyProtocol);
+    // rq.setSslConfiguration(sslConf);
     QJsonObject jo;
     jo["sk"] = "5cfafe13-a886-11ee-ac3e-1078d2d2b808";
     jo["call"] = "sql";
@@ -216,6 +217,7 @@ bool QueryJsonResponse::networkRedirect(const QString &sql)
     r->connect(r, SIGNAL(finished()), &loop, SLOT(quit()));
     loop.exec();
     if (r->error() != QNetworkReply::NoError) {
+        LogWriter::write(LogWriterLevel::verbose, "", QString("Elapsed: %1, query: %2, error: %3").arg(QString::number(t.elapsed()), sql, r->errorString()));
         return dbFail(r->errorString());
     }
     fJsonOut = QJsonDocument::fromJson(r->readAll()).object();
@@ -235,6 +237,7 @@ bool QueryJsonResponse::networkRedirect(const QString &sql)
     }
     fJsonOut["data"].toObject()["types"] = ja;
     r->deleteLater();
+    LogWriter::write(LogWriterLevel::verbose, "", QString("Elapsed: %1, query: %2").arg(QString::number(t.elapsed()), sql));
     qDebug() << t.elapsed() << sql;
     return true;
 }
