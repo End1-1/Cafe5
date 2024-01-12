@@ -14,6 +14,8 @@ public:
 
     int color(int id);
 
+    int fiscalDept(int id);
+
     QString adgcode(int id);
 };
 

@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<<<<<<< HEAD
-<<<<<<< HEAD
-<!-- Written by QtCreator 11.0.3, 2024-01-09T13:49:45. -->
-=======
-<!-- Written by QtCreator 12.0.1, 2024-01-09T11:40:45. -->
->>>>>>> f3a1565e78a78031aa1a8368b3fe24aaeb761cac
-=======
-<!-- Written by QtCreator 12.0.1, 2024-01-11T17:29:43. -->
->>>>>>> bdc47492ab9ce7376fccb652958c08d155d4cb58
+<!-- Written by QtCreator 11.0.3, 2024-01-12T08:43:14. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -99,7 +91,7 @@
    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Desktop Qt 5.15.2 MSVC2019 64bit</value>
    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Desktop Qt 5.15.2 MSVC2019 64bit</value>
    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">qt.qt5.5152.win64_msvc2019_64_kit</value>
-   <value type="qlonglong" key="ProjectExplorer.Target.ActiveBuildConfiguration">0</value>
+   <value type="qlonglong" key="ProjectExplorer.Target.ActiveBuildConfiguration">1</value>
    <value type="qlonglong" key="ProjectExplorer.Target.ActiveDeployConfiguration">0</value>
    <value type="qlonglong" key="ProjectExplorer.Target.ActiveRunConfiguration">0</value>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.BuildConfiguration.0">

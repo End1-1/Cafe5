@@ -18,6 +18,7 @@
 #include "dlgqty.h"
 #include "oheader.h"
 #include "idram.h"
+#include "datadriver.h"
 #include "change.h"
 #include "menudialog.h"
 #include "QRCodeGenerator.h"
@@ -1360,7 +1361,7 @@ int Workspace::printTax(double cardAmount, double idramAmount)
     C5Database db(fDBParams);
     db[":f_header"] = fOrderUuid;
     db[":f_state"] = DISH_STATE_OK;
-    db.exec("select b.f_adgcode, b.f_dish, d.f_name, b.f_price, b.f_discount, b.f_qty1, b.f_emarks "
+    db.exec("select b.f_adgcode, b.f_dish, d.f_name, b.f_price, b.f_discount, b.f_qty1, b.f_emarks, f_part "
             "from o_body b "
             "left join d_dish d on d.f_id=b.f_dish "
             "where b.f_header=:f_header and b.f_state=:f_state");
@@ -1388,19 +1389,25 @@ int Workspace::printTax(double cardAmount, double idramAmount)
         }
         switch (fDiscountMode) {
         case CARD_TYPE_DISCOUNT:
-            pt.addGoods(C5Config::taxDept().toInt(),
+            pt.addGoods(dbdishpart2->fiscalDept(db.getInt("f_part")) == 0
+                            ? C5Config::taxDept().toInt()
+                            : dbdishpart2->fiscalDept(db.getInt("f_part")),
                         db.getString("f_adgcode"), db.getString("f_dish"),
                         db.getString("f_name"), db.getDouble("f_price"),
                         db.getDouble("f_qty1"), fDiscountValue * 100);
             break;
         case CARD_TYPE_SPECIAL_DISHES:
-            pt.addGoods(C5Config::taxDept().toInt(),
+            pt.addGoods(dbdishpart2->fiscalDept(db.getInt("f_part")) == 0
+                            ? C5Config::taxDept().toInt()
+                            : dbdishpart2->fiscalDept(db.getInt("f_part")),
                         db.getString("f_adgcode"), db.getString("f_dish"),
                         db.getString("f_name"), db.getDouble("f_price"),
                         db.getDouble("f_qty1"), db.getDouble("f_discount") * 100);
             break;
         default:
-            pt.addGoods(C5Config::taxDept().toInt(),
+            pt.addGoods(dbdishpart2->fiscalDept(db.getInt("f_part")) == 0
+                            ? C5Config::taxDept().toInt()
+                            : dbdishpart2->fiscalDept(db.getInt("f_part")),
                         db.getString("f_adgcode"), db.getString("f_dish"),
                         db.getString("f_name"), db.getDouble("f_price"),
                         db.getDouble("f_qty1"), db.getDouble("f_discount") * 100);
@@ -1416,8 +1423,8 @@ int Workspace::printTax(double cardAmount, double idramAmount)
     QJsonObject jtax;
     jtax["f_order"] = fOrderUuid;
     jtax["f_elapsed"] = et.elapsed();
-    jtax["f_in"] = jsonIn;
-    jtax["f_out"] = jsonOut;
+    jtax["f_in"] = QJsonDocument::fromJson(jsonIn.toUtf8()).object();
+    jtax["f_out"] = QJsonDocument::fromJson(jsonOut.toUtf8()).object();
     jtax["f_err"] = err;
     jtax["f_result"] = result;
     jtax["f_state"] = result == pt_err_ok ? 1 : 0;
