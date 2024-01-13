@@ -15,6 +15,7 @@
 #include <strsafe.h>
 #include <QApplication>
 #include <QTranslator>
+#include <QTextCodec>
 
 #define SVCNAME TEXT("Breeze")
 
@@ -81,6 +82,8 @@ int __cdecl main(int argc, char *argv[])
     ConfigIni::init(APPDIR);
     LogWriter::fCurrentLevel = 100;
     LogWriter::write(LogWriterLevel::verbose, "", "Service started");
+
+    QTextCodec::setCodecForLocale(QTextCodec::codecForName("utf8") );
 
     if (QString(argv[1]).toLocal8Bit() == "--gui") {
         QApplication a(argc, argv);

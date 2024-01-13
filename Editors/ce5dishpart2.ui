@@ -361,6 +361,13 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
+        <widget class="QCheckBox" name="chDonNotResize">
+         <property name="text">
+          <string>Չփոխել չափսը</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="C5LineEditWithSelector" name="leImageUUID">
          <property name="enabled">
           <bool>false</bool>

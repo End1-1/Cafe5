@@ -23,6 +23,9 @@ private:
     bool createOrder();
     bool dbQuery();
     bool networkRedirect(const QString &sql);
+    bool payment();
+    bool printBill();
+    QJsonObject fConfig;
 };
 
 #endif // QUERYJSONRESPONSE_H

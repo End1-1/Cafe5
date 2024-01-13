@@ -121,12 +121,14 @@ void CE5DishPart2::uploadImage()
 
     QByteArray ba;
     do {
-        pm = pm.scaled(pm.width() * 0.8,  pm.height() * 0.8);
+        if (!ui->chDonNotResize->isChecked()) {
+            pm = pm.scaled(pm.width() * 0.8,  pm.height() * 0.8);
+        }
         ba.clear();
         QBuffer buff(&ba);
         buff.open(QIODevice::WriteOnly);
         pm.save(&buff, "PNG");
-    } while (ba.size() > 100000);
+    } while (ba.size() > 100000 && !ui->chDonNotResize->isChecked());
 
     C5Database db(fDBParams);
     db[":f_id"] = ui->leImageUUID->text();

@@ -1,5 +1,7 @@
 #include "queryjsonresponse.h"
 #include "logwriter.h"
+#include "printtaxn.h"
+#include "c5printing.h"
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QSqlRecord>
@@ -14,6 +16,7 @@
 #define query_create_order 2
 #define query_call_function -1
 #define query_sql 3
+#define query_payment 8
 
 QueryJsonResponse::QueryJsonResponse(Database &db, const QJsonObject &ji, QJsonObject &jo) :
     fDb(db),
@@ -28,6 +31,12 @@ void QueryJsonResponse::getResponse()
     fJsonOut["status"] = 1;
     fJsonOut["data"] = "";
 
+    fDb[":f_name"] = fJsonIn["config"].toString();
+    fDb.exec("select f_config from s_config where f_name=:f_name");
+    if (fDb.next()) {
+        fConfig = QJsonDocument::fromJson(fDb.string("f_config").toUtf8()).object();
+    }
+
     switch (fJsonIn["query"].toInt()) {
     case query_init:
         init();
@@ -40,6 +49,9 @@ void QueryJsonResponse::getResponse()
         break;
     case query_sql:
         dbQuery();
+        break;
+    case query_payment:
+        payment();
         break;
     default:
         fJsonOut["status"] = 0;
@@ -239,6 +251,86 @@ bool QueryJsonResponse::networkRedirect(const QString &sql)
     r->deleteLater();
     LogWriter::write(LogWriterLevel::verbose, "", QString("Elapsed: %1, query: %2").arg(QString::number(t.elapsed()), sql));
     qDebug() << t.elapsed() << sql;
+    return true;
+}
+
+bool QueryJsonResponse::payment()
+{
+    QElapsedTimer et;
+    et.start();
+    QJsonObject jo = fJsonIn["params"].toObject();
+
+    PrintTaxN pt(fConfig["fiscal_ip"].toString(),
+                 fConfig["fiscal_port"].toInt(),
+                 fConfig["fiscal_password"].toString(),
+                 fConfig["fiscal_extpos"].toString(),
+                 fConfig["fiscal_opcode"].toString(),
+                 fConfig["fiscal_oppin"].toString());
+
+    fDb[":f_id"] = jo["f_id"].toString();
+    if (!fDb.exec("select * from o_header where f_id=:f_id")) {
+        return dbFail(fDb.lastDbError());
+    }
+    if (!fDb.next()) {
+        return dbFail("Order not exists");
+    }
+    double amountcard = fDb.doubleValue("f_amountcard") + fDb.doubleValue("f_amountidram");
+
+    fDb[":f_header"] = jo["f_id"].toString();
+    if (!fDb.exec("select d.f_name, coalesce(d.f_adgt, p.f_adgcode) as f_adgcode, "
+                  "b.f_qty1, b.f_price, b.f_discount, p.f_taxdept, d.f_id "
+                  "from o_body b "
+                  "left join d_dish d on d.f_id=b.f_dish "
+                  "left join d_part2 p on p.f_id=d.f_part "
+                  "left join o_header o on o.f_id=b.f_header "
+                  "where b.f_state=1 and o.f_state=2 and o.f_id=:f_header ")) {
+        return dbFail(fDb.lastDbError());
+    }
+    if (fDb.rowCount() == 0) {
+        return dbFail("Empty order");
+    }
+
+    while (fDb.next()) {
+        pt.addGoods(fDb.integer("f_taxdept"),
+                    fDb.string("f_adgcode"),
+                    fDb.string("f_id"),
+                    fDb.string("f_name"),
+                    fDb.doubleValue("f_price"),
+                    fDb.doubleValue("f_qty1"),
+                    fDb.doubleValue("f_discount"));
+    }
+    QString inJson, outJson, err;
+    int fiscal_result = pt.makeJsonAndPrint(amountcard, 0, inJson, outJson, err);
+    QJsonObject jtax;
+    jtax["f_order"] = jo["f_id"].toString();
+    jtax["f_elapsed"] = et.elapsed();
+    jtax["f_in"] = QJsonDocument::fromJson(inJson.toUtf8()).object();
+    jtax["f_out"] = QJsonDocument::fromJson(outJson.toUtf8()).object();;
+    jtax["f_err"] = err;
+    jtax["f_result"] = fiscal_result;
+    jtax["f_state"] = fiscal_result == pt_err_ok ? 1 : 0;
+    if (!fDb.exec(QString("call sf_create_shop_tax('%1')").arg(QString(QJsonDocument(jtax).toJson(QJsonDocument::Compact))))) {
+        return dbFail(fDb.lastDbError());
+    }
+    if (fiscal_result != pt_err_ok) {
+        return dbFail(err);
+    }
+
+    if (!fDb.exec(QString("select %1('%2')")
+                      .arg("sf_order_payment",
+                           QString(QJsonDocument(jo).toJson())))) {
+        return dbFail(fDb.lastDbError());
+    }
+    if (!fDb.next()) {
+        return dbFail("Call function failed");
+    }
+    printBill();
+
+    return true;
+}
+
+bool QueryJsonResponse::printBill()
+{
     return true;
 }
 
