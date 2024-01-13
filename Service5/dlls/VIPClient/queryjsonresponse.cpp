@@ -121,7 +121,7 @@ bool QueryJsonResponse::createOrder()
         return dbFail(fDb.lastDbError());
     }
     if (!fDb.next()) {
-        return dbFail("Create ordre failed");
+        return dbFail("Create order failed");
     }
     fJsonOut = QJsonDocument::fromJson(fDb.string(0).toUtf8()).object();
     return true;

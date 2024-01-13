@@ -34,6 +34,7 @@ HEADERS += \
 
 DEFINES += _APPLICATION_=\\\"Breeze\\\"
 DEFINES += _MODULE_=\\\"Service5_jzstore_dll\\\"
+DEFINES += _DBDRIVER_=\\\"QMARIADB\\\"
 
 TRANSLATIONS += \
     JZStore_hy_AM.ts

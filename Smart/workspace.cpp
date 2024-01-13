@@ -39,6 +39,7 @@
 #include <QSettings>
 #include <QPainter>
 #include <QFile>
+#include <QJsonParseError>
 
 QHash<QString, QString> fPrinterAliases;
 Workspace *Workspace::fWorkspace;
@@ -1421,13 +1422,17 @@ int Workspace::printTax(double cardAmount, double idramAmount)
     result = pt.makeJsonAndPrint(cardAmount, 0, jsonIn, jsonOut, err);
 
     QJsonObject jtax;
+    QJsonParseError jsonErr;
     jtax["f_order"] = fOrderUuid;
     jtax["f_elapsed"] = et.elapsed();
-    jtax["f_in"] = QJsonDocument::fromJson(jsonIn.toUtf8()).object();
+    jtax["f_in"] = QJsonDocument::fromJson(jsonIn.toUtf8(), &jsonErr).object();
     jtax["f_out"] = QJsonDocument::fromJson(jsonOut.toUtf8()).object();
     jtax["f_err"] = err;
     jtax["f_result"] = result;
     jtax["f_state"] = result == pt_err_ok ? 1 : 0;
+    if (jsonErr.error != QJsonParseError::NoError) {
+        C5Message::error(jsonIn);
+    }
     db.exec(QString("call sf_create_shop_tax('%1')").arg(QString(QJsonDocument(jtax).toJson(QJsonDocument::Compact))));
     if (result != pt_err_ok) {
         switch (C5Message::question(err, tr("Try again"), tr("Do not print fiscal"), tr("Return to editing"))) {
