@@ -84,7 +84,6 @@ delete from d_package;
 delete from d_package_list;
 delete from d_stoplist;
 delete from s_syncronize;
-delete from s_draft;
 delete from e_cash_names;
 delete from a_store_sale;
 delete from a_store_dish_waste;

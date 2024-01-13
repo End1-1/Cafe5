@@ -1,8 +1,8 @@
 #ifndef RC_H
 #define RC_H
 
-#define _PRODUCT_VERSION 1,4,6,115
-#define _FILE_VERSION_STR "1.4.6.115\0"
+#define _PRODUCT_VERSION 1,4,6,116
+#define _FILE_VERSION_STR "1.4.6.116\0"
 #define _PRODUCT_VERSION_STR "1.1\0"
 
 #endif // RC_H
