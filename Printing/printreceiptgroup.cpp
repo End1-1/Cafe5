@@ -7,6 +7,8 @@
 #include "cpartners.h"
 #include "QRCodeGenerator.h"
 #include <QApplication>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 PrintReceiptGroup::PrintReceiptGroup(QObject *parent) :
     QObject(parent)
@@ -26,9 +28,12 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
         change = db.getDouble("f_change");
     }
 
-    C5Database dtax(db);
-    dtax[":f_id"] = id;
-    dtax.exec("select * from o_tax where f_id=:f_id");
+    QJsonObject jtax;
+    db[":f_order"] = id;
+    db.exec("select * from o_tax_log where f_order=:f_order and f_state=1");
+    if (db.nextRow()) {
+        jtax = QJsonDocument::fromJson(db.getString("f_out").toUtf8()).object();
+    }
 
     db[":f_id"] = id;
     db.exec("select * from o_header where f_id=:f_id");
@@ -160,32 +165,29 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
         p.br();
         p.setFontSize(20);
     }
-    if (dtax.nextRow()) {
-        p.ltext(dtax.getString("f_firmname"), 0);
+    if (jtax["rseq"].toInt() > 0) {
+        p.ltext(jtax["taxpayer"].toString(), 0);
         p.br();
-        p.ltext(dtax.getString("f_address"), 0);
-        p.br();
-        p.ltext(tr("Department"), 0);
-        p.rtext(dtax.getString("f_dept"));
+        p.ltext(jtax["address"].toString(), 0);
         p.br();
         p.ltext(tr("Tax number"), 0);
-        p.rtext(dtax.getString("f_hvhh"));
+        p.rtext(jtax["tin"].toString());
         p.br();
         p.ltext(tr("Device number"), 0);
-        p.rtext(dtax.getString("f_devnum"));
+        p.rtext(jtax["crn"].toString());
         p.br();
         p.ltext(tr("Serial"), 0);
-        p.rtext(dtax.getString("f_serial"));
+        p.rtext(jtax["sn"].toString());
         p.br();
         p.ltext(tr("Fiscal"), 0);
-        p.rtext(dtax.getString("f_fiscal"));
+        p.rtext(jtax["fiscal"].toString());
         p.br();
         p.ltext(tr("Receipt number"), 0);
-        p.rtext(dtax.getString("f_receiptnumber"));
+        p.rtext(QString::number(jtax["rseq"].toInt()));
         p.br();
-        p.ltext(tr("Date"), 0);
-        p.rtext(dtax.getString("f_time"));
-        p.br();
+//        p.ltext(tr("Date"), 0);
+//        p.rtext(dtax.getString("f_time"));
+//        p.br();
         p.ltext(tr("(F)"), 0);
         if (__c5config.getValue(param_vat).toDouble() > 0.01) {
             p.ltext(QString("%1 %2%").arg(tr("Including VAT"), float_str(__c5config.getValue(param_vat).toDouble() * 100, 2)), 0);
@@ -339,9 +341,12 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
         throw std::exception(QString("No order for %1").arg(id).toStdString().data());
     }
 
-    C5Database dtax(db);
-    dtax[":f_id"] = id;
-    dtax.exec("select * from o_tax where f_id=:f_id");
+    QJsonObject jtax;
+    db[":f_order"] = id;
+    db.exec("select * from o_tax_log where f_order=:f_order and f_state=1");
+    if (db.nextRow()) {
+        jtax = QJsonDocument::fromJson(db.getString("f_out").toUtf8()).object();
+    }
 
     db[":f_id"] = id;
     db.exec("select * from o_header where f_id=:f_id");
@@ -474,39 +479,30 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
         p.setFontSize(20);
     }
 
-    if (dtax.nextRow()) {
-        p.ltext(dtax.getString("f_firmname"), 0);
+    if (jtax["rseq"].toInt() > 0) {
+        p.ltext(jtax["taxpayer"].toString(), 0);
         p.br();
-        p.ltext(dtax.getString("f_address"), 0);
-        p.br();
-        p.ltext(tr("Department"), 0);
-        p.rtext(dtax.getString("f_dept"));
+        p.ltext(jtax["address"].toString(), 0);
         p.br();
         p.ltext(tr("Tax number"), 0);
-        p.rtext(dtax.getString("f_hvhh"));
+        p.rtext(jtax["tin"].toString());
         p.br();
         p.ltext(tr("Device number"), 0);
-        p.rtext(dtax.getString("f_devnum"));
+        p.rtext(jtax["crn"].toString());
         p.br();
         p.ltext(tr("Serial"), 0);
-        p.rtext(dtax.getString("f_serial"));
+        p.rtext(jtax["sn"].toString());
         p.br();
         p.ltext(tr("Fiscal"), 0);
-        p.rtext(dtax.getString("f_fiscal"));
+        p.rtext(jtax["fiscal"].toString());
         p.br();
         p.ltext(tr("Receipt number"), 0);
-        p.rtext(dtax.getString("f_receiptnumber"));
+        p.rtext(QString::number(jtax["rseq"].toInt()));
         p.br();
-        p.ltext(tr("Date"), 0);
-        p.rtext(dtax.getString("f_time"));
-        p.br();
+        //        p.ltext(tr("Date"), 0);
+        //        p.rtext(dtax.getString("f_time"));
+        //        p.br();
         p.ltext(tr("(F)"), 0);
-        p.br();
-        if (__c5config.getValue(param_vat).toDouble() > 0.01) {
-            p.ltext(QString("%1 %2%").arg(tr("Including VAT"), float_str(__c5config.getValue(param_vat).toDouble() * 100, 2)), 0);
-            p.rtext(float_str(oh.amountTotal * __c5config.getValue(param_vat).toDouble(), 2));
-            p.br();
-        }
     }
 
     if (partner.id.toInt() > 0) {
@@ -670,14 +666,12 @@ void PrintReceiptGroup::print3(const QString &id, C5Database &db)
     db.nextRow();
     db.rowToMap(oheader);
 
-    QMap<QString, QVariant> otax;
-    db[":f_id"] = id;
-    db.exec("select * from o_tax where f_id=:f_id");
+    QJsonObject jtax;
+    db[":f_order"] = id;
+    db.exec("select * from o_tax_log where f_order=:f_order and f_state=1");
     if (db.nextRow()) {
-        db.rowToMap(otax);
+        jtax = QJsonDocument::fromJson(db.getString("f_out").toUtf8()).object();
     }
-
-
 
     QString saletype;
     QMap<QString, QVariant> returnFrom;
@@ -736,38 +730,31 @@ void PrintReceiptGroup::print3(const QString &id, C5Database &db)
         p.br();
         p.setFontSize(20);
     }
-    if (otax["f_receiptnumber"].toInt() > 0) {
-        p.ltext(otax["f_firmname"].toString(), 0);
+    if (jtax["rseq"].toInt() > 0) {
+        p.ltext(jtax["taxpayer"].toString(), 0);
         p.br();
-        p.ltext(otax["f_address"].toString(), 0);
-        p.br();
-        p.ltext(tr("Department"), 0);
-        p.rtext(otax["f_dept"].toString());
+        p.ltext(jtax["address"].toString(), 0);
         p.br();
         p.ltext(tr("Tax number"), 0);
-        p.rtext(otax["f_hvhh"].toString());
+        p.rtext(jtax["tin"].toString());
         p.br();
         p.ltext(tr("Device number"), 0);
-        p.rtext(otax["f_devnum"].toString());
+        p.rtext(jtax["crn"].toString());
         p.br();
         p.ltext(tr("Serial"), 0);
-        p.rtext(otax["f_serial"].toString());
+        p.rtext(jtax["sn"].toString());
         p.br();
         p.ltext(tr("Fiscal"), 0);
-        p.rtext(otax["f_fiscal"].toString());
+        p.rtext(jtax["fiscal"].toString());
         p.br();
         p.ltext(tr("Receipt number"), 0);
-        p.rtext(otax["f_receiptnumber"].toString());
+        p.rtext(QString::number(jtax["rseq"].toInt()));
         p.br();
-        p.ltext(tr("Date"), 0);
-        p.rtext(otax["f_time"].toString());
-        p.br();
+        //        p.ltext(tr("Date"), 0);
+        //        p.rtext(dtax.getString("f_time"));
+        //        p.br();
         p.ltext(tr("(F)"), 0);
-        if (__c5config.getValue(param_vat).toDouble() > 0.01) {
-            p.ltext(QString("%1 %2%").arg(tr("Including VAT"), float_str(__c5config.getValue(param_vat).toDouble() * 100, 2)), 0);
-            p.rtext(float_str(oheader["f_amounttotal"].toDouble() * __c5config.getValue(param_vat).toDouble(), 2));
-            p.br();
-        }
+        p.br();
     }
     if (!partnerName.isEmpty() || !partnerTaxcode.isEmpty()) {
         p.ltext(tr("Buyer taxcode"), 0);

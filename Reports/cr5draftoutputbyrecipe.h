@@ -14,6 +14,8 @@ public:
 
     virtual QToolBar *toolBar();
 
+    virtual void buildQuery() override;
+
 private:
     CR5DraftOutputByRecipeFilter *fFilter;
 

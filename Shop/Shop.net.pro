@@ -8,7 +8,7 @@ QT       += core gui printsupport network sql multimedia
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = Shop
+TARGET = Shop.net
 TEMPLATE = app
 
 RC_FILE = res.rc

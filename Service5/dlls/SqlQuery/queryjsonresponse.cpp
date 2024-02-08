@@ -16,9 +16,10 @@
 #define qWorkDetailsList 13
 #define qWorkDefailsUpdate 14
 #define qWorkDefailsDone 15
-#define qWorkDefailsDoneUpdate 16
+#define qWorkDetailsDoneUpdate 16
 #define qRemoveWorkDetails 17
 #define qWorkDetailsUndone 19
+#define qWorkArrayDone 20
 
 QueryJsonResponse::QueryJsonResponse(Database &db, const QJsonObject &ji, QJsonObject &jo) :
     fDb(db),
@@ -79,7 +80,7 @@ void QueryJsonResponse::getResponse()
     case qWorkDefailsDone:
         workDetailsDone();
         break;
-    case qWorkDefailsDoneUpdate:
+    case qWorkDetailsDoneUpdate:
         workDetailsDoneUpdate();
         break;
     case qRemoveWorkDetails:
@@ -87,6 +88,9 @@ void QueryJsonResponse::getResponse()
         break;
     case qWorkDetailsUndone:
         workDetailsUndone();
+        break;
+    case qWorkArrayDone:
+        workArrayDone();
         break;
     default:
         fJsonOut["kData"] = "Unknown query";
@@ -439,6 +443,18 @@ void QueryJsonResponse::workDetailsDone()
             "order by 1 ");
     QJsonArray ja;
     dbToArray(ja);
+    for (int i = 0; i < ja.size(); i++) {
+        QJsonObject jc = ja.at(i).toObject();
+        if (jc["f_id"].toInt() == 0) {
+            int id;
+            fDb[":f_taskid"] = fJsonIn["f_task"].toInt();
+            fDb[":f_processid"] = fJsonIn["f_dailyid"].toInt();
+            fDb[":f_color"] = jc["f_color"].toString();
+            fDb.insert("mf_process_details_done", id);
+            jc["f_id"] = id;
+            ja[i] = jc;
+        }
+    }
     fJsonOut["kData"] = ja;
 }
 
@@ -484,4 +500,30 @@ void QueryJsonResponse::workDetailsUndone()
     fDb[":f_id"] = fJsonIn["f_dailyid"].toInt();
     fDb[":f_qty"] = fJsonIn["f_qty"].toInt();
     fDb.exec("update mf_daily_process set f_qty=f_qty-:f_qty where f_id=:f_id");
+}
+
+void QueryJsonResponse::workArrayDone()
+{
+    QJsonArray arr = fJsonIn["arr"].toArray();
+    QJsonArray doneArr;
+    for (int i = 0; i < arr.size(); i++) {
+        QJsonObject jo = arr[i].toObject();
+        int id = jo["f_id"].toInt();
+        if (id == 0) {
+            fDb[":f_taskid"] = jo["f_taskid"].toInt();
+            fDb[":f_processid"] = jo["f_dailyid"].toInt();
+            fDb[":f_color"] = jo["f_color"].toString();
+            fDb.insert("mf_process_details_done", id);
+        }
+        fDb[":f_id"] = id;
+        fDb[":f_qty"] = jo["f_qty"].toInt();
+        fDb[":" + jo["f_field"].toString() + "d"] = jo["f_qty"].toInt();
+        fDb.exec("update mf_process_details_done set " +jo["f_field"].toString() + "d" +"=coalesce(" +jo["f_field"].toString() + "d, 0)+:f_qty where f_id=:f_id");
+
+        fDb[":f_id"] = jo["f_dailyid"].toInt();
+        fDb[":f_qty"] = jo["f_qty"].toInt();
+        fDb.exec("update mf_daily_process set f_qty=f_qty+:f_qty where f_id=:f_id");
+        doneArr.append(id);
+    }
+    fJsonOut["kData"] = doneArr;
 }

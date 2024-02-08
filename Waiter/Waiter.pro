@@ -183,6 +183,7 @@ SOURCES += \
     ../Forms/c5dbuseraccess.cpp \
     ../Forms/c5dishgroupaction.cpp \
     ../Forms/c5dishselfcostgenprice.cpp \
+    ../Forms/c5dlgconnections.cpp \
     ../Forms/c5dlgselectreporttemplate.cpp \
     ../Forms/c5filtervalues.cpp \
     ../Forms/c5goodsimage.cpp \
@@ -267,6 +268,7 @@ SOURCES += \
     ../Reports/cr5consumptionbysalesdraft.cpp \
     ../Reports/cr5consumptionbysalesfilter.cpp \
     ../Reports/cr5consumptionbysalesfilterdraft.cpp \
+    ../Reports/cr5consuptionbysalesqty.cpp \
     ../Reports/cr5consuptionreason.cpp \
     ../Reports/cr5consuptionreasonfilter.cpp \
     ../Reports/cr5costumerdebts.cpp \
@@ -611,6 +613,7 @@ HEADERS += \
     ../Forms/c5dbuseraccess.h \
     ../Forms/c5dishgroupaction.h \
     ../Forms/c5dishselfcostgenprice.h \
+    ../Forms/c5dlgconnections.h \
     ../Forms/c5dlgselectreporttemplate.h \
     ../Forms/c5filtervalues.h \
     ../Forms/c5goodsimage.h \
@@ -695,6 +698,7 @@ HEADERS += \
     ../Reports/cr5consumptionbysalesdraft.h \
     ../Reports/cr5consumptionbysalesfilter.h \
     ../Reports/cr5consumptionbysalesfilterdraft.h \
+    ../Reports/cr5consuptionbysalesqty.h \
     ../Reports/cr5consuptionreason.h \
     ../Reports/cr5consuptionreasonfilter.h \
     ../Reports/cr5costumerdebts.h \
@@ -950,6 +954,7 @@ FORMS += \
     ../Forms/c5dbuseraccess.ui \
     ../Forms/c5dishgroupaction.ui \
     ../Forms/c5dishselfcostgenprice.ui \
+    ../Forms/c5dlgconnections.ui \
     ../Forms/c5dlgselectreporttemplate.ui \
     ../Forms/c5filtervalues.ui \
     ../Forms/c5goodsimage.ui \
@@ -1023,6 +1028,7 @@ FORMS += \
     ../Reports/cr5commonsalesfilter.ui \
     ../Reports/cr5consumptionbysalesfilter.ui \
     ../Reports/cr5consumptionbysalesfilterdraft.ui \
+    ../Reports/cr5consuptionbysalesqty.ui \
     ../Reports/cr5consuptionreasonfilter.ui \
     ../Reports/cr5costumerdebtsfilter.ui \
     ../Reports/cr5currencycrossratehistoryfilter.ui \

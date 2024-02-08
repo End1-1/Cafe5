@@ -65,8 +65,6 @@ public:
 
     bool openDraft(const QString &id, QString &err);
 
-    void setReasonPartnerName();
-
 public slots:
     void saveDoc();
     
@@ -110,7 +108,7 @@ private:
 
     void countQtyOfComplectation();
 
-    bool docCheck(QString &err);
+    bool docCheck(QString &err, int state);
 
     void rowsCheck(QString &err);
 
@@ -181,6 +179,8 @@ private slots:
 
     void cancelGoodsGroupOrder();
 
+    void tblAddChanged(const QString &arg1);
+
     void tblDishQtyChanged(const QString &arg1);
 
     void tblQtyChanged(const QString &arg1);
@@ -247,8 +247,9 @@ private slots:
 
     void on_btnAddPackages_clicked();
 
-    void on_leReason_textChanged(const QString &arg1);
     void on_btnChangePartner_clicked();
+    void on_btnFixPartner_clicked(bool checked);
+    void on_btnCopyLastAdd_clicked();
 };
 
 #endif // C5STOREDOC_H

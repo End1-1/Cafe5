@@ -53,7 +53,6 @@ void C5CostumerDebtPayment::setId(const QString &id)
 
 void C5CostumerDebtPayment::selectorCallback(int row, const QList<QVariant> &values)
 {
-    qDebug() << values;
     switch (row){
     case cache_cash_names:
         if (values.isEmpty()) {

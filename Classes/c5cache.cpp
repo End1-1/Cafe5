@@ -31,16 +31,16 @@ C5Cache::C5Cache(const QStringList &dbParams) :
                                            left join c_goods_prices gpr on gpr.f_goods=g.f_id and gpr.f_currency=1 \
                                            order by 3 ")
 
-                .arg(tr("Code"))
-                .arg(tr("Group"))
-                .arg(tr("Name"))
-                .arg(tr("Unit"))
-                .arg(tr("Scancode"))
-                .arg(tr("Price"))
-                .arg(tr("Complect output"))
-                .arg(tr("Qty in box"))
-                .arg(tr("Retail price"))
-                .arg(tr("Whosale price"));
+                .arg(tr("Code").toLower())
+                .arg(tr("Group").toLower())
+                .arg(tr("Name").toLower())
+                .arg(tr("Unit").toLower())
+                .arg(tr("Scancode").toLower())
+                .arg(tr("Price").toLower())
+                .arg(tr("Complect output").toLower())
+                .arg(tr("Qty in box").toLower())
+                .arg(tr("Retail price").toLower())
+                .arg(tr("Whosale price").toLower());
         fCacheQuery[cache_goods_store] = QString("select f_id as `%1`, f_name as `%2` from c_storages")
                 .arg(tr("Code"),tr("Name"));
         fCacheQuery[cache_goods_partners] = QString("select f_id as `%1`, f_name as ``, f_address as ``, f_taxname as `%2`, f_contact as `%3`, \

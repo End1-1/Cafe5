@@ -11,6 +11,7 @@
 #include <QDir>
 #include <QLockFile>
 #include <QMessageBox>
+#include <QSettings>
 
 int main(int argc, char *argv[])
 {
@@ -38,20 +39,28 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    QList<QByteArray> connectionParams;
-    C5Connection::readParams(connectionParams);
-    if (connectionParams.count() > 0) {
-        C5Config::fDBHost = connectionParams.at(0);
-        C5Config::fDBPath = connectionParams.at(1);
-        C5Config::fDBUser = connectionParams.at(2);
-        C5Config::fDBPassword = connectionParams.at(3);
-        C5Config::fSettingsName = connectionParams.at(4);
-        C5Config::fFullScreen = connectionParams.at(6);
-        C5Config::initParamsFromDb();
-        C5SocketHandler::setServerAddress(C5Config::serverIP());
-    } else {
-        C5Dialog::go<C5Connection>(C5Config::dbParams());
+    QStringList args;
+    for (int i = 0; i < argc; i++) {
+        args << argv[i];
     }
+    QSettings ss(_ORGANIZATION_, _APPLICATION_+ QString("\\") + _MODULE_);
+    QJsonObject js = QJsonDocument::fromJson(ss.value("server", "{}").toByteArray()).object();
+    if (args.contains("--config")) {
+        C5Connection c(js);
+        if (c.exec() == QDialog::Accepted) {
+            js = c.fParams;
+            ss.setValue("server", QJsonDocument(js).toJson(QJsonDocument::Compact));
+        }
+    }
+    C5Config::fDBHost = js["host"].toString();
+    C5Config::fDBPath = js["database"].toString();
+    C5Config::fDBUser = js["username"].toString();
+    C5Config::fDBPassword = js["password"].toString();
+    C5Config::fSettingsName = js["settings"].toString();
+    C5Config::fFullScreen = js["fullscreen"].toBool();
+    C5SocketHandler::setServerAddress(js["waiter_server"].toString());
+    C5Config::initParamsFromDb();
+
     C5Database::LOGGING = C5Config::getValue(param_debuge_mode).toInt() == 1;
 
     if (!C5SystemPreference::checkDecimalPointAndSeparator()) {

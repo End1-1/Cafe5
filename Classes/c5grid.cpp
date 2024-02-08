@@ -124,10 +124,14 @@ void C5Grid::buildQuery()
             fSqlQuery += s + " ";
         }
         if (!fWhereCondition.isEmpty()) {
-            if (fWhereCondition.contains("where", Qt::CaseInsensitive)) {
-                fSqlQuery += " and " + fWhereCondition;
+            if (fSqlQuery.contains("%where%")) {
+                fSqlQuery.replace("%where%", fWhereCondition);
             } else {
-                fSqlQuery += " where " + fWhereCondition;
+                if (fWhereCondition.contains("where", Qt::CaseInsensitive)) {
+                    fSqlQuery += " and " + fWhereCondition;
+                } else {
+                    fSqlQuery += " where " + fWhereCondition;
+                }
             }
         }
         if (groupFields.count() > 0) {

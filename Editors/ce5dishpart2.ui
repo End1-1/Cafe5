@@ -403,6 +403,22 @@
    <header location="global">c5lineeditwithselector.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>leCode</tabstop>
+  <tabstop>leDept</tabstop>
+  <tabstop>leParent</tabstop>
+  <tabstop>lineEdit_2</tabstop>
+  <tabstop>lineEdit_3</tabstop>
+  <tabstop>leColor</tabstop>
+  <tabstop>lineEdit_5</tabstop>
+  <tabstop>lineEdit_6</tabstop>
+  <tabstop>lePosition</tabstop>
+  <tabstop>lePartDept</tabstop>
+  <tabstop>lePosition_2</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>chDonNotResize</tabstop>
+  <tabstop>leImageUUID</tabstop>
+ </tabstops>
  <resources>
   <include location="../resources/res.qrc"/>
  </resources>

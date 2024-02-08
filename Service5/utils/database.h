@@ -61,6 +61,7 @@ public:
     void rowToMap(QMap<QString, QVariant> &map);
     QStringList params();
     QJsonObject columnsData();
+    QString fNetworkDB;
 
 private:
     static int fDatabaseCounter;

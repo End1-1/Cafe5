@@ -180,15 +180,17 @@
   </layout>
  </widget>
  <tabstops>
+  <tabstop>leName</tabstop>
+  <tabstop>leServer</tabstop>
   <tabstop>leHost</tabstop>
   <tabstop>leDatabase</tabstop>
   <tabstop>leUsername</tabstop>
   <tabstop>lePassword</tabstop>
   <tabstop>cbSettings</tabstop>
+  <tabstop>chFullScreen</tabstop>
   <tabstop>btnSave</tabstop>
   <tabstop>btnTest</tabstop>
   <tabstop>btnCancel</tabstop>
-  <tabstop>btnRefreshSettings</tabstop>
  </tabstops>
  <resources>
   <include location="../resources/res.qrc"/>

@@ -11,7 +11,6 @@ int Database::fDatabaseCounter = 0;
 Database::Database() :
     Database(_DBDRIVER_)
 {
-
 }
 
 Database::Database(Database &other) :
@@ -44,6 +43,10 @@ Database::~Database()
 bool Database::open(const QString &configFile)
 {
     QSettings s(configFile, QSettings::IniFormat);
+    if (s.value("db/networkdb").toInt() == 1) {
+        fNetworkDB = s.value("db/host").toString();
+        return true;
+    }
     return open(s.value("db/host").toString(), s.value("db/schema").toString(), s.value("db/username").toString(), s.value("db/password").toString());
 }
 

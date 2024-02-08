@@ -124,6 +124,7 @@ bool C5User::enterWork()
         return false;
     } else {
         C5Database db(__c5config.dbParams());
+        db[":f_id"] = db.uuid();
         db[":f_user"] = id();
         db[":f_datein"] = QDate::currentDate();
         db[":f_timein"] = QTime::currentTime();

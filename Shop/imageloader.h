@@ -7,7 +7,7 @@ class ImageLoader : public QObject
 {
     Q_OBJECT
 public:
-    explicit ImageLoader(const QString &code, QObject *parent = nullptr);
+    explicit ImageLoader(int id, QObject *parent = nullptr);
 
     void start();
 
@@ -19,7 +19,7 @@ signals:
     void finished();
 
 private:
-    QString fCode;
+    int fId;
 
 private slots:
     void loadImage();

@@ -134,6 +134,7 @@ void CR5Reports::setSearchParameters()
 void CR5Reports::completeRefresh()
 {
     fTableView->resizeColumnsToContents();
+    fTableView->setColumnWidth(0, 0);
     for (int i = 0; i < fModel->columnCount(); i++) {
         fTableTotal->setColumnWidth(i, fTableView->columnWidth(i));
     }

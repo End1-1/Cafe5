@@ -151,7 +151,6 @@ void CR5MfDaily::loadDoc(const QDate &date, int worker, int teamlead)
         }
         row++;
     }
-    qDebug() << e.elapsed();
     ui->wt->sumColumns();
     if (worker > 0) {
         for (int i = 0; i < ui->lstWorkers->count(); i++) {

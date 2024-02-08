@@ -136,7 +136,7 @@ void DlgReturnItem::on_btnReturn_clicked()
     }
 
     OHeader oheader;
-    oheader.staff = ui->tblOrder->getInteger(ui->tblOrder->currentRow(), 6);
+    oheader.staff = ui->tblOrder->getInteger(ui->tblOrder->currentRow(), 6) == 0 ? 1 : ui->tblOrder->getInteger(ui->tblOrder->currentRow(), 6);
     oheader.state = ORDER_STATE_CLOSE;
     oheader.amountTotal = returnAmount * -1;
     oheader.amountCash = returnAmount * -1;
@@ -241,7 +241,7 @@ void DlgReturnItem::on_btnReturn_clicked()
                         QDate::currentDate(), QTime::currentTime(), 0, returnAmount, purpose, 1, __c5config.getValue(param_default_currency).toInt());
         dw.writeAHeaderCash(fCashUuid, 0, __c5config.cashId(), 1, storeDocId, "", 0);
         dw.writeECash(fCashRowId, fCashUuid, __c5config.cashId(), -1, purpose, returnAmount, fCashRowId, 1);
-        if (!dw.writeAHeaderStore(storeDocId, oheader.staff, oheader.staff, "", QDate(), __c5config.defaultStore(), 0, 1, fCashUuid, 0, 0, oheader._id())) {
+        if (!dw.writeAHeaderStore(storeDocId, oheader.staff, oheader.staff, "", QDate::currentDate(), __c5config.defaultStore(), 0, 1, fCashUuid, 0, 0, oheader._id())) {
             C5Message::error(dw.fErrorMsg);
             db.rollback();
             return;

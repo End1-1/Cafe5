@@ -24,7 +24,7 @@ public:
     explicit C5SaleDoc(const QStringList &dbParams, QWidget *parent = nullptr);
     ~C5SaleDoc();
     void setMode(int mode);
-    virtual bool reportHandler(const QString &handleId, const QVariant &data);
+    virtual bool reportHandler(const QString &handleId, const QVariant &data) override;
     virtual QToolBar *toolBar() override;
     bool openDoc(const QString &uuid);
 

@@ -1,4 +1,5 @@
 #include "dlgreports.h"
+#include "c5socketmessage.h"
 #include "ui_dlgreports.h"
 #include "dlgreportslist.h"
 #include "c5printjson.h"

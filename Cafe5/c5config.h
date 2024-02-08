@@ -146,7 +146,7 @@ public:
 
     static QString fLastUsername;
 
-    static QString fFullScreen;
+    static bool fFullScreen;
 
     static QString fDBHost;
 

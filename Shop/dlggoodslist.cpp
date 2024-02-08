@@ -95,7 +95,7 @@ bool DlgGoodsList::event(QEvent *event)
             int r = ui->tbl->currentRow();
             if (r > -1) {
                 fGoodsId = ui->tbl->getInteger(r, 0);
-                emit getGoods(fGoodsId);
+                emit getGoods(fGoodsId, ui->tbl->getDouble(r, 5), ui->tbl->getDouble(r, 6));
                 accept();
             }
             break;

@@ -180,7 +180,7 @@ void WOrder::imageConfig()
     ui->lbGoodsImage->setPixmap(pix);
 }
 
-bool WOrder::addGoods(int id)
+bool WOrder::addGoods(int id, double storeqty, double price1, double price2)
 {
     if (fOHeader.saleType == -1) {
         if (fOGoods.count() > 0) {
@@ -188,45 +188,23 @@ bool WOrder::addGoods(int id)
             return false;
         }
     }
-    DbGoods g(id);
-    if (!g.isService() && __c5config.getValue(param_shop_dont_check_qty).toInt() == 0) {
-        QString err;
-        if (!checkQty(id, g.unit()->defaultQty() / g.qtyBox() , 0, true, err)) {
-            C5Database db(__c5config.dbParams());
-            db[":f_id"] = id;
-            db.exec("select f_name from c_goods where f_id=:f_id");
-            db.nextRow();
-            C5Message::error(db.getString(0) + "\r\n" + err);
-            return false;
-        }
-    }
-    addGoodsToTable(id, false, "");
+    addGoodsToTable(id, false, storeqty, "", price1, price2);
     return true;
 }
 
-int WOrder::addGoodsToTable(int id, bool checkQtyOfStore, const QString &draftid)
+int WOrder::addGoodsToTable(int id, bool checkQtyOfStore, double qtyStore, const QString &draftid, double price1, double price2)
 {
-    C5Database db(C5Config::dbParams());
-    db[":f_goods"] = id;
-    db[":f_currency"] = C5Config::getValue(param_default_currency).toInt();
-    db.exec("select f_price1, f_price2 from c_goods_prices where f_goods=:f_goods and f_currency=:f_currency");
-    if (db.nextRow() == false) {
-        C5Message::error(tr("Goods prices undefined"));
-        return -1;
-    }
-
-
     DbGoods g(id);
     double price = 0;
     switch (fOHeader.saleType) {
     case SALE_RETAIL:
-        price = db.getDouble("f_price1");
+        price = price1;
         break;
     case SALE_WHOSALE:
-        price = db.getDouble("f_price2");
+        price = price2;
         break;
     default:
-        price = db.getDouble("f_price1");
+        price = price1;
         break;
     }
     ls(QString("%1: %2, %3: %4, %5: %6")
@@ -261,14 +239,10 @@ int WOrder::addGoodsToTable(int id, bool checkQtyOfStore, const QString &draftid
     if (checkQtyOfStore) {
         ui->tblData->item(row, 0)->setData(Qt::UserRole + 100, 1);
     }
-    db[":f_goods"] = og.goods;
-    db[":f_store"] = __c5config.defaultStore();
-    db.exec("select f_qty-f_qtyreserve-f_qtyprogram from a_store_sale where f_goods=:f_goods and f_store=:f_store");
-    if (db.nextRow()) {
-        ui->tblData->setDouble(row, col_stock, db.getDouble(0) + (og.qty / og._qtybox));
-    }
+    ui->tblData->setDouble(row, col_stock, (g.unit()->defaultQty()/og._qtybox) + (qtyStore / og._qtybox));
     countTotal();
 
+    C5Database db(__c5config.dbParams());
     QString err;
     if (fDraftSale.id.toString().isEmpty()) {
         fDraftSale.id = db.uuid();
@@ -299,7 +273,7 @@ int WOrder::addGoodsToTable(int id, bool checkQtyOfStore, const QString &draftid
     }
     ui->tblData->item(row, 0)->setData(Qt::UserRole + 101, draftid);
 
-    ImageLoader *il = new ImageLoader(g.scancode(), this);
+    ImageLoader *il = new ImageLoader(id, this);
     connect(il, SIGNAL(imageLoaded(QPixmap)), this, SLOT(imageLoaded(QPixmap)));
     connect(il, SIGNAL(noImage()), this, SLOT(noImage()));
     il->start();
@@ -358,6 +332,7 @@ bool WOrder::writeOrder()
 
     C5User *u = fUser;
     SelectStaff ss(fWorking);
+
     if (__c5config.shopDifferentStaff() && fWorking->fCurrentUsers.count() > 0) {
         if (ss.exec() == QDialog::Rejected) {
             return false;
@@ -370,6 +345,7 @@ bool WOrder::writeOrder()
     QJsonObject jdoc;
     jdoc["session"] = C5Database::uuid();
     jdoc["giftcard"] = fGiftCard;
+    jdoc["settings"] = __c5config.fSettingsName;
     QJsonObject jh;
     jh["f_id"] = fOHeader._id();
     jh["f_hallid"] = fOHeader.hallId;
@@ -499,15 +475,14 @@ bool WOrder::writeOrder()
         QJsonObject jtax;
         jtax["f_order"] = fOHeader._id();
         jtax["f_elapsed"] = et.elapsed();
-        jtax["f_in"] = jsonIn;
-        jtax["f_out"] = jsonOut;
+        jtax["f_in"] = QJsonDocument::fromJson(jsonIn.toUtf8()).object();
+        jtax["f_out"] = QJsonDocument::fromJson(jsonOut.toUtf8()).object();
         jtax["f_err"] = err;
         jtax["f_result"] = result;
         jtax["f_state"] = result == pt_err_ok ? 1 : 0;
         db.exec(QString("call sf_create_shop_tax('%1')").arg(QString(QJsonDocument(jtax).toJson(QJsonDocument::Compact))));
         if (result != pt_err_ok) {
             C5Message::error(err);
-            db[":f_id"] = fOHeader.id;
         }
     }
 
@@ -1069,69 +1044,83 @@ void WOrder::on_leCode_returnPressed()
 
     C5Database db(__c5config.replicaDbParams());
     code.replace(";", "").replace("?", "");
-    db[":f_code"] = code;
-    db.exec("select c.f_id, c.f_code, sum(h.f_amount) as f_amount "
-            "from b_gift_card_history h "
-            "inner join b_gift_card c on c.f_id=h.f_card "
-            "where c.f_code=:f_code ");
-    if (db.nextRow()) {
-        fGiftCard = db.getInt("f_id");
-        if (fGiftCard > 0) {
-            ui->lbGiftCard->setText(db.getString("f_code").right(4));
-            ui->leGiftCardAmount->setDouble(db.getDouble("f_amount"));
-            return;
-        }
-    }
-
-    QStringList scalecode = __c5config.getValue(param_shop_scalecode).split(",");
-    for (const QString &s: scalecode) {
-        if (s.contains(code.mid(0, 2))) {
-            if (code.length() != 13) {
-                int id = dbgoods->idOfScancode(code);
-                if (id == 0) {
-                    if (fWorking->fMultiscancode.contains(code)) {
-                        QString mcode = fWorking->fMultiscancode[code];
-                        id = dbgoods->idOfScancode(mcode);
-                    }
-                }
-                if (id == 0) {
-                    ls(tr("Invalid code entered: ") + code);
-                    return;
-                }
-                addGoods(id);
-                return;
-            }
-            QString code2 = QString("%1").arg(code.midRef(2, 5).toInt());
-            QString qtyStr = code.mid(7,5);
-            int id2 = dbgoods->idOfScancode(code2);
-            if (id2 > 0) {
-                addGoods(id2);
-            } else {
-                ls(tr("Invalid code entered: ") + code + "/" + code2);
-                return;
-            }
-
-            int row = lastRow();
-            if (row < 0) {
-                return;
-            }
-            setQtyOfRow(row, qtyStr.toDouble() / 1000);
-            return;
-        }
-    }
-
-    int id = dbgoods->idOfScancode(code);
-    if (id == 0) {
-        if (fWorking->fMultiscancode.contains(code)) {
-            QString mcode = fWorking->fMultiscancode[code];
-            id = dbgoods->idOfScancode(mcode);
-        }
-    }
-    if (id == 0) {
-        ls(tr("Invalid code entered: ") + code);
+    QJsonObject params;
+    params["scancode"] = code;
+    params["settings"] = __c5config.fSettingsName;
+    params["updatestore"] = 1;
+    params["store"] = __c5config.defaultStore();
+    db.exec(QString("select sf_shop_add_goods('%1')").arg(QString(QJsonDocument(params).toJson(QJsonDocument::Compact))));
+    if (!db.nextRow()) {
+        C5Message::error("Call sf_shop_add_goods failed");
         return;
     }
-    addGoods(id);
+    params = QJsonDocument::fromJson(db.getString(0).toUtf8()).object();
+    if (params["status"].toInt() == 0) {
+        C5Message::error(params["data"].toString());
+        return;
+    }
+    params = params["data"].toObject();
+    if (params["type"].toInt() == 2) {
+        fGiftCard = params["f_id"].toInt();
+        ui->lbGiftCard->setText(params["f_code"].toString().right(4));
+        ui->leGiftCardAmount->setDouble(params["f_amount"].toString().toDouble());
+        return;
+    }
+
+//    db[":f_code"] = code;
+//    db.exec("select c.f_id, c.f_code, sum(h.f_amount) as f_amount "
+//            "from b_gift_card_history h "
+//            "inner join b_gift_card c on c.f_id=h.f_card "
+//            "where c.f_code=:f_code ");
+//    if (db.nextRow()) {
+//        fGiftCard = db.getInt("f_id");
+//        if (fGiftCard > 0) {
+//            ui->lbGiftCard->setText(db.getString("f_code").right(4));
+//            ui->leGiftCardAmount->setDouble(db.getDouble("f_amount"));
+//            return;
+//        }
+//    }
+
+//  TODO: FOR FUTURE: ADD SCALE SCANCODE SUPPORT
+//    QStringList scalecode = __c5config.getValue(param_shop_scalecode).split(",");
+//    for (const QString &s: scalecode) {
+//        if (s.contains(code.mid(0, 2))) {
+//            if (code.length() != 13) {
+//                int id = dbgoods->idOfScancode(code);
+//                if (id == 0) {
+//                    if (fWorking->fMultiscancode.contains(code)) {
+//                        QString mcode = fWorking->fMultiscancode[code];
+//                        id = dbgoods->idOfScancode(mcode);
+//                    }
+//                }
+//                if (id == 0) {
+//                    ls(tr("Invalid code entered: ") + code);
+//                    return;
+//                }
+//                addGoods(id);
+//                return;
+//            }
+//            QString code2 = QString("%1").arg(code.midRef(2, 5).toInt());
+//            QString qtyStr = code.mid(7,5);
+//            int id2 = dbgoods->idOfScancode(code2);
+//            if (id2 > 0) {
+//                addGoods(id2);
+//            } else {
+//                ls(tr("Invalid code entered: ") + code + "/" + code2);
+//                return;
+//            }
+
+//            int row = lastRow();
+//            if (row < 0) {
+//                return;
+//            }
+//            setQtyOfRow(row, qtyStr.toDouble() / 1000);
+//            return;
+//        }
+//    }
+
+
+    addGoods(params["f_id"].toInt(), params["storeqty"].toDouble(), params["price1"].toDouble(), params["price2"].toDouble());
 
 }
 

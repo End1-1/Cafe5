@@ -1,4 +1,5 @@
 #include "c5waiterorderdoc.h"
+#include "c5socketmessage.h"
 #include "c5utils.h"
 #include "c5cafecommon.h"
 #include "c5config.h"
@@ -457,6 +458,28 @@ bool C5WaiterOrderDoc::makeOutputOfStore(C5Database &db, QString &err, int store
         t.price = db.getDouble("f_lastinputprice");
         goods.append(t);
     }
+
+    //DISHES SET
+    db[":f_header"] = fHeader["f_id"].toString();
+    db[":f_state1"] = DISH_STATE_OK;
+    db[":f_state2"] = DISH_STATE_VOID;
+    db.exec("select b.f_id, r.f_goods, r.f_qty*b.f_qty1*ds.f_qty as f_totalqty, r.f_qty, "
+            "g.f_lastinputprice, b.f_store "
+            "from o_body b "
+            "inner join d_dish_set ds on ds.f_dish=b.f_dish "
+            "inner join d_recipes r on r.f_dish=ds.f_part "
+            "inner join c_goods g on g.f_id=r.f_goods and f_component_exit=0 "
+            "where b.f_header=:f_header and (b.f_state=:f_state1 or b.f_state=:f_state2) ");
+    while (db.nextRow()) {
+        tmpg t;
+        t.recId = db.getString("f_id");
+        t.goodsId = db.getInt("f_goods");
+        t.qtyGoods = db.getDouble("f_totalqty");
+        t.store = db.getInt("f_store");
+        t.price = db.getDouble("f_lastinputprice");
+        goods.append(t);
+    }
+
     //WRITE RESULT OF RECIPE
     int row = 1;
     foreach (const tmpg &t, goods) {

@@ -1,4 +1,5 @@
 #include "dlgstoplistoption.h"
+#include "c5socketmessage.h"
 #include "ui_dlgstoplistoption.h"
 #include "c5menu.h"
 #include "dlgorder.h"

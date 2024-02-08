@@ -68,8 +68,8 @@ Working::Working(C5User *user, QWidget *parent) :
     fUser = user;
     QShortcut *sF1 = new QShortcut(QKeySequence(Qt::Key_F1), this);
     QShortcut *sF2 = new QShortcut(QKeySequence(Qt::Key_F2), this);
-    QShortcut *sF3 = new QShortcut(QKeySequence(Qt::Key_F3), this);
-    QShortcut *sF4 = new QShortcut(QKeySequence(Qt::Key_F4), this);
+//    QShortcut *sF3 = new QShortcut(QKeySequence(Qt::Key_F3), this);
+//    QShortcut *sF4 = new QShortcut(QKeySequence(Qt::Key_F4), this);
     QShortcut *sF5 = new QShortcut(QKeySequence(Qt::Key_F5), this);
     QShortcut *sF6 = new QShortcut(QKeySequence(Qt::Key_F6), this);
     QShortcut *sF7 = new QShortcut(QKeySequence(Qt::Key_F7), this);
@@ -87,8 +87,8 @@ Working::Working(C5User *user, QWidget *parent) :
     QShortcut *keyNumpadDot = new QShortcut(QKeySequence(Qt::Key_Comma), this);
     connect(sF1, SIGNAL(activated()), this, SLOT(shortcutF1()));
     connect(sF2, SIGNAL(activated()), this, SLOT(shortcutF2()));
-    connect(sF3, SIGNAL(activated()), this, SLOT(shortcutF3()));
-    connect(sF4, SIGNAL(activated()), this, SLOT(shortcutF4()));
+//    connect(sF3, SIGNAL(activated()), this, SLOT(shortcutF3()));
+//    connect(sF4, SIGNAL(activated()), this, SLOT(shortcutF4()));
     connect(sF5, SIGNAL(activated()), this, SLOT(shortcutF5()));
     connect(sF6, SIGNAL(activated()), this, SLOT(shortcurF6()));
     connect(sF7, SIGNAL(activated()), this, SLOT(shortcutF7()));
@@ -330,14 +330,14 @@ Flag Working::flag(int id)
     }
 }
 
-void Working::getGoods(int id)
+void Working::getGoods(int id, double price1, double price2)
 {
     sender()->deleteLater();
     WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
     if (!w) {
         return;
     }
-    w->addGoods(id);
+    w->addGoods(id, 0, price1, price2);
 }
 
 WOrder *Working::worder()
@@ -350,7 +350,7 @@ void Working::loadStaff()
     fCurrentUsers.clear();
     C5Database db(__c5config.dbParams());
     db[":f_hall"] = __c5config.defaultHall();
-    db.exec("select u.f_id, u.f_group, concat(u.f_last, ' ' , u.f_first) as f_name, p.f_data "
+    db.exec("select u.f_id, u.f_group, concat(u.f_last, ' ' , u.f_first) as f_name, to_base64(p.f_data) as f_data "
             "from s_salary_inout s "
             "inner join s_user u on u.f_id=s.f_user "
             "left join s_user_photo p on p.f_id=u.f_id "
@@ -361,7 +361,8 @@ void Working::loadStaff()
         u.group = db.getInt("f_group");
         u.name = db.getString("f_name");
         QPixmap p;
-        if (!p.loadFromData(db.getValue("f_data").toByteArray())) {
+
+        if (!p.loadFromData(QByteArray::fromBase64(db.getValue("f_data").toString().toLatin1()))) {
             p = QPixmap(":/staff.png");
         }
         u.photo = p;
@@ -896,7 +897,7 @@ void Working::on_btnGiftCard_clicked()
     }
     DlgGiftCardSale d(__c5config.replicaDbParams());
     if (d.exec() == QDialog::Accepted) {
-        int row = wo->addGoodsToTable(d.fGiftGoodsId, true, "");
+        int row = wo->addGoodsToTable(d.fGiftGoodsId, true, 0, "", 0, 0);
         wo->changePrice(d.fGiftPrice);
         wo->fOHeader.saleType = -1;
     }

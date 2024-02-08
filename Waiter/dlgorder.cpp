@@ -1,4 +1,5 @@
 #include "dlgorder.h"
+#include "c5socketmessage.h"
 #include "ui_dlgorder.h"
 #include "c5cafecommon.h"
 #include "c5user.h"

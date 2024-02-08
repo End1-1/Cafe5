@@ -24,7 +24,7 @@ private:
     bool dbQuery();
     bool networkRedirect(const QString &sql);
     bool payment();
-    bool printBill();
+    bool printBill(const QString &id);
     QJsonObject fConfig;
 };
 

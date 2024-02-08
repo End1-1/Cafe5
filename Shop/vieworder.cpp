@@ -5,7 +5,6 @@
 #include "goodsreturnreason.h"
 #include "c5database.h"
 #include "c5utils.h"
-#include "c5replication.h"
 #include "c5user.h"
 #include "c5checkbox.h"
 #include "c5storedraftwriter.h"
@@ -21,7 +20,6 @@
 #include "c5printrecipta4.h"
 #include "dlgdate.h"
 #include "working.h"
-#include "sslsocket.h"
 #include "ogoods.h"
 
 ViewOrder::ViewOrder(Working *w, const QString &order) :
@@ -45,7 +43,9 @@ ViewOrder::ViewOrder(Working *w, const QString &order) :
         ui->leAmount->setDouble(db.getDouble("f_amounttotal"));
         fOHeader.saleType = db.getInt("f_saletype");
         fOHeader.partner = db.getInt("f_partner");
-        fSaleDoc = QString("%1%2, %3").arg(db.getString("f_prefix")).arg(db.getString("f_hallid")).arg(db.getDate("f_datecash").toString(FORMAT_DATE_TO_STR));
+        fSaleDoc = QString("%1%2, %3").arg(db.getString("f_prefix"),
+                                           db.getString("f_hallid"),
+                                           db.getDate("f_datecash").toString(FORMAT_DATE_TO_STR));
         ui->leDate->setDate(db.getDate("f_datecash"));
         ui->leTime->setText(db.getTime("f_timeclose").toString("HH:mm"));
         ui->leUUID->setText(db.getString("f_id"));
@@ -71,8 +71,10 @@ ViewOrder::ViewOrder(Working *w, const QString &order) :
     }
     db[":f_header"] = order;
     db.exec("select b.f_id, g.f_name, g.f_id as f_goodsid, b.f_qty, b.f_price, b.f_total, f_scancode,  "
-            "g.f_service, b.f_return, b.f_tax, b.f_store "
+            "g.f_service, b.f_return, t.f_receiptnumber as f_tax, b.f_store "
             "from o_goods b "
+            "left join o_header h on h.f_id=b.f_header "
+            "left join o_tax t on t.f_id=h.f_id "
             "inner join c_goods g on g.f_id=b.f_goods "
             "where b.f_header=:f_header");
     while (db.nextRow()) {
@@ -189,7 +191,6 @@ void ViewOrder::on_btnReturn_clicked()
     QString storedocUserNum;
     if (haveStore) {
         storeDocComment = QString("%1 %2").arg(tr("Return of sale")).arg(fSaleDoc);
-        storeDocId;
         storedocUserNum = dw.storeDocNum(DOC_TYPE_STORE_INPUT, __c5config.defaultStore(), true, 0);
         if (!dw.writeAHeader(storeDocId, storedocUserNum, DOC_STATE_DRAFT, DOC_TYPE_STORE_INPUT,
                              uid, QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, 0,
@@ -265,7 +266,7 @@ void ViewOrder::on_btnReturn_clicked()
                         1, __c5config.getValue(param_default_currency).toInt());
         dw.writeAHeaderCash(fCashUuid, 0, __c5config.cashId(), 1, storeDocId, "", 0);
         dw.writeECash(fCashRowId, fCashUuid, __c5config.cashId(), -1, purpose, returnAmount, fCashRowId, 1);
-        if (!dw.writeAHeaderStore(storeDocId, uid, uid, "", QDate(), __c5config.defaultStore(), 0, 1, fCashUuid, 0, 0, oheader._id())) {
+        if (!dw.writeAHeaderStore(storeDocId, uid, uid, "", QDate::currentDate(), __c5config.defaultStore(), 0, 1, fCashUuid, 0, 0, oheader._id())) {
             return returnFalse(dw.fErrorMsg, &db);
         }
     }
@@ -492,29 +493,6 @@ bool ViewOrder::printCheckWithTax(C5Database &db, const QString &id, QString &rs
             return resultb;
         }
     }
-    if (__c5config.taxIP().toLower() == "http") {
-        QString url = QString("GET /printtax?auth=up&a=get&user=%1&pass=%2&order=%3 HTTP/1.1\r\n\r\n")
-                .arg(__c5config.httpServerUsername(),__c5config.httpServerPassword(),id);
-        auto *s = new QSslSocket(0);
-        //connect(s, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(err(QAbstractSocket::SocketError)));
-        s->addCaCertificate(fSslCertificate);
-        s->setPeerVerifyMode(QSslSocket::VerifyNone);
-        s->connectToHostEncrypted(__c5config.httpServerIP(), __c5config.httpServerPort());
-        if (s->waitForEncrypted(5000)) {
-            s->write(url.toUtf8());
-            if (s->waitForBytesWritten()) {
-                s->waitForReadyRead();
-                QByteArray d = s->readAll();
-                C5Message::info(d);
-            } else {
-                resultb = false;
-                C5Message::error(s->errorString());
-            }
-            s->close();
-        }
-        s->deleteLater();
-        return resultb;
-    }
     db[":f_id"] = id;
     db.exec("select * from o_header where f_id=:f_id");
     db.nextRow();
@@ -557,14 +535,16 @@ bool ViewOrder::printCheckWithTax(C5Database &db, const QString &id, QString &rs
     QJsonObject jtax;
     jtax["f_order"] = id;
     jtax["f_elapsed"] = et.elapsed();
-    jtax["f_in"] = jsonIn;
-    jtax["f_out"] = jsonOut;
+    jtax["f_in"] = QJsonDocument::fromJson(jsonIn.toUtf8()).object();
+    jtax["f_out"] = QJsonDocument::fromJson(jsonOut.toUtf8()).object();
     jtax["f_err"] = err;
     jtax["f_result"] = result;
     jtax["f_state"] = result == pt_err_ok ? 1 : 0;
     db.exec(QString("call sf_create_shop_tax('%1')").arg(QString(QJsonDocument(jtax).toJson(QJsonDocument::Compact))));
 
     if (result == pt_err_ok) {
+        jtax = QJsonDocument::fromJson(jsonOut.toUtf8()).object();
+        rseq = QString::number(jtax["rseq"].toInt());
         C5Message::info(tr("Printed"));
     } else {
 
@@ -595,7 +575,7 @@ void ViewOrder::on_btnMakeDraft_clicked()
     WOrder *wo = fWorking->newSale(SALE_RETAIL);
     for (int i = 0; i < ui->tbl->rowCount(); i++) {
         int goods = ui->tbl->getInteger(i, 6);
-        int r = wo->addGoodsToTable(goods, true, "");
+        int r = wo->addGoodsToTable(goods, true, 0, "", 0, 0);
         if (r < 0) {
             return;
         }

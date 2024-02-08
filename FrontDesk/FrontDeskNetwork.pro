@@ -8,6 +8,8 @@ QT += core gui network printsupport sql multimedia
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
+include ($$PWD/Frontdesk.pri)
+
 RC_FILE = res.rc
 
 TARGET = OfficeN
@@ -130,6 +132,7 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../Forms/c5dbuseraccess.cpp \
     ../Forms/c5dishgroupaction.cpp \
     ../Forms/c5dishselfcostgenprice.cpp \
+    ../Forms/c5dlgconnections.cpp \
     ../Forms/c5dlgselectreporttemplate.cpp \
     ../Forms/c5filtervalues.cpp \
     ../Forms/c5goodsimage.cpp \
@@ -271,7 +274,6 @@ SOURCES += ../Cafe5/c5cafecommon.cpp \
     ../TableRecord/odraftsalebody.cpp \
     ../TableRecord/ogoods.cpp \
     ../TableRecord/oheader.cpp \
-    c5dlgconnections.cpp \
         main.cpp \
     ../Cafe5/c5config.cpp \
     ../Cafe5/c5connection.cpp \
@@ -475,6 +477,7 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Forms/c5dbuseraccess.h \
     ../Forms/c5dishgroupaction.h \
     ../Forms/c5dishselfcostgenprice.h \
+    ../Forms/c5dlgconnections.h \
     ../Forms/c5dlgselectreporttemplate.h \
     ../Forms/c5filtervalues.h \
     ../Forms/c5goodsimage.h \
@@ -670,7 +673,6 @@ HEADERS += ../Cafe5/c5cafecommon.h \
     ../Reports/cr5documentsfilter.h \
     ../Reports/cr5consumptionbysales.h \
     ../Reports/cr5consumptionbysalesfilter.h \
-    c5dlgconnections.h \
     rc.h \
     res.rc \
     ../Editors/ce5partner.h \
@@ -762,6 +764,7 @@ FORMS += \
     ../Forms/c5dbuseraccess.ui \
     ../Forms/c5dishgroupaction.ui \
     ../Forms/c5dishselfcostgenprice.ui \
+    ../Forms/c5dlgconnections.ui \
     ../Forms/c5dlgselectreporttemplate.ui \
     ../Forms/c5filtervalues.ui \
     ../Forms/c5goodsimage.ui \
@@ -887,8 +890,7 @@ FORMS += \
     ../Editors/ce5createtablesforhall.ui \
     ../Reports/cr5menutranslator.ui \
     ../Reports/cr5dishpriceselfcostfilter.ui \
-    ../Reports/cr5storedocumentsfilter.ui \
-    c5dlgconnections.ui
+    ../Reports/cr5storedocumentsfilter.ui
 
 INCLUDEPATH += ../Cafe5
 INCLUDEPATH += ../Cache
@@ -904,7 +906,7 @@ INCLUDEPATH += ../Service
 INCLUDEPATH += ../Service5Working/utils
 INCLUDEPATH += ../Forms
 INCLUDEPATH += ../Configs
-INCLUDEPATH += /projects/xlsx/src
+INCLUDEPATH += c:/projects/xlsx/src
 INCLUDEPATH += /Projects/NewTax/Src
 INCLUDEPATH += /Soft/OpenSSL-Win64/include
 INCLUDEPATH += /Soft/OpenSSL-Win64/include/openssl

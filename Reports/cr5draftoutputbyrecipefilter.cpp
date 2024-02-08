@@ -49,6 +49,16 @@ QDate CR5DraftOutputByRecipeFilter::date1()
     return ui->deStart->date();
 }
 
+QString CR5DraftOutputByRecipeFilter::d1()
+{
+    return ui->deStart->date().toString(FORMAT_DATE_TO_STR_MYSQL);
+}
+
+QString CR5DraftOutputByRecipeFilter::d2()
+{
+    return ui->deEnd->date().toString(FORMAT_DATE_TO_STR_MYSQL);
+}
+
 QDate CR5DraftOutputByRecipeFilter::date2()
 {
     return ui->deEnd->date();

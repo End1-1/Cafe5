@@ -44,7 +44,6 @@ bool Calculator::event(QEvent *e)
 {
     if (e->type() == QEvent::KeyRelease) {
         QKeyEvent *ke = static_cast<QKeyEvent*>(e);
-        qDebug() << ke->key();
         newKey(ke->key());
     }
     return C5Dialog::event(e);
@@ -88,10 +87,6 @@ void Calculator::newKey(int key)
         }
         if (ui->plHistory->toPlainText().length() > 0) {
             QChar l = ui->plHistory->toPlainText().right(1).at(0);
-            qDebug() << (l.toLatin1() == 47);
-            qDebug() << (l.toLatin1() == 45);
-            qDebug() << (l.toLatin1() == 43);
-            qDebug() << (l.toLatin1() == 42);
             if (l.toLatin1() == 47 || l.toLatin1() == 45 || l.toLatin1() == 42 || l.toLatin1() == 43) {
                 ui->plHistory->setPlainText(ui->plHistory->toPlainText().left(ui->plHistory->toPlainText().length() - 1) + QChar(key));
             } else {

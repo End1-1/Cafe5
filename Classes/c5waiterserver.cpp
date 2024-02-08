@@ -945,6 +945,8 @@ void C5WaiterServer::processCloseOrder(QJsonObject &o, C5Database &db)
 
 int C5WaiterServer::printTax(const QMap<QString, QVariant> &header, const QList<QMap<QString, QVariant> > &body, QString &err)
 {
+    QElapsedTimer et;
+    et.start();
     C5Database db(__c5config.dbParams());
 
     PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(),  this);
@@ -974,38 +976,20 @@ int C5WaiterServer::printTax(const QMap<QString, QVariant> &header, const QList<
             + header["f_amountidram"].toDouble()
             + header["f_amountpayx"].toDouble();
     result = pt.makeJsonAndPrint(cardamount, header["f_amountprepaid"].toDouble(), jsonIn, jsonOut, err);
-    db[":f_id"] = db.uuid();
-    db[":f_order"] = header["f_id"].toString();
-    db[":f_date"] = QDate::currentDate();
-    db[":f_time"] = QTime::currentTime();
-    db[":f_in"] = jsonIn;
-    db[":f_out"] = jsonOut;
-    db[":f_err"] = err;
-    db[":f_result"] = result;
-    db.insert("o_tax_log", false);
-    if (__c5config.getValue(param_debuge_mode).toInt() == 1) {
-        QSqlQuery q(db.fDb);
-        pt.saveTimeResult(header["f_id"].toString(), q);
+    QJsonObject jtax;
+    QJsonParseError jsonErr;
+    jtax["f_order"] = header["f_id"].toString();
+    jtax["f_elapsed"] = et.elapsed();
+    jtax["f_in"] = QJsonDocument::fromJson(jsonIn.toUtf8(), &jsonErr).object();
+    jtax["f_out"] = QJsonDocument::fromJson(jsonOut.toUtf8()).object();;
+    jtax["f_err"] = err;
+    jtax["f_result"] = result;
+    jtax["f_state"] = result == pt_err_ok ? 1 : 0;
+    if (jsonErr.error != QJsonParseError::NoError) {
+
     }
-    if (result == pt_err_ok) {
-        QString sn, firm, address, fiscal, hvhh, rseq, devnum, time;
-        PrintTaxN::parseResponse(jsonOut, firm, hvhh, fiscal, rseq, sn, address, devnum, time);
-        db[":f_id"] = header["f_id"].toString();
-        db.exec("delete from o_tax where f_id=:f_id");
-        db[":f_id"] = header["f_id"].toString();
-        db[":f_dept"] = C5Config::taxDept();
-        db[":f_firmname"] = firm;
-        db[":f_address"] = address;
-        db[":f_devnum"] = devnum;
-        db[":f_serial"] = sn;
-        db[":f_fiscal"] = fiscal;
-        db[":f_receiptnumber"] = rseq;
-        db[":f_hvhh"] = hvhh;
-        db[":f_fiscalmode"] = tr("(F)");
-        db[":f_time"] = time;
-        db.insert("o_tax", false);
-    } else {
-        err = jsonOut;
+    if (!db.exec(QString("call sf_create_shop_tax('%1')").arg(QString(QJsonDocument(jtax).toJson(QJsonDocument::Compact))))) {
+
     }
     return result;
 }

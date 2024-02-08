@@ -342,6 +342,26 @@ bool StoreInputDocument::openDoc(const QString &id)
     }
 }
 
+void StoreInputDocument::setLastInputPrices()
+{
+    C5Database db(fDBParams);
+    db[":f_id"] = ui->leDocnum->property("f_id");
+    db.exec("select b.f_goods, g.f_lastinputprice "
+            "from a_store_draft b "
+            "left join c_goods g on g.f_id=b.f_goods "
+            "where b.f_document=:f_id");
+    for (int i = 0; i < ui->tbl->rowCount(); i++) {
+        for (int j = 0; j < db.rowCount(); j++) {
+            if (ui->tbl->getInteger(i, 2) == db.getInt(j, "f_goods")) {
+                ui->tbl->lineEdit(i, 10)->setDouble(db.getDouble(j, "f_lastinputprice"));
+                ui->tbl->lineEdit(i, 11)->setDouble(ui->tbl->lineEdit(i, 6)->getDouble() * db.getDouble(j, "f_lastinputprice"));
+                break;
+            }
+        }
+    }
+    countTotal();
+}
+
 bool StoreInputDocument::draftDoc()
 {
     if (C5Message::question(tr("Make draft?")) != QDialog::Accepted) {

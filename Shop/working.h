@@ -66,7 +66,7 @@ public:
     Flag flag(int id);
 
 public slots:
-    void getGoods(int id);
+    void getGoods(int id, double price1, double price2);
 
 private:
     Ui::Working *ui;

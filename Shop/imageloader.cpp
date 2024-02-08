@@ -4,9 +4,9 @@
 #include <QThread>
 #include <QPixmap>
 
-ImageLoader::ImageLoader(const QString &code, QObject *parent) :
+ImageLoader::ImageLoader(int id, QObject *parent) :
     QObject(parent),
-    fCode(code)
+    fId(id)
 {
 
 }
@@ -26,14 +26,7 @@ void ImageLoader::start()
 void ImageLoader::loadImage()
 {
     C5Database db(__c5config.dbParams());
-    db[":f_scancode"] = fCode;
-    db.exec("select f_id from c_goods where f_scancode=:f_scancode");
-    if (!db.nextRow()) {
-        emit noImage();
-        emit finished();
-        return;
-    }
-    db[":f_id"] = db.getInt("f_id");
+    db[":f_id"] = fId;
     db.exec("select * from c_goods_images where f_id=:f_id");
     if (db.nextRow()) {
         QPixmap p;

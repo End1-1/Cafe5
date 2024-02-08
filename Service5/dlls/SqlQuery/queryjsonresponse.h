@@ -35,6 +35,7 @@ private:
     void workDetailsDoneUpdate();
     void removeWorkDetails();
     void workDetailsUndone();
+    void workArrayDone();
 };
 
 #endif // QUERYJSONRESPONSE_H

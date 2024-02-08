@@ -143,7 +143,6 @@ void C5SocketHandler::readyRead()
         fReadState = false;
     }
     if (fDataSize < fData.size()) {
-        qDebug() << "PIZDA";
         close();
     }
 }

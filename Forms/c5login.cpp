@@ -47,13 +47,19 @@ void C5Login::on_btnOk_clicked()
         return;
     }
 
+    for (int i = 0; i < fServers.size(); i++) {
+        QJsonObject js = fServers.at(i).toObject();
+        js["lastusername"] = "";
+        js["lastdb"] = "";
+        fServers[i] = js;
+    }
     int index = ui->cbDatabases->currentIndex();
-    const QJsonObject &js = fServers.at(index).toObject();
+    QJsonObject js = fServers.at(index).toObject();
     js["lastusername"] = ui->leUsername->currentText();
+    js["lastdb"] = ui->cbDatabases->currentText();
     fServers[index] = js;
     QSettings s(_ORGANIZATION_, _APPLICATION_+ QString("\\") + _MODULE_);
     s.setValue("servers", QJsonDocument(fServers).toJson());
-
     accept();
 }
 
@@ -92,10 +98,15 @@ void C5Login::readServers()
     QSettings s(_ORGANIZATION_, _APPLICATION_+ QString("\\") + _MODULE_);
     fServers = QJsonDocument::fromJson(s.value("servers", "[]").toByteArray()).array();
     ui->cbDatabases->clear();
+    int dbindex = 0;
     for (int i = 0; i < fServers.count(); i++) {
         const QJsonObject &js = fServers.at(i).toObject();
+        if (!js["lastdb"].toString().isEmpty()) {
+            dbindex = i;
+        }
         ui->cbDatabases->addItem(js["name"].toString());
     }
+    ui->cbDatabases->setCurrentIndex(dbindex);
 }
 
 

@@ -1,5 +1,6 @@
 #include "c5logtoserverthread.h"
 #include "c5sockethandler.h"
+#include "c5socketmessage.h"
 #include "c5utils.h"
 #include "c5config.h"
 #include <QMutex>

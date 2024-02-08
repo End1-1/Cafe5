@@ -27,6 +27,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
+    ../../../Soft/OpenSSL-Win32/include/openssl/applink.c \
     ../../XLSX/src/xlsx.cpp \
     ../../XLSX/src/xlsxborder.cpp \
     ../../XLSX/src/xlsxcell.cpp \
@@ -206,8 +207,6 @@ SOURCES += \
     dlggiftcardsale.cpp \
     dlggoodslist.cpp \
     dlgpin.cpp \
-    dlgpreorder.cpp \
-    dlgpreorderitem.cpp \
     dlgreturnitem.cpp \
     dlgsearchpartner.cpp \
     dlgshowcolumns.cpp \
@@ -248,6 +247,112 @@ SOURCES += \
     ../Controls/c5checkbox.cpp
 
 HEADERS += \
+    ../../../Soft/OpenSSL-Win32/include/openssl/__DECC_INCLUDE_EPILOGUE.H \
+    ../../../Soft/OpenSSL-Win32/include/openssl/__DECC_INCLUDE_PROLOGUE.H \
+    ../../../Soft/OpenSSL-Win32/include/openssl/aes.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/asn1.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/asn1_mac.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/asn1err.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/asn1t.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/async.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/asyncerr.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/bio.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/bioerr.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/blowfish.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/bn.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/bnerr.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/buffer.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/buffererr.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/camellia.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/cast.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/cmac.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/cms.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/cmserr.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/comp.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/comperr.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/conf.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/conf_api.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/conferr.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/crypto.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/cryptoerr.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/ct.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/cterr.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/des.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/dh.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/dherr.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/dsa.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/dsaerr.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/dtls1.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/e_os2.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/ebcdic.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/ec.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/ecdh.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/ecdsa.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/ecerr.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/engine.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/engineerr.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/err.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/evp.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/evperr.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/hmac.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/idea.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/kdf.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/kdferr.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/lhash.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/md2.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/md4.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/md5.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/mdc2.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/modes.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/obj_mac.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/objects.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/objectserr.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/ocsp.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/ocsperr.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/opensslconf.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/opensslv.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/ossl_typ.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/pem.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/pem2.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/pemerr.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/pkcs12.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/pkcs12err.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/pkcs7.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/pkcs7err.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/rand.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/rand_drbg.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/randerr.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/rc2.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/rc4.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/rc5.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/ripemd.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/rsa.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/rsaerr.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/safestack.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/seed.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/sha.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/srp.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/srtp.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/ssl.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/ssl2.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/ssl3.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/sslerr.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/stack.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/store.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/storeerr.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/symhacks.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/tls1.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/ts.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/tserr.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/txt_db.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/ui.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/uierr.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/whrlpool.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/x509.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/x509_vfy.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/x509err.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/x509v3.h \
+    ../../../Soft/OpenSSL-Win32/include/openssl/x509v3err.h \
     ../../XLSX/src/crs32.h \
     ../../XLSX/src/xlsx.h \
     ../../XLSX/src/xlsxall.h \
@@ -435,7 +540,6 @@ HEADERS += \
     dlggiftcardsale.h \
     dlggoodslist.h \
     dlgpin.h \
-    dlgpreorder.h \
     dlgpreorderitem.h \
     dlgreturnitem.h \
     dlgsearchpartner.h \
@@ -500,8 +604,6 @@ FORMS += \
     dlggiftcardsale.ui \
     dlggoodslist.ui \
     dlgpin.ui \
-    dlgpreorder.ui \
-    dlgpreorderitem.ui \
     dlgreturnitem.ui \
     dlgsearchpartner.ui \
     dlgshowcolumns.ui \
@@ -525,7 +627,7 @@ FORMS += \
     ../Cafe5/c5message.ui \
     dqty.ui
 
-DEFINES += _DBDRIVER_=\\\"QMYSQL\\\"
+DEFINES += _DBDRIVER_=\\\"QMARIADB\\\"
 DEFINES += _ORGANIZATION_=\\\"Hotelicca\\\"
 DEFINES += _APPLICATION_=\\\"Shop\\\"
 DEFINES += _MODULE_=\\\"Shop\\\"

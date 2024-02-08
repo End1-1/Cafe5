@@ -476,6 +476,9 @@ void CE5Goods::priceEdited(const QString &arg1)
         double rate = fCrossRate[crossrate];
         ui->tblPricing->lineEdit(r, i)->setDouble(str_float(arg1) * rate);
     }
+    if (l->text() == "nan" || l->text() == "inf") {
+        l->setDouble(0);
+    }
 }
 
 void CE5Goods::tblQtyChanged(const QString &arg1)

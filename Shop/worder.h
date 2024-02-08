@@ -63,9 +63,9 @@ public:
 
     void imageConfig();
 
-    bool addGoods(int id);
+    bool addGoods(int id, double storeqty, double price1, double price2);
 
-    int addGoodsToTable(int id, bool checkQtyOfStore, const QString &draftid);
+    int addGoodsToTable(int id, bool checkQtyOfStore, double qtyStore, const QString &draftid, double price1, double price2);
 
     bool writeOrder();
 

@@ -98,7 +98,6 @@ bool C5StoreBarcode::printOneBarcode(const QString &code, const QString &price, 
     QPainter p(&printer);
     Barcode93 b;
     bool r = b.Encode93(code.toLatin1().data());
-    qDebug() << r;
     QFont f(__c5config.getValue(param_app_font_family), 25, QFont::Normal);
     p.setFont(f);
     qreal plen = 2;

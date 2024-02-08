@@ -154,7 +154,7 @@ bool C5SaleDoc::openDoc(const QString &uuid)
         fToolBar->actions().at(0)->setEnabled(false);
     }
 
-
+    ui->leDocnumber->setText(QString("%1%2").arg(db.getString("f_prefix"), db.getString("f_hallid")));
     ui->leCash->setDouble(db.getDouble("f_amountcash"));
     ui->leCard->setDouble(db.getDouble("f_amountcard"));
     ui->leBankTransfer->setDouble(db.getDouble("f_amountbank"));
@@ -704,7 +704,7 @@ void C5SaleDoc::saveDataChanges()
             if (outStoreDocId.isEmpty()) {
                 dw.writeAHeader(outStoreDocId, outStoredocUserNum, DOC_STATE_DRAFT, DOC_TYPE_STORE_OUTPUT, __user->id(), ui->leDate->date(),
                                 QDate::currentDate(), QTime::currentTime(), 0, 0, outStoreDocComment, 0, ui->cbCurrency->currentData().toInt());
-                dw.writeAHeaderStore(outStoreDocId, __user->id(), __user->id(), "", QDate(), 0,
+                dw.writeAHeaderStore(outStoreDocId, __user->id(), __user->id(), "", QDate::currentDate(), 0,
                                      ui->tblGoods->comboBox(i, col_store)->currentData().toInt(),
                                      1, "", 0, 0, uuid);
                 outDocIds.append(outStoreDocId);

@@ -4,8 +4,8 @@
 #include "c5license.h"
 #include "dlgpin.h"
 #include "c5logsystem.h"
-#include "c5user.h"
 #include "datadriver.h"
+#include "c5user.h"
 #include "settingsselection.h"
 #include "c5systempreference.h"
 #include "dlgsplashscreen.h"
@@ -43,9 +43,16 @@ int main(int argc, char *argv[])
     t.load(":/lang/Shop.qm");
     a.installTranslator(&t);
 
+    QSettings ss(_ORGANIZATION_, _APPLICATION_+ QString("\\") + _MODULE_);
+    QJsonObject js = QJsonDocument::fromJson(ss.value("server", "{}").toByteArray()).object();
+    C5Config::fDBHost = js["host"].toString();
+    C5Config::fDBPath = js["database"].toString();
+    C5Config::fDBUser = js["username"].toString();
+    C5Config::fDBPassword = js["password"].toString();
+    C5Config::fSettingsName = js["settings"].toString();
+
     auto *dlgsplash = new DlgSplashScreen();
     dlgsplash->show();
-    dlgsplash->updateData();
     QDir d;
     if (!d.exists(d.homePath() + "/" + _APPLICATION_)) {
         d.mkpath(d.homePath() + "/" + _APPLICATION_);
@@ -67,8 +74,7 @@ int main(int argc, char *argv[])
         args << argv[i];
     }
 
-    QSettings ss(_ORGANIZATION_, _APPLICATION_+ QString("\\") + _MODULE_);
-    QJsonObject js = QJsonDocument::fromJson(ss.value("server", "{}").toByteArray()).object();
+
     if (args.contains("--config") || js.isEmpty()) {
         C5Connection l(js);
         if (l.exec() == QDialog::Accepted) {
@@ -83,6 +89,7 @@ int main(int argc, char *argv[])
     C5Config::fDBPassword = js["password"].toString();
     C5Config::fSettingsName = js["settings"].toString();
     C5Config::initParamsFromDb();
+    dlgsplash->updateData();
 
     if (!C5SystemPreference::checkDecimalPointAndSeparator()) {
         return 0;
@@ -144,8 +151,6 @@ int main(int argc, char *argv[])
         }
     }
     s->deleteLater();
-
-    DataDriver::init(__c5config.dbParams());
 
     Working w(__user);
     w.setWindowTitle("");

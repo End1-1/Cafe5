@@ -13,13 +13,17 @@ CONFIG += c++11
 
 SOURCES += \
     ../../../../NewTax/Src/printtaxn.cpp \
+    ../../../Cafe5/c5utils.cpp \
     ../../../Classes/c5printing.cpp \
+    ../../../Classes/c5tr.cpp \
     queryjsonresponse.cpp \
     sqlquery.cpp
 
 HEADERS += \
     ../../../../NewTax/Src/printtaxn.h \
+    ../../../Cafe5/c5utils.h \
     ../../../Classes/c5printing.h \
+    ../../../Classes/c5tr.h \
     queryjsonresponse.h \
     sqlquery.h
 
@@ -46,6 +50,7 @@ HEADERS += \
 
 
 INCLUDEPATH += C:/Projects/Cafe5/Classes
+INCLUDEPATH += C:/Projects/Cafe5/Cafe5
 INCLUDEPATH += C:/Projects/Cafe5/Service5/handlers
 INCLUDEPATH += C:/Projects/Cafe5/Service5/utils
 INCLUDEPATH += C:/projects/newtax/src

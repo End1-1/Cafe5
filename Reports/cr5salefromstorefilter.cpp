@@ -44,10 +44,10 @@ QString CR5SaleFromStoreFilter::condition()
         w += " and gg.f_group4 in (" + ui->leClass4->text() + ") ";
     }
     if (ui->rbFiscal->isChecked()) {
-        w += " and og.f_tax>0 ";
+        w += " and coalesce(ot.f_receiptnumber, 0)>0 ";
     }
     if (ui->rbFiscalNone->isChecked()) {
-        w += " and og.f_tax=0 ";
+        w += " and coalesce(ot.f_receiptnumber, 0)=0 ";
     }
     if (ui->rbRIYes->isChecked()) {
         w += " and oh.f_amounttotal<0 ";

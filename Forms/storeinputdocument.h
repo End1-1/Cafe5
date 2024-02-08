@@ -16,6 +16,7 @@ public:
     ~StoreInputDocument();
     virtual QToolBar *toolBar() override;
     bool openDoc(const QString &id);
+    void setLastInputPrices();
 
 private slots:
     void qtyChanged(const QString &arg1);

@@ -14,10 +14,12 @@ C5Connection::C5Connection(const QJsonObject &params) :
 {
     ui->setupUi(this);
     ui->leName->setText(params["name"].toString());
+    ui->leServer->setText(params["waiter_server"].toString());
     ui->leHost->setText(params["host"].toString());
     ui->leDatabase->setText(params["database"].toString());
     ui->leUsername->setText(params["username"].toString());
     ui->lePassword->setText(params["password"].toString());
+    ui->chFullScreen->setChecked(params["fullscreen"].toBool());
     if (!ui->leHost->text().isEmpty() && !ui->leDatabase->text().isEmpty()) {
         on_btnRefreshSettings_clicked();
         ui->cbSettings->setCurrentText(params["settings"].toString());
@@ -65,6 +67,7 @@ void C5Connection::on_btnTest_clicked()
 void C5Connection::on_btnSave_clicked()
 {
     fParams["name"] = ui->leName->text();
+    fParams["waiter_server"] = ui->leServer->text();
     fParams["host"] = ui->leHost->text();
     fParams["database"] = ui->leDatabase->text();
     fParams["username"] = ui->leUsername->text();

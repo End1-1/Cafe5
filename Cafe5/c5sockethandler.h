@@ -5,7 +5,6 @@
 #include <QTcpSocket>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include "c5socketmessage.h"
 
 #define SR_NO_ERROR 0
 #define SR_ERROR 1

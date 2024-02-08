@@ -18,7 +18,7 @@ public slots:
     void run();
 
 private:
-    SslServer *fSslServer;
+    QList<SslServer*> fSslServer;
     const QString fConfigPath;
     QSslCertificate fSslLocalCertificate;
     QSslKey fSslPrivateKey;

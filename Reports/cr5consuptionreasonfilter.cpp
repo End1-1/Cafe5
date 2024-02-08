@@ -20,7 +20,7 @@ CR5ConsuptionReasonFilter::~CR5ConsuptionReasonFilter()
 
 QString CR5ConsuptionReasonFilter::condition()
 {
-    QString cond = QString(" oh.f_datecash between %1 and %2 ")
+    QString cond = QString(" where oh.f_datecash between %1 and %2 and ob.f_state in (1,3) ")
             .arg(ui->deStart->toMySQLDate())
             .arg(ui->deEnd->toMySQLDate());
     if (!ui->leStore->isEmpty()) {

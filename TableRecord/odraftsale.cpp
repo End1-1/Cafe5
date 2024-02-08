@@ -26,15 +26,15 @@ void ODraftSale::bind(C5Database &db)
     db[":f_id"] = id;
     db[":f_state"] = state;
     db[":f_saletype"] = saleType;
-    db[":f_date"] = date;
-    db[":f_time"] = time;
+    db[":f_date"] = date.isValid() ? date : QDate::currentDate();
+    db[":f_time"] = time.isValid() ? time : QTime::currentTime();
     db[":f_staff"] = staff;
     db[":f_partner"] = partner;
     db[":f_amount"] = amount;
     db[":f_discount"] = discount;
     db[":f_comment"] = comment;
     db[":f_payment"] = payment;
-    db[":f_datefor"] = deliveryDate;
+    db[":f_datefor"] = deliveryDate.isValid() ? deliveryDate : QDate::currentDate();
     db[":f_cashier"] = cashier;
 }
 

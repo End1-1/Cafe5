@@ -37,9 +37,12 @@ void C5TempSale::openDraft()
     WOrder *wo = Working::working()->newSale(ds.saleType);
     wo->fDraftSale.id = ds.id;
     db[":f_header"] = wo->fDraftSale.id;
-    db.exec("select * from o_draft_sale_body where f_header=:f_header and f_state=1");
+    db.exec("select b.f_goods, b.f_id, b.f_qty, cp.f_price1, cp.f_price2 "
+            "from o_draft_sale_body b "
+            "left join c_goods_prices cp on cp.f_goods=b.f_goods and cp.f_currency=1 "
+            "where f_header=:f_header and f_state=1 ");
     while (db.nextRow()) {
-        wo->addGoodsToTable(db.getInt("f_goods"), true, db.getString("f_id"));
+        wo->addGoodsToTable(db.getInt("f_goods"), true, 0, db.getString("f_id"), db.getDouble("f_price1"), db.getDouble("f_price2"));
         wo->changeQty(db.getDouble("f_qty"));
     }
 }

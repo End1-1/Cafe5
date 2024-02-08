@@ -59,8 +59,9 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
 #endif
     ui->tblGoods->setColumnWidths(ui->tblGoods->columnCount(), 0, 0, 0, 0, 400, 80, 80, 80, 80, 80, 300);
     ui->tblGoodsStore->setColumnWidths(7, 0, 0, 200, 70, 50, 50, 70);
-    ui->btnNewPartner->setVisible(__user->check(cp_t7_partners));
-    ui->btnNewGoods->setVisible(__user->check(cp_t6_goods));
+    ui->btnNewPartner->setEnabled(__user->check(cp_t7_partners));
+    ui->btnNewGoods->setEnabled(__user->check(cp_t6_goods));
+    ui->btnEditGoods->setEnabled(__user->check(cp_t6_goods));
     ui->leAccepted->setSelector(dbParams, ui->leAcceptedName, cache_users);
     ui->lePassed->setSelector(dbParams, ui->lePassedName, cache_users);
     ui->lbCashDoc->setVisible(!C5Config::noCashDocStore());
@@ -69,8 +70,6 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
     ui->deCashDate->setVisible(!C5Config::noCashDocStore());
     ui->chPaid->setVisible(!C5Config::noCashDocStore());
     ui->leScancode->setVisible(!C5Config::noScanCodeStore());
-    ui->btnNewGoods->setVisible(__user->check(cp_t6_goods));
-    ui->btnEditGoods->setVisible(__user->check(cp_t6_goods));
     fInternalId = C5Database::uuid();
     fDocState = DOC_STATE_DRAFT;
     ui->tblGoodsGroup->viewport()->installEventFilter(this);
@@ -99,7 +98,10 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
     if (__c5config.getRegValue("storedoc_storeinput").toBool()) {
         ui->leStoreInput->setValue(__c5config.getRegValue("storedoc_storeinput_id").toInt());
     }
-
+    if (__c5config.getRegValue("storedoc_fixpartner").toInt() > 0) {
+        ui->lePartner->setValue(__c5config.getRegValue("storedoc_fixpartner").toInt());
+        ui->btnFixPartner->setChecked(true);
+    }
     adjustSize();
     C5Database db(dbParams);
     db.open();
@@ -108,8 +110,6 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
         ui->cbCurrency->addItem(db.getString("f_name"), db.getInt("f_id"));
     }
     ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(__c5config.getValue(param_default_currency).toInt()));
-    ui->leReasonPartner->setSelector(fDBParams, ui->leReasonPartnerName, cache_goods_partners);
-    setReasonPartnerName();
 }
 
 C5StoreDoc::~C5StoreDoc()
@@ -122,53 +122,76 @@ bool C5StoreDoc::openDoc(QString id, QString &err)
 {
     ui->leDocNum->setPlaceholderText("");
     C5Database db(fDBParams);
-    C5StoreDraftWriter dw(db);
-    if (!dw.readAHeader(id)) {
-        err = dw.fErrorMsg;
+//    C5StoreDraftWriter dw(db);
+//    if (!dw.readAHeader(id)) {
+//        err = dw.fErrorMsg;
+//        return false;
+//    }
+
+    db.exec(QString("select sf_open_store_document('{\"f_id\":\"%1\"}')").arg(id));
+    if (!db.nextRow()) {
+        C5Message::error(tr("Document not exists"));
         return false;
     }
 
+    QJsonObject reply = QJsonDocument::fromJson(db.getString(0).toUtf8()).object();
+    if (reply["status"].toInt() != 1) {
+        C5Message::error(reply["data"].toString());
+        return false;
+    }
+    reply = reply["data"].toObject();
+
+    QJsonObject doc_header = reply["doc_header"].toObject();
+    QJsonArray doc_body = reply["doc_body"].toArray();
+    QJsonObject doc_client = reply["doc_client"].toObject();
+    QJsonObject doc_header_store = doc_header["f_body"].toObject();
+    if (doc_header_store.isEmpty()) {
+        doc_header_store = reply["doc_header_store"].toObject();
+    }
+
     fInternalId = id;
-    ui->leDocNum->setText(dw.value(container_aheader, 0, "f_userid").toString());
-    ui->deDate->setDate(dw.value(container_aheader, 0, "f_date").toDate());
-    fDocType = dw.value(container_aheader, 0, "f_type").toInt();
-    fDocState = dw.value(container_aheader, 0, "f_state").toInt();
-    ui->lePartner->setValue(dw.value(container_aheader, 0, "f_partner").toInt());
-    if (dw.rowCount(container_bclient_debts) > 0) {
-        ui->leReasonPartner->setValue(dw.value(container_bclient_debts, 0, "f_costumer").toInt());
-    }
-    ui->leComment->setText(dw.value(container_aheader, 0, "f_comment").toString());
-    ui->leTotal->setDouble(dw.value(container_aheader, 0, "f_amount").toDouble());
-    ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(dw.value(container_aheader, 0, "f_currency").toInt()));
+    ui->leDocNum->setText(doc_header["f_userid"].toString());
+    ui->deDate->setDate(QDate::fromString(doc_header["f_date"].toString(), FORMAT_DATE_TO_STR_MYSQL));
+    fDocType = doc_header["f_type"].toInt();
+    fDocState = doc_header["f_state"].toInt();
+    ui->lePartner->setValue(doc_header["f_partner"].toInt());
+    ui->leComment->setText(doc_header["f_comment"].toString());
+    ui->leTotal->setDouble(doc_header["f_amount"].toDouble());
+    ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(doc_header["f_currency"].toInt()));
     setMode(static_cast<STORE_DOC>(fDocType));
-    for (int i = 0; i < dw.rowCount(container_astoredishwaste); i++) {
-        int row = ui->tblDishes->addEmptyRow();
-        ui->tblDishes->createLineEdit(row, 3);
-        ui->tblDishes->setString(row, 0, dw.value(container_astoredishwaste, i, "f_id").toString());
-        ui->tblDishes->setString(row, 1, dw.value(container_astoredishwaste, i, "f_dish").toString());
-        ui->tblDishes->setString(row, 2, dw.value(container_astoredishwaste, i, "f_dishname").toString());
-        ui->tblDishes->lineEdit(row, 3)->setDouble(dw.value(container_astoredishwaste, i, "f_qty").toDouble());
-        ui->tblDishes->setString(row, 4, dw.value(container_astoredishwaste, i, "f_data").toString());
-        connect(ui->tblDishes->lineEdit(row, 3), SIGNAL(textChanged(QString)), this, SLOT(tblDishQtyChanged(QString)));
-    }
-    for (int i = 0; i < dw.rowCount(container_astoredraft); i++) {
+//    for (int i = 0; i < dw.rowCount(container_astoredishwaste); i++) {
+//        int row = ui->tblDishes->addEmptyRow();
+//        ui->tblDishes->createLineEdit(row, 3);
+//        ui->tblDishes->setString(row, 0, dw.value(container_astoredishwaste, i, "f_id").toString());
+//        ui->tblDishes->setString(row, 1, dw.value(container_astoredishwaste, i, "f_dish").toString());
+//        ui->tblDishes->setString(row, 2, dw.value(container_astoredishwaste, i, "f_dishname").toString());
+//        ui->tblDishes->lineEdit(row, 3)->setDouble(dw.value(container_astoredishwaste, i, "f_qty").toDouble());
+//        ui->tblDishes->setString(row, 4, dw.value(container_astoredishwaste, i, "f_data").toString());
+//        connect(ui->tblDishes->lineEdit(row, 3), SIGNAL(textChanged(QString)), this, SLOT(tblDishQtyChanged(QString)));
+//    }
+    ui->tblGoods->setRowCount(0);
+    for (int i = 0; i < doc_body.size(); i++) {
+        const QJsonObject &jo = doc_body.at(i).toObject();
         int row = -1;
-        if (dw.value(container_astoredraft, i, "f_type").toInt() == 1) {
-            if (dw.value(container_aheader, 0, "f_type").toInt() == DOC_TYPE_COMPLECTATION) {
+        if (jo["f_type"].toInt() == 1) {
+            if (doc_header["f_type"].toInt() == DOC_TYPE_COMPLECTATION) {
                 continue;
             }
-            for (int j = 0; j < ui->tblGoods->rowCount(); j++) {
-                if (dw.value(container_astoredraft, i, "f_id") == ui->tblGoods->getString(j, 2)) {
-                    row = j;
-                    break;
-                }
+            if (doc_header["f_type"].toInt() == DOC_TYPE_STORE_MOVE) {
+                continue;
             }
+//            for (int j = 0; j < ui->tblGoods->rowCount(); j++) {
+//                if (jo["f_id"].toString() == ui->tblGoods->getString(j, 2)) {
+//                    row = j;
+//                    break;
+//                }
+//            }
         } else {
             for (int j = 0; j < ui->tblGoods->rowCount(); j++) {
-                if (dw.value(container_astoredraft, i, "f_base").toString().isEmpty()) {
+                if (jo["f_base"].toString().isEmpty()) {
                     break;
                 }
-                if (dw.value(container_astoredraft, i, "f_base") == ui->tblGoods->getString(j, 0)) {
+                if (jo["f_base"].toString() == ui->tblGoods->getString(j, 0)) {
                     row = j;
                     break;
                 }
@@ -178,36 +201,36 @@ bool C5StoreDoc::openDoc(QString id, QString &err)
             row = addGoodsRow();
         }
         //if (ui->leReason->getInteger() == 0) {
-            ui->leReason->setValue(dw.value(container_astoredraft, i, "f_reason").toString());
+        ui->leReason->setValue(jo["f_reason"].toInt());
         //}
-        if (dw.value(container_astoredraft, i, "f_type").toInt() == 1) {
-            ui->tblGoods->setString(row, 0, dw.value(container_astoredraft, i, "f_id").toString());
+        if (jo["f_type"].toInt() == 1) {
+            ui->tblGoods->setString(row, 0, jo["f_id"].toString());
         } else {
-            ui->tblGoods->setString(row, 1, dw.value(container_astoredraft, i, "f_id").toString());
-            ui->tblGoods->setString(row, 2, dw.value(container_astoredraft, i, "f_base").toString());
+            ui->tblGoods->setString(row, 1, jo["f_id"].toString());
+            ui->tblGoods->setString(row, 2, jo["f_base"].toString());
         }
-        ui->tblGoods->setInteger(row, 3, dw.value(container_astoredraft, i, "f_goods").toInt());
-        ui->tblGoods->setString(row, 4, dw.value(container_astoredraft, i, "f_goodsname").toString());
-        ui->tblGoods->lineEdit(row, 5)->setDouble(dw.value(container_astoredraft, i, "f_qty").toDouble());
-        ui->tblGoods->setString(row, 6, dw.value(container_astoredraft, i, "f_unitname").toString());
-        ui->tblGoods->lineEdit(row, 7)->setDouble(dw.value(container_astoredraft, i, "f_price").toDouble());
-        ui->tblGoods->lineEdit(row, 8)->setDouble(dw.value(container_astoredraft, i, "f_total").toDouble());
-        ui->tblGoods->getWidget<C5DateEdit>(row, 9)->setDate(dw.value(container_astoredraft, i, "f_validdate").toDate());
-        ui->tblGoods->lineEdit(row, 10)->setText(dw.value(container_astoredraft, i, "f_comment").toString());
+        ui->tblGoods->setInteger(row, 3, jo["f_goods"].toInt());
+        ui->tblGoods->setString(row, 4, jo["f_goodsname"].toString());
+        ui->tblGoods->lineEdit(row, 5)->setDouble(jo["f_qty"].toDouble());
+        ui->tblGoods->setString(row, 6, jo["f_unitname"].toString());
+        ui->tblGoods->lineEdit(row, 7)->setDouble(jo["f_price"].toDouble());
+        ui->tblGoods->lineEdit(row, 8)->setDouble(jo["f_total"].toDouble());
+        ui->tblGoods->getWidget<C5DateEdit>(row, 9)->setDate(QDate::fromString(jo["f_validdate"].toString(), FORMAT_DATE_TO_STR));
+        ui->tblGoods->lineEdit(row, 10)->setText(jo["f_comment"].toString());
     }
 
     disconnect(ui->leComplectationName, SIGNAL(textChanged(QString)), this, SLOT(on_leComplectationName_textChanged(QString)));
     disconnect(ui->leComplectationQty, SIGNAL(textChanged(QString)), this, SLOT(on_leComplectationQty_textChanged(QString)));
-    ui->leStoreInput->setValue(dw.value(container_aheaderstore, 0, "f_storein").toString());
-    ui->leStoreOutput->setValue(dw.value(container_aheaderstore, 0, "f_storeout").toString());
-    fBasedOnSale = dw.value(container_aheaderstore, 0, "f_baseonsale").toInt();
-    ui->lePassed->setValue(dw.value(container_aheaderstore, 0, "f_userpass").toString());
-    ui->leAccepted->setValue(dw.value(container_aheaderstore, 0, "f_useraccept").toString());
-    ui->leComplectationCode->setValue(dw.value(container_aheaderstore, 0, "f_complectation").toString());
-    ui->leComplectationQty->setDouble(dw.value(container_aheaderstore, 0, "f_complectationqty").toDouble());
-    ui->deInvoiceDate->setDate(dw.value(container_aheaderstore, 0, "f_invoicedate").toDate());
-    ui->leInvoiceNumber->setText(dw.value(container_aheaderstore, 0, "f_invoice").toString());
-    fCashDocUuid = dw.value(container_aheaderstore, 0, "f_cashuuid").toString();
+    ui->leStoreInput->setValue(doc_header_store["f_storein"].toInt());
+    ui->leStoreOutput->setValue(doc_header_store["f_storeout"].toInt());
+    fBasedOnSale = doc_header_store["f_baseonsale"].toInt();
+    ui->lePassed->setValue(doc_header_store["f_userpass"].toString());
+    ui->leAccepted->setValue(doc_header_store["f_useraccept"].toString());
+    ui->leComplectationCode->setValue(doc_header_store["f_complectation"].toString());
+    ui->leComplectationQty->setDouble(doc_header_store["f_complectationqty"].toDouble());
+    ui->deInvoiceDate->setDate(QDate::fromString(doc_header_store["f_invoicedate"].toString(), FORMAT_DATE_TO_STR_MYSQL));
+    ui->leInvoiceNumber->setText(doc_header_store["f_invoice"].toString());
+    fCashDocUuid = doc_header_store["f_cashuuid"].toString();
     ui->chPaid->setChecked(!fCashDocUuid.isEmpty());
     if (!fCashDocUuid.isEmpty()) {
         on_chPaid_clicked(true);
@@ -219,14 +242,11 @@ bool C5StoreDoc::openDoc(QString id, QString &err)
         on_chPaid_clicked(false);
     }
 
-    connect(ui->leComplectationName, SIGNAL(textChanged(QString)), this, SLOT(on_leComplectationName_textChanged(QString)));
-    connect(ui->leComplectationQty, SIGNAL(textChanged(QString)), this, SLOT(on_leComplectationQty_textChanged(QString)));
-
     if (fDocType == DOC_TYPE_COMPLECTATION) {
         db[":f_document"] = id;
         db[":f_type"] = 1;
         db.exec("select d.f_id, d.f_goods, concat(g.f_name, if(g.f_scancode is null, '', concat(' ', g.f_scancode))) as f_goodsname, \
-                d.f_qty, u.f_name, d.f_price, d.f_total, d.f_reason \
+                d.f_qty, u.f_name, d.f_price, d.f_total, d.f_reason, g.f_scancode \
                 from a_store_draft d \
                 left join c_goods g on g.f_id=d.f_goods \
                 left join c_units u on u.f_id=g.f_unit \
@@ -234,6 +254,7 @@ bool C5StoreDoc::openDoc(QString id, QString &err)
         if (db.nextRow()) {
             fComplectationId = db.getString("f_id");
             ui->leComplectationCode->setValue(db.getInt("f_goods"));
+            ui->leComplectationScancodeCode->setText(db.getString("f_scancode"));
             ui->leComplectationQty->setDouble(db.getDouble("f_qty"));
         } else {
             err = tr("Error in complectation document");
@@ -242,6 +263,7 @@ bool C5StoreDoc::openDoc(QString id, QString &err)
     }
     db[":f_header"] = id;
     db.exec("select f_name, f_amount from a_complectation_additions where f_header=:f_header order by f_row");
+    ui->tblAdd->setRowCount(0);
     while (db.nextRow()) {
         int row = ui->tblAdd->rowCount();
         ui->tblAdd->setRowCount(row + 1);
@@ -252,6 +274,10 @@ bool C5StoreDoc::openDoc(QString id, QString &err)
         l->setValidator(new QDoubleValidator());
         l->setDouble(db.getDouble(1));
     }
+
+    connect(ui->leComplectationName, SIGNAL(textChanged(QString)), this, SLOT(on_leComplectationName_textChanged(QString)));
+    connect(ui->leComplectationQty, SIGNAL(textChanged(QString)), this, SLOT(on_leComplectationQty_textChanged(QString)));
+
     setDocEnabled(fDocState == DOC_STATE_DRAFT);
     countTotal();
 
@@ -319,21 +345,29 @@ void C5StoreDoc::setMode(C5StoreDoc::STORE_DOC sd)
         ui->leStoreOutputName->setVisible(false);
         ui->lbStoreOutput->setVisible(false);
         ui->leReason->setValue(DOC_REASON_INPUT);
+        ui->lePartner->setVisible(true);
+        ui->lePartnerName->setVisible(true);
+        ui->lbPartner->setVisible(true);
+        ui->btnNewPartner->setVisible(true);
+        ui->btnFixPartner->setVisible(true);
+        ui->btnChangePartner->setVisible(true);
         break;
     case sdOutput:
         ui->leStoreInput->setVisible(false);
         ui->leStoreInputName->setVisible(false);
         ui->btnRememberStoreIn->setVisible(false);
-        ui->lePartner->setVisible(false);
-        ui->lePartnerName->setVisible(false);
+        ui->lePartner->setVisible(true);
+        ui->lePartnerName->setVisible(true);
         ui->leInvoiceNumber->setVisible(false);
         ui->deInvoiceDate->setVisible(false);
         ui->lbStoreInput->setVisible(false);
         ui->lbInvoiceDate->setVisible(false);
         ui->lbInvoiceNumber->setVisible(false);
-        ui->lbPartner->setVisible(false);
+        ui->lbPartner->setVisible(true);
         ui->btnNewPartner->setVisible(false);
+        ui->btnFixPartner->setVisible(false);
         ui->leReason->setValue(DOC_REASON_OUT);
+        ui->btnChangePartner->setVisible(true);
         break;
     case sdMovement:
         ui->lePartner->setVisible(false);
@@ -344,7 +378,9 @@ void C5StoreDoc::setMode(C5StoreDoc::STORE_DOC sd)
         ui->lbInvoiceNumber->setVisible(false);
         ui->lbPartner->setVisible(false);
         ui->btnNewPartner->setVisible(false);
+        ui->btnFixPartner->setVisible(false);
         ui->leReason->setValue(DOC_REASON_MOVE);
+        ui->btnChangePartner->setVisible(false);
         break;
     case sdComplectation:
         ui->lePartner->setVisible(false);
@@ -355,7 +391,10 @@ void C5StoreDoc::setMode(C5StoreDoc::STORE_DOC sd)
         ui->lbInvoiceNumber->setVisible(false);
         ui->lbPartner->setVisible(false);
         ui->btnNewPartner->setVisible(false);
+        ui->btnFixPartner->setVisible(false);
         ui->leReason->setValue(DOC_REASON_COMPLECTATION);
+        ui->btnChangePartner->setVisible(false);
+        break;
     case sdDeComplectation:
         ui->lePartner->setVisible(false);
         ui->lePartnerName->setVisible(false);
@@ -365,7 +404,9 @@ void C5StoreDoc::setMode(C5StoreDoc::STORE_DOC sd)
         ui->lbInvoiceNumber->setVisible(false);
         ui->lbPartner->setVisible(false);
         ui->btnNewPartner->setVisible(false);
+        ui->btnFixPartner->setVisible(false);
         ui->leReason->setValue(DOC_REASON_DECOMPLECTATION);
+        ui->btnChangePartner->setVisible(false);
         break;
     default:
         break;
@@ -636,15 +677,6 @@ bool C5StoreDoc::openDraft(const QString &id, QString &err)
     return true;
 }
 
-void C5StoreDoc::setReasonPartnerName()
-{
-    qDebug() << ui->leReason->getInteger();
-    ui->lbReasonPartner->setVisible(ui->leReason->getInteger() == DOC_REASON_BACK_FROM_PARTNER);
-    ui->leReasonPartner->setVisible(ui->leReason->getInteger() == DOC_REASON_BACK_FROM_PARTNER);
-    ui->leReasonPartnerName->setVisible(ui->leReason->getInteger() == DOC_REASON_BACK_FROM_PARTNER);
-    ui->btnChangePartner->setVisible(ui->lbReasonPartner->isVisible());
-}
-
 bool C5StoreDoc::eventFilter(QObject *o, QEvent *e)
 {
     if (o == ui->tblGoodsGroup->viewport() && fGroupTableCellMove) {
@@ -700,7 +732,7 @@ void C5StoreDoc::nextChild()
 
 bool C5StoreDoc::writeDocument(int state, QString &err)
 {
-    if (!docCheck(err)) {
+    if (!docCheck(err, state)) {
         return false;
     }
     if (ui->leDocNum->isEmpty() || (!ui->leDocNum->text().isEmpty() && ui->leDocNum->text().toInt() < 1)) {
@@ -766,6 +798,13 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
         jgoods.append(jitem);
     }
     jdoc["goods"] = jgoods;
+
+    QJsonObject jpartner;
+    jpartner["partner"] = ui->lePartner->getInteger();
+    jpartner["paid"] = ui->chPaid->isChecked() ? 1 : 0;
+    jpartner["cash"] = ui->leCash->getInteger();
+    jdoc["partner"] = jpartner;
+
     QString session = C5Database::uuid();
     jdoc["session"] = session;
 
@@ -780,7 +819,6 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
     db.exec("select f_result from a_result where f_session=:f_session");
     if (db.nextRow()) {
         QJsonObject js = QJsonDocument::fromJson(db.getString(0).toUtf8()).object();
-        qDebug() << js;
         if (js["status"].toInt() == 0) {
             err = js["message"].toString();
             return false;
@@ -903,7 +941,7 @@ void C5StoreDoc::countQtyOfComplectation()
     }
 }
 
-bool C5StoreDoc::docCheck(QString &err)
+bool C5StoreDoc::docCheck(QString &err, int state)
 {
     rowsCheck(err);
     switch (fDocType) {
@@ -913,6 +951,9 @@ bool C5StoreDoc::docCheck(QString &err)
         }
         if (ui->chPaid->isChecked() && ui->leCash->getInteger() == 0) {
             err += tr("Cash must be selected") + "<br>";
+        }
+        if (state == 1 && ui->lePartner->getInteger() == 0) {
+            err += tr("Partner not specified");
         }
         break;
     case sdOutput:
@@ -999,6 +1040,11 @@ void C5StoreDoc::writeDocumentWithState(int state)
                 db.update("o_goods", "f_id", goodsid);
             }
         }
+        if (fDocType == DOC_TYPE_STORE_OUTPUT
+                || fDocType == DOC_TYPE_STORE_MOVE
+                || fDocType == DOC_TYPE_COMPLECTATION) {
+            openDoc(fInternalId, err);
+        }
     } else {
         C5Message::error(err);
     }
@@ -1060,6 +1106,7 @@ int C5StoreDoc::addGoods(int goods, const QString &name, double qty, const QStri
 
 void C5StoreDoc::setDocEnabled(bool v)
 {
+
     ui->deDate->setEnabled(v && __user->check(cp_t1_allow_change_store_doc_date));
     ui->leStoreInput->setEnabled(v);
     ui->leStoreOutput->setEnabled(v);
@@ -1081,7 +1128,8 @@ void C5StoreDoc::setDocEnabled(bool v)
         }
     }
     if (fToolBar) {
-        //fToolBar->actions().at(1)->setEnabled(!v);
+        fToolBar->actions().at(1)->setEnabled(!v);
+        fToolBar->actions().at(0)->setEnabled(v);
     }
     ui->grComplectation->setEnabled(v);
     ui->btnChangePartner->setEnabled(!v);
@@ -2216,17 +2264,17 @@ void C5StoreDoc::dirtyEdit()
 
 void C5StoreDoc::newDoc()
 {
-    if (fDocState != DOC_STATE_SAVED && ui->tblGoods->rowCount() > 0) {
-        C5Message::error(tr("Save current document first"));
-        return;
-    }
-    fInternalId.clear();
+//    if (fDocState != DOC_STATE_SAVED && ui->tblGoods->rowCount() > 0) {
+//        C5Message::error(tr("Save current document first"));
+//        return;
+//    }
+//    fInternalId.clear();
+    fInternalId = C5Database::uuid();
     fBasedOnSale = 0;
     fComplectationId.clear();
     fDocState = DOC_STATE_DRAFT;
     ui->leDocNum->clear();
     ui->lePartner->setValue(0);
-    ui->leReasonPartner->setValue(0);
     ui->leComment->clear();
     ui->leStoreInput->setValue(0);
     ui->leStoreOutput->setValue(0);
@@ -2330,6 +2378,7 @@ void C5StoreDoc::saveDoc()
     if (__c5config.getRegValue("storedoc_storeinput").toBool()) {
         __c5config.setRegValue("storedoc_storeinput_id", ui->leStoreInput->getInteger());
     }
+    __c5config.setRegValue("storedoc_fixpartner", ui->btnFixPartner->isChecked() ? ui->lePartner->getInteger() : 0);
     int cache_id = C5Cache::idForTable("c_goods");
     C5Selector::resetCache(fDBParams, cache_id);
 }
@@ -2467,6 +2516,11 @@ void C5StoreDoc::cancelGoodsGroupOrder()
         fGroupTableCell = nullptr;
     }
     loadGroupsInput();
+}
+
+void C5StoreDoc::tblAddChanged(const QString &arg1)
+{
+    countTotal();
 }
 
 void C5StoreDoc::tblDishQtyChanged(const QString &arg1)
@@ -3009,11 +3063,6 @@ void C5StoreDoc::on_btnAddPackages_clicked()
     }
 }
 
-void C5StoreDoc::on_leReason_textChanged(const QString &arg1)
-{
-    setReasonPartnerName();
-}
-
 void C5StoreDoc::on_btnChangePartner_clicked()
 {
     QList<QVariant> values;
@@ -3023,12 +3072,41 @@ void C5StoreDoc::on_btnChangePartner_clicked()
     if (values.count() == 0) {
         return;
     }
-    ui->leReasonPartner->setValue(values.at(1).toInt());
+    ui->lePartner->setValue(values.at(1).toInt());
     C5Database db(fDBParams);
     db[":f_id"] = fInternalId;
-    db[":f_partner"] = ui->leReasonPartner->getInteger();
+    db[":f_partner"] = ui->lePartner->getInteger();
     db.exec("update a_header set f_partner=:f_partner where f_id=:f_id");
     db[":f_storedoc"] = fInternalId;
-    db[":f_costumer"] = ui->leReasonPartner->getInteger();
+    db[":f_costumer"] = ui->lePartner->getInteger();
     db.exec("update b_clients_debts set f_costumer=:f_costumer where f_storedoc=:f_storedoc");
 }
+
+void C5StoreDoc::on_btnFixPartner_clicked(bool checked)
+{
+    __c5config.setRegValue("storedoc_fixpartner", checked ? ui->lePartner->getInteger() : 0);
+}
+
+
+void C5StoreDoc::on_btnCopyLastAdd_clicked()
+{
+    C5Database db(fDBParams);
+    db.exec("select * from s_draft");
+    if (db.nextRow()) {
+        db[":f_header"] = db.getString(1);
+        db.exec("select * from a_complectation_additions where f_header=:f_header order by f_row");
+        while (db.nextRow()) {
+            int row = ui->tblAdd->rowCount();
+            ui->tblAdd->setRowCount(row + 1);
+            C5LineEdit *l = ui->tblAdd->createLineEdit(row, 1);
+            l->setFocus();
+            l->setText(db.getString("f_name"));
+            l = ui->tblAdd->createLineEdit(row, 2);
+            l->setValidator(new QDoubleValidator());
+            l->setDouble(db.getDouble("f_amount"));
+            connect(l, SIGNAL(textEdited(QString)), this, SLOT(tblAddChanged(QString)));
+        }
+    }
+    countTotal();
+}
+

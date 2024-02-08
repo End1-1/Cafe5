@@ -5,7 +5,6 @@
 #include "dlgface.h"
 #include "c5waiterserver.h"
 #include "c5cafecommon.h"
-#include "c5serverhandler.h"
 #include "dlgsystem.h"
 #include "dlgmanagertools.h"
 #include <QTimer>

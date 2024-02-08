@@ -11,9 +11,11 @@
 #include "c5double.h"
 #include "dlgchangeoutputstore.h"
 #include "c5storedraftwriter.h"
+#include "storeinputdocument.h"
 #include "c5storedoc.h"
 #include "cr5goodsmovement.h"
 #include "dlgsemireadyinout.h"
+#include "cr5consuptionbysalesqty.h"
 #include <QInputDialog>
 
 static const int col_goods = 0;
@@ -260,7 +262,7 @@ void CR5ConsumptionBySales::buildQuery()
             "left join a_header h on h.f_id=s.f_document "
             "where h.f_date between :f_date1 and :f_date2 and s.f_store=:f_store "
             "and s.f_type=:f_type and h.f_state=:f_state  "
-            "and s.f_reason<>:f_reason "
+            "and s.f_reason<>:f_reason " + cond1 +
             "group by 1 ")
             .arg(fFilter->reportType() == REPORTTYPE_AMOUNTS ? "s.f_total" : "s.f_qty"));
     while (db.nextRow()) {
@@ -460,7 +462,7 @@ bool CR5ConsumptionBySales::tblDoubleClicked(int row, int column, const QList<QV
         ddo->setDocType(QString("%1,%2").arg(DOC_TYPE_STORE_OUTPUT).arg(DOC_TYPE_STORE_MOVE));
         ddo->setStore(QString::number(fFilter->store()));
         ddo->setGoods(QString::number(values.at(0).toInt()));
-        ddo->setReason(QString("%1,%2").arg(DOC_REASON_OUT).arg(DOC_REASON_MOVE));
+        ddo->setReason(QString("%1,%2,%3").arg(DOC_REASON_OUT).arg(DOC_REASON_MOVE).arg(DOC_REASON_LOST));
         ddo->setInOut(-1);
         ddo->buildQuery();
         break;
@@ -472,13 +474,23 @@ bool CR5ConsumptionBySales::tblDoubleClicked(int row, int column, const QList<QV
         //}
         break;
     }
-    case col_qtyinv:
-        qty = QInputDialog::getDouble(this, tr("Inventory qty"), tr("Qty"), 0, 0, 100000, 4, &ok);
-        if (!ok) {
-            return true;
+    case col_qtyinv: {
+        switch (cr5consuptionbysalesqty::qty(this, qty)) {
+        case cr5consuptionbysalesqty::rtOk:
+            writeInvQty(db, qty, row, column, values.at(0).toInt());
+            break;
+        case cr5consuptionbysalesqty::rtCancel:
+            break;
+        case cr5consuptionbysalesqty::rtAdd:
+            qty += fModel->data(row, col_qtyinv, Qt::EditRole).toDouble();
+            writeInvQty(db, qty, row, column, values.at(0).toInt());
+        case cr5consuptionbysalesqty::rtClear:
+            writeInvQty(db, 0, row, column, values.at(0).toInt());
+            fModel->setData(row, col_qtyinv, "", Qt::EditRole);
+            break;
         }
-        writeInvQty(db, qty, row, column, values.at(0).toInt());
         break;
+    }
     case col_qty_sr:
         C5SrOfInventory soi(fDBParams, this);
         soi.setGoods(fFilter->date2(), fFilter->store(), values.at(0).toInt());
@@ -511,6 +523,9 @@ void CR5ConsumptionBySales::makeOutput(bool v)
     QMap<int, double> goodsSale, goodsLost, goodsOver;
     QList<QList<QVariant> > &rows = fModel->fRawData;
     for (int i = 0; i < rows.count(); i++) {
+        if (rows[i][col_qtyinv].toString().isEmpty()) {
+            continue;
+        }
         double qty = rows[i][col_qtydiff].toDouble();
         if (rows[i][col_qtydiff].toDouble() > 0.0001) {
             qty = rows[i][col_qtydiff].toDouble();
@@ -552,10 +567,18 @@ void CR5ConsumptionBySales::makeOutput(bool v)
             g.qty = it.value();
             gl.append(g);
         }
+#ifdef NEWVERSION
         C5StoreDoc *sd = writeDocs(DOC_TYPE_STORE_INPUT, DOC_REASON_OVER, gl, tr("Over"));
         if (sd) {
             sd->setLastInputPrices();
         }
+        __mainWindow->removeTab(sd);
+#else
+        C5StoreDoc *sd = writeDocs(DOC_TYPE_STORE_INPUT, DOC_REASON_OVER, gl, tr("Over"));
+        if (sd) {
+            sd->setLastInputPrices();
+        }
+#endif
     }
 }
 
@@ -765,6 +788,22 @@ C5StoreDoc *CR5ConsumptionBySales::writeDocs(int doctype, int reason, const QLis
         dw.writeAStoreDraft(sdid, documentId, store, sdtype, g.goods, g.qty, g.price, g.price * g.qty, reason, "", rownum++, "");
     }
     //= dw.writeDraft(docDate, doctype, store, reason, data, comment);
+#ifdef NEWVERSION
+    auto *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);
+    QString e;
+    if (doctype == DOC_TYPE_STORE_INPUT) {
+        auto *ss = __mainWindow->createTab<StoreInputDocument>(fDBParams);
+        ss->openDoc(documentId);
+        ss->setLastInputPrices();
+    } else {
+        if (!sd->openDoc(documentId, e)) {
+            __mainWindow->removeTab(sd);
+            sd = nullptr;
+            C5Message::error(e);
+        }
+    }
+    return sd;
+#else
     auto *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);
     QString e;
     if (!sd->openDoc(documentId, e)) {
@@ -773,4 +812,5 @@ C5StoreDoc *CR5ConsumptionBySales::writeDocs(int doctype, int reason, const QLis
         C5Message::error(e);
     }
     return sd;
+#endif
 }

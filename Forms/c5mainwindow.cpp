@@ -22,7 +22,6 @@
 #include "cr5breezeservice.h"
 #include "cr5reports.h"
 #include "cr5mfgeneralreport.h"
-#include "cr5routereport.h"
 #include "c5saledoc.h"
 #include "c5salarypayment.h"
 #include "cr5saleremoveddishes.h"
@@ -1039,7 +1038,6 @@ void C5MainWindow::readFavoriteMenu()
         if (!s.contains("favorite") || s.contains("-name")) {
             continue;
         }
-        qDebug() << s;
         if (ss.value(s).toBool()) {
             int prm = s.right(3).toInt();
             if (__user->check(prm)) {

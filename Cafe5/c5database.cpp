@@ -1,5 +1,6 @@
 #include "C5Database.h"
 #include "c5config.h"
+#include "c5utils.h"
 #include <QMutexLocker>
 #include <QSqlQuery>
 #include <QSqlError>
@@ -95,12 +96,12 @@ C5Database::C5Database(const QJsonObject &params) :
 C5Database::C5Database(const QString &host, const QString &db, const QString &user, const QString &password) :
     C5Database()
 {
-    if (fDbParamsForUuid.count() == 0) {
-        fDbParamsForUuid.append(host);
-        fDbParamsForUuid.append(db);
-        fDbParamsForUuid.append(user);
-        fDbParamsForUuid.append(password);
-    }
+    fDbParamsForUuid.clear();
+    fDbParamsForUuid.append(host);
+    fDbParamsForUuid.append(db);
+    fDbParamsForUuid.append(user);
+    fDbParamsForUuid.append(password);
+
     init();
     configureDatabase(fDb, host, db, user, password);
 }
@@ -236,6 +237,7 @@ bool C5Database::exec(const QString &sqlQuery, QList<QList<QVariant> > &dbrows, 
         columns = fNameColumnMap;
         return true;
     } else {
+        logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + fLastError + sqlQuery);
         return false;
     }
 #endif
@@ -331,6 +333,10 @@ bool C5Database::execDirect(const QString &sqlQuery)
 
 bool C5Database::execNetwork(const QString &sqlQuery)
 {
+    if (fDbParamsForUuid.isEmpty()) {
+        fLastError = "Database not configured";
+        return false;
+    }
     QElapsedTimer t;
     t.start();
     QString sql = sqlQuery;
@@ -346,10 +352,18 @@ bool C5Database::execNetwork(const QString &sqlQuery)
                 value = QString("'%1'").arg(value.toString().replace("'", "''"));
                 break;
             case QVariant::Date:
-                value = QString("'%1'").arg(value.toDate().toString("yyyy-MM-dd"));
+                if (value.toDate().isValid()) {
+                    value = QString("'%1'").arg(value.toDate().toString("yyyy-MM-dd"));
+                } else {
+                    value = "null";
+                }
                 break;
             case QVariant::DateTime:
-                value = QString("'%1'").arg(value.toDateTime().toString("yyyy-MM-dd HH:mm:ss"));
+                if (value.toDateTime().isValid()) {
+                    value = QString("'%1'").arg(value.toDateTime().toString("yyyy-MM-dd HH:mm:ss"));
+                } else {
+                    value = "null";
+                }
                 break;
             case QVariant::Double:
                 value = QString("%1").arg(value.toDouble());
@@ -358,7 +372,11 @@ bool C5Database::execNetwork(const QString &sqlQuery)
                 value = QString("%1").arg(value.toInt());
                 break;
             case QVariant::Time:
-                value = QString("'%1'").arg(value.toTime().toString("HH:mm:ss"));
+                if (value.toTime().isValid()) {
+                    value = QString("'%1'").arg(value.toTime().toString("HH:mm:ss"));
+                } else {
+                    value = "null";
+                }
                 break;
             case QVariant::ByteArray:
                 value = QString("'%1'").arg(QString(value.toByteArray().toHex()));
@@ -372,8 +390,9 @@ bool C5Database::execNetwork(const QString &sqlQuery)
     fBindValues.clear();
 
     QNetworkAccessManager m;
-    QString host = QString("https://%1:10002/vipclient").arg(__c5config.fDBHost);
+    QString host = QString("https://%1").arg(fDbParamsForUuid.at(0));
     QNetworkRequest rq(host);
+    m.setTransferTimeout(60000);
     rq.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     QSslConfiguration sslConf = rq.sslConfiguration();
     sslConf.setPeerVerifyMode(QSslSocket::VerifyNone);
@@ -381,21 +400,38 @@ bool C5Database::execNetwork(const QString &sqlQuery)
     rq.setSslConfiguration(sslConf);
     QJsonObject jo;
     jo["query"] = 3;
+    jo["call"] = "sql";
     jo["sql"] = sql;
+    jo["sk"] = "5cfafe13-a886-11ee-ac3e-1078d2d2b808";
     auto *r = m.post(rq, QJsonDocument(jo).toJson());
     while (!r->isFinished()) {
         qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-        QThread::msleep(100);
+        QThread::msleep(10);
     }
     if (r->error() != QNetworkReply::NoError) {
-        qDebug() << r->errorString();
+        fLastError = r->errorString();
         return false;
     }
     QByteArray ba = r->readAll();
-    qDebug() << t.elapsed();
+    quint64 elapsed = t.elapsed();
     jo = QJsonDocument::fromJson(ba).object();
     if (jo["status"].toInt() == 0) {
         return false;
+    }
+    if (sql.mid(0, 6).compare("insert", Qt::CaseInsensitive) == 0
+        || sql.mid(0, 6).compare("delete", Qt::CaseInsensitive) == 0
+        || sql.mid(0, 6).compare("update", Qt::CaseInsensitive) == 0) {
+        if (sql.mid(0, 6).compare("insert", Qt::CaseInsensitive) == 0) {
+            fCursorPos = jo["data"].toString().toInt();
+        }
+#ifdef QT_DEBUG
+        logEvent(fDbParamsForUuid.at(0) + " (" + QString::number(elapsed) + "-" + QString::number(t.elapsed()) + " ms):" + " " + sql);
+#else
+        if (__c5config.getValue(param_debuge_mode).toInt() > 0) {
+            logEvent(fDbParamsForUuid.at(0) + " (" + QString::number(elapsed) + "-" + QString::number(t.elapsed()) + " ms):" + " " + sql);
+        }
+#endif
+        return true;
     }
     jo = jo["data"].toObject();
     QJsonArray ja = jo["columns"].toObject()["column_index_name"].toArray();
@@ -425,7 +461,7 @@ bool C5Database::execNetwork(const QString &sqlQuery)
                 r.append(jar[j].toDouble());
                 break;
             case 10:
-                r.append(QDate::fromString(jar[j].toString()));
+                r.append(QDate::fromString(jar[j].toString(), FORMAT_DATE_TO_STR_MYSQL));
                 break;
             case 11:
                 r.append(QTime::fromString(jar[j].toString()));
@@ -442,7 +478,13 @@ bool C5Database::execNetwork(const QString &sqlQuery)
         fDbRows.append(r);
     }
     fCursorPos = -1;
-    qDebug() << "Elapsed" << t.elapsed() << sql;
+#ifdef QT_DEBUG
+    logEvent(fDbParamsForUuid.at(0) + " (" + QString::number(elapsed) + "-" + QString::number(t.elapsed()) + " ms):" + " " + sql);
+#else
+    if (__c5config.getValue(param_debuge_mode).toInt() > 0) {
+        logEvent(fDbParamsForUuid.at(0) + " (" + QString::number(elapsed) + "-" + QString::number(t.elapsed()) + " ms):" + " " + sql);
+    }
+#endif
     return true;
 }
 
@@ -580,6 +622,9 @@ int C5Database::insert(const QString &tableName, bool returnId)
         return 0;
     }
     if (returnId) {
+#ifdef NETWORKDB
+        return fCursorPos;
+#endif
         fQuery->exec("select last_insert_id()");
         fQuery->next();
         return fQuery->value(0).toInt();

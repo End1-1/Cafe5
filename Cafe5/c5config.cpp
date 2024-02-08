@@ -16,7 +16,7 @@ QString C5Config::fDBHost;
 QString C5Config::fDBPath;
 QString C5Config::fDBUser;
 QString C5Config::fDBPassword;
-QString C5Config::fFullScreen;
+bool C5Config::fFullScreen;
 QStringList __autologin_store;
 C5Config __c5config;
 C5User *__user;
@@ -251,7 +251,7 @@ void C5Config::setValue(int key, const QString &value)
 
 bool C5Config::isAppFullScreen()
 {
-    return fFullScreen == "1";
+    return fFullScreen;
 }
 
 int C5Config::fronDeskFontSize()

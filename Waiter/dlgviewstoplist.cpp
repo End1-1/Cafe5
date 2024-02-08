@@ -1,4 +1,5 @@
 #include "dlgviewstoplist.h"
+#include "c5socketmessage.h"
 #include "ui_dlgviewstoplist.h"
 #include "stoplist.h"
 #include "datadriver.h"

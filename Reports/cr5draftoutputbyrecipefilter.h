@@ -22,6 +22,10 @@ public:
 
     QDate date1();
 
+    QString d1();
+
+    QString d2();
+
     QDate date2();
 
     int store();

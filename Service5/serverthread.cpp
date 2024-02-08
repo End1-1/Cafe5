@@ -15,36 +15,43 @@ ServerThread::ServerThread(const QString &configPath) :
 
 ServerThread::~ServerThread()
 {
-    fSslServer->deleteLater();
+    for (SslServer *s: fSslServer) {
+        s->deleteLater();
+    }
 }
 
 void ServerThread::run()
 {
+    QStringList ports = ConfigIni::value("server/port").split(",", Qt::SkipEmptyParts);
     LogWriter::write(LogWriterLevel::verbose, "", "SSL version: " + QSslSocket::sslLibraryBuildVersionString());
     LogWriter::write(LogWriterLevel::verbose, "", "SSL support: " + QString((QSslSocket::supportsSsl() ? "YES" : "NO")));
     QString certFileName = fConfigPath + "cert.pem";
     QString keyFileName = fConfigPath + "key.pem";
-    fSslServer = new SslServer();
-    fSslServer->setMaxPendingConnections(10000);
-    if (!fSslServer->setSslLocalCertificate(certFileName)) {
-        LogWriter::write(LogWriterLevel::errors, "", QString("%1 certificate is not instaled").arg(certFileName));
-    }
-    if (!fSslServer->setSslPrivateKey(keyFileName)) {
-        LogWriter::write(LogWriterLevel::errors, "", QString("%1 private key is not instaled").arg(keyFileName));
-    }
-    fSslChain = QSslCertificate::fromPath(fConfigPath + "fullchain.pem", QSsl::Pem);
+    for (const QString &p: ports) {
+        auto *s = new SslServer();
+        s->setMaxPendingConnections(10000);
+        if (!s->setSslLocalCertificate(certFileName)) {
+            LogWriter::write(LogWriterLevel::errors, "", QString("%1 certificate is not instaled").arg(certFileName));
+        }
+        if (!s->setSslPrivateKey(keyFileName)) {
+            LogWriter::write(LogWriterLevel::errors, "", QString("%1 private key is not instaled").arg(keyFileName));
+        }
+        fSslChain = QSslCertificate::fromPath(fConfigPath + "fullchain.pem", QSsl::Pem);
 
 
-    fSslServer->setSslProtocol(QSsl::TlsV1_2OrLater);
-    fSslLocalCertificate = fSslServer->fSslLocalCertificate;
-    fSslPrivateKey = fSslServer->fSslPrivateKey;
-    fSslProtocol = fSslServer->fSslProtocol;
-    if (!fSslServer->startListen()) {
-        LogWriter::write(LogWriterLevel::errors, "", "Cannot listen port: " + QString::number(ConfigIni::value("server/port").toInt()));
-        exit(1);
-        return;
+        s->setSslProtocol(QSsl::TlsV1_2OrLater);
+        fSslLocalCertificate = s->fSslLocalCertificate;
+        fSslPrivateKey = s->fSslPrivateKey;
+        fSslProtocol = s->fSslProtocol;
+        if (!s->startListen(p.toInt())) {
+            LogWriter::write(LogWriterLevel::errors, "", "Cannot listen port: " + QString::number(ConfigIni::value("server/port").toInt()));
+            exit(1);
+            return;
+        }
+        LogWriter::write(LogWriterLevel::errors, "", "Listen port: " + p);
+        connect(s, &SslServer::connectionRequest, this, &ServerThread::newConnection);
+        fSslServer.append(s);
     }
-    connect(fSslServer, &SslServer::connectionRequest, this, &ServerThread::newConnection);
 }
 
 void ServerThread::newConnection(int socketDescriptor)

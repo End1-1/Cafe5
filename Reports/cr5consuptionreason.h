@@ -18,6 +18,8 @@ public:
 
     void setFilterParams(const QDate &d1, const QDate &d2, int store, int goods);
 
+    virtual void buildQuery() override;
+
 private:
     CR5ConsuptionReasonFilter *fFilter;
 

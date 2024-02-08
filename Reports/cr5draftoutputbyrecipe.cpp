@@ -101,6 +101,40 @@ QToolBar *CR5DraftOutputByRecipe::toolBar()
     return fToolBar;
 }
 
+void CR5DraftOutputByRecipe::buildQuery()
+{
+    fSimpleQuery = true;
+    fSqlQuery = "select st.f_name as f_storename,gr.f_name as f_goodsgroupname,dr.f_goods,g.f_name as f_goodsname,"
+        "sum(ob.f_qty1) as f_saleqty,sum(dr.f_qty*ob.f_qty1) as f_storeqty,u.f_name as f_unitname "
+         "from o_body ob "
+         "inner join c_storages st on st.f_id=ob.f_store "
+       "inner join d_dish d on d.f_id=ob.f_dish "
+       "inner join d_recipes dr on dr.f_dish=d.f_id  "
+       "inner join c_goods g on g.f_id=dr.f_goods "
+       "inner join c_groups gr on gr.f_id=g.f_group "
+       "inner join c_units u on u.f_id=g.f_unit "
+       "inner join o_header oh on oh.f_id=ob.f_header "
+       "where  oh.f_datecash between '%d1' and '%d2' and ob.f_state in(1,3) and st.f_id in (%store) "
+        "group by st.f_name,gr.f_name,dr.f_goods,g.f_name,u.f_name  "
+        "UNION "
+        "select st.f_name as f_storename,gr.f_name as f_goodsgroupname,dr.f_goods,g.f_name as f_goodsname, "
+        "sum(ob.f_qty1) as f_saleqty,sum(dr.f_qty*ob.f_qty1*ds.f_qty) as f_storeqty,u.f_name as f_unitname "
+         " from o_body ob "
+    "inner join d_dish d on d.f_id=ob.f_dish "
+    "INNER JOIN d_dish_set ds ON ds.f_dish=ob.f_dish "
+    "inner join d_recipes dr on dr.f_dish=ds.f_part "
+    "inner join c_goods g on g.f_id=dr.f_goods "
+    "inner join c_groups gr on gr.f_id=g.f_group  "
+    "inner join c_units u on u.f_id=g.f_unit "
+    "inner join o_header oh on oh.f_id=ob.f_header  "
+    "inner join c_storages st on st.f_id=ob.f_store "
+    "where  oh.f_datecash between '%d1' and '%d2' and ob.f_state in(1,3) and st.f_id in (%store) "
+                "group by st.f_name,gr.f_name,dr.f_goods,g.f_name,u.f_name  ";
+
+    fSqlQuery.replace("%d1", fFilter->d1()).replace("%d2", fFilter->d2()).replace("%store", QString::number(fFilter->store()));
+    C5ReportWidget::buildQuery();
+}
+
 void CR5DraftOutputByRecipe::dateBack()
 {
     fFilter->addDays(-1);

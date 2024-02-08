@@ -1,6 +1,7 @@
 #include "dlgsplashscreen.h"
 #include "ui_dlgsplashscreen.h"
 #include "goodsreserve.h"
+#include "datadriver.h"
 #include <QTimer>
 
 DlgSplashScreen::DlgSplashScreen() :
@@ -62,13 +63,20 @@ void DlgSplashScreen::updateData()
     dr[":f_store"] = __c5config.defaultStore();
     dr[":f_state"] = GR_RESERVED;
     dr.exec("select f_goods, sum(f_qty) as f_qty from a_store_reserve where f_state=:f_state and f_store=:f_store group by 1");
+    QJsonArray ja;
     while (dr.nextRow()) {
-        db2[":f_store"] = __c5config.defaultStore();
-        db2[":f_goods"] = dr.getInt("f_goods");
-        db2[":f_qtyreserve"] = dr.getDouble("f_qty");
-        db2.exec("update a_store_sale set f_qtyreserve=:f_qtyreserve where f_store=:f_store and f_goods=:f_goods");
+        QJsonObject jo;
+        jo["store"] = __c5config.defaultStore();
+        jo["goods"] = dr.getInt("f_goods");
+        jo["qty"] = dr.getDouble("f_qty");
+        ja.append(jo);
     }
+    QJsonObject jo;
+    jo["goods_list"] = ja;
+    db2.exec(QString("call sf_shop_process_reserve('%1')").arg(QString(QJsonDocument(jo).toJson(QJsonDocument::Compact))));
 
+    emit messageSignal(tr("Loading data"));
+    DataDriver::init(__c5config.dbParams());
 }
 
 void DlgSplashScreen::message(const QString &text)

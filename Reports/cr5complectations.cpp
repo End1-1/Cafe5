@@ -78,7 +78,6 @@ void CR5Complectations::buildQuery()
         }
         fModel->insertRow(row);
         for (int i = 1; i < db.columnCount(); i++) {
-            qDebug() << i << "/" << db.columnCount() << "/" << db.getValue(i);
             fModel->setData(row, i - 1, db.getValue(i));
             fModel->setData(row, 5, fModel->data(row, 4, Qt::EditRole).toDouble() * fModel->data(row, 2, Qt::EditRole).toDouble());
             totalamount += fModel->data(row, 4, Qt::EditRole).toDouble() * fModel->data(row, 2, Qt::EditRole).toDouble();

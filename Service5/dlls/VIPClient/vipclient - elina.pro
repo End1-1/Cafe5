@@ -1,6 +1,6 @@
 QT -= gui
 
-QT += sql network
+QT += sql network printsupport
 
 TARGET = vipclient_elina
 TEMPLATE = lib
@@ -16,10 +16,18 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    ../../../../NewTax/Src/printtaxn.cpp \
+    ../../../Cafe5/c5utils.cpp \
+    ../../../Classes/c5printing.cpp \
+    ../../../Classes/c5tr.cpp \
     queryjsonresponse.cpp \
     sqlquery.cpp
 
 HEADERS += \
+    ../../../../NewTax/Src/printtaxn.h \
+    ../../../Cafe5/c5utils.h \
+    ../../../Classes/c5printing.h \
+    ../../../Classes/c5tr.h \
     queryjsonresponse.h \
     sqlquery.h
 
@@ -46,11 +54,21 @@ HEADERS += \
 
 
 INCLUDEPATH += C:/Projects/Cafe5/Classes
+INCLUDEPATH += C:/Projects/Cafe5/Cafe5
 INCLUDEPATH += C:/Projects/Cafe5/Service5/handlers
 INCLUDEPATH += C:/Projects/Cafe5/Service5/utils
+INCLUDEPATH += C:/Projects/NewTax/Src
+INCLUDEPATH += C:/Soft/OpenSSL-Win64/include
+INCLUDEPATH += C:/Soft/OpenSSL-Win64/include/openssl
 
 DEFINES += _APPLICATION_=\\\"VIPClient\\\"
 DEFINES += _MODULE_=\\\"Service5_vipclient_dll\\\"
+
+LIBS += -LC:/Soft/OpenSSL-Win64/lib
+LIBS += -lopenssl
+LIBS += -llibcrypto
+LIBS += -lVersion
+LIBS += -lwsock32
 
 # Default rules for deployment.
 unix {
