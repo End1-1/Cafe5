@@ -298,6 +298,9 @@
          <layout class="QGridLayout" name="gridLayout_3">
           <item row="4" column="0" colspan="2">
            <widget class="C5CheckBox" name="chServiceFee">
+            <property name="focusPolicy">
+             <enum>Qt::ClickFocus</enum>
+            </property>
             <property name="text">
              <string>Append service fee</string>
             </property>
@@ -314,6 +317,9 @@
               <height>16777215</height>
              </size>
             </property>
+            <property name="focusPolicy">
+             <enum>Qt::ClickFocus</enum>
+            </property>
             <property name="Field" stdset="0">
              <string>f_hourlypayment</string>
             </property>
@@ -323,7 +329,10 @@
            </widget>
           </item>
           <item row="6" column="0">
-           <widget class="C5CheckBox" name="checkBox_3">
+           <widget class="C5CheckBox" name="chRemind">
+            <property name="focusPolicy">
+             <enum>Qt::ClickFocus</enum>
+            </property>
             <property name="text">
              <string>Reminder</string>
             </property>
@@ -339,6 +348,9 @@
               <width>50</width>
               <height>16777215</height>
              </size>
+            </property>
+            <property name="focusPolicy">
+             <enum>Qt::ClickFocus</enum>
             </property>
             <property name="Field" stdset="0">
              <string>f_specialdiscount</string>
@@ -371,6 +383,9 @@
           </item>
           <item row="5" column="0" colspan="2">
            <widget class="C5CheckBox" name="chDiscount">
+            <property name="focusPolicy">
+             <enum>Qt::ClickFocus</enum>
+            </property>
             <property name="text">
              <string>Can discount</string>
             </property>
@@ -394,6 +409,9 @@
               <height>16777215</height>
              </size>
             </property>
+            <property name="focusPolicy">
+             <enum>Qt::ClickFocus</enum>
+            </property>
             <property name="Field" stdset="0">
              <string>f_queue</string>
             </property>
@@ -404,6 +422,9 @@
           </item>
           <item row="7" column="0">
            <widget class="C5CheckBox" name="checkBox_4">
+            <property name="focusPolicy">
+             <enum>Qt::ClickFocus</enum>
+            </property>
             <property name="text">
              <string>Extra</string>
             </property>
@@ -419,6 +440,9 @@
               <width>50</width>
               <height>16777215</height>
              </size>
+            </property>
+            <property name="focusPolicy">
+             <enum>Qt::ClickFocus</enum>
             </property>
             <property name="readOnly">
              <bool>true</bool>
@@ -1284,22 +1308,35 @@
   </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>tabWidget</tabstop>
   <tabstop>leCode</tabstop>
   <tabstop>lePart2</tabstop>
   <tabstop>leName</tabstop>
+  <tabstop>tblPricing</tabstop>
   <tabstop>lineEdit_3</tabstop>
+  <tabstop>leBarcode</tabstop>
+  <tabstop>leAdgt</tabstop>
   <tabstop>leQueue</tabstop>
   <tabstop>leColor</tabstop>
   <tabstop>leHourlyPayment</tabstop>
+  <tabstop>leQueue_2</tabstop>
   <tabstop>chServiceFee</tabstop>
   <tabstop>chDiscount</tabstop>
-  <tabstop>checkBox_3</tabstop>
-  <tabstop>tblPricing</tabstop>
-  <tabstop>leDishComment</tabstop>
+  <tabstop>chRemind</tabstop>
+  <tabstop>checkBox_4</tabstop>
   <tabstop>btnRemoveComment</tabstop>
   <tabstop>lwComment</tabstop>
+  <tabstop>leDishComment</tabstop>
   <tabstop>btnAddComment</tabstop>
-  <tabstop>tabWidget</tabstop>
+  <tabstop>leReadyWeight</tabstop>
+  <tabstop>leReadyWeight_3</tabstop>
+  <tabstop>tblRecipe</tabstop>
+  <tabstop>tblRecipeTotal</tabstop>
+  <tabstop>chSameAsInStore</tabstop>
+  <tabstop>leImageUUID</tabstop>
+  <tabstop>tblSet</tabstop>
+  <tabstop>tblRecipeTotal_2</tabstop>
+  <tabstop>leReadyWeight_2</tabstop>
  </tabstops>
  <resources>
   <include location="../resources/res.qrc"/>

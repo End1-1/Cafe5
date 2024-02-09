@@ -20,7 +20,7 @@ void LogWriter::write(const QString &file, const QString &session, const QString
     if (file == LogWriterLevel::special) {
         return;
     }
-#endif;
+#endif
     QMutexLocker ml(&fMutex);
     writeToFile(file, session, message);
     if (file != LogWriterLevel::verbose) {

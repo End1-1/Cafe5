@@ -1,7 +1,5 @@
 #include "requesthandler.h"
-#include "database.h"
 #include "logwriter.h"
-#include "databaseconnectionmanager.h"
 #include <QElapsedTimer>
 
 RequestHandler::RequestHandler(QByteArray &out) :

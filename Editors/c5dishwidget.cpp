@@ -71,6 +71,7 @@ void C5DishWidget::setId(int id)
 {
     CE5Editor::setId(id);
     setDish(id);
+    ui->leName->setFocus();
 }
 
 void C5DishWidget::clear()
@@ -99,6 +100,7 @@ void C5DishWidget::clear()
 
     ui->tblSet->setRowCount(0);
     ui->leImageUUID->setText(C5Database::uuid());
+    ui->leName->setFocus();
 }
 
 void C5DishWidget::setDish(int id)
@@ -198,11 +200,27 @@ bool C5DishWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
             return false;
         }
     }
+    C5Database db(fDBParams);
+    QJsonObject jdoc;
+    QJsonObject jdish;
+    jdish["f_id"] = ui->leCode->getInteger();
+    jdish["f_part"] = ui->lePart2->getInteger();
+    jdish["f_name"] = ui->leName->text();
+    jdish["f_description"] = ui->leDishComment->text();
+    jdish["f_color"] = ui->leColor->getInteger();
+    jdish["f_remind"] = ui->chRemind->isChecked() ? 1 : 0;
+    jdish["f_service"] = ui->chServiceFee->isChecked() ? 1 : 0;
+    jdish["f_discount"] = ui->chDiscount->isChecked() ? 1 : 0;
+    jdish["f_hourlypayment"] =  ui->leHourlyPayment->getInteger();
+    jdish["f_barcode"] = ui->leBarcode->text();
+    jdish["f_adgt"] = ui->leAdgt->text();
+    jdish["f_image"] = ui->leImageUUID->text();
+    jdoc["dish"] = jdish;
+    QJsonArray jmenu;
     bool result = CE5Editor::save(err, data);
     if (!result) {
         return false;
     }
-    C5Database db(fDBParams);
     for (int i = 0; i < ui->tblPricing->rowCount(); i++) {
         if (ui->tblPricing->checkBox(i, 7)->isChecked() && ui->tblPricing->comboBox(i, 4)->currentIndex() < 0) {
             err += tr("Storage is not defined in menu.<br>");
@@ -430,7 +448,7 @@ void C5DishWidget::uploadImage()
     db[":f_id"] = ui->leImageUUID->text();
     db.exec("delete from s_images where f_id=:f_id");
     db[":f_id"] = ui->leImageUUID->text();
-    db[":f_image"] = ba.toBase64();
+    db[":f_image"] = QString(ba.toBase64());
     db.exec("insert into s_images (f_id, f_data) values (:f_id, :f_image)");
 
 }
@@ -776,3 +794,15 @@ void C5DishWidget::on_btnRemoveFromSet_clicked()
         ui->tblSet->removeRow(row);
     }
 }
+
+void C5DishWidget::on_leName_returnPressed()
+{
+    if (ui->tblPricing->rowCount() > 0) {
+        ui->tblPricing->setFocus();
+        C5LineEdit *l = ui->tblPricing->lineEdit(0, 3);
+        if (l) {
+            //l->setFocus();
+        }
+    }
+}
+

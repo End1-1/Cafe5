@@ -44,17 +44,6 @@ void QueryJsonResponse::getResponse()
         }
     }
 #else
-    if (!fDb.fNetworkDB.isEmpty()) {
-        if (!fJsonIn["config"].toString().isEmpty()) {
-            QString sql = QString("select f_config from s_config where f_name='%1'").arg(fJsonIn["config"].toString());
-            if (!networkRedirect(sql)) {
-                return;
-            }
-            if (!fJsonOut["data"].toObject()["data"].toArray().isEmpty()) {
-                fConfig = QJsonDocument::fromJson(fJsonOut["data"].toObject()["data"].toArray()[0].toString().toUtf8()).object();
-            }
-        }
-    }
     fDb[":f_name"] = fJsonIn["config"].toString();
     fDb.exec("select f_config from s_config where f_name=:f_name");
     if (fDb.next()) {
@@ -169,9 +158,6 @@ bool QueryJsonResponse::dbQuery()
 #ifdef ELINA
     return networkRedirect(fJsonIn["sql"].toString());
 #endif
-    if (!fDb.fNetworkDB.isEmpty()) {
-        return networkRedirect(fJsonIn["sql"].toString());
-    }
     QElapsedTimer t;
     t.start();
     if (!fDb.exec(fJsonIn["sql"].toString())) {
@@ -239,7 +225,7 @@ bool QueryJsonResponse::networkRedirect(const QString &sql)
 {
     QElapsedTimer t;
     t.start();
-    QString server = fDb.fNetworkDB;
+    QString server = QString("");
     QEventLoop loop;
     QNetworkAccessManager m;
     QNetworkRequest rq(server);

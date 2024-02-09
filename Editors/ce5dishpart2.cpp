@@ -54,7 +54,8 @@ void CE5DishPart2::setId(int id)
         QString base64 = db.getString("f_data");
         if (!base64.isEmpty()) {
             QPixmap pix;
-            pix.loadFromData(QByteArray::fromBase64(base64.toLatin1()));
+            QByteArray ba = QByteArray::fromBase64(base64.toLatin1());
+            pix.loadFromData(ba);
             ui->lbImg->setPixmap(pix.scaled(ui->lbImg->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
         }
     }
@@ -127,14 +128,14 @@ void CE5DishPart2::uploadImage()
         ba.clear();
         QBuffer buff(&ba);
         buff.open(QIODevice::WriteOnly);
-        pm.save(&buff, "PNG");
+        pm.save(&buff, "JPG");
     } while (ba.size() > 100000 && !ui->chDonNotResize->isChecked());
 
     C5Database db(fDBParams);
     db[":f_id"] = ui->leImageUUID->text();
     db.exec("delete from s_images where f_id=:f_id");
     db[":f_id"] = ui->leImageUUID->text();
-    db[":f_image"] = ba.toBase64();
+    db[":f_image"] = QString(ba.toBase64());
     db.exec("insert into s_images (f_id, f_data) values (:f_id, :f_image)");
 }
 

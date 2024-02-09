@@ -82,6 +82,8 @@ private slots:
 
     void on_btnRemoveFromSet_clicked();
 
+    void on_leName_returnPressed();
+
 private:
     Ui::C5DishWidget *ui;
 

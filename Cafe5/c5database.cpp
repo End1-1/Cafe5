@@ -784,7 +784,7 @@ void C5Database::configureDatabase(QSqlDatabase &cn, const QString &host, const 
 
 void C5Database::logEvent(const QString &event)
 {
-    qDebug() << event;
+    qDebug() << event.left(1000);
     QDir d;
     if (!d.exists(d.homePath() + "/" + _APPLICATION_)) {
         d.mkpath(d.homePath() + "/" + _APPLICATION_);
