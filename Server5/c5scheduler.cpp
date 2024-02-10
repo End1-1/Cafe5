@@ -1,7 +1,9 @@
 #include "c5scheduler.h"
 #include "server5settings.h"
 #include "c5database.h"
-#include "c5databasesync.h"
+#include "c5networkdb.h"
+#include "c5utils.h"
+#include "c5printing.h"
 #include <QDebug>
 #include <QJsonDocument>
 #include <QJsonArray>
@@ -15,14 +17,15 @@ c5scheduler::c5scheduler(QObject *parent) : QObject(parent)
 {
     connect(&fTimer, SIGNAL(timeout()), this, SLOT(timeout()));
 #ifdef QT_DEBUG
-    fTimer.setInterval(5000 * __s.value("updateinterval").toInt());
+    fTimer.setInterval(10000 * __s.value("updateinterval").toInt());
 #else
     fTimer.setInterval(1000 * 60 * __s.value("updateinterval").toInt());
 #endif
     fTimer.start();
     fRun = false;
-    C5DatabaseSync *db = new C5DatabaseSync(this);
-    db->start();
+#ifdef QT_DEBUG
+    timeout();
+#endif
 }
 
 void c5scheduler::timeout()
@@ -32,63 +35,163 @@ void c5scheduler::timeout()
     }
     fRun = true;
     if (__s.value("url").toString().isEmpty()) {
-        uploadStatistic();
+        fRun = false;
+        return;
     }
+    runServicePrint();
 }
 
-void c5scheduler::replyFinished(QNetworkReply *r)
+void c5scheduler::runServicePrint()
 {
-    if (r->error() == QNetworkReply::NoError) {
-        qDebug() << r->readAll();
-    } else {
-        qDebug() << r->errorString();
+    QString originalPrinter = __s.value("printername").toString();
+    QString sql = QString("select sf_print_service('{\"printer\":\"%1\"}')").arg(originalPrinter);
+    C5NetworkDB db(sql, __s.value("url").toString(), this);
+    if (!db.query()) {
+        fRun = false;
+        return;
     }
-    r->deleteLater();
+    QJsonObject jo;
+    QString strData = db.fJsonOut["data"].toObject()["data"].toArray().at(0).toArray().at(0).toString();
+    jo = QJsonDocument::fromJson(strData.toUtf8()).object();
+    jo = jo["data"].toObject();
+    if (jo["orders"].toArray().isEmpty()) {
+        fRun = false;
+        return;
+    }
+    QJsonObject jconfig = jo["config"].toObject();
+    QString printField = __s.value("printerside").toString();
+
+    int fontSize = jconfig["font_size"].toInt();
+    QFont font(jconfig["font_family"].toString(), fontSize);
+    font.setPointSize(20);
+    QJsonArray jcomplete;
+    for (int i = 0; i < jo["orders"].toArray().size(); i++) {
+        C5Printing p;
+        p.setSceneParams(600, 2800, QPrinter::Portrait);
+        p.setFont(font);
+
+        QJsonObject jfirst = jo["orders"].toArray().at(i).toObject();
+        if (jfirst["f_state"].toInt() == ORDER_STATE_PREORDER_EMPTY || jfirst["f_state"].toInt() == ORDER_STATE_PREORDER_WITH_ORDER) {
+            p.setFontSize(32);
+            p.setFontBold(true);
+            p.ctext("Նախնական պատվեր");
+            p.br();
+            // p.ltext(fPreorderData["f_datefor"].toDate().toString(FORMAT_DATE_TO_STR), 0);
+            // p.rtext(fPreorderData["f_timefor"].toTime().toString(FORMAT_TIME_TO_STR));
+            p.br();
+            //p.ltext(tr("Guests"), 0);
+            // p.rtext(fPreorderData["f_guests"].toString());
+            p.br();
+            p.br();
+            p.line();
+            p.br();
+        }
+
+        // if (reprint) {
+        //     p.setFontSize(34);
+        //     p.setFontBold(true);
+        //     p.ctext(tr("REPRINT"));
+        //     p.br();
+        //     p.br();
+        // }
+
+        p.setFontBold(false);
+        p.setFontSize(fontSize);
+        p.ctext("Նոր պատվեր");
+        p.br();
+        p.ltext("Սեղան", 0);
+        p.setFontSize(28);
+        p.rtext(jfirst["f_tablename"].toString());
+        p.br();
+        p.setFontSize(20);
+        p.ltext(tr("Order no"), 0);
+        p.rtext(jfirst["f_hallid"].toString());
+        p.br();
+        p.ltext(tr("Date"), 0);
+        p.rtext(QDate::currentDate().toString(FORMAT_DATE_TO_STR));
+        p.br();
+        p.ltext(tr("Time"), 0);
+        p.rtext(QTime::currentTime().toString(FORMAT_TIME_TO_STR));
+        p.br();
+        p.ltext(tr("Staff"), 0);
+        p.rtext(jfirst["f_staffname"].toString());
+        p.br(p.fLineHeight + 2);
+        p.line(0, p.fTop, p.fNormalWidth, p.fTop);
+        p.br(2);
+
+        p.setFontSize(30);
+        QSet<QString> storages;
+        bool toprint = false;
+        for (int i = 0; i < jfirst["items"].toArray().size(); i++) {
+            QJsonObject jdish = jfirst["items"].toArray().at(i).toObject();
+            if (jdish[printField] != originalPrinter) {
+                continue;
+            }
+            toprint = true;
+            jcomplete.append(jdish["f_id"].toString());
+
+            // storages << dbstore->name(o["f_store"].toInt());
+            // if (__c5config.getValue(param_print_dish_timeorder).toInt() == 1) {
+            //     p.ltext(QString("[%1] %2").arg(o["f_timeorder"].toString(), dbdish->name(o["f_dish"].toInt())), 0);
+            // } else {
+            //     p.ltext(QString("%1").arg(dbdish->name(o["f_dish"].toInt())), 0);
+            // }
+            p.ltext(QString("%1").arg(jdish["f_dishname"].toString()), 0);
+            p.setFontBold(true);
+            p.rtext(QString("%1").arg(float_str(jdish["f_qty1"].toDouble(), 2)));
+            p.setFontBold(false);
+
+            if (jdish["f_comment2"].toString().length() > 0) {
+                p.br();
+                p.setFontSize(25);
+                p.setFontBold(true);
+                p.ltext(jdish["f_comment2"].toString(), 0);
+                p.br();
+                p.setFontSize(30);
+                p.setFontBold(false);
+            }
+
+            if (jdish["f_comment"].toString().length() > 0) {
+                p.br();
+                p.setFontSize(25);
+                p.ltext(jdish["f_comment"].toString(), 0);
+                p.br();
+                p.setFontSize(30);
+            }
+
+            p.br();
+            p.line(0, p.fTop, p.fNormalWidth, p.fTop);
+            p.br(1);
+        }
+        p.line(0, p.fTop, p.fNormalWidth, p.fTop);
+        p.br(1);
+        p.setFontSize(20);
+        p.ltext(tr("Printer: ") + originalPrinter, 0);
+        p.setFontBold(true);
+        p.rtext(printField == "f_print1" ? " [1]" : "[2]");
+        p.br();
+        //p.ltext(tr("Storage: ") + storages.toList().join(","), 0);
+
+        // if (fPrinterAliases.contains(printer)) {
+        //     printer = fPrinterAliases[printer];
+        // }
+        if (!toprint) {
+            continue;
+        }
+        QString final = "OK";
+        if (!p.print(originalPrinter, QPrinter::Custom)) {
+            final = "FAIL";
+        }
+    }
+
+    jo = QJsonObject();
+    jo["ids"] = jcomplete;
+    jo["side"] = printField == "f_print1" ? 1 : 2;
+    sql = QString("select sf_print_complete('%1')")
+              .arg(QString(QJsonDocument(jo).toJson()));
+    db.query(sql);
+
     fRun = false;
 }
 
-void c5scheduler::uploadStatistic()
-{
-    QJsonParseError err;
-    QJsonDocument jdoc = QJsonDocument::fromJson(__s.value("queries").toString().toUtf8(), &err);
-    if (err.error != err.NoError) {
-        return;
-    }
-    QJsonObject jo = jdoc.object();
-    QJsonArray ja = jo["reports"].toArray();
-    C5Database db(__s.value("dbhost").toString(), __s.value("dbschema").toString(), __s.value("dbuser").toString(), __s.value("dbpassword").toString());
-    QJsonArray jaup;
-    for (int i = 0; i < ja.count(); i++) {
-        QJsonObject jr = ja.at(i).toObject();
-        QString sql = jr["sql"].toString();
-        QJsonObject jup;
-        jup["name"] = jr["name"].toString();
-        jup["date1"] = QDate::currentDate().addDays(-1 * __s.value("updatedays").toInt()).toString("yyyy-MM-dd");
-        jup["date2"] = QDate::currentDate().toString("yyyy-MM-dd");
-        db[":date1"] = QDate::currentDate().addDays(-1 * __s.value("updatedays").toInt());
-        db[":date2"] = QDate::currentDate();
-        db.exec(sql);
-        QJsonArray jdata;
-        while (db.nextRow()) {
-            QJsonObject jrow;
-            for (int j = 0; j < db.columnCount(); j++) {
-                jrow[db.columnName(j)] = db.getString(j);
-            }
-            jdata.append(jrow);
-        }
-        jup["data"] = jdata;
-        jaup.append(jup);
-    }
-    db.commit();
-    jdoc = QJsonDocument(jaup);
 
-    QNetworkAccessManager * manager = new QNetworkAccessManager(this);
-    QUrl url(__s.value("url").toString());
-    QNetworkRequest request(url);
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
-    QUrlQuery params;
-    params.addQueryItem("data", jdoc.toJson(QJsonDocument::Compact));
-    params.addQueryItem("reqpass", __s.value("urlsecret").toString());
-    connect(manager, SIGNAL(finished(QNetworkReply *)), this, SLOT(replyFinished(QNetworkReply*)));
-    manager->post(request, params.query().toUtf8());
-}

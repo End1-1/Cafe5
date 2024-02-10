@@ -136,9 +136,9 @@ INCLUDEPATH += headers
 INCLUDEPATH += store
 INCLUDEPATH += datadriver
 INCLUDEPATH += ../Service5Working/raw
-INCLUDEPATH += ../Service5Working/utils
 INCLUDEPATH += ../Service5Working/socket
 INCLUDEPATH += ../Classes
+INCLUDEPATH += C:/Projects/Cafe5/Service5/utils
 INCLUDEPATH += C:/Soft/OpenSSL-Win64/include
 INCLUDEPATH += C:/Soft/OpenSSL-Win64/include/openssl
 

@@ -10,6 +10,7 @@ class C5NetworkDB : public QObject
 public:
     explicit C5NetworkDB(const QString &sql, const QString &host, QObject *parent = nullptr);
     bool query();
+    bool query(const QString &sql);
     QString fLastError;
     QJsonObject fJsonOut;
 

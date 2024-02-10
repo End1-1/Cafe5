@@ -8,6 +8,7 @@
 #include <QSqlError>
 #include <QDateTime>
 #include <QJsonObject>
+#include <QString>
 
 class Database
 {
@@ -63,8 +64,8 @@ public:
 private:
     static int fDatabaseCounter;
     QMap<QString, QVariant> fBindValues;
-    QHash<QString, int> fColumnsNames;
-    QHash<int, QString> fColumnsIndexes;
+    QMap<QString, int> fColumnsNames;
+    QMap<int, QString> fColumnsIndexes;
     QString fDatabaseDriver;
     static QMutex fMutex;
 };
