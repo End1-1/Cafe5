@@ -65,10 +65,19 @@ bool C5NetworkDB::query()
         case 246:
             ja[i] = QVariant::Double;
             break;
+        case 245:
+            ja[i] = QVariant::String;
+            break;
         default:
             ja[i] = QVariant::String;
             break;
         }
     }
     fJsonOut["data"].toObject()["types"] = ja;
+}
+
+bool C5NetworkDB::query(const QString &sql)
+{
+    fSql = sql;
+    return query();
 }

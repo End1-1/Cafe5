@@ -16,12 +16,13 @@ signals:
 
 public slots:
     void timeout();
-    void replyFinished(QNetworkReply *r);
 
 private:
     QTimer fTimer;
     bool fRun;
-    void uploadStatistic();
+
+    void runServicePrint();
+
 };
 
 #endif // C5SCHEDULER_H

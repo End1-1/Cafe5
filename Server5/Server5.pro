@@ -28,14 +28,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
-        ../Cafe5/c5database.cpp \
+        ../Cafe5/c5utils.cpp \
         ../Classes/c5filelogwriter.cpp \
+        ../Classes/c5networkdb.cpp \
         ../Classes/c5printing.cpp \
         ../Classes/c5printjson.cpp \
         ../Classes/c5threadobject.cpp \
         ../Classes/notificationwidget.cpp \
-        c5databasesync.cpp \
-        c5pointsync.cpp \
+        ../Service5Working/utils/logwriter.cpp \
         c5reportsupload.cpp \
         c5scheduler.cpp \
         dbconnection.cpp \
@@ -47,14 +47,14 @@ SOURCES += \
         widgetcontainer.cpp
 
 HEADERS += \
-        ../Cafe5/c5database.h \
+        ../Cafe5/c5utils.h \
         ../Classes/c5filelogwriter.h \
+        ../Classes/c5networkdb.h \
         ../Classes/c5printing.h \
         ../Classes/c5printjson.h \
         ../Classes/c5threadobject.h \
         ../Classes/notificationwidget.h \
-        c5databasesync.h \
-        c5pointsync.h \
+        ../Service5Working/utils/logwriter.h \
         c5reportsupload.h \
         c5scheduler.h \
         c5server5.h \
@@ -88,5 +88,6 @@ DEFINES += _MODULE_=\\\"Server5\\\"
 
 INCLUDEPATH += ../Classes
 INCLUDEPATH += ../Cafe5
+INCLUDEPATH += C:/Projects/Cafe5/Service5/utils
 
 DISTFILES +=
