@@ -34,8 +34,6 @@ SOURCES += \
         ../Classes/c5printjson.cpp \
         ../Classes/c5threadobject.cpp \
         ../Classes/notificationwidget.cpp \
-        c5databasesync.cpp \
-        c5pointsync.cpp \
         c5reportsupload.cpp \
         c5scheduler.cpp \
         dbconnection.cpp \
@@ -53,8 +51,6 @@ HEADERS += \
         ../Classes/c5printjson.h \
         ../Classes/c5threadobject.h \
         ../Classes/notificationwidget.h \
-        c5databasesync.h \
-        c5pointsync.h \
         c5reportsupload.h \
         c5scheduler.h \
         c5server5.h \
