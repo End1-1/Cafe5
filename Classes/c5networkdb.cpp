@@ -74,6 +74,9 @@ bool C5NetworkDB::query()
         }
     }
     fJsonOut["data"].toObject()["types"] = ja;
+#ifdef QT_DEBUG
+    qDebug() << t.elapsed() << fSql;
+#endif
 }
 
 bool C5NetworkDB::query(const QString &sql)

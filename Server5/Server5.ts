@@ -9,47 +9,67 @@
         <translation>Հարցումներ</translation>
     </message>
     <message>
-        <location filename="c5reportsupload.ui" line="47"/>
+        <location filename="c5reportsupload.ui" line="89"/>
         <source>Update interval, min</source>
         <translation>Թարմանցման ինտերվալ, րոպե</translation>
     </message>
     <message>
-        <location filename="c5reportsupload.ui" line="54"/>
+        <location filename="c5reportsupload.ui" line="68"/>
         <source>urlsecret</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="c5reportsupload.ui" line="61"/>
+        <location filename="c5reportsupload.ui" line="123"/>
         <source>url</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="c5reportsupload.ui" line="68"/>
+        <location filename="c5reportsupload.ui" line="54"/>
         <source>Update days</source>
         <translation>Թարմացման օրեր</translation>
     </message>
     <message>
-        <location filename="c5reportsupload.ui" line="75"/>
+        <location filename="c5reportsupload.ui" line="61"/>
         <source>Secret</source>
         <translation>Սերվերի գախտնաբառ</translation>
     </message>
     <message>
-        <location filename="c5reportsupload.ui" line="82"/>
+        <location filename="c5reportsupload.ui" line="75"/>
+        <source>Printer size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c5reportsupload.ui" line="96"/>
         <source>URL</source>
         <translation>Սերվերի հասցե</translation>
     </message>
     <message>
-        <location filename="c5reportsupload.ui" line="102"/>
+        <location filename="c5reportsupload.ui" line="82"/>
         <source>updateinterval</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="c5reportsupload.ui" line="109"/>
+        <location filename="c5reportsupload.ui" line="47"/>
         <source>updatedays</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="c5reportsupload.ui" line="119"/>
+        <location filename="c5reportsupload.ui" line="103"/>
+        <source>printerside</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c5reportsupload.ui" line="130"/>
+        <source>Printer name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c5reportsupload.ui" line="137"/>
+        <source>printername</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c5reportsupload.ui" line="147"/>
         <source>queries</source>
         <translation></translation>
     </message>
@@ -216,6 +236,34 @@
         <location filename="../Classes/notificationwidget.ui" line="179"/>
         <source>The message!</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>c5scheduler</name>
+    <message>
+        <location filename="c5scheduler.cpp" line="107"/>
+        <source>Order no</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c5scheduler.cpp" line="110"/>
+        <source>Date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c5scheduler.cpp" line="113"/>
+        <source>Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c5scheduler.cpp" line="116"/>
+        <source>Staff</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c5scheduler.cpp" line="169"/>
+        <source>Printer: </source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

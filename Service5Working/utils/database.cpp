@@ -195,7 +195,7 @@ void Database::setBindValues(const QMap<QString, QVariant> &v)
 QMap<QString, QVariant> Database::getBindValues()
 {
     QMap<QString, QVariant> b;
-    for (QHash<QString, int>::const_iterator it = fColumnsNames.constBegin(); it != fColumnsNames.constEnd(); it++) {
+    for (QMap<QString, int>::const_iterator it = fColumnsNames.constBegin(); it != fColumnsNames.constEnd(); it++) {
         b[":" + it.key()] = fQuery->value(fColumnsNames[it.key()]);
     }
     return b;

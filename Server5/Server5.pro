@@ -35,10 +35,7 @@ SOURCES += \
         ../Classes/c5printjson.cpp \
         ../Classes/c5threadobject.cpp \
         ../Classes/notificationwidget.cpp \
-<<<<<<< HEAD
-=======
         ../Service5Working/utils/logwriter.cpp \
->>>>>>> cf316ac5a7dce760e7839555c89f98ca9e1855c6
         c5reportsupload.cpp \
         c5scheduler.cpp \
         dbconnection.cpp \
@@ -57,10 +54,7 @@ HEADERS += \
         ../Classes/c5printjson.h \
         ../Classes/c5threadobject.h \
         ../Classes/notificationwidget.h \
-<<<<<<< HEAD
-=======
         ../Service5Working/utils/logwriter.h \
->>>>>>> cf316ac5a7dce760e7839555c89f98ca9e1855c6
         c5reportsupload.h \
         c5scheduler.h \
         c5server5.h \

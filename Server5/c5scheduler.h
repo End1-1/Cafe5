@@ -23,6 +23,8 @@ private:
 
     void runServicePrint();
 
+    void runMessages();
+
 };
 
 #endif // C5SCHEDULER_H

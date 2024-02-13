@@ -34,7 +34,7 @@
         <location filename="../Classes/c5cache.cpp" line="137"/>
         <location filename="../Classes/c5cache.cpp" line="143"/>
         <location filename="../Classes/c5cache.cpp" line="150"/>
-        <location filename="../Classes/c5cache.cpp" line="337"/>
+        <location filename="../Classes/c5cache.cpp" line="295"/>
         <source>Code</source>
         <translation></translation>
     </message>
@@ -66,7 +66,7 @@
         <location filename="../Classes/c5cache.cpp" line="116"/>
         <location filename="../Classes/c5cache.cpp" line="119"/>
         <location filename="../Classes/c5cache.cpp" line="137"/>
-        <location filename="../Classes/c5cache.cpp" line="337"/>
+        <location filename="../Classes/c5cache.cpp" line="295"/>
         <source>Name</source>
         <translation type="unfinished">Անվանում</translation>
     </message>
@@ -247,33 +247,33 @@
         <translation>Կապի պարամետրեր</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.ui" line="54"/>
-        <location filename="../Cafe5/c5connection.cpp" line="82"/>
+        <location filename="../Cafe5/c5connection.ui" line="86"/>
+        <location filename="../Cafe5/c5connection.cpp" line="39"/>
         <source>Password</source>
         <translation>Գախտնաբար</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.ui" line="33"/>
+        <location filename="../Cafe5/c5connection.ui" line="30"/>
         <source>Username</source>
         <translation>Օգտագործող</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.ui" line="90"/>
+        <location filename="../Cafe5/c5connection.ui" line="37"/>
         <source>Database</source>
         <translation>Տվյալների պահոց</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.ui" line="23"/>
+        <location filename="../Cafe5/c5connection.ui" line="93"/>
         <source>Database Host</source>
         <translation>Պահոցի սերվերի IP</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.ui" line="47"/>
+        <location filename="../Cafe5/c5connection.ui" line="44"/>
         <source>Server address</source>
         <translation>Սերվերի IP</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.ui" line="40"/>
+        <location filename="../Cafe5/c5connection.ui" line="20"/>
         <source>Settings</source>
         <translation>Կարգավորումներ</translation>
     </message>
@@ -288,55 +288,44 @@
         <translation>Սուգել</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.ui" line="130"/>
-        <source>Init</source>
-        <translation>Ստեղծել</translation>
+        <location filename="../Cafe5/c5connection.ui" line="173"/>
+        <source>Name</source>
+        <translation type="unfinished">Անվանում</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.ui" line="137"/>
+        <location filename="../Cafe5/c5connection.ui" line="130"/>
         <source>Cancel</source>
         <translation>Փակել</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.ui" line="173"/>
+        <location filename="../Cafe5/c5connection.ui" line="166"/>
         <source>Full screen</source>
         <translation>Ամբողջ էկրանին</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="82"/>
+        <location filename="../Cafe5/c5connection.cpp" line="39"/>
         <source>Configuration settings</source>
         <translation>Կոնֆիգուրացիա</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="85"/>
+        <location filename="../Cafe5/c5connection.cpp" line="42"/>
         <source>Access denied</source>
         <translation>Մուտքը արգելված է</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="103"/>
-        <location filename="../Cafe5/c5connection.cpp" line="128"/>
+        <location filename="../Cafe5/c5connection.cpp" line="60"/>
         <source>Cannot connect to database</source>
         <translation>Կապը ձախողվեց</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="107"/>
+        <location filename="../Cafe5/c5connection.cpp" line="64"/>
         <source>Connection successfull</source>
         <translation>Կապը հաստատվեց</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5connection.cpp" line="120"/>
+        <location filename="../Cafe5/c5connection.cpp" line="77"/>
         <source>Saved</source>
         <translation>Պահպանված է</translation>
-    </message>
-    <message>
-        <location filename="../Cafe5/c5connection.cpp" line="137"/>
-        <source>Already initialized</source>
-        <translation>Ստեղծված է</translation>
-    </message>
-    <message>
-        <location filename="../Cafe5/c5connection.cpp" line="155"/>
-        <source>Ready to use</source>
-        <translation>Պատրաս է օգտագործման</translation>
     </message>
 </context>
 <context>
@@ -766,27 +755,27 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="446"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="433"/>
         <source>Document not exists</source>
         <translation>Փաստաթուղթը գոյություն չունի</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="891"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="871"/>
         <source>Invalid document id</source>
         <translation>Սխալ փաստաթղթի համար</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="928"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="908"/>
         <source>Emtpy document</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="1026"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="1006"/>
         <source>Not enough materials in the store</source>
         <translation>Բացասական քանակ պահեստում</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="1125"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="1105"/>
         <source>This order used in next documents</source>
         <translation>Այս փաստաթուղթը օգտագործվում է հետևյալ պահեստի ելքերի մեջ</translation>
     </message>
@@ -816,13 +805,13 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5user.cpp" line="150"/>
+        <location filename="../Classes/c5user.cpp" line="151"/>
         <source>Cannot output without input</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5user.cpp" line="168"/>
-        <location filename="../Classes/c5user.cpp" line="218"/>
+        <location filename="../Classes/c5user.cpp" line="169"/>
+        <location filename="../Classes/c5user.cpp" line="219"/>
         <source>Access denied</source>
         <translation type="unfinished">Մուտքը արգելված է</translation>
     </message>
@@ -830,12 +819,12 @@
 <context>
     <name>C5WaiterOrderDoc</name>
     <message>
-        <location filename="../Classes/c5waiterorderdoc.cpp" line="96"/>
+        <location filename="../Classes/c5waiterorderdoc.cpp" line="97"/>
         <source>Order state is not closed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5waiterorderdoc.cpp" line="407"/>
+        <location filename="../Classes/c5waiterorderdoc.cpp" line="408"/>
         <source>Document saved</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1909,27 +1898,27 @@ MS Excel</source>
 <context>
     <name>PrintTaxN</name>
     <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="28"/>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="83"/>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="91"/>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="354"/>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="393"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="27"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="82"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="90"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="353"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="392"/>
         <source>Connection error</source>
         <translation>Կապի սխալ</translation>
     </message>
     <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="83"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="82"/>
         <source>Socket read error</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="91"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="90"/>
         <source>Data read timeout</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="352"/>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="391"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="351"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="390"/>
         <source>Tax error code</source>
         <translation>ՀԴՄ -ի սխալի կոդ</translation>
     </message>
@@ -1937,7 +1926,7 @@ MS Excel</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="main.cpp" line="36"/>
+        <location filename="main.cpp" line="37"/>
         <source>An instance of application already running</source>
         <translation></translation>
     </message>
@@ -2339,7 +2328,7 @@ MS Excel</source>
     </message>
     <message>
         <location filename="workspace.ui" line="62"/>
-        <location filename="workspace.cpp" line="1551"/>
+        <location filename="workspace.cpp" line="1546"/>
         <source>Table</source>
         <translation>ՍԵՂԱՆ</translation>
     </message>
@@ -2459,7 +2448,7 @@ MS Excel</source>
     </message>
     <message>
         <location filename="workspace.ui" line="1669"/>
-        <location filename="workspace.cpp" line="2201"/>
+        <location filename="workspace.cpp" line="2199"/>
         <source>Taxpayer ID</source>
         <translation>Հաճախորդի ՀՎՀՀ</translation>
     </message>
@@ -2510,264 +2499,263 @@ POS</translation>
     <message>
         <location filename="workspace.ui" line="1339"/>
         <location filename="workspace.ui" line="1535"/>
-        <location filename="workspace.cpp" line="1646"/>
+        <location filename="workspace.cpp" line="1641"/>
         <source>Total</source>
         <translation>Ընդամենը</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="127"/>
+        <location filename="workspace.cpp" line="125"/>
         <source>ENTER</source>
         <translation>ՄՈՒՏՔ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1511"/>
-        <location filename="workspace.cpp" line="1756"/>
-        <location filename="workspace.cpp" line="1823"/>
+        <location filename="workspace.cpp" line="1506"/>
+        <location filename="workspace.cpp" line="1751"/>
+        <location filename="workspace.cpp" line="1818"/>
         <source>Receipt #</source>
         <translation>Պատվեր №</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="139"/>
+        <location filename="workspace.cpp" line="137"/>
         <source>Continue session</source>
         <translation>Աշխատանքային սեսսիան շարունակվում է</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="144"/>
+        <location filename="workspace.cpp" line="142"/>
         <source>An open session exists on this station and must be closed first before used by another user</source>
         <translation>Պետք է փակել ընդացիկ սեսսիան, նոր աշխատող գրանցելուց առաջ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="168"/>
+        <location filename="workspace.cpp" line="169"/>
         <source>POPULAR</source>
         <translation>Արագ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="744"/>
+        <location filename="workspace.cpp" line="746"/>
         <source>Application error. Cannot retrieve record of cash document.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1015"/>
+        <location filename="workspace.cpp" line="1017"/>
         <source>Confirm to remove customer informaion</source>
         <translation>Հաստատեք հաճախորդի մասին տեղեկության հեռացումը</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1794"/>
-        <location filename="workspace.cpp" line="1861"/>
+        <location filename="workspace.cpp" line="1789"/>
+        <location filename="workspace.cpp" line="1856"/>
         <source>Printed:</source>
         <translation>Տպված</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1237"/>
+        <location filename="workspace.cpp" line="1239"/>
         <source>Unknown order id. Programm error. Contact to developer.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="274"/>
+        <location filename="workspace.cpp" line="276"/>
         <source>Please, configure hall</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="315"/>
+        <location filename="workspace.cpp" line="317"/>
         <source>Not editable</source>
         <translation>Խմբագրման ենթակա չէ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="382"/>
+        <location filename="workspace.cpp" line="384"/>
         <source>Confirm to remove printed row</source>
         <translation>Հաստատեք տպված տողի հեռացումը</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="654"/>
+        <location filename="workspace.cpp" line="656"/>
         <source>Invalid taxpayer id</source>
         <translation>Հաճախորդի ՀՎՀՀ-ը սխալ է</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="984"/>
+        <location filename="workspace.cpp" line="986"/>
         <source>Discount already exists</source>
         <translation>Զեղչը կիրարված է</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1765"/>
-        <location filename="workspace.cpp" line="1832"/>
+        <location filename="workspace.cpp" line="1760"/>
+        <location filename="workspace.cpp" line="1827"/>
         <source>Edited</source>
         <translation>Խմբագրված</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1440"/>
-        <location filename="workspace.cpp" line="1545"/>
+        <location filename="workspace.cpp" line="1540"/>
         <source>(F)</source>
         <translation>(Ֆ)</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1445"/>
+        <location filename="workspace.cpp" line="1438"/>
         <source>Try again</source>
         <translation>Փորձել կրկին</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1445"/>
+        <location filename="workspace.cpp" line="1438"/>
         <source>Return to editing</source>
         <translation>Խմբագրել</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1445"/>
+        <location filename="workspace.cpp" line="1438"/>
         <source>Do not print fiscal</source>
         <translation>Չտպել ՀԴՄ կտրոն</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1447"/>
+        <location filename="workspace.cpp" line="1440"/>
         <source>Fiscal fail, continue without fiscal</source>
         <translation>ՀԴՄ չի տպվել, շարունակել առանձ ՀԴՄ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1450"/>
+        <location filename="workspace.cpp" line="1443"/>
         <source>Fiscal fail, try again</source>
         <translation>ՀԴՄ չի տպվել, փորձել կրկին</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1453"/>
+        <location filename="workspace.cpp" line="1446"/>
         <source>Return to edit</source>
         <translation>Շարունակել խմբագրել</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1507"/>
+        <location filename="workspace.cpp" line="1502"/>
         <source>Invalid order number</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1519"/>
+        <location filename="workspace.cpp" line="1514"/>
         <source>Department</source>
         <translation>Բաժին</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1522"/>
+        <location filename="workspace.cpp" line="1517"/>
         <source>Tax number</source>
         <translation>ՀԴՄ կտրոնի համար</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1525"/>
+        <location filename="workspace.cpp" line="1520"/>
         <source>Device number</source>
         <translation>ԳՀ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1528"/>
+        <location filename="workspace.cpp" line="1523"/>
         <source>Serial</source>
         <translation>ԱՀ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1531"/>
+        <location filename="workspace.cpp" line="1526"/>
         <source>Fiscal</source>
         <translation>Ֆիսկալ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1534"/>
+        <location filename="workspace.cpp" line="1529"/>
         <source>Receipt number</source>
         <translation>ԿՀ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1537"/>
+        <location filename="workspace.cpp" line="1532"/>
         <source>Date</source>
         <translation>Ամսաթիվ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1541"/>
+        <location filename="workspace.cpp" line="1536"/>
         <source>Taxpayer tin</source>
         <translation>Հաճախորդի ՀՎՀՀ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1548"/>
+        <location filename="workspace.cpp" line="1543"/>
         <source>Cashier</source>
         <translation>Գանձապահ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1649"/>
-        <location filename="workspace.cpp" line="1662"/>
+        <location filename="workspace.cpp" line="1644"/>
+        <location filename="workspace.cpp" line="1657"/>
         <source>Discount</source>
         <translation>Զեղչ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="2001"/>
+        <location filename="workspace.cpp" line="1996"/>
         <source>New dish</source>
         <translation>Նոր ուտեստ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="2102"/>
+        <location filename="workspace.cpp" line="2100"/>
         <source>Save order</source>
         <translation>Պահպանել</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="2163"/>
+        <location filename="workspace.cpp" line="2161"/>
         <source>Open order</source>
         <translation>Բացել պատվերը</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="2175"/>
+        <location filename="workspace.cpp" line="2173"/>
         <source>Save order and print precheck</source>
         <translation>Պահպանել պատվերը և տպել նախահաշիվ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="2221"/>
+        <location filename="workspace.cpp" line="2219"/>
         <source>Emark</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1761"/>
-        <location filename="workspace.cpp" line="1828"/>
+        <location filename="workspace.cpp" line="1756"/>
+        <location filename="workspace.cpp" line="1823"/>
         <source>Delivery</source>
         <translation>Առաքում</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="404"/>
+        <location filename="workspace.cpp" line="406"/>
         <source>Remove dish</source>
         <translation>Հեռացնել ուտեստը</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="673"/>
+        <location filename="workspace.cpp" line="675"/>
         <source>Order saved</source>
         <translation>Պահպանված է</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1557"/>
+        <location filename="workspace.cpp" line="1552"/>
         <source>Class | Name | Qty | Price | Total</source>
         <translation>Դաս՝ | Անվանում | Քնկ | Գին | Ընդամենը</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1599"/>
+        <location filename="workspace.cpp" line="1594"/>
         <source>Class:</source>
         <translation>Դաս</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1653"/>
+        <location filename="workspace.cpp" line="1648"/>
         <source>Need to pay</source>
         <translation>Ենթակա է վճարման</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1668"/>
+        <location filename="workspace.cpp" line="1663"/>
         <source>Payment, cash</source>
         <translation>Կանխիկ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1672"/>
+        <location filename="workspace.cpp" line="1667"/>
         <source>Payment, card</source>
         <translation>Անկանխիկ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1676"/>
+        <location filename="workspace.cpp" line="1671"/>
         <source>Payment, Idram</source>
         <translation>Վճարում, Idram</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1680"/>
+        <location filename="workspace.cpp" line="1675"/>
         <source>Payment, other</source>
         <translation>Վճարում, այլ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1687"/>
+        <location filename="workspace.cpp" line="1682"/>
         <source>Customer</source>
         <translation>Հաճախորդ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1709"/>
+        <location filename="workspace.cpp" line="1704"/>
         <source>Sample</source>
         <translation>Օրնկ․</translation>
     </message>
@@ -2787,12 +2775,12 @@ POS</translation>
         <translation>Այլ</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="294"/>
+        <location filename="workspace.cpp" line="296"/>
         <source>Confirm to close application</source>
         <translation>Փակել՞ ծրագիրը</translation>
     </message>
     <message>
-        <location filename="workspace.cpp" line="1706"/>
+        <location filename="workspace.cpp" line="1701"/>
         <source>Printed</source>
         <translation>Տպված</translation>
     </message>
