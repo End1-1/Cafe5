@@ -1402,3 +1402,5 @@ alter table o_tax_log add column f_elapsed int after f_time, add column f_state 
 alter table a_result drop column f_elapsed, add column f_elapsed int after f_done;
 alter table a_header_store add column f_body longtext;
 ALTER TABLE `a_header_store` ADD INDEX `f_saleuuid_storeout` (`f_saleuuid`, `f_storeout`);
+CREATE TABLE s_notifications (f_id INTEGER PRIMARY KEY AUTO_INCREMENT,  f_created TIMESTAMP, f_delivered TIMESTAMP, f_readed TIMESTAMP, f_message JSON);
+alter table s_notifications add column f_destination varchar(36) after f_readed;

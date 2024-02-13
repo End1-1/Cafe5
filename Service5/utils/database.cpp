@@ -194,7 +194,7 @@ void Database::setBindValues(const QMap<QString, QVariant> &v)
 QMap<QString, QVariant> Database::getBindValues()
 {
     QMap<QString, QVariant> b;
-    for (QHash<QString, int>::const_iterator it = fColumnsNames.constBegin(); it != fColumnsNames.constEnd(); it++) {
+    for (QMap<QString, int>::const_iterator it = fColumnsNames.constBegin(); it != fColumnsNames.constEnd(); it++) {
         b[":" + it.key()] = fQuery->value(fColumnsNames[it.key()]);
     }
     return b;
@@ -290,7 +290,7 @@ QJsonObject Database::columnsData()
 {
     QJsonObject jr;
     QJsonArray ja;
-    for (QHash<QString, int>::const_iterator it = fColumnsNames.constBegin(); it != fColumnsNames.constEnd(); it++) {
+    for (QMap<QString, int>::const_iterator it = fColumnsNames.constBegin(); it != fColumnsNames.constEnd(); it++) {
         QJsonObject jv;
         jv["name"] = it.key();
         jv["value"] = it.value();
@@ -298,7 +298,7 @@ QJsonObject Database::columnsData()
     }
     jr["column_name_index"] = ja;
     ja = QJsonArray();
-    for (QHash<int, QString>::const_iterator it = fColumnsIndexes.constBegin(); it != fColumnsIndexes.constEnd(); it++) {
+    for (QMap<int, QString>::const_iterator it = fColumnsIndexes.constBegin(); it != fColumnsIndexes.constEnd(); it++) {
         QJsonObject jv;
         jv["name"] = it.key();
         jv["value"] = it.value();
