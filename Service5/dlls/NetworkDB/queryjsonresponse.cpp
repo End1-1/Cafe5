@@ -3,6 +3,8 @@
 #include "c5printing.h"
 #include "c5utils.h"
 #include "c5tr.h"
+#include "printtaxn.h"
+#include "c5networkdb.h"
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QNetworkAccessManager>
@@ -12,6 +14,8 @@
 #include <QJsonParseError>
 #include <QEventLoop>
 #include <QNetworkProxy>
+
+const int query_print_bill = 9;
 
 QueryJsonResponse::QueryJsonResponse(const QString &host, const QJsonObject &ji, QJsonObject &jo) :
     fJsonIn(ji),
@@ -87,84 +91,6 @@ void QueryJsonResponse::getResponse()
     r->deleteLater();
     LogWriter::write(LogWriterLevel::verbose, "", QString("Elapsed: %1, query: %2").arg(QString::number(t.elapsed()), sql));
 }
-
-
-//bool QueryJsonResponse::payment()
-//{
-//    QElapsedTimer et;
-//    et.start();
-//    QJsonObject jo = fJsonIn["params"].toObject();
-
-//    PrintTaxN pt(fConfig["fiscal_ip"].toString(),
-//                 fConfig["fiscal_port"].toInt(),
-//                 fConfig["fiscal_password"].toString(),
-//                 fConfig["fiscal_extpos"].toString(),
-//                 fConfig["fiscal_opcode"].toString(),
-//                 fConfig["fiscal_oppin"].toString());
-
-//    fDb[":f_id"] = jo["f_id"].toString();
-//    if (!fDb.exec("select * from o_header where f_id=:f_id")) {
-//        return dbFail(fDb.lastDbError());
-//    }
-//    if (!fDb.next()) {
-//        return dbFail("Order not exists");
-//    }
-//    double amountcard = fDb.doubleValue("f_amountcard") + fDb.doubleValue("f_amountidram");
-
-//    fDb[":f_header"] = jo["f_id"].toString();
-//    if (!fDb.exec("select d.f_name, coalesce(d.f_adgt, p.f_adgcode) as f_adgcode, "
-//                  "b.f_qty1, b.f_price, b.f_discount, p.f_taxdept, d.f_id "
-//                  "from o_body b "
-//                  "left join d_dish d on d.f_id=b.f_dish "
-//                  "left join d_part2 p on p.f_id=d.f_part "
-//                  "left join o_header o on o.f_id=b.f_header "
-//                  "where b.f_state=1 and o.f_state=2 and o.f_id=:f_header ")) {
-//        return dbFail(fDb.lastDbError());
-//    }
-//    if (fDb.rowCount() == 0) {
-//        return dbFail("Empty order");
-//    }
-
-//    while (fDb.next()) {
-//        pt.addGoods(fDb.integer("f_taxdept"),
-//                    fDb.string("f_adgcode"),
-//                    fDb.string("f_id"),
-//                    fDb.string("f_name"),
-//                    fDb.doubleValue("f_price"),
-//                    fDb.doubleValue("f_qty1"),
-//                    fDb.doubleValue("f_discount"));
-//    }
-//    QString inJson, outJson, err;
-//    int fiscal_result = pt.makeJsonAndPrint(amountcard, 0, inJson, outJson, err);
-//    QJsonObject jtax;
-//    QJsonParseError jsonErr;
-//    jtax["f_order"] = jo["f_id"].toString();
-//    jtax["f_elapsed"] = et.elapsed();
-//    jtax["f_in"] = QJsonDocument::fromJson(inJson.toUtf8(), &jsonErr).object();
-//    jtax["f_out"] = QJsonDocument::fromJson(outJson.toUtf8()).object();;
-//    jtax["f_err"] = err;
-//    jtax["f_result"] = fiscal_result;
-//    jtax["f_state"] = fiscal_result == pt_err_ok ? 1 : 0;
-//    if (jsonErr.error != QJsonParseError::NoError) {
-//        fJsonOut["data"] = jsonErr.errorString();
-//    }
-//    if (!fDb.exec(QString("call sf_create_shop_tax('%1')").arg(QString(QJsonDocument(jtax).toJson(QJsonDocument::Compact))))) {
-//        return dbFail(fDb.lastDbError());
-//    }
-//    if (fiscal_result != pt_err_ok) {
-//        return dbFail(err);
-//    }
-
-//    if (!fDb.exec(QString("select %1('%2')")
-//                      .arg("sf_order_payment",
-//                           QString(QJsonDocument(jo).toJson())))) {
-//        return dbFail(fDb.lastDbError());
-//    }
-//    if (!fDb.next()) {
-//        return dbFail("Call function failed");
-//    }
-//    return printBill(jo["f_id"].toString());
-//}
 
 //bool QueryJsonResponse::printBill(const QString &id)
 //{

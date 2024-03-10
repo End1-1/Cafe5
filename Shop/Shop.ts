@@ -789,62 +789,62 @@
 <context>
     <name>C5PrintServiceThread</name>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="134"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="135"/>
         <source>PREORDER</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="139"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="140"/>
         <source>Guests</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="150"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="151"/>
         <source>REPRINT</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="157"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="158"/>
         <source>New order</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="159"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="160"/>
         <source>Table</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="164"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="165"/>
         <source>Order no</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="167"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="168"/>
         <source>Date</source>
         <translation type="unfinished">Ամսաթիվ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="170"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="171"/>
         <source>Time</source>
         <translation type="unfinished">Ժամ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="173"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="174"/>
         <source>Staff</source>
         <translation type="unfinished">Սպասարկող</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="206"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="207"/>
         <source>Extra price</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="235"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="236"/>
         <source>Printer: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="239"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="240"/>
         <source>Storage: </source>
         <translation type="unfinished"></translation>
     </message>

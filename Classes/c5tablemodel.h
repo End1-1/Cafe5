@@ -18,6 +18,8 @@ public:
 
     void translate(const QHash<QString, QString> &t);
 
+    void clearModel();
+
     void execQuery(const QString &query);
 
     void setCheckboxes(bool v);
@@ -122,8 +124,6 @@ private:
     QMap<int, QString> fFilters;
 
     QHash<QModelIndex, QFont> fCellFont;
-
-    void clearModel();
 
     inline QVariant dataDisplay(int row, int column) const;
 

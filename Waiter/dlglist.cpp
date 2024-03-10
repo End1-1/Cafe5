@@ -15,23 +15,22 @@ DlgList::~DlgList()
 
 bool DlgList::getValue(const QStringList &names, int &index)
 {
-    DlgList d;
+    auto *d = new DlgList();
     for (int i = 0; i < names.count(); i++) {
-        QListWidgetItem *item = new QListWidgetItem(d.ui->lst);
+        QListWidgetItem *item = new QListWidgetItem(d->ui->lst);
         item->setSizeHint(QSize(50, 50));
         item->setText(names.at(i));
-        d.ui->lst->addItem(item);
+        d->ui->lst->addItem(item);
     }
-    QListWidgetItem *item = new QListWidgetItem(d.ui->lst);
+    QListWidgetItem *item = new QListWidgetItem(d->ui->lst);
     item->setSizeHint(QSize(50, 50));
     item->setText("Cancel");
     item->setIcon(QIcon(":/cancel.png"));
-    d.ui->lst->addItem(item);
-    if (d.exec() == QDialog::Accepted) {
-        index = d.fResult;
-        return true;
-    }
-    return false;
+    d->ui->lst->addItem(item);
+    bool result = d->exec() == QDialog::Accepted;
+    index = d->fResult;
+    delete d;
+    return result;
 }
 
 void DlgList::on_lst_clicked(const QModelIndex &index)

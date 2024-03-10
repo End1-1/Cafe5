@@ -10,6 +10,8 @@ public:
 
     QMap<QString, QMap<QString, QVariant> > fOrderData;
 
+    int guest(const QString &id);
+
     QString guestName(const QString &id);
 
     double amount(const QString &id);

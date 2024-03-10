@@ -13,6 +13,7 @@ DlgShowColumns::DlgShowColumns() :
     ui->chGroup->setChecked(s.value("col" + QString::number(col_group)).toBool());
     ui->chUnit->setChecked(s.value("col" + QString::number(col_unit)).toBool());
     ui->chBox->setChecked(s.value("col" + QString::number(col_qtybox)).toBool());
+    ui->chCheckDiscount->setChecked(s.value("col" + QString::number(col_check_discount)).toBool());
 }
 
 DlgShowColumns::~DlgShowColumns()
@@ -51,3 +52,9 @@ void DlgShowColumns::on_chEmarks_clicked(bool checked)
 {
     s.setValue("col" + QString::number(col_qr), checked);
 }
+
+void DlgShowColumns::on_chCheckDiscount_clicked(bool checked)
+{
+    s.setValue("col" + QString::number(col_check_discount), checked);
+}
+

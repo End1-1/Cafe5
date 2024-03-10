@@ -19,8 +19,12 @@ DlgPreorder::DlgPreorder(C5OrderDriver *w, C5User *user, const QStringList &dbPa
     fUser = user;
     fGuestCode = 0;
     fOrder = w;
-    ui->leCityLedger->setInteger(w->preorder("f_cityledger").toInt());
-    ui->leGuestName->setText(w->preorder("f_guestname").toString());
+    if (w->preorder("f_guest").toInt() > 0) {
+        ui->leCityLedger->setInteger(w->preorder("f_cityledger").toInt());
+        ui->leGuestName->setProperty("guest", w->preorder("f_guest").toInt());
+        ui->leGuestName->setText(dbpartner->name(w->preorder("f_guest").toInt()));
+        ui->lePhone->setText(dbpartner->phone(w->preorder("f_guest").toInt()));
+    }
     ui->leDate->setDate(w->preorder("f_datefor").toDate());
     ui->timeEdit->setTime(w->preorder("f_timefor").toTime());
     ui->leGuest->setValue(w->preorder("f_guests").toInt());
@@ -340,3 +344,12 @@ void DlgPreorder::on_btnPrintPrepaymentTax_clicked()
 {
 
 }
+
+void DlgPreorder::on_btnEditPhone_clicked()
+{
+    QString clCode, clName;
+    if (DlgCL::getCL(clCode, clName)) {
+
+    }
+}
+

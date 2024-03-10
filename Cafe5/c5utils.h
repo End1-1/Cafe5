@@ -33,6 +33,7 @@
 #define DISH_STATE_OK 1
 #define DISH_STATE_MISTAKE 2
 #define DISH_STATE_VOID 3
+#define DISH_STATE_SET 4
 
 #define DOC_STATE_SAVED 1
 #define DOC_STATE_DRAFT 2

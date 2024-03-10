@@ -25,6 +25,7 @@
 #include "c5utils.h"
 #include "odraftsalebody.h"
 #include "QRCodeGenerator.h"
+#include "c5checkbox.h"
 #include <QInputDialog>
 #include <QSettings>
 
@@ -85,6 +86,7 @@ WOrder::WOrder(C5User *user, int saleType, WCustomerDisplay *customerDisplay, QW
     ui->tblData->setColumnWidth(col_discvalue, 120);
     ui->tblData->setColumnWidth(col_stock, 100);
     ui->tblData->setColumnWidth(col_qr, 50);
+    ui->tblData->setColumnWidth(col_check_discount, 50);
 
     ui->tblData->setColumnHidden(col_group, !s.value("col" + QString::number(col_group)).toBool());
     ui->tblData->setColumnHidden(col_unit, !s.value("col" + QString::number(col_unit)).toBool());
@@ -93,6 +95,7 @@ WOrder::WOrder(C5User *user, int saleType, WCustomerDisplay *customerDisplay, QW
     ui->tblData->setColumnHidden(col_discmode, !s.value("col" + QString::number(col_discmode)).toBool());
     ui->tblData->setColumnHidden(col_discvalue, !s.value("col" + QString::number(col_discvalue)).toBool());
     ui->tblData->setColumnHidden(col_qr, !s.value("col" + QString::number(col_qr)).toBool());
+    ui->tblData->setColumnHidden(col_check_discount, !s.value("col" + QString::number(col_check_discount)).toBool());
 }
 
 WOrder::~WOrder()
@@ -216,6 +219,7 @@ int WOrder::addGoodsToTable(int id, bool checkQtyOfStore, double qtyStore, const
        .arg(price));
 
     int row = ui->tblData->addEmptyRow();
+    ui->tblData->setCellWidget(row, col_check_discount, new C5CheckBox());
     OGoods og;
     og._groupName = g.group()->groupName();
     og._goodsName = g.goodsName();
@@ -239,7 +243,8 @@ int WOrder::addGoodsToTable(int id, bool checkQtyOfStore, double qtyStore, const
     if (checkQtyOfStore) {
         ui->tblData->item(row, 0)->setData(Qt::UserRole + 100, 1);
     }
-    ui->tblData->setDouble(row, col_stock, (g.unit()->defaultQty()/og._qtybox) + (qtyStore / og._qtybox));
+    //ui->tblData->setDouble(row, col_stock, (g.unit()->defaultQty()/og._qtybox) + (qtyStore / og._qtybox));
+    ui->tblData->setDouble(row, col_stock, (qtyStore / og._qtybox));
     countTotal();
 
     C5Database db(__c5config.dbParams());
@@ -409,7 +414,7 @@ bool WOrder::writeOrder()
         jt["f_returnfrom"] = g.returnFrom;
         jt["f_isservice"] = g.isService;
         jt["f_amountaccumulate"] = g.accumulateAmount;
-        jt["f_emarks"] = g.emarks;
+        jt["f_emarks"] = QString(g.emarks).replace("\"", "\\\"");
         jg.append(jt);
     }
     jdoc["goods"] = jg;
@@ -419,8 +424,11 @@ bool WOrder::writeOrder()
     jhistory["f_type"] = fBHistory.type;
     jdoc["history"] = jhistory;
 
+    QString sql = QString(QJsonDocument(jdoc).toJson(QJsonDocument::Compact));
+    sql.replace("'", "\\'");
+    sql = QString("call sf_create_shop_order('%1')").arg(sql);
     C5Database db(__c5config.dbParams());
-    if (!db.exec(QString("call sf_create_shop_order('%1')").arg(QString(QJsonDocument(jdoc).toJson(QJsonDocument::Compact))))) {
+    if (!db.exec(sql)) {
         C5Message::error(db.fLastError);
         return false;
     }
@@ -472,15 +480,27 @@ bool WOrder::writeOrder()
             result = pt.printAdvanceJson(fOHeader.amountCash, fOHeader.amountCard, jsonIn, jsonOut, err);
         }
 
+
+        QJsonParseError jerr;
+        QJsonDocument jod = QJsonDocument::fromJson(jsonOut.toUtf8(), &jerr);
+        if (jerr.error != QJsonParseError::NoError) {
+            err = jerr.errorString();
+            jod = QJsonDocument::fromJson(QString("{\"data\":\"" + jsonOut + "\"").toUtf8(), &jerr);
+        }
+
+
         QJsonObject jtax;
         jtax["f_order"] = fOHeader._id();
         jtax["f_elapsed"] = et.elapsed();
         jtax["f_in"] = QJsonDocument::fromJson(jsonIn.toUtf8()).object();
-        jtax["f_out"] = QJsonDocument::fromJson(jsonOut.toUtf8()).object();
+        jtax["f_out"] = jod.object();
         jtax["f_err"] = err;
         jtax["f_result"] = result;
         jtax["f_state"] = result == pt_err_ok ? 1 : 0;
-        db.exec(QString("call sf_create_shop_tax('%1')").arg(QString(QJsonDocument(jtax).toJson(QJsonDocument::Compact))));
+        sql = QString(QJsonDocument(jtax).toJson(QJsonDocument::Compact));
+        sql.replace("\\\"", "\\\\\"");
+        sql.replace("'", "\\'");
+        db.exec(QString("call sf_create_shop_tax('%1')").arg(sql));
         if (result != pt_err_ok) {
             C5Message::error(err);
         }
@@ -732,7 +752,7 @@ void WOrder::removeRow()
     int code = g.goods;
     QString name = g._goodsName;
     C5Database db(__c5config.dbParams());
-    db[":f_id"] = ui->tblData->item(row, 0)->data(Qt::UserRole + 1);
+    db[":f_id"] = ui->tblData->item(row, 0)->data(Qt::UserRole + 101);
     db[":f_state"] = 2;
     db.exec("update o_draft_sale_body set f_state=:f_state where f_id=:f_id");
     db[":f_store"] = __c5config.defaultStore();
@@ -965,6 +985,10 @@ void WOrder::readEmarks()
     bool ok = false;
     QString qr = QInputDialog::getText(this, tr("Emark"), tr("Emark"), QLineEdit::Normal, fOGoods[row].emarks, &ok);
     if (!ok) {
+        return;
+    }
+    if (qr.length() > 0 && qr.length() < 20) {
+        C5Message::error(tr("Incorrect eMarks"));
         return;
     }
     fOGoods[row].emarks = qr;

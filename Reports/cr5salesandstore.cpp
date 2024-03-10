@@ -38,6 +38,8 @@ void CR5SalesEffectiveness::buildQuery()
     case CR5SaleAndStoreFilter::dGroups:
         rep2();
         break;
+    case CR5SaleAndStoreFilter::dNone:
+        break;
     }
 }
 
@@ -81,7 +83,7 @@ void CR5SalesEffectiveness::rep1()
     fTranslation["f_storedelta"] = tr("Store delta");
 
     QList<QList<QVariant> > &rows = fModel->fRawData;
-    rows.clear();
+    fModel->clearModel();
     QHash<int, int> goodsRowMap;
     C5Database db(fDBParams);
 
@@ -316,7 +318,7 @@ void CR5SalesEffectiveness::rep2()
     fTranslation["f_storedelta"] = tr("Store delta");
 
     QList<QList<QVariant> > &rows = fModel->fRawData;
-    rows.clear();
+    fModel->clearModel();
     QHash<int, int> goodsRowMap;
     C5Database db(fDBParams);
 

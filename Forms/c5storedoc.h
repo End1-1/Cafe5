@@ -250,6 +250,7 @@ private slots:
     void on_btnChangePartner_clicked();
     void on_btnFixPartner_clicked(bool checked);
     void on_btnCopyLastAdd_clicked();
+    void on_btnCompressRow_clicked();
 };
 
 #endif // C5STOREDOC_H

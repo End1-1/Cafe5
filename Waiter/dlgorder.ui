@@ -348,7 +348,7 @@
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset resource="../resources/res.qrc">
+                  <iconset resource="../resources/resources.qrc">
                    <normaloff>:/recycle.png</normaloff>:/recycle.png</iconset>
                  </property>
                  <property name="iconSize">
@@ -383,7 +383,7 @@
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset resource="../resources/res.qrc">
+                  <iconset resource="../resources/resources.qrc">
                    <normaloff>:/bill.png</normaloff>:/bill.png</iconset>
                  </property>
                  <property name="iconSize">
@@ -394,6 +394,47 @@
                  </property>
                  <property name="checkable">
                   <bool>true</bool>
+                 </property>
+                 <property name="checked">
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="btnMenuSet">
+                 <property name="minimumSize">
+                  <size>
+                   <width>50</width>
+                   <height>50</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>50</width>
+                   <height>50</height>
+                  </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::NoFocus</enum>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true"/>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../resources/res.qrc">
+                   <normaloff>:/menuset.png</normaloff>:/menuset.png</iconset>
+                 </property>
+                 <property name="iconSize">
+                  <size>
+                   <width>32</width>
+                   <height>32</height>
+                  </size>
+                 </property>
+                 <property name="checkable">
+                  <bool>false</bool>
                  </property>
                  <property name="checked">
                   <bool>false</bool>
@@ -676,7 +717,7 @@
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset resource="../resources/res.qrc">
+                  <iconset resource="../resources/resources.qrc">
                    <normaloff>:/cancel.png</normaloff>:/cancel.png</iconset>
                  </property>
                  <property name="iconSize">
@@ -760,7 +801,7 @@ background:#fff6e5;
               <x>0</x>
               <y>0</y>
               <width>376</width>
-              <height>548</height>
+              <height>547</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="vs">
@@ -906,7 +947,7 @@ background:#fff6e5;
                <string/>
               </property>
               <property name="icon">
-               <iconset resource="../resources/res.qrc">
+               <iconset resource="../resources/resources.qrc">
                 <normaloff>:/minus.png</normaloff>:/minus.png</iconset>
               </property>
               <property name="iconSize">
@@ -935,7 +976,7 @@ background:#fff6e5;
                <string/>
               </property>
               <property name="icon">
-               <iconset resource="../resources/res.qrc">
+               <iconset resource="../resources/resources.qrc">
                 <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
               </property>
               <property name="iconSize">
@@ -1080,7 +1121,7 @@ background:#fff6e5;
            <x>0</x>
            <y>0</y>
            <width>248</width>
-           <height>676</height>
+           <height>679</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -1337,7 +1378,7 @@ background:#fff6e5;
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/res.qrc">
+            <iconset resource="../resources/resources.qrc">
              <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
            </property>
            <property name="iconSize">
@@ -1365,7 +1406,6 @@ background:#fff6e5;
            <property name="font">
             <font>
              <pointsize>22</pointsize>
-             <weight>75</weight>
              <bold>true</bold>
             </font>
            </property>
@@ -1402,7 +1442,6 @@ background:#fff6e5;
            </property>
            <property name="font">
             <font>
-             <weight>75</weight>
              <bold>true</bold>
             </font>
            </property>
@@ -1556,7 +1595,7 @@ CASH</string>
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/res.qrc">
+            <iconset resource="../resources/resources.qrc">
              <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
            </property>
            <property name="iconSize">
@@ -1665,7 +1704,7 @@ CASH</string>
 OTHER</string>
            </property>
            <property name="icon">
-            <iconset resource="../resources/res.qrc">
+            <iconset resource="../resources/resources.qrc">
              <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
            </property>
            <property name="iconSize">
@@ -1687,7 +1726,6 @@ OTHER</string>
            <property name="font">
             <font>
              <pointsize>22</pointsize>
-             <weight>75</weight>
              <bold>true</bold>
             </font>
            </property>
@@ -1730,7 +1768,7 @@ OTHER</string>
 CARD</string>
            </property>
            <property name="icon">
-            <iconset resource="../resources/res.qrc">
+            <iconset resource="../resources/resources.qrc">
              <normaloff>:/credit-card.png</normaloff>:/credit-card.png</iconset>
            </property>
            <property name="iconSize">
@@ -1752,7 +1790,6 @@ CARD</string>
            <property name="font">
             <font>
              <pointsize>22</pointsize>
-             <weight>75</weight>
              <bold>true</bold>
             </font>
            </property>
@@ -1824,7 +1861,7 @@ BANK</string>
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/res.qrc">
+            <iconset resource="../resources/resources.qrc">
              <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
            </property>
            <property name="iconSize">
@@ -1846,7 +1883,6 @@ BANK</string>
            <property name="font">
             <font>
              <pointsize>22</pointsize>
-             <weight>75</weight>
              <bold>true</bold>
             </font>
            </property>
@@ -1881,7 +1917,6 @@ BANK</string>
            <property name="font">
             <font>
              <pointsize>22</pointsize>
-             <weight>75</weight>
              <bold>true</bold>
             </font>
            </property>
@@ -1924,7 +1959,7 @@ BANK</string>
 IDRAM</string>
            </property>
            <property name="icon">
-            <iconset resource="../resources/res.qrc">
+            <iconset resource="../resources/resources.qrc">
              <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
            </property>
            <property name="iconSize">
@@ -1955,7 +1990,6 @@ IDRAM</string>
            </property>
            <property name="font">
             <font>
-             <weight>75</weight>
              <bold>true</bold>
             </font>
            </property>
@@ -1985,7 +2019,7 @@ IDRAM</string>
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/res.qrc">
+            <iconset resource="../resources/resources.qrc">
              <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
            </property>
            <property name="iconSize">
@@ -2014,7 +2048,7 @@ IDRAM</string>
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/res.qrc">
+            <iconset resource="../resources/resources.qrc">
              <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
            </property>
            <property name="iconSize">
@@ -2065,7 +2099,6 @@ IDRAM</string>
            <property name="font">
             <font>
              <pointsize>22</pointsize>
-             <weight>75</weight>
              <bold>true</bold>
             </font>
            </property>
@@ -2100,7 +2133,6 @@ IDRAM</string>
            <property name="font">
             <font>
              <pointsize>22</pointsize>
-             <weight>75</weight>
              <bold>true</bold>
             </font>
            </property>
@@ -2142,7 +2174,7 @@ IDRAM</string>
             <string>PAY X</string>
            </property>
            <property name="icon">
-            <iconset resource="../resources/res.qrc">
+            <iconset resource="../resources/resources.qrc">
              <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
            </property>
            <property name="iconSize">
@@ -2164,7 +2196,6 @@ IDRAM</string>
            <property name="font">
             <font>
              <pointsize>22</pointsize>
-             <weight>75</weight>
              <bold>true</bold>
             </font>
            </property>
@@ -2206,7 +2237,7 @@ IDRAM</string>
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/res.qrc">
+            <iconset resource="../resources/resources.qrc">
              <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
            </property>
            <property name="iconSize">
@@ -2566,7 +2597,6 @@ IDRAM</string>
               <property name="font">
                <font>
                 <pointsize>16</pointsize>
-                <weight>75</weight>
                 <bold>true</bold>
                </font>
               </property>
@@ -2605,7 +2635,7 @@ IDRAM</string>
                <string/>
               </property>
               <property name="icon">
-               <iconset resource="../resources/res.qrc">
+               <iconset resource="../resources/resources.qrc">
                 <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
               </property>
               <property name="iconSize">
@@ -2663,7 +2693,6 @@ IDRAM</string>
               <property name="font">
                <font>
                 <pointsize>16</pointsize>
-                <weight>75</weight>
                 <bold>true</bold>
                </font>
               </property>
@@ -2761,7 +2790,7 @@ IDRAM</string>
          <string>Comment</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/res.qrc">
+         <iconset resource="../resources/resources.qrc">
           <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
         </property>
         <property name="iconSize">
@@ -2848,7 +2877,7 @@ IDRAM</string>
          <string>Search</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/res.qrc">
+         <iconset resource="../resources/resources.qrc">
           <normaloff>:/search.png</normaloff>:/search.png</iconset>
         </property>
         <property name="iconSize">
@@ -3170,7 +3199,7 @@ LANGUAGE</string>
            <x>0</x>
            <y>0</y>
            <width>248</width>
-           <height>696</height>
+           <height>699</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -3483,8 +3512,8 @@ QLabel {color:yellow;background:green;}
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../resources/res.qrc"/>
   <include location="../resources/resources.qrc"/>
+  <include location="../resources/res.qrc"/>
  </resources>
  <connections/>
 </ui>

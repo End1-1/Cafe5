@@ -13,7 +13,6 @@
 #include "rawplugin.h"
 #include "sslsocket.h"
 #include "logwriter.h"
-#include "thread.h"
 #include "socketthread.h"
 
 RawHandler::RawHandler(SslSocket *socket, const QString &session) :

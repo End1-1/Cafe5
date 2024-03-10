@@ -346,9 +346,6 @@ void ViewOrder::on_btnTaxReturn_clicked()
     db[":f_result"] = result;
     db.insert("o_tax_log", false);
     if (result != pt_err_ok) {
-        QSqlQuery *q = new QSqlQuery(db.fDb);
-        pt.saveTimeResult(fUuid, *q);
-        delete q;
         C5Message::error(err);
     } else {
         db[":f_fiscal"] = QVariant();

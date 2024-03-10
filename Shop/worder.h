@@ -24,6 +24,7 @@
 #define col_discvalue 10
 #define col_stock 11
 #define col_qr 12
+#define col_check_discount 13
 
 namespace Ui {
 class WOrder;

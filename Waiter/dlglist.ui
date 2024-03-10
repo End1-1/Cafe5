@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>List</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QListWidget" name="lst"/>
    </item>

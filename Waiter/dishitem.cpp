@@ -73,6 +73,20 @@ void DishItem::setChanges()
             ui->lbTimeOfDish->setText(fOrder->dishesValue("f_state", fIndex).toInt() == DISH_STATE_OK ? dd : "-");
             ui->orderDishFrame->setProperty("dish_focused", fFocus ? "1" : "2");
             ui->orderDishFrame->style()->polish(ui->orderDishFrame);
+        } else if (fOrder->dishesValue("f_state", fIndex) == DISH_STATE_SET) {
+            ui->orderDishFrame->setProperty("state", "4");
+            ui->orderDishFrame->style()->polish(ui->orderDishFrame);
+            ui->lbTimeOfDish->setText(fOrder->dishesValue("f_removetime", fIndex).toDateTime().toString(FORMAT_TIME_TO_SHORT_STR));
+            ui->lbComment->setProperty("state", "4");
+            ui->lbQty1->setProperty("state", "4");
+            ui->lbTimeOfDish->setProperty("state", "4");
+            ui->btnDish->setProperty("state", "4");
+            ui->lbTotal->setProperty("state", "4");
+            ui->lbTimeOfDish->style()->polish(ui->lbTimeOfDish);
+            ui->lbTotal->style()->polish(ui->lbTotal);
+            ui->lbComment->style()->polish(ui->lbComment);
+            ui->lbQty1->style()->polish(ui->lbQty1);
+            ui->btnDish->style()->polish(ui->btnDish);
         } else {
             ui->orderDishFrame->setProperty("state", "3");
             ui->orderDishFrame->style()->polish(ui->orderDishFrame);
@@ -104,7 +118,8 @@ int DishItem::index()
 
 void DishItem::setCheckMode(bool v)
 {
-    if (fOrder->dishesValue("f_state", fIndex).toInt() != DISH_STATE_OK) {
+    if (fOrder->dishesValue("f_state", fIndex).toInt() != DISH_STATE_OK
+        && fOrder->dishesValue("f_state", fIndex).toInt() != DISH_STATE_SET) {
         return;
     }
     ui->btnChecked->setVisible(v);

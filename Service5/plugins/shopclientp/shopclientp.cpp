@@ -2,13 +2,15 @@
 #include "database.h"
 #include "shopclienthandler.h"
 #include <QDebug>
+#include <QTextCodec>
 
 ShopClientHandler *shopClientHandler = nullptr;
 
 bool startPlugin(const QString &configFileName)
 {
     qDebug() << "start plugin shopclientp with" << configFileName;
-    Database db("QMYSQL");
+    QTextCodec::setCodecForLocale(QTextCodec::codecForName("utf8") );
+    Database db("QMARIADB");
     if (!db.open(configFileName)) {
         return false;
     }

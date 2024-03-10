@@ -10,7 +10,7 @@ DlgCL::DlgCL(const QStringList &dbParams) :
     QStringList dbp(C5Config::dbParams());
     if (C5Config::hotelDatabase().isEmpty()) {
         QString where;
-        where = QString("where f_category=%1").arg(__c5config.getValue(param_waiter_debt_costumer_category).toInt());
+        //where = QString("where f_category=%1").arg(__c5config.getValue(param_waiter_debt_costumer_category).toInt());
         C5Database db(__c5config.dbParams());
         db.exec(QString("select f_id, concat_ws(', ',f_contact, f_name, f_address) as f_info, f_phone "
                         "from c_partners %1 order by f_name").arg(where));

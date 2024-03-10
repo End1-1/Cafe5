@@ -73,6 +73,8 @@ private slots:
 
     void on_btnPrintPrepaymentTax_clicked();
 
+    void on_btnEditPhone_clicked();
+
 private:
     Ui::DlgPreorder *ui;
 

@@ -756,6 +756,7 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
     jheader["f_storein"] = ui->leStoreInput->getInteger();
     jheader["f_storeout"] = ui->leStoreOutput->getInteger();
     jheader["f_reason"] = ui->leReason->getInteger();
+    jheader["f_comment"] = ui->leComment->text();
     jdoc["header"] = jheader;
 
     QJsonObject jbody;
@@ -1046,6 +1047,24 @@ void C5StoreDoc::writeDocumentWithState(int state)
             openDoc(fInternalId, err);
         }
     } else {
+        if (fDocType == DOC_TYPE_STORE_OUTPUT) {
+            if (ui->btnAutoDecrease->isChecked()){
+                QStringList rows = err.split("\n");
+                QMap<QString, double> decrease;
+                for (const QString &s: rows) {
+                    QStringList r1 = s.split(" -: ", Qt::SkipEmptyParts);
+                    if (r1.count() == 2) {
+                        decrease[r1.at(0).trimmed()] = decrease[r1.at(0).trimmed()] + r1.at(1).toDouble();
+                    }
+                }
+                for (int i = 0; i < ui->tblGoods->rowCount(); i++){
+                    QString gname = ui->tblGoods->getString(i, 4).trimmed();
+                    if (decrease.contains(gname)) {
+                        ui->tblGoods->lineEdit(i, 5)->setDouble(ui->tblGoods->lineEdit(i, 5)->getDouble() - decrease[gname]);
+                    }
+                }
+            }
+        }
         C5Message::error(err);
     }
 }
@@ -3108,5 +3127,25 @@ void C5StoreDoc::on_btnCopyLastAdd_clicked()
         }
     }
     countTotal();
+}
+
+
+void C5StoreDoc::on_btnCompressRow_clicked()
+{
+    QMap<int, int> goods;
+    QList<int> rowsRemove;
+    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+        if (goods.contains(ui->tblGoods->getInteger(i, 3))) {
+            int nr = goods[ui->tblGoods->getInteger(i, 3)];
+            ui->tblGoods->lineEdit(nr, 5)->setDouble(ui->tblGoods->lineEdit(nr, 5)->getDouble() + ui->tblGoods->lineEdit(i, 5)->getDouble());
+            ui->tblGoods->lineEdit(nr, 8)->setDouble(ui->tblGoods->lineEdit(nr, 8)->getDouble() + ui->tblGoods->lineEdit(i, 8)->getDouble());
+            rowsRemove.append(i);
+        } else {
+            goods[ui->tblGoods->getInteger(i, 3)] = i;
+        }
+    }
+    for (int i = rowsRemove.size() - 1; i > -1; i--) {
+        ui->tblGoods->removeRow(rowsRemove[i]);
+    }
 }
 

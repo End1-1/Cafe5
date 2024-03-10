@@ -28,12 +28,27 @@ int main(int argc, char *argv[])
 //        return 1;
 //    }
 
+    QFile style(a.applicationDirPath() + "/officestyle.qss");
+    QString css;
+    if (style.exists()) {
+        if (style.open(QIODevice::ReadOnly)) {
+            css = style.readAll();
+            QString css2(css);
+            css2.replace("%font-size%", "14");
+            css2.replace("%font-family%", "Arial LatArm Unicode");
+            a.setStyleSheet(css2);
+        }
+    }
+
     C5Login l;
     if (l.exec() == QDialog::Accepted) {
         C5Config::initParamsFromDb();
     } else {
         return 0;
     }
+    css.replace("%font-size%", __c5config.getValue(param_fd_font_size));
+    css.replace("%font-family%", __c5config.getValue(param_app_font_family));
+    a.setStyleSheet(css);
 
     if (!C5SystemPreference::checkDecimalPointAndSeparator()) {
         return 0;
@@ -51,16 +66,6 @@ int main(int argc, char *argv[])
     font.setPointSize(__c5config.fronDeskFontSize());
     font.setFamily(__c5config.getValue(param_app_font_family));
     a.setFont(font);
-
-    QFile style(a.applicationDirPath() + "/officestyle.qss");
-    if (style.exists()) {
-        if (style.open(QIODevice::ReadOnly)) {
-            QString s = style.readAll();
-            s.replace("%font-size%", __c5config.getValue(param_fd_font_size));
-            s.replace("%font-family%", __c5config.getValue(param_app_font_family));
-            a.setStyleSheet(s);
-        }
-    }
 
     srand(time(NULL));
     C5MainWindow w;

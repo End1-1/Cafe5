@@ -1354,6 +1354,16 @@
         <translation>Ուտեստի անվանում</translation>
     </message>
     <message>
+        <location filename="../Editors/c5dishwidget.ui" line="1219"/>
+        <source>Մաքսիմալ քանակ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Editors/c5dishwidget.ui" line="1232"/>
+        <source>f_setqty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../Editors/c5dishwidget.ui" line="356"/>
         <source>f_specialdiscount</source>
         <translation></translation>
@@ -1433,7 +1443,7 @@
     <message>
         <location filename="../Editors/c5dishwidget.ui" line="731"/>
         <location filename="../Editors/c5dishwidget.ui" line="748"/>
-        <location filename="../Editors/c5dishwidget.ui" line="1240"/>
+        <location filename="../Editors/c5dishwidget.ui" line="1260"/>
         <source>Add goods (+)</source>
         <translation>Ավելացնել ապրանք (+)</translation>
     </message>
@@ -1444,7 +1454,7 @@
     </message>
     <message>
         <location filename="../Editors/c5dishwidget.ui" line="782"/>
-        <location filename="../Editors/c5dishwidget.ui" line="1257"/>
+        <location filename="../Editors/c5dishwidget.ui" line="1277"/>
         <source>Remove selected row (-)</source>
         <translation>Հեռացնել նշված տողը (-)</translation>
     </message>

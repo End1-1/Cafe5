@@ -32,7 +32,7 @@ private:
     int fGoodsId;
 
 signals:
-    void getGoods(int , double, double);
+    void getGoods(int , double, double, double);
 };
 
 #endif // DLGGOODSLIST_H

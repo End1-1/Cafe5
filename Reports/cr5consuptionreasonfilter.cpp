@@ -24,7 +24,7 @@ QString CR5ConsuptionReasonFilter::condition()
             .arg(ui->deStart->toMySQLDate())
             .arg(ui->deEnd->toMySQLDate());
     if (!ui->leStore->isEmpty()) {
-        cond += " and og.f_store in (" + ui->leStore->text() + ") ";
+        cond += " and ob.f_store in (" + ui->leStore->text() + ") ";
     }
     if (!ui->leDishPart->isEmpty()) {
         cond += " and dp.f_id in ("  + ui->leDishPart->text() + ") ";

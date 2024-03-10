@@ -12,6 +12,7 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    ../../../../NewTax/Src/printtaxn.cpp \
     ../../../Cafe5/c5utils.cpp \
     ../../../Classes/c5networkdb.cpp \
     ../../../Classes/c5printing.cpp \
@@ -20,6 +21,7 @@ SOURCES += \
     sqlquery.cpp
 
 HEADERS += \
+    ../../../../NewTax/Src/printtaxn.h \
     ../../../Cafe5/c5utils.h \
     ../../../Classes/c5networkdb.h \
     ../../../Classes/c5printing.h \

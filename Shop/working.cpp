@@ -26,6 +26,7 @@
 #include "dlggiftcardsale.h"
 #include "rawmessage.h"
 #include "c5tablewidget.h"
+#include "dlgregistercard.h"
 #include "printreceiptgroup.h"
 #include "dlgserversettings.h"
 #include "serverconnection.h"
@@ -330,14 +331,14 @@ Flag Working::flag(int id)
     }
 }
 
-void Working::getGoods(int id, double price1, double price2)
+void Working::getGoods(int id, double qty, double price1, double price2)
 {
     sender()->deleteLater();
     WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
     if (!w) {
         return;
     }
-    w->addGoods(id, 0, price1, price2);
+    w->addGoods(id, qty, price1, price2);
 }
 
 WOrder *Working::worder()
@@ -939,3 +940,9 @@ void Working::on_btnColumns_clicked()
 {
      DlgShowColumns().exec();
 }
+
+void Working::on_chRegisterCard_clicked()
+{
+     DlgRegisterCard().exec();
+}
+

@@ -9,8 +9,8 @@
 
 DlgSplitOrder::DlgSplitOrder(C5User *user) :
     C5Dialog(__c5config.dbParams()),
-    fUser(user),
-    ui(new Ui::DlgSplitOrder)
+    ui(new Ui::DlgSplitOrder),
+    fUser(user)
 {
     ui->setupUi(this);
     setWindowState(Qt::WindowFullScreen);

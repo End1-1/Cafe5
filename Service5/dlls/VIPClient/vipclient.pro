@@ -14,6 +14,7 @@ CONFIG += c++11
 SOURCES += \
     ../../../../NewTax/Src/printtaxn.cpp \
     ../../../Cafe5/c5utils.cpp \
+    ../../../Classes/c5networkdb.cpp \
     ../../../Classes/c5printing.cpp \
     ../../../Classes/c5tr.cpp \
     queryjsonresponse.cpp \
@@ -22,6 +23,7 @@ SOURCES += \
 HEADERS += \
     ../../../../NewTax/Src/printtaxn.h \
     ../../../Cafe5/c5utils.h \
+    ../../../Classes/c5networkdb.h \
     ../../../Classes/c5printing.h \
     ../../../Classes/c5tr.h \
     queryjsonresponse.h \

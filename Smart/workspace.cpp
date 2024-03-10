@@ -1425,7 +1425,7 @@ int Workspace::printTax(double cardAmount, double idramAmount)
     QJsonParseError jsonErr;
     jtax["f_order"] = fOrderUuid;
     jtax["f_elapsed"] = et.elapsed();
-    jtax["f_in"] = QJsonDocument::fromJson(jsonIn.toUtf8(), &jsonErr).object();
+    jtax["f_in"] = QJsonDocument::fromJson(jsonIn.replace("'", "''").toUtf8(), &jsonErr).object();
     jtax["f_out"] = QJsonDocument::fromJson(jsonOut.toUtf8()).object();
     jtax["f_err"] = err;
     jtax["f_result"] = result;
@@ -1463,6 +1463,14 @@ bool Workspace::printReceipt(const QString &id, bool printSecond, bool precheck)
     p.setSceneParams(650, 2800, QPrinter::Portrait);
     p.setFont(font);
     QMap<int, QMap<QString, QVariant> > packages;
+
+    QJsonObject jtax, jin;
+    db[":f_order"] = id;
+    db.exec("select f_in, f_out from o_tax_log where f_order=:f_order and f_state=1");
+    if (db.nextRow()) {
+        jtax = QJsonDocument::fromJson(db.getString("f_out").toUtf8()).object();
+        jin = QJsonDocument::fromJson(db.getString("f_in").toUtf8()).object();
+    }
 
     if (QFile::exists("./logo_receipt.png")) {
         p.image("./logo_receipt.png", Qt::AlignHCenter);
@@ -1506,35 +1514,29 @@ bool Workspace::printReceipt(const QString &id, bool printSecond, bool precheck)
     p.ctext(tr("Receipt #") + QString("%1%2").arg(db.getString("f_prefix"), db.getString("f_hallid")));
     p.br();
     //p.setFontBold(false);
-    if (db.getString("f_receiptnumber").length() > 0) {
-        p.ltext(db.getString("f_firmname"), 0);
+    if (!jtax.isEmpty()) {
+        p.ltext(jtax["taxpayer"].toString(), 0);
         p.br();
-        p.ltext(db.getString("f_address"), 0);
+        p.ltext(jtax["address"].toString(), 0);
         p.br();
-        p.ltext(tr("Department"), 0);
-        p.rtext(db.getString("f_dept"));
-        p.br();
-        p.ltext(tr("Tax number"), 0);
-        p.rtext(db.getString("f_hvhh"));
+        p.ltext(tr("Taxpayer tin"), 0);
+        p.rtext(jtax["tin"].toString());
         p.br();
         p.ltext(tr("Device number"), 0);
-        p.rtext(db.getString("f_devnum"));
+        p.rtext(jtax["crn"].toString());
         p.br();
         p.ltext(tr("Serial"), 0);
-        p.rtext(db.getString("f_serial"));
+        p.rtext(jtax["sn"].toString());
         p.br();
         p.ltext(tr("Fiscal"), 0);
-        p.rtext(db.getString("f_fiscal"));
+        p.rtext(jtax["fiscal"].toString());
         p.br();
         p.ltext(tr("Receipt number"), 0);
-        p.rtext(db.getString("f_receiptnumber"));
+        p.rtext(QString::number(jtax["rseq"].toInt()));
         p.br();
-        p.ltext(tr("Date"), 0);
-        p.rtext(db.getString("f_taxtime"));
-        p.br();
-        if (db.getString("f_taxpayertin").isEmpty() == false) {
-            p.ltext(tr("Taxpayer tin"), 0);
-            p.rtext(db.getString("f_taxpayertin"));
+        if (jin["taxpayerTin"].toString().isEmpty() == false) {
+            p.ltext(tr("Partner tin"), 0);
+            p.rtext(jin["taxpayerTin"].toString());
             p.br();
         }
         p.ltext(tr("(F)"), 0);
@@ -2220,7 +2222,12 @@ void Workspace::on_btnEmarks_clicked()
     if (!ok) {
         return;
     }
+    if (qr.length() < 20 && qr.length() > 0) {
+        C5Message::error("Invalid eMarks");
+        return;
+    }
 
+    ui->btnFiscal->setChecked(true);
     QString hya("էթփձջւևրչճ-ժ"
                 "քոեռտըւիօպխծշ"
                 "ասդֆգհյկլ;՛"

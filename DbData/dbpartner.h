@@ -10,6 +10,8 @@ public:
 
     QString contact(int id);
 
+    QString phone(int id);
+
     virtual QString name(int id);
 };
 

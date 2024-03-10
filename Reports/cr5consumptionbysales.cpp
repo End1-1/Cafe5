@@ -524,7 +524,7 @@ void CR5ConsumptionBySales::makeOutput(bool v)
     QList<QList<QVariant> > &rows = fModel->fRawData;
     for (int i = 0; i < rows.count(); i++) {
         if (rows[i][col_qtyinv].toString().isEmpty()) {
-            continue;
+            //continue;
         }
         double qty = rows[i][col_qtydiff].toDouble();
         if (rows[i][col_qtydiff].toDouble() > 0.0001) {

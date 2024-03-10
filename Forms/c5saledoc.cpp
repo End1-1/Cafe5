@@ -24,6 +24,7 @@
 #include "oheader.h"
 #include <QClipboard>
 #include <QSqlQuery>
+#include <QInputDialog>
 
 #define col_uuid 0
 #define col_checkbox 1
@@ -236,19 +237,20 @@ void C5SaleDoc::fiscale()
             "left join c_groups gr on gr.f_id=gn.f_group "
             "where og.f_header=:f_header");
     PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(),
-                 C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
+                 C5Config::taxUseExtPos().isEmpty() ? "false" : C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
     while (db.nextRow()) {
         pt.addGoods(1, //dep
                     db.getString("f_adgcode"), //adg
                     db.getString("f_goods"), //goods id
                     db.getString("f_name"), //name
-                    db.getDouble("f_qty"), //price
-                    db.getDouble("f_price"), //qty
+                    db.getDouble("f_price"), //price
+                    db.getDouble("f_qty"), //qty
                     db.getDouble("f_discount")); //discount
     }
     QString jsonIn, jsonOut, err;
     QString sn, firm, address, fiscal, hvhh, rseq, devnum, time;
     int result = 0;
+    pt.fEmarks = fEmarks;
     result = pt.makeJsonAndPrint(ui->leCard->getDouble()
                                  + ui->leDebt->getDouble()
                                  + ui->leBankTransfer->getDouble(), 0, jsonIn, jsonOut, err);
@@ -256,12 +258,15 @@ void C5SaleDoc::fiscale()
     QJsonObject jtax;
     jtax["f_order"] = ui->leUuid->text();
     jtax["f_elapsed"] = t.elapsed();
-    jtax["f_in"] = jsonIn;
-    jtax["f_out"] = jsonOut;
+    jtax["f_in"] = QJsonDocument::fromJson(jsonIn.toUtf8()).object();
+    jtax["f_out"] = QJsonDocument::fromJson(jsonOut.toUtf8()).object();;
     jtax["f_err"] = err;
     jtax["f_result"] = result;
     jtax["f_state"] = result == pt_err_ok ? 1 : 0;
-    db.exec(QString("call sf_create_shop_tax('%1')").arg(QString(QJsonDocument(jtax).toJson(QJsonDocument::Compact))));
+    QString jtaxStr = QString(QJsonDocument(jtax).toJson(QJsonDocument::Compact));
+    jtaxStr = jtaxStr.replace("\'", "\\\'");
+    db.exec(QString("call sf_create_shop_tax('%1')")
+                .arg(jtaxStr));
     if (result != pt_err_ok) {
         C5Message::error(err);;
     }
@@ -881,6 +886,9 @@ int C5SaleDoc::addGoods(int goodsId, C5Database &db)
     case PRICEMODE_WHOSALE:
         priceField = "f_price2";
         break;
+    default:
+        priceField = "f_price1";
+        break;
     }
     db[":f_id"] = goodsId;
     db[":f_currency"] = ui->cbCurrency->currentData();
@@ -1463,3 +1471,14 @@ void C5SaleDoc::removeDoc()
     C5Message::info(tr("Removed"));
     __mainWindow->removeTab(this);
 }
+
+void C5SaleDoc::on_btnQr_clicked()
+{
+
+    QString s = QInputDialog::getText(this, tr("Emarks"), "");
+    if (s.isEmpty()) {
+        return;
+    }
+    fEmarks.append(s);
+}
+

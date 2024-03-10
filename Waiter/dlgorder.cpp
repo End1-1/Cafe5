@@ -7,6 +7,7 @@
 #include "dlgdishremovereason.h"
 #include "c5orderdriver.h"
 #include "c5ordertabledelegate.h"
+#include "dlgmenuset.h"
 #include "dlgsearchinmenu.h"
 #include "dlgpassword.h"
 #include "dlgguest.h"
@@ -227,7 +228,10 @@ void DlgOrder::accept()
     for (int i = 0; i < ui->vs->count(); i++) {
         WOrder *wo = dynamic_cast<WOrder*>(ui->vs->itemAt(i)->widget());
         if (wo) {
-            if (wo->fOrderDriver->isEmpty() && __c5config.getValue(param_waiter_donotclose_empty_order).toInt() == 0) {
+            if (wo->fOrderDriver->isEmpty()
+                && __c5config.getValue(param_waiter_donotclose_empty_order).toInt() == 0
+                && wo->fOrderDriver->headerValue("f_state").toInt() != ORDER_STATE_PREORDER_EMPTY
+                && wo->fOrderDriver->headerValue("f_state").toInt() != ORDER_STATE_PREORDER_WITH_ORDER) {
                 wo->fOrderDriver->setCloseHeader();
             }
             for (int i = 0; i < wo->fOrderDriver->dishesCount(); i++) {
@@ -512,7 +516,7 @@ void DlgOrder::itemsToTable()
     ui->lePrepaidAmount->setDouble(wo->fOrderDriver->preorder("f_prepaidcash").toDouble()
                                    + wo->fOrderDriver->preorder("f_prepaidcard").toDouble()
                                    + wo->fOrderDriver->preorder("f_prepaidpayx").toDouble());
-    ui->leGuest->setText(wo->fOrderDriver->preorder("f_guestname").toString());
+    ui->leGuest->setText(dbopreorder->guestName(wo->fOrderDriver->headerValue("f_id").toString()));
     if (ui->lePrepaidAmount->getDouble() > 0.01) {
         ui->wPreorder->setVisible(true);
     } else {
@@ -1022,7 +1026,8 @@ void DlgOrder::on_btnVoid_clicked()
     if (!wo->currentRow(index)) {
         return;
     }
-    if (wo->fOrderDriver->dishesValue("f_state", index).toInt() != DISH_STATE_OK) {
+    if (wo->fOrderDriver->dishesValue("f_state", index).toInt() != DISH_STATE_OK
+        && wo->fOrderDriver->dishesValue("f_state", index).toInt() != DISH_STATE_SET) {
         return;
     }
     if (wo->fOrderDriver->dishesValue("f_qty2", index).toDouble() < 0.001) {
@@ -2096,7 +2101,7 @@ void DlgOrder::on_btnReceipt_clicked()
         payMethods = "Bank";
         amounts = float_str(wo->fOrderDriver->headerValue("f_amountbank").toDouble(), 2);
     }
-    if (wo->fOrderDriver->headerValue("f_amountother") > 0.001) {
+    if (wo->fOrderDriver->headerValue("f_amountother").toDouble() > 0.001) {
         switch (wo->fOrderDriver->headerValue("f_otherid").toInt()) {
         case PAYOTHER_TRANSFER_TO_ROOM:
             payMethods = wo->fOrderDriver->payRoomValue("f_room").toString() + ","
@@ -2189,12 +2194,12 @@ void DlgOrder::on_btnService_clicked()
     while (db.nextRow()) {
         lst.append(float_str(db.getDouble("f_value") * 100, 2));
     }
-    int index;
+    int index = 0;
     if (!DlgList::getValue(lst, index)) {
         return;
     }
     QList<WOrder*> wos = worders();
-    for (WOrder *wo: wos) {
+    for (WOrder *wo: qAsConst(wos)) {
         QString oldValue = wo->fOrderDriver->headerValue("f_servicefactor").toString();
         wo->fOrderDriver->setHeader("f_servicefactor", lst.at(index).toDouble() / 100);
         wo->fOrderDriver->amountTotal();
@@ -2508,7 +2513,9 @@ void DlgOrder::on_btnPreorder_clicked()
     if (tmp != fUser) {
         delete tmp;
     }
-    ui->leGuest->setText(wo->fOrderDriver->preorder("f_guestname").toString());
+    if (wo->fOrderDriver->preorder("f_guest").toInt() > 0) {
+        ui->leGuest->setText(dbpartner->name(wo->fOrderDriver->preorder("f_guest").toInt()));
+    }
     ui->lePrepaidAmount->setDouble(wo->fOrderDriver->preorder("f_prepaidcash").toDouble()
                                    + wo->fOrderDriver->preorder("f_prepaidcard").toDouble()
                                    + wo->fOrderDriver->preorder("f_prepaidpayx").toDouble());
@@ -2927,3 +2934,23 @@ void DlgOrder::on_btnCashout_clicked()
     C5Message::info(purpose);
 
 }
+
+void DlgOrder::on_btnMenuSet_clicked()
+{
+    int index = 0;
+    WOrder *wo = worder();
+    if (!wo) {
+        return;
+    }
+    if (!wo->currentRow(index)) {
+        return;
+    }
+    if (wo->fOrderDriver->dishesValue("f_state", index).toInt() != DISH_STATE_OK) {
+        return;
+    }
+    DlgMenuSet d(wo->fOrderDriver->dishesValue("f_id", index).toString());
+    d.exec();
+    wo->fOrderDriver->reloadOrder();
+    itemsToTable();
+}
+

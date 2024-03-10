@@ -16,7 +16,6 @@ public:
 private:
     bool dbQuery();
     bool networkRedirect(const QString &sql);
-    //bool payment();
     //bool printBill(const QString &id);
     QJsonObject fConfig;
     QString fHost;

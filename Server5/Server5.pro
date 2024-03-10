@@ -90,4 +90,3 @@ INCLUDEPATH += ../Classes
 INCLUDEPATH += ../Cafe5
 INCLUDEPATH += C:/Projects/Cafe5/Service5/utils
 
-DISTFILES +=

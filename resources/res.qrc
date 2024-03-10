@@ -150,5 +150,6 @@
         <file>preorder.png</file>
         <file>route.png</file>
         <file>icq.wav</file>
+        <file>menuset.png</file>
     </qresource>
 </RCC>

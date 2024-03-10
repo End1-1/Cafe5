@@ -159,6 +159,9 @@ QString C5TableModel::nameForColumnIndex(int index)
 
 QVariant C5TableModel::data(const QModelIndex &index, int role) const
 {
+    if (fRawData.isEmpty()) {
+        return "WASTED";
+    }
     if (!index.isValid()) {
         return QVariant();
     }

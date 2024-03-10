@@ -66,7 +66,7 @@ public:
     Flag flag(int id);
 
 public slots:
-    void getGoods(int id, double price1, double price2);
+    void getGoods(int id, double qty, double price1, double price2);
 
 private:
     Ui::Working *ui;
@@ -175,6 +175,7 @@ private slots:
 
     void on_btnOpenDraft_clicked();
     void on_btnColumns_clicked();
+    void on_chRegisterCard_clicked();
 };
 
 #endif // WORKING_H

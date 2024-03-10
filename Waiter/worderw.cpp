@@ -74,7 +74,8 @@ QList<int> WOrder::checkedItems()
 {
     QList<int> result;
     for (int i = 0; i < fItems.count(); i++) {
-        if (fOrderDriver->dishesValue("f_state", i).toInt() == DISH_STATE_OK) {
+        if (fOrderDriver->dishesValue("f_state", i).toInt() == DISH_STATE_OK
+            || fOrderDriver->dishesValue("f_state", i).toInt() == DISH_STATE_SET) {
             if (fItems.at(i)->isChecked()) {
                 result.append(i);
             }

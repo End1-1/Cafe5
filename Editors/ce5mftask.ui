@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>468</width>
-    <height>317</height>
+    <height>328</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -41,12 +41,18 @@
          <property name="Field" stdset="0">
           <string>f_state</string>
          </property>
+         <property name="Type" stdset="0">
+          <number>1</number>
+         </property>
         </widget>
        </item>
        <item row="7" column="1">
         <widget class="C5LineEditWithSelector" name="lineEdit_9">
          <property name="Field" stdset="0">
           <string>f_qty</string>
+         </property>
+         <property name="Type" stdset="0">
+          <number>2</number>
          </property>
         </widget>
        </item>
@@ -74,6 +80,9 @@
          <property name="Field" stdset="0">
           <string>f_out</string>
          </property>
+         <property name="Type" stdset="0">
+          <number>2</number>
+         </property>
         </widget>
        </item>
        <item row="1" column="0">
@@ -87,6 +96,9 @@
         <widget class="C5LineEditWithSelector" name="leStage">
          <property name="Field" stdset="0">
           <string>f_stage</string>
+         </property>
+         <property name="Type" stdset="0">
+          <number>1</number>
          </property>
         </widget>
        </item>
@@ -178,6 +190,9 @@
          <property name="Field" stdset="0">
           <string>f_ready</string>
          </property>
+         <property name="Type" stdset="0">
+          <number>2</number>
+         </property>
         </widget>
        </item>
        <item row="2" column="2">
@@ -200,6 +215,9 @@
         <widget class="C5LineEditWithSelector" name="leProduct">
          <property name="Field" stdset="0">
           <string>f_product</string>
+         </property>
+         <property name="Type" stdset="0">
+          <number>1</number>
          </property>
         </widget>
        </item>
@@ -228,6 +246,9 @@
         <widget class="C5LineEditWithSelector" name="leWorkshop">
          <property name="Field" stdset="0">
           <string>f_workshop</string>
+         </property>
+         <property name="Type" stdset="0">
+          <number>1</number>
          </property>
         </widget>
        </item>
@@ -262,6 +283,9 @@
         <widget class="C5LineEditWithSelector" name="leResponsible">
          <property name="Field" stdset="0">
           <string>f_responsible</string>
+         </property>
+         <property name="Type" stdset="0">
+          <number>1</number>
          </property>
         </widget>
        </item>
@@ -338,14 +362,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5DateEdit</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5dateedit.h</header>
-  </customwidget>
-  <customwidget>
    <class>C5LineEditWithSelector</class>
    <extends>QLineEdit</extends>
    <header location="global">c5lineeditwithselector.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5DateEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5dateedit.h</header>
   </customwidget>
   <customwidget>
    <class>C5TableWidget</class>

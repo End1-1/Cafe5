@@ -11,6 +11,11 @@ QString DbPartner::contact(int id)
     return get(id, "f_contact").toString();
 }
 
+QString DbPartner::phone(int id)
+{
+    return get(id, "f_phone").toString();
+}
+
 QString DbPartner::name(int id)
 {
     return get(id, "f_taxname").toString();

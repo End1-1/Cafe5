@@ -15,7 +15,7 @@ RC_FILE = res.rc
 
 ICON = cup.ico
 
-DEFINES += _DBDRIVER_=\\\"QMYSQL\\\"
+DEFINES += _DBDRIVER_=\\\"QMARIADB\\\"
 DEFINES += _ORGANIZATION_=\\\"Jazzve\\\"
 DEFINES += _APPLICATION_=\\\"Cafe5\\\"
 DEFINES += _MODULE_=\\\"WAITER\\\"
@@ -383,11 +383,13 @@ SOURCES += \
     dlgcarnumber.cpp \
     dlgcashbuttonopions.cpp \
     dlgchosesplitorderoption.cpp \
+    dlgeditphone.cpp \
     dlgguests.cpp \
     dlglist.cpp \
     dlglistdishspecial.cpp \
     dlglistofpackages.cpp \
     dlgmanagertools.cpp \
+    dlgmenuset.cpp \
     dlgprecheckoptions.cpp \
     dlgpreorderw.cpp \
     dlgreservation.cpp \
@@ -815,6 +817,7 @@ HEADERS += \
     dlgcarnumber.h \
     dlgcashbuttonopions.h \
     dlgchosesplitorderoption.h \
+    dlgeditphone.h \
         dlgface.h \
     ../Cafe5/c5database.h \
     ../Cafe5/c5config.h \
@@ -830,6 +833,7 @@ HEADERS += \
     dlglistdishspecial.h \
     dlglistofpackages.h \
     dlgmanagertools.h \
+    dlgmenuset.h \
     dlgorder.h \
     ../Classes/c5user.h \
     ../Classes/c5menu.h \
@@ -1066,6 +1070,7 @@ FORMS += \
     dlgcarnumber.ui \
     dlgcashbuttonopions.ui \
     dlgchosesplitorderoption.ui \
+    dlgeditphone.ui \
         dlgface.ui \
     ../Cafe5/c5connection.ui \
     ../Cafe5/c5message.ui \
@@ -1074,6 +1079,7 @@ FORMS += \
     dlglistdishspecial.ui \
     dlglistofpackages.ui \
     dlgmanagertools.ui \
+    dlgmenuset.ui \
     dlgorder.ui \
     ../Classes/c5printpreview.ui \
     dlgprecheckoptions.ui \

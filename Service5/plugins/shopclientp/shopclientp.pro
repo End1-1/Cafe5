@@ -12,7 +12,7 @@ CONFIG += c++11
 SOURCES += \
     ../../../../NewTax/Src/printtaxn.cpp \
     ../../../Classes/c5printing.cpp \
-    ../../raw/rawmessage.cpp \
+    ../../../Service5Working/raw/rawmessage.cpp \
     ../../socket/sslsocket.cpp \
     ../../utils/configini.cpp \
     ../../utils/database.cpp \
@@ -34,7 +34,7 @@ SOURCES += \
 HEADERS += \
     ../../../../NewTax/Src/printtaxn.h \
     ../../../Classes/c5printing.h \
-    ../../raw/rawmessage.h \
+    ../../../Service5Working/raw/rawmessage.h \
     ../../socket/sslsocket.h \
     ../../utils/configini.h \
     ../../utils/database.h \
@@ -53,7 +53,7 @@ HEADERS += \
     traiding.h \
     translator.h
 
-DEFINES += _DBDRIVER_=\\\"QMYSQL\\\"
+DEFINES += _DBDRIVER_=\\\"QMARIADB\\\"
 DEFINES += _APPLICATION_=\\\"Breeze\\\"
 DEFINES += _MODULE_=\\\"Service5_shopclientp_dll\\\"
 
@@ -63,6 +63,7 @@ INCLUDEPATH += ../../utils
 INCLUDEPATH += ../../../Classes
 
 INCLUDEPATH += C:/Projects/NewTax/Src
+INCLUDEPATH += C:/projects/Cafe5/Service5Working/raw
 INCLUDEPATH += C:/Soft/OpenSSL-Win64/include
 INCLUDEPATH += C:/Soft/OpenSSL-Win64/include/openssl
 LIBS += -LC:/Soft/OpenSSL-Win64/lib

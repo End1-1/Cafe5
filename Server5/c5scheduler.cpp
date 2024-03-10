@@ -23,9 +23,9 @@ c5scheduler::c5scheduler(QObject *parent) : QObject(parent)
 #endif
     fTimer.start();
     fRun = false;
-#ifdef QT_DEBUG
+
     timeout();
-#endif
+
 }
 
 void c5scheduler::timeout()

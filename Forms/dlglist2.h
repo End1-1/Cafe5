@@ -4,7 +4,7 @@
 #include "c5dialog.h"
 
 namespace Ui {
-class DlgList;
+class DlgList2;
 }
 
 class DlgList2 : public C5Dialog
@@ -22,7 +22,7 @@ private slots:
     void on_btnOK_clicked();
 
 private:
-    Ui::DlgList *ui;
+    Ui::DlgList2 *ui;
 };
 
 #endif // DLGLIST2_H

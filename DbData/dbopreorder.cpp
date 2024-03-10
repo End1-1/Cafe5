@@ -1,4 +1,5 @@
 #include "dbopreorder.h"
+#include "datadriver.h"
 #include "c5database.h"
 
 DbOPreorder::DbOPreorder() :
@@ -7,9 +8,18 @@ DbOPreorder::DbOPreorder() :
 
 }
 
+int DbOPreorder::guest(const QString &id)
+{
+    return get(id, "f_guest").toInt();
+}
+
 QString DbOPreorder::guestName(const QString &id)
 {
-    return get(id, "f_guestname").toString();
+    int guest = get(id, "f_guest").toInt();
+    if (guest == 0) {
+        return "-";
+    }
+    return dbpartner->name(guest);
 }
 
 double DbOPreorder::amount(const QString &id)

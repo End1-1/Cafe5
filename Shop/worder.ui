@@ -136,6 +136,11 @@
        <string>QR</string>
       </property>
      </column>
+     <column>
+      <property name="text">
+       <string>CD</string>
+      </property>
+     </column>
     </widget>
    </item>
    <item>
@@ -284,7 +289,6 @@
            </property>
            <property name="font">
             <font>
-             <weight>50</weight>
              <bold>false</bold>
             </font>
            </property>
@@ -303,7 +307,6 @@
            </property>
            <property name="font">
             <font>
-             <weight>50</weight>
              <bold>false</bold>
             </font>
            </property>
@@ -328,7 +331,6 @@
            </property>
            <property name="font">
             <font>
-             <weight>75</weight>
              <bold>true</bold>
             </font>
            </property>
@@ -366,7 +368,6 @@
            </property>
            <property name="font">
             <font>
-             <weight>50</weight>
              <bold>false</bold>
             </font>
            </property>
@@ -421,7 +422,6 @@
            </property>
            <property name="font">
             <font>
-             <weight>50</weight>
              <bold>false</bold>
             </font>
            </property>

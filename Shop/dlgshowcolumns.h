@@ -28,6 +28,8 @@ private slots:
 
     void on_chEmarks_clicked(bool checked);
 
+    void on_chCheckDiscount_clicked(bool checked);
+
 private:
     Ui::DlgShowColumns *ui;
 };

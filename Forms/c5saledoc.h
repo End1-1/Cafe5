@@ -59,6 +59,7 @@ private slots:
     void on_btnEditAccounts_clicked();
     void on_leCash_textChanged(const QString &arg1);
     void on_btnDeliveryMan_clicked();
+    void on_btnQr_clicked();
 
 private:
     Ui::C5SaleDoc *ui;
@@ -82,6 +83,7 @@ private:
     void setDeliveryMan();
     void exportToAs(int doctype);
     bool fOpenedFromDraft;
+    QStringList fEmarks;
     QMap<int, QString> fListOfStorages;
     QMap<int, double> fSpecialPrices;
 };

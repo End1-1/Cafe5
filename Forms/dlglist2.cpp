@@ -3,7 +3,7 @@
 
 DlgList2::DlgList2(const QStringList &dbParams, QWidget *parent) :
     C5Dialog(dbParams, parent),
-    ui(new Ui::DlgList)
+    ui(new Ui::DlgList2)
 {
     ui->setupUi(this);
 }

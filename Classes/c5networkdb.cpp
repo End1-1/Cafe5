@@ -23,13 +23,14 @@ bool C5NetworkDB::query()
     t.start();
     QEventLoop loop;
     QNetworkAccessManager m;
-    QNetworkRequest rq(fHost);
+    QNetworkRequest rq((QUrl(fHost)));
     rq.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    m.setProxy(QNetworkProxy::NoProxy);
-    // QSslConfiguration sslConf = rq.sslConfiguration();
-    // sslConf.setPeerVerifyMode(QSslSocket::VerifyNone);
-    // sslConf.setProtocol(QSsl::AnyProtocol);
-    // rq.setSslConfiguration(sslConf);
+
+//    m.setProxy(QNetworkProxy::NoProxy);
+//    QSslConfiguration sslConf = rq.sslConfiguration();
+//    sslConf.setPeerVerifyMode(QSslSocket::VerifyNone);
+//    sslConf.setProtocol(QSsl::AnyProtocol);
+//    rq.setSslConfiguration(sslConf);
     QJsonObject jo;
     jo["sk"] = "5cfafe13-a886-11ee-ac3e-1078d2d2b808";
     jo["call"] = "sql";
@@ -40,8 +41,9 @@ bool C5NetworkDB::query()
     if (r->error() != QNetworkReply::NoError) {
         fJsonOut["status"] = 0;
         fJsonOut["data"] = r->errorString();
+        LogWriter::write(LogWriterLevel::verbose, "",rq.url().toString());
         LogWriter::write(LogWriterLevel::verbose, "",
-                         QString("Elapsed: %1, query: %2, error: %3")
+                         QString("Elapsed: %1, query: %2, connection error: %3")
                              .arg(QString::number(t.elapsed()), fSql, fJsonOut["data"].toString()));
         return false;
     }
@@ -52,7 +54,7 @@ bool C5NetworkDB::query()
         fJsonOut["status"] = 0;
         fJsonOut["data"] = err.errorString();
         LogWriter::write(LogWriterLevel::errors, "",
-                         QString("Elapsed: %1, query: %2, error: %3")
+                         QString("Elapsed: %1, query: %2, parser error: %3")
                              .arg(QString::number(t.elapsed()), fSql, QString(ba) + "====" + err.errorString()));
         return false;
     }

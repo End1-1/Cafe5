@@ -816,7 +816,7 @@ bool C5OrderDriver::fetchDishesData(C5Database &db, const QString &header, const
     } else {
         sql += " ob.f_id='" + id + "' ";
     }
-    sql += " order by ob.f_row ";
+    sql += " order by ob.f_row, ob.f_appendtime ";
     if(!db.exec(sql)) {
         fLastError = db.fLastError;
         return false;

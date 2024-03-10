@@ -242,26 +242,36 @@
     <name>c5scheduler</name>
     <message>
         <location filename="c5scheduler.cpp" line="107"/>
-        <source>Order no</source>
+        <source>Պատվեր</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="c5scheduler.cpp" line="110"/>
-        <source>Date</source>
+        <source>Ամսաթիվ</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="c5scheduler.cpp" line="113"/>
-        <source>Time</source>
+        <source>Ժամ</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="c5scheduler.cpp" line="116"/>
-        <source>Staff</source>
+        <source>Սպասարկող</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="c5scheduler.cpp" line="169"/>
+        <location filename="c5scheduler.cpp" line="259"/>
+        <source>Date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c5scheduler.cpp" line="262"/>
+        <source>Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c5scheduler.cpp" line="187"/>
         <source>Printer: </source>
         <translation type="unfinished"></translation>
     </message>

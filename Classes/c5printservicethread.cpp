@@ -44,9 +44,10 @@ bool C5PrintServiceThread::run()
         db.rowToMap(fPreorderData);
     }
     db[":f_header"] = fHeader;
-    db[":f_state"] = DISH_STATE_OK;
+    db[":f_state1"] = DISH_STATE_OK;
+    db[":f_state2"] = DISH_STATE_SET;
     db.exec("select * from o_body b "
-            "where b.f_header=:f_header and b.f_state=:f_state "
+            "where b.f_header=:f_header and (b.f_state=:f_state1 or b.f_state=:f_state2) "
             "and (length(f_print1)>0 or length(f_print2)>0) and b.f_qty2=0 "
             "order by b.f_appendtime ");
     while (db.nextRow()) {
