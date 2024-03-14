@@ -51,6 +51,15 @@ void DbData::refresh()
     getFromDatabase();
 }
 
+void DbData::updateField(int id, const QString &field, const QVariant &value)
+{
+#ifdef QT_DEBUG
+    Q_ASSERT(fData.contains(id));
+    Q_ASSERT(fData[id].contains(field));
+#endif
+    fData[id][field] = value;
+}
+
 void DbData::getFromDatabase()
 {
     fData.clear();

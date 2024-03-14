@@ -318,6 +318,7 @@ HEADERS += \
     ../Classes/fileversion.h \
     ../Classes/goodsreserve.h \
     ../Classes/idram.h \
+    ../Classes/jsons.h \
     ../Classes/notificationwidget.h \
     ../Classes/outputofheader.h \
     ../Classes/proxytablewidgetdatabase.h \

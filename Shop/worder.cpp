@@ -60,6 +60,8 @@ WOrder::WOrder(C5User *user, int saleType, WCustomerDisplay *customerDisplay, QW
     fWorking = static_cast<Working*>(parent);
     ui->lbDisc->setVisible(false);
     ui->leDisc->setVisible(false);
+    ui->lbUseAccumulated->setVisible(false);
+    ui->leUseAccumulated->setVisible(false);
 
     noImage();
 
@@ -219,7 +221,11 @@ int WOrder::addGoodsToTable(int id, bool checkQtyOfStore, double qtyStore, const
        .arg(price));
 
     int row = ui->tblData->addEmptyRow();
-    ui->tblData->setCellWidget(row, col_check_discount, new C5CheckBox());
+    auto *ch = new C5CheckBox();
+    ch->setCheckable(s.value("learnaccumulate").toBool());
+    ch->setChecked(g.canDiscount() == 1);
+    connect(ch, &C5CheckBox::clicked, this, &WOrder::checkCardClicked);
+    ui->tblData->setCellWidget(row, col_check_discount, ch);
     OGoods og;
     og._groupName = g.group()->groupName();
     og._goodsName = g.goodsName();
@@ -238,6 +244,7 @@ int WOrder::addGoodsToTable(int id, bool checkQtyOfStore, double qtyStore, const
     og.discountFactor = fBHistory.value;
     og.discountMode = fBHistory.type;
     og.discountAmount = 0;
+    og.canDiscount = g.canDiscount();
     fOGoods.append(og);
     ui->tblData->setCurrentCell(row, 0);
     if (checkQtyOfStore) {
@@ -299,6 +306,11 @@ bool WOrder::writeOrder()
         C5Message::error(tr("Cashdesk for card not defined"));
         return false;
     }
+    bool prepaidReadonly = false;
+    if (ui->leUseAccumulated->getDouble() > 0) {
+        fOHeader.amountPrepaid = ui->leUseAccumulated->getDouble();
+        prepaidReadonly = true;
+    }
     if (fOHeader.amountCash < 0.001
             && fOHeader.amountCard < 0.001
             && fOHeader.amountBank < 0.001
@@ -312,7 +324,7 @@ bool WOrder::writeOrder()
     if (!DlgPaymentChoose::getValues(fOHeader.amountTotal, fOHeader.amountCash, fOHeader.amountCard, fOHeader.amountIdram,
                                      fOHeader.amountTelcell, fOHeader.amountBank, fOHeader.amountCredit,
                                      fOHeader.amountPrepaid, fOHeader.amountDebt,
-                                     fOHeader.amountCashIn, fOHeader.amountChange, fOHeader._printFiscal)) {
+                                     fOHeader.amountCashIn, fOHeader.amountChange, fOHeader._printFiscal, prepaidReadonly)) {
         return false;
     }
 
@@ -419,6 +431,12 @@ bool WOrder::writeOrder()
     }
     jdoc["goods"] = jg;
     QJsonObject jhistory;
+    if (!fAccCard.isEmpty()) {
+        QJsonObject jtemp = fAccCard["card"].toObject();
+        jtemp["accumulate"] = ui->leCurrentAccumulated->getDouble();
+        fAccCard["card"] = jtemp;
+        jdoc["accumulate"] = fAccCard;
+    }
     jhistory["f_card"] = fBHistory.card;
     jhistory["f_data"] = fBHistory.data;
     jhistory["f_type"] = fBHistory.type;
@@ -822,9 +840,12 @@ void WOrder::setDiscount(const QString &label, const QString &value)
 
 void WOrder::countTotal()
 {
+    double accAmount = 0;
     fOHeader.countAmount(fOGoods, fBHistory);
     ui->leTotal->setDouble(fOHeader.amountTotal);
-    ui->leDisc->setDouble(fOHeader.amountDiscount);
+    if (fAccCard.isEmpty()) {
+        ui->leDisc->setDouble(fOHeader.amountDiscount);
+    }
     for (int i = 0; i < fOGoods.count(); i++) {
         const OGoods &og = fOGoods.at(i);
         ui->tblData->setData(i, col_bacode, og._barcode);
@@ -857,7 +878,15 @@ void WOrder::countTotal()
                 }
             }
         }
+
+        if (fAccCard.isEmpty() == false) {
+            auto *ch = static_cast<C5CheckBox*>(ui->tblData->cellWidget(i, col_check_discount));
+            if (ch->isChecked()) {
+                accAmount += og.total * fAccCard["card"].toObject()["f_value"].toDouble();
+            }
+        }
     }
+    ui->leCurrentAccumulated->setDouble(accAmount);
     ui->leTotal->setDouble(fOHeader.amountTotal);
     C5Database db(__c5config.dbParams());
     QString err;
@@ -1000,6 +1029,27 @@ void WOrder::noImage()
     //ui->wimage->setVisible(false);
 }
 
+void WOrder::checkCardClicked(bool v)
+{
+    if (s.value("learnaccumulate").toBool()) {
+        int row = -1;
+        for (int i = 0; i < ui->tblData->rowCount(); i++) {
+            if (sender() == ui->tblData->cellWidget(i, col_check_discount)) {
+                row = i;
+                break;
+            }
+        }
+        if (row > -1) {
+            C5Database db(__c5config.dbParams());
+            db[":f_candiscount"] = v ? 1 : 0;
+            db.update("c_goods", "f_id", fOGoods[row].goods);
+
+            dbgoods->updateField(fOGoods[row].goods, "f_candiscount", v ? 1 : 0);
+        }
+    }
+    countTotal();
+}
+
 void WOrder::on_leCode_textChanged(const QString &arg1)
 {
     if (arg1 == "+") {
@@ -1068,6 +1118,29 @@ void WOrder::on_leCode_returnPressed()
 
     C5Database db(__c5config.replicaDbParams());
     code.replace(";", "").replace("?", "");
+
+    QJsonObject checkCard;
+    checkCard["code"] = code;
+    QString sql = QString("select sf_check_card('%1')").arg(__jsonstr(checkCard));
+    db.exec(sql);
+    db.nextRow();
+    checkCard = __strjson(db.getString(0));
+    if (checkCard["status"].toInt() == 1) {
+        checkCard = checkCard["data"].toObject();
+        ui->leDisc->setText(QString("%1%").arg(float_str(checkCard["card"].toObject()["f_value"].toDouble() * 100, 2)));
+        ui->leDisc->setVisible(true);
+        ui->lbDisc->setVisible(true);
+        ui->leGiftCardAmount->setDouble(checkCard["history"].toObject()["f_amount"].toDouble());
+        ui->leContact->setText(checkCard["customer"].toObject()["f_name"].toString());
+        fAccCard = checkCard;
+        ui->leUseAccumulated->setReadOnly(!(ui->leGiftCardAmount->getDouble() > 0));
+        ui->lbUseAccumulated->setVisible(true);
+        ui->leUseAccumulated->setVisible(true);
+        countTotal();
+        return;
+    }
+
+
     QJsonObject params;
     params["scancode"] = code;
     params["settings"] = __c5config.fSettingsName;
@@ -1174,3 +1247,14 @@ void WOrder::on_btnSearchPartner_clicked()
         on_leCustomerTaxpayerId_returnPressed();
     }
 }
+
+void WOrder::on_leUseAccumulated_textChanged(const QString &arg1)
+{
+    if (arg1.toDouble() > ui->leGiftCardAmount->getDouble()) {
+        ui->leUseAccumulated->setDouble(ui->leGiftCardAmount->getDouble());
+    }
+    if (ui->leUseAccumulated->getDouble() > ui->leTotal->getDouble()) {
+        ui->leUseAccumulated->setDouble(ui->leTotal->getDouble());
+    }
+}
+

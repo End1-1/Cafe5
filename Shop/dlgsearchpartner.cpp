@@ -44,6 +44,9 @@ void DlgSearchPartner::loadPartners()
 void DlgSearchPartner::on_tbl_cellDoubleClicked(int row, int column)
 {
     Q_UNUSED(column);
+    for (int i = 0; i < ui->tbl->columnCount(); i++) {
+        fData[i] = ui->tbl->item(row, i)->data(Qt::EditRole);
+    }
     result = ui->tbl->item(row, 1)->text();
     accept();
 }

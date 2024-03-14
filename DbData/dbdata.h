@@ -23,6 +23,8 @@ public:
 
     virtual void refresh();
 
+    void updateField(int id, const QString &field, const QVariant &value);
+
 protected:
     int fId;
 

@@ -7,6 +7,7 @@
 struct Dish {
     int id;
     int typeId;
+    int state;
     QString typeName;
     QString name;
     QString printer;
@@ -31,6 +32,7 @@ struct Dish {
     QString f_emarks;
     Dish() {
         id = 0;
+        state = 1;
         typeId = 0;
         store = 0;
         price = 0;
@@ -44,6 +46,7 @@ struct Dish {
     }
     Dish(Dish *d) {
         id = d->id;
+        state = d->state;
         typeId = d->typeId;
         typeName = d->typeName;
         name = d->name;

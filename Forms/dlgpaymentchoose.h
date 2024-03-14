@@ -18,7 +18,7 @@ public:
     ~DlgPaymentChoose();
     static bool getValues(double total, double &cash, double &card, double &idram, double &telcell, double &bank,
                           double &credit,
-                          double &prepaid, double &debt, double &cashin, double &change, bool &fiscal);
+                          double &prepaid, double &debt, double &cashin, double &change, bool &fiscal, bool readOnlyPrepaid);
 
     virtual void keyEnter() override;
 

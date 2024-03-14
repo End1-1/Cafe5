@@ -29,6 +29,8 @@ public:
 
     QString scancode();
 
+    int canDiscount();
+
     bool acceptIntegerQty();
 
     double retailPrice();

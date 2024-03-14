@@ -30,7 +30,8 @@ DlgPaymentChoose::~DlgPaymentChoose()
 
 bool DlgPaymentChoose::getValues(double total, double &cash, double &card, double &idram, double &telcell, double &bank,
                                  double &credit,
-                                 double &prepaid, double &debt, double &cashin, double &change, bool &fiscal)
+                                 double &prepaid, double &debt, double &cashin, double &change, bool &fiscal,
+                                    bool readOnlyPrepaid)
 {
     DlgPaymentChoose d(__c5config.dbParams());
     d.ui->leTotal->setDouble(total);
@@ -59,6 +60,7 @@ bool DlgPaymentChoose::getValues(double total, double &cash, double &card, doubl
         fiscal = d.ui->btnFiscal->isChecked();
         return true;
     }
+    d.ui->lePrepaid->setReadOnly(readOnlyPrepaid);
     return false;
 }
 

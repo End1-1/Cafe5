@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>683</width>
-    <height>144</height>
+    <height>172</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,14 +21,23 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="0">
+   <item row="3" column="2" colspan="4">
+    <widget class="C5LineEdit" name="lePercent"/>
+   </item>
+   <item row="3" column="0">
     <widget class="QLabel" name="label_3">
      <property name="text">
       <string>Կուտակային տոկոս</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="0" colspan="6">
+   <item row="0" column="2" colspan="4">
+    <widget class="QLineEdit" name="leCode"/>
+   </item>
+   <item row="1" column="2" colspan="3">
+    <widget class="C5LineEdit" name="lePartner"/>
+   </item>
+   <item row="4" column="0" colspan="6">
     <widget class="QWidget" name="widget" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
@@ -88,14 +97,15 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="2" colspan="3">
-    <widget class="C5LineEdit" name="lePartner"/>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Հեռախոս</string>
+     </property>
+    </widget>
    </item>
-   <item row="0" column="2" colspan="4">
-    <widget class="QLineEdit" name="leCode"/>
-   </item>
-   <item row="2" column="2" colspan="4">
-    <widget class="QLineEdit" name="lePercent"/>
+   <item row="2" column="2">
+    <widget class="C5LineEdit" name="lePhone"/>
    </item>
   </layout>
  </widget>
@@ -109,6 +119,7 @@
  <tabstops>
   <tabstop>leCode</tabstop>
   <tabstop>lePartner</tabstop>
+  <tabstop>lePhone</tabstop>
   <tabstop>lePercent</tabstop>
   <tabstop>toolButton</tabstop>
   <tabstop>btnRegister</tabstop>

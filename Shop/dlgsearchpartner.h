@@ -15,6 +15,7 @@ public:
     explicit DlgSearchPartner();
     ~DlgSearchPartner();
     QString result;
+    QMap<int, QVariant> fData;
 
 private slots:
     void on_btnAddPartner_clicked();

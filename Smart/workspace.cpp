@@ -201,6 +201,7 @@ bool Workspace::login()
     while (db.nextRow()) {
         Dish *d = new Dish();
         d->id = db.getInt(0);
+        d->state = DISH_STATE_OK;
         d->typeId = db.getInt(1);
         d->name = db.getString(2);
         d->printer = db.getString(3);
@@ -386,10 +387,12 @@ void Workspace::removeDish(int rownum, const QString &packageuuid)
         }
         db[":f_state"] = DISH_STATE_VOID;
         db.update("o_body", "f_id", d.obodyId);
+        d.state = DISH_STATE_VOID;
         ui->tblOrder->removeRow(row);
         if (row < ui->tblOrder->rowCount()) {
             ui->tblOrder->setCurrentCell(row, 0);
         }
+        fFlagEdited = 1;
         countTotal();
         return;
     }
@@ -402,6 +405,7 @@ void Workspace::removeDish(int rownum, const QString &packageuuid)
 
         db[":f_id"] = d.obodyId;
         db[":f_state"] = DISH_STATE_MISTAKE;
+        d.state = DISH_STATE_MISTAKE;
         db.exec("update o_body set f_state=:f_state where f_id=:f_id");
         C5Airlog::write(hostinfo, fUser->fullName(), 1, d.obodyId, fOrderUuid, "", tr("Remove dish"), d.name + " " + d.modificator, float_str(d.qty, 2));
     }
@@ -467,6 +471,9 @@ void Workspace::countTotal()
         }
         for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
             Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
+            if (d.state != DISH_STATE_OK) {
+                continue;
+            }
             for (QMap<QString, QList<QString> >::const_iterator it = dishgroups.constBegin(); it != dishgroups.constEnd(); it++) {
                 if (it.value().contains(QString::number(d.id))) {
                     dishamounts[it.key()] = dishamounts[it.key()] + (d.qty * d.price);
@@ -507,6 +514,9 @@ void Workspace::countTotal()
     fDiscountAmount = 0;
     for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
         Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
+        if (d.state != DISH_STATE_OK) {
+            continue;
+        }
         switch (fDiscountMode) {
         case CARD_TYPE_DISCOUNT:
             total += (d.price - (d.price * fDiscountValue)) * d.qty;
@@ -788,6 +798,7 @@ void Workspace::on_btnCheckout_clicked()
         d->moveToThread(t);
         t->start();
     }
+    C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Close order"), "", "");
 
     ordcount ++;
     resetOrder();
@@ -1433,7 +1444,10 @@ int Workspace::printTax(double cardAmount, double idramAmount)
     if (jsonErr.error != QJsonParseError::NoError) {
         C5Message::error(jsonIn);
     }
-    db.exec(QString("call sf_create_shop_tax('%1')").arg(QString(QJsonDocument(jtax).toJson(QJsonDocument::Compact))));
+    QString sql = QString(QJsonDocument(jtax).toJson(QJsonDocument::Compact));
+    sql.replace("\\\"", "\\\\\"");
+    sql.replace("'", "\\'");
+    db.exec(QString("call sf_create_shop_tax('%1')").arg(sql));
     if (result != pt_err_ok) {
         switch (C5Message::question(err, tr("Try again"), tr("Do not print fiscal"), tr("Return to editing"))) {
         case QDialog::Rejected:
@@ -1719,10 +1733,24 @@ bool Workspace::printReceipt(const QString &id, bool printSecond, bool precheck)
 
 void Workspace::printService()
 {
+    if (fFlagEdited == 0) {
+        bool notprint = true;
+        for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
+            Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
+            if (d.printer.length() > 0 && d.qty2 < 0.01) {
+                notprint = false;
+            }
+        }
+        if (notprint) {
+            return;
+        }
+    }
+
     QSet<QString> prn;
     for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
         Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
-        if (d.printer.length() > 0 && d.qty2 < 0.01) {
+        //if (d.printer.length() > 0 && d.qty2 < 0.01) {
+        if (d.printer.length() > 0) {
             prn.insert(d.printer);
         }
     }
@@ -1768,7 +1796,8 @@ void Workspace::printService()
         p.br();
         for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
             Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
-            if (d.printer == s && d.qty2 < 0.01) {
+            //if (d.printer == s && d.qty2 < 0.01) {
+            if (d.printer == s) {
                 p.setFontSize(basesize);
                 p.setFontBold(true);
                 p.ltext(d.name, 0);
@@ -1803,7 +1832,8 @@ void Workspace::printService()
     prn.clear();
     for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
         Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
-        if (d.printer2.length() > 0 && d.qty2 < 0.01) {
+        //if (d.printer2.length() > 0 && d.qty2 < 0.01) {
+        if (d.printer2.length() > 0) {
             prn.insert(d.printer2);
         }
     }
@@ -1882,8 +1912,11 @@ void Workspace::printService()
             db.rollback();
             return;
         }
-        ui->tblOrder->item(i, 0)->setData(Qt::UserRole, qVariantFromValue(d));
+        ui->tblOrder->item(i, 0)->setData(Qt::UserRole, QVariant::fromValue(d));
     }
+
+    fFlagEdited = false;
+    C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Print service"), "", "");
 }
 
 void Workspace::showCustomerDisplay()
@@ -1996,6 +2029,12 @@ void Workspace::addDishToOrder(Dish *d)
 {
     if (!fOrderUuid.isEmpty()) {
         C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("New dish"), d->name, "");
+    }
+    for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
+        Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
+        if (d.qty2 > 0.01) {
+            fFlagEdited = true;
+        }
     }
     int row = 0;
     bool isnew = true;
@@ -2126,6 +2165,11 @@ void Workspace::on_tblTables_itemClicked(QTableWidgetItem *item)
             fDiscountCard = bh.card;
             fDiscountValue = bh.value;
         }
+        db[":f_id"] = fOrderUuid;
+        db.exec("select * from o_header_flags where f_id=:f_id");
+        if (db.nextRow()) {
+            fFlagEdited = db.getInt("f_2");
+        }
 
         db[":f_header"] = fOrderUuid;
         db[":f_state"] = DISH_STATE_OK;
@@ -2135,6 +2179,7 @@ void Workspace::on_tblTables_itemClicked(QTableWidgetItem *item)
                 "left join d_dish d on d.f_id=b.f_dish "
                 "where b.f_header=:f_header AND b.f_state=:f_state "
                 "order by b.f_row ");
+        int tempFlagEdited = fFlagEdited;
         while (db.nextRow()) {
             Dish d;
             d.obodyId = db.getString("f_id");
@@ -2150,7 +2195,7 @@ void Workspace::on_tblTables_itemClicked(QTableWidgetItem *item)
             d.f_emarks = db.getString("f_emarks");
             addDishToOrder(&d);
         }
-
+        fFlagEdited = tempFlagEdited;
         if (fCustomer > 0) {
             db[":f_id"] = fCustomer;
             db.exec("select * from c_partners where f_id=:f_id");
@@ -2159,7 +2204,7 @@ void Workspace::on_tblTables_itemClicked(QTableWidgetItem *item)
                 ui->lbCostumerPhone->setVisible(true);
             }
         }
-        fFlagEdited = 1;
+
         C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Open order"), QString::number(fTable),  "");
     } else {
 

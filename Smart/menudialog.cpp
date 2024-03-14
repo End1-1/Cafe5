@@ -71,6 +71,8 @@ void MenuDialog::on_btnReturnFiscalReceipt_clicked()
     accept();
     QString number;
     if (TouchEnterTaxReceiptNumber::getTaxReceiptNumber(number)) {
+        QElapsedTimer et;
+        et.start();
         C5Database db(C5Config::dbParams());
         db[":f_receiptnumber"] = number;
         db.exec("select * from o_tax where cast(f_receiptnumber as signed)=cast(:f_receiptnumber as signed)");
@@ -87,29 +89,39 @@ void MenuDialog::on_btnReturnFiscalReceipt_clicked()
         int result;
         result = pt.printTaxback(number, crn, jsnin, jsnout, err);
 
-        db[":f_id"] = db.uuid();
-        db[":f_order"] = uuid;
-        db[":f_date"] = QDate::currentDate();
-        db[":f_time"] = QTime::currentTime();
-        db[":f_in"] = jsnin;
-        db[":f_out"] = jsnout;
-        db[":f_err"] = err;
-        db[":f_result"] = result;
-        db.insert("o_tax_log", false);
-        if (result != pt_err_ok) {
-            QSqlQuery *q = new QSqlQuery(db.fDb);
-            pt.saveTimeResult(uuid, *q);
-            delete q;
-            C5Message::error(err);
-        } else {
-            if (uuid != "--") {
-                db[":f_fiscal"] = QVariant();
-                db[":f_receiptnumber"] = QVariant();
-                db[":f_time"] = QVariant();
-                db.update("o_tax", "f_id", uuid);
-            }
-            C5Message::info(tr("Complete"));
+//        db[":f_id"] = db.uuid();
+//        db[":f_order"] = uuid;
+//        db[":f_date"] = QDate::currentDate();
+//        db[":f_time"] = QTime::currentTime();
+//        db[":f_in"] = jsnin;
+//        db[":f_out"] = jsnout;
+//        db[":f_err"] = err;
+//        db[":f_result"] = result;
+//        db.insert("o_tax_log", false);
+
+        QJsonParseError jerr;
+        QJsonDocument jod = QJsonDocument::fromJson(jsnout.toUtf8(), &jerr);
+        if (jerr.error != QJsonParseError::NoError) {
+            err = jerr.errorString();
+            jod = QJsonDocument::fromJson(QString("{\"data\":\"" + jsnout + "\"").toUtf8(), &jerr);
         }
+
+        QJsonObject jtax;
+        jtax["f_order"] = uuid;
+        jtax["f_elapsed"] = et.elapsed();
+        jtax["f_in"] = QJsonDocument::fromJson(jsnin.toUtf8()).object();
+        jtax["f_out"] = jod.object();
+        jtax["f_err"] = err;
+        jtax["f_result"] = result;
+        jtax["f_state"] = result == pt_err_ok ? 1 : 0;
+        QString sql = QString(QJsonDocument(jtax).toJson(QJsonDocument::Compact));
+        sql.replace("\\\"", "\\\\\"");
+        sql.replace("'", "\\'");
+        db.exec(QString("call sf_create_shop_tax('%1')").arg(sql));
+        if (result != pt_err_ok) {
+            C5Message::error(err);
+        }
+
     }
 }
 

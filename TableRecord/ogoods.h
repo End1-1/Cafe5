@@ -25,6 +25,7 @@ public:
     int return_ = 0;
     QString returnFrom;
     int isService = 0;
+    int canDiscount = 0;
 
     QString _groupName;
     QString _goodsName;

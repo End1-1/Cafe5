@@ -7,6 +7,7 @@
 #include "oheader.h"
 #include "ogoods.h"
 #include "odraftsale.h"
+#include "jsons.h"
 #include <QWidget>
 #include <QDate>
 #include <QTime>
@@ -113,6 +114,8 @@ private slots:
 
     void noImage();
 
+    void checkCardClicked(bool v);
+
     void on_leCode_textChanged(const QString &arg1);
 
     void on_leCode_returnPressed();
@@ -120,6 +123,8 @@ private slots:
     void on_leCustomerTaxpayerId_returnPressed();
 
     void on_btnSearchPartner_clicked();
+
+    void on_leUseAccumulated_textChanged(const QString &arg1);
 
 private:
     Ui::WOrder *ui;
@@ -133,6 +138,8 @@ private:
     int fGiftCard;
 
     BHistory fBHistory;
+
+    QJsonObject fAccCard;
 
     QVector<OGoods> fOGoods;
 

@@ -18,6 +18,10 @@ public:
 private slots:
     void on_toolButton_clicked();
 
+    void on_btnCancel_clicked();
+
+    void on_btnRegister_clicked();
+
 private:
     Ui::DlgRegisterCard *ui;
 };

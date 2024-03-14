@@ -60,6 +60,11 @@ QString DbGoods::scancode()
     return dbgoods->get(fId, "f_scancode").toString();
 }
 
+int DbGoods::canDiscount()
+{
+    return dbgoods->get(fId, "f_candiscount").toInt();
+}
+
 bool DbGoods::acceptIntegerQty()
 {
     return dbgoods->get(fId, "f_wholenumber").toInt() == 1;
