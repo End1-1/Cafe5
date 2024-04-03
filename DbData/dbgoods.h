@@ -25,6 +25,8 @@ public:
 
     QString goodsName();
 
+    QString goodsFiscalName();
+
     QString scancode(int id);
 
     QString scancode();

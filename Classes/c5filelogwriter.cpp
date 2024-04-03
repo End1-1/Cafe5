@@ -39,7 +39,7 @@ void C5FileLogWriter::run()
         file.close();
     }
 #ifdef QT_DEBUG
-    qDebug() << fMessage;
+    qDebug() << fMessage.left(5000);
 #endif
     emit finished();
 }

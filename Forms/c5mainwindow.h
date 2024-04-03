@@ -14,6 +14,7 @@ class C5MainWindow;
 class C5ToolBarWidget;
 class QListWidget;
 class C5Widget;
+class NTableWidget;
 
 class C5MainWindow : public QMainWindow
 {
@@ -34,6 +35,10 @@ public:
         t->postProcess();
         return t;
     }
+
+    NTableWidget *createNTab(const QString &route);
+
+    void nTabDesign(const QIcon &icon, const QString &label, NTableWidget *widget);
 
     void removeTab(QWidget *w);
 

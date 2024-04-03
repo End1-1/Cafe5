@@ -18,17 +18,17 @@ public:
 
     ~CE5Goods();
 
-    virtual QString title();
+    virtual QString title() override;
 
-    virtual QString table();
+    virtual QString table() override;
 
-    virtual QString dbError(QString err);
+    virtual QString dbError(QString err) override;
 
-    virtual void setId(int id);
+    virtual void setId(int id) override;
 
-    virtual bool save(QString &err, QList<QMap<QString, QVariant> > &data);
+    virtual bool save(QString &err, QList<QMap<QString, QVariant> > &data) override;
 
-    virtual void clear();
+    virtual void clear() override;
 
     virtual QPushButton *b1() override;
 

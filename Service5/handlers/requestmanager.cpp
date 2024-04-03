@@ -25,7 +25,7 @@ void RequestManager::init()
     for (auto &s: dll) {
         QLibrary *l = new QLibrary(qApp->applicationDirPath() + "/handlers/" + s);
         if (!l->load()) {
-            LogWriter::write(LogWriterLevel::errors, "", QString("Did not load %1 %2").arg(s, l->errorString()));
+            LogWriter::write(LogWriterLevel::errors, "", QString("Did not load %1 from %2").arg(s, l->errorString()));
             l->deleteLater();
             continue;
         }
@@ -41,7 +41,7 @@ void RequestManager::init()
             continue;
         }
         for (const QString &r: sl) {
-            LogWriter::write(LogWriterLevel::verbose, "", QString("Loaded route %1").arg(r));
+            LogWriter::write(LogWriterLevel::verbose, "", QString("Loaded route %1 from %2").arg(r, s));
             fInstance->fRouteDll[r] = s;
             handle_route h = reinterpret_cast<handle_route>(l->resolve(r.toLatin1().data()));
             fInstance->fRouteFunction.insert(r, h);

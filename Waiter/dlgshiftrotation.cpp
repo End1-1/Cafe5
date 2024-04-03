@@ -72,8 +72,9 @@ void DlgShiftRotation::on_btnChange_clicked()
 //        return;
 //    }
     db[":f_state"] = ORDER_STATE_OPEN;
-    db.exec("select o.f_id, o.f_hall, h.f_settings, ohh.f_roomrate "
+    db.exec("select o.f_id, o.f_hall, if(t.f_special_config>0, t.f_special_config, h.f_settings) as f_settings, ohh.f_roomrate "
             "from o_header o "
+            "left join h_tables t on t.f_id=o.f_table "
             "left join h_halls h on h.f_id=o.f_hall "
             "left join o_header_hotel ohh on ohh.f_id=o.f_id "
             "where o.f_state=:f_state ");

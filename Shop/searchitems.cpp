@@ -40,7 +40,7 @@ void SearchItems::on_btnSearch_clicked()
     db[":f_store"] = __c5config.defaultStore();
     db[":f_reservestate"] = GR_RESERVED;
     db.exec("select ss.f_name as f_storename,g.f_name as f_goodname,g.f_scancode, "
-            "u.f_name as f_unit,gpr.f_price1,gpr.f_price2, sum(s.f_qty*s.f_type) as f_qty, "
+            "u.f_name as f_unit,if(gpr.f_price1disc>0,gpr.f_price1disc, gpr.f_price1) as f_price1,gpr.f_price2, sum(s.f_qty*s.f_type) as f_qty, "
             "coalesce(rs.f_qty, 0) as f_reserveqty, s.f_store, s.f_goods "
             "from a_store s "
             "inner join c_storages ss on ss.f_id=s.f_store "
@@ -54,7 +54,7 @@ void SearchItems::on_btnSearch_clicked()
             "having sum(s.f_qty*s.f_type) > 0 "
             "union "
             "select '-', g.f_name as f_goodname,g.f_scancode, "
-            "u.f_name as f_unit,gpr.f_price1,gpr.f_price2, 99999 as f_qty, "
+            "u.f_name as f_unit,if(gpr.f_price1disc>0,gpr.f_price1disc,gpr.f_price1) as f_price1, gpr.f_price2, 99999 as f_qty, "
             "coalesce(rs.f_qty, 0) as f_reserveqty, 1, g.f_id as f_goods "
             "from c_goods g "
             "inner join c_units u on u.f_id=g.f_unit "

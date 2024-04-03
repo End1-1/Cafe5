@@ -28,6 +28,8 @@
 #include "c5checkbox.h"
 #include <QInputDialog>
 #include <QSettings>
+#include <QDir>
+#include <QFile>
 
 static QSettings s(_ORGANIZATION_, _APPLICATION_+ QString("\\") + _MODULE_);
 
@@ -229,6 +231,7 @@ int WOrder::addGoodsToTable(int id, bool checkQtyOfStore, double qtyStore, const
     OGoods og;
     og._groupName = g.group()->groupName();
     og._goodsName = g.goodsName();
+    og._goodsFiscalName = g.goodsFiscalName();
     og._unitName = g.unit()->unitName();
     og._barcode = g.scancode();
     og._qtybox = g.qtyBox();
@@ -399,6 +402,8 @@ bool WOrder::writeOrder()
     jh["f_partner"] = fOHeader.partner;
     jh["f_currency"] = fOHeader.currency;
     jh["f_taxpayertin"] = fOHeader.taxpayerTin;
+    jh["f_cash"] = fOHeader.amountCashIn;
+    jh["f_change"] = fOHeader.amountChange;
     jdoc["header"] = jh;
     QJsonArray jg;
     for (int i = 0; i < fOGoods.count(); i++) {
@@ -488,7 +493,7 @@ bool WOrder::writeOrder()
                 pt.addGoods(g.taxDept.toInt(), //dep
                             g.adgCode, //adg
                             QString::number(g.goods), //goods id
-                            g._goodsName, //name
+                            g._goodsFiscalName.isEmpty() ? g._goodsName : g._goodsFiscalName, //name
                             g.price / g._qtybox, //price
                             g.qty, //qty
                             fBHistory.value * 100); //discount
@@ -504,6 +509,23 @@ bool WOrder::writeOrder()
         if (jerr.error != QJsonParseError::NoError) {
             err = jerr.errorString();
             jod = QJsonDocument::fromJson(QString("{\"data\":\"" + jsonOut + "\"").toUtf8(), &jerr);
+        }
+
+
+        QDir dir = QDir::tempPath();
+        QFile file(dir.tempPath() + "/printtax_errors.txt");
+        if (file.open(QIODevice::WriteOnly)) {
+            file.write(QDateTime::currentDateTime().toString("dd/MM/yyyy HH:mm:ss").toUtf8());
+            file.write("\r\n");
+            file.write("IN");
+            file.write("\r\n");
+            file.write(jsonIn.toUtf8());
+            file.write("\r\n");
+            file.write("OUT");
+            file.write("\r\n");
+            file.write(jsonOut.toUtf8());
+            file.write("\r\n");
+            file.close();
         }
 
 
@@ -1018,6 +1040,7 @@ void WOrder::readEmarks()
     }
     if (qr.length() > 0 && qr.length() < 20) {
         C5Message::error(tr("Incorrect eMarks"));
+        ui->leCode->setFocus();
         return;
     }
     fOGoods[row].emarks = qr;

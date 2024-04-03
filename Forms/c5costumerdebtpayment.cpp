@@ -48,6 +48,7 @@ void C5CostumerDebtPayment::setId(const QString &id)
     ui->leCostumer->setValue(fBClientDebt.costumer);
     ui->leAmount->setDouble(fBClientDebt.amount);
     ui->leCurrency->setText(fBClientDebt.currencyName(db));
+    ui->leComment->setText(fBClientDebt.comment);
     ui->btnRemove->setEnabled(true);
 }
 
@@ -88,6 +89,7 @@ void C5CostumerDebtPayment::on_btnOK_clicked()
     fBClientDebt.costumer = ui->leCostumer->getInteger();
     fBClientDebt.amount = ui->leAmount->getDouble();
     fBClientDebt.flag = ui->leHall->getInteger();
+    fBClientDebt.comment = ui->leComment->text();
     if (fBClientDebt.id == 0) {
         if (ui->leAmount->getDouble() > 0) {
             C5CashDoc *doc = new C5CashDoc(fDBParams);

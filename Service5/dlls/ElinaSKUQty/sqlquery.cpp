@@ -45,7 +45,8 @@ bool skuqty(const QByteArray &indata, QByteArray &outdata, const QHash<QString, 
         return rh.setResponse(HTTP_FORBIDDEN, "Access denied");
     }
 
-    db.exec("SELECT g.f_scancode AS sku, gp.f_price1 AS price, g.f_name as name "
+    db.exec("SELECT g.f_scancode AS sku, gp.f_price1 AS price, g.f_name as name, "
+            "gp.f_price1 as price1, coalesce(gp.f_price1disc, 0) as price2 "
             "FROM c_goods g "
             "LEFT join c_goods_prices gp ON gp.f_goods=g.f_id AND gp.f_currency=1 "
             "WHERE LENGTH(g.f_scancode)>0 AND gp.f_price1 >0");
@@ -54,6 +55,8 @@ bool skuqty(const QByteArray &indata, QByteArray &outdata, const QHash<QString, 
         QJsonObject js;
         js["sku"] = db.string("sku");
         js["price"] = db.doubleValue("price");
+        js["price1"] = db.doubleValue("price1");
+        js["price2"] = db.doubleValue("price2");
         js["name"] = db.string("name");
         ja.append(js);
     }

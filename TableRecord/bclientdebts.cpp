@@ -22,6 +22,7 @@ bool BClientDebts::getRecord(C5Database &db)
     store = db.getString("f_storedoc");
     amount = db.getDouble("f_amount");
     currency = db.getInt("f_currency");
+    comment = db.getString("f_comment");
     flag = db.getInt("f_flag");
 }
 
@@ -37,6 +38,7 @@ void BClientDebts::bind(C5Database &db)
     db[":f_amount"] = amount;
     db[":f_currency"] = currency;
     db[":f_flag"] = flag;
+    db[":f_comment"] = comment;
 }
 
 bool BClientDebts::write(C5Database &db, QString &err)

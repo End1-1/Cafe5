@@ -630,6 +630,7 @@ bool C5OrderDriver::addDish(int menuid, const QString &comment, double price)
     db[":f_canservice"] = dbdish->canService(dbmenu->dishid(menuid));
     db[":f_guest"] = 1;
     db[":f_row"] = dishesCount();
+    db[":f_appenduser"] = headerValue("f_currentstaff");
     db[":f_appendtime"] = QDateTime::currentDateTime();
     if (!db.insert("o_body", false)) {
         fLastError = db.fLastError;

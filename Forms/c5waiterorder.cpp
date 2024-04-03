@@ -164,14 +164,14 @@ void C5WaiterOrder::showLog()
     ui->tblLog->clearContents();
     C5Database db(fDBParams);
     db[":f_invoice"] = ui->leUuid->text();
-    db.exec("select f_date, f_time, f_user, f_action, f_value1, f_value2 "
+    db.exec("select f_date, f_time, f_user, f_action, f_value1, f_value2, f_id "
             "from airlog.log "
             "where f_invoice=:f_invoice "
             "union "
-            "select f_date, f_time, '', 'TAX', f_err, f_result "
+            "select f_date, f_time, '', 'TAX', f_err, f_result, 0 "
             "from o_tax_log "
             "where f_order=:f_invoice "
-            "order by 1 desc, 2 desc ");
+            "order by 1 desc, f_time desc, 6 desc ");
     ui->tblLog->setRowCount(db.rowCount());
     int row = 0;
     while (db.nextRow()) {

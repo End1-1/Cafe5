@@ -19,6 +19,7 @@ public:
     double amount = 0;
     int currency = 0;
     int flag = 0;
+    QString comment;
 
     QString currencyName(C5Database &db) const;
     virtual bool getRecord(C5Database &db) override;

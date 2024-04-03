@@ -12,14 +12,14 @@ class CR5CostumerDebts : public C5ReportWidget
 public:
     CR5CostumerDebts(const QStringList &dbParams, QWidget *parent = nullptr);
 
-    virtual QToolBar *toolBar();
+    virtual QToolBar *toolBar() override;
 
     virtual void buildQuery() override;
 
 protected:
     virtual void restoreColumnsWidths() override;
 
-    virtual bool tblDoubleClicked(int row, int column, const QList<QVariant> &vals);
+    virtual bool tblDoubleClicked(int row, int column, const QList<QVariant> &vals) override;
 
 private:
     CR5CostumerDebtsFilter *fFilter;

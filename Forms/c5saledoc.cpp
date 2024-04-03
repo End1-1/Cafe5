@@ -46,6 +46,8 @@ C5SaleDoc::C5SaleDoc(const QStringList &dbParams, QWidget *parent) :
     ui(new Ui::C5SaleDoc)
 {
     ui->setupUi(this);
+    fIcon = ":/pricing.png";
+    fLabel = tr("Sale");
     ui->tblGoods->setColumnWidths(ui->tblGoods->columnCount(), 0, 50, 0, 150, 200, 300, 80, 80, 80, 80, 80, 80, 0, 0);
     ui->cbCurrency->setDBValues(dbParams, "select f_id, f_name from e_currency");
     ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(__c5config.getValue(param_default_currency)));
@@ -147,6 +149,7 @@ bool C5SaleDoc::openDoc(const QString &uuid)
     }
     ui->cbHall->setCurrentIndex(ui->cbHall->findData(o.hall));
     ui->cbCashDesk->setCurrentIndex(ui->cbCashDesk->findData(o.table));
+
 
     setMode(db.getInt("f_saletype"));
     ui->flag->setVisible(db.getInt("f_flag") == 1);
@@ -878,25 +881,28 @@ void C5SaleDoc::on_leCmd_returnPressed()
 
 int C5SaleDoc::addGoods(int goodsId, C5Database &db)
 {
-    QString priceField;
+    QString priceField, priceDiscount;
     switch (fMode) {
     case PRICEMODE_RETAIL:
         priceField = "f_price1";
+        priceDiscount = "f_price1disc";
         break;
     case PRICEMODE_WHOSALE:
         priceField = "f_price2";
+        priceDiscount = "f_price2disc";
         break;
     default:
         priceField = "f_price1";
+        priceDiscount = "f_price1disc";
         break;
     }
     db[":f_id"] = goodsId;
     db[":f_currency"] = ui->cbCurrency->currentData();
-    db.exec(QString("select g.*, gu.f_name as f_unitname, gpr.%1 as f_price "
+    db.exec(QString("select g.*, gu.f_name as f_unitname, if(gpr.%1>0, gpr.%1, gpr.%2) as f_price "
             "from c_goods g "
             "left join c_goods_prices gpr on gpr.f_goods=g.f_id "
             "left join c_units gu on gu.f_id=g.f_unit "
-            "where g.f_id=:f_id and gpr.f_currency=:f_currency").arg(priceField));
+            "where g.f_id=:f_id and gpr.f_currency=:f_currency").arg(priceDiscount, priceField));
     if (db.nextRow()) {
         return addGoods(ui->cbStorage->currentData().toInt(), goodsId, db.getString("f_scancode"), db.getString("f_name"),
                         db.getString("f_unitname"), 0, db.getDouble("f_price"), 0, db.getInt("f_service"));

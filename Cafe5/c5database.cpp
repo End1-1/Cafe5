@@ -69,9 +69,7 @@ C5Database::C5Database(const QString &dbdriver)
 C5Database::C5Database(const QStringList &dbParams) :
     C5Database()
 {
-    if (fDbParamsForUuid.count() == 0) {
-        fDbParamsForUuid = dbParams;
-    }
+    fDbParamsForUuid = dbParams;
     init();
     configureDatabase(fDb, dbParams[0], dbParams[1], dbParams[2], dbParams[3]);
 }
@@ -90,6 +88,9 @@ C5Database::C5Database(C5Database &db) :
 C5Database::C5Database(const QJsonObject &params) :
     C5Database()
 {
+    fDbParamsForUuid.clear();
+    fDbParamsForUuid.append(params["host"].toString());
+    fDbParamsForUuid.append(params["database"].toString());
     configureDatabase(fDb, params["host"].toString(), params["database"].toString(), params["username"].toString(), params["password"].toString());
 }
 
@@ -390,7 +391,7 @@ bool C5Database::execNetwork(const QString &sqlQuery)
     fBindValues.clear();
 
     QNetworkAccessManager m;
-    QString host = QString("https://%1").arg(fDbParamsForUuid.at(0));
+    QString host = "https://" + fDbParamsForUuid.at(0);
     QNetworkRequest rq(host);
     m.setTransferTimeout(60000);
     rq.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
@@ -416,6 +417,7 @@ bool C5Database::execNetwork(const QString &sqlQuery)
     quint64 elapsed = t.elapsed();
     jo = QJsonDocument::fromJson(ba).object();
     if (jo["status"].toInt() == 0) {
+        logEvent(ba);
         return false;
     }
     if (sql.mid(0, 6).compare("insert", Qt::CaseInsensitive) == 0

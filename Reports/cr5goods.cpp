@@ -83,6 +83,8 @@ CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
                    << "gg.f_scancode"
                    << "gpr.f_price1"
                    << "gpr.f_price2"
+                << "gpr.f_price1disc"
+                << "gpr.f_price2disc"
                    << "cr.f_symbol as f_currencyname"
                    << "gg.f_lowlevel"
                    << "gg.f_lastinputprice"
@@ -95,6 +97,7 @@ CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
                    << "gcd.f_name as gname4"
                    << "gg.f_description"
                    << "gg.f_weight"
+                   << "gg.f_fiscalname"
                       ;
 
     fColumnsVisible["gg.f_id"] = true;
@@ -105,6 +108,8 @@ CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
     fColumnsVisible["gg.f_name"] = true;
     fColumnsVisible["gpr.f_price1"] = true;
     fColumnsVisible["gpr.f_price2"] = true;
+    fColumnsVisible["gpr.f_price1disc"] = false;
+    fColumnsVisible["gpr.f_price2disc"] = false;
     fColumnsVisible["cr.f_symbol as f_currencyname"] = true;
     fColumnsVisible["gg.f_lowlevel"] = true;
     fColumnsVisible["gg.f_lastinputprice"] = true;
@@ -118,6 +123,7 @@ CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
     fColumnsVisible["gg.f_scancode"] = true;
     fColumnsVisible["gg.f_description"] = false;
     fColumnsVisible["gg.f_weight"] = true;
+    fColumnsVisible["gg.f_fiscalname"] = true;
 
     fTranslation["f_id"] = tr("Code");
     fTranslation["f_taxname"] = tr("Supplier");
@@ -126,7 +132,9 @@ CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_unitname"] = tr("Unit");
     fTranslation["f_name"] = tr("Name");
     fTranslation["f_price1"] = tr("Retail price");
+    fTranslation["f_price1disc"] = tr("Retail discounted");
     fTranslation["f_price2"] = tr("Wholesale price");
+    fTranslation["f_price2disc"] = tr("Whosale discounted");
     fTranslation["f_currencyname"] = tr("Currency");
     fTranslation["f_lowlevel"] = tr("Low level");
     fTranslation["f_lastinputprice"] = tr("Last input price");
@@ -140,6 +148,7 @@ CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_scancode"] = tr("Scancode");
     fTranslation["f_description"] = tr("Description");
     fTranslation["f_weight"] = tr("Weight");
+    fTranslation["f_fiscalname"] = tr("Fiscal name");
 
     restoreColumnsVisibility();
     fEditor = new CE5Goods(dbParams);
@@ -226,18 +235,13 @@ void CR5Goods::pricing()
 
 void CR5Goods::groupPrice()
 {
-    double price1, price2;
-    if (C5ChangePriceOfGroup::groupPrice(fDBParams, price1, price2)) {
-        QString p1, p2;
-        if (price1 < 0.0001 && price2 < 0.0002) {
-            return;
-        }
-        if (price1 > 0.0001) {
-            p1 = " f_saleprice=" + QString::number(price1, 'f', 2);
-        }
-        if (price2 > 0.0001) {
-            p2 = " f_saleprice2=" + QString::number(price2, 'f', 2);
-        }
+    double price1, price2, price1disc, price2disc;
+    if (C5ChangePriceOfGroup::groupPrice(fDBParams, price1, price2, price1disc , price2disc)) {
+        QString p1, p2, p1d, p2d;
+//        if (price1 < 0.0001 && price2 < 0.0002 && price1disc < 0.0002 && price2disc < 0.0002) {
+//            return;
+//        }
+
         QString codes;
         for (int i = 0; i < fModel->rowCount(); i++) {
             if (codes.length() > 0) {
@@ -246,18 +250,44 @@ void CR5Goods::groupPrice()
             codes += fModel->data(i, fModel->indexForColumnName("f_id"), Qt::EditRole).toString();
         }
         C5Database db(dbParams());
-        QString query = "update c_goods set " + p1 + (p1.length() > 0 && p2.length() > 0? "," : "") + p2 + " where f_id in (" + codes + ")";
-        db.exec(query);
-        if (price1 > 0.0001) {
+        QString query ;
+
+        //if (price1 > 0.0001) {
             p1 = " f_price1=" + QString::number(price1, 'f', 2);
-        }
-        if (price2 > 0.0001) {
+        //}
+        //if (price2 > 0.0001) {
             p2 = " f_price2=" + QString::number(price2, 'f', 2);
+        //}
+        //if (price1disc > 0.0001) {
+            p1d = " f_price1disc =" + QString::number(price1disc, 'f', 2);
+        //}
+        //if (price2disc > 0.0001) {
+            p2d = " f_price2disc=" + QString::number(price2disc, 'f', 2);
+        //}
+        QStringList l;
+        if (!p1.isEmpty()) {
+            l.append(p1);
         }
-        query = "update c_goods_prices set "
-                + p1 + (p1.length() > 0 && p2.length() > 0? "," : "")
-                + p2
-                + " where f_currency=1 and f_goods in (" + codes + ")";
+        if (!p2.isEmpty()) {
+            l.append(p2);
+        }
+        if (!p1d.isEmpty()) {
+            l.append(p1d);
+        }
+        if (!p2d.isEmpty()) {
+            l.append(p2d);
+        }
+        query = "update c_goods_prices set ";
+        bool f = true;
+        for (int i = 0; i < l.count(); i++) {
+            if (f) {
+                f = false;
+            } else {
+                query += ",";
+            }
+            query += l.at(i);
+        }
+        query  += " where f_currency=1 and f_goods in (" + codes + ")";
         db.exec(query);
         C5Message::tr("Done");
     }

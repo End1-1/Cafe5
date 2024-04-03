@@ -12,12 +12,12 @@
 
 SocketThread::SocketThread(int handle, const QSslCertificate &cert, const QSslKey &key, QSsl::SslProtocol proto, const QList<QSslCertificate> chain) :
     QObject(),
-    fSocketDescriptor(handle),
     fSslLocalCertificate(cert),
     fSslPrivateKey(key),
     fSslProtocol(proto),
     fSslChain(chain),
-    fRawHandler(0)
+    fRawHandler(0),
+    fSocketDescriptor(handle)
 {
     fMessageNumber = 0;
     fPreviouseMessageNumber = 0;

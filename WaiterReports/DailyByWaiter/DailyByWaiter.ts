@@ -4,27 +4,27 @@
 <context>
     <name>C5Message</name>
     <message>
-        <location filename="../../Cafe5/c5message.ui" line="140"/>
+        <location filename="../../Cafe5/c5message.ui" line="158"/>
         <source>msg</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Cafe5/c5message.ui" line="196"/>
+        <location filename="../../Cafe5/c5message.ui" line="218"/>
         <source>A1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Cafe5/c5message.ui" line="209"/>
+        <location filename="../../Cafe5/c5message.ui" line="231"/>
         <source>A3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Cafe5/c5message.ui" line="222"/>
+        <location filename="../../Cafe5/c5message.ui" line="244"/>
         <source>A2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Cafe5/c5message.ui" line="235"/>
+        <location filename="../../Cafe5/c5message.ui" line="257"/>
         <source>Copy</source>
         <translation type="unfinished"></translation>
     </message>

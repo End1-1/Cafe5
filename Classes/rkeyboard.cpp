@@ -1,5 +1,6 @@
 #include "rkeyboard.h"
 #include "ui_rkeyboard.h"
+#include "c5config.h"
 
 RKeyboard::RKeyboard(QWidget *parent) :
     QWidget(parent),
@@ -61,6 +62,20 @@ RKeyboard::RKeyboard(QWidget *parent) :
     fCapsOn = false;
     setupEnglish();
     setStyleSheet("");
+    switch (__c5config.getRegValue("kbd").toInt()) {
+    case 1:
+        setupEnglish();
+        break;
+    case 2:
+        setupArmenian();
+        break;
+    case 3:
+        setupRussia();
+        break;
+    default:
+        setupArmenian();
+        break;
+    }
 }
 
 RKeyboard::~RKeyboard()
@@ -222,18 +237,25 @@ void RKeyboard::on_btnEn_clicked()
 {
     fCurrentLanguage = "en";
     setupKbd();
+    __c5config.setRegValue("kbd", 1);
 }
 
 void RKeyboard::on_btnAm_clicked()
 {
     fCurrentLanguage = "am";
     setupKbd();
+    ui->leResult->setFocus();
+    ui->leResult->setSelection(ui->leResult->text().length(), 1);
+    __c5config.setRegValue("kbd", 2);
 }
 
 void RKeyboard::on_btnRu_clicked()
 {
     fCurrentLanguage = "ru";
     setupKbd();
+    ui->leResult->setFocus();
+    ui->leResult->setSelection(ui->leResult->text().length(), 1);
+    __c5config.setRegValue("kbd", 3);
 }
 
 void RKeyboard::on_btnClear_clicked()

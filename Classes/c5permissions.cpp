@@ -52,7 +52,8 @@ void C5Permissions::init(C5Database &db, int group)
               << cp_t3_sale_dishes
               << cp_t3_sale_from_store_total
               << cp_t3_discount_statistics
-              << cp_t3_debts
+              << cp_t3_debts_customer
+              << cp_t3_debts_partner
               << cp_t3_consuption_reason
               << cp_t3_preorders
               << cp_t3_sale_effectiveness

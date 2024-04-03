@@ -45,6 +45,15 @@ int main(int argc, char *argv[])
     for (int i = 0; i < argc; i++) {
         args << argv[i];
     }
+
+    QFont f("Arial LatArm Unicode", 10);
+    //QFont f(__c5config.getValue(param_app_font_family), 10);
+    qApp->setFont(f);
+    QFile styleFile(qApp->applicationDirPath() + "/smartstyle.css");
+    if (styleFile.open(QIODevice::ReadOnly)) {
+        a.setStyleSheet(styleFile.readAll());
+    }
+
     QSettings ss(_ORGANIZATION_, _APPLICATION_+ QString("\\") + _MODULE_);
     QJsonObject js = QJsonDocument::fromJson(ss.value("server", "{}").toByteArray()).object();
     if (args.contains("--config")) {
@@ -54,13 +63,7 @@ int main(int argc, char *argv[])
             ss.setValue("server", QJsonDocument(js).toJson(QJsonDocument::Compact));
         }
     }
-    QFont f("Arial LatArm Unicode", 10);
-    //QFont f(__c5config.getValue(param_app_font_family), 10);
-    qApp->setFont(f);
-    QFile styleFile(qApp->applicationDirPath() + "/smartstyle.css");
-    if (styleFile.open(QIODevice::ReadOnly)) {
-        a.setStyleSheet(styleFile.readAll());
-    }
+
     C5Config::fDBHost = js["host"].toString();
     C5Config::fDBPath = js["database"].toString();
     C5Config::fDBUser = js["username"].toString();

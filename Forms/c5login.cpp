@@ -67,7 +67,7 @@ void C5Login::on_btnOk_clicked()
 void C5Login::on_cbDatabases_currentIndexChanged(int index)
 {
     for (int i = 0; i < fServers.count(); i++) {
-        const QJsonObject &js = fServers.at(i).toObject();
+        QJsonObject js = fServers.at(i).toObject();
         js["current"] = i == index;
         fServers[i] = js;
     }
@@ -83,6 +83,7 @@ void C5Login::on_cbDatabases_currentIndexChanged(int index)
 
     C5Database db(js);
     db.exec("select f_login from s_user where f_id in (select f_user from s_db_access where f_permit=1)");
+    ui->leUsername->clear();
     while (db.nextRow()) {
         ui->leUsername->addItem(db.getString(0));
     }

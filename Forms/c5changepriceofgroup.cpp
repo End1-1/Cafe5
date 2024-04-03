@@ -15,12 +15,14 @@ C5ChangePriceOfGroup::~C5ChangePriceOfGroup()
     delete ui;
 }
 
-bool C5ChangePriceOfGroup::groupPrice(const QStringList &dbParams, double &price1, double &price2)
+bool C5ChangePriceOfGroup::groupPrice(const QStringList &dbParams, double &price1, double &price2, double &price1disc, double &price2disc)
 {
     auto *c = new  C5ChangePriceOfGroup(dbParams);
     bool r = c->exec() == QDialog::Accepted;
     price1 = c->ui->lePrice1->getDouble();
     price2 = c->ui->lePrice2->getDouble();
+    price1disc = c->ui->lePrice1disc->getDouble();
+    price2disc = c->ui->lePrice2disc->getDouble();
     return r;
 }
 

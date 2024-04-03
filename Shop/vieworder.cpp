@@ -324,12 +324,13 @@ void ViewOrder::on_btnTaxReturn_clicked()
 {
     C5Database db(__c5config.replicaDbParams());
     db[":f_id"] = ui->leUUID->text();
-    db.exec("select * from o_tax where f_id=:f_id");
+    db.exec("select * from o_tax_log where f_order=:f_id and f_state=1");
     if (!db.nextRow()) {
         C5Message::error(tr("No fiscal exists for this order"));
         return;
     }
-    QString crn = db.getString("f_devnum");
+    QJsonObject jout = __strjson(db.getString("f_out"));
+    QString crn = jout["crn"].toString();
     QString rseq = ui->leTaxNumber->text();
     PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
     QString jsnin, jsnout, err;

@@ -29,12 +29,30 @@ void C5TableModel::execQuery(const QString &query)
     C5Database db(fDBParams);
     QStringList queries = query.split(";", Qt::SkipEmptyParts);
 #ifdef NETWORKDB
-    db.exec(query);
+    db.exec(query, fRawData, fColumnNameIndex);
+    for (int i = 0, count = fRawData.count(); i < count; i++) {
+        if (fCheckboxes) {
+            fRawData[i].insert(0, QVariant());
+        }
+        fProxyData << i;
+    }
+    for (QHash<QString, int>::const_iterator it = fColumnNameIndex.constBegin(); it != fColumnNameIndex.constEnd(); it++) {
+        fColumnIndexName[it.value()] = it.key();
+    }
+    if (fCheckboxes) {
+        for (QHash<QString, int>::iterator it = fColumnNameIndex.begin(); it != fColumnNameIndex.end(); it++) {
+            QString k = it.key();
+            int v = it.value() + 1;
+            fColumnNameIndex[k] = v;
+            fColumnIndexName[v] = k;
+        }
+        fColumnNameIndex["X"] = 0;
+        fColumnIndexName[0] = "X";
+    }
 #else
     for (int i = 0; i < queries.count() - 1; i++) {
         db.exec(queries.at(i));
     }
-#endif
     if (db.exec(queries.last(), fRawData, fColumnNameIndex)) {
         for (int i = 0, count = fRawData.count(); i < count; i++) {
             if (fCheckboxes) {
@@ -58,6 +76,7 @@ void C5TableModel::execQuery(const QString &query)
     } else {
 
     }
+#endif
     endResetModel();
     qDebug() << "Data loaded in " << timer.elapsed() << "ms";
 }

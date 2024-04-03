@@ -29,6 +29,7 @@ public:
 
     QString _groupName;
     QString _goodsName;
+    QString _goodsFiscalName;
     QString _barcode;
     QString _unitName;
     double _qtybox = 0.0;

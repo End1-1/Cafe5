@@ -1049,7 +1049,7 @@ bool printtax(const QByteArray &indata, QByteArray &outdata, const QHash<QString
             "where og.f_header=:f_header");
     while(db.next()) {
         amountTotal += db.doubleValue("f_price") * db.doubleValue("f_qty");
-        pt.addGoods(s.value("shop/taxdep").toString(), //dep
+        pt.addGoods(s.value("shop/taxdep").toInt(), //dep
                     db.string("f_adgcode"), //adg
                     db.string("f_scancode"), //goods id
                     db.string("f_name"), //name
@@ -1061,7 +1061,7 @@ bool printtax(const QByteArray &indata, QByteArray &outdata, const QHash<QString
     int result = 0;
     result = pt.makeJsonAndPrint(0, 0, jsonIn, jsonOut, err);
     if (result == pt_err_ok) {
-        PrintTaxN::parseResponse(jsonOut, firm, hvhh, fiscal, rseq, sn, address, devnum, time);
+        //PrintTaxN::parseResponse(jsonOut, firm, hvhh, fiscal, rseq, sn, address, devnum, time);
         db[":f_id"] = fOrder;
         db.exec("delete from o_tax where f_id=:f_id");
         db[":f_id"] = fOrder;

@@ -12,7 +12,7 @@ DlgGoodsList::DlgGoodsList(int currency) :
     db[":f_store"] = __c5config.defaultStore();
     db[":f_currency"] = currency;
     db.exec("select ss.f_goods, gg.f_name as f_groupname, g.f_scancode, g.f_name, "
-            "ss.f_qty, gp.f_price1, gp.f_price2 "
+            "ss.f_qty, if (coalesce(gp.f_price1disc, 0)>0, gp.f_price1disc, gp.f_price1) as f_price1, gp.f_price2 "
             "from a_store_sale ss "
             "left join c_goods g on g.f_id=ss.f_goods "
             "left join c_groups gg on gg.f_id=g.f_group "
@@ -20,7 +20,7 @@ DlgGoodsList::DlgGoodsList(int currency) :
             "where g.f_enabled=1 and ss.f_store=:f_store and gp.f_currency=:f_currency "
             "union "
             "select g.f_id, gg.f_name as f_groupname, g.f_scancode, g.f_name, "
-            "0, gpr.f_price1, gpr.f_price2 "
+            "0, if (coalesce(gpr.f_price1disc, 0)>0, gpr.f_price1disc, gpr.f_price1) as f_price1, gpr.f_price2 "
             "from c_goods g "
             "left join c_groups gg on gg.f_id=g.f_group "
             "left join c_goods_prices gpr on gpr.f_goods=g.f_id "

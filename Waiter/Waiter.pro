@@ -248,6 +248,10 @@ SOURCES += \
     ../Forms/touchdlgphonenumber.cpp \
     ../Forms/touchentertaxreceiptnumber.cpp \
     ../Forms/touchselecttaxreport.cpp \
+    ../NTable/ndataprovider.cpp \
+    ../NTable/nloadingdlg.cpp \
+    ../NTable/ntablemodel.cpp \
+    ../NTable/ntablewidget.cpp \
     ../Printing/printreceipt.cpp \
     ../Printing/printreceiptgroup.cpp \
     ../Printing/selectprinters.cpp \
@@ -680,6 +684,10 @@ HEADERS += \
     ../Forms/touchdlgphonenumber.h \
     ../Forms/touchentertaxreceiptnumber.h \
     ../Forms/touchselecttaxreport.h \
+    ../NTable/ndataprovider.h \
+    ../NTable/nloadingdlg.h \
+    ../NTable/ntablemodel.h \
+    ../NTable/ntablewidget.h \
     ../Printing/printreceipt.h \
     ../Printing/printreceiptgroup.h \
     ../Printing/selectprinters.h \
@@ -1021,6 +1029,8 @@ FORMS += \
     ../Forms/touchdlgphonenumber.ui \
     ../Forms/touchentertaxreceiptnumber.ui \
     ../Forms/touchselecttaxreport.ui \
+    ../NTable/nloadingdlg.ui \
+    ../NTable/ntablewidget.ui \
     ../Printing/preorders.ui \
     ../Printing/selectprinters.ui \
     ../Reports/c5customfilter.ui \
@@ -1130,6 +1140,7 @@ FORMS += \
     INCLUDEPATH += ../Configs
     INCLUDEPATH += ../TableRecord
     INCLUDEPATH += ../Controls
+    INCLUDEPATH += ../NTable
     INCLUDEPATH += C:/Projects/NewTax/Src
     INCLUDEPATH += C:/Soft/OpenSSL-Win64/include
     INCLUDEPATH += C:/Soft/OpenSSL-Win64/include/openssl

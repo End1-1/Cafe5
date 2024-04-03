@@ -98,6 +98,7 @@ bool printfiscal(const QByteArray &indata, QByteArray &outdata, const QHash<QStr
     QJsonObject jo = QJsonDocument::fromJson(getData(indata, dataMap["json"])).object();
     QJsonObject jresponse;
 
+    bool fiscal = jo["mode"].toInt() == 1;
     QString sql = QString("select sf_bill_info('{\"id\":\"%1\"}')").arg(jo["id"].toString());
     C5NetworkDB db(sql, s.value("host/host").toString());
     if (!db.query()) {
@@ -118,7 +119,7 @@ bool printfiscal(const QByteArray &indata, QByteArray &outdata, const QHash<QStr
 
     int result = HTTP_OK;
 
-    if (jfiscal["rseq"].toInt() == 0) {
+    if (jfiscal["rseq"].toInt() == 0 && fiscal) {
         PrintTaxN pt(jConfig["fiscal_ip"].toString(),
                      jConfig["fiscal_port"].toInt(),
                      jConfig["fiscal_password"].toString(),

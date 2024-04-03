@@ -207,6 +207,7 @@ SOURCES += \
     dlggiftcardsale.cpp \
     dlggoodslist.cpp \
     dlgpin.cpp \
+    dlgregistercard.cpp \
     dlgreturnitem.cpp \
     dlgsearchpartner.cpp \
     dlgshowcolumns.cpp \
@@ -541,6 +542,7 @@ HEADERS += \
     dlggoodslist.h \
     dlgpin.h \
     dlgpreorderitem.h \
+    dlgregistercard.h \
     dlgreturnitem.h \
     dlgsearchpartner.h \
     dlgshowcolumns.h \
@@ -604,6 +606,7 @@ FORMS += \
     dlggiftcardsale.ui \
     dlggoodslist.ui \
     dlgpin.ui \
+    dlgregistercard.ui \
     dlgreturnitem.ui \
     dlgsearchpartner.ui \
     dlgshowcolumns.ui \

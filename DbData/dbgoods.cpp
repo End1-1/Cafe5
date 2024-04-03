@@ -50,6 +50,11 @@ QString DbGoods::goodsName()
     return dbgoods->name(fId);
 }
 
+QString DbGoods::goodsFiscalName()
+{
+    return dbgoods->get(fId, "f_fiscalname").toString();
+}
+
 QString DbGoods::scancode(int id)
 {
     return get(id, "f_scancode").toString();

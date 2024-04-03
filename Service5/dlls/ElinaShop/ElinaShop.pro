@@ -68,6 +68,7 @@ LIBS += -lwsock32
 
 DEFINES += _APPLICATION_=\\\"Cafe5\\\"
 DEFINES += _MODULE_=\\\"Service5_elinashop_dll\\\"
+DEFINES += _DBDRIVER_=\\\"QMARIADB\\\"
 
 FORMS += \
     ../../../Classes/notificationwidget.ui

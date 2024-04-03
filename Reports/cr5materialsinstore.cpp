@@ -86,9 +86,13 @@ void CR5MaterialsInStore::prepareDrafts()
                    << "sum(g.f_lastinputprice*s.f_type*s.f_qty) as f_total"
                    << "g.f_lowlevel"
                    << "gpr.f_price1"
+        << "grp.f_price1disc"
+        << "grp.f_price2dics"
                    << "sum(s.f_qty*s.f_type)*gpr.f_price1 as f_totalsale"
                    << "gpr.f_price2"
                    << "sum(s.f_qty*s.f_type)*gpr.f_price2 as f_totalsale2"
+                   << "sum(s.f_qty*s.f_type)*gpr.f_price1disc as f_totalretaildiscounted"
+                   << "sum(s.f_qty*s.f_type)*gpr.f_price2disc as f_totalsale2discount"
                       ;
 
     fColumnsGroup << "g.f_id as f_code"
@@ -100,6 +104,8 @@ void CR5MaterialsInStore::prepareDrafts()
                    << "g.f_lowlevel"
                    << "gpr.f_price1"
                    << "gpr.f_price2"
+                  << "gpr.f_price1disc"
+                  << "gpr.f_price2disc"
                    << "gca.f_name as f_class1"
                    << "gcb.f_name as f_class2"
                    << "gcc.f_name as f_class3"
@@ -113,6 +119,9 @@ void CR5MaterialsInStore::prepareDrafts()
                 << "f_total"
                 << "f_totalsale"
                 << "f_totalsale2"
+                << "f_totalretaildiscounted"
+                << "f_totalsale2discount"
+
                       ;
 
     if (fFilter->showZero()) {
@@ -134,6 +143,10 @@ void CR5MaterialsInStore::prepareDrafts()
     fTranslation["f_lowlevel"] = tr("Warning");
     fTranslation["f_price1"] = tr("Retail price");
     fTranslation["f_totalsale"] = tr("Retail amount");
+    fTranslation["f_price1disc"] = tr("Retail discounted");
+    fTranslation["f_price2disc"] = tr("Whosale discounted");
+    fTranslation["f_totalretaildiscounted"] = tr("Total retail discounted");
+    fTranslation["f_totalsale2discount"] = tr("Total whosale discounted");
     fTranslation["f_price2"] = tr("Whosale price");
     fTranslation["f_totalsale2"] = tr("Whosale amount");
     fTranslation["f_class1"] = tr("Class 1");
@@ -153,9 +166,13 @@ void CR5MaterialsInStore::prepareDrafts()
     fColumnsVisible["sum(g.f_lastinputprice*s.f_type*s.f_qty) as f_total"] = true;
     fColumnsVisible["g.f_lowlevel"] = true;
     fColumnsVisible["gpr.f_price1"] = false;
+    fColumnsVisible["gpr.f_price1disc"] = false;
     fColumnsVisible["sum(s.f_qty*s.f_type)*gpr.f_price1 as f_totalsale"] = false;
+    fColumnsVisible["sum(s.f_qty*s.f_type)*gpr.f_price1disc as f_totalretaildiscounted"] = false;
     fColumnsVisible["gpr.f_price2"] = false;
+    fColumnsVisible["gpr.f_price2disc"] = false;
     fColumnsVisible["sum(s.f_qty*s.f_type)*gpr.f_price2 as f_totalsale2"] = false;
+    fColumnsVisible["sum(s.f_qty*s.f_type)*gpr.f_price2disc as f_totalsale2discount"] = false;
     fColumnsVisible["gca.f_name as f_class1"] = false;
     fColumnsVisible["gcb.f_name as f_class2"] = false;
     fColumnsVisible["gcc.f_name as f_class3"] = false;
@@ -207,9 +224,13 @@ void CR5MaterialsInStore::prepareNoDrafts()
                    << "sum(s.f_total*s.f_type) as f_total"
                    << "g.f_lowlevel"
                    << "gpr.f_price1"
+                   << "gpr.f_price1disc"
                    << "sum(s.f_qty*s.f_type)*gpr.f_price1 as f_totalsale"
                    << "gpr.f_price2"
+                   << "gpr.f_price2disc"
                    << "sum(s.f_qty*s.f_type)*gpr.f_price2 as f_totalsale2"
+                   << "sum(s.f_qty*s.f_type)*gpr.f_price1disc as f_totalretaildiscounted"
+                   << "sum(s.f_qty*s.f_type)*gpr.f_price2disc as f_totalsale2discount"
                       ;
 
     fColumnsGroup << "g.f_id as f_code"
@@ -221,6 +242,8 @@ void CR5MaterialsInStore::prepareNoDrafts()
                    << "g.f_lowlevel"
                    << "gpr.f_price1"
                    << "gpr.f_price2"
+                  << "gpr.f_price1disc"
+                  << "gpr.f_price2dics"
                    << "gca.f_name as f_class1"
                    << "gcb.f_name as f_class2"
                    << "gcc.f_name as f_class3"
@@ -232,6 +255,8 @@ void CR5MaterialsInStore::prepareNoDrafts()
                 << "f_total"
                 << "f_totalsale"
                 << "f_totalsale2"
+                << "f_totalretaildiscounted"
+                << "f_totalsale2discount"
                       ;
 
     if (fFilter->showZero()) {
@@ -254,6 +279,10 @@ void CR5MaterialsInStore::prepareNoDrafts()
     fTranslation["f_totalsale"] = tr("Retail amount");
     fTranslation["f_price2"] = tr("Whosale price");
     fTranslation["f_totalsale2"] = tr("Whosale amount");
+    fTranslation["f_price1disc"] = tr("Retail discounted");
+    fTranslation["f_price2disc"] = tr("Whosale discounted");
+    fTranslation["f_totalretaildiscounted"] = tr("Total retail discounted");
+    fTranslation["f_totalsale2discount"] = tr("Total whosale discounted");
     fTranslation["f_class1"] = tr("Class 1");
     fTranslation["f_class2"] = tr("Class 2");
     fTranslation["f_class3"] = tr("Class 3");
@@ -272,9 +301,13 @@ void CR5MaterialsInStore::prepareNoDrafts()
     fColumnsVisible["sum(s.f_total*s.f_type) as f_total"] = true;
     fColumnsVisible["g.f_lowlevel"] = true;
     fColumnsVisible["gpr.f_price1"] = false;
+    fColumnsVisible["gpr.f_price1disc"] = false;
     fColumnsVisible["sum(s.f_qty*s.f_type)*gpr.f_price1 as f_totalsale"] = false;
+    fColumnsVisible["sum(s.f_qty*s.f_type)*gpr.f_price1disc as f_totalretaildiscounted"] = false;
     fColumnsVisible["gpr.f_price2"] = false;
+    fColumnsVisible["gpr.f_price2disc"] = false;
     fColumnsVisible["sum(s.f_qty*s.f_type)*gpr.f_price2 as f_totalsale2"] = false;
+    fColumnsVisible["sum(s.f_qty*s.f_type)*gpr.f_price2disc as f_totalsale2discount"] = false;
     fColumnsVisible["gca.f_name as f_class1"] = false;
     fColumnsVisible["gcb.f_name as f_class2"] = false;
     fColumnsVisible["gcc.f_name as f_class3"] = false;

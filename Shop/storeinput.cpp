@@ -204,7 +204,7 @@ void StoreInput::history()
     db[":f_date2"] = ui->deEnd->date();
     db[":f_type"] = 1;
     db[":f_state"] = DOC_STATE_SAVED;
-    if (!db.exec("select ad.f_id, '', ah.f_date, g.f_name, g.f_scancode, ad.f_qty, gpr.f_price1, "
+    if (!db.exec("select ad.f_id, '', ah.f_date, g.f_name, g.f_scancode, ad.f_qty, if(gpr.f_price1disc>0, gpr.f_price1disc, gpr.f_price1) as f_price1, "
             "spa.f_id as f_spa "
             "from a_store_draft ad "
             "inner join c_goods g on g.f_id=ad.f_goods "
@@ -255,7 +255,7 @@ void StoreInput::storeByGroup()
     db[":f_store"] = __c5config.defaultStore();
     db[":f_date"] = QDate::currentDate();
     if (!db.exec("select gg.f_name as f_group,sum(s.f_qty*s.f_type) as f_qty, "
-            "sum(s.f_qty*s.f_type)*gpr.f_price1 as f_totalsale "
+            "sum(s.f_qty*s.f_type)*if(gpr.f_price1disc>0, gpr.f_price1disc, gpr.f_price1) as f_totalsale "
             "from a_store s "
             "inner join c_goods g on g.f_id=s.f_goods "
             "left join c_goods_prices gpr on gpr.f_goods=g.f_id "
@@ -296,7 +296,7 @@ void StoreInput::storeByItems()
     db[":f_store"] = __c5config.defaultStore();
     db[":f_date"] = QDate::currentDate();
     if (!db.exec("select gg.f_name as f_group, g.f_name, g.f_scancode, sum(s.f_qty*s.f_type) as f_qty, "
-            "sum(s.f_qty*s.f_type)*gpr.f_price1 as f_totalsale "
+            "sum(s.f_qty*s.f_type)*if(gpr.f_price1disc>0, gpr.f_price1disc, gpr.f_price1) as f_totalsale "
             "from a_store s "
             "inner join c_goods g on g.f_id=s.f_goods "
             "left join c_goods_prices gpr on gpr.f_goods=g.f_id "

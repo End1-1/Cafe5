@@ -35,9 +35,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>0</y>
+        <y>-84</y>
         <width>763</width>
-        <height>584</height>
+        <height>644</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -2231,6 +2231,21 @@
   </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>leCode</tabstop>
+  <tabstop>lineEdit_2</tabstop>
+  <tabstop>lineEdit_3</tabstop>
+  <tabstop>leFDFontSize</tabstop>
+  <tabstop>fnApp</tabstop>
+  <tabstop>cbFronDeskMode</tabstop>
+  <tabstop>chRDB</tabstop>
+  <tabstop>leRDBHost</tabstop>
+  <tabstop>leRDBSchema</tabstop>
+  <tabstop>leRDBUser</tabstop>
+  <tabstop>leRDBPassword</tabstop>
+  <tabstop>chDebugMode</tabstop>
+  <tabstop>leSystemThouthandSeparator</tabstop>
+  <tabstop>leMobileAppConStr</tabstop>
+  <tabstop>cbDefaultCurrency</tabstop>
   <tabstop>cbMenu</tabstop>
   <tabstop>leServiceFactor</tabstop>
   <tabstop>leAutoDiscount</tabstop>
@@ -2247,92 +2262,77 @@
   <tabstop>chWaiterLoginAfterPayment</tabstop>
   <tabstop>chViewOnChart</tabstop>
   <tabstop>chDontCloseEmtpyOrder</tabstop>
-  <tabstop>cbDefaultStore</tabstop>
-  <tabstop>chCloseTablefterServicePrint</tabstop>
-  <tabstop>chAskForPrecheck</tabstop>
-  <tabstop>leOutDocCounter</tabstop>
-  <tabstop>chCloseTableAfterPrecheck</tabstop>
-  <tabstop>chCompactDishesInOrder</tabstop>
-  <tabstop>chAppendQuantityBefore</tabstop>
-  <tabstop>leMoveDocCounter</tabstop>
-  <tabstop>leInputDocCounter</tabstop>
-  <tabstop>leInputDocNumDigits</tabstop>
-  <tabstop>chAutomaticallyStoreOutWaiter</tabstop>
-  <tabstop>leOrderPrefix</tabstop>
-  <tabstop>chAutoCash</tabstop>
-  <tabstop>leCashId</tabstop>
-  <tabstop>leCardIdPrefix</tabstop>
-  <tabstop>leCashIdPrefix</tabstop>
   <tabstop>leDateOfClose</tabstop>
   <tabstop>chAutoDateCash</tabstop>
-  <tabstop>leCardId</tabstop>
-  <tabstop>leReceiptFooterText</tabstop>
-  <tabstop>leChangeWorkingDateTime</tabstop>
-  <tabstop>leShift</tabstop>
-  <tabstop>leRDBUser</tabstop>
-  <tabstop>leRDBSchema</tabstop>
-  <tabstop>leMoveDocNumDigits</tabstop>
-  <tabstop>leRDBPassword</tabstop>
-  <tabstop>chNoScanCode</tabstop>
-  <tabstop>leOutDocNumDigits</tabstop>
-  <tabstop>leFDFontSize</tabstop>
-  <tabstop>fnApp</tabstop>
-  <tabstop>lineEdit_2</tabstop>
-  <tabstop>chUpdateTempStorageForShop</tabstop>
-  <tabstop>chRDB</tabstop>
-  <tabstop>leSystemThouthandSeparator</tabstop>
-  <tabstop>cbFronDeskMode</tabstop>
-  <tabstop>cbDefaultCurrency</tabstop>
-  <tabstop>leCode</tabstop>
   <tabstop>chCarMode</tabstop>
+  <tabstop>chCloseTablefterServicePrint</tabstop>
+  <tabstop>chAskForPrecheck</tabstop>
   <tabstop>chFinalReceiptQtySelect</tabstop>
-  <tabstop>chFixAutoenterInputDocPrice</tabstop>
-  <tabstop>leRDBHost</tabstop>
-  <tabstop>chDenyPriceChange</tabstop>
-  <tabstop>chEnterShopPin</tabstop>
-  <tabstop>leAutologinPin2</tabstop>
-  <tabstop>chFixShopStaff</tabstop>
-  <tabstop>chHideShopQuantity</tabstop>
-  <tabstop>chDenyReatail</tabstop>
-  <tabstop>chDenyWhosale</tabstop>
-  <tabstop>chDontCheckStoreQty</tabstop>
-  <tabstop>leAutologinPin1</tabstop>
-  <tabstop>chDenyQtychange</tabstop>
-  <tabstop>chDontGroupPrint</tabstop>
-  <tabstop>leShopMobileClentConfig</tabstop>
-  <tabstop>chNeverOfferTax</tabstop>
-  <tabstop>chExternalTax</tabstop>
-  <tabstop>chAlwaysOfferTax</tabstop>
-  <tabstop>leTaxIP</tabstop>
-  <tabstop>leTaxPort</tabstop>
-  <tabstop>leCashierPin</tabstop>
-  <tabstop>leCashierLogin</tabstop>
-  <tabstop>leVAT</tabstop>
-  <tabstop>leTaxAlwaysPrintIfAmountLess</tabstop>
-  <tabstop>leTaxPassword</tabstop>
-  <tabstop>leTaxDept</tabstop>
-  <tabstop>cbTaxUseExtPos</tabstop>
-  <tabstop>chChoosePos</tabstop>
-  <tabstop>lereceiptFontSize</tabstop>
-  <tabstop>fbReceiptFont</tabstop>
-  <tabstop>rbPrintLeft</tabstop>
-  <tabstop>rbPrintDown</tabstop>
-  <tabstop>rbPrint50</tabstop>
-  <tabstop>rbPrint80</tabstop>
+  <tabstop>chCloseTableAfterPrecheck</tabstop>
   <tabstop>leLocalReceiptPrinter</tabstop>
-  <tabstop>chPrintDishOrder</tabstop>
-  <tabstop>leServiceFontSize</tabstop>
-  <tabstop>chPrintModOnReceipt</tabstop>
+  <tabstop>leReceipPaperWidth</tabstop>
   <tabstop>leStaticQRCode</tabstop>
-  <tabstop>chForceUsePrintAlias</tabstop>
   <tabstop>fbServiceFont</tabstop>
+  <tabstop>leServiceFontSize</tabstop>
+  <tabstop>fbReceiptFont</tabstop>
+  <tabstop>lereceiptFontSize</tabstop>
+  <tabstop>chCompactDishesInOrder</tabstop>
+  <tabstop>chPrintDishOrder</tabstop>
+  <tabstop>chPrintScancodeWithName</tabstop>
+  <tabstop>chForceUsePrintAlias</tabstop>
+  <tabstop>leShift</tabstop>
+  <tabstop>chPrintModOnReceipt</tabstop>
+  <tabstop>chDontPrintFinalReceipt</tabstop>
   <tabstop>rbPrintVNoPrint</tabstop>
   <tabstop>rbPrintV1</tabstop>
   <tabstop>rbPrintV2</tabstop>
   <tabstop>rbPrintV3</tabstop>
-  <tabstop>leReceipPaperWidth</tabstop>
-  <tabstop>chPrintScancodeWithName</tabstop>
-  <tabstop>chDontPrintFinalReceipt</tabstop>
+  <tabstop>rbPrint50</tabstop>
+  <tabstop>rbPrint80</tabstop>
+  <tabstop>rbPrintLeft</tabstop>
+  <tabstop>rbPrintDown</tabstop>
+  <tabstop>leTaxIP</tabstop>
+  <tabstop>leTaxPort</tabstop>
+  <tabstop>leTaxPassword</tabstop>
+  <tabstop>leTaxDept</tabstop>
+  <tabstop>leCashierLogin</tabstop>
+  <tabstop>leCashierPin</tabstop>
+  <tabstop>cbTaxUseExtPos</tabstop>
+  <tabstop>leVAT</tabstop>
+  <tabstop>chExternalTax</tabstop>
+  <tabstop>chAlwaysOfferTax</tabstop>
+  <tabstop>chNeverOfferTax</tabstop>
+  <tabstop>chChoosePos</tabstop>
+  <tabstop>leTaxAlwaysPrintIfAmountLess</tabstop>
+  <tabstop>chEnterShopPin</tabstop>
+  <tabstop>leAutologinPin1</tabstop>
+  <tabstop>leAutologinPin2</tabstop>
+  <tabstop>leShopMobileClentConfig</tabstop>
+  <tabstop>chDontCheckStoreQty</tabstop>
+  <tabstop>chDenyQtychange</tabstop>
+  <tabstop>chDontGroupPrint</tabstop>
+  <tabstop>chDenyReatail</tabstop>
+  <tabstop>chDenyWhosale</tabstop>
+  <tabstop>chDenyPriceChange</tabstop>
+  <tabstop>chHideShopQuantity</tabstop>
+  <tabstop>leOutDocNumDigits</tabstop>
+  <tabstop>chFixShopStaff</tabstop>
+  <tabstop>chAppendQuantityBefore</tabstop>
+  <tabstop>leReceiptFooterText</tabstop>
+  <tabstop>leInputDocCounter</tabstop>
+  <tabstop>leOutDocCounter</tabstop>
+  <tabstop>chNoScanCode</tabstop>
+  <tabstop>leOrderPrefix</tabstop>
+  <tabstop>leMoveDocNumDigits</tabstop>
+  <tabstop>cbDefaultStore</tabstop>
+  <tabstop>leInputDocNumDigits</tabstop>
+  <tabstop>leCardIdPrefix</tabstop>
+  <tabstop>leCashIdPrefix</tabstop>
+  <tabstop>leChangeWorkingDateTime</tabstop>
+  <tabstop>chFixAutoenterInputDocPrice</tabstop>
+  <tabstop>leMoveDocCounter</tabstop>
+  <tabstop>chUpdateTempStorageForShop</tabstop>
+  <tabstop>leCashId</tabstop>
   <tabstop>leHttpIP</tabstop>
   <tabstop>leHttpPort</tabstop>
   <tabstop>leHttpUsername</tabstop>
@@ -2352,9 +2352,9 @@
   <tabstop>btnTestScaleODBCString</tabstop>
   <tabstop>scrollArea</tabstop>
   <tabstop>chNoCashDoc</tabstop>
-  <tabstop>lineEdit_3</tabstop>
-  <tabstop>chDebugMode</tabstop>
-  <tabstop>leMobileAppConStr</tabstop>
+  <tabstop>leCardId</tabstop>
+  <tabstop>chAutomaticallyStoreOutWaiter</tabstop>
+  <tabstop>chAutoCash</tabstop>
  </tabstops>
  <resources/>
  <connections/>

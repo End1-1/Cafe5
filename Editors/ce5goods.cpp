@@ -54,7 +54,7 @@ CE5Goods::CE5Goods(const QStringList &dbParams, QWidget *parent) :
     while (db.nextRow()) {
         fStrings.insert(db.getString(0));
     }
-    QStringListModel *m = new QStringListModel(fStrings.toList());
+    QStringListModel *m = new QStringListModel(fStrings.values());
     QCompleter *c = new QCompleter(m);
     c->setCaseSensitivity(Qt::CaseInsensitive);
     ui->leName->setCompleter(c);
@@ -66,6 +66,8 @@ CE5Goods::CE5Goods(const QStringList &dbParams, QWidget *parent) :
     QStringList l;
     l.append(tr("Sale price"));
     l.append(tr("Whosale"));
+    l.append(tr("Retail disc"));
+    l.append(tr("Whosale disc"));
     ui->tblPricing->setVerticalHeaderLabels(l);
     ui->tblPricing->setRowHidden(1, __c5config.getValue(211).toInt() == 1);
     db.exec("select * from e_currency order by f_id");
@@ -76,10 +78,16 @@ CE5Goods::CE5Goods(const QStringList &dbParams, QWidget *parent) :
         colLabels.append(db.getString("f_name"));
         ui->tblPricing->createLineEdit(0, c)->setValidator(new QDoubleValidator(0, 99999999, 4));
         ui->tblPricing->createLineEdit(1, c)->setValidator(new QDoubleValidator(0, 99999999, 4));
+        ui->tblPricing->createLineEdit(2, c)->setValidator(new QDoubleValidator(0, 99999999, 4));
+        ui->tblPricing->createLineEdit(3, c)->setValidator(new QDoubleValidator(0, 99999999, 4));
         ui->tblPricing->lineEdit(0, c)->fDecimalPlaces = 7;
         ui->tblPricing->lineEdit(1, c)->fDecimalPlaces = 7;
+        ui->tblPricing->lineEdit(2, c)->fDecimalPlaces = 7;
+        ui->tblPricing->lineEdit(3, c)->fDecimalPlaces = 7;
         ui->tblPricing->lineEdit(0, c)->setProperty("c", db.getInt("f_id"));
         ui->tblPricing->lineEdit(1, c)->setProperty("c", db.getInt("f_id"));
+        ui->tblPricing->lineEdit(2, c)->setProperty("c", db.getInt("f_id"));
+        ui->tblPricing->lineEdit(3, c)->setProperty("c", db.getInt("f_id"));
         connect(ui->tblPricing->lineEdit(0, c), &C5LineEdit::textEdited, this, &CE5Goods::priceEdited);
         connect(ui->tblPricing->lineEdit(1, c), &C5LineEdit::textEdited, this, &CE5Goods::priceEdited);
     }
@@ -190,6 +198,8 @@ void CE5Goods::setId(int id)
             if (ui->tblPricing->lineEdit(0, j)->property("c").toInt() == db.getInt("f_currency")) {
                 ui->tblPricing->lineEdit(0, j)->setDouble(db.getDouble("f_price1"));
                 ui->tblPricing->lineEdit(1, j)->setDouble(db.getDouble("f_price2"));
+                ui->tblPricing->lineEdit(2, j)->setDouble(db.getDouble("f_price1disc"));
+                ui->tblPricing->lineEdit(3, j)->setDouble(db.getDouble("f_price2disc"));
                 break;
             }
         }
@@ -302,6 +312,8 @@ bool CE5Goods::save(QString &err, QList<QMap<QString, QVariant> > &data)
         db[":f_goods"] = ui->leCode->getInteger();
         db[":f_price1"] = ui->tblPricing->lineEdit(0, j)->getDouble();
         db[":f_price2"] = ui->tblPricing->lineEdit(1, j)->getDouble();
+        db[":f_price1disc"] = ui->tblPricing->lineEdit(2, j)->getDouble();
+        db[":f_price2disc"] = ui->tblPricing->lineEdit(3, j)->getDouble();
         db[":f_currency"] = ui->tblPricing->lineEdit(0, j)->property("c");
         db.insert("c_goods_prices");
     }

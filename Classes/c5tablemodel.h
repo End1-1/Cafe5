@@ -26,7 +26,7 @@ public:
 
     void setSingleCheckBoxSelection(bool v);
 
-    void sort(int column);
+    void sort(int column) ;
 
     void setExternalData(const QHash<QString, int> &columnNameIndex, const QHash<QString, QString> &translation);
 

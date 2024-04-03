@@ -18,6 +18,7 @@
 #include "cr5documents.h"
 #include "cr5goodsclasses.h"
 #include "c5translatorform.h"
+#include "ntablewidget.h"
 #include "c5goodsspecialprices.h"
 #include "cr5breezeservice.h"
 #include "cr5reports.h"
@@ -187,6 +188,30 @@ void C5MainWindow::closeEvent(QCloseEvent *event)
     QMainWindow::closeEvent(event);
 }
 
+NTableWidget *C5MainWindow::createNTab(const QString &route)
+{
+    auto *t = new NTableWidget(route);
+    t->mMainWindow = this;
+    fTab->addTab(t, "");
+    fTab->setCurrentIndex(fTab->count() - 1);
+    t->mHost = __c5config.dbParams().at(1);
+    t->query();
+    return t;
+
+}
+
+void C5MainWindow::nTabDesign(const QIcon &icon, const QString &label, NTableWidget *widget)
+{
+    for (int i = 0; i < fTab->count(); i++) {
+        auto *nt = dynamic_cast<NTableWidget*>(fTab->widget(i));
+        if (nt == widget) {
+            fTab->setTabText(i, label);
+            fTab->setTabIcon(i, icon);
+            return;
+        }
+    }
+}
+
 void C5MainWindow::removeTab(QWidget *w)
 {
     for (int i = 0; i < fTab->count(); i++) {
@@ -223,25 +248,25 @@ void C5MainWindow::tabCloseRequested(int index)
 {
     auto *w = static_cast<C5Widget*>(fTab->widget(index));
     QString prevWindow, currWindow;
-    if (fPrevTabUuid.count() > 1) {
-        prevWindow = fPrevTabUuid.at(fPrevTabUuid.count() - 2);
-    }
-    currWindow = w->fWindowUuid;
+//    if (fPrevTabUuid.count() > 1) {
+//        prevWindow = fPrevTabUuid.at(fPrevTabUuid.count() - 2);
+//    }
+    //currWindow = w->fWindowUuid;
     fTab->removeTab(index);
     delete w;
-    if (!prevWindow.isEmpty() && index == fTab->currentIndex()) {
-        for (int i = 0; i < fTab->count(); i++) {
-            w = static_cast<C5Widget*>(fTab->widget(i));
-            if (w->fWindowUuid == prevWindow) {
-                fPrevTabUuid.append(w->fWindowUuid);
-                fTab->setCurrentIndex(i);
-                fPrevTabUuid.removeAll(w->fWindowUuid);
-                return;
-            }
-        }
-    } else {
-        fPrevTabUuid.removeAll(currWindow);
-    }
+//    if (!prevWindow.isEmpty() && index == fTab->currentIndex()) {
+//        for (int i = 0; i < fTab->count(); i++) {
+//            w = static_cast<C5Widget*>(fTab->widget(i));
+//            if (w->fWindowUuid == prevWindow) {
+//                fPrevTabUuid.append(w->fWindowUuid);
+//                fTab->setCurrentIndex(i);
+//                fPrevTabUuid.removeAll(w->fWindowUuid);
+//                return;
+//            }
+//        }
+//    } else {
+//        fPrevTabUuid.removeAll(currWindow);
+//    }
 }
 
 void C5MainWindow::currentTabChange(int index)
@@ -554,8 +579,11 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
     case cp_t3_store_sale:
         createTab<CR5SaleFromStore>(dbParams);
         break;
-    case cp_t3_debts:
+    case cp_t3_debts_partner:
         createTab<CR5CostumerDebts>(dbParams);
+        break;
+    case cp_t3_debts_customer:
+        createNTab("/engine/reports/customer_debts.php");
         break;
     case cp_t3_sale_removed_dishes:
         createTab<CR5SaleRemovedDishes>(dbParams);
@@ -854,7 +882,8 @@ void C5MainWindow::setDB()
         addTreeL3Item(l, cp_t3_documents_store, tr("Documents in the store"), ":/documents.png");
         addTreeL3Item(l, cp_t3_store, tr("Storage"), ":/goods.png");
         addTreeL3Item(l, cp_t3_store_movement, tr("Storages movements"), ":/goods.png");
-        addTreeL3Item(l, cp_t3_debts, tr("Debts"), ":/cash.png");
+        addTreeL3Item(l, cp_t3_debts_partner, tr("Debts partners"), ":/cash.png");
+        addTreeL3Item(l, cp_t3_debts_customer, tr("Debts customer"), ":/cash.png");
         addTreeL3Item(l, cp_t3_move_uncomplected, tr("Storage movement, uncomplected"), ":/goods.png");
         addTreeL3Item(l, cp_t3_storage_uncomplected, tr("Storage uncomplected"), ":/goods.png");
         addTreeL3Item(l, cp_t3_sale_from_store_total, tr("Detailed movement in the storage"), ":/graph.png");

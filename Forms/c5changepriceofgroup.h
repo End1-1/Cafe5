@@ -16,7 +16,7 @@ public:
 
     ~C5ChangePriceOfGroup();
 
-    static bool groupPrice(const QStringList &dbParams, double &price1, double &price2);
+    static bool groupPrice(const QStringList &dbParams, double &price1, double &price2, double &price1disc, double &price2disc);
 
 private slots:
     void on_btnOk_clicked();

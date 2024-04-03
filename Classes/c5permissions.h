@@ -43,7 +43,7 @@
 #define cp_t3_sale_dishes 309
 #define cp_t3_sale_from_store_total 310
 #define cp_t3_discount_statistics 311
-#define cp_t3_debts 312
+#define cp_t3_debts_partner 312
 #define cp_t3_consuption_reason 313
 #define cp_t3_preorders 315
 #define cp_t3_sale_effectiveness 316
@@ -52,6 +52,7 @@
 #define cp_t3_count_output_of_sale_draft 319
 #define cp_t3_custom_reports 320
 #define cp_t3_draft_output_recipes 321
+#define cp_t3_debts_customer 322
 
 #define cp_t4_menu 400
 #define cp_t4_menu_names 401
