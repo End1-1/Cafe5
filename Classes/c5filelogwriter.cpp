@@ -5,8 +5,6 @@
 #include <QDateTime>
 #include <QDebug>
 
-QString C5FileLogWriter::fFileName;
-
 C5FileLogWriter::C5FileLogWriter(const QString &message, QObject *parent) :
     C5ThreadObject(parent),
     fMessage(message)
@@ -14,43 +12,42 @@ C5FileLogWriter::C5FileLogWriter(const QString &message, QObject *parent) :
     connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
 }
 
-void C5FileLogWriter::write(const QString &message, const QString &fileName)
+void C5FileLogWriter::write(const QString &message, const QString &file)
 {
     C5FileLogWriter *l = new C5FileLogWriter(message);
-    if (!fileName.isEmpty()) {
-        l->fAltFileName = fileName;
-    }
+    l->fFileName = file;
     l->start();
-}
-
-void C5FileLogWriter::setFileName(const QString &fileName)
-{
-    fFileName = createFile(fileName);
 }
 
 void C5FileLogWriter::run()
 {
-    QString filename = fAltFileName.isEmpty() ? fFileName : createFile(fAltFileName);
-    QFile file(filename);
+#ifdef QT_DEBUG
+    qDebug() << fMessage.left(5000);
+    QFile file(createFile());
     if (file.open(QIODevice::Append)) {
         file.write(QDateTime::currentDateTime().toString("dd.MM.yyyy HH:mm:ss ").toUtf8());
         file.write(fMessage.toUtf8());
         file.write("\r\n");
         file.close();
     }
-#ifdef QT_DEBUG
-    qDebug() << fMessage.left(5000);
+#else
+    QFile file(createFile());
+    if (file.open(QIODevice::Append)) {
+        file.write(QDateTime::currentDateTime().toString("dd.MM.yyyy HH:mm:ss ").toUtf8());
+        file.write(fMessage.toUtf8());
+        file.write("\r\n");
+        file.close();
+    }
 #endif
     emit finished();
 }
 
-QString C5FileLogWriter::createFile(const QString &fileName)
+QString C5FileLogWriter::createFile()
 {
     QDir d;
     QString appHomePath = d.homePath() + "\\" + _APPLICATION_ + "\\" + _MODULE_;
     if (!d.exists(appHomePath)) {
         d.mkpath(appHomePath);
     }
-    QString appLogFile = appHomePath + "\\" + fileName;
-    return appLogFile;
+    return appHomePath + "\\" + fFileName + "_" + QDate::currentDate().toString("ddMMyyyy") + ".log";
 }

@@ -151,5 +151,6 @@
         <file>route.png</file>
         <file>icq.wav</file>
         <file>menuset.png</file>
+        <file>down-arrow-thin.png</file>
     </qresource>
 </RCC>

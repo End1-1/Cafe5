@@ -24,13 +24,15 @@ NDataProvider::~NDataProvider()
     delete mTimer;
 }
 
-void NDataProvider::getData(const QString &route)
+void NDataProvider::getData(const QString &route, const QJsonObject &data)
 {
 #ifdef QT_DEBUG
-    C5FileLogWriter::write(route);
+    c5log(route);
+    c5log(QJsonDocument(data).toJson(QJsonDocument::Compact));
 #else
     if (__c5config.getValue(param_debuge_mode).toInt() > 0) {
-        C5FileLogWriter::write(route);
+        c5log(route);
+        c5log(QJsonDocument(data).toJson(QJsonDocument::Compact));
     }
 #endif
     mTimer->restart();
@@ -46,71 +48,20 @@ void NDataProvider::getData(const QString &route)
     jo["call"] = "sql";
     //jo["sql"] = sql;
     jo["sk"] = "5cfafe13-a886-11ee-ac3e-1078d2d2b808";
-    mNetworkAccessManager->post(rq, QJsonDocument(jo).toJson());
+    jo["apikey"] = "8eabcee4-f1bc-11ee-8b0f-021eaa527a65-a0d5c784-f1bc-11ee-8b0f-021eaa527a65";
+    QStringList keys = data.keys();
+    for (const auto &s: keys) {
+        jo[s] = data[s];
+    }
 
-//    QByteArray ba = r->readAll();
-//    quint64 elapsed = t.elapsed();
-//    jo = QJsonDocument::fromJson(ba).object();
-//    if (jo["status"].toInt() == 0) {
-//        logEvent(ba);
-//        return false;
-//    }
-
-//        return true;
-//    }
-//    jo = jo["data"].toObject();
-//    QJsonArray ja = jo["columns"].toObject()["column_index_name"].toArray();
-//    fNameColumnMap.clear();
-//    for (int i = 0; i < ja.size(); i++) {
-//        const QJsonObject &jc = ja[i].toObject();
-//        fNameColumnMap[jc["name"].toString()] = jc["value"].toInt();
-//    }
-//    ja = jo["columns"].toObject()["column_name_index"].toArray();
-//    QJsonArray jtype = jo["types"].toArray();
-//    // fNameColumnMap.clear();
-//    // for (int i = 0; i < ja.size(); i++) {
-//    //     const QJsonObject &jc = ja[i].toObject();
-//    //     fNameColumnMap[jc["name"].toString()] = jc["value"].toInt();
-//    // }
-//    ja = jo["data"].toArray();
-//    fDbRows.clear();
-//    for (int i = 0; i < ja.size(); i++) {
-//        QList<QVariant> r;
-//        QJsonArray jar = ja[i].toArray();
-//        for (int j = 0; j < jar.size(); j++) {
-//            switch (jtype[j].toInt()) {
-//            case 3:
-//                r.append(jar[j].toInt());
-//                break;
-//            case 246:
-//                r.append(jar[j].toDouble());
-//                break;
-//            case 10:
-//                r.append(QDate::fromString(jar[j].toString(), FORMAT_DATE_TO_STR_MYSQL));
-//                break;
-//            case 11:
-//                r.append(QTime::fromString(jar[j].toString()));
-//                break;
-//            case 7:
-//                r.append(QDateTime::fromString(jar[j].toString()));
-//                break;
-//            default:
-//                r.append(jar[j].toString());
-//                break;
-//            }
-
-//        }
-//        fDbRows.append(r);
-//    }
-
-//    return true;
+    mNetworkAccessManager->post(rq, QJsonDocument(jo).toJson(QJsonDocument::Compact));
 }
 
 void NDataProvider::queryFinished(QNetworkReply *r)
 {
 
     if (r->error() != QNetworkReply::NoError) {
-        emit error(r->errorString());
+        emit error(r->errorString() + "\r\n" + r->readAll());
         r->deleteLater();
         return;
     }

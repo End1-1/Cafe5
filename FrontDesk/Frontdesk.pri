@@ -1,4 +1,5 @@
 FORMS += \
+    $$PWD/../NTable/nsearchdlg.ui \
     ../Reports/cr5consuptionbysalesqty.ui \
     ../Classes/calculator.ui \
     ../Classes/notificationwidget.ui \
@@ -161,10 +162,14 @@ FORMS += \
     ../Reports/cr5menutranslator.ui \
     ../Reports/cr5dishpriceselfcostfilter.ui \
     ../Reports/cr5storedocumentsfilter.ui \
-    ../NTable/nloadingdlg.ui
+    ../NTable/nloadingdlg.ui \
+    ../NTable/nfilterdlg.ui
 
 
 HEADERS += \
+        $$PWD/../Classes/c5servername.h \
+        $$PWD/../NTable/nhandler.h \
+        $$PWD/../NTable/nsearchdlg.h \
         ../NTable/ntablemodel.h \
         ../NTable/ndataprovider.h \
         ../NTable/ntablewidget.h \
@@ -627,10 +632,14 @@ HEADERS += \
         ../../XLSX/src/xlsxtheme.h \
         ../../XLSX/src/xlsxworkbook.h \
         ../../XLSX/src/xlsxwriter.h \
-        ../../XLSX/src/zip.h
+        ../../XLSX/src/zip.h \
+        ../NTable/nfilterdlg.h
 
 
 SOURCES += \
+    $$PWD/../Classes/c5servername.cpp \
+    $$PWD/../NTable/nhandler.cpp \
+    $$PWD/../NTable/nsearchdlg.cpp \
         ../NTable/ntablemodel.cpp \
         ../NTable/ndataprovider.cpp \
         ../NTable/ntablewidget.cpp \
@@ -976,7 +985,8 @@ SOURCES += \
         ../../XLSX/src/xlsxstyles.cpp \
         ../../XLSX/src/xlsxtheme.cpp \
         ../../XLSX/src/xlsxworkbook.cpp \
-        ../../XLSX/src/xlsxwriter.cpp
+        ../../XLSX/src/xlsxwriter.cpp \
+        ../NTable/nfilterdlg.cpp
 
 INCLUDEPATH += ../Cafe5
 INCLUDEPATH += ../Cache

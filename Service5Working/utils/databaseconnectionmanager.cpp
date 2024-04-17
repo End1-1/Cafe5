@@ -9,8 +9,11 @@ DatabaseConnectionManager::DatabaseConnectionManager()
 
 }
 
-bool DatabaseConnectionManager::init()
+bool DatabaseConnectionManager::init(const QString &configFile)
 {
+    if (!configFile.isEmpty()) {
+        ConfigIni::init(configFile);
+    }
     DatabaseConnection dc;
     dc.name = SYSTEM;
     dc.host = ConfigIni::value("db/host");

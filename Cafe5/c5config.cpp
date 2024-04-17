@@ -98,15 +98,8 @@ QStringList C5Config::dbParams()
 
 QStringList C5Config::replicaDbParams()
 {
-    if (!rdbReplica()) {
         return dbParams();
-    }
-    QStringList params;
-    params.append(getValue(param_rootdb_host));
-    params.append(getValue(param_rootdb_schema));
-    params.append(getValue(param_rootdb_user));
-    params.append(getValue(param_rootdb_pass));
-    return params;
+
 }
 
 int C5Config::docNumDigitsInput()

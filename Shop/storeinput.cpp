@@ -153,9 +153,9 @@ void StoreInput::getList()
     ui->tbl->setColumnCount(header.count());
     ui->tbl->setHorizontalHeaderLabels(header);
     ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 30, 100, 0, 300, 140, 100, 100);
-    C5Database db(__c5config.replicaDbParams());
+    C5Database db;
     db[":f_store"] = __c5config.defaultStore();
-    if (!db.exec("select ad.f_id, spa.f_id as f_acc, ah.f_date, g.f_name, g.f_scancode, ad.f_qty, gpr.f_price1 "
+    if (!db.exec("select ad.f_id, spa.f_id as f_acc, ah.f_date, g.f_name, g.f_scancode, ad.f_qty, if (gpr.f_price1disc>0,gpr.f_price1disc, gpr.f_price1) as f_price1 "
                 "from a_store_draft ad "
                 "left join a_header_shop2partneraccept spa on spa.f_id=ad.f_id "
                 "inner join c_goods g on g.f_id=ad.f_goods "
@@ -236,7 +236,7 @@ void StoreInput::history()
         }
     }
     ui->tbl->fitColumnsToWidth();
-    ui->chAll->clicked(true);
+    emit ui->chAll->clicked(true);
 }
 
 void StoreInput::storeByGroup()

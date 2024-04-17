@@ -3,13 +3,13 @@
 
 #include "c5threadobject.h"
 
-#define c5log(x) C5FileLogWriter::write(x, "")
+#define c5log(x) C5FileLogWriter::write(x, "log")
+#define c5loge(x) C5FileLogWriter::write(x, "error")
 #define c5logf(x, y) C5FileLogWriter::write(x, y)
 
 #ifdef QT_DEBUG
 #define c5logd(x, y) C5FileLogWriter::write(x, y)
 #else
-//#define c5logd(x, y) ;
 #define c5logd(x, y) C5FileLogWriter::write(x, y)
 #endif
 
@@ -18,17 +18,15 @@ class C5FileLogWriter : public C5ThreadObject
     Q_OBJECT
 public:
     C5FileLogWriter(const QString &message, QObject *parent = nullptr);
-    static void write(const QString &message, const QString &fileName = "");
-    static void setFileName(const QString &fileName);
+    static void write(const QString &message, const QString &file);
 
 protected slots:
     virtual void run() override;
 
 private:
-    static QString fFileName;
-    QString fAltFileName;
+    QString fFileName;
     const QString fMessage;
-    static QString createFile(const QString &fileName);
+    QString createFile();
 };
 
 #endif // C5FILELOGWRITER_H

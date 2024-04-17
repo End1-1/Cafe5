@@ -580,10 +580,10 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
         createTab<CR5SaleFromStore>(dbParams);
         break;
     case cp_t3_debts_partner:
-        createTab<CR5CostumerDebts>(dbParams);
+        createNTab("/engine/reports/customer-debts.php");
         break;
     case cp_t3_debts_customer:
-        createNTab("/engine/reports/customer_debts.php");
+        createNTab("/engine/reports/customer-debts.php");
         break;
     case cp_t3_sale_removed_dishes:
         createTab<CR5SaleRemovedDishes>(dbParams);
@@ -882,8 +882,8 @@ void C5MainWindow::setDB()
         addTreeL3Item(l, cp_t3_documents_store, tr("Documents in the store"), ":/documents.png");
         addTreeL3Item(l, cp_t3_store, tr("Storage"), ":/goods.png");
         addTreeL3Item(l, cp_t3_store_movement, tr("Storages movements"), ":/goods.png");
-        addTreeL3Item(l, cp_t3_debts_partner, tr("Debts partners"), ":/cash.png");
-        addTreeL3Item(l, cp_t3_debts_customer, tr("Debts customer"), ":/cash.png");
+        addTreeL3Item(l, cp_t3_debts_partner, tr("Debts journal"), ":/cash.png");
+        //addTreeL3Item(l, cp_t3_debts_customer, tr("Debts journal"), ":/cash.png");
         addTreeL3Item(l, cp_t3_move_uncomplected, tr("Storage movement, uncomplected"), ":/goods.png");
         addTreeL3Item(l, cp_t3_storage_uncomplected, tr("Storage uncomplected"), ":/goods.png");
         addTreeL3Item(l, cp_t3_sale_from_store_total, tr("Detailed movement in the storage"), ":/graph.png");

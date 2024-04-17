@@ -3,6 +3,11 @@
 #include "c5config.h"
 #include <QSettings>
 #include <QInputDialog>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#include <QThread>
+
 
 #define db_ver 1
 #define params_count 6
@@ -55,6 +60,39 @@ void C5Connection::on_btnCancel_clicked()
 
 void C5Connection::on_btnTest_clicked()
 {
+#ifdef NETWORKDB
+    QNetworkAccessManager m;
+    QString host = "https://" + ui->leHost->text();
+    QNetworkRequest rq(host);
+    m.setTransferTimeout(60000);
+    rq.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    QSslConfiguration sslConf = rq.sslConfiguration();
+    sslConf.setPeerVerifyMode(QSslSocket::VerifyNone);
+    sslConf.setProtocol(QSsl::AnyProtocol);
+    rq.setSslConfiguration(sslConf);
+    QJsonObject jo;
+    jo["query"] = 3;
+    jo["call"] = "sql";
+    jo["sql"] = "select * from s_users where f_id=1";
+    jo["sk"] = "5cfafe13-a886-11ee-ac3e-1078d2d2b808";
+    auto *r = m.post(rq, QJsonDocument(jo).toJson());
+    while (!r->isFinished()) {
+        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+        QThread::msleep(10);
+    }
+    if (r->error() != QNetworkReply::NoError) {
+        C5Message::error(r->errorString());
+        return;
+    }
+    QByteArray ba = r->readAll();
+    jo = QJsonDocument::fromJson(ba).object();
+    if (jo["status"].toInt() == 0) {
+        C5Message::error(ba);
+        return;
+    }
+    C5Message::info(tr("Connection successfull"));
+
+#else
     C5Database db(ui->leHost->text(), ui->leDatabase->text(), ui->leUsername->text(), ui->lePassword->text());
     if (!db.open()) {
         C5Message::error(tr("Cannot connect to database") + "<br>" + db.fLastError);
@@ -62,6 +100,7 @@ void C5Connection::on_btnTest_clicked()
     }
     db.close();
     C5Message::info(tr("Connection successfull"));
+#endif
 }
 
 void C5Connection::on_btnSave_clicked()

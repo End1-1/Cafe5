@@ -4,10 +4,6 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
 
-# You can make your code fail to compile if it uses deprecated APIs.
-# In order to do so, uncomment the following line.
-#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
-
 RC_FILE = res.rc
 
 SOURCES += \
@@ -138,7 +134,7 @@ INCLUDEPATH += datadriver
 INCLUDEPATH += ../Service5Working/raw
 INCLUDEPATH += ../Service5Working/socket
 INCLUDEPATH += ../Classes
-INCLUDEPATH += C:/Projects/Cafe5/Service5/utils
+INCLUDEPATH += C:/projects/Cafe5/Service5Working/utils
 INCLUDEPATH += C:/Soft/OpenSSL-Win64/include
 INCLUDEPATH += C:/Soft/OpenSSL-Win64/include/openssl
 

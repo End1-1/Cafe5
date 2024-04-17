@@ -304,7 +304,6 @@ void Workspace::setQty(double qty, int mode, int rownum, const QString &packageu
     if (row < 0) {
         return;
     }
-
     Dish d = ui->tblOrder->item(row, 0)->data(Qt::UserRole).value<Dish>();
     QString uuid = packageuuid;
     if (uuid.isEmpty()) {
@@ -322,8 +321,8 @@ void Workspace::setQty(double qty, int mode, int rownum, const QString &packageu
         d.qty += qty;
         break;
     case 3:
-        if (d.qty - qty > 0.1) {
-            if (!fOrderUuid.isEmpty()) {
+        if (d.qty2 < 0.1) {
+            if (d.qty - qty < 0.1) {
                 removeDish(row, uuid);
                 return;
             }
@@ -1335,18 +1334,21 @@ bool Workspace::saveOrder(int state)
     dw.writeOHeaderFlags(fOrderUuid, fCustomer == 0 ? 0 : 1, fFlagEdited, 0, 0, 0);
 
     for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
-            Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
-            int pid = 0;
-            double disc = discountValue();
-            if (!dw.writeOBody(d.obodyId, fOrderUuid, d.state, d.id, d.qty, d.qty2, d.price,
-                               (d.qty*d.price) - (d.qty*d.price*disc), __c5config.serviceFactor().toDouble(),
-                               d.discount, d.store, d.printer, "", d.modificator, 0, d.adgCode, 0, 0, pid, i,
-                               QDateTime::currentDateTime(), d.f_emarks)) {
-                C5Message::error(dw.fErrorMsg);
-                db.rollback();
-                return false;
-            }
-            ui->tblOrder->item(i, 0)->setData(Qt::UserRole, QVariant::fromValue(d));
+        Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
+        if (state == ORDER_STATE_CLOSE) {
+            d.qty2 = d.qty;
+        }
+        int pid = 0;
+        double disc = discountValue();
+        if (!dw.writeOBody(d.obodyId, fOrderUuid, d.state, d.id, d.qty, d.qty2, d.price,
+                           (d.qty*d.price) - (d.qty*d.price*disc), __c5config.serviceFactor().toDouble(),
+                           d.discount, d.store, d.printer, "", d.modificator, 0, d.adgCode, 0, 0, pid, i,
+                           QDateTime::currentDateTime(), d.f_emarks)) {
+            C5Message::error(dw.fErrorMsg);
+            db.rollback();
+            return false;
+        }
+        ui->tblOrder->item(i, 0)->setData(Qt::UserRole, QVariant::fromValue(d));
     }
 
 

@@ -14,7 +14,7 @@ class NDataProvider : public QObject
 public:
     explicit NDataProvider(const QString &host, QObject *parent = nullptr);
     ~NDataProvider();
-    void getData(const QString &route);
+    void getData(const QString &route, const QJsonObject &data);
 
 private:
     QString mHost;

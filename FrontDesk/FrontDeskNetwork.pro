@@ -47,6 +47,8 @@ DISTFILES += \
 
 ICON = storehouse.ico
 
+DEFINES += NETWORKDB
+
 
 LIBS += -LC:/Soft/OpenSSL-Win64/lib
 

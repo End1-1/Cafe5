@@ -2,6 +2,7 @@
 #include "c5connection.h"
 #include "c5systempreference.h"
 #include "c5login.h"
+#include "c5servername.h"
 #include <QMessageBox>
 #include <QApplication>
 #include <QTranslator>
@@ -24,9 +25,15 @@ int main(int argc, char *argv[])
 #endif
 
     QApplication a(argc, argv);
-//    if (QDate::currentDate() > QDate::fromString("15/08/2023", "dd/MM/yyyy")) {
-//        return 1;
-//    }
+    for (const QString &sn: a.arguments()) {
+        if (sn.contains("/servername")) {
+            QStringList snconf = sn.split("=");
+            if (snconf.length() == 2) {
+                C5ServerName c5sn(snconf.at(1));
+                c5sn.getServers();
+            }
+        }
+    }
 
     QFile style(a.applicationDirPath() + "/officestyle.qss");
     QString css;

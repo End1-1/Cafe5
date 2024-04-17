@@ -25,14 +25,21 @@ void PluginManager::init(const QString &configFileName)
             l->deleteLater();
             continue;
         }
-        startPlugin s = reinterpret_cast<startPlugin>(l->resolve("startPlugin"));
-        s(configFileName);
+
+        startPlugin sp = reinterpret_cast<startPlugin>(l->resolve("startPlugin"));
+        if (sp) {
+            sp(configFileName);
+        } else {
+            qDebug() << "ERROR! startPlugin cannot resolved!";
+        }
         pluginUuid pu = reinterpret_cast<pluginUuid>(l->resolve("pluginUuid"));
         pluginhandler ph = reinterpret_cast<pluginhandler>(l->resolve("handler"));
         removesocketfromplugin rs = reinterpret_cast<removesocketfromplugin>(l->resolve("removeSocket"));
         QString pus;
         if (pu) {
             pus = pu();
+        } else {
+            qDebug() << "ERROR! pluginUuid cannot resolved!";
         }
         if (!pus.isEmpty() && ph) {
             fInstance->fPluginHandlers[pus] = ph;

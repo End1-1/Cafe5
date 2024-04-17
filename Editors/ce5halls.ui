@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>423</width>
-    <height>191</height>
+    <height>202</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -149,6 +149,9 @@
      </property>
      <property name="Field" stdset="0">
       <string>f_settings</string>
+     </property>
+     <property name="Type" stdset="0">
+      <number>1</number>
      </property>
     </widget>
    </item>

@@ -50,9 +50,18 @@ DWORD WINAPI ThreadProc(CONST LPVOID lpParam) {
     QTranslator t;
     t.load(":/Service5.qm");
     app.installTranslator(&t);
+    QString configFile;
+    for (const QString &a: app.arguments()) {
+        if (a.contains("--config")) {
+            QStringList ac = a.split("=");
+            if (ac.length() == 2){
+                configFile = ac.at(1);
+            }
+        }
+    }
     do {
         LogWriter::write(LogWriterLevel::verbose, "", "Try to initialize database manager");
-    } while (!DatabaseConnectionManager::init());
+    } while (!DatabaseConnectionManager::init(configFile));
     RequestManager::init();
     PluginManager::init(APPDIR + "config.ini");
     Raw::init();
@@ -79,7 +88,7 @@ int __cdecl main(int argc, char *argv[])
     ARGC = argc;
     ARGV = argv;
     APPDIR = QFileInfo(QString(argv[0])).path() + "/";
-    ConfigIni::init(APPDIR);
+    ConfigIni::init(APPDIR + "config.ini");
     LogWriter::fCurrentLevel = 100;
     LogWriter::write(LogWriterLevel::verbose, "", "Service started");
 
@@ -251,7 +260,7 @@ VOID SvcInit( DWORD dwArgc, LPTSTR *lpszArgv)
     ReportSvcStatus( SERVICE_RUNNING, NO_ERROR, 0 );
 
     // TO_DO: Perform work until service stops.
-    HANDLE hThread = CreateThread(NULL, 0, &ThreadProc, NULL, 0, NULL);
+    HANDLE hThread = CreateThread(NULL, 0, &ThreadProc, lpszArgv, 0, NULL);
     LogWriter::write(LogWriterLevel::verbose, "", QString("Socket server thread id: %1").arg(PtrToInt(hThread)));
     while(1)
     {
