@@ -24,13 +24,9 @@
 #include "selectprinters.h"
 #include "c5printing.h"
 #include "dlggiftcardsale.h"
-#include "rawmessage.h"
 #include "c5tablewidget.h"
 #include "dlgregistercard.h"
 #include "printreceiptgroup.h"
-#include "dlgserversettings.h"
-#include "serverconnection.h"
-#include "socketconnection.h"
 #include "dlgshowcolumns.h"
 #include "c5tempsale.h"
 #include <QShortcut>
@@ -56,16 +52,10 @@ Working::Working(C5User *user, QWidget *parent) :
     ui->setupUi(this);
     fInstance = this;
     QString ip;
-    int port;
     fCustomerDisplay = nullptr;
     QString username;
     QString password;
-    ServerConnection::getParams(ip, port, username, password);
-    SocketConnection::initInstance();
-    connect(SocketConnection::instance(), &SocketConnection::connected, this, &Working::socketConnected);
-    connect(SocketConnection::instance(), &SocketConnection::connectionLost, this, &Working::socketDisconnected);
-    connect(SocketConnection::instance(), &SocketConnection::externalDataReady, this, &Working::socketDataReceived);
-    SocketConnection::startConnection(ip, port, username, password);
+
     fUser = user;
     QShortcut *sF1 = new QShortcut(QKeySequence(Qt::Key_F1), this);
     QShortcut *sF2 = new QShortcut(QKeySequence(Qt::Key_F2), this);
@@ -410,30 +400,6 @@ int Working::ordersCount()
     }
 }
 
-void Working::socketConnected()
-{
-    ui->btnServerSettings->setIcon(QIcon(":/wifib.png"));
-}
-
-void Working::socketDisconnected()
-{
-    ui->btnServerSettings->setIcon(QIcon(":/wifi_off.png"));
-}
-
-void Working::socketDataReceived(quint16 cmd, quint32 messageId, QByteArray d)
-{
-    switch (cmd) {
-    case MessageList::silent_auth:
-        quint32 userid;
-        RawMessage r(nullptr);
-        r.readUInt(userid, d);
-        if (userid > 0) {
-            ui->btnServerSettings->setIcon(QIcon(":/wifi_on.png"));
-        }
-        break;
-    }
-}
-
 void Working::timeout()
 {
     fTimerCounter++;
@@ -747,26 +713,6 @@ void Working::on_btnCloseApplication_clicked()
     if (C5Message::question(tr("Confirm to close application")) == QDialog::Accepted) {
         qApp->quit();
     }
-}
-
-void Working::on_btnServerSettings_clicked()
-{
-    QString ip, username, password;
-    int port;
-    ServerConnection::getParams(ip, port, username, password);
-    if (password.isEmpty() == false) {
-        bool ok = false;
-        QString passwordInput = QInputDialog::getText(this, tr("Password"), "", QLineEdit::Password, "", &ok);
-        if (ok == false) {
-            return;
-        }
-        if (password != passwordInput) {
-            QMessageBox::critical(this, tr("Error"), tr("Invalid password"));
-            return;
-        }
-    }
-    DlgServerSettings d;
-    d.exec();
 }
 
 void Working::on_btnWriteOrder_clicked()

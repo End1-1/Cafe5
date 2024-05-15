@@ -1,7 +1,7 @@
 QT += network sql
 
 TEMPLATE = lib
-DEFINES += SYNCFROMAWS_LIBRARY
+DEFINES += SYNCFROMAWSELINA_LIBRARY
 
 CONFIG += c++11
 
@@ -34,6 +34,7 @@ HEADERS += \
 DEFINES += _APPLICATION_=\\\"Breeze\\\"
 DEFINES += _MODULE_=\\\"Service5_syncfromaws_dll\\\"
 DEFINES += _DBDRIVER_=\\\"QMARIADB\\\"
+DEFINES += ELINA
 
 INCLUDEPATH += ../../raw
 INCLUDEPATH += ../../socket

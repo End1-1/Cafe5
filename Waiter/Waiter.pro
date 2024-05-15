@@ -54,6 +54,7 @@ SOURCES += \
     ../Cafe5/c5double.cpp \
     ../Cafe5/c5logsystem.cpp \
     ../Cafe5/c5replication.cpp \
+    ../Cafe5/c5serverhandler.cpp \
     ../Cafe5/c5systempreference.cpp \
     ../Cafe5/calendar.cpp \
     ../Classes/c5airlog.cpp \
@@ -68,11 +69,11 @@ SOURCES += \
     ../Classes/c5jsondb.cpp \
     ../Classes/c5orderdriver.cpp \
     ../Classes/c5printreceiptthread.cpp \
-    ../Classes/c5printreceiptthread50mm.cpp \
     ../Classes/c5printrecipta4.cpp \
     ../Classes/c5random.cpp \
     ../Classes/c5replacecharacter.cpp \
     ../Classes/c5reporttemplatedriver.cpp \
+    ../Classes/c5servername.cpp \
     ../Classes/c5shoporder.cpp \
     ../Classes/c5storedraftwriter.cpp \
     ../Classes/c5tablerec.cpp \
@@ -183,7 +184,6 @@ SOURCES += \
     ../Forms/c5dbuseraccess.cpp \
     ../Forms/c5dishgroupaction.cpp \
     ../Forms/c5dishselfcostgenprice.cpp \
-    ../Forms/c5dlgconnections.cpp \
     ../Forms/c5dlgselectreporttemplate.cpp \
     ../Forms/c5filtervalues.cpp \
     ../Forms/c5goodsimage.cpp \
@@ -236,7 +236,6 @@ SOURCES += \
     ../Forms/dlgreservgoods.cpp \
     ../Forms/dlgselectcurrency.cpp \
     ../Forms/dlgsemireadyinout.cpp \
-    ../Forms/dlgserversettings.cpp \
     ../Forms/dlgsetwaiterordercl.cpp \
     ../Forms/dlgstoreutils.cpp \
     ../Forms/dlgviewcashreport.cpp \
@@ -249,7 +248,10 @@ SOURCES += \
     ../Forms/touchentertaxreceiptnumber.cpp \
     ../Forms/touchselecttaxreport.cpp \
     ../NTable/ndataprovider.cpp \
+    ../NTable/nfilterdlg.cpp \
+    ../NTable/nhandler.cpp \
     ../NTable/nloadingdlg.cpp \
+    ../NTable/nsearchdlg.cpp \
     ../NTable/ntablemodel.cpp \
     ../NTable/ntablewidget.cpp \
     ../Printing/printreceipt.cpp \
@@ -413,10 +415,8 @@ SOURCES += \
     ../Cafe5/c5config.cpp \
     ../Cafe5/c5dialog.cpp \
     ../Cafe5/c5utils.cpp \
-    ../Cafe5/c5connection.cpp \
     ../Cafe5/c5message.cpp \
     ../Cafe5/c5sockethandler.cpp \
-    ../Cafe5/c5serverhandler.cpp \
     dlgorder.cpp \
     ../Classes/c5user.cpp \
     ../Classes/c5menu.cpp \
@@ -487,6 +487,7 @@ HEADERS += \
     ../Cafe5/c5double.h \
     ../Cafe5/c5logsystem.h \
     ../Cafe5/c5replication.h \
+    ../Cafe5/c5serverhandler.h \
     ../Cafe5/c5systempreference.h \
     ../Cafe5/calendar.h \
     ../Classes/barcode5.h \
@@ -502,11 +503,11 @@ HEADERS += \
     ../Classes/c5jsondb.h \
     ../Classes/c5orderdriver.h \
     ../Classes/c5printreceiptthread.h \
-    ../Classes/c5printreceiptthread50mm.h \
     ../Classes/c5printrecipta4.h \
     ../Classes/c5random.h \
     ../Classes/c5replacecharacter.h \
     ../Classes/c5reporttemplatedriver.h \
+    ../Classes/c5servername.h \
     ../Classes/c5shoporder.h \
     ../Classes/c5storedraftwriter.h \
     ../Classes/c5tablerec.h \
@@ -619,7 +620,6 @@ HEADERS += \
     ../Forms/c5dbuseraccess.h \
     ../Forms/c5dishgroupaction.h \
     ../Forms/c5dishselfcostgenprice.h \
-    ../Forms/c5dlgconnections.h \
     ../Forms/c5dlgselectreporttemplate.h \
     ../Forms/c5filtervalues.h \
     ../Forms/c5goodsimage.h \
@@ -672,7 +672,6 @@ HEADERS += \
     ../Forms/dlgreservgoods.h \
     ../Forms/dlgselectcurrency.h \
     ../Forms/dlgsemireadyinout.h \
-    ../Forms/dlgserversettings.h \
     ../Forms/dlgsetwaiterordercl.h \
     ../Forms/dlgstoreutils.h \
     ../Forms/dlgviewcashreport.h \
@@ -685,7 +684,10 @@ HEADERS += \
     ../Forms/touchentertaxreceiptnumber.h \
     ../Forms/touchselecttaxreport.h \
     ../NTable/ndataprovider.h \
+    ../NTable/nfilterdlg.h \
+    ../NTable/nhandler.h \
     ../NTable/nloadingdlg.h \
+    ../NTable/nsearchdlg.h \
     ../NTable/ntablemodel.h \
     ../NTable/ntablewidget.h \
     ../Printing/printreceipt.h \
@@ -818,7 +820,6 @@ HEADERS += \
     ../TableRecord/ogoods.h \
     ../TableRecord/oheader.h \
     ../TableRecord/otax.h \
-    c5printreceiptthread50mm.h \
     dishitem.h \
     dishitembutton.h \
     dlgaskforprecheck.h \
@@ -831,11 +832,9 @@ HEADERS += \
     ../Cafe5/c5config.h \
     ../Cafe5/c5dialog.h \
     ../Cafe5/c5utils.h \
-    ../Cafe5/c5connection.h \
     ../Cafe5/c5message.h \
     ../Cafe5/c5sockethandler.h \
     ../Cafe5/c5socketmessage.h \
-    ../Cafe5/c5serverhandler.h \
     dlgguests.h \
     dlglist.h \
     dlglistdishspecial.h \
@@ -966,7 +965,6 @@ FORMS += \
     ../Forms/c5dbuseraccess.ui \
     ../Forms/c5dishgroupaction.ui \
     ../Forms/c5dishselfcostgenprice.ui \
-    ../Forms/c5dlgconnections.ui \
     ../Forms/c5dlgselectreporttemplate.ui \
     ../Forms/c5filtervalues.ui \
     ../Forms/c5goodsimage.ui \
@@ -1017,7 +1015,6 @@ FORMS += \
     ../Forms/dlgreservgoods.ui \
     ../Forms/dlgselectcurrency.ui \
     ../Forms/dlgsemireadyinout.ui \
-    ../Forms/dlgserversettings.ui \
     ../Forms/dlgsetwaiterordercl.ui \
     ../Forms/dlgstoreutils.ui \
     ../Forms/dlgviewcashreport.ui \
@@ -1029,7 +1026,9 @@ FORMS += \
     ../Forms/touchdlgphonenumber.ui \
     ../Forms/touchentertaxreceiptnumber.ui \
     ../Forms/touchselecttaxreport.ui \
+    ../NTable/nfilterdlg.ui \
     ../NTable/nloadingdlg.ui \
+    ../NTable/nsearchdlg.ui \
     ../NTable/ntablewidget.ui \
     ../Printing/preorders.ui \
     ../Printing/selectprinters.ui \
@@ -1082,7 +1081,6 @@ FORMS += \
     dlgchosesplitorderoption.ui \
     dlgeditphone.ui \
         dlgface.ui \
-    ../Cafe5/c5connection.ui \
     ../Cafe5/c5message.ui \
     dlgguests.ui \
     dlglist.ui \
@@ -1133,6 +1131,7 @@ FORMS += \
     INCLUDEPATH += ../Reports
     INCLUDEPATH += ../Configs
     INCLUDEPATH += ../Printing
+    INCLUDEPATH += ../NTable
     INCLUDEPATH += ../Service5Working/raw
     INCLUDEPATH += ../Service5Working/socket
     INCLUDEPATH += ../Service5Working/utils
@@ -1142,8 +1141,8 @@ FORMS += \
     INCLUDEPATH += ../Controls
     INCLUDEPATH += ../NTable
     INCLUDEPATH += C:/Projects/NewTax/Src
-    INCLUDEPATH += C:/Soft/OpenSSL-Win64/include
-    INCLUDEPATH += C:/Soft/OpenSSL-Win64/include/openssl
+    INCLUDEPATH += C:/Soft/OpenSSLWin64/include
+    INCLUDEPATH += C:/Soft/OpenSSLWin64/include/openssl
     INCLUDEPATH += C:/Projects/XLSX/src
 
 RESOURCES += \
@@ -1156,7 +1155,7 @@ DISTFILES += \
 
 LIBS += -lVersion
 LIBS += -lwsock32
-LIBS += -LC:/Soft/OpenSSL-Win64/lib
+LIBS += -LC:/soft/OpenSSLWin64/lib/VC/x64/MD
 LIBS += -lopenssl
 LIBS += -llibcrypto
 

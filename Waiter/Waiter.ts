@@ -22175,7 +22175,7 @@ STOPLIST-ից</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../NTable/ntablewidget.cpp" line="174"/>
+        <location filename="../NTable/ntablewidget.cpp" line="181"/>
         <source>Empty report!</source>
         <translation type="unfinished"></translation>
     </message>

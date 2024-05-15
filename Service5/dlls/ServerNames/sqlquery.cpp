@@ -12,10 +12,11 @@
 
 void routes(QStringList &r)
 {
-    r.append("servernames");
+    r.append("office");
+    r.append("shop");
 }
 
-bool servernames(const QByteArray &indata, QByteArray &outdata, const QHash<QString, DataAddress> &dataMap, const ContentType &contentType)
+bool office(const QByteArray &indata, QByteArray &outdata, const QHash<QString, DataAddress> &dataMap, const ContentType &contentType)
 {
     CommandLine cl;
     QString path;
@@ -23,17 +24,6 @@ bool servernames(const QByteArray &indata, QByteArray &outdata, const QHash<QStr
     Database db;
     JsonHandler jh;
     RequestHandler rh(outdata);
-//    QString configFile = path + "/skuqty.ini";
-//    if (!QFile::exists(configFile)) {
-//        LogWriter::write(LogWriterLevel::errors, "", QString("sqlquery config path not exists: %1").arg(configFile));
-//        jh["message"] = "Server not configured";
-//        return rh.setInternalServerError(jh.toString());
-//    }
-//    if (!db.open(configFile)) {
-//        LogWriter::write(LogWriterLevel::errors, "", QString("sqlquery::sqlquery").arg(db.lastDbError()));
-//        jh["message"] = "Cannot connect to database";
-//        return rh.setInternalServerError(jh.toString());
-//    }
 
     if (contentType != ContentType::ApplilcationJson) {
         return rh.setDataValidationError("Accept content type: Application/Json");
@@ -46,24 +36,8 @@ bool servernames(const QByteArray &indata, QByteArray &outdata, const QHash<QStr
         return rh.setResponse(HTTP_FORBIDDEN, "Access denied");
     }
 
-//    db.exec("SELECT g.f_scancode AS sku, gp.f_price1 AS price, g.f_name as name, "
-//            "gp.f_price1 as price1, coalesce(gp.f_price1disc, 0) as price2 "
-//            "FROM c_goods g "
-//            "LEFT join c_goods_prices gp ON gp.f_goods=g.f_id AND gp.f_currency=1 "
-//            "WHERE LENGTH(g.f_scancode)>0 AND gp.f_price1 >0");
-//    QJsonArray ja;
-//    while (db.next()){
-//        QJsonObject js;
-//        js["sku"] = db.string("sku");
-//        js["price"] = db.doubleValue("price");
-//        js["price1"] = db.doubleValue("price1");
-//        js["price2"] = db.doubleValue("price2");
-//        js["name"] = db.string("name");
-//        ja.append(js);
-//    }
-
+QJsonArray ja;
 #ifdef REMOTE_VALSH
-    QJsonArray ja;
     jo = QJsonObject();
     jo["name"] = "Archive";
     jo["waiter_server"] = "";
@@ -73,6 +47,7 @@ bool servernames(const QByteArray &indata, QByteArray &outdata, const QHash<QStr
     jo["password"] = "";
     jo["settings"] = "Main";
     jo["fullscreen"] = "";
+    jo["local"] = 0;
     ja.append(jo);
 #ifdef QT_DEBUG
     jo = QJsonObject();
@@ -84,6 +59,7 @@ bool servernames(const QByteArray &indata, QByteArray &outdata, const QHash<QStr
     jo["password"] = "";
     jo["settings"] = "Main";
     jo["fullscreen"] = "";
+    jo["local"] = 1;
     ja.append(jo);
 #else
     jo = QJsonObject();
@@ -95,8 +71,202 @@ bool servernames(const QByteArray &indata, QByteArray &outdata, const QHash<QStr
     jo["password"] = "";
     jo["settings"] = "Main";
     jo["fullscreen"] = "";
+    jo["local"] = 1;
     ja.append(jo);
 #endif
+#endif
+
+#ifdef REMOTE_ELINA
+    jo = QJsonObject();
+    jo["name"] = "Archive";
+    jo["waiter_server"] = "";
+    jo["host"] = "aws.elina.am/info.php";
+    jo["database"] = "https://aws.elina.am/";
+    jo["username"] = "";
+    jo["password"] = "";
+    jo["settings"] = "Main";
+    jo["fullscreen"] = "";
+    jo["local"] = 0;
+    ja.append(jo);
+#ifdef QT_DEBUG
+    jo = QJsonObject();
+    jo["name"] = "Elina";
+    jo["waiter_server"] = "";
+    jo["host"] = "127.0.0.1/engine/info.php";
+    jo["database"] = "https://127.0.0.1/";
+    jo["username"] = "";
+    jo["password"] = "";
+    jo["settings"] = "Main";
+    jo["fullscreen"] = "";
+    jo["local"] = 1;
+    ja.append(jo);
+#else
+    jo = QJsonObject();
+    jo["name"] = "Elina";
+    jo["waiter_server"] = "";
+    jo["host"] = "192.168.88.42/engine/info.php";
+    jo["database"] = "https://192.168.88.42/";
+    jo["username"] = "";
+    jo["password"] = "";
+    jo["settings"] = "Main";
+    jo["fullscreen"] = "";
+    jo["local"] = 1;
+    ja.append(jo);
+#endif
+#endif
+
+#ifdef REMOTE_DEBUG
+    jo = QJsonObject();
+    jo["name"] = "Valsh";
+    jo["waiter_server"] = "";
+    jo["host"] = "valsh.picassocloud.com/info.php";
+    jo["database"] = "https://valsh.picassocloud.com/";
+    jo["username"] = "";
+    jo["password"] = "";
+    jo["settings"] = "Main";
+    jo["fullscreen"] = "";
+    jo["local"] = 0;
+    ja.append(jo);
+    jo = QJsonObject();
+    jo["name"] = "Elina";
+    jo["waiter_server"] = "";
+    jo["host"] = "aws.elina.am/info.php";
+    jo["database"] = "https://aws.elina.am/";
+    jo["username"] = "";
+    jo["password"] = "";
+    jo["settings"] = "Main";
+    jo["fullscreen"] = "";
+    jo["local"] = 0;
+    ja.append(jo);
+    jo = QJsonObject();
+    jo["name"] = "Carwash";
+    jo["waiter_server"] = "";
+    jo["host"] = "carwash.picassocloud.com/engine/info.php";
+    jo["database"] = "https://carwash.picassocloud.com/";
+    jo["username"] = "";
+    jo["password"] = "";
+    jo["settings"] = "Main";
+    jo["fullscreen"] = "";
+    jo["local"] = 0;
+    ja.append(jo);
+#endif
+
+#ifdef REMOTE_ALL
+    QString configFile = path + "/servername.ini";
+    if (!QFile::exists(configFile)) {
+        LogWriter::write(LogWriterLevel::errors, "", QString("sqlquery config path not exists: %1").arg(configFile));
+        jh["message"] = "Server not configured";
+        return rh.setInternalServerError(jh.toString());
+    }
+    QFile f(configFile);
+    f.open(QIODevice::ReadOnly);
+    QJsonObject jconf = QJsonDocument::fromJson(f.readAll()).object();
+    f.close();
+    ja.append(jconf[jo["params"].toObject()["name"].toString()].toObject());
+#endif
+
+    return rh.setResponse(HTTP_OK, QJsonDocument(ja).toJson(QJsonDocument::Compact));
+}
+
+bool shop(const QByteArray &indata, QByteArray &outdata, const QHash<QString, DataAddress> &dataMap, const ContentType &contentType)
+{
+    CommandLine cl;
+    QString path;
+    cl.value("dllpath", path);
+    Database db;
+    JsonHandler jh;
+    RequestHandler rh(outdata);
+
+    if (contentType != ContentType::ApplilcationJson) {
+        return rh.setDataValidationError("Accept content type: Application/Json");
+    }
+
+    qDebug() << indata;
+    QJsonObject jo = QJsonDocument::fromJson(getData(indata, dataMap["json"])).object();
+    qDebug() << jo["key"].toString();
+    if (jo["key"].toString() != "asdf7fa8kk49888d!!jjdjmskkak98983mj???m") {
+        return rh.setResponse(HTTP_FORBIDDEN, "Access denied");
+    }
+
+
+QJsonArray ja;
+#ifdef REMOTE_VALSH
+#ifdef QT_DEBUG
+    jo = QJsonObject();
+    jo["name"] = "ValShin";
+    jo["waiter_server"] = "";
+    jo["host"] = "127.0.0.1/engine/info.php";
+    jo["database"] = "https://127.0.0.1/";
+    jo["username"] = "";
+    jo["password"] = "";
+    jo["settings"] = "Sale";
+    jo["fullscreen"] = "";
+    ja.append(jo);
+#else
+    jo = QJsonObject();
+    jo["name"] = "Archive";
+    jo["waiter_server"] = "";
+    jo["host"] = "valsh.picassocloud.com/info.php";
+    jo["database"] = "https://valsh.picassocloud.com/";
+    jo["username"] = "";
+    jo["password"] = "";
+    jo["settings"] = "Sale";
+    jo["fullscreen"] = "";
+    ja.append(jo);
+#endif
+#endif
+
+#ifdef REMOTE_ELINA
+#ifdef QT_DEBUG
+    jo = QJsonObject();
+    jo["name"] = "ValShin";
+    jo["waiter_server"] = "";
+    jo["host"] = "127.0.0.1/engine/info.php";
+    jo["database"] = "https://127.0.0.1/";
+    jo["username"] = "";
+    jo["password"] = "";
+    jo["settings"] = "Sale";
+    jo["fullscreen"] = "";
+    ja.append(jo);
+#else
+    jo = QJsonObject();
+    jo["name"] = "Archive";
+    jo["waiter_server"] = "";
+    jo["host"] = "aws.elina.am/info.php";
+    jo["database"] = "https://aws.elina.am/";
+    jo["username"] = "";
+    jo["password"] = "";
+    jo["settings"] = "GevorArtur";
+    jo["fullscreen"] = "";
+    ja.append(jo);
+#endif
+#endif
+
+#ifdef REMOTE_DEBUG
+    jo = QJsonObject();
+    jo["name"] = "ValShin";
+    jo["waiter_server"] = "";
+    jo["host"] = "127.0.0.1/engine/info.php";
+    jo["database"] = "https://127.0.0.1/";
+    jo["username"] = "";
+    jo["password"] = "";
+    jo["settings"] = "Sale";
+    jo["fullscreen"] = "";
+    ja.append(jo);
+#endif
+
+#ifdef REMOTE_ALL
+    QString configFile = path + "/servername.ini";
+    if (!QFile::exists(configFile)) {
+        LogWriter::write(LogWriterLevel::errors, "", QString("sqlquery config path not exists: %1").arg(configFile));
+        jh["message"] = "Server not configured";
+        return rh.setInternalServerError(jh.toString());
+    }
+    QFile f(configFile);
+    f.open(QIODevice::ReadOnly);
+    QJsonObject jconf = QJsonDocument::fromJson(f.readAll()).object();
+    f.close();
+    ja.append(jconf[jo["params"].toObject()["name"].toString()].toObject());
 #endif
 
     return rh.setResponse(HTTP_OK, QJsonDocument(ja).toJson(QJsonDocument::Compact));

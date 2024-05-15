@@ -19570,11 +19570,24 @@ permissions</source>
     </message>
 </context>
 <context>
+    <name>NHandler</name>
+    <message>
+        <location filename="../NTable/nhandler.cpp" line="75"/>
+        <source>New customer payment</source>
+        <translation>Հաճախորդի պարքի մարում</translation>
+    </message>
+    <message>
+        <location filename="../NTable/nhandler.cpp" line="84"/>
+        <source>New partner payment</source>
+        <translation>Գործընկերոջ պարտքի մարում</translation>
+    </message>
+</context>
+<context>
     <name>NLoadingDlg</name>
     <message>
         <location filename="../NTable/nloadingdlg.ui" line="26"/>
         <source>1 sec</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -19582,17 +19595,17 @@ permissions</source>
     <message>
         <location filename="../NTable/nsearchdlg.ui" line="14"/>
         <source>Search</source>
-        <translation type="unfinished">Փնտրել</translation>
+        <translation>Փնտրել</translation>
     </message>
     <message>
         <location filename="../NTable/nsearchdlg.ui" line="94"/>
         <source>Apply</source>
-        <translation type="unfinished">Կիռարել</translation>
+        <translation>Կիռարել</translation>
     </message>
     <message>
         <location filename="../NTable/nsearchdlg.ui" line="101"/>
         <source>Cancel</source>
-        <translation type="unfinished">Հրաժարվել</translation>
+        <translation>Հրաժարվել</translation>
     </message>
 </context>
 <context>
@@ -19600,17 +19613,17 @@ permissions</source>
     <message>
         <location filename="../NTable/ntablewidget.ui" line="14"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../NTable/ntablewidget.ui" line="94"/>
         <source>New Row</source>
-        <translation type="unfinished">Նոր տող</translation>
+        <translation>Նոր տող</translation>
     </message>
     <message>
-        <location filename="../NTable/ntablewidget.cpp" line="174"/>
+        <location filename="../NTable/ntablewidget.cpp" line="181"/>
         <source>Empty report!</source>
-        <translation type="unfinished">Հաշվետվությունը դատարկ է</translation>
+        <translation>Հաշվետվությունը դատարկ է</translation>
     </message>
 </context>
 <context>

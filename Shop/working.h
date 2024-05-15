@@ -88,13 +88,6 @@ private:
     bool fUpFinished;
 
 private slots:
-
-    void socketConnected();
-
-    void socketDisconnected();
-
-    void socketDataReceived(quint16 cmd, quint32 messageId, QByteArray d);
-
     void timeout();
 
     void uploadDataFinished();
@@ -146,8 +139,6 @@ private slots:
     void on_tab_currentChanged(int index);
 
     void on_btnCloseApplication_clicked();
-
-    void on_btnServerSettings_clicked();
 
     void on_btnWriteOrder_clicked();
 

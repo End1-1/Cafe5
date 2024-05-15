@@ -1,11 +1,11 @@
 #include "working.h"
 #include "c5config.h"
-#include "c5connection.h"
 #include "c5license.h"
 #include "dlgpin.h"
 #include "c5logsystem.h"
 #include "datadriver.h"
 #include "c5user.h"
+#include "c5servername.h"
 #include "settingsselection.h"
 #include "c5systempreference.h"
 #include "dlgsplashscreen.h"
@@ -32,10 +32,12 @@ int main(int argc, char *argv[])
     QCoreApplication::setLibraryPaths(libPath);
 #endif
 
-//        if (QDate::currentDate() > QDate::fromString("01/12/2022", "dd/MM/yyyy")) {
-//            return 1;
-//        }
-
+    QDir d;
+    QLockFile lockFile(d.homePath() + "/" + _APPLICATION_ + "/lock.pid");
+    if (!lockFile.tryLock()) {
+        C5Message::error(QObject::tr("An instance of application already running"));
+        return -1;
+    }
 
     QApplication a(argc, argv);
 
@@ -43,17 +45,46 @@ int main(int argc, char *argv[])
     t.load(":/lang/Shop.qm");
     a.installTranslator(&t);
 
-    QSettings ss(_ORGANIZATION_, _APPLICATION_+ QString("\\") + _MODULE_);
-    QJsonObject js = QJsonDocument::fromJson(ss.value("server", "{}").toByteArray()).object();
-    C5Config::fDBHost = js["host"].toString();
-    C5Config::fDBPath = js["database"].toString();
-    C5Config::fDBUser = js["username"].toString();
-    C5Config::fDBPassword = js["password"].toString();
-    C5Config::fSettingsName = js["settings"].toString();
-
     auto *dlgsplash = new DlgSplashScreen();
     dlgsplash->show();
-    QDir d;
+    dlgsplash->messageSignal("Get server name");
+
+    QString settingsName;
+    bool noconfig = true;
+    for (const QString &arg: a.arguments()) {
+        if (arg.contains("/servername=")){
+            QStringList sn = arg.split("=", Qt::SkipEmptyParts);
+            if (sn.length() == 2) {
+                C5ServerName sng(sn.at(1), "shop");
+                if (!sng.getServers()){
+                    return 1;
+                }
+                noconfig = false;
+                QJsonObject js = sng.mServers.at(0).toObject();
+
+                C5Config::fDBHost = js["host"].toString();
+                C5Config::fDBPath = js["database"].toString();
+                C5Config::fDBUser = js["username"].toString();
+                C5Config::fDBPassword = js["password"].toString();
+                C5Config::fSettingsName = js["settings"].toString();
+                QSettings ss(_ORGANIZATION_, _APPLICATION_+ QString("\\") + _MODULE_);
+                ss.setValue("server", "");
+            }
+        } else if (arg.contains("/config")) {
+            QStringList sn = arg.split("=", Qt::SkipEmptyParts);
+            if (sn.length() == 2) {
+                settingsName = sn.at(1);
+            }
+        }
+    }
+    if (!settingsName.isEmpty()) {
+        C5Config::fSettingsName = settingsName;
+    }
+    if (noconfig) {
+        QMessageBox::critical(0, "Error", "No config");
+        return 1;
+    }
+
     if (!d.exists(d.homePath() + "/" + _APPLICATION_)) {
         d.mkpath(d.homePath() + "/" + _APPLICATION_);
     }
@@ -74,20 +105,6 @@ int main(int argc, char *argv[])
         args << argv[i];
     }
 
-
-    if (args.contains("--config") || js.isEmpty()) {
-        C5Connection l(js);
-        if (l.exec() == QDialog::Accepted) {
-            js = l.fParams;
-            ss.setValue("server", QJsonDocument(js).toJson(QJsonDocument::Compact));
-        }
-    }
-
-    C5Config::fDBHost = js["host"].toString();
-    C5Config::fDBPath = js["database"].toString();
-    C5Config::fDBUser = js["username"].toString();
-    C5Config::fDBPassword = js["password"].toString();
-    C5Config::fSettingsName = js["settings"].toString();
     C5Config::initParamsFromDb();
     dlgsplash->updateData();
 
@@ -102,17 +119,6 @@ int main(int argc, char *argv[])
     if (shopstyle.exists()) {
         if (shopstyle.open(QIODevice::ReadOnly)) {
             a.setStyleSheet(shopstyle.readAll());
-        }
-    }
-
-    if (args.contains("--multiple-copies") == false) {
-        QFile file(d.homePath() + "/" + _APPLICATION_ + "/lock.pid");
-        file.remove();
-        QLockFile lockFile(d.homePath() + "/" + _APPLICATION_ + "/lock.pid");
-        if (!lockFile.tryLock()) {
-            ls(QObject::tr("Application instance found, exiting"));
-            C5Message::error(QObject::tr("An instance of application already running"));
-            return -1;
         }
     }
 

@@ -1,6 +1,5 @@
 #include "dlgsystem.h"
 #include "ui_dlgsystem.h"
-#include "c5connection.h"
 #include <QProcess>
 #include <QSettings>
 
@@ -19,26 +18,7 @@ DlgSystem::~DlgSystem()
 
 void DlgSystem::setupNoPassword()
 {
-    ui->btnConnection->setEnabled(false);
-}
 
-void DlgSystem::on_btnConnection_clicked()
-{
-    QSettings ss(_ORGANIZATION_, _APPLICATION_+ QString("\\") + _MODULE_);
-    QJsonObject js = QJsonDocument::fromJson(ss.value("server", "{}").toByteArray()).object();
-    C5Connection c(js);
-    if (c.exec() == QDialog::Accepted) {
-        js = c.fParams;
-        ss.setValue("server", QJsonDocument(js).toJson(QJsonDocument::Compact));
-    }
-
-    C5Config::fDBHost = js["host"].toString();
-    C5Config::fDBPath = js["database"].toString();
-    C5Config::fDBUser = js["username"].toString();
-    C5Config::fDBPassword = js["password"].toString();
-    C5Config::fSettingsName = js["settings"].toString();
-    C5Config::fFullScreen = true;
-    C5Config::initParamsFromDb();
 }
 
 void DlgSystem::on_btnShutdown_clicked()

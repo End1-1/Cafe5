@@ -31,8 +31,8 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 
-INCLUDEPATH += c:/Soft/OpenSSL-Win64/include
-INCLUDEPATH += c:/Soft/OpenSSL-Win64/include/openssl
+INCLUDEPATH += c:/Soft/OpenSSLWin64/include
+INCLUDEPATH += c:/Soft/OpenSSLWin64/include/openssl
 
 RESOURCES += \
     ../resources/res.qrc \
@@ -50,7 +50,7 @@ ICON = storehouse.ico
 DEFINES += NETWORKDB
 
 
-LIBS += -LC:/Soft/OpenSSL-Win64/lib
+LIBS += -LC:/soft/OpenSSLWin64/lib/VC/x64/MD
 
 
 win32: QMAKE_CXXFLAGS_RELEASE -= -Zc:strictStrings

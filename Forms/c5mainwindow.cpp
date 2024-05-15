@@ -1,7 +1,6 @@
 #include "c5mainwindow.h"
 #include "ui_c5mainwindow.h"
 #include "c5message.h"
-#include "c5connection.h"
 #include "c5cashdoc.h"
 #include "cr5cashdetailed.h"
 #include "c5permissions.h"
@@ -37,7 +36,6 @@
 #include "cr5dish.h"
 #include "cr5settings.h"
 #include "cr5complectations.h"
-#include "c5dlgconnections.h"
 #include "c5selector.h"
 #include "cr5goodsmovement.h"
 #include "c5salarydoc.h"
@@ -290,11 +288,6 @@ void C5MainWindow::currentTabChange(int index)
         insertToolBar(fRightToolbar, fReportToolbar);
         fReportToolbar->show();
     }
-}
-
-void C5MainWindow::on_actionConnection_triggered()
-{
-    C5DlgConnections().exec();
 }
 
 void C5MainWindow::on_actionLogin_triggered()

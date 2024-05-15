@@ -129,14 +129,16 @@ bool C5SaleDoc::openDoc(const QString &uuid)
 
     //GOODS
     db[":f_header"] = uuid;
-    db.exec(QString("select dsb.f_store, dsb.f_qty, g.*, gu.f_name as f_unitname, dsb.f_price, dsb.f_discountfactor  "
+    db.exec(QString("select dsb.f_id as ogoodsid, dsb.f_store, dsb.f_qty, g.*, gu.f_name as f_unitname, dsb.f_price, dsb.f_discountfactor,  "
+                    "dsb.f_returnfrom "
             "from o_goods dsb "
             "left join c_goods g on g.f_id=dsb.f_goods "
             "left join c_units gu on gu.f_id=g.f_unit "
             "where dsb.f_header=:f_header  "));
     while (db.nextRow()) {
-        addGoods(db.getInt("f_store"), db.getInt("f_id"), db.getString("f_scancode"), db.getString("f_name"),
-                 db.getString("f_unitname"), db.getDouble("f_qty"), db.getDouble("f_price"), db.getDouble("f_discountfactor") * 100, 0);
+        addGoods(db.getString("ogoodsid"), db.getInt("f_store"), db.getInt("f_id"), db.getString("f_scancode"), db.getString("f_name"),
+                 db.getString("f_unitname"), db.getDouble("f_qty"), db.getDouble("f_price"), db.getDouble("f_discountfactor") * 100, 0,
+                 db.getString("f_returnfrom"));
     }
 
     //HEADER
@@ -904,19 +906,19 @@ int C5SaleDoc::addGoods(int goodsId, C5Database &db)
             "left join c_units gu on gu.f_id=g.f_unit "
             "where g.f_id=:f_id and gpr.f_currency=:f_currency").arg(priceDiscount, priceField));
     if (db.nextRow()) {
-        return addGoods(ui->cbStorage->currentData().toInt(), goodsId, db.getString("f_scancode"), db.getString("f_name"),
-                        db.getString("f_unitname"), 0, db.getDouble("f_price"), 0, db.getInt("f_service"));
+        return addGoods("", ui->cbStorage->currentData().toInt(), goodsId, db.getString("f_scancode"), db.getString("f_name"),
+                        db.getString("f_unitname"), 0, db.getDouble("f_price"), 0, db.getInt("f_service"), db.getString("f_returnfrom"));
     } else {
         C5Message::error(tr("Invalid goods id"));
         return false;
     }
 }
 
-int C5SaleDoc::addGoods(int store, int goodsId, const QString &barcode, const QString &name, const QString &unitname,
-                        double qty, double price, double discount, int isService)
+int C5SaleDoc::addGoods(const QString &uuid, int store, int goodsId, const QString &barcode, const QString &name, const QString &unitname,
+                        double qty, double price, double discount, int isService, const QString &returnFrom)
 {
     int r = ui->tblGoods->addEmptyRow();
-    ui->tblGoods->setString(r, col_uuid, "");
+    ui->tblGoods->setString(r, col_uuid, uuid);
     ui->tblGoods->createCheckbox(r, col_checkbox);
     ui->tblGoods->setInteger(r, col_goods_code, goodsId);
     C5ComboBox *cs = ui->tblGoods->createComboBox(r, col_store);
@@ -950,6 +952,7 @@ int C5SaleDoc::addGoods(int store, int goodsId, const QString &barcode, const QS
         ui->tblGoods->lineEdit(r, col_discount_value)->setDouble(0);
     }
     ui->tblGoods->setInteger(r, col_type, isService);
+    ui->tblGoods->setString(r, col_returnfrom, returnFrom);
     countGrandTotal();
     return r;
 }
@@ -1015,8 +1018,8 @@ bool C5SaleDoc::openDraft(const QString &id)
             "where dsb.f_header=:f_header and gpr.f_currency=:f_currency "
             "and dsb.f_state=:f_state and dsb.f_qty>0 ").arg(priceField));
     while (db.nextRow()) {
-        addGoods(db.getInt("f_store"), db.getInt("f_id"), db.getString("f_scancode"), db.getString("f_name"),
-                 db.getString("f_unitname"), db.getDouble("f_qty"), db.getDouble("f_price"), db.getDouble("f_discount"), 0);
+        addGoods("", db.getInt("f_store"), db.getInt("f_id"), db.getString("f_scancode"), db.getString("f_name"),
+                 db.getString("f_unitname"), db.getDouble("f_qty"), db.getDouble("f_price"), db.getDouble("f_discount"), 0, "");
     }
     fOpenedFromDraft = true;
 
@@ -1340,6 +1343,15 @@ void C5SaleDoc::saveReturnItems()
     }
 
     db.commit();
+
+    QJsonObject js;
+    js["id"] = oheader._id();
+    js["user"] = __user->id();
+    js["storein"] = ui->cbStorage->currentData().toInt();
+    js["currency"] = ui->cbCurrency->currentData().toInt();
+    js["date"] = ui->leDate->date().toString(FORMAT_DATE_TO_STR_MYSQL);
+
+    db.exec(QString("call sf_create_return_of_sale('%1')").arg(json_str(js)));
 
     fActionSave->setEnabled(false);
     fActionDraft->setEnabled(false);

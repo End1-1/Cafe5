@@ -1,5 +1,5 @@
 #include "c5serverhandler.h"
-#include "c5connection.h"
+#include "c5config.h"
 #include <QJsonArray>
 
 C5ServerHandler::C5ServerHandler() :

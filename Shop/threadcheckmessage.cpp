@@ -14,7 +14,6 @@ void ThreadCheckMessage::run()
     C5LogSystem::writeEvent(QString("%1 %2").arg(url, __c5config.httpServerIP()));
     auto *s = new QSslSocket(this);
     connect(s, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(err(QAbstractSocket::SocketError)));
-    s->addCaCertificate(fSslCertificate);
     s->setPeerVerifyMode(QSslSocket::VerifyNone);
     s->connectToHostEncrypted(__c5config.httpServerIP(), __c5config.httpServerPort());
     if (s->waitForEncrypted(5000)) {

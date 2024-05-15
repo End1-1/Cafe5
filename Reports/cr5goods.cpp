@@ -252,18 +252,18 @@ void CR5Goods::groupPrice()
         C5Database db(dbParams());
         QString query ;
 
-        //if (price1 > 0.0001) {
+        if (price1 > -1) {
             p1 = " f_price1=" + QString::number(price1, 'f', 2);
-        //}
-        //if (price2 > 0.0001) {
+        }
+        if (price2 > -1) {
             p2 = " f_price2=" + QString::number(price2, 'f', 2);
-        //}
-        //if (price1disc > 0.0001) {
+        }
+        if (price1disc > -1) {
             p1d = " f_price1disc =" + QString::number(price1disc, 'f', 2);
-        //}
-        //if (price2disc > 0.0001) {
+        }
+        if (price2disc > -1) {
             p2d = " f_price2disc=" + QString::number(price2disc, 'f', 2);
-        //}
+        }
         QStringList l;
         if (!p1.isEmpty()) {
             l.append(p1);

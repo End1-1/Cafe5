@@ -3,19 +3,20 @@
 
 #include <QObject>
 #include <QJsonArray>
+#include <QJsonObject>
 
 class C5ServerName : public QObject
 {
     Q_OBJECT
 public:
-    explicit C5ServerName(const QString &server, QObject *parent = nullptr);
-
-    void getServers();
-
+    explicit C5ServerName(const QString &server, const QString &route, QObject *parent = nullptr);
+    bool getServers(const QString &name = "");
     static QJsonArray mServers;
+    QJsonObject mParams;
 
 private:
     QString mServer;
+    QString mRoute;
 signals:
 
 };

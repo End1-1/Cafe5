@@ -31,6 +31,7 @@ private:
     NLoadingDlg *mLoadingDlg;
     NFilterDlg *fFilter;
     NHandler *mHandler;
+    QWidget *mToolWidget;
     void sum();
 
 private slots:

@@ -1,10 +1,10 @@
 #include "c5translator.h"
-#include "c5connection.h"
 #include "c5sockethandler.h"
 #include "datadriver.h"
 #include "dlgscreen.h"
 #include "c5menu.h"
 #include "c5systempreference.h"
+#include "c5servername.h"
 #include <QApplication>
 #include <QTranslator>
 #include <QFile>
@@ -39,19 +39,34 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    QStringList args;
-    for (int i = 0; i < argc; i++) {
-        args << argv[i];
-    }
-    QSettings ss(_ORGANIZATION_, _APPLICATION_+ QString("\\") + _MODULE_);
-    QJsonObject js = QJsonDocument::fromJson(ss.value("server", "{}").toByteArray()).object();
-    if (args.contains("--config")) {
-        C5Connection c(js);
-        if (c.exec() == QDialog::Accepted) {
-            js = c.fParams;
-            ss.setValue("server", QJsonDocument(js).toJson(QJsonDocument::Compact));
+    QString servername;
+    for (const QString &s: a.arguments()) {
+        if (s.contains("/servername")) {
+            QStringList sn = s.split("=", Qt::SkipEmptyParts);
+            if (sn.length() == 2) {
+                servername = sn.at(1);
+            }
         }
     }
+    QString err;
+    if (servername.isEmpty()) {
+        err += "Arguments must contains server name<br>";
+    }
+    if (err.isEmpty() == false) {
+        C5Message::error(err);
+        return 1;
+    }
+    C5ServerName sn(servername, "waiter");
+    sn.mParams["workstation"] = hostinfo;
+    if (!sn.getServers()){
+        return 1;
+    }
+    if (sn.mServers.size() == 0) {
+        C5Message::error("No configuration for this station");
+        return 1;
+    }
+    QJsonObject js = sn.mServers.at(0).toObject();
+
     C5Config::fDBHost = js["host"].toString();
     C5Config::fDBPath = js["database"].toString();
     C5Config::fDBUser = js["username"].toString();

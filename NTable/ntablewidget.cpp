@@ -25,7 +25,8 @@ NTableWidget::NTableWidget(const QString &route, QWidget *parent) :
     C5Widget(QStringList(), parent),
     ui(new Ui::NTableWidget),
     mRoute(route),
-    fFilter(nullptr)
+    fFilter(nullptr),
+    mToolWidget(nullptr)
 {
     ui->setupUi(this);
     ui->mTableView->setModel(new NTableModel());
@@ -147,6 +148,12 @@ void NTableWidget::queryFinished(int elapsed, const QByteArray &ba)
             ui->tblTotal->setColumnHidden(jhiddencols[i].toInt(), true);
         }
         mHandler->configure(fFilter, jo["handler"].toArray().toVariantList());
+        if (!mToolWidget) {
+            mToolWidget = new QWidget();
+            fToolBar->addWidget(mToolWidget);
+            mToolWidget->setLayout(new QGridLayout());
+            mHandler->toolWidget(mToolWidget);
+        }
     } else {
         queryError(ba);
     }

@@ -5,23 +5,26 @@
 #include <QNetworkRequest>
 #include <QApplication>
 #include <QJsonDocument>
-#include <QJsonObject>
 #include <QJsonParseError>
 #include <QThread>
 
 QJsonArray C5ServerName::mServers;
 
-C5ServerName::C5ServerName(const QString &server, QObject *parent)
+C5ServerName::C5ServerName(const QString &server, const QString &route, QObject *parent)
     : QObject{parent},
-    mServer(server)
+    mServer(server),
+    mRoute(route)
 {
 
 }
 
-void C5ServerName::getServers()
+bool C5ServerName::getServers(const QString &name)
 {
+    if (!name.isEmpty()) {
+        mParams["name"] = name;
+    }
     QNetworkAccessManager m;
-    QString host = QString("https://%1:10002/%2").arg(mServer, "servernames");
+    QString host = QString("https://%1:10002/%2").arg(mServer, mRoute);
     QNetworkRequest rq(host);
     m.setTransferTimeout(60000);
     rq.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
@@ -31,6 +34,7 @@ void C5ServerName::getServers()
     rq.setSslConfiguration(sslConf);
     QJsonObject jo;
     jo["key"] = "asdf7fa8kk49888d!!jjdjmskkak98983mj???m";
+    jo["params"] = mParams;
 
     auto *r = m.post(rq, QJsonDocument(jo).toJson(QJsonDocument::Compact));
     while (!r->isFinished()) {
@@ -39,7 +43,7 @@ void C5ServerName::getServers()
     }
     if (r->error() != QNetworkReply::NoError) {
         C5Message::error(r->errorString());
-        return;
+        return false;
     }
     QByteArray ba = r->readAll();
     mServers = QJsonDocument::fromJson(ba).array();

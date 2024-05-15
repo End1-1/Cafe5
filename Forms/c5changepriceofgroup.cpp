@@ -32,6 +32,18 @@ void C5ChangePriceOfGroup::on_btnOk_clicked()
         C5Message::error(tr("Check code is not valid"));
         return;
     }
+    if (!ui->chRetail->isChecked()) {
+        ui->lePrice1->setDouble(-1);
+    }
+    if (!ui->chRetailDisc->isChecked()) {
+        ui->lePrice1disc->setDouble(-1);
+    }
+    if (!ui->chWhosale->isChecked()) {
+        ui->lePrice2->setDouble(-1);
+    }
+    if (!ui->chWhosaleDisc->isChecked()){
+        ui->lePrice2disc->setDouble(-1);
+    }
     accept();
 }
 

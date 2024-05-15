@@ -77,15 +77,17 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
     }
 
     C5LogSystem::writeEvent("before pricee");
-    QString price1, price2;
+    QString price1, price2, price1disc, price2disc;
     switch (rw) {
     case 1:
         price1 = "ad.f_price";
         price2 = "gpr.f_price2";
+        price1disc = "gpr.f_price2disc";
         break;
     case 2:
         price1 = "gpr.f_price1";
         price2 = "gpr.f_price1";
+        price1disc = "gpr.f_price1disc";
         break;
     }
 
@@ -93,10 +95,10 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
     amountTotal = 0;
     db[":f_header"] = id;
     db.exec(QString("select "
-            "if (gc.f_base is null, t2.f_name, t1.f_name) as f_goods, "
-            "sum(if(gc.f_base is null, ad.f_qty, gc.f_qty*ad.f_qty)) as f_qty, "
-            "if(gc.f_base is null, %1, %2) as f_price, "
-            "sum(if(gc.f_base is null, %1*ad.f_qty, %2*(gc.f_qty*ad.f_qty))) as f_total %3 "
+            "if (gc.f_base is null, t2.f_name, t1.f_name) as f_goods,\n "
+            "sum(if(gc.f_base is null, ad.f_qty, gc.f_qty*ad.f_qty)) as f_qty, \n"
+            "if(gc.f_base is null, if(%1>0,%1, %2), if(%3>0,%3,%4)) as f_price, \n"
+            "sum(if(gc.f_base is null, if(%1>0,%1, %2)*ad.f_qty, if(%3>0,%3,%4)*(gc.f_qty*ad.f_qty))) as f_total %5 \n"
             "from o_goods ad "
             "left join c_goods_complectation gc on gc.f_base=ad.f_goods "
             "left join c_goods g on g.f_id=gc.f_goods "
@@ -106,10 +108,13 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
             "left join c_groups t1 on t1.f_id=g.f_group "
             "left join c_groups t2 on t2.f_id=g2.f_group "
             "where oh.f_id=:f_header and g2.f_unit=10 "
-            "group by 1, 3 %4 "
+            "group by 1, 3 %6 "
             "order by ad.f_row ")
+                .arg(price1disc)
             .arg(price1)
+                .arg(price1disc)
             .arg(price2)
+
             .arg(__c5config.getValue(param_shop_print_dontgroup).toInt() == 0 ? "" : ",ad.f_id")
             .arg(__c5config.getValue(param_shop_print_dontgroup).toInt() == 0 ? "" : ",5"));
     QList<QList<QVariant> > data;
@@ -125,13 +130,15 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
     switch (rw) {
     case 1:
         price1 = "ad.f_price";
+        price1disc = "ad.f_price";
         break;
     case 2:
         price1 = "gpr.f_price1";
+        price1disc = "gpr.f_price1disc";
         break;
     }
     db[":f_header"] = id;
-    db.exec(QString("select t1.f_name as f_goods, sum(ad.f_qty) as f_qty, %1,  sum(%1*ad.f_qty) as f_total %3 "
+    db.exec(QString("select t1.f_name as f_goods, sum(ad.f_qty) as f_qty, if(%1>0,%1,%2),  sum(%1*ad.f_qty) as f_total %4 "
             "from o_goods ad "
             "left join c_goods g on g.f_id=ad.f_goods "
             "inner join o_header oh on oh.f_id=ad.f_header "
@@ -141,6 +148,7 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
             "group by 1, 3 %4 "
             "order by ad.f_row ")
             .arg(price1)
+                .arg(price1disc)
             .arg(__c5config.getValue(param_shop_print_dontgroup).toInt() == 0 ? "" : ",ad.f_id")
             .arg(__c5config.getValue(param_shop_print_dontgroup).toInt() == 0 ? "" : ",5"));
     while (db.nextRow()) {

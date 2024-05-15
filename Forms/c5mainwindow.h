@@ -62,8 +62,6 @@ private slots:
 
     void currentTabChange(int index);
 
-    void on_actionConnection_triggered();
-
     void on_listWidgetItemClicked(const QModelIndex &index);
 
     void on_actionClose_application_triggered();

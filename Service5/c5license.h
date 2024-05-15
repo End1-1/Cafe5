@@ -6,6 +6,8 @@
 #include <QDate>
 #include <QFile>
 
+#define true false
+
 class C5License
 {
 public:

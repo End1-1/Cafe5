@@ -1,5 +1,4 @@
 #include "c5mainwindow.h"
-#include "c5connection.h"
 #include "c5systempreference.h"
 #include "c5login.h"
 #include "c5servername.h"
@@ -25,14 +24,25 @@ int main(int argc, char *argv[])
 #endif
 
     QApplication a(argc, argv);
+    QString serverName, configName;
     for (const QString &sn: a.arguments()) {
         if (sn.contains("/servername")) {
             QStringList snconf = sn.split("=");
             if (snconf.length() == 2) {
-                C5ServerName c5sn(snconf.at(1));
-                c5sn.getServers();
+                serverName = snconf.at(1);
+                C5ServerName c5sn(serverName, "office");
+                c5sn.getServers("office");
+            }
+        } else if (sn.contains("/config")) {
+            QStringList snconf = sn.split("=", Qt::SkipEmptyParts);
+            if (snconf.length() == 2) {
+                configName = snconf.at(1);
             }
         }
+    }
+    if (serverName.isEmpty()) {
+        C5Message::error("Servername parameter must be pass as argument");
+        return 1;
     }
 
     QFile style(a.applicationDirPath() + "/officestyle.qss");
@@ -49,6 +59,9 @@ int main(int argc, char *argv[])
 
     C5Login l;
     if (l.exec() == QDialog::Accepted) {
+        if (configName.isEmpty() == false) {
+            C5Config::fSettingsName = configName;
+        }
         C5Config::initParamsFromDb();
     } else {
         return 0;

@@ -82,7 +82,8 @@ void CR5MaterialMoveUncomplect::buildQuery()
 
     "select 'B', dt.f_name as f_doctype, st.f_name as f_action, gc.f_goods as f_code,ss.f_name as f_storage,gg.f_name as f_group,g.f_name as f_goods, "
     "g.f_scancode,s.f_qty*gc.f_qty as f_qty, "
-    "u.f_name as f_unit,s.f_qty*gc.f_qty*g.f_lastinputprice as f_total,s.f_qty*gc.f_qty*gpr.f_price1 as f_totalsale, "
+    //"u.f_name as f_unit,s.f_qty*gc.f_qty*g.f_lastinputprice as f_total,s.f_qty*gc.f_qty*gpr.f_price1 as f_totalsale, "
+    "u.f_name as f_unit,s.f_qty*gc.f_qty*s.f_price as f_total,s.f_qty*gc.f_qty*gpr.f_price1 as f_totalsale, "
     "s.f_qty*gc.f_qty*gpr.f_price2 as f_totalsale2  "
     "from a_store s  "
     "inner join c_goods_complectation gc on gc.f_base=s.f_goods "

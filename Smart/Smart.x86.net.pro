@@ -48,10 +48,16 @@ INCLUDEPATH += C:/Soft/OpenSSL-Win32/include/openssl
 
 LIBS += -lVersion
 LIBS += -lwsock32
-LIBS += -LC:/Soft/OpenSSL-Win32/lib
+LIBS += -LC:/soft/OpenSSL-Win32/lib
 LIBS += -lopenssl
 LIBS += -llibcrypto
 
 RESOURCES += \
     ../resources/resources.qrc \
     transres.qrc
+
+HEADERS += \
+    ../Classes/c5servername.h
+
+SOURCES += \
+    ../Classes/c5servername.cpp

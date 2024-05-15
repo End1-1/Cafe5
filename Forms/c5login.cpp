@@ -1,7 +1,6 @@
 #include "c5login.h"
 #include "ui_c5login.h"
 #include "c5user.h"
-#include "c5dlgconnections.h"
 #include "c5servername.h"
 #include <QSettings>
 
@@ -97,13 +96,7 @@ void C5Login::on_cbDatabases_currentIndexChanged(int index)
 
 void C5Login::readServers()
 {
-    if (C5ServerName::mServers.isEmpty() == false) {
-        fServers = C5ServerName::mServers;
-        ui->btnEditConnections->setEnabled(false);
-    } else {
-        QSettings s(_ORGANIZATION_, _APPLICATION_+ QString("\\") + _MODULE_);
-        fServers = QJsonDocument::fromJson(s.value("servers", "[]").toByteArray()).array();
-    }
+    fServers = C5ServerName::mServers;
     ui->cbDatabases->clear();
     int dbindex = 0;
     for (int i = 0; i < fServers.count(); i++) {
@@ -114,12 +107,5 @@ void C5Login::readServers()
         ui->cbDatabases->addItem(js["name"].toString());
     }
     ui->cbDatabases->setCurrentIndex(dbindex);
-}
-
-
-void C5Login::on_btnEditConnections_clicked()
-{
-    C5DlgConnections().exec();
-    readServers();
 }
 

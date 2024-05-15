@@ -1,4 +1,5 @@
 SOURCES += \
+    $$PWD/../Classes/c5servername.cpp \
     ../../NewTax/Src/printtaxn.cpp \
     ../../XLSX/src/xlsx.cpp \
     ../../XLSX/src/xlsxborder.cpp \
@@ -38,7 +39,6 @@ SOURCES += \
     ../Classes/c5printjson.cpp \
     ../Classes/c5printpreview.cpp \
     ../Classes/c5printreceiptthread.cpp \
-    ../Classes/c5printreceiptthread50mm.cpp \
     ../Classes/c5printremovedservicethread.cpp \
     ../Classes/c5printservicethread.cpp \
     ../Classes/c5random.cpp \
@@ -124,7 +124,6 @@ SOURCES += \
     wcustomerdisplay.cpp \
         workspace.cpp \
     ../Cafe5/c5config.cpp \
-    ../Cafe5/c5connection.cpp \
     ../Cafe5/c5database.cpp \
     ../Cafe5/c5dialog.cpp \
     ../Cafe5/c5message.cpp \
@@ -134,6 +133,7 @@ SOURCES += \
     ../Classes/c5user.cpp
 
 HEADERS += \
+    $$PWD/../Classes/c5servername.h \
     ../../NewTax/Src/printtaxn.h \
     ../../XLSX/src/crs32.h \
     ../../XLSX/src/xlsx.h \
@@ -177,7 +177,6 @@ HEADERS += \
     ../Classes/c5printjson.h \
     ../Classes/c5printpreview.h \
     ../Classes/c5printreceiptthread.h \
-    ../Classes/c5printreceiptthread50mm.h \
     ../Classes/c5printremovedservicethread.h \
     ../Classes/c5printservicethread.h \
     ../Classes/c5random.h \
@@ -266,7 +265,6 @@ HEADERS += \
     wcustomerdisplay.h \
         workspace.h \
     ../Cafe5/c5config.h \
-    ../Cafe5/c5connection.h \
     ../Cafe5/c5database.h \
     ../Cafe5/c5dialog.h \
     ../Cafe5/c5message.h \
@@ -303,7 +301,6 @@ FORMS += \
     supplier.ui \
     wcustomerdisplay.ui \
         workspace.ui \
-    ../Cafe5/c5connection.ui \
     ../Cafe5/c5message.ui
 
 

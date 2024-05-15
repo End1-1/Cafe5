@@ -2,9 +2,11 @@
 #include "c5config.h"
 #include "c5systempreference.h"
 #include "datadriver.h"
+#include "logwriter.h"
+#include "c5servername.h"
 #include <QFile>
 #include <QLockFile>
-#include "c5connection.h"
+#include <QSslSocket>
 #include <QApplication>
 #include <QSettings>
 #include <QTranslator>
@@ -29,6 +31,8 @@ int main(int argc, char *argv[])
 //        return 1;
 //    }
 
+
+
     QDir d;
     QFile file(d.homePath() + "/" + _APPLICATION_ + "/lock.pid");
     file.remove();
@@ -37,6 +41,9 @@ int main(int argc, char *argv[])
         C5Message::error(QObject::tr("An instance of application already running"));
         return -1;
     }
+
+    LogWriter::write(LogWriterLevel::verbose, "", "OpenSSL version " + QSslSocket::sslLibraryBuildVersionString() + " " + QSslSocket::sslLibraryVersionString());
+    LogWriter::write(LogWriterLevel::verbose, "", "OpenSSL support " + QString((QSslSocket::supportsSsl() ? "YES" : "NO")));
 
     QTranslator t;
     t.load(":/Smart.qm");
@@ -54,22 +61,39 @@ int main(int argc, char *argv[])
         a.setStyleSheet(styleFile.readAll());
     }
 
-    QSettings ss(_ORGANIZATION_, _APPLICATION_+ QString("\\") + _MODULE_);
-    QJsonObject js = QJsonDocument::fromJson(ss.value("server", "{}").toByteArray()).object();
-    if (args.contains("--config")) {
-        C5Connection c(js);
-        if (c.exec() == QDialog::Accepted) {
-            js = c.fParams;
-            ss.setValue("server", QJsonDocument(js).toJson(QJsonDocument::Compact));
+    QString settingsName, serverName;
+    for (const QString &arg: a.arguments()) {
+        if (arg.contains("/servername=")){
+            QStringList sn = arg.split("=");
+            if (sn.length() == 2) {
+                serverName = sn.at(1);
+                C5ServerName sng(serverName, "shop");
+                if (!sng.getServers("smart")){
+                    return 1;
+                }
+                QJsonObject js = sng.mServers.at(0).toObject();
+                C5Config::fDBHost = js["host"].toString();
+                C5Config::fDBPath = js["database"].toString();
+                C5Config::fDBUser = js["username"].toString();
+                C5Config::fDBPassword = js["password"].toString();
+                C5Config::fSettingsName = js["settings"].toString();
+                C5Config::fFullScreen = true;
+                QSettings ss(_ORGANIZATION_, _APPLICATION_+ QString("\\") + _MODULE_);
+                ss.setValue("server", "");
+            }
+        } else if (arg.contains("/config")) {
+            QStringList sn = arg.split("=", Qt::SkipEmptyParts);
+            if (sn.length() > 1) {
+                settingsName = sn.at(1);
+                C5Config::fSettingsName = settingsName;
+            }
         }
     }
+    if (serverName.isEmpty()) {
+        C5Message::error("Connection server name not found");
+        return 1;
+    }
 
-    C5Config::fDBHost = js["host"].toString();
-    C5Config::fDBPath = js["database"].toString();
-    C5Config::fDBUser = js["username"].toString();
-    C5Config::fDBPassword = js["password"].toString();
-    C5Config::fSettingsName = js["settings"].toString();
-    C5Config::fFullScreen = true;
     C5Config::initParamsFromDb();
     DataDriver::init(C5Config::dbParams());
 

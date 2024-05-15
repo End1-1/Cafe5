@@ -3,7 +3,6 @@
 #include "c5socketmessage.h"
 #include "c5printservicethread.h"
 #include "c5printreceiptthread.h"
-#include "c5printreceiptthread50mm.h"
 #include "c5printremovedservicethread.h"
 #include "c5permissions.h"
 #include "printtaxn.h"
@@ -437,7 +436,7 @@ void C5WaiterServer::reply(QJsonObject &o)
 
         C5Database &db = srh.fDb;
         QString printerName = "local";
-        int paperWidth = 500, printType = 80;
+        int paperWidth = 500;
         db[":f_name"] = fIn["receipt_printer"].toString();
         db.exec("select f_id from s_settings_names where f_name=:f_name");
         if (db.nextRow()) {
@@ -453,14 +452,6 @@ void C5WaiterServer::reply(QJsonObject &o)
             db.exec("select f_value from s_settings_values where f_settings=:f_settings and f_key=:f_key");
             if (db.nextRow()) {
                 paperWidth = db.getString(0).toInt() == 0 ? 500 : db.getString(0).toInt();
-            }
-            db[":f_settings"] = s;
-            db[":f_key"] = param_printer_paper_width_50mm;
-            db.exec("select f_value from s_settings_values where f_settings=:f_settings and f_key=:f_key");
-            if (db.nextRow()) {
-                if (db.getString(0).toInt() == 1) {
-                    printType = 50;
-                }
             }
         }
 
@@ -963,7 +954,7 @@ int C5WaiterServer::printTax(const QMap<QString, QVariant> &header, const QList<
                 m["f_qty2"].toDouble(),
                 m["f_discount"].toDouble() * 100);
     }
-    if (header["f_amountservice"] > 0.001) {
+    if (header["f_amountservice"].toDouble() > 0.001) {
         pt.addGoods(C5Config::taxDept().toInt(),
                     "5901",
                     "001",
@@ -1094,7 +1085,7 @@ bool C5WaiterServer::printReceipt(QString &err, C5Database &db, bool isBill, boo
     //        jh["f_idramphone"] = C5Config::idramPhone();
 
     QString printerName = "local";
-    int paperWidth = 500, printType = 80;
+    int paperWidth = 500;
     C5LogSystem::writeEvent("Settings name: " + fIn["receipt_printer"].toString());
     db[":f_name"] = fIn["receipt_printer"].toString();
     db.exec("select f_id from s_settings_names where f_name=:f_name");
@@ -1113,14 +1104,6 @@ bool C5WaiterServer::printReceipt(QString &err, C5Database &db, bool isBill, boo
             paperWidth = db.getString(0).toInt() == 0 ? 650 : db.getString(0).toInt();
             C5LogSystem::writeEvent(QString("Paper width was changed: %1").arg(paperWidth));
         }
-        db[":f_settings"] = s;
-        db[":f_key"] = param_printer_paper_width_50mm;
-        db.exec("select f_value from s_settings_values where f_settings=:f_settings and f_key=:f_key");
-        if (db.nextRow()) {
-            if (db.getString(0).toInt() == 1) {
-                printType = 50;
-            }
-        }
     }
 
     if (alias) {
@@ -1132,14 +1115,7 @@ bool C5WaiterServer::printReceipt(QString &err, C5Database &db, bool isBill, boo
     }
 
     if (fIn["withoutprint"].toInt() == 0 && fIn["nofinalreceipt"].toInt() == 0) {
-        switch (printType) {
-        case 50: {
-            //TODO: remove from thread
-            C5PrintReceiptThread50mm *pr = new C5PrintReceiptThread50mm(C5Config::dbParams(), QJsonObject(), QJsonArray(), printerName, paperWidth);
-            pr->start();
-            break;
-        }
-        case 80: {
+
             C5PrintReceiptThread pr(fIn["order"].toString(), headerInfo, bodyInfo,
                     printerName, fIn["language"].toInt(), paperWidth);
             pr.fBill = isBill;
@@ -1151,9 +1127,7 @@ bool C5WaiterServer::printReceipt(QString &err, C5Database &db, bool isBill, boo
             if (!pr.print(db.dbParams())) {
                 err = pr.fError;
             }
-            break;
-        }
-        }
+
     }
 
     if (err.isEmpty()) {

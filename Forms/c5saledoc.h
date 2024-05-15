@@ -75,7 +75,7 @@ private:
     QAction *fActionReturn;
     void saveReturnItems();
     int addGoods(int goodsId, C5Database &db);
-    int addGoods(int store, int goodsId, const QString &barcode, const QString &name, const QString &unitname, double qty, double price, double discount, int isService);
+    int addGoods(const QString &uuid, int store, int goodsId, const QString &barcode, const QString &name, const QString &unitname, double qty, double price, double discount, int isService, const QString &returnFrom);
     void countGrandTotal();
     bool openDraft(const QString &id);
     void setPartner();

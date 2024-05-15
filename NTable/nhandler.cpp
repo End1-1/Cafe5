@@ -6,6 +6,8 @@
 #include "c5mainwindow.h"
 #include "c5costumerdebtpayment.h"
 #include "c5storedoc.h"
+#include <QToolButton>
+#include <QGridLayout>
 
 static const QString hDebt = "90dd520c-f072-11ee-b90b-7c10c9bcac82";
 
@@ -29,6 +31,7 @@ void NHandler::handle(const QJsonArray &ja)
     if (mHandlers.at(1).toString() == hDebt) {
         switch (mFilterDlg->filterValue("mode").toInt()) {
         case 1:
+        case 4:
             if (!ja.at(3).toString().isEmpty()) {
                 C5Database db(__c5config.dbParams());
                 db[":f_id"] = ja.at(3).toString();
@@ -59,6 +62,33 @@ void NHandler::handle(const QJsonArray &ja)
                 }
             }
             break;
+        }
+    }
+}
+
+void NHandler::toolWidget(QWidget *w)
+{
+    auto *gl = static_cast<QGridLayout*>(w->layout());
+    if (mHandlers.size() > 0) {
+        if (mHandlers.contains(hDebt)) {
+            auto *b = new QToolButton(w);
+            b->setIcon(QIcon(":/new.png"));
+            b->setText(tr("New customer payment"));
+            b->setAutoRaise(true);
+            b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+            connect(b, &QAbstractButton::clicked, [](){
+                C5CostumerDebtPayment(BCLIENTDEBTS_SOURCE_SALE, __c5config.dbParams()).exec();
+            });
+            gl->addWidget(b, 0, 0, Qt::AlignLeft);
+            b = new QToolButton(w);
+            b->setIcon(QIcon(":/new.png"));
+            b->setText(tr("New partner payment"));
+            b->setAutoRaise(true);
+            b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+            connect(b, &QAbstractButton::clicked, [](){
+                C5CostumerDebtPayment(BCLIENTDEBTS_SOURCE_INPUT, __c5config.dbParams()).exec();
+            });
+            gl->addWidget(b, 1, 0, Qt::AlignLeft);
         }
     }
 }

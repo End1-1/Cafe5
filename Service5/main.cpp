@@ -51,6 +51,7 @@ DWORD WINAPI ThreadProc(CONST LPVOID lpParam) {
     t.load(":/Service5.qm");
     app.installTranslator(&t);
     QString configFile;
+    DatabaseConnectionManager dcm;
     for (const QString &a: app.arguments()) {
         if (a.contains("--config")) {
             QStringList ac = a.split("=");
@@ -61,7 +62,7 @@ DWORD WINAPI ThreadProc(CONST LPVOID lpParam) {
     }
     do {
         LogWriter::write(LogWriterLevel::verbose, "", "Try to initialize database manager");
-    } while (!DatabaseConnectionManager::init(configFile));
+    } while (!dcm.init(configFile));
     RequestManager::init();
     PluginManager::init(APPDIR + "config.ini");
     Raw::init();

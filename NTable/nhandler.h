@@ -13,6 +13,7 @@ public:
     explicit NHandler(QObject *parent = nullptr);
     void configure(NFilterDlg *filter, const QVariantList &handlers);
     void handle(const QJsonArray &ja);
+    void toolWidget(QWidget *w);
 
 private:
     NFilterDlg *mFilterDlg;

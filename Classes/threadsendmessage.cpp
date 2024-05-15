@@ -53,7 +53,6 @@ void ThreadSendMessage::start()
     url.replace("%content-length%", QString::number(body.toUtf8().length()));
     auto *s = new QSslSocket(this);
     //connect(s, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(err(QAbstractSocket::SocketError)));
-    s->addCaCertificate(fSslCertificate);
     s->setPeerVerifyMode(QSslSocket::VerifyNone);
     QJsonObject jo;
     s->connectToHostEncrypted(__c5config.httpServerIP(), __c5config.httpServerPort());

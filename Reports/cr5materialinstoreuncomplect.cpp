@@ -91,7 +91,8 @@ void CR5MaterialInStoreUncomplect::buildQuery()
 
     "select 'B', gc.f_goods as f_code,ss.f_name as f_storage,gg.f_name as f_group,g.f_name as f_goods, "
     "g.f_scancode,sum(s.f_qty*s.f_type)*gc.f_qty as f_qty, "
-    "u.f_name as f_unit,sum(((s.f_qty*s.f_type)*gc.f_qty)*g.f_lastinputprice*s.f_type) as f_total, "
+    //"u.f_name as f_unit,sum(((s.f_qty*s.f_type)*gc.f_qty)*g.f_lastinputprice*s.f_type) as f_total, "
+    "u.f_name as f_unit,sum(((s.f_qty*s.f_type)*gc.f_qty)*s.f_price*s.f_type) as f_total, "
     "sum((s.f_qty*s.f_type)*gc.f_qty)*gpr.f_price1 as f_totalsale, "
     "sum((s.f_qty*s.f_type)*gc.f_qty)*gpr.f_price2 as f_totalsale2  "
     "from a_store s  "
@@ -105,7 +106,7 @@ void CR5MaterialInStoreUncomplect::buildQuery()
     "inner join a_header h on h.f_id=s.f_document  "
     "where  h.f_date<='%1'  and h.f_state=1 and gu.f_unit in(%2) %3 "
     "group by 1, gc.f_goods,g.f_id,ss.f_name,gg.f_name,g.f_name,u.f_name, gc.f_base "
-"having sum(s.f_qty*s.f_type) <> 0 "
+    "having sum(s.f_qty*s.f_type) <> 0 "
 
     ") k %4 "
     )

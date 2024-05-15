@@ -298,7 +298,4 @@ extern QStringList __databases;
 
 extern C5User *__user;
 
-extern QSslCertificate fSslCertificate;
-
-
 #endif // C5CONFIG_H

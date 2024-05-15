@@ -19,7 +19,6 @@ public:
     void setupNoPassword();
 
 private slots:
-    void on_btnConnection_clicked();
 
     void on_btnShutdown_clicked();
 

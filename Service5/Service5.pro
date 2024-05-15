@@ -43,7 +43,6 @@ SOURCES += \
     utils/commandline.cpp \
     utils/configini.cpp \
     utils/database.cpp \
-    utils/databaseconnectionmanager.cpp \
     datadriver/datadriver.cpp \
     dlglicenses.cpp \
     firebase.cpp \
@@ -102,7 +101,6 @@ HEADERS += \
     utils/commandline.h \
     utils/configini.h \
     utils/database.h \
-    utils/databaseconnectionmanager.h \
     datadriver/datadriver.h \
     dlglicenses.h \
     firebase.h \
@@ -135,8 +133,8 @@ INCLUDEPATH += ../Service5Working/raw
 INCLUDEPATH += ../Service5Working/socket
 INCLUDEPATH += ../Classes
 INCLUDEPATH += C:/projects/Cafe5/Service5Working/utils
-INCLUDEPATH += C:/Soft/OpenSSL-Win64/include
-INCLUDEPATH += C:/Soft/OpenSSL-Win64/include/openssl
+INCLUDEPATH += C:/Soft/OpenSSLWin64/include
+INCLUDEPATH += C:/Soft/OpenSSLWin64/include/openssl
 
 DEFINES += _DBDRIVER_=\\\"QMARIADB\\\"
 DEFINES += _ORGANIZATION_=\\\"BreezeDevs\\\"
@@ -146,7 +144,7 @@ DEFINES += QSSLSOCKET_DEBUG
 
 LIBS += -lVersion
 LIBS += -lwsock32
-LIBS += -LC:/Soft/OpenSSL-Win64/lib
+LIBS += -LC:/soft/OpenSSLWin64/lib/VC/x64/MD
 LIBS += -lopenssl
 LIBS += advapi32.lib
 LIBS += -llibcrypto
@@ -157,4 +155,5 @@ QMAKE_LFLAGS_WINDOWS += /MANIFESTUAC:"level='requireAdministrator'"
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
 

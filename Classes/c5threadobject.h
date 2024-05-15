@@ -2,7 +2,6 @@
 #define C5THREADOBJECT_H
 
 #include <QObject>
-#include <QWidget>
 
 class C5ThreadObject : public QObject
 {

@@ -49,6 +49,7 @@ Sales::Sales(C5User *user) :
         ui->cbHall->addItem(db.getString("f_name"), __c5config.defaultHall());
     }
     ui->cbHall->addItem(tr("Online"), 10);
+    ui->cbHall->addItem(tr("Ozon"), 13);
     ui->cbHall->setCurrentIndex(0);
     ui->lbTotalQty->setVisible(false);
     ui->leTotalQty->setVisible(false);
@@ -87,7 +88,6 @@ bool Sales::printCheckWithTax(C5Database &db, const QString &id, QString &rseq)
                 .arg(__c5config.httpServerUsername(),__c5config.httpServerPassword(),id);
         auto *s = new QSslSocket(0);
         //connect(s, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(err(QAbstractSocket::SocketError)));
-        s->addCaCertificate(fSslCertificate);
         s->setPeerVerifyMode(QSslSocket::VerifyNone);
         s->connectToHostEncrypted(__c5config.httpServerIP(), __c5config.httpServerPort());
         if (s->waitForEncrypted(5000)) {

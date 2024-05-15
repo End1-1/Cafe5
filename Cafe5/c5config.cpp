@@ -23,7 +23,6 @@ C5User *__user;
 QStringList __databases;
 QMap<int, QString> C5Config::fSettings;
 static QMutex settingsMutex;
-QSslCertificate fSslCertificate;
 
 C5Config::C5Config()
 {
@@ -204,13 +203,6 @@ int C5Config::defaultTable()
 
 void C5Config::initParamsFromDb()
 {
-    QString certFileName = qApp->applicationDirPath() + "/" + "cert.pem";
-    QFile file(certFileName);
-    if (file.open(QIODevice::ReadOnly)) {
-        fSslCertificate = QSslCertificate(file.readAll());
-    }
-
-
     C5Database db(fDBHost, fDBPath, fDBUser, fDBPassword);
     fSettings.clear();
     db[":f_name"] = fSettingsName;

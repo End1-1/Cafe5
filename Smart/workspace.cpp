@@ -1,6 +1,5 @@
 #include "workspace.h"
 #include "ui_workspace.h"
-#include "c5connection.h"
 #include "dlgpassword.h"
 #include "c5waiterorderdoc.h"
 #include "menudish.h"

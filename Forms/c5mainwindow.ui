@@ -234,24 +234,11 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionConnection"/>
    <addaction name="actionChange_password"/>
    <addaction name="actionLogout"/>
    <addaction name="actionHome"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <action name="actionConnection">
-   <property name="icon">
-    <iconset resource="../resources/res.qrc">
-     <normaloff>:/database.png</normaloff>:/database.png</iconset>
-   </property>
-   <property name="text">
-    <string>Main connection</string>
-   </property>
-   <property name="toolTip">
-    <string>Connection settings</string>
-   </property>
-  </action>
   <action name="actionClose_application">
    <property name="text">
     <string>Close application</string>

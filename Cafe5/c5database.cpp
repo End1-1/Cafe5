@@ -238,7 +238,11 @@ bool C5Database::exec(const QString &sqlQuery, QList<QList<QVariant> > &dbrows, 
         columns = fNameColumnMap;
         return true;
     } else {
+#ifdef QT_DEBUG
         logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + fLastError + sqlQuery);
+#else
+        logEvent(fLastError + sqlQuery);
+#endif
         return false;
     }
 #endif
@@ -283,7 +287,11 @@ bool C5Database::exec(const QString &sqlQuery, QMap<QString, QList<QVariant> > &
     }
 
     if (LOGGING) {
+#ifdef QT_DEBUG
         logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + lastQuery(fQuery));
+#else
+        logEvent(lastQuery(fQuery));
+#endif
     }
 
     fBindValues.clear();
@@ -367,7 +375,7 @@ bool C5Database::execNetwork(const QString &sqlQuery)
                 }
                 break;
             case QVariant::Double:
-                value = QString("%1").arg(value.toDouble());
+                value = QString("%1").arg(QString::number(value.toDouble(), 'f', 4));
                 break;
             case QVariant::Int:
                 value = QString("%1").arg(value.toInt());
@@ -430,7 +438,7 @@ bool C5Database::execNetwork(const QString &sqlQuery)
         logEvent(fDbParamsForUuid.at(0) + " (" + QString::number(elapsed) + "-" + QString::number(t.elapsed()) + " ms):" + " " + sql);
 #else
         if (__c5config.getValue(param_debuge_mode).toInt() > 0) {
-            logEvent(fDbParamsForUuid.at(0) + " (" + QString::number(elapsed) + "-" + QString::number(t.elapsed()) + " ms):" + " " + sql);
+            logEvent("(" + QString::number(elapsed) + "-" + QString::number(t.elapsed()) + " ms):" + " " + sql);
         }
 #endif
         return true;
@@ -484,7 +492,7 @@ bool C5Database::execNetwork(const QString &sqlQuery)
     logEvent(fDbParamsForUuid.at(0) + " (" + QString::number(elapsed) + "-" + QString::number(t.elapsed()) + " ms):" + " " + sql);
 #else
     if (__c5config.getValue(param_debuge_mode).toInt() > 0) {
-        logEvent(fDbParamsForUuid.at(0) + " (" + QString::number(elapsed) + "-" + QString::number(t.elapsed()) + " ms):" + " " + sql);
+        logEvent("(" + QString::number(elapsed) + "-" + QString::number(t.elapsed()) + " ms):" + " " + sql);
     }
 #endif
     return true;
@@ -578,7 +586,7 @@ bool C5Database::update(const QString &tableName, const QString &field, const QV
 {
     QString sql = "update " + tableName + " set ";
     bool first = true;
-    for (QMap<QString, QVariant>::const_iterator it = fBindValues.begin(); it != fBindValues.end(); it++) {
+    for (QMap<QString, QVariant>::const_iterator it = fBindValues.constBegin(); it != fBindValues.constEnd(); it++) {
         if (first) {
             first = false;
         } else {
@@ -855,8 +863,8 @@ bool C5Database::exec(const QString &sqlQuery, bool &isSelect)
     }
     if (!fQuery->prepare(sql)) {
         fLastError = fQuery->lastError().databaseText();
-        logEvent(fDb.hostName() + " (" + QString::number(fTimerCount) + " ms):" + fDb.databaseName() + " " + fLastError);
-        logEvent(fDb.hostName() + " (" + QString::number(fTimerCount) + " ms):" + fDb.databaseName() + " " + sql);
+        logEvent(fLastError);
+        logEvent(sql);
         throw SqlException(fLastError);
         return false;
     }
@@ -871,8 +879,8 @@ bool C5Database::exec(const QString &sqlQuery, bool &isSelect)
     }
     if (!fQuery->exec()) {
         fLastError = fQuery->lastError().databaseText();
-        logEvent(fDb.hostName() + " (" + QString::number(fTimerCount) + " ms):" + fDb.databaseName() + " " + fLastError);
-        logEvent(fDb.hostName() + " (" + QString::number(fTimerCount) + " ms):" + fDb.databaseName() + " " + lastQuery(fQuery));
+        logEvent(fLastError);
+        logEvent(lastQuery(fQuery));
         throw SqlException(fLastError);
         return false;
     }
@@ -882,7 +890,7 @@ bool C5Database::exec(const QString &sqlQuery, bool &isSelect)
     logEvent(fDb.hostName() + " (" + QString::number(fTimerCount) + " ms):" + fDb.databaseName() + " " + lastQuery(fQuery));
 #else
     if (__c5config.getValue(param_debuge_mode).toInt() > 0) {
-        logEvent(fDb.hostName() + " (" + QString::number(fTimerCount) + " ms):" + fDb.databaseName() + " " + lastQuery(fQuery));
+        logEvent(" (" + QString::number(fTimerCount) + " ms):" + " " + lastQuery(fQuery));
     }
 #endif
 

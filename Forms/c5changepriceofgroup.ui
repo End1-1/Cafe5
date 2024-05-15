@@ -7,13 +7,56 @@
     <x>0</x>
     <y>0</y>
     <width>283</width>
-    <height>254</height>
+    <height>200</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Price for group</string>
   </property>
-  <layout class="QFormLayout" name="formLayout">
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="5" column="1">
+    <widget class="C5LineEdit" name="leCheckCode"/>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Retail discounted</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="C5LineEdit" name="lePrice1"/>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Wholesale price</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="lbCheckcode">
+     <property name="text">
+      <string>Check code</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Wholesale discounted</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="C5LineEdit" name="lePrice2disc"/>
+   </item>
+   <item row="2" column="1">
+    <widget class="C5LineEdit" name="lePrice1disc"/>
+   </item>
+   <item row="3" column="1">
+    <widget class="C5LineEdit" name="lePrice2"/>
+   </item>
    <item row="0" column="0">
     <widget class="QLabel" name="label">
      <property name="text">
@@ -21,30 +64,47 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="1">
-    <widget class="C5LineEdit" name="lePrice1"/>
-   </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_2">
+   <item row="0" column="2">
+    <widget class="QCheckBox" name="chRetail">
+     <property name="focusPolicy">
+      <enum>Qt::ClickFocus</enum>
+     </property>
      <property name="text">
-      <string>Wholesale price</string>
+      <string/>
      </property>
     </widget>
    </item>
-   <item row="2" column="1">
-    <widget class="C5LineEdit" name="lePrice2"/>
-   </item>
-   <item row="4" column="0">
-    <widget class="QLabel" name="lbCheckcode">
+   <item row="2" column="2">
+    <widget class="QCheckBox" name="chRetailDisc">
+     <property name="focusPolicy">
+      <enum>Qt::ClickFocus</enum>
+     </property>
      <property name="text">
-      <string>Check code</string>
+      <string/>
      </property>
     </widget>
    </item>
-   <item row="4" column="1">
-    <widget class="C5LineEdit" name="leCheckCode"/>
+   <item row="3" column="2">
+    <widget class="QCheckBox" name="chWhosale">
+     <property name="focusPolicy">
+      <enum>Qt::ClickFocus</enum>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
    </item>
-   <item row="5" column="0" colspan="2">
+   <item row="4" column="2">
+    <widget class="QCheckBox" name="chWhosaleDisc">
+     <property name="focusPolicy">
+      <enum>Qt::ClickFocus</enum>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0" colspan="3">
     <widget class="QWidget" name="widget" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
@@ -90,26 +150,6 @@
      </layout>
     </widget>
    </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>Retail discounted</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>Wholesale discounted</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1">
-    <widget class="C5LineEdit" name="lePrice2disc"/>
-   </item>
-   <item row="1" column="1">
-    <widget class="C5LineEdit" name="lePrice1disc"/>
-   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -119,6 +159,19 @@
    <header location="global">c5lineedit.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>lePrice1</tabstop>
+  <tabstop>chRetail</tabstop>
+  <tabstop>lePrice1disc</tabstop>
+  <tabstop>chRetailDisc</tabstop>
+  <tabstop>lePrice2</tabstop>
+  <tabstop>chWhosale</tabstop>
+  <tabstop>lePrice2disc</tabstop>
+  <tabstop>chWhosaleDisc</tabstop>
+  <tabstop>leCheckCode</tabstop>
+  <tabstop>btnOk</tabstop>
+  <tabstop>btnCancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

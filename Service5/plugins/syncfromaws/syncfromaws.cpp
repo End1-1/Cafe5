@@ -1,6 +1,5 @@
 #include "syncfromaws.h"
 #include "worker.h"
-#include "database.h"
 #include <QDebug>
 #include <QTextCodec>
 
