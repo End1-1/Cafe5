@@ -37,7 +37,7 @@ private:
 private slots:
     void queryStarted();
     void queryError(const QString &error);
-    void queryFinished(int elapsed, const QByteArray &ba);
+    void queryFinished(const QJsonObject &ba);
     void exportToExcel();
     void refreshData();
     void clearFilter();

@@ -26,7 +26,6 @@ DlgDirtyStoreDoc::DlgDirtyStoreDoc(const QString &uuid, const QStringList &dbPar
         }
         r++;
     }
-
     db[":f_document"] = uuid;
     db.exec("select s.f_base, sum(s.f_qty)*-1 "
             "from a_store s "
@@ -37,7 +36,6 @@ DlgDirtyStoreDoc::DlgDirtyStoreDoc(const QString &uuid, const QStringList &dbPar
         ui->tbl->setDouble(rowsId[db.getString(0)], 5, db.getDouble(1));
     }
     countTotal();
-
     std::vector<int> colswidths;
     colswidths.push_back(0);
     colswidths.push_back(0);
@@ -47,7 +45,6 @@ DlgDirtyStoreDoc::DlgDirtyStoreDoc(const QString &uuid, const QStringList &dbPar
     colswidths.push_back(80);
     colswidths.push_back(80);
     colswidths.push_back(80);
-
     for (int i = 0; i < colswidths.size(); i++) {
         ui->tbl->setColumnWidth(i, colswidths.at(i));
     }
@@ -66,39 +63,41 @@ void DlgDirtyStoreDoc::on_btnEdit_clicked()
     }
     C5LineEdit *l = ui->tbl->createLineEdit(r, 4);
     l->setDouble(ui->tbl->getDouble(r, 4));
-    connect(l, &C5LineEdit::textChanged, this, [this](){
+    connect(l, &C5LineEdit::textChanged, this, [this]() {
         int row, col;
-        if (ui->tbl->findWidget(static_cast<QWidget*>(sender()), row, col)) {
-            ui->tbl->lineEdit(row, 7)->setDouble(ui->tbl->getDouble(row, 4) * ui->tbl->getDouble(row, 6));
+        if (ui->tbl->findWidget(static_cast<QWidget * >(sender()), row, col)) {
+            ui->tbl->lineEdit(row, 7)->setDouble(ui->tbl->getDouble(row, 4) *ui->tbl->getDouble(row, 6));
             countTotal();
         }
     });
     l = ui->tbl->createLineEdit(r, 6);
     l->fDecimalPlaces = 4;
-    l->setValidator(new QDoubleValidator(0, 999999999,4));
+    l->setValidator(new QDoubleValidator(0, 999999999, 4));
     l->setDouble(ui->tbl->getDouble(r, 6));
-    connect(l, &C5LineEdit::textChanged, this, [this](){
+    connect(l, &C5LineEdit::textChanged, this, [this]() {
         int row, col;
-        if (ui->tbl->findWidget(static_cast<QWidget*>(sender()), row, col)) {
-            ui->tbl->lineEdit(row, 7)->setDouble(ui->tbl->getDouble(row, 6) * ui->tbl->getDouble(row, 4));
+        if (ui->tbl->findWidget(static_cast<QWidget * >(sender()), row, col)) {
+            ui->tbl->lineEdit(row, 7)->setDouble(ui->tbl->getDouble(row, 6) *ui->tbl->getDouble(row, 4));
             countTotal();
         }
     });
     l = ui->tbl->createLineEdit(r, 7);
     l->setDouble(ui->tbl->getDouble(r, 7));
-    connect(l, &C5LineEdit::textChanged, this, [this, &r](){
+    connect(l, &C5LineEdit::textChanged, this, [this, &r]() {
         int row, col;
-        if (ui->tbl->findWidget(static_cast<QWidget*>(sender()), row, col)) {
-           if (ui->tbl->getDouble(row, 4) > 0.001) {
-               ui->tbl->lineEdit(row, 6)->setDouble(ui->tbl->lineEdit(row, 7)->getDouble() / ui->tbl->lineEdit(row, 4)->getDouble());
-               countTotal();
-           }
+        if (ui->tbl->findWidget(static_cast<QWidget * >(sender()), row, col)) {
+            if (ui->tbl->getDouble(row, 4) > 0.001) {
+                ui->tbl->lineEdit(row, 6)->setDouble(ui->tbl->lineEdit(row, 7)->getDouble() / ui->tbl->lineEdit(row, 4)->getDouble());
+                countTotal();
+            }
         }
     });
 }
 
 void DlgDirtyStoreDoc::on_tbl_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn)
 {
+    Q_UNUSED(previousColumn);
+    Q_UNUSED(currentColumn);
     if (previousRow > -1 && previousRow != currentRow) {
         ui->tbl->removeCellWidget(previousRow, 4);
         ui->tbl->removeCellWidget(previousRow, 6);
@@ -185,7 +184,6 @@ void DlgDirtyStoreDoc::on_btnSave_clicked()
     db[":f_base"] = ui->tbl->getString(r, 0);
     db[":f_price"] = ui->tbl->lineEdit(r, 6)->getDouble();
     db.exec("update a_store set f_price=:f_price, f_total=f_qty*:f_price where f_base=:f_base and f_type=-1");
-
     ui->tbl->removeCellWidget(r, 4);
     ui->tbl->removeCellWidget(r, 6);
     ui->tbl->removeCellWidget(r, 7);

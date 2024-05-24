@@ -48,6 +48,7 @@ void DlgMemoryRead::on_btnOpen_clicked()
 
 void DlgMemoryRead::on_tblMemory_cellClicked(int row, int column)
 {
+    Q_UNUSED(column);
     if (row >  -1) {
         fResult = ui->tblMemory->item(row, 0)->text().toInt();
     }
@@ -69,10 +70,10 @@ int DlgMemoryRead::getSessionHistory()
     header.append(tr("Amount"));
     ui->tblMemory->setHorizontalHeaderLabels(header);
     QString sql ("SELECT h.f_id, concat(h.f_prefix, h.f_hallid) as f_hallid, "
-                    "date_format(cast(concat(f_dateclose, ' ', f_timeclose) as datetime),'%d/%c/%Y %H:%i' ) as f_date, h.f_amounttotal "
-                    "from o_header h "
-                    "INNER JOIN a_header_cash hc ON hc.f_oheader=h.f_id and hc.f_session=:f_session "
-                    "order by f_dateclose desc, f_timeclose desc ");
+                 "date_format(cast(concat(f_dateclose, ' ', f_timeclose) as datetime),'%d/%c/%Y %H:%i' ) as f_date, h.f_amounttotal "
+                 "from o_header h "
+                 "INNER JOIN a_header_cash hc ON hc.f_oheader=h.f_id and hc.f_session=:f_session "
+                 "order by f_dateclose desc, f_timeclose desc ");
     C5Database db(fDBParams);
     db[":f_session"] = __c5config.getRegValue("session");
     db.exec(sql);
@@ -101,7 +102,6 @@ int DlgMemoryRead::getIncompleteOrders()
     return exec();
 }
 
-
 void DlgMemoryRead::on_btnReprint_clicked()
 {
     int row = ui->tblMemory->currentRow();
@@ -115,10 +115,10 @@ void DlgMemoryRead::on_btnReprint_clicked()
 void DlgMemoryRead::on_btnOpen_2_clicked()
 {
     QString sql ("SELECT h.f_id, concat(h.f_prefix, h.f_hallid) as f_hallid, "
-                    "date_format(cast(concat(f_dateclose, ' ', f_timeclose) as datetime),'%d/%c/%Y %H:%i' ) as f_date, h.f_amounttotal "
-                    "from o_header h "
-                    "where cast(concat(f_dateclose, ' ', f_timeclose) as datetime)>date_sub(current_timestamp(), interval 24 hour) "
-                    "order by f_dateclose desc, f_timeclose desc ");
+                 "date_format(cast(concat(f_dateclose, ' ', f_timeclose) as datetime),'%d/%c/%Y %H:%i' ) as f_date, h.f_amounttotal "
+                 "from o_header h "
+                 "where cast(concat(f_dateclose, ' ', f_timeclose) as datetime)>date_sub(current_timestamp(), interval 24 hour) "
+                 "order by f_dateclose desc, f_timeclose desc ");
     C5Database db(fDBParams);
     db[":f_session"] = __c5config.getRegValue("session");
     db.exec(sql);

@@ -15,7 +15,6 @@ SOURCES += \
     ../../handlers/requesthandler.cpp \
     ../../handlers/socketdata.cpp \
     ../../utils/commandline.cpp \
-    ../../utils/database.cpp \
     ../../utils/jsonhandler.cpp \
     ../../utils/logwriter.cpp \
     standard.cpp
@@ -25,7 +24,6 @@ HEADERS += \
     ../../handlers/requesthandler.h \
     ../../handlers/socketdata.h \
     ../../utils/commandline.h \
-    ../../utils/database.h \
     ../../utils/jsonhandler.h \
     ../../utils/logwriter.h \
     standard.h

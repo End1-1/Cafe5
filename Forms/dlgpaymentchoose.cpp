@@ -19,8 +19,8 @@ DlgPaymentChoose::DlgPaymentChoose(const QStringList &dbParams) :
     ui->leChange->setValidator(new QDoubleValidator(0, 1000000000, 2));
     ui->lePrepaid->setValidator(new QDoubleValidator(0, 1000000000, 2));
     QShortcut *s = new QShortcut(QKeySequence(Qt::Key_F12), this, SLOT(checkFiscal()));
+    Q_UNUSED(s);
     adjustSize();
-
 }
 
 DlgPaymentChoose::~DlgPaymentChoose()
@@ -31,7 +31,7 @@ DlgPaymentChoose::~DlgPaymentChoose()
 bool DlgPaymentChoose::getValues(double total, double &cash, double &card, double &idram, double &telcell, double &bank,
                                  double &credit,
                                  double &prepaid, double &debt, double &cashin, double &change, bool &fiscal,
-                                    bool readOnlyPrepaid)
+                                 bool readOnlyPrepaid)
 {
     DlgPaymentChoose d(__c5config.dbParams());
     d.ui->leTotal->setDouble(total);
@@ -100,7 +100,7 @@ void DlgPaymentChoose::clearAll(QLineEdit *le)
 void DlgPaymentChoose::countChange()
 {
     double diff = ui->leCashIn->getDouble()
-            - ui->leCash->getDouble();
+                  - ui->leCash->getDouble();
     if (diff > ui->leCashIn->getDouble()) {
         diff = ui->leCashIn->getDouble();
     }
@@ -134,6 +134,7 @@ void DlgPaymentChoose::on_btnDebt_clicked()
 
 void DlgPaymentChoose::on_leCashIn_textChanged(const QString &arg1)
 {
+    Q_UNUSED(arg1);
     countChange();
 }
 
@@ -145,14 +146,14 @@ void DlgPaymentChoose::on_btnBankTransfer_clicked()
 void DlgPaymentChoose::on_btnPay_clicked()
 {
     double value =
-            ui->leCash->getDouble()
-            + ui->leCard->getDouble()
-            + ui->leIdram->getDouble()
-            + ui->leTelcell->getDouble()
-            + ui->leBankTransfer->getDouble()
-            + ui->lePrepaid->getDouble()
-            + ui->leDebt->getDouble()
-            + ui->leCredit->getDouble();
+        ui->leCash->getDouble()
+        + ui->leCard->getDouble()
+        + ui->leIdram->getDouble()
+        + ui->leTelcell->getDouble()
+        + ui->leBankTransfer->getDouble()
+        + ui->lePrepaid->getDouble()
+        + ui->leDebt->getDouble()
+        + ui->leCredit->getDouble();
     if (value > ui->leTotal->getDouble() || value < ui->leTotal->getDouble()) {
         C5Message::error(tr("Check amounts"));
         return;
@@ -162,11 +163,13 @@ void DlgPaymentChoose::on_btnPay_clicked()
 
 void DlgPaymentChoose::on_leCash_textChanged(const QString &arg1)
 {
+    Q_UNUSED(arg1);
     countChange();
 }
 
 void DlgPaymentChoose::on_leCard_textChanged(const QString &arg1)
 {
+    Q_UNUSED(arg1);
     countChange();
     if (str_float(arg1) > 0.001) {
         ui->btnFiscal->setChecked(true);
@@ -175,11 +178,13 @@ void DlgPaymentChoose::on_leCard_textChanged(const QString &arg1)
 
 void DlgPaymentChoose::on_leBankTransfer_textChanged(const QString &arg1)
 {
+    Q_UNUSED(arg1);
     countChange();
 }
 
 void DlgPaymentChoose::on_leIdram_textChanged(const QString &arg1)
 {
+    Q_UNUSED(arg1);
     countChange();
     if (str_float(arg1) > 0.001) {
         ui->btnFiscal->setChecked(true);
@@ -188,6 +193,7 @@ void DlgPaymentChoose::on_leIdram_textChanged(const QString &arg1)
 
 void DlgPaymentChoose::on_leTelcell_textChanged(const QString &arg1)
 {
+    Q_UNUSED(arg1);
     countChange();
     if (str_float(arg1) > 0.001) {
         ui->btnFiscal->setChecked(true);
@@ -196,11 +202,13 @@ void DlgPaymentChoose::on_leTelcell_textChanged(const QString &arg1)
 
 void DlgPaymentChoose::on_lePrepaid_textChanged(const QString &arg1)
 {
+    Q_UNUSED(arg1);
     countChange();
 }
 
 void DlgPaymentChoose::on_leDebt_textChanged(const QString &arg1)
 {
+    Q_UNUSED(arg1);
     countChange();
 }
 

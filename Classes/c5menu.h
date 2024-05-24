@@ -9,24 +9,28 @@
 
 #define menu5 C5Menu::fInstance
 
-class DDish {
+class DDish
+{
 public:
     QList<int> data;
 };
 
-class DPart2 {
+class DPart2
+{
 public:
-    DPart2(int id):fId(id){}
+    DPart2(int id): fId(id) {}
     QList<DPart2> data1;
     DDish data2;
     int fId;
 };
 
-class DPart1 {
+class DPart1
+{
 public:
     QList<DPart2> data;
 
-    DPart2 &part2(int id, int dishid) {
+    DPart2 &part2(int id, int dishid)
+    {
         for (int i = 0; i < data.count(); i++) {
             if (data.at(i).fId == id) {
                 if (dishid > 0) {
@@ -57,7 +61,8 @@ public:
         return part2(root.fId, 0);
     }
 
-    bool addToTree(DPart2 &l1, DPart2 &l2) {
+    bool addToTree(DPart2 &l1, DPart2 &l2)
+    {
         for (int i = 0; i < l1.data1.count(); i++) {
             if (l1.data1.at(i).fId == l2.fId) {
                 if (l1.data1.count() > 0 && l2.data1.count() > 0) {
@@ -73,13 +78,14 @@ public:
                     l1.data1[i].data2.data.append(l2.data2.data);
                     return true;
                 }
-
             }
         }
         l1.data1.append(l2);
+        return true;
     }
 
-    DPart2 findParent(int id, DPart2 child) {
+    DPart2 findParent(int id, DPart2 child)
+    {
         if (id == 0) {
             return child;
         } else {
@@ -91,17 +97,20 @@ public:
     }
 };
 
-class DMenu {
+class DMenu
+{
 public:
     QMap<int, QMap<int, DPart1> > data;
 
-    void check(int id) {
+    void check(int id)
+    {
         if (!data.contains(id)) {
             data.insert(id, QMap<int, DPart1>());
         }
     }
 
-    DPart1 &part1(int menuid, int part1id) {
+    DPart1 &part1(int menuid, int part1id)
+    {
         if (!data[menuid].contains(part1id)) {
             data[menuid].insert(part1id, DPart1());
         }

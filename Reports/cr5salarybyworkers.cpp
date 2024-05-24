@@ -7,25 +7,20 @@
 CR5SalaryByWorkers::CR5SalaryByWorkers(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
 {
-
     fIcon = ":/employee.png";
     fLabel = tr("Salary by workers");
     fSimpleQuery = true;
     fQuery = "SELECT sp.f_id, sp.f_date AS `Ամսաթիվ`, g.f_name AS `Հաստիկ`, concat_ws(' ', u.f_last, u.f_first) AS `Աշխատող`, "
-                "if (sp.f_cashdoc is NULL, sp.f_amount, sp.f_amount*-1) AS `Գումար`  "
-                "FROM s_salary_payment sp "
-                "LEFT JOIN s_user u ON u.f_id=sp.f_worker "
-                "LEFT JOIN s_user_group g ON g.f_id=u.f_group "
-                " %filter "
-                "ORDER BY 1, 3";
-
-
+             "if (sp.f_cashdoc is NULL, sp.f_amount, sp.f_amount*-1) AS `Գումար`  "
+             "FROM s_salary_payment sp "
+             "LEFT JOIN s_user u ON u.f_id=sp.f_worker "
+             "LEFT JOIN s_user_group g ON g.f_id=u.f_group "
+             " %filter "
+             "ORDER BY 1, 3";
     fColumnsSum.append("գումար");
-
     restoreColumnsVisibility();
     fFilterWidget = new CR5SalaryByWorkersFilter(fDBParams);
-    fFilter = static_cast<CR5SalaryByWorkersFilter*>(fFilterWidget);
-
+    fFilter = static_cast<CR5SalaryByWorkersFilter *>(fFilterWidget);
 }
 
 void CR5SalaryByWorkers::restoreColumnsVisibility()
@@ -59,5 +54,6 @@ bool CR5SalaryByWorkers::tblDoubleClicked(int row, int column, const QList<QVari
 {
     Q_UNUSED(row);
     Q_UNUSED(column);
+    Q_UNUSED(vals);
     return true;
 }

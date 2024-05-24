@@ -5,6 +5,7 @@
 #include <QMetaType>
 
 struct Dish {
+    int menuid;
     int id;
     int typeId;
     int state;
@@ -30,7 +31,9 @@ struct Dish {
     QString packageName;
     QString obodyId;
     QString f_emarks;
-    Dish() {
+    Dish()
+    {
+        menuid = 0;
         id = 0;
         state = 1;
         typeId = 0;
@@ -44,7 +47,8 @@ struct Dish {
         discount = 0;
         specialDiscount = 0;
     }
-    Dish(Dish *d) {
+    Dish(Dish *d)
+    {
         id = d->id;
         state = d->state;
         typeId = d->typeId;
@@ -70,7 +74,7 @@ struct Dish {
         obodyId = d->obodyId;
     }
 };
-Q_DECLARE_METATYPE(Dish*)
+Q_DECLARE_METATYPE(Dish *)
 Q_DECLARE_METATYPE(Dish)
 
 #endif // DISH_H

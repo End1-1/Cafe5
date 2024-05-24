@@ -34,15 +34,26 @@ win32: QMAKE_CXXFLAGS -= -Zc:strictStrings
 include ($$PWD/Smart.pri)
 
 
-INCLUDEPATH += C:/Soft/OpenSSL-Win32/include
-INCLUDEPATH += C:/Soft/OpenSSL-Win32/include/openssl
+INCLUDEPATH += C:/Soft/OpenSSLWin64/include
+INCLUDEPATH += C:/Soft/OpenSSLWin64/include/openssl
 
 LIBS += -lVersion
 LIBS += -lwsock32
-LIBS += -LC:/Soft/OpenSSL-Win64/lib
+LIBS += -LC:/soft/OpenSSLWin64/lib/VC/x64/MD
 LIBS += -lopenssl
 LIBS += -llibcrypto
 
 RESOURCES += \
     ../resources/resources.qrc \
     transres.qrc
+
+FORMS += \
+    ../NTable/nloadingdlg.ui
+
+HEADERS += \
+    ../NTable/ndataprovider.h \
+    ../NTable/nloadingdlg.h
+
+SOURCES += \
+    ../NTable/ndataprovider.cpp \
+    ../NTable/nloadingdlg.cpp

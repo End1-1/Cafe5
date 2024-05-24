@@ -3,7 +3,8 @@
 
 #include <QDialog>
 
-namespace Ui {
+namespace Ui
+{
 class NLoadingDlg;
 }
 
@@ -14,6 +15,9 @@ class NLoadingDlg : public QDialog
 public:
     explicit NLoadingDlg(QWidget *parent = nullptr);
     ~NLoadingDlg();
+
+    virtual void reject() override;
+    virtual void accept() override;
 
 private:
     Ui::NLoadingDlg *ui;

@@ -26,7 +26,7 @@ private slots:
     void openSuggestions();
     void queryStarted();
     void queryError(const QString &error);
-    void queryFinished(int elapsed, const QByteArray &ba);
+    void queryFinished(const QJsonObject &ba);
     void on_btnCancel_clicked();
     void on_btnApply_clicked();
 

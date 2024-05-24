@@ -6,7 +6,8 @@
 #include <QTableWidgetItem>
 #include <QTimer>
 
-namespace Ui {
+namespace Ui
+{
 class DlgOrder;
 }
 
@@ -72,7 +73,8 @@ private:
 
     void buildMenu(int menuid, int part1, int part2);
 
-    void logRecord(const QString &username, const QString &orderid, const QString &rec, const QString &action, const QString &value1, const QString &value2);
+    void logRecord(const QString &username, const QString &orderid, const QString &rec, const QString &action,
+                   const QString &value1, const QString &value2);
 
     void setButtonsState();
 
@@ -262,9 +264,13 @@ private slots:
     void on_btnDelivery_clicked();
 
     void on_btnCalcIdram_clicked();
+
     void on_btnFillBank_clicked();
+
     void on_btnCashout_clicked();
+
     void on_btnMenuSet_clicked();
+    void on_btnQR_clicked();
 };
 
 #endif // DLGORDER_H

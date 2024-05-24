@@ -35,7 +35,6 @@ C5WaiterOrder::~C5WaiterOrder()
 
 void C5WaiterOrder::setOrder(const QString &id)
 {
-
     C5Database db(fDBParams);
     db[":f_id"] = id;
     db.exec("select o.f_prefix, os.f_name as f_statename, h.f_name as f_hallname, t.f_name as f_tableName, "
@@ -78,17 +77,17 @@ void C5WaiterOrder::setOrder(const QString &id)
     }
     db[":f_header"] = id;
     db.exec("select ob.f_id, ob.f_header, ob.f_state, obs.f_name as f_statename, dp1.f_name as part1, dp2.f_name as part2, ob.f_adgcode, d.f_name as f_name, "
-             "ob.f_qty1, ob.f_qty2, ob.f_price, ob.f_service, ob.f_discount, ob.f_total, "
-             "ob.f_store, ob.f_print1, ob.f_print2, ob.f_comment, ob.f_remind, ob.f_dish, "
-             "s.f_name as f_storename, ob.f_removereason, ob.f_store, st.f_name as f_storename "
-             "from o_body ob "
-             "left join d_dish d on d.f_id=ob.f_dish "
-             "left join d_part2 dp2 on dp2.f_id=d.f_part "
-             "left join d_part1 dp1 on dp1.f_id=dp2.f_part "
-             "left join c_storages s on s.f_id=ob.f_store "
+            "ob.f_qty1, ob.f_qty2, ob.f_price, ob.f_service, ob.f_discount, ob.f_total, "
+            "ob.f_store, ob.f_print1, ob.f_print2, ob.f_comment, ob.f_remind, ob.f_dish, "
+            "s.f_name as f_storename, ob.f_removereason, ob.f_store, st.f_name as f_storename "
+            "from o_body ob "
+            "left join d_dish d on d.f_id=ob.f_dish "
+            "left join d_part2 dp2 on dp2.f_id=d.f_part "
+            "left join d_part1 dp1 on dp1.f_id=dp2.f_part "
+            "left join c_storages s on s.f_id=ob.f_store "
             "left join o_body_state obs on obs.f_id=ob.f_state "
             "left join c_storages st on st.f_id=ob.f_store "
-             "where ob.f_header=:f_header");
+            "where ob.f_header=:f_header");
     while (db.nextRow()) {
         int row = ui->tblDishes->addEmptyRow();
         ui->tblDishes->setString(row, 0, db.getString("f_id"));
@@ -110,17 +109,15 @@ void C5WaiterOrder::setOrder(const QString &id)
         }
     }
     ui->tblDishes->setColumnWidths(ui->tblDishes->columnCount(), 0, 0, 100, 0, 300, 80, 80, 80, 80, 0, 0, 0, 100, 100, 100);
-
     db[":f_id"] = ui->leUuid->text();
     db.exec("select * from o_tax where f_id=:f_id");
     if (db.nextRow()) {
         ui->leTax->setText(db.getString("f_receiptnumber"));
     }
-
     db[":f_id"] = ui->leUuid->text();
     db.exec("select * from o_pay_cl where f_id=:f_id");
     if (db.nextRow()) {
-         ui->leCityLedger->setText(db.getString("f_code"));
+        ui->leCityLedger->setText(db.getString("f_code"));
     }
 }
 
@@ -195,17 +192,17 @@ void C5WaiterOrder::showStore()
     db[":f_state2"] = DISH_STATE_VOID;
     QString priceField = ui->rbDraft->isChecked() ? "g.f_lastinputprice" : "o.f_price";
     db.exec(QString("select sn.f_name as f_dishstatename, d.f_name as f_dishname, st.f_name as f_storename, "
-            "g.f_name as f_goodsname, b.f_qty1, o.f_qty / b.f_qty1 as f_qty, o.f_qty as f_outputqty, %1, "
-            "o.f_qty*%1 as f_total "
-            "from o_goods o "
-            "inner join o_body b on b.f_id=o.f_body "
-            "inner join o_body_state sn on sn.f_id=b.f_state "
-            "inner join d_dish d on d.f_id=b.f_dish "
-            "inner join c_storages st on st.f_id=o.f_store "
-            "inner join c_goods g on g.f_id=o.f_goods "
-            "where b.f_header=:f_header and (b.f_state=:f_state1 or b.f_state=:f_state2) "
-).arg(priceField));
-    ProxyTableWidgetDatabase::fillTableWidgetRowFromDatabase(&db, ui->tblStore);
+                    "g.f_name as f_goodsname, b.f_qty1, o.f_qty / b.f_qty1 as f_qty, o.f_qty as f_outputqty, %1, "
+                    "o.f_qty*%1 as f_total "
+                    "from o_goods o "
+                    "inner join o_body b on b.f_id=o.f_body "
+                    "inner join o_body_state sn on sn.f_id=b.f_state "
+                    "inner join d_dish d on d.f_id=b.f_dish "
+                    "inner join c_storages st on st.f_id=o.f_store "
+                    "inner join c_goods g on g.f_id=o.f_goods "
+                    "where b.f_header=:f_header and (b.f_state=:f_state1 or b.f_state=:f_state2) "
+                   ).arg(priceField));
+    ProxyTableWidgetDatabase::fillTableWidgetRowFromDatabase( &db, ui->tblStore);
     double t = 0;
     for (int i = 0; i < ui->tblStore->rowCount(); i++) {
         t += ui->tblStore->getDouble(i, 8);
@@ -242,7 +239,7 @@ void C5WaiterOrder::removeOrder()
     while (db.nextRow()) {
         idList.append(db.getString("f_id"));
     }
-    for (const QString &id: idList) {
+    for (const QString &id : idList) {
         if (!dw.rollbackOutput(db, id)) {
             db.rollback();
             C5Message::error(dw.fErrorMsg);
@@ -254,7 +251,8 @@ void C5WaiterOrder::removeOrder()
     db.exec("update o_header set f_state=:f_state where f_id=:f_id");
     C5WaiterOrderDoc::removeDocument(db, ui->leUuid->text());
     db.commit();
-    C5Airlog::write(hostinfo, __user->fullName(), LOG_WAITER, "", ui->leUuid->text(), "", tr("Order removed from cash"), ui->leTax->text(), "");
+    C5Airlog::write(hostinfo, __user->fullName(), LOG_WAITER, "", ui->leUuid->text(), "", tr("Order removed from cash"),
+                    ui->leTax->text(), "");
     __mainWindow->removeTab(this);
     C5Message::info(tr("Removed"));
 }
@@ -333,12 +331,12 @@ void C5WaiterOrder::on_tblDishes_customContextMenuRequested(const QPoint &pos)
 void C5WaiterOrder::on_tabWidget_currentChanged(int index)
 {
     switch (index) {
-    case 2:
-        showStore();
-        break;
-    case 3:
-        showLog();
-        break;
+        case 2:
+            showStore();
+            break;
+        case 3:
+            showLog();
+            break;
     }
 }
 
@@ -360,7 +358,8 @@ void C5WaiterOrder::on_btnClearTax_clicked()
             db[":" + db.columnName(i)] = QVariant();
         }
         db.update("o_tax", "f_id", ui->leUuid->text());
-        C5Airlog::write(hostinfo, __user->fullName(), LOG_WAITER, "", ui->leUuid->text(), "", "Clear tax info", ui->leTax->text(), "");
+        C5Airlog::write(hostinfo, __user->fullName(), LOG_WAITER, "", ui->leUuid->text(), "", "Clear tax info",
+                        ui->leTax->text(), "");
         ui->leTax->clear();
     }
 }
@@ -385,7 +384,6 @@ void C5WaiterOrder::on_btnOpenTable_clicked()
     }
     db[":f_order"] = ui->leUuid->text();
     db.exec("delete from b_clients_debts where f_order=:f_order");
-
     db[":f_id"] = ui->leUuid->text();
     db[":f_state"] = ORDER_STATE_OPEN;
     db.exec("update o_header set f_state=:f_state where f_id=:f_id");
@@ -403,10 +401,9 @@ void C5WaiterOrder::on_btnSetCL_clicked()
         C5Database db(fDBParams);
         db[":f_code"] = clcode;
         db[":f_name"] = clname;
-        db.update("o_pay_cl", "f_id", ui->leUuid->text());    
-
+        db.update("o_pay_cl", "f_id", ui->leUuid->text());
         DoubleDatabase fDD;
-        fDD.open(true, true);
+        fDD.open();
         fDD[":f_id"] = ui->leNumber->text();
         fDD[":f_paymentmode"] = 4;
         fDD[":f_dc"] = "DEBIT";
@@ -418,7 +415,6 @@ void C5WaiterOrder::on_btnSetCL_clicked()
         }
         C5Message::info(tr("Saved"));
     }
-
 }
 
 void C5WaiterOrder::on_btnClearCL_clicked()
@@ -428,9 +424,8 @@ void C5WaiterOrder::on_btnClearCL_clicked()
         db[":f_code"] = "";
         db[":f_name"] = "";
         db.update("o_pay_cl", "f_id", ui->leUuid->text());
-
         DoubleDatabase fDD;
-        fDD.open(true, true);
+        fDD.open();
         fDD[":f_id"] = ui->leNumber->text();
         fDD[":f_cityledger"] = 0;
         fDD.exec("update m_register set f_cityledger=:f_cityledger where f_id=:f_id");

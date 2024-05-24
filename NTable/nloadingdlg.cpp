@@ -18,6 +18,16 @@ NLoadingDlg::~NLoadingDlg()
     delete ui;
 }
 
+void NLoadingDlg::reject()
+{
+
+}
+
+void NLoadingDlg::accept()
+{
+
+}
+
 void NLoadingDlg::timeout()
 {
     mSecond++;

@@ -39,12 +39,22 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    QString servername;
+    QString servername, configname, params = "waiter";
     for (const QString &s: a.arguments()) {
         if (s.contains("/servername")) {
             QStringList sn = s.split("=", Qt::SkipEmptyParts);
             if (sn.length() == 2) {
                 servername = sn.at(1);
+            }
+        } else if (s.contains("/config")) {
+            QStringList sn = s.split("=", Qt::SkipEmptyParts);
+            if (sn.length() == 2) {
+                configname = sn.at(1);
+            }
+        } else if (s.contains("/params")) {
+            QStringList sn  = s.split("=", Qt::SkipEmptyParts);
+            if (sn.length() == 2) {
+                params = sn.at(1);
             }
         }
     }
@@ -56,9 +66,9 @@ int main(int argc, char *argv[])
         C5Message::error(err);
         return 1;
     }
-    C5ServerName sn(servername, "waiter");
+    C5ServerName sn(servername, "shop");
     sn.mParams["workstation"] = hostinfo;
-    if (!sn.getServers()){
+    if (!sn.getServers(params)){
         return 1;
     }
     if (sn.mServers.size() == 0) {
@@ -66,6 +76,9 @@ int main(int argc, char *argv[])
         return 1;
     }
     QJsonObject js = sn.mServers.at(0).toObject();
+    if (configname.isEmpty() == false) {
+        js["settings"] = configname;
+    }
 
     C5Config::fDBHost = js["host"].toString();
     C5Config::fDBPath = js["database"].toString();

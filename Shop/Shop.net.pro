@@ -61,8 +61,6 @@ SOURCES += \
     ../Classes/c5jsondb.cpp \
     ../Classes/c5logtoserverthread.cpp \
     ../Classes/c5menu.cpp \
-    ../Classes/c5orderdriver.cpp \
-    ../Classes/c5ordertabledelegate.cpp \
     ../Classes/c5permissions.cpp \
     ../Classes/c5printing.cpp \
     ../Classes/c5printjson.cpp \
@@ -84,14 +82,12 @@ SOURCES += \
     ../Classes/c5threadobject.cpp \
     ../Classes/c5translator.cpp \
     ../Classes/c5user.cpp \
-    ../Classes/c5waiterorderdoc.cpp \
     ../Classes/c5widget.cpp \
     ../Classes/c5witerconf.cpp \
     ../Classes/calculator.cpp \
     ../Classes/checkforupdatethread.cpp \
     ../Classes/dataonline.cpp \
     ../Classes/dlgpassword.cpp \
-    ../Classes/doubledatabase.cpp \
     ../Classes/fileversion.cpp \
     ../Classes/idram.cpp \
     ../Classes/notificationwidget.cpp \
@@ -139,12 +135,13 @@ SOURCES += \
     ../Forms/dlgpaymentchoose.cpp \
     ../Forms/dlgqrcode.cpp \
     ../Forms/dlgreservgoods.cpp \
+    ../NTable/ndataprovider.cpp \
+    ../NTable/nloadingdlg.cpp \
     ../Printing/printreceipt.cpp \
     ../Printing/printreceiptgroup.cpp \
     ../Printing/selectprinters.cpp \
     ../Service5/handlers/httpheader.cpp \
     ../Service5/handlers/requesthandler.cpp \
-    ../Service5/handlers/requestmanager.cpp \
     ../Service5/handlers/socketdata.cpp \
     ../Service5/socket/sslsocket.cpp \
     ../Service5/utils/commandline.cpp \
@@ -262,8 +259,6 @@ HEADERS += \
     ../Classes/c5jsondb.h \
     ../Classes/c5logtoserverthread.h \
     ../Classes/c5menu.h \
-    ../Classes/c5orderdriver.h \
-    ../Classes/c5ordertabledelegate.h \
     ../Classes/c5permissions.h \
     ../Classes/c5printing.h \
     ../Classes/c5printjson.h \
@@ -285,7 +280,6 @@ HEADERS += \
     ../Classes/c5threadobject.h \
     ../Classes/c5translator.h \
     ../Classes/c5user.h \
-    ../Classes/c5waiterorderdoc.h \
     ../Classes/c5widget.h \
     ../Classes/c5witerconf.h \
     ../Classes/calculator.h \
@@ -294,7 +288,6 @@ HEADERS += \
     ../Classes/config.h \
     ../Classes/dataonline.h \
     ../Classes/dlgpassword.h \
-    ../Classes/doubledatabase.h \
     ../Classes/fileversion.h \
     ../Classes/goodsreserve.h \
     ../Classes/idram.h \
@@ -344,12 +337,13 @@ HEADERS += \
     ../Forms/dlgpaymentchoose.h \
     ../Forms/dlgqrcode.h \
     ../Forms/dlgreservgoods.h \
+    ../NTable/ndataprovider.h \
+    ../NTable/nloadingdlg.h \
     ../Printing/printreceipt.h \
     ../Printing/printreceiptgroup.h \
     ../Printing/selectprinters.h \
     ../Service5/handlers/httpheader.h \
     ../Service5/handlers/requesthandler.h \
-    ../Service5/handlers/requestmanager.h \
     ../Service5/handlers/socketdata.h \
     ../Service5/socket/sslsocket.h \
     ../Service5/utils/commandline.h \
@@ -446,6 +440,7 @@ FORMS += \
     ../Forms/dlgpaymentchoose.ui \
     ../Forms/dlgqrcode.ui \
     ../Forms/dlgreservgoods.ui \
+    ../NTable/nloadingdlg.ui \
     ../Printing/selectprinters.ui \
     c5tempsale.ui \
     cashcollection.ui \
@@ -484,6 +479,7 @@ DEFINES += SHOP
 
 INCLUDEPATH += ../Cafe5
 INCLUDEPATH += ../TableRecord
+INCLUDEPATH += ../NTable
 INCLUDEPATH += ../Classes
 INCLUDEPATH += ../Cache
 INCLUDEPATH += ../Controls
@@ -524,3 +520,9 @@ win32: QMAKE_CFLAGS_RELEASE -= -Zc:strictStrings
 win32: QMAKE_CFLAGS -= -Zc:strictStrings
 win32: QMAKE_CXXFLAGS -= -Zc:strictStrings
 
+win32-g++ {
+   QMAKE_CXXFLAGS += -Werror
+}
+win32-msvc*{
+   QMAKE_CXXFLAGS += /WX
+}

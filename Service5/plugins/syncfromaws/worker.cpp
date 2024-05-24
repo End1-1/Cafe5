@@ -33,7 +33,6 @@ WaiterClientHandler::~WaiterClientHandler()
 
 void WaiterClientHandler::run(RawMessage *rm, const QByteArray &in)
 {
-
     emit handleData(rm, in);
 }
 
@@ -44,11 +43,10 @@ void WaiterClientHandler::removeSocket(SslSocket *s)
 
 void WaiterClientHandler::clearTask()
 {
-    auto *dp = new NDataProvider(mLocal["database"].toString(), false, this);
+    auto *dp = new NDataProvider(mLocal["database"].toString(), this);
     connect(dp, &NDataProvider::done, this, &WaiterClientHandler::taskFinish);
     connect(dp, &NDataProvider::error, this, &WaiterClientHandler::getSyncError);
     dp->getData("/engine/sync/clear.php", { });
-
 }
 
 void WaiterClientHandler::tasks()
@@ -72,15 +70,15 @@ void WaiterClientHandler::tasks()
     mNetworkAccessManager->post(rq, QJsonDocument(jo).toJson(QJsonDocument::Compact));
 }
 
-void WaiterClientHandler::taskFinish(int elapsed, const QByteArray &ba)
+void WaiterClientHandler::taskFinish(const QJsonObject &ba)
 {
     mTaskRunning = false;
     sender()->deleteLater();
-    QJsonObject jo = QJsonDocument::fromJson(ba).object();
+    QJsonObject jo = ba;
 #ifdef QT_DEBUG
-    LogWriter::write(LogWriterLevel::verbose, "getSyncObjects", ba);
+    LogWriter::write(LogWriterLevel::verbose, "getSyncObjects", QJsonDocument(ba).toJson());
 #endif
-    LogWriter::write(LogWriterLevel::verbose, "Syncfromaws finished", ba);
+    LogWriter::write(LogWriterLevel::verbose, "Syncfromaws finished", QJsonDocument(ba).toJson());
 }
 
 void WaiterClientHandler::broadcastForClients(QByteArray data)
@@ -91,13 +89,12 @@ void WaiterClientHandler::broadcastForClients(QByteArray data)
 
 void WaiterClientHandler::removeMeFromConnectionList(QString uuid)
 {
-
 }
 
 void WaiterClientHandler::finished(QNetworkReply *r)
 {
     if (r->error() != QNetworkReply::NoError) {
-        LogWriter::write(LogWriterLevel::errors, "",r->errorString());
+        LogWriter::write(LogWriterLevel::errors, "", r->errorString());
         r->deleteLater();
         mTaskRunning = false;
         return;
@@ -123,7 +120,7 @@ void WaiterClientHandler::finished(QNetworkReply *r)
             mLocal = jo;
         }
     }
-    auto *dp = new NDataProvider(mLocal["database"].toString(), false, this);
+    auto *dp = new NDataProvider(mLocal["database"].toString(), this);
     connect(dp, &NDataProvider::done, this, &WaiterClientHandler::getLastTime);
     connect(dp, &NDataProvider::error, this, &WaiterClientHandler::getSyncError);
     dp->getData("/engine/sync/get-last-time.php", {});
@@ -132,77 +129,32 @@ void WaiterClientHandler::finished(QNetworkReply *r)
 void WaiterClientHandler::getSyncError(const QString &err)
 {
     sender()->deleteLater();
-    auto *nd = static_cast<NDataProvider*>(sender());
+    auto *nd = static_cast<NDataProvider *>(sender());
     LogWriter::write(LogWriterLevel::errors, "", err);
     nd->deleteLater();
     mTaskRunning = false;
 }
 
-void WaiterClientHandler::getSyncObject(int elapsed, const QByteArray &ba)
+void WaiterClientHandler::getSyncObject(const QJsonObject &ba)
 {
     sender()->deleteLater();
-    QJsonObject jo = QJsonDocument::fromJson(ba).object();
-#ifdef QT_DEBUG
-    LogWriter::write(LogWriterLevel::verbose, "getSyncObjects", ba);
-#endif
-
-    jo = jo["data"].toObject();
-    auto *dp = new NDataProvider(mLocal["database"].toString(), false, this);
-    dp->changeTimeout(1000 * 60 * 60);
-    connect(dp, &NDataProvider::done, this, &WaiterClientHandler::writeSyncObject);
-    connect(dp, &NDataProvider::error, this, &WaiterClientHandler::getSyncError);
-    dp->getData("/engine/sync/write-sync-objects.php", {
-        {"table", jo["table"].toString()},
-        {"time", jo["time"].toString()},
-        {"data", jo["data"].toArray()}
-    });
-    LogWriter::write(LogWriterLevel::verbose, "starting write objects", QString("%1 %2").arg(jo["table"].toString(), QString::number(jo["data"].toArray().size())));
+    QJsonObject jo = ba;
+    taskFinish(ba);
 }
 
-void WaiterClientHandler::writeSyncObject(int elapsed, const QByteArray &ba)
-{
-    sender()->deleteLater();
-    QJsonParseError jerr;
-    QJsonObject jo = QJsonDocument::fromJson(ba, &jerr).object();
-    if (jerr.error != QJsonParseError::NoError) {
-        LogWriter::write(LogWriterLevel::errors, jerr.errorString(), ba);
-        mTaskRunning = false;
-        return;
-    }
-    for (int i = 0; i < mSyncArrary.size(); i++) {
-        if (mSyncArrary.at(i).toObject()["table"].toString() == jo["table"].toString()) {
-            mSyncArrary.removeAt(0);
-            break;
-        }
-    }
-    if (mSyncArrary.isEmpty()) {
-        clearTask();
-
-        return;
-    }
-    auto *dp = new NDataProvider(mRemote["database"].toString(), false, this);
-    connect(dp, &NDataProvider::done, this, &WaiterClientHandler::getSyncObject);
-    connect(dp, &NDataProvider::error, this, &WaiterClientHandler::getSyncError);
-    dp->getData("/engine/sync/get-sync-object.php", {
-        {"time", mSyncArrary.at(0).toObject()["f_version"].toString()},
-        {"table", mSyncArrary.at(0).toObject()["f_table"].toString()}
-    });
-}
-
-void WaiterClientHandler::getLastTime(int elapsed, const QByteArray &ba)
+void WaiterClientHandler::getLastTime(const QJsonObject &ba)
 {
     sender()->deleteLater();
 #ifdef QT_DEBUG
-    LogWriter::write(LogWriterLevel::verbose, "getLastTime", ba);
+    LogWriter::write(LogWriterLevel::verbose, "getLastTime", QJsonDocument(ba).toJson());
 #endif
-    QJsonObject jo = QJsonDocument::fromJson(ba).object();
-    auto *dp = new NDataProvider(mRemote["database"].toString(), false, this);
+    QJsonObject jo = ba["data"].toObject();
+    auto *dp = new NDataProvider(mLocal["database"].toString(), this);
     dp->changeTimeout(1000 * 60 * 10);
     connect(dp, &NDataProvider::done, this, &WaiterClientHandler::getSyncObject);
     connect(dp, &NDataProvider::error, this, &WaiterClientHandler::getSyncError);
-    mSyncArrary = QJsonDocument::fromJson(ba).object()["data"].toObject()["result"].toArray();
+    mSyncArrary = jo["result"].toArray();
     dp->getData("/engine/sync/get-sync-object.php", {
-        {"time", mSyncArrary.at(0).toObject()["f_version"].toString()},
-        {"table", mSyncArrary.at(0).toObject()["f_table"].toString()}
+        {"server", mRemote["database"].toString()}
     });
 }

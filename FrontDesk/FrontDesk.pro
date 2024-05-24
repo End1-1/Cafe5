@@ -41,8 +41,8 @@ CONFIG += c++11
 include ($$PWD/Frontdesk.pri)
 
 
-INCLUDEPATH += c:/Soft/OpenSSL-Win64/include
-INCLUDEPATH += c:/Soft/OpenSSL-Win64/include/openssl
+INCLUDEPATH += c:/Soft/OpenSSLWin64/include
+INCLUDEPATH += c:/Soft/OpenSSLWin64/include/openssl
 
 RESOURCES += \
     ../resources/res.qrc \
@@ -60,7 +60,7 @@ ICON = storehouse.ico
 
 LIBS += -lVersion
 LIBS += -lwsock32
-LIBS += -LC:/Soft/OpenSSL-Win64/lib
+LIBS += -LC:/soft/OpenSSLWin64/lib/VC/x64/MD
 LIBS += -lopenssl
 LIBS += -llibcrypto
 
@@ -68,3 +68,9 @@ win32: QMAKE_CXXFLAGS_RELEASE -= -Zc:strictStrings
 win32: QMAKE_CFLAGS_RELEASE -= -Zc:strictStrings
 win32: QMAKE_CFLAGS -= -Zc:strictStrings
 win32: QMAKE_CXXFLAGS -= -Zc:strictStrings
+
+HEADERS += \
+    ../Service5/utils/logwriter.h
+
+SOURCES += \
+    ../Service5/utils/logwriter.cpp

@@ -162,7 +162,7 @@ QJsonArray ja;
     f.open(QIODevice::ReadOnly);
     QJsonObject jconf = QJsonDocument::fromJson(f.readAll()).object();
     f.close();
-    ja.append(jconf[jo["params"].toObject()["name"].toString()].toObject());
+    ja = jconf[jo["params"].toObject()["name"].toString()].toArray();
 #endif
 
     return rh.setResponse(HTTP_OK, QJsonDocument(ja).toJson(QJsonDocument::Compact));
@@ -266,6 +266,10 @@ QJsonArray ja;
     f.open(QIODevice::ReadOnly);
     QJsonObject jconf = QJsonDocument::fromJson(f.readAll()).object();
     f.close();
+    if (!jconf.contains(jo["params"].toObject()["name"].toString())) {
+        return rh.setInternalServerError(QString("Params %1 not declare %2").arg(jo["params"].toObject()["name"].toString(),
+                                                                                 QJsonDocument(jconf).toJson()));
+    }
     ja.append(jconf[jo["params"].toObject()["name"].toString()].toObject());
 #endif
 

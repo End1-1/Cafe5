@@ -36,7 +36,6 @@
 #define param_date_cash_shift 31
 #define param_cash_id 32
 #define param_frondesk_mode 33
-#define param_shop_enterpin 34
 #define param_nocash_id 35
 #define param_autocash_prefix 36
 #define param_autonocash_prefix 37
@@ -54,8 +53,6 @@
 #define param_shop_defferentStaff 50
 #define param_shop_print_v1 52
 #define param_shop_print_v2 53
-#define param_shop_autologin_pin1 54
-#define param_shop_autologin_pin2 55
 #define param_recipe_footer_text 56
 #define param_input_doc_fix_price 57
 #define param_shop_print_goods_qty_side_left 58
@@ -156,6 +153,8 @@ public:
 
     static QString fDBPassword;
 
+    static int fJsonConfigId;
+
     static QString localReceiptPrinter();
 
     static QString serviceFactor();
@@ -244,8 +243,6 @@ public:
 
     static int frontDeskMode();
 
-    static bool shopEnterPin();
-
     static QString taxCashier();
 
     static QString taxPin();
@@ -271,7 +268,7 @@ public:
     static int shopPrintVersion();
 
     static int receiptParepWidth();
-    
+
     static int receipPrinterWidth();
 
     static QString httpServerIP();
@@ -289,8 +286,6 @@ public:
 private:
     static QMap<int, QString> fSettings;
 };
-
-extern QStringList __autologin_store;
 
 extern C5Config __c5config;
 

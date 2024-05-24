@@ -10,7 +10,8 @@
 #include <QApplication>
 #include <QUuid>
 
-SocketThread::SocketThread(int handle, const QSslCertificate &cert, const QSslKey &key, QSsl::SslProtocol proto, const QList<QSslCertificate> chain) :
+SocketThread::SocketThread(int handle, const QSslCertificate &cert, const QSslKey &key, QSsl::SslProtocol proto,
+                           const QList<QSslCertificate> chain) :
     QObject(),
     fSslLocalCertificate(cert),
     fSslPrivateKey(key),
@@ -41,7 +42,6 @@ SocketThread::~SocketThread()
 
 void SocketThread::run()
 {
-    fSocketType = Invalid;
     setProperty("session", QUuid::createUuid().toString());
     fTimeoutControl = new QTimer();
     connect(fTimeoutControl, &QTimer::timeout, this, &SocketThread::timeoutControl);
@@ -56,11 +56,11 @@ void SocketThread::run()
     fSslSocket->setProtocol(fSslProtocol);
     fSslSocket->setLocalCertificateChain(fSslChain);
     fSslSocket->startServerEncryption();
-//    if (!fSslSocket->waitForEncrypted()) {
-//        LogWriter::write(LogWriterLevel::errors, "!fSslSocket->waitForEncrypted()", fSslSocket->errorString());
-//        emit finished();
-//        return;
-//    }
+    //    if (!fSslSocket->waitForEncrypted()) {
+    //        LogWriter::write(LogWriterLevel::errors, "!fSslSocket->waitForEncrypted()", fSslSocket->errorString());
+    //        emit finished();
+    //        return;
+    //    }
     fRawHandler = new RawHandler(fSslSocket, property("session").toString());
     connect(fRawHandler, &RawHandler::writeToSocket, this, &SocketThread::writeToSocket);
     fTimer.start();
@@ -77,39 +77,6 @@ void SocketThread::run()
 
 }
 
-void SocketThread::rawRequest()
-{
-    int headersize = 3 + sizeof(fMessageNumber) + sizeof(fMessageId) + sizeof(fMessageListData) + sizeof(fContentLenght);
-    if (fData.length() >= headersize) {
-        int pos = 3;
-        memcpy(&fMessageNumber, &fData.data()[pos], sizeof(fMessageNumber));
-        pos += sizeof(fMessageNumber);
-        memcpy(&fMessageId, &fData.data()[pos], sizeof(fMessageId));
-        pos += sizeof(fMessageId);
-        memcpy(&fMessageListData, &fData.data()[pos], sizeof(fMessageListData));
-        pos += sizeof(fMessageListData);
-        memcpy(&fContentLenght, &fData.data()[pos], sizeof(fContentLenght));
-        //pos += sizeof(fContentLenght);
-    } else {
-        fTimeoutControl->stop();
-        fTimeoutControl->start(3000);
-        return;
-    }
-    if (fPreviouseMessageNumber + 1 != fMessageNumber) {
-        LogWriter::write(LogWriterLevel::errors, property("session").toString(), QString("Packet message number error, previous: %1, current: %2").arg(fPreviouseMessageNumber).arg(fMessageNumber));
-//        fSslSocket->close();
-//        return;
-    }
-    fPreviouseMessageNumber = fMessageNumber;
-    if (fData.length() - headersize >= fContentLenght) {
-        parseBody(fMessageListData, fData.mid(headersize, fContentLenght));
-        fData.remove(0, headersize + fContentLenght);
-        if (fData.length() > 0) {
-            rawRequest();
-        }
-    }
-}
-
 void SocketThread::httpRequest()
 {
     if (fContentLenght > 0) {
@@ -122,7 +89,8 @@ void SocketThread::httpRequest()
                 return;
             }
         } else if (QString(fData.mid(0, 3).toUpper()) == "GET") {
-            if ((QString(fData.mid(fData.length() - 4, 4)) != "\r\n\r\n") && (QString(fData.mid(fData.length() - 4, 4)) != "\n\n\n\n")){
+            if ((QString(fData.mid(fData.length() - 4, 4)) != "\r\n\r\n")
+                    && (QString(fData.mid(fData.length() - 4, 4)) != "\n\n\n\n")) {
                 return;
             }
             if (QString(fData.mid(fData.length() - 4, 4)) == "\n\n\n\n") {
@@ -135,36 +103,43 @@ void SocketThread::httpRequest()
     QString route;
     QString httpVersion;
     switch (parseRequest(m, httpVersion, route)) {
-    case GET:
-        break;
-    case POST:
-        break;
-    case OPTIONS:
-        fSslSocket->write(QString("HTTP/1.1 204 No content\r\n"
-                                  "Allow: OPTIONS, GET, HEAD, POST\r\n"
-                                  "Access-Control-Allow-Origin: *\r\n"
-                                  "Access-Control-Allow-Methods: POST, GET, OPTIONS\r\n"
-                                  "Access-Control-Allow-Headers: access-control-allow-origin, X-PINGOTHER, Content-Type, Content-Length\r\n"
-                                  "\r\n").toUtf8());
-        fSslSocket->close();
-        return;
-    case UNSUPPORTED:
-        fSslSocket->write(QString("HTTP/1.1 405 Method not allowed\r\n\r\n<html><H1>HTTP %1 Method not allowed</H1></html>").arg(fMethodString).toUtf8());
-        fSslSocket->close();
-        return;
-    case UNKNOWN_REQUEST_METHOD:
-        fSslSocket->write(QString("HTTP/1.1 501 Not Implemented\r\n\r\n<html><H1>Not Implemented</H1></html>").toUtf8());
-        fSslSocket->close();
-        return;
-    case INCOMPLETE:
-        LogWriter::write(LogWriterLevel::errors, property("session").toString(), QString("Error in request. %1").arg(QString(fData)));
-        return;
+        case GET:
+            break;
+        case POST:
+            break;
+        case OPTIONS:
+            fSslSocket->write(QString("HTTP/1.1 204 No content\r\n"
+                                      "Allow: OPTIONS, GET, HEAD, POST\r\n"
+                                      "Access-Control-Allow-Origin: *\r\n"
+                                      "Access-Control-Allow-Methods: POST, GET, OPTIONS\r\n"
+                                      "Access-Control-Allow-Headers: access-control-allow-origin, X-PINGOTHER, Content-Type, Content-Length\r\n"
+                                      "\r\n").toUtf8());
+            fSslSocket->close();
+            return;
+        case UNSUPPORTED:
+            fSslSocket->write(
+                QString("HTTP/1.1 405 Method not allowed\r\n\r\n<html><H1>HTTP %1 Method not allowed</H1></html>").arg(
+                    fMethodString).toUtf8());
+            fSslSocket->close();
+            return;
+        case UNKNOWN_REQUEST_METHOD:
+            fSslSocket->write(QString("HTTP/1.1 501 Not Implemented\r\n\r\n<html><H1>Not Implemented</H1></html>").toUtf8());
+            fSslSocket->close();
+            return;
+        case INCOMPLETE:
+            LogWriter::write(LogWriterLevel::errors, property("session").toString(),
+                             QString("Error in request. %1").arg(QString(fData)));
+            return;
+        default:
+            LogWriter::write(LogWriterLevel::errors, property("session").toString(),
+                             QString("No method selected. %1").arg(QString(fData)));
+            break;
     }
     LogWriter::write(LogWriterLevel::verbose, property("session").toString(), route);
     QByteArray response;
     RequestManager::handle(property("session").toString(),
                            QHostAddress(fSslSocket->peerAddress().toIPv4Address()).toString(),
-                           route.remove(0,1),
+                           route.remove(0, 1),
                            fData,
                            response,
                            fRequestBody,
@@ -181,7 +156,7 @@ HttpRequestMethod SocketThread::parseRequest(HttpRequestMethod &requestMethod, Q
     methodsPatters.append("GET");
     methodsPatters.append("POST");
     methodsPatters.append("OPTIONS");
-    for (const QString &m: methodsPatters) {
+    for (const QString &m : methodsPatters) {
         QString cmp = fData.mid(0, m.length()).toUpper();
         if (cmp == m) {
             fMethodString = cmp;
@@ -320,18 +295,18 @@ HttpRequestMethod SocketThread::parseRequest(HttpRequestMethod &requestMethod, Q
 void SocketThread::parseBody(quint16 msgType, const QByteArray &data)
 {
     switch (fRawHandler->run(fPreviouseMessageNumber, fMessageId, msgType, data)) {
-    case 1:
-        fTimeoutControl->stop();
-        break;
-    case 2:
-        fTimeoutControl->stop();
-        fTimeoutControl->start(60000);
-        break;
-    case 3:
-        fDoNotRemovePluginSocket = true;
-        break;
-    default:
-        break;
+        case 1:
+            fTimeoutControl->stop();
+            break;
+        case 2:
+            fTimeoutControl->stop();
+            fTimeoutControl->start(60000);
+            break;
+        case 3:
+            fDoNotRemovePluginSocket = true;
+            break;
+        default:
+            break;
     }
 }
 
@@ -351,7 +326,8 @@ void SocketThread::parseBody(const QString &request, int offset)
             bodyEnd = true;
         }
         if (s1 != -1 && s2 != -1) {
-            fRequestBody.insert(request.mid(s1 + s4, s2 - s1 - s4).toLower(), DataAddress(s2 + 1 + offset, s3 + offset - 1, s3 - s2 - 1));
+            fRequestBody.insert(request.mid(s1 + s4, s2 - s1 - s4).toLower(), DataAddress(s2 + 1 + offset, s3 + offset - 1,
+                                s3 - s2 - 1));
         } else {
             bodyEnd = true;
         }
@@ -379,44 +355,15 @@ QString SocketThread::data(const DataAddress &da) const
 
 void SocketThread::timeoutControl()
 {
-    LogWriter::write(LogWriterLevel::errors, property("session").toString(), QString("%1 %2").arg(tr("Connection timeout"), QHostAddress(fSslSocket->peerAddress().toIPv4Address()).toString()));
+    LogWriter::write(LogWriterLevel::errors, property("session").toString(), QString("%1 %2").arg(tr("Connection timeout"),
+                     QHostAddress(fSslSocket->peerAddress().toIPv4Address()).toString()));
     emit finished();
 }
 
 void SocketThread::readyRead()
 {
-    /* Raw data in socket pattern, otherwise means http request */
-    QByteArray ba;
-    ba.append(0x03);
-    ba.append(0x04);
-    ba.append(0x15);
-
-    if (fData.isEmpty()) {
-        LogWriter::write(LogWriterLevel::warning, "", "Start reading from socket");
-        fData = fSslSocket->read(3);
-        if (fData.length() == 0) {
-            LogWriter::write(LogWriterLevel::errors, "", "Could not determain connection type");
-            emit finished();
-            return;
-        }
-        if (fData.compare(ba) == 0) {
-            LogWriter::write(LogWriterLevel::verbose, "", "Connection type raw data");
-            fSocketType = RawData;
-        } else {
-            LogWriter::write(LogWriterLevel::verbose, "", "Connection type http request");
-            fSocketType = HttpRequest;
-        }
-    }
     fData.append(fSslSocket->readAll());
-    LogWriter::write(LogWriterLevel::warning, fSocketType == RawData ? "raw" : "http", QString(fData));
-    switch (fSocketType) {
-    case RawData:
-        rawRequest();
-        break;
-    case HttpRequest:
-        httpRequest();
-        break;
-    }
+    httpRequest();
 }
 
 void SocketThread::writeToSocket(const QByteArray &d)

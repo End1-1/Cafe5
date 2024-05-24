@@ -1,6 +1,9 @@
 #include "dlgpin.h"
 #include "ui_dlgpin.h"
+#include "nloadingdlg.h"
+#include "c5message.h"
 #include <QKeyEvent>
+#include <QJsonObject>
 
 DlgPin::DlgPin(QWidget *parent) :
     QDialog(parent, Qt::FramelessWindowHint),
@@ -38,7 +41,7 @@ bool DlgPin::getPin(QString &pin, QString &pass)
 
 void DlgPin::btnNumPressed()
 {
-    QPushButton *btn = static_cast<QPushButton*>(sender());
+    QPushButton *btn = static_cast<QPushButton *>(sender());
     QLineEdit *l = ui->leUser;
     if (ui->lePin->hasFocus()) {
         l = ui->lePin;
@@ -115,20 +118,19 @@ void DlgPin::on_btn0_clicked()
     btnNumPressed();
 }
 
-
 void DlgPin::keyReleaseEvent(QKeyEvent *event)
 {
     switch (event->key()) {
-    case Qt::Key_Backspace:
-        if (ui->lePin->isEmpty() && ui->lePin->hasFocus() && fPinEmpty) {
-            ui->leUser->setFocus();
-            if (ui->leUser->text().length() == 4) {
-                ui->leUser->setText(ui->leUser->text().left(3));
+        case Qt::Key_Backspace:
+            if (ui->lePin->isEmpty() && ui->lePin->hasFocus() && fPinEmpty) {
+                ui->leUser->setFocus();
+                if (ui->leUser->text().length() == 4) {
+                    ui->leUser->setText(ui->leUser->text().left(3));
+                }
+                ui->leUser->setCursorPosition(ui->leUser->text().length());
+                event->accept();
             }
-            ui->leUser->setCursorPosition(ui->leUser->text().length());
-            event->accept();
-        }
-        break;
+            break;
     }
     if (ui->leUser->hasFocus() && ui->leUser->text().length() == 4) {
         ui->lePin->setFocus();
@@ -144,4 +146,30 @@ void DlgPin::keyReleaseEvent(QKeyEvent *event)
         fPinEmpty = false;
     }
     QDialog::keyReleaseEvent(event);
+}
+
+void DlgPin::queryLoading()
+{
+    fLoadingDlg = new NLoadingDlg(this);
+    fLoadingDlg->open();
+}
+
+void DlgPin::queryStopped(QObject *sender)
+{
+    fLoadingDlg->hide();
+    fLoadingDlg->deleteLater();
+    sender->deleteLater();
+}
+
+void DlgPin::queryFinished(const QJsonObject &json)
+{
+    QJsonObject jo = json["data"].toObject();
+    Q_UNUSED(jo);
+    queryStopped(sender());
+}
+
+void DlgPin::queryError(const QString &err)
+{
+    C5Message::error(err);
+    queryStopped(sender());
 }

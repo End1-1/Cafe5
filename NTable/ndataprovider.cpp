@@ -1,5 +1,5 @@
 #include "ndataprovider.h"
-#include "c5filelogwriter.h"
+#include "logwriter.h"
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
@@ -8,9 +8,12 @@
 #include <QJsonObject>
 #include <QElapsedTimer>
 
-NDataProvider::NDataProvider(const QString &host, bool debug, QObject *parent)
+bool  NDataProvider::mDebug = false;
+QString NDataProvider::sessionKey;
+
+NDataProvider::NDataProvider(const QString &host, QObject *parent)
     : QObject(parent),
-    mHost(host)
+      mHost(host)
 {
     mNetworkAccessManager = new QNetworkAccessManager(this);
     mNetworkAccessManager->setTransferTimeout(30000);
@@ -25,15 +28,6 @@ NDataProvider::~NDataProvider()
 
 void NDataProvider::getData(const QString &route, const QJsonObject &data)
 {
-#ifdef QT_DEBUG
-    c5log(route);
-    c5log(QJsonDocument(data).toJson(QJsonDocument::Compact));
-#else
-    if (mDebug) {
-        c5log(route);
-        c5log(QJsonDocument(data).toJson(QJsonDocument::Compact));
-    }
-#endif
     mTimer->restart();
     emit started();
     QNetworkRequest rq(mHost + route);
@@ -43,14 +37,19 @@ void NDataProvider::getData(const QString &route, const QJsonObject &data)
     sslConf.setProtocol(QSsl::AnyProtocol);
     rq.setSslConfiguration(sslConf);
     QJsonObject jo;
-    jo["query"] = 3;
-    jo["call"] = "sql";
-    //jo["sql"] = sql;
-    jo["sk"] = "5cfafe13-a886-11ee-ac3e-1078d2d2b808";
-    jo["apikey"] = "8eabcee4-f1bc-11ee-8b0f-021eaa527a65-a0d5c784-f1bc-11ee-8b0f-021eaa527a65";
+    jo["sessionkey"] = sessionKey;
     QStringList keys = data.keys();
-    for (const auto &s: keys) {
+    for (const auto &s : keys) {
         jo[s] = data[s];
+    }
+    if (mDebug) {
+        LogWriter::write(LogWriterLevel::verbose, "", route);
+        LogWriter::write(LogWriterLevel::verbose, "", QJsonDocument(data).toJson(QJsonDocument::Compact));
+    } else {
+#ifdef QT_DEBUG
+        LogWriter::write(LogWriterLevel::verbose, "", route);
+        LogWriter::write(LogWriterLevel::verbose, "", QJsonDocument(jo).toJson(QJsonDocument::Compact));
+#endif
     }
     mNetworkAccessManager->post(rq, QJsonDocument(jo).toJson(QJsonDocument::Compact));
 }
@@ -62,7 +61,6 @@ void NDataProvider::changeTimeout(int value)
 
 void NDataProvider::queryFinished(QNetworkReply *r)
 {
-
     if (r->error() != QNetworkReply::NoError) {
         emit error(r->errorString() + "\r\n" + r->readAll());
         r->deleteLater();
@@ -70,10 +68,29 @@ void NDataProvider::queryFinished(QNetworkReply *r)
     }
     QByteArray ba = r->readAll();
     r->deleteLater();
+    if (mDebug) {
+    }
+    if (mDebug) {
+        LogWriter::write(LogWriterLevel::verbose, "Data size", (ba.size() < 1000 ? QString("%1 bytes").arg(ba.size())
+                         : (ba.size() < 1000000 ? QString("%1 kb").arg(ba.size() / 1000) : QString("%1 mb").arg(
+                                ba.size() / 1000000))));
+        LogWriter::write(LogWriterLevel::verbose, "Elapsed", QString::number(mTimer->elapsed()));
+        LogWriter::write(LogWriterLevel::verbose, "", ba);
+    } else {
 #ifdef QT_DEBUG
-    qDebug() << "Data size: "
-             << (ba.size() < 1000 ? QString("%1 bytes").arg(ba.size())
-                                  : (ba.size() < 1000000 ? QString("%1 kb").arg(ba.size() / 1000) : QString("%1 mb").arg(ba.size() / 1000000)));
+        LogWriter::write(LogWriterLevel::verbose, "Data size", (ba.size() < 1000 ? QString("%1 bytes").arg(ba.size())
+                         : (ba.size() < 1000000 ? QString("%1 kb").arg(ba.size() / 1000) : QString("%1 mb").arg(
+                                ba.size() / 1000000))));
+        LogWriter::write(LogWriterLevel::verbose, "Elapsed", QString::number(mTimer->elapsed()));
+        LogWriter::write(LogWriterLevel::verbose, "", ba);
 #endif
-    emit done(mTimer->elapsed(), ba);
+    }
+    QJsonParseError err;
+    QJsonObject jdoc = QJsonDocument::fromJson(ba, &err).object();
+    if (err.error == QJsonParseError::NoError) {
+        emit done(jdoc);
+    } else {
+        LogWriter::write(LogWriterLevel::errors, "err", ba);
+        emit error(err.errorString());
+    }
 }

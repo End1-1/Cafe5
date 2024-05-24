@@ -9,7 +9,7 @@ DlgSetWaiterOrderCL::DlgSetWaiterOrderCL(const QStringList &dbParams) :
 {
     ui->setupUi(this);
     DoubleDatabase fDD;
-    fDD.open(true, false);
+    fDD.open();
     fDD.exec("select f_id, f_name from f_city_ledger ");
     while (fDD.nextRow()) {
         int r = ui->tbl->addEmptyRow();
@@ -47,7 +47,7 @@ void DlgSetWaiterOrderCL::on_btnNew_clicked()
 
 void DlgSetWaiterOrderCL::on_leSearch_textChanged(const QString &arg1)
 {
-    for (int r = 0; r < ui->tbl->rowCount(); r++){
+    for (int r = 0; r < ui->tbl->rowCount(); r++) {
         bool h = true;
         for (int c = 0; c < ui->tbl->columnCount(); c++) {
             if (ui->tbl->getString(r, c).contains(arg1, Qt::CaseInsensitive)) {

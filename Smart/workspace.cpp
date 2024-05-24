@@ -11,19 +11,21 @@
 #include "c5printing.h"
 #include "touchdlgphonenumber.h"
 #include "touchentertaxreceiptnumber.h"
+#include "logwriter.h"
 #include "touchselecttaxreport.h"
 #include "printtaxn.h"
 #include "c5airlog.h"
+#include "nloadingdlg.h"
 #include "dlgqty.h"
 #include "oheader.h"
 #include "idram.h"
-#include "datadriver.h"
 #include "change.h"
 #include "menudialog.h"
 #include "QRCodeGenerator.h"
 #include "dlglistofdishcomments.h"
 #include "customerinfo.h"
 #include "dlgmemoryread.h"
+#include "ndataprovider.h"
 #include "wcustomerdisplay.h"
 #include "thread.h"
 #include <QScreen>
@@ -44,18 +46,23 @@ QHash<QString, QString> fPrinterAliases;
 Workspace *Workspace::fWorkspace;
 static int ordcount = 1;
 
-class TableItemDelegate : public QItemDelegate {
+class TableItemDelegate : public QItemDelegate
+{
 protected:
-    virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
+    virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+    {
         if (!index.isValid()) {
             QItemDelegate::paint(painter, option, index);
             return;
         }
         painter->save();
+        //green
         painter->setBrush(QColor::fromRgb(0, 255, 100));
+        //if no order, change background to white
         if (index.data(Qt::UserRole + 1).toString().isEmpty()) {
             painter->setBrush(Qt::white);
         }
+        //but if selected table , background must be yellow
         if (index.data(Qt::UserRole + 2).toBool()) {
             painter->setBrush(QColor::fromRgb(252, 186, 0));
         }
@@ -64,34 +71,34 @@ protected:
         QTextOption to(Qt::AlignCenter);
         painter->drawText(option.rect, index.data(Qt::DisplayRole).toString(), to);
         painter->restore();
-
     }
 };
 
 Workspace::Workspace(const QStringList &dbParams) :
     C5Dialog(dbParams),
-    ui(new Ui::Workspace)
+    ui(new Ui::Workspace),
+    fLoadingDlg(nullptr)
 {
     ui->setupUi(this);
     fTypeFilter = -1;
     QRect r = qApp->screens().at(0)->geometry();
     switch (r.width()) {
-    case 1280:
-        ui->tblDishes->setColumnCount(3);
-        break;
-    case 1024:
-        ui->tblDishes->setColumnCount(2);
-        break;
-    default:
-        ui->tblDishes->setColumnCount(r.width() / 300);
-        break;
+        case 1280:
+            ui->tblDishes->setColumnCount(3);
+            break;
+        case 1024:
+            ui->tblDishes->setColumnCount(2);
+            break;
+        default:
+            ui->tblDishes->setColumnCount(r.width() / 300);
+            break;
     }
     configFiscalButton();
     ui->tblTables->setItemDelegate(new TableItemDelegate());
     resetOrder();
     fTimer = new QTimer(this);
-    connect(fTimer, &QTimer::timeout, this, [=]() {
-       ui->leReadCode->setFocus();
+    connect(fTimer, &QTimer::timeout, this, [ = ]() {
+        ui->leReadCode->setFocus();
     });
     fTimer->start(1000);
     ui->tblOrder->setColumnWidth(0, 135);
@@ -102,13 +109,12 @@ Workspace::Workspace(const QStringList &dbParams) :
     ui->btnSetCardExternal->setVisible(__c5config.getValue(param_choose_external_pos).toInt() == 1);
     fWorkspace = this;
     fCustomerDisplay = nullptr;
-
     QSettings d(qApp->applicationDirPath() + "/discount.conf", QSettings::IniFormat);
     QStringList sections = d.childGroups();
-    for (const QString &s: sections) {
+    for (const QString &s : sections) {
         d.beginGroup(s);
         QStringList keys = d.allKeys();
-        for (const QString &k: keys) {
+        for (const QString &k : keys) {
             fAutoDiscounts[s][k] = d.value(k);
         }
         d.endGroup();
@@ -123,167 +129,13 @@ Workspace::~Workspace()
 
 bool Workspace::login()
 {
-    if (!DlgPassword::getUser(tr("ENTER"), fUser)) {
+    QString pin;
+    if (!DlgPassword::getPassword(tr("ENTER"), pin)) {
         accept();
         return false;
     }
-    C5Database db(fDBParams);
-    /* OPEN SESSION OR CONTINUE EXISTING */
-    db[":f_user"] = fUser->id();
-    db[":f_comp"] = hostinfo;
-    db.exec("select * from s_salary_inout where f_comp=:f_comp and f_dateout is null");
-    if (db.nextRow()) {
-        if (db.getInt("f_user") == fUser->id()) {
-            __c5config.setRegValue("session", db.getString("f_id"));
-            C5Message::info(fUser->fullName() + "<br>" + tr("Continue session"));
-        } else {
-            db[":f_id"] = db.getInt("f_user");
-            db.exec("select concat(' ', f_last, f_first) as f_fullname from s_user where f_id=:f_id");
-            db.nextRow();
-            C5Message::error(tr("An open session exists on this station and must be closed first before used by another user") + "<br>" + db.getString(0));
-            return false;
-        }
-    } else {
-        QString uuid = db.uuid();
-        db[":f_id"] = uuid;
-        db[":f_user"] = fUser->id();
-        db[":f_datein"] = QDate::currentDate();
-        db[":f_timein"] = QTime::currentTime();
-        db[":f_comp"] = hostinfo;
-        db.insert("s_salary_inout", false);
-        __c5config.setRegValue("session", uuid);
-        C5Message::info(tr("Welcome") + "<br>"  + fUser->fullName());
-    }
-
-    db.exec("select * from d_print_aliases");
-    while (db.nextRow()) {
-        fPrinterAliases[db.getString("f_alias")] = db.getString("f_printer");
-    }
-    db[":f_menu"] = C5Config::defaultMenu();
-    db.exec("select f_id, f_name, f_color \
-            from d_part2 \
-            where f_id in (select f_part from d_dish where f_id in (Select f_dish from d_menu where f_menu=:f_menu and f_state=1)) \
-            order by f_queue");
-    int row = 0, col = 0;
-    ui->tblPart2->setRowCount(1);
-    QTableWidgetItem *itemAll = new QTableWidgetItem(tr("POPULAR"));
-    itemAll->setData(Qt::UserRole, -1);
-    itemAll->setData(Qt::BackgroundColorRole, -1);
-    ui->tblPart2->setItem(row, col, itemAll);
-    col++;
-    if (col == ui->tblPart2->columnCount()) {
-        row++;
-        col = 0;
-    }
-    while (db.nextRow()) {
-        if (row > ui->tblPart2->rowCount() - 1) {
-            ui->tblPart2->setRowCount(row + 1);
-        }
-        QTableWidgetItem *item = new QTableWidgetItem(db.getString(1));
-        item->setData(Qt::UserRole, db.getInt(0));
-        item->setData(Qt::BackgroundColorRole, db.getInt("f_color"));
-        ui->tblPart2->setItem(row, col, item);
-        col++;
-        if (col == ui->tblPart2->columnCount()) {
-            row++;
-            col = 0;
-        }        
-    }
-    db[":f_menu"] = C5Config::defaultMenu();
-    db.exec("SELECT d.f_id, d.f_part, d.f_name,  m.f_print1, m.f_store, m.f_price, p2.f_adgcode, d.f_color, \
-            d.f_netweight, d.f_cost, m.f_recent, d.f_barcode, p2.f_name as f_groupname, d.f_adgt, d.f_specialdiscount, \
-            m.f_print2, p2.f_qr \
-            FROM d_menu m \
-            left join d_dish d on d.f_id=m.f_dish \
-            left join d_part2 p2 on p2.f_id=d.f_part \
-            where m.f_menu=:f_menu and m.f_state=1 \
-            order by d.f_queue, d.f_name ");
-    while (db.nextRow()) {
-        Dish *d = new Dish();
-        d->id = db.getInt(0);
-        d->state = DISH_STATE_OK;
-        d->typeId = db.getInt(1);
-        d->name = db.getString(2);
-        d->printer = db.getString(3);
-        d->printer2 = db.getString("f_print2");
-        d->price = db.getDouble(5);
-        d->store = db.getInt(4);
-        d->adgCode = db.getString("f_adgt").isEmpty() ? db.getString(6) : db.getString("f_adgt");
-        d->color = db.getInt("f_color");
-        d->netWeight = db.getDouble("f_netweight");
-        d->cost = db.getDouble("f_cost");
-        d->quick = db.getInt("f_recent");
-        d->barcode = db.getString("f_barcode");
-        d->typeName = db.getString("f_groupname");
-        d->specialDiscount = db.getDouble("f_specialdiscount") / 100;
-        d->qrRequired = db.getInt("f_qr");
-        fDishes.append(d);
-        if (d->barcode.isEmpty() == false) {
-            QStringList barcodes = d->barcode.split(",", Qt::SkipEmptyParts);
-            for (const QString &b: barcodes) {
-                fDishesBarcode[b] = d;
-            }
-        }
-    }
-    db[":f_menu"] = __c5config.defaultMenu();
-    db.exec("select p.f_package, p.f_dish, d.f_name, p.f_price, dg.f_adgcode, "
-            "p.f_store, p.f_printer, p.f_qty "
-            "from d_package_list p "
-            "inner join d_dish d on d.f_id=p.f_dish "
-            "inner join d_package dp on dp.f_id=p.f_package "
-            "inner join d_part2 dg on dg.f_id=d.f_part "
-            "where dp.f_menu=:f_menu and dp.f_enabled=1 ");
-    while (db.nextRow()) {
-        DishPackageDriver::fPackageDriver.addMember(db.getInt(0), db.getInt(1), db.getString(2),
-                                                    db.getDouble(3), db.getDouble(7),
-                                                    db.getString(4), db.getInt(5), db.getString(6));
-    }
-    db[":f_menu"] = __c5config.defaultMenu();
-    db.exec("select f_id, f_name, f_price from d_package where f_menu=:f_menu and f_enabled=1");
-    while (db.nextRow()) {
-        QListWidgetItem *item = new QListWidgetItem(ui->lstCombo);
-        item->setText(db.getString(1));
-        item->setData(Qt::UserRole, db.getInt(0));
-        item->setData(Qt::UserRole + 1, db.getDouble(2));
-        item->setSizeHint(QSize(ui->lstCombo->width() - 5, DishPackageDriver::fPackageDriver.itemHeight(db.getInt(0), ui->lstCombo->width(), item->text())));
-        ui->lstCombo->addItem(item);
-        ui->lstCombo->setItemDelegate(new DishMemberDelegate());
-    }
-    ui->btnShowPackages->setVisible(ui->lstCombo->count() > 0);
-    filter("");
-    stretchTableColumns(ui->tblDishes);
-    stretchTableColumns(ui->tblPart2);
-    on_btnShowDishes_clicked();
-    QSettings s(_ORGANIZATION_, _APPLICATION_+ QString("\\") + _MODULE_);
-    if (s.value("customerdisplay").toBool() && qApp->desktop()->screenCount() > 1) {
-        showCustomerDisplay();
-    }
-    db.exec(QString("select f_id, f_name from h_tables where f_hall in (%1)").arg(__c5config.getValue(param_default_hall)));
-    while (db.nextRow()) {
-        int c = ui->tblTables->columnCount();
-        ui->tblTables->setColumnCount(c + 1);
-        QTableWidgetItem *item = new QTableWidgetItem(db.getString("f_name"));
-        item->setData(Qt::UserRole, db.getInt("f_id"));
-        ui->tblTables->setItem(0, c, item);
-    }
-    if (ui->tblTables->columnCount() > 0) {
-        on_tblTables_itemClicked(ui->tblTables->item(0, 0));
-    } else {
-        C5Message::info(tr("Please, configure hall"));
-        return false;
-    }
-    db[":f_state"] = ORDER_STATE_OPEN;
-    db.exec("select f_id, f_table from o_header where f_state=:f_state");
-    while (db.nextRow()) {
-        for (int i = 0; i < ui->tblTables->columnCount(); i++) {
-            QTableWidgetItem *item = ui->tblTables->item(0, i);
-            if (item->data(Qt::UserRole).toInt() == db.getInt("f_table")) {
-                item->setData(Qt::UserRole + 1, db.getString("f_id"));
-                break;
-            }
-        }
-    }
-
+    createHttpRequest("/engine/login.php", QJsonObject{{"method", 2}, {"pin", pin}}, SLOT(loginResponse(QJsonObject)),
+    "login");
     return true;
 }
 
@@ -304,6 +156,9 @@ void Workspace::setQty(double qty, int mode, int rownum, const QString &packageu
         return;
     }
     Dish d = ui->tblOrder->item(row, 0)->data(Qt::UserRole).value<Dish>();
+    if (d.state != DISH_STATE_OK) {
+        return;
+    }
     QString uuid = packageuuid;
     if (uuid.isEmpty()) {
         uuid = ui->tblOrder->item(row, 0)->data(Qt::UserRole + 1).toString();
@@ -313,31 +168,31 @@ void Workspace::setQty(double qty, int mode, int rownum, const QString &packageu
         return;
     }
     switch (mode) {
-    case 1:
-        d.qty = qty;
-        break;
-    case 2:
-        d.qty += qty;
-        break;
-    case 3:
-        if (d.qty2 < 0.1) {
-            if (d.qty - qty < 0.1) {
-                removeDish(row, uuid);
+        case 1:
+            d.qty = qty;
+            break;
+        case 2:
+            d.qty += qty;
+            break;
+        case 3:
+            if (d.qty2 < 0.1) {
+                if (d.qty - qty < 0.1) {
+                    removeDish(row, uuid);
+                    return;
+                }
+                d.qty -= qty;
+            } else {
+                on_btnVoid_clicked();
                 return;
             }
-            d.qty -= qty;
-        } else {
-            on_btnVoid_clicked();
-            return;
-        }
-        break;
+            break;
     }
     if (!fOrderUuid.isEmpty()) {
         fFlagEdited = 1;
         C5Database db(fDBParams);
         C5StoreDraftWriter dw(db);
         if (!dw.writeOBody(d.obodyId, fOrderUuid, DISH_STATE_OK, d.id, d.qty, d.qty, d.price,
-                           (d.qty*d.price) - (d.qty*d.price*discountValue()), __c5config.serviceFactor().toDouble(),
+                           (d.qty *d.price) - (d.qty *d.price *discountValue()), __c5config.serviceFactor().toDouble(),
                            fDiscountValue, d.store, d.printer, "", d.modificator, 0, d.adgCode, 0, 0, 0, row, QDateTime::currentDateTime(),
                            d.f_emarks)) {
             C5Message::error(dw.fErrorMsg);
@@ -345,7 +200,7 @@ void Workspace::setQty(double qty, int mode, int rownum, const QString &packageu
             return;
         }
     }
-    ui->tblOrder->item(row, 0)->setData(Qt::UserRole, qVariantFromValue(d));
+    ui->tblOrder->item(row, 0)->setData(Qt::UserRole, QVariant::fromValue(d));
     updateInfo(row);
     if (!uuid.isEmpty() && packageuuid.isEmpty()) {
         for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
@@ -362,6 +217,7 @@ void Workspace::setQty(double qty, int mode, int rownum, const QString &packageu
 
 void Workspace::removeDish(int rownum, const QString &packageuuid)
 {
+    Q_UNUSED(packageuuid);
     int row = rownum;
     if (row < 0) {
         row = ui->tblOrder->currentRow();
@@ -369,47 +225,14 @@ void Workspace::removeDish(int rownum, const QString &packageuuid)
     if (row < 0) {
         return;
     }
-    C5Database db(fDBParams);
     Dish d = ui->tblOrder->item(row, 0)->data(Qt::UserRole).value<Dish>();
-    QString uuid = packageuuid;
-    if (uuid.isEmpty()) {
-        uuid = ui->tblOrder->item(row, 0)->data(Qt::UserRole + 1).toString();
-    }
     if (d.qty2 > 0.01) {
         if (C5Message::question(tr("Confirm to remove printed row")) != QDialog::Accepted) {
             return;
         }
-        db[":f_state"] = DISH_STATE_VOID;
-        db.update("o_body", "f_id", d.obodyId);
-        d.state = DISH_STATE_VOID;
-        ui->tblOrder->removeRow(row);
-        if (row < ui->tblOrder->rowCount()) {
-            ui->tblOrder->setCurrentCell(row, 0);
-        }
-        fFlagEdited = 1;
-        countTotal();
-        return;
     }
-    ui->tblOrder->removeRow(row);
-    if (row < ui->tblOrder->rowCount()) {
-        ui->tblOrder->setCurrentCell(row, 0);
-    }
-    if (!d.obodyId.isEmpty()) {
-        db[":f_id"] = d.obodyId;
-        db[":f_state"] = DISH_STATE_MISTAKE;
-        d.state = DISH_STATE_MISTAKE;
-        db.exec("update o_body set f_state=:f_state where f_id=:f_id");
-    }
-    C5Airlog::write(hostinfo, fUser->fullName(), 1, d.obodyId, fOrderUuid, "", tr("Remove dish"), d.name + " " + d.modificator, float_str(d.qty, 2));
-    if (!uuid.isEmpty()) {
-        for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
-            if (ui->tblOrder->item(i, 0)->data(Qt::UserRole + 1).toString() == uuid) {
-                removeDish(i, uuid);
-                break;
-            }
-        }
-    }
-    countTotal();
+    createHttpRequest("/engine/smart/removedish.php", QJsonObject{{"obodyid", d.obodyId}}, SLOT(removeDishResponse(
+                QJsonObject)));
 }
 
 void Workspace::filter(const QString &name)
@@ -429,7 +252,7 @@ void Workspace::filter(const QString &name)
                 continue;
             }
         }
-        if (fTypeFilter == -1 && name.isEmpty()){
+        if (fTypeFilter == -1 && name.isEmpty()) {
             if (d->quick == 0) {
                 continue;
             }
@@ -454,11 +277,11 @@ void Workspace::filter(const QString &name)
 
 void Workspace::countTotal()
 {
-    double total = 0, totalDiscount = 0;
+    double total = 0;
     if (fAutoDiscounts.count() > 0) {
         QMap<QString, QList<QString> > dishgroups;
         QMap<QString, double> dishamounts;
-        for (const QString &k: fAutoDiscounts.keys()) {
+        for (const QString &k : fAutoDiscounts.keys()) {
             dishgroups[k] = fAutoDiscounts[k]["items"].toStringList();
         }
         for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
@@ -468,7 +291,7 @@ void Workspace::countTotal()
             }
             for (QMap<QString, QList<QString> >::const_iterator it = dishgroups.constBegin(); it != dishgroups.constEnd(); it++) {
                 if (it.value().contains(QString::number(d.id))) {
-                    dishamounts[it.key()] = dishamounts[it.key()] + (d.qty * d.price);
+                    dishamounts[it.key()] = dishamounts[it.key()] + (d.qty *d.price);
                 }
             }
         }
@@ -484,7 +307,7 @@ void Workspace::countTotal()
                     Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
                     if (fAutoDiscounts[ia.key()]["items"].toStringList().contains(QString::number(d.id))) {
                         d.discount = fAutoDiscounts[ia.key()]["discount"].toDouble() / 100;
-                        ui->tblOrder->item(i, 0)->setData(Qt::UserRole, qVariantFromValue(d));
+                        ui->tblOrder->item(i, 0)->setData(Qt::UserRole, QVariant::fromValue(d));
                     }
                 }
             }
@@ -499,7 +322,7 @@ void Workspace::countTotal()
             for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
                 Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
                 d.discount = 0;
-                ui->tblOrder->item(i, 0)->setData(Qt::UserRole, qVariantFromValue(d));
+                ui->tblOrder->item(i, 0)->setData(Qt::UserRole, QVariant::fromValue(d));
             }
         }
     }
@@ -510,28 +333,28 @@ void Workspace::countTotal()
             continue;
         }
         switch (fDiscountMode) {
-        case CARD_TYPE_DISCOUNT:
-            total += (d.price - (d.price * fDiscountValue)) * d.qty;
-            fDiscountAmount += (d.price * fDiscountValue) * d.qty;
-            break;
-        case CARD_TYPE_SPECIAL_DISHES:
-            total += (d.price - (d.price * d.discount)) * d.qty;
-            fDiscountAmount += (d.price * d.discount) * d.qty;
-            break;
-        default:
-            total += d.price * d.qty;
-            break;
+            case CARD_TYPE_DISCOUNT:
+                total += (d.price - (d.price *fDiscountValue)) * d.qty;
+                fDiscountAmount += (d.price *fDiscountValue) * d.qty;
+                break;
+            case CARD_TYPE_SPECIAL_DISHES:
+                total += (d.price - (d.price *d.discount)) * d.qty;
+                fDiscountAmount += (d.price *d.discount) * d.qty;
+                break;
+            default:
+                total += d.price *d.qty;
+                break;
         }
     }
     if (fDiscountMode > 0) {
         ui->wDiscount->setVisible(true);
         switch (fDiscountMode) {
-        case CARD_TYPE_DISCOUNT:
-            ui->leDiscount->setText(QString("-%1% (%2)").arg(fDiscountValue * 100).arg(fDiscountAmount));
-            break;
-        case CARD_TYPE_SPECIAL_DISHES:
-            ui->leDiscount->setText(QString("%1").arg(fDiscountAmount));
-            break;
+            case CARD_TYPE_DISCOUNT:
+                ui->leDiscount->setText(QString("-%1% (%2)").arg(fDiscountValue * 100).arg(fDiscountAmount));
+                break;
+            case CARD_TYPE_SPECIAL_DISHES:
+                ui->leDiscount->setText(QString("%1").arg(fDiscountAmount));
+                break;
         }
     }
     ui->leTotal->setDouble(total);
@@ -546,7 +369,7 @@ void Workspace::countTotal()
         fCustomerDisplay->clear();
         for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
             Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
-            fCustomerDisplay->addRow(d.name, float_str(d.qty, 2), float_str(d.price, 2), float_str(d.price * d.qty, 2));
+            fCustomerDisplay->addRow(d.name, float_str(d.qty, 2), float_str(d.price, 2), float_str(d.price *d.qty, 2));
         }
         fCustomerDisplay->setTotal(ui->leTotal->text());
     }
@@ -589,15 +412,9 @@ void Workspace::resetOrder()
         ui->btnFiscal->setChecked(false);
     }
     setCustomerPhoneNumber("");
-    for (int i = 0; i < ui->tblTables->columnCount(); i++) {
-        QTableWidgetItem *item = ui->tblTables->item(0, i);
-        if (item->data(Qt::UserRole).toInt() == fTable) {
-            item->setData(Qt::UserRole + 1, "");
-            break;
-        }
-    }
     ui->tblTables->viewport()->update();
     ui->leReadCode->setFocus();
+    ui->btnFlagTakeAway->setChecked(false);
 }
 
 void Workspace::stretchTableColumns(QTableWidget *t)
@@ -614,26 +431,32 @@ void Workspace::stretchTableColumns(QTableWidget *t)
 
 void Workspace::scrollTable(QTableWidget *t, int direction, int rows)
 {
-    t->verticalScrollBar()->setValue((t->verticalScrollBar()->value() + (t->verticalHeader()->defaultSectionSize() * rows)) * direction);
+    t->verticalScrollBar()->setValue((t->verticalScrollBar()->value() + (t->verticalHeader()->defaultSectionSize() *rows))
+                                     *direction);
 }
 
 void Workspace::updateInfo(int row)
 {
     Dish d = ui->tblOrder->item(row, 0)->data(Qt::UserRole).value<Dish>();
+    QFont f(ui->tblOrder->font());
+    if (d.state != DISH_STATE_OK) {
+        f.setStrikeOut(true);
+    }
+    ui->tblOrder->item(row, 0)->setFont(f);
     ui->tblOrder->item(row, 0)->setText(d.name + (d.modificator.isEmpty() ? "" : "\r\n" + d.modificator));
     auto *item = new QTableWidgetItem(float_str(d.qty, 2));
     item->setTextAlignment(Qt::AlignRight);
-    QFont f(ui->tblOrder->font());
     f.setItalic(d.qty2 > 0.001);
     f.setBold(d.qty2 > 0.001);
     item->setFont(f);
-
     ui->tblOrder->setItem(row, 1, item);
-    item = new QTableWidgetItem(float_str(d.price - (d.price * d.discount), 2));
+    item = new QTableWidgetItem(float_str(d.price - (d.price *d.discount), 2));
     item->setTextAlignment(Qt::AlignRight);
+    item->setFont(f);
     ui->tblOrder->setItem(row, 2, item);
-    item = new QTableWidgetItem(float_str((d.price - (d.price * d.discount)) * d.qty, 2));
+    item = new QTableWidgetItem(float_str((d.price - (d.price *d.discount)) *d.qty, 2));
     item->setTextAlignment(Qt::AlignRight);
+    item->setFont(f);
     ui->tblOrder->setItem(row, 3, item);
     if (d.f_emarks.isEmpty()) {
         ui->tblOrder->removeCellWidget(row, 4);
@@ -646,6 +469,20 @@ void Workspace::updateInfo(int row)
     ui->tblOrder->resizeRowsToContents();
 }
 
+void Workspace::createHttpRequest(const QString &route, QJsonObject params, const char *responseOkSlot,
+                                  const QVariant &marks,
+                                  const char *responseErrorSlot)
+{
+    params["sessionkey"] = __c5config.getRegValue("sessionkey").toString();
+    params["comp"] = hostinfo;
+    params["config_id"] = __c5config.getRegValue("json_config_id").toInt();
+    auto np = new NDataProvider(__c5config.fDBPath, this);
+    np->setProperty("marks", marks);
+    connect(np, SIGNAL(error(QString)), this, responseErrorSlot);
+    connect(np, SIGNAL(done(QJsonObject)), this, responseOkSlot);
+    connect(np, &NDataProvider::started, this, &Workspace::httpQueryLoading);
+    np->getData(route, params);
+}
 
 void Workspace::on_tblPart2_itemClicked(QTableWidgetItem *item)
 {
@@ -659,7 +496,7 @@ void Workspace::on_tblPart2_itemClicked(QTableWidgetItem *item)
 void Workspace::on_btnCheckout_clicked()
 {
     if (ui->leTaxpayerId->text().isEmpty() == false) {
-        if (ui->leTaxpayerId->text().length()< 8) {
+        if (ui->leTaxpayerId->text().length() < 8) {
             C5Message::error(tr("Invalid taxpayer id"));
             return;
         }
@@ -667,7 +504,6 @@ void Workspace::on_btnCheckout_clicked()
     if (ui->tblOrder->rowCount() == 0) {
         return;
     }
-
     if (ui->btnSetCard->isChecked() || ui->btnSetCardExternal->isChecked()) {
         ui->btnFiscal->setChecked(true);
     }
@@ -676,29 +512,9 @@ void Workspace::on_btnCheckout_clicked()
             ui->btnFiscal->setChecked(ordcount % __c5config.getValue(param_tax_print_if_amount_less).toInt()  == 0);
         }
     }
-    C5Database db(fDBParams);
-    saveOrder(ORDER_STATE_CLOSE);
-    printService();
-    C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Order saved"), "", "");
-
-    if (ui->btnSetIdram->isChecked()) {
-//        double amount;
-//        QByteArray out;
-//        if (!Idram::check(__c5config.getValue(param_idram_server),
-//                          __c5config.getValue(param_idram_session_id),
-//                          fOrderUuid, amount, out)) {
-//            if (amount < 0) {
-//                C5Message::error(tr("Idram payment was not received"));
-//            } else {
-//                C5Message::error(out);
-//            }
-//            return;
-//        }
-    }
-
-    double cashAmount = 0, cardAmount = 0, idramAmount = 0, otherAmount = 0;
+    double  cardAmount = 0, idramAmount = 0, otherAmount = 0;
     if (ui->btnSetCash->isChecked()) {
-        cashAmount = ui->leTotal->getDouble();
+        //cashAmount = ui->leTotal->getDouble();
     } else if (ui->btnSetCard->isChecked() || ui->btnSetCardExternal->isChecked()) {
         cardAmount = ui->leTotal->getDouble();
     } else if (ui->btnSetIdram->isChecked()) {
@@ -718,87 +534,94 @@ void Workspace::on_btnCheckout_clicked()
             return;
         }
     }
-
-    db[":f_id"] = fOrderUuid;
-    db.exec("select * from o_header where f_id=:f_id");
-    if (!db.nextRow()) {
-        C5Message::error(db.fLastError);
-        return;
+    saveOrder(ORDER_STATE_CLOSE, true);
+    C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Order saved"), "", "");
+    if (ui->btnSetIdram->isChecked()) {
+        //        double amount;
+        //        QByteArray out;
+        //        if (!Idram::check(__c5config.getValue(param_idram_server),
+        //                          __c5config.getValue(param_idram_session_id),
+        //                          fOrderUuid, amount, out)) {
+        //            if (amount < 0) {
+        //                C5Message::error(tr("Idram payment was not received"));
+        //            } else {
+        //                C5Message::error(out);
+        //            }
+        //            return;
+        //        }
     }
-    QString headerNum = db.getString("f_prefix") + db.getString("f_hallid");
-    int cashid = ui->btnSetCash->isChecked() ? __c5config.cashId() : __c5config.nocashId();
-    QString cashprefix = ui->btnSetCash->isChecked() ? __c5config.cashPrefix() : __c5config.nocashPrefix();
-
-    C5StoreDraftWriter dw(db);
-    int counter;
-    QString cashdoc;
-    QString cashUUID;
-
-    if (fFlagEdited == 0) {
-        counter = dw.counterAType(DOC_TYPE_CASH);
-        if (counter == 0) {
-            C5Message::error(dw.fErrorMsg);
-            return;
-        }
-    } else {
-        db[":f_oheader"] = fOrderUuid;
-        db.exec("select * from a_header_cash where f_oheader=:f_oheader");
-        if (db.nextRow()) {
-            cashdoc = db.getString("f_id");
-            db[":f_header"] = cashdoc;
-            db.exec("select f_id from e_cash where f_header=:f_header");
-            if (db.nextRow()) {
-                cashUUID = db.getString("f_id");
-            } else {
-                C5Message::error(tr("Application error. Cannot retrieve record of cash document."));
-                return;
-            }
-        } else {
-
-        }
-    }
-
-    if (otherAmount < 0.01) {
-        if (!dw.writeAHeader(cashdoc, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH,
-                             fUser->id(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(),
-                             0, ui->leTotal->getDouble(), cashprefix + " " + headerNum, 1, __c5config.getValue(param_default_currency).toInt())) {
-            C5Message::error(dw.fErrorMsg);
-            return;
-        }
-        if (!dw.writeAHeaderCash(cashdoc, cashid, 0, 1, "", fOrderUuid, __c5config.getRegValue("session").toString())) {
-            C5Message::error(dw.fErrorMsg);
-            return;
-        }
-        if (!dw.writeECash(cashUUID, cashdoc, cashid, 1, cashprefix + " " + headerNum, ui->leTotal->getDouble(), cashUUID, 1)) {
-            C5Message::error(dw.fErrorMsg);
-            return;
-        }
-    }
-
-    fPreviouseUuid = fOrderUuid;
-    bool printsecond = __c5config.getValue(param_shop_print_v2) == "1";
-    if (idramAmount > 0.001) {
-        //printsecond = true;
-    }
-    if (__c5config.getValue(param_smart_dont_print_receipt).toInt() == 0) {
-        if (printReceipt(fOrderUuid, printsecond, false)) {
-
-        }
-    }
-
-    if (__c5config.getValue(param_waiter_automatially_storeout).toInt() == 1) {
-        auto *t = new Thread("C5WaiterOrderDoc");
-        C5WaiterOrderDoc *d = new C5WaiterOrderDoc(fOrderUuid, db, true);
-        connect(t, &QThread::started, d, &C5WaiterOrderDoc::run);
-        connect(d, &C5WaiterOrderDoc::finished, t, &QThread::quit);
-        connect(t, &QThread::finished, t, &QThread::deleteLater);
-        d->moveToThread(t);
-        t->start();
-    }
-    C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Close order"), "", "");
-
-    ordcount ++;
-    resetOrder();
+    // db[":f_id"] = fOrderUuid;
+    // db.exec("select * from o_header where f_id=:f_id");
+    // if (!db.nextRow()) {
+    //     C5Message::error(db.fLastError);
+    //     return;
+    // }
+    // QString headerNum = db.getString("f_prefix") + db.getString("f_hallid");
+    // int cashid = ui->btnSetCash->isChecked() ? __c5config.cashId() : __c5config.nocashId();
+    // QString cashprefix = ui->btnSetCash->isChecked() ? __c5config.cashPrefix() : __c5config.nocashPrefix();
+    // C5StoreDraftWriter dw(db);
+    // int counter;
+    // QString cashdoc;
+    // QString cashUUID;
+    // if (fFlagEdited == 0) {
+    //     counter = dw.counterAType(DOC_TYPE_CASH);
+    //     if (counter == 0) {
+    //         C5Message::error(dw.fErrorMsg);
+    //         return;
+    //     }
+    // } else {
+    //     db[":f_oheader"] = fOrderUuid;
+    //     db.exec("select * from a_header_cash where f_oheader=:f_oheader");
+    //     if (db.nextRow()) {
+    //         cashdoc = db.getString("f_id");
+    //         db[":f_header"] = cashdoc;
+    //         db.exec("select f_id from e_cash where f_header=:f_header");
+    //         if (db.nextRow()) {
+    //             cashUUID = db.getString("f_id");
+    //         } else {
+    //             C5Message::error(tr("Application error. Cannot retrieve record of cash document."));
+    //             return;
+    //         }
+    //     } else {
+    //     }
+    // }
+    // if (otherAmount < 0.01) {
+    //     if (!dw.writeAHeader(cashdoc, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH,
+    //                          fUser->id(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(),
+    //                          0, ui->leTotal->getDouble(), cashprefix + " " + headerNum, 1, __c5config.getValue(param_default_currency).toInt())) {
+    //         C5Message::error(dw.fErrorMsg);
+    //         return;
+    //     }
+    //     if (!dw.writeAHeaderCash(cashdoc, cashid, 0, 1, "", fOrderUuid, __c5config.getRegValue("session").toString())) {
+    //         C5Message::error(dw.fErrorMsg);
+    //         return;
+    //     }
+    //     if (!dw.writeECash(cashUUID, cashdoc, cashid, 1, cashprefix + " " + headerNum, ui->leTotal->getDouble(), cashUUID, 1)) {
+    //         C5Message::error(dw.fErrorMsg);
+    //         return;
+    //     }
+    // }
+    // fPreviouseUuid = fOrderUuid;
+    // bool printsecond = __c5config.getValue(param_shop_print_v2) == "1";
+    // if (idramAmount > 0.001) {
+    //     //printsecond = true;
+    // }
+    // if (__c5config.getValue(param_smart_dont_print_receipt).toInt() == 0) {
+    //     if (printReceipt(fOrderUuid, printsecond, false)) {
+    //     }
+    // }
+    // if (__c5config.getValue(param_waiter_automatially_storeout).toInt() == 1) {
+    //     auto *t = new Thread("C5WaiterOrderDoc");
+    //     C5WaiterOrderDoc *d = new C5WaiterOrderDoc(fOrderUuid, db, true);
+    //     connect(t, &QThread::started, d, &C5WaiterOrderDoc::run);
+    //     connect(d, &C5WaiterOrderDoc::finished, t, &QThread::quit);
+    //     connect(t, &QThread::finished, t, &QThread::deleteLater);
+    //     d->moveToThread(t);
+    //     t->start();
+    // }
+    // C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Close order"), "", "");
+    // ordcount ++;
+    // resetOrder();
 }
 
 void Workspace::on_btnClearFilter_clicked()
@@ -842,7 +665,6 @@ void Workspace::on_btnShowPackages_clicked()
     QPropertyAnimation *p2 = new QPropertyAnimation(ui->lstCombo, "maximumHeight", this);
     QPropertyAnimation *p3 = new QPropertyAnimation(ui->tblPart2, "minimumHeight", this);
     QPropertyAnimation *p4 = new QPropertyAnimation(ui->tblPart2, "maximumHeight", this);
-
     p1->setStartValue(0);
     p1->setEndValue(h - 100);
     p2->setStartValue(0);
@@ -851,7 +673,6 @@ void Workspace::on_btnShowPackages_clicked()
     p3->setEndValue(0);
     p4->setStartValue(h);
     p4->setEndValue(0);
-
     p1->setDuration(100);
     p2->setDuration(100);
     p3->setDuration(100);
@@ -862,7 +683,6 @@ void Workspace::on_btnShowPackages_clicked()
     ag->addAnimation(p3);
     ag->addAnimation(p4);
     ag->start();
-
     ui->btnShowPackages->setVisible(false);
     ui->btnShowDishes->setVisible(true);
 }
@@ -874,7 +694,6 @@ void Workspace::on_btnShowDishes_clicked()
     QPropertyAnimation *p2 = new QPropertyAnimation(ui->tblPart2, "maximumHeight", this);
     QPropertyAnimation *p3 = new QPropertyAnimation(ui->lstCombo, "minimumHeight", this);
     QPropertyAnimation *p4 = new QPropertyAnimation(ui->lstCombo, "maximumHeight", this);
-
     p1->setStartValue(0);
     p1->setEndValue(h - 100);
     p2->setStartValue(0);
@@ -883,7 +702,6 @@ void Workspace::on_btnShowDishes_clicked()
     p3->setEndValue(0);
     p4->setStartValue(h);
     p4->setEndValue(0);
-
     p1->setDuration(100);
     p2->setDuration(100);
     p3->setDuration(100);
@@ -894,7 +712,6 @@ void Workspace::on_btnShowDishes_clicked()
     ag->addAnimation(p3);
     ag->addAnimation(p4);
     ag->start();
-
     ui->btnShowPackages->setVisible(true);
     ui->btnShowDishes->setVisible(false);
 }
@@ -902,19 +719,18 @@ void Workspace::on_btnShowDishes_clicked()
 void Workspace::on_lstCombo_itemClicked(QListWidgetItem *item)
 {
     const QList<DishPackageMember> &p = DishPackageDriver::fPackageDriver.fPackage[item->data(Qt::UserRole).toInt()];
-//    int row = ui->tblOrder->rowCount();
-//    ui->tblOrder->setRowCount(row + 1);
-//    ui->tblOrder->setSpan(row, 0, 1, 2);
-//    ui->tblOrder->setRowHeight(row, 30);
-//    auto *packageItem = new QTableWidgetItem(item->text());
-//    packageItem->setData(Qt::UserRole + 99, item->data(Qt::UserRole));
-//    packageItem->setData(Qt::UserRole + 100, -1);
-//    packageItem->setData(Qt::UserRole + 101, 1);
-//    packageItem->setData(Qt::UserRole + 102, item->data(Qt::UserRole + 1));
-//    ui->tblOrder->setItem(row, 0, packageItem);
+    //    int row = ui->tblOrder->rowCount();
+    //    ui->tblOrder->setRowCount(row + 1);
+    //    ui->tblOrder->setSpan(row, 0, 1, 2);
+    //    ui->tblOrder->setRowHeight(row, 30);
+    //    auto *packageItem = new QTableWidgetItem(item->text());
+    //    packageItem->setData(Qt::UserRole + 99, item->data(Qt::UserRole));
+    //    packageItem->setData(Qt::UserRole + 100, -1);
+    //    packageItem->setData(Qt::UserRole + 101, 1);
+    //    packageItem->setData(Qt::UserRole + 102, item->data(Qt::UserRole + 1));
+    //    ui->tblOrder->setItem(row, 0, packageItem);
     QString uuid = C5Database::uuid();
-    for (const DishPackageMember &dm: p) {        
-
+    for (const DishPackageMember &dm : p) {
         Dish nd;
         nd.id = dm.fDish;
         nd.adgCode = dm.fAdgCode;
@@ -924,31 +740,29 @@ void Workspace::on_lstCombo_itemClicked(QListWidgetItem *item)
         nd.printer = dm.fPrinter;
         nd.package = dm.fPackage;
         nd.qty = dm.fQty;
-
         int row = ui->tblOrder->rowCount();
         ui->tblOrder->setRowCount(row + 1);
         ui->tblOrder->setItem(row, 0, new QTableWidgetItem());
         ui->tblOrder->setItem(row, 1, new QTableWidgetItem());
         ui->tblOrder->setItem(row, 2, new QTableWidgetItem());
         ui->tblOrder->setItem(row, 3, new QTableWidgetItem());
-        ui->tblOrder->item(row, 0)->setData(Qt::UserRole, qVariantFromValue(nd));
+        ui->tblOrder->item(row, 0)->setData(Qt::UserRole, QVariant::fromValue(nd));
         ui->tblOrder->item(row, 0)->setData(Qt::UserRole + 1, uuid);
         updateInfo(row);
-
-//        nd.packageName = item->data(Qt::DisplayRole).toString();
-//        row = ui->tblOrder->rowCount();
-//        ui->tblOrder->setRowCount(row + 1);
-//        ui->tblOrder->setItem(row, 0, new QTableWidgetItem(nd.name));
-//        ui->tblOrder->item(row, 0)->setData(Qt::UserRole, qVariantFromValue(nd));
-//        ui->tblOrder->item(row, 0)->setData(Qt::UserRole + 98, -1);
+        //        nd.packageName = item->data(Qt::DisplayRole).toString();
+        //        row = ui->tblOrder->rowCount();
+        //        ui->tblOrder->setRowCount(row + 1);
+        //        ui->tblOrder->setItem(row, 0, new QTableWidgetItem(nd.name));
+        //        ui->tblOrder->item(row, 0)->setData(Qt::UserRole, qVariantFromValue(nd));
+        //        ui->tblOrder->item(row, 0)->setData(Qt::UserRole + 98, -1);
     }
-//    row = ui->tblOrder->rowCount();
-//    ui->tblOrder->setRowCount(row + 1);
-//    ui->tblOrder->setSpan(row, 0, 1, 2);
-//    ui->tblOrder->setRowHeight(row, 10);
-//    packageItem = new QTableWidgetItem(item->text());
-//    packageItem->setData(Qt::UserRole + 100, -2);
-//    ui->tblOrder->setItem(row, 0, packageItem);
+    //    row = ui->tblOrder->rowCount();
+    //    ui->tblOrder->setRowCount(row + 1);
+    //    ui->tblOrder->setSpan(row, 0, 1, 2);
+    //    ui->tblOrder->setRowHeight(row, 10);
+    //    packageItem = new QTableWidgetItem(item->text());
+    //    packageItem->setData(Qt::UserRole + 100, -2);
+    //    ui->tblOrder->setItem(row, 0, packageItem);
     countTotal();
 }
 
@@ -959,10 +773,8 @@ void Workspace::on_leReadCode_returnPressed()
     QString oldcode = ui->leReadCode->text();
     ui->leReadCode->clear();
     if (oldcode == " " ) {
-
     }
     QString newcode;
-
     for (int i = 0; i < oldcode.length(); i++) {
         if (hya.contains(oldcode.at(i))) {
             newcode += num.at(hya.indexOf(oldcode.at(i)));
@@ -979,13 +791,11 @@ void Workspace::on_leReadCode_returnPressed()
             ui->leCard->setDouble(cardvalue);
         }
     }
-
     QString code = newcode.replace("?", "").replace(";", "");
     if (fDishesBarcode.contains(code)) {
         addDishToOrder(fDishesBarcode[code]);
         return;
     }
-
     C5Database db(fDBParams);
     db[":f_code"] = code;
     db.exec("select * from b_cards_discount where f_code=:f_code");
@@ -998,29 +808,28 @@ void Workspace::on_leReadCode_returnPressed()
         fDiscountMode = db.getInt("f_mode");
         fDiscountValue = db.getDouble("f_value");
         switch (fDiscountMode) {
-        case CARD_TYPE_DISCOUNT:
-            fDiscountValue /= 100;
-            break;
-        case CARD_TYPE_SPECIAL_DISHES:
-            for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
-                Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
-                d.discount = d.specialDiscount;
-                ui->tblOrder->item(i, 0)->setData(Qt::UserRole, qVariantFromValue(d));
-                updateInfo(i);
-            }
-            break;
+            case CARD_TYPE_DISCOUNT:
+                fDiscountValue /= 100;
+                break;
+            case CARD_TYPE_SPECIAL_DISHES:
+                for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
+                    Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
+                    d.discount = d.specialDiscount;
+                    ui->tblOrder->item(i, 0)->setData(Qt::UserRole, QVariant::fromValue(d));
+                    updateInfo(i);
+                }
+                break;
         }
-
         countTotal();
     }
 }
 
 void Workspace::on_btnCostumer_clicked()
 {
-//    QString phone;
-//    if (TouchDlgPhoneNumber::getPhoneNumber(phone)) {
-//        setCustomerPhoneNumber(phone);
-//    }
+    //    QString phone;
+    //    if (TouchDlgPhoneNumber::getPhoneNumber(phone)) {
+    //        setCustomerPhoneNumber(phone);
+    //    }
     if (ui->lbCostumerPhone->isVisible()) {
         if (C5Message::question(tr("Confirm to remove customer informaion")) == QDialog::Accepted) {
             fCustomer = 0;
@@ -1045,7 +854,7 @@ void Workspace::setCustomerPhoneNumber(const QString &number)
 
 void Workspace::on_tblDishes_cellClicked(int row, int column)
 {
-    MenuDish *md = static_cast<MenuDish*>(ui->tblDishes->cellWidget(row, column));
+    MenuDish *md = static_cast<MenuDish *>(ui->tblDishes->cellWidget(row, column));
     if (md == nullptr) {
         return;
     }
@@ -1053,7 +862,26 @@ void Workspace::on_tblDishes_cellClicked(int row, int column)
     if (!d) {
         return;
     }
-    addDishToOrder(d);
+    QJsonObject dish;
+    dish["header"] = fOrderUuid;
+    dish["menuid"] = d->menuid;
+    dish["table"] = fTable;
+    dish["row"] = ui->tblOrder->rowCount() + 1;
+    dish["mark"] = "addgoods";
+    QJsonObject bhistory;
+    bhistory["card"] = fDiscountCard;
+    bhistory["type"] = fDiscountMode;
+    bhistory["value"] = fDiscountValue;
+    bhistory["data"] = fDiscountAmount;
+    QJsonObject flags;
+    flags["f1"] = fCustomer == 0 ? 0 :  1;
+    flags["f2"] = fFlagEdited;
+    flags["f3"] = ui->btnFlagTakeAway->isChecked() ? 1 : 0;
+    flags["f4"] = 0;
+    flags["f5"] = 0;
+    dish["flags"] = flags;
+    dish["bhistory"] = bhistory;
+    createHttpRequest("/engine/smart/adddish.php", dish, SLOT(addGoodsResponse(QJsonObject)), dish);
 }
 
 void Workspace::on_btnP1_clicked()
@@ -1107,89 +935,82 @@ void Workspace::on_btnSetIdram_clicked()
     ui->btnSetCardExternal->setChecked(false);
     ui->btnFiscal->setChecked(true);
     ui->leCard->clear();
-
-
-//    if (ui->tblOrder->rowCount() == 0) {
-//        on_btnSetCash_clicked();
-//        C5Message::info(tr("Empty order"));
-//        return;
-//    }
-//    if (fOrderUuid.isEmpty() && C5Message::question(tr("Order will saved, continue?")) != QDialog::Accepted) {
-//        on_btnSetCash_clicked();
-//        return;
-//    }
-//    if (fOrderUuid.isEmpty()) {
-//        saveOrder();
-//    }
-//    ui->btnSetCash->setChecked(false);
-//    ui->btnSetCard->setChecked(false);
-//    ui->btnSetIdram->setChecked(true);
-//    ui->btnSetOther->setChecked(false);
-
-//    if (__c5config.getValue(param_idram_id).length() > 0 && !__c5config.localReceiptPrinter().isEmpty()) {
-//        QFont font(qApp->font());
-//        font.setPointSize(24);
-//        C5Printing p;
-//        p.setSceneParams(650, 2800, QPrinter::Portrait);
-//        p.setFont(font);
-//        p.setFontBold(true);
-//        p.ctext(fOrderUuid);
-//        p.br();
-//        p.setFontBold(false);
-//        p.line(3);
-//        p.br(3);
-//        p.br();
-//        p.br();
-//        p.ctext(tr("Amount to paid"));
-//        p.br();
-//        p.ctext(ui->leTotal->text());
-//        p.br();
-//        p.br();
-//        p.ctext(QString::fromUtf8("Վճարեք Idram-ով"));
-//        p.br();
-
-//        int levelIndex = 1;
-//        int versionIndex = 0;
-//        bool bExtent = true;
-//        int maskIndex = -1;
-//        QString encodeString = QString("%1;%2;%3;%4|%5;%6;%7")
-//                .arg(__c5config.getValue(param_idram_name))
-//                .arg(__c5config.getValue(param_idram_id)) //IDram ID
-//                .arg(str_float(ui->leTotal->text()))
-//                .arg(fOrderUuid)
-//                .arg(__c5config.getValue(param_idram_phone))
-//                .arg(__c5config.getValue(param_idram_tips).toInt() == 1 ? "1" : "0")
-//                .arg(__c5config.getValue(param_idram_tips).toInt() == 1 ? __c5config.getValue(param_idram_tips_wallet) : "");
-
-//        CQR_Encode qrEncode;
-//        bool successfulEncoding = qrEncode.EncodeData( levelIndex, versionIndex, bExtent, maskIndex, encodeString.toUtf8().data() );
-//        if (!successfulEncoding) {
-////            fLog.append("Cannot encode qr image");
-//        }
-//        int qrImageSize = qrEncode.m_nSymbleSize;
-//        int encodeImageSize = qrImageSize + ( QR_MARGIN * 2 );
-//        QImage encodeImage(encodeImageSize, encodeImageSize, QImage::Format_Mono);
-//        encodeImage.fill(1);
-
-//        for ( int i = 0; i < qrImageSize; i++ ) {
-//            for ( int j = 0; j < qrImageSize; j++ ) {
-//                if ( qrEncode.m_byModuleData[i][j] ) {
-//                    encodeImage.setPixel(i + QR_MARGIN, j + QR_MARGIN, 0);
-//                }
-//            }
-//        }
-
-//        QPixmap pix = QPixmap::fromImage(encodeImage);
-//        pix = pix.scaled(300, 300);
-//        p.image(pix, Qt::AlignHCenter);
-//        p.br();
-//        /* End QRCode */
-//        p.ltext(QString("%1 %2").arg(tr("Printed:")).arg(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR)), 0);
-//        p.br();
-//        p.ltext("_", 0);
-//        p.br();
-//        p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
-//    }
+    //    if (ui->tblOrder->rowCount() == 0) {
+    //        on_btnSetCash_clicked();
+    //        C5Message::info(tr("Empty order"));
+    //        return;
+    //    }
+    //    if (fOrderUuid.isEmpty() && C5Message::question(tr("Order will saved, continue?")) != QDialog::Accepted) {
+    //        on_btnSetCash_clicked();
+    //        return;
+    //    }
+    //    if (fOrderUuid.isEmpty()) {
+    //        saveOrder();
+    //    }
+    //    ui->btnSetCash->setChecked(false);
+    //    ui->btnSetCard->setChecked(false);
+    //    ui->btnSetIdram->setChecked(true);
+    //    ui->btnSetOther->setChecked(false);
+    //    if (__c5config.getValue(param_idram_id).length() > 0 && !__c5config.localReceiptPrinter().isEmpty()) {
+    //        QFont font(qApp->font());
+    //        font.setPointSize(24);
+    //        C5Printing p;
+    //        p.setSceneParams(650, 2800, QPrinter::Portrait);
+    //        p.setFont(font);
+    //        p.setFontBold(true);
+    //        p.ctext(fOrderUuid);
+    //        p.br();
+    //        p.setFontBold(false);
+    //        p.line(3);
+    //        p.br(3);
+    //        p.br();
+    //        p.br();
+    //        p.ctext(tr("Amount to paid"));
+    //        p.br();
+    //        p.ctext(ui->leTotal->text());
+    //        p.br();
+    //        p.br();
+    //        p.ctext(QString::fromUtf8("Վճարեք Idram-ով"));
+    //        p.br();
+    //        int levelIndex = 1;
+    //        int versionIndex = 0;
+    //        bool bExtent = true;
+    //        int maskIndex = -1;
+    //        QString encodeString = QString("%1;%2;%3;%4|%5;%6;%7")
+    //                .arg(__c5config.getValue(param_idram_name))
+    //                .arg(__c5config.getValue(param_idram_id)) //IDram ID
+    //                .arg(str_float(ui->leTotal->text()))
+    //                .arg(fOrderUuid)
+    //                .arg(__c5config.getValue(param_idram_phone))
+    //                .arg(__c5config.getValue(param_idram_tips).toInt() == 1 ? "1" : "0")
+    //                .arg(__c5config.getValue(param_idram_tips).toInt() == 1 ? __c5config.getValue(param_idram_tips_wallet) : "");
+    //        CQR_Encode qrEncode;
+    //        bool successfulEncoding = qrEncode.EncodeData( levelIndex, versionIndex, bExtent, maskIndex, encodeString.toUtf8().data() );
+    //        if (!successfulEncoding) {
+    ////            fLog.append("Cannot encode qr image");
+    //        }
+    //        int qrImageSize = qrEncode.m_nSymbleSize;
+    //        int encodeImageSize = qrImageSize + ( QR_MARGIN * 2 );
+    //        QImage encodeImage(encodeImageSize, encodeImageSize, QImage::Format_Mono);
+    //        encodeImage.fill(1);
+    //        for ( int i = 0; i < qrImageSize; i++ ) {
+    //            for ( int j = 0; j < qrImageSize; j++ ) {
+    //                if ( qrEncode.m_byModuleData[i][j] ) {
+    //                    encodeImage.setPixel(i + QR_MARGIN, j + QR_MARGIN, 0);
+    //                }
+    //            }
+    //        }
+    //        QPixmap pix = QPixmap::fromImage(encodeImage);
+    //        pix = pix.scaled(300, 300);
+    //        p.image(pix, Qt::AlignHCenter);
+    //        p.br();
+    //        /* End QRCode */
+    //        p.ltext(QString("%1 %2").arg(tr("Printed:")).arg(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR)), 0);
+    //        p.br();
+    //        p.ltext("_", 0);
+    //        p.br();
+    //        p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
+    //    }
 }
 
 void Workspace::on_btnSetOther_clicked()
@@ -1216,47 +1037,8 @@ void Workspace::on_leReceived_textChanged(const QString &arg1)
     ui->leChange->setDouble(str_float(arg1) - ui->leTotal->getDouble());
 }
 
-bool Workspace::saveOrder(int state)
+bool Workspace::saveOrder(int state, bool printService)
 {
-    QString prefix;
-    QString hallid;
-    C5Database db(fDBParams);
-    if (fOrderUuid.isEmpty()) {
-        db[":f_id"] = C5Config::defaultHall();
-        db.exec("select f_counterhall from h_halls where f_id=:f_id");
-        if (db.nextRow()) {
-            int hid = db.getInt(0);
-            db[":f_id"] = hid;
-            db.exec("select f_counter + 1, f_prefix as f_counter from h_halls where f_id=:f_id for update");
-            if (db.nextRow()) {
-                hallid = db.getString(0);
-                prefix = db.getString(1);
-                db[":f_counter"] = db.getInt(0);
-                db.update("h_halls", where_id(hid));
-            }
-        } else {
-            hallid = "[-]";
-        }
-    } else {
-        db[":f_id"] = fOrderUuid;
-        db.exec("select * from o_header where f_id=:f_id");
-        if (db.nextRow()) {
-            prefix = db.getString("f_prefix");
-            hallid = db.getString("f_hallid");
-        } else {
-            C5Message::error(tr("Unknown order id. Programm error. Contact to developer."));
-            return false;
-        }
-    }
-
-    QDate dateCash = QDate::currentDate();
-    QTime tc = QTime::fromString(__c5config.getValue(param_working_date_change_time), "00:00:00");
-    if (tc.isValid()) {
-        if (QTime::currentTime() < tc) {
-            dateCash = dateCash.addDays(-1);
-        }
-    }
-
     double cashAmount = 0, cardAmount = 0, idramAmount = 0, otherAmount = 0;
     if (ui->btnSetCash->isChecked()) {
         cashAmount = ui->leTotal->getDouble() - ui->leCard->getDouble();
@@ -1267,102 +1049,68 @@ bool Workspace::saveOrder(int state)
     } else {
         otherAmount = ui->leTotal->getDouble();
     }
-
-    db.startTransaction();
-    C5StoreDraftWriter dw(db);
-    OHeader oheader;
-    oheader.id = fOrderUuid;
-    oheader.hallId = hallid.toInt();
-    oheader.prefix = prefix;
-    oheader.state = state;
-    oheader.hall = __c5config.defaultHall();
-    oheader.table = fTable;
-    oheader.dateOpen = QDate::currentDate();
-    oheader.dateClose = QDate::currentDate();
-    oheader.dateCash = dateCash;
-    oheader.timeOpen = QTime::currentTime();
-    oheader.timeClose = QTime::currentTime();
-    oheader.staff = fUser->id();
-    oheader.cashier = fUser->id();
-    oheader.comment = fPhone;
-    oheader.amountTotal = ui->leTotal->getDouble();
-    oheader.amountCash = cashAmount;
-    oheader.amountCard = cardAmount;
-    oheader.amountOther = otherAmount;
-    oheader.amountIdram = idramAmount;
-    oheader.amountDiscount = fDiscountAmount;
-    oheader.discountFactor = fDiscountValue;
-    oheader.partner = fCustomer;
-    oheader.taxpayerTin = ui->leTaxpayerId->text();
-    QString err;
-    if (!oheader.write(db, err)) {
-        db.rollback();
-        C5Message::error(err);
-        return false;
-    }
-
-    BHistory bh;
-    bh.id = oheader._id();
-    bh.card = fDiscountCard;
-    bh.type = fDiscountMode;
-    bh.value = fDiscountValue;
-    bh.data = fDiscountAmount;
-    if (!bh.write(db, err)) {
-        db.rollback();
-        C5Message::error(err);
-        return false;
-    }
-
-    fOrderUuid = oheader.id.toString();
-//    if (!dw.writeOHeader(fOrderUuid,
-//                         hallid.toInt(), prefix, state,
-//                         __c5config.defaultHall(), fTable,
-//                         QDate::currentDate(), QDate::currentDate(), dateCash,
-//                         QTime::currentTime(), QTime::currentTime(),
-//                         fUser->id(), fPhone, 0,
-//                         ui->leTotal->getDouble(), cashAmount, cardAmount, 0, 0, otherAmount, idramAmount,
-//                         0, fDiscountAmount, 0, fDiscountValue,
-//                         0, 0, 1, 1, 1, fCustomer)) {
-//        C5Message::error(dw.fErrorMsg);
-//        db.rollback();
-//        return false;
-//    }
-
-    //f_1 delivery
-    //f_2 edited
-    dw.writeOHeaderFlags(fOrderUuid, fCustomer == 0 ? 0 : 1, fFlagEdited, 0, 0, 0);
-
+    QJsonObject header;
+    header["id"] = fOrderUuid;
+    header["state"] = state;
+    header["hall"] = __c5config.defaultHall();
+    header["table"] = fTable;
+    header["phone"] = fPhone;
+    header["amounttotal"] = ui->leTotal->getDouble();
+    header["amountcash"] = cashAmount;
+    header["amountcard"] = cardAmount;
+    header["amountother"] = otherAmount;
+    header["amountidram"] = idramAmount;
+    header["amountdiscount"] = fDiscountAmount;
+    header["discountfactor"] = fDiscountValue;
+    header["partner"] = fCustomer;
+    header["taxpayertin"] = ui->leTaxpayerId->text();
+    QJsonObject bhistory;
+    bhistory["card"] = fDiscountCard;
+    bhistory["type"] = fDiscountMode;
+    bhistory["value"] = fDiscountValue;
+    bhistory["data"] = fDiscountAmount;
+    QJsonObject flags;
+    flags["f1"] = fCustomer == 0 ? 0 :  1;
+    flags["f2"] = fFlagEdited;
+    flags["f3"] = ui->btnFlagTakeAway->isChecked() ? 1 : 0;
+    flags["f4"] = 0;
+    flags["f5"] = 0;
+    double disc = discountValue();
+    QJsonArray dishes;
     for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
         Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
-        if (state == ORDER_STATE_CLOSE) {
-            d.qty2 = d.qty;
-        }
-        int pid = 0;
-        double disc = discountValue();
-        if (!dw.writeOBody(d.obodyId, fOrderUuid, d.state, d.id, d.qty, d.qty2, d.price,
-                           (d.qty*d.price) - (d.qty*d.price*disc), __c5config.serviceFactor().toDouble(),
-                           d.discount, d.store, d.printer, "", d.modificator, 0, d.adgCode, 0, 0, pid, i,
-                           QDateTime::currentDateTime(), d.f_emarks)) {
-            C5Message::error(dw.fErrorMsg);
-            db.rollback();
-            return false;
-        }
-        ui->tblOrder->item(i, 0)->setData(Qt::UserRole, QVariant::fromValue(d));
+        QJsonObject jo;
+        jo["obodyid"] = d.obodyId;
+        jo["state"] = d.state;
+        jo["dishid"] = d.id;
+        jo["qty"] = d.qty;
+        jo["qty2"] = d.qty2;
+        jo["price"] = d.price;
+        jo["total"] = (d.qty *d.price) - (d.qty *d.price *disc);
+        jo["service"] = __c5config.serviceFactor().toDouble();
+        jo["discount"] = d.discount;
+        jo["store"] = d.store;
+        jo["print1"] = d.printer;
+        jo["print2"] = d.printer2;
+        jo["comment"] = d.modificator;
+        jo["remind"] = 0;
+        jo["adgcode"] = d.adgCode;
+        jo["removereason"] = 0;
+        jo["timeorder"] = 0;
+        jo["package"] = 0;
+        jo["row"] = i;
+        jo["emarks"] = d.f_emarks;
+        dishes.append(jo);
     }
-
-
-//    QString err;
-//    if (!dw.writeFromShopOutput(id, DOC_STATE_SAVED, err)) {
-//        C5Message::error(err);
-//        db.rollback();
-//        return;
-//    }
-    db.commit();
-
-
-
-//    ui->tblDishes->setEnabled(false);
-//    ui->wQty->setEnabled(false);
+    QJsonObject marks;
+    if (state == ORDER_STATE_CLOSE || printService) {
+        marks["printservice"] = true;
+        marks["printserviceid"] = fOrderUuid;
+        marks["printreceipt"] = true;
+        marks["header"] = fOrderUuid;
+    }
+    createHttpRequest("/engine/smart/save.php", QJsonObject{{"header", header}, {"bhistory", bhistory}, {"dishes", dishes}, {"flags", flags}},
+    SLOT(saveResponse(QJsonObject)), marks);
     return true;
 }
 
@@ -1373,9 +1121,11 @@ int Workspace::printTax(double cardAmount, double idramAmount)
     C5Database db(fDBParams);
     db[":f_header"] = fOrderUuid;
     db[":f_state"] = DISH_STATE_OK;
-    db.exec("select b.f_adgcode, b.f_dish, d.f_name, b.f_price, b.f_discount, b.f_qty1, b.f_emarks, f_part "
+    db.exec("select b.f_adgcode, b.f_dish, d.f_name, b.f_price, b.f_discount, b.f_qty1, b.f_emarks, d.f_part, "
+            "p2.f_taxdept "
             "from o_body b "
             "left join d_dish d on d.f_id=b.f_dish "
+            "left join d_part2 p2 on p2.f_id=d.f_part "
             "where b.f_header=:f_header and b.f_state=:f_state");
     QString useExtPos = C5Config::taxUseExtPos();
     if (idramAmount > 0.01) {
@@ -1400,38 +1150,35 @@ int Workspace::printTax(double cardAmount, double idramAmount)
             pt.fEmarks.append(db.getString("f_emarks"));
         }
         switch (fDiscountMode) {
-        case CARD_TYPE_DISCOUNT:
-            pt.addGoods(dbdishpart2->fiscalDept(db.getInt("f_part")) == 0
+            case CARD_TYPE_DISCOUNT:
+                pt.addGoods(db.getInt("f_taxdept") == 0
                             ? C5Config::taxDept().toInt()
-                            : dbdishpart2->fiscalDept(db.getInt("f_part")),
-                        db.getString("f_adgcode"), db.getString("f_dish"),
-                        db.getString("f_name"), db.getDouble("f_price"),
-                        db.getDouble("f_qty1"), fDiscountValue * 100);
-            break;
-        case CARD_TYPE_SPECIAL_DISHES:
-            pt.addGoods(dbdishpart2->fiscalDept(db.getInt("f_part")) == 0
+                            : db.getInt("f_taxdept"),
+                            db.getString("f_adgcode"), db.getString("f_dish"),
+                            db.getString("f_name"), db.getDouble("f_price"),
+                            db.getDouble("f_qty1"), fDiscountValue * 100);
+                break;
+            case CARD_TYPE_SPECIAL_DISHES:
+                pt.addGoods(db.getInt("f_taxdept") == 0
                             ? C5Config::taxDept().toInt()
-                            : dbdishpart2->fiscalDept(db.getInt("f_part")),
-                        db.getString("f_adgcode"), db.getString("f_dish"),
-                        db.getString("f_name"), db.getDouble("f_price"),
-                        db.getDouble("f_qty1"), db.getDouble("f_discount") * 100);
-            break;
-        default:
-            pt.addGoods(dbdishpart2->fiscalDept(db.getInt("f_part")) == 0
+                            : db.getInt("f_taxdept"),
+                            db.getString("f_adgcode"), db.getString("f_dish"),
+                            db.getString("f_name"), db.getDouble("f_price"),
+                            db.getDouble("f_qty1"), db.getDouble("f_discount") * 100);
+                break;
+            default:
+                pt.addGoods(db.getInt("f_taxdept") == 0
                             ? C5Config::taxDept().toInt()
-                            : dbdishpart2->fiscalDept(db.getInt("f_part")),
-                        db.getString("f_adgcode"), db.getString("f_dish"),
-                        db.getString("f_name"), db.getDouble("f_price"),
-                        db.getDouble("f_qty1"), db.getDouble("f_discount") * 100);
-            break;
+                            : db.getInt("f_taxdept"),
+                            db.getString("f_adgcode"), db.getString("f_dish"),
+                            db.getString("f_name"), db.getDouble("f_price"),
+                            db.getDouble("f_qty1"), db.getDouble("f_discount") * 100);
+                break;
         }
-
-
     }
     QString jsonIn, jsonOut, err;
     int result = 0;
     result = pt.makeJsonAndPrint(cardAmount, 0, jsonIn, jsonOut, err);
-
     QJsonObject jtax;
     QJsonParseError jsonErr;
     jtax["f_order"] = fOrderUuid;
@@ -1450,18 +1197,17 @@ int Workspace::printTax(double cardAmount, double idramAmount)
     db.exec(QString("call sf_create_shop_tax('%1')").arg(sql));
     if (result != pt_err_ok) {
         switch (C5Message::question(err, tr("Try again"), tr("Do not print fiscal"), tr("Return to editing"))) {
-        case QDialog::Rejected:
-            C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Fiscal fail, continue without fiscal"), "", "");
-            return 1;
-        case QDialog::Accepted:
-            C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Fiscal fail, try again"), "", "");
-            return 0;
-        case 2:
-            C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Return to edit"), "", "");
-            return 2;
+            case QDialog::Rejected:
+                C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Fiscal fail, continue without fiscal"), "", "");
+                return 1;
+            case QDialog::Accepted:
+                C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Fiscal fail, try again"), "", "");
+                return 0;
+            case 2:
+                C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Return to edit"), "", "");
+                return 2;
         }
     }
-
     return -1;
 }
 
@@ -1477,7 +1223,6 @@ bool Workspace::printReceipt(const QString &id, bool printSecond, bool precheck)
     p.setSceneParams(650, 2800, QPrinter::Portrait);
     p.setFont(font);
     QMap<int, QMap<QString, QVariant> > packages;
-
     QJsonObject jtax, jin;
     db[":f_order"] = id;
     db.exec("select f_in, f_out from o_tax_log where f_order=:f_order and f_state=1");
@@ -1485,7 +1230,6 @@ bool Workspace::printReceipt(const QString &id, bool printSecond, bool precheck)
         jtax = QJsonDocument::fromJson(db.getString("f_out").toUtf8()).object();
         jin = QJsonDocument::fromJson(db.getString("f_in").toUtf8()).object();
     }
-
     if (QFile::exists("./logo_receipt.png")) {
         p.image("./logo_receipt.png", Qt::AlignHCenter);
         p.br();
@@ -1502,11 +1246,9 @@ bool Workspace::printReceipt(const QString &id, bool printSecond, bool precheck)
         }
         packages[db.getInt("f_id")] = p;
     }
-
     BHistory bh;
     bh.id = id;
     bh.getRecord(db);
-
     db[":f_id"] = id;
     db.exec("select o.f_prefix, o.f_hallid, t.f_firmname, t.f_address, t.f_dept, t.f_hvhh, t.f_devnum, "
             "t.f_serial, t.f_fiscal, t.f_receiptnumber, t.f_time as f_taxtime, "
@@ -1570,7 +1312,6 @@ bool Workspace::printReceipt(const QString &id, bool printSecond, bool precheck)
     p.br();
     p.line(3);
     p.br(3);
-
     QMap<double, QString> discs;
     C5Database dd(fDBParams);
     dd[":f_header"] = id;
@@ -1602,12 +1343,13 @@ bool Workspace::printReceipt(const QString &id, bool printSecond, bool precheck)
                 p.ltext(QString("%1 x %2 = %3")
                         .arg(float_str(packages[package]["f_qty"].toDouble(), 2))
                         .arg(packages[package]["f_price"].toDouble(), 2)
-                        .arg(packages[package]["f_qty"].toDouble() * packages[package]["f_price"].toDouble()), 0);
+                        .arg(packages[package]["f_qty"].toDouble() *packages[package]["f_price"].toDouble()), 0);
                 p.br();
                 //p.setFontBold(false);
                 p.setFontSize(basefont);
             }
-            p.ltext(QString("*** %1 %2, %3 x%4").arg(tr("Class:"), dd.getString("f_adgcode"), dd.getString("f_name"), float_str(dd.getDouble("f_qty1"), 2)), 0);
+            p.ltext(QString("*** %1 %2, %3 x%4").arg(tr("Class:"), dd.getString("f_adgcode"), dd.getString("f_name"),
+                    float_str(dd.getDouble("f_qty1"), 2)), 0);
             p.br();
         } else {
             if (package > 0) {
@@ -1644,7 +1386,8 @@ bool Workspace::printReceipt(const QString &id, bool printSecond, bool precheck)
                 }
             }
             p.br();
-            p.ltext(QString("%1 x %2 = %3").arg(float_str(dd.getDouble("f_qty1"), 2)).arg(dd.getDouble("f_price"), 2).arg(float_str(dd.getDouble("f_qty1") * dd.getDouble("f_price"), 2)), 0);
+            p.ltext(QString("%1 x %2 = %3").arg(float_str(dd.getDouble("f_qty1"), 2)).arg(dd.getDouble("f_price"),
+                    2).arg(float_str(dd.getDouble("f_qty1") *dd.getDouble("f_price"), 2)), 0);
             p.br();
             p.line();
             p.br(2);
@@ -1665,16 +1408,13 @@ bool Workspace::printReceipt(const QString &id, bool printSecond, bool precheck)
     p.rtext(float_str(db.getDouble("f_amounttotal"), 2));
     p.br();
     p.br();
-
     p.line();
     p.br();
-
     for (QMap<double, QString>::const_iterator it = discs.constBegin(); it != discs.constEnd(); it++) {
         p.ltext(QString("%1 %2 %3%").arg(it.value(), tr("Discount"), QString::number(it.key() * 100)), 0);
         p.br();
     }
     p.br();
-
     if (db.getDouble("f_amountcash") > 0.001) {
         p.ltext(tr("Payment, cash"), 0);
         p.rtext(float_str(db.getDouble("f_amountcash"), 2));
@@ -1691,7 +1431,6 @@ bool Workspace::printReceipt(const QString &id, bool printSecond, bool precheck)
         p.ltext(tr("Payment, other"), 0);
         p.rtext(float_str(db.getDouble("f_amountother"), 2));
     }
-
     if (db.getString("f_phone").length() > 0) {
         p.br();
         p.br();
@@ -1708,7 +1447,6 @@ bool Workspace::printReceipt(const QString &id, bool printSecond, bool precheck)
             p.br();
         }
     }
-
     p.setFontSize(basefont - 2);
     p.setFontBold(true);
     p.br();
@@ -1721,214 +1459,82 @@ bool Workspace::printReceipt(const QString &id, bool printSecond, bool precheck)
     p.br();
     p.ltext(".", 0);
     p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
-
     db[":f_print"] = db.getInt("f_print") + 1;
     db.update("o_header", "f_id", id);
-
     if (printSecond) {
         printReceipt(id, false, precheck);
     }
     return true;
 }
 
-void Workspace::printService()
+void Workspace::printService(const QString &printerName, const QJsonObject &h, const QJsonArray &d,
+                             const QJsonObject &jf, int side)
 {
-    bool q1 = false, q2 = false;
-    bool notprint = true;
-    for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
-        Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
-        if (d.qty2 > 0.001) {
-            q1 = true;
-        }
-        if (d.qty2 < 0.01) {
-            q2 = true;
-        }
-        if ((d.printer.length() > 0 || d.printer2.length() > 0) && d.qty2 < 0.01) {
-            notprint = false;
-        }
+    QFont font(qApp->font());
+    font.setFamily(__c5config.getValue(param_service_print_font_family));
+    int basesize = __c5config.getValue(param_service_print_font_size).toInt();
+    font.setPointSize(basesize);
+    C5Printing p;
+    p.setSceneParams(650, 2800, QPrinter::Portrait);
+    p.setFont(font);
+    p.setFontBold(true);
+    p.ctext(tr("Receipt #") + QString("%1%2").arg(h["f_prefix"].toString(), QString::number(h["f_hallid"].toInt())));
+    p.br();
+    p.ctext(printerName);
+    p.br();
+    if (h["f_partner"].toInt() > 0) {
+        p.ctext(QString("*%1*").arg(tr("Delivery")));
+        p.br();
     }
-    if (notprint) {
-        return;
+    if (h["f_edited"].toInt() > 0) {
+        p.ctext(QString("*%1*").arg(tr("Edited")));
+        p.br();
     }
-    fFlagEdited = q1 && q2 ? 1 : 0;
-
-
-    QSet<QString> prn;
-    for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
-        Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
-        //if (d.printer.length() > 0 && d.qty2 < 0.01) {
-        if (d.printer.length() > 0) {
-            prn.insert(d.printer);
-        }
-    }
-
-    C5Database db(fDBParams);
-    db[":f_id"] = fOrderUuid;
-    db.exec("select o.f_prefix, o.f_hallid, t.f_firmname, t.f_address, t.f_dept, t.f_hvhh, t.f_devnum, "
-            "t.f_serial, t.f_fiscal, t.f_receiptnumber, t.f_time as f_taxtime, concat(left(u.f_first, 1), '. ', u.f_last) as f_staff, "
-            "o.f_amountcash, o.f_amountcard, o.f_amountidram, o.f_amountother, o.f_amounttotal, o.f_print, o.f_comment, ht.f_name as f_tablename, "
-            "p.f_contact, p.f_phone, p.f_address, o.f_taxpayertin "
-            "from o_header o "
-            "left join o_tax t on t.f_id=o.f_id "
-            "left join s_user u on u.f_id=o.f_staff "
-            "left join h_tables ht on ht.f_id=o.f_table "
-            "left join c_partners p on p.f_id=o.f_partner "
-            "where o.f_id=:f_id");
-    db.nextRow();
-
-    for (const QString &s: prn) {
-        QFont font(qApp->font());
-        font.setFamily(__c5config.getValue(param_service_print_font_family));
-        int basesize = __c5config.getValue(param_service_print_font_size).toInt();
-        font.setPointSize(basesize);
-        C5Printing p;
-        p.setSceneParams(650, 2800, QPrinter::Portrait);
-        p.setFont(font);
+    if (jf["f_3"].toInt() > 0) {
+        p.setFontSize(basesize + 4);
         p.setFontBold(true);
-        p.ctext(tr("Receipt #") + QString("%1%2").arg(db.getString("f_prefix"), db.getString("f_hallid")));
+        p.ctext(tr("TAKE AWAY"));
         p.br();
-        p.ctext(s);
-        p.br();
-        if (fCustomer > 0) {
-            p.ctext(QString("*%1*").arg(tr("Delivery")));
-            p.br();
-        }
-        if (fFlagEdited > 0) {
-            p.ctext(QString("*%1*").arg(tr("Edited")));
-            p.br();
-        }
-        //p.setFontBold(false);
-        p.line(3);
-        p.br(3);
-        p.br();
-        for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
-            Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
-            //if (d.printer == s && d.qty2 < 0.01) {
-            if (d.printer == s) {
-                p.setFontSize(basesize);
-                p.setFontBold(true);
-                p.ltext(d.name, 0);
-                p.setFontSize(basesize + 8);
-                p.setFontBold(true);
-                p.rtext(float_str(d.qty, 2));
-                p.br();
-                if (d.modificator.isEmpty() == false) {
-                    p.setFontSize(basesize - 4);
-                    p.ltext(d.modificator, 0);
-                    p.br();
-                }
-                p.line();
-                p.br();
-            }
-        }
-        p.setFontSize(basesize - 4);
-       // p.setFontBold(false);
-
-        p.ltext(QString("%1 %2").arg(tr("[1] Printed:"), QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR)), 0);
-        p.br();
-        p.br();
-        p.ltext("_", 0);
-        p.br();
-        QString finalPrinter = s;
-        if (fPrinterAliases.contains(s)) {
-            finalPrinter = fPrinterAliases[s];
-        }
-        p.print(finalPrinter, QPrinter::Custom);
     }
-
-    prn.clear();
-    for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
-        Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
-        //if (d.printer2.length() > 0 && d.qty2 < 0.01) {
-        if (d.printer2.length() > 0) {
-            prn.insert(d.printer2);
-        }
-    }
-
-    for (const QString &s: prn) {
-        QFont font(qApp->font());
-        font.setFamily(__c5config.getValue(param_service_print_font_family));
-        int basesize = __c5config.getValue(param_service_print_font_size).toInt();
-        font.setPointSize(basesize);
-        C5Printing p;
-        p.setSceneParams(650, 2800, QPrinter::Portrait);
-        p.setFont(font);
+    //p.setFontBold(false);
+    p.line(3);
+    p.br(3);
+    p.br();
+    for (int i = 0; i < d.size(); i++) {
+        const QJsonObject &j = d.at(i).toObject();
+        p.setFontSize(basesize);
         p.setFontBold(true);
-        p.ctext(tr("Receipt #") + QString("%1%2").arg(db.getString("f_prefix"), db.getString("f_hallid")));
+        p.ltext(j["f_name"].toString(), 0);
+        p.setFontSize(basesize + 8);
+        p.setFontBold(true);
+        p.rtext(float_str(j["f_qty1"].toString().toDouble(), 2));
         p.br();
-        p.ctext(s);
-        p.br();
-        if (fCustomer > 0) {
-            p.ctext(QString("*%1*").arg(tr("Delivery")));
+        if (j["f_comment"].toString().isEmpty() == false) {
+            p.setFontSize(basesize - 4);
+            p.ltext(j["f_comment"].toString(), 0);
             p.br();
         }
-        if (fFlagEdited > 0) {
-            p.ctext(QString("*%1*").arg(tr("Edited")));
-            p.br();
-        }
-        //p.setFontBold(false);
-        p.line(3);
-        p.br(3);
+        p.line();
         p.br();
-        for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
-            Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
-            if (d.printer2 == s) {
-                p.setFontSize(basesize);
-                p.setFontBold(true);
-                p.ltext(d.name, 0);
-                p.setFontSize(basesize + 8);
-                p.setFontBold(true);
-                p.rtext(float_str(d.qty, 2));
-                p.br();
-                if (d.modificator.isEmpty() == false) {
-                    p.setFontSize(basesize - 4);
-                    p.ltext(d.modificator, 0);
-                    p.br();
-                }
-                p.line();
-                p.br();
-            }
-        }
-        p.setFontSize(basesize - 4);
-       // p.setFontBold(false);
-
-        p.ltext(QString("%1 %2").arg(tr("[2] Printed:"), QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR)), 0);
-        p.br();
-        p.br();
-        p.ltext("_", 0);
-        p.br();
-        QString finalPrinter = s;
-        if (fPrinterAliases.contains(s)) {
-            finalPrinter = fPrinterAliases[s];
-        }
-        p.print(finalPrinter, QPrinter::Custom);
     }
-
-    C5StoreDraftWriter dw(db);
-    for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
-        Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
-        d.qty2 = d.qty;
-        ui->tblOrder->item(i, 0)->setData(Qt::UserRole, QVariant::fromValue(d));
-        int pid = 0;
-        double disc = discountValue();
-        if (!dw.writeOBody(d.obodyId, fOrderUuid, DISH_STATE_OK, d.id, d.qty, d.qty2, d.price,
-                           (d.qty*d.price) - (d.qty*d.price*d.discount), __c5config.serviceFactor().toDouble(),
-                           d.discount, d.store, d.printer, "", d.modificator, 0, d.adgCode, 0, 0, pid, i, QDateTime::currentDateTime(),
-                           d.f_emarks)) {
-            C5Message::error(dw.fErrorMsg);
-            db.rollback();
-            return;
-        }
-        ui->tblOrder->item(i, 0)->setData(Qt::UserRole, QVariant::fromValue(d));
+    p.setFontSize(basesize - 4);
+    // p.setFontBold(false);
+    p.ltext(QString("%1 %2 [%3]").arg(tr("[1] Printed:"), QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR),
+                                      QString::number(side)), 0);
+    p.br();
+    p.br();
+    p.ltext("_", 0);
+    p.br();
+    QString finalPrinter = printerName;
+    if (fPrinterAliases.contains(printerName)) {
+        finalPrinter = fPrinterAliases[printerName];
     }
-
-    fFlagEdited = 0;
-    C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Print service"), "", "");
+    p.print(finalPrinter, QPrinter::Custom);
 }
 
 void Workspace::showCustomerDisplay()
 {
-    QSettings s(_ORGANIZATION_, _APPLICATION_+ QString("\\") + _MODULE_);
+    QSettings s(_ORGANIZATION_, _APPLICATION_ + QString("\\") + _MODULE_);
     if (fCustomerDisplay) {
         s.setValue("customerdisplay", false);
         fCustomerDisplay->deleteLater();
@@ -1944,6 +1550,383 @@ void Workspace::showCustomerDisplay()
             fCustomerDisplay->showFullScreen();
         }
     }
+}
+
+void Workspace::httpQueryLoading()
+{
+    fLoadingDlg = new NLoadingDlg(this);
+    fLoadingDlg->open();
+}
+
+void Workspace::httpStop(QObject *sender)
+{
+    fLoadingDlg->hide();
+    fLoadingDlg->deleteLater();
+    fLoadingDlg = nullptr;
+    sender->deleteLater();
+}
+
+void Workspace::slotHttpError(const QString &err)
+{
+    QVariant marks = sender()->property("marks");
+    httpStop(sender());
+    if (marks == "login") {
+        C5Message::error(tr("Access denied"));
+        login();
+        return;
+    }
+    if (err.contains("Unauthorized", Qt::CaseInsensitive)) {
+        C5Message::error(tr("Access denied"));
+        qApp->quit();
+    }
+    LogWriter::write(LogWriterLevel::errors, "", err);
+    C5Message::error(err);
+    if (marks == "init") {
+        qApp->quit();
+    }
+}
+
+void Workspace::loginResponse(const QJsonObject &jdoc)
+{
+    if (jdoc["status"].toInt() == 0) {
+        C5Message::error(jdoc["data"].toString());
+        return;
+    }
+    QJsonObject jo = jdoc["data"].toObject();
+    __c5config.setRegValue("sessionkey", jo["sessionkey"].toString());
+    jo = jdoc["data"].toObject()["user"].toObject();
+    __c5config.setRegValue("username", QString("%1 %2").arg(jo["f_last"].toString(), jo["f_first"].toString()));
+    __c5config.setRegValue("json_config_id",
+                           jo["f_config"].toInt() > 0 ? jo["f_config"].toInt() : __c5config.fJsonConfigId);
+    fUser = new C5User(jo["f_id"].toInt());
+    httpStop(sender());
+    createHttpRequest("/engine/smart/init.php", QJsonObject(), SLOT(initResponse(QJsonObject)), "init");
+}
+
+void Workspace::initResponse(const QJsonObject &jdoc)
+{
+    if (jdoc["status"].toInt() == 0) {
+        C5Message::error(jdoc["data"].toString());
+        return;
+    }
+    QJsonObject jo = jdoc["data"].toObject();
+    QJsonArray jta = jo["printeraliases"].toArray();
+    for (int i = 0; i  < jta.size(); i++) {
+        QJsonObject j = jta.at(i).toObject();
+        fPrinterAliases[j["f_alias"].toString()] = j["f_printer"].toString();
+    }
+    jta = jo["part2"].toArray();
+    int row = 0, col = 0;
+    ui->tblPart2->setRowCount(1);
+    QTableWidgetItem *itemAll = new QTableWidgetItem(tr("POPULAR"));
+    itemAll->setData(Qt::UserRole, -1);
+    itemAll->setData(Qt::BackgroundColorRole, -1);
+    ui->tblPart2->setItem(row, col, itemAll);
+    col++;
+    if (col == ui->tblPart2->columnCount()) {
+        row++;
+        col = 0;
+    }
+    for (int i = 0; i < jta.size(); i++) {
+        QJsonObject j = jta.at(i).toObject();
+        if (row > ui->tblPart2->rowCount() - 1) {
+            ui->tblPart2->setRowCount(row + 1);
+        }
+        QTableWidgetItem *item = new QTableWidgetItem(j["f_name"].toString());
+        item->setData(Qt::UserRole, j["f_id"].toInt());
+        item->setData(Qt::BackgroundColorRole, j["f_color"].toInt());
+        ui->tblPart2->setItem(row, col, item);
+        col++;
+        if (col == ui->tblPart2->columnCount()) {
+            row++;
+            col = 0;
+        }
+    }
+    jta = jo["menu"].toArray();
+    for (int i = 0; i < jta.size(); i++) {
+        const QJsonObject &j = jta.at(i).toObject();
+        Dish *d = new Dish();
+        d->menuid = j["menuid"].toInt();
+        d->id = j["f_id"].toInt();
+        d->state = DISH_STATE_OK;
+        d->typeId = j["f_part"].toInt();
+        d->name = j["f_name"].toString();
+        d->printer = j["f_print1"].toString();
+        d->printer2 = j["f_print2"].toString();
+        d->price = j["f_price"].toString().toDouble();
+        d->store = j["f_store"].toInt();
+        d->adgCode = j["f_adgt"].toString().isEmpty() ? j["f_adgcode"].toString() : j["f_adgt"].toString();
+        d->color = j["f_color"].toInt();
+        d->netWeight = j["f_netweight"].toString().toDouble();
+        d->cost = j["f_cost"].toString().toDouble();
+        d->quick = j["f_recent"].toInt();
+        d->barcode = j["f_barcode"].toString();
+        d->typeName = j["f_groupname"].toString();
+        d->specialDiscount = j["f_specialdiscount"].toString().toDouble() / 100;
+        d->qrRequired = j["f_qr"].toString().toInt();
+        fDishes.append(d);
+        if (d->barcode.isEmpty() == false) {
+            QStringList barcodes = d->barcode.split(",", Qt::SkipEmptyParts);
+            for (const QString &b : barcodes) {
+                fDishesBarcode[b] = d;
+            }
+        }
+    }
+    jta = jo["package"].toArray();
+    for (int i = 0; i < jta.size(); i++) {
+        const QJsonObject &j = jta.at(i).toObject();
+        DishPackageDriver::fPackageDriver.addMember(j["f_package"].toString().toInt(), j["f_dish"].toString().toInt(),
+                                         j["f_name"].toString(),
+                                         j["f_price"].toString().toDouble(), j["f_qty"].toString().toDouble(),
+                                         j["f_adgcode"].toString(), j["f_store"].toString().toInt(), j["f_printer"].toString());
+    }
+    jta = jo["packagenames"].toArray();
+    for (int i = 0; i < jta.size(); i++) {
+        const QJsonObject &j = jta.at(i).toObject();
+        QListWidgetItem *item = new QListWidgetItem(ui->lstCombo);
+        item->setText(j["f_name"].toString());
+        item->setData(Qt::UserRole, j["f_id"].toString().toInt());
+        item->setData(Qt::UserRole + 1, j["f_price"].toString().toDouble());
+        item->setSizeHint(QSize(ui->lstCombo->width() - 5,
+                                DishPackageDriver::fPackageDriver.itemHeight(j["f_id"].toString().toInt(),
+                                        ui->lstCombo->width(), item->text())));
+        ui->lstCombo->addItem(item);
+        ui->lstCombo->setItemDelegate(new DishMemberDelegate());
+    }
+    ui->btnShowPackages->setVisible(ui->lstCombo->count() > 0);
+    filter("");
+    stretchTableColumns(ui->tblDishes);
+    stretchTableColumns(ui->tblPart2);
+    on_btnShowDishes_clicked();
+    QSettings s(_ORGANIZATION_, _APPLICATION_ + QString("\\") + _MODULE_);
+    if (s.value("customerdisplay").toBool() && qApp->desktop()->screenCount() > 1) {
+        showCustomerDisplay();
+    }
+    jta = jo["tables"].toArray();
+    for (int i = 0; i < jta.size(); i++) {
+        const QJsonObject &j = jta.at(i).toObject();
+        int c = ui->tblTables->columnCount();
+        ui->tblTables->setColumnCount(c + 1);
+        QTableWidgetItem *item = new QTableWidgetItem(j["f_name"].toString());
+        item->setData(Qt::UserRole, j["f_id"].toInt());
+        ui->tblTables->setItem(0, c, item);
+    }
+    jta = jo["opentables"].toArray();
+    for (int i = 0; i < jta.size(); i++) {
+        const QJsonObject &j = jta.at(i).toObject();
+        for (int i = 0; i < ui->tblTables->columnCount(); i++) {
+            QTableWidgetItem *item = ui->tblTables->item(0, i);
+            if (item->data(Qt::UserRole).toInt() == j["f_table"].toInt()) {
+                item->setData(Qt::UserRole + 1, j["f_id"].toString());
+                break;
+            }
+        }
+    }
+    httpStop(sender());
+    if (jo["welcome"].toString() == "ok") {
+        C5Message::info(tr("Welcome") + "<br>" + __c5config.getRegValue("username").toString());
+    } else {
+        C5Message::info(tr("Please close session of") + "<br>" + jo["welcome"].toString());
+        qApp->quit();
+        return;
+    }
+    if (ui->tblTables->columnCount() > 0) {
+        on_tblTables_itemClicked(ui->tblTables->item(0, 0));
+    } else {
+        C5Message::info(tr("Please, configure hall"));
+        qApp->exit();
+    }
+}
+
+void Workspace::saveResponse(const QJsonObject &jdoc)
+{
+    QJsonObject jo = jdoc["data"].toObject();
+    QJsonObject marks = sender()->property("marks").toJsonObject();
+    httpStop(sender());
+    if (marks["printservice"].toBool()) {
+        createHttpRequest("/engine/smart/printservice.php", QJsonObject{{"header", jo["header"].toString()}, {"mode", 1}}, SLOT(
+            printServiceResponse(QJsonObject)), marks);
+    }
+    if (jo["state"].toInt() == ORDER_STATE_CLOSE) {
+        for (int i = 0; i < ui->tblTables->columnCount(); i++) {
+            if (ui->tblTables->item(0, i)->data(Qt::UserRole + 1).toString() == jo["header"].toString()) {
+                ui->tblTables->item(0, i)->setData(Qt::UserRole + 1, "");
+            }
+        }
+        resetOrder();
+    }
+}
+
+void Workspace::addGoodsResponse(const QJsonObject &jdoc)
+{
+    QJsonObject jo = jdoc["data"].toObject();
+    if (fOrderUuid.isEmpty()) {
+        fOrderUuid = jo["header"].toString();
+        QTableWidgetItem *item = ui->tblTables->currentItem();
+        if (item) {
+            item->setData(Qt::UserRole + 1, fOrderUuid);
+        }
+    }
+    Dish d;
+    d.obodyId = jo["obodyid"].toString();
+    d.menuid = jo["menuid"].toInt();
+    d.id = jo["f_id"].toInt();
+    d.state = DISH_STATE_OK;
+    d.typeId = jo["f_part"].toInt();
+    d.name = jo["f_name"].toString();
+    d.printer = jo["f_print1"].toString();
+    d.printer2 = jo["f_print2"].toString();
+    d.price = jo["f_price"].toString().toDouble();
+    d.store = jo["f_store"].toInt();
+    d.adgCode = jo["f_adgt"].toString().isEmpty() ? jo["f_adgcode"].toString() : jo["f_adgt"].toString();
+    d.color = jo["f_color"].toInt();
+    d.netWeight = jo["f_netweight"].toDouble();
+    d.cost = jo["f_cost"].toDouble();
+    d.quick = jo["f_recent"].toInt();
+    d.barcode = jo["f_barcode"].toString();
+    d.typeName = jo["f_groupname"].toString();
+    d.specialDiscount = jo["f_specialdiscount"].toDouble() / 100;
+    d.qrRequired = jo["f_qr"].toString().toInt();
+    addDishToOrder( &d);
+    httpStop(sender());
+}
+
+void Workspace::printServiceResponse(const QJsonObject &jdoc)
+{
+    QJsonObject jo = jdoc["data"].toObject();
+    QJsonObject jheader = jo["header"].toObject();
+    QJsonObject jflags = jo["flags"].toObject();
+    QJsonArray jdishes1 = jo["dishes1"].toArray();
+    QJsonArray jdishes2 = jo["dishes2"].toArray();
+    if (!jdishes1.isEmpty()) {
+        QSet<QString> prn;
+        for (int i = 0; i < jdishes1.size(); i++) {
+            const QJsonObject &j = jdishes1.at(i).toObject();
+            prn.insert(j["f_print1"].toString());
+        }
+        for (const QString &p : prn) {
+            QJsonArray ja;
+            for (int i = 0; i < jdishes1.size(); i++) {
+                const QJsonObject &j = jdishes1.at(i).toObject();
+                if (j["f_print1"].toString() == p) {
+                    ja.append(j);
+                }
+            }
+            printService(p, jheader, ja, jflags, 1);
+        }
+    }
+    if (!jdishes2.isEmpty()) {
+        QSet<QString> prn;
+        for (int i = 0; i < jdishes1.size(); i++) {
+            const QJsonObject &j = jdishes1.at(i).toObject();
+            prn.insert(j["f_print2"].toString());
+        }
+        for (const QString &p : prn) {
+            QJsonArray ja;
+            for (int i = 0; i < jdishes1.size(); i++) {
+                const QJsonObject &j = jdishes1.at(i).toObject();
+                if (j["f_print2"].toString() == p) {
+                    ja.append(j);
+                }
+            }
+            printService(p, jheader, ja, jflags, 2);
+        }
+    }
+    jo = sender()->property("marks").toJsonObject();
+    httpStop(sender());
+    createHttpRequest("/engine/smart/printservice.php", QJsonObject{{"header", jo["header"].toObject()["f_id"].toString()}, {"mode", 2}},
+    SLOT(
+        voidResponse(QJsonObject)), jo);
+}
+
+void Workspace::receiptResponse(const QJsonObject &jdoc)
+{
+    QJsonObject jo = jdoc["data"].toObject();
+    qDebug() << jo;
+}
+
+void Workspace::voidResponse(const QJsonObject &jdoc)
+{
+    QJsonObject jo = jdoc["data"].toObject();
+    QJsonObject marks = sender()->property("marks").toJsonObject();
+    httpStop(sender());
+    if (marks["printreceipt"].toBool()) {
+        //createHttpRequest("/engine/smart/bill.php", QJsonObject{{"header", marks["header"].toString()}}, SLOT(receiptResponse(
+        //            QJsonObject)));
+        printReceipt(marks["header"].toString(), false, false);
+    }
+}
+
+void Workspace::removeDishResponse(const QJsonObject &jdoc)
+{
+    QJsonObject jo = jdoc["data"].toObject();
+    for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
+        Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
+        if (d.obodyId == jo["obodyid"].toString()) {
+            d.state = jo["state"].toInt();
+            ui->tblOrder->item(i, 0)->setData(Qt::UserRole, QVariant::fromValue(d));
+            updateInfo(i);
+            break;
+        }
+    }
+    ui->tblOrder->viewport()->update();
+    countTotal();
+    httpStop(sender());
+}
+
+void Workspace::openTableResponse(const QJsonObject &jdoc)
+{
+    QJsonObject jo = jdoc["data"].toObject();
+    fTable = jo["table"].toInt();
+    QTableWidgetItem *currentItem = nullptr;
+    for (int i = 0; i < ui->tblTables->columnCount(); i++) {
+        if (fTable == ui->tblTables->item(0, i)->data(Qt::UserRole).toInt()) {
+            currentItem = ui->tblTables->item(0, i);
+            ui->tblTables->setCurrentItem(currentItem);
+            break;
+        }
+    }
+    currentItem->setData(Qt::UserRole + 1, "");
+    if (!jo["empty"].toBool()) {
+        QJsonObject jt = jo["header"].toObject();
+        currentItem->setData(Qt::UserRole + 1, jt["f_id"].toString());
+        fOrderUuid = jt["f_id"].toString();
+        jt = jo["customer"].toObject();
+        fCustomer = jo["f_id"].toInt();
+        if (fCustomer > 0) {
+            ui->lbCostumerPhone->setText(QString("%1\r\n%2\r\n%3").arg(jt["f_phone"].toString(), jt["f_contact"].toString(),
+                                         jt["f_address"].toString()));
+            ui->lbCostumerPhone->setVisible(true);
+        }
+        jt = jo["bhistory"].toObject();
+        fDiscountMode = jt["f_type"].toInt();
+        fDiscountCard = jt["f_card"].toInt();
+        fDiscountValue = jt["f_value"].toString().toDouble();
+        jt = jo["flags"].toObject();
+        fFlagEdited = jt["f_2"].toInt();
+        ui->btnFlagTakeAway->setChecked(jt["f_3"].toInt() > 0);
+        QJsonArray ja = jo["dishes"].toArray();
+        for (int i = 0; i < ja.size(); i++) {
+            jt = ja.at(i).toObject();
+            Dish d;
+            d.obodyId = jt["f_id"].toString();
+            d.id = jt["f_dish"].toInt();
+            d.adgCode = jt["f_adgcode"].toString();
+            d.name = jt["f_name"].toString();
+            d.qty = jt["f_qty1"].toString().toDouble();
+            d.qty2 = jt["f_qty2"].toString().toDouble();
+            d.price = jt["f_price"].toString().toDouble();
+            d.modificator = jt["f_comment"].toString();
+            d.printer = jt["f_print1"].toString();
+            d.printer2 = jt["f_print2"].toString();
+            d.store = jt["f_store"].toInt();
+            d.f_emarks = jt["f_emarks"].toString();
+            d.state = jt["f_state"].toInt();
+            addDishToOrder( &d);
+        }
+        ui->tblTables->viewport()->update();
+    }
+    httpStop(sender());
 }
 
 void Workspace::focusTaxIn()
@@ -1978,11 +1961,6 @@ void Workspace::on_btnP3_clicked()
 void Workspace::on_btnP4_clicked()
 {
     setQty(4, 1, -1, "");
-}
-
-void Workspace::on_btnP5_clicked()
-{
-    setQty(5, 1, -1, "");
 }
 
 void Workspace::on_btnP10_clicked()
@@ -2034,48 +2012,21 @@ void Workspace::on_leReadCode_textChanged(const QString &arg1)
 
 void Workspace::addDishToOrder(Dish *d)
 {
-
-    if (fOrderUuid.isEmpty()) {
-        saveOrder(ORDER_STATE_OPEN);
-        C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("New order"), "", "");
-    }
-
-    C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("New dish"), d->name, "");
-
     int row = 0;
-    bool isnew = true;
-    if (__c5config.getValue(param_zip_dish_in_order).toInt() == 1) {
-        for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
-            Dish dd = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
-            if (d->id == dd.id) {
-                row = i;
-                dd.qty++;
-                ui->tblOrder->item(i, 0)->setData(Qt::UserRole, QVariant::fromValue(dd));
-                updateInfo(row);
-                isnew = false;
-                break;
-            }
-        }
-    }
-    if (isnew) {
-        row = ui->tblOrder->rowCount();
-        ui->tblOrder->setRowCount(row + 1);
-        ui->tblOrder->setItem(row, 0, new QTableWidgetItem(""));
-        ui->tblOrder->setItem(row, 1, new QTableWidgetItem(""));
-        ui->tblOrder->setItem(row, 2, new QTableWidgetItem(""));
-        ui->tblOrder->setItem(row, 3, new QTableWidgetItem(""));
-
-
-        Dish *dd = new Dish(d);
-        switch (fDiscountMode) {
+    row = ui->tblOrder->rowCount();
+    ui->tblOrder->setRowCount(row + 1);
+    ui->tblOrder->setItem(row, 0, new QTableWidgetItem(""));
+    ui->tblOrder->setItem(row, 1, new QTableWidgetItem(""));
+    ui->tblOrder->setItem(row, 2, new QTableWidgetItem(""));
+    ui->tblOrder->setItem(row, 3, new QTableWidgetItem(""));
+    Dish *dd = new Dish(d);
+    switch (fDiscountMode) {
         case CARD_TYPE_SPECIAL_DISHES:
             dd->discount = dd->specialDiscount;
             break;
-        }
-
-        ui->tblOrder->item(row, 0)->setData(Qt::UserRole, QVariant::fromValue(*dd));
-        updateInfo(row);
     }
+    ui->tblOrder->item(row, 0)->setData(Qt::UserRole, QVariant::fromValue( *dd));
+    updateInfo(row);
     ui->tblOrder->setCurrentCell(row, 0);
     countTotal();
     if (ui->btnSetCard->isChecked() || ui->btnSetCardExternal->isChecked()) {
@@ -2089,10 +2040,10 @@ void Workspace::addDishToOrder(Dish *d)
 double Workspace::discountValue()
 {
     switch (fDiscountMode) {
-    case CARD_TYPE_DISCOUNT:
-        return fDiscountValue;
-    default:
-        break;
+        case CARD_TYPE_DISCOUNT:
+            return fDiscountValue;
+        default:
+            break;
     }
     return 0;
 }
@@ -2116,7 +2067,6 @@ void Workspace::on_btnComment_clicked()
     }
 }
 
-
 void Workspace::on_btnMRead_clicked()
 {
     ui->tblTables->setVisible(!ui->tblTables->isVisible());
@@ -2139,10 +2089,12 @@ void Workspace::on_btnSetCardExternal_clicked()
     ui->leCard->setDouble(ui->leTotal->getDouble());
 }
 
-
 void Workspace::on_tblTables_itemClicked(QTableWidgetItem *item)
 {
     if (!item) {
+        return;
+    }
+    if (item->data(Qt::UserRole).toInt() == fTable) {
         return;
     }
     for (int i = 0; i < ui->tblTables->columnCount(); i++) {
@@ -2152,80 +2104,9 @@ void Workspace::on_tblTables_itemClicked(QTableWidgetItem *item)
         }
     }
     item->setData(Qt::UserRole + 2, true);
-    if (ui->tblOrder->rowCount() > 0) {
-        saveOrder(ORDER_STATE_OPEN);
-        QString ord = fOrderUuid;
-        C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Save order"), QString::number(fTable),  item->text());
-        resetOrder();
-        for (int i = 0; i < ui->tblTables->columnCount(); i++) {
-            QTableWidgetItem *item = ui->tblTables->item(0, i);
-            if (item->data(Qt::UserRole).toInt() == fTable) {
-                item->setData(Qt::UserRole + 1, ord);
-                break;
-            }
-        }
-    }
-    fTable = item->data(Qt::UserRole).toInt();
-    C5Database db(fDBParams);
-    db[":f_table"] = fTable;
-    db[":f_state"] = ORDER_STATE_OPEN;
-    db.exec("select * from o_header where f_table=:f_table and f_state=:f_state");
-    if (db.nextRow()) {
-        ui->tblTables->setItem(item->row(), item->column(), item);
-        fOrderUuid = db.getString("f_id");
-        fCustomer = db.getInt("f_partner");
-        BHistory bh;
-        bh.id = fOrderUuid;
-        if (bh.getRecord(db)) {
-            fDiscountMode = bh.type;
-            fDiscountCard = bh.card;
-            fDiscountValue = bh.value;
-        }
-        db[":f_id"] = fOrderUuid;
-        db.exec("select * from o_header_flags where f_id=:f_id");
-        if (db.nextRow()) {
-            fFlagEdited = db.getInt("f_2");
-        }
-
-        db[":f_header"] = fOrderUuid;
-        db[":f_state"] = DISH_STATE_OK;
-        db.exec("select b.f_dish, b.f_adgcode, d.f_name, b.f_qty1, b.f_qty2, b.f_price, b.f_comment, "
-                "b.f_print1, b.f_store, b.f_id, b.f_emarks "
-                "from o_body b "
-                "left join d_dish d on d.f_id=b.f_dish "
-                "where b.f_header=:f_header AND b.f_state=:f_state "
-                "order by b.f_row ");
-        int tempFlagEdited = fFlagEdited;
-        while (db.nextRow()) {
-            Dish d;
-            d.obodyId = db.getString("f_id");
-            d.id = db.getInt("f_dish");
-            d.adgCode = db.getString("f_adgcode");
-            d.name = db.getString("f_name");
-            d.qty = db.getDouble("f_qty1");
-            d.qty2 = db.getDouble("f_qty2");
-            d.price = db.getDouble("f_price");
-            d.modificator = db.getString("f_comment");
-            d.printer = db.getString("f_print1");
-            d.store = db.getInt("f_store");
-            d.f_emarks = db.getString("f_emarks");
-            addDishToOrder(&d);
-        }
-        fFlagEdited = tempFlagEdited;
-        if (fCustomer > 0) {
-            db[":f_id"] = fCustomer;
-            db.exec("select * from c_partners where f_id=:f_id");
-            if (db.nextRow()) {
-                ui->lbCostumerPhone->setText(QString("%1\r\n%2\r\n%3").arg(db.getString("f_phone"), db.getString("f_contact"), db.getString("f_address")));
-                ui->lbCostumerPhone->setVisible(true);
-            }
-        }
-
-        C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Open order"), QString::number(fTable),  "");
-    } else {
-
-    }
-    ui->tblTables->viewport()->update();
+    resetOrder();
+    createHttpRequest("/engine/smart/opentable.php", QJsonObject{{"table", item->data(Qt::UserRole).toInt()}}, SLOT(
+        openTableResponse(QJsonObject)));
 }
 
 void Workspace::on_btnSaveAndPrecheck_clicked()
@@ -2233,8 +2114,9 @@ void Workspace::on_btnSaveAndPrecheck_clicked()
     if (ui->tblOrder->rowCount() == 0) {
         return;
     }
-    C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Save order and print precheck"), QString::number(fTable),  "");
-    if (saveOrder(ORDER_STATE_OPEN)) {
+    C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Save order and print precheck"),
+                    QString::number(fTable),  "");
+    if (saveOrder(ORDER_STATE_OPEN, true)) {
         fFlagEdited = 1;
     }
     printReceipt(fOrderUuid, false, true);
@@ -2287,7 +2169,6 @@ void Workspace::on_btnEmarks_clicked()
         C5Message::error("Invalid eMarks");
         return;
     }
-
     ui->btnFiscal->setChecked(true);
     QString hya("էթփձջւևրչճ-ժ"
                 "քոեռտըւիօպխծշ"
@@ -2298,13 +2179,13 @@ void Workspace::on_btnEmarks_clicked()
                 "ԱՍԴՖԳՀՅԿԼ;՛"
                 "ԶՂՑՎԲՆՄ,․/");
     QString ru("1234567890-="
-                "йцукенгшщзхъ\\"
-                "фывапролджэ"
-                "ячсмитьбю."
-                "1234567890_+"
-                "ЙЦУКЕНГШЩЗХЪ/"
-                "ФЫВАПРОЛДЖЭ"
-                "ЯЧСМИТЬБЮ,");
+               "йцукенгшщзхъ\\"
+               "фывапролджэ"
+               "ячсмитьбю."
+               "1234567890_+"
+               "ЙЦУКЕНГШЩЗХЪ/"
+               "ФЫВАПРОЛДЖЭ"
+               "ЯЧСМИТЬБЮ,");
     QString num("1234567890-="
                 "QWERTYUIOP[]\\"
                 "ASDFGHJKL;՛"
@@ -2315,7 +2196,6 @@ void Workspace::on_btnEmarks_clicked()
                 "ZXCVBNM,./");
     QString oldcode = qr;
     QString newcode;
-
     for (int i = 0; i < oldcode.length(); i++) {
         if (hya.contains(oldcode.at(i))) {
             newcode += num.at(hya.indexOf(oldcode.at(i)));
@@ -2332,21 +2212,18 @@ void Workspace::on_btnEmarks_clicked()
             newcode += oldcode.at(i);
         }
     }
-
     d.f_emarks = newcode;
-    ui->tblOrder->item(row, 0)->setData(Qt::UserRole, qVariantFromValue(d));
+    ui->tblOrder->item(row, 0)->setData(Qt::UserRole, QVariant::fromValue(d));
     updateInfo(row);
 }
 
 void Workspace::on_printOrder_clicked()
 {
-    saveOrder(ORDER_STATE_OPEN);
-    printService();
-    for (int i = 0; i < ui->tblOrder->rowCount();i++) {
+    saveOrder(ORDER_STATE_OPEN, true);
+    for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
         updateInfo(i);
     }
 }
-
 
 void Workspace::on_btnFiscal_clicked(bool checked)
 {
@@ -2363,4 +2240,13 @@ void Workspace::configFiscalButton()
         ui->btnFiscal->setEnabled(false);
         ui->btnFiscal->setChecked(true);
     }
+}
+
+void Workspace::on_btnFlagTakeAway_clicked(bool checked)
+{
+    if (fOrderUuid.isEmpty()) {
+        return;
+    }
+    createHttpRequest("/engine/smart/take-away-flag.php", QJsonObject{{"header", fOrderUuid}, {"flag", checked ? 1 : 0}},
+    SLOT(voidResponse(QJsonObject)));
 }

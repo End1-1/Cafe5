@@ -31,10 +31,13 @@ NTableWidget::NTableWidget(const QString &route, QWidget *parent) :
     ui->setupUi(this);
     ui->mTableView->setModel(new NTableModel());
     ui->mTableView->horizontalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(ui->mTableView->horizontalHeader(), SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(tableViewHeaderContextMenuRequested(QPoint)));
+    connect(ui->mTableView->horizontalHeader(), SIGNAL(customContextMenuRequested(QPoint)), this,
+            SLOT(tableViewHeaderContextMenuRequested(QPoint)));
     connect(ui->mTableView->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(tableViewHeaderClicked(int)));
-    connect(ui->mTableView->horizontalHeader(), SIGNAL(sectionResized(int,int,int)), this, SLOT(tableViewHeaderResized(int,int,int)));
-    connect(ui->mTableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(selectionChanged(QItemSelection,QItemSelection)));
+    connect(ui->mTableView->horizontalHeader(), SIGNAL(sectionResized(int, int, int)), this,
+            SLOT(tableViewHeaderResized(int, int, int)));
+    connect(ui->mTableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this,
+            SLOT(selectionChanged(QItemSelection, QItemSelection)));
     connect(ui->mTableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(tableViewContextMenuRequested(QPoint)));
     connect(ui->tblTotal->horizontalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(tblValueChanged(int)));
     ui->widget->setVisible(false);
@@ -60,11 +63,11 @@ QToolBar *NTableWidget::toolBar()
     if (!fToolBar) {
         QList<ToolBarButtons> btn;
         btn
-            << ToolBarButtons::tbFilter
-            << ToolBarButtons::tbRefresh
-            << ToolBarButtons::tbClearFilter
-            << ToolBarButtons::tbExcel
-            << ToolBarButtons::tbPrint;
+                << ToolBarButtons::tbFilter
+                << ToolBarButtons::tbRefresh
+                << ToolBarButtons::tbClearFilter
+                << ToolBarButtons::tbExcel
+                << ToolBarButtons::tbPrint;
         createStandartToolbar(btn);
     }
     return fToolBar;
@@ -86,7 +89,7 @@ void NTableWidget::hotKey(const QString &key)
 
 void NTableWidget::sum()
 {
-    auto *model = static_cast<NTableModel*>(ui->mTableView->model());
+    auto *model = static_cast<NTableModel *>(ui->mTableView->model());
     ui->tblTotal->setColumnCount(model->columnCount());
     QStringList keys = model->fColSum.keys();
     ui->tblTotal->setVisible(keys.length() > 0);
@@ -116,54 +119,42 @@ void NTableWidget::queryError(const QString &error)
     mLoadingDlg->deleteLater();
 }
 
-void NTableWidget::queryFinished(int elapsed, const QByteArray &ba)
+void NTableWidget::queryFinished(const QJsonObject &ba)
 {
-    QJsonParseError err;
-    QJsonObject jo = QJsonDocument::fromJson(ba, &err).object();
-    if (err.error == QJsonParseError::NoError) {
-        QJsonObject jwidget = jo["widget"].toObject();
-        mMainWindow->nTabDesign(QIcon(jwidget["icon"].toString()), jwidget["title"].toString(), this);
-        QJsonArray jcols = jo["cols"].toArray();
-        QJsonObject colSum = jo["sum"].toObject();
-        QJsonArray jdata = jo["rows"].toArray();
-        QJsonArray jhiddencols = jo["hiddencols"].toArray();
-        if (!fFilter) {
-            QJsonArray jfilter = jo["filter"].toArray();
-            fFilter = new NFilterDlg(this);
-            fFilter->setProperty("host", mHost);
-            fFilter->setup(jfilter);
-        }
-        static_cast<NTableModel*>(ui->mTableView->model())->setDatasource(jcols, jdata);
-        auto * model = static_cast<NTableModel*>(ui->mTableView->model());
-        model->setSumColumns(colSum);
-        sum();
-        ui->mTableView->resizeColumnsToContents();
-        for (int i = 0; i < ui->tblTotal->columnCount(); i++) {
-            ui->mTableView->setColumnHidden(i, false);
-            ui->tblTotal->setColumnHidden(i, false);
-            ui->tblTotal->setColumnWidth(i, ui->mTableView->columnWidth(i));
-        }
-        for (int i = 0; i < jhiddencols.size(); i++) {
-            ui->mTableView->setColumnHidden(jhiddencols[i].toInt(), true);
-            ui->tblTotal->setColumnHidden(jhiddencols[i].toInt(), true);
-        }
-        mHandler->configure(fFilter, jo["handler"].toArray().toVariantList());
-        if (!mToolWidget) {
-            mToolWidget = new QWidget();
-            fToolBar->addWidget(mToolWidget);
-            mToolWidget->setLayout(new QGridLayout());
-            mHandler->toolWidget(mToolWidget);
-        }
-    } else {
-        queryError(ba);
+    QJsonObject jo = ba;
+    QJsonObject jwidget = jo["widget"].toObject();
+    mMainWindow->nTabDesign(QIcon(jwidget["icon"].toString()), jwidget["title"].toString(), this);
+    QJsonArray jcols = jo["cols"].toArray();
+    QJsonObject colSum = jo["sum"].toObject();
+    QJsonArray jdata = jo["rows"].toArray();
+    QJsonArray jhiddencols = jo["hiddencols"].toArray();
+    if (!fFilter) {
+        QJsonArray jfilter = jo["filter"].toArray();
+        fFilter = new NFilterDlg(this);
+        fFilter->setProperty("host", mHost);
+        fFilter->setup(jfilter);
     }
-#ifdef QT_DEBUG
-    c5log(QString(ba));
-#else
-    if (__c5config.getValue(param_debuge_mode).toInt() > 0) {
-        c5log(QString(ba));
+    static_cast<NTableModel * >(ui->mTableView->model())->setDatasource(jcols, jdata);
+    auto *model = static_cast<NTableModel * >(ui->mTableView->model());
+    model->setSumColumns(colSum);
+    sum();
+    ui->mTableView->resizeColumnsToContents();
+    for (int i = 0; i < ui->tblTotal->columnCount(); i++) {
+        ui->mTableView->setColumnHidden(i, false);
+        ui->tblTotal->setColumnHidden(i, false);
+        ui->tblTotal->setColumnWidth(i, ui->mTableView->columnWidth(i));
     }
-#endif
+    for (int i = 0; i < jhiddencols.size(); i++) {
+        ui->mTableView->setColumnHidden(jhiddencols[i].toInt(), true);
+        ui->tblTotal->setColumnHidden(jhiddencols[i].toInt(), true);
+    }
+    mHandler->configure(fFilter, jo["handler"].toArray().toVariantList());
+    if (!mToolWidget) {
+        mToolWidget = new QWidget();
+        fToolBar->addWidget(mToolWidget);
+        mToolWidget->setLayout(new QGridLayout());
+        mHandler->toolWidget(mToolWidget);
+    }
     sender()->deleteLater();
     mLoadingDlg->deleteLater();
 }
@@ -173,8 +164,7 @@ void NTableWidget::exportToExcel()
     int fXlsxFitToPage = 0;
     QString fXlsxPageOrientation = xls_page_orientation_portrait;
     int fXlsxPageSize = xls_page_size_a4;
-
-    auto *fModel = static_cast<NTableModel*>(ui->mTableView->model());
+    auto *fModel = static_cast<NTableModel *>(ui->mTableView->model());
     int colCount = fModel->columnCount();
     int rowCount = fModel->rowCount();
     if (colCount == 0 || rowCount == 0) {
@@ -196,7 +186,6 @@ void NTableWidget::exportToExcel()
         s->addCell(1, i + 1, fModel->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString(), d.style()->styleNum("header"));
         s->setColumnWidth(i + 1, ui->mTableView->columnWidth(i) / 7);
     }
-
     /* BODY */
     QMap<int, QString> bgFill;
     QMap<int, QString> bgFillb;
@@ -206,14 +195,12 @@ void NTableWidget::exportToExcel()
     d.style()->addVAlignment("body", xls_alignment_center);
     d.style()->addBorder("body", XlsxBorder());
     bgFill[QColor(Qt::white).rgb()] = "body";
-
     bodyFont.setBold(true);
     d.style()->addFont("body_b", bodyFont);
     d.style()->addBackgrounFill("body_b", QColor(Qt::white));
     d.style()->addVAlignment("body_b", xls_alignment_center);
     d.style()->addBorder("body_b", XlsxBorder());
     bgFillb[QColor(Qt::white).rgb()] = "body_b";
-
     for (int j = 0; j < rowCount; j++) {
         for (int i = 0; i < colCount; i++) {
             int bgColor = fModel->data(j, i, Qt::BackgroundColorRole).value<QColor>().rgb();
@@ -236,7 +223,6 @@ void NTableWidget::exportToExcel()
             s->addCell(j + 2, i + 1, fModel->data(j, i, Qt::EditRole), d.style()->styleNum(bgStyle));
         }
     }
-
     /* MERGE cells */
     QMap<int, QList<int> > skiprow, skipcol;
     for (int r = 0; r < rowCount; r++) {
@@ -264,20 +250,19 @@ void NTableWidget::exportToExcel()
             }
         }
     }
-
     /* TOTALS ROWS */
-//    if (ui->tblTotal->isVisible()) {
-//        QFont totalFont(qApp->font());
-//        totalFont.setBold(true);
-//        d.style()->addFont("footer", headerFont);
-//        d.style()->addBorder("footer", XlsxBorder());
-//        color = QColor::fromRgb(193, 206, 221);
-//        d.style()->addBackgrounFill("footer", color);
-//        //d.style()->addHAlignment("footer", xls_alignment_right);
-//        for (int i = 0; i < colCount; i++) {
-//            s->addCell(1 + fModel->rowCount() + 1, i + 1, ui->tblTotal->getData(0, i), d.style()->styleNum("footer"));
-//        }
-//    }
+    //    if (ui->tblTotal->isVisible()) {
+    //        QFont totalFont(qApp->font());
+    //        totalFont.setBold(true);
+    //        d.style()->addFont("footer", headerFont);
+    //        d.style()->addBorder("footer", XlsxBorder());
+    //        color = QColor::fromRgb(193, 206, 221);
+    //        d.style()->addBackgrounFill("footer", color);
+    //        //d.style()->addHAlignment("footer", xls_alignment_right);
+    //        for (int i = 0; i < colCount; i++) {
+    //            s->addCell(1 + fModel->rowCount() + 1, i + 1, ui->tblTotal->getData(0, i), d.style()->styleNum("footer"));
+    //        }
+    //    }
     QString err;
     if (!d.save(err, true)) {
         if (!err.isEmpty()) {
@@ -322,14 +307,12 @@ void NTableWidget::tblValueChanged(int v)
 
 void NTableWidget::on_leFilterLineedit_textEdited(const QString &arg1)
 {
-    static_cast<NTableModel*>(ui->mTableView->model())->setFilter(arg1);
+    static_cast<NTableModel *>(ui->mTableView->model())->setFilter(arg1);
     sum();
 }
 
-
 void NTableWidget::on_mTableView_doubleClicked(const QModelIndex &index)
 {
-    auto *m = static_cast<NTableModel*>(ui->mTableView->model());
+    auto *m = static_cast<NTableModel *>(ui->mTableView->model());
     mHandler->handle(m->rowData(index.row()));
 }
-

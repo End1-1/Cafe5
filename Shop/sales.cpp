@@ -67,10 +67,10 @@ void Sales::showSales(Working *w, C5User *u)
     s->fWorking = w;
     s->showMaximized();
     s->exec();
-     delete s;
+    delete s;
 }
 
-bool Sales::printCheckWithTax(C5Database &db, const QString &id, QString &rseq)
+bool Sales::printCheckWithTax(C5Database &db, const QString &id)
 {
     QElapsedTimer et;
     et.start();
@@ -85,7 +85,7 @@ bool Sales::printCheckWithTax(C5Database &db, const QString &id, QString &rseq)
     }
     if (__c5config.taxIP().toLower() == "http") {
         QString url = QString("GET /printtax?auth=up&a=get&user=%1&pass=%2&order=%3 HTTP/1.1\r\n\r\n")
-                .arg(__c5config.httpServerUsername(),__c5config.httpServerPassword(),id);
+                      .arg(__c5config.httpServerUsername(), __c5config.httpServerPassword(), id);
         auto *s = new QSslSocket(0);
         //connect(s, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(err(QAbstractSocket::SocketError)));
         s->setPeerVerifyMode(QSslSocket::VerifyNone);
@@ -130,7 +130,8 @@ bool Sales::printCheckWithTax(C5Database &db, const QString &id, QString &rseq)
             "left join c_units gu on gu.f_id=g.f_unit "
             "left join c_groups t on t.f_id=g.f_group "
             "where og.f_header=:f_id");
-    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), useExtPos, C5Config::taxCashier(), C5Config::taxPin(), 0);
+    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), useExtPos, C5Config::taxCashier(),
+                 C5Config::taxPin(), 0);
     pt.fPartnerTin = partnerHvhh;
     while (db.nextRow()) {
         pt.addGoods(db.getString("f_taxdept").toInt(), //dep
@@ -144,7 +145,6 @@ bool Sales::printCheckWithTax(C5Database &db, const QString &id, QString &rseq)
     QString jsonIn, jsonOut, err;
     int result = 0;
     result = pt.makeJsonAndPrint(card, prepaid, jsonIn, jsonOut, err);
-
     QJsonObject jtax;
     jtax["f_order"] = id;
     jtax["f_elapsed"] = et.elapsed();
@@ -164,28 +164,27 @@ bool Sales::printCheckWithTax(C5Database &db, const QString &id, QString &rseq)
 
 bool Sales::printReceipt(const QString &id)
 {
-
     if (!C5Config::localReceiptPrinter().isEmpty()) {
         C5Database db(C5Config::replicaDbParams());
         PrintReceiptGroup p;
         switch (C5Config::shopPrintVersion()) {
-        case 1: {
-            bool p1, p2;
-            if (SelectPrinters::selectPrinters(p1, p2)) {
-                if (p1) {
-                    p.print(id, db, 1);
+            case 1: {
+                bool p1, p2;
+                if (SelectPrinters::selectPrinters(p1, p2)) {
+                    if (p1) {
+                        p.print(id, db, 1);
+                    }
+                    if (p2) {
+                        p.print(id, db, 2);
+                    }
                 }
-                if (p2) {
-                    p.print(id, db, 2);
-                }
+                break;
             }
-            break;
-        }
-        case 2:
-            p.print2(id, db);
-            break;
-        default:
-            break;
+            case 2:
+                p.print2(id, db);
+                break;
+            default:
+                break;
         }
     }
     return true;
@@ -206,18 +205,18 @@ void Sales::changeDate(int d)
 void Sales::refresh()
 {
     switch (fViewMode) {
-    case VM_TOTAL:
-        refreshTotal();
-        break;
-    case VM_ITEMS:
-        refreshItems();
-        break;
-    case VM_TOTAL_ITEMS:
-        refreshTotalItems();
-        break;
-    case VM_GROUPS:
-        refreshGroups();
-        break;
+        case VM_TOTAL:
+            refreshTotal();
+            break;
+        case VM_ITEMS:
+            refreshItems();
+            break;
+        case VM_TOTAL_ITEMS:
+            refreshTotalItems();
+            break;
+        case VM_GROUPS:
+            refreshGroups();
+            break;
     }
 }
 
@@ -251,26 +250,27 @@ void Sales::refreshTotal()
     }
     if (!fUser->check(cp_t5_view_sales_of_all_users)) {
         //if (__c5config.getValue(param_shop_report_of_logged_staff).toInt() == 1){
-            sqlCond += QString(" and oh.f_staff=%1 ").arg(fUser->id());
+        sqlCond += QString(" and oh.f_staff=%1 ").arg(fUser->id());
         //}
     }
-    QString sql = QString("select '', oh.f_id, oh.f_saletype, u.f_login, os.f_name, concat(oh.f_prefix, oh.f_hallid) as f_number, "
-            "ot.f_receiptnumber, "
-            "oh.f_datecash, oh.f_timeclose, oh.f_amounttotal, concat(c.f_taxname, ' ', c.f_contact) as f_client, "
-            "concat_ws(' ', dm.f_last, dm.f_first) as f_deliverman, "
-            "oh.f_comment "
-            "from o_header oh "
-            "left join o_header_options oo on oo.f_id=oh.f_id "
-            "left join b_history h on h.f_id=oh.f_id "
-            "left join b_cards_discount d on d.f_id=h.f_card "
-            "left join c_partners c on c.f_id=oh.f_partner "
-            "left join o_tax ot on ot.f_id=oh.f_id "
-            "left join o_sale_type os on os.f_id=oh.f_saletype "
-            "left join s_user u on u.f_id=oh.f_staff "
-            "left join s_user dm on dm.f_id=oo.f_deliveryman "
-            "where oh.f_datecash between :f_start and :f_end and oh.f_state=:f_state " + sqlCond +
-            "and oh.f_hall=:f_hall "
-            "order by oh.f_datecash, oh.f_timeclose ");
+    QString sql =
+        QString("select '', oh.f_id, oh.f_saletype, u.f_login, os.f_name, concat(oh.f_prefix, oh.f_hallid) as f_number, "
+                "ot.f_receiptnumber, "
+                "oh.f_datecash, oh.f_timeclose, oh.f_amounttotal, concat(c.f_taxname, ' ', c.f_contact) as f_client, "
+                "concat_ws(' ', dm.f_last, dm.f_first) as f_deliverman, "
+                "oh.f_comment "
+                "from o_header oh "
+                "left join o_header_options oo on oo.f_id=oh.f_id "
+                "left join b_history h on h.f_id=oh.f_id "
+                "left join b_cards_discount d on d.f_id=h.f_card "
+                "left join c_partners c on c.f_id=oh.f_partner "
+                "left join o_tax ot on ot.f_id=oh.f_id "
+                "left join o_sale_type os on os.f_id=oh.f_saletype "
+                "left join s_user u on u.f_id=oh.f_staff "
+                "left join s_user dm on dm.f_id=oo.f_deliveryman "
+                "where oh.f_datecash between :f_start and :f_end and oh.f_state=:f_state " + sqlCond +
+                "and oh.f_hall=:f_hall "
+                "order by oh.f_datecash, oh.f_timeclose ");
     db.exec(sql);
     ui->tbl->setRowCount(db.rowCount());
     int row = 0;
@@ -415,7 +415,6 @@ void Sales::refreshGroups()
     h.append(tr("Qty"));
     h.append(tr("Amount"));
     //h.append(tr(""));
-
     ui->tbl->clearContents();
     ui->tbl->setRowCount(0);
     ui->tbl->setColumnCount(h.count());
@@ -459,21 +458,19 @@ void Sales::refreshGroups()
         ui->tbl->setString(row, col + 2, float_str(db.getDouble("f_total"), 1));
         ui->leTotalQty->setDouble(ui->leTotalQty->getDouble() + db.getDouble("f_qty"));
         ui->leTotal->setDouble(ui->leTotal->getDouble() + db.getDouble("f_total"));
-//        col += 4;
-//        if (col > 11) {
-//            col = 0;
-//            row++;
-//        }
+        //        col += 4;
+        //        if (col > 11) {
+        //            col = 0;
+        //            row++;
+        //        }
         row++;
     }
     ui->tbl->addEmptyRow();
     ui->tbl->setString(row, col + 1, float_str(ui->leTotalQty->getDouble(), 1));
     ui->tbl->setString(row, col + 2, float_str(ui->leTotal->getDouble(), 1));
     row++;
-
     ui->tbl->addEmptyRow();
     row++;
-
     db[":f_hall"] = __c5config.defaultHall();
     db[":f_start"] = ui->deStart->date();
     db[":f_end"] = ui->deEnd->date();
@@ -488,8 +485,6 @@ void Sales::refreshGroups()
     ui->tbl->setString(row, 0, tr("Count of orders"));
     ui->tbl->setString(row, col + 2, float_str(db.getDouble("f_total"), 1));
     row++;
-
-
     db[":f_hall"] = __c5config.defaultHall();
     db[":f_start"] = ui->deStart->date();
     db[":f_end"] = ui->deEnd->date();
@@ -504,7 +499,6 @@ void Sales::refreshGroups()
     ui->tbl->setString(row, 0, tr("Tax"));
     ui->tbl->setString(row, col + 2, float_str(db.getDouble("f_total"), 1));
     row++;
-
     ui->leRetail->setDouble(0);
     ui->leWhosale->setDouble(0);
 }
@@ -556,7 +550,8 @@ void Sales::printpreview()
             }
             if (c > 0) {
                 p.ltext(ui->tbl->horizontalHeaderItem(c)->text(), (sumOfColumnsWidghtBefore(c) / scaleFactor) + 1);
-                p.line(sumOfColumnsWidghtBefore(c) / scaleFactor, p.fTop, sumOfColumnsWidghtBefore(c) / scaleFactor, p.fTop + (ui->tbl->verticalHeader()->defaultSectionSize() / rowScaleFactor));
+                p.line(sumOfColumnsWidghtBefore(c) / scaleFactor, p.fTop, sumOfColumnsWidghtBefore(c) / scaleFactor,
+                       p.fTop + (ui->tbl->verticalHeader()->defaultSectionSize() / rowScaleFactor));
             } else {
                 p.ltext(ui->tbl->horizontalHeaderItem(c)->text(), 1);
                 p.line(0, p.fTop, 0, p.fTop + (ui->tbl->verticalHeader()->defaultSectionSize() / rowScaleFactor));
@@ -565,96 +560,99 @@ void Sales::printpreview()
         p.line(columnsWidth, p.fTop, columnsWidth, p.fTop + (ui->tbl->verticalHeader()->defaultSectionSize() / rowScaleFactor));
         p.br();
         p.line(0, p.fTop, columnsWidth, p.fTop);
-    for (int r = startFrom; r < ui->tbl->rowCount(); r++) {
-        p.line(0, p.fTop, columnsWidth, p.fTop);
-        for (int c = 0; c < ui->tbl->columnCount(); c++) {
-            if (ui->tbl->columnWidth(c) == 0) {
-                continue;
+        for (int r = startFrom; r < ui->tbl->rowCount(); r++) {
+            p.line(0, p.fTop, columnsWidth, p.fTop);
+            for (int c = 0; c < ui->tbl->columnCount(); c++) {
+                if (ui->tbl->columnWidth(c) == 0) {
+                    continue;
+                }
+                int s = ui->tbl->columnSpan(r, c) - 1;
+                if (c > 0) {
+                    p.ltext(ui->tbl->getString(r, c), (sumOfColumnsWidghtBefore(c) / scaleFactor) + 1);
+                    p.line(sumOfColumnsWidghtBefore(c + s) / scaleFactor, p.fTop, sumOfColumnsWidghtBefore(c + s) / scaleFactor,
+                           p.fTop + (ui->tbl->rowHeight(r) / rowScaleFactor));
+                } else {
+                    p.ltext(ui->tbl->getString(r, c), 1);
+                    p.line(0, p.fTop, 0, p.fTop + (ui->tbl->rowHeight(r) / rowScaleFactor));
+                }
+                c += s;
             }
-            int s = ui->tbl->columnSpan(r, c) - 1;
-            if (c > 0) {
-                p.ltext(ui->tbl->getString(r, c), (sumOfColumnsWidghtBefore(c) / scaleFactor) + 1);
-                p.line(sumOfColumnsWidghtBefore(c + s) / scaleFactor, p.fTop, sumOfColumnsWidghtBefore(c + s) / scaleFactor, p.fTop + (ui->tbl->rowHeight(r) / rowScaleFactor));
+            //last vertical line
+            //        p.line(columnsWidth, p.fTop, columnsWidth, p.fTop + (ui->tbl->rowHeight(r) / rowScaleFactor));
+            //        if (ui->tblTotal->isVisible() && r == ui->tbl->rowCount() - 1) {
+            //            p.setFontBold(true);
+            //            if (p.checkBr(ui->tblTotal->rowHeight(0))) {
+            //                p.line(0, p.fTop + (ui->tblTotal->rowHeight(0) / rowScaleFactor), columnsWidth, p.fTop + (ui->tblTotal->rowHeight(0) / rowScaleFactor));\
+            //                p.br();
+            //                stopped = startFrom >= fModel->rowCount() - 1;
+            //                p.fTop = p.fNormalHeight - p.fLineHeight;
+            //                p.ltext(QString("%1 %2, %3 %4, %5/%6")
+            //                        .arg("Page")
+            //                        .arg(page + 1)
+            //                        .arg(tr("Printed"))
+            //                        .arg(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR2))
+            //                        .arg(hostinfo)
+            //                        .arg(hostusername()), 0);
+            //                p.rtext(fDBParams.at(1));
+            //                page++;
+            //            } else {
+            //                p.br();
+            //            }
+            //            p.line(0, p.fTop, columnsWidth, p.fTop);
+            //            p.line(0, p.fTop + (ui->tblTotal->rowHeight(0) / rowScaleFactor), columnsWidth, p.fTop + (ui->tblTotal->rowHeight(0) / rowScaleFactor));\
+            //            for (int c = 0; c < ui->tbl->columnCount(); c++) {
+            //                if (ui->tbl->columnWidth(c) == 0) {
+            //                    continue;
+            //                }
+            //                if (c > 0) {
+            //                    p.ltext(ui->tblTotal->getString(0, c), (sumOfColumnsWidghtBefore(c) / scaleFactor) + 1);
+            //                    p.line(sumOfColumnsWidghtBefore(c) / scaleFactor, p.fTop, sumOfColumnsWidghtBefore(c) / scaleFactor, p.fTop + (fTableView->verticalHeader()->defaultSectionSize() / rowScaleFactor));
+            //                } else {
+            //                    p.ltext(ui->tblTotal->getString(0, c), 1);
+            //                    p.line(0, p.fTop, 0, p.fTop + (ui->tbl->verticalHeader()->defaultSectionSize() / rowScaleFactor));
+            //                }
+            //            }
+            //            p.line(columnsWidth, p.fTop, columnsWidth, p.fTop + (ui->tblTotal->rowHeight(0) / rowScaleFactor));
+            //        }
+            if (p.checkBr(p.fLineHeight * 4) || r >= ui->tbl->rowCount() - 1) {
+                p.line(0, p.fTop + (ui->tbl->rowHeight(r) / rowScaleFactor), columnsWidth,
+                       p.fTop + (ui->tbl->rowHeight(r) / rowScaleFactor));
+                \
+                p.br();
+                startFrom = r + 1;
+                stopped = startFrom >= ui->tbl->rowCount() - 1;
+                p.fTop = p.fNormalHeight - p.fLineHeight;
+                p.ltext(QString("%1 %2, %3 %4, %5/%6")
+                        .arg("Page")
+                        .arg(page + 1)
+                        .arg(tr("Printed"))
+                        .arg(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR2))
+                        .arg(hostinfo)
+                        .arg(hostusername()), 0);
+                p.rtext(fDBParams.at(1));
+                if (r < ui->tbl->rowCount() - 1) {
+                    p.br(p.fLineHeight * 4);
+                }
+                if (r < ui->tbl->rowCount() - 1) {
+                    page++;
+                }
+                break;
             } else {
-                p.ltext(ui->tbl->getString(r, c), 1);
-                p.line(0, p.fTop, 0, p.fTop + (ui->tbl->rowHeight(r) / rowScaleFactor));
+                p.br();
             }
-            c += s;
         }
-        //last vertical line
-//        p.line(columnsWidth, p.fTop, columnsWidth, p.fTop + (ui->tbl->rowHeight(r) / rowScaleFactor));
-//        if (ui->tblTotal->isVisible() && r == ui->tbl->rowCount() - 1) {
-//            p.setFontBold(true);
-//            if (p.checkBr(ui->tblTotal->rowHeight(0))) {
-//                p.line(0, p.fTop + (ui->tblTotal->rowHeight(0) / rowScaleFactor), columnsWidth, p.fTop + (ui->tblTotal->rowHeight(0) / rowScaleFactor));\
-//                p.br();
-//                stopped = startFrom >= fModel->rowCount() - 1;
-//                p.fTop = p.fNormalHeight - p.fLineHeight;
-//                p.ltext(QString("%1 %2, %3 %4, %5/%6")
-//                        .arg("Page")
-//                        .arg(page + 1)
-//                        .arg(tr("Printed"))
-//                        .arg(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR2))
-//                        .arg(hostinfo)
-//                        .arg(hostusername()), 0);
-//                p.rtext(fDBParams.at(1));
-//                page++;
-//            } else {
-//                p.br();
-//            }
-//            p.line(0, p.fTop, columnsWidth, p.fTop);
-//            p.line(0, p.fTop + (ui->tblTotal->rowHeight(0) / rowScaleFactor), columnsWidth, p.fTop + (ui->tblTotal->rowHeight(0) / rowScaleFactor));\
-//            for (int c = 0; c < ui->tbl->columnCount(); c++) {
-//                if (ui->tbl->columnWidth(c) == 0) {
-//                    continue;
-//                }
-//                if (c > 0) {
-//                    p.ltext(ui->tblTotal->getString(0, c), (sumOfColumnsWidghtBefore(c) / scaleFactor) + 1);
-//                    p.line(sumOfColumnsWidghtBefore(c) / scaleFactor, p.fTop, sumOfColumnsWidghtBefore(c) / scaleFactor, p.fTop + (fTableView->verticalHeader()->defaultSectionSize() / rowScaleFactor));
-//                } else {
-//                    p.ltext(ui->tblTotal->getString(0, c), 1);
-//                    p.line(0, p.fTop, 0, p.fTop + (ui->tbl->verticalHeader()->defaultSectionSize() / rowScaleFactor));
-//                }
-//            }
-//            p.line(columnsWidth, p.fTop, columnsWidth, p.fTop + (ui->tblTotal->rowHeight(0) / rowScaleFactor));
-//        }
-        if (p.checkBr(p.fLineHeight * 4) || r >= ui->tbl->rowCount() - 1) {
-            p.line(0, p.fTop + (ui->tbl->rowHeight(r) / rowScaleFactor), columnsWidth, p.fTop + (ui->tbl->rowHeight(r) / rowScaleFactor));\
-            p.br();
-            startFrom = r + 1;
-            stopped = startFrom >= ui->tbl->rowCount() - 1;
-            p.fTop = p.fNormalHeight - p.fLineHeight;
-            p.ltext(QString("%1 %2, %3 %4, %5/%6")
-                    .arg("Page")
-                    .arg(page + 1)
-                    .arg(tr("Printed"))
-                    .arg(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR2))
-                    .arg(hostinfo)
-                    .arg(hostusername()), 0);
-            p.rtext(fDBParams.at(1));
-            if (r < ui->tbl->rowCount() - 1) {
-                p.br(p.fLineHeight * 4);
-            }
-            if (r < ui->tbl->rowCount() - 1) {
-                page++;
-            }
-            break;
-        } else {
-            p.br();
-        }
-    }
         if (ui->tbl->rowCount() == 0) {
             stopped = true;
         }
     } while (!stopped);
-
-    C5PrintPreview pp(&p, fDBParams);
+    C5PrintPreview pp( &p, fDBParams);
     pp.exec();
 }
 
 void Sales::printTaxReport(int report_type)
 {
-    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
+    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(),
+                 C5Config::taxCashier(), C5Config::taxPin(), this);
     QString jsnin, jsnout, err;
     int result;
     result = pt.printReport(QDateTime(ui->deStart->date()),
@@ -690,26 +688,26 @@ void Sales::on_btnItemBack_clicked()
 {
     DlgReturnItem i;
     i.exec();
-//    QModelIndexList l = ui->tbl->selectionModel()->selectedRows();
-//    if (l.count() == 0) {
-//        C5Message::error(tr("No row selected"));
-//        return;
-//    }
-//    if (ui->tbl->getDouble(l.at(0).row(), 4) < 0) {
-//        C5Message::error(tr("Return inpossible to return, just view"));
-//    }
-//    int col = 1;
-//    switch (fViewMode) {
-//    case VM_ITEMS:
-//        col = 0;
-//        break;
-//    default:
-//        break;
-//    }
-//    QString uuid = ui->tbl->getString(l.at(0).row(), col);
-//    ViewOrder *vo = new ViewOrder(uuid);
-//    vo->exec();
-//    vo->deleteLater();
+    //    QModelIndexList l = ui->tbl->selectionModel()->selectedRows();
+    //    if (l.count() == 0) {
+    //        C5Message::error(tr("No row selected"));
+    //        return;
+    //    }
+    //    if (ui->tbl->getDouble(l.at(0).row(), 4) < 0) {
+    //        C5Message::error(tr("Return inpossible to return, just view"));
+    //    }
+    //    int col = 1;
+    //    switch (fViewMode) {
+    //    case VM_ITEMS:
+    //        col = 0;
+    //        break;
+    //    default:
+    //        break;
+    //    }
+    //    QString uuid = ui->tbl->getString(l.at(0).row(), col);
+    //    ViewOrder *vo = new ViewOrder(uuid);
+    //    vo->exec();
+    //    vo->deleteLater();
 }
 
 void Sales::on_btnRefresh_clicked()
@@ -813,28 +811,28 @@ void Sales::on_btnViewOrder_clicked()
 void Sales::on_btnChangeDate_clicked()
 {
     if (fViewMode != VM_TOTAL) {
-            return;
-        }
-        QDate d;
-        C5Database db(__c5config.replicaDbParams());
-        for (int  i = 0; i < ui->tbl->rowCount(); i++) {
-            if (ui->tbl->item(i, 0)->checkState() == Qt::Checked) {
-                if (!d.isValid()) {
-                    if (!DlgDate::getDate(d)) {
-                        return;
-                    }
-                }
-                db[":f_datecash"] = d;
-                db[":f_id"] = ui->tbl->getString(i, 1);
-                if (!db.exec("update o_header set f_datecash=:f_datecash where f_id=:f_id")) {
-                    C5Message::error(db.fLastError);
+        return;
+    }
+    QDate d;
+    C5Database db(__c5config.replicaDbParams());
+    for (int  i = 0; i < ui->tbl->rowCount(); i++) {
+        if (ui->tbl->item(i, 0)->checkState() == Qt::Checked) {
+            if (!d.isValid()) {
+                if (!DlgDate::getDate(d)) {
                     return;
                 }
             }
+            db[":f_datecash"] = d;
+            db[":f_id"] = ui->tbl->getString(i, 1);
+            if (!db.exec("update o_header set f_datecash=:f_datecash where f_id=:f_id")) {
+                C5Message::error(db.fLastError);
+                return;
+            }
         }
-        if (d.isValid()) {
-            refresh();
-        } else {
-            C5Message::info(tr("Nothing was selected"));
-        }
+    }
+    if (d.isValid()) {
+        refresh();
+    } else {
+        C5Message::info(tr("Nothing was selected"));
+    }
 }

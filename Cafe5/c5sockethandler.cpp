@@ -55,27 +55,27 @@ void C5SocketHandler::send()
     QJsonObject jObj;
     for (QMap<QString, QVariant>::const_iterator it = fBindValues.constBegin(); it != fBindValues.constEnd(); it++) {
         switch (it.value().type()) {
-        case QVariant::Int:
-            jObj[it.key()] = it.value().toInt();
-            break;
-        case QVariant::Double:
-            jObj[it.key()] = it.value().toDouble();
-            break;
-        default:
-            jObj[it.key()] = it.value().toString();
-            break;
+            case QVariant::Int:
+                jObj[it.key()] = it.value().toInt();
+                break;
+            case QVariant::Double:
+                jObj[it.key()] = it.value().toDouble();
+                break;
+            default:
+                jObj[it.key()] = it.value().toString();
+                break;
         }
     }
     QJsonDocument jDoc(jObj);
     QByteArray data = jDoc.toJson();
     int docSize = data.size();
-    if (fSocket->write(reinterpret_cast<const char*>(&docSize), sizeof(quint32)) < 0) {
+    if (fSocket->write(reinterpret_cast<const char * >( &docSize), sizeof(quint32)) < 0) {
         QJsonObject obj;
         obj["reply"] = 0;
         obj["msg"] = QString("Socket error.\r\n%1\r\n%2:%3")
-                .arg(fSocket->errorString())
-                .arg(__socketServerHost)
-                .arg(__socketServerPort);
+                     .arg(fSocket->errorString())
+                     .arg(__socketServerHost)
+                     .arg(__socketServerPort);
         emit handleCommand(obj);
         return;
     }
@@ -93,19 +93,18 @@ void C5SocketHandler::send(QJsonObject &obj)
 {
     for (QMap<QString, QVariant>::const_iterator it = fBindValues.begin(); it != fBindValues.end(); it++) {
         switch (it.value().type()) {
-        case QVariant::Int:
-            obj[it.key()] = it.value().toInt();
-            break;
-        default:
-            obj[it.key()] = it.value().toString();
-            break;
+            case QVariant::Int:
+                obj[it.key()] = it.value().toInt();
+                break;
+            default:
+                obj[it.key()] = it.value().toString();
+                break;
         }
     }
-
     QJsonDocument doc(obj);
     QByteArray data = doc.toJson();
     int docSize = data.length();
-    fSocket->write(reinterpret_cast<const char*>(&docSize), sizeof(quint32));
+    fSocket->write(reinterpret_cast<const char *>( &docSize), sizeof(quint32));
     fSocket->write(data);
     fSocket->flush();
 }
@@ -117,7 +116,6 @@ void C5SocketHandler::close()
 
 void C5SocketHandler::connected()
 {
-
 }
 
 void C5SocketHandler::readyRead()
@@ -125,7 +123,7 @@ void C5SocketHandler::readyRead()
     if (!fReadState) {
         char *c = new char[sizeof(quint32)];
         fSocket->read(c, sizeof(quint32));
-        memcpy(&fDataSize, c, sizeof(quint32));
+        memcpy( &fDataSize, c, sizeof(quint32));
         fReadState = true;
     }
     fData.append(fSocket->readAll());
@@ -149,6 +147,7 @@ void C5SocketHandler::readyRead()
 
 void C5SocketHandler::error(QAbstractSocket::SocketError err)
 {
-    QTcpSocket *s = static_cast<QTcpSocket*>(sender());
+    Q_UNUSED(err);
+    QTcpSocket *s = static_cast<QTcpSocket *>(sender());
     qDebug() << s->errorString();
 }

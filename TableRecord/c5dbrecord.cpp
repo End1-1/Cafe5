@@ -4,11 +4,15 @@
 
 bool TableRecord::getRecord(C5Database &db)
 {
+    Q_UNUSED(db);
     throw std::runtime_error("getRecord() not implemented");
+    return true;
 }
 
 TableRecord &TableRecord::queryRecordOfId(C5Database &db, const QVariant &id)
 {
+    Q_UNUSED(db);
+    Q_UNUSED(id);
     throw std::runtime_error("queryRecord(C5Database &db, const QVariant &id) not implemented");
 }
 

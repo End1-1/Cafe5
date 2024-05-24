@@ -42,7 +42,7 @@ private:
 private slots:
     void tasks();
 
-    void taskFinish(int elapsed, const QByteArray &ba);
+    void taskFinish(const QJsonObject &ba);
 
     void broadcastForClients(QByteArray data);
 
@@ -52,14 +52,12 @@ private slots:
 
     void getSyncError(const QString &err);
 
-    void getSyncObject(int elapsed, const QByteArray &ba);
+    void getSyncObject(const QJsonObject &ba);
 
-    void writeSyncObject(int elapsed, const QByteArray &ba);
-
-    void getLastTime(int elapsed, const QByteArray &ba);
+    void getLastTime(const QJsonObject &ba);
 
 signals:
-    void handleData(RawMessage*, const QByteArray);
+    void handleData(RawMessage *, const QByteArray);
 
     void removeSocketHolder(SslSocket *);
 

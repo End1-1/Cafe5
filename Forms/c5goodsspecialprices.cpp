@@ -43,7 +43,8 @@ QToolBar *C5GoodsSpecialPrices::toolBar()
 
 void C5GoodsSpecialPrices::calcPercent1(const QString &arg1)
 {
-    C5LineEdit *l = static_cast<C5LineEdit*>(sender());
+    Q_UNUSED(arg1);
+    C5LineEdit *l = static_cast<C5LineEdit *>(sender());
     int r, c;
     if (!ui->tbl->findWidget(l, r, c)) {
         return;
@@ -53,7 +54,8 @@ void C5GoodsSpecialPrices::calcPercent1(const QString &arg1)
 
 void C5GoodsSpecialPrices::calcPercent2(const QString &arg1)
 {
-    C5LineEdit *l = static_cast<C5LineEdit*>(sender());
+    Q_UNUSED(arg1);
+    C5LineEdit *l = static_cast<C5LineEdit *>(sender());
     int r, c;
     if (!ui->tbl->findWidget(l, r, c)) {
         return;
@@ -84,7 +86,6 @@ void C5GoodsSpecialPrices::saveDataChanges()
 
 void C5GoodsSpecialPrices::getPrices()
 {
-
     if (fPartner == 0) {
         return;
     }
@@ -93,7 +94,7 @@ void C5GoodsSpecialPrices::getPrices()
     C5Database db(fDBParams);
     db[":f_partner"] = fPartner;
     db.exec("select g.f_id, gr.f_name as f_groupname, g.f_name as f_goodsname, gp.f_price1, gp.f_price2, sp.f_price "
-             "from c_goods g "
+            "from c_goods g "
             "left join c_groups gr on gr.f_id=g.f_group "
             "left join c_goods_prices gp on gp.f_goods=g.f_id "
             "left join c_goods_special_prices sp on sp.f_goods=g.f_id and sp.f_partner=:f_partner "
@@ -135,7 +136,6 @@ void C5GoodsSpecialPrices::filterGoods()
 
 void C5GoodsSpecialPrices::on_tblp_itemActivated(QTableWidgetItem *item)
 {
-
 }
 
 void C5GoodsSpecialPrices::on_tblp_itemClicked(QTableWidgetItem *item)
@@ -149,7 +149,7 @@ void C5GoodsSpecialPrices::on_lePartnerFilter_textChanged(const QString &arg1)
 {
     for (int i = 0; i < ui->tblp->rowCount(); i++) {
         bool h = true;
-        for (int c = 1; c< ui->tblp->columnCount(); c++) {
+        for (int c = 1; c < ui->tblp->columnCount(); c++) {
             if (ui->tblp->getString(i, c).contains(arg1, Qt::CaseInsensitive)) {
                 h = false;
                 break;

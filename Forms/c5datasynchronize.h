@@ -3,9 +3,12 @@
 
 #include "c5dialog.h"
 
-namespace Ui {
+namespace Ui
+{
 class C5DataSynchronize;
 }
+
+class NLoadingDlg;
 
 class C5DataSynchronize : public C5Dialog
 {
@@ -17,6 +20,12 @@ public:
     ~C5DataSynchronize();
 
 private slots:
+    void queryStarted();
+
+    void queryError(const QString &err);
+
+    void queryDone(const QJsonObject &jdoc);
+
     void on_btnSaveSyncTables_clicked();
 
     void on_btnRevert_clicked();
@@ -24,7 +33,7 @@ private slots:
 private:
     Ui::C5DataSynchronize *ui;
 
-    void dropTriggers(C5Database &ds);
+    NLoadingDlg *fLoadingDlg;
 
 };
 

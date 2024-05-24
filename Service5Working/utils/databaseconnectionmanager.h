@@ -19,6 +19,7 @@ class DatabaseConnectionManager
 public:
     DatabaseConnectionManager();
     bool init(const QString &configFile);
+    static bool nodb;
     static bool openSystemDatabase(Database &db);
     static bool openDatabase(Database &db, JsonHandler &jh);
     static bool openDatabase(const QString &name, Database &db, JsonHandler &jh);

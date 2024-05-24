@@ -32,7 +32,7 @@ OHeader::OHeader()
     amountOther = 0;
     amountCashIn = 0;
     amountChange = 0;
-    amountService= 0;
+    amountService = 0;
     amountDiscount = 0;
     serviceFactor = 0;
     discountFactor = 0;
@@ -172,7 +172,8 @@ bool OHeader::write(C5Database &db, QString &err)
     return true;
 }
 
-QString OHeader::humanId() {
+QString OHeader::humanId()
+{
     return QString("%1%2").arg(prefix).arg(hallId);
 }
 
@@ -183,6 +184,7 @@ bool OHeader::hasIdram()
 
 void OHeader::countAmount(QVector<OGoods> &goods, BHistory &bhistory)
 {
+    Q_UNUSED(bhistory);
     amountTotal = 0;
     amountDiscount = 0;
     for (int i = 0; i < goods.count(); i++) {
@@ -190,24 +192,24 @@ void OHeader::countAmount(QVector<OGoods> &goods, BHistory &bhistory)
         g.total = (g.qty / g._qtybox)  * g.price;
         amountTotal += g.total;
         switch (g.discountMode) {
-        case CARD_TYPE_DISCOUNT:
-            g.discountAmount = g.total * g.discountFactor;
-            g.total -= g.discountAmount;
-            amountTotal -= g.discountAmount;
-            amountDiscount += g.discountAmount;
-            break;
-        case CARD_TYPE_ACCUMULATIVE:
-            g.accumulateAmount = g.total * g.discountFactor;
-            break;
-        case CARD_TYPE_COUNT_ORDER:
-            break;
-        case CARD_TYPE_MANUAL:
-            amountTotal -= g.discountAmount;
-            amountDiscount += g.discountAmount;
-            g.total -= g.discountAmount;
-            break;
-        default:
-            break;
+            case CARD_TYPE_DISCOUNT:
+                g.discountAmount = g.total *g.discountFactor;
+                g.total -= g.discountAmount;
+                amountTotal -= g.discountAmount;
+                amountDiscount += g.discountAmount;
+                break;
+            case CARD_TYPE_ACCUMULATIVE:
+                g.accumulateAmount = g.total *g.discountFactor;
+                break;
+            case CARD_TYPE_COUNT_ORDER:
+                break;
+            case CARD_TYPE_MANUAL:
+                amountTotal -= g.discountAmount;
+                amountDiscount += g.discountAmount;
+                g.total -= g.discountAmount;
+                break;
+            default:
+                break;
         }
     }
 }

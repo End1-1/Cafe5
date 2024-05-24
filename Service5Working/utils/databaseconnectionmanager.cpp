@@ -3,6 +3,7 @@
 #include "logwriter.h"
 
 QHash<QString, DatabaseConnection> DatabaseConnectionManager::fDatabaseConnections;
+bool DatabaseConnectionManager::nodb = false;
 
 DatabaseConnectionManager::DatabaseConnectionManager()
 {
@@ -13,6 +14,10 @@ bool DatabaseConnectionManager::init(const QString &configFile)
 {
     if (!configFile.isEmpty()) {
         ConfigIni::init(configFile);
+    }
+    if (ConfigIni::value("db/nodb") == "true") {
+        nodb =true;
+        return true;
     }
     DatabaseConnection dc;
     dc.name = SYSTEM;

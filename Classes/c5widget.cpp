@@ -14,7 +14,6 @@ C5Widget::C5Widget(const QStringList &dbParams, QWidget *parent) :
 
 C5Widget::~C5Widget()
 {
-
 }
 
 QIcon C5Widget::icon()
@@ -63,7 +62,8 @@ QToolBar *C5Widget::createStandartToolbar(const QList<ToolBarButtons> &btn)
             fToolBar->addAction(QIcon(":/save.png"), tr("Save\nchanges"), this, SLOT(saveDataChanges()));
         }
         if (btn.contains(ToolBarButtons::tbFilter)) {
-            auto *a = fToolBar->addAction(QIcon(":/filter_set.png"), tr("Search by\nparameters"), this, SLOT(setSearchParameters()));
+            auto *a = fToolBar->addAction(QIcon(":/filter_set.png"), tr("Search by\nparameters"), this,
+                                          SLOT(setSearchParameters()));
             a->setProperty("filter", true);
         }
         if (btn.contains(ToolBarButtons::tbClearFilter)) {
@@ -84,12 +84,10 @@ QToolBar *C5Widget::createStandartToolbar(const QList<ToolBarButtons> &btn)
 
 void C5Widget::nextChild()
 {
-
 }
 
 void C5Widget::print()
 {
-
 }
 
 QWidget *C5Widget::widget()
@@ -111,20 +109,20 @@ void C5Widget::selectorCallback(int row, const QList<QVariant> &values)
 bool C5Widget::event(QEvent *event)
 {
     if (event->type() == QEvent::KeyRelease) {
-        QKeyEvent *ke = static_cast<QKeyEvent*>(event);
+        QKeyEvent *ke = static_cast<QKeyEvent *>(event);
         switch (ke->key()) {
-        case Qt::Key_Enter:
-        case Qt::Key_Return:
-            if (ke->modifiers() & Qt::ControlModifier) {
-                break;
-            } else {
-                if (fFocusNextChild) {
-                    focusNextChild();
+            case Qt::Key_Enter:
+            case Qt::Key_Return:
+                if (ke->modifiers() &Qt::ControlModifier) {
+                    break;
                 } else {
-                    nextChild();
+                    if (fFocusNextChild) {
+                        focusNextChild();
+                    } else {
+                        nextChild();
+                    }
+                    return true;
                 }
-                return true;
-            }
         }
     }
     return QWidget::event(event);
@@ -150,5 +148,7 @@ bool C5Widget::parseBroadcastMessage(int what, const QString &msg, QString &repl
 
 bool C5Widget::reportHandler(const QString &handleId, const QVariant &data)
 {
+    Q_UNUSED(handleId);
+    Q_UNUSED(data);
     return true;
 }

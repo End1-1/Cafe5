@@ -1,5 +1,6 @@
 SOURCES += \
     $$PWD/../Classes/c5servername.cpp \
+    $$PWD/dlgsplashscreen.cpp \
     ../../NewTax/Src/printtaxn.cpp \
     ../../XLSX/src/xlsx.cpp \
     ../../XLSX/src/xlsxborder.cpp \
@@ -55,7 +56,6 @@ SOURCES += \
     ../Classes/calculator.cpp \
     ../Classes/checkforupdatethread.cpp \
     ../Classes/dlgpassword.cpp \
-    ../Classes/doubledatabase.cpp \
     ../Classes/fileversion.cpp \
     ../Classes/idram.cpp \
     ../Classes/notificationwidget.cpp \
@@ -134,6 +134,7 @@ SOURCES += \
 
 HEADERS += \
     $$PWD/../Classes/c5servername.h \
+    $$PWD/dlgsplashscreen.h \
     ../../NewTax/Src/printtaxn.h \
     ../../XLSX/src/crs32.h \
     ../../XLSX/src/xlsx.h \
@@ -193,7 +194,6 @@ HEADERS += \
     ../Classes/calculator.h \
     ../Classes/checkforupdatethread.h \
     ../Classes/dlgpassword.h \
-    ../Classes/doubledatabase.h \
     ../Classes/fileversion.h \
     ../Classes/idram.h \
     ../Classes/notificationwidget.h \
@@ -241,7 +241,6 @@ HEADERS += \
     ../Forms/touchdlgphonenumber.h \
     ../Forms/touchentertaxreceiptnumber.h \
     ../Forms/touchselecttaxreport.h \
-    ../Service/servicecommands.h \
     ../Service5Working/utils/logwriter.h \
     ../TableRecord/aheader.h \
     ../TableRecord/bclientdebts.h \
@@ -275,6 +274,7 @@ HEADERS += \
     ../Classes/c5user.h
 
 FORMS += \
+    $$PWD/dlgsplashscreen.ui \
     ../Cafe5/calendar.ui \
     ../Cafe5/dlgexitbyversion.ui \
     ../Classes/c5gridgilter.ui \
@@ -312,6 +312,7 @@ INCLUDEPATH += c:/projects/cafe5/Service
 INCLUDEPATH += c:/projects/cafe5/TableRecord
 INCLUDEPATH += c:/projects/cafe5/service5working/utils
 INCLUDEPATH += c:/projects/cafe5/DbData
+INCLUDEPATH += c:/projects/cafe5/NTable
 INCLUDEPATH += c:/projects/cafe5/Forms
 INCLUDEPATH += c:/Projects/NewTax/Src
 INCLUDEPATH += /projects/xlsx/src

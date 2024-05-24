@@ -14,9 +14,9 @@ class C5WaiterOrderDoc : public QObject
 public:
     C5WaiterOrderDoc();
 
-    C5WaiterOrderDoc(const QString &id, C5Database &db);
-
     C5WaiterOrderDoc(const QString &id, C5Database &db, bool openlatter);
+
+    C5WaiterOrderDoc(const QString &id, C5Database &db);
 
     C5WaiterOrderDoc(C5Database &db, QJsonObject &jh, QJsonArray &jb);
 

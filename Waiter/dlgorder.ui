@@ -302,7 +302,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="btnModificators">
+                <widget class="QPushButton" name="btnQR">
                  <property name="minimumSize">
                   <size>
                    <width>50</width>
@@ -319,8 +319,8 @@
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset resource="../resources/res.qrc">
-                   <normaloff>:/sauces.png</normaloff>:/sauces.png</iconset>
+                  <iconset resource="../resources/resources.qrc">
+                   <normaloff>:/qrcode.png</normaloff>:/qrcode.png</iconset>
                  </property>
                  <property name="iconSize">
                   <size>

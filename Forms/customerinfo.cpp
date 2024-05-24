@@ -74,15 +74,10 @@ void CustomerInfo::on_pushButton_clicked()
     accept();
 }
 
-void CustomerInfo::on_lePhone_textEdited(const QString &arg1)
-{
-
-}
-
 void CustomerInfo::on_lePhone_returnPressed()
 {
     QString phone = ui->lePhone->text();
-    if (phone.length() == 12){
+    if (phone.length() == 12) {
         if (phone.at(3) != ' ' && phone.at(6) != '-' && phone.at(8) != '-') {
             C5Message::error(tr("Invalid phone number"));
             return;
@@ -91,7 +86,7 @@ void CustomerInfo::on_lePhone_returnPressed()
         C5Message::error(tr("Invalid phone number"));
         return;
     }
-    if (phone.length() == 9){
+    if (phone.length() == 9) {
         phone.insert(3, " ");
         phone.insert(6, "-");
         phone.insert(9, "-");

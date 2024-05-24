@@ -78,7 +78,6 @@ void C5SalaryDoc::save()
         C5Message::error(error);
         return;
     }
-
     C5Database db(fDBParams);
     db[":f_date"] = ui->deDate->date();
     db.exec("delete from s_salary_attendance where f_date=:f_date");
@@ -148,7 +147,8 @@ void C5SalaryDoc::on_btnAddEmployee_clicked()
         ui->tbl->setString(row, 4, db.getString(1));
         ui->tbl->getWidget<C5DateEdit>(row, 6)->setDate(ui->deDate->date());
         ui->tbl->lineEdit(row, 7)->setText(db.getString("f_starttime"));
-        QDateTime dt = QDateTime::fromString(QString("%1 %2").arg(ui->deDate->text(), ui->tbl->lineEdit(row, 7)->text()), "dd/MM/yyyy HH:mm:ss");
+        QDateTime dt = QDateTime::fromString(QString("%1 %2").arg(ui->deDate->text(), ui->tbl->lineEdit(row, 7)->text()),
+                                             "dd/MM/yyyy HH:mm:ss");
         dt = dt.addSecs(60 * 60 * db.getInt("f_duration"));
         ui->tbl->getWidget<C5DateEdit>(row, 8)->setDate(dt.date());
         ui->tbl->lineEdit(row, 9)->setText(dt.time().toString("HH:mm:ss"));
@@ -175,10 +175,10 @@ int C5SalaryDoc::newRow()
     l1->setValidator(new QDoubleValidator(0, 999999999, 2));
     connect(l1, SIGNAL(textChanged(QString)), this, SLOT(countAmounts(QString)));
     l1->setFocus();
-    C5DateEdit *ld1 = ui->tbl->createWidget<C5DateEdit>(row, 6);
-    C5LineEdit *lt1 = ui->tbl->createLineEdit(row, 7);
-    C5DateEdit *ld2 = ui->tbl->createWidget<C5DateEdit>(row, 8);
-    C5LineEdit *lt2 = ui->tbl->createLineEdit(row, 9);
+    ui->tbl->createWidget<C5DateEdit>(row, 6);
+    ui->tbl->createLineEdit(row, 7);
+    ui->tbl->createWidget<C5DateEdit>(row, 8);
+    ui->tbl->createLineEdit(row, 9);
     return row;
 }
 
@@ -229,8 +229,10 @@ double C5SalaryDoc::salaryOfPosition(C5Database &db, int pos, int worker)
         return -1;
     }
     if (dep > 0) {
-        db[":f_printtime1"] = QDateTime::fromString(date1.toString("dd/MM/yyyy") + " " + time1.toString("HH:mm:ss"), "dd/MM/yyyy HH:mm:ss");
-        db[":f_printtime2"] = QDateTime::fromString(date2.toString("dd/MM/yyyy") + " " + time2.toString("HH:mm:ss"), "dd/MM/yyyy HH:mm:ss");
+        db[":f_printtime1"] = QDateTime::fromString(date1.toString("dd/MM/yyyy") + " " + time1.toString("HH:mm:ss"),
+                              "dd/MM/yyyy HH:mm:ss");
+        db[":f_printtime2"] = QDateTime::fromString(date2.toString("dd/MM/yyyy") + " " + time2.toString("HH:mm:ss"),
+                              "dd/MM/yyyy HH:mm:ss");
         db[":f_state"] = 1;
         db[":f_position"] = pos;
         db.exec("select sum(b.f_total * (p2.f_salary_percent / 100)) from o_body b "
@@ -255,7 +257,7 @@ double C5SalaryDoc::salaryOfPosition(C5Database &db, int pos, int worker)
         db[":f_owntotal"] = own;
         db[":f_staff"] = worker;
         db.exec("select sum(oh.f_amounttotal) * :f_owntotal from o_header oh "
-                        "where oh.f_state=:f_state and oh.f_datecash=:f_datecash and oh.f_staff=:f_staff");
+                "where oh.f_state=:f_state and oh.f_datecash=:f_datecash and oh.f_staff=:f_staff");
         db.nextRow();
         own = db.getDouble(0);
     }
@@ -283,4 +285,3 @@ void C5SalaryDoc::on_deDate_returnPressed()
 {
     openDoc(ui->deDate->date());
 }
-

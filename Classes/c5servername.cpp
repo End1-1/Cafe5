@@ -12,10 +12,9 @@ QJsonArray C5ServerName::mServers;
 
 C5ServerName::C5ServerName(const QString &server, const QString &route, QObject *parent)
     : QObject{parent},
-    mServer(server),
-    mRoute(route)
+      mServer(server),
+      mRoute(route)
 {
-
 }
 
 bool C5ServerName::getServers(const QString &name)
@@ -35,18 +34,17 @@ bool C5ServerName::getServers(const QString &name)
     QJsonObject jo;
     jo["key"] = "asdf7fa8kk49888d!!jjdjmskkak98983mj???m";
     jo["params"] = mParams;
-
     auto *r = m.post(rq, QJsonDocument(jo).toJson(QJsonDocument::Compact));
     while (!r->isFinished()) {
         qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
         QThread::msleep(10);
     }
     if (r->error() != QNetworkReply::NoError) {
-        C5Message::error(r->errorString());
+        C5Message::error(r->errorString() + "<br>" + r->readAll());
         return false;
     }
     QByteArray ba = r->readAll();
     mServers = QJsonDocument::fromJson(ba).array();
     qDebug() << mServers;
-
+    return true;
 }

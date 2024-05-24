@@ -15,7 +15,8 @@ class SocketThread : public QObject
     Q_OBJECT
 
 public:
-    SocketThread(int handle, const QSslCertificate &cert, const QSslKey &key, QSsl::SslProtocol proto, const QList<QSslCertificate> chain);
+    SocketThread(int handle, const QSslCertificate &cert, const QSslKey &key, QSsl::SslProtocol proto,
+                 const QList<QSslCertificate> chain);
     ~SocketThread();
     SslSocket *fSslSocket;
 
@@ -37,16 +38,14 @@ private:
     quint32 fMessageNumber;
     quint32 fMessageId;
     QByteArray fData;
-    SocketType fSocketType;
     QString fMethodString;
     QHash<QString, DataAddress> fHttpHeader;
     QHash<QString, DataAddress> fRequestBody;
     ContentType fContentType;
     int fHeaderLength;
-    quint32 fContentLenght;
+    int fContentLenght;
     quint16 fMessageListData;
     QString fBoundary;
-    void rawRequest();
     void httpRequest();
     HttpRequestMethod parseRequest(HttpRequestMethod &requestMethod, QString &httpVersion, QString &route);
     void parseBody(quint16 msgType, const QByteArray &data);

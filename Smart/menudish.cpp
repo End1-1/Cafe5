@@ -5,8 +5,8 @@
 
 MenuDish::MenuDish(Dish *d, bool groupVisible) :
     QWidget(nullptr),
-    ui(new Ui::menudish),
-    fDish(d)
+    fDish(d),
+    ui(new Ui::menudish)
 {
     ui->setupUi(this);
     ui->lbCalcWarning->setVisible(false);

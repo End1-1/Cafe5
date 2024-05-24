@@ -57,13 +57,16 @@ QToolBar *StoreInputDocument::toolBar()
 
 void StoreInputDocument::qtyChanged(const QString &arg1)
 {
+    Q_UNUSED(arg1);
     int row, col;
-    if (!ui->tbl->findWidget(static_cast<QWidget*>(sender()), row, col)) {
+    if (!ui->tbl->findWidget(static_cast<QWidget * >(sender()), row, col)) {
         return;
     }
     disconnectSlotSignal(row);
-    ui->tbl->lineEdit(row, col_qtybox)->setDouble(ui->tbl->lineEdit(row, col_qty)->getDouble() / ui->tbl->getDouble(row, col_qtyinbox));
-    ui->tbl->lineEdit(row, col_total)->setDouble(ui->tbl->lineEdit(row, col_qtybox)->getDouble() * ui->tbl->lineEdit(row, col_price)->getDouble());
+    ui->tbl->lineEdit(row, col_qtybox)->setDouble(ui->tbl->lineEdit(row, col_qty)->getDouble() / ui->tbl->getDouble(row,
+            col_qtyinbox));
+    ui->tbl->lineEdit(row, col_total)->setDouble(ui->tbl->lineEdit(row, col_qtybox)->getDouble() *ui->tbl->lineEdit(row,
+            col_price)->getDouble());
     connectSlotSignal(row);
     countTotal();
 }
@@ -71,12 +74,14 @@ void StoreInputDocument::qtyChanged(const QString &arg1)
 void StoreInputDocument::qtyBoxChanged(const QString &arg1)
 {
     int row, col;
-    if (!ui->tbl->findWidget(static_cast<QWidget*>(sender()), row, col)) {
+    if (!ui->tbl->findWidget(static_cast<QWidget * >(sender()), row, col)) {
         return;
     }
     disconnectSlotSignal(row);
-    ui->tbl->lineEdit(row, col_qty)->setDouble(ui->tbl->lineEdit(row, col_qtybox)->getDouble() * ui->tbl->getDouble(row, col_qtyinbox));
-    ui->tbl->lineEdit(row, col_total)->setDouble(ui->tbl->lineEdit(row, col_qtybox)->getDouble() * ui->tbl->lineEdit(row, col_price)->getDouble());
+    ui->tbl->lineEdit(row, col_qty)->setDouble(ui->tbl->lineEdit(row, col_qtybox)->getDouble() *ui->tbl->getDouble(row,
+            col_qtyinbox));
+    ui->tbl->lineEdit(row, col_total)->setDouble(ui->tbl->lineEdit(row, col_qtybox)->getDouble() *ui->tbl->lineEdit(row,
+            col_price)->getDouble());
     connectSlotSignal(row);
     countTotal();
 }
@@ -84,11 +89,12 @@ void StoreInputDocument::qtyBoxChanged(const QString &arg1)
 void StoreInputDocument::priceChanged(const QString &arg1)
 {
     int row, col;
-    if (!ui->tbl->findWidget(static_cast<QWidget*>(sender()), row, col)) {
+    if (!ui->tbl->findWidget(static_cast<QWidget * >(sender()), row, col)) {
         return;
     }
     disconnectSlotSignal(row);
-    ui->tbl->lineEdit(row, col_total)->setDouble(ui->tbl->lineEdit(row, col_qtybox)->getDouble() * ui->tbl->lineEdit(row, col_price)->getDouble());
+    ui->tbl->lineEdit(row, col_total)->setDouble(ui->tbl->lineEdit(row, col_qtybox)->getDouble() *ui->tbl->lineEdit(row,
+            col_price)->getDouble());
     connectSlotSignal(row);
     countTotal();
 }
@@ -96,13 +102,14 @@ void StoreInputDocument::priceChanged(const QString &arg1)
 void StoreInputDocument::totalChanged(const QString &arg1)
 {
     int row, col;
-    if (!ui->tbl->findWidget(static_cast<QWidget*>(sender()), row, col)) {
+    if (!ui->tbl->findWidget(static_cast<QWidget * >(sender()), row, col)) {
         return;
     }
     if (ui->tbl->lineEdit(row, col_qtybox)->getDouble() < 0.001) {
         return;
     }
-    ui->tbl->lineEdit(row, col_price)->setDouble(ui->tbl->lineEdit(row, col_total)->getDouble() / ui->tbl->lineEdit(row, col_qtybox)->getDouble());
+    ui->tbl->lineEdit(row, col_price)->setDouble(ui->tbl->lineEdit(row, col_total)->getDouble() / ui->tbl->lineEdit(row,
+            col_qtybox)->getDouble());
     countTotal();
 }
 
@@ -180,7 +187,6 @@ void StoreInputDocument::on_toolButton_clicked()
     }
     ui->leStore->setProperty("f_id", vals.at(1));
     ui->leStore->setText(vals.at(2).toString());
-
     C5Database db(fDBParams);
     C5StoreDraftWriter dw(db);
     ui->leDocnum->setPlaceholderText(dw.storeDocNum(DOC_TYPE_STORE_INPUT, vals.at(1).toInt(), false, 0));
@@ -236,7 +242,6 @@ void StoreInputDocument::saveDoc()
     } else {
         db.update("a_header", "f_id", ui->leDocnum->property("f_id"));
     }
-
     db[":f_document"] = ui->leDocnum->property("f_id");
     db.exec("delete from a_store_draft where f_document=:f_document");
     for (int i = 0; i < ui->tbl->rowCount(); i++) {
@@ -253,7 +258,6 @@ void StoreInputDocument::saveDoc()
         db[":f_base"] = ui->tbl->getString(i, col_uuid);
         db[":f_row"] = i;
         db.insert("a_store_draft", false);
-
         db[":f_id"] = ui->tbl->getString(i, col_uuid);
         db[":f_document"] = ui->leDocnum->property("f_id");
         db[":f_store"] = ui->leStore->property("f_id");
@@ -266,15 +270,12 @@ void StoreInputDocument::saveDoc()
         db[":f_base"] = ui->tbl->getString(i, col_uuid);
         db[":f_basedoc"] = ui->leDocnum->property("f_id");
         db.insert("a_store", false);
-
         db[":f_id"] = ui->tbl->getString(i, col_uuid);
         db[":f_document"] = ui->leDocnum->property("f_id");
-        db[":f_date"] = static_cast<C5DateEdit*>(ui->tbl->cellWidget(i, col_valid))->date();
+        db[":f_date"] = static_cast<C5DateEdit *>(ui->tbl->cellWidget(i, col_valid))->date();
         db.insert("a_store_valid", false);
-
-        db[":f_lastvaliddate"] = static_cast<C5DateEdit*>(ui->tbl->cellWidget(i, col_valid))->date();
+        db[":f_lastvaliddate"] = static_cast<C5DateEdit *>(ui->tbl->cellWidget(i, col_valid))->date();
         db.update("c_goods_option", "f_id", ui->tbl->getInteger(i, col_goodsid));
-
         db[":f_lastinputprice"] = ui->tbl->getDouble(i, col_price);
         db.update("c_goods", "f_id", ui->tbl->getInteger(i, col_goodsid));
     }
@@ -297,10 +298,8 @@ bool StoreInputDocument::openDoc(const QString &id)
     ui->lePartner->setProperty("f_id", db.getInt("f_partner"));
     ui->leComment->setText(db.getString("f_comment"));
     ui->leTotal->setDouble(db.getDouble("f_amount"));
-
     fSave->setEnabled(db.getInt("f_state") != DOC_STATE_SAVED);
     fDraft->setEnabled(db.getInt("f_state") == DOC_STATE_SAVED);
-
     db[":f_document"] = id;
     db.exec("select d.f_id, d.f_store, d.f_goods, g.f_scancode, gr.f_name as f_groupname, g.f_name as f_goodsname, "
             "d.f_qty, g.f_qtybox, u.f_name as f_unitname, d.f_price, d.f_total "
@@ -320,7 +319,7 @@ bool StoreInputDocument::openDoc(const QString &id)
         ui->tbl->setDouble(row, col_qtyinbox, db.getDouble("f_qtybox"));
         ui->tbl->setDouble(row, col_saleprice, 0);
         ui->tbl->lineEdit(row, col_price)->setDouble(db.getDouble("f_price"));
-        ui->tbl->lineEdit(row, col_qty)->setDouble(db.getDouble("f_qtybox") * db.getDouble("f_qty"));
+        ui->tbl->lineEdit(row, col_qty)->setDouble(db.getDouble("f_qtybox") *db.getDouble("f_qty"));
         ui->tbl->lineEdit(row, col_qtybox)->setDouble(db.getDouble("f_qty"));
         ui->tbl->lineEdit(row, col_total)->setDouble(db.getDouble("f_total"));
         connectSlotSignal(row);
@@ -328,17 +327,15 @@ bool StoreInputDocument::openDoc(const QString &id)
             ui->leStore->setProperty("f_id", db.getInt("f_store"));
         }
     }
-
     db[":f_id"] = ui->leStore->property("f_id");
     db.exec("select * from c_storages where f_id=:f_id");
     db.nextRow();
     ui->leStore->setText(db.getString("f_name"));
-
     db[":f_id"] = ui->lePartner->property("f_id");
     db.exec("select * from c_partners where f_id=:f_id");
     if (db.nextRow()) {
-    db.nextRow();
-    ui->lePartner->setText(db.getString("f_name"));
+        db.nextRow();
+        ui->lePartner->setText(db.getString("f_name"));
     }
 }
 
@@ -354,7 +351,7 @@ void StoreInputDocument::setLastInputPrices()
         for (int j = 0; j < db.rowCount(); j++) {
             if (ui->tbl->getInteger(i, 2) == db.getInt(j, "f_goods")) {
                 ui->tbl->lineEdit(i, 10)->setDouble(db.getDouble(j, "f_lastinputprice"));
-                ui->tbl->lineEdit(i, 11)->setDouble(ui->tbl->lineEdit(i, 6)->getDouble() * db.getDouble(j, "f_lastinputprice"));
+                ui->tbl->lineEdit(i, 11)->setDouble(ui->tbl->lineEdit(i, 6)->getDouble() *db.getDouble(j, "f_lastinputprice"));
                 break;
             }
         }
@@ -386,7 +383,6 @@ bool StoreInputDocument::draftDoc()
     db.startTransaction();
     db[":f_document"] = ui->leDocnum->property("f_id");
     db.exec("delete from a_store where f_document=:f_document");
-
     db[":f_state"] = DOC_STATE_DRAFT;
     db.update("a_header", "f_id",  ui->leDocnum->property("f_id"));
     db.commit();
@@ -401,7 +397,7 @@ void StoreInputDocument::removeDocument()
         return;
     }
     if (C5StoreDoc::removeDoc(fDBParams, ui->leDocnum->property("f_id").toString(), false)) {
-       __mainWindow->removeTab(this);
+        __mainWindow->removeTab(this);
     }
 }
 
@@ -418,7 +414,6 @@ void StoreInputDocument::on_btnSetPartner_clicked()
     ui->lePartner->setProperty("f_id", vals.at(1));
     ui->lePartner->setText(vals.at(2).toString());
 }
-
 
 void StoreInputDocument::on_leScancode_returnPressed()
 {
@@ -446,7 +441,6 @@ void StoreInputDocument::on_leScancode_returnPressed()
         ui->tbl->lineEdit(row, col_price)->setPlaceholderText(float_str(db.getDouble("f_lastinputprice"), 2));
         ui->tbl->lineEdit(row, col_qty)->setFocus();
         connectSlotSignal(row);
-
         if (ui->leStore->property("f_id").toInt() > 0) {
             C5Database db(fDBParams);
             db[":f_store"] = ui->leStore->property("f_id");
@@ -456,7 +450,6 @@ void StoreInputDocument::on_leScancode_returnPressed()
                 ui->tbl->setDouble(row,  col_stock, db.getDouble("f_qty"));
             }
         }
-
         db[":f_id"] = id;
         db.exec("select f_lastvaliddate from c_goods_option where f_id=:f_id");
         if (db.nextRow()) {
@@ -464,11 +457,9 @@ void StoreInputDocument::on_leScancode_returnPressed()
             if (!date.isValid()) {
                 date = QDate::currentDate();
             }
-            static_cast<C5DateEdit*>(ui->tbl->cellWidget(row, col_valid))->setDate(date);
+            static_cast<C5DateEdit * >(ui->tbl->cellWidget(row, col_valid))->setDate(date);
         }
     }
-
-
 }
 
 void StoreInputDocument::on_btnEditGoods_clicked()

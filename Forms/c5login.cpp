@@ -17,15 +17,6 @@ C5Login::~C5Login()
     delete ui;
 }
 
-int C5Login::exec()
-{
-    if (__autologin_store.count() > 0) {
-        on_btnOk_clicked();
-        return result();
-    }
-    return C5Dialog::exec();
-}
-
 void C5Login::on_btnCancel_clicked()
 {
     reject();
@@ -37,16 +28,13 @@ void C5Login::on_btnOk_clicked()
         __user = new C5User(0);
     }
     if (!__user->authByUsernamePass(ui->leUsername->currentText(), ui->lePassword->text())) {
-        __autologin_store.clear();
         C5Message::error(tr("Login failed"));
         return;
     }
     if (!__user->isActive()) {
-        __autologin_store.clear();
         C5Message::error(tr("User is inactive"));
         return;
     }
-
     for (int i = 0; i < fServers.size(); i++) {
         QJsonObject js = fServers.at(i).toObject();
         js["lastusername"] = "";
@@ -58,11 +46,10 @@ void C5Login::on_btnOk_clicked()
     js["lastusername"] = ui->leUsername->currentText();
     js["lastdb"] = ui->cbDatabases->currentText();
     fServers[index] = js;
-    QSettings s(_ORGANIZATION_, _APPLICATION_+ QString("\\") + _MODULE_);
+    QSettings s(_ORGANIZATION_, _APPLICATION_ + QString("\\") + _MODULE_);
     s.setValue("servers", QJsonDocument(fServers).toJson());
     accept();
 }
-
 
 void C5Login::on_cbDatabases_currentIndexChanged(int index)
 {
@@ -71,7 +58,6 @@ void C5Login::on_cbDatabases_currentIndexChanged(int index)
         js["current"] = i == index;
         fServers[i] = js;
     }
-
     const QJsonObject &js = fServers.at(index).toObject();
     C5Config::fDBHost = js["host"].toString();
     C5Config::fDBPath = js["database"].toString();
@@ -80,7 +66,6 @@ void C5Login::on_cbDatabases_currentIndexChanged(int index)
     C5Config::fSettingsName = js["settings"].toString();
     C5Config::fLastUsername = js["lastusername"].toString();
     C5Config::fFullScreen = js["fullscreen"].toBool();
-
     C5Database db(js);
     db.exec("select f_login from s_user where f_id in (select f_user from s_db_access where f_permit=1)");
     ui->leUsername->clear();
@@ -108,4 +93,3 @@ void C5Login::readServers()
     }
     ui->cbDatabases->setCurrentIndex(dbindex);
 }
-

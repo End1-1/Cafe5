@@ -21,7 +21,7 @@ public:
 
     static void showSales(Working *w, C5User *u);
 
-    static bool printCheckWithTax(C5Database &db, const QString &id, QString &rseq);
+    static bool printCheckWithTax(C5Database &db, const QString &id);
 
     static bool printReceipt(const QString &id);
 

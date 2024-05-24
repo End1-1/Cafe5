@@ -37,7 +37,7 @@ void DlgNewCL::on_btnOK_clicked()
         return;
     }
     DoubleDatabase fDD;
-    fDD.open(true, true);
+    fDD.open();
     fDD[":f_name"] = ui->leName->text();
     ui->leCode->setInteger(fDD.insert("f_city_ledger"));
     accept();

@@ -29,14 +29,13 @@ void C5TempSale::openDraft()
     if (Working::working()->findDraft(draftId)) {
         return;
     }
-    C5Database db(__c5config.replicaDbParams()); 
+    C5Database db(__c5config.replicaDbParams());
     db[":f_id"] = draftId;
     db.exec("select * from o_draft_sale where f_id=:f_id");
     ODraftSale ds;
     ds.getRecord(db);
     WOrder *wo = Working::working()->newSale(ds.saleType);
     wo->fDraftSale.id = ds.id;
-
     QJsonObject params;
     params["f_header"] = wo->fDraftSale.id.toString();
     params["f_store"] = __c5config.defaultStore();
@@ -57,16 +56,6 @@ void C5TempSale::openDraft()
                             jo["f_price2"].toDouble());
         wo->changeQty(jo["f_qty"].toDouble());
     }
-
-//    db[":f_header"] = wo->fDraftSale.id;
-//    db.exec("select b.f_goods, b.f_id, b.f_qty, cp.f_price1, cp.f_price2 "
-//            "from o_draft_sale_body b "
-//            "left join c_goods_prices cp on cp.f_goods=b.f_goods and cp.f_currency=1 "
-//            "where f_header=:f_header and f_state=1 ");
-//    while (db.nextRow()) {
-//        wo->addGoodsToTable(db.getInt("f_goods"), true, 0, db.getString("f_id"), db.getDouble("f_price1"), db.getDouble("f_price2"));
-//        wo->changeQty(db.getDouble("f_qty"));
-//    }
 }
 
 void C5TempSale::on_tbl_itemDoubleClicked(QTableWidgetItem *item)

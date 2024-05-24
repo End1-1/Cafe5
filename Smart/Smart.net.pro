@@ -21,6 +21,7 @@ RC_FILE = res.rc
 DEFINES += QT_DEPRECATED_WARNINGS
 DEFINES += WAITER
 DEFINES += NETWORKDB
+DEFINES += SMART
 
 win32: QMAKE_CXXFLAGS_RELEASE -= -Zc:strictStrings
 win32: QMAKE_CFLAGS_RELEASE -= -Zc:strictStrings
@@ -63,3 +64,21 @@ LIBS += -llibcrypto
 RESOURCES += \
     ../resources/resources.qrc \
     transres.qrc
+
+FORMS += \
+    ../NTable/nloadingdlg.ui
+
+HEADERS += \
+    ../NTable/ndataprovider.h \
+    ../NTable/nloadingdlg.h
+
+SOURCES += \
+    ../NTable/ndataprovider.cpp \
+    ../NTable/nloadingdlg.cpp
+
+win32-g++ {
+   QMAKE_CXXFLAGS += -Werror
+}
+win32-msvc*{
+   QMAKE_CXXFLAGS += /WX
+}

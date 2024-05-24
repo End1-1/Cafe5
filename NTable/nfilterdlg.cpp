@@ -106,16 +106,16 @@ QJsonObject NFilterDlg::filter() const
 {
     QJsonObject jo;
     const QObjectList &wl = children();
-    for (QObject *o: wl) {
+    for (QObject *o : wl) {
         if (!o->property("field").toString().isEmpty()) {
             if (o->property("type").toString() == "date"
-                || o->property("type").toString() == "date1"
-                || o->property("type").toString() == "date2") {
-                jo[o->property("field").toString()] = static_cast<C5DateEdit*>(o)->date().toString("yyyy-MM-dd");
+                    || o->property("type").toString() == "date1"
+                    || o->property("type").toString() == "date2") {
+                jo[o->property("field").toString()] = static_cast<C5DateEdit *>(o)->date().toString("yyyy-MM-dd");
             } else if (o->property("type").toString() == "combo") {
-                jo[o->property("field").toString()] = static_cast<QComboBox*>(o)->currentData().toInt();
+                jo[o->property("field").toString()] = static_cast<QComboBox *>(o)->currentData().toInt();
             } else if (o->property("type").toString() == "keyvalue") {
-                jo[o->property("field").toString()] = static_cast<QLineEdit*>(o)->text();
+                jo[o->property("field").toString()] = static_cast<QLineEdit *>(o)->text();
             }
         }
     }
@@ -125,16 +125,16 @@ QJsonObject NFilterDlg::filter() const
 QVariant NFilterDlg::filterValue(const QString &name)
 {
     const QObjectList &wl = children();
-    for (QObject *o: wl) {
+    for (QObject *o : wl) {
         if (o->property("field").toString() == name) {
             if (o->property("type").toString() == "date"
-                || o->property("type").toString() == "date1"
-                || o->property("type").toString() == "date2") {
-                return static_cast<C5DateEdit*>(o)->date().toString("yyyy-MM-dd");
+                    || o->property("type").toString() == "date1"
+                    || o->property("type").toString() == "date2") {
+                return static_cast<C5DateEdit *>(o)->date().toString("yyyy-MM-dd");
             } else if (o->property("type").toString() == "combo") {
-                return static_cast<QComboBox*>(o)->currentData().toInt();
+                return static_cast<QComboBox *>(o)->currentData().toInt();
             } else if (o->property("type").toString() == "keyvalue") {
-                return static_cast<QLineEdit*>(o)->text();
+                return static_cast<QLineEdit *>(o)->text();
             }
         }
     }
@@ -144,11 +144,11 @@ QVariant NFilterDlg::filterValue(const QString &name)
 void NFilterDlg::clear()
 {
     const QObjectList &wl = children();
-    for (QObject *o: wl) {
-        auto *btn = dynamic_cast<QPushButton*>(o);
+    for (QObject *o : wl) {
+        auto *btn = dynamic_cast<QPushButton *>(o);
         if (btn) {
-            auto *c = btn->property("lineedit").value<C5LineEdit*>();
-            auto *l = btn->property("label").value<QLabel*>();
+            auto *c = btn->property("lineedit").value<C5LineEdit *>();
+            auto *l = btn->property("label").value<QLabel *>();
             if (c) {
                 c->clear();
             }
@@ -161,9 +161,9 @@ void NFilterDlg::clear()
 
 void NFilterDlg::openSuggestions()
 {
-    auto *btn = static_cast<QPushButton*>(sender());
-    auto *c = btn->property("lineedit").value<C5LineEdit*>();
-    auto *l = btn->property("label").value<QLabel*>();
+    auto *btn = static_cast<QPushButton *>(sender());
+    auto *c = btn->property("lineedit").value<C5LineEdit *>();
+    auto *l = btn->property("label").value<QLabel *>();
     if (mData.contains(btn->property("filter").toString())) {
         QPoint btnPos = c->pos();
         btnPos.setY(btnPos.y() + c->height());
@@ -198,29 +198,16 @@ void NFilterDlg::queryError(const QString &error)
     mLoadingDlg->deleteLater();
 }
 
-void NFilterDlg::queryFinished(int elapsed, const QByteArray &ba)
+void NFilterDlg::queryFinished(const QJsonObject &ba)
 {
     mLoadingDlg->reject();
     mLoadingDlg->deleteLater();
-    auto *btn = sender()->property("btn").value<QPushButton*>();
-    QJsonParseError err;
-    QJsonObject jo = QJsonDocument::fromJson(ba, &err).object();
-    if (err.error == QJsonParseError::NoError) {
-        QJsonArray jcols = jo["cols"].toArray();
-        QJsonArray jdata = jo["rows"].toArray();
-        mData[btn->property("filter").toString()] = jdata;
-        mCols[btn->property("filter").toString()] = jcols;
-        btn->click();
-    } else {
-        queryError(ba);
-    }
-#ifdef QT_DEBUG
-    c5log(QString(ba));
-#else
-    if (__c5config.getValue(param_debuge_mode).toInt() > 0) {
-        c5log(QString(ba));
-    }
-#endif
+    auto *btn = sender()->property("btn").value<QPushButton *>();
+    QJsonArray jcols = ba["cols"].toArray();
+    QJsonArray jdata = ba["rows"].toArray();
+    mData[btn->property("filter").toString()] = jdata;
+    mCols[btn->property("filter").toString()] = jcols;
+    btn->click();
     sender()->deleteLater();
 }
 
@@ -229,9 +216,7 @@ void NFilterDlg::on_btnCancel_clicked()
     reject();
 }
 
-
 void NFilterDlg::on_btnApply_clicked()
 {
     accept();
 }
-

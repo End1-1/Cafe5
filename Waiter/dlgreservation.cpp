@@ -68,6 +68,7 @@ DlgReservation::DlgReservation(C5User *u) :
     connect(ui->tbl->horizontalScrollBar(), &QScrollBar::valueChanged, this, &DlgReservation::horizontalScroll);
     connect(ui->tbl->verticalScrollBar(), &QScrollBar::valueChanged, this, &DlgReservation::verticalScroll);
     connect(ui->tblRoom->verticalScrollBar(), &QScrollBar::valueChanged, this, &DlgReservation::verticalRoomScroll);
+    fHallFilter = 0;
     loadTable();
 }
 

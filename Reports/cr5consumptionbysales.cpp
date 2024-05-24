@@ -38,7 +38,6 @@ CR5ConsumptionBySales::CR5ConsumptionBySales(const QStringList &dbParams, QWidge
 {
     fIcon = ":/goods.png";
     fLabel = tr("Consumption of goods base on sales");
-
     fColumnNameIndex["f_goods"] = col_goods;
     fColumnNameIndex["f_goodsgroup"] = col_goodsgroup;
     fColumnNameIndex["f_goodsname"] = col_goodsname;
@@ -53,7 +52,6 @@ CR5ConsumptionBySales::CR5ConsumptionBySales(const QStringList &dbParams, QWidge
     fColumnNameIndex["f_qtydiff"] = col_qtydiff;
     fColumnNameIndex["f_qtyunit"] = col_qtyunit;
     fColumnNameIndex["f_qty_sr"] = col_qty_sr;
-
     fTranslation["f_goods"] = tr("Goods code");
     fTranslation["f_goodsgroup"] = tr("Group");
     fTranslation["f_goodsname"] = tr("Goods name");
@@ -68,7 +66,6 @@ CR5ConsumptionBySales::CR5ConsumptionBySales(const QStringList &dbParams, QWidge
     fTranslation["f_qtydiff"] = tr("Diff");
     fTranslation["f_qtyunit"] = tr("Unit");
     fTranslation["f_qty_sr"] = tr("S/R");
-
     fColumnsSum << "f_qtybefore"
                 << "f_qtyinput"
                 << "f_qtysale"
@@ -77,16 +74,15 @@ CR5ConsumptionBySales::CR5ConsumptionBySales(const QStringList &dbParams, QWidge
                 << "f_qtyafter"
                 << "f_qtyinv"
                 << "f_qtydiff";
-
     fFilterWidget = new CR5ConsumptionBySalesFilter(dbParams);
-    fFilter = static_cast<CR5ConsumptionBySalesFilter*>(fFilterWidget);
+    fFilter = static_cast<CR5ConsumptionBySalesFilter *>(fFilterWidget);
 }
 
 QToolBar *CR5ConsumptionBySales::toolBar()
 {
     if (!fToolBar) {
         QList<ToolBarButtons> btn;
-            btn << ToolBarButtons::tbFilter
+        btn << ToolBarButtons::tbFilter
             << ToolBarButtons::tbClearFilter
             << ToolBarButtons::tbRefresh
             << ToolBarButtons::tbExcel
@@ -109,18 +105,15 @@ QToolBar *CR5ConsumptionBySales::toolBar()
         auto *e = new QAction(QIcon(":/goodsback.png"), tr("Rollback goods output"), this);
         connect(e, SIGNAL(triggered(bool)), this, SLOT(rollbackGoodsOutput(bool)));
         fToolBar->insertAction(c, e);
-
         auto *f = new QAction(QIcon(":/goodsback.png"), tr("Get from AS"), this);
         connect(f, SIGNAL(triggered(bool)), this, SLOT(asinput(bool)));
         fToolBar->insertAction(e, f);
         auto *g = new QAction(QIcon(":/goodsback.png"), tr("Output to AS"), this);
         connect(g, SIGNAL(triggered(bool)), this, SLOT(asoutput(bool)));
         fToolBar->insertAction(e, g);
-
         auto *h = new QAction(QIcon(":/update_prices.png"), tr("Update prices\nof inventorization"), this);
         connect(h, SIGNAL(triggered(bool)), this, SLOT(updateInventorizatinPrices()));
         fToolBar->addAction(h);
-
         auto *i = new QAction(QIcon(":/goods.png"), tr("Semiready\nin/out"), this);
         connect(i, SIGNAL(triggered(bool)), this, SLOT(semireadyInOut()));
         fToolBar->addAction(i);
@@ -130,7 +123,7 @@ QToolBar *CR5ConsumptionBySales::toolBar()
 
 void CR5ConsumptionBySales::buildQuery()
 {
-    CR5ConsumptionBySalesFilter *f = static_cast<CR5ConsumptionBySalesFilter*>(fFilterWidget);
+    CR5ConsumptionBySalesFilter *f = static_cast<CR5ConsumptionBySalesFilter *>(fFilterWidget);
     if (f->store() ==  0) {
         if (!C5GridGilter::filter(f, fWhereCondition, fColumnsVisible, fTranslation)) {
             return;
@@ -140,7 +133,6 @@ void CR5ConsumptionBySales::buildQuery()
         C5Message::info(tr("Store must be defined"));
         return;
     }
-
     QList<QList<QVariant> > &rows = fModel->fRawData;
     rows.clear();
     QMap<int, int> goodsMap;
@@ -163,13 +155,13 @@ void CR5ConsumptionBySales::buildQuery()
     C5Database db(fDBParams);
     /* get all goods */
     db.exec(QString("select c.f_id, g.f_name as f_groupname, c.f_name, c.f_scancode, "
-            "u.f_name as f_unitname "
-            "from c_goods c "
-            "left join c_groups g on g.f_id=c.f_group "
-            "left join c_units u on u.f_id=c.f_unit %1 "
-            "order by 2, 3").arg(cond));
+                    "u.f_name as f_unitname "
+                    "from c_goods c "
+                    "left join c_groups g on g.f_id=c.f_group "
+                    "left join c_units u on u.f_id=c.f_unit %1 "
+                    "order by 2, 3").arg(cond));
     while (db.nextRow()) {
-    QList<QVariant> row;
+        QList<QVariant> row;
         row << db.getInt("f_id")
             << db.getString("f_groupname")
             << db.getString("f_name")
@@ -191,11 +183,11 @@ void CR5ConsumptionBySales::buildQuery()
     db[":f_store"] = f->store();
     db[":f_date"] = f->date1().addDays(-1);
     db.exec(QString("select s.f_goods, sum(%1*s.f_type) as f_qty "
-                "from a_store s "
-                "inner join a_header d on d.f_id=s.f_document "
-                "where s.f_store=:f_store and d.f_date<=:f_date "
-                "group by 1 "
-                "having sum(%1*s.f_type) > 0.001")
+                    "from a_store s "
+                    "inner join a_header d on d.f_id=s.f_document "
+                    "where s.f_store=:f_store and d.f_date<=:f_date "
+                    "group by 1 "
+                    "having sum(%1*s.f_type) > 0.001")
             .arg(fFilter->reportType() == REPORTTYPE_AMOUNTS ? "s.f_total" : "s.f_qty"));
     while (db.nextRow()) {
         if (!goodsMap.contains(db.getInt(0))) {
@@ -212,11 +204,11 @@ void CR5ConsumptionBySales::buildQuery()
     db[":f_store"] = f->store();
     db[":f_state"] = DOC_STATE_SAVED;
     db.exec(QString("select s.f_goods, sum(%1) "
-            "from a_store s "
-            "left join a_header h on h.f_id=s.f_document "
-            "where h.f_date between :f_date1 and :f_date2 and s.f_store=:f_store "
-            "and h.f_state=:f_state and s.f_type=:f_type "
-            "group by 1 ")
+                    "from a_store s "
+                    "left join a_header h on h.f_id=s.f_document "
+                    "where h.f_date between :f_date1 and :f_date2 and s.f_store=:f_store "
+                    "and h.f_state=:f_state and s.f_type=:f_type "
+                    "group by 1 ")
             .arg(fFilter->reportType() == REPORTTYPE_AMOUNTS ? "s.f_total" : "s.f_qty"));
     while (db.nextRow()) {
         if (!goodsMap.contains(db.getInt(0))) {
@@ -237,11 +229,11 @@ void CR5ConsumptionBySales::buildQuery()
     db[":f_type"] = DOC_TYPE_STORE_OUTPUT;
     db[":f_reason"] = DOC_REASON_SALE;
     db.exec(QString("select s.f_goods, sum(%1) as f_qty "
-            "from a_store_draft s "
-            "inner join a_header h on h.f_id=s.f_document "
-            "where h.f_date between :f_date1 and :f_date2 and s.f_store=:f_store "
-            "and s.f_reason=:f_reason and h.f_type=:f_type " + cond1 +
-            "group by 1 ")
+                    "from a_store_draft s "
+                    "inner join a_header h on h.f_id=s.f_document "
+                    "where h.f_date between :f_date1 and :f_date2 and s.f_store=:f_store "
+                    "and s.f_reason=:f_reason and h.f_type=:f_type " + cond1 +
+                    "group by 1 ")
             .arg(fFilter->reportType() == REPORTTYPE_AMOUNTS ? "s.f_total" : "s.f_qty"));
     while (db.nextRow()) {
         if (!goodsMap.contains(db.getInt(0))) {
@@ -258,12 +250,12 @@ void CR5ConsumptionBySales::buildQuery()
     db[":f_state"] = DOC_STATE_SAVED;
     db[":f_reason"] = DOC_REASON_SALE;
     db.exec(QString("select s.f_goods, sum(%1) as f_qty "
-            "from a_store s "
-            "left join a_header h on h.f_id=s.f_document "
-            "where h.f_date between :f_date1 and :f_date2 and s.f_store=:f_store "
-            "and s.f_type=:f_type and h.f_state=:f_state  "
-            "and s.f_reason<>:f_reason " + cond1 +
-            "group by 1 ")
+                    "from a_store s "
+                    "left join a_header h on h.f_id=s.f_document "
+                    "where h.f_date between :f_date1 and :f_date2 and s.f_store=:f_store "
+                    "and s.f_type=:f_type and h.f_state=:f_state  "
+                    "and s.f_reason<>:f_reason " + cond1 +
+                    "group by 1 ")
             .arg(fFilter->reportType() == REPORTTYPE_AMOUNTS ? "s.f_total" : "s.f_qty"));
     while (db.nextRow()) {
         if (!goodsMap.contains(db.getInt(0))) {
@@ -276,11 +268,11 @@ void CR5ConsumptionBySales::buildQuery()
     db[":f_store"] = f->store();
     db[":f_date"] = f->date2();
     db.exec(QString("select s.f_goods, sum(%1*s.f_type) as f_qty "
-                "from a_store s "
-                "inner join a_header d on d.f_id=s.f_document "
-                "where s.f_store=:f_store and d.f_date<=:f_date "
-                "group by 1 "
-                "having sum(%1*s.f_type) > 0.001")
+                    "from a_store s "
+                    "inner join a_header d on d.f_id=s.f_document "
+                    "where s.f_store=:f_store and d.f_date<=:f_date "
+                    "group by 1 "
+                    "having sum(%1*s.f_type) > 0.001")
             .arg(fFilter->reportType() == REPORTTYPE_AMOUNTS ? "s.f_total" : "s.f_qty"));
     while (db.nextRow()) {
         if (!goodsMap.contains(db.getInt(0))) {
@@ -292,21 +284,21 @@ void CR5ConsumptionBySales::buildQuery()
     /* get counted qty */
     for (int i = 0; i < rows.count(); i++) {
         rows[i][col_qtyafter] = rows[i][col_qtybefore].toDouble()
-                + rows[i][col_qtyinput].toDouble()
-                - rows[i][col_qtysale].toDouble()
-                - rows[i][col_qtyout].toDouble();
+                                + rows[i][col_qtyinput].toDouble()
+                                - rows[i][col_qtysale].toDouble()
+                                - rows[i][col_qtyout].toDouble();
     }
     /* get inventory quantities */
     db[":f_date"] = f->date2();
     db[":f_store"] = f->store();
     db[":f_type"] = DOC_TYPE_STORE_INVENTORY;
     db.exec(QString("select i.f_goods, g.f_name, sum(%1) as f_qty "
-            "from a_store_inventory i "
-            "inner join a_header h on h.f_id=i.f_document "
-            "inner join c_goods g on g.f_id=i.f_goods "
-            "where h.f_date=:f_date and h.f_type=:f_type "
-            "and i.f_store=:f_store "
-            "group by 1, 2 ")
+                    "from a_store_inventory i "
+                    "inner join a_header h on h.f_id=i.f_document "
+                    "inner join c_goods g on g.f_id=i.f_goods "
+                    "where h.f_date=:f_date and h.f_type=:f_type "
+                    "and i.f_store=:f_store "
+                    "group by 1, 2 ")
             .arg(fFilter->reportType() == REPORTTYPE_AMOUNTS ? "i.f_total" : "i.f_qty"));
     while (db.nextRow()) {
         if (!goodsMap.contains(db.getInt(0))) {
@@ -315,7 +307,6 @@ void CR5ConsumptionBySales::buildQuery()
         int r = goodsMap[db.getInt(0)];
         rows[r][col_qtyinv] = db.getDouble("f_qty");
     }
-
     /* GET S/R quantities */
     db[":f_date"] = f->date2();
     db[":f_store"] = f->store();
@@ -331,7 +322,6 @@ void CR5ConsumptionBySales::buildQuery()
         int r = goodsMap[db.getInt(0)];
         rows[r][col_qty_sr] = db.getDouble("f_qty");
     }
-
     //remove unused
     for (int i  = rows.count() - 1; i > -1; i--) {
         if (zerodouble(rows[i][col_qtybefore].toDouble())
@@ -372,7 +362,7 @@ void CR5ConsumptionBySales::refreshData()
 QString CR5ConsumptionBySales::documentForInventory(int store)
 {
     QString result;
-    CR5ConsumptionBySalesFilter *f = static_cast<CR5ConsumptionBySalesFilter*>(fFilterWidget);
+    CR5ConsumptionBySalesFilter *f = static_cast<CR5ConsumptionBySalesFilter *>(fFilterWidget);
     C5Database db(fDBParams);
     db[":f_date"] = f->date2();
     db[":f_type"] = DOC_TYPE_STORE_INVENTORY;
@@ -406,7 +396,7 @@ void CR5ConsumptionBySales::countRowQty(int row)
         qtySale = fModel->data(row, col_qtysale, Qt::EditRole).toDouble();
     }
     fModel->setData(row, col_qtyafter,
-                      fModel->data(row, col_qtybefore, Qt::EditRole).toDouble()
+                    fModel->data(row, col_qtybefore, Qt::EditRole).toDouble()
                     + fModel->data(row, col_qtyinput, Qt::EditRole).toDouble()
                     - qtySale
                     - fModel->data(row, col_qtyout, Qt::EditRole).toDouble());
@@ -441,78 +431,77 @@ bool CR5ConsumptionBySales::tblDoubleClicked(int row, int column, const QList<QV
     if (values.count() == 0) {
         return true;
     }
-    bool ok;
     double qty;
     C5Database db(fDBParams);
     switch (column) {
-    case col_qtyinput: {
-        auto *ddi = __mainWindow->createTab<CR5GoodsMovement>(fDBParams);
-        ddi->setDocType(QString("%1,%2").arg(DOC_TYPE_STORE_INPUT).arg(DOC_TYPE_STORE_MOVE));
-        ddi->setDate(fFilter->date1(), fFilter->date2());
-        ddi->setStore(QString::number(fFilter->store()));
-        ddi->setGoods(QString::number(values.at(0).toInt()));
-        ddi->setReason(QString("%1,%2, %3").arg(DOC_REASON_INPUT).arg(DOC_REASON_MOVE).arg(DOC_REASON_SALE_RETURN));
-        ddi->setInOut(1);
-        ddi->buildQuery();
-        break;
-    }
-    case col_qtyout: {
-        auto *ddo = __mainWindow->createTab<CR5GoodsMovement>(fDBParams);
-        ddo->setDate(fFilter->date1(), fFilter->date2());
-        ddo->setDocType(QString("%1,%2").arg(DOC_TYPE_STORE_OUTPUT).arg(DOC_TYPE_STORE_MOVE));
-        ddo->setStore(QString::number(fFilter->store()));
-        ddo->setGoods(QString::number(values.at(0).toInt()));
-        ddo->setReason(QString("%1,%2,%3").arg(DOC_REASON_OUT).arg(DOC_REASON_MOVE).arg(DOC_REASON_LOST));
-        ddo->setInOut(-1);
-        ddo->buildQuery();
-        break;
-    }
-    case col_qtysale: {
-        //if (pr(fDBParams, cp_t3_consuption_reason)) {
+        case col_qtyinput: {
+            auto *ddi = __mainWindow->createTab<CR5GoodsMovement>(fDBParams);
+            ddi->setDocType(QString("%1,%2").arg(DOC_TYPE_STORE_INPUT).arg(DOC_TYPE_STORE_MOVE));
+            ddi->setDate(fFilter->date1(), fFilter->date2());
+            ddi->setStore(QString::number(fFilter->store()));
+            ddi->setGoods(QString::number(values.at(0).toInt()));
+            ddi->setReason(QString("%1,%2, %3").arg(DOC_REASON_INPUT).arg(DOC_REASON_MOVE).arg(DOC_REASON_SALE_RETURN));
+            ddi->setInOut(1);
+            ddi->buildQuery();
+            break;
+        }
+        case col_qtyout: {
+            auto *ddo = __mainWindow->createTab<CR5GoodsMovement>(fDBParams);
+            ddo->setDate(fFilter->date1(), fFilter->date2());
+            ddo->setDocType(QString("%1,%2").arg(DOC_TYPE_STORE_OUTPUT).arg(DOC_TYPE_STORE_MOVE));
+            ddo->setStore(QString::number(fFilter->store()));
+            ddo->setGoods(QString::number(values.at(0).toInt()));
+            ddo->setReason(QString("%1,%2,%3").arg(DOC_REASON_OUT).arg(DOC_REASON_MOVE).arg(DOC_REASON_LOST));
+            ddo->setInOut(-1);
+            ddo->buildQuery();
+            break;
+        }
+        case col_qtysale: {
+            //if (pr(fDBParams, cp_t3_consuption_reason)) {
             CR5ConsuptionReason *s = __mainWindow->createTab<CR5ConsuptionReason>(fDBParams);
             s->setFilterParams(fFilter->date1(), fFilter->date2(), fFilter->store(), values.at(0).toInt());
-        //}
-        break;
-    }
-    case col_qtyinv: {
-        switch (cr5consuptionbysalesqty::qty(this, qty)) {
-        case cr5consuptionbysalesqty::rtOk:
-            writeInvQty(db, qty, row, column, values.at(0).toInt());
-            break;
-        case cr5consuptionbysalesqty::rtCancel:
-            break;
-        case cr5consuptionbysalesqty::rtAdd:
-            qty += fModel->data(row, col_qtyinv, Qt::EditRole).toDouble();
-            writeInvQty(db, qty, row, column, values.at(0).toInt());
-        case cr5consuptionbysalesqty::rtClear:
-            writeInvQty(db, 0, row, column, values.at(0).toInt());
-            fModel->setData(row, col_qtyinv, "", Qt::EditRole);
+            //}
             break;
         }
-        break;
-    }
-    case col_qty_sr:
-        C5SrOfInventory soi(fDBParams, this);
-        soi.setGoods(fFilter->date2(), fFilter->store(), values.at(0).toInt());
-        if (soi.exec() == QDialog::Accepted) {
-            db[":f_rec"] = soi.fUuid;
-            db.exec("select * from a_header_sr where f_rec=:f_rec");
-            QMap<int, double> goods;
-            while (db.nextRow()) {
-                goods[db.getInt("f_goods")] = db.getDouble("f_goods_qty");
+        case col_qtyinv: {
+            switch (cr5consuptionbysalesqty::qty(this, qty)) {
+                case cr5consuptionbysalesqty::rtOk:
+                    writeInvQty(db, qty, row, column, values.at(0).toInt());
+                    break;
+                case cr5consuptionbysalesqty::rtCancel:
+                    break;
+                case cr5consuptionbysalesqty::rtAdd:
+                    qty += fModel->data(row, col_qtyinv, Qt::EditRole).toDouble();
+                    writeInvQty(db, qty, row, column, values.at(0).toInt());
+                case cr5consuptionbysalesqty::rtClear:
+                    writeInvQty(db, 0, row, column, values.at(0).toInt());
+                    fModel->setData(row, col_qtyinv, "", Qt::EditRole);
+                    break;
             }
-            for (QMap<int,double>::const_iterator it = goods.begin(); it != goods.end(); it++) {
-                for (int i = 0; i < fModel->rowCount(); i++) {
-                    if (fModel->data(i, 0, Qt::EditRole).toInt() == it.key()) {
-                        writeInvQty(db, it.value(), i, col_qtyinv, it.key(), false);
-                        fModel->setData(i, col_qty_sr, fModel->data(i, col_qty_sr, Qt::EditRole).toDouble() - it.value());
+            break;
+        }
+        case col_qty_sr:
+            C5SrOfInventory soi(fDBParams, this);
+            soi.setGoods(fFilter->date2(), fFilter->store(), values.at(0).toInt());
+            if (soi.exec() == QDialog::Accepted) {
+                db[":f_rec"] = soi.fUuid;
+                db.exec("select * from a_header_sr where f_rec=:f_rec");
+                QMap<int, double> goods;
+                while (db.nextRow()) {
+                    goods[db.getInt("f_goods")] = db.getDouble("f_goods_qty");
+                }
+                for (QMap<int, double>::const_iterator it = goods.begin(); it != goods.end(); it++) {
+                    for (int i = 0; i < fModel->rowCount(); i++) {
+                        if (fModel->data(i, 0, Qt::EditRole).toInt() == it.key()) {
+                            writeInvQty(db, it.value(), i, col_qtyinv, it.key(), false);
+                            fModel->setData(i, col_qty_sr, fModel->data(i, col_qty_sr, Qt::EditRole).toDouble() - it.value());
+                        }
                     }
                 }
+                db[":f_rec"] = soi.fUuid;
+                db.exec("delete from a_header_sr where f_rec=:f_rec");
             }
-            db[":f_rec"] = soi.fUuid;
-            db.exec("delete from a_header_sr where f_rec=:f_rec");
-        }
-        break;
+            break;
     }
     return true;
 }
@@ -629,7 +618,7 @@ void CR5ConsumptionBySales::countOutputBasedOnRecipes()
     pd->show();
     QString err;
     int count = 0;
-    for (const QString &id: idList) {
+    for (const QString &id : idList) {
         C5WaiterOrderDoc(id, db).makeOutputOfStore(db, err, DOC_STATE_SAVED);
         count++;
         emit updateProgressValue(count);
@@ -653,19 +642,17 @@ void CR5ConsumptionBySales::changeOutputStore()
 void CR5ConsumptionBySales::updateInventorizatinPrices()
 {
     C5Database db(fDBParams);
-
     db[":f_store"] = fFilter->store();
     db[":f_date"] = fFilter->date2();
     db.exec(QString("select s.f_goods, sum(f_qty*s.f_type*f_price) / sum(f_qty*s.f_type) as f_price "
-                "from a_store s "
-                "inner join a_header d on d.f_id=s.f_document "
-                "where s.f_store=:f_store and d.f_date<=:f_date "
-                "group by 1 "));
+                    "from a_store s "
+                    "inner join a_header d on d.f_id=s.f_document "
+                    "where s.f_store=:f_store and d.f_date<=:f_date "
+                    "group by 1 "));
     QMap<int, double> prices;
     while (db.nextRow()) {
         prices[db.getInt("f_goods")] = db.getDouble("f_price");
     }
-
     for (int i = 0; i < fModel->rowCount(); i++) {
         db[":f_type"] = DOC_TYPE_STORE_INVENTORY;
         db[":f_store"] = fFilter->store();
@@ -673,9 +660,8 @@ void CR5ConsumptionBySales::updateInventorizatinPrices()
         db[":f_goods"] = fModel->data(i, col_goods, Qt::EditRole);
         db[":f_price"] = prices[fModel->data(i, col_goods, Qt::EditRole).toInt()];
         db.exec("update a_store_inventory set f_price=:f_price, f_total=f_qty*:f_price where f_goods=:f_goods and f_store=:f_store "
-            " and f_document in (select f_id from a_header where f_type=:f_type and f_date=:f_date)");
+                " and f_document in (select f_id from a_header where f_type=:f_type and f_date=:f_date)");
     }
-
     refreshData();
 }
 
@@ -692,7 +678,8 @@ void CR5ConsumptionBySales::semireadyInOut()
             bool found = false;
             for (int j = 0; j < fModel->rowCount(); j++) {
                 if (fModel->data(j, col_goods, Qt::EditRole).toInt() == d.goodsId(i)) {
-                    found = true;\
+                    found = true;
+                    \
                     double qty = fModel->data(j, col_qtyinv, Qt::EditRole).toDouble();
                     qty += d.goodsQty(i);
                     fModel->setData(j, col_qtyinv, qty);
@@ -712,27 +699,28 @@ void CR5ConsumptionBySales::semireadyInOut()
                         "where g.f_id=:f_id");
                 db.nextRow();
                 QList<QVariant> row;
-                    row << db.getInt("f_id")
-                        << db.getString("f_groupname")
-                        << db.getString("f_name")
-                        << db.getString("f_scancode")
-                        << 0
-                        << 0
-                        << 0
-                        << 0
-                        << 0
-                        << 0
-                        << d.goodsQty(i)
-                        << 0
-                        << db.getString("f_unitname")
-                        << 0;
-                    fModel->insertRow(fModel->rowCount());
-                    for (int k = 0; k < row.count(); k++) {
-                        fModel->setData(fModel->rowCount() - 1, k, row.at(k));
-                    }
-                    fModel->setData(fModel->rowCount() -1, col_qty_sr, fModel->data(fModel->rowCount() - 1, col_qty_sr, Qt::EditRole).toDouble() + d.goodsQty(i));
-                    writeInvQty(db, d.goodsQty(i), fModel->rowCount() -1, col_qtyinv, d.goodsId(i));
-                    countRowQty(fModel->rowCount() - 1);
+                row << db.getInt("f_id")
+                    << db.getString("f_groupname")
+                    << db.getString("f_name")
+                    << db.getString("f_scancode")
+                    << 0
+                    << 0
+                    << 0
+                    << 0
+                    << 0
+                    << 0
+                    << d.goodsQty(i)
+                    << 0
+                    << db.getString("f_unitname")
+                    << 0;
+                fModel->insertRow(fModel->rowCount());
+                for (int k = 0; k < row.count(); k++) {
+                    fModel->setData(fModel->rowCount() - 1, k, row.at(k));
+                }
+                fModel->setData(fModel->rowCount() - 1, col_qty_sr, fModel->data(fModel->rowCount() - 1, col_qty_sr,
+                                Qt::EditRole).toDouble() + d.goodsQty(i));
+                writeInvQty(db, d.goodsQty(i), fModel->rowCount() - 1, col_qtyinv, d.goodsId(i));
+                countRowQty(fModel->rowCount() - 1);
             }
             db[":f_rec"] = uuid;
             db[":f_date"] = fFilter->date2();
@@ -756,16 +744,16 @@ C5StoreDoc *CR5ConsumptionBySales::writeDocs(int doctype, int reason, const QLis
     int storeout = 0;
     int sdtype = 0;
     switch (doctype) {
-    case DOC_TYPE_STORE_OUTPUT:
-        store = fFilter->store();
-        storeout = store;
-        sdtype = -1;
-        break;
-    case DOC_TYPE_STORE_INPUT:
-        store = fFilter->store();
-        storein = store;
-        sdtype = 1;
-        break;
+        case DOC_TYPE_STORE_OUTPUT:
+            store = fFilter->store();
+            storeout = store;
+            sdtype = -1;
+            break;
+        case DOC_TYPE_STORE_INPUT:
+            store = fFilter->store();
+            storein = store;
+            sdtype = 1;
+            break;
     }
     QString documentId;
     QString cashid, cashrowid;
@@ -785,7 +773,7 @@ C5StoreDoc *CR5ConsumptionBySales::writeDocs(int doctype, int reason, const QLis
     int rownum = 1;
     foreach (const OGoods &g, data) {
         QString sdid;
-        dw.writeAStoreDraft(sdid, documentId, store, sdtype, g.goods, g.qty, g.price, g.price * g.qty, reason, "", rownum++, "");
+        dw.writeAStoreDraft(sdid, documentId, store, sdtype, g.goods, g.qty, g.price, g.price *g.qty, reason, "", rownum++, "");
     }
     //= dw.writeDraft(docDate, doctype, store, reason, data, comment);
 #ifdef NEWVERSION

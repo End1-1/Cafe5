@@ -5,7 +5,8 @@
 #include "dish.h"
 #include <QMap>
 
-namespace Ui {
+namespace Ui
+{
 class Workspace;
 }
 
@@ -14,6 +15,7 @@ class QTableWidget;
 class QListWidgetItem;
 class C5User;
 class WCustomerDisplay;
+class NLoadingDlg;
 
 class Workspace : public C5Dialog
 {
@@ -32,11 +34,36 @@ public:
 
     bool printReceipt(const QString &id, bool printSecond, bool precheck);
 
-    void printService();
+    void printService(const QString &printerName, const QJsonObject &h, const QJsonArray &d, const QJsonObject &jf,
+                      int side);
 
     void showCustomerDisplay();
 
 private slots:
+    void httpQueryLoading();
+
+    void httpStop(QObject *sender);
+
+    void slotHttpError(const QString &err);
+
+    void loginResponse(const QJsonObject &d);
+
+    void initResponse(const QJsonObject &jdoc);
+
+    void saveResponse(const QJsonObject &jdoc);
+
+    void addGoodsResponse(const QJsonObject &jdoc);
+
+    void printServiceResponse(const QJsonObject &jdoc);
+
+    void receiptResponse(const QJsonObject &jdoc);
+
+    void voidResponse(const QJsonObject &jdoc);
+
+    void removeDishResponse(const QJsonObject &jdoc);
+
+    void openTableResponse(const QJsonObject &jdoc);
+
     void focusTaxIn();
 
     void focusLineIn();
@@ -99,8 +126,6 @@ private slots:
 
     void on_btnP4_clicked();
 
-    void on_btnP5_clicked();
-
     void on_btnP10_clicked();
 
     void on_btnReprintLastCheck_clicked();
@@ -131,14 +156,18 @@ private slots:
 
     void on_btnFiscal_clicked(bool checked);
 
+    void on_btnFlagTakeAway_clicked(bool checked);
+
 private:
     Ui::Workspace *ui;
 
+    NLoadingDlg *fLoadingDlg;
+
     C5User *fUser;
 
-    QList<Dish*> fDishes;
+    QList<Dish *> fDishes;
 
-    QHash<QString, Dish*> fDishesBarcode;
+    QHash<QString, Dish *> fDishesBarcode;
 
     QString fOrderUuid;
 
@@ -178,7 +207,7 @@ private:
 
     double discountValue();
 
-    bool saveOrder(int state);
+    bool saveOrder(int state, bool printService);
 
     int printTax(double cardAmount, double idramAmount);
 
@@ -197,6 +226,10 @@ private:
     void scrollTable(QTableWidget *t, int direction, int rows);
 
     void updateInfo(int row);
+
+    void createHttpRequest(const QString &route, QJsonObject params, const char *responseOkSlot,
+                           const QVariant &marks = QVariant(),
+                           const char *responseErrorSlot = SLOT(slotHttpError(QString)));
 };
 
 #endif // WORKSPACE_H

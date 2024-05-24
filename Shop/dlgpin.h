@@ -3,9 +3,12 @@
 
 #include <QDialog>
 
-namespace Ui {
+namespace Ui
+{
 class DlgPin;
 }
+
+class NLoadingDlg;
 
 class DlgPin : public QDialog
 {
@@ -22,6 +25,14 @@ protected:
     virtual void keyReleaseEvent(QKeyEvent *event) override;
 
 private slots:
+    void queryLoading();
+
+    void queryStopped(QObject *sender);
+
+    void queryFinished(const QJsonObject &json);
+
+    void queryError(const QString &err);
+
     void btnNumPressed();
 
     void on_btnEnter_clicked();
@@ -54,6 +65,8 @@ private:
     Ui::DlgPin *ui;
 
     bool fPinEmpty;
+
+    NLoadingDlg *fLoadingDlg;
 
 };
 

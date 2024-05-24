@@ -12,13 +12,14 @@ class NDataProvider : public QObject
 {
     Q_OBJECT
 public:
-    explicit NDataProvider(const QString &host, bool debug, QObject *parent = nullptr);
+    explicit NDataProvider(const QString &host, QObject *parent = nullptr);
     ~NDataProvider();
     void getData(const QString &route, const QJsonObject &data);
     void changeTimeout(int value);
+    static bool mDebug;
+    static QString sessionKey;
 
 private:
-    bool mDebug;
     QString mHost;
     QElapsedTimer *mTimer;
     QNetworkAccessManager *mNetworkAccessManager;
@@ -29,7 +30,7 @@ private slots:
 signals:
     void started();
     void error(const QString &);
-    void done(int, const QByteArray&);
+    void done(const QJsonObject &);
 };
 
 #endif // NDATAPROVIDER_H

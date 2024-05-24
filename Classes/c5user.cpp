@@ -1,6 +1,7 @@
 #include "c5user.h"
 #include "c5database.h"
 #include "c5config.h"
+#include "ndataprovider.h"
 #include "c5permissions.h"
 #include <QJsonArray>
 
@@ -67,7 +68,7 @@ bool C5User::authByUsernamePass(const QString &username, const QString &pass)
     db[":f_password"] = pass;
     db.exec("select * from s_user where f_login=:f_login and f_password=md5(:f_password)");
     if (db.nextRow()) {
-        if (db.getInt("f_state") == 2){
+        if (db.getInt("f_state") == 2) {
             fError = tr("User is inactive");
         } else {
             db.rowToMap(fUserData);
@@ -79,6 +80,10 @@ bool C5User::authByUsernamePass(const QString &username, const QString &pass)
         getPermissions();
         getState();
         fValid = true;
+        NDataProvider::sessionKey = db.uuid();
+        db[":f_passhash"] = NDataProvider::sessionKey;
+        db[":f_id"] = fUserData["f_id"];
+        db.exec("update s_user set f_passhash=:f_passhash where f_id=:f_id");
     }
     return fError.isEmpty();
 }
@@ -92,7 +97,7 @@ bool C5User::authByPinPass(const QString &pin, const QString &pass)
     db[":f_password"] = pass;
     db.exec("select * from s_user where f_login=:f_login and f_altpassword=md5(:f_password)");
     if (db.nextRow()) {
-        if (db.getInt("f_state") == 2){
+        if (db.getInt("f_state") == 2) {
             fError = tr("User is inactive");
         } else {
             db.rowToMap(fUserData);

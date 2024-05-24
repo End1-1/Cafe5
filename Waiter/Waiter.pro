@@ -368,6 +368,7 @@ SOURCES += \
     ../Reports/cr5users.cpp \
     ../Reports/cr5usersfilter.cpp \
     ../Reports/cr5usersgroups.cpp \
+    ../Service5/utils/logwriter.cpp \
     ../Service5Working/raw/rawmessage.cpp \
     ../Service5Working/socket/sslserver.cpp \
     ../Service5Working/socket/sslsocket.cpp \
@@ -804,6 +805,7 @@ HEADERS += \
     ../Reports/cr5users.h \
     ../Reports/cr5usersfilter.h \
     ../Reports/cr5usersgroups.h \
+    ../Service5/utils/logwriter.h \
     ../Service5Working/raw/rawmessage.h \
     ../Service5Working/socket/sslserver.h \
     ../Service5Working/socket/sslsocket.h \

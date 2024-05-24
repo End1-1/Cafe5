@@ -1,29 +1,26 @@
 #ifndef DLGSPLASHSCREEN_H
 #define DLGSPLASHSCREEN_H
 
-#include "c5dialog.h"
+#include <QDialog>
 
-namespace Ui {
+namespace Ui
+{
 class DlgSplashScreen;
 }
 
-class DlgSplashScreen : public C5Dialog
+class DlgSplashScreen : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit DlgSplashScreen();
+    explicit DlgSplashScreen(QWidget *parent = nullptr);
 
     ~DlgSplashScreen();
-
-    void updateData();
 
 private:
     Ui::DlgSplashScreen *ui;
 
 private slots:
-    void timeout();
-
     void message(const QString &text);
 
 signals:

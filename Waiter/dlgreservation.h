@@ -28,6 +28,7 @@ private slots:
 
 private:
     Ui::DlgReservation *ui;
+    int fHallFilter;
     QList<int> fRoomId;
     C5User *fUser;
     void loadTable();

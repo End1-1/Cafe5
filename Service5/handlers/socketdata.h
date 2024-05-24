@@ -19,12 +19,6 @@ struct DataAddress {
     }
 };
 
-enum SocketType {
-    Invalid,
-    RawData,
-    HttpRequest
-};
-
 enum HttpRequestMethod {
     UNKNOWN_REQUEST_METHOD,
     INCOMPLETE,

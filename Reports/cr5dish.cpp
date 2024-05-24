@@ -12,7 +12,6 @@ CR5Dish::CR5Dish(const QStringList &dbParams, QWidget *parent) :
 {
     fIcon = ":/menu.png";
     fLabel = tr("Dishes");
-
     fSqlQuery = "select d.f_id, p1.f_name as f_part1, p2.f_name as f_part2, d.f_name, \
                 f_remind, d.f_barcode, f_service, f_discount, d.f_queue, d.f_color, f_netweight, f_cost \
                 from d_dish d \
@@ -42,7 +41,7 @@ QToolBar *CR5Dish::toolBar()
             << ToolBarButtons::tbRefresh
             << ToolBarButtons::tbExcel
             << ToolBarButtons::tbPrint;
-            createStandartToolbar(btn);
+        createStandartToolbar(btn);
         fToolBar->addAction(QIcon(":/translate.png"), tr("Translator"), this, SLOT(translator()));
         fToolBar->addAction(QIcon(":/delete.png"), tr("Remove"), this, SLOT(deleteDish()));
         auto *g = new QAction(QIcon(":/goodsback.png"), tr("Output to AS"), this);
@@ -57,9 +56,9 @@ QToolBar *CR5Dish::toolBar()
 
 bool CR5Dish::on_tblView_doubleClicked(const QModelIndex &index)
 {
-
     if (C5ReportWidget::on_tblView_doubleClicked(index)) {
-        fModel->setRowColor(index.row(), QColor::fromRgb(fModel->data(index.row(), fModel->indexForColumnName("f_color"), Qt::EditRole).toInt()));
+        fModel->setRowColor(index.row(), QColor::fromRgb(fModel->data(index.row(), fModel->indexForColumnName("f_color"),
+                            Qt::EditRole).toInt()));
     }
     return true;
 }
@@ -120,17 +119,18 @@ void CR5Dish::deleteDish()
 
 void CR5Dish::printRecipes(bool v)
 {
-    C5DishWidget *w = static_cast<C5DishWidget*>(fEditor);
+    Q_UNUSED(v);
+    C5DishWidget *w = static_cast<C5DishWidget *>(fEditor);
     bool showprice = false;
-    switch (DlgPrintRecipesOptions(fDBParams).exec()){
-    case 1:
-        showprice = true;
-        break;
-    case 2:
-        showprice = false;
-        break;
-    default:
-        return;
+    switch (DlgPrintRecipesOptions(fDBParams).exec()) {
+        case 1:
+            showprice = true;
+            break;
+        case 2:
+            showprice = false;
+            break;
+        default:
+            return;
     }
     QPrintDialog pd(this);
     if (pd.exec() != QDialog::Accepted) {

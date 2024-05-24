@@ -16,8 +16,8 @@ QString C5Config::fDBHost;
 QString C5Config::fDBPath;
 QString C5Config::fDBUser;
 QString C5Config::fDBPassword;
+int C5Config::fJsonConfigId = 1;
 bool C5Config::fFullScreen;
-QStringList __autologin_store;
 C5Config __c5config;
 C5User *__user;
 QStringList __databases;
@@ -89,16 +89,15 @@ QStringList C5Config::dbParams()
 {
     QStringList params;
     params << C5Config::fDBHost
-             << C5Config::fDBPath
-             << C5Config::fDBUser
-             << C5Config::fDBPassword;
+           << C5Config::fDBPath
+           << C5Config::fDBUser
+           << C5Config::fDBPassword;
     return params;
 }
 
 QStringList C5Config::replicaDbParams()
 {
-        return dbParams();
-
+    return dbParams();
 }
 
 int C5Config::docNumDigitsInput()
@@ -218,19 +217,19 @@ void C5Config::initParamsFromDb()
 
 QVariant C5Config::getRegValue(const QString &key, const QVariant &defaultValue)
 {
-    QSettings s(_ORGANIZATION_, _APPLICATION_+ QString("\\") + _MODULE_);
+    QSettings s(_ORGANIZATION_, _APPLICATION_ + QString("\\") + _MODULE_);
     return s.value(key, defaultValue);
 }
 
 void C5Config::setRegValue(const QString &key, const QVariant &value)
 {
-    QSettings s(_ORGANIZATION_, _APPLICATION_+ QString("\\") + _MODULE_);
+    QSettings s(_ORGANIZATION_, _APPLICATION_ + QString("\\") + _MODULE_);
     s.setValue(key, value);
 }
 
 void C5Config::setValue(int key, const QString &value)
 {
-    QMutexLocker ml(&settingsMutex);
+    QMutexLocker ml( &settingsMutex);
     fSettings[key] = value;
 }
 
@@ -281,11 +280,6 @@ QString C5Config::nocashPrefix()
 int C5Config::frontDeskMode()
 {
     return getValue(param_frondesk_mode).toInt();
-}
-
-bool C5Config::shopEnterPin()
-{
-    return getValue(param_shop_enterpin).toInt() == 1;
 }
 
 QString C5Config::taxCashier()
@@ -398,7 +392,7 @@ int C5Config::receipPrinterWidth()
 
 QString C5Config::getValue(int key)
 {
-    QMutexLocker ml(&settingsMutex);
+    QMutexLocker ml( &settingsMutex);
     return fSettings[key];
 }
 

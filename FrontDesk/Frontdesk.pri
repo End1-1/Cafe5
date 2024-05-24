@@ -466,7 +466,6 @@ HEADERS += \
         ../Reports/cr5documentsfilter.h \
         ../Reports/cr5consumptionbysales.h \
         ../Reports/cr5consumptionbysalesfilter.h \
-        c5dlgconnections.h \
         rc.h \
         res.rc \
         ../Editors/ce5partner.h \

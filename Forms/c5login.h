@@ -5,7 +5,8 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
-namespace Ui {
+namespace Ui
+{
 class C5Login;
 }
 
@@ -16,7 +17,6 @@ class C5Login : public C5Dialog
 public:
     explicit C5Login();
     ~C5Login();
-    virtual int exec() override;
 
 private slots:
     void on_btnCancel_clicked();

@@ -24,6 +24,7 @@ bool BClientDebts::getRecord(C5Database &db)
     currency = db.getInt("f_currency");
     comment = db.getString("f_comment");
     flag = db.getInt("f_flag");
+    return true;
 }
 
 void BClientDebts::bind(C5Database &db)

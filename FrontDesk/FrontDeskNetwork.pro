@@ -57,3 +57,16 @@ win32: QMAKE_CXXFLAGS_RELEASE -= -Zc:strictStrings
 win32: QMAKE_CFLAGS_RELEASE -= -Zc:strictStrings
 win32: QMAKE_CFLAGS -= -Zc:strictStrings
 win32: QMAKE_CXXFLAGS -= -Zc:strictStrings
+
+# win32-g++ {
+#    QMAKE_CXXFLAGS += -Werror
+# }
+# win32-msvc*{
+#    QMAKE_CXXFLAGS += /WX
+# }
+
+HEADERS += \
+    ../Service5/utils/logwriter.h
+
+SOURCES += \
+    ../Service5/utils/logwriter.cpp

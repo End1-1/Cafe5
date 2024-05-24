@@ -3,7 +3,8 @@
 
 #include "c5dialog.h"
 
-namespace Ui {
+namespace Ui
+{
 class CustomerInfo;
 }
 
@@ -20,8 +21,6 @@ private slots:
     void on_pushButton_2_clicked();
 
     void on_pushButton_clicked();
-
-    void on_lePhone_textEdited(const QString &arg1);
 
     void on_lePhone_returnPressed();
 
