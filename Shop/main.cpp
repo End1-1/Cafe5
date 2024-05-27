@@ -91,6 +91,15 @@ int main(int argc, char *argv[])
         styleSheet.open(QIODevice::ReadOnly);
         a.setStyleSheet(styleSheet.readAll());
     }
+    QFontDatabase::addApplicationFont(":/barcode.ttf");
+    //    int id = QFontDatabase::addApplicationFont(":/ahuni.ttf");
+    //    QString family = QFontDatabase::applicationFontFamilies(id).at(0);
+    QFile shopstyle(a.applicationDirPath() + "/shopstyle.qss");
+    if (shopstyle.exists()) {
+        if (shopstyle.open(QIODevice::ReadOnly)) {
+            a.setStyleSheet(shopstyle.readAll());
+        }
+    }
     //FIRST, LOGIN, AUTOLOGIN DISABLED SINCE MAY, 24, 2024
     QString user, pin;
     __user = new C5User(0);
@@ -109,15 +118,6 @@ int main(int argc, char *argv[])
     dlgsplash->updateData();
     if (!C5SystemPreference::checkDecimalPointAndSeparator()) {
         return 0;
-    }
-    QFontDatabase::addApplicationFont(":/barcode.ttf");
-    //    int id = QFontDatabase::addApplicationFont(":/ahuni.ttf");
-    //    QString family = QFontDatabase::applicationFontFamilies(id).at(0);
-    QFile shopstyle(a.applicationDirPath() + "/shopstyle.qss");
-    if (shopstyle.exists()) {
-        if (shopstyle.open(QIODevice::ReadOnly)) {
-            a.setStyleSheet(shopstyle.readAll());
-        }
     }
     C5Database db(C5Config::dbParams());
     db[":f_user"] = __user->id();

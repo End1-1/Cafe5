@@ -6,6 +6,7 @@
 #include "printtaxn.h"
 #include "sales.h"
 #include "c5config.h"
+#include "ndataprovider.h"
 #include "c5user.h"
 #include "loghistory.h"
 #include "dlggoodslist.h"
@@ -644,6 +645,41 @@ void Working::shortcutComma()
     }
 }
 
+void Working::qtyRemains(const QJsonObject &jdoc)
+{
+    QJsonObject jo = jdoc["data"].toObject();
+    QJsonArray ja = jo["qty"].toArray();
+    bool print = false;
+    C5Printing p;
+    QFont font = qApp->font();
+    font.setPointSize(28);
+    p.setSceneParams(650, 2800, QPrinter::Portrait);
+    p.setFont(font);
+    p.br(2);
+    QPixmap img(":/atention.png");
+    img = img.scaled(400, 400);
+    p.image(img, Qt::AlignCenter);
+    p.br(img.height() / 2);
+    p.br(img.height() / 2);
+    p.ctext(tr("the product is out of stock"));
+    for (int i = 0; i < ja.size(); i++) {
+        QJsonObject jn = ja.at(i).toObject();
+        if (jn["f_qty"].toString().toDouble() < 0.01) {
+            print = true;
+            p.ltext(jn["f_name"].toString(), 0);
+            p.br();
+            p.ltext(jn["f_scancode"].toString(), 0);
+            p.br();
+        }
+    }
+    if (print) {
+        p.ltext(tr("Printed"), 0);
+        p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR2));
+        p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
+    }
+    sender()->deleteLater();
+}
+
 void Working::haveChanges(bool v)
 {
     if (!fHaveChanges) {
@@ -703,12 +739,16 @@ void Working::on_btnWriteOrder_clicked()
     if (!w->writeOrder()) {
         return;
     }
+    QString id = w->fOHeader._id();
     w->table()->setRowCount(0);
     ui->tab->removeTab(ui->tab->currentIndex());
     if (ui->tab->count() == 0) {
         newSale(SALE_RETAIL);
     }
     w->deleteLater();
+    auto *dp = new NDataProvider(this);
+    connect(dp, &NDataProvider::done, this, &Working::qtyRemains);
+    dp->getData("/engine/shop/check-qty-remain.php", QJsonObject{{"header", id}});
 }
 
 void Working::on_btnGoodsMovement_clicked()

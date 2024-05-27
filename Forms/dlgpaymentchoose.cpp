@@ -2,6 +2,7 @@
 #include "ui_dlgpaymentchoose.h"
 #include <QDoubleValidator>
 #include <QShortcut>
+#include <QStyle>
 
 DlgPaymentChoose::DlgPaymentChoose(const QStringList &dbParams) :
     C5Dialog(dbParams),
@@ -45,7 +46,9 @@ bool DlgPaymentChoose::getValues(double total, double &cash, double &card, doubl
     d.ui->leDebt->setDouble(debt);
     d.ui->leCashIn->setDouble(cashin);
     d.ui->leChange->setDouble(change);
-    d.ui->btnFiscal->setChecked(fiscal);
+    d.fFiscal = fiscal;
+    d.setFiscalStyle();
+    d.fFiscal = fiscal;
     if (d.exec() == QDialog::Accepted) {
         cash = d.ui->leCash->getDouble();
         card = d.ui->leCard->getDouble();
@@ -57,7 +60,7 @@ bool DlgPaymentChoose::getValues(double total, double &cash, double &card, doubl
         debt = d.ui->leDebt->getDouble();
         cashin = d.ui->leCashIn->getDouble();
         change = d.ui->leChange->getDouble();
-        fiscal = d.ui->btnFiscal->isChecked();
+        fiscal = d.fFiscal;
         return true;
     }
     d.ui->lePrepaid->setReadOnly(readOnlyPrepaid);
@@ -69,9 +72,20 @@ void DlgPaymentChoose::keyEnter()
     on_btnPay_clicked();
 }
 
+void DlgPaymentChoose::setFiscalStyle()
+{
+    if (fFiscal) {
+        setStyleSheet("");
+    } else {
+        setStyleSheet("background:qlineargradient(spread:reflect, x1:0.449, y1:0, x2:0.511, y2:1, stop:0 rgba(210, 255, 197, 255), stop:1 rgba(238, 238, 238, 255))");
+    }
+    style()->polish(this);
+}
+
 void DlgPaymentChoose::checkFiscal()
 {
-    ui->btnFiscal->setChecked(!ui->btnFiscal->isChecked());
+    fFiscal = !fFiscal;
+    setFiscalStyle();
 }
 
 void DlgPaymentChoose::on_btnBack_clicked()
@@ -109,26 +123,36 @@ void DlgPaymentChoose::countChange()
 
 void DlgPaymentChoose::on_btnCard_clicked()
 {
+    fFiscal = true;
+    setFiscalStyle();
     clearAll(ui->leCard);
 }
 
 void DlgPaymentChoose::on_btnIdram_clicked()
 {
+    fFiscal = true;
+    setFiscalStyle();
     clearAll(ui->leIdram);
 }
 
 void DlgPaymentChoose::on_btnTelcell_clicked()
 {
+    fFiscal = true;
+    setFiscalStyle();
     clearAll(ui->leTelcell);
 }
 
 void DlgPaymentChoose::on_btnPrepaid_clicked()
 {
+    fFiscal = true;
+    setFiscalStyle();
     clearAll(ui->lePrepaid);
 }
 
 void DlgPaymentChoose::on_btnDebt_clicked()
 {
+    fFiscal = false;
+    setFiscalStyle();
     clearAll(ui->leDebt);
 }
 
@@ -140,6 +164,8 @@ void DlgPaymentChoose::on_leCashIn_textChanged(const QString &arg1)
 
 void DlgPaymentChoose::on_btnBankTransfer_clicked()
 {
+    fFiscal = false;
+    setFiscalStyle();
     clearAll(ui->leBankTransfer);
 }
 
@@ -172,13 +198,18 @@ void DlgPaymentChoose::on_leCard_textChanged(const QString &arg1)
     Q_UNUSED(arg1);
     countChange();
     if (str_float(arg1) > 0.001) {
-        ui->btnFiscal->setChecked(true);
+        fFiscal = true;
+        setFiscalStyle();
     }
 }
 
 void DlgPaymentChoose::on_leBankTransfer_textChanged(const QString &arg1)
 {
     Q_UNUSED(arg1);
+    if (str_float(arg1) > 0.001) {
+        fFiscal = false;
+        setFiscalStyle();
+    }
     countChange();
 }
 
@@ -187,7 +218,8 @@ void DlgPaymentChoose::on_leIdram_textChanged(const QString &arg1)
     Q_UNUSED(arg1);
     countChange();
     if (str_float(arg1) > 0.001) {
-        ui->btnFiscal->setChecked(true);
+        fFiscal = true;
+        setFiscalStyle();
     }
 }
 
@@ -196,7 +228,8 @@ void DlgPaymentChoose::on_leTelcell_textChanged(const QString &arg1)
     Q_UNUSED(arg1);
     countChange();
     if (str_float(arg1) > 0.001) {
-        ui->btnFiscal->setChecked(true);
+        fFiscal = true;
+        setFiscalStyle();
     }
 }
 

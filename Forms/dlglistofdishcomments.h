@@ -2,8 +2,10 @@
 #define DLGLISTOFDISHCOMMENTS_H
 
 #include <QDialog>
+#include "ninterface.h"
 
-namespace Ui {
+namespace Ui
+{
 class DlgListOfDishComments;
 }
 
@@ -23,12 +25,16 @@ public:
 private slots:
     void kbdAccept();
 
+    void response(const QJsonObject &jdoc);
+
     void on_tbl_itemClicked(QTableWidgetItem *item);
 
 private:
     Ui::DlgListOfDishComments *ui;
 
     QString fResult;
+
+    NInterface *fn;
 };
 
 #endif // DLGLISTOFDISHCOMMENTS_H

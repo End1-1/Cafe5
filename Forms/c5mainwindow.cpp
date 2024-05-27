@@ -9,6 +9,7 @@
 #include "storeinputdocument.h"
 #include "checkforupdatethread.h"
 #include "cr5usersgroups.h"
+#include "nloadingdlg.h"
 #include "cr5materialinstoreuncomplect.h"
 #include "cr5consumptionbysales.h"
 #include "cr5consumptionbysalesdraft.h"
@@ -43,6 +44,7 @@
 #include "cr5creditcards.h"
 #include "cr5dishpart1.h"
 #include "c5toolbarwidget.h"
+#include "ninterface.h"
 #include "cr5generalreportonlydate.h"
 #include "cr5mfactions.h"
 #include "cr5mfdaily.h"
@@ -132,7 +134,6 @@ C5MainWindow::C5MainWindow(QWidget *parent) :
     fToolbarWidget->setUpdateButtonVisible(false);
     fRightToolbar->addWidget(fToolbarWidget);
     ui->actionHome->setEnabled(false);
-
     QShortcut *f3 = new QShortcut(QKeySequence("Ctrl+F"), this);
     connect(f3, SIGNAL(activated()), this, SLOT(hotKey()));
     QShortcut *esc = new QShortcut(QKeySequence("ESC"), this);
@@ -145,7 +146,6 @@ C5MainWindow::C5MainWindow(QWidget *parent) :
     });
     C5Dialog::setMainWindow(this);
     __mainWindow = this;
-
     QVariant menuPanelIsVisible = C5Config::getRegValue("menupanel");
     if (menuPanelIsVisible == QVariant::Invalid) {
         menuPanelIsVisible = true;
@@ -153,20 +153,19 @@ C5MainWindow::C5MainWindow(QWidget *parent) :
     ui->wLog->setVisible(false);
     ui->actionLogout->setVisible(false);
     ui->actionChange_password->setVisible(false);
-    connect(&fUpdateTimer, SIGNAL(timeout()), this, SLOT(updateTimeout()));
+    connect( &fUpdateTimer, SIGNAL(timeout()), this, SLOT(updateTimeout()));
 #ifdef QT_DEBUG
     fUpdateTimer.start(2000);
 #else
     fUpdateTimer.start(10000);
 #endif
     ui->wMenu->resize(C5Config::getRegValue("twdbsize", 300).toInt(), 0);
-
+    http = new NInterface(this);
     setDB();
     enableMenu(true);
     ui->actionHome->setEnabled(true);
     ui->actionLogout->setVisible(true);
     ui->actionChange_password->setVisible(true);
-
     C5ReportTemplateDriver::init(__user->group());
 }
 
@@ -195,13 +194,12 @@ NTableWidget *C5MainWindow::createNTab(const QString &route)
     t->mHost = __c5config.dbParams().at(1);
     t->query();
     return t;
-
 }
 
 void C5MainWindow::nTabDesign(const QIcon &icon, const QString &label, NTableWidget *widget)
 {
     for (int i = 0; i < fTab->count(); i++) {
-        auto *nt = dynamic_cast<NTableWidget*>(fTab->widget(i));
+        auto *nt = dynamic_cast<NTableWidget *>(fTab->widget(i));
         if (nt == widget) {
             fTab->setTabText(i, label);
             fTab->setTabIcon(i, icon);
@@ -244,27 +242,27 @@ void C5MainWindow::removeBroadcastListener(C5Widget *w)
 
 void C5MainWindow::tabCloseRequested(int index)
 {
-    auto *w = static_cast<C5Widget*>(fTab->widget(index));
+    auto *w = static_cast<C5Widget *>(fTab->widget(index));
     QString prevWindow, currWindow;
-//    if (fPrevTabUuid.count() > 1) {
-//        prevWindow = fPrevTabUuid.at(fPrevTabUuid.count() - 2);
-//    }
+    //    if (fPrevTabUuid.count() > 1) {
+    //        prevWindow = fPrevTabUuid.at(fPrevTabUuid.count() - 2);
+    //    }
     //currWindow = w->fWindowUuid;
     fTab->removeTab(index);
     delete w;
-//    if (!prevWindow.isEmpty() && index == fTab->currentIndex()) {
-//        for (int i = 0; i < fTab->count(); i++) {
-//            w = static_cast<C5Widget*>(fTab->widget(i));
-//            if (w->fWindowUuid == prevWindow) {
-//                fPrevTabUuid.append(w->fWindowUuid);
-//                fTab->setCurrentIndex(i);
-//                fPrevTabUuid.removeAll(w->fWindowUuid);
-//                return;
-//            }
-//        }
-//    } else {
-//        fPrevTabUuid.removeAll(currWindow);
-//    }
+    //    if (!prevWindow.isEmpty() && index == fTab->currentIndex()) {
+    //        for (int i = 0; i < fTab->count(); i++) {
+    //            w = static_cast<C5Widget*>(fTab->widget(i));
+    //            if (w->fWindowUuid == prevWindow) {
+    //                fPrevTabUuid.append(w->fWindowUuid);
+    //                fTab->setCurrentIndex(i);
+    //                fPrevTabUuid.removeAll(w->fWindowUuid);
+    //                return;
+    //            }
+    //        }
+    //    } else {
+    //        fPrevTabUuid.removeAll(currWindow);
+    //    }
 }
 
 void C5MainWindow::currentTabChange(int index)
@@ -273,8 +271,8 @@ void C5MainWindow::currentTabChange(int index)
         removeToolBar(fReportToolbar);
     }
     fReportToolbar = nullptr;
-    auto *w = dynamic_cast<C5ReportWidget*>(fTab->widget(index));
-    auto *w2 = dynamic_cast<C5Widget*>(fTab->widget(index));
+    auto *w = dynamic_cast<C5ReportWidget *>(fTab->widget(index));
+    auto *w2 = dynamic_cast<C5Widget *>(fTab->widget(index));
     if (!w && !w2) {
         return;
     }
@@ -292,10 +290,8 @@ void C5MainWindow::currentTabChange(int index)
 
 void C5MainWindow::on_actionLogin_triggered()
 {
-
     showMaximized();
     fStatusLabel->setText(__user->fullName());
-
     C5Database db(C5Config::fDBHost, C5Config::fDBPath, C5Config::fDBUser, C5Config::fDBPassword);
     db[":f_user"] = __user->id();
     db.exec("select f_name, f_description, f_host, f_db, f_user, f_password, f_main from s_db "
@@ -304,6 +300,29 @@ void C5MainWindow::on_actionLogin_triggered()
         C5Message::info(tr("No access to this database"));
         return;
     }
+}
+
+void C5MainWindow::menuListReponse(const QJsonObject &jdoc)
+{
+    QListWidget *lw = nullptr;
+    for (QListWidget *ll : fMenuLists) {
+        if (ll->property("reportlevel").toInt() == 2) {
+            lw = ll;
+            break;
+        }
+    }
+    QJsonObject jo = jdoc["data"].toObject();
+    QJsonArray ja = jo["reports"].toArray();
+    for (int i = 0; i < ja.size(); i++) {
+        const QJsonObject &j = ja.at(i).toObject();
+        if (lw) {
+            // QPixmap p;
+            // p.loadFromData(QByteArray::fromBase64(j["image"].toString().toLatin1()));
+            auto *l = addTreeL3Item(lw, 0, j["title"].toString(), j["image"].toString());
+            l->setData(Qt::UserRole + 105, j["route"].toString());
+        }
+    }
+    http->httpQueryFinished(sender());
 }
 
 void C5MainWindow::updateTimeout()
@@ -338,24 +357,24 @@ void C5MainWindow::updateChecked(bool needUpdate, int source, const QString &pat
     }
     fToolbarWidget->setUpdateButtonVisible(true);
     switch (source) {
-    case usNone:
-        fUpdateTimer.start(60000);
-        break;
-    case usLocalnet: {
-        QStringList args;
-        args << "-lhttp://" + C5Config::fDBHost;
-        args << "-s0";
-        QProcess p;
-        p.start(qApp->applicationDirPath() + "/updater.exe", args);
-        break;
-    }
+        case usNone:
+            fUpdateTimer.start(60000);
+            break;
+        case usLocalnet: {
+            QStringList args;
+            args << "-lhttp://" + C5Config::fDBHost;
+            args << "-s0";
+            QProcess p;
+            p.start(qApp->applicationDirPath() + "/updater.exe", args);
+            break;
+        }
     }
 }
 
 void C5MainWindow::hotKey()
 {
-    QShortcut *s = static_cast<QShortcut*>(sender());
-    C5Widget *w = static_cast<C5Widget*>(fTab->currentWidget());
+    QShortcut *s = static_cast<QShortcut *>(sender());
+    C5Widget *w = static_cast<C5Widget *>(fTab->currentWidget());
     if (!w) {
         return;
     }
@@ -372,14 +391,14 @@ void C5MainWindow::enableMenu(bool v)
         }
     }
     fLogin = v;
-
 }
 
-void C5MainWindow::addTreeL3Item(QListWidget *l, int permission, const QString &text, const QString &icon)
+QListWidgetItem *C5MainWindow::
+addTreeL3Item(QListWidget *l, int permission, const QString &text, const QString &icon)
 {
     if (permission > 0) {
         if (!__user->check(permission)) {
-            return;
+            return nullptr;
         }
     }
     QListWidgetItem *item = new QListWidgetItem(l);
@@ -387,7 +406,6 @@ void C5MainWindow::addTreeL3Item(QListWidget *l, int permission, const QString &
     item->setData(Qt::UserRole + 1, icon);
     int h = (qApp->font().pointSize() * 2) + 2;
     item->setSizeHint(QSize(l->width(), h));
-
     QWidget *w = new QWidget();
     QHBoxLayout *hl = new QHBoxLayout();
     hl->setSpacing(1);
@@ -412,10 +430,9 @@ void C5MainWindow::addTreeL3Item(QListWidget *l, int permission, const QString &
     hl->addWidget(label);
     hl->addStretch();
     w->setLayout(hl);
-
-
     l->addItem(item);
     l->setItemWidget(item, w);
+    return item;
 }
 
 void C5MainWindow::animateMenu(QListWidget *l, bool hide)
@@ -443,7 +460,7 @@ void C5MainWindow::animateMenu(QListWidget *l, bool hide)
 
 QString C5MainWindow::itemIconName(int permission)
 {
-    for (QListWidget *l: fMenuLists) {
+    for (QListWidget *l : fMenuLists) {
         for (int i = 0; i < l->count(); i++) {
             QListWidgetItem *item = l->item(i);
             if (item->data(Qt::UserRole).toInt() == permission) {
@@ -462,12 +479,13 @@ void C5MainWindow::removeFromFavorite(int permission)
             QListWidgetItem *item = l->item(i);
             if (item->data(Qt::UserRole).toInt() == permission) {
                 QObjectList ol = l->itemWidget(item)->children();
-                for (QObject *o: ol) {
-                    if (QToolButton *b = dynamic_cast<QToolButton*>(o)) {
+                for (QObject *o : ol) {
+                    if (QToolButton *b = dynamic_cast<QToolButton * >(o)) {
                         b->setProperty("active", false);
                         b->setIcon(QIcon(":/star-passive.png"));
                         __c5config.setRegValue(QString("favorite-active-%1").arg(b->property("cp").toInt()), false);
-                        __c5config.setRegValue(QString("favorite-active-%1-name").arg(b->property("cp").toInt()), b->property("name").toString());
+                        __c5config.setRegValue(QString("favorite-active-%1-name").arg(b->property("cp").toInt()),
+                                               b->property("name").toString());
                         return;
                     }
                 }
@@ -478,293 +496,297 @@ void C5MainWindow::removeFromFavorite(int permission)
 
 void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
 {
-    QListWidget *l = static_cast<QListWidget*>(sender());
+    QListWidget *l = static_cast<QListWidget *>(sender());
     QStringList dbParams = __c5config.dbParams();
     QListWidgetItem *item = l->item(index.row());
     int permission = item->data(Qt::UserRole).toInt();
+    QString route = item->data(Qt::UserRole + 105).toString();
+    if (!route.isEmpty()) {
+        createNTab(route);
+        return;
+    }
     switch (permission) {
-    case cp_t1_usergroups:
-        createTab<CR5UsersGroups>(dbParams);
-        break;
-    case cp_t1_users:
-        createTab<CR5Users>(dbParams);
-        break;
-    case cp_t1_databases:
-        createTab<CR5Databases>(dbParams);
-        break;
-    case cp_t1_settigns:
-        createTab<CR5Settings>(dbParams);
-        break;
-    case cp_t1_breeze:
-        createTab<CR5BreezeService>(dbParams);
-        break;
-    case cp_t2_store_input: {
+        case cp_t1_usergroups:
+            createTab<CR5UsersGroups>(dbParams);
+            break;
+        case cp_t1_users:
+            createTab<CR5Users>(dbParams);
+            break;
+        case cp_t1_databases:
+            createTab<CR5Databases>(dbParams);
+            break;
+        case cp_t1_settigns:
+            createTab<CR5Settings>(dbParams);
+            break;
+        case cp_t1_breeze:
+            createTab<CR5BreezeService>(dbParams);
+            break;
+        case cp_t2_store_input: {
 #ifdef NEWVERSION
-        createTab<StoreInputDocument>(dbParams);
-
+            createTab<StoreInputDocument>(dbParams);
 #else
-        C5StoreDoc *sd = createTab<C5StoreDoc>(dbParams);
-        sd->setMode(C5StoreDoc::sdInput);
+            C5StoreDoc *sd = createTab<C5StoreDoc>(dbParams);
+            sd->setMode(C5StoreDoc::sdInput);
 #endif
-        break;
-    }
-    case cp_t2_store_output: {
-        C5StoreDoc *sd = createTab<C5StoreDoc>(dbParams);
-        sd->setMode(C5StoreDoc::sdOutput);
-        break;
-    }
-    case cp_t2_store_move: {
-        C5StoreDoc *sd = createTab<C5StoreDoc>(dbParams);
-        sd->setMode(C5StoreDoc::sdMovement);
-        break;
-    }
-    case cp_t2_calculate_self_cost: {
-        createTab<C5DishSelfCostGenPrice>(dbParams);
-        break;
-    }
-    case cp_t2_store_inventory:
-        createTab<C5StoreInventory>(dbParams);
-        break;
-    case cp_t2_count_output_of_sale:
-        createTab<CR5ConsumptionBySales>(dbParams);
-        break;
-    case cp_t2_store_complectation: {
-        C5StoreDoc *sd = createTab<C5StoreDoc>(dbParams);
-        sd->setMode(C5StoreDoc::sdComplectation);
-        break;
-    }
-    case cp_t2_store_decomplectation: {
-        C5StoreDoc *sd = createTab<C5StoreDoc>(dbParams);
-        sd->setMode(C5StoreDoc::sdDeComplectation);
-        break;
-    }
-    case cp_t2_goods_reservations:
-        createTab<CR5GoodsReservations>(dbParams);
-        break;
-    case cp_t2_reatail_trade: {
-        auto *retaildoc = createTab<C5SaleDoc>(dbParams);
-        retaildoc->setMode(1);
-        break;
-    }
-    case cp_t2_whosale_trade: {
-        auto *whosaledoc = createTab<C5SaleDoc>(dbParams);
-        whosaledoc->setMode(2);
-        break;
-    }
-    case cp_t3_sales_common:
-        createTab<CR5CommonSales>(dbParams);
-        break;
-    case cp_t3_documents:
-        createTab<CR5Documents>(dbParams);
-        break;
-    case cp_t3_documents_store:
-        createTab<CR5StoreDocuments>(dbParams);
-        break;
-    case cp_t3_store:
-        createTab<CR5MaterialsInStore>(dbParams);
-        break;
-    case cp_t3_store_movement:
-        createTab<CR5GoodsMovement>(dbParams);
-        break;
-    case cp_t3_tstore_extra:
-        createTab<CR5TStoreExtra>(dbParams);
-        break;
-    case cp_t3_store_sale:
-        createTab<CR5SaleFromStore>(dbParams);
-        break;
-    case cp_t3_debts_partner:
-        createNTab("/engine/reports/customer-debts.php");
-        break;
-    case cp_t3_debts_customer:
-        createNTab("/engine/reports/customer-debts.php");
-        break;
-    case cp_t3_sale_removed_dishes:
-        createTab<CR5SaleRemovedDishes>(dbParams);
-        break;
-    case cp_t3_sale_dishes:
-        createTab<CR5SalesByDishes>(dbParams);
-        break;
-    case cp_t3_sale_from_store_total:
-        createTab<CR5SaleFromStoreTotal>(dbParams);
-        break;
-    case cp_t3_discount_statistics:
-        createTab<CR5DiscountStatisics>(dbParams);
-        break;
-    case cp_t3_consuption_reason:
-        createTab<CR5ConsuptionReason>(dbParams);
-        break;
-    case cp_t3_preorders:
-        createTab<CR5Preorders>(dbParams);
-        break;
-    case cp_t3_sale_effectiveness:
-        createTab<CR5SalesEffectiveness>(dbParams);
-        break;
-    case cp_t3_storage_uncomplected:
-        createTab<CR5MaterialInStoreUncomplect>(dbParams);
-        break;
-    case cp_t3_move_uncomplected:
-        createTab<CR5MaterialMoveUncomplect>(dbParams);
-        break;
-    case cp_t3_count_output_of_sale_draft:
-        createTab<CR5ConsumptionBySalesDraft>(dbParams);
-        break;
-    case cp_t3_custom_reports:
-        createTab<CR5Custom>(dbParams);
-        break;
-    case cp_t3_draft_output_recipes:
-        createTab<CR5DraftOutputByRecipe>(dbParams);
-        break;
-    case cp_t4_part1:
-        createTab<CR5DishPart1>(dbParams);
-        break;
-    case cp_t4_part2:
-        createTab<CR5DishPart2>(dbParams);
-        break;
-    case cp_t4_dishes:
-        createTab<CR5Dish>(dbParams);
-        break;
-    case cp_t4_dishes_packages:
-        createTab<CR5DishPackage>(dbParams);
-        break;
-    case cp_t4_menu_names:
-        createTab<CR5MenuNames>(dbParams);
-        break;
-    case cp_t4_dish_remove_reason:
-        createTab<CR5DishRemoveReason>(dbParams);
-        break;
-    case cp_t4_dish_comments:
-        createTab<CR5DishComment>(dbParams);
-        break;
-    case cp_t4_dish_price_self_cost:
-        createTab<CR5DishPriceSelfCost>(dbParams);
-        break;
-    case cp_t4_menu_review:
-        createTab<CR5MenuReview>(dbParams);
-        break;
-    case cp_t6_units:
-        createTab<CR5GoodsUnit>(dbParams);
-        break;
-    case cp_t6_groups:
-        createTab<CR5GoodsGroup>(dbParams);
-        break;
-    case cp_t6_goods:
-        createTab<CR5Goods>(dbParams);
-        break;
-    case cp_t6_goods_special_prices:
-        createTab<C5GoodsSpecialPrices>(dbParams);
-        break;
-    case cp_t6_waste:
-        createTab<CR5GoodsWaste>(dbParams);
-        break;
-    case cp_t6_storage:
-        createTab<CR5GoodsStorages>(dbParams);
-        break;
-    case cp_t6_goods_images:
-        createTab<CR5GoodsImages>(dbParams);
-        break;
-    case cp_t6_qty_reminder:
-        createTab<CR5GoodsQtyReminder>(dbParams);
-        break;
-    case cp_t6_complectations:
-        createTab<CR5Complectations>(dbParams);
-        break;
-    case cp_t7_partners:
-        createTab<CR5GoodsPartners>(dbParams);
-        break;
-    case cp_t6_classes:
-        createTab<CR5GoodsClasses>(dbParams);
-        break;
-    case cp_t7_credit_card:
-        createTab<CR5CreditCards>(dbParams);
-        break;
-    case cp_t7_discount_system:
-        createTab<CR5DiscountSystem>(dbParams);
-        break;
-    case cp_t7_halls:
-        createTab<CR5Hall>(dbParams);
-        break;
-    case cp_t7_tables:
-        createTab<CR5Tables>(dbParams);
-        break;
-    case cp_t7_translator:
-        createTab<C5TranslatorForm>(dbParams);
-        break;
-    case cp_t7_store_reason:
-        createTab<CR5StoreReason>(dbParams);
-        break;
-    case cp_t7_order_marks:
-        createTab<CR5OrderMarks>(dbParams);
-        break;
-    case cp_t7_route:
-        createTab<C5Route>(dbParams);
-        break;
-    case cp_t7_route_exec:
-        createTab<CR5RouteDaily>(dbParams);
-        break;
-    case cp_t8_cash_names:
-        createTab<CR5CashNames>(dbParams);
-        break;
-    case cp_t8_cash_doc:
-        createTab<C5CashDoc>(dbParams)->loadSuggest();
-        break;
-    case cp_t8_cash_detailed_report:
-        createTab<CR5CashDetailed>(dbParams);
-        break;
-    case cp_t8_cash_movement:
-        createTab<CR5CashMovement>(dbParams);
-        break;
-    case cp_t8_currency:
-        createTab<CR5Currencies>(dbParams);
-        break;
-    case cp_t8_edit_currency:
-        createTab<CR5CurrencyRateHistory>(dbParams);
-        break;
-    case cp_t8_currency_cross_rate:
-        createTab<CR5CurrencyCrossRate>(dbParams);
-        break;
-    case cp_t8_currency_cross_rate_history:
-        createTab<CR5CurrencyCrossRateHistory>(dbParams);
-        break;
-    case cp_t9_salary_doc:
-        createTab<C5SalaryDoc>(dbParams);
-        break;
-    case cp_t9_report:
-        createTab<CR5SalaryByWorkers>(dbParams);
-        break;
-    case cp_t9_payment:
-        createTab<C5SalaryPayment>(dbParams);
-        break;
-    case cp_t10_action_list:
-        createTab<CR5MfActions>(dbParams);
-        break;
-    case cp_t10_daily:
-        createTab<CR5MfDaily>(dbParams);
-        break;
-    case cp_t10_product_list:
-        createTab<CR5MFProduct>(dbParams);
-        break;
-    case cp_t10_general_report:
-        createTab<CR5MFGeneralReport>(dbParams);
-        break;
-    case cp_t10_general_report_only_date:
-        createTab<CR5GeneralReportOnlyDate>(dbParams);
-        break;
-    case cp_t10_actions_stages:
-        createTab<CR5MFActionStage>(dbParams);
-        break;
-    case cp_t10_workshops:
-        createTab<CR5MFWorkshops>(dbParams);
-        break;
-    case cp_t10_active_tasks:
-        createTab<CR5MFActiveTasks>(dbParams);
-        break;
-    default:
-        if (permission < 0) {
-            auto *reports = createTab<CR5Reports>(dbParams);
-            reports->setReport(permission * -1);
-            fTab->setTabText(fTab->count() - 1, reports->label());
+            break;
         }
-        break;
+        case cp_t2_store_output: {
+            C5StoreDoc *sd = createTab<C5StoreDoc>(dbParams);
+            sd->setMode(C5StoreDoc::sdOutput);
+            break;
+        }
+        case cp_t2_store_move: {
+            C5StoreDoc *sd = createTab<C5StoreDoc>(dbParams);
+            sd->setMode(C5StoreDoc::sdMovement);
+            break;
+        }
+        case cp_t2_calculate_self_cost: {
+            createTab<C5DishSelfCostGenPrice>(dbParams);
+            break;
+        }
+        case cp_t2_store_inventory:
+            createTab<C5StoreInventory>(dbParams);
+            break;
+        case cp_t2_count_output_of_sale:
+            createTab<CR5ConsumptionBySales>(dbParams);
+            break;
+        case cp_t2_store_complectation: {
+            C5StoreDoc *sd = createTab<C5StoreDoc>(dbParams);
+            sd->setMode(C5StoreDoc::sdComplectation);
+            break;
+        }
+        case cp_t2_store_decomplectation: {
+            C5StoreDoc *sd = createTab<C5StoreDoc>(dbParams);
+            sd->setMode(C5StoreDoc::sdDeComplectation);
+            break;
+        }
+        case cp_t2_goods_reservations:
+            createTab<CR5GoodsReservations>(dbParams);
+            break;
+        case cp_t2_reatail_trade: {
+            auto *retaildoc = createTab<C5SaleDoc>(dbParams);
+            retaildoc->setMode(1);
+            break;
+        }
+        case cp_t2_whosale_trade: {
+            auto *whosaledoc = createTab<C5SaleDoc>(dbParams);
+            whosaledoc->setMode(2);
+            break;
+        }
+        case cp_t3_sales_common:
+            createTab<CR5CommonSales>(dbParams);
+            break;
+        case cp_t3_documents:
+            createTab<CR5Documents>(dbParams);
+            break;
+        case cp_t3_documents_store:
+            createTab<CR5StoreDocuments>(dbParams);
+            break;
+        case cp_t3_store:
+            createTab<CR5MaterialsInStore>(dbParams);
+            break;
+        case cp_t3_store_movement:
+            createTab<CR5GoodsMovement>(dbParams);
+            break;
+        case cp_t3_tstore_extra:
+            createTab<CR5TStoreExtra>(dbParams);
+            break;
+        case cp_t3_store_sale:
+            createTab<CR5SaleFromStore>(dbParams);
+            break;
+        case cp_t3_debts_partner:
+            createNTab("/engine/reports/customer-debts.php");
+            break;
+        case cp_t3_debts_customer:
+            createNTab("/engine/reports/customer-debts.php");
+            break;
+        case cp_t3_sale_removed_dishes:
+            createTab<CR5SaleRemovedDishes>(dbParams);
+            break;
+        case cp_t3_sale_dishes:
+            createTab<CR5SalesByDishes>(dbParams);
+            break;
+        case cp_t3_sale_from_store_total:
+            createTab<CR5SaleFromStoreTotal>(dbParams);
+            break;
+        case cp_t3_discount_statistics:
+            createTab<CR5DiscountStatisics>(dbParams);
+            break;
+        case cp_t3_consuption_reason:
+            createTab<CR5ConsuptionReason>(dbParams);
+            break;
+        case cp_t3_preorders:
+            createTab<CR5Preorders>(dbParams);
+            break;
+        case cp_t3_sale_effectiveness:
+            createTab<CR5SalesEffectiveness>(dbParams);
+            break;
+        case cp_t3_storage_uncomplected:
+            createTab<CR5MaterialInStoreUncomplect>(dbParams);
+            break;
+        case cp_t3_move_uncomplected:
+            createTab<CR5MaterialMoveUncomplect>(dbParams);
+            break;
+        case cp_t3_count_output_of_sale_draft:
+            createTab<CR5ConsumptionBySalesDraft>(dbParams);
+            break;
+        case cp_t3_custom_reports:
+            createTab<CR5Custom>(dbParams);
+            break;
+        case cp_t3_draft_output_recipes:
+            createTab<CR5DraftOutputByRecipe>(dbParams);
+            break;
+        case cp_t4_part1:
+            createTab<CR5DishPart1>(dbParams);
+            break;
+        case cp_t4_part2:
+            createTab<CR5DishPart2>(dbParams);
+            break;
+        case cp_t4_dishes:
+            createTab<CR5Dish>(dbParams);
+            break;
+        case cp_t4_dishes_packages:
+            createTab<CR5DishPackage>(dbParams);
+            break;
+        case cp_t4_menu_names:
+            createTab<CR5MenuNames>(dbParams);
+            break;
+        case cp_t4_dish_remove_reason:
+            createTab<CR5DishRemoveReason>(dbParams);
+            break;
+        case cp_t4_dish_comments:
+            createTab<CR5DishComment>(dbParams);
+            break;
+        case cp_t4_dish_price_self_cost:
+            createTab<CR5DishPriceSelfCost>(dbParams);
+            break;
+        case cp_t4_menu_review:
+            createTab<CR5MenuReview>(dbParams);
+            break;
+        case cp_t6_units:
+            createTab<CR5GoodsUnit>(dbParams);
+            break;
+        case cp_t6_groups:
+            createTab<CR5GoodsGroup>(dbParams);
+            break;
+        case cp_t6_goods:
+            createTab<CR5Goods>(dbParams);
+            break;
+        case cp_t6_goods_special_prices:
+            createTab<C5GoodsSpecialPrices>(dbParams);
+            break;
+        case cp_t6_waste:
+            createTab<CR5GoodsWaste>(dbParams);
+            break;
+        case cp_t6_storage:
+            createTab<CR5GoodsStorages>(dbParams);
+            break;
+        case cp_t6_goods_images:
+            createTab<CR5GoodsImages>(dbParams);
+            break;
+        case cp_t6_qty_reminder:
+            createTab<CR5GoodsQtyReminder>(dbParams);
+            break;
+        case cp_t6_complectations:
+            createTab<CR5Complectations>(dbParams);
+            break;
+        case cp_t7_partners:
+            createTab<CR5GoodsPartners>(dbParams);
+            break;
+        case cp_t6_classes:
+            createTab<CR5GoodsClasses>(dbParams);
+            break;
+        case cp_t7_credit_card:
+            createTab<CR5CreditCards>(dbParams);
+            break;
+        case cp_t7_discount_system:
+            createTab<CR5DiscountSystem>(dbParams);
+            break;
+        case cp_t7_halls:
+            createTab<CR5Hall>(dbParams);
+            break;
+        case cp_t7_tables:
+            createTab<CR5Tables>(dbParams);
+            break;
+        case cp_t7_translator:
+            createTab<C5TranslatorForm>(dbParams);
+            break;
+        case cp_t7_store_reason:
+            createTab<CR5StoreReason>(dbParams);
+            break;
+        case cp_t7_order_marks:
+            createTab<CR5OrderMarks>(dbParams);
+            break;
+        case cp_t7_route:
+            createTab<C5Route>(dbParams);
+            break;
+        case cp_t7_route_exec:
+            createTab<CR5RouteDaily>(dbParams);
+            break;
+        case cp_t8_cash_names:
+            createTab<CR5CashNames>(dbParams);
+            break;
+        case cp_t8_cash_doc:
+            createTab<C5CashDoc>(dbParams)->loadSuggest();
+            break;
+        case cp_t8_cash_detailed_report:
+            createTab<CR5CashDetailed>(dbParams);
+            break;
+        case cp_t8_cash_movement:
+            createTab<CR5CashMovement>(dbParams);
+            break;
+        case cp_t8_currency:
+            createTab<CR5Currencies>(dbParams);
+            break;
+        case cp_t8_edit_currency:
+            createTab<CR5CurrencyRateHistory>(dbParams);
+            break;
+        case cp_t8_currency_cross_rate:
+            createTab<CR5CurrencyCrossRate>(dbParams);
+            break;
+        case cp_t8_currency_cross_rate_history:
+            createTab<CR5CurrencyCrossRateHistory>(dbParams);
+            break;
+        case cp_t9_salary_doc:
+            createTab<C5SalaryDoc>(dbParams);
+            break;
+        case cp_t9_report:
+            createTab<CR5SalaryByWorkers>(dbParams);
+            break;
+        case cp_t9_payment:
+            createTab<C5SalaryPayment>(dbParams);
+            break;
+        case cp_t10_action_list:
+            createTab<CR5MfActions>(dbParams);
+            break;
+        case cp_t10_daily:
+            createTab<CR5MfDaily>(dbParams);
+            break;
+        case cp_t10_product_list:
+            createTab<CR5MFProduct>(dbParams);
+            break;
+        case cp_t10_general_report:
+            createTab<CR5MFGeneralReport>(dbParams);
+            break;
+        case cp_t10_general_report_only_date:
+            createTab<CR5GeneralReportOnlyDate>(dbParams);
+            break;
+        case cp_t10_actions_stages:
+            createTab<CR5MFActionStage>(dbParams);
+            break;
+        case cp_t10_workshops:
+            createTab<CR5MFWorkshops>(dbParams);
+            break;
+        case cp_t10_active_tasks:
+            createTab<CR5MFActiveTasks>(dbParams);
+            break;
+        default:
+            if (permission < 0) {
+                auto *reports = createTab<CR5Reports>(dbParams);
+                reports->setReport(permission * -1);
+                fTab->setTabText(fTab->count() - 1, reports->label());
+            }
+            break;
     }
 }
 
@@ -777,8 +799,8 @@ void C5MainWindow::on_actionClose_application_triggered()
 
 void C5MainWindow::on_actionLogout_triggered()
 {
-//    qDeleteAll(fMenuLists);
-//    fMenuLists.clear();
+    //    qDeleteAll(fMenuLists);
+    //    fMenuLists.clear();
     for (int i = ui->tabWidget->count() - 1; i > -1 ; i--) {
         QWidget *w = ui->tabWidget->widget(i);
         w->deleteLater();
@@ -810,7 +832,8 @@ void C5MainWindow::on_splitter_splitterMoved(int pos, int index)
     C5Config::setRegValue("twdbsize", ui->wMenu->width());
 }
 
-bool C5MainWindow::addMainLevel(const QString &db, int permission, const QString &title, const QString &icon, QListWidget *&l)
+bool C5MainWindow::addMainLevel(const QString &db, int permission, const QString &title, const QString &icon,
+                                QListWidget *&l)
 {
     if (__user->check(permission)) {
         QPushButton *b = new QPushButton(QIcon(icon), title);
@@ -850,9 +873,7 @@ void C5MainWindow::setDB()
     connect(l, SIGNAL(clicked(QModelIndex)), this, SLOT(on_listWidgetItemClicked(QModelIndex)));
     fMenuLists.append(l);
     ui->lMenu->addWidget(l);
-
     QStringList db = __c5config.dbParams();
-
     if (addMainLevel(db.at(1), cp_t2_action, tr("Actions"), ":/edit.png", l)) {
         l->setProperty("reportlevel", 1);
         addTreeL3Item(l, cp_t2_store_input, tr("New store input"), ":/goods.png");
@@ -868,7 +889,6 @@ void C5MainWindow::setDB()
         addTreeL3Item(l, cp_t2_reatail_trade, tr("New retail traid"), ":/trading.png");
         addTreeL3Item(l, cp_t2_whosale_trade, tr("New whosale traid"), ":/trading.png");
     }
-
     if (addMainLevel(db.at(1), cp_t3_reports, tr("Reports"), ":/reports.png", l)) {
         l->setProperty("reportlevel", 2);
         addTreeL3Item(l, cp_t3_documents, tr("Documents"), ":/documents.png");
@@ -896,7 +916,6 @@ void C5MainWindow::setDB()
         addTreeL3Item(l, cp_t3_preorders, tr("Preorders"), ":/customers.png");
         addTreeL3Item(l, cp_t3_custom_reports, tr("Custom reports"), ":/constructor.png");
     }
-
     if (addMainLevel(db.at(1), cp_t8_cash, tr("Cash"), ":/reports.png", l)) {
         l->setProperty("reportlevel", 3);
         addTreeL3Item(l, cp_t8_cash_doc, tr("New cash document"), ":/cash.png");
@@ -908,14 +927,12 @@ void C5MainWindow::setDB()
         addTreeL3Item(l, cp_t8_currency_cross_rate, tr("Currency cross rates"), ":/cash.png");
         addTreeL3Item(l, cp_t8_currency_cross_rate_history, tr("Currency cross rates history"), ":/cash.png");
     }
-
     if (addMainLevel(db.at(1), cp_t9_salary, tr("Salary"), ":/employee.png", l)) {
         l->setProperty("reportlevel", 4);
         addTreeL3Item(l, cp_t9_salary_doc, tr("New salary document"), ":/employee.png");
         addTreeL3Item(l, cp_t9_report, tr("History"), ":/employee.png");
         addTreeL3Item(l, cp_t9_payment, tr("Payments"), ":/employee.png");
     }
-
     if (__c5config.frontDeskMode() == FRONTDESK_WAITER) {
         if (addMainLevel(db.at(1), cp_t4_menu, tr("Menu"), ":/menu.png", l)) {
             l->setProperty("reportlevel", 5);
@@ -930,7 +947,6 @@ void C5MainWindow::setDB()
             addTreeL3Item(l, cp_t4_menu_review, tr("Review menu"), ":/menu.png");
         }
     }
-
     if (addMainLevel(db.at(1), cp_t6_goods_menu, tr("Goods"), ":/goods.png", l)) {
         l->setProperty("reportlevel", 6);
         addTreeL3Item(l, cp_t6_storage, tr("Storages"), ":/goods.png");
@@ -944,7 +960,6 @@ void C5MainWindow::setDB()
         addTreeL3Item(l, cp_t6_complectations, tr("Complectations"), ":/goods.png");
         addTreeL3Item(l, cp_t6_goods_special_prices, tr("Special prices"), ":/goods.png");
     }
-
     if (addMainLevel(db.at(1), cp_t10_manufacture, tr("Manufacture"), ":/manufacturing.png", l)) {
         l->setProperty("reportlevel", 7);
         addTreeL3Item(l, cp_t10_active_tasks, tr("Active tasks"), ":/manufacturing.png");
@@ -957,7 +972,6 @@ void C5MainWindow::setDB()
         addTreeL3Item(l, cp_t10_general_report_only_date, tr("General report only date"), ":/manufacturing.png");
         addTreeL3Item(l, cp_t10_actions_stages, tr("Action stages"), ":/manufacturing.png");
     }
-
     if (addMainLevel(db.at(1), cp_t7_other, tr("Other"), ":/other.png", l)) {
         l->setProperty("reportlevel", 8);
         addTreeL3Item(l, cp_t7_partners, tr("Partners"), ":/partners.png");
@@ -970,7 +984,6 @@ void C5MainWindow::setDB()
         addTreeL3Item(l, cp_t7_route, tr("Route"), ":/route.png");
         addTreeL3Item(l, cp_t7_route_exec, tr("Route report"), ":/route.png");
     }
-
     if (addMainLevel(db.at(1), cp_t1_preference, tr("Preferences"), ":/configure.png", l)) {
         l->setProperty("reportlevel", 9);
         addTreeL3Item(l, cp_t1_usergroups, tr("Positions of employees"), ":/users_groups.png");
@@ -980,25 +993,23 @@ void C5MainWindow::setDB()
         addTreeL3Item(l, cp_t7_translator, tr("Translator"), ":/translate.png");
         addTreeL3Item(l, cp_t1_breeze, tr("Breeze service"), ":/configure.png");
     }
-
     C5Database dbb(db.at(0),  db.at(1),  db.at(2),  db.at(3));
     dbb[":f_group"] = __user->group();
     dbb.exec("select r.f_id, rg.f_level, r.f_name as f_reportname "
-            "from reports r "
-            "inner join reports_group rg on rg.f_id=r.f_group "
-            "inner join reports_permissions ra on ra.f_report=r.f_id "
-            "where ra.f_access=1 and ra.f_group=:f_group ");
+             "from reports r "
+             "inner join reports_group rg on rg.f_id=r.f_group "
+             "inner join reports_permissions ra on ra.f_report=r.f_id "
+             "where ra.f_access=1 and ra.f_group=:f_group ");
     while (dbb.nextRow()) {
         int reportlevel = dbb.getInt("f_level");
-        for (QListWidget *lw: qAsConst(fMenuLists)) {
+        for (QListWidget *lw : qAsConst(fMenuLists)) {
             if (lw->property("reportlevel").toInt() == reportlevel) {
                 addTreeL3Item(lw, -1 * dbb.getInt("f_id"), dbb.getString("f_reportname"), ":/documents.png");
             }
         }
     }
-
     readFavoriteMenu();
-    for (QListWidget *ll: fMenuLists) {
+    for (QListWidget *ll : fMenuLists) {
         int size = ll->count() == 0 ? 0 : (ll->count() * (ll->item(0)->sizeHint().height() + 1));
         ll->setMinimumHeight(size);
         ll->setMaximumHeight(ll->minimumHeight());
@@ -1006,6 +1017,7 @@ void C5MainWindow::setDB()
         animateMenu(ll, __c5config.getRegValue(QString("btnmenushow-%1").arg(ll->property("cp").toInt()), false).toBool());
     }
     ui->lMenu->addStretch(1);
+    http->createHttpQuery("/engine/reports/list.php", QJsonObject(), SLOT(menuListReponse(QJsonObject)));
 }
 
 void C5MainWindow::on_btnHideMenu_clicked()
@@ -1017,7 +1029,7 @@ void C5MainWindow::on_btnHideMenu_clicked()
 
 void C5MainWindow::on_btnMenuClick()
 {
-    QPushButton *b = static_cast<QPushButton*>(sender());
+    QPushButton *b = static_cast<QPushButton *>(sender());
     int i = b->property("list").toInt();
     QListWidget *l = fMenuLists.at(i);
     bool hide = l->minimumHeight() > 0;
@@ -1031,15 +1043,16 @@ void C5MainWindow::on_btnMenuClick()
 
 void C5MainWindow::on_btnFavoriteClicked()
 {
-    QToolButton *b = static_cast<QToolButton*>(sender());
+    QToolButton *b = static_cast<QToolButton *>(sender());
     bool active = !b->property("active").toBool();
-    if (C5Message::question(active ? tr("Add to favorites?") : tr("Remove from favorites?")) != QDialog::Accepted){
+    if (C5Message::question(active ? tr("Add to favorites?") : tr("Remove from favorites?")) != QDialog::Accepted) {
         return;
     }
     b->setProperty("active", active);
     b->setIcon(active ? QIcon(":/star-active.png") : QIcon(":/star-passive.png"));
     __c5config.setRegValue(QString("favorite-active-%1").arg(b->property("cp").toInt()), active);
-    __c5config.setRegValue(QString("favorite-active-%1-name").arg(b->property("cp").toInt()), b->property("name").toString());
+    __c5config.setRegValue(QString("favorite-active-%1-name").arg(b->property("cp").toInt()),
+                           b->property("name").toString());
     readFavoriteMenu();
     if (!active) {
         removeFromFavorite(b->property("cp").toInt());
@@ -1054,9 +1067,9 @@ void C5MainWindow::readFavoriteMenu()
     QListWidget *l = fMenuLists.at(0);
     l->setProperty("menu", "1");
     l->clear();
-    QSettings ss(_ORGANIZATION_, _APPLICATION_+ QString("\\") + _MODULE_);
+    QSettings ss(_ORGANIZATION_, _APPLICATION_ + QString("\\") + _MODULE_);
     QStringList keys = ss.allKeys();
-    for (const QString &s: keys) {
+    for (const QString &s : keys) {
         if (!s.contains("favorite") || s.contains("-name")) {
             continue;
         }

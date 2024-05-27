@@ -5,7 +5,8 @@
 #include <QList>
 #include <QPushButton>
 
-namespace Ui {
+namespace Ui
+{
 class RKeyboard;
 }
 
@@ -21,6 +22,8 @@ public:
     void setText(const QString &text);
 
     QString text() const;
+
+    virtual bool eventFilter(QObject *o, QEvent *e) override;
 
 private slots:
     void btnTextClicked();
@@ -67,17 +70,17 @@ private:
 
     QString fCurrentLanguage;
 
-    QList<QPushButton*> fLine1b;
+    QList<QPushButton *> fLine1b;
 
-    QList<QPushButton*> fLine2b;
+    QList<QPushButton *> fLine2b;
 
-    QList<QPushButton*> fLine3b;
+    QList<QPushButton *> fLine3b;
 
-    QList<QPushButton*> fLine4b;
+    QList<QPushButton *> fLine4b;
 
-    void connectButtons(QList<QPushButton*> &buttons);
+    void connectButtons(QList<QPushButton *> &buttons);
 
-    void setButtonsText(QList<QPushButton*> &buttons, const QString &text);
+    void setButtonsText(QList<QPushButton *> &buttons, const QString &text);
 
     void setupEnglish();
 

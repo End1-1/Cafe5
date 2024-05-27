@@ -20,12 +20,10 @@ NLoadingDlg::~NLoadingDlg()
 
 void NLoadingDlg::reject()
 {
-
 }
 
 void NLoadingDlg::accept()
 {
-
 }
 
 void NLoadingDlg::timeout()

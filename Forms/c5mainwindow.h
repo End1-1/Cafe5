@@ -5,9 +5,11 @@
 #include <QLabel>
 #include <QTreeWidgetItem>
 #include <QTimer>
+#include <QListWidgetItem>
 #include <QUdpSocket>
 
-namespace Ui {
+namespace Ui
+{
 class C5MainWindow;
 }
 
@@ -15,6 +17,7 @@ class C5ToolBarWidget;
 class QListWidget;
 class C5Widget;
 class NTableWidget;
+class NInterface;
 
 class C5MainWindow : public QMainWindow
 {
@@ -28,7 +31,8 @@ public:
     virtual void closeEvent(QCloseEvent *event);
 
     template<typename T>
-    T *createTab(const QStringList &dbParams) {
+    T *createTab(const QStringList &dbParams)
+    {
         T *t = new T(dbParams);
         fTab->addTab(t, t->icon(), QString("%1").arg(t->label()));
         fTab->setCurrentIndex(fTab->count() - 1);
@@ -52,6 +56,8 @@ public slots:
     void on_actionLogin_triggered();
 
 private slots:
+    void menuListReponse(const QJsonObject &jdoc);
+
     void updateTimeout();
 
     void updateChecked(bool needUpdate, int source, const QString &path);
@@ -79,9 +85,11 @@ private slots:
     void on_btnFavoriteClicked();
 
 private:
+    NInterface *http;
+
     Ui::C5MainWindow *ui;
 
-    QList<QListWidget*> fMenuLists;
+    QList<QListWidget *> fMenuLists;
 
     QLabel *fStatusLabel;
 
@@ -109,7 +117,7 @@ private:
 
     void enableMenu(bool v);
 
-    void addTreeL3Item(QListWidget *l, int permission, const QString &text, const QString &icon);
+    QListWidgetItem *addTreeL3Item(QListWidget *l, int permission, const QString &text, const QString &icon);
 
     void animateMenu(QListWidget *l, bool hide);
 

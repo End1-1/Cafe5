@@ -51,7 +51,7 @@ NTableWidget::~NTableWidget()
 
 void NTableWidget::query()
 {
-    auto *nd = new NDataProvider(mHost, this);
+    auto *nd = new NDataProvider(this);
     connect(nd, &NDataProvider::started, this, &NTableWidget::queryStarted);
     connect(nd, &NDataProvider::error, this, &NTableWidget::queryError);
     connect(nd, &NDataProvider::done, this, &NTableWidget::queryFinished);

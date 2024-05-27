@@ -40,7 +40,7 @@ void C5DataSynchronize::queryDone(const QJsonObject &jdoc)
 
 void C5DataSynchronize::on_btnSaveSyncTables_clicked()
 {
-    auto *dp = new NDataProvider("https://" + fDBParams.at(0), this);
+    auto *dp = new NDataProvider(this);
     connect(dp, &NDataProvider::started, this, &C5DataSynchronize::queryStarted);
     connect(dp, &NDataProvider::error, this, &C5DataSynchronize::queryError);
     connect(dp, &NDataProvider::done, this, &C5DataSynchronize::queryDone);
@@ -49,7 +49,7 @@ void C5DataSynchronize::on_btnSaveSyncTables_clicked()
 
 void C5DataSynchronize::on_btnRevert_clicked()
 {
-    auto *dp = new NDataProvider("https://" + fDBParams.at(0), this);
+    auto *dp = new NDataProvider(this);
     connect(dp, &NDataProvider::started, this, &C5DataSynchronize::queryStarted);
     connect(dp, &NDataProvider::error, this, &C5DataSynchronize::queryError);
     connect(dp, &NDataProvider::done, this, &C5DataSynchronize::queryDone);

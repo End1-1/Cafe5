@@ -1,7 +1,7 @@
 #include "workspace.h"
 #include "c5config.h"
 #include "c5systempreference.h"
-#include "datadriver.h"
+#include "ndataprovider.h"
 #include "logwriter.h"
 #include "c5servername.h"
 #include "ndataprovider.h"
@@ -95,6 +95,7 @@ int main(int argc, char *argv[])
     C5Config::fDBPassword = js["password"].toString();
     C5Config::fSettingsName = js["settings"].toString();
     C5Config::fFullScreen = true;
+    NDataProvider::mHost = C5Config::fDBPath;
     QSettings ss(_ORGANIZATION_, _APPLICATION_ + QString("\\") + _MODULE_);
     ss.setValue("server", "");
     C5Config::initParamsFromDb();

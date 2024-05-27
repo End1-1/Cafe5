@@ -7,11 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>667</width>
-    <height>710</height>
+    <height>809</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background:qlineargradient(spread:reflect, x1:0.449, y1:0, x2:0.511, y2:1, stop:0 rgba(210, 255, 197, 255), stop:1 rgba(238, 238, 238, 255))</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="verticalSpacing">
@@ -118,7 +121,6 @@
      <property name="font">
       <font>
        <pointsize>30</pointsize>
-       <weight>75</weight>
        <bold>true</bold>
       </font>
      </property>
@@ -354,42 +356,6 @@
         </property>
        </spacer>
       </item>
-      <item>
-       <widget class="QPushButton" name="btnFiscal">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>50</height>
-         </size>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>26</pointsize>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">checked: {
-background:blue;
-}</string>
-        </property>
-        <property name="text">
-         <string>Fiscal
-(F12)</string>
-        </property>
-        <property name="checkable">
-         <bool>true</bool>
-        </property>
-        <property name="checked">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
      </layout>
     </widget>
    </item>
@@ -534,7 +500,6 @@ background:blue;
   <tabstop>leCashIn</tabstop>
   <tabstop>leChange</tabstop>
   <tabstop>btnBack</tabstop>
-  <tabstop>btnFiscal</tabstop>
   <tabstop>btnPay</tabstop>
  </tabstops>
  <resources/>

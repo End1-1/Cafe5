@@ -1,7 +1,6 @@
 #ifndef C5MENU_H
 #define C5MENU_H
 
-#include "datadriver.h"
 #include <QString>
 #include <QMap>
 #include <QJsonObject>
@@ -19,6 +18,7 @@ class DPart2
 {
 public:
     DPart2(int id): fId(id) {}
+    int fParentId;
     QList<DPart2> data1;
     DDish data2;
     int fId;
@@ -29,37 +29,7 @@ class DPart1
 public:
     QList<DPart2> data;
 
-    DPart2 &part2(int id, int dishid)
-    {
-        for (int i = 0; i < data.count(); i++) {
-            if (data.at(i).fId == id) {
-                if (dishid > 0) {
-                    data[i].data2.data.append(dishid);
-                }
-                return data[i];
-            }
-        }
-        if (dbdishpart2->parentid(id) == 0) {
-            data.append(DPart2(id));
-            return part2(id, dishid);
-        }
-        DPart2 p2(id);
-        if (dishid > 0) {
-            p2.data2.data.append(dishid);
-        }
-        DPart2 root = findParent(dbdishpart2->parentid(id), p2);
-        bool newtree = true;
-        for (int i = 0; i < data.count(); i++) {
-            if (data.at(i).fId == root.fId) {
-                addToTree(data[i], root.data1[0]);
-                newtree = false;
-            }
-        }
-        if (newtree) {
-            data.append(root);
-        }
-        return part2(root.fId, 0);
-    }
+    DPart2 &part2(int id, int dishid, int parentid);
 
     bool addToTree(DPart2 &l1, DPart2 &l2)
     {
@@ -84,18 +54,50 @@ public:
         return true;
     }
 
-    DPart2 findParent(int id, DPart2 child)
+    DPart2 findParent(int id, DPart2 child, int parentid)
     {
         if (id == 0) {
             return child;
         } else {
             DPart2 parent(id);
             parent.data1.append(child);
-            DPart2 root = findParent(dbdishpart2->parentid(id), parent);
+            DPart2 root = findParent(parentid, parent, parentid);
             return root;
         }
     }
 };
+
+inline DPart2 &DPart1::part2(int id, int dishid, int parentid)
+{
+    for (int i = 0; i < data.count(); i++) {
+        if (data.at(i).fId == id) {
+            if (dishid > 0) {
+                data[i].data2.data.append(dishid);
+            }
+            return data[i];
+        }
+    }
+    if (parentid == 0) {
+        data.append(DPart2(id));
+        return part2(id, dishid, parentid);
+    }
+    DPart2 p2(id);
+    if (dishid > 0) {
+        p2.data2.data.append(dishid);
+    }
+    DPart2 root = findParent(parentid, p2, parentid);
+    bool newtree = true;
+    for (int i = 0; i < data.count(); i++) {
+        if (data.at(i).fId == root.fId) {
+            addToTree(data[i], root.data1[0]);
+            newtree = false;
+        }
+    }
+    if (newtree) {
+        data.append(root);
+    }
+    return part2(root.fId, 0, parentid);
+}
 
 class DMenu
 {
@@ -140,8 +142,6 @@ public:
     static QMap<int, QList<QJsonObject> > fPackagesList;
 
     static QMap<int, double> fStopList;
-
-    void refresh();
 
     static C5Menu *fInstance;
 };

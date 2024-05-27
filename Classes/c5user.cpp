@@ -80,6 +80,7 @@ bool C5User::authByUsernamePass(const QString &username, const QString &pass)
         getPermissions();
         getState();
         fValid = true;
+        NDataProvider::mHost = __c5config.dbParams().at(1);
         NDataProvider::sessionKey = db.uuid();
         db[":f_passhash"] = NDataProvider::sessionKey;
         db[":f_id"] = fUserData["f_id"];
@@ -109,6 +110,11 @@ bool C5User::authByPinPass(const QString &pin, const QString &pass)
         getPermissions();
         getState();
         fValid = true;
+        NDataProvider::mHost = __c5config.dbParams().at(1);
+        NDataProvider::sessionKey = db.uuid();
+        db[":f_passhash"] = NDataProvider::sessionKey;
+        db[":f_id"] = fUserData["f_id"];
+        db.exec("update s_user set f_passhash=:f_passhash where f_id=:f_id");
     }
     return fError.isEmpty();
 }

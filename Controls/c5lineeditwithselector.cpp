@@ -15,10 +15,10 @@ C5LineEditWithSelector::C5LineEditWithSelector(QWidget *parent) :
 
 C5LineEditWithSelector::~C5LineEditWithSelector()
 {
-
 }
 
-C5LineEditWithSelector &C5LineEditWithSelector::setSelector(const QStringList &dbParams, QLineEdit *selName, int cacheId, int colId, int colName)
+C5LineEditWithSelector &C5LineEditWithSelector::setSelector(const QStringList &dbParams, QLineEdit *selName,
+        int cacheId, int colId, int colName)
 {
     fDBParams = dbParams;
     fNameLineEdit = selName;
@@ -85,7 +85,7 @@ void C5LineEditWithSelector::setValue(int id)
 
 QString C5LineEditWithSelector::text()
 {
-    if (property("allowall").toBool()) {
+    if (!property("checkallowed").toBool()) {
         return C5LineEdit::text();
     }
     QString allowedChar("-0123456789,");
@@ -135,7 +135,6 @@ void C5LineEditWithSelector::mouseDoubleClickEvent(QMouseEvent *e)
         emit doubleClicked();
         return;
     }
-
     if (fMultiselection) {
         QList<QList<QVariant> > values;
         if (!C5Selector::getMultipleValues(fDBParams, fCache, values)) {
@@ -187,6 +186,6 @@ void C5LineEditWithSelector::focusOutEvent(QFocusEvent *e)
 
 C5LineEditWithSelector *isLineEditWithSelector(QObject *o)
 {
-    C5LineEditWithSelector *le = dynamic_cast<C5LineEditWithSelector*>(o);
+    C5LineEditWithSelector *le = dynamic_cast<C5LineEditWithSelector *>(o);
     return le;
 }

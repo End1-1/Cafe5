@@ -4,7 +4,8 @@
 #include "c5storedraftwriter.h"
 #include <QWidget>
 
-namespace Ui {
+namespace Ui
+{
 class Working;
 }
 
@@ -55,7 +56,7 @@ public:
 
     static QHash<QString, int> fGoodsRows;
 
-    static QHash<QString,QString> fMultiscancode;
+    static QHash<QString, QString> fMultiscancode;
 
     static QMap<QString, double> fUnitDefaultQty;
 
@@ -129,6 +130,8 @@ private slots:
     void shortcutUp();
 
     void shortcutComma();
+
+    void qtyRemains(const QJsonObject &jdoc);
 
     void haveChanges(bool v);
 

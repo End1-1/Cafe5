@@ -483,9 +483,9 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
         p.ltext(tr("Receipt number"), 0);
         p.rtext(QString::number(jtax["rseq"].toInt()));
         p.br();
-        //        p.ltext(tr("Date"), 0);
-        //        p.rtext(dtax.getString("f_time"));
-        //        p.br();
+        p.ltext(tr("Date"), 0);
+        p.rtext(oh.dateCash.toString(FORMAT_DATETIME_TO_STR));
+        p.br();
         p.ltext(tr("(F)"), 0);
     }
     if (partner.id.toInt() > 0) {

@@ -1,6 +1,5 @@
 #include "c5printservicethread.h"
 #include "c5printing.h"
-#include "datadriver.h"
 #include "c5config.h"
 #include "c5utils.h"
 #include "c5database.h"
@@ -20,7 +19,6 @@ C5PrintServiceThread::C5PrintServiceThread(const QString &header, QObject *paren
 
 C5PrintServiceThread::~C5PrintServiceThread()
 {
-
 }
 
 bool C5PrintServiceThread::run()
@@ -65,15 +63,12 @@ bool C5PrintServiceThread::run()
             }
         }
     }
-
     foreach (QString s, fPrint1) {
         print(s, "f_print1", false);
     }
-
     foreach (QString s, fPrint2) {
         print(s, "f_print2", false);
     }
-
     if (fHeaderData["f_state"].toInt() == ORDER_STATE_OPEN && !fBooking) {
         db[":f_header"] = fHeader;
         db.exec("update o_body set f_qty2=f_qty1, f_reprint=abs(f_reprint) where f_header=:f_header");
@@ -83,7 +78,6 @@ bool C5PrintServiceThread::run()
             db.exec("update o_body set f_printtime=current_timestamp() where f_id=:f_id");
         }
     }
-
     if (!fReprintList.isEmpty()) {
         fBodyData.clear();
         db.exec(QString("select * from o_body where f_id in (%1) ").arg(fReprintList));
@@ -94,7 +88,6 @@ bool C5PrintServiceThread::run()
         }
         fPrint1.clear();
         fPrint2.clear();
-
         for (int i = 0; i < fBodyData.count(); i++) {
             if (fBodyData.at(i)["f_print1"].toString().length() > 0) {
                 fPrint1 << fBodyData.at(i)["f_print1"].toString();
@@ -105,16 +98,13 @@ bool C5PrintServiceThread::run()
                 }
             }
         }
-
         foreach (QString s, fPrint1) {
             print(s, "f_print1", true);
         }
-
         foreach (QString s, fPrint2) {
             print(s, "f_print2", true);
         }
     }
-
     return true;
 }
 
@@ -122,14 +112,13 @@ void C5PrintServiceThread::print(QString printer, const QString &side, bool repr
 {
     C5Database().logEvent(QString::number(__c5config.receiptParepWidth()));
     QString originalPrinter = printer;
-
     QFont font(qApp->font());
     font.setPointSize(20);
     C5Printing p;
     p.setSceneParams(__c5config.receiptParepWidth(), 2800, QPrinter::Portrait);
     p.setFont(font);
-
-    if (fHeaderData["f_state"].toInt() == ORDER_STATE_PREORDER_EMPTY || fHeaderData["f_state"].toInt() == ORDER_STATE_PREORDER_WITH_ORDER || fBooking) {
+    if (fHeaderData["f_state"].toInt() == ORDER_STATE_PREORDER_EMPTY
+            || fHeaderData["f_state"].toInt() == ORDER_STATE_PREORDER_WITH_ORDER || fBooking) {
         p.setFontSize(32);
         p.setFontBold(true);
         p.ctext(tr("PREORDER"));
@@ -144,7 +133,6 @@ void C5PrintServiceThread::print(QString printer, const QString &side, bool repr
         p.line();
         p.br();
     }
-
     if (reprint) {
         p.setFontSize(34);
         p.setFontBold(true);
@@ -152,7 +140,6 @@ void C5PrintServiceThread::print(QString printer, const QString &side, bool repr
         p.br();
         p.br();
     }
-
     p.setFontBold(false);
     p.setFontSize(20);
     p.ctext(tr("New order"));
@@ -176,20 +163,17 @@ void C5PrintServiceThread::print(QString printer, const QString &side, bool repr
     p.br(p.fLineHeight + 2);
     p.line(0, p.fTop, p.fNormalWidth, p.fTop);
     p.br(2);
-
     p.setFontSize(30);
     QSet<QString> storages;
     for (int i = 0; i < fBodyData.count(); i++) {
         const QMap<QString, QVariant> &o = fBodyData.at(i);
-
         C5LogSystem::writeEvent(QString("try to print %1 %2 %3 %4")
                                 .arg(dbdish->name(o["f_dish"].toInt()), printer, side, o[side].toString()));
-
-            if (o[side].toString() != printer) {
-                C5LogSystem::writeEvent(QString("not print case 3 %1 %2 %3 %4").arg(dbdish->name(o["f_dish"].toInt()), printer, side, o[side].toString()));
-                continue;
-            }
-
+        if (o[side].toString() != printer) {
+            C5LogSystem::writeEvent(QString("not print case 3 %1 %2 %3 %4").arg(dbdish->name(o["f_dish"].toInt()), printer, side,
+                                    o[side].toString()));
+            continue;
+        }
         storages << dbstore->name(o["f_store"].toInt());
         if (__c5config.getValue(param_print_dish_timeorder).toInt() == 1) {
             p.ltext(QString("[%1] %2").arg(o["f_timeorder"].toString(), dbdish->name(o["f_dish"].toInt())), 0);
@@ -199,7 +183,6 @@ void C5PrintServiceThread::print(QString printer, const QString &side, bool repr
         p.setFontBold(true);
         p.rtext(QString("%1").arg(float_str(o["f_qty1"].toDouble(), 2)));
         p.setFontBold(false);
-
         if (dbdish->isExtra(o["f_dish"].toInt())) {
             p.br();
             p.setFontSize(25);
@@ -207,7 +190,6 @@ void C5PrintServiceThread::print(QString printer, const QString &side, bool repr
                     .arg(tr("Extra price"))
                     .arg(float_str(o["f_price"].toDouble(), 2)), 0);
         }
-
         if (o["f_comment2"].toString().length() > 0) {
             p.br();
             p.setFontSize(25);
@@ -217,7 +199,6 @@ void C5PrintServiceThread::print(QString printer, const QString &side, bool repr
             p.setFontSize(30);
             p.setFontBold(false);
         }
-
         if (o["f_comment"].toString().length() > 0) {
             p.br();
             p.setFontSize(25);
@@ -225,7 +206,6 @@ void C5PrintServiceThread::print(QString printer, const QString &side, bool repr
             p.br();
             p.setFontSize(30);
         }
-
         p.br();
         p.line(0, p.fTop, p.fNormalWidth, p.fTop);
         p.br(1);
@@ -238,7 +218,6 @@ void C5PrintServiceThread::print(QString printer, const QString &side, bool repr
     p.rtext(side == "f_print1" ? " [1]" : "[2]");
     p.br();
     p.ltext(tr("Storage: ") + storages.toList().join(","), 0);
-
     if (fPrinterAliases.contains(printer)) {
         printer = fPrinterAliases[printer];
     }
@@ -246,26 +225,25 @@ void C5PrintServiceThread::print(QString printer, const QString &side, bool repr
     if (!p.print(printer, QPrinter::Custom)) {
         final = "FAIL";
     }
-
     QDir dir;
     if (!dir.exists(dir.tempPath() + "/Waiter")) {
         dir.mkpath(dir.tempPath() + "/Waiter");
     }
     QString fileName = QString("%1/%2-%3%4-1-%5.txt")
-            .arg(dir.tempPath() + "/Waiter")
-            .arg(originalPrinter)
-            .arg(fHeaderData["f_prefix"].toString())
-            .arg(fHeaderData["f_hallid"].toString())
-            .arg(final);
+                       .arg(dir.tempPath() + "/Waiter")
+                       .arg(originalPrinter)
+                       .arg(fHeaderData["f_prefix"].toString())
+                       .arg(fHeaderData["f_hallid"].toString())
+                       .arg(final);
     int i = 2;
     while (QFile::exists(fileName)) {
         fileName = QString("%1/%2-%3%4-%5-%6.txt")
-                .arg(dir.tempPath() + "/Waiter")
-                .arg(printer)
-                .arg(fHeaderData["f_prefix"].toString())
-                .arg(fHeaderData["f_hallid"].toString())
-                .arg(i++)
-                .arg(final);
+                   .arg(dir.tempPath() + "/Waiter")
+                   .arg(printer)
+                   .arg(fHeaderData["f_prefix"].toString())
+                   .arg(fHeaderData["f_hallid"].toString())
+                   .arg(i++)
+                   .arg(final);
     }
     QFile f(fileName);
     if (f.open(QIODevice::WriteOnly)) {

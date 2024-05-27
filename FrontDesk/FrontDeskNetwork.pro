@@ -66,7 +66,11 @@ win32: QMAKE_CXXFLAGS -= -Zc:strictStrings
 # }
 
 HEADERS += \
+    ../Classes/amkbd.h \
+    ../NTable/ninterface.h \
     ../Service5/utils/logwriter.h
 
 SOURCES += \
+    ../Classes/amkbd.cpp \
+    ../NTable/ninterface.cpp \
     ../Service5/utils/logwriter.cpp

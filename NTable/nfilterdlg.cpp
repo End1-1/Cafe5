@@ -175,7 +175,7 @@ void NFilterDlg::openSuggestions()
             l->setText(f.mName);
         }
     } else {
-        auto *nd = new NDataProvider(property("host").toString(), this);
+        auto *nd = new NDataProvider(this);
         nd->setProperty("btn", QVariant::fromValue(btn));
         connect(nd, &NDataProvider::started, this, &NFilterDlg::queryStarted);
         connect(nd, &NDataProvider::error, this, &NFilterDlg::queryError);

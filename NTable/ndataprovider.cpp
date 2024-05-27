@@ -10,10 +10,10 @@
 
 bool  NDataProvider::mDebug = false;
 QString NDataProvider::sessionKey;
+QString NDataProvider::mHost;
 
-NDataProvider::NDataProvider(const QString &host, QObject *parent)
-    : QObject(parent),
-      mHost(host)
+NDataProvider::NDataProvider(QObject *parent)
+    : QObject(parent)
 {
     mNetworkAccessManager = new QNetworkAccessManager(this);
     mNetworkAccessManager->setTransferTimeout(30000);

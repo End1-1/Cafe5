@@ -64,6 +64,10 @@ private slots:
 
     void openTableResponse(const QJsonObject &jdoc);
 
+    void changeQtyResponse(const QJsonObject &jdoc);
+
+    void updateDishResponse(const QJsonObject &jdoc);
+
     void focusTaxIn();
 
     void focusLineIn();
@@ -182,8 +186,6 @@ private:
     int fCustomer;
 
     int fTypeFilter;
-
-    int fFlagEdited;
 
     QString fPhone;
 

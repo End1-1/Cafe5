@@ -1,8 +1,6 @@
 #include "dlglistofdishcomments.h"
 #include "ui_dlglistofdishcomments.h"
-#include "c5cafecommon.h"
-#include "c5config.h"
-#include "c5menu.h"
+#include <QJsonArray>
 
 DlgListOfDishComments::DlgListOfDishComments(QWidget *parent) :
     QDialog(parent, Qt::FramelessWindowHint),
@@ -10,20 +8,10 @@ DlgListOfDishComments::DlgListOfDishComments(QWidget *parent) :
 {
     ui->setupUi(this);
     setWindowState(Qt::WindowFullScreen);
-    int col = 0;
-    int row = 0;
-    foreach (int id, dbdishcomment->list()) {
-        if (ui->tbl->rowCount() < row + 1) {
-            ui->tbl->setRowCount(row + 1);
-        }
-        ui->tbl->setItem(row, col++, new QTableWidgetItem(dbdishcomment->name(id)));
-        if (col == ui->tbl->columnCount()) {
-            row++;
-            col = 0;
-        }
-    }
     connect(ui->kbd, SIGNAL(accept()), this, SLOT(kbdAccept()));
     connect(ui->kbd, SIGNAL(reject()), this, SLOT(reject()));
+    fn = new NInterface(this);
+    fn->createHttpQuery("/engine/lists/group-comments.php", QJsonObject(), SLOT(response(QJsonObject)));
 }
 
 DlgListOfDishComments::~DlgListOfDishComments()
@@ -35,7 +23,6 @@ bool DlgListOfDishComments::getComment(const QString &caption, QString &comment)
 {
     DlgListOfDishComments *d = new DlgListOfDishComments();
     d->ui->lbComment->setText(tr("Comment for") + " " + caption);
-
     int dec = 5;
     int colWidths = 0;
     int hiddenColumns = 0;
@@ -56,12 +43,10 @@ bool DlgListOfDishComments::getComment(const QString &caption, QString &comment)
         }
         d->ui->tbl->setColumnWidth(i, d->ui->tbl->columnWidth(i) + delta);
     }
-
     int rh = d->ui->tbl->verticalHeader()->defaultSectionSize();
     int visibleRows = (d->ui->tbl->height() - dec) / rh;
-    delta = (d->ui->tbl->height() - dec) - (visibleRows * rh);
+    delta = (d->ui->tbl->height() - dec) - (visibleRows *rh);
     d->ui->tbl->verticalHeader()->setDefaultSectionSize(rh + (delta / visibleRows));
-
     bool result = d->exec() == QDialog::Accepted;
     if (result) {
         comment = d->fResult;
@@ -77,6 +62,25 @@ void DlgListOfDishComments::kbdAccept()
     }
     fResult = ui->kbd->text();
     accept();
+}
+
+void DlgListOfDishComments::response(const QJsonObject &jdoc)
+{
+    int col = 0;
+    int row = 0;
+    QJsonArray ja = jdoc["data"].toArray();
+    for (int i = 0; i < ja.size(); i++) {
+        QJsonObject j = ja.at(i).toObject();
+        if (ui->tbl->rowCount() < row + 1) {
+            ui->tbl->setRowCount(row + 1);
+        }
+        ui->tbl->setItem(row, col++, new QTableWidgetItem(j["f_name"].toString()));
+        if (col == ui->tbl->columnCount()) {
+            row++;
+            col = 0;
+        }
+    }
+    fn->httpQueryFinished(sender());
 }
 
 void DlgListOfDishComments::on_tbl_itemClicked(QTableWidgetItem *item)

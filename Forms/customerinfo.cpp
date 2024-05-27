@@ -1,5 +1,8 @@
 #include "customerinfo.h"
 #include "ui_customerinfo.h"
+#include "amkbd.h"
+#include <QEvent>
+#include <QKeyEvent>
 
 CustomerInfo::CustomerInfo() :
     C5Dialog(__c5config.dbParams()),
@@ -7,6 +10,16 @@ CustomerInfo::CustomerInfo() :
 {
     ui->setupUi(this);
     fCustomerId = 0;
+    ui->leCustomer->installEventFilter(this);
+    ui->leAddress->installEventFilter(this);
+    if (__c5config.getRegValue("language").toString() == "us") {
+        ui->btnKbdUS->setChecked(true);
+        ui->btnKbdUS->click();
+    } else  if (__c5config.getRegValue("language").toString() == "am") {
+        ui->btnKdbAM->setChecked(true);
+    } else {
+        ui->btnKbdUS->setChecked(true);
+    }
 }
 
 CustomerInfo::~CustomerInfo()
@@ -25,6 +38,32 @@ bool CustomerInfo::getCustomer(int &id, QString &name, QString &phone, QString &
         id = ci.fCustomerId;
     }
     return result;
+}
+
+bool CustomerInfo::eventFilter(QObject *o, QEvent *e)
+{
+    if (o == ui->leCustomer || o == ui->leAddress) {
+        if (e->type() == QEvent::KeyPress) {
+            QKeyEvent *ek = static_cast<QKeyEvent *>(e);
+            if (ui->btnKdbAM->isChecked()) {
+                if (ek->key()) {
+                    int index = keys.indexOf(ek->nativeVirtualKey());
+                    if (index < 0) {
+                        return C5Dialog::eventFilter(o, e);
+                    }
+                    QString txt = chars[index];
+                    if (ek->modifiers() &Qt::ShiftModifier) {
+                        txt = txt.toUpper();
+                    }
+                    auto *ekk = new QKeyEvent(QEvent::KeyPress, chars[index].at(0).unicode(), ek->modifiers(), txt);
+                    qApp->postEvent(o, ekk);
+                    return true;
+                    //qDebug() << ek->key() << ek->text() << ek->nativeVirtualKey();
+                }
+            }
+        }
+    }
+    return C5Dialog::eventFilter(o, e);
 }
 
 void CustomerInfo::on_pushButton_2_clicked()
@@ -99,5 +138,21 @@ void CustomerInfo::on_lePhone_returnPressed()
         fCustomerId = db.getInt("f_id");
         ui->leAddress->setText(db.getString("f_address"));
         ui->leCustomer->setText(db.getString("f_contact"));
+    }
+}
+
+void CustomerInfo::on_btnKbdUS_clicked(bool checked)
+{
+    if (checked) {
+        ui->btnKdbAM->setChecked(false);
+        __c5config.setRegValue("language", "us");
+    }
+}
+
+void CustomerInfo::on_btnKdbAM_clicked(bool checked)
+{
+    if (checked) {
+        ui->btnKbdUS->setChecked(false);
+        __c5config.setRegValue("language", "am");
     }
 }

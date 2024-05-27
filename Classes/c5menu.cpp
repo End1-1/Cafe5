@@ -11,29 +11,4 @@ QStringList C5Menu::fDishComments;
 
 C5Menu::C5Menu()
 {
-
-}
-
-void C5Menu::refresh()
-{
-    dbmenu->refresh();
-    dbmenuname->refresh();
-    dbdish->refresh();
-    dbdishpart1->refresh();
-    dbdishpart2->refresh();
-    dbdishspecial->refresh();
-    dbdishcomment->refresh();
-    dbdishremovereason->refresh();
-    menu5->fMenuList.data.clear();
-    for (int id: dbmenu->list()) {
-        int dishid = dbmenu->dishid(id);
-        int part2id = dbdish->part2(dishid);
-        int part1id = dbdishpart2->part1(part2id);
-        int menuid = dbmenu->menuid(id);
-
-        menu5->fMenuList.check(menuid);
-        DPart1 &part1 = menu5->fMenuList.part1(menuid, part1id);
-        DPart2 &part2 = part1.part2(part2id, id);
-        Q_ASSERT(part2.fId > 0);
-    }
 }

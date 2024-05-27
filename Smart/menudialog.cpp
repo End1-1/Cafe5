@@ -8,7 +8,6 @@
 #include "c5printing.h"
 #include "c5user.h"
 #include "dlgcashop.h"
-#include "datadriver.h"
 #include "dlgsmartreports.h"
 #include "sessionshistory.h"
 #include "workspace.h"
@@ -50,7 +49,8 @@ void MenuDialog::on_btnFiscalZReport_clicked()
     if (!Calendar::getDate2(date1, date2)) {
         return;
     }
-    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
+    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(),
+                 C5Config::taxCashier(), C5Config::taxPin(), this);
     QString jsnin, jsnout, err;
     int result;
     result = pt.printReport(QDateTime(date1), QDateTime(date2), reporttype, jsnin, jsnout, err);
@@ -85,27 +85,25 @@ void MenuDialog::on_btnReturnFiscalReceipt_clicked()
             C5Message::error(tr("Fiscal number not found"));
             return;
         }
-        PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
+        PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(),
+                     C5Config::taxCashier(), C5Config::taxPin(), this);
         int result;
         result = pt.printTaxback(number, crn, jsnin, jsnout, err);
-
-//        db[":f_id"] = db.uuid();
-//        db[":f_order"] = uuid;
-//        db[":f_date"] = QDate::currentDate();
-//        db[":f_time"] = QTime::currentTime();
-//        db[":f_in"] = jsnin;
-//        db[":f_out"] = jsnout;
-//        db[":f_err"] = err;
-//        db[":f_result"] = result;
-//        db.insert("o_tax_log", false);
-
+        //        db[":f_id"] = db.uuid();
+        //        db[":f_order"] = uuid;
+        //        db[":f_date"] = QDate::currentDate();
+        //        db[":f_time"] = QTime::currentTime();
+        //        db[":f_in"] = jsnin;
+        //        db[":f_out"] = jsnout;
+        //        db[":f_err"] = err;
+        //        db[":f_result"] = result;
+        //        db.insert("o_tax_log", false);
         QJsonParseError jerr;
         QJsonDocument jod = QJsonDocument::fromJson(jsnout.toUtf8(), &jerr);
         if (jerr.error != QJsonParseError::NoError) {
             err = jerr.errorString();
             jod = QJsonDocument::fromJson(QString("{\"data\":\"" + jsnout + "\"").toUtf8(), &jerr);
         }
-
         QJsonObject jtax;
         jtax["f_order"] = uuid;
         jtax["f_elapsed"] = et.elapsed();
@@ -121,7 +119,6 @@ void MenuDialog::on_btnReturnFiscalReceipt_clicked()
         if (result != pt_err_ok) {
             C5Message::error(err);
         }
-
     }
 }
 
@@ -141,13 +138,11 @@ void MenuDialog::on_btnReportByOrder_clicked()
             "left join o_tax t on t.f_id=oh.f_id  "
             "where oh.f_state=:f_state and oh.f_datecash between :f_datecash1 and :f_datecash2 "
             "order by oh.f_dateopen, oh.f_timeopen ");
-
     QFont font(qApp->font());
     font.setPointSize(28);
     C5Printing p;
     p.setSceneParams(650, 2800, QPrinter::Portrait);
     p.setFont(font);
-
     if (QFile::exists("./logo_receipt.png")) {
         p.image("./logo_receipt.png", Qt::AlignHCenter);
         p.br();
@@ -161,11 +156,12 @@ void MenuDialog::on_btnReportByOrder_clicked()
     p.br();
     p.ctext(date2.toString(FORMAT_DATE_TO_STR));
     p.br();
-    double total = 0, totalcash = 0, totalcard=0, totalidram=0, totalother=0;
-
+    double total = 0, totalcash = 0, totalcard = 0, totalidram = 0, totalother = 0;
     while (db.nextRow()) {
-        p.ltext(QString("[%1]%2").arg((db.getString("f_receiptnumber").toInt() == 0 ? "*" : db.getString("f_receiptnumber")), db.getString("f_ordernum")), 0);
-        p.rtext(QString("%1 %2").arg(db.getDate("f_datecash").toString(FORMAT_DATE_TO_STR), db.getTime("f_dateclose").toString(FORMAT_TIME_TO_SHORT_STR)));
+        p.ltext(QString("[%1]%2").arg((db.getString("f_receiptnumber").toInt() == 0 ? "*" : db.getString("f_receiptnumber")),
+                                      db.getString("f_ordernum")), 0);
+        p.rtext(QString("%1 %2").arg(db.getDate("f_datecash").toString(FORMAT_DATE_TO_STR),
+                                     db.getTime("f_dateclose").toString(FORMAT_TIME_TO_SHORT_STR)));
         p.br();
         total += db.getDouble("f_amounttotal");
         if (db.getDouble("f_amountcash") > 0.001) {
@@ -195,12 +191,10 @@ void MenuDialog::on_btnReportByOrder_clicked()
         p.line();
         p.br();
     }
-
     p.line(2);
     p.br();
     p.line(2);
     p.br();
-
     p.setFontSize(24);
     p.setFontBold(true);
     p.ltext(tr("Total"), 0);
@@ -226,7 +220,6 @@ void MenuDialog::on_btnReportByOrder_clicked()
         p.rtext(float_str(totalother, 2));
         p.br();
     }
-
     p.setFontSize(18);
     p.setFontBold(false);
     p.ltext(tr("Printed"), 0);

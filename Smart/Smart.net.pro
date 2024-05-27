@@ -69,12 +69,17 @@ FORMS += \
     ../NTable/nloadingdlg.ui
 
 HEADERS += \
+    ../Classes/amkbd.h \
     ../NTable/ndataprovider.h \
+    ../NTable/ninterface.h \
     ../NTable/nloadingdlg.h
 
 SOURCES += \
+    ../Classes/amkbd.cpp \
     ../NTable/ndataprovider.cpp \
-    ../NTable/nloadingdlg.cpp
+    ../NTable/ninterface.cpp \
+    ../NTable/nloadingdlg.cpp \
+    ../Service5Working/utils/logwriter.cpp
 
 win32-g++ {
    QMAKE_CXXFLAGS += -Werror

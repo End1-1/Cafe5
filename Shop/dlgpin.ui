@@ -13,10 +13,6 @@
   <property name="windowTitle">
    <string>Shop</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true">border: 1px solid rgb(170, 170, 127);
-background:qlineargradient(spread:pad, x1:0.488, y1:0, x2:0.506, y2:0.994318, stop:0 rgba(237, 237, 237, 255), stop:1 rgba(255, 255, 255, 255))</string>
-  </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="leftMargin">
     <number>2</number>

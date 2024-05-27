@@ -1,6 +1,8 @@
 #include "rkeyboard.h"
 #include "ui_rkeyboard.h"
 #include "c5config.h"
+#include "amkbd.h"
+#include <QKeyEvent>
 
 RKeyboard::RKeyboard(QWidget *parent) :
     QWidget(parent),
@@ -63,19 +65,20 @@ RKeyboard::RKeyboard(QWidget *parent) :
     setupEnglish();
     setStyleSheet("");
     switch (__c5config.getRegValue("kbd").toInt()) {
-    case 1:
-        setupEnglish();
-        break;
-    case 2:
-        setupArmenian();
-        break;
-    case 3:
-        setupRussia();
-        break;
-    default:
-        setupArmenian();
-        break;
+        case 1:
+            setupEnglish();
+            break;
+        case 2:
+            setupArmenian();
+            break;
+        case 3:
+            setupRussia();
+            break;
+        default:
+            setupArmenian();
+            break;
     }
+    ui->leResult->installEventFilter(this);
 }
 
 RKeyboard::~RKeyboard()
@@ -94,9 +97,35 @@ QString RKeyboard::text() const
     return ui->leResult->text();
 }
 
+bool RKeyboard::eventFilter(QObject *o, QEvent *e)
+{
+    if (o == ui->leResult) {
+        if (e->type() == QEvent::KeyPress) {
+            QKeyEvent *ek = static_cast<QKeyEvent *>(e);
+            if (ui->btnAm->isChecked()) {
+                if (ek->key()) {
+                    int index = keys.indexOf(ek->nativeVirtualKey());
+                    if (index < 0) {
+                        return QWidget::eventFilter(o, e);
+                    }
+                    QString txt = chars[index];
+                    if (ek->modifiers() &Qt::ShiftModifier) {
+                        txt = txt.toUpper();
+                    }
+                    auto *ekk = new QKeyEvent(QEvent::KeyPress, chars[index].at(0).unicode(), ek->modifiers(), txt);
+                    qApp->postEvent(o, ekk);
+                    return true;
+                    //qDebug() << ek->key() << ek->text() << ek->nativeVirtualKey();
+                }
+            }
+        }
+    }
+    return QWidget::eventFilter(o, e);
+}
+
 void RKeyboard::btnTextClicked()
 {
-    QPushButton *b = static_cast<QPushButton*>(sender());
+    QPushButton *b = static_cast<QPushButton *>(sender());
     fText.append(b->text());
     if (fShiftOn) {
         fShiftOn = false;
@@ -123,9 +152,9 @@ void RKeyboard::on_btnBackspace_clicked()
 
 void RKeyboard::connectButtons(QList<QPushButton *> &buttons)
 {
-    for (QList<QPushButton*>::const_iterator it = buttons.begin(); it != buttons.end(); it++) {
-        connect(*it, SIGNAL(clicked()), this, SLOT(btnTextClicked()));
-        (*it)->setStyleSheet(styleSheet());
+    for (QList<QPushButton * >::const_iterator it = buttons.begin(); it != buttons.end(); it++) {
+        connect( *it, SIGNAL(clicked()), this, SLOT(btnTextClicked()));
+        ( *it)->setStyleSheet(styleSheet());
     }
 }
 
@@ -204,7 +233,6 @@ void RKeyboard::setupKbd()
         }
     }
 }
-
 
 void RKeyboard::on_btnCaps_clicked()
 {

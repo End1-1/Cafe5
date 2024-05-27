@@ -315,6 +315,7 @@ bool WOrder::writeOrder()
             && fOHeader.amountPrepaid < 0.001) {
         fOHeader.amountCash = fOHeader.amountTotal;
     }
+    fOHeader._printFiscal = false;
     if (!DlgPaymentChoose::getValues(fOHeader.amountTotal, fOHeader.amountCash, fOHeader.amountCard, fOHeader.amountIdram,
                                      fOHeader.amountTelcell, fOHeader.amountBank, fOHeader.amountCredit,
                                      fOHeader.amountPrepaid, fOHeader.amountDebt,

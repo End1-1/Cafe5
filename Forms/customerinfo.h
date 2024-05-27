@@ -14,8 +14,12 @@ class CustomerInfo : public C5Dialog
 
 public:
     explicit CustomerInfo();
+
     ~CustomerInfo();
+
     static bool getCustomer(int &id, QString &name, QString &phone, QString &address);
+
+    virtual bool eventFilter(QObject *o, QEvent *e) override;
 
 private slots:
     void on_pushButton_2_clicked();
@@ -24,9 +28,12 @@ private slots:
 
     void on_lePhone_returnPressed();
 
+    void on_btnKbdUS_clicked(bool checked);
+
+    void on_btnKdbAM_clicked(bool checked);
+
 private:
     Ui::CustomerInfo *ui;
     int fCustomerId;
 };
-
 #endif // CUSTOMERINFO_H

@@ -3,7 +3,8 @@
 
 #include "c5dialog.h"
 
-namespace Ui {
+namespace Ui
+{
 class DlgPaymentChoose;
 }
 
@@ -21,6 +22,11 @@ public:
                           double &prepaid, double &debt, double &cashin, double &change, bool &fiscal, bool readOnlyPrepaid);
 
     virtual void keyEnter() override;
+
+private:
+    bool fFiscal;
+
+    void setFiscalStyle();
 
 private slots:
 

@@ -285,7 +285,6 @@ HEADERS += \
     ../Classes/calculator.h \
     ../Classes/chatmessage.h \
     ../Classes/checkforupdatethread.h \
-    ../Classes/config.h \
     ../Classes/dataonline.h \
     ../Classes/dlgpassword.h \
     ../Classes/fileversion.h \
@@ -326,7 +325,6 @@ HEADERS += \
     ../DbData/dbopreorder.h \
     ../DbData/dbpartner.h \
     ../DbData/dbservicevalues.h \
-    ../DbData/dbshift.h \
     ../DbData/dbstore.h \
     ../DbData/dbstoredoctype.h \
     ../DbData/dbtables.h \

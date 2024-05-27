@@ -40,8 +40,6 @@ SOURCES += \
     ../Classes/c5printjson.cpp \
     ../Classes/c5printpreview.cpp \
     ../Classes/c5printreceiptthread.cpp \
-    ../Classes/c5printremovedservicethread.cpp \
-    ../Classes/c5printservicethread.cpp \
     ../Classes/c5random.cpp \
     ../Classes/c5storedraftwriter.cpp \
     ../Classes/c5tablemodel.cpp \
@@ -67,33 +65,6 @@ SOURCES += \
     ../Controls/c5dateedit.cpp \
     ../Controls/c5graphicsview.cpp \
     ../Controls/c5guicontrols.cpp \
-    ../DbData/datadriver.cpp \
-    ../DbData/dbbodystate.cpp \
-    ../DbData/dbcar.cpp \
-    ../DbData/dbcurrency.cpp \
-    ../DbData/dbdata.cpp \
-    ../DbData/dbdishcomments.cpp \
-    ../DbData/dbdishes.cpp \
-    ../DbData/dbdishpart1.cpp \
-    ../DbData/dbdishpart2.cpp \
-    ../DbData/dbdishremovereason.cpp \
-    ../DbData/dbdishspecial.cpp \
-    ../DbData/dbgoods.cpp \
-    ../DbData/dbgoodsgroup.cpp \
-    ../DbData/dbhalls.cpp \
-    ../DbData/dbmenu.cpp \
-    ../DbData/dbmenuname.cpp \
-    ../DbData/dbmenupackagelist.cpp \
-    ../DbData/dbmenupackages.cpp \
-    ../DbData/dboheader.cpp \
-    ../DbData/dbopreorder.cpp \
-    ../DbData/dbpartner.cpp \
-    ../DbData/dbservicevalues.cpp \
-    ../DbData/dbstore.cpp \
-    ../DbData/dbstoredoctype.cpp \
-    ../DbData/dbtables.cpp \
-    ../DbData/dbunit.cpp \
-    ../DbData/dbusers.cpp \
     ../Forms/change.cpp \
     ../Forms/customerinfo.cpp \
     ../Forms/dlgcashinout.cpp \
@@ -178,8 +149,6 @@ HEADERS += \
     ../Classes/c5printjson.h \
     ../Classes/c5printpreview.h \
     ../Classes/c5printreceiptthread.h \
-    ../Classes/c5printremovedservicethread.h \
-    ../Classes/c5printservicethread.h \
     ../Classes/c5random.h \
     ../Classes/c5storedraftwriter.h \
     ../Classes/c5tablemodel.h \
@@ -205,33 +174,6 @@ HEADERS += \
     ../Controls/c5dateedit.h \
     ../Controls/c5graphicsview.h \
     ../Controls/c5guicontrols.h \
-    ../DbData/datadriver.h \
-    ../DbData/dbbodystate.h \
-    ../DbData/dbcar.h \
-    ../DbData/dbcurrency.h \
-    ../DbData/dbdata.h \
-    ../DbData/dbdishcomments.h \
-    ../DbData/dbdishes.h \
-    ../DbData/dbdishpart1.h \
-    ../DbData/dbdishpart2.h \
-    ../DbData/dbdishremovereason.h \
-    ../DbData/dbdishspecial.h \
-    ../DbData/dbgoods.h \
-    ../DbData/dbgoodsgroup.h \
-    ../DbData/dbhalls.h \
-    ../DbData/dbmenu.h \
-    ../DbData/dbmenuname.h \
-    ../DbData/dbmenupackagelist.h \
-    ../DbData/dbmenupackages.h \
-    ../DbData/dboheader.h \
-    ../DbData/dbopreorder.h \
-    ../DbData/dbpartner.h \
-    ../DbData/dbservicevalues.h \
-    ../DbData/dbstore.h \
-    ../DbData/dbstoredoctype.h \
-    ../DbData/dbtables.h \
-    ../DbData/dbunit.h \
-    ../DbData/dbusers.h \
     ../Forms/change.h \
     ../Forms/customerinfo.h \
     ../Forms/dlgcashinout.h \
@@ -311,7 +253,6 @@ INCLUDEPATH += c:/projects/cafe5/Controls
 INCLUDEPATH += c:/projects/cafe5/Service
 INCLUDEPATH += c:/projects/cafe5/TableRecord
 INCLUDEPATH += c:/projects/cafe5/service5working/utils
-INCLUDEPATH += c:/projects/cafe5/DbData
 INCLUDEPATH += c:/projects/cafe5/NTable
 INCLUDEPATH += c:/projects/cafe5/Forms
 INCLUDEPATH += c:/Projects/NewTax/Src

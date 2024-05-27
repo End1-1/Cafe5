@@ -163,7 +163,7 @@ void Workspace::setQty(double qty, int mode, int rownum, const QString &packageu
     if (uuid.isEmpty()) {
         uuid = ui->tblOrder->item(row, 0)->data(Qt::UserRole + 1).toString();
     }
-    if (d.qty2 > 0.01) {
+    if (d.qty2 > 0.01 || d.qty2 < -0.01) {
         C5Message::error(tr("Not editable"));
         return;
     }
@@ -175,44 +175,16 @@ void Workspace::setQty(double qty, int mode, int rownum, const QString &packageu
             d.qty += qty;
             break;
         case 3:
-            if (d.qty2 < 0.1) {
-                if (d.qty - qty < 0.1) {
-                    removeDish(row, uuid);
-                    return;
-                }
-                d.qty -= qty;
-            } else {
+            if (d.qty - qty < 0.1) {
                 on_btnVoid_clicked();
                 return;
+            } else {
+                d.qty -= qty;
             }
             break;
     }
-    if (!fOrderUuid.isEmpty()) {
-        fFlagEdited = 1;
-        C5Database db(fDBParams);
-        C5StoreDraftWriter dw(db);
-        if (!dw.writeOBody(d.obodyId, fOrderUuid, DISH_STATE_OK, d.id, d.qty, d.qty, d.price,
-                           (d.qty *d.price) - (d.qty *d.price *discountValue()), __c5config.serviceFactor().toDouble(),
-                           fDiscountValue, d.store, d.printer, "", d.modificator, 0, d.adgCode, 0, 0, 0, row, QDateTime::currentDateTime(),
-                           d.f_emarks)) {
-            C5Message::error(dw.fErrorMsg);
-            db.rollback();
-            return;
-        }
-    }
-    ui->tblOrder->item(row, 0)->setData(Qt::UserRole, QVariant::fromValue(d));
-    updateInfo(row);
-    if (!uuid.isEmpty() && packageuuid.isEmpty()) {
-        for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
-            if (i == row) {
-                continue;
-            }
-            if (ui->tblOrder->item(i, 0)->data(Qt::UserRole + 1).toString() == uuid) {
-                setQty(qty, mode, i, uuid);
-            }
-        }
-    }
-    countTotal();
+    createHttpRequest("/engine/smart/change-qty.php", QJsonObject{{"row", row}, {"qty", d.qty}, {"obodyid", d.obodyId}},
+    SLOT(changeQtyResponse(QJsonObject)));
 }
 
 void Workspace::removeDish(int rownum, const QString &packageuuid)
@@ -231,8 +203,8 @@ void Workspace::removeDish(int rownum, const QString &packageuuid)
             return;
         }
     }
-    createHttpRequest("/engine/smart/removedish.php", QJsonObject{{"obodyid", d.obodyId}}, SLOT(removeDishResponse(
-                QJsonObject)));
+    createHttpRequest("/engine/smart/removedish.php", QJsonObject{{"obodyid", d.obodyId}, {"header", fOrderUuid}}, SLOT(
+        removeDishResponse(QJsonObject)));
 }
 
 void Workspace::filter(const QString &name)
@@ -395,7 +367,6 @@ void Workspace::resetOrder()
     fDiscountMode = 0;
     fDiscountValue = 0;
     fDiscountId = 0;
-    fFlagEdited = 0;
     fSupplierName = "";
     fPhone = "";
     ui->tblOrder->clearContents();
@@ -476,7 +447,8 @@ void Workspace::createHttpRequest(const QString &route, QJsonObject params, cons
     params["sessionkey"] = __c5config.getRegValue("sessionkey").toString();
     params["comp"] = hostinfo;
     params["config_id"] = __c5config.getRegValue("json_config_id").toInt();
-    auto np = new NDataProvider(__c5config.fDBPath, this);
+    params["user_session"] = __c5config.getRegValue("session").toString();
+    auto np = new NDataProvider(this);
     np->setProperty("marks", marks);
     connect(np, SIGNAL(error(QString)), this, responseErrorSlot);
     connect(np, SIGNAL(done(QJsonObject)), this, responseOkSlot);
@@ -844,6 +816,10 @@ void Workspace::on_btnCostumer_clicked()
         ui->lbCostumerPhone->setText(QString("%1\r\n%2\r\n%3").arg(phone, name, address));
         ui->lbCostumerPhone->setVisible(true);
     }
+    if (!fOrderUuid.isEmpty()) {
+        createHttpRequest("/engine/smart/set-customer.php", QJsonObject{{"header", fOrderUuid}, {"customer", fCustomer}}, SLOT(
+            voidResponse(QJsonObject)));
+    }
 }
 
 void Workspace::setCustomerPhoneNumber(const QString &number)
@@ -875,12 +851,13 @@ void Workspace::on_tblDishes_cellClicked(int row, int column)
     bhistory["data"] = fDiscountAmount;
     QJsonObject flags;
     flags["f1"] = fCustomer == 0 ? 0 :  1;
-    flags["f2"] = fFlagEdited;
+    flags["f2"] = 0;
     flags["f3"] = ui->btnFlagTakeAway->isChecked() ? 1 : 0;
     flags["f4"] = 0;
     flags["f5"] = 0;
     dish["flags"] = flags;
     dish["bhistory"] = bhistory;
+    dish["customer"] = fCustomer;
     createHttpRequest("/engine/smart/adddish.php", dish, SLOT(addGoodsResponse(QJsonObject)), dish);
 }
 
@@ -1071,7 +1048,7 @@ bool Workspace::saveOrder(int state, bool printService)
     bhistory["data"] = fDiscountAmount;
     QJsonObject flags;
     flags["f1"] = fCustomer == 0 ? 0 :  1;
-    flags["f2"] = fFlagEdited;
+    flags["f2"] = 0;
     flags["f3"] = ui->btnFlagTakeAway->isChecked() ? 1 : 0;
     flags["f4"] = 0;
     flags["f5"] = 0;
@@ -1486,7 +1463,7 @@ void Workspace::printService(const QString &printerName, const QJsonObject &h, c
         p.ctext(QString("*%1*").arg(tr("Delivery")));
         p.br();
     }
-    if (h["f_edited"].toInt() > 0) {
+    if (jf["f_2"].toInt() > 0) {
         p.ctext(QString("*%1*").arg(tr("Edited")));
         p.br();
     }
@@ -1594,10 +1571,12 @@ void Workspace::loginResponse(const QJsonObject &jdoc)
     }
     QJsonObject jo = jdoc["data"].toObject();
     __c5config.setRegValue("sessionkey", jo["sessionkey"].toString());
+    NDataProvider::sessionKey = jo["sessionkey"].toString();
     jo = jdoc["data"].toObject()["user"].toObject();
     __c5config.setRegValue("username", QString("%1 %2").arg(jo["f_last"].toString(), jo["f_first"].toString()));
     __c5config.setRegValue("json_config_id",
                            jo["f_config"].toInt() > 0 ? jo["f_config"].toInt() : __c5config.fJsonConfigId);
+    __c5config.setRegValue("session", C5Database::uuid());
     fUser = new C5User(jo["f_id"].toInt());
     httpStop(sender());
     createHttpRequest("/engine/smart/init.php", QJsonObject(), SLOT(initResponse(QJsonObject)), "init");
@@ -1833,8 +1812,9 @@ void Workspace::printServiceResponse(const QJsonObject &jdoc)
         }
     }
     jo = sender()->property("marks").toJsonObject();
+    jo["opentable"] = true;
     httpStop(sender());
-    createHttpRequest("/engine/smart/printservice.php", QJsonObject{{"header", jo["header"].toObject()["f_id"].toString()}, {"mode", 2}},
+    createHttpRequest("/engine/smart/printservice.php", QJsonObject{{"header", jheader["f_id"].toString()}, {"mode", 2}},
     SLOT(
         voidResponse(QJsonObject)), jo);
 }
@@ -1855,27 +1835,37 @@ void Workspace::voidResponse(const QJsonObject &jdoc)
         //            QJsonObject)));
         printReceipt(marks["header"].toString(), false, false);
     }
+    if (marks["opentable"].toBool()) {
+        createHttpRequest("/engine/smart/opentable.php", QJsonObject{{"table", fTable}}, SLOT(
+            openTableResponse(QJsonObject)));
+    }
 }
 
 void Workspace::removeDishResponse(const QJsonObject &jdoc)
 {
-    QJsonObject jo = jdoc["data"].toObject();
-    for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
-        Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
-        if (d.obodyId == jo["obodyid"].toString()) {
-            d.state = jo["state"].toInt();
-            ui->tblOrder->item(i, 0)->setData(Qt::UserRole, QVariant::fromValue(d));
-            updateInfo(i);
-            break;
-        }
-    }
-    ui->tblOrder->viewport()->update();
-    countTotal();
+    Q_UNUSED(jdoc);
+    // QJsonObject jo = jdoc["data"].toObject();
+    // for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
+    //     Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
+    //     if (d.obodyId == jo["obodyid"].toString()) {
+    //         d.state = jo["state"].toInt();
+    //         ui->tblOrder->item(i, 0)->setData(Qt::UserRole, QVariant::fromValue(d));
+    //         updateInfo(i);
+    //     }
+    //     if (d.state == 1) {
+    //         d.qty2 = abs(d.qty2) * -1;
+    //     }
+    // }
+    // ui->tblOrder->viewport()->update();
+    // countTotal();
     httpStop(sender());
+    createHttpRequest("/engine/smart/opentable.php", QJsonObject{{"table", fTable}}, SLOT(
+        openTableResponse(QJsonObject)));
 }
 
 void Workspace::openTableResponse(const QJsonObject &jdoc)
 {
+    resetOrder();
     QJsonObject jo = jdoc["data"].toObject();
     fTable = jo["table"].toInt();
     QTableWidgetItem *currentItem = nullptr;
@@ -1892,7 +1882,7 @@ void Workspace::openTableResponse(const QJsonObject &jdoc)
         currentItem->setData(Qt::UserRole + 1, jt["f_id"].toString());
         fOrderUuid = jt["f_id"].toString();
         jt = jo["customer"].toObject();
-        fCustomer = jo["f_id"].toInt();
+        fCustomer = jt["f_id"].toInt();
         if (fCustomer > 0) {
             ui->lbCostumerPhone->setText(QString("%1\r\n%2\r\n%3").arg(jt["f_phone"].toString(), jt["f_contact"].toString(),
                                          jt["f_address"].toString()));
@@ -1903,7 +1893,6 @@ void Workspace::openTableResponse(const QJsonObject &jdoc)
         fDiscountCard = jt["f_card"].toInt();
         fDiscountValue = jt["f_value"].toString().toDouble();
         jt = jo["flags"].toObject();
-        fFlagEdited = jt["f_2"].toInt();
         ui->btnFlagTakeAway->setChecked(jt["f_3"].toInt() > 0);
         QJsonArray ja = jo["dishes"].toArray();
         for (int i = 0; i < ja.size(); i++) {
@@ -1926,6 +1915,32 @@ void Workspace::openTableResponse(const QJsonObject &jdoc)
         }
         ui->tblTables->viewport()->update();
     }
+    httpStop(sender());
+}
+
+void Workspace::changeQtyResponse(const QJsonObject &jdoc)
+{
+    QJsonObject jo = jdoc["data"].toObject();
+    int row = jo["row"].toInt();
+    Dish d = ui->tblOrder->item(row, 0)->data(Qt::UserRole).value<Dish>();
+    d.qty = jo["qty"].toDouble();
+    ui->tblOrder->item(row, 0)->setData(Qt::UserRole, QVariant::fromValue(d));
+    ui->tblOrder->setCurrentCell(row, 0);
+    updateInfo(row);
+    countTotal();
+    httpStop(sender());
+}
+
+void Workspace::updateDishResponse(const QJsonObject &jdoc)
+{
+    QJsonObject jo = jdoc["data"].toObject();
+    int row = jo["row"].toInt();
+    Dish d = ui->tblOrder->item(row, 0)->data(Qt::UserRole).value<Dish>();
+    d.modificator = jo["comment"].toString();
+    ui->tblOrder->item(row, 0)->setData(Qt::UserRole, QVariant::fromValue(d));
+    ui->tblOrder->setCurrentCell(row, 0);
+    updateInfo(row);
+    countTotal();
     httpStop(sender());
 }
 
@@ -2061,9 +2076,11 @@ void Workspace::on_btnComment_clicked()
     }
     QString comment;
     if (DlgListOfDishComments::getComment(d.name, comment)) {
-        d.modificator = comment;
-        ui->tblOrder->item(row, 0)->setData(Qt::UserRole, QVariant::fromValue(d));
-        updateInfo(row);
+        createHttpRequest("/engine/smart/update-dish.php", QJsonObject{
+            {"obodyid", d.obodyId},
+            {"row", row},
+            {"comment", comment}
+        }, SLOT(updateDishResponse(QJsonObject)));
     }
 }
 
@@ -2104,7 +2121,6 @@ void Workspace::on_tblTables_itemClicked(QTableWidgetItem *item)
         }
     }
     item->setData(Qt::UserRole + 2, true);
-    resetOrder();
     createHttpRequest("/engine/smart/opentable.php", QJsonObject{{"table", item->data(Qt::UserRole).toInt()}}, SLOT(
         openTableResponse(QJsonObject)));
 }
@@ -2114,11 +2130,8 @@ void Workspace::on_btnSaveAndPrecheck_clicked()
     if (ui->tblOrder->rowCount() == 0) {
         return;
     }
-    C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Save order and print precheck"),
+    C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Print precheck"),
                     QString::number(fTable),  "");
-    if (saveOrder(ORDER_STATE_OPEN, true)) {
-        fFlagEdited = 1;
-    }
     printReceipt(fOrderUuid, false, true);
 }
 
@@ -2219,10 +2232,11 @@ void Workspace::on_btnEmarks_clicked()
 
 void Workspace::on_printOrder_clicked()
 {
-    saveOrder(ORDER_STATE_OPEN, true);
-    for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
-        updateInfo(i);
+    if (fOrderUuid.isEmpty()) {
+        return;
     }
+    createHttpRequest("/engine/smart/printservice.php", QJsonObject{{"header", fOrderUuid}, {"mode", 1}}, SLOT(
+        printServiceResponse(QJsonObject)), QVariant());
 }
 
 void Workspace::on_btnFiscal_clicked(bool checked)
