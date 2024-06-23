@@ -11,7 +11,6 @@ FORMS += \
     ../Editors/ce5currencycrossraterecord.ui \
     ../Editors/ce5currencyrate.ui \
     ../Editors/ce5dishpackage.ui \
-    ../Editors/ce5goodsclass.ui \
     ../Editors/ce5goodsmodel.ui \
     ../Editors/ce5mfprocess.ui \
     ../Editors/ce5mfprocessstage.ui \
@@ -165,6 +164,7 @@ FORMS += \
 
 
 HEADERS += \
+        $$PWD/../Classes/QProgressIndicator.h \
         $$PWD/../Classes/c5servername.h \
         $$PWD/../NTable/nhandler.h \
         $$PWD/../NTable/nsearchdlg.h \
@@ -178,7 +178,6 @@ HEADERS += \
         ../../NewTax/Src/printtaxn.h \
         ../../XLSX/src/xlsxborder.h \
         ../Cafe5/c5double.h \
-        ../Cafe5/c5replication.h \
         ../Cafe5/c5systempreference.h \
         ../Classes/QRCodeGenerator.h \
         ../Classes/barcode5.h \
@@ -198,12 +197,10 @@ HEADERS += \
         ../Classes/calculator.h \
         ../Classes/chatmessage.h \
         ../Classes/dataonline.h \
-        ../Classes/doubledatabase.h \
         ../Classes/goodsreserve.h \
         ../Classes/notificationwidget.h \
         ../Classes/outputofheader.h \
         ../Classes/proxytablewidgetdatabase.h \
-        ../Classes/removeshopsale.h \
         ../Classes/threadsendmessage.h \
         ../Configs/breezeconfig.h \
         ../Configs/configs.h \
@@ -212,33 +209,6 @@ HEADERS += \
         ../Controls/c5guicontrols.h \
         ../Controls/c5tablewithtotal.h \
         ../Controls/combosearchview.h \
-        ../DbData/datadriver.h \
-        ../DbData/dbbodystate.h \
-        ../DbData/dbcar.h \
-        ../DbData/dbcurrency.h \
-        ../DbData/dbdata.h \
-        ../DbData/dbdishcomments.h \
-        ../DbData/dbdishes.h \
-        ../DbData/dbdishpart1.h \
-        ../DbData/dbdishpart2.h \
-        ../DbData/dbdishremovereason.h \
-        ../DbData/dbdishspecial.h \
-        ../DbData/dbgoods.h \
-        ../DbData/dbgoodsgroup.h \
-        ../DbData/dbhalls.h \
-        ../DbData/dbmenu.h \
-        ../DbData/dbmenuname.h \
-        ../DbData/dbmenupackagelist.h \
-        ../DbData/dbmenupackages.h \
-        ../DbData/dboheader.h \
-        ../DbData/dbopreorder.h \
-        ../DbData/dbpartner.h \
-        ../DbData/dbservicevalues.h \
-        ../DbData/dbstore.h \
-        ../DbData/dbstoredoctype.h \
-        ../DbData/dbtables.h \
-        ../DbData/dbunit.h \
-        ../DbData/dbusers.h \
         ../Editors/c5cashname.h \
         ../Editors/ce5currency.h \
         ../Editors/ce5currencycrossrate.h \
@@ -246,7 +216,6 @@ HEADERS += \
         ../Editors/ce5currencyrate.h \
         ../Editors/ce5dishpackage.h \
         ../Editors/ce5goodsbarcodelabelview.h \
-        ../Editors/ce5goodsclass.h \
         ../Editors/ce5goodsmodel.h \
         ../Editors/ce5mfprocess.h \
         ../Editors/ce5mfprocessstage.h \
@@ -362,7 +331,6 @@ HEADERS += \
         ../Reports/cr5draftoutputbyrecipe.h \
         ../Reports/cr5draftoutputbyrecipefilter.h \
         ../Reports/cr5generalreportonlydate.h \
-        ../Reports/cr5goodsclasses.h \
         ../Reports/cr5goodsfilter.h \
         ../Reports/cr5goodsimages.h \
         ../Reports/cr5goodsqtyreminder.h \
@@ -526,6 +494,7 @@ HEADERS += \
 
 
 SOURCES += \
+    $$PWD/../Classes/QProgressIndicator.cpp \
     $$PWD/../Classes/c5servername.cpp \
     $$PWD/../NTable/nhandler.cpp \
     $$PWD/../NTable/nsearchdlg.cpp \
@@ -538,7 +507,6 @@ SOURCES += \
         ../../NewTax/Src/printtaxn.cpp \
         ../../XLSX/src/xlsxborder.cpp \
         ../Cafe5/c5double.cpp \
-        ../Cafe5/c5replication.cpp \
         ../Cafe5/c5systempreference.cpp \
         ../Classes/QRCodeGenerator.cpp \
         ../Classes/c5airlog.cpp \
@@ -556,11 +524,9 @@ SOURCES += \
         ../Classes/c5user.cpp \
         ../Classes/calculator.cpp \
         ../Classes/dataonline.cpp \
-        ../Classes/doubledatabase.cpp \
         ../Classes/notificationwidget.cpp \
         ../Classes/outputofheader.cpp \
         ../Classes/proxytablewidgetdatabase.cpp \
-        ../Classes/removeshopsale.cpp \
         ../Classes/threadsendmessage.cpp \
         ../Configs/breezeconfig.cpp \
         ../Configs/configs.cpp \
@@ -569,33 +535,6 @@ SOURCES += \
         ../Controls/c5guicontrols.cpp \
         ../Controls/c5tablewithtotal.cpp \
         ../Controls/combosearchview.cpp \
-        ../DbData/datadriver.cpp \
-        ../DbData/dbbodystate.cpp \
-        ../DbData/dbcar.cpp \
-        ../DbData/dbcurrency.cpp \
-        ../DbData/dbdata.cpp \
-        ../DbData/dbdishcomments.cpp \
-        ../DbData/dbdishes.cpp \
-        ../DbData/dbdishpart1.cpp \
-        ../DbData/dbdishpart2.cpp \
-        ../DbData/dbdishremovereason.cpp \
-        ../DbData/dbdishspecial.cpp \
-        ../DbData/dbgoods.cpp \
-        ../DbData/dbgoodsgroup.cpp \
-        ../DbData/dbhalls.cpp \
-        ../DbData/dbmenu.cpp \
-        ../DbData/dbmenuname.cpp \
-        ../DbData/dbmenupackagelist.cpp \
-        ../DbData/dbmenupackages.cpp \
-        ../DbData/dboheader.cpp \
-        ../DbData/dbopreorder.cpp \
-        ../DbData/dbpartner.cpp \
-        ../DbData/dbservicevalues.cpp \
-        ../DbData/dbstore.cpp \
-        ../DbData/dbstoredoctype.cpp \
-        ../DbData/dbtables.cpp \
-        ../DbData/dbunit.cpp \
-        ../DbData/dbusers.cpp \
         ../Editors/c5cashname.cpp \
         ../Editors/ce5currency.cpp \
         ../Editors/ce5currencycrossrate.cpp \
@@ -603,7 +542,6 @@ SOURCES += \
         ../Editors/ce5currencyrate.cpp \
         ../Editors/ce5dishpackage.cpp \
         ../Editors/ce5goodsbarcodelabelview.cpp \
-        ../Editors/ce5goodsclass.cpp \
         ../Editors/ce5goodsmodel.cpp \
         ../Editors/ce5mfprocess.cpp \
         ../Editors/ce5mfprocessstage.cpp \
@@ -717,7 +655,6 @@ SOURCES += \
         ../Reports/cr5draftoutputbyrecipe.cpp \
         ../Reports/cr5draftoutputbyrecipefilter.cpp \
         ../Reports/cr5generalreportonlydate.cpp \
-        ../Reports/cr5goodsclasses.cpp \
         ../Reports/cr5goodsfilter.cpp \
         ../Reports/cr5goodsimages.cpp \
         ../Reports/cr5goodsqtyreminder.cpp \
@@ -881,7 +818,6 @@ INCLUDEPATH += ../Reports
 INCLUDEPATH += ../Controls
 INCLUDEPATH += ../Editors
 INCLUDEPATH += ../TableRecord
-INCLUDEPATH += ../DbData
 INCLUDEPATH += ../Waiter
 INCLUDEPATH += ../NTable
 INCLUDEPATH += ../RESOURCES

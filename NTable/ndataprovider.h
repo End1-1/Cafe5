@@ -5,7 +5,6 @@
 #include <QNetworkReply>
 
 class QNetworkAccessManager;
-//class QNetworkReply;
 class QElapsedTimer;
 
 class NDataProvider : public QObject

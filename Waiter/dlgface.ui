@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1024</width>
+    <width>1108</width>
     <height>768</height>
    </rect>
   </property>
@@ -225,6 +225,29 @@
        </spacer>
       </item>
       <item>
+       <widget class="QPushButton" name="btnTools">
+        <property name="minimumSize">
+         <size>
+          <width>140</width>
+          <height>60</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Tools</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/pentools.png</normaloff>:/pentools.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QToolButton" name="btnExit">
         <property name="minimumSize">
          <size>
@@ -329,7 +352,7 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>811</width>
+              <width>898</width>
               <height>682</height>
              </rect>
             </property>
@@ -420,6 +443,7 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
+  <include location="../resources/res.qrc"/>
   <include location="../resources/res.qrc"/>
  </resources>
  <connections/>

@@ -8,6 +8,7 @@
 #include "c5filelogwriter.h"
 #include "c5config.h"
 #include "ndataprovider.h"
+#include <QCheckBox>
 #include <QJsonObject>
 #include <QPushButton>
 #include <QJsonArray>
@@ -93,6 +94,11 @@ void NFilterDlg::setup(const QJsonArray &fields)
             if (!first) {
                 first = c;
             }
+        } else if (jo["type"].toString() == "checkbox") {
+            auto *ch = new QCheckBox(this);
+            ch->setProperty("field", jo["field"].toString());
+            ch->setProperty("type", jo["type"].toString());
+            ui->gl->addWidget(ch, i, 1);
         }
     }
     ui->gl->setColumnStretch(3, 1);
@@ -116,6 +122,8 @@ QJsonObject NFilterDlg::filter() const
                 jo[o->property("field").toString()] = static_cast<QComboBox *>(o)->currentData().toInt();
             } else if (o->property("type").toString() == "keyvalue") {
                 jo[o->property("field").toString()] = static_cast<QLineEdit *>(o)->text();
+            } else if (o->property("type").toString() == "checkbox") {
+                jo[o->property("field").toString()] = static_cast<QCheckBox *>(o)->isChecked() ? 1 : 0;
             }
         }
     }
@@ -135,6 +143,8 @@ QVariant NFilterDlg::filterValue(const QString &name)
                 return static_cast<QComboBox *>(o)->currentData().toInt();
             } else if (o->property("type").toString() == "keyvalue") {
                 return static_cast<QLineEdit *>(o)->text();
+            } else if (o->property("type").toString() == "checkbox") {
+                return static_cast<QCheckBox *>(o)->isChecked();
             }
         }
     }
@@ -203,12 +213,12 @@ void NFilterDlg::queryFinished(const QJsonObject &ba)
     mLoadingDlg->reject();
     mLoadingDlg->deleteLater();
     auto *btn = sender()->property("btn").value<QPushButton *>();
+    sender()->deleteLater();
     QJsonArray jcols = ba["cols"].toArray();
     QJsonArray jdata = ba["rows"].toArray();
     mData[btn->property("filter").toString()] = jdata;
     mCols[btn->property("filter").toString()] = jcols;
     btn->click();
-    sender()->deleteLater();
 }
 
 void NFilterDlg::on_btnCancel_clicked()

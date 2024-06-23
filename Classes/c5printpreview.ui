@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1271</width>
+    <width>910</width>
     <height>714</height>
    </rect>
   </property>
@@ -271,9 +271,12 @@
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Expanding</enum>
+        </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>417</width>
+          <width>0</width>
           <height>20</height>
          </size>
         </property>
@@ -397,8 +400,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>1245</width>
-           <height>649</height>
+           <width>888</width>
+           <height>654</height>
           </rect>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_3">

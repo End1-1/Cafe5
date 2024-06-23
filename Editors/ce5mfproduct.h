@@ -3,7 +3,8 @@
 
 #include "ce5editor.h"
 
-namespace Ui {
+namespace Ui
+{
 class CE5MFProduct;
 }
 
@@ -27,6 +28,10 @@ public:
     virtual bool save(QString &err, QList<QMap<QString, QVariant> > &data);
 
 private slots:
+    void openResponse(const QJsonObject &jdoc);
+
+    void saveResponse(const QJsonObject &jdoc);
+
     void startPriceUpdateOnRow();
 
     void durationChanged(const QString &arg1);
@@ -56,6 +61,28 @@ private slots:
     void on_btnPaste_clicked();
 
     void on_btnExportExcel_clicked();
+
+    void on_btnAdd_2_clicked();
+
+    void on_btnAddImage_clicked();
+
+    void on_btnAdd_3_clicked();
+
+    void on_btnMinus_2_clicked();
+
+    void on_btnClear_2_clicked();
+
+    void on_btnMinus_3_clicked();
+
+    void on_btnClearTblMaterials_clicked();
+
+    void on_btnCopy_2_clicked();
+
+    void on_btnPaste_2_clicked();
+
+    void on_btnCopy_3_clicked();
+
+    void on_btnPaste_3_clicked();
 
 private:
     Ui::CE5MFProduct *ui;

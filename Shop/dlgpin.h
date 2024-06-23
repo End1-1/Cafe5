@@ -1,7 +1,8 @@
 #ifndef DLGPIN_H
 #define DLGPIN_H
 
-#include <QDialog>
+#include "c5dialog.h"
+#include <QJsonObject>
 
 namespace Ui
 {
@@ -10,7 +11,7 @@ class DlgPin;
 
 class NLoadingDlg;
 
-class DlgPin : public QDialog
+class DlgPin : public C5Dialog
 {
     Q_OBJECT
 
@@ -25,6 +26,8 @@ protected:
     virtual void keyReleaseEvent(QKeyEvent *event) override;
 
 private slots:
+    void loginResponse(const QJsonObject &jdoc);
+
     void queryLoading();
 
     void queryStopped(QObject *sender);

@@ -79,6 +79,28 @@
         <property name="sizeConstraint">
          <enum>QLayout::SetMinimumSize</enum>
         </property>
+        <item row="1" column="0">
+         <widget class="QLabel" name="lbComment">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <italic>true</italic>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">font-style:strikeout;</string>
+          </property>
+          <property name="text">
+           <string>Comment of the dish</string>
+          </property>
+         </widget>
+        </item>
         <item row="0" column="0">
          <widget class="QWidget" name="wrow1" native="true">
           <property name="sizePolicy">
@@ -259,35 +281,6 @@
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="lbComment">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-            <italic>true</italic>
-           </font>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">font-style:strikeout;</string>
-          </property>
-          <property name="text">
-           <string>Comment of the dish</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QLabel" name="label">
-          <property name="text">
-           <string>TextLabel</string>
           </property>
          </widget>
         </item>

@@ -4,7 +4,8 @@
 #include "c5dialog.h"
 #include "oheader.h"
 
-namespace Ui {
+namespace Ui
+{
 class ViewOrder;
 }
 
@@ -21,6 +22,8 @@ public:
     ~ViewOrder();
 
 private slots:
+    void removeOrderResponse(const QJsonObject &jdoc);
+
     void on_btnReturn_clicked();
 
     void on_btnTaxReturn_clicked();
@@ -47,6 +50,10 @@ private slots:
 
     void on_btnMakeDraft_clicked();
 
+    void on_btnSaveReturn_clicked();
+
+    void on_tbl_cellClicked(int row, int column);
+
 private:
     Ui::ViewOrder *ui;
 
@@ -59,6 +66,8 @@ private:
     Working *fWorking;
 
     void returnFalse(const QString &msg, C5Database *db);
+
+    void countOrder();
 };
 
 #endif // VIEWORDER_H

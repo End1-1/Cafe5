@@ -24,12 +24,12 @@
      </attribute>
      <column>
       <property name="text">
-       <string>Armenian</string>
+       <string>English (key)</string>
       </property>
      </column>
      <column>
       <property name="text">
-       <string>English</string>
+       <string>Armenian</string>
       </property>
      </column>
      <column>

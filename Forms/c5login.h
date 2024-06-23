@@ -19,6 +19,7 @@ public:
     ~C5Login();
 
 private slots:
+    void loginResponse(const QJsonObject &jdoc);
     void on_btnCancel_clicked();
     void on_btnOk_clicked();
     void on_cbDatabases_currentIndexChanged(int index);

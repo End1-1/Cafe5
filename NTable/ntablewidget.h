@@ -3,7 +3,8 @@
 
 #include "c5widget.h"
 
-namespace Ui {
+namespace Ui
+{
 class NTableWidget;
 }
 
@@ -27,6 +28,7 @@ public:
 
 private:
     Ui::NTableWidget *ui;
+    int fFilterColumn;
     QString mRoute;
     NLoadingDlg *mLoadingDlg;
     NFilterDlg *fFilter;
@@ -36,6 +38,7 @@ private:
 
 private slots:
     void queryStarted();
+    void filterByColumn();
     void queryError(const QString &error);
     void queryFinished(const QJsonObject &ba);
     void exportToExcel();
@@ -46,6 +49,8 @@ private slots:
     void tblValueChanged(int v);
     void on_leFilterLineedit_textEdited(const QString &arg1);
     void on_mTableView_doubleClicked(const QModelIndex &index);
+    virtual void tableViewHeaderContextMenuRequested(const QPoint &point);
+    virtual void tableViewHeaderClicked(int index);
 };
 
 #endif // NTABLEWIDGET_H

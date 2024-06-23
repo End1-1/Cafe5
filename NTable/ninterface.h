@@ -12,8 +12,10 @@ class NInterface : public QObject
 public:
     explicit NInterface(QWidget *parent = nullptr);
 
+    ~NInterface();
+
     void createHttpQuery(const QString &route, const QJsonObject &params, const char *slotResponse,
-                         const QVariant &marks = QVariant());
+                         const QVariant &marks = QVariant(), bool progress = true);
 
 public slots:
     void httpQueryStarted();
@@ -24,6 +26,8 @@ public slots:
 
 private:
     NLoadingDlg *fLoadingDlg;
+
+    bool fProgress;
 
 signals:
 };

@@ -35,6 +35,12 @@
       <item>
        <widget class="QWidget" name="wtopbtn" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
          <item>
           <widget class="QPushButton" name="btnCreateReservation">
            <property name="text">
@@ -45,6 +51,24 @@
              <normaloff>:/new.png</normaloff>:/new.png</iconset>
            </property>
           </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnClearFilter">
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources/res.qrc">
+             <normaloff>:/filter_clear.png</normaloff>:/filter_clear.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="halls">
+           <property name="spacing">
+            <number>2</number>
+           </property>
+          </layout>
          </item>
          <item>
           <spacer name="horizontalSpacer">

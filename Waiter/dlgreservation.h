@@ -3,7 +3,8 @@
 
 #include "c5dialog.h"
 
-namespace Ui {
+namespace Ui
+{
 class DlgReservation;
 }
 
@@ -19,6 +20,7 @@ public:
     ~DlgReservation();
 
 private slots:
+    void openReservationResponse(const QJsonObject &jdoc);
     void on_btnCreateReservation_clicked();
     void on_btnExit_clicked();
     void horizontalScroll(int v);
@@ -26,12 +28,15 @@ private slots:
     void verticalRoomScroll(int v);
     void on_tbl_itemClicked(QTableWidgetItem *item);
 
+    void on_btnClearFilter_clicked();
+
 private:
     Ui::DlgReservation *ui;
-    int fHallFilter;
+    QMap<int, bool> fHallFilter;
     QList<int> fRoomId;
     C5User *fUser;
     void loadTable();
+    void filterHall();
 };
 
 #endif // DLGRESERVATION_H

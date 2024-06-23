@@ -7,13 +7,11 @@ DlgGuest::DlgGuest() :
 {
     ui->setupUi(this);
     setWindowState(Qt::WindowFullScreen);
-    QStringList dbp(C5Config::dbParams());
-    dbp[1] = C5Config::hotelDatabase();
-    C5Database db(dbp);
-    db.exec("select r.f_id, r.f_invoice, r.f_room, g.guest, r.f_startdate, r.f_enddate, r.f_man+r.f_woman+r.f_child "
-            "from f_reservation r "
-            "left join guests g on g.f_id=r.f_guest "
-            "where r.f_state=1 order by r.f_room ");
+    C5Database db;
+    db.exec(QString("select r.f_id, r.f_invoice, r.f_room, g.guest, r.f_startdate, r.f_enddate, r.f_man+r.f_woman+r.f_child "
+                    "from %1.f_reservation r "
+                    "left join %1.guests g on g.f_id=r.f_guest "
+                    "where r.f_state=1 order by r.f_room ").arg(C5Config::hotelDatabase()));
     while (db.nextRow()) {
         int row = ui->tblGuest->addEmptyRow();
         ui->tblGuest->setString(row, 0, db.getString(1));
@@ -24,7 +22,6 @@ DlgGuest::DlgGuest() :
         ui->tblGuest->setData(row, 5, db.getDate(5));
         ui->tblGuest->setInteger(row, 6, db.getInt(6));
     }
-
     connect(ui->kbd, SIGNAL(textChanged(QString)), this, SLOT(searchGuest(QString)));
     connect(ui->kbd, SIGNAL(accept()), this, SLOT(kbdAccept()));
     connect(ui->kbd, SIGNAL(reject()), this, SLOT(reject()));

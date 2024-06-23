@@ -113,7 +113,6 @@
 #define cp_t6_goods 603
 #define cp_t6_waste 604
 #define cp_t6_storage 605
-#define cp_t6_classes 607
 #define cp_t6_goods_images 608
 #define cp_t6_qty_reminder 609
 #define cp_t6_complectations 610
@@ -160,8 +159,6 @@
 #define cp_t10_actions_stages 1007
 #define cp_t10_active_tasks 1008
 #define cp_t10_create_task 1009
-
-
 
 class C5Permissions
 {

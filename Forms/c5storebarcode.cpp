@@ -44,21 +44,18 @@ void C5StoreBarcode::addRow(const QString &name, const QString &barcode, int qty
     C5Database db(fDBParams);
     db[":f_scancode"] = barcode;
     db[":f_currency"] = curr;
-    db.exec("select c.*, c1.f_name as f_class1name, gpr.f_price1 "
+    db.exec("select c.*, gpr.f_price1 "
             "from c_goods c "
-            "left join c_goods_classes c1 on c1.f_id=c.f_group1 "
             "left join c_goods_prices gpr on gpr.f_goods=c.f_id "
             "where f_scancode=:f_scancode and gpr.f_currency=:f_currency");
     if (db.nextRow()) {
         ui->tbl->setDouble(row, 4, db.getDouble("f_price1"));
         ui->tbl->setString(row, 5, db.getString("f_description"));
-        ui->tbl->setString(row, 6, db.getString("f_class1name"));
         ui->tbl->setString(row, 7, db.getString("f_weblink"));
         ui->tbl->setString(row, 8, sizes.right(sizes.length() - 3));
     } else {
         ui->tbl->setDouble(row, 4, 0);
         ui->tbl->setString(row, 5, "");
-        ui->tbl->setString(row, 6, "");
         ui->tbl->setString(row, 7, "");
         ui->tbl->setString(row, 8, "");
     }
@@ -81,7 +78,8 @@ QToolBar *C5StoreBarcode::toolBar()
 
 //SAMO XANUT VERSION
 
-bool C5StoreBarcode::printOneBarcode(const QString &code, const QString &price, const QString &class1, const QString &name, QPrintDialog &pd)
+bool C5StoreBarcode::printOneBarcode(const QString &code, const QString &price, const QString &class1,
+                                     const QString &name, QPrintDialog &pd)
 {
     QPrinter printer(QPrinter::HighResolution);
     printer.setPrinterName(pd.printer()->printerName());
@@ -95,13 +93,12 @@ bool C5StoreBarcode::printOneBarcode(const QString &code, const QString &price, 
     QPrinter::PageSize ps = printer.pageSize();
     ps = pd.printer()->pageSize();
     printer.setPageSize(ps);
-    QPainter p(&printer);
+    QPainter p( &printer);
     Barcode93 b;
     bool r = b.Encode93(code.toLatin1().data());
     QFont f(__c5config.getValue(param_app_font_family), 25, QFont::Normal);
     p.setFont(f);
     qreal plen = 2;
-
     QTextOption to;
     to.setWrapMode(QTextOption::WordWrap);
     f.setPointSize(8);
@@ -113,10 +110,8 @@ bool C5StoreBarcode::printOneBarcode(const QString &code, const QString &price, 
     f.setPointSize(10);
     p.setFont(f);
     p.drawText(5, 185, QString("%1: %2").arg(tr("Price"), price));
-
     return printer.printerState() != QPrinter::Error;
 }
-
 
 bool C5StoreBarcode::printOneBarcode2(const QString &code, const QString &price, QString link,
                                       const QString &name, const QString &sizeList, QPrintDialog &pd)
@@ -124,12 +119,10 @@ bool C5StoreBarcode::printOneBarcode2(const QString &code, const QString &price,
     if (link.isEmpty()) {
         link = " ";
     }
-
     int levelIndex = 1;
     int versionIndex = 0;
     bool bExtent = true;
     int maskIndex = -1;
-
     CQR_Encode qrEncode;
     bool successfulEncoding = qrEncode.EncodeData(levelIndex, versionIndex, bExtent, maskIndex, link.toUtf8().data() );
     if (!successfulEncoding) {
@@ -139,7 +132,6 @@ bool C5StoreBarcode::printOneBarcode2(const QString &code, const QString &price,
     int encodeImageSize = qrImageSize + ( QR_MARGIN * 2 );
     QImage encodeImage(encodeImageSize, encodeImageSize, QImage::Format_Mono);
     encodeImage.fill(1);
-
     for ( int i = 0; i < qrImageSize; i++ ) {
         for ( int j = 0; j < qrImageSize; j++ ) {
             if ( qrEncode.m_byModuleData[i][j] ) {
@@ -147,10 +139,8 @@ bool C5StoreBarcode::printOneBarcode2(const QString &code, const QString &price,
             }
         }
     }
-
     QPixmap pix = QPixmap::fromImage(encodeImage);
     pix = pix.scaled(150, 150);
-
     QPrinter printer(QPrinter::HighResolution);
     printer.setPrinterName(pd.printer()->printerName());
     printer.setOrientation(QPrinter::Landscape);
@@ -160,33 +150,27 @@ bool C5StoreBarcode::printOneBarcode2(const QString &code, const QString &price,
     QPrinter::PageSize ps = printer.pageSize();
     ps = pd.printer()->pageSize();
     printer.setPageSize(ps);
-
     QPixmap px(400, 550);
     px.fill(Qt::white);
-    QPainter painter(&px);
-
+    QPainter painter( &px);
     QGraphicsScene gs;
     gs.setSceneRect(0, 0, 400.0, 550.0);
     Barcode128 b;
     qreal plen = 3;
     bool r = b.Encode128C(code.toLatin1().data());
     b.DrawBarcodeGS(gs, 200 - (b.DrawBarcodeGSLength(0, 150, plen) / 2), 280, 150, 150, plen);
-
     QFont font = painter.font();
     font.setPointSize(font.pointSize() + 8);
     painter.setFont(font);
     painter.drawImage(QRectF(80, 0, 150, 150), encodeImage);
     QSet<QString> sizes;
     QStringList t = sizeList.split(" ");
-    for (const QString &s: qAsConst(t)) {
+    for (const QString &s : qAsConst(t)) {
         sizes.insert(s);
     }
-
-
     QStringList sizess = sizes.toList();
     qSort(sizess.begin(), sizess.end());
     int shift = 170 - ((sizess.length() * 65) / 2);
-
     for (int i = 0; i < sizess.length(); i++) {
         painter.fillRect((i * 50) + 15 + shift, 150, 40, 40, code.mid(0, 2) == sizess.at(i) ? Qt::black : Qt::white);
         if (code.mid(0, 2) == sizess.at(i)) {
@@ -204,21 +188,18 @@ bool C5StoreBarcode::printOneBarcode2(const QString &code, const QString &price,
     }
     font.setBold(false);
     painter.setFont(font);
-
     painter.setBrush(Qt::white);
     painter.setPen(Qt::black);
     QFontMetrics mf(painter.font());
     QString code2 = QString("%1x%2x%3x%4").arg(code.mid(0, 2), code.mid(2, 3),
-                                               code.mid(5, 2), code.mid(7, code.length() - 7));
-
+                    code.mid(5, 2), code.mid(7, code.length() - 7));
     qDebug() << mf.width(code2) << mf.width(price);
     qDebug() << QPointF(140 - (mf.width(code2)), 380);
     painter.drawText(QPointF(140 - (mf.width(code2) / 2), 380), code2);
     painter.drawText(QPointF(140 - (mf.width(price) / 2), 420), price);
-
-    QPainter pp(&printer);
+    QPainter pp( &printer);
     pp.drawImage(0, 0, px.toImage());
-    gs.render(&pp);
+    gs.render( &pp);
     return printer.printerState() != QPrinter::Error;
 }
 
@@ -249,7 +230,6 @@ void C5StoreBarcode::setSearchParameters()
     fCurrencyName = db.getString("f_symbol");
 }
 
-
 //ELINA VERSION
 
 bool C5StoreBarcode::printOneBarcode(const QString &code, QPrintDialog &pd)
@@ -263,7 +243,7 @@ bool C5StoreBarcode::printOneBarcode(const QString &code, QPrintDialog &pd)
     QPrinter::PageSize ps = printer.pageSize();
     ps = pd.printer()->pageSize();
     printer.setPageSize(ps);
-    QPainter p(&printer);
+    QPainter p( &printer);
     Barcode93 b;
     b.Encode93(code.toLatin1().data());
     QFont f("ArTarumianHandes", 40, QFont::Normal);
@@ -329,48 +309,45 @@ bool C5StoreBarcode::printOneBarcode(const QString &code, QPrintDialog &pd)
     //    b.Encode128A(code.toLatin1().data());
     int of = 0;
     switch (code.length()) {
-    case 0:
-    case 1:
-    case 2:
-    case 3:
-    case 4:
-    case 5:
-    case 6:
-        of = 80;
-        break;
-    case 7:
-    case 8:
-    case 9:
-        of = 50;
-        break;
-    case 10:
-        of = 40;
-        break;
-    default:
-        of = 20;
-        break;
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+            of = 80;
+            break;
+        case 7:
+        case 8:
+        case 9:
+            of = 50;
+            break;
+        case 10:
+            of = 40;
+            break;
+        default:
+            of = 20;
+            break;
     }
     b.DrawBarcode(p, of, 210, 270, 270, plen);
-
     f.setBold(true);
     f.setPointSize(10);
     p.setFont(f);
     QString code2 = QString("%1x%2x%3x%4")
-            .arg(code.left(2))
-            .arg(code.mid(2,3))
-            .arg(code.mid(5,2))
-            .arg(code.right(code.length() - 7));
+                    .arg(code.left(2))
+                    .arg(code.mid(2, 3))
+                    .arg(code.mid(5, 2))
+                    .arg(code.right(code.length() - 7));
     p.drawText(QPoint(60, 350), code2);
     p.drawText(QPoint(45, 400), "MADE IN ARMENIA");
     return printer.printerState() != QPrinter::Error;
 }
 
-
 void C5StoreBarcode::print()
 {
     QPrintDialog pd;
     if (pd.exec() == QDialog::Accepted) {
-
     } else {
         return;
     }
@@ -385,7 +362,8 @@ void C5StoreBarcode::print()
                 code = code.left(code.length() - 1);
             }
             //VAHE VERSION
-            printOneBarcode(code, ui->tbl->getString(i, 4) + " " + fCurrencyName, ui->tbl->getString(i, 6), ui->tbl->getString(i, 0), pd);
+            printOneBarcode(code, ui->tbl->getString(i, 4) + " " + fCurrencyName, ui->tbl->getString(i, 6), ui->tbl->getString(i,
+                            0), pd);
             //ELINA VERSION
             //printOneBarcode(code, pd);
             ui->tbl->checkBox(i, 3)->setChecked(false);
@@ -397,7 +375,6 @@ void C5StoreBarcode::print2()
 {
     QPrintDialog pd;
     if (pd.exec() == QDialog::Accepted) {
-
     } else {
         return;
     }
@@ -424,7 +401,6 @@ void C5StoreBarcode::printDescriptions()
 {
     QPrintDialog pd;
     if (pd.exec() == QDialog::Accepted) {
-
     } else {
         return;
     }
@@ -444,7 +420,7 @@ void C5StoreBarcode::printDescriptions()
             QPrinter::PageSize ps = printer.pageSize();
             ps = pd.printer()->pageSize();
             printer.setPageSize(ps);
-            QPainter p(&printer);
+            QPainter p( &printer);
             QFont f("Arial", 6, QFont::Normal);
             p.setFont(f);
             QRectF tr(80, 20, 200, 200);
@@ -475,5 +451,3 @@ void C5StoreBarcode::setQtyToOne()
         ui->tbl->lineEdit(i, 2)->setInteger(1);
     }
 }
-
-

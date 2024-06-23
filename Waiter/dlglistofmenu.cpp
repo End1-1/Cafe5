@@ -1,16 +1,18 @@
 #include "dlglistofmenu.h"
 #include "ui_dlglistofmenu.h"
-#include "c5menu.h"
+#include "c5tabledata.h"
 
 DlgListOfMenu::DlgListOfMenu(const QStringList &dbParams) :
     C5Dialog(dbParams),
     ui(new Ui::DlgListOfMenu)
 {
     ui->setupUi(this);
-    for (int id: dbmenuname->list()) {
+    QJsonArray ja = objs("d_menu_names");
+    for (int i = 0; i < ja.size(); i++) {
+        const QJsonObject &jo = ja.at(i).toObject();
         QListWidgetItem *item = new QListWidgetItem(ui->lst);
-        item->setText(dbmenuname->name(id));
-        item->setData(Qt::UserRole, id);
+        item->setText(jo["f_name"].toString());
+        item->setData(Qt::UserRole, jo["f_id"].toInt());
         ui->lst->addItem(item);
     }
     QListWidgetItem *item = new QListWidgetItem(ui->lst);
@@ -20,7 +22,6 @@ DlgListOfMenu::DlgListOfMenu(const QStringList &dbParams) :
     for (int i = 0; i < ui->lst->count(); i++) {
         ui->lst->item(i)->setSizeHint(QSize(100, 50));
     }
-
 }
 
 DlgListOfMenu::~DlgListOfMenu()

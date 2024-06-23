@@ -19,61 +19,53 @@ CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
 {
     fIcon = ":/goods.png";
     fLabel = tr("Goods");
-
-    l["ա"]="a";
-    l["բ"]="b";
-    l["գ"]="g";
-    l["դ"]="d";
-    l["ե"]="e";
-    l["զ"]="z";
-    l["է"]="e";
-    l["ը"]="@";
-    l["թ"]="t";
-    l["ժ"]="zh";
-    l["ի"]="i";
-    l["լ"]="l";
-    l["խ"]="kh";
-    l["ծ"]="ts";
-    l["կ"]="k";
-    l["հ"]="h";
-    l["ձ"]="dz";
-    l["ղ"]="h";
-    l["ճ"]="tch";
-    l["մ"]="m";
-    l["յ"]="y";
-    l["ն"]="n";
-    l["շ"]="sh";
-    l["ո"]="o";
-    l["չ"]="ch";
-    l["պ"]="p";
-    l["ջ"]="j";
-    l["ռ"]="r";
-    l["ս"]="s";
-    l["վ"]="v";
-    l["տ"]="t";
-    l["ր"]="r";
-    l["ց"]="tc";
-    l["ւ"]="u";
-    l["փ"]="p";
-    l["ք"]="q";
-    l["օ"]="o";
-    l["ֆ"]="f";
-
+    l["ա"] = "a";
+    l["բ"] = "b";
+    l["գ"] = "g";
+    l["դ"] = "d";
+    l["ե"] = "e";
+    l["զ"] = "z";
+    l["է"] = "e";
+    l["ը"] = "@";
+    l["թ"] = "t";
+    l["ժ"] = "zh";
+    l["ի"] = "i";
+    l["լ"] = "l";
+    l["խ"] = "kh";
+    l["ծ"] = "ts";
+    l["կ"] = "k";
+    l["հ"] = "h";
+    l["ձ"] = "dz";
+    l["ղ"] = "h";
+    l["ճ"] = "tch";
+    l["մ"] = "m";
+    l["յ"] = "y";
+    l["ն"] = "n";
+    l["շ"] = "sh";
+    l["ո"] = "o";
+    l["չ"] = "ch";
+    l["պ"] = "p";
+    l["ջ"] = "j";
+    l["ռ"] = "r";
+    l["ս"] = "s";
+    l["վ"] = "v";
+    l["տ"] = "t";
+    l["ր"] = "r";
+    l["ց"] = "tc";
+    l["ւ"] = "u";
+    l["փ"] = "p";
+    l["ք"] = "q";
+    l["օ"] = "o";
+    l["ֆ"] = "f";
     fSimpleQuery = false;
-
     fMainTable = "c_goods gg";
     fLeftJoinTables << "left join c_groups g on g.f_id=gg.f_group [g]"
                     << "left join c_partners cp on cp.f_id=gg.f_supplier [cp]"
-                    << "left join c_goods_classes gca on gca.f_id=gg.f_group1 [gca]"
-                    << "left join c_goods_classes gcb on gcb.f_id=gg.f_group2 [gcb]"
-                    << "left join c_goods_classes gcc on gcc.f_id=gg.f_group3 [gcc]"
-                    << "left join c_goods_classes gcd on gcd.f_id=gg.f_group4 [gcd]"
                     << "left join c_goods_prices gpr on gpr.f_goods=gg.f_id [gpr]"
                     << "left join c_units u on u.f_id=gg.f_unit [u]"
                     << "left join e_currency cr on cr.f_id=gpr.f_currency [cr]"
                     << "left join c_goods_model cm on cm.f_id=gg.f_model [cm]"
-                       ;
-
+                    ;
     fColumnsFields << "gg.f_id"
                    << "cp.f_taxname"
                    << "g.f_name as f_groupname"
@@ -83,23 +75,18 @@ CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
                    << "gg.f_scancode"
                    << "gpr.f_price1"
                    << "gpr.f_price2"
-                << "gpr.f_price1disc"
-                << "gpr.f_price2disc"
+                   << "gpr.f_price1disc"
+                   << "gpr.f_price2disc"
                    << "cr.f_symbol as f_currencyname"
                    << "gg.f_lowlevel"
                    << "gg.f_lastinputprice"
                    << "g.f_chargevalue"
                    << "(ggpr.f_price1/gg.f_lastinputprice*100)-100 as f_realchargevalue"
                    << "gg.f_acc"
-                   << "gca.f_name as gname1"
-                   << "gcb.f_name as gname2"
-                   << "gcc.f_name as gname3"
-                   << "gcd.f_name as gname4"
                    << "gg.f_description"
                    << "gg.f_weight"
                    << "gg.f_fiscalname"
-                      ;
-
+                   ;
     fColumnsVisible["gg.f_id"] = true;
     fColumnsVisible["cp.f_taxname"] = true;
     fColumnsVisible["g.f_name as f_groupname"] = true;
@@ -116,15 +103,10 @@ CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
     fColumnsVisible["g.f_chargevalue"] = false;
     fColumnsVisible["gg.f_acc"] = true;
     fColumnsVisible["(gpr.f_price1/gg.f_lastinputprice*100)-100 as f_realchargevalue"] = false;
-    fColumnsVisible["gca.f_name as gname1"] = true;
-    fColumnsVisible["gcb.f_name as gname2"] = true;
-    fColumnsVisible["gcc.f_name as gname3"] = true;
-    fColumnsVisible["gcd.f_name as gname4"] = true;
     fColumnsVisible["gg.f_scancode"] = true;
     fColumnsVisible["gg.f_description"] = false;
     fColumnsVisible["gg.f_weight"] = true;
     fColumnsVisible["gg.f_fiscalname"] = true;
-
     fTranslation["f_id"] = tr("Code");
     fTranslation["f_taxname"] = tr("Supplier");
     fTranslation["f_groupname"] = tr("Group");
@@ -141,19 +123,14 @@ CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_chargevalue"] = tr("Charge value");
     fTranslation["f_acc"] = tr("Account");
     fTranslation["f_realchargevalue"] = tr("Real charge value");
-    fTranslation["gname1"] = tr("Class 1");
-    fTranslation["gname2"] = tr("Class 2");
-    fTranslation["gname3"] = tr("Class 3");
-    fTranslation["gname4"] = tr("Class 4");
     fTranslation["f_scancode"] = tr("Scancode");
     fTranslation["f_description"] = tr("Description");
     fTranslation["f_weight"] = tr("Weight");
     fTranslation["f_fiscalname"] = tr("Fiscal name");
-
     restoreColumnsVisibility();
     fEditor = new CE5Goods(dbParams);
     fFilterWidget = new CR5GoodsFilter(dbParams);
-    fFilter = static_cast<CR5GoodsFilter*>(fFilterWidget);
+    fFilter = static_cast<CR5GoodsFilter *>(fFilterWidget);
 }
 
 QToolBar *CR5Goods::toolBar()
@@ -166,15 +143,15 @@ QToolBar *CR5Goods::toolBar()
             << ToolBarButtons::tbRefresh
             << ToolBarButtons::tbExcel
             << ToolBarButtons::tbPrint;
-            createStandartToolbar(btn);
-            if (__user->check(cp_t1_goods_pricing)) {
-                fToolBar->addAction(QIcon(":/pricing.png"), tr("Pricing"), this, SLOT(pricing()));
-            }
-            fToolBar->addAction(QIcon(":/dress.png"), tr("Group price"), this, SLOT(groupPrice()));
-            fToolBar->addAction(QIcon(":/scales.png"), tr("Scales"), this, SLOT(exportToScales()));
-            fToolBar->addAction(QIcon(":/delete.png"), tr("Remove"), this, SLOT(deleteGoods()));
-            fToolBar->addAction(QIcon(":/barcode.png"), tr("Print\nbarcode"), this, SLOT(printBarCodes()));
-            fToolBar->addAction(QIcon(":/AS.png"), tr("ArmSoft map"), this, SLOT(armSoftMap()));
+        createStandartToolbar(btn);
+        if (__user->check(cp_t1_goods_pricing)) {
+            fToolBar->addAction(QIcon(":/pricing.png"), tr("Pricing"), this, SLOT(pricing()));
+        }
+        fToolBar->addAction(QIcon(":/dress.png"), tr("Group price"), this, SLOT(groupPrice()));
+        fToolBar->addAction(QIcon(":/scales.png"), tr("Scales"), this, SLOT(exportToScales()));
+        fToolBar->addAction(QIcon(":/delete.png"), tr("Remove"), this, SLOT(deleteGoods()));
+        fToolBar->addAction(QIcon(":/barcode.png"), tr("Print\nbarcode"), this, SLOT(printBarCodes()));
+        fToolBar->addAction(QIcon(":/AS.png"), tr("ArmSoft map"), this, SLOT(armSoftMap()));
     }
     return fToolBar;
 }
@@ -190,7 +167,8 @@ bool CR5Goods::on_tblView_doubleClicked(const QModelIndex &index)
 
 void CR5Goods::pricing()
 {
-    if (C5Message::question(tr("Warning! This operation will applied to all goods in the current report! Continue?")) != QDialog::Accepted) {
+    if (C5Message::question(tr("Warning! This operation will applied to all goods in the current report! Continue?")) !=
+            QDialog::Accepted) {
         return;
     }
     C5GoodsPricing *gp = new C5GoodsPricing(fDBParams);
@@ -221,7 +199,7 @@ void CR5Goods::pricing()
             if (chargeValue < 0.001) {
                 continue;
             }
-            newPrice += (newPrice * chargeValue);
+            newPrice += (newPrice *chargeValue);
             newPrice = ceil(trunc(newPrice));
             db[":f_saleprice"] = newPrice;
             db.update("c_goods", where_id(fModel->data(i, colId, Qt::EditRole).toInt()));
@@ -236,12 +214,11 @@ void CR5Goods::pricing()
 void CR5Goods::groupPrice()
 {
     double price1, price2, price1disc, price2disc;
-    if (C5ChangePriceOfGroup::groupPrice(fDBParams, price1, price2, price1disc , price2disc)) {
+    if (C5ChangePriceOfGroup::groupPrice(fDBParams, price1, price2, price1disc, price2disc)) {
         QString p1, p2, p1d, p2d;
-//        if (price1 < 0.0001 && price2 < 0.0002 && price1disc < 0.0002 && price2disc < 0.0002) {
-//            return;
-//        }
-
+        //        if (price1 < 0.0001 && price2 < 0.0002 && price1disc < 0.0002 && price2disc < 0.0002) {
+        //            return;
+        //        }
         QString codes;
         for (int i = 0; i < fModel->rowCount(); i++) {
             if (codes.length() > 0) {
@@ -251,7 +228,6 @@ void CR5Goods::groupPrice()
         }
         C5Database db(dbParams());
         QString query ;
-
         if (price1 > -1) {
             p1 = " f_price1=" + QString::number(price1, 'f', 2);
         }
@@ -296,12 +272,12 @@ void CR5Goods::groupPrice()
 void CR5Goods::exportToScales()
 {
     C5Database db(fDBParams);
-    QString sql ="select f_scancode, f_name, f_saleprice, f_wholenumber from c_goods where f_enabled=1 and length(f_scancode) between 1 and 5 ";
-    if (static_cast<CR5GoodsFilter*>(fFilterWidget)->group().isEmpty() == false) {
-        sql += " and f_group=" + static_cast<CR5GoodsFilter*>(fFilterWidget)->group();
+    QString sql =
+        "select f_scancode, f_name, f_saleprice, f_wholenumber from c_goods where f_enabled=1 and length(f_scancode) between 1 and 5 ";
+    if (static_cast<CR5GoodsFilter * >(fFilterWidget)->group().isEmpty() == false) {
+        sql += " and f_group=" + static_cast<CR5GoodsFilter *>(fFilterWidget)->group();
     }
     db.exec(sql);
-
     if (__c5config.getValue(param_frontdesk_scale_dir).isEmpty() == false) {
         QFile f(__c5config.getValue(param_frontdesk_scale_dir) + "/export.xml");
         f.open(QIODevice::WriteOnly);
@@ -335,15 +311,15 @@ void CR5Goods::exportToScales()
                 dbo[":PLU"] = db.getString("f_scancode").toInt();
                 dbo.exec("delete from Products where PLU=:PLU");
                 QString sql = QString("insert into Products (ID, PLU, Status, LabelNo, BarcodeNo, "
-                                        "Prefix, Price, Tare, Code, DuringDate, "
-                                        "[Group], Barcode, RVTName, "
-                                        "Type, LiteDuringDate) "
-                                        "values (%1, %2, %3, %4, %5, '%6', %7, %8, %9, %10, %11, %12, '%13', '%14', %15)")
-                        .arg(db.getString("f_scancode"), db.getString("f_scancode"), QString("0"), QString("0"), QString("0"),
-                             QString("0"), QString::number(db.getDouble("f_saleprice") / 100, 'f', 2))
-                        .arg(QString("0"), QString("0"), QString("0"),
-                             QString("0"), db.getString("f_scancode"), name,
-                             QString::fromUtf8("вес."), QString("0"));
+                                      "Prefix, Price, Tare, Code, DuringDate, "
+                                      "[Group], Barcode, RVTName, "
+                                      "Type, LiteDuringDate) "
+                                      "values (%1, %2, %3, %4, %5, '%6', %7, %8, %9, %10, %11, %12, '%13', '%14', %15)")
+                              .arg(db.getString("f_scancode"), db.getString("f_scancode"), QString("0"), QString("0"), QString("0"),
+                                   QString("0"), QString::number(db.getDouble("f_saleprice") / 100, 'f', 2))
+                              .arg(QString("0"), QString("0"), QString("0"),
+                                   QString("0"), db.getString("f_scancode"), name,
+                                   QString::fromUtf8("вес."), QString("0"));
                 dbo.exec(sql);
             }
             C5Message::info(tr("Done"));

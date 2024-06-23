@@ -205,6 +205,8 @@ private:
 
     void configFiscalButton();
 
+    void createAddDishRequest(Dish *d);
+
     void addDishToOrder(Dish *d);
 
     double discountValue();

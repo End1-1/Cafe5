@@ -1,20 +1,18 @@
 #include "dlgsetwaiterordercl.h"
 #include "ui_dlgsetwaiterordercl.h"
 #include "dlgnewcl.h"
-#include "doubledatabase.h"
 
 DlgSetWaiterOrderCL::DlgSetWaiterOrderCL(const QStringList &dbParams) :
     C5Dialog(dbParams),
     ui(new Ui::DlgSetWaiterOrderCL)
 {
     ui->setupUi(this);
-    DoubleDatabase fDD;
-    fDD.open();
-    fDD.exec("select f_id, f_name from f_city_ledger ");
-    while (fDD.nextRow()) {
+    C5Database db(dbParams);
+    db.exec(QString("select f_id, f_name from %1.f_city_ledger ").arg(__c5config.hotelDatabase()));
+    while (db.nextRow()) {
         int r = ui->tbl->addEmptyRow();
-        ui->tbl->setString(r, 0, fDD.getString(0));
-        ui->tbl->setString(r, 1, fDD.getString(1));
+        ui->tbl->setString(r, 0, db.getString(0));
+        ui->tbl->setString(r, 1, db.getString(1));
     }
 }
 

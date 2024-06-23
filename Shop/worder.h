@@ -8,6 +8,7 @@
 #include "ogoods.h"
 #include "odraftsale.h"
 #include "jsons.h"
+#include "ninterface.h"
 #include <QWidget>
 #include <QDate>
 #include <QTime>
@@ -27,7 +28,8 @@
 #define col_qr 12
 #define col_check_discount 13
 
-namespace Ui {
+namespace Ui
+{
 class WOrder;
 }
 
@@ -67,7 +69,8 @@ public:
 
     bool addGoods(int id, double storeqty, double price1, double price2);
 
-    int addGoodsToTable(int id, bool checkQtyOfStore, double qtyStore, const QString &draftid, double price1, double price2);
+    int addGoodsToTable(int id, bool checkQtyOfStore, double qtyStore, const QString &draftid, double price1, double price2,
+                        double qty, bool fromDraft);
 
     bool writeOrder();
 
@@ -105,10 +108,14 @@ public:
 
     C5ClearTableWidget *table();
 
-    bool checkQty(int goods, double qty, double oldqty, bool updateStock, QString &err);
+    bool checkQty(int goods, double qty, QString &err, double oldqty);
+
+    void openDraft(const QString &draftid);
 
 private slots:
     void imageLoaded(const QPixmap &img);
+
+    void openDraftResponse(const QJsonObject &jdoc);
 
     void readEmarks();
 
@@ -142,6 +149,8 @@ private:
     QJsonObject fAccCard;
 
     QVector<OGoods> fOGoods;
+
+    NInterface *fHttp;
 
     bool returnFalse(const QString &msg, C5Database &db);
 

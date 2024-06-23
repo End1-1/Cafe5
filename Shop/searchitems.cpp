@@ -34,7 +34,7 @@ void SearchItems::on_btnSearch_clicked()
     ui->tbl->setColumnWidths(ui->tbl->columnCount(), 200, 200, 200, 80, 100, 100, 100, 100, 0, 0);
     ui->tbl->setColumnHidden(4, __c5config.shopDenyF1());
     ui->tbl->setColumnHidden(5, __c5config.shopDenyF2());
-    C5Database db(__c5config.replicaDbParams());
+    C5Database db(__c5config.dbParams());
     int goods = dbgoods->idOfScancode(ui->leCode->text());
     db[":f_goods"] = goods;
     db[":f_store"] = __c5config.defaultStore();
@@ -105,7 +105,7 @@ void SearchItems::on_btnViewReservations_clicked()
                 .arg(store);
     }
     ui->tblReserve->setRowCount(0);
-    C5Database db(__c5config.replicaDbParams());
+    C5Database db(__c5config.dbParams());
     db[":f_reservestate"] = GR_RESERVED;
     db.exec("select rs.f_id, arn.f_name as f_statename, rs.f_date, ss.f_name as f_sourcestore, sd.f_name as f_storename, "
             "g.f_name as f_goodsname, g.f_scancode, "
@@ -132,7 +132,7 @@ void SearchItems::on_btnViewReservations_clicked()
 void SearchItems::on_btnViewAllReservations_clicked()
 {
     ui->tblReserve->setRowCount(0);
-    C5Database db(__c5config.replicaDbParams());
+    C5Database db(__c5config.dbParams());
     db.exec("select rs.f_id, arn.f_name as f_statename, rs.f_date, ss.f_name as f_sourcestore, sd.f_name as f_storename, "
             "g.f_name as f_goodsname, g.f_scancode, "
             "rs.f_qty, rs.f_message "

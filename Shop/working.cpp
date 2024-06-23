@@ -120,7 +120,9 @@ Working::Working(C5User *user, QWidget *parent) :
     if (s.value("customerdisplay").toBool()) {
         ui->btnCostumerDisplay->click();
     }
-    newSale(SALE_RETAIL);
+    http = new NInterface(this);
+    http->createHttpQuery("/engine/shop/create-a-store-sale.php", QJsonObject{{"store", __c5config.defaultStore()}},
+    SLOT(astoresaleResponse(QJsonObject)));
 }
 
 Working::~Working()
@@ -223,7 +225,7 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
                 break;
             case Qt::Key_T:
                 if (ke->modifiers() &Qt::ControlModifier) {
-                    C5Database db(__c5config.replicaDbParams());
+                    C5Database db(__c5config.dbParams());
                     db[":f_hall"] = __c5config.defaultHall();
                     db[":f_datecash"] = QDate::currentDate();
                     db[":f_state"] = ORDER_STATE_CLOSE;
@@ -279,16 +281,22 @@ void Working::setActiveWidget(WOrder *w)
     }
 }
 
-bool Working::findDraft(const QString &draftid)
+WOrder *Working::findDraft(const QString &draftid)
 {
     for (int i = 0; i < ui->tab->count(); i++) {
         WOrder *wo = static_cast<WOrder *>(ui->tab->widget(i));
         if (wo->fDraftSale.id == draftid) {
             ui->tab->setCurrentIndex(i);
-            return true;
+            return wo;
         }
     }
-    return false;
+    return nullptr;
+}
+
+void Working::openDraft(const QString &draftid)
+{
+    auto *wo = newSale(SALE_RETAIL);
+    wo->openDraft(draftid);
 }
 
 Working *Working::working()
@@ -407,6 +415,22 @@ void Working::timeout()
     }
 }
 
+void Working::astoresaleResponse(const QJsonObject &jdoc)
+{
+    Q_UNUSED(jdoc);
+    newSale(SALE_RETAIL);
+    http->httpQueryFinished(sender());
+}
+
+void Working::checkStoreResponse(const QJsonObject &jdoc)
+{
+    Q_UNUSED(jdoc);
+    http->httpQueryFinished(sender());
+    auto *dg = new DlgGoodsList(C5Config::getValue(param_default_currency).toInt());
+    connect(dg, &DlgGoodsList::getGoods, this, &Working::getGoods);
+    dg->showMaximized();
+}
+
 void Working::uploadDataFinished()
 {
     fUpFinished = true;
@@ -476,7 +500,7 @@ void Working::threadMessageData(int code, const QVariant &data)
                                     .arg(QString("%1 %2").arg(tr("End date")).arg(jjm["enddate"].toString())));
                     break;
                 case MSG_PRINT_TAX: {
-                    C5Database db(__c5config.replicaDbParams());
+                    C5Database db(__c5config.dbParams());
                     QJsonObject jord = jjm["usermessage"].toObject();
                     QString id = jord["id"].toString();
                     QString rseq;
@@ -491,15 +515,10 @@ void Working::threadMessageData(int code, const QVariant &data)
                     }
                     break;
                 }
-                case MSG_UPDATE_TEMP_STORE:
-                    if (__c5config.getValue(param_fd_update_a_temp_store).toInt() == 1) {
-                        DlgSplashScreen().updateData();
-                    }
-                    return;
                 case MSG_PRINT_RECEIPT: {
                     QString orderid = jjm["usermessage"].toString();
                     PrintReceiptGroup p;
-                    C5Database db(__c5config.replicaDbParams());
+                    C5Database db(__c5config.dbParams());
                     switch (C5Config::shopPrintVersion()) {
                         case 1: {
                             bool p1, p2;
@@ -661,11 +680,14 @@ void Working::qtyRemains(const QJsonObject &jdoc)
     p.image(img, Qt::AlignCenter);
     p.br(img.height() / 2);
     p.br(img.height() / 2);
-    p.ctext(tr("the product is out of stock"));
+    p.ctext(tr("The product is out of stock"));
+    p.br();
     for (int i = 0; i < ja.size(); i++) {
         QJsonObject jn = ja.at(i).toObject();
         if (jn["f_qty"].toString().toDouble() < 0.01) {
             print = true;
+            p.ltext(jn["f_taxname"].toString(), 0);
+            p.br();
             p.ltext(jn["f_name"].toString(), 0);
             p.br();
             p.ltext(jn["f_scancode"].toString(), 0);
@@ -784,9 +806,8 @@ void Working::on_btnNewWhosale_clicked()
 
 void Working::on_btnGoodsList_clicked()
 {
-    auto *dg = new DlgGoodsList(C5Config::getValue(param_default_currency).toInt());
-    connect(dg, &DlgGoodsList::getGoods, this, &Working::getGoods);
-    dg->showMaximized();
+    http->createHttpQuery("/engine/shop/create-a-store-sale.php", QJsonObject{{"store", __c5config.defaultStore()}}, SLOT(
+        checkStoreResponse(QJsonObject)));
 }
 
 void Working::on_btnSalesReport_clicked()
@@ -857,9 +878,14 @@ void Working::on_btnGiftCard_clicked()
         C5Message::error(tr("The gift card must saled separately"));
         return;
     }
-    DlgGiftCardSale d(__c5config.replicaDbParams());
+    DlgGiftCardSale d(__c5config.dbParams());
     if (d.exec() == QDialog::Accepted) {
-        wo->addGoodsToTable(d.fGiftGoodsId, true, 0, "", 0, 0);
+        QString err;
+        if (!wo->checkQty(d.fGiftGoodsId, 1, err, 0)) {
+            C5Message::error(err);
+            return;
+        }
+        wo->addGoodsToTable(d.fGiftGoodsId, true, 0, "", 0, 0, 1, false);
         wo->changePrice(d.fGiftPrice);
         wo->fOHeader.saleType = -1;
     }
@@ -894,7 +920,17 @@ void Working::on_btnOpenDraft_clicked()
 {
     C5TempSale t;
     if (t.exec() == QDialog::Accepted) {
-        t.openDraft();
+        QString id = t.openDraft();
+        if (id.isEmpty()) {
+            return;
+        }
+        auto *wo = findDraft(id);
+        if (wo) {
+            wo->openDraft(id);
+        } else {
+            wo = newSale(SALE_RETAIL);
+            wo->openDraft(id);
+        }
     }
 }
 

@@ -35,6 +35,7 @@ C5Editor *C5Editor::createEditor(const QStringList &dbParams, CE5Editor *e, int 
         de->insertButton(e->b1());
     }
     e->fEditor = de;
+    connect(e, &CE5Editor::Accept, de, &C5Editor::EditorAccepted);
     return de;
 }
 
@@ -43,6 +44,16 @@ bool C5Editor::getResult(QList<QMap<QString, QVariant> > &data)
     fEditor->focusFirst();
     if (exec() == QDialog::Accepted) {
         data = fData;
+        return true;
+    }
+    return false;
+}
+
+bool C5Editor::getJsonObject(QJsonObject &j)
+{
+    fEditor->focusFirst();
+    if (exec() == QDialog::Accepted) {
+        j = fEditor->fData;
         return true;
     }
     return false;
@@ -62,10 +73,10 @@ void C5Editor::insertButton(QPushButton *b)
 bool C5Editor::event(QEvent *e)
 {
     if (e->type() == QEvent::KeyPress) {
-        QKeyEvent *ke = static_cast<QKeyEvent*>(e);
+        QKeyEvent *ke = static_cast<QKeyEvent *>(e);
         if (ke->key() == Qt::Key_Return || ke->key() == Qt::Key_Enter) {
-            if (ke->modifiers() & Qt::ControlModifier) {
-                if (ke->modifiers() & Qt::ShiftModifier) {
+            if (ke->modifiers() &Qt::ControlModifier) {
+                if (ke->modifiers() &Qt::ShiftModifier) {
                     on_btnSaveAndNew_clicked();
                 } else {
                     on_btnSave_clicked();
@@ -82,10 +93,18 @@ void C5Editor::closeEvent(QCloseEvent *e)
     C5Dialog::closeEvent(e);
 }
 
+void C5Editor::EditorAccepted()
+{
+    fEditor->clear();
+    accept();
+}
+
 void C5Editor::on_btnSave_clicked()
 {
     if (on_btnSaveAndNew_clicked()) {
-        accept();
+        if (!fEditor->acceptOnSave()) {
+            accept();
+        }
     }
 }
 
@@ -101,7 +120,9 @@ bool C5Editor::on_btnSaveAndNew_clicked()
         C5Message::error(err);
         return false;
     }
-    fEditor->clear();
+    if (!fEditor->acceptOnSave()) {
+        fEditor->clear();
+    }
     return true;
 }
 

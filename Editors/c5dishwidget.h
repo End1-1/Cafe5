@@ -4,7 +4,8 @@
 #include "ce5editor.h"
 #include "c5printing.h"
 
-namespace Ui {
+namespace Ui
+{
 class C5DishWidget;
 }
 

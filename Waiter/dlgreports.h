@@ -3,7 +3,8 @@
 
 #include "c5dialog.h"
 
-namespace Ui {
+namespace Ui
+{
 class DlgReports;
 }
 
@@ -38,9 +39,9 @@ private:
 private slots:
     void handleDailyCommon(const QJsonObject &obj);
 
-    void handleReportsList(const QJsonObject &obj);
+    void reportListResponse(const QJsonObject &obj);
 
-    void handlePrintReport(const QJsonObject &obj);
+    void printReportResponse(const QJsonObject &obj);
 
     void handleReceipt(const QJsonObject &obj);
 

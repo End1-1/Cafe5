@@ -9,10 +9,10 @@
 #include <QFontDatabase>
 #include <QFile>
 #include <ctime>
+#include <QTextCodec>
 
 int main(int argc, char *argv[])
 {
-
 #ifndef QT_DEBUG
     QStringList libPath = QCoreApplication::libraryPaths();
     libPath << qApp->applicationDirPath();
@@ -22,10 +22,10 @@ int main(int argc, char *argv[])
     libPath << qApp->applicationDirPath() + "/imageformats";
     QCoreApplication::setLibraryPaths(libPath);
 #endif
-
     QApplication a(argc, argv);
+    QTextCodec::setCodecForLocale(QTextCodec::codecForName("utf8") );
     QString serverName, configName;
-    for (const QString &sn: a.arguments()) {
+    for (const QString &sn : a.arguments()) {
         if (sn.contains("/servername")) {
             QStringList snconf = sn.split("=");
             if (snconf.length() == 2) {
@@ -44,8 +44,7 @@ int main(int argc, char *argv[])
         C5Message::error("Servername parameter must be pass as argument");
         return 1;
     }
-
-    QFile style(a.applicationDirPath() + "/officestyle.qss");
+    QFile style(a.applicationDirPath() + "/officestyle.css");
     QString css;
     if (style.exists()) {
         if (style.open(QIODevice::ReadOnly)) {
@@ -56,7 +55,6 @@ int main(int argc, char *argv[])
             a.setStyleSheet(css2);
         }
     }
-
     C5Login l;
     if (l.exec() == QDialog::Accepted) {
         if (configName.isEmpty() == false) {
@@ -69,29 +67,24 @@ int main(int argc, char *argv[])
     css.replace("%font-size%", __c5config.getValue(param_fd_font_size));
     css.replace("%font-family%", __c5config.getValue(param_app_font_family));
     a.setStyleSheet(css);
-
     if (!C5SystemPreference::checkDecimalPointAndSeparator()) {
         return 0;
     }
-
     QTranslator t;
     t.load(":/lang/FrontDesk.qm");
-    a.installTranslator(&t);
+    a.installTranslator( &t);
     a.setStyle(QStyleFactory::create("fusion"));
-
     QFontDatabase::addApplicationFont(":/barcode.ttf");
-//    int id = QFontDatabase::addApplicationFont(":/ahuni.ttf");
-//    QString family = QFontDatabase::applicationFontFamilies(id).at(0);
+    //    int id = QFontDatabase::addApplicationFont(":/ahuni.ttf");
+    //    QString family = QFontDatabase::applicationFontFamilies(id).at(0);
     QFont font(a.font());
     font.setPointSize(__c5config.fronDeskFontSize());
     font.setFamily(__c5config.getValue(param_app_font_family));
     a.setFont(font);
-
     srand(time(NULL));
     C5MainWindow w;
     w.showMaximized();
     a.processEvents();
     w.on_actionLogin_triggered();
-
     return a.exec();
 }

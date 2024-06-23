@@ -18,7 +18,6 @@ C5Message::C5Message(QWidget *parent) :
     ui->frame->setFrameShape(QFrame::NoFrame);
 #endif
     ui->btnCopy->setVisible(false);
-
     auto *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &C5Message::timeout);
     timer->start(3000);
@@ -51,7 +50,8 @@ void C5Message::timeout()
     }
 }
 
-int C5Message::showMessage(const QString &text, int tp, const QString &yes, const QString &no, const QString &a3, bool playsound)
+int C5Message::showMessage(const QString &text, int tp, const QString &yes, const QString &no, const QString &a3,
+                           bool playsound)
 {
     C5Message *c5 = new C5Message(__c5config.fParentWidget);
     c5->fPlaySound = playsound;
@@ -64,16 +64,16 @@ int C5Message::showMessage(const QString &text, int tp, const QString &yes, cons
     c5->ui->btnA3->setText(a3);
     QString img;
     switch (tp) {
-    case 1:
-        img = "info";
-        break;
-    case 2:
-        img = "error";
-        c5->ui->btnCopy->setVisible(true);
-        break;
-    case 3:
-        img = "help";
-        break;
+        case 1:
+            img = "info";
+            break;
+        case 2:
+            img = "error";
+            c5->ui->btnCopy->setVisible(true);
+            break;
+        case 3:
+            img = "help";
+            break;
     }
 #ifdef WAITER
     c5->ui->btnYes->setMinimumHeight(50);

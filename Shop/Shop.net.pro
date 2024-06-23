@@ -49,6 +49,7 @@ SOURCES += \
     ../Cafe5/c5systempreference.cpp \
     ../Cafe5/calendar.cpp \
     ../Cafe5/dlgexitbyversion.cpp \
+    ../Classes/QProgressIndicator.cpp \
     ../Classes/QRCodeGenerator.cpp \
     ../Classes/c5airlog.cpp \
     ../Classes/c5combodelegate.cpp \
@@ -68,7 +69,6 @@ SOURCES += \
     ../Classes/c5printreceiptthread.cpp \
     ../Classes/c5printrecipta4.cpp \
     ../Classes/c5printremovedservicethread.cpp \
-    ../Classes/c5printservicethread.cpp \
     ../Classes/c5random.cpp \
     ../Classes/c5replacecharacter.cpp \
     ../Classes/c5reporttemplatedriver.cpp \
@@ -93,8 +93,6 @@ SOURCES += \
     ../Classes/notificationwidget.cpp \
     ../Classes/outputofheader.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
-    ../Classes/removeshopsale.cpp \
-    ../Classes/rkeyboard.cpp \
     ../Classes/thread.cpp \
     ../Classes/threadsendmessage.cpp \
     ../Configs/breezeconfig.cpp \
@@ -133,9 +131,10 @@ SOURCES += \
     ../Forms/c5printtaxanywhere.cpp \
     ../Forms/dlgdataonline.cpp \
     ../Forms/dlgpaymentchoose.cpp \
-    ../Forms/dlgqrcode.cpp \
     ../Forms/dlgreservgoods.cpp \
+    ../Forms/dlgsplashscreen.cpp \
     ../NTable/ndataprovider.cpp \
+    ../NTable/ninterface.cpp \
     ../NTable/nloadingdlg.cpp \
     ../Printing/printreceipt.cpp \
     ../Printing/printreceiptgroup.cpp \
@@ -188,7 +187,6 @@ SOURCES += \
     dlgreturnitem.cpp \
     dlgsearchpartner.cpp \
     dlgshowcolumns.cpp \
-    dlgsplashscreen.cpp \
     goodsreturnreason.cpp \
     imageloader.cpp \
     loghistory.cpp \
@@ -246,6 +244,7 @@ HEADERS += \
     ../Cafe5/c5systempreference.h \
     ../Cafe5/calendar.h \
     ../Cafe5/dlgexitbyversion.h \
+    ../Classes/QProgressIndicator.h \
     ../Classes/QRCodeGenerator.h \
     ../Classes/barcode5.h \
     ../Classes/c5airlog.h \
@@ -266,7 +265,6 @@ HEADERS += \
     ../Classes/c5printreceiptthread.h \
     ../Classes/c5printrecipta4.h \
     ../Classes/c5printremovedservicethread.h \
-    ../Classes/c5printservicethread.h \
     ../Classes/c5random.h \
     ../Classes/c5replacecharacter.h \
     ../Classes/c5reporttemplatedriver.h \
@@ -293,8 +291,6 @@ HEADERS += \
     ../Classes/notificationwidget.h \
     ../Classes/outputofheader.h \
     ../Classes/proxytablewidgetdatabase.h \
-    ../Classes/removeshopsale.h \
-    ../Classes/rkeyboard.h \
     ../Classes/thread.h \
     ../Classes/threadsendmessage.h \
     ../Configs/breezeconfig.h \
@@ -333,9 +329,10 @@ HEADERS += \
     ../Forms/c5printtaxanywhere.h \
     ../Forms/dlgdataonline.h \
     ../Forms/dlgpaymentchoose.h \
-    ../Forms/dlgqrcode.h \
     ../Forms/dlgreservgoods.h \
+    ../Forms/dlgsplashscreen.h \
     ../NTable/ndataprovider.h \
+    ../NTable/ninterface.h \
     ../NTable/nloadingdlg.h \
     ../Printing/printreceipt.h \
     ../Printing/printreceiptgroup.h \
@@ -390,7 +387,6 @@ HEADERS += \
     dlgreturnitem.h \
     dlgsearchpartner.h \
     dlgshowcolumns.h \
-    dlgsplashscreen.h \
     goodsreturnreason.h \
     imageloader.h \
     loghistory.h \
@@ -431,13 +427,12 @@ FORMS += \
     ../Classes/calculator.ui \
     ../Classes/dlgpassword.ui \
     ../Classes/notificationwidget.ui \
-    ../Classes/rkeyboard.ui \
     ../Controls/c5tablewithtotal.ui \
     ../Forms/c5printtaxanywhere.ui \
     ../Forms/dlgdataonline.ui \
     ../Forms/dlgpaymentchoose.ui \
-    ../Forms/dlgqrcode.ui \
     ../Forms/dlgreservgoods.ui \
+    ../Forms/dlgsplashscreen.ui \
     ../NTable/nloadingdlg.ui \
     ../Printing/selectprinters.ui \
     c5tempsale.ui \
@@ -451,7 +446,6 @@ FORMS += \
     dlgreturnitem.ui \
     dlgsearchpartner.ui \
     dlgshowcolumns.ui \
-    dlgsplashscreen.ui \
     goodsreturnreason.ui \
     loghistory.ui \
     sales.ui \

@@ -16,20 +16,22 @@ C5Dialog::C5Dialog(const QStringList &dbParams) :
 {
 #ifdef WAITER
     setMaximumSize(qApp->desktop()->geometry().size());
+    //setWindowFlags(Qt::WindowStaysOnTopHint);
 #endif
     if (__mainWindow == nullptr) {
         __mainWindow = this;
     }
+    fHttp = new NInterface(this);
 }
 
 C5Dialog::C5Dialog(const QStringList &dbParams, bool noparent) :
-    #ifdef WAITER
-        QDialog(noparent ? nullptr : __mainWindow, Qt::FramelessWindowHint),
-        fDBParams(dbParams)
-    #else
-        QDialog(__mainWindow),
-        fDBParams(dbParams)
-    #endif
+#ifdef WAITER
+    QDialog(noparent ? nullptr : __mainWindow, Qt::FramelessWindowHint),
+    fDBParams(dbParams)
+#else
+    QDialog(__mainWindow),
+    fDBParams(dbParams)
+#endif
 {
 #ifdef WAITER
     setMaximumSize(qApp->desktop()->geometry().size());
@@ -60,7 +62,7 @@ C5SocketHandler *C5Dialog::createSocketHandler(const char *slot)
 {
     C5SocketHandler *s = new C5SocketHandler(nullptr, this);
     connect(s, SIGNAL(handleCommand(QJsonObject)), this, slot);
-    connect(s, SIGNAL(handleError(int,QString)), this, SLOT(handleError(int,QString)));
+    connect(s, SIGNAL(handleError(int, QString)), this, SLOT(handleError(int, QString)));
     return s;
 }
 
@@ -91,35 +93,33 @@ void C5Dialog::selectorCallback(int row, const QList<QVariant> &values)
 void C5Dialog::keyPressEvent(QKeyEvent *e)
 {
     switch (e->key()) {
-    case Qt::Key_Enter:
-    case Qt::Key_Return:
-        if (e->modifiers() & Qt::ControlModifier) {
-            keyControlPlusEnter();
-        } if (e->modifiers() & Qt::AltModifier) {
-            keyAlterPlusEnter();
-        } else {
-            focusNextChild();
-            keyEnter();
-        }
-        e->ignore();
-        return;
+        case Qt::Key_Enter:
+        case Qt::Key_Return:
+            if (e->modifiers() &Qt::ControlModifier) {
+                keyControlPlusEnter();
+            }
+            if (e->modifiers() &Qt::AltModifier) {
+                keyAlterPlusEnter();
+            } else {
+                focusNextChild();
+                keyEnter();
+            }
+            e->ignore();
+            return;
     }
     QDialog::keyPressEvent(e);
 }
 
 void C5Dialog::keyEnter()
 {
-
 }
 
 void C5Dialog::keyControlPlusEnter()
 {
-
 }
 
 void C5Dialog::keyAlterPlusEnter()
 {
-
 }
 
 void C5Dialog::handleError(int err, const QString &msg)

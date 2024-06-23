@@ -87,8 +87,6 @@ private:
 
     QString getHotelID(const QString &source, QString &err);
 
-    bool correctHotelID(QString &id, QString &err);
-
 signals:
     void finished();
 };

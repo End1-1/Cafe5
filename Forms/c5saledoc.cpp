@@ -10,7 +10,6 @@
 #include "ce5goods.h"
 #include "c5storedraftwriter.h"
 #include "threadsendmessage.h"
-#include "removeshopsale.h"
 #include "c5daterange.h"
 #include "breezeconfig.h"
 #include "armsoftexportoptions.h"
@@ -193,6 +192,77 @@ bool C5SaleDoc::openDoc(const QString &uuid)
     ui->wtoolbar->setEnabled(o.state != ORDER_STATE_CLOSE);
     ui->paymentFrame->setEnabled(o.state != ORDER_STATE_CLOSE);
     return true;
+}
+
+void C5SaleDoc::makeDraftResponse(const QJsonObject &jdoc)
+{
+    /*    QString oldId = ui->leUuid->text();
+    QString err;
+    C5Database db(fDBParams);
+    db.startTransaction();
+    fDraftSale.id = "";
+    fDraftSale.state = 1;
+    fDraftSale.saleType = ui->leSaleType->property("id").toInt();
+    fDraftSale.date = ui->leDate->date();
+    fDraftSale.time = QTime::currentTime();
+    fDraftSale.cashier = __user->id();
+    fDraftSale.staff = ui->leDeluveryMan->property("id").toInt();
+    fDraftSale.amount = ui->leGrandTotal->getDouble();
+    fDraftSale.comment = ui->leComment->text();
+    fDraftSale.payment = 1;
+    fDraftSale.partner = fPartner.id.toInt();
+    fDraftSale.discount = 0;
+    fDraftSale.deliveryDate = QDate::fromString(ui->leDelivery->text(), "dd/MM/yyyy");
+    if (!fDraftSale.write(db, err)) {
+        db.rollback();
+        C5Message::error(err);
+        return;
+    }
+    ui->leUuid->setText(fDraftSale.id.toString());
+    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+        ui->tblGoods->setString(i, col_uuid, "");
+        fDraftSaleBody.id = "";
+        fDraftSaleBody.header = fDraftSale.id.toString();
+        fDraftSaleBody.state = 1;
+        fDraftSaleBody.store = ui->tblGoods->comboBox(i, col_store)->currentData().toInt();
+        fDraftSaleBody.dateAppend = QDate::currentDate();
+        fDraftSaleBody.timeAppend = QTime::currentTime();
+        fDraftSaleBody.goods = ui->tblGoods->getInteger(i, col_goods_code);
+        fDraftSaleBody.qty = ui->tblGoods->lineEdit(i, col_qty)->getDouble();
+        fDraftSaleBody.price = ui->tblGoods->lineEdit(i, col_price)->getDouble();
+        fDraftSaleBody.discount = ui->tblGoods->lineEdit(i, col_discount_value)->getDouble();
+        fDraftSaleBody.userAppend = __user->id();
+        if (!fDraftSaleBody.write(db, err)) {
+            db.rollback();
+            C5Message::error(err);
+            return;
+        }
+    }
+    fActionSave->setEnabled(true);
+    fActionDraft->setEnabled(false);
+    fActionCopy->setEnabled(false);
+    ui->wtoolbar->setEnabled(true);
+    for (int r = 0; r < ui->tblGoods->rowCount(); r++) {
+        for (int c = 0; c < ui->tblGoods->columnCount(); c++) {
+            QWidget *w = ui->tblGoods->cellWidget(r, c);
+            if (w) {
+                w->setEnabled(true);
+            }
+        }
+    }
+    ui->paymentFrame->setEnabled(true);
+    fOpenedFromDraft = true;
+    fDraftSale.staff = ui->leDelivery->property("id").toInt();
+    */
+    fHttp->httpQueryFinished(sender());
+}
+
+void C5SaleDoc::removeDocResponse(const QJsonObject &jdoc)
+{
+    Q_UNUSED(jdoc);
+    fHttp->httpQueryFinished(sender());
+    C5Message::info(tr("Removed"));
+    __mainWindow->removeTab(this);
 }
 
 void C5SaleDoc::amountDoubleClicked()
@@ -1275,7 +1345,9 @@ void C5SaleDoc::saveReturnItems()
         db.rollback();
         return;
     }
+    bool empty = true;
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+        empty = false;
         OGoods g;
         g.header = oheader._id();
         g.id = ui->tblGoods->getString(i, col_uuid);
@@ -1312,66 +1384,8 @@ void C5SaleDoc::saveAsDraft()
     if (C5Message::question(tr("Confirm to make a draft")) != QDialog::Accepted) {
         return;
     }
-    QString oldId = ui->leUuid->text();
-    QString err;
-    C5Database db(fDBParams);
-    db.startTransaction();
-    fDraftSale.id = "";
-    fDraftSale.state = 1;
-    fDraftSale.saleType = ui->leSaleType->property("id").toInt();
-    fDraftSale.date = ui->leDate->date();
-    fDraftSale.time = QTime::currentTime();
-    fDraftSale.cashier = __user->id();
-    fDraftSale.staff = ui->leDeluveryMan->property("id").toInt();
-    fDraftSale.amount = ui->leGrandTotal->getDouble();
-    fDraftSale.comment = ui->leComment->text();
-    fDraftSale.payment = 1;
-    fDraftSale.partner = fPartner.id.toInt();
-    fDraftSale.discount = 0;
-    fDraftSale.deliveryDate = QDate::fromString(ui->leDelivery->text(), "dd/MM/yyyy");
-    if (!fDraftSale.write(db, err)) {
-        db.rollback();
-        C5Message::error(err);
-        return;
-    }
-    ui->leUuid->setText(fDraftSale.id.toString());
-    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
-        ui->tblGoods->setString(i, col_uuid, "");
-        fDraftSaleBody.id = "";
-        fDraftSaleBody.header = fDraftSale.id.toString();
-        fDraftSaleBody.state = 1;
-        fDraftSaleBody.store = ui->tblGoods->comboBox(i, col_store)->currentData().toInt();
-        fDraftSaleBody.dateAppend = QDate::currentDate();
-        fDraftSaleBody.timeAppend = QTime::currentTime();
-        fDraftSaleBody.goods = ui->tblGoods->getInteger(i, col_goods_code);
-        fDraftSaleBody.qty = ui->tblGoods->lineEdit(i, col_qty)->getDouble();
-        fDraftSaleBody.price = ui->tblGoods->lineEdit(i, col_price)->getDouble();
-        fDraftSaleBody.discount = ui->tblGoods->lineEdit(i, col_discount_value)->getDouble();
-        fDraftSaleBody.userAppend = __user->id();
-        if (!fDraftSaleBody.write(db, err)) {
-            db.rollback();
-            C5Message::error(err);
-            return;
-        }
-    }
-    RemoveShopSale rs(fDBParams);
-    rs.remove(db, oldId);
-    db.commit();
-    fActionSave->setEnabled(true);
-    fActionDraft->setEnabled(false);
-    fActionCopy->setEnabled(false);
-    ui->wtoolbar->setEnabled(true);
-    for (int r = 0; r < ui->tblGoods->rowCount(); r++) {
-        for (int c = 0; c < ui->tblGoods->columnCount(); c++) {
-            QWidget *w = ui->tblGoods->cellWidget(r, c);
-            if (w) {
-                w->setEnabled(true);
-            }
-        }
-    }
-    ui->paymentFrame->setEnabled(true);
-    fOpenedFromDraft = true;
-    fDraftSale.staff = ui->leDelivery->property("id").toInt();
+    fHttp->createHttpQuery("/engine/shop/make-draft.php", QJsonObject{{"id", ui->leUuid->text()}}, SLOT(makeDraftResponse(
+                QJsonObject)));
 }
 
 void C5SaleDoc::saveCopy()
@@ -1426,13 +1440,8 @@ void C5SaleDoc::removeDoc()
     if (C5Message::question(tr("Confirm to remove document")) != QDialog::Accepted) {
         return;
     }
-    C5Database db(fDBParams);
-    db.startTransaction();
-    RemoveShopSale rs(fDBParams);
-    rs.remove(db, ui->leUuid->text());
-    db.commit();
-    C5Message::info(tr("Removed"));
-    __mainWindow->removeTab(this);
+    fHttp->createHttpQuery("/engine/shop/remove-order.php", QJsonObject{{"id", ui->leUuid->text()}}, SLOT(removeDocResponse(
+                QJsonObject)));
 }
 
 void C5SaleDoc::on_btnQr_clicked()

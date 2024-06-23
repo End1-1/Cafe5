@@ -5,7 +5,6 @@
 #include "ce5goodsunit.h"
 #include "ce5partner.h"
 #include "c5message.h"
-#include "ce5goodsclass.h"
 #include "c5selector.h"
 #include "barcode.h"
 #include "c5printpreview.h"
@@ -39,16 +38,10 @@ CE5Goods::CE5Goods(const QStringList &dbParams, QWidget *parent) :
     ui->leUnit->setSelector(dbParams, ui->leUnitName, cache_goods_unit);
     ui->leLowLevel->setValidator(new QDoubleValidator(0, 100000, 4));
     ui->tblGoods->setColumnWidths(7, 0, 0, 400, 80, 80, 80, 80);
-    ui->leClass1->setSelector(dbParams, ui->leClassName1, cache_goods_classes);
-    ui->leClass2->setSelector(dbParams, ui->leClassName2, cache_goods_classes);
-    ui->leClass3->setSelector(dbParams, ui->leClassName3, cache_goods_classes);
-    ui->leClass4->setSelector(dbParams, ui->leClassName4, cache_goods_classes);
     ui->leStoreId->setSelector(dbParams, ui->leStoreIdName, cache_goods, 1, 3);
-
 #ifndef QT_DEBUG
     ui->leIsComplect->setVisible(false);
 #endif
-
     C5Database db(dbParams);
     db.exec("select f_name from c_goods");
     while (db.nextRow()) {
@@ -62,7 +55,6 @@ CE5Goods::CE5Goods(const QStringList &dbParams, QWidget *parent) :
     ui->lbScancodeType->setVisible(false);
     ui->btnPinLast->setChecked(__c5config.getRegValue("last_goods_editor").toBool());
     ui->leCostPrice->fDecimalPlaces = 4;
-    connect(ui->tblMultiscancode, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(tblMultiscancodeContextMenu(QPoint)));
     QStringList l;
     l.append(tr("Sale price"));
     l.append(tr("Whosale"));
@@ -110,7 +102,6 @@ CE5Goods::CE5Goods(const QStringList &dbParams, QWidget *parent) :
         ui->tblAs->setString(r, 1, db.getString("f_name"));
         ui->tblAs->createLineEdit(r, 2);
     }
-
 }
 
 CE5Goods::~CE5Goods()
@@ -138,99 +129,15 @@ QString CE5Goods::dbError(QString err)
 
 void CE5Goods::setId(int id)
 {
-    CE5Editor::setId(id);
-    C5Database db(fDBParams);
-    /* scancode */
     if (id > 0) {
-        db[":f_id"] = id;
-        db.exec("select f_scancode from c_goods where f_id=:f_id");
-        db.nextRow();
-        ui->leScanCode->setText(db.getString("f_scancode"));
+        fHttp->createHttpQuery("/engine/goods/goods-open.php", QJsonObject{{"id", id}}, SLOT(openResponse(QJsonObject)));
     }
-    /* Complectation */
-    db[":f_base"] = id;
-    db.exec("select c.f_id, c.f_goods, concat(g.f_name, if(g.f_scancode is null, '', concat(' ', g.f_scancode))) as f_goodsname, c.f_qty, u.f_name as f_unitname, "
-            "g.f_lastinputprice, c.f_qty*g.f_lastinputprice as f_total "
-            "from c_goods_complectation c "
-            "left join c_goods g on g.f_id=c.f_goods "
-            "left join c_units u on u.f_id=g.f_unit "
-            "where c.f_base=:f_base");
-    while (db.nextRow()) {
-        int row = addGoodsRow();
-        ui->tblGoods->setInteger(row, 0, db.getInt("f_id"));
-        ui->tblGoods->setInteger(row, 1, db.getInt("f_goods"));
-        ui->tblGoods->setString(row, 2, db.getString("f_goodsname"));
-        ui->tblGoods->lineEdit(row, 3)->setDouble(db.getDouble("f_qty"));
-        ui->tblGoods->setString(row, 4, db.getString("f_unitname"));
-        ui->tblGoods->lineEdit(row, 5)->setDouble(db.getDouble("f_lastinputprice"));
-        ui->tblGoods->lineEdit(row, 6)->setDouble(db.getDouble("f_total"));
-    }
-
-    db[":f_goods"] = ui->leCode->getInteger();
-    db.exec("select f_id from c_goods_multiscancode where f_goods=:f_goods");
-    while (db.nextRow()) {
-        int r = ui->tblMultiscancode->addEmptyRow();
-        ui->tblMultiscancode->setString(r, 0, db.getString(0));
-    }
-    ui->chSameStoreId->setChecked(ui->leStoreId->getInteger() == ui->leCode->getInteger());
-    emit ui->chSameStoreId->clicked();
-    countTotal();
-
-    if (__user->check(cp_t6_goods_only_price_edit)) {
-        bool enabled = ui->leCode->getInteger() == 0;
-        ui->tab_2->setEnabled(enabled);
-        ui->tab_3->setEnabled(enabled);
-        ui->tab_4->setEnabled(enabled);
-        ui->tab_5->setEnabled(enabled);
-        ui->leGroup->setEnabled(enabled);
-        ui->leClass1->setEnabled(enabled);
-        ui->leClass2->setEnabled(enabled);
-        ui->leClass3->setEnabled(enabled);
-        ui->leClass4->setEnabled(enabled);
-        ui->leName->setEnabled(enabled);
-        ui->leScanCode->setEnabled(enabled);
-    }
-
-    db[":f_goods"] = ui->leCode->getInteger();
-    db.exec("select * from c_goods_prices where f_goods=:f_goods");
-    while (db.nextRow()) {
-        for (int j = 0; j < ui->tblPricing->columnCount(); j++) {
-            if (ui->tblPricing->lineEdit(0, j)->property("c").toInt() == db.getInt("f_currency")) {
-                ui->tblPricing->lineEdit(0, j)->setDouble(db.getDouble("f_price1"));
-                ui->tblPricing->lineEdit(1, j)->setDouble(db.getDouble("f_price2"));
-                ui->tblPricing->lineEdit(2, j)->setDouble(db.getDouble("f_price1disc"));
-                ui->tblPricing->lineEdit(3, j)->setDouble(db.getDouble("f_price2disc"));
-                break;
-            }
-        }
-    }
-    if (ui->cbCurrency->currentData().toInt() == 0) {
-        ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(__c5config.getValue(param_default_currency)));
-    }
-    db[":f_id"] = ui->leCode->getInteger();
-    db.exec("select f_asdbid, f_ascode from as_convert where f_table='c_goods' and f_tableid=:f_id");
-    while (db.nextRow()) {
-        int asrow = -1;
-        for (int i = 0; i < ui->tblAs->rowCount(); i++) {
-            if (ui->tblAs->getInteger(i, 0) == db.getInt("f_asdbid")) {
-                asrow = i;
-                break;
-            }
-        }
-        if (asrow < 0) {
-            throw std::runtime_error(QString("The database id (%1) not exists. Check database structure.").arg(asrow).toLocal8Bit().data());
-        }
-        ui->tblAs->lineEdit(asrow, 2)->setText(db.getString("f_ascode"));
-    }
-
-
 }
 
 bool CE5Goods::save(QString &err, QList<QMap<QString, QVariant> > &data)
 {
     fLastGroup = ui->leGroup->getInteger();
     fLastUnit = ui->leUnit->getInteger();
-
     if (!ui->chSameStoreId->isChecked()) {
         if (ui->leStoreId->getInteger() == 0) {
             err += tr("Goods code for store output cannot be undefined") + "<br>";
@@ -242,102 +149,11 @@ bool CE5Goods::save(QString &err, QList<QMap<QString, QVariant> > &data)
     if (!err.isEmpty()) {
         return false;
     }
-    if (ui->leCode->getInteger() > 0) {
-        if (ui->chSameStoreId->isChecked() && ui->leStoreId->getInteger() == 0) {
-            ui->leStoreId->setInteger(ui->leCode->getInteger());
-        }
-    }
-    bool isNew = ui->leCode->getInteger() == 0;
-    if (!CE5Editor::save(err, data)) {
-        return false;
-    }
-    C5Database db(fDBParams);
-    if (isNew) {
-        db[":f_id"] = ui->leCode->getInteger();
-        db.insert("c_goods_option", false);
-    }
-
-    if (ui->leScanCode->text().length() > 0) {
-        db[":f_id"] = ui->leCode->getInteger();
-        db[":f_scancode"] = ui->leScanCode->text();
-        db.exec("select * from c_goods where f_scancode=:f_scancode and f_id<>:f_id");
-        if (db.nextRow()) {
-            err += tr("Duplicate barecode");
-            return false;
-        }
-        db[":f_scancode"] = ui->leScanCode->text();
-        db.update("c_goods", "f_id", ui->leCode->getInteger());
-    } else {
-        db[":f_scancode"] = QVariant();
-        db.update("c_goods", "f_id", ui->leCode->getInteger());
-    }
-
-    if (ui->chSameStoreId->isChecked()) {
-        if (ui->leStoreId->getInteger() == 0) {
-            ui->leStoreId->setInteger(ui->leCode->getInteger());
-            db[":f_storeid"] = ui->leStoreId->getInteger();
-            db.update("c_goods", where_id(ui->leCode->getInteger()));
-        }
-    }
-    /* Complectation */
-    db[":f_base"] = ui->leCode->text();
-    db.exec("delete from c_goods_complectation where f_base=:f_base");
-    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
-        db[":f_base"] = ui->leCode->text();
-        db[":f_goods"] = ui->tblGoods->getInteger(i, 1);
-        db[":f_qty"] = ui->tblGoods->lineEdit(i, 3)->getDouble();
-        db[":f_price"] = ui->tblGoods->lineEdit(i, 5)->getDouble();
-        db.insert("c_goods_complectation", false);
-    }
-
     /* Additional Options */
     fStrings.insert(ui->leName->text());
-    static_cast<QStringListModel*>(ui->leName->completer()->model())->setStringList(fStrings.values());
-
-    for (const QString &s: qAsConst(fScancodeAppend)) {
-        db[":f_id"] = s;
-        db[":f_goods"] = ui->leCode->getInteger();
-        db.insert("c_goods_multiscancode", false);
-    }
-    for (const QString &s: fScancodeRemove) {
-        db[":f_id"] = s;
-        db.exec("delete from c_goods_multiscancode where f_id=:f_id");
-    }
-    fScancodeAppend.clear();
-    fScancodeRemove.clear();
-
-    db[":f_goods"] = ui->leCode->getInteger();
-    db.exec("delete from c_goods_prices where f_goods=:f_goods");
-    for (int j = 0; j < ui->tblPricing->columnCount(); j++) {
-        db[":f_goods"] = ui->leCode->getInteger();
-        db[":f_price1"] = ui->tblPricing->lineEdit(0, j)->getDouble();
-        db[":f_price2"] = ui->tblPricing->lineEdit(1, j)->getDouble();
-        db[":f_price1disc"] = ui->tblPricing->lineEdit(2, j)->getDouble();
-        db[":f_price2disc"] = ui->tblPricing->lineEdit(3, j)->getDouble();
-        db[":f_currency"] = ui->tblPricing->lineEdit(0, j)->property("c");
-        db.insert("c_goods_prices");
-    }
-
-    if (fScancodeGenerated) {
-        db[":f_counter"] = ui->leScanCode->text().left(7).toInt();
-        db.exec("update c_goods_scancode_counter set f_counter=:f_counter where f_counter<:f_counter");
-        fScancodeGenerated = false;
-    }
-
-    db[":f_table"] = "c_goods";
-    db[":f_tableid"] = ui->leCode->getInteger();
-    db.exec("delete from as_convert where f_table=:f_table and f_tableid=:f_tableid");
-    for (int i = 0; i < ui->tblAs->rowCount(); i++) {
-        db[":f_asdbid"] = ui->tblAs->getInteger(i, 0);
-        db[":f_table"] = "c_goods";
-        db[":f_tableid"] = ui->leCode->getInteger();
-        db[":f_ascode"] = ui->tblAs->lineEdit(i, 2)->text();
-        db.insert("as_convert");
-    }
-
-    data[0]["f_saleprice1"] =ui->tblPricing->lineEdit(0, 0)->getDouble();
-    data[0]["f_saleprice2"] =ui->tblPricing->lineEdit(1, 0)->getDouble();
-
+    static_cast<QStringListModel *>(ui->leName->completer()->model())->setStringList(fStrings.values());
+    fHttp->createHttpQuery("/engine/goods/goods-save.php", makeJsonObject(), SLOT(saveResponse(QJsonObject)));
+    err = "json";
     return true;
 }
 
@@ -353,7 +169,6 @@ void CE5Goods::clear()
     }
     ui->lbImage->setText(tr("Image"));
     ui->leTotal->clear();
-    ui->chStoreInputBeforeSale->setChecked(false);
     ui->chOnlyWholeNumber->setChecked(false);
     ui->chSameStoreId->setChecked(true);
     ui->chSameStoreId->clicked(true);
@@ -365,10 +180,6 @@ void CE5Goods::clear()
         }
         ui->leName->setFocus();
     }
-    ui->tblMultiscancode->clearContents();
-    ui->tblMultiscancode->setRowCount(0);
-    fScancodeAppend.clear();
-    fScancodeRemove.clear();
     for (int i = 0; i < ui->tblPricing->rowCount(); i++) {
         for (int c = 0; c < ui->tblPricing->columnCount(); c++) {
             ui->tblPricing->lineEdit(i, c)->clear();
@@ -390,13 +201,193 @@ QPushButton *CE5Goods::b1()
     return btn;
 }
 
+QJsonObject CE5Goods::makeJsonObject()
+{
+    fData = QJsonObject();
+    QJsonObject j;
+    j["f_id"] = ui->leCode->getInteger();
+    j["f_name"] = ui->leName->text();
+    j["f_supplier"] = ui->leSupplier->getInteger();
+    j["f_group"] =  ui->leGroup->getInteger();
+    j["f_unit"] = ui->leUnit->getInteger();
+    j["f_lowlevel"] = ui->leLowLevel->getDouble();
+    j["f_qtybox"] = ui->leQtyBox->getDouble();
+    j["f_scancode"] = ui->leScanCode->text().isEmpty() ? QJsonValue() : ui->leScanCode->text();
+    j["f_fiscalname"] = ui->leFiscalName->text();
+    j["f_lastinputprice"] = ui->leCostPrice->getDouble();
+    j["f_price_margin"] = ui->leMargin->getDouble();
+    j["f_price_margin2"] = ui->leMargin2->getDouble();
+    j["f_base_currency"] = ui->cbCurrency->currentData().toInt();
+    j["f_storeid"] = ui->leStoreId->getInteger();
+    j["f_adg"] = ui->leAdg->text();
+    j["f_nospecial_price"] = ui->chNoSpecialPrice->isChecked() ? 1 : 0;
+    j["f_service"] = ui->chService->isChecked() ? 1 : 0;
+    j["f_enabled"] = ui->chEnabled->isChecked() ? 1 : 0;
+    j["f_wholenumber"] = ui->chOnlyWholeNumber->isChecked() ? 1 : 0;
+    j["f_component_exit"] = ui->chComponentExit->isChecked() ? 1 : 0;
+    j["f_weblink"] = ui->leWebLink->text();
+    j["f_queue"] = ui->leQueue->getInteger();
+    j["f_description"] = ui->plainTextEdit->toPlainText();
+    fData["goods"] = j;
+    fData["samestore"] = ui->chSameStoreId->isChecked();
+    fData["scangenerated"] = fScancodeGenerated;
+    fData["scancounter"] = ui->leScanCode->text().left(7).toInt();
+    fData["image"] = fImage.isEmpty() ? QJsonValue() : fImage;
+    QJsonArray ja;
+    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+        j = QJsonObject();
+        j["f_base"] = ui->leCode->text();
+        j["f_goods"] = ui->tblGoods->getInteger(i, 1);
+        j["f_qty"] = ui->tblGoods->lineEdit(i, 3)->getDouble();
+        j["f_price"] = ui->tblGoods->lineEdit(i, 5)->getDouble();
+        ja.append(j);
+    }
+    fData["c_goods_complectation"] = ja;
+    ja = QJsonArray();
+    for (int i = 0; i < ui->tblPricing->columnCount(); i++) {
+        j = QJsonObject();
+        j["f_goods"] = ui->leCode->getInteger();
+        j["f_price1"] = ui->tblPricing->lineEdit(0, i)->getDouble();
+        j["f_price2"] = ui->tblPricing->lineEdit(1, i)->getDouble();
+        j["f_price1disc"] = ui->tblPricing->lineEdit(2, i)->getDouble();
+        j["f_price2disc"] = ui->tblPricing->lineEdit(3, i)->getDouble();
+        j["f_currency"] = ui->tblPricing->lineEdit(0, i)->property("c").toInt();
+        ja.append(j);
+    }
+    fData["c_goods_prices"] = ja;
+    fData["astable"] = "c_goods";
+    fData["astableid"] = ui->leCode->getInteger();
+    ja = QJsonArray();
+    for (int i = 0; i < ui->tblAs->rowCount(); i++) {
+        j = QJsonObject();
+        j["f_asdbid"] = ui->tblAs->getInteger(i, 0);
+        j["f_table"] = "c_goods";
+        j["f_tableid"] = ui->leCode->getInteger();
+        j["f_ascode"] = ui->tblAs->lineEdit(i, 2)->text();
+        ja.append(j);
+    }
+    fData["asconver"] = ja;
+    if (ui->leCode->getInteger() > 0) {
+        if (ui->chSameStoreId->isChecked() && ui->leStoreId->getInteger() == 0) {
+            ui->leStoreId->setInteger(ui->leCode->getInteger());
+        }
+    }
+    fData["f_unitname"] = ui->leUnitName->text();
+    return fData;
+}
+
+bool CE5Goods::acceptOnSave() const
+{
+    return true;
+}
+
+void CE5Goods::saveResponse(const QJsonObject &jdoc)
+{
+    // data[0]["f_saleprice1"] = ui->tblPricing->lineEdit(0, 0)->getDouble();
+    // data[0]["f_saleprice2"] = ui->tblPricing->lineEdit(1, 0)->getDouble();
+    QJsonObject j = fData["goods"].toObject();
+    j["f_id"] = jdoc["f_id"].toInt();
+    fData["goods"] = j;
+    fHttp->httpQueryFinished(sender());
+    if (acceptOnSave()) {
+        emit Accept();
+    }
+}
+
+void CE5Goods::openResponse(const QJsonObject &jdoc)
+{
+    QByteArray ba = QByteArray::fromBase64(jdoc["image"].toString().toLatin1());
+    QPixmap p;
+    p.loadFromData(ba);
+    ui->lbImage->setPixmap(p);
+    QJsonObject j = jdoc["goods"].toObject();
+    ui->leCode->setInteger(j["f_id"].toInt());
+    ui->leName->setText(j["f_name"].toString());
+    ui->leGroup->setValue(j["f_group"].toInt());
+    ui->leSupplier->setValue(j["f_supplier"].toInt());
+    ui->leUnit->setValue(j["f_unit"].toInt());
+    ui->leScanCode->setText(j["f_scancode"].toString());
+    ui->leLowLevel->setDouble(j["f_lowlevel"].toString().toDouble());
+    ui->leQtyBox->setDouble(j["f_qtybox"].toString().toDouble());
+    ui->leFiscalName->setText(j["f_fiscalname"].toString());
+    ui->leCostPrice->setDouble(j["f_lastinputprice"].toString().toDouble());
+    ui->leAdg->setText(j["f_adg"].toString());
+    ui->leMargin->setDouble(j["f_price_margin"].toString().toDouble());
+    ui->leMargin2->setDouble(j["f_price_margin2"].toString().toDouble());
+    ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(j["f_base_currency"].toInt()));
+    ui->leStoreId->setInteger(j["f_storeid"].toInt());
+    ui->chSameStoreId->setChecked(ui->leStoreId->getInteger() == ui->leCode->getInteger());
+    emit ui->chSameStoreId->clicked();
+    ui->chEnabled->setChecked(j["f_enabled"].toInt() > 0);
+    ui->chOnlyWholeNumber->setChecked(j["f_wholenumber"].toInt() > 0);
+    ui->chService->setEnabled(j["f_service"].toInt() > 0);
+    ui->chNoSpecialPrice->setEnabled(j["f_nospecial_price"].toInt() > 0);
+    ui->chComponentExit->setEnabled(j["f_component_exit"].toInt() > 0);
+    ui->leWebLink->setText(j["f_weblink"].toString());
+    ui->leQueue->setInteger(j["f_queue"].toInt());
+    QJsonArray ja = jdoc["complect"].toArray();
+    for(int i = 0; i < ja.size(); i++) {
+        int row = addGoodsRow();
+        const QJsonObject &j = ja.at(i).toObject();
+        ui->tblGoods->setInteger(row, 0, j["f_id"].toInt());
+        ui->tblGoods->setInteger(row, 1, j["f_goods"].toInt());
+        ui->tblGoods->setString(row, 2, j["f_goodsname"].toString());
+        ui->tblGoods->lineEdit(row, 3)->setDouble(j["f_qty"].toString().toDouble());
+        ui->tblGoods->setString(row, 4, j["f_unitname"].toString());
+        ui->tblGoods->lineEdit(row, 5)->setDouble(j["f_lastinputprice"].toString().toDouble());
+        ui->tblGoods->lineEdit(row, 6)->setDouble(j["f_total"].toString().toDouble());
+    }
+    countTotal();
+    ja = jdoc["goods_prices"].toArray();
+    for(int i = 0; i < ja.size(); i++) {
+        const QJsonObject &o = ja.at(i).toObject();
+        for (int j = 0; j < ui->tblPricing->columnCount(); j++) {
+            if (ui->tblPricing->lineEdit(0, j)->property("c").toInt() == o["f_currency"].toInt()) {
+                ui->tblPricing->lineEdit(0, j)->setDouble(o["f_price1"].toString().toDouble());
+                ui->tblPricing->lineEdit(1, j)->setDouble(o["f_price2"].toString().toDouble());
+                ui->tblPricing->lineEdit(2, j)->setDouble(o["f_price1disc"].toString().toDouble());
+                ui->tblPricing->lineEdit(3, j)->setDouble(o["f_price2disc"].toString().toDouble());
+                break;
+            }
+        }
+    }
+    if (ui->cbCurrency->currentData().toInt() == 0) {
+        ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(__c5config.getValue(param_default_currency)));
+    }
+    ja = jdoc["astable"].toArray();
+    for(int i = 0; i < ja.size(); i++) {
+        const QJsonObject &o = ja.at(i).toObject();
+        int asrow = -1;
+        for (int i = 0; i < ui->tblAs->rowCount(); i++) {
+            if (ui->tblAs->getInteger(i, 0) == o["f_asdbid"].toInt()) {
+                asrow = i;
+                break;
+            }
+        }
+        if (asrow < 0) {
+            throw std::runtime_error(QString("The database id (%1) not exists. Check database structure.").arg(
+                                         asrow).toLocal8Bit().data());
+        }
+        ui->tblAs->lineEdit(asrow, 2)->setText(o["f_ascode"].toString());
+    }
+    if (__user->check(cp_t6_goods_only_price_edit)) {
+        bool enabled = ui->leCode->getInteger() == 0;
+        ui->tab_2->setEnabled(enabled);
+        ui->tab_3->setEnabled(enabled);
+        ui->tab_4->setEnabled(enabled);
+        ui->leGroup->setEnabled(enabled);
+        ui->leName->setEnabled(enabled);
+        ui->leScanCode->setEnabled(enabled);
+    }
+    fHttp->httpQueryFinished(sender());
+}
+
 void CE5Goods::printCard()
 {
     C5Printing p;
     QList<qreal> points;
     QStringList vals;
     p.setSceneParams(2000, 2700, QPrinter::Portrait);
-
     p.setFontSize(16);
     p.setFontBold(true);
     p.ltext(QString("%1: %2").arg(tr("Printed")).arg(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR)), 0);
@@ -425,7 +416,6 @@ void CE5Goods::printCard()
     p.tableText(points, vals, p.fLineHeight);
     p.br(p.fLineHeight + 20);
     p.br();
-
     points.clear();
     vals.clear();
     if (ui->tblGoods->rowCount() > 0) {
@@ -448,9 +438,8 @@ void CE5Goods::printCard()
         p.br(p.fLineHeight + 20);
         p.rtext(QString("%1: %2").arg(tr("Complectation cost")).arg(ui->leTotal->text()));
     }
-
     fEditor->close();
-    C5PrintPreview pp(&p, fDBParams);
+    C5PrintPreview pp( &p, fDBParams);
     pp.setWindowState( (windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
     pp.raise();  // for MacOS
     pp.activateWindow();
@@ -459,19 +448,19 @@ void CE5Goods::printCard()
 
 void CE5Goods::priceEdited(const QString &arg1)
 {
-    C5LineEdit *e = static_cast<C5LineEdit*>(sender());
+    C5LineEdit *e = static_cast<C5LineEdit *>(sender());
     int r, c;
     if (!ui->tblPricing->findWidget(e, r, c)) {
         return;
     }
     C5LineEditWithSelector *l;
     switch (r) {
-    case 0:
-        l = ui->leMargin;
-        break;
-    case 1:
-        l = ui->leMargin2;
-        break;
+        case 0:
+            l = ui->leMargin;
+            break;
+        case 1:
+            l = ui->leMargin2;
+            break;
     }
     int basecurrency = e->property("c").toInt();
     for (int i = 0; i < ui->tblPricing->columnCount(); i++) {
@@ -484,9 +473,10 @@ void CE5Goods::priceEdited(const QString &arg1)
             l->setDouble(((str_float(arg1) / costprice) - 1) * 100);
             continue;
         }
-        QString crossrate = QString("%1-%2").arg(QString::number(basecurrency), ui->tblPricing->lineEdit(r, i)->property("c").toString());
+        QString crossrate = QString("%1-%2").arg(QString::number(basecurrency), ui->tblPricing->lineEdit(r,
+                            i)->property("c").toString());
         double rate = fCrossRate[crossrate];
-        ui->tblPricing->lineEdit(r, i)->setDouble(str_float(arg1) * rate);
+        ui->tblPricing->lineEdit(r, i)->setDouble(str_float(arg1) *rate);
     }
     if (l->text() == "nan" || l->text() == "inf") {
         l->setDouble(0);
@@ -496,33 +486,33 @@ void CE5Goods::priceEdited(const QString &arg1)
 void CE5Goods::tblQtyChanged(const QString &arg1)
 {
     Q_UNUSED(arg1);
-    C5LineEdit *l = static_cast<C5LineEdit*>(sender());
+    C5LineEdit *l = static_cast<C5LineEdit *>(sender());
     int row, col;
     ui->tblGoods->findWidget(l, row, col);
     C5LineEdit *lqty = ui->tblGoods->lineEdit(row, 3);
     C5LineEdit *lprice = ui->tblGoods->lineEdit(row, 5);
     C5LineEdit *ltotal = ui->tblGoods->lineEdit(row, 6);
-    ltotal->setDouble(lqty->getDouble() * lprice->getDouble());
+    ltotal->setDouble(lqty->getDouble() *lprice->getDouble());
     countTotal();
 }
 
 void CE5Goods::tblPriceChanged(const QString &arg1)
 {
     Q_UNUSED(arg1);
-    C5LineEdit *l = static_cast<C5LineEdit*>(sender());
+    C5LineEdit *l = static_cast<C5LineEdit *>(sender());
     int row, col;
     ui->tblGoods->findWidget(l, row, col);
     C5LineEdit *lqty = ui->tblGoods->lineEdit(row, 3);
     C5LineEdit *lprice = ui->tblGoods->lineEdit(row, 5);
     C5LineEdit *ltotal = ui->tblGoods->lineEdit(row, 6);
-    ltotal->setDouble(lqty->getDouble() * lprice->getDouble());
+    ltotal->setDouble(lqty->getDouble() *lprice->getDouble());
     countTotal();
 }
 
 void CE5Goods::tblTotalChanged(const QString &arg1)
 {
     Q_UNUSED(arg1);
-    C5LineEdit *l = static_cast<C5LineEdit*>(sender());
+    C5LineEdit *l = static_cast<C5LineEdit *>(sender());
     int row, col;
     ui->tblGoods->findWidget(l, row, col);
     C5LineEdit *lqty = ui->tblGoods->lineEdit(row, 3);
@@ -538,18 +528,6 @@ void CE5Goods::tblTotalChanged(const QString &arg1)
 
 void CE5Goods::uploadImage()
 {
-    if (ui->leCode->getInteger() == 0) {
-        if (C5Message::question(tr("You should to item before upload an image")) ==  QDialog::Accepted) {
-            QString err;
-            QList<QMap<QString, QVariant> > data;
-            if (!save(err, data)) {
-                C5Message::error(err);
-                return;
-            }
-        } else {
-            return;
-        }
-    }
     QString fn = QFileDialog::getOpenFileName(this, tr("Image"), "", "*.jpg;*.png;*.bmp");
     if (fn.isEmpty()) {
         return;
@@ -559,23 +537,16 @@ void CE5Goods::uploadImage()
         C5Message::error(tr("Could not load image"));
         return;
     }
-    ui->lbImage->setPixmap(pm.scaled(ui->lbImage->size(), Qt::KeepAspectRatio));
-
     QByteArray ba;
     do {
         pm = pm.scaled(pm.width() * 0.8,  pm.height() * 0.8);
         ba.clear();
-        QBuffer buff(&ba);
+        QBuffer buff( &ba);
         buff.open(QIODevice::WriteOnly);
-        pm.save(&buff, "JPG");
+        pm.save( &buff, "JPG");
     } while (ba.size() > 100000);
-
-    C5Database db(fDBParams);
-    db[":f_id"] = ui->leCode->getInteger();
-    db.exec("delete from c_goods_images where f_id=:f_id");
-    db[":f_id"] = ui->leCode->getInteger();
-    db[":f_data"] = ba;
-    db.exec("insert into c_goods_images (f_id, f_data) values (:f_id, :f_data)");
+    ui->lbImage->setPixmap(pm.scaled(ui->lbImage->size(), Qt::KeepAspectRatio));
+    fImage = QString(ba.toBase64());
 }
 
 void CE5Goods::removeImage()
@@ -583,55 +554,8 @@ void CE5Goods::removeImage()
     if (C5Message::question(tr("Remove image")) !=  QDialog::Accepted) {
         return;
     }
-    C5Database db(fDBParams);
-    db[":f_id"] = ui->leCode->getInteger();
-    db.exec("delete from c_goods_images where f_id=:f_id");
+    fImage = "";
     ui->lbImage->setText(tr("Image"));
-}
-
-void CE5Goods::newScancode()
-{
-    bool ok;
-    QString scancode = QInputDialog::getText(this, tr("Scancode"), "", QLineEdit::Normal, "", &ok);
-    ok = ok && !scancode.trimmed().isEmpty();
-    if (!ok) {
-        return;
-    }
-    for (int i = 0; i < ui->tblMultiscancode->rowCount(); i++) {
-        if (ui->tblMultiscancode->getString(i, 0) == scancode) {
-            C5Message::error(tr("Scancode exists"));
-            return;
-        }
-    }
-    C5Database db(fDBParams);
-    db[":f_scancode"] = scancode;
-    db.exec("select f_name from c_goods where f_scancode=:f_scancode");
-    if (db.nextRow()) {
-        C5Message::error(tr("This code already used") + "<br>" + db.getString(0));
-        return;
-    }
-    db[":f_id"] = scancode;
-    db.exec("select g.f_name from c_goods_multiscancode m left join c_goods g on g.f_id=m.f_goods where m.f_id=:f_id");
-    if (db.nextRow()) {
-        C5Message::error(tr("This code already used") + "<br>" + db.getString(0));
-        return;
-    }
-    int r = ui->tblMultiscancode->addEmptyRow();
-    ui->tblMultiscancode->setString(r, 0, scancode);
-    fScancodeAppend.append(scancode);
-}
-
-void CE5Goods::removeScancode()
-{
-    int r = ui->tblMultiscancode->currentRow();
-    if (r < 0) {
-        return;
-    }
-    if (C5Message::question(tr("Confirm to remove scancode")) != QDialog::Accepted) {
-        return;
-    }
-    fScancodeRemove.append(ui->tblMultiscancode->getString(r, 0));
-    ui->tblMultiscancode->removeRow(r);
 }
 
 void CE5Goods::genScancode()
@@ -644,17 +568,9 @@ void CE5Goods::genScancode()
     db.exec("select * from c_goods_scancode_counter");
     db.nextRow();
     ui->leScanCode->setText(QString("%1").arg(db.getInt("f_counter") + 1, db.getInt("f_digitsnumber"), 10, QChar('0')));
-//    int checksum = fBarcode->ean8CheckSum(ui->leScanCode->text());
-//    ui->leScanCode->setText(QString("%1%2").arg(ui->leScanCode->text(), QString::number(checksum)));
+    //    int checksum = fBarcode->ean8CheckSum(ui->leScanCode->text());
+    //    ui->leScanCode->setText(QString("%1%2").arg(ui->leScanCode->text(), QString::number(checksum)));
     fScancodeGenerated = true;
-}
-
-void CE5Goods::tblMultiscancodeContextMenu(const QPoint &p)
-{
-    QMenu m;
-    m.addAction(QIcon(":/new.png"), tr("New"), this, SLOT(newScancode()));
-    m.addAction(QIcon(":/delete.png"), tr("Remove"), this, SLOT(removeScancode()));
-    m.exec(ui->tblMultiscancode->mapToGlobal(p));
 }
 
 void CE5Goods::on_btnNewGroup_clicked()
@@ -753,11 +669,14 @@ void CE5Goods::countSalePrice(int r, double margin)
     int basecurrency = ui->cbCurrency->currentData().toInt();
     for (int c = 0; c < ui->tblPricing->columnCount(); c++) {
         if (ui->tblPricing->lineEdit(r, c)->property("c").toInt() == basecurrency) {
-            ui->tblPricing->lineEdit(r, c)->setDouble(((margin / 100) * ui->leCostPrice->getDouble()) + ui->leCostPrice->getDouble());
+            ui->tblPricing->lineEdit(r, c)->setDouble(((margin / 100) *ui->leCostPrice->getDouble()) +
+                ui->leCostPrice->getDouble());
         } else {
-            QString crossrate = QString("%1-%2").arg(QString::number(basecurrency), ui->tblPricing->lineEdit(r, c)->property("c").toString());
+            QString crossrate = QString("%1-%2").arg(QString::number(basecurrency), ui->tblPricing->lineEdit(r,
+                                c)->property("c").toString());
             double rate = fCrossRate[crossrate];
-            ui->tblPricing->lineEdit(r, c)->setDouble((((margin / 100) * ui->leCostPrice->getDouble()) + ui->leCostPrice->getDouble()) * rate);
+            ui->tblPricing->lineEdit(r, c)->setDouble((((margin / 100) *ui->leCostPrice->getDouble()) +
+                    ui->leCostPrice->getDouble()) *rate);
         }
     }
 }
@@ -785,50 +704,6 @@ void CE5Goods::on_btnNewPartner_clicked()
     QList<QMap<QString, QVariant> > data;
     if(e->getResult(data)) {
         ui->leSupplier->setValue(data.at(0)["f_id"].toString());
-    }
-    delete e;
-}
-
-void CE5Goods::on_btnNewGroup1_clicked()
-{
-    CE5GoodsClass *ep = new CE5GoodsClass(fDBParams);
-    C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
-    QList<QMap<QString, QVariant> > data;
-    if(e->getResult(data)) {
-        ui->leClass1->setValue(data.at(0)["f_id"].toString());
-    }
-    delete e;
-}
-
-void CE5Goods::on_btnNewGroup2_clicked()
-{
-    CE5GoodsClass *ep = new CE5GoodsClass(fDBParams);
-    C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
-    QList<QMap<QString, QVariant> > data;
-    if(e->getResult(data)) {
-        ui->leClass2->setValue(data.at(0)["f_id"].toString());
-    }
-    delete e;
-}
-
-void CE5Goods::on_btnNewGroup3_clicked()
-{
-    CE5GoodsClass *ep = new CE5GoodsClass(fDBParams);
-    C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
-    QList<QMap<QString, QVariant> > data;
-    if(e->getResult(data)) {
-        ui->leClass3->setValue(data.at(0)["f_id"].toString());
-    }
-    delete e;
-}
-
-void CE5Goods::on_btnNewGroup4_clicked()
-{
-    CE5GoodsClass *ep = new CE5GoodsClass(fDBParams);
-    C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
-    QList<QMap<QString, QVariant> > data;
-    if(e->getResult(data)) {
-        ui->leClass4->setValue(data.at(0)["f_id"].toString());
     }
     delete e;
 }
@@ -880,17 +755,17 @@ void CE5Goods::on_lbImage_customContextMenuRequested(const QPoint &pos)
 void CE5Goods::on_tabWidget_currentChanged(int index)
 {
     switch (index) {
-    case 3: {
-        C5Database db(fDBParams);
-        db[":f_id"] = ui->leCode->getInteger();
-        db.exec("select * from c_goods_images where f_id=:f_id");
-        if (db.nextRow()) {
-            QPixmap p;
-            if (p.loadFromData(db.getValue("f_data").toByteArray())) {
-                ui->lbImage->setPixmap(p.scaled(ui->lbImage->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        case 3: {
+            C5Database db(fDBParams);
+            db[":f_id"] = ui->leCode->getInteger();
+            db.exec("select * from c_goods_images where f_id=:f_id");
+            if (db.nextRow()) {
+                QPixmap p;
+                if (p.loadFromData(db.getValue("f_data").toByteArray())) {
+                    ui->lbImage->setPixmap(p.scaled(ui->lbImage->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+                }
             }
         }
-    }
     }
 }
 
@@ -942,7 +817,8 @@ void CE5Goods::on_btnPrintBarcode_clicked()
 {
     QPrintDialog pd(this);
     if (pd.exec() == QDialog::Accepted) {
-        C5StoreBarcode::printOneBarcode(ui->leScanCode->text(), ui->tblPricing->lineEdit(0, 0)->text(), "", ui->leName->text(), pd);
+        C5StoreBarcode::printOneBarcode(ui->leScanCode->text(), ui->tblPricing->lineEdit(0, 0)->text(), "", ui->leName->text(),
+                                        pd);
     }
 }
 
@@ -969,7 +845,6 @@ void CE5Goods::on_btnNewModel_clicked()
     C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
     QList<QMap<QString, QVariant> > data;
     if(e->getResult(data)) {
-
     }
     delete e;
 }

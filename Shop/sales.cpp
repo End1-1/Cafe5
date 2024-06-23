@@ -50,6 +50,7 @@ Sales::Sales(C5User *user) :
     }
     ui->cbHall->addItem(tr("Online"), 10);
     ui->cbHall->addItem(tr("Ozon"), 13);
+    ui->cbHall->addItem(tr("WB"), 14);
     ui->cbHall->setCurrentIndex(0);
     ui->lbTotalQty->setVisible(false);
     ui->leTotalQty->setVisible(false);
@@ -165,7 +166,7 @@ bool Sales::printCheckWithTax(C5Database &db, const QString &id)
 bool Sales::printReceipt(const QString &id)
 {
     if (!C5Config::localReceiptPrinter().isEmpty()) {
-        C5Database db(C5Config::replicaDbParams());
+        C5Database db(C5Config::dbParams());
         PrintReceiptGroup p;
         switch (C5Config::shopPrintVersion()) {
             case 1: {
@@ -239,7 +240,7 @@ void Sales::refreshTotal()
     ui->tbl->setColumnCount(h.count());
     ui->tbl->setHorizontalHeaderLabels(h);
     ui->tbl->setColumnWidths(ui->tbl->columnCount(), 40, 0, 0, 80, 120, 120, 100, 120, 120, 150, 100, 100, 300);
-    C5Database db(__c5config.replicaDbParams());
+    C5Database db(__c5config.dbParams());
     db[":f_hall"] = ui->cbHall->currentData();
     db[":f_start"] = ui->deStart->date();
     db[":f_end"] = ui->deEnd->date();
@@ -314,7 +315,7 @@ void Sales::refreshItems()
     ui->tbl->setColumnCount(h.count());
     ui->tbl->setHorizontalHeaderLabels(h);
     ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 0, 80, 120, 120, 100, 120, 100, 150, 250, 80, 80, 80);
-    C5Database db(__c5config.replicaDbParams());
+    C5Database db(__c5config.dbParams());
     db[":f_hall"] = __c5config.defaultHall();
     db[":f_start"] = ui->deStart->date();
     db[":f_end"] = ui->deEnd->date();
@@ -372,7 +373,7 @@ void Sales::refreshTotalItems()
     ui->tbl->setColumnCount(h.count());
     ui->tbl->setHorizontalHeaderLabels(h);
     ui->tbl->setColumnWidths(ui->tbl->columnCount(), 150, 250, 80, 80);
-    C5Database db(__c5config.replicaDbParams());
+    C5Database db(__c5config.dbParams());
     db[":f_hall"] = __c5config.defaultHall();
     db[":f_start"] = ui->deStart->date();
     db[":f_end"] = ui->deEnd->date();
@@ -421,7 +422,7 @@ void Sales::refreshGroups()
     ui->tbl->setHorizontalHeaderLabels(h);
     //ui->tbl->setColumnWidths(ui->tbl->columnCount(), 180, 60, 60, 10, 180, 60, 60, 10, 180, 60, 60);
     ui->tbl->setColumnWidths(ui->tbl->columnCount(), 200, 80, 80);
-    C5Database db(__c5config.replicaDbParams());
+    C5Database db(__c5config.dbParams());
     db[":f_hall"] = __c5config.defaultHall();
     db[":f_start"] = ui->deStart->date();
     db[":f_end"] = ui->deEnd->date();
@@ -655,8 +656,8 @@ void Sales::printTaxReport(int report_type)
                  C5Config::taxCashier(), C5Config::taxPin(), this);
     QString jsnin, jsnout, err;
     int result;
-    result = pt.printReport(QDateTime(ui->deStart->date()),
-                            QDateTime(ui->deEnd->date()),
+    result = pt.printReport(QDateTime::fromString(ui->deStart->date().toString("yyyy-MM-dd"), "yyyy-MM-dd 00:00:00"),
+                            QDateTime::fromString(ui->deEnd->date().toString("yyyy-MM-dd"), "yyyy-MM-dd 00:00:00"),
                             report_type, jsnin, jsnout, err);
     C5Database db(C5Config::dbParams());
     db[":f_id"] = db.uuid();
@@ -814,7 +815,7 @@ void Sales::on_btnChangeDate_clicked()
         return;
     }
     QDate d;
-    C5Database db(__c5config.replicaDbParams());
+    C5Database db(__c5config.dbParams());
     for (int  i = 0; i < ui->tbl->rowCount(); i++) {
         if (ui->tbl->item(i, 0)->checkState() == Qt::Checked) {
             if (!d.isValid()) {

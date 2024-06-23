@@ -28,7 +28,6 @@ DlgCashinOut::DlgCashinOut(C5User *u) :
     ui->tbl->setRowCount(r + 1);
     ui->tbl->setItem(r, 0, new QTableWidgetItem(tr("Input from sale")));
     ui->tbl->setItem(r, 1, new QTableWidgetItem(float_str(db.getDouble("f_amount"), 2)));
-
     db[":f_session"] = __c5config.getRegValue("session");
     //db[":f_cash"] = __c5config.cashId();
     db.exec("select sum(f_amount) as f_amount "
@@ -42,8 +41,6 @@ DlgCashinOut::DlgCashinOut(C5User *u) :
     ui->tbl->setRowCount(r + 1);
     ui->tbl->setItem(r, 0, new QTableWidgetItem(tr("Input from delivery")));
     ui->tbl->setItem(r, 1, new QTableWidgetItem(float_str(db.getDouble("f_amount"), 2)));
-
-
     db[":f_session"] = __c5config.getRegValue("session");
     //db[":f_cash"] = __c5config.cashId();
     db.exec("select f_amount, f_remarks "
@@ -57,7 +54,6 @@ DlgCashinOut::DlgCashinOut(C5User *u) :
         ui->tbl->setItem(r, 1, new QTableWidgetItem(float_str(db.getDouble("f_amount"), 2)));
         balance += db.getDouble("f_amount");
     }
-
     db[":f_session"] = __c5config.getRegValue("session");
     //db[":f_cash"] = __c5config.cashId();
     db.exec("select f_sign*f_amount as f_amount, f_remarks "
@@ -100,14 +96,14 @@ void DlgCashinOut::on_btnCloseSession_clicked()
     if (C5Message::question(tr("Confirm to close session")) != QDialog::Accepted) {
         return;
     }
-
     C5Database db(__c5config.dbParams());
-    db[":f_id"] = __c5config.getRegValue("session");
+    db[":f_comp"] = hostinfo;
     db[":f_dateout"] = QDate::currentDate();
     db[":f_timeout"] = QTime::currentTime();
-    db.exec("update s_salary_inout set f_dateout=:f_dateout, f_timeout=:f_timeout where f_id=:f_id");
+    db.exec("update s_salary_inout "
+            "set f_dateout=:f_dateout, f_timeout=:f_timeout "
+            "where lower(f_comp)=lower(:f_comp)");
     db.commit();
-
     db[":f_session"] = __c5config.getRegValue("session");
     QString sql = "SELECT SUM(oh.f_amountcash) AS f_cash, SUM(oh.f_amountcard) AS f_card, SUM(oh.f_amountidram) AS f_idram "
                   "from s_salary_inout s "
@@ -118,9 +114,8 @@ void DlgCashinOut::on_btnCloseSession_clicked()
     db.exec(sql);
     db.nextRow();
     double cash = db.getDouble("f_cash"),
-            card = db.getDouble("f_card"),
-            idram = db.getDouble("f_idram");
-
+           card = db.getDouble("f_card"),
+           idram = db.getDouble("f_idram");
     C5StoreDraftWriter dw(db);
     double cashbalance = fBalance - card - idram;
     if (cashbalance > 0.1) {
@@ -176,7 +171,7 @@ void DlgCashinOut::on_btnCloseSession_clicked()
         QString cashdoc;
         if (!dw.writeAHeader(cashdoc, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH,
                              fUser->id(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(),
-                             0, card, tr("Close session"),1, __c5config.getValue(param_default_currency).toInt())) {
+                             0, card, tr("Close session"), 1, __c5config.getValue(param_default_currency).toInt())) {
             C5Message::error(dw.fErrorMsg);
             return;
         }
@@ -193,22 +188,22 @@ void DlgCashinOut::on_btnCloseSession_clicked()
             return;
         }
     }
-
     db[":f_id"] = __c5config.getRegValue("session");
     db.exec("select * from s_salary_inout where f_id=:f_id");
-    db.nextRow();
+    if(!db.nextRow()) {
+        accept();
+        return;
+    }
     QString datein = db.getDate("f_datein").toString(FORMAT_DATE_TO_STR);
     QString dateout = db.getDate("f_dateout").toString(FORMAT_DATE_TO_STR);
     QString timein = db.getTime("f_timein").toString(FORMAT_TIME_TO_STR);
     QString timeout = db.getTime("f_timeout").toString(FORMAT_TIME_TO_STR);
-
     QFont font(qApp->font());
     font.setPointSize(__c5config.getValue(param_receipt_print_font_size).toInt());
     font.setFamily(__c5config.getValue(param_receipt_print_font_family));
     C5Printing p;
     p.setSceneParams(650, 2800, QPrinter::Portrait);
     p.setFont(font);
-
     if (QFile::exists("./logo_receipt.png")) {
         p.image("./logo_receipt.png", Qt::AlignHCenter);
         p.br();
@@ -226,7 +221,6 @@ void DlgCashinOut::on_btnCloseSession_clicked()
     p.br();
     p.line();
     p.br();
-
     p.ltext(ui->tbl->item(0, 0)->text(), 0);
     p.rtext(ui->tbl->item(0, 1)->text());
     if (str_float(ui->tbl->item(1, 1)->text()) > 0.01) {
@@ -247,7 +241,8 @@ void DlgCashinOut::on_btnCloseSession_clicked()
         p.ltext(tr("Card"), 0);
         p.rtext(float_str(card, 2));
         p.br();
-    }if (idram > 0.001) {
+    }
+    if (idram > 0.001) {
         p.ltext(tr("Idram"), 0);
         p.rtext(float_str(idram, 2));
         p.br();
@@ -255,7 +250,6 @@ void DlgCashinOut::on_btnCloseSession_clicked()
     p.br();
     p.line();
     p.br();
-
     p.ltext(tr("Other transactions"), 0);
     p.br();
     p.br();
@@ -275,7 +269,6 @@ void DlgCashinOut::on_btnCloseSession_clicked()
     p.rtext(float_str(cash, 2));
     p.br();
     p.br();
-
     p.setFontSize(18);
     p.ltext(tr("Printed"), 0);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));

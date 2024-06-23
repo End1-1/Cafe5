@@ -3,7 +3,8 @@
 
 #include "c5widget.h"
 
-namespace Ui {
+namespace Ui
+{
 class C5TranslatorForm;
 }
 
@@ -23,6 +24,8 @@ private:
 
 private slots:
     void saveDataChanges();
+
+    void refreshData();
 };
 
 #endif // C5TRANSLATORFORM_H

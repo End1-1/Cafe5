@@ -8,15 +8,18 @@
 #include <QItemDelegate>
 #include <QScrollBar>
 
-class TblItemDelegate : public QItemDelegate {
+class TblItemDelegate : public QItemDelegate
+{
 
 public:
-    TblItemDelegate(QTableWidget *w) {
+    TblItemDelegate(QTableWidget *w)
+    {
         fTbl = w;
     }
 
 protected:
-    virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
+    virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+    {
         painter->save();
         painter->setPen(Qt::NoPen);
         painter->drawRect(option.rect);
@@ -68,7 +71,6 @@ DlgReservation::DlgReservation(C5User *u) :
     connect(ui->tbl->horizontalScrollBar(), &QScrollBar::valueChanged, this, &DlgReservation::horizontalScroll);
     connect(ui->tbl->verticalScrollBar(), &QScrollBar::valueChanged, this, &DlgReservation::verticalScroll);
     connect(ui->tblRoom->verticalScrollBar(), &QScrollBar::valueChanged, this, &DlgReservation::verticalRoomScroll);
-    fHallFilter = 0;
     loadTable();
 }
 
@@ -76,6 +78,14 @@ DlgReservation::~DlgReservation()
 {
     delete ui;
 }
+
+void DlgReservation::openReservationResponse(const QJsonObject &jdoc)
+{
+    fHttp->httpQueryFinished(sender());
+    DlgPreorder(jdoc).exec();
+    loadTable();
+}
+
 void DlgReservation::on_btnCreateReservation_clicked()
 {
     int row = ui->tblRoom->currentRow();
@@ -83,15 +93,14 @@ void DlgReservation::on_btnCreateReservation_clicked()
         C5Message::error(tr("Select room"));
         return;
     }
-    C5OrderDriver od(__c5config.dbParams());
-    QString uuid;
-    od.newOrder(fUser->id(), uuid, fRoomId.at(row));
-    od.setHeader("f_state", ORDER_STATE_PREORDER_EMPTY);
-    od.setPreorder("f_fortable", fRoomId.at(row));
-    if (DlgPreorder(&od, fUser, __c5config.dbParams()).setHotelMode(true).exec() == QDialog::Accepted) {
+    if (DlgPreorder(QJsonObject{
+    {"f_table", fRoomId.at(row)},
+        {"f_hall", ui->tblRoom->item(row, 0)->data(Qt::UserRole).toInt()}
+    })
+    .setHotelMode(true).exec() == QDialog::Accepted) {
         loadTable();
     } else {
-
+        loadTable();
     }
 }
 
@@ -125,22 +134,46 @@ void DlgReservation::loadTable()
     int colCount = 60;
     ui->tbl->setColumnCount(colCount);
     ui->tblDate->setColumnCount(colCount);
-
+    db.exec("select h.f_name, h.f_id "
+            "from h_halls h "
+            "inner join s_settings_values v ON v.f_settings=h.f_settings "
+            "WHERE v.f_key=112 AND v.f_value=\"1\" "
+            "order by f_id");
+    fHallFilter.clear();
+    while (ui->halls->itemAt(0)) {
+        ui->halls->itemAt(0)->widget()->deleteLater();
+        ui->halls->removeItem(ui->halls->itemAt(0));
+    }
+    while (db.nextRow()) {
+        QPushButton *btn = new QPushButton(this);
+        btn->setText(db.getString("f_name"));
+        btn->setCheckable(true);
+        btn->setChecked(true);
+        btn->setProperty("id", db.getInt("f_id"));
+        fHallFilter[db.getInt("f_id")] = true;
+        connect(btn, &QPushButton::clicked, [btn, this](bool checked) {
+            fHallFilter[btn->property("id").toInt()] = checked;
+            filterHall();
+        });
+        ui->halls->addWidget(btn);
+    }
     QStringList roomNames;
-    db.exec("SELECT  t.f_id, t.f_name, v.f_value from h_tables t "
+    db.exec("SELECT  t.f_id, t.f_name, v.f_value, t.f_hall "
+            "from h_tables t "
             "inner join h_halls h on h.f_id=t.f_hall "
             "inner join s_settings_values v ON v.f_settings=h.f_settings "
             "WHERE v.f_key=112 AND v.f_value=\"1\" "
             "order by f_id ");
+    ui->tbl->setRowCount(db.rowCount());
+    ui->tblRoom->setRowCount(db.rowCount());
+    int i = 0;
     while (db.nextRow()) {
         roomNames.append(db.getString("f_name"));
         fRoomId.append(db.getInt("f_id"));
-
-    }
-    ui->tbl->setRowCount(db.rowCount());
-    ui->tblRoom->setRowCount(db.rowCount());
-    for (int i = 0; i < roomNames.count(); i++) {
-        ui->tblRoom->setItem(i, 0, new QTableWidgetItem(roomNames.at(i)));
+        QTableWidgetItem *item = new QTableWidgetItem(roomNames.at(i));
+        item->setData(Qt::UserRole, db.getInt("f_hall"));
+        ui->tblRoom->setItem(i, 0, item);
+        i++;
     }
     QDate d1 = QDate::fromString(__c5config.getValue(param_date_cash), FORMAT_DATE_TO_STR_MYSQL);
     QDate d2 = d1;
@@ -156,11 +189,9 @@ void DlgReservation::loadTable()
         ui->tblDate->setItem(1, i, new QTableWidgetItem(QString::number(d1.day())));
         d1 = d1.addDays(1);
     }
-
     ui->tblDate->setSpan(0, colSpan, 1, 60);
     ui->tblDate->setItem(0, colSpan, new QTableWidgetItem(d2.toString("MMMM")));
     ui->tblDate->item(0, colSpan)->setTextAlignment(Qt::AlignCenter);
-
     d1 = QDate::fromString(__c5config.getValue(param_date_cash), FORMAT_DATE_TO_STR_MYSQL);
     db.exec("select o.f_id, o.f_state, o.f_table, ohd.f_date, ohd.f_1, ohd.f_2 "
             "from o_header_hotel_date ohd "
@@ -168,9 +199,10 @@ void DlgReservation::loadTable()
             "where o.f_state in (1, 5, 6) "
             "order by o.f_table, o.f_id, ohd.f_date, ohd.f_1, ohd.f_2 ");
     while (db.nextRow()) {
-        int r = fRoomId.indexOf(db.getInt("f_table"));
+        int table = db.getInt("f_table");
+        int r = fRoomId.indexOf(table);
         if (r < 0) {
-            return;
+            continue;
         }
         int c = d1.daysTo(db.getDate("f_date"));
         QTableWidgetItem *item = new QTableWidgetItem();
@@ -186,6 +218,17 @@ void DlgReservation::loadTable()
     ui->tbl->verticalScrollBar()->setValue(vpos);
 }
 
+void DlgReservation::filterHall()
+{
+    for (int i = 0; i < ui->tblRoom->rowCount(); i++) {
+        auto *item = ui->tblRoom->item(i, 0);
+        int hallid = item->data(Qt::UserRole).toInt();
+        bool rowHidden = fHallFilter[hallid] == 0;
+        ui->tblRoom->setRowHidden(i, rowHidden);
+        ui->tbl->setRowHidden(i, rowHidden);
+    }
+}
+
 void DlgReservation::on_tbl_itemClicked(QTableWidgetItem *item)
 {
     if (!item) {
@@ -193,7 +236,6 @@ void DlgReservation::on_tbl_itemClicked(QTableWidgetItem *item)
     }
     QString id1 = item->data(Qt::UserRole + 3).toString();
     QString id2 = item->data(Qt::UserRole + 4).toString();
-
     if (id1.isEmpty() && id2.isEmpty()) {
         return;
     }
@@ -209,29 +251,30 @@ void DlgReservation::on_tbl_itemClicked(QTableWidgetItem *item)
     }
     if (id.isEmpty() && id1 != id2) {
         switch (C5Message::question(tr("Which one to open?"), tr("Checkout"), tr("Cancel"), tr("Checkin"))) {
-        case C5Message::Rejected:
-            return;
-        case C5Message::Accepted:
-            id = id2;
-            break;
-        case 2:
-            id = id1;
-            break;
+            case C5Message::Rejected:
+                return;
+            case C5Message::Accepted:
+                id = id2;
+                break;
+            case 2:
+                id = id1;
+                break;
         }
     }
-    C5OrderDriver od(__c5config.dbParams());
-    if (od.loadData(id)) {
-        switch (DlgPreorder(&od, fUser, __c5config.dbParams()).setHotelMode(true).exec()) {
-        case DlgPreorder::RESULT_OK:
-            loadTable();
-            break;
-        case DlgPreorder::RESULT_CANCELED:
-            C5Database db(__c5config.dbParams());
-            db[":f_state"] = ORDER_STATE_VOID;
-            db.update("o_header", "f_id", id);
-            C5LogToServerThread::remember(LOG_WAITER, fUser->fullName(), id, id, id, tr("Booking canceled"), "", "");
-            loadTable();
-            break;
+    fHttp->createHttpQuery("/engine/waiter/reservation-open.php", QJsonObject{{"id", id}}, SLOT(openReservationResponse(
+                QJsonObject)));
+}
+
+void DlgReservation::on_btnClearFilter_clicked()
+{
+    for (int i = 0; i < ui->halls->count(); i++) {
+        auto *btn = dynamic_cast<QPushButton *>(ui->halls->itemAt(i)->widget());
+        if (btn) {
+            btn->setChecked(true);
         }
     }
+    for (QMap<int, bool>::iterator it = fHallFilter.begin(); it != fHallFilter.end(); it++) {
+        it.value() = true;
+    }
+    filterHall();
 }

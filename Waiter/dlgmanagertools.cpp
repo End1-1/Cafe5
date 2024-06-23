@@ -4,9 +4,9 @@
 #include "c5user.h"
 #include "dlgshiftrotation.h"
 #include "dlgpassword.h"
-#include "datadriver.h"
 #include "dlgstafflist.h"
 #include <QSettings>
+#include <QProcess>
 
 DlgManagerTools::DlgManagerTools(C5User *u) :
     C5Dialog(__c5config.dbParams()),
@@ -15,7 +15,6 @@ DlgManagerTools::DlgManagerTools(C5User *u) :
     ui->setupUi(this);
     setWindowState(Qt::WindowFullScreen);
     fUser = u;
-
     QSettings _ls(qApp->applicationDirPath() + "/ls.inf", QSettings::IniFormat);
     if (_ls.value("mt/session", 0).toInt() > 0) {
         ui->btnChangeSession->setEnabled(_ls.value("mt/session", -1).toInt() == __user->id());
@@ -70,7 +69,6 @@ void DlgManagerTools::on_btnChangeMyPassword_clicked()
         return;
     }
     C5Message::info(tr("Your password was changed"));
-
 }
 
 void DlgManagerTools::on_btnChangeStaffPassword_clicked()
@@ -82,4 +80,27 @@ void DlgManagerTools::on_btnChangeStaffPassword_clicked()
 void DlgManagerTools::on_btnExit_clicked()
 {
     accept();
+}
+
+void DlgManagerTools::on_btnExitToWindows_clicked()
+{
+    if (C5Message::question(tr("Exit to windows")) == QDialog::Accepted) {
+        qApp->exit();
+    }
+}
+
+void DlgManagerTools::on_btnShutdown_clicked()
+{
+    if (C5Message::question(tr("Confirm to shutdown the system")) == QDialog::Accepted) {
+        QProcess p;
+        p.startDetached("shutdown -f -t 1 -s");
+    }
+}
+
+void DlgManagerTools::on_btnRestart_clicked()
+{
+    if (C5Message::question(tr("Confirm to reboot the system")) == QDialog::Accepted) {
+        QProcess p;
+        p.startDetached("shutdown -f -t 1 -r");
+    }
 }

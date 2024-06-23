@@ -8,18 +8,18 @@ CR5SalesEffectiveness::CR5SalesEffectiveness(const QStringList &dbParams, QWidge
     fLabel = tr("Effectiveness of sales");
     fIcon = ":/effectiveness.png";
     fFilterWidget = new CR5SaleAndStoreFilter(fDBParams);
-    fFilter = static_cast<CR5SaleAndStoreFilter*>(fFilterWidget);
+    fFilter = static_cast<CR5SaleAndStoreFilter *>(fFilterWidget);
 }
 
 QToolBar *CR5SalesEffectiveness::toolBar()
 {
     if (!fToolBar) {
         QList<ToolBarButtons> btn;
-            btn << ToolBarButtons::tbFilter
+        btn << ToolBarButtons::tbFilter
             << ToolBarButtons::tbClearFilter
             << ToolBarButtons::tbRefresh
             << ToolBarButtons::tbExcel;
-            fToolBar = createStandartToolbar(btn);
+        fToolBar = createStandartToolbar(btn);
     }
     return fToolBar;
 }
@@ -30,16 +30,15 @@ void CR5SalesEffectiveness::buildQuery()
     fTranslation.clear();
     fColumnNameIndex.clear();
     fColumnsFields.clear();
-
     switch (fFilter->display()) {
-    case CR5SaleAndStoreFilter::dGoods:
-        rep1();
-        break;
-    case CR5SaleAndStoreFilter::dGroups:
-        rep2();
-        break;
-    case CR5SaleAndStoreFilter::dNone:
-        break;
+        case CR5SaleAndStoreFilter::dGoods:
+            rep1();
+            break;
+        case CR5SaleAndStoreFilter::dGroups:
+            rep2();
+            break;
+        case CR5SaleAndStoreFilter::dNone:
+            break;
     }
 }
 
@@ -54,26 +53,17 @@ void CR5SalesEffectiveness::rep1()
     fColumnNameIndex["f_groupname"] = 1;
     fColumnNameIndex["f_goodsname"] = 2;
     fColumnNameIndex["f_scancode"] = 3;
-    fColumnNameIndex["f_class1"] = 4;
-    fColumnNameIndex["f_class2"] = 5;
-    fColumnNameIndex["f_class3"] = 6;
-    fColumnNameIndex["f_class4"] = 7;
-    fColumnNameIndex["f_startqty"] = 8;
-    fColumnNameIndex["f_inputqty"] = 9;
-    fColumnNameIndex["f_outputqty"] = 10;
-    fColumnNameIndex["f_output"] = 11;
-    fColumnNameIndex["f_finalqty"] = 12;
-    fColumnNameIndex["f_effectivity"] = 13;
-    fColumnNameIndex["f_storedelta"] = 14;
-
+    fColumnNameIndex["f_startqty"] = 4;
+    fColumnNameIndex["f_inputqty"] = 5;
+    fColumnNameIndex["f_outputqty"] = 6;
+    fColumnNameIndex["f_output"] = 7;
+    fColumnNameIndex["f_finalqty"] = 8;
+    fColumnNameIndex["f_effectivity"] = 9;
+    fColumnNameIndex["f_storedelta"] = 10;
     fTranslation["f_goodsid"] = tr("Goods code");
     fTranslation["f_groupname"] = tr("Group");
     fTranslation["f_goodsname"] = tr("Goods name");
     fTranslation["f_scancode"] = tr("Scancode");
-    fTranslation["f_class1"] = tr("Class 1");
-    fTranslation["f_class2"] = tr("Class 2");
-    fTranslation["f_class3"] = tr("Class 3");
-    fTranslation["f_class4"] = tr("Class 4");
     fTranslation["f_startqty"] = tr("Start qty");
     fTranslation["f_inputqty"] = tr("Input qty");
     fTranslation["f_outputqty"] = tr("Sales qty");
@@ -81,31 +71,23 @@ void CR5SalesEffectiveness::rep1()
     fTranslation["f_finalqty"] = tr("Final qty");
     fTranslation["f_effectivity"] = tr("Effectivity");
     fTranslation["f_storedelta"] = tr("Store delta");
-
     QList<QList<QVariant> > &rows = fModel->fRawData;
     fModel->clearModel();
     QHash<int, int> goodsRowMap;
     C5Database db(fDBParams);
-
     QHash<int, QString> storeList;
     QString query = "select f_id, f_name from c_storages where f_id>0 ";
     if (!fFilter->store().isEmpty()) {
         query += QString(" and f_id in (%1) ").arg(fFilter->store());
     }
     db.exec(query);
-    while (db.nextRow()){
+    while (db.nextRow()) {
         storeList[db.getInt("f_id")] = db.getString("f_name");
     }
-
-    query = "select g.f_id as f_goodsid, gr.f_name as f_groupname,  g.f_name as f_goodsname, g.f_scancode, "
-                    "gc1.f_name as f_class1, gc2.f_name as f_class2, gc3.f_name as f_class3, gc4.f_name as f_class4 "
-                    "from c_goods g "
-                    "left join c_groups gr on gr.f_id=g.f_group "
-                    "left join c_goods_classes gc1 on gc1.f_id=g.f_group1 "
-                    "left join c_goods_classes gc2 on gc2.f_id=g.f_group2 "
-                    "left join c_goods_classes gc3 on gc3.f_id=g.f_group3 "
-                    "left join c_goods_classes gc4 on gc4.f_id=g.f_group4 "
-                    "where g.f_id>0 ";
+    query = "select g.f_id as f_goodsid, gr.f_name as f_groupname,  g.f_name as f_goodsname, g.f_scancode "
+            "from c_goods g "
+            "left join c_groups gr on gr.f_id=g.f_group "
+            "where g.f_id>0 ";
     if (!fFilter->goodsGroup().isEmpty()) {
         query += QString(" and g.f_group in (%1) ").arg(fFilter->goodsGroup());
     }
@@ -133,7 +115,6 @@ void CR5SalesEffectiveness::rep1()
         row.append(0);
         //store delta
         row.append(0);
-
         rows.append(row);
         goodsRowMap[db.getInt("f_goodsid")] = rows.count() - 1;
     }
@@ -240,7 +221,6 @@ void CR5SalesEffectiveness::rep1()
         int r = goodsRowMap[db.getInt("f_goods")];
         rows[r][c] = db.getDouble("f_qty");
     }
-
     //FINAL QTY
     query = "select s.f_goods as f_code, sum(s.f_qty*s.f_type) as f_qty,sum(s.f_total*s.f_type) as f_total "
             "from a_store s "
@@ -276,7 +256,8 @@ void CR5SalesEffectiveness::rep1()
     }
     for (int i = rows.count() - 1; i > -1; i--) {
         if ((rows[i][storeIdx].toDouble() + rows[i][storeIdx + 1].toDouble()) > 0.0001) {
-            rows[i][storeIdx + 5] = (rows[i][storeIdx + 2].toDouble() * 100) / (rows[i][storeIdx].toDouble() + rows[i][storeIdx + 1].toDouble());
+            rows[i][storeIdx + 5] = (rows[i][storeIdx + 2].toDouble() * 100) / (rows[i][storeIdx].toDouble() + rows[i][storeIdx +
+                                    1].toDouble());
         }
         if (rows[i][storeIdx].toDouble() > 0.0001) {
             rows[i][storeIdx + 6] = ((rows[i][storeIdx + 4].toDouble() * 100) / rows[i][storeIdx].toDouble()) - 100;
@@ -306,7 +287,6 @@ void CR5SalesEffectiveness::rep2()
     fColumnNameIndex["f_finalqty"] = 6;
     fColumnNameIndex["f_effectivity"] = 7;
     fColumnNameIndex["f_storedelta"] = 8;
-
     fTranslation["f_groupid"] = tr("Group code");
     fTranslation["f_groupname"] = tr("Group");
     fTranslation["f_startqty"] = tr("Start qty");
@@ -316,12 +296,10 @@ void CR5SalesEffectiveness::rep2()
     fTranslation["f_finalqty"] = tr("Final qty");
     fTranslation["f_effectivity"] = tr("Effectivity");
     fTranslation["f_storedelta"] = tr("Store delta");
-
     QList<QList<QVariant> > &rows = fModel->fRawData;
     fModel->clearModel();
     QHash<int, int> goodsRowMap;
     C5Database db(fDBParams);
-
     QString query = "select g.f_id as f_groupid, g.f_name as f_groupname "
                     "from c_groups g "
                     "where g.f_id>0 ";
@@ -349,7 +327,6 @@ void CR5SalesEffectiveness::rep2()
         row.append(0);
         //store delta
         row.append(0);
-
         rows.append(row);
         goodsRowMap[db.getInt("f_groupid")] = rows.count() - 1;
     }
@@ -466,7 +443,8 @@ void CR5SalesEffectiveness::rep2()
     }
     for (int i = rows.count() - 1; i > -1; i--) {
         if ((rows[i][storeIdx].toDouble() + rows[i][storeIdx + 1].toDouble()) > 0.0001) {
-            rows[i][storeIdx + 5] = (rows[i][storeIdx + 2].toDouble() * 100) / (rows[i][storeIdx].toDouble() + rows[i][storeIdx + 1].toDouble());
+            rows[i][storeIdx + 5] = (rows[i][storeIdx + 2].toDouble() * 100) / (rows[i][storeIdx].toDouble() + rows[i][storeIdx +
+                                    1].toDouble());
         }
         if (rows[i][storeIdx].toDouble() > 0.0001) {
             rows[i][storeIdx + 6] = ((rows[i][storeIdx + 4].toDouble() * 100) / rows[i][storeIdx].toDouble()) - 100;

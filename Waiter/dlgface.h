@@ -6,7 +6,8 @@
 #include <QTableWidgetItem>
 #include <QTimer>
 
-namespace Ui {
+namespace Ui
+{
 class DlgFace;
 }
 
@@ -19,11 +20,10 @@ public:
 
     ~DlgFace();
 
-    void setup();
-
     static bool getTable(int &tableId, int hall, C5User *user);
 
 private slots:
+    void initResponse(const QJsonObject &jdoc);
 
     void timeout();
 
@@ -34,8 +34,6 @@ private slots:
     void filterStaffClicked();
 
     void handleCreditCards(const QJsonObject &obj);
-
-    void handleVersion(const QJsonObject &obj);
 
     void on_btnExit_clicked();
 
@@ -48,6 +46,8 @@ private slots:
     void on_btnGuests_clicked();
 
     void on_btnChart_clicked();
+
+    void on_btnTools_clicked();
 
 private:
     Ui::DlgFace *ui;

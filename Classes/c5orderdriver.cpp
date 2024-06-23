@@ -11,12 +11,11 @@
 #include <QDateTime>
 #include <QLibrary>
 
-typedef double (*totalOfHourly)(const QDateTime &date, QString &str);
+typedef double ( *totalOfHourly)(const QDateTime &date, QString &str);
 
 C5OrderDriver::C5OrderDriver(const QStringList &dbParams) :
     fDbParams(dbParams)
 {
-
 }
 
 bool C5OrderDriver::newOrder(int userid, QString &id, int tableId)
@@ -24,7 +23,6 @@ bool C5OrderDriver::newOrder(int userid, QString &id, int tableId)
     fTable = tableId;
     C5Database db(fDbParams);
     db.startTransaction();
-
     fCurrentOrderId = db.uuid();
     db[":f_id"] = fCurrentOrderId;
     db.insert("o_header", false);
@@ -51,8 +49,7 @@ bool C5OrderDriver::newOrder(int userid, QString &id, int tableId)
     db[":f_date"] = QDate::fromString(__c5config.getValue(param_date_cash), FORMAT_DATE_TO_STR_MYSQL);
     db[":f_1"] = 0;
     db[":f_2"] = 1;
-    db.insert("o_Header_hotel_date");
-
+    db.insert("o_header_hotel_date");
     db[":f_id"] = dbtable->hall(fTable);
     db.exec("select f_id, f_prefix, f_counter + 1 as f_counter from h_halls where f_id=(select f_counterhall from h_halls where f_id=:f_id limit 1) for update");
     if (!db.nextRow()) {
@@ -65,7 +62,6 @@ bool C5OrderDriver::newOrder(int userid, QString &id, int tableId)
     db[":f_counter"] = hallid;
     db.update("h_halls", "f_id", db.getInt("f_id"));
     db.commit();
-
     setHeader("f_staff", userid);
     setHeader("f_table", fTable);
     setHeader("f_prefix", prefix);
@@ -115,10 +111,8 @@ bool C5OrderDriver::closeOrder()
                 return false;
             }
         }
-
         C5StoreDraftWriter dw(db);
         auto *cbc = Configs::construct<CashboxConfig>(db.dbParams(), 2);
-
         QString headerPrefix;
         int headerId;
         QDate dateCash = headerValue("f_datecash").toDate();
@@ -126,41 +120,35 @@ bool C5OrderDriver::closeOrder()
             err = dw.fErrorMsg;
         }
         if (headerValue("f_amountcash").toDouble() > 0.0001) {
-           writeCashDoc(dw, headerValue("f_id").toString(), QString("%1%2").arg(headerPrefix, QString::number(headerId)),err,
-                   headerValue("f_amountcash").toDouble(), headerValue("f_currentstaff").toInt(),
-                   cbc->cash1, dateCash);
+            writeCashDoc(dw, headerValue("f_id").toString(), QString("%1%2").arg(headerPrefix, QString::number(headerId)), err,
+                         headerValue("f_amountcash").toDouble(), headerValue("f_currentstaff").toInt(),
+                         cbc->cash1, dateCash);
         }
         if (headerValue("f_amountcard").toDouble() > 0.0001) {
-            writeCashDoc(dw, headerValue("f_id").toString(), QString("%1%2").arg(headerPrefix, QString::number(headerId)),err,
-                    headerValue("f_amountcard").toDouble(), headerValue("f_currentstaff").toInt(),
-                    cbc->cash2, dateCash);
-
+            writeCashDoc(dw, headerValue("f_id").toString(), QString("%1%2").arg(headerPrefix, QString::number(headerId)), err,
+                         headerValue("f_amountcard").toDouble(), headerValue("f_currentstaff").toInt(),
+                         cbc->cash2, dateCash);
         }
         if (headerValue("f_amountbank").toDouble() > 0.0001) {
-            writeCashDoc(dw, headerValue("f_id").toString(), QString("%1%2").arg(headerPrefix, QString::number(headerId)),err,
-                    headerValue("f_amountbank").toDouble(), headerValue("f_currentstaff").toInt(),
-                    cbc->cash3, dateCash);
-
+            writeCashDoc(dw, headerValue("f_id").toString(), QString("%1%2").arg(headerPrefix, QString::number(headerId)), err,
+                         headerValue("f_amountbank").toDouble(), headerValue("f_currentstaff").toInt(),
+                         cbc->cash3, dateCash);
         }
         if (headerValue("f_amountprepaid").toDouble() > 0.0001) {
-            writeCashDoc(dw, headerValue("f_id").toString(), QString("%1%2").arg(headerPrefix, QString::number(headerId)),err,
-                    headerValue("f_amountprepaid").toDouble(), headerValue("f_currentstaff").toInt(),
-                    cbc->cash4, dateCash);
-
+            writeCashDoc(dw, headerValue("f_id").toString(), QString("%1%2").arg(headerPrefix, QString::number(headerId)), err,
+                         headerValue("f_amountprepaid").toDouble(), headerValue("f_currentstaff").toInt(),
+                         cbc->cash4, dateCash);
         }
         if (headerValue("f_amountidram").toDouble() > 0.0001) {
-            writeCashDoc(dw, headerValue("f_id").toString(), QString("%1%2").arg(headerPrefix, QString::number(headerId)),err,
-                    headerValue("f_amountidram").toDouble(), headerValue("f_currentstaff").toInt(),
-                    cbc->cash5, dateCash);
-
+            writeCashDoc(dw, headerValue("f_id").toString(), QString("%1%2").arg(headerPrefix, QString::number(headerId)), err,
+                         headerValue("f_amountidram").toDouble(), headerValue("f_currentstaff").toInt(),
+                         cbc->cash5, dateCash);
         }
         if (headerValue("f_amountpayx").toDouble() > 0.0001) {
-            writeCashDoc(dw, headerValue("f_id").toString(), QString("%1%2").arg(headerPrefix, QString::number(headerId)),err,
-                    headerValue("f_amountpayx").toDouble(), headerValue("f_currentstaff").toInt(),
-                    cbc->cash6, dateCash);
-
+            writeCashDoc(dw, headerValue("f_id").toString(), QString("%1%2").arg(headerPrefix, QString::number(headerId)), err,
+                         headerValue("f_amountpayx").toDouble(), headerValue("f_currentstaff").toInt(),
+                         cbc->cash6, dateCash);
         }
-
         if (clValue("f_code").toInt() > 0) {
             BClientDebts b;
             b.source = BCLIENTDEBTS_SOURCE_SALE;
@@ -172,8 +160,6 @@ bool C5OrderDriver::closeOrder()
             b.write(db, err);
         }
     }
-
-
     clearOrder();
     return true;
 }
@@ -181,12 +167,10 @@ bool C5OrderDriver::closeOrder()
 bool C5OrderDriver::loadData(const QString id)
 {
     clearOrder();
-
     if (id.isEmpty()) {
         fLastError = tr("Empty order id");
         return false;
     }
-
     C5Database db(fDbParams);
     fCurrentOrderId = id;
     if (!fetchTableData(db, "select * from o_header where f_id='" + id + "' ", fHeader)) {
@@ -195,31 +179,24 @@ bool C5OrderDriver::loadData(const QString id)
     if (!fetchTableData(db, "select * from o_header_options where f_id='" + id + "'", fHeaderOptions)) {
         return false;
     }
-
     if (!fetchTableData(db, "select * from o_tax where f_id='" + id + "'", fTaxInfo)) {
         return false;
     }
-
     if (!fetchTableData(db, "select * from o_pay_room where f_id='" + id + "'", fPayRoom)) {
         return false;
     }
-
     if (!fetchTableData(db, "select * from o_pay_cl where f_id='" + id + "'", fPayCL)) {
         return false;
     }
-
-    if (!fetchTableData(db, "select * from o_preorder where f_id='" + id +"'", fHeaderPreorder)) {
+    if (!fetchTableData(db, "select * from o_preorder where f_id='" + id + "'", fHeaderPreorder)) {
         return false;
     }
-
     if (!fetchDishesData(db, id, "")) {
         return false;
     }
-
     if (!fetchTableData(db, "select * from o_header_hotel where f_id='" + id + "'", fHeaderHotel)) {
         return false;
     }
-
     fTable = headerValue("f_table").toInt();
     return true;
 }
@@ -283,8 +260,8 @@ bool C5OrderDriver::save()
             }
         }
     }
-    for (const QString &t: fTableData.keys()) {
-        for (QMap<QString, QVariant>::const_iterator it = fTableData[t].begin(); it != fTableData[t].end(); it++) {
+    for (const QString &t : fTableData.keys()) {
+        for (QMap<QString, QVariant>::const_iterator it = fTableData[t].constBegin(); it != fTableData[t].constEnd(); it++) {
             db[":" + it.key()] = it.value();
         }
         if (!db.update(t, "f_id", fCurrentOrderId)) {
@@ -293,8 +270,9 @@ bool C5OrderDriver::save()
             return false;
         }
     }
-    for (const QString &d: fDishesTableData.keys()) {
-        for (QMap<QString, QVariant>::const_iterator it = fDishesTableData[d].begin(); it != fDishesTableData[d].end(); it++) {
+    for (const QString &d : fDishesTableData.keys()) {
+        for (QMap<QString, QVariant>::const_iterator it = fDishesTableData[d].constBegin();
+                it != fDishesTableData[d].constEnd(); it++) {
             db[":" + it.key()] = it.value();
         }
         if (!db.update("o_body", "f_id", d)) {
@@ -303,7 +281,6 @@ bool C5OrderDriver::save()
             return false;
         }
     }
-
     db.commit();
     fTableData.clear();
     fDishesTableData.clear();
@@ -377,7 +354,8 @@ double C5OrderDriver::amountTotal()
         }
         if (dbdish->isHourlyPayment(dishesValue("f_dish", i).toInt())) {
             QString s;
-            QString dt = headerValue("f_dateopen").toDate().toString("dd/MM/yyyy") + " " + headerValue("f_timeopen").toTime().toString("HH:mm:ss");
+            QString dt = headerValue("f_dateopen").toDate().toString("dd/MM/yyyy") + " " +
+                         headerValue("f_timeopen").toTime().toString("HH:mm:ss");
             if (t) {
                 setDishesValue("f_price",  t(QDateTime::fromString(dt, "dd/MM/yyyy HH:mm:ss"), s), i);
                 setDishesValue("f_total",  t(QDateTime::fromString(dt, "dd/MM/yyyy HH:mm:ss"), s), i);
@@ -391,31 +369,32 @@ double C5OrderDriver::amountTotal()
         double price = dishesValue("f_price", i).toDouble();
         double service = dishesValue("f_service", i).toDouble();
         double discount = dishesValue("f_discount", i).toDouble();
-        double itemTotal = price * dishesValue("f_qty2", i).toDouble();
+        double itemTotal = price *dishesValue("f_qty2", i).toDouble();
         if (dishesValue("f_canservice", i).toInt() > 0) {
-            double serviceAmount = (itemTotal * service);
+            double serviceAmount = (itemTotal *service);
             itemTotal += serviceAmount;
             if (dishesValue("f_candiscount", i).toInt() > 0) {
-                totalService += serviceAmount - (serviceAmount * discount);
+                totalService += serviceAmount - (serviceAmount *discount);
             } else {
                 totalService += serviceAmount;
             }
         }
         if (dishesValue("f_candiscount", i).toInt() > 0) {
-            double discountAmount = (itemTotal * discount);
+            double discountAmount = (itemTotal *discount);
             itemTotal -= discountAmount;
             totalDiscount += discountAmount;
         }
-        setDishesValue("f_total", price * dishesValue("f_qty2", i).toDouble(), i);
+        setDishesValue("f_total", price *dishesValue("f_qty2", i).toDouble(), i);
+        setDishesValue("f_grandtotal", itemTotal, i);
         total += itemTotal;
     }
     setHeader("f_amounttotal", total);
     setHeader("f_amountservice", totalService);
     setHeader("f_amountdiscount", totalDiscount);
     double acash = headerValue("f_amountcash").toDouble(),
-            acard = headerValue("f_amountcard").toDouble(),
-            abank = headerValue("f_amountbank").toDouble(),
-            aother = headerValue("f_amountother").toDouble();
+           acard = headerValue("f_amountcard").toDouble(),
+           abank = headerValue("f_amountbank").toDouble(),
+           aother = headerValue("f_amountother").toDouble();
     double adiff = total - (acash + acard + abank + aother);
     if (adiff < 0.001) {
         setHeader("f_amountother", 0);
@@ -444,27 +423,27 @@ double C5OrderDriver::clearAmount()
         double price = dishesValue("f_price", i).toDouble();
         double service = dishesValue("f_service", i).toDouble();
         double discount = dishesValue("f_discount", i).toDouble();
-        double itemTotal = price * dishesValue("f_qty1", i).toDouble();
+        double itemTotal = price *dishesValue("f_qty1", i).toDouble();
         if (dishesValue("f_canservice", i).toInt() > 0) {
-            double serviceAmount = (itemTotal * service);
+            double serviceAmount = (itemTotal *service);
             itemTotal += serviceAmount;
             totalService += serviceAmount;
         }
         if (dishesValue("f_candiscount", i).toInt() > 0) {
-            double discountAmount = (itemTotal * discount);
+            double discountAmount = (itemTotal *discount);
             itemTotal -= discountAmount;
             totalDiscount += discountAmount;
         }
-        setDishesValue("f_total", price * dishesValue("f_qty1", i).toDouble(), i);
+        setDishesValue("f_total", price *dishesValue("f_qty1", i).toDouble(), i);
         total += itemTotal;
     }
     setHeader("f_amounttotal", total);
     setHeader("f_amountservice", totalService);
     setHeader("f_amountdiscount", totalDiscount);
     double acash = headerValue("f_amountcash").toDouble(),
-            acard = headerValue("f_amountcard").toDouble(),
-            abank = headerValue("f_amountbank").toDouble(),
-            aother = headerValue("f_amountother").toDouble();
+           acard = headerValue("f_amountcard").toDouble(),
+           abank = headerValue("f_amountbank").toDouble(),
+           aother = headerValue("f_amountother").toDouble();
     double adiff = total - (acash + acard + abank + aother);
     if (adiff < 0.001) {
         setHeader("f_amountother", 0);
@@ -491,14 +470,14 @@ double C5OrderDriver::prepayment()
         double price = dishesValue("f_price", i).toDouble();
         double service = dishesValue("f_service", i).toDouble();
         double discount = dishesValue("f_discount", i).toDouble();
-        double itemTotal = price * dishesValue("f_qty1", i).toDouble();
+        double itemTotal = price *dishesValue("f_qty1", i).toDouble();
         if (dishesValue("f_canservice", i).toInt() > 0) {
-            double serviceAmount = (itemTotal * service);
+            double serviceAmount = (itemTotal *service);
             itemTotal += serviceAmount;
             totalService += serviceAmount;
         }
         if (dishesValue("f_candiscount", i).toInt() > 0) {
-            double discountAmount = (itemTotal * discount);
+            double discountAmount = (itemTotal *discount);
             itemTotal -= discountAmount;
             totalDiscount += discountAmount;
         }
@@ -726,17 +705,16 @@ double C5OrderDriver::dishTotal(int index)
     double service = dishesValue("f_service", index).toDouble();
     double discount = dishesValue("f_discount", index).toDouble();
     QString qtyfield = headerValue("f_state").toInt() == ORDER_STATE_OPEN ? "f_qty2" : "f_qty1";
-    double itemTotal = price * dishesValue(qtyfield, index).toDouble();
+    double itemTotal = price *dishesValue(qtyfield, index).toDouble();
     if (dbdish->isHourlyPayment(dishesValue("f_dish", index).toInt())) {
         return dishesValue("f_total", index).toDouble();
     }
-
     if (dishesValue("f_canservice", index).toInt() > 0) {
-        double serviceAmount = (itemTotal * service);
+        double serviceAmount = (itemTotal *service);
         itemTotal += serviceAmount;
     }
     if (dishesValue("f_candiscount", index).toInt() > 0) {
-        double discountAmount = (itemTotal * discount);
+        double discountAmount = (itemTotal *discount);
         itemTotal -= discountAmount;
     }
     return itemTotal;
@@ -746,7 +724,7 @@ double C5OrderDriver::dishTotal2(int index)
 {
     double price = dishesValue("f_price", index).toDouble();
     QString qtyfield = headerValue("f_state").toInt() == ORDER_STATE_OPEN ? "f_qty2" : "f_qty1";
-    double itemTotal = price * dishesValue(qtyfield, index).toDouble();
+    double itemTotal = price *dishesValue(qtyfield, index).toDouble();
     if (dbdish->isHourlyPayment(dishesValue("f_dish", index).toInt())) {
         return dishesValue("f_total", index).toDouble();
     }
@@ -756,7 +734,6 @@ double C5OrderDriver::dishTotal2(int index)
 int C5OrderDriver::duplicateDish(int index)
 {
     QMap<QString, QVariant> o = fDishes[index];
-
     if (fCurrentOrderId.isEmpty()) {
         if (!save()) {
             return -1;
@@ -791,7 +768,7 @@ int C5OrderDriver::duplicateDish(int index)
         fLastError = db.fLastError;
         return -1;
     }
-    if (!fetchDishesData(db, "", id)){
+    if (!fetchDishesData(db, "", id)) {
         return -1;
     }
     return fDishes.count() - 1;
@@ -846,7 +823,6 @@ void C5OrderDriver::setCloseHeader()
             state = ORDER_STATE_MOVED;
         }
     }
-
     QDate datecash;
     int dateshift;
     dateCash(datecash, dateshift);
@@ -874,20 +850,21 @@ void C5OrderDriver::dateCash(QDate &d, int &dateShift)
     d = QDate::currentDate();
     dateShift = 1;
     if (__c5config.getValue(param_date_cash_auto).toInt() == 1) {
-       QTime t = QTime::fromString(__c5config.getValue(param_working_date_change_time), "HH:mm:ss");
-       if (t.isValid()) {
-           if (QTime::currentTime() < t) {
-               d = d.addDays(-1);
-               dateShift = 2;
-           }
-       }
+        QTime t = QTime::fromString(__c5config.getValue(param_working_date_change_time), "HH:mm:ss");
+        if (t.isValid()) {
+            if (QTime::currentTime() < t) {
+                d = d.addDays(-1);
+                dateShift = 2;
+            }
+        }
     } else {
         d = QDate::fromString(__c5config.dateCash(), FORMAT_DATE_TO_STR_MYSQL);
         dateShift = __c5config.dateShift();
     }
 }
 
-void C5OrderDriver::writeCashDoc(C5StoreDraftWriter &dw, const QString &uuid, const QString id, QString &err, double amount, int staff, int cashboxid, QDate dateCash)
+void C5OrderDriver::writeCashDoc(C5StoreDraftWriter &dw, const QString &uuid, const QString id, QString &err,
+                                 double amount, int staff, int cashboxid, QDate dateCash)
 {
     QString cashdocid;
     if (!dw.writeAHeader(cashdocid, id, DOC_STATE_SAVED, DOC_TYPE_CASH,

@@ -107,7 +107,6 @@
         <file>reservation.png</file>
         <file>addguest.png</file>
         <file>prepayment.png</file>
-        <file>back-arrow.png</file>
         <file>sauces.png</file>
         <file>atention.png</file>
         <file>quickmenu.png</file>
@@ -152,5 +151,76 @@
         <file>icq.wav</file>
         <file>menuset.png</file>
         <file>down-arrow-thin.png</file>
+        <file>wash.png</file>
+        <file>ironing.png</file>
+        <file>dryclean.png</file>
+        <file>nowhite.png</file>
+        <file>spin.png</file>
+        <file>back.png</file>
+        <file>restart.png</file>
+        <file>shutdown.png</file>
+        <file>report.png</file>
+        <file>accounts.png</file>
+        <file>alarm-clock.png</file>
+        <file>amex.png</file>
+        <file>arca.png</file>
+        <file>armenia.png</file>
+        <file>bank.png</file>
+        <file>budget.png</file>
+        <file>car_up.png</file>
+        <file>car_up_off.png</file>
+        <file>chair.png</file>
+        <file>comment.png</file>
+        <file>compressor.png</file>
+        <file>cup.ico</file>
+        <file>customer.png</file>
+        <file>danger.png</file>
+        <file>delivery.png</file>
+        <file>discard.png</file>
+        <file>down.png</file>
+        <file>enter.png</file>
+        <file>expand2.png</file>
+        <file>fiscal.png</file>
+        <file>giftbox.png</file>
+        <file>guest.png</file>
+        <file>idram.png</file>
+        <file>ledger.png</file>
+        <file>letter-z.png</file>
+        <file>login2.png</file>
+        <file>logout2.png</file>
+        <file>maestro.png</file>
+        <file>main-menu.png</file>
+        <file>mastercard.png</file>
+        <file>menu.PNG</file>
+        <file>money.png</file>
+        <file>office_res.qrc</file>
+        <file>ok.png</file>
+        <file>payment.png</file>
+        <file>phone-call.png</file>
+        <file>place.png</file>
+        <file>print_receipt.png</file>
+        <file>qrcode.png</file>
+        <file>receipt.png</file>
+        <file>res.qrc</file>
+        <file>res_service5monitor.qrc</file>
+        <file>resources.qrc</file>
+        <file>room-service.png</file>
+        <file>russia.png</file>
+        <file>service_check.png</file>
+        <file>shift.png</file>
+        <file>stop.png</file>
+        <file>tables.png</file>
+        <file>takeaway.png</file>
+        <file>tax.png</file>
+        <file>Thumbs.db</file>
+        <file>tv.png</file>
+        <file>up.png</file>
+        <file>usa.png</file>
+        <file>visa.png</file>
+        <file>wallet-with-money.png</file>
+        <file>weight.png</file>
+        <file>exit.png</file>
+        <file>pentools.png</file>
+        <file>clear.png</file>
     </qresource>
 </RCC>

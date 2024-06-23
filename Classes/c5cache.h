@@ -40,7 +40,6 @@
 #define cache_header_paid 36
 #define cache_dish_package 37
 #define cache_salary_shift 38
-#define cache_goods_classes 39
 #define cache_dish_menu_state 40
 #define cache_order_mark 41
 #define cache_mf_actions 42
@@ -67,11 +66,20 @@ class C5Cache : public QObject
 public:
     C5Cache(const QStringList &dbParams);
 
-    inline QString getString(int row, int column) {return fCacheData.at(row).at(column).toString();}
+    inline QString getString(int row, int column)
+    {
+        return fCacheData.at(row).at(column).toString();
+    }
 
-    inline QList<QVariant> getRow(int row) {return fCacheData.at(row);}
+    inline QList<QVariant> getRow(int row)
+    {
+        return fCacheData.at(row);
+    }
 
-    inline QList<QVariant> getValuesForId(int id) {return find(id) > -1 ? getRow(find(id)) : QList<QVariant>(); }
+    inline QList<QVariant> getValuesForId(int id)
+    {
+        return find(id) > -1 ? getRow(find(id)) : QList<QVariant>();
+    }
 
     QList<QVariant> getJoinedColumn(const QString &columnName);
 
@@ -79,19 +87,31 @@ public:
 
     QString getString(int row, const QString &columnName);
 
-    inline int getInt(int row, int column) {return fCacheData.at(row).at(column).toInt();}
+    inline int getInt(int row, int column)
+    {
+        return fCacheData.at(row).at(column).toInt();
+    }
 
-    inline int rowCount() {return fCacheData.count();}
+    inline int rowCount()
+    {
+        return fCacheData.count();
+    }
 
-    inline int find(int id) {return fCacheIdRow.contains(id) ? fCacheIdRow[id] : -1;}
+    inline int find(int id)
+    {
+        return fCacheIdRow.contains(id) ? fCacheIdRow[id] : -1;
+    }
 
     void refresh();
 
     static C5Cache *cache(const QStringList &dbParams, int cacheId);
 
-    static QMap<QString, C5Cache*> fCacheList;
+    static QMap<QString, C5Cache *> fCacheList;
 
-    static int idForTable(const QString &table) {return fTableCache[table];}
+    static int idForTable(const QString &table)
+    {
+        return fTableCache[table];
+    }
 
     static QString cacheName(const QStringList &dbParams, int cacheId);
 

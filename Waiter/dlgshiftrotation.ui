@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>436</width>
-    <height>127</height>
+    <height>134</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -40,7 +40,7 @@
         <string/>
        </property>
        <property name="icon">
-        <iconset resource="../resources/resources.qrc">
+        <iconset resource="../resources/res.qrc">
          <normaloff>:/right-arrow.png</normaloff>:/right-arrow.png</iconset>
        </property>
        <property name="iconSize">
@@ -75,7 +75,7 @@
         <string/>
        </property>
        <property name="icon">
-        <iconset resource="../resources/resources.qrc">
+        <iconset resource="../resources/res.qrc">
          <normaloff>:/left-arrow.png</normaloff>:/left-arrow.png</iconset>
        </property>
        <property name="iconSize">
@@ -161,7 +161,7 @@
         <string>CHANGE</string>
        </property>
        <property name="icon">
-        <iconset resource="../resources/resources.qrc">
+        <iconset resource="../resources/res.qrc">
          <normaloff>:/ok.png</normaloff>:/ok.png</iconset>
        </property>
        <property name="iconSize">
@@ -197,7 +197,7 @@
        </property>
        <property name="icon">
         <iconset resource="../resources/res.qrc">
-         <normaloff>:/remove.png</normaloff>:/remove.png</iconset>
+         <normaloff>:/cancel.png</normaloff>:/cancel.png</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -232,7 +232,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../resources/resources.qrc"/>
+  <include location="../resources/res.qrc"/>
   <include location="../resources/res.qrc"/>
  </resources>
  <connections/>

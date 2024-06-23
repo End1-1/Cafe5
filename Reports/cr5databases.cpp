@@ -7,7 +7,6 @@
 #include "c5serviceconfig.h"
 #include "c5checkdatabase.h"
 #include "c5dbresetoption.h"
-#include "c5replication.h"
 #include "c5random.h"
 #include <QFileDialog>
 #include <QProcess>
@@ -27,14 +26,12 @@ CR5Databases::CR5Databases(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_description"] = tr("Description");
     fTranslation["f_user"] = tr("User");
     fTranslation["f_password"] = tr("Password");
-
     fTableView->setItemDelegateForColumn(1, new C5TextDelegate(fTableView));
     fTableView->setItemDelegateForColumn(2, new C5TextDelegate(fTableView));
     fTableView->setItemDelegateForColumn(3, new C5TextDelegate(fTableView));
     fTableView->setItemDelegateForColumn(4, new C5TextDelegate(fTableView));
     fTableView->setItemDelegateForColumn(5, new C5TextDelegate(fTableView));
     fTableView->setItemDelegateForColumn(6, new C5TextDelegate(fTableView));
-
     fEditor = new CE5Databases(dbParams);
 }
 
@@ -47,7 +44,7 @@ QToolBar *CR5Databases::toolBar()
             << ToolBarButtons::tbRefresh
             << ToolBarButtons::tbExcel
             << ToolBarButtons::tbPrint;
-            createStandartToolbar(btn);
+        createStandartToolbar(btn);
         fToolBar->addAction(QIcon(":/access.png"), tr("Access"), this, SLOT(actionAccess()));
         fToolBar->addAction(QIcon(":data-transfer.png"), tr("Synchronization"), this, SLOT(actionSync()));
         fToolBar->addAction(QIcon(":/service.png"), tr("Service"), this, SLOT(actionService()));
@@ -255,10 +252,6 @@ void CR5Databases::uploadData()
     QString sqlMsg = p.readAll();
     QStringList randomDB = db.dbParams();
     randomDB[1] = randomDBName;
-    C5Replication r;
-    r.fIgnoreErrors = true;
-    r.downloadDataFromServer(randomDB, fDBParams);
-    r.uploadDataToServer(randomDB, db.dbParams());
     db.exec("drop database "  + randomDBName);
     C5Message::info(tr("Upload completed") + "<br>" + sqlMsg);
 }

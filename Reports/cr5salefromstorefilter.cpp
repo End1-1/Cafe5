@@ -10,10 +10,6 @@ CR5SaleFromStoreFilter::CR5SaleFromStoreFilter(const QStringList &dbParams, QWid
     ui->setupUi(this);
     ui->leHall->setSelector(dbParams, ui->leHallname, cache_hall_list).setMultiselection(true);
     ui->leGroup->setSelector(dbParams, ui->leGroupName, cache_goods_group).setMultiselection(true);
-    ui->leClass1->setSelector(dbParams, ui->leClass1Name, cache_goods_classes).setMultiselection(true);
-    ui->leClass2->setSelector(dbParams, ui->leClass2Name, cache_goods_classes).setMultiselection(true);
-    ui->leClass3->setSelector(dbParams, ui->leClass3Name, cache_goods_classes).setMultiselection(true);
-    ui->leClass4->setSelector(dbParams, ui->leClass4Name, cache_goods_classes).setMultiselection(true);
     ui->leBuyer->setSelector(dbParams, ui->leBuyerName, cache_goods_partners).setMultiselection(true);
 }
 
@@ -30,18 +26,6 @@ QString CR5SaleFromStoreFilter::condition()
     }
     if (!ui->leGroup->isEmpty()) {
         w += " and gg.f_group in (" + ui->leGroup->text() + ") ";
-    }
-    if (!ui->leClass1->isEmpty()) {
-        w += " and gg.f_group1 in (" + ui->leClass1->text() + ") ";
-    }
-    if (!ui->leClass2->isEmpty()) {
-        w += " and gg.f_group2 in (" + ui->leClass2->text() + ") ";
-    }
-    if (!ui->leClass3->isEmpty()) {
-        w += " and gg.f_group3 in (" + ui->leClass3->text() + ") ";
-    }
-    if (!ui->leClass4->isEmpty()) {
-        w += " and gg.f_group4 in (" + ui->leClass4->text() + ") ";
     }
     if (ui->rbFiscal->isChecked()) {
         w += " and coalesce(ot.f_receiptnumber, 0)>0 ";

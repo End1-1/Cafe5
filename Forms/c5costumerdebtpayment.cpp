@@ -39,7 +39,6 @@ void C5CostumerDebtPayment::setId(const QString &id)
     db[":f_header"] = fBClientDebt.cash;
     db.exec("select * from e_cash where f_header=:f_header");
     fECash.getRecord(db);
-
     ui->leCode->setInteger(fBClientDebt.id);
     ui->deDate->setDate(fBClientDebt.date);
     ui->leType->setText(fBClientDebt.source == 1 ? tr("Customer debt payment") : tr("Partner debt payment"));
@@ -52,18 +51,25 @@ void C5CostumerDebtPayment::setId(const QString &id)
     ui->btnRemove->setEnabled(true);
 }
 
+void C5CostumerDebtPayment::setPartnerAndAmount(int partner, double amount, const QString &clearFlag)
+{
+    ui->leCostumer->setValue(partner);
+    ui->leAmount->setDouble(amount);
+    fClearFlag = clearFlag;
+}
+
 void C5CostumerDebtPayment::selectorCallback(int row, const QList<QVariant> &values)
 {
-    switch (row){
-    case cache_cash_names:
-        if (values.isEmpty()) {
-            ui->leCurrency->clear();
-        } else {
-            C5Database db(fDBParams);
-            fBClientDebt.currency = values.at(2).toInt();
-            ui->leCurrency->setText(fBClientDebt.currencyName(db));
-        }
-        break;
+    switch (row) {
+        case cache_cash_names:
+            if (values.isEmpty()) {
+                ui->leCurrency->clear();
+            } else {
+                C5Database db(fDBParams);
+                fBClientDebt.currency = values.at(2).toInt();
+                ui->leCurrency->setText(fBClientDebt.currencyName(db));
+            }
+            break;
     }
 }
 
@@ -82,7 +88,6 @@ void C5CostumerDebtPayment::on_btnOK_clicked()
         C5Message::error(tr("Cash must be defined"));
         return;
     }
-
     QString err;
     C5Database db(fDBParams);
     fBClientDebt.date = ui->deDate->date();
@@ -97,17 +102,16 @@ void C5CostumerDebtPayment::on_btnOK_clicked()
             doc->setRelation(true);
             doc->setPartner(fBClientDebt.costumer);
             switch (fBClientDebt.source) {
-            case BCLIENTDEBTS_SOURCE_INPUT:
-                doc->setCashOutput(ui->leCash->getInteger());
-                doc->setComment(tr("Partner dept payment"));
-                break;
-            case BCLIENTDEBTS_SOURCE_SALE:
-                doc->setCashInput(ui->leCash->getInteger());
-                doc->setComment(tr("Customer dept payment"));
-                break;
+                case BCLIENTDEBTS_SOURCE_INPUT:
+                    doc->setCashOutput(ui->leCash->getInteger());
+                    doc->setComment(tr("Partner dept payment"));
+                    break;
+                case BCLIENTDEBTS_SOURCE_SALE:
+                    doc->setCashInput(ui->leCash->getInteger());
+                    doc->setComment(tr("Customer dept payment"));
+                    break;
             }
-
-            doc->setDate(ui->deDate->date());            
+            doc->setDate(ui->deDate->date());
             doc->addRow(ui->leCostumerName->text(), ui->leAmount->getDouble());
             doc->save(true);
             fBClientDebt.cash = doc->uuid();
@@ -118,12 +122,12 @@ void C5CostumerDebtPayment::on_btnOK_clicked()
         if (doc->openDoc(fBClientDebt.cash)) {
             doc->setDate(ui->deDate->date());
             switch (fBClientDebt.source) {
-            case BCLIENTDEBTS_SOURCE_INPUT:
-                doc->setComment(tr("Partner dept payment"));
-                break;
-            case BCLIENTDEBTS_SOURCE_SALE:
-                doc->setComment(tr("Customer dept payment"));
-                break;
+                case BCLIENTDEBTS_SOURCE_INPUT:
+                    doc->setComment(tr("Partner dept payment"));
+                    break;
+                case BCLIENTDEBTS_SOURCE_SALE:
+                    doc->setComment(tr("Customer dept payment"));
+                    break;
             }
             doc->updateRow(0, ui->leCostumerName->text(), ui->leAmount->getDouble());
             doc->fDebtFlag = fBClientDebt.flag;
@@ -134,6 +138,10 @@ void C5CostumerDebtPayment::on_btnOK_clicked()
     //fBClientDebt.write(db, err);
     ui->leCode->setInteger(fBClientDebt.id);
     ui->btnRemove->setEnabled(true);
+    if (!fClearFlag.isEmpty()) {
+        db[":f_id"] = fClearFlag;
+        db.exec("update o_header_flags set f_5=0 where f_id=:f_id");
+    }
     C5Message::info(tr("Saved"));
     accept();
 }

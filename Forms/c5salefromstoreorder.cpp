@@ -8,7 +8,6 @@
 #include "httpquerydialog.h"
 #include "ce5partner.h"
 #include "../../Xlsx/src/xlsxall.h"
-#include "removeshopsale.h"
 #include "c5printtaxanywhere.h"
 #include "c5cache.h"
 #include "c5printrecipta4.h"
@@ -39,6 +38,12 @@ void C5SaleFromStoreOrder::openOrder(const QStringList &dbParams, const QString 
     d->loadOrder(id);
     d->exec();
     delete d;
+}
+
+void C5SaleFromStoreOrder::removeOrderResponse(const QJsonObject &jdoc)
+{
+    accept();
+    C5Message::info(tr("Removal complete"));
 }
 
 void C5SaleFromStoreOrder::loadOrder(const QString &id)
@@ -119,7 +124,6 @@ void C5SaleFromStoreOrder::exportToAS(int doctype)
         dbid = db.getInt(0, "f_id");
         connStr = db.getString(0, "f_connectionstring");
     }
-
     BreezeConfig *b = Configs::construct<BreezeConfig>(fDBParams, 1);
     QJsonObject jo;
     jo["pkServerAPIKey"] = b->apiKey;
@@ -143,9 +147,10 @@ void C5SaleFromStoreOrder::exportToAS(int doctype)
     jo["database"] = jdb;
     jo["vatpercent"] = index == 0 ? (doctype == 5 ? 0.2 : 0.1667) : 0;
     jo["vattype"] = index == 0 ? (doctype == 5 ? "1" : "5") : "3";
-    jo["pricewithoutvat"] =index == 0 ? (doctype == 5 ? 1.2 : 1) : 1;
+    jo["pricewithoutvat"] = index == 0 ? (doctype == 5 ? 1.2 : 1) : 1;
     jo["withvat"] = index == 0 ? (doctype == 5 ? 0.2 : 0) : 0;
-    HttpQueryDialog *qd = new HttpQueryDialog(fDBParams, QString("https://%1:%2/magnit").arg(b->ipAddress, QString::number(b->port)), jo, this);
+    HttpQueryDialog *qd = new HttpQueryDialog(fDBParams, QString("https://%1:%2/magnit").arg(b->ipAddress,
+        QString::number(b->port)), jo, this);
     qd->exec();
     qd->deleteLater();
 }
@@ -155,17 +160,12 @@ void C5SaleFromStoreOrder::on_btnRemove_clicked()
     if (C5Message::question(tr("Confirm to remove")) != QDialog::Accepted) {
         return;
     }
-    RemoveShopSale r(fDBParams, this);
-    C5Database db(fDBParams);
-    db.startTransaction();
-    r.remove(db, ui->leUUID->text());
-    db.commit();
-    C5Message::info(tr("Removal complete"));
+    fHttp->createHttpQuery("/engine/shop/remove-order.php", QJsonObject{{"id", ui->leUUID->text()}}, SLOT(
+        removeOrderResponse(QJsonObject)));
 }
 
 void C5SaleFromStoreOrder::on_btnPrintTax_clicked()
 {
-
     auto *d = new C5PrintTaxAnywhere(fDBParams, ui->leUUID->text());
     d->exec();
     d->deleteLater();
@@ -173,7 +173,8 @@ void C5SaleFromStoreOrder::on_btnPrintTax_clicked()
     QElapsedTimer t;
     t.start();
     C5Database db(fDBParams);
-    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
+    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(),
+                 C5Config::taxCashier(), C5Config::taxPin(), this);
     for (int i = 0; i < ui->tblData->rowCount(); i++) {
         pt.addGoods(ui->tblData->getString(i, 8).toInt(), //dep
                     ui->tblData->getString(i, 9), //adg
@@ -187,7 +188,6 @@ void C5SaleFromStoreOrder::on_btnPrintTax_clicked()
     QString sn, firm, address, fiscal, hvhh, rseq, devnum, time;
     int result = 0;
     result = pt.makeJsonAndPrint(ui->leTotalCard->getDouble(), 0, jsonIn, jsonOut, err);
-
     if (result == pt_err_ok) {
         QJsonObject jtax;
         jtax["f_order"] = ui->leID->text();
@@ -242,7 +242,6 @@ void C5SaleFromStoreOrder::on_btnSave_clicked()
     db[":f_datecash"] = ui->deDate->date();
     db[":f_hall"] = ui->leHall->getInteger();
     db.update("o_header", where_id(ui->leID->text()));
-
     C5Message::info(tr("Saved"));
 }
 
@@ -265,7 +264,6 @@ void C5SaleFromStoreOrder::on_btnExportToExcel_clicked()
     int fXlsxFitToPage = 0;
     QString fXlsxPageOrientation = xls_page_orientation_portrait;
     int fXlsxPageSize = xls_page_size_a4;
-
     XlsxDocument d;
     XlsxSheet *s = d.workbook()->addSheet("Sheet1");
     s->setupPage(fXlsxPageSize, fXlsxFitToPage, fXlsxPageOrientation);
@@ -276,8 +274,6 @@ void C5SaleFromStoreOrder::on_btnExportToExcel_clicked()
     d.style()->addBackgrounFill("header", color);
     d.style()->addHAlignment("header", xls_alignment_center);
     d.style()->addBorder("header", XlsxBorder());
-
-
     s->setColumnWidth(1, 10);
     s->setColumnWidth(2, 15);
     s->setColumnWidth(3, 50);
@@ -285,17 +281,14 @@ void C5SaleFromStoreOrder::on_btnExportToExcel_clicked()
     s->setColumnWidth(5, 20);
     s->setColumnWidth(6, 20);
     s->setColumnWidth(7, 20);
-
     int col = 1, row = 1;
     s->addCell(row, col, QString("%1 N%2").arg(tr("Order"), ui->leUserId->text()),
-                                           d.style()->styleNum("header"));
+               d.style()->styleNum("header"));
     row++;
-
     if (!ui->lePartnerName->isEmpty()) {
         s->addCell(row, col, tr("Buyer") + " " + ui->lePartnerName->text(), d.style()->styleNum("header"));
         row++;
     }
-
     QList<int> cols;
     QStringList vals;
     col = 1;
@@ -305,14 +298,12 @@ void C5SaleFromStoreOrder::on_btnExportToExcel_clicked()
         s->addCell(row, cols.at(i), vals.at(i), d.style()->styleNum("header"));
     }
     row++;
-
     vals.clear();
     vals << ui->deDate->text() + " " + ui->teTime->text();
     for (int i = 0; i < cols.count(); i++) {
         s->addCell(row, cols.at(i), vals.at(i), d.style()->styleNum("header"));
     }
     row += 2;
-
     cols.clear();
     for (int i = 0; i < 7; i++) {
         cols << i + 1;
@@ -351,7 +342,6 @@ void C5SaleFromStoreOrder::on_btnExportToExcel_clicked()
         }
         row++;
     }
-
     cols.clear();
     cols << 6 << 7;
     vals.clear();
@@ -361,20 +351,17 @@ void C5SaleFromStoreOrder::on_btnExportToExcel_clicked()
         s->addCell(row, cols.at(i), vals.at(i), d.style()->styleNum("header"));
     }
     row++;
-
     col = 1;
     s->setSpan(1, col, 1, col + 5);
     s->setSpan(2, col, 2, col + 5);
     s->setSpan(3, col, 3, col + 5);
     s->setSpan(4, col, 4, col + 5);
-
     QString err;
     if (!d.save(err, true)) {
         if (!err.isEmpty()) {
             C5Message::error(err);
         }
     }
-
 }
 
 void C5SaleFromStoreOrder::on_btnPrintA4_3_clicked()

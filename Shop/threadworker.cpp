@@ -24,6 +24,8 @@ void ThreadWorker::start()
 
 void ThreadWorker::finishedWithError(int code, const QString &errorString)
 {
+    Q_UNUSED(code);
+    Q_UNUSED(errorString);
     emit finished();
 }
 

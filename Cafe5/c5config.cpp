@@ -95,11 +95,6 @@ QStringList C5Config::dbParams()
     return params;
 }
 
-QStringList C5Config::replicaDbParams()
-{
-    return dbParams();
-}
-
 int C5Config::docNumDigitsInput()
 {
     return getValue(param_doc_num_digits_input).toInt();

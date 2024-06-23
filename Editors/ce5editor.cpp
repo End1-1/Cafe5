@@ -47,21 +47,21 @@ void CE5Editor::setId(int id)
             bool found = false;
             foreach (C5LineEditWithSelector *le, fLines) {
                 if (le->property("Field").toString() == colName) {
-                    if (le->cacheId() == 0){
+                    if (le->cacheId() == 0) {
                         switch (le->property("Type").toInt()) {
-                        case 0:
-                            le->setText(db.getString(i));
-                            break;
-                        case 1:
-                            le->setInteger(db.getInt(i));
-                            break;
-                        case 2:
-                        case 3:
-                            le->setDouble(db.getDouble(i));
-                            break;
-                        default:
-                            le->setText(db.getString(i));
-                            break;
+                            case 0:
+                                le->setText(db.getString(i));
+                                break;
+                            case 1:
+                                le->setInteger(db.getInt(i));
+                                break;
+                            case 2:
+                            case 3:
+                                le->setDouble(db.getDouble(i));
+                                break;
+                            default:
+                                le->setText(db.getString(i));
+                                break;
                         }
                     } else {
                         le->setValue(db.getString(i));
@@ -119,7 +119,7 @@ void CE5Editor::setId(int id)
                 }
             }
         }
-        for (C5LineEditWithSelector *l: qAsConst(fLines)) {
+        for (C5LineEditWithSelector *l : qAsConst(fLines)) {
             l->fixValue();
         }
     } else {
@@ -163,20 +163,20 @@ bool CE5Editor::save(QString &err, QList<QMap<QString, QVariant> > &data)
         QString fieldName = leField->property("Field").toString();
         QVariant value;
         switch (leField->property("Type").toInt()) {
-        case 0:
-            value = leField->text();
-            if (value.toString().isEmpty()) {
-                value = QVariant(QVariant::String);
-            }
-            break;
-        case 1:
-            value = leField->getInteger();
-            break;
-        case 2:
-        case 3:
-        case 4:
-            value = leField->getDouble();
-            break;
+            case 0:
+                value = leField->text();
+                if (value.toString().isEmpty()) {
+                    value = QVariant(QVariant::String);
+                }
+                break;
+            case 1:
+                value = leField->getInteger();
+                break;
+            case 2:
+            case 3:
+            case 4:
+                value = leField->getDouble();
+                break;
         }
         db[":" + fieldName] = value;
         row[fieldName] = value;
@@ -274,14 +274,14 @@ bool CE5Editor::checkData(QString &err)
                     le->setText(le->text().trimmed());
                     if (le->isEmpty()) {
                         err += QString("%1 %2<br>")
-                                .arg(rule.mid(rule.indexOf("=") + 1, rule.length() - rule.indexOf("=")))
-                                .arg(tr("cannot be empty"));
+                               .arg(rule.mid(rule.indexOf("=") + 1, rule.length() - rule.indexOf("=")))
+                               .arg(tr("cannot be empty"));
                     }
                 } else if (rule.mid(0, 7) == "nonzero") {
                     if (le->getDouble() < 0.0001) {
                         err += QString("%1 %2<br>")
-                                .arg(rule.mid(rule.indexOf("=") + 1, rule.length() - rule.indexOf("=")))
-                                .arg("cannot be zero");
+                               .arg(rule.mid(rule.indexOf("=") + 1, rule.length() - rule.indexOf("=")))
+                               .arg("cannot be zero");
                     }
                 }
             }
@@ -351,7 +351,7 @@ void CE5Editor::getLineEdit(QObject *parent)
         if (o->children().count() > 0) {
             getLineEdit(o);
         }
-        le = dynamic_cast<C5LineEditWithSelector*>(o);
+        le = dynamic_cast<C5LineEditWithSelector *>(o);
         if (le) {
             QVariant dataType = le->property("Type");
             int decimalPlaces = 3;
@@ -360,20 +360,20 @@ void CE5Editor::getLineEdit(QObject *parent)
             }
             if (dataType != QVariant::Invalid) {
                 switch (dataType.toInt()) {
-                case 0:
-                    break;
-                case 1:
-                    le->setValidator(new QIntValidator());
-                    break;
-                case 2:
-                    le->setValidator(new QDoubleValidator(0, 99999999999, decimalPlaces));
-                    break;
-                case 3:
-                    le->setValidator(new QDoubleValidator(-99999999, 999999999, decimalPlaces));
-                    break;
-                case 4:
-                    le->setValidator(new QDoubleValidator(-1, 999999999, decimalPlaces));
-                    break;
+                    case 0:
+                        break;
+                    case 1:
+                        le->setValidator(new QIntValidator());
+                        break;
+                    case 2:
+                        le->setValidator(new QDoubleValidator(0, 99999999999, decimalPlaces));
+                        break;
+                    case 3:
+                        le->setValidator(new QDoubleValidator(-99999999, 999999999, decimalPlaces));
+                        break;
+                    case 4:
+                        le->setValidator(new QDoubleValidator(-1, 999999999, decimalPlaces));
+                        break;
                 }
             }
             if (le->property("Default").isValid()) {
@@ -381,13 +381,13 @@ void CE5Editor::getLineEdit(QObject *parent)
                 le->setText(v.toString());
             }
             fLines << le;
-        } else if (ch = dynamic_cast<C5CheckBox*>(o)) {
+        } else if (ch = dynamic_cast<C5CheckBox * >(o)) {
             fChecks << ch;
-        } else if (de = dynamic_cast<C5DateEdit*>(o)) {
+        } else if (de = dynamic_cast<C5DateEdit * >(o)) {
             fDates << de;
-        } else if (cb = dynamic_cast<C5ComboBox*>(o)) {
+        } else if (cb = dynamic_cast<C5ComboBox * >(o)) {
             fCombos << cb;
-        } else if (pt = dynamic_cast<QPlainTextEdit*>(o)) {
+        } else if (pt = dynamic_cast<QPlainTextEdit * >(o)) {
             fPlainText << pt;
         }
     }
@@ -432,4 +432,14 @@ void CE5Editor::focusFirst()
 void CE5Editor::setDatabase(const QStringList &dbParams)
 {
     fDBParams = dbParams;
+}
+
+QJsonObject CE5Editor::makeJsonObject()
+{
+    return fData;
+}
+
+bool CE5Editor::acceptOnSave() const
+{
+    return false;
 }

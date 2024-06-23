@@ -4,26 +4,27 @@
 
 NTableModel::NTableModel( QObject *parent) :
     QAbstractTableModel(parent),
-    mCheckboxMode(false)
+    mCheckboxMode(false),
+    mSortOrder(Qt::AscendingOrder),
+    mLastColumnSorted(-1)
 {
-
 }
 
 QVariant NTableModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     switch (role) {
-    case Qt::DisplayRole:
-        if (orientation == Qt::Vertical) {
-            return section + 1;
-        } else {
-            return mColumnsNames[section].toString();
-        }
-    case Qt::DecorationRole:
-        if (orientation == Qt::Horizontal) {
-//            if (fFilters.contains(section)) {
-//                return QIcon(":/filter_set.png");
-//            }
-        }
+        case Qt::DisplayRole:
+            if (orientation == Qt::Vertical) {
+                return section + 1;
+            } else {
+                return mColumnsNames[section].toString();
+            }
+        case Qt::DecorationRole:
+            if (orientation == Qt::Horizontal) {
+                //            if (fFilters.contains(section)) {
+                //                return QIcon(":/filter_set.png");
+                //            }
+            }
     }
     return QVariant();
 }
@@ -58,26 +59,56 @@ QVariant NTableModel::data(const QModelIndex &index, int role) const
     QVariant v;
     const int &row = mProxyRows.at(index.row());
     switch (role) {
-    case Qt::CheckStateRole: {
-        if (mCheckboxMode) {
-            if (index.column() == 0) {
-                return mCheckboxValues.at(row) ? Qt::Checked : Qt::Unchecked;
+        case Qt::CheckStateRole: {
+            if (mCheckboxMode) {
+                if (index.column() == 0) {
+                    return mCheckboxValues.at(row) ? Qt::Checked : Qt::Unchecked;
+                }
             }
-        }
-        return QVariant();
-    }
-    case Qt::DisplayRole:
-        if (index.column() == 0 && mCheckboxMode) {
             return QVariant();
         }
-        v = mRawData.at(row).toArray().at(index.column());
-        if (fColumnsOfDouble.contains(index.column())) {
-            return float_str(str_float(v.toString()), 2);
+        case Qt::EditRole:
+            if (index.column() == 0 && mCheckboxMode) {
+                return QVariant();
+            }
+            return mRawData.at(row).toArray().at(index.column()).toVariant();
+        case Qt::DisplayRole: {
+            if (index.column() == 0 && mCheckboxMode) {
+                return QVariant();
+            }
+            QJsonValue vv = mRawData.at(row).toArray().at(index.column());
+            switch (vv.type()) {
+                case QJsonValue::Double:
+                    return float_str(vv.toDouble(), 2);
+                default:
+                    return vv.toString();
+            }
+            break;
         }
-        return v;
+        case Qt::BackgroundColorRole:
+            return QColor(Qt::white).toRgb();
     }
-
     return QVariant();
+}
+
+void NTableModel::sort(int column, Qt::SortOrder order)
+{
+    if (mLastColumnSorted > -1 && mLastColumnSorted != column) {
+        order = Qt::AscendingOrder;
+    } else {
+        order = mSortOrder == Qt::AscendingOrder ? Qt::DescendingOrder : Qt::AscendingOrder;
+    }
+    mSortOrder = order;
+    QMap<QVariant, int> data;
+    foreach (int i, mProxyRows) {
+        data.insertMulti(mRawData.at(i).toArray().at(column).toVariant(), i);
+    }
+    beginResetModel();
+    mProxyRows = data.values();
+    if (mSortOrder == Qt::DescendingOrder) {
+        std::reverse(mProxyRows.begin(), mProxyRows.end());
+    }
+    endResetModel();
 }
 
 QVariant NTableModel::data(int row, int column, int role) const
@@ -94,6 +125,7 @@ const QJsonArray NTableModel::rowData(int row) const
 void NTableModel::setDatasource(const QJsonArray &jcols, const QJsonArray &ja)
 {
     beginResetModel();
+    mUniqueValuesForColumn.clear();
     mColumnsNames = jcols;
     mRawData = ja;
     mProxyRows.clear();
@@ -103,13 +135,15 @@ void NTableModel::setDatasource(const QJsonArray &jcols, const QJsonArray &ja)
     endResetModel();
 }
 
-void NTableModel::setSumColumns(const QJsonObject &jcolsum)
+void NTableModel::setSumColumns(const QJsonArray &jcolsum)
 {
-    fColSum = jcolsum;
+    fColSum.clear();
     fColumnsOfDouble.clear();
-    for (const QString &s: fColSum.keys()) {
-        fColumnsOfDouble.append(s.toInt());
+    for (int i = 0; i < jcolsum.size(); i++) {
+        fColSum[jcolsum.at(i).toInt()] = 0;
+        fColumnsOfDouble.append(jcolsum.at(i).toInt());
     }
+    countSum();
 }
 
 void NTableModel::setFilter(const QString &filter)
@@ -119,27 +153,28 @@ void NTableModel::setFilter(const QString &filter)
     for (int i = 0; i < mRawData.size(); i++) {
         const QJsonArray &ja = mRawData.at(i).toArray();
         for (int j = 0; j < ja.size(); j++) {
-            if (ja[j].toString().contains(filter, Qt::CaseInsensitive)) {
+            if (ja[j].toVariant().toString().contains(filter, Qt::CaseInsensitive)) {
                 mProxyRows.append(i);
                 break;
             }
         }
     }
-    QStringList keys = fColSum.keys();
-    if (keys.length() > 0) {
-        QMap<int, double> sums;
-        for (const QString &k: keys) {
-            sums[k.toInt()] = 0;
-        }
-        for (int i = 0; i < mProxyRows.size(); i++) {
-            for (QMap<int, double>::iterator it = sums.begin(); it != sums.end(); it++) {
-                it.value() += str_float(mRawData[mProxyRows[i]].toArray()[it.key()].toString());
-            }
-        }
-        for (QMap<int, double>::const_iterator it = sums.constBegin(); it != sums.constEnd(); it++) {
-            fColSum[QString::number(it.key())] = it.value();
+    countSum();
+    endResetModel();
+}
+
+void NTableModel::setColumnFilter(const QString &filter, int column)
+{
+    beginResetModel();
+    mProxyRows.clear();
+    QStringList filters = filter.split("|", Qt::SkipEmptyParts);
+    for (int i = 0; i < mRawData.size(); i++) {
+        const QJsonArray &ja = mRawData.at(i).toArray();
+        if (filters.contains(ja[column].toVariant().toString())) {
+            mProxyRows.append(i);
         }
     }
+    countSum();
     endResetModel();
 }
 
@@ -193,4 +228,41 @@ bool NTableModel::checked(int &row)
         }
     }
     return false;
+}
+
+const QSet<QString> &NTableModel::uniqueValuesForColumn(int column)
+{
+    if (!mUniqueValuesForColumn.contains(column)) {
+        mUniqueValuesForColumn[column] = QSet<QString>();
+    }
+    QSet<QString> &s = mUniqueValuesForColumn[column];
+    if (mUniqueValuesForColumn[column].isEmpty()) {
+        for (int i = 0; i < mRawData.count(); i++) {
+            s.insert(data(i, column, Qt::EditRole).toString());
+        }
+    }
+    return s;
+}
+
+void NTableModel::countSum()
+{
+    for (QMap<int, double>::iterator it = fColSum.begin(); it != fColSum.end(); it++) {
+        it.value() = 0;
+    }
+    for (int i = 0; i < mProxyRows.size(); i++) {
+        for (QMap<int, double>::iterator it = fColSum.begin(); it != fColSum.end(); it++) {
+            it.value() += mRawData[mProxyRows[i]].toArray()[it.key()].toDouble();
+        }
+    }
+    for (int i = 0; i < fSumColumnsSpecial.size(); i++) {
+        QJsonObject jo = fSumColumnsSpecial.at(i).toObject();
+        if (jo["formula"].toString() == "totaldiff") {
+            double d = 0;
+            QJsonArray ja = jo["diffcols"].toArray();
+            for (int j = 0; j < ja.size(); j++) {
+                d += fColSum[ja.at(j).toInt()];
+            }
+            fColSum[jo["column"].toInt()] = d;
+        }
+    }
 }

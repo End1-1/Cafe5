@@ -53,10 +53,11 @@ SOURCES += \
     ../Cafe5/c5cafecommon.cpp \
     ../Cafe5/c5double.cpp \
     ../Cafe5/c5logsystem.cpp \
-    ../Cafe5/c5replication.cpp \
     ../Cafe5/c5serverhandler.cpp \
     ../Cafe5/c5systempreference.cpp \
     ../Cafe5/calendar.cpp \
+    ../Classes/QProgressIndicator.cpp \
+    ../Classes/amkbd.cpp \
     ../Classes/c5airlog.cpp \
     ../Classes/c5combodelegate.cpp \
     ../Classes/c5crypt.cpp \
@@ -76,6 +77,7 @@ SOURCES += \
     ../Classes/c5servername.cpp \
     ../Classes/c5shoporder.cpp \
     ../Classes/c5storedraftwriter.cpp \
+    ../Classes/c5tabledata.cpp \
     ../Classes/c5tablerec.cpp \
     ../Classes/c5textdelegate.cpp \
     ../Classes/c5threadobject.cpp \
@@ -89,7 +91,6 @@ SOURCES += \
     ../Classes/notificationwidget.cpp \
     ../Classes/outputofheader.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
-    ../Classes/removeshopsale.cpp \
     ../Classes/serverconnection.cpp \
     ../Classes/socketconnection.cpp \
     ../Classes/thread.cpp \
@@ -150,7 +151,6 @@ SOURCES += \
     ../Editors/ce5editor.cpp \
     ../Editors/ce5goods.cpp \
     ../Editors/ce5goodsbarcodelabelview.cpp \
-    ../Editors/ce5goodsclass.cpp \
     ../Editors/ce5goodsgroup.cpp \
     ../Editors/ce5goodsmodel.cpp \
     ../Editors/ce5goodsunit.cpp \
@@ -250,6 +250,7 @@ SOURCES += \
     ../NTable/ndataprovider.cpp \
     ../NTable/nfilterdlg.cpp \
     ../NTable/nhandler.cpp \
+    ../NTable/ninterface.cpp \
     ../NTable/nloadingdlg.cpp \
     ../NTable/nsearchdlg.cpp \
     ../NTable/ntablemodel.cpp \
@@ -305,7 +306,6 @@ SOURCES += \
     ../Reports/cr5draftoutputbyrecipefilter.cpp \
     ../Reports/cr5generalreportonlydate.cpp \
     ../Reports/cr5goods.cpp \
-    ../Reports/cr5goodsclasses.cpp \
     ../Reports/cr5goodsfilter.cpp \
     ../Reports/cr5goodsgroup.cpp \
     ../Reports/cr5goodsimages.cpp \
@@ -487,10 +487,11 @@ HEADERS += \
     ../Cafe5/c5cafecommon.h \
     ../Cafe5/c5double.h \
     ../Cafe5/c5logsystem.h \
-    ../Cafe5/c5replication.h \
     ../Cafe5/c5serverhandler.h \
     ../Cafe5/c5systempreference.h \
     ../Cafe5/calendar.h \
+    ../Classes/QProgressIndicator.h \
+    ../Classes/amkbd.h \
     ../Classes/barcode5.h \
     ../Classes/c5airlog.h \
     ../Classes/c5combodelegate.h \
@@ -511,6 +512,7 @@ HEADERS += \
     ../Classes/c5servername.h \
     ../Classes/c5shoporder.h \
     ../Classes/c5storedraftwriter.h \
+    ../Classes/c5tabledata.h \
     ../Classes/c5tablerec.h \
     ../Classes/c5textdelegate.h \
     ../Classes/c5threadobject.h \
@@ -526,7 +528,6 @@ HEADERS += \
     ../Classes/notificationwidget.h \
     ../Classes/outputofheader.h \
     ../Classes/proxytablewidgetdatabase.h \
-    ../Classes/removeshopsale.h \
     ../Classes/serverconnection.h \
     ../Classes/socketconnection.h \
     ../Classes/thread.h \
@@ -587,7 +588,6 @@ HEADERS += \
     ../Editors/ce5editor.h \
     ../Editors/ce5goods.h \
     ../Editors/ce5goodsbarcodelabelview.h \
-    ../Editors/ce5goodsclass.h \
     ../Editors/ce5goodsgroup.h \
     ../Editors/ce5goodsmodel.h \
     ../Editors/ce5goodsunit.h \
@@ -687,6 +687,7 @@ HEADERS += \
     ../NTable/ndataprovider.h \
     ../NTable/nfilterdlg.h \
     ../NTable/nhandler.h \
+    ../NTable/ninterface.h \
     ../NTable/nloadingdlg.h \
     ../NTable/nsearchdlg.h \
     ../NTable/ntablemodel.h \
@@ -742,7 +743,6 @@ HEADERS += \
     ../Reports/cr5draftoutputbyrecipefilter.h \
     ../Reports/cr5generalreportonlydate.h \
     ../Reports/cr5goods.h \
-    ../Reports/cr5goodsclasses.h \
     ../Reports/cr5goodsfilter.h \
     ../Reports/cr5goodsgroup.h \
     ../Reports/cr5goodsimages.h \
@@ -934,7 +934,6 @@ FORMS += \
     ../Editors/ce5dishpart2.ui \
     ../Editors/ce5dishremovereason.ui \
     ../Editors/ce5goods.ui \
-    ../Editors/ce5goodsclass.ui \
     ../Editors/ce5goodsgroup.ui \
     ../Editors/ce5goodsmodel.ui \
     ../Editors/ce5goodsunit.ui \

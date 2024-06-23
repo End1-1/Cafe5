@@ -3,7 +3,8 @@
 
 #include "ce5editor.h"
 
-namespace Ui {
+namespace Ui
+{
 class CE5Partner;
 }
 
@@ -33,6 +34,8 @@ private slots:
 
 private:
     Ui::CE5Partner *ui;
+
+    bool fNew;
 };
 
 #endif // CE5PARTNER_H

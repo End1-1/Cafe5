@@ -290,7 +290,7 @@
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset resource="../resources/resources.qrc">
+                  <iconset resource="../resources/res.qrc">
                    <normaloff>:/comment.png</normaloff>:/comment.png</iconset>
                  </property>
                  <property name="iconSize">
@@ -319,7 +319,7 @@
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset resource="../resources/resources.qrc">
+                  <iconset resource="../resources/res.qrc">
                    <normaloff>:/qrcode.png</normaloff>:/qrcode.png</iconset>
                  </property>
                  <property name="iconSize">
@@ -348,7 +348,7 @@
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset resource="../resources/resources.qrc">
+                  <iconset resource="../resources/res.qrc">
                    <normaloff>:/recycle.png</normaloff>:/recycle.png</iconset>
                  </property>
                  <property name="iconSize">
@@ -383,7 +383,7 @@
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset resource="../resources/resources.qrc">
+                  <iconset resource="../resources/res.qrc">
                    <normaloff>:/bill.png</normaloff>:/bill.png</iconset>
                  </property>
                  <property name="iconSize">
@@ -635,7 +635,7 @@
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset resource="../resources/resources.qrc">
+                  <iconset resource="../resources/res.qrc">
                    <normaloff>:/print_receipt.png</normaloff>:/print_receipt.png</iconset>
                  </property>
                  <property name="iconSize">
@@ -717,7 +717,7 @@
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset resource="../resources/resources.qrc">
+                  <iconset resource="../resources/res.qrc">
                    <normaloff>:/cancel.png</normaloff>:/cancel.png</iconset>
                  </property>
                  <property name="iconSize">
@@ -801,7 +801,7 @@ background:#fff6e5;
               <x>0</x>
               <y>0</y>
               <width>376</width>
-              <height>547</height>
+              <height>543</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="vs">
@@ -860,7 +860,7 @@ background:#fff6e5;
                <string/>
               </property>
               <property name="icon">
-               <iconset resource="../resources/resources.qrc">
+               <iconset resource="../resources/res.qrc">
                 <normaloff>:/down.png</normaloff>:/down.png</iconset>
               </property>
               <property name="iconSize">
@@ -889,7 +889,7 @@ background:#fff6e5;
                <string/>
               </property>
               <property name="icon">
-               <iconset resource="../resources/resources.qrc">
+               <iconset resource="../resources/res.qrc">
                 <normaloff>:/up.png</normaloff>:/up.png</iconset>
               </property>
               <property name="iconSize">
@@ -947,7 +947,7 @@ background:#fff6e5;
                <string/>
               </property>
               <property name="icon">
-               <iconset resource="../resources/resources.qrc">
+               <iconset resource="../resources/res.qrc">
                 <normaloff>:/minus.png</normaloff>:/minus.png</iconset>
               </property>
               <property name="iconSize">
@@ -976,7 +976,7 @@ background:#fff6e5;
                <string/>
               </property>
               <property name="icon">
-               <iconset resource="../resources/resources.qrc">
+               <iconset resource="../resources/res.qrc">
                 <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
               </property>
               <property name="iconSize">
@@ -1018,7 +1018,7 @@ background:#fff6e5;
                <string>Print</string>
               </property>
               <property name="icon">
-               <iconset resource="../resources/resources.qrc">
+               <iconset resource="../resources/res.qrc">
                 <normaloff>:/print_receipt.png</normaloff>:/print_receipt.png</iconset>
               </property>
               <property name="iconSize">
@@ -1222,7 +1222,7 @@ background:#fff6e5;
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/resources.qrc">
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/down.png</normaloff>:/down.png</iconset>
            </property>
            <property name="iconSize">
@@ -1251,7 +1251,7 @@ background:#fff6e5;
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/resources.qrc">
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/up.png</normaloff>:/up.png</iconset>
            </property>
            <property name="iconSize">
@@ -1378,7 +1378,7 @@ background:#fff6e5;
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/resources.qrc">
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
            </property>
            <property name="iconSize">
@@ -1472,7 +1472,7 @@ background:#fff6e5;
 CASH</string>
            </property>
            <property name="icon">
-            <iconset resource="../resources/resources.qrc">
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/wallet-with-money.png</normaloff>:/wallet-with-money.png</iconset>
            </property>
            <property name="iconSize">
@@ -1595,7 +1595,7 @@ CASH</string>
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/resources.qrc">
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
            </property>
            <property name="iconSize">
@@ -1704,7 +1704,7 @@ CASH</string>
 OTHER</string>
            </property>
            <property name="icon">
-            <iconset resource="../resources/resources.qrc">
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
            </property>
            <property name="iconSize">
@@ -1768,7 +1768,7 @@ OTHER</string>
 CARD</string>
            </property>
            <property name="icon">
-            <iconset resource="../resources/resources.qrc">
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/credit-card.png</normaloff>:/credit-card.png</iconset>
            </property>
            <property name="iconSize">
@@ -1832,7 +1832,7 @@ CARD</string>
 BANK</string>
            </property>
            <property name="icon">
-            <iconset resource="../resources/resources.qrc">
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/bank.png</normaloff>:/bank.png</iconset>
            </property>
            <property name="iconSize">
@@ -1861,7 +1861,7 @@ BANK</string>
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/resources.qrc">
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
            </property>
            <property name="iconSize">
@@ -1959,7 +1959,7 @@ BANK</string>
 IDRAM</string>
            </property>
            <property name="icon">
-            <iconset resource="../resources/resources.qrc">
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
            </property>
            <property name="iconSize">
@@ -2019,7 +2019,7 @@ IDRAM</string>
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/resources.qrc">
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
            </property>
            <property name="iconSize">
@@ -2048,7 +2048,7 @@ IDRAM</string>
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/resources.qrc">
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
            </property>
            <property name="iconSize">
@@ -2174,7 +2174,7 @@ IDRAM</string>
             <string>PAY X</string>
            </property>
            <property name="icon">
-            <iconset resource="../resources/resources.qrc">
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
            </property>
            <property name="iconSize">
@@ -2237,7 +2237,7 @@ IDRAM</string>
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/resources.qrc">
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
            </property>
            <property name="iconSize">
@@ -2356,7 +2356,7 @@ IDRAM</string>
                <string>TAX</string>
               </property>
               <property name="icon">
-               <iconset resource="../resources/resources.qrc">
+               <iconset resource="../resources/res.qrc">
                 <normaloff>:/tax.png</normaloff>:/tax.png</iconset>
               </property>
               <property name="iconSize">
@@ -2394,7 +2394,7 @@ IDRAM</string>
                <string>CLOSE ORDER</string>
               </property>
               <property name="icon">
-               <iconset resource="../resources/resources.qrc">
+               <iconset resource="../resources/res.qrc">
                 <normaloff>:/print_receipt.png</normaloff>:/print_receipt.png</iconset>
               </property>
               <property name="iconSize">
@@ -2439,7 +2439,7 @@ IDRAM</string>
             <string>COMPLIMENTARY</string>
            </property>
            <property name="icon">
-            <iconset resource="../resources/resources.qrc">
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/wallet-with-money.png</normaloff>:/wallet-with-money.png</iconset>
            </property>
            <property name="iconSize">
@@ -2468,7 +2468,7 @@ IDRAM</string>
             <string>TRANSFER TO ROOM</string>
            </property>
            <property name="icon">
-            <iconset resource="../resources/resources.qrc">
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/guest.png</normaloff>:/guest.png</iconset>
            </property>
            <property name="iconSize">
@@ -2497,7 +2497,7 @@ IDRAM</string>
             <string>PRIME COST</string>
            </property>
            <property name="icon">
-            <iconset resource="../resources/resources.qrc">
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/wallet-with-money.png</normaloff>:/wallet-with-money.png</iconset>
            </property>
            <property name="iconSize">
@@ -2526,7 +2526,7 @@ IDRAM</string>
             <string>CITY LEDGER</string>
            </property>
            <property name="icon">
-            <iconset resource="../resources/resources.qrc">
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/ledger.png</normaloff>:/ledger.png</iconset>
            </property>
            <property name="iconSize">
@@ -2635,7 +2635,7 @@ IDRAM</string>
                <string/>
               </property>
               <property name="icon">
-               <iconset resource="../resources/resources.qrc">
+               <iconset resource="../resources/res.qrc">
                 <normaloff>:/calculator.png</normaloff>:/calculator.png</iconset>
               </property>
               <property name="iconSize">
@@ -2761,7 +2761,7 @@ IDRAM</string>
          <string>Change table</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/resources.qrc">
+         <iconset resource="../resources/res.qrc">
           <normaloff>:/chair.png</normaloff>:/chair.png</iconset>
         </property>
         <property name="iconSize">
@@ -2790,7 +2790,7 @@ IDRAM</string>
          <string>Comment</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/resources.qrc">
+         <iconset resource="../resources/res.qrc">
           <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
         </property>
         <property name="iconSize">
@@ -2848,7 +2848,7 @@ IDRAM</string>
          <string>Menu</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/resources.qrc">
+         <iconset resource="../resources/res.qrc">
           <normaloff>:/menu.PNG</normaloff>:/menu.PNG</iconset>
         </property>
         <property name="iconSize">
@@ -2877,7 +2877,7 @@ IDRAM</string>
          <string>Search</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/resources.qrc">
+         <iconset resource="../resources/res.qrc">
           <normaloff>:/search.png</normaloff>:/search.png</iconset>
         </property>
         <property name="iconSize">
@@ -2935,7 +2935,7 @@ IDRAM</string>
          <string>Stop list</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/resources.qrc">
+         <iconset resource="../resources/res.qrc">
           <normaloff>:/stop.png</normaloff>:/stop.png</iconset>
         </property>
         <property name="iconSize">
@@ -3096,7 +3096,7 @@ IDRAM</string>
 LANGUAGE</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/resources.qrc">
+         <iconset resource="../resources/res.qrc">
           <normaloff>:/armenia.png</normaloff>:/armenia.png</iconset>
         </property>
         <property name="iconSize">
@@ -3145,7 +3145,7 @@ LANGUAGE</string>
         </property>
         <property name="icon">
          <iconset resource="../resources/res.qrc">
-          <normaloff>:/back-arrow.png</normaloff>:/back-arrow.png</iconset>
+          <normaloff>:/back.png</normaloff>:/back.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -3300,7 +3300,7 @@ LANGUAGE</string>
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/resources.qrc">
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/down.png</normaloff>:/down.png</iconset>
            </property>
            <property name="iconSize">
@@ -3329,7 +3329,7 @@ LANGUAGE</string>
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/resources.qrc">
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/up.png</normaloff>:/up.png</iconset>
            </property>
            <property name="iconSize">
@@ -3512,7 +3512,7 @@ QLabel {color:yellow;background:green;}
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../resources/resources.qrc"/>
+  <include location="../resources/res.qrc"/>
   <include location="../resources/res.qrc"/>
  </resources>
  <connections/>

@@ -97,7 +97,7 @@ void StoreInput::on_btnAccept_clicked()
         C5Message::error(tr("Nothing is selected"));
         return;
     }
-    C5Database db(__c5config.replicaDbParams());
+    C5Database db(__c5config.dbParams());
     db.startTransaction();
     QSet<QString> ids;
     foreach (int r, rows) {
@@ -198,7 +198,7 @@ void StoreInput::history()
     ui->tbl->setColumnCount(header.count());
     ui->tbl->setHorizontalHeaderLabels(header);
     ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 30, 100, 0, 300, 140, 100, 100);
-    C5Database db(__c5config.replicaDbParams());
+    C5Database db(__c5config.dbParams());
     db[":f_store"] = __c5config.defaultStore();
     db[":f_date1"] = ui->deStart->date();
     db[":f_date2"] = ui->deEnd->date();
@@ -251,7 +251,7 @@ void StoreInput::storeByGroup()
     ui->tbl->setColumnCount(header.count());
     ui->tbl->setHorizontalHeaderLabels(header);
     ui->tbl->setColumnWidths(ui->tbl->columnCount(), 30, 400, 100, 100);
-    C5Database db(__c5config.replicaDbParams());
+    C5Database db(__c5config.dbParams());
     db[":f_store"] = __c5config.defaultStore();
     db[":f_date"] = QDate::currentDate();
     if (!db.exec("select gg.f_name as f_group,sum(s.f_qty*s.f_type) as f_qty, "
@@ -292,7 +292,7 @@ void StoreInput::storeByItems()
     ui->tbl->setColumnCount(header.count());
     ui->tbl->setHorizontalHeaderLabels(header);
     ui->tbl->setColumnWidths(ui->tbl->columnCount(), 30, 300, 200, 200, 100, 100);
-    C5Database db(__c5config.replicaDbParams());
+    C5Database db(__c5config.dbParams());
     db[":f_store"] = __c5config.defaultStore();
     db[":f_date"] = QDate::currentDate();
     if (!db.exec("select gg.f_name as f_group, g.f_name, g.f_scancode, sum(s.f_qty*s.f_type) as f_qty, "

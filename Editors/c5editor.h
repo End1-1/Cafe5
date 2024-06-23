@@ -4,7 +4,8 @@
 #include "c5dialog.h"
 #include <QVBoxLayout>
 
-namespace Ui {
+namespace Ui
+{
 class C5Editor;
 }
 
@@ -23,6 +24,8 @@ public:
 
     bool getResult(QList<QMap<QString, QVariant> > &data);
 
+    bool getJsonObject(QJsonObject &j);
+
     virtual void reject() override;
 
     void insertButton(QPushButton *b);
@@ -33,6 +36,8 @@ protected:
     virtual void closeEvent(QCloseEvent *e);
 
 private slots:
+    void EditorAccepted();
+
     void on_btnSave_clicked();
 
     bool on_btnSaveAndNew_clicked();

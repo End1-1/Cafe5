@@ -21,16 +21,14 @@ DlgCL::DlgCL(const QStringList &dbParams) :
             ui->tblGuest->setString(row, 2, db.getString(2));
         }
     } else {
-        dbp[1] = C5Config::hotelDatabase();
         C5Database db(dbp);
-        db.exec("select f_id, f_name from f_city_ledger order by 2");
+        db.exec(QString("select f_id, f_name from %1.f_city_ledger order by 2").arg(__c5config.hotelDatabase()));
         while (db.nextRow()) {
             int row = ui->tblGuest->addEmptyRow();
             ui->tblGuest->setString(row, 0, db.getString(0));
             ui->tblGuest->setString(row, 1, db.getString(1));
         }
     }
-
     connect(ui->kbd, SIGNAL(textChanged(QString)), this, SLOT(searchCL(QString)));
     connect(ui->kbd, SIGNAL(accept()), this, SLOT(kbdAccept()));
     connect(ui->kbd, SIGNAL(reject()), this, SLOT(reject()));

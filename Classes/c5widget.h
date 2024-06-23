@@ -8,6 +8,8 @@
 #include <QIcon>
 #include <QToolBar>
 
+class NInterface;
+
 class C5Widget : public QWidget
 {
     Q_OBJECT
@@ -55,6 +57,8 @@ protected:
     QString fIcon;
 
     QString fLabel;
+
+    NInterface *fHttp;
 
     bool fFocusNextChild;
 

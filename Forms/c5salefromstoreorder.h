@@ -3,7 +3,8 @@
 
 #include "c5dialog.h"
 
-namespace Ui {
+namespace Ui
+{
 class C5SaleFromStoreOrder;
 }
 
@@ -19,6 +20,8 @@ public:
     static void openOrder(const QStringList &dbParams, const QString &id);
 
 private slots:
+    void removeOrderResponse(const QJsonObject &jdoc);
+
     void on_btnRemove_clicked();
 
     void on_btnPrintTax_clicked();

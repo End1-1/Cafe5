@@ -11,11 +11,9 @@
 CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
 {
-
     fIcon = ":/graph.png";
     fLabel = tr("Sales by goods");
     fSimpleQuery = false;
-
     fMainTable = "o_goods og";
     fLeftJoinTables << "left join o_header oh on oh.f_id=og.f_header [oh]"
                     << "left join o_tax ot on ot.f_id=oh.f_id [ot]"
@@ -26,15 +24,10 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
                     << "left join c_units gu on gu.f_id=gg.f_unit [gu]"
                     << "left join c_goods_prices gpr on gpr.f_goods=gg.f_id [gpr]"
                     << "left join c_partners cpb on cpb.f_id=oh.f_partner [cpb]"
-                    << "left join c_goods_classes gca on gca.f_id=gg.f_group1 [gca]"
-                    << "left join c_goods_classes gcb on gcb.f_id=gg.f_group2 [gcb]"
-                    << "left join c_goods_classes gcc on gcc.f_id=gg.f_group3 [gcc]"
-                    << "left join c_goods_classes gcd on gcd.f_id=gg.f_group4 [gcd]"
                     << "left join a_store_draft asd on asd.f_id=og.f_storerec [asd]"
                     << "left join h_halls hl on hl.f_id=oh.f_hall [hl]"
                     << "left join e_currency_cross_rate cr on cr.f_currency1=ah.f_currency and cr.f_currency2=1 [cr]"
-                       ;
-
+                    ;
     fColumnsFields << "oh.f_id as f_header"
                    << "ot.f_receiptnumber"
                    << "concat(oh.f_prefix, oh.f_hallid) as f_number"
@@ -45,10 +38,6 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
                    << "gg.f_name as f_goodsname"
                    << "gg.f_scancode"
                    << "gu.f_name as f_goodsunit"
-                   << "gca.f_name as gname1"
-                   << "gcb.f_name as gname2"
-                   << "gcc.f_name as gname3"
-                   << "gcd.f_name as gname4"
                    << "concat_ws(', ', cpb.f_name, cpb.f_taxname, cpb.f_address) as f_buyer"
                    << "cpb.f_taxcode as f_buyertaxcode"
                    << "og.f_discountfactor*100 as f_discountfactor"
@@ -62,39 +51,32 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
                    << "sum(og.f_total*og.f_sign) as f_total"
                    << "asd.f_price as f_selfcost"
                    << "sum(asd.f_price*og.f_qty*og.f_sign) as f_selfcosttotal"
-                      ;
-
+                   ;
     fColumnsGroup << "oh.f_id as f_header"
                   << "ot.f_receiptnumber"
                   << "concat(oh.f_prefix, oh.f_hallid) as f_number"
-                   << "oh.f_datecash"
-                   << "hl.f_name as f_hallname"
-                   << "s.f_name as f_storename"
-                   << "gg.f_name as f_goodsname"
-                   << "gg.f_scancode"
-                   << "gr.f_name as f_goodsgroup"
-                   << "gu.f_name as f_goodsunit"
-                   << "concat_ws(', ', cpb.f_name, cpb.f_taxname, cpb.f_address) as f_buyer"
-                   << "cpb.f_taxcode as f_buyertaxcode"
-                   << "gca.f_name as gname1"
-                   << "gcb.f_name as gname2"
-                   << "gcc.f_name as gname3"
-                   << "gcd.f_name as gname4"
-                   << "og.f_discountfactor*100 as f_discountfactor"
-                   << "og.f_price"
-                   << "gpr.f_price1"
-                   << "gpr.f_price2"
-                    << "asd.f_price as f_selfcost"
-                      ;
-
+                  << "oh.f_datecash"
+                  << "hl.f_name as f_hallname"
+                  << "s.f_name as f_storename"
+                  << "gg.f_name as f_goodsname"
+                  << "gg.f_scancode"
+                  << "gr.f_name as f_goodsgroup"
+                  << "gu.f_name as f_goodsunit"
+                  << "concat_ws(', ', cpb.f_name, cpb.f_taxname, cpb.f_address) as f_buyer"
+                  << "cpb.f_taxcode as f_buyertaxcode"
+                  << "og.f_discountfactor*100 as f_discountfactor"
+                  << "og.f_price"
+                  << "gpr.f_price1"
+                  << "gpr.f_price2"
+                  << "asd.f_price as f_selfcost"
+                  ;
     fColumnsSum << "f_qty"
                 << "f_total"
                 << "f_discamount"
                 << "f_totalsaleprice"
                 << "f_totalsaleprice2"
                 << "f_selfcosttotal"
-                      ;
-
+                ;
     fTranslation["f_header"] = tr("UUID");
     fTranslation["f_receiptnumber"] = tr("Tax receipt");
     fTranslation["f_number"] = tr("Number");
@@ -106,10 +88,6 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
     fTranslation["f_goodsunit"] = tr("Unit");
     fTranslation["f_qty"] = tr("Qty");
     fTranslation["f_total"] = tr("Total");
-    fTranslation["gname1"] = tr("Class 1");
-    fTranslation["gname2"] = tr("Class 2");
-    fTranslation["gname3"] = tr("Class 3");
-    fTranslation["gname4"] = tr("Class 4");
     fTranslation["f_groupname"] = tr("Group");
     fTranslation["f_hallname"] = tr("Hall");
     fTranslation["f_buyer"] = tr("Buyer");
@@ -123,8 +101,6 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
     fTranslation["f_totalsaleprice2"] = tr("Total of whosale price");
     fTranslation["f_selfcost"] = tr("Selfcost");
     fTranslation["f_selfcosttotal"] = tr("Selfcost total");
-
-
     fColumnsVisible["oh.f_id as f_header"] = true;
     fColumnsVisible["ot.f_receiptnumber"] = true;
     fColumnsVisible["concat(oh.f_prefix, oh.f_hallid) as f_number"] = true;
@@ -136,10 +112,6 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
     fColumnsVisible["gu.f_name as f_goodsunit"] = true;
     fColumnsVisible["sum(og.f_qty*og.f_sign) as f_qty"] = true;
     fColumnsVisible["sum(og.f_total*og.f_sign) as f_total"] = true;
-    fColumnsVisible["gca.f_name as gname1"] = true;
-    fColumnsVisible["gcb.f_name as gname2"] = true;
-    fColumnsVisible["gcc.f_name as gname3"] = true;
-    fColumnsVisible["gcd.f_name as gname4"] = true;
     fColumnsVisible["hl.f_name as f_hallname"] = true;
     fColumnsVisible["concat_ws(', ', cpb.f_name, cpb.f_taxname, cpb.f_address) as f_buyer"] = false;
     fColumnsVisible["cpb.f_taxcode as f_buyertaxcode"] = false;
@@ -152,10 +124,9 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
     fColumnsVisible["sum(gpr.f_price2*og.f_qty) as f_totalsaleprice2"] = false;
     fColumnsVisible["asd.f_price as f_selfcost"] = false;
     fColumnsVisible["sum(asd.f_price*og.f_qty*og.f_sign) as f_selfcosttotal"] = false;
-
     restoreColumnsVisibility();
     fFilterWidget = new CR5SaleFromStoreFilter(fDBParams);
-    fFilter = static_cast<CR5SaleFromStoreFilter*>(fFilterWidget);
+    fFilter = static_cast<CR5SaleFromStoreFilter *>(fFilterWidget);
 }
 
 QToolBar *CR5SaleFromStore::toolBar()
@@ -193,6 +164,5 @@ bool CR5SaleFromStore::tblDoubleClicked(int row, int column, const QList<QVarian
     }
     auto *doc = __mainWindow->createTab<C5SaleDoc>(fDBParams);
     doc->openDoc(values.at(fModel->indexForColumnName("f_header")).toString());
-
     return true;
 }

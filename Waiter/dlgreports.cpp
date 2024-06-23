@@ -59,18 +59,18 @@ void DlgReports::getDailyCommon(const QDate &date1, const QDate &date2)
 void DlgReports::setLangIcon()
 {
     switch (C5Config::getRegValue("receipt_language").toInt()) {
-    case 0:
-        ui->btnReceiptLanguage->setIcon(QIcon(":/armenia.png"));
-        C5Config::setRegValue("receipt_language", LANG_AM);
-        break;
-    case 1:
-        ui->btnReceiptLanguage->setIcon(QIcon(":/usa.png"));
-        C5Config::setRegValue("receipt_language", LANG_EN);
-        break;
-    case 2:
-        ui->btnReceiptLanguage->setIcon(QIcon(":/russia.png"));
-        C5Config::setRegValue("receipt_language", LANG_RU);
-        break;
+        case 0:
+            ui->btnReceiptLanguage->setIcon(QIcon(":/armenia.png"));
+            C5Config::setRegValue("receipt_language", LANG_AM);
+            break;
+        case 1:
+            ui->btnReceiptLanguage->setIcon(QIcon(":/usa.png"));
+            C5Config::setRegValue("receipt_language", LANG_EN);
+            break;
+        case 2:
+            ui->btnReceiptLanguage->setIcon(QIcon(":/russia.png"));
+            C5Config::setRegValue("receipt_language", LANG_RU);
+            break;
     }
 }
 
@@ -111,37 +111,30 @@ void DlgReports::handleDailyCommon(const QJsonObject &obj)
     ui->tblTotal->setVerticalHeaderLabels(l);
 }
 
-void DlgReports::handleReportsList(const QJsonObject &obj)
+void DlgReports::reportListResponse(const QJsonObject &obj)
 {
-    sender()->deleteLater();
-    if (obj["reply"].toInt() != 0) {
-        C5Message::error(obj["msg"].toString());
-        return;
-    }
+    fHttp->httpQueryFinished(sender());
     QString file;
-    if (!DlgReportsList::getReport(obj["reports"].toArray(), file)) {
+    if (!DlgReportsList::getReport(obj["list"].toArray(), file)) {
         return;
     }
-    C5SocketHandler *sh = createSocketHandler(SLOT(handlePrintReport(QJsonObject)));
-    sh->bind("cmd", sm_waiter_report);
-    sh->bind("file", file);
-    sh->bind("date1", ui->date1->date().toString(FORMAT_DATE_TO_STR_MYSQL));
-    sh->bind("date2", ui->date2->date().toString(FORMAT_DATE_TO_STR_MYSQL));
-    sh->bind("shift", QString::number(fShiftId));
-    sh->bind("paper_width", __c5config.getValue(param_print_paper_width).toInt() == 0 ? 650 : __c5config.getValue(param_print_paper_width).toInt());
-    sh->bind("receipt_printer", __c5config.fSettingsName);
-    sh->send();
+    fHttp->createHttpQuery(QString("/engine/waiter/reports/%1.php").arg(file),
+    QJsonObject{{"date1", ui->date1->date().toString(FORMAT_DATE_TO_STR_MYSQL)},
+        {"date2", ui->date2->date().toString(FORMAT_DATE_TO_STR_MYSQL)}},
+    SLOT(printReportResponse(QJsonObject)));
 }
 
-void DlgReports::handlePrintReport(const QJsonObject &obj)
+void DlgReports::printReportResponse(const QJsonObject &obj)
 {
-    sender()->deleteLater();
     if (obj["reply"].toInt() != 0) {
         C5Message::error(obj["msg"].toString());
         return;
     }
-    C5PrintJson *pj = new C5PrintJson(obj["report"].toArray());
+    QJsonArray ja = obj["report"].toArray();
+    ja.append(QJsonObject{{"cmd", "print"}, {"printer", __c5config.localReceiptPrinter()}, {"pagesize", QPageSize::Custom}});
+    C5PrintJson *pj = new C5PrintJson(ja);
     pj->start();
+    fHttp->httpQueryFinished(sender());
 }
 
 void DlgReports::handleReceipt(const QJsonObject &obj)
@@ -202,9 +195,7 @@ void DlgReports::on_btnExit_clicked()
 
 void DlgReports::on_btnReports_clicked()
 {
-    C5SocketHandler *sh = createSocketHandler(SLOT(handleReportsList(QJsonObject)));
-    sh->bind("cmd", sm_reports);
-    sh->send();
+    fHttp->createHttpQuery("/engine/waiter/reports/list.php", QJsonObject(), SLOT(reportListResponse(QJsonObject)));
 }
 
 void DlgReports::on_btnPrintOrderReceipt_clicked()
@@ -235,7 +226,6 @@ void DlgReports::on_btnPrintOrderReceipt_clicked()
     } else if (db.getDouble("f_amountcard") > 0.001) {
         tax = 1;
     }
-
     C5SocketHandler *sh = createSocketHandler(SLOT(handleReceipt(QJsonObject)));
     sh->bind("cmd", sm_printreceipt);
     sh->bind("staffid", QString::number(fUser->id()));
@@ -299,40 +289,35 @@ void DlgReports::on_btnPrintTaxZ_clicked()
     sh->send();
 }
 
-
 void DlgReports::on_btnCashobx_clicked()
 {
-   bool closecash = false;
-   bool printreport = false;
-   switch (DlgCashButtonOpions::getOptions()) {
-   case 0:
-       return;
-   case 1:
-       break;
-   case 2:
-       printreport = true;
-       break;
-   case 3:
-       printreport = true;
-       closecash = true;
-       break;
-   }
-
-   C5Database db(__c5config.dbParams());
-   db.exec("SELECT 'Մուտք', 'title', 0, '' "
+    bool closecash = false;
+    bool printreport = false;
+    switch (DlgCashButtonOpions::getOptions()) {
+        case 0:
+            return;
+        case 1:
+            break;
+        case 2:
+            printreport = true;
+            break;
+        case 3:
+            printreport = true;
+            closecash = true;
+            break;
+    }
+    C5Database db(__c5config.dbParams());
+    db.exec("SELECT 'Մուտք', 'title', 0, '' "
             "UNION "
-
             "SELECT en.f_name AS f_cashname, ah.f_comment, sum(e.f_amount), '' "
             "FROM e_cash e "
             "LEFT JOIN e_cash_names en ON en.f_id=e.f_cash "
             "LEFT join a_header ah ON ah.f_id=e.f_header "
             "WHERE e.f_sign=1 and ah.f_sessionid IS NULL "
             "GROUP BY 1, 2 "
-
             "UNION "
             "SELECT 'Ելք', 'title', 0, '' "
             "union "
-
             "SELECT en.f_name AS f_cashname, concat_ws(' ',ah.f_comment, p.f_name) as f_comment,  sum(e.f_amount*-1), "
             "e.f_id "
             "FROM e_cash e "
@@ -341,121 +326,116 @@ void DlgReports::on_btnCashobx_clicked()
             "left join c_partners p on p.f_id=ah.f_partner "
             "WHERE e.f_sign=-1 and ah.f_sessionid IS NULL "
             "GROUP BY 1, 2, 4 "
-
             "UNION "
             "SELECT 'վերջնահաշվարկ', 'title', 0, '' "
             "union "
-
             "SELECT en.f_name AS f_cashname, '',  sum(e.f_amount*e.f_sign), '' "
             "FROM e_cash e "
             "LEFT JOIN e_cash_names en ON en.f_id=e.f_cash "
             "LEFT join a_header ah ON ah.f_id=e.f_header "
             "WHERE ah.f_sessionid IS NULL "
             "GROUP BY 1");
-
-   if (!printreport) {
-       DlgViewCashReport d;
-       double total = -1000000000;
-       while (db.nextRow()) {
-        if (db.getString(1) == "title") {
-            if (total > -1000000000) {
-                d.addTotal(total);
+    if (!printreport) {
+        DlgViewCashReport d;
+        double total = -1000000000;
+        while (db.nextRow()) {
+            if (db.getString(1) == "title") {
+                if (total > -1000000000) {
+                    d.addTotal(total);
+                }
+                total = 0;
+                d.addTitle(db.getString(0));
+                continue;
             }
-            total = 0;
-            d.addTitle(db.getString(0));
-            continue;
+            d.addRow(db.getString(0) + " " + db.getString(1), db.getDouble(2));
+            total += db.getDouble(2);
         }
-        d.addRow(db.getString(0) + " " + db.getString(1), db.getDouble(2));
-        total += db.getDouble(2);
-       }
-       if (total > -1000000000) {
-           d.addTotal(total);
-       }
-       if (d.exec() == QDialog::Accepted) {
-           printreport = true;
-           db.first();
-       } else {
-        return;
-       }
-   }
-
-   if (printreport) {
-       int bs = 22;
-       QFont font(qApp->font());
-       font.setPointSize(bs);
-       C5Printing p;
-       p.setSceneParams(650, 2600, QPrinter::Portrait);
-       p.setFont(font);
-       p.image("./logo_receipt.png", Qt::AlignHCenter);
-       p.br();
-       p.setFontSize(bs + 2);
-       p.setFontBold(true);
-       p.ctext(QDate::currentDate().toString(FORMAT_DATE_TO_STR));
-       p.br();
-       if (closecash) {
-           p.setFontSize(bs + 4);
-           p.setFontBold(true);
-           p.ctext(tr("Cash closing"));
-           p.br();
-       }
-       double total = -1000000000;
-       while (db.nextRow()) {
-        if (db.getString(1) == "title") {
-            if (total > -1000000000) {
+        if (total > -1000000000) {
+            d.addTotal(total);
+        }
+        if (d.exec() == QDialog::Accepted) {
+            printreport = true;
+            db.first();
+        } else {
+            return;
+        }
+    }
+    if (printreport) {
+        int bs = 22;
+        QFont font(qApp->font());
+        font.setPointSize(bs);
+        C5Printing p;
+        p.setSceneParams(650, 2600, QPrinter::Portrait);
+        p.setFont(font);
+        p.image("./logo_receipt.png", Qt::AlignHCenter);
+        p.br();
+        p.setFontSize(bs + 2);
+        p.setFontBold(true);
+        p.ctext(QDate::currentDate().toString(FORMAT_DATE_TO_STR));
+        p.br();
+        if (closecash) {
+            p.setFontSize(bs + 4);
+            p.setFontBold(true);
+            p.ctext(tr("Cash closing"));
+            p.br();
+        }
+        double total = -1000000000;
+        while (db.nextRow()) {
+            if (db.getString(1) == "title") {
+                if (total > -1000000000) {
+                    p.setFontSize(bs + 2);
+                    p.setFontBold(true);
+                    p.ltext(tr("Total"), 0, 490);
+                    p.rtext(float_str(total, 2));
+                    p.br();
+                    p.line();
+                    p.br();
+                    p.line();
+                    p.br();
+                    p.line();
+                    p.br(2);
+                    p.br(2);
+                }
+                total = 0;
                 p.setFontSize(bs + 2);
                 p.setFontBold(true);
-                p.ltext(tr("Total"), 0, 490);
-                p.rtext(float_str(total, 2));
+                p.ctext(db.getString(0));
                 p.br();
                 p.line();
                 p.br();
-                p.line();
-                p.br();
-                p.line();
-                p.br(2);
-                p.br(2);
+                continue;
             }
-            total = 0;
+            p.setFontSize(bs);
+            p.setFontBold(false);
+            total += db.getDouble(2);
+            p.ltext(db.getString(0) + " " + db.getString(1), 0, 490);
+            p.rtext(float_str(db.getDouble(2), 2));
+            p.br();
+        }
+        if (total > -1000000000) {
             p.setFontSize(bs + 2);
             p.setFontBold(true);
-            p.ctext(db.getString(0));
+            p.ltext(tr("Total"), 0, 490);
+            p.rtext(float_str(total, 2));
             p.br();
             p.line();
             p.br();
-            continue;
+            p.line();
+            p.br();
+            p.line();
+            p.br(2);
+            p.br(2);
         }
-        p.setFontSize(bs);
-        p.setFontBold(false);
-        total += db.getDouble(2);
-        p.ltext(db.getString(0) + " " + db.getString(1), 0, 490);
-        p.rtext(float_str(db.getDouble(2), 2));
+        p.setFontSize(bs - 4);
+        p.ltext(tr("Printed"), 0);
+        p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
         p.br();
-       }
-       if (total > -1000000000) {
-           p.setFontSize(bs + 2);
-           p.setFontBold(true);
-           p.ltext(tr("Total"), 0, 490);
-           p.rtext(float_str(total, 2));
-           p.br();
-           p.line();
-           p.br();
-           p.line();
-           p.br();
-           p.line();
-           p.br(2);
-           p.br(2);
-       }
-       p.setFontSize(bs - 4);
-       p.ltext(tr("Printed"), 0);
-       p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
-       p.br();
-       p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
-   }
-
-   if (closecash) {
-       db[":f_sessionid"] = QDateTime::currentDateTime().toString("dd/MM/yyyy HH:mm:ss");
-       db.exec("update a_header set f_sessionid=:f_sessionid where f_sessionid is null");
-   }
+        p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
+    }
+    if (closecash) {
+        db[":f_sessionid"] = QDateTime::currentDateTime().toString("dd/MM/yyyy HH:mm:ss");
+        db.exec("update a_header set f_sessionid=:f_sessionid where f_sessionid is null");
+    }
 }
 
 void DlgReports::on_btnCashInput_clicked()
@@ -466,24 +446,20 @@ void DlgReports::on_btnCashInput_clicked()
         return;
     }
     C5Database db(__c5config.dbParams());
-
     C5CashDoc *doc = new C5CashDoc(__c5config.dbParams());
     doc->setRelation(true);
     doc->setCashOutput(__c5config.cashId());
     doc->setDate(QDate::currentDate());
     doc->addRow(tr("Change output"), cash);
     doc->save(true);
-
     db[":f_id"] = doc->uuid();
     db.exec("update a_header set f_sessionid=uuid() where f_Id=:f_id");
-
     C5CashDoc *d2 = new C5CashDoc(__c5config.dbParams());
     d2->setRelation(true);
     d2->setCashInput(__c5config.cashId());
     d2->setDate(QDate::currentDate());
     d2->addRow(tr("Change input"), cash);
     d2->save(true);
-
     int bs = 22;
     QFont font(qApp->font());
     font.setPointSize(bs);
@@ -496,23 +472,18 @@ void DlgReports::on_btnCashInput_clicked()
     p.setFontBold(true);
     p.ctext(QDate::currentDate().toString(FORMAT_DATE_TO_STR));
     p.br();
-
-        p.setFontSize(bs + 4);
-        p.setFontBold(true);
-        p.ctext(tr("Change input"));
-        p.br();
-
-
-     p.setFontSize(bs);
-     p.setFontBold(false);
-     p.ctext(float_str(cash, 2));
-     p.br();
-
-     p.setFontSize(bs - 4);
-     p.ltext(tr("Printed"), 0);
-     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
-     p.br();
-
+    p.setFontSize(bs + 4);
+    p.setFontBold(true);
+    p.ctext(tr("Change input"));
+    p.br();
+    p.setFontSize(bs);
+    p.setFontBold(false);
+    p.ctext(float_str(cash, 2));
+    p.br();
+    p.setFontSize(bs - 4);
+    p.ltext(tr("Printed"), 0);
+    p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
+    p.br();
     p.setFontSize(bs - 4);
     p.setFontBold(false);
     p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);

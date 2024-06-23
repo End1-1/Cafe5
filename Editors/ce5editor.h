@@ -4,6 +4,7 @@
 #include "c5widget.h"
 #include "c5editor.h"
 #include <QSet>
+#include <QJsonObject>
 
 class C5LineEditWithSelector;
 class C5CheckBox;
@@ -42,10 +43,17 @@ public:
 
     void setDatabase(const QStringList &dbParams);
 
+    virtual QJsonObject makeJsonObject();
+
+    virtual bool acceptOnSave() const;
+
     QWidget *fEditor;
 
+    QJsonObject fData;
+
     template<typename T>
-    bool getId(QString &id) {
+    bool getId(QString &id)
+    {
         T *ep = new T(fDBParams);
         C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
         QList<QMap<QString, QVariant> > data;
@@ -63,15 +71,18 @@ protected:
 private:
     C5LineEditWithSelector *findLineEditWithId();
 
-    QSet<C5LineEditWithSelector*> fLines;
+    QSet<C5LineEditWithSelector *> fLines;
 
-    QSet<C5ComboBox*> fCombos;
+    QSet<C5ComboBox *> fCombos;
 
-    QSet<C5CheckBox*> fChecks;
+    QSet<C5CheckBox *> fChecks;
 
-    QSet<C5DateEdit*> fDates;
+    QSet<C5DateEdit *> fDates;
 
-    QSet<QPlainTextEdit*> fPlainText;
+    QSet<QPlainTextEdit *> fPlainText;
+
+signals:
+    void Accept();
 };
 
 #endif // CE5EDITOR_H

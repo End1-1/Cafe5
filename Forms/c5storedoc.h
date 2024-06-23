@@ -2,16 +2,17 @@
 #define C5STOREDOC_H
 
 #include "c5document.h"
-#include "ogoods.h"
 #include <QLabel>
 
-namespace Ui {
+namespace Ui
+{
 class C5StoreDoc;
 }
 
 class QTableWidgetItem;
 
-class TableCell : public QLabel {
+class TableCell : public QLabel
+{
 public:
     QTableWidgetItem *fOldItem;
 
@@ -67,7 +68,7 @@ public:
 
 public slots:
     void saveDoc();
-    
+
 protected:
     virtual bool eventFilter(QObject *o, QEvent *e) override;
 
@@ -116,7 +117,8 @@ private:
 
     int addGoodsRow();
 
-    int addGoods(int goods, const QString &name, double qty, const QString &unit, double price, double total, const QString &comment);
+    int addGoods(int goods, const QString &name, double qty, const QString &unit, double price, double total,
+                 const QString &comment);
 
     void setDocEnabled(bool v);
 
@@ -146,6 +148,8 @@ private slots:
     void lineEditKeyPressed(const QChar &key);
 
     void focusNextChildren();
+
+    void changeCurrencyResponse(const QJsonObject &jdoc);
 
     void exportToExcel();
 
@@ -248,9 +252,14 @@ private slots:
     void on_btnAddPackages_clicked();
 
     void on_btnChangePartner_clicked();
+
     void on_btnFixPartner_clicked(bool checked);
+
     void on_btnCopyLastAdd_clicked();
+
     void on_btnCompressRow_clicked();
+
+    void on_cbCurrency_currentIndexChanged(int index);
 };
 
 #endif // C5STOREDOC_H

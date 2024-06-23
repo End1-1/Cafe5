@@ -4,7 +4,8 @@
 #include "c5dialog.h"
 #include <QTcpServer>
 
-namespace Ui {
+namespace Ui
+{
 class DlgScreen;
 }
 
@@ -18,6 +19,8 @@ public:
 
 private slots:
     void newConnection();
+
+    void loginResponse(const QJsonObject &jdoc);
 
     void timerTimeout();
 
@@ -52,14 +55,6 @@ private slots:
     void on_btnAccept_clicked();
 
     void on_lePassword_returnPressed();
-
-    void on_btnHall_clicked();
-
-    void on_btnSystem_clicked();
-
-    void on_btnWorkersInOut_clicked();
-
-    void on_btnManagerTools_clicked();
 
 private:
     Ui::DlgScreen *ui;

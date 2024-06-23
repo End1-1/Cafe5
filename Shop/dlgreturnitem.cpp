@@ -7,7 +7,7 @@
 #include "printreceipt.h"
 
 DlgReturnItem::DlgReturnItem() :
-    C5Dialog(__c5config.replicaDbParams()),
+    C5Dialog(__c5config.dbParams()),
     ui(new Ui::DlgReturnItem)
 {
     ui->setupUi(this);

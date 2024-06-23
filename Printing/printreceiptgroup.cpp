@@ -484,7 +484,7 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
         p.rtext(QString::number(jtax["rseq"].toInt()));
         p.br();
         p.ltext(tr("Date"), 0);
-        p.rtext(oh.dateCash.toString(FORMAT_DATETIME_TO_STR));
+        p.rtext(oh.dateCash.toString(FORMAT_DATE_TO_STR) + " " + oh.timeClose.toString(FORMAT_TIME_TO_SHORT_STR));
         p.br();
         p.ltext(tr("(F)"), 0);
     }

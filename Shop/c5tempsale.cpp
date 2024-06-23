@@ -19,43 +19,14 @@ C5TempSale::~C5TempSale()
     delete ui;
 }
 
-void C5TempSale::openDraft()
+QString C5TempSale::openDraft()
 {
     int r = ui->tbl->currentRow();
     if (r < 0) {
-        return;
+        return "";
     }
     QString draftId = ui->tbl->item(r, 0)->text();
-    if (Working::working()->findDraft(draftId)) {
-        return;
-    }
-    C5Database db(__c5config.replicaDbParams());
-    db[":f_id"] = draftId;
-    db.exec("select * from o_draft_sale where f_id=:f_id");
-    ODraftSale ds;
-    ds.getRecord(db);
-    WOrder *wo = Working::working()->newSale(ds.saleType);
-    wo->fDraftSale.id = ds.id;
-    QJsonObject params;
-    params["f_header"] = wo->fDraftSale.id.toString();
-    params["f_store"] = __c5config.defaultStore();
-    QString sql = QString("select sf_open_draft('%1')").arg(__jsonstr(params));
-    db.exec(sql);
-    if (!db.nextRow()) {
-        return;
-    }
-    params = __strjson(db.getString(0));
-    if (params["status"].toInt() == 0) {
-        return;
-    }
-    QJsonArray ja = params["data"].toArray();
-    for (int i = 0; i < ja.size(); i++) {
-        QJsonObject jo = ja.at(i).toObject();
-        wo->addGoodsToTable(jo["f_goods"].toInt(), true, jo["f_storeqty"].toDouble(),
-                            jo["f_id"].toString(), jo["f_price1"].toDouble(),
-                            jo["f_price2"].toDouble());
-        wo->changeQty(jo["f_qty"].toDouble());
-    }
+    return draftId;
 }
 
 void C5TempSale::on_tbl_itemDoubleClicked(QTableWidgetItem *item)
@@ -89,16 +60,18 @@ void C5TempSale::on_btnTrash_clicked()
         return;
     }
     if (C5Message::question(tr("Confirm to remove")) == QDialog::Accepted) {
-        C5Database db(__c5config.replicaDbParams());
+        C5Database db(__c5config.dbParams());
         db[":f_id"] = ui->tbl->item(r, 0)->text();
         db.exec("update o_draft_sale set f_state=4 where f_id=:f_id");
+        db[":f_header"] = ui->tbl->item(r, 0)->text();
+        db.exec("update o_draft_sale_body set f_state=4 where f_header=:f_header");
         refreshData();
     }
 }
 
 void C5TempSale::refreshData()
 {
-    C5Database db(__c5config.replicaDbParams());
+    C5Database db(__c5config.dbParams());
     db.exec("select d.f_id, d.f_date, d.f_time, concat_ws(' ', u.f_last, u.f_first), "
             "d.f_amount "
             "from o_draft_sale d "

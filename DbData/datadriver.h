@@ -53,6 +53,8 @@
 #define dbdishremovereason DataDriver::fInstance->fDbDishRemoveReason
 #define dbcurrency DataDriver::fInstance->fDbCurrency
 
+class DlgSplashScreen;
+
 class DataDriver
 {
 public:
@@ -106,9 +108,11 @@ public:
 
     DbCurrency *fDbCurrency;
 
-    static void init(const QStringList &dbParams);
+    static void init(const QStringList &dbParams, DlgSplashScreen *info);
 
     static DataDriver *fInstance;
+
+    static QStringList norefresh;
 };
 
 #endif // DATADRIVER_H

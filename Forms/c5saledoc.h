@@ -7,7 +7,8 @@
 #include "odraftsalebody.h"
 #include <QJsonObject>
 
-namespace Ui {
+namespace Ui
+{
 class C5SaleDoc;
 }
 
@@ -29,6 +30,8 @@ public:
     bool openDoc(const QString &uuid);
 
 private slots:
+    void makeDraftResponse(const QJsonObject &jdoc);
+    void removeDocResponse(const QJsonObject &jdoc);
     void amountDoubleClicked();
     void printSale();
     void fiscale();
@@ -75,7 +78,8 @@ private:
     QAction *fActionReturn;
     void saveReturnItems();
     int addGoods(int goodsId, C5Database &db);
-    int addGoods(const QString &uuid, int store, int goodsId, const QString &barcode, const QString &name, const QString &unitname, double qty, double price, double discount, int isService, const QString &returnFrom);
+    int addGoods(const QString &uuid, int store, int goodsId, const QString &barcode, const QString &name,
+                 const QString &unitname, double qty, double price, double discount, int isService, const QString &returnFrom);
     void countGrandTotal();
     bool openDraft(const QString &id);
     void setPartner();

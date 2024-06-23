@@ -8,7 +8,6 @@
 #include "c5dishwidget.h"
 #include "c5mainwindow.h"
 #include "proxytablewidgetdatabase.h"
-#include "doubledatabase.h"
 #include "c5cashdoc.h"
 #include "c5airlog.h"
 #include "dlgsetwaiterordercl.h"
@@ -402,15 +401,14 @@ void C5WaiterOrder::on_btnSetCL_clicked()
         db[":f_code"] = clcode;
         db[":f_name"] = clname;
         db.update("o_pay_cl", "f_id", ui->leUuid->text());
-        DoubleDatabase fDD;
-        fDD.open();
-        fDD[":f_id"] = ui->leNumber->text();
-        fDD[":f_paymentmode"] = 4;
-        fDD[":f_dc"] = "DEBIT";
-        fDD[":f_sign"] = -1;
-        fDD[":f_cityledger"] = clcode.toInt();
-        if (!fDD.exec("update m_register set f_cityledger=:f_cityledger, f_paymentmode=:f_paymentmode, f_dc=:f_dc, f_sign=:f_sign where f_id=:f_id")) {
-            C5Message::error(fDD.fLastError);
+        db[":f_id"] = ui->leNumber->text();
+        db[":f_paymentmode"] = 4;
+        db[":f_dc"] = "DEBIT";
+        db[":f_sign"] = -1;
+        db[":f_cityledger"] = clcode.toInt();
+        if (!db.exec(QString("update %1.m_register set f_cityledger=:f_cityledger, "
+                             "f_paymentmode=:f_paymentmode, f_dc=:f_dc, f_sign=:f_sign where f_id=:f_id").arg(__c5config.hotelDatabase()))) {
+            C5Message::error(db.fLastError);
             return;
         }
         C5Message::info(tr("Saved"));
@@ -424,11 +422,10 @@ void C5WaiterOrder::on_btnClearCL_clicked()
         db[":f_code"] = "";
         db[":f_name"] = "";
         db.update("o_pay_cl", "f_id", ui->leUuid->text());
-        DoubleDatabase fDD;
-        fDD.open();
-        fDD[":f_id"] = ui->leNumber->text();
-        fDD[":f_cityledger"] = 0;
-        fDD.exec("update m_register set f_cityledger=:f_cityledger where f_id=:f_id");
+        db[":f_id"] = ui->leNumber->text();
+        db[":f_cityledger"] = 0;
+        db.exec(QString("update %1.m_register set f_cityledger=:f_cityledger where f_id=:f_id").arg(
+                    __c5config.hotelDatabase()));
         C5Message::info(tr("Saved"));
     }
 }

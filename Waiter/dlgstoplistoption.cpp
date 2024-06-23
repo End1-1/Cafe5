@@ -5,6 +5,7 @@
 #include "dlgorder.h"
 #include "stoplist.h"
 #include "dlgviewstoplist.h"
+#include "c5tabledata.h"
 #include "c5printing.h"
 #include "c5logtoserverthread.h"
 #include "c5user.h"
@@ -52,15 +53,13 @@ void DlgStopListOption::handlePrintStopList(const QJsonObject &obj)
         if (C5Menu::fStopList.isEmpty()) {
             return;
         }
-
-        QList<int> menu = dbmenu->list();
+        QList<int> menu; //QList<int> menu = dbmenu->list();
         QMap<QString, QList<int> > printList;
-        for (int id: menu) {
-            if (C5Menu::fStopList.contains(dbmenu->dishid(id))) {
-                printList[dbmenu->print1(id)].append(dbmenu->dishid(id));
-            }
-        }
-
+        // for (int id: menu) {
+        //     // if (C5Menu::fStopList.contains(dbmenu->dishid(id))) {
+        //     //     printList[dbmenu->print1(id)].append(dbmenu->dishid(id));
+        //     // }
+        // }
         for (QMap<QString, QList<int> >::const_iterator sq = printList.constBegin(); sq != printList.constEnd(); sq++) {
             QFont font(qApp->font());
             font.setPointSize(20);
@@ -80,7 +79,7 @@ void DlgStopListOption::handlePrintStopList(const QJsonObject &obj)
             p.br();
             for (QMap<int, double>::const_iterator it = C5Menu::fStopList.constBegin(); it != C5Menu::fStopList.constEnd(); it++) {
                 if (sq.value().contains(it.key())) {
-                    p.ltext(dbdish->name(it.key()), 0);
+                    p.ltext(tds("d_dish", "f_name", it.key()), 0);
                     p.rtext(float_str(it.value(), 2));
                     p.br();
                     p.line();

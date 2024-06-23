@@ -2,9 +2,9 @@
 #define DLGSEARCHINMENU_H
 
 #include "c5dialog.h"
-#include "c5menu.h"
 
-namespace Ui {
+namespace Ui
+{
 class DlgSearchInMenu;
 }
 
@@ -22,7 +22,7 @@ public:
 private:
     Ui::DlgSearchInMenu *ui;
 
-    void extractDishes(const DPart2 &p2);
+    void extractDishes(int &p2);
 
 private slots:
     void searchDish(const QString &name);

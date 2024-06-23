@@ -3,7 +3,8 @@
 
 #include "c5filterwidget.h"
 
-namespace Ui {
+namespace Ui
+{
 class CR5ConsumptionBySalesFilterDraft;
 }
 
@@ -16,7 +17,7 @@ public:
 
     ~CR5ConsumptionBySalesFilterDraft();
 
-    virtual QString condition();
+    virtual QString condition() override;
 
     virtual QString filterText() override;
 
@@ -29,14 +30,6 @@ public:
     QDate date2();
 
     QString group() const;
-
-    QString class1() const;
-
-    QString class2() const;
-
-    QString class3() const;
-
-    QString class4() const;
 
 private:
     Ui::CR5ConsumptionBySalesFilterDraft *ui;

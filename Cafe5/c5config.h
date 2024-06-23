@@ -177,8 +177,6 @@ public:
 
     static QStringList dbParams();
 
-    static QStringList replicaDbParams();
-
     static int defaultMenu();
 
     static QString defaultMenuName();

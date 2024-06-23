@@ -1,13 +1,14 @@
 #ifndef DLGSPLASHSCREEN_H
 #define DLGSPLASHSCREEN_H
 
-#include "c5dialog.h"
+#include <QDialog>
 
-namespace Ui {
+namespace Ui
+{
 class DlgSplashScreen;
 }
 
-class DlgSplashScreen : public C5Dialog
+class DlgSplashScreen : public QDialog
 {
     Q_OBJECT
 
@@ -15,8 +16,6 @@ public:
     explicit DlgSplashScreen();
 
     ~DlgSplashScreen();
-
-    void updateData();
 
 private:
     Ui::DlgSplashScreen *ui;

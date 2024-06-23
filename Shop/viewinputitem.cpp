@@ -8,7 +8,7 @@ ViewInputItem::ViewInputItem(const QString &code, QWidget *parent) :
     ui(new Ui::ViewInputItem)
 {
     ui->setupUi(this);
-    C5Database db(__c5config.replicaDbParams());
+    C5Database db(__c5config.dbParams());
     db[":f_id"] = code;
     db.exec("select * from a_store_draft where f_id=:f_id");
     db.nextRow();

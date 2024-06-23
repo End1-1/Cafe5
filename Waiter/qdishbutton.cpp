@@ -16,11 +16,10 @@ QDishButton::QDishButton(int minWidth, QWidget *parent) :
 void QDishButton::paintEvent(QPaintEvent *pe)
 {
     QPushButton::paintEvent(pe);
-
-    int id = dbmenu->dishid(property("id").toInt());
+    int id = property("id").toInt();
     bool stop = C5Menu::fStopList.contains(id);
     bool stopreached = false;
-    QString name = dbdish->name(id);
+    QString name = property("name").toString();
     if (stop) {
         double qty = C5Menu::fStopList[id];
         if (qty < 0.001) {
@@ -29,17 +28,15 @@ void QDishButton::paintEvent(QPaintEvent *pe)
             name = QString("[%1] %5").arg(float_str(qty, 2)).arg(name);
         }
     }
-
     QPainter p(this);
     QStyleOptionButton option;
     option.initFrom(this);
-    QColor bgcolor = option.state == QStyle::State_Sunken ? Qt::white : QColor::fromRgb(dbdish->color(id));
-    p.fillRect(pe->rect(), stopreached ? qRgba(0xee,0xee,0xee, 0) : bgcolor);
+    QColor bgcolor = option.state == QStyle::State_Sunken ? Qt::white : QColor::fromRgb(property("color").toInt());
+    p.fillRect(pe->rect(), stopreached ? qRgba(0xee, 0xee, 0xee, 0) : bgcolor);
     QRect r = pe->rect();
     p.setPen(QColor::fromRgb(44, 67, 131));
     p.drawRect(r);
     r.adjust(2, 2, -4, -4);
-
     QRect rectName = pe->rect();
     rectName.adjust(2, 2, -2, -2);
     QTextOption to;
@@ -47,16 +44,15 @@ void QDishButton::paintEvent(QPaintEvent *pe)
     to.setAlignment(Qt::AlignLeft);
     p.setPen(Qt::black);
     p.drawText(rectName, name, to);
-
     QRect rectPrice = option.rect;
     QFontMetrics fm(p.font());
-    QString price = float_str(dbmenu->price(property("id").toInt()), 2);
+    QString price = float_str(property("price").toDouble(), 2);
     rectPrice.adjust(rectPrice.width() - (fm.width(price) + 5), rectPrice.height() - (fm.height() + 5), -2, -2);
     p.drawText(rectPrice, price);
-
     if (stopreached) {
         QRect stopRect = pe->rect();
-        stopRect.adjust((stopRect.width() / 2) - 28, (stopRect.height() / 2) - 28, 28 - (stopRect.width() / 2), 28 - (stopRect.height() / 2));
+        stopRect.adjust((stopRect.width() / 2) - 28, (stopRect.height() / 2) - 28, 28 - (stopRect.width() / 2),
+                        28 - (stopRect.height() / 2));
         QPixmap px(":/stop.png");
         p.drawPixmap(stopRect, px);
     }

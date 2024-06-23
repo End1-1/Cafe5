@@ -34,6 +34,7 @@ HEADERS += \
 DEFINES += _APPLICATION_=\\\"Breeze\\\"
 DEFINES += _MODULE_=\\\"Service5_syncfromaws_dll\\\"
 DEFINES += _DBDRIVER_=\\\"QMARIADB\\\"
+DEFINES += VALSHIN
 
 INCLUDEPATH += ../../raw
 INCLUDEPATH += ../../socket

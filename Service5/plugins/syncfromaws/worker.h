@@ -5,9 +5,6 @@
 #include <QJsonArray>
 #include <QJsonObject>
 
-class QNetworkAccessManager;
-class QNetworkReply;
-
 class WaiterClientHandler : public QObject
 {
     Q_OBJECT
@@ -35,12 +32,18 @@ private:
 
     QHash<QString, QString> fDbConnectionSettings;
 
-    QNetworkAccessManager *mNetworkAccessManager;
+    void getLastId();
 
     void clearTask();
 
 private slots:
     void tasks();
+
+    void getLastIDResponse(const QJsonObject &jdoc);
+
+    void getDataResponse(const QJsonObject &jdoc);
+
+    void updateLocalResponse(const QJsonObject &jdoc);
 
     void taskFinish(const QJsonObject &ba);
 
@@ -48,13 +51,7 @@ private slots:
 
     void removeMeFromConnectionList(QString uuid);
 
-    void finished(QNetworkReply *r);
-
     void getSyncError(const QString &err);
-
-    void getSyncObject(const QJsonObject &ba);
-
-    void getLastTime(const QJsonObject &ba);
 
 signals:
     void handleData(RawMessage *, const QByteArray);

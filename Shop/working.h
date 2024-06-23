@@ -2,6 +2,7 @@
 #define WORKING_H
 
 #include "c5storedraftwriter.h"
+#include "ninterface.h"
 #include <QWidget>
 
 namespace Ui
@@ -48,7 +49,9 @@ public:
 
     void setActiveWidget(WOrder *w);
 
-    bool findDraft(const QString &draftid);
+    WOrder *findDraft(const QString &draftid);
+
+    void openDraft(const QString &draftid);
 
     static Working *working();
 
@@ -88,8 +91,14 @@ private:
 
     bool fUpFinished;
 
+    NInterface *http;
+
 private slots:
     void timeout();
+
+    void astoresaleResponse(const QJsonObject &jdoc);
+
+    void checkStoreResponse(const QJsonObject &jdoc);
 
     void uploadDataFinished();
 
@@ -168,7 +177,9 @@ private slots:
     void on_btnCostumerDisplay_clicked(bool checked);
 
     void on_btnOpenDraft_clicked();
+
     void on_btnColumns_clicked();
+
     void on_chRegisterCard_clicked();
 };
 

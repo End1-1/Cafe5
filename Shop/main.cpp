@@ -1,13 +1,14 @@
 #include "working.h"
 #include "c5config.h"
-#include "c5license.h"
 #include "dlgpin.h"
 #include "c5logsystem.h"
 #include "datadriver.h"
 #include "c5user.h"
 #include "c5servername.h"
 #include "settingsselection.h"
+#include "c5dialog.h"
 #include "c5systempreference.h"
+#include "c5message.h"
 #include "dlgsplashscreen.h"
 #include <QApplication>
 #include <QMessageBox>
@@ -21,6 +22,8 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QSettings>
+#include <QTextCodec>
+
 int main(int argc, char *argv[])
 {
 #ifndef QT_DEBUG
@@ -44,36 +47,39 @@ int main(int argc, char *argv[])
     auto *dlgsplash = new DlgSplashScreen();
     dlgsplash->show();
     dlgsplash->messageSignal("Get server name");
-    QString settingsName;
+    QString serverName, settingsName = "shop", rewriteConfig;
     bool noconfig = true;
     for (const QString &arg : a.arguments()) {
         if (arg.contains("/servername=")) {
             QStringList sn = arg.split("=", Qt::SkipEmptyParts);
             if (sn.length() == 2) {
-                C5ServerName sng(sn.at(1), "shop");
-                if (!sng.getServers()) {
-                    return 1;
-                }
-                noconfig = false;
-                QJsonObject js = sng.mServers.at(0).toObject();
-                C5Config::fDBHost = js["host"].toString();
-                C5Config::fDBPath = js["database"].toString();
-                C5Config::fDBUser = js["username"].toString();
-                C5Config::fDBPassword = js["password"].toString();
-                C5Config::fSettingsName = js["settings"].toString();
-                QSettings ss(_ORGANIZATION_, _APPLICATION_ + QString("\\") + _MODULE_);
-                ss.setValue("server", "");
+                serverName = sn.at(1);
             }
         } else if (arg.contains("/config")) {
             QStringList sn = arg.split("=", Qt::SkipEmptyParts);
             if (sn.length() == 2) {
                 settingsName = sn.at(1);
             }
+        } else if (arg.contains("rewriteconfig")) {
+            QStringList sn = arg.split("=");
+            if (sn.length() == 2) {
+                rewriteConfig = sn.at(1);
+            }
         }
     }
-    if (!settingsName.isEmpty()) {
-        C5Config::fSettingsName = settingsName;
+    C5ServerName sng(serverName, "shop");
+    if (!sng.getServers(settingsName)) {
+        return 1;
     }
+    noconfig = false;
+    QJsonObject js = sng.mServers.at(0).toObject();
+    C5Config::fDBHost = js["host"].toString();
+    C5Config::fDBPath = js["database"].toString();
+    C5Config::fDBUser = js["username"].toString();
+    C5Config::fDBPassword = js["password"].toString();
+    C5Config::fSettingsName = rewriteConfig.isEmpty() ? js["settings"].toString() : rewriteConfig;
+    QSettings ss(_ORGANIZATION_, _APPLICATION_ + QString("\\") + _MODULE_);
+    ss.setValue("server", "");
     if (noconfig) {
         QMessageBox::critical(0, "Error", "No config");
         return 1;
@@ -114,8 +120,8 @@ int main(int argc, char *argv[])
         pin.clear();
         user.clear();
     };
+    DataDriver::init(__c5config.dbParams(), dlgsplash);
     C5Config::initParamsFromDb();
-    dlgsplash->updateData();
     if (!C5SystemPreference::checkDecimalPointAndSeparator()) {
         return 0;
     }

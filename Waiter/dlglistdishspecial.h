@@ -3,7 +3,8 @@
 
 #include "c5dialog.h"
 
-namespace Ui {
+namespace Ui
+{
 class DlgListDishSpecial;
 }
 
@@ -16,14 +17,13 @@ class DlgListDishSpecial : public C5Dialog
 public:
     explicit DlgListDishSpecial(const QStringList &dbParams);
     ~DlgListDishSpecial();
-    static bool getSpecial(int dish, const QStringList &dbParams, QString &special);
+    static bool getSpecial(int dish, QString &special);
 
 private slots:
     void on_lst_itemClicked(QListWidgetItem *item);
 
 private:
     Ui::DlgListDishSpecial *ui;
-    void loadComments(int dish);
     QString fResult;
 };
 

@@ -2,13 +2,15 @@
 #include "ui_dlgpin.h"
 #include "nloadingdlg.h"
 #include "c5message.h"
+#include "ndataprovider.h"
 #include <QKeyEvent>
 #include <QJsonObject>
 
 DlgPin::DlgPin(QWidget *parent) :
-    QDialog(parent, Qt::FramelessWindowHint),
+    C5Dialog(QStringList()),
     ui(new Ui::DlgPin)
 {
+    Q_UNUSED(parent);
     ui->setupUi(this);
     fPinEmpty = true;
     installEventFilter(this);
@@ -51,8 +53,10 @@ void DlgPin::btnNumPressed()
 
 void DlgPin::on_btnEnter_clicked()
 {
+    NDataProvider::mHost = __c5config.dbParams().at(1);
     if (ui->lePin->text().length() == 4 && ui->leUser->text().length() == 4) {
-        accept();
+        fHttp->createHttpQuery("/engine/login.php", QJsonObject{{"method", 2}, {"pin", ui->lePin->text()}},
+        SLOT(loginResponse(QJsonObject)));
     }
 }
 
@@ -146,6 +150,14 @@ void DlgPin::keyReleaseEvent(QKeyEvent *event)
         fPinEmpty = false;
     }
     QDialog::keyReleaseEvent(event);
+}
+
+void DlgPin::loginResponse(const QJsonObject &jdoc)
+{
+    QJsonObject jo = jdoc["data"].toObject();
+    NDataProvider::sessionKey = jo["sessionkey"].toString();
+    fHttp->httpQueryFinished(sender());
+    accept();
 }
 
 void DlgPin::queryLoading()

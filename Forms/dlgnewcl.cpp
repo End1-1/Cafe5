@@ -1,6 +1,5 @@
 #include "dlgnewcl.h"
 #include "ui_dlgnewcl.h"
-#include "doubledatabase.h"
 
 DlgNewCL::DlgNewCL(const QStringList &dbParams) :
     C5Dialog(dbParams),
@@ -36,9 +35,8 @@ void DlgNewCL::on_btnOK_clicked()
         C5Message::error(tr("The name cannot be empty"));
         return;
     }
-    DoubleDatabase fDD;
-    fDD.open();
-    fDD[":f_name"] = ui->leName->text();
-    ui->leCode->setInteger(fDD.insert("f_city_ledger"));
+    C5Database db(fDBParams);
+    db[":f_name"] = ui->leName->text();
+    ui->leCode->setInteger(db.insert(QString("%1.f_city_ledger").arg(__c5config.hotelDatabase())));
     accept();
 }

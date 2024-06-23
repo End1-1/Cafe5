@@ -72,6 +72,7 @@ struct Dish {
         quick = d->quick;
         packageName = d->packageName;
         obodyId = d->obodyId;
+        f_emarks = d->f_emarks;
     }
 };
 Q_DECLARE_METATYPE(Dish *)

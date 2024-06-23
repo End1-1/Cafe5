@@ -16,7 +16,7 @@ DlgGiftCardSale::~DlgGiftCardSale()
 void DlgGiftCardSale::on_leCode_returnPressed()
 {
     ui->leCode->setText(ui->leCode->text().replace(";", "").replace("?", ""));
-    C5Database db(__c5config.replicaDbParams());
+    C5Database db(__c5config.dbParams());
     db[":f_code"] = ui->leCode->text();
     db.exec("select * from b_gift_card where f_code=:f_code");
     if (db.nextRow() == false) {
@@ -37,7 +37,7 @@ void DlgGiftCardSale::on_leCode_returnPressed()
     db.exec("select * from b_gift_card_sale_options");
     if (db.nextRow()) {
         QStringList prices = db.getString("f_value").split(",", Qt::SkipEmptyParts);
-        for (const QString &s: prices) {
+        for (const QString &s : prices) {
             QListWidgetItem *item = new QListWidgetItem(ui->lstPrices);
             item->setText(float_str(str_float(s), 2));
             item->setSizeHint(QSize(300, 50));
@@ -53,7 +53,7 @@ void DlgGiftCardSale::on_btnRegister_clicked()
         C5Message::error(tr("No price selected"));
         return;
     }
-    C5Database db(__c5config.replicaDbParams());
+    C5Database db(__c5config.dbParams());
     db.startTransaction();
     db[":f_code"] = ui->leCode->text();
     db.exec("select * from b_gift_card where f_code=:f_code for update");

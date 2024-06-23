@@ -10,8 +10,8 @@
 #include "c5config.h"
 #include "printtaxn.h"
 #if(!defined FRONTDESK && !defined WAITER)
-#include "worder.h"
-#include "working.h"
+    #include "worder.h"
+    #include "working.h"
 #endif
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -33,7 +33,7 @@ DlgReservGoods::DlgReservGoods(const QStringList &dbParams, int store, int goods
 DlgReservGoods::DlgReservGoods(const QStringList &dbParams, int id) :
     DlgReservGoods(dbParams)
 {
-    C5Database db(__c5config.replicaDbParams());
+    C5Database db(__c5config.dbParams());
     db[":f_id"] = id;
     db.exec("select * from a_store_reserve where f_id=:f_id");
     if (!db.nextRow()) {
@@ -81,7 +81,6 @@ void DlgReservGoods::messageResult(const QJsonObject &jo)
     if (jo["status"].toInt() > 0) {
         C5Message::error(jo["data"].toString());
     } else {
-
     }
 }
 
@@ -106,7 +105,7 @@ void DlgReservGoods::on_btnSave_clicked()
         C5Message::error(err);
         return;
     }
-    insertReserve(__c5config.replicaDbParams());
+    insertReserve(__c5config.dbParams());
     if (__c5config.rdbReplica()) {
         insertReserve(__c5config.dbParams());
     }
@@ -139,7 +138,7 @@ void DlgReservGoods::on_btnCancelReserve_clicked()
 
 void DlgReservGoods::setState(int state)
 {
-    updateState(__c5config.replicaDbParams(), state);
+    updateState(__c5config.dbParams(), state);
     if (__c5config.rdbReplica()) {
         updateState(__c5config.dbParams(), state);
     }
@@ -158,16 +157,16 @@ void DlgReservGoods::updateState(const QStringList &dbparams, int state)
     C5Database db(dbparams);
     db[":f_state"] = state;
     switch (state) {
-    case GR_COMPLETED:
-        db[":f_completed"] = __c5config.defaultStore();
-        db[":f_completeddate"] = QDate::currentDate();
-        db[":f_completedtime"] = QTime::currentTime();
-        break;
-    case GR_REMOVED:
-        db[":f_canceled"] = __c5config.defaultStore();
-        db[":f_canceleddate"] = QDate::currentDate();
-        db[":f_canceledtime"] = QTime::currentTime();
-        break;
+        case GR_COMPLETED:
+            db[":f_completed"] = __c5config.defaultStore();
+            db[":f_completeddate"] = QDate::currentDate();
+            db[":f_completedtime"] = QTime::currentTime();
+            break;
+        case GR_REMOVED:
+            db[":f_canceled"] = __c5config.defaultStore();
+            db[":f_canceleddate"] = QDate::currentDate();
+            db[":f_canceledtime"] = QTime::currentTime();
+            break;
     }
     db.update("a_store_reserve", "f_id", ui->leCode->getInteger());
     db[":f_qty"] = ui->leReservedQty->getDouble();
@@ -205,10 +204,10 @@ void DlgReservGoods::insertReserve(const QStringList &dbparams)
 
 void DlgReservGoods::on_btnCompleteReserve_clicked()
 {
-//    if (fStore != 23) {
-//        C5Message::error("No-no-no!");
-//        return;
-//    }
+    //    if (fStore != 23) {
+    //        C5Message::error("No-no-no!");
+    //        return;
+    //    }
     setState(GR_COMPLETED);
 }
 
@@ -269,7 +268,8 @@ void DlgReservGoods::on_btnPrintFiscal_clicked()
     PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(),
                  C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
     QString jsonIn, jsonOut, err;
-    if (pt.printAdvanceJson(ui->lePrepaid->getDouble(), ui->lePrepaidCard->getDouble(), jsonIn, jsonOut, err) != pt_err_ok) {
+    if (pt.printAdvanceJson(ui->lePrepaid->getDouble(), ui->lePrepaidCard->getDouble(), jsonIn, jsonOut,
+                            err) != pt_err_ok) {
         C5Message::error(err);
     } else {
         QJsonObject jdoc = QJsonDocument::fromJson(jsonOut.toUtf8()).object();

@@ -80,6 +80,7 @@ Workspace::Workspace(const QStringList &dbParams) :
     fLoadingDlg(nullptr)
 {
     ui->setupUi(this);
+    setWindowFlags(Qt::WindowStaysOnTopHint);
     fTypeFilter = -1;
     QRect r = qApp->screens().at(0)->geometry();
     switch (r.width()) {
@@ -764,8 +765,18 @@ void Workspace::on_leReadCode_returnPressed()
         }
     }
     QString code = newcode.replace("?", "").replace(";", "");
+    QString emarks;
+    if (code.length() > 20) {
+        emarks = code;
+        code = code.left(14);
+        while (code.at(0) == "0") {
+            code.remove(0, 1);
+        }
+    }
     if (fDishesBarcode.contains(code)) {
-        addDishToOrder(fDishesBarcode[code]);
+        Dish *d = fDishesBarcode[code];
+        d->f_emarks = emarks;
+        createAddDishRequest(d);
         return;
     }
     C5Database db(fDBParams);
@@ -838,27 +849,7 @@ void Workspace::on_tblDishes_cellClicked(int row, int column)
     if (!d) {
         return;
     }
-    QJsonObject dish;
-    dish["header"] = fOrderUuid;
-    dish["menuid"] = d->menuid;
-    dish["table"] = fTable;
-    dish["row"] = ui->tblOrder->rowCount() + 1;
-    dish["mark"] = "addgoods";
-    QJsonObject bhistory;
-    bhistory["card"] = fDiscountCard;
-    bhistory["type"] = fDiscountMode;
-    bhistory["value"] = fDiscountValue;
-    bhistory["data"] = fDiscountAmount;
-    QJsonObject flags;
-    flags["f1"] = fCustomer == 0 ? 0 :  1;
-    flags["f2"] = 0;
-    flags["f3"] = ui->btnFlagTakeAway->isChecked() ? 1 : 0;
-    flags["f4"] = 0;
-    flags["f5"] = 0;
-    dish["flags"] = flags;
-    dish["bhistory"] = bhistory;
-    dish["customer"] = fCustomer;
-    createHttpRequest("/engine/smart/adddish.php", dish, SLOT(addGoodsResponse(QJsonObject)), dish);
+    createAddDishRequest(d);
 }
 
 void Workspace::on_btnP1_clicked()
@@ -1765,7 +1756,8 @@ void Workspace::addGoodsResponse(const QJsonObject &jdoc)
     d.barcode = jo["f_barcode"].toString();
     d.typeName = jo["f_groupname"].toString();
     d.specialDiscount = jo["f_specialdiscount"].toDouble() / 100;
-    d.qrRequired = jo["f_qr"].toString().toInt();
+    d.qrRequired = jo["f_qr"].toInt();
+    d.f_emarks = jo["f_emarks"].toString();
     addDishToOrder( &d);
     httpStop(sender());
 }
@@ -2047,8 +2039,11 @@ void Workspace::addDishToOrder(Dish *d)
     if (ui->btnSetCard->isChecked() || ui->btnSetCardExternal->isChecked()) {
         ui->leCard->setDouble(ui->leTotal->getDouble());
     }
-    if (d->qrRequired > 0) {
+    if (d->qrRequired > 0 && d->f_emarks.isEmpty()) {
         on_btnEmarks_clicked();
+    }
+    if (d->f_emarks.isEmpty() == false) {
+        ui->btnFiscal->setChecked(true);
     }
 }
 
@@ -2254,6 +2249,32 @@ void Workspace::configFiscalButton()
         ui->btnFiscal->setEnabled(false);
         ui->btnFiscal->setChecked(true);
     }
+}
+
+void Workspace::createAddDishRequest(Dish *d)
+{
+    QJsonObject dish;
+    dish["header"] = fOrderUuid;
+    dish["menuid"] = d->menuid;
+    dish["f_emarks"] = d->f_emarks;
+    dish["table"] = fTable;
+    dish["row"] = ui->tblOrder->rowCount() + 1;
+    dish["mark"] = "addgoods";
+    QJsonObject bhistory;
+    bhistory["card"] = fDiscountCard;
+    bhistory["type"] = fDiscountMode;
+    bhistory["value"] = fDiscountValue;
+    bhistory["data"] = fDiscountAmount;
+    QJsonObject flags;
+    flags["f1"] = fCustomer == 0 ? 0 :  1;
+    flags["f2"] = 0;
+    flags["f3"] = ui->btnFlagTakeAway->isChecked() ? 1 : 0;
+    flags["f4"] = 0;
+    flags["f5"] = 0;
+    dish["flags"] = flags;
+    dish["bhistory"] = bhistory;
+    dish["customer"] = fCustomer;
+    createHttpRequest("/engine/smart/adddish.php", dish, SLOT(addGoodsResponse(QJsonObject)), dish);
 }
 
 void Workspace::on_btnFlagTakeAway_clicked(bool checked)

@@ -22,17 +22,23 @@ public:
 
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
+    virtual void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) override;
+
     QVariant data(int row, int column, int role = Qt::DisplayRole) const;
 
     const QJsonArray rowData(int row) const;
 
     void setDatasource(const QJsonArray &jcols, const QJsonArray &ja);
 
-    void setSumColumns(const QJsonObject &jcolsum);
+    void setSumColumns(const QJsonArray &jcolsum);
 
     void setFilter(const QString &filter);
 
-    QJsonObject fColSum;
+    void setColumnFilter(const QString &filter, int column);
+
+    QMap<int, double> fColSum;
+
+    QJsonArray fSumColumnsSpecial;
 
     void setCheckedBox(bool v, bool multiSelect);
 
@@ -42,7 +48,11 @@ public:
 
     bool checked(int &row);
 
+    const QSet<QString> &uniqueValuesForColumn(int column);
+
 private:
+    QMap<int, QSet<QString> > mUniqueValuesForColumn;
+
     QJsonArray mColumnsNames;
 
     QJsonArray mRawData;
@@ -56,6 +66,12 @@ private:
     bool mCheckboxMode;
 
     bool mCheckboxModeMultySelect;
+
+    Qt::SortOrder mSortOrder;
+
+    int mLastColumnSorted;
+
+    void countSum();
 
 };
 

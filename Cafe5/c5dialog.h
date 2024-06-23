@@ -8,6 +8,7 @@
 #include "c5sockethandler.h"
 #include "c5permissions.h"
 #include "c5utils.h"
+#include "ninterface.h"
 
 class C5Dialog : public QDialog
 {
@@ -25,7 +26,8 @@ public:
     virtual bool preambule();
 
     template<typename T>
-    static bool go(const QStringList &dbParams) {
+    static bool go(const QStringList &dbParams)
+    {
         T *t = new T(dbParams);
         bool result = false;
         if (t->preambule()) {
@@ -53,6 +55,8 @@ protected:
     virtual void keyControlPlusEnter();
 
     virtual void keyAlterPlusEnter();
+
+    NInterface *fHttp;
 
 protected slots:
     void handleError(int err, const QString &msg);

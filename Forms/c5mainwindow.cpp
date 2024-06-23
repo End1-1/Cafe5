@@ -14,9 +14,7 @@
 #include "cr5consumptionbysales.h"
 #include "cr5consumptionbysalesdraft.h"
 #include "cr5storereason.h"
-#include "cr5carvisits.h"
 #include "cr5documents.h"
-#include "cr5goodsclasses.h"
 #include "c5translatorform.h"
 #include "ntablewidget.h"
 #include "c5goodsspecialprices.h"
@@ -318,7 +316,7 @@ void C5MainWindow::menuListReponse(const QJsonObject &jdoc)
         if (lw) {
             // QPixmap p;
             // p.loadFromData(QByteArray::fromBase64(j["image"].toString().toLatin1()));
-            auto *l = addTreeL3Item(lw, 0, j["title"].toString(), j["image"].toString());
+            auto *l = addTreeL3Item(lw, 0, j["title"].toString(), QString(":/%1").arg(j["image"].toString()));
             l->setData(Qt::UserRole + 105, j["route"].toString());
         }
     }
@@ -693,9 +691,6 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
         case cp_t7_partners:
             createTab<CR5GoodsPartners>(dbParams);
             break;
-        case cp_t6_classes:
-            createTab<CR5GoodsClasses>(dbParams);
-            break;
         case cp_t7_credit_card:
             createTab<CR5CreditCards>(dbParams);
             break;
@@ -865,10 +860,6 @@ void C5MainWindow::setDB()
         li->widget()->deleteLater();
         delete li;
     }
-    QPushButton *btn = new QPushButton(icon, "");
-    btn->setProperty("menu", "2");
-    //connect(btn, SIGNAL(clicked()), this, SLOT(on_btnChangeDB_clicked()));
-    ui->lMenu->addWidget(btn);
     QListWidget *l = new QListWidget();
     connect(l, SIGNAL(clicked(QModelIndex)), this, SLOT(on_listWidgetItemClicked(QModelIndex)));
     fMenuLists.append(l);
@@ -954,7 +945,6 @@ void C5MainWindow::setDB()
         addTreeL3Item(l, cp_t6_goods, tr("Goods"), ":/goods.png");
         addTreeL3Item(l, cp_t6_waste, tr("Autowaste"), ":/goods.png");
         addTreeL3Item(l, cp_t6_units, tr("Units"), ":/goods.png");
-        addTreeL3Item(l, cp_t6_classes, tr("Classes"), ":/goods.png");
         addTreeL3Item(l, cp_t6_goods_images, tr("Images"), ":/images.png");
         addTreeL3Item(l, cp_t6_qty_reminder, tr("Quantity reminder"), ":/goods.png");
         addTreeL3Item(l, cp_t6_complectations, tr("Complectations"), ":/goods.png");

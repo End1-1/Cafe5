@@ -2,7 +2,7 @@
 #include "ui_dlgsearchpartner.h"
 
 DlgSearchPartner::DlgSearchPartner() :
-    C5Dialog(__c5config.replicaDbParams()),
+    C5Dialog(__c5config.dbParams()),
     ui(new Ui::DlgSearchPartner)
 {
     ui->setupUi(this);
@@ -66,7 +66,7 @@ void DlgSearchPartner::on_btnSave_clicked()
 
 void DlgSearchPartner::on_lineEdit_textChanged(const QString &arg1)
 {
-    for (int i = 0; i < ui->tbl->rowCount(); i++ ){
+    for (int i = 0; i < ui->tbl->rowCount(); i++ ) {
         bool h = true;
         for (int j = 0; j < ui->tbl->columnCount(); j++) {
             if (ui->tbl->item(i, j)->text().contains(arg1, Qt::CaseInsensitive)) {

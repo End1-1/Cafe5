@@ -9,10 +9,6 @@ CR5ConsumptionBySalesFilter::CR5ConsumptionBySalesFilter(const QStringList &dbPa
     ui->setupUi(this);
     ui->leStore->setSelector(dbParams, ui->leStoreName, cache_goods_store);
     ui->leGroup->setSelector(dbParams, ui->leGroupName, cache_goods_group);
-    ui->leClass1->setSelector(dbParams, ui->leClassName1, cache_goods_classes);
-    ui->leClass2->setSelector(dbParams, ui->leClassName2, cache_goods_classes);
-    ui->leClass3->setSelector(dbParams, ui->leClassName3, cache_goods_classes);
-    ui->leClass4->setSelector(dbParams, ui->leClassName4, cache_goods_classes);
 }
 
 CR5ConsumptionBySalesFilter::~CR5ConsumptionBySalesFilter()
@@ -53,26 +49,6 @@ QDate CR5ConsumptionBySalesFilter::date2()
 QString CR5ConsumptionBySalesFilter::group() const
 {
     return ui->leGroup->text();
-}
-
-QString CR5ConsumptionBySalesFilter::class1() const
-{
-    return ui->leClass1->text();
-}
-
-QString CR5ConsumptionBySalesFilter::class2() const
-{
-    return ui->leClass2->text();
-}
-
-QString CR5ConsumptionBySalesFilter::class3() const
-{
-    return ui->leClass3->text();
-}
-
-QString CR5ConsumptionBySalesFilter::class4() const
-{
-    return ui->leClass4->text();
 }
 
 int CR5ConsumptionBySalesFilter::reportType()

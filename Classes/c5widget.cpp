@@ -1,4 +1,5 @@
 #include "c5widget.h"
+#include "ninterface.h"
 #include <QEvent>
 #include <QKeyEvent>
 #include <QUuid>
@@ -10,10 +11,12 @@ C5Widget::C5Widget(const QStringList &dbParams, QWidget *parent) :
     fToolBar = nullptr;
     fFocusNextChild = true;
     fWindowUuid = QUuid::createUuid().toString();
+    fHttp = new NInterface(this);
 }
 
 C5Widget::~C5Widget()
 {
+    fHttp->deleteLater();
 }
 
 QIcon C5Widget::icon()

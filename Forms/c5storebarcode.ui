@@ -48,11 +48,6 @@
      </column>
      <column>
       <property name="text">
-       <string>Class1</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
        <string>Link</string>
       </property>
      </column>

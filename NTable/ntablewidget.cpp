@@ -5,15 +5,18 @@
 #include "nloadingdlg.h"
 #include "c5mainwindow.h"
 #include "c5filelogwriter.h"
+#include "c5filtervalues.h"
 #include "xlsxall.h"
 #include "c5utils.h"
 #include "nfilterdlg.h"
 #include "nhandler.h"
+#include "c5message.h"
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QScrollBar>
-#include "c5message.h"
+#include <QHeaderView>
+#include <QMenu>
 
 #define xls_page_size_a4 9
 #define xls_page_orientation_landscape "landscape"
@@ -31,14 +34,13 @@ NTableWidget::NTableWidget(const QString &route, QWidget *parent) :
     ui->setupUi(this);
     ui->mTableView->setModel(new NTableModel());
     ui->mTableView->horizontalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(ui->mTableView->horizontalHeader(), SIGNAL(customContextMenuRequested(QPoint)), this,
-            SLOT(tableViewHeaderContextMenuRequested(QPoint)));
-    connect(ui->mTableView->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(tableViewHeaderClicked(int)));
-    connect(ui->mTableView->horizontalHeader(), SIGNAL(sectionResized(int, int, int)), this,
-            SLOT(tableViewHeaderResized(int, int, int)));
+    connect(ui->mTableView->horizontalHeader(), &QHeaderView::customContextMenuRequested, this,
+            &NTableWidget::tableViewHeaderContextMenuRequested);
+    connect(ui->mTableView->horizontalHeader(), &QHeaderView::sectionClicked, this, &NTableWidget::tableViewHeaderClicked);
+    connect(ui->mTableView->horizontalHeader(), &QHeaderView::sectionResized, this,
+            &NTableWidget::tableViewHeaderResized);
     connect(ui->mTableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this,
             SLOT(selectionChanged(QItemSelection, QItemSelection)));
-    connect(ui->mTableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(tableViewContextMenuRequested(QPoint)));
     connect(ui->tblTotal->horizontalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(tblValueChanged(int)));
     ui->widget->setVisible(false);
     mHandler = new NHandler(this);
@@ -82,6 +84,7 @@ void NTableWidget::hotKey(const QString &key)
     } else if (key.toLower() == "esc") {
         ui->widget->setVisible(false);
         ui->leFilterLineedit->clear();
+        static_cast<NTableModel *>(ui->mTableView->model())->setFilter("");
     } else {
         C5Widget::hotKey(key);
     }
@@ -91,14 +94,13 @@ void NTableWidget::sum()
 {
     auto *model = static_cast<NTableModel *>(ui->mTableView->model());
     ui->tblTotal->setColumnCount(model->columnCount());
-    QStringList keys = model->fColSum.keys();
-    ui->tblTotal->setVisible(keys.length() > 0);
+    ui->tblTotal->setVisible(model->fColSum.count() > 0);
     QStringList l;
     l.append(QString::number(model->rowCount()));
     ui->tblTotal->setVerticalHeaderLabels(l);
     for (int i = 0; i < ui->tblTotal->columnCount(); i++) {
-        if (keys.contains(QString::number(i))) {
-            ui->tblTotal->setItem(0, i, new QTableWidgetItem(float_str(model->fColSum[QString::number(i)].toDouble(), 2)));
+        if (model->fColSum.contains(i)) {
+            ui->tblTotal->setItem(0, i, new QTableWidgetItem(float_str(model->fColSum[i], 2)));
         } else {
             ui->tblTotal->setItem(0, i, new QTableWidgetItem(""));
         }
@@ -109,6 +111,18 @@ void NTableWidget::queryStarted()
 {
     mLoadingDlg = new NLoadingDlg(this);
     mLoadingDlg->open();
+}
+
+void NTableWidget::filterByColumn()
+{
+    const QSet<QString> &filterValues = static_cast<NTableModel *>(ui->mTableView->model())->uniqueValuesForColumn(
+                                            fFilterColumn);
+    QStringList sortedValues = filterValues.values();
+    std::sort(sortedValues.begin(), sortedValues.end());
+    if (C5FilterValues::filterValues(sortedValues)) {
+        static_cast<NTableModel *>(ui->mTableView->model())->setColumnFilter(sortedValues.join("|"), fFilterColumn);
+    }
+    sum();
 }
 
 void NTableWidget::queryError(const QString &error)
@@ -125,7 +139,7 @@ void NTableWidget::queryFinished(const QJsonObject &ba)
     QJsonObject jwidget = jo["widget"].toObject();
     mMainWindow->nTabDesign(QIcon(jwidget["icon"].toString()), jwidget["title"].toString(), this);
     QJsonArray jcols = jo["cols"].toArray();
-    QJsonObject colSum = jo["sum"].toObject();
+    QJsonArray colSum = jo["sum"].toArray();
     QJsonArray jdata = jo["rows"].toArray();
     QJsonArray jhiddencols = jo["hiddencols"].toArray();
     if (!fFilter) {
@@ -136,6 +150,7 @@ void NTableWidget::queryFinished(const QJsonObject &ba)
     }
     static_cast<NTableModel * >(ui->mTableView->model())->setDatasource(jcols, jdata);
     auto *model = static_cast<NTableModel * >(ui->mTableView->model());
+    model->fSumColumnsSpecial = jo["sumspecial"].toArray();
     model->setSumColumns(colSum);
     sum();
     ui->mTableView->resizeColumnsToContents();
@@ -148,7 +163,7 @@ void NTableWidget::queryFinished(const QJsonObject &ba)
         ui->mTableView->setColumnHidden(jhiddencols[i].toInt(), true);
         ui->tblTotal->setColumnHidden(jhiddencols[i].toInt(), true);
     }
-    mHandler->configure(fFilter, jo["handler"].toArray().toVariantList());
+    mHandler->configure(fFilter, jo["handler"].toArray().toVariantList(), ui->mTableView);
     if (!mToolWidget) {
         mToolWidget = new QWidget();
         fToolBar->addWidget(mToolWidget);
@@ -191,7 +206,7 @@ void NTableWidget::exportToExcel()
     QMap<int, QString> bgFillb;
     QFont bodyFont(qApp->font());
     d.style()->addFont("body", bodyFont);
-    d.style()->addBackgrounFill("body", QColor(Qt::white));
+    d.style()->addBackgrounFill("body", QColor(Qt::white).toRgb());
     d.style()->addVAlignment("body", xls_alignment_center);
     d.style()->addBorder("body", XlsxBorder());
     bgFill[QColor(Qt::white).rgb()] = "body";
@@ -251,18 +266,21 @@ void NTableWidget::exportToExcel()
         }
     }
     /* TOTALS ROWS */
-    //    if (ui->tblTotal->isVisible()) {
-    //        QFont totalFont(qApp->font());
-    //        totalFont.setBold(true);
-    //        d.style()->addFont("footer", headerFont);
-    //        d.style()->addBorder("footer", XlsxBorder());
-    //        color = QColor::fromRgb(193, 206, 221);
-    //        d.style()->addBackgrounFill("footer", color);
-    //        //d.style()->addHAlignment("footer", xls_alignment_right);
-    //        for (int i = 0; i < colCount; i++) {
-    //            s->addCell(1 + fModel->rowCount() + 1, i + 1, ui->tblTotal->getData(0, i), d.style()->styleNum("footer"));
-    //        }
-    //    }
+    if (ui->tblTotal->isVisible()) {
+        QFont totalFont(qApp->font());
+        totalFont.setBold(true);
+        d.style()->addFont("footer", headerFont);
+        d.style()->addBorder("footer", XlsxBorder());
+        color = QColor::fromRgb(193, 206, 221);
+        d.style()->addBackgrounFill("footer", color);
+        //d.style()->addHAlignment("footer", xls_alignment_right);
+        for (int i = 0; i < colCount; i++) {
+            s->addCell(1 + fModel->rowCount() + 1, i + 1,
+                       fModel->fColSum.contains(i) ?
+                       fModel->fColSum[i] : QVariant(),
+                       d.style()->styleNum("footer"));
+        }
+    }
     QString err;
     if (!d.save(err, true)) {
         if (!err.isEmpty()) {
@@ -315,4 +333,22 @@ void NTableWidget::on_mTableView_doubleClicked(const QModelIndex &index)
 {
     auto *m = static_cast<NTableModel *>(ui->mTableView->model());
     mHandler->handle(m->rowData(index.row()));
+}
+
+void NTableWidget::tableViewHeaderContextMenuRequested(const QPoint &point)
+{
+    fFilterColumn = ui->mTableView->columnAt(point.x());
+    QString colName = ui->mTableView->model()->headerData(fFilterColumn, Qt::Horizontal, Qt::DisplayRole).toString();
+    QMenu m;
+    m.addAction(QIcon(":/filter_set.png"), QString("%1 '%2'").arg(tr("Set filter")).arg(colName), this,
+                SLOT(filterByColumn()));
+    m.addAction(QIcon(":/filter_clear.png"), QString("%1 '%2'").arg(tr("Remove filter")).arg(colName), this,
+                SLOT(removeFilterForColumn()));
+    m.addAction(QIcon(":/expand.png"), tr("Autofit columns widths"), this, SLOT(autofitColumns()));
+    m.exec(ui->mTableView->mapToGlobal(point));
+}
+
+void NTableWidget::tableViewHeaderClicked(int index)
+{
+    static_cast<NTableModel *>(ui->mTableView->model())->sort(index);
 }

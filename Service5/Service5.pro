@@ -38,7 +38,6 @@ SOURCES += \
     ../Service5Working/utils/sqlqueries.cpp \
     ../Service5Working/utils/storemovement.cpp \
     ../Service5Working/utils/tablerecord.cpp \
-    c5license.cpp \
     pluginmanager.cpp \
     utils/commandline.cpp \
     utils/configini.cpp \
@@ -96,7 +95,6 @@ HEADERS += \
     ../Service5Working/utils/sqlqueries.h \
     ../Service5Working/utils/storemovement.h \
     ../Service5Working/utils/tablerecord.h \
-    c5license.h \
     pluginmanager.h \
     utils/commandline.h \
     utils/configini.h \

@@ -1,8 +1,9 @@
 #include "dlgsearchinmenu.h"
 #include "ui_dlgsearchinmenu.h"
+#include "c5tabledata.h"
 
 DlgSearchInMenu::DlgSearchInMenu() :
-   C5Dialog(C5Config::dbParams()),
+    C5Dialog(C5Config::dbParams()),
     ui(new Ui::DlgSearchInMenu)
 {
     ui->setupUi(this);
@@ -10,15 +11,16 @@ DlgSearchInMenu::DlgSearchInMenu() :
     connect(ui->kb, SIGNAL(textChanged(QString)), this, SLOT(searchDish(QString)));
     connect(ui->kb, SIGNAL(accept()), this, SLOT(kbdAccept()));
     connect(ui->kb, SIGNAL(reject()), this, SLOT(reject()));
-
     QPushButton *firstBtn = nullptr;
-    for (int id: dbmenuname->list()) {
+    QJsonArray ja = objs("d_menu_names");
+    for (int i = 0; i < ja.size(); i++) {
+        QJsonObject jo = ja.at(i).toObject();
         QPushButton *b = new QPushButton();
         if (!firstBtn) {
             firstBtn = b;
         }
-        b->setText(dbmenuname->name(id));
-        b->setProperty("id", id);
+        b->setText(jo["f_name"].toString());
+        b->setProperty("id", jo["f_id"].toString());
         ui->hl->insertWidget(0, b);
         connect(b, SIGNAL(clicked()), this, SLOT(menuClicked()));
     }
@@ -36,33 +38,18 @@ void DlgSearchInMenu::buildMenu(int menuid)
 {
     ui->tbl->clearContents();
     ui->tbl->setRowCount(0);
-    if (!menu5->fMenuList.data.contains(menuid)) {
-        return;
-    }
-    QMap<int, DPart1> &m = menu5->fMenuList.data[menuid];
-    for (QMap<int, DPart1>::const_iterator im = m.begin(); im != m.end(); im++) {
-        for (const DPart2 &p2: im.value().data) {
-            extractDishes(p2);
-        }
+    QJsonArray ja = C5TableData::instance()->dishes(menuid, 0);
+    for (int i = 0; i < ja.size(); i++) {
+        int row = ui->tbl->addEmptyRow();
+        const QJsonObject &j = ja.at(i).toObject();
+        ui->tbl->setInteger(row, 0, j["f_dish"].toInt());
+        ui->tbl->setString(row, 1, j["f_part1name"].toString());
+        ui->tbl->setString(row, 2, j["f_part2name"].toString());
+        ui->tbl->setString(row, 3, j["f_name"].toString());
+        ui->tbl->setDouble(row, 4, j["f_price"].toDouble());
     }
     if (ui->leDishName->text().length() > 0) {
         searchDish(ui->leDishName->text());
-    }
-}
-
-void DlgSearchInMenu::extractDishes(const DPart2 &p2)
-{
-    for (const DPart2 &pc: p2.data1) {
-        extractDishes(pc);
-    }
-    for (int d: p2.data2.data) {
-        int row = ui->tbl->addEmptyRow();
-        int dishid = dbmenu->dishid(d);
-        ui->tbl->setInteger(row, 0, d);
-        ui->tbl->setString(row, 1, dbdish->part1name(dishid));
-        ui->tbl->setString(row, 2, dbdish->part2name(dishid));
-        ui->tbl->setString(row, 3, dbdish->name(dishid));
-        ui->tbl->setDouble(row, 4, dbmenu->price(d));
     }
 }
 
@@ -80,7 +67,7 @@ void DlgSearchInMenu::searchDish(const QString &name)
 
 void DlgSearchInMenu::menuClicked()
 {
-    QPushButton *btn = static_cast<QPushButton*>(sender());
+    QPushButton *btn = static_cast<QPushButton *>(sender());
     buildMenu(btn->property("id").toInt());
 }
 

@@ -21,6 +21,7 @@
 #define float_str(value, f) QLocale().toString(value, 'f', f).remove(QRegExp("(?!\\d[\\.\\,][1-9]+)0+$")).remove(QRegExp("[\\.\\,]$"))
 #define str_float(value) QLocale().toDouble(value)
 #define json_str(value) QString(QJsonDocument(value).toJson(QJsonDocument::Compact))
+#define str_json(value) QJsonDocument::fromJson(value.toUtf8()).object()
 
 #define ORDER_STATE_NONE 0
 #define ORDER_STATE_OPEN 1

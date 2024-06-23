@@ -140,18 +140,6 @@ void CR5ConsumptionBySales::buildQuery()
     if (fFilter->group().length() > 0) {
         cond += " and c.f_group in (" + fFilter->group() + ") ";
     }
-    if (fFilter->class1().length() > 0) {
-        cond += " and c.f_group1 in (" + fFilter->class1() + ") ";
-    }
-    if (fFilter->class2().length() > 0) {
-        cond += " and c.f_group2 in (" + fFilter->class2() + ") ";
-    }
-    if (fFilter->class3().length() > 0) {
-        cond += " and c.f_group3 in (" + fFilter->class3() + ") ";
-    }
-    if (fFilter->class4().length() > 0) {
-        cond += " and c.f_group4 in (" + fFilter->class4() + ") ";
-    }
     C5Database db(fDBParams);
     /* get all goods */
     db.exec(QString("select c.f_id, g.f_name as f_groupname, c.f_name, c.f_scancode, "

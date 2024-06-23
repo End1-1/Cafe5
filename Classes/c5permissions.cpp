@@ -6,15 +6,12 @@ QMap<QString, QList<int> > C5Permissions::fPermissions;
 
 C5Permissions::C5Permissions()
 {
-
 }
 
 void C5Permissions::init(C5Database &db, int group)
 {
-
     fPermissions[db.database()].clear();
     fTemplate << cp_append_database
-
               << cp_t1_preference
               << cp_t1_usergroups
               << cp_t1_users
@@ -26,7 +23,6 @@ void C5Permissions::init(C5Database &db, int group)
               << cp_t1_allow_change_cash_doc_date
               << cp_t1_allow_change_store_doc_date
               << cp_t1_breeze
-
               << cp_t2_action
               << cp_t2_store_input
               << cp_t2_store_output
@@ -39,7 +35,6 @@ void C5Permissions::init(C5Database &db, int group)
               << cp_t2_goods_reservations
               << cp_t2_reatail_trade
               << cp_t2_whosale_trade
-
               << cp_t3_reports
               << cp_t3_sales_common
               << cp_t3_documents
@@ -62,7 +57,6 @@ void C5Permissions::init(C5Database &db, int group)
               << cp_t3_count_output_of_sale_draft
               << cp_t3_custom_reports
               << cp_t3_draft_output_recipes
-
               << cp_t4_menu
               << cp_t4_menu_names
               << cp_t4_part1
@@ -73,7 +67,6 @@ void C5Permissions::init(C5Database &db, int group)
               << cp_t4_dish_price_self_cost
               << cp_t4_menu_review
               << cp_t4_dishes_packages
-
               << cp_t5_waiter
               << cp_t5_multiple_receipt
               << cp_t5_remove_printed_service
@@ -113,19 +106,16 @@ void C5Permissions::init(C5Database &db, int group)
               << cp_t5_pay_payx
               << cp_t5_view_tax_and_no_sales
               << cp_t5_view_sales_of_all_users
-
               << cp_t6_storage
               << cp_t6_goods_menu
               << cp_t6_goods
               << cp_t6_units
               << cp_t6_groups
               << cp_t6_waste
-              << cp_t6_classes
               << cp_t6_goods_images
               << cp_t6_qty_reminder
               << cp_t6_complectations
               << cp_t6_goods_special_prices
-
               << cp_t7_other
               << cp_t7_credit_card
               << cp_t7_discount_system
@@ -139,7 +129,6 @@ void C5Permissions::init(C5Database &db, int group)
               << cp_t7_order_marks
               << cp_t7_route
               << cp_t7_route_exec
-
               << cp_t8_cash
               << cp_t8_cash_doc
               << cp_t8_cash_common_report
@@ -150,12 +139,10 @@ void C5Permissions::init(C5Database &db, int group)
               << cp_t8_edit_currency
               << cp_t8_currency_cross_rate
               << cp_t8_currency_cross_rate_history
-
               << cp_t9_salary
               << cp_t9_salary_doc
               << cp_t9_report
               << cp_t9_payment
-
               << cp_t10_manufacture
               << cp_t10_action_list
               << cp_t10_daily
@@ -166,13 +153,13 @@ void C5Permissions::init(C5Database &db, int group)
               << cp_t10_workshops
               << cp_t10_active_tasks
               << cp_t10_create_task
-                 ;
+              ;
     if (group == 1) {
         db[":f_group"] = 1;
         db.exec("delete from s_user_access where f_group=:f_group");
         QString sql = "insert into s_user_access (f_group, f_key, f_value) values ";
         bool f = true;
-        for (auto i: fTemplate) {
+        for (auto i : fTemplate) {
             if (f) {
                 f = false;
             } else {

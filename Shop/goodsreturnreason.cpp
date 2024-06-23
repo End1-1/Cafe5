@@ -3,7 +3,7 @@
 #include <QListWidgetItem>
 
 GoodsReturnReason::GoodsReturnReason() :
-    C5Dialog(__c5config.replicaDbParams()),
+    C5Dialog(__c5config.dbParams()),
     ui(new Ui::GoodsReturnReason)
 {
     ui->setupUi(this);

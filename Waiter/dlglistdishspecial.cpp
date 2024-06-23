@@ -1,6 +1,6 @@
 #include "dlglistdishspecial.h"
 #include "ui_dlglistdishspecial.h"
-#include "c5menu.h"
+#include "c5tabledata.h"
 
 static DlgListDishSpecial *__d = nullptr;
 
@@ -16,33 +16,34 @@ DlgListDishSpecial::~DlgListDishSpecial()
     delete ui;
 }
 
-bool DlgListDishSpecial::getSpecial(int dish, const QStringList &dbParams, QString &special)
+bool DlgListDishSpecial::getSpecial(int dish, QString &special)
 {
     if (!__d) {
-        __d = new DlgListDishSpecial(dbParams);
+        __d = new DlgListDishSpecial(QStringList());
     }
     __d->fResult = "";
-    if (dbdishspecial->contains(dish)) {
-        __d->loadComments(dish);
+    QJsonArray sp = objs("d_special");
+    __d->ui->lst->clear();
+    for (int i = 0; i < sp.size(); i++) {
+        const QJsonObject &jo = sp.at(i).toObject();
+        if (jo["f_dish"].toInt() == dish) {
+            __d->ui->lst->addItem(jo["f_comment"].toString());
+        }
+    }
+    if (__d->ui->lst->count() > 0) {
+        QListWidgetItem *item = new QListWidgetItem(__d->ui->lst);
+        item->setIcon(QIcon(":/cancel.png"));
+        item->setText(tr("Cancel"));
+        __d->ui->lst->addItem(item);
+        for (int i = 0; i < __d->ui->lst->count(); i++) {
+            __d->ui->lst->item(i)->setSizeHint(QSize(100, 50));
+        }
         if (__d->exec() == QDialog::Accepted) {
             special = __d->fResult.trimmed();
+            return special.length() > 0;
         }
-        return special.length() > 0;
     }
     return true;
-}
-
-void DlgListDishSpecial::loadComments(int dish)
-{
-    ui->lst->clear();
-    ui->lst->addItems(dbdishspecial->special(dish));
-    QListWidgetItem *item = new QListWidgetItem(ui->lst);
-    item->setIcon(QIcon(":/cancel.png"));
-    item->setText(tr("Cancel"));
-    ui->lst->addItem(item);
-    for (int i = 0; i < ui->lst->count(); i++) {
-        ui->lst->item(i)->setSizeHint(QSize(100, 50));
-    }
 }
 
 void DlgListDishSpecial::on_lst_itemClicked(QListWidgetItem *item)

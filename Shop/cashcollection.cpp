@@ -10,7 +10,7 @@ CashCollection::CashCollection() :
     ui->setupUi(this);
     fMax = 0;
     ui->lePurpose->setText(tr("Cash collection") + " " + QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
-    C5Database db(__c5config.replicaDbParams());
+    C5Database db(__c5config.dbParams());
     db[":f_cash"] = __c5config.cashId();
     db.exec("select  sum(ec.f_amount*ec.f_sign) as f_amount "
             "from e_cash ec "
@@ -58,7 +58,7 @@ void CashCollection::on_btnSave_clicked()
         C5Message::error(tr("Amount must be greater then 0"));
         return;
     }
-    C5Database db(__c5config.replicaDbParams());
+    C5Database db(__c5config.dbParams());
     if (!db.open()) {
         C5Message::error(db.fLastError);
         return;

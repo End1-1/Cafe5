@@ -5,7 +5,8 @@
 
 class C5User;
 
-namespace Ui {
+namespace Ui
+{
 class DlgManagerTools;
 }
 
@@ -28,6 +29,12 @@ private slots:
     void on_btnChangeStaffPassword_clicked();
 
     void on_btnExit_clicked();
+
+    void on_btnExitToWindows_clicked();
+
+    void on_btnShutdown_clicked();
+
+    void on_btnRestart_clicked();
 
 private:
     Ui::DlgManagerTools *ui;

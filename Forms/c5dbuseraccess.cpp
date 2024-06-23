@@ -27,7 +27,7 @@ QToolBar *C5DbUserAccess::toolBar()
             << ToolBarButtons::tbRefresh
             << ToolBarButtons::tbExcel
             << ToolBarButtons::tbPrint;
-            createStandartToolbar(btn);
+        createStandartToolbar(btn);
     }
     return fToolBar;
 }
@@ -73,6 +73,10 @@ void C5DbUserAccess::refreshData()
     }
     db.exec("select f_user, f_db from s_db_access where f_permit=1");
     while (db.nextRow()) {
+        if (!fDbMap.contains(db.getInt(1))) {
+            C5Message::error("Check database list in the s_db_access");
+            break;
+        }
         ui->tbl->checkBox(fUserMap[db.getInt(0)], fDbMap[db.getInt(1)])->setChecked(true);
     }
 }

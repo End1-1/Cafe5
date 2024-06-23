@@ -3,7 +3,8 @@
 
 #include "ce5editor.h"
 
-namespace Ui {
+namespace Ui
+{
 class CE5Goods;
 }
 
@@ -32,7 +33,15 @@ public:
 
     virtual QPushButton *b1() override;
 
+    virtual QJsonObject makeJsonObject() override;
+
+    virtual bool acceptOnSave() const override;
+
 private slots:
+    void saveResponse(const QJsonObject &jdoc);
+
+    void openResponse(const QJsonObject &jdoc);
+
     void printCard();
 
     void priceEdited(const QString &arg1);
@@ -47,13 +56,7 @@ private slots:
 
     void removeImage();
 
-    void newScancode();
-
-    void removeScancode();
-
     void genScancode();
-
-    void tblMultiscancodeContextMenu(const QPoint &p);
 
     void on_btnNewGroup_clicked();
 
@@ -66,14 +69,6 @@ private slots:
     void on_btnNewGoods_clicked();
 
     void on_btnNewPartner_clicked();
-
-    void on_btnNewGroup1_clicked();
-
-    void on_btnNewGroup2_clicked();
-
-    void on_btnNewGroup3_clicked();
-
-    void on_btnNewGroup4_clicked();
 
     void on_btnCopy_clicked();
 
@@ -114,13 +109,11 @@ private:
 
     QSet<QString> fStrings;
 
+    QString fImage;
+
     bool fScancodeGenerated;
 
     Barcode *fBarcode;
-
-    QStringList fScancodeRemove;
-
-    QStringList fScancodeAppend;
 
     QMap<QString, double> fCrossRate;
 

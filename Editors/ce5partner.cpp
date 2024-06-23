@@ -27,6 +27,7 @@ CE5Partner::CE5Partner(const QStringList &dbParams, QWidget *parent) :
     ui->cbCategory->setDBValues(fDBParams, "select f_id, f_name from c_partners_category");
     ui->cbSaleType->setDBValues(fDBParams, "select f_id, f_name from o_sale_type where f_id in (1,2)");
     ui->cbManager->setDBValues(fDBParams, "select f_id, concat_ws(' ', f_last, f_first) from s_user order by 2");
+    fNew = true;
 }
 
 CE5Partner::~CE5Partner()
@@ -59,18 +60,24 @@ void CE5Partner::setId(int id)
             }
         }
         if (asrow < 0) {
-            throw std::runtime_error(QString("The database id (%1) not exists. Check database structure.").arg(asrow).toLocal8Bit().data());
+            throw std::runtime_error(QString("The database id (%1) not exists. Check database structure.").arg(
+                                         asrow).toLocal8Bit().data());
         }
         ui->tblAs->lineEdit(asrow, 2)->setText(db.getString("f_ascode"));
     }
+    fNew = false;
 }
 
 bool CE5Partner::save(QString &err, QList<QMap<QString, QVariant> > &data)
 {
+    C5Database db(fDBParams);
+    if (fNew && ui->leCode->getInteger() > 0) {
+        db[":f_id"] = ui->leCode->getInteger();
+        db.insert("c_partners", false);
+    }
     if (!CE5Editor::save(err, data)) {
         return false;
     }
-    C5Database db(fDBParams);
     db[":f_table"] = "c_partners";
     db[":f_tableid"] = ui->leCode->getInteger();
     db.exec("delete from as_convert where f_table=:f_table and f_tableid=:f_tableid");

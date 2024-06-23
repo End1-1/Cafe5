@@ -16,13 +16,17 @@ DQty::~DQty()
     delete ui;
 }
 
-double DQty::getQty(const QString &title, QWidget *parent)
+double DQty::getQty(const QString &title, double max, QWidget *parent)
 {
     DQty *d = new DQty(parent);
     d->ui->lbTitle->setText(title);
+    d->mMax = max;
     double result = 0;
-    if (d->exec() == QDialog::Accepted)
+    if (d->exec() == QDialog::Accepted) {
         result = d->ui->leQty->text().toDouble();
+    } else {
+        result = -1;
+    }
     delete d;
     return result;
 }
@@ -30,4 +34,11 @@ double DQty::getQty(const QString &title, QWidget *parent)
 void DQty::on_leQty_returnPressed()
 {
     accept();
+}
+
+void DQty::on_leQty_textChanged(const QString &arg1)
+{
+    if (arg1.toDouble() > mMax && mMax > 0.001) {
+        ui->leQty->setDouble(mMax);
+    }
 }

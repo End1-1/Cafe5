@@ -4,6 +4,7 @@
 #include "c5utils.h"
 #include "c5database.h"
 #include "c5logsystem.h"
+#include "c5tabledata.h"
 #include <QApplication>
 #include <QJsonDocument>
 #include <QFile>
@@ -146,7 +147,7 @@ void C5PrintServiceThread::print(QString printer, const QString &side, bool repr
     p.br();
     p.ltext(tr("Table"), 0);
     p.setFontSize(28);
-    p.rtext(dbtable->name(fHeaderData["f_table"].toInt()));
+    p.rtext(C5TableData::instance()->string("h_tables", "f_name", fHeaderData["f_table"].toInt()));
     p.br();
     p.setFontSize(20);
     p.ltext(tr("Order no"), 0);
@@ -159,7 +160,8 @@ void C5PrintServiceThread::print(QString printer, const QString &side, bool repr
     p.rtext(QTime::currentTime().toString(FORMAT_TIME_TO_STR));
     p.br();
     p.ltext(tr("Staff"), 0);
-    p.rtext(dbuser->fullName(fHeaderData["f_currentstaff"].toInt()));
+    p.rtext(C5TableData::instance()->string("s_user", "f_last", fHeaderData["f_currentstaff"].toInt()) +  " "
+            + C5TableData::instance()->string("s_user", "f_first", fHeaderData["f_currentstaff"].toInt()));
     p.br(p.fLineHeight + 2);
     p.line(0, p.fTop, p.fNormalWidth, p.fTop);
     p.br(2);
@@ -168,22 +170,24 @@ void C5PrintServiceThread::print(QString printer, const QString &side, bool repr
     for (int i = 0; i < fBodyData.count(); i++) {
         const QMap<QString, QVariant> &o = fBodyData.at(i);
         C5LogSystem::writeEvent(QString("try to print %1 %2 %3 %4")
-                                .arg(dbdish->name(o["f_dish"].toInt()), printer, side, o[side].toString()));
+                                .arg(C5TableData::instance()->string("d_dish", "f_name", o["f_dish"].toInt()), printer, side, o[side].toString()));
         if (o[side].toString() != printer) {
-            C5LogSystem::writeEvent(QString("not print case 3 %1 %2 %3 %4").arg(dbdish->name(o["f_dish"].toInt()), printer, side,
+            C5LogSystem::writeEvent(QString("not print case 3 %1 %2 %3 %4").arg(C5TableData::instance()->string("d_dish", "f_name",
+                                    o["f_dish"].toInt()), printer, side,
                                     o[side].toString()));
             continue;
         }
-        storages << dbstore->name(o["f_store"].toInt());
+        storages << C5TableData::instance()->string("c_storages", "f_name", o["f_store"].toInt());
         if (__c5config.getValue(param_print_dish_timeorder).toInt() == 1) {
-            p.ltext(QString("[%1] %2").arg(o["f_timeorder"].toString(), dbdish->name(o["f_dish"].toInt())), 0);
+            p.ltext(QString("[%1] %2").arg(o["f_timeorder"].toString(), C5TableData::instance()->string("d_dish", "f_name",
+                                           o["f_dish"].toInt())), 0);
         } else {
-            p.ltext(QString("%1").arg(dbdish->name(o["f_dish"].toInt())), 0);
+            p.ltext(QString("%1").arg(C5TableData::instance()->string("d_dish", "f_name", o["f_dish"].toInt())), 0);
         }
         p.setFontBold(true);
         p.rtext(QString("%1").arg(float_str(o["f_qty1"].toDouble(), 2)));
         p.setFontBold(false);
-        if (dbdish->isExtra(o["f_dish"].toInt())) {
+        if (C5TableData::instance()->variant("d_dish", "f_extra", o["f_dish"].toInt()).toInt()) {
             p.br();
             p.setFontSize(25);
             p.ltext(QString("%1: %2")

@@ -68,7 +68,7 @@ void RequestManager::handle(const QString &session, const QString &remoteHost, c
             hr(ba, outdata, dataMap, ContentType::TextHtml);
             return;
         } else {
-            outdata = "SERVER NOT CONFIGURE";
+            outdata = QString("SERVER NOT CONFIGURE. ROUTE NOT FOUND %r").arg(r).toUtf8();
             return;
         }
     }

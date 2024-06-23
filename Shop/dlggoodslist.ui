@@ -221,6 +221,16 @@
        <string>Wholesale price</string>
       </property>
      </column>
+     <column>
+      <property name="text">
+       <string>Draft</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Reserve</string>
+      </property>
+     </column>
     </widget>
    </item>
    <item>

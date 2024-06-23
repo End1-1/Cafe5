@@ -40,8 +40,6 @@ private:
 
     void remember(const QJsonObject &h);
 
-    void getVersions(C5Database &db, QJsonArray &arr);
-
     void processAppOrder(QJsonObject &o);
 
     void processCallStaff(QJsonObject &o);
@@ -64,7 +62,8 @@ private:
 
     void processTaxReport(QJsonObject &o);
 
-    void writeCashDoc(C5StoreDraftWriter &dw, const QString &uuid, const QString id, QString &err, double amount, int staff, int cashboxid, QDate dateCash);
+    void writeCashDoc(C5StoreDraftWriter &dw, const QString &uuid, const QString id, QString &err, double amount, int staff,
+                      int cashboxid, QDate dateCash);
 
     QTcpSocket *fSocket;
 };

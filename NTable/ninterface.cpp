@@ -4,13 +4,22 @@
 #include "c5message.h"
 
 NInterface::NInterface(QWidget *parent)
-    : QObject{parent}
+    : QObject{parent},
+      fLoadingDlg(nullptr)
 {
 }
 
-void NInterface::createHttpQuery(const QString &route, const QJsonObject &params, const char *slotResponse,
-                                 const QVariant &marks)
+NInterface::~NInterface()
 {
+    if (fLoadingDlg) {
+        fLoadingDlg->deleteLater();
+    }
+}
+
+void NInterface::createHttpQuery(const QString &route, const QJsonObject &params, const char *slotResponse,
+                                 const QVariant &marks, bool progress)
+{
+    fProgress = progress;
     auto *np = new NDataProvider(this->parent());
     connect(np, &NDataProvider::started, this, &NInterface::httpQueryStarted);
     connect(np, &NDataProvider::error, this, &NInterface::httpQueryError);
@@ -21,19 +30,23 @@ void NInterface::createHttpQuery(const QString &route, const QJsonObject &params
 
 void NInterface::httpQueryStarted()
 {
-    fLoadingDlg = new NLoadingDlg(static_cast<QWidget *>(this->parent()));
-    fLoadingDlg->open();
+    if (!fLoadingDlg) {
+        fLoadingDlg = new NLoadingDlg(static_cast<QWidget *>(this->parent()));
+    }
+    fLoadingDlg->mSecond = 0;
+    if (fProgress) {
+        fLoadingDlg->open();
+    }
 }
 
 void NInterface::httpQueryFinished(QObject *sender)
 {
     fLoadingDlg->hide();
-    fLoadingDlg->deleteLater();
     sender->deleteLater();
 }
 
 void NInterface::httpQueryError(const QString &err)
 {
-    httpQueryFinished(this);
+    httpQueryFinished(sender());
     C5Message::error(err);
 }

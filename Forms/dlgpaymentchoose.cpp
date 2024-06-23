@@ -19,7 +19,11 @@ DlgPaymentChoose::DlgPaymentChoose(const QStringList &dbParams) :
     ui->leCashIn->setValidator(new QDoubleValidator(0, 1000000000, 2));
     ui->leChange->setValidator(new QDoubleValidator(0, 1000000000, 2));
     ui->lePrepaid->setValidator(new QDoubleValidator(0, 1000000000, 2));
+#ifdef QT_DEBUG
+    QShortcut *s = new QShortcut(QKeySequence(Qt::Key_F11), this, SLOT(checkFiscal()));
+#else
     QShortcut *s = new QShortcut(QKeySequence(Qt::Key_F12), this, SLOT(checkFiscal()));
+#endif
     Q_UNUSED(s);
     adjustSize();
 }
@@ -64,6 +68,7 @@ bool DlgPaymentChoose::getValues(double total, double &cash, double &card, doubl
         return true;
     }
     d.ui->lePrepaid->setReadOnly(readOnlyPrepaid);
+    d.ui->btnPrepaid->setEnabled(!readOnlyPrepaid);
     return false;
 }
 

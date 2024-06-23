@@ -6,7 +6,8 @@
 #include "aheader.h"
 #include "ecash.h"
 
-namespace Ui {
+namespace Ui
+{
 class C5CostumerDebtPayment;
 }
 
@@ -20,6 +21,8 @@ public:
     ~C5CostumerDebtPayment();
 
     void setId(const QString &id);
+
+    void setPartnerAndAmount(int partner, double amount, const QString &clearFlag);
 
     virtual void selectorCallback(int row, const QList<QVariant> &values) override;
 
@@ -38,6 +41,8 @@ private:
     AHeader fAHeader;
 
     ECash fECash;
+
+    QString fClearFlag;
 };
 
 #endif // C5COSTUMERDEBTPAYMENT_H

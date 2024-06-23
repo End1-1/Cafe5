@@ -9,7 +9,7 @@ CR5DocumentsFilter::CR5DocumentsFilter(const QStringList &dbParams, QWidget *par
     ui->setupUi(this);
     ui->leDocState->setSelector(dbParams, ui->leDocStateName, cache_doc_state);
     ui->leDocType->setSelector(dbParams, ui->leDocTypeName, cache_doc_type);
-    ui->lePartner->setSelector(dbParams, ui->lePartnerName, cache_goods_partners);
+    ui->lePartner->setSelector(dbParams, ui->lePartnerName, cache_goods_partners, 1, 4);
     ui->leOperator->setSelector(dbParams, ui->leOperatorName, cache_users);
     ui->leReason->setSelector(dbParams, ui->leReasonName, cache_store_reason);
     ui->lePayment->setSelector(dbParams, ui->lePaymentName, cache_header_payment);
