@@ -80,7 +80,7 @@ Workspace::Workspace(const QStringList &dbParams) :
     fLoadingDlg(nullptr)
 {
     ui->setupUi(this);
-    setWindowFlags(Qt::WindowStaysOnTopHint);
+    //setWindowFlags(Qt::WindowStaysOnTopHint);
     fTypeFilter = -1;
     QRect r = qApp->screens().at(0)->geometry();
     switch (r.width()) {
@@ -1438,6 +1438,7 @@ bool Workspace::printReceipt(const QString &id, bool printSecond, bool precheck)
 void Workspace::printService(const QString &printerName, const QJsonObject &h, const QJsonArray &d,
                              const QJsonObject &jf, int side)
 {
+    Q_UNUSED(jf);
     QFont font(qApp->font());
     font.setFamily(__c5config.getValue(param_service_print_font_family));
     int basesize = __c5config.getValue(param_service_print_font_size).toInt();
@@ -1448,13 +1449,15 @@ void Workspace::printService(const QString &printerName, const QJsonObject &h, c
     p.setFontBold(true);
     p.ctext(tr("Receipt #") + QString("%1%2").arg(h["f_prefix"].toString(), QString::number(h["f_hallid"].toInt())));
     p.br();
+    p.lrtext(tr("Cashier"), h["f_staff"].toString());
+    p.br();
     p.ctext(printerName);
     p.br();
     if (h["f_partner"].toInt() > 0) {
         p.ctext(QString("*%1*").arg(tr("Delivery")));
         p.br();
     }
-    if (jf["f_2"].toInt() > 0) {
+    if (h["modified"].toBool()) {
         p.ctext(QString("*%1*").arg(tr("Edited")));
         p.br();
     }
@@ -1475,7 +1478,7 @@ void Workspace::printService(const QString &printerName, const QJsonObject &h, c
         p.ltext(j["f_name"].toString(), 0);
         p.setFontSize(basesize + 8);
         p.setFontBold(true);
-        p.rtext(float_str(j["f_qty1"].toString().toDouble(), 2));
+        p.rtext(float_str(j["f_qty1"].toDouble(), 2));
         p.br();
         if (j["f_comment"].toString().isEmpty() == false) {
             p.setFontSize(basesize - 4);
@@ -1623,16 +1626,16 @@ void Workspace::initResponse(const QJsonObject &jdoc)
         d->name = j["f_name"].toString();
         d->printer = j["f_print1"].toString();
         d->printer2 = j["f_print2"].toString();
-        d->price = j["f_price"].toString().toDouble();
+        d->price = j["f_price"].toDouble();
         d->store = j["f_store"].toInt();
         d->adgCode = j["f_adgt"].toString().isEmpty() ? j["f_adgcode"].toString() : j["f_adgt"].toString();
         d->color = j["f_color"].toInt();
-        d->netWeight = j["f_netweight"].toString().toDouble();
-        d->cost = j["f_cost"].toString().toDouble();
+        d->netWeight = j["f_netweight"].toDouble();
+        d->cost = j["f_cost"].toDouble();
         d->quick = j["f_recent"].toInt();
         d->barcode = j["f_barcode"].toString();
         d->typeName = j["f_groupname"].toString();
-        d->specialDiscount = j["f_specialdiscount"].toString().toDouble() / 100;
+        d->specialDiscount = j["f_specialdiscount"].toDouble() / 100;
         d->qrRequired = j["f_qr"].toString().toInt();
         fDishes.append(d);
         if (d->barcode.isEmpty() == false) {
@@ -1647,7 +1650,7 @@ void Workspace::initResponse(const QJsonObject &jdoc)
         const QJsonObject &j = jta.at(i).toObject();
         DishPackageDriver::fPackageDriver.addMember(j["f_package"].toString().toInt(), j["f_dish"].toString().toInt(),
                                          j["f_name"].toString(),
-                                         j["f_price"].toString().toDouble(), j["f_qty"].toString().toDouble(),
+                                         j["f_price"].toDouble(), j["f_qty"].toDouble(),
                                          j["f_adgcode"].toString(), j["f_store"].toString().toInt(), j["f_printer"].toString());
     }
     jta = jo["packagenames"].toArray();
@@ -1656,7 +1659,7 @@ void Workspace::initResponse(const QJsonObject &jdoc)
         QListWidgetItem *item = new QListWidgetItem(ui->lstCombo);
         item->setText(j["f_name"].toString());
         item->setData(Qt::UserRole, j["f_id"].toString().toInt());
-        item->setData(Qt::UserRole + 1, j["f_price"].toString().toDouble());
+        item->setData(Qt::UserRole + 1, j["f_price"].toDouble());
         item->setSizeHint(QSize(ui->lstCombo->width() - 5,
                                 DishPackageDriver::fPackageDriver.itemHeight(j["f_id"].toString().toInt(),
                                         ui->lstCombo->width(), item->text())));
@@ -1714,7 +1717,7 @@ void Workspace::saveResponse(const QJsonObject &jdoc)
     QJsonObject marks = sender()->property("marks").toJsonObject();
     httpStop(sender());
     if (marks["printservice"].toBool()) {
-        createHttpRequest("/engine/smart/printservice.php", QJsonObject{{"header", jo["header"].toString()}, {"mode", 1}}, SLOT(
+        createHttpRequest("/engine/smart/printservice.php", QJsonObject{{"header", jo["header"].toString()}, {"mode", 3}}, SLOT(
             printServiceResponse(QJsonObject)), marks);
     }
     if (jo["state"].toInt() == ORDER_STATE_CLOSE) {
@@ -1746,7 +1749,7 @@ void Workspace::addGoodsResponse(const QJsonObject &jdoc)
     d.name = jo["f_name"].toString();
     d.printer = jo["f_print1"].toString();
     d.printer2 = jo["f_print2"].toString();
-    d.price = jo["f_price"].toString().toDouble();
+    d.price = jo["f_price"].toDouble();
     d.store = jo["f_store"].toInt();
     d.adgCode = jo["f_adgt"].toString().isEmpty() ? jo["f_adgcode"].toString() : jo["f_adgt"].toString();
     d.color = jo["f_color"].toInt();
@@ -1883,7 +1886,7 @@ void Workspace::openTableResponse(const QJsonObject &jdoc)
         jt = jo["bhistory"].toObject();
         fDiscountMode = jt["f_type"].toInt();
         fDiscountCard = jt["f_card"].toInt();
-        fDiscountValue = jt["f_value"].toString().toDouble();
+        fDiscountValue = jt["f_value"].toDouble();
         jt = jo["flags"].toObject();
         ui->btnFlagTakeAway->setChecked(jt["f_3"].toInt() > 0);
         QJsonArray ja = jo["dishes"].toArray();
@@ -1894,9 +1897,9 @@ void Workspace::openTableResponse(const QJsonObject &jdoc)
             d.id = jt["f_dish"].toInt();
             d.adgCode = jt["f_adgcode"].toString();
             d.name = jt["f_name"].toString();
-            d.qty = jt["f_qty1"].toString().toDouble();
-            d.qty2 = jt["f_qty2"].toString().toDouble();
-            d.price = jt["f_price"].toString().toDouble();
+            d.qty = jt["f_qty1"].toDouble();
+            d.qty2 = jt["f_qty2"].toDouble();
+            d.price = jt["f_price"].toDouble();
             d.modificator = jt["f_comment"].toString();
             d.printer = jt["f_print1"].toString();
             d.printer2 = jt["f_print2"].toString();

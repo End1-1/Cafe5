@@ -1,5 +1,5 @@
 #include "qdishbutton.h"
-#include "c5menu.h"
+#include "c5tabledata.h"
 #include "c5utils.h"
 #include <QPainter>
 #include <QPaintEvent>
@@ -17,11 +17,11 @@ void QDishButton::paintEvent(QPaintEvent *pe)
 {
     QPushButton::paintEvent(pe);
     int id = property("id").toInt();
-    bool stop = C5Menu::fStopList.contains(id);
+    bool stop = C5TableData::instance()->mStopList.contains(id);
     bool stopreached = false;
     QString name = property("name").toString();
     if (stop) {
-        double qty = C5Menu::fStopList[id];
+        double qty = C5TableData::instance()->mStopList[id];
         if (qty < 0.001) {
             stopreached = true;
         } else {

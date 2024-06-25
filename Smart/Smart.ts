@@ -2268,12 +2268,12 @@ POS</translation>
     <message>
         <location filename="workspace.cpp" line="1699"/>
         <source>Please close session of</source>
-        <translation type="unfinished"></translation>
+        <translation>Փակեք սեսիան</translation>
     </message>
     <message>
         <location filename="workspace.cpp" line="2128"/>
         <source>Print precheck</source>
-        <translation type="unfinished"></translation>
+        <translation>Տպել նախահաշիվ</translation>
     </message>
     <message>
         <location filename="workspace.cpp" line="1246"/>
@@ -2294,7 +2294,7 @@ POS</translation>
     <message>
         <location filename="workspace.cpp" line="1464"/>
         <source>TAKE AWAY</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="workspace.cpp" line="1490"/>
@@ -2315,12 +2315,12 @@ POS</translation>
         <location filename="workspace.cpp" line="1542"/>
         <location filename="workspace.cpp" line="1547"/>
         <source>Access denied</source>
-        <translation type="unfinished">Մուտքը արգելված է</translation>
+        <translation>Մուտքը արգելված է</translation>
     </message>
     <message>
         <location filename="workspace.cpp" line="1697"/>
         <source>Welcome</source>
-        <translation type="unfinished"></translation>
+        <translation>Բարի գալուստ</translation>
     </message>
     <message>
         <location filename="workspace.cpp" line="511"/>

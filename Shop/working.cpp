@@ -121,7 +121,7 @@ Working::Working(C5User *user, QWidget *parent) :
         ui->btnCostumerDisplay->click();
     }
     http = new NInterface(this);
-    http->createHttpQuery("/engine/shop/create-a-store-sale.php", QJsonObject{{"store", __c5config.defaultStore()}},
+    http->createHttpQuery("/engine/shop/create-a-store-sale.php", QJsonObject{{"store", __c5config.defaultStore()}, {"forceupdate", true}},
     SLOT(astoresaleResponse(QJsonObject)));
 }
 

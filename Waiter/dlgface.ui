@@ -248,21 +248,15 @@
        </widget>
       </item>
       <item>
-       <widget class="QToolButton" name="btnExit">
+       <widget class="QPushButton" name="btnExit">
         <property name="minimumSize">
          <size>
           <width>140</width>
           <height>60</height>
          </size>
         </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>16777215</height>
-         </size>
-        </property>
         <property name="text">
-         <string>Lock</string>
+         <string>Tools</string>
         </property>
         <property name="icon">
          <iconset resource="../resources/res.qrc">
@@ -273,9 +267,6 @@
           <width>32</width>
           <height>32</height>
          </size>
-        </property>
-        <property name="toolButtonStyle">
-         <enum>Qt::ToolButtonTextBesideIcon</enum>
         </property>
        </widget>
       </item>

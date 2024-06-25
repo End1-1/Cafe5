@@ -82,7 +82,9 @@ DlgReservation::~DlgReservation()
 void DlgReservation::openReservationResponse(const QJsonObject &jdoc)
 {
     fHttp->httpQueryFinished(sender());
-    DlgPreorder(jdoc).exec();
+    DlgPreorder d(jdoc);
+    d.setHotelMode(true);
+    d.exec();
     loadTable();
 }
 

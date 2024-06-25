@@ -207,10 +207,10 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &db, QString &err)
             sign = -1;
         }
     }
-    if (fHeader["f_amountcard"].toString().toDouble() > 0.001) {
+    if (fHeader["f_amountcard"].toDouble() > 0.001) {
         paymentMode = 2;
     }
-    if (fHeader["f_amountbank"].toString().toDouble() > 0.001) {
+    if (fHeader["f_amountbank"].toDouble() > 0.001) {
         paymentMode = 3;
     }
     QString result = fHeader["f_prefix"].toString() + fHeader["f_hallid"].toString();
@@ -304,25 +304,25 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &db, QString &err)
         if (o["f_state"].toString().toInt() != DISH_STATE_OK) {
             continue;
         }
-        double price = o["f_price"].toString().toDouble();
-        if (o["f_service"].toString().toDouble() > 0.001) {
-            price += price *o["f_service"].toString().toDouble();
+        double price = o["f_price"].toDouble();
+        if (o["f_service"].toDouble() > 0.001) {
+            price += price *o["f_service"].toDouble();
         }
-        if (o["f_discount"].toString().toDouble() > 0.001) {
-            price -= price *o["f_discount"].toString().toDouble();
+        if (o["f_discount"].toDouble() > 0.001) {
+            price -= price *o["f_discount"].toDouble();
         }
         db[":f_id"] = getHotelID("DR", err);
         db[":f_state"] = 1;
         db[":f_header"] = result;
         db[":f_dish"] = o["f_dish"].toString().toInt();
-        db[":f_qty"] = o["f_qty1"].toString().toDouble();
-        db[":f_qtyprint"] = o["f_qty2"].toString().toDouble();
+        db[":f_qty"] = o["f_qty1"].toDouble();
+        db[":f_qtyprint"] = o["f_qty2"].toDouble();
         db[":f_price"] = price;
-        db[":f_svcvalue"] = o["f_service"].toString().toDouble();
+        db[":f_svcvalue"] = o["f_service"].toDouble();
         db[":f_svcamount"] = 0;
         db[":f_dctvalue"] = 0;
         db[":f_dctamount"] = 0;
-        db[":f_total"] = o["f_qty1"].toString().toDouble() * price;
+        db[":f_total"] = o["f_qty1"].toDouble() * price;
         db[":f_totalusd"] = 0;
         db[":f_print1"] = "";
         db[":f_print2"] = "";
@@ -578,7 +578,7 @@ int C5WaiterOrderDoc::hInt(const QString &name)
 
 double C5WaiterOrderDoc::hDouble(const QString &name)
 {
-    return fHeader[name].toString().toDouble();
+    return fHeader[name].toDouble();
 }
 
 QString C5WaiterOrderDoc::hString(const QString &name)
@@ -809,7 +809,7 @@ void C5WaiterOrderDoc::calculateSelfCost(C5Database &db)
             continue;
         }
         if (!goodsQty.contains(o["f_dish"].toString().toInt())) {
-            total += o["f_total"].toString().toDouble();
+            total += o["f_total"].toDouble();
             continue;
         }
         double selfcost = 0;
@@ -819,12 +819,12 @@ void C5WaiterOrderDoc::calculateSelfCost(C5Database &db)
         }
         o["f_price"] = QString::number(selfcost, 'f', 2);
         o["f_service"] = "0";
-        o["f_total"] = QString::number(selfcost *o["f_qty1"].toString().toDouble(), 'f', 2);
+        o["f_total"] = QString::number(selfcost *o["f_qty1"].toDouble(), 'f', 2);
         db[":f_id"] = o["f_id"].toString();
         db[":f_price"] = selfcost;
-        db[":f_total"] = selfcost *o["f_qty1"].toString().toDouble();
+        db[":f_total"] = selfcost *o["f_qty1"].toDouble();
         db.exec("update o_body set f_price=:f_price, f_total=:f_total where f_id=:f_id");
-        total += selfcost *o["f_qty1"].toString().toDouble();
+        total += selfcost *o["f_qty1"].toDouble();
         fItems[i] = o;
     }
     fHeader["f_amountother"] = QString::number(total, 'f', 2);

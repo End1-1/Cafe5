@@ -37,6 +37,8 @@ public:
 
     void ltext(const QString &text, qreal x, qreal textWidth = -1);
 
+    void lrtext(const QString &leftText, const QString &rightText, qreal textWidth = -1);
+
     void ltext90(const QString &text, qreal x);
 
     void ctext(const QString &text);
@@ -84,7 +86,7 @@ private:
 
     QGraphicsScene *fCanvas;
 
-    QList<QGraphicsScene*> fCanvasList;
+    QList<QGraphicsScene *> fCanvasList;
 
     QPen fLinePen;
 
@@ -92,7 +94,7 @@ private:
 
     int fCurrentPageIndex;
 
-    QMap<QGraphicsScene*, QPrinter::Orientation> fCanvasOrientation;
+    QMap<QGraphicsScene *, QPrinter::Orientation> fCanvasOrientation;
 
     void setLineHeight();
 

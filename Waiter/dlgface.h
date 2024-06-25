@@ -25,6 +25,10 @@ public:
 private slots:
     void initResponse(const QJsonObject &jdoc);
 
+    void refreshResponse(const QJsonObject &jdoc);
+
+    void openReservationResponse(const QJsonObject &jdoc);
+
     void timeout();
 
     void hallClicked();
@@ -32,6 +36,8 @@ private slots:
     void tableClicked(int id);
 
     void filterStaffClicked();
+
+    void refreshTables();
 
     void handleCreditCards(const QJsonObject &obj);
 
@@ -53,6 +59,8 @@ private:
     Ui::DlgFace *ui;
 
     C5User *fUser;
+
+    QJsonObject fHallState;
 
     int fCurrentHall;
 
@@ -76,7 +84,6 @@ private:
 
     void setViewMode(int v);
 
-    void refreshTables();
 };
 
 #endif // DLGFACE_H

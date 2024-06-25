@@ -13,7 +13,6 @@
 #include "datadriver.h"
 #include "notificationwidget.h"
 #include "c5jsondb.h"
-#include "stoplist.h"
 #include "cashboxconfig.h"
 #include "c5logsystem.h"
 #include <QDebug>
@@ -57,16 +56,16 @@ void C5WaiterServer::reply(QJsonObject &o)
                                  .arg(hallFilter.isEmpty() ? "" : " where f_id in (" + hallFilter + ")"), jHall);
             QJsonArray jTables;
             srh.getJsonFromQuery(QString("select t.f_id, t.f_hall, t.f_name, t.f_lock, t.f_lockSrc, \
-                     h.f_id as f_header, concat(u.f_last, ' ', left(u.f_first, 1), '.') as f_staffName, \
-                              h.f_amountTotal as f_amount, h.f_print, bc.f_govnumber, \
-                              date_format(h.f_dateOpen, '%d.%m.%Y') as f_dateOpen, h.f_timeOpen, \
-                              t.f_special_config \
-                              from h_tables t \
-                              left join o_header h on h.f_table=t.f_id and h.f_state=1 \
-         left join o_header_options o on o.f_id=h.f_id \
-         left join b_car bc on bc.f_id=o.f_car \
-         left join s_user u on u.f_id=h.f_staff  %1 \
-         order by f_id")
+                h.f_id as f_header, concat(u.f_last, ' ', left(u.f_first, 1), '.') as f_staffName, \
+                         h.f_amounttotal as f_amount, h.f_print, bc.f_govnumber, \
+                         date_format(h.f_dateopen, '%d.%m.%Y') as f_dateopen, h.f_timeOpen, \
+                         t.f_special_config \
+                         from h_tables t \
+                         left join o_header h on h.f_table=t.f_id and h.f_state=1 \
+    left join o_header_options o on o.f_id=h.f_id \
+    left join b_car bc on bc.f_id=o.f_car \
+    left join s_user u on u.f_id=h.f_staff  %1 \
+    order by f_id")
                                  .arg(hallFilter.isEmpty() ? "" : " where t.f_hall in (" + hallFilter + ") "), jTables);
             //srh.getJsonFromQuery("select f_id, f_hall, f_name, f_lock, f_lockSrc from h_tables order by f_id", jTables);
             QJsonArray jShift;
@@ -81,18 +80,18 @@ void C5WaiterServer::reply(QJsonObject &o)
             QJsonArray jMenu;
             QString query =
                 "select d.f_id as f_dish, mn.f_name as menu_name, p1.f_name as part1, p2.f_name as part2, p2.f_adgCode, d.f_name, \
-         m.f_price, m.f_store, m.f_print1, m.f_print2, d.f_remind, d.f_comment as f_description, \
-         s.f_name as f_storename, d.f_color as dish_color, p2.f_color as type_color, 1 as f_timeorder, d.f_hourlypayment, \
-         d.f_service as f_canservice, d.f_discount as f_candiscount, dsl.f_qty as f_stoplistqty \
-         from d_menu m \
-         left join d_menu_names mn on mn.f_id=m.f_menu \
-         left join d_dish d on d.f_id=m.f_dish \
-         left join d_part2 p2 on p2.f_id=d.f_part \
-         left join d_part1 p1 on p1.f_id=p2.f_part \
-         left join c_storages s on s.f_id=m.f_store \
-         left join d_stoplist dsl on dsl.f_dish=d.f_id \
-         where m.f_state=1 \
-         order by d.f_queue, d.f_name ";
+    m.f_price, m.f_store, m.f_print1, m.f_print2, d.f_remind, d.f_comment as f_description, \
+    s.f_name as f_storename, d.f_color as dish_color, p2.f_color as type_color, 1 as f_timeorder, d.f_hourlypayment, \
+    d.f_service as f_canservice, d.f_discount as f_candiscount, dsl.f_qty as f_stoplistqty \
+    from d_menu m \
+    left join d_menu_names mn on mn.f_id=m.f_menu \
+    left join d_dish d on d.f_id=m.f_dish \
+    left join d_part2 p2 on p2.f_id=d.f_part \
+    left join d_part1 p1 on p1.f_id=p2.f_part \
+    left join c_storages s on s.f_id=m.f_store \
+    left join d_stoplist dsl on dsl.f_dish=d.f_id \
+    where m.f_state=1 \
+    order by d.f_queue, d.f_name ";
             srh.getJsonFromQuery(query, jMenu);
             QJsonArray jMenuNames;
             srh.getJsonFromQuery("select f_id, f_name from d_menu_names", jMenuNames);
@@ -386,9 +385,6 @@ void C5WaiterServer::reply(QJsonObject &o)
         case sm_checkdiscount_by_visit:
             processCheckDiscountByVisit(o);
             break;
-        case sm_stoplist:
-            processStopList(o);
-            break;
         case sm_print_removed_service:
             processPrintRemovedService(o);
             break;
@@ -514,8 +510,8 @@ void C5WaiterServer::saveOrder(QJsonObject &o, QJsonObject &jh, QJsonArray &ja, 
         jh["f_id"] = C5Database::uuid();
         db[":f_id"] = jh["f_id"].toString();
         db[":f_hallid"] = jh["f_hallid"].toString().toInt();
-        db[":f_dateOpen"] = QDate::fromString(jh["f_dateopen"].toString(), FORMAT_DATE_TO_STR);
-        db[":f_timeOpen"] = QTime::fromString(jh["f_timeopen"].toString(), FORMAT_TIME_TO_STR);
+        db[":f_dateopen"] = QDate::fromString(jh["f_dateopen"].toString(), FORMAT_DATE_TO_STR);
+        db[":f_timeopen"] = QTime::fromString(jh["f_timeopen"].toString(), FORMAT_TIME_TO_STR);
         db[":f_prefix"] = jh["f_prefix"].toString();
         db.insert("o_header", false);
         db[":f_id"] = jh["f_id"].toString();
@@ -575,14 +571,14 @@ void C5WaiterServer::saveOrder(QJsonObject &o, QJsonObject &jh, QJsonArray &ja, 
         db[":f_hall"] = jh["f_hall"].toString().toInt();
         db[":f_table"] = jh["f_table"].toString().toInt();
         db[":f_state"] = jh["f_state"].toString().toInt();
-        db[":f_amountTotal"] = jh["f_amounttotal"].toString().toDouble();
-        db[":f_amountCash"] = jh["f_amountcash"].toString().toDouble();
-        db[":f_amountCard"] = jh["f_amountcard"].toString().toDouble();
-        db[":f_amountBank"] = jh["f_amountbank"].toString().toDouble();
-        db[":f_amountOther"] = jh["f_amountother"].toString().toDouble();
+        db[":f_amounttotal"] = jh["f_amounttotal"].toString().toDouble();
+        db[":f_amountcash"] = jh["f_amountcash"].toString().toDouble();
+        db[":f_amountcard"] = jh["f_amountcard"].toString().toDouble();
+        db[":f_amountbank"] = jh["f_amountbank"].toString().toDouble();
+        db[":f_amountother"] = jh["f_amountother"].toString().toDouble();
         db[":f_servicemode"] = jh["f_servicemode"].toString().toInt();
-        db[":f_amountService"] = jh["f_amountservice"].toString().toDouble();
-        db[":f_amountDiscount"] = jh["f_amountdiscount"].toString().toDouble();
+        db[":f_amountservice"] = jh["f_amountservice"].toString().toDouble();
+        db[":f_amountdiscount"] = jh["f_amountdiscount"].toString().toDouble();
         db[":f_servicefactor"] = jh["f_servicefactor"].toString().toDouble();
         db[":f_discountfactor"] = jh["f_discountfactor"].toString().toDouble();
         db[":f_creditcardid"] = jh["f_creditcardid"].toString().toInt();
@@ -712,9 +708,9 @@ void C5WaiterServer::processCloseOrder(QJsonObject &o, C5Database &db)
         jh["f_dateclose"] = QDate::currentDate().toString(FORMAT_DATE_TO_STR);
         jh["f_datecash"] = dateCash.toString(FORMAT_DATE_TO_STR);
         db[":f_state"] = orderstate;
-        db[":f_dateClose"] = QDate::currentDate();
-        db[":f_dateCash"] = QDate::fromString(jh["f_datecash"].toString(), FORMAT_DATE_TO_STR);
-        db[":f_timeClose"] = QTime::fromString(jh["f_timeclose"].toString(), FORMAT_TIME_TO_STR);
+        db[":f_dateclose"] = QDate::currentDate();
+        db[":f_datecash"] = QDate::fromString(jh["f_datecash"].toString(), FORMAT_DATE_TO_STR);
+        db[":f_timeclose"] = QTime::fromString(jh["f_timeclose"].toString(), FORMAT_TIME_TO_STR);
         db[":f_staff"] = jh["f_currentstaff"].toString().toInt();
         db.update("o_header", where_id(jh["f_id"].toString()));
         db[":f_lock"] = 0;
@@ -1265,98 +1261,6 @@ void C5WaiterServer::processCheckDiscountByVisit(QJsonObject &o)
         o["current"] = o["visit"].toInt() % db.getInt("f_value");
     }
     o["reply"] = 1;
-}
-
-void C5WaiterServer::processStopList(QJsonObject &o)
-{
-    C5Database db(C5Config::dbParams());
-    bool r = true;
-    switch (fIn["state"].toInt()) {
-        case sl_get: {
-            db.exec("select f_dish, f_qty from d_stoplist");
-            QJsonArray ja;
-            while (db.nextRow()) {
-                QJsonObject jg;
-                jg["dish"] = db.getInt("f_dish");
-                jg["qty"] = db.getDouble("f_qty");
-                ja.append(jg);
-            }
-            o["list"] = ja;
-            break;
-        }
-        case sl_set:
-            db[":f_dish"] = fIn["f_dish"].toString().toInt();
-            db.exec("delete from d_stoplist where f_dish=:f_dish");
-            db[":f_dish"] = fIn["f_dish"].toString().toInt();
-            db[":f_qty"] = fIn["f_stopqty"].toDouble();
-            o["f_dish"] = fIn["f_dish"];
-            o["f_qty"] = fIn["f_stopqty"];
-            r =  r && db.insert("d_stoplist", false);
-            break;
-        case sl_add: {
-            o["f_menu"] = fIn["f_menu"];
-            o["f_dish"] = fIn["f_dish"];
-            db[":f_dish"] = fIn["f_dish"].toString().toInt();
-            db.startTransaction();
-            db.exec("select f_qty from d_stoplist where f_dish=:f_dish for update");
-            if (db.nextRow()) {
-                double qty = db.getDouble("f_qty");
-                if (qty > 0.1) {
-                    qty -= 1;
-                    db[":f_dish"] = fIn["f_dish"].toString().toInt();
-                    db[":f_qty"] = qty;
-                    db.exec("update d_stoplist set f_qty=:f_qty where f_dish=:f_dish");
-                    o["status"] = sl_ok;
-                    o["newqty"] = qty;
-                } else {
-                    o["status"] = sl_not_enough_qty;
-                    o["sl_msg"] = tr("Not enough quantity");
-                }
-            } else {
-                o["status"] = sl_not_in_stoplist;
-            }
-            db.commit();
-            o["dish"] = fIn["dish"];
-            break;
-        }
-        case sl_restore_qty:
-            db.startTransaction();
-            o["dish"] = fIn["dish"];
-            db[":f_dish"] = fIn["dish"].toInt();
-            db.exec("select f_qty from d_stoplist where f_dish=:f_dish for update");
-            if (db.nextRow()) {
-                double qty = db.getDouble("f_qty");
-                qty += fIn["qty"].toDouble();
-                db[":f_dish"] = fIn["dish"].toInt();
-                db[":f_qty"] = qty;
-                db.exec("update d_stoplist set f_qty=:f_qty where f_dish=:f_dish");
-                o["status"] = sl_ok;
-                o["newqty"] = qty;
-            } else {
-                o["status"] = sl_not_in_stoplist;
-            }
-            db.commit();
-            break;
-        case sl_remove:
-            if (!db.exec("delete from d_stoplist")) {
-                r = false;
-            }
-            break;
-        case sl_remove_one:
-            db[":f_dish"] = fIn["dish"].toString().toInt();
-            if (!db.exec("delete from d_stoplist where f_dish=:f_dish")) {
-                r = false;
-            }
-            o["dish"] = fIn["dish"].toString().toInt();
-            break;
-    }
-    if (r) {
-        o["reply"] = 1;
-    } else {
-        o["reply"] = 0;
-        o["msg"] = db.fLastError;
-    }
-    o["state"] = fIn["state"];
 }
 
 void C5WaiterServer::processPrintRemovedService(QJsonObject &o)

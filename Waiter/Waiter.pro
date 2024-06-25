@@ -389,7 +389,6 @@ SOURCES += \
     dlgaskforprecheck.cpp \
     dlgcarnumber.cpp \
     dlgcashbuttonopions.cpp \
-    dlgchosesplitorderoption.cpp \
     dlgeditphone.cpp \
     dlgguests.cpp \
     dlglist.cpp \
@@ -406,7 +405,6 @@ SOURCES += \
     dlgsplitorder.cpp \
     dlgstafflist.cpp \
     dlgstoplistoption.cpp \
-    dlgsystem.cpp \
     dlgtext.cpp \
     dlgtimeorder.cpp \
     dlgviewstoplist.cpp \
@@ -827,7 +825,6 @@ HEADERS += \
     dlgaskforprecheck.h \
     dlgcarnumber.h \
     dlgcashbuttonopions.h \
-    dlgchosesplitorderoption.h \
     dlgeditphone.h \
         dlgface.h \
     ../Cafe5/c5database.h \
@@ -865,7 +862,6 @@ HEADERS += \
     dlgsplitorder.h \
     dlgstafflist.h \
     dlgstoplistoption.h \
-    dlgsystem.h \
     dlgtext.h \
     dlgtimeorder.h \
     dlgviewstoplist.h \
@@ -1079,7 +1075,6 @@ FORMS += \
     dlgaskforprecheck.ui \
     dlgcarnumber.ui \
     dlgcashbuttonopions.ui \
-    dlgchosesplitorderoption.ui \
     dlgeditphone.ui \
         dlgface.ui \
     ../Cafe5/c5message.ui \
@@ -1100,7 +1095,6 @@ FORMS += \
     dlgsplitorder.ui \
     dlgstafflist.ui \
     dlgstoplistoption.ui \
-    dlgsystem.ui \
     dlgtext.ui \
     dlgtimeorder.ui \
     dlgviewstoplist.ui \

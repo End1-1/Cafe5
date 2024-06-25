@@ -5,7 +5,7 @@
 #include "c5user.h"
 #include "dlgorder.h"
 #include "dlgexitbyversion.h"
-#include "dlglistofhall.h"
+#include "dlgpreorderw.h"
 #include "c5tabledata.h"
 #include "tablewidgetv1.h"
 #include "tablewidgetv2.h"
@@ -14,7 +14,6 @@
 #include "datadriver.h"
 #include "tablewidget.h"
 #include "dlgexitwithmessage.h"
-#include "c5halltabledelegate.h"
 #include "fileversion.h"
 #include "c5cafecommon.h"
 #include "dlgreservation.h"
@@ -93,6 +92,42 @@ void DlgFace::initResponse(const QJsonObject &jdoc)
     fHttp->httpQueryFinished(sender());
 }
 
+void DlgFace::refreshResponse(const QJsonObject &jdoc)
+{
+    fHallState = jdoc["data"].toObject();
+    for (int i = 0; i < ui->sglHall->count(); i++) {
+        TableWidget *tw = dynamic_cast<TableWidget *>(ui->sglHall->itemAt(i)->widget());
+        if (tw) {
+            QJsonObject to;
+            if (fHallState.contains(QString::number(tw->fTable))) {
+                to = fHallState[QString::number(tw->fTable)].toObject();
+            }
+            tw->configOrder(to);
+        }
+    }
+    while (ui->vlStaff->itemAt(0)) {
+        ui->vlStaff->itemAt(0)->widget()->deleteLater();
+        ui->vlStaff->removeItem(ui->vlStaff->itemAt(0));
+    }
+    // for (QMap<int, int>::const_iterator it = dboheader->fStaffTable.constBegin(); it != dboheader->fStaffTable.constEnd();
+    //      it++) {
+    //     QPushButton *btn = new QPushButton(dbuser->fullShort(it.key()));
+    //     btn->setMinimumSize(QSize(150, 50));
+    //     connect(btn, &QPushButton::clicked, this, &DlgFace::filterStaffClicked);
+    //     btn->setProperty("id", it.key());
+    //     ui->vlStaff->addWidget(btn);
+    // }
+    ui->vlStaff->addStretch(0);
+}
+
+void DlgFace::openReservationResponse(const QJsonObject &jdoc)
+{
+    fHttp->httpQueryFinished(sender());
+    DlgPreorder dp(jdoc);
+    dp.exec();
+    refreshTables();
+}
+
 void DlgFace::timeout()
 {
     ui->lbTime->setText(QTime::currentTime().toString(FORMAT_TIME_TO_SHORT_STR));
@@ -133,19 +168,22 @@ void DlgFace::tableClicked(int id)
         accept();
         return;
     }
-    C5User *tmp = fUser;
-    if (!tmp->check(cp_t5_edit_table)) {
-        if (!DlgPassword::getUserAndCheck(dbtable->name(id), tmp, cp_t5_edit_table)) {
+    fTimer.stop();
+    if (fHallState.contains(QString::number(id))) {
+        const QJsonObject &jt = fHallState[QString::number(id)].toObject();
+        if (jt["f_state"].toInt() != ORDER_STATE_OPEN) {
+            fHttp->createHttpQuery("/engine/waiter/reservation-open.php",
+            QJsonObject{{"id", jt["f_id"].toString()}},
+            SLOT(openReservationResponse(QJsonObject)));
+            fTimer.start(TIMER_TIMEOUT_INTERVAL);
             return;
         }
     }
-    fTimer.stop();
-    DlgOrder::openTable(id, tmp);
-    refreshTables();
-    fTimer.start(TIMER_TIMEOUT_INTERVAL);
-    if (tmp != fUser) {
-        delete tmp;
-    }
+    auto *d = DlgOrder::openTable(id, fUser);
+    connect(d, &DlgOrder::allDone, [this]() {
+        refreshTables();
+        fTimer.start(TIMER_TIMEOUT_INTERVAL);
+    });
 }
 
 //void DlgFace::handleMenu(const QJsonObject &obj)
@@ -245,13 +283,17 @@ void DlgFace::filterHall(int hall, int staff)
     int col = 0;
     int row = 0;
     for (int id : dbtable->list()) {
+        QJsonObject to;
+        if (fHallState.contains(QString::number(id))) {
+            to = fHallState[QString::number(id)].toObject();
+        }
         if (hall > 0) {
             if (dbtable->hall(id) != hall) {
                 continue;
             }
         }
         if (staff > 0) {
-            if (dboheader->staff(dboheader->fTableOrder[id]) != staff) {
+            if (to["f_staff"].toInt() != staff) {
                 continue;
             }
         }
@@ -259,7 +301,7 @@ void DlgFace::filterHall(int hall, int staff)
             TableWidgetV2 *t = new TableWidgetV2();
             connect(t, &TableWidgetV2::clicked, this, &DlgFace::tableClicked);
             t->config(id);
-            t->configOrder(dboheader->fTableOrder.contains(id) ? dboheader->fTableOrder[id] : "");
+            t->configOrder(to);
             ui->sglHall->addWidget(t, row, col++, 1, 1);
         } else {
             TableWidgetV1 *t = new TableWidgetV1();
@@ -267,7 +309,7 @@ void DlgFace::filterHall(int hall, int staff)
             t->setMaximumWidth(minWidth);
             connect(t, &TableWidgetV1::clicked, this, &DlgFace::tableClicked);
             t->config(id);
-            t->configOrder(dboheader->fTableOrder.contains(id) ? dboheader->fTableOrder[id] : "");
+            t->configOrder(to);
             ui->sglHall->addWidget(t, row, col++, 1, 1);
         }
         if (col > cc) {
@@ -321,26 +363,9 @@ void DlgFace::setViewMode(int v)
 
 void DlgFace::refreshTables()
 {
-    dboheader->refresh();
-    dbopreorder->refresh();
-    for (int i = 0; i < ui->sglHall->count(); i++) {
-        TableWidget *tw = dynamic_cast<TableWidget *>(ui->sglHall->itemAt(i)->widget());
-        if (tw) {
-            tw->configOrder(dboheader->fTableOrder.contains(tw->fTable) ? dboheader->fTableOrder[tw->fTable] : "");
-        }
-    }
-    while (ui->vlStaff->itemAt(0)) {
-        ui->vlStaff->itemAt(0)->widget()->deleteLater();
-        ui->vlStaff->removeItem(ui->vlStaff->itemAt(0));
-    }
-    for (int staff : dboheader->fStaffTable.keys()) {
-        QPushButton *btn = new QPushButton(dbuser->fullShort(staff));
-        btn->setMinimumSize(QSize(150, 50));
-        connect(btn, &QPushButton::clicked, this, &DlgFace::filterStaffClicked);
-        btn->setProperty("id", staff);
-        ui->vlStaff->addWidget(btn);
-    }
-    ui->vlStaff->addStretch(0);
+    fHttp->createHttpQuery("/engine/waiter/hall-state.php", QJsonObject{{"date", __c5config.dateCash()}}, SLOT(
+        refreshResponse(QJsonObject)), QVariant(),
+    false);
 }
 
 void DlgFace::on_btnCancel_clicked()

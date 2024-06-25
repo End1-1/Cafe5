@@ -124,8 +124,6 @@ SOURCES += \
     ../DbData/dbmenuname.cpp \
     ../DbData/dbmenupackagelist.cpp \
     ../DbData/dbmenupackages.cpp \
-    ../DbData/dboheader.cpp \
-    ../DbData/dbopreorder.cpp \
     ../DbData/dbpartner.cpp \
     ../DbData/dbservicevalues.cpp \
     ../DbData/dbstore.cpp \
@@ -391,7 +389,6 @@ SOURCES += \
     dlgaskforprecheck.cpp \
     dlgcarnumber.cpp \
     dlgcashbuttonopions.cpp \
-    dlgchosesplitorderoption.cpp \
     dlgeditphone.cpp \
     dlgguests.cpp \
     dlglist.cpp \
@@ -425,7 +422,6 @@ SOURCES += \
     ../Classes/c5witerconf.cpp \
     ../Classes/c5waiterserver.cpp \
     ../Classes/c5ordertabledelegate.cpp \
-    ../Classes/c5halltabledelegate.cpp \
     ../Classes/c5printing.cpp \
     ../Classes/c5printservicethread.cpp \
     ../Classes/QRCodeGenerator.cpp \
@@ -561,8 +557,6 @@ HEADERS += \
     ../DbData/dbmenuname.h \
     ../DbData/dbmenupackagelist.h \
     ../DbData/dbmenupackages.h \
-    ../DbData/dboheader.h \
-    ../DbData/dbopreorder.h \
     ../DbData/dbpartner.h \
     ../DbData/dbservicevalues.h \
     ../DbData/dbstore.h \
@@ -829,7 +823,6 @@ HEADERS += \
     dlgaskforprecheck.h \
     dlgcarnumber.h \
     dlgcashbuttonopions.h \
-    dlgchosesplitorderoption.h \
     dlgeditphone.h \
         dlgface.h \
     ../Cafe5/c5database.h \
@@ -851,7 +844,6 @@ HEADERS += \
     ../Classes/c5witerconf.h \
     ../Classes/c5waiterserver.h \
     ../Classes/c5ordertabledelegate.h \
-    ../Classes/c5halltabledelegate.h \
     ../Classes/c5printing.h \
     ../Classes/c5printservicethread.h \
     ../Classes/QRCodeGenerator.h \
@@ -883,7 +875,6 @@ HEADERS += \
     ../Classes/c5printpreview.h \
     ../Classes/c5widget.h \
     ../Classes/c5cache.h \
-    stoplist.h \
     tablewidget.h \
     tablewidgetv1.h \
     tablewidgetv2.h \
@@ -1081,7 +1072,6 @@ FORMS += \
     dlgaskforprecheck.ui \
     dlgcarnumber.ui \
     dlgcashbuttonopions.ui \
-    dlgchosesplitorderoption.ui \
     dlgeditphone.ui \
         dlgface.ui \
     ../Cafe5/c5message.ui \

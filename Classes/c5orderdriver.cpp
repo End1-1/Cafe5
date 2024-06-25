@@ -18,80 +18,6 @@ C5OrderDriver::C5OrderDriver(const QStringList &dbParams) :
 {
 }
 
-bool C5OrderDriver::newOrder(int userid, QString &id, int tableId)
-{
-    fTable = tableId;
-    C5Database db(fDbParams);
-    db.startTransaction();
-    fCurrentOrderId = db.uuid();
-    db[":f_id"] = fCurrentOrderId;
-    db.insert("o_header", false);
-    db[":f_id"] = fCurrentOrderId;
-    db.insert("o_header_options", false);
-    db[":f_id"] = fCurrentOrderId;
-    db.insert("o_tax", false);
-    db[":f_id"] = fCurrentOrderId;
-    db.insert("o_pay_cl", false);
-    db[":f_id"] = fCurrentOrderId;
-    db.insert("o_pay_room", false);
-    db[":f_id"] = fCurrentOrderId;
-    db.insert("o_header_flags", false);
-    db[":f_id"] = fCurrentOrderId;
-    db.insert("o_payment", false);
-    db[":f_id"] = fCurrentOrderId;
-    db.insert("o_preorder", false);
-    fHeader["f_id"] = fCurrentOrderId;
-    db[":f_id"] = fCurrentOrderId;
-    db[":f_checkin"] = QDate::fromString(__c5config.getValue(param_date_cash), FORMAT_DATE_TO_STR_MYSQL);
-    db[":f_checkout"] = QDate::fromString(__c5config.getValue(param_date_cash), FORMAT_DATE_TO_STR_MYSQL);
-    db.insert("o_header_hotel", false);
-    db[":f_header"] = fCurrentOrderId;
-    db[":f_date"] = QDate::fromString(__c5config.getValue(param_date_cash), FORMAT_DATE_TO_STR_MYSQL);
-    db[":f_1"] = 0;
-    db[":f_2"] = 1;
-    db.insert("o_header_hotel_date");
-    db[":f_id"] = dbtable->hall(fTable);
-    db.exec("select f_id, f_prefix, f_counter + 1 as f_counter from h_halls where f_id=(select f_counterhall from h_halls where f_id=:f_id limit 1) for update");
-    if (!db.nextRow()) {
-        db.rollback();
-        fLastError = QString("NO COUNTER FOR THIS HALL (%1)").arg(dbtable->hall(fTable));
-        return false;
-    }
-    int hallid = db.getInt("f_counter");
-    QString prefix = db.getString("f_prefix");
-    db[":f_counter"] = hallid;
-    db.update("h_halls", "f_id", db.getInt("f_id"));
-    db.commit();
-    setHeader("f_staff", userid);
-    setHeader("f_table", fTable);
-    setHeader("f_prefix", prefix);
-    setHeader("f_hallid", hallid);
-    setHeader("f_dateopen", QDate::currentDate());
-    setHeader("f_timeopen", QTime::currentTime());
-    setHeader("f_currentstaff", userid);
-    setHeader("f_state", ORDER_STATE_OPEN);
-    setHeader("f_precheck", 0);
-    setHeader("f_print", 0);
-    setHeader("f_guests", 1);
-    setHeader("f_comment", "");
-    setHeader("f_hall", dbtable->hall(fTable));
-    setHeader("f_amounttotal", 0);
-    setHeader("f_amountcash", 0);
-    setHeader("f_amountcard", 0);
-    setHeader("f_amountbank", 0);
-    setHeader("f_amountother", 0);
-    setHeader("f_amountservice", 0);
-    setHeader("f_amountdiscount", 0);
-    setHeader("f_servicefactor", __c5config.serviceFactor().toDouble());
-    setHeader("f_discountfactor", 0);
-    if (!save()) {
-        return false;
-    }
-    id = fCurrentOrderId;
-    loadData(fCurrentOrderId);
-    return true;
-}
-
 bool C5OrderDriver::closeOrder()
 {
     setCloseHeader();
@@ -164,48 +90,6 @@ bool C5OrderDriver::closeOrder()
     return true;
 }
 
-bool C5OrderDriver::loadData(const QString id)
-{
-    clearOrder();
-    if (id.isEmpty()) {
-        fLastError = tr("Empty order id");
-        return false;
-    }
-    C5Database db(fDbParams);
-    fCurrentOrderId = id;
-    if (!fetchTableData(db, "select * from o_header where f_id='" + id + "' ", fHeader)) {
-        return false;
-    }
-    if (!fetchTableData(db, "select * from o_header_options where f_id='" + id + "'", fHeaderOptions)) {
-        return false;
-    }
-    if (!fetchTableData(db, "select * from o_tax where f_id='" + id + "'", fTaxInfo)) {
-        return false;
-    }
-    if (!fetchTableData(db, "select * from o_pay_room where f_id='" + id + "'", fPayRoom)) {
-        return false;
-    }
-    if (!fetchTableData(db, "select * from o_pay_cl where f_id='" + id + "'", fPayCL)) {
-        return false;
-    }
-    if (!fetchTableData(db, "select * from o_preorder where f_id='" + id + "'", fHeaderPreorder)) {
-        return false;
-    }
-    if (!fetchDishesData(db, id, "")) {
-        return false;
-    }
-    if (!fetchTableData(db, "select * from o_header_hotel where f_id='" + id + "'", fHeaderHotel)) {
-        return false;
-    }
-    fTable = headerValue("f_table").toInt();
-    return true;
-}
-
-bool C5OrderDriver::reloadOrder()
-{
-    return loadData(fCurrentOrderId);
-}
-
 bool C5OrderDriver::setRoom(const QString &res, const QString &inv, const QString &room, const QString &guest)
 {
     //TODO: insert with new order
@@ -246,6 +130,23 @@ bool C5OrderDriver::setCL(const QString &code, const QString &name)
         setHeader("f_otherid", PAYOTHER_TRANSFER_TO_ROOM);
     }
     return true;
+}
+
+void C5OrderDriver::fromJson(const QJsonObject &jdoc)
+{
+    fHeader = jdoc["header"].toObject().toVariantMap();
+    fCurrentOrderId = fHeader["f_id"].toString();
+    fHeaderOptions = jdoc["headerOptions"].toObject().toVariantMap();
+    fHeaderPreorder = jdoc["opreorder"].toObject().toVariantMap();
+    fTaxInfo = jdoc["otax"].toObject().toVariantMap();
+    fPayRoom = jdoc["oroom"].toObject().toVariantMap();
+    fPayCL = jdoc["opaycl"].toObject().toVariantMap();
+    fHeaderHotel = jdoc["headerHotel"].toObject().toVariantMap();
+    const QJsonArray &ja  = jdoc["dishes"].toArray();
+    fDishes.clear();
+    for (int i = 0; i < ja.size(); i++) {
+        fDishes.append(ja.at(i).toObject().toVariantMap());
+    }
 }
 
 bool C5OrderDriver::save()
@@ -325,7 +226,7 @@ bool C5OrderDriver::isEmpty()
     for (int i = 0; i < fDishes.count(); i++) {
         if (dishesValue("f_state", i).toInt() == DISH_STATE_OK) {
             if (dbhall->booking(headerValue("f_hall").toInt())) {
-                setHeader("f_state", ORDER_STATE_PREORDER_WITH_ORDER);
+                //setHeader("f_state", ORDER_STATE_PREORDER_WITH_ORDER);
             }
             return false;
         }
@@ -486,13 +387,6 @@ double C5OrderDriver::prepayment()
     return total;
 }
 
-C5OrderDriver &C5OrderDriver::setCurrentOrderID(const QString &id)
-{
-    fCurrentOrderId = id;
-    loadData(id);
-    return *this;
-}
-
 QString C5OrderDriver::currentOrderId()
 {
     return fCurrentOrderId;
@@ -615,7 +509,13 @@ bool C5OrderDriver::addDish(int menuid, const QString &comment, double price)
         fLastError = db.fLastError;
         return false;
     }
-    return fetchDishesData(db, "", id);
+    db[":f_id"] = id;
+    db.exec("select * from o_body where f_id=:f_id");
+    db.nextRow();
+    QMap<QString, QVariant> d;
+    db.rowToMap(d);
+    fDishes.append(d);
+    return true;
 }
 
 bool C5OrderDriver::addDish2(int packageid, double qty)
@@ -655,7 +555,13 @@ bool C5OrderDriver::addDish2(int packageid, double qty)
         fLastError = db.fLastError;
         return false;
     }
-    return fetchDishesData(db, "", id);
+    db[":f_id"] = id;
+    db.exec("select * from o_body where f_id=:f_id");
+    db.nextRow();
+    QMap<QString, QVariant> d;
+    db.rowToMap(d);
+    fDishes.append(d);
+    return true;
 }
 
 bool C5OrderDriver::addDish(QMap<QString, QVariant> o)
@@ -768,45 +674,13 @@ int C5OrderDriver::duplicateDish(int index)
         fLastError = db.fLastError;
         return -1;
     }
-    if (!fetchDishesData(db, "", id)) {
-        return -1;
-    }
+    db[":f_id"] = id;
+    db.exec("select * from o_body where f_id=:f_id");
+    db.nextRow();
+    QMap<QString, QVariant> d;
+    db.rowToMap(d);
+    fDishes.append(d);
     return fDishes.count() - 1;
-}
-
-bool C5OrderDriver::fetchTableData(C5Database &db, const QString &sql, QMap<QString, QVariant> &data)
-{
-    if (!db.exec(sql)) {
-        fLastError = db.fLastError;
-        return false;
-    }
-    if (db.nextRow()) {
-        db.rowToMap(data);
-    }
-    return true;
-}
-
-bool C5OrderDriver::fetchDishesData(C5Database &db, const QString &header, const QString &id)
-{
-    QString sql = "select ob.* from o_body ob where ";
-    if (id.isEmpty()) {
-        sql += "ob.f_header in ('" + header + "')";
-    } else {
-        sql += " ob.f_id='" + id + "' ";
-    }
-    sql += " order by ob.f_row, ob.f_appendtime ";
-    if(!db.exec(sql)) {
-        fLastError = db.fLastError;
-        return false;
-    }
-    while (db.nextRow()) {
-        QMap<QString, QVariant> row;
-        for (int i = 0; i < db.columnCount(); i++) {
-            row[db.columnName(i)] = db.getValue(i);
-        }
-        fDishes.append(row);
-    }
-    return true;
 }
 
 void C5OrderDriver::setCloseHeader()

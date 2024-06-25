@@ -27,7 +27,6 @@ private slots:
     void verticalScroll(int v);
     void verticalRoomScroll(int v);
     void on_tbl_itemClicked(QTableWidgetItem *item);
-
     void on_btnClearFilter_clicked();
 
 private:

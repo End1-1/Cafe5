@@ -9,8 +9,6 @@
 #include "dbpartner.h"
 #include "dbcar.h"
 #include "dbdishpart1.h"
-#include "dboheader.h"
-#include "dbopreorder.h"
 #include "dbgoodsgroup.h"
 #include "dbunit.h"
 #include "dbgoods.h"
@@ -35,8 +33,6 @@
 #define dbcar DataDriver::fInstance->fDbCar
 #define dbpartner DataDriver::fInstance->fDbPartner
 #define dbdishpart1 DataDriver::fInstance->fDbDishPart1
-#define dboheader DataDriver::fInstance->fDbOHeader
-#define dbopreorder DataDriver::fInstance->fDbOPreorder
 #define dbmenuname DataDriver::fInstance->fDbMenuName
 #define dbdishpart2 DataDriver::fInstance->fDbDishPart2
 #define dbmenu DataDriver::fInstance->fDbMenu
@@ -77,10 +73,6 @@ public:
     DbPartner *fDbPartner;
 
     DbDishPart1 *fDbDishPart1;
-
-    DbOHeader *fDbOHeader;
-
-    DbOPreorder *fDbOPreorder;
 
     DbGoodsGroup *fDbGoodsGroup;
 

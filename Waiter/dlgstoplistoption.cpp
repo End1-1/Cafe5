@@ -1,13 +1,8 @@
 #include "dlgstoplistoption.h"
-#include "c5socketmessage.h"
 #include "ui_dlgstoplistoption.h"
-#include "c5menu.h"
 #include "dlgorder.h"
-#include "stoplist.h"
-#include "dlgviewstoplist.h"
 #include "c5tabledata.h"
 #include "c5printing.h"
-#include "c5logtoserverthread.h"
 #include "c5user.h"
 
 DlgStopListOption::DlgStopListOption(DlgOrder *o, C5User *u) :
@@ -29,70 +24,59 @@ DlgStopListOption::~DlgStopListOption()
     delete ui;
 }
 
-void DlgStopListOption::handleStopList(const QJsonObject &o)
+void DlgStopListOption::removeStopListResponse(const QJsonObject &jdoc)
 {
-    if (o["reply"].toInt() == 1) {
-        C5Menu::fStopList.clear();
-        accept();
-        C5Message::info(tr("The stoplist was removed"));
-    } else {
-        C5Message::error(o["msg"].toString());
-    }
+    fHttp->httpQueryFinished(sender());
+    C5Message::info(tr("The stoplist was removed"));
+    accept();
 }
 
-void DlgStopListOption::handlePrintStopList(const QJsonObject &obj)
+void DlgStopListOption::printStopListResponse(const QJsonObject &jdoc)
 {
-    if (obj["reply"].toInt() == 1) {
-        accept();
-        C5Menu::fStopList.clear();
-        QJsonArray jga = obj["list"].toArray();
-        for (int i = 0; i < jga.count(); i++) {
-            QJsonObject jgo = jga.at(i).toObject();
-            C5Menu::fStopList[jgo["dish"].toInt()] = jgo["qty"].toDouble();
-        }
-        if (C5Menu::fStopList.isEmpty()) {
-            return;
-        }
-        QList<int> menu; //QList<int> menu = dbmenu->list();
-        QMap<QString, QList<int> > printList;
-        // for (int id: menu) {
-        //     // if (C5Menu::fStopList.contains(dbmenu->dishid(id))) {
-        //     //     printList[dbmenu->print1(id)].append(dbmenu->dishid(id));
-        //     // }
-        // }
-        for (QMap<QString, QList<int> >::const_iterator sq = printList.constBegin(); sq != printList.constEnd(); sq++) {
-            QFont font(qApp->font());
-            font.setPointSize(20);
-            C5Printing p;
-            p.setSceneParams(__c5config.getValue(param_print_paper_width).toInt(), 2800, QPrinter::Portrait);
-            p.setFont(font);
-            p.ctext(tr("STOPLIST"));
-            p.br();
-            p.ctext(sq.key());
-            p.br();
-            p.ctext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
-            p.br();
-            p.br();
-            p.line();
-            p.br(2);
-            p.line();
-            p.br();
-            for (QMap<int, double>::const_iterator it = C5Menu::fStopList.constBegin(); it != C5Menu::fStopList.constEnd(); it++) {
-                if (sq.value().contains(it.key())) {
-                    p.ltext(tds("d_dish", "f_name", it.key()), 0);
-                    p.rtext(float_str(it.value(), 2));
-                    p.br();
-                    p.line();
-                    p.br();
-                }
+    fHttp->httpQueryFinished(sender());
+    C5TableData::instance()->setStopList(jdoc["list"].toArray());
+    accept();
+    if (C5TableData::instance()->mStopList.isEmpty()) {
+        return;
+    }
+    QList<int> menu; //QList<int> menu = dbmenu->list();
+    QMap<QString, QList<int> > printList;
+    // for (int id: menu) {
+    //     // if (C5Menu::fStopList.contains(dbmenu->dishid(id))) {
+    //     //     printList[dbmenu->print1(id)].append(dbmenu->dishid(id));
+    //     // }
+    // }
+    for (QMap<QString, QList<int> >::const_iterator sq = printList.constBegin(); sq != printList.constEnd(); sq++) {
+        QFont font(qApp->font());
+        font.setPointSize(20);
+        C5Printing p;
+        p.setSceneParams(__c5config.getValue(param_print_paper_width).toInt(), 2800, QPrinter::Portrait);
+        p.setFont(font);
+        p.ctext(tr("STOPLIST"));
+        p.br();
+        p.ctext(sq.key());
+        p.br();
+        p.ctext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
+        p.br();
+        p.br();
+        p.line();
+        p.br(2);
+        p.line();
+        p.br();
+        for (QMap<int, double>::const_iterator it = C5TableData::instance()->mStopList.constBegin();
+                it != C5TableData::instance()->mStopList.constEnd(); it++) {
+            if (sq.value().contains(it.key())) {
+                p.ltext(tds("d_dish", "f_name", it.key()), 0);
+                p.rtext(float_str(it.value(), 2));
+                p.br();
+                p.line();
+                p.br();
             }
-            p.br();
-            p.ltext(".", 0);
-            p.br();
-            p.print(__c5config.localReceiptPrinter(),  QPrinter::Custom);
         }
-    } else {
-        C5Message::error(obj["msg"].toString());
+        p.br();
+        p.ltext(".", 0);
+        p.br();
+        p.print(__c5config.localReceiptPrinter(),  QPrinter::Custom);
     }
 }
 
@@ -104,11 +88,8 @@ void DlgStopListOption::on_btnCancel_clicked()
 void DlgStopListOption::on_btnClearStopList_clicked()
 {
     if (C5Message::question(tr("Are sure to clear stoplist?")) == QDialog::Accepted) {
-        C5LogToServerThread::remember(LOG_WAITER, fDlgOrder->fUser->fullName(), "", "", "", "Stop list was removed", "", "");
-        auto *sh = createSocketHandler(SLOT(handleStopList(QJsonObject)));
-        sh->bind("cmd", sm_stoplist);
-        sh->bind("state", sl_remove);
-        sh->send();
+        fHttp->createHttpQuery("/engine/waiter/stoplist.php", QJsonObject{ {"action", "remove"}}, SLOT(removeStopListResponse(
+                    QJsonObject)));
     }
 }
 
@@ -126,8 +107,6 @@ void DlgStopListOption::on_btnViewStopList_clicked()
 
 void DlgStopListOption::on_btnPrintStoplist_clicked()
 {
-    auto *sh = createSocketHandler(SLOT(handlePrintStopList(QJsonObject)));
-    sh->bind("cmd", sm_stoplist);
-    sh->bind("state", sl_get);
-    sh->send();
+    fHttp->createHttpQuery("/engine/waiter/stoplist.php", QJsonObject{{"action", "get"}}, SLOT(printStopListResponse(
+                QJsonObject)));
 }

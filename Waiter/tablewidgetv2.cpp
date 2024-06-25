@@ -1,6 +1,5 @@
 #include "tablewidgetv2.h"
 #include "ui_tablewidgetv2.h"
-#include "datadriver.h"
 #include "c5utils.h"
 #include <QDebug>
 
@@ -46,17 +45,16 @@ QFrame *TableWidgetV2::frame()
     return ui->frame;
 }
 
-void TableWidgetV2::configOrder(const QString &orderid)
+void TableWidgetV2::configOrder(const QJsonObject &jo)
 {
-    TableWidget::configOrder(orderid);
+    TableWidget::configOrder(jo);
     ui->lbGuest->clear();
     ui->lbPrepaid->clear();
-    ui->lbReserveTable->clear();
-    if (orderid.length() > 0) {
-        ui->lbGuest->setText(dbopreorder->guestName(orderid));
-        ui->lbPrepaid->setText(float_str(dbopreorder->amount(orderid), 2));
+    if (jo.length() > 0) {
+        ui->lbGuest->setText(jo["f_guestname"].toString());
+        ui->lbPrepaid->setText(float_str(jo["f_prepaid"].toDouble(), 2));
     }
-    if (dbopreorder->table(orderid) > 0) {
-        ui->lbReserveTable->setText(dbtable->name(dbopreorder->table(orderid)));
+    if (jo["f_tablename"].toString() != jo["f_fortablename"].toString()) {
+        ui->tw1lbName->setText(QString("%1 -> %2").arg(jo["f_tablename"].toString(), jo["f_fortablename"].toString()));
     }
 }

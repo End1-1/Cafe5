@@ -3,7 +3,8 @@
 
 #include "tablewidget.h"
 
-namespace Ui {
+namespace Ui
+{
 class TableWidgetV2;
 }
 
@@ -28,7 +29,7 @@ public:
 
     QFrame *frame();
 
-    virtual void configOrder(const QString &orderid);
+    virtual void configOrder(const QJsonObject &jo);
 
 private:
     Ui::TableWidgetV2 *ui;

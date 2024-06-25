@@ -65,7 +65,7 @@ void WOrder::updateDishes()
 
 void WOrder::checkAllItems(bool v)
 {
-    for (auto *w: fItems) {
+    for (auto *w : fItems) {
         w->setChecked(v);
     }
 }
@@ -75,7 +75,7 @@ QList<int> WOrder::checkedItems()
     QList<int> result;
     for (int i = 0; i < fItems.count(); i++) {
         if (fOrderDriver->dishesValue("f_state", i).toInt() == DISH_STATE_OK
-            || fOrderDriver->dishesValue("f_state", i).toInt() == DISH_STATE_SET) {
+                || fOrderDriver->dishesValue("f_state", i).toInt() == DISH_STATE_SET) {
             if (fItems.at(i)->isChecked()) {
                 result.append(i);
             }
@@ -95,7 +95,6 @@ int WOrder::addItem(int menuid, const QString &comment, double price)
     fItems.append(di);
     connect(di, &DishItem::focused, this, &WOrder::focused);
     if (fDlg) {
-
     } else {
         di->setReadyOnly(true);
     }
@@ -107,7 +106,7 @@ int WOrder::addItem(int menuid, const QString &comment, double price)
 
 void WOrder::updateItem(int index)
 {
-    for (auto *item: fItems) {
+    for (auto *item : qAsConst(fItems)) {
         item->setChanges();
     }
 }
@@ -117,7 +116,7 @@ bool WOrder::currentRow(int &row)
     row = -1;
     for (int i = 0, count = ui->vl->count(); i < count; i++) {
         QLayoutItem *l = ui->vl->itemAt(i);
-        DishItem *d = dynamic_cast<DishItem*>(l->widget());
+        DishItem *d = dynamic_cast<DishItem *>(l->widget());
         if (d) {
             if (d->isFocused()) {
                 row = d->index();
@@ -132,7 +131,7 @@ void WOrder::setCurrentRow(int row)
 {
     for (int i = 0, count = ui->vl->count(); i < count; i++) {
         QLayoutItem *l = ui->vl->itemAt(i);
-        DishItem *d = dynamic_cast<DishItem*>(l->widget());
+        DishItem *d = dynamic_cast<DishItem *>(l->widget());
         if (d) {
             if (i == row) {
                 d->clearFocus(row);
@@ -150,7 +149,7 @@ void WOrder::setSelected(bool v)
     if (!fSelected) {
         for (int i = 0, count = ui->vl->count(); i < count; i++) {
             QLayoutItem *l = ui->vl->itemAt(i);
-            DishItem *d = dynamic_cast<DishItem*>(l->widget());
+            DishItem *d = dynamic_cast<DishItem *>(l->widget());
             if (d) {
                 d->clearFocus(-1);
             }
@@ -167,7 +166,7 @@ void WOrder::setCheckMode(bool v)
 {
     for (int i = 0, count = ui->vl->count(); i < count; i++) {
         QLayoutItem *l = ui->vl->itemAt(i);
-        DishItem *d = dynamic_cast<DishItem*>(l->widget());
+        DishItem *d = dynamic_cast<DishItem *>(l->widget());
         if (d) {
             d->setCheckMode(v);
         }
@@ -193,7 +192,7 @@ QPoint WOrder::focused(int index)
     QPoint p(0, 0);
     for (int i = 0, count = ui->vl->count(); i < count; i++) {
         QLayoutItem *l = ui->vl->itemAt(i);
-        DishItem *d = dynamic_cast<DishItem*>(l->widget());
+        DishItem *d = dynamic_cast<DishItem *>(l->widget());
         if (d) {
             d->clearFocus(index);
             if (d->isFocused()) {
@@ -214,6 +213,5 @@ void WOrder::on_btnEditGuestName_clicked()
     DlgGuestInfo gi;
     gi.exec();
     if (gi.fCode > 0) {
-
     }
 }

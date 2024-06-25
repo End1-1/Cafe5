@@ -1,6 +1,6 @@
 SOURCES += \
     $$PWD/../Classes/c5servername.cpp \
-    $$PWD/dlgsplashscreen.cpp \
+    $$PWD/../Forms/dlgsplashscreen.cpp \
     ../../NewTax/Src/printtaxn.cpp \
     ../../XLSX/src/xlsx.cpp \
     ../../XLSX/src/xlsxborder.cpp \
@@ -31,7 +31,6 @@ SOURCES += \
     ../Classes/c5datedelegate.cpp \
     ../Classes/c5filelogwriter.cpp \
     ../Classes/c5gridgilter.cpp \
-    ../Classes/c5halltabledelegate.cpp \
     ../Classes/c5jsondb.cpp \
     ../Classes/c5logtoserverthread.cpp \
     ../Classes/c5menu.cpp \
@@ -105,7 +104,7 @@ SOURCES += \
 
 HEADERS += \
     $$PWD/../Classes/c5servername.h \
-    $$PWD/dlgsplashscreen.h \
+    $$PWD/../Forms/dlgsplashscreen.h \
     ../../NewTax/Src/printtaxn.h \
     ../../XLSX/src/crs32.h \
     ../../XLSX/src/xlsx.h \
@@ -140,7 +139,6 @@ HEADERS += \
     ../Classes/c5datedelegate.h \
     ../Classes/c5filelogwriter.h \
     ../Classes/c5gridgilter.h \
-    ../Classes/c5halltabledelegate.h \
     ../Classes/c5jsondb.h \
     ../Classes/c5logtoserverthread.h \
     ../Classes/c5menu.h \
@@ -216,7 +214,7 @@ HEADERS += \
     ../Classes/c5user.h
 
 FORMS += \
-    $$PWD/dlgsplashscreen.ui \
+    $$PWD/../Forms/dlgsplashscreen.ui \
     ../Cafe5/calendar.ui \
     ../Cafe5/dlgexitbyversion.ui \
     ../Classes/c5gridgilter.ui \

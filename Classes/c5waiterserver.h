@@ -54,8 +54,6 @@ private:
 
     void processCheckDiscountByVisit(QJsonObject &o);
 
-    void processStopList(QJsonObject &o);
-
     void processPrintRemovedService(QJsonObject &o);
 
     void processReturnTaxReceipt(QJsonObject &o);

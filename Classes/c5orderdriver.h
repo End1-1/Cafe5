@@ -1,7 +1,6 @@
 #ifndef C5ORDERDRIVER_H
 #define C5ORDERDRIVER_H
 
-#include "c5database.h"
 #include "c5storedraftwriter.h"
 #include <QObject>
 #include <QMap>
@@ -16,19 +15,15 @@ class C5OrderDriver : public QObject
 public:
     C5OrderDriver(const QStringList &dbParams);
 
-    bool newOrder(int userid, QString &id, int tableId);
-
     bool closeOrder();
 
     void setCloseHeader();
 
-    bool loadData(const QString id);
-
-    bool reloadOrder();
-
     bool setRoom(const QString &res, const QString &inv, const QString &room, const QString &guest);
 
     bool setCL(const QString &code, const QString &name);
+
+    void fromJson(const QJsonObject &jdoc);
 
     bool save();
 
@@ -45,8 +40,6 @@ public:
     double clearAmount();
 
     double prepayment();
-
-    C5OrderDriver &setCurrentOrderID(const QString &id);
 
     QString currentOrderId();
 
@@ -92,15 +85,6 @@ public:
 
     int duplicateDish(int index);
 
-private:
-    QStringList fDbParams;
-
-    QString fLastError;
-
-    QString fCurrentOrderId;
-
-    int fTable;
-
     QMap<QString, QVariant> fHeader;
 
     QMap<QString, QVariant> fHeaderOptions;
@@ -121,15 +105,21 @@ private:
 
     QMap<QString, QMap<QString, QVariant> > fDishesTableData;
 
-    bool fetchTableData(C5Database &db, const QString &sql, QMap<QString, QVariant> &data);
+private:
+    QStringList fDbParams;
 
-    bool fetchDishesData(C5Database &db, const QString &header, const QString &id);
+    QString fLastError;
+
+    QString fCurrentOrderId;
+
+    int fTable;
 
     void clearOrder();
 
     void dateCash(QDate &d, int &dateShift);
 
-    void writeCashDoc(C5StoreDraftWriter &dw, const QString &uuid, const QString id, QString &err, double amount, int staff, int cashboxid, QDate dateCash);
+    void writeCashDoc(C5StoreDraftWriter &dw, const QString &uuid, const QString id, QString &err, double amount, int staff,
+                      int cashboxid, QDate dateCash);
 };
 
 #endif // C5ORDERDRIVER_H

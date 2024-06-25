@@ -3,7 +3,8 @@
 
 #include "c5dialog.h"
 
-namespace Ui {
+namespace Ui
+{
 class DlgStopListOption;
 }
 
@@ -19,9 +20,9 @@ public:
     ~DlgStopListOption();
 
 private slots:
-    void handleStopList(const QJsonObject &o);
+    void removeStopListResponse(const QJsonObject &jdoc);
 
-    void handlePrintStopList(const QJsonObject &obj);
+    void printStopListResponse(const QJsonObject &jdoc);
 
     void on_btnCancel_clicked();
 

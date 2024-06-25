@@ -67,13 +67,15 @@ private:
 
     void openDoc();
 
-    void save();
+    void save(bool withcheckin);
 
     int fPrevRow;
 
     int fPrevColumn;
 
     void setVerticalHeaders();
+
+    void setState();
 };
 
 #endif // DLGPREORDERW_H

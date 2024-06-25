@@ -28,8 +28,8 @@ CR5CarVisits::CR5CarVisits(const QStringList &dbParams, QWidget *parent) :
                    << "sum(oh.f_amountcash) as f_cash"
                    << "sum(oh.f_amountcard) as f_card"
                    << "sum(oh.f_amountbank) as f_bank"
-                   << "sum(oh.f_amountOther) as f_other"
-                   << "sum(oh.f_amountDiscount) as f_discount";
+                   << "sum(oh.f_amountother) as f_other"
+                   << "sum(oh.f_amountdiscount) as f_discount";
 
     fColumnsGroup << "oh.f_id"
                   << "oh.f_datecash"
@@ -68,8 +68,8 @@ CR5CarVisits::CR5CarVisits(const QStringList &dbParams, QWidget *parent) :
     fColumnsVisible["sum(oh.f_amountcash) as f_cash"] = true;
     fColumnsVisible["sum(oh.f_amountcard) as f_card"] = true;
     fColumnsVisible["sum(oh.f_amountbank) as f_bank"] = true;
-    fColumnsVisible["sum(oh.f_amountOther) as f_other"] = true;
-    fColumnsVisible["sum(oh.f_amountDiscount) as f_discount"] = true;
+    fColumnsVisible["sum(oh.f_amountother) as f_other"] = true;
+    fColumnsVisible["sum(oh.f_amountdiscount) as f_discount"] = true;
 
     restoreColumnsVisibility();
     fFilterWidget = new CR5CarVisitsFilter(dbParams);

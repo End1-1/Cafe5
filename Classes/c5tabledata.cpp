@@ -133,3 +133,12 @@ QMap<QString, int> C5TableData::cashNames()
     }
     return l;
 }
+
+void C5TableData::setStopList(const QJsonArray &ja)
+{
+    mStopList.clear();
+    for (int i = 0; i < ja.size(); i++) {
+        const QJsonObject &j  = ja.at(i).toObject();
+        mStopList[j["f_dish"].toInt()] = j["f_qty"].toDouble();
+    }
+}

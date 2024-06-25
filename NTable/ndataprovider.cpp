@@ -1,5 +1,6 @@
 #include "ndataprovider.h"
 #include "logwriter.h"
+#include <QHostInfo>
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
@@ -38,8 +39,9 @@ void NDataProvider::getData(const QString &route, const QJsonObject &data)
     rq.setSslConfiguration(sslConf);
     QJsonObject jo;
     jo["sessionkey"] = sessionKey;
+    jo["hostinfo"] = QHostInfo::localHostName().toLower();
     QStringList keys = data.keys();
-    for (const auto &s : keys) {
+    for (const auto &s : qAsConst(keys)) {
         jo[s] = data[s];
     }
     if (mDebug) {

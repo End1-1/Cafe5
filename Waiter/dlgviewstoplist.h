@@ -3,7 +3,8 @@
 
 #include "c5dialog.h"
 
-namespace Ui {
+namespace Ui
+{
 class DlgViewStopList;
 }
 
@@ -19,7 +20,7 @@ private:
     Ui::DlgViewStopList *ui;
 
 private slots:
-    void handleStopList(const QJsonObject &obj);
+    void getStopListResponse(const QJsonObject &jdoc);
     void handleStopListQty(const QJsonObject &obj);
     void handleStopListRemoveOne(const QJsonObject &obj);
     void on_btnBack_clicked();

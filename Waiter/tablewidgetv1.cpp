@@ -1,7 +1,5 @@
 #include "tablewidgetv1.h"
 #include "ui_tablewidgetv1.h"
-#include "c5utils.h"
-#include "datadriver.h"
 #include <QDebug>
 #include <QStyle>
 
@@ -11,7 +9,7 @@ TableWidgetV1::TableWidgetV1(QWidget *parent) :
 {
     ui->setupUi(this);
     installEventFilter(this);
-    configOrder("");
+    configOrder(QJsonObject());
 }
 
 TableWidgetV1::~TableWidgetV1()

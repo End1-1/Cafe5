@@ -69,12 +69,14 @@ FORMS += \
     ../NTable/nloadingdlg.ui
 
 HEADERS += \
+    ../Classes/QProgressIndicator.h \
     ../Classes/amkbd.h \
     ../NTable/ndataprovider.h \
     ../NTable/ninterface.h \
     ../NTable/nloadingdlg.h
 
 SOURCES += \
+    ../Classes/QProgressIndicator.cpp \
     ../Classes/amkbd.cpp \
     ../NTable/ndataprovider.cpp \
     ../NTable/ninterface.cpp \

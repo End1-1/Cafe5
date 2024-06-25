@@ -21,15 +21,46 @@ DlgSplitOrder::~DlgSplitOrder()
     delete ui;
 }
 
-void DlgSplitOrder::configOrder(const QString &orderId)
+void DlgSplitOrder::configOrder(int table)
 {
-    if (!ui->o1->fOrderDriver->loadData(orderId)) {
-        C5Message::error(ui->o1->fOrderDriver->error());
-        return;
-    }
+    fHttp->createHttpQuery("/engine/waiter/order.php",
+    QJsonObject{{"action", "open"}, {"table", table},
+        {"current_staff", fUser->id()},
+        {"locksrc", hostinfo},
+        {"service_factor", __c5config.getValue(param_service_factor).toDouble()},},
+    SLOT(openO1Response(QJsonObject)));
+}
+
+void DlgSplitOrder::openO1Response(const QJsonObject &jdoc)
+{
+    ui->o1->fOrderDriver->fromJson(jdoc);
     ui->o1->updateDishes();
     ui->lbLeft->setText(dbtable->name(ui->o1->fOrderDriver->headerValue("f_table").toInt()));
     ui->lbRight->setText(tr("Select table"));
+    fHttp->httpQueryFinished(sender());
+}
+
+void DlgSplitOrder::openO2Response(const QJsonObject &jdoc)
+{
+    fHttp->httpQueryFinished(sender());
+    if (jdoc["confirmcreate"].toBool()) {
+        if (C5Message::question(tr("Open new order")) != QDialog::Accepted) {
+            return;
+        }
+        fHttp->createHttpQuery("/engine/waiter/order.php",
+        QJsonObject{{"action", "open"},
+            {"table", jdoc["table"].toInt()},
+            {"locksrc", hostinfo},
+            {"current_staff", fUser->id()},
+            {"service_factor", __c5config.getValue(param_service_factor).toDouble()},
+            {"createifempty", true}},
+        SLOT(openO2Response(QJsonObject)));
+        return;
+    }
+    ui->o2->fOrderDriver->fromJson(jdoc);
+    ui->o2->setDlg(nullptr);
+    ui->o2->updateDishes();
+    ui->lbRight->setText(dbtable->name(ui->o2->fOrderDriver->headerValue("f_table").toInt()));
 }
 
 void DlgSplitOrder::on_btnChoseTable_clicked()
@@ -43,8 +74,9 @@ void DlgSplitOrder::on_btnChoseTable_clicked()
                 C5Message::error(ui->o2->fOrderDriver->error());
             }
         } else {
-            ui->o1->fOrderDriver->reloadOrder();
-            ui->o1->updateDishes();
+            fHttp->createHttpQuery("/engine/waiter/order.php",
+            QJsonObject{{"action", "open"}, {"current_staff", fUser->id()}, {"table", ui->o1->fOrderDriver->headerValue("f_table").toString()}},
+            SLOT(openO1Response(QJsonObject)));
         }
     }
     QString err;
@@ -61,24 +93,13 @@ void DlgSplitOrder::on_btnChoseTable_clicked()
         C5Message::error(ui->o2->fOrderDriver->error());
         return;
     }
-    if (!dbtable->openTable(tableId, orders, err)) {
-        C5Message::error(err);
-        reject();
-        return;
-    }
-    if (orders.count() == 0) {
-        if (C5Message::question(tr("Open new order")) != QDialog::Accepted) {
-            return;
-        }
-        QString id;
-        ui->o2->fOrderDriver->newOrder(fUser->id(), id, tableId);
-        C5LogToServerThread::remember(LOG_WAITER, fUser->fullName(), id, id, "", "New order", dbtable->name(tableId), QString("%1%2").arg(ui->o2->fOrderDriver->headerValue("f_prefix").toString()).arg(ui->o2->fOrderDriver->headerValue("f_hallid").toInt()));
-    } else {
-        ui->o2->fOrderDriver->setCurrentOrderID(orders.at(0));
-    }
-    ui->o2->setDlg(nullptr);
-    ui->o2->updateDishes();
-    ui->lbRight->setText(dbtable->name(ui->o2->fOrderDriver->headerValue("f_table").toInt()));
+    fHttp->createHttpQuery("/engine/waiter/order.php",
+    QJsonObject{{"action", "open"},
+        {"table",  tableId},
+        {"locksrc", hostinfo},
+        {"service_factor", __c5config.getValue(param_service_factor).toDouble()},
+        {"createifempty", false}},
+    SLOT(openO2Response(QJsonObject)));
 }
 
 void DlgSplitOrder::on_btnExit_clicked()
@@ -125,17 +146,17 @@ bool DlgSplitOrder::moveItem(C5OrderDriver *or1, C5OrderDriver *or2, int row)
         return false;
     }
     fHistory.insert(or1->currentOrderId(), QString("Move %1(%2) to %3 (%4%5) ")
-                      .arg(dbdish->name(or1->dishesValue("f_dish", row).toInt()))
-                      .arg(float_str(or1->dishesValue("f_qty1", row).toDouble(), 2))
-                      .arg(dbtable->name(or2->headerValue("f_table").toInt()))
-                      .arg(or2->headerValue("f_prefix").toString())
-                      .arg(or2->headerValue("f_hallid").toInt()));
+                    .arg(dbdish->name(or1->dishesValue("f_dish", row).toInt()))
+                    .arg(float_str(or1->dishesValue("f_qty1", row).toDouble(), 2))
+                    .arg(dbtable->name(or2->headerValue("f_table").toInt()))
+                    .arg(or2->headerValue("f_prefix").toString())
+                    .arg(or2->headerValue("f_hallid").toInt()));
     fHistory.insert(or2->currentOrderId(), QString("Move %1(%2) from %3 (%4%5) ")
-                      .arg(dbdish->name(or1->dishesValue("f_dish", row).toInt()))
-                      .arg(float_str(or1->dishesValue("f_qty1", row).toDouble(), 2))
-                      .arg(dbtable->name(or1->headerValue("f_table").toInt()))
-                      .arg(or1->headerValue("f_prefix").toString())
-                      .arg(or1->headerValue("f_hallid").toInt()));
+                    .arg(dbdish->name(or1->dishesValue("f_dish", row).toInt()))
+                    .arg(float_str(or1->dishesValue("f_qty1", row).toDouble(), 2))
+                    .arg(dbtable->name(or1->headerValue("f_table").toInt()))
+                    .arg(or1->headerValue("f_prefix").toString())
+                    .arg(or1->headerValue("f_hallid").toInt()));
     or1->removeDish(row);
     ui->o1->updateDishes();
     ui->o2->updateDishes();

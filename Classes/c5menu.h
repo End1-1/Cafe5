@@ -21,8 +21,6 @@ public:
 
     static QMap<int, QList<QJsonObject> > fPackagesList;
 
-    static QMap<int, double> fStopList;
-
     static C5Menu *fInstance;
 };
 

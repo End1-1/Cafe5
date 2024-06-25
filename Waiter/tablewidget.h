@@ -2,6 +2,7 @@
 #define TABLEWIDGET_H
 
 #include <QWidget>
+#include <QJsonObject>
 
 class QLabel;
 class QFrame;
@@ -12,7 +13,7 @@ class TableWidget : public QWidget
 public:
     explicit TableWidget(QWidget *parent = nullptr);
 
-    virtual void configOrder(const QString &orderid);
+    virtual void configOrder(const QJsonObject &jo);
 
     virtual QLabel *labelTable() = 0;
 

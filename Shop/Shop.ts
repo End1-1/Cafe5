@@ -312,12 +312,7 @@
 <context>
     <name>C5OrderDriver</name>
     <message>
-        <location filename="../Classes/c5orderdriver.cpp" line="171"/>
-        <source>Empty order id</source>
-        <translation>Դատարկ համար</translation>
-    </message>
-    <message>
-        <location filename="../Classes/c5orderdriver.cpp" line="873"/>
+        <location filename="../Classes/c5orderdriver.cpp" line="747"/>
         <source>Revenue</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2446,11 +2441,6 @@ MS Excel</source>
         <location filename="main.cpp" line="149"/>
         <source>Store is not defined.</source>
         <translation>Պահեստը նշված չէ</translation>
-    </message>
-    <message>
-        <location filename="../DbData/dbtables.cpp" line="40"/>
-        <source>Table already locked</source>
-        <translation></translation>
     </message>
     <message>
         <location filename="../Cafe5/c5message.h" line="19"/>

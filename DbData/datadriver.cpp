@@ -24,8 +24,6 @@ void DataDriver::init(const QStringList &dbParams, DlgSplashScreen *info)
     info->messageSignal("partners...");
     fInstance->fDbPartner = new DbPartner();
     fInstance->fDbDishPart1 = new DbDishPart1();
-    fInstance->fDbOHeader = new DbOHeader();
-    fInstance->fDbOPreorder = new DbOPreorder();
     info->messageSignal("goods...");
     if (!norefresh.contains("goods")) {
         fInstance->fDbGoodsGroup = new DbGoodsGroup();

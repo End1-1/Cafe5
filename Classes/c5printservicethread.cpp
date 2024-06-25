@@ -70,7 +70,7 @@ bool C5PrintServiceThread::run()
     foreach (QString s, fPrint2) {
         print(s, "f_print2", false);
     }
-    if (fHeaderData["f_state"].toInt() == ORDER_STATE_OPEN && !fBooking) {
+    if (fHeaderData["f_state"].toInt() == ORDER_STATE_OPEN) {
         db[":f_header"] = fHeader;
         db.exec("update o_body set f_qty2=f_qty1, f_reprint=abs(f_reprint) where f_header=:f_header");
         for (int i = 0; i < fBodyData.count(); i++) {

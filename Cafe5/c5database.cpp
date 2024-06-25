@@ -431,7 +431,7 @@ bool C5Database::execNetwork(const QString &sqlQuery)
             fCursorPos = jo["data"].toString().toInt();
         }
 #ifdef QT_DEBUG
-        logEvent(fDbParamsForUuid.at(0) + " (" + QString::number(elapsed) + "-" + QString::number(
+        logEvent(host + " (" + QString::number(elapsed) + "-" + QString::number(
                      t.elapsed()) + " ms):" + " " + sql);
 #else
         if (__c5config.getValue(param_debuge_mode).toInt() > 0) {

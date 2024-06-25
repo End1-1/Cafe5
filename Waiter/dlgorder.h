@@ -2,7 +2,6 @@
 #define DLGORDER_H
 
 #include "c5dialog.h"
-#include "c5menu.h"
 #include <QTableWidgetItem>
 #include <QTimer>
 
@@ -27,9 +26,7 @@ public:
 
     C5User *fUser;
 
-    static void openTable(int table, C5User *user);
-
-    static void openTableById(const QString &id, C5User *user);
+    static DlgOrder *openTable(int table, C5User *user);
 
     void itemsToTable();
 
@@ -67,7 +64,7 @@ private:
 
     QList<WOrder *> worders();
 
-    bool load(int table);
+    void load(int table);
 
     void disableForCheckall(bool v);
 
@@ -111,6 +108,8 @@ private:
 private slots:
     void openReservationResponse(const QJsonObject &jdoc);
 
+    void openTableResponse(const QJsonObject &jdoc);
+
     void timeout();
 
     void worderActivated();
@@ -128,6 +127,12 @@ private slots:
     void handleReceipt(const QJsonObject &obj);
 
     void handleStopList(const QJsonObject &obj);
+
+    void restoreStoplistQtyResponse(const QJsonObject &jdoc);
+
+    void addStopListResponse(const QJsonObject &jdoc);
+
+    void checkStopListResponse(const QJsonObject &jdoc);
 
     virtual void handleError(int err, const QString &msg);
 
@@ -156,8 +161,6 @@ private slots:
     void on_btnMovement_clicked();
 
     void on_btnRecent_clicked();
-
-    void on_btnTable_clicked();
 
     void on_btnChangeStaff_clicked();
 
@@ -270,7 +273,11 @@ private slots:
     void on_btnCashout_clicked();
 
     void on_btnMenuSet_clicked();
+
     void on_btnQR_clicked();
+
+signals:
+    void allDone();
 };
 
 #endif // DLGORDER_H

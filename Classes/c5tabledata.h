@@ -41,12 +41,16 @@ public:
 
     QMap<QString, int> cashNames();
 
+    void setStopList(const QJsonArray &ja);
+
+    QMap<int, double> mStopList;
 private:
     static C5TableData *mInstance;
 
     QMap<QString, QJsonArray> mMenuDish;
 
     QMap<QString, QJsonArray> mPart2List;
+
 };
 
 #endif // C5TABLEDATA_H

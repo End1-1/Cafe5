@@ -4,7 +4,8 @@
 #include "c5dialog.h"
 #include "c5user.h"
 
-namespace Ui {
+namespace Ui
+{
 class DlgSplitOrder;
 }
 
@@ -19,9 +20,13 @@ public:
 
     ~DlgSplitOrder();
 
-    void configOrder(const QString &orderId);
+    void configOrder(int table);
 
 private slots:
+    void openO1Response(const QJsonObject &jdoc);
+
+    void openO2Response(const QJsonObject &jdoc);
+
     void on_btnChoseTable_clicked();
 
     void on_btnExit_clicked();
