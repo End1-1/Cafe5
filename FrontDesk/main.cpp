@@ -50,8 +50,8 @@ int main(int argc, char *argv[])
         if (style.open(QIODevice::ReadOnly)) {
             css = style.readAll();
             QString css2(css);
-            css2.replace("%font-size%", "14");
-            css2.replace("%font-family%", "Arial LatArm Unicode");
+            css2.replace("%font-size%", "12");
+            css2.replace("%font-family%", "Tahoma");
             a.setStyleSheet(css2);
         }
     }

@@ -2,7 +2,6 @@
 #include "ui_dlgcashinout.h"
 #include "c5printing.h"
 #include "c5user.h"
-#include "c5storedraftwriter.h"
 #include <QFile>
 
 DlgCashinOut::DlgCashinOut(C5User *u) :
@@ -15,38 +14,37 @@ DlgCashinOut::DlgCashinOut(C5User *u) :
     ui->tbl->setColumnWidth(1, 100);
     C5Database db(__c5config.dbParams());
     double balance = 0;
-    db[":f_session"] = __c5config.getRegValue("session");
+    db[":f_working_session"] = __c5config.getRegValue("sessionid");
     //db[":f_cash"] = __c5config.cashId();
-    db.exec("select sum(f_amount) as f_amount "
-            "from e_cash e "
-            "inner join a_header_cash hc on hc.f_id=e.f_header "
-            "left join o_header_flags ohf on ohf.f_id=hc.f_oheader "
-            "where length(hc.f_oheader)>0 and f_session=:f_session and ohf.f_1=0");
+    db.exec("select sum(f_amounttotal) as f_amounttotal, sum(f_amountcash) as f_amountcash "
+            "from o_header "
+            "where f_working_session=:f_working_session and f_state=2 ");
     db.nextRow();
-    balance += db.getDouble("f_amount");
+    balance += db.getDouble("f_amounttotal");
     int r = ui->tbl->rowCount();
     ui->tbl->setRowCount(r + 1);
     ui->tbl->setItem(r, 0, new QTableWidgetItem(tr("Input from sale")));
-    ui->tbl->setItem(r, 1, new QTableWidgetItem(float_str(db.getDouble("f_amount"), 2)));
-    db[":f_session"] = __c5config.getRegValue("session");
-    //db[":f_cash"] = __c5config.cashId();
-    db.exec("select sum(f_amount) as f_amount "
-            "from e_cash e "
-            "inner join a_header_cash hc on hc.f_id=e.f_header "
-            "left join o_header_flags ohf on ohf.f_id=hc.f_oheader "
-            "where length(hc.f_oheader)>0 and f_session=:f_session and ohf.f_1=1");
+    ui->tbl->setItem(r, 1, new QTableWidgetItem(float_str(db.getDouble("f_amounttotal"), 2)));
+    r = ui->tbl->rowCount();
+    ui->tbl->setRowCount(r + 1);
+    ui->tbl->setItem(r, 0, new QTableWidgetItem(tr("Cash amount")));
+    ui->tbl->setItem(r, 1, new QTableWidgetItem(float_str(db.getDouble("f_amountcash"), 2)));
+    db[":f_working_session"] = __c5config.getRegValue("sessionid");
+    db.exec("select sum(f_amounttotal) as f_amount "
+            "from o_header oh "
+            "inner join o_header_flags ohf on ohf.f_id=oh.f_id "
+            "where oh.f_working_session=:f_working_session and ohf.f_1=1");
     db.nextRow();
-    balance += db.getDouble("f_amount");
+    //balance += db.getDouble("f_amount");
     r = ui->tbl->rowCount();
     ui->tbl->setRowCount(r + 1);
     ui->tbl->setItem(r, 0, new QTableWidgetItem(tr("Input from delivery")));
     ui->tbl->setItem(r, 1, new QTableWidgetItem(float_str(db.getDouble("f_amount"), 2)));
-    db[":f_session"] = __c5config.getRegValue("session");
-    //db[":f_cash"] = __c5config.cashId();
+    db[":f_working_session"] = __c5config.getRegValue("sessionid");
     db.exec("select f_amount, f_remarks "
             "from e_cash e "
             "inner join a_header_cash hc on hc.f_id=e.f_header "
-            "where length(hc.f_oheader)=0 and f_session=:f_session and f_sign=1");
+            "where length(coalesce(hc.f_oheader, ''))=0 and f_working_session=:f_working_session and f_sign=1");
     while (db.nextRow()) {
         r = ui->tbl->rowCount();
         ui->tbl->setRowCount(r + 1);
@@ -54,12 +52,11 @@ DlgCashinOut::DlgCashinOut(C5User *u) :
         ui->tbl->setItem(r, 1, new QTableWidgetItem(float_str(db.getDouble("f_amount"), 2)));
         balance += db.getDouble("f_amount");
     }
-    db[":f_session"] = __c5config.getRegValue("session");
-    //db[":f_cash"] = __c5config.cashId();
+    db[":f_working_session"] = __c5config.getRegValue("sessionid");
     db.exec("select f_sign*f_amount as f_amount, f_remarks "
             "from e_cash e "
             "inner join a_header_cash hc on hc.f_id=e.f_header "
-            "where length(hc.f_oheader)=0 and f_session=:f_session and f_sign=-1");
+            "where length(coalesce(hc.f_oheader, ''))=0 and f_working_session=:f_working_session and f_sign=-1");
     while (db.nextRow()) {
         r = ui->tbl->rowCount();
         ui->tbl->setRowCount(r + 1);
@@ -97,107 +94,38 @@ void DlgCashinOut::on_btnCloseSession_clicked()
         return;
     }
     C5Database db(__c5config.dbParams());
-    db[":f_comp"] = hostinfo;
-    db[":f_dateout"] = QDate::currentDate();
-    db[":f_timeout"] = QTime::currentTime();
-    db.exec("update s_salary_inout "
-            "set f_dateout=:f_dateout, f_timeout=:f_timeout "
-            "where lower(f_comp)=lower(:f_comp)");
+    db[":f_working_session"] = __c5config.getRegValue("sessionid");
+    db[":f_close"] = QDateTime::currentDateTime();
+    db.exec("update s_working_sessions "
+            "set f_close=:f_close where f_id=:f_working_session ");
     db.commit();
-    db[":f_session"] = __c5config.getRegValue("session");
-    QString sql = "SELECT SUM(oh.f_amountcash) AS f_cash, SUM(oh.f_amountcard) AS f_card, SUM(oh.f_amountidram) AS f_idram "
-                  "from s_salary_inout s "
-                  "INNER JOIN a_header_cash hc ON hc.f_session=s.f_id "
-                  "INNER JOIN o_header oh ON oh.f_id=hc.f_oheader "
-                  "INNER JOIN s_user u ON u.f_id=s.f_user "
-                  "WHERE f_session=:f_session ";
+    db[":f_working_session"] = __c5config.getRegValue("sessionid");
+    QString sql = "SELECT SUM(oh.f_amountcash) AS f_cash, SUM(oh.f_amountcard) AS f_card, "
+                  "SUM(oh.f_amountidram) AS f_idram, sum(oh.f_amountother) as f_amountother "
+                  "from o_header oh "
+                  "WHERE oh.f_working_session=:f_working_session ";
     db.exec(sql);
     db.nextRow();
     double cash = db.getDouble("f_cash"),
            card = db.getDouble("f_card"),
-           idram = db.getDouble("f_idram");
-    C5StoreDraftWriter dw(db);
-    double cashbalance = fBalance - card - idram;
-    if (cashbalance > 0.1) {
-        int counter = dw.counterAType(DOC_TYPE_CASH);
-        QString cashdoc;
-        if (!dw.writeAHeader(cashdoc, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH,
-                             fUser->id(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(),
-                             0, cashbalance, tr("Close session"), 1, __c5config.getValue(param_default_currency).toInt())) {
-            C5Message::error(dw.fErrorMsg);
-            return;
-        }
-        if (!dw.writeAHeaderCash(cashdoc, 0, __c5config.cashId(), 0, "", "", __c5config.getRegValue("session").toString())) {
-            C5Message::error(dw.fErrorMsg);
-            return;
-        }
-        QString cashUUID;
-        if (!dw.writeECash(cashUUID, cashdoc,
-                           __c5config.cashId(),
-                           -1,
-                           QString("%1 %2").arg(tr("Close session"), tr("Cash")),
-                           cashbalance, cashUUID, 1)) {
-            C5Message::error(dw.fErrorMsg);
-            return;
-        }
-    } else if (cashbalance < 0) {
-        C5Message::error(tr("Invalid balance"));
+           idram = db.getDouble("f_idram"),
+           other = db.getDouble("f_amountother");
+    db[":f_id"] = __c5config.getRegValue("sessionid");
+    db.exec("select sws.*, concat(u.f_last, ' ', u.f_first) as f_fullname "
+            "from s_working_sessions sws "
+            "left join s_user u on u.f_id=sws.f_user "
+            "where sws.f_id=:f_id ");
+#ifdef QT_DEBUG
+    Q_ASSERT(db.nextRow());
+#else
+    if (db.nextRow() == false) {
+        C5Message::error(QString("No session with %1").arg(__c5config.getRegValue("sessionid").toInt()));
         return;
     }
-    if (card > 0.1) {
-        int counter = dw.counterAType(DOC_TYPE_CASH);
-        QString cashdoc;
-        if (!dw.writeAHeader(cashdoc, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH,
-                             fUser->id(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(),
-                             0, card, tr("Close session"), 1, __c5config.getValue(param_default_currency).toInt())) {
-            C5Message::error(dw.fErrorMsg);
-            return;
-        }
-        if (!dw.writeAHeaderCash(cashdoc, 0, __c5config.cashId(), 0, "", "", __c5config.getRegValue("session").toString())) {
-            C5Message::error(dw.fErrorMsg);
-            return;
-        }
-        QString cashUUID;
-        if (!dw.writeECash(cashUUID, cashdoc,
-                           __c5config.cashId(),
-                           -1,
-                           QString("%1 %2").arg(tr("Close session"), tr("Card")), card, cashUUID, 1)) {
-            C5Message::error(dw.fErrorMsg);
-            return;
-        }
-    }
-    if (idram > 0.1) {
-        int counter = dw.counterAType(DOC_TYPE_CASH);
-        QString cashdoc;
-        if (!dw.writeAHeader(cashdoc, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH,
-                             fUser->id(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(),
-                             0, card, tr("Close session"), 1, __c5config.getValue(param_default_currency).toInt())) {
-            C5Message::error(dw.fErrorMsg);
-            return;
-        }
-        if (!dw.writeAHeaderCash(cashdoc, 0, __c5config.cashId(), 0, "", "", __c5config.getRegValue("session").toString())) {
-            C5Message::error(dw.fErrorMsg);
-            return;
-        }
-        QString cashUUID;
-        if (!dw.writeECash(cashUUID, cashdoc,
-                           __c5config.cashId(),
-                           -1,
-                           QString("%1 %2").arg(tr("Close session"), tr("Idram")), idram, cashUUID, 1)) {
-            C5Message::error(dw.fErrorMsg);
-            return;
-        }
-    }
-    db[":f_id"] = __c5config.getRegValue("session");
-    db.exec("select * from s_salary_inout where f_id=:f_id");
-    if(!db.nextRow()) {
-        accept();
-        return;
-    }
-    QString datein = db.getDate("f_datein").toString(FORMAT_DATE_TO_STR);
-    QString dateout = db.getDate("f_dateout").toString(FORMAT_DATE_TO_STR);
-    QString timein = db.getTime("f_timein").toString(FORMAT_TIME_TO_STR);
-    QString timeout = db.getTime("f_timeout").toString(FORMAT_TIME_TO_STR);
+#endif
+    QString open = db.getDateTime("f_open").toString(FORMAT_DATETIME_TO_STR);
+    QString close = db.getDateTime("f_close").toString(FORMAT_DATETIME_TO_STR);
+    QString staff = db.getString("f_fullname");
     QFont font(qApp->font());
     font.setPointSize(__c5config.getValue(param_receipt_print_font_size).toInt());
     font.setFamily(__c5config.getValue(param_receipt_print_font_family));
@@ -209,25 +137,25 @@ void DlgCashinOut::on_btnCloseSession_clicked()
         p.br();
     }
     p.setFontBold(true);
-    p.ctext(QString("%1 %2").arg(tr("Close session"), QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR)));
+    p.ctext(QString("%1 %2").arg(tr("Close session"), close));
     p.br();
-    p.ctext(fUser->fullName());
+    p.ctext(staff);
     p.br();
-    p.ctext(QString("%1 %2").arg(datein, timein));
+    p.ctext(QString("%1").arg(open));
     p.br();
     p.ctext("-");
     p.br();
-    p.ctext(QString("%1 %2").arg(dateout, timeout));
+    p.ctext(QString("%1").arg(close));
     p.br();
     p.line();
     p.br();
     p.ltext(ui->tbl->item(0, 0)->text(), 0);
     p.rtext(ui->tbl->item(0, 1)->text());
-    if (str_float(ui->tbl->item(1, 1)->text()) > 0.01) {
-        p.br();
-        p.ltext(ui->tbl->item(1, 0)->text(), 0);
-        p.rtext(ui->tbl->item(1, 1)->text());
-    }
+    // if (str_float(ui->tbl->item(1, 1)->text()) > 0.01) {
+    //     p.br();
+    //     p.ltext(ui->tbl->item(1, 0)->text(), 0);
+    //     p.rtext(ui->tbl->item(1, 1)->text());
+    // }
     p.br();
     p.br();
     p.ltext(tr("Including:"), 0);
@@ -247,13 +175,18 @@ void DlgCashinOut::on_btnCloseSession_clicked()
         p.rtext(float_str(idram, 2));
         p.br();
     }
+    if (other > 0.001) {
+        p.ltext(tr("Other"), 0);
+        p.rtext(float_str(other, 2));
+        p.br();
+    }
     p.br();
     p.line();
     p.br();
     p.ltext(tr("Other transactions"), 0);
     p.br();
     p.br();
-    for (int i = 2 ; i < ui->tbl->rowCount(); i++) {
+    for (int i = 3 ; i < ui->tbl->rowCount(); i++) {
         cash += str_float(ui->tbl->item(i, 1)->text());
         p.ltext(ui->tbl->item(i, 0)->text(), 0);
         p.rtext(ui->tbl->item(i, 1)->text());

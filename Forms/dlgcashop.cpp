@@ -44,17 +44,18 @@ void DlgCashOp::on_btnSave_clicked()
     QString cashdoc;
     if (!dw.writeAHeader(cashdoc, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH,
                          fUser->id(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(),
-                         0, ui->leAmount->getDouble(), ui->lePurpose->text(),1, __c5config.getValue(param_default_currency).toInt())) {
+                         0, ui->leAmount->getDouble(), ui->lePurpose->text(), 1, __c5config.getValue(param_default_currency).toInt())) {
         C5Message::error(dw.fErrorMsg);
         return;
     }
     if (!dw.writeAHeaderCash(cashdoc, fSign ? __c5config.cashId() : 0, fSign ? 0 : __c5config.cashId(),
-                             0, "", "", __c5config.getRegValue("session").toString())) {
+                             0, "", "")) {
         C5Message::error(dw.fErrorMsg);
         return;
     }
     QString cashUUID;
-    if (!dw.writeECash(cashUUID, cashdoc, __c5config.cashId(), fSign ? 1 : -1, ui->lePurpose->text(), ui->leAmount->getDouble(), cashUUID, 1)) {
+    if (!dw.writeECash(cashUUID, cashdoc, __c5config.cashId(), fSign ? 1 : -1, ui->lePurpose->text(),
+                       ui->leAmount->getDouble(), cashUUID, 1)) {
         C5Message::error(dw.fErrorMsg);
         return;
     }

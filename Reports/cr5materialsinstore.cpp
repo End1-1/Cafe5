@@ -74,12 +74,12 @@ void CR5MaterialsInStore::prepareDrafts()
                    << "g.f_lowlevel"
                    << "gpr.f_price1"
                    << "grp.f_price1disc"
-                   << "grp.f_price2dics"
                    << "sum(s.f_qty*s.f_type)*gpr.f_price1 as f_totalsale"
                    << "gpr.f_price2"
+                   << "grp.f_price2dics"
                    << "sum(s.f_qty*s.f_type)*gpr.f_price2 as f_totalsale2"
-                   << "sum(s.f_qty*s.f_type)*gpr.f_price1disc as f_totalretaildiscounted"
-                   << "sum(s.f_qty*s.f_type)*gpr.f_price2disc as f_totalsale2discount"
+                   << "sum(s.f_qty*s.f_type)*if(gpr.f_price1disc>0,gpr.f_price1disc,gpr.f_price1) as f_totalretaildiscounted"
+                   << "sum(s.f_qty*s.f_type)*if(gpr.f_price2disc>0,gpr.f_price2disc,gpr.f_price2) as f_totalsale2discount"
                    ;
     fColumnsGroup << "g.f_id as f_code"
                   << "ss.f_name as f_storage"
@@ -141,11 +141,13 @@ void CR5MaterialsInStore::prepareDrafts()
     fColumnsVisible["gpr.f_price1"] = false;
     fColumnsVisible["gpr.f_price1disc"] = false;
     fColumnsVisible["sum(s.f_qty*s.f_type)*gpr.f_price1 as f_totalsale"] = false;
-    fColumnsVisible["sum(s.f_qty*s.f_type)*gpr.f_price1disc as f_totalretaildiscounted"] = false;
+    fColumnsVisible["sum(s.f_qty*s.f_type)*if(gpr.f_price1disc>0,gpr.f_price1disc,gpr.f_price1) as f_totalretaildiscounted"]
+        = false;
     fColumnsVisible["gpr.f_price2"] = false;
     fColumnsVisible["gpr.f_price2disc"] = false;
     fColumnsVisible["sum(s.f_qty*s.f_type)*gpr.f_price2 as f_totalsale2"] = false;
-    fColumnsVisible["sum(s.f_qty*s.f_type)*gpr.f_price2disc as f_totalsale2discount"] = false;
+    fColumnsVisible["sum(s.f_qty*s.f_type)*if(gpr.f_price2disc>0,gpr.f_price2disc,gpr.f_price2) as f_totalsale2discount"] =
+        false;
     fColumnsVisible["p.f_taxname"] = false;
     fColumnsVisible["v.f_date as f_validdate"] = false;
     restoreColumnsVisibility();
@@ -187,8 +189,8 @@ void CR5MaterialsInStore::prepareNoDrafts()
                    << "gpr.f_price2"
                    << "gpr.f_price2disc"
                    << "sum(s.f_qty*s.f_type)*gpr.f_price2 as f_totalsale2"
-                   << "sum(s.f_qty*s.f_type)*gpr.f_price1disc as f_totalretaildiscounted"
-                   << "sum(s.f_qty*s.f_type)*gpr.f_price2disc as f_totalsale2discount"
+                   << "sum(s.f_qty*s.f_type)*if(gpr.f_price1disc>0,gpr.f_price1disc,gpr.f_price1) as f_totalretaildiscounted"
+                   << "sum(s.f_qty*s.f_type)*if(gpr.f_price2disc>0,gpr.f_price2disc,gpr.f_price2) as f_totalsale2discount"
                    ;
     fColumnsGroup << "g.f_id as f_code"
                   << "ss.f_name as f_storage"
@@ -248,11 +250,13 @@ void CR5MaterialsInStore::prepareNoDrafts()
     fColumnsVisible["gpr.f_price1"] = false;
     fColumnsVisible["gpr.f_price1disc"] = false;
     fColumnsVisible["sum(s.f_qty*s.f_type)*gpr.f_price1 as f_totalsale"] = false;
-    fColumnsVisible["sum(s.f_qty*s.f_type)*gpr.f_price1disc as f_totalretaildiscounted"] = false;
+    fColumnsVisible["sum(s.f_qty*s.f_type)*if(gpr.f_price1disc>0,gpr.f_price1disc,gpr.f_price1) as f_totalretaildiscounted"]
+        = false;
     fColumnsVisible["gpr.f_price2"] = false;
     fColumnsVisible["gpr.f_price2disc"] = false;
     fColumnsVisible["sum(s.f_qty*s.f_type)*gpr.f_price2 as f_totalsale2"] = false;
-    fColumnsVisible["sum(s.f_qty*s.f_type)*gpr.f_price2disc as f_totalsale2discount"] = false;
+    fColumnsVisible["sum(s.f_qty*s.f_type)*if(gpr.f_price2disc>0,gpr.f_price2disc,gpr.f_price2) as f_totalsale2discount"] =
+        false;
     fColumnsVisible["gca.f_name as f_class1"] = false;
     fColumnsVisible["gcb.f_name as f_class2"] = false;
     fColumnsVisible["gcc.f_name as f_class3"] = false;

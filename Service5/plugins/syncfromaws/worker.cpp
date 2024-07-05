@@ -95,6 +95,7 @@ void WaiterClientHandler::getLastIDResponse(const QJsonObject &jdoc)
     jo = jo["result"].toObject();
     int lastid = jo["f_syncin"].toInt();
     NDataProvider::mHost = remote;
+    LogWriter::write(LogWriterLevel::verbose, "getLastIDResponse", QString::number(lastid));
     auto *dp = new NDataProvider(this);
     connect(dp, &NDataProvider::done, this, &WaiterClientHandler::getDataResponse);
     connect(dp, &NDataProvider::error, this, &WaiterClientHandler::getSyncError);
@@ -105,11 +106,12 @@ void WaiterClientHandler::getDataResponse(const QJsonObject &jdoc)
 {
     QJsonObject jo = jdoc["data"].toObject();
     if (jo["empty"].toBool()) {
+        LogWriter::write(LogWriterLevel::verbose, "getDataResponse", "empty");
         clearTask();
         return;
     }
     QJsonArray ja = jdoc["data"].toArray();
-    LogWriter::write(LogWriterLevel::verbose, "", "getDataResponse started");
+    LogWriter::write(LogWriterLevel::verbose, "getDataResponse started", QString::number(ja.size()));
     NDataProvider::mHost = local;
     auto *dp = new NDataProvider(this);
     connect(dp, &NDataProvider::done, this, &WaiterClientHandler::updateLocalResponse);
@@ -119,6 +121,7 @@ void WaiterClientHandler::getDataResponse(const QJsonObject &jdoc)
 
 void WaiterClientHandler::updateLocalResponse(const QJsonObject &jdoc)
 {
+    LogWriter::write(LogWriterLevel::verbose, "updateLocalResponse", "");
     getLastId();
 }
 

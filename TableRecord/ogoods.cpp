@@ -53,12 +53,12 @@ bool OGoods::getRecord(C5Database &db)
     goods = db.getInt("f_goods");
     qty = db.getDouble("f_qty");
     price = db.getDouble("f_price");
-    total = qty * price;
+    total = qty *price;
     tax = db.getInt("f_tax");
     sign = db.getInt("f_sign");
     discountFactor = db.getDouble("f_discountfactor");
     discountMode = db.getInt("f_discountmode");
-    taxDept = db.getString("f_taxdept");
+    taxDept = db.getInt("f_taxdept");
     adgCode = db.getString("f_adgcode");
     return_ = db.getInt("f_return");
     returnFrom = db.getString("f_returnfrom");

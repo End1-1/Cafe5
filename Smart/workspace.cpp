@@ -446,7 +446,7 @@ void Workspace::createHttpRequest(const QString &route, QJsonObject params, cons
                                   const char *responseErrorSlot)
 {
     params["sessionkey"] = __c5config.getRegValue("sessionkey").toString();
-    params["comp"] = hostinfo;
+    params["host"] = hostinfo;
     params["config_id"] = __c5config.getRegValue("json_config_id").toInt();
     params["user_session"] = __c5config.getRegValue("session").toString();
     auto np = new NDataProvider(this);
@@ -474,7 +474,21 @@ void Workspace::on_btnCheckout_clicked()
             return;
         }
     }
-    if (ui->tblOrder->rowCount() == 0) {
+    bool empty = true;
+    bool haveremoved = false;
+    for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
+        haveremoved = true;
+        Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
+        if (d.state == DISH_STATE_OK) {
+            empty = false;
+            break;
+        }
+    }
+    if (empty) {
+        if (haveremoved) {
+            fHttp->createHttpQuery("/engine/smart/remove-order.php", QJsonObject{{"id", fOrderUuid}}, SLOT(removeOrderResponse(
+                        QJsonObject)));
+        }
         return;
     }
     if (ui->btnSetCard->isChecked() || ui->btnSetCardExternal->isChecked()) {
@@ -765,6 +779,7 @@ void Workspace::on_leReadCode_returnPressed()
         }
     }
     QString code = newcode.replace("?", "").replace(";", "");
+    code = code.replace("\'", "\\\'");
     QString emarks;
     if (code.length() > 20) {
         emarks = code;
@@ -1032,6 +1047,7 @@ bool Workspace::saveOrder(int state, bool printService)
     header["discountfactor"] = fDiscountValue;
     header["partner"] = fCustomer;
     header["taxpayertin"] = ui->leTaxpayerId->text();
+    header["sessionid"] = __c5config.getRegValue("sessionid").toInt();
     QJsonObject bhistory;
     bhistory["card"] = fDiscountCard;
     bhistory["type"] = fDiscountMode;
@@ -1039,7 +1055,7 @@ bool Workspace::saveOrder(int state, bool printService)
     bhistory["data"] = fDiscountAmount;
     QJsonObject flags;
     flags["f1"] = fCustomer == 0 ? 0 :  1;
-    flags["f2"] = 0;
+    //flags["f2"] = 0;
     flags["f3"] = ui->btnFlagTakeAway->isChecked() ? 1 : 0;
     flags["f4"] = 0;
     flags["f5"] = 0;
@@ -1373,7 +1389,7 @@ bool Workspace::printReceipt(const QString &id, bool printSecond, bool precheck)
         p.br();
     }
     p.ltext(tr("Need to pay"), 0);
-    p.rtext(float_str(db.getDouble("f_amounttotal"), 2));
+    p.rtext(float_str(clearTotal, 2));
     p.br();
     p.br();
     p.line();
@@ -1475,6 +1491,7 @@ void Workspace::printService(const QString &printerName, const QJsonObject &h, c
         const QJsonObject &j = d.at(i).toObject();
         p.setFontSize(basesize);
         p.setFontBold(true);
+        p.setFontStrike(j["f_state"].toInt() != 1);
         p.ltext(j["f_name"].toString(), 0);
         p.setFontSize(basesize + 8);
         p.setFontBold(true);
@@ -1488,6 +1505,7 @@ void Workspace::printService(const QString &printerName, const QJsonObject &h, c
         p.line();
         p.br();
     }
+    p.setFontStrike(false);
     p.setFontSize(basesize - 4);
     // p.setFontBold(false);
     p.ltext(QString("%1 %2 [%3]").arg(tr("[1] Printed:"), QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR),
@@ -1573,7 +1591,10 @@ void Workspace::loginResponse(const QJsonObject &jdoc)
     __c5config.setRegValue("session", C5Database::uuid());
     fUser = new C5User(jo["f_id"].toInt());
     httpStop(sender());
-    createHttpRequest("/engine/smart/init.php", QJsonObject(), SLOT(initResponse(QJsonObject)), "init");
+    QJsonArray jsessions = jdoc["data"].toObject()["sessions"].toArray();
+    createHttpRequest("/engine/smart/init.php",
+    QJsonObject{{"config_id", __c5config.getRegValue("json_config_id").toInt()}},
+    SLOT(initResponse(QJsonObject)), "init");
 }
 
 void Workspace::initResponse(const QJsonObject &jdoc)
@@ -1696,10 +1717,11 @@ void Workspace::initResponse(const QJsonObject &jdoc)
         }
     }
     httpStop(sender());
-    if (jo["welcome"].toString() == "ok") {
+    if (jo["welcome"].toObject()["ok"].toBool()) {
+        __c5config.setRegValue("sessionid", jo["welcome"].toObject()["sessionid"].toInt());
         C5Message::info(tr("Welcome") + "<br>" + __c5config.getRegValue("username").toString());
     } else {
-        C5Message::info(tr("Please close session of") + "<br>" + jo["welcome"].toString());
+        C5Message::info(tr("Please close session of") + "<br>" + jo["welcome"].toObject()["who"].toString());
         qApp->quit();
         return;
     }
@@ -1937,6 +1959,14 @@ void Workspace::updateDishResponse(const QJsonObject &jdoc)
     updateInfo(row);
     countTotal();
     httpStop(sender());
+}
+
+void Workspace::removeOrderResponse(const QJsonObject &jdoc)
+{
+    Q_UNUSED(jdoc);
+    fHttp->httpQueryFinished(sender());
+    createHttpRequest("/engine/smart/opentable.php", QJsonObject{{"table", fTable}}, SLOT(
+        openTableResponse(QJsonObject)));
 }
 
 void Workspace::focusTaxIn()
@@ -2233,7 +2263,8 @@ void Workspace::on_printOrder_clicked()
     if (fOrderUuid.isEmpty()) {
         return;
     }
-    createHttpRequest("/engine/smart/printservice.php", QJsonObject{{"header", fOrderUuid}, {"mode", 1}}, SLOT(
+    createHttpRequest("/engine/smart/printservice.php", QJsonObject{{"header", fOrderUuid},
+        {"mode", 1}}, SLOT(
         printServiceResponse(QJsonObject)), QVariant());
 }
 
@@ -2277,6 +2308,7 @@ void Workspace::createAddDishRequest(Dish *d)
     dish["flags"] = flags;
     dish["bhistory"] = bhistory;
     dish["customer"] = fCustomer;
+    dish["sessionid"] = __c5config.getRegValue("sessionid").toInt();
     createHttpRequest("/engine/smart/adddish.php", dish, SLOT(addGoodsResponse(QJsonObject)), dish);
 }
 

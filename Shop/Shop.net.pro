@@ -58,7 +58,6 @@ SOURCES += \
     ../Classes/c5document.cpp \
     ../Classes/c5filelogwriter.cpp \
     ../Classes/c5gridgilter.cpp \
-    ../Classes/c5halltabledelegate.cpp \
     ../Classes/c5jsondb.cpp \
     ../Classes/c5logtoserverthread.cpp \
     ../Classes/c5menu.cpp \
@@ -119,8 +118,6 @@ SOURCES += \
     ../DbData/dbmenuname.cpp \
     ../DbData/dbmenupackagelist.cpp \
     ../DbData/dbmenupackages.cpp \
-    ../DbData/dboheader.cpp \
-    ../DbData/dbopreorder.cpp \
     ../DbData/dbpartner.cpp \
     ../DbData/dbservicevalues.cpp \
     ../DbData/dbstore.cpp \
@@ -254,7 +251,6 @@ HEADERS += \
     ../Classes/c5document.h \
     ../Classes/c5filelogwriter.h \
     ../Classes/c5gridgilter.h \
-    ../Classes/c5halltabledelegate.h \
     ../Classes/c5jsondb.h \
     ../Classes/c5logtoserverthread.h \
     ../Classes/c5menu.h \
@@ -317,8 +313,6 @@ HEADERS += \
     ../DbData/dbmenuname.h \
     ../DbData/dbmenupackagelist.h \
     ../DbData/dbmenupackages.h \
-    ../DbData/dboheader.h \
-    ../DbData/dbopreorder.h \
     ../DbData/dbpartner.h \
     ../DbData/dbservicevalues.h \
     ../DbData/dbstore.h \

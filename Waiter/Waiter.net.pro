@@ -896,7 +896,6 @@ HEADERS += \
     ../Classes/c5permissions.h \
     dlgexitwithmessage.h \
     ../Classes/c5translator.h \
-    c5printreceiptthread.h \
     ../Cafe5/dlgexitbyversion.h \
     ../Classes/fileversion.h
 

@@ -4,7 +4,6 @@
 DbGoodsGroup::DbGoodsGroup() :
     DbData("c_groups")
 {
-
 }
 
 DbGoodsGroup::DbGoodsGroup(int id) :
@@ -17,9 +16,9 @@ QString DbGoodsGroup::adgt()
     return dbgoodsgroup->get(fId, "f_adgcode").toString();
 }
 
-QString DbGoodsGroup::taxDept()
+int DbGoodsGroup::taxDept()
 {
-    return dbgoodsgroup->get(fId, "f_taxdept").toString();
+    return dbgoodsgroup->get(fId, "f_taxdept").toInt();
 }
 
 QString DbGoodsGroup::groupName()

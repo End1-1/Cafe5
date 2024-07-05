@@ -153,7 +153,7 @@ bool C5SaleDoc::openDoc(const QString &uuid)
     if (db.getInt("f_state") > 1) {
         fToolBar->actions().at(0)->setEnabled(false);
     }
-    ui->leDocnumber->setText(QString("%1%2").arg(db.getString("f_prefix"), db.getString("f_hallid")));
+    ui->leDocnumber->setText(QString("%1%2").arg(db.getString("f_prefix")).arg(db.getInt("f_hallid")));
     ui->leCash->setDouble(db.getDouble("f_amountcash"));
     ui->leCard->setDouble(db.getDouble("f_amountcard"));
     ui->leBankTransfer->setDouble(db.getDouble("f_amountbank"));
@@ -196,65 +196,8 @@ bool C5SaleDoc::openDoc(const QString &uuid)
 
 void C5SaleDoc::makeDraftResponse(const QJsonObject &jdoc)
 {
-    /*    QString oldId = ui->leUuid->text();
-    QString err;
-    C5Database db(fDBParams);
-    db.startTransaction();
-    fDraftSale.id = "";
-    fDraftSale.state = 1;
-    fDraftSale.saleType = ui->leSaleType->property("id").toInt();
-    fDraftSale.date = ui->leDate->date();
-    fDraftSale.time = QTime::currentTime();
-    fDraftSale.cashier = __user->id();
-    fDraftSale.staff = ui->leDeluveryMan->property("id").toInt();
-    fDraftSale.amount = ui->leGrandTotal->getDouble();
-    fDraftSale.comment = ui->leComment->text();
-    fDraftSale.payment = 1;
-    fDraftSale.partner = fPartner.id.toInt();
-    fDraftSale.discount = 0;
-    fDraftSale.deliveryDate = QDate::fromString(ui->leDelivery->text(), "dd/MM/yyyy");
-    if (!fDraftSale.write(db, err)) {
-        db.rollback();
-        C5Message::error(err);
-        return;
-    }
-    ui->leUuid->setText(fDraftSale.id.toString());
-    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
-        ui->tblGoods->setString(i, col_uuid, "");
-        fDraftSaleBody.id = "";
-        fDraftSaleBody.header = fDraftSale.id.toString();
-        fDraftSaleBody.state = 1;
-        fDraftSaleBody.store = ui->tblGoods->comboBox(i, col_store)->currentData().toInt();
-        fDraftSaleBody.dateAppend = QDate::currentDate();
-        fDraftSaleBody.timeAppend = QTime::currentTime();
-        fDraftSaleBody.goods = ui->tblGoods->getInteger(i, col_goods_code);
-        fDraftSaleBody.qty = ui->tblGoods->lineEdit(i, col_qty)->getDouble();
-        fDraftSaleBody.price = ui->tblGoods->lineEdit(i, col_price)->getDouble();
-        fDraftSaleBody.discount = ui->tblGoods->lineEdit(i, col_discount_value)->getDouble();
-        fDraftSaleBody.userAppend = __user->id();
-        if (!fDraftSaleBody.write(db, err)) {
-            db.rollback();
-            C5Message::error(err);
-            return;
-        }
-    }
-    fActionSave->setEnabled(true);
-    fActionDraft->setEnabled(false);
-    fActionCopy->setEnabled(false);
-    ui->wtoolbar->setEnabled(true);
-    for (int r = 0; r < ui->tblGoods->rowCount(); r++) {
-        for (int c = 0; c < ui->tblGoods->columnCount(); c++) {
-            QWidget *w = ui->tblGoods->cellWidget(r, c);
-            if (w) {
-                w->setEnabled(true);
-            }
-        }
-    }
-    ui->paymentFrame->setEnabled(true);
-    fOpenedFromDraft = true;
-    fDraftSale.staff = ui->leDelivery->property("id").toInt();
-    */
     fHttp->httpQueryFinished(sender());
+    openDraft(jdoc["id"].toString());
 }
 
 void C5SaleDoc::removeDocResponse(const QJsonObject &jdoc)
@@ -431,8 +374,8 @@ void C5SaleDoc::exportToExcel()
         vals << ui->tblGoods->getString(i, 7);
         vals << ui->tblGoods->lineEdit(i, 8)->text();
         vals << ui->tblGoods->lineEdit(i, 9)->text();
-        for (int i = 0; i < cols.count(); i++) {
-            s->addCell(row, cols.at(i), vals.at(i), d.style()->styleNum("body"));
+        for (int j = 0; j < cols.count(); j++) {
+            s->addCell(row, cols.at(j), vals.at(j), d.style()->styleNum("body"));
         }
         row++;
     }
@@ -666,7 +609,7 @@ void C5SaleDoc::saveDataChanges()
         db[":f_total"] = ui->tblGoods->getDouble(i, col_grandtotal);
         db[":f_tax"] = 0;
         db[":f_sign"] = 1;
-        db[":f_taxdept"] = "";
+        db[":f_taxdept"] = 1;
         db[":f_row"] = i;
         db[":f_discountfactor"] = ui->tblGoods->lineEdit(i, col_discount_value)->getDouble() / 100;
         db[":f_discountmode"] = 0;
@@ -866,6 +809,16 @@ void C5SaleDoc::saveDataChanges()
             }
         }
     }
+    for (int r = 0; r < ui->tblGoods->rowCount(); r++) {
+        for (int c = 0; c < ui->tblGoods->columnCount(); c++) {
+            QWidget *w = ui->tblGoods->cellWidget(r, c);
+            if (w) {
+                w->setEnabled(false);
+            }
+        }
+    }
+    ui->wtoolbar->setEnabled(false);
+    ui->paymentFrame->setEnabled(false);
     fActionSave->setEnabled(false);
     fActionDraft->setEnabled(true);
     fActionCopy->setEnabled(true);
@@ -1043,6 +996,7 @@ bool C5SaleDoc::openDraft(const QString &id)
                     "left join c_units gu on gu.f_id=g.f_unit "
                     "where dsb.f_header=:f_header and gpr.f_currency=:f_currency "
                     "and dsb.f_state=:f_state and dsb.f_qty>0 ").arg(priceField));
+    ui->tblGoods->setRowCount(0);
     while (db.nextRow()) {
         addGoods("", db.getInt("f_store"), db.getInt("f_id"), db.getString("f_scancode"), db.getString("f_name"),
                  db.getString("f_unitname"), db.getDouble("f_qty"), db.getDouble("f_price"), db.getDouble("f_discount"), 0, "");
@@ -1065,8 +1019,19 @@ bool C5SaleDoc::openDraft(const QString &id)
             ui->leDebt->setDouble(ui->leGrandTotal->getDouble());
             break;
     }
+    fActionSave->setEnabled(true);
     fActionCopy->setEnabled(false);
     fActionDraft->setEnabled(false);
+    for (int r = 0; r < ui->tblGoods->rowCount(); r++) {
+        for (int c = 0; c < ui->tblGoods->columnCount(); c++) {
+            QWidget *w = ui->tblGoods->cellWidget(r, c);
+            if (w) {
+                w->setEnabled(true);
+            }
+        }
+    }
+    ui->wtoolbar->setEnabled(true);
+    ui->paymentFrame->setEnabled(true);
     return true;
 }
 

@@ -7,7 +7,6 @@
 
 PrintReceipt::PrintReceipt(QObject *parent) : QObject(parent)
 {
-
 }
 
 void PrintReceipt::print(const QString &id, C5Database &db)
@@ -21,7 +20,7 @@ void PrintReceipt::print(const QString &id, C5Database &db)
         saletype = tr("Return");
         db[":f_header"] = id;
         db.exec("select f_returnfrom from o_goods where f_header=:f_header");
-        if (db.nextRow()){
+        if (db.nextRow()) {
             db[":f_id"] = db.getString("f_returnfrom");
             db.exec("select f_header from o_goods where f_id=:f_id");
             db.nextRow();
@@ -34,7 +33,7 @@ void PrintReceipt::print(const QString &id, C5Database &db)
             db.nextRow();
         }
     }
-    QString hallid = db.getString("f_hallid");
+    int hallid = db.getInt("f_hallid");
     QString pref = db.getString("f_prefix");
     int partner = db.getInt("f_partner");
     double amountTotal = db.getDouble("f_amounttotal");
@@ -85,7 +84,6 @@ void PrintReceipt::print(const QString &id, C5Database &db)
         }
         data.append(v);
     }
-
     db[":f_header"] = id;
     db.exec("select og.f_id, g.f_name, g.f_scancode, gc.f_qty "
             "from c_goods_complectation gc "
@@ -101,7 +99,6 @@ void PrintReceipt::print(const QString &id, C5Database &db)
         }
         complectation[db.getString("f_id")].append(v);
     }
-
     if (!C5Config::localReceiptPrinter().isEmpty()) {
         QFont font(qApp->font());
         font.setPointSize(20);
@@ -160,7 +157,9 @@ void PrintReceipt::print(const QString &id, C5Database &db)
         p.ctext(QString("#%1%2").arg(pref).arg(hallid));
         p.br();
         if (returnFrom.count() > 0) {
-            p.ctext(QString("(%1 %2%3)").arg(tr("Return from")).arg(returnFrom["f_prefix"].toString()).arg(returnFrom["f_hallid"].toString()));
+            p.ctext(QString("(%1 %2%3)").arg(tr("Return from"))
+                    .arg(returnFrom["f_prefix"].toString())
+                    .arg(returnFrom["f_hallid"].toInt()));
             p.br();
         }
         p.setFontSize(20);
@@ -183,7 +182,8 @@ void PrintReceipt::print(const QString &id, C5Database &db)
                     QList<QList<QVariant> > rows = complectation[data.at(i).at(8).toString()];
                     for (int ri = 0; ri < rows.count(); ri++) {
                         QList<QVariant> rv = rows.at(ri);
-                        p.ltext(QString("|---%1 %2 X %3").arg(rv.at(1).toString()).arg(rv.at(2).toString()).arg(float_str(rv.at(3).toDouble() * data.at(i).at(3).toDouble(), 2)), 0);
+                        p.ltext(QString("|---%1 %2 X %3").arg(rv.at(1).toString()).arg(rv.at(2).toString()).arg(float_str(rv.at(
+                                    3).toDouble() *data.at(i).at(3).toDouble(), 2)), 0);
                         p.br();
                     }
                 }
@@ -191,7 +191,7 @@ void PrintReceipt::print(const QString &id, C5Database &db)
             p.ltext(QString("%1 X %2 = %3")
                     .arg(float_str(data.at(i).at(3).toDouble(), 2))
                     .arg(data.at(i).at(4).toDouble(), 2)
-                    .arg(float_str(data.at(i).at(3).toDouble() * data.at(i).at(4).toDouble(), 2)), 0);
+                    .arg(float_str(data.at(i).at(3).toDouble() *data.at(i).at(4).toDouble(), 2)), 0);
             p.br();
             p.line();
             p.br(2);
@@ -208,10 +208,8 @@ void PrintReceipt::print(const QString &id, C5Database &db)
             p.rtext(float_str(amountTotal, 2));
             p.br();
             p.br();
-
             p.line();
             p.br();
-
             if (amountCash > 0.001) {
                 p.ltext(tr("Payment, cash"), 0);
                 p.rtext(float_str(amountCash, 2));
@@ -222,7 +220,6 @@ void PrintReceipt::print(const QString &id, C5Database &db)
                 p.rtext(float_str(amountCard, 2));
                 p.br();
             }
-
             p.setFontSize(20);
             p.setFontBold(true);
             p.br(p.fLineHeight * 3);

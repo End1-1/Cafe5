@@ -501,13 +501,6 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QCommandLinkButton" name="btnRetryUpload">
-        <property name="text">
-         <string>Upload incomplete, retry</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <spacer name="horizontalSpacer_2">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -624,17 +617,18 @@
    <header location="global">c5lineedit.h</header>
   </customwidget>
   <customwidget>
-   <class>C5DateEdit</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5dateedit.h</header>
-  </customwidget>
-  <customwidget>
    <class>C5ClearTableWidget</class>
    <extends>QTableWidget</extends>
    <header location="global">c5cleartablewidget.h</header>
   </customwidget>
+  <customwidget>
+   <class>C5DateEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5dateedit.h</header>
+  </customwidget>
  </customwidgets>
  <resources>
+  <include location="../resources/res.qrc"/>
   <include location="../resources/res.qrc"/>
  </resources>
  <connections/>

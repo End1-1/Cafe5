@@ -2714,7 +2714,7 @@ void C5StoreDoc::on_leComplectationName_textChanged(const QString &arg1)
     int gr = c->find(ui->leComplectationCode->getInteger());
     if (gr > -1) {
         ui->lbComplectUnit->setText(c->getString(gr, tr("Unit")));
-        fBaseComplectOutput = c->getString(gr, tr("Complect output")).toDouble();
+        fBaseComplectOutput = c->getDouble(gr, tr("Complect output"));
         ui->leComplectationScancodeCode->setText(c->getString(gr, tr("Scancode")));
     } else {
         ui->lbComplectUnit->clear();

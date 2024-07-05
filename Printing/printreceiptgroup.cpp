@@ -54,7 +54,7 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
             db.nextRow();
         }
     }
-    QString hallid = db.getString("f_hallid");
+    int hallid = db.getInt("f_hallid");
     QString pref = db.getString("f_prefix");
     int partner = db.getInt("f_partner");
     double amountTotal = db.getDouble("f_amounttotal");
@@ -206,8 +206,8 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
     p.ctext(QString("#%1%2").arg(pref, hallid));
     p.br();
     if (returnFrom.count() > 0) {
-        p.ctext(QString("(%1 %2%3)").arg(tr("Return from"), returnFrom["f_prefix"].toString(),
-                                         returnFrom["f_hallid"].toString()));
+        p.ctext(QString("(%1 %2%3)").arg(tr("Return from"), returnFrom["f_prefix"].toString()).arg(
+                    returnFrom["f_hallid"].toInt()));
         p.br();
     }
     p.setFontSize(20);
@@ -500,7 +500,7 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
     p.br();
     if (returnFrom.count() > 0) {
         p.ctext(QString("(%1 %2%3)").arg(tr("Return from")).arg(returnFrom["f_prefix"].toString()).arg(
-                    returnFrom["f_hallid"].toString()));
+                    returnFrom["f_hallid"].toInt()));
         p.br();
     }
     p.setFontSize(20);
@@ -660,7 +660,7 @@ void PrintReceiptGroup::print3(const QString &id, C5Database &db)
             db.rowToMap(returnFrom);
         }
     }
-    QString hallid = oheader["f_hallid"].toString();
+    int hallid = oheader["f_hallid"].toInt();
     QString pref = oheader["f_prefix"].toString();
     int partner = oheader["f_partner"].toInt();
     QString partnerName, partnerTaxcode;
@@ -732,12 +732,12 @@ void PrintReceiptGroup::print3(const QString &id, C5Database &db)
         p.br();
     }
     p.setFontBold(true);
-    p.ltext(QString("%1 #%2%3").arg(tr("Order"), pref, hallid), 0);
+    p.ltext(QString("%1 #%2%3").arg(tr("Order"), pref, QString::number(hallid)), 0);
     p.rtext(QString("%1: %2").arg(tr("Date"), oheader["f_datecash"].toDate().toString(FORMAT_DATE_TO_STR)));
     p.br();
     if (returnFrom.count() > 0) {
-        p.ctext(QString("(%1 %2%3)").arg(tr("Return from"), returnFrom["f_prefix"].toString(),
-                                         returnFrom["f_hallid"].toString()));
+        p.ctext(QString("(%1 %2%3)").arg(tr("Return from"), returnFrom["f_prefix"].toString()).arg(
+                    returnFrom["f_hallid"].toInt()));
         p.br();
     }
     p.setFontSize(20);

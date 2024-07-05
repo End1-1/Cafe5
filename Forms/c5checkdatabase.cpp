@@ -32,15 +32,16 @@ void C5CheckDatabase::on_btnStart_clicked()
         if (db2.nextRow()) {
             QString cashuuid = db2.getString("f_cashuuid");
             if (cashuuid.isEmpty()) {
-                CORRECTCASH:
+            CORRECTCASH:
                 errnum++;
-                QString purpose = tr("Store input") + " #" + db1.getString("f_userid") + ", " + db1.getDate("f_date").toString(FORMAT_DATE_TO_STR);
+                QString purpose = tr("Store input") + " #" + db1.getString("f_userid") + ", " + db1.getDate("f_date").toString(
+                                      FORMAT_DATE_TO_STR);
                 QString fCashRowId;
                 QString cashdocnum = QString("%1").arg(doc.genNumber(DOC_TYPE_CASH), C5Config::docNumDigitsInput(), 10, QChar('0'));
                 dw.writeAHeader(cashuuid, cashdocnum, DOC_STATE_DRAFT, DOC_TYPE_CASH, 1, db1.getDate("f_date"), QDate::currentDate(),
                                 QTime::currentTime(), db1.getInt("f_partner"), db1.getDouble("f_amount"), purpose,
                                 db1.getInt("f_paid"), __c5config.getValue(param_default_currency).toInt());
-                dw.writeAHeaderCash(cashuuid, 0, 1, 1, db1.getString("f_id"), "", 0);
+                dw.writeAHeaderCash(cashuuid, 0, 1, 1, db1.getString("f_id"), "");
                 dw.writeECash(fCashRowId, cashuuid, 1, -1, purpose, db1.getDouble("f_amount"), fCashRowId, 1);
                 db2[":f_id"] = db1.getString("f_id");
                 db2[":f_cashuuid"] = cashuuid;
@@ -57,7 +58,8 @@ void C5CheckDatabase::on_btnStart_clicked()
         } else {
             //error
         }
-        ui->lst->item(0)->setText(QString("Store input documents. (%1 of %2, %3 errors)").arg(++r).arg(db1.rowCount()).arg(errnum));
+        ui->lst->item(0)->setText(QString("Store input documents. (%1 of %2, %3 errors)").arg(++r).arg(db1.rowCount()).arg(
+                                      errnum));
         qApp->processEvents();
     }
     C5Message::info(tr("Complete"));

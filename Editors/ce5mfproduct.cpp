@@ -196,8 +196,8 @@ void CE5MFProduct::openResponse(const QJsonObject &jdoc)
         .setData(row, 3, durationStr(j["f_durationsec"].toInt()))
         .createLineEdit(row, 4, j["f_durationsec"].toInt(), this, SLOT(durationChanged(QString)))
         .setData(row, 5, j["f_durationsec"].toInt() == 0 ? 0 : (3600 * 7) / j["f_durationsec"].toInt())
-        .createLineEdit(row, 6, j["f_goalprice"].toString().toDouble(), this, SLOT(goalPriceChanged(QString)))
-        .setData(row, 7, j["f_price"].toString().toDouble());
+        .createLineEdit(row, 6, j["f_goalprice"].toDouble(), this, SLOT(goalPriceChanged(QString)))
+        .setData(row, 7, j["f_price"].toDouble());
         auto *pu = new MFProcessProductPriceUpdate();
         connect(pu, &MFProcessProductPriceUpdate::startUpdate, this, &CE5MFProduct::startPriceUpdateOnRow);
         ui->wt->setWidget(row, 8, pu);

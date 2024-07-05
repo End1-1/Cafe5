@@ -37,12 +37,6 @@ Sales::Sales(C5User *user) :
     ui->btnChangeDate->setVisible(fUser->check(cp_t5_change_date_of_sale));
     fViewMode = VM_TOTAL;
     C5Database db(__c5config.dbParams());
-    if (__c5config.rdbReplica()) {
-        db.exec("select * from o_header");
-        ui->btnRetryUpload->setVisible(db.nextRow());
-    } else {
-        ui->btnRetryUpload->setVisible(false);
-    }
     db[":f_id"] = __c5config.defaultHall();
     db.exec("select * from h_halls where f_id=:f_id");
     if (db.nextRow()) {

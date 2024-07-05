@@ -46,8 +46,6 @@ public:
 
     void removeTab(QWidget *w);
 
-    void writeLog(const QString &message);
-
     void addBroadcastListener(C5Widget *w);
 
     void removeBroadcastListener(C5Widget *w);
@@ -83,6 +81,8 @@ private slots:
     void on_btnMenuClick();
 
     void on_btnFavoriteClicked();
+
+    void on_btnShowMenu_clicked();
 
 private:
     NInterface *http;

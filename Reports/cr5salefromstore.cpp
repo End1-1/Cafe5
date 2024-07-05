@@ -1,9 +1,7 @@
 #include "cr5salefromstore.h"
 #include "cr5salefromstorefilter.h"
-#include "c5database.h"
 #include "c5tablemodel.h"
 #include "c5mainwindow.h"
-#include "c5storedoc.h"
 #include "c5saledoc.h"
 #include <QJsonObject>
 #include <QJsonDocument>

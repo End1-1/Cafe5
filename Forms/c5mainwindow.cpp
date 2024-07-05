@@ -138,17 +138,14 @@ C5MainWindow::C5MainWindow(QWidget *parent) :
     connect(esc, SIGNAL(activated()), this, SLOT(hotKey()));
     QShortcut *ctrlPlush = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Plus), this);
     connect(ctrlPlush, SIGNAL(activated()), this, SLOT(hotKey()));
-    QShortcut *ctrlLog = new QShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_L), this);
-    connect(ctrlLog, &QShortcut::activated, [this]() {
-        ui->wLog->setVisible(!ui->wLog->isVisible());
-    });
     C5Dialog::setMainWindow(this);
     __mainWindow = this;
     QVariant menuPanelIsVisible = C5Config::getRegValue("menupanel");
     if (menuPanelIsVisible == QVariant::Invalid) {
         menuPanelIsVisible = true;
     }
-    ui->wLog->setVisible(false);
+    ui->wshowmenu->setVisible(!menuPanelIsVisible.toBool());
+    ui->wMenu->setVisible(menuPanelIsVisible.toBool());
     ui->actionLogout->setVisible(false);
     ui->actionChange_password->setVisible(false);
     connect( &fUpdateTimer, SIGNAL(timeout()), this, SLOT(updateTimeout()));
@@ -214,13 +211,6 @@ void C5MainWindow::removeTab(QWidget *w)
             return;
         }
     }
-}
-
-void C5MainWindow::writeLog(const QString &message)
-{
-    ui->ptLog->appendPlainText(QString("%1: %2")
-                               .arg(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR))
-                               .arg(message));
 }
 
 void C5MainWindow::addBroadcastListener(C5Widget *w)
@@ -1013,7 +1003,7 @@ void C5MainWindow::setDB()
 void C5MainWindow::on_btnHideMenu_clicked()
 {
     ui->wMenu->setVisible(!ui->wMenu->isVisible());
-    ui->btnHideMenu->setText(ui->wMenu->isVisible() ? "<" : ">");
+    ui->wshowmenu->setVisible(!ui->wshowmenu->isVisible());
     C5Config::setRegValue("menupanel", ui->wMenu->isVisible());
 }
 
@@ -1076,4 +1066,11 @@ void C5MainWindow::readFavoriteMenu()
     int size = l->count() == 0 ? 0 : (l->count() * (l->item(0)->sizeHint().height() + 1));
     l->setMinimumHeight(size);
     l->setMaximumHeight(l->minimumHeight());
+}
+
+void C5MainWindow::on_btnShowMenu_clicked()
+{
+    ui->wMenu->setVisible(!ui->wMenu->isVisible());
+    ui->wshowmenu->setVisible(!ui->wshowmenu->isVisible());
+    C5Config::setRegValue("menupanel", ui->wMenu->isVisible());
 }

@@ -30,9 +30,9 @@ int main(int argc, char *argv[])
     //        return 1;
     //    }
     QDir d;
-    QFile file(d.homePath() + "/" + _APPLICATION_ + "/lock.pid");
+    QFile file(d.homePath() + "/" + _APPLICATION_ + "/" + _MODULE_ + "lock.pid");
     file.remove();
-    QLockFile lockFile(d.homePath() + "/" + _APPLICATION_ + "/lock.pid");
+    QLockFile lockFile(d.homePath() + "/" + _APPLICATION_ + "/" + _MODULE_ + "lock.pid");
     if (!lockFile.tryLock()) {
         C5Message::error(QObject::tr("An instance of application already running"));
         return -1;
@@ -96,6 +96,9 @@ int main(int argc, char *argv[])
     C5Config::fSettingsName = js["settings"].toString();
     C5Config::fFullScreen = true;
     NDataProvider::mHost = C5Config::fDBPath;
+    if (settingsName.length() > 0) {
+        C5Config::fSettingsName = settingsName;
+    }
     QSettings ss(_ORGANIZATION_, _APPLICATION_ + QString("\\") + _MODULE_);
     ss.setValue("server", "");
     C5Config::initParamsFromDb();

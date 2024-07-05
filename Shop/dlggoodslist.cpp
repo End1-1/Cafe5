@@ -43,8 +43,8 @@ DlgGoodsList::DlgGoodsList(int currency) :
         row++;
     }
     ui->leTotalRetail->setDouble(totalRetail);
-    ui->leTotalRetail->setVisible(!__c5config.getValue(param_shop_hide_store_qty).toInt() == 1);
-    ui->lbTotalRetail->setVisible(ui->leTotalRetail->isVisible());
+    // ui->leTotalRetail->setVisible(__c5config.getValue(param_shop_hide_store_qty).toInt() == 1);
+    // ui->lbTotalRetail->setVisible(ui->leTotalRetail->isVisible());
     ui->tbl->setColumnHidden(6, __c5config.shopDenyF2());
     ui->leSearch->installEventFilter(this);
     ui->tbl->resizeColumnsToContents();

@@ -1,7 +1,7 @@
 #include "dataonline.h"
 #include "c5database.h"
 
-QHash<QString, DataOnline*> DataOnline::fInstances;
+QHash<QString, DataOnline *> DataOnline::fInstances;
 
 DataOnline::DataOnline(const QStringList &dbParams) :
     QObject(nullptr),
@@ -14,7 +14,7 @@ DataOnline::DataOnline(const QStringList &dbParams) :
             fColumnNames.insert(db.getString("f_name"), QHash<QString, int>());
             fTableQueries[db.getString("f_name")] = db.getString("f_sql");
         }
-        for (const QString &table: fColumnNames.keys()) {
+        for (const QString &table : fColumnNames.keys()) {
             db.exec(fTableQueries[table] + " where t.f_id=-1");
             fColumnNames[table] = db.fNameColumnMap;
         }
@@ -37,7 +37,8 @@ QVariant DataOnline::value(const QString &table, const QString &field, int id)
         C5Database db(fDBParams);
         db[":f_id"] = id;
         QList<QList<QVariant> > values;
-        db.exec(fTableQueries[table] + " where t.f_id=:f_id", values);
+        QString sql = fTableQueries[table] + " where t.f_id=:f_id";
+        db.exec(sql, values);
         QList<QList<QVariant> > &data = fValues[table];
         if (values.count() == 0) {
             return "INVALID ID";

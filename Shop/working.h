@@ -29,6 +29,7 @@ struct Flag {
 };
 
 class WCustomerDisplay;
+class QMovie;
 
 class Working : public QWidget
 {
@@ -69,8 +70,10 @@ public:
 
     Flag flag(int id);
 
+    void startStoreUpdate();
+
 public slots:
-    void getGoods(int id, double qty, double price1, double price2);
+    void getGoods(int id);
 
 private:
     Ui::Working *ui;
@@ -92,6 +95,8 @@ private:
     bool fUpFinished;
 
     NInterface *http;
+
+    QMovie *mMovie;
 
 private slots:
     void timeout();

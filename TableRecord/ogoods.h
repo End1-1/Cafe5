@@ -3,7 +3,8 @@
 
 #include "c5dbrecord.h"
 
-class OGoods: public TableRecord {
+class OGoods: public TableRecord
+{
 public:
     QString header;
     QString body;
@@ -16,7 +17,7 @@ public:
     double accumulateAmount = 0.0;
     int tax = 0;
     int sign = 1;
-    QString taxDept;
+    int taxDept = 0;
     QString adgCode;
     int row = 0;
     QString storeRec;

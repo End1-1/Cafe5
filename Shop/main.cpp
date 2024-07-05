@@ -1,6 +1,7 @@
 #include "working.h"
 #include "c5config.h"
 #include "dlgpin.h"
+#include "ndataprovider.h"
 #include "c5logsystem.h"
 #include "datadriver.h"
 #include "c5user.h"
@@ -120,11 +121,17 @@ int main(int argc, char *argv[])
         pin.clear();
         user.clear();
     };
+    if (__user->value("f_settingsname").toString() != __c5config.fSettingsName) {
+        if (__user->value("f_settingsname").toString().isEmpty() == false ) {
+            __c5config.fSettingsName = __user->value("f_settingsname").toString();
+        }
+    }
     DataDriver::init(__c5config.dbParams(), dlgsplash);
     C5Config::initParamsFromDb();
     if (!C5SystemPreference::checkDecimalPointAndSeparator()) {
         return 0;
     }
+    NDataProvider::mDebug = __c5config.getValue(param_debuge_mode).toInt() > 0;
     C5Database db(C5Config::dbParams());
     db[":f_user"] = __user->id();
     db.exec("select sn.f_id, sn.f_name from s_settings_names sn where sn.f_id in (select f_settings from s_user_config where f_user=:f_user)");

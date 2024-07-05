@@ -519,6 +519,7 @@ void ViewOrder::on_btnSaveReturn_clicked()
         g.total = g.qty *g.price;
         g.tax = ui->leTaxNumber->getInteger();
         g.sign = -1;
+        g.taxDept = 1;
         g.row = i + 1;
         g.storeRec = adraftid;
         g.return_ = ui->leReturnReason->property("reason").toInt();
@@ -550,7 +551,7 @@ void ViewOrder::on_btnSaveReturn_clicked()
         dw.writeAHeader(fCashUuid, fCashUserId, DOC_STATE_DRAFT, DOC_TYPE_CASH, uid, QDate::currentDate(),
                         QDate::currentDate(), QTime::currentTime(), 0, returnAmount, purpose,
                         1, __c5config.getValue(param_default_currency).toInt());
-        dw.writeAHeaderCash(fCashUuid, 0, __c5config.cashId(), 1, storeDocId, "", 0);
+        dw.writeAHeaderCash(fCashUuid, 0, __c5config.cashId(), 1, storeDocId, "");
         dw.writeECash(fCashRowId, fCashUuid, __c5config.cashId(), -1, purpose, returnAmount, fCashRowId, 1);
         if (!dw.writeAHeaderStore(storeDocId, uid, uid, "", QDate::currentDate(), __c5config.defaultStore(), 0, 1, fCashUuid, 0,
                                   0, oheader._id())) {
@@ -569,7 +570,7 @@ void ViewOrder::on_btnSaveReturn_clicked()
                              1, __c5config.getValue(param_default_currency).toInt())) {
             return returnFalse(dw.fErrorMsg, &db);
         }
-        if (!dw.writeAHeaderCash(cashdocid, 0, it.key(), 1, "", oheader._id(), 0)) {
+        if (!dw.writeAHeaderCash(cashdocid, 0, it.key(), 1, "", oheader._id())) {
             return returnFalse(dw.fErrorMsg, &db);
         }
         QString cashUUID;

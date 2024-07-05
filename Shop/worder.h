@@ -67,11 +67,6 @@ public:
 
     void imageConfig();
 
-    bool addGoods(int id, double storeqty, double price1, double price2);
-
-    int addGoodsToTable(int id, bool checkQtyOfStore, double qtyStore, const QString &draftid, double price1, double price2,
-                        double qty, bool fromDraft);
-
     bool writeOrder();
 
     void fixCostumer(const QString &code);
@@ -112,7 +107,11 @@ public:
 
     void openDraft(const QString &draftid);
 
+    void addGoods(const QString &barcode);
+
 private slots:
+    void reponseProcessCode(const QJsonObject &jdoc);
+
     void imageLoaded(const QPixmap &img);
 
     void openDraftResponse(const QJsonObject &jdoc);
@@ -155,6 +154,8 @@ private:
     bool returnFalse(const QString &msg, C5Database &db);
 
     bool getDiscountValue(int discountType, double &v);
+
+    void removeDraft();
 
 };
 

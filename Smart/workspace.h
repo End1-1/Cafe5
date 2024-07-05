@@ -68,6 +68,8 @@ private slots:
 
     void updateDishResponse(const QJsonObject &jdoc);
 
+    void removeOrderResponse(const QJsonObject &jdoc);
+
     void focusTaxIn();
 
     void focusLineIn();
@@ -235,5 +237,4 @@ private:
                            const QVariant &marks = QVariant(),
                            const char *responseErrorSlot = SLOT(slotHttpError(QString)));
 };
-
 #endif // WORKSPACE_H

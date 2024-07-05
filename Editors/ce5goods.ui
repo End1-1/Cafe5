@@ -854,7 +854,7 @@
         </widget>
        </item>
        <item row="2" column="2">
-        <widget class="C5LineEditWithSelector" name="lineEdit_8">
+        <widget class="C5LineEditWithSelector" name="leAcc">
          <property name="minimumSize">
           <size>
            <width>100</width>
@@ -1473,9 +1473,10 @@
   <tabstop>chComponentExit</tabstop>
   <tabstop>leQueue</tabstop>
   <tabstop>tblAs</tabstop>
-  <tabstop>lineEdit_8</tabstop>
+  <tabstop>leAcc</tabstop>
  </tabstops>
  <resources>
+  <include location="../resources/res.qrc"/>
   <include location="../resources/res.qrc"/>
  </resources>
  <connections/>

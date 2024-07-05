@@ -27,8 +27,8 @@ void TaxPrint::on_btnPlus_clicked()
 void TaxPrint::qtyChanged(const QString &arg1)
 {
     int r, c;
-    if (ui->tbl->findWidget(static_cast<QWidget*>(sender()), r, c)) {
-        ui->tbl->lineEdit(r, 4)->setDouble(arg1.toDouble() * ui->tbl->lineEdit(r, 3)->getDouble());
+    if (ui->tbl->findWidget(static_cast<QWidget * >(sender()), r, c)) {
+        ui->tbl->lineEdit(r, 4)->setDouble(arg1.toDouble() *ui->tbl->lineEdit(r, 3)->getDouble());
         countTotal();
     }
 }
@@ -36,8 +36,8 @@ void TaxPrint::qtyChanged(const QString &arg1)
 void TaxPrint::priceChanged(const QString &arg1)
 {
     int r, c;
-    if (ui->tbl->findWidget(static_cast<QWidget*>(sender()), r, c)) {
-        ui->tbl->lineEdit(r, 4)->setDouble(arg1.toDouble() * ui->tbl->lineEdit(r, 2)->getDouble());
+    if (ui->tbl->findWidget(static_cast<QWidget * >(sender()), r, c)) {
+        ui->tbl->lineEdit(r, 4)->setDouble(arg1.toDouble() *ui->tbl->lineEdit(r, 2)->getDouble());
         countTotal();
     }
 }
@@ -45,7 +45,7 @@ void TaxPrint::priceChanged(const QString &arg1)
 void TaxPrint::totalChanged(const QString &arg1)
 {
     int r, c;
-    if (ui->tbl->findWidget(static_cast<QWidget*>(sender()), r, c)) {
+    if (ui->tbl->findWidget(static_cast<QWidget * >(sender()), r, c)) {
         if (ui->tbl->lineEdit(r, 2)->getDouble() > 0.00001) {
             ui->tbl->lineEdit(r, 3)->setDouble(arg1.toDouble() / ui->tbl->lineEdit(r, 2)->getDouble());
             countTotal();
@@ -94,11 +94,12 @@ void TaxPrint::on_leCode_returnPressed()
 
 void TaxPrint::on_btnPrint_clicked()
 {
-    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
+    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(),
+                 C5Config::taxCashier(), C5Config::taxPin(), this);
     pt.fPartnerTin = ui->leTaxpayerPin->text();
     for (int i = 0; i < ui->tbl->rowCount(); i++) {
         DbGoods gg(ui->tbl->getInteger(i, 0));
-        pt.addGoods(gg.group()->taxDept().toInt(), //dep
+        pt.addGoods(gg.group()->taxDept(), //dep
                     gg.group()->adgt(), //adg
                     gg.scancode(), //goods id
                     gg.goodsName(), //name
@@ -112,7 +113,7 @@ void TaxPrint::on_btnPrint_clicked()
     if (result == pt_err_ok) {
         C5Message::info(tr("Printed"));
     } else {
-        C5Message::error(err +"<br>" + jsonOut);
+        C5Message::error(err + "<br>" + jsonOut);
     }
 }
 

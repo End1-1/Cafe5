@@ -5,7 +5,6 @@
 #include "c5changedocinputprice.h"
 #include "c5tablemodel.h"
 #include "c5dlgselectreporttemplate.h"
-#include "storeinputdocument.h"
 
 CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
@@ -45,9 +44,9 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
                    << "s.f_price"
                    << "sum(s.f_total) as f_total"
                    << "gpr.f_price1"
-                   << "sum(gpr.f_price1*s.f_qty) as f_salepricetotal"
+                   << "sum(s.f_qty)*if(gpr.f_price1disc>0,gpr.f_price1disc,gpr.f_price1) as f_salepricetotal"
                    << "gpr.f_price2"
-                   << "sum(gpr.f_price2*s.f_qty) as f_salepricetotal2"
+                   << "sum(s.f_qty)*if(gpr.f_price2disc>0,gpr.f_price2disc,gpr.f_price2) as f_salepricetotal2"
                    << "a.f_comment"
                    ;
     fColumnsGroup << "s.f_document"

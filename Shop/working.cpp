@@ -12,6 +12,7 @@
 #include "dlggoodslist.h"
 #include "dlgpin.h"
 #include "dlgsplashscreen.h"
+#include "c5cleartablewidget.h"
 #include "searchitems.h"
 #include "wcustomerdisplay.h"
 #include "goodsreserve.h"
@@ -25,7 +26,6 @@
 #include "selectprinters.h"
 #include "c5printing.h"
 #include "dlggiftcardsale.h"
-#include "c5tablewidget.h"
 #include "dlgregistercard.h"
 #include "printreceiptgroup.h"
 #include "dlgshowcolumns.h"
@@ -38,6 +38,7 @@
 #include <QProcess>
 #include <QSettings>
 #include <QDesktopWidget>
+#include <QMovie>
 
 QHash<QString, int> Working::fGoodsRows;
 QHash<QString, QString> Working::fMultiscancode;
@@ -120,9 +121,13 @@ Working::Working(C5User *user, QWidget *parent) :
     if (s.value("customerdisplay").toBool()) {
         ui->btnCostumerDisplay->click();
     }
+    ui->lbConfig->setText(__c5config.fSettingsName);
+    ui->lbStore->setText(dbstore->name(__c5config.defaultStore()));
+    ui->lbCashier->setText(fUser->fullName());
     http = new NInterface(this);
     http->createHttpQuery("/engine/shop/create-a-store-sale.php", QJsonObject{{"store", __c5config.defaultStore()}, {"forceupdate", true}},
     SLOT(astoresaleResponse(QJsonObject)));
+    mMovie = new QMovie(":/progressbar.gif");
 }
 
 Working::~Working()
@@ -313,14 +318,21 @@ Flag Working::flag(int id)
     }
 }
 
-void Working::getGoods(int id, double qty, double price1, double price2)
+void Working::startStoreUpdate()
+{
+    ui->lbStatus->setMovie(mMovie);
+    mMovie->start();
+}
+
+void Working::getGoods(int id)
 {
     sender()->deleteLater();
     WOrder *w = static_cast<WOrder *>(ui->tab->currentWidget());
     if (!w) {
         return;
     }
-    w->addGoods(id, qty, price1, price2);
+    DbGoods g(id);
+    w->addGoods(g.scancode());
 }
 
 WOrder *Working::worder()
@@ -684,7 +696,7 @@ void Working::qtyRemains(const QJsonObject &jdoc)
     p.br();
     for (int i = 0; i < ja.size(); i++) {
         QJsonObject jn = ja.at(i).toObject();
-        if (jn["f_qty"].toString().toDouble() < 0.01) {
+        if (jn["f_qty"].toDouble() < 0.01) {
             print = true;
             p.ltext(jn["f_taxname"].toString(), 0);
             p.br();
@@ -768,6 +780,7 @@ void Working::on_btnWriteOrder_clicked()
         newSale(SALE_RETAIL);
     }
     w->deleteLater();
+    startStoreUpdate();
     auto *dp = new NDataProvider(this);
     connect(dp, &NDataProvider::done, this, &Working::qtyRemains);
     dp->getData("/engine/shop/check-qty-remain.php", QJsonObject{{"header", id}});
@@ -885,7 +898,8 @@ void Working::on_btnGiftCard_clicked()
             C5Message::error(err);
             return;
         }
-        wo->addGoodsToTable(d.fGiftGoodsId, true, 0, "", 0, 0, 1, false);
+        DbGoods dd(d.fGiftGoodsId);
+        wo->addGoods(dd.scancode());
         wo->changePrice(d.fGiftPrice);
         wo->fOHeader.saleType = -1;
     }

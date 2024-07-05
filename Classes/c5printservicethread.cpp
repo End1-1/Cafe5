@@ -151,7 +151,7 @@ void C5PrintServiceThread::print(QString printer, const QString &side, bool repr
     p.br();
     p.setFontSize(20);
     p.ltext(tr("Order no"), 0);
-    p.rtext(QString("%1%2").arg(fHeaderData["f_prefix"].toString(), fHeaderData["f_hallid"].toString()));
+    p.rtext(QString("%1%2").arg(fHeaderData["f_prefix"].toString()).arg(fHeaderData["f_hallid"].toInt()));
     p.br();
     p.ltext(tr("Date"), 0);
     p.rtext(QDate::currentDate().toString(FORMAT_DATE_TO_STR));
@@ -237,7 +237,7 @@ void C5PrintServiceThread::print(QString printer, const QString &side, bool repr
                        .arg(dir.tempPath() + "/Waiter")
                        .arg(originalPrinter)
                        .arg(fHeaderData["f_prefix"].toString())
-                       .arg(fHeaderData["f_hallid"].toString())
+                       .arg(fHeaderData["f_hallid"].toInt())
                        .arg(final);
     int i = 2;
     while (QFile::exists(fileName)) {
@@ -245,7 +245,7 @@ void C5PrintServiceThread::print(QString printer, const QString &side, bool repr
                    .arg(dir.tempPath() + "/Waiter")
                    .arg(printer)
                    .arg(fHeaderData["f_prefix"].toString())
-                   .arg(fHeaderData["f_hallid"].toString())
+                   .arg(fHeaderData["f_hallid"].toInt())
                    .arg(i++)
                    .arg(final);
     }

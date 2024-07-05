@@ -42,7 +42,7 @@ void DlgSearchInMenu::buildMenu(int menuid)
     for (int i = 0; i < ja.size(); i++) {
         int row = ui->tbl->addEmptyRow();
         const QJsonObject &j = ja.at(i).toObject();
-        ui->tbl->setInteger(row, 0, j["f_dish"].toInt());
+        ui->tbl->setInteger(row, 0, j["f_id"].toInt());
         ui->tbl->setString(row, 1, j["f_part1name"].toString());
         ui->tbl->setString(row, 2, j["f_part2name"].toString());
         ui->tbl->setString(row, 3, j["f_name"].toString());

@@ -25,6 +25,8 @@ public:
 
     void setFontItalic(bool italic);
 
+    void setFontStrike(bool strike);
+
     void setFontSize(int size);
 
     void setPen(const QPen &p);

@@ -1,6 +1,5 @@
 #include "dlglistofpackages.h"
 #include "ui_dlglistofpackages.h"
-#include "c5menu.h"
 #include "datadriver.h"
 
 DlgListOfPackages::DlgListOfPackages(QWidget *parent) :
@@ -11,7 +10,7 @@ DlgListOfPackages::DlgListOfPackages(QWidget *parent) :
     ui->tbl->setRowCount(dbmenupackage->list().count() + 1);
     ui->tbl->setColumnWidths(3, 0, 300, 100);
     int row = 0;
-    for (int id: dbmenupackage->list()) {
+    for (int id : dbmenupackage->list()) {
         DbMenuPackages p(id);
         if (!p.isEnabled()) {
             continue;

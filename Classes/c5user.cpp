@@ -49,6 +49,11 @@ QString C5User::fullName()
     return QString("%1 %2").arg(data("f_last").toString()).arg(data("f_first").toString());
 }
 
+QVariant C5User::value(const QString &key)
+{
+    return fUserData[key];
+}
+
 int C5User::group()
 {
     return data("f_group").toInt();
@@ -166,7 +171,7 @@ bool C5User::loadFromDB(int id)
 {
     C5Database db(__c5config.dbParams());
     db[":f_id"] = id;
-    db.exec("select * from s_user where f_id=:f_id ");
+    db.exec("select u.*, s.f_name as f_settingsname from s_user u left join s_settings_names s on s.f_id=u.f_config where s.f_id=:f_id ");
     if (!db.nextRow()) {
         fError = tr("Access denied");
         fValid = false;

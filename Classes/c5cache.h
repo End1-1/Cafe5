@@ -87,6 +87,12 @@ public:
 
     QString getString(int row, const QString &columnName);
 
+    inline double getDouble(int row, const QString &columnName)
+    {
+        int col = fCacheColumns[fId][columnName.toLower()];
+        return fCacheData.at(row).at(col).toDouble();
+    }
+
     inline int getInt(int row, int column)
     {
         return fCacheData.at(row).at(column).toInt();

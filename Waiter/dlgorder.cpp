@@ -2618,7 +2618,7 @@ void DlgOrder::on_btnCashout_clicked()
 	}
 	QString purpose = tr("") + " #"
 	                  + wo->fOrderDriver->headerValue("f_prefix").toString()
-	                  + wo->fOrderDriver->headerValue("f_hallid").toString() + " " + comment;
+                      + QString::number(wo->fOrderDriver->headerValue("f_hallid").toInt()) + " " + comment;
 	C5Database db(__c5config.dbParams());
 	db[":f_oheader"] = wo->fOrderDriver->headerValue("f_id");
 	db.exec("select e.f_id as f_idout, a.f_id "

@@ -604,7 +604,7 @@ C5StoreDoc *CR5ConsumptionBySalesDraft::writeDocs(int doctype, int reason, const
         QString cashUserId = QString("%1").arg(c5doc.genNumber(DOC_TYPE_CASH), C5Config::docNumDigitsInput(), 10, QChar('0'));
         dw.writeAHeader(cashid, cashUserId, DOC_STATE_DRAFT, DOC_TYPE_CASH, __user->id(), QDate::currentDate(),
                         QDate::currentDate(), QTime::currentTime(), 0, 0, purpose, 0, __c5config.getValue(param_default_currency).toInt());
-        dw.writeAHeaderCash(cashid, 0, 0, 1, documentId, "", 0);
+        dw.writeAHeaderCash(cashid, 0, 0, 1, documentId, "");
         dw.writeECash(cashrowid, cashid, 0, -1, purpose, 0, cashrowid, 1);
     }
     dw.writeAHeaderStore(documentId, __user->id(), __user->id(), "", QDate(), storein, storeout, 0, cashid, 0, 0, "");

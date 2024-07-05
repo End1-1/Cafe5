@@ -48,7 +48,7 @@ void C5WaiterOrder::setOrder(const QString &id)
             "where o.f_id=:f_id ");
     if (db.nextRow()) {
         ui->leUuid->setText(id);
-        ui->leNumber->setText(db.getString("f_prefix") + db.getString("f_hallid"));
+        ui->leNumber->setText(db.getString("f_prefix") + QString::number(db.getInt("f_hallid")));
         ui->deDateOpen->setDate(db.getDate("f_dateopen"));
         ui->teOpen->setTime(db.getTime("f_timeopen"));
         ui->deDateClose->setDate(db.getDate("f_dateclose"));

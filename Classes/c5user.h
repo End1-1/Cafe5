@@ -29,6 +29,8 @@ public:
 
     QString fullName();
 
+    QVariant value(const QString &key);
+
     int group();
 
     bool isActive();

@@ -24,7 +24,8 @@ bool C5StoreDraftWriter::writeFromShopOutput(const QString &doc, int state, QStr
     }
     QDate docDate = fDb.getDate("f_datecash");
     int operatorId = fDb.getInt("f_staff");
-    QString comment = QString("%1 %2%3").arg(tr("Output of sale"), fDb.getString("f_prefix"), fDb.getString("f_hallid"));
+    QString comment = QString("%1 %2%3").arg(tr("Output of sale"), fDb.getString("f_prefix"),
+                      QString::number(fDb.getInt("f_hallid")));
     QSet<int> stores;
     QList<OGoods> items;
     fDb[":f_header"] = doc;
@@ -478,8 +479,7 @@ bool C5StoreDraftWriter::writeAHeaderCash(const QString &id,
         int cashin, int cashout,
         int related,
         const QString &storedoc,
-        const QString &oheader,
-        QString session)
+        const QString &oheader)
 {
     bool u = false;
     fDb[":f_id"] = id;
@@ -491,7 +491,6 @@ bool C5StoreDraftWriter::writeAHeaderCash(const QString &id,
     fDb[":f_related"] = related;
     fDb[":f_storedoc"] = storedoc;
     fDb[":f_oheader"] = oheader;
-    fDb[":f_session"] = session;
     if (u) {
         return returnResult(fDb.update("a_header_cash", where_id(id)));
     } else {
@@ -701,6 +700,7 @@ bool C5StoreDraftWriter::writeECash(QString &id, const QString &header, int cash
     fDb[":f_amount"] = amount;
     fDb[":f_base"] = base;
     fDb[":f_row"] = rownum;
+    fDb[":f_working_session"] = __c5config.getRegValue("sessionid");
     if (u) {
         return returnResult(fDb.update("e_cash", where_id(id)));
     } else {

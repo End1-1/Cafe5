@@ -18,7 +18,8 @@ C5CashDoc::C5CashDoc(const QStringList &dbParams, QWidget *parent) :
     fIcon = ":/cash.png";
     fLabel = tr("Cash document");
     ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 0, 400, 100, 0);
-    ui->leDocNum->setPlaceholderText(QString("%1").arg(genNumber(DOC_TYPE_CASH), C5Config::docNumDigitsInput(), 10, QChar('0')));
+    ui->leDocNum->setPlaceholderText(QString("%1").arg(genNumber(DOC_TYPE_CASH), C5Config::docNumDigitsInput(), 10,
+                                     QChar('0')));
     ui->leInput->setSelector(dbParams, ui->leInputName, cache_cash_names);
     ui->leOutput->setSelector(dbParams, ui->leOutputName, cache_cash_names);
     ui->leInput->setCallbackWidget(this);
@@ -27,8 +28,7 @@ C5CashDoc::C5CashDoc(const QStringList &dbParams, QWidget *parent) :
     ui->lbStoreDoc->setEnabled(false);
     ui->leStoreDoc->setEnabled(false);
     ui->btnOpenStoreDoc->setEnabled(false);
-        ui->deDate->setEnabled(__user->check(cp_t1_allow_change_cash_doc_date));
-
+    ui->deDate->setEnabled(__user->check(cp_t1_allow_change_cash_doc_date));
     fRelation = false;
     fActionFromSale = nullptr;
     fActionDraft = nullptr;
@@ -179,7 +179,6 @@ bool C5CashDoc::openDoc(const QString &uuid)
             ui->leStoreDoc->setText(db.getString("f_userid"));
         }
     }
-
     if (fRelation) {
         ui->witems->setEnabled(false);
         ui->leInput->setEnabled(false);
@@ -211,7 +210,7 @@ void C5CashDoc::setStoreDoc(const QString &uuid)
 
 void C5CashDoc::selectorCallback(int row, const QList<QVariant> &values)
 {
-    C5LineEditWithSelector *l = static_cast<C5LineEditWithSelector*>(sender());
+    C5LineEditWithSelector *l = static_cast<C5LineEditWithSelector *>(sender());
     if (row == cache_cash_names) {
         if (l == ui->leInput) {
             ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(values.at(2)));
@@ -319,21 +318,23 @@ bool C5CashDoc::save(bool writedebt, bool fromrelation)
     dw.writeAHeader(fUuid, ui->leDocNum->text(), DOC_STATE_SAVED, DOC_TYPE_CASH, __user->id(), ui->deDate->date(),
                     QDate::currentDate(), QTime::currentTime(), ui->lePartner->getInteger(), ui->leTotal->getDouble(),
                     ui->cbComment->currentText(), 1, ui->cbCurrency->currentData().toInt());
-    dw.writeAHeaderCash(fUuid, ui->leInput->getInteger(), ui->leOutput->getInteger(), fRelation, fStoreUuid, "", 0);
+    dw.writeAHeaderCash(fUuid, ui->leInput->getInteger(), ui->leOutput->getInteger(), fRelation, fStoreUuid, "");
     for (int i = 0; i < ui->tbl->rowCount(); i++) {
         QString idin = ui->tbl->getString(i, 0);
         QString idout = ui->tbl->getString(i, 1);
         QString base = ui->tbl->getString(i, 4);
         if (ui->leInput->getInteger() > 0) {
-            dw.writeECash(idin, fUuid, ui->leInput->getInteger(), 1, ui->tbl->getString(i, 2), ui->tbl->lineEdit(i, 3)->getDouble(), base, i);
+            dw.writeECash(idin, fUuid, ui->leInput->getInteger(), 1, ui->tbl->getString(i, 2), ui->tbl->lineEdit(i, 3)->getDouble(),
+                          base, i);
             ui->tbl->setString(i, 0, idin);
         }
-        if (ui->leOutput->getInteger() > 0) { 
-            dw.writeECash(idout, fUuid, ui->leOutput->getInteger(), -1, ui->tbl->getString(i, 2), ui->tbl->lineEdit(i, 3)->getDouble(), base, i);
+        if (ui->leOutput->getInteger() > 0) {
+            dw.writeECash(idout, fUuid, ui->leOutput->getInteger(), -1, ui->tbl->getString(i, 2), ui->tbl->lineEdit(i,
+                          3)->getDouble(), base, i);
             ui->tbl->setString(i, 1, idout);
         }
         ui->tbl->setString(i, 4, base);
-    }    
+    }
     db[":f_cash"] = fUuid;
     db.exec("delete from b_clients_debts where f_cash=:f_cash");
     if (writedebt && ui->lePartner->getInteger() > 0) {
@@ -413,9 +414,11 @@ void C5CashDoc::inputFromSale()
         db[":f_shift"] = shift;
         db.exec("select sum(f_amountcash) from o_header where f_datecash=:f_date and f_state=:f_state and f_shift=:f_shift");
         if (db.nextRow()) {
-            ui->cbComment->setCurrentText(QString("%1 %2, %3").arg(tr("Input from sale")).arg(d.toString(FORMAT_DATE_TO_STR)).arg(shiftname));
+            ui->cbComment->setCurrentText(QString("%1 %2, %3").arg(tr("Input from sale")).arg(d.toString(FORMAT_DATE_TO_STR)).arg(
+                                              shiftname));
             int row = ui->tbl->addEmptyRow();
-            ui->tbl->createLineEdit(row, 2)->setText(QString("%1 %2, %3").arg(tr("Input from sale")).arg(d.toString(FORMAT_DATE_TO_STR)).arg(shiftname));
+            ui->tbl->createLineEdit(row, 2)->setText(QString("%1 %2, %3").arg(tr("Input from sale")).arg(d.toString(
+                        FORMAT_DATE_TO_STR)).arg(shiftname));
             ui->tbl->createLineEdit(row, 3)->setDouble(db.getDouble("f_amount"));
             amountChanged("");
         }

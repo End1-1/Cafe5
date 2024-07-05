@@ -32,8 +32,11 @@ void C5PrintJson::run()
             p.setFontBold(jo["bold"].toBool());
         } else if (jo["cmd"].toString() == "br") {
             p.br(jo["height"].toDouble());
+        } else if (jo["cmd"].toString() == "fontstrikeout") {
+            p.setFontStrike(jo["strike"].toBool());
         } else if (jo["cmd"].toString() == "scene") {
-            p.setSceneParams(jo["width"].toDouble(), jo["height"].toDouble(), (jo["orientation"].toInt() == 0 ? QPrinter::Portrait : QPrinter::Landscape));
+            p.setSceneParams(jo["width"].toDouble(), jo["height"].toDouble(),
+                             (jo["orientation"].toInt() == 0 ? QPrinter::Portrait : QPrinter::Landscape));
         } else if (jo["cmd"].toString() == "font") {
             QFont font(jo["family"].toString(), jo["size"].toInt());
             font.setBold(jo["bold"].toBool());

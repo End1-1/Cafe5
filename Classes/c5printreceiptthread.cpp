@@ -134,7 +134,7 @@ bool C5PrintReceiptThread::print(const QStringList &dbParams)
     p.br();
     p.setFontBold(true);
     p.ctext(__translator.tt("Receipt #") + QString("%1%2").arg(fHeaderInfo["f_prefix"].toString()).arg(
-                fHeaderInfo["f_hallid"].toString()));
+                fHeaderInfo["f_hallid"].toInt()));
     p.br();
     if (fHeaderInfo["f_otherid"].toInt() == PAYOTHER_PRIMECOST) {
         p.setFontSize(bs + 4);

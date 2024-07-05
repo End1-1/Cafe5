@@ -92,6 +92,16 @@ void C5Printing::setFontItalic(bool italic)
     fJsonData.append(o);
 }
 
+void C5Printing::setFontStrike(bool strike)
+{
+    fFont.setStrikeOut(strike);
+    setLineHeight();
+    QJsonObject o;
+    o["cmd"] = "fontstrikeout";
+    o["strike"] = strike;
+    fJsonData.append(o);
+}
+
 void C5Printing::setFontSize(int size)
 {
     fFont.setPointSize(size);

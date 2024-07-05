@@ -86,13 +86,14 @@ void CashCollection::on_btnSave_clicked()
         C5Message::error(dw.fErrorMsg);
         return;
     }
-    if (!dw.writeAHeaderCash(cashdocid, 0, __c5config.cashId(), 0, "", "", 0)) {
+    if (!dw.writeAHeaderCash(cashdocid, 0, __c5config.cashId(), 0, "", "")) {
         db.rollback();
         C5Message::error(dw.fErrorMsg);
         return;
     }
     QString cashUUID;
-    if (!dw.writeECash(cashUUID, cashdocid, __c5config.cashId(), -1, ui->lePurpose->text(), ui->leAmount->getDouble(), cashUUID, 1)) {
+    if (!dw.writeECash(cashUUID, cashdocid, __c5config.cashId(), -1, ui->lePurpose->text(), ui->leAmount->getDouble(),
+                       cashUUID, 1)) {
         db.rollback();
         C5Message::error(dw.fErrorMsg);
         return;

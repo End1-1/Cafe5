@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>857</width>
-    <height>547</height>
+    <height>456</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -306,6 +306,7 @@
   <tabstop>leTotalRetail</tabstop>
  </tabstops>
  <resources>
+  <include location="../resources/res.qrc"/>
   <include location="../resources/res.qrc"/>
  </resources>
  <connections/>

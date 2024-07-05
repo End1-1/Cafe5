@@ -464,6 +464,8 @@ bool C5Database::execNetwork(const QString &sqlQuery)
                 case 3:
                     r.append(jar[j].toInt());
                     break;
+                case 4:
+                case 5:
                 case 246:
                     r.append(jar[j].toDouble());
                     break;
@@ -486,10 +488,10 @@ bool C5Database::execNetwork(const QString &sqlQuery)
     fCursorPos = -1;
 #ifdef QT_DEBUG
     logEvent(fDbParamsForUuid.at(0) + " (" + QString::number(elapsed) + "-" + QString::number(
-                 t.elapsed()) + " ms):" + " " + sql);
+                 t.elapsed()) + " ms):" + " " + ba.left(5000));
 #else
     if (__c5config.getValue(param_debuge_mode).toInt() > 0) {
-        logEvent("(" + QString::number(elapsed) + "-" + QString::number(t.elapsed()) + " ms):" + " " + sql);
+        logEvent("(" + QString::number(elapsed) + "-" + QString::number(t.elapsed()) + " ms):" + " " + ba);
     }
 #endif
     return true;

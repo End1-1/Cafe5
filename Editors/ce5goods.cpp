@@ -214,6 +214,8 @@ QJsonObject CE5Goods::makeJsonObject()
     j["f_qtybox"] = ui->leQtyBox->getDouble();
     j["f_scancode"] = ui->leScanCode->text().isEmpty() ? QJsonValue() : ui->leScanCode->text();
     j["f_fiscalname"] = ui->leFiscalName->text();
+    //TODO: option
+    //j["f_lastinputprice"] = ui->leTotal->getDouble() > 0 ? ui->leTotal->getDouble() : ui->leCostPrice->getDouble();
     j["f_lastinputprice"] = ui->leCostPrice->getDouble();
     j["f_price_margin"] = ui->leMargin->getDouble();
     j["f_price_margin2"] = ui->leMargin2->getDouble();
@@ -224,10 +226,12 @@ QJsonObject CE5Goods::makeJsonObject()
     j["f_service"] = ui->chService->isChecked() ? 1 : 0;
     j["f_enabled"] = ui->chEnabled->isChecked() ? 1 : 0;
     j["f_wholenumber"] = ui->chOnlyWholeNumber->isChecked() ? 1 : 0;
+    j["f_complectout"] = ui->leComplectOutputQty->getDouble();
     j["f_component_exit"] = ui->chComponentExit->isChecked() ? 1 : 0;
     j["f_weblink"] = ui->leWebLink->text();
     j["f_queue"] = ui->leQueue->getInteger();
     j["f_description"] = ui->plainTextEdit->toPlainText();
+    j["f_acc"] = ui->leAcc->text();
     fData["goods"] = j;
     fData["samestore"] = ui->chSameStoreId->isChecked();
     fData["scangenerated"] = fScancodeGenerated;
@@ -307,13 +311,13 @@ void CE5Goods::openResponse(const QJsonObject &jdoc)
     ui->leSupplier->setValue(j["f_supplier"].toInt());
     ui->leUnit->setValue(j["f_unit"].toInt());
     ui->leScanCode->setText(j["f_scancode"].toString());
-    ui->leLowLevel->setDouble(j["f_lowlevel"].toString().toDouble());
-    ui->leQtyBox->setDouble(j["f_qtybox"].toString().toDouble());
+    ui->leLowLevel->setDouble(j["f_lowlevel"].toDouble());
+    ui->leQtyBox->setDouble(j["f_qtybox"].toDouble());
     ui->leFiscalName->setText(j["f_fiscalname"].toString());
-    ui->leCostPrice->setDouble(j["f_lastinputprice"].toString().toDouble());
+    ui->leCostPrice->setDouble(j["f_lastinputprice"].toDouble());
     ui->leAdg->setText(j["f_adg"].toString());
-    ui->leMargin->setDouble(j["f_price_margin"].toString().toDouble());
-    ui->leMargin2->setDouble(j["f_price_margin2"].toString().toDouble());
+    ui->leMargin->setDouble(j["f_price_margin"].toDouble());
+    ui->leMargin2->setDouble(j["f_price_margin2"].toDouble());
     ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(j["f_base_currency"].toInt()));
     ui->leStoreId->setInteger(j["f_storeid"].toInt());
     ui->chSameStoreId->setChecked(ui->leStoreId->getInteger() == ui->leCode->getInteger());
@@ -332,10 +336,10 @@ void CE5Goods::openResponse(const QJsonObject &jdoc)
         ui->tblGoods->setInteger(row, 0, j["f_id"].toInt());
         ui->tblGoods->setInteger(row, 1, j["f_goods"].toInt());
         ui->tblGoods->setString(row, 2, j["f_goodsname"].toString());
-        ui->tblGoods->lineEdit(row, 3)->setDouble(j["f_qty"].toString().toDouble());
+        ui->tblGoods->lineEdit(row, 3)->setDouble(j["f_qty"].toDouble());
         ui->tblGoods->setString(row, 4, j["f_unitname"].toString());
-        ui->tblGoods->lineEdit(row, 5)->setDouble(j["f_lastinputprice"].toString().toDouble());
-        ui->tblGoods->lineEdit(row, 6)->setDouble(j["f_total"].toString().toDouble());
+        ui->tblGoods->lineEdit(row, 5)->setDouble(j["f_lastinputprice"].toDouble());
+        ui->tblGoods->lineEdit(row, 6)->setDouble(j["f_total"].toDouble());
     }
     countTotal();
     ja = jdoc["goods_prices"].toArray();
@@ -343,10 +347,10 @@ void CE5Goods::openResponse(const QJsonObject &jdoc)
         const QJsonObject &o = ja.at(i).toObject();
         for (int j = 0; j < ui->tblPricing->columnCount(); j++) {
             if (ui->tblPricing->lineEdit(0, j)->property("c").toInt() == o["f_currency"].toInt()) {
-                ui->tblPricing->lineEdit(0, j)->setDouble(o["f_price1"].toString().toDouble());
-                ui->tblPricing->lineEdit(1, j)->setDouble(o["f_price2"].toString().toDouble());
-                ui->tblPricing->lineEdit(2, j)->setDouble(o["f_price1disc"].toString().toDouble());
-                ui->tblPricing->lineEdit(3, j)->setDouble(o["f_price2disc"].toString().toDouble());
+                ui->tblPricing->lineEdit(0, j)->setDouble(o["f_price1"].toDouble());
+                ui->tblPricing->lineEdit(1, j)->setDouble(o["f_price2"].toDouble());
+                ui->tblPricing->lineEdit(2, j)->setDouble(o["f_price1disc"].toDouble());
+                ui->tblPricing->lineEdit(3, j)->setDouble(o["f_price2disc"].toDouble());
                 break;
             }
         }

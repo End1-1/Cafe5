@@ -56,7 +56,7 @@ void C5SaleFromStoreOrder::loadOrder(const QString &id)
         ui->leUUID->setText(id);
         ui->deDate->setDate(db.getDate("f_datecash"));
         ui->teTime->setText(db.getString("f_timeclose"));
-        ui->leUserId->setText(db.getString("f_prefix") + db.getString("f_hallid"));
+        ui->leUserId->setText(db.getString("f_prefix") + QString::number(db.getInt("f_hallid")));
         ui->leTotal->setDouble(db.getDouble("f_amounttotal"));
         ui->leTotalCash->setDouble(db.getDouble("f_amountcash"));
         ui->leTotalCard->setDouble(db.getDouble("f_amountcard"));

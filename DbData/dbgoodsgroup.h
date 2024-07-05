@@ -12,7 +12,7 @@ public:
 
     QString adgt();
 
-    QString taxDept();
+    int taxDept();
 
     QString groupName();
 };

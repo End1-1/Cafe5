@@ -5,7 +5,6 @@
 
 OutputOfHeader::OutputOfHeader(QObject *parent) : QObject(parent)
 {
-
 }
 
 bool OutputOfHeader::make(C5Database &db, const QString &id)
@@ -13,7 +12,7 @@ bool OutputOfHeader::make(C5Database &db, const QString &id)
     C5StoreDraftWriter dw(db);
     db[":f_saleuuid"] = id;
     db.exec("select f_id from a_header_store where f_saleuuid=:f_saleuuid");
-    if (db.nextRow() == false){
+    if (db.nextRow() == false) {
         return false;
     }
     QString storeDocId = db.getString(0);
@@ -23,11 +22,10 @@ bool OutputOfHeader::make(C5Database &db, const QString &id)
     if (!fOHeader.getRecord(db)) {
         return false;
     }
-
     QList<QMap<QString, QVariant> > goodsList;
     db[":f_header"] = fOHeader.id;
     db.exec("select og.f_goods, g.f_name, g.f_unit, og.f_isservice, og.f_qty  "
-             "from o_goods og "
+            "from o_goods og "
             "left join c_goods g on g.f_id=og.f_goods "
             "where og.f_header=:f_header ");
     while (db.nextRow()) {
@@ -38,7 +36,6 @@ bool OutputOfHeader::make(C5Database &db, const QString &id)
         db.rowToMap(m);
         goodsList.append(m);
     }
-
     db[":f_id"] = fOHeader.partner;
     db.exec("select f_store, f_cash, f_taxname from c_partners where f_id=:f_id");
     QString partnerName;
@@ -56,12 +53,13 @@ bool OutputOfHeader::make(C5Database &db, const QString &id)
                                  tr("Store input") + " " + partnerName, 0, 1)) {
                 return false;
             }
-            if (!dw.writeAHeaderStore(pstoredoc, fOHeader.cashier, fOHeader.cashier, "", QDate(), partnerStore, 0, 0, "", 0, 0, fOHeader._id())) {
+            if (!dw.writeAHeaderStore(pstoredoc, fOHeader.cashier, fOHeader.cashier, "", QDate(), partnerStore, 0, 0, "", 0, 0,
+                                      fOHeader._id())) {
                 return false;
             }
             // DO NOT UNCOMPLECT THE GOODS WITH UNIT ID THAT EQUAL TO 10
             QString goodsComplect;
-            for (const QMap<QString, QVariant> &g: goodsList) {
+            for (const QMap<QString, QVariant> &g : goodsList) {
                 if (g["f_unit"].toInt() == 10) {
                     if (!goodsComplect.isEmpty()) {
                         goodsComplect += ",";
@@ -69,7 +67,6 @@ bool OutputOfHeader::make(C5Database &db, const QString &id)
                     goodsComplect += g["f_goods"].toString();
                 }
             }
-
             QList<QMap<QString, QVariant> > ingoods;
             if (!goodsComplect.isEmpty()) {
                 db[":f_document"] = storeDocId;
@@ -92,14 +89,13 @@ bool OutputOfHeader::make(C5Database &db, const QString &id)
                     ingoods.append(g);
                 }
             }
-
             if (goodsComplect.isEmpty()) {
                 goodsComplect = "0";
             }
             db[":f_document"] = storeDocId;
             db.exec("select ad.f_goods, ad.f_qty, ad.f_price, ad.f_price*ad.f_qty as f_total "
-                      "from a_store_draft ad "
-                      "where f_document=:f_document and ad.f_goods not in (" + goodsComplect + ") ");
+                    "from a_store_draft ad "
+                    "where f_document=:f_document and ad.f_goods not in (" + goodsComplect + ") ");
             while (db.nextRow()) {
                 QMap<QString, QVariant> g;
                 g["f_goods"] = db.getInt("f_goods");
@@ -109,7 +105,6 @@ bool OutputOfHeader::make(C5Database &db, const QString &id)
                 total += db.getDouble("f_total");
                 ingoods.append(g);
             }
-
             for (int i = 0; i < ingoods.count(); i++) {
                 const QMap<QString, QVariant> &g = ingoods[i];
                 QString adraftid;
@@ -118,7 +113,6 @@ bool OutputOfHeader::make(C5Database &db, const QString &id)
                     return false;
                 }
             }
-
             int counter = dw.counterAType(DOC_TYPE_CASH);
             QString partnerCashDoc;
             if (!dw.writeAHeader(partnerCashDoc, QString::number(counter), DOC_STATE_DRAFT, DOC_TYPE_CASH, fOHeader.cashier,
@@ -126,7 +120,7 @@ bool OutputOfHeader::make(C5Database &db, const QString &id)
                                  comment, 0, 1)) {
                 return false;
             }
-            if (!dw.writeAHeaderCash(partnerCashDoc, partnerCash, 0, 1, partnerCashDoc, "", 0)) {
+            if (!dw.writeAHeaderCash(partnerCashDoc, partnerCash, 0, 1, partnerCashDoc, "")) {
                 return false;
             }
             QString cashUUID;
@@ -137,7 +131,6 @@ bool OutputOfHeader::make(C5Database &db, const QString &id)
                                       partnerStore, 0, 0, partnerCashDoc, 0, 0, fOHeader._id())) {
                 return false;
             }
-
             dw.writeAHeader2ShopStore(pstoredoc, partnerStore, 0);
         }
     }

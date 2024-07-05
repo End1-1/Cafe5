@@ -98,14 +98,14 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &db, QString &err)
     err = "";
     return true;
 #else
-    if (fHeader["f_state"].toString().toInt() != ORDER_STATE_CLOSE) {
+    if (fHeader["f_state"].toInt() != ORDER_STATE_CLOSE) {
         err = tr("Order state is not closed");
         return false;
     }
     int settings = 0;
     int item = 0;
     QString itemName;
-    db[":f_id"] = fHeader["f_table"].toString().toInt();
+    db[":f_id"] = fHeader["f_table"].toInt();
     db.exec("select f_special_config from h_tables where f_id=:f_id");
     if (db.nextRow()) {
         if (db.getInt(0) > 0) {
@@ -113,7 +113,7 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &db, QString &err)
         }
     }
     if (settings == 0) {
-        db[":f_id"] = fHeader["f_hall"].toString().toInt();
+        db[":f_id"] = fHeader["f_hall"].toInt();
         db.exec("select f_settings from h_halls where f_id=:f_id");
         if (db.nextRow()) {
             settings = db.getInt(0);
@@ -189,7 +189,7 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &db, QString &err)
     } else if (hInt("f_otherid") == PAYOTHER_PRIMECOST) {
         paymentMode = 14;
     }
-    if (fHeader["f_otherid"].toString().toInt() == PAYOTHER_CL) {
+    if (fHeader["f_otherid"].toInt() == PAYOTHER_CL) {
         clcode = fHeader["f_other_clcode"].toString();
         clname = fHeader["f_other_clname"].toString();
         paymentMode = 4;
@@ -213,7 +213,7 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &db, QString &err)
     if (fHeader["f_amountbank"].toDouble() > 0.001) {
         paymentMode = 3;
     }
-    QString result = fHeader["f_prefix"].toString() + fHeader["f_hallid"].toString();
+    QString result = QString("%1%2").arg(fHeader["f_prefix"].toString(), QString::number(fHeader["f_hallid"].toInt()));
     //Remove old
     db[":f_header"] = result;
     db.exec(QString("delete from %1.o_dish where f_header=:f_header").arg(__c5config.hotelDatabase()));
@@ -239,20 +239,20 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &db, QString &err)
     db[":f_id"] = result;
     db[":f_source"] = "PS";
     db[":f_res"] = no_hotel_invoice ? "" : res;
-    db[":f_wdate"] = QDate::fromString(hString("f_datecash"), ("dd/MM/yyyy"));
+    db[":f_wdate"] = QDate::fromString(hString("f_datecash"), ("yyyy-MM-dd"));
     db[":f_rdate"] = QDate::currentDate();
     db[":f_time"] = QTime::currentTime();
     db[":f_user"] = staffid;
     db[":f_room"] = hInt("f_otherid") == PAYOTHER_TRANSFER_TO_ROOM ? room : clcode;
     db[":f_guest"] = hInt("f_otherid") == PAYOTHER_TRANSFER_TO_ROOM ? guest : clname + ", " + hString("f_prefix") +
-                     hString("f_hallid");
+                     hInt("f_hallid");
     db[":f_itemCode"] = item;
-    db[":f_finalName"] = itemName + " " + hString("f_prefix") + hString("f_hallid");
+    db[":f_finalName"] = itemName + " " + result;
     db[":f_amountAmd"] = hDouble("f_amounttotal");
     db[":f_usedPrepaid"] = 0;
     db[":f_amountVat"] = hDouble("f_amounttotal") - (hDouble("f_amounttotal") / 1.2);
     db[":f_amountUsd"] = 0;
-    db[":f_fiscal"] = fTax["f_receiptnumber"].toString().toInt();
+    db[":f_fiscal"] = fTax["f_receiptnumber"].toInt();
     db[":f_fiscaldate"] = QDate::fromString(fTax["f_time"].toString(), "dd.MM.yyyy HH:mm:ss");
     db[":f_fiscaltime"] = QTime::fromString(fTax["f_time"].toString(), "dd.MM.yyyy HH:mm:ss");
     db[":f_paymentMode"] = paymentMode;
@@ -281,10 +281,10 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &db, QString &err)
     db[":f_hall"] = hallid;
     db[":f_table"] = 1;
     db[":f_staff"] = staffid;
-    db[":f_dateopen"] = QDateTime::fromString(hString("f_dateopen") + " " + hString("f_timeopen"), "dd/MM/yyyy HH:mm:ss");
+    db[":f_dateopen"] = QDateTime::fromString(hString("f_dateopen") + " " + hString("f_timeopen"), "yyyy-MM-dd HH:mm:ss");
     db[":f_dateclose"] = QDateTime::fromString(hString("f_dateclose") + " " + hString("f_timeclose"),
-                         "dd/MM/yyyy HH:mm:ss");
-    db[":f_datecash"] = QDate::fromString(hString("f_datecash"), ("dd/MM/yyyy"));
+                         "yyyy-MM-dd HH:mm:ss");
+    db[":f_datecash"] = QDate::fromString(hString("f_datecash"), ("yyyy-MM-dd"));
     db[":f_comment"] = "";
     db[":f_paymentModeComment"] = paymentModeComment;
     db[":f_paymentMode"] = paymentMode;
@@ -292,7 +292,7 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &db, QString &err)
     db[":f_reservation"] = no_hotel_invoice ? "" : res;
     db[":f_complex"] = 0;
     db[":f_print"] = hInt("f_print");
-    db[":f_tax"] = fTax["f_receiptnumber"].toString().toInt();
+    db[":f_tax"] = fTax["f_receiptnumber"].toInt();
     db[":f_roomComment"] = "";
     db[":f_total"] = hDouble("f_total");
     if (!db.insert(QString("%1.o_header").arg(__c5config.hotelDatabase()), false)) {
@@ -301,7 +301,7 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &db, QString &err)
     }
     for (int i = 0; i < fItems.count(); i++) {
         QJsonObject o = fItems.at(i).toObject();
-        if (o["f_state"].toString().toInt() != DISH_STATE_OK) {
+        if (o["f_state"].toInt() != DISH_STATE_OK) {
             continue;
         }
         double price = o["f_price"].toDouble();
@@ -314,7 +314,7 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &db, QString &err)
         db[":f_id"] = getHotelID("DR", err);
         db[":f_state"] = 1;
         db[":f_header"] = result;
-        db[":f_dish"] = o["f_dish"].toString().toInt();
+        db[":f_dish"] = o["f_dish"].toInt();
         db[":f_qty"] = o["f_qty1"].toDouble();
         db[":f_qtyprint"] = o["f_qty2"].toDouble();
         db[":f_price"] = price;
@@ -326,7 +326,7 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &db, QString &err)
         db[":f_totalusd"] = 0;
         db[":f_print1"] = "";
         db[":f_print2"] = "";
-        db[":f_store"] = o["f_store"].toString().toInt();
+        db[":f_store"] = o["f_store"].toInt();
         db[":f_comment"] = "";
         db[":f_staff"] = 1;
         db[":f_complex"] = 0;
@@ -345,11 +345,11 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &db, QString &err)
     db[":f_time"] = QTime::currentTime();
     db[":f_user"] = 1;
     db[":f_type"] = 23;
-    db[":f_rec"] = hString("f_prefix") + hString("f_hallid");
+    db[":f_rec"] = QString("%1%2").arg(hString("f_prefix"), QString::number(hInt("f_hallid")));
     db[":f_invoice"] = inv;
     db[":f_reservation"] = res;
     db[":f_action"] = "IMPORT FROM WAITER";
-    db[":f_value1"] = hString("f_prefix") + hString("f_hallid");
+    db[":f_value1"] = QString("%1%2").arg(hString("f_prefix"), QString::number(hInt("f_hallid")));
     db[":f_value2"] = hString("f_amounttotal");
     db.insert("airlog.log", false);
     db.commit();
@@ -573,7 +573,7 @@ void C5WaiterOrderDoc::removeDocument(C5Database &db, const QString &id)
 
 int C5WaiterOrderDoc::hInt(const QString &name)
 {
-    return fHeader[name].toString().toInt();
+    return fHeader[name].toInt();
 }
 
 double C5WaiterOrderDoc::hDouble(const QString &name)
@@ -603,7 +603,7 @@ void C5WaiterOrderDoc::hSetDouble(const QString &name, double value)
 
 int C5WaiterOrderDoc::iInt(const QString &name, int index)
 {
-    return fItems[index].toObject()[name].toString().toInt();
+    return fItems[index].toObject()[name].toInt();
 }
 
 double C5WaiterOrderDoc::iDouble(const QString &name, int index)
@@ -646,20 +646,9 @@ void C5WaiterOrderDoc::open(C5Database &db)
         where o.f_id=:f_id \
         order by o.f_id ");
     if (db.nextRow()) {
-        for (int i = 0, count = db.columnCount(); i < count; i++) {
-            QVariant v = db.getValue(i);
-            switch (v.type()) {
-                case QVariant::Date:
-                    fHeader[db.columnName(i)] = db.getDate(i).toString(FORMAT_DATE_TO_STR);
-                    break;
-                case QVariant::DateTime:
-                    fHeader[db.columnName(i)] = db.getDateTime(i).toString(FORMAT_DATETIME_TO_STR);
-                    break;
-                default:
-                    fHeader[db.columnName(i)] = db.getString(i);
-                    break;
-            }
-        }
+        QMap<QString, QVariant> h;
+        db.rowToMap(h);
+        fHeader = QJsonObject::fromVariantMap(h);
     }
     getTaxInfo(db);
     db[":f_header"] = fHeader["f_id"].toString();
@@ -675,11 +664,9 @@ void C5WaiterOrderDoc::open(C5Database &db)
              left join c_storages s on s.f_id=ob.f_store \
              where ob.f_header=:f_header");
     while (db.nextRow()) {
-        QJsonObject o;
-        for (int i = 0; i < db.columnCount(); i++) {
-            o[db.columnName(i)] = db.getString(i);
-        }
-        fItems.append(o);
+        QMap<QString, QVariant> h;
+        db.rowToMap(h);
+        fItems.append(QJsonObject::fromVariantMap(h));
     }
     // Discount
     db[":f_id"] = fHeader["f_id"].toString();
@@ -805,15 +792,15 @@ void C5WaiterOrderDoc::calculateSelfCost(C5Database &db)
     double total = 0;
     for (int i = 0; i < fItems.count(); i++) {
         QJsonObject o = fItems.at(i).toObject();
-        if (o["f_state"].toString().toInt() != DISH_STATE_OK) {
+        if (o["f_state"].toInt() != DISH_STATE_OK) {
             continue;
         }
-        if (!goodsQty.contains(o["f_dish"].toString().toInt())) {
+        if (!goodsQty.contains(o["f_dish"].toInt())) {
             total += o["f_total"].toDouble();
             continue;
         }
         double selfcost = 0;
-        QMap<int, double> recipe = goodsQty[o["f_dish"].toString().toInt()];
+        QMap<int, double> recipe = goodsQty[o["f_dish"].toInt()];
         for (QMap<int, double>::const_iterator it = recipe.constBegin(); it != recipe.constEnd(); it++) {
             selfcost += price[it.key()] * it.value();
         }
